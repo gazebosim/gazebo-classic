@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 #include <iostream>
 
 #include "gazebo/common/Console.hh"
+
+#include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/model/PartVisualConfig.hh"
 
 using namespace gazebo;
@@ -33,6 +35,7 @@ PartVisualConfig::PartVisualConfig()
   this->visualsTreeWidget->setColumnCount(1);
   this->visualsTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->visualsTreeWidget->header()->hide();
+  this->visualsTreeWidget->setIndentation(5);
 
   this->visualsTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
   connect(this->visualsTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
@@ -58,51 +61,59 @@ PartVisualConfig::~PartVisualConfig()
 }
 
 /////////////////////////////////////////////////
-void PartVisualConfig::AddVisual()
+void PartVisualConfig::OnAddVisual()
 {
-  this->OnAddVisual();
+  std::stringstream visualIndex;
+  visualIndex << "visual_" << this->counter;
+  this->AddVisual(visualIndex.str());
+  emit VisualAdded(visualIndex.str());
 }
 
 /////////////////////////////////////////////////
 unsigned int PartVisualConfig::GetVisualCount() const
 {
-  return this->dataWidgets.size();
+//  return this->dataWidgets.size();
+  return this->configs.size();
 }
 
 /////////////////////////////////////////////////
 void PartVisualConfig::Reset()
 {
-  this->visualItems.clear();
-  this->dataWidgets.clear();
+//  this->visualItems.clear();
+  // this->dataWidgets.clear();
+//  this->configWidgets.clear();
+  std::map<int, VisualConfigData *>::iterator it;
+  for (it = this->configs.begin(); it != this->configs.end(); ++it)
+    delete it->second;
+
+  this->configs.clear();
   this->visualsTreeWidget->clear();
 }
 
 /////////////////////////////////////////////////
-void PartVisualConfig::OnAddVisual()
+void PartVisualConfig::AddVisual(const std::string &_name,
+    const msgs::Visual *_visualMsg)
 {
   // Create a top-level tree item for the path
-  std::stringstream visualIndex;
-  visualIndex << "Visual " << counter;
-
   QTreeWidgetItem *visualItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
   this->visualsTreeWidget->addTopLevelItem(visualItem);
 
-  this->visualItems[counter] = visualItem;
+//  this->visualItems[counter] = visualItem;
 
   QWidget *visualItemWidget = new QWidget;
   QHBoxLayout *visualItemLayout = new QHBoxLayout;
-  QLabel *visualLabel = new QLabel(QString(visualIndex.str().c_str()));
+  QLabel *visualLabel = new QLabel(QString(_name.c_str()));
 
   QPushButton *removeVisualButton = new QPushButton(tr("Remove"));
   connect(removeVisualButton, SIGNAL(clicked()), this->signalMapper,
       SLOT(map()));
-  this->signalMapper->setMapping(removeVisualButton, counter);
+  this->signalMapper->setMapping(removeVisualButton, this->counter);
 
-  VisualDataWidget *dataWidget = new VisualDataWidget;
+/*  VisualDataWidget *dataWidget = new VisualDataWidget;
   dataWidget->id = counter;
   this->dataWidgets.push_back(dataWidget);
-  counter++;
+  counter++;*/
 
   visualItemLayout->addWidget(visualLabel);
   visualItemLayout->addWidget(removeVisualButton);
@@ -115,7 +126,37 @@ void PartVisualConfig::OnAddVisual()
   QWidget *visualWidget = new QWidget;
   QVBoxLayout *visualLayout = new QVBoxLayout;
 
-  QLabel *nameLabel = new QLabel(tr("Name:"));
+  ConfigWidget *configWidget = new ConfigWidget;
+
+  if (_visualMsg)
+    configWidget->Load(_visualMsg);
+  else
+  {
+    msgs::Visual visualMsg;
+    configWidget->Load(&visualMsg);
+  }
+  configWidget->SetWidgetVisible("id", false);
+  configWidget->SetWidgetVisible("name", false);
+  configWidget->SetWidgetVisible("parent_name", false);
+  configWidget->SetWidgetVisible("parent_id", false);
+  configWidget->SetWidgetVisible("delete_me", false);
+  configWidget->SetWidgetVisible("is_static", false);
+  configWidget->SetWidgetVisible("visible", false);
+  configWidget->SetWidgetVisible("scale", false);
+  configWidget->SetWidgetVisible("plugin", false);
+
+  VisualConfigData *configData = new VisualConfigData;
+  configData->configWidget = configWidget;
+  configData->id =  this->counter;
+  configData->treeItem = visualItem;
+  configData->name = _name;
+  this->configs[this->counter] = configData;
+  QScrollArea *scrollArea = new QScrollArea;
+  scrollArea->setWidget(configWidget);
+  visualLayout->addWidget(scrollArea);
+  this->counter++;
+
+/*  QLabel *nameLabel = new QLabel(tr("Name:"));
   dataWidget->visualNameLabel = new QLabel(tr(""));
 
   QLabel *geometryLabel = new QLabel(tr("Geometry:"));
@@ -284,14 +325,13 @@ void PartVisualConfig::OnAddVisual()
 
   visualLayout->addLayout(visualGeneralLayout);
   visualLayout->addWidget(poseGroupBox);
-  visualLayout->addLayout(visualPropertyLayout);
+  visualLayout->addLayout(visualPropertyLayout);*/
   visualWidget->setLayout(visualLayout);
+  visualWidget->setContentsMargins(0, 0, 0, 0);
 
   this->visualsTreeWidget->setItemWidget(visualChildItem, 0, visualWidget);
-  visualItem->setExpanded(true);
-  visualChildItem->setExpanded(true);
-
-  emit VisualAdded();
+  visualItem->setExpanded(false);
+  visualChildItem->setExpanded(false);
 }
 
 /////////////////////////////////////////////////
@@ -305,31 +345,60 @@ void PartVisualConfig::OnItemSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 void PartVisualConfig::OnRemoveVisual(int _id)
 {
-  std::map<int, QTreeWidgetItem*>::iterator it = this->visualItems.find(_id);
+  /*std::map<int, QTreeWidgetItem*>::iterator it = this->visualItems.find(_id);
   if (it == this->visualItems.end())
   {
     gzerr << "No visual item found" << std::endl;
     return;
   }
-  QTreeWidgetItem *item = it->second;
-  int index = this->visualsTreeWidget->indexOfTopLevelItem(item);
+  QTreeWidgetItem *item = it->second;*/
+
+  std::map<int, VisualConfigData *>::iterator it = this->configs.find(_id);
+  if (it == this->configs.end())
+  {
+    gzerr << "Visual not found " << std::endl;
+    return;
+  }
+
+  VisualConfigData *configData = this->configs[_id];
+
+  int index = this->visualsTreeWidget->indexOfTopLevelItem(
+      configData->treeItem);
   this->visualsTreeWidget->takeTopLevelItem(index);
 
-  this->visualItems.erase(it);
+//  this->visualItems.erase(it);
+  emit VisualRemoved(this->configs[_id]->name);
+  this->configs.erase(it);
 
-  for (unsigned int i = 0; i < this->dataWidgets.size(); ++i)
+/*  for (unsigned int i = 0; i < this->configs.size(); ++i)
   {
-    if (this->dataWidgets[i]->id == _id)
+    if (this->configWidgets[i]->property("id").toInt() == _id)
     {
       emit VisualRemoved(
-          this->dataWidgets[i]->visualNameLabel->text().toStdString());
-      this->dataWidgets.erase(this->dataWidgets.begin() + i);
+          this->configWidgets[i]->visualNameLabel->text().toStdString());
+      this->configWidgets.erase(this->configWidgets.begin() + i);
       break;
     }
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
+msgs::Visual *PartVisualConfig::GetData(const std::string &_name) const
+{
+
+  std::map<int, VisualConfigData *>::const_iterator it;
+  for (it = this->configs.begin(); it != this->configs.end(); ++it)
+  {
+    std::string name = it->second->name;
+    if (name == _name)
+      return dynamic_cast<msgs::Visual *>(it->second->configWidget->GetMsg());
+  }
+  return NULL;
+}
+
+
+
+/*/////////////////////////////////////////////////
 void PartVisualConfig::SetPose(unsigned int _index, const math::Pose &_pose)
 {
   if (_index >= this->dataWidgets.size())
@@ -636,4 +705,4 @@ void VisualDataWidget::GeometryChanged(const QString _text)
       this->geomLengthLabel->hide();
     }
   }
-}
+}*/

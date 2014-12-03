@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/model/PartGeneralConfig.hh"
 
 using namespace gazebo;
@@ -26,7 +28,21 @@ PartGeneralConfig::PartGeneralConfig()
   this->setObjectName("PartGeneralConfig");
   QVBoxLayout *generalLayout = new QVBoxLayout;
 
-  QLabel *gravityLabel = new QLabel(tr("Gravity:"));
+  this->configWidget = new ConfigWidget;
+  msgs::Link linkMsg;
+  configWidget->Load(&linkMsg);
+  generalLayout->addWidget(this->configWidget);
+
+  // set default properties
+  this->configWidget->SetBoolWidgetValue("gravity", true);
+  this->configWidget->SetBoolWidgetValue("self_collide", false);
+  this->configWidget->SetBoolWidgetValue("kinematic", false);
+  this->configWidget->SetWidgetVisible("id", false);
+  this->configWidget->SetWidgetVisible("name", false);
+  this->configWidget->SetWidgetVisible("canonical", false);
+  this->configWidget->SetWidgetVisible("enabled", false);
+
+  /*QLabel *gravityLabel = new QLabel(tr("Gravity:"));
   this->gravityCheck = new QCheckBox;
   this->gravityCheck->setText(tr("True"));
   this->gravityCheck->setChecked(true);
@@ -263,7 +279,7 @@ PartGeneralConfig::PartGeneralConfig()
 
   generalLayout->addLayout(partLayout);
   generalLayout->addWidget(poseGroupBox);
-  generalLayout->addWidget(inertialGroupBox);
+  generalLayout->addWidget(inertialGroupBox);*/
 
   this->setLayout(generalLayout);
 }
@@ -274,159 +290,13 @@ PartGeneralConfig::~PartGeneralConfig()
 }
 
 /////////////////////////////////////////////////
-void PartGeneralConfig::SetGravity(bool _enabled)
-{
-  this->gravityCheck->setChecked(_enabled);
-}
-
-/////////////////////////////////////////////////
-bool PartGeneralConfig::GetGravity() const
-{
-  return this->gravityCheck->isChecked();
-}
-
-/////////////////////////////////////////////////
-void PartGeneralConfig::SetSelfCollide(bool _enabled)
-{
-  this->selfCollideCheck->setChecked(_enabled);
-}
-
-/////////////////////////////////////////////////
-bool PartGeneralConfig::GetSelfCollide() const
-{
-  return this->selfCollideCheck->isChecked();
-}
-
-/////////////////////////////////////////////////
-void PartGeneralConfig::SetKinematic(bool _enabled)
-{
-  this->kinematicCheck->setChecked(_enabled);
-}
-
-/////////////////////////////////////////////////
-bool PartGeneralConfig::GetKinematic() const
-{
-  return this->kinematicCheck->isChecked();
-}
-
-/////////////////////////////////////////////////
 void PartGeneralConfig::SetPose(const math::Pose &_pose)
 {
-  this->posXSpinBox->setValue(_pose.pos.x);
-  this->posYSpinBox->setValue(_pose.pos.y);
-  this->posZSpinBox->setValue(_pose.pos.z);
-
-  this->rotRSpinBox->setValue(_pose.rot.GetAsEuler().x);
-  this->rotPSpinBox->setValue(_pose.rot.GetAsEuler().y);
-  this->rotYSpinBox->setValue(_pose.rot.GetAsEuler().z);
+  this->configWidget->SetPoseWidgetValue("pose", _pose);
 }
 
 /////////////////////////////////////////////////
-math::Pose PartGeneralConfig::GetPose() const
+msgs::Link *PartGeneralConfig::GetData() const
 {
-  return math::Pose(this->posXSpinBox->value(), this->posYSpinBox->value(),
-      this->posZSpinBox->value(), this->rotRSpinBox->value(),
-      this->rotPSpinBox->value(), this->rotYSpinBox->value());
-}
-
-/////////////////////////////////////////////////
-void PartGeneralConfig::SetMass(double _mass)
-{
-  this->massSpinBox->setValue(_mass);
-}
-
-/////////////////////////////////////////////////
-double PartGeneralConfig::GetMass() const
-{
-  return this->massSpinBox->value();
-}
-
-/////////////////////////////////////////////////
-void PartGeneralConfig::SetInertialPose(const math::Pose &_inertialPose)
-{
-  this->inertialPosXSpinBox->setValue(_inertialPose.pos.x);
-  this->inertialPosYSpinBox->setValue(_inertialPose.pos.y);
-  this->inertialPosZSpinBox->setValue(_inertialPose.pos.z);
-
-  this->inertialRotRSpinBox->setValue(_inertialPose.rot.GetAsEuler().x);
-  this->inertialRotPSpinBox->setValue(_inertialPose.rot.GetAsEuler().y);
-  this->inertialRotYSpinBox->setValue(_inertialPose.rot.GetAsEuler().z);
-}
-
-/////////////////////////////////////////////////
-math::Pose PartGeneralConfig::GetInertialPose() const
-{
-  return math::Pose(this->inertialPosXSpinBox->value(),
-      this->inertialPosYSpinBox->value(), this->inertialPosZSpinBox->value(),
-      this->inertialRotRSpinBox->value(), this->inertialRotPSpinBox->value(),
-      this->inertialRotYSpinBox->value());
-}
-
-/////////////////////////////////////////////////
-void PartGeneralConfig::SetInertia(double _ixx, double _iyy, double _izz,
-    double _ixy, double _ixz, double _iyz)
-{
-  this->inertiaIXXSpinBox->setValue(_ixx);
-  this->inertiaIYYSpinBox->setValue(_iyy);
-  this->inertiaIZZSpinBox->setValue(_izz);
-  this->inertiaIXYSpinBox->setValue(_ixy);
-  this->inertiaIXZSpinBox->setValue(_ixz);
-  this->inertiaIYZSpinBox->setValue(_iyz);
-}
-
-/////////////////////////////////////////////////
-double PartGeneralConfig::GetInertiaIXX() const
-{
-  return this->inertiaIXXSpinBox->value();
-}
-
-/////////////////////////////////////////////////
-double PartGeneralConfig::GetInertiaIYY() const
-{
-  return this->inertiaIYYSpinBox->value();
-}
-
-/////////////////////////////////////////////////
-double PartGeneralConfig::GetInertiaIZZ() const
-{
-  return this->inertiaIZZSpinBox->value();
-}
-
-/////////////////////////////////////////////////
-double PartGeneralConfig::GetInertiaIXY() const
-{
-  return this->inertiaIXYSpinBox->value();
-}
-
-/////////////////////////////////////////////////
-double PartGeneralConfig::GetInertiaIXZ() const
-{
-  return this->inertiaIXZSpinBox->value();
-}
-
-/////////////////////////////////////////////////
-double PartGeneralConfig::GetInertiaIYZ() const
-{
-  return this->inertiaIYZSpinBox->value();
-}
-
-/////////////////////////////////////////////////
-void PartGeneralConfig::OnGravity()
-{
-  std::string text = this->gravityCheck->isChecked() ? "True" : "False";
-  this->gravityCheck->setText(tr(text.c_str()));
-}
-
-/////////////////////////////////////////////////
-void PartGeneralConfig::OnSelfCollide()
-{
-  std::string text = this->selfCollideCheck->isChecked() ? "True" : "False";
-  this->selfCollideCheck->setText(tr(text.c_str()));
-}
-
-/////////////////////////////////////////////////
-void PartGeneralConfig::OnKinematic()
-{
-  std::string text = this->kinematicCheck->isChecked() ? "True" : "False";
-  this->kinematicCheck->setText(tr(text.c_str()));
+  return dynamic_cast<msgs::Link *>(this->configWidget->GetMsg());
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,13 +51,13 @@ PartInspector::PartInspector(QWidget *_parent) : QDialog(_parent)
   this->tabWidget->setObjectName("partInspectorTab");
   this->tabWidget->addTab(this->generalConfig, "General");
   this->tabWidget->addTab(this->visualConfig, "Visual");
-  this->tabWidget->addTab(this->collisionConfig, "Collision");
+//  this->tabWidget->addTab(this->collisionConfig, "Collision");
 
-  ConfigWidget *configWidget = new ConfigWidget;
+/*  ConfigWidget *configWidget = new ConfigWidget;
   msgs::Link msg;
   configWidget->Load(&msg);
   this->tabWidget->addTab(configWidget, "test");
-  msgs::Visual *retMsg = dynamic_cast<msgs::Visual *>(configWidget->GetMsg());
+  msgs::Visual *retMsg = dynamic_cast<msgs::Visual *>(configWidget->GetMsg());*/
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));

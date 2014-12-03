@@ -15,6 +15,7 @@
  *
  */
 
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Inertial.hh"
@@ -29,42 +30,7 @@
 
 using namespace gazebo;
 using namespace gui;
-/*
-/////////////////////////////////////////////////
-VisualData::VisualData()
-{
-  this->visualSDF.reset(new sdf::Element);
-  sdf::initFile("visual.sdf", this->visualSDF);
 
-
-
-}
-
-/////////////////////////////////////////////////
-void VisualData::SetName(const std::string &_name)
-{
-  this->visualSDF->GetElement("name")->Set(_name);
-}
-
-
-/////////////////////////////////////////////////
-void VisualData::GetName(const std::string &_name)
-{
-  this->visualSDF->Get<std::string>("name")
-}
-
-/////////////////////////////////////////////////
-void VisualData::SetMaterial(const std::string &_material)
-{
-  this->visualSDF->Get<std::string>("material")
-}
-
-/////////////////////////////////////////////////
-void VisualData::SetMaterial(const std::string &_material)
-{
-  this->visualSDF->GetElement("material")-><std::string>("material")
-}
-*/
 
 /////////////////////////////////////////////////
 CollisionData::CollisionData()
@@ -73,169 +39,33 @@ CollisionData::CollisionData()
   sdf::initFile("collision.sdf", this->collisionSDF);
 }
 
-/////////////////////////////////////////////////
-void CollisionData::SetName(const std::string &_name)
-{
-  this->collisionSDF->GetElement("name")->Set(_name);
-}
-
-/////////////////////////////////////////////////
-std::string CollisionData::GetName() const
-{
- return  this->collisionSDF->Get<std::string>("name");
-}
-
-/////////////////////////////////////////////////
-math::Pose CollisionData::GetPose() const
-{
-  return this->collisionSDF->Get<math::Pose>("pose");
-}
-
-/////////////////////////////////////////////////
-void CollisionData::SetPose(const math::Pose &_pose)
-{
-  this->collisionSDF->GetElement("pose")->Set(_pose);
-}
-
-/////////////////////////////////////////////////
-double CollisionData::GetLaserRetro() const
-{
-  return this->collisionSDF->Get<double>("laser_retro");
-}
-
-/////////////////////////////////////////////////
-void CollisionData::SetLaserRetro(double _retro)
-{
-  this->collisionSDF->GetElement("laser_retro")->Set(_retro);
-}
-
-/////////////////////////////////////////////////
-int CollisionData::GetMaxContacts() const
-{
-  return this->collisionSDF->Get<int>("max_contacts");
-}
-
-/////////////////////////////////////////////////
-void CollisionData::SetMaxContacts(int _maxContacts)
-{
-  this->collisionSDF->GetElement("max_contacts")->Set(_maxContacts);
-}
-
-/////////////////////////////////////////////////
-double CollisionData::GetSurfaceRestitutionCoeff() const
-{
-  return this->collisionSDF->GetElement("surface")
-      ->Get<double>("restitution_coefficient");
-}
-
-/////////////////////////////////////////////////
-void CollisionData::SetSurfaceRestitutionCoeff(double _coeff)
-{
-  this->collisionSDF->GetElement("surface")->
-      GetElement("restitution_coefficient")->Set(_coeff);
-}
 
 /////////////////////////////////////////////////
 PartData::PartData()
 {
   this->partSDF.reset(new sdf::Element);
   sdf::initFile("link.sdf", this->partSDF);
+
+  this->inspector = new PartInspector;
+  this->inspector->setModal(false);
+  connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
+  connect(this->inspector->GetVisualConfig(),
+      SIGNAL(VisualAdded(const std::string &)),
+      this, SLOT(OnAddVisual(const std::string &)));
+  connect(this->inspector->GetVisualConfig(),
+      SIGNAL(VisualRemoved(const std::string &)), this,
+      SLOT(OnRemoveVisual(const std::string &)));
+
+  this->connections.push_back(
+      event::Events::ConnectPreRender(
+        boost::bind(&PartData::Update, this)));
+  this->updateMutex = new boost::recursive_mutex();
 }
 
 /////////////////////////////////////////////////
-void PartData::OnApply()
+PartData::~PartData()
 {
-  PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
-
-  this->partSDF->GetElement("pose")->Set(generalConfig->GetPose());
-  this->partSDF->GetElement("gravity")->Set(generalConfig->GetGravity());
-  this->partSDF->GetElement("self_collide")->Set(
-      generalConfig->GetSelfCollide());
-  this->partSDF->GetElement("kinematic")->Set(generalConfig->GetKinematic());
-
-  sdf::ElementPtr inertialElem = this->partSDF->GetElement("inertial");
-  inertialElem->GetElement("mass")->Set(generalConfig->GetMass());
-  inertialElem->GetElement("pose")->Set(generalConfig->GetInertialPose());
-
-  sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
-  inertiaElem->GetElement("ixx")->Set(generalConfig->GetInertiaIXX());
-  inertiaElem->GetElement("iyy")->Set(generalConfig->GetInertiaIYY());
-  inertiaElem->GetElement("izz")->Set(generalConfig->GetInertiaIZZ());
-  inertiaElem->GetElement("ixy")->Set(generalConfig->GetInertiaIXY());
-  inertiaElem->GetElement("ixz")->Set(generalConfig->GetInertiaIXZ());
-  inertiaElem->GetElement("iyz")->Set(generalConfig->GetInertiaIYZ());
-
-  // set visual properties
-  if (!this->visuals.empty())
-  {
-    this->partVisual->SetWorldPose(this->GetPose());
-
-    PartVisualConfig *visual = this->inspector->GetVisualConfig();
-    for (unsigned int i = 0; i < this->visuals.size(); ++i)
-    {
-      if (this->visuals[i]->GetMeshName() != visual->GetGeometry(i))
-      {
-        this->visuals[i]->DetachObjects();
-        this->visuals[i]->AttachMesh(visual->GetGeometry(i));
-      }
-      if (this->visuals[i]->GetMaterialName() != visual->GetMaterial(i))
-      {
-        this->visuals[i]->SetMaterial(visual->GetMaterial(i), false);
-      }
-
-      this->visuals[i]->SetPose(visual->GetPose(i));
-      this->visuals[i]->SetTransparency(visual->GetTransparency(i));
-      this->visuals[i]->SetScale(visual->GetGeometryScale(i));
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-void PartData::OnAddVisual()
-{
-  // add a visual when the user adds a visual via the inspector's visual tab
-  PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
-  if (this->visuals.size() != visualConfig->GetVisualCount())
-  {
-    std::ostringstream visualName;
-    visualName << this->partVisual->GetName() << "_visual_"
-        << this->partVisual->GetChildCount();
-
-    visualConfig->SetName(visualConfig->GetVisualCount()-1, visualName.str());
-
-    // add a box for now
-    rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-        this->partVisual));
-    visVisual->Load();
-    this->partVisual->GetScene()->AddVisual(visVisual);
-    visVisual->AttachMesh("unit_box");
-    visVisual->SetMaterial("Gazebo/GreyTransparent");
-
-    /*VisualData *visualData = new VisualData();
-    visualData->SetName(visualName);
-    visualData->SetPose(math::Pose::Zero);
-    visualData->SetGeometry("box");
-    visualData->SetMaterial("Gazebo/GreyTransparent");
-    visualData->SetVisual(visVisual);
-    this->visuals[visualName] = visualData;*/
-  }
-}
-
-/////////////////////////////////////////////////
-void PartData::OnRemoveVisual(const std::string &_name)
-{
-  // find and remove visual when the user removes it in the
-  // inspector's visual tab
-  for (unsigned int i = 0; i < this->visuals.size(); ++i)
-  {
-    if (_name == this->visuals[i]->GetName())
-    {
-      this->partVisual->DetachVisual(this->visuals[i]);
-      this->partVisual->GetScene()->RemoveVisual(this->visuals[i]);
-      this->visuals.erase(this->visuals.begin()+i);
-      break;
-    }
-  }
+  event::Events::DisconnectPreRender(this->connections[0]);
 }
 
 /////////////////////////////////////////////////
@@ -248,42 +78,7 @@ std::string PartData::GetName() const
 void PartData::SetName(const std::string &_name)
 {
   this->partSDF->GetAttribute("name")->Set(_name);
-}
-
-/////////////////////////////////////////////////
-bool PartData::GetGravity() const
-{
-  return this->partSDF->Get<bool>("gravity");
-}
-
-/////////////////////////////////////////////////
-void PartData::SetGravity(bool _gravity)
-{
-  this->partSDF->GetElement("gravity")->Set(_gravity);
-}
-
-/////////////////////////////////////////////////
-bool PartData::GetSelfCollide() const
-{
-  return this->partSDF->Get<bool>("self_collide");
-}
-
-/////////////////////////////////////////////////
-void PartData::SetSelfCollide(bool _selfCollide)
-{
-  this->partSDF->GetElement("self_collide")->Set(_selfCollide);
-}
-
-/////////////////////////////////////////////////
-bool PartData::GetKinematic() const
-{
-  return this->partSDF->Get<bool>("kinematic");
-}
-
-/////////////////////////////////////////////////
-void PartData::SetKinematic(bool _kinematic)
-{
-  this->partSDF->GetElement("kinematic")->Set(_kinematic);
+  this->inspector->SetName(_name);
 }
 
 /////////////////////////////////////////////////
@@ -296,112 +91,165 @@ math::Pose PartData::GetPose() const
 void PartData::SetPose(const math::Pose &_pose)
 {
   this->partSDF->GetElement("pose")->Set(_pose);
+
+  PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
+  generalConfig->SetPose(_pose);
 }
 
 /////////////////////////////////////////////////
-double PartData::GetMass() const
+void PartData::AddVisual(rendering::VisualPtr _visual)
 {
-  return this->partSDF->GetElement("inertial")->Get<double>("mass");
+  PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
+  msgs::Visual visualMsg = msgs::VisualFromSDF(_visual->GetSDF());
+
+  // some of the default values do not transfer to the visualMsg
+  // so set them here and find a better way to fix this in the future.
+  visualMsg.set_transparency(1.0);
+  visualMsg.mutable_material()->set_lighting(true);
+
+  this->visuals[_visual] = visualMsg;
+
+/*  std::cerr << "_visual->GetSDF() "  <<
+      _visual->GetSDF()->ToString("") << std::endl;;
+
+  std::cerr << "===================================" << std::endl;
+  std::cerr << "visualMsg "  <<
+      visualMsg.DebugString() << std::endl;;*/
+
+  std::string partName = this->partVisual->GetName();
+  std::string visName = _visual->GetName();
+  std::string leafName =
+      visName.substr(visName.find(partName)+partName.size()+1);
+
+  visualConfig->AddVisual(leafName, &visualMsg);
+
 }
 
 /////////////////////////////////////////////////
-void PartData::SetMass(double _mass)
+void PartData::OnApply()
 {
-  this->partSDF->GetElement("inertial")->GetElement("mass")->Set(_mass);
+  PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
+
+  this->partSDF = msgs::LinkToSDF(*generalConfig->GetData(), this->partSDF);
+
+  // set visual properties
+  if (!this->visuals.empty())
+  {
+    this->partVisual->SetWorldPose(this->GetPose());
+
+    PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
+    std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
+    for (it = this->visuals.begin(); it != this->visuals.end(); ++it)
+    {
+      std::string name = it->first->GetName();
+      std::string partName = this->partVisual->GetName();
+      std::string leafName =
+          name.substr(name.find(partName)+partName.size()+1);
+
+      msgs::Visual *updateMsg = visualConfig->GetData(leafName);
+      if (updateMsg)
+      {
+        // std::cerr << " updateMsg " << updateMsg->DebugString() << std::endl;
+
+        msgs::Visual visualMsg = it->second;
+        visualMsg.set_transparency(updateMsg->transparency());
+        updateMsg->clear_transparency();
+
+        updateMsg->mutable_material()->clear_ambient();
+        updateMsg->mutable_material()->clear_diffuse();
+        updateMsg->mutable_material()->clear_specular();
+        updateMsg->mutable_material()->clear_emissive();
+
+//        msgs::Visual msg;
+//        msg.CopyFrom(*updateMsg);
+
+        boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+        this->updateMsgs.push_back(updateMsg);
+
+        //it->first->UpdateFromMsg(ConstVisualPtr(updateMsg));
+
+      }
+/*      if (this->visuals[i]->GetMeshName() != visual->GetGeometry(i))
+      {
+        this->visuals[i]->DetachObjects();
+        this->visuals[i]->AttachMesh(visual->GetGeometry(i));
+      }
+      if (this->visuals[i]->GetMaterialName() != visual->GetMaterial(i))
+      {
+        this->visuals[i]->SetMaterial(visual->GetMaterial(i), false);
+      }
+
+      this->visuals[i]->SetPose(visual->GetPose(i));
+      this->visuals[i]->SetTransparency(visual->GetTransparency(i));
+      this->visuals[i]->SetScale(visual->GetGeometryScale(i));*/
+    }
+  }
 }
 
 /////////////////////////////////////////////////
-math::Pose PartData::GetInertialPose() const
+void PartData::OnAddVisual(const std::string &_name)
 {
-  return this->partSDF->GetElement("inertial")->Get<math::Pose>("pose");
+  // add a visual when the user adds a visual via the inspector's visual tab
+  PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
+  if (this->visuals.size() != visualConfig->GetVisualCount())
+  {
+    std::ostringstream visualName;
+    visualName << this->partVisual->GetName() << "_" << _name;
+
+    //visualConfig->SetName(visualConfig->GetVisualCount()-1, visualName.str());
+
+    // add a box for now
+    rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+        this->partVisual));
+    visVisual->Load();
+    this->partVisual->GetScene()->AddVisual(visVisual);
+    visVisual->AttachMesh("unit_box");
+    visVisual->SetMaterial("Gazebo/Grey");
+    visVisual->SetTransparency(0.5);
+  }
 }
 
 /////////////////////////////////////////////////
-void PartData::SetInertialPose(const math::Pose &_pose)
+void PartData::OnRemoveVisual(const std::string &_name)
 {
-  this->partSDF->GetElement("inertial")->GetElement("pose")->Set(_pose);
+  // find and remove visual when the user removes it in the
+  // inspector's visual tab
+  std::ostringstream name;
+  name << this->partVisual->GetName() << "_" << _name;
+  std::string visualName = name.str();
+
+  std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
+  for (it = this->visuals.begin(); it != this->visuals.end(); ++it)
+  {
+    if (visualName == it->first->GetName())
+    {
+      this->partVisual->DetachVisual(it->first);
+      this->partVisual->GetScene()->RemoveVisual(it->first);
+      this->visuals.erase(it);
+      break;
+    }
+  }
 }
 
 /////////////////////////////////////////////////
-double PartData::GetInertiaIXX() const
+void PartData::Update()
 {
-  return this->partSDF->GetElement("inertial")->GetElement("inertia")
-      ->Get<double>("ixx");
-}
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-/////////////////////////////////////////////////
-void PartData::SetInertiaIXX(double _ixx)
-{
-  this->partSDF->GetElement("inertial")->GetElement("inertia")
-      ->GetElement("ixx")->Set(_ixx);
-}
+  while (!this->updateMsgs.empty())
+  {
+    boost::shared_ptr<gazebo::msgs::Visual> updateMsgPtr;
+    updateMsgPtr.reset(new msgs::Visual);
+    updateMsgPtr->CopyFrom(*this->updateMsgs.front());
 
-/////////////////////////////////////////////////
-double PartData::GetInertiaIYY() const
-{
-  return this->partSDF->GetElement("inertial")->GetElement("inertia")
-      ->Get<double>("iyy");
-}
-
-/////////////////////////////////////////////////
-void PartData::SetInertiaIYY(double _iyy)
-{
-  this->partSDF->GetElement("inertial")->GetElement("inertia")
-      ->GetElement("iyy")->Set(_iyy);
-}
-
-/////////////////////////////////////////////////
-double PartData::GetInertiaIZZ() const
-{
-  return this->partSDF->GetElement("inertial")->GetElement("inertia")
-      ->Get<double>("izz");
-}
-
-/////////////////////////////////////////////////
-void PartData::SetInertiaIZZ(double _izz)
-{
-  this->partSDF->GetElement("inertial")->GetElement("inertia")
-      ->GetElement("izz")->Set(_izz);
-}
-
-/////////////////////////////////////////////////
-double PartData::GetInertiaIXY() const
-{
-  return this->partSDF->GetElement("inertial")->GetElement("inertia")
-      ->Get<double>("ixy");
-}
-
-/////////////////////////////////////////////////
-void PartData::SetInertiaIXY(double _ixy)
-{
-  this->partSDF->GetElement("inertial")->GetElement("inertia")
-      ->GetElement("ixy")->Set(_ixy);
-}
-
-/////////////////////////////////////////////////
-double PartData::GetInertiaIXZ() const
-{
-  return this->partSDF->GetElement("inertial")->GetElement("inertia")
-      ->Get<double>("ixz");
-}
-
-/////////////////////////////////////////////////
-void PartData::SetInertiaIXZ(double _ixz)
-{
-  this->partSDF->GetElement("inertial")->GetElement("inertia")
-      ->GetElement("ixz")->Set(_ixz);
-}
-
-/////////////////////////////////////////////////
-double PartData::GetInertiaIYZ() const
-{
-  return this->partSDF->GetElement("inertial")->GetElement("inertia")
-      ->Get<double>("iyz");
-}
-
-/////////////////////////////////////////////////
-void PartData::SetInertiaIYZ(double _iyz)
-{
-  this->partSDF->GetElement("inertial")->GetElement("inertia")
-      ->GetElement("iyz")->Set(_iyz);
+    this->updateMsgs.erase(this->updateMsgs.begin());
+    std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
+    for (it = this->visuals.begin(); it != this->visuals.end(); ++it)
+    {
+      if (it->second.name() == updateMsgPtr->name())
+      {
+        it->first->UpdateFromMsg(updateMsgPtr);
+      }
+    }
+  }
 }

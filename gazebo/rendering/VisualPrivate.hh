@@ -76,6 +76,9 @@ namespace gazebo
       /// \brief Transparency value.
       public: float transparency;
 
+      /// \brief True if visual casts shadows.
+      public: bool castShadows;
+
       /// \brief True if the visual is static, which allows Ogre to improve
       /// performance.
       public: bool isStatic;

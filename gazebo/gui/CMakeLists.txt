@@ -117,7 +117,6 @@ endif ()
 #endif()
 
 set (qt_tests
-  ConfigWidget_TEST.cc
   DataLogger_TEST.cc
   GuiIface_TEST.cc
   ModelAlign_TEST.cc
@@ -129,6 +128,7 @@ if (ENABLE_SCREEN_TESTS)
   set (qt_tests
       ${qt_tests}
       BuildingEditor_TEST.cc
+      ConfigWidget_TEST.cc
       MainWindow_TEST.cc
       ModelListWidget_TEST.cc
       ModelSnap_TEST.cc)

@@ -21,6 +21,7 @@
 #include <string>
 
 #include "gazebo/math/Pose.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/gui/qt.h"
 
@@ -29,6 +30,8 @@ namespace gazebo
 
   namespace gui
   {
+    class ConfigWidget;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -44,7 +47,17 @@ namespace gazebo
       /// \brief Destructor
       public: ~PartGeneralConfig();
 
-      /// \brief Set the part to be affected by gravity.
+      /// \brief Get the msg containing all link data.
+      /// \return Link msg.
+      public: msgs::Link *GetData() const;
+
+      /// \brief Set the pose of the part.
+      /// \param[in] _pose Pose to set the part to.
+      public: void SetPose(const math::Pose &_pose);
+
+      private: ConfigWidget *configWidget;
+
+      /*/// \brief Set the part to be affected by gravity.
       /// \param[in] _enabled True to enable gravity on part.
       public: void SetGravity(bool _enabled);
 
@@ -199,7 +212,7 @@ namespace gazebo
       private: QCheckBox *selfCollideCheck;
 
       /// \brief Kinematic checkbox, true to make the part kinematic.
-      private: QCheckBox *kinematicCheck;
+      private: QCheckBox *kinematicCheck;*/
     };
   }
 }

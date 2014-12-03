@@ -328,32 +328,14 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   PartData *part = new PartData();
 
   part->partVisual = _visual->GetParent();
-  part->visuals.push_back(_visual);
+  part->AddVisual(_visual);
+  //part->visuals.push_back(_visual);
 
-  part->SetName(part->partVisual->GetName());
+  std::string partName = part->partVisual->GetName();
+  part->SetName(partName);
   part->SetPose(part->partVisual->GetWorldPose());
-  part->SetGravity(true);
-  part->SetSelfCollide(false);
-  part->SetKinematic(false);
 
-  part->inspector = new PartInspector;
-  part->inspector->SetName(part->GetName());
-  part->inspector->setModal(false);
-  connect(part->inspector, SIGNAL(Applied()),
-      part, SLOT(OnApply()));
-
-  connect(part->inspector->GetVisualConfig(), SIGNAL(VisualAdded()), part,
-      SLOT(OnAddVisual()));
-  connect(part->inspector->GetVisualConfig(),
-      SIGNAL(VisualRemoved(const std::string &)), part,
-      SLOT(OnRemoveVisual(const std::string &)));
-
-  //part->inertial.reset(new physics::Inertial);
-  //CollisionData *collisionData = new CollisionData;
-  //part->collisions.push_back(collisionData);
-  //part->sensorData = new SensorData;
-
-  this->allParts[part->GetName()] = part;
+  this->allParts[partName] = part;
   return part;
 }
 
@@ -380,9 +362,10 @@ void ModelCreator::RemovePart(const std::string &_partName)
   }
 
   rendering::ScenePtr scene = part->partVisual->GetScene();
-  for (unsigned int i = 0; i < part->visuals.size(); ++i)
+  std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
+  for (it = part->visuals.begin(); it != part->visuals.end(); ++it)
   {
-    rendering::VisualPtr vis = part->visuals[i];
+    rendering::VisualPtr vis = it->first;
     scene->RemoveVisual(vis);
   }
   scene->RemoveVisual(part->partVisual);
@@ -757,28 +740,16 @@ void ModelCreator::OnOpenInspector()
 void ModelCreator::OpenInspector(const std::string &_name)
 {
   PartData *part = this->allParts[_name];
-  PartGeneralConfig *generalConfig = part->inspector->GetGeneralConfig();
-  generalConfig->SetGravity(part->GetGravity());
-  generalConfig->SetSelfCollide(part->GetSelfCollide());
-  generalConfig->SetKinematic(part->GetKinematic());
-  generalConfig->SetPose(part->GetPose());
-  generalConfig->SetMass(part->GetMass());
-  generalConfig->SetInertialPose(part->GetInertialPose());
-  generalConfig->SetInertia(part->GetInertiaIXX(), part->GetInertiaIYY(),
-      part->GetInertiaIZZ(), part->GetInertiaIXY(),
-      part->GetInertiaIXZ(), part->GetInertiaIYZ());
+  part->SetPose(part->partVisual->GetWorldPose());
+/*  PartGeneralConfig *generalConfig = part->inspector->GetGeneralConfig();
+  generalConfig->SetPose(part->GetPose());*/
 
-  PartVisualConfig *visualConfig = part->inspector->GetVisualConfig();
+/*  PartVisualConfig *visualConfig = part->inspector->GetVisualConfig();
   for (unsigned int i = 0; i < part->visuals.size(); ++i)
   {
     if (i >= visualConfig->GetVisualCount())
       visualConfig->AddVisual();
-    visualConfig->SetName(i, part->visuals[i]->GetName());
-    visualConfig->SetPose(i, part->visuals[i]->GetPose());
-    visualConfig->SetTransparency(i, part->visuals[i]->GetTransparency());
-    visualConfig->SetMaterial(i, part->visuals[i]->GetMaterialName());
-    visualConfig->SetGeometry(i, part->visuals[i]->GetMeshName());
-    visualConfig->SetGeometryScale(i, part->visuals[i]->GetScale());
+
   }
 
   PartCollisionConfig *collisionConfig = part->inspector->GetCollisionConfig();
@@ -786,36 +757,8 @@ void ModelCreator::OpenInspector(const std::string &_name)
   {
     if (i >= collisionConfig->GetCollisionCount())
       collisionConfig->AddCollision();
-    collisionConfig->SetName(i, part->collisions[i]->GetName());
-    collisionConfig->SetPose(i, part->collisions[i]->GetPose());
-    collisionConfig->SetLaserRetro(i, part->collisions[i]->GetLaserRetro());
-    collisionConfig->SetMaxContacts(i, part->collisions[i]->GetMaxContacts());
-/*    collisionConfig->SetSurfaceRestitutionCoeff(i,
-        part->collisions[i]->GetSurfaceRestitutionCoeff());
-    collisionConfig->SetSurfaceBounceThreshold(i,
-        part->collisions[i]->GetSurfaceBounceThreshold());
-    collisionConfig->SetSurfaceBounceThreshold(i,
-        part->collisions[i]->GetSurfaceBounceThreshold());
-    collisionConfig->SetSurfaceSoftCFM(i,
-        part->collisions[i]->GetSurfaceSoftCFM());
-    collisionConfig->SetSurfaceSoftERP(i,
-        part->collisions[i]->GetSurfaceSoftERP());
-    collisionConfig->SetSurfaceKp(i,
-        part->collisions[i]->GetSurfaceKP());
-    collisionConfig->SetSurfaceKd(i,
-        part->collisions[i]->GetSurfaceKd());
-    collisionConfig->SetSurfaceMaxVel(i,
-        part->collisions[i]->GetSurfaceMaxVel());
-    collisionConfig->SetSurfaceMinDepth(i,
-        part->collisions[i]->GetSurfaceMinDepth());
-    collisionConfig->SetSurfaceCollideWithoutContact(i,
-        part->collisions[i]->GetSurfaceCollideWithoutContact());
-    collisionConfig->SetSurfaceCollideWithoutContactBitmask(i,
-        part->collisions[i]->GetSurfaceCollideWithoutContactBitmask());*/
 
-//    collisionConfig->SetGeometry(i, part->visuals[i]->GetMeshName());
-//    collisionConfig->SetGeometryScale(i, part->visuals[i]->GetScale());
-  }
+  }*/
 
   part->inspector->show();
 }
@@ -873,74 +816,16 @@ void ModelCreator::GenerateSDF()
 
     PartData *part = partsIt->second;
     sdf::ElementPtr newLinkElem = part->partSDF->Clone();
-    /*sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
-    newLinkElem->ClearElements();
-    newLinkElem->GetAttribute("name")->Set(part->GetName());
-    newLinkElem->GetElement("pose")->Set(part->GetPose() - this->origin);
-    newLinkElem->GetElement("gravity")->Set(part->GetGravity());
-    newLinkElem->GetElement("self_collide")->Set(part->GetSelfCollide());
-    newLinkElem->GetElement("kinematic")->Set(part->GetKinematic());
-    sdf::ElementPtr inertialElem = newLinkElem->GetElement("inertial");
-    inertialElem->GetElement("mass")->Set(part->GetMass());
-    inertialElem->GetElement("pose")->Set(part->GetInertialPose());
-    sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
-    inertiaElem->GetElement("ixx")->Set(part->GetInertiaIXX());
-    inertiaElem->GetElement("iyy")->Set(part->GetInertiaIYY());
-    inertiaElem->GetElement("izz")->Set(part->GetInertiaIZZ());
-    inertiaElem->GetElement("ixy")->Set(part->GetInertiaIXY());
-    inertiaElem->GetElement("ixz")->Set(part->GetInertiaIXZ());
-    inertiaElem->GetElement("iyz")->Set(part->GetInertiaIYZ());*/
+
 
     modelElem->InsertElement(newLinkElem);
 
-    for (unsigned int i = 0; i < part->visuals.size(); ++i)
+    std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
+    for (it = part->visuals.begin(); it != part->visuals.end(); ++it)
     {
-      rendering::VisualPtr visual = part->visuals[i];
-      sdf::ElementPtr visualElem = part->visuals[i]->GetSDF()->Clone();
-      /*sdf::ElementPtr visualElem = templateVisualElem->Clone();
-      sdf::ElementPtr collisionElem = templateCollisionElem->Clone();
+      rendering::VisualPtr visual = it->first;
+      sdf::ElementPtr visualElem = visual->GetSDF()->Clone();
 
-      rendering::VisualPtr visual = part->visuals[i];
-
-      visualElem->GetAttribute("name")->Set(visual->GetName());
-      collisionElem->GetAttribute("name")->Set(
-          visual->GetParent()->GetName() + "_collision");
-      visualElem->GetElement("pose")->Set(visual->GetPose());
-      collisionElem->GetElement("pose")->Set(visual->GetPose());
-
-      sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
-      geomElem->ClearElements();
-
-      math::Vector3 scale = visual->GetScale();
-      if (visual->GetParent()->GetName().find("unit_box") != std::string::npos)
-      {
-        sdf::ElementPtr boxElem = geomElem->AddElement("box");
-        (boxElem->GetElement("size"))->Set(scale);
-      }
-      else if (visual->GetParent()->GetName().find("unit_cylinder")
-         != std::string::npos)
-      {
-        sdf::ElementPtr cylinderElem = geomElem->AddElement("cylinder");
-        (cylinderElem->GetElement("radius"))->Set(scale.x/2.0);
-        (cylinderElem->GetElement("length"))->Set(scale.z);
-      }
-      else if (visual->GetParent()->GetName().find("unit_sphere")
-          != std::string::npos)
-      {
-        sdf::ElementPtr sphereElem = geomElem->AddElement("sphere");
-        (sphereElem->GetElement("radius"))->Set(scale.x/2.0);
-      }
-      else if (visual->GetParent()->GetName().find("custom")
-          != std::string::npos)
-      {
-        sdf::ElementPtr customElem = geomElem->AddElement("mesh");
-        (customElem->GetElement("scale"))->Set(scale);
-        (customElem->GetElement("uri"))->Set(visual->GetMeshName());
-      }
-      sdf::ElementPtr geomElemClone = geomElem->Clone();
-      geomElem =  collisionElem->GetElement("geometry");
-      geomElem->ClearElements();
-      geomElem->InsertElement(geomElemClone->GetFirstElement());*/
 
       newLinkElem->InsertElement(visualElem);
       //newLinkElem->InsertElement(collisionElem);

@@ -90,6 +90,8 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->animState = NULL;
   this->dataPtr->skeleton = NULL;
   this->dataPtr->initialized = false;
+  this->dataPtr->lighting = true;
+  this->dataPtr->castShadows = true;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -125,6 +127,7 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
   this->dataPtr->animState = NULL;
   this->dataPtr->initialized = false;
   this->dataPtr->lighting = true;
+  this->dataPtr->castShadows = true;
 
   Ogre::SceneNode *pnode = NULL;
   if (_parent)
@@ -923,8 +926,16 @@ void Visual::SetLighting(bool _lighting)
   {
     (*iter)->SetLighting(this->dataPtr->lighting);
   }
+
+  this->dataPtr->sdf->GetElement("material")
+      ->GetElement("lighting")->Set(this->dataPtr->lighting);
 }
 
+//////////////////////////////////////////////////
+bool Visual::GetLighting() const
+{
+  return this->dataPtr->lighting;
+}
 
 //////////////////////////////////////////////////
 void Visual::SetMaterial(const std::string &_materialName, bool _unique)
@@ -1105,11 +1116,14 @@ void Visual::SetAmbient(const common::Color &_color)
 
   for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
   {
-    this->dataPtr->children[i]->SetSpecular(_color);
+    this->dataPtr->children[i]->SetAmbient(_color);
   }
+
+  this->dataPtr->sdf->GetElement("material")
+      ->GetElement("ambient")->Set(_color);
 }
 
-/// Set the diffuse color of the visual
+/////////////////////////////////////////////////
 void Visual::SetDiffuse(const common::Color &_color)
 {
   if (!this->dataPtr->lighting)
@@ -1165,9 +1179,12 @@ void Visual::SetDiffuse(const common::Color &_color)
   {
     this->dataPtr->children[i]->SetDiffuse(_color);
   }
+
+  this->dataPtr->sdf->GetElement("material")
+      ->GetElement("diffuse")->Set(_color);
 }
 
-/// Set the specular color of the visual
+/////////////////////////////////////////////////
 void Visual::SetSpecular(const common::Color &_color)
 {
   if (!this->dataPtr->lighting)
@@ -1221,6 +1238,9 @@ void Visual::SetSpecular(const common::Color &_color)
   {
     this->dataPtr->children[i]->SetSpecular(_color);
   }
+
+  this->dataPtr->sdf->GetElement("material")
+      ->GetElement("specular")->Set(_color);
 }
 
 /////////////////////////////////////////////////
@@ -1399,6 +1419,9 @@ void Visual::SetTransparency(float _trans)
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
+
+   std::cerr << " transparency " << _trans << std::endl;
+  this->dataPtr->sdf->GetElement("transparency")->Set(_trans);
 }
 
 //////////////////////////////////////////////////
@@ -1486,6 +1509,9 @@ void Visual::SetEmissive(const common::Color &_color)
   {
     this->dataPtr->children[i]->SetEmissive(_color);
   }
+
+  this->dataPtr->sdf->GetElement("material")
+      ->GetElement("emissive")->Set(_color);
 }
 
 //////////////////////////////////////////////////
@@ -1495,16 +1521,24 @@ float Visual::GetTransparency()
 }
 
 //////////////////////////////////////////////////
-void Visual::SetCastShadows(bool shadows)
+void Visual::SetCastShadows(bool _shadows)
 {
   for (int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects(); i++)
   {
     Ogre::MovableObject *obj = this->dataPtr->sceneNode->getAttachedObject(i);
-    obj->setCastShadows(shadows);
+    obj->setCastShadows(_shadows);
   }
 
   if (this->IsStatic() && this->dataPtr->staticGeom)
-    this->dataPtr->staticGeom->setCastShadows(shadows);
+    this->dataPtr->staticGeom->setCastShadows(_shadows);
+
+  this->dataPtr->sdf->GetElement("cast_shadows")->Set(_shadows);
+}
+
+//////////////////////////////////////////////////
+bool Visual::GetCastShadows() const
+{
+  return this->dataPtr->castShadows;
 }
 
 //////////////////////////////////////////////////

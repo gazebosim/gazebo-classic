@@ -175,6 +175,10 @@ namespace gazebo
       /// \return The scaling factor.
       public: math::Vector3 GetScale();
 
+      /// \brief Get whether or not lighting is enabled.
+      /// \return True if lighting is enabled.
+      public: bool GetLighting() const;
+
       /// \brief Set whether or not to enable or disable lighting.
       /// \param[in] _lighting True to enable lighting.
       public: void SetLighting(bool _lighting);
@@ -228,6 +232,10 @@ namespace gazebo
       /// \brief Set the emissive value.
       /// \param[in] _color The emissive color.
       public: virtual void SetEmissive(const common::Color &_color);
+
+      /// \brief Get whether the visual casts shadows.
+      /// \return True if the visual casts shadows.
+      public: bool GetCastShadows() const;
 
       /// \brief Set whether the visual should cast shadows.
       /// \param[in] _shadows True to enable shadows.

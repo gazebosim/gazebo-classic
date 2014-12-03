@@ -30,10 +30,29 @@ namespace gazebo
 
   namespace gui
   {
+    class ConfigWidget;
+
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class VisualDataWidget PartVisualConfig.hh
+    /// \brief A class of widgets used for configuring visual properties.
+    class VisualConfigData
+    {
+      /// \brief Unique ID of this visual config.
+      public: int id;
+
+      /// \brief Name of the visual.
+      public: std::string name;
+
+      /// \brief config widget for configuring visual properties.
+      public: ConfigWidget *configWidget;
+
+      /// \brief Tree item associated with the configWidget.
+      public: QTreeWidgetItem *treeItem;
+    };
+
+    /*/// \class VisualDataWidget PartVisualConfig.hh
     /// \brief A class of widgets used for configuring visual properties.
     class VisualDataWidget : public QObject
     {
@@ -95,7 +114,7 @@ namespace gazebo
 
       /// \brief Qt signal emitted when a visual is added.
       private slots: void GeometryChanged(const QString _text);
-    };
+    };*/
 
     /// \class PartVisualConfig PartVisualConfig.hh
     /// \brief A tab for configuring visual properties of a part.
@@ -110,7 +129,9 @@ namespace gazebo
       public: ~PartVisualConfig();
 
       /// \brief Add a visual widget to the tab.
-      public: void AddVisual();
+      /// \param[in] _name Name of visual added.
+      public: void AddVisual(const std::string &_name,
+          const msgs::Visual *_visualMsg = NULL);
 
       /// \brief Reset the visual tab.
       public: void Reset();
@@ -119,7 +140,12 @@ namespace gazebo
       /// \return Number of visuals.
       public: unsigned int GetVisualCount() const;
 
-      /// \brief Set the name of the visual.
+      /// \brief Get the msg containing all visual data.
+      /// \param[in] _name Name of visual.
+      /// \return Visual msg.
+      public: msgs::Visual *GetData(const std::string &_name) const;
+
+      /*/// \brief Set the name of the visual.
       /// \param[in] _index Index of visual.
       /// \param[in] _name Name of visual.
       public: void SetName(unsigned int _index, const std::string &_name);
@@ -215,7 +241,13 @@ namespace gazebo
       public: math::Vector3 GetGeometryScale(unsigned int _index) const;
 
       /// \brief List of visual widgets for configuring visual properties.
-      private: std::vector<VisualDataWidget *> dataWidgets;
+      private: std::vector<VisualDataWidget *> dataWidgets;*/
+
+      /// \brief List of config widgets for configuring visual properties.
+      //private: std::vector<ConfigWidget *> configWidgets;
+
+      /// \brief Map of id to visual config widget.
+      private: std::map<int, VisualConfigData *> configs;
 
       /// \brief Widget that display visuals' properties.
       private: QTreeWidget *visualsTreeWidget;
@@ -234,9 +266,10 @@ namespace gazebo
       Q_SIGNALS: void VisualRemoved(const std::string &_name);
 
       /// \brief Qt signal emitted when a visual is added.
-      Q_SIGNALS: void VisualAdded();
+      Q_SIGNALS: void VisualAdded(const std::string &_name);
 
       /// \brief Qt callback when a visual is to be added.
+      /// \param[in] _name Name of visual added.
       private slots: void OnAddVisual();
 
       /// \brief Qt callback when a visual is to be removed.
