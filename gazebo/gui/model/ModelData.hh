@@ -29,20 +29,6 @@ namespace gazebo
 {
   namespace gui
   {
-    /// \class CollisionData CollisionData.hh
-    /// \brief Helper class to store collision data
-    class CollisionData
-    {
-      /// \brief Name of collision.
-      public: std::string name;
-
-      /// \brief Pose of collision.
-      public: math::Vector3 pose;
-
-      /// \brief Sensor topic name.
-      public: std::string geometry;
-    };
-
     /// \class PartData PartData.hh
     /// \brief Helper class to store part data
     class PartData : public QObject
@@ -72,9 +58,6 @@ namespace gazebo
 
       /// \brief Visuals of the part.
       public: std::vector<rendering::VisualPtr> visuals;
-
-      /// \brief Collisions of the part.
-      public: std::vector<CollisionData *> collisions;
     };
   }
 }

@@ -329,6 +329,16 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       elem->GetElement("normal")->Set(plane.normal);
       elem->GetElement("size")->Set(plane.size);
     }
+    else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
+    {
+      sdf::ElementPtr elem = geomElem->AddElement("polyline");
+      elem->GetElement("height")->Set(_msg->geometry().polyline().height());
+      for (int i = 0; i < _msg->geometry().polyline().point_size(); ++i)
+      {
+        elem->AddElement("point")->Set(
+            msgs::Convert(_msg->geometry().polyline().point(i)));
+      }
+    }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
       sdf::ElementPtr elem = geomElem->AddElement("mesh");
@@ -453,23 +463,23 @@ void Visual::Load()
   // Read the desired position and rotation of the mesh
   pose = this->dataPtr->sdf->Get<math::Pose>("pose");
 
-  std::string mesh = this->GetMeshName();
-  std::string subMesh = this->GetSubMeshName();
+  std::string meshName = this->GetMeshName();
+  std::string subMeshName = this->GetSubMeshName();
   bool centerSubMesh = this->GetCenterSubMesh();
 
-  if (!mesh.empty())
+  if (!meshName.empty())
   {
     try
     {
       // Create the visual
       stream << "VISUAL_" << this->dataPtr->sceneNode->getName();
-      obj = this->AttachMesh(mesh, subMesh, centerSubMesh,
+      obj = this->AttachMesh(meshName, subMeshName, centerSubMesh,
           stream.str());
     }
     catch(Ogre::Exception &e)
     {
       gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
-      gzerr << "Unable to create a mesh from " <<  mesh << "\n";
+      gzerr << "Unable to create a mesh from " <<  meshName << "\n";
       return;
     }
   }
@@ -662,9 +672,10 @@ void Visual::DetachVisual(const std::string &_name)
   {
     if ((*iter)->GetName() == _name)
     {
-      this->dataPtr->sceneNode->removeChild((*iter)->GetSceneNode());
-      (*iter)->dataPtr->parent.reset();
+      VisualPtr childVis = (*iter);
       this->dataPtr->children.erase(iter);
+      this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
+      childVis->GetParent().reset();
       break;
     }
   }
@@ -1385,18 +1396,23 @@ void Visual::SetHighlighted(bool _highlighted)
 {
   if (_highlighted)
   {
+    math::Box bbox = this->GetBoundingBox();
+    // GetBoundingBox returns the box in world coordinates
+    // Invert thes scale of the box before attaching to the visual
+    // so that the new inherited scale after attachment is correct.
+    math::Vector3 scale = Conversions::Convert(
+          this->dataPtr->sceneNode->_getDerivedScale());
+    bbox.min = bbox.min / scale;
+    bbox.max = bbox.max / scale;
+
     // Create the bounding box if it's not already created.
     if (!this->dataPtr->boundingBox)
     {
-      this->dataPtr->boundingBox = new WireBox(shared_from_this(),
-                                      this->GetBoundingBox());
+      this->dataPtr->boundingBox = new WireBox(shared_from_this(), bbox);
     }
     else
     {
-      math::Box b = this->GetBoundingBox();
-      this->dataPtr->boundingBox->Init(math::Box(b.min/this->dataPtr->scale,
-          b.max/this->dataPtr->scale));
-      //this->dataPtr->boundingBox->Init(this->GetBoundingBox());
+      this->dataPtr->boundingBox->Init(bbox);
     }
     this->dataPtr->boundingBox->SetVisible(true);
   }
@@ -1764,6 +1780,10 @@ math::Box Visual::GetBoundingBox() const
 void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 {
   node->_updateBounds();
+  node->_update(false, true);
+
+  Ogre::Matrix4 invTransform =
+      this->dataPtr->sceneNode->_getFullTransform().inverse();
 
   Ogre::SceneNode::ChildNodeIterator it = node->getChildIterator();
 
@@ -1777,8 +1797,9 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       Ogre::Any any = obj->getUserAny();
       if (any.getType() == typeid(std::string))
       {
-        std::string str = Ogre::any_cast<std::string>(any).substr(0, 5);
-        if (str.substr(0, 3) == "rot" || str == "trans" || str == "scale")
+        std::string str = Ogre::any_cast<std::string>(any);
+        if (str.substr(0, 3) == "rot" || str.substr(0, 5) == "trans"
+            || str.substr(0, 5) == "scale")
           continue;
       }
 
@@ -1786,14 +1807,6 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 
       math::Vector3 min;
       math::Vector3 max;
-      math::Quaternion rotDiff;
-      math::Vector3 posDiff;
-
-      rotDiff = Conversions::Convert(node->_getDerivedOrientation()) -
-                this->GetWorldPose().rot;
-
-      posDiff = Conversions::Convert(node->_getDerivedPosition()) -
-                this->GetWorldPose().pos;
 
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")
@@ -1803,12 +1816,18 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       }
       else
       {
-        min = rotDiff *
-          Conversions::Convert(bb.getMinimum() * node->getScale()) + posDiff;
-        max = rotDiff *
-          Conversions::Convert(bb.getMaximum() * node->getScale()) + posDiff;
+        // Get transform to be applied to the current node.
+        Ogre::Matrix4 transform = invTransform * node->_getFullTransform();
+        // Correct precision error which makes ogre's isAffine check fail.
+        transform[3][0] = transform[3][1] = transform[3][2] = 0;
+        transform[3][3] = 1;
+        // get oriented bounding box in object's local space
+        bb.transformAffine(transform);
+        if (node->getParentSceneNode())
+          bb.scale(node->getParentSceneNode()->_getDerivedScale());
+        min = Conversions::Convert(bb.getMinimum());
+        max = Conversions::Convert(bb.getMaximum());
       }
-
 
       box.Merge(math::Box(min, max));
     }
@@ -2230,6 +2249,8 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
     else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
       geomScale.x = geomScale.y = geomScale.z = 1.0;
+    else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
+      geomScale.x = geomScale.y = geomScale.z = 1.0;
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
@@ -2296,6 +2317,30 @@ std::string Visual::GetMeshName() const
       return "unit_cylinder";
     else if (geomElem->HasElement("plane"))
       return "unit_plane";
+    else if (geomElem->HasElement("polyline"))
+    {
+      std::string polyLineName = this->GetName();
+      common::MeshManager *meshManager = common::MeshManager::Instance();
+
+      if (!meshManager->IsValidFilename(polyLineName))
+      {
+        std::vector<math::Vector2d> vertices;
+        sdf::ElementPtr pointElem =
+          geomElem->GetElement("polyline")->GetElement("point");
+
+        while (pointElem)
+        {
+          math::Vector2d point = pointElem->Get<math::Vector2d>();
+          vertices.push_back(point);
+          pointElem = pointElem->GetNextElement("point");
+        }
+
+        meshManager->CreateExtrudedPolyline(polyLineName, vertices,
+            geomElem->GetElement("polyline")->Get<double>("height"),
+            math::Vector2d(1, 1));
+       }
+      return polyLineName;
+    }
     else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
     {
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
