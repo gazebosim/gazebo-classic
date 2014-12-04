@@ -181,7 +181,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
+      ->GetElement("name")->Set("Gazebo/Grey");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -197,7 +197,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
   }
 
   this->CreatePart(visVisual);
-
+  visVisual->SetTransparency(0.5);
   this->mouseVisual = linkVisual;
 
   return linkName;
@@ -225,7 +225,7 @@ std::string ModelCreator::AddSphere(double _radius,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
+      ->GetElement("name")->Set("Gazebo/Grey");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -241,6 +241,7 @@ std::string ModelCreator::AddSphere(double _radius,
   }
 
   this->CreatePart(visVisual);
+  visVisual->SetTransparency(0.5);
   this->mouseVisual = linkVisual;
 
   return linkName;
@@ -268,7 +269,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
+      ->GetElement("name")->Set("Gazebo/Grey");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -286,6 +287,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
   }
 
   this->CreatePart(visVisual);
+  visVisual->SetTransparency(0.5);
   this->mouseVisual = linkVisual;
 
   return linkName;
