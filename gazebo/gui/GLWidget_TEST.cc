@@ -75,13 +75,12 @@ void GLWidget_TEST::KeyPresses()
   gazebo::gui::KeyEventHandler::Instance()->
       AddPressFilter("glWidget_TEST_filter", SetKey);
 
-  //QTest::qWait(500);
   // Simulate keypresses separated by 100 millisecond intervals
 
   // Case: Lowercase 'a', no modifier
   QTest::keyClick(glWidget, 'a', Qt::NoModifier, 100);
   QVERIFY(lastKeyEvent.key == 'A');
-  QVERIFY(lastKeyEvent.text.compare("a")==0);
+  QVERIFY(lastKeyEvent.text.compare("a") == 0);
   QVERIFY(!lastKeyEvent.control);
   QVERIFY(!lastKeyEvent.shift);
   QVERIFY(!lastKeyEvent.alt);
@@ -89,7 +88,7 @@ void GLWidget_TEST::KeyPresses()
   // Case: Uppercase "A", no modifier
   QTest::keyClick(glWidget, 'A', Qt::NoModifier, 100);
   QVERIFY(lastKeyEvent.key == 'A');
-  QVERIFY(lastKeyEvent.text.compare("A")==0);
+  QVERIFY(lastKeyEvent.text.compare("A") == 0);
   QVERIFY(!lastKeyEvent.control);
   QVERIFY(!lastKeyEvent.shift);
   QVERIFY(!lastKeyEvent.alt);
@@ -97,7 +96,7 @@ void GLWidget_TEST::KeyPresses()
   // Case: Lowercase 'b', shift modifier
   QTest::keyClick(glWidget, 'b', Qt::ShiftModifier, 100);
   QVERIFY(lastKeyEvent.key == 'B');
-  QVERIFY(lastKeyEvent.text.compare("b")==0);
+  QVERIFY(lastKeyEvent.text.compare("b") == 0);
   QVERIFY(!lastKeyEvent.control);
   QVERIFY(lastKeyEvent.shift);
   QVERIFY(!lastKeyEvent.alt);
@@ -105,7 +104,7 @@ void GLWidget_TEST::KeyPresses()
   // Case: Uppercase 'b', shift modifier
   QTest::keyClick(glWidget, 'B', Qt::ShiftModifier, 100);
   QVERIFY(lastKeyEvent.key == 'B');
-  QVERIFY(lastKeyEvent.text.compare("B")==0);
+  QVERIFY(lastKeyEvent.text.compare("B") == 0);
   QVERIFY(!lastKeyEvent.control);
   QVERIFY(lastKeyEvent.shift);
   QVERIFY(!lastKeyEvent.alt);
