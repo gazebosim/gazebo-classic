@@ -99,7 +99,7 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   // Also insert additional paths from gui.ini
   std::string additionalPaths =
       gui::getINIProperty<std::string>("model_paths.filenames", "");
-  if(!additionalPaths.empty())
+  if (!additionalPaths.empty())
   {
     common::SystemPaths::Instance()->AddModelPaths(additionalPaths);
     this->UpdateLocalPath(additionalPaths);
@@ -108,7 +108,6 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   {
     gzdbg << "No additional model paths found." << std::endl;
   }
-
 }
 
 /////////////////////////////////////////////////
