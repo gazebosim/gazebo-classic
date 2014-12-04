@@ -61,6 +61,13 @@ namespace gazebo
       /// \return Name of the item.
       public: virtual std::string GetName() const;
 
+      /// \brief Get the level in which this building item is located.
+      public: int GetLevel() const;
+
+      /// \brief Get the base height of this level relative to the ground
+      /// plane.
+      public: double GetLevelBaseHeight() const;
+
       /// \brief Get the associated 3D visual's color.
       /// \return Color of the 3D visual.
       public: virtual QColor Get3dColor() const;
@@ -68,6 +75,15 @@ namespace gazebo
       /// \brief Set the name of this editor item.
       /// \param[in] _name Name to set the editor item to.
       public: virtual void SetName(const std::string &_name);
+
+      /// \brief Set the level of this building item.
+      /// \param[in] _level Level number.
+      public: void SetLevel(int _level);
+
+      /// \brief Set the base height of this level relative to the ground
+      /// plane.
+      /// \param[in] _height Base height.
+      public: void SetLevelBaseHeight(double _height);
 
       /// \brief Set the associated 3D visual's color.
       /// \param[in] _color Color.
@@ -152,6 +168,10 @@ namespace gazebo
       /// \param[in] _yaw Yaw rotation of item in degrees.
       Q_SIGNALS: void YawChanged(double _yaw);
 
+      /// \brief Qt signal emitted when the editor item's level has changed.
+      /// \param[in] _level Level.
+      Q_SIGNALS: void LevelChanged(int _level);
+
       /// \brief Qt signal emitted when the editor item's 3D color has
       /// changed.
       /// \param[in] _color Color.
@@ -170,6 +190,13 @@ namespace gazebo
 
       /// \brief Name of editor item.
       protected: std::string name;
+
+      /// \brief Level that this item is on.
+      protected: int level;
+
+      /// \brief Vertical distance from the building's base to the base of
+      /// the level this editor is in.
+      protected: double levelBaseHeight;
 
       /// \brief Color of the associated 3D visual.
       protected: QColor visual3dColor;

@@ -1083,6 +1083,7 @@ void EditorView::DeleteLevel(int _level)
       || _level >= static_cast<int>(this->levels.size()))
     return;
 
+  // Delete current level and move to level below or above
   int newLevelIndex = _level - 1;
   if (newLevelIndex < 0)
     newLevelIndex = _level + 1;
@@ -1231,10 +1232,13 @@ void EditorView::OnLevelApply()
 
   std::string newLevelName = dialog->GetLevelName();
   this->levels[this->currentLevel]->name = newLevelName;
-  this->levels[this->currentLevel]->floorItem->Set3dColor(dialog->
-      GetFloorColor());
-  this->levels[this->currentLevel]->floorItem->Set3dTransparency(0.4);
-  this->levels[this->currentLevel]->floorItem->FloorChanged();
+  FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
+  if (floorItem)
+  {
+    floorItem->Set3dColor(dialog->GetFloorColor());
+    floorItem->Set3dTransparency(0.4);
+    floorItem->FloorChanged();
+  }
   gui::editor::Events::updateLevelWidget(this->currentLevel, newLevelName);
 }
 
