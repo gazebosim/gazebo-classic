@@ -104,10 +104,6 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
     common::SystemPaths::Instance()->AddModelPaths(additionalPaths);
     this->UpdateLocalPath(additionalPaths);
   }
-  else
-  {
-    gzdbg << "No additional model paths found." << std::endl;
-  }
 }
 
 /////////////////////////////////////////////////

@@ -1727,7 +1727,6 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
       {
         boost::filesystem::path guiINIPath = home;
         guiINIPath  = guiINIPath / ".gazebo" / "gui.ini";
-        gzdbg << "Saving property tree to " << guiINIPath.string() << std::endl;
         saveINI(guiINIPath);
       }
     }
