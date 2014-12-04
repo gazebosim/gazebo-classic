@@ -765,7 +765,6 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-//TODO: does not trigger reliably
 void ModelCreator::OnCopy()
 {
   if (!this->selectedVisuals.empty())
@@ -776,7 +775,7 @@ void ModelCreator::OnCopy()
       this->copiedPartNames.push_back(this->selectedVisuals[i]->GetName());
       gzdbg << "Copied part: " << this->copiedPartNames.back() << std::endl;
     }
-    g_pasteAct->setEnabled(true);
+    // Set enable Paste
   } else {
     gzdbg << "no selected visuals?" << std::endl;
   }
@@ -785,7 +784,6 @@ void ModelCreator::OnCopy()
 /////////////////////////////////////////////////
 void ModelCreator::OnPaste()
 {
-  // is GLWidget::Paste colliding?
   gzdbg << "In OnPaste" << std::endl;
   if (this->copiedPartNames.empty())
   {
@@ -808,7 +806,7 @@ void ModelCreator::OnPaste()
       {
         gzdbg << "No model visual found" << std::endl;
         this->Reset();
-        return; //?
+        //return;
       }
 
       rendering::VisualPtr linkVisual(new rendering::Visual(
