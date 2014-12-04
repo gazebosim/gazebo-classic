@@ -126,7 +126,7 @@ void JointMaker_TEST::CreateRemoveJoint()
   jointMaker->RemoveJoint(ballJointData->hotspot->GetName());
   QCOMPARE(jointMaker->GetJointCount(), 0u);*/
 
-  //delete jointMaker;
+  // delete jointMaker;
   mainWindow->close();
   delete mainWindow;
 }
