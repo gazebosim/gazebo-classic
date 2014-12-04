@@ -136,6 +136,8 @@ std::string GetFolderNameFromModelName(const std::string &_modelName)
 
   this->saveDialog =
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
+
+  this->Reset();
 }
 
 /////////////////////////////////////////////////
