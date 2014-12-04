@@ -126,7 +126,7 @@ endmacro ()
 
 #################################################
 macro (gz_setup_unix)
-    # Using static linking in Windows by default
+    # Using dynamic linking in UNIX by default
     add_definitions(-DBUILDING_STATIC_LIBS:BOOL=TRUE)
 endmacro()
 
