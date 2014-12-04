@@ -45,7 +45,7 @@ using namespace gazebo;
 using namespace rendering;
 
 const float g_defaultNearClip = 0.1f;
-const float g_defaultFarClip = 5000.0f;
+const float g_defaultFarClip = 500.0f;
 const float g_defaultIPD = 0.064f;
 const float g_defautlProjectionCenterOffset = 0.14529906f;
 const float g_defaultDistortion[4] = {1.0f, 0.22f, 0.24f, 0};
@@ -57,8 +57,8 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   // Oculus is not ready yet.
   this->ready = false;
 
-  // Set default OculusCamera render rate to 30Hz
-  this->SetRenderRate(30.0);
+  // Set default OculusCamera render rate to 120Hz
+  this->SetRenderRate(120.0);
 
   OVR::System::Init(OVR::Log::ConfigureDefaultLog(OVR::LogMask_None));
 

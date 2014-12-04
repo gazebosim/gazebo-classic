@@ -168,7 +168,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   this->timer = new QTimer(this);
   connect(this->timer, SIGNAL(timeout()), this, SLOT(update()));
-  float fps = 30.0;
+  float fps = 120.0;
   this->timer->start(1000.0 / fps);
 
   this->connections.push_back(
