@@ -298,6 +298,7 @@ void RenderWidget::ShowEditor(bool _show)
     this->baseOverlayMsg = "Building is view-only";
     this->OnClearOverlayMsg();
     this->bottomFrame->hide();
+    this->ShowToolbar(false);
   }
   else
   {
@@ -305,6 +306,7 @@ void RenderWidget::ShowEditor(bool _show)
     this->baseOverlayMsg = "";
     this->OnClearOverlayMsg();
     this->bottomFrame->show();
+    this->ShowToolbar(true);
   }
 }
 

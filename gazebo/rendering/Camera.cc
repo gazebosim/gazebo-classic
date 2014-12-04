@@ -576,26 +576,44 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
 }
 
 //////////////////////////////////////////////////
-void Camera::Translate(const math::Vector3 &direction)
+void Camera::Translate(const math::Vector3 &_direction)
 {
-  Ogre::Vector3 vec(direction.x, direction.y, direction.z);
-
   this->sceneNode->translate(this->sceneNode->getOrientation() *
-      this->sceneNode->getOrientation() * vec);
+      Conversions::Convert(_direction));
+}
+
+//////////////////////////////////////////////////
+void Camera::Roll(const math::Angle &_angle,
+    Ogre::Node::TransformSpace _relativeTo)
+{
+  this->sceneNode->pitch(Ogre::Radian(_angle.Radian()), _relativeTo);
+}
+
+//////////////////////////////////////////////////
+void Camera::Yaw(const math::Angle &_angle,
+    Ogre::Node::TransformSpace _relativeTo)
+{
+  this->sceneNode->roll(Ogre::Radian(_angle.Radian()), _relativeTo);
+}
+
+//////////////////////////////////////////////////
+void Camera::Pitch(const math::Angle &_angle,
+    Ogre::Node::TransformSpace _relativeTo)
+{
+  this->sceneNode->yaw(Ogre::Radian(_angle.Radian()), _relativeTo);
 }
 
 //////////////////////////////////////////////////
 void Camera::RotateYaw(math::Angle _angle)
 {
-  this->sceneNode->roll(Ogre::Radian(_angle.Radian()), Ogre::Node::TS_WORLD);
+  this->Yaw(_angle);
 }
 
 //////////////////////////////////////////////////
 void Camera::RotatePitch(math::Angle _angle)
 {
-  this->sceneNode->yaw(Ogre::Radian(_angle.Radian()));
+  this->Pitch(_angle);
 }
-
 
 //////////////////////////////////////////////////
 void Camera::SetClipDist()

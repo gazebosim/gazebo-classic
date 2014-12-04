@@ -30,10 +30,11 @@ namespace gazebo
   namespace gui
   {
     class EditorItem;
+    class GrabberHandle;
     class WindowItem;
     class StairsItem;
     class DoorItem;
-    class WallItem;
+    class WallSegmentItem;
     class FloorItem;
     class BuildingMaker;
     class LevelInspectorDialog;
@@ -47,7 +48,8 @@ namespace gazebo
       public: Level() : level(0), name("level"), baseHeight(0),
               // 2.4384m == 8ft, standard room height in US
               height(2.4384),
-              backgroundPixmap(NULL) {}
+              backgroundPixmap(NULL),
+              floorItem(NULL) {}
 
       /// \brief Level number
       public: int level;
@@ -63,6 +65,9 @@ namespace gazebo
 
       /// \brief Background pixmap for a level
       public: QGraphicsPixmapItem *backgroundPixmap;
+
+      /// \brief Level's floor item
+      public: FloorItem *floorItem;
     };
 
     /// \addtogroup gazebo_gui
@@ -195,6 +200,7 @@ namespace gazebo
 
       /// \brief Callback received when a level on a building model is to
       /// be changed.
+      /// \param[in] _level The level that is currently being edited.
       private: void OnChangeLevel(int _level);
 
       /// \brief Delete a level from the building model
@@ -213,6 +219,20 @@ namespace gazebo
       /// \brief Show current level items if not currently hiding.
       private: void ShowCurrentLevelItems();
 
+      /// \brief Link grabbers so they move together.
+      /// \param[in] _grabber1 First grabber to be liked.
+      /// \param[in] _grabber2 Second grabber to be unliked.
+      private: void LinkGrabbers(GrabberHandle *_grabber1,
+          GrabberHandle *_grabber2);
+
+      /// \brief Unlink grabbers so they don't move together anymore. If only
+      /// one grabber is input, that grabber is unliked from all its current
+      /// links.
+      /// \param[in] _grabber1 First grabber to be unliked.
+      /// \param[in] _grabber2 Second grabber to be unliked.
+      private: void UnlinkGrabbers(GrabberHandle *_grabber1,
+          GrabberHandle *_grabber2 = NULL);
+
       /// \brief Current draw mode
       private: int drawMode;
 
@@ -225,8 +245,8 @@ namespace gazebo
       /// \brief Indicate whether or not the editor items are visible.
       private: bool elementsVisible;
 
-      /// \brief A list of wall items in the scene.
-      private: std::vector<WallItem*> wallList;
+      /// \brief A list of wall segment items in the scene.
+      private: std::vector<WallSegmentItem*> wallSegmentList;
 
       /// \brief A list of window items in the scene.
       private: std::vector<WindowItem*> windowList;
@@ -255,8 +275,6 @@ namespace gazebo
 
       /// \brief Building maker manages the creation of 3D visuals
       private: BuildingMaker *buildingMaker;
-
-      // private: std::string lastWallSegmentName;
 
       /// \brief Current building level associated to the view.
       private: int currentLevel;
@@ -293,9 +311,15 @@ namespace gazebo
       /// \brief Scale (zoom level) of the editor view.
       private: double viewScale;
 
-      /// \brief Indicate whether or not the wall can be closed during a draw
-      /// wall operation.
-      private: bool snapToCloseWall;
+      /// \brief Indicate whether or not the wall will snap to a grabber
+      /// during a draw wall operation.
+      private: bool snapToGrabber;
+
+      /// \brief Existing grabber to snap towards.
+      private: GrabberHandle *snapGrabberOther;
+
+      /// \brief Currently held grabber which will be snapped.
+      private: GrabberHandle *snapGrabberCurrent;
     };
     /// \}
   }

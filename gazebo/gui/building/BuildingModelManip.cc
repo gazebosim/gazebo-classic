@@ -18,6 +18,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Quaternion.hh"
+#include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/BuildingModelManip.hh"
 
@@ -28,6 +29,11 @@ using namespace gui;
 BuildingModelManip::BuildingModelManip()
 {
   this->parent = NULL;
+  this->level = 0;
+
+  this->connections.push_back(
+  gui::editor::Events::ConnectChangeBuildingLevel(
+    boost::bind(&BuildingModelManip::OnChangeLevel, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -58,6 +64,12 @@ std::string BuildingModelManip::GetName() const
 rendering::VisualPtr BuildingModelManip::GetVisual() const
 {
   return this->visual;
+}
+
+/////////////////////////////////////////////////
+common::Color BuildingModelManip::GetColor() const
+{
+  return this->color;
 }
 
 /////////////////////////////////////////////////
@@ -263,6 +275,24 @@ void BuildingModelManip::OnRotationChanged(double _roll, double _pitch,
 }
 
 /////////////////////////////////////////////////
+void BuildingModelManip::OnLevelChanged(int _level)
+{
+  this->SetLevel(_level);
+}
+
+/////////////////////////////////////////////////
+void BuildingModelManip::OnColorChanged(QColor _color)
+{
+  this->SetColor(_color);
+}
+
+/////////////////////////////////////////////////
+void BuildingModelManip::OnTransparencyChanged(float _transparency)
+{
+  this->SetTransparency(_transparency);
+}
+
+/////////////////////////////////////////////////
 void BuildingModelManip::OnDeleted()
 {
   this->maker->RemovePart(this->name);
@@ -313,4 +343,41 @@ void BuildingModelManip::SetSize(double _width, double _depth, double _height)
       - math::Vector3(dScale.x/2.0, dScale.y/2.0, dScale.z/2.0);
 
   this->visual->SetPosition(newPos);
+}
+
+/////////////////////////////////////////////////
+void BuildingModelManip::SetColor(QColor _color)
+{
+  common::Color newColor(_color.red(), _color.green(), _color.blue());
+  this->color = newColor;
+  this->visual->GetParent()->SetAmbient(this->color);
+}
+
+/////////////////////////////////////////////////
+void BuildingModelManip::SetTransparency(float _transparency)
+{
+  this->visual->GetParent()->SetTransparency(_transparency);
+}
+
+/////////////////////////////////////////////////
+void BuildingModelManip::SetLevel(const int _level)
+{
+  this->level = _level;
+}
+
+/////////////////////////////////////////////////
+int BuildingModelManip::GetLevel() const
+{
+  return this->level;
+}
+
+/////////////////////////////////////////////////
+void BuildingModelManip::OnChangeLevel(int _level)
+{
+  if (this->level > _level)
+    this->SetTransparency(1.0);
+  else if (this->level < _level)
+    this->SetTransparency(0.0);
+  else
+    this->SetTransparency(0.4);
 }

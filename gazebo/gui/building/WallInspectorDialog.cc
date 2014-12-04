@@ -142,13 +142,27 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   heightThicknessLayout->addWidget(thicknessLabel, 1, 0);
   heightThicknessLayout->addWidget(thicknessSpinBox, 1, 1);
 
-  QLabel *materialLabel = new QLabel(tr("Material: "));
-  this->materialComboBox = new QComboBox;
-  materialComboBox->addItem(QString("Concrete"));
+  QLabel *colorLabel = new QLabel(tr("Color: "));
+  this->colorComboBox = new QComboBox;
+  this->colorComboBox->setIconSize(QSize(15, 15));
+  this->colorComboBox->setMinimumWidth(50);
+  this->colorComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  QPixmap colorIcon(15, 15);
+  this->colorList.push_back(QColor(255, 255, 255, 255));
+  this->colorList.push_back(QColor(194, 169, 160, 255));
+  this->colorList.push_back(QColor(235, 206, 157, 255));
+  this->colorList.push_back(QColor(254, 121,   5, 255));
+  this->colorList.push_back(QColor(255, 195,  78, 255));
+  this->colorList.push_back(QColor(111, 203, 172, 255));
+  for (unsigned int i = 0; i < this->colorList.size(); ++i)
+  {
+    colorIcon.fill(this->colorList.at(i));
+    this->colorComboBox->addItem(colorIcon, QString(""));
+  }
 
-  QHBoxLayout *materialLayout = new QHBoxLayout;
-  materialLayout->addWidget(materialLabel);
-  materialLayout->addWidget(materialComboBox);
+  QHBoxLayout *colorLayout = new QHBoxLayout;
+  colorLayout->addWidget(colorLabel);
+  colorLayout->addWidget(colorComboBox);
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
@@ -168,7 +182,7 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   mainLayout->addWidget(positionGroupBox);
   mainLayout->addWidget(lengthGroupBox);
   mainLayout->addLayout(heightThicknessLayout);
-  // mainLayout->addLayout(materialLayout);
+  mainLayout->addLayout(colorLayout);
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
@@ -213,9 +227,9 @@ double WallInspectorDialog::GetThickness() const
 }
 
 /////////////////////////////////////////////////
-std::string WallInspectorDialog::GetMaterial() const
+QColor WallInspectorDialog::GetColor() const
 {
-  return this->materialComboBox->currentText().toStdString();
+  return this->colorList[this->colorComboBox->currentIndex()];
 }
 
 /////////////////////////////////////////////////
@@ -257,11 +271,17 @@ void WallInspectorDialog::SetThickness(double _thickness)
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetMaterial(const std::string &_material)
+void WallInspectorDialog::SetColor(const QColor _color)
 {
-  int index = this->materialComboBox->findText(
-      QString::fromStdString(_material));
-  this->materialComboBox->setCurrentIndex(index);
+  // Find index corresponding to color (only a few colors allowed so far)
+  for (unsigned int i = 0; i < this->colorList.size(); ++i)
+  {
+    if (this->colorList[i] == _color)
+    {
+      this->colorComboBox->setCurrentIndex(i);
+      break;
+    }
+  }
 }
 
 /////////////////////////////////////////////////

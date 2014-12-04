@@ -35,10 +35,11 @@ namespace gazebo
       /// \brief Default constructor
       public: Box();
 
-      /// \brief Constructor
-      /// \param[in] _min Minimum corner of the box
-      /// \param[in] _max Maximum corner of the box
-      public: Box(const Vector3 &_min, const Vector3 &_max);
+      /// \brief Constructor. This constructor will compute the box's
+      /// minumum and maximum corners based on the two arguments.
+      /// \param[in] _vec1 One corner of the box
+      /// \param[in] _vec2 Another corner of the box
+      public: Box(const Vector3 &_vec1, const Vector3 &_vec2);
 
       /// \brief Copy Constructor
       /// \param[in]  _b Box to copy
