@@ -985,7 +985,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
 {
   this->state = _mode;
 
-  if (!this->selectedVisuals.empty() && this->selectedVisuals.back())
+  if (!this->selectedVisuals.empty())
   {
     ModelManipulator::Instance()->SetAttachedVisual(
         this->selectedVisuals.back());
