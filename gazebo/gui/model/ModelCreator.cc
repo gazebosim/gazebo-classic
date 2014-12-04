@@ -66,17 +66,18 @@ ModelCreator::ModelCreator()
 
   this->jointMaker = new JointMaker();
 
+  this->connections.push_back(
+     gui::Events::ConnectAlignMode(
+       boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
+
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
   connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
           SLOT(OnDelete(const std::string &)));
-  // TODO: do we need to take the name of the object to copy?
   connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
-  g_pasteAct->setEnabled(false);
   connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
- this->connections.push_back(
-      gui::Events::ConnectAlignMode(
-        boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
 
+  g_copyAct->setEnabled(true);
+  //g_pasteAct->setEnabled(false);
   this->Reset();
 }
 
@@ -626,9 +627,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   if (vis)
   {
     // Is part
-    boost::unordered_map<std::string, PartData*>::iterator it =
-      this->allParts.find(vis->GetName());
-    if (it != this->allParts.end())
+    if (this->allParts.find(vis->GetName()) != this->allParts.end())
     {
       // In mouse normal mode, let users select a part if the parent model
       // is currently selected.
@@ -757,57 +756,82 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
+//TODO: does not trigger reliably
 void ModelCreator::OnCopy()
 {
-  // Get name of currently highlighted visual (?)
-  if (this->selectedVis)
+  if (!this->selectedVisuals.empty())
   {
-    this->copiedPartName = this->selectedVis->GetName();
-    gzdbg << "Copied part: " << this->copiedPartName << std::endl;
+    gzdbg << "selected visuals non-empty" << std::endl;
+    for (unsigned int i = 0; i < this->selectedVisuals.size(); i++)
+    {
+      this->copiedPartNames.push_back(this->selectedVisuals[i]->GetName());
+      gzdbg << "Copied part: " << this->copiedPartNames.back() << std::endl;
+    }
     g_pasteAct->setEnabled(true);
   } else {
-    gzdbg << "couldn't copy selected visual?" << std::endl;
+    gzdbg << "no selected visuals?" << std::endl;
   }
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::OnPaste()
 {
+  // is GLWidget::Paste colliding?
   gzdbg << "In OnPaste" << std::endl;
-  if (this->copiedPartName.empty())
+  if (this->copiedPartNames.empty())
   {
-    gzdbg << "name empty, returning: " << this->copiedPartName << std::endl;
+    gzdbg << "no copied part names " << std::endl;
     return;
   }
 
-  // Get the part
-  boost::unordered_map<std::string, PartData*>::iterator it =
-    this->allParts.find(this->copiedPartName);
-  if (it != this->allParts.end())
+  for (unsigned int i = 0; i < this->copiedPartNames.size(); i++)
   {
-    PartData *copiedPart = it->second;
-    std::string linkName = copiedPart->name + "_clone";
-
-    this->modelVisual = copiedPart->visuals.back();
-    if (!this->modelVisual)
+    // Get the part
+    boost::unordered_map<std::string, PartData*>::iterator it =
+      this->allParts.find(this->copiedPartNames[i]);
+    if (it != this->allParts.end())
     {
-      this->Reset();
+      PartData *copiedPart = it->second;
+      std::string linkName = copiedPart->name + "_clone";
+
+      /*this->modelVisual = copiedPart->visuals.back();*/
+      if (!this->modelVisual)
+      {
+        gzdbg << "No model visual found" << std::endl;
+        this->Reset();
+        return; //?
+      }
+
+      rendering::VisualPtr linkVisual(new rendering::Visual(
+          linkName, this->modelVisual));
+      linkVisual->Load();
+
+      std::ostringstream visualName;
+      visualName << linkName << "_visual";
+      rendering::VisualPtr visVisual;
+      if (copiedPart->visuals.empty())
+      {
+          visVisual = rendering::VisualPtr(new rendering::Visual(visualName.str(),
+                        linkVisual));
+      }
+      else
+      {
+        visVisual = copiedPart->visuals.back();
+        visVisual->SetName(visualName.str());
+      }
+
+      // Need make a proper linkVisual!
+      // Why is name working?
+      // need to detach on click (wtf)
+
+      gzdbg << "Creating copied part" << std::endl;
+      this->CreatePart(visVisual);
+      this->mouseVisual = linkVisual;
+      emit PartAdded();
+    } else {
+      gzdbg << "Couldn't find part in allParts" << std::endl;
     }
 
-    rendering::VisualPtr linkVisual(new rendering::Visual(
-        linkName, this->modelVisual));
-    linkVisual->Load();
-
-    std::ostringstream visualName;
-    visualName << linkName << "_visual";
-    rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-          linkVisual));
-
-    gzdbg << "Creating copied part" << std::endl;
-    this->CreatePart(visVisual);
-    this->mouseVisual = linkVisual;
-  } else {
-    gzdbg << "Couldn't find part in allParts" << std::endl;
   }
 }
 

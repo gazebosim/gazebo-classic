@@ -293,8 +293,8 @@ namespace gazebo
       /// \brief A list of selected visuals.
       private: std::vector<rendering::VisualPtr> selectedVisuals;
 
-      /// \brief Name of part copied through g_copyAct
-      private: std::string copiedPartName;
+      /// \brief Names of parts copied through g_copyAct
+      private: std::vector<std::string> copiedPartNames;
     };
     /// \}
 
