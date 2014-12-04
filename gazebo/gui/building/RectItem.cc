@@ -933,7 +933,7 @@ void RectItem::UpdateMeasures()
   // Only windows and doors can have a wall as parent
   WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
     this->parentItem());
-  if (this->parentItem() == NULL)
+  if (wallItem == NULL)
   {
     for (unsigned int i = 0; i < this->measures.size(); ++i)
     {
