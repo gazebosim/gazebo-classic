@@ -79,7 +79,7 @@ void GLWidget_TEST::KeyPresses()
 
   // Case: Lowercase 'a', no modifier
   QTest::keyClick(glWidget, 'a', Qt::NoModifier, 100);
-  QVERIFY(lastKeyEvent.key == 'A');
+  QVERIFY(lastKeyEvent.key == Qt::Key_A);
   QVERIFY(lastKeyEvent.text.compare("a") == 0);
   QVERIFY(!lastKeyEvent.control);
   QVERIFY(!lastKeyEvent.shift);
@@ -87,7 +87,7 @@ void GLWidget_TEST::KeyPresses()
 
   // Case: Uppercase "A", no modifier
   QTest::keyClick(glWidget, 'A', Qt::NoModifier, 100);
-  QVERIFY(lastKeyEvent.key == 'A');
+  QVERIFY(lastKeyEvent.key == Qt::Key_A);
   QVERIFY(lastKeyEvent.text.compare("A") == 0);
   QVERIFY(!lastKeyEvent.control);
   QVERIFY(!lastKeyEvent.shift);
@@ -95,7 +95,7 @@ void GLWidget_TEST::KeyPresses()
 
   // Case: Lowercase 'b', shift modifier
   QTest::keyClick(glWidget, 'b', Qt::ShiftModifier, 100);
-  QVERIFY(lastKeyEvent.key == 'B');
+  QVERIFY(lastKeyEvent.key == Qt::Key_B);
   QVERIFY(lastKeyEvent.text.compare("b") == 0);
   QVERIFY(!lastKeyEvent.control);
   QVERIFY(lastKeyEvent.shift);
@@ -103,7 +103,7 @@ void GLWidget_TEST::KeyPresses()
 
   // Case: Uppercase 'b', shift modifier
   QTest::keyClick(glWidget, 'B', Qt::ShiftModifier, 100);
-  QVERIFY(lastKeyEvent.key == 'B');
+  QVERIFY(lastKeyEvent.key == Qt::Key_B);
   QVERIFY(lastKeyEvent.text.compare("B") == 0);
   QVERIFY(!lastKeyEvent.control);
   QVERIFY(lastKeyEvent.shift);
@@ -111,14 +111,14 @@ void GLWidget_TEST::KeyPresses()
 
   // Case: lowercase 'c', control modifier
   QTest::keyClick(glWidget, 'c', Qt::ControlModifier, 100);
-  QVERIFY(lastKeyEvent.key == 'C');
+  QVERIFY(lastKeyEvent.key == Qt::Key_C);
   QVERIFY(lastKeyEvent.control);
   QVERIFY(!lastKeyEvent.shift);
   QVERIFY(!lastKeyEvent.alt);
 
   // Case: lowercase 'd', control modifier
   QTest::keyClick(glWidget, 'd', Qt::AltModifier, 100);
-  QVERIFY(lastKeyEvent.key == 'D');
+  QVERIFY(lastKeyEvent.key == Qt::Key_D);
   QVERIFY(!lastKeyEvent.control);
   QVERIFY(!lastKeyEvent.shift);
   QVERIFY(lastKeyEvent.alt);
