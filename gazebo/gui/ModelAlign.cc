@@ -172,7 +172,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
       if (it->first)
       {
         it->first->SetWorldPose(it->second);
-        it->first->SetTransparency(it->first->GetTransparency()*2.0 - 1.0);
+        it->first->SetTransparency(fabs(it->first->GetTransparency()*2.0-1.0));
       }
     }
     this->dataPtr->originalVisualPose.clear();

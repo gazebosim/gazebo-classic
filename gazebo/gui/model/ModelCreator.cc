@@ -38,6 +38,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ModelManipulator.hh"
+#include "gazebo/gui/ModelAlign.hh"
 
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -72,6 +73,9 @@ ModelCreator::ModelCreator()
   connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
   g_pasteAct->setEnabled(false);
   connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+ this->connections.push_back(
+      gui::Events::ConnectAlignMode(
+        boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
 
   this->Reset();
 }
@@ -118,10 +122,13 @@ void ModelCreator::OnEdit(bool _checked)
     MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
     this->jointMaker->Stop();
 
-    if (this->selectedVis)
+    if (!this->selectedVisuals.empty())
     {
-      this->selectedVis->SetHighlighted(false);
-      this->selectedVis.reset();
+      for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+      {
+        this->selectedVisuals[i]->SetHighlighted(false);
+      }
+      this->selectedVisuals.clear();
     }
   }
 }
@@ -164,8 +171,6 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
       linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -173,6 +178,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
 
   visVisual->Load(visualElem);
 
+  linkVisual->SetTransparency(0.5);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -208,8 +214,6 @@ std::string ModelCreator::AddSphere(double _radius,
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -217,6 +221,7 @@ std::string ModelCreator::AddSphere(double _radius,
 
   visVisual->Load(visualElem);
 
+  linkVisual->SetTransparency(0.5);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -251,8 +256,6 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -262,6 +265,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
 
   visVisual->Load(visualElem);
 
+  linkVisual->SetTransparency(0.5);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -298,8 +302,6 @@ std::string ModelCreator::AddCustom(const std::string &_path,
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -308,6 +310,7 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   meshElem->GetElement("uri")->Set(path);
   visVisual->Load(visualElem);
 
+  linkVisual->SetTransparency(0.5);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -378,7 +381,7 @@ void ModelCreator::Reset()
     return;
 
   this->jointMaker->Reset();
-  this->selectedVis.reset();
+  this->selectedVisuals.clear();
 
   std::stringstream ss;
   ss << "defaultModel_" << this->modelCounter++;
@@ -566,10 +569,15 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
   }
   else if (_event.key == Qt::Key_Delete)
   {
-    if (this->selectedVis)
+    if (!this->selectedVisuals.empty())
     {
-      this->OnDelete(this->selectedVis->GetName());
-      this->selectedVis.reset();
+      for (std::vector<rendering::VisualPtr>::iterator it
+          = this->selectedVisuals.begin(); it != this->selectedVisuals.end();)
+      {
+        (*it)->SetHighlighted(false);
+        this->OnDelete((*it)->GetName());
+        it = this->selectedVisuals.erase(it);
+      }
     }
   }
   return false;
@@ -610,8 +618,6 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
 
-  // In mouse normal mode, let users select a part if the parent model
-  // is currently selected.
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (!userCamera)
     return false;
@@ -624,21 +630,48 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       this->allParts.find(vis->GetName());
     if (it != this->allParts.end())
     {
-      // Whole model or another part is selected
+      // In mouse normal mode, let users select a part if the parent model
+      // is currently selected.
       if (userCamera->GetScene()->GetSelectedVisual() == this->modelVisual ||
-          this->selectedVis)
+          !this->selectedVisuals.empty())
       {
-        // Deselect part
-        // TODO: Should this call selectedVis.reset()?
-        if (this->selectedVis)
-          this->selectedVis->SetHighlighted(false);
         // Deselect model
-        else
-          event::Events::setSelectedEntity("", "normal");
+        this->modelVisual->SetHighlighted(false);
+        event::Events::setSelectedEntity("", "normal");
 
-        gzdbg << "selecting model" << std::endl;
-        this->selectedVis = vis;
-        this->selectedVis->SetHighlighted(true);
+        // deselect all parts if not in multi-selection mode.
+        if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
+        {
+          for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+          {
+            this->selectedVisuals[i]->SetHighlighted(false);
+          }
+          this->selectedVisuals.clear();
+        }
+
+        // Highlight newly selected part
+        vis->SetHighlighted(true);
+
+        // enable multi-selection if control is pressed
+        if (this->selectedVisuals.empty() ||
+            QApplication::keyboardModifiers() & Qt::ControlModifier)
+        {
+          std::vector<rendering::VisualPtr>::iterator it =
+              std::find(this->selectedVisuals.begin(),
+              this->selectedVisuals.end(), vis);
+          // Add part if not already selected
+          if (it == this->selectedVisuals.end())
+          {
+            this->selectedVisuals.push_back(vis);
+          }
+          // if element already exists, move to the back of vector
+          else
+          {
+            this->selectedVisuals.erase(it);
+            this->selectedVisuals.push_back(vis);
+          }
+        }
+        g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
         return true;
       }
       // Handle at GLWidget - select whole model
@@ -647,13 +680,18 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     else
     {
       // Deselect part and model
-      if (this->selectedVis)
+      if (!this->selectedVisuals.empty())
       {
-        this->selectedVis->SetHighlighted(false);
-        this->selectedVis.reset();
+        for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+        {
+          this->selectedVisuals[i]->SetHighlighted(false);
+        }
+        this->selectedVisuals.clear();
       }
       else
         event::Events::setSelectedEntity("", "normal");
+
+      g_alignAct->setEnabled(false);
 
       // Prevent interaction with other models, send event only to
       // user camera
@@ -908,4 +946,19 @@ void ModelCreator::GenerateSDF()
   // Model settings
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnAlignMode(const std::string &_axis,
+    const std::string &_config, const std::string &_target, bool _preview)
+{
+  // Align links, not visuals
+  std::vector<rendering::VisualPtr> selectedLinks;
+  for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+  {
+    selectedLinks.push_back(this->selectedVisuals[i]->GetParent());
+  }
+
+  ModelAlign::Instance()->AlignVisuals(selectedLinks, _axis, _config,
+      _target, !_preview);
 }
