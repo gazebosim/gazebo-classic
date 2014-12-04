@@ -299,6 +299,12 @@ namespace gazebo
 
       /// \brief Names of parts copied through g_copyAct
       private: std::vector<std::string> copiedPartNames;
+
+      /// \brief Is paste enabled? Only true if copy was triggered.
+      private: bool pasteEnabled;
+
+      /// \brief The last mouse event
+      private: common::MouseEvent lastMouseEvent;
     };
     /// \}
 

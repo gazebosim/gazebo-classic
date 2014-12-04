@@ -80,6 +80,7 @@ ModelCreator::ModelCreator()
 
   g_copyAct->setEnabled(false);
   g_pasteAct->setEnabled(false);
+  this->pasteEnabled = false;
   this->Reset();
 }
 
@@ -583,11 +584,11 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
       }
     }
   }
-  else if (_event.modifiers() || Qt::ControlModifier)
+  else if (_event.control)
   {
     if (_event.key == Qt::Key_C && _event.control)
       emit CopyTriggered();
-    else if (_event.key == Qt::Key_V && _event.control)
+    else if (_event.key == Qt::Key_V && _event.control && this->pasteEnabled)
       emit PasteTriggered();
   }
   return false;
@@ -713,6 +714,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 {
+  lastMouseEvent = _event;
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (!userCamera)
     return false;
@@ -769,77 +771,84 @@ void ModelCreator::OnCopy()
 {
   if (!this->selectedVisuals.empty())
   {
-    gzdbg << "selected visuals non-empty" << std::endl;
     for (unsigned int i = 0; i < this->selectedVisuals.size(); i++)
     {
       this->copiedPartNames.push_back(this->selectedVisuals[i]->GetName());
       gzdbg << "Copied part: " << this->copiedPartNames.back() << std::endl;
     }
     // Set enable Paste
-  } else {
-    gzdbg << "no selected visuals?" << std::endl;
+    this->pasteEnabled = true;
   }
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::OnPaste()
 {
-  gzdbg << "In OnPaste" << std::endl;
+  //TODO: Mutex for copiedPartNames
   if (this->copiedPartNames.empty())
   {
-    gzdbg << "no copied part names " << std::endl;
     return;
   }
 
-  for (unsigned int i = 0; i < this->copiedPartNames.size(); i++)
+  // For now, only copy the last selected model
+  boost::unordered_map<std::string, PartData*>::iterator it =
+    this->allParts.find(this->copiedPartNames.back());
+  if (it != this->allParts.end())
   {
-    // Get the part
-    boost::unordered_map<std::string, PartData*>::iterator it =
-      this->allParts.find(this->copiedPartNames[i]);
-    if (it != this->allParts.end())
+    PartData *copiedPart = it->second;
+    if (!copiedPart)
+      return;
+
+    std::string linkName = copiedPart->name + "_clone";
+
+    if (!this->modelVisual)
     {
-      PartData *copiedPart = it->second;
-      std::string linkName = copiedPart->name + "_clone";
-
-      /*this->modelVisual = copiedPart->visuals.back();*/
-      if (!this->modelVisual)
-      {
-        gzdbg << "No model visual found" << std::endl;
-        this->Reset();
-        //return;
-      }
-
-      rendering::VisualPtr linkVisual(new rendering::Visual(
-          linkName, this->modelVisual));
-      linkVisual->Load();
-
-      std::ostringstream visualName;
-      visualName << linkName << "_visual";
-      rendering::VisualPtr visVisual;
-      if (copiedPart->visuals.empty())
-      {
-          visVisual = rendering::VisualPtr(new rendering::Visual(visualName.str(),
-                        linkVisual));
-      }
-      else
-      {
-        visVisual = copiedPart->visuals.back();
-        visVisual->SetName(visualName.str());
-      }
-
-      // Need make a proper linkVisual!
-      // Why is name working?
-      // need to detach on click (wtf)
-
-      gzdbg << "Creating copied part" << std::endl;
-      this->CreatePart(visVisual);
-      this->mouseVisual = linkVisual;
-      emit PartAdded();
-    } else {
-      gzdbg << "Couldn't find part in allParts" << std::endl;
+      this->Reset();
     }
 
+    rendering::VisualPtr linkVisual(new rendering::Visual(
+        linkName, this->modelVisual));
+    linkVisual->Load();
+
+    std::ostringstream visualName;
+    visualName << linkName << "_visual";
+    rendering::VisualPtr visVisual;
+
+    math::Pose clonePose;
+
+    if (copiedPart->visuals.empty())
+    {
+      visVisual = rendering::VisualPtr(new rendering::Visual(visualName.str(),
+                      linkVisual));
+      sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+        ->GetElement("model")->GetElement("link")->GetElement("visual");
+      visVisual->Load(visualElem);
+    }
+    else
+    {
+      rendering::VisualPtr copiedVisual = copiedPart->visuals.back();
+      visVisual = copiedVisual->Clone(visualName.str(), linkVisual);
+      clonePose = copiedVisual->GetWorldPose();
+    }
+
+    rendering::UserCameraPtr userCamera = gui::get_active_camera();
+    if (userCamera)
+    {
+      math::Vector3 mousePosition =
+        ModelManipulator::GetMousePositionOnPlane(userCamera, this->lastMouseEvent);
+      clonePose.pos.x = mousePosition.x;
+      clonePose.pos.y = mousePosition.y;
+    }
+    
+    linkVisual->SetWorldPose(clonePose);
+    linkVisual->SetTransparency(0.5);
+
+    this->CreatePart(visVisual);
+    this->mouseVisual = linkVisual;
+    emit PartAdded();
   }
+
+  this->copiedPartNames.clear();
 }
 
 /////////////////////////////////////////////////
