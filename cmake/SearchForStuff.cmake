@@ -42,6 +42,14 @@ if (NOT PROTOBUF_PROTOC_LIBRARY)
   BUILD_ERROR ("Missing: Google Protobuf Compiler Library (libprotoc-dev)")
 endif()
 
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  set (GZ_PROTOBUF_LIBRARY ${PROTOBUF_LIBRARY_DEBUG})
+  set (GZ_PROTOBUF_PROTOC_LIBRARY ${PROTOBUF_PROTOC_LIBRARY_DEBUG})
+else()
+  set (GZ_PROTOBUF_LIBRARY ${PROTOBUF_LIBRARY})
+  set (GZ_PROTOBUF_PROTOC_LIBRARY ${PROTOBUF_PROTOC_LIBRARY})
+endif()
+
 ########################################
 include (FindOpenGL)
 if (NOT OPENGL_FOUND)

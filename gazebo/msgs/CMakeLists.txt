@@ -114,7 +114,7 @@ gz_build_tests(${msgs_tests_sources})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
-target_link_libraries(gazebomsgs_out ${PROTOBUF_LIBRARY} ${PROTOBUF_PROTOC_LIBRARY})
+target_link_libraries(gazebomsgs_out ${GZ_PROTOBUF_LIBRARY} ${GZ_PROTOBUF_PROTOC_LIBRARY})
 if (UNIX)
   target_link_libraries(gazebomsgs_out pthread)
 endif()
@@ -198,7 +198,7 @@ target_link_libraries(gazebo_msgs
   gazebo_common
   gazebo_math
   ${CURL_LIBRARIES}
-  ${PROTOBUF_LIBRARY}
+  ${GZ_PROTOBUF_LIBRARY}
 )
 
 add_dependencies(gazebo_msgs gazebomsgs_out)
