@@ -57,7 +57,8 @@ namespace gazebo
       // UNSAVED_CHANGES: Has been saved before, but has unsaved changes
       // NAME_CHANGED: Has been saved through "Save As" dialog, then the
       // name was changed, and it has not been saved through "Save As" since.
-      private: enum SaveState { NEVER_SAVED, SAVED, UNSAVED_CHANGES, NAME_CHANGED };
+      private: enum SaveState { NEVER_SAVED, SAVED, UNSAVED_CHANGES,
+                                NAME_CHANGED };
 
       /// \brief Constructor
       public: BuildingMaker();
@@ -322,7 +323,7 @@ namespace gazebo
       /// \brief Counter for the number of floors in the model.
       private: int floorCounter;
 
-      /// \brief Store the save state of the model (pending unsaved changes, etc).
+      /// \brief Store the current save state of the model.
       private: enum SaveState currentSaveState;
 
       /// \brief Default directory to save models: ~/building_editor_models
