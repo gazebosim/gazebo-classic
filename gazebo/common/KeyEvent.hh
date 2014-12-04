@@ -32,7 +32,8 @@ namespace gazebo
     class GAZEBO_VISIBLE KeyEvent
     {
       /// \brief Constructor.
-      public: KeyEvent();
+      public: KeyEvent() : type(NO_EVENT), key(0), text(""), control(false),
+                       shift(false), alt(false) {};
 
       /// \brief Key event types enumeration.
       public: enum EventType {NO_EVENT, PRESS, RELEASE};
