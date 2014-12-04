@@ -1085,6 +1085,7 @@ void EditorView::DeleteLevel(int _level)
       || _level >= static_cast<int>(this->levels.size()))
     return;
 
+  // Delete current level and move to level below or above
   int newLevelIndex = _level - 1;
   if (newLevelIndex < 0)
     newLevelIndex = _level + 1;

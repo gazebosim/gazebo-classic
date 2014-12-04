@@ -18,6 +18,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Quaternion.hh"
+#include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/BuildingModelManip.hh"
 
@@ -28,6 +29,11 @@ using namespace gui;
 BuildingModelManip::BuildingModelManip()
 {
   this->parent = NULL;
+  this->level = 0;
+
+  this->connections.push_back(
+  gui::editor::Events::ConnectChangeBuildingLevel(
+    boost::bind(&BuildingModelManip::OnChangeLevel, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -275,6 +281,12 @@ void BuildingModelManip::OnRotationChanged(double _roll, double _pitch,
 }
 
 /////////////////////////////////////////////////
+void BuildingModelManip::OnLevelChanged(int _level)
+{
+  this->SetLevel(_level);
+}
+
+/////////////////////////////////////////////////
 void BuildingModelManip::OnColorChanged(QColor _color)
 {
   this->SetColor(_color);
@@ -371,4 +383,27 @@ void BuildingModelManip::SetTexture(QString _texture)
 void BuildingModelManip::SetTransparency(float _transparency)
 {
   this->visual->GetParent()->SetTransparency(_transparency);
+}
+
+/////////////////////////////////////////////////
+void BuildingModelManip::SetLevel(const int _level)
+{
+  this->level = _level;
+}
+
+/////////////////////////////////////////////////
+int BuildingModelManip::GetLevel() const
+{
+  return this->level;
+}
+
+/////////////////////////////////////////////////
+void BuildingModelManip::OnChangeLevel(int _level)
+{
+  if (this->level > _level)
+    this->SetTransparency(1.0);
+  else if (this->level < _level)
+    this->SetTransparency(0.0);
+  else
+    this->SetTransparency(0.4);
 }
