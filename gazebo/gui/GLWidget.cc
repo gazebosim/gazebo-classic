@@ -989,18 +989,23 @@ void GLWidget::OnManipMode(const std::string &_mode)
 void GLWidget::OnCopy()
 {
   if (!this->selectedVisuals.empty())
+  {
     this->Copy(this->selectedVisuals.back()->GetName());
+  }
 }
 
 /////////////////////////////////////////////////
 void GLWidget::OnPaste()
 {
+  gzdbg << "In GLWidget::OnPaste" << std::endl;
   this->Paste(this->copyEntityName);
 }
 
 /////////////////////////////////////////////////
 void GLWidget::Copy(const std::string &_name)
 {
+  gzdbg << "GLWidget::Paste: Selected visual " << this->copyEntityName
+        << std::endl;
   this->copyEntityName = _name;
   g_pasteAct->setEnabled(true);
 }

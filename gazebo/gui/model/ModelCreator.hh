@@ -225,6 +225,10 @@ namespace gazebo
       /// \brief Qt signal when the a part has been added.
       Q_SIGNALS: void PartAdded();
 
+      Q_SIGNALS: void CopyTriggered();
+
+      Q_SIGNALS: void PasteTriggered();
+
       /// \brief The model in SDF format.
       private: sdf::SDFPtr modelSDF;
 

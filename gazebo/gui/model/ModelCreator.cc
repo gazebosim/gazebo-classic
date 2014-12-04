@@ -73,8 +73,10 @@ ModelCreator::ModelCreator()
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
   connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
           SLOT(OnDelete(const std::string &)));
-  connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
-  connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+
+  // Argh
+  connect(this, SIGNAL(CopyTriggered()), this, SLOT(OnCopy()));
+  connect(this, SIGNAL(PasteTriggered()), this, SLOT(OnPaste()));
 
   g_copyAct->setEnabled(true);
   //g_pasteAct->setEnabled(false);
@@ -580,6 +582,14 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
         it = this->selectedVisuals.erase(it);
       }
     }
+  }
+  else if (_event.modifiers() || Qt::ControlModifier)
+  {
+    if (_event.key == Qt::Key_C)
+      emit CopyTriggered();
+    else if (_event.key == Qt::Key_V)
+      emit PasteTriggered();
+
   }
   return false;
 }
