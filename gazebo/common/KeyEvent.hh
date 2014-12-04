@@ -34,11 +34,6 @@ namespace gazebo
       /// \brief Key event types enumeration.
       public: enum EventType {NO_EVENT, PRESS, RELEASE};
 
-      /// \brief Constructor.
-      public: KeyEvent()
-              : type(NO_EVENT), key(0)
-              {}
-
       /// \brief Event type.
       public: EventType type;
 
@@ -56,6 +51,12 @@ namespace gazebo
 
       /// \brief Was alt held during this key event?
       public: bool alt;
+
+      /// \brief Constructor.
+      public: KeyEvent()
+              : type(NO_EVENT), key(0), text(""),
+                control(false), shift(false), alt(false)
+              {}
     };
     /// \}
   }
