@@ -70,3 +70,6 @@ QT4_WRAP_CPP(TimerGUIPlugin_MOC TimerGUIPlugin.hh)
 add_library(TimerGUIPlugin SHARED TimerGUIPlugin.cc ${TimerGUIPlugin_MOC})
 target_link_libraries(TimerGUIPlugin libgazebo gazebo_sensors ${ogre_libraries} ${QT_LIBRARIES})
 install (TARGETS TimerGUIPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+
+add_subdirectory(events)
+
