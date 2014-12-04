@@ -89,6 +89,12 @@ namespace gazebo
       /// \brief Reset the joint maker;
       public: void Reset();
 
+      /// \brief Enable the mouse and key event handlers for the joint maker
+      public: void EnableEventHandlers();
+
+      /// \brief Disable the mouse and key event handlers for the joint maker
+      public: void DisableEventHandlers();
+
       /// \brief Add a joint
       /// \param[in] _type Type of joint to be added in string.
       public: void AddJoint(const std::string &_type);
@@ -257,7 +263,6 @@ namespace gazebo
       public: rendering::DynamicLines *line;
 
       /// \brief Visual handle used to represent joint parent / child
-      public: rendering::DynamicLines *handle;
       public: Ogre::BillboardSet *handles;
 
       /// \brief Type of joint.

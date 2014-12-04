@@ -50,9 +50,6 @@ namespace gazebo
       /// \brief Pose of part.
       public: math::Pose pose;
 
-      /// \brief Inertial properties.
-      public: physics::InertialPtr inertial;
-
       /// \brief Visual representing this part.
       public: rendering::VisualPtr partVisual;
 

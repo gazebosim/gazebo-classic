@@ -65,6 +65,21 @@ ModelCreator::ModelCreator()
   this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
 
+  KeyEventHandler::Instance()->AddPressFilter("model_creator",
+      boost::bind(&ModelCreator::OnKeyPress, this, _1));
+
+  MouseEventHandler::Instance()->AddPressFilter("model_creator",
+      boost::bind(&ModelCreator::OnMousePress, this, _1));
+
+  MouseEventHandler::Instance()->AddReleaseFilter("model_creator",
+      boost::bind(&ModelCreator::OnMouseRelease, this, _1));
+
+  MouseEventHandler::Instance()->AddMoveFilter("model_creator",
+      boost::bind(&ModelCreator::OnMouseMove, this, _1));
+
+  MouseEventHandler::Instance()->AddDoubleClickFilter("model_creator",
+      boost::bind(&ModelCreator::OnMouseDoubleClick, this, _1));
+
   this->jointMaker = new JointMaker();
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
@@ -106,6 +121,8 @@ void ModelCreator::OnEdit(bool _checked)
 
     MouseEventHandler::Instance()->AddDoubleClickFilter("model_creator",
         boost::bind(&ModelCreator::OnMouseDoubleClick, this, _1));
+
+    this->jointMaker->EnableEventHandlers();
   }
   else
   {
@@ -114,6 +131,7 @@ void ModelCreator::OnEdit(bool _checked)
     MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
     MouseEventHandler::Instance()->RemoveMoveFilter("model_creator");
     MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
+    this->jointMaker->DisableEventHandlers();
     this->jointMaker->Stop();
 
     if (this->selectedVis)
@@ -610,7 +628,8 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
   if (vis && !vis->IsPlane())
   {
-    if (this->allParts.find(vis->GetName()) == this->allParts.end())
+    if (this->allParts.find(vis->GetParent()->GetName()) ==
+          this->allParts.end())
     {
       // Prevent interaction with other models, send event only to
       // user camera
@@ -793,7 +812,7 @@ void ModelCreator::GenerateSDF()
   // set center of all parts to be origin
   math::Vector3 mid;
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
-      ++partsIt)
+       ++partsIt)
   {
     PartData *part = partsIt->second;
     mid += part->pose.pos;
@@ -804,7 +823,7 @@ void ModelCreator::GenerateSDF()
 
   // loop through all parts and generate sdf
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
-      ++partsIt)
+       ++partsIt)
   {
     visualNameStream.str("");
     collisionNameStream.str("");
@@ -817,16 +836,6 @@ void ModelCreator::GenerateSDF()
     newLinkElem->GetElement("gravity")->Set(part->gravity);
     newLinkElem->GetElement("self_collide")->Set(part->selfCollide);
     newLinkElem->GetElement("kinematic")->Set(part->kinematic);
-    sdf::ElementPtr inertialElem = newLinkElem->GetElement("inertial");
-    inertialElem->GetElement("mass")->Set(part->inertial->GetMass());
-    inertialElem->GetElement("pose")->Set(part->inertial->GetPose());
-    sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
-    inertiaElem->GetElement("ixx")->Set(part->inertial->GetIXX());
-    inertiaElem->GetElement("iyy")->Set(part->inertial->GetIYY());
-    inertiaElem->GetElement("izz")->Set(part->inertial->GetIZZ());
-    inertiaElem->GetElement("ixy")->Set(part->inertial->GetIXY());
-    inertiaElem->GetElement("ixz")->Set(part->inertial->GetIXZ());
-    inertiaElem->GetElement("iyz")->Set(part->inertial->GetIYZ());
 
     modelElem->InsertElement(newLinkElem);
 

@@ -47,30 +47,20 @@ JointMaker::JointMaker()
   this->jointType = JointMaker::JOINT_NONE;
   this->jointCounter = 0;
 
-  this->jointMaterials[JOINT_FIXED] = "Gazebo/Red";
-  this->jointMaterials[JOINT_HINGE] = "Gazebo/Orange";
-  this->jointMaterials[JOINT_HINGE2] = "Gazebo/Yellow";
-  this->jointMaterials[JOINT_SLIDER] = "Gazebo/Green";
-  this->jointMaterials[JOINT_SCREW] = "Gazebo/Black";
+  this->jointMaterials[JOINT_FIXED]     = "Gazebo/Red";
+  this->jointMaterials[JOINT_HINGE]     = "Gazebo/Orange";
+  this->jointMaterials[JOINT_HINGE2]    = "Gazebo/Yellow";
+  this->jointMaterials[JOINT_SLIDER]    = "Gazebo/Green";
+  this->jointMaterials[JOINT_SCREW]     = "Gazebo/Black";
   this->jointMaterials[JOINT_UNIVERSAL] = "Gazebo/Blue";
-  this->jointMaterials[JOINT_BALL] = "Gazebo/Purple";
-
-  MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
-    boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
-
-  MouseEventHandler::Instance()->AddReleaseFilter("model_joint",
-      boost::bind(&JointMaker::OnMouseRelease, this, _1));
-
-  KeyEventHandler::Instance()->AddPressFilter("model_joint",
-      boost::bind(&JointMaker::OnKeyPress, this, _1));
+  this->jointMaterials[JOINT_BALL]      = "Gazebo/Purple";
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&JointMaker::Update, this)));
 
   this->inspectAct = new QAction(tr("Open Joint Inspector"), this);
-  connect(this->inspectAct, SIGNAL(triggered()), this,
-      SLOT(OnOpenInspector()));
+  connect(this->inspectAct, SIGNAL(triggered()), this, SLOT(OnOpenInspector()));
 
   this->updateMutex = new boost::recursive_mutex();
 }
@@ -78,10 +68,6 @@ JointMaker::JointMaker()
 /////////////////////////////////////////////////
 JointMaker::~JointMaker()
 {
-  MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_joint");
-  MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
-  KeyEventHandler::Instance()->RemovePressFilter("model_joint");
-
   this->Reset();
 }
 
@@ -106,6 +92,28 @@ void JointMaker::Reset()
   while (this->joints.size() > 0)
     this->RemoveJoint(this->joints.begin()->first);
   this->joints.clear();
+}
+
+/////////////////////////////////////////////////
+void JointMaker::EnableEventHandlers()
+{
+  MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
+    boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
+
+  MouseEventHandler::Instance()->AddReleaseFilter("model_joint",
+      boost::bind(&JointMaker::OnMouseRelease, this, _1));
+
+  KeyEventHandler::Instance()->AddPressFilter("model_joint",
+      boost::bind(&JointMaker::OnKeyPress, this, _1));
+}
+
+/////////////////////////////////////////////////
+void JointMaker::DisableEventHandlers()
+{
+  MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_joint");
+  MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
+  MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
+  KeyEventHandler::Instance()->RemovePressFilter("model_joint");
 }
 
 /////////////////////////////////////////////////
@@ -388,10 +396,6 @@ void JointMaker::Stop()
     this->selectedVis.reset();
     this->hoverVis.reset();
   }
-  MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_joint");
-  MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
-  MouseEventHandler::Instance()->RemovePressFilter("model_joint");
-  MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
 }
 
 /////////////////////////////////////////////////

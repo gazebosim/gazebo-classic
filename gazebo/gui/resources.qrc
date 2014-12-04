@@ -39,6 +39,17 @@
   <file>images/left_arrow.png</file>
   <file>images/up_arrow.png</file>
   <file>images/screenshot.png</file>
+  <file>images/align.png</file>
+  <file>images/magnet.png</file>
+  <file>images/x_min.png</file>
+  <file>images/x_center.png</file>
+  <file>images/x_max.png</file>
+  <file>images/y_min.png</file>
+  <file>images/y_center.png</file>
+  <file>images/y_max.png</file>
+  <file>images/z_min.png</file>
+  <file>images/z_center.png</file>
+  <file>images/z_max.png</file>
   <file>images/draw_link.svg</file>
 </qresource>
 </RCC>
