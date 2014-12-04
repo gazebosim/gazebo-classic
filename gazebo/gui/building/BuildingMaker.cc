@@ -670,8 +670,8 @@ void BuildingMaker::SaveToSDF(const std::string &_savePath)
 {
   this->saveLocation = _savePath;
   std::ofstream savefile;
-  boost::filesystem::path path;
-  path = path / this->saveLocation / "model.sdf";
+  boost::filesystem::path path(_savePath);
+  path = path / "model.sdf";
   gzdbg << "Saving file to " << path.string() << std::endl;
 
   savefile.open(path.string().c_str());
@@ -1772,6 +1772,24 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
       // Add it to GAZEBO_MODEL_PATHS and notify InsertModelWidget
       gazebo::common::SystemPaths::Instance()->
         AddModelPathsUpdate(parentDirectory);
+    }
+
+    std::string additionalProperties =
+      gui::getINIProperty<std::string>("model_paths.filenames", "");
+    if (additionalProperties.find(parentDirectory) == std::string::npos)
+    {
+      // Add it to gui.ini
+      gui::setINIProperty("model_paths.filenames", parentDirectory);
+      // Save any changes that were made to the property tree
+
+      char *home = getenv("HOME");
+      if (home)
+      {
+        boost::filesystem::path guiINIPath = home;
+        guiINIPath  = guiINIPath / ".gazebo" / "gui.ini";
+        gzdbg << "Saving property tree to " << guiINIPath.string() << std::endl;
+        saveINI(guiINIPath);
+      }
     }
 
     this->currentSaveState = SAVED;
