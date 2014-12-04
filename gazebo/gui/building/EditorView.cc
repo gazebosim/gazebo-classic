@@ -424,7 +424,6 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
   if (grabber && editorItem && (editorItem->GetType() == "Window"
       || editorItem->GetType() == "Door") )
   {
-    editorItem->SetPositionOnWall(0, NULL);
     if (grabber->parentItem())
     {
       WallSegmentItem *wallSegmentItem =
@@ -448,6 +447,8 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         if (distance > 30 || t > 1.0 || t < 0.0)
         {
           editorItem->setParentItem(NULL);
+          editorItem->SetPositionOnWall(0);
+          editorItem->SetAngleOnWall(0);
           this->buildingMaker->DetachManip(this->itemToVisualMap[editorItem],
                 this->itemToVisualMap[wallSegmentItem]);
           editorItem->SetRotation(editorItem->GetRotation()
@@ -467,7 +468,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
                                        absPositionOnWall.y()*
                                        absPositionOnWall.y());
           editorItem->SetPositionOnWall(positionLength /
-              wallSegmentItem->line().length(), wallSegmentItem);
+              wallSegmentItem->line().length());
         }
         return;
       }
@@ -501,7 +502,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
                                          absPositionOnWall.y()*
                                          absPositionOnWall.y());
             editorItem->SetPositionOnWall(positionLength /
-                wallSegmentItem->line().length(), wallSegmentItem);
+                wallSegmentItem->line().length());
             return;
           }
         }

@@ -132,6 +132,10 @@
     1. Detach all child manips when item is deleted, added BuildingMaker::DetachAllChildren.
         * [Pull request #1316](https://bitbucket.org/osrf/gazebo/pull-request/1316)
 
+    1. Measures for doors and windows. Added RectItem::angleOnWall and related Get/Set.
+        * [Pull request #1322](https://bitbucket.org/osrf/gazebo/pull-request/1322)
+        * [Issue #370](https://bitbucket.org/osrf/gazebo/issue/370)
+
 1. Model editor updates
     1. Fix adding/removing event filters .
         * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
