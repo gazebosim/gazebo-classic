@@ -29,6 +29,82 @@ pid_t  pid1, pid2;
 bool killed1 = false;
 bool killed2 = false;
 
+#ifdef _WIN32
+  typedef PROCESS_INFORMATION forkHandlerType;
+#else
+  typedef pid_t forkHandlerType;
+#endif
+
+/// \brief create a new process and run command on it. This function is
+/// implementing the creation of a new process on both Linux (fork) and
+/// Windows (CreateProcess) and the execution of the command provided.
+/// \param[in] command The full system path to the binary to run into the
+/// new process, including arguments.
+/// \return On success, the PID of the child process is returned in the
+/// parent, an 0 is returned in the child. On failure, -1 is returned in the
+/// parent and no child process is created.
+forkHandlerType forkAndRun(const char * command)
+{
+#ifdef _WIN32
+    STARTUPINFO info= {sizeof(info)};
+    PROCESS_INFORMATION processInfo;
+
+    if (!CreateProcess(NULL, const_cast<LPSTR>(command), NULL, NULL, TRUE,
+          0, NULL, NULL, &info, &processInfo))
+    {
+      std::cerr << "CreateProcess call failed" << std::endl;
+    }
+
+    return processInfo;
+#else
+    pid_t pid = fork();
+
+    if (pid == 0)
+    {
+      if (execvp(command[0], command) == -1)
+        std::cerr << "Error running execl call: " << command << std::endl;
+    }
+
+    return pid;
+#endif
+  }
+
+  /// \brief Wait for the end of a process and handle the termination
+  /// \param[in] pi Process handler of the process to wait for
+  /// (PROCESS_INFORMATION in windows or forkHandlerType in UNIX).
+  void waitAndCleanupFork(const forkHandlerType pi)
+  {
+#ifdef _WIN32
+    // Wait until child process exits.
+    WaitForSingleObject(pi.hProcess, INFINITE);
+
+    // Close process and thread handler.
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+#else
+    // Wait for the child process to return.
+    int status;
+    waitpid(pi, &status, 0);
+    if (status == -1)
+      std::cerr << "Error while running waitpid" << std::endl;
+#endif
+  }
+
+  /// \brief Send a termination signal to the process handled by pi.
+  /// \param[in] pi Process handler of the process to stop
+  /// (PROCESS_INFORMATION in windows or forkHandlerType in UNIX).
+  void killFork(const forkHandlerType pi)
+  {
+#ifdef _WIN32
+    // TerminateProcess return 0 on error
+    if (TerminateProcess(pi.hProcess, 0) == 0)
+      std::cerr << "Error running TerminateProcess: " << GetLastError();
+#else
+    kill(pi, SIGTERM);
+#endif
+  }
+}
+
 /////////////////////////////////////////////////
 void help()
 {
@@ -112,6 +188,7 @@ int main(int _argc, char **_argv)
     return 0;
   }
 
+#ifndef _WIN32
   struct sigaction sigact;
   sigact.sa_handler = sig_handler;
   if (sigaction(SIGINT, &sigact, NULL))
@@ -120,8 +197,7 @@ int main(int _argc, char **_argv)
           << " Please visit http://gazebosim.org/support.html for help.\n";
     return 0;
   }
-
-  pid1 = fork();
+#endif
 
   char **argvServer = new char*[_argc+1];
   char **argvClient = new char*[_argc+1];
@@ -134,16 +210,16 @@ int main(int _argc, char **_argv)
   }
   argvServer[_argc] = static_cast<char*>(NULL);
   argvClient[_argc] = static_cast<char*>(NULL);
+  
+  // pid1 = fork();
+  forkHandlerType pid1 = forkAndRun(argvServer);
+  forkHandlerType pid2 = forkAndRun(argvClient);
 
   // Need to check the return of wait function (8 lines below) to know
   // what should be returned by the process
   int returnValue = 0;
 
-  if (pid1)
-  {
-    pid2 = fork();
-    if (pid2)
-    {
+#ifndef (_WIN32)
       int child_exit_status;
       pid_t dead_child = wait(&child_exit_status);
       // WIFEXITED will return zero if the process finished not reaching
@@ -163,25 +239,11 @@ int main(int _argc, char **_argv)
       // one of the children died
       if (!sig_killed)
         sig_handler(SIGINT);
-    }
-    else
-    {
-      // gazebo::gui::run(_argc, _argv);
-      // gzclient argv
-      execvp(argvClient[0], argvClient);
-    }
-  }
-  else
-  {
-    // gazebo::Server *server = new gazebo::Server();
-    // if (!server->ParseArgs(_argc, _argv))
-      // return -1;
-    // server->Run();
-    // server->Fini();
-    // delete server;
-    // server = NULL;
-    execvp(argvServer[0], argvServer);
-  }
+#else
+  // TODO handling exit on Windows
+  waitAndCleanupFork(pid1);
+  waitAndCleanupFork(pid2);
+#endif
 
   delete[] argvServer;
   delete[] argvClient;
