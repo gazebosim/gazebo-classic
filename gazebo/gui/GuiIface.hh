@@ -64,17 +64,18 @@ namespace gazebo
     GAZEBO_VISIBLE
     bool has_entity_name(const std::string &_name);
 
-    /// \brief Load an INI configuration file. If the file does not exists
-    /// one will be automatically created.
-    /// \param[in] _file Full path to the INI file.
-    /// \return False if the file provided exists but is not an INI valid file.
-    GAZEBO_VISIBLE
-    bool loadINI(const boost::filesystem::path &_file);
-
-    /// \brief Locate the GUI INI configuration file.
+    /// \brief Locate and load the INI configuration file.
+    /// If the GAZEBO_GUI_INI_FILE environment variable is set and contains
+    /// valid content, load and return true. If GAZEBO_GUI_INI_FILE is
+    /// not set, load from ~/.gazebo/gui.ini (a gui.ini file will be created
+    /// if it doesn't exist) and return true.
+    /// If GAZEBO_GUI_INI_FILE is set but the path does not exist, or if it
+    /// exists and contains invalid content, do not load, and return false.
+    /// \param[in] _file Absolute path to a gui.ini file. This will override
+    /// the environment variables.
     /// \return True if an INI file was loaded, false otherwise.
     GAZEBO_VISIBLE
-    bool getGUIINIPath();
+    bool loadINI(boost::filesystem::path _file = "");
 
     /// \brief Get a property from the GUI INI file.
     /// \param[in] _key String based key[ SECTION.VALUE ]
