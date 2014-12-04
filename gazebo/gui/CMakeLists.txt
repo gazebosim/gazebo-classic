@@ -21,6 +21,8 @@ add_subdirectory(model)
 add_subdirectory(terrain)
 add_subdirectory(viewers)
 
+include_directories(${TBB_INCLUDEDIR})
+
 set (sources
   Actions.cc
   AlignWidget.cc
@@ -195,6 +197,7 @@ target_link_libraries(gzclient
   gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
+  gazebo_skyx
   gzqtpropertybrowser
   libgazebo
   ${QT_LIBRARIES}
