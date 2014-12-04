@@ -774,7 +774,6 @@ void ModelCreator::OnCopy()
     for (unsigned int i = 0; i < this->selectedVisuals.size(); i++)
     {
       this->copiedPartNames.push_back(this->selectedVisuals[i]->GetName());
-      gzdbg << "Copied part: " << this->copiedPartNames.back() << std::endl;
     }
     // Set enable Paste
     this->pasteEnabled = true;
@@ -784,7 +783,6 @@ void ModelCreator::OnCopy()
 /////////////////////////////////////////////////
 void ModelCreator::OnPaste()
 {
-  //TODO: Mutex for copiedPartNames
   if (this->copiedPartNames.empty())
   {
     return;
@@ -835,11 +833,12 @@ void ModelCreator::OnPaste()
     if (userCamera)
     {
       math::Vector3 mousePosition =
-        ModelManipulator::GetMousePositionOnPlane(userCamera, this->lastMouseEvent);
+        ModelManipulator::GetMousePositionOnPlane(userCamera,
+                                                  this->lastMouseEvent);
       clonePose.pos.x = mousePosition.x;
       clonePose.pos.y = mousePosition.y;
     }
-    
+
     linkVisual->SetWorldPose(clonePose);
     linkVisual->SetTransparency(0.5);
 
