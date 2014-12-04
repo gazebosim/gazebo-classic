@@ -78,8 +78,8 @@ ModelCreator::ModelCreator()
   connect(this, SIGNAL(CopyTriggered()), this, SLOT(OnCopy()));
   connect(this, SIGNAL(PasteTriggered()), this, SLOT(OnPaste()));
 
-  g_copyAct->setEnabled(true);
-  //g_pasteAct->setEnabled(false);
+  g_copyAct->setEnabled(false);
+  g_pasteAct->setEnabled(false);
   this->Reset();
 }
 
@@ -585,11 +585,10 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
   }
   else if (_event.modifiers() || Qt::ControlModifier)
   {
-    if (_event.key == Qt::Key_C)
+    if (_event.key == Qt::Key_C && _event.control)
       emit CopyTriggered();
-    else if (_event.key == Qt::Key_V)
+    else if (_event.key == Qt::Key_V && _event.control)
       emit PasteTriggered();
-
   }
   return false;
 }
