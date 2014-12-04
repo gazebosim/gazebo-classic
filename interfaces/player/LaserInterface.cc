@@ -163,7 +163,7 @@ void LaserInterface::Unsubscribe()
 }
 
 /////////////////////////////////////////////////
-void LaserInterface::OnScan(ConstLaserScanPtr &_msg)
+void LaserInterface::OnScan(ConstLaserScanStampedPtr &_msg)
 {
   int i;
 
@@ -172,12 +172,12 @@ void LaserInterface::OnScan(ConstLaserScanPtr &_msg)
 
   double oldCount = this->data.scan.ranges_count;
 
-  this->data.scan.min_angle = _msg->angle_min();
-  this->data.scan.max_angle = _msg->angle_max();
-  this->data.scan.resolution = _msg->angle_step();
-  this->data.scan.max_range = _msg->range_max();
+  this->data.scan.min_angle = _msg->scan().angle_min();
+  this->data.scan.max_angle = _msg->scan().angle_max();
+  this->data.scan.resolution = _msg->scan().angle_step();
+  this->data.scan.max_range = _msg->scan().range_max();
   this->data.scan.ranges_count =
-    this->data.scan.intensity_count = _msg->ranges_size();
+    this->data.scan.intensity_count = _msg->scan().ranges_size();
   this->data.scan.id = this->scanId++;
 
   if (!gazebo::math::equal(oldCount,
@@ -190,16 +190,16 @@ void LaserInterface::OnScan(ConstLaserScanPtr &_msg)
     this->data.scan.intensity = new uint8_t[this->data.scan.intensity_count];
   }
 
-  for (i = 0; i < _msg->ranges_size(); ++i)
-    this->data.scan.ranges[i] = _msg->ranges(i);
+  for (i = 0; i < _msg->scan().ranges_size(); ++i)
+    this->data.scan.ranges[i] = _msg->scan().ranges(i);
 
-  for (i = 0; i < _msg->intensities_size(); ++i)
-    this->data.scan.intensity[i] = (uint8_t)_msg->intensities(i);
+  for (i = 0; i < _msg->scan().intensities_size(); ++i)
+    this->data.scan.intensity[i] = (uint8_t)_msg->scan().intensities(i);
 
-  this->data.pose.px = _msg->world_pose().position().x();
-  this->data.pose.py = _msg->world_pose().position().y();
+  this->data.pose.px = _msg->scan().world_pose().position().x();
+  this->data.pose.py = _msg->scan().world_pose().position().y();
   this->data.pose.pa = gazebo::msgs::Convert(
-      _msg->world_pose().orientation()).GetAsEuler().z;
+      _msg->scan().world_pose().orientation()).GetAsEuler().z;
 
   if (this->data.scan.ranges_count > 0)
   {

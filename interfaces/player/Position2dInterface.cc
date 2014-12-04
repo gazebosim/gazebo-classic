@@ -79,7 +79,7 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
     gazebo::msgs::Set(msg.mutable_position(),
                       gazebo::math::Vector3(cmd->vel.px, cmd->vel.py, 0));
     gazebo::msgs::Set(msg.mutable_orientation(),
-                      gazebo::math::Quaternion(0, 0, cmd->vel.pa));
+                      gazebo::math::Quaternion(0, 0, -cmd->vel.pa));
     this->velPub->Publish(msg);
 
     result = 0;
@@ -222,7 +222,7 @@ void Position2dInterface::Unsubscribe()
 }
 
 //////////////////////////////////////////////////
-void Position2dInterface::OnPoseMsg(ConstPose_VPtr &_msg)
+void Position2dInterface::OnPoseMsg(ConstPosesStampedPtr &_msg)
 {
   // Iterate through all the pose messages
   for (int i = 0; i < _msg->pose_size(); ++i)
