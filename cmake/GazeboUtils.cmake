@@ -128,13 +128,13 @@ endmacro ()
 macro (gz_setup_unix)
     # Using dynamic linking in UNIX by default
     set(BUILD_SHARED_LIBS TRUE)
-    add_definitions(-DBUILDING_STATIC_LIBS)
 endmacro()
 
 #################################################
 macro (gz_setup_windows)
     # Using static linking in Windows by default
     set(BUILD_SHARED_LIBS FALSE)
+    add_definitions(-DBUILDING_STATIC_LIBS)
 endmacro()
 
 #################################################
