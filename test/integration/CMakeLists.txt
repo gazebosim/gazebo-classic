@@ -68,6 +68,7 @@ set(tests
   road.cc
   sensor.cc
   server_fixture.cc
+  sim_events.cc
   speed.cc
   stress_spawn_models.cc
   #state_log.cc
