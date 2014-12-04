@@ -68,6 +68,10 @@ ModelCreator::ModelCreator()
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
   connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
           SLOT(OnDelete(const std::string &)));
+  // TODO: do we need to take the name of the object to copy?
+  connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
+  g_pasteAct->setEnabled(false);
+  connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
 
   this->Reset();
 }
@@ -616,19 +620,23 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   if (vis)
   {
     // Is part
-    if (this->allParts.find(vis->GetName()) != this->allParts.end())
+    boost::unordered_map<std::string, PartData*>::iterator it =
+      this->allParts.find(vis->GetName());
+    if (it != this->allParts.end())
     {
       // Whole model or another part is selected
       if (userCamera->GetScene()->GetSelectedVisual() == this->modelVisual ||
           this->selectedVis)
       {
         // Deselect part
+        // TODO: Should this call selectedVis.reset()?
         if (this->selectedVis)
           this->selectedVis->SetHighlighted(false);
         // Deselect model
         else
           event::Events::setSelectedEntity("", "normal");
 
+        gzdbg << "selecting model" << std::endl;
         this->selectedVis = vis;
         this->selectedVis->SetHighlighted(true);
         return true;
@@ -708,6 +716,61 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
     }
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnCopy()
+{
+  // Get name of currently highlighted visual (?)
+  if (this->selectedVis)
+  {
+    this->copiedPartName = this->selectedVis->GetName();
+    gzdbg << "Copied part: " << this->copiedPartName << std::endl;
+    g_pasteAct->setEnabled(true);
+  } else {
+    gzdbg << "couldn't copy selected visual?" << std::endl;
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnPaste()
+{
+  gzdbg << "In OnPaste" << std::endl;
+  if (this->copiedPartName.empty())
+  {
+    gzdbg << "name empty, returning: " << this->copiedPartName << std::endl;
+    return;
+  }
+
+  // Get the part
+  boost::unordered_map<std::string, PartData*>::iterator it =
+    this->allParts.find(this->copiedPartName);
+  if (it != this->allParts.end())
+  {
+    PartData *copiedPart = it->second;
+    std::string linkName = copiedPart->name + "_clone";
+
+    this->modelVisual = copiedPart->visuals.back();
+    if (!this->modelVisual)
+    {
+      this->Reset();
+    }
+
+    rendering::VisualPtr linkVisual(new rendering::Visual(
+        linkName, this->modelVisual));
+    linkVisual->Load();
+
+    std::ostringstream visualName;
+    visualName << linkName << "_visual";
+    rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+          linkVisual));
+
+    gzdbg << "Creating copied part" << std::endl;
+    this->CreatePart(visVisual);
+    this->mouseVisual = linkVisual;
+  } else {
+    gzdbg << "Couldn't find part in allParts" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////

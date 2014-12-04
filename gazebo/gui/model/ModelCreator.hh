@@ -186,6 +186,10 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
 
+      private slots: void OnCopy();
+
+      private slots: void OnPaste();
+
       /// \brief Create part with default properties from a visual
       /// \param[in] _visual Visual used to create the part.
       private: void CreatePart(const rendering::VisualPtr &_visual);
@@ -276,8 +280,15 @@ namespace gazebo
       /// \brief origin of the model.
       private: math::Pose origin;
 
-      /// \brief Selected partv visual;
+      /// \brief Selected part visual;
       private: rendering::VisualPtr selectedVis;
+
+      /// \brief Selected part.
+      //private: PartData *selectedPart;
+      
+      /// \brief Name of part copied through g_copyAct
+      private: std::string copiedPartName;
+
     };
     /// \}
 
