@@ -301,6 +301,13 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   this->mouseEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
 
+  this->keyEvent.control =
+    this->keyModifiers & Qt::ControlModifier ? true : false;
+  this->keyEvent.shift =
+    this->keyModifiers & Qt::ShiftModifier ? true : false;
+  this->keyEvent.alt =
+    this->keyModifiers & Qt::AltModifier ? true : false;
+
   if (this->mouseEvent.control)
   {
     if (_event->key() == Qt::Key_C && !this->selectedVisuals.empty())
@@ -361,6 +368,12 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->mouseEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
 
+  this->keyEvent.control =
+    this->keyModifiers & Qt::ControlModifier ? true : false;
+  this->keyEvent.shift =
+    this->keyModifiers & Qt::ShiftModifier ? true : false;
+  this->keyEvent.alt =
+    this->keyModifiers & Qt::AltModifier ? true : false;
 
   ModelManipulator::Instance()->OnKeyReleaseEvent(this->keyEvent);
   this->keyText = "";
