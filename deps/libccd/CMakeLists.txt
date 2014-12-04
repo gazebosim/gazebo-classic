@@ -14,7 +14,11 @@ include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/libccd/include )
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_CCD")
 
-gz_add_library(gazebo_ccd ${sources})
+if (WIN32)
+  add_library(gazebo_ccd SHARED ${sources})
+else()
+  gz_add_library(gazebo_ccd ${sources})
+endif()
 if (NOT WIN32)
   target_link_libraries(gazebo_ccd m)
 endif()

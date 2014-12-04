@@ -250,7 +250,11 @@ endif()
 
 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
 
-gz_add_library(gazebo_ode ${sources})
+if (WIN32)
+  add_library(gazebo_ode SHARED ${sources})
+else()
+  gz_add_library(gazebo_ode ${sources})
+endif()
 target_link_libraries(gazebo_ode
   gazebo_opcode
   gazebo_gimpact
