@@ -342,7 +342,6 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   wallManip->SetName(linkName);
   wallManip->SetVisual(visVisual);
   visVisual->SetScale(scaledSize);
-  visVisual->SetTransparency(0.0);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   wallManip->SetLevel(this->currentLevel);
   wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
@@ -389,7 +388,6 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   windowManip->SetVisual(visVisual);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
-  visVisual->SetTransparency(0.0);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   windowManip->SetLevel(this->currentLevel);
@@ -436,7 +434,6 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   doorManip->SetVisual(visVisual);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
-  visVisual->SetTransparency(0.0);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   doorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   doorManip->SetLevel(this->currentLevel);
@@ -495,7 +492,6 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
       ->Set(gazebo::common::Color(1, 1, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
   baseStepVisual->Load(visualElem);
-  baseStepVisual->SetTransparency(0.0);
 
   double rise = 1.0 / dSteps;
   double run = 1.0 / dSteps;
@@ -560,7 +556,6 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   floorManip->SetLevel(this->currentLevel);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
-  visVisual->SetTransparency(0.4);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   floorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = floorManip;

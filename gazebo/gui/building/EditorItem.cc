@@ -88,6 +88,7 @@ void EditorItem::SetName(const std::string &_name)
 void EditorItem::Set3dColor(QColor _color)
 {
   this->visual3dColor = _color;
+  emit ColorChanged(this->visual3dColor);
 }
 
 /////////////////////////////////////////////////
@@ -113,7 +114,7 @@ void EditorItem::Set3dTexture(QString _texture)
 void EditorItem::Set3dTransparency(float _transparency)
 {
   this->visual3dTransparency = _transparency;
-  this->TransparencyChanged(this->visual3dTransparency);
+  emit TransparencyChanged(this->visual3dTransparency);
 }
 
 /////////////////////////////////////////////////

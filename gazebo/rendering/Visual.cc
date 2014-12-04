@@ -1023,7 +1023,8 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
            << ". Object will appear white.\n";
   }
 
-  this->SetTransparencyInnerLoop(this->GetTransparency());
+  // Re-apply the transparency filter for the last known transparency value
+  this->SetTransparencyInnerLoop();
 
   // Apply material to all child visuals
   for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
@@ -1317,7 +1318,8 @@ void Visual::SetWireframe(bool _show)
   }
 }
 
-void Visual::SetTransparencyInnerLoop(float _trans)
+//////////////////////////////////////////////////
+void Visual::SetTransparencyInnerLoop()
 {
   for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
       i++)
@@ -1375,7 +1377,6 @@ void Visual::SetTransparencyInnerLoop(float _trans)
       }
     }
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -1393,7 +1394,7 @@ void Visual::SetTransparency(float _trans)
     (*iter)->SetTransparency(_trans);
   }
 
-  this->SetTransparencyInnerLoop(_trans);
+  this->SetTransparencyInnerLoop();
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
