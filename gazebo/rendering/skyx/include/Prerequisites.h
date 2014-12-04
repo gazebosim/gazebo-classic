@@ -38,17 +38,21 @@ http://www.gnu.org/copyleft/lesser.txt.
 #include <OGRE/Ogre.h>
 
 /// Define the dll export qualifier if compiling for Windows
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-  #ifdef SKYX_LIB
-    #define DllExport __declspec (dllexport)
-  #else
-    #define DllExport __declspec (dllimport)
-  #endif
+#if defined BUILDING_STATIC_LIBS
+  #define DllExport
 #else
-  #if __GNUC__ >= 4
-    #define DllExport __attribute__ ((visibility ("default")))
+  #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+    #ifdef SKYX_LIB
+      #define DllExport __declspec (dllexport)
+    #else
+      #define DllExport __declspec (dllimport)
+    #endif
   #else
-    #define DllExport
+    #if __GNUC__ >= 4
+      #define DllExport __attribute__ ((visibility ("default")))
+    #else
+      #define DllExport
+    #endif
   #endif
 #endif
 
