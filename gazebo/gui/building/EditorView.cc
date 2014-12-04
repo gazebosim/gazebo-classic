@@ -1234,12 +1234,14 @@ void EditorView::OnLevelApply()
 
   std::string newLevelName = dialog->GetLevelName();
   this->levels[this->currentLevel]->name = newLevelName;
-  this->levels[this->currentLevel]->floorItem->Set3dTexture(dialog->
-      GetFloorTexture());
-  this->levels[this->currentLevel]->floorItem->Set3dColor(dialog->
-      GetFloorColor());
-  this->levels[this->currentLevel]->floorItem->FloorChanged();
-  this->levels[this->currentLevel]->floorItem->Set3dTransparency(0.4);
+  FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
+  if (floorItem)
+  {
+    floorItem->Set3dTexture(dialog->GetFloorTexture());
+    floorItem->Set3dColor(dialog->GetFloorColor());
+    floorItem->Set3dTransparency(0.4);
+    floorItem->FloorChanged();
+  }
   gui::editor::Events::updateLevelWidget(this->currentLevel, newLevelName);
 }
 
