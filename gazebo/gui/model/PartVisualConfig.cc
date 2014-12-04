@@ -129,7 +129,9 @@ void PartVisualConfig::AddVisual(const std::string &_name,
   ConfigWidget *configWidget = new ConfigWidget;
 
   if (_visualMsg)
+  {
     configWidget->Load(_visualMsg);
+  }
   else
   {
     msgs::Visual visualMsg;
@@ -332,6 +334,25 @@ void PartVisualConfig::AddVisual(const std::string &_name,
   this->visualsTreeWidget->setItemWidget(visualChildItem, 0, visualWidget);
   visualItem->setExpanded(false);
   visualChildItem->setExpanded(false);
+}
+
+/////////////////////////////////////////////////
+void PartVisualConfig::UpdateVisual(const std::string &_name,
+    const msgs::Visual *_visualMsg)
+{
+  std::map<int, VisualConfigData *>::iterator it;
+
+  for (it = this->configs.begin(); it != this->configs.end(); ++it)
+  {
+    if (it->second->name == _name)
+    {
+      VisualConfigData *configData = it->second;
+//      std::cerr << " update visual  "<< _visualMsg->DebugString()
+//          << std::endl;
+      configData->configWidget->UpdateFromMsg(_visualMsg);
+      break;
+    }
+  }
 }
 
 /////////////////////////////////////////////////

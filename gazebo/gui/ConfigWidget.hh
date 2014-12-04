@@ -242,7 +242,6 @@ namespace gazebo
       public: std::string GetGeometryWidgetValue(const std::string &_name,
           math::Vector3 &_dimensions) const;
 
-
       /// \brief Parse the input message and either create widgets for
       /// configuring fields of the message, or update the widgets with values
       /// from the message.

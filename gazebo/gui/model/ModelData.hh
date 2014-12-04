@@ -34,6 +34,13 @@ namespace gazebo
 {
   namespace gui
   {
+    class ModelData
+    {
+      /// \brief Get a template SDF string of a simple model.
+      /// \return Template SDF string of a simple model.
+      public: static std::string GetTemplateSDFString();
+    };
+
     /// \class CollisionData CollisionData.hh
     /// \brief Helper class to store collision data
     class CollisionData

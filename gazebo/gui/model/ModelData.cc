@@ -33,12 +33,45 @@ using namespace gui;
 
 
 /////////////////////////////////////////////////
+std::string ModelData::GetTemplateSDFString()
+{
+  std::ostringstream newModelStr;
+  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
+    << "<model name='template_model'>"
+    << "<pose>0 0 0.0 0 0 0</pose>"
+    << "<link name ='link'>"
+    <<   "<visual name ='visual'>"
+    <<     "<pose>0 0 0.0 0 0 0</pose>"
+    <<     "<geometry>"
+    <<       "<box>"
+    <<         "<size>1.0 1.0 1.0</size>"
+    <<       "</box>"
+    <<     "</geometry>"
+    <<     "<material>"
+    <<       "<lighting>true</lighting>"
+    <<       "<ambient>1 1 1 1</ambient>"
+    <<       "<diffuse>1 1 1 1</diffuse>"
+    <<       "<specular>1 1 1 1</specular>"
+    <<       "<script>"
+    <<         "<uri>file://media/materials/scripts/gazebo.material</uri>"
+    <<         "<name>Gazebo/Grey</name>"
+    <<       "</script>"
+    <<     "</material>"
+    <<   "</visual>"
+    << "</link>"
+    << "<static>true</static>"
+    << "</model>"
+    << "</sdf>";
+
+  return newModelStr.str();
+}
+
+/////////////////////////////////////////////////
 CollisionData::CollisionData()
 {
   this->collisionSDF.reset(new sdf::Element);
   sdf::initFile("collision.sdf", this->collisionSDF);
 }
-
 
 /////////////////////////////////////////////////
 PartData::PartData()
@@ -104,8 +137,16 @@ void PartData::AddVisual(rendering::VisualPtr _visual)
 
   // some of the default values do not transfer to the visualMsg
   // so set them here and find a better way to fix this in the future.
-  visualMsg.set_transparency(1.0);
-  visualMsg.mutable_material()->set_lighting(true);
+  //visualMsg.set_transparency(1.0);
+  //visualMsg.mutable_material()->set_lighting(true);
+/*  msgs::Set(visualMsg.mutable_material()->mutable_ambient(),
+      math::Color(0, 0, 0, 0);
+  msgs::Set(visualMsg.mutable_material()->mutable_diffuse(),
+      math::Color(0, 0, 0, 0);
+  msgs::Set(visualMsg.mutable_material()->mutable_specular(),
+      math::Color(0, 0, 0, 0);
+  msgs::Set(visualMsg.mutable_material()->mutable_ambient(),
+      math::Color(0, 0, 0, 0);*/
 
   this->visuals[_visual] = visualMsg;
 
@@ -114,7 +155,7 @@ void PartData::AddVisual(rendering::VisualPtr _visual)
 
   std::cerr << "===================================" << std::endl;
   std::cerr << "visualMsg "  <<
-      visualMsg.DebugString() << std::endl;;*/
+      visualMsg.DebugString() << std::endl;*/
 
   std::string partName = this->partVisual->GetName();
   std::string visName = _visual->GetName();
@@ -149,16 +190,14 @@ void PartData::OnApply()
       msgs::Visual *updateMsg = visualConfig->GetData(leafName);
       if (updateMsg)
       {
-        // std::cerr << " updateMsg " << updateMsg->DebugString() << std::endl;
+//         std::cerr << " updateMsg " << updateMsg->DebugString() << std::endl;
 
         msgs::Visual visualMsg = it->second;
-        visualMsg.set_transparency(updateMsg->transparency());
-        updateMsg->clear_transparency();
 
-        updateMsg->mutable_material()->clear_ambient();
-        updateMsg->mutable_material()->clear_diffuse();
-        updateMsg->mutable_material()->clear_specular();
-        updateMsg->mutable_material()->clear_emissive();
+        // update the visualMsg that will be used to generate the sdf.
+        updateMsg->clear_scale();
+        visualMsg.CopyFrom(*updateMsg);
+        it->second = visualMsg;
 
         // std::cerr << " updateMsg after " << updateMsg->DebugString() << std::endl;
 
@@ -193,20 +232,38 @@ void PartData::OnAddVisual(const std::string &_name)
 {
   // add a visual when the user adds a visual via the inspector's visual tab
   PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
-  if (this->visuals.size() != visualConfig->GetVisualCount())
+//  if (this->visuals.size() != visualConfig->GetVisualCount())
   {
     std::ostringstream visualName;
     visualName << this->partVisual->GetName() << "_" << _name;
 
     //visualConfig->SetName(visualConfig->GetVisualCount()-1, visualName.str());
 
-    // add a box for now
-    rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-        this->partVisual));
-    visVisual->Load();
-    this->partVisual->GetScene()->AddVisual(visVisual);
-    visVisual->AttachMesh("unit_box");
-    visVisual->SetMaterial("Gazebo/Grey");
+    rendering::VisualPtr visVisual;
+    if (!this->visuals.empty())
+    {
+      // add new visual by cloning last instance
+      visVisual = this->visuals.rbegin()->first->Clone(visualName.str(),
+          this->partVisual);
+    }
+    else
+    {
+      // create new visual based on sdf template (box)
+      sdf::SDFPtr modelTemplateSDF(new sdf::SDF);
+      modelTemplateSDF->SetFromString(
+          ModelData::GetTemplateSDFString());
+
+      visVisual.reset(new rendering::Visual(visualName.str(),
+          this->partVisual));
+      sdf::ElementPtr visualElem =  modelTemplateSDF->root
+          ->GetElement("model")->GetElement("link")->GetElement("visual");
+      visVisual->Load(visualElem);
+      this->partVisual->GetScene()->AddVisual(visVisual);
+    }
+
+    msgs::Visual visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
+    visualConfig->UpdateVisual(_name, &visualMsg);
+    this->visuals[visVisual] = visualMsg;
     visVisual->SetTransparency(0.5);
   }
 }
@@ -251,9 +308,21 @@ void PartData::Update()
       if (it->second.name() == updateMsgPtr->name())
       {
         std::string origMatName = it->first->GetMaterialName();
+
+        // make visual semi-transparent here
+        // but generated sdf will use the correct transparency value
+        float transparency = 0.5;
+        msgs::Material *materialMsg = updateMsgPtr->mutable_material();
+        materialMsg->mutable_ambient()->set_a(transparency);
+        materialMsg->mutable_diffuse()->set_a(transparency);
+        materialMsg->mutable_specular()->set_a(transparency);
+        materialMsg->mutable_emissive()->set_a(transparency);
+
+         //std::cerr << " updateMsg " << updateMsgPtr->DebugString() << std::endl;
         it->first->UpdateFromMsg(updateMsgPtr);
-        if (it->first->GetMaterialName() != origMatName)
-          it->first->SetTransparency(0.5);
+        //it->first->SetTransparency(transparency);
+
+        // if (it->first->GetMaterialName() != origMatName)
       }
     }
   }

@@ -56,7 +56,7 @@ ModelCreator::ModelCreator()
   this->modelName = "";
 
   this->modelTemplateSDF.reset(new sdf::SDF);
-  this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
+  this->modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
 
   this->partCounter = 0;
   this->customCounter = 0;
@@ -168,8 +168,6 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
       linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/Grey");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -213,8 +211,6 @@ std::string ModelCreator::AddSphere(double _radius,
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/Grey");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -258,8 +254,6 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/Grey");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -490,36 +484,6 @@ void ModelCreator::CreateTheEntity()
 }
 
 /////////////////////////////////////////////////
-std::string ModelCreator::GetTemplateSDFString()
-{
-  std::ostringstream newModelStr;
-  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
-    << "<model name='template_model'>"
-    << "<pose>0 0 0.0 0 0 0</pose>"
-    << "<link name ='link'>"
-    <<   "<visual name ='visual'>"
-    <<     "<pose>0 0 0.0 0 0 0</pose>"
-    <<     "<geometry>"
-    <<       "<box>"
-    <<         "<size>1.0 1.0 1.0</size>"
-    <<       "</box>"
-    <<     "</geometry>"
-    <<     "<material>"
-    <<       "<script>"
-    <<         "<uri>file://media/materials/scripts/gazebo.material</uri>"
-    <<         "<name>Gazebo/Grey</name>"
-    <<       "</script>"
-    <<     "</material>"
-    <<   "</visual>"
-    << "</link>"
-    << "<static>true</static>"
-    << "</model>"
-    << "</sdf>";
-
-  return newModelStr.str();
-}
-
-/////////////////////////////////////////////////
 void ModelCreator::AddPart(PartType _type)
 {
   this->Stop();
@@ -634,7 +598,8 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
   if (vis && !vis->IsPlane())
   {
-    if (this->allParts.find(vis->GetName()) == this->allParts.end())
+    if (this->allParts.find(vis->GetParent()->GetName()) ==
+        this->allParts.end())
     {
       // Prevent interaction with other models, send event only to
       // user camera
@@ -841,7 +806,7 @@ void ModelCreator::GenerateSDF()
   sdf::ElementPtr linkElem;
 
   this->modelSDF.reset(new sdf::SDF);
-  this->modelSDF->SetFromString(this->GetTemplateSDFString());
+  this->modelSDF->SetFromString(ModelData::GetTemplateSDFString());
 
   modelElem = this->modelSDF->root->GetElement("model");
 

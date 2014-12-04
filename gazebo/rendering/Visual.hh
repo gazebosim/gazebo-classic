@@ -475,6 +475,10 @@ namespace gazebo
       /// \brief Set the id associated with this visual
       public: void SetId(uint32_t _id);
 
+      /// \brief Get the geometry type.
+      /// \return Type of geometry in string.
+      public: std::string GetGeometryType() const;
+
       /// \brief The name of the mesh set in the visual's SDF.
       /// \return Name of the mesh.
       public: std::string GetMeshName() const;

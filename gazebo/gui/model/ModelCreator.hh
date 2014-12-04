@@ -203,10 +203,6 @@ namespace gazebo
       /// \return Name of the model created.
       private: std::string CreateModel();
 
-      /// \brief Get a template SDF string of a simple model.
-      /// \return Template SDF string of a simple model.
-      private: std::string GetTemplateSDFString();
-
       /// \brief Qt callback when a delete signal has been emitted.
       /// \param[in] _name Name of the entity to delete.
       private slots: void OnDelete(const std::string &_name="");

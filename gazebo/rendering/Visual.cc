@@ -1428,7 +1428,7 @@ void Visual::SetTransparency(float _trans)
   {
     (*iter)->SetTransparency(_trans);
   }
-  
+
   this->SetTransparencyInnerLoop();
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
@@ -2199,6 +2199,94 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   if (_msg->has_visible())
     this->SetVisible(_msg->visible());
 
+  if (_msg->has_scale())
+    this->SetScale(msgs::Convert(_msg->scale()));
+
+
+  if (_msg->has_geometry() && _msg->geometry().has_type())
+  {
+    std::string newGeometryType =
+        msgs::ConvertGeometryType(_msg->geometry().type());
+
+    std::string geometryType = this->GetGeometryType();
+
+    if (newGeometryType != geometryType)
+    {
+      sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
+      geomElem->ClearElements();
+
+      this->DetachObjects();
+      if (newGeometryType == "box" || newGeometryType == "cylinder" ||
+          newGeometryType == "sphere" || newGeometryType == "plane")
+      {
+        this->AttachMesh("unit_" + newGeometryType);
+      }
+      else
+      {
+        if (newGeometryType == "mesh")
+        {
+          std::string filename = _msg->geometry().mesh().filename();
+          std::string meshName = common::find_file(filename);
+
+          if (meshName.empty())
+            gzerr << "No mesh found\n";
+
+          this->AttachMesh(meshName);
+        }
+      }
+    }
+
+    math::Vector3 geomScale(1, 1, 1);
+
+    if (_msg->geometry().type() == msgs::Geometry::BOX)
+    {
+      geomScale = msgs::Convert(_msg->geometry().box().size());
+    }
+    else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
+    {
+      geomScale.x = _msg->geometry().cylinder().radius() * 2.0;
+      geomScale.y = _msg->geometry().cylinder().radius() * 2.0;
+      geomScale.z = _msg->geometry().cylinder().length();
+    }
+    else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
+    {
+      geomScale.x = geomScale.y = geomScale.z
+          = _msg->geometry().sphere().radius() * 2.0;
+    }
+    else if (_msg->geometry().type() == msgs::Geometry::PLANE)
+    {
+      geomScale.x = geomScale.y = 1.0;
+      if (_msg->geometry().plane().has_size())
+      {
+        geomScale.x = _msg->geometry().plane().size().x();
+        geomScale.y = _msg->geometry().plane().size().y();
+      }
+      geomScale.z = 1.0;
+    }
+    else if (_msg->geometry().type() == msgs::Geometry::IMAGE)
+    {
+      geomScale.x = geomScale.y = geomScale.z
+          = _msg->geometry().image().scale();
+    }
+    else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
+      geomScale = msgs::Convert(_msg->geometry().heightmap().size());
+    else if (_msg->geometry().type() == msgs::Geometry::MESH)
+    {
+      if (_msg->geometry().mesh().has_scale())
+        geomScale = msgs::Convert(_msg->geometry().mesh().scale());
+      else
+        geomScale.x = geomScale.y = geomScale.z = 1.0;
+    }
+    else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
+      geomScale.x = geomScale.y = geomScale.z = 1.0;
+    else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
+      geomScale.x = geomScale.y = geomScale.z = 1.0;
+    else
+      gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
+
+    this->SetScale(geomScale);
+  }
+
   if (_msg->has_transparency())
     this->SetTransparency(_msg->transparency());
 
@@ -2257,63 +2345,6 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
   }
 
-  if (_msg->has_scale())
-    this->SetScale(msgs::Convert(_msg->scale()));
-
-  // TODO: Make sure this isn't necessary
-  if (_msg->has_geometry() && _msg->geometry().has_type())
-  {
-    math::Vector3 geomScale(1, 1, 1);
-
-    if (_msg->geometry().type() == msgs::Geometry::BOX)
-    {
-      geomScale = msgs::Convert(_msg->geometry().box().size());
-    }
-    else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
-    {
-      geomScale.x = _msg->geometry().cylinder().radius() * 2.0;
-      geomScale.y = _msg->geometry().cylinder().radius() * 2.0;
-      geomScale.z = _msg->geometry().cylinder().length();
-    }
-    else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
-    {
-      geomScale.x = geomScale.y = geomScale.z
-          = _msg->geometry().sphere().radius() * 2.0;
-    }
-    else if (_msg->geometry().type() == msgs::Geometry::PLANE)
-    {
-      geomScale.x = geomScale.y = 1.0;
-      if (_msg->geometry().plane().has_size())
-      {
-        geomScale.x = _msg->geometry().plane().size().x();
-        geomScale.y = _msg->geometry().plane().size().y();
-      }
-      geomScale.z = 1.0;
-    }
-    else if (_msg->geometry().type() == msgs::Geometry::IMAGE)
-    {
-      geomScale.x = geomScale.y = geomScale.z
-          = _msg->geometry().image().scale();
-    }
-    else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
-      geomScale = msgs::Convert(_msg->geometry().heightmap().size());
-    else if (_msg->geometry().type() == msgs::Geometry::MESH)
-    {
-      if (_msg->geometry().mesh().has_scale())
-        geomScale = msgs::Convert(_msg->geometry().mesh().scale());
-      else
-        geomScale.x = geomScale.y = geomScale.z = 1.0;
-    }
-    else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
-      geomScale.x = geomScale.y = geomScale.z = 1.0;
-    else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
-      geomScale.x = geomScale.y = geomScale.z = 1.0;
-    else
-      gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
-
-    this->SetScale(geomScale);
-  }
-
   /*if (msg->points.size() > 0)
   {
     DynamicLines *lines = this->AddDynamicLine(RENDERING_LINE_LIST);
@@ -2358,6 +2389,32 @@ bool Visual::IsPlane() const
   }
 
   return false;
+}
+
+//////////////////////////////////////////////////
+std::string Visual::GetGeometryType() const
+{
+  if (this->dataPtr->sdf->HasElement("geometry"))
+  {
+    sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
+    if (geomElem->HasElement("box"))
+      return "box";
+    else if (geomElem->HasElement("sphere"))
+      return "sphere";
+    else if (geomElem->HasElement("cylinder"))
+      return "cylinder";
+    else if (geomElem->HasElement("plane"))
+      return "plane";
+    else if (geomElem->HasElement("image"))
+      return "image";
+    else if (geomElem->HasElement("polyline"))
+      return "polyline";
+    else if (geomElem->HasElement("mesh"))
+      return "mesh";
+    else if (geomElem->HasElement("heightmap"))
+      return "heightmap";
+  }
+  return "";
 }
 
 //////////////////////////////////////////////////

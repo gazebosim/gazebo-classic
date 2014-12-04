@@ -396,9 +396,10 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
       bool newWidget = true;
       std::string scopedName = _name.empty() ? name : _name + "::" + name;
       if (this->configWidgets.find(scopedName) != this->configWidgets.end())
+      {
         newWidget = false;
-      else
         configChildWidget = this->configWidgets[scopedName];
+      }
 
       switch (field->cpp_type())
       {
@@ -679,12 +680,15 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
           {
             // parse the message fields recursively
             QWidget *groupBoxWidget = Parse(valueMsg, scopedName);
-            newFieldWidget = new ConfigChildWidget();
-            QVBoxLayout *groupBoxLayout = new QVBoxLayout;
-            groupBoxLayout->addWidget(groupBoxWidget);
-            newFieldWidget->setLayout(groupBoxLayout);
-            qobject_cast<ConfigChildWidget *>(newFieldWidget)->
-                widgets.push_back(groupBoxWidget);
+            if (groupBoxWidget)
+            {
+              newFieldWidget = new ConfigChildWidget();
+              QVBoxLayout *groupBoxLayout = new QVBoxLayout;
+              groupBoxLayout->addWidget(groupBoxWidget);
+              newFieldWidget->setLayout(groupBoxLayout);
+              qobject_cast<ConfigChildWidget *>(newFieldWidget)->
+                  widgets.push_back(groupBoxWidget);
+            }
           }
 
           if (newWidget)
