@@ -25,404 +25,409 @@
  * Use to represent "symbol hidden" if supported
  */
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL
-    #ifdef __GNUC__
-      #define GAZEBO_VISIBLE __attribute__ ((dllexport))
-    #else
-      #define GAZEBO_VISIBLE __declspec(dllexport)
-    #endif
-  #else
-    #ifdef __GNUC__
-      #define GAZEBO_VISIBLE __attribute__ ((dllimport))
-    #else
-      #define GAZEBO_VISIBLE __declspec(dllimport)
-    #endif
-  #endif
+#if defined BUILDING_STATIC_LIBS
+  #define GAZEBO_VISIBLE
   #define GAZEBO_HIDDEN
 #else
+ #if defined _WIN32 || defined __CYGWIN__
+   #ifdef BUILDING_DLL
+    #ifdef __GNUC__
+     #define GAZEBO_VISIBLE __attribute__ ((dllexport))
+    #else
+     #define GAZEBO_VISIBLE __declspec(dllexport)
+    #endif
+   #else
+    #ifdef __GNUC__
+     #define GAZEBO_VISIBLE __attribute__ ((dllimport))
+    #else
+     #define GAZEBO_VISIBLE __declspec(dllimport)
+    #endif
+   #endif
+   #define GAZEBO_HIDDEN
+ #else
   #if __GNUC__ >= 4
-    #define GAZEBO_VISIBLE __attribute__ ((visibility ("default")))
-    #define GAZEBO_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
-    #define GAZEBO_VISIBLE
-    #define GAZEBO_HIDDEN
-  #endif
-#endif
+     #define GAZEBO_VISIBLE __attribute__ ((visibility ("default")))
+     #define GAZEBO_HIDDEN  __attribute__ ((visibility ("hidden")))
+   #else
+     #define GAZEBO_VISIBLE
+     #define GAZEBO_HIDDEN
+   #endif
+ #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL_GZ_COMMON
+ #if defined _WIN32 || defined __CYGWIN__
+   #ifdef BUILDING_DLL_GZ_COMMON
     #ifdef __GNUC__
-      #define GZ_COMMON_VISIBLE __attribute__ ((dllexport))
+     #define GZ_COMMON_VISIBLE __attribute__ ((dllexport))
     #else
-      #define GZ_COMMON_VISIBLE __declspec(dllexport)
+     #define GZ_COMMON_VISIBLE __declspec(dllexport)
     #endif
-  #else
+   #else
     #ifdef __GNUC__
-      #define GZ_COMMON_VISIBLE __attribute__ ((dllimport))
+     #define GZ_COMMON_VISIBLE __attribute__ ((dllimport))
     #else
-      #define GZ_COMMON_VISIBLE __declspec(dllimport)
+     #define GZ_COMMON_VISIBLE __declspec(dllimport)
     #endif
-  #endif
-  #define GZ_COMMON_HIDDEN
-#else
-  #if __GNUC__ >= 4
+   #endif
+   #define GZ_COMMON_HIDDEN
+ #else
+   #if __GNUC__ >= 4
     #define GZ_COMMON_VISIBLE __attribute__ ((visibility ("default")))
     #define GZ_COMMON_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
+   #else
     #define GZ_COMMON_VISIBLE
     #define GZ_COMMON_HIDDEN
-  #endif
-#endif
+   #endif
+ #endif
 
 #if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL_GZ_MATH
+   #ifdef BUILDING_DLL_GZ_MATH
     #ifdef __GNUC__
-      #define GZ_MATH_VISIBLE __attribute__ ((dllexport))
+     #define GZ_MATH_VISIBLE __attribute__ ((dllexport))
     #else
-      #define GZ_MATH_VISIBLE __declspec(dllexport)
+     #define GZ_MATH_VISIBLE __declspec(dllexport)
     #endif
-  #else
+   #else
     #ifdef __GNUC__
-      #define GZ_MATH_VISIBLE __attribute__ ((dllimport))
+     #define GZ_MATH_VISIBLE __attribute__ ((dllimport))
     #else
-      #define GZ_MATH_VISIBLE __declspec(dllimport)
+     #define GZ_MATH_VISIBLE __declspec(dllimport)
     #endif
-  #endif
-  #define GZ_MATH_HIDDEN
-#else
-  #if __GNUC__ >= 4
+   #endif
+   #define GZ_MATH_HIDDEN
+ #else
+   #if __GNUC__ >= 4
     #define GZ_MATH_VISIBLE __attribute__ ((visibility ("default")))
     #define GZ_MATH_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
+   #else
     #define GZ_MATH_VISIBLE
     #define GZ_MATH_HIDDEN
-  #endif
-#endif
+   #endif
+ #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL_GZ_TRANSPORT
+ #if defined _WIN32 || defined __CYGWIN__
+   #ifdef BUILDING_DLL_GZ_TRANSPORT
     #ifdef __GNUC__
-      #define GZ_TRANSPORT_VISIBLE __attribute__ ((dllexport))
+     #define GZ_TRANSPORT_VISIBLE __attribute__ ((dllexport))
     #else
-      #define GZ_TRANSPORT_VISIBLE __declspec(dllexport)
+     #define GZ_TRANSPORT_VISIBLE __declspec(dllexport)
     #endif
-  #else
+   #else
     #ifdef __GNUC__
-      #define GZ_TRANSPORT_VISIBLE __attribute__ ((dllimport))
+     #define GZ_TRANSPORT_VISIBLE __attribute__ ((dllimport))
     #else
-      #define GZ_TRANSPORT_VISIBLE __declspec(dllimport)
+     #define GZ_TRANSPORT_VISIBLE __declspec(dllimport)
     #endif
-  #endif
-  #define GZ_TRANSPORT_HIDDEN
-#else
-  #if __GNUC__ >= 4
+   #endif
+   #define GZ_TRANSPORT_HIDDEN
+ #else
+   #if __GNUC__ >= 4
     #define GZ_TRANSPORT_VISIBLE __attribute__ ((visibility ("default")))
     #define GZ_TRANSPORT_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
+   #else
     #define GZ_TRANSPORT_VISIBLE
     #define GZ_TRANSPORT_HIDDEN
-  #endif
-#endif
+   #endif
+ #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL_GZ_MSGS
+ #if defined _WIN32 || defined __CYGWIN__
+   #ifdef BUILDING_DLL_GZ_MSGS
     #ifdef __GNUC__
-      #define GZ_MSGS_VISIBLE __attribute__ ((dllexport))
+     #define GZ_MSGS_VISIBLE __attribute__ ((dllexport))
     #else
-      #define GZ_MSGS_VISIBLE __declspec(dllexport)
+     #define GZ_MSGS_VISIBLE __declspec(dllexport)
     #endif
-  #else
+   #else
     #ifdef __GNUC__
-      #define GZ_MSGS_VISIBLE __attribute__ ((dllimport))
+     #define GZ_MSGS_VISIBLE __attribute__ ((dllimport))
     #else
-      #define GZ_MSGS_VISIBLE __declspec(dllimport)
+     #define GZ_MSGS_VISIBLE __declspec(dllimport)
     #endif
-  #endif
-  #define GZ_MSGS_HIDDEN
-#else
-  #if __GNUC__ >= 4
+   #endif
+   #define GZ_MSGS_HIDDEN
+ #else
+   #if __GNUC__ >= 4
     #define GZ_MSGS_VISIBLE __attribute__ ((visibility ("default")))
     #define GZ_MSGS_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
+   #else
     #define GZ_MSGS_VISIBLE
     #define GZ_MSGS_HIDDEN
-  #endif
-#endif
+   #endif
+ #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL_GZ_SELECTION_BUFFER
+ #if defined _WIN32 || defined __CYGWIN__
+   #ifdef BUILDING_DLL_GZ_SELECTION_BUFFER
     #ifdef __GNUC__
-      #define GZ_SELECTION_BUFFER_VISIBLE __attribute__ ((dllexport))
+     #define GZ_SELECTION_BUFFER_VISIBLE __attribute__ ((dllexport))
     #else
-      #define GZ_SELECTION_BUFFER_VISIBLE __declspec(dllexport)
+     #define GZ_SELECTION_BUFFER_VISIBLE __declspec(dllexport)
     #endif
-  #else
+   #else
     #ifdef __GNUC__
-      #define GZ_SELECTION_BUFFER_VISIBLE __attribute__ ((dllimport))
+     #define GZ_SELECTION_BUFFER_VISIBLE __attribute__ ((dllimport))
     #else
-      #define GZ_SELECTION_BUFFER_VISIBLE __declspec(dllimport)
+     #define GZ_SELECTION_BUFFER_VISIBLE __declspec(dllimport)
     #endif
-  #endif
-  #define GZ_SELECTION_BUFFER_HIDDEN
-#else
-  #if __GNUC__ >= 4
+   #endif
+   #define GZ_SELECTION_BUFFER_HIDDEN
+ #else
+   #if __GNUC__ >= 4
     #define GZ_SELECTION_BUFFER_VISIBLE __attribute__ ((visibility ("default")))
     #define GZ_SELECTION_BUFFER_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
+   #else
     #define GZ_SELECTION_BUFFER_VISIBLE
     #define GZ_SELECTION_BUFFER_HIDDEN
-  #endif
-#endif
+   #endif
+ #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL_GZ_RENDERING
+ #if defined _WIN32 || defined __CYGWIN__
+   #ifdef BUILDING_DLL_GZ_RENDERING
     #ifdef __GNUC__
-      #define GZ_RENDERING_VISIBLE __attribute__ ((dllexport))
+     #define GZ_RENDERING_VISIBLE __attribute__ ((dllexport))
     #else
-      #define GZ_RENDERING_VISIBLE __declspec(dllexport)
+     #define GZ_RENDERING_VISIBLE __declspec(dllexport)
     #endif
-  #else
+   #else
     #ifdef __GNUC__
-      #define GZ_RENDERING_VISIBLE __attribute__ ((dllimport))
+     #define GZ_RENDERING_VISIBLE __attribute__ ((dllimport))
     #else
-      #define GZ_RENDERING_VISIBLE __declspec(dllimport)
+     #define GZ_RENDERING_VISIBLE __declspec(dllimport)
     #endif
-  #endif
-  #define GZ_RENDERING_HIDDEN
-#else
-  #if __GNUC__ >= 4
+   #endif
+   #define GZ_RENDERING_HIDDEN
+ #else
+   #if __GNUC__ >= 4
     #define GZ_RENDERING_VISIBLE __attribute__ ((visibility ("default")))
     #define GZ_RENDERING_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
+   #else
     #define GZ_RENDERING_VISIBLE
     #define GZ_RENDERING_HIDDEN
-  #endif
-#endif
+   #endif
+ #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL_GZ_UTIL
+ #if defined _WIN32 || defined __CYGWIN__
+   #ifdef BUILDING_DLL_GZ_UTIL
     #ifdef __GNUC__
-      #define GZ_UTIL_VISIBLE __attribute__ ((dllexport))
+     #define GZ_UTIL_VISIBLE __attribute__ ((dllexport))
     #else
-      #define GZ_UTIL_VISIBLE __declspec(dllexport)
+     #define GZ_UTIL_VISIBLE __declspec(dllexport)
     #endif
-  #else
+   #else
     #ifdef __GNUC__
-      #define GZ_UTIL_VISIBLE __attribute__ ((dllimport))
+     #define GZ_UTIL_VISIBLE __attribute__ ((dllimport))
     #else
-      #define GZ_UTIL_VISIBLE __declspec(dllimport)
+     #define GZ_UTIL_VISIBLE __declspec(dllimport)
     #endif
-  #endif
-  #define GZ_UTIL_HIDDEN
-#else
-  #if __GNUC__ >= 4
+   #endif
+   #define GZ_UTIL_HIDDEN
+ #else
+   #if __GNUC__ >= 4
     #define GZ_UTIL_VISIBLE __attribute__ ((visibility ("default")))
     #define GZ_UTIL_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
+   #else
     #define GZ_UTIL_VISIBLE
     #define GZ_UTIL_HIDDEN
-  #endif
-#endif
+   #endif
+ #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL_GZ_RENDERING_DEFERRED
+ #if defined _WIN32 || defined __CYGWIN__
+   #ifdef BUILDING_DLL_GZ_RENDERING_DEFERRED
     #ifdef __GNUC__
-      #define GZ_RENDERING_DEFERRED_VISIBLE __attribute__ ((dllexport))
+     #define GZ_RENDERING_DEFERRED_VISIBLE __attribute__ ((dllexport))
     #else
-      #define GZ_RENDERING_DEFERRED_VISIBLE __declspec(dllexport)
+     #define GZ_RENDERING_DEFERRED_VISIBLE __declspec(dllexport)
     #endif
-  #else
+   #else
     #ifdef __GNUC__
-      #define GZ_RENDERING_DEFERRED_VISIBLE __attribute__ ((dllimport))
+     #define GZ_RENDERING_DEFERRED_VISIBLE __attribute__ ((dllimport))
     #else
-      #define GZ_RENDERING_DEFERRED_VISIBLE __declspec(dllimport)
+     #define GZ_RENDERING_DEFERRED_VISIBLE __declspec(dllimport)
     #endif
-  #endif
-  #define GZ_RENDERING_DEFERRED_HIDDEN
-#else
-  #if __GNUC__ >= 4
+   #endif
+   #define GZ_RENDERING_DEFERRED_HIDDEN
+ #else
+   #if __GNUC__ >= 4
     #define GZ_RENDERING_DEFERRED_VISIBLE __attribute__ ((visibility ("default")))
     #define GZ_RENDERING_DEFERRED_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
+   #else
     #define GZ_RENDERING_DEFERRED_VISIBLE
     #define GZ_RENDERING_DEFERRED_HIDDEN
-  #endif
-#endif
+   #endif
+ #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL_GZ_PHYSICS
+ #if defined _WIN32 || defined __CYGWIN__
+   #ifdef BUILDING_DLL_GZ_PHYSICS
     #ifdef __GNUC__
-      #define GZ_PHYSICS_VISIBLE __attribute__ ((dllexport))
+     #define GZ_PHYSICS_VISIBLE __attribute__ ((dllexport))
     #else
-      #define GZ_PHYSICS_VISIBLE __declspec(dllexport)
+     #define GZ_PHYSICS_VISIBLE __declspec(dllexport)
     #endif
-  #else
+   #else
     #ifdef __GNUC__
-      #define GZ_PHYSICS_VISIBLE __attribute__ ((dllimport))
+     #define GZ_PHYSICS_VISIBLE __attribute__ ((dllimport))
     #else
-      #define GZ_PHYSICS_VISIBLE __declspec(dllimport)
+     #define GZ_PHYSICS_VISIBLE __declspec(dllimport)
     #endif
-  #endif
-  #define GZ_PHYSICS_HIDDEN
-#else
-  #if __GNUC__ >= 4
+   #endif
+   #define GZ_PHYSICS_HIDDEN
+ #else
+   #if __GNUC__ >= 4
     #define GZ_PHYSICS_VISIBLE __attribute__ ((visibility ("default")))
     #define GZ_PHYSICS_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
+   #else
     #define GZ_PHYSICS_VISIBLE
     #define GZ_PHYSICS_HIDDEN
-  #endif
-#endif
+   #endif
+ #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL_GZ_PHYSICS_ODE
+ #if defined _WIN32 || defined __CYGWIN__
+   #ifdef BUILDING_DLL_GZ_PHYSICS_ODE
     #ifdef __GNUC__
-      #define GZ_PHYSICS_ODE_VISIBLE __attribute__ ((dllexport))
+     #define GZ_PHYSICS_ODE_VISIBLE __attribute__ ((dllexport))
     #else
-      #define GZ_PHYSICS_ODE_VISIBLE __declspec(dllexport)
+     #define GZ_PHYSICS_ODE_VISIBLE __declspec(dllexport)
     #endif
-  #else
+   #else
     #ifdef __GNUC__
-      #define GZ_PHYSICS_ODE_VISIBLE __attribute__ ((dllimport))
+     #define GZ_PHYSICS_ODE_VISIBLE __attribute__ ((dllimport))
     #else
-      #define GZ_PHYSICS_ODE_VISIBLE __declspec(dllimport)
+     #define GZ_PHYSICS_ODE_VISIBLE __declspec(dllimport)
     #endif
-  #endif
-  #define GZ_PHYSICS_ODE_HIDDEN
-#else
-  #if __GNUC__ >= 4
+   #endif
+   #define GZ_PHYSICS_ODE_HIDDEN
+ #else
+   #if __GNUC__ >= 4
     #define GZ_PHYSICS_ODE_VISIBLE __attribute__ ((visibility ("default")))
     #define GZ_PHYSICS_ODE_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
+   #else
     #define GZ_PHYSICS_ODE_VISIBLE
     #define GZ_PHYSICS_ODE_HIDDEN
-  #endif
-#endif
+   #endif
+ #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL_GZ_GUI
+ #if defined _WIN32 || defined __CYGWIN__
+   #ifdef BUILDING_DLL_GZ_GUI
     #ifdef __GNUC__
-      #define GZ_GUI_VISIBLE __attribute__ ((dllexport))
+     #define GZ_GUI_VISIBLE __attribute__ ((dllexport))
     #else
-      #define GZ_GUI_VISIBLE __declspec(dllexport)
+     #define GZ_GUI_VISIBLE __declspec(dllexport)
     #endif
-  #else
+   #else
     #ifdef __GNUC__
-      #define GZ_GUI_VISIBLE __attribute__ ((dllimport))
+     #define GZ_GUI_VISIBLE __attribute__ ((dllimport))
     #else
-      #define GZ_GUI_VISIBLE __declspec(dllimport)
+     #define GZ_GUI_VISIBLE __declspec(dllimport)
     #endif
-  #endif
-  #define GZ_GUI_HIDDEN
-#else
-  #if __GNUC__ >= 4
+   #endif
+   #define GZ_GUI_HIDDEN
+ #else
+   #if __GNUC__ >= 4
     #define GZ_GUI_VISIBLE __attribute__ ((visibility ("default")))
     #define GZ_GUI_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
+   #else
     #define GZ_GUI_VISIBLE
     #define GZ_GUI_HIDDEN
-  #endif
-#endif
+   #endif
+ #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL_GZ_GUI_BUILDING
+ #if defined _WIN32 || defined __CYGWIN__
+   #ifdef BUILDING_DLL_GZ_GUI_BUILDING
     #ifdef __GNUC__
-      #define GZ_GUI_BUILDING_VISIBLE __attribute__ ((dllexport))
+     #define GZ_GUI_BUILDING_VISIBLE __attribute__ ((dllexport))
     #else
-      #define GZ_GUI_BUILDING_VISIBLE __declspec(dllexport)
+     #define GZ_GUI_BUILDING_VISIBLE __declspec(dllexport)
     #endif
-  #else
+   #else
     #ifdef __GNUC__
-      #define GZ_GUI_BUILDING_VISIBLE __attribute__ ((dllimport))
+     #define GZ_GUI_BUILDING_VISIBLE __attribute__ ((dllimport))
     #else
-      #define GZ_GUI_BUILDING_VISIBLE __declspec(dllimport)
+     #define GZ_GUI_BUILDING_VISIBLE __declspec(dllimport)
     #endif
-  #endif
-  #define GZ_GUI_BUILDING_HIDDEN
-#else
-  #if __GNUC__ >= 4
+   #endif
+   #define GZ_GUI_BUILDING_HIDDEN
+ #else
+   #if __GNUC__ >= 4
     #define GZ_GUI_BUILDING_VISIBLE __attribute__ ((visibility ("default")))
     #define GZ_GUI_BUILDING_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
+   #else
     #define GZ_GUI_BUILDING_VISIBLE
     #define GZ_GUI_BUILDING_HIDDEN
-  #endif
-#endif
+   #endif
+ #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL_GZ_GUI_MODEL
+ #if defined _WIN32 || defined __CYGWIN__
+   #ifdef BUILDING_DLL_GZ_GUI_MODEL
     #ifdef __GNUC__
-      #define GZ_GUI_MODEL_VISIBLE __attribute__ ((dllexport))
+     #define GZ_GUI_MODEL_VISIBLE __attribute__ ((dllexport))
     #else
-      #define GZ_GUI_MODEL_VISIBLE __declspec(dllexport)
+     #define GZ_GUI_MODEL_VISIBLE __declspec(dllexport)
     #endif
-  #else
+   #else
     #ifdef __GNUC__
-      #define GZ_GUI_MODEL_VISIBLE __attribute__ ((dllimport))
+     #define GZ_GUI_MODEL_VISIBLE __attribute__ ((dllimport))
     #else
-      #define GZ_GUI_MODEL_VISIBLE __declspec(dllimport)
+     #define GZ_GUI_MODEL_VISIBLE __declspec(dllimport)
     #endif
-  #endif
-  #define GZ_GUI_MODEL_HIDDEN
-#else
-  #if __GNUC__ >= 4
+   #endif
+   #define GZ_GUI_MODEL_HIDDEN
+ #else
+   #if __GNUC__ >= 4
     #define GZ_GUI_MODEL_VISIBLE __attribute__ ((visibility ("default")))
     #define GZ_GUI_MODEL_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
+   #else
     #define GZ_GUI_MODEL_VISIBLE
     #define GZ_GUI_MODEL_HIDDEN
-  #endif
-#endif
+   #endif
+ #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL_GZ_GUI_TERRAIN
+ #if defined _WIN32 || defined __CYGWIN__
+   #ifdef BUILDING_DLL_GZ_GUI_TERRAIN
     #ifdef __GNUC__
-      #define GZ_GUI_TERRAIN_VISIBLE __attribute__ ((dllexport))
+     #define GZ_GUI_TERRAIN_VISIBLE __attribute__ ((dllexport))
     #else
-      #define GZ_GUI_TERRAIN_VISIBLE __declspec(dllexport)
+     #define GZ_GUI_TERRAIN_VISIBLE __declspec(dllexport)
     #endif
-  #else
+   #else
     #ifdef __GNUC__
-      #define GZ_GUI_TERRAIN_VISIBLE __attribute__ ((dllimport))
+     #define GZ_GUI_TERRAIN_VISIBLE __attribute__ ((dllimport))
     #else
-      #define GZ_GUI_TERRAIN_VISIBLE __declspec(dllimport)
+     #define GZ_GUI_TERRAIN_VISIBLE __declspec(dllimport)
     #endif
-  #endif
-  #define GZ_GUI_TERRAIN_HIDDEN
-#else
-  #if __GNUC__ >= 4
+   #endif
+   #define GZ_GUI_TERRAIN_HIDDEN
+ #else
+   #if __GNUC__ >= 4
     #define GZ_GUI_TERRAIN_VISIBLE __attribute__ ((visibility ("default")))
     #define GZ_GUI_TERRAIN_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
+   #else
     #define GZ_GUI_TERRAIN_VISIBLE
     #define GZ_GUI_TERRAIN_HIDDEN
-  #endif
-#endif
+   #endif
+ #endif
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL_GZ_GUI_VIEWERS
+ #if defined _WIN32 || defined __CYGWIN__
+   #ifdef BUILDING_DLL_GZ_GUI_VIEWERS
     #ifdef __GNUC__
-      #define GZ_GUI_VIEWERS_VISIBLE __attribute__ ((dllexport))
+     #define GZ_GUI_VIEWERS_VISIBLE __attribute__ ((dllexport))
     #else
-      #define GZ_GUI_VIEWERS_VISIBLE __declspec(dllexport)
+     #define GZ_GUI_VIEWERS_VISIBLE __declspec(dllexport)
     #endif
-  #else
+   #else
     #ifdef __GNUC__
-      #define GZ_GUI_VIEWERS_VISIBLE __attribute__ ((dllimport))
+     #define GZ_GUI_VIEWERS_VISIBLE __attribute__ ((dllimport))
     #else
-      #define GZ_GUI_VIEWERS_VISIBLE __declspec(dllimport)
+     #define GZ_GUI_VIEWERS_VISIBLE __declspec(dllimport)
     #endif
-  #endif
-  #define GZ_GUI_VIEWERS_HIDDEN
-#else
-  #if __GNUC__ >= 4
+   #endif
+   #define GZ_GUI_VIEWERS_HIDDEN
+ #else
+   #if __GNUC__ >= 4
     #define GZ_GUI_VIEWERS_VISIBLE __attribute__ ((visibility ("default")))
     #define GZ_GUI_VIEWERS_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
+   #else
     #define GZ_GUI_VIEWERS_VISIBLE
     #define GZ_GUI_VIEWERS_HIDDEN
-  #endif
-#endif
+   #endif
+ #endif
+#endif /* BUILDING_STATIC_LIBS*/
 
 #endif /* GAZEBO_VISIBLE_HH */

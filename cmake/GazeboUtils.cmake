@@ -95,7 +95,8 @@ endmacro (BUILD_WARNING)
 
 #################################################
 macro (gz_add_library _name)
-  add_library(${_name} STATIC ${ARGN})
+  # Not defining STATIC or SHARED will use BUILD_SHARED_LIBS variable
+  add_library(${_name} ${ARGN})
   target_link_libraries (${_name} ${general_libraries})
 endmacro ()
 
@@ -125,10 +126,14 @@ endmacro ()
 
 #################################################
 macro (gz_setup_unix)
+    # Using static linking in Windows by default
+    add_definitions(-DBUILDING_STATIC_LIBS:BOOL=TRUE)
 endmacro()
 
 #################################################
 macro (gz_setup_windows)
+    # Using static linking in Windows by default
+    add_definitions(-DBUILDING_STATIC_LIBS:BOOL=FALSE)
 endmacro()
 
 #################################################
