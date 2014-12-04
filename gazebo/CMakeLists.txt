@@ -104,8 +104,11 @@ target_link_libraries(libgazebo
   gazebo_rendering
   gazebo_msgs
   gazebo_math
-  pthread
 )
+
+if (UNIX)
+  target_link_libraries(libgazebo pthread)
+endif()
 
 add_dependencies(libgazebo gazebo_msgs)
 gz_install_library(libgazebo)
