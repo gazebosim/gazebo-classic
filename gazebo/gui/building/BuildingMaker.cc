@@ -1753,7 +1753,7 @@ void BuildingMaker::OnNameChanged(const std::string &_name)
     GetFolderNameFromModelName(_name);
   this->saveLocation = newPath.string();
 
-  this->currentSaveState = NAME_CHANGED;
+  this->currentSaveState = UNSAVED_CHANGES;
 }
 
 /////////////////////////////////////////////////

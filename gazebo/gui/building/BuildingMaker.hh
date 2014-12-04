@@ -55,10 +55,7 @@ namespace gazebo
       // NEVER_SAVED: The building has never been saved
       // SAVED: Has been saved through the "Save As" dialog
       // UNSAVED_CHANGES: Has been saved before, but has unsaved changes
-      // NAME_CHANGED: Has been saved through "Save As" dialog, then the
-      // name was changed, and it has not been saved through "Save As" since.
-      private: enum SaveState { NEVER_SAVED, SAVED, UNSAVED_CHANGES,
-                                NAME_CHANGED };
+      private: enum SaveState {NEVER_SAVED, SAVED, UNSAVED_CHANGES};
 
       /// \brief Constructor
       public: BuildingMaker();
