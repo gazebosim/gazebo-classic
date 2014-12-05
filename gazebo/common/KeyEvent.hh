@@ -33,7 +33,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       public: KeyEvent() : type(NO_EVENT), key(0), text(""), control(false),
-                       shift(false), alt(false) {};
+                       shift(false), alt(false) {}
 
       /// \brief Key event types enumeration.
       public: enum EventType {NO_EVENT, PRESS, RELEASE};
