@@ -110,6 +110,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   customItem->addChild(customChildItem);
 
   QPushButton *customButton = new QPushButton(tr("Add"), this);
+  customButton->setMaximumWidth(60);
   customButton->setCheckable(true);
   customButton->setChecked(false);
   connect(customButton, SIGNAL(clicked()), this, SLOT(OnCustom()));
