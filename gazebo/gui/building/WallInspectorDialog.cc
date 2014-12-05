@@ -172,12 +172,12 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   this->textureComboBox->setMinimumWidth(50);
   this->textureComboBox->setMinimumHeight(50);
   this->textureComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  this->textureList.push_back(":/images/wood.png");
-  this->textureList.push_back(":/images/ceiling_tiled.png");
+  this->textureList.push_back(":wood.jpg");
+  this->textureList.push_back(":tiles.jpg");
   for (unsigned int i = 0; i < this->textureList.size(); ++i)
   {
-    this->textureComboBox->addItem(QPixmap(this->textureList[i]),
-        QString(""));
+    this->textureComboBox->addItem(QPixmap(this->textureList[i]).scaled(
+        QSize(30, 30), Qt::IgnoreAspectRatio), QString(""));
   }
   this->textureComboBox->addItem("X");
   this->textureComboBox->setCurrentIndex(this->textureComboBox->count()-1);

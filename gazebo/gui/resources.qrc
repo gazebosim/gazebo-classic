@@ -50,7 +50,7 @@
   <file>images/z_min.png</file>
   <file>images/z_center.png</file>  
   <file>images/z_max.png</file>
-  <file>images/wood.png</file>
-  <file>images/ceiling_tiled.png</file>
+  <file alias='wood.jpg'>../../media/materials/textures/wood.jpg</file>
+  <file alias='tiles.jpg'>../../media/materials/textures/ceiling_tiled.jpg</file>
 </qresource>
 </RCC>

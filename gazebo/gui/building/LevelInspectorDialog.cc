@@ -61,12 +61,12 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
   this->floorTextureComboBox->setMinimumHeight(50);
   this->floorTextureComboBox->setSizePolicy(QSizePolicy::Fixed,
       QSizePolicy::Fixed);
-  this->floorTextureList.push_back(":/images/wood.png");
-  this->floorTextureList.push_back(":/images/ceiling_tiled.png");
+  this->floorTextureList.push_back(":wood.jpg");
+  this->floorTextureList.push_back(":tiles.jpg");
   for (unsigned int i = 0; i < this->floorTextureList.size(); ++i)
   {
-    this->floorTextureComboBox->addItem(QPixmap(this->floorTextureList[i]),
-        QString(""));
+    this->floorTextureComboBox->addItem(QPixmap(this->floorTextureList[i])
+        .scaled(QSize(30, 30), Qt::IgnoreAspectRatio), QString(""));
   }
   this->floorTextureComboBox->addItem("X");
   this->floorTextureComboBox->setCurrentIndex(
