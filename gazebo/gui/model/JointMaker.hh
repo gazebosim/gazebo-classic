@@ -192,6 +192,9 @@ namespace gazebo
       /// \brief Qt Callback to open joint inspector
       private slots: void OnOpenInspector();
 
+      /// \brief Constant vector containing [UnitX, UnitY, UnitZ].
+      private: std::vector<math::Vector3> UnitVectors;
+
       /// \brief Type of joint to create
       private: JointMaker::JointType jointType;
 

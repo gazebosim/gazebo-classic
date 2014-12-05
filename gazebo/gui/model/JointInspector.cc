@@ -146,7 +146,6 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
     upperLimitSpinBox->setValue(1e16);
     this->upperLimitSpinBoxes.push_back(upperLimitSpinBox);
 
-
     QGridLayout *limitLayout = new QGridLayout;
     limitLayout->addWidget(lowerLimitLabel, 0, 0);
     limitLayout->addWidget(lowerLimitSpinBox, 0, 1);

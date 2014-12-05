@@ -41,6 +41,10 @@ using namespace gui;
 /////////////////////////////////////////////////
 JointMaker::JointMaker()
 {
+  this->UnitVectors.push_back(math::Vector3::UnitX);
+  this->UnitVectors.push_back(math::Vector3::UnitY);
+  this->UnitVectors.push_back(math::Vector3::UnitZ);
+
   this->newJointCreated = false;
   this->mouseJoint = NULL;
   this->modelSDF.reset();
@@ -300,7 +304,11 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   int axisCount = JointMaker::GetJointAxisCount(jointData->type);
   for (int i = 0; i < axisCount; ++i)
   {
-    jointData->axis[i] = math::Vector3::UnitX;
+    if (i < static_cast<int>(this->UnitVectors.size()))
+      jointData->axis[i] = this->UnitVectors[i];
+    else
+      jointData->axis[i] = this->UnitVectors[0];
+
     jointData->lowerLimit[i] = -1e16;
     jointData->upperLimit[i] = 1e16;
   }
