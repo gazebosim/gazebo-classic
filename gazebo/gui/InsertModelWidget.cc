@@ -208,8 +208,11 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   // Remove current items.
   topItem->takeChildren();
 
-  if (boost::filesystem::exists(dir) &&
-      boost::filesystem::is_directory(dir))
+  boost::system::error_code ec;
+  boost::filesystem::file_status directoryStatus = status(dir, ec);
+  if (ec != boost::system::errc::permission_denied &&
+      boost::filesystem::exists(directoryStatus) &&
+      boost::filesystem::is_directory(directoryStatus))
   {
     std::vector<boost::filesystem::path> paths;
 
