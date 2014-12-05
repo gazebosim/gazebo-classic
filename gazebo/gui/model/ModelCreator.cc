@@ -74,13 +74,12 @@ ModelCreator::ModelCreator()
   connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
           SLOT(OnDelete(const std::string &)));
 
-  // Argh
-  connect(this, SIGNAL(CopyTriggered()), this, SLOT(OnCopy()));
-  connect(this, SIGNAL(PasteTriggered()), this, SLOT(OnPaste()));
-
   g_copyAct->setEnabled(false);
   g_pasteAct->setEnabled(false);
-  this->pasteEnabled = false;
+
+  connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
+  connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+
   this->Reset();
 }
 
@@ -587,9 +586,14 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
   else if (_event.control)
   {
     if (_event.key == Qt::Key_C && _event.control)
-      emit CopyTriggered();
-    else if (_event.key == Qt::Key_V && _event.control && this->pasteEnabled)
-      emit PasteTriggered();
+    {
+      g_copyAct->trigger();
+      return true;
+    }
+    if (_event.key == Qt::Key_V && _event.control){
+      g_pasteAct->trigger();
+      return true;
+    }
   }
   return false;
 }
@@ -680,6 +684,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
             this->selectedVisuals.push_back(vis);
           }
         }
+        g_copyAct->setEnabled(!this->selectedVisuals.empty());
         g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
         return true;
       }
@@ -775,8 +780,7 @@ void ModelCreator::OnCopy()
     {
       this->copiedPartNames.push_back(this->selectedVisuals[i]->GetName());
     }
-    // Set enable Paste
-    this->pasteEnabled = true;
+    g_pasteAct->setEnabled(true);
   }
 }
 

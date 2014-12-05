@@ -310,11 +310,13 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
 
   if (this->mouseEvent.control)
   {
-    if (_event->key() == Qt::Key_C && !this->selectedVisuals.empty())
+    if (_event->key() == Qt::Key_C && !this->selectedVisuals.empty()
+       && !this->modelEditorEnabled)
     {
       g_copyAct->trigger();
     }
-    else if (_event->key() == Qt::Key_V && !this->copyEntityName.empty())
+    else if (_event->key() == Qt::Key_V && !this->copyEntityName.empty()
+       && !this->modelEditorEnabled)
     {
       g_pasteAct->trigger();
     }
@@ -1001,7 +1003,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
 /////////////////////////////////////////////////
 void GLWidget::OnCopy()
 {
-  if (!this->selectedVisuals.empty())
+  if (!this->selectedVisuals.empty() && !this->modelEditorEnabled)
   {
     this->Copy(this->selectedVisuals.back()->GetName());
   }
@@ -1010,15 +1012,13 @@ void GLWidget::OnCopy()
 /////////////////////////////////////////////////
 void GLWidget::OnPaste()
 {
-  gzdbg << "In GLWidget::OnPaste" << std::endl;
-  this->Paste(this->copyEntityName);
+  if (!this->modelEditorEnabled)
+    this->Paste(this->copyEntityName);
 }
 
 /////////////////////////////////////////////////
 void GLWidget::Copy(const std::string &_name)
 {
-  gzdbg << "GLWidget::Paste: Selected visual " << this->copyEntityName
-        << std::endl;
   this->copyEntityName = _name;
   g_pasteAct->setEnabled(true);
 }
@@ -1162,8 +1162,9 @@ void GLWidget::OnAlignMode(const std::string &_axis, const std::string &_config,
 }
 
 /////////////////////////////////////////////////
-void GLWidget::OnModelEditor(bool /*_checked*/)
+void GLWidget::OnModelEditor(bool _checked)
 {
+  this->modelEditorEnabled = _checked;
   g_arrowAct->trigger();
   event::Events::setSelectedEntity("", "normal");
 
