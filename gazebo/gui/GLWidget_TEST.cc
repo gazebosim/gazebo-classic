@@ -44,16 +44,15 @@ void GLWidget_TEST::KeyPresses()
   this->Load("worlds/blank.world", false, false, false);
 
   // Create the main window.
-  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  gazebo::gui::MainWindow mainWindow;
 
-  mainWindow->Load();
+  mainWindow.Load();
 
   gazebo::rendering::create_scene(
       gazebo::physics::get_world()->GetName(), false);
 
-  mainWindow->Init();
-  mainWindow->show();
+  mainWindow.Init();
+  mainWindow.show();
 
   gazebo::rendering::Events::createScene("default");
 
@@ -62,14 +61,13 @@ void GLWidget_TEST::KeyPresses()
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
-    mainWindow->repaint();
+    mainWindow.repaint();
   }
 
   // Get GLWidget
   gazebo::gui::GLWidget *glWidget =
-      mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+      mainWindow.findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != NULL);
-
 
   // Set up a keypress filter
   gazebo::gui::KeyEventHandler::Instance()->
@@ -79,7 +77,7 @@ void GLWidget_TEST::KeyPresses()
 
   // Case: Lowercase 'a', no modifier
   QTest::keyClick(glWidget, 'a', Qt::NoModifier, 100);
-  QVERIFY(lastKeyEvent.key == 'A');
+  QVERIFY(lastKeyEvent.key == Qt::Key_A);
   QVERIFY(lastKeyEvent.text.compare("a") == 0);
   QVERIFY(!lastKeyEvent.control);
   QVERIFY(!lastKeyEvent.shift);
@@ -87,7 +85,7 @@ void GLWidget_TEST::KeyPresses()
 
   // Case: Uppercase "A", no modifier
   QTest::keyClick(glWidget, 'A', Qt::NoModifier, 100);
-  QVERIFY(lastKeyEvent.key == 'A');
+  QVERIFY(lastKeyEvent.key == Qt::Key_A);
   QVERIFY(lastKeyEvent.text.compare("A") == 0);
   QVERIFY(!lastKeyEvent.control);
   QVERIFY(!lastKeyEvent.shift);
@@ -95,7 +93,7 @@ void GLWidget_TEST::KeyPresses()
 
   // Case: Lowercase 'b', shift modifier
   QTest::keyClick(glWidget, 'b', Qt::ShiftModifier, 100);
-  QVERIFY(lastKeyEvent.key == 'B');
+  QVERIFY(lastKeyEvent.key == Qt::Key_B);
   QVERIFY(lastKeyEvent.text.compare("b") == 0);
   QVERIFY(!lastKeyEvent.control);
   QVERIFY(lastKeyEvent.shift);
@@ -103,7 +101,7 @@ void GLWidget_TEST::KeyPresses()
 
   // Case: Uppercase 'b', shift modifier
   QTest::keyClick(glWidget, 'B', Qt::ShiftModifier, 100);
-  QVERIFY(lastKeyEvent.key == 'B');
+  QVERIFY(lastKeyEvent.key == Qt::Key_B);
   QVERIFY(lastKeyEvent.text.compare("B") == 0);
   QVERIFY(!lastKeyEvent.control);
   QVERIFY(lastKeyEvent.shift);
@@ -111,20 +109,19 @@ void GLWidget_TEST::KeyPresses()
 
   // Case: lowercase 'c', control modifier
   QTest::keyClick(glWidget, 'c', Qt::ControlModifier, 100);
-  QVERIFY(lastKeyEvent.key == 'C');
+  QVERIFY(lastKeyEvent.key == Qt::Key_C);
   QVERIFY(lastKeyEvent.control);
   QVERIFY(!lastKeyEvent.shift);
   QVERIFY(!lastKeyEvent.alt);
 
   // Case: lowercase 'd', control modifier
   QTest::keyClick(glWidget, 'd', Qt::AltModifier, 100);
-  QVERIFY(lastKeyEvent.key == 'D');
+  QVERIFY(lastKeyEvent.key == Qt::Key_D);
   QVERIFY(!lastKeyEvent.control);
   QVERIFY(!lastKeyEvent.shift);
   QVERIFY(lastKeyEvent.alt);
 
-  mainWindow->close();
-  delete mainWindow;
+  mainWindow.close();
 }
 
 // Generate a main function for the test
