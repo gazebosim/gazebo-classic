@@ -125,7 +125,6 @@ BuildingMaker::BuildingMaker() : EntityMaker()
 {
   this->buildingDefaultName = "Untitled";
   this->modelName = this->buildingDefaultName;
-  //this->SetModelName(this->buildingDefaultName);
 
   this->conversionScale = 0.01;
 
@@ -343,7 +342,6 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   this->allItems[linkName] = wallManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  //this->currentSaveState = UNSAVED_CHANGES;
   this->BuildingChanged();
   return linkName;
 }
@@ -510,7 +508,6 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   }
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  //this->currentSaveState = UNSAVED_CHANGES;
   this->BuildingChanged();
 
   return linkName;
@@ -559,7 +556,6 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   this->allItems[linkName] = floorManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  //this->currentSaveState = UNSAVED_CHANGES;
   this->BuildingChanged();
   return linkName;
 }
