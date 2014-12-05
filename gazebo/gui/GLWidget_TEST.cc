@@ -44,16 +44,15 @@ void GLWidget_TEST::KeyPresses()
   this->Load("worlds/blank.world", false, false, false);
 
   // Create the main window.
-  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  gazebo::gui::MainWindow mainWindow;
 
-  mainWindow->Load();
+  mainWindow.Load();
 
   gazebo::rendering::create_scene(
       gazebo::physics::get_world()->GetName(), false);
 
-  mainWindow->Init();
-  mainWindow->show();
+  mainWindow.Init();
+  mainWindow.show();
 
   gazebo::rendering::Events::createScene("default");
 
@@ -62,14 +61,13 @@ void GLWidget_TEST::KeyPresses()
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
-    mainWindow->repaint();
+    mainWindow.repaint();
   }
 
   // Get GLWidget
   gazebo::gui::GLWidget *glWidget =
-      mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+      mainWindow.findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != NULL);
-
 
   // Set up a keypress filter
   gazebo::gui::KeyEventHandler::Instance()->
@@ -123,8 +121,7 @@ void GLWidget_TEST::KeyPresses()
   QVERIFY(!lastKeyEvent.shift);
   QVERIFY(lastKeyEvent.alt);
 
-  mainWindow->close();
-  delete mainWindow;
+  mainWindow.close();
 }
 
 // Generate a main function for the test
