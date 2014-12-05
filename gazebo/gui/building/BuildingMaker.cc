@@ -1593,9 +1593,91 @@ void BuildingMaker::OnNew()
 void BuildingMaker::SaveModelFiles()
 {
   this->SetModelName(this->modelName);
+  this->GenerateConfig();
+  this->SaveToConfig(this->saveLocation);
   this->GenerateSDF();
   this->SaveToSDF(this->saveLocation);
   this->currentSaveState = ALL_SAVED;
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::GenerateConfig()
+{
+  // Create an xml config file
+  this->modelConfig.Clear();
+  this->modelConfig.Parse(this->GetTemplateConfigString().c_str());
+
+  TiXmlElement *modelXML = this->modelConfig.FirstChildElement("model");
+  if (!modelXML)
+  {
+    gzerr << "No model name in default config file\n";
+    return;
+  }
+  TiXmlElement *modelNameXML = modelXML->FirstChildElement("name");
+  modelNameXML->FirstChild()->SetValue(this->modelName);
+
+  TiXmlElement *versionXML = modelXML->FirstChildElement("version");
+  if (!versionXML)
+  {
+    gzerr << "Couldn't find model version" << std::endl;
+    versionXML->FirstChild()->SetValue("1.0");
+  }
+  else
+  {
+    versionXML->FirstChild()->SetValue(this->version);
+  }
+
+  TiXmlElement *descriptionXML = modelXML->FirstChildElement("description");
+  if (!descriptionXML)
+  {
+    gzerr << "Couldn't find model description" << std::endl;
+    descriptionXML->FirstChild()->SetValue("");
+  }
+  else
+  {
+    descriptionXML->FirstChild()->SetValue(this->description);
+  }
+
+  // TODO: Multiple authors
+  TiXmlElement *authorXML = modelXML->FirstChildElement("author");
+  if (!authorXML)
+  {
+    gzerr << "Couldn't find model author" << std::endl;
+  }
+  else
+  {
+    TiXmlElement *authorChild = authorXML->FirstChildElement("name");
+    if (!authorChild)
+    {
+      gzerr << "Couldn't find author name" << std::endl;
+      authorChild->FirstChild()->SetValue("");
+    }
+    else
+    {
+      authorChild->FirstChild()->SetValue(this->authorName);
+    }
+    authorChild = authorXML->FirstChildElement("email");
+    if (!authorChild)
+    {
+      gzerr << "Couldn't find author email" << std::endl;
+      authorChild->FirstChild()->SetValue("");
+    }
+    else
+    {
+      authorChild->FirstChild()->SetValue(this->authorEmail);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::SaveToConfig(const std::string &_savePath)
+{
+  boost::filesystem::path path(_savePath);
+  path = path / "model.config";
+  const char* modelConfigString = path.string().c_str();
+  gzdbg << "Saving file to " << modelConfigString << std::endl;
+
+  this->modelConfig.SaveFile(modelConfigString);
 }
 
 /////////////////////////////////////////////////
@@ -1667,71 +1749,6 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
       this->SetModelName(saveLocPath.filename().string());
     }
 
-    // Create an xml config file
-    TiXmlDocument xmlDoc;
-    xmlDoc.Parse(this->GetTemplateConfigString().c_str());
-
-    TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
-    if (!modelXML)
-    {
-      gzerr << "No model name in default config file\n";
-      return false;
-    }
-    TiXmlElement *modelNameXML = modelXML->FirstChildElement("name");
-    modelNameXML->FirstChild()->SetValue(this->modelName);
-
-    TiXmlElement *versionXML = modelXML->FirstChildElement("version");
-    if (!versionXML)
-    {
-      gzerr << "Couldn't find model version" << std::endl;
-      versionXML->FirstChild()->SetValue("1.0");
-    }
-    else
-    {
-      versionXML->FirstChild()->SetValue(this->version);
-    }
-
-    TiXmlElement *descriptionXML = modelXML->FirstChildElement("description");
-    if (!descriptionXML)
-    {
-      gzerr << "Couldn't find model description" << std::endl;
-      descriptionXML->FirstChild()->SetValue("");
-    }
-    else
-    {
-      descriptionXML->FirstChild()->SetValue(this->description);
-    }
-
-    // TODO: Multiple authors
-    TiXmlElement *authorXML = modelXML->FirstChildElement("author");
-    if (!authorXML)
-    {
-      gzerr << "Couldn't find model author" << std::endl;
-    }
-    else
-    {
-      TiXmlElement *authorChild = authorXML->FirstChildElement("name");
-      if (!authorChild)
-      {
-        gzerr << "Couldn't find author name" << std::endl;
-        authorChild->FirstChild()->SetValue("");
-      }
-      else
-      {
-        authorChild->FirstChild()->SetValue(this->authorName);
-      }
-      authorChild = authorXML->FirstChildElement("email");
-      if (!authorChild)
-      {
-        gzerr << "Couldn't find author email" << std::endl;
-        authorChild->FirstChild()->SetValue("");
-      }
-      else
-      {
-        authorChild->FirstChild()->SetValue(this->authorEmail);
-      }
-    }
-
     boost::filesystem::path path;
     path = path / this->saveLocation;
     if (!boost::filesystem::exists(path))
@@ -1768,11 +1785,6 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
         return this->OnSaveAs(this->modelName);
       }
     }
-
-    const char* modelConfigString = modelConfigPath.string().c_str();
-    gzdbg << "Saving file to " << modelConfigString << std::endl;
-
-    xmlDoc.SaveFile(modelConfigString);
 
     this->SaveModelFiles();
 

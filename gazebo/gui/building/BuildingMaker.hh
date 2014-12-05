@@ -205,6 +205,10 @@ namespace gazebo
       /// \param[in] _savePath Path to save the SDF to.
       public: void SaveToSDF(const std::string &_savePath);
 
+      /// \brief Save config file.
+      /// \param[in] _savePath Path to save the file to.
+      public: void SaveToConfig(const std::string &_savePath);
+
       /// \brief Reset the building maker and the SDF.
       public: void Reset();
 
@@ -216,6 +220,9 @@ namespace gazebo
 
       /// \brief Generate the SDF from building part visuals.
       public: void GenerateSDF();
+
+      /// \brief Generate the config file.
+      public: void GenerateConfig();
 
       // Documentation inherited
       public: virtual bool IsActive() const;
@@ -324,6 +331,9 @@ namespace gazebo
 
       /// \brief A template SDF of a simple box model.
       private: sdf::SDFPtr modelTemplateSDF;
+
+      /// \brief The building model's config file.
+      private: TiXmlDocument modelConfig;
 
       /// \brief Name of the building model.
       private: std::string modelName;
