@@ -26,7 +26,9 @@
 @set OGRE_INCLUDE_DIR=%OGRE_PATH%\include;%OGRE_PATH%\include\OGRE;%OGRE_PATH%\include\OGRE\RTShaderSystem;%OGRE_PATH%\include\OGRE\Terrain;%OGRE_PATH%\include\OGRE\Paging
 @set OGRE_LIBRARY_DIR=%OGRE_PATH%\lib\%build_type%
 @set OGRE_PLUGIN_DIR=%OGRE_LIBRARY_DIR%\opt
-@set OGRE_LIBS=%OGRE_LIBRARY_DIR%\OgreMain.lib;%OGRE_LIBRARY_DIR%\OgreOverlay.lib;%OGRE_LIBRARY_DIR%\OgreRTShaderSystem.lib;%OGRE_LIBRARY_DIR%\OgreTerrain.lib;%OGRE_LIBRARY_DIR%\OgrePaging.lib
+set OGRE_LIB_SUFFIX=.lib
+@if "%build_type%"=="Debug" set OGRE_LIB_SUFFIX=_d.lib
+@set OGRE_LIBS=%OGRE_LIBRARY_DIR%\OgreMain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreOverlay%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreRTShaderSystem%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreTerrain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgrePaging%OGRE_LIB_SUFFIX%
 
 @set DLFCN_WIN32_PATH=%cd%\..\..\dlfcn-win32-vc12-x64-release-debug\build\install\%build_type%
 @set DLFCN_WIN32_LIBRARY_DIR=%DLFCN_WIN32_PATH%\lib
