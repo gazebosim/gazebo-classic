@@ -65,6 +65,15 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
+  // Also insert additional paths from gui.ini
+  std::string additionalPaths =
+      gui::getINIProperty<std::string>("model_paths.filenames", "");
+  if (!additionalPaths.empty())
+  {
+    common::SystemPaths::Instance()->AddModelPaths(additionalPaths);
+    this->UpdateLocalPath(additionalPaths);
+  }
+
   // Create a system path watcher
   this->dataPtr->watcher = new QFileSystemWatcher();
 
@@ -95,15 +104,6 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   // Start a timer to check for the results from the ModelDatabase. We need
   // to do this so that the QT elements get added in the main thread.
   QTimer::singleShot(1000, this, SLOT(Update()));
-
-  // Also insert additional paths from gui.ini
-  std::string additionalPaths =
-      gui::getINIProperty<std::string>("model_paths.filenames", "");
-  if (!additionalPaths.empty())
-  {
-    common::SystemPaths::Instance()->AddModelPaths(additionalPaths);
-    this->UpdateLocalPath(additionalPaths);
-  }
 }
 
 /////////////////////////////////////////////////

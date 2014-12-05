@@ -108,8 +108,9 @@ void AddDirToModelPaths(const std::string& _path)
   {
     // Add it to gui.ini
     gui::setINIProperty("model_paths.filenames", parentDirectory);
-    // Save any changes that were made to the property tree
 
+    // Save any changes that were made to the property tree
+    // TODO: check gui.ini env variable
     char *home = getenv("HOME");
     if (home)
     {
@@ -665,8 +666,8 @@ void BuildingMaker::SaveToSDF(const std::string &_savePath)
   std::ofstream savefile;
   boost::filesystem::path path(_savePath);
   path = path / "model.sdf";
-  gzdbg << "Saving file to " << path.string() << std::endl;
 
+  // FIXME
   savefile.open(path.string().c_str());
   if (!savefile.is_open())
   {
@@ -675,6 +676,7 @@ void BuildingMaker::SaveToSDF(const std::string &_savePath)
   }
   savefile << this->modelSDF->ToString();
   savefile.close();
+  gzdbg << "Saved file to " << path.string() << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -1654,9 +1656,9 @@ void BuildingMaker::SaveToConfig(const std::string &_savePath)
   boost::filesystem::path path(_savePath);
   path = path / "model.config";
   const char* modelConfigString = path.string().c_str();
-  gzdbg << "Saving file to " << modelConfigString << std::endl;
 
   this->modelConfig.SaveFile(modelConfigString);
+  gzdbg << "Saved file to " << modelConfigString << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -1788,18 +1790,8 @@ void BuildingMaker::OnNameChanged(const std::string &_name)
     // Set new saveLocation
     boost::filesystem::path oldPath(this->saveLocation);
 
-    boost::filesystem::path newPath;
-    if (oldPath.parent_path().string()
-          .compare(QDir::homePath().toStdString()) == 0)
-    {
-      newPath = boost::filesystem::path(this->defaultPath) /
-                  GetFolderNameFromModelName(_name);
-    }
-    else
-    {
-      newPath = oldPath.parent_path() /
+    boost::filesystem::path newPath = oldPath.parent_path() /
           GetFolderNameFromModelName(_name);
-    }
     this->saveLocation = newPath.string();
   }
 

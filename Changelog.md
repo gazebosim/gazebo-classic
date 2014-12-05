@@ -120,7 +120,7 @@
 
     1. Snap walls to length increments, moved scale to SegmentItem and added Get/SetScale, added SegmentItem::SnapAngle and SegmentItem::SnapLength.
         * [Pull request #1311](https://bitbucket.org/osrf/gazebo/pull-request/1311)
-    1. Save building models in folders, improve save flow.
+    1. Make buildings available in "Insert Models" tab, improve save flow.
         * [Pull request #1312](https://bitbucket.org/osrf/gazebo/pull-request/1312)
 
     1. Added EditorItem::SetHighlighted.
