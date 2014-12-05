@@ -79,10 +79,53 @@ std::string GetFolderNameFromModelName(const std::string &_modelName)
 }
 
 /////////////////////////////////////////////////
+// Add the parent folder of _path to the model path represented by SystemPaths,
+// notify InsertModelWidget to display the model name in the "Insert Models"
+// tab, and write the parent folder filename to gui.ini
+void AddDirToModelPaths(const std::string& _path)
+{
+  std::string parentDirectory = boost::filesystem::path(_path)
+                                  .parent_path().string();
+
+  std::list<std::string> modelPaths =
+              gazebo::common::SystemPaths::Instance()->GetModelPaths();
+  std::list<std::string>::iterator iter;
+  for (iter = modelPaths.begin();
+       iter != modelPaths.end(); ++iter)
+  {
+    if (iter->compare(parentDirectory) == 0)
+    {
+      break;
+    }
+  }
+
+  gazebo::common::SystemPaths::Instance()->
+    AddModelPathsUpdate(parentDirectory);
+
+  std::string additionalProperties =
+    gui::getINIProperty<std::string>("model_paths.filenames", "");
+  if (additionalProperties.find(parentDirectory) == std::string::npos)
+  {
+    // Add it to gui.ini
+    gui::setINIProperty("model_paths.filenames", parentDirectory);
+    // Save any changes that were made to the property tree
+
+    char *home = getenv("HOME");
+    if (home)
+    {
+      boost::filesystem::path guiINIPath = home;
+      guiINIPath  = guiINIPath / ".gazebo" / "gui.ini";
+      saveINI(guiINIPath);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 BuildingMaker::BuildingMaker() : EntityMaker()
 {
   this->buildingDefaultName = "Untitled";
   this->modelName = this->buildingDefaultName;
+  //this->SetModelName(this->buildingDefaultName);
 
   this->conversionScale = 0.01;
 
@@ -1630,20 +1673,19 @@ bool BuildingMaker::OnSave(const std::string &_saveName)
   {
     case UNSAVED_CHANGES:
     {
+      // TODO: Subtle filesystem race condition
       this->SaveModelFiles();
+      AddDirToModelPaths(this->saveLocation);
       gui::editor::Events::saveBuildingModel(this->modelName,
           this->saveLocation);
       return true;
-      break;
     }
     case NEVER_SAVED:
     {
       return this->OnSaveAs(_saveName);
-      break;
     }
     default:
       return false;
-      break;
   }
 }
 
@@ -1728,46 +1770,7 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
 
     this->SaveModelFiles();
 
-    // Check if this this->saveLocation is in the model path
-    // TODO: Add the directory ABOVE saveLocation to SystemPaths
-
-    std::string parentDirectory = boost::filesystem::path(this->saveLocation)
-                                    .parent_path().string();
-
-    std::list<std::string> modelPaths =
-                gazebo::common::SystemPaths::Instance()->GetModelPaths();
-    std::list<std::string>::iterator iter;
-    for (iter = modelPaths.begin();
-         iter != modelPaths.end(); ++iter)
-    {
-      if (iter->compare(parentDirectory) == 0)
-      {
-        break;
-      }
-    }
-    if (iter == modelPaths.end())
-    {
-      // Add it to GAZEBO_MODEL_PATHS and notify InsertModelWidget
-      gazebo::common::SystemPaths::Instance()->
-        AddModelPathsUpdate(parentDirectory);
-    }
-
-    std::string additionalProperties =
-      gui::getINIProperty<std::string>("model_paths.filenames", "");
-    if (additionalProperties.find(parentDirectory) == std::string::npos)
-    {
-      // Add it to gui.ini
-      gui::setINIProperty("model_paths.filenames", parentDirectory);
-      // Save any changes that were made to the property tree
-
-      char *home = getenv("HOME");
-      if (home)
-      {
-        boost::filesystem::path guiINIPath = home;
-        guiINIPath  = guiINIPath / ".gazebo" / "gui.ini";
-        saveINI(guiINIPath);
-      }
-    }
+    AddDirToModelPaths(this->saveLocation);
 
     gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
     return true;
@@ -1788,8 +1791,19 @@ void BuildingMaker::OnNameChanged(const std::string &_name)
   {
     // Set new saveLocation
     boost::filesystem::path oldPath(this->saveLocation);
-    boost::filesystem::path newPath = oldPath.parent_path() /
-        GetFolderNameFromModelName(_name);
+
+    boost::filesystem::path newPath;
+    if (oldPath.parent_path().string()
+          .compare(QDir::homePath().toStdString()) == 0)
+    {
+      newPath = boost::filesystem::path(this->defaultPath) /
+                  GetFolderNameFromModelName(_name);
+    }
+    else
+    {
+      newPath = oldPath.parent_path() /
+          GetFolderNameFromModelName(_name);
+    }
     this->saveLocation = newPath.string();
   }
 

@@ -272,7 +272,6 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
           gzerr << "No model name in manifest[" << manifest << "]\n";
         else
           modelName = modelXML->FirstChildElement("name")->GetText();
-
         // Add a child item for the model
         QTreeWidgetItem *childItem = new QTreeWidgetItem(topItem,
             QStringList(QString::fromStdString(modelName)));
