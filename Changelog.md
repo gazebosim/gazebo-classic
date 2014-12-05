@@ -133,10 +133,13 @@
     1. Detach all child manips when item is deleted, added BuildingMaker::DetachAllChildren.
         * [Pull request #1316](https://bitbucket.org/osrf/gazebo/pull-request/1316)
 
+    1. Enabled multi-selection and align tool inside model editor.
+        * [Pull request #1302](https://bitbucket.org/osrf/gazebo/pull-request/1302)
+        * [Issue #1323](https://bitbucket.org/osrf/gazebo/issue/1323)
+
 1. Model editor updates
     1. Fix adding/removing event filters .
         * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
-
 
 ## Gazebo 4.0
 

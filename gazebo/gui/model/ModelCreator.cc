@@ -59,6 +59,8 @@ ModelCreator::ModelCreator()
   this->sphereCounter = 0;
   this->modelCounter = 0;
 
+  this->editTransparency = 0.4;
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
@@ -66,13 +68,13 @@ ModelCreator::ModelCreator()
 
   this->jointMaker = new JointMaker();
 
-  this->connections.push_back(
-     gui::Events::ConnectAlignMode(
-       boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
-
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
   connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
           SLOT(OnDelete(const std::string &)));
+
+  this->connections.push_back(
+      gui::Events::ConnectAlignMode(
+        boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
 
   g_copyAct->setEnabled(false);
   g_pasteAct->setEnabled(false);
@@ -224,7 +226,7 @@ std::string ModelCreator::AddSphere(double _radius,
 
   visVisual->Load(visualElem);
 
-  linkVisual->SetTransparency(0.5);
+  linkVisual->SetTransparency(this->editTransparency);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -268,7 +270,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
 
   visVisual->Load(visualElem);
 
-  linkVisual->SetTransparency(0.5);
+  linkVisual->SetTransparency(this->editTransparency);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -313,7 +315,7 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   meshElem->GetElement("uri")->Set(path);
   visVisual->Load(visualElem);
 
-  linkVisual->SetTransparency(0.5);
+  linkVisual->SetTransparency(this->editTransparency);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -643,57 +645,47 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     // Is part
     if (this->allParts.find(vis->GetName()) != this->allParts.end())
     {
-      // In mouse normal mode, let users select a part if the parent model
-      // is currently selected.
-      if (userCamera->GetScene()->GetSelectedVisual() == this->modelVisual ||
-          !this->selectedVisuals.empty())
+      // Not in multi-selection mode.
+      if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
       {
-        // Deselect model
-        this->modelVisual->SetHighlighted(false);
-        event::Events::setSelectedEntity("", "normal");
-
-        // deselect all parts if not in multi-selection mode.
-        if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
+        // Deselect all currently selected parts
+        for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
         {
-          for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
-          {
-            this->selectedVisuals[i]->SetHighlighted(false);
-          }
-          this->selectedVisuals.clear();
+          this->selectedVisuals[i]->SetHighlighted(false);
         }
+        this->selectedVisuals.clear();
 
-        // Highlight newly selected part
+        // Highlight and selected clicked part
         vis->SetHighlighted(true);
-
-        // enable multi-selection if control is pressed
-        if (this->selectedVisuals.empty() ||
-            QApplication::keyboardModifiers() & Qt::ControlModifier)
-        {
-          std::vector<rendering::VisualPtr>::iterator it =
-              std::find(this->selectedVisuals.begin(),
-              this->selectedVisuals.end(), vis);
-          // Add part if not already selected
-          if (it == this->selectedVisuals.end())
-          {
-            this->selectedVisuals.push_back(vis);
-          }
-          // if element already exists, move to the back of vector
-          else
-          {
-            this->selectedVisuals.erase(it);
-            this->selectedVisuals.push_back(vis);
-          }
-        }
-        g_copyAct->setEnabled(!this->selectedVisuals.empty());
-        g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
-        return true;
+        this->selectedVisuals.push_back(vis);
       }
-      // Handle at GLWidget - select whole model
+      // Multi-selection mode
+      else
+      {
+        std::vector<rendering::VisualPtr>::iterator it =
+            std::find(this->selectedVisuals.begin(),
+            this->selectedVisuals.end(), vis);
+        // Highlight and selected clicked part if not already selected
+        if (it == this->selectedVisuals.end())
+        {
+          vis->SetHighlighted(true);
+          this->selectedVisuals.push_back(vis);
+        }
+        // Deselect if already selected
+        else
+        {
+          vis->SetHighlighted(false);
+          this->selectedVisuals.erase(it);
+        }
+      }
+      g_copyAct->setEnabled(!this->selectedVisuals.empty());
+      g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
+      return true;
     }
     // Not part
     else
     {
-      // Deselect part and model
+      // Deselect all currently selected parts
       if (!this->selectedVisuals.empty())
       {
         for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
@@ -702,8 +694,6 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         }
         this->selectedVisuals.clear();
       }
-      else
-        event::Events::setSelectedEntity("", "normal");
 
       g_alignAct->setEnabled(false);
 
@@ -719,7 +709,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 {
-  lastMouseEvent = _event;
+  this->lastMouseEvent = _event;
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (!userCamera)
     return false;
