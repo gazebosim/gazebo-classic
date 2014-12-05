@@ -49,9 +49,12 @@ PartInspector::PartInspector(QWidget *_parent) : QDialog(_parent)
   // Create the main tab widget for all components in a part
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("partInspectorTab");
+  this->tabWidget->setMinimumHeight(800);
+
   this->tabWidget->addTab(this->generalConfig, "General");
   this->tabWidget->addTab(this->visualConfig, "Visual");
-//  this->tabWidget->addTab(this->collisionConfig, "Collision");
+  this->tabWidget->addTab(this->collisionConfig, "Collision");
+
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
@@ -76,6 +79,12 @@ PartInspector::PartInspector(QWidget *_parent) : QDialog(_parent)
 /////////////////////////////////////////////////
 PartInspector::~PartInspector()
 {
+  delete this->generalConfig;
+  this->generalConfig = NULL;
+  delete this->visualConfig;
+  this->visualConfig = NULL;
+  delete this->collisionConfig;
+  this->collisionConfig = NULL;
 }
 
 /////////////////////////////////////////////////

@@ -30,10 +30,29 @@ namespace gazebo
 
   namespace gui
   {
+    class ConfigWidget;
+
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class CollisionDataWidget PartCollisionConfig.hh
+    /// \class CollisionConfigData PartCollisionConfig.hh
+    /// \brief A class of widgets used for configuring collision properties.
+    class CollisionConfigData
+    {
+      /// \brief Unique ID of this collision config.
+      public: int id;
+
+      /// \brief Name of the collision.
+      public: std::string name;
+
+      /// \brief config widget for configuring collision properties.
+      public: ConfigWidget *configWidget;
+
+      /// \brief Tree item associated with the configWidget.
+      public: QTreeWidgetItem *treeItem;
+    };
+
+    /*/// \class CollisionDataWidget PartCollisionConfig.hh
     /// \brief A class of widgets used for configuring collision properties.
     class CollisionDataWidget : public QObject
     {
@@ -95,13 +114,79 @@ namespace gazebo
 
       /// \brief Qt signal emitted when a collision is added.
       private slots: void GeometryChanged(const QString _text);
-    };
+    };*/
 
     /// \class PartCollisionConfig PartCollisionConfig.hh
     /// \brief A tab for configuring collision properties of a part.
     class PartCollisionConfig : public QWidget
     {
       Q_OBJECT
+
+      /// \brief Constructor
+      public: PartCollisionConfig();
+
+      /// \brief Destructor
+      public: ~PartCollisionConfig();
+
+      /// \brief Add a collision widget to the tab.
+      /// \param[in] _name Name of collision added.
+      public: void AddCollision(const std::string &_name,
+          const msgs::Collision *_collisionMsg = NULL);
+
+      /// \brief Update a collision widget from a collision msg.
+      /// \param[in] _name Name of collision to be updated.
+      /// \param[in] _collisionMsg Msg used to update the collision widget values.
+      public: void UpdateCollision(const std::string &_name,
+          const msgs::Collision *_collisionMsg);
+
+      /// \brief Reset the collision tab.
+      public: void Reset();
+
+      /// \brief Get the number of collisions.
+      /// \return Number of collisions.
+      public: unsigned int GetCollisionCount() const;
+
+      /// \brief Get the msg containing all collision data.
+      /// \param[in] _name Name of collision.
+      /// \return Collision msg.
+      public: msgs::Collision *GetData(const std::string &_name) const;
+
+      /// \brief Map of id to collision config widget.
+      private: std::map<int, CollisionConfigData *> configs;
+
+      /// \brief Widget that display collisions' properties.
+      private: QTreeWidget *collisionsTreeWidget;
+
+      /// \brief Counter for the number of collisions.
+      private: int counter;
+
+      /// \brief Qt signal mapper for mapping remove button signals.
+      private:  QSignalMapper *signalMapper;
+
+      /// \brief A map of collision items to their id.
+      private: std::map<int, QTreeWidgetItem *> collisionItems;
+
+      /// \brief Qt signal emitted when a collision is removed.
+      /// \param[in] _name Name of collision removed.
+      Q_SIGNALS: void CollisionRemoved(const std::string &_name);
+
+      /// \brief Qt signal emitted when a collision is added.
+      Q_SIGNALS: void CollisionAdded(const std::string &_name);
+
+      /// \brief Qt callback when a collision is to be added.
+      /// \param[in] _name Name of collision added.
+      private slots: void OnAddCollision();
+
+      /// \brief Qt callback when a collision is to be removed.
+      /// \param[in] _item Item to be removed.
+      private slots: void OnRemoveCollision(int);
+
+      /// \brief Received item selection user input.
+      /// \param[in] _item Item selected.
+      /// \param[in] _column Column index.
+      private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
+
+      /*Q_OBJECT
 
       /// \brief Constructor
       public: PartCollisionConfig();
@@ -248,7 +333,7 @@ namespace gazebo
       /// \brief Received item selection user input.
       /// \param[in] _item Item selected.
       /// \param[in] _column Column index.
-      private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
+      private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);*/
     };
   }
 }

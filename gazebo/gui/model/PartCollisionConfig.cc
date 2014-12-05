@@ -18,6 +18,8 @@
 #include <iostream>
 
 #include "gazebo/common/Console.hh"
+
+#include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/model/PartCollisionConfig.hh"
 
 using namespace gazebo;
@@ -35,7 +37,8 @@ PartCollisionConfig::PartCollisionConfig()
   this->collisionsTreeWidget->header()->hide();
 
   this->collisionsTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
-  connect(this->collisionsTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+  connect(this->collisionsTreeWidget,
+      SIGNAL(itemClicked(QTreeWidgetItem *, int)),
       this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
 
   QPushButton *addCollisionButton = new QPushButton(tr("+ &Another Collision"));
@@ -58,25 +61,164 @@ PartCollisionConfig::~PartCollisionConfig()
 }
 
 /////////////////////////////////////////////////
-void PartCollisionConfig::AddCollision()
+void PartCollisionConfig::OnAddCollision()
 {
-  this->OnAddCollision();
+  std::stringstream collisionIndex;
+  collisionIndex << "collision_" << this->counter;
+  this->AddCollision(collisionIndex.str());
+  emit CollisionAdded(collisionIndex.str());
 }
 
 /////////////////////////////////////////////////
 unsigned int PartCollisionConfig::GetCollisionCount() const
 {
-  return this->dataWidgets.size();
+  return this->configs.size();
 }
 
 /////////////////////////////////////////////////
 void PartCollisionConfig::Reset()
 {
-  this->collisionItems.clear();
-  this->dataWidgets.clear();
+  std::map<int, CollisionConfigData *>::iterator it;
+  for (it = this->configs.begin(); it != this->configs.end(); ++it)
+    delete it->second;
+
+  this->configs.clear();
   this->collisionsTreeWidget->clear();
 }
 
+/////////////////////////////////////////////////
+void PartCollisionConfig::UpdateCollision(const std::string &_name,
+    const msgs::Collision *_collisionMsg)
+{
+  std::map<int, CollisionConfigData *>::iterator it;
+
+  for (it = this->configs.begin(); it != this->configs.end(); ++it)
+  {
+    if (it->second->name == _name)
+    {
+      CollisionConfigData *configData = it->second;
+      configData->configWidget->UpdateFromMsg(_collisionMsg);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void PartCollisionConfig::AddCollision(const std::string &_name,
+    const msgs::Collision *_collisionMsg)
+{
+  // Create a top-level tree item for the path
+  QTreeWidgetItem *collisionItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
+  this->collisionsTreeWidget->addTopLevelItem(collisionItem);
+
+  QWidget *collisionItemWidget = new QWidget;
+  QHBoxLayout *collisionItemLayout = new QHBoxLayout;
+  QLabel *collisionLabel = new QLabel(QString(_name.c_str()));
+
+  QPushButton *removeCollisionButton = new QPushButton(tr("Remove"));
+  connect(removeCollisionButton, SIGNAL(clicked()), this->signalMapper,
+      SLOT(map()));
+  this->signalMapper->setMapping(removeCollisionButton, this->counter);
+
+  collisionItemLayout->addWidget(collisionLabel);
+  collisionItemLayout->addWidget(removeCollisionButton);
+  collisionItemLayout->setContentsMargins(10, 0, 0, 0);
+  collisionItemWidget->setLayout(collisionItemLayout);
+  this->collisionsTreeWidget->setItemWidget(collisionItem, 0,
+      collisionItemWidget);
+
+  QTreeWidgetItem *collisionChildItem =
+    new QTreeWidgetItem(collisionItem);
+
+  QWidget *collisionWidget = new QWidget;
+  QVBoxLayout *collisionLayout = new QVBoxLayout;
+
+  ConfigWidget *configWidget = new ConfigWidget;
+
+  if (_collisionMsg)
+  {
+    configWidget->Load(_collisionMsg);
+  }
+  else
+  {
+    msgs::Collision collisionMsg;
+    configWidget->Load(&collisionMsg);
+  }
+
+  configWidget->SetWidgetVisible("id", false);
+  configWidget->SetWidgetVisible("name", false);
+
+  CollisionConfigData *configData = new CollisionConfigData;
+  configData->configWidget = configWidget;
+  configData->id =  this->counter;
+  configData->treeItem = collisionItem;
+  configData->name = _name;
+  this->configs[this->counter] = configData;
+  QScrollArea *scrollArea = new QScrollArea;
+  scrollArea->setWidget(configWidget);
+  collisionLayout->addWidget(scrollArea);
+  this->counter++;
+
+  collisionLayout->setContentsMargins(0, 0, 0, 0);
+  collisionLayout->setAlignment(Qt::AlignTop);
+  collisionWidget->setLayout(collisionLayout);
+  collisionWidget->setMinimumHeight(650);
+  //collisionWidget->setMinimumWidth(600);
+
+  this->collisionsTreeWidget->setItemWidget(collisionChildItem, 0,
+      collisionWidget);
+  collisionItem->setExpanded(false);
+  collisionChildItem->setExpanded(false);
+}
+
+/////////////////////////////////////////////////
+void PartCollisionConfig::OnItemSelection(QTreeWidgetItem *_item,
+                                         int /*_column*/)
+{
+  if (_item && _item->childCount() > 0)
+    _item->setExpanded(!_item->isExpanded());
+}
+
+
+/////////////////////////////////////////////////
+void PartCollisionConfig::OnRemoveCollision(int _id)
+{
+  std::map<int, CollisionConfigData *>::iterator it = this->configs.find(_id);
+  if (it == this->configs.end())
+  {
+    gzerr << "Collision not found " << std::endl;
+    return;
+  }
+
+  CollisionConfigData *configData = this->configs[_id];
+
+  int index = this->collisionsTreeWidget->indexOfTopLevelItem(
+      configData->treeItem);
+  this->collisionsTreeWidget->takeTopLevelItem(index);
+
+  emit CollisionRemoved(this->configs[_id]->name);
+  this->configs.erase(it);
+}
+
+/////////////////////////////////////////////////
+msgs::Collision *PartCollisionConfig::GetData(const std::string &_name) const
+{
+
+  std::map<int, CollisionConfigData *>::const_iterator it;
+  for (it = this->configs.begin(); it != this->configs.end(); ++it)
+  {
+    std::string name = it->second->name;
+    if (name == _name)
+    {
+      return dynamic_cast<msgs::Collision *>(
+          it->second->configWidget->GetMsg());
+    }
+  }
+  return NULL;
+}
+
+/*
 /////////////////////////////////////////////////
 void PartCollisionConfig::OnAddCollision()
 {
@@ -296,14 +438,6 @@ void PartCollisionConfig::OnAddCollision()
   collisionChildItem->setExpanded(true);
 
   emit CollisionAdded();
-}
-
-/////////////////////////////////////////////////
-void PartCollisionConfig::OnItemSelection(QTreeWidgetItem *_item,
-                                         int /*_column*/)
-{
-  if (_item && _item->childCount() > 0)
-    _item->setExpanded(!_item->isExpanded());
 }
 
 /////////////////////////////////////////////////
@@ -640,4 +774,4 @@ void CollisionDataWidget::GeometryChanged(const QString _text)
       this->geomLengthLabel->hide();
     }
   }
-}
+}*/

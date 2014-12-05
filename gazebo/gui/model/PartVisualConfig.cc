@@ -117,6 +117,7 @@ void PartVisualConfig::AddVisual(const std::string &_name,
 
   visualItemLayout->addWidget(visualLabel);
   visualItemLayout->addWidget(removeVisualButton);
+  visualItemLayout->setContentsMargins(10, 0, 0, 0);
   visualItemWidget->setLayout(visualItemLayout);
   this->visualsTreeWidget->setItemWidget(visualItem, 0, visualItemWidget);
 
@@ -328,8 +329,9 @@ void PartVisualConfig::AddVisual(const std::string &_name,
   visualLayout->addLayout(visualGeneralLayout);
   visualLayout->addWidget(poseGroupBox);
   visualLayout->addLayout(visualPropertyLayout);*/
+  visualLayout->setContentsMargins(0, 0, 0, 0);
   visualWidget->setLayout(visualLayout);
-  visualWidget->setContentsMargins(0, 0, 0, 0);
+  visualWidget->setMinimumHeight(650);
 
   this->visualsTreeWidget->setItemWidget(visualChildItem, 0, visualWidget);
   visualItem->setExpanded(false);
@@ -416,8 +418,6 @@ msgs::Visual *PartVisualConfig::GetData(const std::string &_name) const
   }
   return NULL;
 }
-
-
 
 /*/////////////////////////////////////////////////
 void PartVisualConfig::SetPose(unsigned int _index, const math::Pose &_pose)

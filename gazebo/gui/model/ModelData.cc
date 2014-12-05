@@ -169,6 +169,7 @@ void PartData::AddVisual(rendering::VisualPtr _visual)
 /////////////////////////////////////////////////
 void PartData::OnApply()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
 
   this->partSDF = msgs::LinkToSDF(*generalConfig->GetData(), this->partSDF);
@@ -204,7 +205,7 @@ void PartData::OnApply()
 //        msgs::Visual msg;
 //        msg.CopyFrom(*updateMsg);
 
-        boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+
         this->updateMsgs.push_back(updateMsg);
 
         //it->first->UpdateFromMsg(ConstVisualPtr(updateMsg));
@@ -318,13 +319,13 @@ void PartData::Update()
         materialMsg->mutable_specular()->set_a(transparency);
         materialMsg->mutable_emissive()->set_a(transparency);
 
-         // std::cerr << " updateMsg " << updateMsgPtr->DebugString() << std::endl;
+          //std::cerr << " updateMsg " << updateMsgPtr->DebugString() << std::endl;
         it->first->UpdateFromMsg(updateMsgPtr);
         //it->first->SetTransparency(transparency);
 
         // if (it->first->GetMaterialName() != origMatName)
+        break;
       }
-      break;
     }
   }
 }

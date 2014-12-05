@@ -35,7 +35,7 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class VisualDataWidget PartVisualConfig.hh
+    /// \class VisualConfigData PartVisualConfig.hh
     /// \brief A class of widgets used for configuring visual properties.
     class VisualConfigData
     {
