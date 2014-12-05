@@ -233,23 +233,13 @@ void Position2dInterface::OnPoseMsg(ConstPosesStampedPtr &_msg)
     player_position2d_data_t data;
     memset(&data, 0, sizeof(data));
 
-    this->datatime = gazebo::common::Time::GetWallTime().Double();
+    this->datatime = static_cast<double>(_msg->time().sec()) +
+      static_cast<double>(_msg->time().nsec()) / 1.0e-9;
     data.pos.px = _msg->pose(i).position().x();
     data.pos.py = _msg->pose(i).position().y();
-    data.pos.pa = _msg->pose(i).position().z();
-
-    // TODO:
-    /*
-       struct timeval ts;
-       ts.tv_sec = (int) (this->iface->data->head.time);
-       ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
-
-       data.vel.px = this->iface->data->velocity.pos.x;
-       data.vel.py = this->iface->data->velocity.pos.y;
-       data.vel.pa = this->iface->data->velocity.yaw;
-
-       data.stall = (uint8_t) this->iface->data->stall;
-       */
+    gazebo::math::Quaternion quat =
+      gazebo::msgs::Convert(_msg->pose(i).orientation());
+    data.pos.pa = quat.GetYaw();
 
     this->driver->Publish(this->device_addr,
         PLAYER_MSGTYPE_DATA,
