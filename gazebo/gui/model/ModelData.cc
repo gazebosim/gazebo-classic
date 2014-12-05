@@ -307,7 +307,7 @@ void PartData::Update()
     {
       if (it->second.name() == updateMsgPtr->name())
       {
-        std::string origMatName = it->first->GetMaterialName();
+        //std::string origMatName = it->first->GetMaterialName();
 
         // make visual semi-transparent here
         // but generated sdf will use the correct transparency value
@@ -318,12 +318,13 @@ void PartData::Update()
         materialMsg->mutable_specular()->set_a(transparency);
         materialMsg->mutable_emissive()->set_a(transparency);
 
-         //std::cerr << " updateMsg " << updateMsgPtr->DebugString() << std::endl;
+         // std::cerr << " updateMsg " << updateMsgPtr->DebugString() << std::endl;
         it->first->UpdateFromMsg(updateMsgPtr);
         //it->first->SetTransparency(transparency);
 
         // if (it->first->GetMaterialName() != origMatName)
       }
+      break;
     }
   }
 }

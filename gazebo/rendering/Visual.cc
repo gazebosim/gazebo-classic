@@ -252,6 +252,8 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   if (_newParent == this->dataPtr->scene->GetWorldVisual())
     result->SetWorldPose(this->GetWorldPose());
   result->ShowCollision(false);
+
+  result->SetName(_name);
   return result;
 }
 
