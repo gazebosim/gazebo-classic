@@ -192,6 +192,8 @@ target_link_libraries(gzclient
   gazebo_transport
   gazebo_rendering
   gazebo_sensors
+  gazebo_physics
+  gazebo_physics_ode
   gazebo_msgs
   gazebo_gui_building
   gazebo_gui_model

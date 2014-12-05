@@ -3,6 +3,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
   ${CEGUI_INCLUDE_DIRS}
+  ${TBB_INCLUDEDIR}
   skyx
   skyx/include
 )
