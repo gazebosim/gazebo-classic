@@ -65,21 +65,6 @@ ModelCreator::ModelCreator()
   this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
 
-  KeyEventHandler::Instance()->AddPressFilter("model_creator",
-      boost::bind(&ModelCreator::OnKeyPress, this, _1));
-
-  MouseEventHandler::Instance()->AddPressFilter("model_creator",
-      boost::bind(&ModelCreator::OnMousePress, this, _1));
-
-  MouseEventHandler::Instance()->AddReleaseFilter("model_creator",
-      boost::bind(&ModelCreator::OnMouseRelease, this, _1));
-
-  MouseEventHandler::Instance()->AddMoveFilter("model_creator",
-      boost::bind(&ModelCreator::OnMouseMove, this, _1));
-
-  MouseEventHandler::Instance()->AddDoubleClickFilter("model_creator",
-      boost::bind(&ModelCreator::OnMouseDoubleClick, this, _1));
-
   this->jointMaker = new JointMaker();
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));

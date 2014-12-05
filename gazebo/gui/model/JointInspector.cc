@@ -136,14 +136,12 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
     lowerLimitSpinBox->setRange(-1000, 1000);
     lowerLimitSpinBox->setSingleStep(0.01);
     lowerLimitSpinBox->setDecimals(3);
-    lowerLimitSpinBox->setValue(-1e16);
     this->lowerLimitSpinBoxes.push_back(lowerLimitSpinBox);
 
     QDoubleSpinBox *upperLimitSpinBox = new QDoubleSpinBox;
     upperLimitSpinBox->setRange(-1000, 1000);
     upperLimitSpinBox->setSingleStep(0.01);
     upperLimitSpinBox->setDecimals(3);
-    upperLimitSpinBox->setValue(1e16);
     this->upperLimitSpinBoxes.push_back(upperLimitSpinBox);
 
     QGridLayout *limitLayout = new QGridLayout;

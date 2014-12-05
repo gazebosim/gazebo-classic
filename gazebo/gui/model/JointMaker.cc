@@ -309,8 +309,8 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
     else
       jointData->axis[i] = this->UnitVectors[0];
 
-    jointData->lowerLimit[i] = -1e16;
-    jointData->upperLimit[i] = 1e16;
+    jointData->lowerLimit[i] = -3.14;
+    jointData->upperLimit[i] = 3.14;
   }
   jointData->anchor = math::Vector3::Zero;
   jointData->line->setMaterial(this->jointMaterials[jointData->type]);
