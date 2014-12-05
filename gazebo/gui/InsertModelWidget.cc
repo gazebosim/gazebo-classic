@@ -209,10 +209,10 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   topItem->takeChildren();
 
   boost::system::error_code ec;
-  boost::filesystem::file_status directoryStatus = status(dir, ec);
-  if (ec != boost::system::errc::permission_denied &&
-      boost::filesystem::exists(directoryStatus) &&
-      boost::filesystem::is_directory(directoryStatus))
+  status(dir, ec);
+  if ((ec || boost::system::errc::permission_denied) &&
+      boost::filesystem::exists(dir) &&
+      boost::filesystem::is_directory(dir))
   {
     std::vector<boost::filesystem::path> paths;
 
@@ -239,6 +239,13 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
             << "files in a GAZEBO_MODEL_PATH because the file structure may"
             << " be modified by Gazebo.\n";
         }
+        continue;
+      }
+      status(fullPath, ec);
+      if (ec || boost::system::errc::permission_denied)
+      {
+        gzlog << "Permission denied for folder on GAZEBO_MODEL_PATH: "
+              << fullPath << std::endl;
         continue;
       }
 
