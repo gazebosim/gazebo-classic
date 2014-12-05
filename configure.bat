@@ -24,7 +24,7 @@ set CURL_LIBRARY_NAME=libcurl_a
 @set TBB_INCLUDEDIR=%TBB_PATH%\include
 
 @set OGRE_VERSION=1.8.1
-@set OGRE_PATH=%cd%\..\..\ogre_src-v1-8-1-vc12-x64-release-debug\build\install\%build_type%
+@set OGRE_PATH=%cd%\..\..\ogre_src_v1-8-1-vc12-x64-release-debug\build\install\%build_type%
 @set OGRE_INCLUDE_DIR=%OGRE_PATH%\include;%OGRE_PATH%\include\OGRE;%OGRE_PATH%\include\OGRE\RTShaderSystem;%OGRE_PATH%\include\OGRE\Terrain;%OGRE_PATH%\include\OGRE\Paging
 @set OGRE_LIBRARY_DIR=%OGRE_PATH%\lib\%build_type%
 @set OGRE_PLUGIN_DIR=%OGRE_LIBRARY_DIR%\opt
