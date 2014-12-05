@@ -13,6 +13,10 @@ if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
 endif()
 
+if (WIN32)
+  add_definitions(-DCURL_STATICLIB)
+endif()
+
 set (plugins
   ForceTorqueModelRemovalTestPlugin
   Issue1208Plugin
@@ -21,6 +25,6 @@ set (plugins
 )
 
 foreach (src ${plugins})
-  add_library(${src} SHARED ${src}.cc)
+  add_library(${src} ${src}.cc)
   target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries})
 endforeach (src ${plugins})

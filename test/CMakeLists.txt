@@ -4,6 +4,7 @@ include_directories (
   ${OGRE_INCLUDE_DIRS}
   ${SDFormat_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
+  ${PROTOBUF_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/test/gtest/include
   ${PROJECT_SOURCE_DIR}/test/gtest
   ${PROJECT_SOURCE_DIR}/test
