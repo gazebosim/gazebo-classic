@@ -140,6 +140,10 @@ namespace gazebo
       public: void DetachManip(const std::string &_child,
           const std::string &_parent);
 
+      /// \brief Detach all child building parts from the given manip.
+      /// \param[in] _manip Name of the building part.
+      public: void DetachAllChildren(const std::string &_manip);
+
       /// \brief Helper method to convert size from editor coordinate system
       /// to Gazebo coordinate system.
       /// \param[in] _size Size vector in pixels.
@@ -256,6 +260,11 @@ namespace gazebo
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
 
+      /// \brief Callback received when a level on a building model is to
+      /// be changed.
+      /// \param[in] _level The level that is currently being edited.
+      private: void OnChangeLevel(int _level);
+
       /// \brief Conversion scale used by the Convert helper functions.
       public: static double conversionScale;
 
@@ -311,6 +320,9 @@ namespace gazebo
       /// \brief A dialog that prompts to confirm model completion and uploading
       /// to the server
       private: FinishBuildingDialog *finishDialog;
+
+      /// \brief The current level that is being edited.
+      private: int currentLevel;
     };
     /// \}
   }

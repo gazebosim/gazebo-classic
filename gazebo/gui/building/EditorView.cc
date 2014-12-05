@@ -273,19 +273,18 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
       }
       else if (this->drawMode == STAIRS)
       {
-        this->stairsList.push_back(dynamic_cast<StairsItem *>(
-            this->currentMouseItem));
+        StairsItem *stairsItem = dynamic_cast<StairsItem *>(
+            this->currentMouseItem);
+        stairsItem->Set3dColor(Qt::white);
+        this->stairsList.push_back(stairsItem);
         if ((this->currentLevel) < static_cast<int>(floorList.size()))
         {
-          EditorItem *item = dynamic_cast<EditorItem *>(this->currentMouseItem);
-          this->buildingMaker->AttachManip(this->itemToVisualMap[item],
+          this->buildingMaker->AttachManip(this->itemToVisualMap[stairsItem],
               this->itemToVisualMap[floorList[this->currentLevel]]);
         }
       }
-
-      // Select -> deselect to trigger change
-      this->currentMouseItem->setSelected(true);
-      this->currentMouseItem->setSelected(false);
+      dynamic_cast<EditorItem *>(this->currentMouseItem)->
+          SetHighlighted(false);
 
       this->drawMode = NONE;
       this->drawInProgress = false;
@@ -357,20 +356,27 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
             }
           }
 
-          // Snap to 15 degrees increments
           if (!this->snapToGrabber)
           {
+            // Snap to angular increments
             QLineF newLine(p1, p2);
             double angle = GZ_DTOR(QLineF(p1, p2).angle());
-            double range = GZ_DTOR(15);
-            int increment = angle / range;
+            double range = GZ_DTOR(SegmentItem::SnapAngle);
+            int angleIncrement = angle / range;
 
-            if ((angle - range*increment) > range*0.5)
-              increment++;
-            angle = -range*increment;
+            if ((angle - range*angleIncrement) > range*0.5)
+              angleIncrement++;
+            angle = -range*angleIncrement;
 
-            pf.setX(p1.x() + qCos(angle)*newLine.length());
-            pf.setY(p1.y() + qSin(angle)*newLine.length());
+            // Snap to length increments
+            double newLength = newLine.length();
+            double lengthIncrement = SegmentItem::SnapLength /
+                wallSegmentItem->GetScale();
+            newLength  = round(newLength/lengthIncrement)*lengthIncrement-
+                wallSegmentItem->GetThickness();
+
+            pf.setX(p1.x() + qCos(angle)*newLength);
+            pf.setY(p1.y() + qSin(angle)*newLength);
           }
         }
         wallSegmentItem->SetEndPoint(pf);
@@ -560,6 +566,8 @@ void EditorView::DeleteItem(EditorItem *_item)
   if (!_item)
     return;
 
+  this->buildingMaker->DetachAllChildren(this->itemToVisualMap[_item]);
+
   if (_item->GetType() == "WallSegment")
   {
     WallSegmentItem *wallSegmentItem = dynamic_cast<WallSegmentItem *>(_item);
@@ -672,9 +680,8 @@ void EditorView::DrawWall(const QPoint &_pos)
     this->snapGrabberCurrent = NULL;
 
     wallSegmentItem = dynamic_cast<WallSegmentItem*>(this->currentMouseItem);
-    // Select -> deselect to trigger change
-    wallSegmentItem->setSelected(true);
-    wallSegmentItem->setSelected(false);
+    wallSegmentItem->Set3dColor(Qt::white);
+    wallSegmentItem->SetHighlighted(false);
     wallSegmentList.push_back(wallSegmentItem);
     if (wallSegmentItem->GetLevel() > 0)
     {
@@ -1012,10 +1019,8 @@ void EditorView::OnAddLevel()
     this->itemToVisualMap[wallSegmentItem] = wallSegmentName;
 
     floorItem->AttachWallSegment(wallSegmentItem);
-
-    // Select -> deselect to trigger change
-    wallSegmentItem->setSelected(true);
-    wallSegmentItem->setSelected(false);
+    wallSegmentItem->Set3dColor(Qt::white);
+    wallSegmentItem->SetHighlighted(false);
   }
 
   // Clone linked grabber relations
@@ -1059,6 +1064,8 @@ void EditorView::OnAddLevel()
   this->itemToVisualMap[floorItem] = floorName;
   this->scene()->addItem(floorItem);
   this->floorList.push_back(floorItem);
+  floorItem->Set3dColor(Qt::white);
+  floorItem->SetHighlighted(false);
 }
 
 /////////////////////////////////////////////////
@@ -1074,6 +1081,7 @@ void EditorView::DeleteLevel(int _level)
       || _level >= static_cast<int>(this->levels.size()))
     return;
 
+  // Delete current level and move to level below or above
   int newLevelIndex = _level - 1;
   if (newLevelIndex < 0)
     newLevelIndex = _level + 1;
@@ -1210,6 +1218,7 @@ void EditorView::OnOpenLevelInspector()
   {
     this->levelInspector->floorWidget->hide();
   }
+  this->levelInspector->move(QCursor::pos());
   this->levelInspector->show();
 }
 
@@ -1221,9 +1230,13 @@ void EditorView::OnLevelApply()
 
   std::string newLevelName = dialog->GetLevelName();
   this->levels[this->currentLevel]->name = newLevelName;
-  this->levels[this->currentLevel]->floorItem->Set3dColor(dialog->
-      GetFloorColor());
-  this->levels[this->currentLevel]->floorItem->FloorChanged();
+  FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
+  if (floorItem)
+  {
+    floorItem->Set3dColor(dialog->GetFloorColor());
+    floorItem->Set3dTransparency(0.4);
+    floorItem->FloorChanged();
+  }
   gui::editor::Events::updateLevelWidget(this->currentLevel, newLevelName);
 }
 
