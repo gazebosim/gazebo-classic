@@ -1964,7 +1964,7 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
       BuildingModelManip *manip = this->allItems[hoverName];
       this->hoverVis->SetAmbient(manip->GetColor());
       this->hoverVis->SetMaterial(manip->GetTexture());
-      this->hoverVis->SetTransparency(0.4);
+      this->hoverVis->SetTransparency(manip->GetTransparency());
     }
 
     if (visName.find("Wall") != std::string::npos ||
