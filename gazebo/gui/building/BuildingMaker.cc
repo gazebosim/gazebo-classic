@@ -79,7 +79,7 @@ std::string GetFolderNameFromModelName(const std::string &_modelName)
 }
 
 /////////////////////////////////////////////////
-  BuildingMaker::BuildingMaker() : EntityMaker()
+BuildingMaker::BuildingMaker() : EntityMaker()
 {
   this->buildingDefaultName = "Untitled";
   this->modelName = this->buildingDefaultName;
@@ -300,7 +300,8 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   this->allItems[linkName] = wallManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->currentSaveState = UNSAVED_CHANGES;
+  //this->currentSaveState = UNSAVED_CHANGES;
+  this->BuildingChanged();
   return linkName;
 }
 
@@ -346,7 +347,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   this->allItems[linkName] = windowManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->currentSaveState = UNSAVED_CHANGES;
+  this->BuildingChanged();
   return linkName;
 }
 
@@ -393,7 +394,7 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   this->allItems[linkName] = doorManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->currentSaveState = UNSAVED_CHANGES;
+  this->BuildingChanged();
   return linkName;
 }
 
@@ -466,7 +467,8 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   }
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->currentSaveState = UNSAVED_CHANGES;
+  //this->currentSaveState = UNSAVED_CHANGES;
+  this->BuildingChanged();
 
   return linkName;
 }
@@ -514,7 +516,8 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   this->allItems[linkName] = floorManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->currentSaveState = UNSAVED_CHANGES;
+  //this->currentSaveState = UNSAVED_CHANGES;
+  this->BuildingChanged();
   return linkName;
 }
 
@@ -535,7 +538,7 @@ void BuildingMaker::RemovePart(const std::string &_partName)
     scene->RemoveVisual(visParent);
   this->allItems.erase(_partName);
   delete manip;
-  this->currentSaveState = UNSAVED_CHANGES;
+  this->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -613,6 +616,8 @@ void BuildingMaker::SetModelName(const std::string &_modelName)
 {
   this->modelName = _modelName;
   this->saveDialog->SetModelName(_modelName);
+  this->BuildingChanged();
+  // send to palette?
 }
 
 /////////////////////////////////////////////////
@@ -1482,18 +1487,26 @@ void BuildingMaker::OnNew()
   QPushButton *cancelButton = msgBox.addButton("Cancel", QMessageBox::YesRole);
   QPushButton *saveButton = msgBox.addButton("Save", QMessageBox::YesRole);
 
-  if (this->currentSaveState == SAVED)
+  switch (this->currentSaveState)
   {
-    msg.append("Are you sure you want to close this model and open a new "
-               "canvas?\n\n");
-    msgBox.addButton("New Canvas", QMessageBox::ApplyRole);
-    saveButton->hide();
-  }
-  else
-  {
-    msg.append("You have unsaved changes. Do you want to save this model "
-               "and open a new canvas?\n\n");
-    msgBox.addButton("Don't Save", QMessageBox::ApplyRole);
+    case ALL_SAVED:
+    {
+      msg.append("Are you sure you want to close this model and open a new "
+                 "canvas?\n\n");
+      msgBox.addButton("New Canvas", QMessageBox::ApplyRole);
+      saveButton->hide();
+      break;
+    }
+    case UNSAVED_CHANGES:
+    case NEVER_SAVED:
+    {
+      msg.append("You have unsaved changes. Do you want to save this model "
+                 "and open a new canvas?\n\n");
+      msgBox.addButton("Don't Save", QMessageBox::ApplyRole);
+      break;
+    }
+    default:
+      return;
   }
 
   msg.append("Once you open a new canvas, your current model will no longer "
@@ -1504,7 +1517,7 @@ void BuildingMaker::OnNew()
 
   if (msgBox.clickedButton() != cancelButton)
   {
-    if (this->currentSaveState != SAVED && msgBox.clickedButton() == saveButton)
+    if (msgBox.clickedButton() == saveButton)
     {
       if (!this->OnSave(this->modelName))
       {
@@ -1522,6 +1535,7 @@ void BuildingMaker::SaveModelFiles()
   this->SetModelName(this->modelName);
   this->GenerateSDF();
   this->SaveToSDF(this->saveLocation);
+  this->currentSaveState = ALL_SAVED;
 }
 
 /////////////////////////////////////////////////
@@ -1530,13 +1544,25 @@ bool BuildingMaker::OnSave(const std::string &_saveName)
   if (_saveName != "")
     this->SetModelName(_saveName);
 
-  if (this->currentSaveState == SAVED)
+  switch (this->currentSaveState)
   {
-    this->SaveModelFiles();
-    gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
-    return true;
+    case UNSAVED_CHANGES:
+    {
+      this->SaveModelFiles();
+      gui::editor::Events::saveBuildingModel(this->modelName,
+          this->saveLocation);
+      return true;
+      break;
+    }
+    case NEVER_SAVED:
+    {
+      return this->OnSaveAs(_saveName);
+      break;
+    }
+    default:
+      return false;
+      break;
   }
-  return this->OnSaveAs(_saveName);
 }
 
 /////////////////////////////////////////////////
@@ -1731,8 +1757,6 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
       }
     }
 
-    this->currentSaveState = SAVED;
-
     gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
     return true;
   }
@@ -1747,13 +1771,17 @@ void BuildingMaker::OnNameChanged(const std::string &_name)
     return;
   }
   this->SetModelName(_name);
-  // Set new saveLocation
-  boost::filesystem::path oldPath(this->saveLocation);
-  boost::filesystem::path newPath = oldPath.parent_path() /
-    GetFolderNameFromModelName(_name);
-  this->saveLocation = newPath.string();
 
-  this->currentSaveState = UNSAVED_CHANGES;
+  if (this->currentSaveState == NEVER_SAVED)
+  {
+    // Set new saveLocation
+    boost::filesystem::path oldPath(this->saveLocation);
+    boost::filesystem::path newPath = oldPath.parent_path() /
+        GetFolderNameFromModelName(_name);
+    this->saveLocation = newPath.string();
+  }
+
+  this->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -1761,50 +1789,60 @@ void BuildingMaker::OnExit()
 {
   if (this->allItems.empty())
   {
+    this->Reset();
     gui::editor::Events::finishBuildingModel();
     return;
   }
 
-  if (this->currentSaveState == SAVED)
+  switch (this->currentSaveState)
   {
-    QString msg("Once you exit the Building Editor, "
+    case ALL_SAVED:
+    {
+      QString msg("Once you exit the Building Editor, "
       "your building will no longer be editable.\n\n"
       "Are you ready to exit?\n\n");
-    QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
-
-    msgBox.addButton("Exit", QMessageBox::ApplyRole);
-    QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
-    msgBox.exec();
-    if (msgBox.clickedButton() == cancelButton)
-    {
-      return;
-    }
-    this->FinishModel();
-  }
-  else
-  {
-    QString msg("Save Changes before exiting?\n\n"
-        "Note: Once you exit the Building Editor, "
-        "your building will no longer be editable.\n\n");
-
-    QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
-    QPushButton *cancelButton = msgBox.addButton("Cancel",
-      QMessageBox::ApplyRole);
-    QPushButton *saveButton = msgBox.addButton("Save and Exit",
-      QMessageBox::ApplyRole);
-    msgBox.addButton("Don't Save, Exit", QMessageBox::ApplyRole);
-    msgBox.exec();
-    if (msgBox.clickedButton() == cancelButton)
-      return;
-
-    if (msgBox.clickedButton() == saveButton)
-    {
-      if (!this->OnSave(this->modelName))
+      QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
+      msgBox.addButton("Exit", QMessageBox::ApplyRole);
+      QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
+      msgBox.exec();
+      if (msgBox.clickedButton() == cancelButton)
       {
         return;
       }
+      this->FinishModel();
+      break;
     }
+    case UNSAVED_CHANGES:
+    case NEVER_SAVED:
+    {
+      QString msg("Save Changes before exiting?\n\n"
+          "Note: Once you exit the Building Editor, "
+          "your building will no longer be editable.\n\n");
+
+      QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
+      QPushButton *cancelButton = msgBox.addButton("Cancel",
+          QMessageBox::ApplyRole);
+      QPushButton *saveButton = msgBox.addButton("Save and Exit",
+          QMessageBox::ApplyRole);
+      msgBox.addButton("Don't Save, Exit", QMessageBox::ApplyRole);
+      msgBox.exec();
+      if (msgBox.clickedButton() == cancelButton)
+        return;
+
+      if (msgBox.clickedButton() == saveButton)
+      {
+        if (!this->OnSave(this->modelName))
+        {
+          return;
+        }
+      }
+      break;
+    }
+    default:
+      return;
   }
+
+  // Create entity on main window up to the saved point
   if (this->currentSaveState != NEVER_SAVED)
     this->FinishModel();
 
@@ -1813,9 +1851,17 @@ void BuildingMaker::OnExit()
   gui::editor::Events::newBuildingModel();
   gui::editor::Events::finishBuildingModel();
 }
+
 /////////////////////////////////////////////////
 void BuildingMaker::OnChangeLevel(int _level)
 {
   this->currentLevel = _level;
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::BuildingChanged()
+{
+  if (this->currentSaveState != NEVER_SAVED)
+    this->currentSaveState = UNSAVED_CHANGES;
 }
 

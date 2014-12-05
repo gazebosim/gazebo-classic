@@ -95,6 +95,7 @@ void BuildingModelManip::OnSizeChanged(double _width, double _depth,
   math::Vector3 newPos = originalPos
       - math::Vector3(0, 0, dScaleZ/2.0);
   this->visual->SetPosition(newPos);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -171,6 +172,7 @@ void BuildingModelManip::OnPoseChanged(double _x, double _y, double _z,
     double _roll, double _pitch, double _yaw)
 {
   this->SetPose(_x, _y, _z, _roll, _pitch, _yaw);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -184,6 +186,7 @@ void BuildingModelManip::OnPoseOriginTransformed(double _x, double _y,
   math::Pose oldPose = this->visual->GetParent()->GetWorldPose();
 
   this->visual->GetParent()->SetWorldPose(oldPose + trans);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -195,6 +198,7 @@ void BuildingModelManip::OnPositionChanged(double _x, double _y, double _z)
 
   this->visual->GetParent()->SetWorldPosition(math::Vector3(
       scaledX, scaledY, scaledZ));
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -204,6 +208,7 @@ void BuildingModelManip::OnWidthChanged(double _width)
   this->size = this->visual->GetScale();
   this->size.x = scaledWidth;
   this->visual->SetScale(this->size);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -213,6 +218,7 @@ void BuildingModelManip::OnDepthChanged(double _depth)
   this->size = this->visual->GetScale();
   this->size.y = scaledDepth;
   this->visual->SetScale(this->size);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -229,6 +235,7 @@ void BuildingModelManip::OnHeightChanged(double _height)
       - math::Vector3(0, 0, dScale.z/2.0);
 
   this->visual->SetPosition(newPos);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -238,6 +245,7 @@ void BuildingModelManip::OnPosXChanged(double _posX)
   double scaledX = BuildingMaker::Convert(_posX);
   visualPose.pos.x = scaledX;
   this->visual->GetParent()->SetWorldPosition(visualPose.pos);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -247,6 +255,7 @@ void BuildingModelManip::OnPosYChanged(double _posY)
   double scaledY = BuildingMaker::Convert(_posY);
   visualPose.pos.y = -scaledY;
   this->visual->GetParent()->SetWorldPosition(visualPose.pos);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -256,6 +265,7 @@ void BuildingModelManip::OnPosZChanged(double _posZ)
   double scaledZ = BuildingMaker::Convert(_posZ);
   visualPose.pos.z = scaledZ;
   this->visual->GetParent()->SetWorldPosition(visualPose.pos);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -265,6 +275,7 @@ void BuildingModelManip::OnYawChanged(double _yaw)
   math::Vector3 angles = this->visual->GetRotation().GetAsEuler();
   angles.z = -newYaw;
   this->visual->GetParent()->SetRotation(angles);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -272,6 +283,7 @@ void BuildingModelManip::OnRotationChanged(double _roll, double _pitch,
     double _yaw)
 {
   this->SetRotation(_roll, _pitch, _yaw);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -284,12 +296,14 @@ void BuildingModelManip::OnLevelChanged(int _level)
 void BuildingModelManip::OnColorChanged(QColor _color)
 {
   this->SetColor(_color);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
 void BuildingModelManip::OnTransparencyChanged(float _transparency)
 {
   this->SetTransparency(_transparency);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -351,6 +365,7 @@ void BuildingModelManip::SetColor(QColor _color)
   common::Color newColor(_color.red(), _color.green(), _color.blue());
   this->color = newColor;
   this->visual->GetParent()->SetAmbient(this->color);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////

@@ -52,10 +52,10 @@ namespace gazebo
     {
       /// \enum SaveState
       /// \brief Save states for the building editor.
-      // NEVER_SAVED: The building has never been saved
-      // SAVED: Has been saved through the "Save As" dialog
-      // UNSAVED_CHANGES: Has been saved before, but has unsaved changes
-      private: enum SaveState {NEVER_SAVED, SAVED, UNSAVED_CHANGES};
+      // NEVER_SAVED: The building has never been saved.
+      // ALL_SAVED: All changes have been saved.
+      // UNSAVED_CHANGES: Has been saved before, but has unsaved changes.
+      private: enum SaveState { NEVER_SAVED, ALL_SAVED, UNSAVED_CHANGES };
 
       /// \brief Constructor
       public: BuildingMaker();
@@ -214,6 +214,9 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual bool IsActive() const;
+
+      /// TODO
+      public: void BuildingChanged();
 
       // Documentation inherited
       private: virtual void CreateTheEntity();
