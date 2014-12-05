@@ -263,6 +263,9 @@ namespace gazebo
       /// \brief Counter for generating a unique model name.
       private: int modelCounter;
 
+      /// \brief Transparency value for model being edited.
+      private: double editTransparency;
+
       /// \brief Type of part being added.
       private: PartType addPartType;
 
