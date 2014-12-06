@@ -33,7 +33,7 @@ execute_process(COMMAND pkg-config --variable=prefix OGRE
 
 # Add the OGRE cmake path to CMAKE_MODULE_PATH
 set(CMAKE_MODULE_PATH
-  "${OGRE_INSTALL_PREFIX}/share/OGRE/cmake/modules;${CMAKE_MODULE_PATH}")
+  "${OGRE_INSTALL_PREFIX}/share/OGRE/cmake/modules;${OGRE_INSTALL_PREFIX}/CMake;${CMAKE_MODULE_PATH}")
 
 foreach(dep @PKG_DEPENDS@)
   if(NOT ${dep}_FOUND)
