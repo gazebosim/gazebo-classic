@@ -460,7 +460,7 @@ LinkPtr Joint::GetParent() const
 }
 
 //////////////////////////////////////////////////
-msgs::Joint::Type Joint::GetJointType() const
+msgs::Joint::Type Joint::GetMsgType() const
 {
   if (this->HasType(Base::HINGE_JOINT))
   {
@@ -505,7 +505,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
   _msg.set_id(this->GetId());
 
   msgs::Set(_msg.mutable_pose(), this->anchorPose);
-  _msg.set_type(this->GetJointType());
+  _msg.set_type(this->GetMsgType());
 
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
   {
