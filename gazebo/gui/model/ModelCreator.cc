@@ -592,7 +592,8 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
       g_copyAct->trigger();
       return true;
     }
-    if (_event.key == Qt::Key_V && _event.control){
+    if (_event.key == Qt::Key_V && _event.control)
+    {
       g_pasteAct->trigger();
       return true;
     }
