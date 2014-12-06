@@ -5,7 +5,7 @@
 
 @REM Need absolute paths in order to run anything inside build/
 @echo - script path is %~dp0
-@set root_path=%~dp0
+@set root_path=%~dp0\build
 @pushd %~dp0\..
 @set deps_path=%CD%
 @popd

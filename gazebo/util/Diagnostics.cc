@@ -51,8 +51,9 @@ DiagnosticManager::DiagnosticManager()
     this->logPath /= ".gazebo";
   }
 
-  this->logPath = this->logPath / "diagnostics" /
-    common::Time::GetWallTimeAsISOString();
+ // this->logPath = this->logPath / "diagnostics" /
+    //common::Time::GetWallTimeAsISOString();
+  this->logPath = this->logPath / "diagnostics";
 
   // Make sure the path exists.
   if (!boost::filesystem::exists(this->logPath))

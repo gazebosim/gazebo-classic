@@ -14,7 +14,7 @@ set CURL_LIBRARY_NAME=libcurl_a
 @if "%build_type%"=="Debug" set CURL_LIBRARY_NAME=libcurl_a_debug
 
 @set FREEIMAGE_PATH=%cd%\..\..\FreeImage-vc12-x64-release-debug
-@set FREEIMAGE_LIBRARY_DIR=%FREEIMAGE_PATH%\x64\%build_type%
+@set FREEIMAGE_LIBRARY_DIR=%FREEIMAGE_PATH%\x64\%build_type%\DLL
 @set FREEIMAGE_INCLUDE_DIR=%FREEIMAGE_PATH%\Source
 
 @set SDFORMAT_PATH=%cd%\..\..\sdformat\build\install\%build_type%

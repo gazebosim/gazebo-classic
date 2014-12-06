@@ -163,12 +163,10 @@ const Time &Time::GetWallTime()
   static uint32_t start_nsec = 0;
   if ( ( start_sec == 0 ) && ( start_nsec == 0 ) )
    {
-      /*
       QueryPerformanceFrequency(&cpu_freq);
-      if (cpu_freq.QuadPart == 0) {
-        throw NoHighPerformanceTimersException();
-      }
-      */
+      //if (cpu_freq.QuadPart == 0) {
+        //throw NoHighPerformanceTimersException();
+      //}
       QueryPerformanceCounter(&init_cpu_time);
       // compute an offset from the Epoch using the lower-performance timer API
       FILETIME ft;
