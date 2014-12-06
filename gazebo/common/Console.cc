@@ -76,10 +76,11 @@ Logger &Logger::operator()(const std::string &_file, int _line)
 {
   int index = _file.find_last_of("/") + 1;
 
-  Console::log << "(" << Time::GetWallTime() << ") ";
-  (*this) << this->prefix
-    << "[" << _file.substr(index , _file.size() - index) << ":"
-    << _line << "] ";
+  // WIN crashes
+  //Console::log << "(" << Time::GetWallTime() << ") ";
+  //(*this) << this->prefix
+    //<< "[" << _file.substr(index , _file.size() - index) << ":"
+    //<< _line << "] ";
 
   return (*this);
 }
@@ -99,6 +100,8 @@ Logger::Buffer::~Buffer()
 /////////////////////////////////////////////////
 int Logger::Buffer::sync()
 {
+  // Getting windows crashes in here.
+  return 0;
   // Log messages to disk
   Console::log << this->str();
   Console::log.flush();
@@ -116,7 +119,7 @@ int Logger::Buffer::sync()
     }
   }
 
-  this->str("");
+  this->str(std::string());
   return 0;
 }
 
@@ -265,6 +268,6 @@ int FileLogger::Buffer::sync()
 
   this->stream->flush();
 
-  this->str("");
+  this->str(std::string());
   return !(*this->stream);
 }

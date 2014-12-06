@@ -279,7 +279,14 @@ bool gui::run(int _argc, char **_argv)
   }
 #endif
 
-  g_app->exec();
+  try
+  {
+    g_app->exec();
+  }
+  catch (...)
+  {
+    std::cerr << "Exception" << std::endl;
+  }
 
   gazebo::gui::fini();
   gazebo::shutdown();
