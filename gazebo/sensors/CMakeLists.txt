@@ -1,4 +1,10 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+  
+include_directories(${TBB_INCLUDEDIR})
+
+if (WIN32)
+  include_directories(${libdl_include_dir})
+endif()
 
 set (sources
   CameraSensor.cc
