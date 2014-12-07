@@ -283,9 +283,9 @@ bool gui::run(int _argc, char **_argv)
   {
     g_app->exec();
   }
-  catch (...)
+  catch (gazebo::common::Exception& e)
   {
-    std::cerr << "Exception" << std::endl;
+    std::cerr << e.GetErrorStr() << std::endl;
   }
 
   gazebo::gui::fini();

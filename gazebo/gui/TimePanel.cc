@@ -271,6 +271,9 @@ void TimePanel::Update()
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
+  if (!this->simTimes.size() || !this->realTimes.size())
+    return;
+
   std::ostringstream percent;
 
   common::Time simAvg, realAvg;
