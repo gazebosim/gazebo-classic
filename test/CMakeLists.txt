@@ -5,10 +5,15 @@ include_directories (
   ${SDFormat_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
+  ${TBB_INCLUDEDIR}
   ${PROJECT_SOURCE_DIR}/test/gtest/include
   ${PROJECT_SOURCE_DIR}/test/gtest
   ${PROJECT_SOURCE_DIR}/test
 )
+
+if (WIN32)
+  include_directories(${libdl_include_dir})
+endif()
 
 link_directories(
   ${ogre_library_dirs}
