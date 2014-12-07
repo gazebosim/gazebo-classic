@@ -388,7 +388,7 @@ void ModelListWidget_TEST::ModelProperties()
   QObject *propTreeObj =
     modelListWidget->findChild<QObject *>("propTreeBrowser");
   QtTreePropertyBrowser *propTreeBrowser =
-    dynamic_cast<QtTreePropertyBrowser*>(propTreeObj);
+    dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
 
   QVERIFY(propTreeBrowser != NULL);
   QCOMPARE(propTreeBrowser->properties().size(), 0);
@@ -659,7 +659,7 @@ void ModelListWidget_TEST::LinkProperties()
   QObject *propTreeObj =
     modelListWidget->findChild<QObject *>("propTreeBrowser");
   QtTreePropertyBrowser *propTreeBrowser =
-    dynamic_cast<QtTreePropertyBrowser*>(propTreeObj);
+    dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
 
   QVERIFY(propTreeBrowser != NULL);
   QCOMPARE(propTreeBrowser->properties().size(), 0);
