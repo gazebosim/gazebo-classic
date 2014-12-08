@@ -64,18 +64,8 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
-
   // Create a system path watcher
   this->dataPtr->watcher = new QFileSystemWatcher();
-
-  // Connect a callback that is triggered whenever a directory is changed.
-  connect(this->dataPtr->watcher, SIGNAL(directoryChanged(const QString &)),
-          this, SLOT(OnDirectoryChanged(const QString &)));
-
-  // Connect a callback to trigger when the model paths are updated.
-  this->connections.push_back(
-          common::SystemPaths::Instance()->updateModelRequest.Connect(
-            boost::bind(&InsertModelWidget::OnModelUpdateRequest, this, _1)));
 
   // Update the list of models on the local system.
   this->UpdateAllLocalPaths();
@@ -87,15 +77,6 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   this->dataPtr->fileTreeWidget->addTopLevelItem(
       this->dataPtr->modelDatabaseItem);
 
-  /// Non-blocking call to get all the models in the database.
-  this->dataPtr->getModelsConnection =
-    common::ModelDatabase::Instance()->GetModels(
-        boost::bind(&InsertModelWidget::OnModels, this, _1));
-
-  // Start a timer to check for the results from the ModelDatabase. We need
-  // to do this so that the QT elements get added in the main thread.
-  QTimer::singleShot(1000, this, SLOT(Update()));
-
   // Also insert additional paths from gui.ini
   std::string additionalPaths =
       gui::getINIProperty<std::string>("model_paths.filenames", "");
@@ -104,10 +85,26 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
     common::SystemPaths::Instance()->AddModelPaths(additionalPaths);
     this->UpdateLocalPath(additionalPaths);
   }
-  else
-  {
-    gzdbg << "No additional model paths found." << std::endl;
-  }
+
+  // Connect callbacks now that everything else is initialized
+
+  // Connect a callback that is triggered whenever a directory is changed.
+  connect(this->dataPtr->watcher, SIGNAL(directoryChanged(const QString &)),
+          this, SLOT(OnDirectoryChanged(const QString &)));
+
+  // Connect a callback to trigger when the model paths are updated.
+  this->connections.push_back(
+          common::SystemPaths::Instance()->updateModelRequest.Connect(
+            boost::bind(&InsertModelWidget::OnModelUpdateRequest, this, _1)));
+
+  /// Non-blocking call to get all the models in the database.
+  this->dataPtr->getModelsConnection =
+    common::ModelDatabase::Instance()->GetModels(
+        boost::bind(&InsertModelWidget::OnModels, this, _1));
+
+  // Start a timer to check for the results from the ModelDatabase. We need
+  // to do this so that the QT elements get added in the main thread.
+  QTimer::singleShot(1000, this, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////
@@ -276,7 +273,6 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
           gzerr << "No model name in manifest[" << manifest << "]\n";
         else
           modelName = modelXML->FirstChildElement("name")->GetText();
-
         // Add a child item for the model
         QTreeWidgetItem *childItem = new QTreeWidgetItem(topItem,
             QStringList(QString::fromStdString(modelName)));
