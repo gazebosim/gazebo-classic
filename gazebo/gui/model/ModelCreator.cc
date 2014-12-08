@@ -745,6 +745,9 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 void ModelCreator::OnCopy()
 {
+  if (!g_editModelAct->isChecked())
+    return;
+
   if (!this->selectedVisuals.empty())
   {
     this->copiedPartNames.clear();
@@ -759,7 +762,7 @@ void ModelCreator::OnCopy()
 /////////////////////////////////////////////////
 void ModelCreator::OnPaste()
 {
-  if (this->copiedPartNames.empty())
+  if (this->copiedPartNames.empty() || !g_editModelAct->isChecked())
   {
     return;
   }
