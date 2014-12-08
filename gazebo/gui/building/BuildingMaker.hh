@@ -222,7 +222,7 @@ namespace gazebo
       // Documentation inherited
       public: virtual bool IsActive() const;
 
-      /// TODO
+      /// \brief Set save state upon a change to the building.
       public: void BuildingChanged();
 
       // Documentation inherited
