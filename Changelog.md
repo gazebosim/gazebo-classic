@@ -35,6 +35,10 @@
   * [Pull request #1221](https://bitbucket.org/osrf/gazebo/pull-request/1221)
   * [Issue #381](https://bitbucket.org/osrf/gazebo/issue/381)
 
+1. Implement Coulomb joint friction for BulletHingeJoint
+  * [Pull request #1221](https://bitbucket.org/osrf/gazebo/pull-request/1317)
+  * [Issue #1348](https://bitbucket.org/osrf/gazebo/issue/1348)
+
 1. Implemented camera lens distortion.
   * [Pull request #1213](https://bitbucket.org/osrf/gazebo/pull-request/1213)
 
