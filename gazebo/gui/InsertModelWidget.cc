@@ -64,27 +64,8 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
-
-  // Also insert additional paths from gui.ini
-  std::string additionalPaths =
-      gui::getINIProperty<std::string>("model_paths.filenames", "");
-  if (!additionalPaths.empty())
-  {
-    common::SystemPaths::Instance()->AddModelPaths(additionalPaths);
-    this->UpdateLocalPath(additionalPaths);
-  }
-
   // Create a system path watcher
   this->dataPtr->watcher = new QFileSystemWatcher();
-
-  // Connect a callback that is triggered whenever a directory is changed.
-  connect(this->dataPtr->watcher, SIGNAL(directoryChanged(const QString &)),
-          this, SLOT(OnDirectoryChanged(const QString &)));
-
-  // Connect a callback to trigger when the model paths are updated.
-  this->connections.push_back(
-          common::SystemPaths::Instance()->updateModelRequest.Connect(
-            boost::bind(&InsertModelWidget::OnModelUpdateRequest, this, _1)));
 
   // Update the list of models on the local system.
   this->UpdateAllLocalPaths();
@@ -95,6 +76,26 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
         QStringList(QString("Connecting to model database...")));
   this->dataPtr->fileTreeWidget->addTopLevelItem(
       this->dataPtr->modelDatabaseItem);
+
+  // Also insert additional paths from gui.ini
+  std::string additionalPaths =
+      gui::getINIProperty<std::string>("model_paths.filenames", "");
+  if (!additionalPaths.empty())
+  {
+    common::SystemPaths::Instance()->AddModelPaths(additionalPaths);
+    this->UpdateLocalPath(additionalPaths);
+  }
+
+  // Connect callbacks now that everything else is initialized
+
+  // Connect a callback that is triggered whenever a directory is changed.
+  connect(this->dataPtr->watcher, SIGNAL(directoryChanged(const QString &)),
+          this, SLOT(OnDirectoryChanged(const QString &)));
+
+  // Connect a callback to trigger when the model paths are updated.
+  this->connections.push_back(
+          common::SystemPaths::Instance()->updateModelRequest.Connect(
+            boost::bind(&InsertModelWidget::OnModelUpdateRequest, this, _1)));
 
   /// Non-blocking call to get all the models in the database.
   this->dataPtr->getModelsConnection =
