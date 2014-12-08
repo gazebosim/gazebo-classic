@@ -161,6 +161,12 @@ namespace gazebo
       /// \param[in] _checked True if the menu item is checked
       private slots: void OnEdit(bool _checked);
 
+      /// \brief Qt callback when the copy action is triggered.
+      private slots: void OnCopy();
+
+      /// \brief Qt callback when the paste action is triggered.
+      private slots: void OnPaste();
+
       /// \brief Mouse event filter callback when mouse is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -185,10 +191,6 @@ namespace gazebo
       /// \param[in] _event The key event.
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
-
-      private slots: void OnCopy();
-
-      private slots: void OnPaste();
 
       /// \brief Create part with default properties from a visual
       /// \param[in] _visual Visual used to create the part.
@@ -217,6 +219,9 @@ namespace gazebo
       private: void OnAlignMode(const std::string &_axis,
           const std::string &_config, const std::string &_target,
           bool _preview);
+
+      /// \brief Deselect all currently selected visuals.
+      private: void DeselectAll();
 
       /// \brief Qt callback when a delete signal has been emitted.
       /// \param[in] _name Name of the part or model to delete.
