@@ -46,14 +46,13 @@
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 
-
 using namespace gazebo;
 using namespace gui;
 
 double BuildingMaker::conversionScale;
 
 /////////////////////////////////////////////////
-  BuildingMaker::BuildingMaker() : EntityMaker()
+BuildingMaker::BuildingMaker() : EntityMaker()
 {
   this->buildingDefaultName = "BuildingDefaultName";
   this->modelName = this->buildingDefaultName;
@@ -68,6 +67,7 @@ double BuildingMaker::conversionScale;
   this->doorCounter = 0;
   this->stairsCounter = 0;
   this->floorCounter = 0;
+  this->currentLevel = 0;
 
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
@@ -84,6 +84,9 @@ double BuildingMaker::conversionScale;
   this->connections.push_back(
   gui::editor::Events::ConnectExitBuildingEditor(
     boost::bind(&BuildingMaker::OnExit, this)));
+  this->connections.push_back(
+  gui::editor::Events::ConnectChangeBuildingLevel(
+    boost::bind(&BuildingMaker::OnChangeLevel, this, _1)));
 
   this->saveDialog =
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
@@ -119,8 +122,12 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
       manip, SLOT(OnPositionChanged(double, double, double)));
   QObject::connect(_item, SIGNAL(RotationChanged(double, double, double)),
       manip, SLOT(OnRotationChanged(double, double, double)));
+  QObject::connect(_item, SIGNAL(LevelChanged(int)),
+      manip, SLOT(OnLevelChanged(int)));
   QObject::connect(_item, SIGNAL(ColorChanged(QColor)),
       manip, SLOT(OnColorChanged(QColor)));
+  QObject::connect(_item, SIGNAL(TextureChanged(QString)),
+      manip, SLOT(OnTextureChanged(QString)));
   QObject::connect(_item, SIGNAL(TransparencyChanged(float)),
       manip, SLOT(OnTransparencyChanged(float)));
 
@@ -145,6 +152,21 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
 void BuildingMaker::AttachManip(const std::string &_child,
     const std::string &_parent)
 {
+  std::map<std::string, BuildingModelManip *>::const_iterator it =
+      this->allItems.find(_child);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Child manip " << _child << " not found." << std::endl;
+    return;
+  }
+
+  it = this->allItems.find(_parent);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Parent manip " << _parent << " not found." << std::endl;
+    return;
+  }
+
   BuildingModelManip *child = this->allItems[_child];
   BuildingModelManip *parent = this->allItems[_parent];
   parent->AttachManip(child);
@@ -154,9 +176,42 @@ void BuildingMaker::AttachManip(const std::string &_child,
 void BuildingMaker::DetachManip(const std::string &_child,
     const std::string &_parent)
 {
+  std::map<std::string, BuildingModelManip *>::const_iterator it =
+      this->allItems.find(_child);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Child manip " << _child << " not found." << std::endl;
+    return;
+  }
+
+  it = this->allItems.find(_parent);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Parent manip " << _parent << " not found." << std::endl;
+    return;
+  }
+
   BuildingModelManip *child = this->allItems[_child];
   BuildingModelManip *parent = this->allItems[_parent];
   parent->DetachManip(child);
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::DetachAllChildren(const std::string &_manip)
+{
+  std::map<std::string, BuildingModelManip *>::const_iterator it =
+      this->allItems.find(_manip);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Manip " << _manip << " not found." << std::endl;
+    return;
+  }
+
+  BuildingModelManip *manip = this->allItems[_manip];
+  for (int i = manip->GetAttachedManipCount()-1; i >= 0; i--)
+  {
+    (manip->GetAttachedManip(i))->DetachFromParent();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -191,7 +246,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   }
 
   std::ostringstream linkNameStream;
-  linkNameStream << "Wall_" << wallCounter++;
+  linkNameStream << "Wall_" << this->wallCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
@@ -202,7 +257,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   visualName << this->modelName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem = this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
@@ -216,6 +271,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   wallManip->SetVisual(visVisual);
   visVisual->SetScale(scaledSize);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
+  wallManip->SetLevel(this->currentLevel);
   wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = wallManip;
 
@@ -261,6 +317,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   visVisual->SetScale(scaledSize);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+  windowManip->SetLevel(this->currentLevel);
   this->allItems[linkName] = windowManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -306,6 +363,7 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   visVisual->SetScale(scaledSize);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   doorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+  doorManip->SetLevel(this->currentLevel);
   this->allItems[linkName] = doorManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -343,6 +401,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   stairsManip->SetMaker(this);
   stairsManip->SetName(linkName);
   stairsManip->SetVisual(visVisual);
+  stairsManip->SetLevel(this->currentLevel);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
   double dSteps = static_cast<double>(_steps);
@@ -418,6 +477,7 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   floorManip->SetMaker(this);
   floorManip->SetName(linkName);
   floorManip->SetVisual(visVisual);
+  floorManip->SetLevel(this->currentLevel);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
@@ -677,10 +737,12 @@ void BuildingMaker::GenerateSDF()
                 wallVis->GetScale().y, subdivisions[i].height());
             visualElem->GetElement("geometry")->GetElement("box")->
                 GetElement("size")->Set(blockSize);
-            visualElem->GetElement("material")->GetElement("ambient")->
-                Set(buildingModelManip->GetColor());
             collisionElem->GetElement("geometry")->GetElement("box")->
                 GetElement("size")->Set(blockSize);
+            visualElem->GetElement("material")->GetElement("ambient")->
+                Set(buildingModelManip->GetColor());
+            visualElem->GetElement("material")->GetElement("script")
+                ->GetElement("name")->Set(buildingModelManip->GetTexture());
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
@@ -694,12 +756,14 @@ void BuildingMaker::GenerateSDF()
               + "_Collision");
           visualElem->GetElement("pose")->Set(visual->GetPose());
           collisionElem->GetElement("pose")->Set(visual->GetPose());
-          visualElem->GetElement("material")->GetElement("ambient")->
-              Set(buildingModelManip->GetColor());
           visualElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->GetScale());
           collisionElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->GetScale());
+          visualElem->GetElement("material")->GetElement("ambient")->
+              Set(buildingModelManip->GetColor());
+          visualElem->GetElement("material")->GetElement("script")
+              ->GetElement("name")->Set(buildingModelManip->GetTexture());
         }
       }
       // Floor
@@ -779,6 +843,8 @@ void BuildingMaker::GenerateSDF()
                 GetElement("size")->Set(blockSize);
             visualElem->GetElement("material")->GetElement("ambient")->
                 Set(buildingModelManip->GetColor());
+            visualElem->GetElement("material")->GetElement("script")
+                ->GetElement("name")->Set(buildingModelManip->GetTexture());
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
@@ -830,7 +896,8 @@ void BuildingMaker::GenerateSDF()
             GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
         visualElem->GetElement("material")->GetElement("ambient")->
               Set(buildingModelManip->GetColor());
-
+        visualElem->GetElement("material")->GetElement("script")
+            ->GetElement("name")->Set(buildingModelManip->GetTexture());
         newLinkElem->InsertElement(visualElem);
         newLinkElem->InsertElement(collisionElem);
       }
@@ -1431,4 +1498,10 @@ void BuildingMaker::OnExit()
     gui::editor::Events::discardBuildingModel();
     gui::editor::Events::finishBuildingModel();
   }
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnChangeLevel(int _level)
+{
+  this->currentLevel = _level;
 }

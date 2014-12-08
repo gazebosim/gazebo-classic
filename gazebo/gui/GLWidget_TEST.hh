@@ -15,27 +15,18 @@
  *
 */
 
-#ifndef _CONFIGWIDGET_TEST_HH_
-#define _CONFIGWIDGET_TEST_HH_
+#ifndef _GLWIDGET_TEST_HH_
+#define _GLWIDGET_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the config widget.
-class ConfigWidget_TEST : public QTestFixture
+/// \brief A test class for the DataLogger widget.
+class GLWidget_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test creating config widgets from empty messages.
-  private slots: void EmptyMsgWidget();
-
-  /// \brief Test creating a config widget from a visual message.
-  private slots: void VisualMsgWidget();
-
-  /// \brief Test setting visibility of a field in config widget.
-  private slots: void ConfigWidgetVisible();
-
-  /// \brief Test setting a field to be read-only in config widget.
-  private slots: void ConfigWidgetReadOnly();
+  /// \brief Test key presses.
+  private slots: void KeyPresses();
 };
 
 #endif

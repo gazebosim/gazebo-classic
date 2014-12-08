@@ -32,8 +32,6 @@ RectItem::RectItem()
 
   this->width = 100;
   this->height = 100;
-  this->visual3dColor = QColor(255, 255, 255, 255);
-  this->visual3dTransparency = 0.5;
 
   this->drawingOriginX = 0;
   this->drawingOriginY = 0;
@@ -121,29 +119,7 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
 {
   if (_change == QGraphicsItem::ItemSelectedChange && this->scene())
   {
-    if (_value.toBool())
-    {
-      this->setZValue(zValueSelected);
-      for (int i = 0; i < 8; ++i)
-      {
-        if (this->grabbers[i]->isEnabled())
-          this->grabbers[i]->installSceneEventFilter(this);
-      }
-      this->rotateHandle->installSceneEventFilter(this);
-      this->Set3dTransparency(0.0);
-    }
-    else
-    {
-      this->setZValue(zValueIdle);
-      for (int i = 0; i < 8; ++i)
-      {
-        if (this->grabbers[i]->isEnabled())
-          this->grabbers[i]->removeSceneEventFilter(this);
-      }
-      this->rotateHandle->removeSceneEventFilter(this);
-      this->Set3dTransparency(0.5);
-    }
-    emit TransparencyChanged(this->visual3dTransparency);
+    this->SetHighlighted(_value.toBool());
   }
   else if (_change == QGraphicsItem::ItemScenePositionHasChanged
       && this->scene())
@@ -152,6 +128,33 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
     emit PosYChanged(this->scenePos().y());
   }
   return QGraphicsItem::itemChange(_change, _value);
+}
+
+/////////////////////////////////////////////////
+void RectItem::SetHighlighted(bool _highlighted)
+{
+  if (_highlighted)
+  {
+    this->setZValue(zValueSelected);
+    for (int i = 0; i < 8; ++i)
+    {
+      if (this->grabbers[i]->isEnabled())
+        this->grabbers[i]->installSceneEventFilter(this);
+    }
+    this->rotateHandle->installSceneEventFilter(this);
+    this->Set3dTransparency(0.0);
+  }
+  else
+  {
+    this->setZValue(zValueIdle);
+    for (int i = 0; i < 8; ++i)
+    {
+      if (this->grabbers[i]->isEnabled())
+        this->grabbers[i]->removeSceneEventFilter(this);
+    }
+    this->rotateHandle->removeSceneEventFilter(this);
+    this->Set3dTransparency(0.4);
+  }
 }
 
 /////////////////////////////////////////////////
