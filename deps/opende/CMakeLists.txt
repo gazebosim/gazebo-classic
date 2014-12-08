@@ -16,6 +16,7 @@ include_directories(SYSTEM
 
 link_directories(  
   ${CCD_LIBRARY_DIRS} 
+  ${Boost_LIBRARY_DIR}
 )
 
 add_subdirectory(OPCODE)
