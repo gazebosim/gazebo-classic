@@ -59,17 +59,19 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
   this->floorTextureComboBox->setIconSize(QSize(30, 30));
   this->floorTextureComboBox->setMinimumWidth(50);
   this->floorTextureComboBox->setMinimumHeight(50);
-  this->floorTextureComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  this->floorTextureList.push_back(":/images/wood.png");
-  this->floorTextureList.push_back(":/images/ceiling_tiled.png");
-  this->floorTextureList.push_back(":/images/bricks.png");
+  this->floorTextureComboBox->setSizePolicy(QSizePolicy::Fixed,
+      QSizePolicy::Fixed);
+  this->floorTextureList.push_back(":wood.jpg");
+  this->floorTextureList.push_back(":tiles.jpg");
+  this->floorTextureList.push_back(":bricks.png");
   for (unsigned int i = 0; i < this->floorTextureList.size(); ++i)
   {
-    this->floorTextureComboBox->addItem(QPixmap(this->floorTextureList[i]),
-        QString(""));
+    this->floorTextureComboBox->addItem(QPixmap(this->floorTextureList[i])
+        .scaled(QSize(30, 30), Qt::IgnoreAspectRatio), QString(""));
   }
   this->floorTextureComboBox->addItem("X");
-  this->floorTextureComboBox->setCurrentIndex(this->floorTextureComboBox->count()-1);
+  this->floorTextureComboBox->setCurrentIndex(
+      this->floorTextureComboBox->count()-1);
 
   QHBoxLayout *floorTextureLayout = new QHBoxLayout;
   floorTextureLayout->addWidget(floorTextureLabel);
@@ -158,7 +160,8 @@ QString LevelInspectorDialog::GetFloorTexture() const
       this->floorTextureComboBox->currentIndex() <
       this->floorTextureComboBox->count() - 1)
   {
-    floorTexture = this->floorTextureList[this->floorTextureComboBox->currentIndex()];
+    floorTexture = this->floorTextureList[
+        this->floorTextureComboBox->currentIndex()];
   }
   return floorTexture;
 }
@@ -179,14 +182,17 @@ void LevelInspectorDialog::SetHeight(double _height)
 /////////////////////////////////////////////////
 void LevelInspectorDialog::SetFloorColor(const QColor _color)
 {
+  // Find index corresponding to color (only a few colors allowed so far)
+  int index = 0;
   for (unsigned int i = 0; i < this->floorColorList.size(); ++i)
   {
     if (this->floorColorList[i] == _color)
     {
-      this->floorColorComboBox->setCurrentIndex(i);
-      return;
+      index = i;
+      break;
     }
   }
+  this->floorColorComboBox->setCurrentIndex(index);
 
   // Add a new color
   this->floorColorList.push_back(_color);

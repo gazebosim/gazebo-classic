@@ -294,12 +294,16 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     }
   }
 
-  this->mouseEvent.control =
+  this->keyEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;
-  this->mouseEvent.shift =
+  this->keyEvent.shift =
     this->keyModifiers & Qt::ShiftModifier ? true : false;
-  this->mouseEvent.alt =
+  this->keyEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
+
+  this->mouseEvent.control = this->keyEvent.control;
+  this->mouseEvent.shift = this->keyEvent.shift;
+  this->mouseEvent.alt = this->keyEvent.alt;
 
   if (this->mouseEvent.control)
   {
@@ -354,13 +358,16 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
       g_arrowAct->trigger();
   }
 
-  this->mouseEvent.control =
+  this->keyEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;
-  this->mouseEvent.shift =
+  this->keyEvent.shift =
     this->keyModifiers & Qt::ShiftModifier ? true : false;
-  this->mouseEvent.alt =
+  this->keyEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
 
+  this->mouseEvent.control = this->keyEvent.control;
+  this->mouseEvent.shift = this->keyEvent.shift;
+  this->mouseEvent.alt = this->keyEvent.alt;
 
   ModelManipulator::Instance()->OnKeyReleaseEvent(this->keyEvent);
   this->keyText = "";

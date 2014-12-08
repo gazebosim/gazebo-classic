@@ -153,39 +153,42 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   QSize textureIconSize(40, 40);
 
   // wood
-  this->textureList.push_back(":/images/wood.png");
+  this->textureList.push_back(":wood.jpg");
   QToolButton *textureButton = new QToolButton(this);
   textureButton->setFixedSize(textureButtonSize);
   textureButton->setCheckable(true);
   textureButton->setChecked(false);
   textureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-  textureButton->setIcon(QPixmap(this->textureList.back()));
+  textureButton->setIcon(QPixmap(this->textureList.back()).scaled(
+        QSize(30, 30), Qt::IgnoreAspectRatio));
   textureButton->setText("Wood");
   textureButton->setIconSize(QSize(textureIconSize));
   brushes->addButton(textureButton, brushes->buttons().size());
   texturesLayout->addWidget(textureButton, 0, 0);
 
   // tiles
-  this->textureList.push_back(":/images/ceiling_tiled.png");
+  this->textureList.push_back(":tiles.jpg");
   textureButton = new QToolButton(this);
   textureButton->setFixedSize(textureButtonSize);
   textureButton->setCheckable(true);
   textureButton->setChecked(false);
   textureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-  textureButton->setIcon(QPixmap(this->textureList.back()));
+  textureButton->setIcon(QPixmap(this->textureList.back()).scaled(
+        QSize(30, 30), Qt::IgnoreAspectRatio));
   textureButton->setText("Tiles");
   textureButton->setIconSize(QSize(textureIconSize));
   brushes->addButton(textureButton, brushes->buttons().size());
   texturesLayout->addWidget(textureButton, 0, 1);
 
   // bricks
-  this->textureList.push_back(":/images/bricks.png");
+  this->textureList.push_back(":bricks.png");
   textureButton = new QToolButton(this);
   textureButton->setFixedSize(textureButtonSize);
   textureButton->setCheckable(true);
   textureButton->setChecked(false);
   textureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-  textureButton->setIcon(QPixmap(this->textureList.back()));
+  textureButton->setIcon(QPixmap(this->textureList.back()).scaled(
+        QSize(30, 30), Qt::IgnoreAspectRatio));
   textureButton->setText("Bricks");
   textureButton->setIconSize(QSize(textureIconSize));
   brushes->addButton(textureButton, brushes->buttons().size());

@@ -1982,11 +1982,11 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
       else if (this->selectedTexture != "")
       {
         std::string material = "Gazebo/Grey";
-        if (this->selectedTexture == ":/images/wood.png")
+        if (this->selectedTexture == ":wood.jpg")
           material = "Gazebo/Wood";
-        else if (this->selectedTexture == ":/images/ceiling_tiled.png")
+        else if (this->selectedTexture == ":tiles.jpg")
           material = "Gazebo/CeilingTiled";
-        else if (this->selectedTexture == ":/images/bricks.png")
+        else if (this->selectedTexture == ":bricks.png")
           material = "Gazebo/Bricks";
 
         this->hoverVis->SetMaterial(material);

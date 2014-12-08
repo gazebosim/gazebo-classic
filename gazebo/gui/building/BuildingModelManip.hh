@@ -159,8 +159,8 @@ namespace gazebo
 
       /// \brief TODO
       Q_SIGNALS: void TextureChanged(QString _texture);
-      /// \brief Set the level for this manip.
 
+      /// \brief Set the level for this manip.
       /// \param[in] _level The level for this manip.
       public: void SetLevel(const int _level);
 
