@@ -842,7 +842,7 @@ void ModelCreator::GenerateSDF()
       sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
       geomElem->ClearElements();
 
-      math::Vector3 scale = visual->GetScale();
+      math::Vector3 scale = visual->GetParent()->GetScale();
       if (visual->GetParent()->GetName().find("unit_box") != std::string::npos)
       {
         sdf::ElementPtr boxElem = geomElem->AddElement("box");
