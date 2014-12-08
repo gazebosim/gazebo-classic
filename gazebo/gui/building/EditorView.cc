@@ -430,7 +430,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         if (distance > 30 || t > 1.0 || t < 0.0)
         {
           editorItem->setParentItem(NULL);
-                    editorItem->SetPositionOnWall(0);
+          editorItem->SetPositionOnWall(0);
           editorItem->SetAngleOnWall(0);
           this->buildingMaker->DetachManip(this->itemToVisualMap[editorItem],
                 this->itemToVisualMap[wallSegmentItem]);
