@@ -116,11 +116,14 @@ def check_main():
         stdout, stderr = process.communicate()
         for line in string.split(stdout, '\n'):
             if line.find('gzserver /tmp/clone.11347.world') >= 0:
-                m = re.search('^([0-9]+) .*', line)
                 print(line)
-                pid = m.group(1)
-                print("killing gzserver with pid %s" % (pid))
-                subprocess.call(["kill", "%s" % (pid)])
+                m = re.search('^ *([0-9]+) .*', line)
+                if m == None:
+                    print("Error identifying process id, not killing any gzserver's")
+                else:
+                    pid = m.group(1)
+                    print("killing gzserver with pid %s" % (pid))
+                    subprocess.call(["kill", "%s" % (pid)])
 
 if __name__ == '__main__':
     check_main()
