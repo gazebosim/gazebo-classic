@@ -183,7 +183,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
 
   visVisual->Load(visualElem);
 
-  linkVisual->SetTransparency(0.5);
+  linkVisual->SetTransparency(this->editTransparency);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
