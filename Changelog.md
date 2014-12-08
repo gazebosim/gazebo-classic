@@ -130,18 +130,17 @@
     1. Detach all child manips when item is deleted, added BuildingMaker::DetachAllChildren.
         * [Pull request #1316](https://bitbucket.org/osrf/gazebo/pull-request/1316)
 
+1. Model editor updates
+    1. Fix adding/removing event filters .
+        * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
+
     1. Enabled multi-selection and align tool inside model editor.
         * [Pull request #1302](https://bitbucket.org/osrf/gazebo/pull-request/1302)
         * [Issue #1323](https://bitbucket.org/osrf/gazebo/issue/1323)
 
-    1. Enabled snap mode and fixed RTS tools.
+    1. Enabled snap mode inside model editor.
         * [Pull request #1331](https://bitbucket.org/osrf/gazebo/pull-request/1331)
         * [Issue #1318](https://bitbucket.org/osrf/gazebo/issue/1318)
-        * [Issue #1329](https://bitbucket.org/osrf/gazebo/issue/1329)
-
-1. Model editor updates
-    1. Fix adding/removing event filters .
-        * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
 
 ## Gazebo 4.0
 

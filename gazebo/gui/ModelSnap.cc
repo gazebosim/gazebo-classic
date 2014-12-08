@@ -194,7 +194,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
   if (vis && !vis->IsPlane() &&
       this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
   {
-    // Model parent or link parent
+    // Parent model or parent link
     rendering::VisualPtr currentParent = vis->GetRootVisual();
     rendering::VisualPtr previousParent;
     if (gui::get_entity_id(currentParent->GetName()))
