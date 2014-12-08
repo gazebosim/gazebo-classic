@@ -219,6 +219,13 @@ namespace gazebo
 
       /// \brief Transparency of the associated 3D visual.
       protected: float visual3dTransparency;
+
+      /// \brief Flag to indicate whether this item is currently highlighted or
+      /// not.
+      protected: bool highlighted;
+
+      /// \brief Scale for converting from pixel to metric units.
+      protected: double scale;
     };
     /// \}
   }

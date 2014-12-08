@@ -157,7 +157,7 @@ void WallSegmentItem::SegmentUpdated()
     RectItem *rectItem = dynamic_cast<RectItem *>(children[j]);
     if (rectItem)
     {
-      rectItem->SetRotation(-this->line().angle());
+      rectItem->SetRotation(-this->line().angle() + rectItem->GetAngleOnWall());
       QPointF segLine = this->line().p2() - this->line().p1();
       rectItem->setPos(this->line().p1() + rectItem->GetPositionOnWall()*
           segLine);

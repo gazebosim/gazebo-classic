@@ -46,6 +46,7 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
   this->drawingHeight = this->height;
 
   this->UpdateCornerPositions();
+  this->UpdateMeasures();
 
   this->doorPos = this->scenePos();
 
@@ -204,6 +205,7 @@ void DoorItem::SizeChanged()
 {
   emit WidthChanged(this->doorWidth);
   emit DepthChanged(this->doorDepth);
+  this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////
