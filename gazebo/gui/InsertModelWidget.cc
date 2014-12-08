@@ -191,6 +191,19 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
 
   boost::filesystem::path dir(_path);
 
+  boost::filesystem::file_status status = boost::filesystem::status(dir);
+
+  if (ec)
+  {
+    gzdbg << "Boost filesystem error for directory " << dir << ": "
+          << ec.message() << std::endl;
+    return;
+  }
+  else
+  {
+    gzdbg<< "No filesystem errors for " << dir << std::endl;
+  }
+
   // Create a top-level tree item for the path
   if (matchList.empty())
   {
@@ -207,11 +220,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
 
   // Remove current items.
   topItem->takeChildren();
-
-  boost::system::error_code ec;
-  status(dir, ec);
-  if ((ec || boost::system::errc::permission_denied) &&
-      boost::filesystem::exists(dir) &&
+  if (boost::filesystem::exists(dir) &&
       boost::filesystem::is_directory(dir))
   {
     std::vector<boost::filesystem::path> paths;
@@ -230,6 +239,21 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
       boost::filesystem::path fullPath = _path / dIter->filename();
       boost::filesystem::path manifest = fullPath;
 
+      boost::filesystem::status(fullPath, ec);
+
+      if (ec)
+      {
+        gzdbg << "Boost filesystem error for directory " << fullPath << ": "
+              << ec.message() << std::endl;
+        return;
+      }
+      else
+      {
+        gzdbg<< "No filesystem errors for " << fullPath << std::endl;
+        gzdbg << ec.message() << std::endl;
+        gzdbg << ec.value() << std::endl;
+      }
+
       if (!boost::filesystem::is_directory(fullPath))
       {
         if (dIter->filename() != "database.config")
@@ -239,13 +263,6 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
             << "files in a GAZEBO_MODEL_PATH because the file structure may"
             << " be modified by Gazebo.\n";
         }
-        continue;
-      }
-      status(fullPath, ec);
-      if (ec || boost::system::errc::permission_denied)
-      {
-        gzlog << "Permission denied for folder on GAZEBO_MODEL_PATH: "
-              << fullPath << std::endl;
         continue;
       }
 
