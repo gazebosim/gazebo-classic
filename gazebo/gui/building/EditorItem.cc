@@ -73,6 +73,12 @@ QColor EditorItem::Get3dColor() const
 }
 
 /////////////////////////////////////////////////
+QString EditorItem::Get3dTexture() const
+{
+  return this->visual3dTexture;
+}
+
+/////////////////////////////////////////////////
 void EditorItem::SetName(const std::string &_name)
 {
   this->name = _name;
@@ -83,6 +89,13 @@ void EditorItem::Set3dColor(QColor _color)
 {
   this->visual3dColor = _color;
   emit ColorChanged(this->visual3dColor);
+}
+
+/////////////////////////////////////////////////
+void EditorItem::Set3dTexture(QString _texture)
+{
+  this->visual3dTexture = _texture;
+  emit TextureChanged(this->visual3dTexture);
 }
 
 /////////////////////////////////////////////////
