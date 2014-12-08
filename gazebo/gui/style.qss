@@ -1,3 +1,7 @@
+ QGroupBox::title {
+  color: #f0f0f0;  
+ }
+
 QToolButton
 {
   border: 0;
