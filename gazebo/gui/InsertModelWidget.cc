@@ -191,19 +191,6 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
 
   boost::filesystem::path dir(_path);
 
-  boost::filesystem::file_status status = boost::filesystem::status(dir);
-
-  if (ec)
-  {
-    gzdbg << "Boost filesystem error for directory " << dir << ": "
-          << ec.message() << std::endl;
-    return;
-  }
-  else
-  {
-    gzdbg<< "No filesystem errors for " << dir << std::endl;
-  }
-
   // Create a top-level tree item for the path
   if (matchList.empty())
   {
@@ -225,10 +212,19 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   {
     std::vector<boost::filesystem::path> paths;
 
-    // Get all the paths in alphabetical order
-    std::copy(boost::filesystem::directory_iterator(dir),
-        boost::filesystem::directory_iterator(),
-        std::back_inserter(paths));
+    try
+    {
+      // Get all the paths in alphabetical order
+      std::copy(boost::filesystem::directory_iterator(dir),
+          boost::filesystem::directory_iterator(),
+          std::back_inserter(paths));
+    }
+    catch(...)
+    {
+      gzdbg << "Filesystem read error for directory: " << dir << std::endl;
+      return;
+    }
+
     std::sort(paths.begin(), paths.end());
 
     // Iterate over all the models in the current gazebo path
@@ -238,21 +234,6 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
       std::string modelName;
       boost::filesystem::path fullPath = _path / dIter->filename();
       boost::filesystem::path manifest = fullPath;
-
-      boost::filesystem::status(fullPath, ec);
-
-      if (ec)
-      {
-        gzdbg << "Boost filesystem error for directory " << fullPath << ": "
-              << ec.message() << std::endl;
-        return;
-      }
-      else
-      {
-        gzdbg<< "No filesystem errors for " << fullPath << std::endl;
-        gzdbg << ec.message() << std::endl;
-        gzdbg << ec.value() << std::endl;
-      }
 
       if (!boost::filesystem::is_directory(fullPath))
       {
