@@ -594,6 +594,10 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
   {
     if (this->allParts.find(vis->GetName()) == this->allParts.end())
     {
+      // Handle snap from GLWidget
+      if (g_snapAct->isChecked())
+        return false;
+
       // Prevent interaction with other models, send event only to
       // user camera
       userCamera->HandleMouseEvent(_event);
@@ -621,15 +625,16 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   if (!userCamera)
     return false;
 
-  if (g_snapAct->isChecked())
-    return false;
-
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
   if (vis)
   {
     // Is part
     if (this->allParts.find(vis->GetName()) != this->allParts.end())
     {
+      // Handle snap from GLWidget
+      if (g_snapAct->isChecked())
+        return false;
+
       // Not in multi-selection mode.
       if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
       {
