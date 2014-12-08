@@ -74,6 +74,7 @@ target_link_libraries(gzserver
   # Extra libs needed when linking statically (e.g., on WIN32)
   gazebo_physics_ode
   ${freeimage_LIBRARIES}
+  ${TBB_LIBRARIES}
 )
 
 if (UNIX)

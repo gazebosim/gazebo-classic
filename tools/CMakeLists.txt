@@ -5,12 +5,19 @@ include_directories(
   ${tinyxml_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIR}
 )
+
+if (WIN32)
+  include_directories(${libdl_include_dir} ${TBB_INCLUDEDIR})
+endif()
 
 link_directories( 
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
   ${CURL_LIBDIR}
+  ${Boost_LIBRARY_DIR}
+  ${TBB_LIBRARY_DIR}
 )
 
 add_definitions(-DCURL_STATICLIB)
@@ -27,7 +34,11 @@ set (test_sources
 gz_build_tests(${test_sources})
 
 # TODO: port gzlog to windows
-add_executable(gz gz.cc gz_topic.cc gz_log.cc)
+if (WIN32)
+  add_executable(gz gz.cc gz_topic.cc gz_log_stub.cc)
+else()
+  add_executable(gz gz.cc gz_topic.cc gz_log.cc)
+endif()
 
 target_link_libraries(gz 
 	gazebo_msgs 
