@@ -621,6 +621,9 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   if (!userCamera)
     return false;
 
+  if (g_snapAct->isChecked())
+    return false;
+
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
   if (vis)
   {
