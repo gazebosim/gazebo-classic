@@ -146,6 +146,7 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   this->textureComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   this->textureList.push_back(":wood.jpg");
   this->textureList.push_back(":tiles.jpg");
+  this->textureList.push_back(":bricks.png");
   for (unsigned int i = 0; i < this->textureList.size(); ++i)
   {
     this->textureComboBox->addItem(QPixmap(this->textureList[i]).scaled(
