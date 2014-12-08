@@ -100,11 +100,13 @@ namespace gazebo
 
       /// \brief Process a key press event.
       /// \param[in] _event The key event.
-      public: void HandlePress(const common::KeyEvent &_event);
+      /// \return Whether or not the event was handled.
+      public: bool HandlePress(const common::KeyEvent &_event);
 
       /// \brief Process a key release event.
       /// \param[in] _event The key event.
-      public: void HandleRelease(const common::KeyEvent &_event);
+      /// \return Whether or not the event was handled.
+      public: bool HandleRelease(const common::KeyEvent &_event);
 
       /// \brief Method to check if autorepeats are toggled.
       /// \return Whether or not autorepeats are toggled for key presses.
@@ -129,7 +131,8 @@ namespace gazebo
       /// \brief Helper function to process a filters in an event list.
       /// \param[in] _event Key event to process.
       /// \param[in] _list List which contains the filters to process.
-      private: void Handle(const common::KeyEvent &_event,
+      /// \return Whether or not the event was handled.
+      private: bool Handle(const common::KeyEvent &_event,
                    std::list<Filter> &_list);
 
       /// \brief List of key press filters.

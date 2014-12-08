@@ -12,6 +12,7 @@ set (msgs
   contactsensor.proto
   cylindergeom.proto
   diagnostics.proto
+  distortion.proto
   factory.proto
   fluid.proto
   fog.proto
@@ -81,6 +82,7 @@ set (msgs
   sensor.proto
   server_control.proto
   shadows.proto
+  sim_event.proto
   sky.proto
   spheregeom.proto
   spherical_coordinates.proto

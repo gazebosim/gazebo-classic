@@ -96,14 +96,14 @@ RenderWidget::RenderWidget(QWidget *_parent)
   alignMenu->addAction(g_alignAct);
   alignButton->setMenu(alignMenu);
   alignButton->setPopupMode(QToolButton::InstantPopup);
-  this->toolbar->addWidget(alignButton);
+  g_alignButtonAct = this->toolbar->addWidget(alignButton);
   connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
 
   this->toolbar->addSeparator();
   this->toolbar->addAction(g_snapAct);
 
   toolLayout->addSpacing(10);
-  toolLayout->addWidget(toolbar);
+  toolLayout->addWidget(this->toolbar);
   toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
@@ -297,6 +297,7 @@ void RenderWidget::ShowEditor(bool _show)
     this->baseOverlayMsg = "Building is view-only";
     this->OnClearOverlayMsg();
     this->bottomFrame->hide();
+    this->ShowToolbar(false);
   }
   else
   {
@@ -304,6 +305,7 @@ void RenderWidget::ShowEditor(bool _show)
     this->baseOverlayMsg = "";
     this->OnClearOverlayMsg();
     this->bottomFrame->show();
+    this->ShowToolbar(true);
   }
 }
 
@@ -364,6 +366,12 @@ void RenderWidget::ShowToolbar(const bool _show)
 }
 
 /////////////////////////////////////////////////
+QToolBar *RenderWidget::GetToolbar() const
+{
+  return this->toolbar;
+}
+
+/////////////////////////////////////////////////
 void RenderWidget::OnClearOverlayMsg()
 {
   this->DisplayOverlayMsg("");
@@ -382,4 +390,17 @@ void RenderWidget::OnFollow(const std::string &_modelName)
     g_translateAct->setEnabled(false);
     g_rotateAct->setEnabled(false);
   }
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem)
+{
+  // Set the plugin's parent and store the plugin
+  _plugin->setParent(this->glWidget);
+  this->plugins.push_back(_plugin);
+
+  // Load the plugin.
+  _plugin->Load(_elem);
+
+  _plugin->show();
 }

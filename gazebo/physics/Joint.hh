@@ -444,6 +444,10 @@ namespace gazebo
 
       /// \brief Set a non-generic parameter for the joint.
       /// replaces SetAttribute(Attribute, int, double)
+      /// List of parameters:
+      ///  "friction"     Axis Coulomb joint friction coefficient.
+      ///  "hi_stop"      Axis upper limit.
+      ///  "lo_stop"      Axis lower limit.
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
       /// \param[in] _value Value of the attribute.
@@ -452,6 +456,7 @@ namespace gazebo
                                     const boost::any &_value) = 0;
 
       /// \brief Get a non-generic parameter for the joint.
+      /// \sa SetParam(const std::string &, unsigned int, const boost::any)
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
       public: virtual double GetParam(const std::string &_key,
