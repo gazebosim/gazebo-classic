@@ -113,7 +113,8 @@ void ModelSnap::Reset()
 
   if (this->dataPtr->snapVisual)
   {
-    this->dataPtr->snapVisual->SetVisible(false);
+    if (this->dataPtr->snapVisual->GetVisible())
+      this->dataPtr->snapVisual->SetVisible(false);
     if (this->dataPtr->snapVisual->GetParent())
     {
       this->dataPtr->snapVisual->GetParent()->DetachVisual(
