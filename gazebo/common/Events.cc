@@ -33,6 +33,7 @@ EventT<void (std::string)> Events::deleteEntity;
 EventT<void (const common::UpdateInfo &)> Events::worldUpdateBegin;
 
 EventT<void ()> Events::worldUpdateEnd;
+EventT<void ()> Events::worldReset;
 
 EventT<void ()> Events::preRender;
 EventT<void ()> Events::render;
