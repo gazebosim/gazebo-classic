@@ -256,6 +256,9 @@ namespace gazebo
       /// \brief Visual of the dynamic line
       public: rendering::VisualPtr visual;
 
+      /// \brief Joint visual.
+      public: rendering::JointVisualPtr jointVisual;
+
       /// \brieft Visual of the hotspot
       public: rendering::VisualPtr hotspot;
 
@@ -291,6 +294,9 @@ namespace gazebo
 
       /// \brief Inspector for configuring joint properties.
       public: JointInspector *inspector;
+
+      /// \brief TODO
+      public: void UpdateJointVisual();
 
       /// \brief Qt Callback when joint inspector configurations are to be
       /// applied.

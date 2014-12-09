@@ -24,8 +24,10 @@
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/JointVisual.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
@@ -174,7 +176,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 
   // intercept mouse press events when user clicks on the joint hotspot visual
   rendering::UserCameraPtr camera = gui::get_active_camera();
-  rendering::ScenePtr scene = camera->GetScene();
+//  rendering::ScenePtr scene = camera->GetScene();
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
   if (vis)
   {
@@ -194,7 +196,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
   if (this->jointType == JointMaker::JOINT_NONE)
   {
     rendering::UserCameraPtr camera = gui::get_active_camera();
-    rendering::ScenePtr scene = camera->GetScene();
+//    rendering::ScenePtr scene = camera->GetScene();
     rendering::VisualPtr vis = camera->GetVisual(_event.pos);
     if (vis)
     {
@@ -579,6 +581,8 @@ void JointMaker::CreateHotSpot(JointData *_joint)
       GZ_VISIBILITY_SELECTABLE);
   hotspotVisual->GetSceneNode()->setInheritScale(false);
 
+  _joint->UpdateJointVisual();
+
   this->joints[hotSpotName] = _joint;
   camera->GetScene()->AddVisual(hotspotVisual);
 
@@ -817,5 +821,71 @@ void JointData::OnApply()
     this->axis[i] = this->inspector->GetAxis(i);
     this->lowerLimit[i] = this->inspector->GetLowerLimit(i);
     this->upperLimit[i] = this->inspector->GetUpperLimit(i);
+  }
+}
+
+/////////////////////////////////////////////////
+void JointData::UpdateJointVisual()
+{
+  if (!this->jointVisual)
+  {
+    rendering::UserCameraPtr camera = gui::get_active_camera();
+
+    // Create a msg for this joint
+    gazebo::msgs::JointPtr jointMsg;
+    jointMsg.reset(new gazebo::msgs::Joint);
+    jointMsg->set_parent(camera->GetScene()->GetWorldVisual()->GetName());
+    jointMsg->set_parent_id(camera->GetScene()->GetWorldVisual()->GetId());
+    jointMsg->set_child(this->child->GetName());
+    jointMsg->set_child_id(this->child->GetId());
+    jointMsg->set_name(this->name);
+    msgs::Set(jointMsg->mutable_pose(), math::Pose(0, 0, 0, 0, 0, 0));
+    // Convert joint type
+    if (this->type == JointMaker::JOINT_SLIDER)
+    {
+      jointMsg->set_type(msgs::Joint::PRISMATIC);
+    }
+    else if (this->type == JointMaker::JOINT_HINGE)
+    {
+      jointMsg->set_type(msgs::Joint::REVOLUTE);
+    }
+    else if (this->type == JointMaker::JOINT_HINGE2)
+    {
+      jointMsg->set_type(msgs::Joint::REVOLUTE2);
+    }
+    else if (this->type == JointMaker::JOINT_SCREW)
+    {
+      jointMsg->set_type(msgs::Joint::SCREW);
+    }
+    else if (this->type == JointMaker::JOINT_UNIVERSAL)
+    {
+      jointMsg->set_type(msgs::Joint::UNIVERSAL);
+    }
+    else if (this->type == JointMaker::JOINT_BALL)
+    {
+      jointMsg->set_type(msgs::Joint::BALL);
+    }
+
+    int axisCount = JointMaker::GetJointAxisCount(this->type);
+    for (int i = 0; i < axisCount; ++i)
+    {
+      jointMsg->add_angle(0);
+      msgs::Axis *axisMsg;
+      if (i == 0)
+        axisMsg = jointMsg->mutable_axis1();
+      else if (i == 1)
+        axisMsg = jointMsg->mutable_axis2();
+
+      msgs::Set(axisMsg->mutable_xyz(), gazebo::math::Vector3((i+1)%2, i, 0));
+      axisMsg->set_limit_lower(this->lowerLimit[i]);
+      axisMsg->set_limit_upper(this->upperLimit[i]);
+    }
+
+    gazebo::rendering::JointVisualPtr jointVis(
+        new gazebo::rendering::JointVisual(
+        this->name + "__JOINT_VISUAL__", this->child));
+    jointVis->Load(jointMsg);
+
+    this->jointVisual = jointVis;
   }
 }
