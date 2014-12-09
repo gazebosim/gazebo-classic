@@ -494,6 +494,7 @@ void JointMaker::OpenInspector(const std::string &_name)
     joint->inspector->SetLowerLimit(i, joint->lowerLimit[i]);
     joint->inspector->SetUpperLimit(i, joint->upperLimit[i]);
   }
+  joint->inspector->move(QCursor::pos());
   joint->inspector->show();
 }
 
