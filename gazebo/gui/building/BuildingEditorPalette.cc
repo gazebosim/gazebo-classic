@@ -44,6 +44,9 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   modelNameLayout->addWidget(modelLabel);
   modelNameLayout->addWidget(this->modelNameEdit);
 
+  // Brushes (button group)
+  brushes = new QButtonGroup();
+
   QSize toolButtonSize(100, 100);
   QSize iconSize(65, 65);
 
@@ -106,6 +109,32 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   featuresLayout->addWidget(doorButton, 0, 1);
   featuresLayout->addWidget(stairsButton, 1, 0);
 
+  // Colors
+  QLabel *colorsLabel = new QLabel(tr(
+      "<font size=4 color='white'>Add Color</font>"));
+
+  QGridLayout *colorsLayout = new QGridLayout;
+  this->colorList.push_back(QColor(255, 255, 255, 255));
+  this->colorList.push_back(QColor(194, 169, 160, 255));
+  this->colorList.push_back(QColor(235, 206, 157, 255));
+  this->colorList.push_back(QColor(254, 121,   5, 255));
+  this->colorList.push_back(QColor(255, 195,  78, 255));
+  this->colorList.push_back(QColor(111, 203, 172, 255));
+  for (unsigned int i = 0; i < this->colorList.size(); i++)
+  {
+    QToolButton *colorButton = new QToolButton(this);
+    colorButton->setFixedSize(40, 40);
+    colorButton->setCheckable(true);
+    colorButton->setChecked(false);
+    colorButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    QPixmap colorIcon(30, 30);
+    colorIcon.fill(this->colorList.at(i));
+    colorButton->setIcon(colorIcon);
+    brushes->addButton(colorButton, i);
+    colorsLayout->addWidget(colorButton, 0, i);
+  }
+  connect(brushes, SIGNAL(buttonClicked(int)), this, SLOT(OnColor(int)));
+
   // Import button
   QPushButton *importImageButton = new QPushButton(tr("Import"),
       this);
@@ -136,6 +165,8 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   mainLayout->addWidget(wallButton);
   mainLayout->addWidget(featuresLabel);
   mainLayout->addLayout(featuresLayout);
+  mainLayout->addWidget(colorsLabel);
+  mainLayout->addLayout(colorsLayout);
   mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                       QSizePolicy::Minimum));
   mainLayout->addLayout(buttonsLayout);
@@ -156,13 +187,12 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
       gui::editor::Events::ConnectCreateBuildingEditorItem(
     boost::bind(&BuildingEditorPalette::OnCreateEditorItem, this, _1)));
 
-  // Brushes (button group)
-  brushes = new QButtonGroup();
-  brushes->addButton(wallButton);
-  brushes->addButton(windowButton);
-  brushes->addButton(doorButton);
-  brushes->addButton(stairsButton);
-  brushes->addButton(importImageButton);
+  // All buttons must be added after the color buttons
+  brushes->addButton(wallButton, brushes->buttons().size());
+  brushes->addButton(windowButton, brushes->buttons().size());
+  brushes->addButton(doorButton, brushes->buttons().size());
+  brushes->addButton(stairsButton, brushes->buttons().size());
+  brushes->addButton(importImageButton, brushes->buttons().size());
 }
 
 /////////////////////////////////////////////////
@@ -252,6 +282,8 @@ void BuildingEditorPalette::OnSaveModel(const std::string &_saveName,
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnCreateEditorItem(const std::string &_mode)
 {
+  gui::editor::Events::colorSelected(QColor::Invalid);
+
   if (_mode.empty() || this->currentMode == _mode)
   {
     this->brushes->setExclusive(false);
@@ -264,6 +296,31 @@ void BuildingEditorPalette::OnCreateEditorItem(const std::string &_mode)
   else
   {
     this->currentMode = _mode;
+  }
+}
+
+/////////////////////////////////////////////////
+void BuildingEditorPalette::OnColor(int _buttonId)
+{
+  // A button which is not color
+  if (_buttonId >= static_cast<int>(colorList.size()))
+    return;
+
+  std::ostringstream colorStr;
+  colorStr << "color_" << _buttonId;
+  QColor color = this->colorList[_buttonId];
+  if (this->currentMode != colorStr.str())
+  {
+    gui::editor::Events::colorSelected(color);
+    this->currentMode = colorStr.str();
+
+    QPixmap colorCursor(30, 30);
+    colorCursor.fill(color);
+    QApplication::setOverrideCursor(QCursor(colorCursor));
+  }
+  else
+  {
+    gui::editor::Events::createBuildingEditorItem(std::string());
   }
 }
 

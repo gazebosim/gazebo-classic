@@ -150,4 +150,5 @@ void BuildingEditor::OnEdit(bool _checked)
     this->mainWindow->ShowMenuBar();
     this->mainWindow->Play();
   }
+  gui::editor::Events::toggleEditMode(_checked);
 }

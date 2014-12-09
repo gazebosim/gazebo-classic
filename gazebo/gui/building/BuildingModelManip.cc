@@ -67,6 +67,12 @@ rendering::VisualPtr BuildingModelManip::GetVisual() const
 }
 
 /////////////////////////////////////////////////
+double BuildingModelManip::GetTransparency() const
+{
+  return this->transparency;
+}
+
+/////////////////////////////////////////////////
 common::Color BuildingModelManip::GetColor() const
 {
   return this->color;
@@ -363,6 +369,7 @@ void BuildingModelManip::SetColor(QColor _color)
   common::Color newColor(_color.red(), _color.green(), _color.blue());
   this->color = newColor;
   this->visual->GetParent()->SetAmbient(this->color);
+  emit ColorChanged(_color);
 }
 
 /////////////////////////////////////////////////
@@ -382,7 +389,8 @@ void BuildingModelManip::SetTexture(QString _texture)
 /////////////////////////////////////////////////
 void BuildingModelManip::SetTransparency(float _transparency)
 {
-  this->visual->GetParent()->SetTransparency(_transparency);
+  this->transparency = _transparency;
+  this->visual->GetParent()->SetTransparency(this->transparency);
 }
 
 /////////////////////////////////////////////////

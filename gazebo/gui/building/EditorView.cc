@@ -50,6 +50,10 @@ EditorView::EditorView(QWidget *_parent)
   gui::editor::Events::ConnectCreateBuildingEditorItem(
     boost::bind(&EditorView::OnCreateEditorItem, this, _1)));
 
+  this->connections.push_back(
+      gui::editor::Events::ConnectColorSelected(
+      boost::bind(&EditorView::OnColorSelected, this, _1)));
+
 /*  this->connections.push_back(
   gui::editor::Events::ConnectSaveModel(
     boost::bind(&EditorView::OnSaveModel, this, _1, _2)));*/
@@ -121,6 +125,12 @@ EditorView::EditorView(QWidget *_parent)
 
   this->viewScale = 1.0;
   this->levelCounter = 0;
+
+  this->mouseTooltip = new QGraphicsTextItem;
+  this->mouseTooltip->setPlainText(
+      "Oops! Color can only be added in the 3D view.");
+  this->mouseTooltip->setVisible(false);
+  this->mouseTooltip->setZValue(10);
 }
 
 /////////////////////////////////////////////////
@@ -395,6 +405,16 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
     case STAIRS:
       this->DrawStairs(_event->pos());
       break;
+    case COLOR:
+    {
+      if (!this->mouseTooltip->scene())
+        this->scene()->addItem(this->mouseTooltip);
+
+      this->mouseTooltip->setVisible(true);
+      this->mouseTooltip->setPos(this->mapToScene(_event->pos()) +
+          QPointF(15, 15));
+      break;
+    }
     default:
       break;
   }
@@ -500,6 +520,12 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
+void EditorView::leaveEvent(QEvent */*_event*/)
+{
+  this->mouseTooltip->setVisible(false);
+}
+
+/////////////////////////////////////////////////
 void EditorView::keyPressEvent(QKeyEvent *_event)
 {
   if (_event->key() == Qt::Key_Delete || _event->key() == Qt::Key_Backspace)
@@ -523,6 +549,7 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
   }
   else if (_event->key() == Qt::Key_Escape)
   {
+    this->mouseTooltip->setVisible(false);
     this->CancelDrawMode();
     gui::editor::Events::createBuildingEditorItem(std::string());
     this->releaseKeyboard();
@@ -909,6 +936,13 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
     gui::editor::Events::triggerShowElements();
 
   // this->grabKeyboard();
+}
+
+/////////////////////////////////////////////////
+void EditorView::OnColorSelected(QColor _color)
+{
+  if (_color.isValid())
+    this->drawMode = COLOR;
 }
 
 /////////////////////////////////////////////////
