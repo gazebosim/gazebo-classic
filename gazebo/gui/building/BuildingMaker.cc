@@ -421,7 +421,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")->GetElement("name")
-      ->Set("Gazebo/WindowFrame");
+      ->Set("Gazebo/BuildingFrame");
   visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
@@ -467,7 +467,7 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")->GetElement("name")
-      ->Set("Gazebo/WindowFrame");
+      ->Set("Gazebo/BuildingFrame");
   visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
