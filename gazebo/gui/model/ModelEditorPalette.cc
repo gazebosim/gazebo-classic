@@ -147,13 +147,11 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   QLabel *staticLabel = new QLabel(tr("Static:"));
   this->staticCheck = new QCheckBox;
-  this->staticCheck->setText(tr("Disabled"));
   this->staticCheck->setChecked(false);
   connect(this->staticCheck, SIGNAL(clicked()), this, SLOT(OnStatic()));
 
   QLabel *autoDisableLabel = new QLabel(tr("Auto-disable:"));
   this->autoDisableCheck = new QCheckBox;
-  this->autoDisableCheck->setText(tr("Enabled"));
   this->autoDisableCheck->setChecked(true);
   connect(this->autoDisableCheck, SIGNAL(clicked()), this,
       SLOT(OnAutoDisable()));
@@ -292,17 +290,12 @@ void ModelEditorPalette::OnPartAdded()
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnAutoDisable()
 {
-  std::string text =
-    this->autoDisableCheck->isChecked() ? "Enabled" : "Disabled";
-  this->autoDisableCheck->setText(tr(text.c_str()));
   this->modelCreator->SetAutoDisable(this->autoDisableCheck->isChecked());
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnStatic()
 {
-  std::string text = this->staticCheck->isChecked() ? "Enabled" : "Disabled";
-  this->staticCheck->setText(tr(text.c_str()));
   this->modelCreator->SetStatic(this->staticCheck->isChecked());
 }
 
