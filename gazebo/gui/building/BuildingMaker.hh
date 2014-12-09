@@ -65,7 +65,8 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BuildingMaker();
 
-      /// \brief TODO
+      /// \brief QT callback when entering or leaving building edit mode
+      /// \param[in] _checked True if the menu item is checked
       public: void OnEdit(bool _checked);
 
       /// \brief Set the name of this building model.
@@ -298,25 +299,39 @@ namespace gazebo
       /// \param[in] _level The level that is currently being edited.
       private: void OnChangeLevel(int _level);
 
-      /// \brief TODO
+      /// \brief Cancel material modes.
       private: void StopMaterialModes();
 
-      /// \brief TODO
+      /// \brief Reset currently hovered visual to the properties it had before
+      /// being hovered.
+      private: void ResetHoverVis();
+
+      /// \brief Callback received when a color has been selected on the
+      /// palette.
+      /// \param[in] _color Selected color.
       private: void OnColorSelected(QColor _color);
 
       /// \brief TODO
       private: void OnTextureSelected(QString _texture);
 
-      /// \brief TODO
+      /// \brief Mouse event filter callback when mouse is moved.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
       private: bool On3dMouseMove(const common::MouseEvent &_event);
 
-      /// \brief TODO
+      /// \brief Mouse event filter callback when mouse is pressed.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
       private: bool On3dMousePress(const common::MouseEvent &_event);
 
-      /// \brief TODO
+      /// \brief Mouse event filter callback when mouse is released.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
       private: bool On3dMouseRelease(const common::MouseEvent &_event);
 
-      /// \brief TODO
+      /// \brief Key event filter callback when key is pressed.
+      /// \param[in] _event The key event.
+      /// \return True if the event was handled
       private: bool On3dKeyPress(const common::KeyEvent &_event);
 
       /// \brief Conversion scale used by the Convert helper functions.
@@ -389,10 +404,11 @@ namespace gazebo
       /// \brief A dialog for setting building model name and save location.
       private: FinishBuildingDialog *saveDialog;
 
-      /// \brief Visual that is currently hovered over by the mouse
+      /// \brief Visual that is currently hovered over by the mouse.
       private: rendering::VisualPtr hoverVis;
 
-      /// \brief TODO
+      /// \brief The color currently selected. If none is selected, it will be
+      /// QColor::Invalid.
       private: QColor selectedColor;
 
       /// \brief TODO

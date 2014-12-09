@@ -417,6 +417,12 @@ void BuildingModelManip::SetTransparency(float _transparency)
 }
 
 /////////////////////////////////////////////////
+void BuildingModelManip::SetVisible(bool _visible)
+{
+  this->visual->GetParent()->SetVisible(_visible);
+}
+
+/////////////////////////////////////////////////
 void BuildingModelManip::SetLevel(const int _level)
 {
   this->level = _level;
@@ -432,9 +438,15 @@ int BuildingModelManip::GetLevel() const
 void BuildingModelManip::OnChangeLevel(int _level)
 {
   if (this->level > _level)
-    this->SetTransparency(1.0);
+    this->SetVisible(false);
   else if (this->level < _level)
+  {
+    this->SetVisible(true);
     this->SetTransparency(0.0);
+  }
   else
+  {
+    this->SetVisible(true);
     this->SetTransparency(0.4);
+  }
 }

@@ -329,6 +329,14 @@ namespace gazebo
         public: static event::EventT<void (std::string)>
             createBuildingEditorItem;
 
+        /// \brief A color has been selected.
+        public: static event::EventT<void (QColor)>
+            colorSelected;
+
+        /// \brief A texture has been selected.
+        public: static event::EventT<void (QString)>
+            textureSelected;
+
         /// \brief A model has been saved with a name and a location
         public: static event::EventT<void (std::string, std::string)>
             saveBuildingModel;
@@ -366,14 +374,6 @@ namespace gazebo
 
         /// \brief The current zoom level has been changed
         public: static event::EventT<void (double)> changeBuildingEditorZoom;
-
-        /// \brief A color has been selected.
-        public: static event::EventT<void (QColor)>
-            colorSelected;
-
-        /// \brief A texture has been selected.
-        public: static event::EventT<void (QString)>
-            textureSelected;
 
         /// \brief Save the model
         public: static event::EventT<bool (std::string)> saveBuildingEditor;

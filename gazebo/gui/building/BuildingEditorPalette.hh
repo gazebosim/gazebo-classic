@@ -65,7 +65,9 @@ namespace gazebo
       /// \brief Qt callback when the draw stairs button is pressed.
       private slots: void OnAddStair();
 
-      /// \brief TODO
+      /// \brief Qt callback when a brush is pressed, if it is a color button,
+      /// it is handled here.
+      /// \param[in] _colorId Id of the button clicked.
       private slots: void OnColor(int _colorId);
 
       /// \brief TODO
@@ -116,7 +118,7 @@ namespace gazebo
       /// \brief The current draw mode, empty for none.
       private: std::string currentMode;
 
-      /// \brief TODO
+      /// \brief List of default colors to be picked.
       private: std::vector<QColor> colorList;
 
       /// \brief TODO

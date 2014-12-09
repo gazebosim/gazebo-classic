@@ -111,11 +111,10 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   featuresLayout->addWidget(doorButton, 0, 1);
   featuresLayout->addWidget(stairsButton, 1, 0);
 
-  // Colors label
-  QLabel *colorsLabel = new QLabel(tr(
-       "<font size=4 color='white'>Add Color</font>"));
-
   // Colors
+  QLabel *colorsLabel = new QLabel(tr(
+      "<font size=4 color='white'>Add Color</font>"));
+
   QGridLayout *colorsLayout = new QGridLayout;
   this->colorList.push_back(QColor(255, 255, 255, 255));
   this->colorList.push_back(QColor(194, 169, 160, 255));
@@ -123,7 +122,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->colorList.push_back(QColor(254, 121,   5, 255));
   this->colorList.push_back(QColor(255, 195,  78, 255));
   this->colorList.push_back(QColor(111, 203, 172, 255));
-  for(unsigned int i = 0; i < this->colorList.size(); i++)
+  for (unsigned int i = 0; i < this->colorList.size(); i++)
   {
     QToolButton *colorButton = new QToolButton(this);
     colorButton->setFixedSize(40, 40);
@@ -348,7 +347,7 @@ void BuildingEditorPalette::OnCreateEditorItem(const std::string &_mode)
 void BuildingEditorPalette::OnColor(int _buttonId)
 {
   // A button which is not color
-  if (_buttonId >= (int)colorList.size())
+  if (_buttonId >= static_cast<int>(colorList.size()))
   {
     // Textures
     if (_buttonId < (int)colorList.size() + (int)textureList.size())

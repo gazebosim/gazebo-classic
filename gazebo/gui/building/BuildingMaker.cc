@@ -160,19 +160,15 @@ BuildingMaker::BuildingMaker() : EntityMaker()
   this->connections.push_back(
   gui::editor::Events::ConnectChangeBuildingLevel(
     boost::bind(&BuildingMaker::OnChangeLevel, this, _1)));
-
   this->connections.push_back(
     gui::editor::Events::ConnectBuildingNameChanged(
       boost::bind(&BuildingMaker::OnNameChanged, this, _1)));
-
   this->connections.push_back(
       gui::editor::Events::ConnectColorSelected(
       boost::bind(&BuildingMaker::OnColorSelected, this, _1)));
-
   this->connections.push_back(
       gui::editor::Events::ConnectTextureSelected(
       boost::bind(&BuildingMaker::OnTextureSelected, this, _1)));
-
   this->connections.push_back(
       gui::editor::Events::ConnectToggleEditMode(
       boost::bind(&BuildingMaker::OnEdit, this, _1)));
@@ -737,7 +733,8 @@ void BuildingMaker::SaveToSDF(const std::string &_savePath)
 void BuildingMaker::FinishModel()
 {
   this->CreateTheEntity();
-  this->Stop();
+  //this->Stop();
+  this->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -1933,9 +1930,7 @@ void BuildingMaker::OnExit()
 void BuildingMaker::OnColorSelected(QColor _color)
 {
   this->selectedTexture = "";
-
-  if (_color.isValid())
-    this->selectedColor = _color;
+  this->selectedColor = _color;
 }
 
 /////////////////////////////////////////////////
@@ -1965,24 +1960,26 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
   // Highlight visual on hover
   if (vis)
   {
-    if (vis->GetTransparency() > 0.9)
-      return true;
     std::string visName = vis->GetParent()->GetName();
+
     // Stairs have nested visuals
     if (visName.find("Stair") != std::string::npos)
     {
       vis = vis->GetParent();
+      visName = vis->GetParent()->GetName();
     }
 
-    // Reset previous hoverVis
     if (this->hoverVis && this->hoverVis != vis)
+      this->ResetHoverVis();
+
+    // Only handle items from building being edited
+    visName = visName.substr(visName.find("::")+2);
+    std::map<std::string, BuildingModelManip *>::const_iterator it =
+        this->allItems.find(visName);
+    if (it == this->allItems.end())
     {
-      std::string hoverName = this->hoverVis->GetParent()->GetName();
-      hoverName = hoverName.substr(hoverName.find("::")+2);
-      BuildingModelManip *manip = this->allItems[hoverName];
-      this->hoverVis->SetAmbient(manip->GetColor());
-      this->hoverVis->SetMaterial(manip->GetTexture());
-      this->hoverVis->SetTransparency(manip->GetTransparency());
+      userCamera->HandleMouseEvent(_event);
+      return true;
     }
 
     if (visName.find("Wall") != std::string::npos ||
@@ -2014,12 +2011,12 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
     }
     else
     {
-      this->hoverVis.reset();
+      this->ResetHoverVis();
     }
   }
   else
   {
-    this->hoverVis.reset();
+    this->ResetHoverVis();
   }
   return true;
 }
@@ -2082,14 +2079,37 @@ bool BuildingMaker::On3dKeyPress(const common::KeyEvent &_event)
 /////////////////////////////////////////////////
 void BuildingMaker::StopMaterialModes()
 {
-  if (this->hoverVis)
-    this->hoverVis->SetTransparency(0.4);
-
-  this->selectedTexture = QString("");
+  this->ResetHoverVis();
   this->selectedColor = QColor::Invalid;
   gui::editor::Events::colorSelected(this->selectedColor.convertTo(
       QColor::Invalid));
   gui::editor::Events::createBuildingEditorItem(std::string());
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::ResetHoverVis()
+{
+  if (this->hoverVis)
+  {
+    std::string hoverName = this->hoverVis->GetParent()->GetName();
+    hoverName = hoverName.substr(hoverName.find("::")+2);
+
+    std::map<std::string, BuildingModelManip *>::const_iterator it =
+        this->allItems.find(hoverName);
+    if (it == this->allItems.end())
+    {
+      gzerr << "Visual " << hoverName << " is not part of the building but "
+            << "was hovered. This should never happen." << std::endl;
+    }
+    else
+    {
+      BuildingModelManip *manip = this->allItems[hoverName];
+      this->hoverVis->SetAmbient(manip->GetColor());
+      this->hoverVis->SetMaterial(manip->GetTexture());
+      this->hoverVis->SetTransparency(manip->GetTransparency());
+    }
+    this->hoverVis.reset();
+  }
 }
 
 /////////////////////////////////////////////////

@@ -151,7 +151,7 @@ namespace gazebo
       /// \param[in] _event Qt mouse event.
       private: void mouseDoubleClickEvent(QMouseEvent *_event);
 
-      /// \brief TODO
+      /// \brief Qt leave event.
       /// \param[in] _event Qt mouse event.
       private: void leaveEvent(QEvent *_event);
 
@@ -183,7 +183,9 @@ namespace gazebo
       /// \param[in] _type Type of editor item to be created.
       private: void OnCreateEditorItem(const std::string &_type);
 
-      /// \brief TODO
+      /// \brief Callback triggered when the user chooses a color on the
+      /// palette.
+      /// \param[in] _color Selected color.
       private: void OnColorSelected(QColor _color);
 
       /// \brief TODO
@@ -335,7 +337,7 @@ namespace gazebo
       /// \brief Currently held grabber which will be snapped.
       private: GrabberHandle *snapGrabberCurrent;
 
-      /// \brief TODO
+      /// \brief Text tooltip to follow the mouse.
       private: QGraphicsTextItem * mouseTooltip;
     };
     /// \}
