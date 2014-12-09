@@ -6,6 +6,8 @@ include_directories(
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIR}
+  ${libdl_include_dir}
+  ${TBB_INCLUDEDIR}
 )
 
 if (WIN32)
@@ -51,6 +53,10 @@ target_link_libraries(gz
 	gazebo_sensors 
 	${QT_LIBRARIES} 
 	${Boost_LIBRARIES})
+
+if (WIN32)
+  target_link_libraries(gz ${libdl_library})
+endif()
 
 if (UNIX)
   target_link_libraries(gz pthread)
