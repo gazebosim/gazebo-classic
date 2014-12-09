@@ -380,6 +380,8 @@ void ModelCreator::Reset()
 
   this->jointMaker->Reset();
   this->selectedVisuals.clear();
+  g_copyAct->setEnabled(false);
+  g_pasteAct->setEnabled(false);
 
   std::stringstream ss;
   ss << "defaultModel_" << this->modelCounter++;
@@ -677,6 +679,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       this->DeselectAll();
 
       g_alignAct->setEnabled(false);
+      g_copyAct->setEnabled(!this->selectedVisuals.empty());
 
       // Prevent interaction with other models, send event only to
       // user camera
