@@ -15,6 +15,7 @@
  *
  */
 
+#include <unistd.h>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <sdf/sdf.hh>
@@ -189,7 +190,15 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   QList<QTreeWidgetItem *> matchList =
     this->dataPtr->fileTreeWidget->findItems(qpath, Qt::MatchExactly);
 
+  // Unix only: check permissions on this directory
+  int accessStatus = access(_path.c_str(), R_OK);
+  if (accessStatus < 0)
+  {
+    gzlog << "Permission denied for path " << _path << std::endl;
+  }
+
   boost::filesystem::path dir(_path);
+  
 
   // Create a top-level tree item for the path
   if (matchList.empty())
@@ -207,24 +216,16 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
 
   // Remove current items.
   topItem->takeChildren();
+
   if (boost::filesystem::exists(dir) &&
       boost::filesystem::is_directory(dir))
   {
     std::vector<boost::filesystem::path> paths;
 
-    try
-    {
-      // Get all the paths in alphabetical order
-      std::copy(boost::filesystem::directory_iterator(dir),
-          boost::filesystem::directory_iterator(),
-          std::back_inserter(paths));
-    }
-    catch(...)
-    {
-      gzdbg << "Filesystem read error for directory: " << dir << std::endl;
-      return;
-    }
-
+    // Get all the paths in alphabetical order
+    std::copy(boost::filesystem::directory_iterator(dir),
+        boost::filesystem::directory_iterator(),
+        std::back_inserter(paths));
     std::sort(paths.begin(), paths.end());
 
     // Iterate over all the models in the current gazebo path
