@@ -12,6 +12,7 @@ link_directories(
   ${Boost_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${PROJECT_BINARY_DIR}/test
+  ${TBB_LIBRARY_DIR}
 )
 
 if (WIN32)
