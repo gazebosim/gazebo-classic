@@ -147,6 +147,9 @@
         * [Pull request #1322](https://bitbucket.org/osrf/gazebo/pull-request/1322)
         * [Issue #370](https://bitbucket.org/osrf/gazebo/issue/370)
 
+    1. Pick colors from the palette and assign on 3D view. Added mouse and key event handlers to BuildingMaker, and events to communicate from BuildingModelManip to EditorItem.
+        * [Pull request #1336](https://bitbucket.org/osrf/gazebo/pull-request/1336)
+
 1. Model editor updates
     1. Fix adding/removing event filters .
         * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)

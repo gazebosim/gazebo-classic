@@ -273,6 +273,10 @@ namespace gazebo
       /// \brief Cancel material modes.
       private: void StopMaterialModes();
 
+      /// \brief Reset currently hovered visual to the properties it had before
+      /// being hovered.
+      private: void ResetHoverVis();
+
       /// \brief Callback received when a color has been selected on the
       /// palette.
       /// \param[in] _color Selected color.
