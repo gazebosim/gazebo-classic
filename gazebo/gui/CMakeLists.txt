@@ -4,6 +4,8 @@ include ( ${QT_USE_FILE} )
 
 link_directories(
   ${Boost_LIBRARY_DIRS}
+  ${tinyxml_LIBRARY_DIRS}
+  ${TBB_LIBRARYDIR}
 )
 
 include_directories(
@@ -11,7 +13,6 @@ include_directories(
 )
 
 include_directories(${tinyxml_INCLUDE_DIRS})
-link_directories(${tinyxml_LIBRARY_DIRS})
 
 add_definitions(${QT_DEFINITIONS})
 
