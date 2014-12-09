@@ -73,6 +73,12 @@ common::Color BuildingModelManip::GetColor() const
 }
 
 /////////////////////////////////////////////////
+std::string BuildingModelManip::GetTexture() const
+{
+  return this->texture;
+}
+
+/////////////////////////////////////////////////
 void BuildingModelManip::SetMaker(BuildingMaker *_maker)
 {
   this->maker = _maker;
@@ -287,6 +293,12 @@ void BuildingModelManip::OnColorChanged(QColor _color)
 }
 
 /////////////////////////////////////////////////
+void BuildingModelManip::OnTextureChanged(QString _texture)
+{
+  this->SetTexture(_texture);
+}
+
+/////////////////////////////////////////////////
 void BuildingModelManip::OnTransparencyChanged(float _transparency)
 {
   this->SetTransparency(_transparency);
@@ -351,6 +363,20 @@ void BuildingModelManip::SetColor(QColor _color)
   common::Color newColor(_color.red(), _color.green(), _color.blue());
   this->color = newColor;
   this->visual->GetParent()->SetAmbient(this->color);
+}
+
+/////////////////////////////////////////////////
+void BuildingModelManip::SetTexture(QString _texture)
+{
+  // TODO For now setting existing material scripts.
+  // Add support for custom textures.
+  this->texture = "Gazebo/Grey";
+  if (_texture == ":wood.jpg")
+    this->texture = "Gazebo/Wood";
+  else if (_texture == ":tiles.jpg")
+    this->texture = "Gazebo/CeilingTiled";
+
+  this->visual->GetParent()->SetMaterial(this->texture);
 }
 
 /////////////////////////////////////////////////

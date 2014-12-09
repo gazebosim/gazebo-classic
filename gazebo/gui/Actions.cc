@@ -128,3 +128,6 @@ QAction *gazebo::gui::g_snapAct = 0;
 
 GAZEBO_VISIBLE
 QWidgetAction *gazebo::gui::g_alignAct = 0;
+
+GAZEBO_VISIBLE
+QAction *gazebo::gui::g_alignButtonAct = 0;

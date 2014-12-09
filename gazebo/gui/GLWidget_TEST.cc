@@ -15,16 +15,19 @@
  *
 */
 #include <boost/filesystem.hpp>
+#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GLWidget_TEST.hh"
 
 #include "test_config.h"
+
 
 bool g_gotBoxSelection = false;
 void OnSelection(ConstSelectionPtr &_msg)
