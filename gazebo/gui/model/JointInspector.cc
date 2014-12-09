@@ -34,17 +34,32 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
   this->jointType = _jointType;
 
   QLabel *jointLabel = new QLabel(tr("Name:"));
-  this->jointNameLabel = new QLabel(tr(""));
+  this->jointNameLineEdit = new QLineEdit(tr(""));
 
   QHBoxLayout *nameLayout = new QHBoxLayout;
   nameLayout->addWidget(jointLabel);
-  nameLayout->addWidget(jointNameLabel);
+  nameLayout->addWidget(this->jointNameLineEdit);
 
   QLabel *typeLabel = new QLabel(tr("Type: "));
-  this->jointTypeLabel = new QLabel("");
+  this->jointTypeComboBox = new QComboBox;
+  this->jointTypeComboBox->addItem("revolute",
+    QVariant(JointMaker::JOINT_HINGE));
+  this->jointTypeComboBox->addItem("revolute2",
+      QVariant(JointMaker::JOINT_HINGE2));
+  this->jointTypeComboBox->addItem("prismatic",
+      QVariant(JointMaker::JOINT_SLIDER));
+  this->jointTypeComboBox->addItem("ball",
+      QVariant(JointMaker::JOINT_BALL));
+  this->jointTypeComboBox->addItem("universal",
+      QVariant(JointMaker::JOINT_UNIVERSAL));
+  this->jointTypeComboBox->addItem("screw",
+      QVariant(JointMaker::JOINT_SCREW));
+  connect(this->jointTypeComboBox, SIGNAL(currentIndexChanged(int)),
+      this, SLOT(OnJointTypeChanged(int)));
+
   QHBoxLayout *typeLayout = new QHBoxLayout;
   typeLayout->addWidget(typeLabel);
-  typeLayout->addWidget(this->jointTypeLabel);
+  typeLayout->addWidget(this->jointTypeComboBox);
 
   QLabel *parentLabel = new QLabel(tr("Parent: "));
   this->jointParentLabel = new QLabel(tr(""));
@@ -251,6 +266,11 @@ JointMaker::JointType JointInspector::GetType() const
 {
   return this->jointType;
 }
+/////////////////////////////////////////////////
+std::string JointInspector::GetName() const
+{
+  return this->jointNameLineEdit->text().toStdString();
+}
 
 /////////////////////////////////////////////////
 void JointInspector::SetType(JointMaker::JointType _type)
@@ -261,7 +281,16 @@ void JointInspector::SetType(JointMaker::JointType _type)
   int axisCount = JointMaker::GetJointAxisCount(_type);
   GZ_ASSERT(axisCount >= 0, "Invalid axis count");
 
-  this->jointTypeLabel->setText(tr(jointTypeStr.c_str()));
+
+  int index = this->jointTypeComboBox->findText(tr(jointTypeStr.c_str()));
+
+  if (index >= 0)
+    this->jointTypeComboBox->setCurrentIndex(index);
+  else
+  {
+    gzerr << "Joint type not found in inspector" << std::endl;
+    return;
+  }
 
   for (int i = 0; i < axisCount; ++i)
     this->axisGroupBoxes[i]->setVisible(true);
@@ -276,9 +305,8 @@ void JointInspector::SetType(JointMaker::JointType _type)
 /////////////////////////////////////////////////
 void JointInspector::SetName(const std::string &_name)
 {
-  this->jointNameLabel->setText(tr(_name.c_str()));
+  this->jointNameLineEdit->setText(tr(_name.c_str()));
 }
-
 
 /////////////////////////////////////////////////
 void JointInspector::SetParent(const std::string &_parent)
@@ -337,6 +365,13 @@ void JointInspector::SetUpperLimit(unsigned int _index, double _upper)
   }
 
   this->upperLimitSpinBoxes[_index]->setValue(_upper);
+}
+
+/////////////////////////////////////////////////
+void JointInspector::OnJointTypeChanged(int _index)
+{
+  QVariant jointTypeData = this->jointTypeComboBox->itemData(_index);
+  this->jointType = static_cast<JointMaker::JointType>(jointTypeData.toInt());
 }
 
 /////////////////////////////////////////////////

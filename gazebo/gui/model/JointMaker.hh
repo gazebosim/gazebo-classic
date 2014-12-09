@@ -250,6 +250,9 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Name of the joint.
+      public: std::string name;
+
       /// \brief Visual of the dynamic line
       public: rendering::VisualPtr visual;
 

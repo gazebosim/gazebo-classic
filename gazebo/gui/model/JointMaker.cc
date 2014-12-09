@@ -290,6 +290,7 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   jointVis->GetSceneNode()->setInheritOrientation(false);
 
   JointData *jointData = new JointData;
+  jointData->name = jointVis->GetName();
   jointData->dirty = false;
   jointData->visual = jointVis;
   jointData->parent = _parent;
@@ -481,7 +482,7 @@ void JointMaker::OpenInspector(const std::string &_name)
 {
   JointData *joint = this->joints[_name];
   joint->inspector->SetType(joint->type);
-  joint->inspector->SetName(joint->visual->GetName());
+  joint->inspector->SetName(joint->name);
   joint->inspector->SetParent(joint->parent->GetName());
   joint->inspector->SetChild(joint->child->GetName());
   joint->inspector->SetAnchor(0, joint->anchor);
@@ -629,14 +630,29 @@ void JointMaker::Update()
         q.SetFromAxis(w, angle);
         joint->hotspot->SetWorldRotation(q);
 
-        // set pos of joint handle
-        if (joint->handles->getNumBillboards() > 0)
+        // set new material if joint type has changed
+        std::string material = this->jointMaterials[joint->type];
+        if (joint->hotspot->GetMaterialName() != material)
         {
-          joint->handles->getBillboard(0)->setPosition(
-              rendering::Conversions::Convert(parentCentroid -
-              joint->hotspot->GetWorldPose().pos));
-          joint->handles->_updateBounds();
+          // Note: issue setting material when there is a billboard child,
+          // seems to hang so detach before setting and re-attach later.
+          Ogre::SceneNode *handleNode = joint->handles->getParentSceneNode();
+          joint->handles->detachFromParent();
+          joint->hotspot->SetMaterial(material);
+          handleNode->attachObject(joint->handles);
+          Ogre::MaterialPtr mat =
+              Ogre::MaterialManager::getSingleton().getByName(material);
+          Ogre::ColourValue color =
+              mat->getTechnique(0)->getPass(0)->getDiffuse();
+          color.a = 0.5;
+          joint->handles->getBillboard(0)->setColour(color);
         }
+
+        // set pos of joint handle
+        joint->handles->getBillboard(0)->setPosition(
+            rendering::Conversions::Convert(parentCentroid -
+            joint->hotspot->GetWorldPose().pos));
+        joint->handles->_updateBounds();
       }
     }
   }
@@ -657,7 +673,7 @@ void JointMaker::GenerateSDF()
     JointData *joint = jointsIt->second;
     sdf::ElementPtr jointElem = this->modelSDF->AddElement("joint");
 
-    jointElem->GetAttribute("name")->Set(joint->visual->GetName());
+    jointElem->GetAttribute("name")->Set(joint->name);
     jointElem->GetAttribute("type")->Set(GetTypeAsString(joint->type));
     sdf::ElementPtr parentElem = jointElem->GetElement("parent");
     parentElem->Set(joint->parent->GetName());
@@ -792,6 +808,8 @@ void JointData::OnApply()
 {
   this->anchor = this->inspector->GetAnchor(0);
   this->type = this->inspector->GetType();
+  this->name = this->inspector->GetName();
+
   int axisCount = JointMaker::GetJointAxisCount(this->type);
   for (int i = 0; i < axisCount; ++i)
   {

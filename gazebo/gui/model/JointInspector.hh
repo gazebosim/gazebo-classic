@@ -71,6 +71,10 @@ namespace gazebo
       /// \return Joint type.
       public: JointMaker::JointType GetType() const;
 
+      /// \brief Get joint name.
+      /// \return Joint name.
+      public: std::string GetName() const;
+
       /// \brief Set the joint name.
       /// \param[in] _name Name to set to.
       public: void SetName(const std::string &_name);
@@ -110,6 +114,9 @@ namespace gazebo
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
 
+      /// \brief Qt callback when the joint type combox index has changed.
+      private slots: void OnJointTypeChanged(int _index);
+
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
 
@@ -119,8 +126,8 @@ namespace gazebo
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
-      /// \brief Label that displays the name of the joint.
-      private: QLabel* jointNameLabel;
+      /// \brief Line edit that displays the name of the joint.
+      private: QLineEdit* jointNameLineEdit;
 
       /// \brief Label that displays the parent name of the joint.
       private: QLabel* jointParentLabel;
@@ -128,8 +135,8 @@ namespace gazebo
       /// \brief Label that displays the child name of the joint.
       private: QLabel* jointChildLabel;
 
-      /// \brief Label that displays the type of the joint.
-      private: QLabel *jointTypeLabel;
+      /// \brief ComboBox that displays the type of the joint.
+      private: QComboBox *jointTypeComboBox;
 
       /// \brief Spin box for configuring the X position of the anchor.
       private: QDoubleSpinBox *anchorXSpinBox;
