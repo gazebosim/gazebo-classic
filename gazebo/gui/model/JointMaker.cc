@@ -194,7 +194,6 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
   if (this->jointType == JointMaker::JOINT_NONE)
   {
     rendering::UserCameraPtr camera = gui::get_active_camera();
-    rendering::ScenePtr scene = camera->GetScene();
     rendering::VisualPtr vis = camera->GetVisual(_event.pos);
     if (vis)
     {

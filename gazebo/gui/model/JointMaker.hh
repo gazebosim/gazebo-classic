@@ -106,6 +106,7 @@ namespace gazebo
       /// \brief Create a joint with parent and child.
       /// \param[in] _parent Parent of the joint.
       /// \param[in] _child Child of the joint.
+      /// \return joint data.
       public: JointData *CreateJoint(rendering::VisualPtr _parent,
           rendering::VisualPtr _child);
 
