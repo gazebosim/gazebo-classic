@@ -554,7 +554,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
 
   // create two handles at the ends of the line
   Ogre::BillboardSet *handleSet =
-      camera->GetScene()->GetManager()->createBillboardSet(3);
+      camera->GetScene()->GetManager()->createBillboardSet(1);
   handleSet->setAutoUpdate(true);
   handleSet->setMaterialName("Gazebo/PointHandle");
   Ogre::MaterialPtr mat =
@@ -566,10 +566,6 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   handleSet->setDefaultDimensions(dimension, dimension);
   Ogre::Billboard *parentHandle = handleSet->createBillboard(0, 0, 0);
   parentHandle->setColour(color);
-  Ogre::Billboard *childHandle = handleSet->createBillboard(0, 0, 0);
-  childHandle->setColour(color);
-  Ogre::Billboard *childCenterHandle = handleSet->createBillboard(0, 0, 0);
-  childCenterHandle->setDimensions(dimension*0.5, dimension*0.5);
   Ogre::SceneNode *handleNode =
       hotspotVisual->GetSceneNode()->createChildSceneNode();
   handleNode->attachObject(handleSet);
@@ -633,16 +629,14 @@ void JointMaker::Update()
         q.SetFromAxis(w, angle);
         joint->hotspot->SetWorldRotation(q);
 
-        // set pos of joint handles
-        joint->handles->getBillboard(0)->setPosition(
-            rendering::Conversions::Convert(parentCentroid -
-            joint->hotspot->GetWorldPose().pos));
-        joint->handles->getBillboard(1)->setPosition(
-            rendering::Conversions::Convert(childCentroid -
-            joint->hotspot->GetWorldPose().pos));
-        joint->handles->getBillboard(2)->setPosition(
-            joint->handles->getBillboard(1)->getPosition());
-        joint->handles->_updateBounds();
+        // set pos of joint handle
+        if (joint->handles->getNumBillboards() > 0)
+        {
+          joint->handles->getBillboard(0)->setPosition(
+              rendering::Conversions::Convert(parentCentroid -
+              joint->hotspot->GetWorldPose().pos));
+          joint->handles->_updateBounds();
+        }
       }
     }
   }
