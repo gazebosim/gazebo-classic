@@ -779,6 +779,7 @@ void ModelCreator::OnPaste()
     if (!copiedPart)
       return;
 
+    this->Stop();
     this->DeselectAll();
 
     std::string linkName = copiedPart->name + "_clone";
@@ -826,9 +827,9 @@ void ModelCreator::OnPaste()
     linkVisual->SetWorldPose(clonePose);
     linkVisual->SetTransparency(this->editTransparency);
 
+    this->addPartType = PART_CUSTOM;
     this->CreatePart(visVisual);
     this->mouseVisual = linkVisual;
-    emit PartAdded();
   }
 }
 

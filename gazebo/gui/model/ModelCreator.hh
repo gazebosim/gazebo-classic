@@ -356,10 +356,10 @@ namespace gazebo
       /// \brief Pose of part.
       public: math::Pose pose;
 
-      /// \brief Name of part.
+      /// \brief Inertial properties of part.
       public: physics::Inertial *inertial;
 
-      /// \brief Name of part.
+      /// \brief Collision properties of part.
       public: std::vector<physics::CollisionPtr> collisions;
 
       /// \brief Sensor data
