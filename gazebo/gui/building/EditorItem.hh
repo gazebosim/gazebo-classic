@@ -72,6 +72,10 @@ namespace gazebo
       /// \return Color of the 3D visual.
       public: virtual QColor Get3dColor() const;
 
+      /// \brief Get the associated 3D visual's texture.
+      /// \return Texture of the 3D visual.
+      public: virtual QString Get3dTexture() const;
+
       /// \brief Set the name of this editor item.
       /// \param[in] _name Name to set the editor item to.
       public: virtual void SetName(const std::string &_name);
@@ -88,6 +92,10 @@ namespace gazebo
       /// \brief Set the associated 3D visual's color.
       /// \param[in] _color Color.
       public: void Set3dColor(QColor _color);
+
+      /// \brief Set the associated 3D visual's texture.
+      /// \param[in] _texture Texture.
+      public: void Set3dTexture(QString _texture);
 
       /// \brief Set the transparency of the associated 3D visual.
       /// \param[in] _transparency Transparency.
@@ -177,6 +185,11 @@ namespace gazebo
       /// \param[in] _color Color.
       Q_SIGNALS: void ColorChanged(QColor _color);
 
+      /// \brief Qt signal emitted when the editor item's 3D texture has
+      /// changed.
+      /// \param[in] _texture Texture.
+      Q_SIGNALS: void TextureChanged(QString _texture);
+
       /// \brief Qt signal emitted when the editor item's 3D transparency has
       /// changed.
       /// \param[in] _transparency Transparency.
@@ -201,8 +214,18 @@ namespace gazebo
       /// \brief Color of the associated 3D visual.
       protected: QColor visual3dColor;
 
+      /// \brief Texture of the associated 3D visual.
+      protected: QString visual3dTexture;
+
       /// \brief Transparency of the associated 3D visual.
       protected: float visual3dTransparency;
+
+      /// \brief Flag to indicate whether this item is currently highlighted or
+      /// not.
+      protected: bool highlighted;
+
+      /// \brief Scale for converting from pixel to metric units.
+      protected: double scale;
     };
     /// \}
   }
