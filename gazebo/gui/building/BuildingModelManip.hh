@@ -154,6 +154,10 @@ namespace gazebo
       /// \param[in] _transparency Transparency.
       public: void SetTransparency(float _transparency);
 
+      /// \brief Set the visibility of the manip.
+      /// \param[in] _visible True for visible, false for invisible.
+      public: void SetVisible(bool _visible);
+
       /// \brief Set the level for this manip.
       /// \param[in] _level The level for this manip.
       public: void SetLevel(const int _level);
