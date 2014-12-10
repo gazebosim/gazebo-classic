@@ -478,62 +478,75 @@ void Actor::Update()
       break;
     }
 
-  scriptTime = scriptTime - tinfo.startTime;
+  //scriptTime = scriptTime - tinfo.startTime;
+
+  tinfo.type="walking";
+  tinfo.duration=1.0;
 
   SkeletonAnimation *skelAnim = this->skelAnimation[tinfo.type];
-  std::map<std::string, std::string> skelMap = this->skelNodesMap[tinfo.type];
 
-  math::Pose modelPose;
-  std::map<std::string, math::Matrix4> frame;
-  if (this->trajectories.find(tinfo.id) != this->trajectories.end())
+  if (skelAnim)
   {
-    common::PoseKeyFrame posFrame(0.0);
-    this->trajectories[tinfo.id]->SetTime(scriptTime);
-    this->trajectories[tinfo.id]->GetInterpolatedKeyFrame(posFrame);
-    modelPose.pos = posFrame.GetTranslation();
-    modelPose.rot = posFrame.GetRotation();
+    std::map<std::string, std::string> skelMap = this->skelNodesMap[tinfo.type];
 
-    if (this->lastTraj == tinfo.id)
-      this->pathLength += fabs(this->lastPos.Distance(modelPose.pos));
-    else
+    math::Pose modelPose;// = this->GetWorldPose();
+    std::map<std::string, math::Matrix4> frame;
+    /*if (this->trajectories.find(tinfo.id) != this->trajectories.end())
     {
-      common::PoseKeyFrame *frame0 = dynamic_cast<common::PoseKeyFrame*>
-        (this->trajectories[tinfo.id]->GetKeyFrame(0));
-      this->pathLength = fabs(modelPose.pos.Distance(frame0->GetTranslation()));
-    }
-    this->lastPos = modelPose.pos;
-  }
-  if (this->interpolateX[tinfo.type] &&
+      common::PoseKeyFrame posFrame(0.0);
+      this->trajectories[tinfo.id]->SetTime(scriptTime);
+      this->trajectories[tinfo.id]->GetInterpolatedKeyFrame(posFrame);
+      modelPose.pos = posFrame.GetTranslation();
+      modelPose.rot = posFrame.GetRotation();
+
+      if (this->lastTraj == tinfo.id)
+      {
+        this->pathLength += fabs(this->lastPos.Distance(modelPose.pos));
+      }
+      else
+      {
+        common::PoseKeyFrame *frame0 = dynamic_cast<common::PoseKeyFrame*>
+          (this->trajectories[tinfo.id]->GetKeyFrame(0));
+        this->pathLength =
+          fabs(modelPose.pos.Distance(frame0->GetTranslation()));
+      }
+      this->lastPos = modelPose.pos;
+    }*/
+
+    /*if (this->interpolateX[tinfo.type] &&
         this->trajectories.find(tinfo.id) != this->trajectories.end())
-  {
-    frame = skelAnim->GetPoseAtX(this->pathLength,
-              skelMap[this->skeleton->GetRootNode()->GetName()]);
+    {
+      frame = skelAnim->GetPoseAtX(this->pathLength,
+          skelMap[this->skeleton->GetRootNode()->GetName()]);
+    }
+    else
+    {*/
+      frame = skelAnim->GetPoseAt(scriptTime*3.5);
+    //}
+
+    this->lastTraj = tinfo.id;
+
+    math::Matrix4 rootTrans =
+      frame[skelMap[this->skeleton->GetRootNode()->GetName()]];
+
+    math::Vector3 rootPos = rootTrans.GetTranslation();
+    math::Quaternion rootRot = rootTrans.GetRotation();
+
+    if (tinfo.translated)
+      rootPos.x = 0.0;
+    math::Pose actorPose;
+    actorPose.pos = modelPose.pos + modelPose.rot.RotateVector(rootPos);
+    actorPose.rot = modelPose.rot * rootRot;
+
+    math::Matrix4 rootM(actorPose.rot.GetAsMatrix4());
+    //rootM.SetTranslate(actorPose.pos);
+
+    frame[skelMap[this->skeleton->GetRootNode()->GetName()]] = rootM;
+
+    this->SetPose(frame, skelMap, currentTime.Double());
+
+    this->lastScriptTime = scriptTime;
   }
-  else
-    frame = skelAnim->GetPoseAt(scriptTime);
-
-  this->lastTraj = tinfo.id;
-
-  math::Matrix4 rootTrans =
-                  frame[skelMap[this->skeleton->GetRootNode()->GetName()]];
-
-  math::Vector3 rootPos = rootTrans.GetTranslation();
-  math::Quaternion rootRot = rootTrans.GetRotation();
-
-  if (tinfo.translated)
-    rootPos.x = 0.0;
-  math::Pose actorPose;
-  actorPose.pos = modelPose.pos + modelPose.rot.RotateVector(rootPos);
-  actorPose.rot = modelPose.rot *rootRot;
-
-  math::Matrix4 rootM(actorPose.rot.GetAsMatrix4());
-  rootM.SetTranslate(actorPose.pos);
-
-  frame[skelMap[this->skeleton->GetRootNode()->GetName()]] = rootM;
-
-  this->SetPose(frame, skelMap, currentTime.Double());
-
-  this->lastScriptTime = scriptTime;
 }
 
 //////////////////////////////////////////////////
@@ -588,27 +601,28 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
       transform = parentTrans * transform;
     }
 
-    msgs::Pose *link_pose = msg.add_pose();
-    link_pose->set_name(currentLink->GetScopedName());
-    link_pose->set_id(currentLink->GetId());
-    math::Pose linkPose = transform.GetAsPose() - mainLinkPose;
-    link_pose->mutable_position()->CopyFrom(msgs::Convert(linkPose.pos));
-    link_pose->mutable_orientation()->CopyFrom(msgs::Convert(linkPose.rot));
-    currentLink->SetWorldPose(transform.GetAsPose(), true, false);
+    //msgs::Pose *link_pose = msg.add_pose();
+    //link_pose->set_name(currentLink->GetScopedName());
+    //link_pose->set_id(currentLink->GetId());
+    //math::Pose linkPose = transform.GetAsPose() - mainLinkPose;
+    //link_pose->mutable_position()->CopyFrom(msgs::Convert(linkPose.pos));
+    //link_pose->mutable_orientation()->CopyFrom(msgs::Convert(linkPose.rot));
+    // currentLink->SetWorldPose(transform.GetAsPose(), true, false);
   }
 
   msgs::Time *stamp = msg.add_time();
   stamp->CopyFrom(msgs::Convert(_time));
 
-  msgs::Pose *model_pose = msg.add_pose();
-  model_pose->set_name(this->GetScopedName());
-  model_pose->set_id(this->GetId());
-  model_pose->mutable_position()->CopyFrom(msgs::Convert(mainLinkPose.pos));
-  model_pose->mutable_orientation()->CopyFrom(msgs::Convert(mainLinkPose.rot));
+  /*msgs::Pose *modelPose = msg.add_pose();
+  modelPose->set_name(this->GetScopedName());
+  modelPose->set_id(this->GetId());
+  modelPose->mutable_position()->CopyFrom(msgs::Convert(mainLinkPose.pos));
+  modelPose->mutable_orientation()->CopyFrom(msgs::Convert(mainLinkPose.rot));
+  */
 
   if (this->bonePosePub && this->bonePosePub->HasConnections())
     this->bonePosePub->Publish(msg);
-  this->SetWorldPose(mainLinkPose, true, false);
+  // this->SetWorldPose(mainLinkPose, true, false);
 }
 
 //////////////////////////////////////////////////

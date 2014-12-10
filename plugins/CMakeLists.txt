@@ -18,6 +18,7 @@ if (HAVE_BULLET)
 endif()
 
 set (plugins
+  ActorPlugin
   ArrangePlugin
   BreakableJointPlugin
   CameraPlugin
