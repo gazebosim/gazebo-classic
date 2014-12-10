@@ -1168,4 +1168,9 @@ void GLWidget::OnModelEditor(bool _checked)
     this->selectedVisuals[i]->SetHighlighted(false);
   }
   this->selectedVisuals.clear();
+
+  if (_checked)
+    ModelSnap::Instance()->SetSnapLevel("link");
+  else
+    ModelSnap::Instance()->SetSnapLevel("model");
 }
