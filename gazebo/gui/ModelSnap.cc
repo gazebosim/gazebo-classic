@@ -46,7 +46,6 @@ ModelSnap::ModelSnap()
   this->dataPtr->selectedTriangleDirty = false;
   this->dataPtr->hoverTriangleDirty = false;
   this->dataPtr->snapLines = NULL;
-  this->dataPtr->snapLevel = "model";
 
   this->dataPtr->updateMutex = new boost::recursive_mutex();
 }
@@ -195,13 +194,10 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
   if (vis && !vis->IsPlane() &&
       this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
   {
-    // Select first triangle on any mesh
-    // Update triangle if the new triangle is on the same model/link
+    // select first triangle on any mesh, if it's on the same mesh, update the
+    // triangle vertices.
     if (!this->dataPtr->selectedVis ||
-        (this->dataPtr->snapLevel == "model" &&
-        vis->GetRootVisual()  == this->dataPtr->selectedVis->GetRootVisual())
-        || (this->dataPtr->snapLevel == "link" &&
-        vis->GetParent() == this->dataPtr->selectedVis->GetParent()))
+       (vis->GetRootVisual()  == this->dataPtr->selectedVis->GetRootVisual()))
     {
       math::Vector3 intersect;
       this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
@@ -228,16 +224,9 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
 
       if (!vertices.empty())
       {
-        if (this->dataPtr->snapLevel == "model")
-        {
-          this->Snap(this->dataPtr->selectedTriangle, vertices,
-              this->dataPtr->selectedVis->GetRootVisual());
-        }
-        else
-        {
-          this->Snap(this->dataPtr->selectedTriangle, vertices,
-              this->dataPtr->selectedVis->GetParent());
-        }
+        this->Snap(this->dataPtr->selectedTriangle, vertices,
+            this->dataPtr->selectedVis->GetRootVisual());
+
         this->Reset();
         gui::Events::manipMode("select");
       }
@@ -294,7 +283,7 @@ void ModelSnap::GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
   else
     _rot.SetFromAxis((v.Cross(u)).Normalize(), angle);
 
-  // Get translation needed for snapping
+  // Get translation needed for alignment
   // taking into account the rotated position of the mesh
   _trans = centroidDest - (_rot * (centroidSrc - _poseSrc.pos) + _poseSrc.pos);
 }
@@ -439,10 +428,4 @@ void ModelSnap::Update()
     }
     this->dataPtr->selectedTriangleDirty = false;
   }
-}
-
-/////////////////////////////////////////////////
-void ModelSnap::SetSnapLevel(const std::string &_snapLevel)
-{
-  this->dataPtr->snapLevel = _snapLevel;
 }

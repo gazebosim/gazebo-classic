@@ -90,11 +90,6 @@ namespace gazebo
       /// \param[in] _event Mouse event.
       public: void OnMouseReleaseEvent(const common::MouseEvent &_event);
 
-      /// \brief Set the snap level.
-      /// \param[in] _snapLevel Choose "model" to snap models to each other or
-      /// "link" to snap links within a model.
-      public: void SetSnapLevel(const std::string &_snapLevel);
-
       /// \brief Publish visual's pose to the server
       /// \param[in] _vis Pointer to the visual whose pose is to be published.
       private: void PublishVisualPose(rendering::VisualPtr _vis);
