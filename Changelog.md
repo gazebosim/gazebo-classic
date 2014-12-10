@@ -1,7 +1,10 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.0.0
-
+1. Added a events::Event::resetWorld event that is triggered when World::Reset is called.
+    * [Pull request #1332](https://bitbucket.org/osrf/gazebo/pull-request/1332)
+    * [Issue #1375](https://bitbucket.org/osrf/gazebo/issue/1375)
+ 
 1. Fixed `math::Box::GetCenter` functionality.
     * [Pull request #1278](https://bitbucket.org/osrf/gazebo/pull-request/1278)
     * [Issue #1327](https://bitbucket.org/osrf/gazebo/issue/1327)
@@ -154,6 +157,9 @@
     1. Enabled snap mode inside model editor.
         * [Pull request #1331](https://bitbucket.org/osrf/gazebo/pull-request/1331)
         * [Issue #1318](https://bitbucket.org/osrf/gazebo/issue/1318)
+
+    1. Implemented copy/pasting of links.
+        * [Pull request #1330](https://bitbucket.org/osrf/gazebo/pull-request/1330)
 
 ## Gazebo 4.0
 

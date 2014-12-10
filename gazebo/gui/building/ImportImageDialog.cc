@@ -128,8 +128,10 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
 
   QVBoxLayout *step2Layout = new QVBoxLayout;
   step2Layout->addWidget(step2Label);
+  step2Layout->addSpacing(20);
   step2Layout->addLayout(distanceLayout);
   step2Layout->addLayout(resolutionLayout);
+  step2Layout->addSpacing(40);
   step2Layout->addLayout(step2Buttons);
 
   QWidget *step2Widget = new QWidget();
