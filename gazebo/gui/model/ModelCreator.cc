@@ -76,6 +76,12 @@ ModelCreator::ModelCreator()
       gui::Events::ConnectAlignMode(
         boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
 
+  g_copyAct->setEnabled(false);
+  g_pasteAct->setEnabled(false);
+
+  connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
+  connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+
   this->Reset();
 }
 
@@ -121,14 +127,7 @@ void ModelCreator::OnEdit(bool _checked)
     MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
     this->jointMaker->Stop();
 
-    if (!this->selectedVisuals.empty())
-    {
-      for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
-      {
-        this->selectedVisuals[i]->SetHighlighted(false);
-      }
-      this->selectedVisuals.clear();
-    }
+    this->DeselectAll();
   }
 }
 
@@ -381,6 +380,8 @@ void ModelCreator::Reset()
 
   this->jointMaker->Reset();
   this->selectedVisuals.clear();
+  g_copyAct->setEnabled(false);
+  g_pasteAct->setEnabled(false);
 
   std::stringstream ss;
   ss << "defaultModel_" << this->modelCounter++;
@@ -579,6 +580,19 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
       }
     }
   }
+  else if (_event.control)
+  {
+    if (_event.key == Qt::Key_C && _event.control)
+    {
+      g_copyAct->trigger();
+      return true;
+    }
+    if (_event.key == Qt::Key_V && _event.control)
+    {
+      g_pasteAct->trigger();
+      return true;
+    }
+  }
   return false;
 }
 
@@ -630,12 +644,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       // Not in multi-selection mode.
       if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
       {
-        // Deselect all currently selected parts
-        for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
-        {
-          this->selectedVisuals[i]->SetHighlighted(false);
-        }
-        this->selectedVisuals.clear();
+        this->DeselectAll();
 
         // Highlight and selected clicked part
         vis->SetHighlighted(true);
@@ -660,24 +669,17 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
           this->selectedVisuals.erase(it);
         }
       }
-
+      g_copyAct->setEnabled(!this->selectedVisuals.empty());
       g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
       return true;
     }
     // Not part
     else
     {
-      // Deselect all currently selected parts
-      if (!this->selectedVisuals.empty())
-      {
-        for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
-        {
-          this->selectedVisuals[i]->SetHighlighted(false);
-        }
-        this->selectedVisuals.clear();
-      }
+      this->DeselectAll();
 
       g_alignAct->setEnabled(false);
+      g_copyAct->setEnabled(!this->selectedVisuals.empty());
 
       // Prevent interaction with other models, send event only to
       // user camera
@@ -691,6 +693,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 {
+  this->lastMouseEvent = _event;
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (!userCamera)
     return false;
@@ -740,6 +743,94 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
     }
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnCopy()
+{
+  if (!g_editModelAct->isChecked())
+    return;
+
+  if (!this->selectedVisuals.empty())
+  {
+    this->copiedPartNames.clear();
+    for (unsigned int i = 0; i < this->selectedVisuals.size(); i++)
+    {
+      this->copiedPartNames.push_back(this->selectedVisuals[i]->GetName());
+    }
+    g_pasteAct->setEnabled(true);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnPaste()
+{
+  if (this->copiedPartNames.empty() || !g_editModelAct->isChecked())
+  {
+    return;
+  }
+
+  // For now, only copy the last selected model
+  boost::unordered_map<std::string, PartData*>::iterator it =
+    this->allParts.find(this->copiedPartNames.back());
+  if (it != this->allParts.end())
+  {
+    PartData *copiedPart = it->second;
+    if (!copiedPart)
+      return;
+
+    this->Stop();
+    this->DeselectAll();
+
+    std::string linkName = copiedPart->name + "_clone";
+
+    if (!this->modelVisual)
+    {
+      this->Reset();
+    }
+
+    rendering::VisualPtr linkVisual(new rendering::Visual(
+        linkName, this->modelVisual));
+    linkVisual->Load();
+
+    std::ostringstream visualName;
+    visualName << linkName << "_visual";
+    rendering::VisualPtr visVisual;
+
+    math::Pose clonePose;
+
+    if (copiedPart->visuals.empty())
+    {
+      visVisual = rendering::VisualPtr(new rendering::Visual(visualName.str(),
+          linkVisual));
+      sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+          ->GetElement("model")->GetElement("link")->GetElement("visual");
+      visVisual->Load(visualElem);
+    }
+    else
+    {
+      rendering::VisualPtr copiedVisual = copiedPart->visuals.back();
+      visVisual = copiedVisual->Clone(visualName.str(), linkVisual);
+      clonePose = copiedVisual->GetWorldPose();
+    }
+
+    rendering::UserCameraPtr userCamera = gui::get_active_camera();
+    if (userCamera)
+    {
+      math::Vector3 mousePosition =
+        ModelManipulator::GetMousePositionOnPlane(userCamera,
+                                                  this->lastMouseEvent);
+      clonePose.pos.x = mousePosition.x;
+      clonePose.pos.y = mousePosition.y;
+    }
+
+    linkVisual->SetWorldPose(clonePose);
+    linkVisual->SetTransparency(this->editTransparency);
+
+    this->addPartType = PART_CUSTOM;
+    this->CreatePart(visVisual);
+    this->mouseVisual = linkVisual;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -892,4 +983,17 @@ void ModelCreator::OnAlignMode(const std::string &_axis,
 
   ModelAlign::Instance()->AlignVisuals(selectedLinks, _axis, _config,
       _target, !_preview);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::DeselectAll()
+{
+  if (!this->selectedVisuals.empty())
+  {
+    for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+    {
+      this->selectedVisuals[i]->SetHighlighted(false);
+    }
+    this->selectedVisuals.clear();
+  }
 }
