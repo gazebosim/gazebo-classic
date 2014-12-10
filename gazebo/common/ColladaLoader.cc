@@ -910,7 +910,7 @@ void ColladaLoader::LoadPositions(const std::string &_id,
       {
         count = boost::lexical_cast<int>(floatArrayXml->Attribute("count"));
       }
-      catch (...)
+      catch(...)
       {
         // Do nothing
       }
@@ -989,7 +989,7 @@ void ColladaLoader::LoadNormals(const std::string &_id,
       {
         count = boost::lexical_cast<int>(floatArrayXml->Attribute("count"));
       }
-      catch (...)
+      catch(...)
       {
         // Do nothing
       }
@@ -998,7 +998,7 @@ void ColladaLoader::LoadNormals(const std::string &_id,
     if (count)
     {
       gzwarn << "Normal source missing float_array element, or count is "
-        << "invalid\n";
+        << "invalid.\n";
     }
     else
     {
@@ -1071,7 +1071,7 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
       {
         count = boost::lexical_cast<int>(floatArrayXml->Attribute("count"));
       }
-      catch (...)
+      catch(...)
       {
         // Do nothing
       }
@@ -1080,7 +1080,7 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
     if (count)
     {
       gzerr << "Normal source missing float_array element, or count is "
-        << "invalid\n";
+        << "invalid.\n";
     }
     else
     {
@@ -1693,7 +1693,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   }
 
   TiXmlElement *trianglesInputXml = _trianglesXml->FirstChildElement("input");
-
 
   std::vector<math::Vector3> verts;
   std::vector<math::Vector3> norms;
