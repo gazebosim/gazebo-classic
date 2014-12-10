@@ -20,6 +20,7 @@
 
 #include <vector>
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/building/WallSegmentItem.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/util/system.hh"
 
@@ -78,6 +79,14 @@ namespace gazebo
       /// \return Normalized position on parent wall.
       public: double GetPositionOnWall() const;
 
+      /// \brief Set the angle of this item inside its parent wall.
+      /// \param[in] _angleOnWall New angle on wall, either 0 or 180 degrees.
+      public: void SetAngleOnWall(double _angleOnWall);
+
+      /// \brief Get the angle of this item inside its parent wall.
+      /// \return Angle on parent wall in degrees.
+      public: double GetAngleOnWall() const;
+
       /// \brief Show the grabber and rotate handles of the rect item.
       /// \param[in] _show True to draw the handles, and false to hide them.
       public: void ShowHandles(bool _show);
@@ -127,6 +136,9 @@ namespace gazebo
       /// \brief Get the bounding box of the rect item.
       /// \return The bounding box of the rect item.
       protected: virtual QRectF boundingRect() const;
+
+      /// \brief Update this item's measures.
+      protected: void UpdateMeasures();
 
       /// \brief Filter Qt events and redirect them to the rotate handle.
       /// \param[in] _rotateHandle Rotate handle that will handle the event.
@@ -252,6 +264,14 @@ namespace gazebo
       /// \brief Qt action for deleting the item.
       protected: QAction *deleteItemAct;
 
+      /// \brief A vector containing this item's measure items.
+      /// Currently only used for windows and doors, containing one measure
+      /// towards each end of this item's parent wall.
+      protected: std::vector<MeasureItem *> measures;
+
+      /// \brief Scale for converting from pixel to metric units.
+      protected: double scale;
+
       /// \brief Mouse press position in pixel coordinates.
       private: QPointF mousePressPos;
 
@@ -278,6 +298,9 @@ namespace gazebo
       /// \brief Normalized position with respect to the wall segment's start
       /// point.
       private: double positionOnWall;
+
+      /// \brief Angle with respect to parent wall, either 0 or 180 degrees.
+      private: double angleOnWall;
     };
     /// \}
   }
