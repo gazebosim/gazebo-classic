@@ -360,18 +360,7 @@ void ModelCreator::RemovePart(const std::string &_partName)
   if (!part)
     return;
 
-  // Deselect part
-  if (!this->selectedVisuals.empty())
-  {
-    std::vector<rendering::VisualPtr>::iterator it =
-        std::find(this->selectedVisuals.begin(),
-        this->selectedVisuals.end(), part->partVisual);
-    if (it != this->selectedVisuals.end())
-    {
-      part->partVisual->SetHighlighted(false);
-      this->selectedVisuals.erase(it);
-    }
-  }
+  this->DeselectAll();
 
   rendering::ScenePtr scene = part->partVisual->GetScene();
   for (unsigned int i = 0; i < part->visuals.size(); ++i)
@@ -563,13 +552,6 @@ void ModelCreator::Stop()
 /////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
 {
-  // check if it's our model
-  if (_entity == this->modelName)
-  {
-    this->Reset();
-    return;
-  }
-
   // if it's a link
   if (this->allParts.find(_entity) != this->allParts.end())
   {
@@ -648,6 +630,10 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
     if (this->allParts.find(vis->GetParent()->GetName()) ==
           this->allParts.end())
     {
+      // Handle snap from GLWidget
+      if (g_snapAct->isChecked())
+        return false;
+
       // Prevent interaction with other models, send event only to
       // user camera
       userCamera->HandleMouseEvent(_event);
@@ -691,6 +677,10 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     if (this->allParts.find(vis->GetParent()->GetName()) !=
         this->allParts.end())
     {
+      // Handle snap from GLWidget
+      if (g_snapAct->isChecked())
+        return false;
+
       // Not in multi-selection mode.
       if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
       {
@@ -792,9 +782,7 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
   if (this->allParts.find(vis->GetParent()->GetName()) !=
       this->allParts.end())
   {
-// DeselectAll
-//   if (this->selectedVis)
-//     this->selectedVis->SetHighlighted(false);
+    this->DeselectAll();
 
     // TODO open inspector.
     return true;
