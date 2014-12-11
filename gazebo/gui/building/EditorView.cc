@@ -519,7 +519,12 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::leaveEvent(QEvent */*_event*/)
 {
-  this->mouseTooltip->setVisible(false);
+  if (this->mouseTooltip &&
+      this->scene()->items().contains(this->mouseTooltip) &&
+      this->mouseTooltip->isVisible())
+  {
+    this->mouseTooltip->setVisible(false);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -546,7 +551,8 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
   }
   else if (_event->key() == Qt::Key_Escape)
   {
-    this->mouseTooltip->setVisible(false);
+    if (this->mouseTooltip && this->mouseTooltip->isVisible())
+      this->mouseTooltip->setVisible(false);
     this->CancelDrawMode();
     gui::editor::Events::createBuildingEditorItem(std::string());
     this->releaseKeyboard();

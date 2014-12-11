@@ -733,7 +733,7 @@ void BuildingMaker::SaveToSDF(const std::string &_savePath)
 void BuildingMaker::FinishModel()
 {
   this->CreateTheEntity();
-  //this->Stop();
+  // this->Stop();
   this->Reset();
 }
 
