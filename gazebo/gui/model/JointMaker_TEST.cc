@@ -50,9 +50,9 @@ void JointMaker_TEST::JointState()
 /////////////////////////////////////////////////
 void JointMaker_TEST::CreateRemoveJoint()
 {
-  // FIXME Test passes but segfaults when QTestFixture cleansup
+  // FIXME Test passes but segfaults when QTestFixture clean up
   // Problem: JointMaker's destructor resets visual shared_ptrs
-  // but this later causes a segfault in Visual's desctructor on exiting the
+  // but this later causes a segfault in Visual's destructor when exiting the
   // program.
 
   this->resMaxPercentChange = 5.0;
