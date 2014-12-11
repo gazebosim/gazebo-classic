@@ -15,11 +15,11 @@
  *
 */
 
+#include "gazebo/math/Angle.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/WallInspectorDialog.hh"
-#include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/WallSegmentItem.hh"
 
 using namespace gazebo;
@@ -30,7 +30,11 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
     const double _height) : SegmentItem(), BuildingItem()
 {
   this->editorType = "WallSegment";
-  this->scale = BuildingMaker::conversionScale;
+
+  this->measure = new MeasureItem(this->GetStartPoint(),
+                                  this->GetEndPoint());
+  this->measure->setParentItem(this);
+  this->SegmentUpdated();
 
   this->level = 0;
 
@@ -121,11 +125,29 @@ void WallSegmentItem::UpdateInspector()
   QPointF endPos = segmentEndPoint * this->scale;
   endPos.setY(-endPos.y());
   this->inspector->SetEndPosition(endPos);
+  this->inspector->SetColor(this->visual3dColor);
+  this->inspector->SetTexture(this->visual3dTexture);
 }
 
 /////////////////////////////////////////////////
 void WallSegmentItem::SegmentUpdated()
 {
+  // distance in px between wall and measure line
+  double d = 20;
+  double t = this->GetThickness()/2;
+
+  QPointF p1 = this->GetStartPoint();
+  QPointF p2 = this->GetEndPoint();
+  double angle = GZ_DTOR(this->line().angle());
+
+  this->measure->SetStartPoint(
+      QPointF(p1.x()+(d+t)*qCos(angle+M_PI/2.0)+t*qCos(angle+M_PI),
+              p1.y()-(d+t)*qSin(angle+M_PI/2.0)-t*qSin(angle+M_PI)));
+  this->measure->SetEndPoint(
+      QPointF(p2.x()+(d+t)*qCos(angle+M_PI/2.0)-t*qCos(angle+M_PI),
+              p2.y()-(d+t)*qSin(angle+M_PI/2.0)+t*qSin(angle+M_PI)));
+  this->measure->SetValue((this->line().length()+2*t)*this->scale);
+
   // Doors, windows...
   QList<QGraphicsItem *> children = this->childItems();
   for (int j = 0; j < children.size(); ++j)
@@ -135,7 +157,7 @@ void WallSegmentItem::SegmentUpdated()
     RectItem *rectItem = dynamic_cast<RectItem *>(children[j]);
     if (rectItem)
     {
-      rectItem->SetRotation(-this->line().angle());
+      rectItem->SetRotation(-this->line().angle() + rectItem->GetAngleOnWall());
       QPointF segLine = this->line().p2() - this->line().p1();
       rectItem->setPos(this->line().p1() + rectItem->GetPositionOnWall()*
           segLine);
@@ -174,21 +196,30 @@ QVariant WallSegmentItem::itemChange(GraphicsItemChange _change,
 {
   if (_change == QGraphicsItem::ItemSelectedChange && this->scene())
   {
-    if (_value.toBool())
-    {
-      this->ShowHandles(true);
-      this->setZValue(5);
-      this->SetColor(QColor(247, 142, 30));
-    }
-    else
-    {
-      this->ShowHandles(false);
-      this->setZValue(0);
-      this->SetColor(Qt::black);
-    }
-    this->WallSegmentChanged();
+    this->SetHighlighted(_value.toBool());
   }
   return QGraphicsItem::itemChange(_change, _value);
+}
+
+/////////////////////////////////////////////////
+void WallSegmentItem::SetHighlighted(bool _highlighted)
+{
+  if (_highlighted)
+  {
+    this->ShowHandles(true);
+    this->measure->setVisible(true);
+    this->setZValue(5);
+    this->SetColor(QColor(247, 142, 30));
+    this->Set3dTransparency(0.0);
+  }
+  else
+  {
+    this->ShowHandles(false);
+    this->measure->setVisible(false);
+    this->setZValue(0);
+    this->SetColor(Qt::black);
+    this->Set3dTransparency(0.4);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -201,6 +232,8 @@ void WallSegmentItem::OnApply()
   this->wallThickness = dialog->GetThickness() / this->scale;
   this->SetThickness(this->wallThickness);
   this->wallHeight = dialog->GetHeight() / this->scale;
+  this->Set3dTexture(dialog->GetTexture());
+  this->Set3dColor(dialog->GetColor());
   this->WallSegmentChanged();
 
   double newLength = dialog->GetLength() / this->scale;

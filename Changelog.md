@@ -1,14 +1,21 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.0.0
+1. Added a events::Event::resetWorld event that is triggered when World::Reset is called.
+    * [Pull request #1332](https://bitbucket.org/osrf/gazebo/pull-request/1332)
+    * [Issue #1375](https://bitbucket.org/osrf/gazebo/issue/1375)
+ 
+1. Fixed `math::Box::GetCenter` functionality.
+    * [Pull request #1278](https://bitbucket.org/osrf/gazebo/pull-request/1278)
+    * [Issue #1327](https://bitbucket.org/osrf/gazebo/issue/1327)
 
-1. Added a GUI timer plugin that facilitates the display and control a timer inside the Gazebo UI. 
+1. Added a GUI timer plugin that facilitates the display and control a timer inside the Gazebo UI.
     * [Pull request #1270](https://bitbucket.org/osrf/gazebo/pull-request/1270)
 
-1. Added ability to load plugins via SDF. 
+1. Added ability to load plugins via SDF.
     * [Pull request #1261](https://bitbucket.org/osrf/gazebo/pull-request/1261)
 
-1. Added GUIEvent to hide/show the left GUI pane. 
+1. Added GUIEvent to hide/show the left GUI pane.
     * [Pull request #1269](https://bitbucket.org/osrf/gazebo/pull-request/1269)
 
 1. Modified KeyEventHandler and GLWidget so that hotkeys can be suppressed by custom KeyEvents set up by developers
@@ -42,20 +49,119 @@
 1. Added RenderWidget::ShowToolbar to toggle visibility of top toolbar.
   * [Pull request #1248](https://bitbucket.org/osrf/gazebo/pull-request/1248)
 
+1. Fix joint axis visualization.
+  * [Pull request #1258](https://bitbucket.org/osrf/gazebo/pull-request/1258)
+
 1. Change UserCamera view control via joysticks. Clean up rate control vs. pose control.
    see UserCamera::OnJoyPose and UserCamera::OnJoyTwist. Added view twist control toggle
    with joystick button 1.
   * [Pull request #1249](https://bitbucket.org/osrf/gazebo/pull-request/1249)
-  
+
 1. Added RenderWidget::GetToolbar to get the top toolbar and change its actions on ModelEditor.
     * [Pull request #1263](https://bitbucket.org/osrf/gazebo/pull-request/1263)
 
 1. Added accessor for MainWindow graphical widget to GuiIface.
     * [Pull request #1250](https://bitbucket.org/osrf/gazebo/pull-request/1250)
 
+1. Added a ConfigWidget class that takes in a google protobuf message and generates widgets for configuring the fields in the message
+    * [Pull request #1285](https://bitbucket.org/osrf/gazebo/pull-request/1285)
+
+1. Added GLWidget::OnModelEditor when model editor is triggered, and MainWindow::OnEditorGroup to manually uncheck editor actions.
+    * [Pull request #1283](https://bitbucket.org/osrf/gazebo/pull-request/1283)
+
+1. Added Collision, Geometry, Inertial, Surface Msg-to-SDF conversion functions.
+    * [Pull request #1315](https://bitbucket.org/osrf/gazebo/pull-request/1315)
+
+1. Added "button modifier" fields (control, shift, and alt) to common::KeyEvent.
+    * [Pull request #1325](https://bitbucket.org/osrf/gazebo/pull-request/1325)
+
+1. Building editor updates
+    1. Fixed inspector resizing.
+        * [Pull request #1230](https://bitbucket.org/osrf/gazebo/pull-request/1230)
+        * [Issue #395](https://bitbucket.org/osrf/gazebo/issue/395)
+
+    1. Doors and windows move proportionally with wall.
+        * [Pull request #1231](https://bitbucket.org/osrf/gazebo/pull-request/1231)
+        * [Issue #368](https://bitbucket.org/osrf/gazebo/issue/368)
+
+    1. Inspector dialogs stay on top.
+        * [Pull request #1229](https://bitbucket.org/osrf/gazebo/pull-request/1229)
+        * [Issue #417](https://bitbucket.org/osrf/gazebo/issue/417)
+
+    1. Make model name editable on palette.
+        * [Pull request #1239](https://bitbucket.org/osrf/gazebo/pull-request/1239)
+
+    1. Import background image and improve add/delete levels.
+        * [Pull request #1214](https://bitbucket.org/osrf/gazebo/pull-request/1214)
+        * [Issue #422](https://bitbucket.org/osrf/gazebo/issue/422)
+        * [Issue #361](https://bitbucket.org/osrf/gazebo/issue/361)
+
+    1. Fix changing draw mode.
+        * [Pull request #1233](https://bitbucket.org/osrf/gazebo/pull-request/1233)
+        * [Issue #405](https://bitbucket.org/osrf/gazebo/issue/405)
+
+    1. Tips on palette's top-right corner.
+        * [Pull request #1241](https://bitbucket.org/osrf/gazebo/pull-request/1241)
+
+    1. New buttons and layout for the palette.
+        * [Pull request #1242](https://bitbucket.org/osrf/gazebo/pull-request/1242)
+
+    1. Individual wall segments instead of polylines.
+        * [Pull request #1246](https://bitbucket.org/osrf/gazebo/pull-request/1246)
+        * [Issue #389](https://bitbucket.org/osrf/gazebo/issue/389)
+        * [Issue #415](https://bitbucket.org/osrf/gazebo/issue/415)
+
+    1. Fix exiting and saving, exiting when there's nothing drawn, fix text on popups.
+        * [Pull request #1296](https://bitbucket.org/osrf/gazebo/pull-request/1296)
+
+    1. Display measure for selected wall segment.
+        * [Pull request #1291](https://bitbucket.org/osrf/gazebo/pull-request/1291)
+        * [Issue #366](https://bitbucket.org/osrf/gazebo/issue/366)
+
+    1. Highlight selected item's 3D visual.
+        * [Pull request #1292](https://bitbucket.org/osrf/gazebo/pull-request/1292)
+
+    1. Added color picker to inspector dialogs.
+        * [Pull request #1298](https://bitbucket.org/osrf/gazebo/pull-request/1298)
+
+    1. Snapping on by default, off holding Shift. Improved snapping.
+        * [Pull request #1304](https://bitbucket.org/osrf/gazebo/pull-request/1304)
+
+    1. Snap walls to length increments, moved scale to SegmentItem and added Get/SetScale, added SegmentItem::SnapAngle and SegmentItem::SnapLength.
+        * [Pull request #1311](https://bitbucket.org/osrf/gazebo/pull-request/1311)
+
+    1. Added EditorItem::SetHighlighted.
+        * [Pull request #1308](https://bitbucket.org/osrf/gazebo/pull-request/1308)
+
+    1. Current level is transparent, lower levels opaque, higher levels invisible.
+        * [Pull request #1303](https://bitbucket.org/osrf/gazebo/pull-request/1303)
+
+    1. Detach all child manips when item is deleted, added BuildingMaker::DetachAllChildren.
+        * [Pull request #1316](https://bitbucket.org/osrf/gazebo/pull-request/1316)
+
+    1. Enabled multi-selection and align tool inside model editor.
+        * [Pull request #1302](https://bitbucket.org/osrf/gazebo/pull-request/1302)
+        * [Issue #1323](https://bitbucket.org/osrf/gazebo/issue/1323)
+
+    1. Added texture picker to inspector dialogs.
+        * [Pull request #1306](https://bitbucket.org/osrf/gazebo/pull-request/1306)
+
+    1. Measures for doors and windows. Added RectItem::angleOnWall and related Get/Set.
+        * [Pull request #1322](https://bitbucket.org/osrf/gazebo/pull-request/1322)
+        * [Issue #370](https://bitbucket.org/osrf/gazebo/issue/370)
+
+1. Model editor updates
+    1. Fix adding/removing event filters .
+        * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
+
+    1. Implemented copy/pasting of links.
+        * [Pull request #1330](https://bitbucket.org/osrf/gazebo/pull-request/1330)
+
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
+
+### Gazebo 4.1.0 (2014-11-20)
 
 1. Add ArrangePlugin for arranging groups of models.
    Also add Model::ResetPhysicsStates to call Link::ResetPhysicsStates
@@ -72,6 +178,10 @@
     * [Pull request #1255](https://bitbucket.org/osrf/gazebo/pull-request/1255)
 1. Added ConvertJointType functions, display more joint info on model list.
     * [Pull request #1259](https://bitbucket.org/osrf/gazebo/pull-request/1259)
+1. Added ModelListWidget::AddProperty, removed unnecessary checks on ModelListWidget.
+    * [Pull request #1271](https://bitbucket.org/osrf/gazebo/pull-request/1271)
+1. Fix loading collada meshes with unsupported input semantics.
+    * [Pull request #1319](https://bitbucket.org/osrf/gazebo/pull-request/1319)
 
 ### Gazebo 4.0.2 (2014-09-23)
 
@@ -176,6 +286,8 @@
 
 1. Fixed sonar and wireless sensor visualization
     * [Pull request #1254](https://bitbucket.org/osrf/gazebo/pull-request/1254)
+1. Update visual bounding box when model is selected
+    * [Pull request #1280](https://bitbucket.org/osrf/gazebo/pull-request/1280)
 
 ### Gazebo 3.1.0 (2014-08-08)
 

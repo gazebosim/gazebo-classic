@@ -23,6 +23,7 @@ set (sources
   AlignWidget.cc
   BoxMaker.cc
   CloneWindow.cc
+  ConfigWidget.cc
   CylinderMaker.cc
   DataLogger.cc
   Editor.cc
@@ -57,6 +58,7 @@ set (qt_headers
   Actions.hh
   AlignWidget.hh
   CloneWindow.hh
+  ConfigWidget.hh
   DataLogger.hh
   Editor.hh
   GLWidget.hh
@@ -126,6 +128,8 @@ if (ENABLE_SCREEN_TESTS)
   set (qt_tests
       ${qt_tests}
       BuildingEditor_TEST.cc
+      ConfigWidget_TEST.cc
+      GLWidget_TEST.cc
       MainWindow_TEST.cc
       ModelListWidget_TEST.cc
       ModelSnap_TEST.cc)

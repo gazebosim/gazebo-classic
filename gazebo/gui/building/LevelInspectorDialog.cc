@@ -25,10 +25,63 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("levelInspectorDialog");
   this->setWindowTitle(tr("Level Inspector"));
+  this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   QLabel *levelLabel = new QLabel(tr("Level Name: "));
   this->levelNameLineEdit = new QLineEdit;
   this->levelNameLineEdit->setPlaceholderText(tr("Level X"));
+
+  QLabel *floorColorLabel = new QLabel(tr("Floor Color: "));
+  this->floorColorComboBox = new QComboBox;
+  this->floorColorComboBox->setIconSize(QSize(15, 15));
+  this->floorColorComboBox->setMinimumWidth(50);
+  this->floorColorComboBox->setSizePolicy(QSizePolicy::Fixed,
+      QSizePolicy::Fixed);
+  QPixmap floorColorIcon(15, 15);
+  this->floorColorList.push_back(QColor(255, 255, 255, 255));
+  this->floorColorList.push_back(QColor(194, 169, 160, 255));
+  this->floorColorList.push_back(QColor(235, 206, 157, 255));
+  this->floorColorList.push_back(QColor(254, 121,   5, 255));
+  this->floorColorList.push_back(QColor(255, 195,  78, 255));
+  this->floorColorList.push_back(QColor(111, 203, 172, 255));
+  for (unsigned int i = 0; i < this->floorColorList.size(); ++i)
+  {
+    floorColorIcon.fill(this->floorColorList.at(i));
+    this->floorColorComboBox->addItem(floorColorIcon, QString(""));
+  }
+
+  QHBoxLayout *floorColorLayout = new QHBoxLayout;
+  floorColorLayout->addWidget(floorColorLabel);
+  floorColorLayout->addWidget(floorColorComboBox);
+
+  QLabel *floorTextureLabel = new QLabel(tr("Floor Texture: "));
+  this->floorTextureComboBox = new QComboBox;
+  this->floorTextureComboBox->setIconSize(QSize(30, 30));
+  this->floorTextureComboBox->setMinimumWidth(50);
+  this->floorTextureComboBox->setMinimumHeight(50);
+  this->floorTextureComboBox->setSizePolicy(QSizePolicy::Fixed,
+      QSizePolicy::Fixed);
+  this->floorTextureList.push_back(":wood.jpg");
+  this->floorTextureList.push_back(":tiles.jpg");
+  for (unsigned int i = 0; i < this->floorTextureList.size(); ++i)
+  {
+    this->floorTextureComboBox->addItem(QPixmap(this->floorTextureList[i])
+        .scaled(QSize(30, 30), Qt::IgnoreAspectRatio), QString(""));
+  }
+  this->floorTextureComboBox->addItem("X");
+  this->floorTextureComboBox->setCurrentIndex(
+      this->floorTextureComboBox->count()-1);
+
+  QHBoxLayout *floorTextureLayout = new QHBoxLayout;
+  floorTextureLayout->addWidget(floorTextureLabel);
+  floorTextureLayout->addWidget(floorTextureComboBox);
+
+  QVBoxLayout *floorLayout = new QVBoxLayout;
+  floorLayout->addLayout(floorColorLayout);
+  floorLayout->addLayout(floorTextureLayout);
+
+  this->floorWidget = new QWidget;
+  this->floorWidget->setLayout(floorLayout);
 
   /// TODO add the widgets back in after the functions is implemented
 /*  QLabel *floorThicknessLabel = new QLabel(tr("Floor Thickness: "));
@@ -43,11 +96,7 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
   this->heightSpinBox->setRange(-1000, 1000);
   this->heightSpinBox->setSingleStep(0.001);
   this->heightSpinBox->setDecimals(3);
-  this->heightSpinBox->setValue(0.000);
-
-  QLabel *materialLabel = new QLabel(tr("Floor Material: "));
-  this->materialComboBox = new QComboBox;
-  this->materialComboBox->addItem(QString("Hardwood"));*/
+  this->heightSpinBox->setValue(0.000);*/
 
   QGridLayout *levelLayout = new QGridLayout;
   levelLayout->addWidget(levelLabel, 0, 0);
@@ -55,9 +104,7 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
 /*  levelLayout->addWidget(floorThicknessLabel, 1, 0);
   levelLayout->addWidget(this->floorThicknessSpinBox, 1, 1);
   levelLayout->addWidget(heightLabel, 2, 0);
-  levelLayout->addWidget(this->heightSpinBox, 2, 1);
-  levelLayout->addWidget(materialLabel, 3, 0);
-  levelLayout->addWidget(this->materialComboBox, 3, 1);*/
+  levelLayout->addWidget(this->heightSpinBox, 2, 1);*/
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
@@ -74,9 +121,11 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(levelLayout);
+  mainLayout->addWidget(this->floorWidget);
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 /////////////////////////////////////////////////
@@ -97,6 +146,26 @@ double LevelInspectorDialog::GetHeight() const
 }
 
 /////////////////////////////////////////////////
+QColor LevelInspectorDialog::GetFloorColor() const
+{
+  return this->floorColorList[this->floorColorComboBox->currentIndex()];
+}
+
+/////////////////////////////////////////////////
+QString LevelInspectorDialog::GetFloorTexture() const
+{
+  QString floorTexture = QString("");
+  if (this->floorTextureComboBox->currentIndex() != -1 &&
+      this->floorTextureComboBox->currentIndex() <
+      this->floorTextureComboBox->count() - 1)
+  {
+    floorTexture = this->floorTextureList[
+        this->floorTextureComboBox->currentIndex()];
+  }
+  return floorTexture;
+}
+
+/////////////////////////////////////////////////
 void LevelInspectorDialog::SetLevelName(const std::string &_levelName)
 {
   this->levelNameLineEdit->setText(QString(_levelName.c_str()));
@@ -107,6 +176,38 @@ void LevelInspectorDialog::SetLevelName(const std::string &_levelName)
 void LevelInspectorDialog::SetHeight(double _height)
 {
   this->heightSpinBox->setValue(_height);
+}
+
+/////////////////////////////////////////////////
+void LevelInspectorDialog::SetFloorColor(const QColor _color)
+{
+  // Find index corresponding to color (only a few colors allowed so far)
+  int index = 0;
+  for (unsigned int i = 0; i < this->floorColorList.size(); ++i)
+  {
+    if (this->floorColorList[i] == _color)
+    {
+      index = i;
+      break;
+    }
+  }
+  this->floorColorComboBox->setCurrentIndex(index);
+}
+
+/////////////////////////////////////////////////
+void LevelInspectorDialog::SetFloorTexture(QString _floorTexture)
+{
+  // Find index corresponding to texture (only a few textures allowed so far)
+  int index = this->floorTextureComboBox->count()-1;
+  for (unsigned int i = 0; i < this->floorTextureList.size(); ++i)
+  {
+    if (this->floorTextureList[i] == _floorTexture)
+    {
+      index = i;
+      break;
+    }
+  }
+  this->floorTextureComboBox->setCurrentIndex(index);
 }
 
 /////////////////////////////////////////////////

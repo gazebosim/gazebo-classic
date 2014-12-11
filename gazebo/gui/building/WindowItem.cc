@@ -48,6 +48,7 @@ WindowItem::WindowItem(): RectItem(), BuildingItem()
   this->drawingHeight = this->height;
 
   this->UpdateCornerPositions();
+  this->UpdateMeasures();
 
   this->zValueIdle = 3;
   this->setZValue(this->zValueIdle);
