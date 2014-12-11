@@ -294,20 +294,26 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     }
   }
 
-  this->mouseEvent.control =
+  this->keyEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;
-  this->mouseEvent.shift =
+  this->keyEvent.shift =
     this->keyModifiers & Qt::ShiftModifier ? true : false;
-  this->mouseEvent.alt =
+  this->keyEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
+
+  this->mouseEvent.control = this->keyEvent.control;
+  this->mouseEvent.shift = this->keyEvent.shift;
+  this->mouseEvent.alt = this->keyEvent.alt;
 
   if (this->mouseEvent.control)
   {
-    if (_event->key() == Qt::Key_C && !this->selectedVisuals.empty())
+    if (_event->key() == Qt::Key_C && !this->selectedVisuals.empty()
+       && !this->modelEditorEnabled)
     {
       g_copyAct->trigger();
     }
-    else if (_event->key() == Qt::Key_V && !this->copyEntityName.empty())
+    else if (_event->key() == Qt::Key_V && !this->copyEntityName.empty()
+       && !this->modelEditorEnabled)
     {
       g_pasteAct->trigger();
     }
@@ -354,13 +360,16 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
       g_arrowAct->trigger();
   }
 
-  this->mouseEvent.control =
+  this->keyEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;
-  this->mouseEvent.shift =
+  this->keyEvent.shift =
     this->keyModifiers & Qt::ShiftModifier ? true : false;
-  this->mouseEvent.alt =
+  this->keyEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
 
+  this->mouseEvent.control = this->keyEvent.control;
+  this->mouseEvent.shift = this->keyEvent.shift;
+  this->mouseEvent.alt = this->keyEvent.alt;
 
   ModelManipulator::Instance()->OnKeyReleaseEvent(this->keyEvent);
   this->keyText = "";
@@ -988,14 +997,17 @@ void GLWidget::OnManipMode(const std::string &_mode)
 /////////////////////////////////////////////////
 void GLWidget::OnCopy()
 {
-  if (!this->selectedVisuals.empty())
+  if (!this->selectedVisuals.empty() && !this->modelEditorEnabled)
+  {
     this->Copy(this->selectedVisuals.back()->GetName());
+  }
 }
 
 /////////////////////////////////////////////////
 void GLWidget::OnPaste()
 {
-  this->Paste(this->copyEntityName);
+  if (!this->modelEditorEnabled)
+    this->Paste(this->copyEntityName);
 }
 
 /////////////////////////////////////////////////
@@ -1144,8 +1156,9 @@ void GLWidget::OnAlignMode(const std::string &_axis, const std::string &_config,
 }
 
 /////////////////////////////////////////////////
-void GLWidget::OnModelEditor(bool /*_checked*/)
+void GLWidget::OnModelEditor(bool _checked)
 {
+  this->modelEditorEnabled = _checked;
   g_arrowAct->trigger();
   event::Events::setSelectedEntity("", "normal");
 

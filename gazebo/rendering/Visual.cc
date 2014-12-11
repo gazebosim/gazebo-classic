@@ -1393,7 +1393,7 @@ void Visual::SetTransparency(float _trans)
   {
     (*iter)->SetTransparency(_trans);
   }
-  
+
   this->SetTransparencyInnerLoop();
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
