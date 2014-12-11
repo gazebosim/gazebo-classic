@@ -2,6 +2,7 @@ set (files
   actor.world
   arat.world
   blank.world
+  cafe.world
   camera.world
   cart_demo.world
   contact.world
