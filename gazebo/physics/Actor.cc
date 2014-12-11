@@ -296,7 +296,8 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
       trajSdf = trajSdf->GetNextElement("trajectory");
     }
   }
-  double scriptTime = 0.0;
+  this->scriptTime = 0.0;
+  //double scriptTime = 0.0;
   if (!this->skelAnimation.empty())
   {
     if (this->trajInfo.empty())
@@ -447,7 +448,7 @@ void Actor::Update()
   if ((currentTime - this->prevFrameTime).Double() < (1.0 / 20.0))
     return;
 
-  double scriptTime = currentTime.Double() - this->startDelay -
+  /*double scriptTime = currentTime.Double() - this->startDelay -
             this->playStartTime.Double();
 
   /// waiting for delayed start
@@ -463,20 +464,22 @@ void Actor::Update()
       scriptTime = scriptTime - this->scriptLength;
       this->playStartTime = currentTime - scriptTime;
     }
-  }
+  }*/
 
   /// at this point we are certain that a new frame will be animated
   this->prevFrameTime = currentTime;
 
   TrajectoryInfo tinfo;
 
-  for (unsigned int i = 0; i < this->trajInfo.size(); i++)
+  /*for (unsigned int i = 0; i < this->trajInfo.size(); i++)
+  {
     if (this->trajInfo[i].startTime <= scriptTime &&
           this->trajInfo[i].endTime >= scriptTime)
     {
       tinfo = this->trajInfo[i];
       break;
     }
+  }*/
 
   //scriptTime = scriptTime - tinfo.startTime;
 
@@ -489,7 +492,7 @@ void Actor::Update()
   {
     std::map<std::string, std::string> skelMap = this->skelNodesMap[tinfo.type];
 
-    math::Pose modelPose;// = this->GetWorldPose();
+    math::Pose modelPose;
     std::map<std::string, math::Matrix4> frame;
     /*if (this->trajectories.find(tinfo.id) != this->trajectories.end())
     {
@@ -521,7 +524,7 @@ void Actor::Update()
     }
     else
     {*/
-      frame = skelAnim->GetPoseAt(scriptTime*3.5);
+      frame = skelAnim->GetPoseAt(this->scriptTime);
     //}
 
     this->lastTraj = tinfo.id;
@@ -733,4 +736,16 @@ TrajectoryInfo::TrajectoryInfo()
   : id(0), type(""), duration(0.0), startTime(0.0), endTime(0.0),
   translated(false)
 {
+}
+
+//////////////////////////////////////////////////
+void Actor::SetScriptTime(const double _time)
+{
+  this->scriptTime = _time;
+}
+
+//////////////////////////////////////////////////
+double Actor::GetScriptTime() const
+{
+  return this->scriptTime;
 }

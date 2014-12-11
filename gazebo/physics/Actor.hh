@@ -107,6 +107,10 @@ namespace gazebo
       /// \return Pointer to the SDF values.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      public: void SetScriptTime(const double _time);
+
+      public: double GetScriptTime() const;
+
       /// \brief Add inertia for a sphere.
       /// \param[in] _linkSdf The link to add the inertia to.
       /// \param[in] _pose Pose of the inertia.
@@ -253,6 +257,8 @@ namespace gazebo
 
       /// \brief THe old action.
       protected: std::string oldAction;
+
+      private: double scriptTime;
     };
     /// \}
   }
