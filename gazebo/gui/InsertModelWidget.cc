@@ -195,6 +195,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   if (accessStatus < 0)
   {
     gzlog << "Permission denied for path " << _path << std::endl;
+    return;
   }
 
   boost::filesystem::path dir(_path);
@@ -236,6 +237,14 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
       boost::filesystem::path fullPath = _path / dIter->filename();
       boost::filesystem::path manifest = fullPath;
 
+      accessStatus = access(fullPath.string().c_str(), R_OK);
+      if (accessStatus < 0)
+      {
+        gzlog << "Permission denied for path "
+              << fullPath.string() << std::endl;
+        return;
+      }
+
       if (!boost::filesystem::is_directory(fullPath))
       {
         if (dIter->filename() != "database.config")
@@ -264,6 +273,13 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
         continue;
       }
 
+      accessStatus = access(manifest.string().c_str(), R_OK);
+      if (accessStatus < 0)
+      {
+        gzlog << "Permission denied for path "
+              << manifest.string() << std::endl;
+        return;
+      }
       TiXmlDocument xmlDoc;
       if (xmlDoc.LoadFile(manifest.string()))
       {
