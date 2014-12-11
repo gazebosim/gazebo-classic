@@ -242,7 +242,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
       {
         gzlog << "Permission denied for path "
               << fullPath.string() << std::endl;
-        return;
+        continue;
       }
 
       if (!boost::filesystem::is_directory(fullPath))
@@ -278,7 +278,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
       {
         gzlog << "Permission denied for path "
               << manifest.string() << std::endl;
-        return;
+        continue;
       }
       TiXmlDocument xmlDoc;
       if (xmlDoc.LoadFile(manifest.string()))
