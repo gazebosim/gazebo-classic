@@ -522,8 +522,12 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::leaveEvent(QEvent */*_event*/)
 {
-  if (this->mouseTooltip && this->mouseTooltip->isVisible())
+  if (this->mouseTooltip &&
+      this->scene()->items().contains(this->mouseTooltip) &&
+      this->mouseTooltip->isVisible())
+  {
     this->mouseTooltip->setVisible(false);
+  }
 }
 
 /////////////////////////////////////////////////
