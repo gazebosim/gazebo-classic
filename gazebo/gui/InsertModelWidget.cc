@@ -184,12 +184,6 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   if (_path.empty())
     return;
 
-  QString qpath = QString::fromStdString(_path);
-  QTreeWidgetItem *topItem = NULL;
-
-  QList<QTreeWidgetItem *> matchList =
-    this->dataPtr->fileTreeWidget->findItems(qpath, Qt::MatchExactly);
-
   // Unix only: check permissions on this directory
   int accessStatus = access(_path.c_str(), R_OK);
   if (accessStatus < 0)
@@ -198,8 +192,13 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
     return;
   }
 
+  QString qpath = QString::fromStdString(_path);
+  QTreeWidgetItem *topItem = NULL;
+
+  QList<QTreeWidgetItem *> matchList =
+    this->dataPtr->fileTreeWidget->findItems(qpath, Qt::MatchExactly);
+
   boost::filesystem::path dir(_path);
-  
 
   // Create a top-level tree item for the path
   if (matchList.empty())
