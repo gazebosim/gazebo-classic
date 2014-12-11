@@ -50,6 +50,11 @@ void JointMaker_TEST::JointState()
 /////////////////////////////////////////////////
 void JointMaker_TEST::CreateRemoveJoint()
 {
+  // FIXME Test passes but segfaults when QTestFixture cleansup
+  // Problem: JointMaker's destructor resets visual shared_ptrs
+  // but this later causes a segfault in Visual's desctructor on exiting the
+  // program.
+
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
@@ -108,23 +113,23 @@ void JointMaker_TEST::CreateRemoveJoint()
   QCOMPARE(jointMaker->GetJointCount(), 3u);
 
   // Remove the screw joint
-  /*jointMaker->RemoveJoint(screwJointData->hotspot->GetName());
-  QCOMPARE(jointMaker->GetJointCount(), 2u);*/
+  jointMaker->RemoveJoint(screwJointData->hotspot->GetName());
+  QCOMPARE(jointMaker->GetJointCount(), 2u);
 
   // Add a ball joint
   jointMaker->AddJoint(gui::JointMaker::JOINT_BALL);
   gui::JointData *ballJointData =
       jointMaker->CreateJoint(cylinderLink, boxLink);
   jointMaker->CreateHotSpot(ballJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 4u);
+  QCOMPARE(jointMaker->GetJointCount(), 3u);
 
   // Remove the two joints connected to the sphere
-  /*jointMaker->RemoveJointsByPart(sphereLink->GetName());
+  jointMaker->RemoveJointsByPart(sphereLink->GetName());
   QCOMPARE(jointMaker->GetJointCount(), 1u);
 
   // Remove the last joint
   jointMaker->RemoveJoint(ballJointData->hotspot->GetName());
-  QCOMPARE(jointMaker->GetJointCount(), 0u);*/
+  QCOMPARE(jointMaker->GetJointCount(), 0u);
 
   // delete jointMaker;
   mainWindow->close();
