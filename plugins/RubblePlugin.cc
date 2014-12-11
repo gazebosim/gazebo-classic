@@ -372,7 +372,7 @@ void RubblePlugin::MakeCompound(const std::string &_name, CompoundObj &_obj)
                << "<iyz>" << 0.0 << "</iyz>"
                << "</inertial>";
 
-    newModelStr << inertiaStr;
+    newModelStr << inertiaStr.str();
 
     newModelStr << "    <collision name ='collision_" << i << "'>"
                 << "      <pose>" << (*iter).pose << "</pose>"
