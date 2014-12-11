@@ -862,3 +862,352 @@ TEST_F(MsgsTest, MeshFromSDF)
   EXPECT_TRUE(msg.has_center_submesh());
   EXPECT_TRUE(msg.center_submesh());
 }
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, LinkToSDF)
+{
+  msgs::Link linkMsg;
+  linkMsg.set_name("test_link");
+  linkMsg.set_self_collide(false);
+  linkMsg.set_gravity(true);
+  linkMsg.set_kinematic(false);
+  msgs::Set(linkMsg.mutable_pose(), math::Pose(math::Vector3(3, 2, 1),
+      math::Quaternion(0.5, -0.5, -0.5, 0.5)));
+
+  // collision - see CollisionToSDF for a more detailed test
+  msgs::Collision *collisionMsg1 = linkMsg.add_collision();
+  collisionMsg1->set_laser_retro(0.4);
+  collisionMsg1->set_max_contacts(100);
+
+  msgs::Collision *collisionMsg2 = linkMsg.add_collision();
+  collisionMsg2->set_laser_retro(0.5);
+  collisionMsg2->set_max_contacts(300);
+
+  // inertial - see InertialToSDF for a more detailed test
+  msgs::Inertial *inertialMsg = linkMsg.mutable_inertial();
+  inertialMsg->set_mass(3.5);
+
+  sdf::ElementPtr linkSDF = msgs::LinkToSDF(linkMsg);
+  EXPECT_STREQ(linkSDF->Get<std::string>("name").c_str(), "test_link");
+  EXPECT_FALSE(linkSDF->Get<bool>("self_collide"));
+  EXPECT_TRUE(linkSDF->Get<bool>("gravity"));
+  EXPECT_FALSE(linkSDF->Get<bool>("kinematic"));
+
+  sdf::ElementPtr collisionElem1 = linkSDF->GetElement("collision");
+  EXPECT_DOUBLE_EQ(collisionElem1->Get<double>("laser_retro"), 0.4);
+  EXPECT_DOUBLE_EQ(collisionElem1->Get<double>("max_contacts"), 100);
+
+  sdf::ElementPtr collisionElem2 = collisionElem1->GetNextElement("collision");
+  EXPECT_DOUBLE_EQ(collisionElem2->Get<double>("laser_retro"), 0.5);
+  EXPECT_DOUBLE_EQ(collisionElem2->Get<double>("max_contacts"), 300);
+
+  sdf::ElementPtr inertialElem = linkSDF->GetElement("inertial");
+  EXPECT_DOUBLE_EQ(inertialElem->Get<double>("mass"), 3.5);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, CollisionToSDF)
+{
+  msgs::Collision collisionMsg;
+  collisionMsg.set_laser_retro(0.2);
+  collisionMsg.set_max_contacts(5);
+  msgs::Set(collisionMsg.mutable_pose(),  math::Pose(math::Vector3(1, 2, 3),
+      math::Quaternion(0, 0, 1, 0)));
+
+  // geometry - see GeometryToSDF for a more detailed test
+  msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
+  geomMsg->set_type(msgs::Geometry::CYLINDER);
+  msgs::CylinderGeom *cylinderMsg = geomMsg->mutable_cylinder();
+  cylinderMsg->set_radius(3.3);
+  cylinderMsg->set_length(1.0);
+
+  // surface - see SurfaceToSDF for a more detailed test
+  msgs::Surface *surfaceMsg = collisionMsg.mutable_surface();
+  surfaceMsg->set_restitution_coefficient(5.1);
+  surfaceMsg->set_bounce_threshold(1300);
+
+  sdf::ElementPtr collisionSDF = msgs::CollisionToSDF(collisionMsg);
+  EXPECT_DOUBLE_EQ(collisionSDF->Get<double>("laser_retro"), 0.2);
+  EXPECT_DOUBLE_EQ(collisionSDF->Get<double>("max_contacts"), 5);
+
+  EXPECT_TRUE(collisionSDF->Get<math::Pose>("pose") ==
+      math::Pose(math::Vector3(1, 2, 3), math::Quaternion(0, 0, 1, 0)));
+
+  sdf::ElementPtr geomElem = collisionSDF->GetElement("geometry");
+  sdf::ElementPtr cylinderElem = geomElem->GetElement("cylinder");
+  EXPECT_DOUBLE_EQ(cylinderElem->Get<double>("radius"), 3.3);
+  EXPECT_DOUBLE_EQ(cylinderElem->Get<double>("length"), 1.0);
+
+  sdf::ElementPtr surfaceElem = collisionSDF->GetElement("surface");
+  sdf::ElementPtr bounceElem = surfaceElem->GetElement("bounce");
+  EXPECT_DOUBLE_EQ(bounceElem->Get<double>("restitution_coefficient"), 5.1);
+  EXPECT_DOUBLE_EQ(bounceElem->Get<double>("threshold"), 1300);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, GeometryToSDF)
+{
+  // box
+  msgs::Geometry boxMsg;
+  boxMsg.set_type(msgs::Geometry::BOX);
+  msgs::BoxGeom *boxGeom = boxMsg.mutable_box();
+  msgs::Set(boxGeom->mutable_size(), math::Vector3(0.5, 0.75, 1.0));
+
+  sdf::ElementPtr boxSDF = msgs::GeometryToSDF(boxMsg);
+  sdf::ElementPtr boxElem = boxSDF->GetElement("box");
+  EXPECT_TRUE(boxElem->Get<math::Vector3>("size") ==
+      math::Vector3(0.5, 0.75, 1.0));
+
+  // cylinder
+  msgs::Geometry cylinderMsg;
+  cylinderMsg.set_type(msgs::Geometry::CYLINDER);
+  msgs::CylinderGeom *cylinderGeom = cylinderMsg.mutable_cylinder();
+  cylinderGeom->set_radius(0.3);
+  cylinderGeom->set_length(1.0);
+
+  sdf::ElementPtr cylinderSDF = msgs::GeometryToSDF(cylinderMsg);
+  sdf::ElementPtr cylinderElem = cylinderSDF->GetElement("cylinder");
+  EXPECT_DOUBLE_EQ(cylinderElem->Get<double>("radius"), 0.3);
+  EXPECT_DOUBLE_EQ(cylinderElem->Get<double>("length"), 1.0);
+
+  // sphere
+  msgs::Geometry sphereMsg;
+  sphereMsg.set_type(msgs::Geometry::SPHERE);
+  msgs::SphereGeom *sphereGeom = sphereMsg.mutable_sphere();
+  sphereGeom->set_radius(3.0);
+
+  sdf::ElementPtr sphereSDF = msgs::GeometryToSDF(sphereMsg);
+  sdf::ElementPtr sphereElem = sphereSDF->GetElement("sphere");
+  EXPECT_DOUBLE_EQ(sphereElem->Get<double>("radius"), 3.0);
+
+  // plane
+  msgs::Geometry planeMsg;
+  planeMsg.set_type(msgs::Geometry::PLANE);
+  msgs::PlaneGeom *planeGeom = planeMsg.mutable_plane();
+  msgs::Set(planeGeom->mutable_normal(), math::Vector3(0, 0, 1.0));
+  msgs::Set(planeGeom->mutable_size(), math::Vector2d(0.5, 0.8));
+
+  sdf::ElementPtr planeSDF = msgs::GeometryToSDF(planeMsg);
+  sdf::ElementPtr planeElem = planeSDF->GetElement("plane");
+  EXPECT_TRUE(planeElem->Get<math::Vector3>("normal") ==
+      math::Vector3(0, 0, 1.0));
+  EXPECT_TRUE(planeElem->Get<math::Vector2d>("size") ==
+      math::Vector2d(0.5, 0.8));
+
+  // image
+  msgs::Geometry imageMsg;
+  imageMsg.set_type(msgs::Geometry::IMAGE);
+  msgs::ImageGeom *imageGeom = imageMsg.mutable_image();
+  imageGeom->set_uri("test_uri");
+  imageGeom->set_scale(1.8);
+  imageGeom->set_threshold(255);
+  imageGeom->set_height(1.3);
+  imageGeom->set_granularity(2);
+
+  sdf::ElementPtr imageSDF = msgs::GeometryToSDF(imageMsg);
+  sdf::ElementPtr imageElem = imageSDF->GetElement("image");
+  EXPECT_STREQ(imageElem->Get<std::string>("uri").c_str(), "test_uri");
+  EXPECT_DOUBLE_EQ(imageElem->Get<double>("scale"), 1.8);
+  EXPECT_DOUBLE_EQ(imageElem->Get<double>("threshold"), 255);
+  EXPECT_DOUBLE_EQ(imageElem->Get<double>("height"), 1.3);
+  EXPECT_DOUBLE_EQ(imageElem->Get<int>("granularity"), 2);
+
+  // heightmap
+  msgs::Geometry heightmapMsg;
+  heightmapMsg.set_type(msgs::Geometry::HEIGHTMAP);
+  msgs::HeightmapGeom *heightmapGeom = heightmapMsg.mutable_heightmap();
+  heightmapGeom->set_filename("test_heightmap_filename");
+  msgs::Set(heightmapGeom->mutable_size(), math::Vector3(100, 200, 30));
+  msgs::Set(heightmapGeom->mutable_origin(), math::Vector3(50, 100, 15));
+  heightmapGeom->set_use_terrain_paging(true);
+
+  msgs::HeightmapGeom_Texture *texture1 = heightmapGeom->add_texture();
+  texture1->set_diffuse("test_diffuse1");
+  texture1->set_normal("test_normal1");
+  texture1->set_size(10);
+
+  msgs::HeightmapGeom_Texture *texture2 = heightmapGeom->add_texture();
+  texture2->set_diffuse("test_diffuse2");
+  texture2->set_normal("test_normal2");
+  texture2->set_size(20);
+
+  msgs::HeightmapGeom_Blend *blend = heightmapGeom->add_blend();
+  blend->set_min_height(25);
+  blend->set_fade_dist(5);
+
+  sdf::ElementPtr heightmapSDF = msgs::GeometryToSDF(heightmapMsg);
+  sdf::ElementPtr heightmapElem = heightmapSDF->GetElement("heightmap");
+  EXPECT_STREQ(heightmapElem->Get<std::string>("uri").c_str(),
+      "test_heightmap_filename");
+  EXPECT_TRUE(heightmapElem->Get<math::Vector3>("size") ==
+      math::Vector3(100, 200, 30));
+  EXPECT_TRUE(heightmapElem->Get<math::Vector3>("pos") ==
+      math::Vector3(50, 100, 15));
+  EXPECT_TRUE(heightmapElem->Get<bool>("use_terrain_paging"));
+
+  sdf::ElementPtr textureElem1 = heightmapElem->GetElement("texture");
+  EXPECT_STREQ(textureElem1->Get<std::string>("diffuse").c_str(),
+      "test_diffuse1");
+  EXPECT_STREQ(textureElem1->Get<std::string>("normal").c_str(),
+      "test_normal1");
+  EXPECT_DOUBLE_EQ(textureElem1->Get<double>("size"), 10);
+  sdf::ElementPtr textureElem2 = textureElem1->GetNextElement("texture");
+  EXPECT_STREQ(textureElem2->Get<std::string>("diffuse").c_str(),
+      "test_diffuse2");
+  EXPECT_STREQ(textureElem2->Get<std::string>("normal").c_str(),
+      "test_normal2");
+  EXPECT_DOUBLE_EQ(textureElem2->Get<double>("size"), 20);
+
+  sdf::ElementPtr blendElem = heightmapElem->GetElement("blend");
+  EXPECT_DOUBLE_EQ(blendElem->Get<double>("min_height"), 25);
+  EXPECT_DOUBLE_EQ(blendElem->Get<double>("fade_dist"), 5);
+
+  // mesh
+  msgs::Geometry meshMsg;
+  meshMsg.set_type(msgs::Geometry::MESH);
+  msgs::MeshGeom *meshGeom = meshMsg.mutable_mesh();
+  meshGeom->set_filename("test_mesh_filename");
+  msgs::Set(meshGeom->mutable_scale(), math::Vector3(2.3, 1.2, 2.9));
+  meshGeom->set_submesh("test_mesh_submesh");
+  meshGeom->set_center_submesh(false);
+
+  sdf::ElementPtr meshSDF = msgs::GeometryToSDF(meshMsg);
+  sdf::ElementPtr meshElem = meshSDF->GetElement("mesh");
+  EXPECT_STREQ(meshElem->Get<std::string>("uri").c_str(),
+      "test_mesh_filename");
+  EXPECT_TRUE(meshElem->Get<math::Vector3>("scale") ==
+      math::Vector3(2.3, 1.2, 2.9));
+  sdf::ElementPtr submeshElem = meshElem->GetElement("submesh");
+  EXPECT_STREQ(submeshElem->Get<std::string>("name").c_str(),
+      "test_mesh_submesh");
+  EXPECT_TRUE(!submeshElem->Get<bool>("center"));
+
+  // polyline
+  msgs::Geometry polylineMsg;
+  polylineMsg.set_type(msgs::Geometry::POLYLINE);
+  msgs::Polyline *polylineGeom = polylineMsg.mutable_polyline();
+  polylineGeom->set_height(2.33);
+  msgs::Set(polylineGeom->add_point(), math::Vector2d(0.5, 0.7));
+  msgs::Set(polylineGeom->add_point(), math::Vector2d(3.5, 4.7));
+  msgs::Set(polylineGeom->add_point(), math::Vector2d(1000, 2000));
+
+  sdf::ElementPtr polylineSDF = msgs::GeometryToSDF(polylineMsg);
+  sdf::ElementPtr polylineElem = polylineSDF->GetElement("polyline");
+  EXPECT_DOUBLE_EQ(polylineElem->Get<double>("height"), 2.33);
+
+  sdf::ElementPtr pointElem1 = polylineElem->GetElement("point");
+  EXPECT_TRUE(pointElem1->Get<math::Vector2d>() == math::Vector2d(0.5, 0.7));
+  sdf::ElementPtr pointElem2 = pointElem1->GetNextElement("point");
+  EXPECT_TRUE(pointElem2->Get<math::Vector2d>() == math::Vector2d(3.5, 4.7));
+  sdf::ElementPtr pointElem3 = pointElem2->GetNextElement("point");
+  EXPECT_TRUE(pointElem3->Get<math::Vector2d>() == math::Vector2d(1000, 2000));
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, MeshToSDF)
+{
+  msgs::MeshGeom msg;
+  msg.set_filename("test_filename");
+  msgs::Set(msg.mutable_scale(), math::Vector3(0.1, 0.2, 0.3));
+  msg.set_submesh("test_submesh");
+  msg.set_center_submesh(true);
+
+  sdf::ElementPtr meshSDF = msgs::MeshToSDF(msg);
+
+  EXPECT_STREQ(meshSDF->Get<std::string>("uri").c_str(), "test_filename");
+  math::Vector3 scale = meshSDF->Get<math::Vector3>("scale");
+  EXPECT_DOUBLE_EQ(scale.x, 0.1);
+  EXPECT_DOUBLE_EQ(scale.y, 0.2);
+  EXPECT_DOUBLE_EQ(scale.z, 0.3);
+
+  sdf::ElementPtr submeshElem = meshSDF->GetElement("submesh");
+  EXPECT_STREQ(submeshElem->Get<std::string>("name").c_str(), "test_submesh");
+  EXPECT_TRUE(submeshElem->Get<bool>("center"));
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, InertialToSDF)
+{
+  msgs::Inertial msg;
+  msg.set_mass(3.4);
+  msgs::Set(msg.mutable_pose(), math::Pose(math::Vector3(1.2, 3.4, 5.6),
+      math::Quaternion(0.7071, 0.0, 0.7071, 0.0)));
+  msg.set_ixx(0.0133);
+  msg.set_ixy(-0.0003);
+  msg.set_ixz(-0.0004);
+  msg.set_iyy(0.0116);
+  msg.set_iyz(0.0008);
+  msg.set_izz(0.0038);
+
+  sdf::ElementPtr inertialSDF = msgs::InertialToSDF(msg);
+
+  EXPECT_DOUBLE_EQ(inertialSDF->Get<double>("mass"), 3.4);
+
+  EXPECT_TRUE(inertialSDF->Get<math::Pose>("pose") ==
+      math::Pose(math::Vector3(1.2, 3.4, 5.6),
+      math::Quaternion(0.7071, 0.0, 0.7071, 0.0)));
+
+  // inertia
+  sdf::ElementPtr inertiaElem = inertialSDF->GetElement("inertia");
+  EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("ixx"), 0.0133);
+  EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("ixy"), -0.0003);
+  EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("ixz"), -0.0004);
+  EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("iyy"), 0.0116);
+  EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("iyz"), 0.0008);
+  EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("izz"), 0.0038);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, SurfaceToSDF)
+{
+  msgs::Surface msg;
+
+  // friction
+  msgs::Friction *friction = msg.mutable_friction();
+  friction->set_mu(0.1);
+  friction->set_mu2(0.2);
+  msgs::Set(friction->mutable_fdir1(), math::Vector3(0.3, 0.4, 0.5));
+  friction->set_slip1(0.6);
+  friction->set_slip2(0.7);
+
+  // bounce
+  msg.set_restitution_coefficient(1.1);
+  msg.set_bounce_threshold(1000);
+
+  // other ode surface properties
+  msg.set_soft_cfm(0.9);
+  msg.set_soft_erp(0.3);
+  msg.set_kp(0.4);
+  msg.set_kd(0.8);
+  msg.set_max_vel(3.8);
+  msg.set_min_depth(0.0001);
+  msg.set_collide_without_contact(true);
+  msg.set_collide_without_contact_bitmask(0x0004);
+
+  sdf::ElementPtr surfaceSDF = msgs::SurfaceToSDF(msg);
+  sdf::ElementPtr frictionElem = surfaceSDF->GetElement("friction");
+  sdf::ElementPtr frictionPhysicsElem = frictionElem->GetElement("ode");
+  EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("mu"), 0.1);
+  EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("mu2"), 0.2);
+  EXPECT_TRUE(frictionPhysicsElem->Get<math::Vector3>("fdir1") ==
+      math::Vector3(0.3, 0.4, 0.5));
+  EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("slip1"), 0.6);
+  EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("slip2"), 0.7);
+
+  sdf::ElementPtr bounceElem = surfaceSDF->GetElement("bounce");
+  EXPECT_DOUBLE_EQ(bounceElem->Get<double>("restitution_coefficient"), 1.1);
+  EXPECT_DOUBLE_EQ(bounceElem->Get<double>("threshold"), 1000);
+
+  sdf::ElementPtr contactElem = surfaceSDF->GetElement("contact");
+  sdf::ElementPtr contactPhysicsElem = contactElem->GetElement("ode");
+  EXPECT_DOUBLE_EQ(contactPhysicsElem->Get<double>("soft_cfm"), 0.9);
+  EXPECT_DOUBLE_EQ(contactPhysicsElem->Get<double>("soft_erp"), 0.3);
+  EXPECT_DOUBLE_EQ(contactPhysicsElem->Get<double>("kp"), 0.4);
+  EXPECT_DOUBLE_EQ(contactPhysicsElem->Get<double>("kd"), 0.8);
+  EXPECT_DOUBLE_EQ(contactPhysicsElem->Get<double>("max_vel"), 3.8);
+  EXPECT_DOUBLE_EQ(contactPhysicsElem->Get<double>("min_depth"), 0.0001);
+
+  EXPECT_TRUE(contactElem->Get<bool>("collide_without_contact"));
+  EXPECT_EQ(contactElem->Get<unsigned int>("collide_without_contact_bitmask"),
+      static_cast<unsigned int>(0x0004));
+}

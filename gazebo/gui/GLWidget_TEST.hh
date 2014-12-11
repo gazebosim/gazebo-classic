@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- */
-#include <gtest/gtest.h>
-#include <stdio.h>
+*/
 
-TEST(Cmake, Config)
+#ifndef _GLWIDGET_TEST_HH_
+#define _GLWIDGET_TEST_HH_
+
+#include "gazebo/gui/QTestFixture.hh"
+
+/// \brief A test class for the DataLogger widget.
+class GLWidget_TEST : public QTestFixture
 {
-  char cmd[1024];
+  Q_OBJECT
 
-  snprintf(cmd, sizeof(cmd), "cmake %s -DGAZEBO_VERSION=%s",
-           SOURCE_DIR, GAZEBO_VERSION);
-  ASSERT_EQ(system(cmd), 0);
-  snprintf(cmd, sizeof(cmd), "make");
-  ASSERT_EQ(system(cmd), 0);
-}
+  /// \brief Test key presses.
+  private slots: void KeyPresses();
+};
 
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
+#endif

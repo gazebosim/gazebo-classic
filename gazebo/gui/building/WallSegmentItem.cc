@@ -126,6 +126,7 @@ void WallSegmentItem::UpdateInspector()
   endPos.setY(-endPos.y());
   this->inspector->SetEndPosition(endPos);
   this->inspector->SetColor(this->visual3dColor);
+  this->inspector->SetTexture(this->visual3dTexture);
 }
 
 /////////////////////////////////////////////////
@@ -156,7 +157,7 @@ void WallSegmentItem::SegmentUpdated()
     RectItem *rectItem = dynamic_cast<RectItem *>(children[j]);
     if (rectItem)
     {
-      rectItem->SetRotation(-this->line().angle());
+      rectItem->SetRotation(-this->line().angle() + rectItem->GetAngleOnWall());
       QPointF segLine = this->line().p2() - this->line().p1();
       rectItem->setPos(this->line().p1() + rectItem->GetPositionOnWall()*
           segLine);
@@ -231,6 +232,7 @@ void WallSegmentItem::OnApply()
   this->wallThickness = dialog->GetThickness() / this->scale;
   this->SetThickness(this->wallThickness);
   this->wallHeight = dialog->GetHeight() / this->scale;
+  this->Set3dTexture(dialog->GetTexture());
   this->Set3dColor(dialog->GetColor());
   this->WallSegmentChanged();
 
