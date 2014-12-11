@@ -173,7 +173,7 @@ TEST_F(WorldClone, Clone)
   while (!worldCloned && retries++ < 100)
     common::Time::MSleep(20);
 
-  ASSERT_TRUE(worldCloned != NULL);
+  ASSERT_TRUE(worldCloned);
 
   // Remove all the models from the original world.
   world->Clear();
