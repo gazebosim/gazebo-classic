@@ -126,7 +126,7 @@ EditorView::EditorView(QWidget *_parent)
   this->viewScale = 1.0;
   this->levelCounter = 0;
 
-  this->mouseTooltip = new QGraphicsTextItem;
+  this->mouseTooltip = new QGraphicsTextItem();
   this->mouseTooltip->setPlainText(
       "Oops! Color can only be added in the 3D view.");
   this->mouseTooltip->setVisible(false);
@@ -522,8 +522,12 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::leaveEvent(QEvent */*_event*/)
 {
-  if (this->mouseTooltip && this->mouseTooltip->isVisible())
+  if (this->mouseTooltip &&
+      this->scene()->items().contains(this->mouseTooltip) &&
+      this->mouseTooltip->isVisible())
+  {
     this->mouseTooltip->setVisible(false);
+  }
 }
 
 /////////////////////////////////////////////////
