@@ -806,6 +806,7 @@ void ModelCreator::OnPaste()
     rendering::VisualPtr visVisual;
 
     math::Pose clonePose;
+    math::Vector3 cloneScale;
 
     if (copiedPart->visuals.empty())
     {
@@ -820,6 +821,8 @@ void ModelCreator::OnPaste()
       rendering::VisualPtr copiedVisual = copiedPart->visuals.back();
       visVisual = copiedVisual->Clone(visualName.str(), linkVisual);
       clonePose = copiedVisual->GetWorldPose();
+      cloneScale = copiedVisual->GetParent()->GetScale();
+      visVisual->SetScale(math::Vector3::One);
     }
 
     rendering::UserCameraPtr userCamera = gui::get_active_camera();
@@ -832,6 +835,7 @@ void ModelCreator::OnPaste()
       clonePose.pos.y = mousePosition.y;
     }
 
+    linkVisual->SetScale(cloneScale);
     linkVisual->SetWorldPose(clonePose);
     linkVisual->SetTransparency(this->editTransparency);
 
