@@ -369,7 +369,7 @@ else (build_errors)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_rendering_deferred)
   endif()
 
-  set(PKG_DEPENDS Boost Protobuf SDFormat)
+  set(PKG_DEPENDS Boost Protobuf SDFormat OGRE)
 
   set(cmake_conf_file "cmake/gazebo-config.cmake")
   set(cmake_conf_version_file "cmake/gazebo-config-version.cmake")
