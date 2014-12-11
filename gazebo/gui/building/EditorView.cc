@@ -126,7 +126,7 @@ EditorView::EditorView(QWidget *_parent)
   this->viewScale = 1.0;
   this->levelCounter = 0;
 
-  this->mouseTooltip = new QGraphicsTextItem();
+  this->mouseTooltip = new QGraphicsTextItem;
   this->mouseTooltip->setPlainText(
       "Oops! Color can only be added in the 3D view.");
   this->mouseTooltip->setVisible(false);
