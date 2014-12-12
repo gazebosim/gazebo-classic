@@ -943,25 +943,6 @@ material Gazebo/Bricks
   }
 }
 
-material Gazebo/WindowFrame
-{
-  technique
-  {
-    pass
-    {
-      ambient 1.0 1.0 1.0 1.0
-      diffuse 1.0 1.0 1.0 1.0
-      specular 0.2 0.2 0.2 1.0 12.5
-
-      texture_unit
-      {
-        texture window_frame.png
-        filtering trilinear
-      }
-    }
-  }
-}
-
 material Gazebo/Road
 {
   technique

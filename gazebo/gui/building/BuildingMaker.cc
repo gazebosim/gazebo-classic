@@ -66,7 +66,7 @@ std::string GetFolderNameFromModelName(const std::string &_modelName)
   std::vector<std::pair<std::string, std::string> > replacePairs;
   replacePairs.push_back(std::pair<std::string, std::string>(" ", "_"));
 
-  for (unsigned int i = 0; i < replacePairs.size(); i++)
+  for (unsigned int i = 0; i < replacePairs.size(); ++i)
   {
     std::string forbiddenChar = replacePairs[i].first;
     std::string replaceChar = replacePairs[i].second;
@@ -2124,4 +2124,3 @@ void BuildingMaker::BuildingChanged()
   if (this->currentSaveState != NEVER_SAVED)
     this->currentSaveState = UNSAVED_CHANGES;
 }
-
