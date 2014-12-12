@@ -683,10 +683,11 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return false;
 
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
-  if (vis)
+  rendering::VisualPtr partVis = vis->GetParent();
+  if (partVis)
   {
     // Is part
-    if (this->allParts.find(vis->GetParent()->GetName()) !=
+    if (this->allParts.find(partVis->GetName()) !=
         this->allParts.end())
     {
       // Not in multi-selection mode.
@@ -695,8 +696,8 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         this->DeselectAll();
 
         // Highlight and selected clicked part
-        vis->SetHighlighted(true);
-        this->selectedVisuals.push_back(vis);
+        partVis->SetHighlighted(true);
+        this->selectedVisuals.push_back(partVis);
       }
       // Multi-selection mode
       else
@@ -707,13 +708,13 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         // Highlight and selected clicked part if not already selected
         if (it == this->selectedVisuals.end())
         {
-          vis->SetHighlighted(true);
-          this->selectedVisuals.push_back(vis);
+          partVis->SetHighlighted(true);
+          this->selectedVisuals.push_back(partVis);
         }
         // Deselect if already selected
         else
         {
-          vis->SetHighlighted(false);
+          partVis->SetHighlighted(false);
           this->selectedVisuals.erase(it);
         }
       }
@@ -809,7 +810,7 @@ void ModelCreator::OnCopy()
   if (!this->selectedVisuals.empty())
   {
     this->copiedPartNames.clear();
-    for (unsigned int i = 0; i < this->selectedVisuals.size(); i++)
+    for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
     {
       this->copiedPartNames.push_back(this->selectedVisuals[i]->GetName());
     }
@@ -826,7 +827,7 @@ void ModelCreator::OnPaste()
   }
 
   // For now, only copy the last selected model
-  boost::unordered_map<std::string, PartData*>::iterator it =
+  boost::unordered_map<std::string, PartData *>::iterator it =
     this->allParts.find(this->copiedPartNames.back());
   if (it != this->allParts.end())
   {
@@ -1027,7 +1028,7 @@ void ModelCreator::OnAlignMode(const std::string &_axis,
   std::vector<rendering::VisualPtr> selectedLinks;
   for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
   {
-    selectedLinks.push_back(this->selectedVisuals[i]->GetParent());
+    selectedLinks.push_back(this->selectedVisuals[i]);
   }
 
   ModelAlign::Instance()->AlignVisuals(selectedLinks, _axis, _config,
