@@ -67,7 +67,7 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
   for (unsigned int i = 0; i < this->floorTextureList.size(); ++i)
   {
     this->floorTextureComboBox->addItem(QPixmap(this->floorTextureList[i])
-        .scaled(QSize(30, 30), Qt::IgnoreAspectRatio), QString(""));
+        .scaled(QSize(90, 90), Qt::IgnoreAspectRatio), QString(""));
   }
   this->floorTextureComboBox->addItem("X");
   this->floorTextureComboBox->setCurrentIndex(
