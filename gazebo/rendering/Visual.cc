@@ -1821,7 +1821,7 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       {
         // Get transform to be applied to the current node.
         Ogre::Matrix4 transform = invTransform * node->_getFullTransform();
-        // Correct precision error gawhich makes ogre's isAffine check fail.
+        // Correct precision error which makes ogre's isAffine check fail.
         transform[3][0] = transform[3][1] = transform[3][2] = 0;
         transform[3][3] = 1;
         // get oriented bounding box in object's local space
