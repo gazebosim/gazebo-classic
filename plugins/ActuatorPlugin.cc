@@ -1,0 +1,120 @@
+/*
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
+#include "ActuatorPlugin.hh"
+
+using namespace gazebo;
+
+float ElectricMotorModel(const float speed,
+ const ActuatorProperties &properties)
+{
+  if (speed > properties.maximumVelocity)
+    return properties.power / properties.maximumVelocity;
+
+  float torque = properties.power / speed;
+
+  if (torque > properties.maximumTorque)
+    return properties.maximumTorque;
+
+  return torque;
+}
+
+float NullModel(const float /*speed*/, const ActuatorProperties &/*properties*/)
+{
+  return 0;
+}
+
+void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
+{
+  // Read the SDF
+  if (_sdf->HasElement("actuator"))
+  {
+    sdf::ElementPtr elem = _sdf->GetElement("actuator");
+    while (elem)
+    {
+      // Get actuator properties
+      ActuatorProperties properties;
+
+      // actuator name is currently an optional properties
+      if (elem->HasElement("name"))
+        properties.name = elem->GetElement("name")->Get<std::string>();
+
+      if (!elem->HasElement("joint"))
+        continue;
+      std::string jointName = elem->GetElement("joint")->Get<std::string>();
+
+      properties.modelFunction = NULL;
+      if (elem->HasElement("type"))
+      {
+        std::string modelType = elem->GetElement("type")->Get<std::string>();
+        if (modelType.compare("electric_motor") == 0)
+        {
+          if (!elem->HasElement("power") ||
+              !elem->HasElement("max_velocity") ||
+              !elem->HasElement("max_torque"))
+            continue;
+
+          properties.power = elem->GetElement("power")->Get<float>();
+          properties.maximumVelocity =
+            elem->GetElement("max_velocity")->Get<float>();
+          properties.maximumTorque =
+            elem->GetElement("max_torque")->Get<float>();
+
+          properties.modelFunction = ElectricMotorModel;
+        }
+      }
+      if (properties.modelFunction == NULL)      
+        properties.modelFunction = NullModel;
+
+      if (elem->HasElement("index"))
+      {
+        properties.jointIndex = elem->GetElement("index")->Get<unsigned int>();
+      }
+      else
+      {
+        properties.jointIndex = 0;
+      }
+
+      // Store pointer to the joint we will actuate
+      physics::JointPtr joint = _parent->GetJoint(jointName);
+      if (!joint)
+        continue;
+      // Apply starting torque
+      joint->SetForce(properties.jointIndex, -properties.maximumTorque);
+      joint->SetVelocity(properties.jointIndex, 0);
+      this->joints.push_back(joint);
+      this->actuators.push_back(properties);
+
+      elem = elem->GetNextElement("actuator");
+    }
+    // Set up a physics update callback
+    this->connections.push_back(event::Events::ConnectWorldUpdateEnd(
+      boost::bind(&ActuatorPlugin::WorldUpdateCallback, this)));
+  }
+}
+
+void ActuatorPlugin::WorldUpdateCallback()
+{
+  // Update the stored joints according to the desired model.
+  for (unsigned int i = 0; i < this->joints.size(); i++)
+  {
+    const int index = this->actuators[i].jointIndex;
+    const float velocity = this->joints[i]->GetVelocity(index);
+    float force = this->joints[i]->GetForce(index);
+    this->joints[i]->SetForce(index, force);
+  }
+}
