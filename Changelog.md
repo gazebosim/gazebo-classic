@@ -1,7 +1,10 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.0.0
-
+1. Added a events::Event::resetWorld event that is triggered when World::Reset is called.
+    * [Pull request #1332](https://bitbucket.org/osrf/gazebo/pull-request/1332)
+    * [Issue #1375](https://bitbucket.org/osrf/gazebo/issue/1375)
+ 
 1. Fixed `math::Box::GetCenter` functionality.
     * [Pull request #1278](https://bitbucket.org/osrf/gazebo/pull-request/1278)
     * [Issue #1327](https://bitbucket.org/osrf/gazebo/issue/1327)
@@ -147,6 +150,9 @@
         * [Pull request #1322](https://bitbucket.org/osrf/gazebo/pull-request/1322)
         * [Issue #370](https://bitbucket.org/osrf/gazebo/issue/370)
 
+    1. Added Gazebo/BuildingFrame material to display holes for doors and windows on walls.
+        * [Pull request #1338](https://bitbucket.org/osrf/gazebo/pull-request/1338)
+
     1. Added Gazebo/Bricks material to be used as texture on the building editor.
         * [Pull request #1333](https://bitbucket.org/osrf/gazebo/pull-request/1333)
 
@@ -154,6 +160,8 @@
     1. Fix adding/removing event filters .
         * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
 
+    1. Implemented copy/pasting of links.
+        * [Pull request #1330](https://bitbucket.org/osrf/gazebo/pull-request/1330)
 
 ## Gazebo 4.0
 
