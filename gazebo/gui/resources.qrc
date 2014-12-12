@@ -53,5 +53,6 @@
   <file>images/draw_link.svg</file>
   <file alias='wood.jpg'>../../media/materials/textures/wood.jpg</file>
   <file alias='tiles.jpg'>../../media/materials/textures/ceiling_tiled.jpg</file>
+  <file alias='bricks.png'>../../media/materials/textures/bricks.png</file>
 </qresource>
 </RCC>
