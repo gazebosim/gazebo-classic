@@ -169,6 +169,9 @@ void EditorView::resizeEvent(QResizeEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::contextMenuEvent(QContextMenuEvent *_event)
 {
+  if (this->drawMode == COLOR)
+    return;
+
   if (this->drawInProgress)
   {
     this->CancelDrawMode();
@@ -233,7 +236,7 @@ void EditorView::wheelEvent(QWheelEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::mousePressEvent(QMouseEvent *_event)
 {
-  if (!this->drawInProgress && this->drawMode != WALL
+  if (!this->drawInProgress && this->drawMode != WALL && this->drawMode != COLOR
       && (_event->button() != Qt::RightButton))
   {
     QGraphicsItem *mouseItem =
@@ -575,6 +578,10 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
     this->releaseKeyboard();
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
     gui::editor::Events::createBuildingEditorItem(std::string());
+  }
+  else if (this->drawMode == COLOR)
+  {
+    return;
   }
   else
   {

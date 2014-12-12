@@ -602,12 +602,15 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
 /////////////////////////////////////////////////
 void BuildingMaker::RemovePart(const std::string &_partName)
 {
-  BuildingModelManip *manip = this->allItems[_partName];
-  if (!manip)
+  std::map<std::string, BuildingModelManip *>::const_iterator it =
+      this->allItems.find(_partName);
+  if (it == this->allItems.end())
   {
     gzerr << _partName << " does not exist\n";
     return;
   }
+  BuildingModelManip *manip = this->allItems[_partName];
+
   rendering::VisualPtr vis = manip->GetVisual();
   rendering::VisualPtr visParent = vis->GetParent();
   rendering::ScenePtr scene = vis->GetScene();
@@ -721,7 +724,6 @@ void BuildingMaker::SaveToSDF(const std::string &_savePath)
 void BuildingMaker::FinishModel()
 {
   this->CreateTheEntity();
-  // this->Stop();
   this->Reset();
 }
 
@@ -2011,11 +2013,21 @@ bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &_event)
   {
     std::string hoverName = this->hoverVis->GetParent()->GetName();
     hoverName = hoverName.substr(hoverName.find("::")+2);
-    BuildingModelManip *manip = this->allItems[hoverName];
 
-    if (this->selectedColor.isValid())
+    std::map<std::string, BuildingModelManip *>::const_iterator it =
+        this->allItems.find(hoverName);
+    if (it == this->allItems.end())
     {
-      manip->SetColor(this->selectedColor);
+      gzerr << "Visual " << hoverName << " is not part of the building but "
+            << "was hovered. This should never happen." << std::endl;
+    }
+    else
+    {
+      BuildingModelManip *manip = this->allItems[hoverName];
+      if (this->selectedColor.isValid())
+      {
+        manip->SetColor(this->selectedColor);
+      }
     }
     this->hoverVis.reset();
   }
