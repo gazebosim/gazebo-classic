@@ -120,7 +120,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->colorList.push_back(QColor(254, 121,   5, 255));
   this->colorList.push_back(QColor(255, 195,  78, 255));
   this->colorList.push_back(QColor(111, 203, 172, 255));
-  for (unsigned int i = 0; i < this->colorList.size(); i++)
+  for (unsigned int i = 0; i < this->colorList.size(); ++i)
   {
     QToolButton *colorButton = new QToolButton(this);
     colorButton->setFixedSize(40, 40);
@@ -304,7 +304,10 @@ void BuildingEditorPalette::OnColor(int _buttonId)
 {
   // A button which is not color
   if (_buttonId >= static_cast<int>(colorList.size()))
+  {
+    gzwarn << "Brushes other than color are handled elsewhere." << std::endl;
     return;
+  }
 
   std::ostringstream colorStr;
   colorStr << "color_" << _buttonId;
