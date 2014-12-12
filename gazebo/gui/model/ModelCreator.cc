@@ -683,9 +683,9 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return false;
 
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
-  rendering::VisualPtr partVis = vis->GetParent();
-  if (partVis)
+  if (vis)
   {
+    rendering::VisualPtr partVis = vis->GetParent();
     // Is part
     if (this->allParts.find(partVis->GetName()) !=
         this->allParts.end())
@@ -729,9 +729,6 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 
       g_alignAct->setEnabled(false);
       g_copyAct->setEnabled(!this->selectedVisuals.empty());
-
-
-
 
       // Prevent interaction with other models, send event only to
       // user camera
