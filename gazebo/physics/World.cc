@@ -980,7 +980,7 @@ void World::ResetEntities(Base::EntityType _type)
 //////////////////////////////////////////////////
 void World::Reset()
 {
-  bool currently_paused = this->IsPaused();
+  bool currentlyPaused = this->IsPaused();
   this->SetPaused(true);
 
   {
@@ -995,9 +995,12 @@ void World::Reset()
         iter != this->plugins.end(); ++iter)
       (*iter)->Reset();
     this->physicsEngine->Reset();
+
+    // Signal a reset has occurred
+    event::Events::worldReset();
   }
 
-  this->SetPaused(currently_paused);
+  this->SetPaused(currentlyPaused);
 }
 
 //////////////////////////////////////////////////

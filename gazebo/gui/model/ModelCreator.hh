@@ -161,6 +161,12 @@ namespace gazebo
       /// \param[in] _checked True if the menu item is checked
       private slots: void OnEdit(bool _checked);
 
+      /// \brief Qt callback when the copy action is triggered.
+      private slots: void OnCopy();
+
+      /// \brief Qt callback when the paste action is triggered.
+      private slots: void OnPaste();
+
       /// \brief Mouse event filter callback when mouse is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -213,6 +219,9 @@ namespace gazebo
       private: void OnAlignMode(const std::string &_axis,
           const std::string &_config, const std::string &_target,
           bool _preview);
+
+      /// \brief Deselect all currently selected visuals.
+      private: void DeselectAll();
 
       /// \brief Qt callback when a delete signal has been emitted.
       /// \param[in] _name Name of the part or model to delete.
@@ -291,6 +300,12 @@ namespace gazebo
 
       /// \brief A list of selected visuals.
       private: std::vector<rendering::VisualPtr> selectedVisuals;
+
+      /// \brief Names of parts copied through g_copyAct
+      private: std::vector<std::string> copiedPartNames;
+
+      /// \brief The last mouse event
+      private: common::MouseEvent lastMouseEvent;
     };
     /// \}
 
@@ -341,10 +356,10 @@ namespace gazebo
       /// \brief Pose of part.
       public: math::Pose pose;
 
-      /// \brief Name of part.
+      /// \brief Inertial properties of part.
       public: physics::Inertial *inertial;
 
-      /// \brief Name of part.
+      /// \brief Collision properties of part.
       public: std::vector<physics::CollisionPtr> collisions;
 
       /// \brief Sensor data
