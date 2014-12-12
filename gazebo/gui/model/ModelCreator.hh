@@ -316,8 +316,6 @@ namespace gazebo
 
       /// \brief True if the model editor mode is active.
       private: bool active;
-
-
     };
     /// \}
   }
