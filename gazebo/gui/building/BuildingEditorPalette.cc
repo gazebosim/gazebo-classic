@@ -148,7 +148,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 
   this->connections.push_back(
       gui::editor::Events::ConnectCreateBuildingEditorItem(
-    boost::bind(&BuildingEditorPalette::OnCreateEditorItem, this, _1)));
+      boost::bind(&BuildingEditorPalette::OnCreateEditorItem, this, _1)));
 
   // Brushes (button group)
   brushes = new QButtonGroup();
