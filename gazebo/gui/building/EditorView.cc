@@ -129,7 +129,6 @@ EditorView::EditorView(QWidget *_parent)
   this->mouseTooltip = new QGraphicsTextItem;
   this->mouseTooltip->setPlainText(
       "Oops! Color can only be added in the 3D view.");
-  this->mouseTooltip->setVisible(false);
   this->mouseTooltip->setZValue(10);
 }
 
@@ -410,7 +409,6 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
       if (!this->mouseTooltip->scene())
         this->scene()->addItem(this->mouseTooltip);
 
-      this->mouseTooltip->setVisible(true);
       this->mouseTooltip->setPos(this->mapToScene(_event->pos()) +
           QPointF(15, 15));
       break;
@@ -523,10 +521,9 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 void EditorView::leaveEvent(QEvent */*_event*/)
 {
   if (this->mouseTooltip &&
-      this->scene()->items().contains(this->mouseTooltip) &&
-      this->mouseTooltip->isVisible())
+      this->scene()->items().contains(this->mouseTooltip))
   {
-    this->mouseTooltip->setVisible(false);
+    this->scene()->removeItem(this->mouseTooltip);
   }
 }
 
@@ -554,8 +551,9 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
   }
   else if (_event->key() == Qt::Key_Escape)
   {
-    if (this->mouseTooltip && this->mouseTooltip->isVisible())
-      this->mouseTooltip->setVisible(false);
+    if (this->mouseTooltip &&
+        this->scene()->items().contains(this->mouseTooltip))
+      this->scene()->removeItem(this->mouseTooltip);
     this->CancelDrawMode();
     gui::editor::Events::createBuildingEditorItem(std::string());
     this->releaseKeyboard();
