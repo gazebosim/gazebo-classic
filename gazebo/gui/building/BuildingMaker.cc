@@ -862,6 +862,8 @@ void BuildingMaker::GenerateSDF()
               GetElement("size")->Set(visual->GetScale());
           visualElem->GetElement("material")->GetElement("ambient")->
               Set(buildingModelManip->GetColor());
+          visualElem->GetElement("material")->GetElement("script")
+              ->GetElement("name")->Set(buildingModelManip->GetTexture());
         }
       }
     }
