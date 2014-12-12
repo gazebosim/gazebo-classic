@@ -594,7 +594,8 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   floorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = floorManip;
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
+      GZ_VISIBILITY_SELECTABLE);
   this->BuildingChanged();
   return linkName;
 }
@@ -760,7 +761,7 @@ void BuildingMaker::GenerateSDF()
   std::stringstream collisionNameStream;
 
   modelElem->GetAttribute("name")->Set(
-    GetFolderNameFromModelName(this->modelName));
+      GetFolderNameFromModelName(this->modelName));
 
   std::map<std::string, BuildingModelManip *>::iterator itemsIt;
 
@@ -1301,6 +1302,7 @@ double BuildingMaker::ConvertAngle(double _angle)
   return GZ_DTOR(_angle);
 }
 
+/////////////////////////////////////////////////
 std::string BuildingMaker::GetTemplateConfigString()
 {
   std::ostringstream newModelStr;
@@ -1928,6 +1930,12 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (!userCamera)
     return false;
+
+  if (_event.dragging)
+  {
+    userCamera->HandleMouseEvent(_event);
+    return true;
+  }
 
   if (!this->selectedColor.isValid())
   {

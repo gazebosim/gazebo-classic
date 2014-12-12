@@ -321,7 +321,9 @@ void BuildingModelManip::OnTextureChanged(QString _texture)
 void BuildingModelManip::OnTransparencyChanged(float _transparency)
 {
   this->SetTransparency(_transparency);
-  this->maker->BuildingChanged();
+  // For now transparency is used only to aid in the preview and doesn't affect
+  // the saved building
+  //this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
