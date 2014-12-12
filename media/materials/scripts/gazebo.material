@@ -943,7 +943,6 @@ material Gazebo/Road
   }
 }
 
-
 material Gazebo/Residential
 {
   technique
@@ -1297,3 +1296,23 @@ material Gazebo/PointCloud
       }
    }
 }
+
+material Gazebo/BuildingFrame
+{
+  technique
+  {
+    pass
+    {
+      ambient 1.0 1.0 1.0 1.0
+      diffuse 1.0 1.0 1.0 1.0
+      specular 0.2 0.2 0.2 1.0 12.5
+
+      texture_unit
+      {
+        texture building_frame.png
+        filtering trilinear
+      }
+    }
+  }
+}
+
