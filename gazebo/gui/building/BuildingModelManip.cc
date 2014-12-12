@@ -323,7 +323,7 @@ void BuildingModelManip::OnTransparencyChanged(float _transparency)
   this->SetTransparency(_transparency);
   // For now transparency is used only to aid in the preview and doesn't affect
   // the saved building
-  //this->maker->BuildingChanged();
+  // this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
