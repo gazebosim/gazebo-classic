@@ -361,7 +361,7 @@ void ModelCreator::RemovePart(const std::string &_partName)
     return;
 
   for (std::vector<rendering::VisualPtr>::iterator it
-      = this->selectedVisuals.begin(); it != this->selectedVisuals.end();)
+      = this->selectedVisuals.begin(); it != this->selectedVisuals.end(); ++it)
   {
     if (part->partVisual == (*it))
     {
