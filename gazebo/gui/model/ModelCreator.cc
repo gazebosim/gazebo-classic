@@ -912,7 +912,7 @@ void ModelCreator::GenerateSDF()
        ++partsIt)
   {
     PartData *part = partsIt->second;
-    mid += part->pose.pos;
+    mid += part->partVisual->GetWorldPose().pos;
   }
   mid /= this->allParts.size();
   this->origin.pos = mid;
@@ -929,7 +929,8 @@ void ModelCreator::GenerateSDF()
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
     newLinkElem->ClearElements();
     newLinkElem->GetAttribute("name")->Set(part->name);
-    newLinkElem->GetElement("pose")->Set(part->pose - this->origin);
+    newLinkElem->GetElement("pose")->Set(part->partVisual->GetWorldPose()
+        - this->origin);
     newLinkElem->GetElement("gravity")->Set(part->gravity);
     newLinkElem->GetElement("self_collide")->Set(part->selfCollide);
     newLinkElem->GetElement("kinematic")->Set(part->kinematic);
