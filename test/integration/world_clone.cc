@@ -184,6 +184,7 @@ TEST_F(WorldClone, Clone)
     common::Time::MSleep(20);
 
   ASSERT_EQ(world->GetModelCount(), 0u);
+  common::Time::MSleep(500);
 
   // Check that the original world does not contain the camera topics.
   std::string output = custom_exec_str("gz topic -l");
