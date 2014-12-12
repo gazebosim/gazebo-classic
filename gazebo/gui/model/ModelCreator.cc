@@ -360,17 +360,6 @@ void ModelCreator::RemovePart(const std::string &_partName)
   if (!part)
     return;
 
-  for (std::vector<rendering::VisualPtr>::iterator it
-      = this->selectedVisuals.begin(); it != this->selectedVisuals.end(); ++it)
-  {
-    if (part->partVisual == (*it))
-    {
-      (*it)->SetHighlighted(false);
-      this->selectedVisuals.erase(it);
-      break;
-    }
-  }
-
   rendering::ScenePtr scene = part->partVisual->GetScene();
   for (unsigned int i = 0; i < part->visuals.size(); ++i)
   {
