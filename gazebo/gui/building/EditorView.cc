@@ -54,16 +54,8 @@ EditorView::EditorView(QWidget *_parent)
       gui::editor::Events::ConnectColorSelected(
       boost::bind(&EditorView::OnColorSelected, this, _1)));
 
-/*  this->connections.push_back(
-  gui::editor::Events::ConnectSaveModel(
-    boost::bind(&EditorView::OnSaveModel, this, _1, _2)));*/
-
-/*  this->connections.push_back(
-  gui::editor::Events::ConnectDone(
-    boost::bind(&EditorView::OnDone, this)));*/
-
   this->connections.push_back(
-      gui::editor::Events::ConnectDiscardBuildingModel(
+      gui::editor::Events::ConnectNewBuildingModel(
       boost::bind(&EditorView::OnDiscardModel, this)));
 
   this->connections.push_back(

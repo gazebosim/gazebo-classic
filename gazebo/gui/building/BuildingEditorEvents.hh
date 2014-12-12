@@ -99,19 +99,19 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { finishBuildingModel.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the discard model signal
+        /// \brief Connect a Gazebo event to the new model signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
             static event::ConnectionPtr
-                ConnectDiscardBuildingModel(T _subscriber)
-          { return discardBuildingModel.Connect(_subscriber); }
+                ConnectNewBuildingModel(T _subscriber)
+          { return newBuildingModel.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the discard model signal
+        /// \brief Disconnect a Gazebo event from the new model signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectDiscardBuildingModel(
+        public: static void DisconnectNewBuildingModel(
             event::ConnectionPtr _subscriber)
-          { discardBuildingModel.Disconnect(_subscriber); }
+          { newBuildingModel.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the change model signal
         /// \param[in] _subscriber the subscriber to this event
@@ -247,38 +247,39 @@ namespace gazebo
             static event::ConnectionPtr ConnectSaveBuildingEditor(T _subscriber)
           { return saveBuildingEditor.Connect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the save signal
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectSaveAsBuildingEditor
+              (T _subscriber)
+          { return saveAsBuildingEditor.Connect(_subscriber); }
+
         /// \brief Disconnect a Gazebo event from the save signal
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectSaveBuildingEditor(
             event::ConnectionPtr _subscriber)
           { saveBuildingEditor.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the done signal
+        /// \brief Disconnect a Gazebo event from the save as signal
         /// \param[in] _subscriber the subscriber to this event
-        /// \return a connection
-        public: template<typename T>
-            static event::ConnectionPtr ConnectDoneBuildingEditor(T _subscriber)
-          { return doneBuildingEditor.Connect(_subscriber); }
+        public: static void DisconnectSaveAsBuildingEditor(
+            event::ConnectionPtr _subscriber)
+          { saveAsBuildingEditor.Disconnect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the done signal
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectDoneBuildingEditor(
-                    event::ConnectionPtr _subscriber)
-                { doneBuildingEditor.Disconnect(_subscriber); }
-
-        /// \brief Connect a Gazebo event to the discard signal
+        /// \brief Connect a Gazebo event to the new signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
             static event::ConnectionPtr
-            ConnectDiscardBuildingEditor(T _subscriber)
-          { return discardBuildingEditor.Connect(_subscriber); }
+            ConnectNewBuildingEditor(T _subscriber)
+          { return newBuildingEditor.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the discard signal
+        /// \brief Disconnect a Gazebo event from the new signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectDiscardBuildingEditor(
+        public: static void DisconnectNewBuildingEditor(
               event::ConnectionPtr _subscriber)
-          { discardBuildingEditor.Disconnect(_subscriber); }
+          { newBuildingEditor.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the exit signal
         /// \param[in] _subscriber the subscriber to this event
@@ -296,6 +297,20 @@ namespace gazebo
         /// \brief Toggle if the edit mode was checked or not.
         public: static event::EventT<void (bool)> toggleEditMode;
 
+        /// \brief Connect a Gazebo event to the name changed signal
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectBuildingNameChanged
+              (T _subscriber)
+          { return buildingNameChanged.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the exit signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void ConnectBuildingNameChanged(
+            event::ConnectionPtr _subscriber)
+          { buildingNameChanged.Disconnect(_subscriber); }
+
         /// \brief An editor item is to be created
         public: static event::EventT<void (std::string)>
             createBuildingEditorItem;
@@ -311,8 +326,8 @@ namespace gazebo
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishBuildingModel;
 
-        /// \brief A model has been discarded
-        public: static event::EventT<void ()> discardBuildingModel;
+        /// \brief A new model has been started
+        public: static event::EventT<void ()> newBuildingModel;
 
         /// \brief The current level has been changed
         public: static event::EventT<void (int)> changeBuildingLevel;
@@ -343,16 +358,19 @@ namespace gazebo
         public: static event::EventT<void (double)> changeBuildingEditorZoom;
 
         /// \brief Save the model
-        public: static event::EventT<void (std::string)> saveBuildingEditor;
+        public: static event::EventT<bool (std::string)> saveBuildingEditor;
 
-        /// \brief Discard the model
-        public: static event::EventT<void ()> discardBuildingEditor;
+        /// \brief Save the model as
+        public: static event::EventT<bool (std::string)> saveAsBuildingEditor;
 
-        /// \brief Finish creating the model, save, and exit
-        public: static event::EventT<void (std::string)> doneBuildingEditor;
+        /// \brief Make a new model
+        public: static event::EventT<void ()> newBuildingEditor;
 
         /// \brief Exit the editor mode with the option to save
         public: static event::EventT<void ()> exitBuildingEditor;
+
+        /// \brief Name was changed in the editor palette
+        public: static event::EventT<void (std::string)> buildingNameChanged;
       };
     }
   }
