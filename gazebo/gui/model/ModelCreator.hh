@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,6 +188,10 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
 
+      /// \brief Callback when the manipulation mode has changed.
+      /// \param[in] _mode New manipulation mode.
+      private: void OnManipMode(const std::string &_mode);
+
       /// \brief Create part with default properties from a visual
       /// \param[in] _visual Visual used to create the part.
       private: void CreatePart(const rendering::VisualPtr &_visual);
@@ -309,6 +313,9 @@ namespace gazebo
 
       /// \brief Part visual that is currently being inspected.
       private: rendering::VisualPtr inspectVis;
+
+      /// \brief True if the model editor mode is active.
+      private: bool active;
 
 
     };

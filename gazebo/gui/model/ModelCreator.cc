@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ModelManipulator.hh"
+#include "gazebo/gui/ModelSnap.hh"
 #include "gazebo/gui/ModelAlign.hh"
 
 #include "gazebo/gui/model/ModelData.hh"
@@ -51,6 +52,7 @@ using namespace gui;
 /////////////////////////////////////////////////
 ModelCreator::ModelCreator()
 {
+  this->active = false;
   this->modelName = "";
 
   this->modelTemplateSDF.reset(new sdf::SDF);
@@ -77,6 +79,10 @@ ModelCreator::ModelCreator()
   this->connections.push_back(
       gui::Events::ConnectAlignMode(
         boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
+
+  this->connections.push_back(
+      gui::Events::ConnectManipMode(
+        boost::bind(&ModelCreator::OnManipMode, this, _1)));
 
   g_copyAct->setEnabled(false);
   g_pasteAct->setEnabled(false);
@@ -105,6 +111,7 @@ void ModelCreator::OnEdit(bool _checked)
 {
   if (_checked)
   {
+    this->active = true;
     KeyEventHandler::Instance()->AddPressFilter("model_creator",
         boost::bind(&ModelCreator::OnKeyPress, this, _1));
 
@@ -124,6 +131,7 @@ void ModelCreator::OnEdit(bool _checked)
   }
   else
   {
+    this->active = false;
     KeyEventHandler::Instance()->RemovePressFilter("model_creator");
     MouseEventHandler::Instance()->RemovePressFilter("model_creator");
     MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
@@ -1032,5 +1040,32 @@ void ModelCreator::DeselectAll()
       this->selectedVisuals[i]->SetHighlighted(false);
     }
     this->selectedVisuals.clear();
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnManipMode(const std::string &_mode)
+{
+  if (!this->active)
+    return;
+
+  if (!this->selectedVisuals.empty())
+  {
+    ModelManipulator::Instance()->SetAttachedVisual(
+        this->selectedVisuals.back());
+  }
+
+  ModelManipulator::Instance()->SetManipulationMode(_mode);
+  ModelSnap::Instance()->Reset();
+
+  // deselect 0 to n-1 models.
+  if (this->selectedVisuals.size() > 1)
+  {
+    for (std::vector<rendering::VisualPtr>::iterator it
+        = this->selectedVisuals.begin(); it != --this->selectedVisuals.end();)
+    {
+       (*it)->SetHighlighted(false);
+       it = this->selectedVisuals.erase(it);
+    }
   }
 }
