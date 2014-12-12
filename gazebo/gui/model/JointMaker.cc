@@ -312,7 +312,7 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
     jointData->lowerLimit[i] = -3.14;
     jointData->upperLimit[i] = 3.14;
   }
-  jointData->anchor = math::Vector3::Zero;
+  jointData->anchor = math::Pose::Zero;
   jointData->line->setMaterial(this->jointMaterials[jointData->type]);
 
   return jointData;
@@ -680,7 +680,7 @@ void JointMaker::GenerateSDF()
     sdf::ElementPtr childElem = jointElem->GetElement("child");
     childElem->Set(joint->child->GetName());
     sdf::ElementPtr poseElem = jointElem->GetElement("pose");
-    poseElem->Set(math::Pose(joint->anchor, math::Vector3::Zero));
+    poseElem->Set(joint->anchor);
     int axisCount = GetJointAxisCount(joint->type);
     for (int i = 0; i < axisCount; ++i)
     {
