@@ -35,7 +35,7 @@ WindowItem::WindowItem(): RectItem(), BuildingItem()
   this->level = 0;
   this->levelBaseHeight = 0;
 
-  this->windowDepth = 15;
+  this->windowDepth = 17;
   this->windowHeight = 80;
   this->windowWidth = 80;
   this->windowSideBar = 10;

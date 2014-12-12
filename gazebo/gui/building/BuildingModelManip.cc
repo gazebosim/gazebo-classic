@@ -375,6 +375,8 @@ void BuildingModelManip::SetTexture(QString _texture)
     this->texture = "Gazebo/Wood";
   else if (_texture == ":tiles.jpg")
     this->texture = "Gazebo/CeilingTiled";
+  else if (_texture == ":bricks.png")
+    this->texture = "Gazebo/Bricks";
 
   this->visual->GetParent()->SetMaterial(this->texture);
 }
