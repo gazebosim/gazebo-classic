@@ -231,6 +231,7 @@ void PartData::OnApply()
 /////////////////////////////////////////////////
 void PartData::OnAddVisual(const std::string &_name)
 {
+
   // add a visual when the user adds a visual via the inspector's visual tab
   PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
 //  if (this->visuals.size() != visualConfig->GetVisualCount())
@@ -265,8 +266,9 @@ void PartData::OnAddVisual(const std::string &_name)
     msgs::Visual visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
     visualConfig->UpdateVisual(_name, &visualMsg);
     this->visuals[visVisual] = visualMsg;
-    visVisual->SetTransparency(0.5);
+    visVisual->SetTransparency(0.4);
   }
+
 }
 
 /////////////////////////////////////////////////
@@ -312,7 +314,7 @@ void PartData::Update()
 
         // make visual semi-transparent here
         // but generated sdf will use the correct transparency value
-        float transparency = 0.5;
+        float transparency = 0.4;
         msgs::Material *materialMsg = updateMsgPtr->mutable_material();
         materialMsg->mutable_ambient()->set_a(transparency);
         materialMsg->mutable_diffuse()->set_a(transparency);

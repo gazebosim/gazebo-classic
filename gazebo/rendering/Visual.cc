@@ -1445,13 +1445,6 @@ void Visual::SetHighlighted(bool _highlighted)
   if (_highlighted)
   {
     math::Box bbox = this->GetBoundingBox();
-    // GetBoundingBox returns the box in world coordinates
-    // Invert thes scale of the box before attaching to the visual
-    // so that the new inherited scale after attachment is correct.
-    math::Vector3 scale = Conversions::Convert(
-          this->dataPtr->sceneNode->_getDerivedScale());
-    bbox.min = bbox.min / scale;
-    bbox.max = bbox.max / scale;
 
     // Create the bounding box if it's not already created.
     if (!this->dataPtr->boundingBox)
@@ -1851,6 +1844,7 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
     Ogre::MovableObject *obj = node->getAttachedObject(i);
 
     if (obj->isVisible() && obj->getMovableType() != "gazebo::dynamiclines"
+        && obj->getMovableType() != "BillboardSet"
         && obj->getVisibilityFlags() != GZ_VISIBILITY_GUI)
     {
       Ogre::Any any = obj->getUserAny();
@@ -1882,8 +1876,7 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
         transform[3][3] = 1;
         // get oriented bounding box in object's local space
         bb.transformAffine(transform);
-        if (node->getParentSceneNode())
-          bb.scale(node->getParentSceneNode()->_getDerivedScale());
+
         min = Conversions::Convert(bb.getMinimum());
         max = Conversions::Convert(bb.getMaximum());
       }
@@ -2222,6 +2215,9 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
           newGeometryType == "sphere" || newGeometryType == "plane")
       {
         this->AttachMesh("unit_" + newGeometryType);
+        sdf::ElementPtr shapeElem = geomElem->AddElement(newGeometryType);
+        if (newGeometryType == "sphere" || newGeometryType == "cylinder")
+          shapeElem->GetElement("radius")->Set(0.5);
       }
       else
       {
@@ -2234,6 +2230,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
             gzerr << "No mesh found\n";
 
           this->AttachMesh(meshName);
+          geomElem->AddElement(newGeometryType);
         }
       }
     }

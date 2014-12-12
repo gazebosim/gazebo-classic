@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+
+#include <string>
 
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -108,6 +110,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   customItem->addChild(customChildItem);
 
   QPushButton *customButton = new QPushButton(tr("Add"), this);
+  customButton->setMaximumWidth(60);
   customButton->setCheckable(true);
   customButton->setChecked(false);
   connect(customButton, SIGNAL(clicked()), this, SLOT(OnCustom()));
@@ -144,13 +147,11 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   QLabel *staticLabel = new QLabel(tr("Static:"));
   this->staticCheck = new QCheckBox;
-  this->staticCheck->setText(tr("False"));
   this->staticCheck->setChecked(false);
   connect(this->staticCheck, SIGNAL(clicked()), this, SLOT(OnStatic()));
 
   QLabel *autoDisableLabel = new QLabel(tr("Auto-disable:"));
   this->autoDisableCheck = new QCheckBox;
-  this->autoDisableCheck->setText(tr("True"));
   this->autoDisableCheck->setChecked(true);
   connect(this->autoDisableCheck, SIGNAL(clicked()), this,
       SLOT(OnAutoDisable()));
@@ -190,7 +191,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   buttonsLayout->setAlignment(Qt::AlignCenter);
 
   this->modelCreator = new ModelCreator();
-  connect(this->modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
+  connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
 
   QFrame *frame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;
@@ -274,8 +275,6 @@ void ModelEditorPalette::OnCustom()
 void ModelEditorPalette::AddJoint(const std::string &_type)
 {
   event::Events::setSelectedEntity("", "normal");
-  g_arrowAct->trigger();
-
   this->modelCreator->AddJoint(_type);
 }
 
@@ -291,16 +290,12 @@ void ModelEditorPalette::OnPartAdded()
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnAutoDisable()
 {
-  std::string text = this->autoDisableCheck->isChecked() ? "True" : "False";
-  this->autoDisableCheck->setText(tr(text.c_str()));
   this->modelCreator->SetAutoDisable(this->autoDisableCheck->isChecked());
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnStatic()
 {
-  std::string text = this->staticCheck->isChecked() ? "True" : "False";
-  this->staticCheck->setText(tr(text.c_str()));
   this->modelCreator->SetStatic(this->staticCheck->isChecked());
 }
 
@@ -390,3 +385,4 @@ ModelCreator *ModelEditorPalette::GetModelCreator()
 {
   return this->modelCreator;
 }
+

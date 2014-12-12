@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,11 @@ void JointMaker_TEST::JointState()
 /////////////////////////////////////////////////
 void JointMaker_TEST::CreateRemoveJoint()
 {
+  // FIXME Test passes but segfaults when QTestFixture clean up
+  // Problem: JointMaker's destructor resets visual shared_ptrs
+  // but this later causes a segfault in Visual's destructor when exiting the
+  // program.
+
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
@@ -73,7 +78,6 @@ void JointMaker_TEST::CreateRemoveJoint()
     mainWindow->repaint();
   }
 
-  // Get the user camera, and tell it to save frames
   rendering::UserCameraPtr cam = gui::get_active_camera();
   Q_ASSERT(cam);
   rendering::ScenePtr scene = cam->GetScene();
@@ -127,8 +131,8 @@ void JointMaker_TEST::CreateRemoveJoint()
   jointMaker->RemoveJoint(ballJointData->hotspot->GetName());
   QCOMPARE(jointMaker->GetJointCount(), 0u);
 
+  // delete jointMaker;
   mainWindow->close();
-  delete jointMaker;
   delete mainWindow;
 }
 

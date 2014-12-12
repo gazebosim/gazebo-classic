@@ -129,6 +129,7 @@ if (ENABLE_SCREEN_TESTS)
       ${qt_tests}
       BuildingEditor_TEST.cc
       ConfigWidget_TEST.cc
+      GLWidget_TEST.cc
       MainWindow_TEST.cc
       ModelListWidget_TEST.cc
       ModelSnap_TEST.cc)

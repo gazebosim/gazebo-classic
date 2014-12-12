@@ -666,7 +666,6 @@ namespace gazebo
       return result;
     }
 
-
     /////////////////////////////////////////////////
     msgs::Geometry GeometryFromSDF(sdf::ElementPtr _sdf)
     {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
@@ -89,6 +89,12 @@ namespace gazebo
       /// \brief Reset the joint maker;
       public: void Reset();
 
+      /// \brief Enable the mouse and key event handlers for the joint maker
+      public: void EnableEventHandlers();
+
+      /// \brief Disable the mouse and key event handlers for the joint maker
+      public: void DisableEventHandlers();
+
       /// \brief Add a joint
       /// \param[in] _type Type of joint to be added in string.
       public: void AddJoint(const std::string &_type);
@@ -100,6 +106,7 @@ namespace gazebo
       /// \brief Create a joint with parent and child.
       /// \param[in] _parent Parent of the joint.
       /// \param[in] _child Child of the joint.
+      /// \return joint data.
       public: JointData *CreateJoint(rendering::VisualPtr _parent,
           rendering::VisualPtr _child);
 
@@ -186,6 +193,9 @@ namespace gazebo
       /// \brief Qt Callback to open joint inspector
       private slots: void OnOpenInspector();
 
+      /// \brief Constant vector containing [UnitX, UnitY, UnitZ].
+      private: std::vector<math::Vector3> UnitVectors;
+
       /// \brief Type of joint to create
       private: JointMaker::JointType jointType;
 
@@ -241,6 +251,9 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Name of the joint.
+      public: std::string name;
+
       /// \brief Visual of the dynamic line
       public: rendering::VisualPtr visual;
 
@@ -257,7 +270,6 @@ namespace gazebo
       public: rendering::DynamicLines *line;
 
       /// \brief Visual handle used to represent joint parent / child
-      public: rendering::DynamicLines *handle;
       public: Ogre::BillboardSet *handles;
 
       /// \brief Type of joint.
@@ -272,8 +284,8 @@ namespace gazebo
       /// \brief Joint upper limit.
       public: double upperLimit[2];
 
-      /// \brief Joint anchor point.
-      public: math::Vector3 anchor;
+      /// \brief Joint anchor.
+      public: math::Pose anchor;
 
       /// \brief True if the joint visual needs update.
       public: bool dirty;

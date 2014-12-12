@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,19 @@
 #ifndef _MODEL_CREATOR_HH_
 #define _MODEL_CREATOR_HH_
 
+#include <boost/unordered/unordered_map.hpp>
+#include <sdf/sdf.hh>
+
 #include <list>
 #include <string>
 #include <vector>
 
-#include <boost/unordered/unordered_map.hpp>
-
-#include <sdf/sdf.hh>
-
 #include "gazebo/common/KeyEvent.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/transport/TransportTypes.hh"
-
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/PartInspector.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -160,6 +158,12 @@ namespace gazebo
       /// \param[in] _checked True if the menu item is checked
       private slots: void OnEdit(bool _checked);
 
+      /// \brief Qt callback when the copy action is triggered.
+      private slots: void OnCopy();
+
+      /// \brief Qt callback when the paste action is triggered.
+      private slots: void OnPaste();
+
       /// \brief Mouse event filter callback when mouse is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -185,6 +189,10 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
 
+      /// \brief Callback when the manipulation mode has changed.
+      /// \param[in] _mode New manipulation mode.
+      private: void OnManipMode(const std::string &_mode);
+
       /// \brief Create part with default properties from a visual
       /// \param[in] _visual Visual used to create the part.
       private: PartData *CreatePart(const rendering::VisualPtr &_visual);
@@ -202,6 +210,19 @@ namespace gazebo
       /// \brief Create an empty model.
       /// \return Name of the model created.
       private: std::string CreateModel();
+
+      /// \brief Callback when a specific alignment configuration is set.
+      /// \param[in] _axis Axis of alignment: x, y, or z.
+      /// \param[in] _config Configuration: min, center, or max.
+      /// \param[in] _target Target of alignment: first or last.
+      /// \param[in] _bool True to preview alignment without publishing
+      /// to server.
+      private: void OnAlignMode(const std::string &_axis,
+          const std::string &_config, const std::string &_target,
+          bool _preview);
+
+      /// \brief Deselect all currently selected visuals.
+      private: void DeselectAll();
 
       /// \brief Qt callback when a delete signal has been emitted.
       /// \param[in] _name Name of the entity to delete.
@@ -249,6 +270,9 @@ namespace gazebo
       /// \brief Counter for generating a unique model name.
       private: int modelCounter;
 
+      /// \brief Transparency value for model being edited.
+      private: double editTransparency;
+
       /// \brief Type of part being added.
       private: PartType addPartType;
 
@@ -272,14 +296,22 @@ namespace gazebo
       /// \brief origin of the model.
       private: math::Pose origin;
 
-      /// \brief Selected partv visual;
-      private: rendering::VisualPtr selectedVis;
+      /// \brief A list of selected visuals.
+      private: std::vector<rendering::VisualPtr> selectedVisuals;
+      /// \brief Names of parts copied through g_copyAct
+      private: std::vector<std::string> copiedPartNames;
+
+      /// \brief The last mouse event
+      private: common::MouseEvent lastMouseEvent;
 
       /// \brief Qt action for opening the part inspector.
       private: QAction *inspectAct;
 
       /// \brief Part visual that is currently being inspected.
       private: rendering::VisualPtr inspectVis;
+
+      /// \brief True if the model editor mode is active.
+      private: bool active;
     };
     /// \}
   }

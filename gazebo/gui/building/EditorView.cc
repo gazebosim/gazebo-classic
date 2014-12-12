@@ -275,6 +275,7 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
       {
         StairsItem *stairsItem = dynamic_cast<StairsItem *>(
             this->currentMouseItem);
+        stairsItem->Set3dTexture(QString(""));
         stairsItem->Set3dColor(Qt::white);
         this->stairsList.push_back(stairsItem);
         if ((this->currentLevel) < static_cast<int>(floorList.size()))
@@ -429,6 +430,8 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         if (distance > 30 || t > 1.0 || t < 0.0)
         {
           editorItem->setParentItem(NULL);
+          editorItem->SetPositionOnWall(0);
+          editorItem->SetAngleOnWall(0);
           this->buildingMaker->DetachManip(this->itemToVisualMap[editorItem],
                 this->itemToVisualMap[wallSegmentItem]);
           editorItem->SetRotation(editorItem->GetRotation()
@@ -680,6 +683,7 @@ void EditorView::DrawWall(const QPoint &_pos)
     this->snapGrabberCurrent = NULL;
 
     wallSegmentItem = dynamic_cast<WallSegmentItem*>(this->currentMouseItem);
+    wallSegmentItem->Set3dTexture(QString(""));
     wallSegmentItem->Set3dColor(Qt::white);
     wallSegmentItem->SetHighlighted(false);
     wallSegmentList.push_back(wallSegmentItem);
@@ -1019,6 +1023,7 @@ void EditorView::OnAddLevel()
     this->itemToVisualMap[wallSegmentItem] = wallSegmentName;
 
     floorItem->AttachWallSegment(wallSegmentItem);
+    wallSegmentItem->Set3dTexture(QString(""));
     wallSegmentItem->Set3dColor(Qt::white);
     wallSegmentItem->SetHighlighted(false);
   }
@@ -1064,6 +1069,7 @@ void EditorView::OnAddLevel()
   this->itemToVisualMap[floorItem] = floorName;
   this->scene()->addItem(floorItem);
   this->floorList.push_back(floorItem);
+  floorItem->Set3dTexture(QString(""));
   floorItem->Set3dColor(Qt::white);
   floorItem->SetHighlighted(false);
 }
@@ -1081,6 +1087,7 @@ void EditorView::DeleteLevel(int _level)
       || _level >= static_cast<int>(this->levels.size()))
     return;
 
+  // Delete current level and move to level below or above
   int newLevelIndex = _level - 1;
   if (newLevelIndex < 0)
     newLevelIndex = _level + 1;
@@ -1212,6 +1219,7 @@ void EditorView::OnOpenLevelInspector()
   {
     this->levelInspector->floorWidget->show();
     this->levelInspector->SetFloorColor(floorItem->Get3dColor());
+    this->levelInspector->SetFloorTexture(floorItem->Get3dTexture());
   }
   else
   {
@@ -1229,10 +1237,14 @@ void EditorView::OnLevelApply()
 
   std::string newLevelName = dialog->GetLevelName();
   this->levels[this->currentLevel]->name = newLevelName;
-  this->levels[this->currentLevel]->floorItem->Set3dColor(dialog->
-      GetFloorColor());
-  this->levels[this->currentLevel]->floorItem->Set3dTransparency(0.4);
-  this->levels[this->currentLevel]->floorItem->FloorChanged();
+  FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
+  if (floorItem)
+  {
+    floorItem->Set3dTexture(dialog->GetFloorTexture());
+    floorItem->Set3dColor(dialog->GetFloorColor());
+    floorItem->Set3dTransparency(0.4);
+    floorItem->FloorChanged();
+  }
   gui::editor::Events::updateLevelWidget(this->currentLevel, newLevelName);
 }
 

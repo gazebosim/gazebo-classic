@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 */
 #ifndef _MODEL_EDITOR_HH_
 #define _MODEL_EDITOR_HH_
+
+#include <string>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Editor.hh"
@@ -53,6 +55,10 @@ namespace gazebo
 
       /// \brief Qt callback when a joint is added.
       private slots: void OnJointAdded();
+
+      /// \brief Callback when an action in the toolbar has been triggered.
+      /// \param[in] _action Triggered action.
+      private slots: void OnAction(QAction *_action);
 
       /// \brief Callback when the model has been completed.
       private: void OnFinish();

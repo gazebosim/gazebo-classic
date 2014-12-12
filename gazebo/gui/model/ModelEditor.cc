@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,16 @@
  *
 */
 
-#include "gazebo/common/Events.hh"
+#include <string>
+
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/RenderWidget.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -51,8 +54,19 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       tr("Joint"), this);
   this->jointAct->setCheckable(true);
 
+  // set up the action group so that only one action is active at one time.
+  QActionGroup *actionGroup = g_arrowAct->actionGroup();
+  if (actionGroup)
+  {
+    this->jointAct->setActionGroup(actionGroup);
+    connect(actionGroup, SIGNAL(triggered(QAction *)),
+        this, SLOT(OnAction(QAction *)));
+  }
+
   QToolBar *toolbar = this->mainWindow->GetRenderWidget()->GetToolbar();
   this->jointButton = new QToolButton(toolbar);
+  this->jointButton->setObjectName("jointToolButton");
+  this->jointButton->setCheckable(false);
   this->jointButton->setFixedWidth(15);
   this->jointButton->setPopupMode(QToolButton::InstantPopup);
   QMenu *jointMenu = new QMenu(this->jointButton);
@@ -141,7 +155,7 @@ ModelEditor::~ModelEditor()
 /////////////////////////////////////////////////
 void ModelEditor::OnAddSelectedJoint()
 {
-  this->modelPalette->AddJoint(this->selectedJointType);
+  this->OnAddJoint(tr(this->selectedJointType.c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -151,12 +165,17 @@ void ModelEditor::OnAddJoint(const QString &_type)
   this->modelPalette->AddJoint(type);
   this->selectedJointType = type;
   this->jointAct->setChecked(true);
+  gui::Events::manipMode("joint");
 }
 
 /////////////////////////////////////////////////
 void ModelEditor::OnJointAdded()
 {
-  this->jointAct->setChecked(false);
+  if (this->jointAct->isChecked())
+  {
+    this->jointAct->setChecked(false);
+    g_arrowAct->trigger();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -174,7 +193,7 @@ void ModelEditor::OnEdit(bool /*_checked*/)
   }
   this->active = !this->active;
   this->ToggleToolbar();
-//  g_editModelAct->setChecked(this->active);
+  // g_editModelAct->setChecked(this->active);
 }
 
 /////////////////////////////////////////////////
@@ -182,6 +201,13 @@ void ModelEditor::OnFinish()
 {
 //  this->OnEdit(g_editModelAct->isChecked());
   g_editModelAct->trigger();
+}
+
+/////////////////////////////////////////////////
+void ModelEditor::OnAction(QAction *_action)
+{
+  if (_action != this->jointAct)
+    this->modelPalette->AddJoint("none");
 }
 
 /////////////////////////////////////////////////
@@ -196,10 +222,10 @@ void ModelEditor::ToggleToolbar()
         actions[i] == g_rotateAct ||
         actions[i] == g_translateAct ||
         actions[i] == g_scaleAct ||
-        actions[i] == g_screenshotAct)
-//        actions[i] == g_copyAct -- issue #1314
-//        actions[i] == g_pasteAct
-//        align tool              -- issue #1323
+        actions[i] == g_screenshotAct ||
+        actions[i] == g_copyAct ||
+        actions[i] == g_pasteAct ||
+        actions[i] == g_alignButtonAct)
 //        actions[i] == g_snapAct -- issue #1318
     {
       actions[i]->setVisible(true);
@@ -213,4 +239,8 @@ void ModelEditor::ToggleToolbar()
       actions[i]->setVisible(!this->active);
     }
   }
+
+  this->jointAct->setVisible(this->active);
+  this->jointTypeAct->setVisible(this->active);
+  this->jointSeparatorAct->setVisible(this->active);
 }
