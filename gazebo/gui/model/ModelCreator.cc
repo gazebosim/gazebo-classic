@@ -937,10 +937,6 @@ void ModelCreator::GenerateSDF()
 
   linkElem = modelElem->GetElement("link");
   sdf::ElementPtr templateLinkElem = linkElem->Clone();
-  /*sdf::ElementPtr templateVisualElem = templateLinkElem->GetElement(
-      "visual")->Clone();
-  sdf::ElementPtr templateCollisionElem = templateLinkElem->GetElement(
-      "collision")->Clone();*/
   modelElem->ClearElements();
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;
@@ -970,7 +966,8 @@ void ModelCreator::GenerateSDF()
 
     PartData *part = partsIt->second;
     sdf::ElementPtr newLinkElem = part->partSDF->Clone();
-
+    newLinkElem->GetElement("pose")->Set(part->partVisual->GetWorldPose()
+        - this->origin);
 
     modelElem->InsertElement(newLinkElem);
 
@@ -979,10 +976,15 @@ void ModelCreator::GenerateSDF()
     {
       rendering::VisualPtr visual = it->first;
       sdf::ElementPtr visualElem = visual->GetSDF()->Clone();
-
-
       newLinkElem->InsertElement(visualElem);
-      //newLinkElem->InsertElement(collisionElem);
+    }
+
+    std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
+    for (colIt = part->collisions.begin(); colIt != part->collisions.end();
+        ++colIt)
+    {
+      sdf::ElementPtr collisionElem = msgs::CollisionToSDF(colIt->second);
+      newLinkElem->InsertElement(collisionElem);
     }
   }
 
