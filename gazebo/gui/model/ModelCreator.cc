@@ -39,6 +39,7 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/ModelAlign.hh"
+#include "gazebo/gui/ModelSnap.hh"
 
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -378,6 +379,7 @@ void ModelCreator::Reset()
       !gui::get_active_camera()->GetScene())
     return;
 
+  ModelSnap::Instance()->Reset();
   this->jointMaker->Reset();
   this->selectedVisuals.clear();
   g_copyAct->setEnabled(false);
@@ -395,7 +397,7 @@ void ModelCreator::Reset()
   while (this->allParts.size() > 0)
     this->RemovePart(this->allParts.begin()->first);
   this->allParts.clear();
-
+  std::cout << "Calling RemoveVisual in ModelCreator::Reset" << std::endl;
   if (this->modelVisual)
     scene->RemoveVisual(this->modelVisual);
 

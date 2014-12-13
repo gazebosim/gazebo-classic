@@ -102,15 +102,8 @@ void ModelSnap::Init()
 void ModelSnap::Reset()
 {
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
-  this->dataPtr->selectedVis.reset();
-  this->dataPtr->selectedTriangle.clear();
 
-  this->dataPtr->hoverVis.reset();
-  this->dataPtr->hoverTriangle.clear();
-
-  this->dataPtr->hoverTriangleDirty = false;
-  this->dataPtr->selectedTriangleDirty = false;
-
+  std::cout << "Calling ModelSnap::Reset" << std::endl;
   if (this->dataPtr->snapVisual)
   {
     if (this->dataPtr->snapVisual->GetVisible())
@@ -131,6 +124,14 @@ void ModelSnap::Reset()
           this->dataPtr->highlightVisual);
     }
   }
+  this->dataPtr->selectedVis.reset();
+  this->dataPtr->selectedTriangle.clear();
+
+  this->dataPtr->hoverVis.reset();
+  this->dataPtr->hoverTriangle.clear();
+
+  this->dataPtr->hoverTriangleDirty = false;
+  this->dataPtr->selectedTriangleDirty = false;
 
   event::Events::DisconnectRender(this->dataPtr->renderConnection);
   this->dataPtr->renderConnection.reset();

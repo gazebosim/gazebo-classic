@@ -967,6 +967,8 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 /////////////////////////////////////////////////
 void GLWidget::OnManipMode(const std::string &_mode)
 {
+  if (this->state.compare("snap") == 0 && _mode.compare("snap") != 0)
+    ModelSnap::Instance()->Reset();
   this->state = _mode;
 
   if (!this->selectedVisuals.empty())
@@ -976,7 +978,6 @@ void GLWidget::OnManipMode(const std::string &_mode)
   }
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
-  ModelSnap::Instance()->Reset();
 
   if (this->state != "select")
   {
