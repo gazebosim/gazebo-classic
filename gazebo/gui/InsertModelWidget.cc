@@ -15,7 +15,6 @@
  *
  */
 
-#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <sdf/sdf.hh>
 
@@ -184,17 +183,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
     return;
 
   boost::filesystem::path dir(_path);
-
-  bool pathExists = false;
-  try
-  {
-    pathExists = boost::filesystem::exists(dir);
-  }
-  catch(...)
-  {
-    gzlog << "Permission denied for directory: " << _path << std::endl;
-    return;
-  }
+  bool _pathExists = this->IsPathAccesible(dir);
 
   QString qpath = QString::fromStdString(_path);
   QTreeWidgetItem *topItem = NULL;
@@ -210,7 +199,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
     this->dataPtr->fileTreeWidget->addTopLevelItem(topItem);
 
     // Add the new path to the directory watcher
-    if (pathExists)
+    if (_pathExists)
       this->dataPtr->watcher->addPath(qpath);
   }
   else
@@ -219,16 +208,25 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   // Remove current items.
   topItem->takeChildren();
 
-  if (pathExists &&
+  if (_pathExists &&
       boost::filesystem::is_directory(dir))
   {
     std::vector<boost::filesystem::path> paths;
 
     // Get all the paths in alphabetical order
-    std::copy(boost::filesystem::directory_iterator(dir),
-        boost::filesystem::directory_iterator(),
-        std::back_inserter(paths));
-    std::sort(paths.begin(), paths.end());
+    try
+    {
+      std::copy(boost::filesystem::directory_iterator(dir),
+          boost::filesystem::directory_iterator(),
+          std::back_inserter(paths));
+      std::sort(paths.begin(), paths.end());
+    }
+    catch(boost::filesystem::filesystem_error & e)
+    {
+      gzerr << "Not loading models in: " << _path
+            << "Filesystem permission denied" << std::endl;
+      return;
+    }
 
     // Iterate over all the models in the current gazebo path
     for (std::vector<boost::filesystem::path>::iterator dIter = paths.begin();
@@ -249,41 +247,19 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
         }
         continue;
       }
-      bool manifestExists = false;
-      try
-      {
-        manifestExists =
-          boost::filesystem::exists(manifest/GZ_MODEL_MANIFEST_FILENAME);
-      }
-      catch(...)
-      {
-        gzlog << "Permission denied for "
-              << manifest/GZ_MODEL_MANIFEST_FILENAME << std::endl;
-        continue;
-      }
 
-      // Get the GZ_MODEL_MANIFEST_FILENAME.
-      if (manifestExists)
-        manifest /= GZ_MODEL_MANIFEST_FILENAME;
-      else
+      manifest /= GZ_MODEL_MANIFEST_FILENAME;
+      
+      // Check if the manifest does not exists
+      if (!this->IsPathAccesible(manifest))
       {
-        try
-        {
-          manifestExists = boost::filesystem::exists(manifest / "manifest.xml");
-        }
-        catch(...)
-        {
-          gzlog << "Permission denied for "
-              << manifest/"manifest.xml" << std::endl;
-          continue;
-        }
-
         gzerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME << " for model "
           << (*dIter) << "\n";
-        manifest = manifest/"manifest.xml";
+
+        manifest = manifest / "manifest.xml";
       }
 
-      if (!boost::filesystem::exists(manifest) || manifest == fullPath)
+       if (!this->IsPathAccesible(manifest) || manifest == fullPath)
       {
         gzlog << "model.config file is missing in directory["
               << fullPath << "]\n";
@@ -342,4 +318,26 @@ void InsertModelWidget::OnModelUpdateRequest(const std::string &_path)
 {
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
   this->UpdateLocalPath(_path);
+}
+
+/////////////////////////////////////////////////
+bool InsertModelWidget::IsPathAccesible(const boost::filesystem::path &_path)
+{
+  gzlog << "Trying path: " << _path << boost::filesystem::exists(_path) << std::endl;
+
+  try
+  {
+    return boost::filesystem::exists(_path);
+  }
+  catch(boost::filesystem::filesystem_error & e)
+  {
+    gzerr << "Permission denied for directory: " << _path << std::endl;
+  }
+  catch(std::exception & e)
+  {
+    gzerr << "Unexpected error while accessing to: " << _path << "."
+          << "Error reported: " << e.what() << std::endl;
+  }
+  
+  return false;
 }

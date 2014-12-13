@@ -17,9 +17,11 @@
 #ifndef _INSERT_MODEL_WIDGET_HH_
 #define _INSERT_MODEL_WIDGET_HH_
 
+
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/gui/qt.h"
@@ -77,6 +79,10 @@ namespace gazebo
 
       /// \brief Vector to store event connections.
       private: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief check if path exists with special care to filesystem
+      /// permissions
+      private: static bool IsPathAccesible(const boost::filesystem::path &_path);
 
       /// \brief Private data pointer.
       private: InsertModelWidgetPrivate *dataPtr;
