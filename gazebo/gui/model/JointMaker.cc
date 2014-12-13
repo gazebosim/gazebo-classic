@@ -179,7 +179,6 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 
   // intercept mouse press events when user clicks on the joint hotspot visual
   rendering::UserCameraPtr camera = gui::get_active_camera();
-//  rendering::ScenePtr scene = camera->GetScene();
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
   if (vis)
   {
@@ -199,7 +198,6 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
   if (this->jointType == JointMaker::JOINT_NONE)
   {
     rendering::UserCameraPtr camera = gui::get_active_camera();
-//    rendering::ScenePtr scene = camera->GetScene();
     rendering::VisualPtr vis = camera->GetVisual(_event.pos);
     if (vis)
     {
@@ -218,16 +216,9 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
         }
         else if (_event.button == common::MouseEvent::LEFT)
         {
-          // turn off model selection so we don't end up with
-          // both joint and model selected at the same time
-          event::Events::setSelectedEntity("", "normal");
-
           this->selectedJoint = vis;
           this->selectedJoint->SetHighlighted(true);
         }
-        // stop event propagation as we don't want users to manipulate the
-        // hotspot
-        return true;
       }
       return false;
     }
@@ -318,7 +309,7 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
     jointData->lowerLimit[i] = -3.14;
     jointData->upperLimit[i] = 3.14;
   }
-  jointData->anchor = math::Vector3::Zero;
+  jointData->anchor = math::Pose::Zero;
   jointData->line->setMaterial(this->jointMaterials[jointData->type]);
 
   return jointData;
@@ -371,14 +362,6 @@ void JointMaker::AddJoint(JointMaker::JointType _type)
   {
     // Remove the event filters.
     MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
-
-    // Press event added only after a joint is created. Needs to be added here
-    // instead of in the constructor otherwise GLWidget would get the event
-    // first and JoinMaker would not receive it.
-    MouseEventHandler::Instance()->AddPressFilter("model_joint",
-        boost::bind(&JointMaker::OnMousePress, this, _1));
-    MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
-      boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
 
     // signal the end of a joint action.
     emit JointAdded();
@@ -454,10 +437,12 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     if (!this->hoverVis->IsPlane())
     {
       if (this->mouseJoint->parent)
+      {
         parentPos =  this->GetPartWorldCentroid(this->mouseJoint->parent)
             - this->mouseJoint->line->GetPoint(0);
-      this->mouseJoint->line->SetPoint(1,
-          this->GetPartWorldCentroid(this->hoverVis) - parentPos);
+        this->mouseJoint->line->SetPoint(1,
+            this->GetPartWorldCentroid(this->hoverVis) - parentPos);
+      }
     }
     else
     {
@@ -466,10 +451,12 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
       camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
           math::Plane(math::Vector3(0, 0, 1)), pt);
       if (this->mouseJoint->parent)
+      {
         parentPos = this->GetPartWorldCentroid(this->mouseJoint->parent)
             - this->mouseJoint->line->GetPoint(0);
-      this->mouseJoint->line->SetPoint(1,
-          this->GetPartWorldCentroid(this->hoverVis) - parentPos + pt);
+        this->mouseJoint->line->SetPoint(1,
+            this->GetPartWorldCentroid(this->hoverVis) - parentPos + pt);
+      }
     }
   }
   return true;
@@ -559,7 +546,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   hotspotVisual->SetMaterial(this->jointMaterials[_joint->type]);
   hotspotVisual->SetTransparency(0.5);
 
-  // create two handles at the ends of the line
+  // create a handle at the parent end
   Ogre::BillboardSet *handleSet =
       camera->GetScene()->GetManager()->createBillboardSet(1);
   handleSet->setAutoUpdate(true);
@@ -688,7 +675,7 @@ void JointMaker::GenerateSDF()
     sdf::ElementPtr childElem = jointElem->GetElement("child");
     childElem->Set(joint->child->GetName());
     sdf::ElementPtr poseElem = jointElem->GetElement("pose");
-    poseElem->Set(math::Pose(joint->anchor, math::Vector3::Zero));
+    poseElem->Set(joint->anchor);
     int axisCount = GetJointAxisCount(joint->type);
     for (int i = 0; i < axisCount; ++i)
     {
@@ -836,8 +823,7 @@ void JointData::UpdateJointVisual()
   jointMsg->set_parent(this->parent->GetName());
   jointMsg->set_child(this->child->GetName());
   jointMsg->set_name(this->name);
-  msgs::Set(jointMsg->mutable_pose(), math::Pose(this->anchor,
-      math::Vector3(0, 0, 0)));
+  msgs::Set(jointMsg->mutable_pose(), this->anchor);
   if (this->type == JointMaker::JOINT_SLIDER)
   {
     jointMsg->set_type(msgs::Joint::PRISMATIC);

@@ -78,6 +78,9 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
   QLabel *anchorXLabel = new QLabel(tr("x: "));
   QLabel *anchorYLabel = new QLabel(tr("y: "));
   QLabel *anchorZLabel = new QLabel(tr("z: "));
+  QLabel *anchorRollLabel = new QLabel(tr("roll: "));
+  QLabel *anchorPitchLabel = new QLabel(tr("pitch: "));
+  QLabel *anchorYawLabel = new QLabel(tr("yaw: "));
 
   this->anchorXSpinBox = new QDoubleSpinBox;
   this->anchorXSpinBox->setRange(-1000, 1000);
@@ -97,13 +100,37 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
   this->anchorZSpinBox->setDecimals(3);
   this->anchorZSpinBox->setValue(0.000);
 
+  this->anchorRollSpinBox = new QDoubleSpinBox;
+  this->anchorRollSpinBox->setRange(-1000, 1000);
+  this->anchorRollSpinBox->setSingleStep(0.01);
+  this->anchorRollSpinBox->setDecimals(3);
+  this->anchorRollSpinBox->setValue(0.000);
+
+  this->anchorPitchSpinBox = new QDoubleSpinBox;
+  this->anchorPitchSpinBox->setRange(-1000, 1000);
+  this->anchorPitchSpinBox->setSingleStep(0.01);
+  this->anchorPitchSpinBox->setDecimals(3);
+  this->anchorPitchSpinBox->setValue(0.000);
+
+  this->anchorYawSpinBox = new QDoubleSpinBox;
+  this->anchorYawSpinBox->setRange(-1000, 1000);
+  this->anchorYawSpinBox->setSingleStep(0.01);
+  this->anchorYawSpinBox->setDecimals(3);
+  this->anchorYawSpinBox->setValue(0.000);
+
   QGridLayout *anchorLayout = new QGridLayout;
   anchorLayout->addWidget(anchorXLabel, 0, 0);
   anchorLayout->addWidget(anchorXSpinBox, 0, 1);
-  anchorLayout->addWidget(anchorYLabel), 1, 0;
+  anchorLayout->addWidget(anchorYLabel, 1, 0);
   anchorLayout->addWidget(anchorYSpinBox, 1, 1);
-  anchorLayout->addWidget(anchorZLabel), 2, 0;
+  anchorLayout->addWidget(anchorZLabel, 2, 0);
   anchorLayout->addWidget(anchorZSpinBox, 2, 1);
+  anchorLayout->addWidget(anchorRollLabel, 0, 2);
+  anchorLayout->addWidget(anchorRollSpinBox, 0, 3);
+  anchorLayout->addWidget(anchorPitchLabel, 1, 2);
+  anchorLayout->addWidget(anchorPitchSpinBox, 1, 3);
+  anchorLayout->addWidget(anchorYawLabel, 2, 2);
+  anchorLayout->addWidget(anchorYawSpinBox, 2, 3);
 
   QGroupBox *anchorGroupBox = new QGroupBox(tr("Anchor"));
   anchorGroupBox->setLayout(anchorLayout);
@@ -217,10 +244,12 @@ JointInspector::~JointInspector()
 }
 
 /////////////////////////////////////////////////
-math::Vector3 JointInspector::GetAnchor(unsigned int /*_index*/) const
+math::Pose JointInspector::GetAnchor(unsigned int /*_index*/) const
 {
-  return math::Vector3(this->anchorXSpinBox->value(),
-      this->anchorYSpinBox->value(), this->anchorZSpinBox->value());
+  return math::Pose(this->anchorXSpinBox->value(),
+      this->anchorYSpinBox->value(), this->anchorZSpinBox->value(),
+      this->anchorRollSpinBox->value(), this->anchorPitchSpinBox->value(),
+      this->anchorYawSpinBox->value());
 }
 
 /////////////////////////////////////////////////
@@ -322,11 +351,16 @@ void JointInspector::SetChild(const std::string &_child)
 
 /////////////////////////////////////////////////
 void JointInspector::SetAnchor(unsigned int /*_index*/,
-    const math::Vector3 &_anchor)
+    const math::Pose &_anchor)
 {
-  this->anchorXSpinBox->setValue(_anchor.x);
-  this->anchorYSpinBox->setValue(_anchor.y);
-  this->anchorZSpinBox->setValue(_anchor.z);
+  this->anchorXSpinBox->setValue(_anchor.pos.x);
+  this->anchorYSpinBox->setValue(_anchor.pos.y);
+  this->anchorZSpinBox->setValue(_anchor.pos.z);
+
+  math::Vector3 rot = _anchor.rot.GetAsEuler();
+  this->anchorRollSpinBox->setValue(rot.x);
+  this->anchorPitchSpinBox->setValue(rot.y);
+  this->anchorYawSpinBox->setValue(rot.z);
 }
 
 /////////////////////////////////////////////////

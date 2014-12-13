@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2013-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ModelManipulator.hh"
+#include "gazebo/gui/ModelSnap.hh"
 #include "gazebo/gui/ModelAlign.hh"
 
 #include "gazebo/gui/model/ModelData.hh"
@@ -51,6 +52,7 @@ using namespace gui;
 /////////////////////////////////////////////////
 ModelCreator::ModelCreator()
 {
+  this->active = false;
   this->modelName = "";
 
   this->modelTemplateSDF.reset(new sdf::SDF);
@@ -78,6 +80,14 @@ ModelCreator::ModelCreator()
       gui::Events::ConnectAlignMode(
         boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
 
+  this->connections.push_back(
+      gui::Events::ConnectManipMode(
+        boost::bind(&ModelCreator::OnManipMode, this, _1)));
+
+  this->connections.push_back(
+     event::Events::ConnectSetSelectedEntity(
+       boost::bind(&ModelCreator::OnSetSelectedEntity, this, _1, _2)));
+
   g_copyAct->setEnabled(false);
   g_pasteAct->setEnabled(false);
 
@@ -96,6 +106,7 @@ ModelCreator::~ModelCreator()
   this->modelTemplateSDF.reset();
   this->requestPub.reset();
   this->makerPub.reset();
+  this->connections.clear();
 
   delete jointMaker;
 }
@@ -105,6 +116,7 @@ void ModelCreator::OnEdit(bool _checked)
 {
   if (_checked)
   {
+    this->active = true;
     KeyEventHandler::Instance()->AddPressFilter("model_creator",
         boost::bind(&ModelCreator::OnKeyPress, this, _1));
 
@@ -124,6 +136,7 @@ void ModelCreator::OnEdit(bool _checked)
   }
   else
   {
+    this->active = false;
     KeyEventHandler::Instance()->RemovePressFilter("model_creator");
     MouseEventHandler::Instance()->RemovePressFilter("model_creator");
     MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
@@ -190,7 +203,6 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
   }
 
   this->CreatePart(visVisual);
-
   this->mouseVisual = linkVisual;
 
   return linkName;
@@ -646,8 +658,15 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 {
-  if (this->jointMaker->GetState() != JointMaker::JOINT_NONE)
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
     return false;
+
+  if (this->jointMaker->GetState() != JointMaker::JOINT_NONE)
+  {
+    userCamera->HandleMouseEvent(_event);
+    return false;
+  }
 
   if (this->mouseVisual)
   {
@@ -666,15 +685,12 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
 
-  rendering::UserCameraPtr userCamera = gui::get_active_camera();
-  if (!userCamera)
-    return false;
-
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
   if (vis)
   {
+    rendering::VisualPtr partVis = vis->GetParent();
     // Is part
-    if (this->allParts.find(vis->GetParent()->GetName()) !=
+    if (this->allParts.find(partVis->GetName()) !=
         this->allParts.end())
     {
       // Handle snap from GLWidget
@@ -687,25 +703,25 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         this->DeselectAll();
 
         // Highlight and selected clicked part
-        vis->SetHighlighted(true);
-        this->selectedVisuals.push_back(vis);
+        partVis->SetHighlighted(true);
+        this->selectedVisuals.push_back(partVis);
       }
       // Multi-selection mode
       else
       {
         std::vector<rendering::VisualPtr>::iterator it =
             std::find(this->selectedVisuals.begin(),
-            this->selectedVisuals.end(), vis);
+            this->selectedVisuals.end(), partVis);
         // Highlight and selected clicked part if not already selected
         if (it == this->selectedVisuals.end())
         {
-          vis->SetHighlighted(true);
-          this->selectedVisuals.push_back(vis);
+          partVis->SetHighlighted(true);
+          this->selectedVisuals.push_back(partVis);
         }
         // Deselect if already selected
         else
         {
-          vis->SetHighlighted(false);
+          partVis->SetHighlighted(false);
           this->selectedVisuals.erase(it);
         }
       }
@@ -799,10 +815,9 @@ void ModelCreator::OnCopy()
   if (!this->selectedVisuals.empty())
   {
     this->copiedPartNames.clear();
-    for (unsigned int i = 0; i < this->selectedVisuals.size(); i++)
+    for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
     {
-      this->copiedPartNames.push_back(this->selectedVisuals[i]->GetParent()
-          ->GetName());
+      this->copiedPartNames.push_back(this->selectedVisuals[i]->GetName());
     }
     g_pasteAct->setEnabled(true);
   }
@@ -817,7 +832,7 @@ void ModelCreator::OnPaste()
   }
 
   // For now, only copy the last selected model
-  boost::unordered_map<std::string, PartData*>::iterator it =
+  boost::unordered_map<std::string, PartData *>::iterator it =
     this->allParts.find(this->copiedPartNames.back());
   if (it != this->allParts.end())
   {
@@ -844,6 +859,7 @@ void ModelCreator::OnPaste()
     rendering::VisualPtr visVisual;
 
     math::Pose clonePose;
+    math::Vector3 cloneScale;
 
     if (copiedPart->visuals.empty())
     {
@@ -858,6 +874,8 @@ void ModelCreator::OnPaste()
       rendering::VisualPtr copiedVisual = copiedPart->visuals.back();
       visVisual = copiedVisual->Clone(visualName.str(), linkVisual);
       clonePose = copiedVisual->GetWorldPose();
+      cloneScale = copiedVisual->GetParent()->GetScale();
+      visVisual->SetScale(math::Vector3::One);
     }
 
     rendering::UserCameraPtr userCamera = gui::get_active_camera();
@@ -870,6 +888,7 @@ void ModelCreator::OnPaste()
       clonePose.pos.y = mousePosition.y;
     }
 
+    linkVisual->SetScale(cloneScale);
     linkVisual->SetWorldPose(clonePose);
     linkVisual->SetTransparency(this->editTransparency);
 
@@ -916,7 +935,7 @@ void ModelCreator::GenerateSDF()
        ++partsIt)
   {
     PartData *part = partsIt->second;
-    mid += part->pose.pos;
+    mid += part->partVisual->GetWorldPose().pos;
   }
   mid /= this->allParts.size();
   this->origin.pos = mid;
@@ -924,7 +943,7 @@ void ModelCreator::GenerateSDF()
 
   // loop through all parts and generate sdf
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
-       ++partsIt)
+      ++partsIt)
   {
     visualNameStream.str("");
     collisionNameStream.str("");
@@ -933,7 +952,8 @@ void ModelCreator::GenerateSDF()
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
     newLinkElem->ClearElements();
     newLinkElem->GetAttribute("name")->Set(part->name);
-    newLinkElem->GetElement("pose")->Set(part->pose - this->origin);
+    newLinkElem->GetElement("pose")->Set(part->partVisual->GetWorldPose()
+        - this->origin);
     newLinkElem->GetElement("gravity")->Set(part->gravity);
     newLinkElem->GetElement("self_collide")->Set(part->selfCollide);
     newLinkElem->GetElement("kinematic")->Set(part->kinematic);
@@ -1014,14 +1034,7 @@ void ModelCreator::GenerateSDF()
 void ModelCreator::OnAlignMode(const std::string &_axis,
     const std::string &_config, const std::string &_target, bool _preview)
 {
-  // Align links, not visuals
-  std::vector<rendering::VisualPtr> selectedLinks;
-  for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
-  {
-    selectedLinks.push_back(this->selectedVisuals[i]->GetParent());
-  }
-
-  ModelAlign::Instance()->AlignVisuals(selectedLinks, _axis, _config,
+  ModelAlign::Instance()->AlignVisuals(this->selectedVisuals, _axis, _config,
       _target, !_preview);
 }
 
@@ -1036,4 +1049,38 @@ void ModelCreator::DeselectAll()
     }
     this->selectedVisuals.clear();
   }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnManipMode(const std::string &_mode)
+{
+  if (!this->active)
+    return;
+
+  if (!this->selectedVisuals.empty())
+  {
+    ModelManipulator::Instance()->SetAttachedVisual(
+        this->selectedVisuals.back());
+  }
+
+  ModelManipulator::Instance()->SetManipulationMode(_mode);
+  ModelSnap::Instance()->Reset();
+
+  // deselect 0 to n-1 models.
+  if (this->selectedVisuals.size() > 1)
+  {
+    for (std::vector<rendering::VisualPtr>::iterator it
+        = this->selectedVisuals.begin(); it != --this->selectedVisuals.end();)
+    {
+       (*it)->SetHighlighted(false);
+       it = this->selectedVisuals.erase(it);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnSetSelectedEntity(const std::string &/*_name*/,
+    const std::string &/*_mode*/)
+{
+  this->DeselectAll();
 }

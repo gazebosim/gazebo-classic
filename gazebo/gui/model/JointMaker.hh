@@ -27,7 +27,7 @@
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
@@ -106,6 +106,7 @@ namespace gazebo
       /// \brief Create a joint with parent and child.
       /// \param[in] _parent Parent of the joint.
       /// \param[in] _child Child of the joint.
+      /// \return joint data.
       public: JointData *CreateJoint(rendering::VisualPtr _parent,
           rendering::VisualPtr _child);
 
@@ -271,7 +272,7 @@ namespace gazebo
       /// \brief Visual line used to represent joint connecting parent and child
       public: rendering::DynamicLines *line;
 
-      /// \brief Visual handle used to represent joint parent / child
+      /// \brief Visual handle used to represent joint parent
       public: Ogre::BillboardSet *handles;
 
       /// \brief Type of joint.
@@ -286,8 +287,8 @@ namespace gazebo
       /// \brief Joint upper limit.
       public: double upperLimit[2];
 
-      /// \brief Joint anchor point.
-      public: math::Vector3 anchor;
+      /// \brief Joint anchor.
+      public: math::Pose anchor;
 
       /// \brief True if the joint visual needs update.
       public: bool dirty;
