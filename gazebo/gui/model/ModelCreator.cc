@@ -84,6 +84,10 @@ ModelCreator::ModelCreator()
       gui::Events::ConnectManipMode(
         boost::bind(&ModelCreator::OnManipMode, this, _1)));
 
+  this->connections.push_back(
+     event::Events::ConnectSetSelectedEntity(
+       boost::bind(&ModelCreator::OnSetSelectedEntity, this, _1, _2)));
+
   g_copyAct->setEnabled(false);
   g_pasteAct->setEnabled(false);
 
@@ -102,6 +106,7 @@ ModelCreator::~ModelCreator()
   this->modelTemplateSDF.reset();
   this->requestPub.reset();
   this->makerPub.reset();
+  this->connections.clear();
 
   delete jointMaker;
 }
@@ -558,13 +563,6 @@ void ModelCreator::Stop()
 /////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
 {
-  // check if it's our model
-  if (_entity == this->modelName)
-  {
-    this->Reset();
-    return;
-  }
-
   // if it's a link
   if (this->allParts.find(_entity) != this->allParts.end())
   {
@@ -1019,14 +1017,7 @@ void ModelCreator::GenerateSDF()
 void ModelCreator::OnAlignMode(const std::string &_axis,
     const std::string &_config, const std::string &_target, bool _preview)
 {
-  // Align links, not visuals
-  std::vector<rendering::VisualPtr> selectedLinks;
-  for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
-  {
-    selectedLinks.push_back(this->selectedVisuals[i]);
-  }
-
-  ModelAlign::Instance()->AlignVisuals(selectedLinks, _axis, _config,
+  ModelAlign::Instance()->AlignVisuals(this->selectedVisuals, _axis, _config,
       _target, !_preview);
 }
 
@@ -1068,4 +1059,11 @@ void ModelCreator::OnManipMode(const std::string &_mode)
        it = this->selectedVisuals.erase(it);
     }
   }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnSetSelectedEntity(const std::string &/*_name*/,
+    const std::string &/*_mode*/)
+{
+  this->DeselectAll();
 }

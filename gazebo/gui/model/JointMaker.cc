@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -212,8 +212,8 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
         }
         else if (_event.button == common::MouseEvent::LEFT)
         {
-          // turn off model selection so we don't end up with
-          // both joint and model selected at the same time
+          // turn off link selection so we don't end up with
+          // both joint and link selected at the same time
           event::Events::setSelectedEntity("", "normal");
 
           this->selectedJoint = vis;
@@ -366,14 +366,6 @@ void JointMaker::AddJoint(JointMaker::JointType _type)
     // Remove the event filters.
     MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
 
-    // Press event added only after a joint is created. Needs to be added here
-    // instead of in the constructor otherwise GLWidget would get the event
-    // first and JoinMaker would not receive it.
-    MouseEventHandler::Instance()->AddPressFilter("model_joint",
-        boost::bind(&JointMaker::OnMousePress, this, _1));
-    MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
-      boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
-
     // signal the end of a joint action.
     emit JointAdded();
   }
@@ -448,10 +440,12 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     if (!this->hoverVis->IsPlane())
     {
       if (this->mouseJoint->parent)
+      {
         parentPos =  this->GetPartWorldCentroid(this->mouseJoint->parent)
             - this->mouseJoint->line->GetPoint(0);
-      this->mouseJoint->line->SetPoint(1,
-          this->GetPartWorldCentroid(this->hoverVis) - parentPos);
+        this->mouseJoint->line->SetPoint(1,
+            this->GetPartWorldCentroid(this->hoverVis) - parentPos);
+      }
     }
     else
     {
@@ -460,10 +454,12 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
       camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
           math::Plane(math::Vector3(0, 0, 1)), pt);
       if (this->mouseJoint->parent)
+      {
         parentPos = this->GetPartWorldCentroid(this->mouseJoint->parent)
             - this->mouseJoint->line->GetPoint(0);
-      this->mouseJoint->line->SetPoint(1,
-          this->GetPartWorldCentroid(this->hoverVis) - parentPos + pt);
+        this->mouseJoint->line->SetPoint(1,
+            this->GetPartWorldCentroid(this->hoverVis) - parentPos + pt);
+      }
     }
   }
   return true;
@@ -553,7 +549,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   hotspotVisual->SetMaterial(this->jointMaterials[_joint->type]);
   hotspotVisual->SetTransparency(0.5);
 
-  // create two handles at the ends of the line
+  // create a handle at the parent end
   Ogre::BillboardSet *handleSet =
       camera->GetScene()->GetManager()->createBillboardSet(1);
   handleSet->setAutoUpdate(true);

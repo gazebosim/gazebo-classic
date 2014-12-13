@@ -192,6 +192,12 @@ namespace gazebo
       /// \param[in] _mode New manipulation mode.
       private: void OnManipMode(const std::string &_mode);
 
+      /// \brief Callback when an entity is selected.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _mode Select model
+      private: void OnSetSelectedEntity(const std::string &_name,
+          const std::string &_mode);
+
       /// \brief Create part with default properties from a visual
       /// \param[in] _visual Visual used to create the part.
       private: void CreatePart(const rendering::VisualPtr &_visual);

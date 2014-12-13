@@ -269,7 +269,7 @@ namespace gazebo
       /// \brief Visual line used to represent joint connecting parent and child
       public: rendering::DynamicLines *line;
 
-      /// \brief Visual handle used to represent joint parent / child
+      /// \brief Visual handle used to represent joint parent
       public: Ogre::BillboardSet *handles;
 
       /// \brief Type of joint.
