@@ -233,8 +233,8 @@ void Position2dInterface::OnPoseMsg(ConstPosesStampedPtr &_msg)
     player_position2d_data_t data;
     memset(&data, 0, sizeof(data));
 
-    this->datatime = static_cast<double>(_msg->time().sec()) +
-      static_cast<double>(_msg->time().nsec()) / 1.0e-9;
+    this->datatime = gazebo::msgs::Convert(_msg->time()).Double();
+
     data.pos.px = _msg->pose(i).position().x();
     data.pos.py = _msg->pose(i).position().y();
     gazebo::math::Quaternion quat =
