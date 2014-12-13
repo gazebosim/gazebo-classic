@@ -653,8 +653,15 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 {
-  if (this->jointMaker->GetState() != JointMaker::JOINT_NONE)
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
     return false;
+
+  if (this->jointMaker->GetState() != JointMaker::JOINT_NONE)
+  {
+    userCamera->HandleMouseEvent(_event);
+    return false;
+  }
 
   if (this->mouseVisual)
   {
@@ -672,10 +679,6 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     this->AddPart(PART_NONE);
     return true;
   }
-
-  rendering::UserCameraPtr userCamera = gui::get_active_camera();
-  if (!userCamera)
-    return false;
 
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
   if (vis)

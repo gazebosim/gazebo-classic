@@ -212,16 +212,9 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
         }
         else if (_event.button == common::MouseEvent::LEFT)
         {
-          // turn off link selection so we don't end up with
-          // both joint and link selected at the same time
-          event::Events::setSelectedEntity("", "normal");
-
           this->selectedJoint = vis;
           this->selectedJoint->SetHighlighted(true);
         }
-        // stop event propagation as we don't want users to manipulate the
-        // hotspot
-        return true;
       }
       return false;
     }
