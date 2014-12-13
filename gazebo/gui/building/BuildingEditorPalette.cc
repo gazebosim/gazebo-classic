@@ -122,7 +122,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->colorList.push_back(QColor(254, 121,   5, 255));
   this->colorList.push_back(QColor(255, 195,  78, 255));
   this->colorList.push_back(QColor(111, 203, 172, 255));
-  for (unsigned int i = 0; i < this->colorList.size(); i++)
+  for (unsigned int i = 0; i < this->colorList.size(); ++i)
   {
     QToolButton *colorButton = new QToolButton(this);
     colorButton->setFixedSize(40, 40);
@@ -159,7 +159,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   textureButton->setChecked(false);
   textureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
   textureButton->setIcon(QPixmap(this->textureList.back()).scaled(
-        QSize(30, 30), Qt::IgnoreAspectRatio));
+        QSize(90, 90), Qt::IgnoreAspectRatio));
   textureButton->setText("Wood");
   textureButton->setIconSize(QSize(textureIconSize));
   brushes->addButton(textureButton, brushes->buttons().size());
@@ -173,7 +173,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   textureButton->setChecked(false);
   textureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
   textureButton->setIcon(QPixmap(this->textureList.back()).scaled(
-        QSize(30, 30), Qt::IgnoreAspectRatio));
+        QSize(90, 90), Qt::IgnoreAspectRatio));
   textureButton->setText("Tiles");
   textureButton->setIconSize(QSize(textureIconSize));
   brushes->addButton(textureButton, brushes->buttons().size());
@@ -187,7 +187,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   textureButton->setChecked(false);
   textureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
   textureButton->setIcon(QPixmap(this->textureList.back()).scaled(
-        QSize(30, 30), Qt::IgnoreAspectRatio));
+        QSize(90, 90), Qt::IgnoreAspectRatio));
   textureButton->setText("Bricks");
   textureButton->setIconSize(QSize(textureIconSize));
   brushes->addButton(textureButton, brushes->buttons().size());
@@ -358,6 +358,8 @@ void BuildingEditorPalette::OnColor(int _buttonId)
     // Others
     else
     {
+      gzwarn << "Brushes other than color and texture are handled elsewhere."
+             << std::endl;
       return;
     }
   }

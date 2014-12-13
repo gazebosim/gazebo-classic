@@ -338,7 +338,7 @@ namespace gazebo
       private: GrabberHandle *snapGrabberCurrent;
 
       /// \brief Text tooltip to follow the mouse.
-      private: QGraphicsTextItem * mouseTooltip;
+      private: QGraphicsTextItem *mouseTooltip;
     };
     /// \}
   }

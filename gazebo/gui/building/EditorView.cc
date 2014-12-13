@@ -125,7 +125,6 @@ EditorView::EditorView(QWidget *_parent)
   this->mouseTooltip = new QGraphicsTextItem;
   this->mouseTooltip->setPlainText(
       "Oops! Color and texture can only be added in the 3D view.");
-  this->mouseTooltip->setVisible(false);
   this->mouseTooltip->setZValue(10);
 }
 
@@ -174,6 +173,9 @@ void EditorView::resizeEvent(QResizeEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::contextMenuEvent(QContextMenuEvent *_event)
 {
+  if (this->drawMode == COLOR || this->drawMode == TEXTURE)
+    return;
+
   if (this->drawInProgress)
   {
     this->CancelDrawMode();
@@ -238,8 +240,8 @@ void EditorView::wheelEvent(QWheelEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::mousePressEvent(QMouseEvent *_event)
 {
-  if (!this->drawInProgress && this->drawMode != WALL
-      && (_event->button() != Qt::RightButton))
+  if (!this->drawInProgress && this->drawMode != WALL && this->drawMode != COLOR
+      && this->drawMode != TEXTURE && (_event->button() != Qt::RightButton))
   {
     QGraphicsItem *mouseItem =
         this->scene()->itemAt(this->mapToScene(_event->pos()));
@@ -407,7 +409,6 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
       if (!this->mouseTooltip->scene())
         this->scene()->addItem(this->mouseTooltip);
 
-      this->mouseTooltip->setVisible(true);
       this->mouseTooltip->setPos(this->mapToScene(_event->pos()) +
           QPointF(15, 15));
       break;
@@ -520,10 +521,9 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 void EditorView::leaveEvent(QEvent */*_event*/)
 {
   if (this->mouseTooltip &&
-      this->scene()->items().contains(this->mouseTooltip) &&
-      this->mouseTooltip->isVisible())
+      this->scene()->items().contains(this->mouseTooltip))
   {
-    this->mouseTooltip->setVisible(false);
+    this->scene()->removeItem(this->mouseTooltip);
   }
 }
 
@@ -551,8 +551,9 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
   }
   else if (_event->key() == Qt::Key_Escape)
   {
-    if (this->mouseTooltip && this->mouseTooltip->isVisible())
-      this->mouseTooltip->setVisible(false);
+    if (this->mouseTooltip &&
+        this->scene()->items().contains(this->mouseTooltip))
+      this->scene()->removeItem(this->mouseTooltip);
     this->CancelDrawMode();
     gui::editor::Events::createBuildingEditorItem(std::string());
     this->releaseKeyboard();
@@ -582,6 +583,10 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
     this->releaseKeyboard();
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
     gui::editor::Events::createBuildingEditorItem(std::string());
+  }
+  else if (this->drawMode == COLOR || this->drawMode == TEXTURE)
+  {
+    return;
   }
   else
   {
@@ -944,6 +949,9 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
 /////////////////////////////////////////////////
 void EditorView::OnColorSelected(QColor _color)
 {
+  this->CancelDrawMode();
+  this->scene()->clearSelection();
+
   if (_color.isValid())
     this->drawMode = COLOR;
 }
@@ -951,6 +959,9 @@ void EditorView::OnColorSelected(QColor _color)
 /////////////////////////////////////////////////
 void EditorView::OnTextureSelected(QString _texture)
 {
+  this->CancelDrawMode();
+  this->scene()->clearSelection();
+
   if (_texture != QString(""))
     this->drawMode = TEXTURE;
 }
@@ -964,6 +975,7 @@ void EditorView::OnDiscardModel()
   this->stairsList.clear();
   this->floorList.clear();
   this->itemToVisualMap.clear();
+  this->buildingMaker->Reset();
 
   for (unsigned int i = 0; i < this->levels.size(); ++i)
     delete this->levels[i];

@@ -308,6 +308,9 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { exitBuildingEditor.Disconnect(_subscriber); }
 
+        /// \brief Toggle if the edit mode was checked or not.
+        public: static event::EventT<void (bool)> toggleEditMode;
+
         /// \brief Connect a Gazebo event to the name changed signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -321,9 +324,6 @@ namespace gazebo
         public: static void ConnectBuildingNameChanged(
             event::ConnectionPtr _subscriber)
           { buildingNameChanged.Disconnect(_subscriber); }
-
-        /// \brief Toggle if the edit mode was checked or not.
-        public: static event::EventT<void (bool)> toggleEditMode;
 
         /// \brief An editor item is to be created
         public: static event::EventT<void (std::string)>
