@@ -113,22 +113,19 @@ void ModelSnap::Reset()
 
   if (this->dataPtr->snapVisual)
   {
-    // this is a hack.
     //if (this->dataPtr->snapVisual->GetVisible())
     //  this->dataPtr->snapVisual->SetVisible(false);
-    this->dataPtr->snapLines->Clear();
 
     if (this->dataPtr->snapVisual->GetParent())
     {
       this->dataPtr->snapVisual->GetParent()->DetachVisual(
           this->dataPtr->snapVisual);
     }
-    this->dataPtr->snapVisual.reset();
   }
 
   if (this->dataPtr->highlightVisual)
   {
-    this->dataPtr->highlightVisual->SetVisible(false);
+    //this->dataPtr->highlightVisual->SetVisible(false);
     if (this->dataPtr->highlightVisual->GetParent())
     {
       this->dataPtr->highlightVisual->GetParent()->DetachVisual(
