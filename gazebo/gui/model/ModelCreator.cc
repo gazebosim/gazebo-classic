@@ -354,7 +354,14 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 
   part->partVisual = _visual->GetParent();
   part->AddVisual(_visual);
-  //part->visuals.push_back(_visual);
+
+  // create collision with identical geometry
+  rendering::VisualPtr collisoinVis =
+      _visual->Clone(part->partVisual->GetName() + "_collision",
+      part->partVisual);
+  collisoinVis->SetMaterial("Gazebo/Orange");
+  collisoinVis->SetTransparency(this->editTransparency);
+  part->AddCollision(collisoinVis);
 
   std::string partName = part->partVisual->GetName();
   part->SetName(partName);
@@ -671,6 +678,16 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     if (this->allParts.find(partVis->GetName()) !=
         this->allParts.end())
     {
+      // trigger part inspector on right click
+      if (_event.button == common::MouseEvent::RIGHT)
+      {
+        this->inspectVis = vis->GetParent();
+        QMenu menu;
+        menu.addAction(this->inspectAct);
+        menu.exec(QCursor::pos());
+        return true;
+      }
+
       // Not in multi-selection mode.
       if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
       {
@@ -718,9 +735,6 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     }
   }
   return false;
-
-
-
 }
 
 /////////////////////////////////////////////////

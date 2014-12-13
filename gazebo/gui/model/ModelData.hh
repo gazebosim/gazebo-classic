@@ -91,6 +91,10 @@ namespace gazebo
       /// \param[in] _visual Visual to be added.
       public: void AddVisual(rendering::VisualPtr _visual);
 
+      /// \brief Add a collision to the part.
+      /// \param[in] _collision Visual representing the collision.
+      public: void AddCollision(rendering::VisualPtr _collisionVis);
+
       /// \brief Update callback on PreRender.
       public: void Update();
 
@@ -106,10 +110,13 @@ namespace gazebo
       public: std::map<rendering::VisualPtr, msgs::Visual> visuals;
 
       /// \brief Msgs for updating visuals.
-      public: std::vector<msgs::Visual *> updateMsgs;
+      public: std::vector<msgs::Visual *> visualUpdateMsgs;
+
+      /// \brief Msgs for updating collision visuals.
+      public: std::vector<msgs::Collision *> collisionUpdateMsgs;
 
       /// \brief Collisions of the part.
-      public: std::vector<CollisionData *> collisions;
+      public: std::map<rendering::VisualPtr, msgs::Collision> collisions;
 
       /// \brief Inspector for configuring part properties.
       public: PartInspector *inspector;
@@ -122,9 +129,17 @@ namespace gazebo
       /// \param[in] _name Name of visual.
       private slots: void OnAddVisual(const std::string &_name);
 
+      /// \brief Qt callback when a new collision is to be added.
+      /// \param[in] _name Name of collision.
+      private slots: void OnAddCollision(const std::string &_name);
+
       /// \brief Qt callback when a visual is to be removed.
       /// \param[in] _name Name of visual.
       private slots: void OnRemoveVisual(const std::string &_name);
+
+      /// \brief Qt callback when a collision is to be removed.
+      /// \param[in] _name Name of collision.
+      private slots: void OnRemoveCollision(const std::string &_name);
 
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;

@@ -55,7 +55,6 @@ PartInspector::PartInspector(QWidget *_parent) : QDialog(_parent)
   this->tabWidget->addTab(this->visualConfig, "Visual");
   this->tabWidget->addTab(this->collisionConfig, "Collision");
 
-
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));

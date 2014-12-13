@@ -204,7 +204,6 @@ void PartCollisionConfig::OnRemoveCollision(int _id)
 /////////////////////////////////////////////////
 msgs::Collision *PartCollisionConfig::GetData(const std::string &_name) const
 {
-
   std::map<int, CollisionConfigData *>::const_iterator it;
   for (it = this->configs.begin(); it != this->configs.end(); ++it)
   {

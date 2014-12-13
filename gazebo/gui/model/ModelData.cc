@@ -85,9 +85,18 @@ PartData::PartData()
   connect(this->inspector->GetVisualConfig(),
       SIGNAL(VisualAdded(const std::string &)),
       this, SLOT(OnAddVisual(const std::string &)));
+
+  connect(this->inspector->GetCollisionConfig(),
+      SIGNAL(CollisionAdded(const std::string &)),
+      this, SLOT(OnAddCollision(const std::string &)));
+
   connect(this->inspector->GetVisualConfig(),
       SIGNAL(VisualRemoved(const std::string &)), this,
       SLOT(OnRemoveVisual(const std::string &)));
+
+  connect(this->inspector->GetCollisionConfig(),
+      SIGNAL(CollisionRemoved(const std::string &)),
+      this, SLOT(OnRemoveCollision(const std::string &)));
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
@@ -163,7 +172,35 @@ void PartData::AddVisual(rendering::VisualPtr _visual)
       visName.substr(visName.find(partName)+partName.size()+1);
 
   visualConfig->AddVisual(leafName, &visualMsg);
+}
 
+/////////////////////////////////////////////////
+void PartData::AddCollision(rendering::VisualPtr _collisionVis)
+{
+  PartCollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
+  msgs::Visual visualMsg = msgs::VisualFromSDF(_collisionVis->GetSDF());
+
+  sdf::ElementPtr collisionSDF(new sdf::Element);
+  sdf::initFile("collision.sdf", collisionSDF);
+
+/*  collisionSDF->GetAttribute("name")->Set(collisionName);
+  collisionSDF->GetElement("geometry")->ClearElements();
+  collisionSDF->GetElement("geometry")->InsertElement(
+      _collisionVis->GetSDF()->GetElement("geometry")->Clone());*/
+
+  msgs::Collision collisionMsg;
+  collisionMsg.set_name(_collisionVis->GetName());
+  msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
+  geomMsg->CopyFrom(visualMsg.geometry());
+
+  this->collisions[_collisionVis] = collisionMsg;
+
+  std::string partName = this->partVisual->GetName();
+  std::string visName = _collisionVis->GetName();
+  std::string leafName =
+      visName.substr(visName.find(partName)+partName.size()+1);
+
+  collisionConfig->AddCollision(leafName, &collisionMsg);
 }
 
 /////////////////////////////////////////////////
@@ -174,7 +211,7 @@ void PartData::OnApply()
 
   this->partSDF = msgs::LinkToSDF(*generalConfig->GetData(), this->partSDF);
 
-  // set visual properties
+  // update visual
   if (!this->visuals.empty())
   {
     this->partVisual->SetWorldPose(this->GetPose());
@@ -206,7 +243,7 @@ void PartData::OnApply()
 //        msg.CopyFrom(*updateMsg);
 
 
-        this->updateMsgs.push_back(updateMsg);
+        this->visualUpdateMsgs.push_back(updateMsg);
 
         //it->first->UpdateFromMsg(ConstVisualPtr(updateMsg));
 
@@ -226,49 +263,110 @@ void PartData::OnApply()
       this->visuals[i]->SetScale(visual->GetGeometryScale(i));*/
     }
   }
+
+  // update collision visual
+  if (!this->collisions.empty())
+  {
+    PartCollisionConfig *collisionConfig =
+        this->inspector->GetCollisionConfig();
+    std::map<rendering::VisualPtr, msgs::Collision>::iterator it;
+    for (it = this->collisions.begin(); it != this->collisions.end(); ++it)
+    {
+      std::string name = it->first->GetName();
+      std::string partName = this->partVisual->GetName();
+      std::string leafName =
+          name.substr(name.find(partName)+partName.size()+1);
+
+      msgs::Collision *updateMsg = collisionConfig->GetData(leafName);
+      if (updateMsg)
+      {
+        this->collisionUpdateMsgs.push_back(updateMsg);
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
 void PartData::OnAddVisual(const std::string &_name)
 {
-
   // add a visual when the user adds a visual via the inspector's visual tab
   PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
-//  if (this->visuals.size() != visualConfig->GetVisualCount())
+
+  std::ostringstream visualName;
+  visualName << this->partVisual->GetName() << "_" << _name;
+
+  //visualConfig->SetName(visualConfig->GetVisualCount()-1, visualName.str());
+
+  rendering::VisualPtr visVisual;
+  if (!this->visuals.empty())
   {
-    std::ostringstream visualName;
-    visualName << this->partVisual->GetName() << "_" << _name;
+    // add new visual by cloning last instance
+    visVisual = this->visuals.rbegin()->first->Clone(visualName.str(),
+        this->partVisual);
+  }
+  else
+  {
+    // create new visual based on sdf template (box)
+    sdf::SDFPtr modelTemplateSDF(new sdf::SDF);
+    modelTemplateSDF->SetFromString(
+        ModelData::GetTemplateSDFString());
 
-    //visualConfig->SetName(visualConfig->GetVisualCount()-1, visualName.str());
-
-    rendering::VisualPtr visVisual;
-    if (!this->visuals.empty())
-    {
-      // add new visual by cloning last instance
-      visVisual = this->visuals.rbegin()->first->Clone(visualName.str(),
-          this->partVisual);
-    }
-    else
-    {
-      // create new visual based on sdf template (box)
-      sdf::SDFPtr modelTemplateSDF(new sdf::SDF);
-      modelTemplateSDF->SetFromString(
-          ModelData::GetTemplateSDFString());
-
-      visVisual.reset(new rendering::Visual(visualName.str(),
-          this->partVisual));
-      sdf::ElementPtr visualElem =  modelTemplateSDF->root
-          ->GetElement("model")->GetElement("link")->GetElement("visual");
-      visVisual->Load(visualElem);
-      this->partVisual->GetScene()->AddVisual(visVisual);
-    }
-
-    msgs::Visual visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
-    visualConfig->UpdateVisual(_name, &visualMsg);
-    this->visuals[visVisual] = visualMsg;
-    visVisual->SetTransparency(0.4);
+    visVisual.reset(new rendering::Visual(visualName.str(),
+        this->partVisual));
+    sdf::ElementPtr visualElem =  modelTemplateSDF->root
+        ->GetElement("model")->GetElement("link")->GetElement("visual");
+    visVisual->Load(visualElem);
+    this->partVisual->GetScene()->AddVisual(visVisual);
   }
 
+  msgs::Visual visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
+  visualConfig->UpdateVisual(_name, &visualMsg);
+  this->visuals[visVisual] = visualMsg;
+  visVisual->SetTransparency(0.4);
+}
+
+/////////////////////////////////////////////////
+void PartData::OnAddCollision(const std::string &_name)
+{
+  // add a collision when the user adds a collision via the inspector's
+  // collision tab
+  PartCollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
+
+  std::ostringstream collisionName;
+  collisionName << this->partVisual->GetName() << "_" << _name;
+
+  rendering::VisualPtr collisionVis;
+  if (!this->collisions.empty())
+  {
+    // add new collision by cloning last instance
+    collisionVis = this->collisions.rbegin()->first->Clone(collisionName.str(),
+        this->partVisual);
+  }
+  else
+  {
+    // create new collision based on sdf template (box)
+    sdf::SDFPtr modelTemplateSDF(new sdf::SDF);
+    modelTemplateSDF->SetFromString(
+        ModelData::GetTemplateSDFString());
+
+    collisionVis.reset(new rendering::Visual(collisionName.str(),
+        this->partVisual));
+    sdf::ElementPtr collisionElem =  modelTemplateSDF->root
+        ->GetElement("model")->GetElement("link")->GetElement("visual");
+    collisionVis->Load(collisionElem);
+    this->partVisual->GetScene()->AddVisual(collisionVis);
+  }
+
+  msgs::Visual visualMsg = msgs::VisualFromSDF(collisionVis->GetSDF());
+  msgs::Collision collisionMsg;
+  collisionMsg.set_name(collisionVis->GetName());
+  msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
+  geomMsg->CopyFrom(visualMsg.geometry());
+
+  collisionConfig->UpdateCollision(_name, &collisionMsg);
+  this->collisions[collisionVis] = collisionMsg;
+  collisionVis->SetMaterial("Gazebo/Orange");
+  collisionVis->SetTransparency(0.4);
 }
 
 /////////////////////////////////////////////////
@@ -294,17 +392,39 @@ void PartData::OnRemoveVisual(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
+void PartData::OnRemoveCollision(const std::string &_name)
+{
+  // find and remove collision visual when the user removes it in the
+  // inspector's collision tab
+  std::ostringstream name;
+  name << this->partVisual->GetName() << "_" << _name;
+  std::string collisoinName = name.str();
+
+  std::map<rendering::VisualPtr, msgs::Collision>::iterator it;
+  for (it = this->collisions.begin(); it != this->collisions.end(); ++it)
+  {
+    if (collisoinName == it->first->GetName())
+    {
+      this->partVisual->DetachVisual(it->first);
+      this->partVisual->GetScene()->RemoveVisual(it->first);
+      this->collisions.erase(it);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void PartData::Update()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-  while (!this->updateMsgs.empty())
+  while (!this->visualUpdateMsgs.empty())
   {
     boost::shared_ptr<gazebo::msgs::Visual> updateMsgPtr;
     updateMsgPtr.reset(new msgs::Visual);
-    updateMsgPtr->CopyFrom(*this->updateMsgs.front());
+    updateMsgPtr->CopyFrom(*this->visualUpdateMsgs.front());
 
-    this->updateMsgs.erase(this->updateMsgs.begin());
+    this->visualUpdateMsgs.erase(this->visualUpdateMsgs.begin());
     std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
     for (it = this->visuals.begin(); it != this->visuals.end(); ++it)
     {
@@ -326,6 +446,32 @@ void PartData::Update()
         //it->first->SetTransparency(transparency);
 
         // if (it->first->GetMaterialName() != origMatName)
+        break;
+      }
+    }
+  }
+
+  while (!this->collisionUpdateMsgs.empty())
+  {
+    msgs::Collision collisoinMsg = *this->collisionUpdateMsgs.front();
+    this->collisionUpdateMsgs.erase(this->collisionUpdateMsgs.begin());
+    std::map<rendering::VisualPtr, msgs::Collision>::iterator it;
+    for (it = this->collisions.begin(); it != this->collisions.end(); ++it)
+    {
+      if (it->second.name() == collisoinMsg.name())
+      {
+        msgs::Visual collisionVisMsg;
+        msgs::Geometry *geomMsg = collisionVisMsg.mutable_geometry();
+        geomMsg->CopyFrom(collisoinMsg.geometry());
+        msgs::Pose *poseMsg = collisionVisMsg.mutable_pose();
+        poseMsg->CopyFrom(collisoinMsg.pose());
+
+        boost::shared_ptr<gazebo::msgs::Visual> updateMsgPtr;
+        updateMsgPtr.reset(new msgs::Visual);
+        updateMsgPtr->CopyFrom(collisionVisMsg);
+
+        // set visibility?
+        it->first->UpdateFromMsg(updateMsgPtr);
         break;
       }
     }

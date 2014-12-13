@@ -1220,7 +1220,7 @@ namespace gazebo
       }
 
       gzwarn << "msgs::LinkToSDF currently does not convert visual,"
-          << " sensor, and projector data";
+          << " sensor, and projector data" << std::endl;
 
       return linkSDF;
     }
