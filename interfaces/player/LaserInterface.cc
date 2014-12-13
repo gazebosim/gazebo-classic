@@ -167,7 +167,6 @@ void LaserInterface::OnScan(ConstLaserScanStampedPtr &_msg)
 {
   int i;
 
-  // TODO: fix the time to get the time the laser scan was generated
   this->datatime = gazebo::msgs::Convert(_msg->time()).Double();
 
   double oldCount = this->data.scan.ranges_count;
