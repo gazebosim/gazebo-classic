@@ -305,7 +305,7 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
     jointData->lowerLimit[i] = -3.14;
     jointData->upperLimit[i] = 3.14;
   }
-  jointData->anchor = math::Pose::Zero;
+  jointData->pose = math::Pose::Zero;
   jointData->line->setMaterial(this->jointMaterials[jointData->type]);
 
   return jointData;
@@ -473,7 +473,7 @@ void JointMaker::OpenInspector(const std::string &_name)
   joint->inspector->SetName(joint->name);
   joint->inspector->SetParent(joint->parent->GetName());
   joint->inspector->SetChild(joint->child->GetName());
-  joint->inspector->SetAnchor(0, joint->anchor);
+  joint->inspector->SetPose(joint->pose);
   int axisCount = JointMaker::GetJointAxisCount(joint->type);
   for (int i = 0; i < axisCount; ++i)
   {
@@ -669,7 +669,7 @@ void JointMaker::GenerateSDF()
     sdf::ElementPtr childElem = jointElem->GetElement("child");
     childElem->Set(joint->child->GetName());
     sdf::ElementPtr poseElem = jointElem->GetElement("pose");
-    poseElem->Set(joint->anchor);
+    poseElem->Set(joint->pose);
     int axisCount = GetJointAxisCount(joint->type);
     for (int i = 0; i < axisCount; ++i)
     {
@@ -795,7 +795,7 @@ unsigned int JointMaker::GetJointCount()
 /////////////////////////////////////////////////
 void JointData::OnApply()
 {
-  this->anchor = this->inspector->GetAnchor(0);
+  this->pose = this->inspector->GetPose();
   this->type = this->inspector->GetType();
   this->name = this->inspector->GetName();
 
