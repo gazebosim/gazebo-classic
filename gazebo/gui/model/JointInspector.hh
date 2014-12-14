@@ -136,22 +136,22 @@ namespace gazebo
       /// \brief ComboBox that displays the type of the joint.
       private: QComboBox *jointTypeComboBox;
 
-      /// \brief Spin box for configuring the X position of the pose.
+      /// \brief Spin box for configuring the X position of the joint.
       private: QDoubleSpinBox *poseXSpinBox;
 
-      /// \brief Spin box for configuring the Y position of the pose.
+      /// \brief Spin box for configuring the Y position of the joint.
       private: QDoubleSpinBox *poseYSpinBox;
 
-      /// \brief Spin box for configuring the Z position of the pose.
+      /// \brief Spin box for configuring the Z position of joint.
       private: QDoubleSpinBox *poseZSpinBox;
 
-      /// \brief Spin box for configuring the roll of the pose.
+      /// \brief Spin box for configuring the roll of the joint.
       private: QDoubleSpinBox *poseRollSpinBox;
 
-      /// \brief Spin box for configuring the pitch of the pose.
+      /// \brief Spin box for configuring the pitch of the joint.
       private: QDoubleSpinBox *posePitchSpinBox;
 
-      /// \brief Spin box for configuring the yaw of the pose.
+      /// \brief Spin box for configuring the yaw of the joint.
       private: QDoubleSpinBox *poseYawSpinBox;
 
       /// \brief Spin box for configuring the X direction of the axis.
