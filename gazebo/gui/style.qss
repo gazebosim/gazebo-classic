@@ -548,9 +548,11 @@ QTabBar::tab:!selected
   margin-top: 2px;
 }
 
-
-QTabWidget::pane,
-QTabWidget#mainTab::pane
+QTabWidget#mainTab::pane,
+QTabWidget#buildingEditorTab::pane,
+QTabWidget#modelEditorTab::pane,
+QTabWidget#terrainEditorTab::pane,
+QTabWidget#partInspectorTab::pane
 {
   border-left: 1px solid #101010;
   border-bottom: 1px solid #101010;
@@ -745,7 +747,7 @@ QwtScaleWidget
   font-size: 11px;
 }
 
-QRadioButton::indicator
+#configWidget
 {
-  color: #d0d0d0;
+  background-color: #808080;
 }

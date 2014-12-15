@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <sdf/sdf.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
@@ -35,6 +36,7 @@ namespace gazebo
 
   namespace gui
   {
+    class BuildingEditorWidget;
     class TimePanel;
 
     class GAZEBO_VISIBLE RenderWidget : public QWidget
@@ -46,6 +48,9 @@ namespace gazebo
       public: void RemoveScene(const std::string &_name);
       public: void CreateScene(const std::string &_name);
 
+      /// \brief Show editor widget in the main window
+      /// param[in] _show True to show the editor widget, false to hide it.
+      public: void ShowEditor(bool _show);
 
       /// \brief Add a widget inside the render widget
       /// \param[in] _widget Widget to be added.
@@ -60,7 +65,6 @@ namespace gazebo
       /// \para[in] _show True to show the panel, false to hide it.
       public: void ShowTimePanel(bool _show);
 
-
       /// brief Get the time panel widget.
       public: TimePanel *GetTimePanel();
 
@@ -69,7 +73,6 @@ namespace gazebo
       /// \param [in] _duration Duration in milliseconds
       public: void DisplayOverlayMsg(const std::string &_msg,
           int _duration = -1);
-
 
       /// \brief Add a widget to the bottom row stack of widgets.
       /// \param[in] _name Name of the widget
@@ -86,6 +89,19 @@ namespace gazebo
       /// \brief Get the overlay message being displayed
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
+
+      /// \brief Add a plugin to the render widget.
+      /// \param[in] _plugin Plugin pointer to add.
+      /// \param[in] _elem Plugin sdf parameters.
+      public: void AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem);
+
+      /// \brief Get the toolbar on top of the render widget
+      /// \return Toolbar
+      public: QToolBar *GetToolbar() const;
+
+      /// \brief Set the visibility of the toolbar.
+      /// \param[in] _show Whether or not to show the toolbar.
+      public: void ShowToolbar(const bool _show);
 
       private slots: virtual void update();
 
@@ -106,7 +122,7 @@ namespace gazebo
       private: GLWidget *glWidget;
 
       /// \brief Building editor widget for creating a building model
-      //private: BuildingEditorWidget *buildingEditorWidget;
+      private: BuildingEditorWidget *buildingEditorWidget;
 
       /// \brief Frame that holds the contents of this widget.
       private: QFrame *mainFrame;
@@ -128,6 +144,8 @@ namespace gazebo
       private: QLineEdit *fpsEdit;
       private: QLineEdit *trianglesEdit;
 
+      /// \brief Widget for the top toolbar
+      private: QToolBar *toolbar;
       private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 

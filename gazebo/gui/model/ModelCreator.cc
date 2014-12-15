@@ -38,6 +38,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ModelManipulator.hh"
+#include "gazebo/gui/ModelAlign.hh"
 
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -58,6 +59,8 @@ ModelCreator::ModelCreator()
   this->sphereCounter = 0;
   this->modelCounter = 0;
 
+  this->editTransparency = 0.4;
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
@@ -65,8 +68,19 @@ ModelCreator::ModelCreator()
 
   this->jointMaker = new JointMaker();
 
+  connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
   connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
           SLOT(OnDelete(const std::string &)));
+
+  this->connections.push_back(
+      gui::Events::ConnectAlignMode(
+        boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
+
+  g_copyAct->setEnabled(false);
+  g_pasteAct->setEnabled(false);
+
+  connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
+  connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
 
   this->Reset();
 }
@@ -82,6 +96,39 @@ ModelCreator::~ModelCreator()
   this->makerPub.reset();
 
   delete jointMaker;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnEdit(bool _checked)
+{
+  if (_checked)
+  {
+    KeyEventHandler::Instance()->AddPressFilter("model_creator",
+        boost::bind(&ModelCreator::OnKeyPress, this, _1));
+
+    MouseEventHandler::Instance()->AddPressFilter("model_creator",
+        boost::bind(&ModelCreator::OnMousePress, this, _1));
+
+    MouseEventHandler::Instance()->AddReleaseFilter("model_creator",
+        boost::bind(&ModelCreator::OnMouseRelease, this, _1));
+
+    MouseEventHandler::Instance()->AddMoveFilter("model_creator",
+        boost::bind(&ModelCreator::OnMouseMove, this, _1));
+
+    MouseEventHandler::Instance()->AddDoubleClickFilter("model_creator",
+        boost::bind(&ModelCreator::OnMouseDoubleClick, this, _1));
+  }
+  else
+  {
+    KeyEventHandler::Instance()->RemovePressFilter("model_creator");
+    MouseEventHandler::Instance()->RemovePressFilter("model_creator");
+    MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
+    MouseEventHandler::Instance()->RemoveMoveFilter("model_creator");
+    MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
+    this->jointMaker->Stop();
+
+    this->DeselectAll();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -122,8 +169,6 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
       linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -131,6 +176,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
 
   visVisual->Load(visualElem);
 
+  linkVisual->SetTransparency(this->editTransparency);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -166,8 +212,6 @@ std::string ModelCreator::AddSphere(double _radius,
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -175,6 +219,7 @@ std::string ModelCreator::AddSphere(double _radius,
 
   visVisual->Load(visualElem);
 
+  linkVisual->SetTransparency(this->editTransparency);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -209,8 +254,6 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -220,6 +263,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
 
   visVisual->Load(visualElem);
 
+  linkVisual->SetTransparency(this->editTransparency);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -256,8 +300,6 @@ std::string ModelCreator::AddCustom(const std::string &_path,
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -266,6 +308,7 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   meshElem->GetElement("uri")->Set(path);
   visVisual->Load(visualElem);
 
+  linkVisual->SetTransparency(this->editTransparency);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -335,20 +378,10 @@ void ModelCreator::Reset()
       !gui::get_active_camera()->GetScene())
     return;
 
-  KeyEventHandler::Instance()->AddPressFilter("model_part",
-      boost::bind(&ModelCreator::OnKeyPressPart, this, _1));
-
-  MouseEventHandler::Instance()->AddReleaseFilter("model_part",
-      boost::bind(&ModelCreator::OnMouseReleasePart, this, _1));
-
-  MouseEventHandler::Instance()->AddMoveFilter("model_part",
-      boost::bind(&ModelCreator::OnMouseMovePart, this, _1));
-
-  MouseEventHandler::Instance()->AddDoubleClickFilter("model_part",
-      boost::bind(&ModelCreator::OnMouseDoubleClickPart, this, _1));
-
   this->jointMaker->Reset();
-  this->selectedVis.reset();
+  this->selectedVisuals.clear();
+  g_copyAct->setEnabled(false);
+  g_pasteAct->setEnabled(false);
 
   std::stringstream ss;
   ss << "defaultModel_" << this->modelCounter++;
@@ -528,7 +561,7 @@ void ModelCreator::OnDelete(const std::string &_part)
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnKeyPressPart(const common::KeyEvent &_event)
+bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
 {
   if (_event.key == Qt::Key_Escape)
   {
@@ -536,17 +569,56 @@ bool ModelCreator::OnKeyPressPart(const common::KeyEvent &_event)
   }
   else if (_event.key == Qt::Key_Delete)
   {
-    if (this->selectedVis)
+    if (!this->selectedVisuals.empty())
     {
-      this->OnDelete(this->selectedVis->GetName());
-      this->selectedVis.reset();
+      for (std::vector<rendering::VisualPtr>::iterator it
+          = this->selectedVisuals.begin(); it != this->selectedVisuals.end();)
+      {
+        (*it)->SetHighlighted(false);
+        this->OnDelete((*it)->GetName());
+        it = this->selectedVisuals.erase(it);
+      }
+    }
+  }
+  else if (_event.control)
+  {
+    if (_event.key == Qt::Key_C && _event.control)
+    {
+      g_copyAct->trigger();
+      return true;
+    }
+    if (_event.key == Qt::Key_V && _event.control)
+    {
+      g_pasteAct->trigger();
+      return true;
     }
   }
   return false;
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
+bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
+{
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
+    return false;
+
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+  if (vis && !vis->IsPlane())
+  {
+    if (this->allParts.find(vis->GetName()) == this->allParts.end())
+    {
+      // Prevent interaction with other models, send event only to
+      // user camera
+      userCamera->HandleMouseEvent(_event);
+      return true;
+    }
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 {
   if (_event.button != common::MouseEvent::LEFT)
     return false;
@@ -559,48 +631,93 @@ bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
     return true;
   }
 
-  // In mouse normal mode, let users select a part if the parent model
-  // is currently selected.
-  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
+    return false;
+
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
   if (vis)
   {
-    if (this->allParts.find(vis->GetName()) !=
-        this->allParts.end())
+    // Is part
+    if (this->allParts.find(vis->GetName()) != this->allParts.end())
     {
-      if (gui::get_active_camera()->GetScene()->GetSelectedVisual()
-          == this->modelVisual || this->selectedVis)
+      // Not in multi-selection mode.
+      if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
       {
-        if (this->selectedVis)
-          this->selectedVis->SetHighlighted(false);
-        else
-          event::Events::setSelectedEntity("", "normal");
+        this->DeselectAll();
 
-        this->selectedVis = vis;
-        this->selectedVis->SetHighlighted(true);
-        return true;
+        // Highlight and selected clicked part
+        vis->SetHighlighted(true);
+        this->selectedVisuals.push_back(vis);
       }
+      // Multi-selection mode
+      else
+      {
+        std::vector<rendering::VisualPtr>::iterator it =
+            std::find(this->selectedVisuals.begin(),
+            this->selectedVisuals.end(), vis);
+        // Highlight and selected clicked part if not already selected
+        if (it == this->selectedVisuals.end())
+        {
+          vis->SetHighlighted(true);
+          this->selectedVisuals.push_back(vis);
+        }
+        // Deselect if already selected
+        else
+        {
+          vis->SetHighlighted(false);
+          this->selectedVisuals.erase(it);
+        }
+      }
+      g_copyAct->setEnabled(!this->selectedVisuals.empty());
+      g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
+      return true;
     }
-    else if (this->selectedVis)
+    // Not part
+    else
     {
-      this->selectedVis->SetHighlighted(false);
-      this->selectedVis.reset();
+      this->DeselectAll();
+
+      g_alignAct->setEnabled(false);
+      g_copyAct->setEnabled(!this->selectedVisuals.empty());
+
+      // Prevent interaction with other models, send event only to
+      // user camera
+      userCamera->HandleMouseEvent(_event);
+      return true;
     }
   }
   return false;
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
+bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 {
-  if (!this->mouseVisual)
+  this->lastMouseEvent = _event;
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
     return false;
 
-  if (!gui::get_active_camera())
+  if (!this->mouseVisual)
+  {
+    rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+    if (vis && !vis->IsPlane())
+    {
+      if (this->allParts.find(vis->GetName()) == this->allParts.end())
+      {
+        // Prevent interaction with other models, send event only to
+        // user camera
+        QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+        userCamera->HandleMouseEvent(_event);
+        return true;
+      }
+    }
     return false;
+  }
 
   math::Pose pose = this->mouseVisual->GetWorldPose();
   pose.pos = ModelManipulator::GetMousePositionOnPlane(
-      gui::get_active_camera(), _event);
+      userCamera, _event);
 
   if (!_event.shift)
   {
@@ -614,7 +731,7 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
+bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
 {
   rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
   if (vis)
@@ -626,6 +743,94 @@ bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
     }
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnCopy()
+{
+  if (!g_editModelAct->isChecked())
+    return;
+
+  if (!this->selectedVisuals.empty())
+  {
+    this->copiedPartNames.clear();
+    for (unsigned int i = 0; i < this->selectedVisuals.size(); i++)
+    {
+      this->copiedPartNames.push_back(this->selectedVisuals[i]->GetName());
+    }
+    g_pasteAct->setEnabled(true);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnPaste()
+{
+  if (this->copiedPartNames.empty() || !g_editModelAct->isChecked())
+  {
+    return;
+  }
+
+  // For now, only copy the last selected model
+  boost::unordered_map<std::string, PartData*>::iterator it =
+    this->allParts.find(this->copiedPartNames.back());
+  if (it != this->allParts.end())
+  {
+    PartData *copiedPart = it->second;
+    if (!copiedPart)
+      return;
+
+    this->Stop();
+    this->DeselectAll();
+
+    std::string linkName = copiedPart->name + "_clone";
+
+    if (!this->modelVisual)
+    {
+      this->Reset();
+    }
+
+    rendering::VisualPtr linkVisual(new rendering::Visual(
+        linkName, this->modelVisual));
+    linkVisual->Load();
+
+    std::ostringstream visualName;
+    visualName << linkName << "_visual";
+    rendering::VisualPtr visVisual;
+
+    math::Pose clonePose;
+
+    if (copiedPart->visuals.empty())
+    {
+      visVisual = rendering::VisualPtr(new rendering::Visual(visualName.str(),
+          linkVisual));
+      sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+          ->GetElement("model")->GetElement("link")->GetElement("visual");
+      visVisual->Load(visualElem);
+    }
+    else
+    {
+      rendering::VisualPtr copiedVisual = copiedPart->visuals.back();
+      visVisual = copiedVisual->Clone(visualName.str(), linkVisual);
+      clonePose = copiedVisual->GetWorldPose();
+    }
+
+    rendering::UserCameraPtr userCamera = gui::get_active_camera();
+    if (userCamera)
+    {
+      math::Vector3 mousePosition =
+        ModelManipulator::GetMousePositionOnPlane(userCamera,
+                                                  this->lastMouseEvent);
+      clonePose.pos.x = mousePosition.x;
+      clonePose.pos.y = mousePosition.y;
+    }
+
+    linkVisual->SetWorldPose(clonePose);
+    linkVisual->SetTransparency(this->editTransparency);
+
+    this->addPartType = PART_CUSTOM;
+    this->CreatePart(visVisual);
+    this->mouseVisual = linkVisual;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -763,4 +968,32 @@ void ModelCreator::GenerateSDF()
   // Model settings
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnAlignMode(const std::string &_axis,
+    const std::string &_config, const std::string &_target, bool _preview)
+{
+  // Align links, not visuals
+  std::vector<rendering::VisualPtr> selectedLinks;
+  for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+  {
+    selectedLinks.push_back(this->selectedVisuals[i]->GetParent());
+  }
+
+  ModelAlign::Instance()->AlignVisuals(selectedLinks, _axis, _config,
+      _target, !_preview);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::DeselectAll()
+{
+  if (!this->selectedVisuals.empty())
+  {
+    for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+    {
+      this->selectedVisuals[i]->SetHighlighted(false);
+    }
+    this->selectedVisuals.clear();
+  }
 }

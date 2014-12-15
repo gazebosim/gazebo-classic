@@ -20,6 +20,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
@@ -36,7 +37,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->modelPalette = new ModelEditorPalette(_mainWindow);
   this->Init("modelEditorTab", "Model Editor", this->modelPalette);
 
-  connect(g_editModelAct, SIGNAL(triggered(bool)), this, SLOT(OnEdit(bool)));
+  connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
   this->connections.push_back(
       gui::model::Events::ConnectFinishModel(
@@ -61,13 +62,45 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->Play();
   }
-  event::Events::setSelectedEntity("", "normal");
   this->active = !this->active;
-  g_editModelAct->setChecked(this->active);
+  this->ToggleToolbar();
+//  g_editModelAct->setChecked(this->active);
 }
 
 /////////////////////////////////////////////////
 void ModelEditor::OnFinish()
 {
-  this->OnEdit(g_editModelAct->isChecked());
+//  this->OnEdit(g_editModelAct->isChecked());
+  g_editModelAct->trigger();
+}
+
+/////////////////////////////////////////////////
+void ModelEditor::ToggleToolbar()
+{
+  QToolBar *toolbar = this->mainWindow->GetRenderWidget()->GetToolbar();
+  QList<QAction *> actions = toolbar->actions();
+
+  for (int i = 0; i < actions.size(); ++i)
+  {
+    if (actions[i] == g_arrowAct ||
+        actions[i] == g_rotateAct ||
+        actions[i] == g_translateAct ||
+        actions[i] == g_scaleAct ||
+        actions[i] == g_screenshotAct ||
+        actions[i] == g_copyAct ||
+        actions[i] == g_pasteAct ||
+        actions[i] == g_alignButtonAct)
+//        actions[i] == g_snapAct -- issue #1318
+    {
+      actions[i]->setVisible(true);
+      if (i > 0 && actions[i-1]->isSeparator())
+      {
+        actions[i-1]->setVisible(true);
+      }
+    }
+    else
+    {
+      actions[i]->setVisible(!this->active);
+    }
+  }
 }

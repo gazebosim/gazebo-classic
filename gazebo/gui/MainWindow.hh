@@ -29,6 +29,10 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
+#ifdef HAVE_OCULUS
+#include "gazebo/gui/OculusWindow.hh"
+#endif
+
 namespace gazebo
 {
   namespace gui
@@ -38,7 +42,6 @@ namespace gazebo
     class ModelListWidget;
     class Editor;
     class SpaceNav;
-    class OculusWindow;
 
     class GAZEBO_VISIBLE MainWindow : public QMainWindow
     {
@@ -75,9 +78,12 @@ namespace gazebo
       /// \brief Pause simulation.
       public slots: void Pause();
 
-      /// \brief Add a menu to the main window menu bar.
-      /// \param[in] _menu Menu to be added.
-      public: void AddMenu(QMenu *_menu);
+      /// \brief Set whether the left pane is visible
+      /// \param[in] _on True to show the left pane, false to hide.
+      public: void SetLeftPaneVisibility(bool _on);
+
+      /// \brief A signal to trigger loading of GUI plugins.
+      signals: void AddPlugins();
 
       protected: void closeEvent(QCloseEvent *_event);
 
@@ -98,7 +104,6 @@ namespace gazebo
 
       private slots: void About();
       private slots: void Step();
-      private slots: void NewModel();
       private slots: void Arrow();
 
       /// \brief Qt callback when the translate mode is triggered.
@@ -155,6 +160,13 @@ namespace gazebo
 
       /// \brief Callback for diagnostics action.
       private slots: void Diagnostics();
+
+      /// \brief Callback for adding plugins.
+      private slots: void OnAddPlugins();
+
+      /// \brief Qt call back when one of the editor actions is triggered.
+      /// \param[in] _action Action in the group which was triggered.
+      private slots: void OnEditorGroup(QAction *_action);
 
       /// \brief Toggle full screen display.
       /// \param[in] _value True to display in full screen mode.
@@ -277,6 +289,15 @@ namespace gazebo
 #ifdef HAVE_OCULUS
       private: gui::OculusWindow *oculusWindow;
 #endif
+
+      /// \brief Buffer of plugin messages to process.
+      private: std::vector<boost::shared_ptr<msgs::Plugin const> > pluginMsgs;
+
+      /// \brief Mutext to protect plugin loading.
+      private: boost::mutex pluginLoadMutex;
+
+      /// \brief Splitter for the main window.
+      private: QSplitter *splitter;
     };
   }
 }

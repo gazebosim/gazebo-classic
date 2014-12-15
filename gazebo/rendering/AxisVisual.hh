@@ -46,8 +46,20 @@ namespace gazebo
       /// \brief Load the axis visual
       public: virtual void Load();
 
-      /// \brief Load the rotation tube
-      public: void ShowRotation(unsigned int _axis);
+      /// \brief Show the rotation tube
+      /// \param[in] _axis Axis index. 0: x, 1: y, 2: z
+      /// \param[in] _show True to show the axis rotation tube.
+      public: void ShowAxisRotation(unsigned int _axis, bool _show);
+
+      /// \brief Show the axis arrow shaft.
+      /// \param[in] _axis Axis index. 0: x, 1: y, 2: z
+      /// \param[in] _show True to show the axis arrow shaft.
+      public: void ShowAxisShaft(unsigned int _axis, bool _show);
+
+      /// \brief Show the axis arrow head.
+      /// \param[in] _axis Axis index. 0: x, 1: y, 2: z
+      /// \param[in] _show True to show the axis arrow head.
+      public: void ShowAxisHead(unsigned int _axis, bool _show);
 
       /// \brief Scale the X axis
       /// \param[in] _scale Scaling factor
@@ -66,6 +78,11 @@ namespace gazebo
       /// \param[in] _material The name of the material to apply to the axis
       public: void SetAxisMaterial(unsigned int _axis,
                                    const std::string &_material);
+
+      /// \brief Set whether the axis will be visible
+      /// \param[in] _axis The number of the axis (0, 1, 2 = x,y,z)
+      /// \param[in] _visible True to set the axis to be visible.
+      public: void SetAxisVisible(unsigned int _axis, bool _visible);
     };
     /// \}
   }

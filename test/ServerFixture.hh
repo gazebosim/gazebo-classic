@@ -214,14 +214,24 @@ class ServerFixture : public testing::Test
   /// \param[in] _noiseType Type of noise to apply.
   /// \param[in] _noiseMean Mean noise value.
   /// \param[in] _noiseStdDev Standard deviation of the noise.
+  /// \param[in] _distortionK1 Distortion coefficient k1.
+  /// \param[in] _distortionK2 Distortion coefficient k2.
+  /// \param[in] _distortionK3 Distortion coefficient k3.
+  /// \param[in] _distortionP1 Distortion coefficient P1.
+  /// \param[in] _distortionP2 Distortion coefficient p2.
+  /// \param[in] _cx Normalized optical center x, used for distortion.
+  /// \param[in] _cy Normalized optical center y, used for distortion.
   protected: void SpawnCamera(const std::string &_modelName,
                  const std::string &_cameraName,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  unsigned int _width = 320, unsigned int _height = 240,
                  double _rate = 25,
                  const std::string &_noiseType = "",
-                 double _noiseMean = 0.0,
-                 double _noiseStdDev = 0.0);
+                 double _noiseMean = 0.0, double _noiseStdDev = 0.0,
+                 bool _distortion = false, double _distortionK1 = 0.0,
+                 double _distortionK2 = 0.0, double _distortionK3 = 0.0,
+                 double _distortionP1 = 0.0, double _distortionP2 = 0.0,
+                 double _cx = 0.5, double _cy = 0.5);
 
   /// \brief Spawn a laser.
   /// \param[in] _modelName Name of the model.
