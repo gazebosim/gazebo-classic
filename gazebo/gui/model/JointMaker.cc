@@ -571,8 +571,6 @@ void JointMaker::CreateHotSpot(JointData *_joint)
       GZ_VISIBILITY_SELECTABLE);
   hotspotVisual->GetSceneNode()->setInheritScale(false);
 
-  _joint->UpdateJointVisual();
-
   this->joints[hotSpotName] = _joint;
   camera->GetScene()->AddVisual(hotspotVisual);
 
@@ -610,6 +608,9 @@ void JointMaker::Update()
         // get centroid of child part visuals
         math::Vector3 childCentroid =
             this->GetPartWorldCentroid(joint->child);
+
+        // Joint pose is expressed w.r.t. child link frame
+        //childCentroid = (childCentroid + joint->pose.pos);
 
         // set orientation of joint hotspot
         math::Vector3 dPos = (childCentroid - parentCentroid);
@@ -650,6 +651,66 @@ void JointMaker::Update()
         joint->handles->_updateBounds();
       }
     }
+
+    // Create / update joint visual
+    gazebo::msgs::JointPtr jointMsg;
+    jointMsg.reset(new gazebo::msgs::Joint);
+    jointMsg->set_parent(joint->parent->GetName());
+    jointMsg->set_child(joint->child->GetName());
+    jointMsg->set_name(joint->name);
+    msgs::Set(jointMsg->mutable_pose(), joint->pose);
+    if (joint->type == JointMaker::JOINT_SLIDER)
+    {
+      jointMsg->set_type(msgs::Joint::PRISMATIC);
+    }
+    else if (joint->type == JointMaker::JOINT_HINGE)
+    {
+      jointMsg->set_type(msgs::Joint::REVOLUTE);
+    }
+    else if (joint->type == JointMaker::JOINT_HINGE2)
+    {
+      jointMsg->set_type(msgs::Joint::REVOLUTE2);
+    }
+    else if (joint->type == JointMaker::JOINT_SCREW)
+    {
+      jointMsg->set_type(msgs::Joint::SCREW);
+    }
+    else if (joint->type == JointMaker::JOINT_UNIVERSAL)
+    {
+      jointMsg->set_type(msgs::Joint::UNIVERSAL);
+    }
+    else if (joint->type == JointMaker::JOINT_BALL)
+    {
+      jointMsg->set_type(msgs::Joint::BALL);
+    }
+
+    int axisCount = JointMaker::GetJointAxisCount(joint->type);
+    for (int i = 0; i < axisCount; ++i)
+    {
+      jointMsg->add_angle(0);
+      msgs::Axis *axisMsg;
+      if (i == 0)
+        axisMsg = jointMsg->mutable_axis1();
+      else if (i == 1)
+        axisMsg = jointMsg->mutable_axis2();
+
+      msgs::Set(axisMsg->mutable_xyz(), joint->axis[i]);
+    }
+
+    if (joint->jointVisual)
+    {
+      rendering::ScenePtr scene = joint->jointVisual->GetScene();
+      scene->RemoveVisual(joint->jointVisual);
+      joint->jointVisual->GetParent()->DetachVisual(joint->jointVisual->GetName());
+      joint->jointVisual.reset();
+    }
+
+    gazebo::rendering::JointVisualPtr jointVis(
+        new gazebo::rendering::JointVisual(
+        joint->name + "__JOINT_VISUAL__", joint->child));
+
+    jointVis->Load(jointMsg);
+    joint->jointVisual = jointVis;
   }
 }
 
@@ -786,9 +847,17 @@ math::Vector3 JointMaker::GetPartWorldCentroid(
     const rendering::VisualPtr _visual)
 {
   math::Vector3 centroid;
+  int count = 0;
   for (unsigned int i = 0; i < _visual->GetChildCount(); ++i)
-    centroid += _visual->GetChild(i)->GetWorldPose().pos;
-  centroid /= _visual->GetChildCount();
+  {
+    if (_visual->GetChild(i)->GetName().find("_JOINT_VISUAL_") ==
+        std::string::npos)
+    {
+      centroid += _visual->GetChild(i)->GetWorldPose().pos;
+      count++;
+    }
+  }
+  centroid /= count;
   return centroid;
 }
 
@@ -812,68 +881,4 @@ void JointData::OnApply()
     this->lowerLimit[i] = this->inspector->GetLowerLimit(i);
     this->upperLimit[i] = this->inspector->GetUpperLimit(i);
   }
-  this->UpdateJointVisual();
-}
-
-/////////////////////////////////////////////////
-void JointData::UpdateJointVisual()
-{
-  gazebo::msgs::JointPtr jointMsg;
-  jointMsg.reset(new gazebo::msgs::Joint);
-  jointMsg->set_parent(this->parent->GetName());
-  jointMsg->set_child(this->child->GetName());
-  jointMsg->set_name(this->name);
-  msgs::Set(jointMsg->mutable_pose(), this->pose);
-  if (this->type == JointMaker::JOINT_SLIDER)
-  {
-    jointMsg->set_type(msgs::Joint::PRISMATIC);
-  }
-  else if (this->type == JointMaker::JOINT_HINGE)
-  {
-    jointMsg->set_type(msgs::Joint::REVOLUTE);
-  }
-  else if (this->type == JointMaker::JOINT_HINGE2)
-  {
-    jointMsg->set_type(msgs::Joint::REVOLUTE2);
-  }
-  else if (this->type == JointMaker::JOINT_SCREW)
-  {
-    jointMsg->set_type(msgs::Joint::SCREW);
-  }
-  else if (this->type == JointMaker::JOINT_UNIVERSAL)
-  {
-    jointMsg->set_type(msgs::Joint::UNIVERSAL);
-  }
-  else if (this->type == JointMaker::JOINT_BALL)
-  {
-    jointMsg->set_type(msgs::Joint::BALL);
-  }
-
-  int axisCount = JointMaker::GetJointAxisCount(this->type);
-  for (int i = 0; i < axisCount; ++i)
-  {
-    jointMsg->add_angle(0);
-    msgs::Axis *axisMsg;
-    if (i == 0)
-      axisMsg = jointMsg->mutable_axis1();
-    else if (i == 1)
-      axisMsg = jointMsg->mutable_axis2();
-
-    msgs::Set(axisMsg->mutable_xyz(), this->axis[i]);
-  }
-
-  if (this->jointVisual)
-  {
-    rendering::ScenePtr scene = this->jointVisual->GetScene();
-    scene->RemoveVisual(this->jointVisual);
-    this->jointVisual->GetParent()->DetachVisual(this->jointVisual->GetName());
-    this->jointVisual.reset();
-  }
-
-  gazebo::rendering::JointVisualPtr jointVis(
-      new gazebo::rendering::JointVisual(
-      this->name + "__JOINT_VISUAL__", this->child));
-
-  jointVis->Load(jointMsg);
-  this->jointVisual = jointVis;
 }

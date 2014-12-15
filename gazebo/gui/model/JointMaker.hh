@@ -296,9 +296,6 @@ namespace gazebo
       /// \brief Inspector for configuring joint properties.
       public: JointInspector *inspector;
 
-      /// \brief TODO
-      public: void UpdateJointVisual();
-
       /// \brief Qt Callback when joint inspector configurations are to be
       /// applied.
       private slots: void OnApply();
