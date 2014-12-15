@@ -421,7 +421,7 @@ void BuildingModelManip::SetTransparency(float _transparency)
 /////////////////////////////////////////////////
 void BuildingModelManip::SetVisible(bool _visible)
 {
-  this->visual->GetParent()->SetVisible(_visible);
+  this->visual->SetVisible(_visible);
 }
 
 /////////////////////////////////////////////////
