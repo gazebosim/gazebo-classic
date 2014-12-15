@@ -561,7 +561,7 @@ void EditorView::DeleteItem(EditorItem *_item)
   if (!_item)
     return;
 
-  // To make holes in the final model, windows and doors are atatched to walls
+  // To make holes in the final model, windows and doors are attached to walls,
   // and stairs are attached to floors above them.
   // Detach 3D manip, but 2D items may remain as children.
   this->buildingMaker->DetachAllChildren(this->itemToVisualMap[_item]);
@@ -570,7 +570,7 @@ void EditorView::DeleteItem(EditorItem *_item)
   {
     WallSegmentItem *wallSegmentItem = dynamic_cast<WallSegmentItem *>(_item);
 
-    // Delete child doors and windows before
+    // Delete item's child doors and windows before deleting item
     for (int i = wallSegmentItem->childItems().size()-1; i >=0; --i)
     {
       EditorItem *childItem = dynamic_cast<EditorItem *>(
