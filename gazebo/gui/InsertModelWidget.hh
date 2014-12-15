@@ -82,7 +82,9 @@ namespace gazebo
 
       /// \brief check if path exists with special care to filesystem
       /// permissions
-      private: static bool IsPathAccesible(const boost::filesystem::path &_path);
+      /// \param[in] _path The path to check.
+      private: static bool IsPathAccesible
+        (const boost::filesystem::path &_path);
 
       /// \brief Private data pointer.
       private: InsertModelWidgetPrivate *dataPtr;

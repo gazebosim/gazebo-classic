@@ -208,8 +208,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   // Remove current items.
   topItem->takeChildren();
 
-  if (_pathExists &&
-      boost::filesystem::is_directory(dir))
+  if (_pathExists && boost::filesystem::is_directory(dir))
   {
     std::vector<boost::filesystem::path> paths;
 
@@ -249,7 +248,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
       }
 
       manifest /= GZ_MODEL_MANIFEST_FILENAME;
-      
+
       // Check if the manifest does not exists
       if (!this->IsPathAccesible(manifest))
       {
@@ -323,8 +322,6 @@ void InsertModelWidget::OnModelUpdateRequest(const std::string &_path)
 /////////////////////////////////////////////////
 bool InsertModelWidget::IsPathAccesible(const boost::filesystem::path &_path)
 {
-  gzlog << "Trying path: " << _path << boost::filesystem::exists(_path) << std::endl;
-
   try
   {
     return boost::filesystem::exists(_path);
@@ -338,6 +335,6 @@ bool InsertModelWidget::IsPathAccesible(const boost::filesystem::path &_path)
     gzerr << "Unexpected error while accessing to: " << _path << "."
           << "Error reported: " << e.what() << std::endl;
   }
-  
+
   return false;
 }
