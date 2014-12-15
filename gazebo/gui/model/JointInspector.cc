@@ -405,6 +405,16 @@ void JointInspector::OnJointTypeChanged(int _index)
 {
   QVariant jointTypeData = this->jointTypeComboBox->itemData(_index);
   this->jointType = static_cast<JointMaker::JointType>(jointTypeData.toInt());
+
+  int axisCount = JointMaker::GetJointAxisCount(this->jointType);
+  for (int i = 0; i < axisCount; ++i)
+    this->axisGroupBoxes[i]->setVisible(true);
+
+  for (int i = axisCount;
+      i < static_cast<int>(this->axisGroupBoxes.size()); ++i)
+  {
+    this->axisGroupBoxes[i]->setVisible(false);
+  }
 }
 
 /////////////////////////////////////////////////

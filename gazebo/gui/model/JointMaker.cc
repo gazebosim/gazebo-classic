@@ -393,12 +393,16 @@ void JointMaker::Stop()
 /////////////////////////////////////////////////
 bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
 {
-  if (_event.dragging)
-    return false;
-
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
-  rendering::ScenePtr scene = camera->GetScene();
+
+  if (_event.dragging)
+  {
+    // this enables the joint maker to pan while connecting joints
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    camera->HandleMouseEvent(_event);
+    return true;
+  }
 
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
 

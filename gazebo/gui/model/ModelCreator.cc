@@ -636,9 +636,9 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
     return false;
 
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
-  if (vis)
+  if (vis && !vis->IsPlane())
   {
-    if (vis->IsPlane() ||
+    if (
         this->allParts.find(vis->GetParent()->GetName()) ==
         this->allParts.end())
     {
@@ -749,10 +749,9 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
   if (!this->mouseVisual)
   {
     rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
-    if (vis)
+    if (vis && !vis->IsPlane())
     {
-      if (vis->IsPlane() ||
-          this->allParts.find(vis->GetParent()->GetName()) ==
+      if (this->allParts.find(vis->GetParent()->GetName()) ==
           this->allParts.end())
       {
         // Prevent interaction with other models, send event only to
