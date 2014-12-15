@@ -573,9 +573,15 @@ void EditorView::DeleteItem(EditorItem *_item)
     // Delete item's child doors and windows before deleting item
     for (int i = wallSegmentItem->childItems().size()-1; i >=0; --i)
     {
-      EditorItem *childItem = dynamic_cast<EditorItem *>(
+      // WallSegmentItems have other children besides RectItems
+      RectItem *rectItem = dynamic_cast<RectItem *>(
           wallSegmentItem->childItems().at(i));
-      this->DeleteItem(childItem);
+
+      if (rectItem)
+      {
+        EditorItem *editorItem = dynamic_cast<EditorItem *>(rectItem);
+        this->DeleteItem(editorItem);
+      }
     }
 
     this->UnlinkGrabbers(wallSegmentItem->grabbers[0]);
