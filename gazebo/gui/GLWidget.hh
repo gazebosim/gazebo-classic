@@ -233,6 +233,9 @@ namespace gazebo
       /// \brief Flag that is set to true when GLWidget has responded to
       ///  OnCreateScene
       private: bool sceneCreated;
+
+      /// \brief True if the model editor is up, false otherwise
+      private: bool modelEditorEnabled;
     };
   }
 }

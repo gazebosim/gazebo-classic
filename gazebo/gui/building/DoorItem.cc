@@ -35,7 +35,7 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
   this->level = 0;
   this->levelBaseHeight = 0;
 
-  this->doorDepth = 15;
+  this->doorDepth = 17;
   this->doorHeight = 200;
   this->doorWidth = 90;
   this->doorElevation = 0;
