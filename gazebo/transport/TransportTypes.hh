@@ -18,6 +18,11 @@
 #define _TRANSPORT_TYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+// avoid collision from Mac OS X's ConditionalMacros.h
+// see gazebo issue #1289
+#ifdef __MACH__
+# undef TYPE_BOOL
+#endif
 #include <google/protobuf/message.h>
 
 /// \file
