@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -637,19 +637,22 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
     return false;
 
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
-  if (vis && !vis->IsPlane())
+  if (vis)
   {
-    if (this->allParts.find(vis->GetParent()->GetName()) ==
-          this->allParts.end())
+    if (vis->IsPlane() ||
+        this->allParts.find(vis->GetParent()->GetName()) ==
+        this->allParts.end())
     {
-      // Handle snap from GLWidget
-      if (g_snapAct->isChecked())
-        return false;
-
       // Prevent interaction with other models, send event only to
       // user camera
       userCamera->HandleMouseEvent(_event);
       return true;
+    }
+    else
+    {
+      // Handle snap from GLWidget
+      if (g_snapAct->isChecked())
+        return false;
     }
   }
   return false;
@@ -712,7 +715,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         std::vector<rendering::VisualPtr>::iterator it =
             std::find(this->selectedVisuals.begin(),
             this->selectedVisuals.end(), partVis);
-        // Highlight and selected clicked part if not already selected
+        // Highlight and select clicked part if not already selected
         if (it == this->selectedVisuals.end())
         {
           partVis->SetHighlighted(true);
@@ -757,10 +760,11 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
   if (!this->mouseVisual)
   {
     rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
-    if (vis && !vis->IsPlane())
+    if (vis)
     {
-      if (this->allParts.find(vis->GetParent()->GetName()) ==
-        this->allParts.end())
+      if (vis->IsPlane() ||
+          this->allParts.find(vis->GetParent()->GetName()) ==
+          this->allParts.end())
       {
         // Prevent interaction with other models, send event only to
         // user camera

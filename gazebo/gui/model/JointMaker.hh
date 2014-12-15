@@ -287,8 +287,8 @@ namespace gazebo
       /// \brief Joint upper limit.
       public: double upperLimit[2];
 
-      /// \brief Joint anchor.
-      public: math::Pose anchor;
+      /// \brief Joint pose.
+      public: math::Pose pose;
 
       /// \brief True if the joint visual needs update.
       public: bool dirty;
