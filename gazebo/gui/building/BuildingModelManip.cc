@@ -384,7 +384,7 @@ void BuildingModelManip::SetColor(QColor _color)
 {
   common::Color newColor(_color.red(), _color.green(), _color.blue());
   this->color = newColor;
-  this->visual->GetParent()->SetAmbient(this->color);
+  this->visual->SetAmbient(this->color);
   this->maker->BuildingChanged();
   emit ColorChanged(_color);
 }
@@ -402,20 +402,20 @@ void BuildingModelManip::SetTexture(QString _texture)
   else if (_texture == ":bricks.png")
     this->texture = "Gazebo/Bricks";
 
-  this->visual->GetParent()->SetMaterial(this->texture);
+  this->visual->SetMaterial(this->texture);
 }
 
 /////////////////////////////////////////////////
 void BuildingModelManip::SetTransparency(float _transparency)
 {
   this->transparency = _transparency;
-  this->visual->GetParent()->SetTransparency(this->transparency);
+  this->visual->SetTransparency(this->transparency);
 }
 
 /////////////////////////////////////////////////
 void BuildingModelManip::SetVisible(bool _visible)
 {
-  this->visual->GetParent()->SetVisible(_visible);
+  this->visual->SetVisible(_visible);
 }
 
 /////////////////////////////////////////////////
