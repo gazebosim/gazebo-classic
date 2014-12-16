@@ -190,10 +190,10 @@ void ODELink::MoveCallback(dBodyID _id)
   if (_id)
   {
     const dReal *dforce = dBodyGetForce(_id);
-    self->force.Set(dforce[0], dforce[1], dforce[2]);
+    self->linearAccel.Set(dforce[0], dforce[1], dforce[2]);
 
     const dReal *dtorque = dBodyGetTorque(_id);
-    self->torque.Set(dtorque[0], dtorque[1], dtorque[2]);
+    self->angularAccel.Set(dtorque[0], dtorque[1], dtorque[2]);
   }
 }
 
@@ -617,13 +617,13 @@ void ODELink::AddRelativeTorque(const math::Vector3 &_torque)
 /////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldForce() const
 {
-  return this->force;
+  return this->linearAccel;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldTorque() const
 {
-  return this->torque;
+  return this->angularAccel;
 }
 
 //////////////////////////////////////////////////
