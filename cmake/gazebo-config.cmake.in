@@ -13,11 +13,10 @@ list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR
 list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/gazebo-@GAZEBO_VERSION@)
 
 # Visual Studio enables c++11 support by default
-if (NOT MSVC)
+if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
   list(APPEND @PKG_NAME@_CXX_FLAGS -std=c++11)
-endif()
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  set(@PKG_NAME@_CXX_FLAGS "${@PKG_NAME@_CXX_FLAGS} -stdlib=libc++")
+elseif ("${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
+  list(APPEND @PKG_NAME@_CXX_FLAGS -stdlib=libc++)
 endif ()
 
 foreach(lib @PKG_LIBRARIES@)
