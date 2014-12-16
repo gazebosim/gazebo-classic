@@ -361,6 +361,7 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
       part->partVisual);
   collisoinVis->SetMaterial("Gazebo/Orange");
   collisoinVis->SetTransparency(this->editTransparency);
+  collisoinVis->SetVisible(false);
   part->AddCollision(collisoinVis);
 
   std::string partName = part->partVisual->GetName();

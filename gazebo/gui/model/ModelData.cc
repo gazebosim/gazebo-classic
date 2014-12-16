@@ -144,9 +144,11 @@ void PartData::AddVisual(rendering::VisualPtr _visual)
   PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
   msgs::Visual visualMsg = msgs::VisualFromSDF(_visual->GetSDF());
 
+  // override transparency value
+  visualMsg.set_transparency(1.0);
+
   // some of the default values do not transfer to the visualMsg
   // so set them here and find a better way to fix this in the future.
-  //visualMsg.set_transparency(1.0);
   //visualMsg.mutable_material()->set_lighting(true);
 /*  msgs::Set(visualMsg.mutable_material()->mutable_ambient(),
       math::Color(0, 0, 0, 0);
@@ -182,11 +184,6 @@ void PartData::AddCollision(rendering::VisualPtr _collisionVis)
 
   sdf::ElementPtr collisionSDF(new sdf::Element);
   sdf::initFile("collision.sdf", collisionSDF);
-
-/*  collisionSDF->GetAttribute("name")->Set(collisionName);
-  collisionSDF->GetElement("geometry")->ClearElements();
-  collisionSDF->GetElement("geometry")->InsertElement(
-      _collisionVis->GetSDF()->GetElement("geometry")->Clone());*/
 
   msgs::Collision collisionMsg;
   collisionMsg.set_name(_collisionVis->GetName());
@@ -435,15 +432,15 @@ void PartData::Update()
         // make visual semi-transparent here
         // but generated sdf will use the correct transparency value
         float transparency = 0.4;
-        msgs::Material *materialMsg = updateMsgPtr->mutable_material();
-        materialMsg->mutable_ambient()->set_a(transparency);
-        materialMsg->mutable_diffuse()->set_a(transparency);
-        materialMsg->mutable_specular()->set_a(transparency);
-        materialMsg->mutable_emissive()->set_a(transparency);
+//        msgs::Material *materialMsg = updateMsgPtr->mutable_material();
+//        materialMsg->mutable_ambient()->set_a(transparency);
+//        materialMsg->mutable_diffuse()->set_a(transparency);
+//        materialMsg->mutable_specular()->set_a(transparency);
+//        materialMsg->mutable_emissive()->set_a(transparency);
 
           //std::cerr << " updateMsg " << updateMsgPtr->DebugString() << std::endl;
         it->first->UpdateFromMsg(updateMsgPtr);
-        //it->first->SetTransparency(transparency);
+        it->first->SetTransparency(transparency);
 
         // if (it->first->GetMaterialName() != origMatName)
         break;
