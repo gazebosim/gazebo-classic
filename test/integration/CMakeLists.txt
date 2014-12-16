@@ -103,11 +103,10 @@ if (ENABLE_TESTS_COMPILATION)
 endif()
 
 set(display_tests
-  permissions.cc
 )
 
 # Build the display tests (need extra sources to compile)
-gz_build_qt_tests(${display_tests})
+gz_build_display_tests(${display_tests})
 
 set(dri_tests
   camera.cc
@@ -126,6 +125,11 @@ set(dri_tests
 
 gz_build_dri_tests(${dri_tests})
 
+set(qt_tests
+  insert_model.cc
+)
+
+gz_build_qt_tests(${qt_tests})
 
 if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   # Increase timeout, to account for model download time.

@@ -15,13 +15,13 @@
  *
 */
 
-#ifndef _INSERTMODELWIDGET_TEST_HH_
-#define _INSERTMODELWIDGET_TEST_HH_
+#ifndef _INSERTMODEL_TEST_HH_
+#define _INSERTMODEL_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
 /// \brief A test class for the DataLogger widget.
-class InsertModelWidget_TEST : public QTestFixture
+class InsertModelTest : public QTestFixture
 {
   Q_OBJECT
 

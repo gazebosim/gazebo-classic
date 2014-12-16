@@ -20,12 +20,12 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
-#include "gazebo/gui/InsertModelWidget_TEST.hh"
+#include "insert_model.hh"
 
 #include "test_config.h"
 
 /////////////////////////////////////////////////
-void InsertModelWidget_TEST::ReadPermissions()
+void InsertModelTest::ReadPermissions()
 {
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
@@ -43,7 +43,7 @@ void InsertModelWidget_TEST::ReadPermissions()
 
   // Create files in /tmp and set permissions accordingly
 
-  boost::filesystem::path testDir("/tmp/InsertModelWidget_TEST");
+  boost::filesystem::path testDir("/tmp/InsertModelTest");
   if (!boost::filesystem::exists(testDir))
   {
     boost::filesystem::create_directories(testDir);
@@ -58,12 +58,16 @@ void InsertModelWidget_TEST::ReadPermissions()
     }
     boost::filesystem::permissions(testFolder, boost::filesystem::no_perms);
 
-    // Try to add the folder to the model path
-    gazebo::common::SystemPaths::Instance()->
-      AddModelPathsUpdate(testFolder.string());
-
-    // Check if it is in InsertModelWidget
-    QVERIFY(insertModelWidget->LocalPathInFileWidget(testFolder.string()));
+    try
+    {
+      // Try to add the folder to the model path
+      gazebo::common::SystemPaths::Instance()->
+        AddModelPathsUpdate(testFolder.string());
+    }
+    catch(boost::filesystem::filesystem_error & e)
+    {
+      QFAIL("Failed to catch filesystem error!\n");
+    }
 
     boost::filesystem::permissions(testFolder, boost::filesystem::all_all);
   }
@@ -78,9 +82,16 @@ void InsertModelWidget_TEST::ReadPermissions()
     }
     boost::filesystem::permissions(childFolder, boost::filesystem::no_perms);
 
-    // Try to add the folder to the model path
-    gazebo::common::SystemPaths::Instance()->
-      AddModelPathsUpdate(testFolder.string());
+    try
+    {
+      // Try to add the folder to the model path
+      gazebo::common::SystemPaths::Instance()->
+        AddModelPathsUpdate(testFolder.string());
+    }
+    catch(boost::filesystem::filesystem_error & e)
+    {
+      QFAIL("Failed to catch filesystem error!\n");
+    }
 
     // Check if it is in InsertModelWidget
     QVERIFY(insertModelWidget->LocalPathInFileWidget(testFolder.string()));
@@ -104,9 +115,16 @@ void InsertModelWidget_TEST::ReadPermissions()
 
     boost::filesystem::permissions(modelConfig, boost::filesystem::no_perms);
 
-    // Try to add the folder to the model path
-    gazebo::common::SystemPaths::Instance()->
-      AddModelPathsUpdate(testFolder.string());
+    try
+    {
+      // Try to add the folder to the model path
+      gazebo::common::SystemPaths::Instance()->
+        AddModelPathsUpdate(testFolder.string());
+    }
+    catch(boost::filesystem::filesystem_error & e)
+    {
+      QFAIL("Failed to catch filesystem error!\n");
+    }
 
     // Check if it is in InsertModelWidget
     QVERIFY(insertModelWidget->LocalPathInFileWidget(testFolder.string()));
@@ -121,4 +139,4 @@ void InsertModelWidget_TEST::ReadPermissions()
 }
 
 // Generate a main function for the test
-QTEST_MAIN(InsertModelWidget_TEST)
+QTEST_MAIN(InsertModelTest)
