@@ -18,6 +18,7 @@
 #define _BUILDING_EDITOR_EVENTS_HH_
 
 #include <string>
+#include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
 
@@ -29,6 +30,20 @@ namespace gazebo
     {
       class GAZEBO_VISIBLE Events
       {
+        /// \brief Connect a Gazebo event to the toggle edit mode signal
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr
+                ConnectToggleEditMode(T _subscriber)
+          { return toggleEditMode.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the toggle edit mode signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectToggleEditMode(
+            event::ConnectionPtr _subscriber)
+          { toggleEditMode.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the create editor item signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -42,6 +57,20 @@ namespace gazebo
         public: static void DisconnectCreateBuildingEditorItem(
             event::ConnectionPtr _subscriber)
           { createBuildingEditorItem.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the color selected signal
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr
+                ConnectColorSelected(T _subscriber)
+          { return colorSelected.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the color selected signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectColorSelected(
+            event::ConnectionPtr _subscriber)
+          { colorSelected.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the save model signal
         /// \param[in] _subscriber the subscriber to this event
@@ -265,6 +294,9 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { exitBuildingEditor.Disconnect(_subscriber); }
 
+        /// \brief Toggle if the edit mode was checked or not.
+        public: static event::EventT<void (bool)> toggleEditMode;
+
         /// \brief Connect a Gazebo event to the name changed signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -282,6 +314,10 @@ namespace gazebo
         /// \brief An editor item is to be created
         public: static event::EventT<void (std::string)>
             createBuildingEditorItem;
+
+        /// \brief A color has been selected.
+        public: static event::EventT<void (QColor)>
+            colorSelected;
 
         /// \brief A model has been saved with a name and a location
         public: static event::EventT<void (std::string, std::string)>
