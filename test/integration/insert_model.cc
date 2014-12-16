@@ -41,9 +41,9 @@ void InsertModelTest::ReadPermissions()
   gazebo::gui::InsertModelWidget *insertModelWidget =
       mainWindow.findChild<gazebo::gui::InsertModelWidget *>("insertModel");
 
-  // Create files in /tmp and set permissions accordingly
-
-  boost::filesystem::path testDir("/tmp/InsertModelTest");
+  // Create files in a temporary directory and set permissions accordingly
+  boost::filesystem::path testDir = boost::filesystem::temp_directory_path() /
+                                      "InsertModelTest";
   if (!boost::filesystem::exists(testDir))
   {
     boost::filesystem::create_directories(testDir);
