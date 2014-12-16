@@ -232,7 +232,11 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       if (this->hoverVis)
       {
         if (this->hoverVis->IsPlane())
-          return false;
+        {
+          QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+          camera->HandleMouseEvent(_event);
+          return true;
+        }
 
         // Pressed parent part
         if (!this->selectedVis)
@@ -266,6 +270,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
         }
       }
     }
+
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
     camera->HandleMouseEvent(_event);
     return true;

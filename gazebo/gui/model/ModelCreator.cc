@@ -719,8 +719,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       g_copyAct->setEnabled(!this->selectedVisuals.empty());
       g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
 
-      if (this->manipMode == "select")
-        return true;
+      return true;
     }
     // Not part
     else
