@@ -34,7 +34,7 @@ TEST_F(PluginTest, ModelExceptionConstructor)
   gazebo::physics::ModelPtr model = world->GetModel("box");
   ASSERT_TRUE(model != NULL);
 
-  world->StepWorld(100);
+  world->Step(100);
 
   char *home = getenv("HOME");
   ASSERT_TRUE(home);
@@ -69,7 +69,7 @@ TEST_F(PluginTest, ModelExceptionInit)
   gazebo::physics::ModelPtr model = world->GetModel("box");
   ASSERT_TRUE(model != NULL);
 
-  world->StepWorld(100);
+  world->Step(100);
 
   char *home = getenv("HOME");
   ASSERT_TRUE(home);
@@ -104,7 +104,7 @@ TEST_F(PluginTest, ModelExceptionLoad)
   gazebo::physics::ModelPtr model = world->GetModel("box");
   ASSERT_TRUE(model != NULL);
 
-  world->StepWorld(100);
+  world->Step(100);
 
   char *home = getenv("HOME");
   ASSERT_TRUE(home);

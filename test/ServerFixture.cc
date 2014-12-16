@@ -55,8 +55,6 @@ ServerFixture::ServerFixture()
   this->imgData = NULL;
   this->serverThread = NULL;
 
-  gzLogInit("test.log");
-  gazebo::common::Console::SetQuiet(false);
   common::SystemPaths::Instance()->AddGazeboPaths(
       TEST_INTEGRATION_PATH);
 
@@ -220,6 +218,9 @@ void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
                                            _physics));
   else
     ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
+
+  gzLogInit("test.log");
+  gazebo::common::Console::SetQuiet(false);
 
   if (!rendering::get_scene(
         gazebo::physics::get_world()->GetName()))
