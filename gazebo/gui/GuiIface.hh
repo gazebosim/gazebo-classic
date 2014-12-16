@@ -71,7 +71,7 @@ namespace gazebo
     /// if it doesn't exist) and return true.
     /// If GAZEBO_GUI_INI_FILE is set but the path does not exist, or if it
     /// exists and contains invalid content, do not load, and return false.
-    /// \param[in] _file Absolute path to a gui.ini file. This will override
+    /// \param[in] _file Path to a gui.ini file. This will override
     /// the environment variables.
     /// \return True if an INI file was loaded, false otherwise.
     GAZEBO_VISIBLE

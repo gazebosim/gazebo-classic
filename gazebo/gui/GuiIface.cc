@@ -30,6 +30,12 @@
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/GuiIface.hh"
 
+#ifdef WIN32
+# define HOMEDIR "HOMEPATH"
+#else
+# define HOMEDIR "HOME"
+#endif //WIN32
+
 // These are needed by QT. They need to stay valid during the entire
 // lifetime of the application, and argc > 0 and argv must contain one valid
 // character string
@@ -170,7 +176,7 @@ bool gui::loadINI(boost::filesystem::path _file)
   {
     // Get the gui.ini path environment variable
     char *guiINIFile = getenv("GAZEBO_GUI_INI_FILE");
-    char *home = getenv("HOME");
+    char *home = getenv(HOMEDIR);
 
     // If the environment variable was specified
     if (guiINIFile)
@@ -178,7 +184,7 @@ bool gui::loadINI(boost::filesystem::path _file)
       _file = guiINIFile;
       if (!boost::filesystem::exists(_file))
       {
-        gzerr << "GAZEBO_GUI_INI_FILE does not exist: " << _file << ".\n";
+        gzerr << "GAZEBO_GUI_INI_FILE does not exist: " << _file << std::endl;
         return false;
       }
     }
