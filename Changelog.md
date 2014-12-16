@@ -75,6 +75,9 @@
 1. Added "button modifier" fields (control, shift, and alt) to common::KeyEvent.
     * [Pull request #1325](https://bitbucket.org/osrf/gazebo/pull-request/1325)
 
+1. Fixed crash on "permission denied" bug, added insert_model integration test.
+    * [Pull request #1329](https://bitbucket.org/osrf/gazebo/pull-request/1329/)
+
 1. Building editor updates
     1. Fixed inspector resizing.
         * [Pull request #1230](https://bitbucket.org/osrf/gazebo/pull-request/1230)
