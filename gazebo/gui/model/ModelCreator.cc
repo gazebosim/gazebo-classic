@@ -58,6 +58,7 @@ ModelCreator::ModelCreator()
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
 
+  this->manipMode = "";
   this->boxCounter = 0;
   this->cylinderCounter = 0;
   this->sphereCounter = 0;
@@ -635,12 +636,16 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
   if (!userCamera)
     return false;
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
-  if (vis && !vis->IsPlane())
+  if (this->jointMaker->GetState() != JointMaker::JOINT_NONE)
   {
-    if (
-        this->allParts.find(vis->GetParent()->GetName()) ==
-        this->allParts.end())
+    userCamera->HandleMouseEvent(_event);
+    return true;
+  }
+
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+  if (vis)
+  {
+    if (!vis->IsPlane() && gui::get_entity_id(vis->GetRootVisual()->GetName()))
     {
       // Prevent interaction with other models, send event only to
       // user camera
@@ -657,12 +662,6 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (!userCamera)
     return false;
-
-  if (this->jointMaker->GetState() != JointMaker::JOINT_NONE)
-  {
-    userCamera->HandleMouseEvent(_event);
-    return false;
-  }
 
   if (this->mouseVisual)
   {
@@ -719,7 +718,9 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       }
       g_copyAct->setEnabled(!this->selectedVisuals.empty());
       g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
-      return true;
+
+      if (this->manipMode == "select")
+        return true;
     }
     // Not part
     else
@@ -729,10 +730,8 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       g_alignAct->setEnabled(false);
       g_copyAct->setEnabled(!this->selectedVisuals.empty());
 
-      // Prevent interaction with other models, send event only to
-      // user camera
-      userCamera->HandleMouseEvent(_event);
-      return true;
+      if (!vis->IsPlane())
+        return true;
     }
   }
   return false;
@@ -748,19 +747,6 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 
   if (!this->mouseVisual)
   {
-    rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
-    if (vis && !vis->IsPlane())
-    {
-      if (this->allParts.find(vis->GetParent()->GetName()) ==
-          this->allParts.end())
-      {
-        // Prevent interaction with other models, send event only to
-        // user camera
-        QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
-        userCamera->HandleMouseEvent(_event);
-        return true;
-      }
-    }
     return false;
   }
 
@@ -1047,6 +1033,8 @@ void ModelCreator::OnManipMode(const std::string &_mode)
 {
   if (!this->active)
     return;
+
+  this->manipMode = _mode;
 
   if (!this->selectedVisuals.empty())
   {
