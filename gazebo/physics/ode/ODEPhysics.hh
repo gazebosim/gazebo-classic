@@ -91,7 +91,7 @@ namespace gazebo
         MIN_STEP_SIZE,
 
         /// \brief Limit ratios of inertias of adjacent links
-        /// (note that the corresponding SDF tag is "use_dynamic_moi_rescaling"
+        /// (note that the corresponding SDF tag is "use_dynamic_moi_rescaling")
         INERTIA_RATIO_REDUCTION
       };
 
