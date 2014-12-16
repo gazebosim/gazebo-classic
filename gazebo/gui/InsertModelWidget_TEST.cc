@@ -14,12 +14,7 @@
  * limitations under the License.
  *
 */
-/*#include "gazebo/math/Helpers.hh"
-#include "gazebo/msgs/msgs.hh"
-#include "gazebo/transport/transport.hh"
-#include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/TimePanel.hh"
-#include "gazebo/gui/GLWidget.hh"*/
+
 #include <boost/filesystem.hpp>
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/gui/GuiIface.hh"

@@ -6,6 +6,8 @@ include_directories (
   ${PROTOBUF_INCLUDE_DIR}
 )
 
+include ( ${QT_USE_FILE} )
+
 link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
@@ -25,6 +27,8 @@ if(HAVE_DART)
   include_directories ( ${DARTCore_INCLUDE_DIRS} )
   link_directories ( ${DARTCore_LIBRARY_DIRS} )
 endif()
+
+add_definitions(${QT_DEFINITIONS})
 
 set(tests
   aero_plugin.cc
@@ -99,10 +103,11 @@ if (ENABLE_TESTS_COMPILATION)
 endif()
 
 set(display_tests
+  permissions.cc
 )
 
 # Build the display tests (need extra sources to compile)
-gz_build_display_tests(${display_tests})
+gz_build_qt_tests(${display_tests})
 
 set(dri_tests
   camera.cc

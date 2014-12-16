@@ -57,7 +57,60 @@ endmacro()
 if (VALID_DISPLAY)
   # Redefine build display tests
   macro (gz_build_display_tests)
-    gz_build_tests(${ARGV})
+    # Build all the tests
+    foreach(GTEST_SOURCE_file ${ARGN})
+      string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
+      set(BINARY_NAME ${TEST_TYPE}_${BINARY_NAME})
+      if(USE_LOW_MEMORY_TESTS)
+        add_definitions(-DUSE_LOW_MEMORY_TESTS=1)
+      endif(USE_LOW_MEMORY_TESTS)
+     QT4_WRAP_CPP(${BINARY_NAME}_MOC ${QTEST_HEADER_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.hh)
+
+     add_executable(${BINARY_NAME}
+      ${${BINARY_NAME}_MOC} ${GTEST_SOURCE_file} ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
+
+      add_dependencies(${BINARY_NAME}
+        gtest gtest_main
+        gazebo_common
+        gazebo_math
+        gazebo_physics
+        gazebo_sensors
+        gazebo_rendering
+        gazebo_msgs
+        gazebo_transport
+        server_fixture
+        )
+
+
+      target_link_libraries(${BINARY_NAME}
+        libgtest.a
+        libgtest_main.a
+        ${CMAKE_BINARY_DIR}/test/libserver_fixture.a
+        gazebo_common
+        gazebo_math
+        gazebo_physics
+        gazebo_sensors
+        gazebo_rendering
+        gazebo_msgs
+        gazebo_transport
+        libgazebo
+        pthread
+        ${QT_LIBRARIES}
+        )
+
+      add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
+    --gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+
+      set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
+
+      # Check that the test produced a result and create a failure if it didn't.
+      # Guards against crashed and timed out tests.
+      add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
+    ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+    endforeach()
+
+    set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
+
   endmacro()
 
   # Redefine build qt tests
