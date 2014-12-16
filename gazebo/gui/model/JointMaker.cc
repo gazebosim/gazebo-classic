@@ -135,6 +135,7 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
     scene->RemoveVisual(joint->visual);
     joint->jointVisual->GetParent()->DetachVisual(
         joint->jointVisual->GetName());
+    scene->RemoveVisual(joint->jointVisual);
     joint->hotspot.reset();
     joint->visual.reset();
     joint->jointVisual.reset();
@@ -623,8 +624,8 @@ void JointMaker::Update()
         math::Vector3 childCentroid =
             this->GetPartWorldCentroid(joint->child);
 
-        // Joint pose is expressed w.r.t. child link frame
-        //childCentroid = (childCentroid + joint->pose.pos);
+        // Offset due to joint pose
+        // childCentroid = (childCentroid + joint->pose.pos);
 
         // set orientation of joint hotspot
         math::Vector3 dPos = (childCentroid - parentCentroid);
