@@ -34,7 +34,7 @@
 # define HOMEDIR "HOMEPATH"
 #else
 # define HOMEDIR "HOME"
-#endif //WIN32
+#endif  // WIN32
 
 // These are needed by QT. They need to stay valid during the entire
 // lifetime of the application, and argc > 0 and argv must contain one valid
