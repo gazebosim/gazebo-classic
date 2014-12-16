@@ -65,6 +65,7 @@ set(tests
   pioneer2dx.cc
   plugin.cc
   polyline.cc
+  rest_web.cc
   road.cc
   sensor.cc
   server_fixture.cc

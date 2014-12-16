@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <plugin name="WebRest" filename="libWebRestPlugin.so">
+
+    </plugin>
+    
+    <!-- 
+    spawn a few beers in the world
+    -->
+    <include>
+      <pose>0 0 0 0 0 0</pose>
+      <name>can1</name>
+      <uri>model://beer</uri>
+    </include>
+
+    <include>
+      <pose>5 0 0 0 0 0</pose>
+      <name>can2</name>
+      <uri>model://beer</uri>
+    </include>
+
+    <include>
+      <pose>10 0 0 0 0 0</pose>
+      <uri>model://beer</uri>
+      <name>can3</name>
+    </include>
+
+    <include>
+      <pose>15 0 0 0 0 0</pose>
+      <name>can4</name>
+      <uri>model://beer</uri>
+    </include>
+
+
+  </world>
+</sdf>

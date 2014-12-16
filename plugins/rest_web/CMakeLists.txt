@@ -47,9 +47,9 @@ include_directories(
 
 
 
-add_library(RestServicePlugin SHARED ${server_src} )
-target_link_libraries(RestServicePlugin ${GAZEBO_libraries} gazebo_msgs)
-install (TARGETS RestServicePlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+add_library(RestWebPlugin SHARED ${server_src} )
+target_link_libraries(RestWebPlugin ${GAZEBO_libraries} gazebo_msgs)
+install (TARGETS RestWebPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
 gz_install_includes("plugins" ${server_inc})
 
 add_library(RestUiPlugin SHARED ${client_src} ${headers_MOC})
