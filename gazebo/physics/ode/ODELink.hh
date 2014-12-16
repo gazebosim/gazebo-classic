@@ -173,12 +173,6 @@ namespace gazebo
 
       /// \brief Collision space id.
       private: dSpaceID spaceId;
-
-      /// \brief Cache force applied on body
-      private: math::Vector3 force;
-
-      /// \brief Cache torque applied on body
-      private: math::Vector3 torque;
     };
   }
 }
