@@ -322,6 +322,9 @@ namespace gazebo
 
       /// \brief True if the model editor mode is active.
       private: bool active;
+
+      /// \brief Current model manipulation mode.
+      private: std::string manipMode;
     };
     /// \}
   }

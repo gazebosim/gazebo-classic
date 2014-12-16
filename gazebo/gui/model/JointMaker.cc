@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,14 +171,20 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
 /////////////////////////////////////////////////
 bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 {
-  if (_event.button != common::MouseEvent::LEFT)
+  rendering::UserCameraPtr camera = gui::get_active_camera();
+  if (_event.button == common::MouseEvent::MIDDLE)
+  {
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    camera->HandleMouseEvent(_event);
+    return true;
+  }
+  else if (_event.button != common::MouseEvent::LEFT)
     return false;
 
   if (this->jointType != JointMaker::JOINT_NONE)
     return false;
 
   // intercept mouse press events when user clicks on the joint hotspot visual
-  rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
   if (vis)
   {
@@ -195,9 +201,9 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
+  rendering::UserCameraPtr camera = gui::get_active_camera();
   if (this->jointType == JointMaker::JOINT_NONE)
   {
-    rendering::UserCameraPtr camera = gui::get_active_camera();
     rendering::VisualPtr vis = camera->GetVisual(_event.pos);
     if (vis)
     {
@@ -225,43 +231,47 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
   }
   else
   {
-    if (this->hoverVis)
+    if (_event.button == common::MouseEvent::LEFT)
     {
-      if (this->hoverVis->IsPlane())
-        return false;
-
-      // Pressed parent part
-      if (!this->selectedVis)
+      if (this->hoverVis)
       {
-        if (this->mouseJoint)
+        if (this->hoverVis->IsPlane())
           return false;
 
-        this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-        this->selectedVis = this->hoverVis;
-        this->hoverVis.reset();
-        // Create joint data with selected visual as parent
-        // the child will be set on the second mouse release.
-        this->mouseJoint = this->CreateJoint(this->selectedVis,
-            rendering::VisualPtr());
-      }
-      // Pressed child part
-      else if (this->selectedVis != this->hoverVis)
-      {
-        if (this->hoverVis)
+        // Pressed parent part
+        if (!this->selectedVis)
+        {
+          if (this->mouseJoint)
+            return false;
+
           this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-        if (this->selectedVis)
-          this->selectedVis->SetEmissive(common::Color(0, 0, 0));
-        this->mouseJoint->child = this->hoverVis;
+          this->selectedVis = this->hoverVis;
+          this->hoverVis.reset();
+          // Create joint data with selected visual as parent
+          // the child will be set on the second mouse release.
+          this->mouseJoint = this->CreateJoint(this->selectedVis,
+              rendering::VisualPtr());
+        }
+        // Pressed child part
+        else if (this->selectedVis != this->hoverVis)
+        {
+          if (this->hoverVis)
+            this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+          if (this->selectedVis)
+            this->selectedVis->SetEmissive(common::Color(0, 0, 0));
+          this->mouseJoint->child = this->hoverVis;
 
-        // reset variables.
-        this->selectedVis.reset();
-        this->hoverVis.reset();
-        this->AddJoint(JointMaker::JOINT_NONE);
+          // reset variables.
+          this->selectedVis.reset();
+          this->hoverVis.reset();
+          this->AddJoint(JointMaker::JOINT_NONE);
 
-        this->newJointCreated = true;
+          this->newJointCreated = true;
+        }
       }
     }
-
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    camera->HandleMouseEvent(_event);
     return true;
   }
   return false;
@@ -397,12 +407,16 @@ void JointMaker::Stop()
 /////////////////////////////////////////////////
 bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
 {
-  if (_event.dragging)
-    return false;
-
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
-  rendering::ScenePtr scene = camera->GetScene();
+
+  if (_event.dragging)
+  {
+    // this enables the joint maker to pan while connecting joints
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    camera->HandleMouseEvent(_event);
+    return true;
+  }
 
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
 
