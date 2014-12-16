@@ -55,107 +55,74 @@ void InsertModelWidget_TEST::ReadPermissions()
   }
 
   // Case 1: add a restricted access folder to GAZEBO_MODEL_PATHS
-
-  boost::filesystem::path case1 = testDir / "case1";
-  if (!boost::filesystem::exists(case1))
   {
-    boost::filesystem::create_directories(case1);
+    boost::filesystem::path testFolder = testDir / "case1";
+    if (!boost::filesystem::exists(testFolder))
+    {
+      boost::filesystem::create_directories(testFolder);
+    }
+    boost::filesystem::permissions(testFolder, boost::filesystem::no_perms);
+
+    // Try to add the folder to the model path
+    gazebo::common::SystemPaths::Instance()->
+      AddModelPathsUpdate(testFolder.string());
+
+    // Check if it is in InsertModelWidget
+    QVERIFY(insertModelWidget->LocalPathInFileWidget(testFolder.string()));
+
+    boost::filesystem::permissions(testFolder, boost::filesystem::all_all);
   }
-  boost::filesystem::permissions(case1, boost::filesystem::no_perms);
 
-  // Try to add the folder to the model path
-  gazebo::common::SystemPaths::Instance()->AddModelPathsUpdate(case1.string());
+  // Case 2: Add parent of a restricted access folder to GAZEBO_MODEL_PATHS
+  {
+    boost::filesystem::path testFolder = testDir / "case2";
+    boost::filesystem::path childFolder = testFolder / "child";
+    if (!boost::filesystem::exists(childFolder))
+    {
+      boost::filesystem::create_directories(childFolder);
+    }
+    boost::filesystem::permissions(childFolder, boost::filesystem::no_perms);
 
-  // Check if it is in InsertModelWidget
-  QVERIFY(insertModelWidget->LocalPathInFileWidget(case1.string()));
+    // Try to add the folder to the model path
+    gazebo::common::SystemPaths::Instance()->
+      AddModelPathsUpdate(testFolder.string());
 
-  // GAZEBO_MODEL_PATHS contains a restricted access folder
+    // Check if it is in InsertModelWidget
+    QVERIFY(insertModelWidget->LocalPathInFileWidget(testFolder.string()));
 
-  // GAZEBO_MODEL_PATHS contains parent of a restricted access file
+    boost::filesystem::permissions(childFolder, boost::filesystem::all_all);
+  }
 
+  // Case 3: Add parent of a folder containing a restricted access model.config
+  {
+    boost::filesystem::path testFolder = testDir / "case3";
+    boost::filesystem::path childFolder = testFolder / "child";
+    if (!boost::filesystem::exists(childFolder))
+    {
+      boost::filesystem::create_directories(childFolder);
+    }
+    boost::filesystem::path modelConfig = childFolder / "model.config";
+    std::ofstream savefile;
+    savefile.open(modelConfig.string().c_str());
+    savefile << "asdf";
+    savefile.close();
+
+    boost::filesystem::permissions(modelConfig, boost::filesystem::no_perms);
+
+    // Try to add the folder to the model path
+    gazebo::common::SystemPaths::Instance()->
+      AddModelPathsUpdate(testFolder.string());
+
+    // Check if it is in InsertModelWidget
+    QVERIFY(insertModelWidget->LocalPathInFileWidget(testFolder.string()));
+
+    boost::filesystem::permissions(modelConfig, boost::filesystem::all_all);
+  }
 
   mainWindow.close();
-
   // Delete all test files
+
   boost::filesystem::remove_all(testDir);
-
-  /*std::string modelName = "cylinder";
-
-  gazebo::rendering::Events::createScene("default");
-
-  // trigger selection to initialize wirebox's vertex buffer creation first.
-  // Otherwise test segfaults later when selecting a model due to making
-  // this call outside the rendering thread.
-  gazebo::event::Events::setSelectedEntity(modelName, "normal");
-
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
-
-  // Get the user camera and scene
-  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
-  gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
-
-  gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelName);
-  QVERIFY(modelVis != NULL);
-
-  // Select the model
-  gazebo::event::Events::setSelectedEntity(modelName, "normal");
-
-  // Wait until the model is selected
-  int sleep = 0;
-  int maxSleep = 100;
-  while (!modelVis->GetHighlighted() && sleep < maxSleep)
-  {
-    gazebo::common::Time::MSleep(30);
-    sleep++;
-  }
-  QVERIFY(modelVis->GetHighlighted());
-
-  // Get GLWidget
-  gazebo::gui::GLWidget *glWidget =
-      mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
-  QVERIFY(glWidget != NULL);
-
-  // Copy the model
-  QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier);
-  QTest::qWait(500);
-
-  // Move to center of the screen
-  QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
-  QTest::mouseMove(glWidget, moveTo);
-  QTest::qWait(500);
-
-  // Paste the model
-  QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier);
-  QTest::qWait(500);
-
-  // Release and spawn the model
-  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
-  QTest::qWait(500);
-
-  QCoreApplication::processEvents();
-
-  // Verify there is a clone of the model
-  gazebo::rendering::VisualPtr modelVisClone;
-  sleep = 0;
-  maxSleep = 100;
-  while (!modelVisClone && sleep < maxSleep)
-  {
-    modelVisClone = scene->GetVisual(modelName + "_clone");
-    QTest::qWait(30);
-    sleep++;
-  }
-  QVERIFY(modelVisClone);
-
-  cam->Fini();
-  delete mainWindow;*/
 }
 
 // Generate a main function for the test

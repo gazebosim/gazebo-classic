@@ -190,7 +190,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
     return;
 
   boost::filesystem::path dir(_path);
-  bool pathExists = this->IsPathAccesible(dir);
+  bool pathExists = this->IsPathAccessible(dir);
 
   QString qpath = QString::fromStdString(_path);
   QTreeWidgetItem *topItem = NULL;
@@ -262,7 +262,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
       manifest /= GZ_MODEL_MANIFEST_FILENAME;
 
       // Check if the manifest does not exists
-      if (!this->IsPathAccesible(manifest))
+      if (!this->IsPathAccessible(manifest))
       {
         gzerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME << " for model "
           << (*dIter) << "\n";
@@ -270,7 +270,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
         manifest = manifest / "manifest.xml";
       }
 
-       if (!this->IsPathAccesible(manifest) || manifest == fullPath)
+       if (!this->IsPathAccessible(manifest) || manifest == fullPath)
       {
         gzlog << "model.config file is missing in directory["
               << fullPath << "]\n";
@@ -333,7 +333,7 @@ void InsertModelWidget::OnModelUpdateRequest(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-bool InsertModelWidget::IsPathAccesible(const boost::filesystem::path &_path)
+bool InsertModelWidget::IsPathAccessible(const boost::filesystem::path &_path)
 {
   try
   {
