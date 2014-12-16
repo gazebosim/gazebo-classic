@@ -219,7 +219,6 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
     // Add the new path to the directory watcher
     if (pathExists)
     {
-      gzdbg << "Adding path to FileSystemWatcher: " << qpath.toStdString() << std::endl;
       this->dataPtr->watcher->addPath(qpath);
     }
   }
