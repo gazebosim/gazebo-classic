@@ -319,11 +319,11 @@ namespace gazebo
       /// \brief Name of the building model.
       private: std::string modelName;
 
-      /// \brief The root visual of the building model.
-      private: rendering::VisualPtr modelVisual;
+      /// \brief Name of the building model preview.
+      private: std::string previewName;
 
-      /// \brief The pose of the building model.
-      private: math::Pose modelPose;
+      /// \brief The root visual of the building model preview.
+      private: rendering::VisualPtr previewVisual;
 
       /// \brief Counter for the number of walls in the model.
       private: int wallCounter;
