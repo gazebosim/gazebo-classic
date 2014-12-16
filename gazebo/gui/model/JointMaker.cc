@@ -59,19 +59,12 @@ JointMaker::JointMaker()
   this->jointMaterials[JOINT_UNIVERSAL] = "Gazebo/Blue";
   this->jointMaterials[JOINT_BALL]      = "Gazebo/Purple";
 
-  MouseEventHandler::Instance()->AddReleaseFilter("model_joint",
-      boost::bind(&JointMaker::OnMouseRelease, this, _1));
-
-  KeyEventHandler::Instance()->AddPressFilter("model_joint",
-      boost::bind(&JointMaker::OnKeyPress, this, _1));
-
   this->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&JointMaker::Update, this)));
 
   this->inspectAct = new QAction(tr("Open Joint Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this, SLOT(OnOpenInspector()));
-
 
   this->updateMutex = new boost::recursive_mutex();
 }
@@ -186,6 +179,8 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
     return true;
   }
   else if (_event.button != common::MouseEvent::LEFT)
+    return false;
+
   if (this->jointType != JointMaker::JOINT_NONE)
     return false;
 
@@ -276,7 +271,6 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           this->hoverVis.reset();
           this->AddJoint(JointMaker::JOINT_NONE);
 
-        this->AddJoint(JointMaker::JOINT_NONE);
           this->newJointCreated = true;
         }
       }
@@ -348,10 +342,6 @@ void JointMaker::AddJoint(const std::string &_type)
   {
     this->AddJoint(JointMaker::JOINT_HINGE2);
   }
-  else if (_type == "revolute2")
-  {
-    this->AddJoint(JointMaker::JOINT_HINGE2);
-  }
   else if (_type == "prismatic")
   {
     this->AddJoint(JointMaker::JOINT_SLIDER);
@@ -388,7 +378,6 @@ void JointMaker::AddJoint(JointMaker::JointType _type)
   {
     // Remove the event filters.
     MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
-    //MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
 
     // signal the end of a joint action.
     emit JointAdded();
