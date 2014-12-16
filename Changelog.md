@@ -129,6 +129,8 @@
 
     1. Snap walls to length increments, moved scale to SegmentItem and added Get/SetScale, added SegmentItem::SnapAngle and SegmentItem::SnapLength.
         * [Pull request #1311](https://bitbucket.org/osrf/gazebo/pull-request/1311)
+    1. Make buildings available in "Insert Models" tab, improve save flow.
+        * [Pull request #1312](https://bitbucket.org/osrf/gazebo/pull-request/1312)
 
     1. Added EditorItem::SetHighlighted.
         * [Pull request #1308](https://bitbucket.org/osrf/gazebo/pull-request/1308)
@@ -139,10 +141,6 @@
     1. Detach all child manips when item is deleted, added BuildingMaker::DetachAllChildren.
         * [Pull request #1316](https://bitbucket.org/osrf/gazebo/pull-request/1316)
 
-    1. Enabled multi-selection and align tool inside model editor.
-        * [Pull request #1302](https://bitbucket.org/osrf/gazebo/pull-request/1302)
-        * [Issue #1323](https://bitbucket.org/osrf/gazebo/issue/1323)
-
     1. Added texture picker to inspector dialogs.
         * [Pull request #1306](https://bitbucket.org/osrf/gazebo/pull-request/1306)
 
@@ -150,9 +148,23 @@
         * [Pull request #1322](https://bitbucket.org/osrf/gazebo/pull-request/1322)
         * [Issue #370](https://bitbucket.org/osrf/gazebo/issue/370)
 
+    1. Added Gazebo/BuildingFrame material to display holes for doors and windows on walls.
+        * [Pull request #1338](https://bitbucket.org/osrf/gazebo/pull-request/1338)
+
+    1. Added Gazebo/Bricks material to be used as texture on the building editor.
+        * [Pull request #1333](https://bitbucket.org/osrf/gazebo/pull-request/1333)
+
 1. Model editor updates
     1. Fix adding/removing event filters .
         * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
+
+    1. Enabled multi-selection and align tool inside model editor.
+        * [Pull request #1302](https://bitbucket.org/osrf/gazebo/pull-request/1302)
+        * [Issue #1323](https://bitbucket.org/osrf/gazebo/issue/1323)
+
+    1. Enabled snap mode inside model editor.
+        * [Pull request #1331](https://bitbucket.org/osrf/gazebo/pull-request/1331)
+        * [Issue #1318](https://bitbucket.org/osrf/gazebo/issue/1318)
 
     1. Implemented copy/pasting of links.
         * [Pull request #1330](https://bitbucket.org/osrf/gazebo/pull-request/1330)

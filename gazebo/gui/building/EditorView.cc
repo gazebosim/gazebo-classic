@@ -50,16 +50,8 @@ EditorView::EditorView(QWidget *_parent)
   gui::editor::Events::ConnectCreateBuildingEditorItem(
     boost::bind(&EditorView::OnCreateEditorItem, this, _1)));
 
-/*  this->connections.push_back(
-  gui::editor::Events::ConnectSaveModel(
-    boost::bind(&EditorView::OnSaveModel, this, _1, _2)));*/
-
-/*  this->connections.push_back(
-  gui::editor::Events::ConnectDone(
-    boost::bind(&EditorView::OnDone, this)));*/
-
   this->connections.push_back(
-      gui::editor::Events::ConnectDiscardBuildingModel(
+      gui::editor::Events::ConnectNewBuildingModel(
       boost::bind(&EditorView::OnDiscardModel, this)));
 
   this->connections.push_back(
@@ -569,11 +561,28 @@ void EditorView::DeleteItem(EditorItem *_item)
   if (!_item)
     return;
 
+  // To make holes in the final model, windows and doors are attached to walls,
+  // and stairs are attached to floors above them.
+  // Detach 3D manip, but 2D items may remain as children.
   this->buildingMaker->DetachAllChildren(this->itemToVisualMap[_item]);
 
   if (_item->GetType() == "WallSegment")
   {
     WallSegmentItem *wallSegmentItem = dynamic_cast<WallSegmentItem *>(_item);
+
+    // Delete item's child doors and windows before deleting item
+    for (int i = wallSegmentItem->childItems().size()-1; i >=0; --i)
+    {
+      // WallSegmentItems have other children besides RectItems
+      RectItem *rectItem = dynamic_cast<RectItem *>(
+          wallSegmentItem->childItems().at(i));
+
+      if (rectItem)
+      {
+        this->DeleteItem(rectItem);
+      }
+    }
+
     this->UnlinkGrabbers(wallSegmentItem->grabbers[0]);
     this->UnlinkGrabbers(wallSegmentItem->grabbers[1]);
 
@@ -920,7 +929,6 @@ void EditorView::OnDiscardModel()
   this->stairsList.clear();
   this->floorList.clear();
   this->itemToVisualMap.clear();
-  this->buildingMaker->Reset();
 
   for (unsigned int i = 0; i < this->levels.size(); ++i)
     delete this->levels[i];

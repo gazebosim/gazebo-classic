@@ -608,6 +608,10 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
   {
     if (this->allParts.find(vis->GetName()) == this->allParts.end())
     {
+      // Handle snap from GLWidget
+      if (g_snapAct->isChecked())
+        return false;
+
       // Prevent interaction with other models, send event only to
       // user camera
       userCamera->HandleMouseEvent(_event);
@@ -641,6 +645,10 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     // Is part
     if (this->allParts.find(vis->GetName()) != this->allParts.end())
     {
+      // Handle snap from GLWidget
+      if (g_snapAct->isChecked())
+        return false;
+
       // Not in multi-selection mode.
       if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
       {
@@ -798,6 +806,7 @@ void ModelCreator::OnPaste()
     rendering::VisualPtr visVisual;
 
     math::Pose clonePose;
+    math::Vector3 cloneScale;
 
     if (copiedPart->visuals.empty())
     {
@@ -812,6 +821,8 @@ void ModelCreator::OnPaste()
       rendering::VisualPtr copiedVisual = copiedPart->visuals.back();
       visVisual = copiedVisual->Clone(visualName.str(), linkVisual);
       clonePose = copiedVisual->GetWorldPose();
+      cloneScale = copiedVisual->GetParent()->GetScale();
+      visVisual->SetScale(math::Vector3::One);
     }
 
     rendering::UserCameraPtr userCamera = gui::get_active_camera();
@@ -824,6 +835,7 @@ void ModelCreator::OnPaste()
       clonePose.pos.y = mousePosition.y;
     }
 
+    linkVisual->SetScale(cloneScale);
     linkVisual->SetWorldPose(clonePose);
     linkVisual->SetTransparency(this->editTransparency);
 
@@ -920,7 +932,7 @@ void ModelCreator::GenerateSDF()
     sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
     geomElem->ClearElements();
 
-    math::Vector3 scale = visual->GetScale();
+    math::Vector3 scale = visual->GetParent()->GetScale();
     if (visual->GetParent()->GetName().find("unit_box") != std::string::npos)
     {
       sdf::ElementPtr boxElem = geomElem->AddElement("box");
