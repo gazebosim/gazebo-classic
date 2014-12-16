@@ -215,10 +215,7 @@ void Visual::Fini()
 
   if (this->dataPtr->sceneNode != NULL)
   {
-    this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
-    this->dataPtr->sceneNode->removeAndDestroyAllChildren();
     this->dataPtr->sceneNode->detachAllObjects();
-
     this->dataPtr->scene->GetManager()->destroySceneNode(
         this->dataPtr->sceneNode);
     this->dataPtr->sceneNode = NULL;
@@ -1332,6 +1329,9 @@ void Visual::SetTransparencyInnerLoop()
     if (!entity)
       continue;
 
+    if (entity->getName().find("__COLLISION_VISUAL__") != std::string::npos)
+      continue;
+
     // For each ogre::entity
     for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
     {
@@ -1368,7 +1368,6 @@ void Visual::SetTransparencyInnerLoop()
             pass->setDepthWriteEnabled(true);
             pass->setDepthCheckEnabled(true);
           }
-
 
           dc = pass->getDiffuse();
           dc.a =(1.0f - this->dataPtr->transparency);
