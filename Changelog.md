@@ -141,10 +141,6 @@
     1. Detach all child manips when item is deleted, added BuildingMaker::DetachAllChildren.
         * [Pull request #1316](https://bitbucket.org/osrf/gazebo/pull-request/1316)
 
-    1. Enabled multi-selection and align tool inside model editor.
-        * [Pull request #1302](https://bitbucket.org/osrf/gazebo/pull-request/1302)
-        * [Issue #1323](https://bitbucket.org/osrf/gazebo/issue/1323)
-
     1. Added texture picker to inspector dialogs.
         * [Pull request #1306](https://bitbucket.org/osrf/gazebo/pull-request/1306)
 
