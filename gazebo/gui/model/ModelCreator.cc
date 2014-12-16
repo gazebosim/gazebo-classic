@@ -367,7 +367,7 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
       part->partVisual);
   collisoinVis->SetMaterial("Gazebo/Orange");
   collisoinVis->SetTransparency(this->editTransparency);
-  collisoinVis->SetVisible(false);
+//  collisoinVis->SetVisible(false);
   part->AddCollision(collisoinVis);
 
   std::string partName = part->partVisual->GetName();
@@ -971,6 +971,7 @@ void ModelCreator::GenerateSDF()
 
     modelElem->InsertElement(newLinkElem);
 
+    // visuals
     std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
     for (it = part->visuals.begin(); it != part->visuals.end(); ++it)
     {
@@ -979,6 +980,7 @@ void ModelCreator::GenerateSDF()
       newLinkElem->InsertElement(visualElem);
     }
 
+    // collisions
     std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
     for (colIt = part->collisions.begin(); colIt != part->collisions.end();
         ++colIt)

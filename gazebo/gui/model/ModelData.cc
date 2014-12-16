@@ -208,7 +208,7 @@ void PartData::OnApply()
 
   this->partSDF = msgs::LinkToSDF(*generalConfig->GetData(), this->partSDF);
 
-  // update visual
+  // update visuals
   if (!this->visuals.empty())
   {
     this->partVisual->SetWorldPose(this->GetPose());
@@ -261,7 +261,7 @@ void PartData::OnApply()
     }
   }
 
-  // update collision visual
+  // update collisions
   if (!this->collisions.empty())
   {
     PartCollisionConfig *collisionConfig =
@@ -277,6 +277,10 @@ void PartData::OnApply()
       msgs::Collision *updateMsg = collisionConfig->GetData(leafName);
       if (updateMsg)
       {
+        msgs::Collision collisionMsg = it->second;
+        collisionMsg.CopyFrom(*updateMsg);
+        it->second = collisionMsg;
+
         this->collisionUpdateMsgs.push_back(updateMsg);
       }
     }
