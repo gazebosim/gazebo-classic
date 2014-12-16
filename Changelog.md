@@ -133,6 +133,7 @@
 
     1. Snap walls to length increments, moved scale to SegmentItem and added Get/SetScale, added SegmentItem::SnapAngle and SegmentItem::SnapLength.
         * [Pull request #1311](https://bitbucket.org/osrf/gazebo/pull-request/1311)
+
     1. Make buildings available in "Insert Models" tab, improve save flow.
         * [Pull request #1312](https://bitbucket.org/osrf/gazebo/pull-request/1312)
 
@@ -173,6 +174,9 @@
     1. Implemented copy/pasting of links.
         * [Pull request #1330](https://bitbucket.org/osrf/gazebo/pull-request/1330)
 
+1. GUI publishes model selection information on ~/selection topic.
+    * [Pull request #1318](https://bitbucket.org/osrf/gazebo/pull-request/1318)
+            
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)

@@ -15,18 +15,18 @@
  *
 */
 
-#ifndef _GLWIDGET_TEST_HH_
-#define _GLWIDGET_TEST_HH_
+#ifndef _GLWIDGET_TEST2_HH_
+#define _GLWIDGET_TEST2_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
 /// \brief A test class for the DataLogger widget.
-class GLWidget_TEST : public QTestFixture
+class GLWidget_TEST2 : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test selecting an object.
-  private slots: void SelectObject();
+  /// \brief Test key presses.
+  private slots: void KeyPresses();
 };
 
 #endif
