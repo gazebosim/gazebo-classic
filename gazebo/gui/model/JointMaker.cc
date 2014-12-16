@@ -107,6 +107,9 @@ void JointMaker::EnableEventHandlers()
   MouseEventHandler::Instance()->AddReleaseFilter("model_joint",
       boost::bind(&JointMaker::OnMouseRelease, this, _1));
 
+  MouseEventHandler::Instance()->AddPressFilter("model_joint",
+      boost::bind(&JointMaker::OnMousePress, this, _1));
+
   KeyEventHandler::Instance()->AddPressFilter("model_joint",
       boost::bind(&JointMaker::OnKeyPress, this, _1));
 }
@@ -116,6 +119,7 @@ void JointMaker::DisableEventHandlers()
 {
   MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_joint");
   MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
+  MouseEventHandler::Instance()->RemovePressFilter("model_joint");
   MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
   KeyEventHandler::Instance()->RemovePressFilter("model_joint");
 }
