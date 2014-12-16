@@ -47,10 +47,9 @@ namespace gazebo
       /// \brief Destructor
       public: ~JointInspector();
 
-      /// \brief Get anchor pose.
-      /// \param[in] _index Index of anchor
-      /// \return Anchor pose.
-      public: math::Pose GetAnchor(unsigned int _index) const;
+      /// \brief Get joint pose.
+      /// \return Joint pose.
+      public: math::Pose GetPose() const;
 
       /// \brief Get axis.
       /// \param[in] _index Index of axis
@@ -87,10 +86,9 @@ namespace gazebo
       /// \param[in] _name Name of joint child.
       public: void SetChild(const std::string &_child);
 
-      /// \brief Set anchor pose.
-      /// \param[in] _index Index of anchor.
-      /// \param[in] _anchor Anchor pose.
-      public: void SetAnchor(unsigned int _index, const math::Pose &_anchor);
+      /// \brief Set joint pose.
+      /// \param[in] _pose Joint pose.
+      public: void SetPose(const math::Pose &_pose);
 
       /// \brief Set axis.
       /// \param[in] _index Index of axis.
@@ -138,23 +136,23 @@ namespace gazebo
       /// \brief ComboBox that displays the type of the joint.
       private: QComboBox *jointTypeComboBox;
 
-      /// \brief Spin box for configuring the X position of the anchor.
-      private: QDoubleSpinBox *anchorXSpinBox;
+      /// \brief Spin box for configuring the X position of the joint.
+      private: QDoubleSpinBox *poseXSpinBox;
 
-      /// \brief Spin box for configuring the Y position of the anchor.
-      private: QDoubleSpinBox *anchorYSpinBox;
+      /// \brief Spin box for configuring the Y position of the joint.
+      private: QDoubleSpinBox *poseYSpinBox;
 
-      /// \brief Spin box for configuring the Z position of the anchor.
-      private: QDoubleSpinBox *anchorZSpinBox;
+      /// \brief Spin box for configuring the Z position of joint.
+      private: QDoubleSpinBox *poseZSpinBox;
 
-      /// \brief Spin box for configuring the roll of the anchor.
-      private: QDoubleSpinBox *anchorRollSpinBox;
+      /// \brief Spin box for configuring the roll of the joint.
+      private: QDoubleSpinBox *poseRollSpinBox;
 
-      /// \brief Spin box for configuring the pitch of the anchor.
-      private: QDoubleSpinBox *anchorPitchSpinBox;
+      /// \brief Spin box for configuring the pitch of the joint.
+      private: QDoubleSpinBox *posePitchSpinBox;
 
-      /// \brief Spin box for configuring the yaw of the anchor.
-      private: QDoubleSpinBox *anchorYawSpinBox;
+      /// \brief Spin box for configuring the yaw of the joint.
+      private: QDoubleSpinBox *poseYawSpinBox;
 
       /// \brief Spin box for configuring the X direction of the axis.
       private: std::vector<QDoubleSpinBox *> axisXSpinBoxes;

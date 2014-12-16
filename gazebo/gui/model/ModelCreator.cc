@@ -62,6 +62,7 @@ ModelCreator::ModelCreator()
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
 
+  this->manipMode = "";
   this->partCounter = 0;
   this->customCounter = 0;
   this->modelCounter = 0;
@@ -91,6 +92,10 @@ ModelCreator::ModelCreator()
       gui::Events::ConnectManipMode(
         boost::bind(&ModelCreator::OnManipMode, this, _1)));
 
+  this->connections.push_back(
+     event::Events::ConnectSetSelectedEntity(
+       boost::bind(&ModelCreator::OnSetSelectedEntity, this, _1, _2)));
+
   g_copyAct->setEnabled(false);
   g_pasteAct->setEnabled(false);
 
@@ -109,6 +114,7 @@ ModelCreator::~ModelCreator()
   this->modelTemplateSDF.reset();
   this->requestPub.reset();
   this->makerPub.reset();
+  this->connections.clear();
 
   delete jointMaker;
 }
@@ -550,13 +556,6 @@ void ModelCreator::Stop()
 /////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
 {
-  // check if it's our model
-  if (_entity == this->modelName)
-  {
-    this->Reset();
-    return;
-  }
-
   // if it's a link
   if (this->allParts.find(_entity) != this->allParts.end())
   {
@@ -629,12 +628,21 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
   if (!userCamera)
     return false;
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
-  if (vis && !vis->IsPlane())
+  if (this->jointMaker->GetState() != JointMaker::JOINT_NONE)
   {
-    if (this->allParts.find(vis->GetParent()->GetName()) ==
-          this->allParts.end())
+    userCamera->HandleMouseEvent(_event);
+    return true;
+  }
+
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+  if (vis)
+  {
+    if (!vis->IsPlane() && gui::get_entity_id(vis->GetRootVisual()->GetName()))
     {
+      // Handle snap from GLWidget
+      if (g_snapAct->isChecked())
+        return false;
+
       // Prevent interaction with other models, send event only to
       // user camera
       userCamera->HandleMouseEvent(_event);
@@ -647,7 +655,8 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 {
-  if (this->jointMaker->GetState() != JointMaker::JOINT_NONE)
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
     return false;
 
   if (this->mouseVisual)
@@ -667,10 +676,6 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
 
-  rendering::UserCameraPtr userCamera = gui::get_active_camera();
-  if (!userCamera)
-    return false;
-
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
   if (vis)
   {
@@ -679,6 +684,10 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     if (this->allParts.find(partVis->GetName()) !=
         this->allParts.end())
     {
+      // Handle snap from GLWidget
+      if (g_snapAct->isChecked())
+        return false;
+
       // trigger part inspector on right click
       if (_event.button == common::MouseEvent::RIGHT)
       {
@@ -703,8 +712,8 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       {
         std::vector<rendering::VisualPtr>::iterator it =
             std::find(this->selectedVisuals.begin(),
-            this->selectedVisuals.end(), vis);
-        // Highlight and selected clicked part if not already selected
+            this->selectedVisuals.end(), partVis);
+        // Highlight and select clicked part if not already selected
         if (it == this->selectedVisuals.end())
         {
           partVis->SetHighlighted(true);
@@ -719,6 +728,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       }
       g_copyAct->setEnabled(!this->selectedVisuals.empty());
       g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
+
       return true;
     }
     // Not part
@@ -729,10 +739,8 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       g_alignAct->setEnabled(false);
       g_copyAct->setEnabled(!this->selectedVisuals.empty());
 
-      // Prevent interaction with other models, send event only to
-      // user camera
-      userCamera->HandleMouseEvent(_event);
-      return true;
+      if (!vis->IsPlane())
+        return true;
     }
   }
   return false;
@@ -748,19 +756,6 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 
   if (!this->mouseVisual)
   {
-    rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
-    if (vis && !vis->IsPlane())
-    {
-      if (this->allParts.find(vis->GetParent()->GetName()) ==
-        this->allParts.end())
-      {
-        // Prevent interaction with other models, send event only to
-        // user camera
-        QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
-        userCamera->HandleMouseEvent(_event);
-        return true;
-      }
-    }
     return false;
   }
 
@@ -884,6 +879,7 @@ void ModelCreator::OnPaste()
     rendering::VisualPtr visVisual;
 
     math::Pose clonePose;
+    math::Vector3 cloneScale;
 
     if (copiedPart->visuals.empty())
     {
@@ -898,6 +894,8 @@ void ModelCreator::OnPaste()
       rendering::VisualPtr copiedVisual = copiedPart->visuals.rbegin()->first;
       visVisual = copiedVisual->Clone(visualName.str(), linkVisual);
       clonePose = copiedVisual->GetWorldPose();
+      cloneScale = copiedVisual->GetParent()->GetScale();
+      visVisual->SetScale(math::Vector3::One);
     }
 
     rendering::UserCameraPtr userCamera = gui::get_active_camera();
@@ -910,6 +908,7 @@ void ModelCreator::OnPaste()
       clonePose.pos.y = mousePosition.y;
     }
 
+    linkVisual->SetScale(cloneScale);
     linkVisual->SetWorldPose(clonePose);
     linkVisual->SetTransparency(this->editTransparency);
 
@@ -1011,14 +1010,7 @@ void ModelCreator::GenerateSDF()
 void ModelCreator::OnAlignMode(const std::string &_axis,
     const std::string &_config, const std::string &_target, bool _preview)
 {
-  // Align links, not visuals
-  std::vector<rendering::VisualPtr> selectedLinks;
-  for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
-  {
-    selectedLinks.push_back(this->selectedVisuals[i]);
-  }
-
-  ModelAlign::Instance()->AlignVisuals(selectedLinks, _axis, _config,
+  ModelAlign::Instance()->AlignVisuals(this->selectedVisuals, _axis, _config,
       _target, !_preview);
 }
 
@@ -1041,6 +1033,8 @@ void ModelCreator::OnManipMode(const std::string &_mode)
   if (!this->active)
     return;
 
+  this->manipMode = _mode;
+
   if (!this->selectedVisuals.empty())
   {
     ModelManipulator::Instance()->SetAttachedVisual(
@@ -1060,4 +1054,11 @@ void ModelCreator::OnManipMode(const std::string &_mode)
        it = this->selectedVisuals.erase(it);
     }
   }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnSetSelectedEntity(const std::string &/*_name*/,
+    const std::string &/*_mode*/)
+{
+  this->DeselectAll();
 }
