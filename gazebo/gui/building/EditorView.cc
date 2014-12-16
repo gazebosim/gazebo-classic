@@ -579,8 +579,7 @@ void EditorView::DeleteItem(EditorItem *_item)
 
       if (rectItem)
       {
-        EditorItem *editorItem = dynamic_cast<EditorItem *>(rectItem);
-        this->DeleteItem(editorItem);
+        this->DeleteItem(rectItem);
       }
     }
 
