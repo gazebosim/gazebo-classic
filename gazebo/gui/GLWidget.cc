@@ -288,6 +288,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   // is currently selected.
   if (_event->key() == Qt::Key_Delete)
   {
+    boost::mutex::scoped_lock lock(this->selectedVisMutex);
     while (!this->selectedVisuals.empty())
     {
       std::string name = this->selectedVisuals.back()->GetName();
@@ -938,6 +939,8 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 /////////////////////////////////////////////////
 void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 {
+  boost::mutex::scoped_lock lock(this->selectedVisMutex);
+
   msgs::Selection msg;
 
   // deselect all if not in multi-selection mode.
@@ -996,6 +999,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
 
   if (!this->selectedVisuals.empty())
   {
+    boost::mutex::scoped_lock lock(this->selectedVisMutex);
     ModelManipulator::Instance()->SetAttachedVisual(
         this->selectedVisuals.back());
   }
@@ -1005,6 +1009,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
 
   if (this->state != "select")
   {
+    boost::mutex::scoped_lock lock(this->selectedVisMutex);
     // only support multi-model selection in select mode for now.
     // deselect 0 to n-1 models.
     if (this->selectedVisuals.size() > 1)
@@ -1022,6 +1027,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
 /////////////////////////////////////////////////
 void GLWidget::OnCopy()
 {
+  boost::mutex::scoped_lock lock(this->selectedVisMutex);
   if (!this->selectedVisuals.empty() && !this->modelEditorEnabled)
   {
     this->Copy(this->selectedVisuals.back()->GetName());
@@ -1160,6 +1166,7 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
   {
+    boost::mutex::scoped_lock lock(this->selectedVisMutex);
     if (!this->selectedVisuals.empty())
     {
       for (std::vector<rendering::VisualPtr>::iterator it =
@@ -1197,6 +1204,7 @@ void GLWidget::OnModelEditor(bool _checked)
   g_arrowAct->trigger();
   event::Events::setSelectedEntity("", "normal");
 
+  boost::mutex::scoped_lock lock(this->selectedVisMutex);
   // Manually deselect, in case the editor was opened with Ctrl
   for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
   {
