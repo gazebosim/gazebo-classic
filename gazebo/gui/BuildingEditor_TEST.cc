@@ -65,7 +65,7 @@ void BuildingEditor_TEST::ExitBuildingEditor()
   }
 
   // simulate events to discard model and exit the building editor
-  gazebo::gui::editor::Events::discardBuildingModel();
+  gazebo::gui::editor::Events::newBuildingModel();
   gazebo::gui::editor::Events::finishBuildingModel();
 
   // Process some events, and draw the screen

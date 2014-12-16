@@ -31,18 +31,20 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 {
   this->setObjectName("buildingEditorPalette");
 
-  this->buildingDefaultName = "BuildingDefaultName";
+  this->buildingDefaultName = "Untitled";
   this->currentMode = std::string();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
   // Model name layout
   QHBoxLayout *modelNameLayout = new QHBoxLayout;
-  QLabel *modelLabel = new QLabel(tr("Model: "));
+  QLabel *modelLabel = new QLabel(tr("Model Name: "));
   this->modelNameEdit = new QLineEdit();
   this->modelNameEdit->setText(tr(this->buildingDefaultName.c_str()));
   modelNameLayout->addWidget(modelLabel);
   modelNameLayout->addWidget(this->modelNameEdit);
+  connect(this->modelNameEdit, SIGNAL(textChanged(QString)), this,
+          SLOT(OnNameChanged(QString)));
 
   QSize toolButtonSize(100, 100);
   QSize iconSize(65, 65);
@@ -60,7 +62,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   wallButton->setIcon(QPixmap(":/images/wall.svg"));
   wallButton->setText("Wall");
   wallButton->setIconSize(QSize(iconSize));
-  wallButton->setToolTip("Hold Shift to snap while drawing");
+  wallButton->setToolTip("Hold Shift to override snapping");
   connect(wallButton, SIGNAL(clicked()), this, SLOT(OnDrawWall()));
 
   // Features label
@@ -115,18 +117,10 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
       "Import an existing floor plan to use as a guide"));
   connect(importImageButton, SIGNAL(clicked()), this, SLOT(OnImportImage()));
 
-  // Discard button
-  QPushButton *discardButton = new QPushButton(tr("Discard"));
-  connect(discardButton, SIGNAL(clicked()), this, SLOT(OnDiscard()));
-
-  // Save (As) button
-  this->saveButton = new QPushButton(tr("Save As"));
-  connect(this->saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
-
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
-  buttonsLayout->addWidget(discardButton);
   buttonsLayout->addWidget(importImageButton);
-  buttonsLayout->addWidget(this->saveButton);
+  buttonsLayout->setAlignment(Qt::AlignHCenter);
+  buttonsLayout->setContentsMargins(30, 11, 30, 11);
 
   // Main layout
   mainLayout->addLayout(modelNameLayout);
@@ -149,12 +143,12 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
       boost::bind(&BuildingEditorPalette::OnSaveModel, this, _1, _2)));
 
   this->connections.push_back(
-      gui::editor::Events::ConnectDiscardBuildingModel(
-      boost::bind(&BuildingEditorPalette::OnDiscardModel, this)));
+      gui::editor::Events::ConnectNewBuildingModel(
+      boost::bind(&BuildingEditorPalette::OnNewModel, this)));
 
   this->connections.push_back(
       gui::editor::Events::ConnectCreateBuildingEditorItem(
-    boost::bind(&BuildingEditorPalette::OnCreateEditorItem, this, _1)));
+      boost::bind(&BuildingEditorPalette::OnCreateEditorItem, this, _1)));
 
   // Brushes (button group)
   brushes = new QButtonGroup();
@@ -222,22 +216,8 @@ void BuildingEditorPalette::OnAddStair()
 }
 
 /////////////////////////////////////////////////
-void BuildingEditorPalette::OnDiscard()
+void BuildingEditorPalette::OnNewModel()
 {
-  gui::editor::Events::discardBuildingEditor();
-}
-
-/////////////////////////////////////////////////
-void BuildingEditorPalette::OnSave()
-{
-  gui::editor::Events::saveBuildingEditor(
-      this->modelNameEdit->text().toStdString());
-}
-
-/////////////////////////////////////////////////
-void BuildingEditorPalette::OnDiscardModel()
-{
-  this->saveButton->setText("&Save As");
   this->modelNameEdit->setText(tr(this->buildingDefaultName.c_str()));
 }
 
@@ -245,8 +225,13 @@ void BuildingEditorPalette::OnDiscardModel()
 void BuildingEditorPalette::OnSaveModel(const std::string &_saveName,
     const std::string &/*_saveLocation*/)
 {
-  this->saveButton->setText("Save");
   this->modelNameEdit->setText(tr(_saveName.c_str()));
+}
+
+/////////////////////////////////////////////////
+void BuildingEditorPalette::OnNameChanged(const QString &_name)
+{
+  gui::editor::Events::buildingNameChanged(_name.toStdString());
 }
 
 /////////////////////////////////////////////////
