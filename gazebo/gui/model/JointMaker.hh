@@ -269,7 +269,7 @@ namespace gazebo
       /// \brief Visual line used to represent joint connecting parent and child
       public: rendering::DynamicLines *line;
 
-      /// \brief Visual handle used to represent joint parent / child
+      /// \brief Visual handle used to represent joint parent
       public: Ogre::BillboardSet *handles;
 
       /// \brief Type of joint.
@@ -284,8 +284,8 @@ namespace gazebo
       /// \brief Joint upper limit.
       public: double upperLimit[2];
 
-      /// \brief Joint anchor.
-      public: math::Pose anchor;
+      /// \brief Joint pose.
+      public: math::Pose pose;
 
       /// \brief True if the joint visual needs update.
       public: bool dirty;

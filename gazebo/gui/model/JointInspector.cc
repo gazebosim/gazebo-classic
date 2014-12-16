@@ -75,65 +75,65 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
   childLayout->addWidget(childLabel);
   childLayout->addWidget(jointChildLabel);
 
-  QLabel *anchorXLabel = new QLabel(tr("x: "));
-  QLabel *anchorYLabel = new QLabel(tr("y: "));
-  QLabel *anchorZLabel = new QLabel(tr("z: "));
-  QLabel *anchorRollLabel = new QLabel(tr("roll: "));
-  QLabel *anchorPitchLabel = new QLabel(tr("pitch: "));
-  QLabel *anchorYawLabel = new QLabel(tr("yaw: "));
+  QLabel *poseXLabel = new QLabel(tr("x: "));
+  QLabel *poseYLabel = new QLabel(tr("y: "));
+  QLabel *poseZLabel = new QLabel(tr("z: "));
+  QLabel *poseRollLabel = new QLabel(tr("roll: "));
+  QLabel *posePitchLabel = new QLabel(tr("pitch: "));
+  QLabel *poseYawLabel = new QLabel(tr("yaw: "));
 
-  this->anchorXSpinBox = new QDoubleSpinBox;
-  this->anchorXSpinBox->setRange(-1000, 1000);
-  this->anchorXSpinBox->setSingleStep(0.01);
-  this->anchorXSpinBox->setDecimals(3);
-  this->anchorXSpinBox->setValue(0.000);
+  this->poseXSpinBox = new QDoubleSpinBox;
+  this->poseXSpinBox->setRange(-1000, 1000);
+  this->poseXSpinBox->setSingleStep(0.01);
+  this->poseXSpinBox->setDecimals(3);
+  this->poseXSpinBox->setValue(0.000);
 
-  this->anchorYSpinBox = new QDoubleSpinBox;
-  this->anchorYSpinBox->setRange(-1000, 1000);
-  this->anchorYSpinBox->setSingleStep(0.01);
-  this->anchorYSpinBox->setDecimals(3);
-  this->anchorYSpinBox->setValue(0.000);
+  this->poseYSpinBox = new QDoubleSpinBox;
+  this->poseYSpinBox->setRange(-1000, 1000);
+  this->poseYSpinBox->setSingleStep(0.01);
+  this->poseYSpinBox->setDecimals(3);
+  this->poseYSpinBox->setValue(0.000);
 
-  this->anchorZSpinBox = new QDoubleSpinBox;
-  this->anchorZSpinBox->setRange(-1000, 1000);
-  this->anchorZSpinBox->setSingleStep(0.01);
-  this->anchorZSpinBox->setDecimals(3);
-  this->anchorZSpinBox->setValue(0.000);
+  this->poseZSpinBox = new QDoubleSpinBox;
+  this->poseZSpinBox->setRange(-1000, 1000);
+  this->poseZSpinBox->setSingleStep(0.01);
+  this->poseZSpinBox->setDecimals(3);
+  this->poseZSpinBox->setValue(0.000);
 
-  this->anchorRollSpinBox = new QDoubleSpinBox;
-  this->anchorRollSpinBox->setRange(-1000, 1000);
-  this->anchorRollSpinBox->setSingleStep(0.01);
-  this->anchorRollSpinBox->setDecimals(3);
-  this->anchorRollSpinBox->setValue(0.000);
+  this->poseRollSpinBox = new QDoubleSpinBox;
+  this->poseRollSpinBox->setRange(-1000, 1000);
+  this->poseRollSpinBox->setSingleStep(0.01);
+  this->poseRollSpinBox->setDecimals(3);
+  this->poseRollSpinBox->setValue(0.000);
 
-  this->anchorPitchSpinBox = new QDoubleSpinBox;
-  this->anchorPitchSpinBox->setRange(-1000, 1000);
-  this->anchorPitchSpinBox->setSingleStep(0.01);
-  this->anchorPitchSpinBox->setDecimals(3);
-  this->anchorPitchSpinBox->setValue(0.000);
+  this->posePitchSpinBox = new QDoubleSpinBox;
+  this->posePitchSpinBox->setRange(-1000, 1000);
+  this->posePitchSpinBox->setSingleStep(0.01);
+  this->posePitchSpinBox->setDecimals(3);
+  this->posePitchSpinBox->setValue(0.000);
 
-  this->anchorYawSpinBox = new QDoubleSpinBox;
-  this->anchorYawSpinBox->setRange(-1000, 1000);
-  this->anchorYawSpinBox->setSingleStep(0.01);
-  this->anchorYawSpinBox->setDecimals(3);
-  this->anchorYawSpinBox->setValue(0.000);
+  this->poseYawSpinBox = new QDoubleSpinBox;
+  this->poseYawSpinBox->setRange(-1000, 1000);
+  this->poseYawSpinBox->setSingleStep(0.01);
+  this->poseYawSpinBox->setDecimals(3);
+  this->poseYawSpinBox->setValue(0.000);
 
-  QGridLayout *anchorLayout = new QGridLayout;
-  anchorLayout->addWidget(anchorXLabel, 0, 0);
-  anchorLayout->addWidget(anchorXSpinBox, 0, 1);
-  anchorLayout->addWidget(anchorYLabel, 1, 0);
-  anchorLayout->addWidget(anchorYSpinBox, 1, 1);
-  anchorLayout->addWidget(anchorZLabel, 2, 0);
-  anchorLayout->addWidget(anchorZSpinBox, 2, 1);
-  anchorLayout->addWidget(anchorRollLabel, 0, 2);
-  anchorLayout->addWidget(anchorRollSpinBox, 0, 3);
-  anchorLayout->addWidget(anchorPitchLabel, 1, 2);
-  anchorLayout->addWidget(anchorPitchSpinBox, 1, 3);
-  anchorLayout->addWidget(anchorYawLabel, 2, 2);
-  anchorLayout->addWidget(anchorYawSpinBox, 2, 3);
+  QGridLayout *poseLayout = new QGridLayout;
+  poseLayout->addWidget(poseXLabel, 0, 0);
+  poseLayout->addWidget(poseXSpinBox, 0, 1);
+  poseLayout->addWidget(poseYLabel, 1, 0);
+  poseLayout->addWidget(poseYSpinBox, 1, 1);
+  poseLayout->addWidget(poseZLabel, 2, 0);
+  poseLayout->addWidget(poseZSpinBox, 2, 1);
+  poseLayout->addWidget(poseRollLabel, 0, 2);
+  poseLayout->addWidget(poseRollSpinBox, 0, 3);
+  poseLayout->addWidget(posePitchLabel, 1, 2);
+  poseLayout->addWidget(posePitchSpinBox, 1, 3);
+  poseLayout->addWidget(poseYawLabel, 2, 2);
+  poseLayout->addWidget(poseYawSpinBox, 2, 3);
 
-  QGroupBox *anchorGroupBox = new QGroupBox(tr("Anchor"));
-  anchorGroupBox->setLayout(anchorLayout);
+  QGroupBox *poseGroupBox = new QGroupBox(tr("Pose"));
+  poseGroupBox->setLayout(poseLayout);
 
   int axisCount = 2;
   for (int i = 0; i < axisCount; ++i)
@@ -224,7 +224,7 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
   mainLayout->addLayout(typeLayout);
   mainLayout->addLayout(parentLayout);
   mainLayout->addLayout(childLayout);
-  mainLayout->addWidget(anchorGroupBox);
+  mainLayout->addWidget(poseGroupBox);
   for (unsigned int i = 0; i < axisGroupBoxes.size(); ++i)
   {
     mainLayout->addWidget(this->axisGroupBoxes[i]);
@@ -244,12 +244,12 @@ JointInspector::~JointInspector()
 }
 
 /////////////////////////////////////////////////
-math::Pose JointInspector::GetAnchor(unsigned int /*_index*/) const
+math::Pose JointInspector::GetPose() const
 {
-  return math::Pose(this->anchorXSpinBox->value(),
-      this->anchorYSpinBox->value(), this->anchorZSpinBox->value(),
-      this->anchorRollSpinBox->value(), this->anchorPitchSpinBox->value(),
-      this->anchorYawSpinBox->value());
+  return math::Pose(this->poseXSpinBox->value(),
+      this->poseYSpinBox->value(), this->poseZSpinBox->value(),
+      this->poseRollSpinBox->value(), this->posePitchSpinBox->value(),
+      this->poseYawSpinBox->value());
 }
 
 /////////////////////////////////////////////////
@@ -350,17 +350,16 @@ void JointInspector::SetChild(const std::string &_child)
 }
 
 /////////////////////////////////////////////////
-void JointInspector::SetAnchor(unsigned int /*_index*/,
-    const math::Pose &_anchor)
+void JointInspector::SetPose(const math::Pose &_pose)
 {
-  this->anchorXSpinBox->setValue(_anchor.pos.x);
-  this->anchorYSpinBox->setValue(_anchor.pos.y);
-  this->anchorZSpinBox->setValue(_anchor.pos.z);
+  this->poseXSpinBox->setValue(_pose.pos.x);
+  this->poseYSpinBox->setValue(_pose.pos.y);
+  this->poseZSpinBox->setValue(_pose.pos.z);
 
-  math::Vector3 rot = _anchor.rot.GetAsEuler();
-  this->anchorRollSpinBox->setValue(rot.x);
-  this->anchorPitchSpinBox->setValue(rot.y);
-  this->anchorYawSpinBox->setValue(rot.z);
+  math::Vector3 rot = _pose.rot.GetAsEuler();
+  this->poseRollSpinBox->setValue(rot.x);
+  this->posePitchSpinBox->setValue(rot.y);
+  this->poseYawSpinBox->setValue(rot.z);
 }
 
 /////////////////////////////////////////////////
@@ -406,6 +405,16 @@ void JointInspector::OnJointTypeChanged(int _index)
 {
   QVariant jointTypeData = this->jointTypeComboBox->itemData(_index);
   this->jointType = static_cast<JointMaker::JointType>(jointTypeData.toInt());
+
+  int axisCount = JointMaker::GetJointAxisCount(this->jointType);
+  for (int i = 0; i < axisCount; ++i)
+    this->axisGroupBoxes[i]->setVisible(true);
+
+  for (int i = axisCount;
+      i < static_cast<int>(this->axisGroupBoxes.size()); ++i)
+  {
+    this->axisGroupBoxes[i]->setVisible(false);
+  }
 }
 
 /////////////////////////////////////////////////

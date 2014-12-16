@@ -50,6 +50,20 @@ namespace gazebo
     /// \brief Create and manage 3D visuals of a building.
     class GAZEBO_VISIBLE BuildingMaker : public EntityMaker
     {
+      /// \enum SaveState
+      /// \brief Save states for the building editor.
+      private: enum SaveState
+      {
+        // NEVER_SAVED: The building has never been saved.
+        NEVER_SAVED,
+
+        // ALL_SAVED: All changes have been saved.
+        ALL_SAVED,
+
+        // UNSAVED_CHANGES: Has been saved before, but has unsaved changes.
+        UNSAVED_CHANGES
+      };
+
       /// \brief Constructor
       public: BuildingMaker();
 
@@ -193,6 +207,10 @@ namespace gazebo
       /// \param[in] _savePath Path to save the SDF to.
       public: void SaveToSDF(const std::string &_savePath);
 
+      /// \brief Save config file.
+      /// \param[in] _savePath Path to save the file to.
+      public: void SaveToConfig(const std::string &_savePath);
+
       /// \brief Reset the building maker and the SDF.
       public: void Reset();
 
@@ -205,8 +223,14 @@ namespace gazebo
       /// \brief Generate the SDF from building part visuals.
       public: void GenerateSDF();
 
+      /// \brief Generate the config file.
+      public: void GenerateConfig();
+
       // Documentation inherited
       public: virtual bool IsActive() const;
+
+      /// \brief Set save state upon a change to the building.
+      public: void BuildingChanged();
 
       // Documentation inherited
       private: virtual void CreateTheEntity();
@@ -223,6 +247,9 @@ namespace gazebo
 
       /// \brief Get a template SDF string of a simple model.
       private: std::string GetTemplateSDFString();
+
+      /// \brief Get a template config file for a simple model.
+      private: std::string GetTemplateConfigString();
 
       /// \brief Internal helper function for QPointF comparison used by the
       /// surface subsivision algorithm.
@@ -245,17 +272,25 @@ namespace gazebo
       private: void SubdivideRectSurface(const QRectF &_surface,
         const std::vector<QRectF> &_holes, std::vector<QRectF> &_subdivisions);
 
+      /// \brief Helper function to manage writing files to disk.
+      private: void SaveModelFiles();
+
       /// \brief Callback for saving the model.
       /// \param[in] _saveName Name to save the model.
-      private: void OnSave(const std::string &_saveName = "");
+      /// \return True if the user chose to save, false if the user cancelled.
+      private: bool OnSave(const std::string &_saveName = "");
 
-      /// \brief Callback for discarding the model.
-      private: void OnDiscard();
-
-      /// \brief Callback when the model is to be finished and uploaded on to
-      /// the server.
+      /// \brief Callback for selecting a folder and saving the model.
       /// \param[in] _saveName Name to save the model.
-      private: void OnDone(const std::string &_saveName = "");
+      /// \return True if the user chose to save, false if the user cancelled.
+      private: bool OnSaveAs(const std::string &_saveName);
+
+      /// \brief Callback for when the name is changed through the Palette.
+      /// \param[in] _modelName The newly entered building name.
+      private: void OnNameChanged(const std::string &_modelName);
+
+      /// \brief Callback for newing the model.
+      private: void OnNew();
 
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
@@ -277,6 +312,9 @@ namespace gazebo
 
       /// \brief A template SDF of a simple box model.
       private: sdf::SDFPtr modelTemplateSDF;
+
+      /// \brief The building model's config file.
+      private: TiXmlDocument modelConfig;
 
       /// \brief Name of the building model.
       private: std::string modelName;
@@ -302,11 +340,26 @@ namespace gazebo
       /// \brief Counter for the number of floors in the model.
       private: int floorCounter;
 
-      /// \brief Indicate whether the model has been saved before or not.
-      private: bool saved;
+      /// \brief Store the current save state of the model.
+      private: enum SaveState currentSaveState;
+
+      /// \brief Default directory to save models: ~/building_editor_models
+      private: std::string defaultPath;
 
       /// \brief Path to where the model is saved.
       private: std::string saveLocation;
+
+      /// \brief Name of the building model's author.
+      private: std::string authorName;
+
+      /// \brief Name of the building model's author's email.
+      private: std::string authorEmail;
+
+      /// \brief Model description.
+      private: std::string description;
+
+      /// \brief Model version.
+      private: std::string version;
 
       /// \brief A list of gui editor events connected to the building maker.
       private: std::vector<event::ConnectionPtr> connections;
@@ -316,10 +369,6 @@ namespace gazebo
 
       /// \brief A dialog for setting building model name and save location.
       private: FinishBuildingDialog *saveDialog;
-
-      /// \brief A dialog that prompts to confirm model completion and uploading
-      /// to the server
-      private: FinishBuildingDialog *finishDialog;
 
       /// \brief The current level that is being edited.
       private: int currentLevel;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,6 +114,9 @@ void JointMaker::EnableEventHandlers()
   MouseEventHandler::Instance()->AddReleaseFilter("model_joint",
       boost::bind(&JointMaker::OnMouseRelease, this, _1));
 
+  MouseEventHandler::Instance()->AddPressFilter("model_joint",
+      boost::bind(&JointMaker::OnMousePress, this, _1));
+
   KeyEventHandler::Instance()->AddPressFilter("model_joint",
       boost::bind(&JointMaker::OnKeyPress, this, _1));
 }
@@ -123,6 +126,7 @@ void JointMaker::DisableEventHandlers()
 {
   MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_joint");
   MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
+  MouseEventHandler::Instance()->RemovePressFilter("model_joint");
   MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
   KeyEventHandler::Instance()->RemovePressFilter("model_joint");
 }
@@ -174,11 +178,18 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
 /////////////////////////////////////////////////
 bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 {
+  rendering::UserCameraPtr camera = gui::get_active_camera();
+  if (_event.button == common::MouseEvent::MIDDLE)
+  {
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    camera->HandleMouseEvent(_event);
+    return true;
+  }
+  else if (_event.button != common::MouseEvent::LEFT)
   if (this->jointType != JointMaker::JOINT_NONE)
     return false;
 
   // intercept mouse press events when user clicks on the joint hotspot visual
-  rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
   if (vis)
@@ -196,9 +207,9 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
+  rendering::UserCameraPtr camera = gui::get_active_camera();
   if (this->jointType == JointMaker::JOINT_NONE)
   {
-    rendering::UserCameraPtr camera = gui::get_active_camera();
     rendering::VisualPtr vis = camera->GetVisual(_event.pos);
     if (vis)
     {
@@ -217,59 +228,62 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
         }
         else if (_event.button == common::MouseEvent::LEFT)
         {
-          // turn off model selection so we don't end up with
-          // both joint and model selected at the same time
-          event::Events::setSelectedEntity("", "normal");
-
           this->selectedJoint = vis;
           this->selectedJoint->SetHighlighted(true);
         }
-        // stop event propagation as we don't want users to manipulate the
-        // hotspot
-        return true;
       }
       return false;
     }
   }
   else
   {
-    if (this->hoverVis)
+    if (_event.button == common::MouseEvent::LEFT)
     {
-      if (this->hoverVis->IsPlane())
-        return false;
-
-      // Pressed parent part
-      if (!this->selectedVis)
+      if (this->hoverVis)
       {
-        if (this->mouseJoint)
-          return false;
+        if (this->hoverVis->IsPlane())
+        {
+          QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+          camera->HandleMouseEvent(_event);
+          return true;
+        }
 
-        this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-        this->selectedVis = this->hoverVis;
-        this->hoverVis.reset();
-        // Create joint data with selected visual as parent
-        // the child will be set on the second mouse release.
-        this->mouseJoint = this->CreateJoint(this->selectedVis,
-            rendering::VisualPtr());
-      }
-      // Pressed child part
-      else if (this->selectedVis != this->hoverVis)
-      {
-        if (this->hoverVis)
+        // Pressed parent part
+        if (!this->selectedVis)
+        {
+          if (this->mouseJoint)
+            return false;
+
           this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-        if (this->selectedVis)
-          this->selectedVis->SetEmissive(common::Color(0, 0, 0));
-        this->mouseJoint->child = this->hoverVis;
+          this->selectedVis = this->hoverVis;
+          this->hoverVis.reset();
+          // Create joint data with selected visual as parent
+          // the child will be set on the second mouse release.
+          this->mouseJoint = this->CreateJoint(this->selectedVis,
+              rendering::VisualPtr());
+        }
+        // Pressed child part
+        else if (this->selectedVis != this->hoverVis)
+        {
+          if (this->hoverVis)
+            this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+          if (this->selectedVis)
+            this->selectedVis->SetEmissive(common::Color(0, 0, 0));
+          this->mouseJoint->child = this->hoverVis;
 
-        // reset variables.
-        this->selectedVis.reset();
-        this->hoverVis.reset();
+          // reset variables.
+          this->selectedVis.reset();
+          this->hoverVis.reset();
+          this->AddJoint(JointMaker::JOINT_NONE);
 
         this->AddJoint(JointMaker::JOINT_NONE);
-        this->newJointCreated = true;
+          this->newJointCreated = true;
+        }
       }
     }
 
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    camera->HandleMouseEvent(_event);
     return true;
   }
   return false;
@@ -317,7 +331,7 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
     jointData->lowerLimit[i] = -3.14;
     jointData->upperLimit[i] = 3.14;
   }
-  jointData->anchor = math::Pose::Zero;
+  jointData->pose = math::Pose::Zero;
   jointData->line->setMaterial(this->jointMaterials[jointData->type]);
 
   return jointData;
@@ -376,19 +390,6 @@ void JointMaker::AddJoint(JointMaker::JointType _type)
     MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
     //MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
 
-    // Press event added only after a joint is created. Needs to be added here
-    // instead of in the constructor otherwise GLWidget would get the event
-    // first and JoinMaker would not receive it.
-    if (!this->joints.empty())
-    {
-      MouseEventHandler::Instance()->AddPressFilter("model_joint",
-          boost::bind(&JointMaker::OnMousePress, this, _1));
-      MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
-        boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
-
-    // signal the end of a joint action.
-    emit JointAdded();
-    }
     // signal the end of a joint action.
     emit JointAdded();
   }
@@ -423,12 +424,16 @@ void JointMaker::Stop()
 /////////////////////////////////////////////////
 bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
 {
-  if (_event.dragging)
-    return false;
-
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
-  rendering::ScenePtr scene = camera->GetScene();
+
+  if (_event.dragging)
+  {
+    // this enables the joint maker to pan while connecting joints
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    camera->HandleMouseEvent(_event);
+    return true;
+  }
 
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
 
@@ -463,10 +468,12 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     if (!this->hoverVis->IsPlane())
     {
       if (this->mouseJoint->parent)
+      {
         parentPos =  this->GetPartWorldCentroid(this->mouseJoint->parent)
             - this->mouseJoint->line->GetPoint(0);
-      this->mouseJoint->line->SetPoint(1,
-          this->GetPartWorldCentroid(this->hoverVis) - parentPos);
+        this->mouseJoint->line->SetPoint(1,
+            this->GetPartWorldCentroid(this->hoverVis) - parentPos);
+      }
     }
     else
     {
@@ -475,10 +482,12 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
       camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
           math::Plane(math::Vector3(0, 0, 1)), pt);
       if (this->mouseJoint->parent)
+      {
         parentPos = this->GetPartWorldCentroid(this->mouseJoint->parent)
             - this->mouseJoint->line->GetPoint(0);
-      this->mouseJoint->line->SetPoint(1,
-          this->GetPartWorldCentroid(this->hoverVis) - parentPos + pt);
+        this->mouseJoint->line->SetPoint(1,
+            this->GetPartWorldCentroid(this->hoverVis) - parentPos + pt);
+      }
     }
   }
   return true;
@@ -499,7 +508,7 @@ void JointMaker::OpenInspector(const std::string &_name)
   joint->inspector->SetName(joint->name);
   joint->inspector->SetParent(joint->parent->GetName());
   joint->inspector->SetChild(joint->child->GetName());
-  joint->inspector->SetAnchor(0, joint->anchor);
+  joint->inspector->SetPose(joint->pose);
   int axisCount = JointMaker::GetJointAxisCount(joint->type);
   for (int i = 0; i < axisCount; ++i)
   {
@@ -568,7 +577,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   hotspotVisual->SetMaterial(this->jointMaterials[_joint->type]);
   hotspotVisual->SetTransparency(0.5);
 
-  // create two handles at the ends of the line
+  // create a handle at the parent end
   Ogre::BillboardSet *handleSet =
       camera->GetScene()->GetManager()->createBillboardSet(1);
   handleSet->setAutoUpdate(true);
@@ -695,7 +704,7 @@ void JointMaker::GenerateSDF()
     sdf::ElementPtr childElem = jointElem->GetElement("child");
     childElem->Set(joint->child->GetName());
     sdf::ElementPtr poseElem = jointElem->GetElement("pose");
-    poseElem->Set(joint->anchor);
+    poseElem->Set(joint->pose);
     int axisCount = GetJointAxisCount(joint->type);
     for (int i = 0; i < axisCount; ++i)
     {
@@ -821,7 +830,7 @@ unsigned int JointMaker::GetJointCount()
 /////////////////////////////////////////////////
 void JointData::OnApply()
 {
-  this->anchor = this->inspector->GetAnchor(0);
+  this->pose = this->inspector->GetPose();
   this->type = this->inspector->GetType();
   this->name = this->inspector->GetName();
 
