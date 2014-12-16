@@ -105,6 +105,13 @@ InsertModelWidget::~InsertModelWidget()
 }
 
 /////////////////////////////////////////////////
+bool InsertModelWidget::LocalPathInFileWidget(const std::string &_path)
+{
+  return this->dataPtr->localFilenameCache.find(_path) !=
+          this->dataPtr->localFilenameCache.end();
+}
+
+/////////////////////////////////////////////////
 void InsertModelWidget::Update()
 {
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
@@ -183,7 +190,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
     return;
 
   boost::filesystem::path dir(_path);
-  bool _pathExists = this->IsPathAccesible(dir);
+  bool pathExists = this->IsPathAccessible(dir);
 
   QString qpath = QString::fromStdString(_path);
   QTreeWidgetItem *topItem = NULL;
@@ -197,10 +204,14 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
     topItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0), QStringList(qpath));
     this->dataPtr->fileTreeWidget->addTopLevelItem(topItem);
+    this->dataPtr->localFilenameCache.insert(_path);
 
     // Add the new path to the directory watcher
-    if (_pathExists)
+    if (pathExists)
+    {
+      gzdbg << "Adding path to FileSystemWatcher: " << qpath.toStdString() << std::endl;
       this->dataPtr->watcher->addPath(qpath);
+    }
   }
   else
     topItem = matchList.first();
@@ -208,7 +219,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   // Remove current items.
   topItem->takeChildren();
 
-  if (_pathExists && boost::filesystem::is_directory(dir))
+  if (pathExists && boost::filesystem::is_directory(dir))
   {
     std::vector<boost::filesystem::path> paths;
 
@@ -218,14 +229,15 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
       std::copy(boost::filesystem::directory_iterator(dir),
           boost::filesystem::directory_iterator(),
           std::back_inserter(paths));
-      std::sort(paths.begin(), paths.end());
     }
     catch(boost::filesystem::filesystem_error & e)
     {
-      gzerr << "Not loading models in: " << _path
+      gzerr << "Not loading models in: " << _path << std::endl
             << "Filesystem permission denied" << std::endl;
       return;
     }
+
+    std::sort(paths.begin(), paths.end());
 
     // Iterate over all the models in the current gazebo path
     for (std::vector<boost::filesystem::path>::iterator dIter = paths.begin();
@@ -250,7 +262,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
       manifest /= GZ_MODEL_MANIFEST_FILENAME;
 
       // Check if the manifest does not exists
-      if (!this->IsPathAccesible(manifest))
+      if (!this->IsPathAccessible(manifest))
       {
         gzerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME << " for model "
           << (*dIter) << "\n";
@@ -258,7 +270,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
         manifest = manifest / "manifest.xml";
       }
 
-       if (!this->IsPathAccesible(manifest) || manifest == fullPath)
+       if (!this->IsPathAccessible(manifest) || manifest == fullPath)
       {
         gzlog << "model.config file is missing in directory["
               << fullPath << "]\n";
@@ -282,6 +294,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
             QVariant((std::string("file://") + fullPath.string()).c_str()));
 
         this->dataPtr->fileTreeWidget->addTopLevelItem(childItem);
+        this->dataPtr->localFilenameCache.insert(fullPath.string());
       }
     }
   }
@@ -320,7 +333,7 @@ void InsertModelWidget::OnModelUpdateRequest(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-bool InsertModelWidget::IsPathAccesible(const boost::filesystem::path &_path)
+bool InsertModelWidget::IsPathAccessible(const boost::filesystem::path &_path)
 {
   try
   {

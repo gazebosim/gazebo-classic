@@ -48,6 +48,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~InsertModelWidget();
 
+      /// \brief Check if input path is in the fileTreeWidget.
+      public: bool LocalPathInFileWidget(const std::string &_path);
+
       /// \brief Callback triggered when the ModelDatabase has returned
       /// the list of models.
       /// \param[in] _models The map of all models in the database.
@@ -70,6 +73,12 @@ namespace gazebo
       /// \param[in] _path The path that was changed.
       private slots: void OnDirectoryChanged(const QString &_path);
 
+      /// \brief check if path exists with special care to filesystem
+      /// permissions
+      /// \param[in] _path The path to check.
+      private: static bool IsPathAccessible
+        (const boost::filesystem::path &_path);
+
       /// \brief Update the list of models on the local system.
       private: void UpdateAllLocalPaths();
 
@@ -79,12 +88,6 @@ namespace gazebo
 
       /// \brief Vector to store event connections.
       private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief check if path exists with special care to filesystem
-      /// permissions
-      /// \param[in] _path The path to check.
-      private: static bool IsPathAccesible
-        (const boost::filesystem::path &_path);
 
       /// \brief Private data pointer.
       private: InsertModelWidgetPrivate *dataPtr;
