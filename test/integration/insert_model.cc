@@ -133,8 +133,8 @@ void InsertModelTest::ReadPermissions()
   }
 
   mainWindow.close();
-  // Delete all test files
 
+  // Delete all test files
   boost::filesystem::remove_all(testDir);
 }
 
