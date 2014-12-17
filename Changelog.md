@@ -38,6 +38,10 @@
   * [Pull request #1221](https://bitbucket.org/osrf/gazebo/pull-request/1221)
   * [Issue #381](https://bitbucket.org/osrf/gazebo/issue/381)
 
+1. Implement Coulomb joint friction for BulletHingeJoint
+  * [Pull request #1221](https://bitbucket.org/osrf/gazebo/pull-request/1317)
+  * [Issue #1348](https://bitbucket.org/osrf/gazebo/issue/1348)
+
 1. Implemented camera lens distortion.
   * [Pull request #1213](https://bitbucket.org/osrf/gazebo/pull-request/1213)
 
@@ -74,6 +78,9 @@
 
 1. Added "button modifier" fields (control, shift, and alt) to common::KeyEvent.
     * [Pull request #1325](https://bitbucket.org/osrf/gazebo/pull-request/1325)
+
+1. Added inputs for environment variable GAZEBO_GUI_INI_FILE for reading a custom .ini file.
+    * [Pull request #1252](https://bitbucket.org/osrf/gazebo/pull-request/1252)
 
 1. Building editor updates
     1. Fixed inspector resizing.
@@ -130,6 +137,9 @@
     1. Snap walls to length increments, moved scale to SegmentItem and added Get/SetScale, added SegmentItem::SnapAngle and SegmentItem::SnapLength.
         * [Pull request #1311](https://bitbucket.org/osrf/gazebo/pull-request/1311)
 
+    1. Make buildings available in "Insert Models" tab, improve save flow.
+        * [Pull request #1312](https://bitbucket.org/osrf/gazebo/pull-request/1312)
+
     1. Added EditorItem::SetHighlighted.
         * [Pull request #1308](https://bitbucket.org/osrf/gazebo/pull-request/1308)
 
@@ -138,10 +148,6 @@
 
     1. Detach all child manips when item is deleted, added BuildingMaker::DetachAllChildren.
         * [Pull request #1316](https://bitbucket.org/osrf/gazebo/pull-request/1316)
-
-    1. Enabled multi-selection and align tool inside model editor.
-        * [Pull request #1302](https://bitbucket.org/osrf/gazebo/pull-request/1302)
-        * [Issue #1323](https://bitbucket.org/osrf/gazebo/issue/1323)
 
     1. Added texture picker to inspector dialogs.
         * [Pull request #1306](https://bitbucket.org/osrf/gazebo/pull-request/1306)
@@ -156,13 +162,27 @@
     1. Added Gazebo/Bricks material to be used as texture on the building editor.
         * [Pull request #1333](https://bitbucket.org/osrf/gazebo/pull-request/1333)
 
+    1. Pick colors from the palette and assign on 3D view. Added mouse and key event handlers to BuildingMaker, and events to communicate from BuildingModelManip to EditorItem.
+        * [Pull request #1336](https://bitbucket.org/osrf/gazebo/pull-request/1336)
+
 1. Model editor updates
     1. Fix adding/removing event filters .
         * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
 
+    1. Enabled multi-selection and align tool inside model editor.
+        * [Pull request #1302](https://bitbucket.org/osrf/gazebo/pull-request/1302)
+        * [Issue #1323](https://bitbucket.org/osrf/gazebo/issue/1323)
+
+    1. Enabled snap mode inside model editor.
+        * [Pull request #1331](https://bitbucket.org/osrf/gazebo/pull-request/1331)
+        * [Issue #1318](https://bitbucket.org/osrf/gazebo/issue/1318)
+
     1. Implemented copy/pasting of links.
         * [Pull request #1330](https://bitbucket.org/osrf/gazebo/pull-request/1330)
 
+1. GUI publishes model selection information on ~/selection topic.
+    * [Pull request #1318](https://bitbucket.org/osrf/gazebo/pull-request/1318)
+            
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
