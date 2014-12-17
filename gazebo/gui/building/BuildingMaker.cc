@@ -165,12 +165,17 @@ BuildingMaker::BuildingMaker() : EntityMaker()
   this->connections.push_back(
       gui::editor::Events::ConnectColorSelected(
       boost::bind(&BuildingMaker::OnColorSelected, this, _1)));
+   this->connections.push_back(
+      gui::editor::Events::ConnectTextureSelected(
+      boost::bind(&BuildingMaker::OnTextureSelected, this, _1)));
   this->connections.push_back(
       gui::editor::Events::ConnectToggleEditMode(
       boost::bind(&BuildingMaker::OnEdit, this, _1)));
 
   this->saveDialog =
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
+
+  this->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -209,6 +214,8 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
     const EditorItem *_item)
 {
   BuildingModelManip *manip = this->allItems[_partName];
+
+  // Make sure each connection calls BuildingMaker::BuildingChanged
 
   // item changes -> manip changes
   QObject::connect(_item, SIGNAL(SizeChanged(double, double, double)),
@@ -251,6 +258,8 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
   // manip changes -> item changes
   QObject::connect(manip, SIGNAL(ColorChanged(QColor)),
       _item, SLOT(OnColorChanged(QColor)));
+  QObject::connect(manip, SIGNAL(TextureChanged(QString)),
+      _item, SLOT(OnTextureChanged(QString)));
 }
 
 /////////////////////////////////////////////////
@@ -1921,7 +1930,17 @@ void BuildingMaker::OnExit()
 /////////////////////////////////////////////////
 void BuildingMaker::OnColorSelected(QColor _color)
 {
+  this->selectedTexture = "";
   this->selectedColor = _color;
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnTextureSelected(QString _texture)
+{
+  this->selectedColor = QColor::Invalid;
+
+//  if (_texture != QString(""))
+    this->selectedTexture = _texture;
 }
 
 /////////////////////////////////////////////////
@@ -1937,7 +1956,7 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
     return true;
   }
 
-  if (!this->selectedColor.isValid())
+  if (this->selectedTexture == QString("") && !this->selectedColor.isValid())
   {
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
     userCamera->HandleMouseEvent(_event);
@@ -1981,6 +2000,19 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
                                this->selectedColor.green(),
                                this->selectedColor.blue());
         this->hoverVis->SetAmbient(newColor);
+      }
+      else if (this->selectedTexture != "")
+      {
+        std::string material = "Gazebo/Grey";
+        if (this->selectedTexture == ":wood.jpg")
+          material = "Gazebo/Wood";
+        else if (this->selectedTexture == ":tiles.jpg")
+          material = "Gazebo/CeilingTiled";
+        else if (this->selectedTexture == ":bricks.png")
+          material = "Gazebo/Bricks";
+
+        this->hoverVis->SetMaterial(material);
+        this->hoverVis->SetAmbient((*it).second->GetColor());
       }
 
       this->hoverVis->SetTransparency(0);
@@ -2035,6 +2067,10 @@ bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &_event)
       if (this->selectedColor.isValid())
       {
         manip->SetColor(this->selectedColor);
+      }
+      else if (this->selectedTexture != "")
+      {
+        manip->SetTexture(this->selectedTexture);
       }
     }
     this->hoverVis.reset();

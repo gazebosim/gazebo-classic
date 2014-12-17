@@ -315,6 +315,7 @@ void BuildingModelManip::OnColorChanged(QColor _color)
 void BuildingModelManip::OnTextureChanged(QString _texture)
 {
   this->SetTexture(_texture);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -402,7 +403,12 @@ void BuildingModelManip::SetTexture(QString _texture)
   else if (_texture == ":bricks.png")
     this->texture = "Gazebo/Bricks";
 
+  // BuildingModelManip and BuildingMaker handle material names,
+  // Inspectors and palette handle thumbnail uri
   this->visual->SetMaterial(this->texture);
+  this->visual->SetAmbient(this->color);
+  this->maker->BuildingChanged();
+  emit TextureChanged(_texture);
 }
 
 /////////////////////////////////////////////////

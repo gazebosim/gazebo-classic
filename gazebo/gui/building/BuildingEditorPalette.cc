@@ -137,6 +137,56 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   }
   connect(brushes, SIGNAL(buttonClicked(int)), this, SLOT(OnColor(int)));
 
+  // Textures
+  QLabel *texturesLabel = new QLabel(tr(
+       "<font size=4 color='white'>Add Texture</font>"));
+
+  QGridLayout *texturesLayout = new QGridLayout;
+  QSize textureButtonSize(70, 70);
+  QSize textureIconSize(40, 40);
+
+  // wood
+  this->textureList.push_back(":wood.jpg");
+  QToolButton *textureButton = new QToolButton(this);
+  textureButton->setFixedSize(textureButtonSize);
+  textureButton->setCheckable(true);
+  textureButton->setChecked(false);
+  textureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+  textureButton->setIcon(QPixmap(this->textureList.back()).scaled(
+        QSize(90, 90), Qt::IgnoreAspectRatio));
+  textureButton->setText("Wood");
+  textureButton->setIconSize(QSize(textureIconSize));
+  brushes->addButton(textureButton, brushes->buttons().size());
+  texturesLayout->addWidget(textureButton, 0, 0);
+
+  // tiles
+  this->textureList.push_back(":tiles.jpg");
+  textureButton = new QToolButton(this);
+  textureButton->setFixedSize(textureButtonSize);
+  textureButton->setCheckable(true);
+  textureButton->setChecked(false);
+  textureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+  textureButton->setIcon(QPixmap(this->textureList.back()).scaled(
+        QSize(90, 90), Qt::IgnoreAspectRatio));
+  textureButton->setText("Tiles");
+  textureButton->setIconSize(QSize(textureIconSize));
+  brushes->addButton(textureButton, brushes->buttons().size());
+  texturesLayout->addWidget(textureButton, 0, 1);
+
+  // bricks
+  this->textureList.push_back(":bricks.png");
+  textureButton = new QToolButton(this);
+  textureButton->setFixedSize(textureButtonSize);
+  textureButton->setCheckable(true);
+  textureButton->setChecked(false);
+  textureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+  textureButton->setIcon(QPixmap(this->textureList.back()).scaled(
+        QSize(90, 90), Qt::IgnoreAspectRatio));
+  textureButton->setText("Bricks");
+  textureButton->setIconSize(QSize(textureIconSize));
+  brushes->addButton(textureButton, brushes->buttons().size());
+  texturesLayout->addWidget(textureButton, 0, 2);
+
   // Import button
   QPushButton *importImageButton = new QPushButton(tr("Import"),
       this);
@@ -161,6 +211,8 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   mainLayout->addLayout(featuresLayout);
   mainLayout->addWidget(colorsLabel);
   mainLayout->addLayout(colorsLayout);
+  mainLayout->addWidget(texturesLabel);
+  mainLayout->addLayout(texturesLayout);
   mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                       QSizePolicy::Minimum));
   mainLayout->addLayout(buttonsLayout);
@@ -181,7 +233,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
       gui::editor::Events::ConnectCreateBuildingEditorItem(
       boost::bind(&BuildingEditorPalette::OnCreateEditorItem, this, _1)));
 
-  // All buttons must be added after the color buttons
+  // All buttons must be added after the color and texture buttons
   brushes->addButton(wallButton, brushes->buttons().size());
   brushes->addButton(windowButton, brushes->buttons().size());
   brushes->addButton(doorButton, brushes->buttons().size());
@@ -268,6 +320,7 @@ void BuildingEditorPalette::OnNameChanged(const QString &_name)
 void BuildingEditorPalette::OnCreateEditorItem(const std::string &_mode)
 {
   gui::editor::Events::colorSelected(QColor::Invalid);
+  gui::editor::Events::textureSelected(QString(""));
 
   if (_mode.empty() || this->currentMode == _mode)
   {
@@ -290,8 +343,19 @@ void BuildingEditorPalette::OnColor(int _buttonId)
   // A button which is not color
   if (_buttonId >= static_cast<int>(colorList.size()))
   {
-    gzwarn << "Brushes other than color are handled elsewhere." << std::endl;
-    return;
+    // Textures
+    if (_buttonId < (int)colorList.size() + (int)textureList.size())
+    {
+      this->OnTexture(_buttonId - (int)colorList.size());
+      return;
+    }
+    // Others
+    else
+    {
+      gzwarn << "Brushes other than color and texture are handled elsewhere."
+             << std::endl;
+      return;
+    }
   }
 
   std::ostringstream colorStr;
@@ -305,6 +369,27 @@ void BuildingEditorPalette::OnColor(int _buttonId)
     QPixmap colorCursor(30, 30);
     colorCursor.fill(color);
     QApplication::setOverrideCursor(QCursor(colorCursor));
+  }
+  else
+  {
+    gui::editor::Events::createBuildingEditorItem(std::string());
+  }
+}
+
+/////////////////////////////////////////////////
+void BuildingEditorPalette::OnTexture(int _textureId)
+{
+  std::ostringstream textureStr;
+  textureStr << "texture_" << _textureId;
+  QString texture = this->textureList[_textureId];
+  if (this->currentMode != textureStr.str())
+  {
+    gui::editor::Events::textureSelected(texture);
+    this->currentMode = textureStr.str();
+
+    QPixmap textureCursor(this->textureList[_textureId]);
+    textureCursor = textureCursor.scaled(QSize(30, 30));
+    QApplication::setOverrideCursor(textureCursor);
   }
   else
   {
