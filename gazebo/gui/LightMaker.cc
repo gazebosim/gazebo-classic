@@ -98,7 +98,10 @@ bool LightMaker::Init()
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
   this->light.reset(new rendering::Light(scene));
+
+  this->light->SetName("lightmaker_tmp");
   this->light->Load();
+  scene->AddLight(this->light);
 
   this->light->SetLightType(this->lightTypename);
   this->light->SetPosition(math::Vector3(0, 0, 1));
