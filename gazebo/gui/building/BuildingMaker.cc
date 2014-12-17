@@ -688,8 +688,7 @@ void BuildingMaker::Reset()
   this->modelVisual->Load();
   this->modelPose = math::Pose::Zero;
   this->modelVisual->SetPose(this->modelPose);
-  this->modelVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
-      GZ_VISIBILITY_SELECTABLE);
+  this->modelVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   scene->AddVisual(this->modelVisual);
 
   std::map<std::string, BuildingModelManip *>::iterator it;
