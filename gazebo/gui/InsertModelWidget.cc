@@ -15,6 +15,7 @@
  *
  */
 
+#include <fstream>
 #include <boost/lexical_cast.hpp>
 #include <sdf/sdf.hh>
 
@@ -345,7 +346,17 @@ bool InsertModelWidget::IsPathAccessible(const boost::filesystem::path &_path)
 {
   try
   {
-    return boost::filesystem::exists(_path);
+    if (boost::filesystem::is_directory(_path))
+    {
+      boost::filesystem::directory_iterator iter(_path);
+      iter->status();
+      return true;
+    }
+    else
+    {
+      std::ifstream ifs(_path.string().c_str(), std::ifstream::in);
+      return ifs.good();
+    }
   }
   catch(boost::filesystem::filesystem_error & e)
   {
