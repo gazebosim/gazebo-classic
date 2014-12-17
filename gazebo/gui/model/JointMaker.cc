@@ -440,7 +440,7 @@ void JointMaker::CreateHotSpot()
   Ogre::MovableObject *hotspotObj =
       (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
       "__HOTSPOT__" + joint->visual->GetName(), "unit_sphere"));
-  hotspotObj->setUserAny(Ogre::Any(hotSpotName));
+  hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(hotSpotName));
 
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial("Gazebo/RedTransparent");

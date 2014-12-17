@@ -551,12 +551,14 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
   {
     // Make sure we set the _mod only if we have found a selection object
     if (entity->getName().substr(0, 15) == "__SELECTION_OBJ" &&
-        !entity->getUserAny().isEmpty() &&
-        entity->getUserAny().getType() == typeid(std::string))
+        !entity->getUserObjectBindings().getUserAny().isEmpty() &&
+        entity->getUserObjectBindings().getUserAny().getType() ==
+        typeid(std::string))
     {
       try
       {
-        _mod = Ogre::any_cast<std::string>(entity->getUserAny());
+        _mod = Ogre::any_cast<std::string>(
+            entity->getUserObjectBindings().getUserAny());
       }
       catch(Ogre::Exception &e)
       {
@@ -565,12 +567,13 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
       }
     }
 
-    if (!entity->getUserAny().isEmpty())
+    if (!entity->getUserObjectBindings().getUserAny().isEmpty())
     {
       try
       {
         result = this->scene->GetVisual(
-            Ogre::any_cast<std::string>(entity->getUserAny()));
+            Ogre::any_cast<std::string>(
+              entity->getUserObjectBindings().getUserAny()));
       }
       catch(Ogre::Exception &e)
       {
@@ -597,10 +600,11 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
   Ogre::Entity *entity =
     this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
 
-  if (entity && !entity->getUserAny().isEmpty())
+  if (entity && !entity->getUserObjectBindings().getUserAny().isEmpty())
   {
     result = this->scene->GetVisual(
-        Ogre::any_cast<std::string>(entity->getUserAny()));
+        Ogre::any_cast<std::string>(
+          entity->getUserObjectBindings().getUserAny()));
   }
 
   return result;

@@ -236,7 +236,7 @@ void Light::CreateVisual()
     // Make sure the selection object is rendered only in the selection
     // buffer.
     obj->setVisibilityFlags(GZ_VISIBILITY_SELECTION);
-    obj->setUserAny(Ogre::Any(this->GetName()));
+    obj->getUserObjectBindings().setUserAny(Ogre::Any(this->GetName()));
     obj->setCastShadows(false);
 
     // Scale the selection object to roughly match the light visual size.
