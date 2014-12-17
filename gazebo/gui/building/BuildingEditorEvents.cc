@@ -20,7 +20,9 @@
 using namespace gazebo;
 using namespace gui;
 
+event::EventT<void (bool)> editor::Events::toggleEditMode;
 event::EventT<void (std::string)> editor::Events::createBuildingEditorItem;
+event::EventT<void (QColor)> editor::Events::colorSelected;
 event::EventT<void (std::string, std::string)>
     editor::Events::saveBuildingModel;
 event::EventT<void ()> editor::Events::finishBuildingModel;
