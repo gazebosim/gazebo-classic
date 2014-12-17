@@ -15,7 +15,7 @@
  *
 */
 
-#include "RestServicePlugin.hh"
+#include "RestWebPlugin.hh"
 #include <uuid/uuid.h>
 
 using namespace gazebo;
@@ -28,7 +28,7 @@ SimpleMOOCPlugin::SimpleMOOCPlugin()
   requestQThread(NULL)
 {
 
-  cout << "SimpleMOOCPlugin::SimpleMOOCPlugin()" << endl;
+  std::cout << "$$$ SimpleMOOCPlugin::SimpleMOOCPlugin()" << std::endl;
   // generate a unique session ID
   uuid_t uuid;
   uuid_generate_random ( uuid );

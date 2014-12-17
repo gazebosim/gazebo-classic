@@ -71,5 +71,8 @@ add_library(TimerGUIPlugin SHARED TimerGUIPlugin.cc ${TimerGUIPlugin_MOC})
 target_link_libraries(TimerGUIPlugin libgazebo gazebo_sensors ${ogre_libraries} ${QT_LIBRARIES})
 install (TARGETS TimerGUIPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
 
+# SimEvents
 add_subdirectory(events)
+# RestWeb
+add_subdirectory(rest_web)
 

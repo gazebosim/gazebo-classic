@@ -9,9 +9,11 @@
       <uri>model://sun</uri>
     </include>
 
-    <plugin name="WebRest" filename="libWebRestPlugin.so">
+<!--
+    <plugin name="RestWeb" filename="libRestWebPlugin.so">
 
     </plugin>
+-->
     
     <!-- 
     spawn a few beers in the world

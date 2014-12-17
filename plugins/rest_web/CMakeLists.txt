@@ -6,13 +6,13 @@ link_directories(
 set (server_inc 
   RestApi.hh
   RestException.hh
-  RestServicePlugin.hh
+  RestWebPlugin.hh
   )
 
 
 set (server_src 
   RestApi.cc
-  RestServicePlugin.cc
+  RestWebPlugin.cc
   )
 
 set (client_inc

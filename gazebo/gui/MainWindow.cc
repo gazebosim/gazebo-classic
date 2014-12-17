@@ -1790,3 +1790,9 @@ void MainWindow::OnEditorGroup(QAction *_action)
     }
   }
 }
+
+/////////////////////////////////////////////////
+void MainWindow::AddMenu(QMenu *_menu)
+{
+  this->menuBar->addMenu(_menu);
+}

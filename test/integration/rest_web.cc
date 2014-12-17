@@ -99,7 +99,9 @@ TEST_P(RestWebTest, FirstTest)
 ////////////////////////////////////////////////////////////////////////
 void RestWebTest::FirstTest(const std::string &_physicsEngine)
 {
-  Load("test/worlds/rest_web.world", false, _physicsEngine);
+  char *argv[] = {"program name", "-s", "libRestWebPlugin.so"}; 
+  //char **v = {"-s", "libRestWebPlugin.so"};
+  Load("test/worlds/rest_web.world", false, _physicsEngine, 3, argv);
   physics::WorldPtr world = physics::get_world("default");
 
   // setup the callback that increments a counter each time a

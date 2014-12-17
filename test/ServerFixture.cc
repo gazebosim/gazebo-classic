@@ -125,7 +125,8 @@ void ServerFixture::Load(const std::string &_worldFilename, bool _paused)
 
 /////////////////////////////////////////////////
 void ServerFixture::Load(const std::string &_worldFilename,
-                  bool _paused, const std::string &_physics)
+                  bool _paused, const std::string &_physics,
+                  int _argc, char **_argv)
 {
   delete this->server;
   this->server = NULL;
@@ -133,7 +134,7 @@ void ServerFixture::Load(const std::string &_worldFilename,
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
      boost::bind(&ServerFixture::RunServer, this, _worldFilename,
-                 _paused, _physics));
+                 _paused, _physics, _argc, _argv));
 
   // Wait for the server to come up
   // Use a 60 second timeout.
@@ -211,10 +212,14 @@ rendering::ScenePtr ServerFixture::GetScene(
 
 /////////////////////////////////////////////////
 void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
-               const std::string &_physics)
+               const std::string &_physics, int _argc, char ** _argv)
 {
   ASSERT_NO_THROW(this->server = new Server());
-  this->server->PreLoad();
+  // parse arguments. For example, to load system plugins:
+  //    char *argv[] = {"program name", "-s", "libRestWebPlugin.so"};
+  //    int argc = 3;
+  this->server->ParseArgs(_argc, _argv);
+
   if (_physics.length())
     ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
                                            _physics));

@@ -82,6 +82,10 @@ namespace gazebo
       /// \param[in] _on True to show the left pane, false to hide.
       public: void SetLeftPaneVisibility(bool _on);
 
+      /// \brief Add a menu to the main window menu bar.
+      /// \param[in] _menu Menu to be added.
+      public: void AddMenu(QMenu *_menu);
+
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();
 

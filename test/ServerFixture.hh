@@ -82,8 +82,11 @@ class ServerFixture : public testing::Test
   /// \param[in] _worldFilename Name of the world to load.
   /// \param[in] _paused True to start the world paused.
   /// \param[in] _physics Name of the physics engine.
+  /// \param[in] _argc nb of arguments (for example to load system plugins)
+  /// \param[in] _argv array of arguments
   protected: virtual void Load(const std::string &_worldFilename,
-                               bool _paused, const std::string &_physics);
+                               bool _paused, const std::string &_physics,
+                               int _argc=0, char **_argv=NULL);
 
   /// \brief Run the server.
   /// \param[in] _worldFilename Name of the world to run in simulation.
@@ -100,7 +103,8 @@ class ServerFixture : public testing::Test
   /// \param[in] _paused True to start the world paused.
   /// \param[in] _physics Name of the physics engine.
   protected: void RunServer(const std::string &_worldFilename, bool _paused,
-                            const std::string &_physics);
+                            const std::string &_physics,
+                            int _argc=0, char **_argv=NULL);
 
   /// \brief Function that received world stastics messages.
   /// \param[in] _msg World statistics message.
