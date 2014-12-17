@@ -754,6 +754,29 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 
   if (!this->mouseVisual)
   {
+    rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+    if (vis && !vis->IsPlane())
+    {
+      // Main window models always handled here
+      if (this->allParts.find(vis->GetParent()->GetName()) ==
+          this->allParts.end())
+      {
+        // Prevent highlighting for snapping
+        if (this->manipMode == "snap" || this->manipMode == "select" ||
+            this->manipMode == "")
+        {
+          // Don't change cursor on hover
+          QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+          userCamera->HandleMouseEvent(_event);
+        }
+        // Allow ModelManipulator to work while dragging handle over this
+        else if (_event.dragging)
+        {
+          ModelManipulator::Instance()->OnMouseMoveEvent(_event);
+        }
+        return true;
+      }
+    }
     return false;
   }
 
