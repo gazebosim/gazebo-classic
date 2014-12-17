@@ -2206,6 +2206,9 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
     if (newGeometryType != geometryType)
     {
+      std::string origMaterial = this->dataPtr->myMaterialName;
+      float origTransparency = this->dataPtr->transparency;
+
       sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
       geomElem->ClearElements();
 
@@ -2232,6 +2235,8 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
           geomElem->AddElement(newGeometryType);
         }
       }
+      this->SetTransparency(origTransparency);
+      this->SetMaterial(origMaterial);
     }
 
     math::Vector3 geomScale(1, 1, 1);

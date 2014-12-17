@@ -21,6 +21,7 @@
 #include "gazebo/physics/Inertial.hh"
 
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/gui/model/PartVisualConfig.hh"
 #include "gazebo/gui/model/PartGeneralConfig.hh"
@@ -366,8 +367,14 @@ void PartData::OnAddCollision(const std::string &_name)
 
   collisionConfig->UpdateCollision(_name, &collisionMsg);
   this->collisions[collisionVis] = collisionMsg;
+
   collisionVis->SetMaterial("Gazebo/Orange");
-  collisionVis->SetTransparency(0.4);
+  collisionVis->SetTransparency(0.8);
+
+  // fix for transparency alpha compositing
+  Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
+      getAttachedObject(0);
+  colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
 }
 
 /////////////////////////////////////////////////
@@ -471,8 +478,17 @@ void PartData::Update()
         updateMsgPtr.reset(new msgs::Visual);
         updateMsgPtr->CopyFrom(collisionVisMsg);
 
-        // set visibility?
+        std::string origGeomType = it->first->GetGeometryType();
+
         it->first->UpdateFromMsg(updateMsgPtr);
+
+        // fix for transparency alpha compositing
+        if (it->first->GetGeometryType() != origGeomType)
+        {
+          Ogre::MovableObject *colObj = it->first->GetSceneNode()->
+              getAttachedObject(0);
+          colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+        }
         break;
       }
     }

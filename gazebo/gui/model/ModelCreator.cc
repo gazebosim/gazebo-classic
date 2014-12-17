@@ -357,18 +357,25 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 {
   PartData *part = new PartData();
   part->partVisual = _visual->GetParent();
-
-  part->partVisual = _visual->GetParent();
   part->AddVisual(_visual);
 
   // create collision with identical geometry
-  rendering::VisualPtr collisoinVis =
+  rendering::VisualPtr collisionVis =
       _visual->Clone(part->partVisual->GetName() + "_collision",
       part->partVisual);
-  collisoinVis->SetMaterial("Gazebo/Orange");
-  collisoinVis->SetTransparency(this->editTransparency);
+
+//  collisoinVis->SetMaterial("Gazebo/OrangeTransparent");
+  collisionVis->SetMaterial("Gazebo/Orange");
+  collisionVis->SetTransparency(0.8);
+
+  // fix for transparency alpha compositing
+  Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
+      getAttachedObject(0);
+  colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+
+//  collisoinVis->SetTransparency(this->editTransparency);
 //  collisoinVis->SetVisible(false);
-  part->AddCollision(collisoinVis);
+  part->AddCollision(collisionVis);
 
   std::string partName = part->partVisual->GetName();
   part->SetName(partName);
@@ -398,6 +405,14 @@ void ModelCreator::RemovePart(const std::string &_partName)
   for (it = part->visuals.begin(); it != part->visuals.end(); ++it)
   {
     rendering::VisualPtr vis = it->first;
+    scene->RemoveVisual(vis);
+  }
+
+  std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
+  for (colIt = part->collisions.begin(); colIt != part->collisions.end();
+      ++colIt)
+  {
+    rendering::VisualPtr vis = colIt->first;
     scene->RemoveVisual(vis);
   }
 
