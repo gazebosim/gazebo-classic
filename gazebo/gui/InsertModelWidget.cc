@@ -345,17 +345,20 @@ bool InsertModelWidget::IsPathAccessible(const boost::filesystem::path &_path)
 {
   try
   {
-    return boost::filesystem::exists(_path);
+    // Try to read the path. Should throw filesystem_error if permission denied.
+    boost::filesystem::is_empty(_path);
   }
   catch(boost::filesystem::filesystem_error & e)
   {
     gzerr << "Permission denied for directory: " << _path << std::endl;
+    return false;
   }
   catch(std::exception & e)
   {
     gzerr << "Unexpected error while accessing to: " << _path << "."
           << "Error reported: " << e.what() << std::endl;
+    return false;
   }
 
-  return false;
+  return true;
 }
