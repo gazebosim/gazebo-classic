@@ -241,8 +241,8 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
     }
     catch(boost::filesystem::filesystem_error & e)
     {
-      gzerr << "Not loading models in: " << _path << std::endl
-            << "Filesystem permission denied" << std::endl;
+      gzerr << "Not loading models in: " << _path << " ("
+            << e.what() << ")" << std::endl;
       return;
     }
 
