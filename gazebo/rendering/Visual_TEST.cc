@@ -44,7 +44,7 @@ TEST_F(Visual_TEST, BoundingBox)
       cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene);
+  ASSERT_TRUE(scene != NULL);
 
   int sleep = 0;
   int maxSleep = 50;
@@ -55,7 +55,7 @@ TEST_F(Visual_TEST, BoundingBox)
     common::Time::MSleep(1000);
     sleep++;
   }
-  ASSERT_TRUE(visual);
+  ASSERT_TRUE(visual != NULL);
 
   // verify initial bounding box
   math::Vector3 bboxMin(-0.5, -0.5, -0.5);
