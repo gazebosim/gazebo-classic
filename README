@@ -10,7 +10,7 @@ Installation
 ------------
 Instructions are located at
 
-  http://gazebosim.org/documentation.html
+  http://gazebosim.org/tutorials/?cat=install
 
 Gazebo cmake parameters available at configuring time:
 
@@ -34,7 +34,8 @@ Gazebo cmake parameters available at configuring time:
 
 Uninstallation
 --------------
-Read the installation instructions (http://gazebosim.org/documentation.html) in the online manual for generic instructions.  For most people, the following sequence will suffice:
+Read the uninstallation instructions (http://gazebosim.org/tutorials?tut=install_from_source&ver=4.0&cat=install#UninstallingSource-basedInstall)
+in the online manual for generic instructions.  For most people, the following sequence will suffice:
 
   $ make uninstall (inside the gazebo-trunk/build directory)
 
