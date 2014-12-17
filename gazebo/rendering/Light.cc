@@ -224,6 +224,8 @@ void Light::CreateVisual()
         visSceneNode->getCreator()->createEntity(this->GetName() +
         "_selection_sphere", "unit_sphere");
 
+    ent->setMaterialName("Gazebo/White");
+
     // Create the selection object.
     Ogre::MovableObject *obj = static_cast<Ogre::MovableObject*>(ent);
 
