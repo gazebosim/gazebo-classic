@@ -40,7 +40,7 @@ TEST_F(PluginTest, ModelExceptionConstructor)
   ASSERT_TRUE(home);
 
   boost::filesystem::path path(home);
-  path /= "/.gazebo/default.log";
+  path /= "/.gazebo/server-11345/default.log";
 
   // Open the log file, and read back the string
   std::ifstream ifs(path.string().c_str(), std::ios::in);
@@ -75,7 +75,7 @@ TEST_F(PluginTest, ModelExceptionInit)
   ASSERT_TRUE(home);
 
   boost::filesystem::path path(home);
-  path /= "/.gazebo/default.log";
+  path /= "/.gazebo/server-11345/default.log";
 
   // Open the log file, and read back the string
   std::ifstream ifs(path.string().c_str(), std::ios::in);
@@ -110,7 +110,7 @@ TEST_F(PluginTest, ModelExceptionLoad)
   ASSERT_TRUE(home);
 
   boost::filesystem::path path(home);
-  path /= "/.gazebo/default.log";
+  path /= "/.gazebo/server-11345/default.log";
 
   // Open the log file, and read back the string
   std::ifstream ifs(path.string().c_str(), std::ios::in);
