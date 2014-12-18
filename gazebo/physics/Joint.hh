@@ -470,6 +470,10 @@ namespace gazebo
       /// \return Pointer to the parent link.
       public: LinkPtr GetParent() const;
 
+      /// \brief Get the joint type as msgs::Joint::Type.
+      /// \return Joint type.
+      public: msgs::Joint::Type GetMsgType() const;
+
       /// \brief Fill a joint message.
       /// \param[out] _msg Message to fill with this joint's properties.
       public: void FillMsg(msgs::Joint &_msg);

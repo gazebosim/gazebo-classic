@@ -143,11 +143,6 @@ namespace gazebo
       /// \brief Reset time and model poses, configurations in simulation.
       public: void Reset();
 
-      /// \brief Get the selected Entity.
-      /// The selected entity is set via the GUI.
-      /// \return A point to the Entity, NULL if nothing is selected.
-      public: EntityPtr GetSelectedEntity() const;
-
       /// \brief Print Entity tree.
       /// Prints alls the entities to stdout.
       public: void PrintEntityTree();
@@ -391,10 +386,6 @@ namespace gazebo
       /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
 
-      /// \brief Set the selected entity.
-      /// \param[in] _name Name of the entity to select.
-      private: void SetSelectedEntityCB(const std::string &_name);
-
       /// \brief Construct a scene message from the known world state
       /// \param[out] _scene Scene message to build.
       /// \param[in] _entity Pointer to entity from which to build the scene
@@ -478,9 +469,6 @@ namespace gazebo
       /// \brief True to stop the world from running.
       private: bool stop;
 
-      /// \brief The entity currently selected by the user.
-      private: EntityPtr selectedEntity;
-
       /// \brief Name of the world.
       private: std::string name;
 
@@ -504,9 +492,6 @@ namespace gazebo
 
       /// \brief Transportation node.
       private: transport::NodePtr node;
-
-      /// \brief Publisher for selection messages.
-      private: transport::PublisherPtr selectionPub;
 
       /// \brief Publisher for world statistics messages.
       private: transport::PublisherPtr statPub;

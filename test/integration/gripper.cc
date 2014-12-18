@@ -32,19 +32,19 @@ TEST_F(GripperTest, Close)
 {
   Load("worlds/gripper.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr model = world->GetModel("simple_gripper");
-  ASSERT_TRUE(model);
+  ASSERT_TRUE(model != NULL);
 
   physics::JointPtr leftJoint = model->GetJoint("palm_left_finger");
-  ASSERT_TRUE(leftJoint);
+  ASSERT_TRUE(leftJoint != NULL);
 
   physics::JointPtr rightJoint = model->GetJoint("palm_right_finger");
-  ASSERT_TRUE(rightJoint);
+  ASSERT_TRUE(rightJoint != NULL);
 
   physics::GripperPtr gripper = model->GetGripper(0);
-  ASSERT_TRUE(gripper);
+  ASSERT_TRUE(gripper != NULL);
 
   // The gripper should not be attached to anything
   EXPECT_FALSE(gripper->IsAttached());
@@ -83,19 +83,19 @@ TEST_F(GripperTest, CloseOpen)
 {
   Load("worlds/gripper.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr model = world->GetModel("simple_gripper");
-  ASSERT_TRUE(model);
+  ASSERT_TRUE(model != NULL);
 
   physics::JointPtr leftJoint = model->GetJoint("palm_left_finger");
-  ASSERT_TRUE(leftJoint);
+  ASSERT_TRUE(leftJoint != NULL);
 
   physics::JointPtr rightJoint = model->GetJoint("palm_right_finger");
-  ASSERT_TRUE(rightJoint);
+  ASSERT_TRUE(rightJoint != NULL);
 
   physics::GripperPtr gripper = model->GetGripper(0);
-  ASSERT_TRUE(gripper);
+  ASSERT_TRUE(gripper != NULL);
 
   // The gripper should not be attached to anything
   EXPECT_FALSE(gripper->IsAttached());

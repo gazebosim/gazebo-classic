@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,18 @@
  *
 */
 
-#ifndef _GUIIFACE_TEST_HH_
-#define _GUIIFACE_TEST_HH_
+#ifndef _GLWIDGET_TEST2_HH_
+#define _GLWIDGET_TEST2_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
 /// \brief A test class for the DataLogger widget.
-class GuiIface_TEST : public QTestFixture
+class GLWidget_TEST2 : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test reading an INI file that doesn't exist.
-  private slots: void noINIFile();
-
-  /// \brief Test using the env variable GAZEBO_GUI_INI_FILE
-  private slots: void GUIINIPATHEnvVariable();
-
-  /// \brief Test setting configuration properties.
-  private slots: void setINIProperties();
-
-  /// \brief Test savign configuration properties.
-  private slots: void saveINIProperties();
+  /// \brief Test key presses.
+  private slots: void KeyPresses();
 };
 
 #endif

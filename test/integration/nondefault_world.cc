@@ -34,7 +34,7 @@ void NonDefaultWorld::Load(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr model = world->GetModel("ground_plane");
-  ASSERT_TRUE(model);
+  ASSERT_TRUE(model != NULL);
 }
 
 TEST_P(NonDefaultWorld, Load)
