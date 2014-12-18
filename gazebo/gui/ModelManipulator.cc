@@ -168,7 +168,6 @@ math::Vector3 ModelManipulator::GetMousePositionOnPlane(
 
   return p1;
 }
-
 /////////////////////////////////////////////////
 math::Vector3 ModelManipulator::SnapPoint(const math::Vector3 &_point,
     double _interval, double _sensitivity)

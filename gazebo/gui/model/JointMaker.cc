@@ -109,6 +109,9 @@ void JointMaker::EnableEventHandlers()
   MouseEventHandler::Instance()->AddReleaseFilter("model_joint",
       boost::bind(&JointMaker::OnMouseRelease, this, _1));
 
+  MouseEventHandler::Instance()->AddPressFilter("model_joint",
+      boost::bind(&JointMaker::OnMousePress, this, _1));
+
   KeyEventHandler::Instance()->AddPressFilter("model_joint",
       boost::bind(&JointMaker::OnKeyPress, this, _1));
 }
@@ -118,6 +121,7 @@ void JointMaker::DisableEventHandlers()
 {
   MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_joint");
   MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
+  MouseEventHandler::Instance()->RemovePressFilter("model_joint");
   MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
   KeyEventHandler::Instance()->RemovePressFilter("model_joint");
 }
@@ -133,6 +137,7 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
     scene->GetManager()->destroyBillboardSet(joint->handles);
     scene->RemoveVisual(joint->hotspot);
     scene->RemoveVisual(joint->visual);
+    joint->visual->Fini();
     joint->jointVisual->GetParent()->DetachVisual(
         joint->jointVisual->GetName());
     scene->RemoveVisual(joint->jointVisual);
@@ -237,7 +242,11 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       if (this->hoverVis)
       {
         if (this->hoverVis->IsPlane())
-          return false;
+        {
+          QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+          camera->HandleMouseEvent(_event);
+          return true;
+        }
 
         // Pressed parent part
         if (!this->selectedVis)
@@ -271,6 +280,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
         }
       }
     }
+
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
     camera->HandleMouseEvent(_event);
     return true;
