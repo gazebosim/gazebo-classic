@@ -124,42 +124,42 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // get physics engine
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics);
+  ASSERT_TRUE(physics != NULL);
 
   // get pendulum
   std::string pendulumName = "model_pendulum";
   physics::ModelPtr pendulumModel = world->GetModel(pendulumName);
-  ASSERT_TRUE(pendulumModel);
+  ASSERT_TRUE(pendulumModel != NULL);
 
   std::string pendulumSensorName = "pendulum_imu_sensor";
   sensors::ImuSensorPtr pendulumImu =
     boost::static_pointer_cast<sensors::ImuSensor>(
         sensors::SensorManager::Instance()->GetSensor(pendulumSensorName));
-  ASSERT_TRUE(pendulumImu);
+  ASSERT_TRUE(pendulumImu != NULL);
   pendulumImu->Init();
 
   // get friction ball
   std::string ballFrictionName = "model_ball";
   physics::ModelPtr ballFrictionModel = world->GetModel(ballFrictionName);
-  ASSERT_TRUE(ballFrictionModel);
+  ASSERT_TRUE(ballFrictionModel != NULL);
 
   std::string ballFrictionSensorName = "ball_imu_sensor";
   sensors::ImuSensorPtr ballFrictionImu =
     boost::static_pointer_cast<sensors::ImuSensor>(
     sensors::SensorManager::Instance()->GetSensor(ballFrictionSensorName));
-  ASSERT_TRUE(ballFrictionImu);
+  ASSERT_TRUE(ballFrictionImu != NULL);
   ballFrictionImu->Init();
 
   // get frictionless ball
   std::string ballNoFrictionName = "model_ball_no_friction";
   physics::ModelPtr ballNoFrictionModel = world->GetModel(ballNoFrictionName);
-  ASSERT_TRUE(ballNoFrictionModel);
+  ASSERT_TRUE(ballNoFrictionModel != NULL);
 
   std::string ballNoFrictionSensorName = "ball_no_friction_imu_sensor";
   sensors::ImuSensorPtr ballNoFrictionImu =
     boost::static_pointer_cast<sensors::ImuSensor>(
     sensors::SensorManager::Instance()->GetSensor(ballNoFrictionSensorName));
-  ASSERT_TRUE(ballNoFrictionImu);
+  ASSERT_TRUE(ballNoFrictionImu != NULL);
   ballNoFrictionImu->Init();
 
   // get gravity
