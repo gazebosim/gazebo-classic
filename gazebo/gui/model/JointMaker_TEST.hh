@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,21 @@
  *
 */
 
-#include "gazebo/gui/model/ModelEditorEvents.hh"
+#ifndef _JOINT_MAKER_TEST_HH_
+#define _JOINT_MAKER_TEST_HH_
 
-using namespace gazebo;
-using namespace gui;
+#include "gazebo/gui/QTestFixture.hh"
 
-event::EventT<void ()> model::Events::finishModel;
+/// \brief A test class for the JointMaker class.
+class JointMaker_TEST : public QTestFixture
+{
+  Q_OBJECT
+
+  /// \brief Test joint states
+  private slots: void JointState();
+
+  /// \brief Test creating and removing joints
+  private slots: void CreateRemoveJoint();
+};
+
+#endif
