@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _BULLETHINGEJOINT_HH_
-#define _BULLETHINGEJOINT_HH_
+#ifndef _GAZEBO_BULLETHINGEJOINT_HH_
+#define _GAZEBO_BULLETHINGEJOINT_HH_
 
+#include <string>
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/HingeJoint.hh"
@@ -87,6 +88,15 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+
+      // Documentation inherited.
+      public: virtual bool SetParam(const std::string &_key,
+                                    unsigned int _index,
+                                    const boost::any &_value);
+
+      // Documentation inherited.
+      public: virtual double GetParam(const std::string &_key,
+                                      unsigned int _index);
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);

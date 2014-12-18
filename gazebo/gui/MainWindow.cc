@@ -262,8 +262,6 @@ void MainWindow::Init()
     this->node->Advertise<msgs::WorldControl>("~/world_control");
   this->serverControlPub =
     this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
-  this->selectionPub =
-    this->node->Advertise<msgs::Selection>("~/selection");
   this->scenePub =
     this->node->Advertise<msgs::Scene>("~/scene");
 
