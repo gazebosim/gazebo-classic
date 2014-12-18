@@ -724,18 +724,17 @@ void JointMaker::Update()
 
     if (joint->jointVisual)
     {
-      rendering::ScenePtr scene = joint->jointVisual->GetScene();
-      scene->RemoveVisual(joint->jointVisual);
-      joint->jointVisual->GetParent()->DetachVisual(joint->jointVisual->GetName());
-      joint->jointVisual.reset();
+      joint->jointVisual->UpdateFromMsg(jointMsg);
     }
+    else
+    {
+      gazebo::rendering::JointVisualPtr jointVis(
+          new gazebo::rendering::JointVisual(
+          joint->name + "__JOINT_VISUAL__", joint->child));
 
-    gazebo::rendering::JointVisualPtr jointVis(
-        new gazebo::rendering::JointVisual(
-        joint->name + "__JOINT_VISUAL__", joint->child));
-
-    jointVis->Load(jointMsg);
-    joint->jointVisual = jointVis;
+      jointVis->Load(jointMsg);
+      joint->jointVisual = jointVis;
+    }
   }
 }
 

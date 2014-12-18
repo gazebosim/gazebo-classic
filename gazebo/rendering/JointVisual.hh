@@ -61,11 +61,24 @@ namespace gazebo
       /// \param[in] _useParentFrame True to use parent frame instead of the
       /// joint frame.
       /// \param[in] _type Type of axis.
-      public: void CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
-          msgs::Joint::Type _type);
+      public: ArrowVisualPtr CreateAxisVisual(const math::Vector3 &_axis,
+          bool _useParentFrame, msgs::Joint::Type _type);
 
       // Documentation Inherited.
       public: void SetVisible(bool _visible, bool _cascade = true);
+
+      /// \brief Update the joint visual based on a message
+      /// \param[in] _msg Joint message
+      public: void UpdateFromMsg(ConstJointPtr &_msg);
+
+      /// \brief Update an axis and attach it to the joint visual.
+      /// \param[in] _axis Axis vector
+      /// \param[in] _useParentFrame True to use parent frame instead of the
+      /// joint frame.
+      /// \param[in] _type Type of axis.
+      public: void UpdateAxisVisual(ArrowVisualPtr _arrowVisual,
+          const math::Vector3 &_axis, bool _useParentFrame,
+          msgs::Joint::Type _type);
     };
     /// \}
   }

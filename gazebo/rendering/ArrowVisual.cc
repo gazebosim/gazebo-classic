@@ -56,6 +56,9 @@ void ArrowVisual::Load()
   // Make sure the meshes are in Ogre
   this->InsertMesh("axis_shaft");
   this->InsertMesh("axis_head");
+  common::MeshManager::Instance()->CreateTube("rotation_tube",
+      0.035, 0.04, 0.01, 1, 32);
+  this->InsertMesh("rotation_tube");
 
   Ogre::MovableObject *shaftObj =
     (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
@@ -64,6 +67,10 @@ void ArrowVisual::Load()
   Ogre::MovableObject *headObj =
     (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
           this->GetName()+"__HEAD__", "axis_head"));
+
+  Ogre::MovableObject *rotationObj =
+    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+          this->GetName()+"__ROTATION__", "rotation_tube"));
 
   dPtr->shaftNode =
       dPtr->sceneNode->createChildSceneNode(
@@ -76,14 +83,6 @@ void ArrowVisual::Load()
       this->GetName() + "_HEAD");
   dPtr->headNode->attachObject(headObj);
   dPtr->headNode->setPosition(0, 0, 0.24);
-
-  common::MeshManager::Instance()->CreateTube("rotation_tube",
-      0.035, 0.04, 0.01, 1, 32);
-  this->InsertMesh("rotation_tube");
-
-  Ogre::MovableObject *rotationObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__ROTATION__", "rotation_tube"));
 
   dPtr->rotationNode =
       dPtr->sceneNode->createChildSceneNode(
@@ -101,13 +100,10 @@ void ArrowVisual::ShowShaft(bool _show)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
+  dPtr->sceneNode->removeChild(dPtr->shaftNode);
   if (_show)
   {
     dPtr->sceneNode->addChild(dPtr->shaftNode);
-  }
-  else
-  {
-    dPtr->sceneNode->removeChild(dPtr->shaftNode);
   }
 }
 
@@ -117,13 +113,10 @@ void ArrowVisual::ShowHead(bool _show)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
+  dPtr->sceneNode->removeChild(dPtr->headNode);
   if (_show)
   {
     dPtr->sceneNode->addChild(dPtr->headNode);
-  }
-  else
-  {
-    dPtr->sceneNode->removeChild(dPtr->headNode);
   }
 }
 
@@ -133,6 +126,7 @@ void ArrowVisual::ShowRotation(bool _show)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
+  dPtr->sceneNode->removeChild(dPtr->rotationNode);
   if (_show)
   {
     Ogre::MovableObject *rotationObj = dPtr->rotationNode->getAttachedObject(0);
@@ -144,9 +138,5 @@ void ArrowVisual::ShowRotation(bool _show)
     }
     dPtr->rotationNode->setVisible(this->GetVisible());
     dPtr->sceneNode->addChild(dPtr->rotationNode);
-  }
-  else
-  {
-    dPtr->sceneNode->removeChild(dPtr->rotationNode);
   }
 }
