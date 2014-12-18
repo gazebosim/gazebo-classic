@@ -165,11 +165,11 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   // get gravity
   math::Vector3 g = physics->GetGravity();
 
-  // run for 1900 steps (StepWorld(1) each time), or 1.9 seconds, enough
+  // run for 1900 steps (Step(1) each time), or 1.9 seconds, enough
   // to capture what we need from this experiment.
   for (unsigned n = 0; n < 1900; ++n)
   {
-    world->StepWorld(1);
+    world->Step(1);
     // gzdbg << "time: " << world->GetSimTime().Double() << "\n";
 
     // pendulum
