@@ -189,16 +189,11 @@ void ODELink::MoveCallback(dBodyID _id)
   // get force and applied to this body
   if (_id)
   {
-    // \TODO: there are hacks here to preserve ABI
-    // see bitbucket.org/osrf/gazebo/issue/1354
-
     const dReal *dforce = dBodyGetForce(_id);
-    // After gazebo4, replace Link::linearAccel with ODELink::force
-    self->linearAccel.Set(dforce[0], dforce[1], dforce[2]);
+    self->force.Set(dforce[0], dforce[1], dforce[2]);
 
     const dReal *dtorque = dBodyGetTorque(_id);
-    // After gazebo4, replace Link::angularAccel with ODELink::torque
-    self->angularAccel.Set(dtorque[0], dtorque[1], dtorque[2]);
+    self->torque.Set(dtorque[0], dtorque[1], dtorque[2]);
   }
 }
 
@@ -622,19 +617,13 @@ void ODELink::AddRelativeTorque(const math::Vector3 &_torque)
 /////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldForce() const
 {
-  // \TODO: there are hacks here to preserve ABI
-  // see bitbucket.org/osrf/gazebo/issue/1354
-  // After gazebo4, replace Link::linearAccel with ODELink::force
-  return this->linearAccel;
+  return this->force;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldTorque() const
 {
-  // \TODO: there are hacks here to preserve ABI
-  // see bitbucket.org/osrf/gazebo/issue/1354
-  // After gazebo4, replace Link::angularAccel with ODELink::torque
-  return this->angularAccel;
+  return this->torque;
 }
 
 //////////////////////////////////////////////////
