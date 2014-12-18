@@ -39,7 +39,7 @@ TEST_F(Issue1375Test, WorldReset)
 {
   Load("worlds/empty.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   event::ConnectionPtr conn =
     event::Events::ConnectWorldReset(boost::bind(OnReset));

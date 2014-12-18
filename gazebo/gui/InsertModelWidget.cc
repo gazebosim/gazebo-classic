@@ -346,16 +346,25 @@ bool InsertModelWidget::IsPathAccessible(const boost::filesystem::path &_path)
 {
   try
   {
+    if (!boost::filesystem::exists(_path))
+      return false;
+
     if (boost::filesystem::is_directory(_path))
     {
+      // Try to retrieve a pointer to the first entry in this directory.
+      // If permission denied to the directory, will throw filesystem_error
       boost::filesystem::directory_iterator iter(_path);
-      iter->status();
       return true;
     }
     else
     {
       std::ifstream ifs(_path.string().c_str(), std::ifstream::in);
-      return ifs.good();
+      if (ifs.fail() || ifs.bad())
+      {
+        gzerr << "File unreadable: " << _path << std::endl;
+        return false;
+      }
+      return true;
     }
   }
   catch(boost::filesystem::filesystem_error & e)

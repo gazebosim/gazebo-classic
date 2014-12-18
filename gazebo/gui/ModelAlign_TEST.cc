@@ -37,7 +37,7 @@ void ModelAlign_TEST::AlignXMin()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene);
+  QVERIFY(scene != NULL);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -76,7 +76,7 @@ void ModelAlign_TEST::AlignXMin()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis);
+    QVERIFY(modelVis != NULL);
     gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
@@ -113,7 +113,7 @@ void ModelAlign_TEST::AlignXCenter()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene);
+  QVERIFY(scene != NULL);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -152,7 +152,7 @@ void ModelAlign_TEST::AlignXCenter()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis);
+    QVERIFY(modelVis != NULL);
     gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
@@ -189,7 +189,7 @@ void ModelAlign_TEST::AlignXMax()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene);
+  QVERIFY(scene != NULL);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -228,7 +228,7 @@ void ModelAlign_TEST::AlignXMax()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis);
+    QVERIFY(modelVis != NULL);
     gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
@@ -266,7 +266,7 @@ void ModelAlign_TEST::AlignYMin()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene);
+  QVERIFY(scene != NULL);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -305,7 +305,7 @@ void ModelAlign_TEST::AlignYMin()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis);
+    QVERIFY(modelVis != NULL);
     gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
@@ -342,7 +342,7 @@ void ModelAlign_TEST::AlignYCenter()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene);
+  QVERIFY(scene != NULL);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -381,7 +381,7 @@ void ModelAlign_TEST::AlignYCenter()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis);
+    QVERIFY(modelVis != NULL);
     gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
@@ -419,7 +419,7 @@ void ModelAlign_TEST::AlignYMax()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene);
+  QVERIFY(scene != NULL);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -458,7 +458,7 @@ void ModelAlign_TEST::AlignYMax()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis);
+    QVERIFY(modelVis != NULL);
     gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
@@ -496,7 +496,7 @@ void ModelAlign_TEST::AlignZMin()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene);
+  QVERIFY(scene != NULL);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -535,7 +535,7 @@ void ModelAlign_TEST::AlignZMin()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis);
+    QVERIFY(modelVis != NULL);
     gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
@@ -572,7 +572,7 @@ void ModelAlign_TEST::AlignZCenter()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene);
+  QVERIFY(scene != NULL);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -611,7 +611,7 @@ void ModelAlign_TEST::AlignZCenter()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis);
+    QVERIFY(modelVis != NULL);
     gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
@@ -648,7 +648,7 @@ void ModelAlign_TEST::AlignZMax()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene);
+  QVERIFY(scene != NULL);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -687,7 +687,7 @@ void ModelAlign_TEST::AlignZMax()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis);
+    QVERIFY(modelVis != NULL);
     gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
