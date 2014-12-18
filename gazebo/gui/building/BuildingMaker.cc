@@ -32,6 +32,8 @@
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/EntityMaker.hh"
+#include "gazebo/gui/KeyEventHandler.hh"
+#include "gazebo/gui/MouseEventHandler.hh"
 
 #include "gazebo/common/SystemPaths.hh"
 #ifdef HAVE_GTS
@@ -160,6 +162,12 @@ BuildingMaker::BuildingMaker() : EntityMaker()
   this->connections.push_back(
   gui::editor::Events::ConnectChangeBuildingLevel(
     boost::bind(&BuildingMaker::OnChangeLevel, this, _1)));
+  this->connections.push_back(
+      gui::editor::Events::ConnectColorSelected(
+      boost::bind(&BuildingMaker::OnColorSelected, this, _1)));
+  this->connections.push_back(
+      gui::editor::Events::ConnectToggleEditMode(
+      boost::bind(&BuildingMaker::OnEdit, this, _1)));
 
   this->saveDialog =
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
@@ -174,11 +182,35 @@ BuildingMaker::~BuildingMaker()
 }
 
 /////////////////////////////////////////////////
+void BuildingMaker::OnEdit(bool _checked)
+{
+  if (_checked)
+  {
+    MouseEventHandler::Instance()->AddPressFilter("building_maker",
+        boost::bind(&BuildingMaker::On3dMousePress, this, _1));
+    MouseEventHandler::Instance()->AddReleaseFilter("building_maker",
+        boost::bind(&BuildingMaker::On3dMouseRelease, this, _1));
+    MouseEventHandler::Instance()->AddMoveFilter("building_maker",
+        boost::bind(&BuildingMaker::On3dMouseMove, this, _1));
+    KeyEventHandler::Instance()->AddPressFilter("building_maker",
+        boost::bind(&BuildingMaker::On3dKeyPress, this, _1));
+  }
+  else
+  {
+    MouseEventHandler::Instance()->RemovePressFilter("building_maker");
+    MouseEventHandler::Instance()->RemoveReleaseFilter("building_maker");
+    MouseEventHandler::Instance()->RemoveMoveFilter("building_maker");
+    KeyEventHandler::Instance()->RemovePressFilter("building_maker");
+  }
+}
+
+/////////////////////////////////////////////////
 void BuildingMaker::ConnectItem(const std::string &_partName,
     const EditorItem *_item)
 {
   BuildingModelManip *manip = this->allItems[_partName];
 
+  // item changes -> manip changes
   QObject::connect(_item, SIGNAL(SizeChanged(double, double, double)),
       manip, SLOT(OnSizeChanged(double, double, double)));
   QObject::connect(_item, SIGNAL(PoseChanged(double, double, double,
@@ -215,6 +247,10 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
   QObject::connect(_item, SIGNAL(YawChanged(double)),
       manip, SLOT(OnYawChanged(double)));
   QObject::connect(_item, SIGNAL(ItemDeleted()), manip, SLOT(OnDeleted()));
+
+  // manip changes -> item changes
+  QObject::connect(manip, SIGNAL(ColorChanged(QColor)),
+      _item, SLOT(OnColorChanged(QColor)));
 }
 
 /////////////////////////////////////////////////
@@ -344,7 +380,8 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = wallManip;
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
+      GZ_VISIBILITY_SELECTABLE);
   this->BuildingChanged();
   return linkName;
 }
@@ -508,7 +545,8 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
     stepVisual->SetRotation(baseStepVisual->GetRotation());
   }
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
+      GZ_VISIBILITY_SELECTABLE);
   this->BuildingChanged();
 
   return linkName;
@@ -556,7 +594,8 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   floorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = floorManip;
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
+      GZ_VISIBILITY_SELECTABLE);
   this->BuildingChanged();
   return linkName;
 }
@@ -564,12 +603,15 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
 /////////////////////////////////////////////////
 void BuildingMaker::RemovePart(const std::string &_partName)
 {
-  BuildingModelManip *manip = this->allItems[_partName];
-  if (!manip)
+  std::map<std::string, BuildingModelManip *>::const_iterator it =
+      this->allItems.find(_partName);
+  if (it == this->allItems.end())
   {
     gzerr << _partName << " does not exist\n";
     return;
   }
+  BuildingModelManip *manip = this->allItems[_partName];
+
   rendering::VisualPtr vis = manip->GetVisual();
   rendering::VisualPtr visParent = vis->GetParent();
   rendering::ScenePtr scene = vis->GetScene();
@@ -683,7 +725,7 @@ void BuildingMaker::SaveToSDF(const std::string &_savePath)
 void BuildingMaker::FinishModel()
 {
   this->CreateTheEntity();
-  this->Stop();
+  this->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -719,7 +761,7 @@ void BuildingMaker::GenerateSDF()
   std::stringstream collisionNameStream;
 
   modelElem->GetAttribute("name")->Set(
-    GetFolderNameFromModelName(this->modelName));
+      GetFolderNameFromModelName(this->modelName));
 
   std::map<std::string, BuildingModelManip *>::iterator itemsIt;
 
@@ -1260,6 +1302,7 @@ double BuildingMaker::ConvertAngle(double _angle)
   return GZ_DTOR(_angle);
 }
 
+/////////////////////////////////////////////////
 std::string BuildingMaker::GetTemplateConfigString()
 {
   std::ostringstream newModelStr;
@@ -1873,6 +1916,182 @@ void BuildingMaker::OnExit()
 
   gui::editor::Events::newBuildingModel();
   gui::editor::Events::finishBuildingModel();
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnColorSelected(QColor _color)
+{
+  this->selectedColor = _color;
+}
+
+/////////////////////////////////////////////////
+bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
+{
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
+    return false;
+
+  if (_event.dragging)
+  {
+    userCamera->HandleMouseEvent(_event);
+    return true;
+  }
+
+  if (!this->selectedColor.isValid())
+  {
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    userCamera->HandleMouseEvent(_event);
+    return true;
+  }
+
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+  // Highlight visual on hover
+  if (vis)
+  {
+    std::string visName = vis->GetParent()->GetName();
+
+    // Stairs have nested visuals
+    if (visName.find("Stair") != std::string::npos)
+    {
+      vis = vis->GetParent();
+      visName = vis->GetParent()->GetName();
+    }
+
+    if (this->hoverVis && this->hoverVis != vis)
+      this->ResetHoverVis();
+
+    // Only handle items from building being edited
+    visName = visName.substr(visName.find("::")+2);
+    std::map<std::string, BuildingModelManip *>::const_iterator it =
+        this->allItems.find(visName);
+    if (it == this->allItems.end())
+    {
+      userCamera->HandleMouseEvent(_event);
+      return true;
+    }
+
+    if (visName.find("Wall") != std::string::npos ||
+        visName.find("Floor") != std::string::npos ||
+        visName.find("Stair") != std::string::npos)
+    {
+      this->hoverVis = vis;
+      if (this->selectedColor.isValid())
+      {
+        common::Color newColor(this->selectedColor.red(),
+                               this->selectedColor.green(),
+                               this->selectedColor.blue());
+        this->hoverVis->SetAmbient(newColor);
+      }
+
+      this->hoverVis->SetTransparency(0);
+    }
+    else
+    {
+      this->ResetHoverVis();
+    }
+  }
+  else
+  {
+    this->ResetHoverVis();
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool BuildingMaker::On3dMousePress(const common::MouseEvent &_event)
+{
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
+    return false;
+
+  userCamera->HandleMouseEvent(_event);
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &_event)
+{
+  if (_event.button != common::MouseEvent::LEFT)
+  {
+    this->StopMaterialModes();
+    return true;
+  }
+
+  if (this->hoverVis)
+  {
+    std::string hoverName = this->hoverVis->GetParent()->GetName();
+    hoverName = hoverName.substr(hoverName.find("::")+2);
+
+    std::map<std::string, BuildingModelManip *>::const_iterator it =
+        this->allItems.find(hoverName);
+    if (it == this->allItems.end())
+    {
+      gzerr << "Visual " << hoverName << " is not part of the building but "
+            << "was hovered. This should never happen." << std::endl;
+    }
+    else
+    {
+      BuildingModelManip *manip = this->allItems[hoverName];
+      if (this->selectedColor.isValid())
+      {
+        manip->SetColor(this->selectedColor);
+      }
+    }
+    this->hoverVis.reset();
+  }
+  else
+  {
+    rendering::UserCameraPtr userCamera = gui::get_active_camera();
+    userCamera->HandleMouseEvent(_event);
+    this->StopMaterialModes();
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool BuildingMaker::On3dKeyPress(const common::KeyEvent &_event)
+{
+  if (_event.key == Qt::Key_Escape)
+  {
+    this->StopMaterialModes();
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::StopMaterialModes()
+{
+  this->ResetHoverVis();
+  this->selectedColor = QColor::Invalid;
+  gui::editor::Events::colorSelected(this->selectedColor.convertTo(
+      QColor::Invalid));
+  gui::editor::Events::createBuildingEditorItem(std::string());
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::ResetHoverVis()
+{
+  if (this->hoverVis)
+  {
+    std::string hoverName = this->hoverVis->GetParent()->GetName();
+    hoverName = hoverName.substr(hoverName.find("::")+2);
+
+    std::map<std::string, BuildingModelManip *>::const_iterator it =
+        this->allItems.find(hoverName);
+    if (it == this->allItems.end())
+    {
+      gzerr << "Visual " << hoverName << " is not part of the building but "
+            << "was hovered. This should never happen." << std::endl;
+    }
+    else
+    {
+      BuildingModelManip *manip = this->allItems[hoverName];
+      this->hoverVis->SetAmbient(manip->GetColor());
+      this->hoverVis->SetMaterial(manip->GetTexture());
+      this->hoverVis->SetTransparency(manip->GetTransparency());
+    }
+    this->hoverVis.reset();
+  }
 }
 
 /////////////////////////////////////////////////
