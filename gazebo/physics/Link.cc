@@ -446,12 +446,6 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
   }
 #endif
 
-  // Apply our linear accel
-  // this->SetForce(this->linearAccel);
-
-  // Apply our angular accel
-  // this->SetTorque(this->angularAccel);
-
   // FIXME: race condition on factory-based model loading!!!!!
    /*if (this->GetEnabled() != this->enabled)
    {
@@ -571,7 +565,7 @@ void Link::SetLinearAccel(const math::Vector3 &_accel)
 void Link::SetAngularAccel(const math::Vector3 &_accel)
 {
   this->SetEnabled(true);
-  this->angularAccel = _accel * this->inertial->GetMass();
+  this->angularAccel = _accel;
 }
 
 //////////////////////////////////////////////////
