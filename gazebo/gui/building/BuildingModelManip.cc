@@ -67,6 +67,12 @@ rendering::VisualPtr BuildingModelManip::GetVisual() const
 }
 
 /////////////////////////////////////////////////
+double BuildingModelManip::GetTransparency() const
+{
+  return this->transparency;
+}
+
+/////////////////////////////////////////////////
 common::Color BuildingModelManip::GetColor() const
 {
   return this->color;
@@ -315,7 +321,9 @@ void BuildingModelManip::OnTextureChanged(QString _texture)
 void BuildingModelManip::OnTransparencyChanged(float _transparency)
 {
   this->SetTransparency(_transparency);
-  this->maker->BuildingChanged();
+  // For now transparency is used only to aid in the preview and doesn't affect
+  // the saved building
+  // this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -376,8 +384,9 @@ void BuildingModelManip::SetColor(QColor _color)
 {
   common::Color newColor(_color.red(), _color.green(), _color.blue());
   this->color = newColor;
-  this->visual->GetParent()->SetAmbient(this->color);
+  this->visual->SetAmbient(this->color);
   this->maker->BuildingChanged();
+  emit ColorChanged(_color);
 }
 
 /////////////////////////////////////////////////
@@ -393,13 +402,20 @@ void BuildingModelManip::SetTexture(QString _texture)
   else if (_texture == ":bricks.png")
     this->texture = "Gazebo/Bricks";
 
-  this->visual->GetParent()->SetMaterial(this->texture);
+  this->visual->SetMaterial(this->texture);
 }
 
 /////////////////////////////////////////////////
 void BuildingModelManip::SetTransparency(float _transparency)
 {
-  this->visual->GetParent()->SetTransparency(_transparency);
+  this->transparency = _transparency;
+  this->visual->SetTransparency(this->transparency);
+}
+
+/////////////////////////////////////////////////
+void BuildingModelManip::SetVisible(bool _visible)
+{
+  this->visual->SetVisible(_visible);
 }
 
 /////////////////////////////////////////////////
@@ -418,9 +434,15 @@ int BuildingModelManip::GetLevel() const
 void BuildingModelManip::OnChangeLevel(int _level)
 {
   if (this->level > _level)
-    this->SetTransparency(1.0);
+    this->SetVisible(false);
   else if (this->level < _level)
+  {
+    this->SetVisible(true);
     this->SetTransparency(0.0);
+  }
   else
+  {
+    this->SetVisible(true);
     this->SetTransparency(0.4);
+  }
 }

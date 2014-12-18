@@ -49,6 +49,10 @@
 1. **gazebo/physics/Collision.hh**
     + unsigned int GetShapeType()
 
+1. **gazebo/physics/World.hh**
+    + EntityPtr GetSelectedEntity() const
+
+
 ## Gazebo 3.1 to 4.0
 
 ### New Deprecations

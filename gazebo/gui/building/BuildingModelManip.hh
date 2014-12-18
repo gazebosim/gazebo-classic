@@ -56,6 +56,10 @@ namespace gazebo
       /// \return A pointer to the visual object.
       public: rendering::VisualPtr GetVisual() const;
 
+      /// \brief Get the transparency of the manip.
+      /// \return Transparency.
+      public: double GetTransparency() const;
+
       /// \brief Get the color of the manip.
       /// \return Color.
       public: common::Color GetColor() const;
@@ -150,13 +154,22 @@ namespace gazebo
       /// \param[in] _transparency Transparency.
       public: void SetTransparency(float _transparency);
 
+      /// \brief Set the visibility of the manip.
+      /// \param[in] _visible True for visible, false for invisible.
+      public: void SetVisible(bool _visible);
+
       /// \brief Set the level for this manip.
       /// \param[in] _level The level for this manip.
       public: void SetLevel(const int _level);
 
       /// \brief Get the level for this manip.
-      /// \reutrn The level for this manip.
+      /// \return The level for this manip.
       public: int GetLevel() const;
+
+      /// \brief Qt signal emitted when the manip's color has changed from the
+      /// 3D view.
+      /// \param[in] _color New color.
+      Q_SIGNALS: void ColorChanged(QColor _color);
 
       /// \brief Qt callback when the pose of the associated editor item has
       /// changed.
@@ -287,6 +300,9 @@ namespace gazebo
 
       /// \brief Parent manip.
       private: BuildingModelManip *parent;
+
+      /// \brief Visual's transparency.
+      private: double transparency;
 
       /// \brief Visual's color.
       private: common::Color color;
