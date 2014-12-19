@@ -1157,12 +1157,6 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
   if (totCount == 0)
     return;
 
-  if (!floatArrayXml->GetText())
-  {
-    gzerr << "Unable to read the <float_array> value\n";
-    return;
-  }
-
   boost::unordered_map<math::Vector2d, unsigned int, Vector2dHash> unique;
 
   // Read the raw texture values, and split them on spaces.
