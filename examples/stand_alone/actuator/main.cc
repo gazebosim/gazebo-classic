@@ -26,10 +26,10 @@ int main(int _argc, char **_argv)
   const int extraIterations = 5;
   const int sampleTimesteps = 10;
 
-  // TODO: read index and maximumVelocity from SDF
+  // TODO: read index and maximumTargetVelocity from SDF
   const int index = 0;
-  const float maximumVelocity = 500;
-  const float velocityStep = maximumVelocity / (float) maxIterations;
+  const float maximumTargetVelocity = 500;
+  const float velocityStep = maximumTargetVelocity / (float) maxIterations;
 
   // Initialize gazebo.
   gazebo::setupServer(_argc, _argv);
@@ -37,6 +37,11 @@ int main(int _argc, char **_argv)
   // Load a world with two models: one actuated, one not
   gazebo::physics::WorldPtr world =
     gazebo::loadWorld("../actuator_example.world");
+  if (!world)
+  {
+    std::cout << "Could not load world actuator_example" << std::endl;
+    return -1;
+  }
 
   // Get the models and pointers to their joints
   std::vector<std::string> modelNames;
@@ -52,13 +57,13 @@ int main(int _argc, char **_argv)
     gazebo::physics::ModelPtr model = world->GetModel(modelNames[i]);
     if (!model)
     {
-      gzerr << "Couldn't find model: " << modelNames[i] << std::endl;
+      std::cout << "Couldn't find model: " << modelNames[i] << std::endl;
       continue;
     }
     gazebo::physics::JointPtr joint = model->GetJoint(jointName);
     if (!joint)
     {
-      gzerr << "Couldn't find joint: " << jointName << std::endl;
+      std::cout << "Couldn't find joint: " << jointName << std::endl;
       continue;
     }
     joints.push_back(joint);
@@ -84,6 +89,11 @@ int main(int _argc, char **_argv)
     // Command joint speed for this timestep
     for (unsigned int j = 0; j < joints.size(); j++)
     {
+      if (!joints[i])
+      {
+        std::cout << "got NULL joint in actuator example main.cc" << std::endl;
+        continue;
+      }
       joints[i]->SetVelocity(index, velocityStep*i);
     }
 
@@ -109,4 +119,5 @@ int main(int _argc, char **_argv)
   // Close everything.
   fileStream.close();
   gazebo::shutdown();
+  return 0;
 }

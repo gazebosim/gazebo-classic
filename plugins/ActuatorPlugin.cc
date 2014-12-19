@@ -19,21 +19,22 @@
 
 using namespace gazebo;
 
-float ElectricMotorModel(const float speed,
- const ActuatorProperties &properties)
+float ElectricMotorModel(const float _speed,
+ const ActuatorProperties &_properties)
 {
-  if (speed > properties.maximumVelocity)
-    return properties.power / properties.maximumVelocity;
+  if (_speed > _properties.maximumVelocity)
+    return _properties.power / _properties.maximumVelocity;
 
-  float torque = properties.power / speed;
+  float torque = _properties.power / _speed;
 
-  if (torque > properties.maximumTorque)
-    return properties.maximumTorque;
+  if (torque > _properties.maximumTorque)
+    return _properties.maximumTorque;
 
   return torque;
 }
 
-float NullModel(const float /*speed*/, const ActuatorProperties &/*properties*/)
+float NullModel(const float /*_speed*/,
+                const ActuatorProperties &/*_properties*/)
 {
   return 0;
 }
@@ -115,6 +116,7 @@ void ActuatorPlugin::WorldUpdateCallback()
     const int index = this->actuators[i].jointIndex;
     const float velocity = this->joints[i]->GetVelocity(index);
     float force = this->joints[i]->GetForce(index);
+    force += this->actuators[i].modelFunction(velocity, this->actuators[i]);
     this->joints[i]->SetForce(index, force);
   }
 }
