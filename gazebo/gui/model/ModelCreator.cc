@@ -953,7 +953,7 @@ void ModelCreator::GenerateSDF()
 
   // loop through all parts and generate sdf
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
-       ++partsIt)
+      ++partsIt)
   {
     visualNameStream.str("");
     collisionNameStream.str("");
