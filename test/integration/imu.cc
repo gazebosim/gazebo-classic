@@ -27,10 +27,38 @@ using namespace gazebo;
 class ImuTest : public ServerFixture,
                 public testing::WithParamInterface<const char*>
 {
+  /// \brief start imu_sensor_test.world, which contains a pendulum,
+  /// a sphere with frictional contact, a sphere with frictionless
+  /// contact and a ramp.  Each model has an IMU attached.
+  /// This test check results to make sure the readings adhere to
+  /// each simple model under gravity.
+  public: void ImuSensorTestWorld(const std::string &_physicsEngine);
+
+  /// \brief Spawn a static model with an ImuSensor attached
+  /// in the empty world.  Test basic IMU outputs.
   public: void Stationary_EmptyWorld(const std::string &_physicsEngine);
+
+  /// \brief Spawn a static model with an ImuSensor attached
+  /// in the empty world.  Test basic IMU outputs with noise enabled.
   public: void Stationary_EmptyWorld_Noise(const std::string &_physicsEngine);
+
+  /// \brief Spawn a static model with an ImuSensor attached
+  /// in the empty world.  Test basic IMU outputs with bias enabled.
   public: void Stationary_EmptyWorld_Bias(const std::string &_physicsEngine);
+
+  /// \breif Return gravity rotated by some orientation
+  /// \param[in] _rot User specified rotation
+  /// \param[out] _g gravity in user specified orientation
   private: void GetGravity(const math::Quaternion& _rot, math::Vector3 &_g);
+
+  /// \breif Collect a number of samples and return the average
+  /// rate and accel values
+  /// \param[in] _imu Pointer to sensor
+  /// \param[in] _cnt number of samples to tak
+  /// \param[out] _rateMean average angular rates over samples
+  /// \param[out] _accelMean average accelerations over samples
+  /// \param[out] _orientation orientation of the imu at the end of sample
+  /// period
   private: void GetImuData(sensors::ImuSensorPtr _imu, unsigned int _cnt,
                            math::Vector3 &_rateMean,
                            math::Vector3 &_accelMean,
@@ -78,6 +106,241 @@ void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
   _rateMean = rateSum / _cnt;
   _accelMean = accelSum / _cnt;
   _orientation = _imu->GetOrientation();
+}
+
+void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
+{
+  if (_physicsEngine != "ode")
+  {
+    gzerr << "not working yet for anything other than ode. see issue #9999.\n";
+    return;
+  }
+
+  Load("worlds/imu_sensor_test.world", true, _physicsEngine);
+
+  // get world
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // get physics engine
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics);
+
+  // get pendulum
+  std::string pendulumName = "model_pendulum";
+  physics::ModelPtr pendulumModel = world->GetModel(pendulumName);
+  ASSERT_TRUE(pendulumModel);
+
+  std::string pendulumSensorName = "pendulum_imu_sensor";
+  sensors::ImuSensorPtr pendulumImu =
+    boost::static_pointer_cast<sensors::ImuSensor>(
+        sensors::SensorManager::Instance()->GetSensor(pendulumSensorName));
+  ASSERT_TRUE(pendulumImu);
+  pendulumImu->Init();
+
+  // get friction ball
+  std::string ballFrictionName = "model_ball";
+  physics::ModelPtr ballFrictionModel = world->GetModel(ballFrictionName);
+  ASSERT_TRUE(ballFrictionModel);
+
+  std::string ballFrictionSensorName = "ball_imu_sensor";
+  sensors::ImuSensorPtr ballFrictionImu =
+    boost::static_pointer_cast<sensors::ImuSensor>(
+    sensors::SensorManager::Instance()->GetSensor(ballFrictionSensorName));
+  ASSERT_TRUE(ballFrictionImu);
+  ballFrictionImu->Init();
+
+  // get frictionless ball
+  std::string ballNoFrictionName = "model_ball_no_friction";
+  physics::ModelPtr ballNoFrictionModel = world->GetModel(ballNoFrictionName);
+  ASSERT_TRUE(ballNoFrictionModel);
+
+  std::string ballNoFrictionSensorName = "ball_no_friction_imu_sensor";
+  sensors::ImuSensorPtr ballNoFrictionImu =
+    boost::static_pointer_cast<sensors::ImuSensor>(
+    sensors::SensorManager::Instance()->GetSensor(ballNoFrictionSensorName));
+  ASSERT_TRUE(ballNoFrictionImu);
+  ballNoFrictionImu->Init();
+
+  // get gravity
+  math::Vector3 g = physics->GetGravity();
+
+  // run for 1900 steps (Step(1) each time), or 1.9 seconds, enough
+  // to capture what we need from this experiment.
+  for (unsigned n = 0; n < 1900; ++n)
+  {
+    world->Step(1);
+    // gzdbg << "time: " << world->GetSimTime().Double() << "\n";
+
+    // pendulum
+    // on startup
+    //   sensor linear accel [0 0 0]
+    //   Link::GetRelativeLinearAccel() [0 0 -9.81]
+    //   Link::GetWorldLinearAccel() [0 0 -9.81]
+    // @T=1.872 sec, at max lowest position
+    //   sensor linear accel [-0 -0.041216 29.4258]
+    //   Link::GetRelativeLinearAccel() [-0 -0.008923 19.6159]
+    //   Link::GetWorldLinearAccel() [-0 0.055649 19.6158]
+    {
+      // get states from imu sensor
+      math::Vector3 imuLinearAccel = pendulumImu->GetLinearAcceleration();
+      // get states from link
+      math::Vector3 relativeLinearAccel =
+        pendulumModel->GetRelativeLinearAccel();
+      math::Vector3 worldLinearAccel =
+        pendulumModel->GetWorldLinearAccel();
+
+      if (world->GetSimTime().Double() == 1.872)
+      {
+        // initial values
+        EXPECT_NEAR(imuLinearAccel.x, 0, IMU_TOL);
+        EXPECT_NEAR(imuLinearAccel.y, -0.041216, IMU_TOL);
+        EXPECT_NEAR(imuLinearAccel.z, 29.42581726, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.x, 0, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.y, -0.036397, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.z, 19.6158848, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.x, 0, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.y, -0.0267709, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.z, 19.6159003, IMU_TOL);
+      }
+      else
+      {
+        // initial values
+        EXPECT_LE(imuLinearAccel.z, 29.4259);
+        EXPECT_LE(relativeLinearAccel.z, 19.616);
+        EXPECT_LE(worldLinearAccel.z, 19.616);
+      }
+    }
+
+    // friction ball
+    // before contact
+    //   sensor linear accel [0 0 0]
+    //   Link::GetRelativeLinearAccel() [0 0 -9.81]
+    //   Link::GetWorldLinearAccel() [0 0 -9.81]
+    //
+    // @T=1.2 sec, on ramp - varies, e.g.
+    //   sensor linear accel [-7.81558 0 3.71003]
+    //   Link::GetRelativeLinearAccel() [1.98569 0 3.29613]
+    //   Link::GetWorldLinearAccel() [3.37698 0 -1.84485]
+    //
+    // @T=1.849 sec, on ground - sensor vector rotates
+    //   sensor linear accel [-2.93844 0 9.35958]
+    //   Link::GetRelativeLinearAccel() [0 0 0]
+    //   Link::GetWorldLinearAccel() [0 0 0]
+    {
+      // get states from imu sensor
+      math::Vector3 imuLinearAccel = ballFrictionImu->GetLinearAcceleration();
+      // get states from link
+      math::Vector3 relativeLinearAccel =
+        ballFrictionModel->GetRelativeLinearAccel();
+      math::Vector3 worldLinearAccel =
+        ballFrictionModel->GetWorldLinearAccel();
+
+      if (world->GetSimTime().Double() <= 1.0)
+      {
+        // freefall
+        EXPECT_NEAR(imuLinearAccel.x, 0, IMU_TOL);
+        EXPECT_NEAR(imuLinearAccel.y, 0, IMU_TOL);
+        EXPECT_NEAR(imuLinearAccel.z, 0, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.x, g.x, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.y, g.y, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.z, g.z, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.x, g.x, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.y, g.y, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.z, g.z, IMU_TOL);
+      }
+      // should use contact detector for these timing stuff
+      else if (world->GetSimTime().Double() >= 1.2 &&
+               world->GetSimTime().Double() <= 1.84)
+      {
+        // on ramp
+        // ...hm, not much can be said in simple terms, leave out for now.
+      }
+      else if (world->GetSimTime().Double() >= 1.85)
+      {
+        // on the ground
+        double imuMag = imuLinearAccel.GetLength();
+        double gMag = g.GetLength();
+        EXPECT_NEAR(imuMag, gMag, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.x, 0, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.y, 0, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.z, 0, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.x, 0, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.y, 0, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.z, 0, IMU_TOL);
+      }
+    }
+
+    // frictionless ball
+    // before contact
+    //   sensor linear accel [0 0 0]
+    //   Link::GetRelativeLinearAccel() [0 0 -9.81]
+    //   Link::GetWorldLinearAccel() [0 0 -9.81]
+    // @T=1.2 sec, on ramp - constant
+    //   sensor linear accel [4.12742 0 7.55518]
+    //   Link::GetRelativeLinearAccel() [4.12742 0 -2.25482]
+    //   Link::GetWorldLinearAccel() [4.12742 0 -2.25482]
+    // @T=1.8 sec, on ground - constant
+    //   sensor linear accel [0 0 9.81]
+    //   Link::GetRelativeLinearAccel() [0 0 0]
+    //   Link::GetWorldLinearAccel() [0 0 0]
+    {
+      // get states from imu sensor
+      math::Vector3 imuLinearAccel =
+        ballNoFrictionImu->GetLinearAcceleration();
+      // get states from link
+      math::Vector3 relativeLinearAccel =
+        ballNoFrictionModel->GetRelativeLinearAccel();
+      math::Vector3 worldLinearAccel =
+        ballNoFrictionModel->GetWorldLinearAccel();
+
+      if (world->GetSimTime().Double() <= 1.0)
+      {
+        // freefall
+        EXPECT_NEAR(imuLinearAccel.x, 0, IMU_TOL);
+        EXPECT_NEAR(imuLinearAccel.y, 0, IMU_TOL);
+        EXPECT_NEAR(imuLinearAccel.z, 0, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.x, g.x, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.y, g.y, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.z, g.z, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.x, g.x, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.y, g.y, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.z, g.z, IMU_TOL);
+      }
+      else if (world->GetSimTime().Double() >= 1.3 &&
+               world->GetSimTime().Double() <= 1.751)
+      {
+        // on the ramp
+        const double rampAngle = 0.5;
+        double gMag = g.GetLength();
+        double imuMag = imuLinearAccel.GetLength();
+        EXPECT_NEAR(imuMag, gMag*cos(rampAngle), IMU_TOL);
+
+        double relMag = relativeLinearAccel.GetLength();
+        EXPECT_NEAR(relMag, gMag*sin(rampAngle), IMU_TOL);
+        double worMag = worldLinearAccel.GetLength();
+        EXPECT_NEAR(worMag, gMag*sin(rampAngle), IMU_TOL);
+      }
+      else if (world->GetSimTime().Double() >= 1.8)
+      {
+        // on the ground
+        double imuMag = imuLinearAccel.GetLength();
+        double gMag = g.GetLength();
+        EXPECT_NEAR(imuMag, gMag, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.x, 0, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.y, 0, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.z, 0, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.x, 0, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.y, 0, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.z, 0, IMU_TOL);
+      }
+    }
+  }
+}
+
+TEST_P(ImuTest, ImuSensorTestWorld)
+{
+  ImuSensorTestWorld(GetParam());
 }
 
 void ImuTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
