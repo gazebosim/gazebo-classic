@@ -916,7 +916,7 @@ void ColladaLoader::LoadPositions(const std::string &_id,
       }
     }
 
-    if (count > 0)
+    if (count)
     {
       gzerr << "Vertex source missing float_array element, "
         << "or count is invalid.\n";
@@ -1770,7 +1770,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
 
     // It's possible that the triangle count is zero. In this case, we
     // should not output an error message
-    if (count > 0)
+    if (count)
     {
       gzerr << "Collada file[" << this->dataPtr->filename
         << "] is invalid. Loading what we can...\n";
