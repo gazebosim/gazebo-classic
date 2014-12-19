@@ -1090,6 +1090,15 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
 
     return;
   }
+  // Read in the total number of texture coordinate values
+  else if (floatArrayXml->Attribute("count"))
+    totCount = boost::lexical_cast<int>(floatArrayXml->Attribute("count"));
+  else
+  {
+    gzerr << "<float_array> has no count attribute in texture coordinate "
+          << "element with id[" << _id << "]\n";
+    return;
+  }
 
   // The technique_common holds an <accessor> element that indicates how to
   // parse the float array.
@@ -1107,16 +1116,6 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
   {
     gzerr << "Unable to find <accessor> as a child of <technique_common> "
           << "for texture coordinates with id[" << _id << "]\n";
-    return;
-  }
-
-  // Read in the total number of texture coordinate values
-  if (floatArrayXml->Attribute("count"))
-    totCount = boost::lexical_cast<int>(floatArrayXml->Attribute("count"));
-  else
-  {
-    gzerr << "<float_array> has no count attribute in texture coordinate "
-          << "element with id[" << _id << "]\n";
     return;
   }
 
