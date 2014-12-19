@@ -30,6 +30,7 @@ set (plugins
   DiffDrivePlugin
   ForceTorquePlugin
   GpuRayPlugin
+  ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin
   LiftDragPlugin

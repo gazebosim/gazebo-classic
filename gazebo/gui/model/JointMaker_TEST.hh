@@ -14,25 +14,22 @@
  * limitations under the License.
  *
 */
-#include "plugins/ExceptionModelPluginConstructor.hh"
 
-using namespace gazebo;
-GZ_REGISTER_MODEL_PLUGIN(ExceptionModelPluginConstructor)
+#ifndef _JOINT_MAKER_TEST_HH_
+#define _JOINT_MAKER_TEST_HH_
 
-/////////////////////////////////////////////////
-ExceptionModelPluginConstructor::ExceptionModelPluginConstructor()
-  : ModelPlugin()
+#include "gazebo/gui/QTestFixture.hh"
+
+/// \brief A test class for the JointMaker class.
+class JointMaker_TEST : public QTestFixture
 {
-  throw std::runtime_error("Example error");
-}
+  Q_OBJECT
 
-/////////////////////////////////////////////////
-ExceptionModelPluginConstructor::~ExceptionModelPluginConstructor()
-{
-}
+  /// \brief Test joint states
+  private slots: void JointState();
 
-/////////////////////////////////////////////////
-void ExceptionModelPluginConstructor::Load(physics::ModelPtr /*_model*/,
-                           sdf::ElementPtr /*_sdf*/)
-{
-}
+  /// \brief Test creating and removing joints
+  private slots: void CreateRemoveJoint();
+};
+
+#endif

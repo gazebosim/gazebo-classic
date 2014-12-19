@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,18 @@
 #ifndef _MODEL_CREATOR_HH_
 #define _MODEL_CREATOR_HH_
 
+#include <boost/unordered/unordered_map.hpp>
+#include <sdf/sdf.hh>
+
 #include <list>
 #include <string>
 #include <vector>
 
-#include <boost/unordered/unordered_map.hpp>
-
-#include <sdf/sdf.hh>
-
 #include "gazebo/common/KeyEvent.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/transport/TransportTypes.hh"
-
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/JointMaker.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -85,7 +82,7 @@ namespace gazebo
       public: std::string GetModelName() const;
 
       /// \brief Finish the model and create the entity on the gzserver.
-       public: void FinishModel();
+      public: void FinishModel();
 
       /// \brief Add a box to the model.
       /// \param[in] _size Size of the box.
@@ -121,8 +118,7 @@ namespace gazebo
 
       /// \brief Add a joint to the model.
       /// \param[in] _type Type of joint to add.
-      /// \return Name of the joint that has been added.
-      public: void AddJoint(JointMaker::JointType _type);
+      public: void AddJoint(const std::string &_type);
 
       /// \brief Remove a part from the model.
       /// \param[in] _partName Name of the part to remove
@@ -192,9 +188,23 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
 
+      /// \brief Callback when the manipulation mode has changed.
+      /// \param[in] _mode New manipulation mode.
+      private: void OnManipMode(const std::string &_mode);
+
+      /// \brief Callback when an entity is selected.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _mode Select model
+      private: void OnSetSelectedEntity(const std::string &_name,
+          const std::string &_mode);
+
       /// \brief Create part with default properties from a visual
       /// \param[in] _visual Visual used to create the part.
       private: void CreatePart(const rendering::VisualPtr &_visual);
+
+      /// \brief Open the part inspector.
+      /// \param[in] _name Name of part.
+      private: void OpenInspector(const std::string &_name);
 
       // Documentation inherited
       private: virtual void CreateTheEntity();
@@ -224,7 +234,7 @@ namespace gazebo
       private: void DeselectAll();
 
       /// \brief Qt callback when a delete signal has been emitted.
-      /// \param[in] _name Name of the part or model to delete.
+      /// \param[in] _name Name of the entity to delete.
       private slots: void OnDelete(const std::string &_name="");
 
       /// \brief Qt signal when the a part has been added.
@@ -306,65 +316,18 @@ namespace gazebo
 
       /// \brief The last mouse event
       private: common::MouseEvent lastMouseEvent;
+
+      /// \brief Part visual that is currently being inspected.
+      private: rendering::VisualPtr inspectVis;
+
+      /// \brief True if the model editor mode is active.
+      private: bool active;
+
+      /// \brief Current model manipulation mode.
+      private: std::string manipMode;
     };
     /// \}
-
-    /// \class SensorData SensorData.hh
-    /// \brief Helper class to store sensor data
-    class GAZEBO_VISIBLE SensorData
-    {
-      /// \brief Name of sensor.
-      public: std::string name;
-
-      /// \brief Type of sensor.
-      public: std::string type;
-
-      /// \brief Pose of sensor.
-      public: math::Vector3 pose;
-
-      /// \brief True to visualize sensor.
-      public: bool visualize;
-
-      /// \brief True to set sensor to be always on.
-      public: bool alwaysOn;
-
-      /// \brief Sensor topic name.
-      public: std::string topicName;
-    };
-
-    /// \class PartData PartData.hh
-    /// \brief Helper class to store part data
-    class GAZEBO_VISIBLE PartData : public QObject
-    {
-      Q_OBJECT
-
-      /// \brief Name of part.
-      public: std::string name;
-
-      /// \brief Visuals of the part.
-      public: std::vector<rendering::VisualPtr> visuals;
-
-      /// \brief True to enable gravity on part.
-      public: bool gravity;
-
-      /// \brief True to allow self collision.
-      public: bool selfCollide;
-
-      /// \brief True to make part kinematic.
-      public: bool kinematic;
-
-      /// \brief Pose of part.
-      public: math::Pose pose;
-
-      /// \brief Inertial properties of part.
-      public: physics::Inertial *inertial;
-
-      /// \brief Collision properties of part.
-      public: std::vector<physics::CollisionPtr> collisions;
-
-      /// \brief Sensor data
-      public: SensorData *sensorData;
-    };
   }
 }
+
 #endif
