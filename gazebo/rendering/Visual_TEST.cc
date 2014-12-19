@@ -79,10 +79,10 @@ TEST_F(Visual_TEST, BoundingBox)
 
   // verify scaled bounding box dimensions
   math::Box newBoundingBox = visual->GetBoundingBox();
-  EXPECT_EQ(newBoundingBox.min, newScale*bboxMin);
-  EXPECT_EQ(newBoundingBox.max, newScale*bboxMax);
-  EXPECT_EQ(newBoundingBox.min, math::Vector3(-1, -1.5, -2));
-  EXPECT_EQ(newBoundingBox.max, math::Vector3(1, 1.5, 2));
+  EXPECT_EQ(newScale*newBoundingBox.min, newScale*bboxMin);
+  EXPECT_EQ(newScale*newBoundingBox.max, newScale*bboxMax);
+  EXPECT_EQ(newScale*newBoundingBox.min, math::Vector3(-1, -1.5, -2));
+  EXPECT_EQ(newScale*newBoundingBox.max, math::Vector3(1, 1.5, 2));
 }
 
 /////////////////////////////////////////////////
