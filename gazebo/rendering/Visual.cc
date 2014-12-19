@@ -1341,6 +1341,9 @@ void Visual::SetTransparency(float _trans)
     if (!entity)
       continue;
 
+    if (entity->getName().find("__COLLISION_VISUAL__") != std::string::npos)
+      continue;
+
     // For each ogre::entity
     for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
     {
