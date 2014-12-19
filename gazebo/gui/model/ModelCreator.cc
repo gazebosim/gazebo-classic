@@ -942,7 +942,7 @@ void ModelCreator::GenerateSDF()
   // set center of all parts to be origin
   math::Vector3 mid;
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
-      ++partsIt)
+       ++partsIt)
   {
     PartData *part = partsIt->second;
     mid += part->partVisual->GetWorldPose().pos;
@@ -953,7 +953,7 @@ void ModelCreator::GenerateSDF()
 
   // loop through all parts and generate sdf
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
-      ++partsIt)
+       ++partsIt)
   {
     visualNameStream.str("");
     collisionNameStream.str("");

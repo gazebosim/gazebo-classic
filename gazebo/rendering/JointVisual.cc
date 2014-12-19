@@ -77,7 +77,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
 
     // attach axis2 to this visual
     msgs::Axis axis2Msg = _msg->axis2();
-    dPtr->arrow2Visual = this->CreateAxisVisual(msgs::Convert(axis2Msg.xyz()),
+    dPtr->arrowVisual = this->CreateAxis(msgs::Convert(axis2Msg.xyz()),
         axis2Msg.use_parent_model_frame(), _msg->type());
 
     dPtr->parentAxisVis = jointVis;
@@ -87,7 +87,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
     // for all other joint types:
     // axis1 is attached to child link
     msgs::Axis axis1Msg = _msg->axis1();
-    dPtr->arrow1Visual = this->CreateAxisVisual(msgs::Convert(axis1Msg.xyz()),
+    dPtr->arrowVisual = this->CreateAxis(msgs::Convert(axis1Msg.xyz()),
         axis1Msg.use_parent_model_frame(), _msg->type());
   }
 
@@ -104,7 +104,7 @@ void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
   Visual::Load();
 
   msgs::Axis axis1Msg = _msg->axis1();
-  dPtr->arrow1Visual = this->CreateAxisVisual(msgs::Convert(axis1Msg.xyz()),
+  dPtr->arrowVisual = this->CreateAxis(msgs::Convert(axis1Msg.xyz()),
       axis1Msg.use_parent_model_frame(), _msg->type());
 
   // joint pose is always relative to the child link so update axis pose
@@ -115,7 +115,7 @@ void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
 }
 
 /////////////////////////////////////////////////
-ArrowVisualPtr JointVisual::CreateAxisVisual(const math::Vector3 &_axis, bool _useParentFrame,
+ArrowVisualPtr JointVisual::CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
     msgs::Joint::Type _type)
 {
   ArrowVisualPtr axis;
@@ -127,9 +127,27 @@ ArrowVisualPtr JointVisual::CreateAxisVisual(const math::Vector3 &_axis, bool _u
   axis->Load();
   axis->SetMaterial("Gazebo/YellowTransparent");
 
-  this->UpdateAxisVisual(axis, _axis, _useParentFrame, _type);
+  this->UpdateAxis(axis, _axis, _useParentFrame, _type);
 
   return axis;
+}
+
+/////////////////////////////////////////////////
+JointVisualPtr JointVisual::GetParentAxisVisual() const
+{
+  JointVisualPrivate *dPtr =
+      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
+
+  return dPtr->parentAxisVis;
+}
+
+/////////////////////////////////////////////////
+ArrowVisualPtr JointVisual::GetArrowVisual() const
+{
+  JointVisualPrivate *dPtr =
+      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
+
+  return dPtr->arrowVisual;
 }
 
 /////////////////////////////////////////////////
@@ -156,43 +174,92 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
     this->SetRotation(msgs::Convert(_msg->pose().orientation()));
   }
 
-  if (dPtr->arrow1Visual)
-    dPtr->arrow1Visual->SetVisible(false);
-  if (_msg->has_axis1())
+  // Hide current axes and show all XYZ heads
+  if (dPtr->arrowVisual)
+    dPtr->arrowVisual->SetVisible(false);
+
+  ArrowVisualPtr axis2Visual = NULL;
+  if (dPtr->parentAxisVis)
   {
-    msgs::Axis axis1Msg = _msg->axis1();
-    if (dPtr->arrow1Visual)
-    {
-      this->UpdateAxisVisual(dPtr->arrow1Visual, msgs::Convert(axis1Msg.xyz()),
-          axis1Msg.use_parent_model_frame(), _msg->type());
-    }
-    else
-    {
-      dPtr->arrow1Visual = this->CreateAxisVisual(msgs::Convert(axis1Msg.xyz()),
-          axis1Msg.use_parent_model_frame(), _msg->type());
-    }
+    axis2Visual = dPtr->parentAxisVis->GetArrowVisual();
+    if (axis2Visual)
+      axis2Visual->SetVisible(false);
   }
 
-  if (dPtr->arrow2Visual)
-    dPtr->arrow2Visual->SetVisible(false);
+  if (dPtr->axisVisual)
+  {
+    dPtr->axisVisual->ShowAxisHead(0, true);
+    dPtr->axisVisual->ShowAxisHead(1, true);
+    dPtr->axisVisual->ShowAxisHead(2, true);
+  }
+
+  msgs::Axis axis1Msg;
+  msgs::Axis axis2Msg;
+  // Now has 2 axes
   if (_msg->has_axis2())
   {
-    msgs::Axis axis2Msg = _msg->axis2();
-    if (dPtr->arrow2Visual)
+    axis1Msg = _msg->axis1();
+    axis2Msg = _msg->axis2();
+    // Previously already had 2 axes
+    if (axis2Visual)
     {
-      this->UpdateAxisVisual(dPtr->arrow2Visual, msgs::Convert(axis2Msg.xyz()),
+      this->UpdateAxis(dPtr->arrowVisual, msgs::Convert(axis1Msg.xyz()),
+          axis1Msg.use_parent_model_frame(), _msg->type());
+      this->UpdateAxis(axis2Visual, msgs::Convert(axis2Msg.xyz()),
           axis2Msg.use_parent_model_frame(), _msg->type());
     }
     else
     {
-      dPtr->arrow2Visual = this->CreateAxisVisual(msgs::Convert(axis2Msg.xyz()),
-          axis2Msg.use_parent_model_frame(), _msg->type());
+      VisualPtr parentVis;
+      if (_msg->has_parent() && _msg->parent() == "world")
+        parentVis = this->GetScene()->GetWorldVisual();
+      else if (_msg->has_parent_id())
+        parentVis = this->GetScene()->GetVisual(_msg->parent_id());
+      else
+        parentVis = this->GetScene()->GetWorldVisual();
+
+      JointVisualPtr jointVis;
+      jointVis.reset(new JointVisual(this->GetName() + "_parent_", parentVis));
+      jointVis->Load(_msg,
+          msgs::Convert(_msg->pose()) + this->GetParent()->GetWorldPose());
+
+      dPtr->parentAxisVis = jointVis;
+
+      // Previously had 1 axis, which becomes axis 2 now
+      if (dPtr->arrowVisual)
+      {
+        this->UpdateAxis(dPtr->arrowVisual, msgs::Convert(axis2Msg.xyz()),
+            axis2Msg.use_parent_model_frame(), _msg->type());
+      }
+      // Previously had no axis
+      else
+      {
+        dPtr->arrowVisual = this->CreateAxis(msgs::Convert(axis2Msg.xyz()),
+            axis2Msg.use_parent_model_frame(), _msg->type());
+      }
+    }
+  }
+  // Now has 1 axis
+  else if (_msg->has_axis1())
+  {
+    axis1Msg = _msg->axis1();
+    // Previously had at least 1 axis
+    if (dPtr->arrowVisual)
+    {
+      this->UpdateAxis(dPtr->arrowVisual, msgs::Convert(axis1Msg.xyz()),
+          axis1Msg.use_parent_model_frame(), _msg->type());
+    }
+    // Previously had no axis
+    else
+    {
+      dPtr->arrowVisual = this->CreateAxis(msgs::Convert(axis1Msg.xyz()),
+          axis1Msg.use_parent_model_frame(), _msg->type());
     }
   }
 }
 
 /////////////////////////////////////////////////
-void JointVisual::UpdateAxisVisual(ArrowVisualPtr _arrowVisual,
+void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
     const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
 {
   JointVisualPrivate *dPtr =
@@ -232,39 +299,38 @@ void JointVisual::UpdateAxisVisual(ArrowVisualPtr _arrowVisual,
     _arrowVisual->ShowRotation(false);
   }
 
+  if (dPtr->axisVisual)
+  {
+    _arrowVisual->SetVisible(true);
+  }
+  else
+  {
+    return;
+  }
+
+  // Hide existing arrow head if it overlaps with the axis
   math::Quaternion axisWorldRotation = _arrowVisual->GetWorldPose().rot;
   math::Quaternion jointWorldRotation = this->GetWorldPose().rot;
 
-  // Hide existing arrow head if it overlaps with the axis
   dPtr->axisVisual->ShowAxisHead(0, true);
   dPtr->axisVisual->ShowAxisHead(1, true);
   dPtr->axisVisual->ShowAxisHead(2, true);
   _arrowVisual->ShowShaft(true);
+
   math::Vector3 axisWorld = axisWorldRotation*math::Vector3::UnitZ;
   if (axisWorld == jointWorldRotation*math::Vector3::UnitX)
   {
-    if (dPtr->axisVisual)
-    {
-      dPtr->axisVisual->ShowAxisHead(0, false);
-      _arrowVisual->ShowShaft(false);
-    }
+    dPtr->axisVisual->ShowAxisHead(0, false);
+    _arrowVisual->ShowShaft(false);
   }
   else if (axisWorld == jointWorldRotation*math::Vector3::UnitY)
   {
-    if (dPtr->axisVisual)
-    {
-      dPtr->axisVisual->ShowAxisHead(1, false);
-      _arrowVisual->ShowShaft(false);
-    }
+    dPtr->axisVisual->ShowAxisHead(1, false);
+    _arrowVisual->ShowShaft(false);
   }
   else if (axisWorld == jointWorldRotation*math::Vector3::UnitZ)
   {
-    if (dPtr->axisVisual)
-    {
-      dPtr->axisVisual->ShowAxisHead(2, false);
-      _arrowVisual->ShowShaft(false);
-    }
-  }
-
-  _arrowVisual->SetVisible(true);
+    dPtr->axisVisual->ShowAxisHead(2, false);
+    _arrowVisual->ShowShaft(false);
+  }  
 }
