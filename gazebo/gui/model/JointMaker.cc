@@ -687,7 +687,9 @@ void JointMaker::Update()
         gazebo::msgs::JointPtr jointMsg;
         jointMsg.reset(new gazebo::msgs::Joint);
         jointMsg->set_parent(joint->parent->GetName());
+//        jointMsg->set_parent_id(joint->parent->GetId());
         jointMsg->set_child(joint->child->GetName());
+//        jointMsg->set_child_id(joint->child->GetId());
         jointMsg->set_name(joint->name);
         msgs::Set(jointMsg->mutable_pose(), joint->pose);
         if (joint->type == JointMaker::JOINT_SLIDER)
