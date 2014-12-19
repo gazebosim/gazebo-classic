@@ -82,10 +82,13 @@ namespace gazebo
           const math::Vector3 &_axis, bool _useParentFrame,
           msgs::Joint::Type _type);
 
-      /// \brief TODO.
+      /// \brief Get the JointVisual which is attached to the parent link.
+      /// returns Parent axis visual.
       public: JointVisualPtr GetParentAxisVisual() const;
 
-      /// \brief TODO.
+      /// \brief Get the arrow visual which represents the axis attached to the
+      /// child link.
+      /// returns Arrow visual.
       public: ArrowVisualPtr GetArrowVisual() const;
     };
     /// \}
