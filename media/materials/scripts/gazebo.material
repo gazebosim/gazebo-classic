@@ -1348,15 +1348,3 @@ material Gazebo/BuildingFrame
   }
 }
 
-material Gazebo/PointHandle
-{
-   technique
-   {
-      pass
-      {
-        lighting off
-        scene_blend alpha_blend
-        depth_write off
-      }
-   }
-}
