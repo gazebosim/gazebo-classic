@@ -92,6 +92,12 @@ void EditorItem::Set3dColor(QColor _color)
 }
 
 /////////////////////////////////////////////////
+void EditorItem::OnColorChanged(QColor _color)
+{
+  this->visual3dColor = _color;
+}
+
+/////////////////////////////////////////////////
 void EditorItem::Set3dTexture(QString _texture)
 {
   this->visual3dTexture = _texture;
