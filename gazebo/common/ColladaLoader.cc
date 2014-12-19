@@ -912,7 +912,7 @@ void ColladaLoader::LoadPositions(const std::string &_id,
       }
       catch(...)
       {
-        // Do nothing
+        // Do nothing. Messages are printed out below.
       }
     }
 
@@ -991,7 +991,7 @@ void ColladaLoader::LoadNormals(const std::string &_id,
       }
       catch(...)
       {
-        // Do nothing
+        // Do nothing. Messages are printed out below.
       }
     }
 
@@ -1073,7 +1073,7 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
       }
       catch(...)
       {
-        // Do nothing
+        // Do nothing. Messages are printed out below.
       }
     }
 
@@ -1764,7 +1764,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       }
       catch(...)
       {
-        // Do nothing
+        // Do nothing. Messages are printed out below.
       }
     }
 
