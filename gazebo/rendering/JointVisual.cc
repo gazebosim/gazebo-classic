@@ -200,6 +200,9 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
           axis1Msg.use_parent_model_frame(), _msg->type());
       this->UpdateAxis(axis2Visual, msgs::Convert(axis2Msg.xyz()),
           axis2Msg.use_parent_model_frame(), _msg->type());
+      // joint pose is always relative to the child link
+      dPtr->parentAxisVis->SetWorldPose(msgs::Convert(_msg->pose()) +
+          this->GetParent()->GetWorldPose());
     }
     else
     {
