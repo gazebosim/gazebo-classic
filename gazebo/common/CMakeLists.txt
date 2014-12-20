@@ -152,7 +152,7 @@ set_property(
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
 )
 
-link_directories( 
+link_directories(
   ${tinyxml_LIBRARY_DIRS}
 )
 
