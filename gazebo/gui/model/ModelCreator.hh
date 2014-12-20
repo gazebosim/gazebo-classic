@@ -237,6 +237,9 @@ namespace gazebo
       /// \param[in] _name Name of the entity to delete.
       private slots: void OnDelete(const std::string &_name="");
 
+      /// \brief TODO
+      private slots: void AttachAxisVisual(rendering::VisualPtr _linkVisual);
+
       /// \brief Qt signal when the a part has been added.
       Q_SIGNALS: void PartAdded();
 

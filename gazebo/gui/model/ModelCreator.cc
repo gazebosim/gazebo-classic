@@ -24,6 +24,7 @@
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/AxisVisual.hh"
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/math/Quaternion.hh"
@@ -203,6 +204,8 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
     _pose.pos.z + _size.z/2));
   }
 
+  this->AttachAxisVisual(linkVisual);
+
   this->CreatePart(visVisual);
   this->mouseVisual = linkVisual;
 
@@ -244,6 +247,8 @@ std::string ModelCreator::AddSphere(double _radius,
     linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
     _pose.pos.z + _radius));
   }
+
+  this->AttachAxisVisual(linkVisual);
 
   this->CreatePart(visVisual);
   this->mouseVisual = linkVisual;
@@ -289,6 +294,8 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
     _pose.pos.z + _length/2));
   }
 
+  this->AttachAxisVisual(linkVisual);
+
   this->CreatePart(visVisual);
   this->mouseVisual = linkVisual;
 
@@ -333,6 +340,8 @@ std::string ModelCreator::AddCustom(const std::string &_path,
     linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
     _pose.pos.z + _scale.z/2));
   }
+
+  this->AttachAxisVisual(linkVisual);
 
   this->CreatePart(visVisual);
   this->mouseVisual = linkVisual;
@@ -1098,4 +1107,19 @@ void ModelCreator::OnSetSelectedEntity(const std::string &/*_name*/,
     const std::string &/*_mode*/)
 {
   this->DeselectAll();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::AttachAxisVisual(rendering::VisualPtr _linkVisual)
+{
+  rendering::AxisVisualPtr axisVis;
+  axisVis.reset(new rendering::AxisVisual(_linkVisual->GetName() +
+      "_AXIS", _linkVisual));
+  axisVis->Load();
+  axisVis->GetSceneNode()->setInheritScale(false);
+  axisVis->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  axisVis->SetScale(math::Vector3(0.4, 0.4, 0.4));
+  axisVis->ShowAxisHead(0, false);
+  axisVis->ShowAxisHead(1, false);
+  axisVis->ShowAxisHead(2, false);
 }
