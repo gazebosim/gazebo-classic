@@ -67,8 +67,6 @@ void JointVisual::Load(ConstJointPtr &_msg)
       parentVis = this->GetScene()->GetWorldVisual();
     else if (_msg->has_parent_id())
       parentVis = this->GetScene()->GetVisual(_msg->parent_id());
-    else
-      parentVis = this->GetScene()->GetWorldVisual();
 
     JointVisualPtr jointVis;
     jointVis.reset(new JointVisual(this->GetName() + "_parent_", parentVis));
@@ -174,18 +172,13 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
     this->SetRotation(msgs::Convert(_msg->pose().orientation()));
   }
 
-  // Hide current axes and show all XYZ heads
-  if (dPtr->arrowVisual)
-    dPtr->arrowVisual->SetVisible(false);
-
   ArrowVisualPtr axis2Visual = NULL;
   if (dPtr->parentAxisVis)
   {
     axis2Visual = dPtr->parentAxisVis->GetArrowVisual();
-    if (axis2Visual)
-      axis2Visual->SetVisible(false);
   }
 
+  // Show XYZ heads
   if (dPtr->axisVisual)
   {
     dPtr->axisVisual->ShowAxisHead(0, true);
@@ -215,8 +208,6 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
         parentVis = this->GetScene()->GetWorldVisual();
       else if (_msg->has_parent_id())
         parentVis = this->GetScene()->GetVisual(_msg->parent_id());
-      else
-        parentVis = this->GetScene()->GetWorldVisual();
 
       JointVisualPtr jointVis;
       jointVis.reset(new JointVisual(this->GetName() + "_parent_", parentVis));
@@ -242,6 +233,10 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
   // Now has 1 axis
   else if (_msg->has_axis1())
   {
+    // Hide axis 2
+    if (axis2Visual)
+      axis2Visual->SetVisible(false);
+
     axis1Msg = _msg->axis1();
     // Previously had at least 1 axis
     if (dPtr->arrowVisual)
@@ -255,6 +250,15 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
       dPtr->arrowVisual = this->CreateAxis(msgs::Convert(axis1Msg.xyz()),
           axis1Msg.use_parent_model_frame(), _msg->type());
     }
+  }
+  // Now has no axis
+  else if (_msg->has_type())
+  {
+    // Hide axes 1 and 2
+    if (dPtr->arrowVisual)
+      dPtr->arrowVisual->SetVisible(false);
+    if (axis2Visual)
+      axis2Visual->SetVisible(false);
   }
 }
 

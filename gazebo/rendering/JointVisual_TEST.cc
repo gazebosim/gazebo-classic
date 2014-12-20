@@ -107,6 +107,15 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   // pose properly updated
   EXPECT_EQ(jointVis->GetPose(), math::Pose(3, 2, 1, 0, 1.57, 0));
 
+  // axis 1 still visible
+  EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetArrowVisual()->GetVisible());
+
+  // axis 2 still visible
+  EXPECT_TRUE(jointVis->GetParentAxisVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual()->GetVisible());
+
   // update joint type and axis from a message
   jointMsg.reset(new gazebo::msgs::Joint);
   jointMsg->set_name("test_joint");

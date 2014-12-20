@@ -355,6 +355,9 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   part->kinematic = false;
 
   this->allParts[part->name] = part;
+
+  rendering::ScenePtr scene = part->partVisual->GetScene();
+  scene->AddVisual(part->partVisual);
 }
 
 /////////////////////////////////////////////////
