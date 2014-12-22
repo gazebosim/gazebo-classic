@@ -678,11 +678,6 @@ void JointMaker::Update()
             joint->hotspot->GetWorldPose().pos));
         joint->handles->_updateBounds();
 
-        // Line now connects the child link to the joint frame
-        joint->line->SetPoint(0, childCentroid);
-        joint->line->SetPoint(1, childCentroid + joint->pose.pos);
-        joint->line->setMaterial(this->jointMaterials[joint->type]);
-
         // Create / update joint visual
         gazebo::msgs::JointPtr jointMsg;
         jointMsg.reset(new gazebo::msgs::Joint);
@@ -743,6 +738,11 @@ void JointMaker::Update()
           jointVis->Load(jointMsg);
           joint->jointVisual = jointVis;
         }
+
+        // Line now connects the child link to the joint frame
+        joint->line->SetPoint(0, childCentroid);
+        joint->line->SetPoint(1, joint->jointVisual->GetWorldPose().pos);
+        joint->line->setMaterial(this->jointMaterials[joint->type]);
       }
     }
   }

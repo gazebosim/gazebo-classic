@@ -168,7 +168,9 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
 
   if (_msg->has_pose())
   {
-    this->SetPosition(msgs::Convert(_msg->pose().position()));
+    // Avoid position changing when parent is scaled
+    this->SetPosition(msgs::Convert(_msg->pose().position()) /
+        this->GetParent()->GetScale());
     this->SetRotation(msgs::Convert(_msg->pose().orientation()));
   }
 
