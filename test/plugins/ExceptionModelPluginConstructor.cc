@@ -21,7 +21,7 @@ GZ_REGISTER_MODEL_PLUGIN(ExceptionModelPluginConstructor)
 
 /////////////////////////////////////////////////
 ExceptionModelPluginConstructor::ExceptionModelPluginConstructor()
-: ModelPlugin()
+  : ModelPlugin()
 {
   throw std::runtime_error("Example error");
 }

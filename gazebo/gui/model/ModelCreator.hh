@@ -309,10 +309,8 @@ namespace gazebo
 
       /// \brief The last mouse event
       private: common::MouseEvent lastMouseEvent;
-
       /// \brief Qt action for opening the part inspector.
       private: QAction *inspectAct;
-
       /// \brief Part visual that is currently being inspected.
       private: rendering::VisualPtr inspectVis;
 

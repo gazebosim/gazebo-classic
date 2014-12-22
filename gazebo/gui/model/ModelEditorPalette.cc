@@ -271,7 +271,6 @@ void ModelEditorPalette::OnCustom()
   }
 }
 
-/////////////////////////////////////////////////
 void ModelEditorPalette::AddJoint(const std::string &_type)
 {
   event::Events::setSelectedEntity("", "normal");
@@ -385,4 +384,3 @@ ModelCreator *ModelEditorPalette::GetModelCreator()
 {
   return this->modelCreator;
 }
-

@@ -135,6 +135,7 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
     scene->GetManager()->destroyBillboardSet(joint->handles);
     scene->RemoveVisual(joint->hotspot);
     scene->RemoveVisual(joint->visual);
+    joint->visual->Fini();
     joint->hotspot.reset();
     joint->visual.reset();
     joint->parent.reset();

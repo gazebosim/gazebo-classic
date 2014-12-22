@@ -12,6 +12,15 @@ list(APPEND @PKG_NAME@_LIBRARY_DIRS @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR
 list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@)
 list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/gazebo-@GAZEBO_VERSION@)
 
+# Visual Studio enables c++11 support by default
+if (NOT MSVC)
+  list(APPEND @PKG_NAME@_CXX_FLAGS -std=c++11)
+endif()
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND
+    "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
+  set(@PKG_NAME@_CXX_FLAGS "${@PKG_NAME@_CXX_FLAGS} -stdlib=libc++")
+endif ()
+
 foreach(lib @PKG_LIBRARIES@)
   set(onelib "${lib}-NOTFOUND")
   find_library(onelib ${lib}
@@ -44,7 +53,7 @@ foreach(dep @PKG_DEPENDS@)
   else()
     set (dep_lib ${dep})
   endif()
-    
+
   list(APPEND @PKG_NAME@_LIBRARIES ${${dep_lib}_LIBRARIES})
 
   # When including OGRE, also include the Terrain and Paging components
