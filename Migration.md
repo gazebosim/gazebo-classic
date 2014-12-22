@@ -28,6 +28,14 @@
     + ***Removed:*** private: void OnJoy(ConstJoystickPtr &_msg)
     + ***Replacement:*** private: void OnJoyTwist(ConstJoystickPtr &_msg)
 
+1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** public: void RotatePitch(math::Angle _angle);
+    + ***Replacement:*** public: void Pitch(const math::Angle &_angle,
+                                        Ogre::Node::TransformSpace _relativeTo = Ogre::Node::TS_LOCAL);
+    + ***Deprecation:*** public: void RotateYaw(math::Angle _angle);
+    + ***Replacement:*** public: void Yaw(const math::Angle &_angle,
+                                        Ogre::Node::TransformSpace _relativeTo = Ogre::Node::TS_LOCAL);
+    
 1. **gazebo/rendering/AxisVisual.hh**
     + ***Removed:*** public: void ShowRotation(unsigned int _axis)
     + ***Replacement:*** public: void ShowAxisRotation(unsigned int _axis, bool _show)
@@ -40,6 +48,10 @@
 
 1. **gazebo/physics/Collision.hh**
     + unsigned int GetShapeType()
+
+1. **gazebo/physics/World.hh**
+    + EntityPtr GetSelectedEntity() const
+
 
 ## Gazebo 3.1 to 4.0
 

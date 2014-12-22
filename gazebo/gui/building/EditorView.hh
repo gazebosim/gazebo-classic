@@ -48,7 +48,8 @@ namespace gazebo
       public: Level() : level(0), name("level"), baseHeight(0),
               // 2.4384m == 8ft, standard room height in US
               height(2.4384),
-              backgroundPixmap(NULL) {}
+              backgroundPixmap(NULL),
+              floorItem(NULL) {}
 
       /// \brief Level number
       public: int level;
@@ -64,6 +65,9 @@ namespace gazebo
 
       /// \brief Background pixmap for a level
       public: QGraphicsPixmapItem *backgroundPixmap;
+
+      /// \brief Level's floor item
+      public: FloorItem *floorItem;
     };
 
     /// \addtogroup gazebo_gui
@@ -87,7 +91,9 @@ namespace gazebo
                   /// \brief Door mode
                   DOOR,
                   /// \brief Stairs mode
-                  STAIRS
+                  STAIRS,
+                  /// \brief Color mode
+                  COLOR
                 };
 
       /// \brief Constructor
@@ -143,6 +149,10 @@ namespace gazebo
       /// \param[in] _event Qt mouse event.
       private: void mouseDoubleClickEvent(QMouseEvent *_event);
 
+      /// \brief Qt leave event.
+      /// \param[in] _event Qt mouse event.
+      private: void leaveEvent(QEvent *_event);
+
       /// \brief Qt key press event.
       /// \param[in] _event Qt key event.
       private: void keyPressEvent(QKeyEvent *_event);
@@ -171,6 +181,11 @@ namespace gazebo
       /// \param[in] _type Type of editor item to be created.
       private: void OnCreateEditorItem(const std::string &_type);
 
+      /// \brief Callback triggered when the user chooses a color on the
+      /// palette.
+      /// \param[in] _color Selected color.
+      private: void OnColorSelected(QColor _color);
+
       // private: void OnSaveModel(const std::string &_modelName,
       //     const std::string &_savePath);
 
@@ -196,6 +211,7 @@ namespace gazebo
 
       /// \brief Callback received when a level on a building model is to
       /// be changed.
+      /// \param[in] _level The level that is currently being edited.
       private: void OnChangeLevel(int _level);
 
       /// \brief Delete a level from the building model
@@ -315,6 +331,9 @@ namespace gazebo
 
       /// \brief Currently held grabber which will be snapped.
       private: GrabberHandle *snapGrabberCurrent;
+
+      /// \brief Text tooltip to follow the mouse.
+      private: QGraphicsTextItem *mouseTooltip;
     };
     /// \}
   }

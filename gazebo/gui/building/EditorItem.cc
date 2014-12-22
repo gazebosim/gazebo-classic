@@ -25,6 +25,9 @@ EditorItem::EditorItem()
 {
   this->editorType = "base";
   this->name = "";
+
+  this->level = 0;
+  this->levelBaseHeight = 0;
 }
 
 /////////////////////////////////////////////////
@@ -64,13 +67,76 @@ std::string EditorItem::GetName() const
 }
 
 /////////////////////////////////////////////////
+QColor EditorItem::Get3dColor() const
+{
+  return this->visual3dColor;
+}
+
+/////////////////////////////////////////////////
+QString EditorItem::Get3dTexture() const
+{
+  return this->visual3dTexture;
+}
+
+/////////////////////////////////////////////////
 void EditorItem::SetName(const std::string &_name)
 {
   this->name = _name;
 }
 
 /////////////////////////////////////////////////
+void EditorItem::Set3dColor(QColor _color)
+{
+  this->visual3dColor = _color;
+  emit ColorChanged(this->visual3dColor);
+}
+
+/////////////////////////////////////////////////
+void EditorItem::OnColorChanged(QColor _color)
+{
+  this->visual3dColor = _color;
+}
+
+/////////////////////////////////////////////////
+void EditorItem::Set3dTexture(QString _texture)
+{
+  this->visual3dTexture = _texture;
+  emit TextureChanged(this->visual3dTexture);
+}
+
+/////////////////////////////////////////////////
 void EditorItem::Set3dTransparency(float _transparency)
 {
   this->visual3dTransparency = _transparency;
+  emit TransparencyChanged(this->visual3dTransparency);
+}
+
+/////////////////////////////////////////////////
+int EditorItem::GetLevel() const
+{
+  return this->level;
+}
+
+/////////////////////////////////////////////////
+void EditorItem::SetLevel(int _level)
+{
+  this->level = _level;
+  this->LevelChanged(this->level);
+}
+
+/////////////////////////////////////////////////
+double EditorItem::GetLevelBaseHeight() const
+{
+  return this->levelBaseHeight;
+}
+
+/////////////////////////////////////////////////
+void EditorItem::SetLevelBaseHeight(double _height)
+{
+  this->levelBaseHeight = _height;
+}
+
+/////////////////////////////////////////////////
+void EditorItem::SetHighlighted(bool /*_highlighted*/)
+{
 }

@@ -104,7 +104,6 @@ namespace gazebo
 
       private slots: void About();
       private slots: void Step();
-      private slots: void NewModel();
       private slots: void Arrow();
 
       /// \brief Qt callback when the translate mode is triggered.
@@ -164,6 +163,10 @@ namespace gazebo
 
       /// \brief Callback for adding plugins.
       private slots: void OnAddPlugins();
+
+      /// \brief Qt call back when one of the editor actions is triggered.
+      /// \param[in] _action Action in the group which was triggered.
+      private slots: void OnEditorGroup(QAction *_action);
 
       /// \brief Toggle full screen display.
       /// \param[in] _value True to display in full screen mode.
@@ -228,7 +231,6 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::PublisherPtr worldControlPub;
       private: transport::PublisherPtr serverControlPub;
-      private: transport::PublisherPtr selectionPub;
       private: transport::PublisherPtr requestPub;
       private: transport::PublisherPtr scenePub;
       private: transport::SubscriberPtr responseSub;

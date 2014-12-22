@@ -182,6 +182,15 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   sdf::ElementPtr solverElem = odeElem->GetElement("solver");
 
   this->stepType = solverElem->Get<std::string>("type");
+  if (solverElem->HasElement("use_dynamic_moi_rescaling"))
+  {
+    dWorldSetQuickStepInertiaRatioReduction(this->worldId,
+      solverElem->Get<bool>("use_dynamic_moi_rescaling"));
+  }
+  else
+  {
+    dWorldSetQuickStepInertiaRatioReduction(this->worldId, true);
+  }
 
   dWorldSetDamping(this->worldId, 0.0001, 0.0001);
 
@@ -1352,8 +1361,14 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
   }
   else if (_key == "inertia_ratio_reduction")
   {
-    dWorldSetQuickStepInertiaRatioReduction(this->worldId,
-        boost::any_cast<bool>(_value));
+    bool value = boost::any_cast<bool>(_value);
+    dWorldSetQuickStepInertiaRatioReduction(this->worldId, value);
+    if (odeElem->GetElement("solver")->HasElement(
+          "use_dynamic_moi_rescaling"))
+    {
+      odeElem->GetElement("solver")->GetElement(
+          "use_dynamic_moi_rescaling")->Set(value);
+    }
   }
   else if (_key == "contact_residual_smoothing")
   {

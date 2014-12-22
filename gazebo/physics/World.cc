@@ -139,9 +139,6 @@ World::World(const std::string &_name)
   this->connections.push_back(
      event::Events::ConnectStep(boost::bind(&World::OnStep, this)));
   this->connections.push_back(
-     event::Events::ConnectSetSelectedEntity(
-       boost::bind(&World::SetSelectedEntityCB, this, _1)));
-  this->connections.push_back(
      event::Events::ConnectPause(
        boost::bind(&World::SetPaused, this, _1)));
 }
@@ -227,7 +224,6 @@ void World::Load(sdf::ElementPtr _sdf)
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->statPub =
     this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 100, 5);
-  this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
@@ -992,7 +988,7 @@ void World::ResetEntities(Base::EntityType _type)
 //////////////////////////////////////////////////
 void World::Reset()
 {
-  bool currently_paused = this->IsPaused();
+  bool currentlyPaused = this->IsPaused();
   this->SetPaused(true);
 
   {
@@ -1007,56 +1003,18 @@ void World::Reset()
         iter != this->plugins.end(); ++iter)
       (*iter)->Reset();
     this->physicsEngine->Reset();
+
+    // Signal a reset has occurred
+    event::Events::worldReset();
   }
 
-  this->SetPaused(currently_paused);
+  this->SetPaused(currentlyPaused);
 }
 
 //////////////////////////////////////////////////
 void World::OnStep()
 {
   this->stepInc = 1;
-}
-
-//////////////////////////////////////////////////
-void World::SetSelectedEntityCB(const std::string &_name)
-{
-  msgs::Selection msg;
-  BasePtr base = this->GetByName(_name);
-  EntityPtr ent = boost::dynamic_pointer_cast<Entity>(base);
-
-  // unselect selectedEntity
-  if (this->selectedEntity)
-  {
-    msg.set_id(this->selectedEntity->GetId());
-    msg.set_name(this->selectedEntity->GetScopedName());
-    msg.set_selected(false);
-    this->selectionPub->Publish(msg);
-
-    this->selectedEntity->SetSelected(false);
-  }
-
-  // if a different entity is selected, show bounding box and SetSelected(true)
-  if (ent && this->selectedEntity != ent)
-  {
-    // set selected entity to ent
-    this->selectedEntity = ent;
-    this->selectedEntity->SetSelected(true);
-
-    msg.set_id(this->selectedEntity->GetId());
-    msg.set_name(this->selectedEntity->GetScopedName());
-    msg.set_selected(true);
-
-    this->selectionPub->Publish(msg);
-  }
-  else
-    this->selectedEntity.reset();
-}
-
-//////////////////////////////////////////////////
-EntityPtr World::GetSelectedEntity() const
-{
-  return this->selectedEntity;
 }
 
 //////////////////////////////////////////////////
