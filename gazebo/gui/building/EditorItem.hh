@@ -61,9 +61,49 @@ namespace gazebo
       /// \return Name of the item.
       public: virtual std::string GetName() const;
 
+      /// \brief Get the level in which this building item is located.
+      public: int GetLevel() const;
+
+      /// \brief Get the base height of this level relative to the ground
+      /// plane.
+      public: double GetLevelBaseHeight() const;
+
+      /// \brief Get the associated 3D visual's color.
+      /// \return Color of the 3D visual.
+      public: virtual QColor Get3dColor() const;
+
+      /// \brief Get the associated 3D visual's texture.
+      /// \return Texture of the 3D visual.
+      public: virtual QString Get3dTexture() const;
+
       /// \brief Set the name of this editor item.
       /// \param[in] _name Name to set the editor item to.
       public: virtual void SetName(const std::string &_name);
+
+      /// \brief Set the level of this building item.
+      /// \param[in] _level Level number.
+      public: void SetLevel(int _level);
+
+      /// \brief Set the base height of this level relative to the ground
+      /// plane.
+      /// \param[in] _height Base height.
+      public: void SetLevelBaseHeight(double _height);
+
+      /// \brief Set the associated 3D visual's color.
+      /// \param[in] _color Color.
+      public: void Set3dColor(QColor _color);
+
+      /// \brief Set the associated 3D visual's texture.
+      /// \param[in] _texture Texture.
+      public: void Set3dTexture(QString _texture);
+
+      /// \brief Set the transparency of the associated 3D visual.
+      /// \param[in] _transparency Transparency.
+      public: void Set3dTransparency(float _transparency);
+
+      /// \brief Set whether this item should be highlighted or not.
+      /// \param[in] _highlighted True for highlighted.
+      public: virtual void SetHighlighted(bool _highlighted);
 
       /// \brief Qt signal emitted when the editor item size has changed.
       /// \param[in] _width Width of item in pixels.
@@ -136,14 +176,60 @@ namespace gazebo
       /// \param[in] _yaw Yaw rotation of item in degrees.
       Q_SIGNALS: void YawChanged(double _yaw);
 
+      /// \brief Qt signal emitted when the editor item's level has changed.
+      /// \param[in] _level Level.
+      Q_SIGNALS: void LevelChanged(int _level);
+
+      /// \brief Qt signal emitted when the editor item's 3D color has
+      /// changed.
+      /// \param[in] _color Color.
+      Q_SIGNALS: void ColorChanged(QColor _color);
+
+      /// \brief Qt signal emitted when the editor item's 3D texture has
+      /// changed.
+      /// \param[in] _texture Texture.
+      Q_SIGNALS: void TextureChanged(QString _texture);
+
+      /// \brief Qt signal emitted when the editor item's 3D transparency has
+      /// changed.
+      /// \param[in] _transparency Transparency.
+      Q_SIGNALS: void TransparencyChanged(float _transparency);
+
       /// \brief Qt signal emitted when the editor item is being deleted.
       Q_SIGNALS: void ItemDeleted();
+
+      /// \brief Qt callback when the color has been changed from the 3D view.
+      /// \param[in] _color Color.
+      private slots: void OnColorChanged(QColor _color);
 
       /// \brief Type of editor item.
       protected: std::string editorType;
 
       /// \brief Name of editor item.
       protected: std::string name;
+
+      /// \brief Level that this item is on.
+      protected: int level;
+
+      /// \brief Vertical distance from the building's base to the base of
+      /// the level this editor is in.
+      protected: double levelBaseHeight;
+
+      /// \brief Color of the associated 3D visual.
+      protected: QColor visual3dColor;
+
+      /// \brief Texture of the associated 3D visual.
+      protected: QString visual3dTexture;
+
+      /// \brief Transparency of the associated 3D visual.
+      protected: float visual3dTransparency;
+
+      /// \brief Flag to indicate whether this item is currently highlighted or
+      /// not.
+      protected: bool highlighted;
+
+      /// \brief Scale for converting from pixel to metric units.
+      protected: double scale;
     };
     /// \}
   }

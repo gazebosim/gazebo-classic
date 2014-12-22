@@ -353,8 +353,10 @@ void SelectionObj::CreateTranslateVisual()
   transHeadXNode->attachObject(headXObj);
   transHeadXNode->setScale(0.5, 0.5, 0.5);
   transHeadXNode->setPosition(0, 0, 0.22);
-  shaftXObj->setUserAny(Ogre::Any(std::string("trans_x")));
-  headXObj->setUserAny(Ogre::Any(std::string("trans_x")));
+  shaftXObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("trans_x")));
+  headXObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("trans_x")));
   shaftXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   headXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
@@ -376,8 +378,10 @@ void SelectionObj::CreateTranslateVisual()
   transHeadYNode->attachObject(headYObj);
   transHeadYNode->setScale(0.5, 0.5, 0.5);
   transHeadYNode->setPosition(0, 0, 0.22);
-  shaftYObj->setUserAny(Ogre::Any(std::string("trans_y")));
-  headYObj->setUserAny(Ogre::Any(std::string("trans_y")));
+  shaftYObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("trans_y")));
+  headYObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("trans_y")));
   shaftYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   headYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
@@ -399,8 +403,10 @@ void SelectionObj::CreateTranslateVisual()
   transHeadZNode->attachObject(headZObj);
   transHeadZNode->setScale(0.5, 0.5, 0.5);
   transHeadZNode->setPosition(0, 0, 0.22);
-  shaftZObj->setUserAny(Ogre::Any(std::string("trans_z")));
-  headZObj->setUserAny(Ogre::Any(std::string("trans_z")));
+  shaftZObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("trans_z")));
+  headZObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("trans_z")));
   shaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   headZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
@@ -458,7 +464,8 @@ void SelectionObj::CreateRotateVisual()
       dPtr->rotXVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__ROT_NODE_X__"  + this->GetName());
   xNode->attachObject(rotXObj);
-  rotXObj->setUserAny(Ogre::Any(std::string("rot_x")));
+  rotXObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("rot_x")));
   rotXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *rotYObj =
@@ -468,7 +475,8 @@ void SelectionObj::CreateRotateVisual()
       dPtr->rotYVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__ROT_NODE_Y__"  + this->GetName());
   yNode->attachObject(rotYObj);
-  rotYObj->setUserAny(Ogre::Any(std::string("rot_y")));
+  rotYObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("rot_y")));
   rotYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *rotZObj =
@@ -478,7 +486,8 @@ void SelectionObj::CreateRotateVisual()
       dPtr->rotZVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__ROT_NODE_Z__"  + this->GetName());
   zNode->attachObject(rotZObj);
-  rotZObj->setUserAny(Ogre::Any(std::string("rot_z")));
+  rotZObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("rot_z")));
   rotZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   dPtr->rotXVisual->Load();
@@ -557,8 +566,10 @@ void SelectionObj::CreateScaleVisual()
   scaleHeadXNode->attachObject(scaleHeadXObj);
   scaleHeadXNode->setScale(0.02, 0.02, 0.02);
   scaleHeadXNode->setPosition(0, 0, 0.21);
-  scaleShaftXObj->setUserAny(Ogre::Any(std::string("scale_x")));
-  scaleHeadXObj->setUserAny(Ogre::Any(std::string("scale_x")));
+  scaleShaftXObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("scale_x")));
+  scaleHeadXObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("scale_x")));
   scaleShaftXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   scaleHeadXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
@@ -580,8 +591,10 @@ void SelectionObj::CreateScaleVisual()
   scaleHeadYNode->attachObject(scaleHeadYObj);
   scaleHeadYNode->setScale(0.02, 0.02, 0.02);
   scaleHeadYNode->setPosition(0, 0, 0.21);
-  scaleShaftYObj->setUserAny(Ogre::Any(std::string("scale_y")));
-  scaleHeadYObj->setUserAny(Ogre::Any(std::string("scale_y")));
+  scaleShaftYObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("scale_y")));
+  scaleHeadYObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("scale_y")));
   scaleShaftYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   scaleHeadYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
@@ -603,8 +616,10 @@ void SelectionObj::CreateScaleVisual()
   scaleHeadZNode->attachObject(scaleHeadZObj);
   scaleHeadZNode->setScale(0.02, 0.02, 0.02);
   scaleHeadZNode->setPosition(0, 0, 0.21);
-  scaleShaftZObj->setUserAny(Ogre::Any(std::string("scale_z")));
-  scaleHeadZObj->setUserAny(Ogre::Any(std::string("scale_z")));
+  scaleShaftZObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("scale_z")));
+  scaleHeadZObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("scale_z")));
   scaleShaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   scaleHeadZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 

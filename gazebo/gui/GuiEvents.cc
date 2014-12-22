@@ -33,3 +33,5 @@ event::EventT<void (const msgs::Model &)> Events::modelUpdate;
 event::EventT<void (const msgs::Light &)> Events::lightUpdate;
 event::EventT<void (int)> Events::inputStepSize;
 event::EventT<void (const std::string &)> Events::follow;
+event::EventT<void (bool)> Events::leftPaneVisibility;
+event::EventT<void ()> Events::mainWindowReady;

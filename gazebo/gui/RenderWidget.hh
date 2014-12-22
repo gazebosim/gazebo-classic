@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <sdf/sdf.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
@@ -59,6 +60,19 @@ namespace gazebo
       /// \brief Get the overlay message being displayed
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
+
+      /// \brief Add a plugin to the render widget.
+      /// \param[in] _plugin Plugin pointer to add.
+      /// \param[in] _elem Plugin sdf parameters.
+      public: void AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem);
+
+      /// \brief Get the toolbar on top of the render widget
+      /// \return Toolbar
+      public: QToolBar *GetToolbar() const;
+
+      /// \brief Set the visibility of the toolbar.
+      /// \param[in] _show Whether or not to show the toolbar.
+      public: void ShowToolbar(const bool _show);
 
       private slots: virtual void update();
 
@@ -101,6 +115,8 @@ namespace gazebo
       private: QLineEdit *fpsEdit;
       private: QLineEdit *trianglesEdit;
 
+      /// \brief Widget for the top toolbar
+      private: QToolBar *toolbar;
       private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 
@@ -116,6 +132,9 @@ namespace gazebo
 
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
+
+      /// \brief All the gui plugins
+      private: std::vector<gazebo::GUIPluginPtr> plugins;
     };
   }
 }

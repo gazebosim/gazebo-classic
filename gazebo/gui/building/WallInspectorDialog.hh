@@ -19,6 +19,7 @@
 #define _WALL_INSPECTOR_DIALOG_HH_
 
 #include <string>
+#include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -62,9 +63,13 @@ namespace gazebo
       /// \return Wall thickness in pixels.
       public: double GetThickness() const;
 
-      /// \brief Get the material of the wall.
-      /// \return Wall material.
-      public: std::string GetMaterial() const;
+      /// \brief Get the color of the wall.
+      /// \return Wall color.
+      public: QColor GetColor() const;
+
+      /// \brief Get the texture of the wall.
+      /// \return Texture.
+      public: QString GetTexture() const;
 
       /// \brief Set the name of the wall.
       /// \param[in] _name Name to set the wall to.
@@ -91,9 +96,13 @@ namespace gazebo
       /// \param[in] _thickness Thickness of wall in pixels.
       public: void SetThickness(double _thickness);
 
-      /// \brief Set the material of the wall.
-      /// \param[in] _material New wall material to use.
-      public: void SetMaterial(const std::string &_material);
+      /// \brief Set the color of the wall.
+      /// \param[in] _color Color.
+      public: void SetColor(const QColor _color);
+
+      /// \brief Set the texture of the wall.
+      /// \param[in] _texture Texture.
+      public: void SetTexture(const QString _texture);
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
@@ -132,8 +141,17 @@ namespace gazebo
       /// \brief Spin box for configuring the length of the wall segment.
       private: QDoubleSpinBox *lengthSpinBox;
 
-      /// \brief Combo box for selecting the material of the wall to use.
-      private: QComboBox *materialComboBox;
+      /// \brief Combo box for selecting the color of the wall.
+      private: QComboBox *colorComboBox;
+
+      /// \brief Vector of color options.
+      private: std::vector<QColor> colorList;
+
+      /// \brief Combo box for selecting the texture of the wall.
+      private: QComboBox *textureComboBox;
+
+      /// \brief Vector of texture options.
+      private: std::vector<QString> textureList;
 
       /// \brief Label that holds the name of the wall.
       private: QLabel* wallNameLabel;

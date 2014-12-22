@@ -695,10 +695,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = @CMAKE_SOURCE_DIR@/gazebo/gui \
-                         @CMAKE_SOURCE_DIR@/gazebo/physics/ode \
-                         @CMAKE_SOURCE_DIR@/gazebo/physics/bullet \
-                         @CMAKE_SOURCE_DIR@/gazebo/rendering/ogretest \
+EXCLUDE                = @CMAKE_SOURCE_DIR@/gazebo/rendering/ogretest
                          @CMAKE_SOURCE_DIR@/gazebo/rendering/skyx \
                          @CMAKE_SOURCE_DIR@/gazebo/rendering/selection_buffer \
                          @CMAKE_SOURCE_DIR@/gazebo/rendering/deferred_shading
@@ -1666,7 +1663,7 @@ CLASS_GRAPH            = YES
 # indirect implementation dependencies (inheritance, containment, and
 # class references variables) of the class with other documented classes.
 
-COLLABORATION_GRAPH    = NO
+COLLABORATION_GRAPH    = YES
 
 # If the GROUP_GRAPHS and HAVE_DOT tags are set to YES then doxygen
 # will generate a graph for groups, showing the direct groups dependencies

@@ -18,6 +18,8 @@
 
 #include "gazebo/gazebo_config.h"
 
+#include "gazebo/gui/GuiPlugin.hh"
+#include "gazebo/gui/CloneWindow.hh"
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/viewers/ViewFactory.hh"
@@ -28,6 +30,8 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
+
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -46,10 +50,10 @@
 #include "gazebo/gui/AlignWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/SpaceNav.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/terrain/TerrainEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
-
 
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"
@@ -108,19 +112,19 @@ MainWindow::MainWindow()
   this->tabWidget->setMinimumWidth(MINIMUM_TAB_WIDTH);
   this->AddToLeftColumn("default", this->tabWidget);
 
-  this->CreateEditors();
-
   this->toolsWidget = new ToolsWidget();
 
   this->renderWidget = new RenderWidget(mainWidget);
 
+  this->CreateEditors();
+
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
-  QSplitter *splitter = new QSplitter(this);
-  splitter->addWidget(this->leftColumn);
-  splitter->addWidget(this->renderWidget);
-  splitter->addWidget(this->toolsWidget);
-  splitter->setContentsMargins(0, 0, 0, 0);
+  this->splitter = new QSplitter(this);
+  this->splitter->addWidget(this->leftColumn);
+  this->splitter->addWidget(this->renderWidget);
+  this->splitter->addWidget(this->toolsWidget);
+  this->splitter->setContentsMargins(0, 0, 0, 0);
 
   QList<int> sizes;
   sizes.push_back(MINIMUM_TAB_WIDTH);
@@ -128,11 +132,10 @@ MainWindow::MainWindow()
   sizes.push_back(0);
   splitter->setSizes(sizes);
 
-  splitter->setStretchFactor(0, 0);
-  splitter->setStretchFactor(1, 2);
-  splitter->setStretchFactor(2, 0);
-  splitter->setCollapsible(2, false);
-  splitter->setHandleWidth(10);
+  this->splitter->setStretchFactor(0, 0);
+  this->splitter->setStretchFactor(1, 2);
+  this->splitter->setStretchFactor(2, 0);
+  this->splitter->setHandleWidth(10);
 
   centerLayout->addWidget(splitter);
   centerLayout->setContentsMargins(0, 0, 0, 0);
@@ -153,6 +156,10 @@ MainWindow::MainWindow()
 #ifdef HAVE_OCULUS
   this->oculusWindow = NULL;
 #endif
+
+  this->connections.push_back(
+      gui::Events::ConnectLeftPaneVisibility(
+        boost::bind(&MainWindow::SetLeftPaneVisibility, this, _1)));
 
   this->connections.push_back(
       gui::Events::ConnectFullScreen(
@@ -185,6 +192,13 @@ MainWindow::MainWindow()
     (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
     this->CreateMenus();
   }
+
+  // Create a pointer to the space navigator interface
+  this->spacenav = new SpaceNav();
+
+  // Use a signal/slot to load plugins. This makes the process thread safe.
+  connect(this, SIGNAL(AddPlugins()),
+          this, SLOT(OnAddPlugins()), Qt::QueuedConnection);
 }
 
 /////////////////////////////////////////////////
@@ -217,6 +231,10 @@ void MainWindow::Load()
             << "Did you forget to set ~/.gazebo/gui.ini?\n";
   }
 #endif
+
+  // Load the space navigator
+  if (!this->spacenav->Load())
+    gzerr << "Unable to load space navigator\n";
 }
 
 /////////////////////////////////////////////////
@@ -244,8 +262,6 @@ void MainWindow::Init()
     this->node->Advertise<msgs::WorldControl>("~/world_control");
   this->serverControlPub =
     this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
-  this->selectionPub =
-    this->node->Advertise<msgs::Selection>("~/selection");
   this->scenePub =
     this->node->Advertise<msgs::Scene>("~/scene");
 
@@ -266,6 +282,8 @@ void MainWindow::Init()
 
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
+
+  gui::Events::mainWindowReady();
 }
 
 /////////////////////////////////////////////////
@@ -278,6 +296,10 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->connections.clear();
 
   delete this->renderWidget;
+
+  // Cleanup the space navigator
+  delete this->spacenav;
+  this->spacenav = NULL;
 
 #ifdef HAVE_OCULUS
   if (this->oculusWindow)
@@ -469,6 +491,21 @@ void MainWindow::Save()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::Clone()
+{
+  boost::scoped_ptr<CloneWindow> cloneWindow(new CloneWindow(this));
+  if (cloneWindow->exec() == QDialog::Accepted && cloneWindow->IsValidPort())
+  {
+    // Create a gzserver clone in the server side.
+    msgs::ServerControl msg;
+    msg.set_save_world_name("");
+    msg.set_clone(true);
+    msg.set_new_port(cloneWindow->GetPort());
+    this->serverControlPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
 void MainWindow::About()
 {
   std::string helpTxt;
@@ -569,16 +606,6 @@ void MainWindow::OnFollow(const std::string &_modelName)
         "Press Escape to exit Follow mode", 0);
     this->editMenu->setEnabled(false);
   }
-}
-
-/////////////////////////////////////////////////
-void MainWindow::NewModel()
-{
-  /*ModelBuilderWidget *modelBuilder = new ModelBuilderWidget();
-  modelBuilder->Init();
-  modelBuilder->show();
-  modelBuilder->resize(800, 600);
-  */
 }
 
 /////////////////////////////////////////////////
@@ -919,6 +946,10 @@ void MainWindow::CreateActions()
   g_saveCfgAct->setStatusTip(tr("Save GUI configuration"));
   connect(g_saveCfgAct, SIGNAL(triggered()), this, SLOT(SaveINI()));
 
+  g_cloneAct = new QAction(tr("Clone World"), this);
+  g_cloneAct->setStatusTip(tr("Clone the world"));
+  connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
+
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
   connect(g_aboutAct, SIGNAL(triggered()), this, SLOT(About()));
@@ -926,11 +957,6 @@ void MainWindow::CreateActions()
   g_quitAct = new QAction(tr("&Quit"), this);
   g_quitAct->setStatusTip(tr("Quit"));
   connect(g_quitAct, SIGNAL(triggered()), this, SLOT(close()));
-
-  g_newModelAct = new QAction(tr("New &Model"), this);
-  g_newModelAct->setShortcut(tr("Ctrl+M"));
-  g_newModelAct->setStatusTip(tr("Create a new model"));
-  connect(g_newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
 
   g_resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
   g_resetModelsAct->setShortcut(tr("Ctrl+Shift+R"));
@@ -944,6 +970,10 @@ void MainWindow::CreateActions()
   connect(g_resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
 
   QActionGroup *editorGroup = new QActionGroup(this);
+  // Exclusive doesn't allow all actions to be unchecked at the same time
+  editorGroup->setExclusive(false);
+  connect(editorGroup, SIGNAL(triggered(QAction *)), this,
+      SLOT(OnEditorGroup(QAction *)));
 
   g_editBuildingAct = new QAction(tr("&Building Editor"), editorGroup);
   g_editBuildingAct->setShortcut(tr("Ctrl+B"));
@@ -1123,19 +1153,27 @@ void MainWindow::CreateActions()
   connect(g_showJointsAct, SIGNAL(triggered()), this,
           SLOT(ShowJoints()));
 
-
   g_fullScreenAct = new QAction(tr("Full Screen"), this);
   g_fullScreenAct->setStatusTip(tr("Full Screen(F-11 to exit)"));
   connect(g_fullScreenAct, SIGNAL(triggered()), this,
       SLOT(FullScreen()));
 
-  // g_fpsAct = new QAction(tr("FPS View Control"), this);
-  // g_fpsAct->setStatusTip(tr("First Person Shooter View Style"));
-  // connect(g_fpsAct, SIGNAL(triggered()), this, SLOT(FPS()));
+  g_fpsAct = new QAction(tr("FPS View Control"), this);
+  g_fpsAct->setStatusTip(tr("First Person Shooter View Style"));
+  g_fpsAct->setCheckable(true);
+  g_fpsAct->setChecked(false);
+  connect(g_fpsAct, SIGNAL(triggered()), this, SLOT(FPS()));
 
   g_orbitAct = new QAction(tr("Orbit View Control"), this);
   g_orbitAct->setStatusTip(tr("Orbit View Style"));
+  g_orbitAct->setCheckable(true);
+  g_orbitAct->setChecked(true);
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
+
+  QActionGroup *viewControlActionGroup = new QActionGroup(this);
+  viewControlActionGroup->addAction(g_fpsAct);
+  viewControlActionGroup->addAction(g_orbitAct);
+  viewControlActionGroup->setExclusive(true);
 
   g_viewOculusAct = new QAction(tr("Oculus Rift"), this);
   g_viewOculusAct->setStatusTip(tr("Oculus Rift Render Window"));
@@ -1253,25 +1291,43 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
   if (!this->menuLayout)
     this->menuLayout = new QHBoxLayout;
 
-  // Remove all widgets from the menubar
-  QLayoutItem *child = NULL;
-  while ((child = this->menuLayout->takeAt(0)) != 0)
+  // Remove all widgets from the menuLayout
+  while (this->menuLayout->takeAt(0) != 0)
   {
-    delete child;
   }
 
+  if (!this->menuBar)
+  {
+    // create the native menu bar
+    this->menuBar = new QMenuBar;
+    this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    this->setMenuBar(this->menuBar);
+
+    this->CreateMenuBar();
+  }
+
+  this->menuBar->clear();
+
+  QMenuBar *newMenuBar = NULL;
   if (!_bar)
   {
-    this->CreateMenuBar();
-    this->menuLayout->addWidget(this->menuBar);
-    this->setMenuBar(this->menuBar);
+    // Get the main window's menubar
+    // Note: for some reason we can not call menuBar() again,
+    // so manually retrieving the menubar from the mainwindow.
+    QList<QMenuBar *> menuBars  = this->findChildren<QMenuBar *>();
+    newMenuBar = menuBars[0];
   }
   else
   {
-    if (this->menuBar)
-      this->menuBar->hide();
-    this->menuLayout->addWidget(_bar);
+    newMenuBar = _bar;
   }
+  QList<QMenu *> menus  = newMenuBar->findChildren<QMenu *>();
+  for (int i = 0; i < menus.size(); ++i)
+  {
+    this->menuBar->addMenu(menus[i]);
+  }
+
+  this->menuLayout->addWidget(this->menuBar);
 
   this->menuLayout->addStretch(5);
   this->menuLayout->setContentsMargins(0, 0, 0, 0);
@@ -1280,13 +1336,10 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 /////////////////////////////////////////////////
 void MainWindow::CreateMenuBar()
 {
-  if (this->menuBar)
-    delete this->menuBar;
+  // main window's menu bar
+  QMenuBar *bar = QMainWindow::menuBar();
 
-  this->menuBar = new QMenuBar;
-  this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-  QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
+  QMenu *fileMenu = bar->addMenu(tr("&File"));
   // fileMenu->addAction(g_openAct);
   // fileMenu->addAction(g_importAct);
   // fileMenu->addAction(g_newAct);
@@ -1294,10 +1347,11 @@ void MainWindow::CreateMenuBar()
   fileMenu->addAction(g_saveAsAct);
   fileMenu->addSeparator();
   fileMenu->addAction(g_saveCfgAct);
+  fileMenu->addAction(g_cloneAct);
   fileMenu->addSeparator();
   fileMenu->addAction(g_quitAct);
 
-  this->editMenu = this->menuBar->addMenu(tr("&Edit"));
+  this->editMenu = bar->addMenu(tr("&Edit"));
   editMenu->addAction(g_resetModelsAct);
   editMenu->addAction(g_resetWorldAct);
   editMenu->addAction(g_editBuildingAct);
@@ -1308,7 +1362,7 @@ void MainWindow::CreateMenuBar()
   // \TODO: Add this back in when implementing the full Model Editor spec.
   editMenu->addAction(g_editModelAct);
 
-  QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
+  QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
   viewMenu->addSeparator();
 
@@ -1324,10 +1378,11 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_resetAct);
   viewMenu->addAction(g_fullScreenAct);
   viewMenu->addSeparator();
-  // viewMenu->addAction(g_fpsAct);
+
+  viewMenu->addAction(g_fpsAct);
   viewMenu->addAction(g_orbitAct);
 
-  QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
+  QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
   windowMenu->addAction(g_dataLoggerAct);
@@ -1338,9 +1393,9 @@ void MainWindow::CreateMenuBar()
   // windowMenu->addAction(g_diagnosticsAct);
 #endif
 
-  this->menuBar->addSeparator();
+  bar->addSeparator();
 
-  QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
+  QMenu *helpMenu = bar->addMenu(tr("&Help"));
   helpMenu->addAction(g_aboutAct);
 }
 
@@ -1433,6 +1488,52 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
       cam->AttachToVisual(name, false, minDist, maxDist);
     }
   }
+
+  // Store all the plugins for processing
+  {
+    boost::mutex::scoped_lock lock(this->pluginLoadMutex);
+    for (int i = 0; i < _msg->plugin_size(); ++i)
+    {
+      boost::shared_ptr<msgs::Plugin> pm(new msgs::Plugin(_msg->plugin(i)));
+      this->pluginMsgs.push_back(pm);
+    }
+  }
+
+  // Call the signal to trigger plugin loading in the main thread.
+  this->AddPlugins();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnAddPlugins()
+{
+  boost::mutex::scoped_lock lock(this->pluginLoadMutex);
+
+  // Load all plugins.
+  for (std::vector<boost::shared_ptr<msgs::Plugin const> >::iterator iter =
+      this->pluginMsgs.begin(); iter != this->pluginMsgs.end(); ++iter)
+  {
+    // Make sure the filename string is not empty
+    if (!(*iter)->filename().empty())
+    {
+      // Try to create the plugin
+      gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(
+          (*iter)->filename(), (*iter)->name());
+
+      if (!plugin)
+      {
+        gzerr << "Unable to create gui overlay plugin with filename["
+          << (*iter)->filename() << "]\n";
+      }
+      else
+      {
+        gzlog << "Loaded GUI plugin[" << (*iter)->filename() << "]\n";
+
+        // Attach the plugin to the render widget.
+        this->renderWidget->AddPlugin(plugin, msgs::PluginToSDF(**iter));
+      }
+    }
+  }
+  this->pluginMsgs.clear();
 }
 
 /////////////////////////////////////////////////
@@ -1543,6 +1644,16 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
   }
   else if (_msg->has_remove() && _msg->remove())
     this->renderWidget->RemoveScene(_msg->world_name());
+  else if (_msg->has_cloned())
+  {
+    if (_msg->cloned())
+    {
+      gzlog << "Cloned world available at:\n\t" << _msg->cloned_uri()
+            << std::endl;
+    }
+    else
+      gzerr << "Error cloning a world" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1648,4 +1759,32 @@ void MainWindow::CreateDisabledIcon(const std::string &_pixmap, QAction *_act)
   p.drawPixmap(0, 0, pixmap);
   icon.addPixmap(disabledPixmap, QIcon::Disabled);
   _act->setIcon(icon);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::SetLeftPaneVisibility(bool _on)
+{
+  int leftPane = _on ? MINIMUM_TAB_WIDTH : 0;
+  int rightPane = this->splitter->sizes().at(2);
+
+  QList<int> sizes;
+  sizes.push_back(leftPane);
+  sizes.push_back(this->width() - leftPane - rightPane);
+  sizes.push_back(rightPane);
+
+  this->splitter->setSizes(sizes);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnEditorGroup(QAction *_action)
+{
+  QActionGroup * editorGroup = _action->actionGroup();
+  // Manually uncheck all other actions in the group
+  for (int i = 0; i < editorGroup->actions().size(); ++i)
+  {
+    if (editorGroup->actions()[i] != _action)
+    {
+      editorGroup->actions()[i]->setChecked(false);
+    }
+  }
 }

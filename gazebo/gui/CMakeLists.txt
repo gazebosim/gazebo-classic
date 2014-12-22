@@ -22,6 +22,8 @@ set (sources
   Actions.cc
   AlignWidget.cc
   BoxMaker.cc
+  CloneWindow.cc
+  ConfigWidget.cc
   CylinderMaker.cc
   DataLogger.cc
   Editor.cc
@@ -45,6 +47,7 @@ set (sources
   ModelRightMenu.cc
   MouseEventHandler.cc
   SaveDialog.cc
+  SpaceNav.cc
   SphereMaker.cc
   TimePanel.cc
   ToolsWidget.cc
@@ -54,6 +57,8 @@ set (sources
 set (qt_headers
   Actions.hh
   AlignWidget.hh
+  CloneWindow.hh
+  ConfigWidget.hh
   DataLogger.hh
   Editor.hh
   GLWidget.hh
@@ -78,6 +83,7 @@ set (headers
   EntityMaker.hh
   GuiIface.hh
   GuiEvents.hh
+  GuiPlugin.hh
   KeyEventHandler.hh
   LightMaker.hh
   ModelAlign.hh
@@ -86,6 +92,7 @@ set (headers
   MeshMaker.hh
   MouseEventHandler.hh
   ModelMaker.hh
+  SpaceNav.hh
   SphereMaker.hh
 )
 
@@ -118,7 +125,15 @@ set (qt_tests
 
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
-  set (qt_tests   ${qt_tests} MainWindow_TEST.cc ModelListWidget_TEST.cc ModelSnap_TEST.cc)
+  set (qt_tests
+      ${qt_tests}
+      BuildingEditor_TEST.cc
+      ConfigWidget_TEST.cc
+      GLWidget_TEST.cc
+      GLWidget_TEST2.cc
+      MainWindow_TEST.cc
+      ModelListWidget_TEST.cc
+      ModelSnap_TEST.cc)
 endif()
 
 # Generate executables for each of the QT unit tests
@@ -171,16 +186,22 @@ target_link_libraries(gzclient
   pthread
 )
 
+if (SPNAV_LIBRARY)
+  target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})
+  target_link_libraries(gzclient ${SPNAV_LIBRARY})
+endif()
+
+
 add_definitions(${QT_DEFINITIONS})
 
 set (gui_headers "" CACHE INTERNAL "gui headers" FORCE)
-foreach (hdr ${headers})
+foreach (hdr ${headers} ${qt_headers})
   APPEND_TO_CACHED_STRING(gui_headers
     "GUI Headers" "#include \"gazebo/gui/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gui.hh.in ${CMAKE_CURRENT_BINARY_DIR}/gui.hh )
 
 gz_install_library(gazebo_gui)
-gz_install_includes("gui" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
+gz_install_includes("gui" ${headers} ${qt_headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)
 manpage(gzclient 1)

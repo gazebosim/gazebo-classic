@@ -72,7 +72,7 @@ namespace gazebo
         private slots: void OnDeleteItem();
 
         /// \brief Emit window changed Qt signals.
-        private: void WindowChanged();
+        public: void WindowChanged();
 
         /// \brief Depth of the window item in pixels.
         private: double windowDepth;
@@ -91,9 +91,6 @@ namespace gazebo
 
         /// \brief Elevation of the window item in pixels.
         private: double windowElevation;
-
-        /// \brief Scale for converting pixels to metric units.
-        private: double scale;
 
         /// \brief Inspector for configuring the window item.
         private: WindowDoorInspectorDialog *inspector;

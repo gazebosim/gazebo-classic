@@ -28,6 +28,9 @@ class GuiIface_TEST : public QTestFixture
   /// \brief Test reading an INI file that doesn't exist.
   private slots: void noINIFile();
 
+  /// \brief Test using the env variable GAZEBO_GUI_INI_FILE
+  private slots: void GUIINIPATHEnvVariable();
+
   /// \brief Test setting configuration properties.
   private slots: void setINIProperties();
 

@@ -13,5 +13,3 @@ message Selection
   required string name   = 2;
   optional bool selected = 3 [default = false];
 }
-
-

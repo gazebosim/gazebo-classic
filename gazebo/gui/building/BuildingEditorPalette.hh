@@ -46,10 +46,12 @@ namespace gazebo
       /// \brief Destructor
       public: ~BuildingEditorPalette();
 
+      /// \brief Get model name
+      /// \return Model name
+      public: std::string GetModelName() const;
+
       /// \brief Qt callback when the draw wall button is pressed.
       private slots: void OnDrawWall();
-
-      // private slots: void OnImportImage();
 
       /// \brief Qt callback when the draw window button is pressed.
       private slots: void OnAddWindow();
@@ -57,17 +59,19 @@ namespace gazebo
       /// \brief Qt callback when the draw door button is pressed.
       private slots: void OnAddDoor();
 
+      /// \brief Qt callback when the import image button is pressed.
+      private slots: void OnImportImage();
+
       /// \brief Qt callback when the draw stairs button is pressed.
       private slots: void OnAddStair();
 
-      /// \brief Qt callback when the discard button is pressed.
-      private slots: void OnDiscard();
+      /// \brief Qt callback when a brush is pressed, if it is a color button,
+      /// it is handled here.
+      /// \param[in] _colorId Id of the button clicked.
+      private slots: void OnColor(int _colorId);
 
-      /// \brief Qt callback when the save button is pressed.
-      private slots: void OnSave();
-
-      /// \brief Qt callback when the done button is pressed.
-      private slots: void OnDone();
+      /// \brief Qt callback when the Model Name field is changed.
+      private slots: void OnNameChanged(const QString &_name);
 
       /// \brief Callback when user has provided information on where to save
       /// the model to.
@@ -77,20 +81,24 @@ namespace gazebo
           const std::string &_saveLocation);
 
       /// \brief Event received when an editor item is selected.
-      /// \param[in] _type Type of item to add.
-      private: void OnCreateEditorItem(const std::string &_type);
+      /// \param[in] _mode Type of item to add or empty for none.
+      private: void OnCreateEditorItem(const std::string &_mode);
 
-      /// \brief Event received when a building model has been discarded.
-      private: void OnDiscardModel();
+      /// \brief Event received when the user starts a new building model.
+      private: void OnNewModel();
 
-      /// \brief A label that displays the name of the building model.
-      private: QLabel *modelNameLabel;
+      /// \brief Qt callback when the palette is pressed.
+      /// \param[in] _event Event.
+      private: void mousePressEvent(QMouseEvent *_event);
 
-      /// \brief Save button.
-      private: QPushButton *saveButton;
+      /// \brief Default name of the building model.
+      private: std::string buildingDefaultName;
+
+      /// \brief Edit the name of the building model.
+      private: QLineEdit *modelNameEdit;
 
       /// \brief All the brushes (wall, door, window, stair, etc).
-      private: std::list<QPushButton *> brushes;
+      private: QButtonGroup *brushes;
 
       /// \brief Name of model.
       private: std::string modelName;
@@ -100,6 +108,12 @@ namespace gazebo
 
       /// \brief A list of gui editor events connected to this palette.
       private: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief The current draw mode, empty for none.
+      private: std::string currentMode;
+
+      /// \brief List of default colors to be picked.
+      private: std::vector<QColor> colorList;
     };
     /// \}
   }

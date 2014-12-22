@@ -553,7 +553,7 @@ std::string StateFilter::Filter(const std::string &_stateString)
   result << this->filter.Filter(state);
 
   if (this->xmlOutput)
-    result << "</sdf></state>\n";
+    result << "</state></sdf>\n";
 
   this->prevTime = state.GetSimTime();
   return result.str();

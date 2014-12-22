@@ -44,7 +44,7 @@ void QTestFixture::initTestCase()
 {
   // Initialize the informational logger. This will log warnings, and
   // errors.
-  gzLogInit("test.log");
+  gzLogInit("qtest-", "test.log");
 
   // Initialize the data logger. This will log state information.
   gazebo::util::LogRecord::Instance()->Init("test");

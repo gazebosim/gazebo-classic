@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: External interfaces for Gazebo
- * Author: Nate Koenig
- * Date: 03 Apr 2007
- */
 
-#ifndef _QUATERNION_HH_
-#define _QUATERNION_HH_
+#ifndef _GAZEBO_MATH_QUATERNION_HH_
+#define _GAZEBO_MATH_QUATERNION_HH_
 
 #include <math.h>
 #include <iostream>
@@ -346,6 +342,14 @@ namespace gazebo
     public: static Quaternion Slerp(double _fT, const Quaternion &_rkP,
                 const Quaternion &_rkQ, bool _shortestPath = false);
 
+    /// \brief Integrate quaternion for constant angular velocity vector
+    /// along specified interval `_deltaT`.
+    /// \param[in] _angularVelocity Angular velocity vector, specified in
+    /// same reference frame as base of this quaternion.
+    /// \param[in] _deltaT Time interval in seconds to integrate over.
+    /// \return Quaternion at integrated configuration.
+    public: Quaternion Integrate(const Vector3 &_angularVelocity,
+                                 const double _deltaT) const;
 
     /// \brief Attributes of the quaternion
     public: double w;

@@ -48,6 +48,7 @@ WireBox::~WireBox()
 /////////////////////////////////////////////////
 void WireBox::Init(const math::Box &_box)
 {
+  this->dataPtr->box = _box;
   math::Vector3 max = _box.max;
   math::Vector3 min = _box.min;
 
@@ -115,3 +116,10 @@ bool WireBox::GetVisible() const
 {
   return this->dataPtr->lines->isVisible();
 }
+
+/////////////////////////////////////////////////
+math::Box WireBox::GetBox() const
+{
+  return this->dataPtr->box;
+}
+

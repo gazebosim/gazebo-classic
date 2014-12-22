@@ -39,14 +39,14 @@ QAction *gazebo::gui::g_saveAsAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_saveCfgAct = 0;
 GAZEBO_VISIBLE
+QAction *gazebo::gui::g_cloneAct = 0;
+GAZEBO_VISIBLE
 QAction *gazebo::gui::g_aboutAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_quitAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_dataLoggerAct = 0;
 
-GAZEBO_VISIBLE
-QAction *gazebo::gui::g_newModelAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_resetModelsAct = 0;
 GAZEBO_VISIBLE
@@ -128,3 +128,6 @@ QAction *gazebo::gui::g_snapAct = 0;
 
 GAZEBO_VISIBLE
 QWidgetAction *gazebo::gui::g_alignAct = 0;
+
+GAZEBO_VISIBLE
+QAction *gazebo::gui::g_alignButtonAct = 0;
