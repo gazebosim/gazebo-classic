@@ -28,6 +28,11 @@
 #include "player.h"
 #include "gazebo/util/system.hh"
 
+extern "C"
+{
+  GAZEBO_VISIBLE int player_driver_init(DriverTable *_table);
+}
+
 /// \addtogroup player
 /// \brief Gazebo player driver
 /// \{

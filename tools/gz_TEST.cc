@@ -301,9 +301,6 @@ TEST_F(gzTest, Model)
 
     waitForMsg("gz model -w default -m my_box -f " + filename);
 
-    std::ifstream ifs(filename.c_str());
-    EXPECT_TRUE(ifs);
-
     boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));
 
@@ -326,9 +323,6 @@ TEST_F(gzTest, Model)
     cmd += filename + " | gz model -w default -m my_box -s";
     waitForMsg(cmd);
 
-    std::ifstream ifs(filename.c_str());
-    EXPECT_TRUE(ifs);
-
     boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));
 
@@ -341,6 +335,47 @@ TEST_F(gzTest, Model)
     gazebo::msgs::Set(msg.mutable_pose(), gazebo::math::Pose(0, 0, 0, 0, 0, 0));
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
+  }
+
+  // Test model info and pose
+  {
+    // Make sure the error message is output.
+    std::string modelInfo = custom_exec_str("gz model -m does_not_exist -i");
+    EXPECT_EQ(gazebo::common::get_sha1<std::string>(modelInfo),
+        "7b5a9ab178ce5fa6ae74c80a33a99b84183ae600");
+
+    // Get info for a model that exists.
+    modelInfo = custom_exec_str("gz model -m my_box -i");
+
+    // Check that a few values exist. We don't check the sha1 value
+    // because a few values, such as pose, are dynamic.
+    EXPECT_TRUE(modelInfo.find("name: \"my_box\"") != std::string::npos);
+    EXPECT_TRUE(modelInfo.find("id: 9") != std::string::npos);
+    EXPECT_TRUE(modelInfo.find("name: \"my_box::link::collision\"")
+        != std::string::npos);
+
+    // Get the pose of the model.
+    modelInfo = custom_exec_str("gz model -m my_box -p");
+    boost::algorithm::trim(modelInfo);
+
+    // Split the string into parts p.
+    std::vector<std::string> p;
+    boost::split(p, modelInfo, boost::is_any_of(" "));
+
+    // Make sure we have the right number of parts.
+    // Don't ASSERT_EQ, because we need to run fini at end of test
+    EXPECT_EQ(p.size(), 6u);
+
+    // Make sure the pose is correct.
+    if (p.size() == 6u)
+    {
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[0]), 0.0));
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[1]), 0.0));
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[2]), 0.5));
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[3]), 0.0));
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[4]), 0.0));
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[5]), 0.0));
+    }
   }
 
   // Test model delete
@@ -586,8 +621,8 @@ TEST_F(gzTest, SDF)
   descSums["1.0"] = "5235eb8464a96505c2a31fe96327d704e45c9cc4";
   descSums["1.2"] = "27973b2542d7a0f7582a615b245d81797718c89a";
   descSums["1.3"] = "30ffce1c662c17185d23f30ef3af5c110d367e10";
-  descSums["1.4"] = "a917916d211b711c6cba42ffd6811f9a659fce75";
-  descSums["1.5"] = "9797fb275658465d23bdb0e44798cda7250c4dd6";
+  descSums["1.4"] = "9a55c2992b532e0dd4f9a5d5b86cd4c6210d9902";
+  descSums["1.5"] = "a64da1ba2cec921a8b8e446ef01a862dc3e38796";
 
   // Test each descSum
   for (std::map<std::string, std::string>::iterator iter = descSums.begin();
@@ -605,8 +640,8 @@ TEST_F(gzTest, SDF)
   docSums["1.0"] = "4cf955ada785adf72503744604ffadcdf13ec0d2";
   docSums["1.2"] = "f84c1cf1b1ba04ab4859e96f6aea881134fb5a9b";
   docSums["1.3"] = "f3dd699687c8922710e4492aadedd1c038d678c1";
-  docSums["1.4"] = "8d136b204ea6428bd99ee2dc4fd5cf385a3e4c3d";
-  docSums["1.5"] = "641b20e0151ceaa7b5017f8d243628989bf55ab8";
+  docSums["1.4"] = "9627b1deb0c0437ac48c1c1cbd0e9800b0327b76";
+  docSums["1.5"] = "e67df38350bed73372cb0072cfd32c8cf07f5bf9";
 
   // Test each docSum
   for (std::map<std::string, std::string>::iterator iter = docSums.begin();
@@ -637,7 +672,7 @@ TEST_F(gzTest, SDF)
     std::string output =
       custom_exec_str(std::string("gz sdf -p ") + path.string());
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "19898716e05fecb7bd1d78e43fe1294ccf403bbf");
+    EXPECT_EQ(shasum, "381ce9100dd002bcf7e6f9019e33d478a37ab6f1");
   }
 
   path = PROJECT_BINARY_PATH;

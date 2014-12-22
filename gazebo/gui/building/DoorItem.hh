@@ -72,7 +72,7 @@ namespace gazebo
       private slots: void OnDeleteItem();
 
       /// \brief Emit door changed signals
-      private: void DoorChanged();
+      public: void DoorChanged();
 
       /// \brief Emit size changed signals
       private: void SizeChanged();
@@ -91,9 +91,6 @@ namespace gazebo
 
       /// \brief Door scene position in pixel coordinates.
       private: QPointF doorPos;
-
-      /// \brief Scale for converting from pixel to metric units.
-      private: double scale;
 
       /// \brief Inspector for configuring the door item.
       private: WindowDoorInspectorDialog *inspector;

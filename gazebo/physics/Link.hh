@@ -80,7 +80,7 @@ namespace gazebo
       /// \brief Reset the link.
       public: void Reset();
 
-      /// \brief Reset the link.
+      /// \brief Reset the velocity, acceleration, force and torque of link.
       public: void ResetPhysicsStates();
 
       /// \brief Update the parameters using new sdf values.
@@ -607,9 +607,6 @@ namespace gazebo
 
       /// \brief Cached list of collisions. This is here for performance.
       private: Collision_V collisions;
-
-      /// \brief scale of the link.
-      private: math::Vector3 scale;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources

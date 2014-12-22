@@ -16,33 +16,169 @@
     </include>
 
     <include>
-      <uri>model://cricket_ball</uri>
-      <pose>0.6 -0.25 1.015 0 0 0</pose>
+      <uri>model://wooden_case</uri>
+      <pose>0 0.037 1.015 0 0 -1.570796</pose>
     </include>
 
     <include>
-      <uri>model://wood_block_10_2_1cm</uri>
-      <pose>0.4 -0.25 1.015 0 0 0</pose>
+      <uri>model://cricket_ball</uri>
+      <pose> 0.6 250 1.015 0 0 0</pose>
     </include>
 
     <include>
       <uri>model://wood_cube_10cm</uri>
-      <pose>0.2 -0.25 1.015 0 0 0</pose>
+      <pose> 0.2 250 1.015 0 0 0</pose>
     </include>
 
     <include>
       <uri>model://wood_cube_7_5cm</uri>
-      <pose>0 -0.25 1.015 0 0 0</pose>
+      <pose> 0.0 250 1.015 0 0 0</pose>
     </include>
 
     <include>
       <uri>model://wood_cube_5cm</uri>
-      <pose>-0.2 -0.25 1.015 0 0 0</pose>
+      <pose>-0.2 250 1.015 0 0 0</pose>
     </include>
 
     <include>
       <uri>model://wood_cube_2_5cm</uri>
-      <pose>-0.4 -0.25 1.015 0 0 0</pose>
+      <pose>-0.4 250 1.015 0 0 0</pose>
     </include>
+
+    <include>
+      <uri>model://stone_10_2_5_1cm</uri>
+      <pose>-0.6 250 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>cup_1</name>
+      <uri>model://plastic_cup</uri>
+      <pose>-0.8 250 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>cup_2</name>
+      <uri>model://plastic_cup</uri>
+      <pose>-1.0 250 1.015 0 0 0</pose>
+    </include> 
+ 
+    <include>
+      <uri>model://wooden_peg_board</uri>
+      <pose>-1.2 250 1.015 0 0 0</pose>
+    </include> 
+
+    <include>
+      <uri>model://metal_peg_board</uri>
+      <pose>-1.4 250 1.015 0 0 0</pose>
+    </include> 
+
+    <include>
+      <uri>model://tube_2_25cm</uri>
+      <pose>-1.6 250 1.015 0 0 0</pose>
+    </include> 
+
+    <include>
+      <uri>model://tube_9_5mm</uri>
+      <pose>-1.8 250 1.015 0 0 0</pose>
+    </include> 
+ 
+    <include>
+      <uri>model://washer</uri>
+      <pose>-2.0 250 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://ball_bearing</uri>
+      <pose>-2.0 250 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://marble_1_5cm</uri>
+      <pose>-2.0 250 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://round_tin_base</uri>
+      <pose>-2.2 250 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://round_tin_top</uri>
+      <pose>-2.4 250 1.015 0 0 0</pose>
+    </include>
+
+
+    <plugin name="arrange_plugin" filename="libArrangePlugin.so">
+      <model_name>cricket_ball</model_name>
+      <model_name>wood_cube_10cm</model_name>
+      <model_name>wood_cube_7_5cm</model_name>
+      <model_name>wood_cube_5cm</model_name>
+      <model_name>wood_cube_2_5cm</model_name>
+      <model_name>stone_10_2_5_1cm</model_name>
+
+      <model_name>cup_1</model_name>
+      <model_name>cup_2</model_name>
+      <model_name>wooden_peg_board</model_name>
+      <model_name>metal_peg_board</model_name>
+      <model_name>tube_2_25cm</model_name>
+      <model_name>tube_9_5mm</model_name>
+      <model_name>washer</model_name>
+
+      <model_name>ball_bearing</model_name>
+      <model_name>marble_1_5cm</model_name>
+
+      <model_name>round_tin_top</model_name>
+      <model_name>round_tin_base</model_name>
+
+      <initial_arrangement>grasp_1</initial_arrangement>
+      <arrangement name="grasp_1">
+        <pose model="wood_cube_10cm"> 0.217 -0.265 1.04 0 0 0</pose>
+      </arrangement>
+      <arrangement name="grasp_2">
+        <pose model="wood_cube_2_5cm"> 0.217 -0.298 1.04 0 0 0</pose>
+      </arrangement>
+      <arrangement name="grasp_3">
+        <pose model="wood_cube_5cm"> 0.217 -0.284 1.034 0 0 0</pose>
+      </arrangement>
+      <arrangement name="grasp_4">
+        <pose model="wood_cube_7_5cm"> 0.217 -0.268 1.034 0 0 0</pose>
+      </arrangement>
+      <arrangement name="grasp_5"> 
+        <pose model="round_tin_base">0.217 -0.274 1.036 0 0 0</pose>
+        <pose model="round_tin_top">0.217  0.04 1.393 0 0 0 </pose>
+        <pose model="cricket_ball"> 0.217 -0.274 1.038 0 0 0</pose>
+      </arrangement>
+      <arrangement name="grasp_6">
+        <pose model="stone_10_2_5_1cm">0.242 -0.34 1.0475 -1.571074 0 -1.14</pose>
+      </arrangement>
+      <arrangement name="grip_1">
+        <pose model="cup_1"> 0.00 -0.20 1.034 0 0 0</pose>
+        <pose model="cup_2"> 0.217 -0.20 1.034 0 0 0</pose>
+      </arrangement>
+      <arrangement name="grip_2">
+        <pose model="wooden_peg_board">0.128 -0.08 1.034 0 0 -1.571074</pose>
+        <pose model="tube_2_25cm">0.216 -0.328 1.034 0 0 0</pose>
+      </arrangement>
+      <arrangement name="grip_3">
+        <pose model="metal_peg_board">0.128 -0.08 1.034 0 0 -1.571074</pose>
+        <pose model="tube_9_5mm">0.216 -0.328 1.034 0 0 0</pose>
+      </arrangement>
+      <arrangement name="grip_4">
+        <pose model="round_tin_top">0.244 -0.281 1.033 0 0 0</pose>
+        <pose model="washer">0.244 -0.281 1.036 0 0 0</pose>
+        <pose model="metal_peg_board">0.128 -0.08 1.034 0 0 -1.571074</pose>
+      </arrangement>
+      <arrangement name="pinch_1">
+        <pose model="round_tin_base">0.217 -0.274 1.036 0 0 0</pose>
+        <pose model="round_tin_top">0.217  0.04 1.393 0 0 0 </pose>
+        <pose model="ball_bearing">0.217 -0.270 1.038 0 0 0</pose>
+      </arrangement>
+      <arrangement name="pinch_2">
+        <pose model="round_tin_base">0.217 -0.274 1.036 0 0 0</pose>
+        <pose model="round_tin_top">0.217  0.04 1.393 0 0 0 </pose>
+        <pose model="marble_1_5cm">0.217 -0.274 1.036 0 0 0</pose>
+      </arrangement>
+
+    </plugin>
   </world>
 </sdf>
