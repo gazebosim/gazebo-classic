@@ -24,7 +24,7 @@
 class ModelAlign_TEST : public QTestFixture
 {
   Q_OBJECT
-  
+
   /// \brief Test aligning models at min x.
   private slots: void AlignXMin();
 
