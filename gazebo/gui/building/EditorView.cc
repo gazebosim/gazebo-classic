@@ -966,21 +966,23 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
 /////////////////////////////////////////////////
 void EditorView::OnColorSelected(QColor _color)
 {
+  if (!_color.isValid())
+    return;
+
   this->CancelDrawMode();
   this->scene()->clearSelection();
-
-  if (_color.isValid())
-    this->drawMode = COLOR;
+  this->drawMode = COLOR;
 }
 
 /////////////////////////////////////////////////
 void EditorView::OnTextureSelected(QString _texture)
 {
+  if (_texture == QString(""))
+    return;
+
   this->CancelDrawMode();
   this->scene()->clearSelection();
-
-  if (_texture != QString(""))
-    this->drawMode = TEXTURE;
+  this->drawMode = TEXTURE;
 }
 
 /////////////////////////////////////////////////
