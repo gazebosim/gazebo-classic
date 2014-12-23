@@ -112,11 +112,11 @@ MainWindow::MainWindow()
   this->tabWidget->setMinimumWidth(MINIMUM_TAB_WIDTH);
   this->AddToLeftColumn("default", this->tabWidget);
 
-  this->CreateEditors();
-
   this->toolsWidget = new ToolsWidget();
 
   this->renderWidget = new RenderWidget(mainWidget);
+
+  this->CreateEditors();
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 

@@ -99,6 +99,7 @@ bool LightMaker::Init()
 
   this->light.reset(new rendering::Light(scene));
   this->light->Load();
+  scene->AddLight(this->light);
 
   this->light->SetLightType(this->lightTypename);
   this->light->SetPosition(math::Vector3(0, 0, 1));

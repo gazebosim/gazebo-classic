@@ -31,7 +31,7 @@ TEST_F(Issue876Test, Reset)
 {
   Load("worlds/empty.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   math::Rand::SetSeed(math::Rand::GetSeed());
 

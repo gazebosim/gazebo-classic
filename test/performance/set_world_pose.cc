@@ -26,10 +26,10 @@ TEST_F(SetWorldPoseTest, Stress)
 {
   Load("worlds/box_plane_low_friction_test.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr model = world->GetModel("box");
-  ASSERT_TRUE(model);
+  ASSERT_TRUE(model != NULL);
 
   math::Pose pose(1, 2, 3, 0, 0, 0);
 
