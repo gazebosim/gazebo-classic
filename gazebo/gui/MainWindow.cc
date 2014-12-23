@@ -112,11 +112,11 @@ MainWindow::MainWindow()
   this->tabWidget->setMinimumWidth(MINIMUM_TAB_WIDTH);
   this->AddToLeftColumn("default", this->tabWidget);
 
-  this->CreateEditors();
-
   this->toolsWidget = new ToolsWidget();
 
   this->renderWidget = new RenderWidget(mainWidget);
+
+  this->CreateEditors();
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
@@ -262,8 +262,6 @@ void MainWindow::Init()
     this->node->Advertise<msgs::WorldControl>("~/world_control");
   this->serverControlPub =
     this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
-  this->selectionPub =
-    this->node->Advertise<msgs::Selection>("~/selection");
   this->scenePub =
     this->node->Advertise<msgs::Scene>("~/scene");
 

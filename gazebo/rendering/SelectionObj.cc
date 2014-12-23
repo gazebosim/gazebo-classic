@@ -475,7 +475,8 @@ void SelectionObj::CreateRotateVisual()
       dPtr->rotYVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__ROT_NODE_Y__"  + this->GetName());
   yNode->attachObject(rotYObj);
-  rotYObj->getUserObjectBindings().setUserAny(Ogre::Any(std::string("rot_y")));
+  rotYObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("rot_y")));
   rotYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *rotZObj =
@@ -485,7 +486,8 @@ void SelectionObj::CreateRotateVisual()
       dPtr->rotZVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__ROT_NODE_Z__"  + this->GetName());
   zNode->attachObject(rotZObj);
-  rotZObj->getUserObjectBindings().setUserAny(Ogre::Any(std::string("rot_z")));
+  rotZObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("rot_z")));
   rotZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   dPtr->rotXVisual->Load();

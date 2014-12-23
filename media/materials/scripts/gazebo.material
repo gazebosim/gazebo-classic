@@ -924,6 +924,25 @@ material Gazebo/Wood
   }
 }
 
+material Gazebo/Bricks
+{
+  technique
+  {
+    pass
+    {
+      ambient 1.0 1.0 1.0 1.0
+      diffuse 1.0 1.0 1.0 1.0
+      specular 0.2 0.2 0.2 1.0 12.5
+
+      texture_unit
+      {
+        texture bricks.png
+        filtering trilinear
+      }
+    }
+  }
+}
+
 material Gazebo/Road
 {
   technique
@@ -942,7 +961,6 @@ material Gazebo/Road
     }
   }
 }
-
 
 material Gazebo/Residential
 {
@@ -1297,3 +1315,36 @@ material Gazebo/PointCloud
       }
    }
 }
+
+material Gazebo/PointHandle
+{
+   technique
+   {
+      pass
+      {
+        lighting off
+        scene_blend alpha_blend
+        depth_write off
+      }
+   }
+}
+
+material Gazebo/BuildingFrame
+{
+  technique
+  {
+    pass
+    {
+      ambient 1.0 1.0 1.0 1.0
+      diffuse 1.0 1.0 1.0 1.0
+      specular 0.2 0.2 0.2 1.0 12.5
+
+      texture_unit
+      {
+        texture building_frame.png
+        filtering trilinear
+      }
+    }
+  }
+}
+

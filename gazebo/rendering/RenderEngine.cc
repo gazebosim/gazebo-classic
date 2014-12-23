@@ -264,6 +264,7 @@ unsigned int RenderEngine::GetSceneCount() const
 void RenderEngine::PreRender()
 {
   this->root->_fireFrameStarted();
+  // is this still needed since we recovered the same call in PostRender?
   this->root->_fireFrameRenderingQueued();
 }
 
@@ -275,8 +276,10 @@ void RenderEngine::Render()
 //////////////////////////////////////////////////
 void RenderEngine::PostRender()
 {
-  // _fireFrameRenderingQueued needs to be here for CEGUI to work
-  // this->root->_fireFrameRenderingQueued();
+  // _fireFrameRenderingQueued was here for CEGUI to work. Leaving because
+  // it shouldn't harm anything, and we don't want to introduce
+  // a regression.
+  this->root->_fireFrameRenderingQueued();
   this->root->_fireFrameEnded();
 }
 

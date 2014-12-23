@@ -31,8 +31,6 @@ namespace gazebo
 
   namespace rendering
   {
-    class GUIOverlay;
-
     /// \addtogroup gazebo_rendering
     /// \{
 
@@ -138,12 +136,6 @@ namespace gazebo
       /// Use this only if you really know what you're doing.
       /// \param[in] _target The new rendering target.
       public: virtual void SetRenderTarget(Ogre::RenderTarget *_target);
-
-      /// \brief Get the GUI overlay
-      ///
-      /// An overlay allows you to draw 2D elements on the viewport.
-      /// \return Pointer to the GUIOverlay.
-      public: GUIOverlay *GetGUIOverlay();
 
       /// \brief Set whether the view controller is enabled.
       ///

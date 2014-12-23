@@ -45,17 +45,17 @@ TEST_F(SphereShapeTest, Scale)
   physics::SphereShapePtr sphere(
       new physics::SphereShape(physics::CollisionPtr()));
   sdf::ElementPtr elem = sphereSDF->root;
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("collision");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("geometry");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("sphere");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   sphere->Load(elem);
 
   // Test scaling with unit size
