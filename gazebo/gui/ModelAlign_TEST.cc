@@ -715,5 +715,90 @@ void ModelAlign_TEST::AlignZMax()
   }
 }
 
+
+/////////////////////////////////////////////////
+void ModelAlign_TEST::AlignScale()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, true);
+
+  gazebo::rendering::ScenePtr scene;
+  scene = gazebo::rendering::get_scene("default");
+  QVERIFY(scene != NULL);
+
+  std::vector<std::string> modelNames;
+  modelNames.push_back("box");
+  modelNames.push_back("cylinder");
+  modelNames.push_back("sphere");
+
+  gazebo::event::Events::preRender();
+
+  int sleep  = 0;
+  int maxSleep = 200;
+  while (!scene->GetInitialized() && sleep < maxSleep)
+  {
+    gazebo::event::Events::preRender();
+    gazebo::common::Time::MSleep(30);
+    sleep++;
+  }
+
+  sleep = 0;
+  unsigned int modelVisualCount = 0;
+  while (modelVisualCount != modelNames.size() && sleep < maxSleep)
+  {
+    gazebo::event::Events::preRender();
+    modelVisualCount = 0;
+    for (unsigned int i = 0; i < modelNames.size(); ++i)
+    {
+      if (scene->GetVisual(modelNames[i]))
+        modelVisualCount++;
+    }
+    gazebo::common::Time::MSleep(30);
+    sleep++;
+  }
+
+  std::vector<gazebo::rendering::VisualPtr> modelVisuals;
+  std::vector<gazebo::math::Vector3> centerOffsets;
+  for (unsigned int i = 0; i < modelNames.size(); ++i)
+  {
+    gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
+    QVERIFY(modelVis != NULL);
+    gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
+    gazebo::math::Vector3 modelCenterOffset =
+        modelVis->GetBoundingBox().GetCenter();
+    modelVisuals.push_back(modelVis);
+    centerOffsets.push_back(modelCenterOffset);
+  }
+
+  // manually change scale of model visual and verify
+  gazebo::rendering::VisualPtr targetVis = modelVisuals[0];
+  targetVis->SetScale(gazebo::math::Vector3(1.5, 1, 1));
+  QVERIFY(targetVis->GetScale() == gazebo::math::Vector3(1.5, 1, 1));
+
+  gazebo::gui::ModelAlign::Instance()->Init();
+  gazebo::gui::ModelAlign::Instance()->AlignVisuals(
+      modelVisuals, "x", "min", "first");
+
+  gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
+  gazebo::math::Vector3 targetScale = modelVisuals[0]->GetScale();
+
+  // verify other models align at minx of the scaled target model
+  double targetMinX = modelVisuals[0]->GetWorldPose().pos.x +
+      centerOffsets[0].x - targetScale.x * targetBbox.GetXLength()/2.0;
+  for (unsigned int i = 1; i < modelVisuals.size(); ++i)
+  {
+    gazebo::rendering::VisualPtr vis = modelVisuals[i];
+    gazebo::math::Box bbox = vis->GetBoundingBox();
+    gazebo::math::Vector3 visScale = vis->GetScale();
+
+    double minX = vis->GetWorldPose().pos.x + centerOffsets[i].x -
+        visScale.x * bbox.GetXLength()/2.0;
+    QVERIFY(gazebo::math::equal(minX, targetMinX, 1e-5));
+  }
+}
+
+
 // Generate a main function for the test
 QTEST_MAIN(ModelAlign_TEST)
