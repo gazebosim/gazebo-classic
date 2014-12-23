@@ -799,6 +799,5 @@ void ModelAlign_TEST::AlignScale()
   }
 }
 
-
 // Generate a main function for the test
 QTEST_MAIN(ModelAlign_TEST)
