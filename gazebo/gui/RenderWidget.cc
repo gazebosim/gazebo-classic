@@ -174,7 +174,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
       gui::Events::ConnectFollow(
         boost::bind(&RenderWidget::OnFollow, this, _1)));
 
-
   // Load all GUI Plugins
   std::string filenames = getINIProperty<std::string>(
       "overlay_plugins.filenames", "");

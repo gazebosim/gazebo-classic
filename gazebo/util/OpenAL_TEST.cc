@@ -252,7 +252,7 @@ TEST_F(OpenAL, Sourcevalid)
 
     EXPECT_TRUE(sdf::readString(sdfString, sdf->root));
 
-    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->root));
+    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->root) != NULL);
   }
 
   // No Pitch, gain, loop, contact
@@ -268,7 +268,7 @@ TEST_F(OpenAL, Sourcevalid)
 
     EXPECT_TRUE(sdf::readString(sdfString, sdf->root));
 
-    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->root));
+    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->root) != NULL);
   }
 
   ASSERT_NO_THROW(util::OpenAL::Instance()->Fini());

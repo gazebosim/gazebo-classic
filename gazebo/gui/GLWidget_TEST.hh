@@ -25,8 +25,8 @@ class GLWidget_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test key presses.
-  private slots: void KeyPresses();
+  /// \brief Test selecting an object.
+  private slots: void SelectObject();
 };
 
 #endif

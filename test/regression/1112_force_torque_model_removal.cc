@@ -29,7 +29,7 @@ TEST_F(Issue1112Test, Reset)
 {
   Load("worlds/force_torque_model_removal_test.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   // Remove everything
   world->Clear();
