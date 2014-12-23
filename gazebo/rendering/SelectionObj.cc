@@ -378,10 +378,8 @@ void SelectionObj::CreateTranslateVisual()
   transHeadYNode->attachObject(headYObj);
   transHeadYNode->setScale(0.5, 0.5, 0.5);
   transHeadYNode->setPosition(0, 0, 0.22);
-  shaftYObj->getUserObjectBindings().setUserAny(
-      Ogre::Any(std::string("trans_y")));
-  headYObj->getUserObjectBindings().setUserAny(
-      Ogre::Any(std::string("trans_y")));
+  shaftYObj->setUserAny(Ogre::Any(std::string("trans_y")));
+  headYObj->setUserAny(Ogre::Any(std::string("trans_y")));
   shaftYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   headYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
@@ -403,10 +401,8 @@ void SelectionObj::CreateTranslateVisual()
   transHeadZNode->attachObject(headZObj);
   transHeadZNode->setScale(0.5, 0.5, 0.5);
   transHeadZNode->setPosition(0, 0, 0.22);
-  shaftZObj->getUserObjectBindings().setUserAny(
-      Ogre::Any(std::string("trans_z")));
-  headZObj->getUserObjectBindings().setUserAny(
-      Ogre::Any(std::string("trans_z")));
+  shaftZObj->setUserAny(Ogre::Any(std::string("trans_z")));
+  headZObj->setUserAny(Ogre::Any(std::string("trans_z")));
   shaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   headZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
@@ -475,7 +471,8 @@ void SelectionObj::CreateRotateVisual()
       dPtr->rotYVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__ROT_NODE_Y__"  + this->GetName());
   yNode->attachObject(rotYObj);
-  rotYObj->getUserObjectBindings().setUserAny(Ogre::Any(std::string("rot_y")));
+  rotYObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("rot_y")));
   rotYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *rotZObj =
@@ -485,7 +482,8 @@ void SelectionObj::CreateRotateVisual()
       dPtr->rotZVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__ROT_NODE_Z__"  + this->GetName());
   zNode->attachObject(rotZObj);
-  rotZObj->getUserObjectBindings().setUserAny(Ogre::Any(std::string("rot_z")));
+  rotZObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("rot_z")));
   rotZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   dPtr->rotXVisual->Load();

@@ -215,8 +215,7 @@ void Light::CreateVisual()
 
     // Create a scene node to hold the light selection object.
     Ogre::SceneNode *visSceneNode;
-    visSceneNode = this->visual->GetSceneNode()->createChildSceneNode(
-        this->GetName() + "_SELECTION_NODE_");
+    visSceneNode = this->visual->GetSceneNode()->createChildSceneNode();
 
     // Make sure the unit_sphere has been inserted.
     this->visual->InsertMesh("unit_sphere");
@@ -236,7 +235,7 @@ void Light::CreateVisual()
     // Make sure the selection object is rendered only in the selection
     // buffer.
     obj->setVisibilityFlags(GZ_VISIBILITY_SELECTION);
-    obj->setUserAny(Ogre::Any(this->GetName()));
+    obj->getUserObjectBindings().setUserAny(Ogre::Any(this->GetName()));
     obj->setCastShadows(false);
 
     // Scale the selection object to roughly match the light visual size.

@@ -96,7 +96,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   alignMenu->addAction(g_alignAct);
   alignButton->setMenu(alignMenu);
   alignButton->setPopupMode(QToolButton::InstantPopup);
-  this->toolbar->addWidget(alignButton);
+  g_alignButtonAct = this->toolbar->addWidget(alignButton);
   connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
 
   this->toolbar->addSeparator();
@@ -174,7 +174,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->connections.push_back(
       gui::Events::ConnectFollow(
         boost::bind(&RenderWidget::OnFollow, this, _1)));
-
 
   // Load all GUI Plugins
   std::string filenames = getINIProperty<std::string>(

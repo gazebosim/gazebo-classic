@@ -447,3 +447,30 @@ math::Angle BulletUniversalJoint::GetAngleImpl(unsigned int _index) const
 
   return result;
 }
+
+//////////////////////////////////////////////////
+bool BulletUniversalJoint::SetParam(const std::string &_key,
+    unsigned int _index,
+    const boost::any &_value)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return false;
+  }
+
+  return BulletJoint::SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+double BulletUniversalJoint::GetParam(const std::string &_key,
+                                      unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return 0;
+  }
+
+  return BulletJoint::GetParam(_key, _index);
+}

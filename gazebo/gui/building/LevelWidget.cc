@@ -86,7 +86,7 @@ LevelWidget::LevelWidget(QWidget *_parent) : QWidget(_parent)
       boost::bind(&LevelWidget::OnTriggerShowElements, this)));
 
   this->connections.push_back(
-      gui::editor::Events::ConnectDiscardBuildingModel(
+      gui::editor::Events::ConnectNewBuildingModel(
       boost::bind(&LevelWidget::OnDiscard, this)));
 
   this->setLayout(levelLayout);

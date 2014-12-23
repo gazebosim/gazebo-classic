@@ -56,9 +56,17 @@ namespace gazebo
       /// \return A pointer to the visual object.
       public: rendering::VisualPtr GetVisual() const;
 
+      /// \brief Get the transparency of the manip.
+      /// \return Transparency.
+      public: double GetTransparency() const;
+
       /// \brief Get the color of the manip.
       /// \return Color.
       public: common::Color GetColor() const;
+
+      /// \brief Get the texture of the manip.
+      /// \return Texture.
+      public: std::string GetTexture() const;
 
       /// \brief Set the name of the manip object.
       /// \param[in] _name Name to set the manip to.
@@ -138,17 +146,30 @@ namespace gazebo
       /// \param[in] _color Color.
       public: void SetColor(QColor _color);
 
+      /// \brief Set the texture of the manip.
+      /// \param[in] _texture Texture.
+      public: void SetTexture(QString _texture);
+
       /// \brief Set the transparency of the manip.
       /// \param[in] _transparency Transparency.
       public: void SetTransparency(float _transparency);
+
+      /// \brief Set the visibility of the manip.
+      /// \param[in] _visible True for visible, false for invisible.
+      public: void SetVisible(bool _visible);
 
       /// \brief Set the level for this manip.
       /// \param[in] _level The level for this manip.
       public: void SetLevel(const int _level);
 
       /// \brief Get the level for this manip.
-      /// \reutrn The level for this manip.
+      /// \return The level for this manip.
       public: int GetLevel() const;
+
+      /// \brief Qt signal emitted when the manip's color has changed from the
+      /// 3D view.
+      /// \param[in] _color New color.
+      Q_SIGNALS: void ColorChanged(QColor _color);
 
       /// \brief Qt callback when the pose of the associated editor item has
       /// changed.
@@ -240,6 +261,11 @@ namespace gazebo
       /// \param[in] _color New color.
       private slots: void OnColorChanged(QColor _color);
 
+      /// \brief Qt callback when the 3D visual's texture has been changed from
+      /// the associated editor item.
+      /// \param[in] _texture New texture.
+      private slots: void OnTextureChanged(QString _texture);
+
       /// \brief Qt callback when the 3D visual's transparency has been changed
       /// from the associated editor item.
       /// \param[in] _transparency Transparency.
@@ -275,8 +301,14 @@ namespace gazebo
       /// \brief Parent manip.
       private: BuildingModelManip *parent;
 
+      /// \brief Visual's transparency.
+      private: double transparency;
+
       /// \brief Visual's color.
       private: common::Color color;
+
+      /// \brief Visual's texture.
+      private: std::string texture;
 
       /// \brief Level this manipulator is on.
       private: int level;

@@ -204,7 +204,7 @@ void Grid::Create()
 //////////////////////////////////////////////////
 void Grid::SetUserData(const Ogre::Any &_data)
 {
-  this->manualObject->setUserAny(_data);
+  this->manualObject->getUserObjectBindings().setUserAny(_data);
 }
 
 //////////////////////////////////////////////////

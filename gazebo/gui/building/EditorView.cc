@@ -50,16 +50,12 @@ EditorView::EditorView(QWidget *_parent)
   gui::editor::Events::ConnectCreateBuildingEditorItem(
     boost::bind(&EditorView::OnCreateEditorItem, this, _1)));
 
-/*  this->connections.push_back(
-  gui::editor::Events::ConnectSaveModel(
-    boost::bind(&EditorView::OnSaveModel, this, _1, _2)));*/
-
-/*  this->connections.push_back(
-  gui::editor::Events::ConnectDone(
-    boost::bind(&EditorView::OnDone, this)));*/
+  this->connections.push_back(
+      gui::editor::Events::ConnectColorSelected(
+      boost::bind(&EditorView::OnColorSelected, this, _1)));
 
   this->connections.push_back(
-      gui::editor::Events::ConnectDiscardBuildingModel(
+      gui::editor::Events::ConnectNewBuildingModel(
       boost::bind(&EditorView::OnDiscardModel, this)));
 
   this->connections.push_back(
@@ -121,6 +117,11 @@ EditorView::EditorView(QWidget *_parent)
 
   this->viewScale = 1.0;
   this->levelCounter = 0;
+
+  this->mouseTooltip = new QGraphicsTextItem;
+  this->mouseTooltip->setPlainText(
+      "Oops! Color can only be added in the 3D view.");
+  this->mouseTooltip->setZValue(10);
 }
 
 /////////////////////////////////////////////////
@@ -168,6 +169,9 @@ void EditorView::resizeEvent(QResizeEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::contextMenuEvent(QContextMenuEvent *_event)
 {
+  if (this->drawMode == COLOR)
+    return;
+
   if (this->drawInProgress)
   {
     this->CancelDrawMode();
@@ -232,7 +236,7 @@ void EditorView::wheelEvent(QWheelEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::mousePressEvent(QMouseEvent *_event)
 {
-  if (!this->drawInProgress && this->drawMode != WALL
+  if (!this->drawInProgress && this->drawMode != WALL && this->drawMode != COLOR
       && (_event->button() != Qt::RightButton))
   {
     QGraphicsItem *mouseItem =
@@ -275,6 +279,7 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
       {
         StairsItem *stairsItem = dynamic_cast<StairsItem *>(
             this->currentMouseItem);
+        stairsItem->Set3dTexture(QString(""));
         stairsItem->Set3dColor(Qt::white);
         this->stairsList.push_back(stairsItem);
         if ((this->currentLevel) < static_cast<int>(floorList.size()))
@@ -394,6 +399,15 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
     case STAIRS:
       this->DrawStairs(_event->pos());
       break;
+    case COLOR:
+    {
+      if (!this->mouseTooltip->scene())
+        this->scene()->addItem(this->mouseTooltip);
+
+      this->mouseTooltip->setPos(this->mapToScene(_event->pos()) +
+          QPointF(15, 15));
+      break;
+    }
     default:
       break;
   }
@@ -429,6 +443,8 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         if (distance > 30 || t > 1.0 || t < 0.0)
         {
           editorItem->setParentItem(NULL);
+          editorItem->SetPositionOnWall(0);
+          editorItem->SetAngleOnWall(0);
           this->buildingMaker->DetachManip(this->itemToVisualMap[editorItem],
                 this->itemToVisualMap[wallSegmentItem]);
           editorItem->SetRotation(editorItem->GetRotation()
@@ -497,6 +513,16 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
+void EditorView::leaveEvent(QEvent */*_event*/)
+{
+  if (this->mouseTooltip &&
+      this->scene()->items().contains(this->mouseTooltip))
+  {
+    this->scene()->removeItem(this->mouseTooltip);
+  }
+}
+
+/////////////////////////////////////////////////
 void EditorView::keyPressEvent(QKeyEvent *_event)
 {
   if (_event->key() == Qt::Key_Delete || _event->key() == Qt::Key_Backspace)
@@ -520,6 +546,9 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
   }
   else if (_event->key() == Qt::Key_Escape)
   {
+    if (this->mouseTooltip &&
+        this->scene()->items().contains(this->mouseTooltip))
+      this->scene()->removeItem(this->mouseTooltip);
     this->CancelDrawMode();
     gui::editor::Events::createBuildingEditorItem(std::string());
     this->releaseKeyboard();
@@ -550,6 +579,10 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
     gui::editor::Events::createBuildingEditorItem(std::string());
   }
+  else if (this->drawMode == COLOR)
+  {
+    return;
+  }
   else
   {
     if (!this->scene()->itemAt(this->mapToScene(_event->pos())))
@@ -566,11 +599,28 @@ void EditorView::DeleteItem(EditorItem *_item)
   if (!_item)
     return;
 
+  // To make holes in the final model, windows and doors are attached to walls,
+  // and stairs are attached to floors above them.
+  // Detach 3D manip, but 2D items may remain as children.
   this->buildingMaker->DetachAllChildren(this->itemToVisualMap[_item]);
 
   if (_item->GetType() == "WallSegment")
   {
     WallSegmentItem *wallSegmentItem = dynamic_cast<WallSegmentItem *>(_item);
+
+    // Delete item's child doors and windows before deleting item
+    for (int i = wallSegmentItem->childItems().size()-1; i >=0; --i)
+    {
+      // WallSegmentItems have other children besides RectItems
+      RectItem *rectItem = dynamic_cast<RectItem *>(
+          wallSegmentItem->childItems().at(i));
+
+      if (rectItem)
+      {
+        this->DeleteItem(rectItem);
+      }
+    }
+
     this->UnlinkGrabbers(wallSegmentItem->grabbers[0]);
     this->UnlinkGrabbers(wallSegmentItem->grabbers[1]);
 
@@ -680,6 +730,7 @@ void EditorView::DrawWall(const QPoint &_pos)
     this->snapGrabberCurrent = NULL;
 
     wallSegmentItem = dynamic_cast<WallSegmentItem*>(this->currentMouseItem);
+    wallSegmentItem->Set3dTexture(QString(""));
     wallSegmentItem->Set3dColor(Qt::white);
     wallSegmentItem->SetHighlighted(false);
     wallSegmentList.push_back(wallSegmentItem);
@@ -908,6 +959,16 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
+void EditorView::OnColorSelected(QColor _color)
+{
+  this->CancelDrawMode();
+  this->scene()->clearSelection();
+
+  if (_color.isValid())
+    this->drawMode = COLOR;
+}
+
+/////////////////////////////////////////////////
 void EditorView::OnDiscardModel()
 {
   this->wallSegmentList.clear();
@@ -1019,6 +1080,7 @@ void EditorView::OnAddLevel()
     this->itemToVisualMap[wallSegmentItem] = wallSegmentName;
 
     floorItem->AttachWallSegment(wallSegmentItem);
+    wallSegmentItem->Set3dTexture(QString(""));
     wallSegmentItem->Set3dColor(Qt::white);
     wallSegmentItem->SetHighlighted(false);
   }
@@ -1064,6 +1126,7 @@ void EditorView::OnAddLevel()
   this->itemToVisualMap[floorItem] = floorName;
   this->scene()->addItem(floorItem);
   this->floorList.push_back(floorItem);
+  floorItem->Set3dTexture(QString(""));
   floorItem->Set3dColor(Qt::white);
   floorItem->SetHighlighted(false);
 }
@@ -1213,6 +1276,7 @@ void EditorView::OnOpenLevelInspector()
   {
     this->levelInspector->floorWidget->show();
     this->levelInspector->SetFloorColor(floorItem->Get3dColor());
+    this->levelInspector->SetFloorTexture(floorItem->Get3dTexture());
   }
   else
   {
@@ -1233,6 +1297,7 @@ void EditorView::OnLevelApply()
   FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
   if (floorItem)
   {
+    floorItem->Set3dTexture(dialog->GetFloorTexture());
     floorItem->Set3dColor(dialog->GetFloorColor());
     floorItem->Set3dTransparency(0.4);
     floorItem->FloorChanged();

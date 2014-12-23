@@ -72,7 +72,7 @@ TEST_F(WorldClone, CloneUnknownWorld)
 {
   Load("worlds/camera.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   transport::NodePtr node(new transport::Node());
   node->Init();
@@ -118,7 +118,7 @@ TEST_F(WorldClone, CloneEmptyPort)
 {
   Load("worlds/camera.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   transport::NodePtr node(new transport::Node());
   node->Init();
@@ -149,7 +149,7 @@ TEST_F(WorldClone, Clone)
 {
   Load("worlds/camera.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   transport::NodePtr node(new transport::Node());
   node->Init();
@@ -184,6 +184,7 @@ TEST_F(WorldClone, Clone)
     common::Time::MSleep(20);
 
   ASSERT_EQ(world->GetModelCount(), 0u);
+  common::Time::MSleep(500);
 
   // Check that the original world does not contain the camera topics.
   std::string output = custom_exec_str("gz topic -l");
