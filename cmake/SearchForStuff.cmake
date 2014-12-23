@@ -100,23 +100,6 @@ if (PKG_CONFIG_FOUND)
     endif()
   endif ()
 
-  pkg_check_modules(CEGUI CEGUI)
-  pkg_check_modules(CEGUI_OGRE CEGUI-OGRE)
-  if (NOT CEGUI_FOUND)
-    BUILD_WARNING ("CEGUI not found, opengl GUI will be disabled.")
-    set (HAVE_CEGUI OFF CACHE BOOL "HAVE CEGUI" FORCE)
-  else()
-    message (STATUS "Looking for CEGUI, found")
-    if (NOT CEGUI_OGRE_FOUND)
-      BUILD_WARNING ("CEGUI-OGRE not found, opengl GUI will be disabled.")
-      set (HAVE_CEGUI OFF CACHE BOOL "HAVE CEGUI" FORCE)
-    else()
-      set (HAVE_CEGUI ON CACHE BOOL "HAVE CEGUI")
-      set (CEGUI_LIBRARIES "CEGUIBase;CEGUIOgreRenderer")
-      message (STATUS "Looking for CEGUI-OGRE, found")
-    endif()
-  endif()
-
   #################################################
   # Find Simbody
   set(SimTK_INSTALL_DIR ${SimTK_INSTALL_PREFIX})

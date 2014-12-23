@@ -127,7 +127,7 @@ void MainWindow_TEST::CopyPaste()
       QTest::qWait(30);
       sleep++;
     }
-    QVERIFY(modelVisClone);
+    QVERIFY(modelVisClone != NULL);
   }
 
   // Test light copy
@@ -178,7 +178,7 @@ void MainWindow_TEST::CopyPaste()
       QTest::qWait(30);
       sleep++;
     }
-    QVERIFY(lightClone);
+    QVERIFY(lightClone != NULL);
 
     lightClone.reset();
   }

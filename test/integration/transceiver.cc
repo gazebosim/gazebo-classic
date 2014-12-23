@@ -102,7 +102,7 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
     // Store the new transmitter sensor in the map
     transmitters[txEssid] = tx;
 
-    ASSERT_TRUE(tx);
+    ASSERT_TRUE(tx != NULL);
   }
 
   // Wireless Receiver - rx
@@ -120,7 +120,7 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
     boost::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rxSensorName));
 
-  ASSERT_TRUE(rx);
+  ASSERT_TRUE(rx != NULL);
 
   // Initialize gazebo transport layer
   transport::NodePtr node(new transport::Node());
@@ -189,7 +189,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
       boost::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(tx1SensorName));
 
-  ASSERT_TRUE(tx1);
+  ASSERT_TRUE(tx1 != NULL);
 
   txFreq = this->MaxFreq + 1.0;
   SpawnWirelessTransmitterSensor(tx2ModelName, tx2SensorName, txPose.pos,
@@ -199,7 +199,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
       boost::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(tx2SensorName));
 
-  ASSERT_TRUE(tx2);
+  ASSERT_TRUE(tx2 != NULL);
 
   // Wireless Receiver - rx
   std::string rxModelName = "rx";
@@ -216,7 +216,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
     boost::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rxSensorName));
 
-  ASSERT_TRUE(rx);
+  ASSERT_TRUE(rx != NULL);
 
   // Initialize gazebo transport layer
   transport::NodePtr node(new transport::Node());
@@ -265,7 +265,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       boost::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(txSensorName));
 
-  ASSERT_TRUE(tx);
+  ASSERT_TRUE(tx != NULL);
 
   // Wireless Receiver - rx1
   std::string rx1ModelName = "rx1";
@@ -282,7 +282,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       boost::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rx1SensorName));
 
-  ASSERT_TRUE(rx1);
+  ASSERT_TRUE(rx1 != NULL);
 
   // Wireless Receiver - rx2
   std::string rx2ModelName = "rx2";
@@ -298,7 +298,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       boost::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rx2SensorName));
 
-  ASSERT_TRUE(rx2);
+  ASSERT_TRUE(rx2 != NULL);
 
   // Spawn an obstacle between the transmitter and the receiver
   SpawnBox("Box", math::Vector3(1, 1, 1), math::Vector3(-1, 0, 0.5),

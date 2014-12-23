@@ -47,6 +47,9 @@ namespace gazebo
       /// \brief Initialize the model manipulator.
       public: void Init();
 
+      /// \brief Detach the manipulator from an entity
+      public: void Detach();
+
       /// \brief Set the manipulation mode.
       /// \param[in] _mode Manipulation mode: translate, rotate, or scale.
       public: void SetManipulationMode(const std::string &_mode);

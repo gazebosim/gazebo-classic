@@ -28,7 +28,7 @@ TEST_F(SensorTest, GetScopedName)
   Load("worlds/camera_pose_test.world");
 
   sensors::SensorPtr sensor = sensors::get_sensor("cam1");
-  ASSERT_TRUE(sensor);
+  ASSERT_TRUE(sensor != NULL);
 
   std::string sensorName = sensor->GetScopedName();
   EXPECT_EQ(sensorName, std::string("default::rotated_box::link::cam1"));
