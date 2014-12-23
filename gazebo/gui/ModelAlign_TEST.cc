@@ -77,7 +77,6 @@ void ModelAlign_TEST::AlignXMin()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
@@ -153,7 +152,6 @@ void ModelAlign_TEST::AlignXCenter()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
@@ -229,7 +227,6 @@ void ModelAlign_TEST::AlignXMax()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
@@ -306,7 +303,6 @@ void ModelAlign_TEST::AlignYMin()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
@@ -382,7 +378,6 @@ void ModelAlign_TEST::AlignYCenter()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
@@ -459,7 +454,6 @@ void ModelAlign_TEST::AlignYMax()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
@@ -536,7 +530,6 @@ void ModelAlign_TEST::AlignZMin()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
@@ -612,7 +605,6 @@ void ModelAlign_TEST::AlignZCenter()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
@@ -688,7 +680,6 @@ void ModelAlign_TEST::AlignZMax()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
@@ -765,7 +756,6 @@ void ModelAlign_TEST::AlignScale()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    gazebo::math::Pose modelWorldPose = modelVis->GetWorldPose();
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
