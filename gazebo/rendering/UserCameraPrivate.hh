@@ -43,9 +43,6 @@ namespace gazebo
       /// \brief A FPS view controller.
       public: FPSViewController *fpsViewController;
 
-      /// \brief The GUI overlay.
-      public: GUIOverlay *gui;
-
       /// \brief Draws a 3D axis in the viewport.
       // public: Ogre::SceneNode *axisNode;
 
