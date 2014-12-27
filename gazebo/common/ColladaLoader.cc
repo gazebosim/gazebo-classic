@@ -894,10 +894,39 @@ void ColladaLoader::LoadPositions(const std::string &_id,
   }
 
   TiXmlElement *sourceXml = this->GetElementId("source", _id);
-  TiXmlElement *floatArrayXml = sourceXml->FirstChildElement("float_array");
-  if (!floatArrayXml)
+  if (!sourceXml)
   {
-    gzerr << "Vertex source missing float_array element\n";
+    gzerr << "Unable to find source\n";
+    return;
+  }
+
+  TiXmlElement *floatArrayXml = sourceXml->FirstChildElement("float_array");
+  if (!floatArrayXml || !floatArrayXml->GetText())
+  {
+    int count = 1;
+    if (floatArrayXml && floatArrayXml->Attribute("count"))
+    {
+      try
+      {
+        count = boost::lexical_cast<int>(floatArrayXml->Attribute("count"));
+      }
+      catch(...)
+      {
+        // Do nothing. Messages are printed out below.
+      }
+    }
+
+    if (count)
+    {
+      gzerr << "Vertex source missing float_array element, "
+        << "or count is invalid.\n";
+    }
+    else
+    {
+      gzlog << "Vertex source has a float_array with a count of zero. "
+        << "This is likely not desired\n";
+    }
+
     return;
   }
   std::string valueStr = floatArrayXml->GetText();
@@ -951,9 +980,32 @@ void ColladaLoader::LoadNormals(const std::string &_id,
   }
 
   TiXmlElement *floatArrayXml = normalsXml->FirstChildElement("float_array");
-  if (!floatArrayXml)
+  if (!floatArrayXml || !floatArrayXml->GetText())
   {
-    gzwarn << "Normal source missing float_array element\n";
+    int count = 1;
+    if (floatArrayXml && floatArrayXml->Attribute("count"))
+    {
+      try
+      {
+        count = boost::lexical_cast<int>(floatArrayXml->Attribute("count"));
+      }
+      catch(...)
+      {
+        // Do nothing. Messages are printed out below.
+      }
+    }
+
+    if (count)
+    {
+      gzwarn << "Normal source missing float_array element, or count is "
+        << "invalid.\n";
+    }
+    else
+    {
+      gzlog << "Normal source has a float_array with a count of zero. "
+        << "This is likely not desired\n";
+    }
+
     return;
   }
 
@@ -1010,9 +1062,41 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
   // Get the array of float values. These are the raw values for the texture
   // coordinates.
   TiXmlElement *floatArrayXml = xml->FirstChildElement("float_array");
-  if (!floatArrayXml)
+  if (!floatArrayXml || !floatArrayXml->GetText())
   {
-    gzerr << "Normal source missing float_array element\n";
+    int count = 1;
+    if (floatArrayXml && floatArrayXml->Attribute("count"))
+    {
+      try
+      {
+        count = boost::lexical_cast<int>(floatArrayXml->Attribute("count"));
+      }
+      catch(...)
+      {
+        // Do nothing. Messages are printed out below.
+      }
+    }
+
+    if (count)
+    {
+      gzerr << "Normal source missing float_array element, or count is "
+        << "invalid.\n";
+    }
+    else
+    {
+      gzlog << "Normal source has a float_array with a count of zero. "
+        << "This is likely not desired\n";
+    }
+
+    return;
+  }
+  // Read in the total number of texture coordinate values
+  else if (floatArrayXml->Attribute("count"))
+    totCount = boost::lexical_cast<int>(floatArrayXml->Attribute("count"));
+  else
+  {
+    gzerr << "<float_array> has no count attribute in texture coordinate "
+          << "element with id[" << _id << "]\n";
     return;
   }
 
@@ -1032,16 +1116,6 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
   {
     gzerr << "Unable to find <accessor> as a child of <technique_common> "
           << "for texture coordinates with id[" << _id << "]\n";
-    return;
-  }
-
-  // Read in the total number of texture coordinate values
-  if (floatArrayXml->Attribute("count"))
-    totCount = boost::lexical_cast<int>(floatArrayXml->Attribute("count"));
-  else
-  {
-    gzerr << "<float_array> has no count attribute in texture coordinate "
-          << "element with id[" << _id << "]\n";
     return;
   }
 
@@ -1076,6 +1150,11 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
              "with id[" << _id << "] do not add up correctly\n";
     return;
   }
+
+  // Nothing to read. Don't print a warning because the collada file is
+  // correct.
+  if (totCount == 0)
+    return;
 
   boost::unordered_map<math::Vector2d, unsigned int, Vector2dHash> unique;
 
@@ -1220,6 +1299,8 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
       _mat->SetAmbient(color);
     else if (_type == "emission")
       _mat->SetEmissive(color);
+    else if (_type == "specular")
+      _mat->SetSpecular(color);
   }
   else if (typeElem->FirstChildElement("texture"))
   {
@@ -1667,8 +1748,32 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   TiXmlElement *pXml = _trianglesXml->FirstChildElement("p");
   if (!pXml || !pXml->GetText())
   {
-    gzerr << "Collada file[" << this->dataPtr->filename
-          << "] is invalid. Loading what we can...\n";
+    int count = 1;
+    if (_trianglesXml->Attribute("count"))
+    {
+      try
+      {
+        count = boost::lexical_cast<int>(_trianglesXml->Attribute("count"));
+      }
+      catch(...)
+      {
+        // Do nothing. Messages are printed out below.
+      }
+    }
+
+    // It's possible that the triangle count is zero. In this case, we
+    // should not output an error message
+    if (count)
+    {
+      gzerr << "Collada file[" << this->dataPtr->filename
+        << "] is invalid. Loading what we can...\n";
+    }
+    else
+    {
+      gzlog << "Triangle input has a count of zero. "
+        << "This is likely not desired\n";
+    }
+
     return;
   }
   std::string pStr = pXml->GetText();

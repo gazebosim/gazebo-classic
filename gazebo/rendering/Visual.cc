@@ -700,7 +700,7 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
     {
       RTShaderSystem::Instance()->UpdateShaders();
     }
-    _obj->setUserAny(Ogre::Any(this->GetName()));
+    _obj->getUserObjectBindings().setUserAny(Ogre::Any(this->GetName()));
   }
   else
     gzerr << "Visual[" << this->GetName() << "] already has object["
@@ -1846,7 +1846,7 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
         && obj->getMovableType() != "BillboardSet"
         && obj->getVisibilityFlags() != GZ_VISIBILITY_GUI)
     {
-      Ogre::Any any = obj->getUserAny();
+      Ogre::Any any = obj->getUserObjectBindings().getUserAny();
       if (any.getType() == typeid(std::string))
       {
         std::string str = Ogre::any_cast<std::string>(any);

@@ -19,7 +19,6 @@ set (msgs
   friction.proto
   geometry.proto
   gps.proto
-  gui_overlay_config.proto
   gui_camera.proto
   gui.proto
   gz_string.proto

@@ -562,7 +562,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   Ogre::MovableObject *hotspotObj =
       (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
       "__HOTSPOT__" + _joint->visual->GetName(), "unit_cylinder"));
-  hotspotObj->setUserAny(Ogre::Any(hotSpotName));
+  hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(hotSpotName));
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial(this->jointMaterials[_joint->type]);
   hotspotVisual->SetTransparency(0.5);
