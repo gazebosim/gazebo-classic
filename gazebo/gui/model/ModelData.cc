@@ -300,11 +300,13 @@ void PartData::OnAddVisual(const std::string &_name)
   //visualConfig->SetName(visualConfig->GetVisualCount()-1, visualName.str());
 
   rendering::VisualPtr visVisual;
+  rendering::VisualPtr refVisual;
   if (!this->visuals.empty())
   {
     // add new visual by cloning last instance
-    visVisual = this->visuals.rbegin()->first->Clone(visualName.str(),
-        this->partVisual);
+    refVisual = this->visuals.rbegin()->first;
+    visVisual = refVisual->Clone(visualName.str(), this->partVisual);
+
   }
   else
   {
@@ -322,6 +324,9 @@ void PartData::OnAddVisual(const std::string &_name)
   }
 
   msgs::Visual visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
+  // store the correct transparency setting
+  if (refVisual)
+    visualMsg.set_transparency(this->visuals[refVisual].transparency());
   visualConfig->UpdateVisual(_name, &visualMsg);
   this->visuals[visVisual] = visualMsg;
   visVisual->SetTransparency(0.4);
