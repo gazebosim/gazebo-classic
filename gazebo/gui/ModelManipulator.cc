@@ -321,8 +321,12 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 
   // a bit hacky to check for unit sphere and cylinder simple shapes in order
   // to restrict the scaling dimensions.
+  // also extended scaling to work in model editor mode by checking geometry
+  // type of first visual child.
   if (this->dataPtr->keyEvent.key == Qt::Key_Shift ||
-      _vis->GetName().find("unit_sphere") != std::string::npos)
+      _vis->GetName().find("unit_sphere") != std::string::npos ||
+      (_vis->GetChildCount() > 0 &&
+      _vis->GetChild(0)->GetGeometryType() == "sphere"))
   {
     if (_axis.x > 0)
     {
@@ -340,7 +344,9 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       scale.y = scale.z;
     }
   }
-  else if (_vis->GetName().find("unit_cylinder") != std::string::npos)
+  else if (_vis->GetName().find("unit_cylinder") != std::string::npos ||
+      (_vis->GetChildCount() > 0 &&
+      _vis->GetChild(0)->GetGeometryType() == "cylinder"))
   {
     if (_axis.x > 0)
     {
@@ -351,8 +357,11 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       scale.x = scale.y;
     }
   }
-  else if (_vis->GetName().find("unit_box") != std::string::npos)
+  else if (_vis->GetName().find("unit_box") != std::string::npos ||
+      (_vis->GetChildCount() > 0 &&
+      _vis->GetChild(0)->GetGeometryType() == "box"))
   {
+    // keep new scale as it is
   }
   else
   {
