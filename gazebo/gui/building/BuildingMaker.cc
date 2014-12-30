@@ -355,8 +355,8 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   linkNameStream << "Wall_" << this->wallCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName + "::" +
-        linkName, this->previewVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName +
+      "::" + linkName, this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
@@ -400,8 +400,8 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   linkNameStream << "Window_" << this->windowCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName + "::" +
-        linkName, this->previewVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName +
+      "::" + linkName, this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
@@ -446,8 +446,8 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   linkNameStream << "Door_" << this->doorCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName + "::" +
-        linkName, this->previewVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName +
+      "::" + linkName, this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
@@ -491,8 +491,8 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   linkNameStream << "Stairs_" << this->stairsCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName + "::" +
-        linkName, this->previewVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName +
+      "::" + linkName, this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
@@ -567,8 +567,8 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   linkNameStream << "Floor_" << this->floorCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName + "::" +
-        linkName, this->previewVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName +
+      "::" + linkName, this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
@@ -762,6 +762,11 @@ void BuildingMaker::GenerateSDF()
 
   modelElem->GetAttribute("name")->Set(
       GetFolderNameFromModelName(this->modelName));
+  math::Pose modelOrigin(
+      this->previewVisual->GetBoundingBox().GetCenter().x,
+      this->previewVisual->GetBoundingBox().GetCenter().y, 0, 0, 0, 0);
+  modelElem->GetElement("pose")->Set(modelOrigin);
+  // this->previewVisual->SetWorldPose(-modelOrigin);
 
   std::map<std::string, BuildingModelManip *>::iterator itemsIt;
 
@@ -779,7 +784,8 @@ void BuildingMaker::GenerateSDF()
     visualElem = newLinkElem->GetElement("visual");
     collisionElem = newLinkElem->GetElement("collision");
     newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
-    newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
+    newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose() -
+        modelOrigin);
 
     // Only stairs have children
     if (visual->GetChildCount() == 0)
@@ -809,7 +815,8 @@ void BuildingMaker::GenerateSDF()
         {
           std::vector<QRectF> holes;
           rendering::VisualPtr wallVis = visual;
-          math::Pose wallPose = wallVis->GetParent()->GetWorldPose();
+          math::Pose wallPose = wallVis->GetParent()->GetWorldPose() -
+              modelOrigin;
           math::Vector3 wallSize = wallVis->GetScale();
           for (unsigned int i = 0; i <
               buildingModelManip->GetAttachedManipCount(); ++i)
@@ -821,8 +828,8 @@ void BuildingMaker::GenerateSDF()
                 || objName.find("Door") != std::string::npos)
             {
               rendering::VisualPtr attachedVis = attachedObj->GetVisual();
-              math::Pose offset = attachedVis->GetParent()->GetWorldPose()
-                  - wallPose;
+              math::Pose offset = attachedVis->GetParent()->GetWorldPose() -
+                  modelOrigin - wallPose;
               math::Vector3 size = attachedVis->GetScale();
 
               offset.pos.z += attachedVis->GetPosition().z
@@ -844,7 +851,7 @@ void BuildingMaker::GenerateSDF()
           newLinkElem->ClearElements();
           newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
           newLinkElem->GetElement("pose")->Set(
-              visual->GetParent()->GetWorldPose());
+              visual->GetParent()->GetWorldPose() - modelOrigin);
           // create a link element of box geom for each subdivision
           for (unsigned int i = 0; i< subdivisions.size(); ++i)
           {
@@ -909,7 +916,7 @@ void BuildingMaker::GenerateSDF()
         {
           std::vector<QRectF> holes;
           rendering::VisualPtr floorVis = visual;
-          math::Pose floorPose = floorVis->GetWorldPose();
+          math::Pose floorPose = floorVis->GetWorldPose() - modelOrigin;
           math::Vector3 floorSize = floorVis->GetScale();
           for (unsigned int i = 0; i <
               buildingModelManip->GetAttachedManipCount(); ++i)
@@ -920,8 +927,8 @@ void BuildingMaker::GenerateSDF()
             if (objName.find("Stairs") != std::string::npos)
             {
               rendering::VisualPtr attachedVis = attachedObj->GetVisual();
-              math::Pose offset = attachedVis->GetParent()->GetWorldPose()
-                  - floorPose;
+              math::Pose offset = attachedVis->GetParent()->GetWorldPose() -
+                  modelOrigin - floorPose;
               math::Vector3 size = attachedVis->GetScale();
 
               QRectF rect(0, 0, size.x, size.y);
@@ -946,7 +953,7 @@ void BuildingMaker::GenerateSDF()
           newLinkElem->ClearElements();
           newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
           newLinkElem->GetElement("pose")->Set(
-              visual->GetParent()->GetWorldPose());
+              visual->GetParent()->GetWorldPose() - modelOrigin);
           // create a link element of box geom for each subdivision
           for (unsigned int i = 0; i< subdivisions.size(); ++i)
           {
@@ -1023,7 +1030,7 @@ void BuildingMaker::GenerateSDF()
             << "_Collision_" << i;
         collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
         rendering::VisualPtr childVisual = visual->GetChild(i);
-        math::Pose newPose(childVisual->GetWorldPose().pos,
+        math::Pose newPose(childVisual->GetWorldPose().pos - modelOrigin.pos,
             visual->GetParent()->GetRotation());
         visualElem->GetElement("pose")->Set(newPose);
         collisionElem->GetElement("pose")->Set(newPose);
