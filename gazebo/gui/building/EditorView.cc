@@ -758,18 +758,7 @@ void EditorView::DrawWall(const QPoint &_pos)
 
   // 3D counterpart
   if (wallSegmentItem)
-  {
-    QVector3D segmentPosition = wallSegmentItem->GetScenePosition();
-    segmentPosition.setZ(wallSegmentItem->GetLevelBaseHeight() +
-        segmentPosition.z());
-    QVector3D segmentSize = wallSegmentItem->GetSize();
-    segmentSize.setZ(wallSegmentItem->GetHeight());
-    std::string wallSegmentName = this->buildingMaker->AddWall(
-        segmentSize, segmentPosition, wallSegmentItem->GetSceneRotation());
-    this->buildingMaker->ConnectItem(wallSegmentName, wallSegmentItem);
-    this->itemToVisualMap[wallSegmentItem] = wallSegmentName;
-    wallSegmentItem->SetName(wallSegmentName);
-  }
+    this->Create3DVisual(wallSegmentItem);
 }
 
 /////////////////////////////////////////////////
@@ -784,14 +773,7 @@ void EditorView::DrawWindow(const QPoint &_pos)
         this->levels[this->currentLevel]->baseHeight);
     this->scene()->addItem(windowItem);
     this->currentMouseItem = windowItem;
-
-    QVector3D windowPosition = windowItem->GetScenePosition();
-    windowPosition.setZ(windowItem->GetLevelBaseHeight() + windowPosition.z());
-    std::string windowName = this->buildingMaker->AddWindow(
-        windowItem->GetSize(), windowPosition, windowItem->GetSceneRotation());
-    this->buildingMaker->ConnectItem(windowName, windowItem);
-    this->itemToVisualMap[windowItem] = windowName;
-    windowItem->SetName(windowName);
+    this->Create3DVisual(windowItem);
     this->drawInProgress = true;
   }
   windowItem = dynamic_cast<WindowItem*>(this->currentMouseItem);
@@ -813,13 +795,7 @@ void EditorView::DrawDoor(const QPoint &_pos)
     doorItem->SetLevelBaseHeight(this->levels[this->currentLevel]->baseHeight);
     this->scene()->addItem(doorItem);
     this->currentMouseItem = doorItem;
-    QVector3D doorPosition = doorItem->GetScenePosition();
-    doorPosition.setZ(doorItem->GetLevelBaseHeight() + doorPosition.z());
-    std::string doorName = this->buildingMaker->AddDoor(
-        doorItem->GetSize(), doorPosition, doorItem->GetSceneRotation());
-    this->buildingMaker->ConnectItem(doorName, doorItem);
-    this->itemToVisualMap[doorItem] = doorName;
-    doorItem->SetName(doorName);
+    this->Create3DVisual(doorItem);
     this->drawInProgress = true;
   }
   doorItem = dynamic_cast<DoorItem*>(currentMouseItem);
@@ -843,15 +819,7 @@ void EditorView::DrawStairs(const QPoint &_pos)
     this->scene()->addItem(stairsItem);
     this->currentMouseItem = stairsItem;
 
-    QVector3D stairsPosition = stairsItem->GetScenePosition();
-    stairsPosition.setZ(stairsItem->GetLevelBaseHeight() + stairsPosition.z());
-    std::string stairsName = this->buildingMaker->AddStairs(
-        stairsItem->GetSize(), stairsPosition, stairsItem->GetSceneRotation(),
-        stairsItem->GetSteps());
-
-    this->buildingMaker->ConnectItem(stairsName, stairsItem);
-    this->itemToVisualMap[stairsItem] = stairsName;
-    stairsItem->SetName(stairsName);
+    this->Create3DVisual(stairsItem);
     this->drawInProgress = true;
   }
   stairsItem = dynamic_cast<StairsItem*>(this->currentMouseItem);
@@ -865,24 +833,48 @@ void EditorView::DrawStairs(const QPoint &_pos)
 /////////////////////////////////////////////////
 void EditorView::Create3DVisual(EditorItem *_item)
 {
+  QVector3D itemPosition = _item->GetScenePosition();
+  itemPosition.setZ(_item->GetLevelBaseHeight() + itemPosition.z());
+  QVector3D itemSize = _item->GetSize();
+  std::string itemName;
+
   if (_item->GetType() == "Stairs")
   {
     StairsItem *stairsItem = dynamic_cast<StairsItem *>(_item);
-    QVector3D stairsPosition = stairsItem->GetScenePosition();
-    stairsPosition.setZ(stairsItem->GetLevelBaseHeight() + stairsPosition.z());
-    std::string stairsName = this->buildingMaker->AddStairs(
-        stairsItem->GetSize(), stairsPosition, stairsItem->GetSceneRotation(),
+    itemName = this->buildingMaker->AddStairs(
+        itemSize, itemPosition, _item->GetSceneRotation(),
         stairsItem->GetSteps());
-    this->buildingMaker->ConnectItem(stairsName, stairsItem);
-    this->itemToVisualMap[stairsItem] = stairsName;
-    stairsItem->SetName(stairsName);
     if (stairsItem->GetLevel() < static_cast<int>(floorList.size()))
     {
-      this->buildingMaker->AttachManip(stairsName,
+      this->buildingMaker->AttachManip(itemName,
           this->itemToVisualMap[floorList[stairsItem->GetLevel()]]);
     }
   }
-  // TODO add implementation for other times
+  else if (_item->GetType() == "WallSegment")
+  {
+    WallSegmentItem *wallSegmentItem = dynamic_cast<WallSegmentItem *>(_item);
+    itemSize.setZ(wallSegmentItem->GetHeight());
+    itemName = this->buildingMaker->AddWall(
+        itemSize, itemPosition, _item->GetSceneRotation());
+  }
+  else if (_item->GetType() == "Window")
+  {
+    itemName = this->buildingMaker->AddWindow(
+        itemSize, itemPosition, _item->GetSceneRotation());
+  }
+  else if (_item->GetType() == "Door")
+  {
+    itemName = this->buildingMaker->AddDoor(
+        itemSize, itemPosition, _item->GetSceneRotation());
+  }
+  else if (_item->GetType() == "Floor")
+  {
+    itemName = this->buildingMaker->AddFloor(
+        itemSize, _item->GetScenePosition(), 0);
+  }
+  this->buildingMaker->ConnectItem(itemName, _item);
+  this->itemToVisualMap[_item] = itemName;
+  _item->SetName(itemName);
 }
 
 /////////////////////////////////////////////////
@@ -1070,15 +1062,7 @@ void EditorView::OnAddLevel()
     this->scene()->addItem(wallSegmentItem);
     newWalls.push_back(wallSegmentItem);
 
-    QVector3D segmentSize = wallSegmentItem->GetSize();
-    segmentSize.setZ(wallSegmentItem->GetHeight());
-    QVector3D segmentPosition = wallSegmentItem->GetScenePosition();
-    segmentPosition.setZ(wallSegmentItem->GetLevelBaseHeight()
-        + segmentPosition.z());
-    std::string wallSegmentName = this->buildingMaker->AddWall(
-        segmentSize, segmentPosition, wallSegmentItem->GetSceneRotation());
-    this->buildingMaker->ConnectItem(wallSegmentName, wallSegmentItem);
-    this->itemToVisualMap[wallSegmentItem] = wallSegmentName;
+    this->Create3DVisual(wallSegmentItem);
 
     floorItem->AttachWallSegment(wallSegmentItem);
     wallSegmentItem->Set3dTexture(QString(""));
@@ -1115,16 +1099,16 @@ void EditorView::OnAddLevel()
 
   floorItem->SetLevel(this->currentLevel);
   floorItem->SetLevelBaseHeight(this->levels[this->currentLevel]->baseHeight);
-  std::string floorName = this->buildingMaker->AddFloor(
-      floorItem->GetSize(), floorItem->GetScenePosition(), 0);
+  this->Create3DVisual(floorItem);
   for (std::vector<StairsItem *>::iterator it = this->stairsList.begin();
       it != this->stairsList.end(); ++it)
   {
     if ((*it)->GetLevel() == (newLevelNum - 1))
-      buildingMaker->AttachManip(this->itemToVisualMap[(*it)], floorName);
+    {
+      buildingMaker->AttachManip(this->itemToVisualMap[(*it)],
+          floorItem->GetName());
+    }
   }
-  this->buildingMaker->ConnectItem(floorName, floorItem);
-  this->itemToVisualMap[floorItem] = floorName;
   this->scene()->addItem(floorItem);
   this->floorList.push_back(floorItem);
   floorItem->Set3dTexture(QString(""));
