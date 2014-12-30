@@ -8,6 +8,7 @@ include_directories(
 )
 
 link_directories(
+  ${CCD_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
 )
