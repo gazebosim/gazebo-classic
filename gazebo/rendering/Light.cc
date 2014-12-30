@@ -215,8 +215,7 @@ void Light::CreateVisual()
 
     // Create a scene node to hold the light selection object.
     Ogre::SceneNode *visSceneNode;
-    visSceneNode = this->visual->GetSceneNode()->createChildSceneNode(
-        this->GetName() + "_SELECTION_NODE_");
+    visSceneNode = this->visual->GetSceneNode()->createChildSceneNode();
 
     // Make sure the unit_sphere has been inserted.
     this->visual->InsertMesh("unit_sphere");
