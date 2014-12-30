@@ -82,6 +82,9 @@
 1. Added inputs for environment variable GAZEBO_GUI_INI_FILE for reading a custom .ini file.
     * [Pull request #1252](https://bitbucket.org/osrf/gazebo/pull-request/1252)
 
+1. Fixed crash on "permission denied" bug, added insert_model integration test.
+    * [Pull request #1329](https://bitbucket.org/osrf/gazebo/pull-request/1329/)
+
 1. Building editor updates
     1. Fixed inspector resizing.
         * [Pull request #1230](https://bitbucket.org/osrf/gazebo/pull-request/1230)

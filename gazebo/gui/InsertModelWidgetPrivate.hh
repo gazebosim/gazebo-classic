@@ -19,6 +19,7 @@
 
 #include <string>
 #include <map>
+#include <set>
 #include <boost/thread/mutex.hpp>
 
 #include "gazebo/common/Event.hh"
@@ -52,6 +53,9 @@ namespace gazebo
 
       /// \brief Callback reference count for retrieving models.
       public: event::ConnectionPtr getModelsConnection;
+
+      /// \brief Cache for the names added to fileTreeWidget
+      public: std::set<std::string> localFilenameCache;
     };
   }
 }
