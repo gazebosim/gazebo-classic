@@ -90,7 +90,7 @@
         </inertia>
       </inertial>
     </link>
-    <joint name='JOINT_0' type='revolute'>
+    <joint name='JOINT_1' type='revolute'>
       <parent>base</parent>
       <child>top</child>
       <axis>

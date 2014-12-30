@@ -14,34 +14,41 @@ data = numpy.loadtxt('data.csv', delimiter='\t', skiprows=1)
 time = range(len(data[:, 0]))
 
 # Joint positions over time
-pyplot.plot(time, data[:, 3])
-pyplot.plot(time, data[:, 0])
-
-pyplot.xlabel('Timestep')
+passive = pyplot.plot(time, data[:, 3], label='Passive')
+actuated = pyplot.plot(time, data[:, 0], label='Actuated')
+pyplot.legend(loc='upper left')
+pyplot.xlabel('Time')
 pyplot.ylabel('Joint position')
 pyplot.show()
 
 # Joint velocities over time
-pyplot.plot(time, data[:, 4])
-pyplot.plot(time, data[:, 1])
+pyplot.plot(time, data[:, 4], label='Passive')
+pyplot.plot(time, data[:, 1], label='Actuated')
 
-pyplot.xlabel('Timestep')
+pyplot.legend(loc='upper left')
+pyplot.legend()
+pyplot.xlabel('Time')
 pyplot.ylabel('Joint velocity')
 pyplot.show()
 
 # Joint torques over time
-pyplot.plot(time, data[:, 5])
-pyplot.plot(time, data[:, 2])
+pyplot.plot(time, data[:, 5], label='Passive')
+pyplot.plot(time, data[:, 2], label='Actuated')
 
-pyplot.xlabel('Timestep')
+pyplot.legend()
+pyplot.xlabel('Time')
 pyplot.ylabel('Joint torque')
+# Show line at 0 with joint limits
+pyplot.ylim((-0.1, max(data[:, 2])+0.1))
 pyplot.show()
 
 # Torque vs. velocity (velocity on x-axis)
 
-pyplot.plot(data[:, 4], data[:, 5])
-pyplot.plot(data[:, 1], data[:, 2])
+pyplot.plot(data[:, 4], data[:, 5], label='Passive')
+pyplot.plot(data[:, 1], data[:, 2], label='Actuated')
 
+pyplot.legend()
 pyplot.xlabel('Joint velocity')
 pyplot.ylabel('Joint torque')
+pyplot.ylim((-0.1, max(data[:, 2])+0.1))
 pyplot.show()

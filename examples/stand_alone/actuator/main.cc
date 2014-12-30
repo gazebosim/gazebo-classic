@@ -27,7 +27,7 @@ int main(int _argc, char **_argv)
 
   // TODO: read index and maximumTargetVelocity from SDF
   const int index = 0;
-  const float maximumTargetVelocity = 600;
+  const float maximumTargetVelocity = 400;
   const float velocityStep = maximumTargetVelocity / (float) maxIterations;
 
   // Initialize gazebo.
@@ -47,7 +47,7 @@ int main(int _argc, char **_argv)
   modelNames.push_back("actuator_example");
   modelNames.push_back("unactuated_example");
 
-  const std::string jointName = "JOINT_0";
+  //const std::string jointName = "JOINT_0";
 
   std::vector<gazebo::physics::JointPtr> joints;
 
@@ -59,13 +59,20 @@ int main(int _argc, char **_argv)
       std::cout << "Couldn't find model: " << modelNames[i] << std::endl;
       return -1;
     }
-    gazebo::physics::JointPtr joint = model->GetJoint(jointName);
-    if (!joint)
+    for (unsigned int j = 0; j < 2; j++)
     {
-      std::cout << "Couldn't find joint: " << jointName << std::endl;
-      return -1;
+      std::string jointName = "JOINT_" + boost::to_string(j);
+      gazebo::physics::JointPtr joint = model->GetJoint(jointName);
+      if (!joint)
+      {
+        std::cout << "Couldn't find joint " << jointName << " for model "
+                  << modelNames[i] << std::endl;
+      }
+      else
+      {
+        joints.push_back(joint);
+      }
     }
-    joints.push_back(joint);
   }
 
   // Open a file for writing

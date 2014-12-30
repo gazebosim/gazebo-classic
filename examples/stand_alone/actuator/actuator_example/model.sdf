@@ -110,10 +110,10 @@
       <actuator>
         <name>actuator_0</name>
         <joint>JOINT_0</joint>
-        <index>0</index> <!-- ? -->
+        <index>0</index>
         <type>electric_motor</type>
         <power>100</power>
-        <max_velocity>500</max_velocity>
+        <max_velocity>300</max_velocity>
         <max_torque>1.5</max_torque>
       </actuator>
     </plugin>

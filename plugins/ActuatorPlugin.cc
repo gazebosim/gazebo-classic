@@ -128,7 +128,8 @@ void ActuatorPlugin::WorldUpdateCallback()
     const int index = this->actuators[i].jointIndex;
     const float velocity = this->joints[i]->GetVelocity(index);
     float force = this->joints[i]->GetForce(index);
-    force = this->actuators[i].modelFunction(velocity, force, this->actuators[i]);
+    force = this->actuators[i].modelFunction(velocity, force,
+              this->actuators[i]);
     this->joints[i]->SetForce(index, force);
   }
 }
