@@ -23,7 +23,9 @@
 #include <sstream>
 #include <string>
 
-#include <boost/thread.hpp>
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include <boost/thread.hpp>
+#endif
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
