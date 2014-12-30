@@ -24,11 +24,11 @@ set (model_dirs
 )
 
 set (MODEL_URI_LIST "" CACHE INTERNAL "Model URI List" FORCE)
-get_filename_component(MODEL_INSTALL_PREFIX_ABSOLUTE ${CMAKE_INSTALL_PREFIX}
+get_filename_component(MODEL_INSTALL_PREFIX_ABSOLUTE ${MODEL_INSTALL_PREFIX}
   ABSOLUTE)
 
 foreach (model_dir ${model_dirs})
-  install (DIRECTORY ${model_dir} DESTINATION ${MODEL_INSTALL_PREFIX_ABSOLUTE}/models)
-  install (FILES ${model_dir}/model.config ${model_dir}/model.sdf DESTINATION ${MODEL_INSTALL_PREFIX_ABSOLUTE}/${model_dir})
+  #install (DIRECTORY ${model_dir} DESTINATION ${MODEL_INSTALL_PREFIX_ABSOLUTE}/models)
+  install (FILES ${model_dir}/model.config ${model_dir}/model.sdf DESTINATION ${MODEL_INSTALL_PREFIX_ABSOLUTE}/models/${model_dir})
   set(MODEL_URI_LIST "${MODEL_URI_LIST}<uri>file://${model_dir}</uri>\n")
 endforeach()

@@ -43,7 +43,7 @@ namespace gazebo
     /// \brief Maximum torque of the actuator (Newton-meters)
     public: float maximumTorque;
 
-    public: boost::function<float (float, const ActuatorProperties&)>
+    public: boost::function<float (float, float, const ActuatorProperties&)>
               modelFunction;
   };
 

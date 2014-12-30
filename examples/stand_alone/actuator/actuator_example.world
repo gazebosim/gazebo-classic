@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
-  <world name="actuator_example">
+  <world name="actuator_example_world">
+
     <include>
       <uri>model://sun</uri>
     </include>
@@ -18,8 +19,6 @@
       <uri>model://unactuated_example</uri>
       <pose>5 0 0 0 0 0</pose>
     </include>
-
-
 
   </world>
 </sdf>

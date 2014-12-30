@@ -19,11 +19,14 @@
 
 using namespace gazebo;
 
-float ElectricMotorModel(const float _speed,
+float ElectricMotorModel(const float _speed, const float /*_torque*/,
  const ActuatorProperties &_properties)
 {
   if (_speed > _properties.maximumVelocity)
     return _properties.power / _properties.maximumVelocity;
+
+  if (_speed == 0)
+    return 0;
 
   float torque = _properties.power / _speed;
 
@@ -33,7 +36,16 @@ float ElectricMotorModel(const float _speed,
   return torque;
 }
 
-float NullModel(const float /*_speed*/,
+float VelocityLimiterModel(const float _speed, const float _torque,
+ const ActuatorProperties &_properties)
+{
+   if (_speed > _properties.maximumVelocity)
+    return _properties.maximumTorque;
+
+   return _torque;
+}
+
+float NullModel(const float /*_speed*/, const float /*_torque*/,
                 const ActuatorProperties &/*_properties*/)
 {
   return 0;
@@ -95,8 +107,8 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       if (!joint)
         continue;
       // Apply starting torque
-      joint->SetForce(properties.jointIndex, -properties.maximumTorque);
-      joint->SetVelocity(properties.jointIndex, 0);
+      joint->SetForce(properties.jointIndex, 0);
+      //joint->SetVelocity(properties.jointIndex, );
       this->joints.push_back(joint);
       this->actuators.push_back(properties);
 
@@ -116,7 +128,7 @@ void ActuatorPlugin::WorldUpdateCallback()
     const int index = this->actuators[i].jointIndex;
     const float velocity = this->joints[i]->GetVelocity(index);
     float force = this->joints[i]->GetForce(index);
-    force += this->actuators[i].modelFunction(velocity, this->actuators[i]);
+    force = this->actuators[i].modelFunction(velocity, force, this->actuators[i]);
     this->joints[i]->SetForce(index, force);
   }
 }

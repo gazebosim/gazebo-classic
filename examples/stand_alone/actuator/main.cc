@@ -23,12 +23,11 @@
 int main(int _argc, char **_argv)
 {
   const int maxIterations = 1000;
-  const int extraIterations = 5;
-  const int sampleTimesteps = 10;
+  const int sampleTimesteps = 1;
 
   // TODO: read index and maximumTargetVelocity from SDF
   const int index = 0;
-  const float maximumTargetVelocity = 500;
+  const float maximumTargetVelocity = 600;
   const float velocityStep = maximumTargetVelocity / (float) maxIterations;
 
   // Initialize gazebo.
@@ -58,25 +57,25 @@ int main(int _argc, char **_argv)
     if (!model)
     {
       std::cout << "Couldn't find model: " << modelNames[i] << std::endl;
-      continue;
+      return -1;
     }
     gazebo::physics::JointPtr joint = model->GetJoint(jointName);
     if (!joint)
     {
       std::cout << "Couldn't find joint: " << jointName << std::endl;
-      continue;
+      return -1;
     }
     joints.push_back(joint);
   }
 
   // Open a file for writing
-  boost::filesystem::path path("../data/data.csv");
+  boost::filesystem::path path("../data");
   if (!boost::filesystem::exists(path))
   {
     boost::filesystem::create_directories(path);
   }
   std::ofstream fileStream;
-  fileStream.open(path.string().c_str());
+  fileStream.open((path.string() + "/data.csv").c_str());
   // Push initial file headings
   fileStream << "actuated_joint_pos\tactuated_joint_vel\t"
              << "actuated_joint_torque\tunactuated_joint_pos\t"
@@ -84,17 +83,17 @@ int main(int _argc, char **_argv)
 
   // Run the simulation for a fixed number of iterations.
   // Apply an increasing ramp signal to the velocity of the joints of interest
-  for (unsigned int i = 0; i < maxIterations+extraIterations; ++i)
+  for (unsigned int i = 0; i < maxIterations; ++i)
   {
     // Command joint speed for this timestep
     for (unsigned int j = 0; j < joints.size(); j++)
     {
-      if (!joints[i])
+      if (!joints[j])
       {
         std::cout << "got NULL joint in actuator example main.cc" << std::endl;
         continue;
       }
-      joints[i]->SetVelocity(index, velocityStep*i);
+      joints[j]->SetVelocity(index, velocityStep*i);
     }
 
     gazebo::runWorld(world, sampleTimesteps);
@@ -102,9 +101,9 @@ int main(int _argc, char **_argv)
     // Print joint position, velocity and torques for each model to file
     for (unsigned int j = 0; j < joints.size(); j++)
     {
-      fileStream << joints[i]->GetAngle(index) << "\t"
-                 << joints[i]->GetVelocity(index) << "\t"
-                 << joints[i]->GetForce(index);
+      fileStream << joints[j]->GetAngle(index) << "\t"
+                 << joints[j]->GetVelocity(index) << "\t"
+                 << joints[j]->GetForce(index);
       if (j == joints.size() - 1)
       {
         fileStream << std::endl;
