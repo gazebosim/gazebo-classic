@@ -426,7 +426,7 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
     unsigned int &_height)
 {
   sensors::SensorPtr sensor = sensors::get_sensor(_cameraName);
-  EXPECT_TRUE(sensor);
+  EXPECT_TRUE(sensor != NULL);
   sensors::CameraSensorPtr camSensor =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 

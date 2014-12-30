@@ -2,7 +2,6 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
-  ${CEGUI_INCLUDE_DIRS}
   skyx
   skyx/include
 )
@@ -28,7 +27,6 @@ set (sources
   FPSViewController.cc
   GpuLaser.cc
   Grid.cc
-  GUIOverlay.cc
   Heightmap.cc
   JointVisual.cc
   LaserVisual.cc
@@ -73,7 +71,6 @@ set (headers
   FPSViewController.hh
   GpuLaser.hh
   Grid.hh
-  GUIOverlay.hh
   Heightmap.hh
   JointVisual.hh
   LaserVisual.hh
@@ -103,7 +100,6 @@ set (headers
   WindowManager.hh
   WrenchVisual.hh
   ogre_gazebo.h
-  cegui.h
 )
 
 if (HAVE_OCULUS)
@@ -153,7 +149,6 @@ target_link_libraries(gazebo_rendering
   gazebo_transport
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
-  ${CEGUI_LIBRARIES}
 )
 
 if (HAVE_OCULUS)

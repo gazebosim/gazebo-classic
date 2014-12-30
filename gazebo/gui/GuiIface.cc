@@ -30,6 +30,12 @@
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/GuiIface.hh"
 
+#ifdef WIN32
+# define HOMEDIR "HOMEPATH"
+#else
+# define HOMEDIR "HOME"
+#endif  // WIN32
+
 // These are needed by QT. They need to stay valid during the entire
 // lifetime of the application, and argc > 0 and argv must contain one valid
 // character string
@@ -161,9 +167,35 @@ void gui::init()
 }
 
 /////////////////////////////////////////////////
-bool gui::loadINI(const boost::filesystem::path &_file)
+bool gui::loadINI(boost::filesystem::path _file)
 {
   bool result = true;
+
+  // Only use the environment variables if _file is empty.
+  if (_file.empty())
+  {
+    // Get the gui.ini path environment variable
+    char *guiINIFile = getenv("GAZEBO_GUI_INI_FILE");
+    char *home = getenv(HOMEDIR);
+
+    // If the environment variable was specified
+    if (guiINIFile)
+    {
+      _file = guiINIFile;
+      if (!boost::filesystem::exists(_file))
+      {
+        gzerr << "GAZEBO_GUI_INI_FILE does not exist: " << _file << std::endl;
+        return false;
+      }
+    }
+    else if (home)
+    {
+      // Check the home directory
+      // Construct the path to gui.ini
+      _file = home;
+      _file = _file / ".gazebo" / "gui.ini";
+    }
+  }
 
   // Create the gui.ini file if it doesn't exist.
   if (!boost::filesystem::exists(_file))
@@ -171,6 +203,8 @@ bool gui::loadINI(const boost::filesystem::path &_file)
     gui::setINIProperty("geometry.x", 0);
     gui::setINIProperty("geometry.y", 0);
     gui::saveINI(_file);
+    gzwarn << "Couldn't locate specified .ini. Creating file at " << _file
+          << std::endl;
   }
 
   try
@@ -184,29 +218,14 @@ bool gui::loadINI(const boost::filesystem::path &_file)
     result = false;
   }
 
+  gzlog << "Loaded .ini file from: " << _file << std::endl;
   return result;
 }
 
 /////////////////////////////////////////////////
 bool gui::load()
 {
-  bool result = true;
-
-  // Get the HOME path
-  char *home = getenv("HOME");
-  if (home)
-  {
-    // Construct the path to gui.ini
-    boost::filesystem::path path = home;
-    path = path / ".gazebo" / "gui.ini";
-    result = gui::loadINI(path);
-  }
-  else
-  {
-    gzerr << "HOME environment variable not found. "
-      "Unable to read ~/.gazebo/gui.ini file.\n";
-    result = false;
-  }
+  gui::loadINI();
 
   g_modelRightMenu = new gui::ModelRightMenu();
 
@@ -228,7 +247,7 @@ bool gui::load()
   g_main_win->Load();
   g_main_win->resize(1024, 768);
 
-  return result;
+  return true;
 }
 
 /////////////////////////////////////////////////

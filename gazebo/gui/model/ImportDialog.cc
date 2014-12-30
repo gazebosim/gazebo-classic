@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2013-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,7 +141,7 @@ void ImportDialog::OnImport()
   {
     std::string msg = this->pathLineEdit->text().toStdString() +
         " is not a valid mesh file.\nPlease select another file.";
-    QMessageBox::warning(0, QString("Invalid Mesh File"),
+    QMessageBox::warning(this, QString("Invalid Mesh File"),
         QString(msg.c_str()), QMessageBox::Ok,
         QMessageBox::Ok);
   }
