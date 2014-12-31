@@ -177,7 +177,7 @@ class JointTest : public ServerFixture,
             }
             msgs::Joint jointMsg;
             jointMsg.set_name("joint");
-            jointMsg.set_type(msgs::Convert(_opt.type));
+            jointMsg.set_type(msgs::ConvertJointType(_opt.type));
             msgs::Set(jointMsg.mutable_pose(), _opt.jointPose);
             if (_opt.worldParent)
             {
