@@ -21,7 +21,7 @@ TEST(Cmake, Config)
 {
   char cmd[1024];
 
-  snprintf(cmd, sizeof(cmd), "cmake %s -DGAZEBO_VERSION=%f",
+  snprintf(cmd, sizeof(cmd), "cmake %s -DGAZEBO_VERSION=%s",
            SOURCE_DIR, GAZEBO_VERSION);
   ASSERT_EQ(system(cmd), 0);
   snprintf(cmd, sizeof(cmd), "make");

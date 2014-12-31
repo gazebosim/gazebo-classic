@@ -14,38 +14,26 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_INITIAL_VELOCITY_PLUGIN_HH_
-#define _GAZEBO_INITIAL_VELOCITY_PLUGIN_HH_
+#ifndef _GAZEBO_EXCEPTION_MODEL_PLUGIN_LOAD_HH_
+#define _GAZEBO_EXCEPTION_MODEL_PLUGIN_LOAD_HH_
 
 #include <string>
-#include <vector>
 
-#include <sdf/sdf.hh>
 #include "gazebo/common/Plugin.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/gazebo.hh"
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE InitialVelocityPlugin : public ModelPlugin
+  class ExceptionModelPluginLoad : public ModelPlugin
   {
-    /// \brief Constructor.
-    public: InitialVelocityPlugin();
+    /// \brief Constructor
+    public: ExceptionModelPluginLoad();
 
     /// \brief Destructor
-    public: ~InitialVelocityPlugin();
+    public: virtual ~ExceptionModelPluginLoad();
 
-    // Documentation Inherited.
-    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
-
-    // Documentation Inherited.
-    public: virtual void Reset();
-
-    /// \brief Parent model.
-    private: physics::ModelPtr model;
-
-    /// \brief SDF for this plugin;
-    private: sdf::ElementPtr sdf;
+    // Documentation inherited
+    public: virtual void Load(physics::ModelPtr _mode, sdf::ElementPtr _sdf);
   };
 }
-// ifndef _INITIAL_VELOCITY_PLUGIN_HH_
 #endif

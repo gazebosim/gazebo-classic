@@ -14,46 +14,29 @@
  * limitations under the License.
  *
 */
-
-#include "gazebo/common/Assert.hh"
-#include "gazebo/physics/Model.hh"
-#include "plugins/InitialVelocityPlugin.hh"
+#include "plugins/ExceptionModelPluginInit.hh"
 
 using namespace gazebo;
-
-GZ_REGISTER_MODEL_PLUGIN(InitialVelocityPlugin)
+GZ_REGISTER_MODEL_PLUGIN(ExceptionModelPluginInit)
 
 /////////////////////////////////////////////////
-InitialVelocityPlugin::InitialVelocityPlugin()
+ExceptionModelPluginInit::ExceptionModelPluginInit() : ModelPlugin()
 {
 }
 
 /////////////////////////////////////////////////
-InitialVelocityPlugin::~InitialVelocityPlugin()
+ExceptionModelPluginInit::~ExceptionModelPluginInit()
 {
 }
 
 /////////////////////////////////////////////////
-void InitialVelocityPlugin::Load(physics::ModelPtr _model,
-                     sdf::ElementPtr _sdf)
+void ExceptionModelPluginInit::Load(physics::ModelPtr /*_model*/,
+                               sdf::ElementPtr /*_sdf*/)
 {
-  GZ_ASSERT(_model, "_model pointer is NULL");
-  this->model = _model;
-  this->sdf = _sdf;
-  this->Reset();
 }
 
 /////////////////////////////////////////////////
-void InitialVelocityPlugin::Reset()
+void ExceptionModelPluginInit::Init()
 {
-  if (this->sdf->HasElement("linear"))
-  {
-    math::Vector3 linear = this->sdf->Get<math::Vector3>("linear");
-    this->model->SetLinearVel(linear);
-  }
-  if (this->sdf->HasElement("angular"))
-  {
-    math::Vector3 angular = this->sdf->Get<math::Vector3>("angular");
-    this->model->SetAngularVel(angular);
-  }
+  throw std::runtime_error("Example error");
 }

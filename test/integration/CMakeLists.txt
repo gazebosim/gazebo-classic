@@ -64,6 +64,7 @@ set(tests
   physics_msgs.cc
   physics_thread_safe.cc
   pioneer2dx.cc
+  plugin.cc
   polyline.cc
   road.cc
   sensor.cc

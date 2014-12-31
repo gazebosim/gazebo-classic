@@ -1,13 +1,13 @@
 include ( ${QT_USE_FILE} )
 add_definitions(${QT_DEFINITIONS})
 
-include_directories( 
+include_directories(
   ${tinyxml_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
 )
 
-link_directories( 
+link_directories(
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
 )
@@ -16,8 +16,8 @@ if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
 endif()
 
-set (test_sources 
-  gz_log_TEST.cc 
+set (test_sources
+  gz_log_TEST.cc
   gz_TEST.cc
 )
 
