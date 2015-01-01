@@ -205,6 +205,8 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
 
   math::Pose targetWorldPose = this->dataPtr->targetVis->GetWorldPose();
   math::Box targetBbox = this->dataPtr->targetVis->GetBoundingBox();
+  targetBbox.min *= this->dataPtr->targetVis->GetScale();
+  targetBbox.max *= this->dataPtr->targetVis->GetScale();  
 
   std::vector<math::Vector3> targetVertices;
   this->Transform(targetBbox, targetWorldPose, targetVertices);
@@ -219,6 +221,8 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
 
     math::Pose worldPose = vis->GetWorldPose();
     math::Box bbox = vis->GetBoundingBox();
+    bbox.min *= vis->GetScale();
+    bbox.max *= vis->GetScale();    
 
     std::vector<math::Vector3> vertices;
     this->Transform(bbox, worldPose, vertices);
