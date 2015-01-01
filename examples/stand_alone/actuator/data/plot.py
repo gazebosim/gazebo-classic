@@ -26,7 +26,6 @@ pyplot.plot(time, data[:, 4], label='Passive')
 pyplot.plot(time, data[:, 1], label='Actuated')
 
 pyplot.legend(loc='upper left')
-pyplot.legend()
 pyplot.xlabel('Time')
 pyplot.ylabel('Joint velocity')
 pyplot.show()
