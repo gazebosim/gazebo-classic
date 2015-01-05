@@ -19,6 +19,7 @@
 #define _GAZEBO_ACTUATOR_PLUGIN_
 
 #include <vector>
+#include <string>
 #include <gazebo/common/Events.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/gazebo.hh>

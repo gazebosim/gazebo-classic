@@ -70,7 +70,8 @@ int main(int _argc, char **_argv)
         return -1;
       }
       sdf::ElementPtr elem = modelSDF->GetElement("plugin");
-      while (elem->GetAttribute("filename")->GetAsString().compare("libActuatorPlugin.so"))
+      while (elem->GetAttribute("filename")->GetAsString().
+              compare("libActuatorPlugin.so"))
       {
         elem = elem->GetNextElement("plugin");
       }
@@ -101,7 +102,7 @@ int main(int _argc, char **_argv)
       }
       jointName = elem->GetElement("joint")->Get<std::string>();
     }
-    
+
     gazebo::physics::JointPtr joint = model->GetJoint(jointName);
     if (!joint)
     {

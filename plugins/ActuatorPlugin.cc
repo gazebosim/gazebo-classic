@@ -20,12 +20,12 @@
 using namespace gazebo;
 
 float ElectricMotorModel(const float _speed, const float /*_torque*/,
- const ActuatorProperties &_properties)
+  const ActuatorProperties &_properties)
 {
   if (_speed > _properties.maximumVelocity)
     return _properties.power / _properties.maximumVelocity;
 
-  if (_speed == 0)
+  if (std::fabs(_speed) < 1e-6 )
     return 0;
 
   float torque = _properties.power / _speed;
@@ -37,12 +37,12 @@ float ElectricMotorModel(const float _speed, const float /*_torque*/,
 }
 
 float VelocityLimiterModel(const float _speed, const float _torque,
- const ActuatorProperties &_properties)
+  const ActuatorProperties &_properties)
 {
-   if (_speed > _properties.maximumVelocity)
+  if (_speed > _properties.maximumVelocity)
     return _properties.maximumTorque;
 
-   return _torque;
+  return _torque;
 }
 
 float NullModel(const float /*_speed*/, const float /*_torque*/,
@@ -90,7 +90,7 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
           properties.modelFunction = ElectricMotorModel;
         }
       }
-      if (properties.modelFunction == NULL)      
+      if (properties.modelFunction == NULL)
         properties.modelFunction = NullModel;
 
       if (elem->HasElement("index"))
@@ -106,15 +106,15 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       physics::JointPtr joint = _parent->GetJoint(jointName);
       if (!joint)
         continue;
-      //joint->SetForce(properties.jointIndex, 0);
-      //joint->SetVelocity(properties.jointIndex, 0);
+      joint->SetForce(properties.jointIndex, properties.maximumTorque);
+      joint->SetVelocity(properties.jointIndex, 0);
       this->joints.push_back(joint);
       this->actuators.push_back(properties);
 
       elem = elem->GetNextElement("actuator");
     }
     // Set up a physics update callback
-    this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
+    this->connections.push_back(event::Events::ConnectWorldUpdateEnd(
       boost::bind(&ActuatorPlugin::WorldUpdateCallback, this)));
   }
 }
