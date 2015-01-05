@@ -961,11 +961,12 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
 /////////////////////////////////////////////////
 void EditorView::OnColorSelected(QColor _color)
 {
+  if (!_color.isValid())
+    return;
+
   this->CancelDrawMode();
   this->scene()->clearSelection();
-
-  if (_color.isValid())
-    this->drawMode = COLOR;
+  this->drawMode = COLOR;
 }
 
 /////////////////////////////////////////////////
