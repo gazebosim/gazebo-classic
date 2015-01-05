@@ -114,7 +114,7 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       elem = elem->GetNextElement("actuator");
     }
     // Set up a physics update callback
-    this->connections.push_back(event::Events::ConnectWorldUpdateEnd(
+    this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
       boost::bind(&ActuatorPlugin::WorldUpdateCallback, this)));
   }
 }
