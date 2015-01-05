@@ -15,8 +15,6 @@
  *
 */
 
-// TODO: Set motor model
-
 #include "ActuatorPlugin.hh"
 
 using namespace gazebo;
@@ -26,9 +24,6 @@ float ElectricMotorModel(const float _speed, const float /*_torque*/,
 {
   if (_speed > _properties.maximumVelocity)
     return _properties.power / _properties.maximumVelocity;
-
-  if (std::fabs(_speed) < 1e-6 )
-    return 0;
 
   float torque = _properties.power / _speed;
 
@@ -91,6 +86,21 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 
           properties.modelFunction = ElectricMotorModel;
         }
+        else if (modelType.compare("velocity_limiter") == 0)
+        {
+          if (!elem->HasElement("max_velocity") ||
+              !elem->HasElement("max_torque"))
+            continue;
+          properties.maximumVelocity =
+            elem->GetElement("max_velocity")->Get<float>();
+          properties.maximumTorque =
+            elem->GetElement("max_torque")->Get<float>();
+          properties.modelFunction = VelocityLimiterModel;
+        }
+        else
+        {
+          properties.modelFunction = NullModel;
+        }
       }
       if (properties.modelFunction == NULL)
         properties.modelFunction = NullModel;
@@ -109,17 +119,13 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       if (!joint)
         continue;
 
-      // Set initial conditions. Perhaps these should be customizable
-      joint->SetForce(properties.jointIndex, properties.maximumTorque);
-      joint->SetVelocity(properties.jointIndex, 0);
-
       this->joints.push_back(joint);
       this->actuators.push_back(properties);
 
       elem = elem->GetNextElement("actuator");
     }
     // Set up a physics update callback
-    this->connections.push_back(event::Events::ConnectWorldUpdateEnd(
+    this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
       boost::bind(&ActuatorPlugin::WorldUpdateCallback, this)));
   }
 }
@@ -131,9 +137,14 @@ void ActuatorPlugin::WorldUpdateCallback()
   {
     const int index = this->actuators[i].jointIndex;
     const float velocity = this->joints[i]->GetVelocity(index);
-    float force = this->joints[i]->GetForce(index);
-    force = this->actuators[i].modelFunction(velocity, force,
+
+    // Joint::SetMaxForce doesn't work/is deprecated
+    float curForce = this->joints[i]->GetForce(index);
+    float maxForce = this->actuators[i].modelFunction(velocity, curForce,
               this->actuators[i]);
-    this->joints[i]->SetForce(index, force);
+    if (curForce > maxForce)
+    {
+      this->joints[i]->SetForce(index, maxForce);
+    }
   }
 }

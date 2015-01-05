@@ -22,12 +22,18 @@
 /////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
-  // Example-specific parameters:
-  const int maxIterations = 600;
-  const int sampleTimesteps = 1;
-  const float maxTorqueAdj = 150;
+  // Example-specific parameters
 
+  // Maximum number of collection iterations.
+  const int maxIterations = 1000;
+  // Number of timesteps between samples.
+  const int sampleTimesteps = 1;
+  // How much to scale the actuator's maximum torque by
+  const float maxTorqueAdj = 10;
+
+  // The joint index which we are collecting data on.
   unsigned int index;
+  // The torque we are commanding to the actuator
   float maxTorque;
 
   // Initialize gazebo.
@@ -129,10 +135,11 @@ int main(int _argc, char **_argv)
              << "unactuated_joint_vel\tunactuated_joint_torque" << std::endl;
 
   // Run the simulation for a fixed number of iterations.
+  std::cout << "Collecting data for " << maxIterations << " iterations."
+            << std::endl;
 
   for (unsigned int i = 0; i < maxIterations; ++i)
   {
-    float currentTorque = maxTorque*i/maxIterations;
     for (unsigned int j = 0; j < joints.size(); ++j)
     {
       if (!joints[j])
@@ -140,8 +147,13 @@ int main(int _argc, char **_argv)
         std::cout << "got NULL joint in actuator example main.cc" << std::endl;
         continue;
       }
-
-      joints[j]->SetForce(index, currentTorque);
+      // Command a constant force on each joint.
+      // This causes the joints to accelerate linearly
+      // The linear velocity data gives a range of values, allowing us to
+      // construct a torque vs. velocity graph
+      // By commanding a torque above the actuator's maximum torque value
+      // we are forcing the maximum force state of the actuator
+      joints[j]->SetForce(index, maxTorque);
     }
 
     gazebo::runWorld(world, sampleTimesteps);
@@ -166,5 +178,7 @@ int main(int _argc, char **_argv)
   // Close everything.
   fileStream.close();
   gazebo::shutdown();
+
+  std::cout << "Finished data collection. Closing Gazebo." << std::endl;
   return 0;
 }

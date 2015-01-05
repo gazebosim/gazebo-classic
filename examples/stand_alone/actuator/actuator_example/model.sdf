@@ -112,8 +112,8 @@
         <joint>JOINT_0</joint>
         <index>0</index>
         <type>electric_motor</type>
-        <power>100</power>
-        <max_velocity>75</max_velocity>
+        <power>10</power>
+        <max_velocity>20</max_velocity>
         <max_torque>2.0</max_torque>
       </actuator>
     </plugin>
