@@ -17,7 +17,7 @@
 
     <include>
       <uri>model://unactuated_example</uri>
-      <pose>5 0 0 0 0 0</pose>
+      <pose>100 0 0 0 0 0</pose>
     </include>
 
   </world>

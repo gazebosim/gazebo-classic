@@ -22,13 +22,13 @@
 /////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
-  const int maxIterations = 1000;
+  // Example-specific parameters:
+  const int maxIterations = 600;
   const int sampleTimesteps = 1;
+  const float maxTorqueAdj = 150;
 
-  // TODO: read index and maximumTargetVelocity from SDF
-  const int index = 0;
-  const float maximumTargetVelocity = 400;
-  const float velocityStep = maximumTargetVelocity / (float) maxIterations;
+  unsigned int index;
+  float maxTorque;
 
   // Initialize gazebo.
   gazebo::setupServer(_argc, _argv);
@@ -47,7 +47,7 @@ int main(int _argc, char **_argv)
   modelNames.push_back("actuator_example");
   modelNames.push_back("unactuated_example");
 
-  //const std::string jointName = "JOINT_0";
+  std::string jointName;
 
   std::vector<gazebo::physics::JointPtr> joints;
 
@@ -59,19 +59,58 @@ int main(int _argc, char **_argv)
       std::cout << "Couldn't find model: " << modelNames[i] << std::endl;
       return -1;
     }
-    for (unsigned int j = 0; j < 2; j++)
+
+    if (modelNames[i].compare("actuator_example") == 0)
     {
-      std::string jointName = "JOINT_" + boost::to_string(j);
-      gazebo::physics::JointPtr joint = model->GetJoint(jointName);
-      if (!joint)
+      const sdf::ElementPtr modelSDF = model->GetSDF();
+      // Find the ActuatorPlugin SDF block
+      if (!modelSDF->HasElement("plugin"))
       {
-        std::cout << "Couldn't find joint " << jointName << " for model "
-                  << modelNames[i] << std::endl;
+        std::cout << "ERROR: couldn't find index element." << std::endl;
+        return -1;
       }
-      else
+      sdf::ElementPtr elem = modelSDF->GetElement("plugin");
+      while (elem->GetAttribute("filename")->GetAsString().compare("libActuatorPlugin.so"))
       {
-        joints.push_back(joint);
+        elem = elem->GetNextElement("plugin");
       }
+
+      if (!elem->HasElement("actuator"))
+      {
+        std::cout << "ERROR: couldn't find actuator element" << std::endl;
+        return -1;
+      }
+      elem = elem->GetElement("actuator");
+      if (!elem->HasElement("index"))
+      {
+        std::cout << "ERROR: couldn't find index element." << std::endl;
+        return -1;
+      }
+      index = elem->GetElement("index")->Get<unsigned int>();
+      if (!elem->HasElement("max_torque"))
+      {
+        std::cout << "ERROR: couldn't find max_torque element." << std::endl;
+        return -1;
+      }
+      maxTorque = maxTorqueAdj*elem->GetElement("max_torque")->Get<float>();
+
+      if (!elem->HasElement("joint"))
+      {
+        std::cout << "ERROR: couldn't find joint element." << std::endl;
+        return -1;
+      }
+      jointName = elem->GetElement("joint")->Get<std::string>();
+    }
+    
+    gazebo::physics::JointPtr joint = model->GetJoint(jointName);
+    if (!joint)
+    {
+      std::cout << "Couldn't find joint " << jointName << " for model "
+                << modelNames[i] << std::endl;
+    }
+    else
+    {
+      joints.push_back(joint);
     }
   }
 
@@ -89,24 +128,25 @@ int main(int _argc, char **_argv)
              << "unactuated_joint_vel\tunactuated_joint_torque" << std::endl;
 
   // Run the simulation for a fixed number of iterations.
-  // Apply an increasing ramp signal to the velocity of the joints of interest
+
   for (unsigned int i = 0; i < maxIterations; ++i)
   {
-    // Command joint speed for this timestep
-    for (unsigned int j = 0; j < joints.size(); j++)
+    float currentTorque = maxTorque*i/maxIterations;
+    for (unsigned int j = 0; j < joints.size(); ++j)
     {
       if (!joints[j])
       {
         std::cout << "got NULL joint in actuator example main.cc" << std::endl;
         continue;
       }
-      joints[j]->SetVelocity(index, velocityStep*i);
+
+      joints[j]->SetForce(index, currentTorque);
     }
 
     gazebo::runWorld(world, sampleTimesteps);
 
     // Print joint position, velocity and torques for each model to file
-    for (unsigned int j = 0; j < joints.size(); j++)
+    for (unsigned int j = 0; j < joints.size(); ++j)
     {
       fileStream << joints[j]->GetAngle(index) << "\t"
                  << joints[j]->GetVelocity(index) << "\t"

@@ -10,11 +10,13 @@ find_package(Boost ${MIN_BOOST_VERSION} REQUIRED system filesystem regex)
 
 find_package(Protobuf REQUIRED)
 
-include_directories(${GAZEBO_INCLUDE_DIRS})
-link_directories(${GAZEBO_LIBRARY_DIRS})
+find_package(SDFormat REQUIRED)
+
+include_directories(${SDFormat_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
+link_directories(${SDFormat_LIBRARY_DIRS} ${GAZEBO_LIBRARY_DIRS})
 
 add_executable(actuator main.cc)
-target_link_libraries(actuator ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread)
+target_link_libraries(actuator ${SDFormat_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread)
 
 set (MODEL_INSTALL_PREFIX ~/.gazebo)
 

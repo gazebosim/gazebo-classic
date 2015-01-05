@@ -17,10 +17,10 @@
           </script>
         </material>
       </visual>
-      <velocity_decay>
+      <!--<velocity_decay>
         <linear>0</linear>
         <angular>0</angular>
-      </velocity_decay>
+      </velocity_decay>-->
       <collision name='top_collision'>
         <geometry>
           <cylinder>
@@ -61,10 +61,10 @@
           </script>
         </material>
       </visual>
-      <velocity_decay>
+      <!--<velocity_decay>
         <linear>0</linear>
         <angular>0</angular>
-      </velocity_decay>
+      </velocity_decay>-->
       <collision name='base_collision'>
         <geometry>
           <cylinder>
@@ -113,8 +113,8 @@
         <index>0</index>
         <type>electric_motor</type>
         <power>100</power>
-        <max_velocity>300</max_velocity>
-        <max_torque>1.5</max_torque>
+        <max_velocity>100</max_velocity>
+        <max_torque>2.0</max_torque>
       </actuator>
     </plugin>
   </model>

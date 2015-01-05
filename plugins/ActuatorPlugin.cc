@@ -62,7 +62,7 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       // Get actuator properties
       ActuatorProperties properties;
 
-      // actuator name is currently an optional properties
+      // actuator name is currently an optional property
       if (elem->HasElement("name"))
         properties.name = elem->GetElement("name")->Get<std::string>();
 
@@ -106,9 +106,8 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       physics::JointPtr joint = _parent->GetJoint(jointName);
       if (!joint)
         continue;
-      // Apply starting torque
-      joint->SetForce(properties.jointIndex, 0);
-      //joint->SetVelocity(properties.jointIndex, );
+      //joint->SetForce(properties.jointIndex, 0);
+      //joint->SetVelocity(properties.jointIndex, 0);
       this->joints.push_back(joint);
       this->actuators.push_back(properties);
 

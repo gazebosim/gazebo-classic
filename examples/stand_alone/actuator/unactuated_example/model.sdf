@@ -17,10 +17,10 @@
           </script>
         </material>
       </visual>
-      <velocity_decay>
+      <!--<velocity_decay>
         <linear>0</linear>
         <angular>0</angular>
-      </velocity_decay>
+      </velocity_decay>-->
       <collision name='top_collision'>
         <geometry>
           <cylinder>
@@ -61,10 +61,10 @@
           </script>
         </material>
       </visual>
-      <velocity_decay>
+      <!--<velocity_decay>
         <linear>0</linear>
         <angular>0</angular>
-      </velocity_decay>
+      </velocity_decay>-->
       <collision name='base_collision'>
         <geometry>
           <cylinder>
@@ -90,7 +90,7 @@
         </inertia>
       </inertial>
     </link>
-    <joint name='JOINT_1' type='revolute'>
+    <joint name='JOINT_0' type='revolute'>
       <parent>base</parent>
       <child>top</child>
       <axis>
@@ -101,7 +101,7 @@
           <upper>1e16</upper>
         </limit>
       </axis>
-      <pose>0 0 1 0 -0 0</pose>
+      <pose>0 0 1 0 0 0</pose>
     </joint>
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
