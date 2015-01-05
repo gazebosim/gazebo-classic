@@ -15,6 +15,8 @@
  *
 */
 
+// TODO: Set motor model
+
 #include "ActuatorPlugin.hh"
 
 using namespace gazebo;
@@ -106,8 +108,11 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       physics::JointPtr joint = _parent->GetJoint(jointName);
       if (!joint)
         continue;
+
+      // Set initial conditions. Perhaps these should be customizable
       joint->SetForce(properties.jointIndex, properties.maximumTorque);
       joint->SetVelocity(properties.jointIndex, 0);
+
       this->joints.push_back(joint);
       this->actuators.push_back(properties);
 
