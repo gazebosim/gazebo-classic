@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="actuator_example_world">
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://actuator_example</uri>
+    </include>
+
+    <include>
+      <uri>model://unactuated_example</uri>
+      <pose>100 0 0 0 0 0</pose>
+    </include>
+
+  </world>
+</sdf>
