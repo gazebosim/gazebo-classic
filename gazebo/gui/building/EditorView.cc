@@ -119,8 +119,6 @@ EditorView::EditorView(QWidget *_parent)
   this->levelCounter = 0;
 
   this->mouseTooltip = new QGraphicsTextItem;
-  this->mouseTooltip->setPlainText(
-      "Oops! Color can only be added in the 3D view.");
   this->mouseTooltip->setZValue(10);
 }
 
@@ -267,13 +265,31 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
     {
       if (this->drawMode == WINDOW)
       {
-        this->windowList.push_back(dynamic_cast<WindowItem *>(
-            this->currentMouseItem));
+        if (this->currentMouseItem->parentItem())
+        {
+          this->windowList.push_back(dynamic_cast<WindowItem *>(
+              this->currentMouseItem));
+        }
+        else
+        {
+          this->ShowMouseTooltip(true, _event->pos(),
+              "Windows can only be placed on a wall");
+          return;
+        }
       }
       else if (this->drawMode == DOOR)
       {
-        this->doorList.push_back(dynamic_cast<DoorItem *>(
-            this->currentMouseItem));
+        if (this->currentMouseItem->parentItem())
+        {
+          this->doorList.push_back(dynamic_cast<DoorItem *>(
+              this->currentMouseItem));
+        }
+        else
+        {
+          this->ShowMouseTooltip(true, _event->pos(),
+              "Doors can only be placed on a wall");
+          return;
+        }
       }
       else if (this->drawMode == STAIRS)
       {
@@ -401,11 +417,8 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
       break;
     case COLOR:
     {
-      if (!this->mouseTooltip->scene())
-        this->scene()->addItem(this->mouseTooltip);
-
-      this->mouseTooltip->setPos(this->mapToScene(_event->pos()) +
-          QPointF(15, 15));
+      this->ShowMouseTooltip(true, _event->pos(),
+          "Oops! Color can only be added in the 3D view.");
       break;
     }
     default:
@@ -447,8 +460,8 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
           editorItem->SetAngleOnWall(0);
           this->buildingMaker->DetachManip(this->itemToVisualMap[editorItem],
                 this->itemToVisualMap[wallSegmentItem]);
-          //  editorItem->SetRotation(editorItem->GetRotation()
-          //    - this->mousePressRotation);
+            editorItem->SetRotation(editorItem->GetRotation()
+              - this->mousePressRotation);
           editorItem->SetPosition(mousePoint);
         }
         else
@@ -515,11 +528,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::leaveEvent(QEvent */*_event*/)
 {
-  if (this->mouseTooltip &&
-      this->scene()->items().contains(this->mouseTooltip))
-  {
-    this->scene()->removeItem(this->mouseTooltip);
-  }
+  this->ShowMouseTooltip(false);
 }
 
 /////////////////////////////////////////////////
@@ -546,9 +555,6 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
   }
   else if (_event->key() == Qt::Key_Escape)
   {
-    if (this->mouseTooltip &&
-        this->scene()->items().contains(this->mouseTooltip))
-      this->scene()->removeItem(this->mouseTooltip);
     this->CancelDrawMode();
     gui::editor::Events::createBuildingEditorItem(std::string());
     this->releaseKeyboard();
@@ -799,6 +805,12 @@ void EditorView::DrawWindow(const QPoint &_pos)
   {
     QPointF scenePos = this->mapToScene(_pos);
     windowItem->SetPosition(scenePos.x(), scenePos.y());
+
+    // mouse tooltip
+    if (!windowItem->parentItem())
+      this->MoveMouseTooltip(_pos);
+    else
+      this->ShowMouseTooltip(false);
   }
 }
 
@@ -827,6 +839,12 @@ void EditorView::DrawDoor(const QPoint &_pos)
   {
     QPointF scenePos = this->mapToScene(_pos);
     doorItem->SetPosition(scenePos.x(), scenePos.y());
+
+    // mouse tooltip
+    if (!doorItem->parentItem())
+      this->MoveMouseTooltip(_pos);
+    else
+      this->ShowMouseTooltip(false);
   }
 }
 
@@ -1309,6 +1327,7 @@ void EditorView::OnLevelApply()
 /////////////////////////////////////////////////
 void EditorView::CancelDrawMode()
 {
+  this->ShowMouseTooltip(false);
   if (this->drawMode != NONE)
   {
     if (this->currentMouseItem)
@@ -1452,4 +1471,34 @@ void EditorView::UnlinkGrabbers(GrabberHandle *_grabber1,
 
   // TODO: add option to unlink grabbers besides when deleting one of them,
   // perhaps using a hot-key or at the wall inspector
+}
+
+/////////////////////////////////////////////////
+void EditorView::ShowMouseTooltip(bool _show, const QPoint &_pos, QString _text)
+{
+  if (_show)
+  {
+    if (!this->mouseTooltip->scene())
+      this->scene()->addItem(this->mouseTooltip);
+
+    if (!_text.isNull())
+      this->mouseTooltip->setPlainText(_text);
+
+    this->MoveMouseTooltip(_pos);
+  }
+  else
+  {
+    if (this->mouseTooltip &&
+        this->scene()->items().contains(this->mouseTooltip))
+    {
+      this->scene()->removeItem(this->mouseTooltip);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void EditorView::MoveMouseTooltip(const QPoint &_pos)
+{
+  if (!_pos.isNull())
+    this->mouseTooltip->setPos(this->mapToScene(_pos) + QPointF(15, 15));
 }

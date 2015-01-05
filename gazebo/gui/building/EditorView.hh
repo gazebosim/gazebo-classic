@@ -244,6 +244,13 @@ namespace gazebo
       private: void UnlinkGrabbers(GrabberHandle *_grabber1,
           GrabberHandle *_grabber2 = NULL);
 
+      /// \brief TODO
+      private: void ShowMouseTooltip(bool _show,
+          const QPoint &_pos = QPoint(0, 0), QString _text = NULL);
+
+      /// \brief TODO
+      private: void MoveMouseTooltip(const QPoint &_pos);
+
       /// \brief Current draw mode
       private: int drawMode;
 
