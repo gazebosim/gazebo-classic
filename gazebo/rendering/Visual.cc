@@ -1590,6 +1590,8 @@ void Visual::SetPosition(const math::Vector3 &_pos)
   }*/
   GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is NULL");
   this->dataPtr->sceneNode->setPosition(_pos.x, _pos.y, _pos.z);
+
+  this->dataPtr->sdf->GetElement("pose")->Set(this->GetPose());
 }
 
 //////////////////////////////////////////////////
@@ -1598,6 +1600,8 @@ void Visual::SetRotation(const math::Quaternion &_rot)
   GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is NULL");
   this->dataPtr->sceneNode->setOrientation(
       Ogre::Quaternion(_rot.w, _rot.x, _rot.y, _rot.z));
+
+  this->dataPtr->sdf->GetElement("pose")->Set(this->GetPose());
 }
 
 //////////////////////////////////////////////////
