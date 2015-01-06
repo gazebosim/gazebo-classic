@@ -25,9 +25,9 @@ int main(int _argc, char **_argv)
   boost::program_options::options_description desc("Data collection options");
 
   // Maximum number of collection iterations.
-  int maxIterations = 1000;
+  int maxIterations = 2000;
   // Number of timesteps between samples.
-  int sampleTimesteps = 15;
+  int sampleTimesteps = 1;
   // How much to scale the actuator's maximum torque by
   float maxTorqueAdj = 2;
 

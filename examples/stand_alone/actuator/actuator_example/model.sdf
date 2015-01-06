@@ -113,7 +113,7 @@
         <index>0</index>
         <type>electric_motor</type>
         <power>20</power>
-        <max_velocity>100</max_velocity>
+        <max_velocity>6</max_velocity>
         <max_torque>10.0</max_torque>
       </actuator>
     </plugin>
