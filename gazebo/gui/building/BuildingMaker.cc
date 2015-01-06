@@ -53,6 +53,8 @@ using namespace gazebo;
 using namespace gui;
 
 double BuildingMaker::conversionScale;
+const std::string BuildingMaker::buildingDefaultName = "Untitled";
+const std::string BuildingMaker::previewName = "BuildingPreview";
 
 /////////////////////////////////////////////////
 // Helper function to generate a valid folder name from a human-readable model
@@ -126,9 +128,7 @@ void AddDirToModelPaths(const std::string& _path)
 /////////////////////////////////////////////////
 BuildingMaker::BuildingMaker() : EntityMaker()
 {
-  this->buildingDefaultName = "Untitled";
   this->modelName = this->buildingDefaultName;
-  this->previewName = "BuildingPreview";
 
   this->conversionScale = 0.01;
 

@@ -357,7 +357,7 @@ namespace gazebo
       private: std::string modelName;
 
       /// \brief Name of the building model preview.
-      private: std::string previewName;
+      private: static const std::string previewName;
 
       /// \brief The root visual of the building model preview.
       private: rendering::VisualPtr previewVisual;
@@ -402,7 +402,7 @@ namespace gazebo
       private: std::vector<event::ConnectionPtr> connections;
 
       /// \brief Default name of building model
-      private: std::string buildingDefaultName;
+      private: static const std::string buildingDefaultName;
 
       /// \brief A dialog for setting building model name and save location.
       private: FinishBuildingDialog *saveDialog;
