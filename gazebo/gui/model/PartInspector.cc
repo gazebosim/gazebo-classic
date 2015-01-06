@@ -34,6 +34,7 @@ PartInspector::PartInspector(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("PartInspector");
   this->setWindowTitle(tr("Part Inspector"));
+  this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   QLabel *partLabel = new QLabel(tr("Name:"));
   this->partNameLabel = new QLabel(tr(""));
