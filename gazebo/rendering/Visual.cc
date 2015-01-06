@@ -1064,6 +1064,9 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   {
     RTShaderSystem::Instance()->UpdateShaders();
   }
+
+  this->dataPtr->sdf->GetElement("material")->GetElement("script")
+      ->GetElement("name")->Set(_materialName);
 }
 
 /////////////////////////////////////////////////
