@@ -118,7 +118,7 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       physics::JointPtr joint = _parent->GetJoint(jointName);
       if (!joint)
         continue;
-
+      joint->SetEffortLimit(properties.jointIndex, properties.maximumTorque);
       this->joints.push_back(joint);
       this->actuators.push_back(properties);
 
@@ -137,14 +137,15 @@ void ActuatorPlugin::WorldUpdateCallback()
   {
     const int index = this->actuators[i].jointIndex;
     const float velocity = this->joints[i]->GetVelocity(index);
-
-    // Joint::SetMaxForce doesn't work/is deprecated
     float curForce = this->joints[i]->GetForce(index);
-    float maxForce = this->actuators[i].modelFunction(velocity, curForce,
-              this->actuators[i]);
+
+    /*
     if (curForce > maxForce)
     {
       this->joints[i]->SetForce(index, maxForce);
-    }
+    }*/
+    float maxForce = this->actuators[i].modelFunction(velocity, curForce,
+              this->actuators[i]);
+    this->joints[i]->SetEffortLimit(index, maxForce);
   }
 }

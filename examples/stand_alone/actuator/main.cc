@@ -29,7 +29,7 @@ int main(int _argc, char **_argv)
   // Number of timesteps between samples.
   int sampleTimesteps = 15;
   // How much to scale the actuator's maximum torque by
-  float maxTorqueAdj = 10;
+  float maxTorqueAdj = 2;
 
   desc.add_options()("max_iter,i", boost::program_options::value<int>(),
                       "number of collection iterations")
