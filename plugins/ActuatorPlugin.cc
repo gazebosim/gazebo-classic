@@ -138,12 +138,6 @@ void ActuatorPlugin::WorldUpdateCallback()
     const int index = this->actuators[i].jointIndex;
     const float velocity = this->joints[i]->GetVelocity(index);
     float curForce = this->joints[i]->GetForce(index);
-
-    /*
-    if (curForce > maxForce)
-    {
-      this->joints[i]->SetForce(index, maxForce);
-    }*/
     float maxForce = this->actuators[i].modelFunction(velocity, curForce,
               this->actuators[i]);
     this->joints[i]->SetEffortLimit(index, maxForce);
