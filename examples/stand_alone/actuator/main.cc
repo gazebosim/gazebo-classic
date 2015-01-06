@@ -22,14 +22,41 @@
 /////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
-  // Example-specific parameters
+  boost::program_options::options_description desc("Data collection options");
 
   // Maximum number of collection iterations.
-  const int maxIterations = 1000;
+  int maxIterations = 1000;
   // Number of timesteps between samples.
-  const int sampleTimesteps = 1;
+  int sampleTimesteps = 15;
   // How much to scale the actuator's maximum torque by
-  const float maxTorqueAdj = 10;
+  float maxTorqueAdj = 10;
+
+  desc.add_options()("max_iter,i", boost::program_options::value<int>(),
+                      "number of collection iterations")
+                    ("sample_ts,s", boost::program_options::value<int>(),
+                      "number of timesteps between samples")
+                    ("torque_scale,t", boost::program_options::value<float>(),
+                      "scale factor for applied torque"); 
+
+  boost::program_options::variables_map vm;
+  boost::program_options::store(boost::program_options::parse_command_line(
+                                  _argc, _argv, desc), vm);
+  boost::program_options::notify(vm);
+
+  if (vm.count("max_iter"))
+  {
+    maxIterations = vm["max_iter"].as<int>();
+  }
+
+  if (vm.count("sample_ts"))
+  {
+    sampleTimesteps = vm["sample_ts"].as<int>();
+  }
+
+  if (vm.count("torque_scale"))
+  {
+    maxTorqueAdj = vm["sample_ts"].as<float>();
+  }
 
   // The joint index which we are collecting data on.
   unsigned int index;
@@ -88,12 +115,14 @@ int main(int _argc, char **_argv)
         return -1;
       }
       elem = elem->GetElement("actuator");
+
       if (!elem->HasElement("index"))
       {
         std::cout << "ERROR: couldn't find index element." << std::endl;
         return -1;
       }
       index = elem->GetElement("index")->Get<unsigned int>();
+
       if (!elem->HasElement("max_torque"))
       {
         std::cout << "ERROR: couldn't find max_torque element." << std::endl;
@@ -121,12 +150,13 @@ int main(int _argc, char **_argv)
     }
   }
 
-  // Open a file for writing
+  // Create a data directory
   boost::filesystem::path path("../data");
   if (!boost::filesystem::exists(path))
   {
     boost::filesystem::create_directories(path);
   }
+  // Open a file for recording data
   std::ofstream fileStream;
   fileStream.open((path.string() + "/data.csv").c_str());
   // Push initial file headings
