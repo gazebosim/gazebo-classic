@@ -423,6 +423,12 @@ namespace gazebo
       /// \param[in] _column Column index.
       private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
 
+      /// \brief Qt event filter currently used to filter mouse wheel events.
+      /// \param[in] _obj Object that is watched by the event filter.
+      /// \param[in] _event Qt event.
+      /// \return True if the event is handled.
+      private: bool eventFilter(QObject *_obj, QEvent *_event);
+
       /// \brief A map of unique scoped names to correpsonding widgets.
       private: std::map <std::string, ConfigChildWidget *> configWidgets;
 

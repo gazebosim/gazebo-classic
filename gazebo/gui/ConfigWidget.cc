@@ -47,7 +47,25 @@ void ConfigWidget::Load(const google::protobuf::Message *_msg)
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->setAlignment(Qt::AlignTop);
   mainLayout->addWidget(widget);
+
   this->setLayout(mainLayout);
+
+  // set up event filter for scrollable widgets to make sure they don't steal
+  // focus when embedded in a QScrollArea.
+  QList<QAbstractSpinBox *> spinBoxes =
+      this->findChildren<QAbstractSpinBox *>();
+  for (int i = 0; i < spinBoxes.size(); ++i)
+  {
+    spinBoxes[i]->installEventFilter(this);
+    spinBoxes[i]->setFocusPolicy(Qt::StrongFocus);
+  }
+  QList<QComboBox *> comboBoxes =
+      this->findChildren<QComboBox *>();
+  for (int i = 0; i < comboBoxes.size(); ++i)
+  {
+    comboBoxes[i]->installEventFilter(this);
+    comboBoxes[i]->setFocusPolicy(Qt::StrongFocus);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1850,6 +1868,39 @@ void ConfigWidget::OnItemSelection(QTreeWidgetItem *_item,
 {
   if (_item && _item->childCount() > 0)
     _item->setExpanded(!_item->isExpanded());
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::eventFilter(QObject *_obj, QEvent *_event)
+{
+  QAbstractSpinBox* spinBox = qobject_cast<QAbstractSpinBox *>(_obj);
+  QComboBox* comboBox = qobject_cast<QComboBox *>(_obj);
+  if (spinBox || comboBox)
+  {
+    QWidget *widget = qobject_cast<QWidget *>(_obj);
+    if (_event->type() == QEvent::Wheel)
+    {
+      if (widget->focusPolicy() == Qt::WheelFocus)
+      {
+        _event->accept();
+        return false;
+      }
+      else
+      {
+        _event->ignore();
+        return true;
+      }
+    }
+    else if (_event->type() == QEvent::FocusIn)
+    {
+      widget->setFocusPolicy(Qt::WheelFocus);
+    }
+    else if (_event->type() == QEvent::FocusOut)
+    {
+      widget->setFocusPolicy(Qt::StrongFocus);
+    }
+  }
+  return QObject::eventFilter(_obj, _event);
 }
 
 /////////////////////////////////////////////////
