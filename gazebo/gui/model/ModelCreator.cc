@@ -1016,7 +1016,10 @@ void ModelCreator::GenerateSDF()
     for (it = part->visuals.begin(); it != part->visuals.end(); ++it)
     {
       rendering::VisualPtr visual = it->first;
+      msgs::Visual visualMsg = it->second;
       sdf::ElementPtr visualElem = visual->GetSDF()->Clone();
+      visualElem->GetElement("transparency")->Set<double>(
+          visualMsg.transparency());
       newLinkElem->InsertElement(visualElem);
     }
 

@@ -173,7 +173,7 @@ void PartData::AddVisual(rendering::VisualPtr _visual)
   msgs::Visual visualMsg = msgs::VisualFromSDF(_visual->GetSDF());
 
   // override transparency value
-  visualMsg.set_transparency(1.0);
+  visualMsg.set_transparency(0.0);
 
   // some of the default values do not transfer to the visualMsg
   // so set them here and find a better way to fix this in the future.
