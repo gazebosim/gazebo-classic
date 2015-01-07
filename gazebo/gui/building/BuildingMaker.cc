@@ -640,12 +640,6 @@ void BuildingMaker::Start(const rendering::UserCameraPtr _camera)
 /////////////////////////////////////////////////
 void BuildingMaker::Stop()
 {
-//  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-//  scene->RemoveVisual(this->previewVisual);
-//  this->previewVisual.reset();
-//  this->visuals.clear();
-//  this->modelSDF.reset();
-//  this->previewVisual->SetVisible(false);
 }
 
 /////////////////////////////////////////////////
@@ -766,7 +760,6 @@ void BuildingMaker::GenerateSDF()
       this->previewVisual->GetBoundingBox().GetCenter().x,
       this->previewVisual->GetBoundingBox().GetCenter().y, 0, 0, 0, 0);
   modelElem->GetElement("pose")->Set(modelOrigin);
-  // this->previewVisual->SetWorldPose(-modelOrigin);
 
   std::map<std::string, BuildingModelManip *>::iterator itemsIt;
 
