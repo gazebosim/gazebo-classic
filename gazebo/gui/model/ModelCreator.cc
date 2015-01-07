@@ -362,6 +362,7 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   rendering::VisualPtr collisionVis =
       _visual->Clone(part->partVisual->GetName() + "_collision",
       part->partVisual);
+  collisionVis->SetScale(math::Vector3::One);
 
 //  collisoinVis->SetMaterial("Gazebo/OrangeTransparent");
   collisionVis->SetMaterial("Gazebo/Orange");
@@ -842,6 +843,8 @@ void ModelCreator::OpenInspector(const std::string &_name)
 {
   PartData *part = this->allParts[_name];
   part->SetPose(part->partVisual->GetWorldPose());
+//  part->SetScale(part->partVisual->GetScale());
+
 /*  PartGeneralConfig *generalConfig = part->inspector->GetGeneralConfig();
   generalConfig->SetPose(part->GetPose());*/
 
@@ -891,7 +894,7 @@ void ModelCreator::OnPaste()
 
   // For now, only copy the last selected model
   boost::unordered_map<std::string, PartData *>::iterator it =
-    this->allParts.find(this->copiedPartNames.back());
+      this->allParts.find(this->copiedPartNames.back());
   if (it != this->allParts.end())
   {
     PartData *copiedPart = it->second;

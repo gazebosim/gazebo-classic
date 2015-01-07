@@ -323,10 +323,9 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
   // to restrict the scaling dimensions.
   // also extended scaling to work in model editor mode by checking geometry
   // type of first visual child.
+
   if (this->dataPtr->keyEvent.key == Qt::Key_Shift ||
-      _vis->GetName().find("unit_sphere") != std::string::npos ||
-      (_vis->GetChildCount() > 0 &&
-      _vis->GetChild(0)->GetGeometryType() == "sphere"))
+      _vis->GetName().find("unit_sphere") != std::string::npos)
   {
     if (_axis.x > 0)
     {
@@ -344,9 +343,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       scale.y = scale.z;
     }
   }
-  else if (_vis->GetName().find("unit_cylinder") != std::string::npos ||
-      (_vis->GetChildCount() > 0 &&
-      _vis->GetChild(0)->GetGeometryType() == "cylinder"))
+  else if (_vis->GetName().find("unit_cylinder") != std::string::npos)
   {
     if (_axis.x > 0)
     {
@@ -357,11 +354,56 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       scale.x = scale.y;
     }
   }
-  else if (_vis->GetName().find("unit_box") != std::string::npos ||
-      (_vis->GetChildCount() > 0 &&
-      _vis->GetChild(0)->GetGeometryType() == "box"))
+  else if (_vis->GetName().find("unit_box") != std::string::npos)
   {
     // keep new scale as it is
+  }
+  else if (_vis != _vis->GetRootVisual() && _vis->GetChildCount() > 0)
+  {
+/*    std::string geomType;
+    bool mixedGeom = false;
+    for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+    {
+      std::string type = _vis->GetChild(i)->GetGeometryType();
+
+      if (!type.empty() && geomType.empty())
+        type = geomType;
+      else if (geomType != type)
+      {
+        mixedGeom = true;
+        break;
+      }
+    }
+
+    if (mixedGeom || geomType == "sphere")
+    {
+      if (_axis.x > 0)
+      {
+        scale.y = scale.x;
+        scale.z = scale.x;
+      }
+      else if (_axis.y > 0)
+      {
+        scale.x = scale.y;
+        scale.z = scale.y;
+      }
+      else if (_axis.z > 0)
+      {
+        scale.x = scale.z;
+        scale.y = scale.z;
+      }
+    }
+    else if (geomType == "cylinder")
+    {
+      if (_axis.x > 0)
+      {
+        scale.y = scale.x;
+      }
+      else if (_axis.y > 0)
+      {
+        scale.x = scale.y;
+      }
+    }*/
   }
   else
   {

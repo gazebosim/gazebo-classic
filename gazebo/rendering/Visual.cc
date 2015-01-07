@@ -818,7 +818,7 @@ void Visual::SetScale(const math::Vector3 &_scale)
   this->dataPtr->scale = _scale;
 
   // update geom size based on scale.
-  this->UpdateGeomSize(_scale);
+  this->UpdateGeomSize(this->dataPtr->scale);
 
   this->dataPtr->sceneNode->setScale(
       Conversions::Convert(this->dataPtr->scale));
@@ -833,24 +833,33 @@ void Visual::UpdateGeomSize(const math::Vector3 &_scale)
     (*iter)->UpdateGeomSize(_scale);
   }
 
-  sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
+  math::Vector3 derivedScale = math::Vector3::One;
+  VisualPtr parentVis = this->GetParent();
+  if (parentVis)
+  {
+     derivedScale = Conversions::Convert(
+        parentVis->GetSceneNode()->_getDerivedScale());
+  }
 
+  sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
   if (geomElem->HasElement("box"))
   {
     geomElem->GetElement("box")->GetElement("size")->Set(_scale);
   }
   else if (geomElem->HasElement("sphere"))
   {
-    geomElem->GetElement("sphere")->GetElement("radius")->Set(_scale.x/2.0);
+    geomElem->GetElement("sphere")->GetElement("radius")->Set(
+        _scale.x*0.5);
   }
   else if (geomElem->HasElement("cylinder"))
   {
     geomElem->GetElement("cylinder")->GetElement("radius")
-        ->Set(_scale.x/2.0);
+        ->Set(_scale.x*0.5);
     geomElem->GetElement("cylinder")->GetElement("length")->Set(_scale.z);
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
+
 }
 
 //////////////////////////////////////////////////

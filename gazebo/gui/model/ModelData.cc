@@ -306,7 +306,7 @@ void PartData::OnAddVisual(const std::string &_name)
     // add new visual by cloning last instance
     refVisual = this->visuals.rbegin()->first;
     visVisual = refVisual->Clone(visualName.str(), this->partVisual);
-
+    visVisual->SetScale(math::Vector3::One);
   }
   else
   {
@@ -317,9 +317,11 @@ void PartData::OnAddVisual(const std::string &_name)
 
     visVisual.reset(new rendering::Visual(visualName.str(),
         this->partVisual));
+    visVisual->SetScale(math::Vector3::One);
     sdf::ElementPtr visualElem =  modelTemplateSDF->root
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     visVisual->Load(visualElem);
+    visVisual->SetScale(math::Vector3::One);
     this->partVisual->GetScene()->AddVisual(visVisual);
   }
 
