@@ -140,6 +140,21 @@ void PartData::SetPose(const math::Pose &_pose)
 }
 
 /////////////////////////////////////////////////
+bool PartData::GetSelfCollide() const
+{
+  return this->partSDF->Get<bool>("self_collide");
+}
+
+/////////////////////////////////////////////////
+void PartData::SetSelfCollide(bool _selfCollide)
+{
+  this->partSDF->GetElement("self_collide")->Set(_selfCollide);
+
+  PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
+  generalConfig->SetSelfCollide(_selfCollide);
+}
+
+/////////////////////////////////////////////////
 void PartData::UpdateConfig()
 {
   // set new geom size if scale has changed.
@@ -235,6 +250,12 @@ void PartData::OnApply()
   PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
 
   this->partSDF = msgs::LinkToSDF(*generalConfig->GetData(), this->partSDF);
+  //this->partSDF->GetElement("self_collide")->Set(true);
+
+
+std::cout << generalConfig->GetData()->DebugString() << std::endl;
+
+  this->partSDF->PrintValues("");
 
   // update visuals
   if (!this->visuals.empty())

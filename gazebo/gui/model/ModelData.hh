@@ -87,6 +87,12 @@ namespace gazebo
       /// \param[in] _pose Pose of part.
       public: void SetPose(const math::Pose &_pose);
 
+      /// \brief TODO
+      public: bool GetSelfCollide() const;
+
+      /// \brief TODO
+      public: void SetSelfCollide(bool _selfCollide);
+
       /// \brief Set the scale of the part.
       /// \param[in] _scale Scale of part.
       //public: void SetScale(const math::Vector3 &_scale);

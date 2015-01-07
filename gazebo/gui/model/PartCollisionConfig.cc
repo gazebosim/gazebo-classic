@@ -35,6 +35,7 @@ PartCollisionConfig::PartCollisionConfig()
   this->collisionsTreeWidget->setColumnCount(1);
   this->collisionsTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->collisionsTreeWidget->header()->hide();
+  this->collisionsTreeWidget->setIndentation(5);
 
   this->collisionsTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
   connect(this->collisionsTreeWidget,

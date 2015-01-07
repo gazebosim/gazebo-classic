@@ -1008,6 +1008,7 @@ void ModelCreator::GenerateSDF()
     sdf::ElementPtr newLinkElem = part->partSDF->Clone();
     newLinkElem->GetElement("pose")->Set(part->partVisual->GetWorldPose()
         - this->origin);
+    newLinkElem->GetElement("self_collide")->Set(part->GetSelfCollide());
 
     modelElem->InsertElement(newLinkElem);
 

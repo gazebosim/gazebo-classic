@@ -29,13 +29,16 @@ PartGeneralConfig::PartGeneralConfig()
   QVBoxLayout *generalLayout = new QVBoxLayout;
 
   this->configWidget = new ConfigWidget;
+
   msgs::Link linkMsg;
+  linkMsg.set_self_collide(false);
   configWidget->Load(&linkMsg);
+
   generalLayout->addWidget(this->configWidget);
 
   // set default properties
   this->configWidget->SetBoolWidgetValue("gravity", true);
-  this->configWidget->SetBoolWidgetValue("self_collide", false);
+  //this->configWidget->SetBoolWidgetValue("self_collide", false);
   this->configWidget->SetBoolWidgetValue("kinematic", false);
   this->configWidget->SetWidgetVisible("id", false);
   this->configWidget->SetWidgetVisible("name", false);
@@ -293,6 +296,12 @@ PartGeneralConfig::~PartGeneralConfig()
 void PartGeneralConfig::SetPose(const math::Pose &_pose)
 {
   this->configWidget->SetPoseWidgetValue("pose", _pose);
+}
+
+/////////////////////////////////////////////////
+void PartGeneralConfig::SetSelfCollide(bool _selfCollide)
+{
+  this->configWidget->SetBoolWidgetValue("self_collide", _selfCollide);
 }
 
 /////////////////////////////////////////////////

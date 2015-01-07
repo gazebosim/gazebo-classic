@@ -1185,6 +1185,8 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
     return;
   unsigned int count = d->field_count();
 
+//std::cout << _msg->DebugString() << std::endl;
+
   for (unsigned int i = 0; i < count ; ++i)
   {
     const google::protobuf::FieldDescriptor *field = d->field(i);

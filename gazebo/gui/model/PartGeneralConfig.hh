@@ -55,6 +55,9 @@ namespace gazebo
       /// \param[in] _pose Pose to set the part to.
       public: void SetPose(const math::Pose &_pose);
 
+      /// \brief TODO
+      public: void SetSelfCollide(bool _selfCollide);
+
       private: ConfigWidget *configWidget;
 
       /*/// \brief Set the part to be affected by gravity.
