@@ -136,88 +136,130 @@ void TireFrictionPlugin::OnUpdate()
     boost::mutex::scoped_lock lock(this->dataPtr->mutex);
     contacts = this->dataPtr->newestContactsMsg;
     this->dataPtr->newMsg = false;
-    this->dataPtr->newMsgWait.Set(0, 0);
   }
+  this->dataPtr->newMsgWait.Set(0, 0);
 
   // Compute slip at contact points.
-  // The following needs to be done differently,
-  // instead of computing average position of contact points:
-  // * compute relative slip velocity between bodies at each contact point
-  // * somehow lump these into a scalar value of slip
-  //   (perhaps normalizing by normal force magnitude)
+  gzdbg << "Contacts.time "
+        << common::Time(msgs::Convert(contacts.time())).Double()
+        << std::endl;
 
-  //  First compute average position and normal of contact points.
-  math::Vector3 positionAverage;
-  math::Vector3 normalAverage;
-  math::Vector3 forceAverage;
-  math::Vector3 torqueAverage;
-
+  // For each contact point:
+  // Compute slip velocity
+  // * compute relative velocity between bodies at contact point
+  // * subtract velocity component parallel to normal vector
+  // * take sum of velocities, weighted by normal force
+  // Compute reference velocity
+  // * max velocity magnitude
+  double scaledFriction = 0.0;
+  double contactsNormalForceSum = 0.0;
+  for (int i = 0; i < contacts.contact_size(); ++i)
   {
-    int positionCount = 0;
-    int normalCount = 0;
-    int forceCount = 0;
+    // Get pointers to collision objects
+    const msgs::Contact *contact = &contacts.contact(i);
+    const std::string collision1(contact->collision1());
+    const std::string collision2(contact->collision2());
+    physics::CollisionPtr collPtr1 =
+      boost::dynamic_pointer_cast<physics::Collision>(
+      this->world->GetEntity(collision1));
+    physics::CollisionPtr collPtr2 =
+      boost::dynamic_pointer_cast<physics::Collision>(
+      this->world->GetEntity(collision2));
+    physics::LinkPtr link1 = collPtr1->GetLink();
+    physics::LinkPtr link2 = collPtr2->GetLink();
 
-    for (int i = 0; i < contacts.contact_size(); ++i)
+    gzdbg << "contact.time "
+          << common::Time(msgs::Convert(contact->time())).Double()
+          << ", "
+          << collision1
+          << ", "
+          << collision2
+          << std::endl;
+
+    // compute velocity at each contact point
+    if (contact->position_size() == 0 ||
+        contact->position_size() != contact->normal_size() ||
+        contact->position_size() != contact->wrench_size())
     {
-      const msgs::Contact *contact = &contacts.contact(i);
-      for (int j = 0; j < contact->position_size(); ++j)
+      gzerr << "No contacts or invalid contact message"
+            << std::endl;
+      continue;
+    }
+
+    double scaledSlipSpeed = 0.0;
+    double scaledReferenceSpeed = 0.0;
+    double contactNormalForceSum = 0.0;
+    for (int j = 0; j < contact->position_size(); ++j)
+    {
+      // Contact position in world coordinates.
+      math::Vector3 position = msgs::Convert(contact->position(j));
+
+      // Velocity of each link at contact point in world coordinates.
+      math::Vector3 velocity1;
+      math::Vector3 velocity2;
       {
-        positionAverage += msgs::Convert(contact->position(j));
-        positionCount++;
+        math::Pose linkPose = link1->GetWorldPose();
+        math::Vector3 offset = position - linkPose.pos;
+        velocity1 = link1->GetWorldLinearVel(offset, math::Quaternion());
       }
-      for (int j = 0; j < contact->normal_size(); ++j)
       {
-        normalAverage += msgs::Convert(contact->normal(j));
-        normalCount++;
+        math::Pose linkPose = link2->GetWorldPose();
+        math::Vector3 offset = position - linkPose.pos;
+        velocity2 = link2->GetWorldLinearVel(offset, math::Quaternion());
       }
 
-      for (int j = 0; j < contact->wrench_size(); ++j)
+      // Relative link velocity at contact point.
+      math::Vector3 slipVelocity = velocity1 - velocity2;
+
+      // Subtract normal velocity component
+      math::Vector3 normal = msgs::Convert(contact->normal(j));
+      slipVelocity -= normal * velocity.Dot(normal);
+
+      // Scale slip speed by normal force
+      double slipSpeed = slipVelocity.GetLength();
+      double normalForce;
       {
-        forceAverage += msgs::Convert(
-            contact->wrench(j).body_1_wrench().force());
-        torqueAverage += msgs::Convert(
-            contact->wrench(j).body_1_wrench().torque());
-        forceCount++;
+        math::Vector3 force = msgs::Convert(
+          contact->wrench(j).body_1_wrench().force());
+        normalForce = force.Dot(normal);
       }
+      scaledSlipSpeed += slipSpeed * std::abs(normalForce);
+      contactNormalForceSum += std::abs(normalForce);
+
+      // Compute reference speed
+      // max of absolute speed at contact points and at link origin
+      double referenceSpeed = 0.0;
+      referenceSpeed = std::max(velocity1.GetLength(), velocity2.GetLength());
+      referenceSpeed = std::max(referenceSpeed, link1->GetWorldLinearVel());
+      referenceSpeed = std::max(referenceSpeed, link2->GetWorldLinearVel());
+      scaledReferenceSpeed += referenceSpeed * std::abs(normalForce);
     }
 
-    if (positionCount > 0)
-    {
-      positionAverage = positionAverage / positionCount;
-    }
-    if (normalCount > 0)
-    {
-      normalAverage = normalAverage / normalCount;
-    }
-    if (forceCount > 0)
-    {
-      forceAverage = forceAverage / forceCount;
-      torqueAverage = torqueAverage / forceCount;
-    }
+    // Compute aggregate slip and reference speed (m/s)
+    double slipSpeed = scaledSlipSpeed / contactNormalForceSum;
+    double referenceSpeed = scaledReferenceSpeed / contactNormalForceSum;
+
+    // Compute friction as a function of slip and reference speeds.
+    double friction = this->ComputeFriction(slipSpeed, referenceSpeed);
+    scaledFriction += friction * contactNormalForceSum;
+    contactsNormalForceSum += contactNormalForceSum;
   }
+  double friction = scaledFriction / contactsNormalForceSum;
 
-  // Then compute velocity on body at that average contact point.
-  math::Vector3 contactPointVelocity;
-  {
-    math::Pose linkPose = this->dataPtr->link->GetWorldPose();
-    math::Vector3 offset = positionAverage - linkPose.pos;
-    contactPointVelocity =
-      this->dataPtr->link->GetWorldLinearVel(offset, math::Quaternion());
-  }
+  // Set friction coefficient.
+}
 
-  // Compute contact point speed in tangential directions.
-  double speedTangential;
-  {
-    math::Vector3 velocityTangential = contactPointVelocity -
-      contactPointVelocity.Dot(normalAverage) * normalAverage;
-    speedTangential = velocityTangential.GetLength();
-  }
-
+/////////////////////////////////////////////////
+// This is an example function for computing friction based on slip
+// and reference speed.
+double TireFrictionPlugin::ComputeFriction(const double _slipSpeed,
+                                           const double _referenceSpeed)
+{
   // Then normalize that tangential speed somehow.
   // Use speed at origin of link frame.
   double slip;
   {
-    double speed = this->dataPtr->link->GetWorldLinearVel().GetLength();
+    double speed = _slipSpeed;
     const double speedMin = 0.1;
     if (speed < speedMin)
     {
@@ -226,7 +268,5 @@ void TireFrictionPlugin::OnUpdate()
     slip = speedTangential / speed;
   }
 
-  std::cout << "Slip[" << slip << "] Force[" << forceAverage << "] Torque[" << torqueAverage << "]\n";
-  // Compute friction from slip.
-  // Set friction coefficient.
+
 }

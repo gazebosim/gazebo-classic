@@ -42,6 +42,13 @@ namespace gazebo
     // Documentation Inherited.
     public: virtual void Init();
 
+    /// \brief Function for computing friction from slip.
+    /// \param[in] _slipSpeed Relative tangential speed in (m/s).
+    /// \param[in] _referenceSpeed Reference speed in (m/s).
+    /// \return Friction coefficient.
+    public: virtual double ComputeFriction(const double _slipSpeed,
+                                           const double _referenceSpeed);
+
     /// \brief Callback for World Update events.
     protected: virtual void OnUpdate();
 
