@@ -1536,7 +1536,7 @@ namespace gazebo
       }
       for (int i = 0; i < _msg.link_size(); ++i)
       {
-        stream << msgs::ToSDF(_msg.link(i));
+        stream << msgs::LinkToSDF(_msg.link(i))->ToString("");
       }
       // ignore the deleted field, since it's not used in sdformat
       if (_msg.visual_size() > 0)
