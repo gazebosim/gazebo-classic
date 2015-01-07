@@ -13,6 +13,9 @@ link_directories(
   ${tinyxml_LIBRARY_DIRS}
 )
 
+include (${QT_USE_FILE})
+add_definitions(${QT_DEFINITIONS})
+
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
 endif()
@@ -63,3 +66,11 @@ target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
 set_target_properties(BreakableJointPlugin PROPERTIES
   INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
 )
+
+QT4_WRAP_CPP(TimerGUIPlugin_MOC TimerGUIPlugin.hh)
+add_library(TimerGUIPlugin SHARED TimerGUIPlugin.cc ${TimerGUIPlugin_MOC})
+target_link_libraries(TimerGUIPlugin libgazebo gazebo_sensors ${ogre_libraries} ${QT_LIBRARIES})
+install (TARGETS TimerGUIPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+
+add_subdirectory(events)
+

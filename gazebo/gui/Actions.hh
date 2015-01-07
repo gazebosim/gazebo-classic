@@ -32,12 +32,12 @@ namespace gazebo
     extern QAction *g_saveAct;
     extern QAction *g_saveAsAct;
     extern QAction *g_saveCfgAct;
+    extern QAction *g_cloneAct;
     extern QAction *g_aboutAct;
     extern QAction *g_quitAct;
 
     extern QAction *g_dataLoggerAct;
 
-    extern QAction *g_newModelAct;
     extern QAction *g_resetModelsAct;
     extern QAction *g_resetWorldAct;
     extern QAction *g_editBuildingAct;
@@ -85,6 +85,10 @@ namespace gazebo
 
     extern QAction *g_copyAct;
     extern QAction *g_pasteAct;
+
+    extern QWidgetAction *g_alignAct;
+    extern QAction *g_alignButtonAct;
+    extern QAction *g_snapAct;
 
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.

@@ -28,7 +28,7 @@ int main(int argc, char **argv)
   {
     // Initialize the informational logger. This will log warnings, and
     // errors.
-    gzLogInit("gzserver.log");
+    gzLogInit("server-", "gzserver.log");
 
     // Initialize the data logger. This will log state information.
     gazebo::util::LogRecord::Instance()->Init("gzserver");

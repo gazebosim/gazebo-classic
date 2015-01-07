@@ -41,6 +41,7 @@ namespace gazebo
     class ToolsWidget;
     class ModelListWidget;
     class Editor;
+    class SpaceNav;
 
     class GAZEBO_VISIBLE MainWindow : public QMainWindow
     {
@@ -77,6 +78,13 @@ namespace gazebo
       /// \brief Pause simulation.
       public slots: void Pause();
 
+      /// \brief Set whether the left pane is visible
+      /// \param[in] _on True to show the left pane, false to hide.
+      public: void SetLeftPaneVisibility(bool _on);
+
+      /// \brief A signal to trigger loading of GUI plugins.
+      signals: void AddPlugins();
+
       protected: void closeEvent(QCloseEvent *_event);
 
       private: void OnGUI(ConstGUIPtr &_msg);
@@ -91,9 +99,11 @@ namespace gazebo
       /// \brief Save GUI configuration to INI file.
       private slots: void SaveINI();
 
+      /// \brief Clone a simulation.
+      private slots: void Clone();
+
       private slots: void About();
       private slots: void Step();
-      private slots: void NewModel();
       private slots: void Arrow();
 
       /// \brief Qt callback when the translate mode is triggered.
@@ -104,6 +114,13 @@ namespace gazebo
 
       /// \brief Qt callback when the scale mode is triggered.
       private slots: void Scale();
+
+      /// \brief Qt callback when the main align action is triggered. Currently
+      /// just resets the child align actions.
+      private slots: void Align();
+
+      /// \brief Qt callback when the snap mode is triggered.
+      private slots: void Snap();
 
       private slots: void CreateBox();
       private slots: void CreateSphere();
@@ -143,6 +160,13 @@ namespace gazebo
 
       /// \brief Callback for diagnostics action.
       private slots: void Diagnostics();
+
+      /// \brief Callback for adding plugins.
+      private slots: void OnAddPlugins();
+
+      /// \brief Qt call back when one of the editor actions is triggered.
+      /// \param[in] _action Action in the group which was triggered.
+      private slots: void OnEditorGroup(QAction *_action);
 
       /// \brief Toggle full screen display.
       /// \param[in] _value True to display in full screen mode.
@@ -207,7 +231,6 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::PublisherPtr worldControlPub;
       private: transport::PublisherPtr serverControlPub;
-      private: transport::PublisherPtr selectionPub;
       private: transport::PublisherPtr requestPub;
       private: transport::PublisherPtr scenePub;
       private: transport::SubscriberPtr responseSub;
@@ -256,9 +279,24 @@ namespace gazebo
       /// \brief List of all the editors.
       private: std::list<Editor*> editors;
 
+      /// \brief List of all the align action groups.
+      private: std::vector<QActionGroup *> alignActionGroups;
+
+      /// \brief Space navigator interface.
+      private: SpaceNav *spacenav;
+
 #ifdef HAVE_OCULUS
       private: gui::OculusWindow *oculusWindow;
 #endif
+
+      /// \brief Buffer of plugin messages to process.
+      private: std::vector<boost::shared_ptr<msgs::Plugin const> > pluginMsgs;
+
+      /// \brief Mutext to protect plugin loading.
+      private: boost::mutex pluginLoadMutex;
+
+      /// \brief Splitter for the main window.
+      private: QSplitter *splitter;
     };
   }
 }

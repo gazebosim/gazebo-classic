@@ -151,6 +151,16 @@ namespace gazebo
       /// visual
       private: void SetSelectedVisual(rendering::VisualPtr _vis);
 
+      /// \brief Callback when a specific alignment configuration is set.
+      /// \param[in] _axis Axis of alignment: x, y, or z.
+      /// \param[in] _config Configuration: min, center, or max.
+      /// \param[in] _target Target of alignment: first or last.
+      /// \param[in] _bool True to preview alignment without publishing
+      /// to server.
+      private: void OnAlignMode(const std::string &_axis,
+          const std::string &_config, const std::string &_target,
+          bool _preview);
+
       /// \brief Copy an entity by name
       /// \param[in] _name Name of entity to be copied.
       private: void Copy(const std::string &_name);
@@ -164,6 +174,10 @@ namespace gazebo
 
       /// \brief Qt callback when the paste action is triggered.
       private slots: void OnPaste();
+
+      /// \brief Qt callback when the model editor action is toggled.
+      /// \param[in] _checked True if the model editor was checked.
+      private slots: void OnModelEditor(bool _checked);
 
       private: int windowId;
 
@@ -190,10 +204,17 @@ namespace gazebo
       /// \brief Light maker
       private: LightMaker lightMaker;
 
-      private: rendering::VisualPtr hoverVis, selectedVis;
+      private: rendering::VisualPtr hoverVis;
+
+      /// \brief A list of selected visuals.
+      private: std::vector<rendering::VisualPtr> selectedVisuals;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;
+
+      /// \brief Publishes information about user selections.
+      private: transport::PublisherPtr selectionPub;
+
       private: transport::SubscriberPtr selectionSub, requestSub;
 
       private: std::string keyText;
@@ -212,6 +233,12 @@ namespace gazebo
       /// \brief Flag that is set to true when GLWidget has responded to
       ///  OnCreateScene
       private: bool sceneCreated;
+
+      /// \brief True if the model editor is up, false otherwise
+      private: bool modelEditorEnabled;
+
+      /// \brief Mutext to protect selectedVisuals array.
+      private: boost::mutex selectedVisMutex;
     };
   }
 }
