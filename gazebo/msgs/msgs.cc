@@ -1736,7 +1736,7 @@ namespace gazebo
         linkSDF->GetAttribute("name")->Set(_msg.name());
       if (_msg.has_gravity())
         linkSDF->GetElement("gravity")->Set(_msg.gravity());
-      if (_msg.has_gravity())
+      if (_msg.has_self_collide())
         linkSDF->GetElement("self_collide")->Set(_msg.self_collide());
       if (_msg.has_kinematic())
         linkSDF->GetElement("kinematic")->Set(_msg.kinematic());

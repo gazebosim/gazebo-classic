@@ -2,6 +2,9 @@
 
 ### Modifications
 
+1. **gazebo/rendering/Visual.hh**
+    + The GetBoundingBox() function now returns a local bounding box without scale applied.
+
 1. **gazebo/math/Box.hh**
     + The constructor that takes two math::Vector3 values now treats these as two corners, and computes the minimum and maximum values automatically. This change is API and ABI compatible.
 
