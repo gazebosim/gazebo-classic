@@ -51,6 +51,9 @@ class ModelAlign_TEST : public QTestFixture
 
   /// \brief Test aligning models at max z.
   private slots: void AlignZMax();
+
+  /// \brief Test aligning models with non unit scale.
+  private slots: void AlignScale();
 };
 
 #endif
