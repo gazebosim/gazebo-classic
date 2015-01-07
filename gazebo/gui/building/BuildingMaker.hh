@@ -356,11 +356,11 @@ namespace gazebo
       /// \brief Name of the building model.
       private: std::string modelName;
 
-      /// \brief The root visual of the building model.
-      private: rendering::VisualPtr modelVisual;
+      /// \brief Name of the building model preview.
+      private: static const std::string previewName;
 
-      /// \brief The pose of the building model.
-      private: math::Pose modelPose;
+      /// \brief The root visual of the building model preview.
+      private: rendering::VisualPtr previewVisual;
 
       /// \brief Counter for the number of walls in the model.
       private: int wallCounter;
@@ -402,7 +402,7 @@ namespace gazebo
       private: std::vector<event::ConnectionPtr> connections;
 
       /// \brief Default name of building model
-      private: std::string buildingDefaultName;
+      private: static const std::string buildingDefaultName;
 
       /// \brief A dialog for setting building model name and save location.
       private: FinishBuildingDialog *saveDialog;
