@@ -362,7 +362,6 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   rendering::VisualPtr collisionVis =
       _visual->Clone(part->partVisual->GetName() + "_collision",
       part->partVisual);
-  collisionVis->SetScale(math::Vector3::One);
 
 //  collisoinVis->SetMaterial("Gazebo/OrangeTransparent");
   collisionVis->SetMaterial("Gazebo/Orange");
@@ -843,7 +842,7 @@ void ModelCreator::OpenInspector(const std::string &_name)
 {
   PartData *part = this->allParts[_name];
   part->SetPose(part->partVisual->GetWorldPose());
-//  part->SetScale(part->partVisual->GetScale());
+  part->UpdateConfig();
 
 /*  PartGeneralConfig *generalConfig = part->inspector->GetGeneralConfig();
   generalConfig->SetPose(part->GetPose());*/
@@ -936,7 +935,7 @@ void ModelCreator::OnPaste()
       visVisual = copiedVisual->Clone(visualName.str(), linkVisual);
       clonePose = copiedVisual->GetWorldPose();
       cloneScale = copiedVisual->GetParent()->GetScale();
-      visVisual->SetScale(math::Vector3::One);
+//      visVisual->SetScale(math::Vector3::One);
     }
 
     rendering::UserCameraPtr userCamera = gui::get_active_camera();

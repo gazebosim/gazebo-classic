@@ -151,6 +151,11 @@ namespace gazebo
       /// \return Visual msg.
       public: msgs::Visual *GetData(const std::string &_name) const;
 
+      /// \brief Set the geometry size a visual
+      /// \param[in] _size Size to set the geometry to.
+      public: void SetGeometrySize(const std::string &_name,
+          const math::Vector3 &_size);
+
       /*/// \brief Set the name of the visual.
       /// \param[in] _index Index of visual.
       /// \param[in] _name Name of visual.

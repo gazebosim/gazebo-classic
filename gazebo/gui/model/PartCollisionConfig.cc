@@ -217,6 +217,26 @@ msgs::Collision *PartCollisionConfig::GetData(const std::string &_name) const
   return NULL;
 }
 
+/////////////////////////////////////////////////
+void PartCollisionConfig::SetGeometrySize(const std::string &_name,
+    const math::Vector3 &_size)
+{
+  std::map<int, CollisionConfigData *>::iterator it;
+  for (it = this->configs.begin(); it != this->configs.end(); ++it)
+  {
+    if (it->second->name == _name)
+    {
+      math::Vector3 dimensions;
+      std::string type = it->second->configWidget->GetGeometryWidgetValue(
+          "geometry", dimensions);
+      it->second->configWidget->SetGeometryWidgetValue("geometry", type,
+          _size);
+      break;
+    }
+  }
+}
+
+
 /*
 /////////////////////////////////////////////////
 void PartCollisionConfig::OnAddCollision()

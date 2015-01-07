@@ -424,7 +424,17 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     newScale.z = std::max(1e-4, newScale.z);
   }
 
-  _vis->SetScale(newScale);
+  if (_vis == _vis->GetRootVisual())
+    _vis->SetScale(newScale);
+  else
+  {
+    for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+    {
+      rendering::VisualPtr childVis = _vis->GetChild(i);
+      if (childVis != this->dataPtr->selectionObj)
+        childVis->SetScale(newScale);
+    }
+  }
 }
 
 /////////////////////////////////////////////////

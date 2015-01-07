@@ -408,15 +408,32 @@ void PartVisualConfig::OnRemoveVisual(int _id)
 /////////////////////////////////////////////////
 msgs::Visual *PartVisualConfig::GetData(const std::string &_name) const
 {
-
   std::map<int, VisualConfigData *>::const_iterator it;
   for (it = this->configs.begin(); it != this->configs.end(); ++it)
   {
-    std::string name = it->second->name;
-    if (name == _name)
+    if (it->second->name == _name)
       return dynamic_cast<msgs::Visual *>(it->second->configWidget->GetMsg());
   }
   return NULL;
+}
+
+/////////////////////////////////////////////////
+void PartVisualConfig::SetGeometrySize(const std::string &_name,
+    const math::Vector3 &_size)
+{
+  std::map<int, VisualConfigData *>::iterator it;
+  for (it = this->configs.begin(); it != this->configs.end(); ++it)
+  {
+    if (it->second->name == _name)
+    {
+      math::Vector3 dimensions;
+      std::string type = it->second->configWidget->GetGeometryWidgetValue(
+          "geometry", dimensions);
+      it->second->configWidget->SetGeometryWidgetValue("geometry", type,
+          _size);
+      break;
+    }
+  }
 }
 
 /*/////////////////////////////////////////////////

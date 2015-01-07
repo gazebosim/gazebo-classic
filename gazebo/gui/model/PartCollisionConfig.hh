@@ -151,6 +151,11 @@ namespace gazebo
       /// \return Collision msg.
       public: msgs::Collision *GetData(const std::string &_name) const;
 
+      /// \brief Set the geometry size a collision
+      /// \param[in] _size Size to set the geometry to.
+      public: void SetGeometrySize(const std::string &_name,
+          const math::Vector3 &_size);
+
       /// \brief Map of id to collision config widget.
       private: std::map<int, CollisionConfigData *> configs;
 

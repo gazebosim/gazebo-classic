@@ -140,6 +140,33 @@ void PartData::SetPose(const math::Pose &_pose)
 }
 
 /////////////////////////////////////////////////
+void PartData::UpdateConfig()
+{
+  // set new geom size if scale has changed.
+  PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
+  std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
+  for (it = this->visuals.begin(); it != this->visuals.end(); ++it)
+  {
+    std::string name = it->first->GetName();
+    std::string partName = this->partVisual->GetName();
+    std::string leafName =
+        name.substr(name.find(partName)+partName.size()+1);
+    visualConfig->SetGeometrySize(leafName, it->first->GetScale());
+  }
+  PartCollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
+  std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
+  for (colIt = this->collisions.begin(); colIt != this->collisions.end();
+      ++colIt)
+  {
+    std::string name = colIt->first->GetName();
+    std::string partName = this->partVisual->GetName();
+    std::string leafName =
+        name.substr(name.find(partName)+partName.size()+1);
+    collisionConfig->SetGeometrySize(leafName, colIt->first->GetScale());
+  }
+}
+
+/////////////////////////////////////////////////
 void PartData::AddVisual(rendering::VisualPtr _visual)
 {
   PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
@@ -306,7 +333,6 @@ void PartData::OnAddVisual(const std::string &_name)
     // add new visual by cloning last instance
     refVisual = this->visuals.rbegin()->first;
     visVisual = refVisual->Clone(visualName.str(), this->partVisual);
-    visVisual->SetScale(math::Vector3::One);
   }
   else
   {
@@ -317,11 +343,9 @@ void PartData::OnAddVisual(const std::string &_name)
 
     visVisual.reset(new rendering::Visual(visualName.str(),
         this->partVisual));
-    visVisual->SetScale(math::Vector3::One);
     sdf::ElementPtr visualElem =  modelTemplateSDF->root
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     visVisual->Load(visualElem);
-    visVisual->SetScale(math::Vector3::One);
     this->partVisual->GetScene()->AddVisual(visVisual);
   }
 
@@ -459,6 +483,7 @@ void PartData::Update()
           //std::cerr << " updateMsg " << updateMsgPtr->DebugString() << std::endl;
         it->first->UpdateFromMsg(updateMsgPtr);
         it->first->SetTransparency(transparency);
+//        it->first->SetScale(math::Vector3::One);
 
         // if (it->first->GetMaterialName() != origMatName)
         break;
