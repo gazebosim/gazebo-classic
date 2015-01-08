@@ -221,10 +221,10 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   this->Record("energy0", E0);
   this->Record("energyError", energyError);
   this->Record("angMomentum0", H0mag);
-  this->Record("angMomentumErr", angularMomentumError.mag);
-  this->Record("angPositionErr", angularPositionError.mag);
-  this->Record("linPositionErr", linearPositionError.mag);
-  this->Record("linVelocityErr", linearVelocityError.mag);
+  this->Record("angMomentumErr", angularMomentumError.Mag());
+  this->Record("angPositionErr", angularPositionError.Mag());
+  this->Record("linPositionErr", linearPositionError.Mag());
+  this->Record("linVelocityErr", linearVelocityError.Mag());
 }
 
 /////////////////////////////////////////////////

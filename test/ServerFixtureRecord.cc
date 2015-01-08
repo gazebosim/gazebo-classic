@@ -35,7 +35,7 @@ void ServerFixture::Record(const std::string &_name, double _data)
 void ServerFixture::Record(const std::string &_prefix,
                            const math::SignalStats &_stats)
 {
-  std::map<std::string, double> map = _stats.GetMap();
+  std::map<std::string, double> map = _stats.Map();
   for (std::map<std::string, double>::iterator iter = map.begin();
        iter != map.end(); ++iter)
   {
@@ -47,9 +47,9 @@ void ServerFixture::Record(const std::string &_prefix,
 void ServerFixture::Record(const std::string &_prefix,
                            const math::Vector3Stats &_stats)
 {
-  Record(_prefix + "_x_", _stats.x);
-  Record(_prefix + "_y_", _stats.y);
-  Record(_prefix + "_z_", _stats.z);
-  Record(_prefix + "_mag_", _stats.mag);
+  Record(_prefix + "_x_", _stats.X());
+  Record(_prefix + "_y_", _stats.Y());
+  Record(_prefix + "_z_", _stats.Z());
+  Record(_prefix + "_mag_", _stats.Mag());
 }
 

@@ -1150,15 +1150,15 @@ TEST_F(MsgsTest, InertialToSDF)
 
   sdf::ElementPtr inertialSDF = msgs::InertialToSDF(msg);
 
-  EXPECT_TRUE(sdf->HasElement("mass"));
-  EXPECT_DOUBLE_EQ(sdf->Get<double>("mass"), mass);
+  EXPECT_TRUE(inertialSDF->HasElement("mass"));
+  EXPECT_DOUBLE_EQ(inertialSDF->Get<double>("mass"), mass);
 
-  EXPECT_TRUE(sdf->HasElement("pose"));
-  EXPECT_EQ(sdf->Get<math::Pose>("pose"), pose);
+  EXPECT_TRUE(inertialSDF->HasElement("pose"));
+  EXPECT_EQ(inertialSDF->Get<math::Pose>("pose"), pose);
 
   {
-    ASSERT_TRUE(sdf->HasElement("inertia"));
-    sdf::ElementPtr inertiaElem = sdf->GetElement("inertia");
+    ASSERT_TRUE(inertialSDF->HasElement("inertia"));
+    sdf::ElementPtr inertiaElem = inertialSDF->GetElement("inertia");
 
     EXPECT_TRUE(inertiaElem->HasElement("ixx"));
     EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("ixx"), ixx);

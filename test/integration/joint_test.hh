@@ -163,7 +163,7 @@ class JointTest : public ServerFixture,
               {
                 msgs::Set(link.mutable_pose(), _opt.parentLinkPose);
               }
-              modelStr << msgs::ToSDF(link);
+              modelStr << msgs::LinkToSDF(link);
             }
             if (!_opt.worldChild)
             {
@@ -173,7 +173,7 @@ class JointTest : public ServerFixture,
               {
                 msgs::Set(link.mutable_pose(), _opt.childLinkPose);
               }
-              modelStr << msgs::ToSDF(link);
+              modelStr << msgs::LinkToSDF(link);
             }
             msgs::Joint jointMsg;
             jointMsg.set_name("joint");
