@@ -71,7 +71,7 @@ namespace gazebo
       private slots: void OnColor(int _colorId);
 
       /// \brief Qt callback when a texture brush is pressed.
-      /// \param[in] _colorId Id of the button clicked.
+      /// \param[in] _textureId Id of the button clicked.
       private slots: void OnTexture(int _textureId);
 
       /// \brief Qt callback when the Model Name field is changed.

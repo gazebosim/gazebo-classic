@@ -54,7 +54,7 @@ EditorView::EditorView(QWidget *_parent)
       gui::editor::Events::ConnectColorSelected(
       boost::bind(&EditorView::OnColorSelected, this, _1)));
 
-   this->connections.push_back(
+  this->connections.push_back(
       gui::editor::Events::ConnectTextureSelected(
       boost::bind(&EditorView::OnTextureSelected, this, _1)));
 

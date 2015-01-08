@@ -188,11 +188,6 @@ namespace gazebo
       /// \brief Qt signal emitted when the editor item's 3D texture has
       /// changed.
       /// \param[in] _texture Texture.
-      private slots: void OnTextureChanged(QString _texture);
-
-      /// \brief Qt signal emitted when the editor item's 3D texture has
-      /// changed.
-      /// \param[in] _texture Texture.
       Q_SIGNALS: void TextureChanged(QString _texture);
 
       /// \brief Qt signal emitted when the editor item's 3D transparency has
@@ -206,6 +201,10 @@ namespace gazebo
       /// \brief Qt callback when the color has been changed from the 3D view.
       /// \param[in] _color Color.
       private slots: void OnColorChanged(QColor _color);
+
+      /// \brief Qt callback when the texture has been changed from the 3D view.
+      /// \param[in] _texture Texture.
+      private slots: void OnTextureChanged(QString _texture);
 
       /// \brief Type of editor item.
       protected: std::string editorType;

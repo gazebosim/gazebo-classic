@@ -340,13 +340,15 @@ void BuildingEditorPalette::OnCreateEditorItem(const std::string &_mode)
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnColor(int _buttonId)
 {
+  // TODO: improve button group logic
   // A button which is not color
   if (_buttonId >= static_cast<int>(colorList.size()))
   {
     // Textures
-    if (_buttonId < (int)colorList.size() + (int)textureList.size())
+    if (_buttonId < static_cast<int>(colorList.size()) +
+                    static_cast<int>(textureList.size()))
     {
-      this->OnTexture(_buttonId - (int)colorList.size());
+      this->OnTexture(_buttonId - static_cast<int>(colorList.size()));
       return;
     }
     // Others
@@ -388,7 +390,8 @@ void BuildingEditorPalette::OnTexture(int _textureId)
     this->currentMode = textureStr.str();
 
     QPixmap textureCursor(this->textureList[_textureId]);
-    textureCursor = textureCursor.scaled(QSize(30, 30));
+    textureCursor = textureCursor.scaled(QSize(30, 30), Qt::IgnoreAspectRatio,
+        Qt::SmoothTransformation);
     QApplication::setOverrideCursor(textureCursor);
   }
   else

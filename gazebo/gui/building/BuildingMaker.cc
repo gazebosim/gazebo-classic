@@ -166,7 +166,7 @@ BuildingMaker::BuildingMaker() : EntityMaker()
   this->connections.push_back(
       gui::editor::Events::ConnectColorSelected(
       boost::bind(&BuildingMaker::OnColorSelected, this, _1)));
-   this->connections.push_back(
+  this->connections.push_back(
       gui::editor::Events::ConnectTextureSelected(
       boost::bind(&BuildingMaker::OnTextureSelected, this, _1)));
   this->connections.push_back(
@@ -175,8 +175,6 @@ BuildingMaker::BuildingMaker() : EntityMaker()
 
   this->saveDialog =
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
-
-  this->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -1939,9 +1937,7 @@ void BuildingMaker::OnColorSelected(QColor _color)
 void BuildingMaker::OnTextureSelected(QString _texture)
 {
   this->selectedColor = QColor::Invalid;
-
-//  if (_texture != QString(""))
-    this->selectedTexture = _texture;
+  this->selectedTexture = _texture;
 }
 
 /////////////////////////////////////////////////

@@ -406,7 +406,6 @@ void BuildingModelManip::SetTexture(QString _texture)
   // BuildingModelManip and BuildingMaker handle material names,
   // Inspectors and palette handle thumbnail uri
   this->visual->SetMaterial(this->texture);
-  this->visual->SetAmbient(this->color);
   this->maker->BuildingChanged();
   emit TextureChanged(_texture);
 }
