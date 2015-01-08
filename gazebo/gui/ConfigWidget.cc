@@ -1219,10 +1219,14 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
     // Update each field in the message
     // TODO update repeated fields and enum fields
-    if (!field->is_repeated() && ref->HasField(*_msg, field))
+    if (!field->is_repeated() /*&& ref->HasField(*_msg, field)*/)
     {
       std::string scopedName = _name.empty() ? name : _name + "::" + name;
       if (this->configWidgets.find(scopedName) == this->configWidgets.end())
+        continue;
+
+      // don't update msgs field that are associated with read-only widgets
+      if (this->GetWidgetReadOnly(scopedName))
         continue;
 
       ConfigChildWidget *childWidget = this->configWidgets[scopedName];

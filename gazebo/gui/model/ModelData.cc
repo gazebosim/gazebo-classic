@@ -80,6 +80,8 @@ PartData::PartData()
   this->partSDF.reset(new sdf::Element);
   sdf::initFile("link.sdf", this->partSDF);
 
+//  this->partSDF->ToString("") << std::endl;
+
   this->inspector = new PartInspector;
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
@@ -236,11 +238,15 @@ void PartData::OnApply()
 
   this->partSDF = msgs::LinkToSDF(*generalConfig->GetData(), this->partSDF);
 
+//  std::cerr << this->partSDF->ToString("")  << std::endl;
+
+//  std::cerr << generalConfig->GetData()->DebugString() << std::endl;
+
+  this->partVisual->SetWorldPose(this->GetPose());
+
   // update visuals
   if (!this->visuals.empty())
   {
-    this->partVisual->SetWorldPose(this->GetPose());
-
     PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
     std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
     for (it = this->visuals.begin(); it != this->visuals.end(); ++it)

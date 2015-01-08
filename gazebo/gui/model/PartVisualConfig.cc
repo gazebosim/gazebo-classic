@@ -138,6 +138,7 @@ void PartVisualConfig::AddVisual(const std::string &_name,
     msgs::Visual visualMsg;
     configWidget->Load(&visualMsg);
   }
+
   configWidget->SetWidgetVisible("id", false);
   configWidget->SetWidgetVisible("name", false);
   configWidget->SetWidgetVisible("parent_name", false);
@@ -147,6 +148,15 @@ void PartVisualConfig::AddVisual(const std::string &_name,
   configWidget->SetWidgetVisible("visible", false);
   configWidget->SetWidgetVisible("scale", false);
   configWidget->SetWidgetVisible("plugin", false);
+  configWidget->SetWidgetReadOnly("id", true);
+  configWidget->SetWidgetReadOnly("name", true);
+  configWidget->SetWidgetReadOnly("parent_name", true);
+  configWidget->SetWidgetReadOnly("parent_id", true);
+  configWidget->SetWidgetReadOnly("delete_me", true);
+  configWidget->SetWidgetReadOnly("is_static", true);
+  configWidget->SetWidgetReadOnly("visible", true);
+  configWidget->SetWidgetReadOnly("scale", true);
+  configWidget->SetWidgetReadOnly("plugin", true);
 
   VisualConfigData *configData = new VisualConfigData;
   configData->configWidget = configWidget;

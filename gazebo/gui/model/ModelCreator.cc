@@ -378,6 +378,7 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   std::string partName = part->partVisual->GetName();
   part->SetName(partName);
   part->SetPose(part->partVisual->GetWorldPose());
+
   this->allParts[partName] = part;
   return part;
 }
@@ -1050,6 +1051,8 @@ void ModelCreator::GenerateSDF()
   // Model settings
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
+
+//  std::cerr << modelElem->ToString("") << std::endl;
 }
 
 /////////////////////////////////////////////////

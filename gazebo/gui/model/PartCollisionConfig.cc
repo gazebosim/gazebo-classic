@@ -136,18 +136,40 @@ void PartCollisionConfig::AddCollision(const std::string &_name,
 
   ConfigWidget *configWidget = new ConfigWidget;
 
+
+  msgs::Collision msgToLoad;
   if (_collisionMsg)
-  {
-    configWidget->Load(_collisionMsg);
-  }
-  else
-  {
-    msgs::Collision collisionMsg;
-    configWidget->Load(&collisionMsg);
-  }
+    msgToLoad = *_collisionMsg;
+
+  // set default values
+  // TODO: auto-fill them with SDF defaults
+  if (!msgToLoad.has_max_contacts())
+    msgToLoad.set_max_contacts(10);
+  msgs::Surface *surfaceMsg = msgToLoad.mutable_surface();
+  if (!surfaceMsg->has_bounce_threshold())
+    surfaceMsg->set_bounce_threshold(10e5);
+  if (!surfaceMsg->has_soft_erp())
+      surfaceMsg->set_soft_erp(0.2);
+  if (!surfaceMsg->has_kp())
+    surfaceMsg->set_kp(10e12);
+  if (!surfaceMsg->has_kd())
+    surfaceMsg->set_kd(1.0);
+  if (!surfaceMsg->has_max_vel())
+    surfaceMsg->set_max_vel(0.01);
+  if (!surfaceMsg->has_collide_without_contact_bitmask())
+    surfaceMsg->set_collide_without_contact_bitmask(1);
+  msgs::Friction *frictionMsg = surfaceMsg->mutable_friction();
+  if (!frictionMsg->has_mu())
+    frictionMsg->set_mu(1.0);
+  if (!frictionMsg->has_mu2())
+    frictionMsg->set_mu2(1.0);
+
+  configWidget->Load(&msgToLoad);
 
   configWidget->SetWidgetVisible("id", false);
   configWidget->SetWidgetVisible("name", false);
+  configWidget->SetWidgetReadOnly("id", true);
+  configWidget->SetWidgetReadOnly("name", true);
 
   CollisionConfigData *configData = new CollisionConfigData;
   configData->configWidget = configWidget;

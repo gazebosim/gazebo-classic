@@ -33,14 +33,24 @@ PartGeneralConfig::PartGeneralConfig()
   configWidget->Load(&linkMsg);
   generalLayout->addWidget(this->configWidget);
 
-  // set default properties
+  // set default values
+  // TODO: auto-fill them with SDF defaults
+  this->configWidget->SetDoubleWidgetValue("inertial::mass", 1.0);
+  this->configWidget->SetDoubleWidgetValue("inertial::ixx", 1.0);
+  this->configWidget->SetDoubleWidgetValue("inertial::iyy", 1.0);
+  this->configWidget->SetDoubleWidgetValue("inertial::izz", 1.0);
   this->configWidget->SetBoolWidgetValue("gravity", true);
   this->configWidget->SetBoolWidgetValue("self_collide", false);
   this->configWidget->SetBoolWidgetValue("kinematic", false);
+
   this->configWidget->SetWidgetVisible("id", false);
   this->configWidget->SetWidgetVisible("name", false);
   this->configWidget->SetWidgetVisible("canonical", false);
   this->configWidget->SetWidgetVisible("enabled", false);
+  this->configWidget->SetWidgetReadOnly("id", true);
+  this->configWidget->SetWidgetReadOnly("name", true);
+  this->configWidget->SetWidgetReadOnly("canonical", true);
+  this->configWidget->SetWidgetReadOnly("enabled", true);
 
   /*QLabel *gravityLabel = new QLabel(tr("Gravity:"));
   this->gravityCheck = new QCheckBox;
