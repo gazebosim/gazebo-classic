@@ -1053,7 +1053,7 @@ void ModelCreator::GenerateSDF()
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
 
-  std::cerr << modelElem->ToString("") << std::endl;
+  // std::cerr << modelElem->ToString("") << std::endl;
 }
 
 /////////////////////////////////////////////////

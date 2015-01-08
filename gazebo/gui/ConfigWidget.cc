@@ -583,7 +583,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
                 double length = geomValueMsg->GetReflection()->GetDouble(
                     *geomValueMsg, geomLengthField);
                 dimensions.x = radius * 2.0;
-                dimensions.y = radius * 2.0;
+                dimensions.y = dimensions.x;
                 dimensions.z = length;
                 break;
               }
@@ -714,8 +714,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
             // create a group widget to collapse or expand child widgets
             // (contained in a group box).
             GroupWidget *groupWidget = new GroupWidget;
-            newFieldWidget->setStyleSheet(
-                "QGroupBox {border : 0px; padding-left : 20px}");
+            newFieldWidget->setStyleSheet("QGroupBox {border : 0px}");
 
             QVBoxLayout *configGroupLayout = new QVBoxLayout;
             configGroupLayout->setContentsMargins(0, 0, 0, 0);

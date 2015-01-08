@@ -35,6 +35,7 @@ PartCollisionConfig::PartCollisionConfig()
   this->collisionsTreeWidget->setColumnCount(1);
   this->collisionsTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->collisionsTreeWidget->header()->hide();
+  this->collisionsTreeWidget->setIndentation(4);
 
   this->collisionsTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
   connect(this->collisionsTreeWidget,
@@ -183,10 +184,8 @@ void PartCollisionConfig::AddCollision(const std::string &_name,
   this->counter++;
 
   collisionLayout->setContentsMargins(0, 0, 0, 0);
-  collisionLayout->setAlignment(Qt::AlignTop);
   collisionWidget->setLayout(collisionLayout);
   collisionWidget->setMinimumHeight(650);
-  //collisionWidget->setMinimumWidth(600);
 
   this->collisionsTreeWidget->setItemWidget(collisionChildItem, 0,
       collisionWidget);

@@ -35,7 +35,7 @@ PartVisualConfig::PartVisualConfig()
   this->visualsTreeWidget->setColumnCount(1);
   this->visualsTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->visualsTreeWidget->header()->hide();
-  this->visualsTreeWidget->setIndentation(5);
+  this->visualsTreeWidget->setIndentation(4);
 
   this->visualsTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
   connect(this->visualsTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
