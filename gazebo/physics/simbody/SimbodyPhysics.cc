@@ -1172,12 +1172,10 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
     Transform X_LC =
       SimbodyPhysics::Pose2Transform((*ci)->GetRelativePose());
 
-    // The following is required until the deprecated, non-const version of
-    // Collision::GetShapeType is removed
-    // Otherwise it could be:
-    // (*ci)->GetShapeType()
-    boost::shared_ptr<const Collision> col = *ci;
-    switch (col->GetShapeType() & (~physics::Entity::SHAPE))
+// Remove these pragmas when non-const GetShapeType is removed
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    switch ((*ci)->GetShapeType() & (~physics::Entity::SHAPE))
     {
       case physics::Entity::PLANE_SHAPE:
       {
@@ -1268,10 +1266,11 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
       }
       break;
       default:
-        gzerr << "Collision type [" << col->GetShapeType()
+        gzerr << "Collision type [" << (*ci)->GetShapeType()
               << "] unimplemented\n";
         break;
     }
+#pragma GCC diagnostic pop
   }
 }
 
@@ -1369,6 +1368,10 @@ boost::any SimbodyPhysics::GetParam(const std::string &_key) const
   else if (_key == "max_transient_velocity")
   {
     return this->contact.getTransitionVelocity();
+  }
+  else if (_key == "max_step_size")
+  {
+    return this->GetMaxStepSize();
   }
   else
   {

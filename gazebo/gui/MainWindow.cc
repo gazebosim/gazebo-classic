@@ -130,7 +130,6 @@ MainWindow::MainWindow()
   splitter->setStretchFactor(0, 0);
   splitter->setStretchFactor(1, 2);
   splitter->setStretchFactor(2, 0);
-  splitter->setCollapsible(2, false);
   splitter->setHandleWidth(10);
 
   centerLayout->addWidget(splitter);
@@ -1156,25 +1155,43 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
   if (!this->menuLayout)
     this->menuLayout = new QHBoxLayout;
 
-  // Remove all widgets from the menubar
-  QLayoutItem *child = NULL;
-  while ((child = this->menuLayout->takeAt(0)) != 0)
+  // Remove all widgets from the menuLayout
+  while (this->menuLayout->takeAt(0) != 0)
   {
-    delete child;
   }
 
+  if (!this->menuBar)
+  {
+    // create the native menu bar
+    this->menuBar = new QMenuBar;
+    this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    this->setMenuBar(this->menuBar);
+
+    this->CreateMenuBar();
+  }
+
+  this->menuBar->clear();
+
+  QMenuBar *newMenuBar = NULL;
   if (!_bar)
   {
-    this->CreateMenuBar();
-    this->menuLayout->addWidget(this->menuBar);
-    this->setMenuBar(this->menuBar);
+    // Get the main window's menubar
+    // Note: for some reason we can not call menuBar() again,
+    // so manually retrieving the menubar from the mainwindow.
+    QList<QMenuBar *> menuBars  = this->findChildren<QMenuBar *>();
+    newMenuBar = menuBars[0];
   }
   else
   {
-    if (this->menuBar)
-      this->menuBar->hide();
-    this->menuLayout->addWidget(_bar);
+    newMenuBar = _bar;
   }
+  QList<QMenu *> menus  = newMenuBar->findChildren<QMenu *>();
+  for (int i = 0; i < menus.size(); ++i)
+  {
+    this->menuBar->addMenu(menus[i]);
+  }
+
+  this->menuLayout->addWidget(this->menuBar);
 
   this->menuLayout->addStretch(5);
   this->menuLayout->setContentsMargins(0, 0, 0, 0);
@@ -1183,13 +1200,10 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 /////////////////////////////////////////////////
 void MainWindow::CreateMenuBar()
 {
-  if (this->menuBar)
-    delete this->menuBar;
+  // main window's menu bar
+  QMenuBar *bar = QMainWindow::menuBar();
 
-  this->menuBar = new QMenuBar;
-  this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-  QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
+  QMenu *fileMenu = bar->addMenu(tr("&File"));
   // fileMenu->addAction(g_openAct);
   // fileMenu->addAction(g_importAct);
   // fileMenu->addAction(g_newAct);
@@ -1200,7 +1214,7 @@ void MainWindow::CreateMenuBar()
   fileMenu->addSeparator();
   fileMenu->addAction(g_quitAct);
 
-  this->editMenu = this->menuBar->addMenu(tr("&Edit"));
+  this->editMenu = bar->addMenu(tr("&Edit"));
   editMenu->addAction(g_resetModelsAct);
   editMenu->addAction(g_resetWorldAct);
   editMenu->addAction(g_editBuildingAct);
@@ -1211,7 +1225,7 @@ void MainWindow::CreateMenuBar()
   // \TODO: Add this back in when implementing the full Model Editor spec.
   editMenu->addAction(g_editModelAct);
 
-  QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
+  QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
   viewMenu->addSeparator();
 
@@ -1230,7 +1244,7 @@ void MainWindow::CreateMenuBar()
   // viewMenu->addAction(g_fpsAct);
   viewMenu->addAction(g_orbitAct);
 
-  QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
+  QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
   windowMenu->addAction(g_dataLoggerAct);
@@ -1241,9 +1255,9 @@ void MainWindow::CreateMenuBar()
   // windowMenu->addAction(g_diagnosticsAct);
 #endif
 
-  this->menuBar->addSeparator();
+  bar->addSeparator();
 
-  QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
+  QMenu *helpMenu = bar->addMenu(tr("&Help"));
   helpMenu->addAction(g_aboutAct);
 }
 

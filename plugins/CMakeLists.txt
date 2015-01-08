@@ -9,6 +9,7 @@ include_directories(
 # which uses tinxyml. Not defining the link directory here will end up
 # failures in clang.
 link_directories(
+  ${CCD_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
 )
@@ -18,6 +19,7 @@ if (HAVE_BULLET)
 endif()
 
 set (plugins
+  ArrangePlugin
   BreakableJointPlugin
   CameraPlugin
   CartDemoPlugin
@@ -26,6 +28,8 @@ set (plugins
   DiffDrivePlugin
   ForceTorquePlugin
   GpuRayPlugin
+  ImuSensorPlugin
+  InitialVelocityPlugin
   JointTrajectoryPlugin
   LiftDragPlugin
   ModelPropShop

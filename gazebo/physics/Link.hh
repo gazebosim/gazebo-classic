@@ -80,7 +80,7 @@ namespace gazebo
       /// \brief Reset the link.
       public: void Reset();
 
-      /// \brief Reset the link.
+      /// \brief Reset the velocity, acceleration, force and torque of link.
       public: void ResetPhysicsStates();
 
       /// \brief Update the parameters using new sdf values.
