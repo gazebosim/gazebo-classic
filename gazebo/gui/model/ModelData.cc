@@ -154,6 +154,12 @@ void PartData::UpdateConfig()
     std::string leafName =
         name.substr(name.find(partName)+partName.size()+1);
     visualConfig->SetGeometrySize(leafName, it->first->GetScale());
+
+    msgs::Visual *updateMsg = visualConfig->GetData(leafName);
+    msgs::Visual visualMsg = it->second;
+    updateMsg->clear_scale();
+    visualMsg.CopyFrom(*updateMsg);
+    it->second = visualMsg;
   }
   PartCollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
   std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
@@ -165,6 +171,11 @@ void PartData::UpdateConfig()
     std::string leafName =
         name.substr(name.find(partName)+partName.size()+1);
     collisionConfig->SetGeometrySize(leafName, colIt->first->GetScale());
+
+    msgs::Collision *updateMsg = collisionConfig->GetData(leafName);
+    msgs::Collision collisionMsg = colIt->second;
+    collisionMsg.CopyFrom(*updateMsg);
+    colIt->second = collisionMsg;
   }
 }
 

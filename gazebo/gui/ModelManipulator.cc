@@ -354,56 +354,10 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       scale.x = scale.y;
     }
   }
-  else if (_vis->GetName().find("unit_box") != std::string::npos)
+  else if (_vis->GetName().find("unit_box") != std::string::npos ||
+      (_vis != _vis->GetRootVisual() && _vis->GetChildCount() > 0))
   {
     // keep new scale as it is
-  }
-  else if (_vis != _vis->GetRootVisual() && _vis->GetChildCount() > 0)
-  {
-/*    std::string geomType;
-    bool mixedGeom = false;
-    for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
-    {
-      std::string type = _vis->GetChild(i)->GetGeometryType();
-
-      if (!type.empty() && geomType.empty())
-        type = geomType;
-      else if (geomType != type)
-      {
-        mixedGeom = true;
-        break;
-      }
-    }
-
-    if (mixedGeom || geomType == "sphere")
-    {
-      if (_axis.x > 0)
-      {
-        scale.y = scale.x;
-        scale.z = scale.x;
-      }
-      else if (_axis.y > 0)
-      {
-        scale.x = scale.y;
-        scale.z = scale.y;
-      }
-      else if (_axis.z > 0)
-      {
-        scale.x = scale.z;
-        scale.y = scale.z;
-      }
-    }
-    else if (geomType == "cylinder")
-    {
-      if (_axis.x > 0)
-      {
-        scale.y = scale.x;
-      }
-      else if (_axis.y > 0)
-      {
-        scale.x = scale.y;
-      }
-    }*/
   }
   else
   {
@@ -428,6 +382,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     _vis->SetScale(newScale);
   else
   {
+    // model editor mode -> apply scaling to individual visuals
     for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
     {
       rendering::VisualPtr childVis = _vis->GetChild(i);

@@ -984,9 +984,8 @@ void ModelCreator::GenerateSDF()
 
   modelElem->GetAttribute("name")->Set(this->modelName);
 
-  boost::unordered_map<std::string, PartData *>::iterator partsIt;
-
   // set center of all parts to be origin
+  boost::unordered_map<std::string, PartData *>::iterator partsIt;
   math::Vector3 mid;
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
        ++partsIt)
@@ -1006,6 +1005,8 @@ void ModelCreator::GenerateSDF()
     collisionNameStream.str("");
 
     PartData *part = partsIt->second;
+    part->UpdateConfig();
+
     sdf::ElementPtr newLinkElem = part->partSDF->Clone();
     newLinkElem->GetElement("pose")->Set(part->partVisual->GetWorldPose()
         - this->origin);
@@ -1052,7 +1053,7 @@ void ModelCreator::GenerateSDF()
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
 
-//  std::cerr << modelElem->ToString("") << std::endl;
+  std::cerr << modelElem->ToString("") << std::endl;
 }
 
 /////////////////////////////////////////////////
