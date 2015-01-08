@@ -281,14 +281,8 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       // Check that model is resting on ground
       pose1 = model->GetWorldPose();
       x0 = modelPos[name].x;
-      // issue \#848: failure with bullet 2.81
-      // make this if statement unconditional when \#848 is resolved
-      if (!(name == "link_offset_box" && _physicsEngine == "bullet"
-          && LIBBULLET_VERSION < 2.82))
-      {
-        EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
-        EXPECT_NEAR(pose1.pos.y, 0, PHYSICS_TOL);
-      }
+      EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
+      EXPECT_NEAR(pose1.pos.y, 0, PHYSICS_TOL);
 
       // debug
       // if (physics->GetType()  == "bullet")
@@ -358,6 +352,14 @@ TEST_P(PhysicsTest, SpawnDrop)
 ////////////////////////////////////////////////////////////////////////
 void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Skipping SpawnDropCoGOffset for physics engine ["
+          << _physicsEngine
+          << "] due to issue #1209.\n";
+    return;
+  }
+
   // load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -1078,7 +1080,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
     model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
 
     // let model settle
-    world->Step(1000);
+    world->Step(2000);
 
     for (unsigned int n = 0; n < 10; ++n)
     {
@@ -1153,7 +1155,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
     model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
 
     // let model settle
-    world->Step(1000);
+    world->Step(2000);
 
     for (unsigned int n = 0; n < 10; ++n)
     {

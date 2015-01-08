@@ -110,11 +110,29 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::PlaneGeom Convert(const math::Plane &_p);
 
+    /// \brief Convert a string to a msgs::Joint::Type enum.
+    /// \param[in] _str Joint type string.
+    /// \return A msgs::Joint::Type enum.
+    GAZEBO_VISIBLE
+    msgs::Joint::Type ConvertJointType(const std::string &_str);
+
+    /// \brief Convert a msgs::Joint::Type to a string.
+    /// \param[in] _type A msgs::Joint::Type enum.
+    /// \return Joint type string.
+    GAZEBO_VISIBLE
+    std::string ConvertJointType(const msgs::Joint::Type _type);
+
     /// \brief Convert a msgs::Vector3d to a math::Vector
     /// \param[in] _v The plane to convert
     /// \return A math::Vector3 object
     GAZEBO_VISIBLE
     math::Vector3    Convert(const msgs::Vector3d &_v);
+
+    /// \brief Convert a msgs::Vector2d to a math::Vector2d
+    /// \param[in] _v The vector2 to convert
+    /// \return A math::Vector2d object
+    GAZEBO_VISIBLE
+    math::Vector2d    Convert(const msgs::Vector2d &_v);
 
     /// \brief Convert a msgs::Quaternion to a math::Quaternion
     /// \param[in] _q The quaternion to convert
@@ -255,6 +273,15 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create an SDF element from a msgs::Scene
+    /// \param[in] _msg Light messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element
+    GAZEBO_VISIBLE
+    sdf::ElementPtr LightToSDF(const msgs::Light &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
     /// \cond
     GAZEBO_VISIBLE
     const google::protobuf::FieldDescriptor *GetFD(
@@ -272,4 +299,3 @@ namespace gazebo
 }
 
 #endif
-

@@ -1,4 +1,6 @@
 set (files
+  actor.world
+  arat.world
   blank.world
   camera.world
   cart_demo.world
@@ -14,6 +16,8 @@ set (files
   gripper.world
   heightmap_dem.world
   heightmap.world
+  hydra_demo.world
+  initial_velocity.world
   joint_damping_demo.world
   joints.world
   lights.world
@@ -24,6 +28,7 @@ set (files
   pioneer2dx.world
   plane_demo.world
   plugin.world
+  polyline.world
   pr2.world
   presentation.world
   pressure_sensor.world
@@ -33,6 +38,7 @@ set (files
   ray_cpu.world
   ray_noise_plugin.world
   road.world
+  road_textures.world
   robocup09_spl_field.world
   robocup14_spl_field.world
   robocup_3Dsim.world

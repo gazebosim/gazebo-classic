@@ -45,7 +45,11 @@ http://www.gnu.org/copyleft/lesser.txt.
     #define DllExport __declspec (dllimport)
   #endif
 #else
-  #define DllExport
+  #if __GNUC__ >= 4
+    #define DllExport __attribute__ ((visibility ("default")))
+  #else
+    #define DllExport
+  #endif
 #endif
 
 /// Log macro

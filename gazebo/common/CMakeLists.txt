@@ -20,6 +20,7 @@ set (sources
   AudioDecoder.cc
   Base64.cc
   BVHLoader.cc
+  ColladaExporter.cc
   ColladaLoader.cc
   Color.cc
   CommonIface.cc
@@ -33,6 +34,7 @@ set (sources
   KeyFrame.cc
   Material.cc
   Mesh.cc
+  MeshExporter.cc
   MeshLoader.cc
   MeshManager.cc
   ModelDatabase.cc
@@ -94,16 +96,19 @@ set (headers
 if (HAVE_GTS)
 set (sources
   ${sources}
+  GTSMeshUtils.cc
   MeshCSG.cc
 )
 set (headers
   ${headers}
+  GTSMeshUtils.hh
   MeshCSG.hh
 )
 endif()
 
 set (gtest_sources
   Animation_TEST.cc
+  ColladaExporter_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
   CommonIface_TEST.cc
@@ -141,12 +146,13 @@ set_property(
   SOURCE SystemPaths.cc SystemPaths_TEST.cc ModelDatabase.cc
   PROPERTY COMPILE_DEFINITIONS
   GAZEBO_PLUGIN_PATH="${GAZEBO_PLUGIN_PATH}"
+  GAZEBO_MODEL_PATH="${GAZEBO_MODEL_PATH}"
   GAZEBO_RESOURCE_PATH="${GAZEBO_RESOURCE_PATH}"
   GAZEBO_MODEL_DATABASE_URI="${GAZEBO_MODEL_DATABASE_URI}"
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
 )
 
-link_directories( 
+link_directories(
   ${tinyxml_LIBRARY_DIRS}
 )
 
@@ -164,7 +170,7 @@ target_link_libraries(gazebo_common
   ${libswscale_LIBRARIES}
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
-  ${SDF_LIBRARIES}
+  ${SDFormat_LIBRARIES}
   pthread
 )
 
