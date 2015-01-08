@@ -343,6 +343,43 @@ TEST_F(gzTest, Model)
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
 
+  // Test model info and pose
+  {
+    // Make sure the error message is output.
+    std::string modelInfo = custom_exec_str("gz model -m does_not_exist -i");
+    EXPECT_EQ(gazebo::common::get_sha1<std::string>(modelInfo),
+        "7b5a9ab178ce5fa6ae74c80a33a99b84183ae600");
+
+    // Get info for a model that exists.
+    modelInfo = custom_exec_str("gz model -m my_box -i");
+
+    // Check that a few values exist. We don't check the sha1 value
+    // because a few values, such as pose, are dynamic.
+    EXPECT_TRUE(modelInfo.find("name: \"my_box\"") != std::string::npos);
+    EXPECT_TRUE(modelInfo.find("id: 9") != std::string::npos);
+    EXPECT_TRUE(modelInfo.find("name: \"my_box::link::collision\"")
+        != std::string::npos);
+
+    // Get the pose of the model.
+    modelInfo = custom_exec_str("gz model -m my_box -p");
+    boost::algorithm::trim(modelInfo);
+
+    // Split the string into parts.
+    std::vector<std::string> parts;
+    boost::split(parts, modelInfo, boost::is_any_of(" "));
+
+    // Make sure we have the right number of parts.
+    ASSERT_EQ(parts.size(), 6u);
+
+    // Make sure the pose is correct.
+    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[0]), 0.0);
+    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[1]), 0.0);
+    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[2]), 0.5);
+    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[3]), 0.0);
+    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[4]), 0.0);
+    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[5]), 0.0);
+  }
+
   // Test model delete
   {
     waitForMsg("gz model -w default -m simple_arm -d");

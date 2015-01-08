@@ -123,14 +123,13 @@ void transport::stop()
 {
   g_stopped = true;
   g_responseCondition.notify_all();
+
   transport::ConnectionManager::Instance()->Stop();
 }
 
 /////////////////////////////////////////////////
 void transport::fini()
 {
-  transport::TopicManager::Instance()->Fini();
-
   transport::stop();
   if (g_runThread)
   {
@@ -138,6 +137,7 @@ void transport::fini()
     delete g_runThread;
     g_runThread = NULL;
   }
+  transport::TopicManager::Instance()->Fini();
   transport::ConnectionManager::Instance()->Fini();
 }
 
@@ -156,7 +156,7 @@ void transport::pause_incoming(bool _pause)
 /////////////////////////////////////////////////
 void on_response(ConstResponsePtr &_msg)
 {
-  if (g_requests.empty())
+  if (g_requests.empty() || g_stopped)
     return;
 
   std::list<msgs::Request *>::iterator iter;
@@ -170,6 +170,7 @@ void on_response(ConstResponsePtr &_msg)
   if (iter == g_requests.end())
     return;
 
+  boost::mutex::scoped_lock lock(requestMutex);
   boost::shared_ptr<msgs::Response> response(new msgs::Response);
   response->CopyFrom(*_msg);
   g_responses.push_back(response);
@@ -188,8 +189,6 @@ boost::shared_ptr<msgs::Response> transport::request(
     const std::string &_worldName, const std::string &_request,
     const std::string &_data)
 {
-  boost::mutex::scoped_lock lock(requestMutex);
-
   msgs::Request *request = msgs::CreateRequest(_request, _data);
 
   g_requests.push_back(request);
@@ -197,18 +196,19 @@ boost::shared_ptr<msgs::Response> transport::request(
   NodePtr node = NodePtr(new Node());
   node->Init(_worldName);
 
+  SubscriberPtr responseSub = node->Subscribe("~/response", &on_response);
+
   PublisherPtr requestPub = node->Advertise<msgs::Request>("~/request");
   requestPub->WaitForConnection();
 
-  SubscriberPtr responseSub = node->Subscribe("~/response", &on_response);
-
+  boost::mutex::scoped_lock lock(requestMutex);
   requestPub->Publish(*request, true);
 
   boost::shared_ptr<msgs::Response> response;
   std::list<boost::shared_ptr<msgs::Response> >::iterator iter;
 
   bool valid = false;
-  while (!valid)
+  while (!valid && !g_stopped)
   {
     // Wait for a response
     g_responseCondition.wait(lock);

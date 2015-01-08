@@ -102,13 +102,6 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
     }
 
     // spawn joint using using parent model frame to define joint axis
-    if (_physicsEngine == "dart")
-    {
-      gzerr << "dart doesn't support parent model frame, skipping sub-test"
-            << " per issue #1143"
-            << std::endl;
-    }
-    else
     {
       gzdbg << "test case with joint axis specified in parent model frame.\n";
       opt.useParentModelFrame = true;
@@ -208,10 +201,12 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
     // ODE requires maxForce to be non-zero for SetVelocity to work
     // See issue #964 for discussion of consistent API
     if (isOde)
+    {
       _joint->SetMaxForce(0, maxForce);
+      world->Step(1);
+    }
 
-    // Take a step and verify that Joint::GetVelocity returns the same value
-    world->Step(1);
+    // Verify that Joint::GetVelocity returns the same value
     EXPECT_NEAR(_joint->GetVelocity(0), vel, g_tolerance);
 
     // Also verify that relative body motions match expected joint behavior

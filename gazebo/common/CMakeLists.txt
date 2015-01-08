@@ -146,12 +146,13 @@ set_property(
   SOURCE SystemPaths.cc SystemPaths_TEST.cc ModelDatabase.cc
   PROPERTY COMPILE_DEFINITIONS
   GAZEBO_PLUGIN_PATH="${GAZEBO_PLUGIN_PATH}"
+  GAZEBO_MODEL_PATH="${GAZEBO_MODEL_PATH}"
   GAZEBO_RESOURCE_PATH="${GAZEBO_RESOURCE_PATH}"
   GAZEBO_MODEL_DATABASE_URI="${GAZEBO_MODEL_DATABASE_URI}"
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
 )
 
-link_directories( 
+link_directories(
   ${tinyxml_LIBRARY_DIRS}
 )
 
@@ -169,7 +170,7 @@ target_link_libraries(gazebo_common
   ${libswscale_LIBRARIES}
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
-  ${SDF_LIBRARIES}
+  ${SDFormat_LIBRARIES}
   pthread
 )
 
