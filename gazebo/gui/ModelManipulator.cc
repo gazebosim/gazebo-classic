@@ -87,6 +87,14 @@ void ModelManipulator::Init()
 }
 
 /////////////////////////////////////////////////
+void ModelManipulator::Detach()
+{
+  this->dataPtr->selectionObj->SetMode(
+      rendering::SelectionObj::SELECTION_NONE);
+  this->dataPtr->selectionObj->Detach();
+}
+
+/////////////////////////////////////////////////
 void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
     const math::Vector3 &_axis, bool _local)
 {
@@ -160,7 +168,6 @@ math::Vector3 ModelManipulator::GetMousePositionOnPlane(
 
   return p1;
 }
-
 /////////////////////////////////////////////////
 math::Vector3 ModelManipulator::SnapPoint(const math::Vector3 &_point,
     double _interval, double _sensitivity)
@@ -360,6 +367,10 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
   if (this->dataPtr->mouseEvent.control)
   {
     newScale = SnapPoint(newScale);
+    // prevent setting zero scale
+    newScale.x = std::max(1e-4, newScale.x);
+    newScale.y = std::max(1e-4, newScale.y);
+    newScale.z = std::max(1e-4, newScale.z);
   }
 
   _vis->SetScale(newScale);
@@ -456,9 +467,16 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   if (vis && !vis->IsPlane() &&
       this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
   {
-    if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
+    rendering::VisualPtr rootVis = vis->GetRootVisual();
+    if (gui::get_entity_id(rootVis->GetName()))
     {
-      vis = vis->GetRootVisual();
+      // select model
+      vis = rootVis;
+    }
+    else if (vis->GetParent() != rootVis)
+    {
+      // select link
+      vis = vis->GetParent();
     }
 
     this->dataPtr->mouseMoveVisStartPose = vis->GetWorldPose();

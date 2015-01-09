@@ -38,26 +38,19 @@ namespace gazebo
       /// \brief Setup the test fixture. This gets called by gtest.
       protected: virtual void SetUp()
       {
-        ASSERT_TRUE(getenv("HOME") != NULL);
-
-        // We need to create the log directory if needed.
-        boost::filesystem::path logPath(getenv("HOME"));
-        logPath = logPath / ".gazebo" / "test_logs";
-        if (!boost::filesystem::exists(logPath))
-          boost::filesystem::create_directories(logPath);
-
         const ::testing::TestInfo *const testInfo =
           ::testing::UnitTest::GetInstance()->current_test_info();
 
         std::string testName = testInfo->name();
         std::string testCaseName = testInfo->test_case_name();
         this->logFilename = testCaseName + "_" + testName + ".log";
-        this->logDirectory = logPath.string();
 
         // Initialize Console
-        gzLogInit((boost::filesystem::path("test_logs") /
-             this->logFilename).string());
+        gzLogInit("test_logs-", this->logFilename);
         gazebo::common::Console::SetQuiet(false);
+
+        // Read the full path to the log directory.
+        this->logDirectory = gzLogDirectory();
       }
 
       /// \brief Get a string with the full log file path.

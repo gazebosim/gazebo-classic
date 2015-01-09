@@ -35,9 +35,9 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
   this->level = 0;
   this->levelBaseHeight = 0;
 
-  this->doorDepth = 20;
+  this->doorDepth = 17;
   this->doorHeight = 200;
-  this->doorWidth = 100;
+  this->doorWidth = 90;
   this->doorElevation = 0;
 
   this->width = this->doorWidth;
@@ -46,6 +46,7 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
   this->drawingHeight = this->height;
 
   this->UpdateCornerPositions();
+  this->UpdateMeasures();
 
   this->doorPos = this->scenePos();
 
@@ -185,6 +186,7 @@ void DoorItem::OnOpenInspector()
   QPointF itemPos = this->doorPos * this->scale;
   itemPos.setY(-itemPos.y());
   this->inspector->SetPosition(itemPos);
+  this->inspector->move(QCursor::pos());
   this->inspector->show();
 }
 
@@ -203,6 +205,7 @@ void DoorItem::SizeChanged()
 {
   emit WidthChanged(this->doorWidth);
   emit DepthChanged(this->doorDepth);
+  this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////

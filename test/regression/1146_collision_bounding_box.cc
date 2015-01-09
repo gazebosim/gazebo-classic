@@ -30,16 +30,16 @@ TEST_F(Issue1146Test, Reset)
 {
   Load("worlds/box_plane_low_friction_test.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr model = world->GetModel("box");
-  ASSERT_TRUE(model);
+  ASSERT_TRUE(model != NULL);
 
   physics::LinkPtr link = model->GetLink("link");
-  ASSERT_TRUE(link);
+  ASSERT_TRUE(link != NULL);
 
   physics::CollisionPtr coll = link->GetCollision("collision");
-  ASSERT_TRUE(coll);
+  ASSERT_TRUE(coll != NULL);
 
   EXPECT_EQ(coll->GetCollisionBoundingBox(),
       math::Box(math::Vector3(-0.5, -0.5, 0), math::Vector3(0.5, 0.5, 1)));

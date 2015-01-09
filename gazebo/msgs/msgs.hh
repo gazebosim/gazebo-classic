@@ -80,6 +80,12 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Vector3d      Convert(const math::Vector3 &_v);
 
+    /// \brief Convert a math::Vector2d to a msgs::Vector2d
+    /// \param[in] _v The vector to convert
+    /// \return A msgs::Vector2d object
+    GAZEBO_VISIBLE
+    msgs::Vector2d Convert(const math::Vector2d &_v);
+
     /// \brief Convert a math::Quaternion to a msgs::Quaternion
     /// \param[in] _q The quaternion to convert
     /// \return A msgs::Quaternion object
@@ -273,13 +279,85 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf);
 
-    /// \brief Create an SDF element from a msgs::Scene
+    /// \brief Create an SDF element from a msgs::Light
     /// \param[in] _msg Light messsage
     /// \param[in] _sdf if supplied, performs an update from _msg intead of
     /// creating a new sdf element.
-    /// \return The new SDF element
+    /// \return The new SDF element.
     GAZEBO_VISIBLE
     sdf::ElementPtr LightToSDF(const msgs::Light &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::CameraSensor
+    /// \param[in] _msg CameraSensor messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr CameraSensorToSDF(const msgs::CameraSensor &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Plugin
+    /// \param[in] _msg Plugin messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    sdf::ElementPtr PluginToSDF(const msgs::Plugin &_plugin,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Collision
+    /// \param[in] _msg Collision messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr CollisionToSDF(const msgs::Collision &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \internal
+    /// \brief Create an SDF element from a msgs::Link.
+    /// \param[in] _msg Link messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr LinkToSDF(const msgs::Link &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Inertial
+    /// \param[in] _msg Inertial messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr InertialToSDF(const msgs::Inertial &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Surface
+    /// \param[in] _msg Surface messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr SurfaceToSDF(const msgs::Surface &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Geometry
+    /// \param[in] _msg Geometry messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr GeometryToSDF(const msgs::Geometry &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Mesh
+    /// \param[in] _msg Mesh messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr MeshToSDF(const msgs::MeshGeom &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
     /// \cond
