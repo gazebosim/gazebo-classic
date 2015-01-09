@@ -1512,32 +1512,44 @@ namespace gazebo
     }
 
     ////////////////////////////////////////////////////////
-    std::string ToSDF(const msgs::Model &_msg)
+    sdf::ElementPtr ModelToSDF(const msgs::Model &_msg, sdf::ElementPtr _sdf)
     {
-      std::ostringstream stream;
-      stream << "<model name='"
-             << _msg.name()
-             << "'>";
+      sdf::ElementPtr modelSDF;
 
+      if (_sdf)
+      {
+        modelSDF = _sdf;
+      }
+      else
+      {
+        modelSDF.reset(new sdf::Element);
+        sdf::initFile("model.sdf", modelSDF);
+      }
+
+      if (_msg.has_name())
+        modelSDF->GetAttribute("name")->Set(_msg.name());
       // ignore the id field, since it's not used in sdformat
       if (_msg.has_is_static())
-      {
-        stream << "<static>" << _msg.is_static() << "</static>";
-      }
+        modelSDF->GetElement("static")->Set(_msg.is_static());
       if (_msg.has_pose())
-      {
-        stream << "<pose>"
-               << msgs::Convert(_msg.pose())
-               << "</pose>";
-      }
+        modelSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+
+      while (modelSDF->HasElement("joint"))
+        modelSDF->GetElement("joint")->RemoveFromParent();
       for (int i = 0; i < _msg.joint_size(); ++i)
       {
-        stream << msgs::ToSDF(_msg.joint(i));
+        sdf::ElementPtr jointElem = modelSDF->AddElement("joint");
+        jointElem = JointToSDF(_msg.joint(i), jointElem);
       }
+
+      while (modelSDF->HasElement("link"))
+        modelSDF->GetElement("link")->RemoveFromParent();
       for (int i = 0; i < _msg.link_size(); ++i)
       {
-        stream << msgs::LinkToSDF(_msg.link(i))->ToString("");
+        sdf::ElementPtr linkElem = modelSDF->AddElement("link");
+        linkElem = LinkToSDF(_msg.link(i), linkElem);
       }
+
       // ignore the deleted field, since it's not used in sdformat
       if (_msg.visual_size() > 0)
       {
@@ -1545,191 +1557,112 @@ namespace gazebo
       }
       // ignore the scale field, since it's not used in sdformat
 
-      stream << "</model>";
-      return stream.str();
+      return modelSDF;
     }
 
 
     ////////////////////////////////////////////////////////
-    std::string ToSDF(const msgs::Joint &_msg,
+    sdf::ElementPtr JointToSDF(const msgs::Joint &_msg, sdf::ElementPtr _sdf,
                       int _useParentModelFrame1,
                       int _useParentModelFrame2)
     {
-      std::ostringstream stream;
-      stream << "<joint name='"
-             << _msg.name();
-      if (_msg.has_type())
-      {
-        if (_msg.type() == Joint::REVOLUTE)
-        {
-          stream << "' type='revolute";
-        }
-        else if (_msg.type() == Joint::REVOLUTE2)
-        {
-          stream << "' type='revolute2";
-        }
-        else if (_msg.type() == Joint::PRISMATIC)
-        {
-          stream << "' type='prismatic";
-        }
-        else if (_msg.type() == Joint::UNIVERSAL)
-        {
-          stream << "' type='universal";
-        }
-        else if (_msg.type() == Joint::BALL)
-        {
-          stream << "' type='ball";
-        }
-        else if (_msg.type() == Joint::SCREW)
-        {
-          stream << "' type='screw";
-        }
-        else if (_msg.type() == Joint::GEARBOX)
-        {
-          stream << "' type='gearbox";
-        }
-      }
-      stream << "'>";
+      sdf::ElementPtr jointSDF;
 
+      if (_sdf)
+      {
+        jointSDF = _sdf;
+      }
+      else
+      {
+        jointSDF.reset(new sdf::Element);
+        sdf::initFile("joint.sdf", jointSDF);
+      }
+
+      if (_msg.has_name())
+        jointSDF->GetAttribute("name")->Set(_msg.name());
+      if (_msg.has_type())
+        jointSDF->GetAttribute("type")->Set(ConvertJointType(_msg.type()));
       // ignore the id field, since it's not used in sdformat
       // ignore the parent_id field, since it's not used in sdformat
       // ignore the child_id field, since it's not used in sdformat
       // ignore the angle field, since it's not used in sdformat
       if (_msg.has_parent())
-      {
-        stream << "<parent>" << _msg.parent() << "</parent>";
-      }
+        jointSDF->GetElement("parent")->Set(_msg.parent());
       if (_msg.has_child())
-      {
-        stream << "<child>" << _msg.child() << "</child>";
-      }
+        jointSDF->GetElement("child")->Set(_msg.child());
       if (_msg.has_pose())
-      {
-        stream << "<pose>"
-               << msgs::Convert(_msg.pose())
-               << "</pose>";
-      }
+        jointSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
       if (_msg.has_axis1())
       {
-        stream << ToSDF(_msg.axis1(), "axis", _useParentModelFrame1);
+        AxisToSDF(_msg.axis1(), jointSDF->GetElement("axis"),
+          _useParentModelFrame1);
       }
       if (_msg.has_axis2())
       {
-        stream << ToSDF(_msg.axis2(), "axis2", _useParentModelFrame2);
+        AxisToSDF(_msg.axis2(), jointSDF->GetElement("axis2"),
+          _useParentModelFrame2);
       }
 
-      stream << "<physics>"
-             << "<ode>";
+      sdf::ElementPtr odePhysicsElem =
+        jointSDF->GetElement("physics")->GetElement("ode");
       if (_msg.has_cfm())
-      {
-        stream << "<cfm>" << _msg.cfm() << "</cfm>";
-      }
+        odePhysicsElem->GetElement("cfm")->Set(_msg.cfm());
       if (_msg.has_bounce())
-      {
-        stream << "<bounce>" << _msg.bounce() << "</bounce>";
-      }
+        odePhysicsElem->GetElement("bounce")->Set(_msg.bounce());
       if (_msg.has_velocity())
-      {
-        stream << "<velocity>" << _msg.velocity() << "</velocity>";
-      }
+        odePhysicsElem->GetElement("velocity")->Set(_msg.velocity());
       if (_msg.has_fudge_factor())
+        odePhysicsElem->GetElement("fudge_factor")->Set(_msg.fudge_factor());
+
       {
-        stream << "<fudge_factor>" << _msg.fudge_factor() << "</fudge_factor>";
+        sdf::ElementPtr limitElem = odePhysicsElem->GetElement("limit");
+        if (_msg.has_limit_cfm())
+          limitElem->GetElement("cfm")->Set(_msg.limit_cfm());
+        if (_msg.has_limit_erp())
+          limitElem->GetElement("erp")->Set(_msg.limit_erp());
       }
 
-      stream << "<limit>";
-      if (_msg.has_limit_cfm())
       {
-        stream << "<cfm>" << _msg.limit_cfm() << "</cfm>";
+        sdf::ElementPtr suspensionElem =
+          odePhysicsElem->GetElement("suspension");
+        if (_msg.has_suspension_cfm())
+          suspensionElem->GetElement("cfm")->Set(_msg.suspension_cfm());
+        if (_msg.has_suspension_erp())
+          suspensionElem->GetElement("erp")->Set(_msg.suspension_erp());
       }
-      if (_msg.has_limit_erp())
-      {
-        stream << "<erp>" << _msg.limit_erp() << "</erp>";
-      }
-      stream << "</limit>"
-             << "<suspension>";
-      if (_msg.has_suspension_cfm())
-      {
-        stream << "<cfm>" << _msg.suspension_cfm() << "</cfm>";
-      }
-      if (_msg.has_suspension_erp())
-      {
-        stream << "<erp>" << _msg.suspension_erp() << "</erp>";
-      }
-      stream << "</suspension>"
-             << "</ode>"
-             << "</physics>";
       // also ignore the sensor field for now
 
-      stream << "</joint>";
-      return stream.str();
+      return jointSDF;
     }
 
     ////////////////////////////////////////////////////////
-    std::string ToSDF(const msgs::Axis &_msg,
-                      const std::string &_name,
-                      int _useParentModelFrame)
+    void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf,
+        int _useParentModelFrame)
     {
-      std::ostringstream stream;
-      stream << "<" << _name << ">";
-
       if (_msg.has_xyz())
-      {
-        stream << "<xyz>"
-               << msgs::Convert(_msg.xyz())
-               << "</xyz>";
-      }
+        _sdf->GetElement("xyz")->Set(msgs::Convert(_msg.xyz()));
       if (_useParentModelFrame >= 0)
+        _sdf->GetElement("use_parent_model_frame")->Set(_useParentModelFrame);
+
       {
-        stream << "<use_parent_model_frame>"
-               << _useParentModelFrame
-               << "</use_parent_model_frame>";
+        sdf::ElementPtr dynamicsElem = _sdf->GetElement("dynamics");
+        if (_msg.has_damping())
+          dynamicsElem->GetElement("damping")->Set(_msg.damping());
+        if (_msg.has_friction())
+          dynamicsElem->GetElement("friction")->Set(_msg.friction());
       }
 
-      stream << "<dynamics>";
-      if (_msg.has_damping())
       {
-        stream << "<damping>"
-               << _msg.damping()
-               << "</damping>";
+        sdf::ElementPtr limitElem = _sdf->GetElement("limit");
+        if (_msg.has_limit_lower())
+          limitElem->GetElement("lower")->Set(_msg.limit_lower());
+        if (_msg.has_limit_upper())
+          limitElem->GetElement("upper")->Set(_msg.limit_upper());
+        if (_msg.has_limit_effort())
+          limitElem->GetElement("effort")->Set(_msg.limit_effort());
+        if (_msg.has_limit_velocity())
+          limitElem->GetElement("velocity")->Set(_msg.limit_velocity());
       }
-      if (_msg.has_friction())
-      {
-        stream << "<friction>"
-               << _msg.friction()
-               << "</friction>";
-      }
-      stream << "</dynamics>";
-
-      stream << "<limit>";
-      if (_msg.has_limit_lower())
-      {
-        stream << "<lower>"
-               << _msg.limit_lower()
-               << "</lower>";
-      }
-      if (_msg.has_limit_upper())
-      {
-        stream << "<upper>"
-               << _msg.limit_upper()
-               << "</upper>";
-      }
-      if (_msg.has_limit_effort())
-      {
-        stream << "<effort>"
-               << _msg.limit_effort()
-               << "</effort>";
-      }
-      if (_msg.has_limit_velocity())
-      {
-        stream << "<velocity>"
-               << _msg.limit_velocity()
-               << "</velocity>";
-      }
-      stream << "</limit>";
-
-      stream << "</" << _name << ">";
-      return stream.str();
     }
   }
 }

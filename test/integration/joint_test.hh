@@ -203,8 +203,8 @@ class JointTest : public ServerFixture,
                         math::Vector3(0, 1, 0));
             }
             modelStr
-              << msgs::ToSDF(jointMsg, _opt.useParentModelFrame,
-                                       _opt.useParentModelFrame)
+              << msgs::JointToSDF(jointMsg, sdf::ElementPtr(),
+                  _opt.useParentModelFrame, _opt.useParentModelFrame)
               << "</model>";
 
             msg.set_sdf(modelStr.str());
