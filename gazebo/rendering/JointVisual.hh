@@ -68,11 +68,11 @@ namespace gazebo
       // Documentation Inherited.
       public: void SetVisible(bool _visible, bool _cascade = true);
 
-      /// \brief Update the joint visual based on a message
+      /// \brief Update the joint visual based on a message.
       /// \param[in] _msg Joint message
       public: void UpdateFromMsg(ConstJointPtr &_msg);
 
-      /// \brief Update an axis visual.
+      /// \brief Update an axis' arrow visual.
       /// \param[in] _arrowVisual Arrow visual to be updated.
       /// \param[in] _axis Axis vector.
       /// \param[in] _useParentFrame True to use parent frame instead of the

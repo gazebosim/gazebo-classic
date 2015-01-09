@@ -376,8 +376,6 @@ void ModelCreator::RemovePart(const std::string &_partName)
   if (!part)
     return;
 
-  this->DeselectAll();
-
   rendering::ScenePtr scene = part->partVisual->GetScene();
   for (unsigned int i = 0; i < part->visuals.size(); ++i)
   {
@@ -612,8 +610,9 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
           = this->selectedVisuals.begin(); it != this->selectedVisuals.end();)
       {
         (*it)->SetHighlighted(false);
+        std::string name = (*it)->GetName();
         it = this->selectedVisuals.erase(it);
-        this->OnDelete((*it)->GetName());
+        this->OnDelete(name);
       }
     }
   }
@@ -811,11 +810,10 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
   if (this->allParts.find(vis->GetParent()->GetName()) !=
       this->allParts.end())
   {
-    this->DeselectAll();
-
     // TODO open inspector.
     return true;
   }
+
   return false;
 }
 

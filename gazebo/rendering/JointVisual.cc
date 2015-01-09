@@ -113,8 +113,8 @@ void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
 }
 
 /////////////////////////////////////////////////
-ArrowVisualPtr JointVisual::CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
-    msgs::Joint::Type _type)
+ArrowVisualPtr JointVisual::CreateAxis(const math::Vector3 &_axis,
+    bool _useParentFrame, msgs::Joint::Type _type)
 {
   ArrowVisualPtr axis;
 
@@ -128,36 +128,6 @@ ArrowVisualPtr JointVisual::CreateAxis(const math::Vector3 &_axis, bool _usePare
   this->UpdateAxis(axis, _axis, _useParentFrame, _type);
 
   return axis;
-}
-
-/////////////////////////////////////////////////
-JointVisualPtr JointVisual::GetParentAxisVisual() const
-{
-  JointVisualPrivate *dPtr =
-      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
-
-  return dPtr->parentAxisVis;
-}
-
-/////////////////////////////////////////////////
-ArrowVisualPtr JointVisual::GetArrowVisual() const
-{
-  JointVisualPrivate *dPtr =
-      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
-
-  return dPtr->arrowVisual;
-}
-
-/////////////////////////////////////////////////
-void JointVisual::SetVisible(bool _visible, bool _cascade)
-{
-  JointVisualPrivate *dPtr =
-      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
-
-  Visual::SetVisible(_visible, _cascade);
-
-  if (dPtr->parentAxisVis)
-    dPtr->parentAxisVis->SetVisible(_visible, _cascade);
 }
 
 /////////////////////////////////////////////////
@@ -341,5 +311,35 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
   {
     dPtr->axisVisual->ShowAxisHead(2, false);
     _arrowVisual->ShowShaft(false);
-  }  
+  }
+}
+
+/////////////////////////////////////////////////
+JointVisualPtr JointVisual::GetParentAxisVisual() const
+{
+  JointVisualPrivate *dPtr =
+      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
+
+  return dPtr->parentAxisVis;
+}
+
+/////////////////////////////////////////////////
+ArrowVisualPtr JointVisual::GetArrowVisual() const
+{
+  JointVisualPrivate *dPtr =
+      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
+
+  return dPtr->arrowVisual;
+}
+
+/////////////////////////////////////////////////
+void JointVisual::SetVisible(bool _visible, bool _cascade)
+{
+  JointVisualPrivate *dPtr =
+      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
+
+  Visual::SetVisible(_visible, _cascade);
+
+  if (dPtr->parentAxisVis)
+    dPtr->parentAxisVis->SetVisible(_visible, _cascade);
 }
