@@ -610,9 +610,8 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
           = this->selectedVisuals.begin(); it != this->selectedVisuals.end();)
       {
         (*it)->SetHighlighted(false);
-        std::string name = (*it)->GetName();
+        this->OnDelete((*it)->GetName());
         it = this->selectedVisuals.erase(it);
-        this->OnDelete(name);
       }
     }
   }
