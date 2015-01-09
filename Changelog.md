@@ -169,7 +169,7 @@
         * [Pull request #1336](https://bitbucket.org/osrf/gazebo/pull-request/1336)
 
     1. Pick textures from the palette and assign in 3D view.
-        * [Pull request #1336](https://bitbucket.org/osrf/gazebo/pull-request/1368)
+        * [Pull request #1368](https://bitbucket.org/osrf/gazebo/pull-request/1368)
 
 1. Model editor updates
     1. Fix adding/removing event filters .
