@@ -20,7 +20,8 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/physics/ode/ODESurfaceParams.hh"
+#include "gazebo/physics/ode/ODETypes.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/TireFrictionPluginPrivate.hh"
 #include "plugins/TireFrictionPlugin.hh"
@@ -161,20 +162,12 @@ void TireFrictionPlugin::OnUpdate()
     const std::string collision2(contact->collision2());
     physics::CollisionPtr collPtr1 =
       boost::dynamic_pointer_cast<physics::Collision>(
-      this->world->GetEntity(collision1));
+      this->dataPtr->world->GetEntity(collision1));
     physics::CollisionPtr collPtr2 =
       boost::dynamic_pointer_cast<physics::Collision>(
-      this->world->GetEntity(collision2));
+      this->dataPtr->world->GetEntity(collision2));
     physics::LinkPtr link1 = collPtr1->GetLink();
     physics::LinkPtr link2 = collPtr2->GetLink();
-
-    gzdbg << "contact.time "
-          << common::Time(msgs::Convert(contact->time())).Double()
-          << ", "
-          << collision1
-          << ", "
-          << collision2
-          << std::endl;
 
     // compute velocity at each contact point
     if (contact->position_size() == 0 ||
@@ -213,7 +206,7 @@ void TireFrictionPlugin::OnUpdate()
 
       // Subtract normal velocity component
       math::Vector3 normal = msgs::Convert(contact->normal(j));
-      slipVelocity -= normal * velocity.Dot(normal);
+      slipVelocity -= normal * slipVelocity.Dot(normal);
 
       // Scale slip speed by normal force
       double slipSpeed = slipVelocity.GetLength();
@@ -230,8 +223,10 @@ void TireFrictionPlugin::OnUpdate()
       // max of absolute speed at contact points and at link origin
       double referenceSpeed = 0.0;
       referenceSpeed = std::max(velocity1.GetLength(), velocity2.GetLength());
-      referenceSpeed = std::max(referenceSpeed, link1->GetWorldLinearVel());
-      referenceSpeed = std::max(referenceSpeed, link2->GetWorldLinearVel());
+      referenceSpeed = std::max(referenceSpeed,
+        link1->GetWorldLinearVel().GetLength());
+      referenceSpeed = std::max(referenceSpeed,
+        link2->GetWorldLinearVel().GetLength());
       scaledReferenceSpeed += referenceSpeed * std::abs(normalForce);
     }
 
@@ -242,11 +237,42 @@ void TireFrictionPlugin::OnUpdate()
     // Compute friction as a function of slip and reference speeds.
     double friction = this->ComputeFriction(slipSpeed, referenceSpeed);
     scaledFriction += friction * contactNormalForceSum;
-    contactsNormalForceSum += contactNormalForceSum;
+
+     gzdbg << "contact.time "
+          << common::Time(msgs::Convert(contact->time())).Double()
+          << ", "
+          << collision1
+          << ", "
+          << collision2
+          << ", "
+          << slipSpeed
+          << ", "
+          << referenceSpeed
+          << ", "
+          << contactNormalForceSum
+          << std::endl;
+
+   contactsNormalForceSum += contactNormalForceSum;
   }
   double friction = scaledFriction / contactsNormalForceSum;
 
   // Set friction coefficient.
+  if (this->dataPtr->physics->GetType() == "ode")
+  {
+    physics::ODESurfaceParamsPtr surface =
+      boost::dynamic_pointer_cast<physics::ODESurfaceParams>(
+        this->dataPtr->collision->GetSurface());
+    if (surface)
+    {
+      // ideally we should change fdir1 I think?
+      surface->frictionPyramid.SetMuPrimary(friction);
+      surface->frictionPyramid.SetMuSecondary(friction);
+    }
+  }
+  else
+  {
+    gzerr << "Only ODE is supported right now" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -255,18 +281,19 @@ void TireFrictionPlugin::OnUpdate()
 double TireFrictionPlugin::ComputeFriction(const double _slipSpeed,
                                            const double _referenceSpeed)
 {
-  // Then normalize that tangential speed somehow.
-  // Use speed at origin of link frame.
-  double slip;
-  {
-    double speed = _slipSpeed;
-    const double speedMin = 0.1;
-    if (speed < speedMin)
-    {
-      speed = speedMin;
-    }
-    slip = speedTangential / speed;
-  }
-
-
+//  // Then normalize that tangential speed somehow.
+//  // Use speed at origin of link frame.
+//  double slip;
+//  {
+//    double speed = _slipSpeed;
+//    const double speedMin = 0.1;
+//    if (speed < speedMin)
+//    {
+//      speed = speedMin;
+//    }
+//    slip = speedTangential / speed;
+//  }
+//
+//
+  return 1.0;
 }
