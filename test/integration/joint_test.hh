@@ -145,70 +145,78 @@ class JointTest : public ServerFixture,
   /// \param[in] _opt Options for spawned model and joint.
   public: physics::JointPtr SpawnJoint(const SpawnJointOptions &_opt)
           {
-            msgs::Factory msg;
-            std::ostringstream modelStr;
-            std::string modelName;
-            modelName = this->GetUniqueString("joint_model");
-
-            modelStr
-              << "<sdf version='" << SDF_VERSION << "'>"
-              << "<model name ='" << modelName << "'>"
-              << "  <pose>" << _opt.modelPose << "</pose>";
+            msgs::Model model;
+            std::string modelName = this->GetUniqueString("joint_model");
+            model.set_name(modelName);
+            msgs::Set(model.mutable_pose(), _opt.modelPose);
 
             if (!_opt.worldParent)
             {
-              msgs::Link link;
-              link.set_name("parent");
+              model.add_link();
+              int linkCount = model.link_size();
+              msgs::Link *link = model.mutable_link(linkCount-1);
+
+              link->set_name("parent");
               if (!_opt.noLinkPose)
               {
-                msgs::Set(link.mutable_pose(), _opt.parentLinkPose);
+                msgs::Set(link->mutable_pose(), _opt.parentLinkPose);
               }
-              modelStr << msgs::LinkToSDF(link);
             }
             if (!_opt.worldChild)
             {
-              msgs::Link link;
-              link.set_name("child");
+              model.add_link();
+              int linkCount = model.link_size();
+              msgs::Link *link = model.mutable_link(linkCount-1);
+
+              link->set_name("child");
               if (!_opt.noLinkPose)
               {
-                msgs::Set(link.mutable_pose(), _opt.childLinkPose);
+                msgs::Set(link->mutable_pose(), _opt.childLinkPose);
               }
-              modelStr << msgs::LinkToSDF(link);
             }
-            msgs::Joint jointMsg;
-            jointMsg.set_name("joint");
-            jointMsg.set_type(msgs::ConvertJointType(_opt.type));
-            msgs::Set(jointMsg.mutable_pose(), _opt.jointPose);
+            model.add_joint();
+            msgs::Joint *jointMsg = model.mutable_joint(0);
+            jointMsg->set_name("joint");
+            jointMsg->set_type(msgs::ConvertJointType(_opt.type));
+            msgs::Set(jointMsg->mutable_pose(), _opt.jointPose);
             if (_opt.worldParent)
             {
-              jointMsg.set_parent("world");
+              jointMsg->set_parent("world");
             }
             else
             {
-              jointMsg.set_parent("parent");
+              jointMsg->set_parent("parent");
             }
             if (_opt.worldChild)
             {
-              jointMsg.set_child("world");
+              jointMsg->set_child("world");
             }
             else
             {
-              jointMsg.set_child("child");
+              jointMsg->set_child("child");
             }
-            msgs::Set(jointMsg.mutable_axis1()->mutable_xyz(), _opt.axis);
+
+            {
+              msgs::Axis *axis = jointMsg->mutable_axis1();
+              msgs::Set(axis->mutable_xyz(), _opt.axis);
+              axis->set_use_parent_model_frame(_opt.useParentModelFrame);
+            }
             // Hack: hardcode a second axis for universal joints
             if (_opt.type == "universal")
             {
-              msgs::Set(jointMsg.mutable_axis2()->mutable_xyz(),
-                        math::Vector3(0, 1, 0));
+              msgs::Axis *axis2 = jointMsg->mutable_axis2();
+              msgs::Set(axis2->mutable_xyz(), math::Vector3(0, 1, 0));
+              axis2->set_use_parent_model_frame(_opt.useParentModelFrame);
             }
-            modelStr
-              << msgs::JointToSDF(jointMsg, sdf::ElementPtr(),
-                  _opt.useParentModelFrame, _opt.useParentModelFrame)
-              << "</model>";
 
-            msg.set_sdf(modelStr.str());
-            this->factoryPub->Publish(msg);
+            {
+              msgs::Factory factoryMsg;
+              factoryMsg.set_sdf(
+                "<sdf version='" + std::string(SDF_VERSION) + "'>"
+                + msgs::ModelToSDF(model)->ToString("")
+                + "</sdf>");
+              this->factoryPub->Publish(factoryMsg);
+            }
 
             physics::JointPtr joint;
             if (_opt.wait != common::Time::Zero)

@@ -383,26 +383,17 @@ namespace gazebo
     /// \brief Create an SDF element from msgs::Axis.
     /// \param[in] _msg The msgs::Axis object.
     /// \param[in] _sdf sdf::ElementPtr to fill with data.
-    /// \param[in] _useParentModelFrame Flag to use parent model frame,
-    ///   <0 for not set, 0 for false, >0 for true.
     GAZEBO_VISIBLE
-    void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf,
-        int _useParentModelFrame = -1);
+    void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf);
 
     /// \brief Create an SDF element from msgs::Joint.
     /// \param[in] _msg The msgs::Joint object.
     /// \param[in] _sdf if supplied, performs an update from _sdf intead of
     /// creating a new sdf element.
-    /// \param[in] _useParentModelFrame1 Use parent model frame for axis 1.
-    ///   <0 for not set, 0 for false, >0 for true.
-    /// \param[in] _useParentModelFrame2 Use parent model frame for axis 2.
-    ///   <0 for not set, 0 for false, >0 for true.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
     sdf::ElementPtr JointToSDF(const msgs::Joint &_msg,
-                      sdf::ElementPtr _sdf = sdf::ElementPtr(),
-                      int _useParentModelFrame1 = -1,
-                      int _useParentModelFrame2 = -1);
+                      sdf::ElementPtr _sdf = sdf::ElementPtr());
 
     /// \cond
     GAZEBO_VISIBLE

@@ -1127,7 +1127,8 @@ namespace gazebo
       }
 
       gzwarn << "msgs::LinkToSDF currently does not convert visual,"
-          << " sensor, and projector data";
+             << " sensor, and projector data"
+             << std::endl;
 
       return linkSDF;
     }
@@ -1562,9 +1563,7 @@ namespace gazebo
 
 
     ////////////////////////////////////////////////////////
-    sdf::ElementPtr JointToSDF(const msgs::Joint &_msg, sdf::ElementPtr _sdf,
-                      int _useParentModelFrame1,
-                      int _useParentModelFrame2)
+    sdf::ElementPtr JointToSDF(const msgs::Joint &_msg, sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr jointSDF;
 
@@ -1593,15 +1592,9 @@ namespace gazebo
       if (_msg.has_pose())
         jointSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
       if (_msg.has_axis1())
-      {
-        AxisToSDF(_msg.axis1(), jointSDF->GetElement("axis"),
-          _useParentModelFrame1);
-      }
+        AxisToSDF(_msg.axis1(), jointSDF->GetElement("axis"));
       if (_msg.has_axis2())
-      {
-        AxisToSDF(_msg.axis2(), jointSDF->GetElement("axis2"),
-          _useParentModelFrame2);
-      }
+        AxisToSDF(_msg.axis2(), jointSDF->GetElement("axis2"));
 
       sdf::ElementPtr odePhysicsElem =
         jointSDF->GetElement("physics")->GetElement("ode");
@@ -1636,13 +1629,15 @@ namespace gazebo
     }
 
     ////////////////////////////////////////////////////////
-    void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf,
-        int _useParentModelFrame)
+    void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf)
     {
       if (_msg.has_xyz())
         _sdf->GetElement("xyz")->Set(msgs::Convert(_msg.xyz()));
-      if (_useParentModelFrame >= 0)
-        _sdf->GetElement("use_parent_model_frame")->Set(_useParentModelFrame);
+      if (_msg.has_use_parent_model_frame())
+      {
+        _sdf->GetElement("use_parent_model_frame")->Set(
+          _msg.use_parent_model_frame());
+      }
 
       {
         sdf::ElementPtr dynamicsElem = _sdf->GetElement("dynamics");
