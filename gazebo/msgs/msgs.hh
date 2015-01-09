@@ -399,7 +399,8 @@ namespace gazebo
     ///   <0 for not set, 0 for false, >0 for true.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
-    sdf::ElementPtr JointToSDF(const msgs::Joint &_msg, sdf::ElementPtr _sdf,
+    sdf::ElementPtr JointToSDF(const msgs::Joint &_msg,
+                      sdf::ElementPtr _sdf = sdf::ElementPtr(),
                       int _useParentModelFrame1 = -1,
                       int _useParentModelFrame2 = -1);
 
