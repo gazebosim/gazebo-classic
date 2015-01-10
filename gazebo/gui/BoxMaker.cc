@@ -183,7 +183,7 @@ std::string BoxMaker::GetSDFString()
   model.AddBoxLink(1.0, math::Vector3::One);
   msgs::Link *link = model.mutable_link(0);
   msgs::Visual *visual = link->mutable_visual(0);
-  msgs::Script *script = visual->mutable_material()->mutable_script();
+  msgs::Material::Script *script = visual->mutable_material()->mutable_script();
   script->set_name("Gazebo/Grey");
   script->set_uri("<uri>file://media/materials/scripts/gazebo.material</uri>");
 

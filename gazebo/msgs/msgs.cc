@@ -1704,7 +1704,8 @@ namespace gazebo
         geometry->set_type(Geometry_Type_BOX);
         msgs::Set(geometry->mutable_box()->mutable_size(), _size);
 
-        msgs::Script *script = visual->mutable_material()->mutable_script();
+        msgs::Material::Script *script =
+          visual->mutable_material()->mutable_script();
         script->set_uri("file://media/materials/scripts/gazebo.material");
         script->set_name("Gazebo/Grey");
       }
