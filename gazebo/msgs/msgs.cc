@@ -1697,7 +1697,7 @@ namespace gazebo
 
       {
         link->add_visual();
-        msgs::Collision *visual = link->mutable_visual(0);
+        msgs::Visual *visual = link->mutable_visual(0);
         visual->set_name("visual");
 
         msgs::Geometry *geometry = visual->mutable_geometry();
