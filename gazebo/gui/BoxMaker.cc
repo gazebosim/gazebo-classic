@@ -177,39 +177,20 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 std::string BoxMaker::GetSDFString()
 {
-  std::ostringstream newModelStr;
-  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
-    << "<model name='unit_box_" << counter << "'>"
-    << "<pose>0 0 0.5 0 0 0</pose>"
-    << "<link name ='link'>"
-    <<   "<inertial><mass>1.0</mass></inertial>"
-    <<   "<collision name ='collision'>"
-    <<     "<geometry>"
-    <<       "<box>"
-    <<         "<size>1.0 1.0 1.0</size>"
-    <<       "</box>"
-    <<     "</geometry>"
-    << "</collision>"
-    << "<visual name ='visual'>"
-    <<     "<geometry>"
-    <<       "<box>"
-    <<         "<size>1.0 1.0 1.0</size>"
-    <<       "</box>"
-    <<     "</geometry>"
-    <<     "<material>"
-    <<       "<script>"
-    <<         "<uri>file://media/materials/scripts/gazebo.material</uri>"
-    <<         "<name>Gazebo/Grey</name>"
-    <<       "</script>"
-    <<     "</material>"
-    <<   "</visual>"
-    << "</link>"
-    << "</model>"
-    << "</sdf>";
+  msgs::Model model;
+  model.set_name("unit_box_" + std::string(counter));
+  msgs::Set(model.mutable_pose(), math::Pose(0, 0, 0.5, 0, 0, 0));
+  model.AddBoxLink(1.0, math::Vector3::One);
+  msgs::Link *link = model.mutable_link(0);
+  msgs::Visual *visual = link->mutable_visual(0);
+  msgs::Script *script = visual->mutable_material()->mutable_script();
+  script->set_name("Gazebo/Grey");
+  script->set_uri("<uri>file://media/materials/scripts/gazebo.material</uri>");
 
-  return newModelStr.str();
+  return msgs::ModelToSDF(model)->ToString("");
 }
 
+/////////////////////////////////////////////////
 void BoxMaker::CreateTheEntity()
 {
   msgs::Factory msg;

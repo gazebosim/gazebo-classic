@@ -1685,13 +1685,29 @@ namespace gazebo
         inertial->set_iyz(0.0);
       }
 
-      link->add_collision();
-      msgs::Collision *collision = link->mutable_collision(0);
-      collision->set_name("collision");
+      {
+        link->add_collision();
+        msgs::Collision *collision = link->mutable_collision(0);
+        collision->set_name("collision");
 
-      msgs::Geometry *geometry = collision->mutable_geometry();
-      geometry->set_type(Geometry_Type_BOX);
-      msgs::Set(geometry->mutable_box()->mutable_size(), _size);
+        msgs::Geometry *geometry = collision->mutable_geometry();
+        geometry->set_type(Geometry_Type_BOX);
+        msgs::Set(geometry->mutable_box()->mutable_size(), _size);
+      }
+
+      {
+        link->add_visual();
+        msgs::Collision *visual = link->mutable_visual(0);
+        visual->set_name("visual");
+
+        msgs::Geometry *geometry = visual->mutable_geometry();
+        geometry->set_type(Geometry_Type_BOX);
+        msgs::Set(geometry->mutable_box()->mutable_size(), _size);
+
+        msgs::Script *script = visual->mutable_material()->mutable_script();
+        script->set_uri("file://media/materials/scripts/gazebo.material");
+        script->set_name("Gazebo/Grey");
+      }
     }
 
     ////////////////////////////////////////////////////////
