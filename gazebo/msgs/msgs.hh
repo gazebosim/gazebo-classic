@@ -222,6 +222,7 @@ namespace gazebo
     /// a common::SphericalCoordinates object.
     /// \param[out] _p A msgs::SphericalCoordinates pointer.
     /// \param[in] _v A common::SphericalCoordinates reference
+    GAZEBO_VISIBLE
     void Set(msgs::SphericalCoordinates *_s,
              const common::SphericalCoordinates &_v);
 
@@ -267,6 +268,36 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create an SDF element from a msgs::Visual
+    /// \param[in] _msg Visual messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr VisualToSDF(const msgs::Visual &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Material
+    /// \param[in] _msg Material messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr MaterialToSDF(const msgs::Material &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Convert a string to a msgs::ShaderType enum.
+    /// \param[in] _str Shader type string.
+    /// \return A msgs::ShaderType enum.
+    GAZEBO_VISIBLE
+    msgs::Material::ShaderType ConvertShaderType(const std::string &_str);
+
+    /// \brief Convert a msgs::ShaderType to a string.
+    /// \param[in] _type A msgs::ShaderType enum.
+    /// \return Shader type string.
+    GAZEBO_VISIBLE
+    std::string ConvertShaderType(const msgs::Material::ShaderType _type);
+
     /// \brief Create a msgs::Fog from a fog SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::Fog object
@@ -302,6 +333,7 @@ namespace gazebo
     /// \param[in] _sdf if supplied, performs an update from _msg intead of
     /// creating a new sdf element.
     /// \return The new SDF element.
+    GAZEBO_VISIBLE
     sdf::ElementPtr PluginToSDF(const msgs::Plugin &_plugin,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 

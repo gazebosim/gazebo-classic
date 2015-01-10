@@ -806,6 +806,181 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    sdf::ElementPtr VisualToSDF(const msgs::Visual &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr visualSDF;
+
+      if (_sdf)
+      {
+        visualSDF = _sdf;
+      }
+      else
+      {
+        visualSDF.reset(new sdf::Element);
+        sdf::initFile("visual.sdf", visualSDF);
+      }
+
+      if (_msg.has_name())
+        visualSDF->GetAttribute("name")->Set(_msg.name());
+
+      if (_msg.has_cast_shadows())
+        visualSDF->GetElement("cast_shadows")->Set(_msg.cast_shadows());
+
+      if (_msg.has_transparency())
+        visualSDF->GetElement("transparency")->Set(_msg.transparency());
+
+      if (_msg.has_laser_retro())
+        visualSDF->GetElement("laser_retro")->Set(_msg.laser_retro());
+
+      if (_msg.has_pose())
+        visualSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+
+      // Load the geometry
+      if (_msg.has_geometry())
+      {
+        sdf::ElementPtr geomElem = visualSDF->GetElement("geometry");
+        geomElem = GeometryToSDF(_msg.geometry(), geomElem);
+      }
+
+      /// Load the material
+      if (_msg.has_material())
+      {
+        sdf::ElementPtr materialElem = visualSDF->GetElement("material");
+        materialElem = MaterialToSDF(_msg.material(), materialElem);
+      }
+
+      // Set plugins of the visual
+      if (_msg.has_plugin())
+      {
+        sdf::ElementPtr pluginElem = visualSDF->GetElement("plugin");
+        pluginElem = PluginToSDF(_msg.plugin(), pluginElem);
+      }
+
+      return visualSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr MaterialToSDF(const msgs::Material &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr materialSDF;
+
+      if (_sdf)
+      {
+        materialSDF = _sdf;
+      }
+      else
+      {
+        materialSDF.reset(new sdf::Element);
+        sdf::initFile("material.sdf", materialSDF);
+      }
+
+      if (_msg.has_script())
+      {
+        sdf::ElementPtr scriptElem = materialSDF->GetElement("script");
+        msgs::Material::Script script = _msg.script();
+
+        if (script.has_name())
+          scriptElem->GetElement("name")->Set(script.name());
+
+        while (scriptElem->HasElement("uri"))
+          scriptElem->GetElement("uri")->RemoveFromParent();
+        for (int i = 0; i < script.uri_size(); ++i)
+        {
+          sdf::ElementPtr uriElem = scriptElem->AddElement("uri");
+          uriElem->Set(script.uri(i));
+        }
+      }
+
+      if (_msg.has_shader_type())
+      {
+        sdf::ElementPtr shaderElem = materialSDF->GetElement("shader");
+        shaderElem->GetAttribute("type")->Set(
+          ConvertShaderType(_msg.shader_type()));
+        
+        if (_msg.has_normal_map())
+          shaderElem->GetElement("normal_map")->Set(_msg.normal_map());
+      }
+
+      if (_msg.has_lighting())
+        materialSDF->GetElement("lighting")->Set(_msg.lighting());
+
+      if (_msg.has_ambient())
+        materialSDF->GetElement("ambient")->Set(Convert(_msg.ambient()));
+      if (_msg.has_diffuse())
+        materialSDF->GetElement("diffuse")->Set(Convert(_msg.diffuse()));
+      if (_msg.has_emissive())
+        materialSDF->GetElement("emissive")->Set(Convert(_msg.emissive()));
+      if (_msg.has_specular())
+        materialSDF->GetElement("specular")->Set(Convert(_msg.specular()));
+
+      return materialSDF;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Material::ShaderType ConvertShaderType(const std::string &_str)
+    {
+      msgs::Material::ShaderType result = msgs::Material::VERTEX;
+      if (_str == "vertex")
+      {
+        result = msgs::Material::VERTEX;
+      }
+      else if (_str == "pixel")
+      {
+        result = msgs::Material::PIXEL;
+      }
+      else if (_str == "normal_map_object_space")
+      {
+        result = msgs::Material::NORMAL_MAP_OBJECT_SPACE;
+      }
+      else if (_str == "normal_map_tangent_space")
+      {
+        result = msgs::Material::NORMAL_MAP_TANGENT_SPACE;
+      }
+      else
+      {
+        gzthrow(std::string("Unknown shader type[") + _str + "]");
+      }
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    std::string ConvertShaderType(const msgs::Material::ShaderType _type)
+    {
+      std::string result;
+      switch (_type)
+      {
+        case msgs::Material::VERTEX:
+        {
+          result = "vertex";
+          break;
+        }
+        case msgs::Material::PIXEL:
+        {
+          result = "pixel";
+          break;
+        }
+        case msgs::Material::NORMAL_MAP_OBJECT_SPACE:
+        {
+          result = "normal_map_object_space";
+          break;
+        }
+        case msgs::Material::NORMAL_MAP_TANGENT_SPACE:
+        {
+          result = "normal_map_tangent_space";
+          break;
+        }
+        default:
+        {
+          result = "unknown";
+          break;
+        }
+      }
+      return result;
+    }
+
+    /////////////////////////////////////////////////
     msgs::Fog FogFromSDF(sdf::ElementPtr _sdf)
     {
       msgs::Fog result;
@@ -1125,9 +1300,16 @@ namespace gazebo
         sdf::ElementPtr collisionElem = linkSDF->AddElement("collision");
         collisionElem = CollisionToSDF(_msg.collision(i), collisionElem);
       }
+      while (linkSDF->HasElement("visual"))
+        linkSDF->GetElement("visual")->RemoveFromParent();
+      for (int i = 0; i < _msg.visual_size(); ++i)
+      {
+        sdf::ElementPtr visualElem = linkSDF->AddElement("visual");
+        visualElem = VisualToSDF(_msg.visual(i), visualElem);
+      }
 
-      gzwarn << "msgs::LinkToSDF currently does not convert visual,"
-             << " sensor, and projector data"
+      gzwarn << "msgs::LinkToSDF currently does not convert"
+             << " sensor and projector data"
              << std::endl;
 
       return linkSDF;
