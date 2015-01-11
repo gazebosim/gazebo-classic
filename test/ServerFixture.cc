@@ -458,7 +458,10 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
 physics::ModelPtr ServerFixture::SpawnModel(const msgs::Model &_msg)
 {
   physics::WorldPtr world = physics::get_world();
-  world->InsertModelString(msgs::ModelToSDF(_msg)->ToString(""));
+  world->InsertModelString(
+    "<sdf version='" + std::string(SDF_VERSION) + "'>"
+    + msgs::ModelToSDF(_msg)->ToString("")
+    + "</sdf>");
 
   common::Time wait(10, 0);
   common::Time wallStart = common::Time::GetWallTime();
