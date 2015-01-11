@@ -1706,7 +1706,8 @@ namespace gazebo
 
         msgs::Material::Script *script =
           visual->mutable_material()->mutable_script();
-        script->set_uri("file://media/materials/scripts/gazebo.material");
+        script->add_uri();
+        script->set_uri(0, "file://media/materials/scripts/gazebo.material");
         script->set_name("Gazebo/Grey");
       }
     }

@@ -178,14 +178,19 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
 std::string BoxMaker::GetSDFString()
 {
   msgs::Model model;
-  model.set_name("unit_box_" + std::string(counter));
+  {
+    std::ostringstream modelName;
+    modelName << "unit_box_" << counter;
+    model.set_name(modelName.str());
+  }
   msgs::Set(model.mutable_pose(), math::Pose(0, 0, 0.5, 0, 0, 0));
-  model.AddBoxLink(1.0, math::Vector3::One);
+  msgs::AddBoxLink(model, 1.0, math::Vector3::One);
   msgs::Link *link = model.mutable_link(0);
   msgs::Visual *visual = link->mutable_visual(0);
   msgs::Material::Script *script = visual->mutable_material()->mutable_script();
   script->set_name("Gazebo/Grey");
-  script->set_uri("<uri>file://media/materials/scripts/gazebo.material</uri>");
+  script->add_uri();
+  script->set_uri(0, "file://media/materials/scripts/gazebo.material");
 
   return msgs::ModelToSDF(model)->ToString("");
 }
