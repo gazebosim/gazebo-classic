@@ -138,19 +138,20 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
     scene->RemoveVisual(joint->hotspot);
     scene->RemoveVisual(joint->visual);
     joint->visual->Fini();
-
-    rendering::JointVisualPtr parentAxisVis = joint->jointVisual
-        ->GetParentAxisVisual();
-    if (parentAxisVis)
+    if (joint->jointVisual)
     {
-      parentAxisVis->GetParent()->DetachVisual(
-          parentAxisVis->GetName());
-      scene->RemoveVisual(parentAxisVis);
+      rendering::JointVisualPtr parentAxisVis = joint->jointVisual
+          ->GetParentAxisVisual();
+      if (parentAxisVis)
+      {
+        parentAxisVis->GetParent()->DetachVisual(
+            parentAxisVis->GetName());
+        scene->RemoveVisual(parentAxisVis);
+      }
+      joint->jointVisual->GetParent()->DetachVisual(
+          joint->jointVisual->GetName());
+      scene->RemoveVisual(joint->jointVisual);
     }
-    joint->jointVisual->GetParent()->DetachVisual(
-        joint->jointVisual->GetName());
-    scene->RemoveVisual(joint->jointVisual);
-
     joint->hotspot.reset();
     joint->visual.reset();
     joint->jointVisual.reset();

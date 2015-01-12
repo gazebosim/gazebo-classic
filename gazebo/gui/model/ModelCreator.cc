@@ -649,16 +649,14 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
   {
     if (!vis->IsPlane() && gui::get_entity_id(vis->GetRootVisual()->GetName()))
     {
+      // Handle snap from GLWidget
+      if (g_snapAct->isChecked())
+        return false;
+
       // Prevent interaction with other models, send event only to
       // user camera
       userCamera->HandleMouseEvent(_event);
       return true;
-    }
-    else
-    {
-      // Handle snap from GLWidget
-      if (g_snapAct->isChecked())
-        return false;
     }
   }
   return false;
@@ -730,6 +728,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       }
       g_copyAct->setEnabled(!this->selectedVisuals.empty());
       g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
+
       return true;
     }
     // Not part

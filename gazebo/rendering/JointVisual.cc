@@ -131,6 +131,83 @@ ArrowVisualPtr JointVisual::CreateAxis(const math::Vector3 &_axis,
 }
 
 /////////////////////////////////////////////////
+void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
+    const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
+{
+  JointVisualPrivate *dPtr =
+      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
+
+  // Get rotation to axis vector
+  math::Vector3 axisDir = _axis;
+  math::Vector3 u = axisDir.Normalize();
+  math::Vector3 v = math::Vector3::UnitZ;
+  double cosTheta = v.Dot(u);
+  double angle = acos(cosTheta);
+  math::Quaternion quat;
+  // check the parallel case
+  if (math::equal(angle, M_PI))
+    quat.SetFromAxis(u.GetPerpendicular(), angle);
+  else
+    quat.SetFromAxis((v.Cross(u)).Normalize(), angle);
+  _arrowVisual->SetRotation(quat);
+
+  if (_useParentFrame)
+  {
+    // if set to use parent model frame
+    // rotate the arrow visual relative to the model
+    VisualPtr model = this->GetRootVisual();
+    math::Quaternion quatFromModel =
+        model->GetWorldPose().rot.GetInverse()*this->GetWorldPose().rot;
+    _arrowVisual->SetRotation(quatFromModel.GetInverse() *
+        _arrowVisual->GetRotation());
+  }
+  if (_type == msgs::Joint::REVOLUTE || _type == msgs::Joint::REVOLUTE2
+      || _type == msgs::Joint::UNIVERSAL || _type == msgs::Joint::GEARBOX)
+  {
+    _arrowVisual->ShowRotation(true);
+  }
+  else
+  {
+    _arrowVisual->ShowRotation(false);
+  }
+
+  if (dPtr->axisVisual)
+  {
+    _arrowVisual->SetVisible(true);
+  }
+  else
+  {
+    return;
+  }
+
+  // Hide existing arrow head if it overlaps with the axis
+  math::Quaternion axisWorldRotation = _arrowVisual->GetWorldPose().rot;
+  math::Quaternion jointWorldRotation = this->GetWorldPose().rot;
+
+  dPtr->axisVisual->ShowAxisHead(0, true);
+  dPtr->axisVisual->ShowAxisHead(1, true);
+  dPtr->axisVisual->ShowAxisHead(2, true);
+  _arrowVisual->ShowShaft(true);
+
+  math::Vector3 axisWorld = axisWorldRotation*math::Vector3::UnitZ;
+  if (axisWorld == jointWorldRotation*math::Vector3::UnitX)
+  {
+    dPtr->axisVisual->ShowAxisHead(0, false);
+    _arrowVisual->ShowShaft(false);
+  }
+  else if (axisWorld == jointWorldRotation*math::Vector3::UnitY)
+  {
+    dPtr->axisVisual->ShowAxisHead(1, false);
+    _arrowVisual->ShowShaft(false);
+  }
+  else if (axisWorld == jointWorldRotation*math::Vector3::UnitZ)
+  {
+    dPtr->axisVisual->ShowAxisHead(2, false);
+    _arrowVisual->ShowShaft(false);
+  }
+}
+
+/////////////////////////////////////////////////
 void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
 {
   JointVisualPrivate *dPtr =
@@ -234,83 +311,6 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
       dPtr->arrowVisual->SetVisible(false);
     if (axis2Visual)
       axis2Visual->SetVisible(false);
-  }
-}
-
-/////////////////////////////////////////////////
-void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
-    const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
-{
-  JointVisualPrivate *dPtr =
-      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
-
-  // Get rotation to axis vector
-  math::Vector3 axisDir = _axis;
-  math::Vector3 u = axisDir.Normalize();
-  math::Vector3 v = math::Vector3::UnitZ;
-  double cosTheta = v.Dot(u);
-  double angle = acos(cosTheta);
-  math::Quaternion quat;
-  // check the parallel case
-  if (math::equal(angle, M_PI))
-    quat.SetFromAxis(u.GetPerpendicular(), angle);
-  else
-    quat.SetFromAxis((v.Cross(u)).Normalize(), angle);
-  _arrowVisual->SetRotation(quat);
-
-  if (_useParentFrame)
-  {
-    // if set to use parent model frame
-    // rotate the arrow visual relative to the model
-    VisualPtr model = this->GetRootVisual();
-    math::Quaternion quatFromModel =
-        model->GetWorldPose().rot.GetInverse()*this->GetWorldPose().rot;
-    _arrowVisual->SetRotation(quatFromModel.GetInverse() *
-        _arrowVisual->GetRotation());
-  }
-  if (_type == msgs::Joint::REVOLUTE || _type == msgs::Joint::REVOLUTE2
-      || _type == msgs::Joint::UNIVERSAL || _type == msgs::Joint::GEARBOX)
-  {
-    _arrowVisual->ShowRotation(true);
-  }
-  else
-  {
-    _arrowVisual->ShowRotation(false);
-  }
-
-  if (dPtr->axisVisual)
-  {
-    _arrowVisual->SetVisible(true);
-  }
-  else
-  {
-    return;
-  }
-
-  // Hide existing arrow head if it overlaps with the axis
-  math::Quaternion axisWorldRotation = _arrowVisual->GetWorldPose().rot;
-  math::Quaternion jointWorldRotation = this->GetWorldPose().rot;
-
-  dPtr->axisVisual->ShowAxisHead(0, true);
-  dPtr->axisVisual->ShowAxisHead(1, true);
-  dPtr->axisVisual->ShowAxisHead(2, true);
-  _arrowVisual->ShowShaft(true);
-
-  math::Vector3 axisWorld = axisWorldRotation*math::Vector3::UnitZ;
-  if (axisWorld == jointWorldRotation*math::Vector3::UnitX)
-  {
-    dPtr->axisVisual->ShowAxisHead(0, false);
-    _arrowVisual->ShowShaft(false);
-  }
-  else if (axisWorld == jointWorldRotation*math::Vector3::UnitY)
-  {
-    dPtr->axisVisual->ShowAxisHead(1, false);
-    _arrowVisual->ShowShaft(false);
-  }
-  else if (axisWorld == jointWorldRotation*math::Vector3::UnitZ)
-  {
-    dPtr->axisVisual->ShowAxisHead(2, false);
-    _arrowVisual->ShowShaft(false);
   }
 }
 
