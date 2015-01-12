@@ -145,16 +145,16 @@ class JointTest : public ServerFixture,
   /// \param[in] _opt Options for spawned model and joint.
   public: physics::JointPtr SpawnJoint(const SpawnJointOptions &_opt)
           {
-            msgs::Model model;
+            msgs::Model msg;
             std::string modelName = this->GetUniqueString("joint_model");
-            model.set_name(modelName);
-            msgs::Set(model.mutable_pose(), _opt.modelPose);
+            msg.set_name(modelName);
+            msgs::Set(msg.mutable_pose(), _opt.modelPose);
 
             if (!_opt.worldParent)
             {
-              model.add_link();
-              int linkCount = model.link_size();
-              msgs::Link *link = model.mutable_link(linkCount-1);
+              msg.add_link();
+              int linkCount = msg.link_size();
+              msgs::Link *link = msg.mutable_link(linkCount-1);
 
               link->set_name("parent");
               if (!_opt.noLinkPose)
@@ -164,9 +164,9 @@ class JointTest : public ServerFixture,
             }
             if (!_opt.worldChild)
             {
-              model.add_link();
-              int linkCount = model.link_size();
-              msgs::Link *link = model.mutable_link(linkCount-1);
+              msg.add_link();
+              int linkCount = msg.link_size();
+              msgs::Link *link = msg.mutable_link(linkCount-1);
 
               link->set_name("child");
               if (!_opt.noLinkPose)
@@ -174,8 +174,8 @@ class JointTest : public ServerFixture,
                 msgs::Set(link->mutable_pose(), _opt.childLinkPose);
               }
             }
-            model.add_joint();
-            msgs::Joint *jointMsg = model.mutable_joint(0);
+            msg.add_joint();
+            msgs::Joint *jointMsg = msg.mutable_joint(0);
             jointMsg->set_name("joint");
             jointMsg->set_type(msgs::ConvertJointType(_opt.type));
             msgs::Set(jointMsg->mutable_pose(), _opt.jointPose);
@@ -209,41 +209,11 @@ class JointTest : public ServerFixture,
               axis2->set_use_parent_model_frame(_opt.useParentModelFrame);
             }
 
-            {
-              msgs::Factory factoryMsg;
-              factoryMsg.set_sdf(
-                "<sdf version='" + std::string(SDF_VERSION) + "'>"
-                + msgs::ModelToSDF(model)->ToString("")
-                + "</sdf>");
-              this->factoryPub->Publish(factoryMsg);
-            }
-
+            physics::ModelPtr model = this->SpawnModel(msg);
             physics::JointPtr joint;
-            if (_opt.wait != common::Time::Zero)
-            {
-              common::Time wallStart = common::Time::GetWallTime();
-              unsigned int waitCount = 0;
-              while (_opt.wait > (common::Time::GetWallTime() - wallStart) &&
-                     !this->HasEntity(modelName))
-              {
-                common::Time::MSleep(100);
-                if (++waitCount % 10 == 0)
-                {
-                  gzwarn << "Waiting " << waitCount / 10 << " seconds for "
-                         << _opt.type << " joint to spawn." << std::endl;
-                }
-              }
-              if (this->HasEntity(modelName) && waitCount >= 10)
-                gzwarn << _opt.type << " joint has spawned." << std::endl;
+            if (model != NULL)
+              joint = model->GetJoint("joint");
 
-              physics::WorldPtr world = physics::get_world("default");
-              if (world != NULL)
-              {
-                physics::ModelPtr model = world->GetModel(modelName);
-                if (model != NULL)
-                  joint = model->GetJoint("joint");
-              }
-            }
             return joint;
           }
 

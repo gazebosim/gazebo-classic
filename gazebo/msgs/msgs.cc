@@ -1308,9 +1308,7 @@ namespace gazebo
         visualElem = VisualToSDF(_msg.visual(i), visualElem);
       }
 
-      gzwarn << "msgs::LinkToSDF currently does not convert"
-             << " sensor and projector data"
-             << std::endl;
+      // msgs::LinkToSDF currently does not convert sensor and projector data
 
       return linkSDF;
     }

@@ -192,7 +192,9 @@ std::string BoxMaker::GetSDFString()
   script->add_uri();
   script->set_uri(0, "file://media/materials/scripts/gazebo.material");
 
-  return msgs::ModelToSDF(model)->ToString("");
+  return "<sdf version='" + std::string(SDF_VERSION) + "'>"
+         + msgs::ModelToSDF(model)->ToString("")
+         + "</sdf>";
 }
 
 /////////////////////////////////////////////////
