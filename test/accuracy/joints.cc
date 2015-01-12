@@ -386,7 +386,7 @@ TEST_P(JointsTest, OneDof)
 // #define DT_MAX 1.01e-3
 // #define DT_STEP 2.0e-4
 // #define DT_VALUES ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
-//#define DT_VALUES ::testing::Values(1e-4, 4e-4, 8e-4, 1.6e-3, 3.2e-3, 6.4e-3)
+// #define DT_VALUES ::testing::Values(1e-4, 4e-4, 8e-4, 1.6e-3, 3.2e-3, 6.4e-3)
 #define DT_VALUES ::testing::Values(4e-4, 8e-4, 1.6e-3, 3.2e-3, 6.4e-3, 1.28e-2)
 // #define ITERS_MIN 5
 // #define ITERS_MAX 51
@@ -459,7 +459,7 @@ INSTANTIATE_TEST_CASE_P(NonlinearDt, JointsTest,
 //   , ::testing::Values(false)
 //   , ::testing::Values(true)
 //   ));
-// 
+//
 // INSTANTIATE_TEST_CASE_P(OneDofsTorque, JointsTest,
 //     ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
 //   , ::testing::Values("prismatic")
