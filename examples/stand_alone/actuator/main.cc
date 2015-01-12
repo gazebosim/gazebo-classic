@@ -36,7 +36,7 @@ int main(int _argc, char **_argv)
                     ("sample_ts,s", boost::program_options::value<int>(),
                       "number of timesteps between samples")
                     ("torque_scale,t", boost::program_options::value<float>(),
-                      "scale factor for applied torque"); 
+                      "scale factor for applied torque");
 
   boost::program_options::variables_map vm;
   boost::program_options::store(boost::program_options::parse_command_line(
