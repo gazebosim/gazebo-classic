@@ -27,6 +27,7 @@
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/gui/qt.h"
@@ -269,6 +270,14 @@ namespace gazebo
       /// \brief Child visual the joint is connected to.
       public: rendering::VisualPtr child;
 
+      /// \internal
+      /// \brief Parent visual pose used to determine if updates are needed.
+      public: math::Pose parentPose;
+
+      /// \internal
+      /// \brief Child visual pose used to determine if updates are needed.
+      public: math::Pose childPose;
+
       /// \brief Visual line used to represent joint connecting parent and child
       public: rendering::DynamicLines *line;
 
@@ -292,6 +301,9 @@ namespace gazebo
 
       /// \brief True if the joint visual needs update.
       public: bool dirty;
+
+      /// \brief Msg containing joint data.
+      public: msgs::JointPtr jointMsg;
 
       /// \brief Inspector for configuring joint properties.
       public: JointInspector *inspector;

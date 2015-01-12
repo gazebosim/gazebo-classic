@@ -570,8 +570,6 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   rendering::VisualPtr hotspotVisual(
       new rendering::Visual(hotSpotName, _joint->visual, false));
 
-  _joint->hotspot = hotspotVisual;
-
   // create a cylinder to represent the joint
   hotspotVisual->InsertMesh("unit_cylinder");
   Ogre::MovableObject *hotspotObj =
@@ -610,7 +608,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   this->joints[hotSpotName] = _joint;
   camera->GetScene()->AddVisual(hotspotVisual);
 
-  _joint->dirty = true;
+  _joint->hotspot = hotspotVisual;
 }
 
 /////////////////////////////////////////////////
@@ -629,121 +627,142 @@ void JointMaker::Update()
   for (it = this->joints.begin(); it != this->joints.end(); ++it)
   {
     JointData *joint = it->second;
-    if (joint->dirty)
+    if (joint->hotspot)
     {
       if (joint->child && joint->parent)
       {
-        // get centroid of parent part visuals
-        math::Vector3 parentCentroid =
-            this->GetPartWorldCentroid(joint->parent);
+        bool poseUpdate = false;
+        if (joint->parentPose != joint->parent->GetWorldPose() ||
+            joint->childPose != joint->child->GetWorldPose())
+         {
+           joint->parentPose = joint->parent->GetWorldPose();
+           joint->childPose = joint->child->GetWorldPose();
+           poseUpdate = true;
+         }
 
-        // get centroid of child part visuals
-        math::Vector3 childCentroid =
-            this->GetPartWorldCentroid(joint->child);
-
-        // set orientation of joint hotspot
-        math::Vector3 dPos = (childCentroid - parentCentroid);
-        math::Vector3 center = dPos/2.0;
-        joint->hotspot->SetScale(math::Vector3(0.02, 0.02, dPos.GetLength()));
-        joint->hotspot->SetWorldPosition(parentCentroid + center);
-        math::Vector3 u = dPos.Normalize();
-        math::Vector3 v = math::Vector3::UnitZ;
-        double cosTheta = v.Dot(u);
-        double angle = acos(cosTheta);
-        math::Vector3 w = (v.Cross(u)).Normalize();
-        math::Quaternion q;
-        q.SetFromAxis(w, angle);
-        joint->hotspot->SetWorldRotation(q);
-
-        // set new material if joint type has changed
-        std::string material = this->jointMaterials[joint->type];
-        if (joint->hotspot->GetMaterialName() != material)
+        if (joint->dirty || poseUpdate)
         {
-          // Note: issue setting material when there is a billboard child,
-          // seems to hang so detach before setting and re-attach later.
-          Ogre::SceneNode *handleNode = joint->handles->getParentSceneNode();
-          joint->handles->detachFromParent();
-          joint->hotspot->SetMaterial(material);
-          handleNode->attachObject(joint->handles);
-          Ogre::MaterialPtr mat =
-              Ogre::MaterialManager::getSingleton().getByName(material);
-          Ogre::ColourValue color =
-              mat->getTechnique(0)->getPass(0)->getDiffuse();
-          color.a = 0.5;
-          joint->handles->getBillboard(0)->setColour(color);
-        }
+          // get centroid of parent part visuals
+          math::Vector3 parentCentroid =
+              this->GetPartWorldCentroid(joint->parent);
 
-        // set pos of joint handle
-        joint->handles->getBillboard(0)->setPosition(
-            rendering::Conversions::Convert(parentCentroid -
-            joint->hotspot->GetWorldPose().pos));
-        joint->handles->_updateBounds();
+          // get centroid of child part visuals
+          math::Vector3 childCentroid =
+              this->GetPartWorldCentroid(joint->child);
+
+          // set orientation of joint hotspot
+          math::Vector3 dPos = (childCentroid - parentCentroid);
+          math::Vector3 center = dPos/2.0;
+          joint->hotspot->SetScale(math::Vector3(0.02, 0.02, dPos.GetLength()));
+          joint->hotspot->SetWorldPosition(parentCentroid + center);
+          math::Vector3 u = dPos.Normalize();
+          math::Vector3 v = math::Vector3::UnitZ;
+          double cosTheta = v.Dot(u);
+          double angle = acos(cosTheta);
+          math::Vector3 w = (v.Cross(u)).Normalize();
+          math::Quaternion q;
+          q.SetFromAxis(w, angle);
+          joint->hotspot->SetWorldRotation(q);
+
+          // set new material if joint type has changed
+          std::string material = this->jointMaterials[joint->type];
+          if (joint->hotspot->GetMaterialName() != material)
+          {
+            // Note: issue setting material when there is a billboard child,
+            // seems to hang so detach before setting and re-attach later.
+            Ogre::SceneNode *handleNode = joint->handles->getParentSceneNode();
+            joint->handles->detachFromParent();
+            joint->hotspot->SetMaterial(material);
+            handleNode->attachObject(joint->handles);
+            Ogre::MaterialPtr mat =
+                Ogre::MaterialManager::getSingleton().getByName(material);
+            Ogre::ColourValue color =
+                mat->getTechnique(0)->getPass(0)->getDiffuse();
+            color.a = 0.5;
+            joint->handles->getBillboard(0)->setColour(color);
+          }
+
+          // set pos of joint handle
+          joint->handles->getBillboard(0)->setPosition(
+              rendering::Conversions::Convert(parentCentroid -
+              joint->hotspot->GetWorldPose().pos));
+          joint->handles->_updateBounds();
+        }
 
         // Create / update joint visual
-        gazebo::msgs::JointPtr jointMsg;
-        jointMsg.reset(new gazebo::msgs::Joint);
-        jointMsg->set_parent(joint->parent->GetName());
-        jointMsg->set_parent_id(joint->parent->GetId());
-        jointMsg->set_child(joint->child->GetName());
-        jointMsg->set_child_id(joint->child->GetId());
-        jointMsg->set_name(joint->name);
-        msgs::Set(jointMsg->mutable_pose(), joint->pose);
-        if (joint->type == JointMaker::JOINT_SLIDER)
+        if (!joint->jointMsg)
         {
-          jointMsg->set_type(msgs::Joint::PRISMATIC);
-        }
-        else if (joint->type == JointMaker::JOINT_HINGE)
-        {
-          jointMsg->set_type(msgs::Joint::REVOLUTE);
-        }
-        else if (joint->type == JointMaker::JOINT_HINGE2)
-        {
-          jointMsg->set_type(msgs::Joint::REVOLUTE2);
-        }
-        else if (joint->type == JointMaker::JOINT_SCREW)
-        {
-          jointMsg->set_type(msgs::Joint::SCREW);
-        }
-        else if (joint->type == JointMaker::JOINT_UNIVERSAL)
-        {
-          jointMsg->set_type(msgs::Joint::UNIVERSAL);
-        }
-        else if (joint->type == JointMaker::JOINT_BALL)
-        {
-          jointMsg->set_type(msgs::Joint::BALL);
+          joint->jointMsg.reset(new gazebo::msgs::Joint);
+          joint->jointMsg->set_parent(joint->parent->GetName());
+          joint->jointMsg->set_parent_id(joint->parent->GetId());
+          joint->jointMsg->set_child(joint->child->GetName());
+          joint->jointMsg->set_child_id(joint->child->GetId());
+          joint->dirty = true;
         }
 
-        int axisCount = JointMaker::GetJointAxisCount(joint->type);
-        for (int i = 0; i < axisCount; ++i)
+        if (joint->dirty || poseUpdate)
         {
-          jointMsg->add_angle(0);
-          msgs::Axis *axisMsg;
-          if (i == 0)
-            axisMsg = jointMsg->mutable_axis1();
-          else if (i == 1)
-            axisMsg = jointMsg->mutable_axis2();
+          joint->jointMsg->set_name(joint->name);
 
-          msgs::Set(axisMsg->mutable_xyz(), joint->axis[i]);
+          msgs::Set(joint->jointMsg->mutable_pose(), joint->pose);
+          if (joint->type == JointMaker::JOINT_SLIDER)
+          {
+            joint->jointMsg->set_type(msgs::Joint::PRISMATIC);
+          }
+          else if (joint->type == JointMaker::JOINT_HINGE)
+          {
+            joint->jointMsg->set_type(msgs::Joint::REVOLUTE);
+          }
+          else if (joint->type == JointMaker::JOINT_HINGE2)
+          {
+            joint->jointMsg->set_type(msgs::Joint::REVOLUTE2);
+          }
+          else if (joint->type == JointMaker::JOINT_SCREW)
+          {
+            joint->jointMsg->set_type(msgs::Joint::SCREW);
+          }
+          else if (joint->type == JointMaker::JOINT_UNIVERSAL)
+          {
+            joint->jointMsg->set_type(msgs::Joint::UNIVERSAL);
+          }
+          else if (joint->type == JointMaker::JOINT_BALL)
+          {
+            joint->jointMsg->set_type(msgs::Joint::BALL);
+          }
+
+          int axisCount = JointMaker::GetJointAxisCount(joint->type);
+          for (int i = 0; i < axisCount; ++i)
+          {
+            joint->jointMsg->add_angle(0);
+            msgs::Axis *axisMsg;
+            if (i == 0)
+              axisMsg = joint->jointMsg->mutable_axis1();
+            else if (i == 1)
+              axisMsg = joint->jointMsg->mutable_axis2();
+
+            msgs::Set(axisMsg->mutable_xyz(), joint->axis[i]);
+          }
+
+          if (joint->jointVisual)
+          {
+            joint->jointVisual->UpdateFromMsg(joint->jointMsg);
+          }
+          else
+          {
+            gazebo::rendering::JointVisualPtr jointVis(
+                new gazebo::rendering::JointVisual(
+                joint->name + "__JOINT_VISUAL__", joint->child));
+
+            jointVis->Load(joint->jointMsg);
+            joint->jointVisual = jointVis;
+          }
+
+          // Line now connects the child link to the joint frame
+          joint->line->SetPoint(0, this->GetPartWorldCentroid(joint->child));
+          joint->line->SetPoint(1, joint->jointVisual->GetWorldPose().pos);
+          joint->line->setMaterial(this->jointMaterials[joint->type]);
+          joint->dirty = false;
         }
-
-        if (joint->jointVisual)
-        {
-          joint->jointVisual->UpdateFromMsg(jointMsg);
-        }
-        else
-        {
-          gazebo::rendering::JointVisualPtr jointVis(
-              new gazebo::rendering::JointVisual(
-              joint->name + "__JOINT_VISUAL__", joint->child));
-
-          jointVis->Load(jointMsg);
-          joint->jointVisual = jointVis;
-        }
-
-        // Line now connects the child link to the joint frame
-        joint->line->SetPoint(0, childCentroid);
-        joint->line->SetPoint(1, joint->jointVisual->GetWorldPose().pos);
-        joint->line->setMaterial(this->jointMaterials[joint->type]);
       }
     }
   }
@@ -916,4 +935,5 @@ void JointData::OnApply()
     this->lowerLimit[i] = this->inspector->GetLowerLimit(i);
     this->upperLimit[i] = this->inspector->GetUpperLimit(i);
   }
+  this->dirty = true;
 }
