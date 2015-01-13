@@ -74,8 +74,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   /// \TODO: simbody not complete for this test
   if (_physicsEngine == "simbody" && (
       _jointType == "gearbox" ||
-      _jointType == "revolute2" ||
-      _jointType == "screw"))
+      _jointType == "revolute2"))
   {
     gzerr << "Aborting test for Simbody, see issues #859, #861.\n";
     return;
@@ -147,10 +146,18 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     gzerr << "Skip tests for child world link cases "
           << "since DART does not allow joint with world as child. "
           << "Please see issue #914. "
-          << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
-    return;
+          << "(https://bitbucket.org/osrf/gazebo/issue/914)"
+          << std::endl;
   }
-
+  else if (_physicsEngine == "simbody" && _jointType == "screw")
+  {
+    // SimbodyScrewJoint doesn't support joints with world child.
+    gzerr << "Skip SimbodyScrewJoint tests for child world link cases."
+          << "Please see issue #857. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/857)"
+          << std::endl;
+  }
+  else
   {
     gzdbg << "SpawnJoint " << _jointType << " world parent" << std::endl;
     physics::JointPtr joint = SpawnJoint(_jointType, true, false);
