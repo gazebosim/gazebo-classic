@@ -310,6 +310,9 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     return;
   }
 
+  // Reset world prior to testing SetVelocity
+  // This is needed for SimbodyUniversalJoint
+  world->Reset();
   double velocityMagnitude = 1.0;
   std::vector<double> velocities;
   velocities.push_back(velocityMagnitude);
