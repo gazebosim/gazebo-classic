@@ -633,10 +633,12 @@ void JointMaker::Update()
       {
         bool poseUpdate = false;
         if (joint->parentPose != joint->parent->GetWorldPose() ||
-            joint->childPose != joint->child->GetWorldPose())
+            joint->childPose != joint->child->GetWorldPose() ||
+            joint->childScale != joint->child->GetScale())
          {
            joint->parentPose = joint->parent->GetWorldPose();
            joint->childPose = joint->child->GetWorldPose();
+           joint->childScale = joint->child->GetScale();
            poseUpdate = true;
          }
 
@@ -690,18 +692,13 @@ void JointMaker::Update()
         }
 
         // Create / update joint visual
-        if (!joint->jointMsg)
+        if (!joint->jointMsg || joint->dirty || poseUpdate)
         {
           joint->jointMsg.reset(new gazebo::msgs::Joint);
           joint->jointMsg->set_parent(joint->parent->GetName());
           joint->jointMsg->set_parent_id(joint->parent->GetId());
           joint->jointMsg->set_child(joint->child->GetName());
           joint->jointMsg->set_child_id(joint->child->GetId());
-          joint->dirty = true;
-        }
-
-        if (joint->dirty || poseUpdate)
-        {
           joint->jointMsg->set_name(joint->name);
 
           msgs::Set(joint->jointMsg->mutable_pose(), joint->pose);

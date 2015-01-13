@@ -278,6 +278,10 @@ namespace gazebo
       /// \brief Child visual pose used to determine if updates are needed.
       public: math::Pose childPose;
 
+      /// \internal
+      /// \brief Child visual scale used to determine if updates are needed.
+      public: math::Vector3 childScale;
+
       /// \brief Visual line used to represent joint connecting parent and child
       public: rendering::DynamicLines *line;
 
