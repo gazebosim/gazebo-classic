@@ -41,6 +41,7 @@ namespace gazebo
   namespace gui
   {
     class PartData;
+    class SaveDialog;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -80,6 +81,25 @@ namespace gazebo
       /// \brief Get the name of the model.
       /// \return Name of model.
       public: std::string GetModelName() const;
+
+      /// \brief Callback for newing the model.
+      private: void OnNew();
+
+      /// \brief Helper function to manage writing files to disk.
+      private: void SaveModelFiles();
+
+      /// \brief Callback for saving the model.
+      /// \param[in] _saveName Name to save the model.
+      /// \return True if the user chose to save, false if the user cancelled.
+      private: bool OnSave(const std::string &_saveName = "");
+
+      /// \brief Callback for selecting a folder and saving the model.
+      /// \param[in] _saveName Name to save the model.
+      /// \return True if the user chose to save, false if the user cancelled.
+      private: bool OnSaveAs(const std::string &_saveName);
+
+      /// \brief Callback received when exiting the editor mode.
+      private: void OnExit();
 
       /// \brief Finish the model and create the entity on the gzserver.
       public: void FinishModel();
@@ -249,8 +269,11 @@ namespace gazebo
       /// \brief Name of the model.
       private: std::string modelName;
 
+      /// \brief Name of the model preview.
+      private: static const std::string previewName;
+
       /// \brief The root visual of the model.
-      private: rendering::VisualPtr modelVisual;
+      private: rendering::VisualPtr previewVisual;
 
       /// \brief The root visual of the model.
       private: rendering::VisualPtr mouseVisual;
@@ -325,6 +348,18 @@ namespace gazebo
 
       /// \brief Current model manipulation mode.
       private: std::string manipMode;
+
+      /// \brief Default directory to save models: ~/model_editor_models
+      private: std::string defaultPath;
+
+      /// \brief Path to where the model is saved.
+      private: std::string saveLocation;
+
+      /// \brief Default name of model model
+      private: static const std::string modelDefaultName;
+
+      /// \brief A dialog for setting model model name and save location.
+      private: SaveDialog *saveDialog;
     };
     /// \}
   }

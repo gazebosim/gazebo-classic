@@ -21,3 +21,7 @@ using namespace gazebo;
 using namespace gui;
 
 event::EventT<void ()> model::Events::finishModel;
+event::EventT<bool (std::string)> model::Events::saveAsModelEditor;
+event::EventT<bool (std::string)> model::Events::saveModelEditor;
+event::EventT<void ()> model::Events::newModelEditor;
+event::EventT<void ()> model::Events::exitModelEditor;

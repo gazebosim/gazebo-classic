@@ -42,7 +42,7 @@ namespace gazebo
     class EntityMaker;
     class EditorItem;
     class BuildingModelManip;
-    class FinishBuildingDialog;
+    class SaveDialog;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -212,10 +212,6 @@ namespace gazebo
       /// \param[in] _savePath Path to save the SDF to.
       public: void SaveToSDF(const std::string &_savePath);
 
-      /// \brief Save config file.
-      /// \param[in] _savePath Path to save the file to.
-      public: void SaveToConfig(const std::string &_savePath);
-
       /// \brief Reset the building maker and the SDF.
       public: void Reset();
 
@@ -227,9 +223,6 @@ namespace gazebo
 
       /// \brief Generate the SDF from building part visuals.
       public: void GenerateSDF();
-
-      /// \brief Generate the config file.
-      public: void GenerateConfig();
 
       // Documentation inherited
       public: virtual bool IsActive() const;
@@ -252,9 +245,6 @@ namespace gazebo
 
       /// \brief Get a template SDF string of a simple model.
       private: std::string GetTemplateSDFString();
-
-      /// \brief Get a template config file for a simple model.
-      private: std::string GetTemplateConfigString();
 
       /// \brief Internal helper function for QPointF comparison used by the
       /// surface subsivision algorithm.
@@ -350,9 +340,6 @@ namespace gazebo
       /// \brief A template SDF of a simple box model.
       private: sdf::SDFPtr modelTemplateSDF;
 
-      /// \brief The building model's config file.
-      private: TiXmlDocument modelConfig;
-
       /// \brief Name of the building model.
       private: std::string modelName;
 
@@ -386,18 +373,6 @@ namespace gazebo
       /// \brief Path to where the model is saved.
       private: std::string saveLocation;
 
-      /// \brief Name of the building model's author.
-      private: std::string authorName;
-
-      /// \brief Name of the building model's author's email.
-      private: std::string authorEmail;
-
-      /// \brief Model description.
-      private: std::string description;
-
-      /// \brief Model version.
-      private: std::string version;
-
       /// \brief A list of gui editor events connected to the building maker.
       private: std::vector<event::ConnectionPtr> connections;
 
@@ -405,7 +380,7 @@ namespace gazebo
       private: static const std::string buildingDefaultName;
 
       /// \brief A dialog for setting building model name and save location.
-      private: FinishBuildingDialog *saveDialog;
+      private: SaveDialog *saveDialog;
 
       /// \brief Visual that is currently hovered over by the mouse.
       private: rendering::VisualPtr hoverVis;

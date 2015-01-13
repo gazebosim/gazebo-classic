@@ -27,7 +27,6 @@
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
-#include "gazebo/gui/SaveDialog.hh"
 #include "gazebo/gui/model/ImportDialog.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
@@ -174,29 +173,12 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
         QStringList(QString("Plugin")));
   // this->modelTreeWidget->addTopLevelItem(this->pluginItem);
 
-  // save buttons
-  QPushButton *discardButton = new QPushButton(tr("Discard"));
-  connect(discardButton, SIGNAL(clicked()), this, SLOT(OnDiscard()));
-
-  this->saveButton = new QPushButton(tr("Save As"));
-  connect(this->saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
-
-  QPushButton *doneButton = new QPushButton(tr("Done"));
-  connect(doneButton, SIGNAL(clicked()), this, SLOT(OnDone()));
-
-  QHBoxLayout *buttonsLayout = new QHBoxLayout;
-  buttonsLayout->addWidget(discardButton);
-  buttonsLayout->addWidget(this->saveButton);
-  buttonsLayout->addWidget(doneButton);
-  buttonsLayout->setAlignment(Qt::AlignCenter);
-
   this->modelCreator = new ModelCreator();
   connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
 
   QFrame *frame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;
   frameLayout->addWidget(this->modelTreeWidget, 0);
-  frameLayout->addLayout(buttonsLayout);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frame->setLayout(frameLayout);
 
@@ -204,10 +186,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
-
-  this->saved = false;
-  this->saveLocation = QDir::homePath().toStdString();
-  this->modelName = "default";
 
   KeyEventHandler::Instance()->AddPressFilter("model_editor",
     boost::bind(&ModelEditorPalette::OnKeyPress, this, _1));
@@ -297,71 +275,6 @@ void ModelEditorPalette::OnAutoDisable()
 void ModelEditorPalette::OnStatic()
 {
   this->modelCreator->SetStatic(this->staticCheck->isChecked());
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnSave()
-{
-  SaveDialog saveDialog;
-  saveDialog.deleteLater();
-  saveDialog.SetTitle("Save Model");
-  saveDialog.SetSaveName(this->modelCreator->GetModelName());
-  saveDialog.SetSaveLocation(QDir::homePath().toStdString());
-  saveDialog.SetFileExtension("sdf");
-  if (saveDialog.exec() == QDialog::Accepted)
-  {
-    this->modelName = saveDialog.GetSaveName();
-    this->saveLocation = saveDialog.GetSaveLocation();
-    this->modelCreator->SetModelName(this->modelName);
-    this->modelCreator->GenerateSDF();
-    this->modelCreator->SaveToSDF(this->saveLocation);
-    this->saveButton->setText("&Save");
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnDiscard()
-{
-  int ret = QMessageBox::warning(0, QString("Discard"),
-      QString("Are you sure you want to discard\n"
-      "your model? All of your work will\n"
-      "be lost."),
-      QMessageBox::Discard | QMessageBox::Cancel,
-      QMessageBox::Cancel);
-
-  switch (ret)
-  {
-    case QMessageBox::Discard:
-      this->modelCreator->Reset();
-      this->saveButton->setText("&Save As");
-      this->saveLocation = QDir::homePath().toStdString();
-      break;
-    case QMessageBox::Cancel:
-      // Do nothing
-      break;
-    default:
-      break;
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnDone()
-{
-  SaveDialog saveDialog;
-  saveDialog.SetTitle("Save Model");
-  saveDialog.SetSaveName(this->modelCreator->GetModelName());
-  saveDialog.SetSaveLocation(QDir::homePath().toStdString());
-  saveDialog.SetFileExtension("sdf");
-  if (saveDialog.exec() == QDialog::Accepted)
-  {
-    this->modelName = saveDialog.GetSaveName();
-    this->saveLocation = saveDialog.GetSaveLocation();
-    this->modelCreator->SetModelName(this->modelName);
-    this->modelCreator->GenerateSDF();
-    this->modelCreator->SaveToSDF(this->saveLocation);
-    this->modelCreator->FinishModel();
-    gui::model::Events::finishModel();
-  }
 }
 
 /////////////////////////////////////////////////

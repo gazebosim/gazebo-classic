@@ -92,15 +92,6 @@ namespace gazebo
       /// \brief Qt callback when the model is allowed to auto disable at rest.
       private slots: void OnAutoDisable();
 
-      /// \brief Qt callback when the model is to be saved.
-      private slots: void OnSave();
-
-      /// \brief Qt callback when the model is to be discarded.
-      private slots: void OnDiscard();
-
-      /// \brief Qt callback when model editing is complete.
-      private slots: void OnDone();
-
       /// \brief Widget that display model properties.
       private: QTreeWidget *modelTreeWidget;
 
@@ -118,18 +109,6 @@ namespace gazebo
 
       /// \brief Model creator.
       private: ModelCreator *modelCreator;
-
-      /// \brief Save button.
-      private: QPushButton *saveButton;
-
-      /// \brief Indicate whether the model has been saved before or not.
-      private: bool saved;
-
-      /// \brief Path to where the model is saved.
-      private: std::string saveLocation;
-
-      /// \brief Name of model being edited.
-      private: std::string modelName;
 
       /// \brief Static checkbox, true to create a static model.
       private: QCheckBox *staticCheck;

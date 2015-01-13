@@ -41,19 +41,24 @@
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/ModelSnap.hh"
 #include "gazebo/gui/ModelAlign.hh"
+#include "gazebo/gui/SaveDialog.hh"
 
 #include "gazebo/gui/model/ModelData.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
+
+const std::string ModelCreator::modelDefaultName = "Untitled";
+const std::string ModelCreator::previewName = "ModelPreview";
 
 /////////////////////////////////////////////////
 ModelCreator::ModelCreator()
 {
   this->active = false;
-  this->modelName = "";
+  this->modelName = this->modelDefaultName;
 
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
@@ -78,6 +83,22 @@ ModelCreator::ModelCreator()
           SLOT(OnDelete(const std::string &)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectSaveModelEditor(
+      boost::bind(&ModelCreator::OnSave, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectSaveAsModelEditor(
+      boost::bind(&ModelCreator::OnSaveAs, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectNewModelEditor(
+      boost::bind(&ModelCreator::OnNew, this)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectExitModelEditor(
+      boost::bind(&ModelCreator::OnExit, this)));
+
+  this->connections.push_back(
       gui::Events::ConnectAlignMode(
         boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
 
@@ -94,6 +115,8 @@ ModelCreator::ModelCreator()
 
   connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
   connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+
+  this->saveDialog = new SaveDialog(SaveDialog::MODEL);
 
   this->Reset();
 }
@@ -151,6 +174,175 @@ void ModelCreator::OnEdit(bool _checked)
 }
 
 /////////////////////////////////////////////////
+void ModelCreator::OnNew()
+{
+  if (this->allParts.empty())
+  {
+    this->Reset();
+    return;
+  }
+  QString msg;
+  QMessageBox msgBox(QMessageBox::Warning, QString("New"), msg);
+  QPushButton *cancelButton = msgBox.addButton("Cancel", QMessageBox::YesRole);
+  QPushButton *saveButton = msgBox.addButton("Save", QMessageBox::YesRole);
+
+//  switch (this->currentSaveState)
+//  {
+//    case ALL_SAVED:
+//    {
+//      msg.append("Are you sure you want to close this model and open a new "
+//                 "canvas?\n\n");
+//      msgBox.addButton("New Canvas", QMessageBox::ApplyRole);
+//      saveButton->hide();
+//      break;
+//    }
+//    case UNSAVED_CHANGES:
+//    case NEVER_SAVED:
+//    {
+      msg.append("You have unsaved changes. Do you want to save this model "
+                 "and open a new canvas?\n\n");
+      msgBox.addButton("Don't Save", QMessageBox::ApplyRole);
+//      break;
+//    }
+//    default:
+//      return;
+//  }
+
+  msg.append("Once you open a new canvas, your current model will no longer "
+             "be editable.");
+  msgBox.setText(msg);
+
+  msgBox.exec();
+
+  if (msgBox.clickedButton() != cancelButton)
+  {
+    if (msgBox.clickedButton() == saveButton)
+    {
+      if (!this->OnSave(this->modelName))
+      {
+        return;
+      }
+    }
+
+    this->Reset();
+  }
+}
+
+/////////////////////////////////////////////////
+bool ModelCreator::OnSave(const std::string &_saveName)
+{
+  if (_saveName != "")
+    this->SetModelName(_saveName);
+
+//  switch (this->currentSaveState)
+//  {
+//    case UNSAVED_CHANGES:
+//    {
+//      // TODO: Subtle filesystem race condition
+//      this->SaveModelFiles();
+//      AddDirToModelPaths(this->saveLocation);
+//      gui::editor::Events::saveBuildingModel(this->modelName,
+//          this->saveLocation);
+//      return true;
+//    }
+//    case NEVER_SAVED:
+//    {
+      return this->OnSaveAs(_saveName);
+//    }
+//    default:
+//      return false;
+//  }
+}
+
+/////////////////////////////////////////////////
+bool ModelCreator::OnSaveAs(const std::string &_saveName)
+{
+  if (this->saveDialog->OnSaveAs(_saveName))
+  {
+    this->modelName = this->saveDialog->GetModelName();
+    this->saveLocation = this->saveDialog->GetSaveLocation();
+    this->SaveModelFiles();
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnExit()
+{
+  if (this->allParts.empty())
+  {
+    this->Reset();
+    gui::model::Events::finishModel();
+    return;
+  }
+
+//  switch (this->currentSaveState)
+//  {
+//    case ALL_SAVED:
+//    {
+//      QString msg("Once you exit the Building Editor, "
+//      "your building will no longer be editable.\n\n"
+//      "Are you ready to exit?\n\n");
+//      QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
+//      msgBox.addButton("Exit", QMessageBox::ApplyRole);
+//      QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
+//      msgBox.exec();
+//      if (msgBox.clickedButton() == cancelButton)
+//      {
+//        return;
+//      }
+//      this->FinishModel();
+//      break;
+//    }
+//    case UNSAVED_CHANGES:
+//    case NEVER_SAVED:
+//    {
+      QString msg("Save Changes before exiting?\n\n"
+          "Note: Once you exit the Model Editor, "
+          "your model will no longer be editable.\n\n");
+
+      QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
+      QPushButton *cancelButton = msgBox.addButton("Cancel",
+          QMessageBox::ApplyRole);
+      QPushButton *saveButton = msgBox.addButton("Save and Exit",
+          QMessageBox::ApplyRole);
+      msgBox.addButton("Don't Save, Exit", QMessageBox::ApplyRole);
+      msgBox.exec();
+      if (msgBox.clickedButton() == cancelButton)
+        return;
+
+      if (msgBox.clickedButton() == saveButton)
+      {
+        if (!this->OnSave(this->modelName))
+        {
+          return;
+        }
+      }
+//      break;
+//    }
+//    default:
+//      return;
+//  }
+
+//  // Create entity on main window up to the saved point
+//  if (this->currentSaveState != NEVER_SAVED)
+      this->FinishModel();
+
+    this->Reset();
+
+//  gui::editor::Events::newBuildingModel();
+  gui::model::Events::finishModel();
+}
+
+void ModelCreator::SaveModelFiles()
+{
+  this->SetModelName(this->modelName);
+  this->GenerateSDF();
+  this->SaveToSDF(this->saveLocation);
+}
+
+/////////////////////////////////////////////////
 std::string ModelCreator::CreateModel()
 {
   this->Reset();
@@ -169,7 +361,7 @@ void ModelCreator::AddJoint(const std::string &_type)
 std::string ModelCreator::AddBox(const math::Vector3 &_size,
     const math::Pose &_pose)
 {
-  if (!this->modelVisual)
+  if (!this->previewVisual)
   {
     this->Reset();
   }
@@ -179,7 +371,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
-      this->modelVisual));
+      this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
@@ -214,7 +406,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
 std::string ModelCreator::AddSphere(double _radius,
     const math::Pose &_pose)
 {
-  if (!this->modelVisual)
+  if (!this->previewVisual)
     this->Reset();
 
   std::ostringstream linkNameStream;
@@ -222,7 +414,7 @@ std::string ModelCreator::AddSphere(double _radius,
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(
-      linkName, this->modelVisual));
+      linkName, this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
@@ -256,7 +448,7 @@ std::string ModelCreator::AddSphere(double _radius,
 std::string ModelCreator::AddCylinder(double _radius, double _length,
     const math::Pose &_pose)
 {
-  if (!this->modelVisual)
+  if (!this->previewVisual)
     this->Reset();
 
   std::ostringstream linkNameStream;
@@ -264,7 +456,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(
-      linkName, this->modelVisual));
+      linkName, this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
@@ -300,7 +492,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
 std::string ModelCreator::AddCustom(const std::string &_path,
     const math::Vector3 &_scale, const math::Pose &_pose)
 {
-  if (!this->modelVisual)
+  if (!this->previewVisual)
     this->Reset();
 
   std::string path = _path;
@@ -309,8 +501,8 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   linkNameStream << "custom_" << this->customCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName + "::" +
+        linkName, this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
@@ -361,7 +553,7 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 /////////////////////////////////////////////////
 void ModelCreator::RemovePart(const std::string &_partName)
 {
-  if (!this->modelVisual)
+  if (!this->previewVisual)
   {
     this->Reset();
     return;
@@ -399,9 +591,11 @@ void ModelCreator::Reset()
   g_copyAct->setEnabled(false);
   g_pasteAct->setEnabled(false);
 
-  std::stringstream ss;
-  ss << "defaultModel_" << this->modelCounter++;
-  this->modelName = ss.str();
+  this->SetModelName(this->modelDefaultName);
+  this->defaultPath = (QDir::homePath() + "/model_editor_models")
+                        .toStdString();
+//  this->saveLocation = defaultPath + "/" +
+//                        GetFolderNameFromModelName(this->modelName);
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
@@ -412,22 +606,23 @@ void ModelCreator::Reset()
     this->RemovePart(this->allParts.begin()->first);
   this->allParts.clear();
 
-  if (this->modelVisual)
-    scene->RemoveVisual(this->modelVisual);
+  if (this->previewVisual)
+    scene->RemoveVisual(this->previewVisual);
 
-  this->modelVisual.reset(new rendering::Visual(this->modelName,
+  this->previewVisual.reset(new rendering::Visual(this->previewName,
       scene->GetWorldVisual()));
 
-  this->modelVisual->Load();
+  this->previewVisual->Load();
   this->modelPose = math::Pose::Zero;
-  this->modelVisual->SetPose(this->modelPose);
-  scene->AddVisual(this->modelVisual);
+  this->previewVisual->SetPose(this->modelPose);
+  scene->AddVisual(this->previewVisual);
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::SetModelName(const std::string &_modelName)
 {
   this->modelName = _modelName;
+  this->saveDialog->SetModelName(_modelName);
 }
 
 /////////////////////////////////////////////////
@@ -452,33 +647,40 @@ void ModelCreator::SetAutoDisable(bool _auto)
 void ModelCreator::SaveToSDF(const std::string &_savePath)
 {
   std::ofstream savefile;
-  boost::filesystem::path path;
-  path = boost::filesystem::operator/(_savePath, this->modelName + ".sdf");
+  boost::filesystem::path path(_savePath);
+  path = path / "model.sdf";
+
+  // FIXME
   savefile.open(path.string().c_str());
-  if (savefile.is_open())
+  if (!savefile.is_open())
   {
-    savefile << this->modelSDF->ToString();
-    savefile.close();
+    gzerr << "Couldn't open file for writing: " << path.string() << std::endl;
+    return;
   }
-  else
-  {
-    gzerr << "Unable to open file for writing: '" << path.string().c_str()
-        << "'. Possibly a permission issue." << std::endl;
-  }
+
+  savefile << this->modelSDF->ToString();
+  savefile.close();
+  gzdbg << "Saved file to " << path.string() << std::endl;
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::FinishModel()
 {
   event::Events::setSelectedEntity("", "normal");
-  this->Reset();
   this->CreateTheEntity();
+  this->Reset();
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::CreateTheEntity()
 {
   msgs::Factory msg;
+  // Create a new name if the model exists
+  if (!this->modelSDF->root->HasElement("model"))
+  {
+    gzerr << "Generated invalid SDF! Cannot create entity." << std::endl;
+    return;
+  }
   msg.set_sdf(this->modelSDF->ToString());
   this->makerPub->Publish(msg);
 }
@@ -516,6 +718,11 @@ std::string ModelCreator::GetTemplateSDFString()
 /////////////////////////////////////////////////
 void ModelCreator::AddPart(PartType _type)
 {
+  if (!this->previewVisual)
+  {
+    this->Reset();
+  }
+
   this->Stop();
 
   this->addPartType = _type;
@@ -852,13 +1059,13 @@ void ModelCreator::OnPaste()
 
     std::string linkName = copiedPart->name + "_clone";
 
-    if (!this->modelVisual)
+    if (!this->previewVisual)
     {
       this->Reset();
     }
 
     rendering::VisualPtr linkVisual(new rendering::Visual(
-        linkName, this->modelVisual));
+        linkName, this->previewVisual));
     linkVisual->Load();
 
     std::ostringstream visualName;
