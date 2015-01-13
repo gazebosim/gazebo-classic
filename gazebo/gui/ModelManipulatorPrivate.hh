@@ -79,6 +79,9 @@ namespace gazebo
       /// \brief Scale of the visual attached to the mouse.
       public: math::Vector3 mouseVisualScale;
 
+      /// \brief Scale of all the child visuals attached to the mouse.
+      public: std::vector<math::Vector3> mouseChildVisualScale;
+
       /// \brief Bounding box of the visual attached to the mouse (for scaling).
       public: math::Box mouseVisualBbox;
 
