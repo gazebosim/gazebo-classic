@@ -448,6 +448,25 @@ void Joint::SetModel(ModelPtr _model)
 }
 
 //////////////////////////////////////////////////
+double Joint::GetParam(const std::string &_key,
+    unsigned int _index)
+{
+  if (_key == "hi_stop")
+  {
+    return this->GetHighStop(_index).Radian();
+  }
+  else if (_key == "lo_stop")
+  {
+    return this->GetLowStop(_index).Radian();
+  }
+  gzerr << "GetParam unrecognized parameter ["
+        << _key
+        << "]"
+        << std::endl;
+  return 0;
+}
+
+//////////////////////////////////////////////////
 LinkPtr Joint::GetChild() const
 {
   return this->childLink;
