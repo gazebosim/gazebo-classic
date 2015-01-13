@@ -270,9 +270,6 @@ namespace gazebo
       /// \brief Counter for the number of parts in the model.
       private: int partCounter;
 
-      /// \brief Counter for the number of custom parts in the model.
-      private: int customCounter;
-
       /// \brief Counter for generating a unique model name.
       private: int modelCounter;
 
@@ -304,13 +301,16 @@ namespace gazebo
 
       /// \brief A list of selected visuals.
       private: std::vector<rendering::VisualPtr> selectedVisuals;
+
       /// \brief Names of parts copied through g_copyAct
       private: std::vector<std::string> copiedPartNames;
 
       /// \brief The last mouse event
       private: common::MouseEvent lastMouseEvent;
+
       /// \brief Qt action for opening the part inspector.
       private: QAction *inspectAct;
+
       /// \brief Part visual that is currently being inspected.
       private: rendering::VisualPtr inspectVis;
 

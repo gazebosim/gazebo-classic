@@ -64,7 +64,6 @@ ModelCreator::ModelCreator()
 
   this->manipMode = "";
   this->partCounter = 0;
-  this->customCounter = 0;
   this->modelCounter = 0;
 
   this->editTransparency = 0.4;
@@ -315,11 +314,11 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   std::string path = _path;
 
   std::ostringstream linkNameStream;
-  linkNameStream << "custom_" << this->customCounter++;
+  linkNameStream << "part_" << this->partCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(
+      linkName, this->modelVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
@@ -370,7 +369,6 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
       getAttachedObject(0);
   colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
-
 //  collisoinVis->SetTransparency(this->editTransparency);
 //  collisoinVis->SetVisible(false);
   part->AddCollision(collisionVis);
@@ -378,7 +376,6 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   std::string partName = part->partVisual->GetName();
   part->SetName(partName);
   part->SetPose(part->partVisual->GetWorldPose());
-
   this->allParts[partName] = part;
   return part;
 }
@@ -1053,7 +1050,7 @@ void ModelCreator::GenerateSDF()
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
 
-  // std::cerr << modelElem->ToString("") << std::endl;
+//   std::cerr << modelElem->ToString("") << std::endl;
 }
 
 /////////////////////////////////////////////////

@@ -271,6 +271,7 @@ void ModelEditorPalette::OnCustom()
   }
 }
 
+/////////////////////////////////////////////////
 void ModelEditorPalette::AddJoint(const std::string &_type)
 {
   event::Events::setSelectedEntity("", "normal");
