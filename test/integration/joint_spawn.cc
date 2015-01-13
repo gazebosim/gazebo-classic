@@ -385,7 +385,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
 
     // set friction to 1.0
     const double friction = 1.0;
-    _joint->SetParam("friction", _index, friction);
+    EXPECT_TRUE(_joint->SetParam("friction", _index, friction));
     EXPECT_NEAR(_joint->GetParam("friction", _index), friction, g_tolerance);
 
     for (unsigned int i = 0; i < 500; ++i)
@@ -493,10 +493,10 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_Rotational,
                   , "ball")));
 
 // Skip prismatic, screw, and revolute2 because they allow translation
-// Skip universal because it can't be connected to world in bullet.
 INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_RotationalWorld,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
+                  , "universal"
                   , "ball")));
 
 int main(int argc, char **argv)
