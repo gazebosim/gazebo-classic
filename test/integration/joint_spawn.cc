@@ -182,13 +182,6 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
 void JointSpawningTest::SpawnJointRotational(const std::string &_physicsEngine,
                                              const std::string &_jointType)
 {
-  /// \TODO: simbody not complete for this test
-  if (_physicsEngine == "simbody" && _jointType != "revolute")
-  {
-    gzerr << "Aborting test for Simbody, see issue #859.\n";
-    return;
-  }
-
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
