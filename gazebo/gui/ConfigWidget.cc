@@ -532,75 +532,80 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
                 valueMsg->GetDescriptor();
             const google::protobuf::FieldDescriptor *typeField =
                 valueDescriptor->FindFieldByName("type");
-            const google::protobuf::EnumValueDescriptor *typeValueDescriptor =
-                valueMsg->GetReflection()->GetEnum(*valueMsg, typeField);
 
-            std::string geometryTypeStr;
-            if (typeValueDescriptor)
+            if (valueMsg->GetReflection()->HasField(*valueMsg, typeField))
             {
-              geometryTypeStr =
-                  QString(typeValueDescriptor->name().c_str()).toLower().
-                  toStdString();
-            }
+              const google::protobuf::EnumValueDescriptor *typeValueDescriptor =
+                  valueMsg->GetReflection()->GetEnum(*valueMsg, typeField);
 
-            math::Vector3 dimensions;
-            // dimensions
-            for (int k = 0; k < valueDescriptor->field_count() ; ++k)
-            {
-              const google::protobuf::FieldDescriptor *geomField =
-                  valueDescriptor->field(k);
+              std::string geometryTypeStr;
+              if (typeValueDescriptor)
+              {
+                geometryTypeStr =
+                    QString(typeValueDescriptor->name().c_str()).toLower().
+                    toStdString();
+              }
 
-              if (geomField->is_repeated())
+              math::Vector3 dimensions;
+              // dimensions
+              for (int k = 0; k < valueDescriptor->field_count() ; ++k)
+              {
+                const google::protobuf::FieldDescriptor *geomField =
+                    valueDescriptor->field(k);
+
+                if (geomField->is_repeated())
+                    continue;
+
+                if (geomField->cpp_type() !=
+                    google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE ||
+                    !valueMsg->GetReflection()->HasField(*valueMsg, geomField))
                   continue;
 
-              if (geomField->cpp_type() !=
-                  google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE ||
-                  !valueMsg->GetReflection()->HasField(*valueMsg, geomField))
-                continue;
+                google::protobuf::Message *geomValueMsg =
+                    valueMsg->GetReflection()->MutableMessage(
+                    valueMsg, geomField);
+                const google::protobuf::Descriptor *geomValueDescriptor =
+                    geomValueMsg->GetDescriptor();
 
-              google::protobuf::Message *geomValueMsg =
-                valueMsg->GetReflection()->MutableMessage(valueMsg, geomField);
-              const google::protobuf::Descriptor *geomValueDescriptor =
-                  geomValueMsg->GetDescriptor();
-
-              std::string geomMsgName = geomField->message_type()->name();
-              if (geomMsgName == "BoxGeom")
-              {
-                google::protobuf::Message *geomDimMsg =
-                    geomValueMsg->GetReflection()->MutableMessage(geomValueMsg,
-                    geomValueDescriptor->field(0));
-                dimensions = this->ParseVector3(geomDimMsg);
-                break;
+                std::string geomMsgName = geomField->message_type()->name();
+                if (geomMsgName == "BoxGeom")
+                {
+                  google::protobuf::Message *geomDimMsg =
+                      geomValueMsg->GetReflection()->MutableMessage(
+                      geomValueMsg, geomValueDescriptor->field(0));
+                  dimensions = this->ParseVector3(geomDimMsg);
+                  break;
+                }
+                else if (geomMsgName == "CylinderGeom")
+                {
+                  const google::protobuf::FieldDescriptor *geomRadiusField =
+                      geomValueDescriptor->FindFieldByName("radius");
+                  double radius = geomValueMsg->GetReflection()->GetDouble(
+                      *geomValueMsg, geomRadiusField);
+                  const google::protobuf::FieldDescriptor *geomLengthField =
+                      geomValueDescriptor->FindFieldByName("length");
+                  double length = geomValueMsg->GetReflection()->GetDouble(
+                      *geomValueMsg, geomLengthField);
+                  dimensions.x = radius * 2.0;
+                  dimensions.y = dimensions.x;
+                  dimensions.z = length;
+                  break;
+                }
+                else if (geomMsgName == "SphereGeom")
+                {
+                  const google::protobuf::FieldDescriptor *geomRadiusField =
+                      geomValueDescriptor->FindFieldByName("radius");
+                  double radius = geomValueMsg->GetReflection()->GetDouble(
+                      *geomValueMsg, geomRadiusField);
+                  dimensions.x = radius * 2.0;
+                  dimensions.y = dimensions.x;
+                  dimensions.z = dimensions.x;
+                  break;
+                }
               }
-              else if (geomMsgName == "CylinderGeom")
-              {
-                const google::protobuf::FieldDescriptor *geomRadiusField =
-                    geomValueDescriptor->FindFieldByName("radius");
-                double radius = geomValueMsg->GetReflection()->GetDouble(
-                    *geomValueMsg, geomRadiusField);
-                const google::protobuf::FieldDescriptor *geomLengthField =
-                    geomValueDescriptor->FindFieldByName("length");
-                double length = geomValueMsg->GetReflection()->GetDouble(
-                    *geomValueMsg, geomLengthField);
-                dimensions.x = radius * 2.0;
-                dimensions.y = dimensions.x;
-                dimensions.z = length;
-                break;
-              }
-              else if (geomMsgName == "SphereGeom")
-              {
-                const google::protobuf::FieldDescriptor *geomRadiusField =
-                    geomValueDescriptor->FindFieldByName("radius");
-                double radius = geomValueMsg->GetReflection()->GetDouble(
-                    *geomValueMsg, geomRadiusField);
-                dimensions.x = radius * 2.0;
-                dimensions.y = dimensions.x;
-                dimensions.z = dimensions.x;
-                break;
-              }
+              this->UpdateGeometryWidget(configChildWidget,
+                  geometryTypeStr, dimensions);
             }
-            this->UpdateGeometryWidget(configChildWidget,
-                geometryTypeStr, dimensions);
           }
           // parse and create custom pose widgets
           else if (field->message_type()->name() == "Pose")
@@ -1672,14 +1677,14 @@ void ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
   else if (_value == "cylinder")
   {
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->setValue(
-        _dimensions.x/2.0);
+        _dimensions.x*0.5);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[5])->setValue(
         _dimensions.z);
   }
   else if (_value == "sphere")
   {
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->setValue(
-        _dimensions.x/2.0);
+        _dimensions.x*0.5);
   }
 }
 

@@ -367,6 +367,7 @@ void PartData::OnAddVisual(const std::string &_name)
   }
 
   msgs::Visual visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
+
   // store the correct transparency setting
   if (refVisual)
     visualMsg.set_transparency(this->visuals[refVisual].transparency());
