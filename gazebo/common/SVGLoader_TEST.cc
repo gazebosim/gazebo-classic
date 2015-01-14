@@ -25,16 +25,24 @@ using namespace gazebo;
 
 class SVGLoader : public gazebo::testing::AutoLogFixture { };
 
+
+double step = 0.1;
+
 /////////////////////////////////////////////////
 TEST_F(SVGLoader, LoadPaths)
 {
-  common::SVGLoader loader;
+  common::SVGLoader loader(step);
   std::vector<common::SVGPath> paths;
-  loader.Parse(std::string(PROJECT_SOURCE_PATH) + "/test/data/paths.svg", paths);
+  std::string filePath = std::string(PROJECT_SOURCE_PATH);
+  filePath += "/test/data/paths.svg";
+  loader.Parse(filePath, paths);
 
-  loader.Dump_paths(paths);     
+  loader.DumpPaths(paths);
 
-/*  EXPECT_STREQ("unknown", mesh->GetName().c_str());
+    
+
+/*
+  EXPECT_STREQ("unknown", mesh->GetName().c_str());
   EXPECT_EQ(math::Vector3(1, 1, 1), mesh->GetMax());
   EXPECT_EQ(math::Vector3(-1, -1, -1), mesh->GetMin());
   // 36 vertices, 24 unique, 12 shared.
@@ -46,12 +54,32 @@ TEST_F(SVGLoader, LoadPaths)
   EXPECT_EQ(1u, mesh->GetMaterialCount());
 
   // Make sure we can read a submesh name
-  EXPECT_STREQ("Cube", mesh->GetSubMesh(0)->GetName().c_str());*/
+  EXPECT_STREQ("Cube", mesh->GetSubMesh(0)->GetName().c_str());
+*/
+
 }
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
+
+  for(size_t i=0; i < (size_t)argc; ++i)
+  {
+    std::cout << i << " " << argv[i] << std::endl;
+  }
+
+  if(argc >= 2)
+  {
+    std::string s = argv[1];
+    try {
+      step = atof(s.c_str());
+    }
+    catch(...)
+    {
+        std::cout << "Can't set step to " << s << ". Step is " << step << std::endl;
+    }
+  }
+
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

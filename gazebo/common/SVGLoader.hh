@@ -39,18 +39,6 @@ namespace gazebo
 		{
 			 char type;
 			 std::vector<double> numbers;
-		
-/*			 std::string tostr() 
-			 {
-				 std::ostringstream os;
-				 os << type << "[";
-				 for (double d : numbers)
-				 {
-				   os << d << ", ";
-				 }
-				 os << "]";
-				 return os.str();
-			 }   */
 		};
 
 		struct GAZEBO_VISIBLE SVGPath
@@ -63,19 +51,17 @@ namespace gazebo
 			 std::vector< std::vector<math::Vector2d> > polylines;
 		};
 
-
-
 		class GAZEBO_VISIBLE SVGLoader
 		{
-			public: SVGLoader(){}
+			public: SVGLoader(double _resolution);
 
 			public: void Parse(const std::string &_filename, std::vector<SVGPath> &paths);
-			public: void Dump_paths(const std::vector<SVGPath> paths ) const;
+			public: void DumpPaths(const std::vector<SVGPath> paths ) const;
 
 			private: void make_commands(char cmd, const std::vector<double> &numbers, std::vector<SVGCommand> &cmds);
 			private: void get_path_commands(const std::vector<std::string> &tokens, SVGPath &path);
-			private: void get_path_attribs(TiXmlElement* pElement, SVGPath &path);
-			private: void get_svg_paths(TiXmlNode* pParent, std::vector<SVGPath> &paths);
+			private: void GetPathAttribs(TiXmlElement* pElement, SVGPath &path);
+			private: void GetSvgPaths(TiXmlNode* pParent, std::vector<SVGPath> &paths);
 
 			private: void ExpandCommands(const std::vector< std::vector<SVGCommand> > &subpaths, SVGPath &path);
 			private: void SplitSubpaths(const std::vector<SVGCommand> cmds, std::vector< std::vector<SVGCommand> > &split_cmds);
@@ -84,9 +70,9 @@ namespace gazebo
 			private: math::Vector2d SubpathToPolyline(const std::vector<SVGCommand> &subpath, math::Vector2d last,
 					std::vector<math::Vector2d> &polyline);
 
+            private: double resolution;
 		};
 	}
 }
-
 
 
