@@ -59,7 +59,7 @@ class GAZEBO_VISIBLE Position2dInterface : public GazeboInterface
 
   /// \brief Process pose messages.
   /// \param[in] _msg A new pose message.
-  private: void OnPoseMsg(ConstPose_VPtr &_msg);
+  private: void OnPoseMsg(ConstPosesStampedPtr &_msg);
 
   /// \brief Timestamp on last data update
   private: double datatime;

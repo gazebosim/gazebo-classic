@@ -115,7 +115,6 @@ void CameraInterface::Subscribe()
   topic += this->cameraName + "/image";
   boost::replace_all(topic, "::", "/");
 
-  std::cout << "Topic[" << topic << "]\n";
   this->cameraSub = this->node->Subscribe(topic,
                                           &CameraInterface::OnImage, this);
 }
