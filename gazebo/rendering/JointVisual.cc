@@ -161,15 +161,10 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
     _arrowVisual->SetRotation(quatFromModel.GetInverse() *
         _arrowVisual->GetRotation());
   }
-  if (_type == msgs::Joint::REVOLUTE || _type == msgs::Joint::REVOLUTE2
-      || _type == msgs::Joint::UNIVERSAL || _type == msgs::Joint::GEARBOX)
-  {
-    _arrowVisual->ShowRotation(true);
-  }
-  else
-  {
-    _arrowVisual->ShowRotation(false);
-  }
+  _arrowVisual->ShowRotation(_type == msgs::Joint::REVOLUTE ||
+                             _type == msgs::Joint::REVOLUTE2 ||
+                             _type == msgs::Joint::UNIVERSAL ||
+                             _type == msgs::Joint::GEARBOX);
 
   if (dPtr->axisVisual)
   {
