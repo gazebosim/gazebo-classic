@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,8 +65,6 @@ ModelCreator::ModelCreator()
   this->manipMode = "";
   this->partCounter = 0;
   this->modelCounter = 0;
-
-  this->editTransparency = 0.4;
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -202,7 +200,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
 
   visVisual->Load(visualElem);
 
-  linkVisual->SetTransparency(this->editTransparency);
+  linkVisual->SetTransparency(ModelData::GetEditTransparency());
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -244,7 +242,7 @@ std::string ModelCreator::AddSphere(double _radius,
 
   visVisual->Load(visualElem);
 
-  linkVisual->SetTransparency(this->editTransparency);
+  linkVisual->SetTransparency(ModelData::GetEditTransparency());
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -289,7 +287,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
 
   visVisual->Load(visualElem);
 
-  linkVisual->SetTransparency(this->editTransparency);
+  linkVisual->SetTransparency(ModelData::GetEditTransparency());
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -335,7 +333,7 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   meshElem->GetElement("uri")->Set(path);
   visVisual->Load(visualElem);
 
-  linkVisual->SetTransparency(this->editTransparency);
+  linkVisual->SetTransparency(ModelData::GetEditTransparency());
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -362,15 +360,12 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
       _visual->Clone(part->partVisual->GetName() + "_collision",
       part->partVisual);
 
-//  collisoinVis->SetMaterial("Gazebo/OrangeTransparent");
   collisionVis->SetMaterial("Gazebo/Orange");
   collisionVis->SetTransparency(0.8);
   // fix for transparency alpha compositing
   Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
       getAttachedObject(0);
   colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
-//  collisoinVis->SetTransparency(this->editTransparency);
-//  collisoinVis->SetVisible(false);
   part->AddCollision(collisionVis);
 
   std::string partName = part->partVisual->GetName();
@@ -790,8 +785,6 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
         return true;
       }
     }
-
-
     return false;
   }
 
@@ -841,26 +834,6 @@ void ModelCreator::OpenInspector(const std::string &_name)
   PartData *part = this->allParts[_name];
   part->SetPose(part->partVisual->GetWorldPose());
   part->UpdateConfig();
-
-/*  PartGeneralConfig *generalConfig = part->inspector->GetGeneralConfig();
-  generalConfig->SetPose(part->GetPose());*/
-
-/*  PartVisualConfig *visualConfig = part->inspector->GetVisualConfig();
-  for (unsigned int i = 0; i < part->visuals.size(); ++i)
-  {
-    if (i >= visualConfig->GetVisualCount())
-      visualConfig->AddVisual();
-
-  }
-
-  PartCollisionConfig *collisionConfig = part->inspector->GetCollisionConfig();
-  for (unsigned int i = 0; i < part->collisions.size(); ++i)
-  {
-    if (i >= collisionConfig->GetCollisionCount())
-      collisionConfig->AddCollision();
-
-  }*/
-
   part->inspector->show();
 }
 
@@ -933,7 +906,6 @@ void ModelCreator::OnPaste()
       visVisual = copiedVisual->Clone(visualName.str(), linkVisual);
       clonePose = copiedVisual->GetWorldPose();
       cloneScale = copiedVisual->GetParent()->GetScale();
-//      visVisual->SetScale(math::Vector3::One);
     }
 
     rendering::UserCameraPtr userCamera = gui::get_active_camera();
@@ -948,7 +920,7 @@ void ModelCreator::OnPaste()
 
     linkVisual->SetScale(cloneScale);
     linkVisual->SetWorldPose(clonePose);
-    linkVisual->SetTransparency(this->editTransparency);
+    linkVisual->SetTransparency(ModelData::GetEditTransparency());
 
     this->addPartType = PART_CUSTOM;
     this->CreatePart(visVisual);
@@ -1030,7 +1002,6 @@ void ModelCreator::GenerateSDF()
       sdf::ElementPtr collisionElem = msgs::CollisionToSDF(colIt->second);
       newLinkElem->InsertElement(collisionElem);
     }
-
   }
 
   // Add joint sdf elements
@@ -1050,7 +1021,7 @@ void ModelCreator::GenerateSDF()
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
 
-//   std::cerr << modelElem->ToString("") << std::endl;
+  // std::cerr << modelElem->ToString("") << std::endl;
 }
 
 /////////////////////////////////////////////////

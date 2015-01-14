@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@
 
 using namespace gazebo;
 using namespace gui;
-
 
 /////////////////////////////////////////////////
 std::string ModelData::GetTemplateSDFString()
@@ -68,10 +67,9 @@ std::string ModelData::GetTemplateSDFString()
 }
 
 /////////////////////////////////////////////////
-CollisionData::CollisionData()
+double ModelData::GetEditTransparency()
 {
-  this->collisionSDF.reset(new sdf::Element);
-  sdf::initFile("collision.sdf", this->collisionSDF);
+  return 0.4;
 }
 
 /////////////////////////////////////////////////
@@ -79,8 +77,6 @@ PartData::PartData()
 {
   this->partSDF.reset(new sdf::Element);
   sdf::initFile("link.sdf", this->partSDF);
-
-//  this->partSDF->ToString("") << std::endl;
 
   this->inspector = new PartInspector;
   this->inspector->setModal(false);
@@ -111,6 +107,7 @@ PartData::PartData()
 PartData::~PartData()
 {
   event::Events::DisconnectPreRender(this->connections[0]);
+  delete this->inspector;
 }
 
 /////////////////////////////////////////////////
@@ -187,27 +184,7 @@ void PartData::AddVisual(rendering::VisualPtr _visual)
 
   // override transparency value
   visualMsg.set_transparency(0.0);
-
-  // some of the default values do not transfer to the visualMsg
-  // so set them here and find a better way to fix this in the future.
-  //visualMsg.mutable_material()->set_lighting(true);
-/*  msgs::Set(visualMsg.mutable_material()->mutable_ambient(),
-      math::Color(0, 0, 0, 0);
-  msgs::Set(visualMsg.mutable_material()->mutable_diffuse(),
-      math::Color(0, 0, 0, 0);
-  msgs::Set(visualMsg.mutable_material()->mutable_specular(),
-      math::Color(0, 0, 0, 0);
-  msgs::Set(visualMsg.mutable_material()->mutable_ambient(),
-      math::Color(0, 0, 0, 0);*/
-
   this->visuals[_visual] = visualMsg;
-
-/*  std::cerr << "_visual->GetSDF() "  <<
-      _visual->GetSDF()->ToString("") << std::endl;;
-
-  std::cerr << "===================================" << std::endl;
-  std::cerr << "visualMsg "  <<
-      visualMsg.DebugString() << std::endl;*/
 
   std::string partName = this->partVisual->GetName();
   std::string visName = _visual->GetName();
@@ -248,11 +225,6 @@ void PartData::OnApply()
   PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
 
   this->partSDF = msgs::LinkToSDF(*generalConfig->GetData(), this->partSDF);
-
-//  std::cerr << this->partSDF->ToString("")  << std::endl;
-
-//  std::cerr << generalConfig->GetData()->DebugString() << std::endl;
-
   this->partVisual->SetWorldPose(this->GetPose());
 
   // update visuals
@@ -270,8 +242,6 @@ void PartData::OnApply()
       msgs::Visual *updateMsg = visualConfig->GetData(leafName);
       if (updateMsg)
       {
-//         std::cerr << " updateMsg " << updateMsg->DebugString() << std::endl;
-
         msgs::Visual visualMsg = it->second;
 
         // update the visualMsg that will be used to generate the sdf.
@@ -279,30 +249,8 @@ void PartData::OnApply()
         visualMsg.CopyFrom(*updateMsg);
         it->second = visualMsg;
 
-        // std::cerr << " updateMsg after " << updateMsg->DebugString() << std::endl;
-
-//        msgs::Visual msg;
-//        msg.CopyFrom(*updateMsg);
-
-
         this->visualUpdateMsgs.push_back(updateMsg);
-
-        //it->first->UpdateFromMsg(ConstVisualPtr(updateMsg));
-
       }
-/*      if (this->visuals[i]->GetMeshName() != visual->GetGeometry(i))
-      {
-        this->visuals[i]->DetachObjects();
-        this->visuals[i]->AttachMesh(visual->GetGeometry(i));
-      }
-      if (this->visuals[i]->GetMaterialName() != visual->GetMaterial(i))
-      {
-        this->visuals[i]->SetMaterial(visual->GetMaterial(i), false);
-      }
-
-      this->visuals[i]->SetPose(visual->GetPose(i));
-      this->visuals[i]->SetTransparency(visual->GetTransparency(i));
-      this->visuals[i]->SetScale(visual->GetGeometryScale(i));*/
     }
   }
 
@@ -341,8 +289,6 @@ void PartData::OnAddVisual(const std::string &_name)
   std::ostringstream visualName;
   visualName << this->partVisual->GetName() << "_" << _name;
 
-  //visualConfig->SetName(visualConfig->GetVisualCount()-1, visualName.str());
-
   rendering::VisualPtr visVisual;
   rendering::VisualPtr refVisual;
   if (!this->visuals.empty())
@@ -373,7 +319,7 @@ void PartData::OnAddVisual(const std::string &_name)
     visualMsg.set_transparency(this->visuals[refVisual].transparency());
   visualConfig->UpdateVisual(_name, &visualMsg);
   this->visuals[visVisual] = visualMsg;
-  visVisual->SetTransparency(0.4);
+  visVisual->SetTransparency(ModelData::GetEditTransparency());
 }
 
 /////////////////////////////////////////////////
@@ -418,7 +364,8 @@ void PartData::OnAddCollision(const std::string &_name)
   this->collisions[collisionVis] = collisionMsg;
 
   collisionVis->SetMaterial("Gazebo/Orange");
-  collisionVis->SetTransparency(0.8);
+  collisionVis->SetTransparency(
+      math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
 
   // fix for transparency alpha compositing
   Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
@@ -487,23 +434,10 @@ void PartData::Update()
     {
       if (it->second.name() == updateMsgPtr->name())
       {
-        //std::string origMatName = it->first->GetMaterialName();
-
         // make visual semi-transparent here
         // but generated sdf will use the correct transparency value
-        float transparency = 0.4;
-//        msgs::Material *materialMsg = updateMsgPtr->mutable_material();
-//        materialMsg->mutable_ambient()->set_a(transparency);
-//        materialMsg->mutable_diffuse()->set_a(transparency);
-//        materialMsg->mutable_specular()->set_a(transparency);
-//        materialMsg->mutable_emissive()->set_a(transparency);
-
-          //std::cerr << " updateMsg " << updateMsgPtr->DebugString() << std::endl;
         it->first->UpdateFromMsg(updateMsgPtr);
-        it->first->SetTransparency(transparency);
-//        it->first->SetScale(math::Vector3::One);
-
-        // if (it->first->GetMaterialName() != origMatName)
+        it->first->SetTransparency(ModelData::GetEditTransparency());
         break;
       }
     }

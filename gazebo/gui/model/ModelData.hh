@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,25 +39,11 @@ namespace gazebo
       /// \brief Get a template SDF string of a simple model.
       /// \return Template SDF string of a simple model.
       public: static std::string GetTemplateSDFString();
+
+      /// \brief Get the default transparency setting for entities in model
+      /// editor.
+      public: static double GetEditTransparency();
     };
-
-    /// \class CollisionData CollisionData.hh
-    /// \brief Helper class to store collision data
-    class CollisionData
-    {
-      /// \brief Constructor
-      public: CollisionData();
-
-      /// \brief Name of collision.
-      public: std::string name;
-
-      /// \brief Pose of collision.
-      public: math::Vector3 pose;
-
-      /// \brief SDF representing the visual data.
-      public: sdf::ElementPtr collisionSDF;
-    };
-
 
     /// \class PartData PartData.hh
     /// \brief Helper class to store part data
@@ -105,29 +91,6 @@ namespace gazebo
       /// \brief Update callback on PreRender.
       private: void Update();
 
-      /// \brief SDF representing the part data.
-      public: sdf::ElementPtr partSDF;
-
-      /// \brief Visual representing this part.
-      public: rendering::VisualPtr partVisual;
-
-      /// \brief Visuals of the part.
-      //public: std::map<std::string, VisualData *> visuals;
-      //public: std::vector<rendering::VisualPtr> visuals;
-      public: std::map<rendering::VisualPtr, msgs::Visual> visuals;
-
-      /// \brief Msgs for updating visuals.
-      public: std::vector<msgs::Visual *> visualUpdateMsgs;
-
-      /// \brief Msgs for updating collision visuals.
-      public: std::vector<msgs::Collision *> collisionUpdateMsgs;
-
-      /// \brief Collisions of the part.
-      public: std::map<rendering::VisualPtr, msgs::Collision> collisions;
-
-      /// \brief Inspector for configuring part properties.
-      public: PartInspector *inspector;
-
       /// \brief Qt Callback when part inspector configurations are to be
       /// applied.
       private slots: void OnApply();
@@ -153,6 +116,27 @@ namespace gazebo
 
       /// \brief Mutex to protect the list of joints
       private: boost::recursive_mutex *updateMutex;
+
+      /// \brief SDF representing the part data.
+      public: sdf::ElementPtr partSDF;
+
+      /// \brief Visual representing this part.
+      public: rendering::VisualPtr partVisual;
+
+      /// \brief Visuals of the part.
+      public: std::map<rendering::VisualPtr, msgs::Visual> visuals;
+
+      /// \brief Msgs for updating visuals.
+      public: std::vector<msgs::Visual *> visualUpdateMsgs;
+
+      /// \brief Msgs for updating collision visuals.
+      public: std::vector<msgs::Collision *> collisionUpdateMsgs;
+
+      /// \brief Collisions of the part.
+      public: std::map<rendering::VisualPtr, msgs::Collision> collisions;
+
+      /// \brief Inspector for configuring part properties.
+      public: PartInspector *inspector;
     };
   }
 }

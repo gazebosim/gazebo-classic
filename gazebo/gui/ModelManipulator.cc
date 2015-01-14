@@ -323,7 +323,6 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
   // to restrict the scaling dimensions.
   // also extended scaling to work in model editor mode by checking geometry
   // type of first visual child.
-
   if (_vis == _vis->GetRootVisual())
   {
     if (this->dataPtr->keyEvent.key == Qt::Key_Shift ||
