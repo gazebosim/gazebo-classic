@@ -222,6 +222,7 @@ namespace gazebo
     /// a common::SphericalCoordinates object.
     /// \param[out] _p A msgs::SphericalCoordinates pointer.
     /// \param[in] _v A common::SphericalCoordinates reference
+    GAZEBO_VISIBLE
     void Set(msgs::SphericalCoordinates *_s,
              const common::SphericalCoordinates &_v);
 
@@ -302,6 +303,7 @@ namespace gazebo
     /// \param[in] _sdf if supplied, performs an update from _msg intead of
     /// creating a new sdf element.
     /// \return The new SDF element.
+    GAZEBO_VISIBLE
     sdf::ElementPtr PluginToSDF(const msgs::Plugin &_plugin,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
