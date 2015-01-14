@@ -68,6 +68,20 @@ namespace gazebo
         PART_CUSTOM
       };
 
+      /// \enum SaveState
+      /// \brief Save states for the building editor.
+      private: enum SaveState
+      {
+        // NEVER_SAVED: The building has never been saved.
+        NEVER_SAVED,
+
+        // ALL_SAVED: All changes have been saved.
+        ALL_SAVED,
+
+        // UNSAVED_CHANGES: Has been saved before, but has unsaved changes.
+        UNSAVED_CHANGES
+      };
+
       /// \brief Constructor
       public: ModelCreator();
 
@@ -81,6 +95,9 @@ namespace gazebo
       /// \brief Get the name of the model.
       /// \return Name of model.
       public: std::string GetModelName() const;
+
+      /// \brief Set save state upon a change to the model.
+      public: void ModelChanged();
 
       /// \brief Callback for newing the model.
       private: void OnNew();
@@ -360,6 +377,9 @@ namespace gazebo
 
       /// \brief A dialog for setting model model name and save location.
       private: SaveDialog *saveDialog;
+
+      /// \brief Store the current save state of the model.
+      private: enum SaveState currentSaveState;
     };
     /// \}
   }

@@ -45,8 +45,8 @@
 
 #include "gazebo/gui/model/ModelData.hh"
 #include "gazebo/gui/model/JointMaker.hh"
-#include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/gui/model/ModelCreator.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -97,6 +97,10 @@ ModelCreator::ModelCreator()
   this->connections.push_back(
       gui::model::Events::ConnectExitModelEditor(
       boost::bind(&ModelCreator::OnExit, this)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectModelChanged(
+      boost::bind(&ModelCreator::ModelChanged, this)));
 
   this->connections.push_back(
       gui::Events::ConnectAlignMode(
@@ -186,27 +190,27 @@ void ModelCreator::OnNew()
   QPushButton *cancelButton = msgBox.addButton("Cancel", QMessageBox::YesRole);
   QPushButton *saveButton = msgBox.addButton("Save", QMessageBox::YesRole);
 
-//  switch (this->currentSaveState)
-//  {
-//    case ALL_SAVED:
-//    {
-//      msg.append("Are you sure you want to close this model and open a new "
-//                 "canvas?\n\n");
-//      msgBox.addButton("New Canvas", QMessageBox::ApplyRole);
-//      saveButton->hide();
-//      break;
-//    }
-//    case UNSAVED_CHANGES:
-//    case NEVER_SAVED:
-//    {
+  switch (this->currentSaveState)
+  {
+    case ALL_SAVED:
+    {
+      msg.append("Are you sure you want to close this model and open a new "
+                 "canvas?\n\n");
+      msgBox.addButton("New Canvas", QMessageBox::ApplyRole);
+      saveButton->hide();
+      break;
+    }
+    case UNSAVED_CHANGES:
+    case NEVER_SAVED:
+    {
       msg.append("You have unsaved changes. Do you want to save this model "
                  "and open a new canvas?\n\n");
       msgBox.addButton("Don't Save", QMessageBox::ApplyRole);
-//      break;
-//    }
-//    default:
-//      return;
-//  }
+      break;
+    }
+    default:
+      return;
+  }
 
   msg.append("Once you open a new canvas, your current model will no longer "
              "be editable.");
@@ -234,24 +238,22 @@ bool ModelCreator::OnSave(const std::string &_saveName)
   if (_saveName != "")
     this->SetModelName(_saveName);
 
-//  switch (this->currentSaveState)
-//  {
-//    case UNSAVED_CHANGES:
-//    {
-//      // TODO: Subtle filesystem race condition
-//      this->SaveModelFiles();
-//      AddDirToModelPaths(this->saveLocation);
-//      gui::editor::Events::saveBuildingModel(this->modelName,
-//          this->saveLocation);
-//      return true;
-//    }
-//    case NEVER_SAVED:
-//    {
+  switch (this->currentSaveState)
+  {
+    case UNSAVED_CHANGES:
+    {
+      // TODO: Subtle filesystem race condition
+      this->SaveModelFiles();
+      this->saveDialog->AddDirToModelPaths(this->saveLocation);
+      return true;
+    }
+    case NEVER_SAVED:
+    {
       return this->OnSaveAs(_saveName);
-//    }
-//    default:
-//      return false;
-//  }
+    }
+    default:
+      return false;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -277,27 +279,27 @@ void ModelCreator::OnExit()
     return;
   }
 
-//  switch (this->currentSaveState)
-//  {
-//    case ALL_SAVED:
-//    {
-//      QString msg("Once you exit the Building Editor, "
-//      "your building will no longer be editable.\n\n"
-//      "Are you ready to exit?\n\n");
-//      QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
-//      msgBox.addButton("Exit", QMessageBox::ApplyRole);
-//      QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
-//      msgBox.exec();
-//      if (msgBox.clickedButton() == cancelButton)
-//      {
-//        return;
-//      }
-//      this->FinishModel();
-//      break;
-//    }
-//    case UNSAVED_CHANGES:
-//    case NEVER_SAVED:
-//    {
+  switch (this->currentSaveState)
+  {
+    case ALL_SAVED:
+    {
+      QString msg("Once you exit the Building Editor, "
+      "your building will no longer be editable.\n\n"
+      "Are you ready to exit?\n\n");
+      QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
+      msgBox.addButton("Exit", QMessageBox::ApplyRole);
+      QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
+      msgBox.exec();
+      if (msgBox.clickedButton() == cancelButton)
+      {
+        return;
+      }
+      this->FinishModel();
+      break;
+    }
+    case UNSAVED_CHANGES:
+    case NEVER_SAVED:
+    {
       QString msg("Save Changes before exiting?\n\n"
           "Note: Once you exit the Model Editor, "
           "your model will no longer be editable.\n\n");
@@ -319,17 +321,17 @@ void ModelCreator::OnExit()
           return;
         }
       }
-//      break;
-//    }
-//    default:
-//      return;
-//  }
+      break;
+    }
+    default:
+      return;
+  }
 
-//  // Create entity on main window up to the saved point
-//  if (this->currentSaveState != NEVER_SAVED)
-      this->FinishModel();
+  // Create entity on main window up to the saved point
+  if (this->currentSaveState != NEVER_SAVED)
+    this->FinishModel();
 
-    this->Reset();
+  this->Reset();
 
 //  gui::editor::Events::newBuildingModel();
   gui::model::Events::finishModel();
@@ -340,6 +342,7 @@ void ModelCreator::SaveModelFiles()
   this->SetModelName(this->modelName);
   this->GenerateSDF();
   this->SaveToSDF(this->saveLocation);
+  this->currentSaveState = ALL_SAVED;
 }
 
 /////////////////////////////////////////////////
@@ -548,6 +551,7 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   part->kinematic = false;
 
   this->allParts[part->name] = part;
+  this->ModelChanged();
 }
 
 /////////////////////////////////////////////////
@@ -577,6 +581,7 @@ void ModelCreator::RemovePart(const std::string &_partName)
   part->partVisual.reset();
 
   this->allParts.erase(_partName);
+  this->ModelChanged();
 }
 
 /////////////////////////////////////////////////
@@ -591,6 +596,7 @@ void ModelCreator::Reset()
   g_copyAct->setEnabled(false);
   g_pasteAct->setEnabled(false);
 
+  this->currentSaveState = NEVER_SAVED;
   this->SetModelName(this->modelDefaultName);
   this->defaultPath = (QDir::homePath() + "/model_editor_models")
                         .toStdString();
@@ -635,12 +641,14 @@ std::string ModelCreator::GetModelName() const
 void ModelCreator::SetStatic(bool _static)
 {
   this->isStatic = _static;
+  this->ModelChanged();
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::SetAutoDisable(bool _auto)
 {
   this->autoDisable = _auto;
+  this->ModelChanged();
 }
 
 /////////////////////////////////////////////////
@@ -1299,4 +1307,11 @@ void ModelCreator::OnSetSelectedEntity(const std::string &/*_name*/,
     const std::string &/*_mode*/)
 {
   this->DeselectAll();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::ModelChanged()
+{
+  if (this->currentSaveState != NEVER_SAVED)
+    this->currentSaveState = UNSAVED_CHANGES;
 }

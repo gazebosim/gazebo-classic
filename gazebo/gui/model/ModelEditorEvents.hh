@@ -97,6 +97,19 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { exitModelEditor.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the model changed signal
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectModelChanged(T _subscriber)
+          { return modelChanged.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the model changed signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectModelChanged(
+            event::ConnectionPtr _subscriber)
+          { modelChanged.Disconnect(_subscriber); }
+
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishModel;
 
@@ -111,6 +124,9 @@ namespace gazebo
 
         /// \brief Exit the editor mode with the option to save
         public: static event::EventT<void ()> exitModelEditor;
+
+        /// \brief Model has been changed
+        public: static event::EventT<void ()> modelChanged;
       };
     }
   }

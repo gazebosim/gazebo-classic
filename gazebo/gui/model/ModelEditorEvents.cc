@@ -25,3 +25,4 @@ event::EventT<bool (std::string)> model::Events::saveAsModelEditor;
 event::EventT<bool (std::string)> model::Events::saveModelEditor;
 event::EventT<void ()> model::Events::newModelEditor;
 event::EventT<void ()> model::Events::exitModelEditor;
+event::EventT<void ()> model::Events::modelChanged;
