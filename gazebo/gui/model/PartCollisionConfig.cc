@@ -134,7 +134,6 @@ void PartCollisionConfig::AddCollision(const std::string &_name,
 
   ConfigWidget *configWidget = new ConfigWidget;
 
-
   msgs::Collision msgToLoad;
   if (_collisionMsg)
     msgToLoad = *_collisionMsg;

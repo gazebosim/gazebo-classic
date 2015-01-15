@@ -72,7 +72,7 @@ void ConfigWidget::Load(const google::protobuf::Message *_msg)
 void ConfigWidget::UpdateFromMsg(const google::protobuf::Message *_msg)
 {
   this->configMsg->CopyFrom(*_msg);
-  this->Parse(this->configMsg);
+  this->Parse(this->configMsg, true);
 }
 
 /////////////////////////////////////////////////
@@ -380,7 +380,7 @@ std::string ConfigWidget::GetGeometryWidgetValue(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
+QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
     const std::string &_name)
 {
   std::vector<QWidget *> newWidgets;
@@ -408,6 +408,9 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
     // TODO parse repeated fields and enum fields.
     if (!field->is_repeated())
     {
+      if (_update && !ref->HasField(*_msg, field))
+        continue;
+
       QWidget *newFieldWidget = NULL;
       ConfigChildWidget *configChildWidget = NULL;
 
@@ -702,7 +705,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
           else
           {
             // parse the message fields recursively
-            QWidget *groupBoxWidget = Parse(valueMsg, scopedName);
+            QWidget *groupBoxWidget = Parse(valueMsg, _update, scopedName);
             if (groupBoxWidget)
             {
               newFieldWidget = new ConfigChildWidget();
