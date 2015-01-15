@@ -5,13 +5,9 @@ package gazebo.msgs;
 /// \brief A message containing a description of a scene
 
 
-import "header.proto";
 import "color.proto";
 import "fog.proto";
 import "sky.proto";
-import "shadows.proto";
-import "visual.proto";
-import "pose.proto";
 import "light.proto";
 import "joint.proto";
 import "model.proto";
