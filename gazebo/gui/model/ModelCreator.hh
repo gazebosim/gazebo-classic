@@ -106,14 +106,12 @@ namespace gazebo
       private: void SaveModelFiles();
 
       /// \brief Callback for saving the model.
-      /// \param[in] _saveName Name to save the model.
       /// \return True if the user chose to save, false if the user cancelled.
-      private: bool OnSave(const std::string &_saveName = "");
+      private: bool OnSave();
 
       /// \brief Callback for selecting a folder and saving the model.
-      /// \param[in] _saveName Name to save the model.
       /// \return True if the user chose to save, false if the user cancelled.
-      private: bool OnSaveAs(const std::string &_saveName);
+      private: bool OnSaveAs();
 
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
@@ -168,10 +166,6 @@ namespace gazebo
       /// \brief Set the model to allow auto disable at rest.
       /// \param[in] _auto True to allow the model to auto disable.
       public: void SetAutoDisable(bool _auto);
-
-      /// \brief Save model to SDF format.
-      /// \param[in] _savePath Path to save the SDF to.
-      public: void SaveToSDF(const std::string &_savePath);
 
       /// \brief Reset the model creator and the SDF.
       public: void Reset();
@@ -286,6 +280,9 @@ namespace gazebo
       /// \brief Name of the model.
       private: std::string modelName;
 
+      /// \brief TODO
+      private: std::string folderName;
+
       /// \brief Name of the model preview.
       private: static const std::string previewName;
 
@@ -365,12 +362,6 @@ namespace gazebo
 
       /// \brief Current model manipulation mode.
       private: std::string manipMode;
-
-      /// \brief Default directory to save models: ~/model_editor_models
-      private: std::string defaultPath;
-
-      /// \brief Path to where the model is saved.
-      private: std::string saveLocation;
 
       /// \brief Default name of model model
       private: static const std::string modelDefaultName;

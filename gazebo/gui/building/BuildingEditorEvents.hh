@@ -320,8 +320,7 @@ namespace gazebo
             colorSelected;
 
         /// \brief A model has been saved with a name and a location
-        public: static event::EventT<void (std::string, std::string)>
-            saveBuildingModel;
+        public: static event::EventT<void (std::string)> saveBuildingModel;
 
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishBuildingModel;
@@ -358,10 +357,10 @@ namespace gazebo
         public: static event::EventT<void (double)> changeBuildingEditorZoom;
 
         /// \brief Save the model
-        public: static event::EventT<bool (std::string)> saveBuildingEditor;
+        public: static event::EventT<bool ()> saveBuildingEditor;
 
         /// \brief Save the model as
-        public: static event::EventT<bool (std::string)> saveAsBuildingEditor;
+        public: static event::EventT<bool ()> saveAsBuildingEditor;
 
         /// \brief Make a new model
         public: static event::EventT<void ()> newBuildingEditor;

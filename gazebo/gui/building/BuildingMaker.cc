@@ -55,36 +55,8 @@ const std::string BuildingMaker::buildingDefaultName = "Untitled";
 const std::string BuildingMaker::previewName = "BuildingPreview";
 
 /////////////////////////////////////////////////
-// Helper function to generate a valid folder name from a human-readable model
-// name.
-std::string GetFolderNameFromModelName(const std::string &_modelName)
-{
-  // Auto-generate folder name based on model name
-  std::string foldername = _modelName;
-
-  std::vector<std::pair<std::string, std::string> > replacePairs;
-  replacePairs.push_back(std::pair<std::string, std::string>(" ", "_"));
-
-  for (unsigned int i = 0; i < replacePairs.size(); ++i)
-  {
-    std::string forbiddenChar = replacePairs[i].first;
-    std::string replaceChar = replacePairs[i].second;
-    size_t index = foldername.find(forbiddenChar);
-    while (index != std::string::npos)
-    {
-      foldername.replace(index, forbiddenChar.size(), replaceChar);
-      index = foldername.find(forbiddenChar);
-    }
-  }
-
-  return foldername;
-}
-
-/////////////////////////////////////////////////
 BuildingMaker::BuildingMaker() : EntityMaker()
 {
-  this->modelName = this->buildingDefaultName;
-
   this->conversionScale = 0.01;
 
   // Counters are only used for giving visuals unique names.
@@ -102,10 +74,10 @@ BuildingMaker::BuildingMaker() : EntityMaker()
 
   this->connections.push_back(
     gui::editor::Events::ConnectSaveBuildingEditor(
-      boost::bind(&BuildingMaker::OnSave, this, _1)));
+      boost::bind(&BuildingMaker::OnSave, this)));
   this->connections.push_back(
     gui::editor::Events::ConnectSaveAsBuildingEditor(
-      boost::bind(&BuildingMaker::OnSaveAs, this, _1)));
+      boost::bind(&BuildingMaker::OnSaveAs, this)));
   this->connections.push_back(
     gui::editor::Events::ConnectNewBuildingEditor(
       boost::bind(&BuildingMaker::OnNew, this)));
@@ -126,6 +98,8 @@ BuildingMaker::BuildingMaker() : EntityMaker()
       boost::bind(&BuildingMaker::OnEdit, this, _1)));
 
   this->saveDialog = new SaveDialog(SaveDialog::BUILDING);
+
+  this->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -278,7 +252,7 @@ void BuildingMaker::DetachAllChildren(const std::string &_manip)
 std::string BuildingMaker::CreateModel()
 {
   this->Reset();
-  return this->modelName;
+  return this->folderName;
 }
 
 /////////////////////////////////////////////////
@@ -616,10 +590,6 @@ void BuildingMaker::Reset()
 
   this->currentSaveState = NEVER_SAVED;
   this->SetModelName(this->buildingDefaultName);
-  this->defaultPath = (QDir::homePath() + "/building_editor_models")
-                        .toStdString();
-  this->saveLocation = defaultPath + "/" +
-                        GetFolderNameFromModelName(this->modelName);
 
   this->previewVisual.reset(new rendering::Visual(this->previewName,
       scene->GetWorldVisual()));
@@ -646,27 +616,18 @@ void BuildingMaker::SetModelName(const std::string &_modelName)
 {
   this->modelName = _modelName;
   this->saveDialog->SetModelName(_modelName);
-  this->BuildingChanged();
-  // send to palette?
-}
 
-/////////////////////////////////////////////////
-void BuildingMaker::SaveToSDF(const std::string &_savePath)
-{
-  std::ofstream savefile;
-  boost::filesystem::path path(_savePath);
-  path = path / "model.sdf";
+  this->folderName = this->saveDialog->
+      GetFolderNameFromModelName(this->modelName);
 
-  // FIXME
-  savefile.open(path.string().c_str());
-  if (!savefile.is_open())
+  if (this->currentSaveState == NEVER_SAVED)
   {
-    gzerr << "Couldn't open file for writing: " << path.string() << std::endl;
-    return;
+    // Set new saveLocation
+    boost::filesystem::path oldPath(this->saveDialog->GetSaveLocation());
+
+    boost::filesystem::path newPath = oldPath.parent_path() / this->folderName;
+    this->saveDialog->SetSaveLocation(newPath.string());
   }
-  savefile << this->modelSDF->ToString();
-  savefile.close();
-  gzdbg << "Saved file to " << path.string() << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -708,8 +669,7 @@ void BuildingMaker::GenerateSDF()
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;
 
-  modelElem->GetAttribute("name")->Set(
-      GetFolderNameFromModelName(this->modelName));
+  modelElem->GetAttribute("name")->Set(this->folderName);
   math::Pose modelOrigin(
       this->previewVisual->GetBoundingBox().GetCenter().x,
       this->previewVisual->GetBoundingBox().GetCenter().y, 0, 0, 0, 0);
@@ -1030,7 +990,7 @@ void BuildingMaker::GenerateSDFWithCSG()
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;
 
-  modelElem->GetAttribute("name")->Set(this->modelName);
+  modelElem->GetAttribute("name")->Set(this->folderName);
 
   std::map<std::string, BuildingModelManip *>::iterator itemsIt;
   for (itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
@@ -1141,7 +1101,7 @@ void BuildingMaker::GenerateSDFWithCSG()
       visGeomElem->ClearElements();
       sdf::ElementPtr meshElem = visGeomElem->AddElement("mesh");
       // TODO create the folder
-      std::string uri = "model://" + this->modelName + "/meshes/"
+      std::string uri = "model://" + this->folderName + "/meshes/"
           + booleanMeshName;
       meshElem->GetElement("uri")->Set(uri);
       visualElem->GetElement("pose")->Set(visual->GetPose());
@@ -1548,7 +1508,7 @@ void BuildingMaker::OnNew()
   {
     if (msgBox.clickedButton() == saveButton)
     {
-      if (!this->OnSave(this->modelName))
+      if (!this->OnSave())
       {
         return;
       }
@@ -1561,32 +1521,28 @@ void BuildingMaker::OnNew()
 
 void BuildingMaker::SaveModelFiles()
 {
-  this->SetModelName(this->modelName);
+  this->saveDialog->GenerateConfig();
+  this->saveDialog->SaveToConfig();
   this->GenerateSDF();
-  this->SaveToSDF(this->saveLocation);
+  this->saveDialog->SaveToSDF(this->modelSDF);
   this->currentSaveState = ALL_SAVED;
 }
 
 /////////////////////////////////////////////////
-bool BuildingMaker::OnSave(const std::string &_saveName)
+bool BuildingMaker::OnSave()
 {
-  if (_saveName != "")
-    this->SetModelName(_saveName);
-
   switch (this->currentSaveState)
   {
     case UNSAVED_CHANGES:
     {
       // TODO: Subtle filesystem race condition
       this->SaveModelFiles();
-      this->saveDialog->AddDirToModelPaths(this->saveLocation);
-      gui::editor::Events::saveBuildingModel(this->modelName,
-          this->saveLocation);
+      gui::editor::Events::saveBuildingModel(this->modelName);
       return true;
     }
     case NEVER_SAVED:
     {
-      return this->OnSaveAs(_saveName);
+      return this->OnSaveAs();
     }
     default:
       return false;
@@ -1594,15 +1550,18 @@ bool BuildingMaker::OnSave(const std::string &_saveName)
 }
 
 /////////////////////////////////////////////////
-bool BuildingMaker::OnSaveAs(const std::string &_saveName)
+bool BuildingMaker::OnSaveAs()
 {
-  if (this->saveDialog->OnSaveAs(_saveName))
+  if (this->saveDialog->OnSaveAs())
   {
-    this->modelName = this->saveDialog->GetModelName();
-    this->saveLocation = this->saveDialog->GetSaveLocation();
+    // Prevent changing save location
+    this->currentSaveState = ALL_SAVED;
+    // Get name set by user
+    this->SetModelName(this->saveDialog->GetModelName());
+    // Update name on palette
+    gui::editor::Events::saveBuildingModel(this->modelName);
+    // Generate and save files
     this->SaveModelFiles();
-    gui::editor::Events::saveBuildingModel(this->modelName,
-        this->saveDialog->GetSaveLocation());
     return true;
   }
   return false;
@@ -1612,21 +1571,9 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
 void BuildingMaker::OnNameChanged(const std::string &_name)
 {
   if (_name.compare(this->modelName) == 0)
-  {
     return;
-  }
+
   this->SetModelName(_name);
-
-  if (this->currentSaveState == NEVER_SAVED)
-  {
-    // Set new saveLocation
-    boost::filesystem::path oldPath(this->saveLocation);
-
-    boost::filesystem::path newPath = oldPath.parent_path() /
-          GetFolderNameFromModelName(_name);
-    this->saveLocation = newPath.string();
-  }
-
   this->BuildingChanged();
 }
 
@@ -1678,7 +1625,7 @@ void BuildingMaker::OnExit()
 
       if (msgBox.clickedButton() == saveButton)
       {
-        if (!this->OnSave(this->modelName))
+        if (!this->OnSave())
         {
           return;
         }

@@ -58,7 +58,6 @@ const std::string ModelCreator::previewName = "ModelPreview";
 ModelCreator::ModelCreator()
 {
   this->active = false;
-  this->modelName = this->modelDefaultName;
 
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
@@ -84,11 +83,11 @@ ModelCreator::ModelCreator()
 
   this->connections.push_back(
       gui::model::Events::ConnectSaveModelEditor(
-      boost::bind(&ModelCreator::OnSave, this, _1)));
+      boost::bind(&ModelCreator::OnSave, this)));
 
   this->connections.push_back(
       gui::model::Events::ConnectSaveAsModelEditor(
-      boost::bind(&ModelCreator::OnSaveAs, this, _1)));
+      boost::bind(&ModelCreator::OnSaveAs, this)));
 
   this->connections.push_back(
       gui::model::Events::ConnectNewModelEditor(
@@ -222,7 +221,7 @@ void ModelCreator::OnNew()
   {
     if (msgBox.clickedButton() == saveButton)
     {
-      if (!this->OnSave(this->modelName))
+      if (!this->OnSave())
       {
         return;
       }
@@ -233,23 +232,18 @@ void ModelCreator::OnNew()
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnSave(const std::string &_saveName)
+bool ModelCreator::OnSave()
 {
-  if (_saveName != "")
-    this->SetModelName(_saveName);
-
   switch (this->currentSaveState)
   {
     case UNSAVED_CHANGES:
     {
-      // TODO: Subtle filesystem race condition
       this->SaveModelFiles();
-      this->saveDialog->AddDirToModelPaths(this->saveLocation);
       return true;
     }
     case NEVER_SAVED:
     {
-      return this->OnSaveAs(_saveName);
+      return this->OnSaveAs();
     }
     default:
       return false;
@@ -257,12 +251,15 @@ bool ModelCreator::OnSave(const std::string &_saveName)
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnSaveAs(const std::string &_saveName)
+bool ModelCreator::OnSaveAs()
 {
-  if (this->saveDialog->OnSaveAs(_saveName))
+  if (this->saveDialog->OnSaveAs())
   {
-    this->modelName = this->saveDialog->GetModelName();
-    this->saveLocation = this->saveDialog->GetSaveLocation();
+    // Prevent changing save location
+    this->currentSaveState = ALL_SAVED;
+    // Get name set by user
+    this->SetModelName(this->saveDialog->GetModelName());
+    // Generate and save files
     this->SaveModelFiles();
     return true;
   }
@@ -316,7 +313,7 @@ void ModelCreator::OnExit()
 
       if (msgBox.clickedButton() == saveButton)
       {
-        if (!this->OnSave(this->modelName))
+        if (!this->OnSave())
         {
           return;
         }
@@ -337,11 +334,13 @@ void ModelCreator::OnExit()
   gui::model::Events::finishModel();
 }
 
+/////////////////////////////////////////////////
 void ModelCreator::SaveModelFiles()
 {
-  this->SetModelName(this->modelName);
+  this->saveDialog->GenerateConfig();
+  this->saveDialog->SaveToConfig();
   this->GenerateSDF();
-  this->SaveToSDF(this->saveLocation);
+  this->saveDialog->SaveToSDF(this->modelSDF);
   this->currentSaveState = ALL_SAVED;
 }
 
@@ -349,7 +348,7 @@ void ModelCreator::SaveModelFiles()
 std::string ModelCreator::CreateModel()
 {
   this->Reset();
-  return this->modelName;
+  return this->folderName;
 }
 
 /////////////////////////////////////////////////
@@ -598,10 +597,6 @@ void ModelCreator::Reset()
 
   this->currentSaveState = NEVER_SAVED;
   this->SetModelName(this->modelDefaultName);
-  this->defaultPath = (QDir::homePath() + "/model_editor_models")
-                        .toStdString();
-//  this->saveLocation = defaultPath + "/" +
-//                        GetFolderNameFromModelName(this->modelName);
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
@@ -629,6 +624,18 @@ void ModelCreator::SetModelName(const std::string &_modelName)
 {
   this->modelName = _modelName;
   this->saveDialog->SetModelName(_modelName);
+
+  this->folderName = this->saveDialog->
+      GetFolderNameFromModelName(this->modelName);
+
+  if (this->currentSaveState == NEVER_SAVED)
+  {
+    // Set new saveLocation
+    boost::filesystem::path oldPath(this->saveDialog->GetSaveLocation());
+
+    boost::filesystem::path newPath = oldPath.parent_path() / this->folderName;
+    this->saveDialog->SetSaveLocation(newPath.string());
+  }
 }
 
 /////////////////////////////////////////////////
@@ -649,26 +656,6 @@ void ModelCreator::SetAutoDisable(bool _auto)
 {
   this->autoDisable = _auto;
   this->ModelChanged();
-}
-
-/////////////////////////////////////////////////
-void ModelCreator::SaveToSDF(const std::string &_savePath)
-{
-  std::ofstream savefile;
-  boost::filesystem::path path(_savePath);
-  path = path / "model.sdf";
-
-  // FIXME
-  savefile.open(path.string().c_str());
-  if (!savefile.is_open())
-  {
-    gzerr << "Couldn't open file for writing: " << path.string() << std::endl;
-    return;
-  }
-
-  savefile << this->modelSDF->ToString();
-  savefile.close();
-  gzdbg << "Saved file to " << path.string() << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -1147,7 +1134,7 @@ void ModelCreator::GenerateSDF()
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;
 
-  modelElem->GetAttribute("name")->Set(this->modelName);
+  modelElem->GetAttribute("name")->Set(this->folderName);
 
   boost::unordered_map<std::string, PartData *>::iterator partsIt;
 

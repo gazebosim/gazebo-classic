@@ -32,12 +32,12 @@ using namespace gui;
 SaveDialog::SaveDialog(int _mode, QWidget *_parent)
   : QDialog(_parent)
 {
-  this->setObjectName("SaveDialog");
+  this->setObjectName("saveDialog");
   this->setWindowTitle(tr("Save Model"));
 
   this->messageLabel = new QLabel;
   this->messageLabel->setText(
-      tr("Pick a location for your model \"Untitled\":\n"));
+      tr("Pick a location for your model:\n"));
 
   QLabel *modelLabel = new QLabel;
   modelLabel->setText(tr("Model Name: "));
@@ -209,9 +209,6 @@ std::string SaveDialog::GetVersion() const
 void SaveDialog::SetModelName(const std::string &_name)
 {
   this->modelNameLineEdit->setText(tr(_name.c_str()));
-  std::string label = "Pick a location for your model \""
-                      + _name + "\":\n";
-  this->messageLabel->setText(QString(label.c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -243,10 +240,8 @@ void SaveDialog::OnSave()
 }
 
 /////////////////////////////////////////////////
-bool SaveDialog::OnSaveAs(const std::string &_saveName)
+bool SaveDialog::OnSaveAs()
 {
-  this->SetModelName(_saveName);
-
   if (this->exec() == QDialog::Accepted)
   {
     if (this->GetModelName().size() == 0)
@@ -255,7 +250,7 @@ bool SaveDialog::OnSaveAs(const std::string &_saveName)
                        QString("Please give your model a non-empty name."));
 
       msgBox.exec();
-      return this->OnSaveAs(_saveName);
+      return this->OnSaveAs();
     }
     if (this->GetSaveLocation().size() == 0)
     {
@@ -263,12 +258,12 @@ bool SaveDialog::OnSaveAs(const std::string &_saveName)
              QString("Please give a path to where your model will be saved."));
 
       msgBox.exec();
-      return this->OnSaveAs(_saveName);
+      return this->OnSaveAs();
     }
 
-    // Parse saveLocation and set model name
-    boost::filesystem::path saveLocPath(this->GetSaveLocation());
-    this->SetModelName(saveLocPath.filename().string());
+//    // Parse saveLocation and set model name
+//    boost::filesystem::path saveLocPath(this->GetSaveLocation());
+//    this->SetModelName(saveLocPath.filename().string());
 
     boost::filesystem::path path;
     path = path / this->GetSaveLocation();
@@ -303,15 +298,11 @@ bool SaveDialog::OnSaveAs(const std::string &_saveName)
       msgBox.exec();
       if (msgBox.clickedButton() != saveButton)
       {
-        return this->OnSaveAs(this->GetModelName());
+        return this->OnSaveAs();
       }
     }
 
     this->AddDirToModelPaths(this->GetSaveLocation());
-
-    this->GenerateConfig();
-    this->SaveToConfig(this->GetSaveLocation());
-
     return true;
   }
   return false;
@@ -381,14 +372,14 @@ std::string SaveDialog::GetTemplateConfigString()
   std::ostringstream newModelStr;
   newModelStr << "<?xml version=\"1.0\"?>"
   << "<model>"
-  <<   "<name>building_template_model</name>"
+  <<   "<name>template_model</name>"
   <<   "<version>1.0</version>"
   <<   "<sdf version=\"1.5\">model.sdf</sdf>"
   <<   "<author>"
   <<     "<name>author_name</name>"
   <<     "<email>author_email</email>"
   <<   "</author>"
-  <<   "<description>Made with the Gazebo Building Editor</description>"
+  <<   "<description>Made with Gazebo</description>"
   << "</model>";
   return newModelStr.str();
 }
@@ -463,12 +454,58 @@ void SaveDialog::GenerateConfig()
 }
 
 /////////////////////////////////////////////////
-void SaveDialog::SaveToConfig(const std::string &_savePath)
+void SaveDialog::SaveToConfig()
 {
-  boost::filesystem::path path(_savePath);
+  boost::filesystem::path path(this->GetSaveLocation());
   path = path / "model.config";
   const char* modelConfigString = path.string().c_str();
 
   this->modelConfig.SaveFile(modelConfigString);
   gzdbg << "Saved file to " << modelConfigString << std::endl;
+}
+
+/////////////////////////////////////////////////
+void SaveDialog::SaveToSDF(sdf::SDFPtr _modelSDF)
+{
+  std::ofstream savefile;
+  boost::filesystem::path path(this->GetSaveLocation());
+  path = path / "model.sdf";
+
+  // FIXME
+  savefile.open(path.string().c_str());
+  if (!savefile.is_open())
+  {
+    gzerr << "Couldn't open file for writing: " << path.string() << std::endl;
+    return;
+  }
+  savefile << _modelSDF->ToString();
+  savefile.close();
+  gzdbg << "Saved file to " << path.string() << std::endl;
+  this->AddDirToModelPaths(this->GetSaveLocation());
+}
+
+/////////////////////////////////////////////////
+// Helper function to generate a valid folder name from a human-readable model
+// name.
+std::string SaveDialog::GetFolderNameFromModelName(const std::string &_modelName)
+{
+  // Auto-generate folder name based on model name
+  std::string foldername = _modelName;
+
+  std::vector<std::pair<std::string, std::string> > replacePairs;
+  replacePairs.push_back(std::pair<std::string, std::string>(" ", "_"));
+
+  for (unsigned int i = 0; i < replacePairs.size(); ++i)
+  {
+    std::string forbiddenChar = replacePairs[i].first;
+    std::string replaceChar = replacePairs[i].second;
+    size_t index = foldername.find(forbiddenChar);
+    while (index != std::string::npos)
+    {
+      foldername.replace(index, forbiddenChar.size(), replaceChar);
+      index = foldername.find(forbiddenChar);
+    }
+  }
+
+  return foldername;
 }

@@ -114,10 +114,10 @@ namespace gazebo
         public: static event::EventT<void ()> finishModel;
 
         /// \brief Save the model
-        public: static event::EventT<bool (std::string)> saveModelEditor;
+        public: static event::EventT<bool ()> saveModelEditor;
 
         /// \brief Save the model as
-        public: static event::EventT<bool (std::string)> saveAsModelEditor;
+        public: static event::EventT<bool ()> saveAsModelEditor;
 
         /// \brief Make a new model
         public: static event::EventT<void ()> newModelEditor;

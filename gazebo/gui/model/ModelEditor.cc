@@ -181,13 +181,13 @@ ModelEditor::~ModelEditor()
 ////////////////////////////////////////////////
 void ModelEditor::Save()
 {
-  gui::model::Events::saveModelEditor("AAA");
+  gui::model::Events::saveModelEditor();
 }
 
 ////////////////////////////////////////////////
 void ModelEditor::SaveAs()
 {
-  gui::model::Events::saveAsModelEditor("BBB");
+  gui::model::Events::saveAsModelEditor();
 }
 
 /////////////////////////////////////////////////

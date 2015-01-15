@@ -88,6 +88,10 @@ namespace gazebo
       /// \brief TODO
       public: void AddDirToModelPaths(const std::string& _path);
 
+       /// \brief TODO
+      public: std::string GetFolderNameFromModelName(const std::string
+          &_modelName);
+
       /// \brief Qt callback when the file directory browse button is pressed.
       private slots: void OnBrowse();
 
@@ -100,7 +104,7 @@ namespace gazebo
       /// \brief Callback for selecting a folder and saving the model.
       /// \param[in] _saveName Name to save the model.
       /// \return True if the user chose to save, false if the user cancelled.
-      public: bool OnSaveAs(const std::string &_saveName);
+      public: bool OnSaveAs();
 
       /// \brief Get a template config file for a simple model.
       private: std::string GetTemplateConfigString();
@@ -109,8 +113,11 @@ namespace gazebo
       public: void GenerateConfig();
 
       /// \brief Save config file.
-      /// \param[in] _savePath Path to save the file to.
-      public: void SaveToConfig(const std::string &_savePath);
+      public: void SaveToConfig();
+
+      /// \brief Save model to SDF format.
+      /// \param[in] TODO
+      public: void SaveToSDF(sdf::SDFPtr _modelSDF);
 
       /// \brief Qt callback to show/hide advanced model saving options.
       private slots: void ToggleAdvancedOptions(bool _checked);
