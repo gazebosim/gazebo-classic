@@ -101,16 +101,15 @@ void CubicBezier(const math::Vector2d &p0,
 {
   // double step = GetStepLength(p0, p1, p2, p3, resolution);
   double step = resolution;
-//  std::cout << "bezier " << step << std::endl;
+  // std::cout << "bezier " << step << std::endl;
   double t = 0;
-
-  math::Vector2d p = bezierInterpolate(t, p0, p1, p2, p3);
-  points.push_back(p);
+//  math::Vector2d p = bezierInterpolate(t, p0, p1, p2, p3);
+//  points.push_back(p);
 
   while (t < 1.0)
   {
     t += step;
-    p = bezierInterpolate(t, p0, p1, p2, p3);
+    auto p = bezierInterpolate(t, p0, p1, p2, p3);
     points.push_back(p);
   }
 std::cout << "done" << std::endl;
@@ -455,13 +454,33 @@ void SVGLoader::Parse(const std::string &_filename, std::vector<SVGPath> &paths)
 
 /////////////////////////////////////////////////
 void SVGLoader::DumpPaths(const std::vector<SVGPath> paths ) const
-{
+{   
+
+  for (SVGPath path : paths)
+  {
+    std::cout << "// Path : " <<  path.id << std::endl;
+    for (auto subpath :path.subpaths)
+    {
+      std::cout << "// subpath" << std::endl;  
+      for (auto cmd : subpath)
+      {
+         std::cout << "// " << cmd.type << std::endl << "//  ";
+         for (auto n : cmd.numbers)
+         {
+            std::cout << " " << n;
+         }
+         std::cout << std::endl;
+      }
+    }
+  }
+
   std::cout << "var svg = [];" << std::endl;
   for (SVGPath path : paths)
   {
     std::cout << "svg.push({name:\"" << path.id <<  "\", subpaths:[], style: \"" << path.style << "\"}); " << std::endl;
     std::cout << "svg[svg.length-1].subpaths = [";
     char psep = ' ';
+
     for (unsigned int i=0; i < path.polylines.size(); i++)
     {
       std::vector<math::Vector2d> poly = path.polylines[i];
