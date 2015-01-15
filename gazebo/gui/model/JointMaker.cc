@@ -310,7 +310,7 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  math::Vector3 origin = this->GetPartWorldCentroid(_parent)
+  math::Vector3 origin = _parent->GetWorldPose().pos
       - _parent->GetParent()->GetWorldPose().pos;
   jointLine->AddPoint(origin);
   jointLine->AddPoint(origin + math::Vector3(0, 0, 0.1));
@@ -644,19 +644,17 @@ void JointMaker::Update()
 
         if (joint->dirty || poseUpdate)
         {
-          // get centroid of parent part visuals
-          math::Vector3 parentCentroid =
-              this->GetPartWorldCentroid(joint->parent);
+          // get origin of parent part visuals
+          math::Vector3 parentOrigin = joint->parent->GetWorldPose().pos;
 
-          // get centroid of child part visuals
-          math::Vector3 childCentroid =
-              this->GetPartWorldCentroid(joint->child);
+          // get origin of child part visuals
+          math::Vector3 childOrigin = joint->child->GetWorldPose().pos;
 
           // set orientation of joint hotspot
-          math::Vector3 dPos = (childCentroid - parentCentroid);
+          math::Vector3 dPos = (childOrigin - parentOrigin);
           math::Vector3 center = dPos/2.0;
           joint->hotspot->SetScale(math::Vector3(0.02, 0.02, dPos.GetLength()));
-          joint->hotspot->SetWorldPosition(parentCentroid + center);
+          joint->hotspot->SetWorldPosition(parentOrigin + center);
           math::Vector3 u = dPos.Normalize();
           math::Vector3 v = math::Vector3::UnitZ;
           double cosTheta = v.Dot(u);
@@ -686,7 +684,7 @@ void JointMaker::Update()
 
           // set pos of joint handle
           joint->handles->getBillboard(0)->setPosition(
-              rendering::Conversions::Convert(parentCentroid -
+              rendering::Conversions::Convert(parentOrigin -
               joint->hotspot->GetWorldPose().pos));
           joint->handles->_updateBounds();
         }
@@ -755,7 +753,7 @@ void JointMaker::Update()
           }
 
           // Line now connects the child link to the joint frame
-          joint->line->SetPoint(0, this->GetPartWorldCentroid(joint->child));
+          joint->line->SetPoint(0, joint->child->GetWorldPose().pos);
           joint->line->SetPoint(1, joint->jointVisual->GetWorldPose().pos);
           joint->line->setMaterial(this->jointMaterials[joint->type]);
           joint->dirty = false;
