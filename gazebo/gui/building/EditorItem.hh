@@ -206,6 +206,12 @@ namespace gazebo
       /// \param[in] _texture Texture.
       private slots: void OnTextureChanged(QString _texture);
 
+      /// \brief Z ordering of the rect item when idle (unselected.)
+      public: int zValueIdle;
+
+      /// \brief Z ordering of the rect item when selected.
+      public: int zValueSelected;
+
       /// \brief Type of editor item.
       protected: std::string editorType;
 
