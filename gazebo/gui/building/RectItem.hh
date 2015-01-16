@@ -269,9 +269,6 @@ namespace gazebo
       /// towards each end of this item's parent wall.
       protected: std::vector<MeasureItem *> measures;
 
-      /// \brief Scale for converting from pixel to metric units.
-      protected: double scale;
-
       /// \brief Mouse press position in pixel coordinates.
       private: QPointF mousePressPos;
 
