@@ -12,7 +12,7 @@
 @echo - script path is %gz_root_path%
 @echo - dependencies path is %deps_path%
 
-@set HOME=%HOMEPATH%
+@set HOME=%HOMEDRIVE%%HOMEPATH%
 
 @set GAZEBO_MODEL_PATH=%gz_root_path%\models
 @set GAZEBO_PLUGINS_PATH=%gz_build_path%\plugins
