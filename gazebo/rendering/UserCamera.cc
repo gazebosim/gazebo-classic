@@ -552,16 +552,17 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
   Camera::SetRenderTarget(_target);
 
-  // is 0.03m the stereo baseline?
-  Ogre::Vector2 offset(0.03f, 0.0f);
-  float focalLength = 1.0;
-
-  this->camera->setFocalLength(focalLength);
-  this->camera->setFrustumOffset(offset);
-  this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
-
+  // Setup stereo rendering viewports
   if (this->dataPtr->stereoEnabled)
   {
+    float focalLength = 1.0;
+
+    // Defaulting to 0.03m stereo baseline.
+    Ogre::Vector2 offset(0.03f, 0.0f);
+
+    this->camera->setFocalLength(focalLength);
+    this->camera->setFrustumOffset(offset);
+
     this->dataPtr->rightCamera->setFocalLength(focalLength);
     this->dataPtr->rightCamera->setFrustumOffset(-offset);
 
@@ -577,6 +578,8 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     this->dataPtr->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
   }
+
+  this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
 
   this->initialized = true;
 

@@ -116,7 +116,7 @@ void SpaceNav::Run()
         break;
 
       case SPNAV_EVENT_BUTTON:
-        // update if button pressed
+        // update button press
         this->dataPtr->buttons[sev.button.bnum] = sev.button.press;
         joystickMsg.mutable_buttons()->Set(sev.button.bnum, sev.button.press);
         this->dataPtr->joyPub->Publish(joystickMsg);

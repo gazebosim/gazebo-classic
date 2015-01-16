@@ -750,7 +750,7 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
 
   if (_scene->GetUserCameraCount() == 0)
     this->userCamera = _scene->CreateUserCamera(cameraName,
-        gazebo::gui::getINIProperty<int>("rendering.stereo"));
+        gazebo::gui::getINIProperty<int>("rendering.stereo", 0));
   else
     this->userCamera = _scene->GetUserCamera(0);
 
