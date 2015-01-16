@@ -21,7 +21,6 @@
 
 #include "gazebo/common/Exception.hh"
 
-#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -1940,9 +1939,7 @@ void BuildingMaker::OnColorSelected(QColor _color)
 void BuildingMaker::OnTextureSelected(QString _texture)
 {
   this->selectedColor = QColor::Invalid;
-
-  if (_texture != QString(""))
-    this->selectedTexture = _texture;
+  this->selectedTexture = _texture;
 }
 
 /////////////////////////////////////////////////
@@ -2014,6 +2011,7 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
           material = "Gazebo/Bricks";
 
         this->hoverVis->SetMaterial(material);
+        this->hoverVis->SetAmbient((*it).second->GetColor());
       }
 
       this->hoverVis->SetTransparency(0);

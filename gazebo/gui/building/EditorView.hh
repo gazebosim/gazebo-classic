@@ -188,11 +188,10 @@ namespace gazebo
       /// \param[in] _color Selected color.
       private: void OnColorSelected(QColor _color);
 
-      /// \brief TODO
+      /// \brief Callback triggered when the user chooses a texture on the
+      /// palette.
+      /// \param[in] _texture Selected texture.
       private: void OnTextureSelected(QString _texture);
-
-      // private: void OnSaveModel(const std::string &_modelName,
-      //     const std::string &_savePath);
 
       /// \brief Callback received when the model has been completed and
       /// uploaded onto the server.

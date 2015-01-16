@@ -171,7 +171,9 @@ namespace gazebo
       /// \param[in] _color New color.
       Q_SIGNALS: void ColorChanged(QColor _color);
 
-      /// \brief TODO
+      /// \brief Qt signal emitted when the manip's texture has changed from the
+      /// 3D view.
+      /// \param[in] _texture New texture.
       Q_SIGNALS: void TextureChanged(QString _texture);
 
       /// \brief Qt callback when the pose of the associated editor item has

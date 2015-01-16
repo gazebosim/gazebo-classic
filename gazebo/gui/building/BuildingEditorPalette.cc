@@ -48,6 +48,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 
   // Brushes (button group)
   brushes = new QButtonGroup();
+  connect(brushes, SIGNAL(buttonClicked(int)), this, SLOT(OnBrush(int)));
 
   QSize toolButtonSize(100, 100);
   QSize iconSize(65, 65);
@@ -135,63 +136,40 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
     brushes->addButton(colorButton, i);
     colorsLayout->addWidget(colorButton, 0, i);
   }
-  connect(brushes, SIGNAL(buttonClicked(int)), this, SLOT(OnColor(int)));
 
   QPushButton *customColor = new QPushButton("More");
   colorsLayout->addWidget(customColor, 1, 4, 1, 2);
   connect(customColor, SIGNAL(clicked()), this,
       SLOT(OnCustomColor()));
 
-  // Textures label
+  // Textures
   QLabel *texturesLabel = new QLabel(tr(
        "<font size=4 color='white'>Add Texture</font>"));
 
-  // Textures
   QGridLayout *texturesLayout = new QGridLayout;
-  QSize textureButtonSize(70, 70);
-  QSize textureIconSize(40, 40);
+  std::vector<QString> textureButtonTextList;
 
-  // wood
   this->textureList.push_back(":wood.jpg");
-  QToolButton *textureButton = new QToolButton(this);
-  textureButton->setFixedSize(textureButtonSize);
-  textureButton->setCheckable(true);
-  textureButton->setChecked(false);
-  textureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-  textureButton->setIcon(QPixmap(this->textureList.back()).scaled(
-        QSize(90, 90), Qt::IgnoreAspectRatio));
-  textureButton->setText("Wood");
-  textureButton->setIconSize(QSize(textureIconSize));
-  brushes->addButton(textureButton, brushes->buttons().size());
-  texturesLayout->addWidget(textureButton, 0, 0);
-
-  // tiles
+  textureButtonTextList.push_back("Wood");
   this->textureList.push_back(":tiles.jpg");
-  textureButton = new QToolButton(this);
-  textureButton->setFixedSize(textureButtonSize);
-  textureButton->setCheckable(true);
-  textureButton->setChecked(false);
-  textureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-  textureButton->setIcon(QPixmap(this->textureList.back()).scaled(
-        QSize(90, 90), Qt::IgnoreAspectRatio));
-  textureButton->setText("Tiles");
-  textureButton->setIconSize(QSize(textureIconSize));
-  brushes->addButton(textureButton, brushes->buttons().size());
-  texturesLayout->addWidget(textureButton, 0, 1);
-
-  // bricks
+  textureButtonTextList.push_back("Tiles");
   this->textureList.push_back(":bricks.png");
-  textureButton = new QToolButton(this);
-  textureButton->setFixedSize(textureButtonSize);
-  textureButton->setCheckable(true);
-  textureButton->setChecked(false);
-  textureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-  textureButton->setIcon(QPixmap(this->textureList.back()).scaled(
+  textureButtonTextList.push_back("Bricks");
+
+  for (unsigned int i = 0; i < this->textureList.size(); ++i)
+  {
+    QToolButton *textureButton = new QToolButton(this);
+    textureButton->setFixedSize(70, 70);
+    textureButton->setCheckable(true);
+    textureButton->setChecked(false);
+    textureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    textureButton->setIcon(QPixmap(this->textureList[i]).scaled(
         QSize(90, 90), Qt::IgnoreAspectRatio));
-  textureButton->setText("Bricks");
-  textureButton->setIconSize(QSize(textureIconSize));
-  brushes->addButton(textureButton, brushes->buttons().size());
-  texturesLayout->addWidget(textureButton, 0, 2);
+    textureButton->setText(textureButtonTextList[i]);
+    textureButton->setIconSize(QSize(40, 40));
+    brushes->addButton(textureButton, brushes->buttons().size());
+    texturesLayout->addWidget(textureButton, 0, i);
+  }
 
   // Import button
   QPushButton *importImageButton = new QPushButton(tr("Import"),
@@ -344,26 +322,27 @@ void BuildingEditorPalette::OnCreateEditorItem(const std::string &_mode)
 }
 
 /////////////////////////////////////////////////
+void BuildingEditorPalette::OnBrush(int _buttonId)
+{
+  if (_buttonId < static_cast<int>(colorList.size()))
+  {
+    this->OnColor(_buttonId);
+  }
+  else if (_buttonId < static_cast<int>(colorList.size()) +
+                       static_cast<int>(textureList.size()))
+  {
+    this->OnTexture(_buttonId - static_cast<int>(colorList.size()));
+  }
+  else
+  {
+    gzwarn << "Brushes other than color and texture are handled elsewhere."
+           << std::endl;
+  }
+}
+
+/////////////////////////////////////////////////
 void BuildingEditorPalette::OnColor(int _buttonId)
 {
-  // A button which is not color
-  if (_buttonId >= static_cast<int>(colorList.size()))
-  {
-    // Textures
-    if (_buttonId < (int)colorList.size() + (int)textureList.size())
-    {
-      this->OnTexture(_buttonId - (int)colorList.size());
-      return;
-    }
-    // Others
-    else
-    {
-      gzwarn << "Brushes other than color and texture are handled elsewhere."
-             << std::endl;
-      return;
-    }
-  }
-
   std::ostringstream colorStr;
   colorStr << "color_" << _buttonId;
   QColor color = this->colorList[_buttonId];
@@ -405,18 +384,19 @@ void BuildingEditorPalette::OnCustomColor()
 }
 
 /////////////////////////////////////////////////
-void BuildingEditorPalette::OnTexture(int _textureId)
+void BuildingEditorPalette::OnTexture(int _buttonId)
 {
   std::ostringstream textureStr;
-  textureStr << "texture_" << _textureId;
-  QString texture = this->textureList[_textureId];
+  textureStr << "texture_" << _buttonId;
+  QString texture = this->textureList[_buttonId];
   if (this->currentMode != textureStr.str())
   {
     gui::editor::Events::textureSelected(texture);
     this->currentMode = textureStr.str();
 
-    QPixmap textureCursor(this->textureList[_textureId]);
-    textureCursor = textureCursor.scaled(QSize(30, 30));
+    QPixmap textureCursor(this->textureList[_buttonId]);
+    textureCursor = textureCursor.scaled(QSize(30, 30), Qt::IgnoreAspectRatio,
+        Qt::SmoothTransformation);
     QApplication::setOverrideCursor(textureCursor);
   }
   else

@@ -330,12 +330,10 @@ namespace gazebo
             createBuildingEditorItem;
 
         /// \brief A color has been selected.
-        public: static event::EventT<void (QColor)>
-            colorSelected;
+        public: static event::EventT<void (QColor)> colorSelected;
 
         /// \brief A texture has been selected.
-        public: static event::EventT<void (QString)>
-            textureSelected;
+        public: static event::EventT<void (QString)> textureSelected;
 
         /// \brief A model has been saved with a name and a location
         public: static event::EventT<void (std::string, std::string)>
