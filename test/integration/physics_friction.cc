@@ -26,6 +26,11 @@
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #endif
 
+#ifdef HAVE_DART
+#include "gazebo/physics/dart/DARTSurfaceParams.hh"
+#include "gazebo/physics/dart/DARTTypes.hh"
+#endif
+
 #include "gazebo/transport/transport.hh"
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
@@ -73,6 +78,18 @@ class PhysicsFrictionTest : public ServerFixture,
                 {
                   physics::BulletSurfaceParamsPtr surface =
                     boost::dynamic_pointer_cast<physics::BulletSurfaceParams>(
+                    (*iter)->GetSurface());
+                  // Average the mu1 and mu2 values
+                  this->friction = (surface->frictionPyramid.GetMuPrimary()
+                                  + surface->frictionPyramid.GetMuSecondary())
+                                  / 2.0;
+                }
+#endif
+#ifdef HAVE_DART
+                else if (physics->GetType() == "dart")
+                {
+                  physics::DARTSurfaceParamsPtr surface =
+                    boost::dynamic_pointer_cast<physics::DARTSurfaceParams>(
                     (*iter)->GetSurface());
                   // Average the mu1 and mu2 values
                   this->friction = (surface->frictionPyramid.GetMuPrimary()
@@ -252,13 +269,6 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine)
   {
     gzerr << "Aborting test since there's an issue with simbody's friction"
           << " parameters (#989)"
-          << std::endl;
-    return;
-  }
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test since there's an issue with dart's friction"
-          << " parameters (#1000)"
           << std::endl;
     return;
   }
