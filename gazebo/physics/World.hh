@@ -451,6 +451,7 @@ namespace gazebo
       /// \param[in] _msg Pointer to the light message.
       private: void OnLightMsg(ConstLightPtr &_msg);
 
+      /// \internal
       /// \brief Private data pointer.
       private: WorldPrivate *dataPtr;
 
