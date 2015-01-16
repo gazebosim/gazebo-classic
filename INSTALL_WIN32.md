@@ -69,6 +69,20 @@ Windows `cmd` for configuring and building.  You might also need to [disable the
 
     Once this all works (which it currently does not, by a long shot): you should now have an installation of gazebo in gz-ws/sdformat/build/install/Release.
 
+## Running
+
+### gzserver
+
+1. Adjust all paths to load dll
+         cd gz-ws/gazebo
+         addpath.bat Debug|Release
+
+1. Download the ogre plugins.cfg file         
+         cd gz-ws/gazebo/build/gazebo
+         <download> http://packages.osrfoundation.org/win32/deps/plugins.cfg
+         <edit> plugins.cfg
+         gzserver.exe ..\..\worlds\empty.world
+
 ## Debugging
 
 Just in case that you need to debug problems on Gazebo
