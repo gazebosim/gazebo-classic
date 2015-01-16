@@ -1315,7 +1315,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->camera->setFOVy(Ogre::Radian(vfov));
 
     // Setup Deferred rendering for the camera
-    /*if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
+    if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
     {
       // Deferred shading GBuffer compositor
       this->dataPtr->dsGBufferInstance =
@@ -1349,14 +1349,13 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
       this->dataPtr->dlMergeInstance->setEnabled(true);
 
       // this->dataPtr->this->ssaoInstance->setEnabled(false);
-    }*/
+    }
 
     if (this->dataPtr->distortion)
       this->dataPtr->distortion->SetCamera(shared_from_this());
 
-    /*if (this->GetScene()->skyx != NULL)
+    if (this->GetScene()->skyx != NULL)
       this->renderTarget->addListener(this->GetScene()->skyx);
-      */
   }
 }
 

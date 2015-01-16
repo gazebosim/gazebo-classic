@@ -749,7 +749,8 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
     gzerr << "Unable to connect to a running Gazebo master.\n";
 
   if (_scene->GetUserCameraCount() == 0)
-    this->userCamera = _scene->CreateUserCamera(cameraName);
+    this->userCamera = _scene->CreateUserCamera(cameraName,
+        gazebo::gui::getINIProperty<int>("rendering.stereo"));
   else
     this->userCamera = _scene->GetUserCamera(0);
 

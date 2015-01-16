@@ -35,7 +35,8 @@ using namespace gazebo;
 using namespace rendering;
 
 //////////////////////////////////////////////////
-UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
+UserCamera::UserCamera(const std::string &_name, ScenePtr _scene,
+    bool _stereoEnabled)
   : Camera(_name, _scene),
     dataPtr(new UserCameraPrivate)
 {
@@ -46,10 +47,11 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   this->dataPtr->joyTwistControl = true;
   this->dataPtr->joystickButtonToggleLast = false;
   this->dataPtr->joyPoseControl = true;
+  this->dataPtr->stereoEnabled = _stereoEnabled;
 
-  // Set default UserCamera render rate to 120Hz. This was choosen
-  // for stereo rendering and smooth user interactions.
-  this->SetRenderRate(120.0);
+  // Set default UserCamera render rate to 120Hz when stereo rendering is
+  // enabled. Otherwise use 60Hz.
+  this->SetRenderRate(_stereoEnabled ? 120.0 : 60.0);
 
   this->SetUseSDFPose(false);
 }
@@ -108,6 +110,7 @@ void UserCamera::Init()
   this->camera->setAutoAspectRatio(false);
 
   // Right camera
+  if (this->dataPtr->stereoEnabled)
   {
     this->dataPtr->rightCamera = this->scene->GetManager()->createCamera(
         "StereoUserRight");
@@ -391,8 +394,11 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
 
-    this->dataPtr->rightCamera->setAspectRatio(ratio);
-    this->dataPtr->rightCamera->setFOVy(Ogre::Radian(vfov));
+    if (this->dataPtr->stereoEnabled)
+    {
+      this->dataPtr->rightCamera->setAspectRatio(ratio);
+      this->dataPtr->rightCamera->setFOVy(Ogre::Radian(vfov));
+    }
 
     delete [] this->saveFrameBuffer;
     this->saveFrameBuffer = NULL;
@@ -552,22 +558,25 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
   this->camera->setFocalLength(focalLength);
   this->camera->setFrustumOffset(offset);
+  this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
 
-  this->dataPtr->rightCamera->setFocalLength(focalLength);
-  this->dataPtr->rightCamera->setFrustumOffset(-offset);
+  if (this->dataPtr->stereoEnabled)
+  {
+    this->dataPtr->rightCamera->setFocalLength(focalLength);
+    this->dataPtr->rightCamera->setFrustumOffset(-offset);
 
-  this->dataPtr->rightViewport =
-    this->renderTarget->addViewport(this->dataPtr->rightCamera, 1);
-  this->dataPtr->rightViewport->setBackgroundColour(
+    this->dataPtr->rightViewport =
+      this->renderTarget->addViewport(this->dataPtr->rightCamera, 1);
+    this->dataPtr->rightViewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
-  this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
-  this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
+    this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
+    this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
 #endif
 
-  this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
-  this->dataPtr->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+    this->dataPtr->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+  }
 
   this->initialized = true;
 
@@ -739,6 +748,7 @@ void UserCamera::SetClipDist(float _near, float _far)
 {
   Camera::SetClipDist(_near, _far);
 
+  // Update right camera, if it exists.
   if (this->camera && this->dataPtr->rightCamera)
   {
     this->dataPtr->rightCamera->setNearClipDistance(

@@ -209,8 +209,11 @@ namespace gazebo
       ///
       /// A user camera is one design for use with a GUI.
       /// \param[in] _name Name of the UserCamera.
+      /// \param[in] _stereoEnabled True to enable stereo rendering. This is
+      /// here for compatibility with 3D monitors/TVs.
       /// \return A pointer to the new UserCamera.
-      public: UserCameraPtr CreateUserCamera(const std::string &_name);
+      public: UserCameraPtr CreateUserCamera(const std::string &_name,
+                  bool _stereoEnabled = false);
 
       /// \brief Get the number of user cameras in this scene
       /// \return The number of user cameras.

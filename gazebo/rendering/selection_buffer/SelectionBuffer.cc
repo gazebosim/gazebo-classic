@@ -211,12 +211,17 @@ void SelectionBuffer::CreateRTTOverlays()
 }
 
 /////////////////////////////////////////////////
-void SelectionBuffer::ShowOverlay(bool /*_show*/)
-{
 #if OGRE_VERSION_MAJOR > 1 && OGRE_VERSION_MINOR  <= 9
+void SelectionBuffer::ShowOverlay(bool _show)
+{
   if (_show)
     this->selectionDebugOverlay->show();
   else
     this->selectionDebugOverlay->hide();
-#endif
 }
+#else
+void SelectionBuffer::ShowOverlay(bool /*_show*/)
+{
+  gzerr << "Selectioin debug overlay disabled for Ogre > 1.9\n";
+}
+#endif

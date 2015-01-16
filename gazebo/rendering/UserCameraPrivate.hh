@@ -62,14 +62,17 @@ namespace gazebo
       /// \brief Used to detect joystick button release
       public: bool joystickButtonToggleLast;
 
-      /// \brief Ogre camera for the right Oculus screen.
+      /// \brief An optional Ogre camera for stereo rendering.
       public: Ogre::Camera *rightCamera;
 
-      /// \brief View port for the right camera.
+      /// \brief An optional viewport for stereo rendering.
       public: Ogre::Viewport *rightViewport;
 
       /// \brief Publishes user camera world pose
       public: transport::PublisherPtr posePub;
+
+      /// \brief True if stereo rendering should be enabled.
+      public: bool stereoEnabled;
     };
   }
 }
