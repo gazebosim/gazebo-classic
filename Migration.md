@@ -55,6 +55,12 @@
 1. **gazebo/physics/World.hh**
     + EntityPtr GetSelectedEntity() const
 
+1. **gazebo/physics/bullet/BulletJoint.hh**
+    + void SetAttribute(Attribute, unsigned int, double)
+
+1. **gazebo/physics/simbody/SimbodyJoint.hh**
+    + void SetAttribute(Attribute, unsigned int, double)
+
 
 ## Gazebo 3.1 to 4.0
 

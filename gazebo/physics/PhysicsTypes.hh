@@ -38,6 +38,7 @@ namespace gazebo
     class Actor;
     class Link;
     class Collision;
+    class FrictionPyramid;
     class Gripper;
     class Joint;
     class JointController;
@@ -128,6 +129,10 @@ namespace gazebo
     /// \def RoadPtr
     /// \brief Boost shared pointer to a Road object
     typedef boost::shared_ptr<Road> RoadPtr;
+
+    /// \def FrictionPyramidPtr
+    /// \brief Boost shared pointer to a FrictionPyramid object
+    typedef boost::shared_ptr<FrictionPyramid> FrictionPyramidPtr;
 
     /// \def SurfaceParamsPtr
     /// \brief Boost shared pointer to a SurfaceParams object

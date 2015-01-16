@@ -32,7 +32,7 @@ SegmentItem::SegmentItem(QGraphicsItem *_parent)
       end(0, 0)
 {
   this->editorType = "Segment";
-  this->scale = BuildingMaker::conversionScale;
+  this->itemScale = BuildingMaker::conversionScale;
 
   if (_parent)
     this->setParentItem(_parent);
@@ -136,13 +136,13 @@ double SegmentItem::GetThickness() const
 /////////////////////////////////////////////////
 double SegmentItem::GetScale() const
 {
-  return this->scale;
+  return this->itemScale;
 }
 
 /////////////////////////////////////////////////
 void SegmentItem::SetScale(double _scale)
 {
-  this->scale = _scale;
+  this->itemScale = _scale;
 }
 
 /////////////////////////////////////////////////

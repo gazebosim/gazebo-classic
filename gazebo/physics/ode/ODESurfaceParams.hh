@@ -51,6 +51,9 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 
+      // Documentation inherited.
+      public: virtual FrictionPyramidPtr GetFrictionPyramid() const;
+
       /// \brief bounce restitution coefficient [0,1], with 0 being inelastic,
       ///        and 1 being perfectly elastic.
       /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
@@ -99,13 +102,6 @@ namespace gazebo
       ///        (http://www.ode.org/ode-latest-userguide.html#sec_5_2_0)
       public: double minDepth;
 
-      /// \brief Friction pyramid parameters (mu1, mu2).
-      /// Note that the primary friction pyramid direction can be specified
-      /// by fdir1, otherwise a vector constrained to be perpendicular to the
-      /// contact normal in the global y-z plane is used.
-      /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
-      public: FrictionPyramid frictionPyramid;
-
       /// \brief Artificial contact slip in the primary friction direction.
       /// \sa    See dContactSlip1 in
       ///        http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
@@ -115,7 +111,14 @@ namespace gazebo
       /// \sa    See dContactSlip2 in
       ///        http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       public: double slip2;
-    };
+ 
+      /// \brief Friction pyramid parameters (mu1, mu2).
+      /// Note that the primary friction pyramid direction can be specified
+      /// by fdir1, otherwise a vector constrained to be perpendicular to the
+      /// contact normal in the global y-z plane is used.
+      /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
+      private: FrictionPyramidPtr frictionPyramid;
+   };
     /// \}
   }
 }

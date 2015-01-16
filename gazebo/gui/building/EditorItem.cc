@@ -105,6 +105,12 @@ void EditorItem::Set3dTexture(QString _texture)
 }
 
 /////////////////////////////////////////////////
+void EditorItem::OnTextureChanged(QString _texture)
+{
+  this->visual3dTexture = _texture;
+}
+
+/////////////////////////////////////////////////
 void EditorItem::Set3dTransparency(float _transparency)
 {
   this->visual3dTransparency = _transparency;

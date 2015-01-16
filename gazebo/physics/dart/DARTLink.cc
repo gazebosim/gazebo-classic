@@ -232,15 +232,17 @@ void DARTLink::Init()
   {
     if ((*iter)->HasType(Base::COLLISION))
     {
+      CollisionPtr collision =
+          boost::static_pointer_cast<Collision>(*iter);
+
+      SurfaceParamsPtr surface = collision->GetSurface();
+      GZ_ASSERT(surface, "Surface pointer for is invalid");
+      FrictionPyramidPtr friction = surface->GetFrictionPyramid();
+      GZ_ASSERT(friction, "Friction pointer for is invalid");
+
       numCollisions++;
-
-      DARTCollisionPtr collision =
-          boost::static_pointer_cast<DARTCollision>(*iter);
-
-      hackAvgMu1 +=
-          collision->GetDARTSurface()->frictionPyramid.GetMuPrimary();
-      hackAvgMu2 +=
-          collision->GetDARTSurface()->frictionPyramid.GetMuSecondary();
+      hackAvgMu1 += friction->GetMuPrimary();
+      hackAvgMu2 += friction->GetMuSecondary();
     }
   }
 

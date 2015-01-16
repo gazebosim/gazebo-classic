@@ -104,6 +104,14 @@ namespace gazebo
 
       /// \brief Pointer to bullet hinge2 constraint
       private: btHinge2Constraint *bulletHinge2;
+
+      /// \brief Offset angle used in GetAngleImpl, so that angles are reported
+      /// relative to the initial configuration.
+      private: double angleOffset[2];
+
+      /// \brief Initial value of joint axis, expressed as unit vector
+      /// in world frame.
+      private: math::Vector3 initialWorldAxis[2];
     };
 
   /// \}

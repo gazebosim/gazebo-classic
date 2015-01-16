@@ -166,9 +166,6 @@ namespace gazebo
       /// \brief Length to snap in meters.
       public: static const double SnapLength;
 
-      /// \brief Scale for converting pixels to metric units.
-      protected: double scale;
-
       /// \brief Segment's start position in pixel coordinates.
       private: QPointF start;
 

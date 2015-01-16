@@ -51,8 +51,11 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 
+      // Documentation inherited.
+      public: virtual FrictionPyramidPtr GetFrictionPyramid() const;
+
       /// \brief Friction pyramid parameters (mu1, mu2).
-      FrictionPyramid frictionPyramid;
+      private: FrictionPyramidPtr frictionPyramid;
     };
     /// \}
   }

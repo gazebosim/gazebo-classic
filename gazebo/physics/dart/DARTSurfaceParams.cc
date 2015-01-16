@@ -25,6 +25,7 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTSurfaceParams::DARTSurfaceParams()
   : SurfaceParams()
+  , frictionPyramid(new FrictionPyramid())
 {
 }
 
@@ -56,9 +57,9 @@ void DARTSurfaceParams::Load(sdf::ElementPtr _sdf)
         gzerr << "Surface friction ode sdf member is NULL" << std::endl;
       else
       {
-        this->frictionPyramid.SetMuPrimary(
+        this->frictionPyramid->SetMuPrimary(
           frictionOdeElem->Get<double>("mu"));
-        this->frictionPyramid.SetMuSecondary(
+        this->frictionPyramid->SetMuSecondary(
           frictionOdeElem->Get<double>("mu2"));
       }
     }
@@ -70,8 +71,8 @@ void DARTSurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
-  _msg.mutable_friction()->set_mu(this->frictionPyramid.GetMuPrimary());
-  _msg.mutable_friction()->set_mu2(this->frictionPyramid.GetMuSecondary());
+  _msg.mutable_friction()->set_mu(this->frictionPyramid->GetMuPrimary());
+  _msg.mutable_friction()->set_mu2(this->frictionPyramid->GetMuSecondary());
 }
 
 /////////////////////////////////////////////////
@@ -82,8 +83,14 @@ void DARTSurfaceParams::ProcessMsg(const msgs::Surface &_msg)
   if (_msg.has_friction())
   {
     if (_msg.friction().has_mu())
-      this->frictionPyramid.SetMuPrimary(_msg.friction().mu());
+      this->frictionPyramid->SetMuPrimary(_msg.friction().mu());
     if (_msg.friction().has_mu2())
-      this->frictionPyramid.SetMuSecondary(_msg.friction().mu2());
+      this->frictionPyramid->SetMuSecondary(_msg.friction().mu2());
   }
+}
+
+/////////////////////////////////////////////////
+FrictionPyramidPtr DARTSurfaceParams::GetFrictionPyramid() const
+{
+  return this->frictionPyramid;
 }
