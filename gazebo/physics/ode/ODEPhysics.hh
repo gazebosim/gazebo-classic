@@ -19,9 +19,7 @@
 
 #include <tbb/spin_mutex.h>
 #include <tbb/concurrent_vector.h>
-#include <map>
 #include <string>
-#include <vector>
 #include <utility>
 
 #include <boost/thread/thread.hpp>
@@ -34,25 +32,12 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/util/system.hh"
 
+#include "gazebo/physics/ode/ODEPhysicsPrivate.hh"
+
 namespace gazebo
 {
   namespace physics
   {
-    /// \brief Data structure for contact feedbacks
-    class GAZEBO_VISIBLE ODEJointFeedback
-    {
-      public: ODEJointFeedback() : contact(NULL), count(0) {}
-
-      /// \brief Contact information.
-      public: Contact *contact;
-
-      /// \brief Number of elements in feedbacks array.
-      public: int count;
-
-      /// \brief Contact joint feedback information.
-      public: dJointFeedback feedbacks[MAX_CONTACT_JOINTS];
-    };
-
     /// \brief ODE physics engine.
     class GAZEBO_VISIBLE ODEPhysics : public PhysicsEngine
     {
@@ -281,21 +266,11 @@ namespace gazebo
       /// \brief The type of the solver.
       private: std::string stepType;
 
-      /// \brief Buffer of contact feedback information.
-      private: std::vector<ODEJointFeedback*> jointFeedbacks;
+      /// \brief Physics step function.
+      public: int (*physicsStepFunc)(dxWorld*, dReal);
 
       /// \brief Current index into the contactFeedbacks buffer
       private: unsigned int jointFeedbackIndex;
-
-      /// \brief All the collsiion spaces.
-      private: std::map<std::string, dSpaceID> spaces;
-
-      /// \brief All the normal colliders.
-      private: std::vector< std::pair<ODECollision*, ODECollision*> > colliders;
-
-      /// \brief All the triangle mesh colliders.
-      private: std::vector< std::pair<ODECollision*, ODECollision*> >
-               trimeshColliders;
 
       /// \brief Number of normal colliders.
       private: unsigned int collidersCount;
@@ -303,17 +278,11 @@ namespace gazebo
       /// \brief Number of triangle mesh colliders.
       private: unsigned int trimeshCollidersCount;
 
-      /// \brief Array of contact collisions.
-      private: dContactGeom contactCollisions[MAX_COLLIDE_RETURNS];
-
-      /// \brief Physics step function.
-      private: int (*physicsStepFunc)(dxWorld*, dReal);
-
-      /// \brief Indices used during creation of contact joints.
-      private: int indices[MAX_CONTACT_JOINTS];
-
       /// \brief Maximum number of contact points per collision pair.
       private: unsigned int maxContacts;
+
+      /// \brief Private data pointer.
+      private: ODEPhysicsPrivate *dataPtr;
     };
   }
 }

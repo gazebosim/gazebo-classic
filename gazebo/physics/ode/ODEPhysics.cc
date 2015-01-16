@@ -123,6 +123,8 @@ class Colliders_TBB
 ODEPhysics::ODEPhysics(WorldPtr _world)
     : PhysicsEngine(_world), physicsStepFunc(NULL), maxContacts(0)
 {
+  this->dataPtr = new ODEPhysicsPrivate;
+
   // Collision detection init
   dInitODE2(0);
 
@@ -135,7 +137,7 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 
   this->contactGroup = dJointGroupCreate(0);
 
-  this->colliders.resize(100);
+  this->dataPtr->colliders.resize(100);
 
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
@@ -151,11 +153,11 @@ ODEPhysics::~ODEPhysics()
 
   // Delete all the joint feedbacks.
   for (std::vector<ODEJointFeedback*>::iterator iter =
-      this->jointFeedbacks.begin(); iter != this->jointFeedbacks.end(); ++iter)
+      this->dataPtr->jointFeedbacks.begin(); iter != this->dataPtr->jointFeedbacks.end(); ++iter)
   {
     delete *iter;
   }
-  this->jointFeedbacks.clear();
+  this->dataPtr->jointFeedbacks.clear();
 
   if (this->spaceId)
   {
@@ -369,8 +371,8 @@ void ODEPhysics::UpdateCollision()
   // Generate non-trimesh collisions.
   for (i = 0; i < this->collidersCount; ++i)
   {
-    this->Collide(this->colliders[i].first,
-        this->colliders[i].second, this->contactCollisions);
+    this->Collide(this->dataPtr->colliders[i].first,
+        this->dataPtr->colliders[i].second, this->dataPtr->contactCollisions);
   }
   DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "collideShapes");
 
@@ -378,9 +380,9 @@ void ODEPhysics::UpdateCollision()
   // This must happen in this thread sequentially
   for (i = 0; i < this->trimeshCollidersCount; ++i)
   {
-    ODECollision *collision1 = this->trimeshColliders[i].first;
-    ODECollision *collision2 = this->trimeshColliders[i].second;
-    this->Collide(collision1, collision2, this->contactCollisions);
+    ODECollision *collision1 = this->dataPtr->trimeshColliders[i].first;
+    ODECollision *collision2 = this->dataPtr->trimeshColliders[i].second;
+    this->Collide(collision1, collision2, this->dataPtr->contactCollisions);
   }
   DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "collideTrimeshes");
 
@@ -404,29 +406,29 @@ void ODEPhysics::UpdatePhysics()
     // Set the joint contact feedback for each contact.
     for (unsigned int i = 0; i < this->jointFeedbackIndex; ++i)
     {
-      Contact *contactFeedback = this->jointFeedbacks[i]->contact;
+      Contact *contactFeedback = this->dataPtr->jointFeedbacks[i]->contact;
       Collision *col1 = contactFeedback->collision1;
       Collision *col2 = contactFeedback->collision2;
 
       GZ_ASSERT(col1 != NULL, "Collision 1 is NULL");
       GZ_ASSERT(col2 != NULL, "Collision 2 is NULL");
 
-      for (int j = 0; j < this->jointFeedbacks[i]->count; ++j)
+      for (int j = 0; j < this->dataPtr->jointFeedbacks[i]->count; ++j)
       {
-        dJointFeedback fb = this->jointFeedbacks[i]->feedbacks[j];
+        dJointFeedback fb = this->dataPtr->jointFeedbacks[i]->feedbacks[j];
         f1.Set(fb.f1[0], fb.f1[1], fb.f1[2]);
         f2.Set(fb.f2[0], fb.f2[1], fb.f2[2]);
         t1.Set(fb.t1[0], fb.t1[1], fb.t1[2]);
         t2.Set(fb.t2[0], fb.t2[1], fb.t2[2]);
 
         // set force torque in link frame
-        this->jointFeedbacks[i]->contact->wrench[j].body1Force =
+        this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body1Force =
              col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(f1);
-        this->jointFeedbacks[i]->contact->wrench[j].body2Force =
+        this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body2Force =
              col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(f2);
-        this->jointFeedbacks[i]->contact->wrench[j].body1Torque =
+        this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body1Torque =
              col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(t1);
-        this->jointFeedbacks[i]->contact->wrench[j].body2Torque =
+        this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body2Torque =
              col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(t2);
       }
     }
@@ -456,14 +458,14 @@ LinkPtr ODEPhysics::CreateLink(ModelPtr _parent)
     gzthrow("Link must have a parent\n");
 
   std::map<std::string, dSpaceID>::iterator iter;
-  iter = this->spaces.find(_parent->GetName());
+  iter = this->dataPtr->spaces.find(_parent->GetName());
 
-  if (iter == this->spaces.end())
-    this->spaces[_parent->GetName()] = dSimpleSpaceCreate(this->spaceId);
+  if (iter == this->dataPtr->spaces.end())
+    this->dataPtr->spaces[_parent->GetName()] = dSimpleSpaceCreate(this->spaceId);
 
   ODELinkPtr link(new ODELink(_parent));
 
-  link->SetSpaceId(this->spaces[_parent->GetName()]);
+  link->SetSpaceId(this->dataPtr->spaces[_parent->GetName()]);
   link->SetWorld(_parent->GetWorld());
 
   return link;
@@ -836,7 +838,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   unsigned int numc = 0;
   dContact contact;
 
-  // maxCollide must less than the size of this->indices. Check the header
+  // maxCollide must less than the size of this->dataPtr->indices. Check the header
   unsigned int maxCollide = MAX_CONTACT_JOINTS;
 
   // max_contacts specified globally
@@ -860,7 +862,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   // Store the indices of the contacts.
   for (int i = 0; i < MAX_CONTACT_JOINTS; i++)
-    this->indices[i] = i;
+    this->dataPtr->indices[i] = i;
 
   // Choose only the best contacts if too many were generated.
   if (numc > maxCollide)
@@ -871,7 +873,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       if (_contactCollisions[i].depth > max)
       {
         max = _contactCollisions[i].depth;
-        this->indices[maxCollide-1] = i;
+        this->dataPtr->indices[maxCollide-1] = i;
       }
     }
 
@@ -980,12 +982,12 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Create a joint feedback mechanism
   if (contactFeedback)
   {
-    if (this->jointFeedbackIndex < this->jointFeedbacks.size())
-      jointFeedback = this->jointFeedbacks[this->jointFeedbackIndex];
+    if (this->jointFeedbackIndex < this->dataPtr->jointFeedbacks.size())
+      jointFeedback = this->dataPtr->jointFeedbacks[this->jointFeedbackIndex];
     else
     {
       jointFeedback = new ODEJointFeedback();
-      this->jointFeedbacks.push_back(jointFeedback);
+      this->dataPtr->jointFeedbacks.push_back(jointFeedback);
     }
 
     this->jointFeedbackIndex++;
@@ -996,7 +998,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Create a joint for each contact
   for (unsigned int j = 0; j < numc; ++j)
   {
-    contact.geom = _contactCollisions[this->indices[j]];
+    contact.geom = _contactCollisions[this->dataPtr->indices[j]];
 
     // Create the contact joint. This introduces the contact constraint to
     // ODE
@@ -1007,19 +1009,19 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     if (contactFeedback && jointFeedback)
     {
       // Store the contact depth
-      contactFeedback->depths[j] = _contactCollisions[this->indices[j]].depth;
+      contactFeedback->depths[j] = _contactCollisions[this->dataPtr->indices[j]].depth;
 
       // Store the contact position
       contactFeedback->positions[j].Set(
-          _contactCollisions[this->indices[j]].pos[0],
-          _contactCollisions[this->indices[j]].pos[1],
-          _contactCollisions[this->indices[j]].pos[2]);
+          _contactCollisions[this->dataPtr->indices[j]].pos[0],
+          _contactCollisions[this->dataPtr->indices[j]].pos[1],
+          _contactCollisions[this->dataPtr->indices[j]].pos[2]);
 
       // Store the contact normal
       contactFeedback->normals[j].Set(
-          _contactCollisions[this->indices[j]].normal[0],
-          _contactCollisions[this->indices[j]].normal[1],
-          _contactCollisions[this->indices[j]].normal[2]);
+          _contactCollisions[this->dataPtr->indices[j]].normal[0],
+          _contactCollisions[this->dataPtr->indices[j]].normal[1],
+          _contactCollisions[this->dataPtr->indices[j]].normal[2]);
 
       // Set the joint feedback.
       dJointSetFeedback(contactJoint, &(jointFeedback->feedbacks[j]));
@@ -1040,11 +1042,11 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,
                                     ODECollision *_collision2)
 {
-  if (this->trimeshCollidersCount >= this->trimeshColliders.size())
-    this->trimeshColliders.resize(this->trimeshColliders.size() + 100);
+  if (this->trimeshCollidersCount >= this->dataPtr->trimeshColliders.size())
+    this->dataPtr->trimeshColliders.resize(this->dataPtr->trimeshColliders.size() + 100);
 
-  this->trimeshColliders[this->trimeshCollidersCount].first  = _collision1;
-  this->trimeshColliders[this->trimeshCollidersCount].second = _collision2;
+  this->dataPtr->trimeshColliders[this->trimeshCollidersCount].first  = _collision1;
+  this->dataPtr->trimeshColliders[this->trimeshCollidersCount].second = _collision2;
   this->trimeshCollidersCount++;
 }
 
@@ -1052,11 +1054,11 @@ void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,
 void ODEPhysics::AddCollider(ODECollision *_collision1,
                              ODECollision *_collision2)
 {
-  if (this->collidersCount >= this->colliders.size())
-    this->colliders.resize(this->colliders.size() + 100);
+  if (this->collidersCount >= this->dataPtr->colliders.size())
+    this->dataPtr->colliders.resize(this->dataPtr->colliders.size() + 100);
 
-  this->colliders[this->collidersCount].first  = _collision1;
-  this->colliders[this->collidersCount].second = _collision2;
+  this->dataPtr->colliders[this->collidersCount].first  = _collision1;
+  this->dataPtr->colliders[this->collidersCount].second = _collision2;
   this->collidersCount++;
 }
 

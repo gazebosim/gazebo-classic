@@ -201,6 +201,7 @@ namespace gazebo
       private: void AddCollisionsToLink(const physics::SimbodyLink *_link,
         SimTK::MobilizedBody &_mobod, SimTK::ContactCliqueId _modelClique);
 
+      // TODO: setters and getters? PIMP?
       public: SimTK::MultibodySystem system;
       public: SimTK::SimbodyMatterSubsystem matter;
       public: SimTK::GeneralForceSubsystem forces;
