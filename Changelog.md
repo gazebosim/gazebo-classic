@@ -1,6 +1,8 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.0.0
+1. Implemented private data pointer for ODEPhysics.
+
 1. Added a events::Event::resetWorld event that is triggered when World::Reset is called.
     * [Pull request #1332](https://bitbucket.org/osrf/gazebo/pull-request/1332)
     * [Issue #1375](https://bitbucket.org/osrf/gazebo/issue/1375)

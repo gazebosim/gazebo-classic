@@ -254,18 +254,6 @@ namespace gazebo
       private: void AddCollider(ODECollision *_collision1,
                                 ODECollision *_collision2);
 
-      /// \brief Top-level world for all bodies
-      private: dWorldID worldId;
-
-      /// \brief Top-level space for all sub-spaces/collisions
-      private: dSpaceID spaceId;
-
-      /// \brief Collision attributes
-      private: dJointGroupID contactGroup;
-
-      /// \brief The type of the solver.
-      private: std::string stepType;
-
       /// \brief Physics step function.
       public: int (*physicsStepFunc)(dxWorld*, dReal);
 
@@ -281,6 +269,7 @@ namespace gazebo
       /// \brief Maximum number of contact points per collision pair.
       private: unsigned int maxContacts;
 
+      /// \internal
       /// \brief Private data pointer.
       private: ODEPhysicsPrivate *dataPtr;
     };

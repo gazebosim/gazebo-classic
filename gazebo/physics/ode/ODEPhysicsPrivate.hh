@@ -44,6 +44,17 @@ namespace gazebo
 
     class GAZEBO_VISIBLE ODEPhysicsPrivate
     { 
+      /// \brief Top-level world for all bodies
+      public: dWorldID worldId;
+
+      /// \brief Top-level space for all sub-spaces/collisions
+      public: dSpaceID spaceId;
+
+      /// \brief Collision attributes
+      public: dJointGroupID contactGroup;
+
+      /// \brief The type of the solver.
+      public: std::string stepType;
 
       /// \brief Buffer of contact feedback information.
       public: std::vector<ODEJointFeedback*> jointFeedbacks;
