@@ -94,6 +94,11 @@ RectItem::~RectItem()
   }
   this->rotateHandle->setParentItem(NULL);
   delete this->rotateHandle;
+  if (!this->measures.empty())
+  {
+    delete this->measures[0];
+    delete this->measures[1];
+  }
 }
 
 /////////////////////////////////////////////////
@@ -138,6 +143,11 @@ void RectItem::SetHighlighted(bool _highlighted)
   if (_highlighted)
   {
     this->setZValue(zValueSelected);
+    WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
+        this->parentItem());
+    if (wallItem)
+      wallItem->setZValue(wallItem->zValueSelected);
+
     for (int i = 0; i < 8; ++i)
     {
       if (this->grabbers[i]->isEnabled())
@@ -149,6 +159,11 @@ void RectItem::SetHighlighted(bool _highlighted)
   else
   {
     this->setZValue(zValueIdle);
+    WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
+        this->parentItem());
+    if (wallItem)
+      wallItem->setZValue(wallItem->zValueIdle);
+
     for (int i = 0; i < 8; ++i)
     {
       if (this->grabbers[i]->isEnabled())

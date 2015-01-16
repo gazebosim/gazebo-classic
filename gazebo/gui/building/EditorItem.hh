@@ -202,6 +202,12 @@ namespace gazebo
       /// \param[in] _color Color.
       private slots: void OnColorChanged(QColor _color);
 
+      /// \brief Z ordering of the rect item when idle (unselected.)
+      public: int zValueIdle;
+
+      /// \brief Z ordering of the rect item when selected.
+      public: int zValueSelected;
+
       /// \brief Type of editor item.
       protected: std::string editorType;
 

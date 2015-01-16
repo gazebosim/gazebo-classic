@@ -45,6 +45,9 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
   this->SetLine(_start, _end);
   this->SetColor(QColor(247, 142, 30));
 
+  this->zValueIdle = 0;
+  this->zValueSelected = 5;
+
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
   this->setAcceptHoverEvents(true);
 
@@ -208,7 +211,7 @@ void WallSegmentItem::SetHighlighted(bool _highlighted)
   {
     this->ShowHandles(true);
     this->measure->setVisible(true);
-    this->setZValue(5);
+    this->setZValue(this->zValueSelected);
     this->SetColor(QColor(247, 142, 30));
     this->Set3dTransparency(0.0);
   }
@@ -216,7 +219,7 @@ void WallSegmentItem::SetHighlighted(bool _highlighted)
   {
     this->ShowHandles(false);
     this->measure->setVisible(false);
-    this->setZValue(0);
+    this->setZValue(this->zValueIdle);
     this->SetColor(Qt::black);
     this->Set3dTransparency(0.4);
   }
