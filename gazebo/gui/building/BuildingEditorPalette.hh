@@ -69,14 +69,6 @@ namespace gazebo
       /// \param[in] _buttonId Id of the button clicked.
       private slots: void OnBrush(int _buttonId);
 
-      /// \brief Qt callback when a color brush is pressed.
-      /// \param[in] _buttonId Id of the button clicked.
-      private slots: void OnColor(int _buttonId);
-
-      /// \brief Qt callback when a texture brush is pressed.
-      /// \param[in] _buttonId Id of the button clicked.
-      private slots: void OnTexture(int _buttonId);
-
       /// \brief Qt callback when the Model Name field is changed.
       private slots: void OnNameChanged(const QString &_name);
 
@@ -97,6 +89,22 @@ namespace gazebo
       /// \brief Qt callback when the palette is pressed.
       /// \param[in] _event Event.
       private: void mousePressEvent(QMouseEvent *_event);
+
+      /// \brief When a default color button is selected.
+      /// \param[in] _buttonId Id of the button clicked.
+      private: void OnDefaultColor(int _buttonId);
+
+      /// \brief When  the custom color button is selected.
+      /// A QColorDialog is opened.
+      private: void OnCustomColor();
+
+      /// \brief When any color is selected.
+      /// \param[in] _color Color selected.
+      private: void OnColor(QColor _color);
+
+      /// \brief When a default texture button is selected.
+      /// \param[in] _buttonId Id of the button clicked.
+      private: void OnTexture(int _buttonId);
 
       /// \brief Default name of the building model.
       private: std::string buildingDefaultName;
@@ -124,6 +132,9 @@ namespace gazebo
 
       /// \brief List of default textures to be picked.
       private: std::vector<QString> textureList;
+
+      /// \brief Custom color button.
+      private: QPushButton *customColorButton;
     };
     /// \}
   }

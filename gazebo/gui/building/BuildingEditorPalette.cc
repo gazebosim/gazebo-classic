@@ -137,6 +137,11 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
     colorsLayout->addWidget(colorButton, 0, i);
   }
 
+  this->customColorButton = new QPushButton("More");
+  this->customColorButton->setCheckable(true);
+  this->customColorButton->setChecked(false);
+  colorsLayout->addWidget(this->customColorButton, 1, 4, 1, 2);
+
   // Textures
   QLabel *texturesLabel = new QLabel(tr(
        "<font size=4 color='white'>Add Texture</font>"));
@@ -212,7 +217,10 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
       gui::editor::Events::ConnectCreateBuildingEditorItem(
       boost::bind(&BuildingEditorPalette::OnCreateEditorItem, this, _1)));
 
-  // All buttons must be added after the color and texture buttons
+  // TODO: Improve brushes logic
+  // Custom color button must come immediately after color and texture buttons
+  brushes->addButton(this->customColorButton, brushes->buttons().size());
+  // And all other buttons after that
   brushes->addButton(wallButton, brushes->buttons().size());
   brushes->addButton(windowButton, brushes->buttons().size());
   brushes->addButton(doorButton, brushes->buttons().size());
@@ -321,12 +329,17 @@ void BuildingEditorPalette::OnBrush(int _buttonId)
 {
   if (_buttonId < static_cast<int>(colorList.size()))
   {
-    this->OnColor(_buttonId);
+    this->OnDefaultColor(_buttonId);
   }
   else if (_buttonId < static_cast<int>(colorList.size()) +
                        static_cast<int>(textureList.size()))
   {
     this->OnTexture(_buttonId - static_cast<int>(colorList.size()));
+  }
+  else if (_buttonId == static_cast<int>(colorList.size()) +
+                       static_cast<int>(textureList.size()))
+  {
+    this->OnCustomColor();
   }
   else
   {
@@ -336,24 +349,52 @@ void BuildingEditorPalette::OnBrush(int _buttonId)
 }
 
 /////////////////////////////////////////////////
-void BuildingEditorPalette::OnColor(int _buttonId)
+void BuildingEditorPalette::OnDefaultColor(int _buttonId)
 {
   std::ostringstream colorStr;
   colorStr << "color_" << _buttonId;
   QColor color = this->colorList[_buttonId];
   if (this->currentMode != colorStr.str())
   {
-    gui::editor::Events::colorSelected(color);
     this->currentMode = colorStr.str();
-
-    QPixmap colorCursor(30, 30);
-    colorCursor.fill(color);
-    QApplication::setOverrideCursor(QCursor(colorCursor));
+    this->OnColor(color);
   }
   else
   {
     gui::editor::Events::createBuildingEditorItem(std::string());
   }
+}
+
+/////////////////////////////////////////////////
+void BuildingEditorPalette::OnCustomColor()
+{
+  // Cancel draw mode
+  gui::editor::Events::createBuildingEditorItem(std::string());
+
+  this->customColorButton->setChecked(true);
+
+  QColor color = QColorDialog::getColor(Qt::green, this);
+
+  if (color.isValid())
+  {
+    std::ostringstream colorStr;
+    colorStr << "color_custom";
+    this->currentMode = colorStr.str();
+    this->OnColor(color);
+  }
+  else
+  {
+    gui::editor::Events::createBuildingEditorItem(std::string());
+  }
+}
+
+/////////////////////////////////////////////////
+void BuildingEditorPalette::OnColor(QColor _color)
+{
+  gui::editor::Events::colorSelected(_color);
+  QPixmap colorCursor(30, 30);
+  colorCursor.fill(_color);
+  QApplication::setOverrideCursor(QCursor(colorCursor));
 }
 
 /////////////////////////////////////////////////
