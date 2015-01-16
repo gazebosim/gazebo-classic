@@ -34,6 +34,8 @@ namespace gazebo
       {
         this->pollThread = NULL;
         this->stop = false;
+        this->buttons[0] = 0;
+        this->buttons[1] = 0;
       }
 
       /// \brief Destructor

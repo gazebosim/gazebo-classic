@@ -47,6 +47,8 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene,
   this->dataPtr->joyTwistControl = true;
   this->dataPtr->joystickButtonToggleLast = false;
   this->dataPtr->joyPoseControl = true;
+  this->dataPtr->rightCamera = NULL;
+  this->dataPtr->rightViewport = NULL;
   this->dataPtr->stereoEnabled = _stereoEnabled;
 
   // Set default UserCamera render rate to 120Hz when stereo rendering is
@@ -752,7 +754,7 @@ void UserCamera::SetClipDist(float _near, float _far)
   Camera::SetClipDist(_near, _far);
 
   // Update right camera, if it exists.
-  if (this->camera && this->dataPtr->rightCamera)
+  if (this->dataPtr->stereoEnabled)
   {
     this->dataPtr->rightCamera->setNearClipDistance(
       this->camera->getNearClipDistance());
