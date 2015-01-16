@@ -96,11 +96,10 @@ void CubicBezier(const math::Vector2d &p0,
                  const math::Vector2d &p1,
                  const math::Vector2d &p2,
                  const math::Vector2d &p3,
-                 double resolution,
+                 double step,
                  std::vector<math::Vector2d> &points)
 {
   // double step = GetStepLength(p0, p1, p2, p3, resolution);
-  double step = resolution;
   // std::cout << "bezier " << step << std::endl;
   double t = 0;
 //  math::Vector2d p = bezierInterpolate(t, p0, p1, p2, p3);
@@ -116,17 +115,18 @@ void CubicBezier(const math::Vector2d &p0,
 
 
 /////////////////////////////////////////////////
-SVGLoader::SVGLoader(double _resolution)
-    :resolution(_resolution)
+SVGLoader::SVGLoader(unsigned int _samples)
 {
-
-    if(resolution > 1)
-    {
-      std::ostringstream os;
-      os << "sample size must be smaller than 1";
-      SvgError x(os.str());
-     throw x;
-    }
+  if(_samples == 0)
+  {
+    std::ostringstream os;
+    os << "sample size must be larger than 1";
+    SvgError x(os.str());
+    throw x;
+  }
+    
+  this->resolution = 1.0 / _samples; 
+  
 }
 
 /////////////////////////////////////////////////

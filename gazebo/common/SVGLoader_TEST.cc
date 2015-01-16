@@ -26,13 +26,13 @@ using namespace gazebo;
 class SVGLoader : public gazebo::testing::AutoLogFixture { };
 
 
-double step = 0.1;
+unsigned int samples=10;
 std::string foutput = "";
 
 /////////////////////////////////////////////////
 TEST_F(SVGLoader, LoadPaths)
 {
-  common::SVGLoader loader(step);
+  common::SVGLoader loader(samples);
   std::vector<common::SVGPath> paths;
   std::string filePath = std::string(PROJECT_SOURCE_PATH);
   filePath += "/test/data/paths.svg";
@@ -77,11 +77,11 @@ int main(int argc, char **argv)
   {
     std::string s = argv[1];
     try {
-      step = atof(s.c_str());
+      samples = atoi(s.c_str());
     }
     catch(...)
     {
-        std::cout << "Can't set step to " << s << ". Step is " << step << std::endl;
+        std::cout << "Can't set sample to " << s << ". Sample is " << samples << std::endl;
     }
   }
 

@@ -52,7 +52,7 @@ namespace gazebo
 
 		class GAZEBO_VISIBLE SVGLoader
 		{
-			public: SVGLoader(double _resolution);
+			public: SVGLoader(unsigned int _samples);
 
 			public: void Parse(const std::string &_filename, std::vector<SVGPath> &paths);
 			public: void DumpPaths(const std::vector<SVGPath> paths, std::ostream &out=std::cout) const;
