@@ -229,7 +229,7 @@ namespace gazebo
       protected: bool highlighted;
 
       /// \brief Scale for converting from pixel to metric units.
-      protected: double scale;
+      protected: double itemScale;
     };
     /// \}
   }
