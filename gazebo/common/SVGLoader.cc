@@ -63,7 +63,7 @@ math::Vector2d bezierInterpolate(double t,
   math::Vector2d p;  
   p.x = t_1_3 * p0.x + 3 * t *  t_1_2 * p1.x + 3 * t2 * t_1 * p2.x + t3 * p3.x;
   p.y = t_1_3 * p0.y + 3 * t *  t_1_2 * p1.y + 3 * t2 * t_1 * p2.y + t3 * p3.y;
-
+std::cout << "BEZIER " << t << " [" << p.x << ", " << p.y << "]" << std::endl;
   return p;  
 }
 
@@ -101,15 +101,15 @@ void CubicBezier(const math::Vector2d &p0,
 {
   // double step = GetStepLength(p0, p1, p2, p3, resolution);
   // std::cout << "bezier " << step << std::endl;
-  double t = 0;
+  double t = step;
 //  math::Vector2d p = bezierInterpolate(t, p0, p1, p2, p3);
 //  points.push_back(p);
 
   while (t < 1.0)
   {
-    t += step;
     auto p = bezierInterpolate(t, p0, p1, p2, p3);
     points.push_back(p);
+    t += step;
   }
 }
 

@@ -26,14 +26,14 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1.3318201"
      inkscape:cx="372.04724"
-     inkscape:cy="613.97187"
+     inkscape:cy="734.10822"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1083"
      inkscape:window-height="1022"
-     inkscape:window-x="65"
-     inkscape:window-y="532"
+     inkscape:window-x="798"
+     inkscape:window-y="266"
      inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
@@ -53,20 +53,9 @@
      id="layer1">
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 71.924445,153.27877 C 484.33992,423.62454 60.101405,136.27303 172.98711,189.71964"
-       id="path4490"
+       d="m 113.34044,232.88974 c 161.31798,87.47792 53.31251,135.28406 205.60712,55.6132"
+       id="path2985"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 165.93833,150.58875 8.25937,39.04431 33.03749,-7.50852"
-       id="coords"
-       inkscape:connector-curvature="0" />
-    <path
-       sodipodi:nodetypes="csc"
-       inkscape:connector-curvature="0"
-       id="path4496"
-       d="M 124.39009,349.09623 C 554.58171,480.75607 400.26944,427.2828 299.78422,383.1177 249.74547,361.12474 213.0545,341.43998 268.53535,348.07392"
-       style="fill:none;stroke:#000000;stroke-width:1.53823519px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
   </g>
 </svg>
