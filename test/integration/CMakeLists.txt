@@ -6,6 +6,8 @@ include_directories (
   ${PROTOBUF_INCLUDE_DIR}
 )
 
+include ( ${QT_USE_FILE} )
+
 link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
@@ -25,6 +27,8 @@ if(HAVE_DART)
   include_directories ( ${DARTCore_INCLUDE_DIRS} )
   link_directories ( ${DARTCore_LIBRARY_DIRS} )
 endif()
+
+add_definitions(${QT_DEFINITIONS})
 
 set(tests
   aero_plugin.cc
@@ -57,6 +61,7 @@ set(tests
   nondefault_world.cc
   physics.cc
   physics_basic_controller_response.cc
+  physics_collision.cc
   physics_friction.cc
   physics_inertia_ratio.cc
   physics_link.cc
@@ -121,6 +126,11 @@ set(dri_tests
 
 gz_build_dri_tests(${dri_tests})
 
+set(qt_tests
+  insert_model.cc
+)
+
+gz_build_qt_tests(${qt_tests})
 
 if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   # Increase timeout, to account for model download time.

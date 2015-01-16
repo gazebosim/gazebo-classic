@@ -9,6 +9,7 @@ include_directories(
 # which uses tinxyml. Not defining the link directory here will end up
 # failures in clang.
 link_directories(
+  ${CCD_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
 )
@@ -18,6 +19,10 @@ add_definitions(${QT_DEFINITIONS})
 
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
+endif()
+
+if (HAVE_DART)
+  link_directories(${DARTCore_LIBRARY_DIRS})
 endif()
 
 set (plugins
@@ -30,6 +35,7 @@ set (plugins
   DiffDrivePlugin
   ForceTorquePlugin
   GpuRayPlugin
+  ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin
   LiftDragPlugin

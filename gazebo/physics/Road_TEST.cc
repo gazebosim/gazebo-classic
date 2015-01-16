@@ -45,7 +45,7 @@ TEST_F(RoadTest, Texture)
       new physics::Road(physics::BasePtr()));
   sdf::ElementPtr scriptElem = roadSDF->GetElement(
       "material")->GetElement("script");
-  ASSERT_TRUE(scriptElem);
+  ASSERT_TRUE(scriptElem != NULL);
   road->Load(roadSDF);
 
   EXPECT_STREQ(road->GetName().c_str(), "my_road");

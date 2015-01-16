@@ -448,6 +448,15 @@ void Joint::SetModel(ModelPtr _model)
 }
 
 //////////////////////////////////////////////////
+double Joint::GetParam(const std::string &/*_key*/,
+    unsigned int /*_index*/)
+{
+  gzerr << "GetParam not yet implemented"
+        << std::endl;
+  return 0;
+}
+
+//////////////////////////////////////////////////
 LinkPtr Joint::GetChild() const
 {
   return this->childLink;
@@ -460,41 +469,52 @@ LinkPtr Joint::GetParent() const
 }
 
 //////////////////////////////////////////////////
+msgs::Joint::Type Joint::GetMsgType() const
+{
+  if (this->HasType(Base::HINGE_JOINT))
+  {
+    return msgs::Joint::REVOLUTE;
+  }
+  else if (this->HasType(Base::HINGE2_JOINT))
+  {
+    return msgs::Joint::REVOLUTE2;
+  }
+  else if (this->HasType(Base::BALL_JOINT))
+  {
+    return msgs::Joint::BALL;
+  }
+  else if (this->HasType(Base::SLIDER_JOINT))
+  {
+    return msgs::Joint::PRISMATIC;
+  }
+  else if (this->HasType(Base::SCREW_JOINT))
+  {
+    return msgs::Joint::SCREW;
+  }
+  else if (this->HasType(Base::GEARBOX_JOINT))
+  {
+    return msgs::Joint::GEARBOX;
+  }
+  else if (this->HasType(Base::UNIVERSAL_JOINT))
+  {
+    return msgs::Joint::UNIVERSAL;
+  }
+
+  gzerr << "No joint recognized in type ["
+        << this->GetType()
+        << "], returning REVOLUTE"
+        << std::endl;
+  return msgs::Joint::REVOLUTE;
+}
+
+//////////////////////////////////////////////////
 void Joint::FillMsg(msgs::Joint &_msg)
 {
   _msg.set_name(this->GetScopedName());
   _msg.set_id(this->GetId());
 
   msgs::Set(_msg.mutable_pose(), this->anchorPose);
-
-  if (this->HasType(Base::HINGE_JOINT))
-  {
-    _msg.set_type(msgs::Joint::REVOLUTE);
-  }
-  else if (this->HasType(Base::HINGE2_JOINT))
-  {
-    _msg.set_type(msgs::Joint::REVOLUTE2);
-  }
-  else if (this->HasType(Base::BALL_JOINT))
-  {
-    _msg.set_type(msgs::Joint::BALL);
-  }
-  else if (this->HasType(Base::SLIDER_JOINT))
-  {
-    _msg.set_type(msgs::Joint::PRISMATIC);
-  }
-  else if (this->HasType(Base::SCREW_JOINT))
-  {
-    _msg.set_type(msgs::Joint::SCREW);
-  }
-  else if (this->HasType(Base::GEARBOX_JOINT))
-  {
-    _msg.set_type(msgs::Joint::GEARBOX);
-  }
-  else if (this->HasType(Base::UNIVERSAL_JOINT))
-  {
-    _msg.set_type(msgs::Joint::UNIVERSAL);
-  }
+  _msg.set_type(this->GetMsgType());
 
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
   {

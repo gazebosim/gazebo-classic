@@ -745,11 +745,13 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
   {
     // Make sure we set the _mod only if we have found a selection object
     if (closestEntity->getName().substr(0, 15) == "__SELECTION_OBJ" &&
-        closestEntity->getUserAny().getType() == typeid(std::string))
+        closestEntity->getUserObjectBindings().getUserAny().getType()
+        == typeid(std::string))
     {
       try
       {
-        _mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
+        _mod = Ogre::any_cast<std::string>(
+            closestEntity->getUserObjectBindings().getUserAny());
       }
       catch(boost::bad_any_cast &e)
       {
@@ -760,7 +762,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
     try
     {
       visual = this->GetVisual(Ogre::any_cast<std::string>(
-            closestEntity->getUserAny()));
+            closestEntity->getUserObjectBindings().getUserAny()));
     }
     catch(boost::bad_any_cast &e)
     {
@@ -904,7 +906,7 @@ void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
         try
         {
           VisualPtr v = this->GetVisual(Ogre::any_cast<std::string>(
-                                        ogreEntity->getUserAny()));
+                ogreEntity->getUserObjectBindings().getUserAny()));
           if (v)
             _visuals.push_back(v);
         }
@@ -930,7 +932,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
     try
     {
       visual = this->GetVisual(Ogre::any_cast<std::string>(
-            closestEntity->getUserAny()));
+            closestEntity->getUserObjectBindings().getUserAny()));
     }
     catch(boost::bad_any_cast &e)
     {

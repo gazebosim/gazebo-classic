@@ -105,7 +105,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   sensors::ImuSensorPtr imuSensor =
       boost::dynamic_pointer_cast<sensors::ImuSensor>(sensor);
 
-  ASSERT_TRUE(imuSensor);
+  ASSERT_TRUE(imuSensor != NULL);
 
   sensors::SensorManager::Instance()->Init();
   imuSensor->SetActive(true);

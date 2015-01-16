@@ -460,7 +460,7 @@ namespace gazebo
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
       public: virtual double GetParam(const std::string &_key,
-                                      unsigned int _index) = 0;
+                                      unsigned int _index);
 
       /// \brief Get the child link
       /// \return Pointer to the child link.
@@ -469,6 +469,10 @@ namespace gazebo
       /// \brief Get the parent link.
       /// \return Pointer to the parent link.
       public: LinkPtr GetParent() const;
+
+      /// \brief Get the joint type as msgs::Joint::Type.
+      /// \return Joint type.
+      public: msgs::Joint::Type GetMsgType() const;
 
       /// \brief Fill a joint message.
       /// \param[out] _msg Message to fill with this joint's properties.

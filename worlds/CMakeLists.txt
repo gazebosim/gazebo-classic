@@ -26,6 +26,9 @@ set (files
   multilink_shape.world
   openal.world
   pioneer2dx.world
+  pioneer2dx_camera.world
+  pioneer2dx_laser.world
+  pioneer2dx_laser_camera.world
   plane_demo.world
   plugin.world
   polyline.world
