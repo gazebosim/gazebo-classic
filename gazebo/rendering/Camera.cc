@@ -1222,7 +1222,6 @@ void Camera::SetCaptureDataOnce()
 //////////////////////////////////////////////////
 void Camera::CreateRenderTexture(const std::string &_textureName)
 {
-  return;
   int fsaa = 4;
 
   // Full-screen anti-aliasing only works correctly in 1.8 and above
@@ -1298,7 +1297,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->viewport = this->renderTarget->addViewport(this->camera);
     this->viewport->setClearEveryFrame(true);
     this->viewport->setShadowsEnabled(true);
-    this->viewport->setOverlaysEnabled(true);
+    this->viewport->setOverlaysEnabled(false);
 
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 

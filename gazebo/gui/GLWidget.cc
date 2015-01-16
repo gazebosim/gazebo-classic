@@ -341,13 +341,6 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     }
   }
 
-  // publish key press event
-  msgs::Request keyData;
-  keyData.set_id(1);
-  keyData.set_request("key pressed");
-  keyData.set_dbl_data(1.0);
-  keyData.set_data(this->keyText);
-
   // Process Key Events
   if (!KeyEventHandler::Instance()->HandlePress(this->keyEvent))
   {
@@ -404,13 +397,6 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->keyText = "";
 
   this->userCamera->HandleKeyReleaseEvent(_event->text().toStdString());
-
-  // publish key press event
-  msgs::Request keyData;
-  keyData.set_id(1);
-  keyData.set_request("key released");
-  keyData.set_dbl_data(0.0);
-  keyData.set_data(_event->text().toStdString());
 
   // Process Key Events
   KeyEventHandler::Instance()->HandleRelease(this->keyEvent);
