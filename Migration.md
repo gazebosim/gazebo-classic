@@ -4,6 +4,9 @@
 1. **gazebo/physics/ODEPhysics**
     + Many member variables are now contained in a private data pointer.
 
+1. Privatized World::dirtyPoses
+    + World::dirtyPoses used to be a public attribute. This is now a private attribute, and specific "friends" have been added to the World file.
+
 1. **gazebo/rendering/Visual.hh**
     + The GetBoundingBox() function now returns a local bounding box without scale applied.
 
