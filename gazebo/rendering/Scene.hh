@@ -585,7 +585,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: ScenePrivate *dataPtr;
+      private: ScenePrivate *dataPtr;
     };
     /// \}
   }
