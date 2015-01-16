@@ -238,7 +238,6 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
 {
   VisualPtr result(new Visual(_name, _newParent));
   result->Load(this->dataPtr->sdf);
-
   std::vector<VisualPtr>::iterator iter;
   for (iter = this->dataPtr->children.begin();
       iter != this->dataPtr->children.end(); ++iter)
@@ -547,6 +546,7 @@ void Visual::Load()
   {
     sdf::ElementPtr matElem =
         this->dataPtr->sdf->GetElement("material");
+
     if (matElem->HasElement("script"))
     {
       sdf::ElementPtr scriptElem = matElem->GetElement("script");
@@ -565,21 +565,21 @@ void Visual::Load()
 
       if (!matName.empty())
         this->SetMaterial(matName);
+
+      if (matElem->HasElement("ambient"))
+        this->SetAmbient(matElem->Get<common::Color>("ambient"));
+      if (matElem->HasElement("diffuse"))
+        this->SetDiffuse(matElem->Get<common::Color>("diffuse"));
+      if (matElem->HasElement("specular"))
+        this->SetSpecular(matElem->Get<common::Color>("specular"));
+      if (matElem->HasElement("emissive"))
+        this->SetEmissive(matElem->Get<common::Color>("emissive"));
     }
 
     if (matElem->HasElement("lighting"))
     {
       this->SetLighting(matElem->Get<bool>("lighting"));
     }
-
-    if (matElem->HasElement("ambient"))
-      this->SetAmbient(matElem->Get<common::Color>("ambient"));
-    if (matElem->HasElement("diffuse"))
-      this->SetDiffuse(matElem->Get<common::Color>("diffuse"));
-    if (matElem->HasElement("specular"))
-      this->SetSpecular(matElem->Get<common::Color>("specular"));
-    if (matElem->HasElement("emissive"))
-      this->SetEmissive(matElem->Get<common::Color>("emissive"));
   }
 
   // Allow the mesh to cast shadows

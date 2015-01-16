@@ -518,7 +518,7 @@ material Gazebo/RedTransparent
       scene_blend alpha_blend
       depth_write off
       lighting off
-      
+
       texture_unit
       {
         colour_op_ex source1 src_manual src_current 1 0 0

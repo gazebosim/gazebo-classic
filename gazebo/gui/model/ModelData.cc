@@ -49,9 +49,9 @@ std::string ModelData::GetTemplateSDFString()
     <<     "</geometry>"
     <<     "<material>"
     <<       "<lighting>true</lighting>"
-    <<       "<ambient>1 1 1 1</ambient>"
-    <<       "<diffuse>1 1 1 1</diffuse>"
-    <<       "<specular>1 1 1 1</specular>"
+    <<       "<ambient>0.3 0.3 0.3 1</ambient>"
+    <<       "<diffuse>0.7 0.7 0.7 1</diffuse>"
+    <<       "<specular>0.01 0.01 0.01 1</specular>"
     <<       "<script>"
     <<         "<uri>file://media/materials/scripts/gazebo.material</uri>"
     <<         "<name>Gazebo/Grey</name>"
@@ -363,7 +363,6 @@ void PartData::OnAddCollision(const std::string &_name)
   collisionConfig->UpdateCollision(_name, &collisionMsg);
   this->collisions[collisionVis] = collisionMsg;
 
-  collisionVis->SetMaterial("Gazebo/Orange");
   collisionVis->SetTransparency(
       math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
 
@@ -461,9 +460,7 @@ void PartData::Update()
         boost::shared_ptr<gazebo::msgs::Visual> updateMsgPtr;
         updateMsgPtr.reset(new msgs::Visual);
         updateMsgPtr->CopyFrom(collisionVisMsg);
-
         std::string origGeomType = it->first->GetGeometryType();
-
         it->first->UpdateFromMsg(updateMsgPtr);
 
         // fix for transparency alpha compositing

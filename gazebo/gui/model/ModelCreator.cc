@@ -360,8 +360,12 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
       _visual->Clone(part->partVisual->GetName() + "_collision",
       part->partVisual);
 
-  collisionVis->SetMaterial("Gazebo/Orange");
-  collisionVis->SetTransparency(0.8);
+  // orange
+  collisionVis->SetAmbient(common::Color(1.0, 0.5, 0.05));
+  collisionVis->SetDiffuse(common::Color(1.0, 0.5, 0.05));
+  collisionVis->SetSpecular(common::Color(0.5, 0.5, 0.5));
+  collisionVis->SetTransparency(
+      math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
   // fix for transparency alpha compositing
   Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
       getAttachedObject(0);
