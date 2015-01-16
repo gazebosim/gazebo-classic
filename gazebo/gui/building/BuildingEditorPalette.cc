@@ -32,7 +32,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->setObjectName("buildingEditorPalette");
 
   this->buildingDefaultName = "Untitled";
-  this->currentMode = std::string();
+  this->currentMode.clear();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
@@ -47,8 +47,8 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
           SLOT(OnNameChanged(QString)));
 
   // Brushes (button group)
-  brushes = new QButtonGroup();
-  connect(brushes, SIGNAL(buttonClicked(int)), this, SLOT(OnBrush(int)));
+  this->brushes = new QButtonGroup();
+  connect(this->brushes, SIGNAL(buttonClicked(int)), this, SLOT(OnBrush(int)));
 
   QSize toolButtonSize(100, 100);
   QSize iconSize(65, 65);
@@ -133,7 +133,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
     QPixmap colorIcon(30, 30);
     colorIcon.fill(this->colorList.at(i));
     colorButton->setIcon(colorIcon);
-    brushes->addButton(colorButton, i);
+    this->brushes->addButton(colorButton, i);
     colorsLayout->addWidget(colorButton, 0, i);
   }
 
@@ -167,7 +167,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
         QSize(90, 90), Qt::IgnoreAspectRatio));
     textureButton->setText(textureButtonTextList[i]);
     textureButton->setIconSize(QSize(40, 40));
-    brushes->addButton(textureButton, brushes->buttons().size());
+    this->brushes->addButton(textureButton, this->brushes->buttons().size());
     texturesLayout->addWidget(textureButton, 0, i);
   }
 
@@ -219,13 +219,14 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 
   // TODO: Improve brushes logic
   // Custom color button must come immediately after color and texture buttons
-  brushes->addButton(this->customColorButton, brushes->buttons().size());
+  this->brushes->addButton(this->customColorButton,
+      this->brushes->buttons().size());
   // And all other buttons after that
-  brushes->addButton(wallButton, brushes->buttons().size());
-  brushes->addButton(windowButton, brushes->buttons().size());
-  brushes->addButton(doorButton, brushes->buttons().size());
-  brushes->addButton(stairsButton, brushes->buttons().size());
-  brushes->addButton(importImageButton, brushes->buttons().size());
+  this->brushes->addButton(wallButton, this->brushes->buttons().size());
+  this->brushes->addButton(windowButton, this->brushes->buttons().size());
+  this->brushes->addButton(doorButton, this->brushes->buttons().size());
+  this->brushes->addButton(stairsButton, this->brushes->buttons().size());
+  this->brushes->addButton(importImageButton, this->brushes->buttons().size());
 }
 
 /////////////////////////////////////////////////
@@ -316,7 +317,7 @@ void BuildingEditorPalette::OnCreateEditorItem(const std::string &_mode)
       this->brushes->checkedButton()->setChecked(false);
     this->brushes->setExclusive(true);
 
-    this->currentMode = std::string();
+    this->currentMode.clear();
   }
   else
   {
@@ -327,17 +328,17 @@ void BuildingEditorPalette::OnCreateEditorItem(const std::string &_mode)
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnBrush(int _buttonId)
 {
-  if (_buttonId < static_cast<int>(colorList.size()))
+  if (_buttonId < static_cast<int>(this->colorList.size()))
   {
     this->OnDefaultColor(_buttonId);
   }
-  else if (_buttonId < static_cast<int>(colorList.size()) +
-                       static_cast<int>(textureList.size()))
+  else if (_buttonId < static_cast<int>(this->colorList.size()) +
+                       static_cast<int>(this->textureList.size()))
   {
-    this->OnTexture(_buttonId - static_cast<int>(colorList.size()));
+    this->OnTexture(_buttonId - static_cast<int>(this->colorList.size()));
   }
-  else if (_buttonId == static_cast<int>(colorList.size()) +
-                       static_cast<int>(textureList.size()))
+  else if (_buttonId == static_cast<int>(this->colorList.size()) +
+                       static_cast<int>(this->textureList.size()))
   {
     this->OnCustomColor();
   }
@@ -377,9 +378,7 @@ void BuildingEditorPalette::OnCustomColor()
 
   if (color.isValid())
   {
-    std::ostringstream colorStr;
-    colorStr << "color_custom";
-    this->currentMode = colorStr.str();
+    this->currentMode = "color_custom";
     this->OnColor(color);
   }
   else

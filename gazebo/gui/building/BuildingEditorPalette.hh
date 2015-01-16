@@ -115,12 +115,6 @@ namespace gazebo
       /// \brief All the brushes (wall, door, window, stair, etc).
       private: QButtonGroup *brushes;
 
-      /// \brief Name of model.
-      private: std::string modelName;
-
-      /// \brief Save location.
-      private: std::string saveLocation;
-
       /// \brief A list of gui editor events connected to this palette.
       private: std::vector<event::ConnectionPtr> connections;
 
