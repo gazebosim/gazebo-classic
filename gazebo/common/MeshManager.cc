@@ -606,6 +606,179 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
 }
 
 //////////////////////////////////////////////////
+void MeshManager::CreateExtrudedPath(const std::string &_name,
+    const std::vector<std::vector<math::Vector2d> > &_path, double _height)
+{
+  if (this->HasMesh(_name))
+  {
+    return;
+  }
+
+  Mesh *mesh = new Mesh();
+  mesh->SetName(_name);
+  this->meshes.insert(std::make_pair(_name, mesh));
+
+  SubMesh *subMesh = new SubMesh();
+  mesh->AddSubMesh(subMesh);
+
+  #if HAVE_GTS
+  {
+    if (!GTSMeshUtils::CreateExtrudedPath(_path, _height, subMesh))
+    {
+      gzerr << "Unable to triangulate path.\n";
+      delete mesh;
+      return;
+    }
+  }
+  #else
+  {
+    gzerr << "GTS library not found. Can not extrud path" << std::endl;
+  }
+  #endif
+
+  // create a list of all exterior edges.
+  std::vector<std::vector<math::Vector2d> > edges;
+  for (unsigned int i = 0; i < _path.size(); ++i)
+  {
+    for (unsigned int j = 0; j < _path[i].size(); ++j)
+    {
+      if (j == 0)
+        continue;
+
+      std::vector<math::Vector2d> edge;
+      edge.resize(2);
+      edge[0] = _path[i][j-1];
+      edge[1] = _path[i][j];
+      edges.push_back(edge);
+    }
+    std::vector<math::Vector2d> edge;
+    edge.resize(2);
+    edge[0] = _path[i][_path[i].size()-1];
+    edge[1] = _path[i][0];
+    edges.push_back(edge);
+  }
+
+
+  std::vector<math::Vector3> normals;
+  for (unsigned int i  = 0; i < edges.size(); ++i)
+  {
+    std::vector<math::Vector2d> edge = edges[i];
+    std::cerr << " submesh index count " << subMesh->GetIndexCount()
+         << std::endl;
+    for (unsigned int j = 0; j < subMesh->GetIndexCount(); j+=3)
+    {
+      math::Vector3 v0 = subMesh->GetVertex(subMesh->GetIndex(j));
+      math::Vector3 v1 = subMesh->GetVertex(subMesh->GetIndex(j+1));
+      math::Vector3 v2 = subMesh->GetVertex(subMesh->GetIndex(j+2));
+
+      //std::cerr << subMesh->GetIndex(j) << " " << subMesh->GetIndex(j+1) << " "
+          //<< subMesh->GetIndex(j+2) << std::endl;
+/*      std::cerr << "v0 " << v0 << std::endl;
+      std::cerr << "v1 " << v1 << std::endl;
+      std::cerr << "v2 " << v2 << std::endl;
+      std::cerr << "e0 " << edge[0] << std::endl;
+      std::cerr << "e1 " << edge[1] << std::endl;*/
+      std::vector<math::Vector3> triangle;
+      triangle.push_back(v0);
+      triangle.push_back(v1);
+      triangle.push_back(v2);
+
+      int ev0 = -1;
+      for (unsigned int k = 0; k < triangle.size(); ++k)
+      {
+        if (math::Vector2d(triangle[k].x, triangle[k].y) == edge[0])
+        {
+          // found a vertex in triangle that matches the vertex of the edge
+          ev0 = k;
+//          std::cerr << " found ev0 " << triangle[k] << ", index " << ev0 << std::endl;
+          break;
+        }
+      }
+      if (ev0 >=0)
+      {
+        int ev1 = -1;
+        int ev2 = -1;
+        for (unsigned int k = 0; k < triangle.size()-1; ++k)
+        {
+          int index = (ev0 + k + 1) % triangle.size();
+          math::Vector3 triV = triangle[index];
+          if (math::Vector2d(triV.x, triV.y) == edge[1])
+          {
+            // found another vertex in triangle that matches the vertex of the
+            // other edge.
+            ev1 = index;
+            // Store the index of the third triangle vertex.
+            // It's either 0, 1, or 2. Find it using simple bitwise operation.
+            ev2 =  ~(ev1 | ev0) & 0x03;
+//            std::cerr << " found ev1 " << triV << ", index " << ev1 << std::endl;
+//            std::cerr << " found ev2 index " << ev2 << std::endl;
+            break;
+          }
+        }
+        if (ev1 >= 0 && ev2 >= 0 && ev0 != ev1 && ev0 != ev2)
+        {
+//          std::cerr << "found an edge in triangle that matches the exterior edge"
+//              << std::endl;
+
+          // Found an edge in triangle that matches the exterior edge.
+          // Now find its normal.
+
+          math::Vector3 edgeVec = triangle[ev0] - triangle[ev1];
+          edgeVec.Normalize();
+          math::Vector3 normal(edgeVec.y, edgeVec.x, 0);
+
+          math::Vector3 otherEdgeVec = triangle[ev0] - triangle[ev2];
+          otherEdgeVec.Normalize();
+          double angle0 = otherEdgeVec.Dot(normal);
+          double angle1 = otherEdgeVec.Dot(-normal);
+
+          if (angle0 > angle1)
+          {
+            if (angle0 >= 0)
+              normals.push_back(normal);
+            else
+                std::cerr << "angle0: found negative normal" << std::endl;
+          }
+          else
+          {
+            if (angle1 >= 0)
+              normals.push_back(-normal);
+            else
+                std::cerr << "angle1: found negative normal" << std::endl;
+          }
+
+        }
+        else
+        {
+          //std::cerr << "Same edge vertices found. This should never happen"
+          //    << std::endl;
+        }
+      }
+    }
+  }
+
+  std::cerr << " no. of edges " << edges.size() << std::endl;
+  std::cerr << " no. of normals " << normals.size() << std::endl;
+
+  for (unsigned i = 0; i < normals.size(); ++i)
+  {
+    std::cerr << "edge " << edges[i][0] << ", " << edges[i][1] << std::endl;
+    std::cerr << "normals " << normals[i] << std::endl;
+  }
+
+  // create the top face
+  unsigned int numIndices = subMesh->GetIndexCount();
+  for (unsigned int i = 0; i < numIndices; ++i)
+  {
+    math::Vector3 vertex = subMesh->GetVertex(subMesh->GetIndex(i));
+    subMesh->AddVertex(vertex.x, vertex.y, _height);
+    subMesh->AddIndex(numIndices+i);
+  }
+
+  // create the size faces
+}
+
+//////////////////////////////////////////////////
 void MeshManager::CreateCamera(const std::string &_name, float _scale)
 {
   int i, k;
@@ -1123,4 +1296,3 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
   this->meshes.insert(std::make_pair(_name, mesh));
 }
 #endif
-
