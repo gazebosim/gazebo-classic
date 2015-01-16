@@ -526,13 +526,6 @@ math::Vector3 BulletJoint::GetLinkTorque(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetAttribute(Attribute, unsigned int /*_index*/,
-    double /*_value*/)
-{
-  gzdbg << "Not implement in Bullet\n";
-}
-
-//////////////////////////////////////////////////
 bool BulletJoint::SetParam(const std::string &/*_key*/,
     unsigned int /*_index*/,
     const boost::any &/*_value*/)
