@@ -1858,7 +1858,9 @@ void Scene::PreRender()
 
     if (this->selectionMsg)
     {
-      this->SelectVisual(this->selectionMsg->name(), "normal");
+      if (!this->selectedVis ||
+          this->selectionMsg->name() != this->selectedVis->GetName())
+        this->SelectVisual(this->selectionMsg->name(), "normal");
       this->selectionMsg.reset();
     }
   }
