@@ -573,7 +573,7 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->dataPtr->rightViewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
 
-#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
     this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
     this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
 #endif
