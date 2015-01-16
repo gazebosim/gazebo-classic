@@ -255,9 +255,6 @@ namespace gazebo
       /// \brief Rotation angle of the rect item in degrees.
       protected: double rotationAngle;
 
-      /// \brief Z ordering of the rect item when idle (unselected.)
-      protected: int zValueIdle;
-
       /// \brief Qt action for opening the inspector.
       protected: QAction *openInspectorAct;
 
@@ -268,9 +265,6 @@ namespace gazebo
       /// Currently only used for windows and doors, containing one measure
       /// towards each end of this item's parent wall.
       protected: std::vector<MeasureItem *> measures;
-
-      /// \brief Scale for converting from pixel to metric units.
-      protected: double scale;
 
       /// \brief Mouse press position in pixel coordinates.
       private: QPointF mousePressPos;
@@ -288,9 +282,6 @@ namespace gazebo
       /// \brief A list of resize cursors used when the mouse hovers over the
       /// grabber handles.
       private: std::vector<Qt::CursorShape> cursors;
-
-      /// \brief Z ordering of the rect item when selected.
-      private: int zValueSelected;
 
       /// \brief Resize flag that controls how the rect item can be resized.
       private: unsigned int resizeFlag;

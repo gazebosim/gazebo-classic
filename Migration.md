@@ -2,8 +2,11 @@
 
 ### Modifications
 
-+1. Privatized Scene::skyx
-+    + Scene::skyx used to be a public attribute. This is now a private attribute, and a GetSkyX() funcion has been added to access the sky object.
+1. Privatized World::dirtyPoses
+    + World::dirtyPoses used to be a public attribute. This is now a private attribute, and specific "friends" have been added to the World file.
+
+1. Privatized Scene::skyx
+    + Scene::skyx used to be a public attribute. This is now a private attribute, and a GetSkyX() funcion has been added to access the sky object.
 
 1. **gazebo/rendering/Visual.hh**
     + The GetBoundingBox() function now returns a local bounding box without scale applied.
