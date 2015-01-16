@@ -1,6 +1,9 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.0.0
+1. Implemented private data pointer for the World class.
+    * [Pull request #1383](https://bitbucket.org/osrf/gazebo/pull-request/1383)
+
 1. Added a events::Event::resetWorld event that is triggered when World::Reset is called.
     * [Pull request #1332](https://bitbucket.org/osrf/gazebo/pull-request/1332)
     * [Issue #1375](https://bitbucket.org/osrf/gazebo/issue/1375)
