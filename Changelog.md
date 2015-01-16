@@ -1,3 +1,7 @@
+1. Model editor updates
+    1. Joint preview using JointVisuals.
+        * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.0.0
