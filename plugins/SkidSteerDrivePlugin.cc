@@ -42,6 +42,7 @@ int SkidSteerDrivePlugin::RegisterJoint(int _index, const std::string &_name)
     gzerr << "Joint index " << _index <<  " out of bounds [0, "
           << NUMBER_OF_WHEELS << "] in model " << this->model->GetName()
           << "." << std::endl;
+    return 1;
   }
 
   // Find the specified joint and add it to out list
