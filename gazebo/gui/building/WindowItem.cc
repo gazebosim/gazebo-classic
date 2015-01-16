@@ -30,7 +30,7 @@ using namespace gui;
 WindowItem::WindowItem(): RectItem(), BuildingItem()
 {
   this->editorType = "Window";
-  this->scale = BuildingMaker::conversionScale;
+  this->itemScale = BuildingMaker::conversionScale;
 
   this->level = 0;
   this->levelBaseHeight = 0;
@@ -160,18 +160,18 @@ void WindowItem::OnApply()
   WindowDoorInspectorDialog *dialog =
      qobject_cast<WindowDoorInspectorDialog *>(QObject::sender());
 
-  QPointF itemPos = this->windowPos * this->scale;
+  QPointF itemPos = this->windowPos * this->itemScale;
   itemPos.setY(-itemPos.y());
-  this->SetSize(QSize(dialog->GetWidth() / this->scale,
-      dialog->GetDepth() / this->scale));
-  this->windowWidth = dialog->GetWidth() / this->scale;
-  this->windowHeight = dialog->GetHeight() / this->scale;
-  this->windowDepth = dialog->GetDepth() / this->scale;
-  this->windowElevation = dialog->GetElevation() / this->scale;
+  this->SetSize(QSize(dialog->GetWidth() / this->itemScale,
+      dialog->GetDepth() / this->itemScale));
+  this->windowWidth = dialog->GetWidth() / this->itemScale;
+  this->windowHeight = dialog->GetHeight() / this->itemScale;
+  this->windowDepth = dialog->GetDepth() / this->itemScale;
+  this->windowElevation = dialog->GetElevation() / this->itemScale;
   if ((fabs(dialog->GetPosition().x() - itemPos.x()) >= 0.01)
       || (fabs(dialog->GetPosition().y() - itemPos.y()) >= 0.01))
   {
-    itemPos = dialog->GetPosition() / this->scale;
+    itemPos = dialog->GetPosition() / this->itemScale;
     itemPos.setY(-itemPos.y());
     this->windowPos = itemPos;
     this->setPos(this->windowPos);
@@ -205,12 +205,12 @@ void WindowItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
 void WindowItem::OnOpenInspector()
 {
   this->inspector->SetName(this->GetName());
-  this->inspector->SetWidth(this->windowWidth * this->scale);
-  this->inspector->SetHeight(this->windowHeight * this->scale);
-  this->inspector->SetElevation(this->windowElevation * this->scale);
-  this->inspector->SetDepth(this->windowDepth * this->scale);
+  this->inspector->SetWidth(this->windowWidth * this->itemScale);
+  this->inspector->SetHeight(this->windowHeight * this->itemScale);
+  this->inspector->SetElevation(this->windowElevation * this->itemScale);
+  this->inspector->SetDepth(this->windowDepth * this->itemScale);
 
-  QPointF itemPos = this->windowPos * this->scale;
+  QPointF itemPos = this->windowPos * this->itemScale;
   itemPos.setY(-itemPos.y());
   this->inspector->SetPosition(itemPos);
   this->inspector->move(QCursor::pos());

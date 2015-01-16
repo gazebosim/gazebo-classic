@@ -34,7 +34,8 @@ MeasureItem::MeasureItem(const QPointF &_start, const QPointF &_end)
   this->setAcceptHoverEvents(true);
 
   this->SetLine(_start, _end);
-  this->setZValue(5);
+  this->zValueSelected = 8;
+  this->setZValue(this->zValueSelected);
   this->ShowHandles(false);
 
   this->value = 0;
