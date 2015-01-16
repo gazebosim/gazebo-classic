@@ -112,7 +112,6 @@ void CubicBezier(const math::Vector2d &p0,
     auto p = bezierInterpolate(t, p0, p1, p2, p3);
     points.push_back(p);
   }
-std::cout << "done" << std::endl;
 }
 
 
@@ -252,8 +251,6 @@ void SVGLoader::make_commands(char cmd, const std::vector<double> &numbers, std:
     c.numbers = numbers;
     cmds.push_back(c);
   }
-
-
 }
 
 /////////////////////////////////////////////////
@@ -387,6 +384,10 @@ void SVGLoader::GetPathAttribs(TiXmlElement* pElement, SVGPath &path)
         {
             path.id = value;
         }
+        if (name == "transform")
+        {
+            path.transform = value;
+        }
         if (name == "d")
         {
             using namespace std;
@@ -453,32 +454,33 @@ void SVGLoader::Parse(const std::string &_filename, std::vector<SVGPath> &paths)
 }
 
 /////////////////////////////////////////////////
-void SVGLoader::DumpPaths(const std::vector<SVGPath> paths ) const
+void SVGLoader::DumpPaths(const std::vector<SVGPath> paths, std::ostream &out) const
 {   
-
   for (SVGPath path : paths)
   {
-    std::cout << "// Path : " <<  path.id << std::endl;
+    out << "// Path : " <<  path.id << std::endl;
     for (auto subpath :path.subpaths)
     {
-      std::cout << "// subpath" << std::endl;  
+      out << "// subpath" << std::endl;  
       for (auto cmd : subpath)
       {
-         std::cout << "// " << cmd.type << std::endl << "//  ";
+         out << "// " << cmd.type << std::endl << "//  ";
          for (auto n : cmd.numbers)
          {
-            std::cout << " " << n;
+            out << " " << n;
          }
-         std::cout << std::endl;
+         out << std::endl;
       }
     }
   }
 
-  std::cout << "var svg = [];" << std::endl;
+  out << "var svg = [];" << std::endl;
   for (SVGPath path : paths)
   {
-    std::cout << "svg.push({name:\"" << path.id <<  "\", subpaths:[], style: \"" << path.style << "\"}); " << std::endl;
-    std::cout << "svg[svg.length-1].subpaths = [";
+    out << "svg.push({name:\"" << path.id <<  "\"," << std::endl;
+    out << "          transform:\"" << path.transform <<  "\"," << std::endl;
+    out << "          subpaths:[], style: \"" << path.style << "\"});" << std::endl;
+    out << "svg[svg.length-1].subpaths = [[" << std::endl;
     char psep = ' ';
 
     for (unsigned int i=0; i < path.polylines.size(); i++)
@@ -489,13 +491,13 @@ void SVGLoader::DumpPaths(const std::vector<SVGPath> paths ) const
       char sep = ' ';
       for( math::Vector2d p : poly)
       {
-        std::cout << " " << sep << " [" <<  p.x << ", " << p.y << "]" <<std::endl;
+        out << " " << sep << " [" <<  p.x << ", " << p.y << "]" <<std::endl;
 	    sep = ',';
       }
-      std::cout << " ] " << std::endl;
+      out << " ] " << std::endl;
     }
-    std::cout << "];" << std::endl;
-    std::cout << "\n\n";
+    out << "];" << std::endl;
+    out << "\n\n";
   }
 }
 

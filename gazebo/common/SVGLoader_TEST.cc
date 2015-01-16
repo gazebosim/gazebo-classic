@@ -27,6 +27,7 @@ class SVGLoader : public gazebo::testing::AutoLogFixture { };
 
 
 double step = 0.1;
+std::string foutput = "";
 
 /////////////////////////////////////////////////
 TEST_F(SVGLoader, LoadPaths)
@@ -36,10 +37,14 @@ TEST_F(SVGLoader, LoadPaths)
   std::string filePath = std::string(PROJECT_SOURCE_PATH);
   filePath += "/test/data/paths.svg";
   loader.Parse(filePath, paths);
-
+  
   loader.DumpPaths(paths);
-
-    
+  if(!foutput.empty())
+  {
+    std::ofstream out(foutput.c_str() );
+    loader.DumpPaths(paths, out);
+    out.close();
+  }
 
 /*
   EXPECT_STREQ("unknown", mesh->GetName().c_str());
@@ -79,6 +84,13 @@ int main(int argc, char **argv)
         std::cout << "Can't set step to " << s << ". Step is " << step << std::endl;
     }
   }
+
+  if(argc >= 3)
+  {
+    // output to save results
+    foutput = argv[2];
+  }
+
 
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

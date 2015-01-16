@@ -45,9 +45,8 @@ namespace gazebo
 		{
 			 std::string id;
 			 std::string style;
-
+             std::string transform;
 			 std::vector< std::vector<SVGCommand> > subpaths;   
-
 			 std::vector< std::vector<math::Vector2d> > polylines;
 		};
 
@@ -56,7 +55,7 @@ namespace gazebo
 			public: SVGLoader(double _resolution);
 
 			public: void Parse(const std::string &_filename, std::vector<SVGPath> &paths);
-			public: void DumpPaths(const std::vector<SVGPath> paths ) const;
+			public: void DumpPaths(const std::vector<SVGPath> paths, std::ostream &out=std::cout) const;
 
 			private: void make_commands(char cmd, const std::vector<double> &numbers, std::vector<SVGCommand> &cmds);
 			private: void get_path_commands(const std::vector<std::string> &tokens, SVGPath &path);
