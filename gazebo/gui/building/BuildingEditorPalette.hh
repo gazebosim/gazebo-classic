@@ -94,8 +94,8 @@ namespace gazebo
       /// \param[in] _buttonId Id of the button clicked.
       private: void OnDefaultColor(int _buttonId);
 
-      /// \brief When the custom color button is selected.
-      /// A QColorDialog is opened.
+      /// \brief When the custom color button is selected,
+      /// a QColorDialog is opened.
       private: void OnCustomColor();
 
       /// \brief When any color is selected.
