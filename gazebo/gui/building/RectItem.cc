@@ -976,8 +976,8 @@ void RectItem::UpdateMeasures()
     this->measures[1]->SetStartPoint(QPointF(this->drawingWidth/2, -d));
 
     this->measures[0]->SetValue(
-        (this->measures[0]->line().length())*this->scale);
+        (this->measures[0]->line().length())*this->itemScale);
     this->measures[1]->SetValue(
-        (this->measures[1]->line().length())*this->scale);
+        (this->measures[1]->line().length())*this->itemScale);
   }
 }
