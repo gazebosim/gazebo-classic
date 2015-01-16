@@ -8,12 +8,17 @@ include_directories(
 )
 
 link_directories(
+  ${CCD_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
 )
 
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
+endif()
+
+if (HAVE_DART)
+  link_directories(${DARTCore_LIBRARY_DIRS})
 endif()
 
 set (test_sources
