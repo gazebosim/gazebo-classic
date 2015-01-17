@@ -44,78 +44,58 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
   // Load parent class
   SurfaceParams::Load(_sdf);
 
-  if (!_sdf)
-    gzerr << "Surface _sdf is NULL" << std::endl;
-  else
+  GZ_ASSERT(_sdf, "Surface _sdf is NULL");
+
   {
-    {
-      sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
-      if (!bounceElem)
-        gzerr << "Surface bounce sdf member is NULL" << std::endl;
-      else
-      {
-        this->bounce = bounceElem->Get<double>("restitution_coefficient");
-        if (this->bounce < 0)
-        {
-          gzwarn << "bounce restitution_coefficient ["
-                 << this->bounce
-                 << "] < 0, so it will not be applied by ODE."
-                 << std::endl;
-        }
-        else if (this->bounce > 1)
-        {
-          gzwarn << "bounce restitution_coefficient ["
-                 << this->bounce
-                 << "] > 1, which is outside the recommended range."
-                 << std::endl;
-        }
-        this->bounceThreshold = bounceElem->Get<double>("threshold");
-      }
-    }
+    sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
+    GZ_ASSERT(frictionElem, "Surface bounce sdf member is NULL");
 
+    this->bounce = bounceElem->Get<double>("restitution_coefficient");
+    if (this->bounce < 0)
     {
-      sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
-      if (!frictionElem)
-        gzerr << "Surface friction sdf member is NULL" << std::endl;
-      else
-      {
-        sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
-        if (!frictionOdeElem)
-          gzerr << "Surface friction ode sdf member is NULL" << std::endl;
-        else
-        {
-          this->frictionPyramid->SetMuPrimary(
-            frictionOdeElem->Get<double>("mu"));
-          this->frictionPyramid->SetMuSecondary(
-            frictionOdeElem->Get<double>("mu2"));
-          this->frictionPyramid->direction1 =
-            frictionOdeElem->Get<math::Vector3>("fdir1");
-
-          this->slip1 = frictionOdeElem->Get<double>("slip1");
-          this->slip2 = frictionOdeElem->Get<double>("slip2");
-        }
-      }
+      gzwarn << "bounce restitution_coefficient ["
+             << this->bounce
+             << "] < 0, so it will not be applied by ODE."
+             << std::endl;
     }
-
+    else if (this->bounce > 1)
     {
-      sdf::ElementPtr contactElem = _sdf->GetElement("contact");
-      if (!contactElem)
-        gzerr << "Surface contact sdf member is NULL" << std::endl;
-      else
-      {
-        sdf::ElementPtr contactOdeElem = contactElem->GetElement("ode");
-        if (!contactOdeElem)
-          gzerr << "Surface contact ode sdf member is NULL" << std::endl;
-        {
-          this->kp = contactOdeElem->Get<double>("kp");
-          this->kd = contactOdeElem->Get<double>("kd");
-          this->cfm = contactOdeElem->Get<double>("soft_cfm");
-          this->erp = contactOdeElem->Get<double>("soft_erp");
-          this->maxVel = contactOdeElem->Get<double>("max_vel");
-          this->minDepth = contactOdeElem->Get<double>("min_depth");
-        }
-      }
+      gzwarn << "bounce restitution_coefficient ["
+             << this->bounce
+             << "] > 1, which is outside the recommended range."
+             << std::endl;
     }
+    this->bounceThreshold = bounceElem->Get<double>("threshold");
+  }
+
+  {
+    sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
+    GZ_ASSERT(frictionElem, "Surface friction sdf member is NULL");
+
+    sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
+    GZ_ASSERT(frictionOdeElem , "Surface friction ode sdf member is NULL");
+
+    this->frictionPyramid->SetMuPrimary(  frictionOdeElem->Get<double>("mu"));
+    this->frictionPyramid->SetMuSecondary(frictionOdeElem->Get<double>("mu2"));
+    this->frictionPyramid->direction1 =
+      frictionOdeElem->Get<math::Vector3>("fdir1");
+    this->slip1 = frictionOdeElem->Get<double>("slip1");
+    this->slip2 = frictionOdeElem->Get<double>("slip2");
+  }
+
+  {
+    sdf::ElementPtr contactElem = _sdf->GetElement("contact");
+    GZ_ASSERT(frictionElem, "Surface contact sdf member is NULL");
+
+    sdf::ElementPtr contactOdeElem = contactElem->GetElement("ode");
+    GZ_ASSERT(frictionElem, "Surface contact ode sdf member is NULL");
+
+    this->kp       = contactOdeElem->Get<double>("kp");
+    this->kd       = contactOdeElem->Get<double>("kd");
+    this->cfm      = contactOdeElem->Get<double>("soft_cfm");
+    this->erp      = contactOdeElem->Get<double>("soft_erp");
+    this->maxVel   = contactOdeElem->Get<double>("max_vel");
+    this->minDepth = contactOdeElem->Get<double>("min_depth");
   }
 }
 
