@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/gui/building/LevelInspectorDialog.hh"
 
 using namespace gazebo;
@@ -201,6 +202,7 @@ void LevelInspectorDialog::SetFloorColor(const QColor _color)
     this->floorColorComboBox->addItem(colorIcon, QString(""));
     index = this->floorColorComboBox->count()-1;
   }
+  GZ_ASSERT(index > 0, "Color index is broken < 0");
   this->floorColorComboBox->setCurrentIndex(index);
 }
 

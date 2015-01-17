@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/gui/building/StairsInspectorDialog.hh"
 
 using namespace gazebo;
@@ -299,6 +300,7 @@ void StairsInspectorDialog::SetColor(const QColor _color)
     this->colorComboBox->addItem(colorIcon, QString(""));
     index = this->colorComboBox->count()-1;
   }
+  GZ_ASSERT(index > 0, "Color index is broken < 0");
   this->colorComboBox->setCurrentIndex(index);
 }
 
