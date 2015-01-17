@@ -845,7 +845,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   unsigned int numc = 0;
   dContact contact;
 
-  // maxCollide must less than the size of this->dataPtr->indices. Check the header
+  // maxCollide must less than the size of this->dataPtr->indices
+  // Check the header
   unsigned int maxCollide = MAX_CONTACT_JOINTS;
 
   // max_contacts specified globally
