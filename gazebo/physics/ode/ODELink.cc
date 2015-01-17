@@ -23,6 +23,7 @@
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/WorldPrivate.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
@@ -182,7 +183,7 @@ void ODELink::MoveCallback(dBodyID _id)
   self->dirtyPose.pos -= cog;
 
   // TODO: this is an ugly line of code. It's like this for speed.
-  self->world->dirtyPoses.push_back(self);
+  self->world->dataPtr->dirtyPoses.push_back(self);
 
   // self->poseMutex->unlock();
 
