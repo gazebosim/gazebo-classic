@@ -43,7 +43,6 @@ SET (headers
   ODEMeshShape.hh
   ODEMultiRayShape.hh
   ODEPhysics.hh
-  ODEPhysicsPrivate.hh
   ODEPlaneShape.hh
   ODEPolylineShape.hh
   ODERayShape.hh
