@@ -16,6 +16,7 @@
 */
 
 #include <float.h>
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/bullet/BulletSurfaceParams.hh"
 

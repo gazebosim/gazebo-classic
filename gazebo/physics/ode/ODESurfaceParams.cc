@@ -16,6 +16,7 @@
 */
 
 #include <float.h>
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 
@@ -48,7 +49,7 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
 
   {
     sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
-    GZ_ASSERT(frictionElem, "Surface bounce sdf member is NULL");
+    GZ_ASSERT(bounceElem, "Surface bounce sdf member is NULL");
 
     this->bounce = bounceElem->Get<double>("restitution_coefficient");
     if (this->bounce < 0)
@@ -85,10 +86,10 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
 
   {
     sdf::ElementPtr contactElem = _sdf->GetElement("contact");
-    GZ_ASSERT(frictionElem, "Surface contact sdf member is NULL");
+    GZ_ASSERT(contactElem, "Surface contact sdf member is NULL");
 
     sdf::ElementPtr contactOdeElem = contactElem->GetElement("ode");
-    GZ_ASSERT(frictionElem, "Surface contact ode sdf member is NULL");
+    GZ_ASSERT(contactOdeElem, "Surface contact ode sdf member is NULL");
 
     this->kp       = contactOdeElem->Get<double>("kp");
     this->kd       = contactOdeElem->Get<double>("kd");
