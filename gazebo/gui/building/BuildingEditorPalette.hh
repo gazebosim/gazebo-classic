@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <map>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Events.hh"
@@ -115,6 +116,9 @@ namespace gazebo
       /// \brief All the brushes (wall, door, window, stair, etc).
       private: QButtonGroup *brushes;
 
+      /// \brief Link each button ID to a draw mode.
+      private: std::map<std::string, int> brushIdToModeMap;
+
       /// \brief A list of gui editor events connected to this palette.
       private: std::vector<event::ConnectionPtr> connections;
 
@@ -126,6 +130,12 @@ namespace gazebo
 
       /// \brief List of default textures to be picked.
       private: std::vector<QString> textureList;
+
+      /// \brief Name of the last default color mode.
+      private: std::string lastDefaultColor;
+
+      /// \brief Name of the last default texture mode.
+      private: std::string lastDefaultTexture;
 
       /// \brief Custom color button.
       private: QPushButton *customColorButton;
