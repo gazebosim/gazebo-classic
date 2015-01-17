@@ -153,7 +153,8 @@ ODEPhysics::~ODEPhysics()
 
   // Delete all the joint feedbacks.
   for (std::vector<ODEJointFeedback*>::iterator iter =
-      this->dataPtr->jointFeedbacks.begin(); iter != this->dataPtr->jointFeedbacks.end(); ++iter)
+      this->dataPtr->jointFeedbacks.begin(); iter !=
+        this->dataPtr->jointFeedbacks.end(); ++iter)
   {
     delete *iter;
   }
@@ -232,7 +233,8 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   else
     dWorldSetERP(this->dataPtr->worldId, 0.2);
 
-  dWorldSetQuickStepNumIterations(this->dataPtr->worldId, this->GetSORPGSIters());
+  dWorldSetQuickStepNumIterations(this->dataPtr->worldId,
+    this->GetSORPGSIters());
   dWorldSetQuickStepW(this->dataPtr->worldId, this->GetSORPGSW());
 
   // Set the physics update function
@@ -461,7 +463,8 @@ LinkPtr ODEPhysics::CreateLink(ModelPtr _parent)
   iter = this->dataPtr->spaces.find(_parent->GetName());
 
   if (iter == this->dataPtr->spaces.end())
-    this->dataPtr->spaces[_parent->GetName()] = dSimpleSpaceCreate(this->dataPtr->spaceId);
+    this->dataPtr->spaces[_parent->GetName()] =
+      dSimpleSpaceCreate(this->dataPtr->spaceId);
 
   ODELinkPtr link(new ODELink(_parent));
 
@@ -736,7 +739,8 @@ void ODEPhysics::SetStepType(const std::string &_type)
   else if (this->dataPtr->stepType == "world")
     this->physicsStepFunc = &dWorldStep;
   else
-    gzerr << "Invalid step type[" << this->dataPtr->stepType << "]" << std::endl;
+    gzerr << "Invalid step type[" << this->dataPtr->stepType
+          << "]" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -829,9 +833,12 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   /*
   if (_collision1->GetCollisionId() && _collision2->GetCollisionId())
   {
-    const dVector3 *pos1 = (const dVector3*)dGeomGetPosition(_collision1->GetCollisionId());
-    const dVector3 *pos2 = (const dVector3*)dGeomGetPosition(_collision2->GetCollisionId());
-    std::cout << "1[" << (*pos1)[0]<< " " << (*pos1)[1] << " " << (*pos1)[2] << "] "
+    const dVector3 *pos1 =
+      (const dVector3*)dGeomGetPosition(_collision1->GetCollisionId());
+    const dVector3 *pos2 =
+      (const dVector3*)dGeomGetPosition(_collision2->GetCollisionId());
+    std::cout << "1[" << (*pos1)[0]<< " " << (*pos1)[1] << " "
+              << (*pos1)[2] << "] "
       << "2[" << (*pos2)[0]<< " " << (*pos2)[1] << " " << (*pos2)[2] << "]\n";
   }*/
 
@@ -1002,14 +1009,15 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
     // Create the contact joint. This introduces the contact constraint to
     // ODE
-    dJointID contactJoint =
-      dJointCreateContact(this->dataPtr->worldId, this->dataPtr->contactGroup, &contact);
+    dJointID contactJoint = dJointCreateContact(this->dataPtr->worldId,
+      this->dataPtr->contactGroup, &contact);
 
     // Store contact information.
     if (contactFeedback && jointFeedback)
     {
       // Store the contact depth
-      contactFeedback->depths[j] = _contactCollisions[this->dataPtr->indices[j]].depth;
+      contactFeedback->depths[j] =
+        _contactCollisions[this->dataPtr->indices[j]].depth;
 
       // Store the contact position
       contactFeedback->positions[j].Set(
@@ -1043,10 +1051,13 @@ void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,
                                     ODECollision *_collision2)
 {
   if (this->trimeshCollidersCount >= this->dataPtr->trimeshColliders.size())
-    this->dataPtr->trimeshColliders.resize(this->dataPtr->trimeshColliders.size() + 100);
+    this->dataPtr->trimeshColliders.resize(
+      this->dataPtr->trimeshColliders.size() + 100);
 
-  this->dataPtr->trimeshColliders[this->trimeshCollidersCount].first  = _collision1;
-  this->dataPtr->trimeshColliders[this->trimeshCollidersCount].second = _collision2;
+  this->dataPtr->trimeshColliders[this->trimeshCollidersCount].first  =
+    _collision1;
+  this->dataPtr->trimeshColliders[this->trimeshCollidersCount].second =
+    _collision2;
   this->trimeshCollidersCount++;
 }
 
@@ -1066,7 +1077,8 @@ void ODEPhysics::AddCollider(ODECollision *_collision1,
 void ODEPhysics::DebugPrint() const
 {
   dBodyID b;
-  std::cout << "Debug Print[" << dWorldGetBodyCount(this->dataPtr->worldId) << "]\n";
+  std::cout << "Debug Print[" <<
+    dWorldGetBodyCount(this->dataPtr->worldId) << "]\n";
   for (int i = 0; i < dWorldGetBodyCount(this->dataPtr->worldId); ++i)
   {
     b = dWorldGetBody(this->dataPtr->worldId, i);

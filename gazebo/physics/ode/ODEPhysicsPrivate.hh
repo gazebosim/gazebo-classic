@@ -18,6 +18,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "gazebo/physics/ode/ODETypes.hh"
 
@@ -25,7 +26,6 @@ namespace gazebo
 {
   namespace physics
   {
-
     /// \brief Data structure for contact feedbacks
     class GAZEBO_VISIBLE ODEJointFeedback
     {
@@ -43,7 +43,7 @@ namespace gazebo
 
 
     class GAZEBO_VISIBLE ODEPhysicsPrivate
-    { 
+    {
       /// \brief Top-level world for all bodies
       public: dWorldID worldId;
 
