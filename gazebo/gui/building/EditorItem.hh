@@ -202,6 +202,16 @@ namespace gazebo
       /// \param[in] _color Color.
       private slots: void OnColorChanged(QColor _color);
 
+      /// \brief Qt callback when the texture has been changed from the 3D view.
+      /// \param[in] _texture Texture.
+      private slots: void OnTextureChanged(QString _texture);
+
+      /// \brief Z ordering of the rect item when idle (unselected.)
+      public: int zValueIdle;
+
+      /// \brief Z ordering of the rect item when selected.
+      public: int zValueSelected;
+
       /// \brief Type of editor item.
       protected: std::string editorType;
 
@@ -229,7 +239,7 @@ namespace gazebo
       protected: bool highlighted;
 
       /// \brief Scale for converting from pixel to metric units.
-      protected: double scale;
+      protected: double itemScale;
     };
     /// \}
   }

@@ -72,6 +72,20 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { colorSelected.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the texture selected signal
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr
+                ConnectTextureSelected(T _subscriber)
+          { return textureSelected.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the texture selected signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectTextureSelected(
+            event::ConnectionPtr _subscriber)
+          { textureSelected.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the save model signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -316,8 +330,10 @@ namespace gazebo
             createBuildingEditorItem;
 
         /// \brief A color has been selected.
-        public: static event::EventT<void (QColor)>
-            colorSelected;
+        public: static event::EventT<void (QColor)> colorSelected;
+
+        /// \brief A texture has been selected.
+        public: static event::EventT<void (QString)> textureSelected;
 
         /// \brief A model has been saved with a name and a location
         public: static event::EventT<void (std::string, std::string)>
