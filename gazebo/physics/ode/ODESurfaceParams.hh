@@ -111,14 +111,14 @@ namespace gazebo
       /// \sa    See dContactSlip2 in
       ///        http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       public: double slip2;
- 
+
       /// \brief Friction pyramid parameters (mu1, mu2).
       /// Note that the primary friction pyramid direction can be specified
       /// by fdir1, otherwise a vector constrained to be perpendicular to the
       /// contact normal in the global y-z plane is used.
       /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       private: FrictionPyramidPtr frictionPyramid;
-   };
+    };
     /// \}
   }
 }

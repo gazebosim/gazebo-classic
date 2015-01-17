@@ -53,8 +53,7 @@ class PhysicsFrictionTest : public ServerFixture,
                 // Average the mu1 and mu2 values
                 this->friction = (
                   surface->GetFrictionPyramid()->GetMuPrimary() +
-                  surface->GetFrictionPyramid()->GetMuSecondary()
-                  ) / 2.0;
+                  surface->GetFrictionPyramid()->GetMuSecondary() ) / 2.0;
               }
             }
     public: ~FrictionDemoBox() {}
