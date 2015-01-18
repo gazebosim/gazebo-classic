@@ -426,6 +426,10 @@ else ()
   set (HAVE_GDAL ON CACHE BOOL "HAVE GDAL" FORCE)
 endif ()
 
+if (GDAL_FOUND)
+  include_directories(${GDAL_INCLUDE_DIR})
+endif()
+
 ########################################
 # Find libusb
 pkg_check_modules(libusb-1.0 libusb-1.0)
