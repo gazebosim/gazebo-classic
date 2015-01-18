@@ -22,7 +22,7 @@
 #include <gazebo/gazebo_config.h>
 
 #ifdef HAVE_GDAL
-# include <gdal/gdalwarper.h>
+# include <gdalwarper.h>
 #endif
 
 #include <algorithm>

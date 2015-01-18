@@ -22,7 +22,7 @@
 #include <gazebo/util/system.hh>
 
 #ifdef HAVE_GDAL
-# include <gdal/gdal_priv.h>
+# include <gdal_priv.h>
 # include <vector>
 
 namespace gazebo

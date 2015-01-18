@@ -226,6 +226,10 @@ endif()
 # Main includes for compilation
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
+if (GDAL_FOUND)
+  include_directories(${GDAL_INCLUDE_DIR})
+endif()
+
 #################################################
 # Configure 3rd Party Packages after OS Specific initialization
 message (STATUS "\n\n====== Configuring 3rd Party Packages ======")
