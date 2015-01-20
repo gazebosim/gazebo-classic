@@ -7,10 +7,13 @@
 1. Implemented private data pointer for the World class.
     * [Pull request #1383](https://bitbucket.org/osrf/gazebo/pull-request/1383)
 
+1. Implemented private data pointer for the Scene class.
+    * [Pull request #1385](https://bitbucket.org/osrf/gazebo/pull-request/1385)
+
 1. Added a events::Event::resetWorld event that is triggered when World::Reset is called.
     * [Pull request #1332](https://bitbucket.org/osrf/gazebo/pull-request/1332)
     * [Issue #1375](https://bitbucket.org/osrf/gazebo/issue/1375)
- 
+
 1. Fixed `math::Box::GetCenter` functionality.
     * [Pull request #1278](https://bitbucket.org/osrf/gazebo/pull-request/1278)
     * [Issue #1327](https://bitbucket.org/osrf/gazebo/issue/1327)
@@ -194,7 +197,7 @@
 
 1. GUI publishes model selection information on ~/selection topic.
     * [Pull request #1318](https://bitbucket.org/osrf/gazebo/pull-request/1318)
-            
+
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)

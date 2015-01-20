@@ -1354,8 +1354,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     if (this->dataPtr->distortion)
       this->dataPtr->distortion->SetCamera(shared_from_this());
 
-    if (this->GetScene()->skyx != NULL)
-      this->renderTarget->addListener(this->GetScene()->skyx);
+    if (this->GetScene()->GetSkyX() != NULL)
+      this->renderTarget->addListener(this->GetScene()->GetSkyX());
   }
 }
 
