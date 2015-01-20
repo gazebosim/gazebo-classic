@@ -41,6 +41,7 @@ set (plugins
   LiftDragPlugin
   ModelPropShop
   MudPlugin
+  OptitrackPlugin
   PressurePlugin
   RayPlugin
   RaySensorNoisePlugin
