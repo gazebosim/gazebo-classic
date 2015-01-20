@@ -32,12 +32,13 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/util/system.hh"
 
-#include "gazebo/physics/ode/ODEPhysicsPrivate.hh"
-
 namespace gazebo
 {
   namespace physics
   {
+    class ODEJointFeedback;
+    class ODEPhysicsPrivate;
+
     /// \brief ODE physics engine.
     class GAZEBO_VISIBLE ODEPhysics : public PhysicsEngine
     {
@@ -253,21 +254,6 @@ namespace gazebo
       /// \param[in] _collision2 The second collision object.
       private: void AddCollider(ODECollision *_collision1,
                                 ODECollision *_collision2);
-
-      /// \brief Physics step function.
-      public: int (*physicsStepFunc)(dxWorld*, dReal);
-
-      /// \brief Current index into the contactFeedbacks buffer
-      private: unsigned int jointFeedbackIndex;
-
-      /// \brief Number of normal colliders.
-      private: unsigned int collidersCount;
-
-      /// \brief Number of triangle mesh colliders.
-      private: unsigned int trimeshCollidersCount;
-
-      /// \brief Maximum number of contact points per collision pair.
-      private: unsigned int maxContacts;
 
       /// \internal
       /// \brief Private data pointer.

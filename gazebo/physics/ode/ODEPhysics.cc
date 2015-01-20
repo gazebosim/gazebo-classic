@@ -69,6 +69,8 @@
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 
+#include "gazebo/physics/ode/ODEPhysicsPrivate.hh"
+
 using namespace gazebo;
 using namespace physics;
 
@@ -121,9 +123,11 @@ class Colliders_TBB
 
 //////////////////////////////////////////////////
 ODEPhysics::ODEPhysics(WorldPtr _world)
-    : PhysicsEngine(_world), physicsStepFunc(NULL), maxContacts(0)
+    : PhysicsEngine(_world)
 {
   this->dataPtr = new ODEPhysicsPrivate;
+  this->dataPtr->physicsStepFunc = NULL;
+  this->dataPtr->maxContacts = 0;
 
   // Collision detection init
   dInitODE2(0);
@@ -171,6 +175,7 @@ ODEPhysics::~ODEPhysics()
 
   this->dataPtr->spaceId = NULL;
   this->dataPtr->worldId = NULL;
+  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////
@@ -178,8 +183,8 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
 
-  this->maxContacts = _sdf->Get<unsigned int>("max_contacts");
-  this->SetMaxContacts(this->maxContacts);
+  this->dataPtr->maxContacts = _sdf->Get<unsigned int>("max_contacts");
+  this->SetMaxContacts(this->dataPtr->maxContacts);
 
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   sdf::ElementPtr solverElem = odeElem->GetElement("solver");
@@ -239,7 +244,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 
   // Set the physics update function
   this->SetStepType(this->dataPtr->stepType);
-  if (this->physicsStepFunc == NULL)
+  if (this->dataPtr->physicsStepFunc == NULL)
     gzthrow(std::string("Invalid step type[") + this->dataPtr->stepType);
 }
 
@@ -359,9 +364,9 @@ void ODEPhysics::UpdateCollision()
   dJointGroupEmpty(this->dataPtr->contactGroup);
 
   unsigned int i = 0;
-  this->collidersCount = 0;
-  this->trimeshCollidersCount = 0;
-  this->jointFeedbackIndex = 0;
+  this->dataPtr->collidersCount = 0;
+  this->dataPtr->trimeshCollidersCount = 0;
+  this->dataPtr->jointFeedbackIndex = 0;
 
   // Reset the contact count
   this->contactManager->ResetCount();
@@ -371,7 +376,7 @@ void ODEPhysics::UpdateCollision()
   DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "dSpaceCollide");
 
   // Generate non-trimesh collisions.
-  for (i = 0; i < this->collidersCount; ++i)
+  for (i = 0; i < this->dataPtr->collidersCount; ++i)
   {
     this->Collide(this->dataPtr->colliders[i].first,
         this->dataPtr->colliders[i].second, this->dataPtr->contactCollisions);
@@ -380,7 +385,7 @@ void ODEPhysics::UpdateCollision()
 
   // Generate trimesh collision.
   // This must happen in this thread sequentially
-  for (i = 0; i < this->trimeshCollidersCount; ++i)
+  for (i = 0; i < this->dataPtr->trimeshCollidersCount; ++i)
   {
     ODECollision *collision1 = this->dataPtr->trimeshColliders[i].first;
     ODECollision *collision2 = this->dataPtr->trimeshColliders[i].second;
@@ -401,12 +406,13 @@ void ODEPhysics::UpdatePhysics()
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
     // Update the dynamical model
-    (*physicsStepFunc)(this->dataPtr->worldId, this->maxStepSize);
+    (*(this->dataPtr->physicsStepFunc))
+      (this->dataPtr->worldId, this->maxStepSize);
 
     math::Vector3 f1, f2, t1, t2;
 
     // Set the joint contact feedback for each contact.
-    for (unsigned int i = 0; i < this->jointFeedbackIndex; ++i)
+    for (unsigned int i = 0; i < this->dataPtr->jointFeedbackIndex; ++i)
     {
       Contact *contactFeedback = this->dataPtr->jointFeedbacks[i]->contact;
       Collision *col1 = contactFeedback->collision1;
@@ -604,7 +610,7 @@ void ODEPhysics::SetContactSurfaceLayer(double _depth)
 //////////////////////////////////////////////////
 void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
 {
-  this->maxContacts = _maxContacts;
+  this->dataPtr->maxContacts = _maxContacts;
   this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
 }
 
@@ -661,7 +667,7 @@ double ODEPhysics::GetContactSurfaceLayer()
 //////////////////////////////////////////////////
 unsigned int ODEPhysics::GetMaxContacts()
 {
-  return this->maxContacts;
+  return this->dataPtr->maxContacts;
 }
 
 //////////////////////////////////////////////////
@@ -735,9 +741,9 @@ void ODEPhysics::SetStepType(const std::string &_type)
 
   // Set the physics update function
   if (this->dataPtr->stepType == "quick")
-    this->physicsStepFunc = &dWorldQuickStep;
+    this->dataPtr->physicsStepFunc = &dWorldQuickStep;
   else if (this->dataPtr->stepType == "world")
-    this->physicsStepFunc = &dWorldStep;
+    this->dataPtr->physicsStepFunc = &dWorldStep;
   else
     gzerr << "Invalid step type[" << this->dataPtr->stepType
           << "]" << std::endl;
@@ -990,15 +996,15 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Create a joint feedback mechanism
   if (contactFeedback)
   {
-    if (this->jointFeedbackIndex < this->dataPtr->jointFeedbacks.size())
-      jointFeedback = this->dataPtr->jointFeedbacks[this->jointFeedbackIndex];
+    if (this->dataPtr->jointFeedbackIndex < this->dataPtr->jointFeedbacks.size())
+      jointFeedback = this->dataPtr->jointFeedbacks[this->dataPtr->jointFeedbackIndex];
     else
     {
       jointFeedback = new ODEJointFeedback();
       this->dataPtr->jointFeedbacks.push_back(jointFeedback);
     }
 
-    this->jointFeedbackIndex++;
+    this->dataPtr->jointFeedbackIndex++;
     jointFeedback->count = 0;
     jointFeedback->contact = contactFeedback;
   }
@@ -1051,27 +1057,27 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,
                                     ODECollision *_collision2)
 {
-  if (this->trimeshCollidersCount >= this->dataPtr->trimeshColliders.size())
+  if (this->dataPtr->trimeshCollidersCount >= this->dataPtr->trimeshColliders.size())
     this->dataPtr->trimeshColliders.resize(
       this->dataPtr->trimeshColliders.size() + 100);
 
-  this->dataPtr->trimeshColliders[this->trimeshCollidersCount].first  =
+  this->dataPtr->trimeshColliders[this->dataPtr->trimeshCollidersCount].first  =
     _collision1;
-  this->dataPtr->trimeshColliders[this->trimeshCollidersCount].second =
+  this->dataPtr->trimeshColliders[this->dataPtr->trimeshCollidersCount].second =
     _collision2;
-  this->trimeshCollidersCount++;
+  this->dataPtr->trimeshCollidersCount++;
 }
 
 /////////////////////////////////////////////////
 void ODEPhysics::AddCollider(ODECollision *_collision1,
                              ODECollision *_collision2)
 {
-  if (this->collidersCount >= this->dataPtr->colliders.size())
+  if (this->dataPtr->collidersCount >= this->dataPtr->colliders.size())
     this->dataPtr->colliders.resize(this->dataPtr->colliders.size() + 100);
 
-  this->dataPtr->colliders[this->collidersCount].first  = _collision1;
-  this->dataPtr->colliders[this->collidersCount].second = _collision2;
-  this->collidersCount++;
+  this->dataPtr->colliders[this->dataPtr->collidersCount].first  = _collision1;
+  this->dataPtr->colliders[this->dataPtr->collidersCount].second = _collision2;
+  this->dataPtr->collidersCount++;
 }
 
 /////////////////////////////////////////////////

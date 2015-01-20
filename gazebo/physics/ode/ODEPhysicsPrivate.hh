@@ -59,6 +59,9 @@ namespace gazebo
       /// \brief Buffer of contact feedback information.
       public: std::vector<ODEJointFeedback*> jointFeedbacks;
 
+      /// \brief Physics step function.
+      public: int (*physicsStepFunc)(dxWorld*, dReal);
+
       /// \brief All the collsiion spaces.
       public: std::map<std::string, dSpaceID> spaces;
 
@@ -74,6 +77,18 @@ namespace gazebo
 
       /// \brief Indices used during creation of contact joints.
       public: int indices[MAX_CONTACT_JOINTS];
+
+      /// \brief Current index into the contactFeedbacks buffer
+      public: unsigned int jointFeedbackIndex;
+
+      /// \brief Number of normal colliders.
+      public: unsigned int collidersCount;
+
+      /// \brief Number of triangle mesh colliders.
+      public: unsigned int trimeshCollidersCount;
+
+      /// \brief Maximum number of contact points per collision pair.
+      public: unsigned int maxContacts;
     };
   }
 }
