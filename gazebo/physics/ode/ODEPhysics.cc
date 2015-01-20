@@ -996,8 +996,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Create a joint feedback mechanism
   if (contactFeedback)
   {
-    if (this->dataPtr->jointFeedbackIndex < this->dataPtr->jointFeedbacks.size())
-      jointFeedback = this->dataPtr->jointFeedbacks[this->dataPtr->jointFeedbackIndex];
+    if (this->dataPtr->jointFeedbackIndex <
+        this->dataPtr->jointFeedbacks.size())
+      jointFeedback =
+        this->dataPtr->jointFeedbacks[this->dataPtr->jointFeedbackIndex];
     else
     {
       jointFeedback = new ODEJointFeedback();
@@ -1057,7 +1059,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,
                                     ODECollision *_collision2)
 {
-  if (this->dataPtr->trimeshCollidersCount >= this->dataPtr->trimeshColliders.size())
+  if (this->dataPtr->trimeshCollidersCount >=
+      this->dataPtr->trimeshColliders.size())
     this->dataPtr->trimeshColliders.resize(
       this->dataPtr->trimeshColliders.size() + 100);
 
