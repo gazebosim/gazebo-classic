@@ -47,7 +47,6 @@ OptitrackPlugin::OptitrackPlugin(const bool _verbose)
   : verbose(_verbose)
 {
   this->active = false;
-  //this->myIPAddress = ignition::transport::determineHost();
 }
 
 void OptitrackPlugin::Load(physics::WorldPtr _parent,
@@ -120,8 +119,8 @@ void OptitrackPlugin::StartReception()
   memset(&mySocketAddr, 0, sizeof(mySocketAddr));
   mySocketAddr.sin_family = AF_INET;
   mySocketAddr.sin_port = htons(this->PortData);
-  mySocketAddr.sin_addr.s_addr = htonl(INADDR_ANY);;
-  if (bind(this->dataSocket, (struct sockaddr *)&mySocketAddr,
+  mySocketAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+  if (bind(this->dataSocket, reinterpret_cast<struct sockaddr *>(&mySocketAddr),
     sizeof(struct sockaddr)) < 0)
   {
     gzerr << "Binding to a local port failed." << std::endl;
@@ -175,9 +174,10 @@ void OptitrackPlugin::RunReceptionTask()
     // Block until we receive a datagram from the network (from anyone
     //  including ourselves)
     if (recvfrom(this->dataSocket, buffer, sizeof(buffer), 0,
-         (sockaddr *)&theirAddress, &addr_len) < 0)
+         reinterpret_cast<sockaddr *>(&theirAddress), &addr_len) < 0)
     {
-      gzerr << "OptitrackPlugin::RunReceptionTask() Recvfrom failed" << std::endl;
+      gzerr << "OptitrackPlugin::RunReceptionTask() Recvfrom failed"
+            << std::endl;
       continue;
     }
 
@@ -217,20 +217,26 @@ void OptitrackPlugin::Unpack(char *pData)
 
   // message ID
   int MessageID = 0;
-  memcpy(&MessageID, ptr, 2); ptr += 2;
+  memcpy(&MessageID, ptr, 2);
+  ptr += 2;
 
   // size
   int nBytes = 0;
-  memcpy(&nBytes, ptr, 2); ptr += 2;
+  memcpy(&nBytes, ptr, 2);
+  ptr += 2;
 
   if (MessageID == 7)      // FRAME OF MOCAP DATA packet
   {
     // frame number
-    int frameNumber = 0; memcpy(&frameNumber, ptr, 4); ptr += 4;
+    int frameNumber = 0;
+    memcpy(&frameNumber, ptr, 4);
+    ptr += 4;
     output << "Frame # :" << frameNumber << std::endl;
 
     // number of data sets (markersets, rigidbodies, etc)
-    int nMarkerSets = 0; memcpy(&nMarkerSets, ptr, 4); ptr += 4;
+    int nMarkerSets = 0;
+    memcpy(&nMarkerSets, ptr, 4);
+    ptr += 4;
     output << "Marker Set Count : " << nMarkerSets << std::endl;
 
     ModelMarkers markerSets;
@@ -239,7 +245,7 @@ void OptitrackPlugin::Unpack(char *pData)
     {
       // Markerset name
       std::string szName(ptr);
-      int nDataBytes = (int) strlen(ptr) + 1;
+      int nDataBytes = static_cast<int>(strlen(ptr)) + 1;
       ptr += nDataBytes;
       output << "Model Name: " << szName << std::endl;
       markerSets[szName] = std::vector<math::Vector3>();
@@ -252,9 +258,15 @@ void OptitrackPlugin::Unpack(char *pData)
 
       for (int j = 0; j < nMarkers; j++)
       {
-        float x = 0; memcpy(&x, ptr, 4); ptr += 4;
-        float y = 0; memcpy(&y, ptr, 4); ptr += 4;
-        float z = 0; memcpy(&z, ptr, 4); ptr += 4;
+        float x = 0;
+        memcpy(&x, ptr, 4);
+        ptr += 4;
+        float y = 0;
+        memcpy(&y, ptr, 4);
+        ptr += 4;
+        float z = 0;
+        memcpy(&z, ptr, 4);
+        ptr += 4;
         output << "\tMarker " << j << " : [x="
               << x << ",y=" << y << ",z=" << z << "]" << std::endl;
         markerSets[szName].push_back(math::Vector3(x, y, z));
@@ -262,29 +274,54 @@ void OptitrackPlugin::Unpack(char *pData)
     }
 
     // unidentified markers
-    int nOtherMarkers = 0; memcpy(&nOtherMarkers, ptr, 4); ptr += 4;
+    int nOtherMarkers = 0;
+    memcpy(&nOtherMarkers, ptr, 4);
+    ptr += 4;
     for (int j = 0; j < nOtherMarkers; j++)
     {
-      float x = 0.0f; memcpy(&x, ptr, 4); ptr += 4;
-      float y = 0.0f; memcpy(&y, ptr, 4); ptr += 4;
-      float z = 0.0f; memcpy(&z, ptr, 4); ptr += 4;
+      float x = 0.0f;
+      memcpy(&x, ptr, 4);
+      ptr += 4;
+      float y = 0.0f;
+      memcpy(&y, ptr, 4);
+      ptr += 4;
+      float z = 0.0f;
+      memcpy(&z, ptr, 4);
+      ptr += 4;
     }
 
     // rigid bodies
     int nRigidBodies = 0;
-    memcpy(&nRigidBodies, ptr, 4); ptr += 4;
+    memcpy(&nRigidBodies, ptr, 4);
+    ptr += 4;
     output << "Rigid Body Count : " << nRigidBodies << std::endl;
     for (int j = 0; j < nRigidBodies; j++)
     {
       // rigid body pos/ori
-      int ID = 0; memcpy(&ID, ptr, 4); ptr += 4;
-      float x = 0.0f; memcpy(&x, ptr, 4); ptr += 4;
-      float y = 0.0f; memcpy(&y, ptr, 4); ptr += 4;
-      float z = 0.0f; memcpy(&z, ptr, 4); ptr += 4;
-      float qx = 0; memcpy(&qx, ptr, 4); ptr += 4;
-      float qy = 0; memcpy(&qy, ptr, 4); ptr += 4;
-      float qz = 0; memcpy(&qz, ptr, 4); ptr += 4;
-      float qw = 0; memcpy(&qw, ptr, 4); ptr += 4;
+      int ID = 0;
+      memcpy(&ID, ptr, 4);
+      ptr += 4;
+      float x = 0.0f;
+      memcpy(&x, ptr, 4);
+      ptr += 4;
+      float y = 0.0f;
+      memcpy(&y, ptr, 4);
+      ptr += 4;
+      float z = 0.0f;
+      memcpy(&z, ptr, 4);
+      ptr += 4;
+      float qx = 0;
+      memcpy(&qx, ptr, 4);
+      ptr += 4;
+      float qy = 0;
+      memcpy(&qy, ptr, 4);
+      ptr += 4;
+      float qz = 0;
+      memcpy(&qz, ptr, 4);
+      ptr += 4;
+      float qw = 0;
+      memcpy(&qw, ptr, 4);
+      ptr += 4;
       output << "ID : " << ID << std::endl;
       output << "pos: [" << x << "," << y << "," << z << "]" << std::endl;
       output << "ori: [" << qx << "," << qy << ","
@@ -294,12 +331,12 @@ void OptitrackPlugin::Unpack(char *pData)
                              math::Quaternion(qw, qx, qy, qz));
 
       // associated marker positions
-      unsigned int nRigidMarkers = 0; 
+      unsigned int nRigidMarkers = 0;
       memcpy(&nRigidMarkers, ptr, 4);
       ptr += 4;
       output << "Rigid Marker Count: " << nRigidMarkers << std::endl;
-      int nMarkerBytes = nRigidMarkers*3*sizeof(float);
-      float* markerData = (float*)malloc(nMarkerBytes);
+      int nMarkerBytes = nRigidMarkers*3*sizeof(x);
+      float* markerData = reinterpret_cast<float*>(malloc(nMarkerBytes));
       memcpy(markerData, ptr, nMarkerBytes);
       ptr += nMarkerBytes;
 
@@ -329,14 +366,14 @@ void OptitrackPlugin::Unpack(char *pData)
       if (major >= 2)
       {
         // associated marker IDs
-        int nIntBytes = nRigidMarkers*sizeof(int);
-        int* markerIDs = (int*)malloc(nIntBytes);
+        int nIntBytes = nRigidMarkers*sizeof(nMarkerBytes);
+        int* markerIDs = reinterpret_cast<int*>(malloc(nIntBytes));
         memcpy(markerIDs, ptr, nIntBytes);
         ptr += nIntBytes;
 
         // associated marker sizes
-        int nFloatBytes = nRigidMarkers*sizeof(float);
-        float* markerSizes = (float*)malloc(nFloatBytes);
+        int nFloatBytes = nRigidMarkers*sizeof(x);
+        float* markerSizes = reinterpret_cast<float*>(malloc(nFloatBytes));
         memcpy(markerSizes, ptr, nFloatBytes);
         ptr += nFloatBytes;
 
@@ -368,7 +405,9 @@ void OptitrackPlugin::Unpack(char *pData)
       if (major >= 2)
       {
         // Mean marker error
-        float fError = 0.0f; memcpy(&fError, ptr, 4); ptr += 4;
+        float fError = 0.0f;
+        memcpy(&fError, ptr, 4);
+        ptr += 4;
         output << "Mean marker error: " << fError << std::endl;
       }
 
@@ -376,61 +415,84 @@ void OptitrackPlugin::Unpack(char *pData)
       if (((major == 2) && (minor >= 6)) || (major > 2) || (major == 0) )
       {
         // params
-        short params = 0; memcpy(&params, ptr, 2); ptr += 2;
+        int16_t params = 0;
+        memcpy(&params, ptr, 2);
+        ptr += 2;
         // 0x01 : rigid body was successfully tracked in this frame
         bool bTrackingValid = params & 0x01;
         output << "Tracking valid?: " << bTrackingValid << std::endl;
       }
-    } // next rigid body
+    }  // next rigid body
 
     // skeletons (version 2.1 and later)
     if (((major == 2) && (minor>0)) || (major>2))
     {
       int nSkeletons = 0;
-      memcpy(&nSkeletons, ptr, 4); ptr += 4;
-      output << "Skeleton Count : " << nSkeletons << std::endl;;
+      memcpy(&nSkeletons, ptr, 4);
+      ptr += 4;
+      output << "Skeleton Count : " << nSkeletons << std::endl;
       for (int j = 0; j < nSkeletons; j++)
       {
         // skeleton id
         int skeletonID = 0;
-        memcpy(&skeletonID, ptr, 4); ptr += 4;
+        memcpy(&skeletonID, ptr, 4);
+        ptr += 4;
         // # of rigid bodies (bones) in skeleton
         nRigidBodies = 0;
-        memcpy(&nRigidBodies, ptr, 4); ptr += 4;
+        memcpy(&nRigidBodies, ptr, 4);
+        ptr += 4;
         output << "Rigid Body Count : " << nRigidBodies << std::endl;
         for (int b = 0; b < nRigidBodies; b++)
         {
           // rigid body pos/ori
-          int ID = 0; memcpy(&ID, ptr, 4); ptr += 4;
-          float x = 0.0f; memcpy(&x, ptr, 4); ptr += 4;
-          float y = 0.0f; memcpy(&y, ptr, 4); ptr += 4;
-          float z = 0.0f; memcpy(&z, ptr, 4); ptr += 4;
-          float qx = 0; memcpy(&qx, ptr, 4); ptr += 4;
-          float qy = 0; memcpy(&qy, ptr, 4); ptr += 4;
-          float qz = 0; memcpy(&qz, ptr, 4); ptr += 4;
-          float qw = 0; memcpy(&qw, ptr, 4); ptr += 4;
+          int ID = 0;
+          memcpy(&ID, ptr, 4);
+          ptr += 4;
+          float x = 0.0f;
+          memcpy(&x, ptr, 4);
+          ptr += 4;
+          float y = 0.0f;
+          memcpy(&y, ptr, 4);
+          ptr += 4;
+          float z = 0.0f;
+          memcpy(&z, ptr, 4);
+          ptr += 4;
+          float qx = 0;
+          memcpy(&qx, ptr, 4);
+          ptr += 4;
+          float qy = 0;
+          memcpy(&qy, ptr, 4);
+          ptr += 4;
+          float qz = 0;
+          memcpy(&qz, ptr, 4);
+          ptr += 4;
+          float qw = 0;
+          memcpy(&qw, ptr, 4);
+          ptr += 4;
           output << "ID : " << ID << std::endl;
           output << "pos: [" << x << "," << y << "," << z << "]" << std::endl;
           output << "ori: [" << qx << "," << qy << ","
                             << qz << "," << qw << "]" << std::endl;
 
           // associated marker positions
-          int nRigidMarkers = 0;  memcpy(&nRigidMarkers, ptr, 4); ptr += 4;
+          int nRigidMarkers = 0;
+          memcpy(&nRigidMarkers, ptr, 4);
+          ptr += 4;
           output << "Marker Count: " << nRigidMarkers << std::endl;
-          int nMarkerBytes = nRigidMarkers*3*sizeof(float);
-          float* markerData = (float*)malloc(nMarkerBytes);
+          int nMarkerBytes = nRigidMarkers*3*sizeof(x);
+          float* markerData = reinterpret_cast<float*>(malloc(nMarkerBytes));
           memcpy(markerData, ptr, nMarkerBytes);
           ptr += nMarkerBytes;
 
           // associated marker IDs
-          nMarkerBytes = nRigidMarkers*sizeof(int);
-          int* markerIDs = (int*)malloc(nMarkerBytes);
+          nMarkerBytes = nRigidMarkers*sizeof(nRigidMarkers);
+          int* markerIDs = reinterpret_cast<int*>(malloc(nMarkerBytes));
           memcpy(markerIDs, ptr, nMarkerBytes);
           ptr += nMarkerBytes;
 
           // associated marker sizes
-          nMarkerBytes = nRigidMarkers*sizeof(float);
-          float* markerSizes = (float*)malloc(nMarkerBytes);
+          nMarkerBytes = nRigidMarkers*sizeof(x);
+          float* markerSizes = reinterpret_cast<float*>(malloc(nMarkerBytes));
           memcpy(markerSizes, ptr, nMarkerBytes);
           ptr += nMarkerBytes;
 
@@ -443,39 +505,54 @@ void OptitrackPlugin::Unpack(char *pData)
           }
 
           // Mean marker error
-          float fError = 0.0f; memcpy(&fError, ptr, 4); ptr += 4;
+          float fError = 0.0f;
+          memcpy(&fError, ptr, 4);
+          ptr += 4;
           output << "Mean marker error: " << fError << std::endl;
 
           // release resources
-          if(markerIDs)
+          if (markerIDs)
             free(markerIDs);
-          if(markerSizes)
+          if (markerSizes)
             free(markerSizes);
-          if(markerData)
+          if (markerData)
             free(markerData);
-        } // next rigid body
-      } // next skeleton
+        }  // next rigid body
+      }  // next skeleton
     }
 
     // labeled markers (version 2.3 and later)
-    if (((major == 2) && (minor>=3)) || (major>2))
+    if (((major == 2) && (minor >= 3)) || (major>2))
     {
       int nLabeledMarkers = 0;
-      memcpy(&nLabeledMarkers, ptr, 4); ptr += 4;
+      memcpy(&nLabeledMarkers, ptr, 4);
+      ptr += 4;
       output << "Labeled Marker Count : " << nLabeledMarkers << std::endl;
       for (int j = 0; j < nLabeledMarkers; j++)
       {
-        int ID = 0; memcpy(&ID, ptr, 4); ptr += 4;
-        float x = 0.0f; memcpy(&x, ptr, 4); ptr += 4;
-        float y = 0.0f; memcpy(&y, ptr, 4); ptr += 4;
-        float z = 0.0f; memcpy(&z, ptr, 4); ptr += 4;
-        float size = 0.0f; memcpy(&size, ptr, 4); ptr += 4;
+        int ID = 0;
+        memcpy(&ID, ptr, 4);
+        ptr += 4;
+        float x = 0.0f;
+        memcpy(&x, ptr, 4);
+        ptr += 4;
+        float y = 0.0f;
+        memcpy(&y, ptr, 4);
+        ptr += 4;
+        float z = 0.0f;
+        memcpy(&z, ptr, 4);
+        ptr += 4;
+        float size = 0.0f;
+        memcpy(&size, ptr, 4);
+        ptr += 4;
 
         // 2.6 and later
         if (((major == 2) && (minor >= 6)) || (major > 2) || (major == 0) )
         {
           // marker params
-          short params = 0; memcpy(&params, ptr, 2); ptr += 2;
+          int16_t params = 0;
+          memcpy(&params, ptr, 2);
+          ptr += 2;
           output << "Params: " << params << std::endl;
           // marker was not visible (occluded) in this frame
           /* bool bOccluded = params & 0x01;
@@ -492,32 +569,42 @@ void OptitrackPlugin::Unpack(char *pData)
     }
 
     // latency
-    float latency = 0.0f; memcpy(&latency, ptr, 4); ptr += 4;
+    float latency = 0.0f;
+    memcpy(&latency, ptr, 4);
+    ptr += 4;
     output << "latency : " << latency << std::endl;
 
     // timecode
-    unsigned int timecode = 0;  memcpy(&timecode, ptr, 4);  ptr += 4;
-    unsigned int timecodeSub = 0; memcpy(&timecodeSub, ptr, 4); ptr += 4;
+    unsigned int timecode = 0;
+    memcpy(&timecode, ptr, 4);
+    ptr += 4;
+    unsigned int timecodeSub = 0;
+    memcpy(&timecodeSub, ptr, 4);
+    ptr += 4;
     char szTimecode[128] = "";
     this->TimecodeStringify(timecode, timecodeSub, szTimecode, 128);
 
     // timestamp
     double timestamp = 0.0f;
     // 2.7 and later - increased from single to double precision
-    if( ((major == 2)&&(minor>=7)) || (major>2))
+    if (((major == 2)&&(minor >= 7)) || (major>2))
     {
-        memcpy(&timestamp, ptr, 8); ptr += 8;
+      memcpy(&timestamp, ptr, 8);
+      ptr += 8;
     }
     else
     {
       float fTemp = 0.0f;
-      memcpy(&fTemp, ptr, 4); ptr += 4;
-      timestamp = (double)fTemp;
+      memcpy(&fTemp, ptr, 4);
+      ptr += 4;
+      timestamp = static_cast<double>(fTemp);
     }
     output << "Timestamp: " << timestamp;
 
     // frame params
-    short params = 0;  memcpy(&params, ptr, 2); ptr += 2;
+    int16_t params = 0;
+    memcpy(&params, ptr, 2);
+    ptr += 2;
     output << "Params: " << params << std::endl;
     // 0x01 Motive is recording
     /* bool bIsRecording = params & 0x01;
@@ -525,38 +612,45 @@ void OptitrackPlugin::Unpack(char *pData)
     bool bTrackedModelsChanged = params & 0x02; */
 
     // end of data tag
-    int eod = 0; memcpy(&eod, ptr, 4); ptr += 4;
+    int eod = 0;
+    memcpy(&eod, ptr, 4);
+    ptr += 4;
     output << "End Packet\n-------------" << std::endl;
   }
-  else if (MessageID == 5) // Data Descriptions
+  else if (MessageID == 5)  // Data Descriptions
   {
-    // number of datasets
-    int nDatasets = 0; memcpy(&nDatasets, ptr, 4); ptr += 4;
+    int nDatasets = 0;
+    memcpy(&nDatasets, ptr, 4);
+    ptr += 4;
     output << "Dataset Count : " << nDatasets << std::endl;
 
     for (int i = 0; i < nDatasets; i++)
     {
       output << "Dataset " << i << std::endl;
 
-      int packetType = 0; memcpy(&packetType, ptr, 4); ptr += 4;
+      int packetType = 0;
+      memcpy(&packetType, ptr, 4);
+      ptr += 4;
       output << "Type : " << packetType << std::endl;
 
       if (packetType == 0)   // markerset
       {
         // name
         std::string szName(ptr);
-        int nDataBytes = (int) strlen(ptr) + 1;
+        int nDataBytes = static_cast<int>(strlen(ptr)) + 1;
         ptr += nDataBytes;
         output << "Markerset Name: " << szName << std::endl;
 
         // marker data
-        int nMarkers = 0; memcpy(&nMarkers, ptr, 4); ptr += 4;
+        int nMarkers = 0;
+        memcpy(&nMarkers, ptr, 4);
+        ptr += 4;
         output << "Marker Count : " << nMarkers << std::endl;
 
         for (int j = 0; j < nMarkers; j++)
         {
           std::string markerName(ptr);
-          int nMarkerDataBytes = (int) strlen(ptr) + 1;
+          int nMarkerDataBytes = static_cast<int>(strlen(ptr) + 1);
           ptr += nMarkerDataBytes;
           output << "Marker Name: " << markerName << std::endl;
         }
@@ -567,37 +661,51 @@ void OptitrackPlugin::Unpack(char *pData)
         {
           // name
           char szName[MAX_NAMELENGTH];
-          strcpy(szName, ptr);
+          strncpy(szName, ptr, MAX_NAMELENGTH);
           ptr += strlen(ptr) + 1;
           output << "Name: " << szName << std::endl;
         }
 
-        int ID = 0; memcpy(&ID, ptr, 4); ptr +=4;
+        int ID = 0;
+        memcpy(&ID, ptr, 4);
+        ptr +=4;
         output << "ID : " << ID << std::endl;
 
-        int parentID = 0; memcpy(&parentID, ptr, 4); ptr +=4;
+        int parentID = 0;
+        memcpy(&parentID, ptr, 4);
+        ptr +=4;
         output << "Parent ID : " << parentID << std::endl;
 
-        float xoffset = 0; memcpy(&xoffset, ptr, 4); ptr +=4;
+        float xoffset = 0;
+        memcpy(&xoffset, ptr, 4);
+        ptr +=4;
         output << "X Offset : " << xoffset << std::endl;
 
-        float yoffset = 0; memcpy(&yoffset, ptr, 4); ptr +=4;
-        output << "Y Offset : " << yoffset << std::endl;;
+        float yoffset = 0;
+        memcpy(&yoffset, ptr, 4);
+        ptr +=4;
+        output << "Y Offset : " << yoffset << std::endl;
 
-        float zoffset = 0; memcpy(&zoffset, ptr, 4); ptr +=4;
+        float zoffset = 0;
+        memcpy(&zoffset, ptr, 4);
+        ptr +=4;
         output << "Z Offset : " << zoffset << std::endl;
       }
       else if (packetType == 2)   // skeleton
       {
         char szName[MAX_NAMELENGTH];
-        strcpy(szName, ptr);
+        strncpy(szName, ptr, MAX_NAMELENGTH);
         ptr += strlen(ptr) + 1;
         output << "Name: " << szName << std::endl;
 
-        int ID = 0; memcpy(&ID, ptr, 4); ptr +=4;
+        int ID = 0;
+        memcpy(&ID, ptr, 4);
+        ptr +=4;
         output << "ID : " << ID << std::endl;
 
-        int nRigidBodies = 0; memcpy(&nRigidBodies, ptr, 4); ptr +=4;
+        int nRigidBodies = 0;
+        memcpy(&nRigidBodies, ptr, 4);
+        ptr +=4;
         output << "RigidBody (Bone) Count : " << nRigidBodies << std::endl;
 
         for (int j = 0; j < nRigidBodies; j++)
@@ -606,24 +714,34 @@ void OptitrackPlugin::Unpack(char *pData)
           {
             // RB name
             char rigidBodyName[MAX_NAMELENGTH];
-            strcpy(rigidBodyName, ptr);
+            strncpy(rigidBodyName, ptr, MAX_NAMELENGTH);
             ptr += strlen(ptr) + 1;
             output << "Rigid Body Name: " << rigidBodyName << std::endl;
           }
 
-          int rigidBodyID = 0; memcpy(&rigidBodyID, ptr, 4); ptr +=4;
+          int rigidBodyID = 0;
+          memcpy(&rigidBodyID, ptr, 4);
+          ptr +=4;
           output << "RigidBody ID : " << rigidBodyID << std::endl;
 
-          int parentID = 0; memcpy(&parentID, ptr, 4); ptr +=4;
+          int parentID = 0;
+          memcpy(&parentID, ptr, 4);
+          ptr +=4;
           output << "Parent ID : " << parentID << std::endl;
 
-          float xoffset = 0; memcpy(&xoffset, ptr, 4); ptr +=4;
+          float xoffset = 0;
+          memcpy(&xoffset, ptr, 4);
+          ptr +=4;
           output << "X Offset : " << xoffset << std::endl;
 
-          float yoffset = 0; memcpy(&yoffset, ptr, 4); ptr +=4;
-          output << "Y Offset : " << yoffset << std::endl;;
+          float yoffset = 0;
+          memcpy(&yoffset, ptr, 4);
+          ptr +=4;
+          output << "Y Offset : " << yoffset << std::endl;
 
-          float zoffset = 0; memcpy(&zoffset, ptr, 4); ptr +=4;
+          float zoffset = 0;
+          memcpy(&zoffset, ptr, 4);
+          ptr +=4;
           output << "Z Offset : " << zoffset << std::endl;
         }
       }

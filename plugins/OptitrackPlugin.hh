@@ -40,8 +40,8 @@ namespace gazebo
   {
     #define MAX_NAMELENGTH              256
 
-    /// \brief Creates an OptitrackPlugin object able to receive multicast updates
-    /// from the Optitrack server containing the tracking information.
+    /// \brief Creates an OptitrackPlugin object able to receive multicast
+    /// updates from the Optitrack server containing the tracking information.
     /// \param[in] _server IP address of the optitrack server. This might be
     /// needed for requesting commands for tweaking the tracking behavior. The
     /// server IP is not needed for receiving tracking messages. These
