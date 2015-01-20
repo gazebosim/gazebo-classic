@@ -92,6 +92,7 @@ void OptitrackPlugin::Load(physics::WorldPtr _parent,
   {
     this->PortData = 1511;
   }
+  this->StartReception();
 }
 
 void OptitrackPlugin::Init()
