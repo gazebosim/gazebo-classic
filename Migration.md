@@ -1,6 +1,13 @@
 ## Gazebo 4.X to 5.X
 
+### C++11 compiler required
+
+Gazebo 5.x uses features from the new c++11 standard. This requires to have a compatible c++11 compiler. Note that some platforms (like Ubuntu Precise) do not include one by default.
+
 ### Modifications
+
+1. Privatized World::dirtyPoses
+    + World::dirtyPoses used to be a public attribute. This is now a private attribute, and specific "friends" have been added to the World file.
 
 1. **gazebo/rendering/Visual.hh**
     + The GetBoundingBox() function now returns a local bounding box without scale applied.

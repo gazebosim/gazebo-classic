@@ -448,6 +448,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         if (distance > 30 || t > 1.0 || t < 0.0)
         {
           editorItem->setParentItem(NULL);
+          wallSegmentItem->setZValue(wallSegmentItem->zValueIdle);
           editorItem->SetPositionOnWall(0);
           editorItem->SetAngleOnWall(0);
           this->buildingMaker->DetachManip(this->itemToVisualMap[editorItem],
@@ -489,6 +490,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
               scenePos)))
           {
             editorItem->setParentItem(wallSegmentItem);
+            wallSegmentItem->setZValue(wallSegmentItem->zValueIdle+5);
             this->buildingMaker->AttachManip(
                 this->itemToVisualMap[editorItem],
                 this->itemToVisualMap[wallSegmentItem]);
@@ -608,6 +610,8 @@ void EditorView::DeleteItem(EditorItem *_item)
   // and stairs are attached to floors above them.
   // Detach 3D manip, but 2D items may remain as children.
   this->buildingMaker->DetachAllChildren(this->itemToVisualMap[_item]);
+
+  _item->SetHighlighted(false);
 
   if (_item->GetType() == "WallSegment")
   {

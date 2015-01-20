@@ -189,7 +189,6 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
 
-
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
   ((geomElem->AddElement("box"))->AddElement("size"))->Set(_size);
@@ -356,6 +355,9 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   part->kinematic = false;
 
   this->allParts[part->name] = part;
+
+  rendering::ScenePtr scene = part->partVisual->GetScene();
+  scene->AddVisual(part->partVisual);
 }
 
 /////////////////////////////////////////////////
@@ -983,7 +985,7 @@ void ModelCreator::GenerateSDF()
       sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
       geomElem->ClearElements();
 
-    math::Vector3 scale = visual->GetParent()->GetScale();
+      math::Vector3 scale = visual->GetParent()->GetScale();
       if (visual->GetParent()->GetName().find("unit_box") != std::string::npos)
       {
         sdf::ElementPtr boxElem = geomElem->AddElement("box");
