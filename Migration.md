@@ -1,5 +1,9 @@
 ## Gazebo 4.X to 5.X
 
+### C++11 compiler required
+
+Gazebo 5.x uses features from the new c++11 standard. This requires to have a compatible c++11 compiler. Note that some platforms (like Ubuntu Precise) do not include one by default.
+
 ### Modifications
 
 1. Privatized World::dirtyPoses
