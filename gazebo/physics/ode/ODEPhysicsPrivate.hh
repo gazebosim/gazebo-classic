@@ -27,7 +27,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Data structure for contact feedbacks
-    class GAZEBO_VISIBLE ODEJointFeedback
+    class ODEJointFeedback
     {
       public: ODEJointFeedback() : contact(NULL), count(0) {}
 
@@ -41,8 +41,7 @@ namespace gazebo
       public: dJointFeedback feedbacks[MAX_CONTACT_JOINTS];
     };
 
-
-    class GAZEBO_VISIBLE ODEPhysicsPrivate
+    class ODEPhysicsPrivate
     {
       /// \brief Top-level world for all bodies
       public: dWorldID worldId;
