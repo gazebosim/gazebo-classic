@@ -113,6 +113,10 @@ ModelCreator::ModelCreator()
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&ModelCreator::OnSetSelectedEntity, this, _1, _2)));
 
+  this->connections.push_back(
+      event::Events::ConnectPreRender(
+        boost::bind(&ModelCreator::Update, this)));
+
   g_copyAct->setEnabled(false);
   g_pasteAct->setEnabled(false);
 
@@ -545,6 +549,7 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 
   part->name = part->partVisual->GetName();
   part->pose = part->partVisual->GetWorldPose();
+  part->scale = part->partVisual->GetScale();
   part->gravity = true;
   part->selfCollide = false;
   part->kinematic = false;
@@ -1301,4 +1306,22 @@ void ModelCreator::ModelChanged()
 {
   if (this->currentSaveState != NEVER_SAVED)
     this->currentSaveState = UNSAVED_CHANGES;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::Update()
+{
+  boost::unordered_map<std::string, PartData *>::iterator partsIt;
+  for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
+       ++partsIt)
+  {
+    PartData *part = partsIt->second;
+    if (part->pose != part->partVisual->GetWorldPose() ||
+        part->scale != part->partVisual->GetScale())
+    {
+      part->pose = part->partVisual->GetWorldPose();
+      part->scale = part->partVisual->GetScale();
+      this->ModelChanged();
+    }
+  }
 }
