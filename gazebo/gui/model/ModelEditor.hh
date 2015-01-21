@@ -42,6 +42,22 @@ namespace gazebo
       /// \brief Destuctor.
       public: virtual ~ModelEditor();
 
+      /// \brief Qt callback when the building editor's save action is
+      /// triggered.
+      private slots: void Save();
+
+      /// \brief Qt callback when the building editor's save as action is
+      /// triggered.
+      private slots: void SaveAs();
+
+      /// \brief Qt callback when the building editor's new action is
+      /// triggered.
+      private slots: void New();
+
+      /// \brief Qt callback when the building editor's exit action is
+      /// triggered.
+      private slots: void Exit();
+
       /// \brief QT callback when entering model edit mode
       /// \param[in] _checked True if the menu item is checked
       private slots: void OnEdit(bool _checked);
@@ -65,6 +81,12 @@ namespace gazebo
 
       /// \brief Toggle main window's toolbar to display model editor icons.
       private: void ToggleToolbar();
+
+      /// \brief Create menus
+      private: void CreateMenus();
+
+      /// \brief Our custom menubar
+      private: QMenuBar *menuBar;
 
       /// \brief Contains all the model editor tools.
       private: ModelEditorPalette *modelPalette;
@@ -90,6 +112,11 @@ namespace gazebo
 
       /// \brief Previously selected joint type.
       private: std::string selectedJointType;
+
+      private: QAction *saveAct;
+      private: QAction *saveAsAct;
+      private: QAction *newAct;
+      private: QAction *exitAct;
     };
   }
 }

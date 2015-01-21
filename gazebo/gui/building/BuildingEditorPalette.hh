@@ -76,9 +76,7 @@ namespace gazebo
       /// \brief Callback when user has provided information on where to save
       /// the model to.
       /// \param[in] _saveName Name of model being saved.
-      /// \param[in] _saveLocation Location to save the model to.
-      private: void OnSaveModel(const std::string &_saveName,
-          const std::string &_saveLocation);
+      private: void OnSaveModel(const std::string &_saveName);
 
       /// \brief Event received when an editor item is selected.
       /// \param[in] _mode Type of item to add or empty for none.
