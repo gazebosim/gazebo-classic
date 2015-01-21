@@ -184,6 +184,9 @@
     1. Pick textures from the palette and assign in 3D view.
         * [Pull request #1368](https://bitbucket.org/osrf/gazebo/pull-request/1368)
 
+    1. Pick custom colors from the palette and assign in 3D view.
+        * [Pull request #1382](https://bitbucket.org/osrf/gazebo/pull-request/1382)
+
 1. Model editor updates
     1. Fix adding/removing event filters .
         * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
