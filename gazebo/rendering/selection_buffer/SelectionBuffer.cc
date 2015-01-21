@@ -222,6 +222,6 @@ void SelectionBuffer::ShowOverlay(bool _show)
 #else
 void SelectionBuffer::ShowOverlay(bool /*_show*/)
 {
-  gzerr << "Selectioin debug overlay disabled for Ogre > 1.9\n";
+  gzerr << "Selection debug overlay disabled for Ogre > 1.9\n";
 }
 #endif
