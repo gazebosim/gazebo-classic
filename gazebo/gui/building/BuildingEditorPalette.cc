@@ -284,7 +284,7 @@ void BuildingEditorPalette::OnBrush(int _buttonId)
   else if (_buttonId >= brushIdToModeMap["texture_0"] &&
            _buttonId <= brushIdToModeMap[this->lastDefaultTexture])
   {
-    this->OnTexture(_buttonId - 11);
+    this->OnTexture(_buttonId - brushIdToModeMap["texture_0"]);
   }
   else if (_buttonId == brushIdToModeMap["image"])
   {
@@ -382,11 +382,11 @@ void BuildingEditorPalette::OnCreateEditorItem(const std::string &_mode)
 }
 
 /////////////////////////////////////////////////
-void BuildingEditorPalette::OnDefaultColor(int _buttonId)
+void BuildingEditorPalette::OnDefaultColor(int _colorId)
 {
   std::ostringstream colorStr;
-  colorStr << "color_" << _buttonId;
-  QColor color = this->colorList[_buttonId];
+  colorStr << "color_" << _colorId;
+  QColor color = this->colorList[_colorId];
   if (this->currentMode != colorStr.str())
   {
     this->currentMode = colorStr.str();
@@ -431,17 +431,17 @@ void BuildingEditorPalette::OnColor(QColor _color)
 }
 
 /////////////////////////////////////////////////
-void BuildingEditorPalette::OnTexture(int _buttonId)
+void BuildingEditorPalette::OnTexture(int _textureId)
 {
   std::ostringstream textureStr;
-  textureStr << "texture_" << _buttonId;
-  QString texture = this->textureList[_buttonId];
+  textureStr << "texture_" << _textureId;
+  QString texture = this->textureList[_textureId];
   if (this->currentMode != textureStr.str())
   {
     gui::editor::Events::textureSelected(texture);
     this->currentMode = textureStr.str();
 
-    QPixmap textureCursor(this->textureList[_buttonId]);
+    QPixmap textureCursor(this->textureList[_textureId]);
     textureCursor = textureCursor.scaled(QSize(30, 30), Qt::IgnoreAspectRatio,
         Qt::SmoothTransformation);
     QApplication::setOverrideCursor(textureCursor);

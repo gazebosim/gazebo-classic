@@ -96,8 +96,8 @@ namespace gazebo
       private: void OnAddStair();
 
       /// \brief When a default color button is selected.
-      /// \param[in] _buttonId Id of the button clicked.
-      private: void OnDefaultColor(int _buttonId);
+      /// \param[in] _colorId Id of the color clicked.
+      private: void OnDefaultColor(int _colorId);
 
       /// \brief Open a color dialog when the custom color button is clicked.
       private: void OnCustomColorDialog();
@@ -107,11 +107,14 @@ namespace gazebo
       private: void OnColor(QColor _color);
 
       /// \brief When a default texture button is selected.
-      /// \param[in] _buttonId Id of the button clicked.
-      private: void OnTexture(int _buttonId);
+      /// \param[in] _textureId Id of the texture clicked.
+      private: void OnTexture(int _textureId);
 
       /// \brief When the import image button is selected.
       private: void OnImportImage();
+
+      /// \brief Custom color dialog.
+      public: QColorDialog *customColorDialog;
 
       /// \brief Default name of the building model.
       private: std::string buildingDefaultName;
@@ -142,9 +145,6 @@ namespace gazebo
 
       /// \brief Name of the last default texture mode.
       private: std::string lastDefaultTexture;
-
-      /// \brief Custom color dialog.
-      private: QColorDialog *customColorDialog;
 
       /// \brief Custom color button.
       private: QPushButton *customColorButton;
