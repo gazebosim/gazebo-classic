@@ -28,7 +28,7 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
-    : QWidget(_parent)
+    : QWidget(_parent), dataPtr(new BuildingEditorPalettePrivate)
 {
   this->setObjectName("buildingEditorPalette");
 
@@ -232,6 +232,8 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 /////////////////////////////////////////////////
 BuildingEditorPalette::~BuildingEditorPalette()
 {
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
