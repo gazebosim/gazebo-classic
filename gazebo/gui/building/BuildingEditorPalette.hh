@@ -51,27 +51,19 @@ namespace gazebo
       /// \return Model name
       public: std::string GetModelName() const;
 
-      /// \brief Qt callback when the draw wall button is pressed.
-      private slots: void OnDrawWall();
-
-      /// \brief Qt callback when the draw window button is pressed.
-      private slots: void OnAddWindow();
-
-      /// \brief Qt callback when the draw door button is pressed.
-      private slots: void OnAddDoor();
-
-      /// \brief Qt callback when the import image button is pressed.
-      private slots: void OnImportImage();
-
-      /// \brief Qt callback when the draw stairs button is pressed.
-      private slots: void OnAddStair();
-
       /// \brief Qt callback when a brush is pressed.
       /// \param[in] _buttonId Id of the button clicked.
       private slots: void OnBrush(int _buttonId);
 
       /// \brief Qt callback when the Model Name field is changed.
       private slots: void OnNameChanged(const QString &_name);
+
+      /// \brief Qt callback when custom color has been selected on the dialog.
+      /// \param[in] _color Selected color.
+      private slots: void OnCustomColor(const QColor _color);
+
+      /// \brief Cancel whatever is being drawn and uncheck all brushes.
+      private slots: void CancelDrawModes();
 
       /// \brief Callback when user has provided information on where to save
       /// the model to.
@@ -91,13 +83,24 @@ namespace gazebo
       /// \param[in] _event Event.
       private: void mousePressEvent(QMouseEvent *_event);
 
+      /// \brief When the draw wall button is selected.
+      private: void OnDrawWall();
+
+      /// \brief When the draw window button is selected.
+      private: void OnAddWindow();
+
+      /// \brief When the draw door button is selected.
+      private: void OnAddDoor();
+
+      /// \brief When the draw stairs button is selected.
+      private: void OnAddStair();
+
       /// \brief When a default color button is selected.
       /// \param[in] _buttonId Id of the button clicked.
       private: void OnDefaultColor(int _buttonId);
 
-      /// \brief When the custom color button is selected,
-      /// a QColorDialog is opened.
-      private: void OnCustomColor();
+      /// \brief Open a color dialog when the custom color button is clicked.
+      private: void OnCustomColorDialog();
 
       /// \brief When any color is selected.
       /// \param[in] _color Color selected.
@@ -106,6 +109,9 @@ namespace gazebo
       /// \brief When a default texture button is selected.
       /// \param[in] _buttonId Id of the button clicked.
       private: void OnTexture(int _buttonId);
+
+      /// \brief When the import image button is selected.
+      private: void OnImportImage();
 
       /// \brief Default name of the building model.
       private: std::string buildingDefaultName;
@@ -136,6 +142,9 @@ namespace gazebo
 
       /// \brief Name of the last default texture mode.
       private: std::string lastDefaultTexture;
+
+      /// \brief Custom color dialog.
+      private: QColorDialog *customColorDialog;
 
       /// \brief Custom color button.
       private: QPushButton *customColorButton;

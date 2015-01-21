@@ -153,6 +153,13 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->brushes->addButton(this->customColorButton,
       this->brushes->buttons().size());
 
+  this->customColorDialog = new QColorDialog(Qt::green, this);
+  this->customColorDialog->setWindowModality(Qt::NonModal);
+  connect(this->customColorDialog, SIGNAL(currentColorChanged(const QColor)),
+      this, SLOT(OnCustomColor(const QColor)));
+  connect(this->customColorDialog, SIGNAL(rejected()), this,
+      SLOT(CancelDrawModes()));
+
   // Textures
   QLabel *texturesLabel = new QLabel(tr(
        "<font size=4 color='white'>Add Texture</font>"));
@@ -272,7 +279,7 @@ void BuildingEditorPalette::OnBrush(int _buttonId)
   }
   else if (_buttonId == brushIdToModeMap["color_custom"])
   {
-    this->OnCustomColor();
+    this->OnCustomColorDialog();
   }
   else if (_buttonId >= brushIdToModeMap["texture_0"] &&
            _buttonId <= brushIdToModeMap[this->lastDefaultTexture])
@@ -295,7 +302,7 @@ void BuildingEditorPalette::OnDrawWall()
   if (this->currentMode != "wall")
     gui::editor::Events::createBuildingEditorItem("wall");
   else
-    gui::editor::Events::createBuildingEditorItem(std::string());
+    this->CancelDrawModes();
 }
 
 /////////////////////////////////////////////////
@@ -304,7 +311,7 @@ void BuildingEditorPalette::OnAddWindow()
   if (this->currentMode != "window")
     gui::editor::Events::createBuildingEditorItem("window");
   else
-    gui::editor::Events::createBuildingEditorItem(std::string());
+    this->CancelDrawModes();
 }
 
 /////////////////////////////////////////////////
@@ -313,7 +320,7 @@ void BuildingEditorPalette::OnAddDoor()
   if (this->currentMode != "door")
     gui::editor::Events::createBuildingEditorItem("door");
   else
-    gui::editor::Events::createBuildingEditorItem(std::string());
+    this->CancelDrawModes();
 }
 
 /////////////////////////////////////////////////
@@ -322,7 +329,7 @@ void BuildingEditorPalette::OnImportImage()
   if (this->currentMode != "image")
     gui::editor::Events::createBuildingEditorItem("image");
   else
-    gui::editor::Events::createBuildingEditorItem(std::string());
+    this->CancelDrawModes();
 }
 
 /////////////////////////////////////////////////
@@ -331,7 +338,7 @@ void BuildingEditorPalette::OnAddStair()
   if (this->currentMode != "stairs")
     gui::editor::Events::createBuildingEditorItem("stairs");
   else
-    gui::editor::Events::createBuildingEditorItem(std::string());
+    this->CancelDrawModes();
 }
 
 /////////////////////////////////////////////////
@@ -387,28 +394,30 @@ void BuildingEditorPalette::OnDefaultColor(int _buttonId)
   }
   else
   {
-    gui::editor::Events::createBuildingEditorItem(std::string());
+    this->CancelDrawModes();
   }
 }
 
 /////////////////////////////////////////////////
-void BuildingEditorPalette::OnCustomColor()
+void BuildingEditorPalette::OnCustomColorDialog()
 {
-  // Cancel draw mode
-  gui::editor::Events::createBuildingEditorItem(std::string());
-
+  this->CancelDrawModes();
   this->customColorButton->setChecked(true);
+  this->customColorDialog->show();
+}
 
-  QColor color = QColorDialog::getColor(Qt::green, this);
-
-  if (color.isValid())
+/////////////////////////////////////////////////
+void BuildingEditorPalette::OnCustomColor(const QColor _color)
+{
+  this->customColorButton->setChecked(true);
+  if (_color.isValid())
   {
     this->currentMode = "color_custom";
-    this->OnColor(color);
+    this->OnColor(_color);
   }
   else
   {
-    gui::editor::Events::createBuildingEditorItem(std::string());
+    this->CancelDrawModes();
   }
 }
 
@@ -439,13 +448,18 @@ void BuildingEditorPalette::OnTexture(int _buttonId)
   }
   else
   {
-    gui::editor::Events::createBuildingEditorItem(std::string());
+    this->CancelDrawModes();
   }
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::mousePressEvent(QMouseEvent * /*_event*/)
 {
-  // Cancel draw mode
+  this->CancelDrawModes();
+}
+
+/////////////////////////////////////////////////
+void BuildingEditorPalette::CancelDrawModes()
+{
   gui::editor::Events::createBuildingEditorItem(std::string());
 }
