@@ -731,9 +731,21 @@ void JointMaker::Update()
             joint->jointMsg->add_angle(0);
             msgs::Axis *axisMsg;
             if (i == 0)
+            {
               axisMsg = joint->jointMsg->mutable_axis1();
+            }
             else if (i == 1)
+            {
               axisMsg = joint->jointMsg->mutable_axis2();
+            }
+            else
+            {
+              gzerr << "Invalid axis index["
+                    << i
+                    << "]"
+                    << std::endl;
+              continue;
+            }
 
             msgs::Set(axisMsg->mutable_xyz(), joint->axis[i]);
           }
