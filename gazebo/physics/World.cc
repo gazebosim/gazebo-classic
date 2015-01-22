@@ -250,6 +250,9 @@ void World::Load(sdf::ElementPtr _sdf)
   // This should come before loading of entities
   this->dataPtr->physicsEngine->Load(this->dataPtr->sdf->GetElement("physics"));
 
+  this->dataPtr->presetManager =
+    new PresetManager(this, this->dataPtr->sdf->GetElement("physics"));
+
   // This should also come before loading of entities
   {
     sdf::ElementPtr spherical = this->dataPtr->sdf->GetElement(

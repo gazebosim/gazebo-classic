@@ -15,39 +15,133 @@
  *
 */
 
-#include "gazebo/physics/PresetManager.hh"
+#include <boost/any.hpp>
+
+#include "gazebo/common/Console.hh"
+#include "gazebo/physics/World.hh"
 #include "gazebo/physics/PresetManagerPrivate.hh"
+#include "gazebo/physics/PresetManager.hh"
 
-PresetManager::PresetManager(PhysicsEngine _engine)
+using namespace gazebo;
+using namespace physics;
+
+PresetManager::PresetManager(WorldPtr _world, sdf::ElementPtr _sdf)
 {
+  this->dataPtr->physicsEngine = _world->GetPhysicsEngine();
 
+  // Load SDF
+  if (_sdf->HasElement("presets")
+  {
+  }
 }
 
-virtual ~PresetManager::PresetManager();
+PresetManager::~PresetManager()
+{
+}
 
-virtual void PresetManager::Load(sdf::ElementPtr _sdf);
+bool PresetManager::SetCurrentProfile(const std::string& _name)
+{
+  if (this->dataPtr->presetProfiles.find(_name) ==
+      this->dataPtr->presetProfiles.end())
+  {
+    gzwarn << "Profile " << _name << " not found." << std::endl;
+    return false;
+  }
+  this->dataPtr->currentPreset = this->dataPtr->presetProfiles[_name];
 
-void PresetManager::SetCurrentProfile(const std::string& _name);
+  bool result = true;
+  for (Preset::iterator it = this->dataPtr->currentPreset->begin();
+     it != this->dataPtr->currentPreset->end(); ++it)
+  {
+    result = result &&
+      this->dataPtr->physicsEngine->SetParam(it->first, it->second);
+  }
+  return result;
+}
 
 Preset* PresetManager::GetCurrentProfile()
 {
-
+  return this->dataPtr->currentPreset;
 }
 
-std::string PresetManager::GetCurrentProfileName();
+// name can be an entry in preset
+std::string PresetManager::GetCurrentProfileName()
+{
+  if (!this->dataPtr->currentPreset)
+  {
+    return "";
+  }
+  // TODO: type checking
+  return boost::any_cast<std::string>(
+    this->dataPtr->currentPreset->at("name"));
+}
 
-std::vector<std::string> PresetManager::GetAllProfiles();
+std::vector<Preset*> PresetManager::GetAllProfiles()
+{
+  std::vector<Preset*> ret;
+  for (std::map<std::string, Preset*>::iterator it = this->dataPtr->presetProfiles.begin();
+     it != this->dataPtr->presetProfiles.end(); ++it)
+  {
+    ret.push_back(it->second);
+  }
+  return ret;
+}
 
-bool PresetManager::SetProfileParam(const std::string& _profileName, const std::string& _key, const boost::any &_value);
+std::vector<std::string> PresetManager::GetAllProfileNames()
+{
+  std::vector<std::string> ret;
+  for (std::map<std::string, Preset*>::iterator it =
+        this->dataPtr->presetProfiles.begin();
+         it != this->dataPtr->presetProfiles.end(); ++it)
+  {
+    ret.push_back(it->first);
+  }
+  return ret;
+}
 
-bool PresetManager::SetCurrentProfileParam(const std::string& _key, const boost::any &_value);
+bool PresetManager::SetProfileParam(const std::string& _profileName,
+  const std::string& _key, const boost::any &_value)
+{
+  if (_profileName == this->GetCurrentProfileName())
+  {
+    return this->SetCurrentProfileParam(_key, _value);
+  }
 
-void PresetManager::CreateProfile(const std::string& _name);
+  // TODO: error cond?
+  this->dataPtr->presetProfiles[_profileName]->at(_key) = _value;
+  return true;
+}
 
-void PresetManager::CreateProfileFromPreset(const std::string& _name, Preset* _preset);
+bool PresetManager::SetCurrentProfileParam(const std::string& _key,
+  const boost::any &_value)
+{
+  if (!this->dataPtr->currentPreset)
+  {
+    return false;
+  }
+  this->dataPtr->currentPreset->at(_key) = _value;
+  return this->dataPtr->physicsEngine->SetParam(_key, _value);
+}
 
-sdf::ElementPtr PresetManager::GetSDFForProfile(const std::string &_name);
+void PresetManager::CreateProfile(const std::string& _name)
+{
+  this->dataPtr->presetProfiles[_name] = new Preset;
+  this->dataPtr->presetProfiles[_name]->at("name") = _name;
+}
 
-void PresetManager::GetSDFForProfile(const std::string &_name);
+void PresetManager::CreateProfileFromPreset(const std::string& _name,
+  Preset* _preset)
+{
+  this->dataPtr->presetProfiles[_name] = _preset;
+  this->dataPtr->presetProfiles[_name]->at("name") = _name;
+}
 
+sdf::ElementPtr PresetManager::GetSDFForProfile(const std::string &_name)
+{
+  return NULL;
+}
 
+void PresetManager::SetSDFForProfile(const std::string &_name)
+{
+
+}

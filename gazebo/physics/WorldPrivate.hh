@@ -32,6 +32,7 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 
+#include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
 
@@ -285,6 +286,8 @@ namespace gazebo
       /// this flag is set to trigger Entity::SetWorldPose on the
       /// physics::Link in World::Update.
       public: std::list<Entity*> dirtyPoses;
+
+      public: PresetManager* presetManager;
     };
   }
 }

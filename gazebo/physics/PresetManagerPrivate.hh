@@ -14,18 +14,27 @@
  * limitations under the License.
  *
 */
-#ifndef _PRESETMANAGERPRIVATE_HH_
-#define _PRESETMANAGERPRIVATE_HH_
+#ifndef _PRESETMANAGER_PRIVATE_HH_
+#define _PRESETMANAGER_PRIVATE_HH_
+
+#include <map>
+#include <string>
+#include "gazebo/physics/PhysicsEngine.hh"
+
 namespace gazebo
 {
   namespace physics
   {
+    typedef std::map<std::string, boost::any> Preset;
+
     class PresetManagerPrivate
     {
       public: Preset* currentPreset;
-      public: map<std::string, Preset*> presetProfiles;
-      public: PhysicsEngine* physicsEngine;
+      public: std::map<std::string, Preset*> presetProfiles;
+      public: PhysicsEnginePtr physicsEngine;
       public: sdf::ElementPtr sdf;
     };
   }  // namespace physics
 }  // namespace gazebo 
+
+#endif

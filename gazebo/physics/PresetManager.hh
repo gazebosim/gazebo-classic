@@ -17,48 +17,57 @@
 
 #ifndef _PRESETMANAGER_HH_
 #define _PRESETMANAGER_HH_
+
+#include <string>
+
+#include "gazebo/physics/PhysicsEngine.hh"
+
 namespace gazebo
 {
   namespace physics
   {
+    typedef std::map<std::string, boost::any> Preset;
+
+    class PresetManagerPrivate;
+
     class GAZEBO_VISIBLE PresetManager
     {
-      class PresetManagerPrivate;
 
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.
-      public: PresetManager(PhysicsEngine _engine);
+      /// \param[in] _sdf Pointer to the SDF parameters.
+      public: PresetManager(WorldPtr _world, sdf::ElementPtr _sdf);
 
       /// \brief Destructor.
-      public: virtual ~PresetManager();
+      public: ~PresetManager();
 
-      /// \brief Load the physics engine.
-      /// \param[in] _sdf Pointer to the SDF parameters.
-      public: virtual void Load(sdf::ElementPtr _sdf);
-
-      public: void SetCurrentProfile(const std::string& _name);
+      public: bool SetCurrentProfile(const std::string& _name);
 
       public: Preset* GetCurrentProfile();
 
       public: std::string GetCurrentProfileName();
+ 
+      public: std::vector<std::string> GetAllProfileNames();
 
-      public: std::vector<std::string> GetAllProfiles();
+      public: std::vector<Preset*> GetAllProfiles();
 
       public: bool SetProfileParam(const std::string& _profileName,
                                    const std::string& _key,
                                    const boost::any &_value);
 
-      public: bool SetCurrentProfileParam(const std::string& _key, const boost::any &_value);
+      public: bool SetCurrentProfileParam(const std::string& _key,
+                                          const boost::any &_value);
 
       public: void CreateProfile(const std::string& _name);
 
-      public: void CreateProfileFromPreset(const std::string& _name, Preset* _preset);
+      public: void CreateProfileFromPreset(const std::string& _name,
+                                           Preset* _preset);
 
       public: sdf::ElementPtr GetSDFForProfile(const std::string &_name);
 
-      public: void GetSDFForProfile(const std::string &_name);
+      public: void SetSDFForProfile(const std::string &_name);
 
-      private: PresetManagerPrivate dataPtr;
+      private: PresetManagerPrivate *dataPtr;
     };
   }  // namespace physics
 }  //namespace gazebo
