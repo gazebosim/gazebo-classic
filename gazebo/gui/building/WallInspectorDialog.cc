@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/gui/building/WallInspectorDialog.hh"
 
 using namespace gazebo;
@@ -310,8 +311,7 @@ void WallInspectorDialog::SetThickness(double _thickness)
 /////////////////////////////////////////////////
 void WallInspectorDialog::SetColor(const QColor _color)
 {
-  // Find index corresponding to color (only a few colors allowed so far)
-  int index = 0;
+  int index = -1;
   for (unsigned int i = 0; i < this->colorList.size(); ++i)
   {
     if (this->colorList[i] == _color)
@@ -320,6 +320,17 @@ void WallInspectorDialog::SetColor(const QColor _color)
       break;
     }
   }
+
+  if (index == -1)
+  {
+    // Add a new color
+    this->colorList.push_back(_color);
+    QPixmap colorIcon(15, 15);
+    colorIcon.fill(this->colorList.back());
+    this->colorComboBox->addItem(colorIcon, QString(""));
+    index = this->colorComboBox->count()-1;
+  }
+  GZ_ASSERT(index > 0, "Color index is broken < 0");
   this->colorComboBox->setCurrentIndex(index);
 }
 

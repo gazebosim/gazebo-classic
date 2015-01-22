@@ -6,7 +6,6 @@ package gazebo.msgs;
 
 
 import "vector3d.proto";
-import "header.proto";
 
 message Physics
 {
