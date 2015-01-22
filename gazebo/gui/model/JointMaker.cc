@@ -728,7 +728,6 @@ void JointMaker::Update()
           int axisCount = JointMaker::GetJointAxisCount(joint->type);
           for (int i = 0; i < axisCount; ++i)
           {
-            joint->jointMsg->add_angle(0);
             msgs::Axis *axisMsg;
             if (i == 0)
             {
@@ -746,8 +745,10 @@ void JointMaker::Update()
                     << std::endl;
               continue;
             }
-
             msgs::Set(axisMsg->mutable_xyz(), joint->axis[i]);
+
+            // Add angle field after we've checked that index i is valid
+            joint->jointMsg->add_angle(0);
           }
 
           if (joint->jointVisual)
