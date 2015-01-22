@@ -674,6 +674,7 @@ TEST_P(PhysicsTest, SpawnDropCoGOffset)
   */
 // }
 
+////////////////////////////////////////////////////////////////////////
 void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 {
   // Random seed is set to prevent brittle failures (gazebo issue #479)
@@ -745,6 +746,7 @@ TEST_P(PhysicsTest, JointDampingTest)
   JointDampingTest(GetParam());
 }
 
+////////////////////////////////////////////////////////////////////////
 void PhysicsTest::DropStuff(const std::string &_physicsEngine)
 {
   Load("worlds/drop_test.world", true, _physicsEngine);
@@ -898,6 +900,7 @@ TEST_F(PhysicsTest, DropStuffDART)
 }
 #endif  // HAVE_DART
 
+////////////////////////////////////////////////////////////////////////
 void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
 {
   // check conservation of mementum for linear inelastic collision
@@ -950,7 +953,7 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
           if (i == 0)
           {
             box_model->GetLink("link")->SetForce(math::Vector3(f, 0, 0));
-            EXPECT_TRUE(box_model->GetLink("link")->GetWorldForce() ==
+            EXPECT_EQ(box_model->GetLink("link")->GetWorldForce(),
               math::Vector3(f, 0, 0));
           }
 
