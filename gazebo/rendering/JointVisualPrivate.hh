@@ -29,10 +29,16 @@ namespace gazebo
     /// \brief Private data for the Joint Visual class.
     class JointVisualPrivate : public VisualPrivate
     {
-      /// \brief The visual used to draw the joint.
+      /// \brief The joint's XYZ frame visual.
       public: AxisVisualPtr axisVisual;
 
-      /// \brief Second joint visual for hinge2 and universal joints.
+      /// \brief The visual representing the one joint axis. There can be only
+      /// one axis visual per joint visual, so joints with two axes have a 2nd
+      /// JointVisual with its own arrowVisual.
+      public: ArrowVisualPtr arrowVisual;
+
+      /// \brief Second joint visual for hinge2 and universal joints. It is a
+      /// simplified visual without an XYZ frame.
       public: JointVisualPtr parentAxisVis;
     };
   }

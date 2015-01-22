@@ -143,6 +143,7 @@ void BuildingEditor::OnEdit(bool _checked)
   }
   else
   {
+    this->buildingPalette->customColorDialog->reject();
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->GetRenderWidget()->ShowEditor(false);
     this->mainWindow->ShowMenuBar();
