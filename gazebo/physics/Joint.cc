@@ -448,8 +448,7 @@ void Joint::SetModel(ModelPtr _model)
 }
 
 //////////////////////////////////////////////////
-double Joint::GetParam(const std::string &_key,
-    unsigned int _index)
+double Joint::GetParam(const std::string &_key, unsigned int _index)
 {
   if (_key == "hi_stop")
   {

@@ -479,8 +479,7 @@ bool SimbodyJoint::SetParam(const std::string &/*_key*/,
 }
 
 //////////////////////////////////////////////////
-double SimbodyJoint::GetParam(const std::string &_key,
-    unsigned int _index)
+double SimbodyJoint::GetParam(const std::string &_key, unsigned int _index)
 {
   return Joint::GetParam(_key, _index);
 }
