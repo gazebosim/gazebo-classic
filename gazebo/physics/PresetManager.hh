@@ -65,7 +65,8 @@ namespace gazebo
 
       public: sdf::ElementPtr GetSDFForProfile(const std::string &_name);
 
-      public: void SetSDFForProfile(const std::string &_name);
+      public: void SetSDFForProfile(const std::string &_name,
+                sdf::ElementPtr _sdf);
 
       private: PresetManagerPrivate *dataPtr;
     };

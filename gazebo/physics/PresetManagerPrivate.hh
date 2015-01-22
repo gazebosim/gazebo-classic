@@ -31,8 +31,8 @@ namespace gazebo
     {
       public: Preset* currentPreset;
       public: std::map<std::string, Preset*> presetProfiles;
+      public: std::map<std::string, sdf::ElementPtr> presetSDF;
       public: PhysicsEnginePtr physicsEngine;
-      public: sdf::ElementPtr sdf;
     };
   }  // namespace physics
 }  // namespace gazebo 

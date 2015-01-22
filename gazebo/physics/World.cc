@@ -251,7 +251,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->physicsEngine->Load(this->dataPtr->sdf->GetElement("physics"));
 
   this->dataPtr->presetManager =
-    new PresetManager(this, this->dataPtr->sdf->GetElement("physics"));
+    new PresetManager(WorldPtr(this), this->dataPtr->sdf->GetElement("physics"));
 
   // This should also come before loading of entities
   {

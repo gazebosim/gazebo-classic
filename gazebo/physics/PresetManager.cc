@@ -15,6 +15,8 @@
  *
 */
 
+// TODO: mutexes
+
 #include <boost/any.hpp>
 
 #include "gazebo/common/Console.hh"
@@ -30,13 +32,33 @@ PresetManager::PresetManager(WorldPtr _world, sdf::ElementPtr _sdf)
   this->dataPtr->physicsEngine = _world->GetPhysicsEngine();
 
   // Load SDF
-  if (_sdf->HasElement("presets")
+  if (_sdf->HasElement("presets"))
   {
+    sdf::ElementPtr preset = _sdf->GetElement("presets");
+    while (preset)
+    {
+      // Get name attribute
+      const std::string name = preset->GetAttribute("name")->GetAsString();
+
+      // Put all the elements in a map
+      sdf::ElementPtr elem = preset->GetFirstElement();
+      Preset *paramMap = new Preset();
+      while (elem)
+      {
+        paramMap->at(elem->GetName()) = elem->Get<std::string>();
+        elem = elem->GetNextElement();
+      }
+
+      this->CreateProfileFromPreset(name, paramMap);
+      this->dataPtr->presetSDF[name] = preset;
+      preset = preset->GetNextElement("presets");
+    }
   }
 }
 
 PresetManager::~PresetManager()
 {
+  // TODO: delete all the pointers!
 }
 
 bool PresetManager::SetCurrentProfile(const std::string& _name)
@@ -138,10 +160,14 @@ void PresetManager::CreateProfileFromPreset(const std::string& _name,
 
 sdf::ElementPtr PresetManager::GetSDFForProfile(const std::string &_name)
 {
-  return NULL;
+  // TODO: check null
+  return this->dataPtr->presetSDF[_name];
 }
 
-void PresetManager::SetSDFForProfile(const std::string &_name)
+void PresetManager::SetSDFForProfile(const std::string &_name,
+  sdf::ElementPtr _sdf)
 {
+  this->dataPtr->presetSDF[_name] = _sdf;
 
+  // TODO: Update the parameter map
 }
