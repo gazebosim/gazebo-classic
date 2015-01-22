@@ -176,6 +176,7 @@ ODEPhysics::~ODEPhysics()
   this->dataPtr->spaceId = NULL;
   this->dataPtr->worldId = NULL;
   delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
