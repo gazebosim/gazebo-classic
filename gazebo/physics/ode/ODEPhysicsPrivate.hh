@@ -15,11 +15,15 @@
  *
 */
 
+#ifndef _ODEPHYSICS_PRIVATE_HH_
+#define _ODEPHYSICS_PRIVATE_HH_
+
 #include <map>
 #include <string>
 #include <vector>
 #include <utility>
 
+#include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
 
 namespace gazebo
@@ -91,3 +95,5 @@ namespace gazebo
     };
   }
 }
+
+#endif
