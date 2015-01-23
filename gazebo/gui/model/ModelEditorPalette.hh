@@ -92,18 +92,6 @@ namespace gazebo
       /// \brief Qt callback when the model is allowed to auto disable at rest.
       private slots: void OnAutoDisable();
 
-      /// \brief Widget that display model properties.
-      private: QTreeWidget *modelTreeWidget;
-
-      /// \brief Model settings item in the tree widget.
-      private: QTreeWidgetItem *modelSettingsItem;
-
-      /// \brief Model parts item in the tree widget.
-      private: QTreeWidgetItem *modelItem;
-
-      /// \brief Plugin item in the tree widget.
-      private: QTreeWidgetItem *pluginItem;
-
       /// \brief Parts button group.
       private: QButtonGroup *partButtonGroup;
 

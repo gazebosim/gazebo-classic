@@ -43,70 +43,59 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
-  this->modelTreeWidget = new QTreeWidget();
-  this->modelTreeWidget->setColumnCount(1);
-  this->modelTreeWidget->setIndentation(10);
-  this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-  this->modelTreeWidget->header()->hide();
-  this->modelTreeWidget->setFocusPolicy(Qt::NoFocus);
+  // Simple Shapes
+  QLabel *shapesLabel = new QLabel(tr(
+       "<font size=4 color='white'>Simple Shapes</font>"));
 
-  this->modelTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
-  connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-      this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
+  QHBoxLayout *shapesLayout = new QHBoxLayout;
 
-  // Parts tree item
-  this->modelItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Link Palette")));
-  this->modelTreeWidget->addTopLevelItem(this->modelItem);
+  QSize toolButtonSize(70, 70);
+  QSize iconSize(40, 40);
 
-  QTreeWidgetItem *simpleShapesItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Simple Shapes")));
-  this->modelItem->addChild(simpleShapesItem);
-
-  QTreeWidgetItem *simpleShapesChildItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  simpleShapesItem->addChild(simpleShapesChildItem);
-
-  // Shapes buttons
-  QWidget *modelWidget = new QWidget;
-  QWidget *customWidget = new QWidget;
-  QGridLayout *partsLayout = new QGridLayout;
-  QGridLayout *customLayout = new QGridLayout;
-
-  // cylinder button
-  QPushButton *cylinderButton = new QPushButton(tr("Cylinder"), this);
+  // Cylinder button
+  QToolButton *cylinderButton = new QToolButton(this);
+  cylinderButton->setFixedSize(toolButtonSize);
+  cylinderButton->setToolTip(tr("Cylinder"));
+  cylinderButton->setIcon(QPixmap(":/images/cylinder.png"));
+  cylinderButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  cylinderButton->setIconSize(QSize(iconSize));
   cylinderButton->setCheckable(true);
   cylinderButton->setChecked(false);
   connect(cylinderButton, SIGNAL(clicked()), this, SLOT(OnCylinder()));
+  shapesLayout->addWidget(cylinderButton);
 
   // Sphere button
-  QPushButton *sphereButton = new QPushButton(tr("Sphere"), this);
+  QToolButton *sphereButton = new QToolButton(this);
+  sphereButton->setFixedSize(toolButtonSize);
+  sphereButton->setToolTip(tr("Sphere"));
+  sphereButton->setIcon(QPixmap(":/images/sphere.png"));
+  sphereButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  sphereButton->setIconSize(QSize(iconSize));
   sphereButton->setCheckable(true);
   sphereButton->setChecked(false);
   connect(sphereButton, SIGNAL(clicked()), this, SLOT(OnSphere()));
+  shapesLayout->addWidget(sphereButton);
 
   // Box button
-  QPushButton *boxButton = new QPushButton(tr("Box"), this);
+  QToolButton *boxButton = new QToolButton(this);
+  boxButton->setFixedSize(toolButtonSize);
+  boxButton->setToolTip(tr("Box"));
+  boxButton->setIcon(QPixmap(":/images/box.png"));
+  boxButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  boxButton->setIconSize(QSize(iconSize));
   boxButton->setCheckable(true);
   boxButton->setChecked(false);
   connect(boxButton, SIGNAL(clicked()), this, SLOT(OnBox()));
+  shapesLayout->addWidget(boxButton);
 
-  partsLayout->addWidget(cylinderButton, 0, 0);
-  partsLayout->addWidget(sphereButton, 0, 1);
-  partsLayout->addWidget(boxButton, 0, 2);
-  modelWidget->setLayout(partsLayout);
+  // Custom Shapes
+  QLabel *customShapesLabel = new QLabel(tr(
+       "<font size=4 color='white'>Custom Shapes</font>"));
 
-  // custom button
-  QTreeWidgetItem *customItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Custom")));
-  this->modelItem->addChild(customItem);
-
-  QTreeWidgetItem *customChildItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  customItem->addChild(customChildItem);
+  QHBoxLayout *customLayout = new QHBoxLayout;
+  customLayout->setAlignment(Qt::AlignLeft);
+  customLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
+      QSizePolicy::Minimum));
 
   QPushButton *customButton = new QPushButton(tr("Add"), this);
   customButton->setMaximumWidth(60);
@@ -114,34 +103,18 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   customButton->setChecked(false);
   connect(customButton, SIGNAL(clicked()), this, SLOT(OnCustom()));
   customLayout->addWidget(customButton, 0, 0);
-  customWidget->setLayout(customLayout);
 
-  this->modelTreeWidget->setItemWidget(simpleShapesChildItem, 0, modelWidget);
-  this->modelTreeWidget->setItemWidget(customChildItem, 0, customWidget);
-  this->modelItem->setExpanded(true);
-  simpleShapesItem->setExpanded(true);
-  simpleShapesChildItem->setExpanded(true);
-  customItem->setExpanded(true);
-  customChildItem->setExpanded(true);
-
+  // Button group
   this->partButtonGroup = new QButtonGroup;
   this->partButtonGroup->addButton(cylinderButton);
   this->partButtonGroup->addButton(sphereButton);
   this->partButtonGroup->addButton(boxButton);
   this->partButtonGroup->addButton(customButton);
 
-  // model settings tree item
-  this->modelSettingsItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Model Settings")));
-  this->modelTreeWidget->addTopLevelItem(this->modelSettingsItem);
+  // Model Settings
+  QLabel *settingsLabel = new QLabel(tr(
+       "<font size=4 color='white'>Model Settings</font>"));
 
-  QTreeWidgetItem *modelSettingsChildItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  this->modelSettingsItem->addChild(modelSettingsChildItem);
-
-  QWidget *modelSettingsWidget = new QWidget;
-  QVBoxLayout *modelSettingsLayout = new QVBoxLayout;
   QGridLayout *dynamicsLayout = new QGridLayout;
 
   QLabel *staticLabel = new QLabel(tr("Static:"));
@@ -160,29 +133,26 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   dynamicsLayout->addWidget(autoDisableLabel, 1, 0);
   dynamicsLayout->addWidget(this->autoDisableCheck, 1, 1);
 
-  modelSettingsLayout->addLayout(dynamicsLayout);
-  modelSettingsWidget->setLayout(modelSettingsLayout);
-  this->modelTreeWidget->setItemWidget(modelSettingsChildItem, 0,
-    modelSettingsWidget);
-  this->modelSettingsItem->setExpanded(true);
-  modelSettingsChildItem->setExpanded(true);
-
-  // plugin
-  this->pluginItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Plugin")));
-  // this->modelTreeWidget->addTopLevelItem(this->pluginItem);
-
   this->modelCreator = new ModelCreator();
   connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
 
-  QFrame *frame = new QFrame;
-  QVBoxLayout *frameLayout = new QVBoxLayout;
-  frameLayout->addWidget(this->modelTreeWidget, 0);
-  frameLayout->setContentsMargins(0, 0, 0, 0);
-  frame->setLayout(frameLayout);
+  // Horizontal separator
+  QFrame *separator = new QFrame(this);
+  separator->setFrameShape(QFrame::HLine);
+  separator->setFrameShadow(QFrame::Sunken);
+  separator->setLineWidth(1);
 
-  mainLayout->addWidget(frame);
+  // Main layout
+  mainLayout->addWidget(shapesLabel);
+  mainLayout->addLayout(shapesLayout);
+  mainLayout->addWidget(customShapesLabel);
+  mainLayout->addLayout(customLayout);
+  mainLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
+      QSizePolicy::Minimum));
+  mainLayout->addWidget(separator);
+  mainLayout->addWidget(settingsLabel);
+  mainLayout->addLayout(dynamicsLayout);
+  mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
