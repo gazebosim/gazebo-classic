@@ -157,7 +157,7 @@ ODEPhysics::~ODEPhysics()
   // Delete all the joint feedbacks.
   for (std::vector<ODEJointFeedback*>::iterator iter =
       this->dataPtr->jointFeedbacks.begin(); iter !=
-        this->dataPtr->jointFeedbacks.end(); ++iter)
+          this->dataPtr->jointFeedbacks.end(); ++iter)
   {
     delete *iter;
   }
