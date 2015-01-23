@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  * Stairs designed by Brian Oppenlander from the thenounproject.com
 */
 
+#include "gazebo/gui/building/BuildingEditorPalettePrivate.hh"
 #include "gazebo/gui/building/BuildingEditorPalette.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/ImportImageDialog.hh"
@@ -27,27 +28,30 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
-    : QWidget(_parent)
+    : QWidget(_parent), dataPtr(new BuildingEditorPalettePrivate)
 {
   this->setObjectName("buildingEditorPalette");
 
-  this->buildingDefaultName = "Untitled";
+  this->dataPtr->buildingDefaultName = "Untitled";
+  this->dataPtr->currentMode = std::string();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
   // Model name layout
   QHBoxLayout *modelNameLayout = new QHBoxLayout;
   QLabel *modelLabel = new QLabel(tr("Model Name: "));
-  this->modelNameEdit = new QLineEdit();
-  this->modelNameEdit->setText(tr(this->buildingDefaultName.c_str()));
+  this->dataPtr->modelNameEdit = new QLineEdit();
+  this->dataPtr->modelNameEdit->setText(
+      tr(this->dataPtr->buildingDefaultName.c_str()));
   modelNameLayout->addWidget(modelLabel);
-  modelNameLayout->addWidget(this->modelNameEdit);
-  connect(this->modelNameEdit, SIGNAL(textChanged(QString)), this,
+  modelNameLayout->addWidget(this->dataPtr->modelNameEdit);
+  connect(this->dataPtr->modelNameEdit, SIGNAL(textChanged(QString)), this,
           SLOT(OnNameChanged(QString)));
 
   // Brushes (button group)
-  this->brushes = new QButtonGroup();
-  connect(this->brushes, SIGNAL(buttonClicked(int)), this, SLOT(OnBrush(int)));
+  this->dataPtr->brushes = new QButtonGroup();
+  connect(this->dataPtr->brushes, SIGNAL(buttonClicked(int)),
+      this, SLOT(OnBrush(int)));
 
   QSize toolButtonSize(100, 100);
   QSize iconSize(65, 65);
@@ -66,8 +70,10 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   wallButton->setText("Wall");
   wallButton->setIconSize(QSize(iconSize));
   wallButton->setToolTip("Hold Shift to override snapping");
-  this->brushIdToModeMap["wall"] = this->brushes->buttons().size();
-  this->brushes->addButton(wallButton, this->brushes->buttons().size());
+  this->dataPtr->brushIdToModeMap["wall"] =
+    this->dataPtr->brushes->buttons().size();
+  this->dataPtr->brushes->addButton(wallButton,
+      this->dataPtr->brushes->buttons().size());
 
   // Features label
   QLabel *featuresLabel = new QLabel(tr(
@@ -82,8 +88,10 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   windowButton->setIcon(QPixmap(":/images/window.svg"));
   windowButton->setText("Window");
   windowButton->setIconSize(QSize(iconSize));
-  this->brushIdToModeMap["window"] = this->brushes->buttons().size();
-  this->brushes->addButton(windowButton, this->brushes->buttons().size());
+  this->dataPtr->brushIdToModeMap["window"] =
+    this->dataPtr->brushes->buttons().size();
+  this->dataPtr->brushes->addButton(windowButton,
+      this->dataPtr->brushes->buttons().size());
 
   // Door button
   QToolButton *doorButton = new QToolButton(this);
@@ -94,8 +102,10 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   doorButton->setIcon(QPixmap(":/images/door.svg"));
   doorButton->setText("Door");
   doorButton->setIconSize(QSize(iconSize));
-  this->brushIdToModeMap["door"] = this->brushes->buttons().size();
-  this->brushes->addButton(doorButton, this->brushes->buttons().size());
+  this->dataPtr->brushIdToModeMap["door"] =
+    this->dataPtr->brushes->buttons().size();
+  this->dataPtr->brushes->addButton(doorButton,
+      this->dataPtr->brushes->buttons().size());
 
   // Stairs button
   QToolButton *stairsButton = new QToolButton(this);
@@ -106,8 +116,10 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   stairsButton->setIcon(QPixmap(":/images/stairs.svg"));
   stairsButton->setText("Stairs");
   stairsButton->setIconSize(QSize(iconSize));
-  this->brushIdToModeMap["stairs"] = this->brushes->buttons().size();
-  this->brushes->addButton(stairsButton, this->brushes->buttons().size());
+  this->dataPtr->brushIdToModeMap["stairs"] =
+    this->dataPtr->brushes->buttons().size();
+  this->dataPtr->brushes->addButton(stairsButton,
+      this->dataPtr->brushes->buttons().size());
 
   // Features layout
   QGridLayout *featuresLayout = new QGridLayout;
@@ -120,13 +132,13 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
       "<font size=4 color='white'>Add Color</font>"));
 
   QGridLayout *colorsLayout = new QGridLayout;
-  this->colorList.push_back(QColor(255, 255, 255, 255));
-  this->colorList.push_back(QColor(194, 169, 160, 255));
-  this->colorList.push_back(QColor(235, 206, 157, 255));
-  this->colorList.push_back(QColor(254, 121,   5, 255));
-  this->colorList.push_back(QColor(255, 195,  78, 255));
-  this->colorList.push_back(QColor(111, 203, 172, 255));
-  for (unsigned int i = 0; i < this->colorList.size(); ++i)
+  this->dataPtr->colorList.push_back(QColor(255, 255, 255, 255));
+  this->dataPtr->colorList.push_back(QColor(194, 169, 160, 255));
+  this->dataPtr->colorList.push_back(QColor(235, 206, 157, 255));
+  this->dataPtr->colorList.push_back(QColor(254, 121,   5, 255));
+  this->dataPtr->colorList.push_back(QColor(255, 195,  78, 255));
+  this->dataPtr->colorList.push_back(QColor(111, 203, 172, 255));
+  for (unsigned int i = 0; i < this->dataPtr->colorList.size(); ++i)
   {
     QToolButton *colorButton = new QToolButton(this);
     colorButton->setFixedSize(40, 40);
@@ -134,30 +146,33 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
     colorButton->setChecked(false);
     colorButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
     QPixmap colorIcon(30, 30);
-    colorIcon.fill(this->colorList.at(i));
+    colorIcon.fill(this->dataPtr->colorList.at(i));
     colorButton->setIcon(colorIcon);
     std::ostringstream colorStr;
     colorStr << "color_" << i;
-    this->lastDefaultColor = colorStr.str();
-    this->brushIdToModeMap[this->lastDefaultColor] =
-        this->brushes->buttons().size();
-    this->brushes->addButton(colorButton, this->brushes->buttons().size());
+    this->dataPtr->lastDefaultColor = colorStr.str();
+    this->dataPtr->brushIdToModeMap[this->dataPtr->lastDefaultColor] =
+        this->dataPtr->brushes->buttons().size();
+    this->dataPtr->brushes->addButton(colorButton,
+        this->dataPtr->brushes->buttons().size());
     colorsLayout->addWidget(colorButton, 0, i);
   }
 
-  this->customColorButton = new QPushButton("More");
-  this->customColorButton->setCheckable(true);
-  this->customColorButton->setChecked(false);
-  colorsLayout->addWidget(this->customColorButton, 1, 4, 1, 2);
-  this->brushIdToModeMap["color_custom"] = this->brushes->buttons().size();
-  this->brushes->addButton(this->customColorButton,
-      this->brushes->buttons().size());
+  this->dataPtr->customColorButton = new QPushButton("More");
+  this->dataPtr->customColorButton->setCheckable(true);
+  this->dataPtr->customColorButton->setChecked(false);
+  colorsLayout->addWidget(this->dataPtr->customColorButton, 1, 4, 1, 2);
+  this->dataPtr->brushIdToModeMap["color_custom"] =
+    this->dataPtr->brushes->buttons().size();
+  this->dataPtr->brushes->addButton(this->dataPtr->customColorButton,
+      this->dataPtr->brushes->buttons().size());
 
-  this->customColorDialog = new QColorDialog(Qt::green, this);
-  this->customColorDialog->setWindowModality(Qt::NonModal);
-  connect(this->customColorDialog, SIGNAL(currentColorChanged(const QColor)),
+  this->dataPtr->customColorDialog = new QColorDialog(Qt::green, this);
+  this->dataPtr->customColorDialog->setWindowModality(Qt::NonModal);
+  connect(this->dataPtr->customColorDialog,
+      SIGNAL(currentColorChanged(const QColor)),
       this, SLOT(OnCustomColor(const QColor)));
-  connect(this->customColorDialog, SIGNAL(rejected()), this,
+  connect(this->dataPtr->customColorDialog, SIGNAL(rejected()), this,
       SLOT(CancelDrawModes()));
 
   // Textures
@@ -167,30 +182,31 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   QGridLayout *texturesLayout = new QGridLayout;
   std::vector<QString> textureButtonTextList;
 
-  this->textureList.push_back(":wood.jpg");
+  this->dataPtr->textureList.push_back(":wood.jpg");
   textureButtonTextList.push_back("Wood");
-  this->textureList.push_back(":tiles.jpg");
+  this->dataPtr->textureList.push_back(":tiles.jpg");
   textureButtonTextList.push_back("Tiles");
-  this->textureList.push_back(":bricks.png");
+  this->dataPtr->textureList.push_back(":bricks.png");
   textureButtonTextList.push_back("Bricks");
 
-  for (unsigned int i = 0; i < this->textureList.size(); ++i)
+  for (unsigned int i = 0; i < this->dataPtr->textureList.size(); ++i)
   {
     QToolButton *textureButton = new QToolButton(this);
     textureButton->setFixedSize(70, 70);
     textureButton->setCheckable(true);
     textureButton->setChecked(false);
     textureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    textureButton->setIcon(QPixmap(this->textureList[i]).scaled(
+    textureButton->setIcon(QPixmap(this->dataPtr->textureList[i]).scaled(
         QSize(90, 90), Qt::IgnoreAspectRatio));
     textureButton->setText(textureButtonTextList[i]);
     textureButton->setIconSize(QSize(40, 40));
     std::ostringstream textureStr;
     textureStr << "texture_" << i;
-    this->lastDefaultTexture = textureStr.str();
-    this->brushIdToModeMap[this->lastDefaultTexture] =
-        this->brushes->buttons().size();
-    this->brushes->addButton(textureButton, this->brushes->buttons().size());
+    this->dataPtr->lastDefaultTexture = textureStr.str();
+    this->dataPtr->brushIdToModeMap[this->dataPtr->lastDefaultTexture] =
+        this->dataPtr->brushes->buttons().size();
+    this->dataPtr->brushes->addButton(textureButton,
+        this->dataPtr->brushes->buttons().size());
     texturesLayout->addWidget(textureButton, 0, i);
   }
 
@@ -201,8 +217,10 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   importImageButton->setChecked(false);
   importImageButton->setToolTip(tr(
       "Import an existing floor plan to use as a guide"));
-  this->brushIdToModeMap["image"] = this->brushes->buttons().size();
-  this->brushes->addButton(importImageButton, this->brushes->buttons().size());
+  this->dataPtr->brushIdToModeMap["image"] =
+    this->dataPtr->brushes->buttons().size();
+  this->dataPtr->brushes->addButton(importImageButton,
+      this->dataPtr->brushes->buttons().size());
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(importImageButton);
@@ -229,15 +247,15 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->setLayout(mainLayout);
 
   // Connections
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::editor::Events::ConnectSaveBuildingModel(
       boost::bind(&BuildingEditorPalette::OnSaveModel, this, _1, _2)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::editor::Events::ConnectNewBuildingModel(
       boost::bind(&BuildingEditorPalette::OnNewModel, this)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::editor::Events::ConnectCreateBuildingEditorItem(
       boost::bind(&BuildingEditorPalette::OnCreateEditorItem, this, _1)));
 }
@@ -245,48 +263,53 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 /////////////////////////////////////////////////
 BuildingEditorPalette::~BuildingEditorPalette()
 {
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
 std::string BuildingEditorPalette::GetModelName() const
 {
-  return this->modelNameEdit->text().toStdString();
+  return this->dataPtr->modelNameEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnBrush(int _buttonId)
 {
-  if (_buttonId == brushIdToModeMap["wall"])
+  if (_buttonId == this->dataPtr->brushIdToModeMap["wall"])
   {
     this->OnDrawWall();
   }
-  else if (_buttonId == brushIdToModeMap["window"])
+  else if (_buttonId == this->dataPtr->brushIdToModeMap["window"])
   {
     this->OnAddWindow();
   }
-  else if (_buttonId == brushIdToModeMap["door"])
+  else if (_buttonId == this->dataPtr->brushIdToModeMap["door"])
   {
     this->OnAddDoor();
   }
-  else if (_buttonId == brushIdToModeMap["stairs"])
+  else if (_buttonId == this->dataPtr->brushIdToModeMap["stairs"])
   {
     this->OnAddStair();
   }
-  else if (_buttonId >= brushIdToModeMap["color_0"] &&
-           _buttonId <= brushIdToModeMap[this->lastDefaultColor])
+  else if (_buttonId >= this->dataPtr->brushIdToModeMap["color_0"] &&
+           _buttonId <= this->dataPtr->brushIdToModeMap[
+           this->dataPtr->lastDefaultColor])
   {
-    this->OnDefaultColor(_buttonId - brushIdToModeMap["color_0"]);
+    this->OnDefaultColor(_buttonId -
+        this->dataPtr->brushIdToModeMap["color_0"]);
   }
-  else if (_buttonId == brushIdToModeMap["color_custom"])
+  else if (_buttonId == this->dataPtr->brushIdToModeMap["color_custom"])
   {
     this->OnCustomColorDialog();
   }
-  else if (_buttonId >= brushIdToModeMap["texture_0"] &&
-           _buttonId <= brushIdToModeMap[this->lastDefaultTexture])
+  else if (_buttonId >= this->dataPtr->brushIdToModeMap["texture_0"] &&
+           _buttonId <= this->dataPtr->brushIdToModeMap[
+           this->dataPtr->lastDefaultTexture])
   {
-    this->OnTexture(_buttonId - brushIdToModeMap["texture_0"]);
+    this->OnTexture(_buttonId - this->dataPtr->brushIdToModeMap["texture_0"]);
   }
-  else if (_buttonId == brushIdToModeMap["image"])
+  else if (_buttonId == this->dataPtr->brushIdToModeMap["image"])
   {
     this->OnImportImage();
   }
@@ -299,7 +322,7 @@ void BuildingEditorPalette::OnBrush(int _buttonId)
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnDrawWall()
 {
-  if (this->currentMode != "wall")
+  if (this->dataPtr->currentMode != "wall")
     gui::editor::Events::createBuildingEditorItem("wall");
   else
     this->CancelDrawModes();
@@ -308,7 +331,7 @@ void BuildingEditorPalette::OnDrawWall()
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnAddWindow()
 {
-  if (this->currentMode != "window")
+  if (this->dataPtr->currentMode != "window")
     gui::editor::Events::createBuildingEditorItem("window");
   else
     this->CancelDrawModes();
@@ -317,7 +340,7 @@ void BuildingEditorPalette::OnAddWindow()
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnAddDoor()
 {
-  if (this->currentMode != "door")
+  if (this->dataPtr->currentMode != "door")
     gui::editor::Events::createBuildingEditorItem("door");
   else
     this->CancelDrawModes();
@@ -326,7 +349,7 @@ void BuildingEditorPalette::OnAddDoor()
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnImportImage()
 {
-  if (this->currentMode != "image")
+  if (this->dataPtr->currentMode != "image")
     gui::editor::Events::createBuildingEditorItem("image");
   else
     this->CancelDrawModes();
@@ -335,7 +358,7 @@ void BuildingEditorPalette::OnImportImage()
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnAddStair()
 {
-  if (this->currentMode != "stairs")
+  if (this->dataPtr->currentMode != "stairs")
     gui::editor::Events::createBuildingEditorItem("stairs");
   else
     this->CancelDrawModes();
@@ -344,14 +367,15 @@ void BuildingEditorPalette::OnAddStair()
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnNewModel()
 {
-  this->modelNameEdit->setText(tr(this->buildingDefaultName.c_str()));
+  this->dataPtr->modelNameEdit->setText(
+      tr(this->dataPtr->buildingDefaultName.c_str()));
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnSaveModel(const std::string &_saveName,
     const std::string &/*_saveLocation*/)
 {
-  this->modelNameEdit->setText(tr(_saveName.c_str()));
+  this->dataPtr->modelNameEdit->setText(tr(_saveName.c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -366,18 +390,18 @@ void BuildingEditorPalette::OnCreateEditorItem(const std::string &_mode)
   gui::editor::Events::colorSelected(QColor::Invalid);
   gui::editor::Events::textureSelected(QString(""));
 
-  if (_mode.empty() || this->currentMode == _mode)
+  if (_mode.empty() || this->dataPtr->currentMode == _mode)
   {
-    this->brushes->setExclusive(false);
-    if (this->brushes->checkedButton())
-      this->brushes->checkedButton()->setChecked(false);
-    this->brushes->setExclusive(true);
+    this->dataPtr->brushes->setExclusive(false);
+    if (this->dataPtr->brushes->checkedButton())
+      this->dataPtr->brushes->checkedButton()->setChecked(false);
+    this->dataPtr->brushes->setExclusive(true);
 
-    this->currentMode.clear();
+    this->dataPtr->currentMode.clear();
   }
   else
   {
-    this->currentMode = _mode;
+    this->dataPtr->currentMode = _mode;
   }
 }
 
@@ -386,10 +410,10 @@ void BuildingEditorPalette::OnDefaultColor(int _colorId)
 {
   std::ostringstream colorStr;
   colorStr << "color_" << _colorId;
-  QColor color = this->colorList[_colorId];
-  if (this->currentMode != colorStr.str())
+  QColor color = this->dataPtr->colorList[_colorId];
+  if (this->dataPtr->currentMode != colorStr.str())
   {
-    this->currentMode = colorStr.str();
+    this->dataPtr->currentMode = colorStr.str();
     this->OnColor(color);
   }
   else
@@ -402,17 +426,17 @@ void BuildingEditorPalette::OnDefaultColor(int _colorId)
 void BuildingEditorPalette::OnCustomColorDialog()
 {
   this->CancelDrawModes();
-  this->customColorButton->setChecked(true);
-  this->customColorDialog->show();
+  this->dataPtr->customColorButton->setChecked(true);
+  this->dataPtr->customColorDialog->show();
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnCustomColor(const QColor _color)
 {
-  this->customColorButton->setChecked(true);
+  this->dataPtr->customColorButton->setChecked(true);
   if (_color.isValid())
   {
-    this->currentMode = "color_custom";
+    this->dataPtr->currentMode = "color_custom";
     this->OnColor(_color);
   }
   else
@@ -435,13 +459,13 @@ void BuildingEditorPalette::OnTexture(int _textureId)
 {
   std::ostringstream textureStr;
   textureStr << "texture_" << _textureId;
-  QString texture = this->textureList[_textureId];
-  if (this->currentMode != textureStr.str())
+  QString texture = this->dataPtr->textureList[_textureId];
+  if (this->dataPtr->currentMode != textureStr.str())
   {
     gui::editor::Events::textureSelected(texture);
-    this->currentMode = textureStr.str();
+    this->dataPtr->currentMode = textureStr.str();
 
-    QPixmap textureCursor(this->textureList[_textureId]);
+    QPixmap textureCursor(this->dataPtr->textureList[_textureId]);
     textureCursor = textureCursor.scaled(QSize(30, 30), Qt::IgnoreAspectRatio,
         Qt::SmoothTransformation);
     QApplication::setOverrideCursor(textureCursor);
@@ -462,4 +486,10 @@ void BuildingEditorPalette::mousePressEvent(QMouseEvent * /*_event*/)
 void BuildingEditorPalette::CancelDrawModes()
 {
   gui::editor::Events::createBuildingEditorItem(std::string());
+}
+
+/////////////////////////////////////////////////
+QColorDialog *BuildingEditorPalette::CustomColorDialog() const
+{
+  return this->dataPtr->customColorDialog;
 }
