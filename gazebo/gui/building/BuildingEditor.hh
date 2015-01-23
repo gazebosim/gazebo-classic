@@ -73,10 +73,17 @@ namespace gazebo
       /// \brief Our custom menubar
       private: QMenuBar *menuBar;
 
-      private: QAction *saveAct;
-      private: QAction *saveAsAct;
-      private: QAction *newAct;
-      private: QAction *exitAct;
+        /// \brief Action to save model.
+        private: QAction *saveAct;
+
+        /// \brief Action to save model as.
+        private: QAction *saveAsAct;
+
+        /// \brief Action to start a new model.
+        private: QAction *newAct;
+
+        /// \brief Action to exit the editor.
+        private: QAction *exitAct;
     };
   }
 }

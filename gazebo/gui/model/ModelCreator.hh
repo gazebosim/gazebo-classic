@@ -69,10 +69,10 @@ namespace gazebo
       };
 
       /// \enum SaveState
-      /// \brief Save states for the building editor.
+      /// \brief Save states for the model editor.
       private: enum SaveState
       {
-        // NEVER_SAVED: The building has never been saved.
+        // NEVER_SAVED: The model has never been saved.
         NEVER_SAVED,
 
         // ALL_SAVED: All changes have been saved.
@@ -287,7 +287,7 @@ namespace gazebo
       /// \brief Name of the model.
       private: std::string modelName;
 
-      /// \brief TODO
+      /// \brief Folder name, which is the model name without spaces.
       private: std::string folderName;
 
       /// \brief Name of the model preview.

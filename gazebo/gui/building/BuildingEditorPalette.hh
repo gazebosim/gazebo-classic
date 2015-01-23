@@ -52,6 +52,7 @@ namespace gazebo
       private slots: void OnBrush(int _buttonId);
 
       /// \brief Qt callback when the Model Name field is changed.
+      /// \param[in] _name New name.
       private slots: void OnNameChanged(const QString &_name);
 
       /// \brief Qt callback when custom color has been selected on the dialog.

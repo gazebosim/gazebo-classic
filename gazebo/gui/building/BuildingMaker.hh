@@ -342,7 +342,7 @@ namespace gazebo
       /// \brief Name of the building model.
       private: std::string modelName;
 
-      /// \brief TODO
+      /// \brief Folder name, which is the model name without spaces.
       private: std::string folderName;
 
       /// \brief Name of the building model preview.

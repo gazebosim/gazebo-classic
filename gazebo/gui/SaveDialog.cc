@@ -49,6 +49,7 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
   QLabel *modelLocation = new QLabel;
   modelLocation->setText(tr("  Location:"));
   this->modelLocationLineEdit = new QLineEdit;
+
   // Try to get path to home folder
   if (_mode == BUILDING)
   {
@@ -260,10 +261,6 @@ bool SaveDialog::OnSaveAs()
       msgBox.exec();
       return this->OnSaveAs();
     }
-
-//    // Parse saveLocation and set model name
-//    boost::filesystem::path saveLocPath(this->GetSaveLocation());
-//    this->SetModelName(saveLocPath.filename().string());
 
     boost::filesystem::path path;
     path = path / this->GetSaveLocation();

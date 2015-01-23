@@ -304,8 +304,8 @@ void ModelCreator::OnExit()
   {
     case ALL_SAVED:
     {
-      QString msg("Once you exit the Building Editor, "
-      "your building will no longer be editable.\n\n"
+      QString msg("Once you exit the Model Editor, "
+      "your model will no longer be editable.\n\n"
       "Are you ready to exit?\n\n");
       QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
       msgBox.addButton("Exit", QMessageBox::ApplyRole);

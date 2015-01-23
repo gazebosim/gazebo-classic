@@ -94,6 +94,7 @@ namespace gazebo
       private slots: void OnAutoDisable();
 
       /// \brief Qt callback when the Model Name field is changed.
+      /// \param[in] _name New name.
       private slots: void OnNameChanged(const QString &_name);
 
       /// \brief Callback when user has provided information on where to save
