@@ -6,35 +6,42 @@
       <uri>model://sun</uri>
     </include>
 
-    
+    <%  # Wheel parameters
+        wheel_mass   = 2.5
+        wheel_radius = 0.5
+        wheel_width  = 0.5
+        wheel_ixx    = wheel_mass * (0.25 * wheel_radius**2 + 1.0/12.0 * wheel_width**2)
+        wheel_iyy    = wheel_ixx
+        wheel_izz    = wheel_mass * 0.5 * wheel_radius**2
+    %>
     <model name="tire">
-      <pose>0 0 0.5  0 0 0.261799388</pose>
+      <pose>0 0 <%= wheel_radius %>  0 0 0.261799388</pose>
 
       <link name="wheel">
-        <pose>0 0 0  1.5707963267948966 0 0</pose>
+        <pose>0 0 0  <%= Math::PI/2 %> 0 0</pose>
         <inertial>
-          <mass>2.5</mass>
+          <mass><%= wheel_mass %></mass>
           <inertia>
-            <ixx>0.20833333333333331</ixx>
+            <ixx><%= wheel_ixx %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.20833333333333331</iyy>
+            <iyy><%= wheel_iyy %></iyy>
             <iyz>0</iyz>
-            <izz>0.3125</izz>
+            <izz><%= wheel_izz %></izz>
           </inertia>
         </inertial>
         <collision name="collision">
           <geometry>
             <cylinder>
-              <radius>0.5</radius>
-              <length>0.5</length>
+              <radius><%= wheel_radius %></radius>
+              <length><%= wheel_width %></length>
             </cylinder>
           </geometry>
           <surface>
             <contact>
               <ode>
                 <max_vel>0.1</max_vel>
-                <min_depth>0.005</min_depth>
+                <min_depth><%= wheel_radius * 0.01 %></min_depth>
               </ode>
             </contact>
             <friction>
@@ -61,8 +68,8 @@
         <visual name="visual">
           <geometry>
             <cylinder>
-              <radius>0.5</radius>
-              <length>0.5</length>
+              <radius><%= wheel_radius %></radius>
+              <length><%= wheel_width %></length>
             </cylinder>
           </geometry>
           <material>
@@ -192,27 +199,34 @@
     </model>
 
 
-    
+    <%  # Drum parameters
+        drum_mass   = 10
+        drum_radius = 4.0
+        drum_width  = 2.0
+        drum_ixx    = drum_mass * (0.25 * drum_radius**2 + 1.0/12.0 * drum_width**2)
+        drum_iyy    = drum_ixx
+        drum_izz    = drum_mass * 0.5 * drum_radius**2
+    %>
     <model name="drum">
-      <pose>0 0 -4.0  1.5707963267948966 0 0</pose>
+      <pose>0 0 <%= -drum_radius %>  <%= Math::PI/2 %> 0 0</pose>
 
       <link name="link">
         <inertial>
-          <mass>10</mass>
+          <mass><%= drum_mass %></mass>
           <inertia>
-            <ixx>43.33333333333333</ixx>
+            <ixx><%= drum_ixx %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>43.33333333333333</iyy>
+            <iyy><%= drum_iyy %></iyy>
             <iyz>0</iyz>
-            <izz>80.0</izz>
+            <izz><%= drum_izz %></izz>
           </inertia>
         </inertial>
         <collision name="collision">
           <geometry>
             <cylinder>
-              <radius>4.0</radius>
-              <length>2.0</length>
+              <radius><%= drum_radius %></radius>
+              <length><%= drum_width %></length>
             </cylinder>
           </geometry>
           <surface>
@@ -228,8 +242,8 @@
         <visual name="visual">
           <geometry>
             <cylinder>
-              <radius>4.0</radius>
-              <length>2.0</length>
+              <radius><%= drum_radius %></radius>
+              <length><%= drum_width %></length>
             </cylinder>
           </geometry>
           <material>

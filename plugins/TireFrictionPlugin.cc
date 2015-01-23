@@ -141,10 +141,6 @@ void TireFrictionPlugin::OnUpdate()
   this->dataPtr->newMsgWait.Set(0, 0);
 
   // Compute slip at contact points.
-  gzdbg << "Contacts.time "
-        << common::Time(msgs::Convert(contacts.time())).Double()
-        << std::endl;
-
   // For each contact point:
   // Compute slip velocity
   // * compute relative velocity between bodies at contact point
