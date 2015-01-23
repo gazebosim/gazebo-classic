@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,14 @@
  *
 */
 
+#include <string>
+
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/UserCamera.hh"
 
+#include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
@@ -43,6 +46,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   this->modelTreeWidget = new QTreeWidget();
   this->modelTreeWidget->setColumnCount(1);
+  this->modelTreeWidget->setIndentation(10);
   this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->modelTreeWidget->header()->hide();
   this->modelTreeWidget->setFocusPolicy(Qt::NoFocus);
@@ -51,59 +55,26 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
       this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
 
-  // Create a top-level tree item for the path
-  this->modelSettingsItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Model Settings")));
-  this->modelTreeWidget->addTopLevelItem(this->modelSettingsItem);
-
-  QTreeWidgetItem *modelSettingsChildItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  this->modelSettingsItem->addChild(modelSettingsChildItem);
-
-  QWidget *modelSettingsWidget = new QWidget;
-  QVBoxLayout *modelSettingsLayout = new QVBoxLayout;
-  QGridLayout *dynamicsLayout = new QGridLayout;
-
-  QLabel *staticLabel = new QLabel(tr("Static:"));
-  this->staticCheck = new QCheckBox;
-  this->staticCheck->setText(tr("False"));
-  this->staticCheck->setChecked(false);
-  connect(this->staticCheck, SIGNAL(clicked()), this, SLOT(OnStatic()));
-
-  QLabel *autoDisableLabel = new QLabel(tr("Auto-disable:"));
-  this->autoDisableCheck = new QCheckBox;
-  this->autoDisableCheck->setText(tr("True"));
-  this->autoDisableCheck->setChecked(true);
-  connect(this->autoDisableCheck, SIGNAL(clicked()), this,
-      SLOT(OnAutoDisable()));
-
-  dynamicsLayout->addWidget(staticLabel, 0, 0);
-  dynamicsLayout->addWidget(this->staticCheck, 0, 1);
-  dynamicsLayout->addWidget(autoDisableLabel, 1, 0);
-  dynamicsLayout->addWidget(this->autoDisableCheck, 1, 1);
-
-  modelSettingsLayout->addLayout(dynamicsLayout);
-  modelSettingsWidget->setLayout(modelSettingsLayout);
-  this->modelTreeWidget->setItemWidget(modelSettingsChildItem, 0,
-    modelSettingsWidget);
-  this->modelSettingsItem->setExpanded(true);
-  modelSettingsChildItem->setExpanded(true);
-
+  // Parts tree item
   this->modelItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Parts and Joints")));
+        QStringList(QString("Link Palette")));
   this->modelTreeWidget->addTopLevelItem(this->modelItem);
 
-  QTreeWidgetItem *modelChildItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  this->modelItem->addChild(modelChildItem);
+  QTreeWidgetItem *simpleShapesItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("Simple Shapes")));
+  this->modelItem->addChild(simpleShapesItem);
 
-  // Parts and joints buttons
+  QTreeWidgetItem *simpleShapesChildItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
+  simpleShapesItem->addChild(simpleShapesChildItem);
+
+  // Shapes buttons
   QWidget *modelWidget = new QWidget;
-  QVBoxLayout *modelLayout = new QVBoxLayout;
+  QWidget *customWidget = new QWidget;
   QGridLayout *partsLayout = new QGridLayout;
-  QLabel *partsLabel = new QLabel(tr("Parts"));
+  QGridLayout *customLayout = new QGridLayout;
 
   // cylinder button
   QPushButton *cylinderButton = new QPushButton(tr("Cylinder"), this);
@@ -123,92 +94,79 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   boxButton->setChecked(false);
   connect(boxButton, SIGNAL(clicked()), this, SLOT(OnBox()));
 
-  // Box button
-  QPushButton *customButton = new QPushButton(tr("Custom"), this);
+  partsLayout->addWidget(cylinderButton, 0, 0);
+  partsLayout->addWidget(sphereButton, 0, 1);
+  partsLayout->addWidget(boxButton, 0, 2);
+  modelWidget->setLayout(partsLayout);
+
+  // custom button
+  QTreeWidgetItem *customItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("Custom")));
+  this->modelItem->addChild(customItem);
+
+  QTreeWidgetItem *customChildItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
+  customItem->addChild(customChildItem);
+
+  QPushButton *customButton = new QPushButton(tr("Add"), this);
+  customButton->setMaximumWidth(60);
   customButton->setCheckable(true);
   customButton->setChecked(false);
   connect(customButton, SIGNAL(clicked()), this, SLOT(OnCustom()));
+  customLayout->addWidget(customButton, 0, 0);
+  customWidget->setLayout(customLayout);
 
-  partsLayout->addWidget(partsLabel, 0, 0);
-  partsLayout->addWidget(cylinderButton, 1, 0);
-  partsLayout->addWidget(sphereButton, 1, 1);
-  partsLayout->addWidget(boxButton, 2, 0);
-  partsLayout->addWidget(customButton, 2, 1);
-
-  QGridLayout *jointsLayout = new QGridLayout;
-  QLabel *jointsLabel = new QLabel(tr("Joints"));
-
-  // Fixed joint button
-  QPushButton *fixedJointButton = new QPushButton(tr("Fixed"), this);
-  fixedJointButton->setCheckable(true);
-  fixedJointButton->setChecked(false);
-  connect(fixedJointButton, SIGNAL(clicked()), this, SLOT(OnFixedJoint()));
-
-  // Hinge joint button
-  QPushButton *hingeJointButton = new QPushButton(tr("Revolute"), this);
-  hingeJointButton->setCheckable(true);
-  hingeJointButton->setChecked(false);
-  connect(hingeJointButton, SIGNAL(clicked()), this, SLOT(OnHingeJoint()));
-
-  // Hinge2 joint button
-  QPushButton *hinge2JointButton = new QPushButton(tr("Revolute2"), this);
-  hinge2JointButton->setCheckable(true);
-  hinge2JointButton->setChecked(false);
-  connect(hinge2JointButton, SIGNAL(clicked()), this, SLOT(OnHinge2Joint()));
-
-  // slider joint button
-  QPushButton *sliderJointButton = new QPushButton(tr("Prismatic"), this);
-  sliderJointButton->setCheckable(true);
-  sliderJointButton->setChecked(false);
-  connect(sliderJointButton, SIGNAL(clicked()), this, SLOT(OnSliderJoint()));
-
-  // Screw joint button
-  QPushButton *screwJointButton = new QPushButton(tr("Screw"), this);
-  screwJointButton->setCheckable(true);
-  screwJointButton->setChecked(false);
-  connect(screwJointButton, SIGNAL(clicked()), this, SLOT(OnScrewJoint()));
-
-  // Universal joint button
-  QPushButton *universalJointButton = new QPushButton(tr("Universal"), this);
-  universalJointButton->setCheckable(true);
-  universalJointButton->setChecked(false);
-  connect(universalJointButton, SIGNAL(clicked()), this,
-      SLOT(OnUniversalJoint()));
-
-  // Ball joint button
-  QPushButton *ballJointButton = new QPushButton(tr("Ball"), this);
-  ballJointButton->setCheckable(true);
-  ballJointButton->setChecked(false);
-  connect(ballJointButton, SIGNAL(clicked()), this, SLOT(OnBallJoint()));
-
-  partJointsButtonGroup = new QButtonGroup;
-  this->partJointsButtonGroup->addButton(cylinderButton);
-  this->partJointsButtonGroup->addButton(sphereButton);
-  this->partJointsButtonGroup->addButton(boxButton);
-  this->partJointsButtonGroup->addButton(customButton);
-  this->partJointsButtonGroup->addButton(fixedJointButton);
-  this->partJointsButtonGroup->addButton(sliderJointButton);
-  this->partJointsButtonGroup->addButton(hingeJointButton);
-  this->partJointsButtonGroup->addButton(hinge2JointButton);
-  this->partJointsButtonGroup->addButton(screwJointButton);
-  this->partJointsButtonGroup->addButton(universalJointButton);
-  this->partJointsButtonGroup->addButton(ballJointButton);
-
-  jointsLayout->addWidget(jointsLabel, 0, 0);
-//  jointsLayout->addWidget(fixedJointButton, 1, 0);
-  jointsLayout->addWidget(sliderJointButton, 1, 0);
-  jointsLayout->addWidget(hingeJointButton, 1, 1);
-  jointsLayout->addWidget(hinge2JointButton, 2, 0);
-  jointsLayout->addWidget(screwJointButton, 2, 1);
-  jointsLayout->addWidget(universalJointButton, 3, 0);
-  jointsLayout->addWidget(ballJointButton, 3, 1);
-
-  modelLayout->addLayout(partsLayout);
-  modelLayout->addLayout(jointsLayout);
-  modelWidget->setLayout(modelLayout);
-  this->modelTreeWidget->setItemWidget(modelChildItem, 0, modelWidget);
+  this->modelTreeWidget->setItemWidget(simpleShapesChildItem, 0, modelWidget);
+  this->modelTreeWidget->setItemWidget(customChildItem, 0, customWidget);
   this->modelItem->setExpanded(true);
-  modelChildItem->setExpanded(true);
+  simpleShapesItem->setExpanded(true);
+  simpleShapesChildItem->setExpanded(true);
+  customItem->setExpanded(true);
+  customChildItem->setExpanded(true);
+
+  this->partButtonGroup = new QButtonGroup;
+  this->partButtonGroup->addButton(cylinderButton);
+  this->partButtonGroup->addButton(sphereButton);
+  this->partButtonGroup->addButton(boxButton);
+  this->partButtonGroup->addButton(customButton);
+
+  // model settings tree item
+  this->modelSettingsItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("Model Settings")));
+  this->modelTreeWidget->addTopLevelItem(this->modelSettingsItem);
+
+  QTreeWidgetItem *modelSettingsChildItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
+  this->modelSettingsItem->addChild(modelSettingsChildItem);
+
+  QWidget *modelSettingsWidget = new QWidget;
+  QVBoxLayout *modelSettingsLayout = new QVBoxLayout;
+  QGridLayout *dynamicsLayout = new QGridLayout;
+
+  QLabel *staticLabel = new QLabel(tr("Static:"));
+  this->staticCheck = new QCheckBox;
+  this->staticCheck->setChecked(false);
+  connect(this->staticCheck, SIGNAL(clicked()), this, SLOT(OnStatic()));
+
+  QLabel *autoDisableLabel = new QLabel(tr("Auto-disable:"));
+  this->autoDisableCheck = new QCheckBox;
+  this->autoDisableCheck->setChecked(true);
+  connect(this->autoDisableCheck, SIGNAL(clicked()), this,
+      SLOT(OnAutoDisable()));
+
+  dynamicsLayout->addWidget(staticLabel, 0, 0);
+  dynamicsLayout->addWidget(this->staticCheck, 0, 1);
+  dynamicsLayout->addWidget(autoDisableLabel, 1, 0);
+  dynamicsLayout->addWidget(this->autoDisableCheck, 1, 1);
+
+  modelSettingsLayout->addLayout(dynamicsLayout);
+  modelSettingsWidget->setLayout(modelSettingsLayout);
+  this->modelTreeWidget->setItemWidget(modelSettingsChildItem, 0,
+    modelSettingsWidget);
+  this->modelSettingsItem->setExpanded(true);
+  modelSettingsChildItem->setExpanded(true);
 
   // plugin
   this->pluginItem =
@@ -233,9 +191,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   buttonsLayout->setAlignment(Qt::AlignCenter);
 
   this->modelCreator = new ModelCreator();
-
-  connect(modelCreator->GetJointMaker(), SIGNAL(JointAdded()), this,
-      SLOT(OnJointAdded()));
   connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
 
   QFrame *frame = new QFrame;
@@ -274,28 +229,39 @@ void ModelEditorPalette::OnItemSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnCylinder()
 {
+  event::Events::setSelectedEntity("", "normal");
+  g_arrowAct->trigger();
+
   this->modelCreator->AddPart(ModelCreator::PART_CYLINDER);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnSphere()
 {
+  event::Events::setSelectedEntity("", "normal");
+  g_arrowAct->trigger();
+
   this->modelCreator->AddPart(ModelCreator::PART_SPHERE);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnBox()
 {
+  event::Events::setSelectedEntity("", "normal");
+  g_arrowAct->trigger();
+
   this->modelCreator->AddPart(ModelCreator::PART_BOX);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnCustom()
 {
-  ImportDialog importDialog;
+  ImportDialog importDialog(this);
   importDialog.deleteLater();
   if (importDialog.exec() == QDialog::Accepted)
   {
+    event::Events::setSelectedEntity("", "normal");
+    g_arrowAct->trigger();
     this->modelCreator->AddCustom(importDialog.GetImportPath());
   }
   else
@@ -305,80 +271,31 @@ void ModelEditorPalette::OnCustom()
   }
 }
 
-
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnFixedJoint()
+void ModelEditorPalette::AddJoint(const std::string &_type)
 {
-  this->modelCreator->AddJoint(JointMaker::JOINT_FIXED);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnHingeJoint()
-{
-  this->modelCreator->AddJoint(JointMaker::JOINT_HINGE);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnHinge2Joint()
-{
-  this->modelCreator->AddJoint(JointMaker::JOINT_HINGE2);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnSliderJoint()
-{
-  this->modelCreator->AddJoint(JointMaker::JOINT_SLIDER);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnScrewJoint()
-{
-  this->modelCreator->AddJoint(JointMaker::JOINT_SCREW);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnUniversalJoint()
-{
-  this->modelCreator->AddJoint(JointMaker::JOINT_UNIVERSAL);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnBallJoint()
-{
-  this->modelCreator->AddJoint(JointMaker::JOINT_BALL);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnJointAdded()
-{
-  this->partJointsButtonGroup->setExclusive(false);
-  if (this->partJointsButtonGroup->checkedButton())
-    this->partJointsButtonGroup->checkedButton()->setChecked(false);
-  this->partJointsButtonGroup->setExclusive(true);
+  event::Events::setSelectedEntity("", "normal");
+  this->modelCreator->AddJoint(_type);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnPartAdded()
 {
-  this->partJointsButtonGroup->setExclusive(false);
-  if (this->partJointsButtonGroup->checkedButton())
-    this->partJointsButtonGroup->checkedButton()->setChecked(false);
-  this->partJointsButtonGroup->setExclusive(true);
+  this->partButtonGroup->setExclusive(false);
+  if (this->partButtonGroup->checkedButton())
+    this->partButtonGroup->checkedButton()->setChecked(false);
+  this->partButtonGroup->setExclusive(true);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnAutoDisable()
 {
-  std::string text = this->autoDisableCheck->isChecked() ? "True" : "False";
-  this->autoDisableCheck->setText(tr(text.c_str()));
   this->modelCreator->SetAutoDisable(this->autoDisableCheck->isChecked());
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnStatic()
 {
-  std::string text = this->staticCheck->isChecked() ? "True" : "False";
-  this->staticCheck->setText(tr(text.c_str()));
   this->modelCreator->SetStatic(this->staticCheck->isChecked());
 }
 
@@ -452,11 +369,19 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
 {
   if (_event.key == Qt::Key_Escape)
   {
-    // this->modelCreator->Stop();
     // call the slots to uncheck the buttons
     this->OnPartAdded();
-    this->OnJointAdded();
-    return true;
+  }
+  if (_event.key == Qt::Key_Delete)
+  {
+    event::Events::setSelectedEntity("", "normal");
+    g_arrowAct->trigger();
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+ModelCreator *ModelEditorPalette::GetModelCreator()
+{
+  return this->modelCreator;
 }

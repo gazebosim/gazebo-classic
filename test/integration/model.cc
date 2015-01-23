@@ -32,7 +32,7 @@ TEST_F(ModelTest, GetLinksV)
   for (physics::Link_V::const_iterator iter = model->GetLinks().begin();
        iter != model->GetLinks().end(); ++iter)
   {
-    EXPECT_TRUE(*iter);
+    EXPECT_TRUE(*iter != NULL);
     EXPECT_FALSE((*iter)->GetName().empty());
     EXPECT_STREQ((*iter)->GetName().c_str(), "link_1");
   }

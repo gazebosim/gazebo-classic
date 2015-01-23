@@ -80,7 +80,7 @@ namespace gazebo
       private slots: void OnDeleteItem();
 
       /// \brief Emit stairs changed Qt signals.
-      private: void StairsChanged();
+      public: void StairsChanged();
 
       /// \brief Emit steps changed Qt signals.
       private: void StepsChanged();
@@ -102,9 +102,6 @@ namespace gazebo
 
       /// \brief Number of steps in the staircase item.
       private: int stairsSteps;
-
-      /// \brief Scale for converting pixels to metric units.
-      private: double scale;
 
       /// \brief Inspector for configuring the staircase item.
       private: StairsInspectorDialog *inspector;

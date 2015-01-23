@@ -28,15 +28,17 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
 * --record_encoding arg (=zlib) :
  Compression encoding format for log data (zlib|bz2|txt).
 * --record_path arg :
- Absolute path in which to store state data
+ Absolute path in which to store state data.
 * --seed arg :
  Start with a given random number seed.
 * --iters arg :
  Number of iterations to simulate.
 * --minimal_comms :
- Reduce the TCP/IP traffic output by gazebo
+ Reduce the TCP/IP traffic output by gazebo.
+* -g, --gui-plugin arg :
+ Load a GUI plugin.
 * -s, --server-plugin arg :
- Load a plugin.
+ Load a server plugin.
 
 
 ## AUTHOR

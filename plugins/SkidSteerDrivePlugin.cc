@@ -78,7 +78,12 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
     return;
 
   if (_sdf->HasElement("max_force"))
+  {
     this->maxForce = _sdf->GetElement("max_force")->Get<double>();
+    gzwarn << "The MaxForce API is deprecated in Gazebo, "
+           << "and the max_force tag is no longer used in this plugin."
+           << std::endl;
+  }
   else
     gzwarn << "No MaxForce value set in the model sdf, default value is 5.0.\n";
 
@@ -123,9 +128,6 @@ void SkidSteerDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 {
   // gzmsg << "cmd_vel: " << msg->position().x() << ", "
   //       << msgs::Convert(msg->orientation()).GetAsEuler().z << std::endl;
-
-  for (int i = 0; i < NUMBER_OF_WHEELS; i++)
-    this->joints[i]->SetMaxForce(0, this->maxForce);
 
   double vel_lin = _msg->position().x() / this->wheelRadius;
   double vel_rot = -1 * msgs::Convert(_msg->orientation()).GetAsEuler().z

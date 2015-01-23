@@ -22,11 +22,9 @@
 #include <gazebo/util/system.hh>
 
 #ifdef HAVE_GDAL
-# include <gdal/gdal_priv.h>
 # include <string>
 # include <vector>
 
-# include "gazebo/common/DemPrivate.hh"
 # include "gazebo/common/HeightmapData.hh"
 # include "gazebo/math/Angle.hh"
 
@@ -34,6 +32,8 @@ namespace gazebo
 {
   namespace common
   {
+    class DemPrivate;
+
     /// \addtogroup gazebo_common Common
     /// \{
 
