@@ -46,16 +46,16 @@ TEST_F(TireSlipTest, Logitudinal)
     boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
         sensors::get_sensor("default::tire::axel_wheel::force_torque"));
 
-  ASSERT_TRUE(sensor);
+  ASSERT_TRUE(sensor != NULL);
 
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   /*physics::ModelPtr tireModel = world->GetModel("tire");
-  ASSERT_TRUE(tireModel);
+  ASSERT_TRUE(tireModel != NULL);
 
   physics::JointPtr worldUprightJoint =  tireModel->GetJoint("world_upright");
-  ASSERT_TRUE(worldUprightJoint);
+  ASSERT_TRUE(worldUprightJoint != NULL);
 
   worldUprightJoint->SetUpperLimit(0, 0.0);
   worldUprightJoint->SetLowerLimit(0, 0.0);
