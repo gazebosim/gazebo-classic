@@ -123,9 +123,8 @@ class Colliders_TBB
 
 //////////////////////////////////////////////////
 ODEPhysics::ODEPhysics(WorldPtr _world)
-    : PhysicsEngine(_world)
+    : PhysicsEngine(_world), dataPtr(new ODEPhysicsPrivate)
 {
-  this->dataPtr = new ODEPhysicsPrivate;
   this->dataPtr->physicsStepFunc = NULL;
   this->dataPtr->maxContacts = 0;
 
@@ -999,7 +998,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     if (this->dataPtr->jointFeedbackIndex <
         this->dataPtr->jointFeedbacks.size())
       jointFeedback =
-        this->dataPtr->jointFeedbacks[this->dataPtr->jointFeedbackIndex];
+          this->dataPtr->jointFeedbacks[this->dataPtr->jointFeedbackIndex];
     else
     {
       jointFeedback = new ODEJointFeedback();
