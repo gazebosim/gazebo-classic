@@ -148,6 +148,7 @@ World::World(const std::string &_name)
 //////////////////////////////////////////////////
 World::~World()
 {
+  delete this->dataPtr->presetManager;
   delete this->dataPtr->receiveMutex;
   this->dataPtr->receiveMutex = NULL;
   delete this->dataPtr->loadModelMutex;
@@ -816,6 +817,12 @@ std::string World::GetName() const
 PhysicsEnginePtr World::GetPhysicsEngine() const
 {
   return this->dataPtr->physicsEngine;
+}
+
+//////////////////////////////////////////////////
+PresetManager* World::GetPresetManager() const
+{
+  return this->dataPtr->presetManager;
 }
 
 //////////////////////////////////////////////////

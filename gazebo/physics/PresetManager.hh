@@ -19,6 +19,7 @@
 #define _PRESETMANAGER_HH_
 
 #include <string>
+#include <vector>
 
 #include "gazebo/physics/PhysicsEngine.hh"
 
@@ -43,13 +44,13 @@ namespace gazebo
 
       public: bool SetCurrentProfile(const std::string& _name);
 
-      public: Preset* GetCurrentProfile();
+      public: Preset* GetCurrentProfile() const;
 
-      public: std::string GetCurrentProfileName();
+      public: std::string GetCurrentProfileName() const;
  
-      public: std::vector<std::string> GetAllProfileNames();
+      public: std::vector<std::string> GetAllProfileNames() const;
 
-      public: std::vector<Preset*> GetAllProfiles();
+      public: std::vector<Preset*> GetAllProfiles() const;
 
       public: bool SetProfileParam(const std::string& _profileName,
                                    const std::string& _key,
@@ -63,10 +64,12 @@ namespace gazebo
       public: void CreateProfileFromPreset(const std::string& _name,
                                            Preset* _preset);
 
-      public: sdf::ElementPtr GetSDFForProfile(const std::string &_name);
+      public: sdf::ElementPtr GetSDFForProfile(const std::string &_name) const;
 
       public: void SetSDFForProfile(const std::string &_name,
                 sdf::ElementPtr _sdf);
+
+      private: void SetPresetFromSDF(sdf::ElementPtr _elem, Preset* _paramMap);
 
       private: PresetManagerPrivate *dataPtr;
     };

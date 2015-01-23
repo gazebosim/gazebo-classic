@@ -27,6 +27,24 @@
 using namespace gazebo;
 using namespace physics;
 
+//////////////////////////////////////////////////
+void PresetManager::SetPresetFromSDF(sdf::ElementPtr _preset, Preset* _paramMap)
+{
+  if (!_paramMap)
+  {
+    gzwarn << "Will not initialize NULL preset from SDF. Abort." << std::endl;
+    return;
+  }
+
+  sdf::ElementPtr elem = _preset->GetFirstElement();
+  while (elem)
+  {
+    _paramMap->at(elem->GetName()) = elem->Get<std::string>();
+    elem = elem->GetNextElement();
+  }
+}
+
+//////////////////////////////////////////////////
 PresetManager::PresetManager(WorldPtr _world, sdf::ElementPtr _sdf)
 {
   this->dataPtr->physicsEngine = _world->GetPhysicsEngine();
@@ -38,29 +56,51 @@ PresetManager::PresetManager(WorldPtr _world, sdf::ElementPtr _sdf)
     while (preset)
     {
       // Get name attribute
-      const std::string name = preset->GetAttribute("name")->GetAsString();
-
-      // Put all the elements in a map
-      sdf::ElementPtr elem = preset->GetFirstElement();
-      Preset *paramMap = new Preset();
-      while (elem)
+      if (preset->HasAttribute("name"))
       {
-        paramMap->at(elem->GetName()) = elem->Get<std::string>();
-        elem = elem->GetNextElement();
+        const std::string name = preset->GetAttribute("name")->GetAsString();
+
+        // Put all the elements in a map
+        Preset *paramMap = new Preset();
+
+        this->SetPresetFromSDF(preset, paramMap);
+
+        this->CreateProfileFromPreset(name, paramMap);
+        this->dataPtr->presetSDF[name] = preset;
+
+        bool selected = false;
+        if (preset->HasAttribute("selected"))
+        {
+          preset->GetAttribute("selected")->Get<bool>(selected);
+          if (!this->GetCurrentProfile())
+          {
+            this->SetCurrentProfile(name);
+          }
+          else
+          {
+            gzwarn << "Multiple simulation presets selected in SDF. "
+                   << "Ignoring preset: " << name << "." << std::endl;
+          }
+        }
       }
 
-      this->CreateProfileFromPreset(name, paramMap);
-      this->dataPtr->presetSDF[name] = preset;
       preset = preset->GetNextElement("presets");
     }
   }
 }
 
+//////////////////////////////////////////////////
 PresetManager::~PresetManager()
 {
-  // TODO: delete all the pointers!
+  std::vector<Preset*> allProfiles = this->GetAllProfiles();
+  for (unsigned int i = 0; i < allProfiles.size(); i++)
+  {
+    delete allProfiles[i];
+  }
+  delete this->dataPtr;
 }
 
+//////////////////////////////////////////////////
 bool PresetManager::SetCurrentProfile(const std::string& _name)
 {
   if (this->dataPtr->presetProfiles.find(_name) ==
@@ -81,24 +121,33 @@ bool PresetManager::SetCurrentProfile(const std::string& _name)
   return result;
 }
 
-Preset* PresetManager::GetCurrentProfile()
+//////////////////////////////////////////////////
+Preset* PresetManager::GetCurrentProfile() const
 {
   return this->dataPtr->currentPreset;
 }
 
-// name can be an entry in preset
-std::string PresetManager::GetCurrentProfileName()
+//////////////////////////////////////////////////
+std::string PresetManager::GetCurrentProfileName() const
 {
   if (!this->dataPtr->currentPreset)
   {
     return "";
   }
-  // TODO: type checking
+  try
+  {
   return boost::any_cast<std::string>(
     this->dataPtr->currentPreset->at("name"));
+  }
+  catch (boost::bad_any_cast)
+  {
+    gzwarn << "Got bad type in GetCurrentProfileName" << std::endl;
+    return "";
+  }
 }
 
-std::vector<Preset*> PresetManager::GetAllProfiles()
+//////////////////////////////////////////////////
+std::vector<Preset*> PresetManager::GetAllProfiles() const
 {
   std::vector<Preset*> ret;
   for (std::map<std::string, Preset*>::iterator it = this->dataPtr->presetProfiles.begin();
@@ -109,7 +158,8 @@ std::vector<Preset*> PresetManager::GetAllProfiles()
   return ret;
 }
 
-std::vector<std::string> PresetManager::GetAllProfileNames()
+//////////////////////////////////////////////////
+std::vector<std::string> PresetManager::GetAllProfileNames() const
 {
   std::vector<std::string> ret;
   for (std::map<std::string, Preset*>::iterator it =
@@ -121,6 +171,7 @@ std::vector<std::string> PresetManager::GetAllProfileNames()
   return ret;
 }
 
+//////////////////////////////////////////////////
 bool PresetManager::SetProfileParam(const std::string& _profileName,
   const std::string& _key, const boost::any &_value)
 {
@@ -129,11 +180,14 @@ bool PresetManager::SetProfileParam(const std::string& _profileName,
     return this->SetCurrentProfileParam(_key, _value);
   }
 
-  // TODO: error cond?
+  if (!this->dataPtr->presetProfiles[_profileName])
+    return false;
+
   this->dataPtr->presetProfiles[_profileName]->at(_key) = _value;
   return true;
 }
 
+//////////////////////////////////////////////////
 bool PresetManager::SetCurrentProfileParam(const std::string& _key,
   const boost::any &_value)
 {
@@ -154,20 +208,24 @@ void PresetManager::CreateProfile(const std::string& _name)
 void PresetManager::CreateProfileFromPreset(const std::string& _name,
   Preset* _preset)
 {
+  if (!_preset)
+    return;
+
   this->dataPtr->presetProfiles[_name] = _preset;
   this->dataPtr->presetProfiles[_name]->at("name") = _name;
 }
 
-sdf::ElementPtr PresetManager::GetSDFForProfile(const std::string &_name)
+//////////////////////////////////////////////////
+sdf::ElementPtr PresetManager::GetSDFForProfile(const std::string &_name) const
 {
-  // TODO: check null
   return this->dataPtr->presetSDF[_name];
 }
 
+//////////////////////////////////////////////////
 void PresetManager::SetSDFForProfile(const std::string &_name,
   sdf::ElementPtr _sdf)
 {
   this->dataPtr->presetSDF[_name] = _sdf;
 
-  // TODO: Update the parameter map
+  this->SetPresetFromSDF(_sdf, this->dataPtr->presetProfiles[_name]);
 }

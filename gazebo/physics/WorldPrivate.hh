@@ -287,6 +287,7 @@ namespace gazebo
       /// physics::Link in World::Update.
       public: std::list<Entity*> dirtyPoses;
 
+      /// \brief Class to manage preset simulation parameter profiles.
       public: PresetManager* presetManager;
     };
   }

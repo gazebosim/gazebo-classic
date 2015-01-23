@@ -146,6 +146,7 @@ set (gtest_sources
   Inertial_TEST.cc
   JointController_TEST.cc
   PhysicsEngine_TEST.cc
+  PresetManager_TEST.cc
   Road_TEST.cc
   SphereShape_TEST.cc
 )

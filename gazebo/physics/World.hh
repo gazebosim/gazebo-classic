@@ -39,6 +39,7 @@
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
+#include "gazebo/physics/PresetManager.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -114,6 +115,10 @@ namespace gazebo
       /// Get a pointer to the physics engine used by the world.
       /// \return Pointer to the physics engine.
       public: PhysicsEnginePtr GetPhysicsEngine() const;
+
+      /// \brief Return the preset manager.
+      /// \return Pointer to the preset manager.
+      public: PresetManager *GetPresetManager() const;
 
       /// \brief Return the spherical coordinates converter.
       /// \return Pointer to the spherical coordinates converter.
