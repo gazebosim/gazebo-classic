@@ -98,6 +98,10 @@ ModelCreator::ModelCreator()
       boost::bind(&ModelCreator::OnExit, this)));
 
   this->connections.push_back(
+    gui::model::Events::ConnectModelNameChanged(
+      boost::bind(&ModelCreator::OnNameChanged, this, _1)));
+
+  this->connections.push_back(
       gui::model::Events::ConnectModelChanged(
       boost::bind(&ModelCreator::ModelChanged, this)));
 
@@ -186,6 +190,7 @@ void ModelCreator::OnNew()
   if (this->allParts.empty())
   {
     this->Reset();
+    gui::model::Events::newModel();
     return;
   }
   QString msg;
@@ -232,6 +237,7 @@ void ModelCreator::OnNew()
     }
 
     this->Reset();
+    gui::model::Events::newModel();
   }
 }
 
@@ -243,6 +249,7 @@ bool ModelCreator::OnSave()
     case UNSAVED_CHANGES:
     {
       this->SaveModelFiles();
+      gui::model::Events::saveModel(this->modelName);
       return true;
     }
     case NEVER_SAVED:
@@ -263,6 +270,8 @@ bool ModelCreator::OnSaveAs()
     this->currentSaveState = ALL_SAVED;
     // Get name set by user
     this->SetModelName(this->saveDialog->GetModelName());
+    // Update name on palette
+    gui::model::Events::saveModel(this->modelName);
     // Generate and save files
     this->SaveModelFiles();
     return true;
@@ -271,11 +280,22 @@ bool ModelCreator::OnSaveAs()
 }
 
 /////////////////////////////////////////////////
+void ModelCreator::OnNameChanged(const std::string &_name)
+{
+  if (_name.compare(this->modelName) == 0)
+    return;
+
+  this->SetModelName(_name);
+  this->ModelChanged();
+}
+
+/////////////////////////////////////////////////
 void ModelCreator::OnExit()
 {
   if (this->allParts.empty())
   {
     this->Reset();
+    gui::model::Events::newModel();
     gui::model::Events::finishModel();
     return;
   }
@@ -334,7 +354,7 @@ void ModelCreator::OnExit()
 
   this->Reset();
 
-//  gui::editor::Events::newBuildingModel();
+  gui::model::Events::newModel();
   gui::model::Events::finishModel();
 }
 
@@ -506,8 +526,8 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   linkNameStream << "custom_" << this->customCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName + "::" +
-        linkName, this->previewVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName +
+      "::" + linkName, this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;

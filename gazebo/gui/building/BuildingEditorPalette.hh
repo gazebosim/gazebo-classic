@@ -47,10 +47,6 @@ namespace gazebo
       /// \brief Destructor
       public: ~BuildingEditorPalette();
 
-      /// \brief Get model name
-      /// \return Model name
-      public: std::string GetModelName() const;
-
       /// \brief Qt callback when a brush is pressed.
       /// \param[in] _buttonId Id of the button clicked.
       private slots: void OnBrush(int _buttonId);

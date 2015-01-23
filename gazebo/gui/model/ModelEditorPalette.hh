@@ -19,6 +19,7 @@
 #define _MODEL_EDITOR_PALETTE_HH_
 
 #include <string>
+#include <vector>
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/Event.hh"
@@ -92,6 +93,20 @@ namespace gazebo
       /// \brief Qt callback when the model is allowed to auto disable at rest.
       private slots: void OnAutoDisable();
 
+      /// \brief Qt callback when the Model Name field is changed.
+      private slots: void OnNameChanged(const QString &_name);
+
+      /// \brief Callback when user has provided information on where to save
+      /// the model to.
+      /// \param[in] _saveName Name of model being saved.
+      private: void OnSaveModel(const std::string &_saveName);
+
+      /// \brief Event received when the user starts a new model.
+      private: void OnNewModel();
+
+      /// \brief A list of gui editor events connected to this palette.
+      private: std::vector<event::ConnectionPtr> connections;
+
       /// \brief Parts button group.
       private: QButtonGroup *partButtonGroup;
 
@@ -104,6 +119,12 @@ namespace gazebo
       /// \brief Auto disable checkbox, true to allow model to auto-disable at
       /// rest.
       private: QCheckBox *autoDisableCheck;
+
+      /// \brief Default name of the model.
+      private: std::string modelDefaultName;
+
+      /// \brief Edit the name of the model.
+      private: QLineEdit *modelNameEdit;
     };
   }
 }

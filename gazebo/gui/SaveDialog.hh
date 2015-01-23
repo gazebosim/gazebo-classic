@@ -85,10 +85,15 @@ namespace gazebo
       /// \return The model's version.
       public: std::string GetVersion() const;
 
-      /// \brief TODO
-      public: void AddDirToModelPaths(const std::string& _path);
+      /// \brief Add the parent folder of _path to the model path represented
+      /// by SystemPaths, notify InsertModelWidget to display the model name in
+      /// the "Insert Models" tab, and write the parent folder filename to
+      /// gui.ini
+      /// \param[in] _path Path to be added.
+      public: void AddDirToModelPaths(const std::string &_path);
 
-       /// \brief TODO
+       /// \brief Helper function to generate a valid folder name from a
+       /// human-readable model name.
       public: std::string GetFolderNameFromModelName(const std::string
           &_modelName);
 
@@ -116,7 +121,7 @@ namespace gazebo
       public: void SaveToConfig();
 
       /// \brief Save model to SDF format.
-      /// \param[in] TODO
+      /// \param[in] _modelSDF Pointer to the model SDF.
       public: void SaveToSDF(sdf::SDFPtr _modelSDF);
 
       /// \brief Qt callback to show/hide advanced model saving options.

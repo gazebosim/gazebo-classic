@@ -110,16 +110,58 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { modelChanged.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the name changed signal
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectModelNameChanged
+              (T _subscriber)
+          { return modelNameChanged.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the exit signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void ConnectModelNameChanged(
+            event::ConnectionPtr _subscriber)
+          { modelNameChanged.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the name changed signal
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectSaveModel
+              (T _subscriber)
+          { return saveModel.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the exit signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void ConnectSaveModel(
+            event::ConnectionPtr _subscriber)
+          { saveModel.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the name changed signal
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectNewModel
+              (T _subscriber)
+          { return newModel.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the exit signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void ConnectNewModel(
+            event::ConnectionPtr _subscriber)
+          { newModel.Disconnect(_subscriber); }
+
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishModel;
 
-        /// \brief Save the model
+        /// \brief Request to save the model
         public: static event::EventT<bool ()> saveModelEditor;
 
-        /// \brief Save the model as
+        /// \brief Request to save the model as
         public: static event::EventT<bool ()> saveAsModelEditor;
 
-        /// \brief Make a new model
+        /// \brief Request to start a new model
         public: static event::EventT<void ()> newModelEditor;
 
         /// \brief Exit the editor mode with the option to save
@@ -127,6 +169,15 @@ namespace gazebo
 
         /// \brief Model has been changed
         public: static event::EventT<void ()> modelChanged;
+
+        /// \brief Name was changed in the editor palette
+        public: static event::EventT<void (std::string)> modelNameChanged;
+
+        /// \brief Notify that model has been saved
+        public: static event::EventT<void (std::string)> saveModel;
+
+        /// \brief Notify that model has been newed
+        public: static event::EventT<void ()> newModel;
       };
     }
   }

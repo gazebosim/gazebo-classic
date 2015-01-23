@@ -41,6 +41,8 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 {
   this->setObjectName("modelEditorPalette");
 
+  this->modelDefaultName = "Untitled";
+
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
   // Simple Shapes
@@ -115,23 +117,34 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   QLabel *settingsLabel = new QLabel(tr(
        "<font size=4 color='white'>Model Settings</font>"));
 
-  QGridLayout *dynamicsLayout = new QGridLayout;
+  QGridLayout *settingsLayout = new QGridLayout;
 
+  // Model name
+  QLabel *modelLabel = new QLabel(tr("Model Name: "));
+  this->modelNameEdit = new QLineEdit();
+  this->modelNameEdit->setText(tr(this->modelDefaultName.c_str()));
+  connect(this->modelNameEdit, SIGNAL(textChanged(QString)), this,
+      SLOT(OnNameChanged(QString)));
+
+  // Static
   QLabel *staticLabel = new QLabel(tr("Static:"));
   this->staticCheck = new QCheckBox;
   this->staticCheck->setChecked(false);
   connect(this->staticCheck, SIGNAL(clicked()), this, SLOT(OnStatic()));
 
+  // Auto disable
   QLabel *autoDisableLabel = new QLabel(tr("Auto-disable:"));
   this->autoDisableCheck = new QCheckBox;
   this->autoDisableCheck->setChecked(true);
   connect(this->autoDisableCheck, SIGNAL(clicked()), this,
       SLOT(OnAutoDisable()));
 
-  dynamicsLayout->addWidget(staticLabel, 0, 0);
-  dynamicsLayout->addWidget(this->staticCheck, 0, 1);
-  dynamicsLayout->addWidget(autoDisableLabel, 1, 0);
-  dynamicsLayout->addWidget(this->autoDisableCheck, 1, 1);
+  settingsLayout->addWidget(modelLabel, 0, 0);
+  settingsLayout->addWidget(this->modelNameEdit, 0, 1);
+  settingsLayout->addWidget(staticLabel, 1, 0);
+  settingsLayout->addWidget(this->staticCheck, 1, 1);
+  settingsLayout->addWidget(autoDisableLabel, 2, 0);
+  settingsLayout->addWidget(this->autoDisableCheck, 2, 1);
 
   this->modelCreator = new ModelCreator();
   connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
@@ -151,7 +164,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       QSizePolicy::Minimum));
   mainLayout->addWidget(separator);
   mainLayout->addWidget(settingsLabel);
-  mainLayout->addLayout(dynamicsLayout);
+  mainLayout->addLayout(settingsLayout);
   mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
   this->setLayout(mainLayout);
@@ -159,6 +172,15 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   KeyEventHandler::Instance()->AddPressFilter("model_editor",
     boost::bind(&ModelEditorPalette::OnKeyPress, this, _1));
+
+  // Connections
+  this->connections.push_back(
+      gui::model::Events::ConnectSaveModel(
+      boost::bind(&ModelEditorPalette::OnSaveModel, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectNewModel(
+      boost::bind(&ModelEditorPalette::OnNewModel, this)));
 }
 
 /////////////////////////////////////////////////
@@ -267,4 +289,22 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
 ModelCreator *ModelEditorPalette::GetModelCreator()
 {
   return this->modelCreator;
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnNameChanged(const QString &_name)
+{
+  gui::model::Events::modelNameChanged(_name.toStdString());
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnNewModel()
+{
+  this->modelNameEdit->setText(tr(this->modelDefaultName.c_str()));
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnSaveModel(const std::string &_saveName)
+{
+  this->modelNameEdit->setText(tr(_saveName.c_str()));
 }

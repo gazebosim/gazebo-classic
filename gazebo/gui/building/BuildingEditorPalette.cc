@@ -248,12 +248,6 @@ BuildingEditorPalette::~BuildingEditorPalette()
 }
 
 /////////////////////////////////////////////////
-std::string BuildingEditorPalette::GetModelName() const
-{
-  return this->modelNameEdit->text().toStdString();
-}
-
-/////////////////////////////////////////////////
 void BuildingEditorPalette::OnBrush(int _buttonId)
 {
   if (_buttonId == brushIdToModeMap["wall"])

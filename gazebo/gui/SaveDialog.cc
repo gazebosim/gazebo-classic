@@ -324,10 +324,7 @@ void SaveDialog::ToggleAdvancedOptions(bool _checked)
 }
 
 /////////////////////////////////////////////////
-// Add the parent folder of _path to the model path represented by SystemPaths,
-// notify InsertModelWidget to display the model name in the "Insert Models"
-// tab, and write the parent folder filename to gui.ini
-void SaveDialog::AddDirToModelPaths(const std::string& _path)
+void SaveDialog::AddDirToModelPaths(const std::string &_path)
 {
   std::string parentDirectory = boost::filesystem::path(_path)
                                   .parent_path().string();
@@ -485,9 +482,8 @@ void SaveDialog::SaveToSDF(sdf::SDFPtr _modelSDF)
 }
 
 /////////////////////////////////////////////////
-// Helper function to generate a valid folder name from a human-readable model
-// name.
-std::string SaveDialog::GetFolderNameFromModelName(const std::string &_modelName)
+std::string SaveDialog::GetFolderNameFromModelName(const std::string
+    &_modelName)
 {
   // Auto-generate folder name based on model name
   std::string foldername = _modelName;

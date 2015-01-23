@@ -113,6 +113,10 @@ namespace gazebo
       /// \return True if the user chose to save, false if the user cancelled.
       private: bool OnSaveAs();
 
+      /// \brief Callback for when the name is changed through the Palette.
+      /// \param[in] _modelName The newly entered model name.
+      private: void OnNameChanged(const std::string &_modelName);
+
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
 
