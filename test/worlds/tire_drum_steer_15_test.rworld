@@ -172,22 +172,22 @@
         <parent>upright</parent>
         <child>axel</child>
         <axis>
-          <xyz>1 0 0</xyz>
+          <xyz>0 1 0</xyz>
           <limit>
-            <upper>0.75</upper>
-            <lower>-0.75</lower>
+            <upper>0</upper>
+            <lower>-0</lower>
           </limit>
         </axis>
       </joint>
 
-      <joint type="revolute" name="world_upright">
+      <joint type="prismatic" name="world_upright">
         <parent>world</parent>
         <child>upright</child>
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
-            <upper>0</upper>
-            <lower>0</lower>
+            <upper>0.1</upper>
+            <lower>-0.1</lower>
           </limit>
         </axis>
       </joint>
@@ -230,6 +230,12 @@
             </cylinder>
           </geometry>
           <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth><%= drum_radius * 0.01 %></min_depth>
+              </ode>
+            </contact>
             <friction>
               <ode>
                 <mu>0.9</mu>
