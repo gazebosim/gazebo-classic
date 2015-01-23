@@ -154,6 +154,17 @@ namespace gazebo
               { follow.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a signal to the edit model signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectEditModel(T _subscriber)
+              { return editModel.Connect(_subscriber); }
+
+      /// \brief Disconnect a signal from the edit model signal
+      public: static void DisconnectEditModel(
+              event::ConnectionPtr _subscriber)
+              { editModel.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a signal to the main window ready signal
       public: template<typename T>
               static event::ConnectionPtr ConnectMainWindowReady(T _subscriber)
@@ -208,6 +219,10 @@ namespace gazebo
       /// \brief Event triggered when the user follows a model. The model
       /// name is given as the function parameter.
       public: static event::EventT<void (const std::string &)> follow;
+
+      /// \brief Event triggered when the user selects edit a model. The model
+      /// name is given as the function parameter.
+      public: static event::EventT<void (const std::string &)> editModel;
 
       /// \brief Event triggered when a key is pressed
       public: static event::EventT<void (std::string)> keyPress;

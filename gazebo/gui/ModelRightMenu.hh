@@ -57,6 +57,9 @@ namespace gazebo
       /// \brief QT callback when follow has been selected.
       private slots: void OnFollow();
 
+      /// \brief QT callback when edit has been selected.
+      private slots: void OnEdit();
+
       /// \brief QT callback when delete has been selected.
       /// \param[in] _name Name of the model to delete.
       private slots: void OnDelete(const std::string &_name="");
@@ -89,6 +92,9 @@ namespace gazebo
 
       /// \brief Action for attaching the camera to a model.
       private: QAction *followAct;
+
+      /// \brief Action for opening model on Model Editor.
+      private: QAction *editAct;
 
       /// \brief Action for snapping an object to another object below the
       /// first.

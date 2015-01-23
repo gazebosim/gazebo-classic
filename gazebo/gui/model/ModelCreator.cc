@@ -30,6 +30,7 @@
 
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 #include "gazebo/physics/Inertial.hh"
 
@@ -80,6 +81,10 @@ ModelCreator::ModelCreator()
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
   connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
           SLOT(OnDelete(const std::string &)));
+
+  this->connections.push_back(
+      gui::Events::ConnectEditModel(
+      boost::bind(&ModelCreator::OnEditModel, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectSaveModelEditor(
@@ -182,6 +187,85 @@ void ModelCreator::OnEdit(bool _checked)
 
     this->DeselectAll();
   }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnEditModel(const std::string &_modelName)
+{
+  if (!gui::get_active_camera() ||
+      !gui::get_active_camera()->GetScene())
+    return;
+
+  if(!this->active)
+  {
+    gzwarn << "Model Editor must be active before loading a model. " <<
+              "Not loading model " << _modelName << std::endl;
+    return;
+  }
+
+  // Get SDF model element from model name
+  boost::shared_ptr<msgs::Response> response =
+    transport::request(get_world(), "world_sdf");
+
+  msgs::GzString msg;
+  // Make sure the response is correct
+  if (response->response() != "error" && response->type() == msg.GetTypeName())
+  {
+    // Parse the response message
+    msg.ParseFromString(response->serialized_data());
+
+    // Parse the string into sdf
+    sdf::SDF sdf_parsed;
+    sdf_parsed.SetFromString(msg.data());
+    // Check that sdf contains world
+    if (sdf_parsed.root->HasElement("world") &&
+        sdf_parsed.root->GetElement("world")->HasElement("model"))
+    {
+      sdf::ElementPtr world = sdf_parsed.root->GetElement("world");
+      sdf::ElementPtr model = world->GetElement("model");
+      while (model)
+      {
+        if (_modelName.compare(model->GetAttribute("name")->GetAsString()) == 0)
+        {
+          // Remove model from the scene to substitute with the preview visual
+          rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+          rendering::VisualPtr vis = scene->GetVisual(_modelName);
+          scene->RemoveVisual(vis);
+
+          this->LoadSDF(model);
+          return;
+        }
+        model = model->GetNextElement("model");
+      }
+      gzwarn << "Couldn't find SDF for " << _modelName << ". Not loading it."
+          << std::endl;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::LoadSDF(sdf::ElementPtr _modelElem)
+{
+  // Reset preview visual in case there was something already loaded
+  this->Reset();
+
+  // Model general info
+  // Keep previewModel with previewName to avoid conflicts
+  if (_modelElem->HasElement("pose"))
+    this->modelPose = _modelElem->Get<math::Pose>("pose");
+  else
+    this->modelPose = math::Pose::Zero;
+  this->previewVisual->SetPose(this->modelPose);
+
+  // Links
+  sdf::ElementPtr linkElem = _modelElem->GetElement("link");
+  while (linkElem)
+  {
+    this->CreatePartFromSDF(linkElem);
+    linkElem = linkElem->GetNextElement("link");
+  }
+  // Joints
+
 }
 
 /////////////////////////////////////////////////
@@ -364,6 +448,7 @@ void ModelCreator::SaveModelFiles()
   this->saveDialog->GenerateConfig();
   this->saveDialog->SaveToConfig();
   this->GenerateSDF();
+  std::cout << this->modelSDF->ToString() << std::endl;
   this->saveDialog->SaveToSDF(this->modelSDF);
   this->currentSaveState = ALL_SAVED;
 }
@@ -572,6 +657,83 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   part->gravity = true;
   part->selfCollide = false;
   part->kinematic = false;
+
+  this->allParts[part->name] = part;
+
+  rendering::ScenePtr scene = part->partVisual->GetScene();
+  scene->AddVisual(part->partVisual);
+
+  this->ModelChanged();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
+{
+  PartData *part = new PartData;
+
+  // General link info
+  part->name = _linkElem->Get<std::string>("name");
+  part->scale = math::Vector3::One;
+  part->gravity = _linkElem->Get<bool>("gravity");
+  part->selfCollide = _linkElem->Get<bool>("self_collide");
+  part->kinematic = _linkElem->Get<bool>("kinematic");
+
+  math::Pose linkPose;
+  if (_linkElem->HasElement("pose"))
+    linkPose = _linkElem->Get<math::Pose>("pose");
+  else
+    linkPose.Set(0, 0, 0, 0, 0, 0);
+
+  part->pose = this->modelPose + linkPose;
+
+  rendering::VisualPtr linkVisual(new rendering::Visual(part->name,
+      this->previewVisual));
+  linkVisual->Load();
+  linkVisual->SetPose(linkPose);
+  part->partVisual = linkVisual;
+
+  // Visuals
+  int visualIndex = 0;
+  sdf::ElementPtr visualElem;
+
+  if (_linkElem->HasElement("visual"))
+    visualElem = _linkElem->GetElement("visual");
+
+  while (visualElem)
+  {
+    math::Pose visualPose;
+    if (visualElem->HasElement("pose"))
+      visualPose = visualElem->Get<math::Pose>("pose");
+    else
+      visualPose.Set(0, 0, 0, 0, 0, 0);
+
+    // Hack alert
+    std::string shapeSuffix;
+    if (visualElem->HasElement("geometry"))
+    {
+      if (visualElem->GetElement("geometry")->HasElement("box"))
+        shapeSuffix = "_unit_box";
+      else if (visualElem->GetElement("geometry")->HasElement("sphere"))
+        shapeSuffix = "_unit_sphere";
+      else if (visualElem->GetElement("geometry")->HasElement("cylinder"))
+        shapeSuffix = "_unit_cylinder";
+      else
+        shapeSuffix = "_custom";
+    }
+
+    std::ostringstream visualName;
+    visualName << part->name << "::Visual_" << shapeSuffix
+      << visualIndex++;
+    rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+          linkVisual));
+
+    visVisual->Load(visualElem);
+    visVisual->SetPose(visualPose);
+    part->visuals.push_back(visVisual);
+
+    visualElem = visualElem->GetNextElement("visual");
+  }
+  linkVisual->SetTransparency(this->editTransparency);
 
   this->allParts[part->name] = part;
 
@@ -1214,30 +1376,40 @@ void ModelCreator::GenerateSDF()
       geomElem->ClearElements();
 
       math::Vector3 scale = visual->GetParent()->GetScale();
-      if (visual->GetParent()->GetName().find("unit_box") != std::string::npos)
+      if (visual->GetParent()->GetName().find("unit_box") != std::string::npos ||
+          visual->GetName().find("unit_box") != std::string::npos)
       {
         sdf::ElementPtr boxElem = geomElem->AddElement("box");
         (boxElem->GetElement("size"))->Set(scale);
       }
       else if (visual->GetParent()->GetName().find("unit_cylinder")
-         != std::string::npos)
+          != std::string::npos ||
+          visual->GetName().find("unit_cylinder") != std::string::npos)
       {
         sdf::ElementPtr cylinderElem = geomElem->AddElement("cylinder");
         (cylinderElem->GetElement("radius"))->Set(scale.x/2.0);
         (cylinderElem->GetElement("length"))->Set(scale.z);
       }
       else if (visual->GetParent()->GetName().find("unit_sphere")
-          != std::string::npos)
+          != std::string::npos ||
+          visual->GetName().find("unit_sphere") != std::string::npos)
       {
         sdf::ElementPtr sphereElem = geomElem->AddElement("sphere");
         (sphereElem->GetElement("radius"))->Set(scale.x/2.0);
       }
       else if (visual->GetParent()->GetName().find("custom")
-          != std::string::npos)
+          != std::string::npos ||
+          visual->GetName().find("custom") != std::string::npos)
       {
         sdf::ElementPtr customElem = geomElem->AddElement("mesh");
         (customElem->GetElement("scale"))->Set(scale);
         (customElem->GetElement("uri"))->Set(visual->GetMeshName());
+      }
+      else
+      {
+        gzerr << "Visual named " << visual->GetParent()->GetName() <<
+              " hasn't been properly named at creation." << std::endl;
+        continue;
       }
       sdf::ElementPtr geomElemClone = geomElem->Clone();
       geomElem =  collisionElem->GetElement("geometry");
