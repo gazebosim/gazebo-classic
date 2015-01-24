@@ -153,6 +153,9 @@ namespace gazebo
       /// return Number of joints.
       public: unsigned int GetJointCount();
 
+      /// \brief TODO
+      public: JointData *CreateJointFromSDF(sdf::ElementPtr _jointElem);
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -187,6 +190,9 @@ namespace gazebo
       /// \brief Open joint inspector.
       /// \param[in] _name Name of joint.
       private: void OpenInspector(const std::string &_name);
+
+      /// \brief TODO
+      private: JointType ConvertJointType(const std::string &_type);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();

@@ -269,6 +269,12 @@ void ModelCreator::LoadSDF(sdf::ElementPtr _modelElem)
     linkElem = linkElem->GetNextElement("link");
   }
   // Joints
+  sdf::ElementPtr jointElem = _modelElem->GetElement("joint");
+  while (jointElem)
+  {
+    this->jointMaker->CreateJointFromSDF(jointElem);
+    jointElem = jointElem->GetNextElement("joint");
+  }
 
 }
 
@@ -452,7 +458,6 @@ void ModelCreator::SaveModelFiles()
   this->saveDialog->GenerateConfig();
   this->saveDialog->SaveToConfig();
   this->GenerateSDF();
-  std::cout << this->modelSDF->ToString() << std::endl;
   this->saveDialog->SaveToSDF(this->modelSDF);
   this->currentSaveState = ALL_SAVED;
 }
@@ -694,10 +699,6 @@ PartData *ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 
   // General link info
   part->SetName(_linkElem->Get<std::string>("name"));
-//  part->scale = math::Vector3::One;
-//  part->gravity = _linkElem->Get<bool>("gravity");
-//  part->selfCollide = _linkElem->Get<bool>("self_collide");
-//  part->kinematic = _linkElem->Get<bool>("kinematic");
 
   math::Pose linkPose;
   if (_linkElem->HasElement("pose"))
@@ -705,7 +706,7 @@ PartData *ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
   else
     linkPose.Set(0, 0, 0, 0, 0, 0);
 
-  part->SetPose(this->modelPose + linkPose);
+  part->SetPose(linkPose);
 
   rendering::VisualPtr linkVisual(new rendering::Visual(part->GetName(),
       this->previewVisual));
@@ -754,8 +755,69 @@ PartData *ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 
     visualElem = visualElem->GetNextElement("visual");
   }
-  linkVisual->SetTransparency(ModelData::GetEditTransparency());
 
+  // Collisions
+  int collisionIndex = 0;
+  sdf::ElementPtr collisionElem;
+
+  if (_linkElem->HasElement("collision"))
+    collisionElem = _linkElem->GetElement("collision");
+
+  while (collisionElem)
+  {
+    math::Pose collisionPose;
+    if (collisionElem->HasElement("pose"))
+      collisionPose = collisionElem->Get<math::Pose>("pose");
+    else
+      collisionPose.Set(0, 0, 0, 0, 0, 0);
+
+    // Hack alert
+    std::string shapeSuffix;
+    if (collisionElem->HasElement("geometry"))
+    {
+      if (collisionElem->GetElement("geometry")->HasElement("box"))
+        shapeSuffix = "_unit_box";
+      else if (collisionElem->GetElement("geometry")->HasElement("sphere"))
+        shapeSuffix = "_unit_sphere";
+      else if (collisionElem->GetElement("geometry")->HasElement("cylinder"))
+        shapeSuffix = "_unit_cylinder";
+      else
+        shapeSuffix = "_custom";
+    }
+
+    std::ostringstream collisionName;
+    collisionName << part->GetName() << "::Collision_" << shapeSuffix
+        << collisionIndex++;
+    rendering::VisualPtr colVisual(new rendering::Visual(collisionName.str(),
+        linkVisual));
+
+    // Make a visual element from the collision element
+    sdf::ElementPtr colVisualElem =  this->modelTemplateSDF->root
+        ->GetElement("model")->GetElement("link")->GetElement("visual");
+
+    sdf::ElementPtr geomElem = colVisualElem->GetElement("geometry");
+    geomElem->ClearElements();
+    geomElem ->Copy(collisionElem->GetElement("geometry"));
+
+    colVisual->Load(colVisualElem);
+    colVisual->SetPose(collisionPose);
+    // orange
+    colVisual->SetAmbient(common::Color(1.0, 0.5, 0.05));
+    colVisual->SetDiffuse(common::Color(1.0, 0.5, 0.05));
+    colVisual->SetSpecular(common::Color(0.5, 0.5, 0.5));
+    colVisual->SetTransparency(
+        math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
+    // fix for transparency alpha compositing
+    Ogre::MovableObject *colObj = colVisual->GetSceneNode()->
+        getAttachedObject(0);
+    colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+    part->AddCollision(colVisual);
+
+    collisionElem = collisionElem->GetNextElement("collision");
+  }
+
+  // Finalize
+  linkVisual->SetTransparency(ModelData::GetEditTransparency());
   this->allParts[part->GetName()] = part;
 
   rendering::ScenePtr scene = part->partVisual->GetScene();
