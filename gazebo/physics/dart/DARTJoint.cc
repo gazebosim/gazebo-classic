@@ -470,6 +470,11 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       this->SetLowStop(_index, boost::any_cast<double>(_value));
     }
+    else if (_key == "friction")
+    {
+      this->dtJoint->setCoulombFriction(_index,
+        boost::any_cast<double>(_value));
+    }
     else
     {
       gzerr << "SetParam: unrecognized parameter ["
@@ -490,8 +495,7 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-double DARTJoint::GetParam(const std::string& _key,
-                               unsigned int _index)
+double DARTJoint::GetParam(const std::string& _key, unsigned int _index)
 {
   if (_index >= this->GetAngleCount())
   {
@@ -499,10 +503,10 @@ double DARTJoint::GetParam(const std::string& _key,
     return 0;
   }
 
-  // if (_key == "friction")
-  // {
-  //   return this->dtJoint->getCoulombFriction(_index);
-  // }
+  if (_key == "friction")
+  {
+    return this->dtJoint->getCoulombFriction(_index);
+  }
   return Joint::GetParam(_key, _index);
 }
 
