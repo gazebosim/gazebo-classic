@@ -33,7 +33,6 @@ WireBox::WireBox(VisualPtr _parent, const math::Box &_box)
   this->dataPtr->lines->setMaterial("BaseWhiteNoLighting");
   this->dataPtr->parent->AttachObject(this->dataPtr->lines);
   this->dataPtr->lines->setVisibilityFlags(GZ_VISIBILITY_GUI);
-
   this->Init(_box);
 }
 
@@ -49,6 +48,7 @@ WireBox::~WireBox()
 void WireBox::Init(const math::Box &_box)
 {
   this->dataPtr->box = _box;
+
   math::Vector3 max = _box.max;
   math::Vector3 min = _box.min;
 
@@ -122,4 +122,3 @@ math::Box WireBox::GetBox() const
 {
   return this->dataPtr->box;
 }
-

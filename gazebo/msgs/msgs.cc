@@ -367,6 +367,100 @@ namespace gazebo
       return result;
     }
 
+    /////////////////////////////////////////////////
+    msgs::Geometry::Type ConvertGeometryType(const std::string &_str)
+    {
+      msgs::Geometry::Type result = msgs::Geometry::BOX;
+      if (_str == "box")
+      {
+        result = msgs::Geometry::BOX;
+      }
+      else if (_str == "cylinder")
+      {
+        result = msgs::Geometry::CYLINDER;
+      }
+      else if (_str == "sphere")
+      {
+        result = msgs::Geometry::SPHERE;
+      }
+      else if (_str == "plane")
+      {
+        result = msgs::Geometry::PLANE;
+      }
+      else if (_str == "image")
+      {
+        result = msgs::Geometry::IMAGE;
+      }
+      else if (_str == "heightmap")
+      {
+        result = msgs::Geometry::HEIGHTMAP;
+      }
+      else if (_str == "mesh")
+      {
+        result = msgs::Geometry::MESH;
+      }
+      else if (_str == "polyline")
+      {
+        result = msgs::Geometry::POLYLINE;
+      }
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    std::string ConvertGeometryType(const msgs::Geometry::Type _type)
+    {
+      std::string result;
+      switch (_type)
+      {
+        case msgs::Geometry::BOX:
+        {
+          result = "box";
+          break;
+        }
+        case msgs::Geometry::CYLINDER:
+        {
+          result = "cylinder";
+          break;
+        }
+        case msgs::Geometry::SPHERE:
+        {
+          result = "sphere";
+          break;
+        }
+        case msgs::Geometry::PLANE:
+        {
+          result = "plane";
+          break;
+        }
+        case msgs::Geometry::IMAGE:
+        {
+          result = "image";
+          break;
+        }
+        case msgs::Geometry::HEIGHTMAP:
+        {
+          result = "heightmap";
+          break;
+        }
+        case msgs::Geometry::MESH:
+        {
+          result = "mesh";
+          break;
+        }
+        case msgs::Geometry::POLYLINE:
+        {
+          result = "polyline";
+          break;
+        }
+        default:
+        {
+          result = "unknown";
+          break;
+        }
+      }
+      return result;
+    }
+
     math::Vector3 Convert(const msgs::Vector3d &_v)
     {
       return math::Vector3(_v.x(), _v.y(), _v.z());
@@ -571,7 +665,6 @@ namespace gazebo
 
       return result;
     }
-
 
     /////////////////////////////////////////////////
     msgs::Geometry GeometryFromSDF(sdf::ElementPtr _sdf)
@@ -1127,7 +1220,7 @@ namespace gazebo
       }
 
       gzwarn << "msgs::LinkToSDF currently does not convert visual,"
-          << " sensor, and projector data";
+          << " sensor, and projector data" << std::endl;
 
       return linkSDF;
     }

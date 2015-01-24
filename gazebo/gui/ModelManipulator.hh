@@ -153,6 +153,15 @@ namespace gazebo
       /// \param[in] _vis Pointer to the visual whose scale is to be published.
       private: void PublishVisualScale(rendering::VisualPtr _vis);
 
+      /// \brief Helper function to constrain the scale dimensions for simple
+      /// shapes
+      /// \param[in] _axis Scaling axis.
+      /// \param[in] _scale Input scale to be updated.
+      /// \param[in] _geom Type of geometry.
+      /// \return Updated scale.
+      private: math::Vector3 UpdateScale(const math::Vector3 &_axis,
+          const math::Vector3 &_scale, const std::string &_geom);
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelManipulator>;
 

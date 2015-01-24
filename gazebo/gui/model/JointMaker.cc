@@ -174,6 +174,7 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
   for (it = this->joints.begin(); it != this->joints.end(); ++it)
   {
     JointData *joint = it->second;
+
     if (joint->child->GetName() == _partName ||
         joint->parent->GetName() == _partName)
     {
@@ -946,6 +947,7 @@ void JointData::OnApply()
     this->lowerLimit[i] = this->inspector->GetLowerLimit(i);
     this->upperLimit[i] = this->inspector->GetUpperLimit(i);
   }
+  gui::model::Events::modelChanged();
   this->dirty = true;
   gui::model::Events::modelChanged();
 }

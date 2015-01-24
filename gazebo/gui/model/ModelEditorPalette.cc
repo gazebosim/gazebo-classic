@@ -41,8 +41,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 {
   this->setObjectName("modelEditorPalette");
 
-  this->modelDefaultName = "Untitled";
-
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
   // Simple Shapes

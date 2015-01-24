@@ -7,9 +7,14 @@ set (sources
   JointInspector.cc
   JointMaker.cc
   ModelCreator.cc
+  ModelData.cc
   ModelEditor.cc
   ModelEditorEvents.cc
   ModelEditorPalette.cc
+  PartCollisionConfig.cc
+  PartGeneralConfig.cc
+  PartInspector.cc
+  PartVisualConfig.cc
 )
 
 set (qt_headers
@@ -20,6 +25,11 @@ set (qt_headers
   ModelData.hh
   ModelEditor.hh
   ModelEditorPalette.hh
+  PartVisualConfig.hh
+  PartCollisionConfig.hh
+  PartGeneralConfig.hh
+  PartInspector.hh
+  PartVisualConfig.hh
 )
 
 set (headers

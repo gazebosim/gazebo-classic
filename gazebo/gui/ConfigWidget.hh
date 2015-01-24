@@ -246,10 +246,12 @@ namespace gazebo
       /// configuring fields of the message, or update the widgets with values
       /// from the message.
       /// \param[in] _msg Message.
+      /// \param[in] _update True to parse available fields in an update
+      /// message rather than the all available fields in the message
       /// \param[in] _name Name used when creating new widgets.
       /// return Updated widget.
       private: QWidget *Parse(google::protobuf::Message *_msg,
-          const std::string &_name = "");
+          bool _update = false, const std::string &_name = "");
 
       /// \brief Parse a vector3 message.
       /// param[in] _msg Input vector3d message.
@@ -422,6 +424,12 @@ namespace gazebo
       /// \param[in] _item Item selected.
       /// \param[in] _column Column index.
       private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
+
+      /// \brief Qt event filter currently used to filter mouse wheel events.
+      /// \param[in] _obj Object that is watched by the event filter.
+      /// \param[in] _event Qt event.
+      /// \return True if the event is handled.
+      private: bool eventFilter(QObject *_obj, QEvent *_event);
 
       /// \brief A map of unique scoped names to correpsonding widgets.
       private: std::map <std::string, ConfigChildWidget *> configWidgets;
