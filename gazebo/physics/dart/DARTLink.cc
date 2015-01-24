@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/WorldPrivate.hh"
 
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTPhysics.hh"
@@ -717,7 +718,7 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
 
   // Set the new pose to the world
   // (Below method can be changed in gazebo code)
-  this->world->dirtyPoses.push_back(this);
+  this->world->dataPtr->dirtyPoses.push_back(this);
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -315,6 +315,7 @@ void BuildingModelManip::OnColorChanged(QColor _color)
 void BuildingModelManip::OnTextureChanged(QString _texture)
 {
   this->SetTexture(_texture);
+  this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -402,7 +403,11 @@ void BuildingModelManip::SetTexture(QString _texture)
   else if (_texture == ":bricks.png")
     this->texture = "Gazebo/Bricks";
 
+  // BuildingModelManip and BuildingMaker handle material names,
+  // Inspectors and palette handle thumbnail uri
   this->visual->SetMaterial(this->texture);
+  this->maker->BuildingChanged();
+  emit TextureChanged(_texture);
 }
 
 /////////////////////////////////////////////////

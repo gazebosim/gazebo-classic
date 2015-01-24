@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ using namespace gui;
 event::EventT<void (bool)> editor::Events::toggleEditMode;
 event::EventT<void (std::string)> editor::Events::createBuildingEditorItem;
 event::EventT<void (QColor)> editor::Events::colorSelected;
+event::EventT<void (QString)> editor::Events::textureSelected;
 event::EventT<void (std::string, std::string)>
     editor::Events::saveBuildingModel;
 event::EventT<void ()> editor::Events::finishBuildingModel;

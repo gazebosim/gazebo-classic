@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,9 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
   this->SetThickness(this->wallThickness);
   this->SetLine(_start, _end);
   this->SetColor(QColor(247, 142, 30));
+
+  this->zValueIdle = 0;
+  this->zValueSelected = 5;
 
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
   this->setAcceptHoverEvents(true);
@@ -116,13 +119,13 @@ void WallSegmentItem::UpdateInspector()
   QPointF segmentEndPoint = this->mapToScene(this->line().p2());
 
   this->inspector->SetName(this->GetName());
-  this->inspector->SetThickness(this->wallThickness * this->scale);
-  this->inspector->SetHeight(this->wallHeight * this->scale);
-  this->inspector->SetLength(segmentLength * this->scale);
-  QPointF startPos = segmentStartPoint * this->scale;
+  this->inspector->SetThickness(this->wallThickness * this->itemScale);
+  this->inspector->SetHeight(this->wallHeight * this->itemScale);
+  this->inspector->SetLength(segmentLength * this->itemScale);
+  QPointF startPos = segmentStartPoint * this->itemScale;
   startPos.setY(-startPos.y());
   this->inspector->SetStartPosition(startPos);
-  QPointF endPos = segmentEndPoint * this->scale;
+  QPointF endPos = segmentEndPoint * this->itemScale;
   endPos.setY(-endPos.y());
   this->inspector->SetEndPosition(endPos);
   this->inspector->SetColor(this->visual3dColor);
@@ -146,7 +149,7 @@ void WallSegmentItem::SegmentUpdated()
   this->measure->SetEndPoint(
       QPointF(p2.x()+(d+t)*qCos(angle+M_PI/2.0)-t*qCos(angle+M_PI),
               p2.y()-(d+t)*qSin(angle+M_PI/2.0)+t*qSin(angle+M_PI)));
-  this->measure->SetValue((this->line().length()+2*t)*this->scale);
+  this->measure->SetValue((this->line().length()+2*t)*this->itemScale);
 
   // Doors, windows...
   QList<QGraphicsItem *> children = this->childItems();
@@ -208,7 +211,7 @@ void WallSegmentItem::SetHighlighted(bool _highlighted)
   {
     this->ShowHandles(true);
     this->measure->setVisible(true);
-    this->setZValue(5);
+    this->setZValue(this->zValueSelected);
     this->SetColor(QColor(247, 142, 30));
     this->Set3dTransparency(0.0);
   }
@@ -216,7 +219,7 @@ void WallSegmentItem::SetHighlighted(bool _highlighted)
   {
     this->ShowHandles(false);
     this->measure->setVisible(false);
-    this->setZValue(0);
+    this->setZValue(this->zValueIdle);
     this->SetColor(Qt::black);
     this->Set3dTransparency(0.4);
   }
@@ -229,14 +232,14 @@ void WallSegmentItem::OnApply()
       qobject_cast<WallInspectorDialog *>(QObject::sender());
 
   double segmentLength = this->line().length() + this->wallThickness;
-  this->wallThickness = dialog->GetThickness() / this->scale;
+  this->wallThickness = dialog->GetThickness() / this->itemScale;
   this->SetThickness(this->wallThickness);
-  this->wallHeight = dialog->GetHeight() / this->scale;
+  this->wallHeight = dialog->GetHeight() / this->itemScale;
   this->Set3dTexture(dialog->GetTexture());
   this->Set3dColor(dialog->GetColor());
   this->WallSegmentChanged();
 
-  double newLength = dialog->GetLength() / this->scale;
+  double newLength = dialog->GetLength() / this->itemScale;
 
   // The if statement below limits the change to either the length of
   // the wall segment or its start/end pos.
@@ -250,9 +253,9 @@ void WallSegmentItem::OnApply()
   }
   else
   {
-    QPointF newStartPoint = dialog->GetStartPosition() / this->scale;
+    QPointF newStartPoint = dialog->GetStartPosition() / this->itemScale;
     newStartPoint.setY(-newStartPoint.y());
-    QPointF newEndPoint = dialog->GetEndPosition() / this->scale;
+    QPointF newEndPoint = dialog->GetEndPosition() / this->itemScale;
     newEndPoint.setY(-newEndPoint.y());
 
     this->SetStartPoint(newStartPoint);

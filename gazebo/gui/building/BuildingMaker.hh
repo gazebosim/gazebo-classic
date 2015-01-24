@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -317,6 +317,11 @@ namespace gazebo
       /// \param[in] _color Selected color.
       private: void OnColorSelected(QColor _color);
 
+      /// \brief Callback received when a texture has been selected on the
+      /// palette.
+      /// \param[in] _texture Selected texture.
+      private: void OnTextureSelected(QString _texture);
+
       /// \brief Mouse event filter callback when mouse is moved.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -413,6 +418,10 @@ namespace gazebo
       /// \brief The color currently selected. If none is selected, it will be
       /// QColor::Invalid.
       private: QColor selectedColor;
+
+      /// \brief The texture currently selected. If none is selected, it will be
+      /// an empty string.
+      private: QString selectedTexture;
 
       /// \brief The current level that is being edited.
       private: int currentLevel;
