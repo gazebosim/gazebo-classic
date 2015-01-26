@@ -106,40 +106,6 @@ void DARTJoint::Init()
   // We assume that the joint angles are all zero.
   this->dtJoint->setTransformFromParentBodyNode(dtTransformParentLinkToJoint);
   this->dtJoint->setTransformFromChildBodyNode(dtTransformChildLinkToJoint);
-
-  //----------------------------------------------------------------------------
-  // TODO: Currently, dampingCoefficient seems not to be initialized when
-  //       this joint is loaded. Therefore, we need below code...
-  //----------------------------------------------------------------------------
-  if (this->sdf->HasElement("axis"))
-  {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    if (axisElem->HasElement("dynamics"))
-    {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-
-      if (dynamicsElem->HasElement("friction"))
-      {
-        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
-        gzlog << "joint friction not implemented in DART.\n";
-      }
-    }
-  }
-
-  if (this->sdf->HasElement("axis2"))
-  {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    if (axisElem->HasElement("dynamics"))
-    {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-
-      if (dynamicsElem->HasElement("friction"))
-      {
-        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
-        gzlog << "joint friction not implemented in DART.\n";
-      }
-    }
-  }
 }
 
 //////////////////////////////////////////////////
@@ -452,71 +418,69 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
 
 //////////////////////////////////////////////////
 bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
-                             const boost::any &_value)
+                         const boost::any &_value)
 {
-  if (_key == "hi_stop")
+  // try because boost::any_cast can throw
+  try
   {
-    try
+    if (_key == "hi_stop")
     {
       this->SetHighStop(_index, boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-  }
-  else if (_key == "lo_stop")
-  {
-    try
+    else if (_key == "lo_stop")
     {
       this->SetLowStop(_index, boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "friction")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+      this->dtJoint->setCoulombFriction(_index,
+                                        boost::any_cast<double>(_value));
+    }
+    else
+    {
+      gzerr << "Unable to handle joint attribute[" << _key << "]\n";
       return false;
     }
   }
-  else
+  catch (const boost::bad_any_cast &e)
   {
-    gzerr << "Unable to handle joint attribute[" << _key << "]\n";
+    gzerr << "SetParam(" << _key << ")"
+          << " boost any_cast error:" << e.what()
+          << std::endl;
     return false;
   }
+
   return true;
 }
 
 //////////////////////////////////////////////////
-double DARTJoint::GetParam(const std::string& _key,
-                               unsigned int _index)
+double DARTJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  if (_key == "hi_stop")
+  try
   {
-    try
+    if (_key == "hi_stop")
     {
       return this->GetHighStop(_index).Radian();
     }
-    catch(common::Exception &e)
-    {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
-    }
-  }
-  else if (_key == "lo_stop")
-  {
-    try
+    else if (_key == "lo_stop")
     {
       return this->GetLowStop(_index).Radian();
     }
-    catch(common::Exception &e)
+    else if (_key == "friction")
     {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
+      this->dtJoint->getCoulombFriction(_index);
+    }
+    else
+    {
+      gzerr << "Unable to get joint attribute[" << _key << "]\n";
       return 0;
     }
   }
-  else
+  catch (const common::Exception &e)
   {
-    gzerr << "Unable to get joint attribute[" << _key << "]\n";
+    gzerr << "GetParam(" << _key << ") error:"
+          << e.GetErrorStr()
+          << std::endl;
     return 0;
   }
 }
