@@ -17,6 +17,8 @@
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 
+using namespace gazebo;
+
 class TireSlipTest : public ServerFixture
 {
 };
@@ -24,15 +26,10 @@ class TireSlipTest : public ServerFixture
 /////////////////////////////////////////////////
 TEST_F(TireSlipTest, Logitudinal)
 {
-  double metersPerMile = 1609.34;
-  double secondsPerHour = 3600.0;
-  double mphTomps = metersPerMile / secondsPerHour;
+  const double metersPerMile = 1609.34;
+  const double secondsPerHour = 3600.0;
 
-  double wheelSpeed = (25.0 * mphTomps);
-  double wheelAngle = 0;
-  double drumSpeed = (40.0 * mphTomps);
-
-  Load("worlds/tire_drum_no_steer_test.world", true);
+  Load("worlds/tire_drum_steer_15_test.world", true);
 
   // PID Controller for the tire
   transport::PublisherPtr tirePIDPub = node->Advertise<msgs::JointCmd>(
@@ -51,108 +48,151 @@ TEST_F(TireSlipTest, Logitudinal)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  /*physics::ModelPtr tireModel = world->GetModel("tire");
-  ASSERT_TRUE(tireModel != NULL);
+  physics::ModelPtr wheelModel = world->GetModel("tire");
+  ASSERT_TRUE(wheelModel != NULL);
 
-  physics::JointPtr worldUprightJoint =  tireModel->GetJoint("world_upright");
+  double wheelRadius = 0.0;
+  {
+    physics::LinkPtr wheelLink = wheelModel->GetLink("wheel");
+    ASSERT_TRUE(wheelLink != NULL);
+
+    physics::CollisionPtr wheelCollision = wheelLink->GetCollision("collision");
+    ASSERT_TRUE(wheelCollision != NULL);
+
+    physics::ShapePtr shape = wheelCollision->GetShape();
+    ASSERT_TRUE(shape != NULL);
+    ASSERT_TRUE(shape->HasType(physics::Base::CYLINDER_SHAPE));
+    physics::CylinderShape *cyl =
+      static_cast<physics::CylinderShape*>(shape.get());
+    wheelRadius = cyl->GetRadius();
+  }
+
+  physics::ModelPtr drumModel = world->GetModel("drum");
+  ASSERT_TRUE(drumModel != NULL);
+
+  double drumRadius = 0.0;
+  {
+    physics::LinkPtr drumLink = drumModel->GetLink("link");
+    ASSERT_TRUE(drumLink != NULL);
+
+    physics::CollisionPtr drumCollision = drumLink->GetCollision("collision");
+    ASSERT_TRUE(drumCollision != NULL);
+
+    physics::ShapePtr shape = drumCollision->GetShape();
+    ASSERT_TRUE(shape != NULL);
+    ASSERT_TRUE(shape->HasType(physics::Base::CYLINDER_SHAPE));
+    physics::CylinderShape *cyl =
+      static_cast<physics::CylinderShape*>(shape.get());
+    drumRadius = cyl->GetRadius();
+  }
+
+  physics::JointPtr steerJoint =  wheelModel->GetJoint("steer");
+  ASSERT_TRUE(steerJoint != NULL);
+
+  physics::JointPtr worldUprightJoint =  wheelModel->GetJoint("world_upright");
   ASSERT_TRUE(worldUprightJoint != NULL);
 
-  worldUprightJoint->SetUpperLimit(0, 0.0);
-  worldUprightJoint->SetLowerLimit(0, 0.0);
-  */
+  // speed in miles / hour, convert to rad/s
+  const double wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
+  const double drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
+  const double normalForce = 200.0;
+  math::Angle steer;
+  steer.SetFromDegree(-15.0);
 
-  // Set the tire to face forward (no yaw)
-  /*{
-    gazebo::msgs::JointCmd jointCmdMsg;
-    gazebo::msgs::PID *pidMsg = jointCmdMsg.mutable_position();
+  // PID gains for joint controllers
+  const double wheelSpinP = 1e1;
+  const double wheelSpinI = 0.0;
+  const double wheelSpinD = 0.0;
+  const double drumSpinP = 1e2;
+  const double drumSpinI = 0.0;
+  const double drumSpinD = 0.0;
 
-    jointCmdMsg.set_name("tire::world_upright");
-    pidMsg->set_target(wheelAngle);
-    pidMsg->set_p_gain(100.0);
-    pidMsg->set_d_gain(0.0);
-    pidMsg->set_i_gain(0.0);
-
-    tirePIDPub->Publish(jointCmdMsg);
-  }*/
-
-  // common::Time::Sleep(5);
-
-  // Set the tire to rotate at a fixed speed (25mph == 11.176m/s).
   {
-    gazebo::msgs::JointCmd jointCmdMsg;
-    gazebo::msgs::PID *pidMsg = jointCmdMsg.mutable_velocity();
+    msgs::JointCmd msg;
+    msg.set_name("drum::joint");
 
-    jointCmdMsg.set_name("tire::axel_wheel");
-    pidMsg->set_target(-wheelSpeed);
-    pidMsg->set_p_gain(10.0);
-    pidMsg->set_d_gain(0.0);
-    pidMsg->set_i_gain(0.0);
+    msgs::PID *pid = msg.mutable_velocity();
+    pid->set_target(drumSpeed);
+    pid->set_p_gain(drumSpinP);
+    pid->set_i_gain(drumSpinI);
+    pid->set_d_gain(drumSpinD);
 
-    tirePIDPub->Publish(jointCmdMsg);
+    drumPIDPub->Publish(msg);
   }
 
-  // Set the drum to rotate at a fixed speed.
   {
-    gazebo::msgs::JointCmd jointCmdMsg;
-    gazebo::msgs::PID *pidMsg = jointCmdMsg.mutable_velocity();
+    msgs::JointCmd msg;
+    msg.set_name("tire::axel_wheel");
 
-    jointCmdMsg.set_name("drum::joint");
-    pidMsg->set_target(drumSpeed);
-    pidMsg->set_p_gain(10.0);
-    pidMsg->set_d_gain(0.0);
-    pidMsg->set_i_gain(0.0);
+    msgs::PID *pid = msg.mutable_velocity();
+    pid->set_target(wheelSpeed);
+    pid->set_p_gain(wheelSpinP);
+    pid->set_i_gain(wheelSpinI);
+    pid->set_d_gain(wheelSpinD);
 
-    drumPIDPub->Publish(jointCmdMsg);
+    tirePIDPub->Publish(msg);
   }
 
-  for (int i = 0; i < 100; ++i)
+  {
+    msgs::JointCmd msg;
+    msg.set_name("tire::world_upright");
+    msg.set_force(-normalForce);
+
+    tirePIDPub->Publish(msg);
+  }
+
+  steerJoint->SetHighStop(0, steer);
+  steerJoint->SetLowStop(0, steer);
+
+  common::Time::MSleep(100);
+
+  for (int i = 0; i < 10000; ++i)
   {
     world->Step(10);
-    /*std::cout << "I[" << i << "] Torque[" << sensor->GetTorque()
+    std::cout << "I[" << i << "] Torque[" << sensor->GetTorque()
               << "] Force[" << sensor->GetForce() << "]\n";
-              */
   }
 }
 
-/////////////////////////////////////////////////
-TEST_F(TireSlipTest, Angle15Degrees)
-{
-  Load("worlds/tire_drum_steer_15_test.world");
-
-  transport::PublisherPtr tirePIDPub = node->Advertise<msgs::JointCmd>(
-      "~/tire/joint_cmd");
-
-  transport::PublisherPtr drumPIDPub = node->Advertise<msgs::JointCmd>(
-      "~/drum/joint_cmd");
-
-  common::Time::Sleep(10);
-  {
-    gazebo::msgs::JointCmd jointCmdMsg;
-    gazebo::msgs::PID *pidMsg = jointCmdMsg.mutable_position();
-
-    jointCmdMsg.set_name("tire::world_upright");
-    pidMsg->set_target(GZ_DTOR(15));
-    pidMsg->set_p_gain(10.0);
-    pidMsg->set_d_gain(0.0);
-    pidMsg->set_i_gain(0.0);
-
-    tirePIDPub->Publish(jointCmdMsg);
-  }
-
-  {
-    gazebo::msgs::JointCmd jointCmdMsg;
-    gazebo::msgs::PID *pidMsg = jointCmdMsg.mutable_velocity();
-
-    jointCmdMsg.set_name("drum::joint");
-    pidMsg->set_target(1.0);
-    pidMsg->set_p_gain(10.0);
-    pidMsg->set_d_gain(0.0);
-    pidMsg->set_i_gain(0.0);
-
-    drumPIDPub->Publish(jointCmdMsg);
-  }
-  common::Time::Sleep(10);
-}
+// /////////////////////////////////////////////////
+// TEST_F(TireSlipTest, Angle15Degrees)
+// {
+//   Load("worlds/tire_drum_steer_15_test.world");
+// 
+//   transport::PublisherPtr tirePIDPub = node->Advertise<msgs::JointCmd>(
+//       "~/tire/joint_cmd");
+// 
+//   transport::PublisherPtr drumPIDPub = node->Advertise<msgs::JointCmd>(
+//       "~/drum/joint_cmd");
+// 
+//   common::Time::Sleep(10);
+//   {
+//     gazebo::msgs::JointCmd jointCmdMsg;
+//     gazebo::msgs::PID *pidMsg = jointCmdMsg.mutable_position();
+// 
+//     jointCmdMsg.set_name("tire::world_upright");
+//     pidMsg->set_target(GZ_DTOR(15));
+//     pidMsg->set_p_gain(10.0);
+//     pidMsg->set_d_gain(0.0);
+//     pidMsg->set_i_gain(0.0);
+// 
+//     tirePIDPub->Publish(jointCmdMsg);
+//   }
+// 
+//   {
+//     gazebo::msgs::JointCmd jointCmdMsg;
+//     gazebo::msgs::PID *pidMsg = jointCmdMsg.mutable_velocity();
+// 
+//     jointCmdMsg.set_name("drum::joint");
+//     pidMsg->set_target(1.0);
+//     pidMsg->set_p_gain(10.0);
+//     pidMsg->set_d_gain(0.0);
+//     pidMsg->set_i_gain(0.0);
+// 
+//     drumPIDPub->Publish(jointCmdMsg);
+//   }
+//   common::Time::Sleep(10);
+// }
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

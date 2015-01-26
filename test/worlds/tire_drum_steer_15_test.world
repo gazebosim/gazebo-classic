@@ -161,7 +161,7 @@
         </sensor>
       </joint>
 
-      <joint type="revolute" name="upright_axel">
+      <joint type="revolute" name="steer">
         <parent>upright</parent>
         <child>axel</child>
         <axis>
