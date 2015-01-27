@@ -28,31 +28,6 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-// Copied from libspnav in order to prevent an error message from
-// spnav_open() when spnav daemon is not running.
-int spnav_test_daemon(void)
-{
-  int s;
-  struct sockaddr_un addr;
-
-  if ((s = socket(PF_UNIX, SOCK_STREAM, 0)) == -1)
-    return -1;
-
-  memset(&addr, 0, sizeof addr);
-  addr.sun_family = AF_UNIX;
-  strncpy(addr.sun_path, "/var/run/spnav.sock", sizeof(addr.sun_path));
-
-  if (connect(s, (struct sockaddr*)&addr, sizeof addr) == -1)
-  {
-    close(s);
-    return -1;
-  }
-
-  close(s);
-  return 0;
-}
-
-/////////////////////////////////////////////////
 SpaceNav::SpaceNav()
   : dataPtr(new SpaceNavPrivate)
 {
@@ -90,7 +65,7 @@ bool SpaceNav::Load()
   std::string topic = getINIProperty<std::string>("spacenav.topic",
                                                   "~/user_camera/joy_twist");
 
-  if (spnav_test_daemon() >= 0 && spnav_open() >= 0)
+  if (spnav_fd() >= 0 && spnav_open() >= 0)
   {
     this->dataPtr->node = transport::NodePtr(new transport::Node());
     this->dataPtr->node->Init();
