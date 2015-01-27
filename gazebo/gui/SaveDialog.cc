@@ -372,7 +372,7 @@ std::string SaveDialog::GetTemplateConfigString()
   << "<model>"
   <<   "<name>template_model</name>"
   <<   "<version>1.0</version>"
-  <<   "<sdf version=\"1.5\">model.sdf</sdf>"
+  <<   "<sdf version=\"" << SDF_VERSION << "\">model.sdf</sdf>"
   <<   "<author>"
   <<     "<name>author_name</name>"
   <<     "<email>author_email</email>"
@@ -393,7 +393,7 @@ void SaveDialog::GenerateConfig()
       ->modelConfig.FirstChildElement("model");
   if (!modelXML)
   {
-    gzerr << "No model name in default config file\n";
+    gzerr << "No model name in default config file" << std::endl;
     return;
   }
   TiXmlElement *modelNameXML = modelXML->FirstChildElement("name");

@@ -187,6 +187,8 @@ void ModelCreator::OnEdit(bool _checked)
 /////////////////////////////////////////////////
 void ModelCreator::OnNew()
 {
+  this->Stop();
+
   if (this->allParts.empty())
   {
     this->Reset();
@@ -244,6 +246,8 @@ void ModelCreator::OnNew()
 /////////////////////////////////////////////////
 bool ModelCreator::OnSave()
 {
+  this->Stop();
+
   switch (this->currentSaveState)
   {
     case UNSAVED_CHANGES:
@@ -264,6 +268,8 @@ bool ModelCreator::OnSave()
 /////////////////////////////////////////////////
 bool ModelCreator::OnSaveAs()
 {
+  this->Stop();
+
   if (this->saveDialog->OnSaveAs())
   {
     // Prevent changing save location
@@ -292,6 +298,8 @@ void ModelCreator::OnNameChanged(const std::string &_name)
 /////////////////////////////////////////////////
 void ModelCreator::OnExit()
 {
+  this->Stop();
+
   if (this->allParts.empty())
   {
     this->Reset();
@@ -618,6 +626,7 @@ void ModelCreator::Reset()
       !gui::get_active_camera()->GetScene())
     return;
 
+  this->saveDialog = new SaveDialog(SaveDialog::MODEL);
   this->jointMaker->Reset();
   this->selectedVisuals.clear();
   g_copyAct->setEnabled(false);
@@ -800,6 +809,7 @@ void ModelCreator::Stop()
     for (unsigned int i = 0; i < this->mouseVisual->GetChildCount(); ++i)
         this->RemovePart(this->mouseVisual->GetName());
     this->mouseVisual.reset();
+    emit PartAdded();
   }
   if (this->jointMaker)
     this->jointMaker->Stop();
