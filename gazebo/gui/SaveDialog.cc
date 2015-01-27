@@ -21,6 +21,7 @@
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/SaveDialogPrivate.hh"
 #include "gazebo/gui/SaveDialog.hh"
 
 #include "gazebo/gazebo_config.h"
@@ -30,35 +31,35 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 SaveDialog::SaveDialog(int _mode, QWidget *_parent)
-  : QDialog(_parent)
+  : QDialog(_parent), dataPtr(new SaveDialogPrivate)
 {
   this->setObjectName("saveDialog");
   this->setWindowTitle(tr("Save Model"));
 
-  this->messageLabel = new QLabel;
-  this->messageLabel->setText(
+  this->dataPtr->messageLabel = new QLabel;
+  this->dataPtr->messageLabel->setText(
       tr("Pick a location for your model:\n"));
 
   QLabel *modelLabel = new QLabel;
   modelLabel->setText(tr("Model Name: "));
-  this->modelNameLineEdit = new QLineEdit;
+  this->dataPtr->modelNameLineEdit = new QLineEdit;
 
   QLabel *modelHeader = new QLabel;
   modelHeader->setText(tr("<b>Model</b>"));
 
   QLabel *modelLocation = new QLabel;
   modelLocation->setText(tr("  Location:"));
-  this->modelLocationLineEdit = new QLineEdit;
+  this->dataPtr->modelLocationLineEdit = new QLineEdit;
 
   // Try to get path to home folder
-  if (_mode == BUILDING)
+  if (_mode == SaveMode::BUILDING)
   {
-    this->modelLocationLineEdit->setText(QDir::homePath()+
+    this->dataPtr->modelLocationLineEdit->setText(QDir::homePath()+
         "/building_editor_models/Untitled");
   }
-  else if (_mode == MODEL)
+  else if (_mode == SaveMode::MODEL)
   {
-    this->modelLocationLineEdit->setText(QDir::homePath()+
+    this->dataPtr->modelLocationLineEdit->setText(QDir::homePath()+
         "/model_editor_models/Untitled");
   }
 
@@ -69,20 +70,21 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
   authorHeader->setText(tr("<b>Author</b>"));
   QLabel *modelAuthorName = new QLabel;
   modelAuthorName->setText(tr("  Name:"));
-  this->modelAuthorNameLineEdit = new QLineEdit;
+  this->dataPtr->modelAuthorNameLineEdit = new QLineEdit;
   QLabel *modelAuthorEmail = new QLabel;
   modelAuthorEmail->setText(tr("  Email:"));
-  this->modelAuthorEmailLineEdit = new QLineEdit;
+  this->dataPtr->modelAuthorEmailLineEdit = new QLineEdit;
 
   QLabel *modelVersion = new QLabel;
   modelVersion->setText(tr("  Version:"));
-  this->modelVersionLineEdit = new QLineEdit;
-  this->modelVersionLineEdit->setText(tr("1.0"));
+  this->dataPtr->modelVersionLineEdit = new QLineEdit;
+  this->dataPtr->modelVersionLineEdit->setText(tr("1.0"));
 
   QLabel *modelDescription = new QLabel;
   modelDescription->setText(tr("  Description:"));
-  this->modelDescriptionLineEdit = new QLineEdit;
+  this->dataPtr->modelDescriptionLineEdit = new QLineEdit;
 
+// TODO Propshop integration
 /*  QString contributeText(
       tr("Contribute this model to the Model Database so that\n"
          "the entire Gazebo community can benefit!\n"
@@ -97,7 +99,7 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
 
   QPushButton *saveButton = new QPushButton(tr(saveButtonText.c_str()));
   saveButton->setDefault(true);
-  connect(saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
+  connect(saveButton, SIGNAL(clicked()), this, SLOT(OnAcceptSave()));
   buttonsLayout->addWidget(saveButton);
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
@@ -105,7 +107,7 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
   QHBoxLayout *locationLayout = new QHBoxLayout;
 
   locationLayout->addWidget(modelLocation);
-  locationLayout->addWidget(this->modelLocationLineEdit);
+  locationLayout->addWidget(this->dataPtr->modelLocationLineEdit);
   locationLayout->addWidget(browseButton);
 
   QRadioButton *advancedOptionsCollapser = new QRadioButton();
@@ -132,30 +134,30 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
   // Advanced options
   QGridLayout *advancedOptionsGrid = new QGridLayout();
   advancedOptionsGrid->addWidget(modelLabel, 0, 0);
-  advancedOptionsGrid->addWidget(modelNameLineEdit, 0, 1);
+  advancedOptionsGrid->addWidget(this->dataPtr->modelNameLineEdit, 0, 1);
 
   advancedOptionsGrid->addWidget(modelHeader, 1, 0);
   advancedOptionsGrid->addWidget(modelVersion, 2, 0);
-  advancedOptionsGrid->addWidget(this->modelVersionLineEdit, 2, 1);
+  advancedOptionsGrid->addWidget(this->dataPtr->modelVersionLineEdit, 2, 1);
   advancedOptionsGrid->addWidget(modelDescription, 3, 0);
-  advancedOptionsGrid->addWidget(this->modelDescriptionLineEdit, 3, 1);
+  advancedOptionsGrid->addWidget(this->dataPtr->modelDescriptionLineEdit, 3, 1);
 
   advancedOptionsGrid->addWidget(authorHeader, 4, 0);
   advancedOptionsGrid->addWidget(modelAuthorName, 5, 0);
-  advancedOptionsGrid->addWidget(this->modelAuthorNameLineEdit, 5, 1);
+  advancedOptionsGrid->addWidget(this->dataPtr->modelAuthorNameLineEdit, 5, 1);
   advancedOptionsGrid->addWidget(modelAuthorEmail, 6, 0);
-  advancedOptionsGrid->addWidget(this->modelAuthorEmailLineEdit, 6, 1);
+  advancedOptionsGrid->addWidget(this->dataPtr->modelAuthorEmailLineEdit, 6, 1);
 
-  this->advancedOptionsWidget = new QWidget();
-  this->advancedOptionsWidget->setLayout(advancedOptionsGrid);
-  this->advancedOptionsWidget->hide();
+  this->dataPtr->advancedOptionsWidget = new QWidget();
+  this->dataPtr->advancedOptionsWidget->setLayout(advancedOptionsGrid);
+  this->dataPtr->advancedOptionsWidget->hide();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(this->messageLabel);
+  mainLayout->addWidget(this->dataPtr->messageLabel);
   mainLayout->addLayout(locationLayout);
 
   mainLayout->addLayout(advancedOptions);
-  mainLayout->addWidget(this->advancedOptionsWidget);
+  mainLayout->addWidget(this->dataPtr->advancedOptionsWidget);
   mainLayout->addLayout(buttonsLayout);
   mainLayout->setAlignment(Qt::AlignTop);
 
@@ -168,54 +170,56 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
 /////////////////////////////////////////////////
 SaveDialog::~SaveDialog()
 {
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
 std::string SaveDialog::GetModelName() const
 {
-  return this->modelNameLineEdit->text().toStdString();
+  return this->dataPtr->modelNameLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
 std::string SaveDialog::GetSaveLocation() const
 {
-  return this->modelLocationLineEdit->text().toStdString();
+  return this->dataPtr->modelLocationLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
 std::string SaveDialog::GetAuthorName() const
 {
-  return this->modelAuthorNameLineEdit->text().toStdString();
+  return this->dataPtr->modelAuthorNameLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
 std::string SaveDialog::GetAuthorEmail() const
 {
-  return this->modelAuthorEmailLineEdit->text().toStdString();
+  return this->dataPtr->modelAuthorEmailLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
 std::string SaveDialog::GetDescription() const
 {
-  return this->modelDescriptionLineEdit->text().toStdString();
+  return this->dataPtr->modelDescriptionLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
 std::string SaveDialog::GetVersion() const
 {
-  return this->modelVersionLineEdit->text().toStdString();
+  return this->dataPtr->modelVersionLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
 void SaveDialog::SetModelName(const std::string &_name)
 {
-  this->modelNameLineEdit->setText(tr(_name.c_str()));
+  this->dataPtr->modelNameLineEdit->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////
 void SaveDialog::SetSaveLocation(const std::string &_location)
 {
-  this->modelLocationLineEdit->setText(tr(_location.c_str()));
+  this->dataPtr->modelLocationLineEdit->setText(tr(_location.c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -225,7 +229,7 @@ void SaveDialog::OnBrowse()
     QDir::homePath(), QFileDialog::ShowDirsOnly
     | QFileDialog::DontResolveSymlinks);
   if (!dir.isEmpty())
-    this->modelLocationLineEdit->setText(dir);
+    this->dataPtr->modelLocationLineEdit->setText(dir);
 }
 
 /////////////////////////////////////////////////
@@ -235,7 +239,7 @@ void SaveDialog::OnCancel()
 }
 
 /////////////////////////////////////////////////
-void SaveDialog::OnSave()
+void SaveDialog::OnAcceptSave()
 {
   this->accept();
 }
@@ -310,12 +314,12 @@ void SaveDialog::ToggleAdvancedOptions(bool _checked)
 {
   if (_checked)
   {
-    this->advancedOptionsWidget->show();
+    this->dataPtr->advancedOptionsWidget->show();
     this->resize(this->maximumSize());
   }
   else
   {
-    this->advancedOptionsWidget->hide();
+    this->dataPtr->advancedOptionsWidget->hide();
     this->resize(this->minimumSize());
   }
 }
@@ -382,10 +386,10 @@ std::string SaveDialog::GetTemplateConfigString()
 void SaveDialog::GenerateConfig()
 {
   // Create an xml config file
-  this->modelConfig.Clear();
-  this->modelConfig.Parse(this->GetTemplateConfigString().c_str());
+  this->dataPtr->modelConfig.Clear();
+  this->dataPtr->modelConfig.Parse(this->GetTemplateConfigString().c_str());
 
-  TiXmlElement *modelXML = this->modelConfig.FirstChildElement("model");
+  TiXmlElement *modelXML = this->dataPtr->modelConfig.FirstChildElement("model");
   if (!modelXML)
   {
     gzerr << "No model name in default config file\n";
@@ -454,7 +458,7 @@ void SaveDialog::SaveToConfig()
   path = path / "model.config";
   const char* modelConfigString = path.string().c_str();
 
-  this->modelConfig.SaveFile(modelConfigString);
+  this->dataPtr->modelConfig.SaveFile(modelConfigString);
   gzdbg << "Saved file to " << modelConfigString << std::endl;
 }
 

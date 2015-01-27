@@ -27,6 +27,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class SaveDialogPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -97,6 +99,10 @@ namespace gazebo
       public: std::string GetFolderNameFromModelName(const std::string
           &_modelName);
 
+      /// \brief Call to execute the dialog.
+      /// \return True if the user accepted the dialog.
+      public: bool OnSaveAs();
+
       /// \brief Qt callback when the file directory browse button is pressed.
       private slots: void OnBrowse();
 
@@ -104,12 +110,7 @@ namespace gazebo
       private slots: void OnCancel();
 
       /// \brief Qt callback when the Save button is pressed.
-      private slots: void OnSave();
-
-      /// \brief Callback for selecting a folder and saving the model.
-      /// \param[in] _saveName Name to save the model.
-      /// \return True if the user chose to save, false if the user cancelled.
-      public: bool OnSaveAs();
+      private slots: void OnAcceptSave();
 
       /// \brief Get a template config file for a simple model.
       private: std::string GetTemplateConfigString();
@@ -127,32 +128,9 @@ namespace gazebo
       /// \brief Qt callback to show/hide advanced model saving options.
       private slots: void ToggleAdvancedOptions(bool _checked);
 
-      /// \brief Widget container to hold advanced model saving options.
-      private: QWidget *advancedOptionsWidget;
-
-      /// \brief Label appearing at the top of the dialog box.
-      private: QLabel *messageLabel;
-
-      /// \brief Editable line that holds the model name.
-      private: QLineEdit* modelNameLineEdit;
-
-      /// \brief Editable line that holds the model's version.
-      private: QLineEdit* modelVersionLineEdit;
-
-      /// \brief Editable line that holds the model's description.
-      private: QLineEdit* modelDescriptionLineEdit;
-
-      /// \brief Editable line that holds the model's author's name.
-      private: QLineEdit* modelAuthorNameLineEdit;
-
-      /// \brief Editable line that holds the model's author's email.
-      private: QLineEdit* modelAuthorEmailLineEdit;
-
-      /// \brief Editable line that holds the model's save location.
-      private: QLineEdit* modelLocationLineEdit;
-
-      /// \brief The model's config file.
-      private: TiXmlDocument modelConfig;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: SaveDialogPrivate *dataPtr;
     };
     /// \}
   }
