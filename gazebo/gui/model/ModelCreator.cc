@@ -232,10 +232,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
         if (_modelName.compare(model->GetAttribute("name")->GetAsString()) == 0)
         {
           // Remove model from the scene to substitute with the preview visual
-          rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-          rendering::VisualPtr vis = scene->GetVisual(_modelName);
-          scene->RemoveVisual(vis);
-
+          transport::requestNoReply(this->node, "entity_delete", _modelName);
           this->LoadSDF(model);
           return;
         }
@@ -268,14 +265,16 @@ void ModelCreator::LoadSDF(sdf::ElementPtr _modelElem)
     this->CreatePartFromSDF(linkElem);
     linkElem = linkElem->GetNextElement("link");
   }
+
   // Joints
-  sdf::ElementPtr jointElem = _modelElem->GetElement("joint");
+  sdf::ElementPtr jointElem;
+  if (_modelElem->HasElement("joint"))
+     jointElem = _modelElem->GetElement("joint");
   while (jointElem)
   {
     this->jointMaker->CreateJointFromSDF(jointElem);
     jointElem = jointElem->GetNextElement("joint");
   }
-
 }
 
 /////////////////////////////////////////////////
@@ -729,7 +728,7 @@ PartData *ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
     else
       visualPose.Set(0, 0, 0, 0, 0, 0);
 
-    // Hack alert
+    // FIXME Hack alert
     std::string shapeSuffix;
     if (visualElem->HasElement("geometry"))
     {
@@ -771,7 +770,7 @@ PartData *ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
     else
       collisionPose.Set(0, 0, 0, 0, 0, 0);
 
-    // Hack alert
+    // FIXME Hack alert
     std::string shapeSuffix;
     if (collisionElem->HasElement("geometry"))
     {
@@ -797,7 +796,7 @@ PartData *ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 
     sdf::ElementPtr geomElem = colVisualElem->GetElement("geometry");
     geomElem->ClearElements();
-    geomElem ->Copy(collisionElem->GetElement("geometry"));
+    geomElem->Copy(collisionElem->GetElement("geometry"));
 
     colVisual->Load(colVisualElem);
     colVisual->SetPose(collisionPose);
@@ -1406,7 +1405,6 @@ void ModelCreator::GenerateSDF()
   modelElem = this->modelSDF->root->GetElement("model");
 
   linkElem = modelElem->GetElement("link");
-  sdf::ElementPtr templateLinkElem = linkElem->Clone();
   modelElem->ClearElements();
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;

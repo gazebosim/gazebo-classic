@@ -207,6 +207,8 @@ void PartData::AddCollision(rendering::VisualPtr _collisionVis)
   collisionMsg.set_name(_collisionVis->GetName());
   msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
   geomMsg->CopyFrom(visualMsg.geometry());
+  msgs::Pose *poseMsg = collisionMsg.mutable_pose();
+  poseMsg->CopyFrom(visualMsg.pose());
 
   this->collisions[_collisionVis] = collisionMsg;
 
