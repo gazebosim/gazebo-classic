@@ -154,7 +154,7 @@ namespace gazebo
       public: unsigned int GetJointCount();
 
       /// \brief TODO
-      public: JointData *CreateJointFromSDF(sdf::ElementPtr _jointElem);
+      public: void CreateJointFromSDF(sdf::ElementPtr _jointElem);
 
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
@@ -305,6 +305,9 @@ namespace gazebo
 
       /// \brief Joint upper limit.
       public: double upperLimit[2];
+
+      /// \brief Use parent model frame flag.
+      public: bool useParentModelFrame[2];
 
       /// \brief Joint pose.
       public: math::Pose pose;

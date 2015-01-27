@@ -959,14 +959,10 @@ void JointData::OnApply()
 }
 
 /////////////////////////////////////////////////
-JointData *JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem)
+void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem)
 {
-std::cout << "Started CreateJointFromSDF" << std::endl;
   JointData *joint = new JointData();
   joint->dirty = true;
-//  jointData->visual = jointVis;
-//  jointData->line = jointLine;
-
 
   // TODO: Add checks for whether elements are present, whether visuals can be found...
 
@@ -997,6 +993,25 @@ std::cout << "Started CreateJointFromSDF" << std::endl;
   std::string type = _jointElem->Get<std::string>("type");
   joint->type = this->ConvertJointType(type);
 
+  // Axes
+  int axisCount = JointMaker::GetJointAxisCount(joint->type);
+  for (int i = 0; i < axisCount; ++i)
+  {
+    sdf::ElementPtr axisElem;
+    if (i == 0)
+      axisElem = _jointElem->GetElement("axis");
+    else
+      axisElem = _jointElem->GetElement("axis2");
+
+    joint->axis[i] = axisElem->Get<math::Vector3>("xyz");
+
+    joint->lowerLimit[i] = axisElem->GetElement("limit")->Get<double>("lower");
+    joint->upperLimit[i] = axisElem->GetElement("limit")->Get<double>("upper");
+
+    // Use parent model frame
+    bool use_parent = axisElem->Get<bool>("use_parent_model_frame");
+    joint->useParentModelFrame[i] = use_parent;
+  }
 
   // Inspector
   joint->inspector = new JointInspector(joint->type);
@@ -1004,6 +1019,18 @@ std::cout << "Started CreateJointFromSDF" << std::endl;
   connect(joint->inspector, SIGNAL(Applied()),
       joint, SLOT(OnApply()));
 
-std::cout << "Ended CreateJointFromSDF" << std::endl;
-  return joint;
+  // Visuals
+  rendering::VisualPtr jointVis(
+      new rendering::Visual(joint->name, parentVis->GetParent()));
+  jointVis->Load();
+  rendering::DynamicLines *jointLine =
+      jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
+  jointLine->AddPoint(parentVis->GetWorldPose().pos);
+  jointLine->AddPoint(childVis->GetWorldPose().pos);
+  jointVis->GetSceneNode()->setInheritScale(false);
+  jointVis->GetSceneNode()->setInheritOrientation(false);
+  joint->visual = jointVis;
+  joint->line = jointLine;
+
+  this->CreateHotSpot(joint);
 }
