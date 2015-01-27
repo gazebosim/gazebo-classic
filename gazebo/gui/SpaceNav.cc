@@ -90,7 +90,7 @@ bool SpaceNav::Load()
   std::string topic = getINIProperty<std::string>("spacenav.topic",
                                                   "~/user_camera/joy_twist");
 
-  if (spnav_test_daemon() && spnav_open() >= 0)
+  if (spnav_test_daemon() >= 0 && spnav_open() >= 0)
   {
     this->dataPtr->node = transport::NodePtr(new transport::Node());
     this->dataPtr->node->Init();
