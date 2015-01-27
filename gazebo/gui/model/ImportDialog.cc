@@ -30,7 +30,7 @@ ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
   this->messageLabel->setText(
       tr("You can import a 3D mesh that you have \n"
       "made with a modelling tool such as Blender, \n"
-      "Maya or SolidWorks. It will apear as a \n"
+      "Maya or SolidWorks. It will appear as a \n"
       "part in the 3D View."));
 
   this->pathLineEdit = new QLineEdit;
