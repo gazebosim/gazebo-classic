@@ -55,6 +55,16 @@ namespace gazebo
       /// \param[in] _pose Pose to set the part to.
       public: void SetPose(const math::Pose &_pose);
 
+      /// TODO
+      public: void SetMass(double _mass);
+
+      /// TODO
+      public: void SetInertialPose(const math::Pose &_pose);
+
+      /// TODO
+      public: void SetInertiaMatrix(double _ixx, double _ixy, double _ixz,
+          double _iyy, double _iyz, double _izz);
+
       /// \brief config widget for configuring link properties.
       private: ConfigWidget *configWidget;
     };

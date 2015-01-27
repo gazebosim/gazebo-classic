@@ -696,16 +696,61 @@ PartData *ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 {
   PartData *part = new PartData;
 
-  // General link info
+  // Link name
   part->SetName(_linkElem->Get<std::string>("name"));
 
+  // Link pose
   math::Pose linkPose;
   if (_linkElem->HasElement("pose"))
+  {
     linkPose = _linkElem->Get<math::Pose>("pose");
+  }
   else
+  {
     linkPose.Set(0, 0, 0, 0, 0, 0);
+    gzwarn << "SDF missing <link><pose> tag. Setting to zero."
+        << std::endl;
+  }
 
   part->SetPose(linkPose);
+
+  // Link inertial
+  if (_linkElem->HasElement("inertial"))
+  {
+    sdf::ElementPtr inertialElem = _linkElem->GetElement("inertial");
+
+    if (inertialElem->HasElement("mass"))
+      part->SetMass(inertialElem->Get<double>("mass"));
+
+    if (inertialElem->HasElement("pose"))
+      part->SetInertialPose(inertialElem->Get<math::Pose>("pose"));
+
+    if (inertialElem->HasElement("inertia"))
+    {
+      sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
+      double inertiaMatrix[6] = {1, 0, 0, 1, 0, 1};
+      if (inertiaElem->HasElement("ixx"))
+        inertiaMatrix[0] = inertiaElem->Get<double>("ixx");
+      if (inertiaElem->HasElement("ixy"))
+        inertiaMatrix[1] = inertiaElem->Get<double>("ixy");
+      if (inertiaElem->HasElement("ixz"))
+        inertiaMatrix[2] = inertiaElem->Get<double>("ixz");
+      if (inertiaElem->HasElement("iyy"))
+        inertiaMatrix[3] = inertiaElem->Get<double>("iyy");
+      if (inertiaElem->HasElement("iyz"))
+        inertiaMatrix[4] = inertiaElem->Get<double>("iyz");
+      if (inertiaElem->HasElement("izz"))
+        inertiaMatrix[5] = inertiaElem->Get<double>("izz");
+
+      part->SetInertiaMatrix(inertiaMatrix[0], inertiaMatrix[1], inertiaMatrix[2],
+                             inertiaMatrix[3], inertiaMatrix[4], inertiaMatrix[5]);
+    }
+  }
+  else
+  {
+    gzwarn << "SDF missing <inertial> tag. Setting to default."
+        << std::endl;
+  }
 
   rendering::VisualPtr linkVisual(new rendering::Visual(part->GetName(),
       this->previewVisual));

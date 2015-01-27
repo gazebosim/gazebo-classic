@@ -73,6 +73,16 @@ namespace gazebo
       /// \param[in] _pose Pose of part.
       public: void SetPose(const math::Pose &_pose);
 
+      /// \brief TODO
+      public: void SetMass(double _mass);
+
+      /// \brief TODO
+      public: void SetInertialPose(const math::Pose &_pose);
+
+      /// TODO
+      public: void SetInertiaMatrix(double _ixx, double _ixy, double _ixz,
+          double _iyy, double _iyz, double _izz);
+
       /// \brief Set the scale of the part.
       /// \param[in] _scale Scale of part.
       //public: void SetScale(const math::Vector3 &_scale);

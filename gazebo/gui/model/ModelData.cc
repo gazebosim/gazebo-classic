@@ -139,6 +139,41 @@ void PartData::SetPose(const math::Pose &_pose)
 }
 
 /////////////////////////////////////////////////
+void PartData::SetMass(double _mass)
+{
+  this->partSDF->GetElement("inertial")->GetElement("mass")->Set(_mass);
+
+  PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
+  generalConfig->SetMass(_mass);
+}
+
+/////////////////////////////////////////////////
+void PartData::SetInertialPose(const math::Pose &_pose)
+{
+  this->partSDF->GetElement("inertial")->GetElement("pose")->Set(_pose);
+
+  PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
+  generalConfig->SetInertialPose(_pose);
+}
+
+/////////////////////////////////////////////////
+void PartData::SetInertiaMatrix(double _ixx, double _ixy, double _ixz,
+    double _iyy, double _iyz, double _izz)
+{
+  sdf::ElementPtr inertiaElem = this->partSDF->GetElement("inertial")->
+      GetElement("inertia");
+  inertiaElem->GetElement("ixx")->Set(_ixx);
+  inertiaElem->GetElement("ixy")->Set(_ixy);
+  inertiaElem->GetElement("ixz")->Set(_ixz);
+  inertiaElem->GetElement("iyy")->Set(_iyy);
+  inertiaElem->GetElement("iyz")->Set(_iyz);
+  inertiaElem->GetElement("izz")->Set(_izz);
+
+  PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
+  generalConfig->SetInertiaMatrix(_ixx, _ixy, _ixz, _iyy, _iyz, _izz);
+}
+
+/////////////////////////////////////////////////
 void PartData::UpdateConfig()
 {
   // set new geom size if scale has changed.
