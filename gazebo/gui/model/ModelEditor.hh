@@ -85,7 +85,7 @@ namespace gazebo
       /// \brief Create menus
       private: void CreateMenus();
 
-      /// \brief Our custom menubar
+      /// \brief Menubar containing actions related to the editor.
       private: QMenuBar *menuBar;
 
       /// \brief Contains all the model editor tools.
