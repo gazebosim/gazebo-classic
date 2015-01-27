@@ -25,16 +25,23 @@
         </inertial>
         <collision name="collision">
           <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+            <!--
             <cylinder>
               <radius>0.5</radius>
               <length>0.5</length>
             </cylinder>
+            -->
           </geometry>
           <surface>
             <contact>
               <ode>
                 <max_vel>0.1</max_vel>
                 <min_depth>0.005</min_depth>
+                <kp>250e3</kp>
+                <kd>5</kd>
               </ode>
             </contact>
             <friction>

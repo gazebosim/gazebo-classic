@@ -61,10 +61,20 @@ TEST_F(TireSlipTest, Logitudinal)
 
     physics::ShapePtr shape = wheelCollision->GetShape();
     ASSERT_TRUE(shape != NULL);
-    ASSERT_TRUE(shape->HasType(physics::Base::CYLINDER_SHAPE));
-    physics::CylinderShape *cyl =
-      static_cast<physics::CylinderShape*>(shape.get());
-    wheelRadius = cyl->GetRadius();
+    ASSERT_TRUE(shape->HasType(physics::Base::CYLINDER_SHAPE)
+             || shape->HasType(physics::Base::SPHERE_SHAPE));
+    if (shape->HasType(physics::Base::CYLINDER_SHAPE))
+    {
+      physics::CylinderShape *cyl =
+        static_cast<physics::CylinderShape*>(shape.get());
+      wheelRadius = cyl->GetRadius();
+    }
+    else if (shape->HasType(physics::Base::SPHERE_SHAPE))
+    {
+      physics::SphereShape *sph =
+        static_cast<physics::SphereShape*>(shape.get());
+      wheelRadius = sph->GetRadius();
+    }
   }
 
   physics::ModelPtr drumModel = world->GetModel("drum");
@@ -95,7 +105,7 @@ TEST_F(TireSlipTest, Logitudinal)
   // speed in miles / hour, convert to rad/s
   const double wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
   const double drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
-  const double normalForce = 200.0;
+  const double normalForce = 1000.0;
   math::Angle steer;
   steer.SetFromDegree(-15.0);
 

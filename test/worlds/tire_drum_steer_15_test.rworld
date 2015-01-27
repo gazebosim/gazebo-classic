@@ -32,16 +32,23 @@
         </inertial>
         <collision name="collision">
           <geometry>
+            <sphere>
+              <radius><%= wheel_radius %></radius>
+            </sphere>
+            <!--
             <cylinder>
               <radius><%= wheel_radius %></radius>
               <length><%= wheel_width %></length>
             </cylinder>
+            -->
           </geometry>
           <surface>
             <contact>
               <ode>
                 <max_vel>0.1</max_vel>
                 <min_depth><%= wheel_radius * 0.01 %></min_depth>
+                <kp>250e3</kp>
+                <kd>5</kd>
               </ode>
             </contact>
             <friction>

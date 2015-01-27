@@ -264,6 +264,10 @@ void TireFrictionPlugin::OnUpdate()
       surface->frictionPyramid.SetMuPrimary(friction);
       surface->frictionPyramid.SetMuSecondary(friction);
     }
+    else
+    {
+      gzerr << "Setting friction failed" << std::endl;
+    }
   }
   else
   {
@@ -291,5 +295,5 @@ double TireFrictionPlugin::ComputeFriction(const double _slipSpeed,
 //  }
 //
 //
-  return 1.0;
+  return 0.0;
 }
