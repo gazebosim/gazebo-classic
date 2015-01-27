@@ -1348,6 +1348,7 @@ void ModelCreator::ModelChanged()
 /////////////////////////////////////////////////
 void ModelCreator::Update()
 {
+  // Check if any parts have been moved or resized and trigger ModelChanged
   boost::unordered_map<std::string, PartData *>::iterator partsIt;
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
        ++partsIt)

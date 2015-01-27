@@ -389,7 +389,8 @@ void SaveDialog::GenerateConfig()
   this->dataPtr->modelConfig.Clear();
   this->dataPtr->modelConfig.Parse(this->GetTemplateConfigString().c_str());
 
-  TiXmlElement *modelXML = this->dataPtr->modelConfig.FirstChildElement("model");
+  TiXmlElement *modelXML = this->dataPtr
+      ->modelConfig.FirstChildElement("model");
   if (!modelXML)
   {
     gzerr << "No model name in default config file\n";

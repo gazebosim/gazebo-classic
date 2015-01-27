@@ -155,28 +155,28 @@ namespace gazebo
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishModel;
 
-        /// \brief Request to save the model
+        /// \brief Request to save the model.
         public: static event::EventT<bool ()> saveModelEditor;
 
-        /// \brief Request to save the model as
+        /// \brief Request to save the model as.
         public: static event::EventT<bool ()> saveAsModelEditor;
 
-        /// \brief Request to start a new model
+        /// \brief Request to start a new model.
         public: static event::EventT<void ()> newModelEditor;
 
-        /// \brief Exit the editor mode with the option to save
+        /// \brief Request to exit the editor.
         public: static event::EventT<void ()> exitModelEditor;
 
-        /// \brief Model has been changed
+        /// \brief Model has been changed.
         public: static event::EventT<void ()> modelChanged;
 
-        /// \brief Name was changed in the editor palette
+        /// \brief Name was changed in the editor palette.
         public: static event::EventT<void (std::string)> modelNameChanged;
 
-        /// \brief Notify that model has been saved
+        /// \brief Notify that model has been saved.
         public: static event::EventT<void (std::string)> saveModel;
 
-        /// \brief Notify that model has been newed
+        /// \brief Notify that model has been newed.
         public: static event::EventT<void ()> newModel;
       };
     }

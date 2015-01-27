@@ -47,12 +47,12 @@ namespace gazebo
                 MODEL
               };
 
-      /// \brief Constructor
-      /// \param[in] _mode Mode of the dialog
+      /// \brief Constructor.
+      /// \param[in] _mode Mode of the dialog.
       /// \param[in] _parent Parent QWidget.
       public: SaveDialog(int _mode = 0, QWidget *_parent = 0);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: ~SaveDialog();
 
       /// \brief Get the model name.
