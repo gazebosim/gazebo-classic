@@ -1154,14 +1154,14 @@ void BuildingMaker::GenerateSDFWithCSG()
 /////////////////////////////////////////////////
 void BuildingMaker::CreateTheEntity()
 {
-  msgs::Factory msg;
-  // Create a new name if the model exists
   if (!this->modelSDF->root->HasElement("model"))
   {
     gzerr << "Generated invalid SDF! Cannot create entity." << std::endl;
     return;
   }
 
+  msgs::Factory msg;
+  // Create a new name if the model exists
   sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
   std::string modelElemName = modelElem->Get<std::string>("name");
   if (has_entity_name(modelElemName))

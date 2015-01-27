@@ -697,13 +697,27 @@ void ModelCreator::FinishModel()
 /////////////////////////////////////////////////
 void ModelCreator::CreateTheEntity()
 {
-  msgs::Factory msg;
-  // Create a new name if the model exists
   if (!this->modelSDF->root->HasElement("model"))
   {
     gzerr << "Generated invalid SDF! Cannot create entity." << std::endl;
     return;
   }
+
+  msgs::Factory msg;
+  // Create a new name if the model exists
+  sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
+  std::string modelElemName = modelElem->Get<std::string>("name");
+  if (has_entity_name(modelElemName))
+  {
+    int i = 0;
+    while (has_entity_name(modelElemName))
+    {
+      modelElemName = modelElem->Get<std::string>("name") + "_" +
+        boost::lexical_cast<std::string>(i++);
+    }
+    modelElem->GetAttribute("name")->Set(modelElemName);
+  }
+
   msg.set_sdf(this->modelSDF->ToString());
   this->makerPub->Publish(msg);
 }
