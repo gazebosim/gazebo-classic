@@ -259,6 +259,11 @@ void ModelCreator::LoadSDF(sdf::ElementPtr _modelElem)
   this->previewVisual->SetPose(this->modelPose);
 
   // Links
+  if (!_modelElem->HasElement("link"))
+  {
+    gzerr << "Can't load a model without links." << std::endl;
+    return;
+  }
   sdf::ElementPtr linkElem = _modelElem->GetElement("link");
   while (linkElem)
   {
@@ -697,7 +702,20 @@ PartData *ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
   PartData *part = new PartData;
 
   // Link name
-  part->SetName(_linkElem->Get<std::string>("name"));
+  std::string linkName;
+  if (_linkElem->HasAttribute("name"))
+  {
+    linkName = _linkElem->Get<std::string>("name");
+  }
+  else
+  {
+    std::ostringstream linkNameStream;
+    linkNameStream << "part_" << this->partCounter++;
+    linkName = linkNameStream.str();
+    gzwarn << "SDF missing link name attribute. Created name " << linkName
+        << std::endl;
+  }
+  part->SetName(linkName);
 
   // Link pose
   math::Pose linkPose;
@@ -711,7 +729,6 @@ PartData *ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
     gzwarn << "SDF missing <link><pose> tag. Setting to zero."
         << std::endl;
   }
-
   part->SetPose(linkPose);
 
   // Link inertial
@@ -767,34 +784,34 @@ PartData *ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 
   while (visualElem)
   {
+    // Visual name
+    std::string visualName;
+    if (visualElem->HasAttribute("name"))
+    {
+      visualName = visualElem->Get<std::string>("name");
+      visualIndex++;
+    }
+    else
+    {
+      std::ostringstream visualNameStream;
+      visualNameStream << linkName << "::Visual_" << visualIndex++;
+      visualName = visualNameStream.str();
+      gzwarn << "SDF missing visual name attribute. Created name " << visualName
+          << std::endl;
+    }
+    rendering::VisualPtr visVisual(new rendering::Visual(visualName,
+        linkVisual));
+    visVisual->Load(visualElem);
+
+    // Visual pose
     math::Pose visualPose;
     if (visualElem->HasElement("pose"))
       visualPose = visualElem->Get<math::Pose>("pose");
     else
       visualPose.Set(0, 0, 0, 0, 0, 0);
-
-    // FIXME Hack alert
-    std::string shapeSuffix;
-    if (visualElem->HasElement("geometry"))
-    {
-      if (visualElem->GetElement("geometry")->HasElement("box"))
-        shapeSuffix = "_unit_box";
-      else if (visualElem->GetElement("geometry")->HasElement("sphere"))
-        shapeSuffix = "_unit_sphere";
-      else if (visualElem->GetElement("geometry")->HasElement("cylinder"))
-        shapeSuffix = "_unit_cylinder";
-      else
-        shapeSuffix = "_custom";
-    }
-
-    std::ostringstream visualName;
-    visualName << part->GetName() << "::Visual_" << shapeSuffix
-      << visualIndex++;
-    rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-          linkVisual));
-
-    visVisual->Load(visualElem);
     visVisual->SetPose(visualPose);
+
+    // Add to part
     part->AddVisual(visVisual);
 
     visualElem = visualElem->GetNextElement("visual");
@@ -809,31 +826,30 @@ PartData *ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 
   while (collisionElem)
   {
+    // Collision name
+    std::string collisionName;
+    if (collisionElem->HasAttribute("name"))
+    {
+      collisionName = collisionElem->Get<std::string>("name");
+      collisionIndex++;
+    }
+    else
+    {
+      std::ostringstream collisionNameStream;
+      collisionNameStream << linkName << "::Collision_" << collisionIndex++;
+      collisionName = collisionNameStream.str();
+      gzwarn << "SDF missing collision name attribute. Created name " <<
+          collisionName << std::endl;
+    }
+    rendering::VisualPtr colVisual(new rendering::Visual(collisionName,
+        linkVisual));
+
+    // Collision pose
     math::Pose collisionPose;
     if (collisionElem->HasElement("pose"))
       collisionPose = collisionElem->Get<math::Pose>("pose");
     else
       collisionPose.Set(0, 0, 0, 0, 0, 0);
-
-    // FIXME Hack alert
-    std::string shapeSuffix;
-    if (collisionElem->HasElement("geometry"))
-    {
-      if (collisionElem->GetElement("geometry")->HasElement("box"))
-        shapeSuffix = "_unit_box";
-      else if (collisionElem->GetElement("geometry")->HasElement("sphere"))
-        shapeSuffix = "_unit_sphere";
-      else if (collisionElem->GetElement("geometry")->HasElement("cylinder"))
-        shapeSuffix = "_unit_cylinder";
-      else
-        shapeSuffix = "_custom";
-    }
-
-    std::ostringstream collisionName;
-    collisionName << part->GetName() << "::Collision_" << shapeSuffix
-        << collisionIndex++;
-    rendering::VisualPtr colVisual(new rendering::Visual(collisionName.str(),
-        linkVisual));
 
     // Make a visual element from the collision element
     sdf::ElementPtr colVisualElem =  this->modelTemplateSDF->root
@@ -855,6 +871,8 @@ PartData *ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
     Ogre::MovableObject *colObj = colVisual->GetSceneNode()->
         getAttachedObject(0);
     colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+
+    // Add to part
     part->AddCollision(colVisual);
 
     collisionElem = collisionElem->GetNextElement("collision");
