@@ -41,10 +41,10 @@ namespace gazebo
       /// \enum SaveMode
       /// \brief Unique identifiers for all dialog modes.
       public: enum SaveMode {
-                /// \brief Save building
-                BUILDING,
                 /// \brief Save model
-                MODEL
+                MODEL,
+                /// \brief Save building
+                BUILDING
               };
 
       /// \brief Constructor.
@@ -96,6 +96,8 @@ namespace gazebo
 
        /// \brief Helper function to generate a valid folder name from a
        /// human-readable model name.
+       /// \param[in] _modelName Human-readable model name.
+       /// \return Folder name.
       public: std::string GetFolderNameFromModelName(const std::string
           &_modelName);
 
@@ -126,6 +128,7 @@ namespace gazebo
       public: void SaveToSDF(sdf::SDFPtr _modelSDF);
 
       /// \brief Qt callback to show/hide advanced model saving options.
+      /// \param[in] _checked Whether it is checked or not.
       private slots: void ToggleAdvancedOptions(bool _checked);
 
       /// \internal

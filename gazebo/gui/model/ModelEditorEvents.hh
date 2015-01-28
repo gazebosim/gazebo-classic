@@ -29,126 +29,120 @@ namespace gazebo
     {
       class GAZEBO_VISIBLE Events
       {
-        /// \brief Connect a boost::slot to the finish model signal
+        /// \brief Connect a boost::slot to the finish model signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr
-            ConnectFinishModel(T _subscriber)
+            static event::ConnectionPtr ConnectFinishModel(T _subscriber)
           { return finishModel.Connect(_subscriber); }
 
-        /// \brief Disconnect a boost::slot to the finish model signal
+        /// \brief Disconnect a boost::slot to the finish model signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectFinishModel(
             event::ConnectionPtr _subscriber)
           { finishModel.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the save signal
+        /// \brief Connect a Gazebo event to the save signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
             static event::ConnectionPtr ConnectSaveModelEditor(T _subscriber)
           { return saveModelEditor.Connect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the save signal
-        /// \param[in] _subscriber the subscriber to this event
-        /// \return a connection
-        public: template<typename T>
-            static event::ConnectionPtr ConnectSaveAsModelEditor
-              (T _subscriber)
-          { return saveAsModelEditor.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the save signal
+        /// \brief Disconnect a Gazebo event from the save signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectSaveModelEditor(
             event::ConnectionPtr _subscriber)
           { saveModelEditor.Disconnect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the save as signal
+        /// \brief Connect a Gazebo event to the save as signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectSaveAsModelEditor(T _subscriber)
+          { return saveAsModelEditor.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the save as signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectSaveAsModelEditor(
             event::ConnectionPtr _subscriber)
           { saveAsModelEditor.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the new signal
+        /// \brief Connect a Gazebo event to the new signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr
-            ConnectNewModelEditor(T _subscriber)
+            static event::ConnectionPtr ConnectNewModelEditor(T _subscriber)
           { return newModelEditor.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the new signal
+        /// \brief Disconnect a Gazebo event from the new signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectNewModelEditor(
               event::ConnectionPtr _subscriber)
           { newModelEditor.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the exit signal
+        /// \brief Connect a Gazebo event to the exit signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
             static event::ConnectionPtr ConnectExitModelEditor(T _subscriber)
           { return exitModelEditor.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the exit signal
+        /// \brief Disconnect a Gazebo event from the exit signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectExitModelEditor(
             event::ConnectionPtr _subscriber)
           { exitModelEditor.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the model changed signal
+        /// \brief Connect a Gazebo event to the model changed signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
             static event::ConnectionPtr ConnectModelChanged(T _subscriber)
           { return modelChanged.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the model changed signal
+        /// \brief Disconnect a Gazebo event from the model changed signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectModelChanged(
             event::ConnectionPtr _subscriber)
           { modelChanged.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the name changed signal
+        /// \brief Connect a Gazebo event to the name changed signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectModelNameChanged
-              (T _subscriber)
+            static event::ConnectionPtr ConnectModelNameChanged(T _subscriber)
           { return modelNameChanged.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the exit signal
+        /// \brief Disconnect a Gazebo event from the name changed signal.
         /// \param[in] _subscriber the subscriber to this event
-        public: static void ConnectModelNameChanged(
+        public: static void DisconnectModelNameChanged(
             event::ConnectionPtr _subscriber)
           { modelNameChanged.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the name changed signal
+        /// \brief Connect a Gazebo event to the save model signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectSaveModel
-              (T _subscriber)
+            static event::ConnectionPtr ConnectSaveModel(T _subscriber)
           { return saveModel.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the exit signal
+        /// \brief Disconnect a Gazebo event from the save model signal.
         /// \param[in] _subscriber the subscriber to this event
-        public: static void ConnectSaveModel(
+        public: static void DisconnectSaveModel(
             event::ConnectionPtr _subscriber)
           { saveModel.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the name changed signal
+        /// \brief Connect a Gazebo event to the new model signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectNewModel
-              (T _subscriber)
+            static event::ConnectionPtr ConnectNewModel(T _subscriber)
           { return newModel.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the exit signal
+        /// \brief Disconnect a Gazebo event from the new model signal.
         /// \param[in] _subscriber the subscriber to this event
-        public: static void ConnectNewModel(
+        public: static void DisconnectNewModel(
             event::ConnectionPtr _subscriber)
           { newModel.Disconnect(_subscriber); }
 
