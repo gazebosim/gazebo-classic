@@ -2040,6 +2040,14 @@ bool BuildingMaker::On3dMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &_event)
 {
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+
+  if (_event.dragging)
+  {
+    userCamera->HandleMouseEvent(_event);
+    return true;
+  }
+
   if (_event.button != common::MouseEvent::LEFT)
   {
     this->StopMaterialModes();
@@ -2074,7 +2082,6 @@ bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &_event)
   }
   else
   {
-    rendering::UserCameraPtr userCamera = gui::get_active_camera();
     userCamera->HandleMouseEvent(_event);
     this->StopMaterialModes();
   }

@@ -8,6 +8,9 @@
 1. C++11 support (C++11 compatible compiler is now required)
     * [Pull request #1340](https://bitbucket.org/osrf/gazebo/pull-request/1340)
 
+1. Implemented private data pointer for the ODEPhysicsPrivate class.
+    * [Pull request #1383](https://bitbucket.org/osrf/gazebo/pull-request/1383)
+
 1. Implemented private data pointer for the World class.
     * [Pull request #1383](https://bitbucket.org/osrf/gazebo/pull-request/1383)
 
@@ -183,6 +186,9 @@
 
     1. Pick textures from the palette and assign in 3D view.
         * [Pull request #1368](https://bitbucket.org/osrf/gazebo/pull-request/1368)
+
+    1. Pick custom colors from the palette and assign in 3D view.
+        * [Pull request #1382](https://bitbucket.org/osrf/gazebo/pull-request/1382)
 
 1. Model editor updates
     1. Fix adding/removing event filters .
