@@ -2320,7 +2320,6 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
         geomScale.x = _msg->geometry().plane().size().x();
         geomScale.y = _msg->geometry().plane().size().y();
       }
-      geomScale.z = 1.0;
     }
     else if (_msg->geometry().type() == msgs::Geometry::IMAGE)
     {
@@ -2396,6 +2395,10 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
           msgs::Material::NORMAL_MAP_TANGENT_SPACE)
       {
         this->SetShaderType("normal_map_tangent_space");
+      }
+      else
+      {
+        gzerr << "Unrecognized shader type" << std::endl;
       }
 
       if (_msg->material().has_normal_map())
