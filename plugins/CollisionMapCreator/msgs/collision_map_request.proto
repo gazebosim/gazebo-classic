@@ -1,0 +1,14 @@
+package collision_map_creator_msgs.msgs;
+import "vector2d.proto";
+
+message CollisionMapRequest
+{
+  required gazebo.msgs.Vector2d   upperLeft  = 1;
+  required gazebo.msgs.Vector2d   upperRight = 2;
+  required gazebo.msgs.Vector2d   lowerRight = 3;
+  required gazebo.msgs.Vector2d   lowerLeft  = 4;
+  required double                 height     = 5;
+  required double                 resolution = 6;
+  optional string                 filename   = 7 [default = ""];
+  optional int32                  threshold  = 8 [default = 255];
+}
