@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,29 @@
  * limitations under the License.
  *
 */
-#include "ServerFixture.hh"
+#include "test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 
 using namespace gazebo;
 
 class TireSlipTest : public ServerFixture
 {
+  /// \brief Set joint commands for tire testrig.
+  /// \param[in] _wheelSpeed Wheel spin speed in rad/s.
+  /// \param[in] _drumSpeed Drum spin speed in rad/s.
+  /// \param[in] _suspForce Suspension force to apply in N.
+  /// \param[in] _steer Steer angle to apply.
+  public: void SetCommands(const double _wheelSpeed, const double _drumSpeed,
+                           const double _suspForce, const math::Angle _steer);
+
+  /// \brief Publisher of joint commands for the tire model.
+  protected: transport::PublisherPtr tireJointCmdPub;
+
+  /// \brief Publisher of joint commands for the drum model.
+  protected: transport::PublisherPtr drumJointCmdPub;
+
+  /// \brief Joint pointer for steering joint.
+  protected: physics::JointPtr steerJoint;
 };
 
 /////////////////////////////////////////////////
@@ -31,13 +47,9 @@ TEST_F(TireSlipTest, Logitudinal)
 
   Load("worlds/tire_drum_steer_15_test.world", true);
 
-  // PID Controller for the tire
-  transport::PublisherPtr tirePIDPub = node->Advertise<msgs::JointCmd>(
-      "~/tire/joint_cmd");
-
-  // PID Controller for the drum
-  transport::PublisherPtr drumPIDPub = node->Advertise<msgs::JointCmd>(
-      "~/drum/joint_cmd");
+  // joint command publishers
+  this->tireJointCmdPub = node->Advertise<msgs::JointCmd>("~/tire/joint_cmd");
+  this->drumJointCmdPub = node->Advertise<msgs::JointCmd>("~/drum/joint_cmd");
 
   sensors::ForceTorqueSensorPtr sensor =
     boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
@@ -96,8 +108,8 @@ TEST_F(TireSlipTest, Logitudinal)
     drumRadius = cyl->GetRadius();
   }
 
-  physics::JointPtr steerJoint =  wheelModel->GetJoint("steer");
-  ASSERT_TRUE(steerJoint != NULL);
+  this->steerJoint =  wheelModel->GetJoint("steer");
+  ASSERT_TRUE(this->steerJoint != NULL);
 
   physics::JointPtr worldUprightJoint =  wheelModel->GetJoint("world_upright");
   ASSERT_TRUE(worldUprightJoint != NULL);
@@ -105,10 +117,25 @@ TEST_F(TireSlipTest, Logitudinal)
   // speed in miles / hour, convert to rad/s
   const double wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
   const double drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
-  const double normalForce = 1000.0;
+  const double suspForce = 1000.0;
   math::Angle steer;
   steer.SetFromDegree(-15.0);
 
+  this->SetCommands(wheelSpeed, drumSpeed, suspForce, steer);
+  common::Time::MSleep(100);
+
+  for (int i = 0; i < 10000; ++i)
+  {
+    world->Step(10);
+    std::cout << "I[" << i << "] Torque[" << sensor->GetTorque()
+              << "] Force[" << sensor->GetForce() << "]\n";
+  }
+}
+
+/////////////////////////////////////////////////
+void TireSlipTest::SetCommands(const double _wheelSpeed,
+  const double _drumSpeed, const double _suspForce, const math::Angle _steer)
+{
   // PID gains for joint controllers
   const double wheelSpinP = 1e1;
   const double wheelSpinI = 0.0;
@@ -122,12 +149,12 @@ TEST_F(TireSlipTest, Logitudinal)
     msg.set_name("drum::joint");
 
     msgs::PID *pid = msg.mutable_velocity();
-    pid->set_target(drumSpeed);
+    pid->set_target(_drumSpeed);
     pid->set_p_gain(drumSpinP);
     pid->set_i_gain(drumSpinI);
     pid->set_d_gain(drumSpinD);
 
-    drumPIDPub->Publish(msg);
+    this->drumJointCmdPub->Publish(msg);
   }
 
   {
@@ -135,33 +162,24 @@ TEST_F(TireSlipTest, Logitudinal)
     msg.set_name("tire::axel_wheel");
 
     msgs::PID *pid = msg.mutable_velocity();
-    pid->set_target(wheelSpeed);
+    pid->set_target(_wheelSpeed);
     pid->set_p_gain(wheelSpinP);
     pid->set_i_gain(wheelSpinI);
     pid->set_d_gain(wheelSpinD);
 
-    tirePIDPub->Publish(msg);
+    this->tireJointCmdPub->Publish(msg);
   }
 
   {
     msgs::JointCmd msg;
     msg.set_name("tire::world_upright");
-    msg.set_force(-normalForce);
+    msg.set_force(-_suspForce);
 
-    tirePIDPub->Publish(msg);
+    this->tireJointCmdPub->Publish(msg);
   }
 
-  steerJoint->SetHighStop(0, steer);
-  steerJoint->SetLowStop(0, steer);
-
-  common::Time::MSleep(100);
-
-  for (int i = 0; i < 10000; ++i)
-  {
-    world->Step(10);
-    std::cout << "I[" << i << "] Torque[" << sensor->GetTorque()
-              << "] Force[" << sensor->GetForce() << "]\n";
-  }
+  this->steerJoint->SetHighStop(0, _steer);
+  this->steerJoint->SetLowStop(0, _steer);
 }
 
 // /////////////////////////////////////////////////
@@ -169,10 +187,10 @@ TEST_F(TireSlipTest, Logitudinal)
 // {
 //   Load("worlds/tire_drum_steer_15_test.world");
 // 
-//   transport::PublisherPtr tirePIDPub = node->Advertise<msgs::JointCmd>(
+//   transport::PublisherPtr tireJointCmdPub = node->Advertise<msgs::JointCmd>(
 //       "~/tire/joint_cmd");
 // 
-//   transport::PublisherPtr drumPIDPub = node->Advertise<msgs::JointCmd>(
+//   transport::PublisherPtr drumJointCmdPub = node->Advertise<msgs::JointCmd>(
 //       "~/drum/joint_cmd");
 // 
 //   common::Time::Sleep(10);
@@ -186,7 +204,7 @@ TEST_F(TireSlipTest, Logitudinal)
 //     pidMsg->set_d_gain(0.0);
 //     pidMsg->set_i_gain(0.0);
 // 
-//     tirePIDPub->Publish(jointCmdMsg);
+//     tireJointCmdPub->Publish(jointCmdMsg);
 //   }
 // 
 //   {
@@ -199,7 +217,7 @@ TEST_F(TireSlipTest, Logitudinal)
 //     pidMsg->set_d_gain(0.0);
 //     pidMsg->set_i_gain(0.0);
 // 
-//     drumPIDPub->Publish(jointCmdMsg);
+//     drumJointCmdPub->Publish(jointCmdMsg);
 //   }
 //   common::Time::Sleep(10);
 // }
