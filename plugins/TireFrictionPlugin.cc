@@ -208,9 +208,10 @@ void TireFrictionPlugin::OnUpdate()
       double slipSpeed = slipVelocity.GetLength();
       double normalForce;
       {
-        math::Vector3 force = msgs::Convert(
+        math::Vector3 force1 = msgs::Convert(
           contact->wrench(j).body_1_wrench().force());
-        normalForce = force.Dot(normal);
+        math::Quaternion rot1 = link1->GetWorldPose().rot;
+        normalForce = rot1.RotateVector(force1).Dot(normal);
       }
       scaledSlipSpeed += slipSpeed * std::abs(normalForce);
       contactNormalForceSum += std::abs(normalForce);
