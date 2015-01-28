@@ -25,15 +25,15 @@
         </inertial>
         <collision name="collision">
           <geometry>
+            <!--
             <sphere>
               <radius>0.5</radius>
             </sphere>
-            <!--
+            -->
             <cylinder>
               <radius>0.5</radius>
               <length>0.5</length>
             </cylinder>
-            -->
           </geometry>
           <surface>
             <contact>

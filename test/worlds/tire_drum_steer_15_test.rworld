@@ -32,15 +32,15 @@
         </inertial>
         <collision name="collision">
           <geometry>
+            <!--
             <sphere>
               <radius><%= wheel_radius %></radius>
             </sphere>
-            <!--
+            -->
             <cylinder>
               <radius><%= wheel_radius %></radius>
               <length><%= wheel_width %></length>
             </cylinder>
-            -->
           </geometry>
           <surface>
             <contact>
