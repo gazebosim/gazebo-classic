@@ -146,13 +146,13 @@ TEST_F(TireSlipTest, Logitudinal)
   const double drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
   const double suspForce = 1000.0;
   math::Angle steer;
-  steer.SetFromDegree(-15.0);
+  steer.SetFromDegree(0.0);
 
   this->SetCommands(wheelSpeed, drumSpeed, suspForce, steer);
   common::Time::MSleep(100);
   world->Step(50);
 
-  for (int i = 0; i < 10e3; ++i)
+  for (int i = 0; i < 100e3; ++i)
   {
     world->Step(1);
     statsSteer.InsertData((this->steerJoint->GetAngle(0) - steer).Radian());

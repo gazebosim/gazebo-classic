@@ -8,7 +8,7 @@
 
     
     <model name="tire">
-      <pose>0 0 0.5  0 0 0.261799388</pose>
+      <pose>0 0 0.5  0 0 0</pose>
 
       <link name="wheel">
         <pose>0 0 0  1.5707963267948966 0 0</pose>
@@ -79,7 +79,7 @@
       </link>
 
       <link name="axel">
-        <pose>0 0.35 0 1.57 0 0</pose>
+        <pose>0 0.35 0  0 0 0</pose>
 
         <inertial>
           <mass>0.5</mass>
@@ -163,7 +163,10 @@
         <sensor name="force_torque" type="force_torque">
           <always_on>true</always_on>
           <visualize>true</visualize>
-          <update_rate>1</update_rate>
+          <update_rate>1000</update_rate>
+          <force_torque>
+            <frame>parent</frame>
+          </force_torque>
         </sensor>
       </joint>
 
@@ -171,7 +174,7 @@
         <parent>upright</parent>
         <child>axel</child>
         <axis>
-          <xyz>0 1 0</xyz>
+          <xyz>0 0 1</xyz>
           <limit>
             <upper>0</upper>
             <lower>-0</lower>
