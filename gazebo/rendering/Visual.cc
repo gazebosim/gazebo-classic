@@ -2339,7 +2339,7 @@ std::string Visual::GetMeshName() const
         meshManager->CreateExtrudedPolyline(polyLineName, vertices,
             geomElem->GetElement("polyline")->Get<double>("height"),
             math::Vector2d(1, 1));
-       }
+      }
       return polyLineName;
     }
     else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))

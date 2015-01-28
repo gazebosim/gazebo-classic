@@ -20,6 +20,7 @@
 #include "gazebo/math/Plane.hh"
 #include "gazebo/math/Matrix3.hh"
 #include "gazebo/math/Matrix4.hh"
+#include "gazebo/math/Vector2i.hh"
 
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
@@ -486,6 +487,49 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     const std::vector<math::Vector2d> &_vertices,
     const double &_height, const math::Vector2d & /*_uvCoords*/)
 {
+
+/// == for testing
+  std::vector<std::vector<math::Vector2d> > path;
+/*  std::vector<math::Vector2d> subpath01;
+  subpath01.push_back(math::Vector2d(0, 0));
+  subpath01.push_back(math::Vector2d(1, 0));
+  subpath01.push_back(math::Vector2d(1, 1));
+  subpath01.push_back(math::Vector2d(0, 1));
+
+  std::vector<math::Vector2d> subpath02;
+  subpath02.push_back(math::Vector2d(0.25, 0.25));
+  subpath02.push_back(math::Vector2d(0.25, 0.75));
+  subpath02.push_back(math::Vector2d(0.75, 0.75));
+  subpath02.push_back(math::Vector2d(0.75, 0.25));*/
+
+
+  std::vector<math::Vector2d> subpath01;
+  subpath01.push_back(math::Vector2d(2.27467, 1.0967));
+  subpath01.push_back(math::Vector2d(1.81094, 2.35418));
+  subpath01.push_back(math::Vector2d(2.74009, 2.35418));
+//  subpath01.push_back(math::Vector2d(227.467, 109.67));
+
+  std::vector<math::Vector2d> subpath02;
+  subpath02.push_back(math::Vector2d(2.08173, 0.7599));
+  subpath02.push_back(math::Vector2d(2.4693, 0.7599));
+  subpath02.push_back(math::Vector2d(3.4323, 3.28672));
+  subpath02.push_back(math::Vector2d(3.07689, 3.28672));
+  subpath02.push_back(math::Vector2d(2.84672, 2.63851));
+  subpath02.push_back(math::Vector2d(1.7077, 2.63851));
+  subpath02.push_back(math::Vector2d(1.47753, 3.28672));
+  subpath02.push_back(math::Vector2d(1.11704, 3.28672));
+//  subpath02.push_back(math::Vector2d(208.173, 75.99));
+
+  path.push_back(subpath01);
+  path.push_back(subpath02);
+  double height = 1.0;
+  common::MeshManager::Instance()->CreateExtrudedPath(
+      _name, path, height);
+
+  return;
+/// == for testing
+
+
   if (this->HasMesh(_name))
   {
     return;
@@ -658,13 +702,14 @@ void MeshManager::CreateExtrudedPath(const std::string &_name,
     edges.push_back(edge);
   }
 
+  std::vector<math::Vector2i> edgeIndices;
+
 
   std::vector<math::Vector3> normals;
   for (unsigned int i  = 0; i < edges.size(); ++i)
   {
     std::vector<math::Vector2d> edge = edges[i];
-    std::cerr << " submesh index count " << subMesh->GetIndexCount()
-         << std::endl;
+
     for (unsigned int j = 0; j < subMesh->GetIndexCount(); j+=3)
     {
       math::Vector3 v0 = subMesh->GetVertex(subMesh->GetIndex(j));
@@ -673,11 +718,11 @@ void MeshManager::CreateExtrudedPath(const std::string &_name,
 
       //std::cerr << subMesh->GetIndex(j) << " " << subMesh->GetIndex(j+1) << " "
           //<< subMesh->GetIndex(j+2) << std::endl;
-/*      std::cerr << "v0 " << v0 << std::endl;
+      std::cerr << "v0 " << v0 << std::endl;
       std::cerr << "v1 " << v1 << std::endl;
       std::cerr << "v2 " << v2 << std::endl;
       std::cerr << "e0 " << edge[0] << std::endl;
-      std::cerr << "e1 " << edge[1] << std::endl;*/
+      std::cerr << "e1 " << edge[1] << std::endl;
       std::vector<math::Vector3> triangle;
       triangle.push_back(v0);
       triangle.push_back(v1);
@@ -690,7 +735,7 @@ void MeshManager::CreateExtrudedPath(const std::string &_name,
         {
           // found a vertex in triangle that matches the vertex of the edge
           ev0 = k;
-//          std::cerr << " found ev0 " << triangle[k] << ", index " << ev0 << std::endl;
+          std::cerr << " found ev0 " << triangle[k] << ", index " << ev0 << std::endl;
           break;
         }
       }
@@ -710,22 +755,22 @@ void MeshManager::CreateExtrudedPath(const std::string &_name,
             // Store the index of the third triangle vertex.
             // It's either 0, 1, or 2. Find it using simple bitwise operation.
             ev2 =  ~(ev1 | ev0) & 0x03;
-//            std::cerr << " found ev1 " << triV << ", index " << ev1 << std::endl;
-//            std::cerr << " found ev2 index " << ev2 << std::endl;
+            std::cerr << " found ev1 " << triV << ", index " << ev1 << std::endl;
+            std::cerr << " found ev2 index " << ev2 << std::endl;
             break;
           }
         }
         if (ev1 >= 0 && ev2 >= 0 && ev0 != ev1 && ev0 != ev2)
         {
-//          std::cerr << "found an edge in triangle that matches the exterior edge"
-//              << std::endl;
+          std::cerr << "found an edge in triangle that matches the exterior edge"
+              << std::endl;
 
           // Found an edge in triangle that matches the exterior edge.
           // Now find its normal.
 
           math::Vector3 edgeVec = triangle[ev0] - triangle[ev1];
           edgeVec.Normalize();
-          math::Vector3 normal(edgeVec.y, edgeVec.x, 0);
+          math::Vector3 normal(edgeVec.y, -edgeVec.x, 0);
 
           math::Vector3 otherEdgeVec = triangle[ev0] - triangle[ev2];
           otherEdgeVec.Normalize();
@@ -746,7 +791,7 @@ void MeshManager::CreateExtrudedPath(const std::string &_name,
             else
                 std::cerr << "angle1: found negative normal" << std::endl;
           }
-
+          edgeIndices.push_back(math::Vector2i(j+ev1, j+ev0));
         }
         else
         {
@@ -768,14 +813,68 @@ void MeshManager::CreateExtrudedPath(const std::string &_name,
 
   // create the top face
   unsigned int numIndices = subMesh->GetIndexCount();
-  for (unsigned int i = 0; i < numIndices; ++i)
+  for (unsigned int i = 0; i < numIndices; i+=3)
   {
-    math::Vector3 vertex = subMesh->GetVertex(subMesh->GetIndex(i));
-    subMesh->AddVertex(vertex.x, vertex.y, _height);
-    subMesh->AddIndex(numIndices+i);
+    unsigned int i0 = subMesh->GetIndex(i);
+    unsigned int i1 = subMesh->GetIndex(i+1);
+    unsigned int i2 = subMesh->GetIndex(i+2);
+    math::Vector3 v0 = subMesh->GetVertex(i);
+    math::Vector3 v1 = subMesh->GetVertex(i+1);
+    math::Vector3 v2 = subMesh->GetVertex(i+2);
+    subMesh->AddVertex(v0.x, v0.y, _height);
+    subMesh->AddIndex(numIndices+i0);
+    subMesh->AddVertex(v1.x, v1.y, _height);
+    subMesh->AddIndex(numIndices+i2);
+    subMesh->AddVertex(v2.x, v2.y, _height);
+    subMesh->AddIndex(numIndices+i1);
   }
 
   // create the size faces
+  for (unsigned int i = 0; i < edges.size(); ++i)
+  {
+    math::Vector2d v0 = edges[i][0];
+    math::Vector2d v1 = edges[i][1];
+    math::Vector2d edge2d = v1 - v0;
+    math::Vector3 edge = math::Vector3(edge2d.x, edge2d.y, 0);
+    math::Vector3 cross = edge.Cross(normals[i]);
+//    math::Vector2i edgeIdx = edgeIndices[i-1];
+//    std::cerr << " size face edgeIndex " << edgeIdx.x << " , " << edgeIdx.y << std::endl;
+
+    unsigned int vCount = subMesh->GetVertexCount();
+    if (cross.z >0)
+    {
+      subMesh->AddVertex(math::Vector3(v0.x, v0.y, 0));
+      subMesh->AddIndex(vCount++);
+      subMesh->AddVertex(math::Vector3(v0.x, v0.y, _height));
+      subMesh->AddIndex(vCount++);
+      subMesh->AddVertex(math::Vector3(v1.x, v1.y, _height));
+      subMesh->AddIndex(vCount++);
+      subMesh->AddVertex(math::Vector3(v0.x, v0.y, 0));
+      subMesh->AddIndex(vCount++);
+      subMesh->AddVertex(math::Vector3(v1.x, v1.y, _height));
+      subMesh->AddIndex(vCount++);
+      subMesh->AddVertex(math::Vector3(v1.x, v1.y, 0));
+      subMesh->AddIndex(vCount++);
+    }
+    else
+    {
+      subMesh->AddVertex(math::Vector3(v0.x, v0.y, 0));
+      subMesh->AddIndex(vCount++);
+      subMesh->AddVertex(math::Vector3(v1.x, v1.y, _height));
+      subMesh->AddIndex(vCount++);
+      subMesh->AddVertex(math::Vector3(v0.x, v0.y, _height));
+      subMesh->AddIndex(vCount++);
+      subMesh->AddVertex(math::Vector3(v0.x, v0.y, 0));
+      subMesh->AddIndex(vCount++);
+      subMesh->AddVertex(math::Vector3(v1.x, v1.y, 0));
+      subMesh->AddIndex(vCount++);
+      subMesh->AddVertex(math::Vector3(v1.x, v1.y, _height));
+      subMesh->AddIndex(vCount++);
+    }
+
+  }
+
+    std::cerr << " v index count  " << subMesh->GetIndexCount() << std::endl;
 }
 
 //////////////////////////////////////////////////

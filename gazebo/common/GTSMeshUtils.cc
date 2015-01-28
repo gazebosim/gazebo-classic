@@ -41,7 +41,6 @@ static void FillVertex(GtsPoint *_p, gpointer *_data)
 //////////////////////////////////////////////////
 static void FillFace(GtsTriangle *_t, gpointer *_data)
 {
-  std::cerr << "fill face " << std::endl;
   SubMesh *subMesh = reinterpret_cast<SubMesh *>(_data[0]);
   GHashTable *vIndex = reinterpret_cast<GHashTable *>(_data[2]);
   int *x = reinterpret_cast<int*>(_data[3]);
