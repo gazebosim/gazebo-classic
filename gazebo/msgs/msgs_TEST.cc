@@ -234,11 +234,13 @@ TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
   EXPECT_TRUE(math::equal(1.0, v.d));
 }
 
+//////////////////////////////////////////////////
 void CompareMsgsJointTypeToString(const msgs::Joint::Type _type)
 {
   EXPECT_EQ(_type, msgs::ConvertJointType(msgs::ConvertJointType(_type)));
 }
 
+//////////////////////////////////////////////////
 TEST_F(MsgsTest, ConvertMsgsJointTypeToString)
 {
   CompareMsgsJointTypeToString(msgs::Joint::REVOLUTE);
@@ -250,8 +252,24 @@ TEST_F(MsgsTest, ConvertMsgsJointTypeToString)
   CompareMsgsJointTypeToString(msgs::Joint::GEARBOX);
 }
 
+//////////////////////////////////////////////////
+void CompareMsgsGeometryTypeToString(const msgs::Geometry::Type _type)
+{
+  EXPECT_EQ(_type, msgs::ConvertGeometryType(msgs::ConvertGeometryType(_type)));
+}
+
+//////////////////////////////////////////////////
 TEST_F(MsgsTest, ConvertMsgsGeometryTypeToString)
 {
+  CompareMsgsGeometryTypeToString(msgs::Geometry::BOX);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::SPHERE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::CYLINDER);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::PLANE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::IMAGE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::HEIGHTMAP);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::MESH);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::POLYLINE);
+
   EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::BOX), "box");
   EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::SPHERE), "sphere");
   EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::CYLINDER), "cylinder");

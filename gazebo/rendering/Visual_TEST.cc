@@ -341,10 +341,10 @@ TEST_F(Visual_TEST, Color)
   gazebo::rendering::VisualPtr cylinderVis(
       new gazebo::rendering::Visual("cylinder_visual", scene));
   cylinderVis->Load(cylinderSDF);
-  EXPECT_TRUE(cylinderVis->GetAmbient() == common::Color::Black);
-  EXPECT_TRUE(cylinderVis->GetDiffuse() == common::Color::Black);
-  EXPECT_TRUE(cylinderVis->GetSpecular() == common::Color::Black);
-  EXPECT_TRUE(cylinderVis->GetEmissive() == common::Color::Black);
+  EXPECT_EQ(cylinderVis->GetAmbient(), common::Color::Black);
+  EXPECT_EQ(cylinderVis->GetDiffuse(), common::Color::Black);
+  EXPECT_EQ(cylinderVis->GetSpecular(), common::Color::Black);
+  EXPECT_EQ(cylinderVis->GetEmissive(), common::Color::Black);
 
   sdf::ElementPtr cylinderSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF2);
@@ -355,39 +355,55 @@ TEST_F(Visual_TEST, Color)
   gazebo::rendering::VisualPtr cylinderVis2(
       new gazebo::rendering::Visual("cylinder_visual2", scene));
   cylinderVis2->Load(cylinderSDF2);
-  EXPECT_TRUE(cylinderVis2->GetAmbient() == common::Color::Green);
-  EXPECT_TRUE(cylinderVis2->GetDiffuse() == common::Color::Blue);
-  EXPECT_TRUE(cylinderVis2->GetSpecular() == common::Color::Red);
-  EXPECT_TRUE(cylinderVis2->GetEmissive() == common::Color::Yellow);
+  EXPECT_EQ(cylinderVis2->GetAmbient(), common::Color::Green);
+  EXPECT_EQ(cylinderVis2->GetDiffuse(), common::Color::Blue);
+  EXPECT_EQ(cylinderVis2->GetSpecular(), common::Color::Red);
+  EXPECT_EQ(cylinderVis2->GetEmissive(), common::Color::Yellow);
 
   // test changing ambient/diffuse/specular colors
-  cylinderVis->SetAmbient(common::Color(0.1, 0.2, 0.3, 0.4));
-  EXPECT_TRUE(cylinderVis->GetAmbient() ==
-      common::Color(0.1, 0.2, 0.3, 0.4));
-  cylinderVis->SetDiffuse(common::Color(1.0, 1.0, 1.0, 1.0));
-  EXPECT_TRUE(cylinderVis->GetDiffuse() ==
-      common::Color(1.0, 1.0, 1.0, 1.0));
-  cylinderVis->SetSpecular(common::Color(0.5, 0.6, 0.4, 0.0));
-  EXPECT_TRUE(cylinderVis->GetSpecular() ==
-      common::Color(0.5, 0.6, 0.4, 0.0));
-  cylinderVis->SetEmissive(common::Color(0.9, 0.8, 0.7, 0.6));
-  EXPECT_TRUE(cylinderVis->GetEmissive() ==
-      common::Color(0.9, 0.8, 0.7, 0.6));
+  {
+    common::Color color(0.1, 0.2, 0.3, 0.4);
+    cylinderVis->SetAmbient(color);
+    EXPECT_EQ(cylinderVis->GetAmbient(), color);
+  }
+  {
+    common::Color color(1.0, 1.0, 1.0, 1.0);
+    cylinderVis->SetDiffuse(color);
+    EXPECT_EQ(cylinderVis->GetDiffuse(), color);
+  }
+  {
+    common::Color color(0.5, 0.6, 0.4, 0.0);
+    cylinderVis->SetSpecular(color);
+    EXPECT_EQ(cylinderVis->GetSpecular(), color);
+  }
+  {
+    common::Color color(0.9, 0.8, 0.7, 0.6);
+    cylinderVis->SetEmissive(color);
+    EXPECT_EQ(cylinderVis->GetEmissive(), color);
+  }
 
-  cylinderVis2->SetAmbient(common::Color(0.0, 0.0, 0.0, 0.0));
-  EXPECT_TRUE(cylinderVis2->GetAmbient() ==
-      common::Color(0.0, 0.0, 0.0, 0.0));
-  cylinderVis2->SetDiffuse(common::Color(1.0, 1.0, 1.0, 1.0));
-  EXPECT_TRUE(cylinderVis2->GetDiffuse() ==
-      common::Color(1.0, 1.0, 1.0, 1.0));
+  {
+    common::Color color(0.0, 0.0, 0.0, 0.0);
+    cylinderVis2->SetAmbient(color);
+    EXPECT_EQ(cylinderVis2->GetAmbient(), color);
+  }
+  {
+    common::Color color(1.0, 1.0, 1.0, 1.0);
+    cylinderVis2->SetDiffuse(color);
+    EXPECT_EQ(cylinderVis2->GetDiffuse(), color);
+  }
   // test with color values that are out of range but should still work,
   // rendering engine should clamp the values internally
-  cylinderVis2->SetSpecular(common::Color(5.0, 5.0, 5.5, 5.1));
-  EXPECT_TRUE(cylinderVis2->GetSpecular() ==
-      common::Color(5.0, 5.0, 5.5, 5.1));
-  cylinderVis2->SetEmissive(common::Color(-5.0, -5.0, -5.5, -5.1));
-  EXPECT_TRUE(cylinderVis2->GetEmissive() ==
-      common::Color(-5.0, -5.0, -5.5, -5.1));
+  {
+    common::Color color(5.0, 5.0, 5.5, 5.1);
+    cylinderVis2->SetSpecular(color);
+    EXPECT_EQ(cylinderVis2->GetSpecular(), color);
+  }
+  {
+    common::Color color(-5.0, -5.0, -5.5, -5.1);
+    cylinderVis2->SetEmissive(color);
+    EXPECT_EQ(cylinderVis2->GetEmissive(), color);
+  }
 }
 
 /////////////////////////////////////////////////
