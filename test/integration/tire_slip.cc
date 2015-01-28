@@ -16,6 +16,8 @@
 */
 #include "test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/physics/ode/ODESurfaceParams.hh"
+#include "gazebo/physics/ode/ODETypes.hh"
 
 using namespace gazebo;
 
@@ -60,10 +62,16 @@ TEST_F(TireSlipTest, Logitudinal)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+
+  math::Vector3 g = physics->GetGravity();
+
   physics::ModelPtr wheelModel = world->GetModel("tire");
   ASSERT_TRUE(wheelModel != NULL);
 
   double wheelRadius = 0.0;
+  double wheelStiffness = 0.0;
   {
     physics::LinkPtr wheelLink = wheelModel->GetLink("wheel");
     ASSERT_TRUE(wheelLink != NULL);
@@ -87,13 +95,29 @@ TEST_F(TireSlipTest, Logitudinal)
         static_cast<physics::SphereShape*>(shape.get());
       wheelRadius = sph->GetRadius();
     }
+
+    physics::ODESurfaceParamsPtr surface =
+      boost::dynamic_pointer_cast<physics::ODESurfaceParams>(
+        wheelCollision->GetSurface());
+    ASSERT_TRUE(surface != NULL);
+    wheelStiffness = surface->kp;
   }
 
-  physics::ModelPtr drumModel = world->GetModel("drum");
-  ASSERT_TRUE(drumModel != NULL);
+  double modelMass = 0.0;
+  {
+    physics::Link_V links = wheelModel->GetLinks();
+    for (physics::Link_V::iterator iter = links.begin();
+         iter != links.end(); ++iter)
+    {
+      modelMass += (*iter)->GetInertial()->GetMass();
+    }
+  }
 
   double drumRadius = 0.0;
   {
+    physics::ModelPtr drumModel = world->GetModel("drum");
+    ASSERT_TRUE(drumModel != NULL);
+
     physics::LinkPtr drumLink = drumModel->GetLink("link");
     ASSERT_TRUE(drumLink != NULL);
 
@@ -111,8 +135,11 @@ TEST_F(TireSlipTest, Logitudinal)
   this->steerJoint =  wheelModel->GetJoint("steer");
   ASSERT_TRUE(this->steerJoint != NULL);
 
-  physics::JointPtr worldUprightJoint =  wheelModel->GetJoint("world_upright");
-  ASSERT_TRUE(worldUprightJoint != NULL);
+  // Measure certain quantities
+  math::SignalMaxAbsoluteValue statsDrumSpeed;
+  math::SignalMaxAbsoluteValue statsNormalForce;
+  math::SignalMaxAbsoluteValue statsSteer;
+  math::SignalMaxAbsoluteValue statsWheelSpeed;
 
   // speed in miles / hour, convert to rad/s
   const double wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
@@ -123,13 +150,16 @@ TEST_F(TireSlipTest, Logitudinal)
 
   this->SetCommands(wheelSpeed, drumSpeed, suspForce, steer);
   common::Time::MSleep(100);
+  world->Step(50);
 
-  for (int i = 0; i < 10000; ++i)
+  for (int i = 0; i < 10e3; ++i)
   {
-    world->Step(10);
+    world->Step(1);
+    statsSteer.InsertData((this->steerJoint->GetAngle(0) - steer).Radian());
     std::cout << "I[" << i << "] Torque[" << sensor->GetTorque()
               << "] Force[" << sensor->GetForce() << "]\n";
   }
+  EXPECT_LT(statsSteer.Value(), 1e-2);
 }
 
 /////////////////////////////////////////////////
