@@ -37,7 +37,8 @@ std::string GetVisualSDFString(const std::string &_name,
     bool _lighting = true,
     const common::Color &_ambient = common::Color::White,
     const common::Color &_diffuse = common::Color::White,
-    const common::Color &_specular = common::Color::White)
+    const common::Color &_specular = common::Color::White,
+    const common::Color &_emissive = common::Color::White)
 {
   std::stringstream visualString;
   visualString
@@ -78,6 +79,7 @@ std::string GetVisualSDFString(const std::string &_name,
       << "      <ambient>" << _ambient << "</ambient>"
       << "      <diffuse>" << _diffuse << "</diffuse>"
       << "      <specular>" << _specular << "</specular>"
+      << "      <emissive>" << _emissive << "</emissive>"
       << "    </material>"
       << "    <transparency>" << _transparency << "</transparency>"
       << "    <cast_shadows>" << _castShadows << "</cast_shadows>"
@@ -162,7 +164,7 @@ TEST_F(Visual_TEST, GetGeometryType)
   gazebo::rendering::VisualPtr boxVis(
       new gazebo::rendering::Visual("box_visual", scene));
   boxVis->Load(boxSDF);
-  EXPECT_TRUE(boxVis->GetGeometryType() == "box");
+  EXPECT_EQ(boxVis->GetGeometryType(), "box");
 
   // sphere geom
   sdf::ElementPtr sphereSDF(new sdf::Element);
@@ -171,16 +173,17 @@ TEST_F(Visual_TEST, GetGeometryType)
   gazebo::rendering::VisualPtr sphereVis(
       new gazebo::rendering::Visual("sphere_visual", scene));
   sphereVis->Load(sphereSDF);
-  EXPECT_TRUE(sphereVis->GetGeometryType() == "sphere");
+  EXPECT_EQ(sphereVis->GetGeometryType(), "sphere");
 
   // cylinder geom
   sdf::ElementPtr cylinderSDF(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF);
-  sdf::readString(GetVisualSDFString("visual_cylinder", "cylinder"), cylinderSDF);
+  sdf::readString(GetVisualSDFString("visual_cylinder", "cylinder"),
+      cylinderSDF);
   gazebo::rendering::VisualPtr cylinderVis(
       new gazebo::rendering::Visual("cylinder_visual", scene));
   cylinderVis->Load(cylinderSDF);
-  EXPECT_TRUE(cylinderVis->GetGeometryType() == "cylinder");
+  EXPECT_EQ(cylinderVis->GetGeometryType(), "cylinder");
 }
 
 /////////////////////////////////////////////////
@@ -283,9 +286,9 @@ TEST_F(Visual_TEST, Material)
 
   // test changing to use non-unique materials
   boxVis->SetMaterial("Gazebo/Yellow", false);
-  EXPECT_TRUE(boxVis->GetMaterialName() == "Gazebo/Yellow");
+  EXPECT_EQ(boxVis->GetMaterialName(), "Gazebo/Yellow");
   boxVis2->SetMaterial("Gazebo/OrangeTransparent", false);
-  EXPECT_TRUE(boxVis2->GetMaterialName() == "Gazebo/OrangeTransparent");
+  EXPECT_EQ(boxVis2->GetMaterialName(), "Gazebo/OrangeTransparent");
 }
 
 /////////////////////////////////////////////////
@@ -333,27 +336,29 @@ TEST_F(Visual_TEST, Color)
   sdf::initFile("visual.sdf", cylinderSDF);
   sdf::readString(GetVisualSDFString("visual_cylinder_black", "cylinder",
       gazebo::math::Pose::Zero, 0, true, "Gazebo/Grey", true,
-      common::Color::Black, common::Color::Black, common::Color::Black),
-      cylinderSDF);
+      common::Color::Black, common::Color::Black, common::Color::Black,
+      common::Color::Black), cylinderSDF);
   gazebo::rendering::VisualPtr cylinderVis(
       new gazebo::rendering::Visual("cylinder_visual", scene));
   cylinderVis->Load(cylinderSDF);
   EXPECT_TRUE(cylinderVis->GetAmbient() == common::Color::Black);
   EXPECT_TRUE(cylinderVis->GetDiffuse() == common::Color::Black);
   EXPECT_TRUE(cylinderVis->GetSpecular() == common::Color::Black);
+  EXPECT_TRUE(cylinderVis->GetEmissive() == common::Color::Black);
 
   sdf::ElementPtr cylinderSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF2);
   sdf::readString(GetVisualSDFString("visual_cylinder_black", "cylinder",
       gazebo::math::Pose::Zero, 0, true, "Gazebo/Grey", true,
-      common::Color::Green, common::Color::Blue, common::Color::Red),
-      cylinderSDF2);
+      common::Color::Green, common::Color::Blue, common::Color::Red,
+      common::Color::Yellow), cylinderSDF2);
   gazebo::rendering::VisualPtr cylinderVis2(
       new gazebo::rendering::Visual("cylinder_visual2", scene));
   cylinderVis2->Load(cylinderSDF2);
   EXPECT_TRUE(cylinderVis2->GetAmbient() == common::Color::Green);
   EXPECT_TRUE(cylinderVis2->GetDiffuse() == common::Color::Blue);
   EXPECT_TRUE(cylinderVis2->GetSpecular() == common::Color::Red);
+  EXPECT_TRUE(cylinderVis2->GetEmissive() == common::Color::Yellow);
 
   // test changing ambient/diffuse/specular colors
   cylinderVis->SetAmbient(common::Color(0.1, 0.2, 0.3, 0.4));
@@ -365,6 +370,9 @@ TEST_F(Visual_TEST, Color)
   cylinderVis->SetSpecular(common::Color(0.5, 0.6, 0.4, 0.0));
   EXPECT_TRUE(cylinderVis->GetSpecular() ==
       common::Color(0.5, 0.6, 0.4, 0.0));
+  cylinderVis->SetEmissive(common::Color(0.9, 0.8, 0.7, 0.6));
+  EXPECT_TRUE(cylinderVis->GetEmissive() ==
+      common::Color(0.9, 0.8, 0.7, 0.6));
 
   cylinderVis2->SetAmbient(common::Color(0.0, 0.0, 0.0, 0.0));
   EXPECT_TRUE(cylinderVis2->GetAmbient() ==
@@ -372,11 +380,14 @@ TEST_F(Visual_TEST, Color)
   cylinderVis2->SetDiffuse(common::Color(1.0, 1.0, 1.0, 1.0));
   EXPECT_TRUE(cylinderVis2->GetDiffuse() ==
       common::Color(1.0, 1.0, 1.0, 1.0));
-  // test with color values that are out of range but should still work
+  // test with color values that are out of range but should still work,
   // rendering engine should clamp the values internally
   cylinderVis2->SetSpecular(common::Color(5.0, 5.0, 5.5, 5.1));
   EXPECT_TRUE(cylinderVis2->GetSpecular() ==
       common::Color(5.0, 5.0, 5.5, 5.1));
+  cylinderVis2->SetEmissive(common::Color(-5.0, -5.0, -5.5, -5.1));
+  EXPECT_TRUE(cylinderVis2->GetEmissive() ==
+      common::Color(-5.0, -5.0, -5.5, -5.1));
 }
 
 /////////////////////////////////////////////////

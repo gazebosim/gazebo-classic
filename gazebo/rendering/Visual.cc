@@ -565,16 +565,16 @@ void Visual::Load()
 
       if (!matName.empty())
         this->SetMaterial(matName);
-
-      if (matElem->HasElement("ambient"))
-        this->SetAmbient(matElem->Get<common::Color>("ambient"));
-      if (matElem->HasElement("diffuse"))
-        this->SetDiffuse(matElem->Get<common::Color>("diffuse"));
-      if (matElem->HasElement("specular"))
-        this->SetSpecular(matElem->Get<common::Color>("specular"));
-      if (matElem->HasElement("emissive"))
-        this->SetEmissive(matElem->Get<common::Color>("emissive"));
     }
+
+    if (matElem->HasElement("ambient"))
+      this->SetAmbient(matElem->Get<common::Color>("ambient"));
+    if (matElem->HasElement("diffuse"))
+      this->SetDiffuse(matElem->Get<common::Color>("diffuse"));
+    if (matElem->HasElement("specular"))
+      this->SetSpecular(matElem->Get<common::Color>("specular"));
+    if (matElem->HasElement("emissive"))
+      this->SetEmissive(matElem->Get<common::Color>("emissive"));
 
     if (matElem->HasElement("lighting"))
     {
@@ -864,7 +864,6 @@ void Visual::UpdateGeomSize(const math::Vector3 &_scale)
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
-
 }
 
 //////////////////////////////////////////////////
@@ -944,6 +943,9 @@ void Visual::SetLighting(bool _lighting)
   {
     (*iter)->SetLighting(this->dataPtr->lighting);
   }
+
+  // only set the sdf element if this is a visual sdf element or it has
+  // a geometry attached. Verify by checking if it has a geometry child element.
 
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("lighting")->Set(this->dataPtr->lighting);
@@ -1144,6 +1146,7 @@ void Visual::SetAmbient(const common::Color &_color)
   }
 
   this->dataPtr->ambient = _color;
+
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("ambient")->Set(_color);
 }
@@ -1206,6 +1209,7 @@ void Visual::SetDiffuse(const common::Color &_color)
   }
 
   this->dataPtr->diffuse = _color;
+
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("diffuse")->Set(_color);
 }
@@ -1266,8 +1270,60 @@ void Visual::SetSpecular(const common::Color &_color)
   }
 
   this->dataPtr->specular = _color;
+
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("specular")->Set(_color);
+}
+
+//////////////////////////////////////////////////
+void Visual::SetEmissive(const common::Color &_color)
+{
+  for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
+      i++)
+  {
+    Ogre::Entity *entity = NULL;
+    Ogre::MovableObject *obj = this->dataPtr->sceneNode->getAttachedObject(i);
+
+    entity = dynamic_cast<Ogre::Entity*>(obj);
+
+    if (!entity)
+      continue;
+
+    // For each ogre::entity
+    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
+    {
+      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
+      Ogre::MaterialPtr material = subEntity->getMaterial();
+
+      unsigned int techniqueCount, passCount;
+      Ogre::Technique *technique;
+      Ogre::Pass *pass;
+      Ogre::ColourValue dc;
+
+      for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
+          techniqueCount++)
+      {
+        technique = material->getTechnique(techniqueCount);
+
+        for (passCount = 0; passCount < technique->getNumPasses();
+            passCount++)
+        {
+          pass = technique->getPass(passCount);
+          pass->setSelfIllumination(Conversions::Convert(_color));
+        }
+      }
+    }
+  }
+
+  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
+  {
+    this->dataPtr->children[i]->SetEmissive(_color);
+  }
+
+  this->dataPtr->emissive = _color;
+
+  this->dataPtr->sdf->GetElement("material")
+      ->GetElement("emissive")->Set(_color);
 }
 
 /////////////////////////////////////////////////
@@ -1286,6 +1342,12 @@ common::Color Visual::GetDiffuse() const
 common::Color Visual::GetSpecular() const
 {
   return this->dataPtr->specular;
+}
+
+/////////////////////////////////////////////////
+common::Color Visual::GetEmissive() const
+{
+  return this->dataPtr->emissive;
 }
 
 /////////////////////////////////////////////////
@@ -1509,55 +1571,6 @@ bool Visual::GetHighlighted() const
     return this->dataPtr->boundingBox->GetVisible();
   }
   return false;
-}
-
-//////////////////////////////////////////////////
-void Visual::SetEmissive(const common::Color &_color)
-{
-  for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
-      i++)
-  {
-    Ogre::Entity *entity = NULL;
-    Ogre::MovableObject *obj = this->dataPtr->sceneNode->getAttachedObject(i);
-
-    entity = dynamic_cast<Ogre::Entity*>(obj);
-
-    if (!entity)
-      continue;
-
-    // For each ogre::entity
-    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
-    {
-      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
-      Ogre::MaterialPtr material = subEntity->getMaterial();
-
-      unsigned int techniqueCount, passCount;
-      Ogre::Technique *technique;
-      Ogre::Pass *pass;
-      Ogre::ColourValue dc;
-
-      for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-          techniqueCount++)
-      {
-        technique = material->getTechnique(techniqueCount);
-
-        for (passCount = 0; passCount < technique->getNumPasses();
-            passCount++)
-        {
-          pass = technique->getPass(passCount);
-          pass->setSelfIllumination(Conversions::Convert(_color));
-        }
-      }
-    }
-  }
-
-  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
-  {
-    this->dataPtr->children[i]->SetEmissive(_color);
-  }
-
-  this->dataPtr->sdf->GetElement("material")
-      ->GetElement("emissive")->Set(_color);
 }
 
 //////////////////////////////////////////////////
@@ -2302,7 +2315,6 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
     else if (_msg->geometry().type() == msgs::Geometry::PLANE)
     {
-      geomScale.x = geomScale.y = 1.0;
       if (_msg->geometry().plane().has_size())
       {
         geomScale.x = _msg->geometry().plane().size().x();
@@ -2321,13 +2333,12 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     {
       if (_msg->geometry().mesh().has_scale())
         geomScale = msgs::Convert(_msg->geometry().mesh().scale());
-      else
-        geomScale.x = geomScale.y = geomScale.z = 1.0;
     }
-    else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
-      geomScale.x = geomScale.y = geomScale.z = 1.0;
-    else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
-      geomScale.x = geomScale.y = geomScale.z = 1.0;
+    else if (_msg->geometry().type() == msgs::Geometry::EMPTY ||
+        _msg->geometry().type() == msgs::Geometry::POLYLINE)
+    {
+      // do nothing for now - keep unit scale.
+    }
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 

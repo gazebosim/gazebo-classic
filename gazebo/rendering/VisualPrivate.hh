@@ -157,6 +157,9 @@ namespace gazebo
 
       /// \brief Specular color of the viusal.
       public: common::Color specular;
+
+      /// \brief Emissive color of the viusal.
+      public: common::Color emissive;
     };
     /// \}
   }

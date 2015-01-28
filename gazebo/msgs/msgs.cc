@@ -403,6 +403,12 @@ namespace gazebo
       {
         result = msgs::Geometry::POLYLINE;
       }
+      else
+      {
+        gzwarn << "Geometry: '" << _str << "' is not recognized, "
+            << " returning type as msgs::Geometry::BOX." << std::endl;
+      }
+
       return result;
     }
 
