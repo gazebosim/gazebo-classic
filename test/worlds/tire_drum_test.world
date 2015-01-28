@@ -6,36 +6,48 @@
       <uri>model://sun</uri>
     </include>
 
+    
     <model name="tire">
-      <pose>0 0 0.5 0 0 0</pose>
+      <pose>0 0 0.5  0 0 0.261799388</pose>
 
       <link name="wheel">
+        <pose>0 0 0  1.5707963267948966 0 0</pose>
         <inertial>
           <mass>2.5</mass>
           <inertia>
-            <ixx>0.208333</ixx>
+            <ixx>0.20833333333333331</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.208333</iyy>
+            <iyy>0.20833333333333331</iyy>
             <iyz>0</iyz>
             <izz>0.3125</izz>
           </inertia>
         </inertial>
-        <pose>0 0 0 1.57 0 0</pose>
         <collision name="collision">
           <geometry>
+            <!--
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+            -->
             <cylinder>
               <radius>0.5</radius>
               <length>0.5</length>
             </cylinder>
           </geometry>
           <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.005</min_depth>
+                <kp>250e3</kp>
+                <kd>5</kd>
+              </ode>
+            </contact>
             <friction>
               <ode>
                 <mu>0.9</mu>
                 <mu2>0.9</mu2>
-                <slip1>0.3</slip1>
-                <slip2>0.1</slip2>
               </ode>
             </friction>
           </surface>
@@ -120,7 +132,6 @@
           </inertia>
         </inertial>
 
-
         <collision name="collision">
           <geometry>
             <box>
@@ -152,30 +163,30 @@
         <sensor name="force_torque" type="force_torque">
           <always_on>true</always_on>
           <visualize>true</visualize>
-          <update_rate>30</update_rate>
+          <update_rate>1</update_rate>
         </sensor>
       </joint>
 
-      <joint type="revolute" name="upright_axel">
+      <joint type="revolute" name="steer">
         <parent>upright</parent>
         <child>axel</child>
         <axis>
-          <xyz>1 0 0</xyz>
+          <xyz>0 1 0</xyz>
           <limit>
-            <upper>0.75</upper>
-            <lower>-0.75</lower>
+            <upper>0</upper>
+            <lower>-0</lower>
           </limit>
         </axis>
       </joint>
 
-      <joint type="revolute" name="world_upright">
+      <joint type="prismatic" name="world_upright">
         <parent>world</parent>
         <child>upright</child>
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
-            <upper>1.5707</upper>
-            <lower>-1.5707</lower>
+            <upper>0.1</upper>
+            <lower>-0.1</lower>
           </limit>
         </axis>
       </joint>
@@ -187,36 +198,40 @@
     </model>
 
 
+    
     <model name="drum">
-      <pose>0 0 -4.0 1.57079632679 0 0</pose>
+      <pose>0 0 -4.0  1.5707963267948966 0 0</pose>
 
       <link name="link">
         <inertial>
           <mass>10</mass>
           <inertia>
-            <ixx>43.3333</ixx>
+            <ixx>43.33333333333333</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>43.3333</iyy>
+            <iyy>43.33333333333333</iyy>
             <iyz>0</iyz>
             <izz>80.0</izz>
           </inertia>
         </inertial>
-
         <collision name="collision">
           <geometry>
             <cylinder>
-              <radius>4</radius>
-              <length>2</length>
+              <radius>4.0</radius>
+              <length>2.0</length>
             </cylinder>
           </geometry>
           <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.04</min_depth>
+              </ode>
+            </contact>
             <friction>
               <ode>
                 <mu>0.9</mu>
                 <mu2>0.9</mu2>
-                <slip1>0.3</slip1>
-                <slip2>0.1</slip2>
               </ode>
             </friction>
           </surface>
@@ -225,16 +240,15 @@
         <visual name="visual">
           <geometry>
             <cylinder>
-              <radius>4</radius>
-              <length>2</length>
+              <radius>4.0</radius>
+              <length>2.0</length>
             </cylinder>
           </geometry>
           <material>
-            <script>
-              <name>Gazebo/Orange</name>
-            </script>
+            <script><name>Gazebo/Orange</name></script>
           </material>
         </visual>
+
         <visual name='block0'>
           <pose>0.0 4.0 1 0 0 0</pose>
           <geometry>

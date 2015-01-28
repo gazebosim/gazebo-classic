@@ -47,7 +47,7 @@ TEST_F(TireSlipTest, Logitudinal)
   const double metersPerMile = 1609.34;
   const double secondsPerHour = 3600.0;
 
-  Load("worlds/tire_drum_steer_15_test.world", true);
+  Load("worlds/tire_drum_test.world", true);
 
   // joint command publishers
   this->tireJointCmdPub = node->Advertise<msgs::JointCmd>("~/tire/joint_cmd");
