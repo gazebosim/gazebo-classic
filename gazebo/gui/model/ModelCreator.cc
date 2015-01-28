@@ -981,6 +981,12 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       g_copyAct->setEnabled(!this->selectedVisuals.empty());
       g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
 
+      if (this->manipMode == "translate" || this->manipMode == "rotate" ||
+          this->manipMode == "scale")
+      {
+        this->OnManipMode(this->manipMode);
+      }
+
       return true;
     }
     // Not part
