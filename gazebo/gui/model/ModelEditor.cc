@@ -57,7 +57,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
 
   this->saveAsAct = new QAction(tr("&Save As"), this->mainWindow);
   this->saveAsAct->setStatusTip(tr("Save As"));
-  this->saveAsAct->setShortcut(tr("Ctrl+SHIFT+S"));
+  this->saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
   this->saveAsAct->setCheckable(false);
   connect(this->saveAsAct, SIGNAL(triggered()), this, SLOT(SaveAs()));
 

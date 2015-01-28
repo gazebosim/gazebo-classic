@@ -370,10 +370,10 @@ namespace gazebo
       /// \brief Current model manipulation mode.
       private: std::string manipMode;
 
-      /// \brief Default name of model model
+      /// \brief Default name of the model.
       private: static const std::string modelDefaultName;
 
-      /// \brief A dialog for setting model model name and save location.
+      /// \brief A dialog with options to save the model.
       private: SaveDialog *saveDialog;
 
       /// \brief Store the current save state of the model.

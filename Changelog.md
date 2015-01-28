@@ -2,6 +2,9 @@
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
 
+    1. Saving, exiting, generalizing SaveDialog.
+        * [Pull request #1401](https://bitbucket.org/osrf/gazebo/pull-request/1401)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.0.0
