@@ -234,11 +234,13 @@ TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
   EXPECT_TRUE(math::equal(1.0, v.d));
 }
 
+//////////////////////////////////////////////////
 void CompareMsgsJointTypeToString(const msgs::Joint::Type _type)
 {
   EXPECT_EQ(_type, msgs::ConvertJointType(msgs::ConvertJointType(_type)));
 }
 
+//////////////////////////////////////////////////
 TEST_F(MsgsTest, ConvertMsgsJointTypeToString)
 {
   CompareMsgsJointTypeToString(msgs::Joint::REVOLUTE);
@@ -250,25 +252,23 @@ TEST_F(MsgsTest, ConvertMsgsJointTypeToString)
   CompareMsgsJointTypeToString(msgs::Joint::GEARBOX);
 }
 
+//////////////////////////////////////////////////
+void CompareMsgsGeometryTypeToString(const msgs::Geometry::Type _type)
+{
+  EXPECT_EQ(_type, msgs::ConvertGeometryType(msgs::ConvertGeometryType(_type)));
+}
+
+//////////////////////////////////////////////////
 TEST_F(MsgsTest, ConvertMsgsGeometryTypeToString)
 {
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::BOX), "box");
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::SPHERE), "sphere");
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::CYLINDER), "cylinder");
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::PLANE), "plane");
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::IMAGE), "image");
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::HEIGHTMAP), "heightmap");
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::MESH), "mesh");
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::POLYLINE), "polyline");
-
-  EXPECT_EQ(msgs::ConvertGeometryType("box"), msgs::Geometry::BOX);
-  EXPECT_EQ(msgs::ConvertGeometryType("sphere"), msgs::Geometry::SPHERE);
-  EXPECT_EQ(msgs::ConvertGeometryType("cylinder"), msgs::Geometry::CYLINDER);
-  EXPECT_EQ(msgs::ConvertGeometryType("plane"), msgs::Geometry::PLANE);
-  EXPECT_EQ(msgs::ConvertGeometryType("image"), msgs::Geometry::IMAGE);
-  EXPECT_EQ(msgs::ConvertGeometryType("heightmap"), msgs::Geometry::HEIGHTMAP);
-  EXPECT_EQ(msgs::ConvertGeometryType("mesh"), msgs::Geometry::MESH);
-  EXPECT_EQ(msgs::ConvertGeometryType("polyline"), msgs::Geometry::POLYLINE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::BOX);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::SPHERE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::CYLINDER);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::PLANE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::IMAGE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::HEIGHTMAP);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::MESH);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::POLYLINE);
 }
 
 TEST_F(MsgsTest, SetVector3)
