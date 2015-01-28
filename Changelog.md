@@ -87,7 +87,7 @@
 
 1. Enable simbody joint tests, implement `SimbodyJoint::GetParam`, create
    `Joint::GetParam`, fix bug in `BulletHingeJoint::SetParam`.
-    * [Pull request #1373](https://bitbucket.org/osrf/gazebo/pull-request/1373/)
+    * [Pull request #1404](https://bitbucket.org/osrf/gazebo/pull-request/1404/)
 
 1. Building editor updates
     1. Fixed inspector resizing.
