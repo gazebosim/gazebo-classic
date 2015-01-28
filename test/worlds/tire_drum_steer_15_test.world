@@ -132,7 +132,6 @@
           </inertia>
         </inertial>
 
-
         <collision name="collision">
           <geometry>
             <box>
@@ -164,7 +163,7 @@
         <sensor name="force_torque" type="force_torque">
           <always_on>true</always_on>
           <visualize>true</visualize>
-          <update_rate>30</update_rate>
+          <update_rate>1</update_rate>
         </sensor>
       </joint>
 
