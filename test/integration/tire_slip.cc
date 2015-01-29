@@ -37,6 +37,12 @@ class TireSlipTest : public ServerFixture
   /// \brief Publisher of joint commands for the drum model.
   protected: transport::PublisherPtr drumJointCmdPub;
 
+  /// \brief Joint pointer for drum spin joint.
+  protected: physics::JointPtr drumJoint;
+
+  /// \brief Joint pointer for spin joint.
+  protected: physics::JointPtr spinJoint;
+
   /// \brief Joint pointer for steering joint.
   protected: physics::JointPtr steerJoint;
 };
@@ -121,6 +127,9 @@ TEST_F(TireSlipTest, Logitudinal)
     physics::ModelPtr drumModel = world->GetModel("drum");
     ASSERT_TRUE(drumModel != NULL);
 
+    this->drumJoint =  drumModel->GetJoint("joint");
+    ASSERT_TRUE(this->drumJoint != NULL);
+
     physics::LinkPtr drumLink = drumModel->GetLink("link");
     ASSERT_TRUE(drumLink != NULL);
 
@@ -134,6 +143,9 @@ TEST_F(TireSlipTest, Logitudinal)
       static_cast<physics::CylinderShape*>(shape.get());
     drumRadius = cyl->GetRadius();
   }
+
+  this->spinJoint =  wheelModel->GetJoint("axel_wheel");
+  ASSERT_TRUE(this->spinJoint != NULL);
 
   this->steerJoint =  wheelModel->GetJoint("steer");
   ASSERT_TRUE(this->steerJoint != NULL);
@@ -159,11 +171,13 @@ TEST_F(TireSlipTest, Logitudinal)
   for (int i = 0; i < 1e3; ++i)
   {
     world->Step(1);
+    statsDrumSpeed.InsertData(drumJoint->GetVelocity(0) - drumSpeed);
     statsHeight.InsertData(wheelLink->GetWorldPose().pos.z
       - (wheelRadius - suspForce / wheelStiffness));
     statsSteer.InsertData((this->steerJoint->GetAngle(0) - steer).Radian());
     statsVerticalForce.InsertData(
       sensor->GetForce().z - (suspForce - (modelMass-wheelMass) * g.z));
+    statsWheelSpeed.InsertData(spinJoint->GetVelocity(0) - wheelSpeed);
   }
   EXPECT_LT(statsHeight.Value(), 1e-3);
   EXPECT_LT(statsSteer.Value(), 1e-2);
