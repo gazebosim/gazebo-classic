@@ -104,6 +104,7 @@ Link::~Link()
 
   this->requestPub.reset();
   this->dataPub.reset();
+  this->wrenchSub.reset();
   this->connections.clear();
 
   delete this->publishDataMutex;
@@ -216,6 +217,9 @@ void Link::Load(sdf::ElementPtr _sdf)
   if (needUpdate)
     this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
           boost::bind(&Link::Update, this, _1)));
+
+  this->wrenchSub = this->node->Subscribe("~/wrench",
+      &Link::OnWrenchMsg, this);
 }
 
 //////////////////////////////////////////////////
@@ -1325,4 +1329,20 @@ msgs::Visual Link::GetVisualMessage(const std::string &_name) const
     result = iter->second;
 
   return result;
+}
+
+//////////////////////////////////////////////////
+void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
+{
+  if (_msg->has_force())
+  {
+    const math::Vector3 force = _msg->force();
+    std::cout << force.x << "  " << force.y << "  " << force.z << std::endl;
+  }
+
+//  if (_msg->name() == this->GetScopedName())
+//  {
+//    math::Pose p = msgs::Convert(*_msg);
+//    this->SetWorldPose(p);
+//  }
 }

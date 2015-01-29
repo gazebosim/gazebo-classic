@@ -550,6 +550,10 @@ namespace gazebo
       /// \brief Update visual SDFs.
       private: void UpdateVisualSDF();
 
+      /// \brief Called when a new wrench message arrives.
+      /// \param[in] _msg The message to set the wrench from.
+      private: void OnWrenchMsg(ConstWrenchPtr &_msg);
+
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
 
@@ -607,6 +611,9 @@ namespace gazebo
 
       /// \brief Cached list of collisions. This is here for performance.
       private: Collision_V collisions;
+
+      /// \brief Wrench subscriber.
+      private: transport::SubscriberPtr wrenchSub;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources
