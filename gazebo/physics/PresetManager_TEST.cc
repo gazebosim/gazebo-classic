@@ -145,25 +145,45 @@ TEST_F(PresetManagerTest, SetCurrentProfile)
   EXPECT_NEAR(boost::any_cast<float>(physicsEngine->GetParam("erp")), 0.06, 1e-4);
   EXPECT_NEAR(boost::any_cast<float>(physicsEngine->GetParam("contact_max_correcting_vel")), 400, 1e-4);
   EXPECT_NEAR(boost::any_cast<float>(physicsEngine->GetParam("contact_surface_layer")), 0.004, 1e-4);
-  //EXPECT_NEAR(boost::any_cast<float>(physicsEngine->GetSORPGSW(), 1.5, 1e-4);  // ????
   EXPECT_NEAR(boost::any_cast<float>(physicsEngine->GetParam("sor")), 1.5, 1e-4);  // ????
   EXPECT_NEAR(boost::any_cast<float>(physicsEngine->GetParam("min_step_size")), 0.002, 1e-4);
   EXPECT_FALSE(boost::any_cast<bool>(physicsEngine->GetParam("inertia_ratio_reduction")));
 }
 
 /////////////////////////////////////////////////
-/*
 TEST_F(PresetManagerTest, CreateProfile)
 {
+  Load("test/worlds/presets.world", false, "ode");
+  physics::WorldPtr world = physics::get_world("default");
+
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+
+  physics::PresetManager *presetManager = world->GetPresetManager();
+  if (!presetManager)
+  {
+    FAIL();
+  }
+
+  // Create a new profile
+
 }
 
 /////////////////////////////////////////////////
 TEST_F(PresetManagerTest, CreateProfileFromSDF)
 {
-}*/
+  Load("test/worlds/presets.world", false, "ode");
+  physics::WorldPtr world = physics::get_world("default");
+
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+
+  physics::PresetManager *presetManager = world->GetPresetManager();
+  if (!presetManager)
+  {
+    FAIL();
+  }
+}
 
 /////////////////////////////////////////////////
-
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
