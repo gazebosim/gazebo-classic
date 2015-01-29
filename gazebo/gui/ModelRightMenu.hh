@@ -23,7 +23,7 @@
 
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/ApplyForceDialog.hh"
+#include "gazebo/gui/ApplyWrenchDialog.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
@@ -33,7 +33,6 @@ namespace gazebo
   namespace gui
   {
     class ViewState;
-//    class ApplyForceDialog;
 
     /// \class ModelRightMenu ModelRightMenu.hh gui/gui.hh
     /// \brief Displays a menu when the right mouse button has been pressed.
@@ -60,7 +59,7 @@ namespace gazebo
       private slots: void OnFollow();
 
       /// \brief QT callback when apply force has been selected.
-      private slots: void OnApplyForce();
+      private slots: void OnApplyWrench();
 
       /// \brief QT callback when delete has been selected.
       /// \param[in] _name Name of the model to delete.
@@ -96,10 +95,10 @@ namespace gazebo
       private: QAction *followAct;
 
       /// \brief Action for applying force and torque to a model.
-      private: QAction *applyForceAct;
+      private: QAction *applyWrenchAct;
 
       /// \brief TODO
-      private: ApplyForceDialog *applyForceDialog;
+      private: ApplyWrenchDialog *applyWrenchDialog;
 
       /// \brief Action for snapping an object to another object below the
       /// first.

@@ -19,6 +19,8 @@
 #define _APPLY_FORCE_DIALOG_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
@@ -28,18 +30,18 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class ApplyForceDialog ApplyForceDialog.hh gui/gui.hh
+    /// \class ApplyWrenchDialog ApplyWrenchDialog.hh gui/gui.hh
     /// \brief Dialog for applying force and torque to a model.
-    class GAZEBO_VISIBLE ApplyForceDialog : public QDialog
+    class GAZEBO_VISIBLE ApplyWrenchDialog : public QDialog
     {
       Q_OBJECT
 
       /// \brief Constructor.
       /// \param[in] _parent Parent QWidget.
-      public: ApplyForceDialog(QWidget *_parent = 0);
+      public: ApplyWrenchDialog(QWidget *_parent = 0);
 
       /// \brief Destructor.
-      public: ~ApplyForceDialog();
+      public: ~ApplyWrenchDialog();
 
       /// \brief Set model to be followed.
       /// \param[in] Model name.
@@ -83,9 +85,20 @@ namespace gazebo
       /// \param[in] _magnitude Torque vector Z component
       private slots: void OnTorqueZChanged(double _fZ);
 
+      /// \brief TODO
+      private: void SetTopic();
+
+      /// \brief TODO
+      private: std::string GetTopic() const;
+
+      /// \brief Node for communication.
+      private: transport::NodePtr node;
 
       /// TODO
       private: std::string modelName;
+
+      /// TODO
+      private: std::string topicName;
 
       /// TODO
       private: QLabel *messageLabel;
@@ -113,6 +126,15 @@ namespace gazebo
 
       /// TODO
       private: QDoubleSpinBox *torqueZSpin;
+
+      /// TODO
+      private: math::Vector3 forceVector;
+
+      /// TODO
+      private: math::Vector3 torqueVector;
+
+      /// \brief Publishes the wrench message.
+      private: transport::PublisherPtr wrenchPub;
     };
     /// \}
   }

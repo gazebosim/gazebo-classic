@@ -15,18 +15,23 @@
  *
 */
 
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Visual.hh"
+
 #include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/ApplyForceDialog.hh"
+#include "gazebo/gui/ApplyWrenchDialog.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-ApplyForceDialog::ApplyForceDialog(QWidget *_parent) : QDialog(_parent)
+ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
 {
-  this->setObjectName("ApplyForceDialog");
+  this->setObjectName("ApplyWrenchDialog");
 
   this->setWindowTitle(tr("Apply Force and Torque"));
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
@@ -198,77 +203,122 @@ ApplyForceDialog::ApplyForceDialog(QWidget *_parent) : QDialog(_parent)
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
+
+  this->forceVector = math::Vector3::UnitX;
+  this->torqueVector = math::Vector3::UnitX;
+
+  this->node = transport::NodePtr(new transport::Node());
 }
 
 /////////////////////////////////////////////////
-ApplyForceDialog::~ApplyForceDialog()
+ApplyWrenchDialog::~ApplyWrenchDialog()
 {
+  this->node->Fini();
 }
 
 /////////////////////////////////////////////////
-void ApplyForceDialog::SetModel(std::string _modelName)
+void ApplyWrenchDialog::SetModel(std::string _modelName)
 {
   this->messageLabel->setText(
       tr("Apply Force and Torque")); // add model name
   this->modelName = _modelName;
+  this->SetTopic();
 }
 
 /////////////////////////////////////////////////
-void ApplyForceDialog::OnApply()
+void ApplyWrenchDialog::OnApply()
 {
-  // apply force and torque
+  // publish wrench msg
+  this->wrenchPub = this->node->Advertise<msgs::Wrench>(
+      this->GetTopic());
+
+  msgs::Wrench msg;
+  msgs::Set(msg.mutable_force(), this->forceVector);
+  msgs::Set(msg.mutable_torque(), this->torqueVector);
+
+  this->wrenchPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
-void ApplyForceDialog::OnCancel()
+void ApplyWrenchDialog::OnCancel()
 {
   this->reject();
 }
 
 /////////////////////////////////////////////////
-void ApplyForceDialog::OnForceMagChanged(double _magnitude)
+void ApplyWrenchDialog::OnForceMagChanged(double /*_magnitude*/)
 {
   // update visual
 }
 
 /////////////////////////////////////////////////
-void ApplyForceDialog::OnForceXChanged(double _fX)
+void ApplyWrenchDialog::OnForceXChanged(double /*_fX*/)
 {
   // update visual
 }
 
 /////////////////////////////////////////////////
-void ApplyForceDialog::OnForceYChanged(double _fY)
+void ApplyWrenchDialog::OnForceYChanged(double /*_fY*/)
 {
   // update visual
 }
 
 /////////////////////////////////////////////////
-void ApplyForceDialog::OnForceZChanged(double _fZ)
+void ApplyWrenchDialog::OnForceZChanged(double /*_fZ*/)
 {
   // update visual
 }
 
 /////////////////////////////////////////////////
-void ApplyForceDialog::OnTorqueMagChanged(double _magnitude)
+void ApplyWrenchDialog::OnTorqueMagChanged(double /*_magnitude*/)
 {
   // update visual
 }
 
 /////////////////////////////////////////////////
-void ApplyForceDialog::OnTorqueXChanged(double _fX)
+void ApplyWrenchDialog::OnTorqueXChanged(double /*_fX*/)
 {
   // update visual
 }
 
 /////////////////////////////////////////////////
-void ApplyForceDialog::OnTorqueYChanged(double _fY)
+void ApplyWrenchDialog::OnTorqueYChanged(double /*_fY*/)
 {
   // update visual
 }
 
 /////////////////////////////////////////////////
-void ApplyForceDialog::OnTorqueZChanged(double _fZ)
+void ApplyWrenchDialog::OnTorqueZChanged(double /*_fZ*/)
 {
   // update visual
+}
+
+//////////////////////////////////////////////////
+void ApplyWrenchDialog::SetTopic()
+{
+  rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
+      GetVisual(this->modelName);
+
+  std::string linkName = this->modelName;
+  // If the visual is a model, get its canonical link
+  // For now getting the first link that comes up
+  if (vis && vis == vis->GetRootVisual())
+  {
+//    std::cout << vis->GetName() << std::endl;
+//    for (unsigned int i = 0; i < vis->GetChildCount(); ++i)
+//    {
+//      std::cout << "Child " << i << "  " << vis->GetChild(i)->GetName() << std::endl;
+//    }
+    linkName = vis->GetChild(0)->GetName();
+  }
+
+  this->topicName = "~/";
+  topicName += linkName + "/wrench";
+  boost::replace_all(topicName, "::", "/");
+}
+
+//////////////////////////////////////////////////
+std::string ApplyWrenchDialog::GetTopic() const
+{
+  return this->topicName;
 }
