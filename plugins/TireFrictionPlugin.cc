@@ -311,7 +311,7 @@ void TireFrictionPlugin::OnUpdate()
           << contactNormalForceSum
           << std::endl;
 
-   contactsNormalForceSum += contactNormalForceSum;
+    contactsNormalForceSum += contactNormalForceSum;
   }
   double friction = scaledFriction / contactsNormalForceSum;
 
