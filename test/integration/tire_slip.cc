@@ -37,6 +37,9 @@ class TireSlipTest : public ServerFixture
     {
     }
 
+    /// \brief Description to print during test loop.
+    std::string description;
+
     /// \brief Wheel spin speed in rad/s.
     double wheelSpeed;
 
@@ -141,10 +144,9 @@ TEST_F(TireSlipTest, Logitudinal)
   double modelMass = 0.0;
   {
     physics::Link_V links = wheelModel->GetLinks();
-    for (physics::Link_V::iterator iter = links.begin();
-         iter != links.end(); ++iter)
+    for (auto const & link : links)
     {
-      modelMass += (*iter)->GetInertial()->GetMass();
+      modelMass += link->GetInertial()->GetMass();
     }
   }
 
@@ -183,42 +185,94 @@ TEST_F(TireSlipTest, Logitudinal)
   math::SignalMaxAbsoluteValue statsSteer;
   math::SignalMaxAbsoluteValue statsWheelSpeed;
 
-  TireSlipState state;
-  // speed in miles / hour, convert to rad/s
-  state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
-  state.drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
-  state.suspForce = 1000.0;
-  state.steer.SetFromDegree(25.7);
-
-  this->SetCommands(state);
-  common::Time::MSleep(100);
-  world->Step(150);
-
-  for (int i = 0; i < 1e3; ++i)
+  std::vector<TireSlipState> states;
   {
-    world->Step(1);
-    statsDrumSpeed.InsertData(drumJoint->GetVelocity(0) - state.drumSpeed);
-    statsHeight.InsertData(wheelLink->GetWorldPose().pos.z
-      - (wheelRadius - state.suspForce / wheelStiffness));
-    statsSteer.InsertData(
-      (this->steerJoint->GetAngle(0) - state.steer).Radian());
-    statsVerticalForce.InsertData(
-      sensor->GetForce().z - (state.suspForce - (modelMass-wheelMass) * g.z));
-    statsWheelSpeed.InsertData(spinJoint->GetVelocity(0) - state.wheelSpeed);
+    TireSlipState state;
+    state.description = "Zero slip";
+    // speed in miles / hour, convert to rad/s
+    state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
+    state.drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
+    state.suspForce = 1000.0;
+    state.steer.SetFromDegree(0.0);
+    states.push_back(state);
   }
-  EXPECT_LT(statsHeight.Value(), 1e-3);
-  EXPECT_LT(statsSteer.Value(), 1e-2);
-  EXPECT_LT(statsVerticalForce.Value(), state.suspForce * 1e-2);
+  {
+    TireSlipState state;
+    state.description = "Lateral slip: low";
+    // speed in miles / hour, convert to rad/s
+    state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
+    state.drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
+    state.suspForce = 1000.0;
+    state.steer.SetFromDegree(3.0);
+    states.push_back(state);
+  }
+  {
+    TireSlipState state;
+    state.description = "Lateral slip: peak friction";
+    // speed in miles / hour, convert to rad/s
+    state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
+    state.drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
+    state.suspForce = 1000.0;
+    state.steer.SetFromDegree(5.7);
+    states.push_back(state);
+  }
+  {
+    TireSlipState state;
+    state.description = "Lateral slip: decreasing friction";
+    // speed in miles / hour, convert to rad/s
+    state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
+    state.drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
+    state.suspForce = 1000.0;
+    state.steer.SetFromDegree(9.0);
+    states.push_back(state);
+  }
+  {
+    TireSlipState state;
+    state.description = "Lateral slip: dynamic friction";
+    // speed in miles / hour, convert to rad/s
+    state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
+    state.drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
+    state.suspForce = 1000.0;
+    state.steer.SetFromDegree(20.0);
+    states.push_back(state);
+  }
+
+  for (auto const & state : states)
+  {
+    gzdbg << "Loading state: " << state.description << std::endl;
+    this->SetCommands(state);
+    common::Time::MSleep(100);
+    world->Step(250);
+
+    for (int i = 0; i < 1e3; ++i)
+    {
+      world->Step(1);
+      statsDrumSpeed.InsertData(drumJoint->GetVelocity(0) - state.drumSpeed);
+      statsHeight.InsertData(wheelLink->GetWorldPose().pos.z
+        - (wheelRadius - state.suspForce / wheelStiffness));
+      statsSteer.InsertData(
+        (this->steerJoint->GetAngle(0) - state.steer).Radian());
+      statsVerticalForce.InsertData(
+        sensor->GetForce().z - (state.suspForce - (modelMass-wheelMass)*g.z));
+      statsWheelSpeed.InsertData(spinJoint->GetVelocity(0) - state.wheelSpeed);
+      gzwarn << "wheelSpeed " << spinJoint->GetVelocity(0) << std::endl;
+    }
+    EXPECT_LT(statsDrumSpeed.Value(), 0.5);
+    EXPECT_LT(statsHeight.Value(), 2e-3);
+    EXPECT_LT(statsSteer.Value(), 1e-2);
+    EXPECT_LT(statsVerticalForce.Value(), state.suspForce * 3e-2);
+    EXPECT_LT(statsWheelSpeed.Value(), 2e-1);
+  }
 }
 
 /////////////////////////////////////////////////
 void TireSlipTest::SetCommands(const TireSlipState &_state)
 {
   // PID gains for joint controllers
-  const double wheelSpinP = 1e1;
+  const double wheelSpinP = 1e2;
   const double wheelSpinI = 0.0;
   const double wheelSpinD = 0.0;
-  const double drumSpinP = 1e2;
+  const double drumSpinP = 1e4;
   const double drumSpinI = 0.0;
   const double drumSpinD = 0.0;
 
