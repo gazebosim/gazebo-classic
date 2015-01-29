@@ -297,20 +297,6 @@ void TireFrictionPlugin::OnUpdate()
     double friction = this->ComputeFriction(slipSpeed, referenceSpeed);
     scaledFriction += friction * contactNormalForceSum;
 
-    gzdbg << "contact.time "
-          << common::Time(msgs::Convert(contact->time())).Double()
-          << ", "
-          << collision1
-          << ", "
-          << collision2
-          << ", "
-          << slipSpeed
-          << ", "
-          << referenceSpeed
-          << ", "
-          << contactNormalForceSum
-          << std::endl;
-
     contactsNormalForceSum += contactNormalForceSum;
   }
   double friction = scaledFriction / contactsNormalForceSum;

@@ -255,7 +255,6 @@ TEST_F(TireSlipTest, Logitudinal)
       statsVerticalForce.InsertData(
         sensor->GetForce().z - (state.suspForce - (modelMass-wheelMass)*g.z));
       statsWheelSpeed.InsertData(spinJoint->GetVelocity(0) - state.wheelSpeed);
-      gzwarn << "wheelSpeed " << spinJoint->GetVelocity(0) << std::endl;
     }
     EXPECT_LT(statsDrumSpeed.Value(), 0.5);
     EXPECT_LT(statsHeight.Value(), 2e-3);
