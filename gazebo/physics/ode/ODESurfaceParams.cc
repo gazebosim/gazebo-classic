@@ -75,9 +75,9 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
     sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
     GZ_ASSERT(frictionOdeElem , "Surface friction ode sdf member is NULL");
 
-    this->frictionPyramid->SetMuPrimary(  frictionOdeElem->Get<double>("mu"));
-    this->frictionPyramid->SetMuSecondary(frictionOdeElem->Get<double>("mu2"));
-    this->frictionPyramid->direction1 =
+    this->frictionPyramid.SetMuPrimary(  frictionOdeElem->Get<double>("mu"));
+    this->frictionPyramid.SetMuSecondary(frictionOdeElem->Get<double>("mu2"));
+    this->frictionPyramid.direction1 =
       frictionOdeElem->Get<math::Vector3>("fdir1");
     this->slip1 = frictionOdeElem->Get<double>("slip1");
     this->slip2 = frictionOdeElem->Get<double>("slip2");
