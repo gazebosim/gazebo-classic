@@ -189,6 +189,10 @@ namespace gazebo
       /// gz topic ~/user_camera/joy_pose.
       public: void SetJoyPoseControl(bool _value);
 
+      /// \brief Get whether stereo is enabled.
+      /// \return True if stereo is enabled.
+      public: bool StereoEnabled() const;
+
       /// \brief Set the camera to be attached to a visual.
       ///
       /// This causes the camera to move in relation to the specified visual.

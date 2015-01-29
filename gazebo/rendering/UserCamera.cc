@@ -764,3 +764,9 @@ void UserCamera::SetClipDist(float _near, float _far)
       this->camera->getRenderingDistance());
   }
 }
+
+//////////////////////////////////////////////////
+bool UserCamera::StereoEnabled() const
+{
+  return this->dataPtr->stereoEnabled;
+}

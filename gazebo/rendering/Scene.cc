@@ -2699,6 +2699,18 @@ void Scene::SetSky()
 /////////////////////////////////////////////////
 void Scene::SetShadowsEnabled(bool _value)
 {
+  // If a usercamera is set to stereo mode, then turn off shadows. 
+  // Our shadow mapping technique disables stereo.
+  bool stereoOverride = true;
+  for (std::vector<UserCameraPtr>::iterator iter =
+       this->dataPtr->userCameras.begin();
+       iter != this->dataPtr->userCameras.end() && stereoOverride; ++iter)
+  {
+    stereoOverride = !(*iter)->StereoEnabled();
+  }
+
+  _value = _value && stereoOverride;
+ 
   this->dataPtr->sdf->GetElement("shadows")->Set(_value);
 
   if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
