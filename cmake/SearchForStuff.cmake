@@ -192,6 +192,13 @@ if (PKG_CONFIG_FOUND)
                   OUTPUT_VARIABLE OGRE_VERSION)
   string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
 
+  string (REGEX REPLACE "^([0-9]+).*" "\\1"
+    OGRE_MAJOR_VERSION "${OGRE_VERSION}")
+  string (REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1"
+    OGRE_MINOR_VERSION "${OGRE_VERSION}")
+  string (REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1"
+    OGRE_PATCH_VERSION ${OGRE_VERSION})
+
   pkg_check_modules(OGRE-RTShaderSystem
                     OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
 
