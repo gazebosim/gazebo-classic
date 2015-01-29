@@ -33,7 +33,6 @@ namespace gazebo
 
     class GAZEBO_VISIBLE PresetManager
     {
-
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.
       /// \param[in] _sdf Pointer to the SDF parameters.
@@ -64,12 +63,18 @@ namespace gazebo
       public: void CreateProfileFromPreset(const std::string& _name,
                                            Preset* _preset);
 
+      public: void CreateProfileFromSDF(sdf::ElementPtr _sdf);
+
+      public: void RemoveProfile(const std::string& _name);
+
       public: sdf::ElementPtr GetSDFForProfile(const std::string &_name) const;
 
       public: void SetSDFForProfile(const std::string &_name,
-                sdf::ElementPtr _sdf);
+                  sdf::ElementPtr _sdf);
 
       private: void SetPresetFromSDF(sdf::ElementPtr _elem, Preset* _paramMap);
+
+      private: sdf::ElementPtr GetSDFFromPreset(Preset* _paramMap) const;
 
       private: PresetManagerPrivate *dataPtr;
     };
