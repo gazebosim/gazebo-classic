@@ -2,6 +2,9 @@
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
 
+1. Added various Get functions to Visual. Also added a ConvertGeometryType function to msgs.
+    * [Pull request #1402](https://bitbucket.org/osrf/gazebo/pull-request/1402)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.0.0
