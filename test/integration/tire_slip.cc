@@ -29,7 +29,7 @@ class TireSlipTest : public ServerFixture
   /// \param[in] _suspForce Suspension force to apply in N.
   /// \param[in] _steer Steer angle to apply.
   public: void SetCommands(const double _wheelSpeed, const double _drumSpeed,
-                           const double _suspForce, const math::Angle _steer);
+                           const double _suspForce, const math::Angle &_steer);
 
   /// \brief Publisher of joint commands for the tire model.
   protected: transport::PublisherPtr tireJointCmdPub;
@@ -162,13 +162,13 @@ TEST_F(TireSlipTest, Logitudinal)
   const double drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
   const double suspForce = 1000.0;
   math::Angle steer;
-  steer.SetFromDegree(0.0);
+  steer.SetFromDegree(25.7);
 
   this->SetCommands(wheelSpeed, drumSpeed, suspForce, steer);
   common::Time::MSleep(100);
   world->Step(150);
 
-  for (int i = 0; i < 1e3; ++i)
+  for (int i = 0; i < 100e3; ++i)
   {
     world->Step(1);
     statsDrumSpeed.InsertData(drumJoint->GetVelocity(0) - drumSpeed);
@@ -186,7 +186,7 @@ TEST_F(TireSlipTest, Logitudinal)
 
 /////////////////////////////////////////////////
 void TireSlipTest::SetCommands(const double _wheelSpeed,
-  const double _drumSpeed, const double _suspForce, const math::Angle _steer)
+  const double _drumSpeed, const double _suspForce, const math::Angle &_steer)
 {
   // PID gains for joint controllers
   const double wheelSpinP = 1e1;
