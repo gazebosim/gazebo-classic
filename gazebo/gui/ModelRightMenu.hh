@@ -23,6 +23,7 @@
 
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/ApplyForceDialog.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
@@ -32,6 +33,7 @@ namespace gazebo
   namespace gui
   {
     class ViewState;
+//    class ApplyForceDialog;
 
     /// \class ModelRightMenu ModelRightMenu.hh gui/gui.hh
     /// \brief Displays a menu when the right mouse button has been pressed.
@@ -56,6 +58,9 @@ namespace gazebo
 
       /// \brief QT callback when follow has been selected.
       private slots: void OnFollow();
+
+      /// \brief QT callback when apply force has been selected.
+      private slots: void OnApplyForce();
 
       /// \brief QT callback when delete has been selected.
       /// \param[in] _name Name of the model to delete.
@@ -89,6 +94,12 @@ namespace gazebo
 
       /// \brief Action for attaching the camera to a model.
       private: QAction *followAct;
+
+      /// \brief Action for applying force and torque to a model.
+      private: QAction *applyForceAct;
+
+      /// \brief TODO
+      private: ApplyForceDialog *applyForceDialog;
 
       /// \brief Action for snapping an object to another object below the
       /// first.

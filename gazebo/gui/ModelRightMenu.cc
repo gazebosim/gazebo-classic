@@ -24,6 +24,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/ApplyForceDialog.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 
 using namespace gazebo;
@@ -43,6 +44,9 @@ ModelRightMenu::ModelRightMenu()
   this->followAct->setStatusTip(tr("Follow the selection"));
   connect(this->followAct, SIGNAL(triggered()), this, SLOT(OnFollow()));
 
+  this->applyForceAct = new QAction(tr("Apply Force/Torque"), this);
+  this->applyForceAct->setStatusTip(tr("Apply force and torque to the model"));
+  connect(this->applyForceAct, SIGNAL(triggered()), this, SLOT(OnApplyForce()));
 
   // \todo Reimplement
   // this->snapBelowAct = new QAction(tr("Snap"), this);
@@ -129,6 +133,8 @@ bool ModelRightMenu::OnKeyRelease(const common::KeyEvent &_event)
 ModelRightMenu::~ModelRightMenu()
 {
   this->node->Fini();
+//  delete this->applyForceDialog;
+//  this->applyForceDialog = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -139,6 +145,7 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   QMenu menu;
   menu.addAction(this->moveToAct);
   menu.addAction(this->followAct);
+  menu.addAction(this->applyForceAct);
 
   // menu.addAction(this->snapBelowAct);
 
@@ -187,6 +194,14 @@ void ModelRightMenu::OnFollow()
   rendering::UserCameraPtr cam = gui::get_active_camera();
   cam->TrackVisual(this->modelName);
   gui::Events::follow(this->modelName);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnApplyForce()
+{
+  this->applyForceDialog = new ApplyForceDialog();
+  this->applyForceDialog->SetModel(this->modelName);
+  this->applyForceDialog->exec();
 }
 
 /////////////////////////////////////////////////

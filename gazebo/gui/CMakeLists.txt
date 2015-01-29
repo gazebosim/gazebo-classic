@@ -21,6 +21,7 @@ add_subdirectory(viewers)
 set (sources
   Actions.cc
   AlignWidget.cc
+  ApplyForceDialog.cc
   BoxMaker.cc
   CloneWindow.cc
   ConfigWidget.cc
@@ -57,6 +58,7 @@ set (sources
 set (qt_headers
   Actions.hh
   AlignWidget.hh
+  ApplyForceDialog.hh
   CloneWindow.hh
   ConfigWidget.hh
   DataLogger.hh
