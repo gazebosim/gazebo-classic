@@ -70,6 +70,23 @@ namespace gazebo
 
     /// \brief Number of updates without having a new contacts message.
     public: common::Time newMsgWait;
+
+    // The following attributes are related to the friction vs slip model.
+
+    /// \brief Static coefficient of friction.
+    public: double frictionStatic;
+
+    /// \brief Dynamic coefficient of friction.
+    public: double frictionDynamic;
+
+    /// \brief Tire slip at static friction.
+    public: double slipStatic;
+
+    /// \brief Tire slip at dynamic friction.
+    public: double slipDynamic;
+
+    /// \brief Reference speed below which static friction is used.
+    public: double speedStatic;
   };
 }
 #endif

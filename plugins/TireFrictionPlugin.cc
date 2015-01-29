@@ -34,6 +34,12 @@ GZ_REGISTER_MODEL_PLUGIN(TireFrictionPlugin)
 TireFrictionPlugin::TireFrictionPlugin()
   : dataPtr(new TireFrictionPluginPrivate)
 {
+  this->dataPtr->newMsg = false;
+  this->dataPtr->frictionStatic  = 1.1;
+  this->dataPtr->frictionDynamic = 1.0;
+  this->dataPtr->slipStatic  = 0.1;
+  this->dataPtr->slipDynamic = 0.2;
+  this->dataPtr->speedStatic = 1.0;
 }
 
 /////////////////////////////////////////////////
@@ -80,6 +86,62 @@ void TireFrictionPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
   GZ_ASSERT(this->dataPtr->collision,
     "TireFrictionPlugin collision pointer is NULL");
+
+  if (_sdf->HasElement("friction_static"))
+    this->dataPtr->frictionStatic = _sdf->Get<double>("friction_static");
+  if (_sdf->HasElement("friction_dynamic"))
+    this->dataPtr->frictionDynamic = _sdf->Get<double>("friction_dynamic");
+  if (_sdf->HasElement("slip_static"))
+  {
+    double valueCheck = _sdf->Get<double>("slip_static");
+    if (valueCheck <= 0)
+    {
+      gzerr << "slip_static parameter value ["
+            << valueCheck
+            << "] must be positive, using default value ["
+            << this->dataPtr->slipStatic
+            << std::endl;
+    }
+    else
+    {
+      this->dataPtr->slipStatic = valueCheck;
+    }
+  }
+  if (_sdf->HasElement("slip_dynamic"))
+  {
+    double valueCheck = _sdf->Get<double>("slip_dynamic");
+    if (valueCheck <= this->dataPtr->slipStatic)
+    {
+      this->dataPtr->slipDynamic = this->dataPtr->slipStatic + 0.1;
+      gzerr << "slip_dynamic parameter value ["
+            << valueCheck
+            << "] must be greater than slip_static ["
+            << this->dataPtr->slipStatic
+            << "], using slip_static + 0.1 ["
+            << this->dataPtr->slipDynamic
+            << std::endl;
+    }
+    else
+    {
+      this->dataPtr->slipDynamic = valueCheck;
+    }
+  }
+  if (_sdf->HasElement("speed_static"))
+  {
+    double valueCheck = _sdf->Get<double>("speed_static");
+    if (valueCheck <= 0)
+    {
+      gzerr << "speed_static parameter value ["
+            << valueCheck
+            << "] must be positive, using default value ["
+            << this->dataPtr->speedStatic
+            << std::endl;
+    }
+    else
+    {
+      this->dataPtr->speedStatic = valueCheck;
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -235,7 +297,7 @@ void TireFrictionPlugin::OnUpdate()
     double friction = this->ComputeFriction(slipSpeed, referenceSpeed);
     scaledFriction += friction * contactNormalForceSum;
 
-     gzdbg << "contact.time "
+    gzdbg << "contact.time "
           << common::Time(msgs::Convert(contact->time())).Double()
           << ", "
           << collision1
@@ -282,19 +344,46 @@ void TireFrictionPlugin::OnUpdate()
 double TireFrictionPlugin::ComputeFriction(const double _slipSpeed,
                                            const double _referenceSpeed)
 {
-//  // Then normalize that tangential speed somehow.
-//  // Use speed at origin of link frame.
-//  double slip;
-//  {
-//    double speed = _slipSpeed;
-//    const double speedMin = 0.1;
-//    if (speed < speedMin)
-//    {
-//      speed = speedMin;
-//    }
-//    slip = speedTangential / speed;
-//  }
-//
-//
-  return 0.0;
+  // For very low speeds, there can be numerical problems.
+  // Thus don't compute friction based on slip if
+  // reference speed is less than 50% of static speed;
+  // just use static friction coefficient.
+  if (std::abs(_referenceSpeed) < 0.5 * std::abs(this->dataPtr->speedStatic))
+  {
+    return this->dataPtr->frictionStatic;
+  }
+
+  // Compute slip ratio:
+  double slipRatio = std::abs(_slipSpeed) / std::abs(_referenceSpeed);
+
+  // Compute friction as function of slip:
+  const double muStatic = std::abs(this->dataPtr->frictionStatic);
+  const double muDynamic = std::abs(this->dataPtr->frictionDynamic);
+
+  // note muDynamic value corresponds to slipRation >= slipDynamic,
+  // so we only need two if statements to check other values
+  double frictionFromSlip = muDynamic;
+  if (slipRatio < this->dataPtr->slipStatic)
+  {
+    frictionFromSlip = muStatic * slipRatio / this->dataPtr->slipStatic;
+  }
+  else if (slipRatio < this->dataPtr->slipDynamic)
+  {
+    frictionFromSlip = muDynamic + (muStatic - muDynamic)
+      / (this->dataPtr->slipStatic - this->dataPtr->slipDynamic)
+      * (slipRatio - this->dataPtr->slipDynamic);
+  }
+
+  // Now that friction is computed from slip, do some additional smoothing
+  // at moderate speeds (between 50% and 100% speedStatic)
+  double speedRatio = std::abs(_referenceSpeed)
+    / std::abs(this->dataPtr->speedStatic);
+  if (speedRatio >= 0.5 && speedRatio < 1.0)
+  {
+    return (frictionFromSlip - this->dataPtr->frictionStatic)
+      / 0.5 * (speedRatio - 0.5);
+  }
+
+  // Otherwise speeds are high enough, so return friction from slip.
+  return frictionFromSlip;
 }
