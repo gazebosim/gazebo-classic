@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -280,8 +280,8 @@ void TireFrictionPlugin::OnUpdate()
 
       // Compute reference speed
       // max of absolute speed at contact points and at link origin
-      double referenceSpeed = 0.0;
-      referenceSpeed = std::max(velocity1.GetLength(), velocity2.GetLength());
+      double referenceSpeed =
+        std::max(velocity1.GetLength(), velocity2.GetLength());
       referenceSpeed = std::max(referenceSpeed,
         link1->GetWorldLinearVel().GetLength());
       referenceSpeed = std::max(referenceSpeed,
