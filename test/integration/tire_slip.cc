@@ -234,46 +234,6 @@ void TireSlipTest::SetCommands(const double _wheelSpeed,
   this->steerJoint->SetLowStop(0, _steer);
 }
 
-// /////////////////////////////////////////////////
-// TEST_F(TireSlipTest, Angle15Degrees)
-// {
-//   Load("worlds/tire_drum_steer_15_test.world");
-// 
-//   transport::PublisherPtr tireJointCmdPub = node->Advertise<msgs::JointCmd>(
-//       "~/tire/joint_cmd");
-// 
-//   transport::PublisherPtr drumJointCmdPub = node->Advertise<msgs::JointCmd>(
-//       "~/drum/joint_cmd");
-// 
-//   common::Time::Sleep(10);
-//   {
-//     gazebo::msgs::JointCmd jointCmdMsg;
-//     gazebo::msgs::PID *pidMsg = jointCmdMsg.mutable_position();
-// 
-//     jointCmdMsg.set_name("tire::world_upright");
-//     pidMsg->set_target(GZ_DTOR(15));
-//     pidMsg->set_p_gain(10.0);
-//     pidMsg->set_d_gain(0.0);
-//     pidMsg->set_i_gain(0.0);
-// 
-//     tireJointCmdPub->Publish(jointCmdMsg);
-//   }
-// 
-//   {
-//     gazebo::msgs::JointCmd jointCmdMsg;
-//     gazebo::msgs::PID *pidMsg = jointCmdMsg.mutable_velocity();
-// 
-//     jointCmdMsg.set_name("drum::joint");
-//     pidMsg->set_target(1.0);
-//     pidMsg->set_p_gain(10.0);
-//     pidMsg->set_d_gain(0.0);
-//     pidMsg->set_i_gain(0.0);
-// 
-//     drumJointCmdPub->Publish(jointCmdMsg);
-//   }
-//   common::Time::Sleep(10);
-// }
-
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
