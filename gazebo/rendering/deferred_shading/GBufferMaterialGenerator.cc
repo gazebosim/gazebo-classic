@@ -15,10 +15,13 @@
  *
  */
 
+#include <OgrePrerequisites.h>
+
 #include <OgreMaterialManager.h>
 #include <OgreGpuProgramManager.h>
 #include <OgreStringConverter.h>
 #include <OgreHighLevelGpuProgramManager.h>
+#include <OgreHighLevelGpuProgram.h>
 #include <OgreTechnique.h>
 
 #include "gazebo/rendering/deferred_shading/GBufferMaterialGenerator.hh"
@@ -155,6 +158,7 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::GenerateVertexShader(
 
   return Ogre::GpuProgramPtr(ptrProgram);
 }
+
 /////////////////////////////////////////////////
 Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::GenerateFragmentShader(
     MaterialGenerator::Perm _permutation)
