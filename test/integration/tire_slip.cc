@@ -27,8 +27,9 @@ class TireSlipTest : public ServerFixture
   public: class TireSlipState
   {
     /// \brief Constructor.
-    public: TireSlipState() : wheelSpeed(0.0),
-              drumSpeed(0.0), suspForce(0.0)
+    public: TireSlipState()
+      : wheelSpeed(0.0), wheelSpeedGain(0.0), wheelTorque(0.0)
+      , drumSpeed(0.0), suspForce(0.0)
     {
     }
 
@@ -42,6 +43,12 @@ class TireSlipTest : public ServerFixture
 
     /// \brief Wheel spin speed in rad/s.
     double wheelSpeed;
+
+    /// \brief P gain with wheel spin speed.
+    double wheelSpeedGain;
+
+    /// \brief Wheel torque in Nm.
+    double wheelTorque;
 
     /// \brief Drum spin speed in rad/s.
     double drumSpeed;
@@ -77,7 +84,7 @@ class TireSlipTest : public ServerFixture
 };
 
 /////////////////////////////////////////////////
-TEST_F(TireSlipTest, Logitudinal)
+TEST_F(TireSlipTest, Lateral)
 {
   const double metersPerMile = 1609.34;
   const double secondsPerHour = 3600.0;
@@ -190,8 +197,9 @@ TEST_F(TireSlipTest, Logitudinal)
     TireSlipState state;
     state.description = "Zero slip";
     // speed in miles / hour, convert to rad/s
-    state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
     state.drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
+    state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
+    state.wheelSpeedGain = 1e2;
     state.suspForce = 1000.0;
     state.steer.SetFromDegree(0.0);
     states.push_back(state);
@@ -200,8 +208,9 @@ TEST_F(TireSlipTest, Logitudinal)
     TireSlipState state;
     state.description = "Lateral slip: low";
     // speed in miles / hour, convert to rad/s
-    state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
     state.drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
+    state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
+    state.wheelSpeedGain = 1e2;
     state.suspForce = 1000.0;
     state.steer.SetFromDegree(3.0);
     states.push_back(state);
@@ -210,8 +219,9 @@ TEST_F(TireSlipTest, Logitudinal)
     TireSlipState state;
     state.description = "Lateral slip: peak friction";
     // speed in miles / hour, convert to rad/s
-    state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
     state.drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
+    state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
+    state.wheelSpeedGain = 1e2;
     state.suspForce = 1000.0;
     state.steer.SetFromDegree(5.7);
     states.push_back(state);
@@ -220,8 +230,9 @@ TEST_F(TireSlipTest, Logitudinal)
     TireSlipState state;
     state.description = "Lateral slip: decreasing friction";
     // speed in miles / hour, convert to rad/s
-    state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
     state.drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
+    state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
+    state.wheelSpeedGain = 1e2;
     state.suspForce = 1000.0;
     state.steer.SetFromDegree(9.0);
     states.push_back(state);
@@ -230,8 +241,9 @@ TEST_F(TireSlipTest, Logitudinal)
     TireSlipState state;
     state.description = "Lateral slip: dynamic friction";
     // speed in miles / hour, convert to rad/s
-    state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
     state.drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
+    state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
+    state.wheelSpeedGain = 1e2;
     state.suspForce = 1000.0;
     state.steer.SetFromDegree(20.0);
     states.push_back(state);
@@ -268,7 +280,6 @@ TEST_F(TireSlipTest, Logitudinal)
 void TireSlipTest::SetCommands(const TireSlipState &_state)
 {
   // PID gains for joint controllers
-  const double wheelSpinP = 1e2;
   const double wheelSpinI = 0.0;
   const double wheelSpinD = 0.0;
   const double drumSpinP = 1e4;
@@ -294,9 +305,11 @@ void TireSlipTest::SetCommands(const TireSlipState &_state)
 
     msgs::PID *pid = msg.mutable_velocity();
     pid->set_target(_state.wheelSpeed);
-    pid->set_p_gain(wheelSpinP);
+    pid->set_p_gain(_state.wheelSpeedGain);
     pid->set_i_gain(wheelSpinI);
     pid->set_d_gain(wheelSpinD);
+
+    msg.set_force(_state.wheelTorque);
 
     this->tireJointCmdPub->Publish(msg);
   }
