@@ -23,13 +23,39 @@ using namespace gazebo;
 
 class TireSlipTest : public ServerFixture
 {
+  /// \brief Class to hold parameters for tire tests.
+  public: class TireSlipState
+  {
+    /// \brief Constructor.
+    public: TireSlipState() : wheelSpeed(0.0),
+              drumSpeed(0.0), suspForce(0.0)
+    {
+    }
+
+    /// \brief Destructor.
+    public: ~TireSlipState()
+    {
+    }
+
+    /// \brief Wheel spin speed in rad/s.
+    double wheelSpeed;
+
+    /// \brief Drum spin speed in rad/s.
+    double drumSpeed;
+
+    /// \brief Suspension force to apply in N.
+    double suspForce;
+
+    /// \brief Steer angle to apply.
+    math::Angle steer;
+  };
+
   /// \brief Set joint commands for tire testrig.
   /// \param[in] _wheelSpeed Wheel spin speed in rad/s.
   /// \param[in] _drumSpeed Drum spin speed in rad/s.
   /// \param[in] _suspForce Suspension force to apply in N.
   /// \param[in] _steer Steer angle to apply.
-  public: void SetCommands(const double _wheelSpeed, const double _drumSpeed,
-                           const double _suspForce, const math::Angle &_steer);
+  public: void SetCommands(const TireSlipState &_state);
 
   /// \brief Publisher of joint commands for the tire model.
   protected: transport::PublisherPtr tireJointCmdPub;
@@ -157,36 +183,36 @@ TEST_F(TireSlipTest, Logitudinal)
   math::SignalMaxAbsoluteValue statsSteer;
   math::SignalMaxAbsoluteValue statsWheelSpeed;
 
+  TireSlipState state;
   // speed in miles / hour, convert to rad/s
-  const double wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
-  const double drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
-  const double suspForce = 1000.0;
-  math::Angle steer;
-  steer.SetFromDegree(25.7);
+  state.wheelSpeed = 25.0 * metersPerMile / secondsPerHour / wheelRadius;
+  state.drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
+  state.suspForce = 1000.0;
+  state.steer.SetFromDegree(25.7);
 
-  this->SetCommands(wheelSpeed, drumSpeed, suspForce, steer);
+  this->SetCommands(state);
   common::Time::MSleep(100);
   world->Step(150);
 
-  for (int i = 0; i < 100e3; ++i)
+  for (int i = 0; i < 1e3; ++i)
   {
     world->Step(1);
-    statsDrumSpeed.InsertData(drumJoint->GetVelocity(0) - drumSpeed);
+    statsDrumSpeed.InsertData(drumJoint->GetVelocity(0) - state.drumSpeed);
     statsHeight.InsertData(wheelLink->GetWorldPose().pos.z
-      - (wheelRadius - suspForce / wheelStiffness));
-    statsSteer.InsertData((this->steerJoint->GetAngle(0) - steer).Radian());
+      - (wheelRadius - state.suspForce / wheelStiffness));
+    statsSteer.InsertData(
+      (this->steerJoint->GetAngle(0) - state.steer).Radian());
     statsVerticalForce.InsertData(
-      sensor->GetForce().z - (suspForce - (modelMass-wheelMass) * g.z));
-    statsWheelSpeed.InsertData(spinJoint->GetVelocity(0) - wheelSpeed);
+      sensor->GetForce().z - (state.suspForce - (modelMass-wheelMass) * g.z));
+    statsWheelSpeed.InsertData(spinJoint->GetVelocity(0) - state.wheelSpeed);
   }
   EXPECT_LT(statsHeight.Value(), 1e-3);
   EXPECT_LT(statsSteer.Value(), 1e-2);
-  EXPECT_LT(statsVerticalForce.Value(), suspForce * 1e-2);
+  EXPECT_LT(statsVerticalForce.Value(), state.suspForce * 1e-2);
 }
 
 /////////////////////////////////////////////////
-void TireSlipTest::SetCommands(const double _wheelSpeed,
-  const double _drumSpeed, const double _suspForce, const math::Angle &_steer)
+void TireSlipTest::SetCommands(const TireSlipState &_state)
 {
   // PID gains for joint controllers
   const double wheelSpinP = 1e1;
@@ -201,7 +227,7 @@ void TireSlipTest::SetCommands(const double _wheelSpeed,
     msg.set_name("drum::joint");
 
     msgs::PID *pid = msg.mutable_velocity();
-    pid->set_target(_drumSpeed);
+    pid->set_target(_state.drumSpeed);
     pid->set_p_gain(drumSpinP);
     pid->set_i_gain(drumSpinI);
     pid->set_d_gain(drumSpinD);
@@ -214,7 +240,7 @@ void TireSlipTest::SetCommands(const double _wheelSpeed,
     msg.set_name("tire::axel_wheel");
 
     msgs::PID *pid = msg.mutable_velocity();
-    pid->set_target(_wheelSpeed);
+    pid->set_target(_state.wheelSpeed);
     pid->set_p_gain(wheelSpinP);
     pid->set_i_gain(wheelSpinI);
     pid->set_d_gain(wheelSpinD);
@@ -225,13 +251,13 @@ void TireSlipTest::SetCommands(const double _wheelSpeed,
   {
     msgs::JointCmd msg;
     msg.set_name("tire::world_upright");
-    msg.set_force(-_suspForce);
+    msg.set_force(-_state.suspForce);
 
     this->tireJointCmdPub->Publish(msg);
   }
 
-  this->steerJoint->SetHighStop(0, _steer);
-  this->steerJoint->SetLowStop(0, _steer);
+  this->steerJoint->SetHighStop(0, _state.steer);
+  this->steerJoint->SetLowStop(0, _state.steer);
 }
 
 /////////////////////////////////////////////////
