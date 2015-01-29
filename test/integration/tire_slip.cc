@@ -70,13 +70,13 @@ TEST_F(TireSlipTest, Logitudinal)
   physics::ModelPtr wheelModel = world->GetModel("tire");
   ASSERT_TRUE(wheelModel != NULL);
 
+  physics::LinkPtr wheelLink = wheelModel->GetLink("wheel");
+  ASSERT_TRUE(wheelLink != NULL);
+
   double wheelMass = 0.0;
   double wheelRadius = 0.0;
   double wheelStiffness = 0.0;
   {
-    physics::LinkPtr wheelLink = wheelModel->GetLink("wheel");
-    ASSERT_TRUE(wheelLink != NULL);
-
     wheelMass = wheelLink->GetInertial()->GetMass();
 
     physics::CollisionPtr wheelCollision = wheelLink->GetCollision("collision");
@@ -141,6 +141,7 @@ TEST_F(TireSlipTest, Logitudinal)
   // Measure certain quantities
   math::SignalMaxAbsoluteValue statsDrumSpeed;
   math::SignalMaxAbsoluteValue statsVerticalForce;
+  math::SignalMaxAbsoluteValue statsHeight;
   math::SignalMaxAbsoluteValue statsSteer;
   math::SignalMaxAbsoluteValue statsWheelSpeed;
 
@@ -153,17 +154,18 @@ TEST_F(TireSlipTest, Logitudinal)
 
   this->SetCommands(wheelSpeed, drumSpeed, suspForce, steer);
   common::Time::MSleep(100);
-  world->Step(100);
+  world->Step(150);
 
   for (int i = 0; i < 1e3; ++i)
   {
     world->Step(1);
+    statsHeight.InsertData(wheelLink->GetWorldPose().pos.z
+      - (wheelRadius - suspForce / wheelStiffness));
     statsSteer.InsertData((this->steerJoint->GetAngle(0) - steer).Radian());
     statsVerticalForce.InsertData(
       sensor->GetForce().z - (suspForce - (modelMass-wheelMass) * g.z));
-    std::cout << "I[" << i << "] Torque[" << sensor->GetTorque()
-              << "] Force[" << sensor->GetForce() << "]\n";
   }
+  EXPECT_LT(statsHeight.Value(), 1e-3);
   EXPECT_LT(statsSteer.Value(), 1e-2);
   EXPECT_LT(statsVerticalForce.Value(), suspForce * 1e-2);
 }

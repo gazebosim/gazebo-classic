@@ -38,8 +38,8 @@
           <surface>
             <contact>
               <ode>
-                <max_vel>0.1</max_vel>
-                <min_depth>0.005</min_depth>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.0</min_depth>
                 <kp>250e3</kp>
                 <kd>5</kd>
               </ode>
@@ -227,8 +227,8 @@
           <surface>
             <contact>
               <ode>
-                <max_vel>0.1</max_vel>
-                <min_depth>0.04</min_depth>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.0</min_depth>
               </ode>
             </contact>
             <friction>
