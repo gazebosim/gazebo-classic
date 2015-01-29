@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _SURFACEPARAMS_HH_
-#define _SURFACEPARAMS_HH_
+#ifndef _GAZEBO_SURFACEPARAMS_HH_
+#define _GAZEBO_SURFACEPARAMS_HH_
 
 #include <sdf/sdf.hh>
 
