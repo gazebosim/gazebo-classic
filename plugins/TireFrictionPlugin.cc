@@ -348,7 +348,7 @@ void TireFrictionPlugin::OnUpdate()
 // * (slipStatic,frictionStatic)
 // * (slipDynamic,frictionDynamic)
 // * (Inf,frictionDynamic)
-// 
+//
 //   |
 //   |         frictionStatic
 //   |        /.\
