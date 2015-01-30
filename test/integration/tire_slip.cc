@@ -260,7 +260,7 @@ TEST_F(TireSlipTest, Lateral)
   }
   {
     TireSlipState state;
-    state.description = "Longitudinal slip: low";
+    state.description = "Longitudinal torque control: low";
     // speed in miles / hour, convert to rad/s
     state.drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
     state.wheelSpeed = -1.055 * state.drumSpeed * drumRadius / wheelRadius;
@@ -277,7 +277,7 @@ TEST_F(TireSlipTest, Lateral)
   }
   {
     TireSlipState state;
-    state.description = "Longitudinal slip: high";
+    state.description = "Longitudinal torque control: moderate";
     // speed in miles / hour, convert to rad/s
     state.drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
     state.wheelSpeed = -1.12 * state.drumSpeed * drumRadius / wheelRadius;
@@ -328,7 +328,7 @@ TEST_F(TireSlipTest, Lateral)
     EXPECT_LT(statsDrumSpeed.Value(), 0.5);
     EXPECT_LT(statsHeight.Value(), 2e-3);
     EXPECT_LT(statsSteer.Value(), 1e-2);
-    if (state.description.compare("Longitudinal slip: high") != 0)
+    if (state.description.compare("Longitudinal torque control: moderate") != 0)
     {
       // Lateral forces are really noisy on that test
       EXPECT_LT(statsForceLateral.Value(), state.suspForce * 5e-2);
