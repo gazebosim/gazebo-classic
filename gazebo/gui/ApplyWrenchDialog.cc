@@ -66,6 +66,8 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   // Force X
   QLabel *forceXLabel = new QLabel();
   forceXLabel->setText(tr("X:"));
+  QLabel *forceXUnitLabel = new QLabel();
+  forceXUnitLabel->setText(tr("N"));
 
   this->forceXSpin = new QDoubleSpinBox();
   this->forceXSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
@@ -78,6 +80,8 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   // Force Y
   QLabel *forceYLabel = new QLabel();
   forceYLabel->setText(tr("Y:"));
+  QLabel *forceYUnitLabel = new QLabel();
+  forceYUnitLabel->setText(tr("N"));
 
   this->forceYSpin = new QDoubleSpinBox();
   this->forceYSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
@@ -90,6 +94,8 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   // Force Z
   QLabel *forceZLabel = new QLabel();
   forceZLabel->setText(tr("Z:"));
+  QLabel *forceZUnitLabel = new QLabel();
+  forceZUnitLabel->setText(tr("N"));
 
   this->forceZSpin = new QDoubleSpinBox();
   this->forceZSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
@@ -107,10 +113,13 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   forceLayout->addWidget(forceDirectionLabel, 2, 0);
   forceLayout->addWidget(forceXLabel, 3, 0);
   forceLayout->addWidget(this->forceXSpin, 3, 1);
+  forceLayout->addWidget(forceXUnitLabel, 3, 2);
   forceLayout->addWidget(forceYLabel, 4, 0);
   forceLayout->addWidget(this->forceYSpin, 4, 1);
+  forceLayout->addWidget(forceYUnitLabel, 4, 2);
   forceLayout->addWidget(forceZLabel, 5, 0);
   forceLayout->addWidget(this->forceZSpin, 5, 1);
+  forceLayout->addWidget(forceZUnitLabel, 5, 2);
 
   // Torque
   QLabel *torqueLabel = new QLabel();
@@ -120,7 +129,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   QLabel *torqueMagLabel = new QLabel();
   torqueMagLabel->setText(tr("Magnitude:"));
   QLabel *torqueMagUnitLabel = new QLabel();
-  torqueMagUnitLabel->setText(tr("N m"));
+  torqueMagUnitLabel->setText(tr("Nm"));
 
   this->torqueMagSpin = new QDoubleSpinBox();
   this->torqueMagSpin->setRange(0, GZ_DBL_MAX);
@@ -137,6 +146,8 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   // Torque X
   QLabel *torqueXLabel = new QLabel();
   torqueXLabel->setText(tr("X:"));
+  QLabel *torqueXUnitLabel = new QLabel();
+  torqueXUnitLabel->setText(tr("Nm"));
 
   this->torqueXSpin = new QDoubleSpinBox();
   this->torqueXSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
@@ -149,6 +160,8 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   // Torque Y
   QLabel *torqueYLabel = new QLabel();
   torqueYLabel->setText(tr("Y:"));
+  QLabel *torqueYUnitLabel = new QLabel();
+  torqueYUnitLabel->setText(tr("Nm"));
 
   this->torqueYSpin = new QDoubleSpinBox();
   this->torqueYSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
@@ -161,6 +174,8 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   // Torque Z
   QLabel *torqueZLabel = new QLabel();
   torqueZLabel->setText(tr("Z:"));
+  QLabel *torqueZUnitLabel = new QLabel();
+  torqueZUnitLabel->setText(tr("Nm"));
 
   this->torqueZSpin = new QDoubleSpinBox();
   this->torqueZSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
@@ -178,10 +193,13 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   torqueLayout->addWidget(torqueDirectionLabel, 2, 0);
   torqueLayout->addWidget(torqueXLabel, 3, 0);
   torqueLayout->addWidget(this->torqueXSpin, 3, 1);
+  torqueLayout->addWidget(torqueXUnitLabel, 3, 2);
   torqueLayout->addWidget(torqueYLabel, 4, 0);
   torqueLayout->addWidget(this->torqueYSpin, 4, 1);
+  torqueLayout->addWidget(torqueYUnitLabel, 4, 2);
   torqueLayout->addWidget(torqueZLabel, 5, 0);
   torqueLayout->addWidget(this->torqueZSpin, 5, 1);
+  torqueLayout->addWidget(torqueZUnitLabel, 5, 2);
 
   // Buttons
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
