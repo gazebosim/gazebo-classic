@@ -4,7 +4,7 @@
       <gravity>0.000000 0.000000 -9.810000</gravity>
       <ode>
         <solver>
-          <type>quick</type>
+          <type>world</type>
           <iters>250</iters>
           <precon_iters>0</precon_iters>
           <sor>1.400000</sor>
