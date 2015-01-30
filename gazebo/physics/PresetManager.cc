@@ -24,8 +24,6 @@
 using namespace gazebo;
 using namespace physics;
 
-// TODO: Create better default physics selection behavior!!
-
 ////////////////////////////////////////////////////////////////////////////////
 Preset PresetManager::GeneratePresetFromSDF(const sdf::ElementPtr _elem) const
 {
@@ -47,8 +45,17 @@ sdf::ElementPtr PresetManager::GenerateSDFFromPreset(Preset* _preset) const
   sdf::ElementPtr elem(new sdf::Element);
   elem->SetName("physics");
   elem->AddAttribute("name", "string", "", true);
-  sdf::ParamPtr name = elem->GetAttribute("name");
-  name->Set(boost::any_cast<std::string>(_preset->paramMap["name"]));
+  sdf::ParamPtr nameParam = elem->GetAttribute("name");
+  std::string name = ;
+  try
+  {
+    nameParam->Set(boost::any_cast<std::string>(_preset->paramMap["name"]));
+  }
+  catch (boost::bad_any_cast)
+  {
+    gzwarn << " ";
+  }
+  name->
   for (auto &param : _preset->paramMap)
   {
     std::string key = param.first;
@@ -67,7 +74,7 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine, sdf::ElementPtr _s
   this->dataPtr->physicsEngine = _physicsEngine;
   this->dataPtr->currentPreset = NULL;
 
-  std::string defaultName;
+  std::string defaultName = "default_physics";
   if (_sdf->HasAttribute("default_physics"))
   {
     defaultName = _sdf->GetAttribute("default_physics")->GetAsString();
@@ -89,15 +96,8 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine, sdf::ElementPtr _s
       std::string name = this->CreateProfile(elemCopy);
       if (name.size() > 0)
       {
-        //const std::string name = elemCopy->GetAttribute("name")->GetAsString();
-
         gzdbg << "Created physics profile " << name << std::endl;
         // Put all the elements in a map
-        //Preset preset;
-
-        //this->GeneratePresetFromSDF(elemCopy, paramMap);
-
-        // this->dataPtr->presetSDF[name] = elemCopy;
 
         if (name == defaultName)
         {
@@ -112,7 +112,6 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine, sdf::ElementPtr _s
           }
         }
       }
-      //physicsElem = physicsElem->GetNextElement("physics");
     }
   }
   gzdbg << "finished constructing PresetManager" << std::endl;
@@ -161,12 +160,21 @@ std::string PresetManager::GetCurrentProfileName() const
 {
   if (!this->dataPtr->currentPreset)
   {
+    gzwarn << "No current preset." << std::endl;
     return "";
   }
+
+  if (this->dataPtr->currentPreset->paramMap.find("name") ==
+      this->dataPtr->currentPreset->paramMap.end())
+  {
+    gzwarn << "Current preset does not have name" << std::endl;
+    return "";
+  }
+
   try
   {
-  return boost::any_cast<std::string>(
-    this->dataPtr->currentPreset->paramMap["name"]);
+    return boost::any_cast<std::string>(
+      this->dataPtr->currentPreset->paramMap["name"]);
   }
   catch (boost::bad_any_cast)
   {
@@ -208,8 +216,6 @@ bool PresetManager::SetProfileParam(const std::string& _profileName,
     return this->SetCurrentProfileParam(_key, _value);
   }
 
-  /*if (!this->dataPtr->presetProfiles[_profileName])
-    return false;*/
 
   this->dataPtr->presetProfiles[_profileName].paramMap[_key] = _value;
   return true;
@@ -231,7 +237,6 @@ bool PresetManager::SetCurrentProfileParam(const std::string& _key,
 void PresetManager::CreateProfile(const std::string& _name)
 {
   // TODO: Check if profile exists
-  //this->dataPtr->presetProfiles[_name] = new Preset;
   if (this->dataPtr->presetProfiles.find(_name) !=
       this->dataPtr->presetProfiles.end())
   {
@@ -247,28 +252,8 @@ void PresetManager::CreateProfile(const std::string& _name)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*void PresetManager::CreateProfileFromPreset(const std::string& _name,
-  Preset* _preset)
-{
-  // TODO: Check if profile exists
-  if (!_preset)
-    return;
-
-  gzdbg << "create profile from preset: " << _name << std::endl;
-
-  this->CreateProfile(_name);
-
-  this->dataPtr->presetProfiles[_name] = *_preset;
-  gzdbg << "created preset" << std::endl;
-}*/
-
-////////////////////////////////////////////////////////////////////////////////
 std::string PresetManager::CreateProfile(sdf::ElementPtr _elem)
 {
-  /*Preset* preset = new Preset;
-  this->GeneratePresetFromSDF(_elem, preset);
-  this->CreateProfileFromPreset(boost::any_cast<std::string>((*preset)["name"]),
-      preset);*/
   if (!_elem->HasAttribute("name"))
   {
     return "";
@@ -277,6 +262,7 @@ std::string PresetManager::CreateProfile(sdf::ElementPtr _elem)
 
   this->CreateProfile(name);
   this->SetProfileSDF(name, _elem);
+  this->dataPtr->presetProfiles[name].paramMap["name"] = name;
   return name;
 }
 
