@@ -24,6 +24,8 @@
 using namespace gazebo;
 using namespace physics;
 
+// TODO: Create better default physics selection behavior!!
+
 ////////////////////////////////////////////////////////////////////////////////
 Preset PresetManager::GeneratePresetFromSDF(const sdf::ElementPtr _elem) const
 {

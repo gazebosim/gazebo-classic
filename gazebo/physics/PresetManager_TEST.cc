@@ -151,24 +151,6 @@ TEST_F(PresetManagerTest, SetCurrentProfile)
 }
 
 /////////////////////////////////////////////////
-TEST_F(PresetManagerTest, CreateProfile)
-{
-  Load("test/worlds/presets.world", false, "ode");
-  physics::WorldPtr world = physics::get_world("default");
-
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
-
-  physics::PresetManager *presetManager = world->GetPresetManager();
-  if (!presetManager)
-  {
-    FAIL();
-  }
-
-  // Create a new profile
-
-}
-
-/////////////////////////////////////////////////
 TEST_F(PresetManagerTest, CreateProfileFromSDF)
 {
   Load("test/worlds/presets.world", false, "ode");
@@ -181,6 +163,28 @@ TEST_F(PresetManagerTest, CreateProfileFromSDF)
   {
     FAIL();
   }
+
+  // TODO
+
+    /*"<physics name=\"preset_3\" type=\"ode\">\
+      <max_step_size>0.003</max_step_size>\
+      <max_contacts>64</max_contacts>\
+      <ode>\
+        <solver>\
+          <min_step_size>0.003</min_step_size>\
+          <iters>200</iters>\
+          <sor>1.6</sor>\
+          <use_dynamic_moi_rescaling>1</use_dynamic_moi_rescaling>\
+        </solver>\
+        <constraints>\
+          <cfm>0.04</cfm>\
+          <erp>0.7</erp>\
+          <contact_max_correcting_vel>500</contact_max_correcting_vel>\
+          <contact_surface_layer>0.008</contact_surface_layer>\
+        </constraints>\
+      </ode>\
+    </physics>"*/
+
 }
 
 /////////////////////////////////////////////////
