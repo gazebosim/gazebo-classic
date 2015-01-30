@@ -1,0 +1,34 @@
+<sdf version="1.5">
+  <world name="default">
+    <physics type="ode">
+      <gravity>0.000000 0.000000 -9.810000</gravity>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>250</iters>
+          <precon_iters>0</precon_iters>
+          <sor>1.400000</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <contact_max_correcting_vel>0.000000</contact_max_correcting_vel>
+          <contact_surface_layer>0.00000</contact_surface_layer>
+        </constraints>
+      </ode>
+      <real_time_update_rate>1000.000000</real_time_update_rate>
+      <max_step_size>0.001000</max_step_size>
+    </physics>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://double_pendulum_with_base</uri>
+      <name>pendulum_0deg</name>
+      <pose>0 2.1 0 0 0 0</pose>
+    </include>
+  </world>
+</sdf>
