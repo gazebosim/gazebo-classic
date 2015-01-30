@@ -286,8 +286,8 @@ bool SaveDialog::OnSaveAs()
     if (boost::filesystem::exists(sdfPath) ||
           boost::filesystem::exists(modelConfigPath))
     {
-      std::string msg = "A model named " + this->GetModelName() +
-                        " already exists in folder " + path.string() + ".\n\n"
+      std::string msg = "A model already exists in folder \n" +
+                        path.string() + ".\n\n" +
                         "Do you wish to overwrite the existing model files?\n";
 
       QMessageBox msgBox(QMessageBox::Warning, QString("Files Exist"),
