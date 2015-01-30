@@ -201,7 +201,7 @@ void ModelRightMenu::OnApplyWrench()
 {
   this->applyWrenchDialog = new ApplyWrenchDialog();
   this->applyWrenchDialog->SetModel(this->modelName);
-  this->applyWrenchDialog->exec();
+  this->applyWrenchDialog->show();
 }
 
 /////////////////////////////////////////////////

@@ -86,10 +86,22 @@ namespace gazebo
       private slots: void OnTorqueZChanged(double _fZ);
 
       /// \brief TODO
-      private: void SetTopic();
+      private: void SetPublisher();
 
       /// \brief TODO
-      private: std::string GetTopic() const;
+      private: void CalculateWrench();
+
+      /// \brief TODO
+      private: void UpdateForceMag();
+
+      /// \brief TODO
+      private: void UpdateForceVector();
+
+      /// \brief TODO
+      private: void UpdateTorqueMag();
+
+      /// \brief TODO
+      private: void UpdateTorqueVector();
 
       /// \brief Node for communication.
       private: transport::NodePtr node;

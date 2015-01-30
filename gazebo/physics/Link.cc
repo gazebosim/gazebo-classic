@@ -1334,16 +1334,14 @@ msgs::Visual Link::GetVisualMessage(const std::string &_name) const
 //////////////////////////////////////////////////
 void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
 {
-std::cout << _msg->DebugString() << std::endl;
   if (_msg->has_force())
   {
     const math::Vector3 force = msgs::Convert(_msg->force());
     this->AddForce(force);
   }
-
-//  if (_msg->name() == this->GetScopedName())
-//  {
-//    math::Pose p = msgs::Convert(*_msg);
-//    this->SetWorldPose(p);
-//  }
+  if (_msg->has_torque())
+  {
+    const math::Vector3 torque = msgs::Convert(_msg->torque());
+    this->AddTorque(torque);
+  }
 }

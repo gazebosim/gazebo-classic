@@ -52,10 +52,10 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   forceMagUnitLabel->setText(tr("N"));
 
   this->forceMagSpin = new QDoubleSpinBox();
-  this->forceMagSpin->setRange(0.001, 1000);
+  this->forceMagSpin->setRange(0, GZ_DBL_MAX);
   this->forceMagSpin->setSingleStep(0.1);
   this->forceMagSpin->setDecimals(3);
-  this->forceMagSpin->setValue(1);
+  this->forceMagSpin->setValue(1000);
   connect(this->forceMagSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForceMagChanged(double)));
 
@@ -68,10 +68,10 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   forceXLabel->setText(tr("X:"));
 
   this->forceXSpin = new QDoubleSpinBox();
-  this->forceXSpin->setRange(-1, 1);
+  this->forceXSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->forceXSpin->setSingleStep(0.1);
   this->forceXSpin->setDecimals(3);
-  this->forceXSpin->setValue(-1);
+  this->forceXSpin->setValue(1);
   connect(this->forceXSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForceXChanged(double)));
 
@@ -80,7 +80,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   forceYLabel->setText(tr("Y:"));
 
   this->forceYSpin = new QDoubleSpinBox();
-  this->forceYSpin->setRange(-1, 1);
+  this->forceYSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->forceYSpin->setSingleStep(0.1);
   this->forceYSpin->setDecimals(3);
   this->forceYSpin->setValue(0);
@@ -92,7 +92,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   forceZLabel->setText(tr("Z:"));
 
   this->forceZSpin = new QDoubleSpinBox();
-  this->forceZSpin->setRange(-1, 1);
+  this->forceZSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->forceZSpin->setSingleStep(0.1);
   this->forceZSpin->setDecimals(3);
   this->forceZSpin->setValue(0);
@@ -123,7 +123,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   torqueMagUnitLabel->setText(tr("N m"));
 
   this->torqueMagSpin = new QDoubleSpinBox();
-  this->torqueMagSpin->setRange(0.001, 1000);
+  this->torqueMagSpin->setRange(0, GZ_DBL_MAX);
   this->torqueMagSpin->setSingleStep(0.1);
   this->torqueMagSpin->setDecimals(3);
   this->torqueMagSpin->setValue(0);
@@ -139,10 +139,10 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   torqueXLabel->setText(tr("X:"));
 
   this->torqueXSpin = new QDoubleSpinBox();
-  this->torqueXSpin->setRange(-1, 1);
+  this->torqueXSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->torqueXSpin->setSingleStep(0.1);
   this->torqueXSpin->setDecimals(3);
-  this->torqueXSpin->setValue(1);
+  this->torqueXSpin->setValue(0);
   connect(this->torqueXSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnTorqueXChanged(double)));
 
@@ -151,7 +151,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   torqueYLabel->setText(tr("Y:"));
 
   this->torqueYSpin = new QDoubleSpinBox();
-  this->torqueYSpin->setRange(-1, 1);
+  this->torqueYSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->torqueYSpin->setSingleStep(0.1);
   this->torqueYSpin->setDecimals(3);
   this->torqueYSpin->setValue(0);
@@ -163,7 +163,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   torqueZLabel->setText(tr("Z:"));
 
   this->torqueZSpin = new QDoubleSpinBox();
-  this->torqueZSpin->setRange(-1, 1);
+  this->torqueZSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->torqueZSpin->setSingleStep(0.1);
   this->torqueZSpin->setDecimals(3);
   this->torqueZSpin->setValue(0);
@@ -204,11 +204,12 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
 
   this->setLayout(mainLayout);
 
-  this->forceVector = math::Vector3::UnitX;
-  this->torqueVector = math::Vector3::UnitX;
-
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
+
+  this->UpdateForceVector();
+  this->UpdateTorqueVector();
+  this->CalculateWrench();
 }
 
 /////////////////////////////////////////////////
@@ -223,7 +224,7 @@ void ApplyWrenchDialog::SetModel(std::string _modelName)
   this->messageLabel->setText(
       tr("Apply Force and Torque")); // add model name
   this->modelName = _modelName;
-  this->SetTopic();
+  this->SetPublisher();
 }
 
 /////////////////////////////////////////////////
@@ -246,53 +247,53 @@ void ApplyWrenchDialog::OnCancel()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceMagChanged(double /*_magnitude*/)
 {
-  // update visual
+  this->UpdateForceVector();
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceXChanged(double /*_fX*/)
 {
-  // update visual
+  this->UpdateForceMag();
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceYChanged(double /*_fY*/)
 {
-  // update visual
+  this->UpdateForceMag();
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceZChanged(double /*_fZ*/)
 {
-  // update visual
+  this->UpdateForceMag();
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueMagChanged(double /*_magnitude*/)
 {
-  // update visual
+  this->UpdateTorqueVector();
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueXChanged(double /*_fX*/)
 {
-  // update visual
+  this->UpdateTorqueMag();
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueYChanged(double /*_fY*/)
 {
-  // update visual
+  this->UpdateTorqueMag();
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueZChanged(double /*_fZ*/)
 {
-  // update visual
+  this->UpdateTorqueMag();
 }
 
 //////////////////////////////////////////////////
-void ApplyWrenchDialog::SetTopic()
+void ApplyWrenchDialog::SetPublisher()
 {
   rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
       GetVisual(this->modelName);
@@ -312,8 +313,81 @@ void ApplyWrenchDialog::SetTopic()
   this->wrenchPub = this->node->Advertise<msgs::Wrench>(this->topicName);
 }
 
-//////////////////////////////////////////////////
-std::string ApplyWrenchDialog::GetTopic() const
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::CalculateWrench()
 {
-  return this->topicName;
+  this->forceVector =
+      math::Vector3(this->forceXSpin->value(),
+                    this->forceYSpin->value(),
+                    this->forceZSpin->value());
+  this->torqueVector =
+      math::Vector3(this->torqueXSpin->value(),
+                    this->torqueYSpin->value(),
+                    this->torqueZSpin->value());
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::UpdateForceMag()
+{
+  this->forceMagSpin->setValue(sqrt(
+      pow(this->forceXSpin->value(), 2) +
+      pow(this->forceYSpin->value(), 2) +
+      pow(this->forceZSpin->value(), 2)));
+  this->CalculateWrench();
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::UpdateForceVector()
+{
+  // Normalize current vector
+  math::Vector3 v = math::Vector3(this->forceXSpin->value(),
+                                   this->forceYSpin->value(),
+                                   this->forceZSpin->value());
+  if (v == math::Vector3::Zero)
+    v = math::Vector3::UnitX;
+  else
+    v.Normalize();
+
+  // Multiply by new magnitude
+  v = v * this->forceMagSpin->value();
+
+  // Update spins
+  this->forceXSpin->setValue(v.x);
+  this->forceYSpin->setValue(v.y);
+  this->forceZSpin->setValue(v.z);
+
+  this->CalculateWrench();
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::UpdateTorqueMag()
+{
+  this->torqueMagSpin->setValue(sqrt(
+      pow(this->torqueXSpin->value(), 2) +
+      pow(this->torqueYSpin->value(), 2) +
+      pow(this->torqueZSpin->value(), 2)));
+  this->CalculateWrench();
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::UpdateTorqueVector()
+{
+  // Normalize current vector
+  math::Vector3 v = math::Vector3(this->torqueXSpin->value(),
+                                   this->torqueYSpin->value(),
+                                   this->torqueZSpin->value());
+  if (v == math::Vector3::Zero)
+    v = math::Vector3::UnitX;
+  else
+    v.Normalize();
+
+  // Multiply by new magnitude
+  v = v * this->torqueMagSpin->value();
+
+  // Update spins
+  this->torqueXSpin->setValue(v.x);
+  this->torqueYSpin->setValue(v.y);
+  this->torqueZSpin->setValue(v.z);
+
+  this->CalculateWrench();
 }
