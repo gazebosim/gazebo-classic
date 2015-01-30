@@ -161,6 +161,7 @@ void ModelCreator::OnEdit(bool _checked)
   if (_checked)
   {
     this->active = true;
+    this->modelCounter++;
     KeyEventHandler::Instance()->AddPressFilter("model_creator",
         boost::bind(&ModelCreator::OnKeyPress, this, _1));
 
@@ -705,7 +706,7 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 }
 
 /////////////////////////////////////////////////
-PartData *ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
+void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 {
   PartData *part = new PartData;
 
@@ -894,8 +895,6 @@ PartData *ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
   scene->AddVisual(part->partVisual);
 
   this->ModelChanged();
-
-  return part;
 }
 
 /////////////////////////////////////////////////
@@ -954,6 +953,11 @@ void ModelCreator::Reset()
 
   this->currentSaveState = NEVER_SAVED;
   this->SetModelName(this->modelDefaultName);
+
+  this->modelTemplateSDF.reset(new sdf::SDF);
+  this->modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
+
+  this->modelSDF.reset(new sdf::SDF);
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 

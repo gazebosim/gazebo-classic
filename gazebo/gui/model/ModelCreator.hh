@@ -246,7 +246,7 @@ namespace gazebo
       private: PartData *CreatePart(const rendering::VisualPtr &_visual);
 
       /// \brief TODO
-      private: PartData *CreatePartFromSDF(sdf::ElementPtr _linkElem);
+      private: void CreatePartFromSDF(sdf::ElementPtr _linkElem);
 
       /// \brief Open the part inspector.
       /// \param[in] _name Name of part.
