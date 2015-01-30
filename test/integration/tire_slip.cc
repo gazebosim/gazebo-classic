@@ -28,8 +28,9 @@ class TireSlipTest : public ServerFixture
   {
     /// \brief Constructor.
     public: TireSlipState()
-      : wheelSpeed(0.0), wheelSpeedGain(0.0), wheelTorque(0.0)
+      : axelForceLateral(0.0), axelForceLongitudinal(0.0)
       , drumSpeed(0.0), suspForce(0.0)
+      , wheelSpeed(0.0), wheelSpeedGain(0.0), wheelTorque(0.0)
     {
     }
 
@@ -38,8 +39,23 @@ class TireSlipTest : public ServerFixture
     {
     }
 
+    /// \brief Axel force in lateral direction to expect.
+    double axelForceLateral;
+
+    /// \brief Axel force in lateral direction to expect.
+    double axelForceLongitudinal;
+
     /// \brief Description to print during test loop.
     std::string description;
+
+    /// \brief Drum spin speed in rad/s.
+    double drumSpeed;
+
+    /// \brief Steer angle to apply.
+    math::Angle steer;
+
+    /// \brief Suspension force to apply in N.
+    double suspForce;
 
     /// \brief Wheel spin speed in rad/s.
     double wheelSpeed;
@@ -49,15 +65,6 @@ class TireSlipTest : public ServerFixture
 
     /// \brief Wheel torque in Nm.
     double wheelTorque;
-
-    /// \brief Drum spin speed in rad/s.
-    double drumSpeed;
-
-    /// \brief Suspension force to apply in N.
-    double suspForce;
-
-    /// \brief Steer angle to apply.
-    math::Angle steer;
   };
 
   /// \brief Set joint commands for tire testrig.
@@ -185,13 +192,6 @@ TEST_F(TireSlipTest, Lateral)
   this->steerJoint =  wheelModel->GetJoint("steer");
   ASSERT_TRUE(this->steerJoint != NULL);
 
-  // Measure certain quantities
-  math::SignalMaxAbsoluteValue statsDrumSpeed;
-  math::SignalMaxAbsoluteValue statsVerticalForce;
-  math::SignalMaxAbsoluteValue statsHeight;
-  math::SignalMaxAbsoluteValue statsSteer;
-  math::SignalMaxAbsoluteValue statsWheelSpeed;
-
   std::vector<TireSlipState> states;
   {
     TireSlipState state;
@@ -202,6 +202,8 @@ TEST_F(TireSlipTest, Lateral)
     state.wheelSpeedGain = 1e2;
     state.suspForce = 1000.0;
     state.steer.SetFromDegree(0.0);
+    state.axelForceLateral = 0.0;
+    state.axelForceLongitudinal = 0.0;
     states.push_back(state);
   }
   {
@@ -213,6 +215,8 @@ TEST_F(TireSlipTest, Lateral)
     state.wheelSpeedGain = 1e2;
     state.suspForce = 1000.0;
     state.steer.SetFromDegree(3.0);
+    state.axelForceLateral = -570.0;
+    state.axelForceLongitudinal = 0.0;
     states.push_back(state);
   }
   {
@@ -224,6 +228,8 @@ TEST_F(TireSlipTest, Lateral)
     state.wheelSpeedGain = 1e2;
     state.suspForce = 1000.0;
     state.steer.SetFromDegree(5.7);
+    state.axelForceLateral = -1130.0;
+    state.axelForceLongitudinal = 0.0;
     states.push_back(state);
   }
   {
@@ -235,6 +241,8 @@ TEST_F(TireSlipTest, Lateral)
     state.wheelSpeedGain = 1e2;
     state.suspForce = 1000.0;
     state.steer.SetFromDegree(9.0);
+    state.axelForceLateral = -900.0;
+    state.axelForceLongitudinal = 0.0;
     states.push_back(state);
   }
   {
@@ -246,6 +254,8 @@ TEST_F(TireSlipTest, Lateral)
     state.wheelSpeedGain = 1e2;
     state.suspForce = 1000.0;
     state.steer.SetFromDegree(20.0);
+    state.axelForceLateral = -750.0;
+    state.axelForceLongitudinal = 0.0;
     states.push_back(state);
   }
 
@@ -256,6 +266,15 @@ TEST_F(TireSlipTest, Lateral)
     common::Time::MSleep(100);
     world->Step(250);
 
+    // Measure certain quantities
+    math::SignalMaxAbsoluteValue statsDrumSpeed;
+    math::SignalMaxAbsoluteValue statsForceLateral;
+    math::SignalMaxAbsoluteValue statsForceLongitudinal;
+    math::SignalMaxAbsoluteValue statsForceVertical;
+    math::SignalMaxAbsoluteValue statsHeight;
+    math::SignalMaxAbsoluteValue statsSteer;
+    math::SignalMaxAbsoluteValue statsWheelSpeed;
+
     for (int i = 0; i < 1e3; ++i)
     {
       world->Step(1);
@@ -264,14 +283,20 @@ TEST_F(TireSlipTest, Lateral)
         - (wheelRadius - state.suspForce / wheelStiffness));
       statsSteer.InsertData(
         (this->steerJoint->GetAngle(0) - state.steer).Radian());
-      statsVerticalForce.InsertData(
+      statsForceLateral.InsertData(
+        sensor->GetForce().y - state.axelForceLateral);
+      statsForceLongitudinal.InsertData(
+        sensor->GetForce().x - state.axelForceLongitudinal);
+      statsForceVertical.InsertData(
         sensor->GetForce().z - (state.suspForce - (modelMass-wheelMass)*g.z));
       statsWheelSpeed.InsertData(spinJoint->GetVelocity(0) - state.wheelSpeed);
     }
     EXPECT_LT(statsDrumSpeed.Value(), 0.5);
     EXPECT_LT(statsHeight.Value(), 2e-3);
     EXPECT_LT(statsSteer.Value(), 1e-2);
-    EXPECT_LT(statsVerticalForce.Value(), state.suspForce * 3e-2);
+    EXPECT_LT(statsForceLateral.Value(), state.suspForce * 3e-2);
+    EXPECT_LT(statsForceLongitudinal.Value(), state.suspForce * 4e-2);
+    EXPECT_LT(statsForceVertical.Value(), state.suspForce * 3e-2);
     EXPECT_LT(statsWheelSpeed.Value(), 2e-1);
   }
 }
