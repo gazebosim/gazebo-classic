@@ -258,6 +258,23 @@ TEST_F(TireSlipTest, Lateral)
     state.axelForceLongitudinal = 0.0;
     states.push_back(state);
   }
+  {
+    TireSlipState state;
+    state.description = "Longitudinal slip: low";
+    // speed in miles / hour, convert to rad/s
+    state.drumSpeed = -25.0 * metersPerMile / secondsPerHour /  drumRadius;
+    state.wheelSpeed = -1.055 * state.drumSpeed * drumRadius / wheelRadius;
+    state.suspForce = 1000.0;
+    state.wheelTorque = 0.25 * state.suspForce * wheelRadius;
+    state.steer.SetFromDegree(0.0);
+    // TODO the following line should be used
+    // state.axelForceLateral = 0.0;
+    state.axelForceLongitudinal = -250.0;
+    // The following is used instead, however, since we are not setting
+    // the friction directions properly.
+    state.axelForceLateral = -state.axelForceLongitudinal;
+    states.push_back(state);
+  }
 
   for (auto const & state : states)
   {
