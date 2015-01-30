@@ -25,13 +25,14 @@ namespace gazebo
 {
   namespace physics
   {
-    typedef std::map<std::string, boost::any> Preset;
+    //typedef std::map<std::string, boost::any> Preset;
+    class Preset;
 
     class PresetManagerPrivate
     {
       public: Preset* currentPreset;
-      public: std::map<std::string, Preset*> presetProfiles;
-      public: std::map<std::string, sdf::ElementPtr> presetSDF;
+      public: std::map<std::string, Preset> presetProfiles;
+      //public: std::map<std::string, sdf::ElementPtr> presetSDF;
       public: PhysicsEnginePtr physicsEngine;
     };
   }  // namespace physics

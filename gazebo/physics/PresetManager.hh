@@ -27,7 +27,12 @@ namespace gazebo
 {
   namespace physics
   {
-    typedef std::map<std::string, boost::any> Preset;
+    //typedef std::map<std::string, boost::any> Preset;
+    class Preset
+    {
+      public: std::map<std::string, boost::any> paramMap;
+      public: sdf::ElementPtr sdfElement;
+    };
 
     class PresetManagerPrivate;
 
@@ -36,7 +41,7 @@ namespace gazebo
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.
       /// \param[in] _sdf Pointer to the SDF parameters.
-      public: PresetManager(WorldPtr _world, sdf::ElementPtr _sdf);
+      public: PresetManager(PhysicsEnginePtr _physicsEngine, const sdf::ElementPtr _sdf);
 
       /// \brief Destructor.
       public: ~PresetManager();
@@ -60,21 +65,21 @@ namespace gazebo
 
       public: void CreateProfile(const std::string& _name);
 
-      public: void CreateProfileFromPreset(const std::string& _name,
-                                           Preset* _preset);
-
-      public: void CreateProfileFromSDF(sdf::ElementPtr _sdf);
+      /// \return The name of the created profile
+      public: std::string CreateProfile(sdf::ElementPtr _sdf);
 
       public: void RemoveProfile(const std::string& _name);
 
-      public: sdf::ElementPtr GetSDFForProfile(const std::string &_name) const;
+      public: sdf::ElementPtr GetProfileSDF(const std::string &_name) const;
 
-      public: void SetSDFForProfile(const std::string &_name,
+      public: void SetProfileSDF(const std::string &_name,
                   sdf::ElementPtr _sdf);
 
-      private: void SetPresetFromSDF(sdf::ElementPtr _elem, Preset* _paramMap);
+      /*private: void CreateProfileFromPreset(const std::string& _name,
+                                           Preset* _preset);*/
+      private: Preset GeneratePresetFromSDF(const sdf::ElementPtr _elem) const;
 
-      private: sdf::ElementPtr GetSDFFromPreset(Preset* _paramMap) const;
+      private: sdf::ElementPtr GenerateSDFFromPreset(Preset* _paramMap) const;
 
       private: PresetManagerPrivate *dataPtr;
     };
