@@ -324,9 +324,57 @@ void TireFrictionPlugin::OnUpdate()
   }
 }
 
-/////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
 // This is an example function for computing friction based on slip
 // and reference speed.
+//
+// The model has five parameters:
+// * frictionStatic
+// * frictionDynamic
+// * slipStatic
+// * slipDynamic
+// * speedStatic
+//
+// The model behaves differently in three speed ranges:
+//
+// When the _referenceSpeed is high (larger than speedStatic parameter),
+// slipRatio is computed as the ratio of _slipSpeed to _referenceSpeed.
+// The tire friction coefficient is computed as a piecewise linear
+// function of the slip ratio.
+// A plot of this function is given below with the slipRatio on the
+// horizontal axis, and friction on the vertical axis.
+// The piecewise function connects the following points:
+// * (0,0)
+// * (slipStatic,frictionStatic)
+// * (slipDynamic,frictionDynamic)
+// * (Inf,frictionDynamic)
+// 
+//   |
+//   |         frictionStatic
+//   |        /.\
+//   |       / . \
+//   |      /  .  \_____________ frictionDynamic
+//   |     /   .  .
+//   |    /    .  .
+//   |   /     .  .
+//   |  /      .  .
+//   | /       .  .
+//   |/        .  .
+// --+-------------------------- slipRatio
+//   |         |  └— slipDynamic
+//   |         └— slipStatic
+//
+// This model is a piecewise linear approximation of the Pacejka
+// magic formula and other semi-empirical tire models. These formulae
+// require adjustments at low-speed, however.
+//
+// When the _referenceSpeed is low (below 50% of the speedStatic parameter),
+// the frictionStatic parameter is always returned.
+//
+// To make the function continuous, the two value are interpolated
+// when the _referenceSpeed lies between 50% and 100% of the speedStatic
+// parameter.
+/////////////////////////////////////////////////////////////////////
 double TireFrictionPlugin::ComputeFriction(const double _slipSpeed,
                                            const double _referenceSpeed)
 {
@@ -351,7 +399,7 @@ double TireFrictionPlugin::ComputeFriction(const double _slipSpeed,
   double frictionFromSlip = muDynamic;
   if (slipRatio < this->dataPtr->slipStatic)
   {
-    frictionFromSlip = muStatic * slipRatio / this->dataPtr->slipStatic;
+    frictionFromSlip = slipRatio * muStatic / this->dataPtr->slipStatic;
   }
   else if (slipRatio < this->dataPtr->slipDynamic)
   {
