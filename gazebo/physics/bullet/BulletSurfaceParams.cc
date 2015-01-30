@@ -51,7 +51,7 @@ void BulletSurfaceParams::Load(sdf::ElementPtr _sdf)
   sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
   GZ_ASSERT(frictionOdeElem , "Surface friction ode sdf member is NULL");
 
-  this->frictionPyramid.SetMuPrimary(  frictionOdeElem->Get<double>("mu"));
+  this->frictionPyramid.SetMuPrimary(frictionOdeElem->Get<double>("mu"));
   this->frictionPyramid.SetMuSecondary(frictionOdeElem->Get<double>("mu2"));
 }
 
