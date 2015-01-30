@@ -87,10 +87,12 @@ void TireFrictionPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   GZ_ASSERT(this->dataPtr->collision,
     "TireFrictionPlugin collision pointer is NULL");
 
+  // Get tire friction parameters
   if (_sdf->HasElement("friction_static"))
     this->dataPtr->frictionStatic = _sdf->Get<double>("friction_static");
   if (_sdf->HasElement("friction_dynamic"))
     this->dataPtr->frictionDynamic = _sdf->Get<double>("friction_dynamic");
+
   if (_sdf->HasElement("slip_static"))
   {
     double valueCheck = _sdf->Get<double>("slip_static");
@@ -107,25 +109,23 @@ void TireFrictionPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       this->dataPtr->slipStatic = valueCheck;
     }
   }
+
   if (_sdf->HasElement("slip_dynamic"))
   {
-    double valueCheck = _sdf->Get<double>("slip_dynamic");
-    if (valueCheck <= this->dataPtr->slipStatic)
-    {
-      this->dataPtr->slipDynamic = this->dataPtr->slipStatic + 0.1;
-      gzerr << "slip_dynamic parameter value ["
-            << valueCheck
-            << "] must be greater than slip_static ["
-            << this->dataPtr->slipStatic
-            << "], using slip_static + 0.1 ["
-            << this->dataPtr->slipDynamic
-            << std::endl;
-    }
-    else
-    {
-      this->dataPtr->slipDynamic = valueCheck;
-    }
+    this->dataPtr->slipDynamic = _sdf->Get<double>("slip_dynamic");
   }
+  if (this->dataPtr->slipDynamic <= this->dataPtr->slipStatic)
+  {
+    gzerr << "slip_dynamic parameter value ["
+          << this->dataPtr->slipDynamic
+          << "] must be greater than slip_static ["
+          << this->dataPtr->slipStatic
+          << "], using slip_static + 0.1 ["
+          << this->dataPtr->slipStatic + 0.1
+          << std::endl;
+    this->dataPtr->slipDynamic = this->dataPtr->slipStatic + 0.1;
+  }
+
   if (_sdf->HasElement("speed_static"))
   {
     double valueCheck = _sdf->Get<double>("speed_static");
