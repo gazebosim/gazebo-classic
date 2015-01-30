@@ -56,7 +56,6 @@ Link::Link(EntityPtr _parent)
   this->publishDataMutex = new boost::recursive_mutex();
 }
 
-
 //////////////////////////////////////////////////
 Link::~Link()
 {
@@ -218,8 +217,9 @@ void Link::Load(sdf::ElementPtr _sdf)
     this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
           boost::bind(&Link::Update, this, _1)));
 
-  this->wrenchSub = this->node->Subscribe("~/wrench",
-      &Link::OnWrenchMsg, this);
+  std::string topicName = "~/" + this->GetScopedName() + "/wrench";
+  boost::replace_all(topicName, "::", "/");
+  this->wrenchSub = this->node->Subscribe(topicName, &Link::OnWrenchMsg, this);
 }
 
 //////////////////////////////////////////////////
@@ -1334,10 +1334,11 @@ msgs::Visual Link::GetVisualMessage(const std::string &_name) const
 //////////////////////////////////////////////////
 void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
 {
+std::cout << _msg->DebugString() << std::endl;
   if (_msg->has_force())
   {
-    const math::Vector3 force = _msg->force();
-    std::cout << force.x << "  " << force.y << "  " << force.z << std::endl;
+    const math::Vector3 force = msgs::Convert(_msg->force());
+    this->AddForce(force);
   }
 
 //  if (_msg->name() == this->GetScopedName())

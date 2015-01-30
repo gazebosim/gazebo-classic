@@ -208,6 +208,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   this->torqueVector = math::Vector3::UnitX;
 
   this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
 }
 
 /////////////////////////////////////////////////
@@ -229,9 +230,6 @@ void ApplyWrenchDialog::SetModel(std::string _modelName)
 void ApplyWrenchDialog::OnApply()
 {
   // publish wrench msg
-  this->wrenchPub = this->node->Advertise<msgs::Wrench>(
-      this->GetTopic());
-
   msgs::Wrench msg;
   msgs::Set(msg.mutable_force(), this->forceVector);
   msgs::Set(msg.mutable_torque(), this->torqueVector);
@@ -304,17 +302,14 @@ void ApplyWrenchDialog::SetTopic()
   // For now getting the first link that comes up
   if (vis && vis == vis->GetRootVisual())
   {
-//    std::cout << vis->GetName() << std::endl;
-//    for (unsigned int i = 0; i < vis->GetChildCount(); ++i)
-//    {
-//      std::cout << "Child " << i << "  " << vis->GetChild(i)->GetName() << std::endl;
-//    }
     linkName = vis->GetChild(0)->GetName();
   }
 
   this->topicName = "~/";
   topicName += linkName + "/wrench";
   boost::replace_all(topicName, "::", "/");
+
+  this->wrenchPub = this->node->Advertise<msgs::Wrench>(this->topicName);
 }
 
 //////////////////////////////////////////////////
