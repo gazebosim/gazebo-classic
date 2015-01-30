@@ -31,7 +31,7 @@ TEST_F(Issue351Test, WorldStep)
 {
   Load("worlds/world_step.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   // Take 500 steps; it passes if it doesn't seg-fault
   world->Step(500);
