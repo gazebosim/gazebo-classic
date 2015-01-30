@@ -106,7 +106,11 @@ namespace gazebo
       /// \brief Update the visual.
       public: void Update();
 
-      /// \brief Get the visual SDF.
+      /// \brief Get the visual SDF. Note that visuals are abstract. This SDF
+      /// could be associated with a visual that represents a model, a link,
+      /// a visual (inside a link), or a visualization object
+      /// (e.g. LaserVisual). Therefore this SDF may store more fields than
+      /// actually used.
       /// \return SDF of the visual.
       public: sdf::ElementPtr GetSDF() const;
 
@@ -202,6 +206,22 @@ namespace gazebo
       /// \brief Set the specular color of the visual.
       /// \param[in] _color Specular color.
       public: void SetSpecular(const common::Color &_color);
+
+      /// \brief Get the ambient color of the visual.
+      /// \return Ambient color.
+      public: common::Color GetAmbient() const;
+
+      /// \brief Get the diffuse color of the visual.
+      /// \return Diffuse color.
+      public: common::Color GetDiffuse() const;
+
+      /// \brief Get the specular color of the visual.
+      /// \return Specular color.
+      public: common::Color GetSpecular() const;
+
+      /// \brief Get the emissive color of the visual.
+      /// \return Emissive color.
+      public: common::Color GetEmissive() const;
 
       /// \brief Attach visualization axes
       public: void AttachAxes();
