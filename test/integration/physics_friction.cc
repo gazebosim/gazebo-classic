@@ -220,6 +220,12 @@ class PhysicsFrictionTest : public ServerFixture,
   /// \param[in] _physicsEngine Physics engine to use.
   public: void FrictionDemo(const std::string &_physicsEngine);
 
+  /// \brief Friction test of maximum dissipation principle.
+  /// Basically test that friction force vector is aligned with
+  /// and opposes velocity vector.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void MaximumDissipation(const std::string &_physicsEngine);
+
   /// \brief Test friction directions for friction pyramid with boxes.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void BoxDirectionRing(const std::string &_physicsEngine);
@@ -324,6 +330,89 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine)
   for (box = boxes.begin(); box != boxes.end(); ++box)
   {
     ASSERT_TRUE(box->model != NULL);
+  }
+}
+
+/////////////////////////////////////////////////
+// MaximumDissipation test:
+// Start with empty world,
+// spawn a bunch of boxes,
+// sets box velocities to different angles,
+// expect velocity unit vectors to stay constant while in motion.
+void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
+{
+  // Load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // get the gravity vector
+  // small positive y component
+  math::Vector3 g = physics->GetGravity();
+
+  // Spawn concentric semi-circles of boxes
+  int boxes = 10;
+  double dx = 0.5;
+  double dy = 0.5;
+  double dz = 0.2;
+  std::map<physics::ModelPtr, double> modelAngles;
+
+  for (int ring = 0; ring < 5; ++ring)
+  {
+    gzdbg << "Spawn ring " << ring+1 << " of boxes" << std::endl;
+    for (int i = 0; i <= boxes; ++i)
+    {
+      // Set box size and anisotropic friction
+      SpawnFrictionBoxOptions opt;
+      opt.size.Set(dx, dy, dz);
+      opt.friction1 = 0.3;
+      opt.friction2 = opt.friction1;
+
+      // Compute angle for each box
+      double radius = 5.0 + ring;
+      double angle = M_PI*static_cast<double>(i) / static_cast<double>(boxes);
+      opt.modelPose.pos.Set(radius*cos(angle), radius*sin(angle), dz/2);
+
+      if (ring == 0)
+        opt.direction1 = math::Vector3(-sin(angle), cos(angle), 0);
+      else if (ring < 4)
+        opt.direction1 = math::Vector3(0.0, 1.0, 0.0);
+
+      if (ring == 1)
+        opt.collisionPose.rot.SetFromEuler(0.0, 0.0, angle);
+
+      if (ring == 2)
+        opt.linkPose.rot.SetFromEuler(0.0, 0.0, angle);
+
+      if (ring == 3)
+        opt.modelPose.rot.SetFromEuler(0.0, 0.0, angle);
+
+      physics::ModelPtr model = SpawnBox(opt);
+      ASSERT_TRUE(model != NULL);
+      modelAngles[model] = angle;
+
+      // Set velocity, larger for outer rings.
+      model->SetLinearVel(radius * math::Vector3(cos(angle), sin(angle), 0));
+    }
+  }
+
+  gzdbg << "Checking velocity direction" << std::endl;
+  std::map<physics::ModelPtr, double>::iterator iter;
+  for (int i = 0; i < 1500; ++i)
+  {
+    world->Step(1);
+    for (iter = modelAngles.begin(); iter != modelAngles.end(); ++iter)
+    {
+      double cosAngle = cos(iter->second);
+      double sinAngle = sin(iter->second);
+      math::Vector3 vel = iter->first->GetWorldLinearVel();
+      EXPECT_EQ(math::Vector3(cosAngle, sinAngle, 0), vel / vel.GetLength());
+    }
   }
 }
 
@@ -648,6 +737,12 @@ void PhysicsFrictionTest::LinkGetWorldInertia(const std::string &_physicsEngine)
 TEST_P(PhysicsFrictionTest, FrictionDemo)
 {
   FrictionDemo(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsFrictionTest, MaximumDissipation)
+{
+  MaximumDissipation(GetParam());
 }
 
 /////////////////////////////////////////////////
