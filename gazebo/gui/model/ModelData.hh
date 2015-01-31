@@ -21,9 +21,7 @@
 #include <vector>
 
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
-
-#include "gazebo/gui/model/PartInspector.hh"
+#include "gazebo/gui/qt.h"
 
 namespace boost
 {
@@ -34,6 +32,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class LinkInspector;
+
     class ModelData
     {
       /// \brief Get a template SDF string of a simple model.
@@ -72,10 +72,6 @@ namespace gazebo
       /// \brief Set the pose of the part.
       /// \param[in] _pose Pose of part.
       public: void SetPose(const math::Pose &_pose);
-
-      /// \brief Set the scale of the part.
-      /// \param[in] _scale Scale of part.
-      //public: void SetScale(const math::Vector3 &_scale);
 
       /// \brief Add a visual to the part.
       /// \param[in] _visual Visual to be added.
@@ -139,7 +135,7 @@ namespace gazebo
       public: std::map<rendering::VisualPtr, msgs::Collision> collisions;
 
       /// \brief Inspector for configuring part properties.
-      public: PartInspector *inspector;
+      public: LinkInspector *inspector;
     };
   }
 }

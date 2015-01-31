@@ -17,7 +17,6 @@
 #ifndef _MODEL_CREATOR_HH_
 #define _MODEL_CREATOR_HH_
 
-#include <boost/unordered/unordered_map.hpp>
 #include <sdf/sdf.hh>
 
 #include <list>
@@ -25,11 +24,12 @@
 #include <vector>
 
 #include "gazebo/common/KeyEvent.hh"
-#include "gazebo/gui/qt.h"
-#include "gazebo/gui/model/JointMaker.hh"
-#include "gazebo/gui/model/PartInspector.hh"
+#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/gui/qt.h"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -43,6 +43,7 @@ namespace gazebo
   {
     class PartData;
     class SaveDialog;
+    class JointMaker;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -321,7 +322,7 @@ namespace gazebo
       private: PartType addPartType;
 
       /// \brief A map of model part names to and their visuals.
-      private: boost::unordered_map<std::string, PartData *> allParts;
+      private: std::map<std::string, PartData *> allParts;
 
       /// \brief Transport node
       private: transport::NodePtr node;

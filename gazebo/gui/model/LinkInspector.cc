@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,19 +21,19 @@
 #include "gazebo/gui/ConfigWidget.hh"
 
 
-#include "gazebo/gui/model/PartGeneralConfig.hh"
-#include "gazebo/gui/model/PartVisualConfig.hh"
-#include "gazebo/gui/model/PartCollisionConfig.hh"
-#include "gazebo/gui/model/PartInspector.hh"
+#include "gazebo/gui/model/LinkConfig.hh"
+#include "gazebo/gui/model/VisualConfig.hh"
+#include "gazebo/gui/model/CollisionConfig.hh"
+#include "gazebo/gui/model/LinkInspector.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-PartInspector::PartInspector(QWidget *_parent) : QDialog(_parent)
+LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
 {
-  this->setObjectName("PartInspector");
-  this->setWindowTitle(tr("Part Inspector"));
+  this->setObjectName("LinkInspector");
+  this->setWindowTitle(tr("Link Inspector"));
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   QLabel *partLabel = new QLabel(tr("Name:"));
@@ -43,16 +43,16 @@ PartInspector::PartInspector(QWidget *_parent) : QDialog(_parent)
   nameLayout->addWidget(partLabel);
   nameLayout->addWidget(partNameLabel);
 
-  this->generalConfig = new PartGeneralConfig;
-  this->visualConfig = new PartVisualConfig;
-  this->collisionConfig = new PartCollisionConfig;
+  this->linkConfig = new LinkConfig;
+  this->visualConfig = new VisualConfig;
+  this->collisionConfig = new CollisionConfig;
 
   // Create the main tab widget for all components in a part
   this->tabWidget = new QTabWidget();
-  this->tabWidget->setObjectName("partInspectorTab");
+  this->tabWidget->setObjectName("LinkInspectorTab");
   this->tabWidget->setMinimumHeight(800);
 
-  this->tabWidget->addTab(this->generalConfig, "General");
+  this->tabWidget->addTab(this->linkConfig, "Link");
   this->tabWidget->addTab(this->visualConfig, "Visual");
   this->tabWidget->addTab(this->collisionConfig, "Collision");
 
@@ -77,10 +77,10 @@ PartInspector::PartInspector(QWidget *_parent) : QDialog(_parent)
 }
 
 /////////////////////////////////////////////////
-PartInspector::~PartInspector()
+LinkInspector::~LinkInspector()
 {
-  delete this->generalConfig;
-  this->generalConfig = NULL;
+  delete this->linkConfig;
+  this->linkConfig = NULL;
   delete this->visualConfig;
   this->visualConfig = NULL;
   delete this->collisionConfig;
@@ -88,49 +88,49 @@ PartInspector::~PartInspector()
 }
 
 /////////////////////////////////////////////////
-void PartInspector::SetName(const std::string &_name)
+void LinkInspector::SetName(const std::string &_name)
 {
   this->partNameLabel->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////
-std::string PartInspector::GetName() const
+std::string LinkInspector::GetName() const
 {
   return this->partNameLabel->text().toStdString();
 }
 
 /////////////////////////////////////////////////
-PartGeneralConfig *PartInspector::GetGeneralConfig() const
+LinkConfig *LinkInspector::GetLinkConfig() const
 {
-  return this->generalConfig;
+  return this->linkConfig;
 }
 
 /////////////////////////////////////////////////
-PartVisualConfig *PartInspector::GetVisualConfig() const
+VisualConfig *LinkInspector::GetVisualConfig() const
 {
   return this->visualConfig;
 }
 
 /////////////////////////////////////////////////
-PartCollisionConfig *PartInspector::GetCollisionConfig() const
+CollisionConfig *LinkInspector::GetCollisionConfig() const
 {
   return this->collisionConfig;
 }
 
 /////////////////////////////////////////////////
-void PartInspector::OnCancel()
+void LinkInspector::OnCancel()
 {
   this->close();
 }
 
 /////////////////////////////////////////////////
-void PartInspector::OnApply()
+void LinkInspector::OnApply()
 {
   emit Applied();
 }
 
 /////////////////////////////////////////////////
-void PartInspector::OnOK()
+void LinkInspector::OnOK()
 {
   emit Applied();
   this->accept();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _PART_VISUAL_CONFIG_HH_
-#define _PART_VISUAL_CONFIG_HH_
+#ifndef _VISUAL_CONFIG_HH_
+#define _VISUAL_CONFIG_HH_
 
 #include <string>
 
@@ -35,7 +35,7 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class VisualConfigData PartVisualConfig.hh
+    /// \class VisualConfigData VisualConfig.hh
     /// \brief A class of widgets used for configuring visual properties.
     class VisualConfigData
     {
@@ -52,17 +52,17 @@ namespace gazebo
       public: QTreeWidgetItem *treeItem;
     };
 
-    /// \class PartVisualConfig PartVisualConfig.hh
+    /// \class VisualConfig VisualConfig.hh
     /// \brief A tab for configuring visual properties of a part.
-    class PartVisualConfig : public QWidget
+    class VisualConfig : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor
-      public: PartVisualConfig();
+      public: VisualConfig();
 
       /// \brief Destructor
-      public: ~PartVisualConfig();
+      public: ~VisualConfig();
 
       /// \brief Add a visual widget to the tab.
       /// \param[in] _name Name of visual added.

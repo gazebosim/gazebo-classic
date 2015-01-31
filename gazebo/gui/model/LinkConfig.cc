@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,15 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/gui/ConfigWidget.hh"
-#include "gazebo/gui/model/PartGeneralConfig.hh"
+#include "gazebo/gui/model/LinkConfig.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-PartGeneralConfig::PartGeneralConfig()
+LinkConfig::LinkConfig()
 {
-  this->setObjectName("PartGeneralConfig");
+  this->setObjectName("LinkConfig");
   QVBoxLayout *generalLayout = new QVBoxLayout;
 
   this->configWidget = new ConfigWidget;
@@ -56,18 +56,18 @@ PartGeneralConfig::PartGeneralConfig()
 }
 
 /////////////////////////////////////////////////
-PartGeneralConfig::~PartGeneralConfig()
+LinkConfig::~LinkConfig()
 {
 }
 
 /////////////////////////////////////////////////
-void PartGeneralConfig::SetPose(const math::Pose &_pose)
+void LinkConfig::SetPose(const math::Pose &_pose)
 {
   this->configWidget->SetPoseWidgetValue("pose", _pose);
 }
 
 /////////////////////////////////////////////////
-msgs::Link *PartGeneralConfig::GetData() const
+msgs::Link *LinkConfig::GetData() const
 {
   return dynamic_cast<msgs::Link *>(this->configWidget->GetMsg());
 }

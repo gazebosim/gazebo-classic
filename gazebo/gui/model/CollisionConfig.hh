@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _PART_COLLISION_TAB_HH_
-#define _PART_COLLISION_TAB_HH_
+#ifndef _COLLISION_CONFIG_HH_
+#define _COLLISION_CONFIG_HH_
 
 #include <string>
 
@@ -35,7 +35,7 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class CollisionConfigData PartCollisionConfig.hh
+    /// \class CollisionConfigData CollisionConfig.hh
     /// \brief A class of widgets used for configuring collision properties.
     class CollisionConfigData
     {
@@ -52,17 +52,17 @@ namespace gazebo
       public: QTreeWidgetItem *treeItem;
     };
 
-    /// \class PartCollisionConfig PartCollisionConfig.hh
+    /// \class CollisionConfig CollisionConfig.hh
     /// \brief A tab for configuring collision properties of a part.
-    class PartCollisionConfig : public QWidget
+    class CollisionConfig : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor
-      public: PartCollisionConfig();
+      public: CollisionConfig();
 
       /// \brief Destructor
-      public: ~PartCollisionConfig();
+      public: ~CollisionConfig();
 
       /// \brief Add a collision widget to the tab.
       /// \param[in] _name Name of collision added.

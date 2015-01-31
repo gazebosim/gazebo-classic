@@ -117,7 +117,6 @@ namespace gazebo
 
       /// \brief Widget for the top toolbar
       private: QToolBar *toolbar;
-
       private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 

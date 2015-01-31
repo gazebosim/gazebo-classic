@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _PART_GENERAL_TAB_HH_
-#define _PART_GENERAL_TAB_HH_
+#ifndef _Link_CONFIG_HH_
+#define _LINK_CONFIG_HH_
 
 #include <string>
 
@@ -35,17 +35,17 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class PartGeneralConfig PartGeneralConfig.hh
+    /// \class LinkConfig LinkConfig.hh
     /// \brief A tab for configuring general properties of a part.
-    class PartGeneralConfig : public QWidget
+    class LinkConfig : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor
-      public: PartGeneralConfig();
+      public: LinkConfig();
 
       /// \brief Destructor
-      public: ~PartGeneralConfig();
+      public: ~LinkConfig();
 
       /// \brief Get the msg containing all link data.
       /// \return Link msg.

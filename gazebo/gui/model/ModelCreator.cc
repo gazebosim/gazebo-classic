@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,15 @@
 #include <sstream>
 #include <string>
 
-#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
-#include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/math/Quaternion.hh"
 
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
-
-#include "gazebo/physics/Inertial.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
@@ -44,10 +40,7 @@
 #include "gazebo/gui/SaveDialog.hh"
 
 #include "gazebo/gui/model/ModelData.hh"
-#include "gazebo/gui/model/PartGeneralConfig.hh"
-#include "gazebo/gui/model/PartVisualConfig.hh"
-#include "gazebo/gui/model/PartCollisionConfig.hh"
-#include "gazebo/gui/model/PartInspector.hh"
+#include "gazebo/gui/model/LinkInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -578,6 +571,7 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 {
   PartData *part = new PartData();
   part->partVisual = _visual->GetParent();
+  part->scale = part->partVisual->GetScale();
   part->AddVisual(_visual);
 
   // create collision with identical geometry
@@ -1067,7 +1061,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
 {
   // open the part inspector on double click
- rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
+  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
   if (!vis)
     return false;
 
@@ -1123,7 +1117,7 @@ void ModelCreator::OnPaste()
   }
 
   // For now, only copy the last selected model
-  boost::unordered_map<std::string, PartData *>::iterator it =
+  std::map<std::string, PartData *>::iterator it =
       this->allParts.find(this->copiedPartNames.back());
   if (it != this->allParts.end())
   {
@@ -1214,7 +1208,7 @@ void ModelCreator::GenerateSDF()
   modelElem->GetAttribute("name")->Set(this->folderName);
 
   // set center of all parts to be origin
-  boost::unordered_map<std::string, PartData *>::iterator partsIt;
+  std::map<std::string, PartData *>::iterator partsIt;
   math::Vector3 mid;
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
        ++partsIt)
@@ -1280,8 +1274,6 @@ void ModelCreator::GenerateSDF()
   // Model settings
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
-
-  // std::cerr << modelElem->ToString("") << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -1352,15 +1344,15 @@ void ModelCreator::ModelChanged()
 void ModelCreator::Update()
 {
   // Check if any parts have been moved or resized and trigger ModelChanged
-  boost::unordered_map<std::string, PartData *>::iterator partsIt;
+  std::map<std::string, PartData *>::iterator partsIt;
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
        ++partsIt)
   {
     PartData *part = partsIt->second;
-    if (part->pose != part->partVisual->GetWorldPose() ||
+    if (part->GetPose() != part->partVisual->GetWorldPose() ||
         part->scale != part->partVisual->GetScale())
     {
-      part->pose = part->partVisual->GetWorldPose();
+      part->SetPose(part->partVisual->GetWorldPose());
       part->scale = part->partVisual->GetScale();
       this->ModelChanged();
     }

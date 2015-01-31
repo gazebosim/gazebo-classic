@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,10 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo/gui/model/PartVisualConfig.hh"
-#include "gazebo/gui/model/PartGeneralConfig.hh"
-#include "gazebo/gui/model/PartCollisionConfig.hh"
+#include "gazebo/gui/model/LinkInspector.hh"
+#include "gazebo/gui/model/VisualConfig.hh"
+#include "gazebo/gui/model/LinkConfig.hh"
+#include "gazebo/gui/model/CollisionConfig.hh"
 
 #include "gazebo/gui/model/ModelData.hh"
 
@@ -78,7 +79,7 @@ PartData::PartData()
   this->partSDF.reset(new sdf::Element);
   sdf::initFile("link.sdf", this->partSDF);
 
-  this->inspector = new PartInspector;
+  this->inspector = new LinkInspector;
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
   connect(this->inspector->GetVisualConfig(),
@@ -134,15 +135,15 @@ void PartData::SetPose(const math::Pose &_pose)
 {
   this->partSDF->GetElement("pose")->Set(_pose);
 
-  PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
-  generalConfig->SetPose(_pose);
+  LinkConfig *linkConfig = this->inspector->GetLinkConfig();
+  linkConfig->SetPose(_pose);
 }
 
 /////////////////////////////////////////////////
 void PartData::UpdateConfig()
 {
   // set new geom size if scale has changed.
-  PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
+  VisualConfig *visualConfig = this->inspector->GetVisualConfig();
   std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
   for (it = this->visuals.begin(); it != this->visuals.end(); ++it)
   {
@@ -158,7 +159,7 @@ void PartData::UpdateConfig()
     visualMsg.CopyFrom(*updateMsg);
     it->second = visualMsg;
   }
-  PartCollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
+  CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
   std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
   for (colIt = this->collisions.begin(); colIt != this->collisions.end();
       ++colIt)
@@ -179,7 +180,7 @@ void PartData::UpdateConfig()
 /////////////////////////////////////////////////
 void PartData::AddVisual(rendering::VisualPtr _visual)
 {
-  PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
+  VisualConfig *visualConfig = this->inspector->GetVisualConfig();
   msgs::Visual visualMsg = msgs::VisualFromSDF(_visual->GetSDF());
 
   // override transparency value
@@ -197,7 +198,7 @@ void PartData::AddVisual(rendering::VisualPtr _visual)
 /////////////////////////////////////////////////
 void PartData::AddCollision(rendering::VisualPtr _collisionVis)
 {
-  PartCollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
+  CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
   msgs::Visual visualMsg = msgs::VisualFromSDF(_collisionVis->GetSDF());
 
   sdf::ElementPtr collisionSDF(new sdf::Element);
@@ -222,15 +223,15 @@ void PartData::AddCollision(rendering::VisualPtr _collisionVis)
 void PartData::OnApply()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
+  LinkConfig *linkConfig = this->inspector->GetLinkConfig();
 
-  this->partSDF = msgs::LinkToSDF(*generalConfig->GetData(), this->partSDF);
+  this->partSDF = msgs::LinkToSDF(*linkConfig->GetData(), this->partSDF);
   this->partVisual->SetWorldPose(this->GetPose());
 
   // update visuals
   if (!this->visuals.empty())
   {
-    PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
+    VisualConfig *visualConfig = this->inspector->GetVisualConfig();
     std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
     for (it = this->visuals.begin(); it != this->visuals.end(); ++it)
     {
@@ -257,7 +258,7 @@ void PartData::OnApply()
   // update collisions
   if (!this->collisions.empty())
   {
-    PartCollisionConfig *collisionConfig =
+    CollisionConfig *collisionConfig =
         this->inspector->GetCollisionConfig();
     std::map<rendering::VisualPtr, msgs::Collision>::iterator it;
     for (it = this->collisions.begin(); it != this->collisions.end(); ++it)
@@ -284,7 +285,7 @@ void PartData::OnApply()
 void PartData::OnAddVisual(const std::string &_name)
 {
   // add a visual when the user adds a visual via the inspector's visual tab
-  PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
+  VisualConfig *visualConfig = this->inspector->GetVisualConfig();
 
   std::ostringstream visualName;
   visualName << this->partVisual->GetName() << "_" << _name;
@@ -327,7 +328,7 @@ void PartData::OnAddCollision(const std::string &_name)
 {
   // add a collision when the user adds a collision via the inspector's
   // collision tab
-  PartCollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
+  CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
 
   std::ostringstream collisionName;
   collisionName << this->partVisual->GetName() << "_" << _name;
