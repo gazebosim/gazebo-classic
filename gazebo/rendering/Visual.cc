@@ -565,7 +565,6 @@ void Visual::Load()
 
       if (!matName.empty())
         this->SetMaterial(matName);
-
       if (matElem->HasElement("ambient"))
         this->SetAmbient(matElem->Get<common::Color>("ambient"));
       if (matElem->HasElement("diffuse"))
@@ -574,6 +573,16 @@ void Visual::Load()
         this->SetSpecular(matElem->Get<common::Color>("specular"));
       if (matElem->HasElement("emissive"))
         this->SetEmissive(matElem->Get<common::Color>("emissive"));
+
+    if (matElem->HasElement("lighting"))
+    {
+      this->SetLighting(matElem->Get<bool>("lighting"));
+    }
+  }
+
+  if (this->dataPtr->sdf->HasElement("transparency"))
+  {
+    this->SetTransparency(this->dataPtr->sdf->Get<float>("transparency"));
     }
 
     if (matElem->HasElement("lighting"))
@@ -940,6 +949,7 @@ void Visual::SetLighting(bool _lighting)
     (*iter)->SetLighting(this->dataPtr->lighting);
   }
 
+
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("lighting")->Set(this->dataPtr->lighting);
 }
@@ -1138,6 +1148,8 @@ void Visual::SetAmbient(const common::Color &_color)
     this->dataPtr->children[i]->SetAmbient(_color);
   }
 
+  this->dataPtr->ambient = _color;
+
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("ambient")->Set(_color);
 }
@@ -1199,6 +1211,8 @@ void Visual::SetDiffuse(const common::Color &_color)
     this->dataPtr->children[i]->SetDiffuse(_color);
   }
 
+  this->dataPtr->diffuse = _color;
+
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("diffuse")->Set(_color);
 }
@@ -1258,8 +1272,85 @@ void Visual::SetSpecular(const common::Color &_color)
     this->dataPtr->children[i]->SetSpecular(_color);
   }
 
+  this->dataPtr->specular = _color;
+
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("specular")->Set(_color);
+}
+
+//////////////////////////////////////////////////
+void Visual::SetEmissive(const common::Color &_color)
+{
+  for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
+      i++)
+  {
+    Ogre::Entity *entity = NULL;
+    Ogre::MovableObject *obj = this->dataPtr->sceneNode->getAttachedObject(i);
+
+    entity = dynamic_cast<Ogre::Entity*>(obj);
+
+    if (!entity)
+      continue;
+
+    // For each ogre::entity
+    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
+    {
+      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
+      Ogre::MaterialPtr material = subEntity->getMaterial();
+
+      unsigned int techniqueCount, passCount;
+      Ogre::Technique *technique;
+      Ogre::Pass *pass;
+      Ogre::ColourValue dc;
+
+      for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
+          techniqueCount++)
+      {
+        technique = material->getTechnique(techniqueCount);
+
+        for (passCount = 0; passCount < technique->getNumPasses();
+            passCount++)
+        {
+          pass = technique->getPass(passCount);
+          pass->setSelfIllumination(Conversions::Convert(_color));
+        }
+      }
+    }
+  }
+
+  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
+  {
+    this->dataPtr->children[i]->SetEmissive(_color);
+  }
+
+  this->dataPtr->emissive = _color;
+
+  this->dataPtr->sdf->GetElement("material")
+      ->GetElement("emissive")->Set(_color);
+}
+
+/////////////////////////////////////////////////
+common::Color Visual::GetAmbient() const
+{
+  return this->dataPtr->ambient;
+}
+
+/////////////////////////////////////////////////
+common::Color Visual::GetDiffuse() const
+{
+  return this->dataPtr->diffuse;
+}
+
+/////////////////////////////////////////////////
+common::Color Visual::GetSpecular() const
+{
+  return this->dataPtr->specular;
+}
+
+/////////////////////////////////////////////////
+common::Color Visual::GetEmissive() const
+{
+  return this->dataPtr->emissive;
 }
 
 /////////////////////////////////////////////////
@@ -1435,6 +1526,7 @@ void Visual::SetTransparency(float _trans)
 
   this->dataPtr->transparency = std::min(
       std::max(_trans, static_cast<float>(0.0)), static_cast<float>(1.0));
+
   std::vector<VisualPtr>::iterator iter;
   for (iter = this->dataPtr->children.begin();
       iter != this->dataPtr->children.end(); ++iter)
@@ -1485,55 +1577,9 @@ bool Visual::GetHighlighted() const
 }
 
 //////////////////////////////////////////////////
-void Visual::SetEmissive(const common::Color &_color)
-{
-  for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
-      i++)
-  {
-    Ogre::Entity *entity = NULL;
-    Ogre::MovableObject *obj = this->dataPtr->sceneNode->getAttachedObject(i);
-
-    entity = dynamic_cast<Ogre::Entity*>(obj);
-
-    if (!entity)
-      continue;
-
-    // For each ogre::entity
-    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
-    {
-      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
-      Ogre::MaterialPtr material = subEntity->getMaterial();
-
-      unsigned int techniqueCount, passCount;
-      Ogre::Technique *technique;
-      Ogre::Pass *pass;
-      Ogre::ColourValue dc;
-
-      for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-          techniqueCount++)
-      {
-        technique = material->getTechnique(techniqueCount);
-
-        for (passCount = 0; passCount < technique->getNumPasses();
-            passCount++)
-        {
-          pass = technique->getPass(passCount);
-          pass->setSelfIllumination(Conversions::Convert(_color));
-        }
-      }
-    }
-  }
-
-  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
-  {
-    this->dataPtr->children[i]->SetEmissive(_color);
-  }
 
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("emissive")->Set(_color);
-}
-
-//////////////////////////////////////////////////
 float Visual::GetTransparency()
 {
   return this->dataPtr->transparency;
@@ -1551,6 +1597,7 @@ void Visual::SetCastShadows(bool _shadows)
   if (this->IsStatic() && this->dataPtr->staticGeom)
     this->dataPtr->staticGeom->setCastShadows(_shadows);
 
+  this->dataPtr->castShadows = _shadows;
   this->dataPtr->sdf->GetElement("cast_shadows")->Set(_shadows);
 }
 
@@ -2274,13 +2321,11 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
     else if (_msg->geometry().type() == msgs::Geometry::PLANE)
     {
-      geomScale.x = geomScale.y = 1.0;
       if (_msg->geometry().plane().has_size())
       {
         geomScale.x = _msg->geometry().plane().size().x();
         geomScale.y = _msg->geometry().plane().size().y();
       }
-      geomScale.z = 1.0;
     }
     else if (_msg->geometry().type() == msgs::Geometry::IMAGE)
     {
@@ -2293,13 +2338,12 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     {
       if (_msg->geometry().mesh().has_scale())
         geomScale = msgs::Convert(_msg->geometry().mesh().scale());
-      else
-        geomScale.x = geomScale.y = geomScale.z = 1.0;
     }
-    else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
-      geomScale.x = geomScale.y = geomScale.z = 1.0;
-    else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
-      geomScale.x = geomScale.y = geomScale.z = 1.0;
+    else if (_msg->geometry().type() == msgs::Geometry::EMPTY ||
+        _msg->geometry().type() == msgs::Geometry::POLYLINE)
+    {
+      // do nothing for now - keep unit scale.
+    }
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
@@ -2357,6 +2401,10 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
           msgs::Material::NORMAL_MAP_TANGENT_SPACE)
       {
         this->SetShaderType("normal_map_tangent_space");
+      }
+      else
+      {
+        gzerr << "Unrecognized shader type" << std::endl;
       }
 
       if (_msg->material().has_normal_map())

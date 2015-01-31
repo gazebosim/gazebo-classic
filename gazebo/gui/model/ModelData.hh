@@ -120,6 +120,9 @@ namespace gazebo
       /// \brief SDF representing the part data.
       public: sdf::ElementPtr partSDF;
 
+      /// \brief Scale of part.
+      public: math::Vector3 scale;
+
       /// \brief Visual representing this part.
       public: rendering::VisualPtr partVisual;
 

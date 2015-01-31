@@ -489,10 +489,7 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
 {
   if (this->state == "make_entity")
     this->OnMouseReleaseMakeEntity();
-  // Auto switch to select mode if control is pressed to allow multi-object
-  // selection. Remove this once multi-object manipulation is implemented in
-  // RTS modes, issue #213
-  else if (this->state == "select"  || this->mouseEvent.control)
+  else if (this->state == "select")
     this->OnMouseReleaseNormal();
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
