@@ -423,7 +423,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
   if (_pose == math::Pose::Zero)
   {
     linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
-    _pose.pos.z + _size.z/2));
+    _pose.pos.z + _size.z*0.5));
   }
 
   this->CreatePart(visVisual);
@@ -510,7 +510,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
   if (_pose == math::Pose::Zero)
   {
     linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
-    _pose.pos.z + _length/2));
+    _pose.pos.z + _length*0.5));
   }
 
   this->CreatePart(visVisual);
@@ -533,8 +533,8 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   linkNameStream << "part_" << this->partCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName +
-      "::" + linkName, this->previewVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(
+      linkName, this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
@@ -556,7 +556,7 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   if (_pose == math::Pose::Zero)
   {
     linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
-    _pose.pos.z + _scale.z/2));
+    _pose.pos.z + _scale.z*0.5));
   }
 
   this->CreatePart(visVisual);
