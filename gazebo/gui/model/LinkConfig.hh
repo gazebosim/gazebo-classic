@@ -27,7 +27,6 @@
 
 namespace gazebo
 {
-
   namespace gui
   {
     class ConfigWidget;

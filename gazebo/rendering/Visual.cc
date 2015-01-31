@@ -565,12 +565,8 @@ void Visual::Load()
 
       if (!matName.empty())
         this->SetMaterial(matName);
-
-      if (matElem->HasElement("lighting"))
-      {
-        this->SetLighting(matElem->Get<bool>("lighting"));
-      }
     }
+
     if (matElem->HasElement("ambient"))
       this->SetAmbient(matElem->Get<common::Color>("ambient"));
     if (matElem->HasElement("diffuse"))
@@ -579,6 +575,11 @@ void Visual::Load()
       this->SetSpecular(matElem->Get<common::Color>("specular"));
     if (matElem->HasElement("emissive"))
       this->SetEmissive(matElem->Get<common::Color>("emissive"));
+
+    if (matElem->HasElement("lighting"))
+    {
+      this->SetLighting(matElem->Get<bool>("lighting"));
+    }
   }
 
   if (this->dataPtr->sdf->HasElement("transparency"))
@@ -863,7 +864,6 @@ void Visual::UpdateGeomSize(const math::Vector3 &_scale)
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
-
 }
 
 //////////////////////////////////////////////////

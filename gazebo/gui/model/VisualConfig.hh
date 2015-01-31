@@ -18,6 +18,7 @@
 #ifndef _VISUAL_CONFIG_HH_
 #define _VISUAL_CONFIG_HH_
 
+#include <map>
 #include <string>
 
 #include "gazebo/math/Pose.hh"
@@ -27,7 +28,6 @@
 
 namespace gazebo
 {
-
   namespace gui
   {
     class ConfigWidget;
@@ -104,8 +104,8 @@ namespace gazebo
       private slots: void OnAddVisual();
 
       /// \brief Qt callback when a visual is to be removed.
-      /// \param[in] _item Item to be removed.
-      private slots: void OnRemoveVisual(int);
+      /// \param[in] _id Id of item to be removed.
+      private slots: void OnRemoveVisual(int _id);
 
       /// \brief Received item selection user input.
       /// \param[in] _item Item selected.

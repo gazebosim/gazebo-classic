@@ -18,6 +18,7 @@
 #ifndef _COLLISION_CONFIG_HH_
 #define _COLLISION_CONFIG_HH_
 
+#include <map>
 #include <string>
 
 #include "gazebo/math/Pose.hh"
@@ -27,7 +28,6 @@
 
 namespace gazebo
 {
-
   namespace gui
   {
     class ConfigWidget;
@@ -105,8 +105,8 @@ namespace gazebo
       private slots: void OnAddCollision();
 
       /// \brief Qt callback when a collision is to be removed.
-      /// \param[in] _item Item to be removed.
-      private slots: void OnRemoveCollision(int);
+      /// \param[in] _id Id of item to be removed.
+      private slots: void OnRemoveCollision(int _id);
 
       /// \brief Received item selection user input.
       /// \param[in] _item Item selected.
