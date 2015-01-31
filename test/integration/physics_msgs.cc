@@ -39,14 +39,10 @@ class PhysicsMsgsTest : public ServerFixture,
 void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
 {
   Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
+  EXPECT_EQ(this->Physics()->GetType(), _physicsEngine);
+  math::Vector3 g = this->Physics()->GetGravity();
 
   // Assume gravity vector points down z axis only.
   EXPECT_EQ(g.x, 0);
@@ -78,13 +74,13 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
     msgs::Set(msg.mutable_gravity(), *iter);
     physicsPub->Publish(msg);
 
-    while (*iter != physics->GetGravity())
+    while (*iter != this->Physics()->GetGravity())
     {
-      world->Step(1);
+      this->World()->Step(1);
       common::Time::MSleep(1);
     }
 
-    EXPECT_EQ(*iter, physics->GetGravity());
+    EXPECT_EQ(*iter, this->Physics()->GetGravity());
   }
 }
 
@@ -92,14 +88,10 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
 void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
 {
   Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
 
   // set gravity to zero
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
-  physics->SetGravity(math::Vector3::Zero);
+  EXPECT_EQ(this->Physics()->GetType(), _physicsEngine);
+  this->Physics()->SetGravity(math::Vector3::Zero);
 
   // spawn a box
   std::string name = "test_box";
@@ -124,7 +116,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   poses.push_back(math::Pose(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
   poses.push_back(math::Pose(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
-  physics::ModelPtr model = world->GetModel(name);
+  physics::ModelPtr model = this->World()->GetModel(name);
   ASSERT_TRUE(model != NULL);
 
   {
@@ -145,14 +137,14 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
 
       while (*iter != model->GetWorldPose())
       {
-        world->Step(1);
+        this->World()->Step(1);
         common::Time::MSleep(1);
       }
 
       // Take a few steps to verify the correct model pose.
       // dart has a failure mode that was not exposed without
       // this change to the test.
-      world->Step(10);
+      this->World()->Step(10);
 
       EXPECT_EQ(*iter, model->GetWorldPose());
     }
@@ -170,12 +162,8 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
   }
 
   Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(this->Physics()->GetType(), _physicsEngine);
 
   // spawn a box
   std::string name = "test_box";
@@ -188,7 +176,7 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
   transport::PublisherPtr modelPub =
     this->node->Advertise<msgs::Model>("~/model/modify");
 
-  physics::ModelPtr model = world->GetModel(name);
+  physics::ModelPtr model = this->World()->GetModel(name);
   ASSERT_TRUE(model != NULL);
 
   // change gravity mode and verify the msg gets through
@@ -235,7 +223,7 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
     int maxSleep = 50;
     while (link->GetGravityMode() != newGravityMode && sleep < maxSleep)
     {
-      world->Step(1);
+      this->World()->Step(1);
       common::Time::MSleep(100);
       sleep++;
     }
@@ -263,7 +251,7 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
     int maxSleep = 50;
     while (link->GetKinematic() != newKinematicMode && sleep < maxSleep)
     {
-      world->Step(1);
+      this->World()->Step(1);
       common::Time::MSleep(100);
       sleep++;
     }
@@ -294,7 +282,7 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
     int maxSleep = 50;
     while (link->GetSelfCollide() != newSelfCollideMode && sleep < maxSleep)
     {
-      world->Step(1);
+      this->World()->Step(1);
       common::Time::MSleep(100);
       sleep++;
     }
@@ -306,14 +294,10 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
 void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
 {
   Load("worlds/multilink_shape.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
 
   // set gravity to zero
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
-  physics->SetGravity(math::Vector3::Zero);
+  EXPECT_EQ(this->Physics()->GetType(), _physicsEngine);
+  this->Physics()->SetGravity(math::Vector3::Zero);
 
   // advertise on "~/model/modify"
   transport::PublisherPtr modelPub =
@@ -332,7 +316,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
   poses.push_back(math::Pose(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
   std::string name = "multilink";
-  physics::ModelPtr model = world->GetModel(name);
+  physics::ModelPtr model = this->World()->GetModel(name);
   ASSERT_TRUE(model != NULL);
 
   {
@@ -362,14 +346,14 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
         int maxSleep = 50;
         while (*iter != link->GetRelativePose() && sleep < maxSleep)
         {
-          world->Step(1);
+          this->World()->Step(1);
           common::Time::MSleep(1);
         }
 
         // Take a few steps to verify the correct link pose.
         // dart has a failure mode that was not exposed without
         // this change to the test.
-        world->Step(10);
+        this->World()->Step(10);
 
         EXPECT_EQ(*iter, link->GetRelativePose());
       }
@@ -393,21 +377,17 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 
   // load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
+  EXPECT_EQ(this->Physics()->GetType(), _physicsEngine);
+  math::Vector3 g = this->Physics()->GetGravity();
   // Assume gravity vector points down z axis only.
   EXPECT_EQ(g.x, 0);
   EXPECT_EQ(g.y, 0);
   EXPECT_LE(g.z, -9.8);
 
   // get physics time step
-  double dt = physics->GetMaxStepSize();
+  double dt = this->Physics()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
 
   // spawn some simple shapes with unit size
@@ -445,7 +425,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   double x0, y0;
 
   // Allow objects to settle on ground_plane
-  world->Step(100);
+  this->World()->Step(100);
 
   // Verify the initial model pose is where we set it to be.
   for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
@@ -453,7 +433,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   {
     std::string name = iter->first;
     // Make sure the model is loaded
-    model = world->GetModel(name);
+    model = this->World()->GetModel(name);
     EXPECT_TRUE(model != NULL);
 
     pose1 = model->GetWorldPose();
@@ -471,7 +451,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     iter != modelPos.end(); ++iter)
   {
     std::string name = iter->first;
-    model = world->GetModel(name);
+    model = this->World()->GetModel(name);
     if (*(name.rbegin()) == '2')
     {
       // Use a message to resize this one
@@ -492,10 +472,10 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   double tHit = sqrt(2*(z0-0.5*scaleFactor) / (-g.z));
   // Time to advance, allow 0.5 s settling time.
   // This assumes inelastic collisions with the ground.
-  double dtHit = tHit+0.5 - world->GetSimTime().Double();
+  double dtHit = tHit+0.5 - this->World()->GetSimTime().Double();
   steps = ceil(dtHit / dt);
   EXPECT_GT(steps, 0);
-  world->Step(steps);
+  this->World()->Step(steps);
 
   // Issue #856, simbody doesn't support shape resizes.
   if (_physicsEngine == "simbody")
@@ -513,7 +493,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   {
     std::string name = iter->first;
     // Make sure the model is loaded
-    model = world->GetModel(name);
+    model = this->World()->GetModel(name);
     if (model != NULL)
     {
       gzdbg << "Check ground contact of model " << name << '\n';

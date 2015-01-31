@@ -523,6 +523,14 @@ class ServerFixture : public testing::Test
   /// \param[out] _share Shared memory.
   protected: void GetMemInfo(double &_resident, double &_share);
 
+  /// \brief Get world pointer, assert if it's NULL.
+  /// \return Pointer to current world.
+  protected: physics::WorldPtr World();
+
+  /// \brief Get physics engine pointer, assert if it's NULL.
+  /// \return Pointer to current physics engine.
+  protected: physics::PhysicsEnginePtr Physics();
+
   /// \brief Pointer the Gazebo server.
   protected: Server *server;
 
@@ -549,6 +557,12 @@ class ServerFixture : public testing::Test
 
   /// \brief Mutex to protect data structures that store messages.
   protected: boost::mutex receiveMutex;
+
+  /// \brief World pointer.
+  private: physics::WorldPtr worldPointer;
+
+  /// \brief Physics engine pointer.
+  private: physics::PhysicsEnginePtr physicsPointer;
 
   /// \brief Image data
   private: unsigned char **imgData;

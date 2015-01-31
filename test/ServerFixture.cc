@@ -174,6 +174,9 @@ void ServerFixture::Load(const std::string &_worldFilename,
          ++waitCount < maxWaitCount)
     common::Time::MSleep(100);
   ASSERT_LT(waitCount, maxWaitCount);
+  this->worldPointer = physics::get_world();
+  this->physicsPointer = this->World()->GetPhysicsEngine();
+  ASSERT_TRUE(this->physicsPointer != NULL);
 
   this->factoryPub->WaitForConnection();
   this->requestPub->WaitForConnection();
@@ -1359,3 +1362,18 @@ void ServerFixture::GetMemInfo(double &_resident, double &_share)
   return;
 #endif
 }
+
+/////////////////////////////////////////////////
+physics::WorldPtr ServerFixture::World()
+{
+  ASSERT_TRUE(this->worldPointer != NULL);
+  return this->worldPointer;
+}
+
+/////////////////////////////////////////////////
+physics::PhysicsEnginePtr ServerFixture::Physics()
+{
+  ASSERT_TRUE(this->physicsPointer != NULL);
+  return this->physicsPointer;
+}
+
