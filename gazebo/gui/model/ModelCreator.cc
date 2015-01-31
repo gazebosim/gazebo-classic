@@ -1088,6 +1088,7 @@ void ModelCreator::OpenInspector(const std::string &_name)
   PartData *part = this->allParts[_name];
   part->SetPose(part->partVisual->GetWorldPose());
   part->UpdateConfig();
+  part->inspector->move(QCursor::pos());
   part->inspector->show();
 }
 

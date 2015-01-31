@@ -17,9 +17,6 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/physics/Inertial.hh"
-
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 
