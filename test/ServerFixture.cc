@@ -1364,16 +1364,31 @@ void ServerFixture::GetMemInfo(double &_resident, double &_share)
 }
 
 /////////////////////////////////////////////////
-physics::WorldPtr ServerFixture::World()
+physics::WorldPtr ServerFixture::World() const
 {
-  ASSERT_TRUE(this->worldPointer != NULL);
+  // The ASSERT calls must be in a void function,
+  // that's why the void CheckWorld function exists.
+  this->CheckWorld();
   return this->worldPointer;
 }
 
 /////////////////////////////////////////////////
-physics::PhysicsEnginePtr ServerFixture::Physics()
+physics::PhysicsEnginePtr ServerFixture::Physics() const
 {
-  ASSERT_TRUE(this->physicsPointer != NULL);
+  // The ASSERT calls must be in a void function,
+  // that's why the void CheckPhysics function exists.
+  this->CheckPhysics();
   return this->physicsPointer;
 }
 
+/////////////////////////////////////////////////
+void ServerFixture::CheckWorld() const
+{
+  ASSERT_TRUE(this->worldPointer != NULL);
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::CheckPhysics() const
+{
+  ASSERT_TRUE(this->physicsPointer != NULL);
+}

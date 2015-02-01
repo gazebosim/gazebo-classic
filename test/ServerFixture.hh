@@ -525,11 +525,17 @@ class ServerFixture : public testing::Test
 
   /// \brief Get world pointer, assert if it's NULL.
   /// \return Pointer to current world.
-  protected: physics::WorldPtr World();
+  protected: physics::WorldPtr World() const;
 
   /// \brief Get physics engine pointer, assert if it's NULL.
   /// \return Pointer to current physics engine.
-  protected: physics::PhysicsEnginePtr Physics();
+  protected: physics::PhysicsEnginePtr Physics() const;
+
+  /// \brief ASSERT if world pointer is NULL.
+  private: void CheckWorld() const;
+
+  /// \brief ASSERT if physics pointer is NULL.
+  private: void CheckPhysics() const;
 
   /// \brief Pointer the Gazebo server.
   protected: Server *server;
