@@ -231,7 +231,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   // Connections
   this->connections.push_back(
       gui::editor::Events::ConnectSaveBuildingModel(
-      boost::bind(&BuildingEditorPalette::OnSaveModel, this, _1, _2)));
+      boost::bind(&BuildingEditorPalette::OnSaveModel, this, _1)));
 
   this->connections.push_back(
       gui::editor::Events::ConnectNewBuildingModel(
@@ -245,12 +245,6 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 /////////////////////////////////////////////////
 BuildingEditorPalette::~BuildingEditorPalette()
 {
-}
-
-/////////////////////////////////////////////////
-std::string BuildingEditorPalette::GetModelName() const
-{
-  return this->modelNameEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
@@ -348,8 +342,7 @@ void BuildingEditorPalette::OnNewModel()
 }
 
 /////////////////////////////////////////////////
-void BuildingEditorPalette::OnSaveModel(const std::string &_saveName,
-    const std::string &/*_saveLocation*/)
+void BuildingEditorPalette::OnSaveModel(const std::string &_saveName)
 {
   this->modelNameEdit->setText(tr(_saveName.c_str()));
 }
