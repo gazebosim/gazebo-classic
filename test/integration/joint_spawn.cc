@@ -291,9 +291,8 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   ASSERT_TRUE(world != NULL);
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
-  bool isOde = physics->GetType().compare("ode") == 0;
   bool isBullet = physics->GetType().compare("bullet") == 0;
-  bool isDART = physics->GetType().compare("dart") == 0;
+  bool isSimbody = physics->GetType().compare("simbody") == 0;
   double dt = physics->GetMaxStepSize();
 
   if (_joint->HasType(physics::Base::HINGE2_JOINT) ||
@@ -371,7 +370,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
           << " joint"
           << std::endl;
   }
-  else if (!isOde && !isBullet && !isDART)
+  else if (isSimbody)
   {
     gzerr << "Skipping friction test for "
           << physics->GetType()
