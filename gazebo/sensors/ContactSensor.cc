@@ -112,7 +112,7 @@ void ContactSensor::Load(const std::string &_worldName)
     // this sensor
     physics::ContactManager *mgr =
         this->world->GetPhysicsEngine()->GetContactManager();
-    std::string topic = mgr->CreateFilter(entityName, this->collisions);
+    std::string topic = mgr->CreateFilter(this->GetScopedName(), this->collisions);
     if (!this->contactSub)
     {
       this->contactSub = this->node->Subscribe(topic,
