@@ -90,7 +90,6 @@ INSTANTIATE_TEST_CASE_P(ExamplePlugins, ExamplePlugins, ::testing::Values(
   , "world_edit"
   , "gui_overlay_plugin_spawn"
   , "gui_overlay_plugin_time"
-  , "collion_map_creator"
 ));
 
 int main(int argc, char **argv)
