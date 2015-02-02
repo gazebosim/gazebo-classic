@@ -691,15 +691,60 @@ void GLWidget::OnMouseReleaseNormal()
   {
     rendering::VisualPtr vis =
       this->userCamera->GetVisual(this->mouseEvent.pos);
+
     if (vis)
     {
-      vis = vis->GetRootVisual();
-      this->SetSelectedVisual(vis);
-      event::Events::setSelectedEntity(vis->GetName(), "normal");
+      rendering::VisualPtr selectVis;
+      rendering::VisualPtr modelVis = vis->GetRootVisual();
+      rendering::VisualPtr linkVis = vis->GetParent();
+
+      // Flags to check if we should select a link or a model
+      bool modelHighlighted = modelVis->GetHighlighted();
+      int linkCount = 0;
+      bool linkHighlighted = false;
+      for (unsigned int i = 0; i < modelVis->GetChildCount(); ++i)
+      {
+        // A hacky way to find out if there's only one link in the model
+        if (modelVis->GetChild(i)->GetName().find("__GL_MANIP__") !=
+            std::string::npos)
+        {
+          continue;
+        }
+        linkCount++;
+
+        // A link from the same model is currently selected
+        if (modelVis->GetChild(i)->GetHighlighted())
+        {
+          linkHighlighted = true;
+        }
+      }
+
+      // Select link
+      if (linkCount > 1 && !this->mouseEvent.control &&
+          (modelHighlighted || linkHighlighted))
+      {
+        selectVis = linkVis;
+        this->selectionLevel = SelectionLevels::LINK;
+      }
+      // Select model
+      else
+      {
+        // Can't select a link and a model at the same time
+        if (this->selectionLevel == SelectionLevels::LINK)
+          this->DeselectAllVisuals();
+
+        selectVis = modelVis;
+        this->selectionLevel = SelectionLevels::MODEL;
+      }
+      this->SetSelectedVisual(selectVis);
+      event::Events::setSelectedEntity(selectVis->GetName(), "normal");
 
       if (this->mouseEvent.button == common::MouseEvent::RIGHT)
       {
-        g_modelRightMenu->Run(vis->GetName(), QCursor::pos());
+        if (selectVis == modelVis)
+          g_modelRightMenu->Run(selectVis->GetName(), QCursor::pos());
+        else if (selectVis == linkVis)
+          gzdbg << "TODO: Open link right menu" << std::endl;
       }
     }
     else
@@ -936,23 +981,15 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 /////////////////////////////////////////////////
 void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 {
-  boost::mutex::scoped_lock lock(this->selectedVisMutex);
-
-  msgs::Selection msg;
-
   // deselect all if not in multi-selection mode.
   if (!this->mouseEvent.control)
   {
-    for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
-    {
-      this->selectedVisuals[i]->SetHighlighted(false);
-      msg.set_id(this->selectedVisuals[i]->GetId());
-      msg.set_name(this->selectedVisuals[i]->GetName());
-      msg.set_selected(false);
-      this->selectionPub->Publish(msg);
-    }
-    this->selectedVisuals.clear();
+    this->DeselectAllVisuals();
   }
+
+  boost::mutex::scoped_lock lock(this->selectedVisMutex);
+
+  msgs::Selection msg;
 
   if (_vis && !_vis->IsPlane())
   {
@@ -987,6 +1024,23 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
   }
 
   g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
+}
+
+/////////////////////////////////////////////////
+void GLWidget::DeselectAllVisuals()
+{
+  boost::mutex::scoped_lock lock(this->selectedVisMutex);
+
+  msgs::Selection msg;
+  for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+  {
+    this->selectedVisuals[i]->SetHighlighted(false);
+    msg.set_id(this->selectedVisuals[i]->GetId());
+    msg.set_name(this->selectedVisuals[i]->GetName());
+    msg.set_selected(false);
+    this->selectionPub->Publish(msg);
+  }
+  this->selectedVisuals.clear();
 }
 
 /////////////////////////////////////////////////
@@ -1201,11 +1255,6 @@ void GLWidget::OnModelEditor(bool _checked)
   g_arrowAct->trigger();
   event::Events::setSelectedEntity("", "normal");
 
-  boost::mutex::scoped_lock lock(this->selectedVisMutex);
   // Manually deselect, in case the editor was opened with Ctrl
-  for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
-  {
-    this->selectedVisuals[i]->SetHighlighted(false);
-  }
-  this->selectedVisuals.clear();
+  this->DeselectAllVisuals();
 }
