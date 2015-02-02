@@ -286,7 +286,8 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
 
   // Trigger a model delete if the Delete key was pressed, and a model
   // is currently selected.
-  if (_event->key() == Qt::Key_Delete)
+  if (_event->key() == Qt::Key_Delete &&
+      this->selectionLevel == SelectionLevels::MODEL)
   {
     boost::mutex::scoped_lock lock(this->selectedVisMutex);
     while (!this->selectedVisuals.empty())
@@ -699,6 +700,7 @@ void GLWidget::OnMouseReleaseNormal()
       rendering::VisualPtr linkVis = vis->GetParent();
 
       // Flags to check if we should select a link or a model
+      bool rightButton = (this->mouseEvent.button == common::MouseEvent::RIGHT);
       bool modelHighlighted = modelVis->GetHighlighted();
       int linkCount = 0;
       bool linkHighlighted = false;
@@ -721,10 +723,9 @@ void GLWidget::OnMouseReleaseNormal()
 
       // Select link
       if (linkCount > 1 && !this->mouseEvent.control &&
-          (modelHighlighted || linkHighlighted))
+          ((modelHighlighted && !rightButton) || linkHighlighted))
       {
         selectVis = linkVis;
-        this->selectionLevel = SelectionLevels::LINK;
       }
       // Select model
       else
@@ -734,12 +735,12 @@ void GLWidget::OnMouseReleaseNormal()
           this->DeselectAllVisuals();
 
         selectVis = modelVis;
-        this->selectionLevel = SelectionLevels::MODEL;
       }
       this->SetSelectedVisual(selectVis);
       event::Events::setSelectedEntity(selectVis->GetName(), "normal");
 
-      if (this->mouseEvent.button == common::MouseEvent::RIGHT)
+      // Open context menu
+      if (rightButton)
       {
         if (selectVis == modelVis)
           g_modelRightMenu->Run(selectVis->GetName(), QCursor::pos());
@@ -993,6 +994,11 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 
   if (_vis && !_vis->IsPlane())
   {
+    if (_vis == _vis->GetRootVisual())
+      this->selectionLevel = SelectionLevels::MODEL;
+    else
+      this->selectionLevel = SelectionLevels::LINK;
+
     _vis->SetHighlighted(true);
 
     // enable multi-selection if control is pressed
