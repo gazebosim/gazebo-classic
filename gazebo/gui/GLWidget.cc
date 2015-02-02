@@ -742,9 +742,15 @@ void GLWidget::OnMouseReleaseNormal()
       if (this->mouseEvent.button == common::MouseEvent::RIGHT)
       {
         if (selectVis == modelVis)
-          g_modelRightMenu->Run(selectVis->GetName(), QCursor::pos());
+        {
+          g_modelRightMenu->Run(selectVis->GetName(), QCursor::pos(),
+              ModelRightMenu::EntityTypes::MODEL);
+        }
         else if (selectVis == linkVis)
-          gzdbg << "TODO: Open link right menu" << std::endl;
+        {
+          g_modelRightMenu->Run(selectVis->GetName(), QCursor::pos(),
+              ModelRightMenu::EntityTypes::LINK);
+        }
       }
     }
     else

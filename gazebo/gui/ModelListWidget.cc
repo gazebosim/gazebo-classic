@@ -509,7 +509,8 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
   if (i >= 0)
   {
     g_modelRightMenu->Run(item->text(0).toStdString(),
-                          this->modelTreeWidget->mapToGlobal(_pt));
+                          this->modelTreeWidget->mapToGlobal(_pt),
+                          ModelRightMenu::EntityTypes::MODEL);
     return;
   }
 
@@ -518,7 +519,16 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
   if (i >= 0)
   {
     g_modelRightMenu->Run(item->text(0).toStdString(),
-                          this->modelTreeWidget->mapToGlobal(_pt));
+                          this->modelTreeWidget->mapToGlobal(_pt),
+                          ModelRightMenu::EntityTypes::LIGHT);
+  }
+
+  // Check to see if the selected item is a link
+  if (item->data(3, Qt::UserRole).toString().toStdString() == "Link")
+  {
+    g_modelRightMenu->Run(item->data(0, Qt::UserRole).toString().toStdString(),
+                          this->modelTreeWidget->mapToGlobal(_pt),
+                          ModelRightMenu::EntityTypes::LINK);
   }
 }
 

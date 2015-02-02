@@ -237,11 +237,11 @@ ApplyWrenchDialog::~ApplyWrenchDialog()
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetModel(std::string _modelName)
+void ApplyWrenchDialog::SetLink(std::string _linkName)
 {
   this->messageLabel->setText(
-      tr("Apply Force and Torque")); // add model name
-  this->modelName = _modelName;
+      tr("Apply Force and Torque")); // add link name
+  this->linkName = _linkName;
   this->SetPublisher();
 }
 
@@ -313,19 +313,8 @@ void ApplyWrenchDialog::OnTorqueZChanged(double /*_fZ*/)
 //////////////////////////////////////////////////
 void ApplyWrenchDialog::SetPublisher()
 {
-  rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
-      GetVisual(this->modelName);
-
-  std::string linkName = this->modelName;
-  // If the visual is a model, get its canonical link
-  // For now getting the first link that comes up
-  if (vis && vis == vis->GetRootVisual())
-  {
-    linkName = vis->GetChild(0)->GetName();
-  }
-
   this->topicName = "~/";
-  topicName += linkName + "/wrench";
+  topicName += this->linkName + "/wrench";
   boost::replace_all(topicName, "::", "/");
 
   this->wrenchPub = this->node->Advertise<msgs::Wrench>(this->topicName);

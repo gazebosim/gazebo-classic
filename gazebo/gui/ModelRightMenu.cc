@@ -138,42 +138,64 @@ ModelRightMenu::~ModelRightMenu()
 }
 
 /////////////////////////////////////////////////
-void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
+void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
+    EntityTypes _type)
 {
-  this->modelName = _modelName.substr(0, _modelName.find("::"));
+  this->entityType = _type;
+
+  if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
+  {
+    this->modelName = _modelName.substr(0, _modelName.find("::"));
+  }
+  else if (_type == EntityTypes::LINK)
+  {
+    this->modelName = _modelName;
+  }
 
   QMenu menu;
-  menu.addAction(this->moveToAct);
-  menu.addAction(this->followAct);
-  menu.addAction(this->applyWrenchAct);
 
-  // menu.addAction(this->snapBelowAct);
-
-  // Create the view menu
-  QMenu *viewMenu = menu.addMenu(tr("View"));
-  for (std::vector<ViewState*>::iterator iter = this->viewStates.begin();
-       iter != this->viewStates.end(); ++iter)
+  if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
   {
-    viewMenu->addAction((*iter)->action);
-
-    std::map<std::string, bool>::iterator modelIter =
-      (*iter)->modelStates.find(this->modelName);
-
-    if (modelIter == (*iter)->modelStates.end())
-      (*iter)->action->setChecked((*iter)->globalEnable);
-    else
-      (*iter)->action->setChecked(modelIter->second);
+    menu.addAction(this->moveToAct);
+    menu.addAction(this->followAct);
   }
 
-  if (g_copyAct && g_pasteAct)
+  if (_type == EntityTypes::MODEL || _type == EntityTypes::LINK)
+    menu.addAction(this->applyWrenchAct);
+
+  if (_type == EntityTypes::MODEL)
   {
-    menu.addSeparator();
-    menu.addAction(g_copyAct);
-    menu.addAction(g_pasteAct);
+    // menu.addAction(this->snapBelowAct);
+
+    // Create the view menu
+    QMenu *viewMenu = menu.addMenu(tr("View"));
+    for (std::vector<ViewState*>::iterator iter = this->viewStates.begin();
+         iter != this->viewStates.end(); ++iter)
+    {
+      viewMenu->addAction((*iter)->action);
+
+      std::map<std::string, bool>::iterator modelIter =
+        (*iter)->modelStates.find(this->modelName);
+
+      if (modelIter == (*iter)->modelStates.end())
+        (*iter)->action->setChecked((*iter)->globalEnable);
+      else
+        (*iter)->action->setChecked(modelIter->second);
+    }
   }
 
-  menu.addSeparator();
-  menu.addAction(g_deleteAct);
+  if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
+  {
+      if (g_copyAct && g_pasteAct)
+      {
+        menu.addSeparator();
+        menu.addAction(g_copyAct);
+        menu.addAction(g_pasteAct);
+      }
+
+      menu.addSeparator();
+      menu.addAction(g_deleteAct);
+  }
 
   // \todo Reimplement these features.
   // menu.addAction(this->skeletonAction);
@@ -200,7 +222,37 @@ void ModelRightMenu::OnFollow()
 void ModelRightMenu::OnApplyWrench()
 {
   this->applyWrenchDialog = new ApplyWrenchDialog();
-  this->applyWrenchDialog->SetModel(this->modelName);
+
+  std::string linkName;
+  if (this->entityType == MODEL)
+  {
+    // Get the canonical link
+    // For now getting the first link that comes up
+    rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
+        GetVisual(this->modelName);
+
+    if (vis && vis == vis->GetRootVisual())
+    {
+      linkName = vis->GetChild(0)->GetName();
+    }
+    else
+    {
+      gzerr << "Can't find model " << this->modelName
+          << std::endl;
+      return;
+    }
+  }
+  else if (this->entityType == LINK)
+  {
+    linkName = this->modelName;
+  }
+  else
+  {
+    gzerr << "Wrench can only be applied to a link." << std::endl;
+    return;
+  }
+
+  this->applyWrenchDialog->SetLink(linkName);
   this->applyWrenchDialog->show();
 }
 
