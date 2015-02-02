@@ -356,7 +356,7 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
   math::Vector3 g = physics->GetGravity();
 
   // Spawn concentric semi-circles of boxes
-  int boxes = 10;
+  int boxes = 32;
   double dx = 0.5;
   double dy = 0.5;
   double dz = 0.2;
@@ -365,7 +365,7 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
   for (int ring = 0; ring < 5; ++ring)
   {
     gzdbg << "Spawn ring " << ring+1 << " of boxes" << std::endl;
-    for (int i = 0; i <= boxes; ++i)
+    for (int i = 0; i < boxes; ++i)
     {
       // Set box size and anisotropic friction
       SpawnFrictionBoxOptions opt;
@@ -374,8 +374,8 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
       opt.friction2 = opt.friction1;
 
       // Compute angle for each box
-      double radius = 5.0 + ring;
-      double angle = M_PI*static_cast<double>(i) / static_cast<double>(boxes);
+      double radius = 9.0 + ring;
+      double angle = 2*M_PI*static_cast<double>(i) / static_cast<double>(boxes);
       opt.modelPose.pos.Set(radius*cos(angle), radius*sin(angle), dz/2);
 
       if (ring == 0)
@@ -401,18 +401,18 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
     }
   }
 
-  gzdbg << "Checking velocity direction" << std::endl;
-  std::map<physics::ModelPtr, double>::iterator iter;
-  for (int i = 0; i < 1500; ++i)
+  world->Step(1500);
+
+  gzdbg << "Checking position of boxes" << std::endl;
+  for (auto const & iter : modelAngles)
   {
-    world->Step(1);
-    for (iter = modelAngles.begin(); iter != modelAngles.end(); ++iter)
-    {
-      double cosAngle = cos(iter->second);
-      double sinAngle = sin(iter->second);
-      math::Vector3 vel = iter->first->GetWorldLinearVel();
-      EXPECT_EQ(math::Vector3(cosAngle, sinAngle, 0), vel / vel.GetLength());
-    }
+    double cosAngle = cos(iter.second);
+    double sinAngle = sin(iter.second);
+    math::Vector3 pos = iter.first->GetWorldPose().pos;
+    double cosPosAngle = pos.x / pos.GetLength();
+    double sinPosAngle = pos.y / pos.GetLength();
+    EXPECT_NEAR(cosAngle, cosPosAngle, 1e-2);
+    EXPECT_NEAR(sinAngle, sinPosAngle, 1e-2);
   }
 }
 
