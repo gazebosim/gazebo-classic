@@ -46,16 +46,19 @@ sdf::ElementPtr PresetManager::GenerateSDFFromPreset(Preset* _preset) const
   elem->SetName("physics");
   elem->AddAttribute("name", "string", "", true);
   sdf::ParamPtr nameParam = elem->GetAttribute("name");
-  std::string name = ;
+  if (_preset->paramMap.find("name") == _preset->paramMap.end())
+  {
+    gzwarn << "Name not set in parameter map, returning from GenerateSDFFromPreset!" << std::endl;
+    return elem;
+  }
   try
   {
     nameParam->Set(boost::any_cast<std::string>(_preset->paramMap["name"]));
   }
   catch (boost::bad_any_cast)
   {
-    gzwarn << " ";
+    gzwarn << "Bad cast for name in GenerateSDFFromPreset" << std::endl;
   }
-  name->
   for (auto &param : _preset->paramMap)
   {
     std::string key = param.first;
@@ -225,7 +228,7 @@ bool PresetManager::SetProfileParam(const std::string& _profileName,
 bool PresetManager::SetCurrentProfileParam(const std::string& _key,
   const boost::any &_value)
 {
-  if (!this->dataPtr->currentPreset)
+  if (this->dataPtr->currentPreset == NULL)
   {
     return false;
   }
