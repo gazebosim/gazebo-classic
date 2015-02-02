@@ -13,6 +13,6 @@
       <uri>model://willowgarage</uri>
     </include>
 
-    <plugin filename="libcollision_map_creator.so" name="collision_map_creator"/>
+    <plugin filename="libcollision_map_creator.dylib" name="collision_map_creator"/>
   </world>
 </sdf>

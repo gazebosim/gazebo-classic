@@ -12,14 +12,10 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(GAZEBO gazebo)
   pkg_check_modules(SDF sdformat)
 endif()
-
-find_package(PNG REQUIRED)
-
 include_directories(
   ${GAZEBO_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}/msgs
-  ${PNG_INCLUDE_DIR})
-
+  )
 link_directories(${GAZEBO_LIBRARY_DIRS} ${SDF_LIBRARY_DIRS} ${CMAKE_CURRENT_BINARY_DIR}/msgs)
 add_subdirectory(msgs)
 
@@ -28,5 +24,5 @@ target_link_libraries(request_publisher collision_map_creator_msgs ${GAZEBO_LIBR
 add_dependencies(request_publisher collision_map_creator_msgs)
 
 add_library(collision_map_creator SHARED collision_map_creator.cc )
-target_link_libraries(collision_map_creator collision_map_creator_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${SDF_LIBRARIES} ${PNG_LIBRARY})
+target_link_libraries(collision_map_creator collision_map_creator_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${SDF_LIBRARIES} /usr/local/lib/libpng.dylib)
 add_dependencies(collision_map_creator collision_map_creator_msgs)
