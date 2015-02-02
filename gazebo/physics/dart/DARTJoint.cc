@@ -458,22 +458,9 @@ double DARTJoint::GetParam(const std::string &_key, unsigned int _index)
 {
   try
   {
-    if (_key == "hi_stop")
-    {
-      return this->GetHighStop(_index).Radian();
-    }
-    else if (_key == "lo_stop")
-    {
-      return this->GetLowStop(_index).Radian();
-    }
-    else if (_key == "friction")
+    if (_key == "friction")
     {
       this->dtJoint->getCoulombFriction(_index);
-    }
-    else
-    {
-      gzerr << "Unable to get joint attribute[" << _key << "]\n";
-      return 0;
     }
   }
   catch (const common::Exception &e)
@@ -483,6 +470,7 @@ double DARTJoint::GetParam(const std::string &_key, unsigned int _index)
           << std::endl;
     return 0;
   }
+  return Joint::GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////
