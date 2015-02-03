@@ -222,8 +222,8 @@ msgs::Visual *VisualConfig::GetData(const std::string &_name) const
 }
 
 /////////////////////////////////////////////////
-void VisualConfig::SetGeometrySize(const std::string &_name,
-    const math::Vector3 &_size)
+void VisualConfig::SetGeometry(const std::string &_name,
+    const math::Vector3 &_size, const std::string &_uri)
 {
   std::map<int, VisualConfigData *>::iterator it;
   for (it = this->configs.begin(); it != this->configs.end(); ++it)
@@ -231,10 +231,11 @@ void VisualConfig::SetGeometrySize(const std::string &_name,
     if (it->second->name == _name)
     {
       math::Vector3 dimensions;
+      std::string uri;
       std::string type = it->second->configWidget->GetGeometryWidgetValue(
-          "geometry", dimensions);
+          "geometry", dimensions, uri);
       it->second->configWidget->SetGeometryWidgetValue("geometry", type,
-          _size);
+          _size, _uri);
       break;
     }
   }

@@ -148,11 +148,14 @@ void PartData::UpdateConfig()
     std::string partName = this->partVisual->GetName();
     std::string leafName =
         name.substr(name.find(partName)+partName.size()+1);
-    visualConfig->SetGeometrySize(leafName, it->first->GetScale());
+    visualConfig->SetGeometry(leafName, it->first->GetScale(),
+        it->first->GetMeshName());
 
     msgs::Visual *updateMsg = visualConfig->GetData(leafName);
     msgs::Visual visualMsg = it->second;
     updateMsg->clear_scale();
+    msgs::Color *diffuse = updateMsg->mutable_material()->mutable_diffuse();
+    diffuse->set_a(1.0-updateMsg->transparency());
     visualMsg.CopyFrom(*updateMsg);
     it->second = visualMsg;
   }
@@ -165,7 +168,8 @@ void PartData::UpdateConfig()
     std::string partName = this->partVisual->GetName();
     std::string leafName =
         name.substr(name.find(partName)+partName.size()+1);
-    collisionConfig->SetGeometrySize(leafName, colIt->first->GetScale());
+    collisionConfig->SetGeometry(leafName, colIt->first->GetScale(),
+        colIt->first->GetMeshName());
 
     msgs::Collision *updateMsg = collisionConfig->GetData(leafName);
     msgs::Collision collisionMsg = colIt->second;
@@ -244,6 +248,8 @@ void PartData::OnApply()
 
         // update the visualMsg that will be used to generate the sdf.
         updateMsg->clear_scale();
+        msgs::Color *diffuse = updateMsg->mutable_material()->mutable_diffuse();
+        diffuse->set_a(1.0-updateMsg->transparency());
         visualMsg.CopyFrom(*updateMsg);
         it->second = visualMsg;
 
@@ -317,7 +323,9 @@ void PartData::OnAddVisual(const std::string &_name)
     visualMsg.set_transparency(this->visuals[refVisual].transparency());
   visualConfig->UpdateVisual(_name, &visualMsg);
   this->visuals[visVisual] = visualMsg;
-  visVisual->SetTransparency(ModelData::GetEditTransparency());
+  visVisual->SetTransparency(visualMsg.transparency() *
+      (1-ModelData::GetEditTransparency()-0.1)
+      + ModelData::GetEditTransparency());
 }
 
 /////////////////////////////////////////////////
@@ -349,6 +357,10 @@ void PartData::OnAddCollision(const std::string &_name)
     sdf::ElementPtr collisionElem =  modelTemplateSDF->root
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     collisionVis->Load(collisionElem);
+    // orange
+    collisionVis->SetAmbient(common::Color(1.0, 0.5, 0.05));
+    collisionVis->SetDiffuse(common::Color(1.0, 0.5, 0.05));
+    collisionVis->SetSpecular(common::Color(0.5, 0.5, 0.5));
     this->partVisual->GetScene()->AddVisual(collisionVis);
   }
 
@@ -434,7 +446,9 @@ void PartData::Update()
         // make visual semi-transparent here
         // but generated sdf will use the correct transparency value
         it->first->UpdateFromMsg(updateMsgPtr);
-        it->first->SetTransparency(ModelData::GetEditTransparency());
+        it->first->SetTransparency(updateMsgPtr->transparency() *
+            (1-ModelData::GetEditTransparency()-0.1)
+            + ModelData::GetEditTransparency());
         break;
       }
     }

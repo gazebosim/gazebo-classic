@@ -61,6 +61,10 @@ namespace gazebo
       /// \return Tab widget with visual configurations.
       public: CollisionConfig *GetCollisionConfig() const;
 
+      /// \brief Qt event emiited when the mouse enters this widget.
+      /// \param[in] _event Qt event.
+      protected: virtual void enterEvent(QEvent *_event);
+
       /// \brief Set the item name.
       /// \param[in] _name Name to set to.
       // public: void SetName(const std::string &_name);

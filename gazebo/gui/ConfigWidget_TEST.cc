@@ -251,7 +251,9 @@ void ConfigWidget_TEST::VisualMsgWidget()
 
     // geometry
     gazebo::math::Vector3 dimensions;
-    QVERIFY(visualConfigWidget->GetGeometryWidgetValue("geometry", dimensions)
+    std::string uri;
+    QVERIFY(visualConfigWidget->GetGeometryWidgetValue("geometry", dimensions,
+        uri)
         ==  "box");
     QCOMPARE(dimensions, gazebo::math::Vector3(5.0, 3.0, 4.0));
 

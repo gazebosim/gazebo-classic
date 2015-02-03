@@ -662,7 +662,7 @@ void ModelCreator::Reset()
   this->isStatic = false;
   this->autoDisable = true;
 
-  while (this->allParts.size() > 0)
+  while (!this->allParts.empty())
     this->RemovePart(this->allParts.begin()->first);
   this->allParts.clear();
 

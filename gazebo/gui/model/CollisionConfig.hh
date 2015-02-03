@@ -88,10 +88,11 @@ namespace gazebo
       /// \return Collision msg.
       public: msgs::Collision *GetData(const std::string &_name) const;
 
-      /// \brief Set the geometry size a collision
+      /// \brief Set the geometry data of a collision
       /// \param[in] _size Size to set the geometry to.
-      public: void SetGeometrySize(const std::string &_name,
-          const math::Vector3 &_size);
+      /// \param[in] _uri URI of the geometry.
+      public: void SetGeometry(const std::string &_name,
+          const math::Vector3 &_size, const std::string &_uri = "");
 
       /// \brief Qt signal emitted when a collision is removed.
       /// \param[in] _name Name of collision removed.

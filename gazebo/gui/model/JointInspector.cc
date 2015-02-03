@@ -207,11 +207,11 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
   }
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
-  QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
+  QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
-  QPushButton *applyButton = new QPushButton(tr("&Apply"));
+  QPushButton *applyButton = new QPushButton(tr("Apply"));
   connect(applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
-  QPushButton *OKButton = new QPushButton(tr("&OK"));
+  QPushButton *OKButton = new QPushButton(tr("OK"));
   OKButton->setDefault(true);
   connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
   buttonsLayout->addWidget(cancelButton);
