@@ -84,6 +84,7 @@ void GUIExampleTimeWidget::OnStats(ConstWorldStatisticsPtr &_msg)
 {
   this->SetSimTime(QString::fromStdString(
         this->FormatTime(_msg->sim_time())));
+  gui::get_active_camera();
 }
 
 /////////////////////////////////////////////////
