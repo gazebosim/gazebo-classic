@@ -28,19 +28,51 @@ using namespace gazebo;
 class ContactSensor : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
-  public: void EmptyWorld(const std::string &_physicsEngine);
+  public: void MultipleSensors(const std::string &_physicsEngine);
   public: void StackTest(const std::string &_physicsEngine);
   public: void TorqueTest(const std::string &_physicsEngine);
 };
 
-void ContactSensor::EmptyWorld(const std::string &_physicsEngine)
+////////////////////////////////////////////////////////////////////////
+// Test having multiple contact sensors under a single link.
+// https://bitbucket.org/osrf/gazebo/issue/960
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
 {
-  Load("worlds/empty.world", false, _physicsEngine);
+  Load("worlds/contact_sensors_multiple.world", true, _physicsEngine);
+
+  const std::string contactSensorName1("box_contact");
+  const std::string contactSensorName2("box_contact2");
+
+  {
+    sensors::SensorPtr sensor1 = sensors::get_sensor(contactSensorName1);
+    sensors::ContactSensorPtr contactSensor1 =
+        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor1);
+    ASSERT_TRUE(contactSensor1 != NULL);
+  }
+
+  {
+    sensors::SensorPtr sensor2 = sensors::get_sensor(contactSensorName2);
+    sensors::ContactSensorPtr contactSensor2 =
+        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor2);
+    ASSERT_TRUE(contactSensor2 != NULL);
+  }
+
+  // There should be 4 topics advertising Contacts messages
+  // /gazebo/default/physics/contacts
+  // /gazebo/default/sensor_box/link/box_contact
+  // /gazebo/default/sensor_box/link/box_contact2
+  // /gazebo/default/sensor_box/link/contacts
+  std::list<std::string> topics = getAdvertisedTopics("gazebo.msgs.Contacts");
+  EXPECT_FALSE(topics.empty());
+  EXPECT_EQ(topics.size(), 4u);
+
+  // We should expect them all to publish.
 }
 
-TEST_P(ContactSensor, EmptyWorld)
+TEST_P(ContactSensor, MultipleSensors)
 {
-  EmptyWorld(GetParam());
+  MultipleSensors(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
