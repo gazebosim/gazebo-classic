@@ -435,3 +435,9 @@ void JointInspector::OnOK()
   emit Applied();
   this->accept();
 }
+
+/////////////////////////////////////////////////
+void JointInspector::enterEvent(QEvent */*_event*/)
+{
+  QApplication::setOverrideCursor(Qt::ArrowCursor);
+}

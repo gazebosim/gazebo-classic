@@ -1367,11 +1367,12 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
               if (geomType == "mesh")
               {
+                 std::string uri = qobject_cast<QLineEdit *>(
+                      childWidget->widgets[6])->text().toStdString();
                 const google::protobuf::FieldDescriptor *uriFieldDescriptor =
                     geomValueMsg->GetDescriptor()->field(0);
                 geomValueMsg->GetReflection()->SetString(geomValueMsg,
-                    uriFieldDescriptor, qobject_cast<QLineEdit *>(
-                    childWidget->widgets[6])->text().toStdString());
+                    uriFieldDescriptor, uri);
               }
             }
             else if (geomType == "cylinder")
