@@ -15,10 +15,11 @@
  *
 */
 
+#include "gazebo/common/MeshManager.hh"
+
 //#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/DynamicLines.hh"
-//#include "gazebo/rendering/Scene.hh"
-//#include "gazebo/rendering/AxisVisual.hh"
+#include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/ArrowVisual.hh"
 #include "gazebo/rendering/ApplyWrenchVisualPrivate.hh"
 #include "gazebo/rendering/ApplyWrenchVisual.hh"
@@ -67,7 +68,7 @@ void ApplyWrenchVisual::Load()
 //  p5 = _pose.rot.RotateVector(p5);
 //  p6 = _pose.rot.RotateVector(p6);
 
-  dPtr->crossLines = dPtr->parent->
+  dPtr->crossLines = this->
       CreateDynamicLine(rendering::RENDERING_LINE_LIST);
   dPtr->crossLines->setMaterial("Gazebo/SkyBlue");
   dPtr->crossLines->AddPoint(p1);
@@ -78,14 +79,62 @@ void ApplyWrenchVisual::Load()
   dPtr->crossLines->AddPoint(p6);
 
   // Force visual
-  dPtr->forceArrow.reset(new rendering::ArrowVisual(
-      dPtr->parent->GetName() + "__FORCE_VISUAL__", dPtr->parent));
-  dPtr->forceArrow->Load();
-  dPtr->forceArrow->SetMaterial("Gazebo/RedBright");
-  dPtr->forceArrow->SetScale(math::Vector3(2, 2, 2));
-  dPtr->forceArrow->GetSceneNode()->setInheritScale(false);
+  dPtr->forceVisual.reset(new rendering::ArrowVisual(
+      this->GetName() + "__FORCE_VISUAL__", shared_from_this()));
+  dPtr->forceVisual->Load();
+  dPtr->forceVisual->SetMaterial("Gazebo/RedBright");
+  dPtr->forceVisual->SetScale(math::Vector3(2, 2, 2));
+  dPtr->forceVisual->GetSceneNode()->setInheritScale(false);
+
+  // Torque visual
+  // Torque tube
+  dPtr->torqueVisual.reset(new rendering::Visual(
+       this->GetName() + "__TORQUE_VISUAL__", shared_from_this()));
+  dPtr->torqueVisual->Load();
+
+  common::MeshManager::Instance()->CreateTube("torque_tube",
+      0.1, 0.15, 0.05, 1, 32);
+  this->InsertMesh("torque_tube");
+
+  Ogre::MovableObject *torqueObj =
+    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+          this->GetName()+"__TORQUE_VISUAL__", "torque_tube"));
+
+  Ogre::SceneNode *torqueNode =
+      dPtr->torqueVisual->GetSceneNode()->createChildSceneNode(
+      this->GetName() + "__TORQUE_VISUAL_NODE__");
+  torqueNode->attachObject(torqueObj);
+  dPtr->torqueVisual->SetMaterial("Gazebo/Orange");
+
+  // Torque line
+  double linkDiagonal = dPtr->parent->GetBoundingBox().GetDiagonalLength();
+  dPtr->torqueLine = dPtr->torqueVisual->
+      CreateDynamicLine(rendering::RENDERING_LINE_LIST);
+  dPtr->torqueLine->setMaterial("Gazebo/Orange");
+  dPtr->torqueLine->AddPoint(0, 0, 0);
+  dPtr->torqueLine->AddPoint(0, 0, linkDiagonal*0.5 + 0.5);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+}
+
+///////////////////////////////////////////////////
+void ApplyWrenchVisual::SetMode(WrenchModes _mode)
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  this->wrenchMode = _mode;
+
+  if (this->wrenchMode == WrenchModes::FORCE)
+  {
+    dPtr->forceVisual->SetVisible(true);
+    dPtr->torqueVisual->SetVisible(false);
+  }
+  else if (this->wrenchMode == WrenchModes::TORQUE)
+  {
+    dPtr->forceVisual->SetVisible(false);
+    dPtr->torqueVisual->SetVisible(true);
+  }
 }
 
 ///////////////////////////////////////////////////
@@ -94,8 +143,15 @@ void ApplyWrenchVisual::UpdateForce(math::Vector3 _forceVector)
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  if (dPtr->forceArrow)
+  if (dPtr->forceVisual)
   {
+    if (_forceVector == math::Vector3::Zero)
+    {
+      dPtr->forceVisual->SetVisible(false);
+      return;
+    }
+    dPtr->forceVisual->SetVisible(true);
+
     // Set rotation
     math::Vector3 u = _forceVector;
     u = u.Normalize();
@@ -107,11 +163,45 @@ void ApplyWrenchVisual::UpdateForce(math::Vector3 _forceVector)
       quat.SetFromAxis(u.GetPerpendicular(), angle);
     else
       quat.SetFromAxis((v.Cross(u)).Normalize(), angle);
-    dPtr->forceArrow->SetRotation(quat);
+    dPtr->forceVisual->SetRotation(quat);
 
     // Set position
-    double linkSize = dPtr->parent->GetBoundingBox().GetDiagonalLength();
-    //double arrowSize = this->forceArrow->GetBoundingBox().GetZLength();
-    dPtr->forceArrow->SetPosition(-u * (linkSize*0.5 + 0.5));
+    double linkDiagonal = dPtr->parent->GetBoundingBox().GetDiagonalLength();
+    //double arrowSize = this->forceVisual->GetBoundingBox().GetZLength();
+    dPtr->forceVisual->SetPosition(-u * (linkDiagonal*0.5 + 0.5));
+  }
+}
+
+///////////////////////////////////////////////////
+void ApplyWrenchVisual::UpdateTorque(math::Vector3 _torqueVector)
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  if (dPtr->torqueVisual)
+  {
+    if (_torqueVector == math::Vector3::Zero)
+    {
+      dPtr->torqueVisual->SetVisible(false);
+      return;
+    }
+    dPtr->torqueVisual->SetVisible(true);
+
+    // Set rotation
+    math::Vector3 u = _torqueVector;
+    u = u.Normalize();
+    math::Vector3 v = math::Vector3::UnitZ;
+    double cosTheta = v.Dot(u);
+    double angle = acos(cosTheta);
+    math::Quaternion quat;
+    if (math::equal(angle, M_PI))
+      quat.SetFromAxis(u.GetPerpendicular(), angle);
+    else
+      quat.SetFromAxis((v.Cross(u)).Normalize(), angle);
+    dPtr->torqueVisual->SetRotation(quat);
+
+    // Set position
+    double linkDiagonal = dPtr->parent->GetBoundingBox().GetDiagonalLength();
+    dPtr->torqueVisual->SetPosition(-u * (linkDiagonal*0.5 + 0.5));
   }
 }

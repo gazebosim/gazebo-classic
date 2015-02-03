@@ -35,6 +35,15 @@ namespace gazebo
     /// \brief Visualization for the apply wrench GUI
     class GAZEBO_VISIBLE ApplyWrenchVisual : public Visual
     {
+      /// \enum WrenchModes
+      /// \brief Identifies if either in force mode or torque mode.
+      public: enum WrenchModes {
+                  /// \brief Force mode
+                  FORCE,
+                  /// \brief Torque mode
+                  TORQUE
+                };
+
       /// \brief Constructor
       /// \param[in] _name Name of the visual
       /// \param[in] _parentVis Pointer to the parent visual
@@ -47,7 +56,16 @@ namespace gazebo
       public: void Load();
 
       /// \brief TODO
+      public: void SetMode(WrenchModes _mode);
+
+      /// \brief TODO
       public: void UpdateForce(math::Vector3 _forceVector);
+
+      /// \brief TODO
+      public: void UpdateTorque(math::Vector3 _torqueVector);
+
+      /// \brief TODO
+      public: ApplyWrenchVisual::WrenchModes wrenchMode;
     };
     /// \}
   }

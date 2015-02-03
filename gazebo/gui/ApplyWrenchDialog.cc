@@ -22,8 +22,6 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/ApplyWrenchVisual.hh"
-//#include "gazebo/rendering/ArrowVisual.hh"
-//#include "gazebo/rendering/DynamicLines.hh"
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ApplyWrenchDialog.hh"
@@ -44,13 +42,91 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   this->messageLabel->setText(
       tr("Apply Force and Torque"));
 
+  // Reference point
+  QRadioButton *pointCollapser = new QRadioButton();
+  pointCollapser->setChecked(false);
+  pointCollapser->setText("Reference Point");
+  pointCollapser->setStyleSheet(
+     "QRadioButton {\
+        color: #d0d0d0;\
+      }\
+      QRadioButton::indicator::unchecked {\
+        image: url(:/images/right_arrow.png);\
+      }\
+      QRadioButton::indicator::checked {\
+        image: url(:/images/down_arrow.png);\
+      }");
+  connect(pointCollapser, SIGNAL(toggled(bool)), this,
+           SLOT(TogglePoint(bool)));
+
+  // Point X
+  QLabel *pointXLabel = new QLabel();
+  pointXLabel->setText(tr("X:"));
+  QLabel *pointXUnitLabel = new QLabel();
+  pointXUnitLabel->setText(tr("m"));
+
+  this->pointXSpin = new QDoubleSpinBox();
+  this->pointXSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->pointXSpin->setSingleStep(0.1);
+  this->pointXSpin->setDecimals(3);
+  this->pointXSpin->setValue(0);
+  connect(this->pointXSpin, SIGNAL(valueChanged(double)), this,
+      SLOT(OnPointXChanged(double)));
+
+  // Point Y
+  QLabel *pointYLabel = new QLabel();
+  pointYLabel->setText(tr("Y:"));
+  QLabel *pointYUnitLabel = new QLabel();
+  pointYUnitLabel->setText(tr("m"));
+
+  this->pointYSpin = new QDoubleSpinBox();
+  this->pointYSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->pointYSpin->setSingleStep(0.1);
+  this->pointYSpin->setDecimals(3);
+  this->pointYSpin->setValue(0);
+  connect(this->pointYSpin, SIGNAL(valueChanged(double)), this,
+      SLOT(OnPointYChanged(double)));
+
+  // Point Z
+  QLabel *pointZLabel = new QLabel();
+  pointZLabel->setText(tr("Z:"));
+  QLabel *pointZUnitLabel = new QLabel();
+  pointZUnitLabel->setText(tr("m"));
+
+  this->pointZSpin = new QDoubleSpinBox();
+  this->pointZSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->pointZSpin->setSingleStep(0.1);
+  this->pointZSpin->setDecimals(3);
+  this->pointZSpin->setValue(0);
+  connect(this->pointZSpin, SIGNAL(valueChanged(double)), this,
+      SLOT(OnPointZChanged(double)));
+
+  QGridLayout *pointCollapsible = new QGridLayout();
+  pointCollapsible->addWidget(pointXLabel, 0, 0);
+  pointCollapsible->addWidget(this->pointXSpin, 0, 1);
+  pointCollapsible->addWidget(pointXUnitLabel, 0, 2);
+  pointCollapsible->addWidget(pointYLabel, 1, 0);
+  pointCollapsible->addWidget(this->pointYSpin, 1, 1);
+  pointCollapsible->addWidget(pointYUnitLabel, 1, 2);
+  pointCollapsible->addWidget(pointZLabel, 2, 0);
+  pointCollapsible->addWidget(this->pointZSpin, 2, 1);
+  pointCollapsible->addWidget(pointZUnitLabel, 2, 2);
+
+  this->pointCollapsibleWidget = new QWidget();
+  this->pointCollapsibleWidget->setLayout(pointCollapsible);
+  this->pointCollapsibleWidget->hide();
+
+  QVBoxLayout *pointLayout = new QVBoxLayout();
+  pointLayout->addWidget(pointCollapser);
+  pointLayout->addWidget(pointCollapsibleWidget);
+
   // Force
   QLabel *forceLabel = new QLabel();
   forceLabel->setText(tr("Force"));
 
   // Force magnitude
   QLabel *forceMagLabel = new QLabel();
-  forceMagLabel->setText(tr("Magnitude:"));
+  forceMagLabel->setText(tr("Total:"));
   QLabel *forceMagUnitLabel = new QLabel();
   forceMagUnitLabel->setText(tr("N"));
 
@@ -61,10 +137,6 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   this->forceMagSpin->setValue(1000);
   connect(this->forceMagSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForceMagChanged(double)));
-
-  // Force direction
-  QLabel *forceDirectionLabel = new QLabel();
-  forceDirectionLabel->setText(tr("Direction:"));
 
   // Force X
   QLabel *forceXLabel = new QLabel();
@@ -110,19 +182,18 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
 
   QGridLayout *forceLayout = new QGridLayout();
   forceLayout->addWidget(forceLabel, 0, 0);
-  forceLayout->addWidget(forceMagLabel, 1, 0);
-  forceLayout->addWidget(this->forceMagSpin, 1, 1);
-  forceLayout->addWidget(forceMagUnitLabel, 1, 2);
-  forceLayout->addWidget(forceDirectionLabel, 2, 0);
-  forceLayout->addWidget(forceXLabel, 3, 0);
-  forceLayout->addWidget(this->forceXSpin, 3, 1);
-  forceLayout->addWidget(forceXUnitLabel, 3, 2);
-  forceLayout->addWidget(forceYLabel, 4, 0);
-  forceLayout->addWidget(this->forceYSpin, 4, 1);
-  forceLayout->addWidget(forceYUnitLabel, 4, 2);
-  forceLayout->addWidget(forceZLabel, 5, 0);
-  forceLayout->addWidget(this->forceZSpin, 5, 1);
-  forceLayout->addWidget(forceZUnitLabel, 5, 2);
+  forceLayout->addWidget(forceXLabel, 1, 0);
+  forceLayout->addWidget(this->forceXSpin, 1, 1);
+  forceLayout->addWidget(forceXUnitLabel, 1, 2);
+  forceLayout->addWidget(forceYLabel, 2, 0);
+  forceLayout->addWidget(this->forceYSpin, 2, 1);
+  forceLayout->addWidget(forceYUnitLabel, 2, 2);
+  forceLayout->addWidget(forceZLabel, 3, 0);
+  forceLayout->addWidget(this->forceZSpin, 3, 1);
+  forceLayout->addWidget(forceZUnitLabel, 3, 2);
+  forceLayout->addWidget(forceMagLabel, 4, 0);
+  forceLayout->addWidget(this->forceMagSpin, 4, 1);
+  forceLayout->addWidget(forceMagUnitLabel, 4, 2);
 
   // Torque
   QLabel *torqueLabel = new QLabel();
@@ -130,7 +201,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
 
   // Torque magnitude
   QLabel *torqueMagLabel = new QLabel();
-  torqueMagLabel->setText(tr("Magnitude:"));
+  torqueMagLabel->setText(tr("Total:"));
   QLabel *torqueMagUnitLabel = new QLabel();
   torqueMagUnitLabel->setText(tr("Nm"));
 
@@ -141,10 +212,6 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   this->torqueMagSpin->setValue(0);
   connect(this->torqueMagSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnTorqueMagChanged(double)));
-
-  // Torque direction
-  QLabel *torqueDirectionLabel = new QLabel();
-  torqueDirectionLabel->setText(tr("Direction:"));
 
   // Torque X
   QLabel *torqueXLabel = new QLabel();
@@ -190,19 +257,18 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
 
   QGridLayout *torqueLayout = new QGridLayout();
   torqueLayout->addWidget(torqueLabel, 0, 0);
-  torqueLayout->addWidget(torqueMagLabel, 1, 0);
-  torqueLayout->addWidget(this->torqueMagSpin, 1, 1);
-  torqueLayout->addWidget(torqueMagUnitLabel, 1, 2);
-  torqueLayout->addWidget(torqueDirectionLabel, 2, 0);
-  torqueLayout->addWidget(torqueXLabel, 3, 0);
-  torqueLayout->addWidget(this->torqueXSpin, 3, 1);
-  torqueLayout->addWidget(torqueXUnitLabel, 3, 2);
-  torqueLayout->addWidget(torqueYLabel, 4, 0);
-  torqueLayout->addWidget(this->torqueYSpin, 4, 1);
-  torqueLayout->addWidget(torqueYUnitLabel, 4, 2);
-  torqueLayout->addWidget(torqueZLabel, 5, 0);
-  torqueLayout->addWidget(this->torqueZSpin, 5, 1);
-  torqueLayout->addWidget(torqueZUnitLabel, 5, 2);
+  torqueLayout->addWidget(torqueXLabel, 1, 0);
+  torqueLayout->addWidget(this->torqueXSpin, 1, 1);
+  torqueLayout->addWidget(torqueXUnitLabel, 1, 2);
+  torqueLayout->addWidget(torqueYLabel, 2, 0);
+  torqueLayout->addWidget(this->torqueYSpin, 2, 1);
+  torqueLayout->addWidget(torqueYUnitLabel, 2, 2);
+  torqueLayout->addWidget(torqueZLabel, 3, 0);
+  torqueLayout->addWidget(this->torqueZSpin, 3, 1);
+  torqueLayout->addWidget(torqueZUnitLabel, 3, 2);
+  torqueLayout->addWidget(torqueMagLabel, 4, 0);
+  torqueLayout->addWidget(this->torqueMagSpin, 4, 1);
+  torqueLayout->addWidget(torqueMagUnitLabel, 4, 2);
 
   // Buttons
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
@@ -219,6 +285,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   // Main layout
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(this->messageLabel);
+//  mainLayout->addLayout(pointLayout);
   mainLayout->addLayout(forceLayout);
   mainLayout->addLayout(torqueLayout);
   mainLayout->addLayout(buttonsLayout);
@@ -231,6 +298,9 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   this->UpdateForceVector();
   this->UpdateTorqueVector();
   this->CalculateWrench();
+  this->SetMode(rendering::ApplyWrenchVisual::FORCE);
+
+  connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
 }
 
 /////////////////////////////////////////////////
@@ -242,8 +312,8 @@ ApplyWrenchDialog::~ApplyWrenchDialog()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::SetLink(std::string _linkName)
 {
-  this->messageLabel->setText(
-      tr("Apply Force and Torque")); // add link name
+  std::string msg = "Apply Force and Torque \n Apply to " + _linkName;
+  this->messageLabel->setText(msg.c_str());
   this->linkName = _linkName;
   this->SetPublisher();
 
@@ -252,6 +322,12 @@ void ApplyWrenchDialog::SetLink(std::string _linkName)
 
   this->linkVisual = vis;
   this->AttachVisuals();
+}
+
+///////////////////////////////////////////////////
+void ApplyWrenchDialog::SetMode(rendering::ApplyWrenchVisual::WrenchModes _mode)
+{
+  this->wrenchMode = _mode;
 }
 
 /////////////////////////////////////////////////
@@ -269,7 +345,22 @@ void ApplyWrenchDialog::OnApply()
 void ApplyWrenchDialog::OnCancel()
 {
   this->applyWrenchVisual->SetVisible(false);
-  this->reject();
+  this->close();
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::OnPointXChanged(double /*_pX*/)
+{
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::OnPointYChanged(double /*_pY*/)
+{
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::OnPointZChanged(double /*_pZ*/)
+{
 }
 
 /////////////////////////////////////////////////
@@ -344,7 +435,10 @@ void ApplyWrenchDialog::CalculateWrench()
 
   // Update visuals
   if (this->applyWrenchVisual)
+  {
     this->applyWrenchVisual->UpdateForce(this->forceVector);
+    this->applyWrenchVisual->UpdateTorque(this->torqueVector);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -416,10 +510,32 @@ void ApplyWrenchDialog::UpdateTorqueVector()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::AttachVisuals()
 {
-  this->applyWrenchVisual.reset(new rendering::ApplyWrenchVisual(this->linkName +
-      "__APPLY_WRENCH__", this->linkVisual));
+  if (!this->applyWrenchVisual)
+  {
+    this->applyWrenchVisual.reset(new rendering::ApplyWrenchVisual(this->linkName +
+        "__APPLY_WRENCH__", this->linkVisual));
 
-  this->applyWrenchVisual->Load();
+    this->applyWrenchVisual->Load();
+  }
+  else
+  {
+    this->applyWrenchVisual->SetVisible(true);
+  }
 
   this->CalculateWrench();
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::TogglePoint(bool _checked)
+{
+  if (_checked)
+  {
+    this->pointCollapsibleWidget->show();
+    //this->resize(this->maximumSize());
+  }
+  else
+  {
+    this->pointCollapsibleWidget->hide();
+    //this->resize(this->minimumSize());
+  }
 }

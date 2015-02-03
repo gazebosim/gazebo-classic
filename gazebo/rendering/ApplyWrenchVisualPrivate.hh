@@ -26,14 +26,17 @@ namespace gazebo
 {
   namespace rendering
   {
-    /// \brief Private data for the Joint Visual class.
+    /// \brief Private data for the Apply Wrench Visual class.
     class ApplyWrenchVisualPrivate : public VisualPrivate
     {
       /// TODO
-      public: rendering::ArrowVisualPtr forceArrow;
+      public: rendering::ArrowVisualPtr forceVisual;
 
-      /// TODO
-      public: rendering::VisualPtr torqueVisual;
+      /// \brief TODO
+      public: VisualPtr torqueVisual;
+
+      /// \brief TODO
+      public: rendering::DynamicLines *torqueLine;
 
       /// \brief Lines that make the cross marking the point of application.
       public: rendering::DynamicLines *crossLines;

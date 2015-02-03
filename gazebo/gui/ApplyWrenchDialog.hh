@@ -21,6 +21,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/ApplyWrenchVisual.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
@@ -36,15 +37,6 @@ namespace gazebo
     {
       Q_OBJECT
 
-      /// \enum WrenchModes
-      /// \brief Identifies if either in force mode or torque mode.
-      public: enum WrenchModes {
-                  /// \brief Force mode
-                  FORCE,
-                  /// \brief Torque mode
-                  TORQUE
-                };
-
       /// \brief Constructor.
       /// \param[in] _parent Parent QWidget.
       public: ApplyWrenchDialog(QWidget *_parent = 0);
@@ -56,11 +48,30 @@ namespace gazebo
       /// \param[in] _linkName Link name.
       public: void SetLink(std::string _linkName);
 
+      /// \brief TODO
+      public: void SetMode(rendering::ApplyWrenchVisual::WrenchModes _mode);
+
       /// \brief Qt callback when the Apply button is pressed.
       private slots: void OnApply();
 
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
+
+      /// \brief Qt callback to show/hide point options.
+      /// \param[in] _checked Whether it is checked or not.
+      private slots: void TogglePoint(bool _checked);
+
+      /// \brief Qt callback when the the point X has changed.
+      /// \param[in] _magnitude Point vector X component
+      private slots: void OnPointXChanged(double _pX);
+
+      /// \brief Qt callback when the the point Y has changed.
+      /// \param[in] _magnitude Point vector Y component
+      private slots: void OnPointYChanged(double _pY);
+
+      /// \brief Qt callback when the the point Z has changed.
+      /// \param[in] _magnitude Point vector Z component
+      private slots: void OnPointZChanged(double _pZ);
 
       /// \brief Qt callback when the the force magnitude has changed.
       /// \param[in] _magnitude Force magnitude
@@ -128,6 +139,18 @@ namespace gazebo
       private: QLabel *messageLabel;
 
       /// TODO
+      private: QWidget *pointCollapsibleWidget;
+
+      /// TODO
+      private: QDoubleSpinBox *pointXSpin;
+
+      /// TODO
+      private: QDoubleSpinBox *pointYSpin;
+
+      /// TODO
+      private: QDoubleSpinBox *pointZSpin;
+
+      /// TODO
       private: QDoubleSpinBox *forceMagSpin;
 
       /// TODO
@@ -167,7 +190,7 @@ namespace gazebo
       private: rendering::ApplyWrenchVisualPtr applyWrenchVisual;
 
       /// TODO
-      private: WrenchModes mode;
+      private: rendering::ApplyWrenchVisual::WrenchModes wrenchMode;
     };
     /// \}
   }
