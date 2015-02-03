@@ -56,7 +56,10 @@ namespace gazebo
       public: void Load();
 
       /// \brief TODO
-      public: void SetMode(WrenchModes _mode);
+      public: rendering::VisualPtr GetForceVisual() const;
+
+      /// \brief TODO
+      public: rendering::VisualPtr GetTorqueVisual() const;
 
       /// \brief TODO
       public: void UpdateForce(math::Vector3 _forceVector);

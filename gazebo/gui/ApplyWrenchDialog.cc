@@ -312,7 +312,8 @@ ApplyWrenchDialog::~ApplyWrenchDialog()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::SetLink(std::string _linkName)
 {
-  std::string msg = "Apply Force and Torque \n Apply to " + _linkName;
+  std::string msg = "Apply Force and Torque \n\n" +
+                    "Apply to " + _linkName + "\n";
   this->messageLabel->setText(msg.c_str());
   this->linkName = _linkName;
   this->SetPublisher();

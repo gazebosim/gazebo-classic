@@ -118,6 +118,24 @@ void ApplyWrenchVisual::Load()
 }
 
 ///////////////////////////////////////////////////
+rendering::VisualPtr ApplyWrenchVisual::GetForceVisual() const
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  return dPtr->forceVisual;
+}
+
+///////////////////////////////////////////////////
+rendering::VisualPtr ApplyWrenchVisual::GetTorqueVisual() const
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  return dPtr->torqueVisual;
+}
+
+///////////////////////////////////////////////////
 void ApplyWrenchVisual::SetMode(WrenchModes _mode)
 {
   ApplyWrenchVisualPrivate *dPtr =
