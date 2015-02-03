@@ -30,8 +30,12 @@ namespace gazebo
     //typedef std::map<std::string, boost::any> Preset;
     class Preset
     {
-      public: std::map<std::string, boost::any> paramMap;
-      public: sdf::ElementPtr sdfElement;
+      public: std::string GetName();
+      public: boost::any _value GetParam(const std::string& _key);
+      public: void SetParam(const std::string& _key, boost::any _value);
+      public: sdf::ElementPtr GetSDF();
+      public: void SetSDF(sdf::ElementPtr _sdfElement);
+      private: PresetPrivate *dataPtr;
     };
 
     class PresetManagerPrivate;
@@ -48,13 +52,9 @@ namespace gazebo
 
       public: bool SetCurrentProfile(const std::string& _name);
 
-      public: Preset* GetCurrentProfile() const;
-
-      public: std::string GetCurrentProfileName() const;
+      public: std::string GetCurrentProfile() const;
  
-      public: std::vector<std::string> GetAllProfileNames() const;
-
-      public: std::vector<Preset*> GetAllProfiles() const;
+      public: std::vector<std::string> GetAllProfiles() const;
 
       public: bool SetProfileParam(const std::string& _profileName,
                                    const std::string& _key,
@@ -80,6 +80,8 @@ namespace gazebo
       private: Preset GeneratePresetFromSDF(const sdf::ElementPtr _elem) const;
 
       private: sdf::ElementPtr GenerateSDFFromPreset(Preset* _paramMap) const;
+
+      private: Preset* GetCurrentProfilePreset() const;
 
       private: PresetManagerPrivate *dataPtr;
     };

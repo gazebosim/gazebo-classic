@@ -24,6 +24,8 @@
 using namespace gazebo;
 using namespace physics;
 
+Preset::
+
 ////////////////////////////////////////////////////////////////////////////////
 Preset PresetManager::GeneratePresetFromSDF(const sdf::ElementPtr _elem) const
 {
@@ -104,7 +106,7 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine, sdf::ElementPtr _s
 
         if (name == defaultName)
         {
-          if (!this->GetCurrentProfile())
+          if (!this->GetCurrentProfilePreset())
           {
             this->SetCurrentProfile(name);
           }
@@ -153,13 +155,13 @@ bool PresetManager::SetCurrentProfile(const std::string& _name)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Preset* PresetManager::GetCurrentProfile() const
+Preset* PresetManager::GetCurrentProfilePreset() const
 {
   return this->dataPtr->currentPreset;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string PresetManager::GetCurrentProfileName() const
+std::string PresetManager::GetCurrentProfile() const
 {
   if (!this->dataPtr->currentPreset)
   {
@@ -181,7 +183,7 @@ std::string PresetManager::GetCurrentProfileName() const
   }
   catch (boost::bad_any_cast)
   {
-    gzwarn << "Got bad type in GetCurrentProfileName" << std::endl;
+    gzwarn << "Got bad type in GetCurrentProfile" << std::endl;
     return "";
   }
 }
@@ -199,7 +201,7 @@ std::vector<Preset*> PresetManager::GetAllProfiles() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> PresetManager::GetAllProfileNames() const
+std::vector<std::string> PresetManager::GetAllProfiles() const
 {
   std::vector<std::string> ret;
   for (auto it = this->dataPtr->presetProfiles.begin();
@@ -214,7 +216,7 @@ std::vector<std::string> PresetManager::GetAllProfileNames() const
 bool PresetManager::SetProfileParam(const std::string& _profileName,
   const std::string& _key, const boost::any &_value)
 {
-  if (_profileName == this->GetCurrentProfileName())
+  if (_profileName == this->GetCurrentProfile())
   {
     return this->SetCurrentProfileParam(_key, _value);
   }
@@ -272,7 +274,7 @@ std::string PresetManager::CreateProfile(sdf::ElementPtr _elem)
 ////////////////////////////////////////////////////////////////////////////////
 void PresetManager::RemoveProfile(const std::string& _name)
 {
-  if (_name == this->GetCurrentProfileName())
+  if (_name == this->GetCurrentProfile())
   {
     gzwarn << "deselecting current preset " << _name << std::endl;
     this->dataPtr->currentPreset = NULL;
