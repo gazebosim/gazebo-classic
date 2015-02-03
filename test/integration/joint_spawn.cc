@@ -294,6 +294,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   bool isBullet = physics->GetType().compare("bullet") == 0;
+  bool isDart = physics->GetType().compare("dart") == 0;
   bool isSimbody = physics->GetType().compare("simbody") == 0;
   double dt = physics->GetMaxStepSize();
 
@@ -414,6 +415,16 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     // Expect motion
     EXPECT_GT(_joint->GetVelocity(_index), 0.2 * friction);
     EXPECT_GT(_joint->GetAngle(_index).Radian(), 0.05 * friction);
+
+    // DART has problem with joint friction and joint limits
+    // https://github.com/dartsim/dart/issues/317
+    // Set friction back to zero to not interfere with other tests
+    // until this issue is resolved.
+    if (isDart)
+    {
+      EXPECT_TRUE(_joint->SetParam("friction", _index, 0.0));
+      EXPECT_NEAR(_joint->GetParam("friction", _index), 0.0, g_tolerance);
+    }
   }
 
   // SetHighStop

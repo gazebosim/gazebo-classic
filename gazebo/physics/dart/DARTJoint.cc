@@ -442,7 +442,7 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
       return false;
     }
   }
-  catch (const boost::bad_any_cast &e)
+  catch(const boost::bad_any_cast &e)
   {
     gzerr << "SetParam(" << _key << ")"
           << " boost any_cast error:" << e.what()
@@ -463,7 +463,7 @@ double DARTJoint::GetParam(const std::string &_key, unsigned int _index)
       return this->dtJoint->getCoulombFriction(_index);
     }
   }
-  catch (const common::Exception &e)
+  catch(const common::Exception &e)
   {
     gzerr << "GetParam(" << _key << ") error:"
           << e.GetErrorStr()
