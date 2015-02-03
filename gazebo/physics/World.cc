@@ -1291,7 +1291,8 @@ void World::LoadPlugin(const std::string &_filename,
 //////////////////////////////////////////////////
 void World::RemovePlugin(const std::string &_name)
 {
-  for (auto iter : this->dataPtr->plugins)
+  for (auto iter = this->dataPtr->plugins.begin();
+           iter != this->dataPtr->plugins.end(); ++iter)
   {
     if ((*iter)->GetHandle() == _name)
     {
@@ -2009,7 +2010,8 @@ void World::RemoveModel(const std::string &_name)
 
   // Remove all the dirty poses from the delete entity.
   {
-    for (auto iter2 : this->dataPtr->dirtyPoses)
+    for (auto iter2 = this->dataPtr->dirtyPoses.begin();
+             iter2 != this->dataPtr->dirtyPoses.end(); ++iter2)
     {
       if ((*iter2)->GetName() == _name ||
           ((*iter2)->GetParent() && (*iter2)->GetParent()->GetName() == _name))
@@ -2058,7 +2060,8 @@ void World::RemoveModel(const std::string &_name)
 
     this->dataPtr->rootElement->RemoveChild(_name);
 
-    for (auto iter : this->dataPtr->models)
+    for (auto iter = this->dataPtr->models.begin();
+             iter != this->dataPtr->models.end(); ++iter)
     {
       if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
       {
@@ -2071,7 +2074,8 @@ void World::RemoveModel(const std::string &_name)
   // Cleanup the publishModelPoses list.
   {
     boost::recursive_mutex::scoped_lock lock2(*this->dataPtr->receiveMutex);
-    for (auto iter : this->dataPtr->publishModelPoses)
+    for (auto iter = this->dataPtr->publishModelPoses.begin();
+             iter != this->dataPtr->publishModelPoses.end(); ++iter)
     {
       if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
       {
