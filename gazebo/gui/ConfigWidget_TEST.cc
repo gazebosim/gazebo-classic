@@ -253,7 +253,7 @@ void ConfigWidget_TEST::VisualMsgWidget()
     gazebo::math::Vector3 dimensions;
     std::string uri;
     QVERIFY(visualConfigWidget->GetGeometryWidgetValue("geometry", dimensions,
-        uri) ==  "box");
+        uri) == "box");
     QCOMPARE(dimensions, gazebo::math::Vector3(5.0, 3.0, 4.0));
 
     // material
