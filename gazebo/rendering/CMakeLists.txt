@@ -13,6 +13,7 @@ add_subdirectory(skyx)
 add_subdirectory(selection_buffer)
 
 set (sources
+  ApplyWrenchVisual.cc
   ArrowVisual.cc
   AxisVisual.cc
   Camera.cc
@@ -57,6 +58,7 @@ set (sources
 )
 
 set (headers
+  ApplyWrenchVisual.hh
   ArrowVisual.hh
   AxisVisual.hh
   Camera.hh

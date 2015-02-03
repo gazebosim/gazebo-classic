@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _APPLY_FORCE_DIALOG_HH_
-#define _APPLY_FORCE_DIALOG_HH_
+#ifndef _APPLY_WRENCH_DIALOG_HH_
+#define _APPLY_WRENCH_DIALOG_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/math/Vector3.hh"
@@ -164,13 +164,7 @@ namespace gazebo
       private: rendering::VisualPtr linkVisual;
 
       /// TODO
-      private: rendering::ArrowVisualPtr forceArrow;
-
-      /// TODO
-      private: rendering::VisualPtr torqueVisual;
-
-      /// \brief Lines that make the cross marking the point of application.
-      public: rendering::DynamicLines *crossLines;
+      private: rendering::ApplyWrenchVisualPtr applyWrenchVisual;
 
       /// TODO
       private: WrenchModes mode;
