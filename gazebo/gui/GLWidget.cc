@@ -696,8 +696,18 @@ void GLWidget::OnMouseReleaseNormal()
     if (vis)
     {
       rendering::VisualPtr selectVis;
-      rendering::VisualPtr modelVis = vis->GetRootVisual();
       rendering::VisualPtr linkVis = vis->GetParent();
+      if (!linkVis)
+      {
+        gzerr << "Link visual not found, this should not happen." << std::endl;
+        return;
+      }
+      rendering::VisualPtr modelVis = vis->GetRootVisual();
+      if (!modelVis)
+      {
+        gzerr << "Model visual not found, this should not happen." << std::endl;
+        return;
+      }
 
       // Flags to check if we should select a link or a model
       bool rightButton = (this->mouseEvent.button == common::MouseEvent::RIGHT);
@@ -744,8 +754,8 @@ void GLWidget::OnMouseReleaseNormal()
       {
         if (selectVis == modelVis)
           g_modelRightMenu->Run(selectVis->GetName(), QCursor::pos());
-        else if (selectVis == linkVis)
-          gzdbg << "TODO: Open link right menu" << std::endl;
+        // else if (selectVis == linkVis)
+          // TODO: Open link right menu
       }
     }
     else
