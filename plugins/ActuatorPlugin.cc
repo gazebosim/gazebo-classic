@@ -19,6 +19,12 @@
 
 using namespace gazebo;
 
+//////////////////////////////////////////////////
+/// \brief Calculate torque due to the input conditions for an electric motor
+/// model. Simplified from http://lancet.mit.edu/motors/motors3.html#power
+/// \param[in] _speed Input velocity.
+/// \param[in] _properties Static properties of this actuator
+/// \return Torque according to the model.
 float ElectricMotorModel(const float _speed, const float /*_torque*/,
   const ActuatorProperties &_properties)
 {
@@ -33,6 +39,13 @@ float ElectricMotorModel(const float _speed, const float /*_torque*/,
   return torque;
 }
 
+//////////////////////////////////////////////////
+/// \brief A simple velocity limiting motor model. Returns the maximum torque
+/// if speed is above the allowed limit, and returns the input torque otherwise.
+/// \param[in] _speed Input velocity.
+/// \param[in] _torque Input torque.
+/// \param[in] _properties Static properties of this actuator
+/// \return Torque according to the model.
 float VelocityLimiterModel(const float _speed, const float _torque,
   const ActuatorProperties &_properties)
 {
@@ -42,47 +55,57 @@ float VelocityLimiterModel(const float _speed, const float _torque,
   return _torque;
 }
 
+//////////////////////////////////////////////////
+/// \brief The null motor model. Nothing exciting happening here.
+/// \return Torque according to the model, which will always be zero.
 float NullModel(const float /*_speed*/, const float /*_torque*/,
                 const ActuatorProperties &/*_properties*/)
 {
   return 0;
 }
 
+//////////////////////////////////////////////////
 void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
   // Read the SDF
   if (_sdf->HasElement("actuator"))
   {
-    sdf::ElementPtr elem = _sdf->GetElement("actuator");
-    while (elem)
+    for (sdf::ElementPtr elem = _sdf->GetElement("actuator"); elem != NULL;
+         elem = elem->GetNextElement("actuator"))
     {
       // Get actuator properties
       ActuatorProperties properties;
 
       // actuator name is currently an optional property
       if (elem->HasElement("name"))
-        properties.name = elem->GetElement("name")->Get<std::string>();
+        properties.name = elem->Get<std::string>("name");
 
       if (!elem->HasElement("joint"))
+      {
+        gzwarn << "Invalid SDF: got actuator element without joint."
+               << std::endl;
         continue;
-      std::string jointName = elem->GetElement("joint")->Get<std::string>();
+      }
+      std::string jointName = elem->Get<std::string>("joint");
 
-      properties.modelFunction = NULL;
+      properties.modelFunction = NullModel;
       if (elem->HasElement("type"))
       {
-        std::string modelType = elem->GetElement("type")->Get<std::string>();
+        std::string modelType = elem->Get<std::string>("type");
         if (modelType.compare("electric_motor") == 0)
         {
           if (!elem->HasElement("power") ||
               !elem->HasElement("max_velocity") ||
               !elem->HasElement("max_torque"))
+          {
+            gzwarn << "Invalid SDF: Missing required elements for motor model "
+                   << modelType << "." << std::endl;
             continue;
+          }
 
-          properties.power = elem->GetElement("power")->Get<float>();
-          properties.maximumVelocity =
-            elem->GetElement("max_velocity")->Get<float>();
-          properties.maximumTorque =
-            elem->GetElement("max_torque")->Get<float>();
+          properties.power = elem->Get<float>("power");
+          properties.maximumVelocity = elem->Get<float>("max_velocity");
+          properties.maximumTorque = elem->Get<float>("max_torque");
 
           properties.modelFunction = ElectricMotorModel;
         }
@@ -90,24 +113,29 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         {
           if (!elem->HasElement("max_velocity") ||
               !elem->HasElement("max_torque"))
+          {
+            gzwarn << "Invalid SDF: Missing required elements for motor model "
+                   << modelType << "." << std::endl;
             continue;
-          properties.maximumVelocity =
-            elem->GetElement("max_velocity")->Get<float>();
-          properties.maximumTorque =
-            elem->GetElement("max_torque")->Get<float>();
+          }
+          properties.maximumVelocity = elem->Get<float>("max_velocity");
+          properties.maximumTorque = elem->Get<float>("max_torque");
           properties.modelFunction = VelocityLimiterModel;
         }
-        else
         {
-          properties.modelFunction = NullModel;
+          gzwarn << "Unknown motor model specified, selecting NullModel."
+                 << std::endl;
         }
       }
-      if (properties.modelFunction == NULL)
-        properties.modelFunction = NullModel;
+      else
+      {
+        gzwarn << "No motor model specified, selecting NullModel."
+               << std::endl;
+      }
 
       if (elem->HasElement("index"))
       {
-        properties.jointIndex = elem->GetElement("index")->Get<unsigned int>();
+        properties.jointIndex = elem->Get<unsigned int>("index");
       }
       else
       {
@@ -117,12 +145,14 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       // Store pointer to the joint we will actuate
       physics::JointPtr joint = _parent->GetJoint(jointName);
       if (!joint)
+      {
+        gzwarn << "Invalid SDF: actuator joint " << jointName << " does not "
+               << "exist!" << std::endl;
         continue;
+      }
       joint->SetEffortLimit(properties.jointIndex, properties.maximumTorque);
       this->joints.push_back(joint);
       this->actuators.push_back(properties);
-
-      elem = elem->GetNextElement("actuator");
     }
     // Set up a physics update callback
     this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
@@ -130,6 +160,7 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   }
 }
 
+//////////////////////////////////////////////////
 void ActuatorPlugin::WorldUpdateCallback()
 {
   // Update the stored joints according to the desired model.

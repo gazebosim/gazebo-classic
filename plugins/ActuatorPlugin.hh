@@ -24,6 +24,33 @@
 #include <gazebo/physics/physics.hh>
 #include <gazebo/gazebo.hh>
 
+/// Example SDF:
+///       <plugin name="actuator_plugin" filename="libActuatorPlugin.so">
+///        <actuator>
+///          <name>actuator_0</name> <!-- optional -->
+///          <joint>JOINT_0</joint> <!-- name of joint to actuate -->
+///          <index>0</index> <!-- needed for multi-DOF joints -->
+///          <type>electric_motor</type> <!-- motor model type -->
+///          <power>20</power> <!-- parameters for motor model -->
+///          <max_velocity>6</max_velocity>
+///          <max_torque>10.0</max_torque>
+///        </actuator>
+///      </plugin>
+///    </model>
+///
+/// Required fields:
+/// - name
+/// - joint
+/// - index (can be 0 in most cases)
+/// - type: current options are electric_motor, velocity_limiter or null
+/// Required for motor model electric_motor:
+/// - power
+/// - max_velocity
+/// - max_torque
+/// Required for motor model velocity_limiter:
+/// - max_velocity
+/// - max_torque
+
 namespace gazebo
 {
   /// \brief Properties for a model of a rotational actuator
@@ -44,13 +71,15 @@ namespace gazebo
     /// \brief Maximum torque of the actuator (Newton-meters)
     public: float maximumTorque;
 
+    /// \brief Function used to calculate motor output.
     public: boost::function<float (float, float, const ActuatorProperties&)>
               modelFunction;
   };
 
+  /// \brief Plugin for simulating a torque-speed curve for actuators.
   class ActuatorPlugin : public ModelPlugin
   {
-    /// \brief Load the plugin from SDF.
+    /// Documentation inherited
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
 
     /// \brief Callback on world update event.

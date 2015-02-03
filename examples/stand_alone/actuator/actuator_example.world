@@ -11,14 +11,216 @@
       <uri>model://ground_plane</uri>
     </include>
 
-    <include>
-      <uri>model://actuator_example</uri>
-    </include>
+    <model name='actuator_example'>
+      <link name='top'>
+        <visual name='top_visual'>
+          <pose>0 0 1.5 0 -0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+         <collision name='top_collision'>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <pose>0 0 1.5 0 0 0</pose>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+      </link>
+      <link name='base'>
+        <visual name='base_visual'>
+          <pose>0 0 0.5 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>1.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+         <collision name='base_collision'>
+          <geometry>
+            <cylinder>
+              <radius>1.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <pose>0 0 0.5 0 0 0</pose>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <inertial>
+          <mass>1</mass>
+          <pose>0 0 0 0 -0 0</pose>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+      </link>
+      <joint name='JOINT_0' type='revolute'>
+        <parent>base</parent>
+        <child>top</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <use_parent_model_frame>0</use_parent_model_frame>
+          <limit>
+            <lower>1e-16</lower>
+            <upper>1e16</upper>
+          </limit>
+        </axis>
+        <pose>0 0 1 0 -0 0</pose>
+      </joint>
+      <static>0</static>
+      <allow_auto_disable>1</allow_auto_disable>
 
-    <include>
-      <uri>model://unactuated_example</uri>
-      <pose>100 0 0 0 0 0</pose>
-    </include>
+      <plugin name="actuator_plugin" filename="libActuatorPlugin.so">
+        <actuator>
+          <name>actuator_0</name>
+          <joint>JOINT_0</joint>
+          <index>0</index>
+          <type>electric_motor</type>
+          <power>20</power>
+          <max_velocity>6</max_velocity>
+          <max_torque>10.0</max_torque>
+        </actuator>
+      </plugin>
+    </model>
+
+    <model name='unactuated_example'>
+      <pose>20 0 0 0 0 0</pose>
+      <link name='top'>
+        <visual name='top_visual'>
+          <pose>0 0 1.5 0 -0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+        <collision name='top_collision'>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <pose>0 0 1.5 0 0 0</pose>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+      </link>
+      <link name='base'>
+        <visual name='base_visual'>
+          <pose>0 0 0.5 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>1.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+        <collision name='base_collision'>
+          <geometry>
+            <cylinder>
+              <radius>1.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <pose>0 0 0.5 0 0 0</pose>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <inertial>
+          <mass>1</mass>
+          <pose>0 0 0 0 -0 0</pose>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+      </link>
+      <joint name='JOINT_0' type='revolute'>
+        <parent>base</parent>
+        <child>top</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <use_parent_model_frame>0</use_parent_model_frame>
+          <limit>
+            <lower>1e-16</lower>
+            <upper>1e16</upper>
+          </limit>
+        </axis>
+        <pose>0 0 1 0 0 0</pose>
+      </joint>
+      <static>0</static>
+      <allow_auto_disable>1</allow_auto_disable>
+    </model>
 
   </world>
 </sdf>
