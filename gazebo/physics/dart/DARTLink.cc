@@ -247,9 +247,20 @@ void DARTLink::OnPoseChange()
       P = this->dtBodyNode->getParentBodyNode()->getTransform();
 
     Eigen::Isometry3d Q = T1.inverse() * P.inverse() * W * InvT2;
+
     // Set generalized coordinate and update the transformations only
-    freeJoint->setPositions(dart::math::logMap(Q));
+    Eigen::Vector6d q;
+    q.head<3>() = dart::math::logMap(Q.linear());
+    q.tail<3>() = Q.translation();
+    freeJoint->setPositions(q);
+    // TODO: The above 4 lines will be reduced to single line as:
+    // freeJoint->setPositions(FreeJoint::convertToPositions(Q));
+    // after the following PR is merged:
+    // https://github.com/dartsim/dart/pull/322
+
     freeJoint->getSkeleton()->computeForwardKinematics(true, false, false);
+    // TODO: This line will be redundant after the following PR is merged:
+    // https://github.com/dartsim/dart/pull/319
   }
   else
   {
