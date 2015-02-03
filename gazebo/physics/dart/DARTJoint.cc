@@ -460,7 +460,7 @@ double DARTJoint::GetParam(const std::string &_key, unsigned int _index)
   {
     if (_key == "friction")
     {
-      this->dtJoint->getCoulombFriction(_index);
+      return this->dtJoint->getCoulombFriction(_index);
     }
   }
   catch (const common::Exception &e)
