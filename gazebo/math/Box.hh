@@ -64,6 +64,10 @@ namespace gazebo
       /// \return Size of the box
       public: math::Vector3 GetSize() const;
 
+      /// \brief Get the length of the diagonal.
+      /// \return Diagonal of the box
+      public: double GetDiagonalLength() const;
+
       /// \brief Get the box center
       /// \return The center position of the box
       public: math::Vector3 GetCenter() const;

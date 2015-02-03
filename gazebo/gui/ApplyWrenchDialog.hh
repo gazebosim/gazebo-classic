@@ -36,6 +36,15 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \enum WrenchModes
+      /// \brief Identifies if either in force mode or torque mode.
+      public: enum WrenchModes {
+                  /// \brief Force mode
+                  FORCE,
+                  /// \brief Torque mode
+                  TORQUE
+                };
+
       /// \brief Constructor.
       /// \param[in] _parent Parent QWidget.
       public: ApplyWrenchDialog(QWidget *_parent = 0);
@@ -103,6 +112,9 @@ namespace gazebo
       /// \brief TODO
       private: void UpdateTorqueVector();
 
+      /// \brief TODO
+      private: void AttachVisuals();
+
       /// \brief Node for communication.
       private: transport::NodePtr node;
 
@@ -147,6 +159,21 @@ namespace gazebo
 
       /// \brief Publishes the wrench message.
       private: transport::PublisherPtr wrenchPub;
+
+      /// TODO
+      private: rendering::VisualPtr linkVisual;
+
+      /// TODO
+      private: rendering::ArrowVisualPtr forceArrow;
+
+      /// TODO
+      private: rendering::VisualPtr torqueVisual;
+
+      /// \brief Lines that make the cross marking the point of application.
+      public: rendering::DynamicLines *crossLines;
+
+      /// TODO
+      private: WrenchModes mode;
     };
     /// \}
   }

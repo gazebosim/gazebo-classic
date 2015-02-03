@@ -21,6 +21,8 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/ArrowVisual.hh"
+#include "gazebo/rendering/DynamicLines.hh"
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ApplyWrenchDialog.hh"
@@ -243,6 +245,12 @@ void ApplyWrenchDialog::SetLink(std::string _linkName)
       tr("Apply Force and Torque")); // add link name
   this->linkName = _linkName;
   this->SetPublisher();
+
+  rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
+        GetVisual(this->linkName);
+
+  this->linkVisual = vis;
+  this->AttachVisuals();
 }
 
 /////////////////////////////////////////////////
@@ -259,6 +267,8 @@ void ApplyWrenchDialog::OnApply()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnCancel()
 {
+  this->forceArrow->SetVisible(false);
+  this->crossLines->setVisible(false);
   this->reject();
 }
 
@@ -331,6 +341,28 @@ void ApplyWrenchDialog::CalculateWrench()
       math::Vector3(this->torqueXSpin->value(),
                     this->torqueYSpin->value(),
                     this->torqueZSpin->value());
+
+  // Update visuals
+  if (this->forceArrow)
+  {
+    // Set rotation
+    math::Vector3 u = this->forceVector;
+    u = u.Normalize();
+    math::Vector3 v = math::Vector3::UnitZ;
+    double cosTheta = v.Dot(u);
+    double angle = acos(cosTheta);
+    math::Quaternion quat;
+    if (math::equal(angle, M_PI))
+      quat.SetFromAxis(u.GetPerpendicular(), angle);
+    else
+      quat.SetFromAxis((v.Cross(u)).Normalize(), angle);
+    this->forceArrow->SetRotation(quat);
+
+    // Set position
+    double linkSize = this->linkVisual->GetBoundingBox().GetDiagonalLength();
+    //double arrowSize = this->forceArrow->GetBoundingBox().GetZLength();
+    this->forceArrow->SetPosition(-u * (linkSize*0.5 + 0.5));
+  }
 }
 
 /////////////////////////////////////////////////
@@ -395,6 +427,53 @@ void ApplyWrenchDialog::UpdateTorqueVector()
   this->torqueXSpin->setValue(v.x);
   this->torqueYSpin->setValue(v.y);
   this->torqueZSpin->setValue(v.z);
+
+  this->CalculateWrench();
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::AttachVisuals()
+{
+  math::Vector3 linkSize = this->linkVisual->GetBoundingBox().GetSize();
+
+  // Point visual
+  // Adapted from COMVisual, it may be good to generalize it
+  math::Vector3 p1(0, 0, -2*linkSize.z);
+  math::Vector3 p2(0, 0,  2*linkSize.z);
+  math::Vector3 p3(0, -2*linkSize.y, 0);
+  math::Vector3 p4(0,  2*linkSize.y, 0);
+  math::Vector3 p5(-2*linkSize.x, 0, 0);
+  math::Vector3 p6(2*linkSize.x,  0, 0);
+//  p1 += _pose.pos;
+//  p2 += _pose.pos;
+//  p3 += _pose.pos;
+//  p4 += _pose.pos;
+//  p5 += _pose.pos;
+//  p6 += _pose.pos;
+//  p1 = _pose.rot.RotateVector(p1);
+//  p2 = _pose.rot.RotateVector(p2);
+//  p3 = _pose.rot.RotateVector(p3);
+//  p4 = _pose.rot.RotateVector(p4);
+//  p5 = _pose.rot.RotateVector(p5);
+//  p6 = _pose.rot.RotateVector(p6);
+
+  this->crossLines = this->linkVisual->
+      CreateDynamicLine(rendering::RENDERING_LINE_LIST);
+  this->crossLines->setMaterial("Gazebo/SkyBlue");
+  this->crossLines->AddPoint(p1);
+  this->crossLines->AddPoint(p2);
+  this->crossLines->AddPoint(p3);
+  this->crossLines->AddPoint(p4);
+  this->crossLines->AddPoint(p5);
+  this->crossLines->AddPoint(p6);
+
+  // Force visual
+  this->forceArrow.reset(new rendering::ArrowVisual(this->linkName +
+      "__FORCE_VISUAL__", this->linkVisual));
+  this->forceArrow->Load();
+  this->forceArrow->SetMaterial("Gazebo/RedBright");
+  this->forceArrow->SetScale(math::Vector3(2, 2, 2));
+  this->forceArrow->GetSceneNode()->setInheritScale(false);
 
   this->CalculateWrench();
 }
