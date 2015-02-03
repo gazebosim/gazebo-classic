@@ -230,7 +230,7 @@ void SignalStats::Reset()
 {
   for (auto & iter : this->dataPtr->stats)
   {
-    (iter)->Reset();
+    iter->Reset();
   }
 }
 
