@@ -234,11 +234,28 @@ TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
   EXPECT_TRUE(math::equal(1.0, v.d));
 }
 
+//////////////////////////////////////////////////
+void CompareMsgsShaderTypeToString(const msgs::Material::ShaderType _type)
+{
+  EXPECT_EQ(_type, msgs::ConvertShaderType(msgs::ConvertShaderType(_type)));
+}
+
+//////////////////////////////////////////////////
+TEST_F(MsgsTest, ConvertMsgsShaderTypeToString)
+{
+  CompareMsgsShaderTypeToString(msgs::Material::NORMAL_MAP_OBJECT_SPACE);
+  CompareMsgsShaderTypeToString(msgs::Material::NORMAL_MAP_TANGENT_SPACE);
+  CompareMsgsShaderTypeToString(msgs::Material::PIXEL);
+  CompareMsgsShaderTypeToString(msgs::Material::VERTEX);
+}
+
+//////////////////////////////////////////////////
 void CompareMsgsJointTypeToString(const msgs::Joint::Type _type)
 {
   EXPECT_EQ(_type, msgs::ConvertJointType(msgs::ConvertJointType(_type)));
 }
 
+//////////////////////////////////////////////////
 TEST_F(MsgsTest, ConvertMsgsJointTypeToString)
 {
   CompareMsgsJointTypeToString(msgs::Joint::REVOLUTE);
