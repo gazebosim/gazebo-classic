@@ -925,7 +925,10 @@ TEST_F(MsgsTest, LinkToSDF)
 /////////////////////////////////////////////////
 TEST_F(MsgsTest, CollisionToSDF)
 {
+  const std::string name("collision");
+
   msgs::Collision collisionMsg;
+  collisionMsg.set_name(name);
   collisionMsg.set_laser_retro(0.2);
   collisionMsg.set_max_contacts(5);
   msgs::Set(collisionMsg.mutable_pose(),  math::Pose(math::Vector3(1, 2, 3),
@@ -944,6 +947,10 @@ TEST_F(MsgsTest, CollisionToSDF)
   surfaceMsg->set_bounce_threshold(1300);
 
   sdf::ElementPtr collisionSDF = msgs::CollisionToSDF(collisionMsg);
+
+  EXPECT_TRUE(collisionSDF->HasAttribute("name"));
+  EXPECT_EQ(name, collisionSDF->Get<std::string>("name"));
+
   EXPECT_DOUBLE_EQ(collisionSDF->Get<double>("laser_retro"), 0.2);
   EXPECT_DOUBLE_EQ(collisionSDF->Get<double>("max_contacts"), 5);
 
@@ -959,6 +966,58 @@ TEST_F(MsgsTest, CollisionToSDF)
   sdf::ElementPtr bounceElem = surfaceElem->GetElement("bounce");
   EXPECT_DOUBLE_EQ(bounceElem->Get<double>("restitution_coefficient"), 5.1);
   EXPECT_DOUBLE_EQ(bounceElem->Get<double>("threshold"), 1300);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, VisualToSDF)
+{
+  const std::string name("visual");
+  const double laserRetro = 0.2;
+  const math::Pose pose(math::Vector3(1, 2, 3), math::Quaternion(0, 0, 1, 0));
+  const double radius = 3.3;
+  const std::string materialName("Gazebo/Grey");
+  const std::string uri("pretend_this_is_a_URI");
+
+  msgs::Visual visualMsg;
+  visualMsg.set_name(name);
+  visualMsg.set_laser_retro(laserRetro);
+  msgs::Set(visualMsg.mutable_pose(), pose);
+
+  // geometry - see GeometryToSDF for a more detailed test
+  auto geomMsg = visualMsg.mutable_geometry();
+  geomMsg->set_type(msgs::Geometry::SPHERE);
+  geomMsg->mutable_sphere()->set_radius(radius);
+
+  // material - see MaterialToSDF for a more detailed test
+  auto scriptMsg = visualMsg.mutable_material()->mutable_script();
+  scriptMsg->set_name(materialName);
+  scriptMsg->add_uri();
+  scriptMsg->set_uri(0, uri);
+
+  sdf::ElementPtr visualSDF = msgs::VisualToSDF(visualMsg);
+
+  EXPECT_TRUE(visualSDF->HasAttribute("name"));
+  EXPECT_EQ(name, visualSDF->Get<std::string>("name"));
+
+  EXPECT_DOUBLE_EQ(visualSDF->Get<double>("laser_retro"), laserRetro);
+
+  EXPECT_EQ(pose, visualSDF->Get<math::Pose>("pose"));
+
+  ASSERT_TRUE(visualSDF->HasElement("geometry"));
+  sdf::ElementPtr geomElem = visualSDF->GetElement("geometry");
+  EXPECT_TRUE(geomElem->HasElement("sphere"));
+  sdf::ElementPtr sphereElem = geomElem->GetElement("sphere");
+  EXPECT_TRUE(sphereElem->HasElement("radius"));
+  EXPECT_DOUBLE_EQ(sphereElem->Get<double>("radius"), radius);
+
+  ASSERT_TRUE(visualSDF->HasElement("material"));
+  sdf::ElementPtr materialElem = visualSDF->GetElement("material");
+  EXPECT_TRUE(materialElem->HasElement("script"));
+  sdf::ElementPtr scriptElem = materialElem->GetElement("script");
+  EXPECT_TRUE(scriptElem->HasElement("name"));
+  EXPECT_EQ(materialName, scriptElem->Get<std::string>("name"));
+  EXPECT_TRUE(scriptElem->HasElement("uri"));
+  EXPECT_EQ(uri, scriptElem->Get<std::string>("uri"));
 }
 
 /////////////////////////////////////////////////
