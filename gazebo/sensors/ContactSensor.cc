@@ -92,13 +92,12 @@ void ContactSensor::Load(const std::string &_worldName)
 
   std::string entityName =
       this->world->GetEntity(this->parentName)->GetScopedName();
-  std::string filterName;
+  std::string filterName = this->GetScopedName();
   {
     // If we create the filter with this->GetScopedName(),
     // it will have the world name twice, such as:
     // /gazebo/default/default/sensor_box/link/box_contact/contacts
     // so remove the world:: prefix
-    filterName = this->GetScopedName();
     size_t i = filterName.find("::");
     if (i+2 < filterName.length())
       filterName = filterName.substr(i+2);

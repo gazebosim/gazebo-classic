@@ -73,15 +73,19 @@ void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
     ASSERT_TRUE(contactSensor2 != NULL);
   }
 
-  // There should be 4 topics advertising Contacts messages
-  // /gazebo/default/physics/contacts
-  // /gazebo/default/sensor_box/link/box_contact
-  // /gazebo/default/sensor_box/link/box_contact2
-  // /gazebo/default/sensor_box/link/contacts
+  // There should be 5 topics advertising Contacts messages
+  std::list<std::string> topicsExpected;
+  std::string prefix = "/gazebo/default/";
+  topicsExpected.push_back(prefix+"physics/contacts");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact/contacts");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact2/contacts");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact2");
   std::list<std::string> topics =
     transport::getAdvertisedTopics("gazebo.msgs.Contacts");
   EXPECT_FALSE(topics.empty());
-  EXPECT_EQ(topics.size(), 5u);
+  EXPECT_EQ(topics.size(), topicsExpected.size());
+  EXPECT_EQ(topics, topicsExpected);
 
   // We should expect them all to publish.
   for (std::list<std::string>::iterator iter = topics.begin();
