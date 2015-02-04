@@ -149,19 +149,19 @@ namespace gazebo
       /// \brief The visual's submesh name.
       public: std::string subMeshName;
 
-      /// \brief Ambient color of the viusal.
+      /// \brief Ambient color of the visual.
       public: common::Color ambient;
 
-      /// \brief Diffuse color of the viusal.
+      /// \brief Diffuse color of the visual.
       public: common::Color diffuse;
 
-      /// \brief Specular color of the viusal.
+      /// \brief Specular color of the visual.
       public: common::Color specular;
 
-      /// \brief Emissive color of the viusal.
+      /// \brief Emissive color of the visual.
       public: common::Color emissive;
 
-      /// \brief Visibility flags of the viusal.
+      /// \brief Visibility flags of the visual.
       public: uint32_t visibilityFlags;
     };
     /// \}

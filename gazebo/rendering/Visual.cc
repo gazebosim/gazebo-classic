@@ -81,6 +81,7 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->id = this->dataPtr->visualIdCount--;
   this->dataPtr->boundingBox = NULL;
   this->dataPtr->useRTShader = _useRTShader;
+  this->dataPtr->visibilityFlags = GZ_VISIBILITY_ALL;
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("visual.sdf", this->dataPtr->sdf);
