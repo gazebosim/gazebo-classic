@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,13 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/physics/Inertial.hh"
-
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo/gui/model/PartVisualConfig.hh"
-#include "gazebo/gui/model/PartGeneralConfig.hh"
-#include "gazebo/gui/model/PartCollisionConfig.hh"
+#include "gazebo/gui/model/LinkInspector.hh"
+#include "gazebo/gui/model/VisualConfig.hh"
+#include "gazebo/gui/model/LinkConfig.hh"
+#include "gazebo/gui/model/CollisionConfig.hh"
 
 #include "gazebo/gui/model/ModelData.hh"
 
@@ -78,7 +76,7 @@ PartData::PartData()
   this->partSDF.reset(new sdf::Element);
   sdf::initFile("link.sdf", this->partSDF);
 
-  this->inspector = new PartInspector;
+  this->inspector = new LinkInspector;
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
   connect(this->inspector->GetVisualConfig(),
@@ -134,8 +132,8 @@ void PartData::SetPose(const math::Pose &_pose)
 {
   this->partSDF->GetElement("pose")->Set(_pose);
 
-  PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
-  generalConfig->SetPose(_pose);
+  LinkConfig *linkConfig = this->inspector->GetLinkConfig();
+  linkConfig->SetPose(_pose);
 }
 
 /////////////////////////////////////////////////
@@ -143,8 +141,8 @@ void PartData::SetMass(double _mass)
 {
   this->partSDF->GetElement("inertial")->GetElement("mass")->Set(_mass);
 
-  PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
-  generalConfig->SetMass(_mass);
+  LinkConfig *linkConfig = this->inspector->GetLinkConfig();
+  linkConfig->SetMass(_mass);
 }
 
 /////////////////////////////////////////////////
@@ -152,8 +150,8 @@ void PartData::SetInertialPose(const math::Pose &_pose)
 {
   this->partSDF->GetElement("inertial")->GetElement("pose")->Set(_pose);
 
-  PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
-  generalConfig->SetInertialPose(_pose);
+  LinkConfig *linkConfig = this->inspector->GetLinkConfig();
+  linkConfig->SetInertialPose(_pose);
 }
 
 /////////////////////////////////////////////////
@@ -169,15 +167,15 @@ void PartData::SetInertiaMatrix(double _ixx, double _ixy, double _ixz,
   inertiaElem->GetElement("iyz")->Set(_iyz);
   inertiaElem->GetElement("izz")->Set(_izz);
 
-  PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
-  generalConfig->SetInertiaMatrix(_ixx, _ixy, _ixz, _iyy, _iyz, _izz);
+  LinkConfig *linkConfig = this->inspector->GetLinkConfig();
+  linkConfig->SetInertiaMatrix(_ixx, _ixy, _ixz, _iyy, _iyz, _izz);
 }
 
 /////////////////////////////////////////////////
 void PartData::UpdateConfig()
 {
   // set new geom size if scale has changed.
-  PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
+  VisualConfig *visualConfig = this->inspector->GetVisualConfig();
   std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
   for (it = this->visuals.begin(); it != this->visuals.end(); ++it)
   {
@@ -185,15 +183,18 @@ void PartData::UpdateConfig()
     std::string partName = this->partVisual->GetName();
     std::string leafName =
         name.substr(name.find(partName)+partName.size()+1);
-    visualConfig->SetGeometrySize(leafName, it->first->GetScale());
+    visualConfig->SetGeometry(leafName, it->first->GetScale(),
+        it->first->GetMeshName());
 
     msgs::Visual *updateMsg = visualConfig->GetData(leafName);
     msgs::Visual visualMsg = it->second;
     updateMsg->clear_scale();
+    msgs::Color *diffuse = updateMsg->mutable_material()->mutable_diffuse();
+    diffuse->set_a(1.0-updateMsg->transparency());
     visualMsg.CopyFrom(*updateMsg);
     it->second = visualMsg;
   }
-  PartCollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
+  CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
   std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
   for (colIt = this->collisions.begin(); colIt != this->collisions.end();
       ++colIt)
@@ -202,7 +203,8 @@ void PartData::UpdateConfig()
     std::string partName = this->partVisual->GetName();
     std::string leafName =
         name.substr(name.find(partName)+partName.size()+1);
-    collisionConfig->SetGeometrySize(leafName, colIt->first->GetScale());
+    collisionConfig->SetGeometry(leafName, colIt->first->GetScale(),
+        colIt->first->GetMeshName());
 
     msgs::Collision *updateMsg = collisionConfig->GetData(leafName);
     msgs::Collision collisionMsg = colIt->second;
@@ -214,7 +216,7 @@ void PartData::UpdateConfig()
 /////////////////////////////////////////////////
 void PartData::AddVisual(rendering::VisualPtr _visual)
 {
-  PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
+  VisualConfig *visualConfig = this->inspector->GetVisualConfig();
   msgs::Visual visualMsg = msgs::VisualFromSDF(_visual->GetSDF());
 
   // override transparency value
@@ -232,7 +234,7 @@ void PartData::AddVisual(rendering::VisualPtr _visual)
 /////////////////////////////////////////////////
 void PartData::AddCollision(rendering::VisualPtr _collisionVis)
 {
-  PartCollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
+  CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
   msgs::Visual visualMsg = msgs::VisualFromSDF(_collisionVis->GetSDF());
 
   sdf::ElementPtr collisionSDF(new sdf::Element);
@@ -259,15 +261,15 @@ void PartData::AddCollision(rendering::VisualPtr _collisionVis)
 void PartData::OnApply()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
+  LinkConfig *linkConfig = this->inspector->GetLinkConfig();
 
-  this->partSDF = msgs::LinkToSDF(*generalConfig->GetData(), this->partSDF);
+  this->partSDF = msgs::LinkToSDF(*linkConfig->GetData(), this->partSDF);
   this->partVisual->SetWorldPose(this->GetPose());
 
   // update visuals
   if (!this->visuals.empty())
   {
-    PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
+    VisualConfig *visualConfig = this->inspector->GetVisualConfig();
     std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
     for (it = this->visuals.begin(); it != this->visuals.end(); ++it)
     {
@@ -283,6 +285,8 @@ void PartData::OnApply()
 
         // update the visualMsg that will be used to generate the sdf.
         updateMsg->clear_scale();
+        msgs::Color *diffuse = updateMsg->mutable_material()->mutable_diffuse();
+        diffuse->set_a(1.0-updateMsg->transparency());
         visualMsg.CopyFrom(*updateMsg);
         it->second = visualMsg;
 
@@ -294,7 +298,7 @@ void PartData::OnApply()
   // update collisions
   if (!this->collisions.empty())
   {
-    PartCollisionConfig *collisionConfig =
+    CollisionConfig *collisionConfig =
         this->inspector->GetCollisionConfig();
     std::map<rendering::VisualPtr, msgs::Collision>::iterator it;
     for (it = this->collisions.begin(); it != this->collisions.end(); ++it)
@@ -321,7 +325,7 @@ void PartData::OnApply()
 void PartData::OnAddVisual(const std::string &_name)
 {
   // add a visual when the user adds a visual via the inspector's visual tab
-  PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
+  VisualConfig *visualConfig = this->inspector->GetVisualConfig();
 
   std::ostringstream visualName;
   visualName << this->partVisual->GetName() << "_" << _name;
@@ -356,7 +360,9 @@ void PartData::OnAddVisual(const std::string &_name)
     visualMsg.set_transparency(this->visuals[refVisual].transparency());
   visualConfig->UpdateVisual(_name, &visualMsg);
   this->visuals[visVisual] = visualMsg;
-  visVisual->SetTransparency(ModelData::GetEditTransparency());
+  visVisual->SetTransparency(visualMsg.transparency() *
+      (1-ModelData::GetEditTransparency()-0.1)
+      + ModelData::GetEditTransparency());
 }
 
 /////////////////////////////////////////////////
@@ -364,7 +370,7 @@ void PartData::OnAddCollision(const std::string &_name)
 {
   // add a collision when the user adds a collision via the inspector's
   // collision tab
-  PartCollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
+  CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
 
   std::ostringstream collisionName;
   collisionName << this->partVisual->GetName() << "_" << _name;
@@ -388,6 +394,10 @@ void PartData::OnAddCollision(const std::string &_name)
     sdf::ElementPtr collisionElem =  modelTemplateSDF->root
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     collisionVis->Load(collisionElem);
+    // orange
+    collisionVis->SetAmbient(common::Color(1.0, 0.5, 0.05));
+    collisionVis->SetDiffuse(common::Color(1.0, 0.5, 0.05));
+    collisionVis->SetSpecular(common::Color(0.5, 0.5, 0.5));
     this->partVisual->GetScene()->AddVisual(collisionVis);
   }
 
@@ -473,7 +483,9 @@ void PartData::Update()
         // make visual semi-transparent here
         // but generated sdf will use the correct transparency value
         it->first->UpdateFromMsg(updateMsgPtr);
-        it->first->SetTransparency(ModelData::GetEditTransparency());
+        it->first->SetTransparency(updateMsgPtr->transparency() *
+            (1-ModelData::GetEditTransparency()-0.1)
+            + ModelData::GetEditTransparency());
         break;
       }
     }

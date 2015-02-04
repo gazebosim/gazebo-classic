@@ -109,6 +109,10 @@ namespace gazebo
       /// \param[in] _type joint type.
       public: void SetType(JointMaker::JointType _type);
 
+      /// \brief Qt event emiited when the mouse enters this widget.
+      /// \param[in] _event Qt event.
+      protected: virtual void enterEvent(QEvent *_event);
+
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
 

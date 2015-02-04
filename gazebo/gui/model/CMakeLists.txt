@@ -3,33 +3,32 @@ include (${QT_USE_FILE})
 
 
 set (sources
+  CollisionConfig.cc
   ImportDialog.cc
   JointInspector.cc
   JointMaker.cc
+  LinkConfig.cc
+  LinkInspector.cc
   ModelCreator.cc
   ModelData.cc
   ModelEditor.cc
   ModelEditorEvents.cc
   ModelEditorPalette.cc
-  PartCollisionConfig.cc
-  PartGeneralConfig.cc
-  PartInspector.cc
-  PartVisualConfig.cc
+  VisualConfig.cc
 )
 
 set (qt_headers
+  CollisionConfig.hh
   ImportDialog.hh
   JointInspector.hh
   JointMaker.hh
+  LinkConfig.hh
+  LinkInspector.hh
   ModelCreator.hh
   ModelData.hh
   ModelEditor.hh
   ModelEditorPalette.hh
-  PartVisualConfig.hh
-  PartCollisionConfig.hh
-  PartGeneralConfig.hh
-  PartInspector.hh
-  PartVisualConfig.hh
+  VisualConfig.hh
 )
 
 set (headers

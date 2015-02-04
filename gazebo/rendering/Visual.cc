@@ -944,8 +944,6 @@ void Visual::SetLighting(bool _lighting)
     (*iter)->SetLighting(this->dataPtr->lighting);
   }
 
-  // only set the sdf element if this is a visual sdf element or it has
-  // a geometry attached. Verify by checking if it has a geometry child element.
 
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("lighting")->Set(this->dataPtr->lighting);

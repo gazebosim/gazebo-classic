@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,17 @@
 #ifndef _MODEL_DATA_HH_
 #define _MODEL_DATA_HH_
 
+#include <map>
 #include <string>
 #include <vector>
 
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/gui/model/LinkInspector.hh"
 
-#include "gazebo/gui/model/PartInspector.hh"
+namespace boost
+{
+  class recursive_mutex;
+}
 
 namespace boost
 {
@@ -34,6 +38,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class LinkInspector;
+
     class ModelData
     {
       /// \brief Get a template SDF string of a simple model.
@@ -149,7 +155,7 @@ namespace gazebo
       public: std::map<rendering::VisualPtr, msgs::Collision> collisions;
 
       /// \brief Inspector for configuring part properties.
-      public: PartInspector *inspector;
+      public: LinkInspector *inspector;
     };
   }
 }

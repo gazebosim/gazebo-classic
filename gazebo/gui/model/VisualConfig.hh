@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _PART_VISUAL_CONFIG_HH_
-#define _PART_VISUAL_CONFIG_HH_
+#ifndef _VISUAL_CONFIG_HH_
+#define _VISUAL_CONFIG_HH_
 
+#include <map>
 #include <string>
 
 #include "gazebo/math/Pose.hh"
@@ -27,7 +28,6 @@
 
 namespace gazebo
 {
-
   namespace gui
   {
     class ConfigWidget;
@@ -35,7 +35,7 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class VisualConfigData PartVisualConfig.hh
+    /// \class VisualConfigData VisualConfig.hh
     /// \brief A class of widgets used for configuring visual properties.
     class VisualConfigData
     {
@@ -52,17 +52,17 @@ namespace gazebo
       public: QTreeWidgetItem *treeItem;
     };
 
-    /// \class PartVisualConfig PartVisualConfig.hh
+    /// \class VisualConfig VisualConfig.hh
     /// \brief A tab for configuring visual properties of a part.
-    class PartVisualConfig : public QWidget
+    class VisualConfig : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor
-      public: PartVisualConfig();
+      public: VisualConfig();
 
       /// \brief Destructor
-      public: ~PartVisualConfig();
+      public: ~VisualConfig();
 
       /// \brief Add a visual widget to the tab.
       /// \param[in] _name Name of visual added.
@@ -87,10 +87,11 @@ namespace gazebo
       /// \return Visual msg.
       public: msgs::Visual *GetData(const std::string &_name) const;
 
-      /// \brief Set the geometry size a visual
-      /// \param[in] _size Size to set the geometry to.
-      public: void SetGeometrySize(const std::string &_name,
-          const math::Vector3 &_size);
+      /// \brief Set the geometry data of a visual
+      /// \param[in] _size URI of the geometry.
+      /// \param[in] _uri URI of the geometry.
+      public: void SetGeometry(const std::string &_name,
+          const math::Vector3 &_size, const std::string &_uri = "");
 
       /// \brief Qt signal emitted when a visual is removed.
       /// \param[in] _name Name of visual removed.
@@ -104,8 +105,8 @@ namespace gazebo
       private slots: void OnAddVisual();
 
       /// \brief Qt callback when a visual is to be removed.
-      /// \param[in] _item Item to be removed.
-      private slots: void OnRemoveVisual(int);
+      /// \param[in] _id Id of item to be removed.
+      private slots: void OnRemoveVisual(int _id);
 
       /// \brief Received item selection user input.
       /// \param[in] _item Item selected.

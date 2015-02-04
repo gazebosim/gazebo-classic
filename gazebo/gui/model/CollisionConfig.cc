@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,15 @@
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/gui/ConfigWidget.hh"
-#include "gazebo/gui/model/PartCollisionConfig.hh"
+#include "gazebo/gui/model/CollisionConfig.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-PartCollisionConfig::PartCollisionConfig()
+CollisionConfig::CollisionConfig()
 {
-  this->setObjectName("PartCollisionConfig");
+  this->setObjectName("CollisionConfig");
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
   this->collisionsTreeWidget = new QTreeWidget();
@@ -54,12 +54,12 @@ PartCollisionConfig::PartCollisionConfig()
 }
 
 /////////////////////////////////////////////////
-PartCollisionConfig::~PartCollisionConfig()
+CollisionConfig::~CollisionConfig()
 {
 }
 
 /////////////////////////////////////////////////
-void PartCollisionConfig::OnAddCollision()
+void CollisionConfig::OnAddCollision()
 {
   std::stringstream collisionIndex;
   collisionIndex << "collision_" << this->counter;
@@ -68,13 +68,13 @@ void PartCollisionConfig::OnAddCollision()
 }
 
 /////////////////////////////////////////////////
-unsigned int PartCollisionConfig::GetCollisionCount() const
+unsigned int CollisionConfig::GetCollisionCount() const
 {
   return this->configs.size();
 }
 
 /////////////////////////////////////////////////
-void PartCollisionConfig::Reset()
+void CollisionConfig::Reset()
 {
   std::map<int, CollisionConfigData *>::iterator it;
   for (it = this->configs.begin(); it != this->configs.end(); ++it)
@@ -85,7 +85,7 @@ void PartCollisionConfig::Reset()
 }
 
 /////////////////////////////////////////////////
-void PartCollisionConfig::UpdateCollision(const std::string &_name,
+void CollisionConfig::UpdateCollision(const std::string &_name,
     const msgs::Collision *_collisionMsg)
 {
   std::map<int, CollisionConfigData *>::iterator it;
@@ -102,7 +102,7 @@ void PartCollisionConfig::UpdateCollision(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void PartCollisionConfig::AddCollision(const std::string &_name,
+void CollisionConfig::AddCollision(const std::string &_name,
     const msgs::Collision *_collisionMsg)
 {
   // Create a top-level tree item for the path
@@ -190,7 +190,7 @@ void PartCollisionConfig::AddCollision(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void PartCollisionConfig::OnItemSelection(QTreeWidgetItem *_item,
+void CollisionConfig::OnItemSelection(QTreeWidgetItem *_item,
                                          int /*_column*/)
 {
   if (_item && _item->childCount() > 0)
@@ -199,7 +199,7 @@ void PartCollisionConfig::OnItemSelection(QTreeWidgetItem *_item,
 
 
 /////////////////////////////////////////////////
-void PartCollisionConfig::OnRemoveCollision(int _id)
+void CollisionConfig::OnRemoveCollision(int _id)
 {
   std::map<int, CollisionConfigData *>::iterator it = this->configs.find(_id);
   if (it == this->configs.end())
@@ -219,7 +219,7 @@ void PartCollisionConfig::OnRemoveCollision(int _id)
 }
 
 /////////////////////////////////////////////////
-msgs::Collision *PartCollisionConfig::GetData(const std::string &_name) const
+msgs::Collision *CollisionConfig::GetData(const std::string &_name) const
 {
   std::map<int, CollisionConfigData *>::const_iterator it;
   for (it = this->configs.begin(); it != this->configs.end(); ++it)
@@ -235,8 +235,8 @@ msgs::Collision *PartCollisionConfig::GetData(const std::string &_name) const
 }
 
 /////////////////////////////////////////////////
-void PartCollisionConfig::SetGeometrySize(const std::string &_name,
-    const math::Vector3 &_size)
+void CollisionConfig::SetGeometry(const std::string &_name,
+    const math::Vector3 &_size, const std::string &_uri)
 {
   std::map<int, CollisionConfigData *>::iterator it;
   for (it = this->configs.begin(); it != this->configs.end(); ++it)
@@ -244,10 +244,11 @@ void PartCollisionConfig::SetGeometrySize(const std::string &_name,
     if (it->second->name == _name)
     {
       math::Vector3 dimensions;
+      std::string uri;
       std::string type = it->second->configWidget->GetGeometryWidgetValue(
-          "geometry", dimensions);
+          "geometry", dimensions, uri);
       it->second->configWidget->SetGeometryWidgetValue("geometry", type,
-          _size);
+          _size, _uri);
       break;
     }
   }

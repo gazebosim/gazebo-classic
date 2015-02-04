@@ -372,7 +372,9 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
     {
       rendering::VisualPtr childVis = _vis->GetChild(i);
-      if (childVis != this->dataPtr->selectionObj)
+      std::string geomType = childVis->GetGeometryType();
+      if (childVis != this->dataPtr->selectionObj &&
+          geomType != "" && geomType != "mesh")
       {
         math::Vector3 geomScale = this->UpdateScale(_axis, scale,
             childVis->GetGeometryType());

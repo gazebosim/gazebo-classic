@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,21 @@
 #ifndef _MODEL_CREATOR_HH_
 #define _MODEL_CREATOR_HH_
 
-#include <boost/unordered/unordered_map.hpp>
 #include <sdf/sdf.hh>
 
 #include <list>
+#include <map>
 #include <string>
 #include <vector>
 
 #include "gazebo/common/KeyEvent.hh"
-#include "gazebo/gui/qt.h"
-#include "gazebo/gui/model/JointMaker.hh"
-#include "gazebo/gui/model/PartInspector.hh"
+#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/gui/model/LinkInspector.hh"
+#include "gazebo/gui/qt.h"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -43,6 +45,7 @@ namespace gazebo
   {
     class PartData;
     class SaveDialog;
+    class JointMaker;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -264,7 +267,6 @@ namespace gazebo
 
       /// \brief TODO
       private: void LoadSDF(sdf::ElementPtr _sdf);
-
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _axis Axis of alignment: x, y, or z.
       /// \param[in] _config Configuration: min, center, or max.
@@ -331,7 +333,7 @@ namespace gazebo
       private: PartType addPartType;
 
       /// \brief A map of model part names to and their visuals.
-      private: boost::unordered_map<std::string, PartData *> allParts;
+      private: std::map<std::string, PartData *> allParts;
 
       /// \brief Transport node
       private: transport::NodePtr node;

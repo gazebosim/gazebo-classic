@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _PART_COLLISION_TAB_HH_
-#define _PART_COLLISION_TAB_HH_
+#ifndef _COLLISION_CONFIG_HH_
+#define _COLLISION_CONFIG_HH_
 
+#include <map>
 #include <string>
 
 #include "gazebo/math/Pose.hh"
@@ -27,7 +28,6 @@
 
 namespace gazebo
 {
-
   namespace gui
   {
     class ConfigWidget;
@@ -35,7 +35,7 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class CollisionConfigData PartCollisionConfig.hh
+    /// \class CollisionConfigData CollisionConfig.hh
     /// \brief A class of widgets used for configuring collision properties.
     class CollisionConfigData
     {
@@ -52,17 +52,17 @@ namespace gazebo
       public: QTreeWidgetItem *treeItem;
     };
 
-    /// \class PartCollisionConfig PartCollisionConfig.hh
+    /// \class CollisionConfig CollisionConfig.hh
     /// \brief A tab for configuring collision properties of a part.
-    class PartCollisionConfig : public QWidget
+    class CollisionConfig : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor
-      public: PartCollisionConfig();
+      public: CollisionConfig();
 
       /// \brief Destructor
-      public: ~PartCollisionConfig();
+      public: ~CollisionConfig();
 
       /// \brief Add a collision widget to the tab.
       /// \param[in] _name Name of collision added.
@@ -88,10 +88,11 @@ namespace gazebo
       /// \return Collision msg.
       public: msgs::Collision *GetData(const std::string &_name) const;
 
-      /// \brief Set the geometry size a collision
+      /// \brief Set the geometry data of a collision
       /// \param[in] _size Size to set the geometry to.
-      public: void SetGeometrySize(const std::string &_name,
-          const math::Vector3 &_size);
+      /// \param[in] _uri URI of the geometry.
+      public: void SetGeometry(const std::string &_name,
+          const math::Vector3 &_size, const std::string &_uri = "");
 
       /// \brief Qt signal emitted when a collision is removed.
       /// \param[in] _name Name of collision removed.
@@ -105,8 +106,8 @@ namespace gazebo
       private slots: void OnAddCollision();
 
       /// \brief Qt callback when a collision is to be removed.
-      /// \param[in] _item Item to be removed.
-      private slots: void OnRemoveCollision(int);
+      /// \param[in] _id Id of item to be removed.
+      private slots: void OnRemoveCollision(int _id);
 
       /// \brief Received item selection user input.
       /// \param[in] _item Item selected.

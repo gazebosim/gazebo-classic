@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,9 @@
 #include <sstream>
 #include <string>
 
-#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
-#include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/math/Quaternion.hh"
@@ -31,8 +29,6 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
-
-#include "gazebo/physics/Inertial.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
@@ -45,10 +41,7 @@
 #include "gazebo/gui/SaveDialog.hh"
 
 #include "gazebo/gui/model/ModelData.hh"
-#include "gazebo/gui/model/PartGeneralConfig.hh"
-#include "gazebo/gui/model/PartVisualConfig.hh"
-#include "gazebo/gui/model/PartCollisionConfig.hh"
-#include "gazebo/gui/model/PartInspector.hh"
+#include "gazebo/gui/model/LinkInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -525,7 +518,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
   if (_pose == math::Pose::Zero)
   {
     linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
-    _pose.pos.z + _size.z/2));
+    _pose.pos.z + _size.z*0.5));
   }
 
   this->CreatePart(visVisual);
@@ -612,7 +605,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
   if (_pose == math::Pose::Zero)
   {
     linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
-    _pose.pos.z + _length/2));
+    _pose.pos.z + _length*0.5));
   }
 
   this->CreatePart(visVisual);
@@ -635,8 +628,8 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   linkNameStream << "part_" << this->partCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName +
-      "::" + linkName, this->previewVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(
+      linkName, this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
@@ -658,7 +651,7 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   if (_pose == math::Pose::Zero)
   {
     linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
-    _pose.pos.z + _scale.z/2));
+    _pose.pos.z + _scale.z*0.5));
   }
 
   this->CreatePart(visVisual);
@@ -964,7 +957,7 @@ void ModelCreator::Reset()
   this->isStatic = false;
   this->autoDisable = true;
 
-  while (this->allParts.size() > 0)
+  while (!this->allParts.empty())
     this->RemovePart(this->allParts.begin()->first);
   this->allParts.clear();
 
@@ -1390,6 +1383,7 @@ void ModelCreator::OpenInspector(const std::string &_name)
   PartData *part = this->allParts[_name];
   part->SetPose(part->partVisual->GetWorldPose());
   part->UpdateConfig();
+  part->inspector->move(QCursor::pos());
   part->inspector->show();
 }
 
@@ -1419,7 +1413,7 @@ void ModelCreator::OnPaste()
   }
 
   // For now, only copy the last selected model
-  boost::unordered_map<std::string, PartData *>::iterator it =
+  std::map<std::string, PartData *>::iterator it =
       this->allParts.find(this->copiedPartNames.back());
   if (it != this->allParts.end())
   {
@@ -1509,7 +1503,7 @@ void ModelCreator::GenerateSDF()
   modelElem->GetAttribute("name")->Set(this->folderName);
 
   // set center of all parts to be origin
-  boost::unordered_map<std::string, PartData *>::iterator partsIt;
+  std::map<std::string, PartData *>::iterator partsIt;
   math::Vector3 mid;
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
        ++partsIt)
@@ -1645,7 +1639,7 @@ void ModelCreator::ModelChanged()
 void ModelCreator::Update()
 {
   // Check if any parts have been moved or resized and trigger ModelChanged
-  boost::unordered_map<std::string, PartData *>::iterator partsIt;
+  std::map<std::string, PartData *>::iterator partsIt;
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
        ++partsIt)
   {

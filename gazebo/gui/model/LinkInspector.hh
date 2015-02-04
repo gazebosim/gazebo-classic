@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _PART_INSPECTOR_HH_
-#define _PART_INSPECTOR_HH_
+#ifndef _LINK_INSPECTOR_HH_
+#define _LINK_INSPECTOR_HH_
 
 #include <string>
 
@@ -26,20 +26,20 @@ namespace gazebo
 {
   namespace gui
   {
-    class PartGeneralConfig;
-    class PartVisualConfig;
-    class PartCollisionConfig;
+    class LinkConfig;
+    class VisualConfig;
+    class CollisionConfig;
 
-    class PartInspector : public QDialog
+    class LinkInspector : public QDialog
     {
       Q_OBJECT
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: PartInspector(QWidget *_parent = 0);
+      public: LinkInspector(QWidget *_parent = 0);
 
       /// \brief Destructor
-      public: ~PartInspector();
+      public: ~LinkInspector();
 
       /// \brief Set the name of the part.
       /// \param[in] Name to set the part to.
@@ -49,17 +49,21 @@ namespace gazebo
       /// \return Name of the part.
       public: std::string GetName() const;
 
-      /// \brief Get general configurations of the part.
-      /// \return Tab widget with general configurations.
-      public: PartGeneralConfig *GetGeneralConfig() const;
+      /// \brief Get link configurations of the part.
+      /// \return Tab widget with link configurations.
+      public: LinkConfig *GetLinkConfig() const;
 
       /// \brief Get visual configurations of the part.
       /// \return Tab widget with visual configurations.
-      public: PartVisualConfig *GetVisualConfig() const;
+      public: VisualConfig *GetVisualConfig() const;
 
       /// \brief Get collision configurations of the part.
       /// \return Tab widget with visual configurations.
-      public: PartCollisionConfig *GetCollisionConfig() const;
+      public: CollisionConfig *GetCollisionConfig() const;
+
+      /// \brief Qt event emiited when the mouse enters this widget.
+      /// \param[in] _event Qt event.
+      protected: virtual void enterEvent(QEvent *_event);
 
       /// \brief Set the item name.
       /// \param[in] _name Name to set to.
@@ -83,14 +87,14 @@ namespace gazebo
       /// \brief Label that displays the name of the part.
       private: QLabel* partNameLabel;
 
-      /// \brief Widget with configurable general properties.
-      private: PartGeneralConfig *generalConfig;
+      /// \brief Widget with configurable link properties.
+      private: LinkConfig *linkConfig;
 
       /// \brief Widget with configurable visual properties.
-      private: PartVisualConfig *visualConfig;
+      private: VisualConfig *visualConfig;
 
       /// \brief Widget with configurable collision properties.
-      private: PartCollisionConfig *collisionConfig;
+      private: CollisionConfig *collisionConfig;
     };
     /// \}
   }

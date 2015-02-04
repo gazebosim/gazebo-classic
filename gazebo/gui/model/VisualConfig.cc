@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,15 @@
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/gui/ConfigWidget.hh"
-#include "gazebo/gui/model/PartVisualConfig.hh"
+#include "gazebo/gui/model/VisualConfig.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-PartVisualConfig::PartVisualConfig()
+VisualConfig::VisualConfig()
 {
-  this->setObjectName("PartVisualConfig");
+  this->setObjectName("VisualConfig");
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
   this->visualsTreeWidget = new QTreeWidget();
@@ -53,12 +53,12 @@ PartVisualConfig::PartVisualConfig()
 }
 
 /////////////////////////////////////////////////
-PartVisualConfig::~PartVisualConfig()
+VisualConfig::~VisualConfig()
 {
 }
 
 /////////////////////////////////////////////////
-void PartVisualConfig::OnAddVisual()
+void VisualConfig::OnAddVisual()
 {
   std::stringstream visualIndex;
   visualIndex << "visual_" << this->counter;
@@ -67,13 +67,13 @@ void PartVisualConfig::OnAddVisual()
 }
 
 /////////////////////////////////////////////////
-unsigned int PartVisualConfig::GetVisualCount() const
+unsigned int VisualConfig::GetVisualCount() const
 {
   return this->configs.size();
 }
 
 /////////////////////////////////////////////////
-void PartVisualConfig::Reset()
+void VisualConfig::Reset()
 {
   std::map<int, VisualConfigData *>::iterator it;
   for (it = this->configs.begin(); it != this->configs.end(); ++it)
@@ -84,7 +84,7 @@ void PartVisualConfig::Reset()
 }
 
 /////////////////////////////////////////////////
-void PartVisualConfig::AddVisual(const std::string &_name,
+void VisualConfig::AddVisual(const std::string &_name,
     const msgs::Visual *_visualMsg)
 {
   // Create a top-level tree item for the path
@@ -165,7 +165,7 @@ void PartVisualConfig::AddVisual(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void PartVisualConfig::UpdateVisual(const std::string &_name,
+void VisualConfig::UpdateVisual(const std::string &_name,
     const msgs::Visual *_visualMsg)
 {
   std::map<int, VisualConfigData *>::iterator it;
@@ -182,7 +182,7 @@ void PartVisualConfig::UpdateVisual(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void PartVisualConfig::OnItemSelection(QTreeWidgetItem *_item,
+void VisualConfig::OnItemSelection(QTreeWidgetItem *_item,
                                          int /*_column*/)
 {
   if (_item && _item->childCount() > 0)
@@ -190,7 +190,7 @@ void PartVisualConfig::OnItemSelection(QTreeWidgetItem *_item,
 }
 
 /////////////////////////////////////////////////
-void PartVisualConfig::OnRemoveVisual(int _id)
+void VisualConfig::OnRemoveVisual(int _id)
 {
   std::map<int, VisualConfigData *>::iterator it = this->configs.find(_id);
   if (it == this->configs.end())
@@ -210,7 +210,7 @@ void PartVisualConfig::OnRemoveVisual(int _id)
 }
 
 /////////////////////////////////////////////////
-msgs::Visual *PartVisualConfig::GetData(const std::string &_name) const
+msgs::Visual *VisualConfig::GetData(const std::string &_name) const
 {
   std::map<int, VisualConfigData *>::const_iterator it;
   for (it = this->configs.begin(); it != this->configs.end(); ++it)
@@ -222,8 +222,8 @@ msgs::Visual *PartVisualConfig::GetData(const std::string &_name) const
 }
 
 /////////////////////////////////////////////////
-void PartVisualConfig::SetGeometrySize(const std::string &_name,
-    const math::Vector3 &_size)
+void VisualConfig::SetGeometry(const std::string &_name,
+    const math::Vector3 &_size, const std::string &_uri)
 {
   std::map<int, VisualConfigData *>::iterator it;
   for (it = this->configs.begin(); it != this->configs.end(); ++it)
@@ -231,10 +231,11 @@ void PartVisualConfig::SetGeometrySize(const std::string &_name,
     if (it->second->name == _name)
     {
       math::Vector3 dimensions;
+      std::string uri;
       std::string type = it->second->configWidget->GetGeometryWidgetValue(
-          "geometry", dimensions);
+          "geometry", dimensions, uri);
       it->second->configWidget->SetGeometryWidgetValue("geometry", type,
-          _size);
+          _size, _uri);
       break;
     }
   }
