@@ -1488,14 +1488,12 @@ JointMaker *ModelCreator::GetJointMaker() const
 void ModelCreator::GenerateSDF()
 {
   sdf::ElementPtr modelElem;
-  sdf::ElementPtr linkElem;
 
   this->modelSDF.reset(new sdf::SDF);
   this->modelSDF->SetFromString(ModelData::GetTemplateSDFString());
 
   modelElem = this->modelSDF->root->GetElement("model");
 
-  linkElem = modelElem->GetElement("link");
   modelElem->ClearElements();
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;

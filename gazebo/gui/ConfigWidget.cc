@@ -269,7 +269,6 @@ void ConfigWidget::SetGeometryWidgetValue(const std::string &_name,
     this->UpdateGeometryWidget(iter->second, _value, _dimensions, _uri);
 }
 
-
 /////////////////////////////////////////////////
 int ConfigWidget::GetIntWidgetValue(const std::string &_name) const
 {
