@@ -67,7 +67,6 @@ void ApplyWrenchVisual::Load()
   dPtr->crossLines->AddPoint(p6);
 
   // Force visual
-  // Force arrow
   dPtr->forceVisual.reset(new rendering::ArrowVisual(
       this->GetName() + "__FORCE_VISUAL__", shared_from_this()));
   dPtr->forceVisual->Load();
@@ -179,7 +178,7 @@ void ApplyWrenchVisual::UpdateForce(math::Vector3 _forceVector)
   // Set rotation
   math::Vector3 u = _forceVector;
   u = u.Normalize();
-  math::Vector3 v = math::Vector3::UnitZ;
+  math::Vector3 v = math::Vector3::UnitX;
   double cosTheta = v.Dot(u);
   double angle = acos(cosTheta);
   math::Quaternion quat;
@@ -187,7 +186,9 @@ void ApplyWrenchVisual::UpdateForce(math::Vector3 _forceVector)
     quat.SetFromAxis(u.GetPerpendicular(), angle);
   else
     quat.SetFromAxis((v.Cross(u)).Normalize(), angle);
-  dPtr->forceVisual->SetRotation(quat);
+
+  dPtr->forceVisual->SetRotation(quat * math::Quaternion(
+      math::Vector3(0, M_PI/2.0, 0)));
 
   // Set position
   double linkDiagonal = dPtr->parent->GetBoundingBox().GetDiagonalLength();

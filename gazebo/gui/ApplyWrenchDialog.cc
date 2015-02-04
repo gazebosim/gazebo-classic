@@ -627,7 +627,7 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent & _event)
     return false;
 
   // Register drag start point if on top of a handle
-  if (this->dataPtr->manipState == "rot_x" ||
+  if (this->dataPtr->manipState == "rot_z" ||
       this->dataPtr->manipState == "rot_y")
   {
     this->dataPtr->applyWrenchVisual->GetRotTool()->SetState(
@@ -661,7 +661,7 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
         ->GetWorldPose();
 
     math::Vector3 normal;
-    if (this->dataPtr->manipState == "rot_x")
+    if (this->dataPtr->manipState == "rot_z")
     {
       normal = math::Vector3::UnitZ;
     }
@@ -701,7 +701,7 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
     math::Quaternion rot(normal, angle);
 
     math::Vector3 vec;
-    if (this->dataPtr->manipState == "rot_x")
+    if (this->dataPtr->manipState == "rot_z")
     {
       vec = rot.RotateVector(-math::Vector3::UnitY);
     }
@@ -725,7 +725,7 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
   {
     userCamera->GetVisual(_event.pos, this->dataPtr->manipState);
 
-    if (this->dataPtr->manipState == "rot_x" ||
+    if (this->dataPtr->manipState == "rot_z" ||
       this->dataPtr->manipState == "rot_y")
     {
       this->dataPtr->applyWrenchVisual->GetRotTool()->SetState(
