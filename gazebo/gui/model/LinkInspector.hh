@@ -49,7 +49,7 @@ namespace gazebo
       /// \return Name of the part.
       public: std::string GetName() const;
 
-      /// \brief Get link configurations of the part.
+      /// \brief Get configurations of the link.
       /// \return Tab widget with link configurations.
       public: LinkConfig *GetLinkConfig() const;
 

@@ -88,7 +88,8 @@ namespace gazebo
       public: msgs::Visual *GetData(const std::string &_name) const;
 
       /// \brief Set the geometry data of a visual
-      /// \param[in] _size URI of the geometry.
+      /// \param[in] _name Name of visual.
+      /// \param[in] _size Size of the geometry.
       /// \param[in] _uri URI of the geometry.
       public: void SetGeometry(const std::string &_name,
           const math::Vector3 &_size, const std::string &_uri = "");
@@ -98,10 +99,10 @@ namespace gazebo
       Q_SIGNALS: void VisualRemoved(const std::string &_name);
 
       /// \brief Qt signal emitted when a visual is added.
+      /// \param[in] _name Name of visual added.
       Q_SIGNALS: void VisualAdded(const std::string &_name);
 
       /// \brief Qt callback when a visual is to be added.
-      /// \param[in] _name Name of visual added.
       private slots: void OnAddVisual();
 
       /// \brief Qt callback when a visual is to be removed.

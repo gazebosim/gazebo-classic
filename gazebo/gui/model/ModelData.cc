@@ -76,7 +76,7 @@ PartData::PartData()
   this->partSDF.reset(new sdf::Element);
   sdf::initFile("link.sdf", this->partSDF);
 
-  this->inspector = new LinkInspector;
+  this->inspector = new LinkInspector();
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
   connect(this->inspector->GetVisualConfig(),
@@ -95,9 +95,10 @@ PartData::PartData()
       SIGNAL(CollisionRemoved(const std::string &)),
       this, SLOT(OnRemoveCollision(const std::string &)));
 
-  this->connections.push_back(
-      event::Events::ConnectPreRender(
-        boost::bind(&PartData::Update, this)));
+  // note the destructor removes this connection with the assumption that it is
+  // the first one in the vector
+  this->connections.push_back(event::Events::ConnectPreRender(
+      boost::bind(&PartData::Update, this)));
   this->updateMutex = new boost::recursive_mutex();
 }
 

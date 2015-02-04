@@ -71,7 +71,7 @@ ModelCreator::ModelCreator()
   this->jointMaker = new JointMaker();
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
-  this->inspectAct = new QAction(tr("Open Part Inspector"), this);
+  this->inspectAct = new QAction(tr("Open Link Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this,
       SLOT(OnOpenInspector()));
 
@@ -567,7 +567,7 @@ std::string ModelCreator::AddCustom(const std::string &_path,
 }
 
 /////////////////////////////////////////////////
-PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
+void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 {
   PartData *part = new PartData();
   part->partVisual = _visual->GetParent();
@@ -597,7 +597,6 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   this->allParts[partName] = part;
 
   this->ModelChanged();
-  return part;
 }
 
 /////////////////////////////////////////////////

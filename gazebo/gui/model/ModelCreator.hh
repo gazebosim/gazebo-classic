@@ -239,9 +239,12 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
 
-      /// \brief Create part with default properties from a visual
+      /// \brief Create part with default properties from a visual. This
+      /// function creates a link that will become the parent of the
+      /// input visual. A collision visual with the same geometry as the input
+      /// visual will also be added to the link.
       /// \param[in] _visual Visual used to create the part.
-      private: PartData *CreatePart(const rendering::VisualPtr &_visual);
+      private: void CreatePart(const rendering::VisualPtr &_visual);
 
       /// \brief Open the part inspector.
       /// \param[in] _name Name of part.
