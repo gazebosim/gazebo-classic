@@ -255,7 +255,7 @@ void JointsTest::OneDof(const std::string &_physicsEngine
   math::Vector3Stats angularMomentumError;
   math::SignalStats energyError;
   {
-    const std::string statNames = "MaxAbs";
+    const std::string statNames = "maxAbs";
     EXPECT_TRUE(linearPositionError.InsertStatistics(statNames));
     EXPECT_TRUE(linearVelocityError.InsertStatistics(statNames));
     EXPECT_TRUE(angularPositionError.InsertStatistics(statNames));
