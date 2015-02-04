@@ -27,7 +27,6 @@
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
-#include "gazebo/gui/SaveDialog.hh"
 #include "gazebo/gui/model/ImportDialog.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
@@ -42,72 +41,63 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 {
   this->setObjectName("modelEditorPalette");
 
+  this->modelDefaultName = "Untitled";
+
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
-  this->modelTreeWidget = new QTreeWidget();
-  this->modelTreeWidget->setColumnCount(1);
-  this->modelTreeWidget->setIndentation(10);
-  this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-  this->modelTreeWidget->header()->hide();
-  this->modelTreeWidget->setFocusPolicy(Qt::NoFocus);
+  // Simple Shapes
+  QLabel *shapesLabel = new QLabel(tr(
+       "<font size=4 color='white'>Simple Shapes</font>"));
 
-  this->modelTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
-  connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-      this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
+  QHBoxLayout *shapesLayout = new QHBoxLayout;
 
-  // Parts tree item
-  this->modelItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Link Palette")));
-  this->modelTreeWidget->addTopLevelItem(this->modelItem);
+  QSize toolButtonSize(70, 70);
+  QSize iconSize(40, 40);
 
-  QTreeWidgetItem *simpleShapesItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Simple Shapes")));
-  this->modelItem->addChild(simpleShapesItem);
-
-  QTreeWidgetItem *simpleShapesChildItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  simpleShapesItem->addChild(simpleShapesChildItem);
-
-  // Shapes buttons
-  QWidget *modelWidget = new QWidget;
-  QWidget *customWidget = new QWidget;
-  QGridLayout *partsLayout = new QGridLayout;
-  QGridLayout *customLayout = new QGridLayout;
-
-  // cylinder button
-  QPushButton *cylinderButton = new QPushButton(tr("Cylinder"), this);
+  // Cylinder button
+  QToolButton *cylinderButton = new QToolButton(this);
+  cylinderButton->setFixedSize(toolButtonSize);
+  cylinderButton->setToolTip(tr("Cylinder"));
+  cylinderButton->setIcon(QPixmap(":/images/cylinder.png"));
+  cylinderButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  cylinderButton->setIconSize(QSize(iconSize));
   cylinderButton->setCheckable(true);
   cylinderButton->setChecked(false);
   connect(cylinderButton, SIGNAL(clicked()), this, SLOT(OnCylinder()));
+  shapesLayout->addWidget(cylinderButton);
 
   // Sphere button
-  QPushButton *sphereButton = new QPushButton(tr("Sphere"), this);
+  QToolButton *sphereButton = new QToolButton(this);
+  sphereButton->setFixedSize(toolButtonSize);
+  sphereButton->setToolTip(tr("Sphere"));
+  sphereButton->setIcon(QPixmap(":/images/sphere.png"));
+  sphereButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  sphereButton->setIconSize(QSize(iconSize));
   sphereButton->setCheckable(true);
   sphereButton->setChecked(false);
   connect(sphereButton, SIGNAL(clicked()), this, SLOT(OnSphere()));
+  shapesLayout->addWidget(sphereButton);
 
   // Box button
-  QPushButton *boxButton = new QPushButton(tr("Box"), this);
+  QToolButton *boxButton = new QToolButton(this);
+  boxButton->setFixedSize(toolButtonSize);
+  boxButton->setToolTip(tr("Box"));
+  boxButton->setIcon(QPixmap(":/images/box.png"));
+  boxButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  boxButton->setIconSize(QSize(iconSize));
   boxButton->setCheckable(true);
   boxButton->setChecked(false);
   connect(boxButton, SIGNAL(clicked()), this, SLOT(OnBox()));
+  shapesLayout->addWidget(boxButton);
 
-  partsLayout->addWidget(cylinderButton, 0, 0);
-  partsLayout->addWidget(sphereButton, 0, 1);
-  partsLayout->addWidget(boxButton, 0, 2);
-  modelWidget->setLayout(partsLayout);
+  // Custom Shapes
+  QLabel *customShapesLabel = new QLabel(tr(
+       "<font size=4 color='white'>Custom Shapes</font>"));
 
-  // custom button
-  QTreeWidgetItem *customItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Custom")));
-  this->modelItem->addChild(customItem);
-
-  QTreeWidgetItem *customChildItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  customItem->addChild(customChildItem);
+  QHBoxLayout *customLayout = new QHBoxLayout;
+  customLayout->setAlignment(Qt::AlignLeft);
+  customLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
+      QSizePolicy::Minimum));
 
   QPushButton *customButton = new QPushButton(tr("Add"), this);
   customButton->setMaximumWidth(60);
@@ -115,102 +105,82 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   customButton->setChecked(false);
   connect(customButton, SIGNAL(clicked()), this, SLOT(OnCustom()));
   customLayout->addWidget(customButton, 0, 0);
-  customWidget->setLayout(customLayout);
 
-  this->modelTreeWidget->setItemWidget(simpleShapesChildItem, 0, modelWidget);
-  this->modelTreeWidget->setItemWidget(customChildItem, 0, customWidget);
-  this->modelItem->setExpanded(true);
-  simpleShapesItem->setExpanded(true);
-  simpleShapesChildItem->setExpanded(true);
-  customItem->setExpanded(true);
-  customChildItem->setExpanded(true);
-
+  // Button group
   this->partButtonGroup = new QButtonGroup;
   this->partButtonGroup->addButton(cylinderButton);
   this->partButtonGroup->addButton(sphereButton);
   this->partButtonGroup->addButton(boxButton);
   this->partButtonGroup->addButton(customButton);
 
-  // model settings tree item
-  this->modelSettingsItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Model Settings")));
-  this->modelTreeWidget->addTopLevelItem(this->modelSettingsItem);
+  // Model Settings
+  QLabel *settingsLabel = new QLabel(tr(
+       "<font size=4 color='white'>Model Settings</font>"));
 
-  QTreeWidgetItem *modelSettingsChildItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  this->modelSettingsItem->addChild(modelSettingsChildItem);
+  QGridLayout *settingsLayout = new QGridLayout;
 
-  QWidget *modelSettingsWidget = new QWidget;
-  QVBoxLayout *modelSettingsLayout = new QVBoxLayout;
-  QGridLayout *dynamicsLayout = new QGridLayout;
+  // Model name
+  QLabel *modelLabel = new QLabel(tr("Model Name: "));
+  this->modelNameEdit = new QLineEdit();
+  this->modelNameEdit->setText(tr(this->modelDefaultName.c_str()));
+  connect(this->modelNameEdit, SIGNAL(textChanged(QString)), this,
+      SLOT(OnNameChanged(QString)));
 
+  // Static
   QLabel *staticLabel = new QLabel(tr("Static:"));
   this->staticCheck = new QCheckBox;
   this->staticCheck->setChecked(false);
   connect(this->staticCheck, SIGNAL(clicked()), this, SLOT(OnStatic()));
 
+  // Auto disable
   QLabel *autoDisableLabel = new QLabel(tr("Auto-disable:"));
   this->autoDisableCheck = new QCheckBox;
   this->autoDisableCheck->setChecked(true);
   connect(this->autoDisableCheck, SIGNAL(clicked()), this,
       SLOT(OnAutoDisable()));
 
-  dynamicsLayout->addWidget(staticLabel, 0, 0);
-  dynamicsLayout->addWidget(this->staticCheck, 0, 1);
-  dynamicsLayout->addWidget(autoDisableLabel, 1, 0);
-  dynamicsLayout->addWidget(this->autoDisableCheck, 1, 1);
-
-  modelSettingsLayout->addLayout(dynamicsLayout);
-  modelSettingsWidget->setLayout(modelSettingsLayout);
-  this->modelTreeWidget->setItemWidget(modelSettingsChildItem, 0,
-    modelSettingsWidget);
-  this->modelSettingsItem->setExpanded(true);
-  modelSettingsChildItem->setExpanded(true);
-
-  // plugin
-  this->pluginItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Plugin")));
-  // this->modelTreeWidget->addTopLevelItem(this->pluginItem);
-
-  // save buttons
-  QPushButton *discardButton = new QPushButton(tr("Discard"));
-  connect(discardButton, SIGNAL(clicked()), this, SLOT(OnDiscard()));
-
-  this->saveButton = new QPushButton(tr("Save As"));
-  connect(this->saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
-
-  QPushButton *doneButton = new QPushButton(tr("Done"));
-  connect(doneButton, SIGNAL(clicked()), this, SLOT(OnDone()));
-
-  QHBoxLayout *buttonsLayout = new QHBoxLayout;
-  buttonsLayout->addWidget(discardButton);
-  buttonsLayout->addWidget(this->saveButton);
-  buttonsLayout->addWidget(doneButton);
-  buttonsLayout->setAlignment(Qt::AlignCenter);
+  settingsLayout->addWidget(modelLabel, 0, 0);
+  settingsLayout->addWidget(this->modelNameEdit, 0, 1);
+  settingsLayout->addWidget(staticLabel, 1, 0);
+  settingsLayout->addWidget(this->staticCheck, 1, 1);
+  settingsLayout->addWidget(autoDisableLabel, 2, 0);
+  settingsLayout->addWidget(this->autoDisableCheck, 2, 1);
 
   this->modelCreator = new ModelCreator();
   connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
 
-  QFrame *frame = new QFrame;
-  QVBoxLayout *frameLayout = new QVBoxLayout;
-  frameLayout->addWidget(this->modelTreeWidget, 0);
-  frameLayout->addLayout(buttonsLayout);
-  frameLayout->setContentsMargins(0, 0, 0, 0);
-  frame->setLayout(frameLayout);
+  // Horizontal separator
+  QFrame *separator = new QFrame(this);
+  separator->setFrameShape(QFrame::HLine);
+  separator->setFrameShadow(QFrame::Sunken);
+  separator->setLineWidth(1);
 
-  mainLayout->addWidget(frame);
+  // Main layout
+  mainLayout->addWidget(shapesLabel);
+  mainLayout->addLayout(shapesLayout);
+  mainLayout->addWidget(customShapesLabel);
+  mainLayout->addLayout(customLayout);
+  mainLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
+      QSizePolicy::Minimum));
+  mainLayout->addWidget(separator);
+  mainLayout->addWidget(settingsLabel);
+  mainLayout->addLayout(settingsLayout);
+  mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  this->saved = false;
-  this->saveLocation = QDir::homePath().toStdString();
-  this->modelName = "default";
-
   KeyEventHandler::Instance()->AddPressFilter("model_editor",
     boost::bind(&ModelEditorPalette::OnKeyPress, this, _1));
+
+  // Connections
+  this->connections.push_back(
+      gui::model::Events::ConnectSaveModel(
+      boost::bind(&ModelEditorPalette::OnSaveModel, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectNewModel(
+      boost::bind(&ModelEditorPalette::OnNewModel, this)));
 }
 
 /////////////////////////////////////////////////
@@ -300,71 +270,6 @@ void ModelEditorPalette::OnStatic()
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnSave()
-{
-  SaveDialog saveDialog;
-  saveDialog.deleteLater();
-  saveDialog.SetTitle("Save Model");
-  saveDialog.SetSaveName(this->modelCreator->GetModelName());
-  saveDialog.SetSaveLocation(QDir::homePath().toStdString());
-  saveDialog.SetFileExtension("sdf");
-  if (saveDialog.exec() == QDialog::Accepted)
-  {
-    this->modelName = saveDialog.GetSaveName();
-    this->saveLocation = saveDialog.GetSaveLocation();
-    this->modelCreator->SetModelName(this->modelName);
-    this->modelCreator->GenerateSDF();
-    this->modelCreator->SaveToSDF(this->saveLocation);
-    this->saveButton->setText("&Save");
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnDiscard()
-{
-  int ret = QMessageBox::warning(0, QString("Discard"),
-      QString("Are you sure you want to discard\n"
-      "your model? All of your work will\n"
-      "be lost."),
-      QMessageBox::Discard | QMessageBox::Cancel,
-      QMessageBox::Cancel);
-
-  switch (ret)
-  {
-    case QMessageBox::Discard:
-      this->modelCreator->Reset();
-      this->saveButton->setText("&Save As");
-      this->saveLocation = QDir::homePath().toStdString();
-      break;
-    case QMessageBox::Cancel:
-      // Do nothing
-      break;
-    default:
-      break;
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnDone()
-{
-  SaveDialog saveDialog;
-  saveDialog.SetTitle("Save Model");
-  saveDialog.SetSaveName(this->modelCreator->GetModelName());
-  saveDialog.SetSaveLocation(QDir::homePath().toStdString());
-  saveDialog.SetFileExtension("sdf");
-  if (saveDialog.exec() == QDialog::Accepted)
-  {
-    this->modelName = saveDialog.GetSaveName();
-    this->saveLocation = saveDialog.GetSaveLocation();
-    this->modelCreator->SetModelName(this->modelName);
-    this->modelCreator->GenerateSDF();
-    this->modelCreator->SaveToSDF(this->saveLocation);
-    this->modelCreator->FinishModel();
-    gui::model::Events::finishModel();
-  }
-}
-
-/////////////////////////////////////////////////
 bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
 {
   if (_event.key == Qt::Key_Escape)
@@ -384,4 +289,22 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
 ModelCreator *ModelEditorPalette::GetModelCreator()
 {
   return this->modelCreator;
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnNameChanged(const QString &_name)
+{
+  gui::model::Events::modelNameChanged(_name.toStdString());
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnNewModel()
+{
+  this->modelNameEdit->setText(tr(this->modelDefaultName.c_str()));
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnSaveModel(const std::string &_saveName)
+{
+  this->modelNameEdit->setText(tr(_saveName.c_str()));
 }

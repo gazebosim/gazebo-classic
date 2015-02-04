@@ -50,6 +50,9 @@ namespace gazebo
       /// \brief Pose of part.
       public: math::Pose pose;
 
+      /// \brief Scale of part.
+      public: math::Vector3 scale;
+
       /// \brief Visual representing this part.
       public: rendering::VisualPtr partVisual;
 
