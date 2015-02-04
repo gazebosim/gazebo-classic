@@ -698,6 +698,7 @@ void GLWidget::OnMouseReleaseNormal()
     {
       vis = vis->GetRootVisual();
       this->SetSelectedVisual(vis);
+
       event::Events::setSelectedEntity(vis->GetName(), "normal");
 
       if (this->mouseEvent.button == common::MouseEvent::RIGHT)

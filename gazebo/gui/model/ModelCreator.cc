@@ -696,6 +696,39 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   return part;
 }
 
+
+/////////////////////////////////////////////////
+PartData *ModelCreator::ClonePart(const std::string &_partName)
+{
+  boost::unordered_map<std::string, PartData *>::iterator it
+      = this->allParts.find(_partName);
+  if (it == allParts.end())
+  {
+    gzerr << "No part with name: " << _partName << " found."  << std::endl;
+    return NULL;
+  }
+
+  // generate unique name.
+  boost::unordered_map<std::string, PartData *>::iterator itName;
+  std::string newName = _partName + "_clone";
+  itName = this->allParts.find(newName);
+  int nameCounter = 0;
+  while (itName != this->allParts.end())
+  {
+    std::stringstream newPartName;
+    newPartName << _partName << "_clone_" << nameCounter++;
+    newName = newPartName.str();
+    itName = this->allParts.find(newName);
+  }
+
+  PartData *part = it->second->Clone(newName);
+  this->allParts[newName] = part;
+
+  this->ModelChanged();
+
+  return part;
+}
+
 /////////////////////////////////////////////////
 PartData *ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 {
@@ -1417,33 +1450,9 @@ void ModelCreator::OnPaste()
       this->Reset();
     }
 
-    rendering::VisualPtr linkVisual(new rendering::Visual(
-        linkName, this->previewVisual));
-    linkVisual->Load();
+    PartData* clonedPart = this->ClonePart(copiedPart->GetName());
 
-    std::ostringstream visualName;
-    visualName << linkName << "_visual";
-    rendering::VisualPtr visVisual;
-
-    math::Pose clonePose;
-    math::Vector3 cloneScale;
-
-    if (copiedPart->visuals.empty())
-    {
-      visVisual = rendering::VisualPtr(new rendering::Visual(visualName.str(),
-          linkVisual));
-      sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
-          ->GetElement("model")->GetElement("link")->GetElement("visual");
-      visVisual->Load(visualElem);
-    }
-    else
-    {
-      rendering::VisualPtr copiedVisual = copiedPart->visuals.rbegin()->first;
-      visVisual = copiedVisual->Clone(visualName.str(), linkVisual);
-      clonePose = copiedVisual->GetWorldPose();
-      cloneScale = copiedVisual->GetParent()->GetScale();
-    }
-
+    math::Pose clonePose = copiedPart->partVisual->GetWorldPose();
     rendering::UserCameraPtr userCamera = gui::get_active_camera();
     if (userCamera)
     {
@@ -1454,13 +1463,10 @@ void ModelCreator::OnPaste()
       clonePose.pos.y = mousePosition.y;
     }
 
-    linkVisual->SetScale(cloneScale);
-    linkVisual->SetWorldPose(clonePose);
-    linkVisual->SetTransparency(ModelData::GetEditTransparency());
-
+    clonedPart->partVisual->SetWorldPose(clonePose);
+    clonedPart->partVisual->SetTransparency(ModelData::GetEditTransparency());
     this->addPartType = PART_CUSTOM;
-    this->CreatePart(visVisual);
-    this->mouseVisual = linkVisual;
+    this->mouseVisual = clonedPart->partVisual;
   }
 }
 

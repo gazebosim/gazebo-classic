@@ -243,7 +243,13 @@ namespace gazebo
 
       /// \brief Create part with default properties from a visual
       /// \param[in] _visual Visual used to create the part.
+      /// \return Newly created part.
       private: PartData *CreatePart(const rendering::VisualPtr &_visual);
+
+      /// \brief Clone a part from an existing part
+      /// \param[in] _partName Name of part to be cloned.
+      /// \return Cloned part.
+      private: PartData *ClonePart(const std::string &_partName);
 
       /// \brief TODO
       private: PartData *CreatePartFromSDF(sdf::ElementPtr _linkElem);
