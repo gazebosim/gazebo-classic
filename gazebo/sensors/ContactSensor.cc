@@ -90,8 +90,7 @@ void ContactSensor::Load(const std::string &_worldName)
   sdf::ElementPtr collisionElem =
     this->sdf->GetElement("contact")->GetElement("collision");
 
-  std::string entityName =
-      this->world->GetEntity(this->parentName)->GetScopedName();
+  std::string entityName = this->parentName + "::" + this->GetName();
 
   // Get all the collision elements
   while (collisionElem)

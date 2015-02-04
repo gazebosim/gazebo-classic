@@ -81,7 +81,7 @@ void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
   std::list<std::string> topics =
     transport::getAdvertisedTopics("gazebo.msgs.Contacts");
   EXPECT_FALSE(topics.empty());
-  EXPECT_EQ(topics.size(), 4u);
+  EXPECT_EQ(topics.size(), 5u);
 
   // We should expect them all to publish.
   for (std::list<std::string>::iterator iter = topics.begin();
