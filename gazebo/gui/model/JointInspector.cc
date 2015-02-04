@@ -160,7 +160,7 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
     axisZSpinBox->setRange(-1000, 1000);
     axisZSpinBox->setSingleStep(0.01);
     axisZSpinBox->setDecimals(3);
-    axisZSpinBox->setValue(0.000);
+    axisZSpinBox->setValue(1.000);
     this->axisZSpinBoxes.push_back(axisZSpinBox);
 
     QGridLayout *axisLayout = new QGridLayout;

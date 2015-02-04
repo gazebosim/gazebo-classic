@@ -448,6 +448,15 @@ void Joint::SetModel(ModelPtr _model)
 }
 
 //////////////////////////////////////////////////
+double Joint::GetParam(const std::string &/*_key*/,
+    unsigned int /*_index*/)
+{
+  gzerr << "GetParam not yet implemented"
+        << std::endl;
+  return 0;
+}
+
+//////////////////////////////////////////////////
 LinkPtr Joint::GetChild() const
 {
   return this->childLink;

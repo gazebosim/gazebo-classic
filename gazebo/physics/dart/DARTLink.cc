@@ -20,6 +20,7 @@
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/WorldPrivate.hh"
 
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTPhysics.hh"
@@ -717,7 +718,7 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
 
   // Set the new pose to the world
   // (Below method can be changed in gazebo code)
-  this->world->dirtyPoses.push_back(this);
+  this->world->dataPtr->dirtyPoses.push_back(this);
 }
 
 //////////////////////////////////////////////////

@@ -21,6 +21,10 @@ if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
 endif()
 
+if (HAVE_DART)
+  link_directories(${DARTCore_LIBRARY_DIRS})
+endif()
+
 set (plugins
   ActuatorPlugin
   ArrangePlugin
