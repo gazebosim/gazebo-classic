@@ -122,6 +122,7 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
           properties.maximumTorque = elem->Get<float>("max_torque");
           properties.modelFunction = VelocityLimiterModel;
         }
+        else if (modelType.compare("null") != 0)
         {
           gzwarn << "Unknown motor model specified, selecting NullModel."
                  << std::endl;
