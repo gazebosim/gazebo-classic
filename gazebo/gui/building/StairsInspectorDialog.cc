@@ -116,6 +116,28 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   QGroupBox *sizeGroupBox = new QGroupBox(tr("Size"));
   sizeGroupBox->setLayout(sizeStepsLayout);
 
+  QLabel *colorLabel = new QLabel(tr("Color: "));
+  this->colorComboBox = new QComboBox;
+  this->colorComboBox->setIconSize(QSize(15, 15));
+  this->colorComboBox->setMinimumWidth(50);
+  this->colorComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  QPixmap colorIcon(15, 15);
+  this->colorList.push_back(QColor(255, 255, 255, 255));
+  this->colorList.push_back(QColor(194, 169, 160, 255));
+  this->colorList.push_back(QColor(235, 206, 157, 255));
+  this->colorList.push_back(QColor(254, 121,   5, 255));
+  this->colorList.push_back(QColor(255, 195,  78, 255));
+  this->colorList.push_back(QColor(111, 203, 172, 255));
+  for (unsigned int i = 0; i < this->colorList.size(); ++i)
+  {
+    colorIcon.fill(this->colorList.at(i));
+    this->colorComboBox->addItem(colorIcon, QString(""));
+  }
+
+  QHBoxLayout *colorLayout = new QHBoxLayout;
+  colorLayout->addWidget(colorLabel);
+  colorLayout->addWidget(colorComboBox);
+
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
@@ -133,6 +155,7 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   mainLayout->addLayout(nameLayout);
   mainLayout->addWidget(positionGroupBox);
   mainLayout->addWidget(sizeGroupBox);
+  mainLayout->addLayout(colorLayout);
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
@@ -176,6 +199,12 @@ int StairsInspectorDialog::GetSteps() const
 }
 
 /////////////////////////////////////////////////
+QColor StairsInspectorDialog::GetColor() const
+{
+  return this->colorList[this->colorComboBox->currentIndex()];
+}
+
+/////////////////////////////////////////////////
 void StairsInspectorDialog::SetName(const std::string &_name)
 {
   this->stairsNameLabel->setText(tr(_name.c_str()));
@@ -211,6 +240,20 @@ void StairsInspectorDialog::SetHeight(double _height)
 void StairsInspectorDialog::SetSteps(int _steps)
 {
   this->stepsSpinBox->setValue(_steps);
+}
+
+/////////////////////////////////////////////////
+void StairsInspectorDialog::SetColor(const QColor _color)
+{
+  // Find index corresponding to color (only a few colors allowed so far)
+  for (unsigned int i = 0; i < this->colorList.size(); ++i)
+  {
+    if (this->colorList[i] == _color)
+    {
+      this->colorComboBox->setCurrentIndex(i);
+      break;
+    }
+  }
 }
 
 /////////////////////////////////////////////////

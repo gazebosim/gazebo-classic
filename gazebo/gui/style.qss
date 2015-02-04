@@ -747,6 +747,11 @@ QwtScaleWidget
   font-size: 11px;
 }
 
+#configWidget
+{
+  background-color: #808080;
+}
+
 QwtTextLabel
 {
   font-size: 10px;
@@ -757,4 +762,3 @@ QwtScaleWidget
   color: white;
   font-size: 11px;
 }
-
