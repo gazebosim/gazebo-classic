@@ -891,17 +891,27 @@ TEST_F(MsgsTest, LinkToSDF)
   msgs::Set(linkMsg.mutable_pose(), math::Pose(math::Vector3(3, 2, 1),
       math::Quaternion(0.5, -0.5, -0.5, 0.5)));
 
+  const double laserRetro1 = 0.4;
+  const double laserRetro2 = 0.5;
+
   // collision - see CollisionToSDF for a more detailed test
-  msgs::Collision *collisionMsg1 = linkMsg.add_collision();
-  collisionMsg1->set_laser_retro(0.4);
+  auto collisionMsg1 = linkMsg.add_collision();
+  collisionMsg1->set_laser_retro(laserRetro1);
   collisionMsg1->set_max_contacts(100);
 
-  msgs::Collision *collisionMsg2 = linkMsg.add_collision();
-  collisionMsg2->set_laser_retro(0.5);
+  auto collisionMsg2 = linkMsg.add_collision();
+  collisionMsg2->set_laser_retro(laserRetro2);
   collisionMsg2->set_max_contacts(300);
 
+  // visual - see VisualToSDF for a more detailed test
+  auto visualMsg1 = linkMsg.add_visual();
+  visualMsg1->set_laser_retro(laserRetro1);
+
+  auto visualMsg2 = linkMsg.add_visual();
+  visualMsg2->set_laser_retro(laserRetro2);
+
   // inertial - see InertialToSDF for a more detailed test
-  msgs::Inertial *inertialMsg = linkMsg.mutable_inertial();
+  auto inertialMsg = linkMsg.mutable_inertial();
   inertialMsg->set_mass(3.5);
 
   sdf::ElementPtr linkSDF = msgs::LinkToSDF(linkMsg);
@@ -911,12 +921,18 @@ TEST_F(MsgsTest, LinkToSDF)
   EXPECT_FALSE(linkSDF->Get<bool>("kinematic"));
 
   sdf::ElementPtr collisionElem1 = linkSDF->GetElement("collision");
-  EXPECT_DOUBLE_EQ(collisionElem1->Get<double>("laser_retro"), 0.4);
+  EXPECT_DOUBLE_EQ(collisionElem1->Get<double>("laser_retro"), laserRetro1);
   EXPECT_DOUBLE_EQ(collisionElem1->Get<double>("max_contacts"), 100);
 
   sdf::ElementPtr collisionElem2 = collisionElem1->GetNextElement("collision");
-  EXPECT_DOUBLE_EQ(collisionElem2->Get<double>("laser_retro"), 0.5);
+  EXPECT_DOUBLE_EQ(collisionElem2->Get<double>("laser_retro"), laserRetro2);
   EXPECT_DOUBLE_EQ(collisionElem2->Get<double>("max_contacts"), 300);
+
+  sdf::ElementPtr visualElem1 = linkSDF->GetElement("visual");
+  EXPECT_DOUBLE_EQ(visualElem1->Get<double>("laser_retro"), laserRetro1);
+
+  sdf::ElementPtr visualElem2 = visualElem1->GetNextElement("visual");
+  EXPECT_DOUBLE_EQ(visualElem2->Get<double>("laser_retro"), laserRetro2);
 
   sdf::ElementPtr inertialElem = linkSDF->GetElement("inertial");
   EXPECT_DOUBLE_EQ(inertialElem->Get<double>("mass"), 3.5);
