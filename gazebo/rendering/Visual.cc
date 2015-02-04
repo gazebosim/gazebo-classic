@@ -1611,12 +1611,7 @@ void Visual::SetVisible(bool _visible, bool _cascade)
 //////////////////////////////////////////////////
 uint32_t Visual::GetVisibilityFlags()
 {
-  if (this->dataPtr->sceneNode->numAttachedObjects() > 0)
-  {
-    return this->dataPtr->sceneNode->getAttachedObject(0)->getVisibilityFlags();
-  }
-
-  return GZ_VISIBILITY_ALL;
+  return this->dataPtr->visibilityFlags;
 }
 
 //////////////////////////////////////////////////
@@ -2753,6 +2748,8 @@ void Visual::SetVisibilityFlags(uint32_t _flags)
     for (int j = 0; j < sn->numAttachedObjects(); ++j)
       sn->getAttachedObject(j)->setVisibilityFlags(_flags);
   }
+
+  this->dataPtr->visibilityFlags = _flags;
 }
 
 //////////////////////////////////////////////////

@@ -716,9 +716,9 @@ void GLWidget::OnMouseReleaseNormal()
       bool linkHighlighted = false;
       for (unsigned int i = 0; i < modelVis->GetChildCount(); ++i)
       {
-        // A hacky way to find out if there's only one link in the model
-        if (modelVis->GetChild(i)->GetName().find("__GL_MANIP__") !=
-            std::string::npos)
+        // Find out if there's only one link in the model
+        uint32_t flags = modelVis->GetChild(i)->GetVisibilityFlags();
+        if ((flags != GZ_VISIBILITY_ALL) && (flags & GZ_VISIBILITY_GUI))
         {
           continue;
         }

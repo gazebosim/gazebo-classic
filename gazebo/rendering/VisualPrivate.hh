@@ -160,6 +160,9 @@ namespace gazebo
 
       /// \brief Emissive color of the viusal.
       public: common::Color emissive;
+
+      /// \brief Visibility flags of the viusal.
+      public: uint32_t visibilityFlags;
     };
     /// \}
   }
