@@ -219,7 +219,7 @@ void ApplyWrenchVisual::UpdateTorque(math::Vector3 _torqueVector)
   // Set rotation
   math::Vector3 u = _torqueVector;
   u = u.Normalize();
-  math::Vector3 v = math::Vector3::UnitZ;
+  math::Vector3 v = math::Vector3::UnitX;
   double cosTheta = v.Dot(u);
   double angle = acos(cosTheta);
   math::Quaternion quat;
@@ -227,7 +227,8 @@ void ApplyWrenchVisual::UpdateTorque(math::Vector3 _torqueVector)
     quat.SetFromAxis(u.GetPerpendicular(), angle);
   else
     quat.SetFromAxis((v.Cross(u)).Normalize(), angle);
-  dPtr->torqueVisual->SetRotation(quat);
+  dPtr->torqueVisual->SetRotation(quat * math::Quaternion(
+      math::Vector3(0, M_PI/2.0, 0)));
 
   // Set position
   double linkDiagonal = dPtr->parent->GetBoundingBox().GetDiagonalLength();
