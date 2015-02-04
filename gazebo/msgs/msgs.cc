@@ -710,7 +710,7 @@ namespace gazebo
       // Load the geometry
       if (_sdf->HasElement("geometry"))
       {
-        msgs::Geometry *geomMsg = result.mutable_geometry();
+        auto geomMsg = result.mutable_geometry();
         geomMsg->CopyFrom(GeometryFromSDF(_sdf->GetElement("geometry")));
       }
 
@@ -718,7 +718,7 @@ namespace gazebo
       if (_sdf->HasElement("material"))
       {
         sdf::ElementPtr elem = _sdf->GetElement("material");
-        msgs::Material *matMsg = result.mutable_material();
+        auto matMsg = result.mutable_material();
 
         if (elem->HasElement("script"))
         {
@@ -1659,14 +1659,14 @@ namespace gazebo
     {
       _msg.add_link();
       int linkCount = _msg.link_size();
-      msgs::Link *link = _msg.mutable_link(linkCount-1);
+      auto link = _msg.mutable_link(linkCount-1);
       {
         std::ostringstream linkName;
         linkName << "link" << linkCount;
         link->set_name(linkName.str());
       }
 
-      msgs::Inertial *inertial = link->mutable_inertial();
+      auto inertial = link->mutable_inertial();
       inertial->set_mass(_mass);
       {
         double dx = _size.x;
@@ -1685,20 +1685,20 @@ namespace gazebo
 
       {
         link->add_collision();
-        msgs::Collision *collision = link->mutable_collision(0);
+        auto collision = link->mutable_collision(0);
         collision->set_name("collision");
 
-        msgs::Geometry *geometry = collision->mutable_geometry();
+        auto geometry = collision->mutable_geometry();
         geometry->set_type(Geometry_Type_BOX);
         msgs::Set(geometry->mutable_box()->mutable_size(), _size);
       }
 
       {
         link->add_visual();
-        msgs::Visual *visual = link->mutable_visual(0);
+        auto visual = link->mutable_visual(0);
         visual->set_name("visual");
 
-        msgs::Geometry *geometry = visual->mutable_geometry();
+        auto geometry = visual->mutable_geometry();
         geometry->set_type(Geometry_Type_BOX);
         msgs::Set(geometry->mutable_box()->mutable_size(), _size);
 
