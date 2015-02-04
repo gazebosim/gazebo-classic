@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -286,7 +286,8 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
 
   // Trigger a model delete if the Delete key was pressed, and a model
   // is currently selected.
-  if (_event->key() == Qt::Key_Delete)
+  if (_event->key() == Qt::Key_Delete &&
+      this->selectionLevel == SelectionLevels::MODEL)
   {
     boost::mutex::scoped_lock lock(this->selectedVisMutex);
     while (!this->selectedVisuals.empty())
@@ -695,18 +696,29 @@ void GLWidget::OnMouseReleaseNormal()
     if (vis)
     {
       rendering::VisualPtr selectVis;
-      rendering::VisualPtr modelVis = vis->GetRootVisual();
       rendering::VisualPtr linkVis = vis->GetParent();
+      if (!linkVis)
+      {
+        gzerr << "Link visual not found, this should not happen." << std::endl;
+        return;
+      }
+      rendering::VisualPtr modelVis = vis->GetRootVisual();
+      if (!modelVis)
+      {
+        gzerr << "Model visual not found, this should not happen." << std::endl;
+        return;
+      }
 
       // Flags to check if we should select a link or a model
+      bool rightButton = (this->mouseEvent.button == common::MouseEvent::RIGHT);
       bool modelHighlighted = modelVis->GetHighlighted();
       int linkCount = 0;
       bool linkHighlighted = false;
       for (unsigned int i = 0; i < modelVis->GetChildCount(); ++i)
       {
-        // A hacky way to find out if there's only one link in the model
-        if (modelVis->GetChild(i)->GetName().find("__GL_MANIP__") !=
-            std::string::npos)
+        // Find out if there's only one link in the model
+        uint32_t flags = modelVis->GetChild(i)->GetVisibilityFlags();
+        if ((flags != GZ_VISIBILITY_ALL) && (flags & GZ_VISIBILITY_GUI))
         {
           continue;
         }
@@ -721,7 +733,7 @@ void GLWidget::OnMouseReleaseNormal()
 
       // Select link
       if (linkCount > 1 && !this->mouseEvent.control &&
-          (modelHighlighted || linkHighlighted))
+          ((modelHighlighted && !rightButton) || linkHighlighted))
       {
         selectVis = linkVis;
         this->selectionLevel = SelectionLevels::LINK;
@@ -739,7 +751,8 @@ void GLWidget::OnMouseReleaseNormal()
       this->SetSelectedVisual(selectVis);
       event::Events::setSelectedEntity(selectVis->GetName(), "normal");
 
-      if (this->mouseEvent.button == common::MouseEvent::RIGHT)
+      // Open context menu
+      if (rightButton)
       {
         if (selectVis == modelVis)
         {
@@ -999,6 +1012,11 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 
   if (_vis && !_vis->IsPlane())
   {
+    if (_vis == _vis->GetRootVisual())
+      this->selectionLevel = SelectionLevels::MODEL;
+    else
+      this->selectionLevel = SelectionLevels::LINK;
+
     _vis->SetHighlighted(true);
 
     // enable multi-selection if control is pressed
