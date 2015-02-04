@@ -32,6 +32,9 @@ namespace gazebo
       /// TODO
       public: rendering::ArrowVisualPtr forceVisual;
 
+      /// TODO
+      public: rendering::SelectionObjPtr rotTool;
+
       /// \brief TODO
       public: VisualPtr torqueVisual;
 

@@ -21,9 +21,11 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/ApplyWrenchVisual.hh"
 
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/ApplyWrenchDialog.hh"
 
 using namespace gazebo;
@@ -301,6 +303,15 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent) : QDialog(_parent)
   this->SetMode(rendering::ApplyWrenchVisual::FORCE);
 
   connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
+
+  MouseEventHandler::Instance()->AddPressFilter("applyWrenchDialog",
+      boost::bind(&ApplyWrenchDialog::OnMousePress, this, _1));
+
+  MouseEventHandler::Instance()->AddReleaseFilter("applyWrenchDialog",
+      boost::bind(&ApplyWrenchDialog::OnMouseRelease, this, _1));
+
+  MouseEventHandler::Instance()->AddMoveFilter("applyWrenchDialog",
+      boost::bind(&ApplyWrenchDialog::OnMouseMove, this, _1));
 }
 
 /////////////////////////////////////////////////
@@ -312,8 +323,7 @@ ApplyWrenchDialog::~ApplyWrenchDialog()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::SetLink(std::string _linkName)
 {
-  std::string msg = "Apply Force and Torque \n\n" +
-                    "Apply to " + _linkName + "\n";
+  std::string msg = "Apply Force and Torque\n\nApply to " + _linkName + "\n";
   this->messageLabel->setText(msg.c_str());
   this->linkName = _linkName;
   this->SetPublisher();
@@ -329,6 +339,8 @@ void ApplyWrenchDialog::SetLink(std::string _linkName)
 void ApplyWrenchDialog::SetMode(rendering::ApplyWrenchVisual::WrenchModes _mode)
 {
   this->wrenchMode = _mode;
+  if (this->applyWrenchVisual)
+    this->applyWrenchVisual->SetMode(this->wrenchMode);
 }
 
 /////////////////////////////////////////////////
@@ -368,48 +380,56 @@ void ApplyWrenchDialog::OnPointZChanged(double /*_pZ*/)
 void ApplyWrenchDialog::OnForceMagChanged(double /*_magnitude*/)
 {
   this->UpdateForceVector();
+  this->SetMode(rendering::ApplyWrenchVisual::FORCE);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceXChanged(double /*_fX*/)
 {
   this->UpdateForceMag();
+  this->SetMode(rendering::ApplyWrenchVisual::FORCE);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceYChanged(double /*_fY*/)
 {
   this->UpdateForceMag();
+  this->SetMode(rendering::ApplyWrenchVisual::FORCE);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceZChanged(double /*_fZ*/)
 {
   this->UpdateForceMag();
+  this->SetMode(rendering::ApplyWrenchVisual::FORCE);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueMagChanged(double /*_magnitude*/)
 {
   this->UpdateTorqueVector();
+  this->SetMode(rendering::ApplyWrenchVisual::TORQUE);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueXChanged(double /*_fX*/)
 {
   this->UpdateTorqueMag();
+  this->SetMode(rendering::ApplyWrenchVisual::TORQUE);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueYChanged(double /*_fY*/)
 {
   this->UpdateTorqueMag();
+  this->SetMode(rendering::ApplyWrenchVisual::TORQUE);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueZChanged(double /*_fZ*/)
 {
   this->UpdateTorqueMag();
+  this->SetMode(rendering::ApplyWrenchVisual::TORQUE);
 }
 
 //////////////////////////////////////////////////
@@ -476,6 +496,26 @@ void ApplyWrenchDialog::UpdateForceVector()
 }
 
 /////////////////////////////////////////////////
+void ApplyWrenchDialog::UpdateForceVector(math::Vector3 _fV)
+{
+  // Normalize new vector;
+  if (_fV == math::Vector3::Zero)
+    _fV = math::Vector3::UnitX;
+  else
+    _fV.Normalize();
+
+  // Multiply by magnitude
+  _fV = _fV * this->forceMagSpin->value();
+
+  // Update spins
+  this->forceXSpin->setValue(_fV.x);
+  this->forceYSpin->setValue(_fV.y);
+  this->forceZSpin->setValue(_fV.z);
+
+  this->CalculateWrench();
+}
+
+/////////////////////////////////////////////////
 void ApplyWrenchDialog::UpdateTorqueMag()
 {
   this->torqueMagSpin->setValue(sqrt(
@@ -509,6 +549,26 @@ void ApplyWrenchDialog::UpdateTorqueVector()
 }
 
 /////////////////////////////////////////////////
+void ApplyWrenchDialog::UpdateTorqueVector(math::Vector3 _tV)
+{
+  // Normalize new vector;
+  if (_tV == math::Vector3::Zero)
+    _tV = math::Vector3::UnitX;
+  else
+    _tV.Normalize();
+
+  // Multiply by magnitude
+  _tV = _tV * this->torqueMagSpin->value();
+
+  // Update spins
+  this->torqueXSpin->setValue(_tV.x);
+  this->torqueYSpin->setValue(_tV.y);
+  this->torqueZSpin->setValue(_tV.z);
+
+  this->CalculateWrench();
+}
+
+/////////////////////////////////////////////////
 void ApplyWrenchDialog::AttachVisuals()
 {
   if (!this->applyWrenchVisual)
@@ -517,6 +577,7 @@ void ApplyWrenchDialog::AttachVisuals()
         "__APPLY_WRENCH__", this->linkVisual));
 
     this->applyWrenchVisual->Load();
+    this->applyWrenchVisual->SetMode(this->wrenchMode);
   }
   else
   {
@@ -539,4 +600,72 @@ void ApplyWrenchDialog::TogglePoint(bool _checked)
     this->pointCollapsibleWidget->hide();
     //this->resize(this->minimumSize());
   }
+}
+
+/////////////////////////////////////////////////
+bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent & _event)
+{
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
+    return false;
+
+  this->dragStart = math::Vector2i(0, 0);
+
+  std::string manipState;
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos, manipState);
+  this->applyWrenchVisual->GetRotTool()->SetState(manipState);
+
+  if (!vis)
+    return false;
+
+//  if (manipState == rendering::SelectionObj::ROT_X ||
+//      manipState == rendering::SelectionObj::ROT_Y)
+  {
+    this->dragStart = _event.pressPos;
+  }
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent & /*_event*/)
+{
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
+{
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
+    return false;
+
+  // Dragging
+  if (_event.dragging && _event.button == common::MouseEvent::LEFT &&
+      this->dragStart.x != 0)
+  {
+    // TODO: calculate proper displacement
+    math::Vector3 vec = math::Vector3(-1, -1, -1);
+
+    if (this->wrenchMode == rendering::ApplyWrenchVisual::FORCE)
+    {
+      this->UpdateForceVector(vec);
+    }
+    else if (this->wrenchMode == rendering::ApplyWrenchVisual::TORQUE)
+    {
+      this->UpdateTorqueVector(vec);
+    }
+  }
+  // Highlight hovered tools
+  else
+  {
+    std::string manipState;
+    rendering::VisualPtr vis = userCamera->GetVisual(_event.pos, manipState);
+    this->applyWrenchVisual->GetRotTool()->SetState(manipState);
+
+    if (!vis)
+      return false;
+  }
+
+  return false;
 }

@@ -62,6 +62,12 @@ namespace gazebo
       public: rendering::VisualPtr GetTorqueVisual() const;
 
       /// \brief TODO
+      public: rendering::SelectionObjPtr GetRotTool() const;
+
+      /// \brief TODO
+      public: void SetMode(WrenchModes _mode);
+
+      /// \brief TODO
       public: void UpdateForce(math::Vector3 _forceVector);
 
       /// \brief TODO

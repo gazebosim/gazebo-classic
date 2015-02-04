@@ -19,6 +19,7 @@
 #define _APPLY_WRENCH_DIALOG_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/math/Vector2i.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/ApplyWrenchVisual.hh"
@@ -105,6 +106,21 @@ namespace gazebo
       /// \param[in] _magnitude Torque vector Z component
       private slots: void OnTorqueZChanged(double _fZ);
 
+      /// \brief Callback for a mouse press event.
+      /// \param[in] _event The mouse press event
+      /// \return True if handled by this function.
+      private: bool OnMousePress(const common::MouseEvent &_event);
+
+      /// \brief Callback for a mouse release event.
+      /// \param[in] _event The mouse release event
+      /// \return True if handled by this function.
+      private: bool OnMouseRelease(const common::MouseEvent &_event);
+
+      /// \brief Callback for a mouse move event.
+      /// \param[in] _event The mouse move event
+      /// \return True if handled by this function.
+      private: bool OnMouseMove(const common::MouseEvent &_event);
+
       /// \brief TODO
       private: void SetPublisher();
 
@@ -118,10 +134,16 @@ namespace gazebo
       private: void UpdateForceVector();
 
       /// \brief TODO
+      private: void UpdateForceVector(math::Vector3 _fV);
+
+      /// \brief TODO
       private: void UpdateTorqueMag();
 
       /// \brief TODO
       private: void UpdateTorqueVector();
+
+      /// \brief TODO
+      private: void UpdateTorqueVector(math::Vector3 _fV);
 
       /// \brief TODO
       private: void AttachVisuals();
@@ -191,6 +213,9 @@ namespace gazebo
 
       /// TODO
       private: rendering::ApplyWrenchVisual::WrenchModes wrenchMode;
+
+      /// TODO
+      private: math::Vector2i dragStart;
     };
     /// \}
   }
