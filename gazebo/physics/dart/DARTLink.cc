@@ -248,7 +248,13 @@ void DARTLink::OnPoseChange()
 
     Eigen::Isometry3d Q = T1.inverse() * P.inverse() * W * InvT2;
 
-    // Set generalized coordinate and update the transformations only
+    // Convert homogeneous transformation matrix to 6-dimensional generalized
+    // coordinates. There are several ways of conversions. Here is the way of
+    // DART. The orientation part is converted by using logarithm map, which
+    // maps SO(3) to so(3), and it takes the first three components of the
+    // generalized coordinates. On the other hand, the position part just takes
+    // the last three components of the generalized coordinates without any
+    // conversion.
     Eigen::Vector6d q;
     q.head<3>() = dart::math::logMap(Q.linear());
     q.tail<3>() = Q.translation();
@@ -258,9 +264,11 @@ void DARTLink::OnPoseChange()
     // after the following PR is merged:
     // https://github.com/dartsim/dart/pull/322
 
+    // Update all the transformations of the links in the parent model.
     freeJoint->getSkeleton()->computeForwardKinematics(true, false, false);
-    // TODO: This line will be redundant after the following PR is merged:
-    // https://github.com/dartsim/dart/pull/319
+    // TODO: This kinematic updating will be done automatically after pull
+    // request (https://github.com/dartsim/dart/pull/319) is merged so that
+    // we don't need this line anymore.
   }
   else
   {
