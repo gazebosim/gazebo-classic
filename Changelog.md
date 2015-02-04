@@ -14,6 +14,8 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.0.0
+1. Support for using [digital elevation maps](http://gazebosim.org/tutorials?tut=dem) has been added to debian packages.
+
 1. C++11 support (C++11 compatible compiler is now required)
     * [Pull request #1340](https://bitbucket.org/osrf/gazebo/pull-request/1340)
 
