@@ -1198,6 +1198,63 @@ TEST_F(MsgsTest, InertialToSDF)
 }
 
 /////////////////////////////////////////////////
+TEST_F(MsgsTest, MaterialToSDF)
+{
+  msgs::Material msg;
+
+  const std::string name("Gazebo/Grey");
+  const std::string uri("file://media/materials/scripts/gazebo.material");
+  const msgs::Material::ShaderType type = msgs::Material::VERTEX;
+  const std::string normalMap("normalMap");
+  const bool lighting = true;
+  const common::Color ambient(.1, .2, .3, 1.0);
+  const common::Color diffuse(.4, .5, .6, 1.0);
+  const common::Color emissive(.5, .5, .5, 0.5);
+  const common::Color specular(.7, .8, .9, 1.0);
+
+  msg.mutable_script()->set_name(name);
+  msg.mutable_script()->add_uri();
+  msg.mutable_script()->set_uri(0, uri);
+  msg.set_shader_type(type);
+  msg.set_normal_map(normalMap);
+  msg.set_lighting(lighting);
+  msgs::Set(msg.mutable_ambient(), ambient);
+  msgs::Set(msg.mutable_diffuse(), diffuse);
+  msgs::Set(msg.mutable_emissive(), emissive);
+  msgs::Set(msg.mutable_specular(), specular);
+
+  sdf::ElementPtr materialSDF = msgs::MaterialToSDF(msg);
+
+  {
+    ASSERT_TRUE(materialSDF->HasElement("script"));
+    sdf::ElementPtr scriptElem = materialSDF->GetElement("script");
+    EXPECT_TRUE(scriptElem->HasElement("name"));
+    EXPECT_EQ(name, scriptElem->Get<std::string>("name"));
+    EXPECT_TRUE(scriptElem->HasElement("uri"));
+    EXPECT_EQ(uri, scriptElem->Get<std::string>("uri"));
+  }
+
+  {
+    ASSERT_TRUE(materialSDF->HasElement("shader"));
+    sdf::ElementPtr shaderElem = materialSDF->GetElement("shader");
+    EXPECT_TRUE(shaderElem->HasAttribute("type"));
+    EXPECT_EQ(msgs::ConvertShaderType(type),
+              shaderElem->Get<std::string>("type"));
+    EXPECT_TRUE(shaderElem->HasElement("normal_map"));
+    EXPECT_EQ(normalMap, shaderElem->Get<std::string>("normal_map"));
+  }
+
+  EXPECT_TRUE(materialSDF->HasElement("ambient"));
+  EXPECT_EQ(ambient, materialSDF->Get<common::Color>("ambient"));
+  EXPECT_TRUE(materialSDF->HasElement("diffuse"));
+  EXPECT_EQ(diffuse, materialSDF->Get<common::Color>("diffuse"));
+  EXPECT_TRUE(materialSDF->HasElement("emissive"));
+  EXPECT_EQ(emissive, materialSDF->Get<common::Color>("emissive"));
+  EXPECT_TRUE(materialSDF->HasElement("specular"));
+  EXPECT_EQ(specular, materialSDF->Get<common::Color>("specular"));
+}
+
+/////////////////////////////////////////////////
 TEST_F(MsgsTest, SurfaceToSDF)
 {
   msgs::Surface msg;
