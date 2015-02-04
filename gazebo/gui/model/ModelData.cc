@@ -258,6 +258,44 @@ void PartData::AddCollision(rendering::VisualPtr _collisionVis)
 }
 
 /////////////////////////////////////////////////
+PartData* PartData::Clone(const std::string &_newName)
+{
+  PartData *clonePart = new PartData();
+  clonePart->SetName(_newName);
+  clonePart->SetPose(this->GetPose());
+
+  // clone partVisual;
+  rendering::VisualPtr linkVisual(new rendering::Visual(_newName,
+      this->partVisual->GetParent()));
+  linkVisual->Load();
+
+  clonePart->partVisual = linkVisual;
+
+  std::string partName = this->GetName();
+  std::map<rendering::VisualPtr, msgs::Visual>::iterator visIt;
+  for (visIt = this->visuals.begin(); visIt != this->visuals.end(); ++visIt)
+  {
+    std::string newVisName = visIt->first->GetName();
+    newVisName = _newName + newVisName.substr(
+        newVisName.find(partName) + partName.size());
+
+    clonePart->AddVisual(visIt->first->Clone(newVisName,
+        clonePart->partVisual));
+  }
+  std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
+  for (colIt = this->collisions.begin(); colIt != this->collisions.end();
+      ++colIt)
+  {
+    std::string newColName = colIt->first->GetName();
+    newColName = _newName + newColName.substr(
+        newColName.find(partName) + partName.size());
+    clonePart->AddCollision(colIt->first->Clone(newColName,
+        clonePart->partVisual));
+  }
+  return clonePart;
+}
+
+/////////////////////////////////////////////////
 void PartData::OnApply()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);

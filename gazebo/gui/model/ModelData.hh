@@ -104,6 +104,11 @@ namespace gazebo
       /// \brief Update the inspector widget if necessary.
       public: void UpdateConfig();
 
+      /// \brief Clone the part data.
+      /// \param[in] _newName Name to give to the cloned part.
+      /// \return A clone of this part data.
+      public: PartData* Clone(const std::string &_newName);
+
       /// \brief Update callback on PreRender.
       private: void Update();
 
