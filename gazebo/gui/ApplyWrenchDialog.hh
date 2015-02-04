@@ -29,6 +29,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class ApplyWrenchDialogPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -148,74 +150,9 @@ namespace gazebo
       /// \brief TODO
       private: void AttachVisuals();
 
-      /// \brief Node for communication.
-      private: transport::NodePtr node;
-
-      /// TODO
-      private: std::string linkName;
-
-      /// TODO
-      private: std::string topicName;
-
-      /// TODO
-      private: QLabel *messageLabel;
-
-      /// TODO
-      private: QWidget *pointCollapsibleWidget;
-
-      /// TODO
-      private: QDoubleSpinBox *pointXSpin;
-
-      /// TODO
-      private: QDoubleSpinBox *pointYSpin;
-
-      /// TODO
-      private: QDoubleSpinBox *pointZSpin;
-
-      /// TODO
-      private: QDoubleSpinBox *forceMagSpin;
-
-      /// TODO
-      private: QDoubleSpinBox *forceXSpin;
-
-      /// TODO
-      private: QDoubleSpinBox *forceYSpin;
-
-      /// TODO
-      private: QDoubleSpinBox *forceZSpin;
-
-      /// TODO
-      private: QDoubleSpinBox *torqueMagSpin;
-
-      /// TODO
-      private: QDoubleSpinBox *torqueXSpin;
-
-      /// TODO
-      private: QDoubleSpinBox *torqueYSpin;
-
-      /// TODO
-      private: QDoubleSpinBox *torqueZSpin;
-
-      /// TODO
-      private: math::Vector3 forceVector;
-
-      /// TODO
-      private: math::Vector3 torqueVector;
-
-      /// \brief Publishes the wrench message.
-      private: transport::PublisherPtr wrenchPub;
-
-      /// TODO
-      private: rendering::VisualPtr linkVisual;
-
-      /// TODO
-      private: rendering::ApplyWrenchVisualPtr applyWrenchVisual;
-
-      /// TODO
-      private: rendering::ApplyWrenchVisual::WrenchModes wrenchMode;
-
-      /// TODO
-      private: math::Vector2i dragStart;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: ApplyWrenchDialogPrivate *dataPtr;
     };
     /// \}
   }
