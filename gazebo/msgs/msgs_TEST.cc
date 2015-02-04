@@ -234,11 +234,28 @@ TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
   EXPECT_TRUE(math::equal(1.0, v.d));
 }
 
+//////////////////////////////////////////////////
+void CompareMsgsShaderTypeToString(const msgs::Material::ShaderType _type)
+{
+  EXPECT_EQ(_type, msgs::ConvertShaderType(msgs::ConvertShaderType(_type)));
+}
+
+//////////////////////////////////////////////////
+TEST_F(MsgsTest, ConvertMsgsShaderTypeToString)
+{
+  CompareMsgsShaderTypeToString(msgs::Material::NORMAL_MAP_OBJECT_SPACE);
+  CompareMsgsShaderTypeToString(msgs::Material::NORMAL_MAP_TANGENT_SPACE);
+  CompareMsgsShaderTypeToString(msgs::Material::PIXEL);
+  CompareMsgsShaderTypeToString(msgs::Material::VERTEX);
+}
+
+//////////////////////////////////////////////////
 void CompareMsgsJointTypeToString(const msgs::Joint::Type _type)
 {
   EXPECT_EQ(_type, msgs::ConvertJointType(msgs::ConvertJointType(_type)));
 }
 
+//////////////////////////////////////////////////
 TEST_F(MsgsTest, ConvertMsgsJointTypeToString)
 {
   CompareMsgsJointTypeToString(msgs::Joint::REVOLUTE);
@@ -908,7 +925,10 @@ TEST_F(MsgsTest, LinkToSDF)
 /////////////////////////////////////////////////
 TEST_F(MsgsTest, CollisionToSDF)
 {
+  const std::string name("collision");
+
   msgs::Collision collisionMsg;
+  collisionMsg.set_name(name);
   collisionMsg.set_laser_retro(0.2);
   collisionMsg.set_max_contacts(5);
   msgs::Set(collisionMsg.mutable_pose(),  math::Pose(math::Vector3(1, 2, 3),
@@ -927,6 +947,10 @@ TEST_F(MsgsTest, CollisionToSDF)
   surfaceMsg->set_bounce_threshold(1300);
 
   sdf::ElementPtr collisionSDF = msgs::CollisionToSDF(collisionMsg);
+
+  EXPECT_TRUE(collisionSDF->HasAttribute("name"));
+  EXPECT_EQ(name, collisionSDF->Get<std::string>("name"));
+
   EXPECT_DOUBLE_EQ(collisionSDF->Get<double>("laser_retro"), 0.2);
   EXPECT_DOUBLE_EQ(collisionSDF->Get<double>("max_contacts"), 5);
 
@@ -942,6 +966,58 @@ TEST_F(MsgsTest, CollisionToSDF)
   sdf::ElementPtr bounceElem = surfaceElem->GetElement("bounce");
   EXPECT_DOUBLE_EQ(bounceElem->Get<double>("restitution_coefficient"), 5.1);
   EXPECT_DOUBLE_EQ(bounceElem->Get<double>("threshold"), 1300);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, VisualToSDF)
+{
+  const std::string name("visual");
+  const double laserRetro = 0.2;
+  const math::Pose pose(math::Vector3(1, 2, 3), math::Quaternion(0, 0, 1, 0));
+  const double radius = 3.3;
+  const std::string materialName("Gazebo/Grey");
+  const std::string uri("pretend_this_is_a_URI");
+
+  msgs::Visual visualMsg;
+  visualMsg.set_name(name);
+  visualMsg.set_laser_retro(laserRetro);
+  msgs::Set(visualMsg.mutable_pose(), pose);
+
+  // geometry - see GeometryToSDF for a more detailed test
+  auto geomMsg = visualMsg.mutable_geometry();
+  geomMsg->set_type(msgs::Geometry::SPHERE);
+  geomMsg->mutable_sphere()->set_radius(radius);
+
+  // material - see MaterialToSDF for a more detailed test
+  auto scriptMsg = visualMsg.mutable_material()->mutable_script();
+  scriptMsg->set_name(materialName);
+  scriptMsg->add_uri();
+  scriptMsg->set_uri(0, uri);
+
+  sdf::ElementPtr visualSDF = msgs::VisualToSDF(visualMsg);
+
+  EXPECT_TRUE(visualSDF->HasAttribute("name"));
+  EXPECT_EQ(name, visualSDF->Get<std::string>("name"));
+
+  EXPECT_DOUBLE_EQ(visualSDF->Get<double>("laser_retro"), laserRetro);
+
+  EXPECT_EQ(pose, visualSDF->Get<math::Pose>("pose"));
+
+  ASSERT_TRUE(visualSDF->HasElement("geometry"));
+  sdf::ElementPtr geomElem = visualSDF->GetElement("geometry");
+  EXPECT_TRUE(geomElem->HasElement("sphere"));
+  sdf::ElementPtr sphereElem = geomElem->GetElement("sphere");
+  EXPECT_TRUE(sphereElem->HasElement("radius"));
+  EXPECT_DOUBLE_EQ(sphereElem->Get<double>("radius"), radius);
+
+  ASSERT_TRUE(visualSDF->HasElement("material"));
+  sdf::ElementPtr materialElem = visualSDF->GetElement("material");
+  EXPECT_TRUE(materialElem->HasElement("script"));
+  sdf::ElementPtr scriptElem = materialElem->GetElement("script");
+  EXPECT_TRUE(scriptElem->HasElement("name"));
+  EXPECT_EQ(materialName, scriptElem->Get<std::string>("name"));
+  EXPECT_TRUE(scriptElem->HasElement("uri"));
+  EXPECT_EQ(uri, scriptElem->Get<std::string>("uri"));
 }
 
 /////////////////////////////////////////////////
@@ -1128,33 +1204,113 @@ TEST_F(MsgsTest, MeshToSDF)
 /////////////////////////////////////////////////
 TEST_F(MsgsTest, InertialToSDF)
 {
+  const double mass = 3.4;
+  const math::Pose pose = math::Pose(math::Vector3(1.2, 3.4, 5.6),
+      math::Quaternion(0.7071, 0.0, 0.7071, 0.0));
+  const double ixx = 0.0133;
+  const double ixy = -0.0003;
+  const double ixz = -0.0004;
+  const double iyy = 0.0116;
+  const double iyz = 0.0008;
+  const double izz = 0.0038;
+
   msgs::Inertial msg;
-  msg.set_mass(3.4);
-  msgs::Set(msg.mutable_pose(), math::Pose(math::Vector3(1.2, 3.4, 5.6),
-      math::Quaternion(0.7071, 0.0, 0.7071, 0.0)));
-  msg.set_ixx(0.0133);
-  msg.set_ixy(-0.0003);
-  msg.set_ixz(-0.0004);
-  msg.set_iyy(0.0116);
-  msg.set_iyz(0.0008);
-  msg.set_izz(0.0038);
+  msg.set_mass(mass);
+  msgs::Set(msg.mutable_pose(), pose);
+  msg.set_ixx(ixx);
+  msg.set_ixy(ixy);
+  msg.set_ixz(ixz);
+  msg.set_iyy(iyy);
+  msg.set_iyz(iyz);
+  msg.set_izz(izz);
 
   sdf::ElementPtr inertialSDF = msgs::InertialToSDF(msg);
 
-  EXPECT_DOUBLE_EQ(inertialSDF->Get<double>("mass"), 3.4);
+  EXPECT_TRUE(inertialSDF->HasElement("mass"));
+  EXPECT_DOUBLE_EQ(inertialSDF->Get<double>("mass"), mass);
 
-  EXPECT_TRUE(inertialSDF->Get<math::Pose>("pose") ==
-      math::Pose(math::Vector3(1.2, 3.4, 5.6),
-      math::Quaternion(0.7071, 0.0, 0.7071, 0.0)));
+  EXPECT_TRUE(inertialSDF->HasElement("pose"));
+  EXPECT_EQ(inertialSDF->Get<math::Pose>("pose"), pose);
 
-  // inertia
-  sdf::ElementPtr inertiaElem = inertialSDF->GetElement("inertia");
-  EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("ixx"), 0.0133);
-  EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("ixy"), -0.0003);
-  EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("ixz"), -0.0004);
-  EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("iyy"), 0.0116);
-  EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("iyz"), 0.0008);
-  EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("izz"), 0.0038);
+  {
+    ASSERT_TRUE(inertialSDF->HasElement("inertia"));
+    sdf::ElementPtr inertiaElem = inertialSDF->GetElement("inertia");
+
+    EXPECT_TRUE(inertiaElem->HasElement("ixx"));
+    EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("ixx"), ixx);
+
+    EXPECT_TRUE(inertiaElem->HasElement("ixy"));
+    EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("ixy"), ixy);
+
+    EXPECT_TRUE(inertiaElem->HasElement("ixz"));
+    EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("ixz"), ixz);
+
+    EXPECT_TRUE(inertiaElem->HasElement("iyy"));
+    EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("iyy"), iyy);
+
+    EXPECT_TRUE(inertiaElem->HasElement("iyz"));
+    EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("iyz"), iyz);
+
+    EXPECT_TRUE(inertiaElem->HasElement("izz"));
+    EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("izz"), izz);
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, MaterialToSDF)
+{
+  msgs::Material msg;
+
+  const std::string name("Gazebo/Grey");
+  const std::string uri("file://media/materials/scripts/gazebo.material");
+  const msgs::Material::ShaderType type = msgs::Material::VERTEX;
+  const std::string normalMap("normalMap");
+  const bool lighting = true;
+  const common::Color ambient(.1, .2, .3, 1.0);
+  const common::Color diffuse(.4, .5, .6, 1.0);
+  const common::Color emissive(.5, .5, .5, 0.5);
+  const common::Color specular(.7, .8, .9, 1.0);
+
+  msg.mutable_script()->set_name(name);
+  msg.mutable_script()->add_uri();
+  msg.mutable_script()->set_uri(0, uri);
+  msg.set_shader_type(type);
+  msg.set_normal_map(normalMap);
+  msg.set_lighting(lighting);
+  msgs::Set(msg.mutable_ambient(), ambient);
+  msgs::Set(msg.mutable_diffuse(), diffuse);
+  msgs::Set(msg.mutable_emissive(), emissive);
+  msgs::Set(msg.mutable_specular(), specular);
+
+  sdf::ElementPtr materialSDF = msgs::MaterialToSDF(msg);
+
+  {
+    ASSERT_TRUE(materialSDF->HasElement("script"));
+    sdf::ElementPtr scriptElem = materialSDF->GetElement("script");
+    EXPECT_TRUE(scriptElem->HasElement("name"));
+    EXPECT_EQ(name, scriptElem->Get<std::string>("name"));
+    EXPECT_TRUE(scriptElem->HasElement("uri"));
+    EXPECT_EQ(uri, scriptElem->Get<std::string>("uri"));
+  }
+
+  {
+    ASSERT_TRUE(materialSDF->HasElement("shader"));
+    sdf::ElementPtr shaderElem = materialSDF->GetElement("shader");
+    EXPECT_TRUE(shaderElem->HasAttribute("type"));
+    EXPECT_EQ(msgs::ConvertShaderType(type),
+              shaderElem->Get<std::string>("type"));
+    EXPECT_TRUE(shaderElem->HasElement("normal_map"));
+    EXPECT_EQ(normalMap, shaderElem->Get<std::string>("normal_map"));
+  }
+
+  EXPECT_TRUE(materialSDF->HasElement("ambient"));
+  EXPECT_EQ(ambient, materialSDF->Get<common::Color>("ambient"));
+  EXPECT_TRUE(materialSDF->HasElement("diffuse"));
+  EXPECT_EQ(diffuse, materialSDF->Get<common::Color>("diffuse"));
+  EXPECT_TRUE(materialSDF->HasElement("emissive"));
+  EXPECT_EQ(emissive, materialSDF->Get<common::Color>("emissive"));
+  EXPECT_TRUE(materialSDF->HasElement("specular"));
+  EXPECT_EQ(specular, materialSDF->Get<common::Color>("specular"));
 }
 
 /////////////////////////////////////////////////
@@ -1163,12 +1319,18 @@ TEST_F(MsgsTest, SurfaceToSDF)
   msgs::Surface msg;
 
   // friction
+  const double mu = 0.1;
+  const double mu2 = 0.2;
+  const math::Vector3 fdir1(0.3, 0.4, 0.5);
+  const double slip1 = 0.6;
+  const double slip2 = 0.7;
+
   msgs::Friction *friction = msg.mutable_friction();
-  friction->set_mu(0.1);
-  friction->set_mu2(0.2);
-  msgs::Set(friction->mutable_fdir1(), math::Vector3(0.3, 0.4, 0.5));
-  friction->set_slip1(0.6);
-  friction->set_slip2(0.7);
+  friction->set_mu(mu);
+  friction->set_mu2(mu2);
+  msgs::Set(friction->mutable_fdir1(), fdir1);
+  friction->set_slip1(slip1);
+  friction->set_slip2(slip2);
 
   // bounce
   msg.set_restitution_coefficient(1.1);
@@ -1187,12 +1349,11 @@ TEST_F(MsgsTest, SurfaceToSDF)
   sdf::ElementPtr surfaceSDF = msgs::SurfaceToSDF(msg);
   sdf::ElementPtr frictionElem = surfaceSDF->GetElement("friction");
   sdf::ElementPtr frictionPhysicsElem = frictionElem->GetElement("ode");
-  EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("mu"), 0.1);
-  EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("mu2"), 0.2);
-  EXPECT_TRUE(frictionPhysicsElem->Get<math::Vector3>("fdir1") ==
-      math::Vector3(0.3, 0.4, 0.5));
-  EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("slip1"), 0.6);
-  EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("slip2"), 0.7);
+  EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("mu"), mu);
+  EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("mu2"), mu2);
+  EXPECT_TRUE(frictionPhysicsElem->Get<math::Vector3>("fdir1") == fdir1);
+  EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("slip1"), slip1);
+  EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("slip2"), slip2);
 
   sdf::ElementPtr bounceElem = surfaceSDF->GetElement("bounce");
   EXPECT_DOUBLE_EQ(bounceElem->Get<double>("restitution_coefficient"), 1.1);
