@@ -620,16 +620,18 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent & _event)
 
   this->dataPtr->dragStart = math::Vector2i(0, 0);
 
-  std::string manipState;
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos, manipState);
-  this->dataPtr->applyWrenchVisual->GetRotTool()->SetState(manipState);
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos,
+        this->dataPtr->manipState);
 
   if (vis)
     return false;
 
   // Register drag start point if on top of a handle
-  if (manipState == "rot_x" || manipState == "rot_y")
+  if (this->dataPtr->manipState == "rot_x" ||
+      this->dataPtr->manipState == "rot_y")
   {
+    this->dataPtr->applyWrenchVisual->GetRotTool()->SetState(
+        this->dataPtr->manipState);
     this->dataPtr->dragStart = _event.pressPos;
   }
 
@@ -649,17 +651,65 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
   if (!userCamera)
     return false;
 
-  // Dragging
+  // Dragging tool
   if (_event.dragging && _event.button == common::MouseEvent::LEFT &&
       this->dataPtr->dragStart.x != 0)
   {
     // TODO: calculate proper displacement
-//    math::Vector3 dist = ModelManipulator::GetMouseMoveDistance(userCamera,
-//        this->dataPtr->dragStart, _event.pressPos,
-//        this->dataPtr->forceVisual->GetWorldPose(), math::Vector3::UnitX, true);
 
-    math::Vector3 vec = math::Vector3(-1, -1, -1);
+    math::Pose rotToolPose = this->dataPtr->applyWrenchVisual->GetRotTool()
+        ->GetWorldPose();
 
+    math::Vector3 normal;
+    if (this->dataPtr->manipState == "rot_x")
+    {
+      normal = math::Vector3::UnitZ;
+    }
+    else if (this->dataPtr->manipState == "rot_y")
+    {
+      normal = math::Vector3::UnitY;
+    }
+    else
+    {
+      gzerr << "Manipulation state not supported." << std::endl;
+      return false;
+    }
+
+    double offset = rotToolPose.pos.Dot(normal);
+
+    math::Vector3 pressPoint;
+    userCamera->GetWorldPointOnPlane(_event.pressPos.x, _event.pressPos.y,
+          math::Plane(normal, offset), pressPoint);
+
+    math::Vector3 newPoint;
+    userCamera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
+        math::Plane(normal, offset), newPoint);
+
+    math::Vector3 v1 = pressPoint - rotToolPose.pos;
+    math::Vector3 v2 = newPoint - rotToolPose.pos;
+    v1 = v1.Normalize();
+    v2 = v2.Normalize();
+    double signTest = v1.Cross(v2).Dot(normal);
+    double angle = atan2((v1.Cross(v2)).GetLength(), v1.Dot(v2));
+
+    if (signTest < 0 )
+      angle *= -1;
+
+    if (_event.control)
+      angle = rint(angle / (M_PI * 0.25)) * (M_PI * 0.25);
+
+    math::Quaternion rot(normal, angle);
+
+    math::Vector3 vec;
+    if (this->dataPtr->manipState == "rot_x")
+    {
+      vec = rot.RotateVector(-math::Vector3::UnitY);
+    }
+    else
+    {
+      vec = rot.RotateVector(-math::Vector3::UnitZ);
+    }
+    //math::Vector3 vec = rot.RotateVector(-this->dataPtr->forceVector);
     if (this->dataPtr->wrenchMode == rendering::ApplyWrenchVisual::FORCE)
     {
       this->UpdateForceVector(vec);
@@ -668,16 +718,19 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
     {
       this->UpdateTorqueVector(vec);
     }
+    return true;
   }
   // Highlight hovered tools
   else
   {
-    std::string manipState;
-    rendering::VisualPtr vis = userCamera->GetVisual(_event.pos, manipState);
-    this->dataPtr->applyWrenchVisual->GetRotTool()->SetState(manipState);
+    userCamera->GetVisual(_event.pos, this->dataPtr->manipState);
 
-    if (!vis)
-      return false;
+    if (this->dataPtr->manipState == "rot_x" ||
+      this->dataPtr->manipState == "rot_y")
+    {
+      this->dataPtr->applyWrenchVisual->GetRotTool()->SetState(
+          this->dataPtr->manipState);
+    }
   }
 
   return false;

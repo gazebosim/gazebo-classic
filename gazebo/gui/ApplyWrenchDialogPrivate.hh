@@ -92,6 +92,9 @@ namespace gazebo
 
       /// TODO
       public: math::Vector2i dragStart;
+
+      /// TODO
+      public: std::string manipState;
     };
   }
 }
