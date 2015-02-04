@@ -90,7 +90,19 @@ void ContactSensor::Load(const std::string &_worldName)
   sdf::ElementPtr collisionElem =
     this->sdf->GetElement("contact")->GetElement("collision");
 
-  std::string entityName = this->parentName + "::" + this->GetName();
+  std::string entityName =
+      this->world->GetEntity(this->parentName)->GetScopedName();
+  std::string filterName;
+  {
+    // If we create the filter with this->GetScopedName(),
+    // it will have the world name twice, such as:
+    // /gazebo/default/default/sensor_box/link/box_contact/contacts
+    // so remove the world:: prefix
+    filterName = this->GetScopedName();
+    size_t i = filterName.find("::");
+    if (i+2 < filterName.length())
+      filterName = filterName.substr(i+2);
+  }
 
   // Get all the collision elements
   while (collisionElem)
@@ -111,7 +123,7 @@ void ContactSensor::Load(const std::string &_worldName)
     // this sensor
     physics::ContactManager *mgr =
         this->world->GetPhysicsEngine()->GetContactManager();
-    std::string topic = mgr->CreateFilter(entityName, this->collisions);
+    std::string topic = mgr->CreateFilter(filterName, this->collisions);
     if (!this->contactSub)
     {
       this->contactSub = this->node->Subscribe(topic,
@@ -204,12 +216,17 @@ void ContactSensor::Fini()
 {
   if (this->world && this->world->GetRunning())
   {
-    std::string entityName =
-        this->world->GetEntity(this->parentName)->GetScopedName();
+    std::string filterName;
+    {
+      filterName = this->GetScopedName();
+      size_t i = filterName.find("::");
+      if (i+2 < filterName.length())
+        filterName = filterName.substr(i+2);
+    }
 
     physics::ContactManager *mgr =
         this->world->GetPhysicsEngine()->GetContactManager();
-    mgr->RemoveFilter(entityName);
+    mgr->RemoveFilter(filterName);
   }
 
   this->contactSub.reset();
