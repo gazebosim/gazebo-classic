@@ -39,7 +39,7 @@ namespace gazebo
     {
       Q_OBJECT
 
-      /// \enum EntityType
+      /// \enum EntityTypes
       /// \brief Unique identifiers for the type of entity this menu is
       /// attached to.
       public: enum EntityTypes {
