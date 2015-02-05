@@ -955,13 +955,13 @@ void JointData::OnApply()
     this->lowerLimit[i] = this->inspector->GetLowerLimit(i);
     this->upperLimit[i] = this->inspector->GetUpperLimit(i);
   }
-  gui::model::Events::modelChanged();
   this->dirty = true;
   gui::model::Events::modelChanged();
 }
 
 /////////////////////////////////////////////////
-void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem)
+void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
+    const std::string &_modelName)
 {
   JointData *joint = new JointData();
   joint->dirty = true;
@@ -980,13 +980,16 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem)
   joint->pose = jointPose;
 
   // Parent
-  std::string parentName = _jointElem->GetElement("parent")->GetValue()->GetAsString();
+  std::string parentName = _modelName + "::" +
+      _jointElem->GetElement("parent")->GetValue()->GetAsString();
+
   rendering::VisualPtr parentVis =
       gui::get_active_camera()->GetScene()->GetVisual(parentName);
   joint->parent = parentVis;
 
   // Child
-  std::string childName = _jointElem->GetElement("child")->GetValue()->GetAsString();
+  std::string childName = _modelName + "::" +
+      _jointElem->GetElement("child")->GetValue()->GetAsString();
   rendering::VisualPtr childVis =
       gui::get_active_camera()->GetScene()->GetVisual(childName);
   joint->child = childVis;

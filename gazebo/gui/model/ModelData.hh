@@ -98,7 +98,7 @@ namespace gazebo
       public: void AddVisual(rendering::VisualPtr _visual);
 
       /// \brief Add a collision to the part.
-      /// \param[in] _collision Visual representing the collision.
+      /// \param[in] _collisionVis Visual representing the collision.
       public: void AddCollision(rendering::VisualPtr _collisionVis);
 
       /// \brief Update the inspector widget if necessary.
@@ -135,7 +135,7 @@ namespace gazebo
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief Mutex to protect the list of joints
+      /// \brief Mutex to protect visual and collision update messages.
       private: boost::recursive_mutex *updateMutex;
 
       /// \brief SDF representing the part data.

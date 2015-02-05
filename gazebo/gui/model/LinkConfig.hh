@@ -15,7 +15,7 @@
  *
 */
 
-#ifndef _Link_CONFIG_HH_
+#ifndef _LINK_CONFIG_HH_
 #define _LINK_CONFIG_HH_
 
 #include <string>
@@ -35,7 +35,7 @@ namespace gazebo
     /// \{
 
     /// \class LinkConfig LinkConfig.hh
-    /// \brief A tab for configuring general properties of a part.
+    /// \brief A tab for configuring properties of a link.
     class LinkConfig : public QWidget
     {
       Q_OBJECT

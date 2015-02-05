@@ -249,10 +249,12 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
 
-      /// \brief Create part with default properties from a visual
+      /// \brief Create part with default properties from a visual. This
+      /// function creates a link that will become the parent of the
+      /// input visual. A collision visual with the same geometry as the input
+      /// visual will also be added to the link.
       /// \param[in] _visual Visual used to create the part.
-      /// \return Newly created part.
-      private: PartData *CreatePart(const rendering::VisualPtr &_visual);
+      private: void CreatePart(const rendering::VisualPtr &_visual);
 
       /// \brief Clone an existing part.
       /// \param[in] _partName Name of part to be cloned.
@@ -394,7 +396,7 @@ namespace gazebo
       private: enum SaveState currentSaveState;
 
       /// \brief A list of model sdfs to load in the model editor.
-//      private: std::vector<sdf::ElementPtr> sdfToLoad;
+      private: std::vector<sdf::ElementPtr> sdfToLoad;
 
       /// \brief Mutex to protect allParts
       private: boost::recursive_mutex *updateMutex;

@@ -154,7 +154,8 @@ namespace gazebo
       public: unsigned int GetJointCount();
 
       /// \brief TODO
-      public: void CreateJointFromSDF(sdf::ElementPtr _jointElem);
+      public: void CreateJointFromSDF(sdf::ElementPtr _jointElem,
+          const std::string &_modelName = "");
 
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.

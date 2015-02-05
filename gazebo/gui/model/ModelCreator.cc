@@ -75,7 +75,7 @@ ModelCreator::ModelCreator()
   this->jointMaker = new JointMaker();
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
-  this->inspectAct = new QAction(tr("Open Part Inspector"), this);
+  this->inspectAct = new QAction(tr("Open Link Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this,
       SLOT(OnOpenInspector()));
 
@@ -239,9 +239,9 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
           transport::requestNoReply(this->node, "entity_delete", _modelName);
 
 //          std::cerr << " loading model " << model->ToString("") << std::endl;
-          this->LoadSDF(model);
+//          this->LoadSDF(model);
           boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-//          this->sdfToLoad.push_back(model);
+          this->sdfToLoad.push_back(model);
         }
         model = model->GetNextElement("model");
       }
@@ -279,12 +279,14 @@ void ModelCreator::LoadSDF(sdf::ElementPtr _modelElem)
   }
 
   // Joints
+  std::stringstream preivewModelName;
+  preivewModelName << this->previewName << "_" << this->modelCounter;
   sdf::ElementPtr jointElem;
   if (_modelElem->HasElement("joint"))
      jointElem = _modelElem->GetElement("joint");
   while (jointElem)
   {
-    this->jointMaker->CreateJointFromSDF(jointElem);
+    this->jointMaker->CreateJointFromSDF(jointElem, preivewModelName.str());
     jointElem = jointElem->GetNextElement("joint");
   }
 }
@@ -679,7 +681,7 @@ std::string ModelCreator::AddCustom(const std::string &_path,
 }
 
 /////////////////////////////////////////////////
-PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
+void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 {
   PartData *part = new PartData();
   part->partVisual = _visual->GetParent();
@@ -716,7 +718,6 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 
   this->ModelChanged();
 
-  return part;
 }
 
 /////////////////////////////////////////////////
@@ -1705,10 +1706,10 @@ void ModelCreator::Update()
     }
   }
 
-/*  for (unsigned int i = 0; i < this->sdfToLoad.size(); ++i)
+  for (unsigned int i = 0; i < this->sdfToLoad.size(); ++i)
     this->LoadSDF(this->sdfToLoad[i]);
 
-  this->sdfToLoad.clear();*/
+  this->sdfToLoad.clear();
 
 
 }

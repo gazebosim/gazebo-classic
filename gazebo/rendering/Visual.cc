@@ -2287,7 +2287,8 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
             gzerr << "No mesh found\n";
 
           this->AttachMesh(meshName);
-          geomElem->AddElement(newGeometryType);
+          sdf::ElementPtr meshElem = geomElem->AddElement(newGeometryType);
+          meshElem->GetElement("uri")->Set(filename);
         }
       }
       this->SetTransparency(origTransparency);
