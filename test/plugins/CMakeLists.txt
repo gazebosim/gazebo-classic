@@ -27,3 +27,18 @@ foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
   target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries})
 endforeach (src ${plugins})
+
+set ( qt_plugins
+  Issue1434Plugin
+)
+
+include (${QT_USE_FILE})
+add_definitions(${QT_DEFINITIONS})
+
+foreach (src ${qt_plugins})
+  QT4_WRAP_CPP(headers_MOC ${src}.hh)
+
+  add_library(${src} SHARED ${headers_MOC} ${src}.cc)
+  target_link_libraries(${src} ${GAZEBO_LIBRARIES} ${OGRE_LIBRARIES}
+    ${QT_LIRARIES})
+endforeach (src ${qt_plugins})
