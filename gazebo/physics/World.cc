@@ -718,7 +718,7 @@ void World::Update()
       boost::recursive_mutex::scoped_lock lock(
         *this->dataPtr->physicsEngine->GetPhysicsUpdateMutex());
 
-      for (auto & iter : this->dataPtr->dirtyPoses)
+      for (auto &iter : this->dataPtr->dirtyPoses)
       {
         iter->SetWorldPose(iter->GetDirtyPose(), false);
       }
@@ -791,7 +791,7 @@ void World::ClearModels()
   this->dataPtr->publishModelPoses.clear();
 
   // Remove all models
-  for (auto & iter : this->dataPtr->models)
+  for (auto &iter : this->dataPtr->models)
   {
     this->dataPtr->rootElement->RemoveChild(iter->GetId());
   }
@@ -1010,7 +1010,7 @@ void World::Reset()
 
     this->ResetTime();
     this->ResetEntities(Base::BASE);
-    for (auto & iter : this->dataPtr->plugins)
+    for (auto &iter : this->dataPtr->plugins)
     {
       iter->Reset();
     }
@@ -1315,7 +1315,7 @@ void World::ProcessEntityMsgs()
 {
   boost::mutex::scoped_lock lock(this->dataPtr->entityDeleteMutex);
 
-  for (auto & iter : this->dataPtr->deleteEntity)
+  for (auto &iter : this->dataPtr->deleteEntity)
   {
     this->RemoveModel(iter);
   }
@@ -1333,7 +1333,7 @@ void World::ProcessRequestMsgs()
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   msgs::Response response;
 
-  for (auto const & iter : this->dataPtr->requestMsgs)
+  for (auto const &iter : this->dataPtr->requestMsgs)
   {
     bool send = true;
     response.set_id(iter.id());
@@ -1468,7 +1468,7 @@ void World::ProcessRequestMsgs()
 void World::ProcessModelMsgs()
 {
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-  for (auto const & iter : this->dataPtr->modelMsgs)
+  for (auto const &iter : this->dataPtr->modelMsgs)
   {
     ModelPtr model;
     if (iter.has_id())
@@ -1522,7 +1522,7 @@ void World::ProcessFactoryMsgs()
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-    for (auto const & iter : this->dataPtr->factoryMsgs)
+    for (auto const &iter : this->dataPtr->factoryMsgs)
     {
       this->dataPtr->factorySDF->root->ClearElements();
 
@@ -1661,7 +1661,7 @@ void World::ProcessFactoryMsgs()
     this->dataPtr->factoryMsgs.clear();
   }
 
-  for (auto const & iter : modelsToLoad)
+  for (auto const &iter : modelsToLoad)
   {
     try
     {
@@ -1715,7 +1715,7 @@ void World::SetState(const WorldState &_state)
   this->dataPtr->logRealTime = _state.GetRealTime();
 
   const ModelState_M modelStates = _state.GetModelStates();
-  for (auto const & iter : modelStates)
+  for (auto const &iter : modelStates)
   {
     ModelPtr model = this->GetModel(iter.second.GetName());
     if (model)
@@ -1764,7 +1764,7 @@ std::string World::StripWorldName(const std::string &_name) const
 //////////////////////////////////////////////////
 void World::EnableAllModels()
 {
-  for (auto & iter : this->dataPtr->models)
+  for (auto &iter : this->dataPtr->models)
   {
     iter->SetEnabled(true);
   }
@@ -1773,7 +1773,7 @@ void World::EnableAllModels()
 //////////////////////////////////////////////////
 void World::DisableAllModels()
 {
-  for (auto & iter : this->dataPtr->models)
+  for (auto &iter : this->dataPtr->models)
   {
     iter->SetEnabled(false);
   }
@@ -1810,7 +1810,7 @@ bool World::OnLog(std::ostringstream &_stream)
       boost::mutex::scoped_lock lock(this->dataPtr->logBufferMutex);
       this->dataPtr->currentStateBuffer ^= 1;
     }
-    for (auto const & iter : this->dataPtr->states[bufferIndex])
+    for (auto const &iter : this->dataPtr->states[bufferIndex])
     {
       _stream << "<sdf version='" << SDF_VERSION << "'>" << iter << "</sdf>";
     }
@@ -1871,7 +1871,7 @@ void World::ProcessMessages()
 
       if (!this->dataPtr->publishModelPoses.empty())
       {
-        for (auto const & iter : this->dataPtr->publishModelPoses)
+        for (auto const &iter : this->dataPtr->publishModelPoses)
         {
           msgs::Pose *poseMsg = msg.add_pose();
 
@@ -1882,7 +1882,7 @@ void World::ProcessMessages()
 
           // Publish each of the model's children relative poses
           Link_V links = iter->GetLinks();
-          for (auto const & linkIter : links)
+          for (auto const &linkIter : links)
           {
             poseMsg = msg.add_pose();
             poseMsg->set_name(linkIter->GetScopedName());

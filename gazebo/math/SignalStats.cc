@@ -144,7 +144,7 @@ size_t SignalStats::Count() const
 std::map<std::string, double> SignalStats::Map() const
 {
   std::map<std::string, double> map;
-  for (auto const & iter : this->dataPtr->stats)
+  for (auto const &iter : this->dataPtr->stats)
   {
     map[iter->ShortName()] = iter->Value();
   }
@@ -154,7 +154,7 @@ std::map<std::string, double> SignalStats::Map() const
 //////////////////////////////////////////////////
 void SignalStats::InsertData(const double _data)
 {
-  for (auto & iter : this->dataPtr->stats)
+  for (auto &iter : this->dataPtr->stats)
   {
     iter->InsertData(_data);
   }
@@ -218,7 +218,7 @@ bool SignalStats::InsertStatistics(const std::string &_names)
   bool result = true;
   std::vector<std::string> names;
   boost::split(names, _names, boost::is_any_of(","));
-  for (auto & iter : names)
+  for (auto &iter : names)
   {
     result = result && this->InsertStatistic(iter);
   }
@@ -228,7 +228,7 @@ bool SignalStats::InsertStatistics(const std::string &_names)
 //////////////////////////////////////////////////
 void SignalStats::Reset()
 {
-  for (auto & iter : this->dataPtr->stats)
+  for (auto &iter : this->dataPtr->stats)
   {
     iter->Reset();
   }
