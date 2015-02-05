@@ -616,18 +616,15 @@ void ModelCreator::RemovePart(const std::string &_partName)
     return;
 
   rendering::ScenePtr scene = part->partVisual->GetScene();
-  std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
-  for (it = part->visuals.begin(); it != part->visuals.end(); ++it)
+  for (auto &it : part->visuals)
   {
-    rendering::VisualPtr vis = it->first;
+    rendering::VisualPtr vis = it.first;
     scene->RemoveVisual(vis);
   }
   scene->RemoveVisual(part->partVisual);
-  std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
-  for (colIt = part->collisions.begin(); colIt != part->collisions.end();
-      ++colIt)
+  for (auto &colIt : part->collisions)
   {
-    rendering::VisualPtr vis = colIt->first;
+    rendering::VisualPtr vis = colIt.first;
     scene->RemoveVisual(vis);
   }
 
@@ -1120,8 +1117,7 @@ void ModelCreator::OnPaste()
   }
 
   // For now, only copy the last selected model
-  std::map<std::string, PartData *>::iterator it =
-      this->allParts.find(this->copiedPartNames.back());
+  auto it = this->allParts.find(this->copiedPartNames.back());
   if (it != this->allParts.end())
   {
     PartData *copiedPart = it->second;
@@ -1211,12 +1207,10 @@ void ModelCreator::GenerateSDF()
   modelElem->GetAttribute("name")->Set(this->folderName);
 
   // set center of all parts to be origin
-  std::map<std::string, PartData *>::iterator partsIt;
   math::Vector3 mid;
-  for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
-       ++partsIt)
+  for (auto &partsIt : this->allParts)
   {
-    PartData *part = partsIt->second;
+    PartData *part = partsIt.second;
     mid += part->GetPose().pos;
   }
   mid /= this->allParts.size();
@@ -1224,13 +1218,12 @@ void ModelCreator::GenerateSDF()
   modelElem->GetElement("pose")->Set(this->origin);
 
   // loop through all parts and generate sdf
-  for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
-       ++partsIt)
+  for (auto &partsIt : this->allParts)
   {
     visualNameStream.str("");
     collisionNameStream.str("");
 
-    PartData *part = partsIt->second;
+    PartData *part = partsIt.second;
     part->UpdateConfig();
 
     sdf::ElementPtr newLinkElem = part->partSDF->Clone();
@@ -1240,11 +1233,10 @@ void ModelCreator::GenerateSDF()
     modelElem->InsertElement(newLinkElem);
 
     // visuals
-    std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
-    for (it = part->visuals.begin(); it != part->visuals.end(); ++it)
+    for (auto const &it : part->visuals)
     {
-      rendering::VisualPtr visual = it->first;
-      msgs::Visual visualMsg = it->second;
+      rendering::VisualPtr visual = it.first;
+      msgs::Visual visualMsg = it.second;
       sdf::ElementPtr visualElem = visual->GetSDF()->Clone();
       visualElem->GetElement("transparency")->Set<double>(
           visualMsg.transparency());
@@ -1252,11 +1244,9 @@ void ModelCreator::GenerateSDF()
     }
 
     // collisions
-    std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
-    for (colIt = part->collisions.begin(); colIt != part->collisions.end();
-        ++colIt)
+    for (auto const &colIt : part->collisions)
     {
-      sdf::ElementPtr collisionElem = msgs::CollisionToSDF(colIt->second);
+      sdf::ElementPtr collisionElem = msgs::CollisionToSDF(colIt.second);
       newLinkElem->InsertElement(collisionElem);
     }
   }
@@ -1347,11 +1337,9 @@ void ModelCreator::ModelChanged()
 void ModelCreator::Update()
 {
   // Check if any parts have been moved or resized and trigger ModelChanged
-  std::map<std::string, PartData *>::iterator partsIt;
-  for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
-       ++partsIt)
+  for (auto &partsIt : this->allParts)
   {
-    PartData *part = partsIt->second;
+    PartData *part = partsIt.second;
     if (part->GetPose() != part->partVisual->GetWorldPose() ||
         part->scale != part->partVisual->GetScale())
     {
