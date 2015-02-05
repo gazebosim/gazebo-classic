@@ -914,6 +914,9 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 
   if (this->mouseVisual)
   {
+    if (_event.button == common::MouseEvent::RIGHT)
+      return true;
+
     // set the part data pose
     if (this->allParts.find(this->mouseVisual->GetName()) !=
         this->allParts.end())

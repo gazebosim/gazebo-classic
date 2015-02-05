@@ -1200,6 +1200,9 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   widget->geomFilenameLabel = geomFilenameLabel;
   widget->geomFilenameLineEdit = geomFilenameLineEdit;
 
+  geomFilenameLabel->setVisible(false);
+  geomFilenameLineEdit->setVisible(false);
+
   connect(geometryComboBox,
     SIGNAL(currentIndexChanged(const QString)),
     widget, SLOT(GeometryChanged(const QString)));
@@ -1972,7 +1975,7 @@ void GeometryConfigWidget::GeometryChanged(const QString _text)
   if (widget)
   {
     std::string textStr = _text.toStdString();
-    bool isMesh = textStr == "mesh";
+    bool isMesh = (textStr == "mesh");
     if (textStr == "box" || isMesh)
     {
       this->geomDimensionWidget->setCurrentIndex(0);
