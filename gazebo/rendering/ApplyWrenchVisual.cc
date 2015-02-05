@@ -231,6 +231,9 @@ math::Quaternion ApplyWrenchVisual::GetQuaternionFromVector(math::Vector3 _vec)
   double cosTheta = v.Dot(_vec);
   double angle = acos(cosTheta);
   math::Quaternion quat;
+
+  std::cout << GZ_RTOD(angle) << std::endl;
+
   if (math::equal(angle, M_PI))
     quat.SetFromAxis(_vec.GetPerpendicular(), angle);
   else
