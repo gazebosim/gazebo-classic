@@ -219,12 +219,12 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
 
   // Record statistics on pitch and yaw angles
   this->Record("energy0", E0);
-  this->Record("energyError", energyError);
+  this->Record("energyError_", energyError);
   this->Record("angMomentum0", H0mag);
-  this->Record("angMomentumErr", angularMomentumError.Mag());
-  this->Record("angPositionErr", angularPositionError.Mag());
-  this->Record("linPositionErr", linearPositionError.Mag());
-  this->Record("linVelocityErr", linearVelocityError.Mag());
+  this->Record("angMomentumErr_", angularMomentumError.Mag());
+  this->Record("angPositionErr_", angularPositionError.Mag());
+  this->Record("linPositionErr_", linearPositionError.Mag());
+  this->Record("linVelocityErr_", linearVelocityError.Mag());
 }
 
 /////////////////////////////////////////////////
