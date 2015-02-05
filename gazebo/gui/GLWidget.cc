@@ -345,9 +345,9 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   // Process Key Events
   if (!KeyEventHandler::Instance()->HandlePress(this->keyEvent))
   {
-    // issue #1439: model editor exit pop-up message is modal so can block
-    // event propagation. So using hotkeys to exit will leave the control
-    // variable in a bad state - manually override and reset the control value.
+    // model editor exit pop-up message is modal so can block event propagation.
+    // So using hotkeys to exit will leave the control variable in a bad state.
+    // Manually override and reset the control value.
     if (this->modelEditorEnabled && this->mouseEvent.control)
       this->mouseEvent.control = false;
 
