@@ -643,6 +643,7 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent & _event)
     this->dataPtr->applyWrenchVisual->GetRotTool()->SetState(
         this->dataPtr->manipState);
     this->dataPtr->dragStart = _event.pressPos;
+
     if (this->dataPtr->wrenchMode == rendering::ApplyWrenchVisual::FORCE)
     {
       this->dataPtr->dragStartVector = this->dataPtr->forceVector;
@@ -651,8 +652,19 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent & _event)
     {
       this->dataPtr->dragStartVector = this->dataPtr->torqueVector;
     }
-  }
 
+    math::Pose rotToolPose = this->dataPtr->applyWrenchVisual->GetRotTool()
+        ->GetWorldPose();
+
+    if (this->dataPtr->manipState == "rot_z")
+    {
+      this->dataPtr->dragStartNormal = rotToolPose.rot.GetZAxis();
+    }
+    else if (this->dataPtr->manipState == "rot_y")
+    {
+      this->dataPtr->dragStartNormal = rotToolPose.rot.GetYAxis();
+    }
+  }
   return false;
 }
 
@@ -673,25 +685,12 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
   if (_event.dragging && _event.button == common::MouseEvent::LEFT &&
       this->dataPtr->dragStart.x != 0)
   {
+    // TODO: calculate proper rotation
+
     math::Pose rotToolPose = this->dataPtr->applyWrenchVisual->GetRotTool()
         ->GetWorldPose();
 
-    math::Vector3 normal;
-    if (this->dataPtr->manipState == "rot_z")
-    {
-      normal = rotToolPose.rot.GetZAxis();
-    }
-    else if (this->dataPtr->manipState == "rot_y")
-    {
-      normal = rotToolPose.rot.GetYAxis();
-    }
-    else
-    {
-      gzerr << "Manipulation state not supported." << std::endl;
-      return false;
-    }
-
-    // TODO: calculate proper rotation
+    math::Vector3 normal = this->dataPtr->dragStartNormal;
 
     double offset = rotToolPose.pos.Dot(normal);
 
@@ -719,7 +718,7 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
     math::Quaternion rot(normal, angle);
 
     math::Vector3 vec = rot.RotateVector(this->dataPtr->dragStartVector);
-    //math::Vector3 vec = rot.RotateVector(-this->dataPtr->forceVector);
+
     if (this->dataPtr->wrenchMode == rendering::ApplyWrenchVisual::FORCE)
     {
       this->UpdateForceVector(vec);

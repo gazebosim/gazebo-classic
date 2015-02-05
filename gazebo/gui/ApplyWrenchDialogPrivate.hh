@@ -97,6 +97,9 @@ namespace gazebo
       public: math::Vector3 dragStartVector;
 
       /// TODO
+      public: math::Vector3 dragStartNormal;
+
+      /// TODO
       public: std::string manipState;
     };
   }
