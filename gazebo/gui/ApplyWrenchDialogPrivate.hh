@@ -40,6 +40,12 @@ namespace gazebo
       public: QWidget *pointCollapsibleWidget;
 
       /// TODO
+      public: QWidget *forceCollapsibleWidget;
+
+      /// TODO
+      public: QWidget *torqueCollapsibleWidget;
+
+      /// TODO
       public: QDoubleSpinBox *pointXSpin;
 
       /// TODO

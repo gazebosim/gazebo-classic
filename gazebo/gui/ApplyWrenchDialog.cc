@@ -46,22 +46,21 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->messageLabel->setText(
       tr("Apply Force and Torque"));
 
-  // Reference point
-  QRadioButton *pointCollapser = new QRadioButton();
+  // Point
+  QCheckBox *pointCollapser = new QCheckBox();
   pointCollapser->setChecked(false);
   pointCollapser->setText("Reference Point");
   pointCollapser->setStyleSheet(
-     "QRadioButton {\
+     "QCheckBox {\
         color: #d0d0d0;\
       }\
-      QRadioButton::indicator::unchecked {\
+      QCheckBox::indicator::unchecked {\
         image: url(:/images/right_arrow.png);\
       }\
-      QRadioButton::indicator::checked {\
+      QCheckBox::indicator::checked {\
         image: url(:/images/down_arrow.png);\
       }");
-  connect(pointCollapser, SIGNAL(toggled(bool)), this,
-           SLOT(TogglePoint(bool)));
+  connect(pointCollapser, SIGNAL(toggled(bool)), this, SLOT(TogglePoint(bool)));
 
   // Point X
   QLabel *pointXLabel = new QLabel();
@@ -125,8 +124,20 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   pointLayout->addWidget(this->dataPtr->pointCollapsibleWidget);
 
   // Force
-  QLabel *forceLabel = new QLabel();
-  forceLabel->setText(tr("Force"));
+  QCheckBox *forceCollapser = new QCheckBox();
+  forceCollapser->setChecked(true);
+  forceCollapser->setText("Force");
+  forceCollapser->setStyleSheet(
+     "QCheckBox {\
+        color: #d0d0d0;\
+      }\
+      QCheckBox::indicator::unchecked {\
+        image: url(:/images/right_arrow.png);\
+      }\
+      QCheckBox::indicator::checked {\
+        image: url(:/images/down_arrow.png);\
+      }");
+  connect(forceCollapser, SIGNAL(toggled(bool)), this, SLOT(ToggleForce(bool)));
 
   // Force magnitude
   QLabel *forceMagLabel = new QLabel();
@@ -139,6 +150,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->forceMagSpin->setSingleStep(0.1);
   this->dataPtr->forceMagSpin->setDecimals(3);
   this->dataPtr->forceMagSpin->setValue(1000);
+  this->dataPtr->forceMagSpin->installEventFilter(this);
   connect(this->dataPtr->forceMagSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForceMagChanged(double)));
 
@@ -184,24 +196,43 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   connect(this->dataPtr->forceZSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForceZChanged(double)));
 
-  QGridLayout *forceLayout = new QGridLayout();
-  forceLayout->addWidget(forceLabel, 0, 0);
-  forceLayout->addWidget(forceXLabel, 1, 0);
-  forceLayout->addWidget(this->dataPtr->forceXSpin, 1, 1);
-  forceLayout->addWidget(forceXUnitLabel, 1, 2);
-  forceLayout->addWidget(forceYLabel, 2, 0);
-  forceLayout->addWidget(this->dataPtr->forceYSpin, 2, 1);
-  forceLayout->addWidget(forceYUnitLabel, 2, 2);
-  forceLayout->addWidget(forceZLabel, 3, 0);
-  forceLayout->addWidget(this->dataPtr->forceZSpin, 3, 1);
-  forceLayout->addWidget(forceZUnitLabel, 3, 2);
-  forceLayout->addWidget(forceMagLabel, 4, 0);
-  forceLayout->addWidget(this->dataPtr->forceMagSpin, 4, 1);
-  forceLayout->addWidget(forceMagUnitLabel, 4, 2);
+  QGridLayout *forceCollapsible = new QGridLayout();
+  forceCollapsible->addWidget(forceXLabel, 0, 0);
+  forceCollapsible->addWidget(this->dataPtr->forceXSpin, 0, 1);
+  forceCollapsible->addWidget(forceXUnitLabel, 0, 2);
+  forceCollapsible->addWidget(forceYLabel, 1, 0);
+  forceCollapsible->addWidget(this->dataPtr->forceYSpin, 1, 1);
+  forceCollapsible->addWidget(forceYUnitLabel, 1, 2);
+  forceCollapsible->addWidget(forceZLabel, 2, 0);
+  forceCollapsible->addWidget(this->dataPtr->forceZSpin, 2, 1);
+  forceCollapsible->addWidget(forceZUnitLabel, 2, 2);
+  forceCollapsible->addWidget(forceMagLabel, 3, 0);
+  forceCollapsible->addWidget(this->dataPtr->forceMagSpin, 3, 1);
+  forceCollapsible->addWidget(forceMagUnitLabel, 3, 2);
+
+  this->dataPtr->forceCollapsibleWidget = new QWidget();
+  this->dataPtr->forceCollapsibleWidget->setLayout(forceCollapsible);
+  this->dataPtr->forceCollapsibleWidget->show();
+
+  QVBoxLayout *forceLayout = new QVBoxLayout();
+  forceLayout->addWidget(forceCollapser);
+  forceLayout->addWidget(this->dataPtr->forceCollapsibleWidget);
 
   // Torque
-  QLabel *torqueLabel = new QLabel();
-  torqueLabel->setText(tr("Torque"));
+  QCheckBox *torqueCollapser = new QCheckBox();
+  torqueCollapser->setChecked(false);
+  torqueCollapser->setText("Torque");
+  torqueCollapser->setStyleSheet(
+     "QCheckBox {\
+        color: #d0d0d0;\
+      }\
+      QCheckBox::indicator::unchecked {\
+        image: url(:/images/right_arrow.png);\
+      }\
+      QCheckBox::indicator::checked {\
+        image: url(:/images/down_arrow.png);\
+      }");
+  connect(torqueCollapser, SIGNAL(toggled(bool)), this, SLOT(ToggleTorque(bool)));
 
   // Torque magnitude
   QLabel *torqueMagLabel = new QLabel();
@@ -259,20 +290,27 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   connect(this->dataPtr->torqueZSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnTorqueZChanged(double)));
 
-  QGridLayout *torqueLayout = new QGridLayout();
-  torqueLayout->addWidget(torqueLabel, 0, 0);
-  torqueLayout->addWidget(torqueXLabel, 1, 0);
-  torqueLayout->addWidget(this->dataPtr->torqueXSpin, 1, 1);
-  torqueLayout->addWidget(torqueXUnitLabel, 1, 2);
-  torqueLayout->addWidget(torqueYLabel, 2, 0);
-  torqueLayout->addWidget(this->dataPtr->torqueYSpin, 2, 1);
-  torqueLayout->addWidget(torqueYUnitLabel, 2, 2);
-  torqueLayout->addWidget(torqueZLabel, 3, 0);
-  torqueLayout->addWidget(this->dataPtr->torqueZSpin, 3, 1);
-  torqueLayout->addWidget(torqueZUnitLabel, 3, 2);
-  torqueLayout->addWidget(torqueMagLabel, 4, 0);
-  torqueLayout->addWidget(this->dataPtr->torqueMagSpin, 4, 1);
-  torqueLayout->addWidget(torqueMagUnitLabel, 4, 2);
+  QGridLayout *torqueCollapsible = new QGridLayout();
+  torqueCollapsible->addWidget(torqueXLabel, 0, 0);
+  torqueCollapsible->addWidget(this->dataPtr->torqueXSpin, 0, 1);
+  torqueCollapsible->addWidget(torqueXUnitLabel, 0, 2);
+  torqueCollapsible->addWidget(torqueYLabel, 1, 0);
+  torqueCollapsible->addWidget(this->dataPtr->torqueYSpin, 1, 1);
+  torqueCollapsible->addWidget(torqueYUnitLabel, 1, 2);
+  torqueCollapsible->addWidget(torqueZLabel, 2, 0);
+  torqueCollapsible->addWidget(this->dataPtr->torqueZSpin, 2, 1);
+  torqueCollapsible->addWidget(torqueZUnitLabel, 2, 2);
+  torqueCollapsible->addWidget(torqueMagLabel, 3, 0);
+  torqueCollapsible->addWidget(this->dataPtr->torqueMagSpin, 3, 1);
+  torqueCollapsible->addWidget(torqueMagUnitLabel, 3, 2);
+
+  this->dataPtr->torqueCollapsibleWidget = new QWidget();
+  this->dataPtr->torqueCollapsibleWidget->setLayout(torqueCollapsible);
+  this->dataPtr->torqueCollapsibleWidget->hide();
+
+  QVBoxLayout *torqueLayout = new QVBoxLayout();
+  torqueLayout->addWidget(torqueCollapser);
+  torqueLayout->addWidget(this->dataPtr->torqueCollapsibleWidget);
 
   // Buttons
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
@@ -288,6 +326,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   // Main layout
   QVBoxLayout *mainLayout = new QVBoxLayout;
+  mainLayout->setSizeConstraint(QLayout::SetFixedSize);
   mainLayout->addWidget(this->dataPtr->messageLabel);
 //  mainLayout->addLayout(pointLayout);
   mainLayout->addLayout(forceLayout);
@@ -301,7 +340,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   this->UpdateForceVector();
   this->UpdateTorqueVector();
-  this->SetMode(rendering::ApplyWrenchVisual::FORCE);
+  this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::FORCE);
 
   connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
 
@@ -388,56 +427,56 @@ void ApplyWrenchDialog::OnPointZChanged(double /*_pZ*/)
 void ApplyWrenchDialog::OnForceMagChanged(double /*_magnitude*/)
 {
   this->UpdateForceVector();
-  this->SetMode(rendering::ApplyWrenchVisual::FORCE);
+  this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::FORCE);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceXChanged(double /*_fX*/)
 {
   this->UpdateForceMag();
-  this->SetMode(rendering::ApplyWrenchVisual::FORCE);
+  this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::FORCE);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceYChanged(double /*_fY*/)
 {
   this->UpdateForceMag();
-  this->SetMode(rendering::ApplyWrenchVisual::FORCE);
+  this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::FORCE);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceZChanged(double /*_fZ*/)
 {
   this->UpdateForceMag();
-  this->SetMode(rendering::ApplyWrenchVisual::FORCE);
+  this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::FORCE);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueMagChanged(double /*_magnitude*/)
 {
   this->UpdateTorqueVector();
-  this->SetMode(rendering::ApplyWrenchVisual::TORQUE);
+  this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::TORQUE);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueXChanged(double /*_fX*/)
 {
   this->UpdateTorqueMag();
-  this->SetMode(rendering::ApplyWrenchVisual::TORQUE);
+  this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::TORQUE);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueYChanged(double /*_fY*/)
 {
   this->UpdateTorqueMag();
-  this->SetMode(rendering::ApplyWrenchVisual::TORQUE);
+  this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::TORQUE);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueZChanged(double /*_fZ*/)
 {
   this->UpdateTorqueMag();
-  this->SetMode(rendering::ApplyWrenchVisual::TORQUE);
+  this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::TORQUE);
 }
 
 //////////////////////////////////////////////////
@@ -612,12 +651,38 @@ void ApplyWrenchDialog::TogglePoint(bool _checked)
   if (_checked)
   {
     this->dataPtr->pointCollapsibleWidget->show();
-    //this->resize(this->maximumSize());
   }
   else
   {
     this->dataPtr->pointCollapsibleWidget->hide();
-    //this->resize(this->minimumSize());
+  }
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::ToggleForce(bool _checked)
+{
+  if (_checked)
+  {
+    this->dataPtr->forceCollapsibleWidget->show();
+    this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::FORCE);
+  }
+  else
+  {
+    this->dataPtr->forceCollapsibleWidget->hide();
+  }
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::ToggleTorque(bool _checked)
+{
+  if (_checked)
+  {
+    this->dataPtr->torqueCollapsibleWidget->show();
+    this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::TORQUE);
+  }
+  else
+  {
+    this->dataPtr->torqueCollapsibleWidget->hide();
   }
 }
 
@@ -742,5 +807,28 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
     }
   }
 
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool ApplyWrenchDialog::eventFilter(QObject *_object, QEvent *_event)
+{
+  if (_event->type() == QEvent::FocusIn)
+  {
+    if (_object == this->dataPtr->forceMagSpin ||
+        _object == this->dataPtr->forceXSpin ||
+        _object == this->dataPtr->forceYSpin ||
+        _object == this->dataPtr->forceZSpin)
+    {
+        this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::FORCE);
+    }
+    else if (_object == this->dataPtr->torqueMagSpin ||
+             _object == this->dataPtr->torqueXSpin ||
+             _object == this->dataPtr->torqueYSpin ||
+             _object == this->dataPtr->torqueZSpin)
+    {
+        this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::TORQUE);
+    }
+  }
   return false;
 }

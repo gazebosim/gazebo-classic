@@ -253,6 +253,7 @@ void ModelRightMenu::OnApplyWrench()
   }
 
   this->applyWrenchDialog->SetLink(linkName);
+  this->applyWrenchDialog->move(QCursor::pos());
   this->applyWrenchDialog->show();
 }
 

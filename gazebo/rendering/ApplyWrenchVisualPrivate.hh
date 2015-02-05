@@ -43,6 +43,12 @@ namespace gazebo
 
       /// \brief Lines that make the cross marking the point of application.
       public: rendering::DynamicLines *crossLines;
+
+      /// TODO
+      public: math::Vector3 forceVector;
+
+      /// TODO
+      public: math::Vector3 torqueVector;
     };
   }
 }

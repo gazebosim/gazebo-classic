@@ -64,6 +64,14 @@ namespace gazebo
       /// \param[in] _checked Whether it is checked or not.
       private slots: void TogglePoint(bool _checked);
 
+      /// \brief Qt callback to show/hide force options.
+      /// \param[in] _checked Whether it is checked or not.
+      private slots: void ToggleForce(bool _checked);
+
+      /// \brief Qt callback to show/hide torque options.
+      /// \param[in] _checked Whether it is checked or not.
+      private slots: void ToggleTorque(bool _checked);
+
       /// \brief Qt callback when the the point X has changed.
       /// \param[in] _magnitude Point vector X component
       private slots: void OnPointXChanged(double _pX);
@@ -107,6 +115,9 @@ namespace gazebo
       /// \brief Qt callback when the the torque Z has changed.
       /// \param[in] _magnitude Torque vector Z component
       private slots: void OnTorqueZChanged(double _fZ);
+
+      /// \brief TODO
+      private slots: bool eventFilter(QObject *_object, QEvent *_event);
 
       /// \brief Callback for a mouse press event.
       /// \param[in] _event The mouse press event

@@ -109,6 +109,9 @@ void ApplyWrenchVisual::Load()
   dPtr->rotTool->SetMode("rotate");
   dPtr->rotTool->SetHandleVisible("rotate", 0, false);
 
+  dPtr->forceVector = math::Vector3::UnitX;
+  dPtr->torqueVector = math::Vector3::Zero;
+
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
 
@@ -148,15 +151,25 @@ void ApplyWrenchVisual::SetMode(WrenchModes _mode)
   this->wrenchMode = _mode;
 
   // Attach rotation to mode visual
-  if (this->wrenchMode == WrenchModes::FORCE)
+  dPtr->rotTool->SetHandleVisible("rotate", 1, true);
+  dPtr->rotTool->SetHandleVisible("rotate", 2, true);
+  if (this->wrenchMode == WrenchModes::FORCE &&
+      dPtr->forceVector != math::Vector3::Zero)
   {
-    dPtr->rotTool->SetRotation(dPtr->forceVisual->GetRotation() * math::Quaternion(
-      math::Vector3(0, M_PI/2.0, 0)));
+    dPtr->rotTool->SetRotation(dPtr->forceVisual->GetRotation() *
+        math::Quaternion(math::Vector3(0, M_PI/2.0, 0)));
   }
-  else if (this->wrenchMode == WrenchModes::TORQUE)
+  else if (this->wrenchMode == WrenchModes::TORQUE &&
+      dPtr->torqueVector != math::Vector3::Zero)
   {
-    dPtr->rotTool->SetRotation(dPtr->torqueVisual->GetRotation() * math::Quaternion(
-      math::Vector3(0, M_PI/2.0, 0)));
+    dPtr->rotTool->SetRotation(dPtr->torqueVisual->GetRotation() *
+        math::Quaternion(math::Vector3(0, M_PI/2.0, 0)));
+  }
+  else if (dPtr->forceVector == math::Vector3::Zero &&
+           dPtr->torqueVector == math::Vector3::Zero)
+  {
+    dPtr->rotTool->SetHandleVisible("rotate", 1, false);
+    dPtr->rotTool->SetHandleVisible("rotate", 2, false);
   }
 }
 
@@ -168,6 +181,8 @@ void ApplyWrenchVisual::UpdateForce(math::Vector3 _forceVector)
 
   if (!dPtr->forceVisual)
     return;
+
+  dPtr->forceVector = _forceVector;
 
   if (_forceVector == math::Vector3::Zero)
   {
@@ -200,6 +215,8 @@ void ApplyWrenchVisual::UpdateTorque(math::Vector3 _torqueVector)
 
   if (!dPtr->torqueVisual)
     return;
+
+  dPtr->torqueVector = _torqueVector;
 
   if (_torqueVector == math::Vector3::Zero)
   {
