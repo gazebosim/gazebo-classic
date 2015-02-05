@@ -646,3 +646,20 @@ void SelectionObj::CreateScaleVisual()
   dPtr->scene->AddVisual(dPtr->scaleYVisual);
   dPtr->scene->AddVisual(dPtr->scaleZVisual);
 }
+
+/////////////////////////////////////////////////
+void SelectionObj::SetHandleVisible(std::string _mode, int _axis, bool _visible)
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  if (_mode == "rotate")
+  {
+    if (_axis == 0)
+      dPtr->rotXVisual->SetVisible(_visible);
+    else if (_axis == 1)
+      dPtr->rotYVisual->SetVisible(_visible);
+    else if (_axis == 2)
+      dPtr->rotZVisual->SetVisible(_visible);
+  }
+}

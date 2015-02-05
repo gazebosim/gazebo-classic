@@ -117,6 +117,9 @@ namespace gazebo
       /// \brief Update selection object size to match the parent visual.
       public: void UpdateSize();
 
+      /// \brief TODO.
+      public: void SetHandleVisible(std::string _mode, int _axis, bool _visible);
+
       /// \brief Helper function to create scale visuals.
       private: void CreateScaleVisual();
 

@@ -301,7 +301,6 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   this->UpdateForceVector();
   this->UpdateTorqueVector();
-  this->CalculateWrench();
   this->SetMode(rendering::ApplyWrenchVisual::FORCE);
 
   connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
@@ -452,12 +451,23 @@ void ApplyWrenchDialog::SetPublisher()
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::CalculateWrench()
+void ApplyWrenchDialog::CalculateForce()
 {
   this->dataPtr->forceVector =
       math::Vector3(this->dataPtr->forceXSpin->value(),
                     this->dataPtr->forceYSpin->value(),
                     this->dataPtr->forceZSpin->value());
+
+  // Update visuals
+  if (this->dataPtr->applyWrenchVisual)
+  {
+    this->dataPtr->applyWrenchVisual->UpdateForce(this->dataPtr->forceVector);
+  }
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::CalculateTorque()
+{
   this->dataPtr->torqueVector =
       math::Vector3(this->dataPtr->torqueXSpin->value(),
                     this->dataPtr->torqueYSpin->value(),
@@ -466,7 +476,6 @@ void ApplyWrenchDialog::CalculateWrench()
   // Update visuals
   if (this->dataPtr->applyWrenchVisual)
   {
-    this->dataPtr->applyWrenchVisual->UpdateForce(this->dataPtr->forceVector);
     this->dataPtr->applyWrenchVisual->UpdateTorque(this->dataPtr->torqueVector);
   }
 }
@@ -478,7 +487,7 @@ void ApplyWrenchDialog::UpdateForceMag()
       pow(this->dataPtr->forceXSpin->value(), 2) +
       pow(this->dataPtr->forceYSpin->value(), 2) +
       pow(this->dataPtr->forceZSpin->value(), 2)));
-  this->CalculateWrench();
+  this->CalculateForce();
 }
 
 /////////////////////////////////////////////////
@@ -501,7 +510,7 @@ void ApplyWrenchDialog::UpdateForceVector()
   this->dataPtr->forceYSpin->setValue(v.y);
   this->dataPtr->forceZSpin->setValue(v.z);
 
-  this->CalculateWrench();
+  this->CalculateForce();
 }
 
 /////////////////////////////////////////////////
@@ -521,7 +530,7 @@ void ApplyWrenchDialog::UpdateForceVector(math::Vector3 _fV)
   this->dataPtr->forceYSpin->setValue(_fV.y);
   this->dataPtr->forceZSpin->setValue(_fV.z);
 
-  this->CalculateWrench();
+  this->CalculateForce();
 }
 
 /////////////////////////////////////////////////
@@ -531,7 +540,7 @@ void ApplyWrenchDialog::UpdateTorqueMag()
       pow(this->dataPtr->torqueXSpin->value(), 2) +
       pow(this->dataPtr->torqueYSpin->value(), 2) +
       pow(this->dataPtr->torqueZSpin->value(), 2)));
-  this->CalculateWrench();
+  this->CalculateTorque();
 }
 
 /////////////////////////////////////////////////
@@ -554,7 +563,7 @@ void ApplyWrenchDialog::UpdateTorqueVector()
   this->dataPtr->torqueYSpin->setValue(v.y);
   this->dataPtr->torqueZSpin->setValue(v.z);
 
-  this->CalculateWrench();
+  this->CalculateTorque();
 }
 
 /////////////////////////////////////////////////
@@ -574,7 +583,7 @@ void ApplyWrenchDialog::UpdateTorqueVector(math::Vector3 _tV)
   this->dataPtr->torqueYSpin->setValue(_tV.y);
   this->dataPtr->torqueZSpin->setValue(_tV.z);
 
-  this->CalculateWrench();
+  this->CalculateTorque();
 }
 
 /////////////////////////////////////////////////
@@ -593,7 +602,8 @@ void ApplyWrenchDialog::AttachVisuals()
     this->dataPtr->applyWrenchVisual->SetVisible(true);
   }
 
-  this->CalculateWrench();
+  this->CalculateForce();
+  this->CalculateTorque();
 }
 
 /////////////////////////////////////////////////
@@ -633,6 +643,14 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent & _event)
     this->dataPtr->applyWrenchVisual->GetRotTool()->SetState(
         this->dataPtr->manipState);
     this->dataPtr->dragStart = _event.pressPos;
+    if (this->dataPtr->wrenchMode == rendering::ApplyWrenchVisual::FORCE)
+    {
+      this->dataPtr->dragStartVector = this->dataPtr->forceVector;
+    }
+    else if (this->dataPtr->wrenchMode == rendering::ApplyWrenchVisual::TORQUE)
+    {
+      this->dataPtr->dragStartVector = this->dataPtr->torqueVector;
+    }
   }
 
   return false;
@@ -655,25 +673,25 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
   if (_event.dragging && _event.button == common::MouseEvent::LEFT &&
       this->dataPtr->dragStart.x != 0)
   {
-    // TODO: calculate proper displacement
-
     math::Pose rotToolPose = this->dataPtr->applyWrenchVisual->GetRotTool()
         ->GetWorldPose();
 
     math::Vector3 normal;
     if (this->dataPtr->manipState == "rot_z")
     {
-      normal = math::Vector3::UnitZ;
+      normal = rotToolPose.rot.GetZAxis();
     }
     else if (this->dataPtr->manipState == "rot_y")
     {
-      normal = math::Vector3::UnitY;
+      normal = rotToolPose.rot.GetYAxis();
     }
     else
     {
       gzerr << "Manipulation state not supported." << std::endl;
       return false;
     }
+
+    // TODO: calculate proper rotation
 
     double offset = rotToolPose.pos.Dot(normal);
 
@@ -700,15 +718,7 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
 
     math::Quaternion rot(normal, angle);
 
-    math::Vector3 vec;
-    if (this->dataPtr->manipState == "rot_z")
-    {
-      vec = rot.RotateVector(-math::Vector3::UnitY);
-    }
-    else
-    {
-      vec = rot.RotateVector(-math::Vector3::UnitZ);
-    }
+    math::Vector3 vec = rot.RotateVector(this->dataPtr->dragStartVector);
     //math::Vector3 vec = rot.RotateVector(-this->dataPtr->forceVector);
     if (this->dataPtr->wrenchMode == rendering::ApplyWrenchVisual::FORCE)
     {

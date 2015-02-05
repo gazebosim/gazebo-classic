@@ -18,11 +18,7 @@
 #ifndef _APPLYWRENCHVISUAL_HH_
 #define _APPLYWRENCHVISUAL_HH_
 
-//#include <string>
-
-//#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
-//#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -72,6 +68,9 @@ namespace gazebo
 
       /// \brief TODO
       public: void UpdateTorque(math::Vector3 _torqueVector);
+
+      /// \brief TODO
+      public: math::Quaternion GetQuaternionFromVector(math::Vector3 _vec);
 
       /// \brief TODO
       public: ApplyWrenchVisual::WrenchModes wrenchMode;

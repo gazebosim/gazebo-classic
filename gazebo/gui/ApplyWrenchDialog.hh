@@ -127,7 +127,10 @@ namespace gazebo
       private: void SetPublisher();
 
       /// \brief TODO
-      private: void CalculateWrench();
+      private: void CalculateForce();
+
+      /// \brief TODO
+      private: void CalculateTorque();
 
       /// \brief TODO
       private: void UpdateForceMag();
