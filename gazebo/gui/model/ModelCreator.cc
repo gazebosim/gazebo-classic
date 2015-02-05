@@ -880,7 +880,7 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
   if (_linkElem->HasElement("collision"))
     collisionElem = _linkElem->GetElement("collision");
 
-  while (collisionElem && false)
+  while (collisionElem)
   {
     // Collision name
     std::string collisionName;
