@@ -586,7 +586,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   hotspotVisual->InsertMesh("unit_cylinder");
   Ogre::MovableObject *hotspotObj =
       (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
-      "__HOTSPOT__" + _joint->visual->GetName(), "unit_cylinder"));
+      _joint->visual->GetName(), "unit_cylinder"));
   hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(hotSpotName));
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial(this->jointMaterials[_joint->type]);
@@ -969,7 +969,7 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   // TODO: Add checks for whether elements are present, whether visuals can be found...
 
   // Name
-  joint->name = _jointElem->Get<std::string>("name");
+  joint->name = _modelName + "::" + _jointElem->Get<std::string>("name");
 
   // Pose
   math::Pose jointPose;
