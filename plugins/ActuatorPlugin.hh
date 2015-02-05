@@ -72,6 +72,10 @@ namespace gazebo
     public: float maximumTorque;
 
     /// \brief Function used to calculate motor output.
+    /// \param[in] float1 Input velocity.
+    /// \param[in] float2 Input torque.
+    /// \param[in] ActuatorProperties Static properties of this actuator
+    /// \return Torque according to the model.
     public: boost::function<float (float, float, const ActuatorProperties&)>
               modelFunction;
   };
