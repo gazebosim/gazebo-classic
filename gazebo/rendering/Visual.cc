@@ -699,6 +699,26 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
 
   if (!this->HasAttachedObject(_obj->getName()))
   {
+    // update to use unique materials
+    Ogre::Entity *entity = dynamic_cast<Ogre::Entity *>(_obj);
+    if (entity)
+    {
+      for (unsigned j = 0; j < entity->getNumSubEntities(); ++j)
+      {
+        Ogre::SubEntity *subEntity = entity->getSubEntity(j);
+        Ogre::MaterialPtr material = subEntity->getMaterial();
+        if (!material.isNull() &&
+            material->getName().find("_MATERIAL_") == std::string::npos)
+        {
+          std::string newMaterialName;
+          newMaterialName = this->dataPtr->sceneNode->getName() +
+              "_MATERIAL_" + material->getName();
+          material = material->clone(newMaterialName);
+          subEntity->setMaterial(material);
+        }
+      }
+    }
+
     this->dataPtr->sceneNode->attachObject(_obj);
     if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized() &&
       _obj->getName().find("__COLLISION_VISUAL__") == std::string::npos)

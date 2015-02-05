@@ -17,6 +17,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -192,8 +193,21 @@ void PartData::UpdateConfig()
     msgs::Visual *updateMsg = visualConfig->GetData(leafName);
     msgs::Visual visualMsg = it->second;
     updateMsg->clear_scale();
-    msgs::Color *diffuse = updateMsg->mutable_material()->mutable_diffuse();
-    diffuse->set_a(1.0-updateMsg->transparency());
+    msgs::Material *matMsg = updateMsg->mutable_material();
+    // clear empty colors so they are not used by visual updates
+    common::Color emptyColor;
+    if (msgs::Convert(matMsg->ambient()) == emptyColor)
+      matMsg->clear_ambient();
+    if (msgs::Convert(matMsg->diffuse()) == emptyColor)
+      matMsg->clear_diffuse();
+    if (msgs::Convert(matMsg->specular()) == emptyColor)
+      matMsg->clear_specular();
+    if (msgs::Convert(matMsg->emissive()) == emptyColor)
+      matMsg->clear_emissive();
+
+    if (matMsg->has_diffuse())
+      matMsg->mutable_diffuse()->set_a(1.0-updateMsg->transparency());
+
     visualMsg.CopyFrom(*updateMsg);
     it->second = visualMsg;
   }
@@ -337,8 +351,21 @@ void PartData::OnApply()
 
         // update the visualMsg that will be used to generate the sdf.
         updateMsg->clear_scale();
-        msgs::Color *diffuse = updateMsg->mutable_material()->mutable_diffuse();
-        diffuse->set_a(1.0-updateMsg->transparency());
+        msgs::Material *matMsg = updateMsg->mutable_material();
+        // clear empty colors so they are not used by visual updates
+        common::Color emptyColor;
+        if (msgs::Convert(matMsg->ambient()) == emptyColor)
+          matMsg->clear_ambient();
+        if (msgs::Convert(matMsg->diffuse()) == emptyColor)
+          matMsg->clear_diffuse();
+        if (msgs::Convert(matMsg->specular()) == emptyColor)
+          matMsg->clear_specular();
+        if (msgs::Convert(matMsg->emissive()) == emptyColor)
+          matMsg->clear_emissive();
+
+        if (matMsg->has_diffuse())
+          matMsg->mutable_diffuse()->set_a(1.0-updateMsg->transparency());
+
         visualMsg.CopyFrom(*updateMsg);
         it->second = visualMsg;
 
@@ -448,9 +475,16 @@ void PartData::OnAddCollision(const std::string &_name)
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     collisionVis->Load(collisionElem);
     // orange
-    collisionVis->SetAmbient(common::Color(1.0, 0.5, 0.05));
-    collisionVis->SetDiffuse(common::Color(1.0, 0.5, 0.05));
-    collisionVis->SetSpecular(common::Color(0.5, 0.5, 0.5));
+    common::Color ambient;
+    common::Color diffuse;
+    common::Color specular;
+    common::Color emissive;
+    rendering::Material::GetMaterialAsColor("Gazebo/Orange", ambient, diffuse,
+        specular, emissive);
+    collisionVis->SetAmbient(ambient);
+    collisionVis->SetDiffuse(diffuse);
+    collisionVis->SetSpecular(specular);
+    collisionVis->SetEmissive(emissive);
     this->partVisual->GetScene()->AddVisual(collisionVis);
   }
 

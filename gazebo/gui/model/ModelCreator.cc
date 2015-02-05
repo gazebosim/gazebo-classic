@@ -23,6 +23,7 @@
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/math/Quaternion.hh"
@@ -693,9 +694,16 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
       part->partVisual);
 
   // orange
-  collisionVis->SetAmbient(common::Color(1.0, 0.5, 0.05));
-  collisionVis->SetDiffuse(common::Color(1.0, 0.5, 0.05));
-  collisionVis->SetSpecular(common::Color(0.5, 0.5, 0.5));
+  common::Color ambient;
+  common::Color diffuse;
+  common::Color specular;
+  common::Color emissive;
+  rendering::Material::GetMaterialAsColor("Gazebo/Orange", ambient, diffuse,
+      specular, emissive);
+  collisionVis->SetAmbient(ambient);
+  collisionVis->SetDiffuse(diffuse);
+  collisionVis->SetSpecular(specular);
+  collisionVis->SetEmissive(emissive);
   collisionVis->SetTransparency(
       math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
   // fix for transparency alpha compositing
@@ -918,9 +926,16 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
     colVisual->Load(colVisualElem);
     colVisual->SetPose(collisionPose);
     // orange
-    colVisual->SetAmbient(common::Color(1.0, 0.5, 0.05));
-    colVisual->SetDiffuse(common::Color(1.0, 0.5, 0.05));
-    colVisual->SetSpecular(common::Color(0.5, 0.5, 0.5));
+    common::Color ambient;
+    common::Color diffuse;
+    common::Color specular;
+    common::Color emissive;
+    rendering::Material::GetMaterialAsColor("Gazebo/Orange", ambient, diffuse,
+        specular, emissive);
+    colVisual->SetAmbient(ambient);
+    colVisual->SetDiffuse(diffuse);
+    colVisual->SetSpecular(specular);
+    colVisual->SetEmissive(emissive);
     colVisual->SetTransparency(
         math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
     // fix for transparency alpha compositing
@@ -940,7 +955,6 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allParts[part->GetName()] = part;
   }
-
 
   rendering::ScenePtr scene = part->partVisual->GetScene();
   scene->AddVisual(part->partVisual);
@@ -1620,6 +1634,8 @@ void ModelCreator::GenerateSDF()
   // Model settings
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
+
+  std::cerr << modelElem->ToString("") << std::endl;
 }
 
 /////////////////////////////////////////////////

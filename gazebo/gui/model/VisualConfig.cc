@@ -15,7 +15,9 @@
  *
 */
 
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/rendering/Material.hh"
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/model/VisualConfig.hh"
 
@@ -115,15 +117,37 @@ void VisualConfig::AddVisual(const std::string &_name,
 
   ConfigWidget *configWidget = new ConfigWidget;
 
+  msgs::Visual msgToLoad;
   if (_visualMsg)
+    msgToLoad = *_visualMsg;
+
+  // set default values
+  // TODO: auto-fill them with SDF defaults
+  msgs::Material *matMsg = msgToLoad.mutable_material();
+  if (!matMsg->has_lighting())
+      matMsg->set_lighting(true);
+  if (matMsg->has_script())
   {
-    configWidget->Load(_visualMsg);
+    msgs::Material::Script *scriptMsg = matMsg->mutable_script();
+    if (scriptMsg && scriptMsg->has_name())
+    {
+      common::Color ambient;
+      common::Color diffuse;
+      common::Color specular;
+      common::Color emissive;
+      bool matFound = rendering::Material::GetMaterialAsColor(scriptMsg->name(),
+          ambient, diffuse, specular, emissive);
+      if (matFound)
+      {
+        msgs::Set(matMsg->mutable_ambient(), ambient);
+        msgs::Set(matMsg->mutable_diffuse(), diffuse);
+        msgs::Set(matMsg->mutable_specular(), specular);
+        msgs::Set(matMsg->mutable_emissive(), emissive);
+      }
+    }
   }
-  else
-  {
-    msgs::Visual visualMsg;
-    configWidget->Load(&visualMsg);
-  }
+
+  configWidget->Load(&msgToLoad);
 
   configWidget->SetWidgetVisible("id", false);
   configWidget->SetWidgetVisible("name", false);
