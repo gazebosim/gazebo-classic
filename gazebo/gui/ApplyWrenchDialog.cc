@@ -534,8 +534,8 @@ void ApplyWrenchDialog::UpdateForceVector()
 {
   // Normalize current vector
   math::Vector3 v = math::Vector3(this->dataPtr->forceXSpin->value(),
-                                   this->dataPtr->forceYSpin->value(),
-                                   this->dataPtr->forceZSpin->value());
+                                  this->dataPtr->forceYSpin->value(),
+                                  this->dataPtr->forceZSpin->value());
   if (v == math::Vector3::Zero)
     v = math::Vector3::UnitX;
   else
@@ -821,6 +821,10 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
     {
       this->dataPtr->applyWrenchVisual->GetRotTool()->SetState(
           this->dataPtr->manipState);
+    }
+    else
+    {
+      this->dataPtr->applyWrenchVisual->GetRotTool()->SetState("");
     }
   }
 
