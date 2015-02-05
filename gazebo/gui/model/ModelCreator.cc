@@ -15,6 +15,7 @@
  *
  */
 
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/filesystem.hpp>
 #include <sstream>
 #include <string>
@@ -59,6 +60,8 @@ ModelCreator::ModelCreator()
 
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
+
+  this->updateMutex = new boost::recursive_mutex();
 
   this->manipMode = "";
   this->partCounter = 0;
@@ -145,6 +148,8 @@ ModelCreator::~ModelCreator()
   this->makerPub.reset();
   this->connections.clear();
 
+  delete this->updateMutex;
+
   delete jointMaker;
 }
 
@@ -202,6 +207,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
   }
 
   // Get SDF model element from model name
+  // TODO replace with entity_info and parse gazebo.msgs.Model msgs
   boost::shared_ptr<msgs::Response> response =
     transport::request(get_world(), "world_sdf");
 
@@ -213,13 +219,17 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
     msg.ParseFromString(response->serialized_data());
 
     // Parse the string into sdf
-    sdf::SDF sdf_parsed;
-    sdf_parsed.SetFromString(msg.data());
+    sdf::SDF sdfParsed;
+    sdfParsed.SetFromString(msg.data());
+
+//    std::cerr << " sdfParsed " << sdfParsed.ToString() << std::endl;
+
+
     // Check that sdf contains world
-    if (sdf_parsed.root->HasElement("world") &&
-        sdf_parsed.root->GetElement("world")->HasElement("model"))
+    if (sdfParsed.root->HasElement("world") &&
+        sdfParsed.root->GetElement("world")->HasElement("model"))
     {
-      sdf::ElementPtr world = sdf_parsed.root->GetElement("world");
+      sdf::ElementPtr world = sdfParsed.root->GetElement("world");
       sdf::ElementPtr model = world->GetElement("model");
       while (model)
       {
@@ -227,8 +237,11 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
         {
           // Remove model from the scene to substitute with the preview visual
           transport::requestNoReply(this->node, "entity_delete", _modelName);
+
+//          std::cerr << " loading model " << model->ToString("") << std::endl;
           this->LoadSDF(model);
-          return;
+          boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+//          this->sdfToLoad.push_back(model);
         }
         model = model->GetNextElement("model");
       }
@@ -492,8 +505,9 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
     this->Reset();
   }
 
-  std::ostringstream linkNameStream;
-  linkNameStream << "part_" << this->partCounter++;
+  std::stringstream linkNameStream;
+  linkNameStream << this->previewName << "_" << this->modelCounter
+      << "::part_" << this->partCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
@@ -501,7 +515,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << linkName << "_visual";
+  visualName << linkName << "::visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
       linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
@@ -534,8 +548,9 @@ std::string ModelCreator::AddSphere(double _radius,
   if (!this->previewVisual)
     this->Reset();
 
-  std::ostringstream linkNameStream;
-  linkNameStream << "part_" << this->partCounter++;
+  std::stringstream linkNameStream;
+  linkNameStream << this->previewName << "_" << this->modelCounter
+      << "::part_" << this->partCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(
@@ -543,7 +558,7 @@ std::string ModelCreator::AddSphere(double _radius,
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << linkName << "_visual";
+  visualName << linkName << "::visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
@@ -577,8 +592,9 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
   if (!this->previewVisual)
     this->Reset();
 
-  std::ostringstream linkNameStream;
-  linkNameStream << "part_" << this->partCounter++;
+  std::stringstream linkNameStream;
+  linkNameStream << this->previewName << "_" << this->modelCounter
+      << "::part_" << this->partCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(
@@ -586,7 +602,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << linkName << "_visual";
+  visualName << linkName << "::visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
@@ -624,8 +640,9 @@ std::string ModelCreator::AddCustom(const std::string &_path,
 
   std::string path = _path;
 
-  std::ostringstream linkNameStream;
-  linkNameStream << "part_" << this->partCounter++;
+  std::stringstream linkNameStream;
+  linkNameStream << this->previewName << "_" << this->modelCounter
+      << "::part_" << this->partCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(
@@ -633,7 +650,7 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << linkName << "_visual";
+  visualName << linkName << "::visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
@@ -670,7 +687,7 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 
   // create collision with identical geometry
   rendering::VisualPtr collisionVis =
-      _visual->Clone(part->partVisual->GetName() + "_collision",
+      _visual->Clone(part->partVisual->GetName() + "::collision",
       part->partVisual);
 
   // orange
@@ -688,7 +705,11 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   std::string partName = part->partVisual->GetName();
   part->SetName(partName);
   part->SetPose(part->partVisual->GetWorldPose());
-  this->allParts[partName] = part;
+
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    this->allParts[partName] = part;
+  }
 
   rendering::ScenePtr scene = part->partVisual->GetScene();
   scene->AddVisual(part->partVisual);
@@ -701,6 +722,8 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 /////////////////////////////////////////////////
 PartData *ModelCreator::ClonePart(const std::string &_partName)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+
   std::map<std::string, PartData *>::iterator it
       = this->allParts.find(_partName);
   if (it == allParts.end())
@@ -733,22 +756,20 @@ PartData *ModelCreator::ClonePart(const std::string &_partName)
 /////////////////////////////////////////////////
 void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 {
-  PartData *part = new PartData;
+  PartData *part = new PartData();
 
   // Link name
-  std::string linkName;
+  std::stringstream linkNameStream;
+  linkNameStream << this->previewName << "_" << this->modelCounter << "::";
   if (_linkElem->HasAttribute("name"))
-  {
-    linkName = _linkElem->Get<std::string>("name");
-  }
+    linkNameStream << _linkElem->Get<std::string>("name");
   else
   {
-    std::ostringstream linkNameStream;
     linkNameStream << "part_" << this->partCounter++;
-    linkName = linkNameStream.str();
-    gzwarn << "SDF missing link name attribute. Created name " << linkName
-        << std::endl;
+    gzwarn << "SDF missing link name attribute. Created name " <<
+        linkNameStream.str() << std::endl;
   }
+  std::string linkName = linkNameStream.str();
   part->SetName(linkName);
 
   // Link pose
@@ -822,13 +843,13 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
     std::string visualName;
     if (visualElem->HasAttribute("name"))
     {
-      visualName = visualElem->Get<std::string>("name");
+      visualName = linkName + "::" + visualElem->Get<std::string>("name");
       visualIndex++;
     }
     else
     {
-      std::ostringstream visualNameStream;
-      visualNameStream << linkName << "::Visual_" << visualIndex++;
+      std::stringstream visualNameStream;
+      visualNameStream << linkName << "::visual_" << visualIndex++;
       visualName = visualNameStream.str();
       gzwarn << "SDF missing visual name attribute. Created name " << visualName
           << std::endl;
@@ -858,19 +879,19 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
   if (_linkElem->HasElement("collision"))
     collisionElem = _linkElem->GetElement("collision");
 
-  while (collisionElem)
+  while (collisionElem && false)
   {
     // Collision name
     std::string collisionName;
     if (collisionElem->HasAttribute("name"))
     {
-      collisionName = collisionElem->Get<std::string>("name");
+      collisionName = linkName + "::" + collisionElem->Get<std::string>("name");
       collisionIndex++;
     }
     else
     {
       std::ostringstream collisionNameStream;
-      collisionNameStream << linkName << "::Collision_" << collisionIndex++;
+      collisionNameStream << linkName << "::collision_" << collisionIndex++;
       collisionName = collisionNameStream.str();
       gzwarn << "SDF missing collision name attribute. Created name " <<
           collisionName << std::endl;
@@ -914,7 +935,11 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 
   // Finalize
   linkVisual->SetTransparency(ModelData::GetEditTransparency());
-  this->allParts[part->GetName()] = part;
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    this->allParts[part->GetName()] = part;
+  }
+
 
   rendering::ScenePtr scene = part->partVisual->GetScene();
   scene->AddVisual(part->partVisual);
@@ -931,10 +956,15 @@ void ModelCreator::RemovePart(const std::string &_partName)
     return;
   }
 
-  if (this->allParts.find(_partName) == this->allParts.end())
-    return;
+  PartData *part = NULL;
 
-  PartData *part = this->allParts[_partName];
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    if (this->allParts.find(_partName) == this->allParts.end())
+      return;
+    part = this->allParts[_partName];
+  }
+
   if (!part)
     return;
 
@@ -959,7 +989,10 @@ void ModelCreator::RemovePart(const std::string &_partName)
   part->partVisual.reset();
   delete part->inspector;
 
-  this->allParts.erase(_partName);
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    this->allParts.erase(_partName);
+  }
   this->ModelChanged();
 }
 
@@ -969,6 +1002,8 @@ void ModelCreator::Reset()
   if (!gui::get_active_camera() ||
       !gui::get_active_camera()->GetScene())
     return;
+
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
   this->saveDialog = new SaveDialog(SaveDialog::MODEL);
   this->jointMaker->Reset();
@@ -1137,6 +1172,8 @@ void ModelCreator::Stop()
 /////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+
   // if it's a link
   if (this->allParts.find(_entity) != this->allParts.end())
   {
@@ -1239,6 +1276,8 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (!userCamera)
     return false;
+
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
   if (this->mouseVisual)
   {
@@ -1392,6 +1431,8 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
   if (!vis)
     return false;
 
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+
   if (this->allParts.find(vis->GetParent()->GetName()) !=
       this->allParts.end())
   {
@@ -1412,6 +1453,7 @@ void ModelCreator::OnOpenInspector()
 /////////////////////////////////////////////////
 void ModelCreator::OpenInspector(const std::string &_name)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   PartData *part = this->allParts[_name];
   part->SetPose(part->partVisual->GetWorldPose());
   part->UpdateConfig();
@@ -1443,6 +1485,8 @@ void ModelCreator::OnPaste()
   {
     return;
   }
+
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
   // For now, only copy the last selected model
   std::map<std::string, PartData *>::iterator it =
@@ -1505,6 +1549,8 @@ void ModelCreator::GenerateSDF()
   std::stringstream collisionNameStream;
 
   modelElem->GetAttribute("name")->Set(this->folderName);
+
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
   // set center of all parts to be origin
   std::map<std::string, PartData *>::iterator partsIt;
@@ -1642,6 +1688,8 @@ void ModelCreator::ModelChanged()
 /////////////////////////////////////////////////
 void ModelCreator::Update()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+
   // Check if any parts have been moved or resized and trigger ModelChanged
   std::map<std::string, PartData *>::iterator partsIt;
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
@@ -1656,4 +1704,11 @@ void ModelCreator::Update()
       this->ModelChanged();
     }
   }
+
+/*  for (unsigned int i = 0; i < this->sdfToLoad.size(); ++i)
+    this->LoadSDF(this->sdfToLoad[i]);
+
+  this->sdfToLoad.clear();*/
+
+
 }

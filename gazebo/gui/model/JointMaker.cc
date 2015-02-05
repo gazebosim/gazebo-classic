@@ -76,6 +76,8 @@ JointMaker::JointMaker()
 JointMaker::~JointMaker()
 {
   this->Reset();
+
+  delete this->updateMutex;
 }
 
 /////////////////////////////////////////////////

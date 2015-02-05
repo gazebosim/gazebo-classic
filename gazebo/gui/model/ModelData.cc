@@ -181,8 +181,10 @@ void PartData::UpdateConfig()
   {
     std::string name = it->first->GetName();
     std::string partName = this->partVisual->GetName();
-    std::string leafName =
-        name.substr(name.find(partName)+partName.size()+1);
+    std::string leafName = name;
+    size_t idx = name.find_last_of("::");
+    if (idx != std::string::npos)
+      leafName = name.substr(idx+1);
     visualConfig->SetGeometry(leafName, it->first->GetScale(),
         it->first->GetMeshName());
 
@@ -201,8 +203,10 @@ void PartData::UpdateConfig()
   {
     std::string name = colIt->first->GetName();
     std::string partName = this->partVisual->GetName();
-    std::string leafName =
-        name.substr(name.find(partName)+partName.size()+1);
+    std::string leafName = name;
+    size_t idx = name.find_last_of("::");
+    if (idx != std::string::npos)
+      leafName = name.substr(idx+1);
     collisionConfig->SetGeometry(leafName, colIt->first->GetScale(),
         colIt->first->GetMeshName());
 
@@ -225,8 +229,10 @@ void PartData::AddVisual(rendering::VisualPtr _visual)
 
   std::string partName = this->partVisual->GetName();
   std::string visName = _visual->GetName();
-  std::string leafName =
-      visName.substr(visName.find(partName)+partName.size()+1);
+  std::string leafName = visName;
+  size_t idx = visName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = visName.substr(idx+1);
 
   visualConfig->AddVisual(leafName, &visualMsg);
 }
@@ -251,8 +257,10 @@ void PartData::AddCollision(rendering::VisualPtr _collisionVis)
 
   std::string partName = this->partVisual->GetName();
   std::string visName = _collisionVis->GetName();
-  std::string leafName =
-      visName.substr(visName.find(partName)+partName.size()+1);
+  std::string leafName = visName;
+  size_t idx = visName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = visName.substr(idx+1);
 
   collisionConfig->AddCollision(leafName, &collisionMsg);
 }
@@ -276,9 +284,11 @@ PartData* PartData::Clone(const std::string &_newName)
   for (visIt = this->visuals.begin(); visIt != this->visuals.end(); ++visIt)
   {
     std::string newVisName = visIt->first->GetName();
-    newVisName = _newName + newVisName.substr(
-        newVisName.find(partName) + partName.size());
-
+    size_t idx = newVisName.find_last_of("::");
+    if (idx != std::string::npos)
+      newVisName = _newName + newVisName.substr(idx);
+    else
+      newVisName = _newName + "::" + newVisName;
     clonePart->AddVisual(visIt->first->Clone(newVisName,
         clonePart->partVisual));
   }
@@ -287,8 +297,11 @@ PartData* PartData::Clone(const std::string &_newName)
       ++colIt)
   {
     std::string newColName = colIt->first->GetName();
-    newColName = _newName + newColName.substr(
-        newColName.find(partName) + partName.size());
+    size_t idx = newColName.find_last_of("::");
+    if (idx != std::string::npos)
+      newColName = _newName + newColName.substr(idx);
+    else
+      newColName = _newName + "::" + newColName;
     clonePart->AddCollision(colIt->first->Clone(newColName,
         clonePart->partVisual));
   }
@@ -312,10 +325,10 @@ void PartData::OnApply()
     for (it = this->visuals.begin(); it != this->visuals.end(); ++it)
     {
       std::string name = it->first->GetName();
-      std::string partName = this->partVisual->GetName();
-      std::string leafName =
-          name.substr(name.find(partName)+partName.size()+1);
-
+      std::string leafName = name;
+      size_t idx = name.find_last_of("::");
+      if (idx != std::string::npos)
+        leafName = name.substr(idx+1);
       msgs::Visual *updateMsg = visualConfig->GetData(leafName);
       if (updateMsg)
       {
@@ -343,9 +356,10 @@ void PartData::OnApply()
     {
       std::string name = it->first->GetName();
       std::string partName = this->partVisual->GetName();
-      std::string leafName =
-          name.substr(name.find(partName)+partName.size()+1);
-
+      std::string leafName = name;
+      size_t idx = name.find_last_of("::");
+      if (idx != std::string::npos)
+        leafName = name.substr(idx+1);
       msgs::Collision *updateMsg = collisionConfig->GetData(leafName);
       if (updateMsg)
       {
@@ -366,7 +380,7 @@ void PartData::OnAddVisual(const std::string &_name)
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
 
   std::ostringstream visualName;
-  visualName << this->partVisual->GetName() << "_" << _name;
+  visualName << this->partVisual->GetName() << "::" << _name;
 
   rendering::VisualPtr visVisual;
   rendering::VisualPtr refVisual;
@@ -411,7 +425,7 @@ void PartData::OnAddCollision(const std::string &_name)
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
 
   std::ostringstream collisionName;
-  collisionName << this->partVisual->GetName() << "_" << _name;
+  collisionName << this->partVisual->GetName() << "::" << _name;
 
   rendering::VisualPtr collisionVis;
   if (!this->collisions.empty())
@@ -463,7 +477,7 @@ void PartData::OnRemoveVisual(const std::string &_name)
   // find and remove visual when the user removes it in the
   // inspector's visual tab
   std::ostringstream name;
-  name << this->partVisual->GetName() << "_" << _name;
+  name << this->partVisual->GetName() << "::" << _name;
   std::string visualName = name.str();
 
   std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
@@ -485,7 +499,7 @@ void PartData::OnRemoveCollision(const std::string &_name)
   // find and remove collision visual when the user removes it in the
   // inspector's collision tab
   std::ostringstream name;
-  name << this->partVisual->GetName() << "_" << _name;
+  name << this->partVisual->GetName() << "::" << _name;
   std::string collisoinName = name.str();
 
   std::map<rendering::VisualPtr, msgs::Collision>::iterator it;
