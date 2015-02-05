@@ -76,9 +76,8 @@ unsigned int CollisionConfig::GetCollisionCount() const
 /////////////////////////////////////////////////
 void CollisionConfig::Reset()
 {
-  std::map<int, CollisionConfigData *>::iterator it;
-  for (it = this->configs.begin(); it != this->configs.end(); ++it)
-    delete it->second;
+  for (auto &it : this->configs)
+    delete it.second;
 
   this->configs.clear();
   this->collisionsTreeWidget->clear();
@@ -88,13 +87,11 @@ void CollisionConfig::Reset()
 void CollisionConfig::UpdateCollision(const std::string &_name,
     const msgs::Collision *_collisionMsg)
 {
-  std::map<int, CollisionConfigData *>::iterator it;
-
-  for (it = this->configs.begin(); it != this->configs.end(); ++it)
+  for (auto &it : this->configs)
   {
-    if (it->second->name == _name)
+    if (it.second->name == _name)
     {
-      CollisionConfigData *configData = it->second;
+      CollisionConfigData *configData = it.second;
       configData->configWidget->UpdateFromMsg(_collisionMsg);
       break;
     }
@@ -201,7 +198,7 @@ void CollisionConfig::OnItemSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 void CollisionConfig::OnRemoveCollision(int _id)
 {
-  std::map<int, CollisionConfigData *>::iterator it = this->configs.find(_id);
+  auto it = this->configs.find(_id);
   if (it == this->configs.end())
   {
     gzerr << "Collision not found " << std::endl;
@@ -221,14 +218,12 @@ void CollisionConfig::OnRemoveCollision(int _id)
 /////////////////////////////////////////////////
 msgs::Collision *CollisionConfig::GetData(const std::string &_name) const
 {
-  std::map<int, CollisionConfigData *>::const_iterator it;
-  for (it = this->configs.begin(); it != this->configs.end(); ++it)
+  for (auto const &it : this->configs)
   {
-    std::string name = it->second->name;
+    std::string name = it.second->name;
     if (name == _name)
     {
-      return dynamic_cast<msgs::Collision *>(
-          it->second->configWidget->GetMsg());
+      return dynamic_cast<msgs::Collision *>(it.second->configWidget->GetMsg());
     }
   }
   return NULL;
@@ -238,16 +233,15 @@ msgs::Collision *CollisionConfig::GetData(const std::string &_name) const
 void CollisionConfig::SetGeometry(const std::string &_name,
     const math::Vector3 &_size, const std::string &_uri)
 {
-  std::map<int, CollisionConfigData *>::iterator it;
-  for (it = this->configs.begin(); it != this->configs.end(); ++it)
+  for (auto &it : this->configs)
   {
-    if (it->second->name == _name)
+    if (it.second->name == _name)
     {
       math::Vector3 dimensions;
       std::string uri;
-      std::string type = it->second->configWidget->GetGeometryWidgetValue(
+      std::string type = it.second->configWidget->GetGeometryWidgetValue(
           "geometry", dimensions, uri);
-      it->second->configWidget->SetGeometryWidgetValue("geometry", type,
+      it.second->configWidget->SetGeometryWidgetValue("geometry", type,
           _size, _uri);
       break;
     }
