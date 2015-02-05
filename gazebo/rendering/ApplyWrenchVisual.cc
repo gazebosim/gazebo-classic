@@ -259,35 +259,47 @@ math::Quaternion ApplyWrenchVisual::GetQuaternionFromVector(math::Vector3 _vec)
   // http://gamedev.stackexchange.com/questions/53129/quaternion-look-at-with-up-vector
   // Still doesn't stay properly up at some angles though.
 
-  math::Vector3 up = math::Vector3::UnitZ;
+//  math::Vector3 up = math::Vector3::UnitZ;
 
-  math::Vector3 forward_l = _vec;
-  math::Vector3 forward_w(1, 0, 0);
-  math::Vector3 axis  = forward_l.Cross(forward_w);
-  float angle = acos(forward_l.Dot(forward_w));
+//  math::Vector3 forward_l = _vec;
+//  math::Vector3 forward_w(1, 0, 0);
+//  math::Vector3 axis  = forward_l.Cross(forward_w);
+//  float angle = acos(forward_l.Dot(forward_w));
 
-  math::Vector3 third = axis.Cross(forward_w);
-  if (third.Dot(forward_l) < 0)
-  {
-    angle = -angle;
-  }
-  math::Quaternion q1;
-  q1.SetFromAxis(axis, angle);
-
-  math::Vector3 up_l  = q1 * up.Normalize();
-  math::Vector3 right = (forward_l.Cross(up)).Normalize();
-  math::Vector3 up_w  = (right.Cross(forward_l)).Normalize();
-
-  math::Vector3 axis2  = up_l.Cross(up_w);
-  float angle2 = acos(up_l.Dot(up_w));
-
-//  math::Vector3 third2 = axis2.Cross(up_w);
-//  if (third2.Dot(up_l) < 0)
+//  math::Vector3 third = axis.Cross(forward_w);
+//  if (third.Dot(forward_l) < 0)
 //  {
-//    angle2 = -angle2;
+//    angle = -angle;
 //  }
-  math::Quaternion q2;
-  q2.SetFromAxis(axis2, angle2);
+//  math::Quaternion q1;
+//  q1.SetFromAxis(axis, angle);
 
-  return q2 * q1;
+//  math::Vector3 up_l  = q1 * up.Normalize();
+//  math::Vector3 right = (forward_l.Cross(up)).Normalize();
+//  math::Vector3 up_w  = (right.Cross(forward_l)).Normalize();
+
+//  math::Vector3 axis2  = up_l.Cross(up_w);
+//  float angle2 = acos(up_l.Dot(up_w));
+
+////  math::Vector3 third2 = axis2.Cross(up_w);
+////  if (third2.Dot(up_l) < 0)
+////  {
+////    angle2 = -angle2;
+////  }
+//  math::Quaternion q2;
+//  q2.SetFromAxis(axis2, angle2);
+
+//  return q2 * q1;
+
+//  double roll = 0;
+//  double pitch = -atan2(_vec.z, _vec.x);
+//  double yaw = atan2(_vec.y, sqrt(pow(_vec.x, 2) + pow(_vec.z, 2)));
+
+  double roll = 0;
+  double pitch = -atan2(_vec.z, sqrt(pow(_vec.x, 2) + pow(_vec.y, 2)));
+  double yaw = atan2(_vec.y, _vec.x);
+
+
+  return math::Quaternion(roll, pitch, yaw);
+
 }
