@@ -103,9 +103,6 @@ namespace gazebo
       /// \brief Number of steps in the staircase item.
       private: int stairsSteps;
 
-      /// \brief Scale for converting pixels to metric units.
-      private: double scale;
-
       /// \brief Inspector for configuring the staircase item.
       private: StairsInspectorDialog *inspector;
 

@@ -12,7 +12,6 @@ set (sources
   DoorItem.cc
   EditorItem.cc
   EditorView.cc
-  FinishBuildingDialog.cc
   FloorItem.cc
   GrabberHandle.cc
   GridLines.cc
@@ -40,7 +39,6 @@ set (qt_headers
   DoorItem.hh
   EditorItem.hh
   EditorView.hh
-  FinishBuildingDialog.hh
   FloorItem.hh
   ImportImageDialog.hh
   ImportImageView.hh
