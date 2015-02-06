@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,7 +105,7 @@ void SonarSensor_TEST::DemoWorld(const std::string &_physicsEngine,
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
   physics::WorldPtr world = physics::get_world();
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
   world->Step(100);
 
   // Sonar sensor name

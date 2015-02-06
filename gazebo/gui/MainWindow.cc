@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *
  */
 #include <sdf/sdf.hh>
+#include <boost/scoped_ptr.hpp>
 
 #include "gazebo/gazebo_config.h"
 
@@ -112,11 +113,11 @@ MainWindow::MainWindow()
   this->tabWidget->setMinimumWidth(MINIMUM_TAB_WIDTH);
   this->AddToLeftColumn("default", this->tabWidget);
 
-  this->CreateEditors();
-
   this->toolsWidget = new ToolsWidget();
 
   this->renderWidget = new RenderWidget(mainWidget);
+
+  this->CreateEditors();
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
@@ -262,8 +263,6 @@ void MainWindow::Init()
     this->node->Advertise<msgs::WorldControl>("~/world_control");
   this->serverControlPub =
     this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
-  this->selectionPub =
-    this->node->Advertise<msgs::Selection>("~/selection");
   this->scenePub =
     this->node->Advertise<msgs::Scene>("~/scene");
 

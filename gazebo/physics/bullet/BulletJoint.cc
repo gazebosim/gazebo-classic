@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -523,13 +523,6 @@ math::Vector3 BulletJoint::GetLinkTorque(unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Bullet\n";
   return math::Vector3();
-}
-
-//////////////////////////////////////////////////
-void BulletJoint::SetAttribute(Attribute, unsigned int /*_index*/,
-    double /*_value*/)
-{
-  gzdbg << "Not implement in Bullet\n";
 }
 
 //////////////////////////////////////////////////

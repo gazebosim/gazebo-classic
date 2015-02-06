@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
 #include "gazebo/rendering/RenderEngine.hh"
-#include "gazebo/rendering/GUIOverlay.hh"
 #include "gazebo/rendering/WindowManager.hh"
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/OrbitViewController.hh"
@@ -39,8 +38,6 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   : Camera(_name, _scene),
     dataPtr(new UserCameraPrivate)
 {
-  this->dataPtr->gui = new GUIOverlay();
-
   this->dataPtr->orbitViewController = NULL;
   this->dataPtr->fpsViewController = NULL;
   this->dataPtr->viewController = NULL;
@@ -60,9 +57,6 @@ UserCamera::~UserCamera()
 {
   delete this->dataPtr->orbitViewController;
   delete this->dataPtr->fpsViewController;
-
-  delete this->dataPtr->gui;
-  this->dataPtr->gui = NULL;
 
   this->connections.clear();
 
@@ -187,9 +181,6 @@ void UserCamera::Update()
 {
   Camera::Update();
 
-  if (this->dataPtr->gui)
-    this->dataPtr->gui->Update();
-
   if (this->dataPtr->viewController)
     this->dataPtr->viewController->Update();
 }
@@ -215,32 +206,25 @@ void UserCamera::Fini()
 //////////////////////////////////////////////////
 void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
-  if (!this->dataPtr->gui || !this->dataPtr->gui->HandleMouseEvent(_evt))
-  {
-    if (this->dataPtr->selectionBuffer)
-      this->dataPtr->selectionBuffer->Update();
+  if (this->dataPtr->selectionBuffer)
+    this->dataPtr->selectionBuffer->Update();
 
-    // DEBUG: this->dataPtr->selectionBuffer->ShowOverlay(true);
+  // DEBUG: this->dataPtr->selectionBuffer->ShowOverlay(true);
 
-    // Don't update the camera if it's being animated.
-    if (!this->animState)
-      this->dataPtr->viewController->HandleMouseEvent(_evt);
-  }
+  // Don't update the camera if it's being animated.
+  if (!this->animState)
+    this->dataPtr->viewController->HandleMouseEvent(_evt);
 }
 
 /////////////////////////////////////////////////
 void UserCamera::HandleKeyPressEvent(const std::string &_key)
 {
-  if (this->dataPtr->gui)
-    this->dataPtr->gui->HandleKeyPressEvent(_key);
   this->dataPtr->viewController->HandleKeyPressEvent(_key);
 }
 
 /////////////////////////////////////////////////
 void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
 {
-  if (this->dataPtr->gui)
-    this->dataPtr->gui->HandleKeyReleaseEvent(_key);
   this->dataPtr->viewController->HandleKeyReleaseEvent(_key);
 }
 
@@ -380,12 +364,6 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
-
-    if (this->dataPtr->gui)
-    {
-      this->dataPtr->gui->Resize(this->viewport->getActualWidth(),
-                        this->viewport->getActualHeight());
-    }
 
     delete [] this->saveFrameBuffer;
     this->saveFrameBuffer = NULL;
@@ -541,19 +519,10 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
 
-  if (this->dataPtr->gui)
-    this->dataPtr->gui->Init(this->renderTarget);
-
   this->initialized = true;
 
   this->dataPtr->selectionBuffer = new SelectionBuffer(this->scopedUniqueName,
       this->scene->GetManager(), this->renderTarget);
-}
-
-//////////////////////////////////////////////////
-GUIOverlay *UserCamera::GetGUIOverlay()
-{
-  return this->dataPtr->gui;
 }
 
 //////////////////////////////////////////////////
@@ -582,12 +551,14 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
   {
     // Make sure we set the _mod only if we have found a selection object
     if (entity->getName().substr(0, 15) == "__SELECTION_OBJ" &&
-        !entity->getUserAny().isEmpty() &&
-        entity->getUserAny().getType() == typeid(std::string))
+        !entity->getUserObjectBindings().getUserAny().isEmpty() &&
+        entity->getUserObjectBindings().getUserAny().getType() ==
+        typeid(std::string))
     {
       try
       {
-        _mod = Ogre::any_cast<std::string>(entity->getUserAny());
+        _mod = Ogre::any_cast<std::string>(
+            entity->getUserObjectBindings().getUserAny());
       }
       catch(Ogre::Exception &e)
       {
@@ -596,12 +567,13 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
       }
     }
 
-    if (!entity->getUserAny().isEmpty())
+    if (!entity->getUserObjectBindings().getUserAny().isEmpty())
     {
       try
       {
         result = this->scene->GetVisual(
-            Ogre::any_cast<std::string>(entity->getUserAny()));
+            Ogre::any_cast<std::string>(
+              entity->getUserObjectBindings().getUserAny()));
       }
       catch(Ogre::Exception &e)
       {
@@ -628,10 +600,11 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
   Ogre::Entity *entity =
     this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
 
-  if (entity && !entity->getUserAny().isEmpty())
+  if (entity && !entity->getUserObjectBindings().getUserAny().isEmpty())
   {
     result = this->scene->GetVisual(
-        Ogre::any_cast<std::string>(entity->getUserAny()));
+        Ogre::any_cast<std::string>(
+          entity->getUserObjectBindings().getUserAny()));
   }
 
   return result;

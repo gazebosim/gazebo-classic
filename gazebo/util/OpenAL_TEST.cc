@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -252,7 +252,7 @@ TEST_F(OpenAL, Sourcevalid)
 
     EXPECT_TRUE(sdf::readString(sdfString, sdf->root));
 
-    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->root));
+    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->root) != NULL);
   }
 
   // No Pitch, gain, loop, contact
@@ -268,7 +268,7 @@ TEST_F(OpenAL, Sourcevalid)
 
     EXPECT_TRUE(sdf::readString(sdfString, sdf->root));
 
-    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->root));
+    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->root) != NULL);
   }
 
   ASSERT_NO_THROW(util::OpenAL::Instance()->Fini());

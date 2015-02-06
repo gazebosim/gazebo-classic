@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,12 +144,10 @@ void Node::ProcessPublishers()
 
   int start, end;
   boost::mutex::scoped_lock lock(this->publisherDeleteMutex);
+  boost::mutex::scoped_lock lock2(this->publisherMutex);
 
-  {
-    boost::mutex::scoped_lock lock2(this->publisherMutex);
-    start = 0;
-    end = this->publishers.size();
-  }
+  start = 0;
+  end = this->publishers.size();
 
   for (int i = start; i < end; ++i)
     this->publishers[i]->SendMessage();

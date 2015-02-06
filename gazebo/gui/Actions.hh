@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,6 +87,7 @@ namespace gazebo
     extern QAction *g_pasteAct;
 
     extern QWidgetAction *g_alignAct;
+    extern QAction *g_alignButtonAct;
     extern QAction *g_snapAct;
 
     /// \class DeleteAction Actions.hh gui/gui.hh

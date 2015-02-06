@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ TEST_F(ModelTest, GetLinksV)
   for (physics::Link_V::const_iterator iter = model->GetLinks().begin();
        iter != model->GetLinks().end(); ++iter)
   {
-    EXPECT_TRUE(*iter);
+    EXPECT_TRUE(*iter != NULL);
     EXPECT_FALSE((*iter)->GetName().empty());
     EXPECT_STREQ((*iter)->GetName().c_str(), "link_1");
   }

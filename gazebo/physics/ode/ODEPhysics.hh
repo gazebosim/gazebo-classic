@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,7 @@
 
 #include <tbb/spin_mutex.h>
 #include <tbb/concurrent_vector.h>
-#include <map>
 #include <string>
-#include <vector>
 #include <utility>
 
 #include <boost/thread/thread.hpp>
@@ -38,20 +36,8 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \brief Data structure for contact feedbacks
-    class GAZEBO_VISIBLE ODEJointFeedback
-    {
-      public: ODEJointFeedback() : contact(NULL), count(0) {}
-
-      /// \brief Contact information.
-      public: Contact *contact;
-
-      /// \brief Number of elements in feedbacks array.
-      public: int count;
-
-      /// \brief Contact joint feedback information.
-      public: dJointFeedback feedbacks[MAX_CONTACT_JOINTS];
-    };
+    class ODEJointFeedback;
+    class ODEPhysicsPrivate;
 
     /// \brief ODE physics engine.
     class GAZEBO_VISIBLE ODEPhysics : public PhysicsEngine
@@ -90,8 +76,8 @@ namespace gazebo
         /// \brief Minimum step size
         MIN_STEP_SIZE,
 
-        /// \brief Limit ratios of inertias of adjacent links
-        /// (note that the corresponding SDF tag is "use_dynamic_moi_rescaling"
+        /// \brief Limit ratios of inertias of adjacent links (note that the
+        /// corresponding SDF tag is "use_dynamic_moi_rescaling")
         INERTIA_RATIO_REDUCTION
       };
 
@@ -269,51 +255,9 @@ namespace gazebo
       private: void AddCollider(ODECollision *_collision1,
                                 ODECollision *_collision2);
 
-      /// \brief Top-level world for all bodies
-      private: dWorldID worldId;
-
-      /// \brief Top-level space for all sub-spaces/collisions
-      private: dSpaceID spaceId;
-
-      /// \brief Collision attributes
-      private: dJointGroupID contactGroup;
-
-      /// \brief The type of the solver.
-      private: std::string stepType;
-
-      /// \brief Buffer of contact feedback information.
-      private: std::vector<ODEJointFeedback*> jointFeedbacks;
-
-      /// \brief Current index into the contactFeedbacks buffer
-      private: unsigned int jointFeedbackIndex;
-
-      /// \brief All the collsiion spaces.
-      private: std::map<std::string, dSpaceID> spaces;
-
-      /// \brief All the normal colliders.
-      private: std::vector< std::pair<ODECollision*, ODECollision*> > colliders;
-
-      /// \brief All the triangle mesh colliders.
-      private: std::vector< std::pair<ODECollision*, ODECollision*> >
-               trimeshColliders;
-
-      /// \brief Number of normal colliders.
-      private: unsigned int collidersCount;
-
-      /// \brief Number of triangle mesh colliders.
-      private: unsigned int trimeshCollidersCount;
-
-      /// \brief Array of contact collisions.
-      private: dContactGeom contactCollisions[MAX_COLLIDE_RETURNS];
-
-      /// \brief Physics step function.
-      private: int (*physicsStepFunc)(dxWorld*, dReal);
-
-      /// \brief Indices used during creation of contact joints.
-      private: int indices[MAX_CONTACT_JOINTS];
-
-      /// \brief Maximum number of contact points per collision pair.
-      private: unsigned int maxContacts;
+      /// \internal
+      /// \brief Private data pointer.
+      private: ODEPhysicsPrivate *dataPtr;
     };
   }
 }

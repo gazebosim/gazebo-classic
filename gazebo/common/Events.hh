@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,6 +155,19 @@ namespace gazebo
               { worldUpdateEnd.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect to the the world reset signal
+      /// \param[in] _subscriber the subscriber to this event
+      /// \return a connection
+      public: template<typename T>
+              static ConnectionPtr ConnectWorldReset(T _subscriber)
+              { return worldReset.Connect(_subscriber); }
+
+      /// \brief Disconnect from the world reset signal
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectWorldReset(ConnectionPtr _subscriber)
+              { worldReset.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
       /// \brief Render start signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
@@ -254,6 +267,9 @@ namespace gazebo
 
       /// \brief World update has ended
       public: static EventT<void ()> worldUpdateEnd;
+
+      /// \brief World reset signal
+      public: static EventT<void ()> worldReset;
 
       /// \brief Pre-render
       public: static EventT<void ()> preRender;

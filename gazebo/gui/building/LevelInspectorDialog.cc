@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/gui/building/LevelInspectorDialog.hh"
 
 using namespace gazebo;
@@ -54,8 +55,32 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
   floorColorLayout->addWidget(floorColorLabel);
   floorColorLayout->addWidget(floorColorComboBox);
 
+  QLabel *floorTextureLabel = new QLabel(tr("Floor Texture: "));
+  this->floorTextureComboBox = new QComboBox;
+  this->floorTextureComboBox->setIconSize(QSize(30, 30));
+  this->floorTextureComboBox->setMinimumWidth(50);
+  this->floorTextureComboBox->setMinimumHeight(50);
+  this->floorTextureComboBox->setSizePolicy(QSizePolicy::Fixed,
+      QSizePolicy::Fixed);
+  this->floorTextureList.push_back(":wood.jpg");
+  this->floorTextureList.push_back(":tiles.jpg");
+  this->floorTextureList.push_back(":bricks.png");
+  for (unsigned int i = 0; i < this->floorTextureList.size(); ++i)
+  {
+    this->floorTextureComboBox->addItem(QPixmap(this->floorTextureList[i])
+        .scaled(QSize(90, 90), Qt::IgnoreAspectRatio), QString(""));
+  }
+  this->floorTextureComboBox->addItem("X");
+  this->floorTextureComboBox->setCurrentIndex(
+      this->floorTextureComboBox->count()-1);
+
+  QHBoxLayout *floorTextureLayout = new QHBoxLayout;
+  floorTextureLayout->addWidget(floorTextureLabel);
+  floorTextureLayout->addWidget(floorTextureComboBox);
+
   QVBoxLayout *floorLayout = new QVBoxLayout;
   floorLayout->addLayout(floorColorLayout);
+  floorLayout->addLayout(floorTextureLayout);
 
   this->floorWidget = new QWidget;
   this->floorWidget->setLayout(floorLayout);
@@ -129,6 +154,20 @@ QColor LevelInspectorDialog::GetFloorColor() const
 }
 
 /////////////////////////////////////////////////
+QString LevelInspectorDialog::GetFloorTexture() const
+{
+  QString floorTexture = QString("");
+  if (this->floorTextureComboBox->currentIndex() != -1 &&
+      this->floorTextureComboBox->currentIndex() <
+      this->floorTextureComboBox->count() - 1)
+  {
+    floorTexture = this->floorTextureList[
+        this->floorTextureComboBox->currentIndex()];
+  }
+  return floorTexture;
+}
+
+/////////////////////////////////////////////////
 void LevelInspectorDialog::SetLevelName(const std::string &_levelName)
 {
   this->levelNameLineEdit->setText(QString(_levelName.c_str()));
@@ -144,15 +183,43 @@ void LevelInspectorDialog::SetHeight(double _height)
 /////////////////////////////////////////////////
 void LevelInspectorDialog::SetFloorColor(const QColor _color)
 {
-  // Find index corresponding to color (only a few colors allowed so far)
+  int index = -1;
   for (unsigned int i = 0; i < this->floorColorList.size(); ++i)
   {
     if (this->floorColorList[i] == _color)
     {
-      this->floorColorComboBox->setCurrentIndex(i);
+      index = i;
       break;
     }
   }
+
+  if (index == -1)
+  {
+    // Add a new color
+    this->floorColorList.push_back(_color);
+    QPixmap colorIcon(15, 15);
+    colorIcon.fill(this->floorColorList.back());
+    this->floorColorComboBox->addItem(colorIcon, QString(""));
+    index = this->floorColorComboBox->count()-1;
+  }
+  GZ_ASSERT(index > 0, "Color index is broken < 0");
+  this->floorColorComboBox->setCurrentIndex(index);
+}
+
+/////////////////////////////////////////////////
+void LevelInspectorDialog::SetFloorTexture(QString _floorTexture)
+{
+  // Find index corresponding to texture (only a few textures allowed so far)
+  int index = this->floorTextureComboBox->count()-1;
+  for (unsigned int i = 0; i < this->floorTextureList.size(); ++i)
+  {
+    if (this->floorTextureList[i] == _floorTexture)
+    {
+      index = i;
+      break;
+    }
+  }
+  this->floorTextureComboBox->setCurrentIndex(index);
 }
 
 /////////////////////////////////////////////////

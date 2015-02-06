@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,9 @@ EditorItem::EditorItem()
 {
   this->editorType = "base";
   this->name = "";
+
+  this->level = 0;
+  this->levelBaseHeight = 0;
 }
 
 /////////////////////////////////////////////////
@@ -70,6 +73,12 @@ QColor EditorItem::Get3dColor() const
 }
 
 /////////////////////////////////////////////////
+QString EditorItem::Get3dTexture() const
+{
+  return this->visual3dTexture;
+}
+
+/////////////////////////////////////////////////
 void EditorItem::SetName(const std::string &_name)
 {
   this->name = _name;
@@ -83,10 +92,54 @@ void EditorItem::Set3dColor(QColor _color)
 }
 
 /////////////////////////////////////////////////
+void EditorItem::OnColorChanged(QColor _color)
+{
+  this->visual3dColor = _color;
+}
+
+/////////////////////////////////////////////////
+void EditorItem::Set3dTexture(QString _texture)
+{
+  this->visual3dTexture = _texture;
+  emit TextureChanged(this->visual3dTexture);
+}
+
+/////////////////////////////////////////////////
+void EditorItem::OnTextureChanged(QString _texture)
+{
+  this->visual3dTexture = _texture;
+}
+
+/////////////////////////////////////////////////
 void EditorItem::Set3dTransparency(float _transparency)
 {
   this->visual3dTransparency = _transparency;
   emit TransparencyChanged(this->visual3dTransparency);
+}
+
+/////////////////////////////////////////////////
+int EditorItem::GetLevel() const
+{
+  return this->level;
+}
+
+/////////////////////////////////////////////////
+void EditorItem::SetLevel(int _level)
+{
+  this->level = _level;
+  this->LevelChanged(this->level);
+}
+
+/////////////////////////////////////////////////
+double EditorItem::GetLevelBaseHeight() const
+{
+  return this->levelBaseHeight;
+}
+
+/////////////////////////////////////////////////
+void EditorItem::SetLevelBaseHeight(double _height)
+{
+  this->levelBaseHeight = _height;
 }
 
 /////////////////////////////////////////////////

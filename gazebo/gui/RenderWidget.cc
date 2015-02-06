@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   alignMenu->addAction(g_alignAct);
   alignButton->setMenu(alignMenu);
   alignButton->setPopupMode(QToolButton::InstantPopup);
-  this->toolbar->addWidget(alignButton);
+  g_alignButtonAct = this->toolbar->addWidget(alignButton);
   connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
 
   this->toolbar->addSeparator();
@@ -173,7 +173,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->connections.push_back(
       gui::Events::ConnectFollow(
         boost::bind(&RenderWidget::OnFollow, this, _1)));
-
 
   // Load all GUI Plugins
   std::string filenames = getINIProperty<std::string>(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -301,9 +301,6 @@ TEST_F(gzTest, Model)
 
     waitForMsg("gz model -w default -m my_box -f " + filename);
 
-    std::ifstream ifs(filename.c_str());
-    EXPECT_TRUE(ifs);
-
     boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));
 
@@ -325,9 +322,6 @@ TEST_F(gzTest, Model)
     std::string cmd = "cat ";
     cmd += filename + " | gz model -w default -m my_box -s";
     waitForMsg(cmd);
-
-    std::ifstream ifs(filename.c_str());
-    EXPECT_TRUE(ifs);
 
     boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));

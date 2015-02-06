@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,6 +128,18 @@ namespace gazebo
     GAZEBO_VISIBLE
     std::string ConvertJointType(const msgs::Joint::Type _type);
 
+    /// \brief Convert a string to a msgs::Geometry::Type enum.
+    /// \param[in] _str Geometry type string.
+    /// \return A msgs::Geometry::Type enum.
+    GAZEBO_VISIBLE
+    msgs::Geometry::Type ConvertGeometryType(const std::string &_str);
+
+    /// \brief Convert a msgs::Geometry::Type to a string.
+    /// \param[in] _type A msgs::Geometry::Type enum.
+    /// \return Geometry type string.
+    GAZEBO_VISIBLE
+    std::string ConvertGeometryType(const msgs::Geometry::Type _type);
+
     /// \brief Convert a msgs::Vector3d to a math::Vector
     /// \param[in] _v The plane to convert
     /// \return A math::Vector3 object
@@ -222,6 +234,7 @@ namespace gazebo
     /// a common::SphericalCoordinates object.
     /// \param[out] _p A msgs::SphericalCoordinates pointer.
     /// \param[in] _v A common::SphericalCoordinates reference
+    GAZEBO_VISIBLE
     void Set(msgs::SphericalCoordinates *_s,
              const common::SphericalCoordinates &_v);
 
@@ -409,7 +422,62 @@ namespace gazebo
     /// \param[in] _sdf if supplied, performs an update from _msg intead of
     /// creating a new sdf element.
     /// \return The new SDF element.
+    GAZEBO_VISIBLE
     sdf::ElementPtr PluginToSDF(const msgs::Plugin &_plugin,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Collision
+    /// \param[in] _msg Collision messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr CollisionToSDF(const msgs::Collision &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Link
+    /// \param[in] _msg Link messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr LinkToSDF(const msgs::Link &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Inertial
+    /// \param[in] _msg Inertial messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr InertialToSDF(const msgs::Inertial &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Surface
+    /// \param[in] _msg Surface messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr SurfaceToSDF(const msgs::Surface &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Geometry
+    /// \param[in] _msg Geometry messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr GeometryToSDF(const msgs::Geometry &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Mesh
+    /// \param[in] _msg Mesh messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr MeshToSDF(const msgs::MeshGeom &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
     /// \cond

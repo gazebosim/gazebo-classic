@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,35 +23,9 @@ using namespace gui;
 /////////////////////////////////////////////////
 BuildingItem::BuildingItem()
 {
-  this->level = 0;
-  this->levelBaseHeight = 0;
 }
 
 /////////////////////////////////////////////////
 BuildingItem::~BuildingItem()
 {
-}
-
-/////////////////////////////////////////////////
-int BuildingItem::GetLevel() const
-{
-  return this->level;
-}
-
-/////////////////////////////////////////////////
-void BuildingItem::SetLevel(int _level)
-{
-  this->level = _level;
-}
-
-/////////////////////////////////////////////////
-double BuildingItem::GetLevelBaseHeight() const
-{
-  return this->levelBaseHeight;
-}
-
-/////////////////////////////////////////////////
-void BuildingItem::SetLevelBaseHeight(double _height)
-{
-  this->levelBaseHeight = _height;
 }
