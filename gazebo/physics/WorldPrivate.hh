@@ -87,6 +87,9 @@ namespace gazebo
       /// \brief Publisher for world statistics messages.
       public: transport::PublisherPtr statPub;
 
+      /// \brief Publisher for publishing clock
+      public: transport::PublisherPtr clockPub;
+
       /// \brief Publisher for request response messages.
       public: transport::PublisherPtr responsePub;
 

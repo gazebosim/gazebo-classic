@@ -197,7 +197,8 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->node->Init(this->GetName());
 
   // Publish clock for diagnostics
-  this->clockPub = this->node->Advertise<msgs::Time>("~/clock", 10);
+  this->dataPtr->clockPub =
+    this->dataPtr->node->Advertise<msgs::Time>("~/clock", 10);
 
   // pose pub for server side, mainly used for updating and timestamping
   // Scene, which in turn will be used by rendering sensors.
@@ -684,7 +685,8 @@ void World::Update()
   DIAG_TIMER_LAP("World::Update", "Events::worldUpdateBegin");
 
   /// \brief Publish clock
-  this->clockPub->Publish(msgs::Convert(this->updateInfo.simTime));
+  this->dataPtr->clockPub->Publish(
+    msgs::Convert(this->dataPtr->updateInfo.simTime));
 
   // Update all the models
   (*this.*dataPtr->modelUpdateFunc)();
@@ -2191,4 +2193,3 @@ void World::EnablePhysicsEngine(bool _enable)
 {
   this->dataPtr->enablePhysicsEngine = _enable;
 }
-

@@ -268,18 +268,15 @@ namespace gazebo
 
       /// \brief Get the set world pose mutex.
       /// \return Pointer to the mutex.
-      public: boost::mutex *GetSetWorldPoseMutex() const
-        {return this->setWorldPoseMutex;}
+      public: boost::mutex *GetSetWorldPoseMutex() const;
 
       /// \brief check if physics engine is enabled/disabled.
       /// \param True if the physics engine is enabled.
-      public: bool GetEnablePhysicsEngine()
-              {return this->enablePhysicsEngine;}
+      public: bool GetEnablePhysicsEngine();
 
       /// \brief enable/disable physics engine during World::Update.
       /// \param[in] _enable True to enable the physics engine.
-      public: void EnablePhysicsEngine(bool _enable)
-              {this->enablePhysicsEngine = _enable;}
+      public: void EnablePhysicsEngine(bool _enable);
 
       /// \brief Update the state SDF value from the current state.
       public: void UpdateStateSDF();

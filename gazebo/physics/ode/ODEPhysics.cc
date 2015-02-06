@@ -430,8 +430,9 @@ void ODEPhysics::UpdateCollision()
 
   if (DIAG_ENABLED())
   {
-    DIAG_VARIABLE("ODE colliders", this->collidersCount);
-    DIAG_VARIABLE("ODE trimesh colliders", this->trimeshCollidersCount);
+    DIAG_VARIABLE("ODE colliders", this->dataPtr->collidersCount);
+    DIAG_VARIABLE("ODE trimesh colliders",
+      this->dataPtr->trimeshCollidersCount);
   }
 }
 
