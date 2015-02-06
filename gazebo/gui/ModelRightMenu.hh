@@ -39,6 +39,16 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \enum EntityTypes
+      /// \brief Unique identifiers for the type of entity this menu is
+      /// attached to.
+      public: enum EntityTypes {
+                  /// \brief Model
+                  MODEL,
+                  /// \brief Light
+                  LIGHT
+                };
+
       /// \brief Constructor
       public: ModelRightMenu();
 
@@ -49,7 +59,9 @@ namespace gazebo
       /// \param[in] _modelName Name of the model that is active.
       /// \param[in] _pt Point on the GUI that has received the right-click
       /// request.
-      public: void Run(const std::string &_modelName, const QPoint &_pt);
+      /// \param[in] _type Type of the entity clicked.
+      public: void Run(const std::string &_modelName, const QPoint &_pt,
+          EntityTypes _type = MODEL);
 
       /// \brief QT callback when move to has been selected.
       private slots: void OnMoveTo();
