@@ -396,7 +396,6 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       }
     }
   }
-
 }
 
 /////////////////////////////////////////////////
