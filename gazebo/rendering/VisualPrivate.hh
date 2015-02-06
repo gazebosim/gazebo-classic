@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,17 +149,20 @@ namespace gazebo
       /// \brief The visual's submesh name.
       public: std::string subMeshName;
 
-      /// \brief Ambient color of the viusal.
+      /// \brief Ambient color of the visual.
       public: common::Color ambient;
 
-      /// \brief Diffuse color of the viusal.
+      /// \brief Diffuse color of the visual.
       public: common::Color diffuse;
 
-      /// \brief Specular color of the viusal.
+      /// \brief Specular color of the visual.
       public: common::Color specular;
 
-      /// \brief Emissive color of the viusal.
+      /// \brief Emissive color of the visual.
       public: common::Color emissive;
+
+      /// \brief Visibility flags of the visual.
+      public: uint32_t visibilityFlags;
     };
     /// \}
   }
