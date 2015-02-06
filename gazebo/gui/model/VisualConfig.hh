@@ -66,6 +66,8 @@ namespace gazebo
 
       /// \brief Add a visual widget to the tab.
       /// \param[in] _name Name of visual added.
+      /// \param[in] _visualMsg Msg containing information of the visual
+      /// to be added.
       public: void AddVisual(const std::string &_name,
           const msgs::Visual *_visualMsg = NULL);
 

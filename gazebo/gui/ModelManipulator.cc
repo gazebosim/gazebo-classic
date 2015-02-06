@@ -26,6 +26,7 @@
 #include "gazebo/rendering/SelectionObj.hh"
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiIface.hh"
 
@@ -358,6 +359,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       newScale.z = std::max(1e-4, newScale.z);
     }
     _vis->SetScale(newScale);
+    Events::scaleEntity(_vis->GetName(), newScale);
   }
   else
   {
@@ -390,9 +392,11 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
           newScale.z = std::max(1e-4, newScale.z);
         }
         childVis->SetScale(newScale);
+        Events::scaleEntity(childVis->GetName(), newScale);
       }
     }
   }
+
 }
 
 /////////////////////////////////////////////////
