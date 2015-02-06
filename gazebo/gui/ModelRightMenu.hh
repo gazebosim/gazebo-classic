@@ -40,16 +40,16 @@ namespace gazebo
     {
       Q_OBJECT
 
-      /// \enum EntityType
+      /// \enum EntityTypes
       /// \brief Unique identifiers for the type of entity this menu is
       /// attached to.
       public: enum EntityTypes {
                   /// \brief Model
                   MODEL,
-                  /// \brief Link
-                  LINK,
                   /// \brief Light
-                  LIGHT
+                  LIGHT,
+                  /// \brief Link
+                  LINK
                 };
 
       /// \brief Constructor
@@ -64,7 +64,7 @@ namespace gazebo
       /// request.
       /// \param[in] _type Type of the entity clicked.
       public: void Run(const std::string &_modelName, const QPoint &_pt,
-          EntityTypes _type);
+          EntityTypes _type = MODEL);
 
       /// \brief QT callback when move to has been selected.
       private slots: void OnMoveTo();
