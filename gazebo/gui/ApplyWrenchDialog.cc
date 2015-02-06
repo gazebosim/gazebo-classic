@@ -517,7 +517,15 @@ void ApplyWrenchDialog::UpdateForceVisual()
   if (!this->dataPtr->applyWrenchVisual)
     return;
 
-  this->dataPtr->applyWrenchVisual->UpdateForce(this->dataPtr->forceVector);
+  bool pleaseTryToRotateTheTool = true;
+  if (this->dataPtr->updatingByMouse > 0)
+  {
+    pleaseTryToRotateTheTool = false;
+    this->dataPtr->updatingByMouse--;
+  }
+
+  this->dataPtr->applyWrenchVisual->UpdateForce(this->dataPtr->forceVector,
+      pleaseTryToRotateTheTool);
 }
 
 /////////////////////////////////////////////////
@@ -526,7 +534,15 @@ void ApplyWrenchDialog::UpdateTorqueVisual()
   if (!this->dataPtr->applyWrenchVisual)
     return;
 
-  this->dataPtr->applyWrenchVisual->UpdateTorque(this->dataPtr->torqueVector);
+  bool pleaseTryToRotateTheTool = true;
+  if (this->dataPtr->updatingByMouse > 0)
+  {
+    pleaseTryToRotateTheTool = false;
+    this->dataPtr->updatingByMouse--;
+  }
+
+  this->dataPtr->applyWrenchVisual->UpdateTorque(this->dataPtr->torqueVector,
+      pleaseTryToRotateTheTool);
 }
 
 /////////////////////////////////////////////////
@@ -778,6 +794,10 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
 
     if (this->dataPtr->wrenchMode == rendering::ApplyWrenchVisual::FORCE)
     {
+      // figure out why UpdateForceVisual gets called 5 times when moving the
+      // mouse and fix this number
+      this->dataPtr->updatingByMouse = 5;
+
       vec = vec * this->dataPtr->forceMagSpin->value();
       this->UpdateForceVectorSpins(vec);
     }

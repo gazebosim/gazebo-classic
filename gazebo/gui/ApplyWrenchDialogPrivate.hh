@@ -107,6 +107,9 @@ namespace gazebo
 
       /// TODO
       public: std::string manipState;
+
+      /// TODO
+      public: int updatingByMouse;
     };
   }
 }

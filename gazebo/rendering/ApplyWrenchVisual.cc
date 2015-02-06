@@ -174,7 +174,7 @@ void ApplyWrenchVisual::SetMode(WrenchModes _mode)
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::UpdateForce(math::Vector3 _forceVector)
+void ApplyWrenchVisual::UpdateForce(math::Vector3 _forceVector, bool _rotateTool)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
@@ -203,12 +203,13 @@ void ApplyWrenchVisual::UpdateForce(math::Vector3 _forceVector)
   //double arrowSize = this->forceVisual->GetBoundingBox().GetZLength();
   dPtr->forceVisual->SetPosition(-normVec * (linkDiagonal*0.5 + 0.5));
 
-//  // Rotation tool
-//  dPtr->rotTool->SetRotation(quat);
+  // Rotation tool
+  if (_rotateTool)
+    dPtr->rotTool->SetRotation(quat);
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::UpdateTorque(math::Vector3 _torqueVector)
+void ApplyWrenchVisual::UpdateTorque(math::Vector3 _torqueVector, bool _rotateTool)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
@@ -237,7 +238,8 @@ void ApplyWrenchVisual::UpdateTorque(math::Vector3 _torqueVector)
   dPtr->torqueVisual->SetPosition(-normVec * (linkDiagonal*0.5 + 0.5));
 
   // Rotation tool
-//  dPtr->rotTool->SetRotation(quat);
+  if (_rotateTool)
+    dPtr->rotTool->SetRotation(quat);
 }
 
 ///////////////////////////////////////////////////

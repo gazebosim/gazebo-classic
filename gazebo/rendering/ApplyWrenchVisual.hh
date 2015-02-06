@@ -64,10 +64,10 @@ namespace gazebo
       public: void SetMode(WrenchModes _mode);
 
       /// \brief TODO
-      public: void UpdateForce(math::Vector3 _forceVector);
+      public: void UpdateForce(math::Vector3 _forceVector, bool _rotateTool);
 
       /// \brief TODO
-      public: void UpdateTorque(math::Vector3 _torqueVector);
+      public: void UpdateTorque(math::Vector3 _torqueVector, bool _rotateTool);
 
       /// \brief TODO
       public: math::Quaternion GetQuaternionFromVector(math::Vector3 _vec);
