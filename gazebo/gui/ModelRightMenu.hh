@@ -61,7 +61,7 @@ namespace gazebo
       /// request.
       /// \param[in] _type Type of the entity clicked.
       public: void Run(const std::string &_modelName, const QPoint &_pt,
-          int _type = 0);
+          EntityTypes _type = MODEL);
 
       /// \brief QT callback when move to has been selected.
       private slots: void OnMoveTo();

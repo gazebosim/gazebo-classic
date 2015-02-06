@@ -133,7 +133,7 @@ ModelRightMenu::~ModelRightMenu()
 
 /////////////////////////////////////////////////
 void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
-    int _type)
+    EntityTypes _type)
 {
   this->modelName = _modelName.substr(0, _modelName.find("::"));
 
