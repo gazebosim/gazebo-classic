@@ -122,6 +122,11 @@ namespace gazebo
       /// \param[in] _visible Whether to show or not.
       public: void SetHandleVisible(SelectionMode _mode, bool _visible);
 
+      /// \brief Get the visibility for a specific handle.
+      /// \param[in] _mode Manipulation mode corresponding to the handle.
+      /// \return _visible Whether it is visible or not.
+      public: bool GetHandleVisible(SelectionMode _mode) const;
+
       /// \brief Helper function to create scale visuals.
       private: void CreateScaleVisual();
 
