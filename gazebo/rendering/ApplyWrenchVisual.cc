@@ -95,7 +95,7 @@ void ApplyWrenchVisual::Load()
   dPtr->torqueVisual->SetMaterial("Gazebo/Orange");
 
   // Torque line
-  double linkDiagonal = dPtr->parent->GetBoundingBox().GetDiagonalLength();
+  double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
   dPtr->torqueLine = dPtr->torqueVisual->
       CreateDynamicLine(rendering::RENDERING_LINE_LIST);
   dPtr->torqueLine->setMaterial("Gazebo/Orange");
@@ -199,7 +199,7 @@ void ApplyWrenchVisual::UpdateForce(math::Vector3 _forceVector, bool _rotateTool
       math::Vector3(0, M_PI/2.0, 0)));
 
   // Set position
-  double linkDiagonal = dPtr->parent->GetBoundingBox().GetDiagonalLength();
+  double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
   //double arrowSize = this->forceVisual->GetBoundingBox().GetZLength();
   dPtr->forceVisual->SetPosition(-normVec * (linkDiagonal*0.5 + 0.5));
 
@@ -234,7 +234,7 @@ void ApplyWrenchVisual::UpdateTorque(math::Vector3 _torqueVector, bool _rotateTo
       math::Vector3(0, M_PI/2.0, 0)));
 
   // Set position
-  double linkDiagonal = dPtr->parent->GetBoundingBox().GetDiagonalLength();
+  double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
   dPtr->torqueVisual->SetPosition(-normVec * (linkDiagonal*0.5 + 0.5));
 
   // Rotation tool

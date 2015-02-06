@@ -78,14 +78,6 @@ math::Vector3 Box::GetSize() const
 }
 
 //////////////////////////////////////////////////
-double Box::GetDiagonalLength() const
-{
-  return sqrt(pow(this->GetXLength(), 2) +
-              pow(this->GetYLength(), 2) +
-              pow(this->GetZLength(), 2));
-}
-
-//////////////////////////////////////////////////
 math::Vector3 Box::GetCenter() const
 {
   return this->min + (this->max - this->min) * 0.5;
