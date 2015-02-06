@@ -907,9 +907,12 @@ namespace gazebo
         sdf::ElementPtr shaderElem = materialSDF->GetElement("shader");
         shaderElem->GetAttribute("type")->Set(
           ConvertShaderType(_msg.shader_type()));
+      }
 
-        if (_msg.has_normal_map())
-          shaderElem->GetElement("normal_map")->Set(_msg.normal_map());
+      if (_msg.has_normal_map())
+      {
+        sdf::ElementPtr shaderElem = materialSDF->GetElement("shader");
+        shaderElem->GetElement("normal_map")->Set(_msg.normal_map());
       }
 
       if (_msg.has_lighting())
@@ -1322,7 +1325,7 @@ namespace gazebo
         visualElem = VisualToSDF(_msg.visual(i), visualElem);
       }
 
-      // msgs::LinkToSDF currently does not convert sensor and projector data
+      /// \todo LinkToSDF currently does not convert sensor and projector data
 
       return linkSDF;
     }
