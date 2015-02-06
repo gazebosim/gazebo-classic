@@ -118,13 +118,15 @@ namespace gazebo
 
     /// \brief Convert a string to a msgs::Joint::Type enum.
     /// \param[in] _str Joint type string.
-    /// \return A msgs::Joint::Type enum.
+    /// \return A msgs::Joint::Type enum. Defaults to REVOLUTE
+    /// if _str is unrecognized.
     GAZEBO_VISIBLE
     msgs::Joint::Type ConvertJointType(const std::string &_str);
 
     /// \brief Convert a msgs::Joint::Type to a string.
     /// \param[in] _type A msgs::Joint::Type enum.
-    /// \return Joint type string.
+    /// \return Joint type string. Returns "unknown" if
+    /// _type is unrecognized.
     GAZEBO_VISIBLE
     std::string ConvertJointType(const msgs::Joint::Type _type);
 
@@ -286,15 +288,17 @@ namespace gazebo
     sdf::ElementPtr MaterialToSDF(const msgs::Material &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
-    /// \brief Convert a string to a msgs::ShaderType enum.
+    /// \brief Convert a string to a msgs::Material::ShaderType enum.
     /// \param[in] _str Shader type string.
-    /// \return A msgs::ShaderType enum.
+    /// \return A msgs::Material::ShaderType enum. Defaults to VERTEX
+    /// if _str is unrecognized.
     GAZEBO_VISIBLE
     msgs::Material::ShaderType ConvertShaderType(const std::string &_str);
 
     /// \brief Convert a msgs::ShaderType to a string.
     /// \param[in] _type A msgs::ShaderType enum.
-    /// \return Shader type string.
+    /// \return Shader type string. Returns "unknown" if
+    /// _type is unrecognized.
     GAZEBO_VISIBLE
     std::string ConvertShaderType(const msgs::Material::ShaderType _type);
 

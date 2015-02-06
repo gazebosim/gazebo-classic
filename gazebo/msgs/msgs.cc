@@ -315,6 +315,13 @@ namespace gazebo
       {
         result = msgs::Joint::GEARBOX;
       }
+      else
+      {
+        gzerr << "Unrecognized JointType ["
+              << _str
+              << "], returning REVOLUTE"
+              << std::endl;
+      }
       return result;
     }
 
@@ -361,6 +368,8 @@ namespace gazebo
         default:
         {
           result = "unknown";
+          gzerr << "Unrecognized JointType [" << _type << "]"
+                << std::endl;
           break;
         }
       }
@@ -940,7 +949,10 @@ namespace gazebo
       }
       else
       {
-        gzthrow(std::string("Unknown shader type[") + _str + "]");
+        gzerr << "Unrecognized ShaderType ["
+              << _str
+              << "], returning VERTEX"
+              << std::endl;
       }
       return result;
     }
@@ -974,6 +986,8 @@ namespace gazebo
         default:
         {
           result = "unknown";
+          gzerr << "Unrecognized ShaderType [" << _type << "]"
+                << std::endl;
           break;
         }
       }
