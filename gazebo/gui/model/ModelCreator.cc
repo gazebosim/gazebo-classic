@@ -500,8 +500,9 @@ void ModelCreator::AddJoint(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
-std::string ModelCreator::AddBox(const math::Vector3 &_size,
-    const math::Pose &_pose)
+std::string ModelCreator::AddShape(PartType _type,
+    const math::Vector3 &_size, const math::Pose &_pose,
+    const std::string &_uri)
 {
   if (!this->previewVisual)
   {
@@ -526,7 +527,32 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
-  ((geomElem->AddElement("box"))->AddElement("size"))->Set(_size);
+
+  if (_type == PART_CYLINDER)
+  {
+    sdf::ElementPtr cylinderElem = geomElem->AddElement("cylinder");
+    (cylinderElem->GetElement("radius"))->Set(_size.x*0.5);
+    (cylinderElem->GetElement("length"))->Set(_size.z);
+  }
+  else if (_type == PART_SPHERE)
+  {
+    ((geomElem->AddElement("sphere"))->GetElement("radius"))->Set(_size.x*0.5);
+  }
+  else if (_type == PART_MESH)
+  {
+    sdf::ElementPtr meshElem = geomElem->AddElement("mesh");
+    meshElem->GetElement("scale")->Set(_size);
+    meshElem->GetElement("uri")->Set(_uri);
+  }
+  else
+  {
+    if (_type != PART_BOX)
+    {
+      gzwarn << "Unknown part type '" << _type << "'. " <<
+          "Adding a box" << std::endl;
+    }
+    ((geomElem->AddElement("box"))->GetElement("size"))->Set(_size);
+  }
 
   visVisual->Load(visualElem);
 
@@ -535,147 +561,10 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
   if (_pose == math::Pose::Zero)
   {
     linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
-    _pose.pos.z + _size.z*0.5));
+    _pose.pos.z + _size.z * 0.5));
   }
 
   this->CreatePart(visVisual);
-  this->mouseVisual = linkVisual;
-
-  return linkName;
-}
-
-/////////////////////////////////////////////////
-std::string ModelCreator::AddSphere(double _radius,
-    const math::Pose &_pose)
-{
-  if (!this->previewVisual)
-    this->Reset();
-
-  std::stringstream linkNameStream;
-  linkNameStream << this->previewName << "_" << this->modelCounter
-      << "::part_" << this->partCounter++;
-  std::string linkName = linkNameStream.str();
-
-  rendering::VisualPtr linkVisual(new rendering::Visual(
-      linkName, this->previewVisual));
-  linkVisual->Load();
-
-  std::ostringstream visualName;
-  visualName << linkName << "::visual";
-  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-        linkVisual));
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
-      ->GetElement("model")->GetElement("link")->GetElement("visual");
-
-  sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
-  geomElem->ClearElements();
-  ((geomElem->AddElement("sphere"))->GetElement("radius"))->Set(_radius);
-
-  visVisual->Load(visualElem);
-
-  linkVisual->SetTransparency(ModelData::GetEditTransparency());
-  linkVisual->SetPose(_pose);
-  if (_pose == math::Pose::Zero)
-  {
-    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
-    _pose.pos.z + _radius));
-  }
-
-  this->CreatePart(visVisual);
-
-  this->mouseVisual = linkVisual;
-
-  return linkName;
-}
-
-/////////////////////////////////////////////////
-std::string ModelCreator::AddCylinder(double _radius, double _length,
-    const math::Pose &_pose)
-{
-  if (!this->previewVisual)
-    this->Reset();
-
-  std::stringstream linkNameStream;
-  linkNameStream << this->previewName << "_" << this->modelCounter
-      << "::part_" << this->partCounter++;
-  std::string linkName = linkNameStream.str();
-
-  rendering::VisualPtr linkVisual(new rendering::Visual(
-      linkName, this->previewVisual));
-  linkVisual->Load();
-
-  std::ostringstream visualName;
-  visualName << linkName << "::visual";
-  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-        linkVisual));
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
-      ->GetElement("model")->GetElement("link")->GetElement("visual");
-
-  sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
-  geomElem->ClearElements();
-  sdf::ElementPtr cylinderElem = geomElem->AddElement("cylinder");
-  (cylinderElem->GetElement("radius"))->Set(_radius);
-  (cylinderElem->GetElement("length"))->Set(_length);
-
-  visVisual->Load(visualElem);
-
-  linkVisual->SetTransparency(ModelData::GetEditTransparency());
-  linkVisual->SetPose(_pose);
-  if (_pose == math::Pose::Zero)
-  {
-    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
-    _pose.pos.z + _length*0.5));
-  }
-
-  this->CreatePart(visVisual);
-
-  this->mouseVisual = linkVisual;
-
-  return linkName;
-}
-
-/////////////////////////////////////////////////
-std::string ModelCreator::AddCustom(const std::string &_path,
-    const math::Vector3 &_scale, const math::Pose &_pose)
-{
-  if (!this->previewVisual)
-    this->Reset();
-
-  std::string path = _path;
-
-  std::stringstream linkNameStream;
-  linkNameStream << this->previewName << "_" << this->modelCounter
-      << "::part_" << this->partCounter++;
-  std::string linkName = linkNameStream.str();
-
-  rendering::VisualPtr linkVisual(new rendering::Visual(
-      linkName, this->previewVisual));
-  linkVisual->Load();
-
-  std::ostringstream visualName;
-  visualName << linkName << "::visual";
-  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-        linkVisual));
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
-      ->GetElement("model")->GetElement("link")->GetElement("visual");
-
-  sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
-  geomElem->ClearElements();
-  sdf::ElementPtr meshElem = geomElem->AddElement("mesh");
-  meshElem->GetElement("scale")->Set(_scale);
-  meshElem->GetElement("uri")->Set(path);
-  visVisual->Load(visualElem);
-
-  linkVisual->SetTransparency(ModelData::GetEditTransparency());
-  linkVisual->SetPose(_pose);
-  if (_pose == math::Pose::Zero)
-  {
-    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
-    _pose.pos.z + _scale.z*0.5));
-  }
-
-  this->CreatePart(visVisual);
-
   this->mouseVisual = linkVisual;
 
   return linkName;
@@ -713,7 +602,13 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   part->AddCollision(collisionVis);
 
   std::string partName = part->partVisual->GetName();
-  part->SetName(partName);
+
+  std::string leafName = partName;
+  size_t idx = partName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = partName.substr(idx+1);
+
+  part->SetName(leafName);
   part->SetPose(part->partVisual->GetWorldPose());
 
   {
@@ -754,7 +649,12 @@ PartData *ModelCreator::ClonePart(const std::string &_partName)
     itName = this->allParts.find(newName);
   }
 
-  PartData *part = it->second->Clone(newName);
+  std::string leafName = newName;
+  size_t idx = newName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = newName.substr(idx+1);
+  PartData *part = it->second->Clone(leafName);
+
   this->allParts[newName] = part;
 
   this->ModelChanged();
@@ -769,17 +669,24 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 
   // Link name
   std::stringstream linkNameStream;
+  std::stringstream leafNameStream;
   linkNameStream << this->previewName << "_" << this->modelCounter << "::";
   if (_linkElem->HasAttribute("name"))
-    linkNameStream << _linkElem->Get<std::string>("name");
+  {
+    leafNameStream << _linkElem->Get<std::string>("name");
+  }
   else
   {
-    linkNameStream << "part_" << this->partCounter++;
+    leafNameStream << "part_" << this->partCounter++;
     gzwarn << "SDF missing link name attribute. Created name " <<
-        linkNameStream.str() << std::endl;
+        leafNameStream.str() << std::endl;
   }
+
+  linkNameStream << leafNameStream;
   std::string linkName = linkNameStream.str();
-  part->SetName(linkName);
+
+  std::string leafName = leafNameStream.str();
+  part->SetName(leafName);
 
   // Link pose
   math::Pose linkPose;
@@ -833,7 +740,7 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
         << std::endl;
   }
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(part->GetName(),
+  rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
       this->previewVisual));
   linkVisual->Load();
   linkVisual->SetPose(linkPose);
@@ -953,7 +860,7 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
   linkVisual->SetTransparency(ModelData::GetEditTransparency());
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->allParts[part->GetName()] = part;
+    this->allParts[linkName] = part;
   }
 
   rendering::ScenePtr scene = part->partVisual->GetScene();
@@ -1142,32 +1049,7 @@ void ModelCreator::AddPart(PartType _type)
 
   this->addPartType = _type;
   if (_type != PART_NONE)
-  {
-    switch (_type)
-    {
-      case PART_BOX:
-      {
-        this->AddBox();
-        break;
-      }
-      case PART_SPHERE:
-      {
-        this->AddSphere();
-        break;
-      }
-      case PART_CYLINDER:
-      {
-        this->AddCylinder();
-        break;
-      }
-      default:
-      {
-        gzwarn << "Unknown part type '" << _type << "'. " <<
-            "Part not added" << std::endl;
-        break;
-      }
-    }
-  }
+    this->AddShape(_type);
 }
 
 /////////////////////////////////////////////////
@@ -1204,7 +1086,12 @@ void ModelCreator::OnDelete(const std::string &_entity)
   if (vis)
   {
     rendering::VisualPtr parentLink = vis->GetParent();
-    if (this->allParts.find(parentLink->GetName()) != this->allParts.end())
+    std::string parentLinkName = parentLink->GetName();
+/*    std::string leafName = parentLinkName;
+    size_t idx = parentLinkName.find_last_of("::");
+    if (idx != std::string::npos)
+      leafName = parentLinkName.substr(idx+1);*/
+    if (this->allParts.find(parentLinkName) != this->allParts.end())
     {
       // remove the parent link if it's the only child
       if (parentLink->GetChildCount() == 1)
@@ -1515,14 +1402,12 @@ void ModelCreator::OnPaste()
     this->Stop();
     this->DeselectAll();
 
-    std::string linkName = copiedPart->GetName() + "_clone";
-
     if (!this->previewVisual)
     {
       this->Reset();
     }
 
-    PartData* clonedPart = this->ClonePart(copiedPart->GetName());
+    PartData* clonedPart = this->ClonePart(it->first);
 
     math::Pose clonePose = copiedPart->partVisual->GetWorldPose();
     rendering::UserCameraPtr userCamera = gui::get_active_camera();
@@ -1537,7 +1422,7 @@ void ModelCreator::OnPaste()
 
     clonedPart->partVisual->SetWorldPose(clonePose);
     clonedPart->partVisual->SetTransparency(ModelData::GetEditTransparency());
-    this->addPartType = PART_CUSTOM;
+    this->addPartType = PART_MESH;
     this->mouseVisual = clonedPart->partVisual;
   }
 }

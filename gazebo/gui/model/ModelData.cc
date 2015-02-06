@@ -287,8 +287,14 @@ PartData* PartData::Clone(const std::string &_newName)
   clonePart->SetName(_newName);
   clonePart->SetPose(this->GetPose());
 
+  std::string partVisualName = this->partVisual->GetName();
+  std::string cloneVisName = _newName;
+  size_t partIdx = partVisualName.find("::");
+  if (partIdx != std::string::npos)
+    cloneVisName = partVisualName.substr(0, partIdx+2) + _newName;
+
   // clone partVisual;
-  rendering::VisualPtr linkVisual(new rendering::Visual(_newName,
+  rendering::VisualPtr linkVisual(new rendering::Visual(cloneVisName,
       this->partVisual->GetParent()));
   linkVisual->Load();
 
@@ -301,9 +307,9 @@ PartData* PartData::Clone(const std::string &_newName)
     std::string newVisName = visIt->first->GetName();
     size_t idx = newVisName.find_last_of("::");
     if (idx != std::string::npos)
-      newVisName = _newName + newVisName.substr(idx);
+      newVisName = cloneVisName + newVisName.substr(idx);
     else
-      newVisName = _newName + "::" + newVisName;
+      newVisName = cloneVisName + "::" + newVisName;
     clonePart->AddVisual(visIt->first->Clone(newVisName,
         clonePart->partVisual));
   }
@@ -314,9 +320,9 @@ PartData* PartData::Clone(const std::string &_newName)
     std::string newColName = colIt->first->GetName();
     size_t idx = newColName.find_last_of("::");
     if (idx != std::string::npos)
-      newColName = _newName + newColName.substr(idx);
+      newColName = cloneVisName + newColName.substr(idx);
     else
-      newColName = _newName + "::" + newColName;
+      newColName = cloneVisName + "::" + newColName;
     clonePart->AddCollision(colIt->first->Clone(newColName,
         clonePart->partVisual));
   }

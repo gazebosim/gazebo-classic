@@ -232,7 +232,8 @@ void ModelEditorPalette::OnCustom()
   {
     event::Events::setSelectedEntity("", "normal");
     g_arrowAct->trigger();
-    this->modelCreator->AddCustom(importDialog.GetImportPath());
+    this->modelCreator->AddShape(ModelCreator::PART_MESH,
+        math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
   }
   else
   {
