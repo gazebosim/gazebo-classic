@@ -144,13 +144,19 @@ namespace gazebo
       private: void CalculateTorque();
 
       /// \brief TODO
+      private: void UpdateForceVisual();
+
+      /// \brief TODO
+      private: void UpdateTorqueVisual();
+
+      /// \brief TODO
       private: void UpdateForceMag();
 
       /// \brief TODO
       private: void UpdateForceVector();
 
       /// \brief TODO
-      private: void UpdateForceVector(math::Vector3 _fV);
+      private: void UpdateForceVectorSpins(math::Vector3 _fV);
 
       /// \brief TODO
       private: void UpdateTorqueMag();
@@ -159,7 +165,7 @@ namespace gazebo
       private: void UpdateTorqueVector();
 
       /// \brief TODO
-      private: void UpdateTorqueVector(math::Vector3 _fV);
+      private: void UpdateTorqueVectorSpins(math::Vector3 _fV);
 
       /// \brief TODO
       private: void AttachVisuals();
