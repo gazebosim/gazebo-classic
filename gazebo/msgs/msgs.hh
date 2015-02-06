@@ -272,7 +272,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Visual
     /// \param[in] _msg Visual messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -281,7 +281,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Material
     /// \param[in] _msg Material messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -316,7 +316,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Light
     /// \param[in] _msg Light messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -325,7 +325,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::CameraSensor
     /// \param[in] _msg CameraSensor messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -334,7 +334,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Plugin
     /// \param[in] _msg Plugin messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -343,7 +343,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Collision
     /// \param[in] _msg Collision messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -353,7 +353,7 @@ namespace gazebo
     /// \internal
     /// \brief Create an SDF element from a msgs::Link.
     /// \param[in] _msg Link messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -362,7 +362,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Inertial
     /// \param[in] _msg Inertial messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -371,7 +371,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Surface
     /// \param[in] _msg Surface messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -380,7 +380,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Geometry
     /// \param[in] _msg Geometry messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -389,7 +389,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Mesh
     /// \param[in] _msg Mesh messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
