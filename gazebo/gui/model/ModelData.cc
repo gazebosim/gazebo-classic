@@ -261,15 +261,6 @@ void PartData::AddCollision(rendering::VisualPtr _collisionVis)
   sdf::ElementPtr collisionSDF(new sdf::Element);
   sdf::initFile("collision.sdf", collisionSDF);
 
-  msgs::Collision collisionMsg;
-  collisionMsg.set_name(_collisionVis->GetName());
-  msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
-  geomMsg->CopyFrom(visualMsg.geometry());
-  msgs::Pose *poseMsg = collisionMsg.mutable_pose();
-  poseMsg->CopyFrom(visualMsg.pose());
-
-  this->collisions[_collisionVis] = collisionMsg;
-
   std::string partName = this->partVisual->GetName();
   std::string visName = _collisionVis->GetName();
   std::string leafName = visName;
@@ -277,6 +268,14 @@ void PartData::AddCollision(rendering::VisualPtr _collisionVis)
   if (idx != std::string::npos)
     leafName = visName.substr(idx+1);
 
+  msgs::Collision collisionMsg;
+  collisionMsg.set_name(leafName);
+  msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
+  geomMsg->CopyFrom(visualMsg.geometry());
+  msgs::Pose *poseMsg = collisionMsg.mutable_pose();
+  poseMsg->CopyFrom(visualMsg.pose());
+
+  this->collisions[_collisionVis] = collisionMsg;
   collisionConfig->AddCollision(leafName, &collisionMsg);
 }
 
@@ -458,7 +457,7 @@ void PartData::OnAddCollision(const std::string &_name)
   // collision tab
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
 
-  std::ostringstream collisionName;
+  std::stringstream collisionName;
   collisionName << this->partVisual->GetName() << "::" << _name;
 
   rendering::VisualPtr collisionVis;
@@ -496,7 +495,7 @@ void PartData::OnAddCollision(const std::string &_name)
 
   msgs::Visual visualMsg = msgs::VisualFromSDF(collisionVis->GetSDF());
   msgs::Collision collisionMsg;
-  collisionMsg.set_name(collisionVis->GetName());
+  collisionMsg.set_name(_name);
   msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
   geomMsg->CopyFrom(visualMsg.geometry());
 

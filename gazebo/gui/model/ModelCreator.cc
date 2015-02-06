@@ -234,15 +234,17 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
       sdf::ElementPtr model = world->GetElement("model");
       while (model)
       {
-        if (_modelName.compare(model->GetAttribute("name")->GetAsString()) == 0)
+        if (model->GetAttribute("name")->GetAsString() == _modelName)
         {
           // Remove model from the scene to substitute with the preview visual
-          transport::requestNoReply(this->node, "entity_delete", _modelName);
-
+          //transport::requestNoReply(this->node, "entity_delete", _modelName);
+          this->SetVisible(_modelName, false);
 //          std::cerr << " loading model " << model->ToString("") << std::endl;
-//          this->LoadSDF(model);
-          boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-          this->sdfToLoad.push_back(model);
+          this->LoadSDF(model);
+          this->serverModelName = _modelName;
+          return;
+//          boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+//          this->sdfToLoad.push_back(model);
         }
         model = model->GetNextElement("model");
       }
@@ -410,6 +412,7 @@ void ModelCreator::OnExit()
 
   if (this->allParts.empty())
   {
+    this->SetVisible(this->serverModelName, true);
     this->Reset();
     gui::model::Events::newModel();
     gui::model::Events::finishModel();
@@ -467,6 +470,8 @@ void ModelCreator::OnExit()
   // Create entity on main window up to the saved point
   if (this->currentSaveState != NEVER_SAVED)
     this->FinishModel();
+  else
+    this->SetVisible(this->serverModelName, true);
 
   this->Reset();
 
@@ -682,7 +687,7 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
         leafNameStream.str() << std::endl;
   }
 
-  linkNameStream << leafNameStream;
+  linkNameStream << leafNameStream.str();
   std::string linkName = linkNameStream.str();
 
   std::string leafName = leafNameStream.str();
@@ -935,6 +940,7 @@ void ModelCreator::Reset()
 
   this->currentSaveState = NEVER_SAVED;
   this->SetModelName(this->modelDefaultName);
+  this->serverModelName = "";
 
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
@@ -1004,6 +1010,7 @@ void ModelCreator::SetAutoDisable(bool _auto)
 /////////////////////////////////////////////////
 void ModelCreator::FinishModel()
 {
+  transport::requestNoReply(this->node, "entity_delete", this->serverModelName);
   event::Events::setSelectedEntity("", "normal");
   this->CreateTheEntity();
   this->Reset();
@@ -1611,6 +1618,31 @@ void ModelCreator::Update()
     this->LoadSDF(this->sdfToLoad[i]);
 
   this->sdfToLoad.clear();
+}
 
+/////////////////////////////////////////////////
+void ModelCreator::SetVisible(const std::string &_name, bool _visible)
+{
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  rendering::VisualPtr visual = scene->GetVisual(_name);
+  if (!visual)
+    return;
 
+  this->SetVisible(visual, _visible);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::SetVisible(rendering::VisualPtr _visual, bool _visible)
+{
+  if (!_visual)
+    return;
+
+  for (unsigned int i = 0; i < _visual->GetChildCount(); ++i)
+  {
+    this->SetVisible(_visual->GetChild(i), _visible);
+  }
+
+  if (!((_visual->GetVisibilityFlags() != GZ_VISIBILITY_ALL) &&
+      (_visual->GetVisibilityFlags() & GZ_VISIBILITY_GUI)))
+    _visual->SetVisible(_visible, false);
 }

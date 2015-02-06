@@ -324,7 +324,12 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   jointVis->GetSceneNode()->setInheritOrientation(false);
 
   JointData *jointData = new JointData();
-  jointData->name = jointVis->GetName();
+  std::string jointVisName = jointVis->GetName();
+  std::string leafName = jointVisName;
+  size_t pIdx = jointVisName.find_last_of("::");
+  if (pIdx != std::string::npos)
+    leafName = jointVisName.substr(pIdx+1);
+  jointData->name = leafName;
   jointData->dirty = false;
   jointData->visual = jointVis;
   jointData->parent = _parent;
@@ -769,9 +774,14 @@ void JointMaker::Update()
           }
           else
           {
+            std::string childName = joint->child->GetName();
+            std::string jointVisName = childName;
+            size_t idx = childName.find("::");
+            if (idx != std::string::npos)
+              jointVisName = childName.substr(0, idx+2);
+            jointVisName += "_JOINT_VISUAL_";
             gazebo::rendering::JointVisualPtr jointVis(
-                new gazebo::rendering::JointVisual(
-                joint->name + "__JOINT_VISUAL__", joint->child));
+                new gazebo::rendering::JointVisual(jointVisName, joint->child));
 
             jointVis->Load(joint->jointMsg);
             joint->jointVisual = jointVis;
@@ -796,7 +806,7 @@ void JointMaker::GenerateSDF()
   this->modelSDF->ClearElements();
 
   boost::unordered_map<std::string, JointData *>::iterator jointsIt;
-  // loop through all parts
+  // loop through all joints
   for (jointsIt = this->joints.begin(); jointsIt != this->joints.end();
       ++jointsIt)
   {
@@ -806,9 +816,22 @@ void JointMaker::GenerateSDF()
     jointElem->GetAttribute("name")->Set(joint->name);
     jointElem->GetAttribute("type")->Set(GetTypeAsString(joint->type));
     sdf::ElementPtr parentElem = jointElem->GetElement("parent");
-    parentElem->Set(joint->parent->GetName());
+
+    std::string parentName = joint->parent->GetName();
+    std::string parentLeafName = parentName;
+    size_t pIdx = parentName.find_last_of("::");
+    if (pIdx != std::string::npos)
+      parentLeafName = parentName.substr(pIdx+1);
+    parentElem->Set(parentLeafName);
+
     sdf::ElementPtr childElem = jointElem->GetElement("child");
-    childElem->Set(joint->child->GetName());
+    std::string childName = joint->child->GetName();
+    std::string childLeafName = childName;
+    size_t cIdx = childName.find_last_of("::");
+    if (cIdx != std::string::npos)
+      childLeafName = childName.substr(cIdx+1);
+    childElem->Set(childLeafName);
+
     sdf::ElementPtr poseElem = jointElem->GetElement("pose");
     poseElem->Set(joint->pose);
     int axisCount = GetJointAxisCount(joint->type);
@@ -969,7 +992,8 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   // TODO: Add checks for whether elements are present, whether visuals can be found...
 
   // Name
-  joint->name = _modelName + "::" + _jointElem->Get<std::string>("name");
+  joint->name = _jointElem->Get<std::string>("name");
+  std::string jointVisName = _modelName + "::" + joint->name;
 
   // Pose
   math::Pose jointPose;
@@ -1026,7 +1050,7 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 
   // Visuals
   rendering::VisualPtr jointVis(
-      new rendering::Visual(joint->name, parentVis->GetParent()));
+      new rendering::Visual(jointVisName, parentVis->GetParent()));
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);

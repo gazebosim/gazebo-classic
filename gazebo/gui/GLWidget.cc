@@ -1199,14 +1199,19 @@ void GLWidget::OnAlignMode(const std::string &_axis, const std::string &_config,
 void GLWidget::OnModelEditor(bool _checked)
 {
   this->modelEditorEnabled = _checked;
+
+  {
+    boost::mutex::scoped_lock lock(this->selectedVisMutex);
+    // Manually deselect, in case the editor was opened with Ctrl
+    for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+    {
+      this->selectedVisuals[i]->SetHighlighted(false);
+    }
+    this->selectedVisuals.clear();
+  }
+
   g_arrowAct->trigger();
   event::Events::setSelectedEntity("", "normal");
 
-  boost::mutex::scoped_lock lock(this->selectedVisMutex);
-  // Manually deselect, in case the editor was opened with Ctrl
-  for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
-  {
-    this->selectedVisuals[i]->SetHighlighted(false);
-  }
-  this->selectedVisuals.clear();
+
 }
