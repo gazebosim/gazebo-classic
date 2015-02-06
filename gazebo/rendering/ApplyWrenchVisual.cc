@@ -107,7 +107,7 @@ void ApplyWrenchVisual::Load()
       this->GetName() + "__SELECTION_OBJ", shared_from_this()));
   dPtr->rotTool->Load();
   dPtr->rotTool->SetMode("rotate");
-  dPtr->rotTool->SetHandleVisible("rotate", 0, false);
+  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_X, false);
 
   dPtr->forceVector = math::Vector3::UnitX;
   dPtr->torqueVector = math::Vector3::Zero;
@@ -151,8 +151,8 @@ void ApplyWrenchVisual::SetMode(WrenchModes _mode)
   this->wrenchMode = _mode;
 
   // Attach rotation to mode visual
-  dPtr->rotTool->SetHandleVisible("rotate", 1, true);
-  dPtr->rotTool->SetHandleVisible("rotate", 2, true);
+  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
+  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
   if (this->wrenchMode == WrenchModes::FORCE &&
       dPtr->forceVector != math::Vector3::Zero)
   {
@@ -168,8 +168,8 @@ void ApplyWrenchVisual::SetMode(WrenchModes _mode)
   else if (dPtr->forceVector == math::Vector3::Zero &&
            dPtr->torqueVector == math::Vector3::Zero)
   {
-    dPtr->rotTool->SetHandleVisible("rotate", 1, false);
-    dPtr->rotTool->SetHandleVisible("rotate", 2, false);
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, false);
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, false);
   }
 }
 

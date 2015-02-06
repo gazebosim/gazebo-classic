@@ -117,8 +117,10 @@ namespace gazebo
       /// \brief Update selection object size to match the parent visual.
       public: void UpdateSize();
 
-      /// \brief TODO.
-      public: void SetHandleVisible(std::string _mode, int _axis, bool _visible);
+      /// \brief Set the visibility for a specific handle.
+      /// \param[in] _mode Manipulation mode corresponding to the handle.
+      /// \param[in] _visible Whether to show or not.
+      public: void SetHandleVisible(SelectionMode _mode, bool _visible);
 
       /// \brief Helper function to create scale visuals.
       private: void CreateScaleVisual();
