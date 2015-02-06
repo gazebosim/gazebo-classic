@@ -646,3 +646,31 @@ void SelectionObj::CreateScaleVisual()
   dPtr->scene->AddVisual(dPtr->scaleYVisual);
   dPtr->scene->AddVisual(dPtr->scaleZVisual);
 }
+
+/////////////////////////////////////////////////
+void SelectionObj::SetHandleVisible(SelectionMode _mode, bool _visible)
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  if (_mode == ROT_X)
+    dPtr->rotXVisual->SetVisible(_visible);
+  else if (_mode == ROT_Y)
+    dPtr->rotYVisual->SetVisible(_visible);
+  else if (_mode == ROT_Z)
+    dPtr->rotZVisual->SetVisible(_visible);
+  else if (_mode == TRANS_X)
+    dPtr->transXVisual->SetVisible(_visible);
+  else if (_mode == TRANS_Y)
+    dPtr->transYVisual->SetVisible(_visible);
+  else if (_mode == TRANS_Z)
+    dPtr->transZVisual->SetVisible(_visible);
+  else if (_mode == SCALE_X)
+    dPtr->scaleXVisual->SetVisible(_visible);
+  else if (_mode == SCALE_Y)
+    dPtr->scaleYVisual->SetVisible(_visible);
+  else if (_mode == SCALE_Z)
+    dPtr->scaleZVisual->SetVisible(_visible);
+  else
+    gzwarn << "Input mode does not correspond to a handle." << std::endl;
+}
