@@ -109,7 +109,28 @@ namespace gazebo
       public: std::string manipState;
 
       /// TODO
-      public: int updatingByMouse;
+      public: bool mouseForceMag;
+
+      /// TODO
+      public: bool mouseForceX;
+
+      /// TODO
+      public: bool mouseForceY;
+
+      /// TODO
+      public: bool mouseForceZ;
+
+      /// TODO
+      public: bool mouseTorqueMag;
+
+      /// TODO
+      public: bool mouseTorqueX;
+
+      /// TODO
+      public: bool mouseTorqueY;
+
+      /// TODO
+      public: bool mouseTorqueZ;
     };
   }
 }

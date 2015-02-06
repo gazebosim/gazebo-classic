@@ -426,6 +426,11 @@ void ApplyWrenchDialog::OnPointZChanged(double /*_pZ*/)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceMagChanged(double /*_magnitude*/)
 {
+  if (this->dataPtr->mouseForceMag)
+  {
+    this->dataPtr->mouseForceMag = false;
+    return;
+  }
   this->UpdateForceVector();
   this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::FORCE);
 }
@@ -433,6 +438,11 @@ void ApplyWrenchDialog::OnForceMagChanged(double /*_magnitude*/)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceXChanged(double /*_fX*/)
 {
+  if (this->dataPtr->mouseForceX)
+  {
+    this->dataPtr->mouseForceX = false;
+    return;
+  }
   this->UpdateForceMag();
   this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::FORCE);
 }
@@ -440,6 +450,11 @@ void ApplyWrenchDialog::OnForceXChanged(double /*_fX*/)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceYChanged(double /*_fY*/)
 {
+  if (this->dataPtr->mouseForceY)
+  {
+    this->dataPtr->mouseForceY = false;
+    return;
+  }
   this->UpdateForceMag();
   this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::FORCE);
 }
@@ -447,6 +462,11 @@ void ApplyWrenchDialog::OnForceYChanged(double /*_fY*/)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceZChanged(double /*_fZ*/)
 {
+  if (this->dataPtr->mouseForceZ)
+  {
+    this->dataPtr->mouseForceZ = false;
+    return;
+  }
   this->UpdateForceMag();
   this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::FORCE);
 }
@@ -454,6 +474,11 @@ void ApplyWrenchDialog::OnForceZChanged(double /*_fZ*/)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueMagChanged(double /*_magnitude*/)
 {
+  if (this->dataPtr->mouseTorqueMag)
+  {
+    this->dataPtr->mouseTorqueMag = false;
+    return;
+  }
   this->UpdateTorqueVector();
   this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::TORQUE);
 }
@@ -461,6 +486,11 @@ void ApplyWrenchDialog::OnTorqueMagChanged(double /*_magnitude*/)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueXChanged(double /*_fX*/)
 {
+  if (this->dataPtr->mouseTorqueX)
+  {
+    this->dataPtr->mouseTorqueX = false;
+    return;
+  }
   this->UpdateTorqueMag();
   this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::TORQUE);
 }
@@ -468,6 +498,11 @@ void ApplyWrenchDialog::OnTorqueXChanged(double /*_fX*/)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueYChanged(double /*_fY*/)
 {
+  if (this->dataPtr->mouseTorqueY)
+  {
+    this->dataPtr->mouseTorqueY = false;
+    return;
+  }
   this->UpdateTorqueMag();
   this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::TORQUE);
 }
@@ -475,6 +510,11 @@ void ApplyWrenchDialog::OnTorqueYChanged(double /*_fY*/)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueZChanged(double /*_fZ*/)
 {
+  if (this->dataPtr->mouseTorqueZ)
+  {
+    this->dataPtr->mouseTorqueZ = false;
+    return;
+  }
   this->UpdateTorqueMag();
   this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::TORQUE);
 }
@@ -518,10 +558,12 @@ void ApplyWrenchDialog::UpdateForceVisual()
     return;
 
   bool pleaseTryToRotateTheTool = true;
-  if (this->dataPtr->updatingByMouse > 0)
+  if (this->dataPtr->mouseForceX ||
+      this->dataPtr->mouseForceY ||
+      this->dataPtr->mouseForceZ ||
+      this->dataPtr->mouseForceMag)
   {
     pleaseTryToRotateTheTool = false;
-    this->dataPtr->updatingByMouse--;
   }
 
   this->dataPtr->applyWrenchVisual->UpdateForce(this->dataPtr->forceVector,
@@ -535,10 +577,12 @@ void ApplyWrenchDialog::UpdateTorqueVisual()
     return;
 
   bool pleaseTryToRotateTheTool = true;
-  if (this->dataPtr->updatingByMouse > 0)
+  if (this->dataPtr->mouseTorqueX ||
+      this->dataPtr->mouseTorqueY ||
+      this->dataPtr->mouseTorqueZ ||
+      this->dataPtr->mouseTorqueMag)
   {
     pleaseTryToRotateTheTool = false;
-    this->dataPtr->updatingByMouse--;
   }
 
   this->dataPtr->applyWrenchVisual->UpdateTorque(this->dataPtr->torqueVector,
@@ -552,6 +596,7 @@ void ApplyWrenchDialog::UpdateForceMag()
       pow(this->dataPtr->forceXSpin->value(), 2) +
       pow(this->dataPtr->forceYSpin->value(), 2) +
       pow(this->dataPtr->forceZSpin->value(), 2)));
+
   this->CalculateForce();
 }
 
@@ -794,15 +839,21 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
 
     if (this->dataPtr->wrenchMode == rendering::ApplyWrenchVisual::FORCE)
     {
-      // figure out why UpdateForceVisual gets called 5 times when moving the
-      // mouse and fix this number
-      this->dataPtr->updatingByMouse = 5;
+      this->dataPtr->mouseForceX = true;
+      this->dataPtr->mouseForceY = true;
+      this->dataPtr->mouseForceZ = true;
+      this->dataPtr->mouseForceMag = true;
 
       vec = vec * this->dataPtr->forceMagSpin->value();
       this->UpdateForceVectorSpins(vec);
     }
     else if (this->dataPtr->wrenchMode == rendering::ApplyWrenchVisual::TORQUE)
     {
+      this->dataPtr->mouseTorqueX = true;
+      this->dataPtr->mouseTorqueY = true;
+      this->dataPtr->mouseTorqueZ = true;
+      this->dataPtr->mouseTorqueMag = true;
+
       vec = vec * this->dataPtr->torqueMagSpin->value();
       this->UpdateTorqueVectorSpins(vec);
     }
