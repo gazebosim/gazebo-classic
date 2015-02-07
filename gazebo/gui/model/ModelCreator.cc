@@ -671,71 +671,16 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 
   part->Load(_linkElem);
 
-  // Link name
+  // Link
   std::stringstream linkNameStream;
   std::stringstream leafNameStream;
-  linkNameStream << this->previewName << "_" << this->modelCounter << "::";
-  if (_linkElem->HasAttribute("name"))
-  {
-    leafNameStream << _linkElem->Get<std::string>("name");
-  }
-  else
-  {
-    leafNameStream << "part_" << this->partCounter++;
-    gzwarn << "SDF missing link name attribute. Created name " <<
-        leafNameStream.str() << std::endl;
-  }
+  std::string leafName = part->GetName();
 
-  linkNameStream << leafNameStream.str();
+  linkNameStream << this->previewName << "_" << this->modelCounter << "::";
+  linkNameStream << leafName;
   std::string linkName = linkNameStream.str();
 
-  std::string leafName = leafNameStream.str();
   part->SetName(leafName);
-
-
-/*  // Link pose
-  math::Pose linkPose = _linkElem->Get<math::Pose>("pose");
-
-  part->SetPose(linkPose);
-
-  // Link inertial
-  if (_linkElem->HasElement("inertial"))
-  {
-    sdf::ElementPtr inertialElem = _linkElem->GetElement("inertial");
-
-    if (inertialElem->HasElement("mass"))
-      part->SetMass(inertialElem->Get<double>("mass"));
-
-    if (inertialElem->HasElement("pose"))
-      part->SetInertialPose(inertialElem->Get<math::Pose>("pose"));
-
-    if (inertialElem->HasElement("inertia"))
-    {
-      sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
-      double inertiaMatrix[6] = {1, 0, 0, 1, 0, 1};
-      if (inertiaElem->HasElement("ixx"))
-        inertiaMatrix[0] = inertiaElem->Get<double>("ixx");
-      if (inertiaElem->HasElement("ixy"))
-        inertiaMatrix[1] = inertiaElem->Get<double>("ixy");
-      if (inertiaElem->HasElement("ixz"))
-        inertiaMatrix[2] = inertiaElem->Get<double>("ixz");
-      if (inertiaElem->HasElement("iyy"))
-        inertiaMatrix[3] = inertiaElem->Get<double>("iyy");
-      if (inertiaElem->HasElement("iyz"))
-        inertiaMatrix[4] = inertiaElem->Get<double>("iyz");
-      if (inertiaElem->HasElement("izz"))
-        inertiaMatrix[5] = inertiaElem->Get<double>("izz");
-
-      part->SetInertiaMatrix(
-          inertiaMatrix[0], inertiaMatrix[1], inertiaMatrix[2],
-          inertiaMatrix[3], inertiaMatrix[4], inertiaMatrix[5]);
-    }
-  }
-  else
-  {
-    gzwarn << "SDF missing <inertial> tag. Setting to default."
-        << std::endl;
-  }*/
 
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
       this->previewVisual));
