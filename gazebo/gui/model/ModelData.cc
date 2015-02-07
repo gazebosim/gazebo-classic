@@ -312,6 +312,7 @@ PartData* PartData::Clone(const std::string &_newName)
     clonePart->AddVisual(visIt->first->Clone(newVisName,
         clonePart->partVisual));
   }
+  linkVisual->SetTransparency(ModelData::GetEditTransparency());
   std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
   for (colIt = this->collisions.begin(); colIt != this->collisions.end();
       ++colIt)
@@ -322,8 +323,16 @@ PartData* PartData::Clone(const std::string &_newName)
       newColName = cloneVisName + newColName.substr(idx);
     else
       newColName = cloneVisName + "::" + newColName;
-    clonePart->AddCollision(colIt->first->Clone(newColName,
-        clonePart->partVisual));
+    rendering::VisualPtr collisionVis = colIt->first->Clone(newColName,
+        clonePart->partVisual);
+    collisionVis->SetTransparency(
+       math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
+    // fix for transparency alpha compositing
+    Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
+        getAttachedObject(0);
+    colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+    clonePart->AddCollision(collisionVis);
+
   }
   return clonePart;
 }
