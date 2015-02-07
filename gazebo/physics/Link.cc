@@ -1334,10 +1334,20 @@ msgs::Visual Link::GetVisualMessage(const std::string &_name) const
 //////////////////////////////////////////////////
 void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
 {
+  math::Vector3 pos = math::Vector3::Zero;
+  if (_msg->has_position())
+  {
+    pos = msgs::Convert(_msg->position());
+  }
   if (_msg->has_force())
   {
-    const math::Vector3 force = msgs::Convert(_msg->force());
-    this->AddRelativeForce(force);
+    math::Vector3 force = msgs::Convert(_msg->force());
+
+    // rotate force to relative position, because we don't have an
+    // AddRelativeForceAtRelativePosition
+    force = this->GetWorldPose().rot.RotateVector(force);
+
+    this->AddForceAtRelativePosition(force, pos);
   }
   if (_msg->has_torque())
   {

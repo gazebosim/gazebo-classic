@@ -64,6 +64,9 @@ namespace gazebo
       public: void SetMode(WrenchModes _mode);
 
       /// \brief TODO
+      public: void UpdatePoint(math::Vector3 _pointVector);
+
+      /// \brief TODO
       public: void UpdateForce(math::Vector3 _forceVector, bool _rotateTool);
 
       /// \brief TODO

@@ -138,10 +138,16 @@ namespace gazebo
       private: void SetPublisher();
 
       /// \brief TODO
+      private: void CalculatePoint();
+
+      /// \brief TODO
       private: void CalculateForce();
 
       /// \brief TODO
       private: void CalculateTorque();
+
+      /// \brief TODO
+      private: void UpdatePointVisual();
 
       /// \brief TODO
       private: void UpdateForceVisual();

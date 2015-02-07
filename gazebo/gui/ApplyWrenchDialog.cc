@@ -328,7 +328,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->setSizeConstraint(QLayout::SetFixedSize);
   mainLayout->addWidget(this->dataPtr->messageLabel);
-//  mainLayout->addLayout(pointLayout);
+  mainLayout->addLayout(pointLayout);
   mainLayout->addLayout(forceLayout);
   mainLayout->addLayout(torqueLayout);
   mainLayout->addLayout(buttonsLayout);
@@ -392,6 +392,7 @@ void ApplyWrenchDialog::OnApply()
   msgs::Wrench msg;
   msgs::Set(msg.mutable_force(), this->dataPtr->forceVector);
   msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector);
+  msgs::Set(msg.mutable_position(), this->dataPtr->pointVector);
 
   this->dataPtr->wrenchPub->Publish(msg);
 }
@@ -411,16 +412,19 @@ void ApplyWrenchDialog::OnCancel()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnPointXChanged(double /*_pX*/)
 {
+  this->CalculatePoint();
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnPointYChanged(double /*_pY*/)
 {
+  this->CalculatePoint();
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnPointZChanged(double /*_pZ*/)
 {
+  this->CalculatePoint();
 }
 
 /////////////////////////////////////////////////
@@ -530,6 +534,17 @@ void ApplyWrenchDialog::SetPublisher()
 }
 
 /////////////////////////////////////////////////
+void ApplyWrenchDialog::CalculatePoint()
+{
+  this->dataPtr->pointVector =
+      math::Vector3(this->dataPtr->pointXSpin->value(),
+                    this->dataPtr->pointYSpin->value(),
+                    this->dataPtr->pointZSpin->value());
+
+  this->UpdatePointVisual();
+}
+
+/////////////////////////////////////////////////
 void ApplyWrenchDialog::CalculateForce()
 {
   this->dataPtr->forceVector =
@@ -549,6 +564,15 @@ void ApplyWrenchDialog::CalculateTorque()
                     this->dataPtr->torqueZSpin->value());
 
   this->UpdateTorqueVisual();
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::UpdatePointVisual()
+{
+  if (!this->dataPtr->applyWrenchVisual)
+    return;
+
+  this->dataPtr->applyWrenchVisual->UpdatePoint(this->dataPtr->pointVector);
 }
 
 /////////////////////////////////////////////////

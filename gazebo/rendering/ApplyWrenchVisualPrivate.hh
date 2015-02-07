@@ -45,6 +45,9 @@ namespace gazebo
       public: rendering::DynamicLines *crossLines;
 
       /// TODO
+      public: math::Vector3 pointVector;
+
+      /// TODO
       public: math::Vector3 forceVector;
 
       /// TODO

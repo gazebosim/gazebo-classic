@@ -174,6 +174,19 @@ void ApplyWrenchVisual::SetMode(WrenchModes _mode)
 }
 
 ///////////////////////////////////////////////////
+void ApplyWrenchVisual::UpdatePoint(math::Vector3 _pointVector)
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  dPtr->pointVector = _pointVector;
+
+  this->SetPosition(_pointVector);
+  dPtr->torqueVisual->SetPosition(
+      dPtr->torqueVisual->GetPosition() - _pointVector);
+}
+
+///////////////////////////////////////////////////
 void ApplyWrenchVisual::UpdateForce(math::Vector3 _forceVector, bool _rotateTool)
 {
   ApplyWrenchVisualPrivate *dPtr =
@@ -235,9 +248,10 @@ void ApplyWrenchVisual::UpdateTorque(math::Vector3 _torqueVector, bool _rotateTo
 
   // Set position
   double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
-  dPtr->torqueVisual->SetPosition(-normVec * (linkDiagonal*0.5 + 0.5));
+  dPtr->torqueVisual->SetPosition((-normVec * (linkDiagonal*0.5 + 0.5)) - this->GetPosition());
 
   // Rotation tool
+  dPtr->rotTool->SetPosition(-this->GetPosition());
   if (_rotateTool)
     dPtr->rotTool->SetRotation(quat);
 }
