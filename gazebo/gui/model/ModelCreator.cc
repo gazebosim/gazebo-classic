@@ -210,11 +210,11 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
   // Get SDF model element from model name
   // TODO replace with entity_info and parse gazebo.msgs.Model msgs
   boost::shared_ptr<msgs::Response> response =
-    transport::request(get_world(), "world_sdf");
+    transport::request(gui::get_world(), "world_sdf");
 
   msgs::GzString msg;
   // Make sure the response is correct
-  if (response->response() != "error" && response->type() == msg.GetTypeName())
+  if (response->type() == msg.GetTypeName())
   {
     // Parse the response message
     msg.ParseFromString(response->serialized_data());
@@ -222,9 +222,6 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
     // Parse the string into sdf
     sdf::SDF sdfParsed;
     sdfParsed.SetFromString(msg.data());
-
-//    std::cerr << " sdfParsed " << sdfParsed.ToString() << std::endl;
-
 
     // Check that sdf contains world
     if (sdfParsed.root->HasElement("world") &&
@@ -236,10 +233,8 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
       {
         if (model->GetAttribute("name")->GetAsString() == _modelName)
         {
-          // Remove model from the scene to substitute with the preview visual
-          //transport::requestNoReply(this->node, "entity_delete", _modelName);
+          // Hide the model from the scene to substitute with the preview visual
           this->SetVisible(_modelName, false);
-//          std::cerr << " loading model " << model->ToString("") << std::endl;
           this->LoadSDF(model);
           this->serverModelName = _modelName;
           return;
@@ -412,7 +407,8 @@ void ModelCreator::OnExit()
 
   if (this->allParts.empty())
   {
-    this->SetVisible(this->serverModelName, true);
+    if (!this->serverModelName.empty())
+      this->SetVisible(this->serverModelName, true);
     this->Reset();
     gui::model::Events::newModel();
     gui::model::Events::finishModel();
@@ -1010,7 +1006,25 @@ void ModelCreator::SetAutoDisable(bool _auto)
 /////////////////////////////////////////////////
 void ModelCreator::FinishModel()
 {
-  transport::requestNoReply(this->node, "entity_delete", this->serverModelName);
+  if (!this->serverModelName.empty())
+  {
+    // delete model on server first before spawning the updated one.
+    transport::request(gui::get_world(), "entity_delete", this->serverModelName);
+    int timeoutCounter = 0;
+    int timeout = 100;
+    while (timeoutCounter < timeout)
+    {
+      boost::shared_ptr<msgs::Response> response =
+          transport::request(gui::get_world(), "entity_info",
+          this->serverModelName);
+      // Make sure the response is correct
+      if (response->response() == "nonexistent")
+        break;
+
+      common::Time::MSleep(100);
+      timeoutCounter++;
+    }
+  }
   event::Events::setSelectedEntity("", "normal");
   this->CreateTheEntity();
   this->Reset();
@@ -1527,7 +1541,7 @@ void ModelCreator::GenerateSDF()
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
 
-  std::cerr << modelElem->ToString("") << std::endl;
+  // std::cerr << modelElem->ToString("") << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -1614,10 +1628,9 @@ void ModelCreator::Update()
     }
   }
 
-  for (unsigned int i = 0; i < this->sdfToLoad.size(); ++i)
-    this->LoadSDF(this->sdfToLoad[i]);
-
-  this->sdfToLoad.clear();
+//  for (unsigned int i = 0; i < this->sdfToLoad.size(); ++i)
+//    this->LoadSDF(this->sdfToLoad[i]);
+//  this->sdfToLoad.clear();
 }
 
 /////////////////////////////////////////////////
