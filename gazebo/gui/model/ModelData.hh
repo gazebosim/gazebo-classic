@@ -79,15 +79,27 @@ namespace gazebo
       /// \param[in] _pose Pose of part.
       public: void SetPose(const math::Pose &_pose);
 
-      /// \brief TODO
+      /// \brief Load the part with data from SDF.
+      /// \param[in] _sdf Link SDF element.
+      public: void Load(sdf::ElementPtr _sdf);
+
+/*      /// \brief Set the mass of the part
+      /// \param[in] _mass Mass of part.
       public: void SetMass(double _mass);
 
-      /// \brief TODO
+      /// \brief Set the inertial pose of the part
+      /// \param[in] _pose Inertial pose of part.
       public: void SetInertialPose(const math::Pose &_pose);
 
-      /// TODO
+      /// \brief Set the inertial matrix of the part
+      /// \param[in] _ixx X second moment of inertia (MOI) about x axis.
+      /// \param[in] _iyy Y second moment of inertia about y axis.
+      /// \param[in] _izz Z second moment of inertia about z axis.
+      /// \param[in] _ixy XY inertia.
+      /// \param[in] _ixz XZ inertia.
+      /// \param[in] _iyz YZ inertia.
       public: void SetInertiaMatrix(double _ixx, double _ixy, double _ixz,
-          double _iyy, double _iyz, double _izz);
+          double _iyy, double _iyz, double _izz);*/
 
       /// \brief Set the scale of the part.
       /// \param[in] _scale Scale of part.

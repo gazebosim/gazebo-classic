@@ -153,7 +153,10 @@ namespace gazebo
       /// return Number of joints.
       public: unsigned int GetJointCount();
 
-      /// \brief TODO
+      /// \brief Create a joint from SDF. This is mainly used when editing
+      /// existing models.
+      /// \param[_in] _jointElement SDF element to load.
+      /// \_modelName Name of the model that contains this joint.
       public: void CreateJointFromSDF(sdf::ElementPtr _jointElem,
           const std::string &_modelName = "");
 
@@ -192,7 +195,9 @@ namespace gazebo
       /// \param[in] _name Name of joint.
       private: void OpenInspector(const std::string &_name);
 
-      /// \brief TODO
+      /// \brief Convert a joint type string to enum.
+      /// \param[in] _type Joint type in string.
+      /// \return Joint type enum.
       private: JointType ConvertJointType(const std::string &_type);
 
       /// \brief Qt signal when the joint creation process has ended.

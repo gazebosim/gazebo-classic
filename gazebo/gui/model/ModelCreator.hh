@@ -271,7 +271,9 @@ namespace gazebo
       /// \return Cloned part.
       private: PartData *ClonePart(const std::string &_partName);
 
-      /// \brief TODO
+      /// \brief Create a part from an SDF.
+      /// \param[in] _link SDF element of the link that will be used to
+      /// recreate its visual representation in the model editor.
       private: void CreatePartFromSDF(sdf::ElementPtr _linkElem);
 
       /// \brief Open the part inspector.
@@ -288,8 +290,11 @@ namespace gazebo
       /// \return Name of the model created.
       private: std::string CreateModel();
 
-      /// \brief TODO
+      /// \brief Load a model SDF file and create visuals in the model editor.
+      /// This is used mainly when editing existing models.
+      /// \param[in] _sdf SDF of a model to be loaded
       private: void LoadSDF(sdf::ElementPtr _sdf);
+
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _axis Axis of alignment: x, y, or z.
       /// \param[in] _config Configuration: min, center, or max.

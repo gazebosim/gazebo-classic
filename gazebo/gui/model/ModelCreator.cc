@@ -209,6 +209,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
 
   // Get SDF model element from model name
   // TODO replace with entity_info and parse gazebo.msgs.Model msgs
+  // or handle model_sdf requests in world.
   boost::shared_ptr<msgs::Response> response =
     transport::request(gui::get_world(), "world_sdf");
 
@@ -668,6 +669,8 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 {
   PartData *part = new PartData();
 
+  part->Load(_linkElem);
+
   // Link name
   std::stringstream linkNameStream;
   std::stringstream leafNameStream;
@@ -689,18 +692,10 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
   std::string leafName = leafNameStream.str();
   part->SetName(leafName);
 
-  // Link pose
-  math::Pose linkPose;
-  if (_linkElem->HasElement("pose"))
-  {
-    linkPose = _linkElem->Get<math::Pose>("pose");
-  }
-  else
-  {
-    linkPose.Set(0, 0, 0, 0, 0, 0);
-    gzwarn << "SDF missing <link><pose> tag. Setting to zero."
-        << std::endl;
-  }
+
+/*  // Link pose
+  math::Pose linkPose = _linkElem->Get<math::Pose>("pose");
+
   part->SetPose(linkPose);
 
   // Link inertial
@@ -731,20 +726,21 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
       if (inertiaElem->HasElement("izz"))
         inertiaMatrix[5] = inertiaElem->Get<double>("izz");
 
-      part->SetInertiaMatrix(inertiaMatrix[0], inertiaMatrix[1], inertiaMatrix[2],
-                             inertiaMatrix[3], inertiaMatrix[4], inertiaMatrix[5]);
+      part->SetInertiaMatrix(
+          inertiaMatrix[0], inertiaMatrix[1], inertiaMatrix[2],
+          inertiaMatrix[3], inertiaMatrix[4], inertiaMatrix[5]);
     }
   }
   else
   {
     gzwarn << "SDF missing <inertial> tag. Setting to default."
         << std::endl;
-  }
+  }*/
 
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
       this->previewVisual));
   linkVisual->Load();
-  linkVisual->SetPose(linkPose);
+  linkVisual->SetPose(part->GetPose());
   part->partVisual = linkVisual;
 
   // Visuals

@@ -139,38 +139,45 @@ void PartData::SetPose(const math::Pose &_pose)
 }
 
 /////////////////////////////////////////////////
-void PartData::SetMass(double _mass)
+void PartData::Load(sdf::ElementPtr _sdf)
 {
-  this->partSDF->GetElement("inertial")->GetElement("mass")->Set(_mass);
-
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
-  linkConfig->SetMass(_mass);
-}
 
-/////////////////////////////////////////////////
-void PartData::SetInertialPose(const math::Pose &_pose)
-{
-  this->partSDF->GetElement("inertial")->GetElement("pose")->Set(_pose);
+  this->SetName(_sdf->Get<std::string>("name"));
+  this->SetPose(_sdf->Get<math::Pose>("pose"));
 
-  LinkConfig *linkConfig = this->inspector->GetLinkConfig();
-  linkConfig->SetInertialPose(_pose);
-}
+  if (_sdf->HasElement("inertial"))
+  {
+    sdf::ElementPtr inertialElem = _sdf->GetElement("inertial");
+    this->partSDF->GetElement("inertial")->Copy(inertialElem);
 
-/////////////////////////////////////////////////
-void PartData::SetInertiaMatrix(double _ixx, double _ixy, double _ixz,
-    double _iyy, double _iyz, double _izz)
-{
-  sdf::ElementPtr inertiaElem = this->partSDF->GetElement("inertial")->
-      GetElement("inertia");
-  inertiaElem->GetElement("ixx")->Set(_ixx);
-  inertiaElem->GetElement("ixy")->Set(_ixy);
-  inertiaElem->GetElement("ixz")->Set(_ixz);
-  inertiaElem->GetElement("iyy")->Set(_iyy);
-  inertiaElem->GetElement("iyz")->Set(_iyz);
-  inertiaElem->GetElement("izz")->Set(_izz);
+    msgs::Link linkMsg;
+    msgs::Inertial *inertialMsg = linkMsg.mutable_inertial();
 
-  LinkConfig *linkConfig = this->inspector->GetLinkConfig();
-  linkConfig->SetInertiaMatrix(_ixx, _ixy, _ixz, _iyy, _iyz, _izz);
+    if (inertialElem->HasElement("mass"))
+    {
+      double mass = inertialElem->Get<double>("mass");
+      inertialMsg->set_mass(mass);
+    }
+
+    if (inertialElem->HasElement("pose"))
+    {
+      math::Pose inertialPose = inertialElem->Get<math::Pose>("pose");
+      msgs::Set(inertialMsg->mutable_pose(), inertialPose);
+    }
+
+    if (inertialElem->HasElement("inertia"))
+    {
+      sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
+      inertialMsg->set_ixx(inertiaElem->Get<double>("ixx"));
+      inertialMsg->set_ixy(inertiaElem->Get<double>("ixy"));
+      inertialMsg->set_ixz(inertiaElem->Get<double>("ixz"));
+      inertialMsg->set_iyy(inertiaElem->Get<double>("iyy"));
+      inertialMsg->set_iyz(inertiaElem->Get<double>("iyz"));
+      inertialMsg->set_izz(inertiaElem->Get<double>("izz"));
+    }
+    linkConfig->Update(&linkMsg);
+  }
 }
 
 /////////////////////////////////////////////////

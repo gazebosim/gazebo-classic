@@ -865,6 +865,8 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key)
   widgetLayout->addWidget(keyLabel);
   QDoubleSpinBox *valueSpinBox = new QDoubleSpinBox;
   valueSpinBox->setRange(-1e6, 1e6);
+  valueSpinBox->setSingleStep(0.01);
+  valueSpinBox->setDecimals(6);
   valueSpinBox->setAlignment(Qt::AlignRight);
   widgetLayout->addWidget(valueSpinBox);
   ConfigChildWidget *widget = new ConfigChildWidget();

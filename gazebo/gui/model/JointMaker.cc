@@ -986,14 +986,8 @@ void JointData::OnApply()
 void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
     const std::string &_modelName)
 {
-  JointData *joint = new JointData();
-  joint->dirty = true;
-
-  // TODO: Add checks for whether elements are present, whether visuals can be found...
-
   // Name
-  joint->name = _jointElem->Get<std::string>("name");
-  std::string jointVisName = _modelName + "::" + joint->name;
+  std::string jointName = _jointElem->Get<std::string>("name");
 
   // Pose
   math::Pose jointPose;
@@ -1001,7 +995,6 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
     jointPose = _jointElem->Get<math::Pose>("pose");
   else
     jointPose.Set(0, 0, 0, 0, 0, 0);
-  joint->pose = jointPose;
 
   // Parent
   std::string parentName = _modelName + "::" +
@@ -1009,18 +1002,31 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 
   rendering::VisualPtr parentVis =
       gui::get_active_camera()->GetScene()->GetVisual(parentName);
-  joint->parent = parentVis;
 
   // Child
   std::string childName = _modelName + "::" +
       _jointElem->GetElement("child")->GetValue()->GetAsString();
   rendering::VisualPtr childVis =
       gui::get_active_camera()->GetScene()->GetVisual(childName);
-  joint->child = childVis;
+
+  if (!parentVis || !childVis)
+  {
+    gzerr << "Unable to load joint. Joint child / parent not found"
+        << std::endl;
+    return;
+  }
 
   // Type
   std::string type = _jointElem->Get<std::string>("type");
+
+  JointData *joint = new JointData();
+  joint->name = jointName;
+  joint->pose = jointPose;
+  joint->parent = parentVis;
+  joint->child = childVis;
   joint->type = this->ConvertJointType(type);
+  std::string jointVisName = _modelName + "::" + joint->name;
+
 
   // Axes
   int axisCount = JointMaker::GetJointAxisCount(joint->type);
@@ -1060,6 +1066,7 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   jointVis->GetSceneNode()->setInheritOrientation(false);
   joint->visual = jointVis;
   joint->line = jointLine;
+  joint->dirty = true;
 
   this->CreateHotSpot(joint);
 }
