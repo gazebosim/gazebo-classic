@@ -1247,6 +1247,7 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
       {
         if ((*it)->GetName() == _msg->data())
         {
+          ModelManipulator::Instance()->Detach();
           this->selectedVisuals.erase(it);
           break;
         }
