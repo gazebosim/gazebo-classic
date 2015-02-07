@@ -162,7 +162,7 @@ namespace gazebo
       private: void UpdateForceVector();
 
       /// \brief TODO
-      private: void UpdateForceVectorSpins(math::Vector3 _fV);
+      private: void UpdateForceVectorSpins(math::Vector3 _v);
 
       /// \brief TODO
       private: void UpdateTorqueMag();
@@ -171,10 +171,13 @@ namespace gazebo
       private: void UpdateTorqueVector();
 
       /// \brief TODO
-      private: void UpdateTorqueVectorSpins(math::Vector3 _fV);
+      private: void UpdateTorqueVectorSpins(math::Vector3 _v);
 
       /// \brief TODO
       private: void AttachVisuals();
+
+      /// \brief TODO
+      private: void SetSpinValue(QDoubleSpinBox *_spin, double _value);
 
       /// \internal
       /// \brief Pointer to private data.

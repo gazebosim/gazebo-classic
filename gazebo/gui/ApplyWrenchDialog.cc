@@ -433,7 +433,7 @@ void ApplyWrenchDialog::OnForceMagChanged(double /*_magnitude*/)
   if (this->dataPtr->mouseForceMag)
   {
     this->dataPtr->mouseForceMag = false;
-    return;
+//    return;
   }
   this->UpdateForceVector();
   this->SetMode(rendering::ApplyWrenchVisual::WrenchModes::FORCE);
@@ -616,7 +616,7 @@ void ApplyWrenchDialog::UpdateTorqueVisual()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::UpdateForceMag()
 {
-  this->dataPtr->forceMagSpin->setValue(sqrt(
+  this->SetSpinValue(this->dataPtr->forceMagSpin, sqrt(
       pow(this->dataPtr->forceXSpin->value(), 2) +
       pow(this->dataPtr->forceYSpin->value(), 2) +
       pow(this->dataPtr->forceZSpin->value(), 2)));
@@ -643,11 +643,11 @@ void ApplyWrenchDialog::UpdateForceVector()
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::UpdateForceVectorSpins(math::Vector3 _fV)
+void ApplyWrenchDialog::UpdateForceVectorSpins(math::Vector3 _v)
 {
-  this->dataPtr->forceXSpin->setValue(_fV.x);
-  this->dataPtr->forceYSpin->setValue(_fV.y);
-  this->dataPtr->forceZSpin->setValue(_fV.z);
+  this->SetSpinValue(this->dataPtr->forceXSpin, _v.x);
+  this->SetSpinValue(this->dataPtr->forceYSpin, _v.y);
+  this->SetSpinValue(this->dataPtr->forceZSpin, _v.z);
 
   this->CalculateForce();
 }
@@ -655,10 +655,11 @@ void ApplyWrenchDialog::UpdateForceVectorSpins(math::Vector3 _fV)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::UpdateTorqueMag()
 {
-  this->dataPtr->torqueMagSpin->setValue(sqrt(
+  this->SetSpinValue(this->dataPtr->torqueMagSpin, sqrt(
       pow(this->dataPtr->torqueXSpin->value(), 2) +
       pow(this->dataPtr->torqueYSpin->value(), 2) +
       pow(this->dataPtr->torqueZSpin->value(), 2)));
+
   this->CalculateTorque();
 }
 
@@ -667,8 +668,8 @@ void ApplyWrenchDialog::UpdateTorqueVector()
 {
   // Normalize current vector
   math::Vector3 v = math::Vector3(this->dataPtr->torqueXSpin->value(),
-                                   this->dataPtr->torqueYSpin->value(),
-                                   this->dataPtr->torqueZSpin->value());
+                                  this->dataPtr->torqueYSpin->value(),
+                                  this->dataPtr->torqueZSpin->value());
   if (v == math::Vector3::Zero)
     v = math::Vector3::UnitX;
   else
@@ -681,11 +682,11 @@ void ApplyWrenchDialog::UpdateTorqueVector()
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::UpdateTorqueVectorSpins(math::Vector3 _tV)
+void ApplyWrenchDialog::UpdateTorqueVectorSpins(math::Vector3 _v)
 {
-  this->dataPtr->torqueXSpin->setValue(_tV.x);
-  this->dataPtr->torqueYSpin->setValue(_tV.y);
-  this->dataPtr->torqueZSpin->setValue(_tV.z);
+  this->SetSpinValue(this->dataPtr->torqueXSpin, _v.x);
+  this->SetSpinValue(this->dataPtr->torqueYSpin, _v.y);
+  this->SetSpinValue(this->dataPtr->torqueZSpin, _v.z);
 
   this->CalculateTorque();
 }
@@ -924,4 +925,12 @@ bool ApplyWrenchDialog::eventFilter(QObject *_object, QEvent *_event)
     }
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::SetSpinValue(QDoubleSpinBox *_spin, double _value)
+{
+  _spin->blockSignals(true);
+  _spin->setValue(_value);
+  _spin->blockSignals(false);
 }
