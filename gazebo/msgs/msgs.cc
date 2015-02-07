@@ -34,6 +34,12 @@ namespace gazebo
 {
   namespace msgs
   {
+    /// \brief Internal function to create an SDF element from msgs::Axis.
+    /// It is only intended to be used by JointToSDF.
+    /// \param[in] _msg The msgs::Axis object.
+    /// \param[in] _sdf sdf::ElementPtr to fill with data.
+    void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf);
+
     /// Create a request message
     msgs::Request *CreateRequest(const std::string &_request,
         const std::string &_data)

@@ -416,12 +416,6 @@ namespace gazebo
     sdf::ElementPtr ModelToSDF(const msgs::Model &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
-    /// \brief Create an SDF element from msgs::Axis.
-    /// \param[in] _msg The msgs::Axis object.
-    /// \param[in] _sdf sdf::ElementPtr to fill with data.
-    GAZEBO_VISIBLE
-    void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf);
-
     /// \brief Create an SDF element from msgs::Joint.
     /// \param[in] _msg The msgs::Joint object.
     /// \param[in] _sdf if supplied, performs an update from _sdf intead of
