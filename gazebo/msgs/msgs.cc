@@ -315,6 +315,13 @@ namespace gazebo
       {
         result = msgs::Joint::GEARBOX;
       }
+      else
+      {
+        gzerr << "Unrecognized JointType ["
+              << _str
+              << "], returning REVOLUTE"
+              << std::endl;
+      }
       return result;
     }
 
@@ -361,6 +368,8 @@ namespace gazebo
         default:
         {
           result = "unknown";
+          gzerr << "Unrecognized JointType [" << _type << "]"
+                << std::endl;
           break;
         }
       }
@@ -898,9 +907,12 @@ namespace gazebo
         sdf::ElementPtr shaderElem = materialSDF->GetElement("shader");
         shaderElem->GetAttribute("type")->Set(
           ConvertShaderType(_msg.shader_type()));
+      }
 
-        if (_msg.has_normal_map())
-          shaderElem->GetElement("normal_map")->Set(_msg.normal_map());
+      if (_msg.has_normal_map())
+      {
+        sdf::ElementPtr shaderElem = materialSDF->GetElement("shader");
+        shaderElem->GetElement("normal_map")->Set(_msg.normal_map());
       }
 
       if (_msg.has_lighting())
@@ -921,7 +933,7 @@ namespace gazebo
     /////////////////////////////////////////////////
     msgs::Material::ShaderType ConvertShaderType(const std::string &_str)
     {
-      msgs::Material::ShaderType result = msgs::Material::VERTEX;
+      auto result = msgs::Material::VERTEX;
       if (_str == "vertex")
       {
         result = msgs::Material::VERTEX;
@@ -940,7 +952,10 @@ namespace gazebo
       }
       else
       {
-        gzthrow(std::string("Unknown shader type[") + _str + "]");
+        gzerr << "Unrecognized ShaderType ["
+              << _str
+              << "], returning VERTEX"
+              << std::endl;
       }
       return result;
     }
@@ -974,6 +989,8 @@ namespace gazebo
         default:
         {
           result = "unknown";
+          gzerr << "Unrecognized ShaderType [" << _type << "]"
+                << std::endl;
           break;
         }
       }
@@ -1308,7 +1325,7 @@ namespace gazebo
         visualElem = VisualToSDF(_msg.visual(i), visualElem);
       }
 
-      // msgs::LinkToSDF currently does not convert sensor and projector data
+      /// \todo LinkToSDF currently does not convert sensor and projector data
 
       return linkSDF;
     }
