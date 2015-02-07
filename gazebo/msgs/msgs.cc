@@ -1725,8 +1725,7 @@ namespace gazebo
         geometry->set_type(Geometry_Type_BOX);
         msgs::Set(geometry->mutable_box()->mutable_size(), _size);
 
-        msgs::Material::Script *script =
-          visual->mutable_material()->mutable_script();
+        auto script = visual->mutable_material()->mutable_script();
         script->add_uri();
         script->set_uri(0, "file://media/materials/scripts/gazebo.material");
         script->set_name("Gazebo/Grey");
@@ -1775,6 +1774,8 @@ namespace gazebo
       // ignore the deleted field, since it's not used in sdformat
       if (_msg.visual_size() > 0)
       {
+        // model element in SDF cannot store visuals,
+        // so ignore them for now
         gzerr << "Model visuals not yet parsed" << std::endl;
       }
       // ignore the scale field, since it's not used in sdformat
@@ -1817,8 +1818,7 @@ namespace gazebo
       if (_msg.has_axis2())
         AxisToSDF(_msg.axis2(), jointSDF->GetElement("axis2"));
 
-      sdf::ElementPtr odePhysicsElem =
-        jointSDF->GetElement("physics")->GetElement("ode");
+      auto odePhysicsElem = jointSDF->GetElement("physics")->GetElement("ode");
       if (_msg.has_cfm())
         odePhysicsElem->GetElement("cfm")->Set(_msg.cfm());
       if (_msg.has_bounce())
@@ -1829,7 +1829,7 @@ namespace gazebo
         odePhysicsElem->GetElement("fudge_factor")->Set(_msg.fudge_factor());
 
       {
-        sdf::ElementPtr limitElem = odePhysicsElem->GetElement("limit");
+        auto limitElem = odePhysicsElem->GetElement("limit");
         if (_msg.has_limit_cfm())
           limitElem->GetElement("cfm")->Set(_msg.limit_cfm());
         if (_msg.has_limit_erp())
@@ -1837,8 +1837,7 @@ namespace gazebo
       }
 
       {
-        sdf::ElementPtr suspensionElem =
-          odePhysicsElem->GetElement("suspension");
+        auto suspensionElem = odePhysicsElem->GetElement("suspension");
         if (_msg.has_suspension_cfm())
           suspensionElem->GetElement("cfm")->Set(_msg.suspension_cfm());
         if (_msg.has_suspension_erp())
@@ -1861,7 +1860,7 @@ namespace gazebo
       }
 
       {
-        sdf::ElementPtr dynamicsElem = _sdf->GetElement("dynamics");
+        auto dynamicsElem = _sdf->GetElement("dynamics");
         if (_msg.has_damping())
           dynamicsElem->GetElement("damping")->Set(_msg.damping());
         if (_msg.has_friction())
@@ -1869,7 +1868,7 @@ namespace gazebo
       }
 
       {
-        sdf::ElementPtr limitElem = _sdf->GetElement("limit");
+        auto limitElem = _sdf->GetElement("limit");
         if (_msg.has_limit_lower())
           limitElem->GetElement("lower")->Set(_msg.limit_lower());
         if (_msg.has_limit_upper())
