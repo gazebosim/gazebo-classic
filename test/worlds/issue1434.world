@@ -1,6 +1,18 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
-  <world name="issue1434">
-    <plugin filename="libIssue1434Plugin.so" name="Issue1434"/>
+  <world name="default">
+
+    <gui>
+      <plugin name="Issue1434" filename="libIssue1434Plugin.so"/>
+    </gui>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
   </world> 
 </sdf>

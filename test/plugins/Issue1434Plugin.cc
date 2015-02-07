@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include <sstream>
 #include <gazebo/gui/GuiIface.hh>
 #include "Issue1434Plugin.hh"
 
@@ -23,7 +22,7 @@ using namespace gazebo;
 // Register this plugin with the simulator
 GZ_REGISTER_GUI_PLUGIN(Issue1434Plugin)
 
-Issue1434Plugin::Issue1434Plugin()
+Issue1434Plugin::Issue1434Plugin() : GUIPlugin()
 {
   // Create the main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
@@ -56,9 +55,11 @@ Issue1434Plugin::Issue1434Plugin()
   this->resize(200, 30);
 
   gzdbg << "World: " << gazebo::gui::get_world() << std::endl;
+  gazebo::gui::get_active_camera();
 }
 
 void Issue1434Plugin::Load(sdf::ElementPtr /*_sdf*/)
 {
   gzdbg << "World: " << gazebo::gui::get_world() << std::endl;
+  gazebo::gui::get_active_camera();
 }

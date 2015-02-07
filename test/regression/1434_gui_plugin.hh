@@ -14,31 +14,27 @@
  * limitations under the License.
  *
 */
-#ifndef _ISSUE1434PLUGIN_HH_
-#define _ISSUE1434PLUGIN_HH_
 
-#include <gazebo/common/Plugin.hh>
-#include <gazebo/gui/GuiPlugin.hh>
-#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
-# include <gazebo/transport/transport.hh>
-# include <gazebo/gui/gui.hh>
-#endif
+#ifndef _1434_GUI_PLUGIN_TEST_HH_
+#define _1434_GUI_PLUGIN_TEST_HH_
 
-namespace gazebo
+#include <string>
+#include "gazebo/gui/QTestFixture.hh"
+
+class Issue1434Test : public QTestFixture
 {
-  class GAZEBO_VISIBLE Issue1434Plugin : public GUIPlugin
-  {
-    Q_OBJECT
+  Q_OBJECT
 
-    /// \brief Constructor
-    public: Issue1434Plugin();
+  public: bool manipModeFired = false;
 
-    /// \brief Destructor
-    public: virtual ~Issue1434Plugin() {}
+  public: void OnManipMode(const std::string& _mode)
+    {
+      this->manipModeFired = true;
+    }
 
-    /// Documentation inherited
-    public: void Load(sdf::ElementPtr /*_sdf*/);
-  };
-}
+  private slots: void CheckGuiIface();
+  private slots: void CheckGuiEventsSuccess();
+  private slots: void CheckGuiEvents();
+};
 
 #endif

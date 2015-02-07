@@ -33,7 +33,6 @@ set(tests
   1146_collision_bounding_box.cc
   1208_world_plugin_init.cc
   1375_world_reset.cc
-  1434_gui_plugin.cc
 )
 
 gz_build_tests(${tests})
@@ -59,7 +58,10 @@ if (ENABLE_TESTS_COMPILATION)
   add_dependencies(${TEST_TYPE}_1112_force_torque_model_removal
                    ForceTorqueModelRemovalTestPlugin)
   add_dependencies(${TEST_TYPE}_1208_world_plugin_init Issue1208Plugin)
-
-  add_dependencies(${TEST_TYPE}_1434_gui_plugin Issue1434Plugin gazebo_gui)
-  target_link_libraries(${TEST_TYPE}_1434_gui_plugin gazebo_gui)
 endif()
+
+set(qt_tests
+  1434_gui_plugin.cc
+)
+
+gz_build_qt_tests(${qt_tests})
