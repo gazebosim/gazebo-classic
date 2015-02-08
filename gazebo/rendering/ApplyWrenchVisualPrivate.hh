@@ -29,6 +29,9 @@ namespace gazebo
     /// \brief Private data for the Apply Wrench Visual class.
     class ApplyWrenchVisualPrivate : public VisualPrivate
     {
+      /// \brief TODO
+      public: VisualPtr pointVisual;
+
       /// TODO
       public: rendering::ArrowVisualPtr forceVisual;
 
@@ -41,9 +44,6 @@ namespace gazebo
       /// \brief TODO
       public: rendering::DynamicLines *torqueLine;
 
-      /// \brief Lines that make the cross marking the point of application.
-      public: rendering::DynamicLines *crossLines;
-
       /// TODO
       public: math::Vector3 pointVector;
 
@@ -52,6 +52,12 @@ namespace gazebo
 
       /// TODO
       public: math::Vector3 torqueVector;
+
+      /// TODO
+      public: std::string mode;
+
+      /// TODO
+      public: bool rotatedByMouse;
     };
   }
 }

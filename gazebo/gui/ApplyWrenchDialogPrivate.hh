@@ -97,9 +97,6 @@ namespace gazebo
       public: rendering::ApplyWrenchVisualPtr applyWrenchVisual;
 
       /// TODO
-      public: rendering::ApplyWrenchVisual::WrenchModes wrenchMode;
-
-      /// TODO
       public: math::Vector2i dragStart;
 
       /// TODO
@@ -112,28 +109,7 @@ namespace gazebo
       public: std::string manipState;
 
       /// TODO
-      public: bool mouseForceMag;
-
-      /// TODO
-      public: bool mouseForceX;
-
-      /// TODO
-      public: bool mouseForceY;
-
-      /// TODO
-      public: bool mouseForceZ;
-
-      /// TODO
-      public: bool mouseTorqueMag;
-
-      /// TODO
-      public: bool mouseTorqueX;
-
-      /// TODO
-      public: bool mouseTorqueY;
-
-      /// TODO
-      public: bool mouseTorqueZ;
+      public: std::string mode;
     };
   }
 }

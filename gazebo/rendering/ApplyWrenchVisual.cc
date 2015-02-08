@@ -49,6 +49,10 @@ void ApplyWrenchVisual::Load()
   math::Vector3 linkSize = dPtr->parent->GetBoundingBox().GetSize();
 
   // Point visual
+  dPtr->pointVisual.reset(new rendering::Visual(
+       this->GetName() + "__POINT_VISUAL__", shared_from_this()));
+  dPtr->pointVisual->Load();
+
   math::Vector3 p1(0, 0, -2*linkSize.z);
   math::Vector3 p2(0, 0,  2*linkSize.z);
   math::Vector3 p3(0, -2*linkSize.y, 0);
@@ -56,15 +60,15 @@ void ApplyWrenchVisual::Load()
   math::Vector3 p5(-2*linkSize.x, 0, 0);
   math::Vector3 p6(2*linkSize.x,  0, 0);
 
-  dPtr->crossLines = this->
+  rendering::DynamicLines *crossLines = dPtr->pointVisual->
       CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  dPtr->crossLines->setMaterial("Gazebo/SkyBlue");
-  dPtr->crossLines->AddPoint(p1);
-  dPtr->crossLines->AddPoint(p2);
-  dPtr->crossLines->AddPoint(p3);
-  dPtr->crossLines->AddPoint(p4);
-  dPtr->crossLines->AddPoint(p5);
-  dPtr->crossLines->AddPoint(p6);
+  crossLines->setMaterial("Gazebo/SkyBlue");
+  crossLines->AddPoint(p1);
+  crossLines->AddPoint(p2);
+  crossLines->AddPoint(p3);
+  crossLines->AddPoint(p4);
+  crossLines->AddPoint(p5);
+  crossLines->AddPoint(p6);
 
   // Force visual
   dPtr->forceVisual.reset(new rendering::ArrowVisual(
@@ -111,6 +115,7 @@ void ApplyWrenchVisual::Load()
 
   dPtr->forceVector = math::Vector3::UnitX;
   dPtr->torqueVector = math::Vector3::Zero;
+  dPtr->mode = "force";
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
@@ -142,70 +147,245 @@ rendering::SelectionObjPtr ApplyWrenchVisual::GetRotTool() const
   return dPtr->rotTool;
 }
 
+/////////////////////////////////////////////////////
+//void ApplyWrenchVisual::SetMode(WrenchModes _mode)
+//{
+//  ApplyWrenchVisualPrivate *dPtr =
+//      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+//  this->wrenchMode = _mode;
+
+//  // Attach rotation to mode visual
+//  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
+//  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
+//  if (this->wrenchMode == WrenchModes::FORCE &&
+//      dPtr->forceVector != math::Vector3::Zero)
+//  {
+////    dPtr->rotTool->SetRotation(dPtr->forceVisual->GetRotation() *
+////        math::Quaternion(math::Vector3(0, M_PI/2.0, 0)));
+//  }
+//  else if (this->wrenchMode == WrenchModes::TORQUE &&
+//      dPtr->torqueVector != math::Vector3::Zero)
+//  {
+////    dPtr->rotTool->SetRotation(dPtr->torqueVisual->GetRotation() *
+////        math::Quaternion(math::Vector3(0, M_PI/2.0, 0)));
+//  }
+//  else if (dPtr->forceVector == math::Vector3::Zero &&
+//           dPtr->torqueVector == math::Vector3::Zero)
+//  {
+//    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, false);
+//    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, false);
+//  }
+//}
+
+/////////////////////////////////////////////////////
+//void ApplyWrenchVisual::UpdatePoint(math::Vector3 _pointVector)
+//{
+//  ApplyWrenchVisualPrivate *dPtr =
+//      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+//  dPtr->pointVector = _pointVector;
+
+//  this->SetPosition(_pointVector);
+//  dPtr->torqueVisual->SetPosition(
+//      dPtr->torqueVisual->GetPosition() - _pointVector);
+//}
+
+/////////////////////////////////////////////////////
+//void ApplyWrenchVisual::UpdateForce(math::Vector3 _forceVector, bool _rotateTool)
+//{
+//  ApplyWrenchVisualPrivate *dPtr =
+//      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+//  if (!dPtr->forceVisual)
+//    return;
+
+//  dPtr->forceVector = _forceVector;
+
+//  if (_forceVector == math::Vector3::Zero)
+//  {
+//    dPtr->forceVisual->SetVisible(false);
+//    return;
+//  }
+//  dPtr->forceVisual->SetVisible(true);
+
+//  // Set rotation
+//  math::Vector3 normVec = _forceVector;
+//  normVec.Normalize();
+//  math::Quaternion quat = this->GetQuaternionFromVector(normVec);
+//  dPtr->forceVisual->SetRotation(quat * math::Quaternion(
+//      math::Vector3(0, M_PI/2.0, 0)));
+
+//  // Set position
+//  double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
+//  //double arrowSize = this->forceVisual->GetBoundingBox().GetZLength();
+//  dPtr->forceVisual->SetPosition(-normVec * (linkDiagonal*0.5 + 0.5));
+
+//  // Rotation tool
+//  if (_rotateTool)
+//    dPtr->rotTool->SetRotation(quat);
+//}
+
+/////////////////////////////////////////////////////
+//void ApplyWrenchVisual::UpdateTorque(math::Vector3 _torqueVector, bool _rotateTool)
+//{
+//  ApplyWrenchVisualPrivate *dPtr =
+//      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+//  if (!dPtr->torqueVisual)
+//    return;
+
+//  dPtr->torqueVector = _torqueVector;
+
+//  if (_torqueVector == math::Vector3::Zero)
+//  {
+//    dPtr->torqueVisual->SetVisible(false);
+//    return;
+//  }
+//  dPtr->torqueVisual->SetVisible(true);
+
+//  // Set rotation
+//  math::Vector3 normVec = _torqueVector;
+//  normVec.Normalize();
+//  math::Quaternion quat = this->GetQuaternionFromVector(normVec);
+//  dPtr->torqueVisual->SetRotation(quat * math::Quaternion(
+//      math::Vector3(0, M_PI/2.0, 0)));
+
+//  // Set position
+//  double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
+//  dPtr->torqueVisual->SetPosition((-normVec * (linkDiagonal*0.5 + 0.5)) - this->GetPosition());
+
+//  // Rotation tool
+//  dPtr->rotTool->SetPosition(-this->GetPosition());
+//  if (_rotateTool)
+//    dPtr->rotTool->SetRotation(quat);
+//}
+
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetMode(WrenchModes _mode)
+math::Quaternion ApplyWrenchVisual::GetQuaternionFromVector(math::Vector3 _vec)
+{
+  double roll = 0;
+  double pitch = -atan2(_vec.z, sqrt(pow(_vec.x, 2) + pow(_vec.y, 2)));
+  double yaw = atan2(_vec.y, _vec.x);
+
+  return math::Quaternion(roll, pitch, yaw);
+}
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////
+void ApplyWrenchVisual::SetWrenchMode(std::string _mode)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  this->wrenchMode = _mode;
+  // Update variable
+  dPtr->mode = _mode;
 
-  // Attach rotation to mode visual
-  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
-  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
-  if (this->wrenchMode == WrenchModes::FORCE &&
-      dPtr->forceVector != math::Vector3::Zero)
+  if (_mode == "force")
   {
-//    dPtr->rotTool->SetRotation(dPtr->forceVisual->GetRotation() *
-//        math::Quaternion(math::Vector3(0, M_PI/2.0, 0)));
+    // set force visual visible and update direction
+    this->SetForceVisual();
   }
-  else if (this->wrenchMode == WrenchModes::TORQUE &&
-      dPtr->torqueVector != math::Vector3::Zero)
+  else if (_mode == "torque")
   {
-//    dPtr->rotTool->SetRotation(dPtr->torqueVisual->GetRotation() *
-//        math::Quaternion(math::Vector3(0, M_PI/2.0, 0)));
+    // set torque visual visible and update direction
+    this->SetTorqueVisual();
   }
-  else if (dPtr->forceVector == math::Vector3::Zero &&
-           dPtr->torqueVector == math::Vector3::Zero)
+  else if (_mode == "none")
   {
+    // hide rot
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, false);
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, false);
   }
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::UpdatePoint(math::Vector3 _pointVector)
+void ApplyWrenchVisual::SetPoint(math::Vector3 _pointVector)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  dPtr->pointVector = _pointVector;
+  dPtr->pointVisual->SetPosition(_pointVector);
+  // move force no matter what
+  dPtr->forceVisual->SetPosition(dPtr->forceVisual->GetPosition() - dPtr->pointVector + _pointVector);
 
-  this->SetPosition(_pointVector);
-  dPtr->torqueVisual->SetPosition(
-      dPtr->torqueVisual->GetPosition() - _pointVector);
+  // move rot if force mode
+  if (dPtr->mode == "force")
+    dPtr->rotTool->SetPosition(dPtr->rotTool->GetPosition() - dPtr->pointVector + _pointVector);
+
+  dPtr->pointVector = _pointVector;
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::UpdateForce(math::Vector3 _forceVector, bool _rotateTool)
+void ApplyWrenchVisual::SetForce(math::Vector3 _forceVector, bool _rotatedByMouse)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  if (!dPtr->forceVisual)
-    return;
-
   dPtr->forceVector = _forceVector;
+  dPtr->rotatedByMouse = _rotatedByMouse;
 
   if (_forceVector == math::Vector3::Zero)
   {
     dPtr->forceVisual->SetVisible(false);
-    return;
+    if (dPtr->torqueVector == math::Vector3::Zero)
+      this->SetWrenchMode("none");
+    else
+      this->SetWrenchMode("torque");
   }
+  else
+  {
+    this->SetWrenchMode("force");
+  }
+}
+
+///////////////////////////////////////////////////
+void ApplyWrenchVisual::SetTorque(math::Vector3 _torqueVector, bool _rotatedByMouse)
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  dPtr->torqueVector = _torqueVector;
+  dPtr->rotatedByMouse = _rotatedByMouse;
+
+  if (_torqueVector == math::Vector3::Zero)
+  {
+    dPtr->torqueVisual->SetVisible(false);
+    if (dPtr->forceVector == math::Vector3::Zero)
+      this->SetWrenchMode("none");
+    else
+      this->SetWrenchMode("force");
+  }
+  else
+  {
+    this->SetWrenchMode("torque");
+  }
+}
+
+///////////////////////////////////////////////////
+void ApplyWrenchVisual::SetForceVisual()
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  // make visible
   dPtr->forceVisual->SetVisible(true);
+  dPtr->forceVisual->SetMaterial("Gazebo/Red");
+  dPtr->torqueVisual->SetMaterial("Gazebo/OrangeTransparent");
+  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
+  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
+
+  // position according to force and position vectors
 
   // Set rotation
-  math::Vector3 normVec = _forceVector;
+  math::Vector3 normVec = dPtr->forceVector;
   normVec.Normalize();
   math::Quaternion quat = this->GetQuaternionFromVector(normVec);
   dPtr->forceVisual->SetRotation(quat * math::Quaternion(
@@ -214,33 +394,32 @@ void ApplyWrenchVisual::UpdateForce(math::Vector3 _forceVector, bool _rotateTool
   // Set position
   double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
   //double arrowSize = this->forceVisual->GetBoundingBox().GetZLength();
-  dPtr->forceVisual->SetPosition(-normVec * (linkDiagonal*0.5 + 0.5));
+  dPtr->forceVisual->SetPosition(-normVec * (linkDiagonal*0.5 + 0.5)
+      + dPtr->pointVector);
 
   // Rotation tool
-  if (_rotateTool)
+  dPtr->rotTool->SetPosition(dPtr->pointVector);
+  if (!dPtr->rotatedByMouse)
     dPtr->rotTool->SetRotation(quat);
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::UpdateTorque(math::Vector3 _torqueVector, bool _rotateTool)
+void ApplyWrenchVisual::SetTorqueVisual()
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  if (!dPtr->torqueVisual)
-    return;
-
-  dPtr->torqueVector = _torqueVector;
-
-  if (_torqueVector == math::Vector3::Zero)
-  {
-    dPtr->torqueVisual->SetVisible(false);
-    return;
-  }
+  // make visible
   dPtr->torqueVisual->SetVisible(true);
+  dPtr->torqueVisual->SetMaterial("Gazebo/Orange");
+  dPtr->forceVisual->SetMaterial("Gazebo/RedTransparent");
+  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
+  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
+
+  // position according to torque and position vectors
 
   // Set rotation
-  math::Vector3 normVec = _torqueVector;
+  math::Vector3 normVec = dPtr->torqueVector;
   normVec.Normalize();
   math::Quaternion quat = this->GetQuaternionFromVector(normVec);
   dPtr->torqueVisual->SetRotation(quat * math::Quaternion(
@@ -248,74 +427,10 @@ void ApplyWrenchVisual::UpdateTorque(math::Vector3 _torqueVector, bool _rotateTo
 
   // Set position
   double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
-  dPtr->torqueVisual->SetPosition((-normVec * (linkDiagonal*0.5 + 0.5)) - this->GetPosition());
+  dPtr->torqueVisual->SetPosition(-normVec * (linkDiagonal*0.5 + 0.5));
 
   // Rotation tool
-  dPtr->rotTool->SetPosition(-this->GetPosition());
-  if (_rotateTool)
+  dPtr->rotTool->SetPosition(math::Vector3::Zero);
+  if (!dPtr->rotatedByMouse)
     dPtr->rotTool->SetRotation(quat);
-}
-
-///////////////////////////////////////////////////
-math::Quaternion ApplyWrenchVisual::GetQuaternionFromVector(math::Vector3 _vec)
-{
-//  _vec.Normalize();
-//  math::Vector3 v = math::Vector3::UnitX;
-//  double cosTheta = v.Dot(_vec);
-//  double angle = acos(cosTheta);
-//  math::Quaternion quat;
-//  if (math::equal(angle, M_PI))
-//    quat.SetFromAxis(_vec.GetPerpendicular(), angle);
-//  else
-//    quat.SetFromAxis((v.Cross(_vec)).Normalize(), angle);
-
-//  return quat;
-
-  // Adapted from
-  // http://gamedev.stackexchange.com/questions/53129/quaternion-look-at-with-up-vector
-  // Still doesn't stay properly up at some angles though.
-
-//  math::Vector3 up = math::Vector3::UnitZ;
-
-//  math::Vector3 forward_l = _vec;
-//  math::Vector3 forward_w(1, 0, 0);
-//  math::Vector3 axis  = forward_l.Cross(forward_w);
-//  float angle = acos(forward_l.Dot(forward_w));
-
-//  math::Vector3 third = axis.Cross(forward_w);
-//  if (third.Dot(forward_l) < 0)
-//  {
-//    angle = -angle;
-//  }
-//  math::Quaternion q1;
-//  q1.SetFromAxis(axis, angle);
-
-//  math::Vector3 up_l  = q1 * up.Normalize();
-//  math::Vector3 right = (forward_l.Cross(up)).Normalize();
-//  math::Vector3 up_w  = (right.Cross(forward_l)).Normalize();
-
-//  math::Vector3 axis2  = up_l.Cross(up_w);
-//  float angle2 = acos(up_l.Dot(up_w));
-
-////  math::Vector3 third2 = axis2.Cross(up_w);
-////  if (third2.Dot(up_l) < 0)
-////  {
-////    angle2 = -angle2;
-////  }
-//  math::Quaternion q2;
-//  q2.SetFromAxis(axis2, angle2);
-
-//  return q2 * q1;
-
-//  double roll = 0;
-//  double pitch = -atan2(_vec.z, _vec.x);
-//  double yaw = atan2(_vec.y, sqrt(pow(_vec.x, 2) + pow(_vec.z, 2)));
-
-  double roll = 0;
-  double pitch = -atan2(_vec.z, sqrt(pow(_vec.x, 2) + pow(_vec.y, 2)));
-  double yaw = atan2(_vec.y, _vec.x);
-
-
-  return math::Quaternion(roll, pitch, yaw);
-
 }

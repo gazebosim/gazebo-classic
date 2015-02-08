@@ -51,9 +51,6 @@ namespace gazebo
       /// \param[in] _linkName Link name.
       public: void SetLink(std::string _linkName);
 
-      /// \brief TODO
-      public: void SetMode(rendering::ApplyWrenchVisual::WrenchModes _mode);
-
       /// \brief Qt callback when the Apply button is pressed.
       private slots: void OnApply();
 
@@ -138,46 +135,43 @@ namespace gazebo
       private: void SetPublisher();
 
       /// \brief TODO
-      private: void CalculatePoint();
-
-      /// \brief TODO
-      private: void CalculateForce();
-
-      /// \brief TODO
-      private: void CalculateTorque();
-
-      /// \brief TODO
-      private: void UpdatePointVisual();
-
-      /// \brief TODO
-      private: void UpdateForceVisual();
-
-      /// \brief TODO
-      private: void UpdateTorqueVisual();
-
-      /// \brief TODO
-      private: void UpdateForceMag();
-
-      /// \brief TODO
-      private: void UpdateForceVector();
-
-      /// \brief TODO
-      private: void UpdateForceVectorSpins(math::Vector3 _v);
-
-      /// \brief TODO
-      private: void UpdateTorqueMag();
-
-      /// \brief TODO
-      private: void UpdateTorqueVector();
-
-      /// \brief TODO
-      private: void UpdateTorqueVectorSpins(math::Vector3 _v);
-
-      /// \brief TODO
       private: void AttachVisuals();
 
       /// \brief TODO
       private: void SetSpinValue(QDoubleSpinBox *_spin, double _value);
+
+      /// \brief TODO
+      public: void SetWrenchMode(std::string _mode);
+
+      /// \brief TODO
+      private: void SetPoint(math::Vector3 _force);
+
+      /// \brief TODO
+      private: void NewPointVector();
+
+      /// \brief TODO
+      private: void SetForce(math::Vector3 _force, bool _rotationByMouse = false);
+
+      /// \brief TODO
+      private: void NewForceVector();
+
+      /// \brief TODO
+      private: void NewForceMag();
+
+      /// \brief TODO
+      private: void NewForceDirection(math::Vector3 _dir);
+
+      /// \brief TODO
+      private: void SetTorque(math::Vector3 _torque, bool _rotationByMouse = false);
+
+      /// \brief TODO
+      private: void NewTorqueVector();
+
+      /// \brief TODO
+      private: void NewTorqueMag();
+
+      /// \brief TODO
+      private: void NewTorqueDirection(math::Vector3 _dir);
 
       /// \internal
       /// \brief Pointer to private data.

@@ -31,15 +31,6 @@ namespace gazebo
     /// \brief Visualization for the apply wrench GUI
     class GAZEBO_VISIBLE ApplyWrenchVisual : public Visual
     {
-      /// \enum WrenchModes
-      /// \brief Identifies if either in force mode or torque mode.
-      public: enum WrenchModes {
-                  /// \brief Force mode
-                  FORCE,
-                  /// \brief Torque mode
-                  TORQUE
-                };
-
       /// \brief Constructor
       /// \param[in] _name Name of the visual
       /// \param[in] _parentVis Pointer to the parent visual
@@ -60,23 +51,40 @@ namespace gazebo
       /// \brief TODO
       public: rendering::SelectionObjPtr GetRotTool() const;
 
-      /// \brief TODO
-      public: void SetMode(WrenchModes _mode);
+//      /// \brief TODO
+//      public: void SetMode(WrenchModes _mode);
 
-      /// \brief TODO
-      public: void UpdatePoint(math::Vector3 _pointVector);
+//      /// \brief TODO
+//      public: void UpdatePoint(math::Vector3 _pointVector);
 
-      /// \brief TODO
-      public: void UpdateForce(math::Vector3 _forceVector, bool _rotateTool);
+//      /// \brief TODO
+//      public: void UpdateForce(math::Vector3 _forceVector, bool _rotateTool);
 
-      /// \brief TODO
-      public: void UpdateTorque(math::Vector3 _torqueVector, bool _rotateTool);
+//      /// \brief TODO
+//      public: void UpdateTorque(math::Vector3 _torqueVector, bool _rotateTool);
 
       /// \brief TODO
       public: math::Quaternion GetQuaternionFromVector(math::Vector3 _vec);
 
+
+
       /// \brief TODO
-      public: ApplyWrenchVisual::WrenchModes wrenchMode;
+      public: void SetWrenchMode(std::string _mode);
+
+      /// \brief TODO
+      public: void SetPoint(math::Vector3 _pointVector);
+
+      /// \brief TODO
+      public: void SetForce(math::Vector3 _forceVector, bool _rotatedByMouse);
+
+      /// \brief TODO
+      public: void SetTorque(math::Vector3 _torqueVector, bool _rotatedByMouse);
+
+      /// \brief TODO
+      public: void SetForceVisual();
+
+      /// \brief TODO
+      public: void SetTorqueVisual();
     };
     /// \}
   }
