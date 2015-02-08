@@ -988,6 +988,10 @@ void Link::PublishData()
         this->GetWorldLinearVel());
     msgs::Set(this->linkDataMsg.mutable_angular_velocity(),
         this->GetWorldAngularVel());
+    msgs::Set(this->linkDataMsg.mutable_linear_acceleration(),
+        this->GetWorldLinearAccel());
+    msgs::Set(this->linkDataMsg.mutable_angular_acceleration(),
+        this->GetWorldAngularAccel());
     this->dataPub->Publish(this->linkDataMsg);
   }
 }

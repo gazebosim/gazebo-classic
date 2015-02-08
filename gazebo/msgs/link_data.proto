@@ -13,4 +13,6 @@ message LinkData
   required string name           = 2;
   optional Vector3d linear_velocity  = 3;
   optional Vector3d angular_velocity = 4;
+  optional Vector3d linear_acceleration  = 5;
+  optional Vector3d angular_acceleration = 6;
 }

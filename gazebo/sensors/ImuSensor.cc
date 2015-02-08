@@ -43,8 +43,6 @@ GZ_REGISTER_STATIC_SENSOR("imu", ImuSensor)
 ImuSensor::ImuSensor()
   : Sensor(sensors::OTHER)
 {
-  this->dataIndex = 0;
-  this->dataDirty = false;
   this->incomingLinkData[0].reset();
   this->incomingLinkData[1].reset();
 }
@@ -137,10 +135,6 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   }
 
   this->parentEntity->SetPublishData(true);
-
-  std::string topic = "~/" + this->parentEntity->GetScopedName();
-  this->linkDataSub = this->node->Subscribe(topic,
-    &ImuSensor::OnLinkData, this);
 }
 
 //////////////////////////////////////////////////
@@ -157,8 +151,6 @@ void ImuSensor::Load(const std::string &_worldName)
             "]. Must be a link\n");
   }
   this->referencePose = this->pose + this->parentEntity->GetWorldPose();
-  this->lastLinearVel = this->referencePose.rot.RotateVector(
-    this->parentEntity->GetWorldLinearVel());
 }
 
 //////////////////////////////////////////////////
@@ -180,15 +172,6 @@ msgs::IMU ImuSensor::GetImuMessage() const
 {
   boost::mutex::scoped_lock lock(this->mutex);
   return this->imuMsg;
-}
-
-//////////////////////////////////////////////////
-void ImuSensor::OnLinkData(ConstLinkDataPtr &_msg)
-{
-  boost::mutex::scoped_lock lock(this->mutex);
-  // Store the contacts message for processing in UpdateImpl
-  this->incomingLinkData[this->dataIndex] = _msg;
-  this->dataDirty = true;
 }
 
 //////////////////////////////////////////////////
@@ -221,25 +204,8 @@ void ImuSensor::SetReferencePose()
 //////////////////////////////////////////////////
 bool ImuSensor::UpdateImpl(bool /*_force*/)
 {
-  msgs::LinkData msg;
-  int readIndex = 0;
-
-  {
-    boost::mutex::scoped_lock lock(this->mutex);
-
-    // Don't do anything if there is no new data to process.
-    if (!this->dataDirty)
-      return false;
-
-    readIndex = this->dataIndex;
-    this->dataIndex ^= 1;
-    this->dataDirty = false;
-  }
-
   // toggle the index
-  msg.CopyFrom(*this->incomingLinkData[readIndex].get());
-
-  common::Time timestamp = msgs::Convert(msg.time());
+  common::Time timestamp = this->world->GetSimTime();
 
   double dt = (timestamp - this->lastMeasurementTime).Double();
 
@@ -256,22 +222,30 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
     math::Pose parentEntityPose = this->parentEntity->GetWorldPose();
     math::Pose imuPose = this->pose + parentEntityPose;
 
-    // Set the IMU angular velocity
-    math::Vector3 imuWorldAngularVel
-        = msgs::Convert(msg.angular_velocity());
+    math::Vector3 parentEntityWorldLinearVel =
+      this->parentEntity->GetWorldLinearVel();
+    math::Vector3 parentEntityWorldLinearAccel =
+      this->parentEntity->GetWorldLinearAccel();
+    math::Vector3 parentEntityWorldAngularAccel =
+      this->parentEntity->GetWorldAngularAccel();
 
-    msgs::Set(this->imuMsg.mutable_angular_velocity(),
-              imuPose.rot.GetInverse().RotateVector(
-              imuWorldAngularVel));
+    // Get and rotate IMU parent angular velocity from world to IMU sensor frame
+    math::Vector3 parentEntityWorldAngularVel =
+      this->parentEntity->GetWorldAngularVel();
+    math::Vector3 imuWorldAngularVel =
+      imuPose.rot.GetInverse().RotateVector(parentEntityWorldAngularVel);
+    // Set IMU angular velocity
+    msgs::Set(this->imuMsg.mutable_angular_velocity(), imuWorldAngularVel);
 
-    // Compute and set the IMU linear acceleration
-    math::Vector3 imuWorldLinearVel
-        = msgs::Convert(msg.linear_velocity());
-    // Get the correct vel for imu's that are at an offset from parent link
-    imuWorldLinearVel +=
-        imuWorldAngularVel.Cross(parentEntityPose.pos - imuPose.pos);
+    // Get the correct accel for imu's that are at an offset from parent link
+    math::Vector3 r = parentEntityPose.pos - imuPose.pos;
+    math::Vector3 imuWorldLinearAccel = parentEntityWorldLinearAccel +
+      parentEntityWorldAngularAccel.Cross(r) +
+      parentEntityWorldAngularVel.Cross(parentEntityWorldAngularVel.Cross(r));
+
+    // Rotate IMU linear acceleration from world frame to imu frame
     this->linearAcc = imuPose.rot.GetInverse().RotateVector(
-      (imuWorldLinearVel - this->lastLinearVel) / dt);
+      imuWorldLinearAccel);
 
     // Add contribution from gravity
     this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
@@ -280,8 +254,6 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
     // Set the IMU orientation
     msgs::Set(this->imuMsg.mutable_orientation(),
               (imuPose - this->referencePose).rot);
-
-    this->lastLinearVel = imuWorldLinearVel;
 
     this->lastMeasurementTime = timestamp;
 
