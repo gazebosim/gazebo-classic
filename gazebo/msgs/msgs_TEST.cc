@@ -1085,7 +1085,7 @@ TEST_F(MsgsTest, GeometryToSDF)
   // polyline
   msgs::Geometry polylineMsg;
   polylineMsg.set_type(msgs::Geometry::POLYLINE);
-  msgs::Polyline *polylineGeom = polylineMsg.mutable_polyline();
+  msgs::Polyline *polylineGeom = polylineMsg.add_polyline();
   polylineGeom->set_height(2.33);
   msgs::Set(polylineGeom->add_point(), math::Vector2d(0.5, 0.7));
   msgs::Set(polylineGeom->add_point(), math::Vector2d(3.5, 4.7));

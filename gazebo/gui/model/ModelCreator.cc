@@ -18,9 +18,11 @@
 #include <boost/filesystem.hpp>
 #include <sstream>
 #include <string>
+#include <algorithm>
 
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/SVGLoader.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -322,9 +324,36 @@ std::string ModelCreator::AddCustom(const std::string &_path,
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
-  sdf::ElementPtr meshElem = geomElem->AddElement("mesh");
-  meshElem->GetElement("scale")->Set(_scale);
-  meshElem->GetElement("uri")->Set(path);
+
+  std::string extension =  path.substr(path.size()-4);
+  std::transform(extension.begin(), extension.end(), extension.begin(),
+      ::tolower);
+  if (extension == ".svg")
+  {
+    common::SVGLoader svgLoader(5);
+    std::vector<common::SVGPath> paths;
+    svgLoader.Parse(path, paths);
+    for (common::SVGPath p: paths)
+    {
+      for (std::vector<math::Vector2d> poly : p.polylines)
+      {
+        sdf::ElementPtr polylineElem = geomElem->AddElement("polyline");
+        polylineElem->GetElement("height")->Set(1.0);
+
+        for (math::Vector2d pt : poly)
+        {
+          sdf::ElementPtr pointElem = polylineElem->AddElement("point");
+          pointElem->Set(pt);
+        }
+      }
+    }
+  }
+  else
+  {
+    sdf::ElementPtr meshElem = geomElem->AddElement("mesh");
+    meshElem->GetElement("scale")->Set(_scale);
+    meshElem->GetElement("uri")->Set(path);
+  }
   visVisual->Load(visualElem);
 
   linkVisual->SetTransparency(this->editTransparency);

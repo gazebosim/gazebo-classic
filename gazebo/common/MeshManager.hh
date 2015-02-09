@@ -120,22 +120,12 @@ namespace gazebo
                              const math::Vector3 &_sides,
                              const math::Vector2d &_uvCoords);
 
-      /// \brief Create a Extruded Polyline mesh
-      /// \param[in] _name the name of the new mesh
-      /// \param[in] _vertices the x y  dimentions of eah vertex in meter
-      /// \param[in] _height the height of the polyline
-      /// \param[in] _uvCoords the texture coordinates
-      public: void CreateExtrudedPolyline(const std::string &_name,
-                  const std::vector<math::Vector2d> &_vertices,
-                  const double &_height,
-                  const math::Vector2d &_uvCoords);
-
-      /// \brief Create an extruded mesh from a path
+      /// \brief Create an extruded mesh from polylines
       /// \param[in] _name the name of the new mesh
       /// \param[in] _vertices the x y  dimentions of eah vertex in meter
       /// \param[in] _height the height of extrusion
       /// \param[in] _uvCoords the texture coordinates
-      public: void CreateExtrudedPath(const std::string &_name,
+      public: void CreateExtrudedPolyline(const std::string &_name,
                   const std::vector<std::vector<math::Vector2d> > &_vertices,
                   double _height);
 

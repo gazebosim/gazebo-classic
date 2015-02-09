@@ -43,21 +43,11 @@ static void FillFace(GtsTriangle *_t, gpointer *_data)
 {
   SubMesh *subMesh = reinterpret_cast<SubMesh *>(_data[0]);
   GHashTable *vIndex = reinterpret_cast<GHashTable *>(_data[2]);
-  int *x = reinterpret_cast<int*>(_data[3]);
   GtsVertex *v1, *v2, *v3;
   gts_triangle_vertices(_t, &v1, &v2, &v3);
-  if (*x == 0)
-  {
-    subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v1))+*x);
-    subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v3))+*x);
-    subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v2))+*x);
-  }
-  else
-  {
-    subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v1))+*x);
-    subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v2))+*x);
-    subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v3))+*x);
-  }
+  subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v1)));
+  subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v3)));
+  subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v2)));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -67,190 +57,86 @@ static void AddConstraint(GtsConstraint *_c, GtsSurface *_s)
 }
 
 //////////////////////////////////////////////////
-bool GTSMeshUtils::CreateExtrudedPolyline(
-    const std::vector<math::Vector2d> &_vertices,
-    const double &_height, SubMesh *_subMesh)
+static void Intersection(GtsEdge *_c, gpointer *_data)
 {
-  if (_vertices.size() < 3)
+
+  double x = *reinterpret_cast<double *>(_data[0]);
+  double y = *reinterpret_cast<double *>(_data[1]);
+  int *intersection = reinterpret_cast<int *>(_data[2]);
+
+
+  GtsVertex *v1, *v2;
+  v1 = _c->segment.v1;
+  v2 = _c->segment.v2;
+
+  double x1 = v1->p.x;
+  double x2 = v2->p.x;
+  double y1 = v1->p.y;
+  double y2 = v2->p.y;
+
+  double xmin = std::min(x1, x2);
+  double xmax = (x1 + x2) - xmin;
+  double ymin = std::min(y1, y2);
+  double ymax = (y1 + y2) - ymin;
+  double xBound = xmax+1;
+
+
+  if (y < ymax && y >= ymin)
   {
-    gzerr << "Unable to create an extruded polyline mesh with "
-      << "less than 3 vertices\n";
-    return false;
+    double xdiff1, ydiff1, xdiff2, ydiff2;
+    xdiff1 = x2 - x1;
+    ydiff1 = y2 - y1;
+    xdiff2 = xBound - x;
+    ydiff2 = 0;
+
+    double s, t;
+    s = (-ydiff1 * (x1 - x) + xdiff1 * (y1 - y)) /
+        (-xdiff2 * ydiff1 + xdiff1 * ydiff2);
+    t = ( xdiff2 * (y1 - y) - ydiff2 * (x1 - x)) /
+        (-xdiff2 * ydiff1 + xdiff1 * ydiff2);
+
+    if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+      (*intersection)++;
   }
-
-  if (!_subMesh)
-    _subMesh = new SubMesh();
-
-  int i, k;
-
-  int numSides = _vertices.size();
-
-  // Euler's Formula: numFaces = numEdges - numVertices + 2
-  //                           = numSides + 2
-  // # of SideFaces = numFaces - (upper face + lower face)
-  //                = numFaces - 2
-  //                = numSides
-
-
-  GSList *l, *verticesList = NULL;
-  double z;
-  for (k = 0; k < 2; ++k)
-  {
-    GtsSurface *surface;
-    GtsVertex *v1, *v2, *v3;
-    GtsFifo *edgeList;
-    edgeList = gts_fifo_new();
-    verticesList = NULL;
-
-    if (k == 0)
-      z = 0.0;
-    else
-      z = _height;
-
-    // List the vertices and edges
-    for (i = 0; i < numSides; ++i)
-    {
-      verticesList = g_slist_append(verticesList,
-          gts_vertex_new(gts_vertex_class(),
-            _vertices[i].x, _vertices[i].y, z));
-      if (i != 0)
-      {
-        gts_fifo_push(edgeList,
-            gts_edge_new(GTS_EDGE_CLASS(gts_constraint_class()),
-              reinterpret_cast<GtsVertex *>
-              (g_slist_nth_data(verticesList, i)),
-              reinterpret_cast<GtsVertex *>
-              (g_slist_nth_data(verticesList, i-1))));
-      }
-    }
-
-    gts_fifo_push(edgeList,
-        gts_edge_new(GTS_EDGE_CLASS(gts_constraint_class()),
-          reinterpret_cast<GtsVertex *>
-          (g_slist_nth_data(verticesList, i-1)),
-          reinterpret_cast<GtsVertex *>
-          (g_slist_nth_data(verticesList, 0))));
-
-    GtsTriangle *tri = gts_triangle_enclosing(
-        gts_triangle_class(), verticesList, 100.);
-    gts_triangle_vertices(tri, &v1, &v2, &v3);
-
-    surface = gts_surface_new(gts_surface_class(),
-        gts_face_class(),
-        gts_edge_class(),
-        gts_vertex_class());
-
-
-    gts_surface_add_face(surface,
-        gts_face_new(gts_face_class(),
-          tri->e1, tri->e2, tri->e3));
-
-    l = verticesList;
-    while (l)
-    {
-      GtsVertex *v_in = reinterpret_cast<GtsVertex *>(l->data);
-      GtsVertex *v_out = gts_delaunay_add_vertex(surface, v_in, NULL);
-      if (v_out != NULL)
-      {
-        gts_vertex_replace(v_in, v_out);
-      }
-      l = l->next;
-    }
-
-    // add constraints
-    gts_fifo_foreach(edgeList, (GtsFunc) AddConstraint, surface);
-
-    // delete the enclosing triangle
-    gts_allow_floating_vertices = TRUE;
-    gts_object_destroy(GTS_OBJECT(v1));
-    gts_object_destroy(GTS_OBJECT(v2));
-    gts_object_destroy(GTS_OBJECT(v3));
-    gts_allow_floating_vertices = FALSE;
-
-    // Remove edges on the boundary which are not constraints
-    gts_delaunay_remove_hull(surface);
-
-    FILE * fp;
-    fp = fopen ("tt.gts", "wt");
-    gts_surface_write (surface, fp);
-    fclose (fp);
-
-
-    // fill the submesh with data generated by GTS
-    unsigned int n2 = 0, m = numSides*k;
-    gpointer data[4];
-    GHashTable *vIndex = g_hash_table_new(NULL, NULL);
-
-    data[0] = _subMesh;
-    data[1] = &n2;
-    data[2] = vIndex;
-    data[3] = &m;
-    gts_surface_foreach_vertex(surface, (GtsFunc) FillVertex, data);
-    n2 = 0;
-    gts_surface_foreach_face(surface, (GtsFunc) FillFace, data);
-
-    g_hash_table_destroy(vIndex);
-    gts_object_destroy(GTS_OBJECT(surface));
-    gts_fifo_destroy(edgeList);
-  }
-
-  return true;
 }
 
-
 //////////////////////////////////////////////////
-bool TriangleIsHole(GtsTriangle *_t)
+bool TriangleIsHole(GtsTriangle *_t, GtsFifo *_edgeList)
 {
   GtsEdge *e1, *e2, *e3;
   GtsVertex *v1, *v2, *v3;
 
   gts_triangle_vertices_edges (_t, NULL, &v1, &v2, &v3, &e1, &e2, &e3);
 
-  if ((GTS_IS_CONSTRAINT (e1) && GTS_SEGMENT (e1)->v1 != v1) ||
-      (GTS_IS_CONSTRAINT (e2) && GTS_SEGMENT (e2)->v1 != v2) ||
-      (GTS_IS_CONSTRAINT (e3) && GTS_SEGMENT (e3)->v1 != v3))
-    return true;
-  return false;
-}
+  double xCenter = (v1->p.x + v2->p.x + v3->p.x) / 3.0;
+  double yCenter = (v1->p.y + v2->p.y + v3->p.y) / 3.0;
 
-//////////////////////////////////////////////////
-unsigned int DelaunayRemoveHoles(GtsSurface *_surface)
-{
-//  g_return_val_if_fail (_surface != NULL, 0);
-  return gts_surface_foreach_face_remove (_surface,
-      (GtsFunc) TriangleIsHole, NULL);
+  int intersections = 0;
+  gpointer data[3];
+  data[0] = &xCenter;
+  data[1] = &yCenter;
+  data[2] = &intersections;
+
+  gts_fifo_foreach (_edgeList, (GtsFunc) Intersection, data);
+
+  if (intersections % 2)
+    return false;
+  else
+    return true;
 }
 
 //////////////////////////////////////////////////
 GtsSurface *GTSMeshUtils::DelaunayTriangulation(
     const std::vector<std::vector<math::Vector2d> > &_path)
 {
-
-//  int i, k;
-
-
-  // Euler's Formula: numFaces = numEdges - numVertices + 2
-  //                           = numSides + 2
-  // # of SideFaces = numFaces - (upper face + lower face)
-  //                = numFaces - 2
-  //                = numSides
-
-
   GSList *l, *verticesList = NULL;
   double z = 0;
-//  for (k = 0; k < 2; ++k)
-//  for (k = 0; k < 1; ++k)
-//  {
+
   GtsSurface *surface;
   GtsVertex *v1, *v2, *v3;
   GtsFifo *edgeList;
   edgeList = gts_fifo_new();
   verticesList = NULL;
-
-  /*if (k == 0)
-    z = 0.0;
-  else
-    z = _height;*/
 
   int e = 0;
   unsigned startEdgeIndex = 0;
@@ -322,19 +208,21 @@ GtsSurface *GTSMeshUtils::DelaunayTriangulation(
   // Remove edges on the boundary which are not constraints
   gts_delaunay_remove_hull(surface);
 
-  DelaunayRemoveHoles(surface);
-
+  // remove holes - only needed if there is more than one path
+  if (_path.size() > 1)
+  {
+    gts_surface_foreach_face_remove (surface, (GtsFunc) TriangleIsHole,
+        edgeList);
+  }
 
   gts_fifo_destroy(edgeList);
-//  }
 
   return surface;
 }
 
 //////////////////////////////////////////////////
-bool GTSMeshUtils::CreateExtrudedPath(
-    const std::vector<std::vector<math::Vector2d> > &_path,
-    double /*_height*/, SubMesh *_subMesh)
+bool GTSMeshUtils::DelaunayTriangulation(
+    const std::vector<std::vector<math::Vector2d> > &_path, SubMesh *_subMesh)
 {
   if (_path.empty())
   {
@@ -349,24 +237,19 @@ bool GTSMeshUtils::CreateExtrudedPath(
 
   GtsSurface *surface = GTSMeshUtils::DelaunayTriangulation(_path);
 
-  FILE * fp;
+/*  FILE * fp;
   fp = fopen ("tt.gts", "wt");
   gts_surface_write (surface, fp);
-  fclose (fp);
-
-/*  int e = 0;
-  for (unsigned p = 0; p < _path.size(); ++p)
-    e += _path[p].size();*/
+  fclose (fp);*/
 
   // fill the submesh with data generated by GTS
-  unsigned int n2 = 0, m = 0;
-  gpointer data[4];
+  unsigned int n2 = 0;
+  gpointer data[3];
   GHashTable *vIndex = g_hash_table_new(NULL, NULL);
 
   data[0] = _subMesh;
   data[1] = &n2;
   data[2] = vIndex;
-  data[3] = &m;
   gts_surface_foreach_vertex(surface, (GtsFunc) FillVertex, data);
   n2 = 0;
   gts_surface_foreach_face(surface, (GtsFunc) FillFace, data);

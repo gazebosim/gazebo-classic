@@ -40,15 +40,14 @@ namespace gazebo
     /// \brief Creates GTS utilities for meshes
     class GAZEBO_VISIBLE GTSMeshUtils
     {
-      /// \brief Create an extruded Polyline submesh
-      /// \param[in] _vertices the x y dimensions of each vertex in meter
-      /// \param[in] _height the height of the polyline
+      /// \brief Perform delaunay triangulation on input vertices.
+      /// \param[in] _path A path can contain multiple subpath, which in turn
+      /// is composed of a list of vertices.
       /// \param[out] _submesh A submesh that will be populated with the
-      /// extruded polyline.
+      /// resulting triangles.
       /// \return True on success.
-      public: static bool CreateExtrudedPolyline(
-                  const std::vector<math::Vector2d> &_vertices,
-                  const double &_height,
+      public: static bool DelaunayTriangulation(
+                  const std::vector<std::vector<math::Vector2d> > &_path,
                   SubMesh *_submesh);
 
       /// \brief Perform delaunay triangulation on input vertices.
@@ -57,19 +56,8 @@ namespace gazebo
       /// \param[out] _submesh A submesh that will be populated with the
       /// resulting triangles.
       /// \return Triangulated GTS surface.
-      public: static GtsSurface *DelaunayTriangulation(
+      private: static GtsSurface *DelaunayTriangulation(
                   const std::vector<std::vector<math::Vector2d> > &_path);
-
-      /// \brief Create an extruded submesh from a path.
-      /// \param[in] _path A path can contain multiple subpath, which in turn
-      /// is composed of a list of vertices.
-      /// param[in] _height Height of extrusion.
-      /// \param[out] _submesh A submesh that will be populated with the
-      /// resulting triangles.
-      /// \return True on success.
-      public: static bool CreateExtrudedPath(
-                  const std::vector<std::vector<math::Vector2d> > &_path,
-                  double _height, SubMesh *_submesh);
     };
   }
 }

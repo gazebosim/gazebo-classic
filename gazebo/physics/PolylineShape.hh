@@ -43,7 +43,7 @@ namespace gazebo
 
       /// \brief Get the vertices of the polyline
       /// \return The vertex information of the polyline
-      public: std::vector<math::Vector2d> GetVertices() const;
+      public: std::vector<std::vector<math::Vector2d> > GetVertices() const;
 
       /// \brief Get the height of the polyLine.
       /// \return The height of each side of the polyLine.
@@ -65,7 +65,7 @@ namespace gazebo
       /// \param[in] _vertices std::vector<math::Vector2d>
       /// containing the vertex information
       private: virtual void SetVertices(
-                  const std::vector<math::Vector2d> &_vertices);
+                  const std::vector<std::vector<math::Vector2d> > &_vertices);
 
       /// \brief Set the vertices of the polyline
       /// \param[in] _msg geometry msg containing the vertex information
@@ -76,7 +76,7 @@ namespace gazebo
       /// \param[in] _vertices std::vector<math::Vector2d>
       /// containing the vertex information
       private: void SetPolylineShape(const double &_height,
-                  const std::vector<math::Vector2d> &_vertices);
+                  const std::vector<std::vector<math::Vector2d> > &_vertices);
 
       /// \brief Set the height of the polyLine.
       /// \param[in] _height Height of the polyLine.

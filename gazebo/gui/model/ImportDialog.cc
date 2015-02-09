@@ -107,7 +107,7 @@ void ImportDialog::SetTitle(const std::string &_title)
 void ImportDialog::OnBrowse()
 {
   QFileDialog fd(this, tr("Import Part"), QDir::homePath(),
-      tr("Mesh files (*.dae *.stl)"));
+      tr("Mesh files (*.dae *.stl );; SVG files (*.svg)"));
   fd.setFilter(QDir::AllDirs | QDir::Hidden);
   fd.setFileMode(QFileDialog::ExistingFile);
   if (fd.exec())

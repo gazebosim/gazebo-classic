@@ -513,7 +513,6 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
       shape.reset(new ODERayShape(this->world->GetPhysicsEngine()));
   else
     gzerr << "Unable to create collision of type[" << _type << "]\n";
-
   return shape;
 }
 
