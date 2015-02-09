@@ -15,6 +15,9 @@
  *
  */
 
+#ifndef SVGLOADER_HH
+#define SVGLOADER_HH
+
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -26,67 +29,58 @@ class TiXmlNode;
 
 namespace gazebo
 {
-	namespace common
-	{
-		class GAZEBO_VISIBLE SvgError: public std::runtime_error
-		{ 
-			public: SvgError(const std::string& what_arg)
-				         : std::runtime_error(what_arg)
-								{};
-		};
+  namespace common
+  {
+    class GAZEBO_VISIBLE SvgError: public std::runtime_error
+    {
+      public: SvgError(const std::string& what_arg)
+        : std::runtime_error(what_arg)
+      {}
+    };
 
-		struct GAZEBO_VISIBLE SVGCommand
-		{
-			 char type;
-			 std::vector<double> numbers;
-		
-/*			 std::string tostr() 
-			 {
-				 std::ostringstream os;
-				 os << type << "[";
-				 for (double d : numbers)
-				 {
-				   os << d << ", ";
-				 }
-				 os << "]";
-				 return os.str();
-			 }   */
-		};
+    struct GAZEBO_VISIBLE SVGCommand
+    {
+      char type;
+      std::vector<double> numbers;
+    };
 
-		struct GAZEBO_VISIBLE SVGPath
-		{
-			 std::string id;
-			 std::string style;
+    struct GAZEBO_VISIBLE SVGPath
+    {
+      std::string id;
+      std::string style;
+      std::vector< std::vector<SVGCommand> > subpaths;
+      std::vector< std::vector<math::Vector2d> > polylines;
+    };
 
-			 std::vector< std::vector<SVGCommand> > subpaths;   
+    class GAZEBO_VISIBLE SVGLoader
+    {
+      public: SVGLoader() {}
+      public: void Parse(const std::string &_filename,
+                         std::vector<SVGPath> &_paths);
+      public: void DumpPaths(const std::vector<SVGPath> &_paths ) const;
 
-			 std::vector< std::vector<math::Vector2d> > polylines;
-		};
-
-
-
-		class GAZEBO_VISIBLE SVGLoader
-		{
-			public: SVGLoader(){}
-
-			public: void Parse(const std::string &_filename, std::vector<SVGPath> &paths);
-			public: void Dump_paths(const std::vector<SVGPath> paths ) const;
-
-			private: void make_commands(char cmd, const std::vector<double> &numbers, std::vector<SVGCommand> &cmds);
-			private: void get_path_commands(const std::vector<std::string> &tokens, SVGPath &path);
-			private: void get_path_attribs(TiXmlElement* pElement, SVGPath &path);
-			private: void get_svg_paths(TiXmlNode* pParent, std::vector<SVGPath> &paths);
-
-			private: void ExpandCommands(const std::vector< std::vector<SVGCommand> > &subpaths, SVGPath &path);
-			private: void SplitSubpaths(const std::vector<SVGCommand> cmds, std::vector< std::vector<SVGCommand> > &split_cmds);
-			private: void PathToPoints(const SVGPath &path, double resolution, std::vector< std::vector<math::Vector2d> > &polys);
-
-			private: math::Vector2d SubpathToPolyline(const std::vector<SVGCommand> &subpath, math::Vector2d last,
-					std::vector<math::Vector2d> &polyline);
-
-		};
-	}
+      private: void MakeCommands( char _cmd,
+                                  const std::vector<double> &_numbers,
+                                  std::vector<SVGCommand> &_cmds);
+      private: void GetPathCommands(const std::vector<std::string> &_tokens, SVGPath &_path);
+      private: void GetPathAttribs(TiXmlElement* _pElement, SVGPath &_path);
+      private: void GetSvgPaths(TiXmlNode* _pParent,
+                                  std::vector<SVGPath> &_paths);
+      private: void ExpandCommands(
+                      const std::vector< std::vector<SVGCommand> >&_subpaths,
+                      SVGPath &_path);
+      private: void SplitSubpaths(const std::vector<SVGCommand> &_cmds,
+                      std::vector< std::vector<SVGCommand> > &_split_cmds);
+      private: void PathToPoints(const SVGPath &_path,
+                      double _resolution,
+                      std::vector< std::vector<math::Vector2d> > &_polys);
+      private: math::Vector2d SubpathToPolyline(
+                      const std::vector<SVGCommand> &_subpath,
+                      math::Vector2d _last,
+                      std::vector<math::Vector2d> &_polyline);
+    };
+  }
 }
 
-
+#endif
 
