@@ -54,7 +54,7 @@ namespace gazebo
 
     class GAZEBO_VISIBLE SVGLoader
     {
-      public: SVGLoader() {}
+      public: SVGLoader(unsigned int _samples) {}
       public: void Parse(const std::string &_filename,
                          std::vector<SVGPath> &_paths);
       public: void DumpPaths(const std::vector<SVGPath> &_paths ) const;
@@ -78,8 +78,9 @@ namespace gazebo
                       const std::vector<SVGCommand> &_subpath,
                       math::Vector2d _last,
                       std::vector<math::Vector2d> &_polyline);
-    };
-  }
+      private: double resolution;
+		};
+	}
 }
 
 #endif

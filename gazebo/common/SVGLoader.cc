@@ -72,6 +72,7 @@ math::Vector2d bezierInterpolate( double _t,
   return p;  
 }
 
+
 /////////////////////////////////////////////////
 math::Vector2d SVGLoader::SubpathToPolyline(
                             const std::vector<SVGCommand> &_subpath,
@@ -97,6 +98,63 @@ math::Vector2d SVGLoader::SubpathToPolyline(
          i += 2;
       }
     }
+
+    else if(cmd.type == 'M' || cmd.type == 'L')
+    {
+      size_t i = 0;
+      size_t count = cmd.numbers.size();
+      while(i < count)
+      {
+        math::Vector2d p;
+        p.x = cmd.numbers[i+0];
+        p.y = cmd.numbers[i+1];
+        polyline.push_back(p);
+        last = p;
+        i += 2;
+      }
+    }
+
+    else if(cmd.type == 'C')
+    {
+
+      size_t i = 0;
+      size_t count = cmd.numbers.size();
+      while(i < count)
+      {
+        math::Vector2d p0 = last;
+        math::Vector2d p1, p2, p3;
+        p1.x = cmd.numbers[i+0];
+        p1.y = cmd.numbers[i+1];
+        p2.x = cmd.numbers[i+2];
+        p2.y = cmd.numbers[i+3];
+        p3.x = cmd.numbers[i+4];
+        p3.y = cmd.numbers[i+5];
+        CubicBezier(p0, p1, p2, p3, resolution, polyline);     
+        last = p3;
+        i += 6;
+      }
+    }
+
+    else if(cmd.type == 'c')
+    {
+      size_t i = 0;
+      size_t count = cmd.numbers.size();
+      while(i < count)
+      {
+        math::Vector2d p0 = last;
+        math::Vector2d p1, p2, p3;
+        p1.x = cmd.numbers[i+0] + last.x;
+        p1.y = cmd.numbers[i+1] + last.y;
+        p2.x = cmd.numbers[i+2] + last.x;
+        p2.y = cmd.numbers[i+3] + last.y;
+        p3.x = cmd.numbers[i+4] + last.x;
+        p3.y = cmd.numbers[i+5] + last.y;
+        CubicBezier(p0, p1, p2, p3, resolution, polyline);     
+        last = p3;
+        i += 6;
+      }
+    }
+
   }
   return _last;
 }
@@ -169,9 +227,9 @@ void SVGLoader::ExpandCommands(
       if (tolower(xCmd.type) == 'h')
         numberCount = 1;
       if (tolower(xCmd.type) == 'z')
-      {
         subpath.push_back(xCmd);
       }
+      	
       // group numbers together and repeat the command
       // for each group
       unsigned int n = 0;
@@ -206,7 +264,6 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
        if(lookup.find(token[0]) == std::string::npos)
        { 
          // its just numbers
-         std::cout << std::endl;
          std::vector<std::string> numberStrs;
          split(token, ',', numberStrs);
          for(std::string numberStr : numberStrs)
@@ -265,7 +322,7 @@ void SVGLoader::GetPathAttribs(TiXmlElement* pElement, SVGPath &path)
     while (pAttrib)
     {
         std::string name = lowercase(pAttrib->Name());
-        std::string value= lowercase(pAttrib->Value());
+        std::string value= pAttrib->Value();
         if (name == "style")
         {
             path.style = value;
@@ -274,6 +331,10 @@ void SVGLoader::GetPathAttribs(TiXmlElement* pElement, SVGPath &path)
         {
             path.id = value;
         }
+        if (name == "transform")
+        {
+            path.transform = value;
+        }
         if (name == "d")
         {
             using namespace std;
@@ -281,7 +342,6 @@ void SVGLoader::GetPathAttribs(TiXmlElement* pElement, SVGPath &path)
             std::vector<std::string> tokens;
             split(value, ' ', tokens);
             GetPathCommands(tokens, path);
-            
         }
         // int ival;
         // double dval;
@@ -325,19 +385,18 @@ void SVGLoader::GetSvgPaths(TiXmlNode* pParent, std::vector<SVGPath> &paths)
 /////////////////////////////////////////////////
 void SVGLoader::Parse(const std::string &_filename, std::vector<SVGPath> &paths)
 {
-    // load the named file and dump its structure to STDOUT
-    TiXmlDocument doc(_filename.c_str());
-    bool loadOkay = doc.LoadFile();
-    if (!loadOkay)
-    {
-      std::ostringstream os;
-      os << "Failed to load file " <<  _filename;
-      SvgError x(os.str());
-      throw x;
-    }
+  // load the named file and dump its structure to STDOUT
+  TiXmlDocument doc(_filename.c_str());
+  bool loadOkay = doc.LoadFile();
+  if (!loadOkay)
+  {
+    std::ostringstream os;
+    os << "Failed to load file " <<  _filename;
+    SvgError x(os.str());
+    throw x;
+  }
 
   GetSvgPaths( &doc, paths);
-
 }
 
 /////////////////////////////////////////////////
@@ -349,6 +408,7 @@ void SVGLoader::DumpPaths(const std::vector<SVGPath> &_paths ) const
     std::cout << "svg.push({name:\"" << path.id <<  "\", subpaths:[], style: \"" << path.style << "\"}); " << std::endl;
     std::cout << "svg[svg.length-1].subpaths = [";
     char psep = ' ';
+
     for (unsigned int i=0; i < path.polylines.size(); i++)
     {
       std::vector<math::Vector2d> poly = path.polylines[i];
@@ -360,9 +420,9 @@ void SVGLoader::DumpPaths(const std::vector<SVGPath> &_paths ) const
         std::cout << " " << sep << " [" <<  p.x << ", " << p.y << "]" <<std::endl;
         sep = ',';
       }
-      std::cout << " ] " << std::endl;
+      out << " ] " << std::endl;
     }
-    std::cout << "];" << std::endl;
-    std::cout << "\n\n";
+    out << "];" << std::endl;
+    out << "\n\n";
   }
 }

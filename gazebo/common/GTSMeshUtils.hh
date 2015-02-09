@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 #ifndef _GAZEBO_GTSMESHUTILS_HH_
 #define _GAZEBO_GTSMESHUTILS_HH_
 
@@ -21,6 +22,10 @@
 
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/math/Vector2d.hh"
+
+struct _GtsSurface;
+typedef _GtsSurface GtsSurface;
+
 
 namespace gazebo
 {
@@ -36,7 +41,7 @@ namespace gazebo
     class GAZEBO_VISIBLE GTSMeshUtils
     {
       /// \brief Create an extruded Polyline submesh
-      /// \param[in] _vertices the x y dimentions of eah vertex in meter
+      /// \param[in] _vertices the x y dimensions of each vertex in meter
       /// \param[in] _height the height of the polyline
       /// \param[out] _submesh A submesh that will be populated with the
       /// extruded polyline.
@@ -46,17 +51,25 @@ namespace gazebo
                   const double &_height,
                   SubMesh *_submesh);
 
-      /// \brief Create an extruded submesh from a 2D outline
-      /// \param[in] _vertices the x y dimentions of eah vertex in meter
-      /// \param[in] _height the height of the polyline
+      /// \brief Perform delaunay triangulation on input vertices.
+      /// \param[in] _path A path can contain multiple subpath, which in turn
+      /// is composed of a list of vertices.
       /// \param[out] _submesh A submesh that will be populated with the
-      /// extruded outline.
-      /// \return True on success.
-      public: static bool CreateExtrudedOutlines(
-                  const std::vector<std::vector<math::Vector2d> > &_path,
-                  const double &_height,
-                  SubMesh *_submesh);
+      /// resulting triangles.
+      /// \return Triangulated GTS surface.
+      public: static GtsSurface *DelaunayTriangulation(
+                  const std::vector<std::vector<math::Vector2d> > &_path);
 
+      /// \brief Create an extruded submesh from a path.
+      /// \param[in] _path A path can contain multiple subpath, which in turn
+      /// is composed of a list of vertices.
+      /// param[in] _height Height of extrusion.
+      /// \param[out] _submesh A submesh that will be populated with the
+      /// resulting triangles.
+      /// \return True on success.
+      public: static bool CreateExtrudedPath(
+                  const std::vector<std::vector<math::Vector2d> > &_path,
+                  double _height, SubMesh *_submesh);
     };
   }
 }
