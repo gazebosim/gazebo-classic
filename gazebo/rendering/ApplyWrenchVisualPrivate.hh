@@ -30,7 +30,7 @@ namespace gazebo
     class ApplyWrenchVisualPrivate : public VisualPrivate
     {
       /// \brief TODO
-      public: VisualPtr pointVisual;
+      public: VisualPtr comVisual;
 
       /// TODO
       public: rendering::ArrowVisualPtr forceVisual;
@@ -41,11 +41,8 @@ namespace gazebo
       /// \brief TODO
       public: VisualPtr torqueVisual;
 
-      /// \brief TODO
-      public: rendering::DynamicLines *torqueLine;
-
       /// TODO
-      public: math::Vector3 pointVector;
+      public: math::Vector3 forcePosVector;
 
       /// TODO
       public: math::Vector3 forceVector;

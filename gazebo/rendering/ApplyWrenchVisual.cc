@@ -41,34 +41,28 @@ ApplyWrenchVisual::~ApplyWrenchVisual()
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::Load()
+void ApplyWrenchVisual::Load(math::Vector3 /*_comVector*/)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
   math::Vector3 linkSize = dPtr->parent->GetBoundingBox().GetSize();
 
-  // Point visual
-  dPtr->pointVisual.reset(new rendering::Visual(
-       this->GetName() + "__POINT_VISUAL__", shared_from_this()));
-  dPtr->pointVisual->Load();
+  // CoM visual
+  dPtr->comVisual.reset(new rendering::Visual(
+       this->GetName() + "__CoM_VISUAL__", shared_from_this()));
+  dPtr->comVisual->Load();
 
-  math::Vector3 p1(0, 0, -2*linkSize.z);
-  math::Vector3 p2(0, 0,  2*linkSize.z);
-  math::Vector3 p3(0, -2*linkSize.y, 0);
-  math::Vector3 p4(0,  2*linkSize.y, 0);
-  math::Vector3 p5(-2*linkSize.x, 0, 0);
-  math::Vector3 p6(2*linkSize.x,  0, 0);
-
-  rendering::DynamicLines *crossLines = dPtr->pointVisual->
+  rendering::DynamicLines *comLines = dPtr->comVisual->
       CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  crossLines->setMaterial("Gazebo/SkyBlue");
-  crossLines->AddPoint(p1);
-  crossLines->AddPoint(p2);
-  crossLines->AddPoint(p3);
-  crossLines->AddPoint(p4);
-  crossLines->AddPoint(p5);
-  crossLines->AddPoint(p6);
+  comLines->setMaterial("Gazebo/SkyBlue");
+  comLines->AddPoint(math::Vector3(0, 0, -2*linkSize.z));
+  comLines->AddPoint(math::Vector3(0, 0,  2*linkSize.z));
+  comLines->AddPoint(math::Vector3(0, -2*linkSize.y, 0));
+  comLines->AddPoint(math::Vector3(0,  2*linkSize.y, 0));
+  comLines->AddPoint(math::Vector3(-2*linkSize.x, 0, 0));
+  comLines->AddPoint(math::Vector3(2*linkSize.x,  0, 0));
+//  dPtr->comVisual->SetPosition(_comVector);
 
   // Force visual
   dPtr->forceVisual.reset(new rendering::ArrowVisual(
@@ -77,6 +71,14 @@ void ApplyWrenchVisual::Load()
   dPtr->forceVisual->SetMaterial("Gazebo/RedBright");
   dPtr->forceVisual->SetScale(math::Vector3(2, 2, 2));
   dPtr->forceVisual->GetSceneNode()->setInheritScale(false);
+
+  // Force line
+  double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
+  rendering::DynamicLines *forceLine = dPtr->forceVisual->
+      CreateDynamicLine(rendering::RENDERING_LINE_LIST);
+  forceLine->setMaterial("Gazebo/RedBright");
+  forceLine->AddPoint(0, 0, 0);
+  forceLine->AddPoint(0, 0, linkDiagonal*0.5);
 
   // Torque visual
   // Torque tube
@@ -90,7 +92,7 @@ void ApplyWrenchVisual::Load()
 
   Ogre::MovableObject *torqueObj =
     (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__TORQUE_VISUAL__", "torque_tube"));
+        this->GetName()+"__TORQUE_VISUAL__", "torque_tube"));
 
   Ogre::SceneNode *torqueNode =
       dPtr->torqueVisual->GetSceneNode()->createChildSceneNode(
@@ -99,12 +101,11 @@ void ApplyWrenchVisual::Load()
   dPtr->torqueVisual->SetMaterial("Gazebo/Orange");
 
   // Torque line
-  double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
-  dPtr->torqueLine = dPtr->torqueVisual->
+  rendering::DynamicLines *torqueLine = dPtr->torqueVisual->
       CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  dPtr->torqueLine->setMaterial("Gazebo/Orange");
-  dPtr->torqueLine->AddPoint(0, 0, 0);
-  dPtr->torqueLine->AddPoint(0, 0, linkDiagonal*0.5 + 0.5);
+  torqueLine->setMaterial("Gazebo/Orange");
+  torqueLine->AddPoint(0, 0, 0);
+  torqueLine->AddPoint(0, 0, linkDiagonal*0.5 + 0.5);
 
   // Rotation manipulator
   dPtr->rotTool.reset(new rendering::SelectionObj(
@@ -147,120 +148,6 @@ rendering::SelectionObjPtr ApplyWrenchVisual::GetRotTool() const
   return dPtr->rotTool;
 }
 
-/////////////////////////////////////////////////////
-//void ApplyWrenchVisual::SetMode(WrenchModes _mode)
-//{
-//  ApplyWrenchVisualPrivate *dPtr =
-//      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
-
-//  this->wrenchMode = _mode;
-
-//  // Attach rotation to mode visual
-//  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
-//  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
-//  if (this->wrenchMode == WrenchModes::FORCE &&
-//      dPtr->forceVector != math::Vector3::Zero)
-//  {
-////    dPtr->rotTool->SetRotation(dPtr->forceVisual->GetRotation() *
-////        math::Quaternion(math::Vector3(0, M_PI/2.0, 0)));
-//  }
-//  else if (this->wrenchMode == WrenchModes::TORQUE &&
-//      dPtr->torqueVector != math::Vector3::Zero)
-//  {
-////    dPtr->rotTool->SetRotation(dPtr->torqueVisual->GetRotation() *
-////        math::Quaternion(math::Vector3(0, M_PI/2.0, 0)));
-//  }
-//  else if (dPtr->forceVector == math::Vector3::Zero &&
-//           dPtr->torqueVector == math::Vector3::Zero)
-//  {
-//    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, false);
-//    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, false);
-//  }
-//}
-
-/////////////////////////////////////////////////////
-//void ApplyWrenchVisual::UpdatePoint(math::Vector3 _pointVector)
-//{
-//  ApplyWrenchVisualPrivate *dPtr =
-//      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
-
-//  dPtr->pointVector = _pointVector;
-
-//  this->SetPosition(_pointVector);
-//  dPtr->torqueVisual->SetPosition(
-//      dPtr->torqueVisual->GetPosition() - _pointVector);
-//}
-
-/////////////////////////////////////////////////////
-//void ApplyWrenchVisual::UpdateForce(math::Vector3 _forceVector, bool _rotateTool)
-//{
-//  ApplyWrenchVisualPrivate *dPtr =
-//      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
-
-//  if (!dPtr->forceVisual)
-//    return;
-
-//  dPtr->forceVector = _forceVector;
-
-//  if (_forceVector == math::Vector3::Zero)
-//  {
-//    dPtr->forceVisual->SetVisible(false);
-//    return;
-//  }
-//  dPtr->forceVisual->SetVisible(true);
-
-//  // Set rotation
-//  math::Vector3 normVec = _forceVector;
-//  normVec.Normalize();
-//  math::Quaternion quat = this->GetQuaternionFromVector(normVec);
-//  dPtr->forceVisual->SetRotation(quat * math::Quaternion(
-//      math::Vector3(0, M_PI/2.0, 0)));
-
-//  // Set position
-//  double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
-//  //double arrowSize = this->forceVisual->GetBoundingBox().GetZLength();
-//  dPtr->forceVisual->SetPosition(-normVec * (linkDiagonal*0.5 + 0.5));
-
-//  // Rotation tool
-//  if (_rotateTool)
-//    dPtr->rotTool->SetRotation(quat);
-//}
-
-/////////////////////////////////////////////////////
-//void ApplyWrenchVisual::UpdateTorque(math::Vector3 _torqueVector, bool _rotateTool)
-//{
-//  ApplyWrenchVisualPrivate *dPtr =
-//      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
-
-//  if (!dPtr->torqueVisual)
-//    return;
-
-//  dPtr->torqueVector = _torqueVector;
-
-//  if (_torqueVector == math::Vector3::Zero)
-//  {
-//    dPtr->torqueVisual->SetVisible(false);
-//    return;
-//  }
-//  dPtr->torqueVisual->SetVisible(true);
-
-//  // Set rotation
-//  math::Vector3 normVec = _torqueVector;
-//  normVec.Normalize();
-//  math::Quaternion quat = this->GetQuaternionFromVector(normVec);
-//  dPtr->torqueVisual->SetRotation(quat * math::Quaternion(
-//      math::Vector3(0, M_PI/2.0, 0)));
-
-//  // Set position
-//  double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
-//  dPtr->torqueVisual->SetPosition((-normVec * (linkDiagonal*0.5 + 0.5)) - this->GetPosition());
-
-//  // Rotation tool
-//  dPtr->rotTool->SetPosition(-this->GetPosition());
-//  if (_rotateTool)
-//    dPtr->rotTool->SetRotation(quat);
-//}
-
 ///////////////////////////////////////////////////
 math::Quaternion ApplyWrenchVisual::GetQuaternionFromVector(math::Vector3 _vec)
 {
@@ -270,14 +157,6 @@ math::Quaternion ApplyWrenchVisual::GetQuaternionFromVector(math::Vector3 _vec)
 
   return math::Quaternion(roll, pitch, yaw);
 }
-
-
-
-
-
-
-
-
 
 /////////////////////////////////////////////////
 void ApplyWrenchVisual::SetWrenchMode(std::string _mode)
@@ -307,20 +186,20 @@ void ApplyWrenchVisual::SetWrenchMode(std::string _mode)
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetPoint(math::Vector3 _pointVector)
+void ApplyWrenchVisual::SetForcePos(math::Vector3 _forcePosVector)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  dPtr->pointVisual->SetPosition(_pointVector);
-  // move force no matter what
-  dPtr->forceVisual->SetPosition(dPtr->forceVisual->GetPosition() - dPtr->pointVector + _pointVector);
+  // move force
+  dPtr->forceVisual->SetPosition(dPtr->forceVisual->GetPosition() -
+      dPtr->forcePosVector + _forcePosVector);
 
-  // move rot if force mode
-  if (dPtr->mode == "force")
-    dPtr->rotTool->SetPosition(dPtr->rotTool->GetPosition() - dPtr->pointVector + _pointVector);
+  // move rot
+  dPtr->rotTool->SetPosition(dPtr->rotTool->GetPosition() -
+      dPtr->forcePosVector + _forcePosVector);
 
-  dPtr->pointVector = _pointVector;
+  dPtr->forcePosVector = _forcePosVector;
 }
 
 ///////////////////////////////////////////////////
@@ -395,10 +274,10 @@ void ApplyWrenchVisual::SetForceVisual()
   double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
   //double arrowSize = this->forceVisual->GetBoundingBox().GetZLength();
   dPtr->forceVisual->SetPosition(-normVec * (linkDiagonal*0.5 + 0.5)
-      + dPtr->pointVector);
+      + dPtr->forcePosVector);
 
   // Rotation tool
-  dPtr->rotTool->SetPosition(dPtr->pointVector);
+  dPtr->rotTool->SetPosition(dPtr->forcePosVector);
   if (!dPtr->rotatedByMouse)
     dPtr->rotTool->SetRotation(quat);
 }

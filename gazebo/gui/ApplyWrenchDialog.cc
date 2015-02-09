@@ -46,11 +46,11 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->messageLabel->setText(
       tr("Apply Force and Torque"));
 
-  // Point
-  QCheckBox *pointCollapser = new QCheckBox();
-  pointCollapser->setChecked(false);
-  pointCollapser->setText("Reference Point");
-  pointCollapser->setStyleSheet(
+  // Force position
+  QCheckBox *forcePosCollapser = new QCheckBox();
+  forcePosCollapser->setChecked(false);
+  forcePosCollapser->setText("Reference Point");
+  forcePosCollapser->setStyleSheet(
      "QCheckBox {\
         color: #d0d0d0;\
       }\
@@ -60,68 +60,78 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
       QCheckBox::indicator::checked {\
         image: url(:/images/down_arrow.png);\
       }");
-  connect(pointCollapser, SIGNAL(toggled(bool)), this, SLOT(TogglePoint(bool)));
+  connect(forcePosCollapser, SIGNAL(toggled(bool)), this, SLOT(ToggleForcePos(bool)));
 
-  // Point X
-  QLabel *pointXLabel = new QLabel();
-  pointXLabel->setText(tr("X:"));
-  QLabel *pointXUnitLabel = new QLabel();
-  pointXUnitLabel->setText(tr("m"));
+  // CoM
+  QLabel *comLabel = new QLabel();
+  comLabel->setText(tr("Center of mass"));
+  this->dataPtr->comCheckBox = new QCheckBox();
+  this->dataPtr->comCheckBox->setChecked(true);
+  connect(this->dataPtr->comCheckBox, SIGNAL(toggled(bool)), this,
+      SLOT(ToggleComCheckBox(bool)));
 
-  this->dataPtr->pointXSpin = new QDoubleSpinBox();
-  this->dataPtr->pointXSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->pointXSpin->setSingleStep(0.1);
-  this->dataPtr->pointXSpin->setDecimals(3);
-  this->dataPtr->pointXSpin->setValue(0);
-  connect(this->dataPtr->pointXSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnPointXChanged(double)));
+  // Force Position X
+  QLabel *forcePosXLabel = new QLabel();
+  forcePosXLabel->setText(tr("X:"));
+  QLabel *forcePosXUnitLabel = new QLabel();
+  forcePosXUnitLabel->setText(tr("m"));
 
-  // Point Y
-  QLabel *pointYLabel = new QLabel();
-  pointYLabel->setText(tr("Y:"));
-  QLabel *pointYUnitLabel = new QLabel();
-  pointYUnitLabel->setText(tr("m"));
+  this->dataPtr->forcePosXSpin = new QDoubleSpinBox();
+  this->dataPtr->forcePosXSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dataPtr->forcePosXSpin->setSingleStep(0.1);
+  this->dataPtr->forcePosXSpin->setDecimals(3);
+  this->dataPtr->forcePosXSpin->setValue(0);
+  connect(this->dataPtr->forcePosXSpin, SIGNAL(valueChanged(double)), this,
+      SLOT(OnForcePosXChanged(double)));
 
-  this->dataPtr->pointYSpin = new QDoubleSpinBox();
-  this->dataPtr->pointYSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->pointYSpin->setSingleStep(0.1);
-  this->dataPtr->pointYSpin->setDecimals(3);
-  this->dataPtr->pointYSpin->setValue(0);
-  connect(this->dataPtr->pointYSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnPointYChanged(double)));
+  // Force Position Y
+  QLabel *forcePosYLabel = new QLabel();
+  forcePosYLabel->setText(tr("Y:"));
+  QLabel *forcePosYUnitLabel = new QLabel();
+  forcePosYUnitLabel->setText(tr("m"));
 
-  // Point Z
-  QLabel *pointZLabel = new QLabel();
-  pointZLabel->setText(tr("Z:"));
-  QLabel *pointZUnitLabel = new QLabel();
-  pointZUnitLabel->setText(tr("m"));
+  this->dataPtr->forcePosYSpin = new QDoubleSpinBox();
+  this->dataPtr->forcePosYSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dataPtr->forcePosYSpin->setSingleStep(0.1);
+  this->dataPtr->forcePosYSpin->setDecimals(3);
+  this->dataPtr->forcePosYSpin->setValue(0);
+  connect(this->dataPtr->forcePosYSpin, SIGNAL(valueChanged(double)), this,
+      SLOT(OnForcePosYChanged(double)));
 
-  this->dataPtr->pointZSpin = new QDoubleSpinBox();
-  this->dataPtr->pointZSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->pointZSpin->setSingleStep(0.1);
-  this->dataPtr->pointZSpin->setDecimals(3);
-  this->dataPtr->pointZSpin->setValue(0);
-  connect(this->dataPtr->pointZSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnPointZChanged(double)));
+  // Force Position Z
+  QLabel *forcePosZLabel = new QLabel();
+  forcePosZLabel->setText(tr("Z:"));
+  QLabel *forcePosZUnitLabel = new QLabel();
+  forcePosZUnitLabel->setText(tr("m"));
 
-  QGridLayout *pointCollapsible = new QGridLayout();
-  pointCollapsible->addWidget(pointXLabel, 0, 0);
-  pointCollapsible->addWidget(this->dataPtr->pointXSpin, 0, 1);
-  pointCollapsible->addWidget(pointXUnitLabel, 0, 2);
-  pointCollapsible->addWidget(pointYLabel, 1, 0);
-  pointCollapsible->addWidget(this->dataPtr->pointYSpin, 1, 1);
-  pointCollapsible->addWidget(pointYUnitLabel, 1, 2);
-  pointCollapsible->addWidget(pointZLabel, 2, 0);
-  pointCollapsible->addWidget(this->dataPtr->pointZSpin, 2, 1);
-  pointCollapsible->addWidget(pointZUnitLabel, 2, 2);
+  this->dataPtr->forcePosZSpin = new QDoubleSpinBox();
+  this->dataPtr->forcePosZSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dataPtr->forcePosZSpin->setSingleStep(0.1);
+  this->dataPtr->forcePosZSpin->setDecimals(3);
+  this->dataPtr->forcePosZSpin->setValue(0);
+  connect(this->dataPtr->forcePosZSpin, SIGNAL(valueChanged(double)), this,
+      SLOT(OnForcePosZChanged(double)));
 
-  this->dataPtr->pointCollapsibleWidget = new QWidget();
-  this->dataPtr->pointCollapsibleWidget->setLayout(pointCollapsible);
-  this->dataPtr->pointCollapsibleWidget->hide();
+  QGridLayout *forcePosCollapsible = new QGridLayout();
+  forcePosCollapsible->addWidget(comLabel, 0, 0);
+  forcePosCollapsible->addWidget(this->dataPtr->comCheckBox, 0, 1);
+  forcePosCollapsible->addWidget(forcePosXLabel, 1, 0);
+  forcePosCollapsible->addWidget(this->dataPtr->forcePosXSpin, 1, 1);
+  forcePosCollapsible->addWidget(forcePosXUnitLabel, 1, 2);
+  forcePosCollapsible->addWidget(forcePosYLabel, 2, 0);
+  forcePosCollapsible->addWidget(this->dataPtr->forcePosYSpin, 2, 1);
+  forcePosCollapsible->addWidget(forcePosYUnitLabel, 2, 2);
+  forcePosCollapsible->addWidget(forcePosZLabel, 3, 0);
+  forcePosCollapsible->addWidget(this->dataPtr->forcePosZSpin, 3, 1);
+  forcePosCollapsible->addWidget(forcePosZUnitLabel, 3, 2);
 
-  QVBoxLayout *pointLayout = new QVBoxLayout();
-  pointLayout->addWidget(pointCollapser);
-  pointLayout->addWidget(this->dataPtr->pointCollapsibleWidget);
+  this->dataPtr->forcePosCollapsibleWidget = new QWidget();
+  this->dataPtr->forcePosCollapsibleWidget->setLayout(forcePosCollapsible);
+  this->dataPtr->forcePosCollapsibleWidget->hide();
+
+  QVBoxLayout *forcePosLayout = new QVBoxLayout();
+  forcePosLayout->addWidget(forcePosCollapser);
+  forcePosLayout->addWidget(this->dataPtr->forcePosCollapsibleWidget);
 
   // Force
   QCheckBox *forceCollapser = new QCheckBox();
@@ -196,19 +206,23 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   connect(this->dataPtr->forceZSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForceZChanged(double)));
 
-  QGridLayout *forceCollapsible = new QGridLayout();
-  forceCollapsible->addWidget(forceXLabel, 0, 0);
-  forceCollapsible->addWidget(this->dataPtr->forceXSpin, 0, 1);
-  forceCollapsible->addWidget(forceXUnitLabel, 0, 2);
-  forceCollapsible->addWidget(forceYLabel, 1, 0);
-  forceCollapsible->addWidget(this->dataPtr->forceYSpin, 1, 1);
-  forceCollapsible->addWidget(forceYUnitLabel, 1, 2);
-  forceCollapsible->addWidget(forceZLabel, 2, 0);
-  forceCollapsible->addWidget(this->dataPtr->forceZSpin, 2, 1);
-  forceCollapsible->addWidget(forceZUnitLabel, 2, 2);
-  forceCollapsible->addWidget(forceMagLabel, 3, 0);
-  forceCollapsible->addWidget(this->dataPtr->forceMagSpin, 3, 1);
-  forceCollapsible->addWidget(forceMagUnitLabel, 3, 2);
+  QGridLayout *forceVectorLayout = new QGridLayout();
+  forceVectorLayout->addWidget(forceXLabel, 0, 0);
+  forceVectorLayout->addWidget(this->dataPtr->forceXSpin, 0, 1);
+  forceVectorLayout->addWidget(forceXUnitLabel, 0, 2);
+  forceVectorLayout->addWidget(forceYLabel, 1, 0);
+  forceVectorLayout->addWidget(this->dataPtr->forceYSpin, 1, 1);
+  forceVectorLayout->addWidget(forceYUnitLabel, 1, 2);
+  forceVectorLayout->addWidget(forceZLabel, 2, 0);
+  forceVectorLayout->addWidget(this->dataPtr->forceZSpin, 2, 1);
+  forceVectorLayout->addWidget(forceZUnitLabel, 2, 2);
+  forceVectorLayout->addWidget(forceMagLabel, 3, 0);
+  forceVectorLayout->addWidget(this->dataPtr->forceMagSpin, 3, 1);
+  forceVectorLayout->addWidget(forceMagUnitLabel, 3, 2);
+
+  QVBoxLayout *forceCollapsible = new QVBoxLayout();
+  forceCollapsible->addLayout(forcePosLayout);
+  forceCollapsible->addLayout(forceVectorLayout);
 
   this->dataPtr->forceCollapsibleWidget = new QWidget();
   this->dataPtr->forceCollapsibleWidget->setLayout(forceCollapsible);
@@ -328,7 +342,6 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->setSizeConstraint(QLayout::SetFixedSize);
   mainLayout->addWidget(this->dataPtr->messageLabel);
-  mainLayout->addLayout(pointLayout);
   mainLayout->addLayout(forceLayout);
   mainLayout->addLayout(torqueLayout);
   mainLayout->addLayout(buttonsLayout);
@@ -339,6 +352,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->node->Init();
 
   this->dataPtr->mode = "force";
+  this->dataPtr->comVector = math::Vector3::Zero;
   this->dataPtr->forceVector = 1000 * math::Vector3::UnitX;
   this->dataPtr->torqueVector = math::Vector3::Zero;
 
@@ -370,6 +384,9 @@ void ApplyWrenchDialog::SetLink(std::string _linkName)
   this->dataPtr->linkName = _linkName;
   this->SetPublisher();
 
+  // TODO: somehow get com
+  // this->dataPtr->comVector = ??
+
   rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
         GetVisual(this->dataPtr->linkName);
 
@@ -384,7 +401,7 @@ void ApplyWrenchDialog::OnApply()
   msgs::Wrench msg;
   msgs::Set(msg.mutable_force(), this->dataPtr->forceVector);
   msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector);
-  msgs::Set(msg.mutable_position(), this->dataPtr->pointVector);
+  msgs::Set(msg.mutable_position(), this->dataPtr->forcePosVector);
 
   this->dataPtr->wrenchPub->Publish(msg);
 }
@@ -402,21 +419,21 @@ void ApplyWrenchDialog::OnCancel()
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::OnPointXChanged(double /*_pX*/)
+void ApplyWrenchDialog::OnForcePosXChanged(double /*_pX*/)
 {
-  this->NewPointVector();
+  this->NewForcePosVector();
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::OnPointYChanged(double /*_pY*/)
+void ApplyWrenchDialog::OnForcePosYChanged(double /*_pY*/)
 {
-  this->NewPointVector();
+  this->NewForcePosVector();
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::OnPointZChanged(double /*_pZ*/)
+void ApplyWrenchDialog::OnForcePosZChanged(double /*_pZ*/)
 {
-  this->NewPointVector();
+  this->NewForcePosVector();
 }
 
 /////////////////////////////////////////////////
@@ -485,7 +502,7 @@ void ApplyWrenchDialog::AttachVisuals()
     this->dataPtr->applyWrenchVisual.reset(new rendering::ApplyWrenchVisual(
         this->dataPtr->linkName + "__APPLY_WRENCH__", this->dataPtr->linkVisual));
 
-    this->dataPtr->applyWrenchVisual->Load();
+    this->dataPtr->applyWrenchVisual->Load(this->dataPtr->comVector);
   }
   else
   {
@@ -497,15 +514,24 @@ void ApplyWrenchDialog::AttachVisuals()
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::TogglePoint(bool _checked)
+void ApplyWrenchDialog::ToggleForcePos(bool _checked)
 {
   if (_checked)
   {
-    this->dataPtr->pointCollapsibleWidget->show();
+    this->dataPtr->forcePosCollapsibleWidget->show();
   }
   else
   {
-    this->dataPtr->pointCollapsibleWidget->hide();
+    this->dataPtr->forcePosCollapsibleWidget->hide();
+  }
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::ToggleComCheckBox(bool _checked)
+{
+  if (_checked)
+  {
+    this->SetForcePos(this->dataPtr->comVector);
   }
 }
 
@@ -685,14 +711,14 @@ bool ApplyWrenchDialog::eventFilter(QObject *_object, QEvent *_event)
         _object == this->dataPtr->forceYSpin ||
         _object == this->dataPtr->forceZSpin)
     {
-      this->SetWrenchMode("force");
+      this->SetForce(this->dataPtr->forceVector);
     }
     else if (_object == this->dataPtr->torqueMagSpin ||
              _object == this->dataPtr->torqueXSpin ||
              _object == this->dataPtr->torqueYSpin ||
              _object == this->dataPtr->torqueZSpin)
     {
-      this->SetWrenchMode("torque");
+      this->SetForce(this->dataPtr->torqueVector);
     }
   }
   return false;
@@ -715,25 +741,37 @@ void ApplyWrenchDialog::SetWrenchMode(std::string _mode)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetPoint(math::Vector3 _point)
+void ApplyWrenchDialog::SetForcePos(math::Vector3 _forcePos)
 {
-  // Set point vector and send it to visuals
-  this->dataPtr->pointVector = _point;
+  // Set forcePos vector and send it to visuals
+  this->dataPtr->forcePosVector = _forcePos;
 
+  // Spins
+  this->SetSpinValue(this->dataPtr->forcePosXSpin, _forcePos.x);
+  this->SetSpinValue(this->dataPtr->forcePosYSpin, _forcePos.y);
+  this->SetSpinValue(this->dataPtr->forcePosZSpin, _forcePos.z);
+
+  // Mode
+  this->SetWrenchMode("force");
+
+  // Check com box
+  this->dataPtr->comCheckBox->setChecked((_forcePos == this->dataPtr->comVector));
+
+  // Visuals
   if (!this->dataPtr->applyWrenchVisual)
     return;
 
-  this->dataPtr->applyWrenchVisual->SetPoint(this->dataPtr->pointVector);
+  this->dataPtr->applyWrenchVisual->SetForcePos(this->dataPtr->forcePosVector);
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::NewPointVector()
+void ApplyWrenchDialog::NewForcePosVector()
 {
-  // Update point vector with values from XYZ spins
-  this->SetPoint(
-      math::Vector3(this->dataPtr->pointXSpin->value(),
-                    this->dataPtr->pointYSpin->value(),
-                    this->dataPtr->pointZSpin->value()));
+  // Update forcePos vector with values from XYZ spins
+  this->SetForcePos(
+      math::Vector3(this->dataPtr->forcePosXSpin->value(),
+                    this->dataPtr->forcePosYSpin->value(),
+                    this->dataPtr->forcePosZSpin->value()));
 }
 
 /////////////////////////////////////////////////

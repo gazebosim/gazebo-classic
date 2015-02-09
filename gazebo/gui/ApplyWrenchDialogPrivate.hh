@@ -37,7 +37,7 @@ namespace gazebo
       public: QLabel *messageLabel;
 
       /// TODO
-      public: QWidget *pointCollapsibleWidget;
+      public: QWidget *forcePosCollapsibleWidget;
 
       /// TODO
       public: QWidget *forceCollapsibleWidget;
@@ -46,13 +46,16 @@ namespace gazebo
       public: QWidget *torqueCollapsibleWidget;
 
       /// TODO
-      public: QDoubleSpinBox *pointXSpin;
+      public: QCheckBox *comCheckBox;
 
       /// TODO
-      public: QDoubleSpinBox *pointYSpin;
+      public: QDoubleSpinBox *forcePosXSpin;
 
       /// TODO
-      public: QDoubleSpinBox *pointZSpin;
+      public: QDoubleSpinBox *forcePosYSpin;
+
+      /// TODO
+      public: QDoubleSpinBox *forcePosZSpin;
 
       /// TODO
       public: QDoubleSpinBox *forceMagSpin;
@@ -79,7 +82,10 @@ namespace gazebo
       public: QDoubleSpinBox *torqueZSpin;
 
       /// TODO
-      public: math::Vector3 pointVector;
+      public: math::Vector3 comVector;
+
+      /// TODO
+      public: math::Vector3 forcePosVector;
 
       /// TODO
       public: math::Vector3 forceVector;

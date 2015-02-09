@@ -57,9 +57,13 @@ namespace gazebo
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
 
-      /// \brief Qt callback to show/hide point options.
+      /// \brief Qt callback to show/hide position options.
       /// \param[in] _checked Whether it is checked or not.
-      private slots: void TogglePoint(bool _checked);
+      private slots: void ToggleForcePos(bool _checked);
+
+      /// \brief Qt callback to set position to CoM.
+      /// \param[in] _checked Whether it is checked or not.
+      private slots: void ToggleComCheckBox(bool _checked);
 
       /// \brief Qt callback to show/hide force options.
       /// \param[in] _checked Whether it is checked or not.
@@ -69,17 +73,17 @@ namespace gazebo
       /// \param[in] _checked Whether it is checked or not.
       private slots: void ToggleTorque(bool _checked);
 
-      /// \brief Qt callback when the the point X has changed.
-      /// \param[in] _magnitude Point vector X component
-      private slots: void OnPointXChanged(double _pX);
+      /// \brief Qt callback when the the position X has changed.
+      /// \param[in] _magnitude ForcePos vector X component
+      private slots: void OnForcePosXChanged(double _pX);
 
-      /// \brief Qt callback when the the point Y has changed.
-      /// \param[in] _magnitude Point vector Y component
-      private slots: void OnPointYChanged(double _pY);
+      /// \brief Qt callback when the the position Y has changed.
+      /// \param[in] _magnitude ForcePos vector Y component
+      private slots: void OnForcePosYChanged(double _pY);
 
-      /// \brief Qt callback when the the point Z has changed.
-      /// \param[in] _magnitude Point vector Z component
-      private slots: void OnPointZChanged(double _pZ);
+      /// \brief Qt callback when the the position Z has changed.
+      /// \param[in] _magnitude ForcePos vector Z component
+      private slots: void OnForcePosZChanged(double _pZ);
 
       /// \brief Qt callback when the the force magnitude has changed.
       /// \param[in] _magnitude Force magnitude
@@ -144,10 +148,10 @@ namespace gazebo
       public: void SetWrenchMode(std::string _mode);
 
       /// \brief TODO
-      private: void SetPoint(math::Vector3 _force);
+      private: void SetForcePos(math::Vector3 _force);
 
       /// \brief TODO
-      private: void NewPointVector();
+      private: void NewForcePosVector();
 
       /// \brief TODO
       private: void SetForce(math::Vector3 _force, bool _rotationByMouse = false);

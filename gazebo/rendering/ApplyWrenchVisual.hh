@@ -40,7 +40,7 @@ namespace gazebo
       public: virtual ~ApplyWrenchVisual();
 
       /// \brief TODO
-      public: void Load();
+      public: void Load(math::Vector3 _comVector);
 
       /// \brief TODO
       public: rendering::VisualPtr GetForceVisual() const;
@@ -51,28 +51,14 @@ namespace gazebo
       /// \brief TODO
       public: rendering::SelectionObjPtr GetRotTool() const;
 
-//      /// \brief TODO
-//      public: void SetMode(WrenchModes _mode);
-
-//      /// \brief TODO
-//      public: void UpdatePoint(math::Vector3 _pointVector);
-
-//      /// \brief TODO
-//      public: void UpdateForce(math::Vector3 _forceVector, bool _rotateTool);
-
-//      /// \brief TODO
-//      public: void UpdateTorque(math::Vector3 _torqueVector, bool _rotateTool);
-
       /// \brief TODO
       public: math::Quaternion GetQuaternionFromVector(math::Vector3 _vec);
-
-
 
       /// \brief TODO
       public: void SetWrenchMode(std::string _mode);
 
       /// \brief TODO
-      public: void SetPoint(math::Vector3 _pointVector);
+      public: void SetForcePos(math::Vector3 _forcePosVector);
 
       /// \brief TODO
       public: void SetForce(math::Vector3 _forceVector, bool _rotatedByMouse);
