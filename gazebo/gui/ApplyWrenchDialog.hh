@@ -101,6 +101,9 @@ namespace gazebo
       /// \param[in] _magnitude Force vector Z component
       private slots: void OnForceZChanged(double _fZ);
 
+      /// \brief Qt callback when the the force clear button is clicked.
+      private slots: void OnForceClear();
+
       /// \brief Qt callback when the the torque magnitude has changed.
       /// \param[in] _magnitude Torque magnitude
       private slots: void OnTorqueMagChanged(double _magnitude);
@@ -116,6 +119,9 @@ namespace gazebo
       /// \brief Qt callback when the the torque Z has changed.
       /// \param[in] _magnitude Torque vector Z component
       private slots: void OnTorqueZChanged(double _fZ);
+
+      /// \brief Qt callback when the the torque clear button is clicked.
+      private slots: void OnTorqueClear();
 
       /// \brief TODO
       private slots: bool eventFilter(QObject *_object, QEvent *_event);

@@ -81,6 +81,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->forcePosXSpin->setSingleStep(0.1);
   this->dataPtr->forcePosXSpin->setDecimals(3);
   this->dataPtr->forcePosXSpin->setValue(0);
+  this->dataPtr->forcePosXSpin->setMaximumWidth(100);
   this->dataPtr->forcePosXSpin->installEventFilter(this);
   connect(this->dataPtr->forcePosXSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForcePosXChanged(double)));
@@ -96,6 +97,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->forcePosYSpin->setSingleStep(0.1);
   this->dataPtr->forcePosYSpin->setDecimals(3);
   this->dataPtr->forcePosYSpin->setValue(0);
+  this->dataPtr->forcePosYSpin->setMaximumWidth(100);
   this->dataPtr->forcePosYSpin->installEventFilter(this);
   connect(this->dataPtr->forcePosYSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForcePosYChanged(double)));
@@ -111,6 +113,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->forcePosZSpin->setSingleStep(0.1);
   this->dataPtr->forcePosZSpin->setDecimals(3);
   this->dataPtr->forcePosZSpin->setValue(0);
+  this->dataPtr->forcePosZSpin->setMaximumWidth(100);
   this->dataPtr->forcePosZSpin->installEventFilter(this);
   connect(this->dataPtr->forcePosZSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForcePosZChanged(double)));
@@ -163,6 +166,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->forceMagSpin->setSingleStep(0.1);
   this->dataPtr->forceMagSpin->setDecimals(3);
   this->dataPtr->forceMagSpin->setValue(1000);
+  this->dataPtr->forceMagSpin->setMaximumWidth(100);
   this->dataPtr->forceMagSpin->installEventFilter(this);
   connect(this->dataPtr->forceMagSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForceMagChanged(double)));
@@ -178,6 +182,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->forceXSpin->setSingleStep(0.1);
   this->dataPtr->forceXSpin->setDecimals(3);
   this->dataPtr->forceXSpin->setValue(1);
+  this->dataPtr->forceXSpin->setMaximumWidth(100);
   this->dataPtr->forceXSpin->installEventFilter(this);
   connect(this->dataPtr->forceXSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForceXChanged(double)));
@@ -193,6 +198,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->forceYSpin->setSingleStep(0.1);
   this->dataPtr->forceYSpin->setDecimals(3);
   this->dataPtr->forceYSpin->setValue(0);
+  this->dataPtr->forceYSpin->setMaximumWidth(100);
   this->dataPtr->forceYSpin->installEventFilter(this);
   connect(this->dataPtr->forceYSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForceYChanged(double)));
@@ -208,23 +214,29 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->forceZSpin->setSingleStep(0.1);
   this->dataPtr->forceZSpin->setDecimals(3);
   this->dataPtr->forceZSpin->setValue(0);
+  this->dataPtr->forceZSpin->setMaximumWidth(100);
   this->dataPtr->forceZSpin->installEventFilter(this);
   connect(this->dataPtr->forceZSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForceZChanged(double)));
 
+  // Force clear
+  QPushButton *forceClearButton = new QPushButton(tr("Clear"));
+  connect(forceClearButton, SIGNAL(clicked()), this, SLOT(OnForceClear()));
+
   QGridLayout *forceVectorLayout = new QGridLayout();
-  forceVectorLayout->addWidget(forceXLabel, 0, 0);
-  forceVectorLayout->addWidget(this->dataPtr->forceXSpin, 0, 1);
-  forceVectorLayout->addWidget(forceXUnitLabel, 0, 2);
-  forceVectorLayout->addWidget(forceYLabel, 1, 0);
-  forceVectorLayout->addWidget(this->dataPtr->forceYSpin, 1, 1);
-  forceVectorLayout->addWidget(forceYUnitLabel, 1, 2);
-  forceVectorLayout->addWidget(forceZLabel, 2, 0);
-  forceVectorLayout->addWidget(this->dataPtr->forceZSpin, 2, 1);
-  forceVectorLayout->addWidget(forceZUnitLabel, 2, 2);
-  forceVectorLayout->addWidget(forceMagLabel, 3, 0);
-  forceVectorLayout->addWidget(this->dataPtr->forceMagSpin, 3, 1);
-  forceVectorLayout->addWidget(forceMagUnitLabel, 3, 2);
+  forceVectorLayout->addWidget(forceXLabel, 0, 1);
+  forceVectorLayout->addWidget(this->dataPtr->forceXSpin, 0, 2);
+  forceVectorLayout->addWidget(forceXUnitLabel, 0, 3);
+  forceVectorLayout->addWidget(forceYLabel, 1, 1);
+  forceVectorLayout->addWidget(this->dataPtr->forceYSpin, 1, 2);
+  forceVectorLayout->addWidget(forceYUnitLabel, 1, 3);
+  forceVectorLayout->addWidget(forceZLabel, 2, 1);
+  forceVectorLayout->addWidget(this->dataPtr->forceZSpin, 2, 2);
+  forceVectorLayout->addWidget(forceZUnitLabel, 2, 3);
+  forceVectorLayout->addWidget(forceMagLabel, 3, 1);
+  forceVectorLayout->addWidget(this->dataPtr->forceMagSpin, 3, 2);
+  forceVectorLayout->addWidget(forceMagUnitLabel, 3, 3);
+  forceVectorLayout->addWidget(forceClearButton, 4, 0);
 
   QVBoxLayout *forceCollapsible = new QVBoxLayout();
   forceCollapsible->addLayout(forcePosLayout);
@@ -265,6 +277,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->torqueMagSpin->setSingleStep(0.1);
   this->dataPtr->torqueMagSpin->setDecimals(3);
   this->dataPtr->torqueMagSpin->setValue(0);
+  this->dataPtr->torqueMagSpin->setMaximumWidth(100);
   this->dataPtr->torqueMagSpin->installEventFilter(this);
   connect(this->dataPtr->torqueMagSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnTorqueMagChanged(double)));
@@ -280,6 +293,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->torqueXSpin->setSingleStep(0.1);
   this->dataPtr->torqueXSpin->setDecimals(3);
   this->dataPtr->torqueXSpin->setValue(0);
+  this->dataPtr->torqueXSpin->setMaximumWidth(100);
   this->dataPtr->torqueXSpin->installEventFilter(this);
   connect(this->dataPtr->torqueXSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnTorqueXChanged(double)));
@@ -295,6 +309,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->torqueYSpin->setSingleStep(0.1);
   this->dataPtr->torqueYSpin->setDecimals(3);
   this->dataPtr->torqueYSpin->setValue(0);
+  this->dataPtr->torqueYSpin->setMaximumWidth(100);
   this->dataPtr->torqueYSpin->installEventFilter(this);
   connect(this->dataPtr->torqueYSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnTorqueYChanged(double)));
@@ -310,23 +325,29 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->torqueZSpin->setSingleStep(0.1);
   this->dataPtr->torqueZSpin->setDecimals(3);
   this->dataPtr->torqueZSpin->setValue(0);
+  this->dataPtr->torqueZSpin->setMaximumWidth(100);
   this->dataPtr->torqueZSpin->installEventFilter(this);
   connect(this->dataPtr->torqueZSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnTorqueZChanged(double)));
 
+  // Torque clear
+  QPushButton *torqueClearButton = new QPushButton(tr("Clear"));
+  connect(torqueClearButton, SIGNAL(clicked()), this, SLOT(OnTorqueClear()));
+
   QGridLayout *torqueCollapsible = new QGridLayout();
-  torqueCollapsible->addWidget(torqueXLabel, 0, 0);
-  torqueCollapsible->addWidget(this->dataPtr->torqueXSpin, 0, 1);
-  torqueCollapsible->addWidget(torqueXUnitLabel, 0, 2);
-  torqueCollapsible->addWidget(torqueYLabel, 1, 0);
-  torqueCollapsible->addWidget(this->dataPtr->torqueYSpin, 1, 1);
-  torqueCollapsible->addWidget(torqueYUnitLabel, 1, 2);
-  torqueCollapsible->addWidget(torqueZLabel, 2, 0);
-  torqueCollapsible->addWidget(this->dataPtr->torqueZSpin, 2, 1);
-  torqueCollapsible->addWidget(torqueZUnitLabel, 2, 2);
-  torqueCollapsible->addWidget(torqueMagLabel, 3, 0);
-  torqueCollapsible->addWidget(this->dataPtr->torqueMagSpin, 3, 1);
-  torqueCollapsible->addWidget(torqueMagUnitLabel, 3, 2);
+  torqueCollapsible->addWidget(torqueXLabel, 0, 1);
+  torqueCollapsible->addWidget(this->dataPtr->torqueXSpin, 0, 2);
+  torqueCollapsible->addWidget(torqueXUnitLabel, 0, 3);
+  torqueCollapsible->addWidget(torqueYLabel, 1, 1);
+  torqueCollapsible->addWidget(this->dataPtr->torqueYSpin, 1, 2);
+  torqueCollapsible->addWidget(torqueYUnitLabel, 1, 3);
+  torqueCollapsible->addWidget(torqueZLabel, 2, 1);
+  torqueCollapsible->addWidget(this->dataPtr->torqueZSpin, 2, 2);
+  torqueCollapsible->addWidget(torqueZUnitLabel, 2, 3);
+  torqueCollapsible->addWidget(torqueMagLabel, 3, 1);
+  torqueCollapsible->addWidget(this->dataPtr->torqueMagSpin, 3, 2);
+  torqueCollapsible->addWidget(torqueMagUnitLabel, 3, 3);
+  torqueCollapsible->addWidget(torqueClearButton, 4, 0);
 
   this->dataPtr->torqueCollapsibleWidget = new QWidget();
   this->dataPtr->torqueCollapsibleWidget->setLayout(torqueCollapsible);
@@ -337,10 +358,10 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   torqueLayout->addWidget(this->dataPtr->torqueCollapsibleWidget);
 
   // Buttons
-  QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
+  QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
-  QPushButton *applyButton = new QPushButton("&Apply");
+  QPushButton *applyButton = new QPushButton("Apply");
   applyButton->setDefault(true);
   connect(applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
 
@@ -515,6 +536,12 @@ void ApplyWrenchDialog::OnForceZChanged(double /*_fZ*/)
 }
 
 /////////////////////////////////////////////////
+void ApplyWrenchDialog::OnForceClear()
+{
+  this->SetForce(math::Vector3::Zero);
+}
+
+/////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueMagChanged(double /*_magnitude*/)
 {
   this->NewTorqueMag();
@@ -536,6 +563,12 @@ void ApplyWrenchDialog::OnTorqueYChanged(double /*_fY*/)
 void ApplyWrenchDialog::OnTorqueZChanged(double /*_fZ*/)
 {
   this->NewTorqueVector();
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::OnTorqueClear()
+{
+  this->SetTorque(math::Vector3::Zero);
 }
 
 //////////////////////////////////////////////////
