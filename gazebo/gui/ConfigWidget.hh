@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,6 +78,12 @@ namespace gazebo
 
       /// \brief A label for the length widget.
       public: QWidget *geomLengthLabel;
+
+      /// \brief A line edit for editing the mesh filename.
+      public: QWidget *geomFilenameLineEdit;
+
+      /// \brief A label for the mesh filename widget.
+      public: QWidget *geomFilenameLabel;
 
       /// brief Callback when the geometry type is changed.
       /// \param[in] _text New geometry type in string.
@@ -192,7 +198,8 @@ namespace gazebo
       /// \param[in] _value Type of geometry.
       /// \param[in] _dimensions Dimensions of geometry.
       public: void SetGeometryWidgetValue(const std::string &_name,
-          const std::string &_value, const math::Vector3 &_dimensions);
+          const std::string &_value, const math::Vector3 &_dimensions,
+          const std::string &_uri = "");
 
       /// \brief Get an integer value from a child widget.
       /// \param[in] _name Name of the child widget.
@@ -240,16 +247,18 @@ namespace gazebo
       /// \param[out] _dimensions Dimensions of geometry.
       /// \return Type of geometry.
       public: std::string GetGeometryWidgetValue(const std::string &_name,
-          math::Vector3 &_dimensions) const;
+          math::Vector3 &_dimensions, std::string &_uri) const;
 
       /// \brief Parse the input message and either create widgets for
       /// configuring fields of the message, or update the widgets with values
       /// from the message.
       /// \param[in] _msg Message.
+      /// \param[in] _update True to parse only fields that are specified in
+      /// the message rather than all the available fields in the message
       /// \param[in] _name Name used when creating new widgets.
       /// return Updated widget.
       private: QWidget *Parse(google::protobuf::Message *_msg,
-          const std::string &_name = "");
+          bool _update = false, const std::string &_name = "");
 
       /// \brief Parse a vector3 message.
       /// param[in] _msg Input vector3d message.
@@ -364,8 +373,10 @@ namespace gazebo
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Type of geometry.
       /// \param[in] _dimensions Dimensions of the geometry.
+      /// \param[in] _uri URI of the geometry mesh, if any.
       private: void UpdateGeometryWidget(ConfigChildWidget *_widget,
-          const std::string &_value, const math::Vector3 &_dimensions);
+          const std::string &_value, const math::Vector3 &_dimensions,
+          const std::string &_uri = "");
 
       /// \brief Get an integer value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
@@ -414,14 +425,21 @@ namespace gazebo
       /// \brief Get a geometry value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[out] _dimensions Dimensions of geometry.
+      /// \param[out] _uri URI of the geometry mesh, if any.
       /// \return Type of geometry.
       private: std::string GetGeometryWidgetValue(ConfigChildWidget *_widget,
-          math::Vector3 &_dimensions) const;
+          math::Vector3 &_dimensions, std::string &_uri) const;
 
       /// \brief Received item selection user input.
       /// \param[in] _item Item selected.
       /// \param[in] _column Column index.
       private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
+
+      /// \brief Qt event filter currently used to filter mouse wheel events.
+      /// \param[in] _obj Object that is watched by the event filter.
+      /// \param[in] _event Qt event.
+      /// \return True if the event is handled.
+      private: bool eventFilter(QObject *_obj, QEvent *_event);
 
       /// \brief A map of unique scoped names to correpsonding widgets.
       private: std::map <std::string, ConfigChildWidget *> configWidgets;
