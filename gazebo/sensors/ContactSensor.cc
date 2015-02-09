@@ -92,16 +92,7 @@ void ContactSensor::Load(const std::string &_worldName)
 
   std::string entityName =
       this->world->GetEntity(this->parentName)->GetScopedName();
-  std::string filterName = this->GetScopedName();
-  {
-    // If we create the filter with this->GetScopedName(),
-    // it will have the world name twice, such as:
-    // /gazebo/default/default/sensor_box/link/box_contact/contacts
-    // so remove the world:: prefix
-    size_t i = filterName.find("::");
-    if (i+2 < filterName.length())
-      filterName = filterName.substr(i+2);
-  }
+  std::string filterName = entityName + "::" + this->GetName();
 
   // Get all the collision elements
   while (collisionElem)
@@ -215,13 +206,9 @@ void ContactSensor::Fini()
 {
   if (this->world && this->world->GetRunning())
   {
-    std::string filterName;
-    {
-      filterName = this->GetScopedName();
-      size_t i = filterName.find("::");
-      if (i+2 < filterName.length())
-        filterName = filterName.substr(i+2);
-    }
+    std::string entityName =
+        this->world->GetEntity(this->parentName)->GetScopedName();
+    std::string filterName = entityName + "::" + this->GetName();
 
     physics::ContactManager *mgr =
         this->world->GetPhysicsEngine()->GetContactManager();
