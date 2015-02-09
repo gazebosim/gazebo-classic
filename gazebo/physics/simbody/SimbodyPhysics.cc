@@ -407,27 +407,64 @@ void SimbodyPhysics::UpdateCollision()
   this->contactManager->ResetCount();
 
   // Get all contacts from Simbody
-  /// \TODO: get collision data from simbody contacts
-  Collision *collision1 = NULL;
-  Collision *collision2 = NULL;
-
   const SimTK::State &state = this->integ->getState();
   int numc = this->contact.getNumContactForces(state);
 
-  // add contacts to the manager. This will return NULL if no one is
-  // listening for contact information.
-  Contact *contactFeedback = this->contactManager->NewContact(collision1,
-      collision2, this->world->GetSimTime());
+  gzerr << "UpdateCollisions[" << numc << "]\n";
 
-  if (contactFeedback)
+  int count = 0;
+  for (int j = 0; j < numc; ++j)
   {
-    int count = 0;
-    for (int j = 0; j < numc; ++j)
-    {
-      // get contact stuff from Simbody
-      const SimTK::ContactForce& force = this->contact.getContactForce(state,j);
+    // get contact stuff from Simbody
+    const SimTK::ContactForce& force = this->contact.getContactForce(state,j);
 
-      const bool useContactPatch = false;
+    /// \TODO: below, get collision data from simbody contacts
+    Collision *collision1 = NULL;
+    Collision *collision2 = NULL;
+
+    /// \TODO: get SimTK::ContactGeometry* from ContactForce somehow
+    SimTK::ContactGeometry* cg1;
+    SimTK::ContactGeometry* cg2;
+
+    /// \TODO: proof of concept only
+    /// loop through all link->all collisions and find
+    physics::Model_V models = this->world->GetModels();
+    for (physics::Model_V::iterator mi = models.begin();
+         mi != models.end(); ++mi)
+    {
+      physics::Link_V links = (*mi)->GetLinks();
+      for (Link_V::iterator li = links.begin(); li != links.end(); ++li)
+      {
+        Collision_V collisions = (*li)->GetCollisions();
+        for (Collision_V::iterator ci = collisions.begin();
+             ci != collisions.end(); ++ci)
+        {
+          /// compare SimbodyCollision::GetCollisionShape() to
+          /// ContactGeometry from SimTK::ContactForce
+          SimbodyCollisionPtr sc =
+            boost::dynamic_pointer_cast<physics::SimbodyCollision>(*ci);
+          if (sc->GetCollisionShape() == cg1)
+          {
+            collision1 = (*ci).get();
+          }
+          else if (sc->GetCollisionShape() == cg2)
+          {
+            collision2 = (*ci).get();
+          }
+        }
+      }
+    }
+
+    // add contacts to the manager. This will return NULL if no one is
+    // listening for contact information.
+    Contact *contactFeedback = this->contactManager->NewContact(collision1,
+        collision2, this->world->GetSimTime());
+
+    if (contactFeedback)
+    {
+      gzerr << "constructed contactFeedback\n";
+
+      const bool useContactPatch = true;
       if (useContactPatch)
       {
         // get contact patch to get detailed contacts
@@ -435,6 +472,8 @@ void SimbodyPhysics::UpdateCollision()
         SimTK::ContactPatch patch;
         const bool found =
           this->contact.calcContactPatchDetailsById(state, id, patch);
+
+        gzerr << "found[" << found << "]\n";
 
         // loop through detials of patch
         if (found)
@@ -493,7 +532,6 @@ void SimbodyPhysics::UpdateCollision()
       }
     }
   }
-
 }
 
 //////////////////////////////////////////////////
