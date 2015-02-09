@@ -37,6 +37,8 @@ using namespace physics;
 ODELink::ODELink(EntityPtr _parent)
     : Link(_parent)
 {
+  this->force = 0;
+  this->torque = 0;
   this->linkId = NULL;
 }
 

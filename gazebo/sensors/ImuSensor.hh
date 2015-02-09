@@ -80,8 +80,15 @@ namespace gazebo
       // Documentation inherited.
       public: virtual bool IsActive();
 
+      /// \brief Callback when link data is received
+      /// \param[in] _msg Message containing link data
+      private: void OnLinkData(ConstLinkDataPtr &_msg);
+
       /// \brief Imu reference pose
       private: math::Pose referencePose;
+
+      /// \brief Save previous imu linear velocity for computing acceleration.
+      private: math::Vector3 lastLinearVel;
 
       /// \brief Imu linear acceleration
       private: math::Vector3 linearAcc;
@@ -91,6 +98,9 @@ namespace gazebo
 
       /// \brief Imu data publisher
       private: transport::PublisherPtr pub;
+
+      /// \brief Subscriber to link data published by parent entity
+      private: transport::SubscriberPtr linkDataSub;
 
       /// \brief Parent entity which the IMU is attached to
       private: physics::LinkPtr parentEntity;
@@ -103,6 +113,12 @@ namespace gazebo
 
       /// \brief Buffer for storing link data
       private: boost::shared_ptr<msgs::LinkData const> incomingLinkData[2];
+
+      /// \brief Index for accessing element in the link data array
+      private: unsigned int dataIndex;
+
+      /// \brief True if new link data is received
+      private: bool dataDirty;
 
       /// \brief Which noise type we support
       private: enum NoiseModelType

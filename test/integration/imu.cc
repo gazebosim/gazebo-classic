@@ -170,7 +170,6 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   for (unsigned n = 0; n < 1900; ++n)
   {
     world->Step(1);
-    // gzdbg << "time: " << world->GetSimTime().Double() << "\n";
 
     // pendulum
     // on startup
@@ -192,7 +191,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
       if (world->GetSimTime().Double() == 1.872)
       {
-        // initial values
+        // values at lowest point of pendulum swing
         EXPECT_NEAR(imuLinearAccel.x, 0, IMU_TOL);
         EXPECT_NEAR(imuLinearAccel.y, -0.041216, IMU_TOL);
         EXPECT_NEAR(imuLinearAccel.z, 29.42581726, IMU_TOL);
