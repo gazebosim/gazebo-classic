@@ -202,6 +202,9 @@ void ApplyWrenchVisual::SetForcePos(math::Vector3 _forcePosVector)
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
+  if (dPtr->forceVector == math::Vector3::Zero)
+    return;
+
   // move force
   dPtr->forceVisual->SetPosition(dPtr->forceVisual->GetPosition() -
       dPtr->forcePosVector + _forcePosVector);
@@ -211,6 +214,7 @@ void ApplyWrenchVisual::SetForcePos(math::Vector3 _forcePosVector)
       dPtr->forcePosVector + _forcePosVector);
 
   dPtr->forcePosVector = _forcePosVector;
+  this->SetWrenchMode("force");
 }
 
 ///////////////////////////////////////////////////

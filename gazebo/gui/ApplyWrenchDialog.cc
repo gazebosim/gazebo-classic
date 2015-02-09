@@ -857,7 +857,17 @@ void ApplyWrenchDialog::SetForce(math::Vector3 _force, bool _rotationByMouse)
   this->SetSpinValue(this->dataPtr->forceMagSpin, _force.GetLength());
 
   // Mode
-  this->SetWrenchMode("force");
+  if (_force == math::Vector3::Zero)
+  {
+    if (this->dataPtr->torqueVector == math::Vector3::Zero)
+      this->SetWrenchMode("none");
+    else
+      this->SetWrenchMode("torque");
+  }
+  else
+  {
+    this->SetWrenchMode("force");
+  }
 
   // Visuals
   if (!this->dataPtr->applyWrenchVisual)
@@ -920,7 +930,17 @@ void ApplyWrenchDialog::SetTorque(math::Vector3 _torque, bool _rotationByMouse)
   this->SetSpinValue(this->dataPtr->torqueMagSpin, _torque.GetLength());
 
   // Mode
-  this->SetWrenchMode("torque");
+  if (_torque == math::Vector3::Zero)
+  {
+    if (this->dataPtr->forceVector == math::Vector3::Zero)
+      this->SetWrenchMode("none");
+    else
+      this->SetWrenchMode("force");
+  }
+  else
+  {
+    this->SetWrenchMode("torque");
+  }
 
   // Visuals
   if (!this->dataPtr->applyWrenchVisual)
