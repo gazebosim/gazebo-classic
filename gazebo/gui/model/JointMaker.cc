@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 
 #include "gazebo/gui/model/JointInspector.hh"
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 
 using namespace gazebo;
@@ -161,6 +162,7 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
     delete joint->inspector;
     delete joint;
     this->joints.erase(_jointName);
+    gui::model::Events::modelChanged();
   }
 }
 
@@ -288,6 +290,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           this->AddJoint(JointMaker::JOINT_NONE);
 
           this->newJointCreated = true;
+          gui::model::Events::modelChanged();
         }
       }
     }
@@ -944,4 +947,5 @@ void JointData::OnApply()
     this->upperLimit[i] = this->inspector->GetUpperLimit(i);
   }
   this->dirty = true;
+  gui::model::Events::modelChanged();
 }

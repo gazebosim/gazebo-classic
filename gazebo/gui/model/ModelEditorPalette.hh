@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #define _MODEL_EDITOR_PALETTE_HH_
 
 #include <string>
+#include <vector>
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/Event.hh"
@@ -92,14 +93,20 @@ namespace gazebo
       /// \brief Qt callback when the model is allowed to auto disable at rest.
       private slots: void OnAutoDisable();
 
-      /// \brief Qt callback when the model is to be saved.
-      private slots: void OnSave();
+      /// \brief Qt callback when the Model Name field is changed.
+      /// \param[in] _name New name.
+      private slots: void OnNameChanged(const QString &_name);
 
-      /// \brief Qt callback when the model is to be discarded.
-      private slots: void OnDiscard();
+      /// \brief Callback when user has provided information on where to save
+      /// the model to.
+      /// \param[in] _saveName Name of model being saved.
+      private: void OnSaveModel(const std::string &_saveName);
 
-      /// \brief Qt callback when model editing is complete.
-      private slots: void OnDone();
+      /// \brief Event received when the user starts a new model.
+      private: void OnNewModel();
+
+      /// \brief A list of gui editor events connected to this palette.
+      private: std::vector<event::ConnectionPtr> connections;
 
       /// \brief Parts button group.
       private: QButtonGroup *partButtonGroup;
@@ -107,24 +114,18 @@ namespace gazebo
       /// \brief Model creator.
       private: ModelCreator *modelCreator;
 
-      /// \brief Save button.
-      private: QPushButton *saveButton;
-
-      /// \brief Indicate whether the model has been saved before or not.
-      private: bool saved;
-
-      /// \brief Path to where the model is saved.
-      private: std::string saveLocation;
-
-      /// \brief Name of model being edited.
-      private: std::string modelName;
-
       /// \brief Static checkbox, true to create a static model.
       private: QCheckBox *staticCheck;
 
       /// \brief Auto disable checkbox, true to allow model to auto-disable at
       /// rest.
       private: QCheckBox *autoDisableCheck;
+
+      /// \brief Default name of the model.
+      private: std::string modelDefaultName;
+
+      /// \brief Edit the name of the model.
+      private: QLineEdit *modelNameEdit;
     };
   }
 }

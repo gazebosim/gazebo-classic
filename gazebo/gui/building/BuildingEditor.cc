@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,15 +86,13 @@ BuildingEditor::~BuildingEditor()
 ////////////////////////////////////////////////
 void BuildingEditor::Save()
 {
-  gui::editor::Events::saveBuildingEditor(
-    this->buildingPalette->GetModelName());
+  gui::editor::Events::saveBuildingEditor();
 }
 
 ////////////////////////////////////////////////
 void BuildingEditor::SaveAs()
 {
-  gui::editor::Events::saveAsBuildingEditor(
-      this->buildingPalette->GetModelName());
+  gui::editor::Events::saveAsBuildingEditor();
 }
 
 /////////////////////////////////////////////////
@@ -145,7 +143,7 @@ void BuildingEditor::OnEdit(bool _checked)
   }
   else
   {
-    this->buildingPalette->customColorDialog->reject();
+    this->buildingPalette->CustomColorDialog()->reject();
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->GetRenderWidget()->ShowEditor(false);
     this->mainWindow->ShowMenuBar();
