@@ -14,7 +14,8 @@
  * limitations under the License.
  *
 */
-#include <gazebo/gui/GuiIface.hh>
+#include <sstream>
+#include <gazebo/msgs/msgs.hh>
 #include "GUIExampleSpawnWidget.hh"
 
 using namespace gazebo;
@@ -22,44 +23,90 @@ using namespace gazebo;
 // Register this plugin with the simulator
 GZ_REGISTER_GUI_PLUGIN(GUIExampleSpawnWidget)
 
-GUIExampleSpawnWidget::GUIExampleSpawnWidget() : GUIPlugin()
+/////////////////////////////////////////////////
+GUIExampleSpawnWidget::GUIExampleSpawnWidget()
+  : GUIPlugin()
 {
-  // Create the main layout                                                          
-  QHBoxLayout *mainLayout = new QHBoxLayout;                                         
-  
-  // Create the frame to hold all the widgets                                        
-  QFrame *mainFrame = new QFrame();                                                  
-                                                                                     
-  // Create the layout that sits inside the frame                                    
-  QHBoxLayout *frameLayout = new QHBoxLayout();                                      
-                                                                                     
-  QLabel *label = new QLabel(tr("I am a test widget"));                              
-    
-  // Add the label to the frame's layout                                             
-  frameLayout->addWidget(label);                                                     
-    
-  // Add frameLayout to the frame                                                    
-  mainFrame->setLayout(frameLayout);                                                 
-                                                                                     
-  // Add the frame to the main layout                                                
+  this->counter = 0;
+
+  // Set the frame background and foreground colors
+  this->setStyleSheet(
+      "QFrame { background-color : rgba(100, 100, 100, 255); color : white; }");
+
+  // Create the main layout
+  QHBoxLayout *mainLayout = new QHBoxLayout;
+
+  // Create the frame to hold all the widgets
+  QFrame *mainFrame = new QFrame();
+
+  // Create the layout that sits inside the frame
+  QVBoxLayout *frameLayout = new QVBoxLayout();
+
+  // Create a push button, and connect it to the OnButton function
+  QPushButton *button = new QPushButton(tr("Spawn Sphere"));
+  connect(button, SIGNAL(clicked()), this, SLOT(OnButton()));
+
+  // Add the button to the frame's layout
+  frameLayout->addWidget(button);
+
+  // Add frameLayout to the frame
+  mainFrame->setLayout(frameLayout);
+
+  // Add the frame to the main layout
   mainLayout->addWidget(mainFrame);
 
   // Remove margins to reduce space
-  frameLayout->setContentsMargins(4, 4, 4, 4);
+  frameLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(mainLayout);
 
   // Position and resize this widget
-  this->move(200, 10);
-  this->resize(200, 30);
+  this->move(10, 10);
+  this->resize(120, 30);
 
-  gzdbg << "World: " << gazebo::gui::get_world() << std::endl;
-  gazebo::gui::get_active_camera();
+  // Create a node for transportation
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
 }
 
-void GUIExampleSpawnWidget::Load(sdf::ElementPtr /*_sdf*/)
+/////////////////////////////////////////////////
+GUIExampleSpawnWidget::~GUIExampleSpawnWidget()
 {
-  gzdbg << "World: " << gazebo::gui::get_world() << std::endl;
-  gazebo::gui::get_active_camera();
+}
+
+/////////////////////////////////////////////////
+void GUIExampleSpawnWidget::OnButton()
+{
+  std::ostringstream newModelStr;
+  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
+    << "<model name='plugin_unit_sphere_" << this->counter++ << "'>"
+    << "  <pose>0 0 1.5 0 0 0</pose>"
+    << "  <link name='link'>"
+    << "    <inertial><mass>1.0</mass></inertial>"
+    << "    <collision name='collision'>"
+    << "      <geometry>"
+    << "        <sphere><radius>0.5</radius></sphere>"
+    << "      </geometry>"
+    << "    </collision>"
+    << "    <visual name ='visual'>"
+    << "      <geometry>"
+    << "        <sphere><radius>0.5</radius></sphere>"
+    << "      </geometry>"
+    << "      <material>"
+    << "        <script>"
+    << "          <uri>file://media/materials/scripts/gazebo.material</uri>"
+    << "          <name>Gazebo/Grey</name>"
+    << "        </script>"
+    << "      </material>"
+    << "    </visual>"
+    << "  </link>"
+    << "  </model>"
+    << "</sdf>";
+
+  // Send the model to the gazebo server
+  msgs::Factory msg;
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
 }

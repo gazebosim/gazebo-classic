@@ -26,19 +26,28 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE GUIExampleSpawnWidget : public GUIPlugin
-  {
-    Q_OBJECT
+    class GAZEBO_VISIBLE GUIExampleSpawnWidget : public GUIPlugin
+    {
+      Q_OBJECT
 
-    /// \brief Constructor
-    public: GUIExampleSpawnWidget();
+      /// \brief Constructor
+      /// \param[in] _parent Parent widget
+      public: GUIExampleSpawnWidget();
 
-    /// \brief Destructor
-    public: virtual ~GUIExampleSpawnWidget() {}
+      /// \brief Destructor
+      public: virtual ~GUIExampleSpawnWidget();
 
-    /// Documentation inherited
-    public: void Load(sdf::ElementPtr /*_sdf*/);
-  };
+      /// \brief Callback trigged when the button is pressed.
+      protected slots: void OnButton();
+
+      /// \brief Counter used to create unique model names
+      private: unsigned int counter;
+
+      /// \brief Node used to establish communication with gzserver.
+      private: transport::NodePtr node;
+
+      /// \brief Publisher of factory messages.
+      private: transport::PublisherPtr factoryPub;
+    };
 }
-
 #endif
