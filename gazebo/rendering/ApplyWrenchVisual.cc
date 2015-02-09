@@ -41,7 +41,7 @@ ApplyWrenchVisual::~ApplyWrenchVisual()
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::Load(math::Vector3 /*_comVector*/)
+void ApplyWrenchVisual::Load()
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
@@ -62,7 +62,6 @@ void ApplyWrenchVisual::Load(math::Vector3 /*_comVector*/)
   comLines->AddPoint(math::Vector3(0,  2*linkSize.y, 0));
   comLines->AddPoint(math::Vector3(-2*linkSize.x, 0, 0));
   comLines->AddPoint(math::Vector3(2*linkSize.x,  0, 0));
-//  dPtr->comVisual->SetPosition(_comVector);
 
   // Force visual
   dPtr->forceVisual.reset(new rendering::ArrowVisual(
@@ -183,6 +182,18 @@ void ApplyWrenchVisual::SetWrenchMode(std::string _mode)
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, false);
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, false);
   }
+}
+
+///////////////////////////////////////////////////
+void ApplyWrenchVisual::SetCoM(math::Vector3 _comVector)
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  // move com visual
+  dPtr->comVisual->SetPosition(_comVector);
+
+  dPtr->comVector = _comVector;
 }
 
 ///////////////////////////////////////////////////

@@ -42,6 +42,9 @@ namespace gazebo
       public: VisualPtr torqueVisual;
 
       /// TODO
+      public: math::Vector3 comVector;
+
+      /// TODO
       public: math::Vector3 forcePosVector;
 
       /// TODO

@@ -148,6 +148,9 @@ namespace gazebo
       public: void SetWrenchMode(std::string _mode);
 
       /// \brief TODO
+      private: void SetCoM(math::Vector3 _com);
+
+      /// \brief TODO
       private: void SetForcePos(math::Vector3 _force);
 
       /// \brief TODO
@@ -176,6 +179,9 @@ namespace gazebo
 
       /// \brief TODO
       private: void NewTorqueDirection(math::Vector3 _dir);
+
+      /// \brief TODO
+      private: void OnResponse(ConstResponsePtr &_msg);
 
       /// \internal
       /// \brief Pointer to private data.

@@ -81,6 +81,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->forcePosXSpin->setSingleStep(0.1);
   this->dataPtr->forcePosXSpin->setDecimals(3);
   this->dataPtr->forcePosXSpin->setValue(0);
+  this->dataPtr->forcePosXSpin->installEventFilter(this);
   connect(this->dataPtr->forcePosXSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForcePosXChanged(double)));
 
@@ -95,6 +96,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->forcePosYSpin->setSingleStep(0.1);
   this->dataPtr->forcePosYSpin->setDecimals(3);
   this->dataPtr->forcePosYSpin->setValue(0);
+  this->dataPtr->forcePosYSpin->installEventFilter(this);
   connect(this->dataPtr->forcePosYSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForcePosYChanged(double)));
 
@@ -109,6 +111,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->forcePosZSpin->setSingleStep(0.1);
   this->dataPtr->forcePosZSpin->setDecimals(3);
   this->dataPtr->forcePosZSpin->setValue(0);
+  this->dataPtr->forcePosZSpin->installEventFilter(this);
   connect(this->dataPtr->forcePosZSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForcePosZChanged(double)));
 
@@ -175,6 +178,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->forceXSpin->setSingleStep(0.1);
   this->dataPtr->forceXSpin->setDecimals(3);
   this->dataPtr->forceXSpin->setValue(1);
+  this->dataPtr->forceXSpin->installEventFilter(this);
   connect(this->dataPtr->forceXSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForceXChanged(double)));
 
@@ -189,6 +193,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->forceYSpin->setSingleStep(0.1);
   this->dataPtr->forceYSpin->setDecimals(3);
   this->dataPtr->forceYSpin->setValue(0);
+  this->dataPtr->forceYSpin->installEventFilter(this);
   connect(this->dataPtr->forceYSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForceYChanged(double)));
 
@@ -203,6 +208,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->forceZSpin->setSingleStep(0.1);
   this->dataPtr->forceZSpin->setDecimals(3);
   this->dataPtr->forceZSpin->setValue(0);
+  this->dataPtr->forceZSpin->installEventFilter(this);
   connect(this->dataPtr->forceZSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForceZChanged(double)));
 
@@ -259,6 +265,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->torqueMagSpin->setSingleStep(0.1);
   this->dataPtr->torqueMagSpin->setDecimals(3);
   this->dataPtr->torqueMagSpin->setValue(0);
+  this->dataPtr->torqueMagSpin->installEventFilter(this);
   connect(this->dataPtr->torqueMagSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnTorqueMagChanged(double)));
 
@@ -273,6 +280,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->torqueXSpin->setSingleStep(0.1);
   this->dataPtr->torqueXSpin->setDecimals(3);
   this->dataPtr->torqueXSpin->setValue(0);
+  this->dataPtr->torqueXSpin->installEventFilter(this);
   connect(this->dataPtr->torqueXSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnTorqueXChanged(double)));
 
@@ -287,6 +295,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->torqueYSpin->setSingleStep(0.1);
   this->dataPtr->torqueYSpin->setDecimals(3);
   this->dataPtr->torqueYSpin->setValue(0);
+  this->dataPtr->torqueYSpin->installEventFilter(this);
   connect(this->dataPtr->torqueYSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnTorqueYChanged(double)));
 
@@ -301,6 +310,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->torqueZSpin->setSingleStep(0.1);
   this->dataPtr->torqueZSpin->setDecimals(3);
   this->dataPtr->torqueZSpin->setValue(0);
+  this->dataPtr->torqueZSpin->installEventFilter(this);
   connect(this->dataPtr->torqueZSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnTorqueZChanged(double)));
 
@@ -351,6 +361,10 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
 
+  this->dataPtr->requestMsg = NULL;
+  this->dataPtr->requestPub.reset();
+  this->dataPtr->responseSub.reset();
+
   this->dataPtr->mode = "force";
   this->dataPtr->comVector = math::Vector3::Zero;
   this->dataPtr->forceVector = 1000 * math::Vector3::UnitX;
@@ -379,19 +393,59 @@ ApplyWrenchDialog::~ApplyWrenchDialog()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::SetLink(std::string _linkName)
 {
-  std::string msg = "Apply Force and Torque\n\nApply to " + _linkName + "\n";
-  this->dataPtr->messageLabel->setText(msg.c_str());
+  // Request link message to get CoM
+  this->dataPtr->requestPub = this->dataPtr->node->Advertise<msgs::Request>(
+      "~/request");
+  this->dataPtr->responseSub = this->dataPtr->node->Subscribe(
+      "~/response", &ApplyWrenchDialog::OnResponse, this);
+
+  this->dataPtr->requestMsg = msgs::CreateRequest("entity_info", _linkName);
+  this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+
+  // Visual
   this->dataPtr->linkName = _linkName;
-  this->SetPublisher();
-
-  // TODO: somehow get com
-  // this->dataPtr->comVector = ??
-
   rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
-        GetVisual(this->dataPtr->linkName);
+      GetVisual(this->dataPtr->linkName);
 
   this->dataPtr->linkVisual = vis;
   this->AttachVisuals();
+}
+
+///////////////////////////////////////////////////
+void ApplyWrenchDialog::OnResponse(ConstResponsePtr &_msg)
+{
+  if (!this->dataPtr->requestMsg ||
+      _msg->id() != this->dataPtr->requestMsg->id())
+    return;
+
+  if (_msg->has_type() && _msg->type() == "gazebo.msgs.Link")
+  {
+    this->dataPtr->linkMsg.ParseFromString(_msg->serialized_data());
+
+    // Name
+    if (!this->dataPtr->linkMsg.has_name())
+      return;
+
+    std::string linkName = this->dataPtr->linkMsg.name();
+
+    std::string msg = "Apply Force and Torque\n\nApply to " + linkName + "\n";
+    this->dataPtr->messageLabel->setText(msg.c_str());
+
+    this->dataPtr->linkName = linkName;
+    this->SetPublisher();
+
+    // CoM
+    if (this->dataPtr->linkMsg.has_inertial() &&
+        this->dataPtr->linkMsg.inertial().has_pose())
+    {
+      this->SetCoM(msgs::Convert(
+          this->dataPtr->linkMsg.inertial().pose()).pos);
+      // Apply force at com by default
+      this->SetForcePos(this->dataPtr->comVector);
+    }
+  }
+  delete this->dataPtr->requestMsg;
+  this->dataPtr->requestMsg = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -502,7 +556,7 @@ void ApplyWrenchDialog::AttachVisuals()
     this->dataPtr->applyWrenchVisual.reset(new rendering::ApplyWrenchVisual(
         this->dataPtr->linkName + "__APPLY_WRENCH__", this->dataPtr->linkVisual));
 
-    this->dataPtr->applyWrenchVisual->Load(this->dataPtr->comVector);
+    this->dataPtr->applyWrenchVisual->Load();
   }
   else
   {
@@ -709,7 +763,10 @@ bool ApplyWrenchDialog::eventFilter(QObject *_object, QEvent *_event)
     if (_object == this->dataPtr->forceMagSpin ||
         _object == this->dataPtr->forceXSpin ||
         _object == this->dataPtr->forceYSpin ||
-        _object == this->dataPtr->forceZSpin)
+        _object == this->dataPtr->forceZSpin ||
+        _object == this->dataPtr->forcePosXSpin ||
+        _object == this->dataPtr->forcePosYSpin ||
+        _object == this->dataPtr->forcePosZSpin)
     {
       this->SetForce(this->dataPtr->forceVector);
     }
@@ -718,7 +775,7 @@ bool ApplyWrenchDialog::eventFilter(QObject *_object, QEvent *_event)
              _object == this->dataPtr->torqueYSpin ||
              _object == this->dataPtr->torqueZSpin)
     {
-      this->SetForce(this->dataPtr->torqueVector);
+      this->SetTorque(this->dataPtr->torqueVector);
     }
   }
   return false;
@@ -738,6 +795,19 @@ void ApplyWrenchDialog::SetWrenchMode(std::string _mode)
   // Update variable
   this->dataPtr->mode = _mode;
   // Not needed to set at visual
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::SetCoM(math::Vector3 _com)
+{
+  // Set com vector and send it to visuals
+  this->dataPtr->comVector = _com;
+
+  // Visuals
+  if (!this->dataPtr->applyWrenchVisual)
+    return;
+
+  this->dataPtr->applyWrenchVisual->SetCoM(this->dataPtr->comVector);
 }
 
 /////////////////////////////////////////////////

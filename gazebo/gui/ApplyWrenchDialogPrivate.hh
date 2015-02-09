@@ -116,6 +116,18 @@ namespace gazebo
 
       /// TODO
       public: std::string mode;
+
+      /// TODO
+      public: msgs::Request *requestMsg;
+
+      /// TODO
+      public: transport::PublisherPtr requestPub;
+
+      /// TODO
+      public: transport::SubscriberPtr responseSub;
+
+      /// TODO
+      public: msgs::Link linkMsg;
     };
   }
 }

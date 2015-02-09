@@ -40,7 +40,7 @@ namespace gazebo
       public: virtual ~ApplyWrenchVisual();
 
       /// \brief TODO
-      public: void Load(math::Vector3 _comVector);
+      public: void Load();
 
       /// \brief TODO
       public: rendering::VisualPtr GetForceVisual() const;
@@ -56,6 +56,9 @@ namespace gazebo
 
       /// \brief TODO
       public: void SetWrenchMode(std::string _mode);
+
+      /// \brief TODO
+      public: void SetCoM(math::Vector3 _comVector);
 
       /// \brief TODO
       public: void SetForcePos(math::Vector3 _forcePosVector);
