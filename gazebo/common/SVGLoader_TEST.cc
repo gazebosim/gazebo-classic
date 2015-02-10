@@ -46,9 +46,9 @@ TEST_F(SVGLoader, LoadPaths)
     out.close();
   }
 
+  EXPECT_EQ( 3, paths.size());
 /*
   EXPECT_STREQ("unknown", mesh->GetName().c_str());
-  EXPECT_EQ(math::Vector3(1, 1, 1), mesh->GetMax());
   EXPECT_EQ(math::Vector3(-1, -1, -1), mesh->GetMin());
   // 36 vertices, 24 unique, 12 shared.
   EXPECT_EQ(24u, mesh->GetVertexCount());
