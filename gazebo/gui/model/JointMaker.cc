@@ -528,8 +528,21 @@ void JointMaker::OpenInspector(const std::string &_name)
   JointData *joint = this->joints[_name];
   joint->inspector->SetType(joint->type);
   joint->inspector->SetName(joint->name);
-  joint->inspector->SetParent(joint->parent->GetName());
-  joint->inspector->SetChild(joint->child->GetName());
+
+  std::string parentName = joint->parent->GetName();
+  std::string parentLeafName = parentName;
+  size_t pIdx = parentName.find_last_of("::");
+  if (pIdx != std::string::npos)
+    parentLeafName = parentName.substr(pIdx+1);
+  joint->inspector->SetParent(parentLeafName);
+
+  std::string childName = joint->child->GetName();
+  std::string childLeafName = childName;
+  size_t cIdx = childName.find_last_of("::");
+  if (cIdx != std::string::npos)
+    childLeafName = childName.substr(cIdx+1);
+  joint->inspector->SetChild(childLeafName);
+
   joint->inspector->SetPose(joint->pose);
   int axisCount = JointMaker::GetJointAxisCount(joint->type);
   for (int i = 0; i < axisCount; ++i)
