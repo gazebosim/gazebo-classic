@@ -35,10 +35,13 @@ TEST_F(SVGLoader, LoadPaths)
   common::SVGLoader loader(samples);
   std::vector<common::SVGPath> paths;
   std::string filePath = std::string(PROJECT_SOURCE_PATH);
-  filePath += "/test/data/paths.svg";
+  filePath += "/test/data/loader.svg";
   loader.Parse(filePath, paths);
   
-  loader.DumpPaths(paths, std::cout);
+  // useful to see the points
+  // on screen:  loader.DumpPaths(paths, std::cout);
+  
+  // or in a file
   if (!foutput.empty())
   {
     std::ofstream out(foutput.c_str() );
@@ -46,22 +49,30 @@ TEST_F(SVGLoader, LoadPaths)
     out.close();
   }
 
+  // the test file has 3 paths inside
   EXPECT_EQ( 3, paths.size());
-/*
-  EXPECT_STREQ("unknown", mesh->GetName().c_str());
-  EXPECT_EQ(math::Vector3(-1, -1, -1), mesh->GetMin());
-  // 36 vertices, 24 unique, 12 shared.
-  EXPECT_EQ(24u, mesh->GetVertexCount());
-  EXPECT_EQ(24u, mesh->GetNormalCount());
-  EXPECT_EQ(36u, mesh->GetIndexCount());
-  EXPECT_EQ(0u, mesh->GetTexCoordCount());
-  EXPECT_EQ(1u, mesh->GetSubMeshCount());
-  EXPECT_EQ(1u, mesh->GetMaterialCount());
+  common::SVGPath &a = paths[0]; 
+  EXPECT_EQ( "letterA", a.id);
 
-  // Make sure we can read a submesh name
-  EXPECT_STREQ("Cube", mesh->GetSubMesh(0)->GetName().c_str());
-*/
+  // the letter A has 2 subpaths:
+  EXPECT_EQ( 2, a.subpaths.size());
 
+  // The hole of A
+  // 4 commands
+  EXPECT_EQ( 4, a.subpaths[0].size());
+  // 4 points
+  EXPECT_EQ( 4, a.polylines[0].size());  
+  // THe A contour has 9
+  EXPECT_EQ( 9, a.polylines[1].size());
+
+  // the second path
+  common::SVGPath &p2 = paths[1];
+  EXPECT_EQ( 1, p2.subpaths.size());
+  // 8 commands
+  EXPECT_EQ( 8, p2.subpaths[0].size());
+  // since it has splines, there are more
+  // points than commands
+  EXPECT_EQ( 61, p2.polylines[0].size());
 }
 
 /////////////////////////////////////////////////

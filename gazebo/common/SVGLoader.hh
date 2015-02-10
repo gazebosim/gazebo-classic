@@ -31,56 +31,119 @@ namespace gazebo
 {
   namespace common
   {
+    /// \brief Handles errors during SVG parsing
     class GAZEBO_VISIBLE SvgError: public std::runtime_error
     {
-      public: SvgError(const std::string& what_arg)
-        : std::runtime_error(what_arg)
-      {}
+      /// \brief constructor
+      /// \param[in] _what The error description
+      public: SvgError(const std::string& _what);
     };
 
+    /// \brief An SVG command
     struct GAZEBO_VISIBLE SVGCommand
     {
+      /// \brief A letter that describe the segment
       char type;
+
+      /// \brief Coordinates for the command
       std::vector<double> numbers;
     };
 
+    /// \brief An SVG path element
     struct GAZEBO_VISIBLE SVGPath
     {
+      /// \brief An id or name
       std::string id;
+
+      /// \brief The style (i.e. stroke style, color, thickness etc)
       std::string style;
+
+      /// \brief A 2D transform (or a list of transforms)
       std::string transform;
+
+      /// \brief A list of subpaths (as lists of commands) 
       std::vector< std::vector<SVGCommand> > subpaths;
+
+      /// \brief The polylines described by the commands
       std::vector< std::vector<math::Vector2d> > polylines;
     };
 
+    /// \brief A loader for SVG files
     class GAZEBO_VISIBLE SVGLoader
     {
+      /// \brief Constructor
+      /// \param[in] _samples The number of points for cubic spline segments
       public: SVGLoader(unsigned int _samples);
+
+      /// \brief Reads an SVG file and loads all the paths
+      /// \param[in] _filename The SVG file
+      /// \param[out] _paths Vector that receives path data 
       public: void Parse(const std::string &_filename,
                          std::vector<SVGPath> &_paths);
-      public: void DumpPaths(const std::vector<SVGPath> &_paths,
-                             std::ostream &out) const;
 
+      /// \brief Outputs the content of the paths to file (or console)
+      /// \param[in] _paths The paths
+      /// \param[in] _out The output stream (can be a file or std::cout)
+      public: void DumpPaths(const std::vector<SVGPath> &_paths,
+                             std::ostream &_out) const;
+
+      /// \brief Creates a vector of commands from a list of numbers
+      /// \param[in] _cmd The type of SVG command
+      /// \param[in] _numbers The list of coordinates
+      /// \param[out] _cmds The vector that receives the commands
       private: void MakeCommands(char _cmd,
                                  const std::vector<double> &_numbers,
                                  std::vector<SVGCommand> &_cmds);
+
+      /// \brief Parses a list of strings into a path
+      /// \param[in] _tokens The tokenized path attribute from SVG file
+      /// \param[out] _path The path that receives the data
       private: void GetPathCommands(const std::vector<std::string> &_tokens,
                                     SVGPath &_path);
+
+      /// \brief Gets data from an XML path element
+      /// \param[in] _pElement The path Element
+      /// \param[out] _path The path that receives the data.
       private: void GetPathAttribs(TiXmlElement* _pElement, SVGPath &_path);
+
+      /// \brief Reads the paths from the root XML element
+      /// \param[in] _pParent The parent XML node of the SVG file
+      /// \param[out] _paths The vector of paths that receives the data
       private: void GetSvgPaths(TiXmlNode* _pParent,
                                   std::vector<SVGPath> &_paths);
+
+      /// \brief Generates new commands for every repeat commands in SVG subpaths
+      /// \param[in] _subpaths The subpaths (with repeats)
+      /// \param[out] _path The path that receives the data.
       private: void ExpandCommands(
                       const std::vector< std::vector<SVGCommand> >&_subpaths,
                       SVGPath &_path);
+
+      /// \brief Splits a list of commands into subpaths
+      /// \param[in] _cmds The flat list of commands for all the subpaths
+      /// \param[out] _subpaths The vector of subpathts that receives the data
       private: void SplitSubpaths(const std::vector<SVGCommand> &_cmds,
-                      std::vector< std::vector<SVGCommand> > &_split_cmds);
+                      std::vector< std::vector<SVGCommand> > &_subpaths);
+
+      /// \brief Generates a list of polylines from a path
+      /// \param[in] _path The path
+      /// \param[in] _resolution The step size (between 0 and 1)
+      /// \param[out] _polys The vector that receives the polylines
       private: void PathToPoints(const SVGPath &_path,
                       double _resolution,
                       std::vector< std::vector<math::Vector2d> > &_polys);
+
+      /// \brief Generates polylines for each SVG subpath
+      /// \param[in] _subpath The subpath commands
+      /// \param[in] _last The previous position (for relative path commands)
+      /// \param[out] _polyline The polyline that receives the data
       private: math::Vector2d SubpathToPolyline(
                       const std::vector<SVGCommand> &_subpath,
                       math::Vector2d _last,
                       std::vector<math::Vector2d> &_polyline);
+
+      /// \brief The step distance between 2 sampled points in a bezier curve
+      /// It is the inverse of the number of samples
       private: double resolution;
     };
   }

@@ -86,8 +86,15 @@ void CubicBezier(const math::Vector2d &_p0,
     _points.push_back(p);
     t += _step;
   }
-  auto p = bezierInterpolate(1.0, _p0, _p1, _p2, _p3);
-  _points.push_back(p);
+  // auto p = bezierInterpolate(1.0, _p0, _p1, _p2, _p3);
+  // _points.push_back(p);
+}
+
+
+/////////////////////////////////////////////////
+SvgError::SvgError(const std::string& _what)
+  :std::runtime_error(_what)
+{
 }
 
 /////////////////////////////////////////////////
