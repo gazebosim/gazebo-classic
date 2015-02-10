@@ -398,7 +398,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from msgs::Joint.
     /// \param[in] _msg The msgs::Joint object.
-    /// \param[in] _sdf if supplied, performs an update from _sdf intead of
+    /// \param[in] _sdf if supplied, performs an update from _sdf instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
