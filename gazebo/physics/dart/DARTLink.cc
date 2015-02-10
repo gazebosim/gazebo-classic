@@ -23,10 +23,12 @@
 #include "gazebo/physics/WorldPrivate.hh"
 
 #include "gazebo/physics/dart/dart_inc.h"
+#include "gazebo/physics/dart/DARTCollision.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
 #include "gazebo/physics/dart/DARTModel.hh"
 #include "gazebo/physics/dart/DARTLink.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
+#include "gazebo/physics/dart/DARTSurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -208,6 +210,46 @@ void DARTLink::Init()
 
   // Gravity mode
   this->SetGravityMode(this->sdf->Get<bool>("gravity"));
+
+  // Friction coefficient
+
+  /// \todo FIXME: Friction Parameters
+  /// Gazebo allows to have different friction parameters per collision objects,
+  /// while DART stores the friction parameter per link (BodyNode in DART). For
+  /// now, the average friction parameter of all the child collision objects is
+  /// stored in this->dtBodyNode.
+  /// Final friction coefficient is applied in DART's constraint solver by
+  /// taking the lower of the 2 colliding rigidLink's.
+  /// See also:
+  /// - https://github.com/dartsim/dart/issues/141
+  /// - https://github.com/dartsim/dart/issues/266
+
+  double hackAvgMu1 = 0;
+  double hackAvgMu2 = 0;
+  int numCollisions = 0;
+
+  for (auto const &child : this->children)
+  {
+    if (child->HasType(Base::COLLISION))
+    {
+      CollisionPtr collision =
+          boost::static_pointer_cast<Collision>(child);
+
+      SurfaceParamsPtr surface = collision->GetSurface();
+      GZ_ASSERT(surface, "Surface pointer for is invalid");
+      FrictionPyramidPtr friction = surface->GetFrictionPyramid();
+      GZ_ASSERT(friction, "Friction pointer for is invalid");
+
+      numCollisions++;
+      hackAvgMu1 += friction->GetMuPrimary();
+      hackAvgMu2 += friction->GetMuSecondary();
+    }
+  }
+
+  hackAvgMu1 /= static_cast<double>(numCollisions);
+  hackAvgMu2 /= static_cast<double>(numCollisions);
+
+  this->dtBodyNode->setFrictionCoeff(0.5 * (hackAvgMu1 + hackAvgMu2));
 
   // We don't add dart body node to the skeleton here because dart body node
   // should be set its parent joint before being added. This body node will be

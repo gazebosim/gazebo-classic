@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,26 @@
 */
 
 #include <float.h>
-#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/physics/bullet/BulletSurfaceParams.hh"
+#include "gazebo/physics/dart/DARTSurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletSurfaceParams::BulletSurfaceParams()
+DARTSurfaceParams::DARTSurfaceParams()
   : SurfaceParams()
   , frictionPyramid(new FrictionPyramid())
 {
 }
 
 //////////////////////////////////////////////////
-BulletSurfaceParams::~BulletSurfaceParams()
+DARTSurfaceParams::~DARTSurfaceParams()
 {
 }
 
 //////////////////////////////////////////////////
-void BulletSurfaceParams::Load(sdf::ElementPtr _sdf)
+void DARTSurfaceParams::Load(sdf::ElementPtr _sdf)
 {
   // Load parent class
   SurfaceParams::Load(_sdf);
@@ -68,7 +67,7 @@ void BulletSurfaceParams::Load(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void BulletSurfaceParams::FillMsg(msgs::Surface &_msg)
+void DARTSurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
@@ -77,7 +76,7 @@ void BulletSurfaceParams::FillMsg(msgs::Surface &_msg)
 }
 
 /////////////////////////////////////////////////
-void BulletSurfaceParams::ProcessMsg(const msgs::Surface &_msg)
+void DARTSurfaceParams::ProcessMsg(const msgs::Surface &_msg)
 {
   SurfaceParams::ProcessMsg(_msg);
 
@@ -91,7 +90,7 @@ void BulletSurfaceParams::ProcessMsg(const msgs::Surface &_msg)
 }
 
 /////////////////////////////////////////////////
-FrictionPyramidPtr BulletSurfaceParams::GetFrictionPyramid() const
+FrictionPyramidPtr DARTSurfaceParams::GetFrictionPyramid() const
 {
   return this->frictionPyramid;
 }

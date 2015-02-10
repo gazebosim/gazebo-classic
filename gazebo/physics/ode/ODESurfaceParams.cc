@@ -16,6 +16,7 @@
 */
 
 #include <float.h>
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 
@@ -28,7 +29,8 @@ ODESurfaceParams::ODESurfaceParams()
     bounce(0), bounceThreshold(100000),
     kp(1000000000000), kd(1), cfm(0), erp(0.2),
     maxVel(0.01), minDepth(0),
-    slip1(0), slip2(0)
+    slip1(0), slip2(0),
+    frictionPyramid(new FrictionPyramid())
 {
 }
 
@@ -123,12 +125,12 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
-  _msg.mutable_friction()->set_mu(this->frictionPyramid.GetMuPrimary());
-  _msg.mutable_friction()->set_mu2(this->frictionPyramid.GetMuSecondary());
+  _msg.mutable_friction()->set_mu(this->frictionPyramid->GetMuPrimary());
+  _msg.mutable_friction()->set_mu2(this->frictionPyramid->GetMuSecondary());
   _msg.mutable_friction()->set_slip1(this->slip1);
   _msg.mutable_friction()->set_slip2(this->slip2);
   msgs::Set(_msg.mutable_friction()->mutable_fdir1(),
-            this->frictionPyramid.direction1);
+            this->frictionPyramid->direction1);
 
   _msg.set_restitution_coefficient(this->bounce);
   _msg.set_bounce_threshold(this->bounceThreshold);
@@ -149,15 +151,15 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
   if (_msg.has_friction())
   {
     if (_msg.friction().has_mu())
-      this->frictionPyramid.SetMuPrimary(_msg.friction().mu());
+      this->frictionPyramid->SetMuPrimary(_msg.friction().mu());
     if (_msg.friction().has_mu2())
-      this->frictionPyramid.SetMuSecondary(_msg.friction().mu2());
+      this->frictionPyramid->SetMuSecondary(_msg.friction().mu2());
     if (_msg.friction().has_slip1())
       this->slip1 = _msg.friction().slip1();
     if (_msg.friction().has_slip2())
       this->slip2 = _msg.friction().slip2();
     if (_msg.friction().has_fdir1())
-      this->frictionPyramid.direction1 =
+      this->frictionPyramid->direction1 =
         msgs::Convert(_msg.friction().fdir1());
   }
 
@@ -177,4 +179,10 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
     this->maxVel = _msg.max_vel();
   if (_msg.has_min_depth())
     this->minDepth = _msg.min_depth();
+}
+
+/////////////////////////////////////////////////
+FrictionPyramidPtr ODESurfaceParams::GetFrictionPyramid() const
+{
+  return this->frictionPyramid;
 }

@@ -37,6 +37,7 @@ namespace gazebo
     class DARTJoint;
     class DARTCollision;
     class DARTRayShape;
+    class DARTSurfaceParams;
 
     typedef boost::shared_ptr<DARTPhysics>   DARTPhysicsPtr;
     typedef boost::shared_ptr<DARTModel>     DARTModelPtr;
@@ -44,6 +45,7 @@ namespace gazebo
     typedef boost::shared_ptr<DARTJoint>     DARTJointPtr;
     typedef boost::shared_ptr<DARTCollision> DARTCollisionPtr;
     typedef boost::shared_ptr<DARTRayShape>  DARTRayShapePtr;
+    typedef boost::shared_ptr<DARTSurfaceParams> DARTSurfaceParamsPtr;
 
     /// \addtogroup gazebo_physics_dart
     /// \{

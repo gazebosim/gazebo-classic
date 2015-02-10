@@ -1,3 +1,11 @@
+## Gazebo 5.X to 6.X
+
+### Modifications
+
+1. **gazebo/physics/SurfaceParams.hh**
+    + ***Removed:*** public: FrictionPyramid frictionPyramid
+    + ***Replacement:*** public: FrictionPyramidPtr GetFrictionPyramid() const
+
 ## Gazebo 4.X to 5.X
 
 ### C++11 compiler required
