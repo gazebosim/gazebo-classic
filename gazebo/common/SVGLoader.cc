@@ -15,9 +15,9 @@
  *
  */
 
-#include "SVGLoader.hh"
-#include <tinyxml.h>
 #include <algorithm>
+#include <tinyxml.h>
+#include "SVGLoader.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -38,40 +38,38 @@ std::string lowercase(const char* _in)
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string> &split(const std::string &_s, 
+std::vector<std::string> &split(const std::string &_s,
                                 char _delim,
                                 std::vector<std::string> &_elems)
 {
     std::stringstream ss(_s);
     std::string item;
-    while (std::getline(ss, item, _delim)) {
+    while (std::getline(ss, item, _delim))
+    {
         _elems.push_back(item);
     }
     return _elems;
 }
 
 /////////////////////////////////////////////////
-math::Vector2d bezierInterpolate( double _t,
-                                  const math::Vector2d &_p0,
-                                  const math::Vector2d &_p1,
-                                  const math::Vector2d &_p2,
-                                  const math::Vector2d &_p3)
+math::Vector2d bezierInterpolate(double _t,
+                                 const math::Vector2d &_p0,
+                                 const math::Vector2d &_p1,
+                                 const math::Vector2d &_p2,
+                                 const math::Vector2d &_p3)
 {
   double t_1 = 1.0 - _t;
   double t_1_2 = t_1 * t_1;
   double t_1_3 = t_1_2 * t_1;
   double t2 = _t * _t;
   double t3 = t2 * _t;
-  
-  math::Vector2d p;  
+  math::Vector2d p;
   p.x = t_1_3 * _p0.x + 3 * _t *  t_1_2 * _p1.x + 3 * t2 * t_1 * _p2.x +
         t3 * _p3.x;
   p.y = t_1_3 * _p0.y + 3 * _t *  t_1_2 * _p1.y + 3 * t2 * t_1 * _p2.y +
         t3 * _p3.y;
-
-  return p;  
+  return p;
 }
-
 
 /////////////////////////////////////////////////
 void CubicBezier(const math::Vector2d &_p0,
@@ -104,7 +102,7 @@ math::Vector2d SVGLoader::SubpathToPolyline(
     {
        size_t i =0;
        size_t count = cmd.numbers.size();
-       while(i < count)
+       while (i < count)
        {
          math::Vector2d p;
          p.x = cmd.numbers[i+0];
@@ -113,16 +111,15 @@ math::Vector2d SVGLoader::SubpathToPolyline(
          p.x += _last.x;
          p.y += _last.y;
          _polyline.push_back(p);
-         _last = p; 
+         _last = p;
          i += 2;
       }
     }
-
-    else if(cmd.type == 'M' || cmd.type == 'L')
+    else if (cmd.type == 'M' || cmd.type == 'L')
     {
       size_t i = 0;
       size_t count = cmd.numbers.size();
-      while(i < count)
+      while (i < count)
       {
         math::Vector2d p;
         p.x = cmd.numbers[i+0];
@@ -132,13 +129,11 @@ math::Vector2d SVGLoader::SubpathToPolyline(
         i += 2;
       }
     }
-
-    else if(cmd.type == 'C')
+    else if (cmd.type == 'C')
     {
-
       size_t i = 0;
       size_t count = cmd.numbers.size();
-      while(i < count)
+      while (i < count)
       {
         math::Vector2d p0 = _last;
         math::Vector2d p1, p2, p3;
@@ -148,17 +143,16 @@ math::Vector2d SVGLoader::SubpathToPolyline(
         p2.y = cmd.numbers[i+3];
         p3.x = cmd.numbers[i+4];
         p3.y = cmd.numbers[i+5];
-        CubicBezier(p0, p1, p2, p3, resolution, _polyline);     
+        CubicBezier(p0, p1, p2, p3, resolution, _polyline);
         _last = p3;
         i += 6;
       }
     }
-
-    else if(cmd.type == 'c')
+    else if (cmd.type == 'c')
     {
       size_t i = 0;
       size_t count = cmd.numbers.size();
-      while(i < count)
+      while (i < count)
       {
         math::Vector2d p0 = _last;
         math::Vector2d p1, p2, p3;
@@ -168,7 +162,7 @@ math::Vector2d SVGLoader::SubpathToPolyline(
         p2.y = cmd.numbers[i+3] + _last.y;
         p3.x = cmd.numbers[i+4] + _last.x;
         p3.y = cmd.numbers[i+5] + _last.y;
-        CubicBezier(p0, p1, p2, p3, resolution, _polyline);     
+        CubicBezier(p0, p1, p2, p3, resolution, _polyline);
         _last = p3;
         i += 6;
       }
@@ -181,24 +175,23 @@ math::Vector2d SVGLoader::SubpathToPolyline(
 SVGLoader::SVGLoader(unsigned int _samples)
   :resolution(1.0/_samples)
 {
-  
 }
 
 /////////////////////////////////////////////////
 void SVGLoader::SplitSubpaths(const std::vector<SVGCommand> &_cmds,
                               std::vector< std::vector<SVGCommand> > &subpaths)
 {
-  if(_cmds.size() ==0)
+  if (_cmds.size() ==0)
   {
     std::ostringstream os;
     os << "SVGPath has no commands";
     SvgError x(os.str());
     throw x;
   }
-  
-  for(SVGCommand cmd: _cmds)
+
+  for (SVGCommand cmd: _cmds)
   {
-    if( tolower(cmd.type) == 'm')
+    if (tolower(cmd.type) == 'm')
     {
       // the path contains a subpath
       std::vector<SVGCommand> sub;
@@ -208,16 +201,16 @@ void SVGLoader::SplitSubpaths(const std::vector<SVGCommand> &_cmds,
     std::vector<SVGCommand> &subpath = subpaths.back();
     // give the cmd to the latest
     subpath.push_back(cmd);
-  }  
+  }
 }
 
 /////////////////////////////////////////////////
-void SVGLoader::MakeCommands( char _cmd,
-                              const std::vector<double> &_numbers,
-                              std::vector<SVGCommand> &_cmds)
+void SVGLoader::MakeCommands(char _cmd,
+                             const std::vector<double> &_numbers,
+                             std::vector<SVGCommand> &_cmds)
 {
-  if(_cmd != 'x')
-  { 
+  if (_cmd != 'x')
+  {
     SVGCommand c;
     c.type = _cmd;
     c.numbers = _numbers;
@@ -233,13 +226,12 @@ void SVGLoader::ExpandCommands(
   for (std::vector<SVGCommand> compressedSubpath :_subpaths)
   {
     // add new subpath
-    _path.subpaths.push_back( std::vector<SVGCommand>());
+    _path.subpaths.push_back(std::vector<SVGCommand>());
     // get a reference
     std::vector<SVGCommand> &subpath = _path.subpaths.back();
     // copy the cmds with repeating commands, grouping the numbers
     for (SVGCommand xCmd : compressedSubpath)
     {
-
       unsigned int numberCount = 0;
       if (tolower(xCmd.type) == 'c')
         numberCount = 6;
@@ -251,20 +243,18 @@ void SVGLoader::ExpandCommands(
         numberCount = 1;
       if (tolower(xCmd.type) == 'h')
         numberCount = 1;
-
       if (tolower(xCmd.type) == 'z')
         subpath.push_back(xCmd);
-      
       // group numbers together and repeat the command
       // for each group
       unsigned int n = 0;
       size_t size = xCmd.numbers.size();
-      while(n < size)
+      while (n < size)
       {
         subpath.push_back(SVGCommand());
         SVGCommand &cmd = subpath.back();
         cmd.type = xCmd.type;
-        for(size_t i=0; i < numberCount; i++)
+        for (size_t i = 0; i < numberCount; i++)
         {
           cmd.numbers.push_back(xCmd.numbers[i+n]);
         }
@@ -282,16 +272,16 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
      std::string lookup = "cCmMlLvVhHzZ";
      char lastCmd = 'x';
      std::vector<double> numbers;
-     
-     for(std::string token: _tokens)
+
+     for (std::string token: _tokens)
      {
        // new command?
-       if(lookup.find(token[0]) == std::string::npos)
-       { 
+       if (lookup.find(token[0]) == std::string::npos)
+       {
          // its just numbers
          std::vector<std::string> numberStrs;
          split(token, ',', numberStrs);
-         for(std::string numberStr : numberStrs)
+         for (std::string numberStr : numberStrs)
          {
            double f = atof(numberStr.c_str());
            numbers.push_back(f);
@@ -299,9 +289,8 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
        }
        else
        {
-         
-         if(lastCmd != 'x')
-         { 
+         if (lastCmd != 'x')
+         {
            SVGCommand c;
            c.type = lastCmd;
            c.numbers = numbers;
@@ -314,17 +303,17 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
        }
      }
      // the last command
-     if(lastCmd != 'x')
-     { 
+     if (lastCmd != 'x')
+     {
        SVGCommand c;
        c.type = lastCmd;
        c.numbers = numbers;
        cmds.push_back(c);
      }
-    // split the commands into sub_paths 
+    // split the commands into sub_paths
     std::vector< std::vector< SVGCommand> > subpaths;
     this->SplitSubpaths(cmds, subpaths);
-    this->ExpandCommands(subpaths, _path );
+    this->ExpandCommands(subpaths, _path);
     // the starting point for the subpath
     // it is the end point of the previous one
     math::Vector2d p;
@@ -343,11 +332,11 @@ void SVGLoader::GetPathAttribs(TiXmlElement* pElement, SVGPath &path)
 {
     if ( !pElement ) return;
 
-    TiXmlAttribute* pAttrib=pElement->FirstAttribute();
+    TiXmlAttribute* pAttrib = pElement->FirstAttribute();
     while (pAttrib)
     {
         std::string name = lowercase(pAttrib->Name());
-        std::string value= pAttrib->Value();
+        std::string value = pAttrib->Value();
         if (name == "style")
         {
             path.style = value;
@@ -368,19 +357,15 @@ void SVGLoader::GetPathAttribs(TiXmlElement* pElement, SVGPath &path)
             split(value, ' ', tokens);
             GetPathCommands(tokens, path);
         }
-        // int ival;
-        // double dval;
-        // if (pAttrib->QueryIntValue(&ival)==TIXML_SUCCESS)    printf( " int=%d", ival);
-        // if (pAttrib->QueryDoubleValue(&dval)==TIXML_SUCCESS) printf( " d=%1.1f", dval);
-        pAttrib=pAttrib->Next();
+        pAttrib = pAttrib->Next();
     }
 }
 
 /////////////////////////////////////////////////
 void SVGLoader::GetSvgPaths(TiXmlNode* pParent, std::vector<SVGPath> &paths)
 {
-  if (!pParent) 
-		return;
+  if (!pParent)
+    return;
 
   TiXmlNode *pChild;
   int t = pParent->Type();
@@ -395,15 +380,17 @@ void SVGLoader::GetSvgPaths(TiXmlNode* pParent, std::vector<SVGPath> &paths)
         GetPathAttribs(pParent->ToElement(), p);
         paths.push_back(p);
       }
-      break; 
+      break;
 
     default:
       break;
-   }
+  }
 
-  for (pChild = pParent->FirstChild(); pChild != 0; pChild = pChild->NextSibling())
+  for (pChild = pParent->FirstChild();
+        pChild != 0;
+        pChild = pChild->NextSibling())
   {
-    GetSvgPaths( pChild, paths );
+    GetSvgPaths(pChild, paths);
   }
 }
 
@@ -421,26 +408,29 @@ void SVGLoader::Parse(const std::string &_filename, std::vector<SVGPath> &paths)
     throw x;
   }
 
-  GetSvgPaths( &doc, paths);
+  GetSvgPaths(&doc, paths);
 }
 
 /////////////////////////////////////////////////
-void SVGLoader::DumpPaths(const std::vector<SVGPath> &_paths, std::ostream &out ) const
+void SVGLoader::DumpPaths(const std::vector<SVGPath> &_paths,
+                          std::ostream &out) const
 {
   out << "var svg = [];" << std::endl;
   for (SVGPath path : _paths)
   {
-    out << "svg.push({name:\"" << path.id <<  "\", subpaths:[], style: \"" << path.style << "\"}); " << std::endl;
+    out << "svg.push({name:\"" << path.id;
+    out <<  "\", subpaths:[], style: \"";
+    out << path.style << "\"}); " << std::endl;
     out << "svg[svg.length-1].subpaths = [";
     char psep = ' ';
 
-    for (unsigned int i=0; i < path.polylines.size(); i++)
+    for (unsigned int i = 0; i < path.polylines.size(); i++)
     {
       std::vector<math::Vector2d> poly = path.polylines[i];
       out << psep <<  "[" << std::endl;
       psep = ',';
       char sep = ' ';
-      for( math::Vector2d p : poly)
+      for ( math::Vector2d p : poly)
       {
         out << " " << sep << " [" <<  p.x << ", " << p.y << "]" <<std::endl;
         sep = ',';

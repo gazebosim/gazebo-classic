@@ -38,8 +38,8 @@ TEST_F(SVGLoader, LoadPaths)
   filePath += "/test/data/paths.svg";
   loader.Parse(filePath, paths);
   
-  loader.DumpPaths(paths);
-  if(!foutput.empty())
+  loader.DumpPaths(paths, std::cout);
+  if (!foutput.empty())
   {
     std::ofstream out(foutput.c_str() );
     loader.DumpPaths(paths, out);
@@ -81,11 +81,12 @@ int main(int argc, char **argv)
     }
     catch(...)
     {
-        std::cout << "Can't set sample to " << s << ". Sample is " << samples << std::endl;
+        std::cout << "Can't set sample to " << s;
+        std::cout << ". Sample is " << samples << std::endl;
     }
   }
 
-  if(argc >= 3)
+  if (argc >= 3)
   {
     // output to save results
     foutput = argv[2];

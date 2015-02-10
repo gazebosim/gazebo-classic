@@ -58,12 +58,14 @@ namespace gazebo
       public: SVGLoader(unsigned int _samples);
       public: void Parse(const std::string &_filename,
                          std::vector<SVGPath> &_paths);
-      public: void DumpPaths(const std::vector<SVGPath> &_paths, std::ostream &out) const;
+      public: void DumpPaths(const std::vector<SVGPath> &_paths,
+                             std::ostream &out) const;
 
-      private: void MakeCommands( char _cmd,
-                                  const std::vector<double> &_numbers,
-                                  std::vector<SVGCommand> &_cmds);
-      private: void GetPathCommands(const std::vector<std::string> &_tokens, SVGPath &_path);
+      private: void MakeCommands(char _cmd,
+                                 const std::vector<double> &_numbers,
+                                 std::vector<SVGCommand> &_cmds);
+      private: void GetPathCommands(const std::vector<std::string> &_tokens,
+                                    SVGPath &_path);
       private: void GetPathAttribs(TiXmlElement* _pElement, SVGPath &_path);
       private: void GetSvgPaths(TiXmlNode* _pParent,
                                   std::vector<SVGPath> &_paths);
@@ -80,8 +82,8 @@ namespace gazebo
                       math::Vector2d _last,
                       std::vector<math::Vector2d> &_polyline);
       private: double resolution;
-		};
-	}
+    };
+  }
 }
 
 #endif
