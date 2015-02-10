@@ -410,6 +410,10 @@ void SimbodyPhysics::UpdateCollision()
   const SimTK::State &state = this->integ->getState();
   int numc = this->contact.getNumContactForces(state);
 
+  // get contact snapshot
+  const SimTK::ContactSnapshot& contactSnapshot =
+    this->tracker.getActiveContacts(state);
+
   gzerr << "UpdateCollisions[" << numc << "]\n";
 
   int count = 0;
@@ -417,14 +421,20 @@ void SimbodyPhysics::UpdateCollision()
   {
     // get contact stuff from Simbody
     const SimTK::ContactForce& force = this->contact.getContactForce(state,j);
+    const SimTK::ContactId contactId = force.getContactId();
+    const SimTK::Contact simbodyContact = contactSnapshot.getContact(contactId);
+    SimTK::ContactSurfaceIndex csi1 = simbodyContact.getSurface1();
+    SimTK::ContactSurfaceIndex csi2 = simbodyContact.getSurface2();
+    SimTK::ContactSurface cs1 = this->tracker.getContactSurface(csi1);
+    SimTK::ContactSurface cs2 = this->tracker.getContactSurface(csi2);
 
     /// \TODO: below, get collision data from simbody contacts
     Collision *collision1 = NULL;
     Collision *collision2 = NULL;
 
     /// \TODO: get SimTK::ContactGeometry* from ContactForce somehow
-    SimTK::ContactGeometry* cg1;
-    SimTK::ContactGeometry* cg2;
+    const SimTK::ContactGeometry cg1 = cs1.getShape();
+    const SimTK::ContactGeometry cg2 = cs2.getShape();
 
     /// \TODO: proof of concept only
     /// loop through all link->all collisions and find
@@ -443,11 +453,11 @@ void SimbodyPhysics::UpdateCollision()
           /// ContactGeometry from SimTK::ContactForce
           SimbodyCollisionPtr sc =
             boost::dynamic_pointer_cast<physics::SimbodyCollision>(*ci);
-          if (sc->GetCollisionShape() == cg1)
+          if (sc->GetCollisionShape() == &cg1)
           {
             collision1 = (*ci).get();
           }
-          else if (sc->GetCollisionShape() == cg2)
+          else if (sc->GetCollisionShape() == &cg2)
           {
             collision2 = (*ci).get();
           }
@@ -468,10 +478,9 @@ void SimbodyPhysics::UpdateCollision()
       if (useContactPatch)
       {
         // get contact patch to get detailed contacts
-        const SimTK::ContactId     id    = force.getContactId();
         SimTK::ContactPatch patch;
         const bool found =
-          this->contact.calcContactPatchDetailsById(state, id, patch);
+          this->contact.calcContactPatchDetailsById(state, contactId, patch);
 
         gzerr << "found[" << found << "]\n";
 
