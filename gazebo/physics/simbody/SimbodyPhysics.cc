@@ -421,10 +421,15 @@ void SimbodyPhysics::UpdateCollision()
   {
     // get contact stuff from Simbody
     const SimTK::ContactForce& force = this->contact.getContactForce(state,j);
+    gzerr << "got " << force << "\n";
     const SimTK::ContactId contactId = force.getContactId();
+    gzerr << "got " << contactId << "\n";
     const SimTK::Contact simbodyContact = contactSnapshot.getContact(contactId);
+    gzerr << "got simbodyContact\n";
     SimTK::ContactSurfaceIndex csi1 = simbodyContact.getSurface1();
+    gzerr << "got " << csi1 << "\n";
     SimTK::ContactSurfaceIndex csi2 = simbodyContact.getSurface2();
+    gzerr << "got " << csi2 << "\n";
     SimTK::ContactSurface cs1 = this->tracker.getContactSurface(csi1);
     SimTK::ContactSurface cs2 = this->tracker.getContactSurface(csi2);
 
@@ -435,6 +440,8 @@ void SimbodyPhysics::UpdateCollision()
     /// \TODO: get SimTK::ContactGeometry* from ContactForce somehow
     const SimTK::ContactGeometry cg1 = cs1.getShape();
     const SimTK::ContactGeometry cg2 = cs2.getShape();
+
+    gzerr << "got cg1, cg2\n";
 
     /// \TODO: proof of concept only
     /// loop through all link->all collisions and find
@@ -449,6 +456,7 @@ void SimbodyPhysics::UpdateCollision()
         for (Collision_V::iterator ci = collisions.begin();
              ci != collisions.end(); ++ci)
         {
+          gzerr << "compare " << (*ci)->GetName() << "\n";
           /// compare SimbodyCollision::GetCollisionShape() to
           /// ContactGeometry from SimTK::ContactForce
           SimbodyCollisionPtr sc =
