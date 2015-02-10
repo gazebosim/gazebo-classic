@@ -34,6 +34,7 @@ namespace gazebo
 {
   namespace msgs
   {
+    /// \internal
     /// \brief Internal function to create an SDF element from msgs::Axis.
     /// It is only intended to be used by JointToSDF.
     /// \param[in] _msg The msgs::Axis object.
