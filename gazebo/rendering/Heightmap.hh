@@ -402,16 +402,16 @@ namespace gazebo
 
           protected: virtual void generateVpHeader(const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: virtual void generateVpFooter(const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: virtual void generateVertexProgramSource(
                          const SM2Profile *_prof, const Ogre::Terrain *_terrain,
                          TechniqueType _tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: virtual void defaultVpParams(const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain, TechniqueType _tt,
@@ -420,49 +420,49 @@ namespace gazebo
           protected: virtual unsigned int generateVpDynamicShadowsParams(
                          unsigned int _texCoordStart, const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: virtual void generateVpDynamicShadows(
                          const SM2Profile *_prof, const Ogre::Terrain *_terrain,
                          TechniqueType _tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: virtual void generateFpHeader(const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain,
                          TechniqueType tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: virtual void generateFpLayer(const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain, TechniqueType tt,
                          Ogre::uint _layer,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: virtual void generateFpFooter(const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain,
                          TechniqueType tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: virtual void generateFpDynamicShadowsParams(
                          Ogre::uint *_texCoord, Ogre::uint *_sampler,
                          const SM2Profile *_prof, const Ogre::Terrain *_terrain,
                          TechniqueType _tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: virtual void generateFpDynamicShadowsHelpers(
                          const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain,
                          TechniqueType tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: void generateFpDynamicShadows(const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: virtual void generateFragmentProgramSource(
                          const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain,
                          TechniqueType _tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: virtual void updateVpParams(const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain, TechniqueType _tt,
@@ -486,16 +486,16 @@ namespace gazebo
 
           protected: virtual void generateVpHeader(const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: virtual void generateVpFooter(const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: virtual void generateVertexProgramSource(
                          const SM2Profile *_prof, const Ogre::Terrain *_terrain,
                          TechniqueType _tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: virtual void defaultVpParams(const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain, TechniqueType _tt,
@@ -504,12 +504,12 @@ namespace gazebo
           protected: virtual unsigned int generateVpDynamicShadowsParams(
                          unsigned int _texCoordStart, const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
 
           protected: virtual void generateVpDynamicShadows(
                          const SM2Profile *_prof, const Ogre::Terrain *_terrain,
                          TechniqueType _tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
+                         Ogre::StringStream &_outStream);
         };
 #ifdef __clang__
 #pragma clang diagnostic pop
