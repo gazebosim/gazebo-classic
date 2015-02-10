@@ -88,12 +88,11 @@ void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
   EXPECT_EQ(topics, topicsExpected);
 
   // We should expect them all to publish.
-  for (std::list<std::string>::iterator iter = topics.begin();
-                                       iter != topics.end(); ++iter)
+  for (auto const &topic : topics)
   {
-    gzdbg << "Listening to " << *iter << std::endl;
+    gzdbg << "Listening to " << topic << std::endl;
     g_messageCount = 0;
-    transport::SubscriberPtr sub = this->node->Subscribe(*iter,
+    transport::SubscriberPtr sub = this->node->Subscribe(topic,
       &ContactSensor::Callback, this);
 
     const int steps = 50;
