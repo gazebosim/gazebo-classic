@@ -344,6 +344,12 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   // Process Key Events
   if (!KeyEventHandler::Instance()->HandlePress(this->keyEvent))
   {
+    // model editor exit pop-up message is modal so can block event propagation.
+    // So using hotkeys to exit will leave the control variable in a bad state.
+    // Manually override and reset the control value.
+    if (this->modelEditorEnabled && this->mouseEvent.control)
+      this->mouseEvent.control = false;
+
     ModelManipulator::Instance()->OnKeyPressEvent(this->keyEvent);
     this->userCamera->HandleKeyPressEvent(this->keyText);
   }
@@ -809,7 +815,8 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
     gzerr << "Unable to connect to a running Gazebo master.\n";
 
   if (_scene->GetUserCameraCount() == 0)
-    this->userCamera = _scene->CreateUserCamera(cameraName);
+    this->userCamera = _scene->CreateUserCamera(cameraName,
+        gazebo::gui::getINIProperty<int>("rendering.stereo", 0));
   else
     this->userCamera = _scene->GetUserCamera(0);
 
@@ -1249,6 +1256,7 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
       {
         if ((*it)->GetName() == _msg->data())
         {
+          ModelManipulator::Instance()->Detach();
           this->selectedVisuals.erase(it);
           break;
         }

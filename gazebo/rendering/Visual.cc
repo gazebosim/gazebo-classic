@@ -945,8 +945,6 @@ void Visual::SetLighting(bool _lighting)
     (*iter)->SetLighting(this->dataPtr->lighting);
   }
 
-  // only set the sdf element if this is a visual sdf element or it has
-  // a geometry attached. Verify by checking if it has a geometry child element.
 
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("lighting")->Set(this->dataPtr->lighting);
@@ -2256,8 +2254,13 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
         msgs::ConvertGeometryType(_msg->geometry().type());
 
     std::string geometryType = this->GetGeometryType();
+    std::string geometryName = this->GetMeshName();
 
-    if (newGeometryType != geometryType)
+    std::string newGeometryName = geometryName;
+    if (_msg->geometry().has_mesh() && _msg->geometry().mesh().has_filename())
+        newGeometryName = _msg->geometry().mesh().filename();
+
+    if (newGeometryType != geometryType || newGeometryName != geometryName)
     {
       std::string origMaterial = this->dataPtr->myMaterialName;
       float origTransparency = this->dataPtr->transparency;
@@ -2282,10 +2285,15 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
           std::string meshName = common::find_file(filename);
 
           if (meshName.empty())
-            gzerr << "No mesh found\n";
+          {
+            meshName = "unit_box";
+            gzerr << "No mesh found, setting mesh to a unit box" << std::endl;
+          }
 
           this->AttachMesh(meshName);
-          geomElem->AddElement(newGeometryType);
+          sdf::ElementPtr meshElem = geomElem->AddElement(newGeometryType);
+          if (!filename.empty())
+            meshElem->GetElement("uri")->Set(filename);
         }
       }
       this->SetTransparency(origTransparency);
