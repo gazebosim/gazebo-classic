@@ -886,8 +886,6 @@ TEST_F(MsgsTest, LinkToSDF)
   const std::string name("test_link");
   const math::Pose pose(math::Vector3(3, 2, 1),
                         math::Quaternion(0.5, -0.5, -0.5, 0.5));
-  const std::string materialName("Gazebo/Grey");
-  const std::string uri("pretend_this_is_a_URI");
 
   msgs::Link linkMsg;
   linkMsg.set_name(name);
