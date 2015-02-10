@@ -48,9 +48,6 @@ std::string ModelData::GetTemplateSDFString()
     <<     "</geometry>"
     <<     "<material>"
     <<       "<lighting>true</lighting>"
-    <<       "<ambient>0.3 0.3 0.3 1</ambient>"
-    <<       "<diffuse>0.7 0.7 0.7 1</diffuse>"
-    <<       "<specular>0.01 0.01 0.01 1</specular>"
     <<       "<script>"
     <<         "<uri>file://media/materials/scripts/gazebo.material</uri>"
     <<         "<name>Gazebo/Grey</name>"
@@ -375,15 +372,47 @@ void PartData::OnApply()
         // update the visualMsg that will be used to generate the sdf.
         updateMsg->clear_scale();
         msgs::Material *matMsg = updateMsg->mutable_material();
+        msgs::Material::Script *scriptMsg = matMsg->mutable_script();
+
+        bool matScriptChanged = false;
+        bool colorChanged = false;
+
+        std::string matName = it->first->GetMaterialName();
+        std::string uniqueMatName = name + "_MATERIAL_";
+        size_t visMatIdx = matName.find(uniqueMatName);
+        if (visMatIdx != std::string::npos)
+          matName = matName.substr(visMatIdx + uniqueMatName.size());
+
+        if (matName != scriptMsg->name())
+        {
+          matScriptChanged = true;
+        }
+        else
+        {
+          if (msgs::Convert(matMsg->ambient()) != it->first->GetAmbient()
+              || msgs::Convert(matMsg->diffuse()) != it->first->GetDiffuse()
+              || msgs::Convert(matMsg->specular()) != it->first->GetSpecular()
+              || msgs::Convert(matMsg->emissive()) != it->first->GetEmissive())
+            colorChanged = true;
+
+            if (colorChanged)
+              scriptMsg->clear_name();
+        }
+
+        // update material or color, but not both
         // clear empty colors so they are not used by visual updates
         common::Color emptyColor;
-        if (msgs::Convert(matMsg->ambient()) == emptyColor)
+        if (matScriptChanged || !colorChanged ||
+            msgs::Convert(matMsg->ambient()) == emptyColor)
           matMsg->clear_ambient();
-        if (msgs::Convert(matMsg->diffuse()) == emptyColor)
+        if (matScriptChanged || !colorChanged ||
+            msgs::Convert(matMsg->diffuse()) == emptyColor)
           matMsg->clear_diffuse();
-        if (msgs::Convert(matMsg->specular()) == emptyColor)
+        if (matScriptChanged || !colorChanged ||
+            msgs::Convert(matMsg->specular()) == emptyColor)
           matMsg->clear_specular();
-        if (msgs::Convert(matMsg->emissive()) == emptyColor)
+        if (matScriptChanged || !colorChanged ||
+            msgs::Convert(matMsg->emissive()) == emptyColor)
           matMsg->clear_emissive();
 
         if (matMsg->has_diffuse())
