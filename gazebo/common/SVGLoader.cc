@@ -105,7 +105,7 @@ math::Vector2d SVGLoader::SubpathToPolyline(
 {
   for (SVGCommand cmd: _subpath)
   {
-    if (cmd.type == 'm' || cmd.type == 'l')
+    if (cmd.cmd == 'm' || cmd.cmd == 'l')
     {
        size_t i =0;
        size_t count = cmd.numbers.size();
@@ -122,7 +122,7 @@ math::Vector2d SVGLoader::SubpathToPolyline(
          i += 2;
       }
     }
-    else if (cmd.type == 'M' || cmd.type == 'L')
+    else if (cmd.cmd == 'M' || cmd.cmd == 'L')
     {
       size_t i = 0;
       size_t count = cmd.numbers.size();
@@ -136,7 +136,7 @@ math::Vector2d SVGLoader::SubpathToPolyline(
         i += 2;
       }
     }
-    else if (cmd.type == 'C')
+    else if (cmd.cmd == 'C')
     {
       size_t i = 0;
       size_t count = cmd.numbers.size();
@@ -155,7 +155,7 @@ math::Vector2d SVGLoader::SubpathToPolyline(
         i += 6;
       }
     }
-    else if (cmd.type == 'c')
+    else if (cmd.cmd == 'c')
     {
       size_t i = 0;
       size_t count = cmd.numbers.size();
@@ -198,7 +198,7 @@ void SVGLoader::SplitSubpaths(const std::vector<SVGCommand> &_cmds,
 
   for (SVGCommand cmd: _cmds)
   {
-    if (tolower(cmd.type) == 'm')
+    if (tolower(cmd.cmd) == 'm')
     {
       // the path contains a subpath
       std::vector<SVGCommand> sub;
@@ -219,7 +219,7 @@ void SVGLoader::MakeCommands(char _cmd,
   if (_cmd != 'x')
   {
     SVGCommand c;
-    c.type = _cmd;
+    c.cmd = _cmd;
     c.numbers = _numbers;
     _cmds.push_back(c);
   }
@@ -240,17 +240,17 @@ void SVGLoader::ExpandCommands(
     for (SVGCommand xCmd : compressedSubpath)
     {
       unsigned int numberCount = 0;
-      if (tolower(xCmd.type) == 'c')
+      if (tolower(xCmd.cmd) == 'c')
         numberCount = 6;
-      if (tolower(xCmd.type) == 'm')
+      if (tolower(xCmd.cmd) == 'm')
         numberCount = 2;
-      if (tolower(xCmd.type) == 'l')
+      if (tolower(xCmd.cmd) == 'l')
         numberCount = 2;
-      if (tolower(xCmd.type) == 'v')
+      if (tolower(xCmd.cmd) == 'v')
         numberCount = 1;
-      if (tolower(xCmd.type) == 'h')
+      if (tolower(xCmd.cmd) == 'h')
         numberCount = 1;
-      if (tolower(xCmd.type) == 'z')
+      if (tolower(xCmd.cmd) == 'z')
         subpath.push_back(xCmd);
       // group numbers together and repeat the command
       // for each group
@@ -260,7 +260,7 @@ void SVGLoader::ExpandCommands(
       {
         subpath.push_back(SVGCommand());
         SVGCommand &cmd = subpath.back();
-        cmd.type = xCmd.type;
+        cmd.cmd = xCmd.cmd;
         for (size_t i = 0; i < numberCount; i++)
         {
           cmd.numbers.push_back(xCmd.numbers[i+n]);
@@ -299,7 +299,7 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
          if (lastCmd != 'x')
          {
            SVGCommand c;
-           c.type = lastCmd;
+           c.cmd = lastCmd;
            c.numbers = numbers;
            cmds.push_back(c);
          }
@@ -313,7 +313,7 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
      if (lastCmd != 'x')
      {
        SVGCommand c;
-       c.type = lastCmd;
+       c.cmd = lastCmd;
        c.numbers = numbers;
        cmds.push_back(c);
      }

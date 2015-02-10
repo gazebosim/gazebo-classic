@@ -39,17 +39,18 @@ namespace gazebo
       public: SvgError(const std::string& _what);
     };
 
-    /// \brief An SVG command
+    /// \brief SVG command data structure
     struct GAZEBO_VISIBLE SVGCommand
     {
       /// \brief A letter that describe the segment
-      char type;
+      // cppcheck-suppress
+      char cmd;
 
       /// \brief Coordinates for the command
       std::vector<double> numbers;
     };
 
-    /// \brief An SVG path element
+    /// \brief An SVG path element data structure
     struct GAZEBO_VISIBLE SVGPath
     {
       /// \brief An id or name
@@ -61,7 +62,7 @@ namespace gazebo
       /// \brief A 2D transform (or a list of transforms)
       std::string transform;
 
-      /// \brief A list of subpaths (as lists of commands) 
+      /// \brief A list of subpaths (as lists of commands)
       std::vector< std::vector<SVGCommand> > subpaths;
 
       /// \brief The polylines described by the commands
@@ -77,7 +78,7 @@ namespace gazebo
 
       /// \brief Reads an SVG file and loads all the paths
       /// \param[in] _filename The SVG file
-      /// \param[out] _paths Vector that receives path data 
+      /// \param[out] _paths Vector that receives path data
       public: void Parse(const std::string &_filename,
                          std::vector<SVGPath> &_paths);
 
@@ -112,7 +113,7 @@ namespace gazebo
       private: void GetSvgPaths(TiXmlNode* _pParent,
                                   std::vector<SVGPath> &_paths);
 
-      /// \brief Generates new commands for every repeat commands in SVG subpaths
+      /// \brief Generates new commands for every repeat commands in subpaths
       /// \param[in] _subpaths The subpaths (with repeats)
       /// \param[out] _path The path that receives the data.
       private: void ExpandCommands(
