@@ -290,8 +290,9 @@ void PartData::AddCollision(rendering::VisualPtr _collisionVis)
 PartData* PartData::Clone(const std::string &_newName)
 {
   PartData *clonePart = new PartData();
+
+  clonePart->Load(this->partSDF);
   clonePart->SetName(_newName);
-  clonePart->SetPose(this->GetPose());
 
   std::string partVisualName = this->partVisual->GetName();
   std::string cloneVisName = _newName;
