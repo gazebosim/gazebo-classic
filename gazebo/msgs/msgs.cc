@@ -1710,8 +1710,7 @@ namespace gazebo
       if (_msg.has_axis2())
         AxisToSDF(_msg.axis2(), jointSDF->GetElement("axis2"));
 
-      sdf::ElementPtr odePhysicsElem =
-        jointSDF->GetElement("physics")->GetElement("ode");
+      auto odePhysicsElem = jointSDF->GetElement("physics")->GetElement("ode");
       if (_msg.has_cfm())
         odePhysicsElem->GetElement("cfm")->Set(_msg.cfm());
       if (_msg.has_bounce())
@@ -1722,7 +1721,7 @@ namespace gazebo
         odePhysicsElem->GetElement("fudge_factor")->Set(_msg.fudge_factor());
 
       {
-        sdf::ElementPtr limitElem = odePhysicsElem->GetElement("limit");
+        auto limitElem = odePhysicsElem->GetElement("limit");
         if (_msg.has_limit_cfm())
           limitElem->GetElement("cfm")->Set(_msg.limit_cfm());
         if (_msg.has_limit_erp())
@@ -1730,8 +1729,7 @@ namespace gazebo
       }
 
       {
-        sdf::ElementPtr suspensionElem =
-          odePhysicsElem->GetElement("suspension");
+        auto suspensionElem = odePhysicsElem->GetElement("suspension");
         if (_msg.has_suspension_cfm())
           suspensionElem->GetElement("cfm")->Set(_msg.suspension_cfm());
         if (_msg.has_suspension_erp())
@@ -1754,7 +1752,7 @@ namespace gazebo
       }
 
       {
-        sdf::ElementPtr dynamicsElem = _sdf->GetElement("dynamics");
+        auto dynamicsElem = _sdf->GetElement("dynamics");
         if (_msg.has_damping())
           dynamicsElem->GetElement("damping")->Set(_msg.damping());
         if (_msg.has_friction())
@@ -1762,7 +1760,7 @@ namespace gazebo
       }
 
       {
-        sdf::ElementPtr limitElem = _sdf->GetElement("limit");
+        auto limitElem = _sdf->GetElement("limit");
         if (_msg.has_limit_lower())
           limitElem->GetElement("lower")->Set(_msg.limit_lower());
         if (_msg.has_limit_upper())
