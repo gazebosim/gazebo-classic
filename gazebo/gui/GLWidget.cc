@@ -33,7 +33,6 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/OrbitViewController.hh"
 #include "gazebo/rendering/FPSViewController.hh"
-#include "gazebo/rendering/SelectionObj.hh"
 
 #include "gazebo/gui/ModelAlign.hh"
 #include "gazebo/gui/ModelSnap.hh"
