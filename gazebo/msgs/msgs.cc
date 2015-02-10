@@ -1736,7 +1736,7 @@ namespace gazebo
         if (_msg.has_suspension_erp())
           suspensionElem->GetElement("erp")->Set(_msg.suspension_erp());
       }
-      // also ignore the sensor field for now
+      /// \todo JointToSDF currently does not convert sensor data
 
       return jointSDF;
     }
