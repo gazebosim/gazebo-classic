@@ -28,13 +28,15 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCameraPrivate.hh"
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/UserCamera.hh"
 
 using namespace gazebo;
 using namespace rendering;
 
 //////////////////////////////////////////////////
-UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
+UserCamera::UserCamera(const std::string &_name, ScenePtr _scene,
+    bool _stereoEnabled)
   : Camera(_name, _scene),
     dataPtr(new UserCameraPrivate)
 {
@@ -45,9 +47,13 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   this->dataPtr->joyTwistControl = true;
   this->dataPtr->joystickButtonToggleLast = false;
   this->dataPtr->joyPoseControl = true;
+  this->dataPtr->rightCamera = NULL;
+  this->dataPtr->rightViewport = NULL;
+  this->dataPtr->stereoEnabled = _stereoEnabled;
 
-  // Set default UserCamera render rate to 30Hz
-  this->SetRenderRate(30.0);
+  // Set default UserCamera render rate to 120Hz when stereo rendering is
+  // enabled. Otherwise use 60Hz.
+  this->SetRenderRate(_stereoEnabled ? 120.0 : 60.0);
 
   this->SetUseSDFPose(false);
 }
@@ -76,12 +82,17 @@ void UserCamera::Load()
   Camera::Load();
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
+
   this->dataPtr->joySubTwist =
     this->dataPtr->node->Subscribe("~/user_camera/joy_twist",
     &UserCamera::OnJoyTwist, this);
+
   this->dataPtr->joySubPose =
     this->dataPtr->node->Subscribe("~/user_camera/joy_pose",
     &UserCamera::OnJoyPose, this);
+
+  this->dataPtr->posePub =
+    this->dataPtr->node->Advertise<msgs::Pose>("~/user_camera/pose", 1, 30.0);
 }
 
 //////////////////////////////////////////////////
@@ -98,6 +109,23 @@ void UserCamera::Init()
   // Don't yaw along variable axis, causes leaning
   this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
   this->camera->setDirection(1, 0, 0);
+  this->camera->setAutoAspectRatio(false);
+
+  // Right camera
+  if (this->dataPtr->stereoEnabled)
+  {
+    this->dataPtr->rightCamera = this->scene->GetManager()->createCamera(
+        "StereoUserRight");
+    this->dataPtr->rightCamera->pitch(Ogre::Degree(90));
+
+    // Don't yaw along variable axis, causes leaning
+    this->dataPtr->rightCamera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+    this->dataPtr->rightCamera->setDirection(1, 0, 0);
+
+    this->dataPtr->rightCamera->setAutoAspectRatio(false);
+
+    this->sceneNode->attachObject(this->dataPtr->rightCamera);
+  }
 
   this->SetHFOV(GZ_DTOR(60));
 
@@ -183,6 +211,9 @@ void UserCamera::Update()
 
   if (this->dataPtr->viewController)
     this->dataPtr->viewController->Update();
+
+  // publish camera pose
+  this->dataPtr->posePub->Publish(msgs::Convert(this->GetWorldPose()));
 }
 
 //////////////////////////////////////////////////
@@ -365,6 +396,12 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
 
+    if (this->dataPtr->stereoEnabled)
+    {
+      this->dataPtr->rightCamera->setAspectRatio(ratio);
+      this->dataPtr->rightCamera->setFOVy(Ogre::Radian(vfov));
+    }
+
     delete [] this->saveFrameBuffer;
     this->saveFrameBuffer = NULL;
   }
@@ -380,15 +417,15 @@ void UserCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
 //////////////////////////////////////////////////
 float UserCamera::GetAvgFPS() const
 {
-  return RenderEngine::Instance()->GetWindowManager()->GetAvgFPS(
-      this->windowId);
+  float avgFPS, lastFPS, bestFPS, worstFPS = 0;
+  this->renderTarget->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
+  return avgFPS;
 }
 
 //////////////////////////////////////////////////
 unsigned int UserCamera::GetTriangleCount() const
 {
-  return RenderEngine::Instance()->GetWindowManager()->GetTriangleCount(
-      this->windowId);
+  return this->renderTarget->getTriangleCount();
 }
 
 //////////////////////////////////////////////////
@@ -516,6 +553,33 @@ void UserCamera::OnMoveToVisualComplete()
 void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
   Camera::SetRenderTarget(_target);
+
+  // Setup stereo rendering viewports
+  if (this->dataPtr->stereoEnabled)
+  {
+    float focalLength = 1.0;
+
+    // Defaulting to 0.03m stereo baseline.
+    Ogre::Vector2 offset(0.03f, 0.0f);
+
+    this->camera->setFocalLength(focalLength);
+    this->camera->setFrustumOffset(offset);
+
+    this->dataPtr->rightCamera->setFocalLength(focalLength);
+    this->dataPtr->rightCamera->setFrustumOffset(-offset);
+
+    this->dataPtr->rightViewport =
+      this->renderTarget->addViewport(this->dataPtr->rightCamera, 1);
+    this->dataPtr->rightViewport->setBackgroundColour(
+        Conversions::Convert(this->scene->GetBackgroundColor()));
+
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
+    this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
+    this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
+#endif
+
+    this->dataPtr->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+  }
 
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
 
@@ -682,4 +746,27 @@ void UserCamera::OnJoyPose(ConstPosePtr &_msg)
                     msgs::Convert(_msg->orientation()));
     this->SetWorldPose(pose);
   }
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetClipDist(float _near, float _far)
+{
+  Camera::SetClipDist(_near, _far);
+
+  // Update right camera, if it exists.
+  if (this->dataPtr->stereoEnabled)
+  {
+    this->dataPtr->rightCamera->setNearClipDistance(
+      this->camera->getNearClipDistance());
+    this->dataPtr->rightCamera->setFarClipDistance(
+      this->camera->getFarClipDistance());
+    this->dataPtr->rightCamera->setRenderingDistance(
+      this->camera->getRenderingDistance());
+  }
+}
+
+//////////////////////////////////////////////////
+bool UserCamera::StereoEnabled() const
+{
+  return this->dataPtr->stereoEnabled;
 }

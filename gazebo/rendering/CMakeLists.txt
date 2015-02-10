@@ -6,9 +6,10 @@ include_directories(SYSTEM
   skyx/include
 )
 
-if (${OGRE_VERSION} GREATER 1.7.4)
+if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
   add_subdirectory(deferred_shading)
 endif()
+
 add_subdirectory(skyx)
 add_subdirectory(selection_buffer)
 
@@ -162,7 +163,7 @@ if (NOT APPLE)
   target_link_libraries(gazebo_rendering X11)
 endif()
 
-if (${OGRE_VERSION} GREATER 1.7.4)
+if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
   target_link_libraries(gazebo_rendering gazebo_rendering_deferred)
 endif()
 
