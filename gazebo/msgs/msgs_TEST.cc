@@ -1536,23 +1536,28 @@ TEST_F(MsgsTest, JointToSDF)
     EXPECT_DOUBLE_EQ(limit_velocity2, axisLimit->Get<double>("velocity"));
   }
 
-  auto physicsElem = jointSDF->GetElement("physics")->GetElement("ode");
-  EXPECT_TRUE(physicsElem->HasElement("cfm"));
-  EXPECT_DOUBLE_EQ(physicsElem->Get<double>("cfm"), cfm);
-  EXPECT_TRUE(physicsElem->HasElement("bounce"));
-  EXPECT_DOUBLE_EQ(physicsElem->Get<double>("bounce"), bounce);
-  EXPECT_TRUE(physicsElem->HasElement("velocity"));
-  EXPECT_DOUBLE_EQ(physicsElem->Get<double>("velocity"), velocity);
-  EXPECT_TRUE(physicsElem->HasElement("fudge_factor"));
-  EXPECT_DOUBLE_EQ(physicsElem->Get<double>("fudge_factor"), fudge_factor);
+  EXPECT_TRUE(jointSDF->HasElement("physics"));
+  auto physicsElem = jointSDF->GetElement("physics");
+  EXPECT_TRUE(physicsElem->HasElement("ode"));
+  auto odePhysics = physicsElem->GetElement("ode");
+  EXPECT_TRUE(odePhysics->HasElement("cfm"));
+  EXPECT_DOUBLE_EQ(odePhysics->Get<double>("cfm"), cfm);
+  EXPECT_TRUE(odePhysics->HasElement("bounce"));
+  EXPECT_DOUBLE_EQ(odePhysics->Get<double>("bounce"), bounce);
+  EXPECT_TRUE(odePhysics->HasElement("velocity"));
+  EXPECT_DOUBLE_EQ(odePhysics->Get<double>("velocity"), velocity);
+  EXPECT_TRUE(odePhysics->HasElement("fudge_factor"));
+  EXPECT_DOUBLE_EQ(odePhysics->Get<double>("fudge_factor"), fudge_factor);
 
-  auto limitElem = physicsElem->GetElement("limit");
+  EXPECT_TRUE(odePhysics->HasElement("limit"));
+  auto limitElem = odePhysics->GetElement("limit");
   EXPECT_TRUE(limitElem->HasElement("cfm"));
   EXPECT_DOUBLE_EQ(limitElem->Get<double>("cfm"), limit_cfm);
   EXPECT_TRUE(limitElem->HasElement("erp"));
   EXPECT_DOUBLE_EQ(limitElem->Get<double>("erp"), limit_erp);
 
-  auto suspensionElem = physicsElem->GetElement("suspension");
+  EXPECT_TRUE(odePhysics->HasElement("suspension"));
+  auto suspensionElem = odePhysics->GetElement("suspension");
   EXPECT_TRUE(suspensionElem->HasElement("cfm"));
   EXPECT_DOUBLE_EQ(suspensionElem->Get<double>("cfm"), suspension_cfm);
   EXPECT_TRUE(suspensionElem->HasElement("erp"));
