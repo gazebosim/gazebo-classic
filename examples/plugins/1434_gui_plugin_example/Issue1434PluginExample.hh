@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _ISSUE1434PLUGIN_HH_
-#define _ISSUE1434PLUGIN_HH_
+#ifndef _ISSUE1434PLUGINEXAMPLE_HH_
+#define _ISSUE1434PLUGINEXAMPLE_HH_
 
+#include <QObject>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829

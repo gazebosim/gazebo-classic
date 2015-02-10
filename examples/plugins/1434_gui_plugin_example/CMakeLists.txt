@@ -1,31 +1,39 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-find_package (Qt4)
+find_package (Qt4 REQUIRED)
+find_package(Protobuf REQUIRED)
+find_package(Gazebo REQUIRED)
 
-include (FindPkgConfig)
-if (PKG_CONFIG_FOUND)
-  pkg_check_modules(GAZEBO gazebo)
-  pkg_check_modules(OGRE OGRE)
-  pkg_check_modules(OGRE-Terrain OGRE-Terrain)
+include_directories(
+  ${GAZEBO_SOURCE_DIRS}
+  ${GAZEBO_INCLUDE_DIRS}
+  ${PROTOBUF_INCLUDE_DIR}
+  ${SDFormat_INCLUDE_DIRS}
+  ${OGRE_INCLUDE_DIRS}
+  ${OGRE-RTShaderSystem_INCLUDE_DIRS}
+)
+
+link_directories(
+  ${SDFormat_LIBRARY_DIRS}
+  ${GAZEBO_LIBRARY_DIRS}
+  ${OGRE-RTShaderSystem_LIBRARY_DIRS}
+)
+
+if (HAVE_BULLET)
+  link_directories(${BULLET_LIBRARY_DIRS})
 endif()
 
-find_package(Protobuf REQUIRED)
+set ( qt_plugins
+  Issue1434PluginExample
+)
 
 include (${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 
-include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS}
-  ${OGRE-Terrain_INCLUDE_DIRS})
+foreach (src ${qt_plugins})
+  QT4_WRAP_CPP(headers_MOC ${src}.hh)
 
-link_directories(${GAZEBO_LIBRARY_DIRS} ${OGRE_LIBRARY_DIRS}
-  ${OGRE-Terrain_LIBRARY_DIRS})
-
-QT4_WRAP_CPP(headers_MOC Issue1434PluginExample.hh)
-
-add_library(Issue1434PluginExample SHARED ${headers_MOC}
-  Issue1434PluginExample.cc)
-target_link_libraries(Issue1434PluginExample ${GAZEBO_LIBRARIES}
-    ${OGRE_LIBRARIES} 
-    ${OGRE-Terrain_LIBRARIES}
-    ${QT_LIBRARIES}
-    ${PROTOBUF_LIBRARIES})
+  add_library(${src} SHARED ${headers_MOC} ${src}.cc)
+  target_link_libraries(${src} ${GAZEBO_LIBRARIES} ${OGRE_LIBRARIES}
+    ${OGRE-RTShaderSystem_LIBRARIES} ${QT_LIRARIES})
+endforeach (src ${qt_plugins})
