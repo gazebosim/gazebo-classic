@@ -1500,16 +1500,17 @@ namespace gazebo
       if (_msg.has_filename())
         meshSDF->GetElement("uri")->Set(_msg.filename());
 
-      sdf::ElementPtr submeshElem = meshSDF->GetElement("submesh");
       if (_msg.has_submesh())
-        submeshElem->GetElement("name")->Set(_msg.submesh());
-      if (_msg.has_center_submesh())
-        submeshElem->GetElement("center")->Set(_msg.center_submesh());
-      if (_msg.has_scale())
       {
-        meshSDF->GetElement("scale")->Set(msgs::Convert(_msg.scale()));
+        sdf::ElementPtr submeshElem = meshSDF->GetElement("submesh");
+        submeshElem->GetElement("name")->Set(_msg.submesh());
+        if (_msg.has_center_submesh())
+          submeshElem->GetElement("center")->Set(_msg.center_submesh());
+        if (_msg.has_scale())
+        {
+          meshSDF->GetElement("scale")->Set(msgs::Convert(_msg.scale()));
+        }
       }
-
       return meshSDF;
     }
 
