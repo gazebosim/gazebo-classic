@@ -424,128 +424,133 @@ void SimbodyPhysics::UpdateCollision()
     gzerr << "got " << force << "\n";
     const SimTK::ContactId contactId = force.getContactId();
     gzerr << "got " << contactId << "\n";
-    const SimTK::Contact simbodyContact = contactSnapshot.getContact(contactId);
-    gzerr << "got simbodyContact\n";
-    SimTK::ContactSurfaceIndex csi1 = simbodyContact.getSurface1();
-    gzerr << "got " << csi1 << "\n";
-    SimTK::ContactSurfaceIndex csi2 = simbodyContact.getSurface2();
-    gzerr << "got " << csi2 << "\n";
-    SimTK::ContactSurface cs1 = this->tracker.getContactSurface(csi1);
-    SimTK::ContactSurface cs2 = this->tracker.getContactSurface(csi2);
-
-    /// \TODO: below, get collision data from simbody contacts
-    Collision *collision1 = NULL;
-    Collision *collision2 = NULL;
-
-    /// \TODO: get SimTK::ContactGeometry* from ContactForce somehow
-    const SimTK::ContactGeometry cg1 = cs1.getShape();
-    const SimTK::ContactGeometry cg2 = cs2.getShape();
-
-    gzerr << "got cg1, cg2\n";
-
-    /// \TODO: proof of concept only
-    /// loop through all link->all collisions and find
-    physics::Model_V models = this->world->GetModels();
-    for (physics::Model_V::iterator mi = models.begin();
-         mi != models.end(); ++mi)
+    gzerr << "got " << contactSnapshot << "\n";
+    if (contactSnapshot.hasContact(contactId))
     {
-      physics::Link_V links = (*mi)->GetLinks();
-      for (Link_V::iterator li = links.begin(); li != links.end(); ++li)
+      const SimTK::Contact simbodyContact =
+        contactSnapshot.getContact(contactId);
+      gzerr << "got " << simbodyContact << "\n";
+      SimTK::ContactSurfaceIndex csi1 = simbodyContact.getSurface1();
+      gzerr << "got " << csi1 << "\n";
+      SimTK::ContactSurfaceIndex csi2 = simbodyContact.getSurface2();
+      gzerr << "got " << csi2 << "\n";
+      SimTK::ContactSurface cs1 = this->tracker.getContactSurface(csi1);
+      SimTK::ContactSurface cs2 = this->tracker.getContactSurface(csi2);
+
+      /// \TODO: below, get collision data from simbody contacts
+      Collision *collision1 = NULL;
+      Collision *collision2 = NULL;
+
+      /// \TODO: get SimTK::ContactGeometry* from ContactForce somehow
+      const SimTK::ContactGeometry cg1 = cs1.getShape();
+      const SimTK::ContactGeometry cg2 = cs2.getShape();
+
+      gzerr << "got cg1, cg2\n";
+
+      /// \TODO: proof of concept only
+      /// loop through all link->all collisions and find
+      physics::Model_V models = this->world->GetModels();
+      for (physics::Model_V::iterator mi = models.begin();
+           mi != models.end(); ++mi)
       {
-        Collision_V collisions = (*li)->GetCollisions();
-        for (Collision_V::iterator ci = collisions.begin();
-             ci != collisions.end(); ++ci)
+        physics::Link_V links = (*mi)->GetLinks();
+        for (Link_V::iterator li = links.begin(); li != links.end(); ++li)
         {
-          gzerr << "compare " << (*ci)->GetName() << "\n";
-          /// compare SimbodyCollision::GetCollisionShape() to
-          /// ContactGeometry from SimTK::ContactForce
-          SimbodyCollisionPtr sc =
-            boost::dynamic_pointer_cast<physics::SimbodyCollision>(*ci);
-          if (sc->GetCollisionShape() == &cg1)
+          Collision_V collisions = (*li)->GetCollisions();
+          for (Collision_V::iterator ci = collisions.begin();
+               ci != collisions.end(); ++ci)
           {
-            collision1 = (*ci).get();
-          }
-          else if (sc->GetCollisionShape() == &cg2)
-          {
-            collision2 = (*ci).get();
+            gzerr << "compare " << (*ci)->GetName() << "\n";
+            /// compare SimbodyCollision::GetCollisionShape() to
+            /// ContactGeometry from SimTK::ContactForce
+            SimbodyCollisionPtr sc =
+              boost::dynamic_pointer_cast<physics::SimbodyCollision>(*ci);
+            if (sc->GetCollisionShape() == &cg1)
+            {
+              collision1 = (*ci).get();
+            }
+            else if (sc->GetCollisionShape() == &cg2)
+            {
+              collision2 = (*ci).get();
+            }
           }
         }
       }
-    }
 
-    // add contacts to the manager. This will return NULL if no one is
-    // listening for contact information.
-    Contact *contactFeedback = this->contactManager->NewContact(collision1,
-        collision2, this->world->GetSimTime());
+      // add contacts to the manager. This will return NULL if no one is
+      // listening for contact information.
+      Contact *contactFeedback = this->contactManager->NewContact(collision1,
+          collision2, this->world->GetSimTime());
 
-    if (contactFeedback)
-    {
-      gzerr << "constructed contactFeedback\n";
-
-      const bool useContactPatch = true;
-      if (useContactPatch)
+      if (contactFeedback)
       {
-        // get contact patch to get detailed contacts
-        SimTK::ContactPatch patch;
-        const bool found =
-          this->contact.calcContactPatchDetailsById(state, contactId, patch);
+        gzerr << "constructed contactFeedback\n";
 
-        gzerr << "found[" << found << "]\n";
-
-        // loop through detials of patch
-        if (found)
+        const bool useContactPatch = true;
+        if (useContactPatch)
         {
-          for (int i=0; i < patch.getNumDetails(); ++i)
+          // get contact patch to get detailed contacts
+          SimTK::ContactPatch patch;
+          const bool found =
+            this->contact.calcContactPatchDetailsById(state, contactId, patch);
+
+          gzerr << "found[" << found << "]\n";
+
+          // loop through detials of patch
+          if (found)
           {
-            // get detail
-            const SimTK::ContactDetail& detail = patch.getContactDetail(i);
-            // get contact information from simbody and
-            // add them to contactFeedback.
-            // Store the contact depth
-            contactFeedback->depths[count] = detail.getDeformation();
+            for (int i=0; i < patch.getNumDetails(); ++i)
+            {
+              // get detail
+              const SimTK::ContactDetail& detail = patch.getContactDetail(i);
+              // get contact information from simbody and
+              // add them to contactFeedback.
+              // Store the contact depth
+              contactFeedback->depths[count] = detail.getDeformation();
 
-            // Store the contact position
-            contactFeedback->positions[count].Set(
-              detail.getContactPoint()[0],
-              detail.getContactPoint()[1],
-              detail.getContactPoint()[2]);
+              // Store the contact position
+              contactFeedback->positions[count].Set(
+                detail.getContactPoint()[0],
+                detail.getContactPoint()[1],
+                detail.getContactPoint()[2]);
 
-            // Store the contact normal
-            contactFeedback->normals[j].Set(
-              detail.getContactNormal()[0],
-              detail.getContactNormal()[1],
-              detail.getContactNormal()[2]);
+              // Store the contact normal
+              contactFeedback->normals[j].Set(
+                detail.getContactNormal()[0],
+                detail.getContactNormal()[1],
+                detail.getContactNormal()[2]);
 
-            // Increase the counters
-            ++count;
-            contactFeedback->count = count;
+              // Increase the counters
+              ++count;
+              contactFeedback->count = count;
+            }
           }
         }
-      }
-      else  // use single ContactForce
-      {
-        // get contact information from simbody ContactForce and
-        // add it to contactFeedback.
+        else  // use single ContactForce
+        {
+          // get contact information from simbody ContactForce and
+          // add it to contactFeedback.
 
-        /// \TODO: confirm the contact depth is zero?
-        contactFeedback->depths[count] = 0.0;
+          /// \TODO: confirm the contact depth is zero?
+          contactFeedback->depths[count] = 0.0;
 
-        // Store the contact position
-        contactFeedback->positions[count].Set(
-          force.getContactPoint()[0],
-          force.getContactPoint()[1],
-          force.getContactPoint()[2]);
+          // Store the contact position
+          contactFeedback->positions[count].Set(
+            force.getContactPoint()[0],
+            force.getContactPoint()[1],
+            force.getContactPoint()[2]);
 
-        // Store the contact normal
-        contactFeedback->normals[j].Set(
-          0, 0, 0);
-          // force.getContactNormal()[0],
-          // force.getContactNormal()[1],
-          // force.getContactNormal()[2]);
+          // Store the contact normal
+          contactFeedback->normals[j].Set(
+            0, 0, 0);
+            // force.getContactNormal()[0],
+            // force.getContactNormal()[1],
+            // force.getContactNormal()[2]);
 
-        // Increase the counters
-        ++count;
-        contactFeedback->count = count;
+          // Increase the counters
+          ++count;
+          contactFeedback->count = count;
+        }
       }
     }
   }
