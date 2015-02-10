@@ -143,7 +143,6 @@ void PartData::SetPose(const math::Pose &_pose)
 void PartData::SetScale(const math::Vector3 &_scale)
 {
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
-  std::string uri;
   for (auto it = this->visuals.begin(); it != this->visuals.end(); ++it)
   {
     std::string name = it->first->GetName();

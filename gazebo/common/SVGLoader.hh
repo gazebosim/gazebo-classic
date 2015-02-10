@@ -43,8 +43,7 @@ namespace gazebo
     struct GAZEBO_VISIBLE SVGCommand
     {
       /// \brief A letter that describe the segment
-      // cppcheck-suppress
-      char cmd;
+      char cmd;  // cppcheck style error is a false positive
 
       /// \brief Coordinates for the command
       std::vector<double> numbers;
