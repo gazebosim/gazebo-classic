@@ -314,12 +314,13 @@ PartData* PartData::Clone(const std::string &_newName)
     std::string newVisName = visIt->first->GetName();
     size_t idx = newVisName.find_last_of("::");
     if (idx != std::string::npos)
-      newVisName = cloneVisName + newVisName.substr(idx);
+      newVisName = cloneVisName + newVisName.substr(idx-1);
     else
       newVisName = cloneVisName + "::" + newVisName;
     clonePart->AddVisual(visIt->first->Clone(newVisName,
         clonePart->partVisual));
   }
+
   linkVisual->SetTransparency(ModelData::GetEditTransparency());
   std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
   for (colIt = this->collisions.begin(); colIt != this->collisions.end();
@@ -328,7 +329,7 @@ PartData* PartData::Clone(const std::string &_newName)
     std::string newColName = colIt->first->GetName();
     size_t idx = newColName.find_last_of("::");
     if (idx != std::string::npos)
-      newColName = cloneVisName + newColName.substr(idx);
+      newColName = cloneVisName + newColName.substr(idx-1);
     else
       newColName = cloneVisName + "::" + newColName;
     rendering::VisualPtr collisionVis = colIt->first->Clone(newColName,
