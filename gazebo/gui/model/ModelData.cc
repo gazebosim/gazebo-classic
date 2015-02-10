@@ -612,8 +612,8 @@ void PartData::Update()
         msgs::Visual collisionVisMsg;
         msgs::Geometry *geomMsg = collisionVisMsg.mutable_geometry();
         geomMsg->CopyFrom(collisoinMsg.geometry());
-//        msgs::Pose *poseMsg = collisionVisMsg.mutable_pose();
-//        poseMsg->CopyFrom(collisoinMsg.pose());
+        msgs::Pose *poseMsg = collisionVisMsg.mutable_pose();
+        poseMsg->CopyFrom(collisoinMsg.pose());
 
         boost::shared_ptr<gazebo::msgs::Visual> updateMsgPtr;
         updateMsgPtr.reset(new msgs::Visual);
