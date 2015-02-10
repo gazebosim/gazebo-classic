@@ -48,16 +48,17 @@ namespace gazebo
     {
       std::string id;
       std::string style;
+      std::string transform;
       std::vector< std::vector<SVGCommand> > subpaths;
       std::vector< std::vector<math::Vector2d> > polylines;
     };
 
     class GAZEBO_VISIBLE SVGLoader
     {
-      public: SVGLoader(unsigned int _samples) {}
+      public: SVGLoader(unsigned int _samples);
       public: void Parse(const std::string &_filename,
                          std::vector<SVGPath> &_paths);
-      public: void DumpPaths(const std::vector<SVGPath> &_paths ) const;
+      public: void DumpPaths(const std::vector<SVGPath> &_paths, std::ostream &out) const;
 
       private: void MakeCommands( char _cmd,
                                   const std::vector<double> &_numbers,

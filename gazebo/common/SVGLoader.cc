@@ -74,6 +74,25 @@ math::Vector2d bezierInterpolate( double _t,
 
 
 /////////////////////////////////////////////////
+void CubicBezier(const math::Vector2d &_p0,
+                 const math::Vector2d &_p1,
+                 const math::Vector2d &_p2,
+                 const math::Vector2d &_p3,
+                 double _step,
+                 std::vector<math::Vector2d> &_points)
+{
+  double t = _step;
+  while (t < 1.0)
+  {
+    auto p = bezierInterpolate(t, _p0, _p1, _p2, _p3);
+    _points.push_back(p);
+    t += _step;
+  }
+  auto p = bezierInterpolate(1.0, _p0, _p1, _p2, _p3);
+  _points.push_back(p);
+}
+
+/////////////////////////////////////////////////
 math::Vector2d SVGLoader::SubpathToPolyline(
                             const std::vector<SVGCommand> &_subpath,
                             math::Vector2d _last,
@@ -108,8 +127,8 @@ math::Vector2d SVGLoader::SubpathToPolyline(
         math::Vector2d p;
         p.x = cmd.numbers[i+0];
         p.y = cmd.numbers[i+1];
-        polyline.push_back(p);
-        last = p;
+        _polyline.push_back(p);
+        _last = p;
         i += 2;
       }
     }
@@ -121,7 +140,7 @@ math::Vector2d SVGLoader::SubpathToPolyline(
       size_t count = cmd.numbers.size();
       while(i < count)
       {
-        math::Vector2d p0 = last;
+        math::Vector2d p0 = _last;
         math::Vector2d p1, p2, p3;
         p1.x = cmd.numbers[i+0];
         p1.y = cmd.numbers[i+1];
@@ -129,8 +148,8 @@ math::Vector2d SVGLoader::SubpathToPolyline(
         p2.y = cmd.numbers[i+3];
         p3.x = cmd.numbers[i+4];
         p3.y = cmd.numbers[i+5];
-        CubicBezier(p0, p1, p2, p3, resolution, polyline);     
-        last = p3;
+        CubicBezier(p0, p1, p2, p3, resolution, _polyline);     
+        _last = p3;
         i += 6;
       }
     }
@@ -141,26 +160,31 @@ math::Vector2d SVGLoader::SubpathToPolyline(
       size_t count = cmd.numbers.size();
       while(i < count)
       {
-        math::Vector2d p0 = last;
+        math::Vector2d p0 = _last;
         math::Vector2d p1, p2, p3;
-        p1.x = cmd.numbers[i+0] + last.x;
-        p1.y = cmd.numbers[i+1] + last.y;
-        p2.x = cmd.numbers[i+2] + last.x;
-        p2.y = cmd.numbers[i+3] + last.y;
-        p3.x = cmd.numbers[i+4] + last.x;
-        p3.y = cmd.numbers[i+5] + last.y;
-        CubicBezier(p0, p1, p2, p3, resolution, polyline);     
-        last = p3;
+        p1.x = cmd.numbers[i+0] + _last.x;
+        p1.y = cmd.numbers[i+1] + _last.y;
+        p2.x = cmd.numbers[i+2] + _last.x;
+        p2.y = cmd.numbers[i+3] + _last.y;
+        p3.x = cmd.numbers[i+4] + _last.x;
+        p3.y = cmd.numbers[i+5] + _last.y;
+        CubicBezier(p0, p1, p2, p3, resolution, _polyline);     
+        _last = p3;
         i += 6;
       }
     }
-
   }
   return _last;
 }
 
 /////////////////////////////////////////////////
-// hello
+SVGLoader::SVGLoader(unsigned int _samples)
+  :resolution(1.0/_samples)
+{
+  
+}
+
+/////////////////////////////////////////////////
 void SVGLoader::SplitSubpaths(const std::vector<SVGCommand> &_cmds,
                               std::vector< std::vector<SVGCommand> > &subpaths)
 {
@@ -215,6 +239,7 @@ void SVGLoader::ExpandCommands(
     // copy the cmds with repeating commands, grouping the numbers
     for (SVGCommand xCmd : compressedSubpath)
     {
+
       unsigned int numberCount = 0;
       if (tolower(xCmd.type) == 'c')
         numberCount = 6;
@@ -226,10 +251,10 @@ void SVGLoader::ExpandCommands(
         numberCount = 1;
       if (tolower(xCmd.type) == 'h')
         numberCount = 1;
+
       if (tolower(xCmd.type) == 'z')
         subpath.push_back(xCmd);
-      }
-      	
+      
       // group numbers together and repeat the command
       // for each group
       unsigned int n = 0;
@@ -400,24 +425,24 @@ void SVGLoader::Parse(const std::string &_filename, std::vector<SVGPath> &paths)
 }
 
 /////////////////////////////////////////////////
-void SVGLoader::DumpPaths(const std::vector<SVGPath> &_paths ) const
+void SVGLoader::DumpPaths(const std::vector<SVGPath> &_paths, std::ostream &out ) const
 {
-  std::cout << "var svg = [];" << std::endl;
+  out << "var svg = [];" << std::endl;
   for (SVGPath path : _paths)
   {
-    std::cout << "svg.push({name:\"" << path.id <<  "\", subpaths:[], style: \"" << path.style << "\"}); " << std::endl;
-    std::cout << "svg[svg.length-1].subpaths = [";
+    out << "svg.push({name:\"" << path.id <<  "\", subpaths:[], style: \"" << path.style << "\"}); " << std::endl;
+    out << "svg[svg.length-1].subpaths = [";
     char psep = ' ';
 
     for (unsigned int i=0; i < path.polylines.size(); i++)
     {
       std::vector<math::Vector2d> poly = path.polylines[i];
-      std::cout << psep <<  "[" << std::endl;
+      out << psep <<  "[" << std::endl;
       psep = ',';
       char sep = ' ';
       for( math::Vector2d p : poly)
       {
-        std::cout << " " << sep << " [" <<  p.x << ", " << p.y << "]" <<std::endl;
+        out << " " << sep << " [" <<  p.x << ", " << p.y << "]" <<std::endl;
         sep = ',';
       }
       out << " ] " << std::endl;
