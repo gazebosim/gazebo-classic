@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _MODEL_MANIPULATOR_PRIVATE_HH_
 
 #include <string>
+#include <vector>
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
@@ -78,6 +79,9 @@ namespace gazebo
 
       /// \brief Scale of the visual attached to the mouse.
       public: math::Vector3 mouseVisualScale;
+
+      /// \brief Scale of all the child visuals attached to the mouse.
+      public: std::vector<math::Vector3> mouseChildVisualScale;
 
       /// \brief Bounding box of the visual attached to the mouse (for scaling).
       public: math::Box mouseVisualBbox;
