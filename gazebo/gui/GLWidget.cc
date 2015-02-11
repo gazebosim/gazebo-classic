@@ -1212,6 +1212,4 @@ void GLWidget::OnModelEditor(bool _checked)
 
   g_arrowAct->trigger();
   event::Events::setSelectedEntity("", "normal");
-
-
 }

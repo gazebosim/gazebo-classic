@@ -185,7 +185,6 @@ void PartData::Load(sdf::ElementPtr _sdf)
       sensorElem = sensorElem->GetNextElement("sensor");
     }
   }
-
 }
 
 /////////////////////////////////////////////////
@@ -197,7 +196,6 @@ void PartData::UpdateConfig()
   for (it = this->visuals.begin(); it != this->visuals.end(); ++it)
   {
     std::string name = it->first->GetName();
-    std::string partName = this->partVisual->GetName();
     std::string leafName = name;
     size_t idx = name.find_last_of("::");
     if (idx != std::string::npos)
@@ -232,7 +230,6 @@ void PartData::UpdateConfig()
       ++colIt)
   {
     std::string name = colIt->first->GetName();
-    std::string partName = this->partVisual->GetName();
     std::string leafName = name;
     size_t idx = name.find_last_of("::");
     if (idx != std::string::npos)
@@ -257,7 +254,6 @@ void PartData::AddVisual(rendering::VisualPtr _visual)
   visualMsg.set_transparency(0.0);
   this->visuals[_visual] = visualMsg;
 
-  std::string partName = this->partVisual->GetName();
   std::string visName = _visual->GetName();
   std::string leafName = visName;
   size_t idx = visName.find_last_of("::");
@@ -276,7 +272,6 @@ void PartData::AddCollision(rendering::VisualPtr _collisionVis)
   sdf::ElementPtr collisionSDF(new sdf::Element);
   sdf::initFile("collision.sdf", collisionSDF);
 
-  std::string partName = this->partVisual->GetName();
   std::string visName = _collisionVis->GetName();
   std::string leafName = visName;
   size_t idx = visName.find_last_of("::");
@@ -315,7 +310,6 @@ PartData* PartData::Clone(const std::string &_newName)
 
   clonePart->partVisual = linkVisual;
 
-  std::string partName = this->GetName();
   std::map<rendering::VisualPtr, msgs::Visual>::iterator visIt;
   for (visIt = this->visuals.begin(); visIt != this->visuals.end(); ++visIt)
   {
@@ -349,7 +343,6 @@ PartData* PartData::Clone(const std::string &_newName)
         getAttachedObject(0);
     colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
     clonePart->AddCollision(collisionVis);
-
   }
   return clonePart;
 }
@@ -461,7 +454,6 @@ void PartData::OnApply()
     for (it = this->collisions.begin(); it != this->collisions.end(); ++it)
     {
       std::string name = it->first->GetName();
-      std::string partName = this->partVisual->GetName();
       std::string leafName = name;
       size_t idx = name.find_last_of("::");
       if (idx != std::string::npos)

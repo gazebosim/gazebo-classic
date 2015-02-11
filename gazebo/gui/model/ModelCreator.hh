@@ -423,9 +423,6 @@ namespace gazebo
       /// \brief Store the current save state of the model.
       private: enum SaveState currentSaveState;
 
-      /// \brief A list of model sdfs to load in the model editor.
-//      private: std::vector<sdf::ElementPtr> sdfToLoad;
-
       /// \brief Mutex to protect allParts
       private: boost::recursive_mutex *updateMutex;
 

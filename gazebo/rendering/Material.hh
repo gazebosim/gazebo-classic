@@ -17,6 +17,8 @@
 #ifndef _RENDERING_MATERIAL_HH_
 #define _RENDERING_MATERIAL_HH_
 
+#include <string>
+
 #include "gazebo/common/Material.hh"
 #include "gazebo/util/system.hh"
 

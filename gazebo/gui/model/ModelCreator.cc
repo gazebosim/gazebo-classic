@@ -200,7 +200,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
       !gui::get_active_camera()->GetScene())
     return;
 
-  if(!this->active)
+  if (!this->active)
   {
     gzwarn << "Model Editor must be active before loading a model. " <<
               "Not loading model " << _modelName << std::endl;
@@ -254,8 +254,6 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
           this->serverModelSDF = model;
 
           return;
-//          boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-//          this->sdfToLoad.push_back(model);
         }
         model = model->GetNextElement("model");
       }
@@ -638,7 +636,6 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   scene->AddVisual(part->partVisual);
 
   this->ModelChanged();
-
 }
 
 /////////////////////////////////////////////////
@@ -689,7 +686,6 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 
   // Link
   std::stringstream linkNameStream;
-  std::stringstream leafNameStream;
   std::string leafName = part->GetName();
 
   linkNameStream << this->previewName << "_" << this->modelCounter << "::";
@@ -1524,8 +1520,6 @@ void ModelCreator::GenerateSDF()
       }
     }
   }
-
-   std::cerr << modelElem->ToString("") << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -1611,10 +1605,6 @@ void ModelCreator::Update()
       this->ModelChanged();
     }
   }
-
-//  for (unsigned int i = 0; i < this->sdfToLoad.size(); ++i)
-//    this->LoadSDF(this->sdfToLoad[i]);
-//  this->sdfToLoad.clear();
 }
 
 /////////////////////////////////////////////////

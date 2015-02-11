@@ -113,7 +113,7 @@ namespace gazebo
       /// \brief Set the axis to use parent model frame.
       /// \param[in] _index Index of axis
       /// \param[in] True to use the parent model frame.
-      public: void SetUseParentModelFrame(unsigned int _index, bool _use) ;
+      public: void SetUseParentModelFrame(unsigned int _index, bool _use);
 
       /// \brief Set joint type.
       /// \param[in] _type joint type.
