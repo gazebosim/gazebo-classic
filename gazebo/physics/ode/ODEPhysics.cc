@@ -1311,7 +1311,15 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
   }
   else if (_key == "max_step_size")
   {
-    this->SetMaxStepSize(boost::any_cast<double>(_value));
+    try
+    {
+      this->SetMaxStepSize(boost::any_cast<double>(_value));
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
   }
   else if (_key == "sor_lcp_tolerance")
   {
