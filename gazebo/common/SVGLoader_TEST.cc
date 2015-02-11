@@ -78,31 +78,6 @@ TEST_F(SVGLoader, LoadPaths)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  for (size_t i = 0; i < (size_t)argc; ++i)
-  {
-    std::cout << i << " " << argv[i] << std::endl;
-  }
-
-  if (argc >= 2)
-  {
-    std::string s = argv[1];
-    try {
-      samples = atoi(s.c_str());
-    }
-    catch(...)
-    {
-        std::cout << "Can't set sample to " << s;
-        std::cout << ". Sample is " << samples << std::endl;
-    }
-  }
-
-  if (argc >= 3)
-  {
-    // output to save results
-    foutput = argv[2];
-  }
-
-
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
