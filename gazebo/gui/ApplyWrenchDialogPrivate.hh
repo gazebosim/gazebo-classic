@@ -37,6 +37,9 @@ namespace gazebo
       public: QLabel *messageLabel;
 
       /// TODO
+      public: QComboBox *linksComboBox;
+
+      /// TODO
       public: QWidget *forcePosCollapsibleWidget;
 
       /// TODO

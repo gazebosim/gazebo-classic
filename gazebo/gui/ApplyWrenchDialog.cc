@@ -47,6 +47,9 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->messageLabel->setText(
       tr("Apply Force and Torque"));
 
+  // Links ComboBox
+  this->dataPtr->linksComboBox = new QComboBox();
+
   // Force position
   QCheckBox *forcePosCollapser = new QCheckBox();
   forcePosCollapser->setChecked(false);
@@ -374,6 +377,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->setSizeConstraint(QLayout::SetFixedSize);
   mainLayout->addWidget(this->dataPtr->messageLabel);
+  mainLayout->addWidget(this->dataPtr->linksComboBox);
   mainLayout->addLayout(forceLayout);
   mainLayout->addLayout(torqueLayout);
   mainLayout->addLayout(buttonsLayout);
@@ -450,8 +454,14 @@ void ApplyWrenchDialog::OnResponse(ConstResponsePtr &_msg)
 
     std::string linkName = this->dataPtr->linkMsg.name();
 
-    std::string msg = "Apply Force and Torque\n\nApply to " + linkName + "\n";
+    int pos = linkName.find("::");
+
+    std::string unscopedModelName = linkName.substr(0, linkName.size() - pos + 2);
+    std::string unscopedLinkName = linkName.substr(pos+2);
+
+    std::string msg = "Model: " + unscopedModelName + "\n";
     this->dataPtr->messageLabel->setText(msg.c_str());
+    this->dataPtr->linksComboBox->addItem(QString::fromStdString(unscopedLinkName));
 
     this->dataPtr->linkName = linkName;
     this->SetPublisher();
