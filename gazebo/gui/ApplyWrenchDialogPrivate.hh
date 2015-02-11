@@ -131,6 +131,9 @@ namespace gazebo
 
       /// TODO
       public: MainWindow *mainWindow;
+
+      /// \brief A list of events connected to this.
+      public: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

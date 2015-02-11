@@ -393,12 +393,17 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->torqueVector = math::Vector3::Zero;
 
   connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
+
+  this->dataPtr->connections.push_back(
+      event::Events::ConnectPreRender(
+      boost::bind(&ApplyWrenchDialog::OnPreRender, this)));
 }
 
 /////////////////////////////////////////////////
 ApplyWrenchDialog::~ApplyWrenchDialog()
 {
   this->dataPtr->node->Fini();
+  this->dataPtr->connections.clear();
   delete this->dataPtr;
   this->dataPtr = NULL;
 }
@@ -1082,4 +1087,14 @@ void ApplyWrenchDialog::SetActive(bool _active)
     MouseEventHandler::Instance()->RemoveMoveFilter(
         "applyWrenchDialog_"+this->dataPtr->linkName);
   }
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::OnPreRender()
+{
+  rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
+      GetVisual(this->dataPtr->linkName);
+
+  if (!vis)
+    this->reject();
 }

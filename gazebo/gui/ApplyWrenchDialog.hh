@@ -195,6 +195,9 @@ namespace gazebo
       /// \brief TODO
       private: void SetActive(bool _active);
 
+      /// \brief TODO
+      private: void OnPreRender();
+
       /// \internal
       /// \brief Pointer to private data.
       private: ApplyWrenchDialogPrivate *dataPtr;
