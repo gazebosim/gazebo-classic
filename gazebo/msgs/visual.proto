@@ -27,6 +27,7 @@ message Visual
   optional bool visible        = 11;
   optional bool delete_me      = 12;
   optional bool is_static      = 13;
-  optional Plugin plugin       = 14;
+  optional Plugin plugin       = 14 [deprecated=true];
   optional Vector3d scale      = 15;
+  repeated Plugin plugins      = 16;
 }
