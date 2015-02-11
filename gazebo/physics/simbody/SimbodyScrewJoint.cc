@@ -330,6 +330,14 @@ bool SimbodyScrewJoint::SetHighStop(
   {
     if (this->physicsInitialized)
     {
+      // check if limitForce is initialized
+      if (this->limitForce[_index].isEmptyHandle())
+      {
+        gzerr << "child link is NULL, force element not initialized, "
+              << "SetHighStop failed. Please file a report on issue tracker.\n";
+        return false;
+      }
+
       if (_index == 0)
       {
         // angular limit is specified
@@ -399,6 +407,14 @@ bool SimbodyScrewJoint::SetLowStop(
   {
     if (this->physicsInitialized)
     {
+      // check if limitForce is initialized
+      if (this->limitForce[_index].isEmptyHandle())
+      {
+        gzerr << "child link is NULL, force element not initialized, "
+              << "SetHighStop failed. Please file a report on issue tracker.\n";
+        return false;
+      }
+
       if (_index == 0)
       {
         // angular limit is specified
