@@ -59,11 +59,11 @@ namespace gazebo
       public: virtual ~ModelRightMenu();
 
       /// \brief Show the right menu.
-      /// \param[in] _modelName Name of the model that is active.
+      /// \param[in] _entityName Name of the entity that is active.
       /// \param[in] _pt Point on the GUI that has received the right-click
       /// request.
       /// \param[in] _type Type of the entity clicked.
-      public: void Run(const std::string &_modelName, const QPoint &_pt,
+      public: void Run(const std::string &_entityName, const QPoint &_pt,
           EntityTypes _type = MODEL);
 
       /// \brief QT callback when move to has been selected.
@@ -99,8 +99,8 @@ namespace gazebo
       /// \brief Subscriber to request messages.
       private: transport::SubscriberPtr requestSub;
 
-      /// \brief Name of the active model.
-      private: std::string modelName;
+      /// \brief Name of the active entity.
+      private: std::string entityName;
 
       /// \brief Action for moving the camera to an object.
       private: QAction *moveToAct;
