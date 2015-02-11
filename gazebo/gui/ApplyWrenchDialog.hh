@@ -126,6 +126,9 @@ namespace gazebo
       /// \brief TODO
       private slots: bool eventFilter(QObject *_object, QEvent *_event);
 
+      /// \brief TODO
+      private slots: void changeEvent(QEvent *_event);
+
       /// \brief Callback for a mouse press event.
       /// \param[in] _event The mouse press event
       /// \return True if handled by this function.
@@ -188,6 +191,9 @@ namespace gazebo
 
       /// \brief TODO
       private: void OnResponse(ConstResponsePtr &_msg);
+
+      /// \brief TODO
+      private: void SetActive(bool _active);
 
       /// \internal
       /// \brief Pointer to private data.

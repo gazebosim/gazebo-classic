@@ -317,3 +317,37 @@ void ApplyWrenchVisual::SetTorqueVisual()
   if (!dPtr->rotatedByMouse)
     dPtr->rotTool->SetRotation(quat);
 }
+
+/////////////////////////////////////////////////
+void ApplyWrenchVisual::SetVisible(bool _visible, bool /*_cascade*/)
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  if (_visible)
+  {
+    dPtr->comVisual->SetVisible(true);
+    if (dPtr->mode == "force" && dPtr->forceVector != math::Vector3::Zero)
+    {
+      dPtr->forceVisual->SetVisible(true);
+    }
+    else if (dPtr->mode == "torque" && dPtr->torqueVector != math::Vector3::Zero)
+    {
+      dPtr->torqueVisual->SetVisible(true);
+    }
+
+    if (dPtr->mode != "none")
+    {
+      dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
+      dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
+    }
+  }
+  else
+  {
+    dPtr->comVisual->SetVisible(false);
+    dPtr->forceVisual->SetVisible(false);
+    dPtr->torqueVisual->SetVisible(false);
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, false);
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, false);
+  }
+}

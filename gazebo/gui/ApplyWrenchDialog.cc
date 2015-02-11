@@ -24,6 +24,7 @@
 #include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/ApplyWrenchVisual.hh"
 
+#include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/ApplyWrenchDialogPrivate.hh"
@@ -392,15 +393,6 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->torqueVector = math::Vector3::Zero;
 
   connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
-
-  MouseEventHandler::Instance()->AddPressFilter("applyWrenchDialog",
-      boost::bind(&ApplyWrenchDialog::OnMousePress, this, _1));
-
-  MouseEventHandler::Instance()->AddReleaseFilter("applyWrenchDialog",
-      boost::bind(&ApplyWrenchDialog::OnMouseRelease, this, _1));
-
-  MouseEventHandler::Instance()->AddMoveFilter("applyWrenchDialog",
-      boost::bind(&ApplyWrenchDialog::OnMouseMove, this, _1));
 }
 
 /////////////////////////////////////////////////
@@ -430,6 +422,10 @@ void ApplyWrenchDialog::SetLink(std::string _linkName)
 
   this->dataPtr->linkVisual = vis;
   this->AttachVisuals();
+
+  // Main window
+  this->dataPtr->mainWindow = gui::get_main_window();
+  this->dataPtr->mainWindow->installEventFilter(this);
 }
 
 ///////////////////////////////////////////////////
@@ -485,10 +481,6 @@ void ApplyWrenchDialog::OnApply()
 void ApplyWrenchDialog::OnCancel()
 {
   this->dataPtr->applyWrenchVisual->SetVisible(false);
-
-  MouseEventHandler::Instance()->RemovePressFilter("applyWrenchDialog");
-  MouseEventHandler::Instance()->RemoveReleaseFilter("applyWrenchDialog");
-  MouseEventHandler::Instance()->RemoveMoveFilter("applyWrenchDialog");
 
   this->close();
 }
@@ -791,6 +783,7 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
 /////////////////////////////////////////////////
 bool ApplyWrenchDialog::eventFilter(QObject *_object, QEvent *_event)
 {
+  // Focus in spins
   if (_event->type() == QEvent::FocusIn)
   {
     if (_object == this->dataPtr->forceMagSpin ||
@@ -811,7 +804,43 @@ bool ApplyWrenchDialog::eventFilter(QObject *_object, QEvent *_event)
       this->SetTorque(this->dataPtr->torqueVector);
     }
   }
+  // Focus in main window
+  else if (_event->type() == QEvent::ActivationChange)
+  {
+    if (!this->dataPtr->mainWindow)
+      return false;
+
+    if (_object == this->dataPtr->mainWindow)
+    {
+      if (!this->isActiveWindow() &&
+          !this->dataPtr->mainWindow->isActiveWindow())
+      {
+        this->SetActive(false);
+      }
+    }
+  }
+
   return false;
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::changeEvent(QEvent *_event)
+{
+  // Focus in this dialog
+  if (_event->type() == QEvent::ActivationChange)
+  {
+    if (!this->dataPtr->mainWindow)
+      return;
+
+    if (this->isActiveWindow() || this->dataPtr->mainWindow->isActiveWindow())
+    {
+      this->SetActive(true);
+    }
+    else
+    {
+      this->SetActive(false);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1021,4 +1050,36 @@ void ApplyWrenchDialog::NewTorqueDirection(math::Vector3 _dir)
 
   // Multiply by magnitude
   this->SetTorque(v * this->dataPtr->torqueMagSpin->value(), true);
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::SetActive(bool _active)
+{
+  if (_active)
+  {
+    this->dataPtr->applyWrenchVisual->SetVisible(true);
+
+    MouseEventHandler::Instance()->AddPressFilter(
+        "applyWrenchDialog_"+this->dataPtr->linkName,
+        boost::bind(&ApplyWrenchDialog::OnMousePress, this, _1));
+
+    MouseEventHandler::Instance()->AddReleaseFilter(
+        "applyWrenchDialog_"+this->dataPtr->linkName,
+        boost::bind(&ApplyWrenchDialog::OnMouseRelease, this, _1));
+
+    MouseEventHandler::Instance()->AddMoveFilter(
+        "applyWrenchDialog_"+this->dataPtr->linkName,
+        boost::bind(&ApplyWrenchDialog::OnMouseMove, this, _1));
+  }
+  else
+  {
+    this->dataPtr->applyWrenchVisual->SetVisible(false);
+
+    MouseEventHandler::Instance()->RemovePressFilter(
+        "applyWrenchDialog_"+this->dataPtr->linkName);
+    MouseEventHandler::Instance()->RemoveReleaseFilter(
+        "applyWrenchDialog_"+this->dataPtr->linkName);
+    MouseEventHandler::Instance()->RemoveMoveFilter(
+        "applyWrenchDialog_"+this->dataPtr->linkName);
+  }
 }

@@ -74,6 +74,9 @@ namespace gazebo
 
       /// \brief TODO
       public: void SetTorqueVisual();
+
+      // Documentation Inherited.
+      public: void SetVisible(bool _visible, bool _cascade = true);
     };
     /// \}
   }

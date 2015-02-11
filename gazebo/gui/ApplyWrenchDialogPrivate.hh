@@ -128,6 +128,9 @@ namespace gazebo
 
       /// TODO
       public: msgs::Link linkMsg;
+
+      /// TODO
+      public: MainWindow *mainWindow;
     };
   }
 }
