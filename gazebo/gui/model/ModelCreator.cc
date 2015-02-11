@@ -241,10 +241,17 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
 
           rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
           rendering::VisualPtr visual = scene->GetVisual(_modelName);
+
+          math::Pose pose;
           if (visual)
-            this->previewVisual->SetWorldPose(visual->GetWorldPose());
+          {
+            pose = visual->GetWorldPose();
+            this->previewVisual->SetWorldPose(pose);
+          }
 
           this->serverModelName = _modelName;
+          this->serverModelPose = serverModelPose;
+
           return;
 //          boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 //          this->sdfToLoad.push_back(model);
@@ -891,6 +898,7 @@ void ModelCreator::Reset()
   this->currentSaveState = NEVER_SAVED;
   this->SetModelName(this->modelDefaultName);
   this->serverModelName = "";
+  this->serverModelPose = math::Pose::Zero;
 
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
@@ -1010,6 +1018,7 @@ void ModelCreator::CreateTheEntity()
   }
 
   msg.set_sdf(this->modelSDF->ToString());
+  msgs::Set(msg.mutable_pose(), this->modelPose + this->serverModelPose);
   this->makerPub->Publish(msg);
 }
 
@@ -1425,19 +1434,24 @@ void ModelCreator::GenerateSDF()
 
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-  // set center of all parts to be origin
-  std::map<std::string, PartData *>::iterator partsIt;
-  math::Vector3 mid;
-  for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
-       ++partsIt)
+  if (this->serverModelName.empty())
   {
-    PartData *part = partsIt->second;
-    mid += part->GetPose().pos;
+    // set center of all parts to be origin
+    std::map<std::string, PartData *>::iterator partsIt;
+    math::Vector3 mid;
+    for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
+         ++partsIt)
+    {
+      PartData *part = partsIt->second;
+      mid += part->GetPose().pos;
+    }
+    mid /= this->allParts.size();
+    this->modelPose.pos = mid;
   }
-  mid /= this->allParts.size();
-  this->origin.pos = mid;
-  modelElem->GetElement("pose")->Set(this->origin);
 
+  modelElem->GetElement("pose")->Set(this->modelPose);
+
+  std::map<std::string, PartData *>::iterator partsIt;
   // loop through all parts and generate sdf
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
        ++partsIt)
@@ -1450,7 +1464,7 @@ void ModelCreator::GenerateSDF()
 
     sdf::ElementPtr newLinkElem = part->partSDF->Clone();
     newLinkElem->GetElement("pose")->Set(part->partVisual->GetWorldPose()
-        - this->origin);
+        - this->modelPose - this->serverModelPose);
 
     modelElem->InsertElement(newLinkElem);
 

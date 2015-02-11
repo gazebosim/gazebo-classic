@@ -805,8 +805,13 @@ void JointMaker::Update()
           }
 
           // Line now connects the child link to the joint frame
-          joint->line->SetPoint(0, joint->child->GetWorldPose().pos);
-          joint->line->SetPoint(1, joint->jointVisual->GetWorldPose().pos);
+          math::Vector3 origin = joint->child->GetWorldPose().pos
+            - joint->child->GetParent()->GetWorldPose().pos;
+
+          joint->line->SetPoint(0, origin);
+          joint->line->SetPoint(1,
+              joint->jointVisual->GetWorldPose().pos
+              - joint->child->GetParent()->GetWorldPose().pos);
           joint->line->setMaterial(this->jointMaterials[joint->type]);
           joint->dirty = false;
         }
@@ -1103,8 +1108,12 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  jointLine->AddPoint(parentVis->GetWorldPose().pos);
-  jointLine->AddPoint(childVis->GetWorldPose().pos);
+
+  math::Vector3 origin = parentVis->GetWorldPose().pos
+      - parentVis->GetParent()->GetWorldPose().pos;
+  jointLine->AddPoint(origin);
+  jointLine->AddPoint(origin + math::Vector3(0, 0, 0.1));
+
   jointVis->GetSceneNode()->setInheritScale(false);
   jointVis->GetSceneNode()->setInheritOrientation(false);
   joint->visual = jointVis;

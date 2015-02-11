@@ -431,6 +431,9 @@ namespace gazebo
       /// \brief Name of model on the server that is being edited here in the
       /// model editor.
       private: std::string serverModelName;
+
+      /// \brief Pose of the model on the server.
+      private: math::Pose serverModelPose;
     };
     /// \}
   }
