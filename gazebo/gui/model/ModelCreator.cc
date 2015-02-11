@@ -950,7 +950,8 @@ void ModelCreator::FinishModel()
   if (!this->serverModelName.empty())
   {
     // delete model on server first before spawning the updated one.
-    transport::request(gui::get_world(), "entity_delete", this->serverModelName);
+    transport::request(gui::get_world(), "entity_delete",
+        this->serverModelName);
     int timeoutCounter = 0;
     int timeout = 100;
     while (timeoutCounter < timeout)
@@ -1482,7 +1483,7 @@ void ModelCreator::GenerateSDF()
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
 
-  // std::cerr << modelElem->ToString("") << std::endl;
+   std::cerr << modelElem->ToString("") << std::endl;
 }
 
 /////////////////////////////////////////////////

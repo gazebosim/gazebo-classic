@@ -195,9 +195,20 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
     QGroupBox *limitGroupBox = new QGroupBox(tr("Limit"));
     limitGroupBox->setLayout(limitLayout);
 
+    QLabel *frameLabel = new QLabel(tr("Use parent model frame: "));
+    QCheckBox *frameCheckbox = new QCheckBox;
+    frameCheckbox->setCheckable(true);
+    this->frameCheckBoxes.push_back(frameCheckbox);
+
+    QHBoxLayout *frameLayout = new QHBoxLayout;
+    frameLayout->addWidget(frameLabel);
+    frameLayout->addWidget(frameCheckbox);
+
+
     QVBoxLayout *axisAllLayout = new QVBoxLayout;
     axisAllLayout->addLayout(axisLayout);
     axisAllLayout->addWidget(limitGroupBox);
+    axisAllLayout->addLayout(frameLayout);
 
     std::stringstream ss;
     ss << "Axis" << (i+1);
@@ -288,6 +299,18 @@ double JointInspector::GetUpperLimit(unsigned int _index) const
   }
 
   return this->upperLimitSpinBoxes[_index]->value();
+}
+
+/////////////////////////////////////////////////
+bool JointInspector::GetUseParentModelFrame(unsigned int _index) const
+{
+  if (_index > this->frameCheckBoxes.size())
+  {
+    gzerr << "Axis index is out of range" << std::endl;
+    return 0;
+  }
+
+  return this->frameCheckBoxes[_index]->isChecked();
 }
 
 /////////////////////////////////////////////////
@@ -398,6 +421,18 @@ void JointInspector::SetUpperLimit(unsigned int _index, double _upper)
   }
 
   this->upperLimitSpinBoxes[_index]->setValue(_upper);
+}
+
+/////////////////////////////////////////////////
+void JointInspector::SetUseParentModelFrame(unsigned int _index, bool _use)
+{
+  if (_index > this->frameCheckBoxes.size())
+  {
+    gzerr << "Axis index is out of range" << std::endl;
+    return;
+  }
+
+  this->frameCheckBoxes[_index]->setChecked(_use);
 }
 
 /////////////////////////////////////////////////

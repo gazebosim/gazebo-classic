@@ -551,6 +551,7 @@ void JointMaker::OpenInspector(const std::string &_name)
     joint->inspector->SetAxis(i, joint->axis[i]);
     joint->inspector->SetLowerLimit(i, joint->lowerLimit[i]);
     joint->inspector->SetUpperLimit(i, joint->upperLimit[i]);
+    joint->inspector->SetUseParentModelFrame(i, joint->useParentModelFrame[i]);
   }
   joint->inspector->move(QCursor::pos());
   joint->inspector->show();
@@ -776,6 +777,7 @@ void JointMaker::Update()
               continue;
             }
             msgs::Set(axisMsg->mutable_xyz(), joint->axis[i]);
+            axisMsg->set_use_parent_model_frame(joint->useParentModelFrame[i]);
 
             // Add angle field after we've checked that index i is valid
             joint->jointMsg->add_angle(0);
@@ -860,6 +862,9 @@ void JointMaker::GenerateSDF()
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
       limitElem->GetElement("lower")->Set(joint->lowerLimit[i]);
       limitElem->GetElement("upper")->Set(joint->upperLimit[i]);
+
+      axisElem->GetElement("use_parent_model_frame")->Set(
+          joint->useParentModelFrame[i]);
     }
   }
 }
@@ -990,6 +995,7 @@ void JointData::OnApply()
     this->axis[i] = this->inspector->GetAxis(i);
     this->lowerLimit[i] = this->inspector->GetLowerLimit(i);
     this->upperLimit[i] = this->inspector->GetUpperLimit(i);
+    this->useParentModelFrame[i] = this->inspector->GetUseParentModelFrame(i);
   }
   this->dirty = true;
   gui::model::Events::modelChanged();
@@ -1057,8 +1063,9 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
     joint->upperLimit[i] = axisElem->GetElement("limit")->Get<double>("upper");
 
     // Use parent model frame
-    bool use_parent = axisElem->Get<bool>("use_parent_model_frame");
-    joint->useParentModelFrame[i] = use_parent;
+    bool useParent = axisElem->Get<bool>("use_parent_model_frame");
+    joint->useParentModelFrame[i] = useParent;
+    std::cerr << "userParent " << useParent << std::endl;
   }
 
   // Inspector
