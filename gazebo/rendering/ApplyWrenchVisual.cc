@@ -67,7 +67,7 @@ void ApplyWrenchVisual::Load()
   dPtr->forceVisual.reset(new rendering::ArrowVisual(
       this->GetName() + "__FORCE_VISUAL__", shared_from_this()));
   dPtr->forceVisual->Load();
-  dPtr->forceVisual->SetMaterial("Gazebo/RedBright");
+  dPtr->forceVisual->SetMaterial("Gazebo/Orange");
   dPtr->forceVisual->SetScale(math::Vector3(2, 2, 2));
   dPtr->forceVisual->GetSceneNode()->setInheritScale(false);
 
@@ -75,7 +75,7 @@ void ApplyWrenchVisual::Load()
   double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
   rendering::DynamicLines *forceLine = dPtr->forceVisual->
       CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  forceLine->setMaterial("Gazebo/RedBright");
+  forceLine->setMaterial("Gazebo/Orange");
   forceLine->AddPoint(0, 0, 0);
   forceLine->AddPoint(0, 0, linkDiagonal*0.5);
 
@@ -97,12 +97,12 @@ void ApplyWrenchVisual::Load()
       dPtr->torqueVisual->GetSceneNode()->createChildSceneNode(
       this->GetName() + "__TORQUE_VISUAL_NODE__");
   torqueNode->attachObject(torqueObj);
-  dPtr->torqueVisual->SetMaterial("Gazebo/Orange");
+  dPtr->torqueVisual->SetMaterial("Gazebo/Yellow");
 
   // Torque line
   rendering::DynamicLines *torqueLine = dPtr->torqueVisual->
       CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  torqueLine->setMaterial("Gazebo/Orange");
+  torqueLine->setMaterial("Gazebo/Yellow");
   torqueLine->AddPoint(0, 0, 0);
   torqueLine->AddPoint(0, 0, linkDiagonal*0.5 + 0.5);
 
@@ -260,8 +260,8 @@ void ApplyWrenchVisual::SetForceVisual()
 
   // make visible
   dPtr->forceVisual->SetVisible(true);
-  dPtr->forceVisual->SetMaterial("Gazebo/Red");
-  dPtr->torqueVisual->SetMaterial("Gazebo/OrangeTransparent");
+  dPtr->forceVisual->SetMaterial("Gazebo/Orange");
+  dPtr->torqueVisual->SetMaterial("Gazebo/YellowTransparent");
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
 
@@ -294,8 +294,8 @@ void ApplyWrenchVisual::SetTorqueVisual()
 
   // make visible
   dPtr->torqueVisual->SetVisible(true);
-  dPtr->torqueVisual->SetMaterial("Gazebo/Orange");
-  dPtr->forceVisual->SetMaterial("Gazebo/RedTransparent");
+  dPtr->torqueVisual->SetMaterial("Gazebo/Yellow");
+  dPtr->forceVisual->SetMaterial("Gazebo/OrangeTransparent");
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
 
