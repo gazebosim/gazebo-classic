@@ -236,7 +236,14 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
         {
           // Hide the model from the scene to substitute with the preview visual
           this->SetVisible(_modelName, false);
+
           this->LoadSDF(model);
+
+          rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+          rendering::VisualPtr visual = scene->GetVisual(_modelName);
+          if (visual)
+            this->previewVisual->SetWorldPose(visual->GetWorldPose());
+
           this->serverModelName = _modelName;
           return;
 //          boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
