@@ -557,15 +557,13 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   // Setup stereo rendering viewports
   if (this->dataPtr->stereoEnabled)
   {
-    float focalLength = 1.0;
-
     // Defaulting to 0.03m stereo baseline.
-    Ogre::Vector2 offset(0.03f, 0.0f);
+    Ogre::Vector2 offset(this->dataPtr->frustumOffset, 0.0f);
 
-    this->camera->setFocalLength(focalLength);
+    this->camera->setFocalLength(this->dataPtr->focalLength);
     this->camera->setFrustumOffset(offset);
 
-    this->dataPtr->rightCamera->setFocalLength(focalLength);
+    this->dataPtr->rightCamera->setFocalLength(this->dataPtr->focalLength);
     this->dataPtr->rightCamera->setFrustumOffset(-offset);
 
     this->dataPtr->rightViewport =
@@ -769,4 +767,16 @@ void UserCamera::SetClipDist(float _near, float _far)
 bool UserCamera::StereoEnabled() const
 {
   return this->dataPtr->stereoEnabled;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::FocalLength(const float _length)
+{
+  this->dataPtr->focalLength = _length;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::FrustumOffset(const float _offset)
+{
+  this->dataPtr->frustumOffset = _offset;
 }

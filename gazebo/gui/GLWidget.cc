@@ -812,8 +812,15 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
     gzerr << "Unable to connect to a running Gazebo master.\n";
 
   if (_scene->GetUserCameraCount() == 0)
+  {
     this->userCamera = _scene->CreateUserCamera(cameraName,
         gazebo::gui::getINIProperty<int>("rendering.stereo", 0));
+
+    this->userCamera->FrustumOffset(
+        gazebo::gui::getINIProperty<float>("rendering.frustum_offset", 0.0));
+    this->userCamera->FocalLength(
+        gazebo::gui::getINIProperty<float>("rendering.focal_length", 1.0));
+  }
   else
     this->userCamera = _scene->GetUserCamera(0);
 

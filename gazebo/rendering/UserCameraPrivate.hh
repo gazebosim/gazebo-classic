@@ -73,6 +73,12 @@ namespace gazebo
 
       /// \brief True if stereo rendering should be enabled.
       public: bool stereoEnabled;
+
+      /// \brief Camera focal length.
+      public: float focalLength = 1.0;
+
+      /// \brief Camera frustum offset. Used for stereo rendering.
+      public: float frustumOffset = 0.0;
     };
   }
 }

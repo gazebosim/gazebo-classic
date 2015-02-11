@@ -193,6 +193,15 @@ namespace gazebo
       /// \return True if stereo is enabled.
       public: bool StereoEnabled() const;
 
+      /// \brief Set the camera's focal length.
+      /// \param[in] _length Focal length (m)
+      public: void FocalLength(const float _length);
+
+      /// \brief Set the camera's frustum offset. This is used for stereo
+      /// rendering. This can be thought of as half of your eye separation.
+      /// \param[in] _length Frustum offset (m)
+      public: void FrustumOffset(const float _offset);
+
       /// \brief Set the camera to be attached to a visual.
       ///
       /// This causes the camera to move in relation to the specified visual.
