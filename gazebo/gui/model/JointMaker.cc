@@ -98,6 +98,8 @@ void JointMaker::Reset()
   this->inspectVis.reset();
   this->selectedJoint.reset();
 
+  this->scopedLinkedNames.clear();
+
   while (this->joints.size() > 0)
     this->RemoveJoint(this->joints.begin()->first);
   this->joints.clear();
@@ -814,6 +816,25 @@ void JointMaker::Update()
 }
 
 /////////////////////////////////////////////////
+void JointMaker::AddScopedLinkName(const std::string &_name)
+{
+  this->scopedLinkedNames.push_back(_name);
+}
+
+/////////////////////////////////////////////////
+std::string JointMaker::GetScopedLinkName(const std::string &_name)
+{
+  for (unsigned int i = 0; i < this->scopedLinkedNames.size(); ++i)
+  {
+    std::string scopedName = this->scopedLinkedNames[i];
+    size_t idx = scopedName.find("::" + _name);
+    if (idx != std::string::npos)
+      return scopedName;
+  }
+  return _name;
+}
+
+/////////////////////////////////////////////////
 void JointMaker::GenerateSDF()
 {
   this->modelSDF.reset(new sdf::Element);
@@ -837,6 +858,8 @@ void JointMaker::GenerateSDF()
     size_t pIdx = parentName.find_last_of("::");
     if (pIdx != std::string::npos)
       parentLeafName = parentName.substr(pIdx+1);
+
+    parentLeafName = this->GetScopedLinkName(parentLeafName);
     parentElem->Set(parentLeafName);
 
     sdf::ElementPtr childElem = jointElem->GetElement("child");
@@ -845,6 +868,7 @@ void JointMaker::GenerateSDF()
     size_t cIdx = childName.find_last_of("::");
     if (cIdx != std::string::npos)
       childLeafName = childName.substr(cIdx+1);
+    childLeafName = this->GetScopedLinkName(childLeafName);
     childElem->Set(childLeafName);
 
     sdf::ElementPtr poseElem = jointElem->GetElement("pose");
@@ -1065,7 +1089,6 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
     // Use parent model frame
     bool useParent = axisElem->Get<bool>("use_parent_model_frame");
     joint->useParentModelFrame[i] = useParent;
-    std::cerr << "userParent " << useParent << std::endl;
   }
 
   // Inspector

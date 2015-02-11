@@ -160,6 +160,13 @@ namespace gazebo
       public: void CreateJointFromSDF(sdf::ElementPtr _jointElem,
           const std::string &_modelName = "");
 
+      /// \brief Add a scoped link name. Nested model's link names are scoped
+      /// but the parent and child field in the joint SDF element may not be.
+      /// So keep track of scoped link names in order to generate the correct
+      /// SDF before spawning the model.
+      /// \param[in] _name Scoped link name.
+      public: void AddScopedLinkName(const std::string &_name);
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -199,6 +206,11 @@ namespace gazebo
       /// \param[in] _type Joint type in string.
       /// \return Joint type enum.
       private: JointType ConvertJointType(const std::string &_type);
+
+      /// \brief Get the scoped name of a link.
+      /// \param[in] _name Unscoped link name.
+      /// \return Scoped link name.
+      private :std::string GetScopedLinkName(const std::string &_name);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
@@ -254,6 +266,9 @@ namespace gazebo
 
       /// \brief Selected joint.
       private: rendering::VisualPtr selectedJoint;
+
+      /// \brief A list of scoped link names.
+      private: std::vector<std::string> scopedLinkedNames;
     };
     /// \}
 

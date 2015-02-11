@@ -682,6 +682,12 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 
   part->SetName(leafName);
 
+  // find scoped link names which mean it could an included model.
+  // joint maker needs to know about this in order to specify the correct
+  // parent and child links in sdf generation step.
+  if (leafName.find("::") != std::string::npos)
+    this->jointMaker->AddScopedLinkName(leafName);
+
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
       this->previewVisual));
   linkVisual->Load();
@@ -1050,10 +1056,7 @@ void ModelCreator::OnDelete(const std::string &_entity)
   {
     rendering::VisualPtr parentLink = vis->GetParent();
     std::string parentLinkName = parentLink->GetName();
-/*    std::string leafName = parentLinkName;
-    size_t idx = parentLinkName.find_last_of("::");
-    if (idx != std::string::npos)
-      leafName = parentLinkName.substr(idx+1);*/
+
     if (this->allParts.find(parentLinkName) != this->allParts.end())
     {
       // remove the parent link if it's the only child
