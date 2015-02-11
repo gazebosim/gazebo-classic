@@ -124,6 +124,10 @@ ModelCreator::ModelCreator()
        boost::bind(&ModelCreator::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
+      gui::Events::ConnectScaleEntity(
+      boost::bind(&ModelCreator::OnEntityScaleChanged, this, _1, _2)));
+
+  this->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&ModelCreator::Update, this)));
 
@@ -850,18 +854,15 @@ void ModelCreator::RemovePart(const std::string &_partName)
     return;
 
   rendering::ScenePtr scene = part->partVisual->GetScene();
-  std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
-  for (it = part->visuals.begin(); it != part->visuals.end(); ++it)
+  for (auto &it : part->visuals)
   {
-    rendering::VisualPtr vis = it->first;
+    rendering::VisualPtr vis = it.first;
     scene->RemoveVisual(vis);
   }
   scene->RemoveVisual(part->partVisual);
-  std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
-  for (colIt = part->collisions.begin(); colIt != part->collisions.end();
-      ++colIt)
+  for (auto &colIt : part->collisions)
   {
-    rendering::VisualPtr vis = colIt->first;
+    rendering::VisualPtr vis = colIt.first;
     scene->RemoveVisual(vis);
   }
 
@@ -1164,6 +1165,9 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 
   if (this->mouseVisual)
   {
+    if (_event.button == common::MouseEvent::RIGHT)
+      return true;
+
     // set the part data pose
     if (this->allParts.find(this->mouseVisual->GetName()) !=
         this->allParts.end())
@@ -1372,8 +1376,7 @@ void ModelCreator::OnPaste()
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
   // For now, only copy the last selected model
-  std::map<std::string, PartData *>::iterator it =
-      this->allParts.find(this->copiedPartNames.back());
+  auto it = this->allParts.find(this->copiedPartNames.back());
   if (it != this->allParts.end())
   {
     PartData *copiedPart = it->second;
@@ -1436,12 +1439,10 @@ void ModelCreator::GenerateSDF()
   if (this->serverModelName.empty())
   {
     // set center of all parts to be origin
-    std::map<std::string, PartData *>::iterator partsIt;
     math::Vector3 mid;
-    for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
-         ++partsIt)
+    for (auto &partsIt : this->allParts)
     {
-      PartData *part = partsIt->second;
+      PartData *part = partsIt.second;
       mid += part->GetPose().pos;
     }
     mid /= this->allParts.size();
@@ -1450,15 +1451,13 @@ void ModelCreator::GenerateSDF()
 
   modelElem->GetElement("pose")->Set(this->modelPose);
 
-  std::map<std::string, PartData *>::iterator partsIt;
   // loop through all parts and generate sdf
-  for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
-       ++partsIt)
+  for (auto &partsIt : this->allParts)
   {
     visualNameStream.str("");
     collisionNameStream.str("");
 
-    PartData *part = partsIt->second;
+    PartData *part = partsIt.second;
     part->UpdateConfig();
 
     sdf::ElementPtr newLinkElem = part->partSDF->Clone();
@@ -1468,11 +1467,10 @@ void ModelCreator::GenerateSDF()
     modelElem->InsertElement(newLinkElem);
 
     // visuals
-    std::map<rendering::VisualPtr, msgs::Visual>::iterator it;
-    for (it = part->visuals.begin(); it != part->visuals.end(); ++it)
+    for (auto const &it : part->visuals)
     {
-      rendering::VisualPtr visual = it->first;
-      msgs::Visual visualMsg = it->second;
+      rendering::VisualPtr visual = it.first;
+      msgs::Visual visualMsg = it.second;
       sdf::ElementPtr visualElem = visual->GetSDF()->Clone();
       visualElem->GetElement("transparency")->Set<double>(
           visualMsg.transparency());
@@ -1480,11 +1478,9 @@ void ModelCreator::GenerateSDF()
     }
 
     // collisions
-    std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
-    for (colIt = part->collisions.begin(); colIt != part->collisions.end();
-        ++colIt)
+    for (auto const &colIt : part->collisions)
     {
-      sdf::ElementPtr collisionElem = msgs::CollisionToSDF(colIt->second);
+      sdf::ElementPtr collisionElem = msgs::CollisionToSDF(colIt.second);
       newLinkElem->InsertElement(collisionElem);
     }
   }
@@ -1592,17 +1588,35 @@ void ModelCreator::Update()
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
   // Check if any parts have been moved or resized and trigger ModelChanged
-  std::map<std::string, PartData *>::iterator partsIt;
-  for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
-       ++partsIt)
+  for (auto &partsIt : this->allParts)
   {
-    PartData *part = partsIt->second;
-    if (part->GetPose() != part->partVisual->GetWorldPose() ||
-        part->scale != part->partVisual->GetScale())
+    PartData *part = partsIt.second;
+    if (part->GetPose() != part->partVisual->GetWorldPose())
     {
       part->SetPose(part->partVisual->GetWorldPose());
-      part->scale = part->partVisual->GetScale();
       this->ModelChanged();
+    }
+    for (auto scaleIt : this->partScaleUpdate)
+    {
+      if (part->partVisual->GetName() == scaleIt.first)
+        part->SetScale(scaleIt.second);
+    }
+    this->partScaleUpdate.clear();
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnEntityScaleChanged(const std::string &_name,
+  const math::Vector3 &_scale)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  for (auto partsIt : this->allParts)
+  {
+    if (_name == partsIt.first ||
+        _name.find(partsIt.first) != std::string::npos)
+    {
+      this->partScaleUpdate[partsIt.first] = _scale;
+      break;
     }
   }
 }

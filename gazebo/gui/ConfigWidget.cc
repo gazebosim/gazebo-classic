@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1207,6 +1207,9 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   widget->geomFilenameLabel = geomFilenameLabel;
   widget->geomFilenameLineEdit = geomFilenameLineEdit;
 
+  geomFilenameLabel->setVisible(false);
+  geomFilenameLineEdit->setVisible(false);
+
   connect(geometryComboBox,
     SIGNAL(currentIndexChanged(const QString)),
     widget, SLOT(GeometryChanged(const QString)));
@@ -1979,7 +1982,7 @@ void GeometryConfigWidget::GeometryChanged(const QString _text)
   if (widget)
   {
     std::string textStr = _text.toStdString();
-    bool isMesh = textStr == "mesh";
+    bool isMesh = (textStr == "mesh");
     if (textStr == "box" || isMesh)
     {
       this->geomDimensionWidget->setCurrentIndex(0);

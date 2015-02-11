@@ -66,6 +66,8 @@ namespace gazebo
 
       /// \brief Add a collision widget to the tab.
       /// \param[in] _name Name of collision added.
+      /// \param[in] _collisionMsg Msg containing information of the collision
+      /// to be added.
       public: void AddCollision(const std::string &_name,
           const msgs::Collision *_collisionMsg = NULL);
 

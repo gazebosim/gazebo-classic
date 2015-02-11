@@ -77,9 +77,8 @@ unsigned int VisualConfig::GetVisualCount() const
 /////////////////////////////////////////////////
 void VisualConfig::Reset()
 {
-  std::map<int, VisualConfigData *>::iterator it;
-  for (it = this->configs.begin(); it != this->configs.end(); ++it)
-    delete it->second;
+  for (auto &it : this->configs)
+    delete it.second;
 
   this->configs.clear();
   this->visualsTreeWidget->clear();
@@ -192,13 +191,11 @@ void VisualConfig::AddVisual(const std::string &_name,
 void VisualConfig::UpdateVisual(const std::string &_name,
     const msgs::Visual *_visualMsg)
 {
-  std::map<int, VisualConfigData *>::iterator it;
-
-  for (it = this->configs.begin(); it != this->configs.end(); ++it)
+  for (auto &it : this->configs)
   {
-    if (it->second->name == _name)
+    if (it.second->name == _name)
     {
-      VisualConfigData *configData = it->second;
+      VisualConfigData *configData = it.second;
       configData->configWidget->UpdateFromMsg(_visualMsg);
       break;
     }
@@ -216,7 +213,7 @@ void VisualConfig::OnItemSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 void VisualConfig::OnRemoveVisual(int _id)
 {
-  std::map<int, VisualConfigData *>::iterator it = this->configs.find(_id);
+  auto it = this->configs.find(_id);
   if (it == this->configs.end())
   {
     gzerr << "Visual not found " << std::endl;
@@ -236,11 +233,10 @@ void VisualConfig::OnRemoveVisual(int _id)
 /////////////////////////////////////////////////
 msgs::Visual *VisualConfig::GetData(const std::string &_name) const
 {
-  std::map<int, VisualConfigData *>::const_iterator it;
-  for (it = this->configs.begin(); it != this->configs.end(); ++it)
+  for (auto const &it : this->configs)
   {
-    if (it->second->name == _name)
-      return dynamic_cast<msgs::Visual *>(it->second->configWidget->GetMsg());
+    if (it.second->name == _name)
+      return dynamic_cast<msgs::Visual *>(it.second->configWidget->GetMsg());
   }
   return NULL;
 }
@@ -249,16 +245,15 @@ msgs::Visual *VisualConfig::GetData(const std::string &_name) const
 void VisualConfig::SetGeometry(const std::string &_name,
     const math::Vector3 &_size, const std::string &_uri)
 {
-  std::map<int, VisualConfigData *>::iterator it;
-  for (it = this->configs.begin(); it != this->configs.end(); ++it)
+  for (auto &it : this->configs)
   {
-    if (it->second->name == _name)
+    if (it.second->name == _name)
     {
       math::Vector3 dimensions;
       std::string uri;
-      std::string type = it->second->configWidget->GetGeometryWidgetValue(
+      std::string type = it.second->configWidget->GetGeometryWidgetValue(
           "geometry", dimensions, uri);
-      it->second->configWidget->SetGeometryWidgetValue("geometry", type,
+      it.second->configWidget->SetGeometryWidgetValue("geometry", type,
           _size, _uri);
       break;
     }

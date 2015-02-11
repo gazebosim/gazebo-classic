@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -253,8 +253,8 @@ namespace gazebo
       /// configuring fields of the message, or update the widgets with values
       /// from the message.
       /// \param[in] _msg Message.
-      /// \param[in] _update True to parse available fields in an update
-      /// message rather than the all available fields in the message
+      /// \param[in] _update True to parse only fields that are specified in
+      /// the message rather than all the available fields in the message
       /// \param[in] _name Name used when creating new widgets.
       /// return Updated widget.
       private: QWidget *Parse(google::protobuf::Message *_msg,

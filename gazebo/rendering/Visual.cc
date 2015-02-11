@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,6 +81,7 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->id = this->dataPtr->visualIdCount--;
   this->dataPtr->boundingBox = NULL;
   this->dataPtr->useRTShader = _useRTShader;
+  this->dataPtr->visibilityFlags = GZ_VISIBILITY_ALL;
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("visual.sdf", this->dataPtr->sdf);
@@ -1629,12 +1630,7 @@ void Visual::SetVisible(bool _visible, bool _cascade)
 //////////////////////////////////////////////////
 uint32_t Visual::GetVisibilityFlags()
 {
-  if (this->dataPtr->sceneNode->numAttachedObjects() > 0)
-  {
-    return this->dataPtr->sceneNode->getAttachedObject(0)->getVisibilityFlags();
-  }
-
-  return GZ_VISIBILITY_ALL;
+  return this->dataPtr->visibilityFlags;
 }
 
 //////////////////////////////////////////////////
@@ -2278,8 +2274,13 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
         msgs::ConvertGeometryType(_msg->geometry().type());
 
     std::string geometryType = this->GetGeometryType();
+    std::string geometryName = this->GetMeshName();
 
-    if (newGeometryType != geometryType)
+    std::string newGeometryName = geometryName;
+    if (_msg->geometry().has_mesh() && _msg->geometry().mesh().has_filename())
+        newGeometryName = _msg->geometry().mesh().filename();
+
+    if (newGeometryType != geometryType || newGeometryName != geometryName)
     {
       std::string origMaterial = this->dataPtr->myMaterialName;
       float origTransparency = this->dataPtr->transparency;
@@ -2304,11 +2305,15 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
           std::string meshName = common::find_file(filename);
 
           if (meshName.empty())
-            gzerr << "No mesh found\n";
+          {
+            meshName = "unit_box";
+            gzerr << "No mesh found, setting mesh to a unit box" << std::endl;
+          }
 
           this->AttachMesh(meshName);
           sdf::ElementPtr meshElem = geomElem->AddElement(newGeometryType);
-          meshElem->GetElement("uri")->Set(filename);
+          if (!filename.empty())
+            meshElem->GetElement("uri")->Set(filename);
         }
       }
       this->SetTransparency(origTransparency);
@@ -2772,6 +2777,8 @@ void Visual::SetVisibilityFlags(uint32_t _flags)
     for (int j = 0; j < sn->numAttachedObjects(); ++j)
       sn->getAttachedObject(j)->setVisibilityFlags(_flags);
   }
+
+  this->dataPtr->visibilityFlags = _flags;
 }
 
 //////////////////////////////////////////////////
