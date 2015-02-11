@@ -149,14 +149,6 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
           << "(https://bitbucket.org/osrf/gazebo/issue/914)"
           << std::endl;
   }
-  else if (_physicsEngine == "simbody" && _jointType == "screw")
-  {
-    // SimbodyScrewJoint doesn't support joints with world child.
-    gzerr << "Skip SimbodyScrewJoint tests for child world link cases."
-          << "Please see issue #857. "
-          << "(https://bitbucket.org/osrf/gazebo/issue/857)"
-          << std::endl;
-  }
   else
   {
     gzdbg << "SpawnJoint " << _jointType << " world parent" << std::endl;
