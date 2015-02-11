@@ -385,8 +385,13 @@ void PartData::OnApply()
         msgs::Material *matMsg = updateMsg->mutable_material();
         msgs::Material::Script *scriptMsg = matMsg->mutable_script();
 
+        common::Color emptyColor;
         bool matScriptChanged = false;
         bool colorChanged = false;
+        common::Color ambient;
+        common::Color diffuse;
+        common::Color specular;
+        common::Color emissive;
 
         std::string matName = it->first->GetMaterialName();
         std::string uniqueMatName = name + "_MATERIAL_";
@@ -394,17 +399,28 @@ void PartData::OnApply()
         if (visMatIdx != std::string::npos)
           matName = matName.substr(visMatIdx + uniqueMatName.size());
 
-        if (matName != scriptMsg->name())
+        if (matName != scriptMsg->name() && !scriptMsg->name().empty())
         {
+          rendering::Material::GetMaterialAsColor(scriptMsg->name(), ambient,
+              diffuse, specular, emissive);
+          visualConfig->SetMaterial(leafName, scriptMsg->name(), ambient,
+              diffuse, specular, emissive);
+
           matScriptChanged = true;
         }
         else
         {
-          if (msgs::Convert(matMsg->ambient()) != it->first->GetAmbient()
-              || msgs::Convert(matMsg->diffuse()) != it->first->GetDiffuse()
-              || msgs::Convert(matMsg->specular()) != it->first->GetSpecular()
-              || msgs::Convert(matMsg->emissive()) != it->first->GetEmissive())
+          ambient = msgs::Convert(matMsg->ambient());
+          diffuse = msgs::Convert(matMsg->diffuse());
+          specular = msgs::Convert(matMsg->specular());
+          emissive = msgs::Convert(matMsg->emissive());
+          if (ambient != it->first->GetAmbient()
+              || diffuse != it->first->GetDiffuse()
+              || specular != it->first->GetSpecular()
+              || emissive != it->first->GetEmissive())
+          {
             colorChanged = true;
+          }
 
             if (colorChanged)
               scriptMsg->clear_name();
@@ -412,7 +428,6 @@ void PartData::OnApply()
 
         // update material or color, but not both
         // clear empty colors so they are not used by visual updates
-        common::Color emptyColor;
         if (matScriptChanged || !colorChanged ||
             msgs::Convert(matMsg->ambient()) == emptyColor)
           matMsg->clear_ambient();

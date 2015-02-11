@@ -94,6 +94,18 @@ namespace gazebo
       public: void SetGeometry(const std::string &_name,
           const math::Vector3 &_size, const std::string &_uri = "");
 
+      /// \brief Set the material of a visual
+      /// \param[in] _name Name of visual.
+      /// \param[in] _materialName Name of material.
+      /// \param[in] _ambient Ambient color of visual.
+      /// \param[in] _diffuse Diffuse color of visual.
+      /// \param[in] _specular Specular color of visual.
+      /// \param[in] _emissive Emissive color of visual.
+      public: void SetMaterial(const std::string &_name,
+          const std::string &_materialName,
+          common::Color ambient, common::Color diffuse, common::Color specular,
+          common::Color emissive);
+
       /// \brief Qt signal emitted when a visual is removed.
       /// \param[in] _name Name of visual removed.
       Q_SIGNALS: void VisualRemoved(const std::string &_name);

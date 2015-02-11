@@ -264,3 +264,28 @@ void VisualConfig::SetGeometry(const std::string &_name,
     }
   }
 }
+
+/////////////////////////////////////////////////
+void VisualConfig::SetMaterial(const std::string &_name,
+    const std::string &_materialName,
+    common::Color _ambient, common::Color _diffuse, common::Color _specular,
+    common::Color _emissive)
+{
+  for (auto &it : this->configs)
+  {
+    if (it.second->name == _name)
+    {
+      it.second->configWidget->SetStringWidgetValue("material::script::name",
+          _materialName);
+      it.second->configWidget->SetColorWidgetValue("material::ambient",
+          _ambient);
+      it.second->configWidget->SetColorWidgetValue("material::diffuse",
+          _diffuse);
+      it.second->configWidget->SetColorWidgetValue("material::specular",
+          _specular);
+      it.second->configWidget->SetColorWidgetValue("material::emissive",
+          _emissive);
+      break;
+    }
+  }
+}
