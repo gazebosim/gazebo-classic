@@ -553,8 +553,6 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
   Camera::SetRenderTarget(_target);
 
-  // this->Resize(0, 0);
-
   // Setup stereo rendering viewports
   if (this->dataPtr->stereoEnabled)
   {
