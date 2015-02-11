@@ -65,9 +65,14 @@ TEST_F(SVGLoader, LoadPaths)
   // THe A contour has 9
   EXPECT_EQ(9, a.polylines[1].size());
 
+  // see what's going on
+  loader.DumpPaths(paths, std::cout);
+
   // the second path
   common::SVGPath &p2 = paths[1];
   EXPECT_EQ(1, p2.subpaths.size());
+  EXPECT_EQ("path2984", p2.id);
+
   // 8 commands
   EXPECT_EQ(8, p2.subpaths[0].size());
   // since it has splines, there are more
