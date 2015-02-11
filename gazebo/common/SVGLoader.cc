@@ -212,20 +212,6 @@ void SVGLoader::SplitSubpaths(const std::vector<SVGCommand> &_cmds,
 }
 
 /////////////////////////////////////////////////
-void SVGLoader::MakeCommands(char _cmd,
-                             const std::vector<double> &_numbers,
-                             std::vector<SVGCommand> &_cmds)
-{
-  if (_cmd != 'x')
-  {
-    SVGCommand c;
-    c.cmd = _cmd;
-    c.numbers = _numbers;
-    _cmds.push_back(c);
-  }
-}
-
-/////////////////////////////////////////////////
 void SVGLoader::ExpandCommands(
                   const std::vector< std::vector<SVGCommand> > &_subpaths,
                   SVGPath &_path)
@@ -422,6 +408,158 @@ void SVGLoader::Parse(const std::string &_filename, std::vector<SVGPath> &paths)
 void SVGLoader::DumpPaths(const std::vector<SVGPath> &_paths,
                           std::ostream &out) const
 {
+  // this prints an html document that allows to debug
+  // SVG parsing issues. The points are generated in
+  // a loop between the header and footer.
+  std::string  header = R"***(
+<!DOCTYPE html>
+<html>
+
+<script type="text/javascript">
+
+)***";
+  std::string footer = R"***(
+</script>
+
+<script>
+
+var x0 = 0;
+var y0 = 0;
+var scale = 1.;
+
+function xx(x)
+{
+  var r = x0 + scale * x;
+  return r;
+}
+
+function yy(y)
+{
+  var r =  - (y0 + scale * (-y) );
+  return r;
+}
+
+function drawPoint(ctx, x, y)
+{
+  ctx.beginPath();
+  ctx.arc(x, y, 5, 0, 2 * Math.PI, true);
+  ctx.strokeStyle= style;
+  ctx.stroke();
+}
+
+function drawPath(ctx, path, style, x0, y0, scale, showCtrlPoints )
+{
+  console.log('drawPath ' + path.name);
+
+  ctx.beginPath();
+  for (var j = 0; j <  path.subpaths.length; j++)
+  {
+    var points = path.subpaths[j];
+    console.log(points.length + ' points in subpath, (' + style + ')');
+    if (points.length < 2)
+    {
+      console.log("not enough points in subpath " + j);
+      return;
+    }
+    ctx.moveTo(xx(points[0][0]), yy(points[0][1]));
+    for (var i = 1; i < points.length; i++)
+    {
+      var x= xx(points[i][0]);
+      var y= yy(points[i][1]);
+      ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle= style;
+    ctx.stroke();
+
+    // draw points
+    if (showCtrlPoints)
+    {
+      var styles = ["black", "orange", "grey"];
+      for (var i = 0; i < points.length; i++)
+      {
+        var x= xx(points[i][0]);
+        var y= yy(points[i][1]);
+        var m = " [" + points[i][0] + ", " + points[i][1];
+        m += "]  [" + x + ", " + y + "]";
+        console.log(m);
+        ctx.beginPath();
+        if (i == 0)
+        {
+          ctx.arc(x, y, 4, 0, 2 * Math.PI, true);
+          ctx.strokeStyle = "red";
+          ctx.fill();
+        }
+        else if (i == 1)
+        {
+          ctx.arc(x, y, 2, 0, 2 * Math.PI, true);
+          ctx.strokeStyle= "red";
+        }
+        else
+        {
+          ctx.arc(x, y, 2, 0, 2 * Math.PI, true);
+          ctx.strokeStyle= styles[i % styles.length ];
+        }
+        ctx.stroke();
+       }
+    }
+  }
+}
+
+
+function draw(showCtrlPoints)
+{
+  var canvas = document.getElementById("myCanvas");
+  var ctx = canvas.getContext("2d");
+  var styles = ["red", "green", "blue"];
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  x0 = Number(document.getElementsByName("xoff_in")[0].value);
+  y0 = Number(document.getElementsByName("yoff_in")[0].value);
+  scale = Number(document.getElementsByName("scale_in")[0].value);
+
+  for (var i =0; i < svg.length; i++)
+  {
+    var path = svg[i];
+    console.log("path: " + path.name);
+    drawPath(ctx, path, styles[i%3], x0, y0, scale, showCtrlPoints);
+  }
+}
+
+  console.log("number of paths: " + svg.length);
+
+  document.addEventListener("DOMContentLoaded", function(event)
+  {
+    draw();
+  });
+
+</script>
+
+
+<body>
+
+  <div>
+
+  Xoff: <input type="text" name="xoff_in" value="0"><br>
+  Yoff: <input type="text" name="yoff_in" value="0"><br>
+  Scale: <input type="text" name="scale_in" value="1.0"><br>
+
+  <button onclick="draw(true);">Draw</button>
+  </div>
+
+  <canvas
+    id="myCanvas"
+    width="1024"
+    height="768"
+    style="border:1px solid #d3d3d3;">
+    Your browser does not support the canvas element.
+  </canvas>
+
+</body>
+</html>
+
+)***";
+
+  out << header << std::endl;
   out << "var svg = [];" << std::endl;
   for (SVGPath path : _paths)
   {
@@ -447,4 +585,5 @@ void SVGLoader::DumpPaths(const std::vector<SVGPath> &_paths,
     out << "];" << std::endl;
     out << "\n\n";
   }
+  out << footer << std::endl;
 }

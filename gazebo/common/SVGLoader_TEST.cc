@@ -34,6 +34,20 @@ TEST_F(SVGLoader, LoadPaths)
 {
   common::SVGLoader loader(samples);
   std::vector<common::SVGPath> paths;
+
+  // bad path
+  bool error = false;
+  try
+  {
+    std::string bad = "/not/a/file.svg";
+    loader.Parse(bad, paths);
+  }
+  catch(...)
+  {
+    error = true;
+  }
+  EXPECT_EQ(true, error);
+
   std::string filePath = std::string(PROJECT_SOURCE_PATH);
   filePath += "/test/data/loader.svg";
   loader.Parse(filePath, paths);

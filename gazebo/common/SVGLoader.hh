@@ -87,14 +87,6 @@ namespace gazebo
       public: void DumpPaths(const std::vector<SVGPath> &_paths,
                              std::ostream &_out) const;
 
-      /// \brief Creates a vector of commands from a list of numbers
-      /// \param[in] _cmd The type of SVG command
-      /// \param[in] _numbers The list of coordinates
-      /// \param[out] _cmds The vector that receives the commands
-      private: void MakeCommands(char _cmd,
-                                 const std::vector<double> &_numbers,
-                                 std::vector<SVGCommand> &_cmds);
-
       /// \brief Parses a list of strings into a path
       /// \param[in] _tokens The tokenized path attribute from SVG file
       /// \param[out] _path The path that receives the data
