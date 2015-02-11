@@ -175,6 +175,17 @@ void PartData::Load(sdf::ElementPtr _sdf)
     }
     linkConfig->Update(&linkMsg);
   }
+
+  if (_sdf->HasElement("sensor"))
+  {
+    sdf::ElementPtr sensorElem = _sdf->GetElement("sensor");
+    while (sensorElem)
+    {
+      this->partSDF->InsertElement(sensorElem->Clone());
+      sensorElem = sensorElem->GetNextElement("sensor");
+    }
+  }
+
 }
 
 /////////////////////////////////////////////////

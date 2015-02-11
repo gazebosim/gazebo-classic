@@ -434,6 +434,9 @@ namespace gazebo
 
       /// \brief Pose of the model on the server.
       private: math::Pose serverModelPose;
+
+      /// \brief SDF element of the model on the server.
+      private: sdf::ElementPtr serverModelSDF;
     };
     /// \}
   }

@@ -251,6 +251,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
 
           this->serverModelName = _modelName;
           this->serverModelPose = serverModelPose;
+          this->serverModelSDF = model;
 
           return;
 //          boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
@@ -297,6 +298,7 @@ void ModelCreator::LoadSDF(sdf::ElementPtr _modelElem)
   sdf::ElementPtr jointElem;
   if (_modelElem->HasElement("joint"))
      jointElem = _modelElem->GetElement("joint");
+
   while (jointElem)
   {
     this->jointMaker->CreateJointFromSDF(jointElem, preivewModelName.str());
@@ -899,6 +901,7 @@ void ModelCreator::Reset()
   this->SetModelName(this->modelDefaultName);
   this->serverModelName = "";
   this->serverModelPose = math::Pose::Zero;
+  this->serverModelSDF.reset();
 
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
@@ -1506,6 +1509,21 @@ void ModelCreator::GenerateSDF()
   // Model settings
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
+
+  // If we're editing an existing model, copy the original plugin sdf elements
+  // since we are not generating them.
+  if (this->serverModelSDF)
+  {
+    if (this->serverModelSDF->HasElement("plugin"))
+    {
+      sdf::ElementPtr pluginElem = this->serverModelSDF->GetElement("plugin");
+      while (pluginElem)
+      {
+        modelElem->InsertElement(pluginElem->Clone());
+        pluginElem = pluginElem->GetNextElement("plugin");
+      }
+    }
+  }
 
    std::cerr << modelElem->ToString("") << std::endl;
 }

@@ -805,10 +805,8 @@ void JointMaker::Update()
           }
 
           // Line now connects the child link to the joint frame
-          math::Vector3 origin = joint->child->GetWorldPose().pos
-            - joint->child->GetParent()->GetWorldPose().pos;
-
-          joint->line->SetPoint(0, origin);
+          joint->line->SetPoint(0, joint->child->GetWorldPose().pos
+            - joint->child->GetParent()->GetWorldPose().pos);
           joint->line->SetPoint(1,
               joint->jointVisual->GetWorldPose().pos
               - joint->child->GetParent()->GetWorldPose().pos);
