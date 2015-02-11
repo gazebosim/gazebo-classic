@@ -1,6 +1,9 @@
 1. Added various Get functions to Visual. Also added a ConvertGeometryType function to msgs.
     * [Pull request #1402](https://bitbucket.org/osrf/gazebo/pull-request/1402)
 
+1. Get and Set visibility of SelectionObj's handles, with unit test.
+    * [Pull request #1417](https://bitbucket.org/osrf/gazebo/pull-request/1417)
+
 1. Allow link selection with the mouse if parent model already selected.
     * [Pull request #1409](https://bitbucket.org/osrf/gazebo/pull-request/1409)
 
