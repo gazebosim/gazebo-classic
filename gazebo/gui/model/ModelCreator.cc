@@ -234,10 +234,10 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
       {
         if (model->GetAttribute("name")->GetAsString() == _modelName)
         {
-          // Hide the model from the scene to substitute with the preview visual
-          this->SetVisible(_modelName, false);
-
           this->LoadSDF(model);
+
+          // Hide the model from the scene to substitute with the preview visual
+          this->SetModelVisible(_modelName, false);
 
           rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
           rendering::VisualPtr visual = scene->GetVisual(_modelName);
@@ -425,7 +425,7 @@ void ModelCreator::OnExit()
   if (this->allParts.empty())
   {
     if (!this->serverModelName.empty())
-      this->SetVisible(this->serverModelName, true);
+      this->SetModelVisible(this->serverModelName, true);
     this->Reset();
     gui::model::Events::newModel();
     gui::model::Events::finishModel();
@@ -484,7 +484,7 @@ void ModelCreator::OnExit()
   if (this->currentSaveState != NEVER_SAVED)
     this->FinishModel();
   else
-    this->SetVisible(this->serverModelName, true);
+    this->SetModelVisible(this->serverModelName, true);
 
   this->Reset();
 
@@ -698,8 +698,8 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 
   part->SetName(leafName);
 
-  // find scoped link names which mean it could an included model.
-  // joint maker needs to know about this in order to specify the correct
+  // if link name is scoped, it could mean that it's from an included model.
+  // The joint maker needs to know about this in order to specify the correct
   // parent and child links in sdf generation step.
   if (leafName.find("::") != std::string::npos)
     this->jointMaker->AddScopedLinkName(leafName);
@@ -751,6 +751,7 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 
     visualElem = visualElem->GetNextElement("visual");
   }
+  linkVisual->SetTransparency(ModelData::GetEditTransparency());
 
   // Collisions
   int collisionIndex = 0;
@@ -820,8 +821,6 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
     collisionElem = collisionElem->GetNextElement("collision");
   }
 
-  // Finalize
-  linkVisual->SetTransparency(ModelData::GetEditTransparency());
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allParts[linkName] = part;
@@ -902,6 +901,7 @@ void ModelCreator::Reset()
   this->serverModelName = "";
   this->serverModelPose = math::Pose::Zero;
   this->serverModelSDF.reset();
+  this->serverModelVisible.clear();
 
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
@@ -1618,28 +1618,40 @@ void ModelCreator::Update()
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::SetVisible(const std::string &_name, bool _visible)
+void ModelCreator::SetModelVisible(const std::string &_name, bool _visible)
 {
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
   rendering::VisualPtr visual = scene->GetVisual(_name);
   if (!visual)
     return;
 
-  this->SetVisible(visual, _visible);
+  this->SetModelVisible(visual, _visible);
+
+  if (_visible)
+    visual->SetHighlighted(false);
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::SetVisible(rendering::VisualPtr _visual, bool _visible)
+void ModelCreator::SetModelVisible(rendering::VisualPtr _visual, bool _visible)
 {
   if (!_visual)
     return;
 
-  for (unsigned int i = 0; i < _visual->GetChildCount(); ++i)
+  if (!_visible)
   {
-    this->SetVisible(_visual->GetChild(i), _visible);
+    // store original visibility and hide all visuals
+    this->serverModelVisible[_visual->GetId()] = _visual->GetVisible();
+    _visual->SetVisible(_visible);
+  }
+  else
+  {
+    // restore original visibility
+    std::map<uint32_t, bool>::iterator it =
+        this->serverModelVisible.find(_visual->GetId());
+    if (it != this->serverModelVisible.end())
+      _visual->SetVisible(it->second);
   }
 
-  if (!((_visual->GetVisibilityFlags() != GZ_VISIBILITY_ALL) &&
-      (_visual->GetVisibilityFlags() & GZ_VISIBILITY_GUI)))
-    _visual->SetVisible(_visible, false);
+  for (unsigned int i = 0; i < _visual->GetChildCount(); ++i)
+    this->SetModelVisible(_visual->GetChild(i), _visible);
 }

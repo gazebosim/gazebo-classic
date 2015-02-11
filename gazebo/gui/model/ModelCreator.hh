@@ -308,17 +308,18 @@ namespace gazebo
       /// \brief Deselect all currently selected visuals.
       private: void DeselectAll();
 
-      /// \brief Set visibilty of a visual recursively while ignoring
-      /// gui visuals.
+      /// \brief Set visibilty of a visual recursively while storing their
+      /// original values
       /// \param[in] _name Name of visual.
       /// \param[in] _visible True to set the visual to be visible.
-      private: void SetVisible(const std::string &_name, bool _visible);
+      private: void SetModelVisible(const std::string &_name, bool _visible);
 
-      /// \brief Set visibilty of a visual recursively while ignoring
-      /// gui visuals.
+      /// \brief Set visibilty of a visual recursively while storing their
+      /// original values
       /// \param[in] _visual Pointer to the visual.
       /// \param[in] _visible True to set the visual to be visible.
-      private: void SetVisible(rendering::VisualPtr _visual, bool _visible);
+      private: void SetModelVisible(rendering::VisualPtr _visual,
+          bool _visible);
 
       /// \brief Qt callback when a delete signal has been emitted.
       /// \param[in] _name Name of the entity to delete.
@@ -437,6 +438,10 @@ namespace gazebo
 
       /// \brief SDF element of the model on the server.
       private: sdf::ElementPtr serverModelSDF;
+
+      /// \brief A map of all visuals of the model to be edited to their
+      /// visibility.
+      private: std::map<uint32_t, bool> serverModelVisible;
     };
     /// \}
   }
