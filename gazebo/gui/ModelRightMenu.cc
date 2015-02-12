@@ -138,18 +138,18 @@ ModelRightMenu::~ModelRightMenu()
 }
 
 /////////////////////////////////////////////////
-void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
+void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     EntityTypes _type)
 {
   this->entityType = _type;
 
   if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
   {
-    this->modelName = _modelName.substr(0, _modelName.find("::"));
+    this->entityName = _entityName.substr(0, _entityName.find("::"));
   }
   else if (_type == EntityTypes::LINK)
   {
-    this->modelName = _modelName;
+    this->entityName = _entityName;
   }
 
   QMenu menu;
@@ -175,7 +175,7 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
       viewMenu->addAction((*iter)->action);
 
       std::map<std::string, bool>::iterator modelIter =
-        (*iter)->modelStates.find(this->modelName);
+        (*iter)->modelStates.find(this->entityName);
 
       if (modelIter == (*iter)->modelStates.end())
         (*iter)->action->setChecked((*iter)->globalEnable);
@@ -186,15 +186,15 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
 
   if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
   {
-      if (g_copyAct && g_pasteAct)
-      {
-        menu.addSeparator();
-        menu.addAction(g_copyAct);
-        menu.addAction(g_pasteAct);
-      }
-
+    if (g_copyAct && g_pasteAct)
+    {
       menu.addSeparator();
-      menu.addAction(g_deleteAct);
+      menu.addAction(g_copyAct);
+      menu.addAction(g_pasteAct);
+    }
+
+    menu.addSeparator();
+    menu.addAction(g_deleteAct);
   }
 
   // \todo Reimplement these features.
@@ -207,15 +207,15 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
 void ModelRightMenu::OnMoveTo()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->MoveToVisual(this->modelName);
+  cam->MoveToVisual(this->entityName);
 }
 
 /////////////////////////////////////////////////
 void ModelRightMenu::OnFollow()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->TrackVisual(this->modelName);
-  gui::Events::follow(this->modelName);
+  cam->TrackVisual(this->entityName);
+  gui::Events::follow(this->entityName);
 }
 
 /////////////////////////////////////////////////
@@ -223,35 +223,33 @@ void ModelRightMenu::OnApplyWrench()
 {
   this->applyWrenchDialog = new ApplyWrenchDialog();
 
-  std::string linkName;
-  if (this->entityType == MODEL)
-  {
-    // Get the canonical link
-    // For now getting the first link that comes up
-    rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
-        GetVisual(this->modelName);
+  rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
+      GetVisual(this->entityName);
 
-    if (vis && vis == vis->GetRootVisual())
-    {
-      linkName = vis->GetChild(0)->GetName();
-    }
-    else
-    {
-      gzerr << "Can't find model " << this->modelName
-          << std::endl;
-      return;
-    }
-  }
-  else if (this->entityType == LINK)
+  if (!vis)
   {
-    linkName = this->modelName;
-  }
-  else
-  {
-    gzerr << "Wrench can only be applied to a link." << std::endl;
+    gzerr << "Can't find entity " << this->entityName  << std::endl;
     return;
   }
 
+  std::string modelName, linkName;
+  if (this->entityType == MODEL && vis == vis->GetRootVisual())
+  {
+    modelName = this->entityName;
+    linkName = vis->GetChild(0)->GetName();
+  }
+  else if (this->entityType == LINK && vis != vis->GetRootVisual())
+  {
+    modelName = vis->GetRootVisual()->GetName();
+    linkName = this->entityName;
+  }
+  else
+  {
+    gzerr << "Entity type does not correspont to entity." << std::endl;
+    return;
+  }
+
+  this->applyWrenchDialog->SetModel(modelName);
   this->applyWrenchDialog->SetLink(linkName);
   this->applyWrenchDialog->move(QCursor::pos());
   this->applyWrenchDialog->show();
@@ -267,7 +265,7 @@ void ModelRightMenu::OnApplyWrench()
 //   if (!cam->GetScene())
 //     gzerr << "Invalid user camera scene\n";
 //
-//   // cam->GetScene()->SnapVisualToNearestBelow(this->modelName);
+//   // cam->GetScene()->SnapVisualToNearestBelow(this->entityName);
 // }
 
 /////////////////////////////////////////////////
@@ -275,7 +273,7 @@ void ModelRightMenu::OnDelete(const std::string &_name)
 {
   std::string name = _name;
   if (name.empty())
-    name = this->modelName;
+    name = this->entityName;
 
   // Delete the entity
   if (!name.empty())
@@ -338,19 +336,19 @@ ViewState::ViewState(ModelRightMenu *_parent,
 void ViewState::Callback()
 {
   // Store the check state for the model
-  this->modelStates[this->parent->modelName] = this->action->isChecked();
+  this->modelStates[this->parent->entityName] = this->action->isChecked();
 
   // Send a message with the new check state. The Scene listens to these
   // messages and updates the visualizations accordingly.
   if (this->action->isChecked())
   {
     transport::requestNoReply(this->parent->node, this->checkRequest,
-                              this->parent->modelName);
+                              this->parent->entityName);
   }
   else
   {
     transport::requestNoReply(this->parent->node, this->uncheckRequest,
-                              this->parent->modelName);
+                              this->parent->entityName);
   }
 }
 
@@ -358,17 +356,17 @@ void ViewState::Callback()
 /////////////////////////////////////////////////
 // void ModelRightMenu::OnSkeleton()
 // {
-//   this->skeletonActionState[this->modelName] =
+//   this->skeletonActionState[this->entityName] =
 //     this->skeletonAction->isChecked();
 //
 //   if (this->skeletonAction->isChecked())
 //   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->modelName);
+//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->entityName);
 //     this->requestMsg->set_dbl_data(1.0);
 //   }
 //   else
 //   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->modelName);
+//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->entityName);
 //     this->requestMsg->set_dbl_data(0.0);
 //   }
 //

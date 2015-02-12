@@ -47,9 +47,16 @@ namespace gazebo
       /// \brief Destructor.
       public: ~ApplyWrenchDialog();
 
+      /// \brief Set model to which wrench will be applied.
+      /// \param[in] _modelName Model name.
+      public: void SetModel(std::string _modelName);
+
       /// \brief Set link to which wrench will be applied.
       /// \param[in] _linkName Link name.
       public: void SetLink(std::string _linkName);
+
+      /// \brief TODO
+      private slots: void SetLink(QString _linkName);
 
       /// \brief Qt callback when the Apply button is pressed.
       private slots: void OnApply();

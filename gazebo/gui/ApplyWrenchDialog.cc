@@ -43,9 +43,18 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
   this->setWindowModality(Qt::NonModal);
 
-  this->dataPtr->messageLabel = new QLabel();
-  this->dataPtr->messageLabel->setText(
-      tr("Apply Force and Torque"));
+  this->dataPtr->modelLabel = new QLabel();
+
+  // Links list
+  QHBoxLayout *linkLayout = new QHBoxLayout();
+  QLabel *linkLabel = new QLabel();
+  linkLabel->setText(tr("Apply to link:"));
+  this->dataPtr->linksComboBox = new QComboBox();
+  connect(this->dataPtr->linksComboBox, SIGNAL(currentIndexChanged (QString)),
+      this, SLOT(SetLink(QString)));
+
+  linkLayout->addWidget(linkLabel);
+  linkLayout->addWidget(this->dataPtr->linksComboBox);
 
   // Force position
   QCheckBox *forcePosCollapser = new QCheckBox();
@@ -373,7 +382,8 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   // Main layout
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->setSizeConstraint(QLayout::SetFixedSize);
-  mainLayout->addWidget(this->dataPtr->messageLabel);
+  mainLayout->addWidget(this->dataPtr->modelLabel);
+  mainLayout->addLayout(linkLayout);
   mainLayout->addLayout(forceLayout);
   mainLayout->addLayout(torqueLayout);
   mainLayout->addLayout(buttonsLayout);
@@ -409,9 +419,65 @@ ApplyWrenchDialog::~ApplyWrenchDialog()
 }
 
 /////////////////////////////////////////////////
+void ApplyWrenchDialog::SetModel(std::string _modelName)
+{
+  rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
+      GetVisual(_modelName);
+
+  if (!vis)
+  {
+    gzerr << "Model [" << _modelName << "] could not be found." << std::endl;
+    this->reject();
+    return;
+  }
+
+  this->dataPtr->modelName = _modelName;
+
+  this->dataPtr->modelLabel->setText(
+      ("Model: " + _modelName).c_str());
+
+  this->dataPtr->linksComboBox->clear();
+
+  for (unsigned int i = 0; i < vis->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr childVis = vis->GetChild(i);
+
+    uint32_t flags = childVis->GetVisibilityFlags();
+    if (!((flags != GZ_VISIBILITY_ALL) && (flags & GZ_VISIBILITY_GUI)))
+    {
+      std::string linkName = childVis->GetName();
+      std::string unscopedLinkName = linkName.substr(linkName.find("::") + 2);
+      this->dataPtr->linksComboBox->addItem(
+          QString::fromStdString(unscopedLinkName));
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void ApplyWrenchDialog::SetLink(std::string _linkName)
 {
+  // Select on combo box
+  std::string unscopedLinkName = _linkName.substr(_linkName.find("::") + 2);
+  int index = -1;
+  for (int i = 0; i < this->dataPtr->linksComboBox->count(); ++i)
+  {
+    if (this->dataPtr->linksComboBox->itemText(i) == QString::fromStdString(unscopedLinkName))
+    {
+      index = i;
+      break;
+    }
+  }
+  if (index == -1)
+  {
+    gzerr << "Link [" << _linkName << "] could not be found." << std::endl;
+    this->reject();
+    return;
+  }
+  this->dataPtr->linksComboBox->setCurrentIndex(index);
+
   // Request link message to get CoM
+  this->dataPtr->requestPub.reset();
+  this->dataPtr->responseSub.reset();
   this->dataPtr->requestPub = this->dataPtr->node->Advertise<msgs::Request>(
       "~/request");
   this->dataPtr->responseSub = this->dataPtr->node->Subscribe(
@@ -433,6 +499,12 @@ void ApplyWrenchDialog::SetLink(std::string _linkName)
   this->dataPtr->mainWindow->installEventFilter(this);
 }
 
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::SetLink(QString _linkName)
+{
+  this->SetLink(this->dataPtr->modelName + "::" + _linkName.toStdString());
+}
+
 ///////////////////////////////////////////////////
 void ApplyWrenchDialog::OnResponse(ConstResponsePtr &_msg)
 {
@@ -448,12 +520,7 @@ void ApplyWrenchDialog::OnResponse(ConstResponsePtr &_msg)
     if (!this->dataPtr->linkMsg.has_name())
       return;
 
-    std::string linkName = this->dataPtr->linkMsg.name();
-
-    std::string msg = "Apply Force and Torque\n\nApply to " + linkName + "\n";
-    this->dataPtr->messageLabel->setText(msg.c_str());
-
-    this->dataPtr->linkName = linkName;
+    this->dataPtr->linkName = this->dataPtr->linkMsg.name();
     this->SetPublisher();
 
     // CoM
@@ -588,9 +655,13 @@ void ApplyWrenchDialog::AttachVisuals()
 
     this->dataPtr->applyWrenchVisual->Load();
   }
-  else
+  else if (this->dataPtr->applyWrenchVisual->GetParent() == this->dataPtr->linkVisual)
   {
     this->dataPtr->applyWrenchVisual->SetVisible(true);
+  }
+  else
+  {
+    this->dataPtr->linkVisual->AttachVisual(this->dataPtr->applyWrenchVisual);
   }
 
   this->SetTorque(this->dataPtr->torqueVector);

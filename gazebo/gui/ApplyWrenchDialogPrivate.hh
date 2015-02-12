@@ -34,7 +34,16 @@ namespace gazebo
       public: std::string linkName;
 
       /// TODO
-      public: QLabel *messageLabel;
+      public: std::string modelName;
+
+      /// TODO
+      public: QLabel *modelLabel;
+
+      /// TODO
+      public: std::vector<std::string> linkList;
+
+      /// TODO
+      public: QComboBox *linksComboBox;
 
       /// TODO
       public: QWidget *forcePosCollapsibleWidget;

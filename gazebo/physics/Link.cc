@@ -1347,8 +1347,8 @@ void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
     // AddRelativeForceAtRelativePosition
     force = this->GetWorldPose().rot.RotateVector(force);
 
-    gzdbg << "Pos: " << pos.x << "  " << pos.y << "  " << pos.z
-          << "  Force: " << force.x << "  " << force.y << "  " << force.z << std::endl;
+//    gzdbg << "Pos: " << pos.x << "  " << pos.y << "  " << pos.z
+//          << "  Force: " << force.x << "  " << force.y << "  " << force.z << std::endl;
 
     // AddForceAtRelativePosition seems to be relative to the CoM
    pos = pos - this->inertial->GetCoG();
