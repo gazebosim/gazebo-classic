@@ -218,6 +218,8 @@ namespace gazebo
       /// \return True if the camera is now tracking the visual.
       protected: virtual bool TrackVisualImpl(VisualPtr _visual);
 
+      // Documentation inherited.
+      protected: virtual void UpdateFOV();
 
       /// \brief Toggle whether to show the visual.
       private: void ToggleShowVisual();

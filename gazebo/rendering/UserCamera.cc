@@ -384,26 +384,25 @@ unsigned int UserCamera::GetImageHeight() const
 //////////////////////////////////////////////////
 void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 {
-  if (this->viewport)
+  this->UpdateFOV();
+}
+
+//////////////////////////////////////////////////
+void UserCamera::UpdateFOV()
+{
+  Camera::UpdateFOV();
+
+  if (this->dataPtr->stereoEnabled && this->viewport)
   {
-    this->viewport->setDimensions(0, 0, 1, 1);
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
-                   static_cast<double>(this->viewport->getActualHeight());
+      static_cast<double>(this->viewport->getActualHeight());
 
     double hfov =
       this->sdf->Get<double>("horizontal_fov");
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
-    this->camera->setAspectRatio(ratio);
-    this->camera->setFOVy(Ogre::Radian(vfov));
 
-    if (this->dataPtr->stereoEnabled)
-    {
-      this->dataPtr->rightCamera->setAspectRatio(ratio);
-      this->dataPtr->rightCamera->setFOVy(Ogre::Radian(vfov));
-    }
-
-    delete [] this->saveFrameBuffer;
-    this->saveFrameBuffer = NULL;
+    this->dataPtr->rightCamera->setAspectRatio(ratio);
+    this->dataPtr->rightCamera->setFOVy(Ogre::Radian(vfov));
   }
 }
 
