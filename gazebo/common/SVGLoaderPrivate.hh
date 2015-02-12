@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef SVGLOADERPRIVATE_HH
-#define SVGLOADERPRIVATE_HH
+#ifndef __GAZEBO_SVGLOADERPRIVATE_HH
+#define __GAZEBO_SVGLOADERPRIVATE_HH
 
 #include <stdexcept>
 #include <string>
@@ -31,7 +31,6 @@ namespace gazebo
 {
   namespace common
   {
-
     class SVGLoaderPrivate
     {
       /// \brief The step distance between 2 sampled points in a bezier curve

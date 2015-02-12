@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef SVGLOADER_HH
-#define SVGLOADER_HH
+#ifndef __GAZEBO_SVGLOADER_HH
+#define __GAZEBO_SVGLOADER_HH
 
 #include <stdexcept>
 #include <string>
@@ -82,7 +82,8 @@ namespace gazebo
 
       /// \brief Reads an SVG file and loads all the paths
       /// \param[in] _filename The SVG file
-      /// \param[out] _paths Vector that receives path data
+      /// \param[out] _paths Vector that receives path datai
+      /// \throws SvgError When the file cannot be processed
       public: void Parse(const std::string &_filename,
                          std::vector<SVGPath> &_paths);
 
@@ -119,6 +120,7 @@ namespace gazebo
       /// \brief Splits a list of commands into subpaths
       /// \param[in] _cmds The flat list of commands for all the subpaths
       /// \param[out] _subpaths The vector of subpathts that receives the data
+      /// \throws SvgError
       private: void SplitSubpaths(const std::vector<SVGCommand> &_cmds,
                       std::vector< std::vector<SVGCommand> > &_subpaths);
 
