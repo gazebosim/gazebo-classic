@@ -256,7 +256,7 @@ double SimbodyScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 //////////////////////////////////////////////////
 double SimbodyScrewJoint::GetThreadPitch()
 {
-  if (this->physicsInitialized &&
+  if (!this->mobod.isEmptyHandle() && this->physicsInitialized &&
       this->simbodyPhysics->simbodyPhysicsInitialized)
   {
     // downcast mobod to screw mobod first
