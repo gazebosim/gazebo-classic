@@ -17,6 +17,9 @@
     1. Saving, exiting, generalizing SaveDialog.
         * [Pull request #1401](https://bitbucket.org/osrf/gazebo/pull-request/1401)
 
+    1. Edit existing model.
+        * [Pull request #1425](https://bitbucket.org/osrf/gazebo/pull-request/1425)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
