@@ -41,6 +41,15 @@ namespace gazebo
     /// \param[in] _sdf sdf::ElementPtr to fill with data.
     void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf);
 
+    /// \internal
+    /// \brief Internal function to add a link with a collision and visual
+    /// of specified geometry to a model message.
+    /// It is only intended to be used by functions like AddBoxLink,
+    /// which compute the appropriate inertia values.
+    /// \param[out] _model The msgs::Model object to receive a new link.
+    /// \param[in] _geom Geometry to be added to collision and visual.
+    void AddLinkGeom(Model &_msg, const Geometry &_geom);
+
     /// Create a request message
     msgs::Request *CreateRequest(const std::string &_request,
         const std::string &_data)
@@ -1678,17 +1687,48 @@ namespace gazebo
     }
 
     ////////////////////////////////////////////////////////
-    void AddBoxLink(msgs::Model &_msg, const double _mass,
-                    const math::Vector3 &_size)
+    void AddLinkGeom(Model &_model, const Geometry &_geom)
     {
-      _msg.add_link();
-      int linkCount = _msg.link_size();
-      auto link = _msg.mutable_link(linkCount-1);
+      _model.add_link();
+      int linkCount = _model.link_size();
+      auto link = _model.mutable_link(linkCount-1);
       {
         std::ostringstream linkName;
         linkName << "link" << linkCount;
         link->set_name(linkName.str());
       }
+
+      {
+        link->add_collision();
+        auto collision = link->mutable_collision(0);
+        collision->set_name("collision");
+        *(collision->mutable_geometry()) = _geom;
+      }
+
+      {
+        link->add_visual();
+        auto visual = link->mutable_visual(0);
+        visual->set_name("visual");
+        *(visual->mutable_geometry()) = _geom;
+
+        auto script = visual->mutable_material()->mutable_script();
+        script->add_uri();
+        script->set_uri(0, "file://media/materials/scripts/gazebo.material");
+        script->set_name("Gazebo/Grey");
+      }
+    }
+
+    ////////////////////////////////////////////////////////
+    void AddBoxLink(Model &_model, const double _mass,
+                    const math::Vector3 &_size)
+    {
+      Geometry geometry;
+      geometry.set_type(Geometry_Type_BOX);
+      Set(geometry.mutable_box()->mutable_size(), _size);
+
+      AddLinkGeom(_model, geometry);
+      int linkCount = _model.link_size();
+      auto link = _model.mutable_link(linkCount-1);
 
       auto inertial = link->mutable_inertial();
       inertial->set_mass(_mass);
@@ -1705,31 +1745,6 @@ namespace gazebo
         inertial->set_ixy(0.0);
         inertial->set_ixz(0.0);
         inertial->set_iyz(0.0);
-      }
-
-      {
-        link->add_collision();
-        auto collision = link->mutable_collision(0);
-        collision->set_name("collision");
-
-        auto geometry = collision->mutable_geometry();
-        geometry->set_type(Geometry_Type_BOX);
-        msgs::Set(geometry->mutable_box()->mutable_size(), _size);
-      }
-
-      {
-        link->add_visual();
-        auto visual = link->mutable_visual(0);
-        visual->set_name("visual");
-
-        auto geometry = visual->mutable_geometry();
-        geometry->set_type(Geometry_Type_BOX);
-        msgs::Set(geometry->mutable_box()->mutable_size(), _size);
-
-        auto script = visual->mutable_material()->mutable_script();
-        script->add_uri();
-        script->set_uri(0, "file://media/materials/scripts/gazebo.material");
-        script->set_name("Gazebo/Grey");
       }
     }
 
