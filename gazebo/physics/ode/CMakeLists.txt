@@ -6,7 +6,6 @@ link_directories(
   ${CCD_LIBRARY_DIRS}
 )
 
-
 set (sources
   ODEBallJoint.cc
   ODECollision.cc
@@ -16,9 +15,11 @@ set (sources
   ODEHingeJoint.cc
   ODEJoint.cc
   ODELink.cc
+  ODEMesh.cc
   ODEMeshShape.cc
   ODEMultiRayShape.cc
   ODEPhysics.cc
+  ODEPolylineShape.cc
   ODERayShape.cc
   ODEScrewJoint.cc
   ODESliderJoint.cc
@@ -38,10 +39,12 @@ SET (headers
   ODEHingeJoint.hh
   ODEJoint.hh
   ODELink.hh
+  ODEMesh.hh
   ODEMeshShape.hh
   ODEMultiRayShape.hh
   ODEPhysics.hh
   ODEPlaneShape.hh
+  ODEPolylineShape.hh
   ODERayShape.hh
   ODEScrewJoint.hh
   ODESliderJoint.hh
@@ -67,6 +70,7 @@ target_link_libraries(gazebo_physics_ode
 )
 
 gz_install_library(gazebo_physics_ode)
+gz_install_includes("physics/ode" ${headers})
 
 # unit tests
 set (gtest_sources

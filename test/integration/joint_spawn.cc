@@ -254,7 +254,7 @@ void JointSpawningTest::SpawnJointRotationalWorld(
             << "since DART does not allow joint with world as child. "
             << "Please see issue #914. "
             << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
-      return;
+      continue;
     }
     bool worldChild = (i == 0);
     bool worldParent = (i == 1);
@@ -292,14 +292,8 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   ASSERT_TRUE(physics != NULL);
   bool isOde = physics->GetType().compare("ode") == 0;
   bool isBullet = physics->GetType().compare("bullet") == 0;
-  bool isDart = physics->GetType().compare("dart") == 0;
   double dt = physics->GetMaxStepSize();
 
-  if (_joint->HasType(physics::Base::SCREW_JOINT) && isDart)
-  {
-    gzerr << "This portion of the test fails for DARTScrewJoint" << std::endl;
-    return;
-  }
   if (_joint->HasType(physics::Base::HINGE2_JOINT) ||
       _joint->HasType(physics::Base::GEARBOX_JOINT) ||
       _joint->HasType(physics::Base::SCREW_JOINT) ||

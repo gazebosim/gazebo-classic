@@ -16,6 +16,7 @@
 #cmakedefine BUILD_TYPE_PROFILE 1
 #cmakedefine BUILD_TYPE_DEBUG 1
 #cmakedefine BUILD_TYPE_RELEASE 1
+#cmakedefine BUILD_TYPE_COVERAGE 1
 #cmakedefine HAVE_CEGUI 1
 #cmakedefine HAVE_OPENAL 1
 #cmakedefine HAVE_FFMPEG 1
@@ -28,6 +29,8 @@
 #cmakedefine HAVE_QWT 1
 #cmakedefine ENABLE_DIAGNOSTICS 1
 #cmakedefine HAVE_GDAL 1
+#cmakedefine HAVE_USB 1
+#cmakedefine HAVE_OCULUS 1
 
 #ifdef BUILD_TYPE_PROFILE
 #include <google/heap-checker.h>

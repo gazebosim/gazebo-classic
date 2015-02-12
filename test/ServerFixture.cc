@@ -968,6 +968,71 @@ void ServerFixture::WaitUntilSensorSpawn(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+void ServerFixture::SpawnLight(const std::string &_name,
+    const std::string &_type,
+    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const common::Color &_diffuse,
+    const common::Color &_specular,
+    const math::Vector3 &_direction,
+    double _attenuationRange,
+    double _attenuationConstant,
+    double _attenuationLinear,
+    double _attenuationQuadratic,
+    double _spotInnerAngle,
+    double _spotOuterAngle,
+    double _spotFallOff,
+    bool _castShadows)
+{
+  msgs::Factory msg;
+  std::ostringstream newLightStr;
+
+  newLightStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<light name ='" << _name << "' type = '" << _type << "'>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<diffuse>" << _diffuse << "</diffuse>"
+    << "<specular>" << _specular << "</specular>"
+    << "<direction>" << _direction << "</direction>"
+    << "<attenuation>"
+    << "  <range>" << _attenuationRange << "</range>"
+    << "  <constant>" << _attenuationConstant << "</constant>"
+    << "  <linear>" << _attenuationLinear << "</linear>"
+    << "  <quadratic>" << _attenuationQuadratic << "</quadratic>"
+    << "</attenuation>";
+
+  if (_type == "spot")
+  {
+    newLightStr << "<spot>"
+    << "  <inner_angle>" << _spotInnerAngle << "</inner_angle>"
+    << "  <outer_angle>" << _spotOuterAngle << "</outer_angle>"
+    << "  <falloff>" << _spotFallOff << "</falloff>"
+    << "</spot>";
+  }
+
+  newLightStr << "<cast_shadows>" << _castShadows << "</cast_shadows>"
+    << "</light>"
+    << "</sdf>";
+
+  msg.set_sdf(newLightStr.str());
+  this->factoryPub->Publish(msg);
+
+  physics::WorldPtr world = physics::get_world();
+  msgs::Scene sceneMsg;
+  int timeOutCount = 0;
+  int maxTimeOut = 10;
+  while (timeOutCount < maxTimeOut)
+  {
+    sceneMsg = world->GetSceneMsg();
+    for (int i = 0; i < sceneMsg.light_size(); ++i)
+    {
+      if (sceneMsg.light(i).name() == _name)
+        break;
+    }
+    timeOutCount++;
+    common::Time::MSleep(100);
+  }
+}
+
+/////////////////////////////////////////////////
 void ServerFixture::SpawnCylinder(const std::string &_name,
     const math::Vector3 &_pos, const math::Vector3 &_rpy,
     bool _static)

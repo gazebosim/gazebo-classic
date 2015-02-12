@@ -18,6 +18,7 @@
 
 #include "test_config.h"
 #include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Material.hh"
 #include "gazebo/common/ColladaLoader.hh"
 #include "test/util.hh"
 
@@ -35,8 +36,9 @@ TEST_F(ColladaLoader, LoadBox)
   EXPECT_STREQ("unknown", mesh->GetName().c_str());
   EXPECT_EQ(math::Vector3(1, 1, 1), mesh->GetMax());
   EXPECT_EQ(math::Vector3(-1, -1, -1), mesh->GetMin());
-  EXPECT_EQ(36u, mesh->GetVertexCount());
-  EXPECT_EQ(36u, mesh->GetNormalCount());
+  // 36 vertices, 24 unique, 12 shared.
+  EXPECT_EQ(24u, mesh->GetVertexCount());
+  EXPECT_EQ(24u, mesh->GetNormalCount());
   EXPECT_EQ(36u, mesh->GetIndexCount());
   EXPECT_EQ(0u, mesh->GetTexCoordCount());
   EXPECT_EQ(1u, mesh->GetSubMeshCount());
@@ -44,6 +46,91 @@ TEST_F(ColladaLoader, LoadBox)
 
   // Make sure we can read a submesh name
   EXPECT_STREQ("Cube", mesh->GetSubMesh(0)->GetName().c_str());
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, ShareVertices)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) + "/test/data/box.dae");
+
+  // check number of shared vertices
+  std::set<unsigned int> uniqueIndices;
+  int shared = 0;
+  for (unsigned int i = 0; i < mesh->GetSubMeshCount(); ++i)
+  {
+    const common::SubMesh *subMesh = mesh->GetSubMesh(i);
+    for (unsigned int j = 0; j < subMesh->GetIndexCount(); ++j)
+    {
+      if (uniqueIndices.find(subMesh->GetIndex(j)) == uniqueIndices.end())
+        uniqueIndices.insert(subMesh->GetIndex(j));
+      else
+        shared++;
+    }
+  }
+  EXPECT_EQ(shared, 12);
+  EXPECT_EQ(uniqueIndices.size(), 24u);
+
+  // check all vertices are unique
+  for (unsigned int i = 0; i < mesh->GetSubMeshCount(); ++i)
+  {
+    const common::SubMesh *subMesh = mesh->GetSubMesh(i);
+    for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
+    {
+      math::Vector3 v = subMesh->GetVertex(j);
+      math::Vector3 n = subMesh->GetNormal(j);
+
+      // Verify there is no other vertex with the same position AND normal
+      for (unsigned int k = j+1; k < subMesh->GetVertexCount(); ++k)
+      {
+        if (v == subMesh->GetVertex(k))
+        {
+          EXPECT_TRUE(n != subMesh->GetNormal(k));
+        }
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadZeroCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) + "/test/data/zero_count.dae");
+  ASSERT_TRUE(mesh);
+
+  std::string log = GetLogContent();
+
+  // Expect no errors about missing values
+  EXPECT_EQ(log.find("Loading what we can..."), std::string::npos);
+  EXPECT_EQ(log.find("Vertex source missing float_array"), std::string::npos);
+  EXPECT_EQ(log.find("Normal source missing float_array"), std::string::npos);
+
+  // Expect the logs to contain information
+  EXPECT_NE(log.find("Triangle input has a count of zero"), std::string::npos);
+  EXPECT_NE(log.find("Vertex source has a float_array with a count of zero"),
+      std::string::npos);
+  EXPECT_NE(log.find("Normal source has a float_array with a count of zero"),
+      std::string::npos);
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, Specular)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) + "/test/data/box.dae");
+  ASSERT_TRUE(mesh);
+
+  EXPECT_EQ(mesh->GetMaterialCount(), 1u);
+
+  const common::Material *mat = mesh->GetMaterial(0u);
+  ASSERT_TRUE(mat);
+
+  // Make sure we read the specular value
+  EXPECT_EQ(mat->GetSpecular(), common::Color(0.5, 0.5, 0.5, 1.0));
 }
 
 /////////////////////////////////////////////////

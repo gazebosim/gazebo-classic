@@ -77,13 +77,13 @@ void GazeboDriver_Register(DriverTable *_table)
 // need the extern to avoid C++ name-mangling
 extern "C"
 {
+  GAZEBO_VISIBLE
   int player_driver_init(DriverTable *_table)
   {
     GazeboDriver_Register(_table);
     return(0);
   }
 }
-
 
 //////////////////////////////////////////////////
 // Retrieve options from the configuration file and do any
@@ -373,5 +373,3 @@ GazeboInterface *GazeboDriver::LookupDevice(player_devaddr_t _addr)
 
   return NULL;
 }
-
-

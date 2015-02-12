@@ -1,12 +1,12 @@
 include_directories(
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
-  ${SDF_INCLUDE_DIRS}
+  ${SDFormat_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
 )
 
 link_directories(
-  ${SDF_LIBRARY_DIRS}
+  ${SDFormat_LIBRARY_DIRS}
 )
 
 if (HAVE_BULLET)

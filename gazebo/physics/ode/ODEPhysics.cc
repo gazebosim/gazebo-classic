@@ -64,6 +64,7 @@
 #include "gazebo/physics/ode/ODEMeshShape.hh"
 #include "gazebo/physics/ode/ODEMultiRayShape.hh"
 #include "gazebo/physics/ode/ODEHeightmapShape.hh"
+#include "gazebo/physics/ode/ODEPolylineShape.hh"
 
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
@@ -495,6 +496,8 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
     shape.reset(new ODEBoxShape(collision));
   else if (_type == "cylinder")
     shape.reset(new ODECylinderShape(collision));
+  else if (_type == "polyline")
+    shape.reset(new ODEPolylineShape(collision));
   else if (_type == "multiray")
     shape.reset(new ODEMultiRayShape(collision));
   else if (_type == "mesh" || _type == "trimesh")
@@ -1115,75 +1118,12 @@ void ODEPhysics::SetSeed(uint32_t _seed)
 }
 
 //////////////////////////////////////////////////
-bool ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
-{
-  switch (_param)
-  {
-    case SOLVER_TYPE:
-    {
-      return this->SetParam("solver_type", _value);
-    }
-    case GLOBAL_CFM:
-    {
-      return this->SetParam("cfm", _value);
-    }
-    case GLOBAL_ERP:
-    {
-      return this->SetParam("erp", _value);
-    }
-    case SOR_PRECON_ITERS:
-    {
-      return this->SetParam("precon_iters", _value);
-    }
-    case PGS_ITERS:
-    {
-      return this->SetParam("iters", _value);
-    }
-    case SOR:
-    {
-      return this->SetParam("sor", _value);
-    }
-    case CONTACT_SURFACE_LAYER:
-    {
-      return this->SetParam("contact_surface_layer", _value);
-    }
-    case CONTACT_MAX_CORRECTING_VEL:
-    {
-      return this->SetParam("contact_max_correcting_vel", _value);
-    }
-    case MAX_CONTACTS:
-    {
-      return this->SetParam("max_contacts", _value);
-    }
-    case MIN_STEP_SIZE:
-    {
-      return this->SetParam("min_step_size", _value);
-    }
-    case INERTIA_RATIO_REDUCTION:
-    {
-      return this->SetParam("inertia_ratio_reduction", _value);
-    }
-    default:
-    {
-      gzwarn << "Param not supported in ode" << std::endl;
-      return false;
-    }
-  }
-}
-
-//////////////////////////////////////////////////
 bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
 
-  if (_key == "type")
-  {
-    gzwarn << "keyword `type` for GetParam/SetParam is deprecated, please"
-           << " use `solver_type`.\n";
-    return this->SetParam("solver_type", _value);
-  }
-  else if (_key == "solver_type")
+  if (_key == "solver_type")
   {
     std::string value;
     try
@@ -1400,78 +1340,12 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 }
 
 //////////////////////////////////////////////////
-boost::any ODEPhysics::GetParam(ODEParam _param) const
-{
-  sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
-  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
-
-  switch (_param)
-  {
-    case SOLVER_TYPE:
-    {
-      return this->GetParam("solver_type");
-    }
-    case GLOBAL_CFM:
-    {
-      return this->GetParam("cfm");
-    }
-    case GLOBAL_ERP:
-    {
-      return this->GetParam("erp");
-    }
-    case SOR_PRECON_ITERS:
-    {
-      return this->GetParam("precon_iters");
-    }
-    case PGS_ITERS:
-    {
-      return this->GetParam("iters");
-    }
-    case SOR:
-    {
-      return this->GetParam("sor");
-    }
-    case CONTACT_MAX_CORRECTING_VEL:
-    {
-      return this->GetParam("contact_max_correcting_vel");
-    }
-    case CONTACT_SURFACE_LAYER:
-    {
-      return this->GetParam("contact_surface_layer");
-    }
-    case MAX_CONTACTS:
-    {
-      return this->GetParam("max_contacts");
-    }
-    case MIN_STEP_SIZE:
-    {
-      return this->GetParam("min_step_size");
-    }
-    case INERTIA_RATIO_REDUCTION:
-    {
-      return this->GetParam("inertia_ratio_reduction");
-    }
-    default:
-    {
-      gzwarn << "Attribute not supported in bullet" << std::endl;
-      return 0;
-    }
-  }
-}
-
-//////////////////////////////////////////////////
 boost::any ODEPhysics::GetParam(const std::string &_key) const
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
 
-  if (_key == "type")
-  {
-    gzwarn << "keyword `type` for GetParam/SetParam is deprecated, please"
-           << " use `solver_type`.\n";
-    return this->GetParam("solver_type");
-  }
-  else if (_key == "solver_type")
+  if (_key == "solver_type")
   {
     return odeElem->GetElement("solver")->Get<std::string>("type");
   }

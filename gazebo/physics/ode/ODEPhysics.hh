@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The ODE physics engine wrapper
- * Author: Nate Koenig
- * Date: 11 June 2007
- */
-
 #ifndef _ODEPHYSICS_HH_
 #define _ODEPHYSICS_HH_
 
@@ -204,28 +199,12 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetSeed(uint32_t _seed);
 
-      /// \brief Set a parameter of the bullet physics engine
-      /// \sa bool SetParam(const std::string &_key,
-      /// const boost::any &_value)
-      /// \param[in] _param A parameter listed in the ODEParam enum
-      /// \param[in] _value The value to set to
-      /// \return true if SetParam is successful, false if operation fails.
-      public: virtual bool SetParam(ODEParam _param,
-                  const boost::any &_value) GAZEBO_DEPRECATED(3.0);
-
       /// Documentation inherited
       public: virtual bool SetParam(const std::string &_key,
                   const boost::any &_value);
 
       /// Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
-
-      /// \brief Get an parameter of the physics engine
-      /// \sa boost::any GetParam(const std::string &_key) const
-      /// \param[in] _param A parameter listed in the ODEParam enum
-      /// \return The value of the parameter
-      public: virtual boost::any GetParam(ODEParam _param) const
-                GAZEBO_DEPRECATED(3.0);
 
       /// \brief Return the world space id.
       /// \return The space id for the world.

@@ -1,0 +1,47 @@
+uniform float2 LensCentre;
+uniform float2 Scale;
+uniform float2 ScaleIn;
+uniform float4 HmdWarpParam;
+
+// Scales input texture coordinates for distortion.
+float2 HmdWarp(float2 in01)
+{
+	float2 theta = (in01 - LensCentre) * ScaleIn; // Scales to [-1, 1]
+	float rSq = theta.x * theta.x + theta.y * theta.y;
+	float2 rvector = theta * (HmdWarpParam.x + HmdWarpParam.y * rSq + HmdWarpParam.z * rSq * rSq + HmdWarpParam.w * rSq * rSq * rSq);
+	return LensCentre + Scale * rvector;
+}
+
+float4 main_fp(float4 pos : POSITION, float2 iTexCoord : TEXCOORD0, uniform sampler2D RT : register(s0)) : COLOR
+{
+	float2 tc = HmdWarp(iTexCoord);
+	return float4(tex2D(RT, tc).rgb,1);
+}
+
+void oculusBaseLightMap_vp(float4 position : POSITION,
+						  float2 uv1		  : TEXCOORD0,
+						  float2 uv2		  : TEXCOORD1,
+						  
+						  out float4 oPosition : POSITION,
+						  out float2 oUv1	   : TEXCOORD0,
+						  out float2 oUv2	   : TEXCOORD1,
+						  out float4 colour    : COLOR,
+
+						  uniform float4x4 worldViewProj,
+						  uniform float4 ambient)
+{
+	oPosition = mul(worldViewProj, position);
+	oUv1 = uv1;
+	oUv2 = uv2;
+	colour = ambient;
+}
+
+float4 oculusBaseLightMap_fp(float2 uv1 : TEXCOORD0, float2 uv2 : TEXCOORD1, uniform sampler2D texMap : register(s0), uniform sampler2D lightMap : register(s1)) : COLOR
+{
+	float4 colour1 = tex2D(texMap, uv1);
+	float4 colour2 = tex2D(lightMap, uv2);
+	colour2.rgb = colour2.rgb * lerp(1.2, 1.9, saturate(length(colour2.rgb)));
+	if (colour1.a <= 0.4)
+		discard;
+	return float4(colour1 * colour2);
+}

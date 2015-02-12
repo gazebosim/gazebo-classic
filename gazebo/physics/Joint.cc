@@ -587,23 +587,52 @@ bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-void Joint::SetAngle(unsigned int _index, math::Angle _position)
+void Joint::SetAngle(unsigned int _index, math::Angle _angle)
+{
+  this->SetPosition(_index, _angle.Radian());
+}
+
+//////////////////////////////////////////////////
+bool Joint::SetPosition(unsigned int /*_index*/, double _position)
+{
+  // parent class doesn't do much, derived classes do all the work.
+  if (this->model)
+  {
+    if (this->model->IsStatic())
+    {
+      this->staticAngle = _position;
+    }
+  }
+  else
+  {
+    gzwarn << "model not setup yet, setting staticAngle.\n";
+    this->staticAngle = _position;
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool Joint::SetPositionMaximal(unsigned int _index, double _position)
 {
   // check if index is inbound
   if (_index >= this->GetAngleCount())
   {
     gzerr << "Joint axis index too large.\n";
-    return;
+    return false;
   }
 
-  if (this->model->IsStatic())
+  /// If the Joint is static, Gazebo stores the state of
+  /// this Joint as a scalar inside the Joint class in Joint::SetPosition.
+  if (!Joint::SetPosition(_index, _position))
   {
-    this->staticAngle = _position;
+    gzerr << "Joint::SetPosition failed, "
+          << "but it's not possible as implemented.\n";
+    return false;
   }
 
   // truncate position by joint limits
-  math::Angle lower = this->GetLowStop(_index);
-  math::Angle upper = this->GetHighStop(_index);
+  double lower = this->GetLowStop(_index).Radian();
+  double upper = this->GetHighStop(_index).Radian();
   if (lower < upper)
     _position = math::clamp(_position, lower, upper);
   else
@@ -643,7 +672,7 @@ void Joint::SetAngle(unsigned int _index, math::Angle _position)
 
         // Compute new child link pose based on position change
         math::Pose newChildLinkPose =
-          this->ComputeChildLinkPose(_index, _position.Radian());
+          this->ComputeChildLinkPose(_index, _position);
 
         // debug
         // gzerr << "child link pose0 [" << childLinkPose
@@ -676,23 +705,23 @@ void Joint::SetAngle(unsigned int _index, math::Angle _position)
         gzwarn << "failed to find a clean set of connected links,"
                << " i.e. this joint is inside a loop, cannot SetPosition"
                << " kinematically.\n";
-        return;
+        return false;
       }
     }
     else
     {
       gzerr << "child link is null.\n";
-      return;
+      return false;
     }
   }
   else
   {
     gzerr << "joint type SetPosition not supported.\n";
-    return;
+    return false;
   }
 
   /// \todo:  Set link and joint "velocities" based on change / time
-  return;
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -701,7 +730,7 @@ void Joint::SetState(const JointState &_state)
   this->SetMaxForce(0, 0);
   this->SetVelocity(0, 0);
   for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
-    this->SetAngle(i, _state.GetAngle(i));
+    this->SetPosition(i, _state.GetAngle(i).Radian());
 }
 
 //////////////////////////////////////////////////
@@ -737,21 +766,6 @@ double Joint::GetForce(unsigned int /*_index*/)
 {
   gzerr << "Joint::GetForce should be overloaded by physics engines.\n";
   return 0;
-}
-
-//////////////////////////////////////////////////
-double Joint::GetDampingCoefficient() const
-{
-  gzerr << "Joint::GetDampingCoefficient() is deprecated, please switch "
-        << "to Joint::GetDamping(index)\n";
-  return this->dissipationCoefficient[0];
-}
-
-//////////////////////////////////////////////////
-void Joint::ApplyDamping()
-{
-  gzerr << "Joint::ApplyDamping deprecated by Joint::ApplyStiffnessDamping.\n";
-  this->ApplyStiffnessDamping();
 }
 
 //////////////////////////////////////////////////
@@ -1123,6 +1137,11 @@ double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
   double x = this->GetAngle(_index).Radian() -
     this->springReferencePosition[_index];
   return 0.5 * k * x * x;
+}
+
+//////////////////////////////////////////////////
+void Joint::CacheForceTorque()
+{
 }
 
 //////////////////////////////////////////////////

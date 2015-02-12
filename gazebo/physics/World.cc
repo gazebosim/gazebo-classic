@@ -66,7 +66,6 @@ using namespace physics;
 /// \brief Flag used to say if/when to clear all models.
 /// This will be replaced with a class member variable in Gazebo 3.0
 bool g_clearModels;
-boost::mutex g_deprecatedMutexReplaceInGazebo4;
 
 class ModelUpdate_TBB
 {
@@ -590,12 +589,6 @@ void World::Step()
 
   if (g_clearModels)
     this->ClearModels();
-}
-
-//////////////////////////////////////////////////
-void World::StepWorld(int _steps)
-{
-  this->Step(_steps);
 }
 
 //////////////////////////////////////////////////
@@ -1668,7 +1661,7 @@ void World::ProcessFactoryMsgs()
   {
     try
     {
-      boost::mutex::scoped_lock lock(g_deprecatedMutexReplaceInGazebo4);
+      boost::mutex::scoped_lock lock(this->factoryDeleteMutex);
 
       ModelPtr model = this->LoadModel(*iter2, this->rootElement);
       model->Init();
@@ -2001,7 +1994,7 @@ uint32_t World::GetIterations() const
 //////////////////////////////////////////////////
 void World::RemoveModel(const std::string &_name)
 {
-  boost::mutex::scoped_lock flock(g_deprecatedMutexReplaceInGazebo4);
+  boost::mutex::scoped_lock flock(this->factoryDeleteMutex);
 
   // Remove all the dirty poses from the delete entity.
   {
@@ -2025,6 +2018,28 @@ void World::RemoveModel(const std::string &_name)
       childElem = childElem->GetNextElement("model");
     if (childElem)
       this->sdf->RemoveChild(childElem);
+  }
+
+  if (this->sdf->HasElement("light"))
+  {
+    sdf::ElementPtr childElem = this->sdf->GetElement("light");
+    while (childElem && childElem->Get<std::string>("name") != _name)
+      childElem = childElem->GetNextElement("light");
+    if (childElem)
+    {
+      this->sdf->RemoveChild(childElem);
+      // Find the light by name in the scene msg, and remove it.
+      for (int i = 0; i < this->sceneMsg.light_size(); ++i)
+      {
+        if (this->sceneMsg.light(i).name() == _name)
+        {
+          this->sceneMsg.mutable_light()->SwapElements(i,
+              this->sceneMsg.light_size()-1);
+          this->sceneMsg.mutable_light()->RemoveLast();
+          break;
+        }
+      }
+    }
   }
 
   {
@@ -2073,6 +2088,12 @@ void World::OnLightMsg(ConstLightPtr &_msg)
     {
       lightExists = true;
       this->sceneMsg.mutable_light(i)->MergeFrom(*_msg);
+
+      sdf::ElementPtr childElem = this->sdf->GetElement("light");
+      while (childElem && childElem->Get<std::string>("name") != _msg->name())
+        childElem = childElem->GetNextElement("light");
+      if (childElem)
+        msgs::LightToSDF(*_msg, childElem);
       break;
     }
   }
@@ -2081,6 +2102,11 @@ void World::OnLightMsg(ConstLightPtr &_msg)
   if (!lightExists)
   {
     this->sceneMsg.add_light()->CopyFrom(*_msg);
+
+    // add to the world sdf
+    sdf::ElementPtr lightSDF = msgs::LightToSDF(*_msg);
+    lightSDF->SetParent(this->sdf);
+    lightSDF->GetParent()->InsertElement(lightSDF);
   }
 }
 
