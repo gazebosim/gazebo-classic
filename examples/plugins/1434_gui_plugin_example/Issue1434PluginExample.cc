@@ -62,4 +62,5 @@ void Issue1434PluginExample::Load(sdf::ElementPtr /*_sdf*/)
 {
   gzdbg << "World: " << gazebo::gui::get_world() << std::endl;
   gazebo::gui::get_active_camera();
+  gazebo::gui::Events::leftPaneVisibility;
 }
