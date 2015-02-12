@@ -82,7 +82,7 @@ namespace gazebo
       /// \brief Load the part with data from SDF.
       /// \param[in] _sdf Link SDF element.
       public: void Load(sdf::ElementPtr _sdf);
-      
+
       /// \brief Get the scale of the part.
       /// \return Scale of part.
       public: math::Vector3 GetScale() const;

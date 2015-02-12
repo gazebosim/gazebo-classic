@@ -434,7 +434,7 @@ namespace gazebo
 
       /// \brief A list of part names whose scale has changed externally.
       private: std::map<std::string, math::Vector3> partScaleUpdate;
-      
+
       /// \brief Name of model on the server that is being edited here in the
       /// model editor.
       private: std::string serverModelName;
