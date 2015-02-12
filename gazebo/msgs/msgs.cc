@@ -34,6 +34,13 @@ namespace gazebo
 {
   namespace msgs
   {
+    /// \internal
+    /// \brief Internal function to create an SDF element from msgs::Axis.
+    /// It is only intended to be used by JointToSDF.
+    /// \param[in] _msg The msgs::Axis object.
+    /// \param[in] _sdf sdf::ElementPtr to fill with data.
+    void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf);
+
     /// Create a request message
     msgs::Request *CreateRequest(const std::string &_request,
         const std::string &_data)
@@ -315,6 +322,13 @@ namespace gazebo
       {
         result = msgs::Joint::GEARBOX;
       }
+      else
+      {
+        gzerr << "Unrecognized JointType ["
+              << _str
+              << "], returning REVOLUTE"
+              << std::endl;
+      }
       return result;
     }
 
@@ -361,6 +375,8 @@ namespace gazebo
         default:
         {
           result = "unknown";
+          gzerr << "Unrecognized JointType [" << _type << "]"
+                << std::endl;
           break;
         }
       }
@@ -710,7 +726,7 @@ namespace gazebo
       // Load the geometry
       if (_sdf->HasElement("geometry"))
       {
-        msgs::Geometry *geomMsg = result.mutable_geometry();
+        auto geomMsg = result.mutable_geometry();
         geomMsg->CopyFrom(GeometryFromSDF(_sdf->GetElement("geometry")));
       }
 
@@ -718,7 +734,7 @@ namespace gazebo
       if (_sdf->HasElement("material"))
       {
         sdf::ElementPtr elem = _sdf->GetElement("material");
-        msgs::Material *matMsg = result.mutable_material();
+        auto matMsg = result.mutable_material();
 
         if (elem->HasElement("script"))
         {
@@ -802,6 +818,189 @@ namespace gazebo
         plgnMsg->set_innerxml("<sdf>" + ss.str() + "</sdf>");
       }
 
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr VisualToSDF(const msgs::Visual &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr visualSDF;
+
+      if (_sdf)
+      {
+        visualSDF = _sdf;
+      }
+      else
+      {
+        visualSDF.reset(new sdf::Element);
+        sdf::initFile("visual.sdf", visualSDF);
+      }
+
+      if (_msg.has_name())
+        visualSDF->GetAttribute("name")->Set(_msg.name());
+
+      if (_msg.has_cast_shadows())
+        visualSDF->GetElement("cast_shadows")->Set(_msg.cast_shadows());
+
+      if (_msg.has_transparency())
+        visualSDF->GetElement("transparency")->Set(_msg.transparency());
+
+      if (_msg.has_laser_retro())
+        visualSDF->GetElement("laser_retro")->Set(_msg.laser_retro());
+
+      if (_msg.has_pose())
+        visualSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+
+      // Load the geometry
+      if (_msg.has_geometry())
+      {
+        sdf::ElementPtr geomElem = visualSDF->GetElement("geometry");
+        geomElem = GeometryToSDF(_msg.geometry(), geomElem);
+      }
+
+      /// Load the material
+      if (_msg.has_material())
+      {
+        sdf::ElementPtr materialElem = visualSDF->GetElement("material");
+        materialElem = MaterialToSDF(_msg.material(), materialElem);
+      }
+
+      // Set plugins of the visual
+      if (_msg.has_plugin())
+      {
+        sdf::ElementPtr pluginElem = visualSDF->GetElement("plugin");
+        pluginElem = PluginToSDF(_msg.plugin(), pluginElem);
+      }
+
+      return visualSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr MaterialToSDF(const msgs::Material &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr materialSDF;
+
+      if (_sdf)
+      {
+        materialSDF = _sdf;
+      }
+      else
+      {
+        materialSDF.reset(new sdf::Element);
+        sdf::initFile("material.sdf", materialSDF);
+      }
+
+      if (_msg.has_script())
+      {
+        sdf::ElementPtr scriptElem = materialSDF->GetElement("script");
+        msgs::Material::Script script = _msg.script();
+
+        if (script.has_name())
+          scriptElem->GetElement("name")->Set(script.name());
+
+        while (scriptElem->HasElement("uri"))
+          scriptElem->GetElement("uri")->RemoveFromParent();
+        for (int i = 0; i < script.uri_size(); ++i)
+        {
+          sdf::ElementPtr uriElem = scriptElem->AddElement("uri");
+          uriElem->Set(script.uri(i));
+        }
+      }
+
+      if (_msg.has_shader_type())
+      {
+        sdf::ElementPtr shaderElem = materialSDF->GetElement("shader");
+        shaderElem->GetAttribute("type")->Set(
+          ConvertShaderType(_msg.shader_type()));
+      }
+
+      if (_msg.has_normal_map())
+      {
+        sdf::ElementPtr shaderElem = materialSDF->GetElement("shader");
+        shaderElem->GetElement("normal_map")->Set(_msg.normal_map());
+      }
+
+      if (_msg.has_lighting())
+        materialSDF->GetElement("lighting")->Set(_msg.lighting());
+
+      if (_msg.has_ambient())
+        materialSDF->GetElement("ambient")->Set(Convert(_msg.ambient()));
+      if (_msg.has_diffuse())
+        materialSDF->GetElement("diffuse")->Set(Convert(_msg.diffuse()));
+      if (_msg.has_emissive())
+        materialSDF->GetElement("emissive")->Set(Convert(_msg.emissive()));
+      if (_msg.has_specular())
+        materialSDF->GetElement("specular")->Set(Convert(_msg.specular()));
+
+      return materialSDF;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Material::ShaderType ConvertShaderType(const std::string &_str)
+    {
+      auto result = msgs::Material::VERTEX;
+      if (_str == "vertex")
+      {
+        result = msgs::Material::VERTEX;
+      }
+      else if (_str == "pixel")
+      {
+        result = msgs::Material::PIXEL;
+      }
+      else if (_str == "normal_map_object_space")
+      {
+        result = msgs::Material::NORMAL_MAP_OBJECT_SPACE;
+      }
+      else if (_str == "normal_map_tangent_space")
+      {
+        result = msgs::Material::NORMAL_MAP_TANGENT_SPACE;
+      }
+      else
+      {
+        gzerr << "Unrecognized ShaderType ["
+              << _str
+              << "], returning VERTEX"
+              << std::endl;
+      }
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    std::string ConvertShaderType(const msgs::Material::ShaderType _type)
+    {
+      std::string result;
+      switch (_type)
+      {
+        case msgs::Material::VERTEX:
+        {
+          result = "vertex";
+          break;
+        }
+        case msgs::Material::PIXEL:
+        {
+          result = "pixel";
+          break;
+        }
+        case msgs::Material::NORMAL_MAP_OBJECT_SPACE:
+        {
+          result = "normal_map_object_space";
+          break;
+        }
+        case msgs::Material::NORMAL_MAP_TANGENT_SPACE:
+        {
+          result = "normal_map_tangent_space";
+          break;
+        }
+        default:
+        {
+          result = "unknown";
+          gzerr << "Unrecognized ShaderType [" << _type << "]"
+                << std::endl;
+          break;
+        }
+      }
       return result;
     }
 
@@ -1125,9 +1324,15 @@ namespace gazebo
         sdf::ElementPtr collisionElem = linkSDF->AddElement("collision");
         collisionElem = CollisionToSDF(_msg.collision(i), collisionElem);
       }
+      while (linkSDF->HasElement("visual"))
+        linkSDF->GetElement("visual")->RemoveFromParent();
+      for (int i = 0; i < _msg.visual_size(); ++i)
+      {
+        sdf::ElementPtr visualElem = linkSDF->AddElement("visual");
+        visualElem = VisualToSDF(_msg.visual(i), visualElem);
+      }
 
-      gzwarn << "msgs::LinkToSDF currently does not convert visual,"
-          << " sensor, and projector data";
+      /// \todo LinkToSDF currently does not convert sensor and projector data
 
       return linkSDF;
     }
@@ -1230,19 +1435,36 @@ namespace gazebo
             _msg.collide_without_contact_bitmask());
       }
 
-      sdf::ElementPtr physicsEngElem = contactElem->GetElement("ode");
+      sdf::ElementPtr odeElem = contactElem->GetElement("ode");
+      sdf::ElementPtr bulletElem = contactElem->GetElement("bullet");
       if (_msg.has_soft_cfm())
-        physicsEngElem->GetElement("soft_cfm")->Set(_msg.soft_cfm());
+      {
+        odeElem->GetElement("soft_cfm")->Set(_msg.soft_cfm());
+        bulletElem->GetElement("soft_cfm")->Set(_msg.soft_cfm());
+      }
       if (_msg.has_soft_erp())
-        physicsEngElem->GetElement("soft_erp")->Set(_msg.soft_erp());
+      {
+        odeElem->GetElement("soft_erp")->Set(_msg.soft_erp());
+        bulletElem->GetElement("soft_erp")->Set(_msg.soft_erp());
+      }
       if (_msg.has_kp())
-        physicsEngElem->GetElement("kp")->Set(_msg.kp());
+      {
+        odeElem->GetElement("kp")->Set(_msg.kp());
+        bulletElem->GetElement("kp")->Set(_msg.kp());
+      }
       if (_msg.has_kd())
-        physicsEngElem->GetElement("kd")->Set(_msg.kd());
+      {
+        odeElem->GetElement("kd")->Set(_msg.kd());
+        bulletElem->GetElement("kd")->Set(_msg.kd());
+      }
       if (_msg.has_max_vel())
-        physicsEngElem->GetElement("max_vel")->Set(_msg.max_vel());
+      {
+        odeElem->GetElement("max_vel")->Set(_msg.max_vel());
+      }
       if (_msg.has_min_depth())
-        physicsEngElem->GetElement("min_depth")->Set(_msg.min_depth());
+      {
+        odeElem->GetElement("min_depth")->Set(_msg.min_depth());
+      }
 
       return surfaceSDF;
     }
@@ -1266,14 +1488,16 @@ namespace gazebo
       if (!_msg.has_type())
         return geometrySDF;
 
-      if (_msg.type() == msgs::Geometry::BOX)
+      if (_msg.type() == msgs::Geometry::BOX &&
+          _msg.has_box())
       {
         sdf::ElementPtr geom = geometrySDF->GetElement("box");
         msgs::BoxGeom boxGeom = _msg.box();
         if (boxGeom.has_size())
           geom->GetElement("size")->Set(msgs::Convert(boxGeom.size()));
       }
-      else if (_msg.type() == msgs::Geometry::CYLINDER)
+      else if (_msg.type() == msgs::Geometry::CYLINDER &&
+          _msg.has_cylinder())
       {
         sdf::ElementPtr geom = geometrySDF->GetElement("cylinder");
         msgs::CylinderGeom cylinderGeom = _msg.cylinder();
@@ -1282,14 +1506,16 @@ namespace gazebo
         if (cylinderGeom.has_length())
           geom->GetElement("length")->Set(cylinderGeom.length());
       }
-      if (_msg.type() == msgs::Geometry::SPHERE)
+      else if (_msg.type() == msgs::Geometry::SPHERE &&
+          _msg.has_sphere())
       {
         sdf::ElementPtr geom = geometrySDF->GetElement("sphere");
         msgs::SphereGeom sphereGeom = _msg.sphere();
         if (sphereGeom.has_radius())
           geom->GetElement("radius")->Set(sphereGeom.radius());
       }
-      if (_msg.type() == msgs::Geometry::PLANE)
+      else if (_msg.type() == msgs::Geometry::PLANE &&
+          _msg.has_plane())
       {
         sdf::ElementPtr geom = geometrySDF->GetElement("plane");
         msgs::PlaneGeom planeGeom = _msg.plane();
@@ -1300,8 +1526,11 @@ namespace gazebo
         }
         if (planeGeom.has_size())
           geom->GetElement("size")->Set(msgs::Convert(planeGeom.size()));
+        if (planeGeom.has_d())
+          gzerr << "sdformat doesn't have Plane.d variable" << std::endl;
       }
-      if (_msg.type() == msgs::Geometry::IMAGE)
+      else if (_msg.type() == msgs::Geometry::IMAGE &&
+          _msg.has_image())
       {
         sdf::ElementPtr geom = geometrySDF->GetElement("image");
         msgs::ImageGeom imageGeom = _msg.image();
@@ -1316,7 +1545,8 @@ namespace gazebo
         if (imageGeom.has_granularity())
           geom->GetElement("granularity")->Set(imageGeom.granularity());
       }
-      if (_msg.type() == msgs::Geometry::HEIGHTMAP)
+      else if (_msg.type() == msgs::Geometry::HEIGHTMAP &&
+          _msg.has_heightmap())
       {
         sdf::ElementPtr geom = geometrySDF->GetElement("heightmap");
         msgs::HeightmapGeom heightmapGeom = _msg.heightmap();
@@ -1359,13 +1589,15 @@ namespace gazebo
         if (heightmapGeom.has_filename())
           geom->GetElement("uri")->Set(heightmapGeom.filename());
       }
-      if (_msg.type() == msgs::Geometry::MESH)
+      else if (_msg.type() == msgs::Geometry::MESH &&
+          _msg.has_mesh())
       {
         sdf::ElementPtr geom = geometrySDF->GetElement("mesh");
         msgs::MeshGeom meshGeom = _msg.mesh();
         geom = msgs::MeshToSDF(meshGeom, geom);
       }
-      if (_msg.type() == msgs::Geometry::POLYLINE)
+      else if (_msg.type() == msgs::Geometry::POLYLINE &&
+          _msg.has_polyline())
       {
         sdf::ElementPtr geom = geometrySDF->GetElement("polyline");
         gazebo::msgs::Polyline polylineGeom = _msg.polyline();
@@ -1379,6 +1611,10 @@ namespace gazebo
           sdf::ElementPtr pointElem = geom->AddElement("point");
           pointElem->Set(msgs::Convert(polylineGeom.point(i)));
         }
+      }
+      else
+      {
+        gzerr << "Unrecognized geometry type" << std::endl;
       }
       return geometrySDF;
     }
@@ -1439,6 +1675,102 @@ namespace gazebo
       sdf::readString(tmp, pluginSDF);
 
       return pluginSDF;
+    }
+
+    ////////////////////////////////////////////////////////
+    sdf::ElementPtr JointToSDF(const msgs::Joint &_msg, sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr jointSDF;
+
+      if (_sdf)
+      {
+        jointSDF = _sdf;
+      }
+      else
+      {
+        jointSDF.reset(new sdf::Element);
+        sdf::initFile("joint.sdf", jointSDF);
+      }
+
+      if (_msg.has_name())
+        jointSDF->GetAttribute("name")->Set(_msg.name());
+      if (_msg.has_type())
+        jointSDF->GetAttribute("type")->Set(ConvertJointType(_msg.type()));
+      // ignore the id field, since it's not used in sdformat
+      // ignore the parent_id field, since it's not used in sdformat
+      // ignore the child_id field, since it's not used in sdformat
+      // ignore the angle field, since it's not used in sdformat
+      if (_msg.has_parent())
+        jointSDF->GetElement("parent")->Set(_msg.parent());
+      if (_msg.has_child())
+        jointSDF->GetElement("child")->Set(_msg.child());
+      if (_msg.has_pose())
+        jointSDF->GetElement("pose")->Set(Convert(_msg.pose()));
+      if (_msg.has_axis1())
+        AxisToSDF(_msg.axis1(), jointSDF->GetElement("axis"));
+      if (_msg.has_axis2())
+        AxisToSDF(_msg.axis2(), jointSDF->GetElement("axis2"));
+
+      auto odePhysicsElem = jointSDF->GetElement("physics")->GetElement("ode");
+      if (_msg.has_cfm())
+        odePhysicsElem->GetElement("cfm")->Set(_msg.cfm());
+      if (_msg.has_bounce())
+        odePhysicsElem->GetElement("bounce")->Set(_msg.bounce());
+      if (_msg.has_velocity())
+        odePhysicsElem->GetElement("velocity")->Set(_msg.velocity());
+      if (_msg.has_fudge_factor())
+        odePhysicsElem->GetElement("fudge_factor")->Set(_msg.fudge_factor());
+
+      {
+        auto limitElem = odePhysicsElem->GetElement("limit");
+        if (_msg.has_limit_cfm())
+          limitElem->GetElement("cfm")->Set(_msg.limit_cfm());
+        if (_msg.has_limit_erp())
+          limitElem->GetElement("erp")->Set(_msg.limit_erp());
+      }
+
+      {
+        auto suspensionElem = odePhysicsElem->GetElement("suspension");
+        if (_msg.has_suspension_cfm())
+          suspensionElem->GetElement("cfm")->Set(_msg.suspension_cfm());
+        if (_msg.has_suspension_erp())
+          suspensionElem->GetElement("erp")->Set(_msg.suspension_erp());
+      }
+      /// \todo JointToSDF currently does not convert sensor data
+
+      return jointSDF;
+    }
+
+    ////////////////////////////////////////////////////////
+    void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf)
+    {
+      if (_msg.has_xyz())
+        _sdf->GetElement("xyz")->Set(Convert(_msg.xyz()));
+      if (_msg.has_use_parent_model_frame())
+      {
+        _sdf->GetElement("use_parent_model_frame")->Set(
+          _msg.use_parent_model_frame());
+      }
+
+      {
+        auto dynamicsElem = _sdf->GetElement("dynamics");
+        if (_msg.has_damping())
+          dynamicsElem->GetElement("damping")->Set(_msg.damping());
+        if (_msg.has_friction())
+          dynamicsElem->GetElement("friction")->Set(_msg.friction());
+      }
+
+      {
+        auto limitElem = _sdf->GetElement("limit");
+        if (_msg.has_limit_lower())
+          limitElem->GetElement("lower")->Set(_msg.limit_lower());
+        if (_msg.has_limit_upper())
+          limitElem->GetElement("upper")->Set(_msg.limit_upper());
+        if (_msg.has_limit_effort())
+          limitElem->GetElement("effort")->Set(_msg.limit_effort());
+        if (_msg.has_limit_velocity())
+          limitElem->GetElement("velocity")->Set(_msg.limit_velocity());
+      }
     }
   }
 }

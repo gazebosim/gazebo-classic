@@ -20,7 +20,7 @@
 #include <gazebo/gazebo_config.h>
 
 #ifdef HAVE_GDAL
-# include <gdal/ogr_spatialref.h>
+# include <ogr_spatialref.h>
 #endif
 
 #include "gazebo/common/CommonIface.hh"
