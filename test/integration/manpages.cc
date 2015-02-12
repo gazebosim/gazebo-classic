@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include "test_config.h"
 
 boost::filesystem::path g_mkRonn;
+boost::filesystem::path g_gzRoff;
 boost::filesystem::path g_toolBinPath;
 boost::filesystem::path g_toolSrcPath;
 boost::filesystem::path g_serverBinPath;
@@ -51,6 +52,7 @@ std::string customExec(std::string _cmd)
   pclose(pipe);
   return result;
 }
+
 /////////////////////////////////////////////////
 std::string readFile(const std::string &_filename)
 {
@@ -159,10 +161,30 @@ TEST(ManTest, gztopic)
 }
 
 /////////////////////////////////////////////////
+TEST(ManTest, gz)
+{
+  std::string command =
+    ::testing::UnitTest::GetInstance()->current_test_info()->name();
+
+  std::string roffOut = customExec(g_gzRoff.string()
+      + " " + (g_toolBinPath / command).string());
+
+  boost::filesystem::path origRoffFilename =
+    g_toolSrcPath / (command + ".1.roff");
+
+  std::string origRoff = readFile(origRoffFilename.string());
+
+  EXPECT_EQ(origRoff, roffOut);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   g_mkRonn = PROJECT_SOURCE_PATH;
   g_mkRonn = g_mkRonn / "tools" / "make_ronn.py";
+
+  g_gzRoff = PROJECT_SOURCE_PATH;
+  g_gzRoff = g_gzRoff / "tools" / "gz_roff.py";
 
   g_toolBinPath = PROJECT_BINARY_PATH;
   g_toolBinPath = g_toolBinPath / "tools";

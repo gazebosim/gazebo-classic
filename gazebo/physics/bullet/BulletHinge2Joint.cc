@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,23 +171,35 @@ double BulletHinge2Joint::GetMaxForce(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetHighStop(unsigned int /*_index*/,
+bool BulletHinge2Joint::SetHighStop(unsigned int /*_index*/,
     const math::Angle &_angle)
 {
   if (this->bulletHinge2)
+  {
     this->bulletHinge2->setUpperLimit(_angle.Radian());
+    return true;
+  }
   else
+  {
     gzerr << "Joint must be created first.\n";
+    return false;
+  }
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetLowStop(unsigned int /*_index*/,
+bool BulletHinge2Joint::SetLowStop(unsigned int /*_index*/,
     const math::Angle &_angle)
 {
   if (this->bulletHinge2)
+  {
     this->bulletHinge2->setLowerLimit(_angle.Radian());
+    return true;
+  }
   else
+  {
     gzerr << "Joint must be created first.\n";
+    return false;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -212,7 +224,10 @@ math::Angle BulletHinge2Joint::GetHighStop(unsigned int _index)
 math::Angle BulletHinge2Joint::GetLowStop(unsigned int _index)
 {
   if (!this->bulletHinge2)
-    gzerr << "Joint must be created first.\n";
+  {
+    gzerr << "BulletHinge2Joint::bulletHigne2 not created yet, returning 0.\n";
+    return math::Angle(0.0);
+  }
 
   btRotationalLimitMotor *motor =
     this->bulletHinge2->getRotationalLimitMotor(_index);

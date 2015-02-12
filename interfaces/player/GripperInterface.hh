@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,11 @@
 #define GRIPPERINTERFACE_HH
 
 #include "GazeboInterface.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
-  class recursive_mutex;
+  class GAZEBO_VISIBLE recursive_mutex;
 }
 
 namespace libgazebo
@@ -36,10 +37,10 @@ namespace libgazebo
   /// \defgroup gripper_player Gripper Interface
   /// \brief Gripper Player interface
   /// \{
-  class GripperIface;
+  class GAZEBO_VISIBLE GripperIface;
 
   /// \brief Gripper interface
-  class GripperInterface : public GazeboInterface
+  class GAZEBO_VISIBLE GripperInterface : public GazeboInterface
   {
     /// \brief Constructor
     public: GripperInterface(player_devaddr_t addr, GazeboDriver *driver,

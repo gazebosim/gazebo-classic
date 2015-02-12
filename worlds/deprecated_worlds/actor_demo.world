@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.4">
+<sdf version="1.5">
   <world name="default">
     <include>
       <uri>model://ground_plane</uri>
@@ -30,8 +30,8 @@
         </visual>
       </link>
     </model>
-
-    <actor name="actor1" static="true">
+    <actor name="actor1">
+      <static>true</static>
       <origin pose="0 0 0 0 0 0" />
       <skin filename="walk.dae" scale="1.0" />
       <!-- resource files -->
@@ -71,6 +71,5 @@
         </trajectory>
       </script>
     </actor>
-
   </world>
 </sdf>

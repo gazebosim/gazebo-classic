@@ -2,7 +2,6 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
-  ${CEGUI_INCLUDE_DIRS}
   skyx
   skyx/include
 )
@@ -22,12 +21,12 @@ set (sources
   ContactVisual.cc
   Conversions.cc
   DepthCamera.cc
+  Distortion.cc
   DynamicLines.cc
   DynamicRenderable.cc
   FPSViewController.cc
   GpuLaser.cc
   Grid.cc
-  GUIOverlay.cc
   Heightmap.cc
   JointVisual.cc
   LaserVisual.cc
@@ -37,6 +36,7 @@ set (sources
   MovableText.cc
   OrbitViewController.cc
   Projector.cc
+  RayQuery.cc
   RenderEngine.cc
   RenderEvents.cc
   RenderingIface.cc
@@ -65,12 +65,12 @@ set (headers
   ContactVisual.hh
   Conversions.hh
   DepthCamera.hh
+  Distortion.hh
   DynamicLines.hh
   DynamicRenderable.hh
   FPSViewController.hh
   GpuLaser.hh
   Grid.hh
-  GUIOverlay.hh
   Heightmap.hh
   JointVisual.hh
   LaserVisual.hh
@@ -80,6 +80,7 @@ set (headers
   MovableText.hh
   OrbitViewController.hh
   Projector.hh
+  RayQuery.hh
   RenderEngine.hh
   RenderEvents.hh
   RenderingIface.hh
@@ -99,8 +100,16 @@ set (headers
   WindowManager.hh
   WrenchVisual.hh
   ogre_gazebo.h
-  cegui.h
 )
+
+if (HAVE_OCULUS)
+  set (sources ${sources}
+    OculusCamera.cc
+  )
+  set (headers ${headers}
+    OculusCamera.hh
+  )
+endif ()
 
 set (gtest_sources
 )
@@ -110,6 +119,10 @@ gz_build_tests(${gtest_sources})
 set (gtest_sources_dri
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
+  JointVisual_TEST.cc
+  SonarVisual_TEST.cc
+  TransmitterVisual_TEST.cc
+  Visual_TEST.cc
 )
 
 gz_build_dri_tests(${gtest_sources_dri})
@@ -128,7 +141,7 @@ link_directories(
 
 gz_add_library(gazebo_rendering ${sources})
 
-target_link_libraries( gazebo_rendering
+target_link_libraries(gazebo_rendering
   gazebo_common
   gazebo_msgs
   gazebo_skyx
@@ -136,8 +149,13 @@ target_link_libraries( gazebo_rendering
   gazebo_transport
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
-  ${CEGUI_LIBRARIES}
 )
+
+if (HAVE_OCULUS)
+  target_link_libraries(gazebo_rendering
+    OculusVR
+  )
+endif()
 
 if (NOT APPLE)
   target_link_libraries(gazebo_rendering X11)

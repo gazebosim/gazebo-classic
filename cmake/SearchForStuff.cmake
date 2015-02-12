@@ -67,12 +67,6 @@ endif ()
 ########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
-
-  pkg_check_modules(SDF sdformat>=1.4.10)
-  if (NOT SDF_FOUND)
-    BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
-  endif()
-
   pkg_check_modules(CURL libcurl)
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
@@ -106,27 +100,10 @@ if (PKG_CONFIG_FOUND)
     endif()
   endif ()
 
-  pkg_check_modules(CEGUI CEGUI)
-  pkg_check_modules(CEGUI_OGRE CEGUI-OGRE)
-  if (NOT CEGUI_FOUND)
-    BUILD_WARNING ("CEGUI not found, opengl GUI will be disabled.")
-    set (HAVE_CEGUI OFF CACHE BOOL "HAVE CEGUI" FORCE)
-  else()
-    message (STATUS "Looking for CEGUI, found")
-    if (NOT CEGUI_OGRE_FOUND)
-      BUILD_WARNING ("CEGUI-OGRE not found, opengl GUI will be disabled.")
-      set (HAVE_CEGUI OFF CACHE BOOL "HAVE CEGUI" FORCE)
-    else()
-      set (HAVE_CEGUI ON CACHE BOOL "HAVE CEGUI")
-      set (CEGUI_LIBRARIES "CEGUIBase;CEGUIOgreRenderer")
-      message (STATUS "Looking for CEGUI-OGRE, found")
-    endif()
-  endif()
-
   #################################################
   # Find Simbody
   set(SimTK_INSTALL_DIR ${SimTK_INSTALL_PREFIX})
-  #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake) 
+  #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake)
   find_package(Simbody)
   if (SIMBODY_FOUND)
     set (HAVE_SIMBODY TRUE)
@@ -137,12 +114,13 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore)
+  find_package(DARTCore 4.3 QUIET)
   if (DARTCore_FOUND)
     message (STATUS "Looking for DARTCore - found")
     set (HAVE_DART TRUE)
   else()
-    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core3.")
+    message (STATUS "Looking for DARTCore - not found")
+    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core4-dev.")
     set (HAVE_DART FALSE)
   endif()
 
@@ -153,17 +131,17 @@ if (PKG_CONFIG_FOUND)
   if (NOT tinyxml_FOUND)
       find_path (tinyxml_INCLUDE_DIRS tinyxml.h ${tinyxml_INCLUDE_DIRS} ENV CPATH)
       find_library(tinyxml_LIBRARIES NAMES tinyxml)
-      set (tinyxml_FAIL False) 
+      set (tinyxml_FAIL False)
       if (NOT tinyxml_INCLUDE_DIRS)
         message (STATUS "Looking for tinyxml headers - not found")
-        set (tinyxml_FAIL True) 
+        set (tinyxml_FAIL True)
       endif()
       if (NOT tinyxml_LIBRARIES)
         message (STATUS "Looking for tinyxml library - not found")
-        set (tinyxml_FAIL True) 
+        set (tinyxml_FAIL True)
       endif()
   endif()
-        
+
   if (tinyxml_FAIL)
     message (STATUS "Looking for tinyxml.h - not found")
     BUILD_ERROR("Missing: tinyxml")
@@ -192,12 +170,6 @@ if (PKG_CONFIG_FOUND)
   if (NOT LIBTAR_FOUND)
      BUILD_ERROR("Missing: libtar")
   endif()
-
-  #################################################
-  # Use internal CCD (built as libgazebo_ccd.so)
-  #
-  set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
-  set(CCD_LIBRARIES gazebo_ccd)
 
   #################################################
   # Find TBB
@@ -236,13 +208,10 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
-  # There are some runtime problems to solve with ogre-1.9. 
-  # Please read gazebo issues: 994, 995, 996
-  pkg_check_modules(MAX_VALID_OGRE OGRE<=1.8.9)
+  # There are some runtime problems to solve with ogre-1.9.
+  # Please read gazebo issues: 994, 995
   if (NOT OGRE_FOUND)
     BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
-  elseif (NOT MAX_VALID_OGRE_FOUND)
-    BUILD_ERROR("Bad Ogre3d version: gazebo using ${OGRE_VERSION} ogre version has known bugs in runtime (issue #996). Please use 1.7 or 1.8 series")
   else ()
     set(ogre_ldflags ${ogre_ldflags} ${OGRE_LDFLAGS})
     set(ogre_include_dirs ${ogre_include_dirs} ${OGRE_INCLUDE_DIRS})
@@ -286,6 +255,15 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   ########################################
+  # Check and find libccd (if needed)
+  pkg_check_modules(CCD ccd>=1.4)
+  if (NOT CCD_FOUND)
+    message(STATUS "Using internal copy of libccd")
+    set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
+    set(CCD_LIBRARIES gazebo_ccd)
+  endif()
+
+  ########################################
   # Find OpenAL
   # pkg_check_modules(OAL openal)
   # if (NOT OAL_FOUND)
@@ -325,7 +303,15 @@ if (PKG_CONFIG_FOUND)
     link_directories(${libavcodec_LIBRARY_DIRS})
   endif ()
 
-  if (libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
+  ########################################
+  # Find avutil
+  pkg_check_modules(libavutil libavutil)
+  if (NOT libavutil_FOUND)
+    BUILD_WARNING ("libavutil not found. Audio-video capabilities will be disabled.")
+  endif ()
+
+
+  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
     set (HAVE_FFMPEG TRUE)
   else ()
     set (HAVE_FFMPEG FALSE)
@@ -360,8 +346,8 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find bullet
-  # First and preferred option is to look for bullet standard pkgconfig, 
-  # so check it first. if it is not present, check for the OSRF 
+  # First and preferred option is to look for bullet standard pkgconfig,
+  # so check it first. if it is not present, check for the OSRF
   # custom bullet2.82.pc file
   pkg_check_modules(BULLET bullet>=2.82)
   if (NOT BULLET_FOUND)
@@ -374,6 +360,7 @@ if (PKG_CONFIG_FOUND)
   else()
     set (HAVE_BULLET FALSE)
     add_definitions( -DLIBBULLET_VERSION=0.0 )
+    BUILD_WARNING ("Bullet > 2.82 not found, for bullet physics engine option, please install libbullet2.82-dev.")
   endif()
 
 else (PKG_CONFIG_FOUND)
@@ -381,6 +368,18 @@ else (PKG_CONFIG_FOUND)
   BUILD_ERROR ("Error: pkg-config not found")
 endif ()
 
+########################################
+# Find SDFormat
+find_package(SDFormat 2.1.0)
+if (NOT SDFormat_FOUND)
+  message (STATUS "Looking for SDFormat - not found")
+  BUILD_ERROR ("Missing: SDF version >=2.1.0. Required for reading and writing SDF files.")
+else()
+  message (STATUS "Looking for SDFormat - found")
+endif()
+
+########################################
+# Find QT
 find_package (Qt4)
 if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
@@ -395,8 +394,6 @@ if (NOT Boost_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
   BUILD_ERROR ("Boost not found. Please install thread signals system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
 endif()
-
-
 
 ########################################
 # Find libdl
@@ -427,28 +424,69 @@ if (NOT GDAL_FOUND)
 else ()
   message (STATUS "Looking for libgdal - found")
   set (HAVE_GDAL ON CACHE BOOL "HAVE GDAL" FORCE)
+  include_directories(${GDAL_INCLUDE_DIR})
+endif()
+
+########################################
+# Find libusb
+pkg_check_modules(libusb-1.0 libusb-1.0)
+if (NOT libusb-1.0_FOUND)
+  BUILD_WARNING ("libusb-1.0 not found. USB peripherals support will be disabled.")
+  set (HAVE_USB OFF CACHE BOOL "HAVE USB" FORCE)
+else()
+  message (STATUS "Looking for libusb-1.0 - found. USB peripherals support enabled.")
+  set (HAVE_USB ON CACHE BOOL "HAVE USB" FORCE)
+  include_directories(${libusb-1.0_INCLUDE_DIRS})
+  link_directories(${libusb-1.0_LIBRARY_DIRS})
 endif ()
+
+#################################################
+# Find Oculus SDK.
+pkg_check_modules(OculusVR OculusVR)
+
+if (HAVE_USB AND OculusVR_FOUND)
+  message (STATUS "Oculus Rift support enabled.")
+  set (HAVE_OCULUS ON CACHE BOOL "HAVE OCULUS" FORCE)
+  include_directories(SYSTEM ${OculusVR_INCLUDE_DIRS})
+  link_directories(${OculusVR_LIBRARY_DIRS})
+else ()
+  BUILD_WARNING ("Oculus Rift support will be disabled.")
+  set (HAVE_OCULUS OFF CACHE BOOL "HAVE OCULUS" FORCE)
+endif()
 
 ########################################
 # Include man pages stuff
 include (${gazebo_cmake_dir}/Ronn2Man.cmake)
+include (${gazebo_cmake_dir}/Man.cmake)
 add_manpage_target()
+
+########################################
+# Find Space Navigator header and library
+find_library(SPNAV_LIBRARY NAMES spnav)
+find_file(SPNAV_HEADER NAMES spnav.h)
+if (SPNAV_LIBRARY AND SPNAV_HEADER)
+  message(STATUS "Looking for libspnav and spnav.h - found")
+  set(HAVE_SPNAV TRUE)
+else()
+  message(STATUS "Looking for libspnav and spnav.h - not found")
+  set(HAVE_SPNAV FALSE)
+endif()
 
 ########################################
 # Find QWT (QT graphing library)
 #find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
 #  /usr/include
 #  /usr/local/include
-#  "$ENV{LIB_DIR}/include" 
-#  "$ENV{INCLUDE}" 
+#  "$ENV{LIB_DIR}/include"
+#  "$ENV{INCLUDE}"
 #  PATH_SUFFIXES qwt-qt4 qwt qwt5
 #  )
 #
-#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS 
+#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
 #  /usr/lib
 #  /usr/local/lib
-#  "$ENV{LIB_DIR}/lib" 
-#  "$ENV{LIB}/lib" 
+#  "$ENV{LIB_DIR}/lib"
+#  "$ENV{LIB}/lib"
 #  )
 #
 #if (QWT_INCLUDE_DIR AND QWT_LIBRARY)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,14 @@
 
 #include "gazebo/physics/Hinge2Joint.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A two axis hinge joint
-    class ODEHinge2Joint : public Hinge2Joint<ODEJoint>
+    class GAZEBO_VISIBLE ODEHinge2Joint : public Hinge2Joint<ODEJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldID ODE id of the world.

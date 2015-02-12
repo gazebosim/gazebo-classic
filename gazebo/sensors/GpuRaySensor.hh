@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -46,7 +47,7 @@ namespace gazebo
     /// This sensor cast rays into the world, tests for intersections, and
     /// reports the range to the nearest object.  It is used by ranging
     /// sensor models (e.g., sonars and scanning laser range finders).
-    class GpuRaySensor: public Sensor
+    class GAZEBO_VISIBLE GpuRaySensor: public Sensor
     {
       /// \brief Constructor
       public: GpuRaySensor();
@@ -58,7 +59,7 @@ namespace gazebo
       /// \param[in] _sdf SDF Sensor parameters
       /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName,
-                                sdf::ElementPtr &_sdf);
+                                sdf::ElementPtr _sdf);
 
       /// \brief Load the sensor with default parameters
       /// \param[in] _worldName Name of world to load from

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/util/system.hh"
 
 #define HEADER_LENGTH 8
 
@@ -52,7 +53,7 @@ namespace gazebo
     /// \cond
     /// \brief A task instance that is created when data is read from
     /// a socket and used by TBB
-    class ConnectionReadTask : public tbb::task
+    class GAZEBO_VISIBLE ConnectionReadTask : public tbb::task
     {
       /// \brief Constructor
       /// \param[_in] _func Boost function pointer, which is the function
@@ -96,7 +97,8 @@ namespace gazebo
     ///
     /// \class Connection Connection.hh transport/transport.hh
     /// \brief Single TCP/IP connection manager
-    class Connection : public boost::enable_shared_from_this<Connection>
+    class GAZEBO_VISIBLE Connection :
+      public boost::enable_shared_from_this<Connection>
     {
       /// \brief Constructor
       public: Connection();

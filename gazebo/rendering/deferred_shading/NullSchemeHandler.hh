@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,15 @@
 #define _NULLSCHEMEHANDLER_HH_
 
 #include <OgreMaterialManager.h>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace rendering
   {
     /// \brief Class for skipping materials which do not have the scheme defined
-    class NullSchemeHandler : public Ogre::MaterialManager::Listener
+    class GAZEBO_VISIBLE NullSchemeHandler :
+      public Ogre::MaterialManager::Listener
     {
       /** @copydoc MaterialManager::Listener::handleSchemeNotFound */
       public: virtual Ogre::Technique *handleSchemeNotFound(

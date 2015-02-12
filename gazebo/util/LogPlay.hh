@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <fstream>
 
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -43,7 +44,7 @@ namespace gazebo
     /// state information to a World.
     ///
     /// \sa LogRecord, State
-    class LogPlay : public SingletonT<LogPlay>
+    class GAZEBO_VISIBLE LogPlay : public SingletonT<LogPlay>
     {
       /// \brief Constructor
       private: LogPlay();

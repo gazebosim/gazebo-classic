@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class ScaleWidget ScaleWidget.hh
     /// \brief Widget that displays the scale (zoom level) of the editor
-    class ScaleWidget : public QWidget
+    class GAZEBO_VISIBLE ScaleWidget : public QWidget
     {
       Q_OBJECT
 

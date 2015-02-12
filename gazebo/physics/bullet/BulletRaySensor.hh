@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #define BULLETRAYSENSOR_HH
 
 #include <vector>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
     /// \{
 
     /// \brief An Bullet Ray sensor
-    class BulletRaySensor : public PhysicsRaySensor
+    class GAZEBO_VISIBLE BulletRaySensor : public PhysicsRaySensor
     {
       /// \brief Constructor
       public: BulletRaySensor(Link *body);

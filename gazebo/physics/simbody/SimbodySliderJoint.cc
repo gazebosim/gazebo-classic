@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,9 +59,13 @@ void SimbodySliderJoint::SetAxis(unsigned int /*_index*/,
 void SimbodySliderJoint::SetVelocity(unsigned int _index, double _rate)
 {
   if (_index < this->GetAngleCount())
+  {
     this->mobod.setOneU(
       this->simbodyPhysics->integ->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
+    this->simbodyPhysics->system.realize(
+      this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
+  }
   else
     gzerr << "SetVelocity _index too large.\n";
 }
@@ -113,119 +117,31 @@ void SimbodySliderJoint::SetForceImpl(unsigned int _index, double _torque)
 }
 
 //////////////////////////////////////////////////
-void SimbodySliderJoint::SetHighStop(unsigned int _index,
-                                   const math::Angle &_angle)
-{
-  if (_index < this->GetAngleCount())
-  {
-    Joint::SetHighStop(_index, _angle);
-    if (this->physicsInitialized)
-    {
-      this->limitForce[_index].setBounds(
-        this->simbodyPhysics->integ->updAdvancedState(),
-        this->limitForce[_index].getLowerBound(
-          this->simbodyPhysics->integ->updAdvancedState()),
-        _angle.Radian());
-    }
-    else
-    {
-      gzerr << "SetHighStop: State not initialized, SetLowStop failed.\n";
-    }
-  }
-  else
-    gzerr << "SetHighStop: index out of bounds.\n";
-}
-
-//////////////////////////////////////////////////
-void SimbodySliderJoint::SetLowStop(unsigned int _index,
-                                  const math::Angle &_angle)
-{
-  if (_index < this->GetAngleCount())
-  {
-    Joint::SetLowStop(_index, _angle);
-    if (this->physicsInitialized)
-    {
-      this->limitForce[_index].setBounds(
-        this->simbodyPhysics->integ->updAdvancedState(),
-        _angle.Radian(),
-        this->limitForce[_index].getUpperBound(
-          this->simbodyPhysics->integ->updAdvancedState()));
-    }
-    else
-    {
-      gzerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
-    }
-  }
-  else
-    gzerr << "SetLowStop: index out of bounds.\n";
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodySliderJoint::GetHighStop(unsigned int _index)
-{
-  if (_index >= this->GetAngleCount())
-  {
-    gzerr << "Invalid joint index [" << _index
-          << "] when trying to get high stop\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
-  }
-  else if (_index == 0)
-  {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("upper"));
-  }
-  else if (_index == 1)
-  {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("upper"));
-  }
-  else
-  {
-    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
-  }
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodySliderJoint::GetLowStop(unsigned int _index)
-{
-  if (_index >= this->GetAngleCount())
-  {
-    gzerr << "Invalid joint index [" << _index
-          << "] when trying to get low stop\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
-  }
-  else if (_index == 0)
-  {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("lower"));
-  }
-  else if (_index == 1)
-  {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("lower"));
-  }
-  else
-  {
-    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
-  }
-}
-
-//////////////////////////////////////////////////
 math::Vector3 SimbodySliderJoint::GetGlobalAxis(unsigned int _index) const
 {
   if (this->simbodyPhysics->simbodyPhysicsStepped &&
       _index < this->GetAngleCount())
   {
-    const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
-      this->simbodyPhysics->integ->getState());
+    if (!this->mobod.isEmptyHandle())
+    {
+      const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
+        this->simbodyPhysics->integ->getState());
 
-    // express Z-axis of X_OM in world frame
-    SimTK::Vec3 z_W(this->mobod.expressVectorInGroundFrame(
-      this->simbodyPhysics->integ->getState(), X_OM.z()));
+      // express X-axis of X_OM in world frame
+      SimTK::Vec3 x_W(this->mobod.expressVectorInGroundFrame(
+        this->simbodyPhysics->integ->getState(), X_OM.x()));
 
-    return SimbodyPhysics::Vec3ToVector3(z_W);
+      return SimbodyPhysics::Vec3ToVector3(x_W);
+    }
+    else
+    {
+      gzerr << "Joint mobod not initialized correctly.  Returning"
+            << " initial axis vector in world frame (not valid if"
+            << " joint frame has moved). Please file"
+            << " a report on issue tracker.\n";
+      return this->GetAxisFrame(_index).RotateVector(
+        this->GetLocalAxis(_index));
+    }
   }
   else
   {
@@ -243,21 +159,8 @@ math::Vector3 SimbodySliderJoint::GetGlobalAxis(unsigned int _index) const
 
       // if local axis specified in model frame (to be changed)
       // switch to code below if issue #494 is to be addressed
-      return this->model->GetWorldPose().rot.RotateVector(
+      return this->GetAxisFrame(_index).RotateVector(
         this->GetLocalAxis(_index));
-
-      // if local axis specified in joint frame (Issue #494)
-      // if (this->childLink)
-      // {
-      //   math::Pose jointPose =
-      //    this->anchorPose + this->childLink->GetWorldPose();
-      //   return jointPose.rot.RotateVector(this->GetLocalAxis(_index));
-      // }
-      // else
-      // {
-      //   gzerr << "Joint [" << this->GetName() << "] missing child link.\n";
-      //   return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
-      // }
     }
   }
 }
@@ -268,8 +171,19 @@ math::Angle SimbodySliderJoint::GetAngleImpl(unsigned int _index) const
   if (_index < this->GetAngleCount())
   {
     if (this->simbodyPhysics->simbodyPhysicsInitialized)
-      return math::Angle(this->mobod.getOneQ(
-        this->simbodyPhysics->integ->getState(), _index));
+    {
+      if (!this->mobod.isEmptyHandle())
+      {
+        return math::Angle(this->mobod.getOneQ(
+          this->simbodyPhysics->integ->getState(), _index));
+      }
+      else
+      {
+        gzerr << "Joint mobod not initialized correctly.  Please file"
+              << " a report on issue tracker.\n";
+        return math::Angle(0.0);
+      }
+    }
     else
     {
       gzdbg << "Simbody::GetAngleImpl() simbody not yet initialized, "

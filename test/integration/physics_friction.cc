@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,6 +115,9 @@ class PhysicsFrictionTest : public ServerFixture,
     /// \brief Link pose.
     public: math::Pose linkPose;
 
+    /// \brief Inertial pose.
+    public: math::Pose inertialPose;
+
     /// \brief Collision pose.
     public: math::Pose collisionPose;
 
@@ -151,6 +154,7 @@ class PhysicsFrictionTest : public ServerFixture,
               << "  <link name='link'>"
               << "    <pose>" << _opt.linkPose << "</pose>"
               << "    <inertial>"
+              << "      <pose>" << _opt.inertialPose << "</pose>"
               << "      <mass>" << _opt.mass << "</mass>"
               << "      <inertia>"
               << "        <ixx>" << ixx << "</ixx>"
@@ -224,6 +228,12 @@ class PhysicsFrictionTest : public ServerFixture,
   /// no NaN's are generated.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void DirectionNaN(const std::string &_physicsEngine);
+
+  /// \brief Test Link::GetWorldInertia* functions.
+  /// \TODO: move the SpawnBox function to ServerFixture,
+  /// and then move this test to a different file.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void LinkGetWorldInertia(const std::string &_physicsEngine);
 
   /// \brief Count of spawned models, used to ensure unique model names.
   private: unsigned int spawnCount;
@@ -461,7 +471,7 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
   math::Vector3 g(0.0, 1.5, -1.0);
   physics->SetGravity(g);
 
-  // Spawn concentric semi-circles of boxes
+  // Spawn a single box
   double dx = 0.5;
   double dy = 0.5;
   double dz = 0.2;
@@ -487,6 +497,154 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
+// LinkGetWorldInertia:
+// Spawn boxes and verify Link::GetWorldInertia* functions
+void PhysicsFrictionTest::LinkGetWorldInertia(const std::string &_physicsEngine)
+{
+  // Load a blank world (no ground plane)
+  Load("worlds/blank.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // disable gravity
+  physics->SetGravity(math::Vector3::Zero);
+
+  // Box size
+  double dx = 1.0;
+  double dy = 4.0;
+  double dz = 9.0;
+  double mass = 10.0;
+  double angle = M_PI / 3.0;
+
+  const unsigned int testCases = 4;
+  for (unsigned int i = 0; i < testCases; ++i)
+  {
+    // Set box size and position
+    SpawnFrictionBoxOptions opt;
+    opt.size.Set(dx, dy, dz);
+    opt.mass = mass;
+    opt.modelPose.pos.x = i * dz;
+    opt.modelPose.pos.z = dz;
+
+    // i=0: rotated model pose
+    //  expect inertial pose to match model pose
+    if (i == 0)
+    {
+      opt.modelPose.rot.SetFromEuler(0.0, 0.0, angle);
+    }
+    // i=1: rotated link pose
+    //  expect inertial pose to match link pose
+    else if (i == 1)
+    {
+      opt.linkPose.rot.SetFromEuler(0.0, 0.0, angle);
+    }
+    // i=2: rotated inertial pose
+    //  expect inertial pose to differ from link pose
+    else if (i == 2)
+    {
+      opt.inertialPose.rot.SetFromEuler(0.0, 0.0, angle);
+    }
+    // i=3: offset inertial pose
+    //  expect inertial pose to differ from link pose
+    else if (i == 3)
+    {
+      opt.inertialPose.pos.Set(1, 1, 1);
+    }
+
+    physics::ModelPtr model = SpawnBox(opt);
+    ASSERT_TRUE(model != NULL);
+
+    physics::LinkPtr link = model->GetLink();
+    ASSERT_TRUE(link != NULL);
+
+    EXPECT_EQ(model->GetWorldPose(), opt.modelPose);
+    EXPECT_EQ(link->GetWorldPose(), opt.linkPose + opt.modelPose);
+    EXPECT_EQ(link->GetWorldInertialPose(),
+              opt.inertialPose + opt.linkPose + opt.modelPose);
+
+    // i=0: rotated model pose
+    //  expect inertial pose to match model pose
+    if (i == 0)
+    {
+      EXPECT_EQ(model->GetWorldPose(),
+                link->GetWorldInertialPose());
+    }
+    // i=1: rotated link pose
+    //  expect inertial pose to match link pose
+    else if (i == 1)
+    {
+      EXPECT_EQ(link->GetWorldPose(),
+                link->GetWorldInertialPose());
+    }
+    // i=2: offset and rotated inertial pose
+    //  expect inertial pose to differ from link pose
+    else if (i == 2)
+    {
+      EXPECT_EQ(link->GetWorldPose().pos,
+                link->GetWorldInertialPose().pos);
+    }
+    // i=3: offset inertial pose
+    //  expect inertial pose to differ from link pose
+    else if (i == 3)
+    {
+      EXPECT_EQ(link->GetWorldPose().pos + opt.inertialPose.pos,
+                link->GetWorldInertialPose().pos);
+    }
+
+    // Expect rotated inertia matrix
+    math::Matrix3 inertia = link->GetWorldInertiaMatrix();
+    if (i == 3)
+    {
+      EXPECT_NEAR(inertia[0][0], 80.8333, 1e-4);
+      EXPECT_NEAR(inertia[1][1], 68.3333, 1e-4);
+      EXPECT_NEAR(inertia[2][2], 14.1667, 1e-4);
+      for (int row = 0; row < 3; ++row)
+        for (int col = 0; col < 3; ++col)
+          if (row != col)
+            EXPECT_NEAR(inertia[row][col], 0.0, g_friction_tolerance);
+    }
+    else
+    {
+      EXPECT_NEAR(inertia[0][0], 71.4583, 1e-4);
+      EXPECT_NEAR(inertia[1][1], 77.7083, 1e-4);
+      EXPECT_NEAR(inertia[2][2], 14.1667, 1e-4);
+      EXPECT_NEAR(inertia[0][1],  5.4126, 1e-4);
+      EXPECT_NEAR(inertia[1][0],  5.4126, 1e-4);
+      EXPECT_NEAR(inertia[0][2], 0, g_friction_tolerance);
+      EXPECT_NEAR(inertia[2][0], 0, g_friction_tolerance);
+      EXPECT_NEAR(inertia[1][2], 0, g_friction_tolerance);
+      EXPECT_NEAR(inertia[2][1], 0, g_friction_tolerance);
+    }
+
+    // For 0-2, apply torque and expect equivalent response
+    if (i <= 2)
+    {
+      for (int step = 0; step < 50; ++step)
+      {
+        link->SetTorque(math::Vector3(100, 0, 0));
+        world->Step(1);
+      }
+      if (_physicsEngine.compare("dart") == 0)
+      {
+        gzerr << "Dart fails this portion of the test (#1090)" << std::endl;
+      }
+      else
+      {
+        math::Vector3 vel = link->GetWorldAngularVel();
+        EXPECT_NEAR(vel.x,  0.0703, g_friction_tolerance);
+        EXPECT_NEAR(vel.y, -0.0049, g_friction_tolerance);
+        EXPECT_NEAR(vel.z,  0.0000, g_friction_tolerance);
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 TEST_P(PhysicsFrictionTest, FrictionDemo)
 {
   FrictionDemo(GetParam());
@@ -502,6 +660,12 @@ TEST_P(PhysicsFrictionTest, BoxDirectionRing)
 TEST_P(PhysicsFrictionTest, DirectionNaN)
 {
   DirectionNaN(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsFrictionTest, LinkGetWorldInertia)
+{
+  LinkGetWorldInertia(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsFrictionTest,

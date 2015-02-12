@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #define _JOINT_WRENCH_HH_
 
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     /// \brief Wrench information from a joint.  These are
     /// forces and torques on parent and child Links, relative to
     /// the Joint frame immediately after rotation.
-    class JointWrench
+    class GAZEBO_VISIBLE JointWrench
     {
       /// \brief Operator =
       /// \param[in] _wrench Joint wrench to set from.

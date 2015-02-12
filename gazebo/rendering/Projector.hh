@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -42,7 +43,7 @@ namespace gazebo
 
     /// \class Projector Projector.hh rendering/rendering.hh
     /// \brief Projects a material onto surface, light a light projector.
-    class Projector
+    class GAZEBO_VISIBLE Projector
     {
       /// \brief Constructor.
       /// \param[in] _parent Name of the parent visual.
@@ -81,7 +82,7 @@ namespace gazebo
       public: void Toggle();
 
       /// \brief Get the parent visual.
-      /// \return Pointer ot the parent visual.
+      /// \return Pointer to the parent visual.
       public: VisualPtr GetParent();
 
       /// \brief Set whether the projector is enabled or disabled.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,10 @@ class JointTest : public ServerFixture,
   protected: JointTest() : ServerFixture(), spawnCount(0)
              {
              }
+
+  /// \brief Test Joint::GetInertiaRatio.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void GetInertiaRatio(const std::string &_physicsEngine);
 
   /// \brief Test spring dampers
   /// \param[in] _physicsEngine Type of physics engine to use.
@@ -180,15 +184,20 @@ class JointTest : public ServerFixture,
               modelStr << "    <child>child</child>";
             modelStr
               << "    <axis>"
-              << "      <xyz>" << _opt.axis << "</xyz>";
-            if (!(SDF_MAJOR_VERSION == 1 && SDF_MINOR_VERSION < 5))
+              << "      <xyz>" << _opt.axis << "</xyz>"
+              << "      <use_parent_model_frame>" << _opt.useParentModelFrame
+              << "      </use_parent_model_frame>"
+              << "    </axis>";
+            // Hack: hardcode a second axis for universal joints
+            if (_opt.type == "universal")
             {
               modelStr
-                << "      <use_parent_model_frame>" << _opt.useParentModelFrame
-                << "      </use_parent_model_frame>";
+                << "  <axis2>"
+                << "    <xyz>" << math::Vector3(0, 1, 0) << "</xyz>"
+                << "    <use_parent_model_frame>" << _opt.useParentModelFrame
+                << "    </use_parent_model_frame>"
+                << "  </axis2>";
             }
-            modelStr
-              << "    </axis>";
             modelStr
               << "  </joint>"
               << "</model>";

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <string>
 
 #include "gazebo/math/Pose.hh"
+#include "gazebo/util/system.hh"
 
 #define X_POSITION 0
 #define Y_POSITION 1
@@ -41,7 +42,7 @@ namespace gazebo
 
     /// \class BVHLoader BVHLoader.hh common/common.hh
     /// \brief Handles loading BVH animation files
-    class BVHLoader
+    class GAZEBO_VISIBLE BVHLoader
     {
       /// \brief Constructor
       public: BVHLoader();

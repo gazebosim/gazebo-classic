@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include "gazebo/rendering/RenderTypes.hh"
 
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     /// \class ModelManipulator ModelManipulator.hh gui/Gui.hh
     /// \brief Manipulator tool for translating/rotating/scaling models and
     /// links
-    class ModelManipulator : public SingletonT<ModelManipulator>
+    class GAZEBO_VISIBLE ModelManipulator : public SingletonT<ModelManipulator>
     {
       /// \brief Constructor
       private: ModelManipulator();
@@ -45,6 +46,9 @@ namespace gazebo
 
       /// \brief Initialize the model manipulator.
       public: void Init();
+
+      /// \brief Detach the manipulator from an entity
+      public: void Detach();
 
       /// \brief Set the manipulation mode.
       /// \param[in] _mode Manipulation mode: translate, rotate, or scale.

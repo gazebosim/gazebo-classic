@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,24 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh collision
- * Author: Nate Koenig
- * Date: 21 May 2009
- */
-
-#ifndef _BULLETMESHSHAPE_HH_
-#define _BULLETMESHSHAPE_HH_
+#ifndef _GAZEBO_BULLETMESHSHAPE_HH_
+#define _GAZEBO_BULLETMESHSHAPE_HH_
 
 #include "gazebo/physics/MeshShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    class BulletMesh;
+
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
 
     /// \brief Triangle mesh collision
-    class BulletMeshShape : public MeshShape
+    class GAZEBO_VISIBLE BulletMeshShape : public MeshShape
     {
       /// \brief Constructor
       public: BulletMeshShape(CollisionPtr _parent);
@@ -44,11 +42,13 @@ namespace gazebo
       /// \brief Load the trimesh
       public: virtual void Load(sdf::ElementPtr _sdf);
 
+      /// \brief Initialize the mesh shape.
       protected: virtual void Init();
-    };
 
+      /// \brief Bullet collision mesh helper class
+      private: BulletMesh *bulletMesh;
+    };
     /// \}
   }
 }
 #endif
-

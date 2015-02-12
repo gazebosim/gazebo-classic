@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <map>
 
 #include <string>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     /// all these out is a tedious job. Of course it is possible to always use
     /// the material with all features, but that might result in large, slow
     /// shader programs. This class provides an efficient solution to that.
-    class MaterialGenerator
+    class GAZEBO_VISIBLE MaterialGenerator
     {
       /// Bitfield used to signify a material permutations
       public: typedef uint32_t Perm;

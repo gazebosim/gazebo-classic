@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #define OPAQUEINTERFACE_HH
 
 #include "GazeboInterface.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
@@ -40,7 +41,7 @@ namespace libgazebo
 class OpaqueIface;
 
 /// \brief Opaque Player interface
-class OpaqueInterface : public GazeboInterface
+class GAZEBO_VISIBLE OpaqueInterface : public GazeboInterface
 {
   /// \brief Constructor
     public: OpaqueInterface(player_devaddr_t addr, GazeboDriver *driver,

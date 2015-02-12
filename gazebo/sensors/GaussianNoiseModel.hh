@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/rendering/RenderTypes.hh"
-
 #include "gazebo/sensors/Noise.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
@@ -40,7 +40,7 @@ namespace gazebo
   {
     /// \class GaussianNoiseModel
     /// \brief Gaussian noise class
-    class GaussianNoiseModel : public Noise
+    class GAZEBO_VISIBLE GaussianNoiseModel : public Noise
     {
         /// \brief Constructor.
         public: GaussianNoiseModel();
@@ -90,7 +90,7 @@ namespace gazebo
 
     /// \class GaussianNoiseModel
     /// \brief Gaussian noise class for image sensors
-    class ImageGaussianNoiseModel : public GaussianNoiseModel
+    class GAZEBO_VISIBLE ImageGaussianNoiseModel : public GaussianNoiseModel
     {
       /// \brief Constructor.
       public: ImageGaussianNoiseModel();

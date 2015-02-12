@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: A universal joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
+#include <string>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -28,7 +25,6 @@
 
 using namespace gazebo;
 using namespace physics;
-
 
 //////////////////////////////////////////////////
 ODEUniversalJoint::ODEUniversalJoint(dWorldID _worldId, BasePtr _parent)
@@ -93,17 +89,14 @@ math::Vector3 ODEUniversalJoint::GetGlobalAxis(unsigned int _index) const
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->childLink)
+    this->childLink->SetEnabled(true);
+  if (this->parentLink)
+    this->parentLink->SetEnabled(true);
 
   /// ODE needs global axis
-  /// \TODO: currently we assume joint axis is specified in model frame,
-  /// this is incorrect, and should be corrected to be
-  /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
-  if (this->parentLink)
-    globalAxis =
-      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+  math::Quaternion axisFrame = this->GetAxisFrame(_index);
+  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
 
   if (this->jointId)
   {
@@ -166,13 +159,7 @@ double ODEUniversalJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  // flipping axis 1 and 2 around
-  if (_index == UniversalJoint::AXIS_CHILD)
-    this->SetParam(dParamVel, _angle);
-  else if (_index == UniversalJoint::AXIS_PARENT)
-    this->SetParam(dParamVel2, _angle);
-  else
-    gzerr << "Joint index out of bounds.\n";
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////
@@ -209,12 +196,25 @@ double ODEUniversalJoint::GetMaxForce(unsigned int _index)
 {
   // flipping axis 1 and 2 around
   if (_index == UniversalJoint::AXIS_CHILD)
-    return this->GetParam(dParamFMax);
+    return ODEJoint::GetParam(dParamFMax);
   else if (_index == UniversalJoint::AXIS_PARENT)
-    return this->GetParam(dParamFMax2);
+    return ODEJoint::GetParam(dParamFMax2);
 
   gzerr << "Joint index out of bounds.\n";
   return 0;
+}
+
+//////////////////////////////////////////////////
+double ODEUniversalJoint::GetParam(unsigned int _parameter) const
+{
+  double result = 0;
+
+  if (this->jointId)
+    result = dJointGetUniversalParam(this->jointId, _parameter);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -226,4 +226,155 @@ void ODEUniversalJoint::SetParam(unsigned int _parameter, double _value)
     dJointSetUniversalParam(this->jointId, _parameter, _value);
   else
     gzerr << "ODE Joint ID is invalid\n";
+}
+
+//////////////////////////////////////////////////
+bool ODEUniversalJoint::SetHighStop(
+  unsigned int _index, const math::Angle &_angle)
+{
+  // Overload because we switched axis orders
+  Joint::SetHighStop(_index, _angle);
+  switch (_index)
+  {
+    case UniversalJoint::AXIS_CHILD:
+      this->SetParam(dParamHiStop, _angle.Radian());
+      return true;
+    case UniversalJoint::AXIS_PARENT:
+      this->SetParam(dParamHiStop2, _angle.Radian());
+      return true;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
+      return false;
+  };
+}
+
+//////////////////////////////////////////////////
+bool ODEUniversalJoint::SetLowStop(
+  unsigned int _index, const math::Angle &_angle)
+{
+  // Overload because we switched axis orders
+  Joint::SetLowStop(_index, _angle);
+  switch (_index)
+  {
+    case UniversalJoint::AXIS_CHILD:
+      this->SetParam(dParamLoStop, _angle.Radian());
+      return true;
+    case UniversalJoint::AXIS_PARENT:
+      this->SetParam(dParamLoStop2, _angle.Radian());
+      return true;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
+      return false;
+  };
+}
+
+//////////////////////////////////////////////////
+bool ODEUniversalJoint::SetParam(
+  const std::string &_key, unsigned int _index, const boost::any &_value)
+{
+  // Axis parameters for multi-axis joints use a group bitmask
+  // to identify the variable.
+  unsigned int group;
+  switch (_index)
+  {
+    case UniversalJoint::AXIS_CHILD:
+      group = dParamGroup1;
+      break;
+    case UniversalJoint::AXIS_PARENT:
+      group = dParamGroup2;
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
+      return false;
+  };
+
+  try
+  {
+    if (_key == "stop_erp")
+    {
+      this->SetParam(dParamStopERP | group, boost::any_cast<double>(_value));
+    }
+    else if (_key == "stop_cfm")
+    {
+      this->SetParam(dParamStopCFM | group, boost::any_cast<double>(_value));
+    }
+    else if (_key == "friction")
+    {
+      this->SetParam(dParamVel | group, 0.0);
+      this->SetParam(dParamFMax | group, boost::any_cast<double>(_value));
+    }
+    else if (_key == "hi_stop")
+    {
+      this->SetParam(dParamHiStop | group, boost::any_cast<double>(_value));
+    }
+    else if (_key == "lo_stop")
+    {
+      this->SetParam(dParamLoStop | group, boost::any_cast<double>(_value));
+    }
+    else
+    {
+      // Overload because we switched axis orders
+      return ODEJoint::SetParam(_key, _index, _value);
+    }
+  }
+  catch(const boost::bad_any_cast &e)
+  {
+    gzerr << "boost any_cast error during "
+          << "SetParam('" << _key << "'): "
+          << e.what()
+          << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
+//////////////////////////////////////////////////
+double ODEUniversalJoint::GetParam(
+  const std::string &_key, unsigned int _index)
+{
+  // Axis parameters for multi-axis joints use a group bitmask
+  // to identify the variable.
+  unsigned int group;
+  switch (_index)
+  {
+    case UniversalJoint::AXIS_CHILD:
+      group = dParamGroup1;
+      break;
+    case UniversalJoint::AXIS_PARENT:
+      group = dParamGroup2;
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
+      return false;
+  };
+
+  // Overload because we switched axis orders
+  try
+  {
+    if (_key == "friction")
+    {
+        return this->GetParam(dParamFMax | group);
+    }
+    else if (_key == "hi_stop")
+    {
+      return this->GetHighStop(_index).Radian();
+    }
+    else if (_key == "lo_stop")
+    {
+      return this->GetLowStop(_index).Radian();
+    }
+    else
+    {
+      return ODEJoint::GetParam(_key, _index);
+    }
+  }
+  catch(const common::Exception &e)
+  {
+    gzerr << "Error during "
+          << "GetParam('" << _key << "'): "
+          << e.GetErrorStr()
+          << std::endl;
+    return 0;
+  }
 }

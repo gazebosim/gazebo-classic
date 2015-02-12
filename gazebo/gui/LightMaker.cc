@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/Scene.hh"
 
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/LightMaker.hh"
 
 using namespace gazebo;
@@ -49,12 +50,56 @@ LightMaker::LightMaker() : EntityMaker()
 }
 
 /////////////////////////////////////////////////
-void LightMaker::Start(const rendering::UserCameraPtr _camera)
+bool LightMaker::InitFromLight(const std::string & _lightName)
 {
-  this->camera = _camera;
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
-  this->light = new rendering::Light(this->camera->GetScene());
+  if (this->light)
+  {
+    scene->RemoveLight(this->light);
+    this->light.reset();
+  }
+
+  rendering::LightPtr sceneLight = scene->GetLight(_lightName);
+  if (!sceneLight)
+  {
+    gzerr << "Light: '" << _lightName << "' does not exist." << std::endl;
+    return false;
+  }
+
+  this->light = sceneLight->Clone(_lightName + "_clone_tmp", scene);
+
+  if (!this->light)
+  {
+    gzerr << "Unable to clone\n";
+    return false;
+  }
+
+  this->lightTypename =  this->light->GetType();
+  this->light->FillMsg(this->msg);
+
+  std::string newName = _lightName + "_clone";
+  int i = 0;
+  while (scene->GetLight(newName))
+  {
+    newName = _lightName + "_clone_" +
+      boost::lexical_cast<std::string>(i);
+    i++;
+  }
+
+  this->msg.set_name(newName);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool LightMaker::Init()
+{
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+
+  this->light.reset(new rendering::Light(scene));
   this->light->Load();
+  scene->AddLight(this->light);
 
   this->light->SetLightType(this->lightTypename);
   this->light->SetPosition(math::Vector3(0, 0, 1));
@@ -64,15 +109,29 @@ void LightMaker::Start(const rendering::UserCameraPtr _camera)
   std::ostringstream stream;
   stream << "user_" << this->lightTypename << "_light_" << counter++;
   this->msg.set_name(stream.str());
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+void LightMaker::Start(const rendering::UserCameraPtr _camera)
+{
+  if (!this->light)
+    this->Init();
+
+  this->camera = _camera;
   this->state = 1;
 }
 
 /////////////////////////////////////////////////
 void LightMaker::Stop()
 {
-  delete this->light;
-  this->light = NULL;
-
+  if (this->light)
+  {
+    rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+    scene->RemoveLight(this->light);
+    this->light.reset();
+  }
   this->state = 0;
   gui::Events::moveMode(true);
 }

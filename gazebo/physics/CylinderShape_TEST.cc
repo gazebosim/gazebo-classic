@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,17 +46,17 @@ TEST_F(CylinderShapeTest, Scale)
   physics::CylinderShapePtr cylinder(
       new physics::CylinderShape(physics::CollisionPtr()));
   sdf::ElementPtr elem = cylinderSDF->root;
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("collision");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("geometry");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("cylinder");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   cylinder->Load(elem);
 
   // Test scaling with unit size

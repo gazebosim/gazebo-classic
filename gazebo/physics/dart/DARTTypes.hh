@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <boost/shared_ptr.hpp>
 #include "gazebo/math/Pose.hh"
 #include "gazebo/physics/dart/dart_inc.h"
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_physics
@@ -50,7 +51,7 @@ namespace gazebo
     /// \class DARTTypes DARTTypes.hh
     /// \brief A set of functions for converting between the math types used
     ///        by gazebo and dart.
-    class DARTTypes
+    class GAZEBO_VISIBLE DARTTypes
     {
       /// \brief
       public: static Eigen::Vector3d ConvVec3(const math::Vector3 &_vec3)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 /////////////////////////////////////////////////
 std::string customExec(std::string _cmd)
 {
-  _cmd += " 2>/dev/null";
+  _cmd += " 2>&1";
   FILE* pipe = popen(_cmd.c_str(), "r");
 
   if (!pipe)
@@ -66,15 +66,18 @@ TEST(WorldsInstalled, checkWorlds)
   {
     if (dir_itr->path().filename().extension() == ".world")
     {
-      std::string cmd = "gzsdf check " + dir_itr->path().string();
+      std::string cmd = "gz sdf --check " + dir_itr->path().string();
       std::string result = customExec(cmd);
 
-      bool success = boost::algorithm::find_first(result, "Success");
+      bool success = boost::algorithm::find_first(result, "Check complete");
       EXPECT_TRUE(success);
       if (!success)
+      {
+        std::cerr << "result: " << result << std::endl;
         std::cerr << "World file [" << dir_itr->path()
                   << "] is going to be installed but it's not SDF compliant.\n";
       }
+    }
   }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -214,14 +214,24 @@ class ServerFixture : public testing::Test
   /// \param[in] _noiseType Type of noise to apply.
   /// \param[in] _noiseMean Mean noise value.
   /// \param[in] _noiseStdDev Standard deviation of the noise.
+  /// \param[in] _distortionK1 Distortion coefficient k1.
+  /// \param[in] _distortionK2 Distortion coefficient k2.
+  /// \param[in] _distortionK3 Distortion coefficient k3.
+  /// \param[in] _distortionP1 Distortion coefficient P1.
+  /// \param[in] _distortionP2 Distortion coefficient p2.
+  /// \param[in] _cx Normalized optical center x, used for distortion.
+  /// \param[in] _cy Normalized optical center y, used for distortion.
   protected: void SpawnCamera(const std::string &_modelName,
                  const std::string &_cameraName,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  unsigned int _width = 320, unsigned int _height = 240,
                  double _rate = 25,
                  const std::string &_noiseType = "",
-                 double _noiseMean = 0.0,
-                 double _noiseStdDev = 0.0);
+                 double _noiseMean = 0.0, double _noiseStdDev = 0.0,
+                 bool _distortion = false, double _distortionK1 = 0.0,
+                 double _distortionK2 = 0.0, double _distortionK3 = 0.0,
+                 double _distortionP1 = 0.0, double _distortionP2 = 0.0,
+                 double _cx = 0.5, double _cy = 0.5);
 
   /// \brief Spawn a laser.
   /// \param[in] _modelName Name of the model.
@@ -385,6 +395,36 @@ class ServerFixture : public testing::Test
   protected: void WaitUntilSensorSpawn(const std::string &_name,
                                      unsigned int _sleepEach,
                                      int _retries);
+
+  /// \brief Spawn a light.
+  /// \param[in] _name Name for the light.
+  /// \param[in] _size Type of light - "spot", "directional", or "point".
+  /// \param[in] _pos Position for the light.
+  /// \param[in] _rpy Roll, pitch, yaw for the light.
+  /// \param[in] _diffuse Diffuse color of the light.
+  /// \param[in] _specular Specular color of the light.
+  /// \param[in] _direction Direction of the light ("spot" and "directional").
+  /// \param[in] _attenuationRange Range of attenuation.
+  /// \param[in] _attenuationConstant Constant component of attenuation
+  /// \param[in] _attenuationLinear Linear component of attenuation
+  /// \param[in] _attenuationQuadratic Quadratic component of attenuation
+  /// \param[in] _spotInnerAngle Inner angle ("spot" only).
+  /// \param[in] _spotOuterAngle Outer angle ("spot" only).
+  /// \param[in] _spotFallOff Fall off ("spot" only).
+  /// \param[in] _castShadows True to cast shadows.
+  protected: void SpawnLight(const std::string &_name, const std::string &_type,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const common::Color &_diffuse = common::Color::White,
+                 const common::Color &_specular = common::Color::White,
+                 const math::Vector3 &_direction = -math::Vector3::UnitZ,
+                 double _attenuationRange = 20,
+                 double _attenuationConstant = 0.5,
+                 double _attenuationLinear = 0.01,
+                 double _attenuationQuadratic = 0.001,
+                 double _spotInnerAngle = 0,
+                 double _spotOuterAngle = 0,
+                 double _spotFallOff = 0,
+                 bool _castShadows = true);
 
   /// \brief Spawn a cylinder
   /// \param[in] _name Name for the model.

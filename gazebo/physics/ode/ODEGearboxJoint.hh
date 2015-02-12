@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #include "gazebo/physics/GearboxJoint.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
   {
     /// \class ODEGearboxJoint ODEGearboxJoint.hh physics/physics.hh
     /// \brief A double axis gearbox joint.
-    class ODEGearboxJoint : public GearboxJoint<ODEJoint>
+    class GAZEBO_VISIBLE ODEGearboxJoint : public GearboxJoint<ODEJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldID ODE id of the world.
@@ -61,7 +62,7 @@ namespace gazebo
                                    const math::Vector3 &_axis);
 
       // Documentation inherited
-      public: virtual void SetGearRatio(double _gearRatio);
+      public: virtual void SetGearboxRatio(double _gearRatio);
 
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;

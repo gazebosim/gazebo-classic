@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,6 +103,8 @@ void SimbodyUniversalJoint::SetVelocity(unsigned int _index,
     this->mobod.setOneU(
       this->simbodyPhysics->integ->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
+    this->simbodyPhysics->system.realize(
+      this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
   }
   else
   {
@@ -136,110 +138,6 @@ double SimbodyUniversalJoint::GetMaxForce(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetHighStop(unsigned int _index,
-  const math::Angle &_angle)
-{
-  if (_index < this->GetAngleCount())
-  {
-    Joint::SetHighStop(_index, _angle);
-    if (this->physicsInitialized)
-    {
-      this->limitForce[_index].setBounds(
-        this->simbodyPhysics->integ->updAdvancedState(),
-        this->limitForce[_index].getLowerBound(
-          this->simbodyPhysics->integ->updAdvancedState()),
-        _angle.Radian());
-    }
-    else
-    {
-      gzerr << "SetHighStop: State not initialized, SetLowStop failed.\n";
-    }
-  }
-  else
-    gzerr << "SetHighStop: index out of bounds.\n";
-}
-
-//////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetLowStop(unsigned int _index,
-  const math::Angle &_angle)
-{
-  if (_index < this->GetAngleCount())
-  {
-    Joint::SetLowStop(_index, _angle);
-    if (this->physicsInitialized)
-    {
-      this->limitForce[_index].setBounds(
-        this->simbodyPhysics->integ->updAdvancedState(),
-        _angle.Radian(),
-        this->limitForce[_index].getUpperBound(
-          this->simbodyPhysics->integ->updAdvancedState()));
-    }
-    else
-    {
-      gzerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
-    }
-  }
-  else
-    gzerr << "SetLowStop: index out of bounds.\n";
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyUniversalJoint::GetHighStop(unsigned int _index)
-{
-  if (_index >= this->GetAngleCount())
-  {
-    gzerr << "GetHighStop: Invalid joint index ["
-          << _index << "] when trying to get high stop\n";
-    /// \TODO: consider returning NaN
-    return math::Angle(0.0);
-  }
-  else if (_index == UniversalJoint::AXIS_PARENT)
-  {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("upper"));
-  }
-  else if (_index == UniversalJoint::AXIS_CHILD)
-  {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("upper"));
-  }
-  else
-  {
-    gzerr << "GetHighStop: Should not be here in code, GetAngleCount < 0.\n";
-    /// \TODO: consider returning NaN
-    return math::Angle(0.0);
-  }
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyUniversalJoint::GetLowStop(unsigned int _index)
-{
-  if (_index >= this->GetAngleCount())
-  {
-    gzerr << "GetLowStop: Invalid joint index ["
-          << _index << "] when trying to get low stop\n";
-    /// \TODO: consider returning NaN
-    return math::Angle(0.0);
-  }
-  else if (_index == UniversalJoint::AXIS_PARENT)
-  {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("lower"));
-  }
-  else if (_index == UniversalJoint::AXIS_CHILD)
-  {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("lower"));
-  }
-  else
-  {
-    gzerr << "GetLowStop: Should not be here in code, GetAngleCount < 0.\n";
-    /// \TODO: consider returning NaN
-    return math::Angle(0.0);
-  }
-}
-
-//////////////////////////////////////////////////
 math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
     unsigned int _index) const
 {
@@ -247,34 +145,46 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
       this->simbodyPhysics->simbodyPhysicsStepped &&
       _index < this->GetAngleCount())
   {
-    if (_index == UniversalJoint::AXIS_PARENT)
+    if (!this->mobod.isEmptyHandle())
     {
-      // express X-axis of X_IF in world frame
-      const SimTK::Transform &X_IF = this->mobod.getInboardFrame(
-        this->simbodyPhysics->integ->getState());
+      if (_index == UniversalJoint::AXIS_PARENT)
+      {
+        // express X-axis of X_IF in world frame
+        const SimTK::Transform &X_IF = this->mobod.getInboardFrame(
+          this->simbodyPhysics->integ->getState());
 
-      SimTK::Vec3 x_W(
-        this->mobod.getParentMobilizedBody().expressVectorInGroundFrame(
-        this->simbodyPhysics->integ->getState(), X_IF.x()));
+        SimTK::Vec3 x_W(
+          this->mobod.getParentMobilizedBody().expressVectorInGroundFrame(
+          this->simbodyPhysics->integ->getState(), X_IF.x()));
 
-      return SimbodyPhysics::Vec3ToVector3(x_W);
-    }
-    else if (_index == UniversalJoint::AXIS_CHILD)
-    {
-      // express Y-axis of X_OM in world frame
-      const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
-        this->simbodyPhysics->integ->getState());
+        return SimbodyPhysics::Vec3ToVector3(x_W);
+      }
+      else if (_index == UniversalJoint::AXIS_CHILD)
+      {
+        // express Y-axis of X_OM in world frame
+        const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
+          this->simbodyPhysics->integ->getState());
 
-      SimTK::Vec3 y_W(
-        this->mobod.expressVectorInGroundFrame(
-        this->simbodyPhysics->integ->getState(), X_OM.y()));
+        SimTK::Vec3 y_W(
+          this->mobod.expressVectorInGroundFrame(
+          this->simbodyPhysics->integ->getState(), X_OM.y()));
 
-      return SimbodyPhysics::Vec3ToVector3(y_W);
+        return SimbodyPhysics::Vec3ToVector3(y_W);
+      }
+      else
+      {
+        gzerr << "GetGlobalAxis: internal error, GetAngleCount < 0.\n";
+        return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
+      }
     }
     else
     {
-      gzerr << "GetGlobalAxis: internal error, GetAngleCount < 0.\n";
-      return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
+      gzerr << "Joint mobod not initialized correctly.  Returning"
+            << " initial axis vector in world frame (not valid if"
+            << " joint frame has moved). Please file"
+            << " a report on issue tracker.\n";
+      return this->GetAxisFrame(_index).RotateVector(
+        this->GetLocalAxis(_index));
     }
   }
   else
@@ -291,22 +201,8 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
             << "global axis.\n";
       // if local axis specified in model frame (to be changed)
       // switch to code below if issue #494 is to be addressed
-      return this->model->GetWorldPose().rot.RotateVector(
+      return this->GetAxisFrame(_index).RotateVector(
         this->GetLocalAxis(_index));
-
-      // if local axis specified in joint frame (Issue #494)
-      // Remember to remove include of Model.hh when switching.
-      // if (this->childLink)
-      // {
-      //   math::Pose jointPose =
-      //    this->anchorPose + this->childLink->GetWorldPose();
-      //   return jointPose.rot.RotateVector(this->GetLocalAxis(_index));
-      // }
-      // else
-      // {
-      //   gzerr << "Joint [" << this->GetName() << "] missing child link.\n";
-      //   return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
-      // }
     }
   }
 }
@@ -318,8 +214,19 @@ math::Angle SimbodyUniversalJoint::GetAngleImpl(unsigned int _index) const
   {
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)
-      return math::Angle(this->mobod.getOneQ(
-        this->simbodyPhysics->integ->getState(), _index));
+    {
+      if (!this->mobod.isEmptyHandle())
+      {
+        return math::Angle(this->mobod.getOneQ(
+          this->simbodyPhysics->integ->getState(), _index));
+      }
+      else
+      {
+        gzerr << "Joint mobod not initialized correctly.  Please file"
+              << " a report on issue tracker.\n";
+        return math::Angle(0.0);
+      }
+    }
     else
     {
       gzdbg << "GetAngleImpl(): simbody not yet initialized, "

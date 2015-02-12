@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
 #ifndef _KEYEVENT_HH_
 #define _KEYEVENT_HH_
 
+#include <string>
+#include "gazebo/util/system.hh"
+
 namespace gazebo
 {
   namespace common
@@ -26,20 +29,32 @@ namespace gazebo
 
     /// \class KeyEvent KeyEvent.hh common/common.hh
     /// \brief Generic description of a keyboard event.
-    class KeyEvent
+    class GAZEBO_VISIBLE KeyEvent
     {
+      /// \brief Constructor.
+      public: KeyEvent() : type(NO_EVENT), key(0), text(""), control(false),
+                       shift(false), alt(false) {}
+
       /// \brief Key event types enumeration.
       public: enum EventType {NO_EVENT, PRESS, RELEASE};
-
-      /// \brief Constructor.
-      public: KeyEvent()
-              : type(NO_EVENT), key(0)
-              {}
 
       /// \brief Event type.
       public: EventType type;
 
+      /// \brief The raw value of the key pressed.
       public: int key;
+
+      /// \brief Formatted string of the key pressed (could be uppercase).
+      public: std::string text;
+
+      /// \brief Was control held during this key event?
+      public: bool control;
+
+      /// \brief Was shift held during this key event?
+      public: bool shift;
+
+      /// \brief Was alt held during this key event?
+      public: bool alt;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -257,6 +257,18 @@ const Material *Mesh::GetMaterial(int index) const
     return this->materials[index];
 
   return NULL;
+}
+
+//////////////////////////////////////////////////
+int Mesh::GetMaterialIndex(const Material *_mat) const
+{
+  for (unsigned int i = 0; i < this->materials.size(); ++i)
+  {
+    if (this->materials[i] == _mat)
+      return i;
+  }
+
+  return -1;
 }
 
 //////////////////////////////////////////////////

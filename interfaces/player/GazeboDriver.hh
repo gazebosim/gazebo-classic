@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,12 @@
 #include <string.h>
 
 #include "player.h"
+#include "gazebo/util/system.hh"
+
+extern "C"
+{
+  GAZEBO_VISIBLE int player_driver_init(DriverTable *_table);
+}
 
 /// \addtogroup player
 /// \brief Gazebo player driver
@@ -34,7 +40,7 @@
 class GazeboInterface;
 
 /// \brief Gazebo player driver
-class GazeboDriver : public Driver
+class GAZEBO_VISIBLE GazeboDriver : public Driver
 {
   /// \brief Constructor
   public: GazeboDriver(ConfigFile *_cf, int _section);

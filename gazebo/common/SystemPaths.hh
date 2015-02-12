@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,9 @@
 #include <string>
 
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/Event.hh"
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -51,7 +53,7 @@ namespace gazebo
     ///            Should point to Ogre RenderSystem_GL.so et. al.
     ///        \li SystemPaths#pluginPaths - plugin library paths
     ///            for common::WorldPlugin
-    class SystemPaths : public SingletonT<SystemPaths>
+    class GAZEBO_VISIBLE SystemPaths : public SingletonT<SystemPaths>
     {
       /// Constructor for SystemPaths
       private: SystemPaths();
@@ -116,6 +118,11 @@ namespace gazebo
       /// \param[in] _path the directory to add
       public: void AddModelPaths(const std::string &_path);
 
+      /// \brief Add colon delimited paths to modelPaths and signal the update
+      /// to InsertModelWidget
+      /// \param[in] _path Path to be added to the current model path
+      public: void AddModelPathsUpdate(const std::string &_path);
+
       /// \brief Add colon delimited paths to ogre install
       /// \param[in] _path the directory to add
       public: void AddOgrePaths(const std::string &_path);
@@ -126,10 +133,13 @@ namespace gazebo
 
       /// \brief clear out SystemPaths#gazeboPaths
       public: void ClearGazeboPaths();
+
       /// \brief clear out SystemPaths#modelPaths
       public: void ClearModelPaths();
+
       /// \brief clear out SystemPaths#ogrePaths
       public: void ClearOgrePaths();
+
       /// \brief clear out SystemPaths#pluginPaths
       public: void ClearPluginPaths();
 
@@ -139,10 +149,13 @@ namespace gazebo
 
       /// \brief re-read SystemPaths#gazeboPaths from environment variable
       private: void UpdateModelPaths();
+
       /// \brief re-read SystemPaths#gazeboPaths from environment variable
       private: void UpdateGazeboPaths();
+
       /// \brief re-read SystemPaths#pluginPaths from environment variable
       private: void UpdatePluginPaths();
+
       /// \brief re-read SystemPaths#ogrePaths from environment variable
       private: void UpdateOgrePaths();
 
@@ -166,6 +179,10 @@ namespace gazebo
       private: std::list<std::string> modelPaths;
 
       private: std::string logPath;
+
+      /// \brief Event to notify InsertModelWidget that the model paths were
+      /// changed.
+      public: event::EventT<void (std::string)> updateModelRequest;
 
       /// \brief if true, call UpdateGazeboPaths() within GetGazeboPaths()
       public: bool modelPathsFromEnv;

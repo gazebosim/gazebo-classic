@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -41,7 +42,7 @@ namespace gazebo
 
     /// \class Exception Exception.hh common/common.hh
     /// \brief Class for generating exceptions
-    class Exception
+    class GAZEBO_VISIBLE Exception
     {
       /// \brief Constructor
       public: Exception();
@@ -91,7 +92,7 @@ namespace gazebo
     /// \brief Class for generating Internal Gazebo Errors:
     ///        those errors which should never happend and
     ///        represent programming bugs.
-    class InternalError : public Exception
+    class GAZEBO_VISIBLE InternalError : public Exception
     {
       /// \brief Constructor
       public: InternalError();
@@ -112,7 +113,7 @@ namespace gazebo
     ///        gazebo assertions. They include information about the
     ///        assertion expression violated, function where problem
     ///        appeared and assertion debug message.
-    class AssertionInternalError : public InternalError
+    class GAZEBO_VISIBLE AssertionInternalError : public InternalError
     {
       /// \brief Constructor for assertions
       /// \param[in] _file File name

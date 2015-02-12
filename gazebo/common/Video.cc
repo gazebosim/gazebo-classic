@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,10 @@
  *
 */
 
-#include <gazebo/common/Video.hh>
 #include <gazebo/common/Console.hh>
+#include <gazebo/common/Video.hh>
 #include <gazebo/gazebo_config.h>
-
-#ifdef HAVE_FFMPEG
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
-extern "C"
-{
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
-}
-#endif
+#include <gazebo/common/ffmpeg_inc.h>
 
 using namespace gazebo;
 using namespace common;
@@ -61,6 +48,7 @@ Video::Video()
   this->swsCtx = NULL;
   this->avFrame = NULL;
   this->pic = NULL;
+  this->videoStream = -1;
 
 #ifdef HAVE_FFMPEG
   this->pic = new AVPicture;

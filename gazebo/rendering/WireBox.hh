@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 #include "gazebo/math/Box.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class WireBox WireBox.hh rendering/rendering.hh
     /// \brief Draws a wireframe box.
-    class WireBox
+    class GAZEBO_VISIBLE WireBox
     {
       /// \brief Constructor
       /// \param[in] _box Dimension of the box to draw.

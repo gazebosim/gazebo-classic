@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,11 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  class JointTrajectoryPlugin : public ModelPlugin
+  class GAZEBO_VISIBLE JointTrajectoryPlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: JointTrajectoryPlugin();

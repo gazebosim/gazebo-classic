@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -31,7 +32,7 @@ namespace gazebo
 
     /// \class FrictionPyramid SurfaceParams.hh physics/physics.hh
     /// \brief Parameters used for friction pyramid model.
-    class FrictionPyramid
+    class GAZEBO_VISIBLE FrictionPyramid
     {
       /// \brief Constructor.
       public: FrictionPyramid();
@@ -89,7 +90,7 @@ namespace gazebo
     /// \brief SurfaceParams defines various Surface contact parameters.
     /// These parameters defines the properties of a
     /// physics::Contact constraint.
-    class SurfaceParams
+    class GAZEBO_VISIBLE SurfaceParams
     {
       /// \brief Constructor.
       public: SurfaceParams();

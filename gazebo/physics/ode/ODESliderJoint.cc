@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,9 +88,9 @@ double ODESliderJoint::GetVelocity(unsigned int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetVelocity(unsigned int /*index*/, double _angle)
+void ODESliderJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  this->SetParam(dParamVel, _angle);
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////
@@ -101,14 +101,9 @@ void ODESliderJoint::SetAxis(unsigned int /*index*/, const math::Vector3 &_axis)
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
-  /// ODE needs global axis
-  /// \TODO: currently we assume joint axis is specified in model frame,
-  /// this is incorrect, and should be corrected to be
-  /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
-  if (this->parentLink)
-    globalAxis =
-      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+  // ODE needs global axis
+  math::Quaternion axisFrame = this->GetAxisFrame(0);
+  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
 
   if (this->jointId)
   {
@@ -158,4 +153,19 @@ void ODESliderJoint::SetMaxForce(unsigned int /*_index*/, double _t)
 double ODESliderJoint::GetMaxForce(unsigned int /*_index*/)
 {
   return this->GetParam(dParamFMax);
+}
+
+//////////////////////////////////////////////////
+math::Vector3 ODESliderJoint::GetAnchor(unsigned int /*_index*/) const
+{
+  dVector3 result;
+  gzlog << "ODESliderJoint::GetAnchor not implemented.\n";
+  return math::Vector3(result[0], result[1], result[2]);
+}
+
+//////////////////////////////////////////////////
+void ODESliderJoint::SetAnchor(unsigned int /*_index*/,
+  const math::Vector3 &/*_anchor*/)
+{
+  gzlog << "ODESliderJoint::SetAnchor not implemented.\n";
 }

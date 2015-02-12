@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
@@ -36,7 +37,7 @@ namespace gazebo
 
     /// \class WindowManager WindowManager.hh rendering/rendering.hh
     /// \brief Class to mangage render windows.
-    class WindowManager
+    class GAZEBO_VISIBLE WindowManager
     {
       /// \brief Constructor
       public: WindowManager();

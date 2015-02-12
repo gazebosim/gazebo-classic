@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,14 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/Connection.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   /// \class Master Master.hh gazebo_core.hh
-  /// \brief A ROS Master-like manager that directs gztopic connections, enables
-  ///        each gazebo network client to locate one another for peer-to-peer
-  ///        communication.
-  class Master
+  /// \brief A manager that directs topic connections, enables each gazebo
+  /// network client to locate one another for peer-to-peer communication.
+  class GAZEBO_VISIBLE Master
   {
     /// \def Map of unique id's to connections.
     typedef std::map<unsigned int, transport::ConnectionPtr> Connection_M;

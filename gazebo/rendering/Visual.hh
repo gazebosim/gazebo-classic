@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@
 #include "gazebo/math/Vector3.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
@@ -58,7 +59,7 @@ namespace gazebo
 
     /// \class Visual Visual.hh rendering/rendering.hh
     /// \brief A renderable object
-    class Visual : public boost::enable_shared_from_this<Visual>
+    class GAZEBO_VISIBLE Visual : public boost::enable_shared_from_this<Visual>
     {
       /// \brief Constructor
       /// \param[in] _name Name of the visual.
@@ -201,6 +202,10 @@ namespace gazebo
       /// \param[in] _show True to enable wireframe for this visual.
       public: void SetWireframe(bool _show);
 
+      /// \brief Set the transparency of a single visual without calling
+      /// UpdateShaders.
+      private: void SetTransparencyInnerLoop();
+
       /// \brief Set the transparency.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
       /// transparency.
@@ -270,7 +275,7 @@ namespace gazebo
 
       /// \brief Set the world pose of the visual.
       /// \param[in] _pose Pose of the visual in the world coordinate frame.
-      public: void SetWorldPose(const math::Pose _pose);
+      public: void SetWorldPose(const math::Pose &_pose);
 
       /// \brief Set the world linear position of the visual.
       /// \param[in] _pose Position in the world coordinate frame.
@@ -531,6 +536,11 @@ namespace gazebo
       /// \param[in] _sceneNode Pointer to the scene node to process.
       private: void DestroyAllAttachedMovableObjects(
                    Ogre::SceneNode *_sceneNode);
+
+      /// \brief Helper function to update the geometry object size based on
+      /// the scale of the visual.
+      /// \param[in] _scale Scale of visual
+      private: void UpdateGeomSize(const math::Vector3 &_scale);
 
       /// \internal
       /// \brief Pointer to private data.

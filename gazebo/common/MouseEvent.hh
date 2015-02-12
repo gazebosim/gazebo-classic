@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _MOUSEEVENT_HH_
 
 #include "gazebo/math/Vector2i.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -28,7 +29,7 @@ namespace gazebo
 
     /// \class MouseEvent MouseEvent.hh common/common.hh
     /// \brief Generic description of a mouse event.
-    class MouseEvent
+    class GAZEBO_VISIBLE MouseEvent
     {
       /// \brief Standard mouse buttons enumeration.
       public: enum Buttons {NO_BUTTON = 0x0, LEFT = 0x1, MIDDLE = 0x2,

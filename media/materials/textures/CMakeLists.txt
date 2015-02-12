@@ -1,5 +1,7 @@
 set (files
   beigeWall.jpg
+  building_frame.png
+  bricks.png
   ceiling_tiled.jpg
   clouds.jpg
   dirt_diffusespecular.png
@@ -14,15 +16,22 @@ set (files
   grass_normal.png
   hardwood_floor.jpg
   heightmap_bowl.png
+  motorway.jpg
   paintedWall.jpg
   pioneerBody.jpg
+  primary.jpg
   projection_filter.png
   random.png
+  residential.jpg
   road1.jpg
+  secondary.jpg
+  sidewalk.jpg
+  steps.jpeg
   stereo_projection_pattern_high_res.png
   stereo_projection_pattern_high_res_red.png
   terrain_detail.jpg
   terrain.png
+  trunk.jpg
   white.bmp
   willowMap.png
   wood.jpg

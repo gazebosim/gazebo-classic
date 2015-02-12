@@ -5,7 +5,6 @@ package gazebo.msgs;
 /// \brief Information about a collision element
 
 
-import "header.proto";
 import "pose.proto";
 import "geometry.proto";
 import "surface.proto";

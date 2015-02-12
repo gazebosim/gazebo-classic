@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/JointWrench.hh"
+#include "gazebo/util/system.hh"
 
 // For the sake of efficiency, use fixed size arrays for collision
 // MAX_COLLIDE_RETURNS limits contact detection, needs to be large
@@ -50,7 +51,7 @@ namespace gazebo
     /// \class Contact Contact.hh physics/physics.hh
     /// \brief A contact between two collisions. Each contact can consist of
     /// a number of contact points
-    class Contact
+    class GAZEBO_VISIBLE Contact
     {
       /// \brief Constructor.
       public: Contact();

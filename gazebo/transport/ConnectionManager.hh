@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Connection.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +40,8 @@ namespace gazebo
 
     /// \class ConnectionManager ConnectionManager.hh transport/transport.hh
     /// \brief Manager of connections
-    class ConnectionManager : public SingletonT<ConnectionManager>
+    class GAZEBO_VISIBLE ConnectionManager :
+      public SingletonT<ConnectionManager>
     {
       /// \brief Constructor
       private: ConnectionManager();

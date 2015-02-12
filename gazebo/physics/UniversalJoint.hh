@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: A universal joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
-#ifndef _UNIVERSALJOINT_HH_
-#define _UNIVERSALJOINT_HH_
+#ifndef _GAZEBO_UNIVERSALJOINT_HH_
+#define _GAZEBO_UNIVERSALJOINT_HH_
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,7 +33,7 @@ namespace gazebo
     /// Axis1 and axis2 are body-fixed, with axis1 attached to parent
     /// body and axis2 attached to child body.
     template<class T>
-    class UniversalJoint : public T
+    class GAZEBO_VISIBLE UniversalJoint : public T
     {
       /// \enum AxisIndex
       /// \brief Map joint axes to corresponding link.

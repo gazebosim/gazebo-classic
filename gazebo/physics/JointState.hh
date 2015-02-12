@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/math/Pose.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
 
     /// \class JointState JointState.hh physics/physics.hh
     /// \brief keeps track of state of a physics::Joint
-    class JointState : public State
+    class GAZEBO_VISIBLE JointState : public State
     {
       /// \brief Default constructor.
       public: JointState();

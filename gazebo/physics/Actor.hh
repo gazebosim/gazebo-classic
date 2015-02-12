@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Skeleton.hh"
 #include "gazebo/common/Animation.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,7 +38,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Information about a trajectory for an Actor.
-    class TrajectoryInfo
+    class GAZEBO_VISIBLE TrajectoryInfo
     {
       /// \brief Constructor.
       public: TrajectoryInfo();
@@ -67,7 +68,7 @@ namespace gazebo
     /// \class Actor Actor.hh physics/physics.hh
     /// \brief Actor class enables GPU based mesh model / skeleton
     /// scriptable animation.
-    class Actor : public Model
+    class GAZEBO_VISIBLE Actor : public Model
     {
       /// \brief Constructor
       /// \param[in] _parent Parent object

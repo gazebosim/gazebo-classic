@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #define _GAZEBO_PID_HH_
 
 #include "gazebo/common/Time.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
     /// Generic proportiolnal-integral-derivative controller class that
     /// keeps track of PID-error states and control inputs given
     /// the state of a system and a user specified target state.
-    class PID
+    class GAZEBO_VISIBLE PID
     {
       /// \brief Constructor, zeros out Pid values when created and
       /// initialize Pid-gains and integral term limits:[iMax:iMin]-[I1:I2].
@@ -90,6 +91,34 @@ namespace gazebo
       /// \brief Set the maximum value for the command.
       /// \param[in] _c The maximum value
       public: void SetCmdMin(double _c);
+
+      /// \brief Get the proportional Gain.
+      /// \return The proportional gain value
+      public: double GetPGain() const;
+
+      /// \brief Get the integral Gain.
+      /// \return The integral gain value
+      public: double GetIGain() const;
+
+      /// \brief Get the derivative Gain.
+      /// \return The derivative gain value
+      public: double GetDGain() const;
+
+      /// \brief Get the integral upper limit.
+      /// \return The integral upper limit value
+      public: double GetIMax() const;
+
+      /// \brief Get the integral lower limit.
+      /// \return The integral lower limit value
+      public: double GetIMin() const;
+
+      /// \brief Get the maximum value for the command.
+      /// \return The maximum value
+      public: double GetCmdMax() const;
+
+      /// \brief Get the maximum value for the command.
+      /// \return The maximum value
+      public: double GetCmdMin() const;
 
       /// \brief Update the Pid loop with nonuniform time step size.
       /// \param[_in] _error  Error since last call (p_state - p_target).

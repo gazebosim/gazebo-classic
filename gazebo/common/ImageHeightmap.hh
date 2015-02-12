@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include "gazebo/common/HeightmapData.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
 
     /// \class ImageHeightmap ImageHeightmap.hh common/common.hh
     /// \brief Encapsulates an image that will be interpreted as a heightmap.
-    class ImageHeightmap
+    class GAZEBO_VISIBLE ImageHeightmap
       : public gazebo::common::HeightmapData
     {
       /// \brief Constructor

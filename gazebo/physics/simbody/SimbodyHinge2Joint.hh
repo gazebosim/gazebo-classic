@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include "gazebo/physics/Hinge2Joint.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
     /// \{
 
     /// \brief A two axis hinge joint
-    class SimbodyHinge2Joint : public Hinge2Joint<SimbodyJoint>
+    class GAZEBO_VISIBLE SimbodyHinge2Joint : public Hinge2Joint<SimbodyJoint>
     {
       /// \brief Constructor
       public: SimbodyHinge2Joint(SimTK::MultibodySystem *world,
@@ -44,9 +45,6 @@ namespace gazebo
 
       // Documentation inherited.
       protected: virtual void Load(sdf::ElementPtr _sdf);
-
-      // Documentation inherited.
-      public: virtual void Init();
 
       // Documentation inherited.
       public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
@@ -69,20 +67,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual double GetMaxForce(unsigned int _index);
-
-      // Documentation inherited.
-      public: virtual void SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
-
-      // Documentation inherited.
-      public: virtual void SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
-
-      // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
-
-      // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
       public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/util/system.hh"
 
 class QLineEdit;
 class QLabel;
@@ -34,7 +35,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class TimePanel : public QWidget
+    class GAZEBO_VISIBLE TimePanel : public QWidget
     {
       Q_OBJECT
 

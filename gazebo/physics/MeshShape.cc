@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh shape
- * Author: Nate Koenig
- * Date: 16 Oct 2009
- */
 
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"

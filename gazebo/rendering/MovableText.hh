@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/math/MathTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
@@ -45,7 +46,8 @@ namespace gazebo
 
     /// \class MovableText MovableText.hh rendering/rendering.hh
     /// \brief Movable text
-    class MovableText : public Ogre::MovableObject, public Ogre::Renderable
+    class GAZEBO_VISIBLE MovableText
+      : public Ogre::MovableObject, public Ogre::Renderable
     {
       /// \enum HorizAlign
       /// \brief Horizontal alignment

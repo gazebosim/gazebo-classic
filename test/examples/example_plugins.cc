@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,10 +79,17 @@ TEST_P(ExamplePlugins, Build)
 }
 
 INSTANTIATE_TEST_CASE_P(ExamplePlugins, ExamplePlugins, ::testing::Values(
-  "hello_world"
-  , "world_edit"
-  , "model_push"
+  "animate_joints"
+  , "animate_pose"
   , "factory"
+  , "hello_world"
+  , "model_push"
+  , "parameters"
+  , "projector"
+  , "system_gui_plugin"
+  , "world_edit"
+  , "gui_overlay_plugin_spawn"
+  , "gui_overlay_plugin_time"
 ));
 
 int main(int argc, char **argv)

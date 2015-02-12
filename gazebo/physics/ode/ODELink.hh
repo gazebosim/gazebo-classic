@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,14 @@
 #include "gazebo/physics/ode/ode_inc.h"
 #include "gazebo/physics/ode/ODETypes.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief ODE Link class.
-    class ODELink : public Link
+    class GAZEBO_VISIBLE ODELink : public Link
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent model.
@@ -173,6 +174,12 @@ namespace gazebo
 
       /// \brief Collision space id.
       private: dSpaceID spaceId;
+
+      /// \brief Cache force applied on body
+      private: math::Vector3 force;
+
+      /// \brief Cache torque applied on body
+      private: math::Vector3 torque;
     };
   }
 }

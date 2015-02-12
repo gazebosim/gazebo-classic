@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ ServerFixture::ServerFixture()
   this->imgData = NULL;
   this->serverThread = NULL;
 
-  gzLogInit("test.log");
+  gzLogInit("test-", "test.log");
   gazebo::common::Console::SetQuiet(false);
   common::SystemPaths::Instance()->AddGazeboPaths(
       TEST_INTEGRATION_PATH);
@@ -224,17 +224,17 @@ void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
   if (!rendering::get_scene(
         gazebo::physics::get_world()->GetName()))
   {
-    rendering::create_scene(
-        gazebo::physics::get_world()->GetName(), false, true);
+    ASSERT_NO_THROW(rendering::create_scene(
+        gazebo::physics::get_world()->GetName(), false, true));
   }
 
-  this->SetPause(_paused);
+  ASSERT_NO_THROW(this->SetPause(_paused));
 
-  this->server->Run();
+  ASSERT_NO_THROW(this->server->Run());
 
   ASSERT_NO_THROW(this->server->Fini());
 
-  delete this->server;
+  ASSERT_NO_THROW(delete this->server);
   this->server = NULL;
 }
 
@@ -426,7 +426,7 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
     unsigned int &_height)
 {
   sensors::SensorPtr sensor = sensors::get_sensor(_cameraName);
-  EXPECT_TRUE(sensor);
+  EXPECT_TRUE(sensor != NULL);
   sensors::CameraSensorPtr camSensor =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
@@ -457,11 +457,11 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
 void ServerFixture::SpawnCamera(const std::string &_modelName,
     const std::string &_cameraName,
     const math::Vector3 &_pos, const math::Vector3 &_rpy,
-    unsigned int _width, unsigned int _height,
-    double _rate,
-    const std::string &_noiseType,
-    double _noiseMean,
-    double _noiseStdDev)
+    unsigned int _width, unsigned int _height, double _rate,
+    const std::string &_noiseType, double _noiseMean, double _noiseStdDev,
+    bool _distortion, double _distortionK1, double _distortionK2,
+    double _distortionK3, double _distortionP1, double _distortionP2,
+    double _cx, double _cy)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -494,6 +494,16 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     << "        <mean>" << _noiseMean << "</mean>"
     << "        <stddev>" << _noiseStdDev << "</stddev>"
     << "      </noise>";
+
+  if (_distortion)
+    newModelStr << "      <distortion>"
+    << "        <k1>" << _distortionK1 << "</k1>"
+    << "        <k2>" << _distortionK2 << "</k2>"
+    << "        <k3>" << _distortionK3 << "</k3>"
+    << "        <p1>" << _distortionP1 << "</p1>"
+    << "        <p2>" << _distortionP2 << "</p2>"
+    << "        <center>" << _cx << " " << _cy << "</center>"
+    << "      </distortion>";
 
   newModelStr << "    </camera>"
     << "  </sensor>"
@@ -965,6 +975,71 @@ void ServerFixture::WaitUntilSensorSpawn(const std::string &_name,
     FAIL() << "ServerFixture timeout: max number of retries ("
            << _retries
            << ") exceeded while awaiting the spawn of " << _name;
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::SpawnLight(const std::string &_name,
+    const std::string &_type,
+    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const common::Color &_diffuse,
+    const common::Color &_specular,
+    const math::Vector3 &_direction,
+    double _attenuationRange,
+    double _attenuationConstant,
+    double _attenuationLinear,
+    double _attenuationQuadratic,
+    double _spotInnerAngle,
+    double _spotOuterAngle,
+    double _spotFallOff,
+    bool _castShadows)
+{
+  msgs::Factory msg;
+  std::ostringstream newLightStr;
+
+  newLightStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<light name ='" << _name << "' type = '" << _type << "'>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<diffuse>" << _diffuse << "</diffuse>"
+    << "<specular>" << _specular << "</specular>"
+    << "<direction>" << _direction << "</direction>"
+    << "<attenuation>"
+    << "  <range>" << _attenuationRange << "</range>"
+    << "  <constant>" << _attenuationConstant << "</constant>"
+    << "  <linear>" << _attenuationLinear << "</linear>"
+    << "  <quadratic>" << _attenuationQuadratic << "</quadratic>"
+    << "</attenuation>";
+
+  if (_type == "spot")
+  {
+    newLightStr << "<spot>"
+    << "  <inner_angle>" << _spotInnerAngle << "</inner_angle>"
+    << "  <outer_angle>" << _spotOuterAngle << "</outer_angle>"
+    << "  <falloff>" << _spotFallOff << "</falloff>"
+    << "</spot>";
+  }
+
+  newLightStr << "<cast_shadows>" << _castShadows << "</cast_shadows>"
+    << "</light>"
+    << "</sdf>";
+
+  msg.set_sdf(newLightStr.str());
+  this->factoryPub->Publish(msg);
+
+  physics::WorldPtr world = physics::get_world();
+  msgs::Scene sceneMsg;
+  int timeOutCount = 0;
+  int maxTimeOut = 10;
+  while (timeOutCount < maxTimeOut)
+  {
+    sceneMsg = world->GetSceneMsg();
+    for (int i = 0; i < sceneMsg.light_size(); ++i)
+    {
+      if (sceneMsg.light(i).name() == _name)
+        break;
+    }
+    timeOutCount++;
+    common::Time::MSleep(100);
+  }
 }
 
 /////////////////////////////////////////////////

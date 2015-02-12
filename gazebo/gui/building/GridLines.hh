@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #define _GRID_LINES_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,7 @@ namespace gazebo
 
     /// \class GridLines GridLines.hh
     /// \brief 2D grid lines.
-    class GridLines : public  QGraphicsItem
+    class GAZEBO_VISIBLE GridLines : public  QGraphicsItem
     {
       /// \brief Constructor
       /// \param[in] _width Width of grid lines in pixels.

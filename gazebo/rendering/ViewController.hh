@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <string>
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
 
     /// \class ViewController ViewController.hh rendering/rendering.hh
     /// \brief Base class for view controllers.
-    class ViewController
+    class GAZEBO_VISIBLE ViewController
     {
       /// \brief Constructor
       /// \param[in] _camera The user camera to controll.

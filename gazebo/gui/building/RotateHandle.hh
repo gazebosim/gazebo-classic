@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #define _ROTATE_HANDLE_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,7 @@ namespace gazebo
 
     /// \class RotateHandle RotateHandle.hh
     /// \brief Handle for rotating an editor item
-    class RotateHandle : public QGraphicsItem
+    class GAZEBO_VISIBLE RotateHandle : public QGraphicsItem
     {
       /// \brief Constructor
       /// param[in] _parent Parent graphics item.

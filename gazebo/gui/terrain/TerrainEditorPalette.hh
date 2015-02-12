@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +40,7 @@ namespace gazebo
 
     /// \class TerrainEditorPalette TerrainEditorPalette.hh
     /// \brief A palette of building items which can be added to the editor.
-    class TerrainEditorPalette : public QWidget
+    class GAZEBO_VISIBLE TerrainEditorPalette : public QWidget
     {
       Q_OBJECT
 

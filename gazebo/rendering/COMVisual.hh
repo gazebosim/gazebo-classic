@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
 
     /// \class COMVisual COMVisual.hh rendering/rendering.hh
     /// \brief Basic Center of Mass visualization
-    class COMVisual : public Visual
+    class GAZEBO_VISIBLE COMVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the Visual
@@ -49,6 +50,7 @@ namespace gazebo
       /// \brief Load the Visual from an SDF pointer
       /// \param[in] _elem SDF Element pointer
       public: virtual void Load(sdf::ElementPtr _elem);
+      using Visual::Load;
 
       /// \brief Load from a message
       /// \param[in] _msg Pointer to the message

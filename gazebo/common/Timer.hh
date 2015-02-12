@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
 
     /// \class Timer Timer.hh common/common.hh
     /// \brief A timer class, used to time things in real world walltime
-    class Timer
+    class GAZEBO_VISIBLE Timer
     {
       /// \brief Constructor
       public: Timer();
@@ -56,6 +57,9 @@ namespace gazebo
       /// \return The time
       public: Time GetElapsed() const;
 
+      /// \brief Reset the timer
+      public: void Reset();
+
       /// \brief Stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
                                               const gazebo::common::Timer &t)
@@ -64,14 +68,17 @@ namespace gazebo
                 return out;
               }
 
+      /// \brief True if a reset is needed.
+      private: bool reset;
+
+      /// \brief True if the timer is running.
+      private: bool running;
+
       /// \brief The time of the last call to Start
       private: Time start;
 
       /// \brief The time when Stop was called.
       private: Time stop;
-
-      /// \brief True if the timer is running.
-      private: bool running;
     };
     /// \}
   }

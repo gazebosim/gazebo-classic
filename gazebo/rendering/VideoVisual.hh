@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 #include <string>
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
 
     /// \class VideoVisual VideoVisual.hh rendering/rendering.hh
     /// \brief A visual element that displays a video as a texture
-    class VideoVisual : public Visual
+    class GAZEBO_VISIBLE VideoVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the video visual.

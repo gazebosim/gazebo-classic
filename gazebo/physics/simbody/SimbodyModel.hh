@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #define _SIMBODY_MODEL_HH_
 
 #include "gazebo/physics/Model.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,7 @@ namespace gazebo
 
     /// \class SimbodyModel SimbodyModel.hh physics/physics.hh
     /// \brief A model is a collection of links, joints, and plugins.
-    class SimbodyModel : public Model
+    class GAZEBO_VISIBLE SimbodyModel : public Model
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent object.

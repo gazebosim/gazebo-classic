@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,18 +24,14 @@ using namespace gazebo;
 class PR2Test : public ServerFixture,
                 public testing::WithParamInterface<const char*>
 {
+  public: void LoadPR2(std::string _physicsEngine);
+  public: void ScrewJoint(std::string _physicsEngine);
   public: void StaticPR2(std::string _physicsEngine);
-  public: void Load(std::string _physicsEngine);
 };
 
-void PR2Test::Load(std::string _physicsEngine)
+////////////////////////////////////////////////////////////////////////
+void PR2Test::LoadPR2(std::string _physicsEngine)
 {
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Abort test since simbody does not support screw joints in PR2, "
-          << "Please see issue #857.\n";
-    return;
-  }
   if (_physicsEngine == "dart")
   {
     gzerr << "Abort test since dart does not support ray sensor in PR2, "
@@ -63,11 +59,11 @@ void PR2Test::Load(std::string _physicsEngine)
 
   sensors::SensorPtr sensor =
     sensors::get_sensor("narrow_stereo_gazebo_l_stereo_camera_sensor");
-  EXPECT_TRUE(sensor);
+  EXPECT_TRUE(sensor != NULL);
 
   sensors::CameraSensorPtr camSensor =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  EXPECT_TRUE(camSensor);
+  EXPECT_TRUE(camSensor != NULL);
 
   while (!camSensor->SaveFrame(paths->GetDefaultTestPath() + "/frame_10.jpg"))
     common::Time::MSleep(100);
@@ -86,9 +82,65 @@ void PR2Test::Load(std::string _physicsEngine)
   boost::filesystem::remove_all(paths->GetDefaultTestPath());
 }
 
-TEST_P(PR2Test, Load)
+TEST_P(PR2Test, LoadPR2)
 {
-  Load(GetParam());
+  LoadPR2(GetParam());
+}
+
+////////////////////////////////////////////////////////////////////////
+void PR2Test::ScrewJoint(std::string _physicsEngine)
+{
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Abort test since bullet screw joints don't work yet\n";
+    return;
+  }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray sensor in PR2, "
+          << "Please see issue #911.\n";
+    return;
+  }
+
+  ServerFixture::Load("worlds/pr2.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  physics::ModelPtr model = world->GetModel("pr2");
+  ASSERT_TRUE(model != NULL);
+
+  physics::LinkPtr link = model->GetLink("torso_lift_link");
+  ASSERT_TRUE(link != NULL);
+
+  physics::JointPtr motor = model->GetJoint("torso_lift_motor_screw_joint");
+  ASSERT_TRUE(motor != NULL);
+  motor->SetEffortLimit(0, 1000);
+
+  physics::JointPtr screw =
+    model->GetJoint("torso_lift_screw_torso_lift_joint");
+  ASSERT_TRUE(screw != NULL);
+
+  // Let it settle a bit
+  world->Step(300);
+
+  // Set a fixed velocity on revolute joint that connects to the screw joint
+  unsigned int steps = 1000;
+  for (unsigned int i = 0; i < steps; ++i)
+  {
+    motor->SetForce(0, 10);
+    world->Step(1);
+  }
+
+  // Expect torso to lift at least 1 mm/s
+  gzdbg << "motor " << motor->GetVelocity(0) << std::endl;
+  gzdbg << "screw " << screw->GetVelocity(0) << std::endl;
+  gzdbg << "link  " << link->GetWorldLinearVel() << std::endl;
+  EXPECT_GT(link->GetWorldLinearVel().z, 1e-3);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -136,6 +188,11 @@ void PR2Test::StaticPR2(std::string _physicsEngine)
   EXPECT_GT(dt, 0);
   t = world->GetSimTime().Double();
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
+}
+
+TEST_P(PR2Test, ScrewJoint)
+{
+  ScrewJoint(GetParam());
 }
 
 TEST_P(PR2Test, StaticPR2)

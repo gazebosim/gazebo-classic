@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _MESHCSG_HH_
 
 #include "gazebo/math/Pose.hh"
+#include "gazebo/util/system.hh"
 
 struct _GtsSurface;
 typedef _GtsSurface GtsSurface;
@@ -35,7 +36,7 @@ namespace gazebo
 
     /// \class MeshCSG MeshCSG.hh common/common.hh
     /// \brief Creates CSG meshes
-    class MeshCSG
+    class GAZEBO_VISIBLE MeshCSG
     {
       /// \brief An enumeration of the boolean operations
       public: enum BooleanOperation {UNION, INTERSECTION, DIFFERENCE};

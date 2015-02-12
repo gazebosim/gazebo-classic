@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,12 @@
 #include <sstream>
 #include <string>
 
-#include <boost/thread.hpp>
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include <boost/thread.hpp>
+#endif
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -51,12 +54,19 @@ namespace gazebo
     /// \brief Initialize log file with filename given by _str.
     /// If called twice, it will close currently in use and open a new
     /// log file.
+    /// \param[in] _prefix Prefix added to the directory where the log file
+    /// will be created.
     /// \param[in] _str Name of log file for gzlog messages.
-    #define gzLogInit(_str) (gazebo::common::Console::log.Init(_str))
+    #define gzLogInit(_prefix, _str) \
+        (gazebo::common::Console::log.Init(_prefix, _str))
+
+    /// \brief Get the full path of the directory where the log files are stored
+    /// \return Full path of the directory
+    #define gzLogDirectory() (gazebo::common::Console::log.GetLogDirectory())
 
     /// \class FileLogger FileLogger.hh common/common.hh
     /// \brief A logger that outputs messages to a file.
-    class FileLogger : public std::ostream
+    class GAZEBO_VISIBLE FileLogger : public std::ostream
     {
       /// \brief Constructor.
       /// \param[in] _filename Filename to write into. If empty,
@@ -67,9 +77,12 @@ namespace gazebo
       public: virtual ~FileLogger();
 
       /// \brief Initialize the file logger.
+      /// \param[in] _prefix Prefix added to the directory where the log file
+      /// will be created.
       /// \param[in] _filename Name and path of the log file to write output
       /// into.
-      public: void Init(const std::string &_filename);
+      public: void Init(const std::string &_prefix,
+                        const std::string &_filename);
 
       /// \brief Output a filename and line number, then return a reference
       /// to the logger.
@@ -83,6 +96,15 @@ namespace gazebo
       /// \return Reference to this logger.
       public: virtual FileLogger &operator()(
                   const std::string &_file, int _line);
+
+      /// \brief Get the full path of the directory where all the log files
+      /// are stored.
+      /// \return Full path of the directory.
+      public: std::string GetLogDirectory() const;
+
+      /// \brief Get the port of the master.
+      /// \return The port of the master.
+      private: static std::string GetMasterPort();
 
       /// \brief String buffer for the file logger.
       protected: class Buffer : public std::stringbuf
@@ -102,11 +124,15 @@ namespace gazebo
                    /// \brief Stream to output information into.
                    public: std::ofstream *stream;
                  };
+
+      /// \brief Stores the full path of the directory where all the log files
+      /// are stored.
+      private: std::string logDirectory;
     };
 
     /// \class Logger Logger.hh common/common.hh
     /// \brief Terminal logger.
-    class Logger : public std::ostream
+    class GAZEBO_VISIBLE Logger : public std::ostream
     {
       /// \enum LogType.
       /// \brief Output destination type.
@@ -175,7 +201,7 @@ namespace gazebo
     /// \class Console Console.hh common/common.hh
     /// \brief Container for loggers, and global logging options
     /// (such as verbose vs. quiet output).
-    class Console
+    class GAZEBO_VISIBLE Console
     {
       /// \brief Set quiet output.
       /// \param[in] q True to prevent warning.

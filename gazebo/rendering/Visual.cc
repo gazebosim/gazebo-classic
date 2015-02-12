@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -215,13 +215,16 @@ void Visual::Fini()
 
   if (this->dataPtr->sceneNode != NULL)
   {
-    this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
-    this->dataPtr->sceneNode->removeAndDestroyAllChildren();
     this->dataPtr->sceneNode->detachAllObjects();
-
     this->dataPtr->scene->GetManager()->destroySceneNode(
         this->dataPtr->sceneNode);
     this->dataPtr->sceneNode = NULL;
+  }
+
+  if (this->dataPtr->preRenderConnection)
+  {
+    event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
+    this->dataPtr->preRenderConnection.reset();
   }
 
   RTShaderSystem::Instance()->DetachEntity(this);
@@ -237,13 +240,12 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   for (iter = this->dataPtr->children.begin();
       iter != this->dataPtr->children.end(); ++iter)
   {
-    result->dataPtr->children.push_back(
-        (*iter)->Clone((*iter)->GetName(), result));
+    (*iter)->Clone((*iter)->GetName(), result);
   }
 
-  result->SetWorldPose(this->GetWorldPose());
+  if (_newParent == this->dataPtr->scene->GetWorldVisual())
+    result->SetWorldPose(this->GetWorldPose());
   result->ShowCollision(false);
-
   return result;
 }
 
@@ -323,6 +325,16 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       sdf::ElementPtr elem = geomElem->AddElement("plane");
       elem->GetElement("normal")->Set(plane.normal);
       elem->GetElement("size")->Set(plane.size);
+    }
+    else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
+    {
+      sdf::ElementPtr elem = geomElem->AddElement("polyline");
+      elem->GetElement("height")->Set(_msg->geometry().polyline().height());
+      for (int i = 0; i < _msg->geometry().polyline().point_size(); ++i)
+      {
+        elem->AddElement("point")->Set(
+            msgs::Convert(_msg->geometry().polyline().point(i)));
+      }
     }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
@@ -657,9 +669,10 @@ void Visual::DetachVisual(const std::string &_name)
   {
     if ((*iter)->GetName() == _name)
     {
-      this->dataPtr->sceneNode->removeChild((*iter)->GetSceneNode());
-      (*iter)->dataPtr->parent.reset();
+      VisualPtr childVis = (*iter);
       this->dataPtr->children.erase(iter);
+      this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
+      childVis->GetParent().reset();
       break;
     }
   }
@@ -682,7 +695,7 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
     {
       RTShaderSystem::Instance()->UpdateShaders();
     }
-    _obj->setUserAny(Ogre::Any(this->GetName()));
+    _obj->getUserObjectBindings().setUserAny(Ogre::Any(this->GetName()));
   }
   else
     gzerr << "Visual[" << this->GetName() << "] already has object["
@@ -770,7 +783,7 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
   this->InsertMesh(_meshName, _subMesh, _centerSubmesh);
 
   obj = (Ogre::MovableObject*)
-    (this->dataPtr->sceneNode->getCreator()->createEntity(objName, meshName));
+      (this->dataPtr->sceneNode->getCreator()->createEntity(objName, meshName));
 
   this->AttachObject(obj);
   return obj;
@@ -782,13 +795,30 @@ void Visual::SetScale(const math::Vector3 &_scale)
   if (this->dataPtr->scale == _scale)
     return;
 
-  math::Vector3 tmpScale = this->dataPtr->scale;
   this->dataPtr->scale = _scale;
+
+  // update geom size based on scale.
+  this->UpdateGeomSize(_scale);
+
+  this->dataPtr->sceneNode->setScale(
+      Conversions::Convert(this->dataPtr->scale));
+}
+
+//////////////////////////////////////////////////
+void Visual::UpdateGeomSize(const math::Vector3 &_scale)
+{
+  for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
+       iter != this->dataPtr->children.end(); ++iter)
+  {
+    (*iter)->UpdateGeomSize(_scale);
+  }
 
   sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
 
   if (geomElem->HasElement("box"))
+  {
     geomElem->GetElement("box")->GetElement("size")->Set(_scale);
+  }
   else if (geomElem->HasElement("sphere"))
   {
     geomElem->GetElement("sphere")->GetElement("radius")->Set(_scale.x/2.0);
@@ -801,48 +831,12 @@ void Visual::SetScale(const math::Vector3 &_scale)
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
-
-  this->dataPtr->sceneNode->setScale(
-      Conversions::Convert(this->dataPtr->scale));
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetScale()
 {
   return this->dataPtr->scale;
-  /*math::Vector3 result(1, 1, 1);
-  if (this->dataPtr->sdf->HasElement("geometry"))
-  {
-    sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
-
-    if (geomElem->HasElement("box"))
-    {
-      result = geomElem->GetElement("box")->Get<math::Vector3>("size");
-    }
-    else if (geomElem->HasElement("sphere"))
-    {
-      double r = geomElem->GetElement("sphere")->Get<double>("radius");
-      result.Set(r * 2.0, r * 2.0, r * 2.0);
-    }
-    else if (geomElem->HasElement("cylinder"))
-    {
-      double r = geomElem->GetElement("cylinder")->Get<double>("radius");
-      double l = geomElem->GetElement("cylinder")->Get<double>("length");
-      result.Set(r * 2.0, r * 2.0, l);
-    }
-    else if (geomElem->HasElement("plane"))
-    {
-      math::Vector2d size =
-        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
-      result.Set(size.x, size.y, 1);
-    }
-    else if (geomElem->HasElement("mesh"))
-    {
-      result = geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
-    }
-  }
-
-  return result;*/
 }
 
 //////////////////////////////////////////////////
@@ -1026,6 +1020,9 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
            << ". Object will appear white.\n";
   }
 
+  // Re-apply the transparency filter for the last known transparency value
+  this->SetTransparencyInnerLoop();
+
   // Apply material to all child visuals
   for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
        iter != this->dataPtr->children.end(); ++iter)
@@ -1034,7 +1031,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   }
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized()
-      && !this->dataPtr->lighting &&
+      && this->dataPtr->lighting &&
       this->GetName().find("__COLLISION_VISUAL__") == std::string::npos)
   {
     RTShaderSystem::Instance()->UpdateShaders();
@@ -1319,20 +1316,8 @@ void Visual::SetWireframe(bool _show)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetTransparency(float _trans)
+void Visual::SetTransparencyInnerLoop()
 {
-  if (math::equal(_trans, this->dataPtr->transparency))
-    return;
-
-  this->dataPtr->transparency = std::min(
-      std::max(_trans, static_cast<float>(0.0)), static_cast<float>(1.0));
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
-  {
-    (*iter)->SetTransparency(_trans);
-  }
-
   for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
       i++)
   {
@@ -1342,6 +1327,9 @@ void Visual::SetTransparency(float _trans)
     entity = dynamic_cast<Ogre::Entity*>(obj);
 
     if (!entity)
+      continue;
+
+    if (entity->getName().find("__COLLISION_VISUAL__") != std::string::npos)
       continue;
 
     // For each ogre::entity
@@ -1381,7 +1369,6 @@ void Visual::SetTransparency(float _trans)
             pass->setDepthCheckEnabled(true);
           }
 
-
           dc = pass->getDiffuse();
           dc.a =(1.0f - this->dataPtr->transparency);
           pass->setDiffuse(dc);
@@ -1389,6 +1376,24 @@ void Visual::SetTransparency(float _trans)
       }
     }
   }
+}
+
+//////////////////////////////////////////////////
+void Visual::SetTransparency(float _trans)
+{
+  if (math::equal(_trans, this->dataPtr->transparency))
+    return;
+
+  this->dataPtr->transparency = std::min(
+      std::max(_trans, static_cast<float>(0.0)), static_cast<float>(1.0));
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->dataPtr->children.begin();
+      iter != this->dataPtr->children.end(); ++iter)
+  {
+    (*iter)->SetTransparency(_trans);
+  }
+
+  this->SetTransparencyInnerLoop();
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
@@ -1399,13 +1404,17 @@ void Visual::SetHighlighted(bool _highlighted)
 {
   if (_highlighted)
   {
+    math::Box bbox = this->GetBoundingBox();
+
     // Create the bounding box if it's not already created.
     if (!this->dataPtr->boundingBox)
     {
-      this->dataPtr->boundingBox = new WireBox(shared_from_this(),
-                                      this->GetBoundingBox());
+      this->dataPtr->boundingBox = new WireBox(shared_from_this(), bbox);
     }
-
+    else
+    {
+      this->dataPtr->boundingBox->Init(bbox);
+    }
     this->dataPtr->boundingBox->SetVisible(true);
   }
   else if (this->dataPtr->boundingBox)
@@ -1570,7 +1579,7 @@ math::Pose Visual::GetPose() const
 }
 
 //////////////////////////////////////////////////
-void Visual::SetWorldPose(const math::Pose _pose)
+void Visual::SetWorldPose(const math::Pose &_pose)
 {
   this->SetWorldPosition(_pose.pos);
   this->SetWorldRotation(_pose.rot);
@@ -1723,7 +1732,7 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
 DynamicLines *Visual::CreateDynamicLine(RenderOpType _type)
 {
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
-      boost::bind(&Visual::Update, this));
+      boost::bind(&Visual::Update, shared_from_this()));
 
   DynamicLines *line = new DynamicLines(_type);
   this->dataPtr->lines.push_back(line);
@@ -1772,6 +1781,10 @@ math::Box Visual::GetBoundingBox() const
 void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 {
   node->_updateBounds();
+  node->_update(false, true);
+
+  Ogre::Matrix4 invTransform =
+      this->dataPtr->sceneNode->_getFullTransform().inverse();
 
   Ogre::SceneNode::ChildNodeIterator it = node->getChildIterator();
 
@@ -1780,13 +1793,15 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
     Ogre::MovableObject *obj = node->getAttachedObject(i);
 
     if (obj->isVisible() && obj->getMovableType() != "gazebo::dynamiclines"
+        && obj->getMovableType() != "BillboardSet"
         && obj->getVisibilityFlags() != GZ_VISIBILITY_GUI)
     {
-      Ogre::Any any = obj->getUserAny();
+      Ogre::Any any = obj->getUserObjectBindings().getUserAny();
       if (any.getType() == typeid(std::string))
       {
         std::string str = Ogre::any_cast<std::string>(any);
-        if (str.substr(0, 3) == "rot" || str.substr(0, 5) == "trans")
+        if (str.substr(0, 3) == "rot" || str.substr(0, 5) == "trans"
+            || str.substr(0, 5) == "scale")
           continue;
       }
 
@@ -1794,14 +1809,6 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 
       math::Vector3 min;
       math::Vector3 max;
-      math::Quaternion rotDiff;
-      math::Vector3 posDiff;
-
-      rotDiff = Conversions::Convert(node->_getDerivedOrientation()) -
-                this->GetWorldPose().rot;
-
-      posDiff = Conversions::Convert(node->_getDerivedPosition()) -
-                this->GetWorldPose().pos;
 
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")
@@ -1811,12 +1818,17 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       }
       else
       {
-        min = rotDiff *
-          Conversions::Convert(bb.getMinimum() * node->getScale()) + posDiff;
-        max = rotDiff *
-          Conversions::Convert(bb.getMaximum() * node->getScale()) + posDiff;
-      }
+        // Get transform to be applied to the current node.
+        Ogre::Matrix4 transform = invTransform * node->_getFullTransform();
+        // Correct precision error which makes ogre's isAffine check fail.
+        transform[3][0] = transform[3][1] = transform[3][2] = 0;
+        transform[3][3] = 1;
+        // get oriented bounding box in object's local space
+        bb.transformAffine(transform);
 
+        min = Conversions::Convert(bb.getMinimum());
+        max = Conversions::Convert(bb.getMaximum());
+      }
 
       box.Merge(math::Box(min, max));
     }
@@ -2078,6 +2090,10 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
         rendering::Material::Update(material);
         ogreSubMesh->setMaterialName(material->GetName());
       }
+      else
+      {
+        ogreSubMesh->setMaterialName("Gazebo/White");
+      }
 
       // Unlock
       vBuf->unlock();
@@ -2234,6 +2250,8 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
     else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
       geomScale.x = geomScale.y = geomScale.z = 1.0;
+    else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
+      geomScale.x = geomScale.y = geomScale.z = 1.0;
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
@@ -2300,6 +2318,30 @@ std::string Visual::GetMeshName() const
       return "unit_cylinder";
     else if (geomElem->HasElement("plane"))
       return "unit_plane";
+    else if (geomElem->HasElement("polyline"))
+    {
+      std::string polyLineName = this->GetName();
+      common::MeshManager *meshManager = common::MeshManager::Instance();
+
+      if (!meshManager->IsValidFilename(polyLineName))
+      {
+        std::vector<math::Vector2d> vertices;
+        sdf::ElementPtr pointElem =
+          geomElem->GetElement("polyline")->GetElement("point");
+
+        while (pointElem)
+        {
+          math::Vector2d point = pointElem->Get<math::Vector2d>();
+          vertices.push_back(point);
+          pointElem = pointElem->GetNextElement("point");
+        }
+
+        meshManager->CreateExtrudedPolyline(polyLineName, vertices,
+            geomElem->GetElement("polyline")->Get<double>("height"),
+            math::Vector2d(1, 1));
+       }
+      return polyLineName;
+    }
     else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
     {
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
@@ -2406,8 +2448,11 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
   this->dataPtr->prevAnimTime = common::Time::GetWallTime();
 
   if (!this->dataPtr->preRenderConnection)
+  {
     this->dataPtr->preRenderConnection =
-      event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
+      event::Events::ConnectPreRender(boost::bind(&Visual::Update,
+      shared_from_this()));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -2445,7 +2490,8 @@ void Visual::MoveToPosition(const math::Pose &_pose, double _time)
   this->dataPtr->prevAnimTime = common::Time::GetWallTime();
 
   this->dataPtr->preRenderConnection =
-    event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
+    event::Events::ConnectPreRender(boost::bind(&Visual::Update,
+    shared_from_this()));
 }
 
 //////////////////////////////////////////////////

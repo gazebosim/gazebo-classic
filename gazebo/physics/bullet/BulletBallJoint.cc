@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,7 +184,7 @@ math::Angle BulletBallJoint::GetAngleImpl(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::SetHighStop(unsigned int /*_index*/,
+bool BulletBallJoint::SetHighStop(unsigned int /*_index*/,
                                    const math::Angle &/*_angle*/)
 {
   if (this->bulletBall)
@@ -194,9 +194,14 @@ void BulletBallJoint::SetHighStop(unsigned int /*_index*/,
     // settings
     // this->bulletBall->setLimit(this->btBall->getLowerLimit(),
     //                         _angle.Radian());
+    gzerr << "BulletBallJoint limits not implemented" << std::endl;
+    return false;
   }
   else
+  {
     gzerr << "bulletBall does not yet exist" << std::endl;
+    return false;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -206,7 +211,7 @@ void BulletBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::SetLowStop(unsigned int /*_index*/,
+bool BulletBallJoint::SetLowStop(unsigned int /*_index*/,
                                   const math::Angle &/*_angle*/)
 {
   if (this->bulletBall)
@@ -216,9 +221,14 @@ void BulletBallJoint::SetLowStop(unsigned int /*_index*/,
     // settings
     // this->bulletBall->setLimit(-_angle.Radian(),
     //                         this->bulletBall->getUpperLimit());
+    gzerr << "BulletBallJoint limits not implemented" << std::endl;
+    return false;
   }
   else
+  {
     gzerr << "bulletBall does not yet exist" << std::endl;
+    return false;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -227,3 +237,23 @@ math::Vector3 BulletBallJoint::GetAxis(unsigned int /*_index*/) const
   return math::Vector3();
 }
 
+//////////////////////////////////////////////////
+void BulletBallJoint::SetAxis(unsigned int /*_index*/,
+                        const math::Vector3 &/*_axis*/)
+{
+  gzerr << "BulletBallJoint::SetAxis not implemented" << std::endl;
+}
+
+//////////////////////////////////////////////////
+math::Angle BulletBallJoint::GetHighStop(unsigned int /*_index*/)
+{
+  gzerr << "BulletBallJoint::GetHighStop not implemented" << std::endl;
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+math::Angle BulletBallJoint::GetLowStop(unsigned int /*_index*/)
+{
+  gzerr << "BulletBallJoint::GetLowStop not implemented" << std::endl;
+  return math::Angle();
+}

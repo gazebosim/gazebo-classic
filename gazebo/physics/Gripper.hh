@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -40,7 +41,7 @@ namespace gazebo
     /// will intelligently generate fixed joints between the gripper and an
     /// object within the gripper. This allows the object to be manipulated
     /// without falling or behaving poorly.
-    class Gripper
+    class GAZEBO_VISIBLE Gripper
     {
       /// \brief Constructor
       /// \param[in] _model The model which contains the Gripper.
@@ -104,6 +105,9 @@ namespace gazebo
 
       /// \brief The current contacts.
       private: std::vector<msgs::Contact> contacts;
+
+      /// \brief Mutex used to protect reading/writing the sonar message.
+      private: boost::mutex mutexContacts;
 
       /// \brief True if the gripper has an object.
       private: bool attached;

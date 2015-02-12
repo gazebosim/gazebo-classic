@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@
 #define _ODEMULTIRAYSHAPE_HH_
 
 #include "gazebo/physics/MultiRayShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief ODE specific version of MultiRayShape
-    class ODEMultiRayShape : public MultiRayShape
+    class GAZEBO_VISIBLE ODEMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

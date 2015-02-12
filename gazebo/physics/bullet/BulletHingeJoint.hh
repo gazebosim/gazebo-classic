@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,16 @@
  * limitations under the License.
  *
 */
-/* Desc: A body that has a box shape
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
+#ifndef _GAZEBO_BULLETHINGEJOINT_HH_
+#define _GAZEBO_BULLETHINGEJOINT_HH_
 
-#ifndef _BULLETHINGEJOINT_HH_
-#define _BULLETHINGEJOINT_HH_
-
+#include <string>
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/HingeJoint.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/util/system.hh"
 
 class btHingeConstraint;
 
@@ -39,7 +36,7 @@ namespace gazebo
     /// \{
 
     /// \brief A single axis hinge joint
-    class BulletHingeJoint : public HingeJoint<BulletJoint>
+    class GAZEBO_VISIBLE BulletHingeJoint : public HingeJoint<BulletJoint>
     {
       ///  Constructor
       public: BulletHingeJoint(btDynamicsWorld *world, BasePtr _parent);
@@ -73,11 +70,11 @@ namespace gazebo
       public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual void SetHighStop(unsigned int _index,
+      public: virtual bool SetHighStop(unsigned int _index,
                   const math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual void SetLowStop(unsigned int _index,
+      public: virtual bool SetLowStop(unsigned int _index,
                   const math::Angle &_angle);
 
       // Documentation inherited.
@@ -91,6 +88,15 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+
+      // Documentation inherited.
+      public: virtual bool SetParam(const std::string &_key,
+                                    unsigned int _index,
+                                    const boost::any &_value);
+
+      // Documentation inherited.
+      public: virtual double GetParam(const std::string &_key,
+                                      unsigned int _index);
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);

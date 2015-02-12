@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
   sensors::SensorPtr sensor = sensors::get_sensor("box_contact");
   sensors::ContactSensorPtr contactSensor =
       boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
-  ASSERT_TRUE(contactSensor);
+  ASSERT_TRUE(contactSensor != NULL);
 
   // Step forward 0.2 s
   double stepTime = 0.2;

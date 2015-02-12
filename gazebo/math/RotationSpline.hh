@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <vector>
 #include "gazebo/math/Quaternion.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,7 @@ namespace gazebo
 
     /// \class RotationSpline RotationSpline.hh math/gzmath.hh
     /// \brief Spline for rotations
-    class  RotationSpline
+    class GAZEBO_VISIBLE  RotationSpline
     {
         /// \brief Constructor. Sets the autoCalc to true
         public: RotationSpline();

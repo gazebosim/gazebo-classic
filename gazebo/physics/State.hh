@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +40,7 @@ namespace gazebo
     /// \brief State of an entity.
     ///
     /// This is the base class for all State information.
-    class State
+    class GAZEBO_VISIBLE State
     {
       /// \brief Default constructor
       public: State();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
@@ -47,7 +48,7 @@ namespace gazebo
 
     /// \class DummyPageProvider Heightmap.hh rendering/rendering.hh
     /// \brief Pretends to provide procedural page content to avoid page loading
-    class DummyPageProvider : public Ogre::PageProvider
+    class GAZEBO_VISIBLE DummyPageProvider : public Ogre::PageProvider
     {
       /// \brief Give a provider the opportunity to prepare page content
       /// procedurally. The parameters are not used.
@@ -84,7 +85,7 @@ namespace gazebo
 
     /// \class Heightmap Heightmap.hh rendering/rendering.hh
     /// \brief Rendering a terrain using heightmap information
-    class Heightmap
+    class GAZEBO_VISIBLE Heightmap
     {
       /// \brief Constructor
       /// \param[in] _scene Pointer to the scene that will contain the heightmap
@@ -345,7 +346,8 @@ namespace gazebo
 
     /// \internal
     /// \brief Custom terrain material generator for GLSL terrains.
-    class GzTerrainMatGen : public Ogre::TerrainMaterialGeneratorA
+    class GAZEBO_VISIBLE GzTerrainMatGen
+      : public Ogre::TerrainMaterialGeneratorA
     {
       /// \brief Constructor
       public: GzTerrainMatGen();
@@ -378,6 +380,10 @@ namespace gazebo
         protected: virtual void addTechnique(const Ogre::MaterialPtr &_mat,
                        const Ogre::Terrain *_terrain, TechniqueType _tt);
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverloaded-virtual"
+#endif  // ifdef __clang__
         /// \brief Utility class to help with generating shaders for GLSL.
         protected: class ShaderHelperGLSL :
             public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL
@@ -505,6 +511,9 @@ namespace gazebo
                          TechniqueType _tt,
                          Ogre::StringUtil::StrStreamType &_outStream);
         };
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif  // ifdef __clang__
       };
     };
   }

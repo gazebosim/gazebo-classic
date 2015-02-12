@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ std::string GpuRaySensor::GetTopic() const
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::Load(const std::string &_worldName, sdf::ElementPtr &_sdf)
+void GpuRaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 }
@@ -574,12 +574,12 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
   scan->set_angle_min(this->GetAngleMin().Radian());
   scan->set_angle_max(this->GetAngleMax().Radian());
   scan->set_angle_step(this->GetAngleResolution());
-    scan->set_count(this->GetRayCount());
+  scan->set_count(this->GetRayCount());
 
-    scan->set_vertical_angle_min(this->GetVerticalAngleMin().Radian());
-    scan->set_vertical_angle_max(this->GetVerticalAngleMax().Radian());
-    scan->set_vertical_angle_step(this->GetVerticalAngleResolution());
-    scan->set_vertical_count(this->GetVerticalRayCount());
+  scan->set_vertical_angle_min(this->GetVerticalAngleMin().Radian());
+  scan->set_vertical_angle_max(this->GetVerticalAngleMax().Radian());
+  scan->set_vertical_angle_step(this->GetVerticalAngleResolution());
+  scan->set_vertical_count(this->GetVerticalRayCount());
 
   scan->set_range_min(this->GetRangeMin());
   scan->set_range_max(this->GetRangeMax());
@@ -599,6 +599,8 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
         range = this->noises[0]->Apply(range);
         range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
       }
+
+      range = math::isnan(range) ? this->GetRangeMax() : range;
 
       if (add)
       {
