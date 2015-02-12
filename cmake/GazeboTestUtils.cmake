@@ -20,13 +20,6 @@ macro (gz_build_tests)
       libgtest.a
       libgtest_main.a
     )
-    # gazebo_common required by AutoLogFixture
-    add_dependencies(${BINARY_NAME}
-      gazebo_common
-    )
-    target_link_libraries(${BINARY_NAME}
-      gazebo_common
-    )
     foreach (TEST_DEP ${TEST_DEPENDENCIES})
       add_dependencies(${BINARY_NAME} ${TEST_DEP})
       target_link_libraries(${BINARY_NAME} ${TEST_DEP})
