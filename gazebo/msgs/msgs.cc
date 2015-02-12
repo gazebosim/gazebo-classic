@@ -34,6 +34,7 @@ namespace gazebo
 {
   namespace msgs
   {
+    /// \internal
     /// \brief Internal function to create an SDF element from msgs::Axis.
     /// It is only intended to be used by JointToSDF.
     /// \param[in] _msg The msgs::Axis object.
@@ -1812,7 +1813,7 @@ namespace gazebo
       if (_msg.has_child())
         jointSDF->GetElement("child")->Set(_msg.child());
       if (_msg.has_pose())
-        jointSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+        jointSDF->GetElement("pose")->Set(Convert(_msg.pose()));
       if (_msg.has_axis1())
         AxisToSDF(_msg.axis1(), jointSDF->GetElement("axis"));
       if (_msg.has_axis2())
@@ -1843,7 +1844,7 @@ namespace gazebo
         if (_msg.has_suspension_erp())
           suspensionElem->GetElement("erp")->Set(_msg.suspension_erp());
       }
-      // also ignore the sensor field for now
+      /// \todo JointToSDF currently does not convert sensor data
 
       return jointSDF;
     }
@@ -1852,7 +1853,7 @@ namespace gazebo
     void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf)
     {
       if (_msg.has_xyz())
-        _sdf->GetElement("xyz")->Set(msgs::Convert(_msg.xyz()));
+        _sdf->GetElement("xyz")->Set(Convert(_msg.xyz()));
       if (_msg.has_use_parent_model_frame())
       {
         _sdf->GetElement("use_parent_model_frame")->Set(
