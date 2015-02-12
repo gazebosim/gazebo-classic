@@ -204,7 +204,6 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
     frameLayout->addWidget(frameLabel);
     frameLayout->addWidget(frameCheckbox);
 
-
     QVBoxLayout *axisAllLayout = new QVBoxLayout;
     axisAllLayout->addLayout(axisLayout);
     axisAllLayout->addWidget(limitGroupBox);

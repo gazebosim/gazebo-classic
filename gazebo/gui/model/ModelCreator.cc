@@ -1411,7 +1411,6 @@ void ModelCreator::OnPaste()
   }
 }
 
-
 /////////////////////////////////////////////////
 JointMaker *ModelCreator::GetJointMaker() const
 {

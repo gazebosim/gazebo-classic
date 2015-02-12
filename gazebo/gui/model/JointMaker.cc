@@ -806,7 +806,7 @@ void JointMaker::Update()
 
           // Line now connects the child link to the joint frame
           joint->line->SetPoint(0, joint->child->GetWorldPose().pos
-            - joint->child->GetParent()->GetWorldPose().pos);
+              - joint->child->GetParent()->GetWorldPose().pos);
           joint->line->SetPoint(1,
               joint->jointVisual->GetWorldPose().pos
               - joint->child->GetParent()->GetWorldPose().pos);
@@ -1072,7 +1072,6 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   joint->child = childVis;
   joint->type = this->ConvertJointType(type);
   std::string jointVisName = _modelName + "::" + joint->name;
-
 
   // Axes
   int axisCount = JointMaker::GetJointAxisCount(joint->type);
