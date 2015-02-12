@@ -63,6 +63,9 @@ set (gtest_sources
   Vector3Stats_TEST.cc
   Vector4_TEST.cc
 )
+set (TEST_DEPENDENCIES
+  gazebo_math
+)
 gz_build_tests(${gtest_sources})
 
 set (math_headers "" CACHE INTERNAL "transport headers" FORCE)

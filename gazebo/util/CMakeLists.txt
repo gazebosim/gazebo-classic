@@ -26,6 +26,9 @@ set (gtest_sources
   OpenAL_TEST.cc
 )
 
+set (TEST_DEPENDENCIES
+  gazebo_util
+)
 gz_build_tests(${gtest_sources})
 
 set (util_headers "" CACHE INTERNAL "util headers" FORCE)

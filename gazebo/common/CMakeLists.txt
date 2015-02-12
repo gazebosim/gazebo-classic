@@ -129,6 +129,9 @@ if (HAVE_FFMPEG)
                      AudioDecoder_TEST.cc)
 endif()
 
+set (TEST_DEPENDENCIES
+  gazebo_common
+)
 gz_build_tests(${gtest_sources})
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)

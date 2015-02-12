@@ -13,32 +13,24 @@ macro (gz_build_tests)
     add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
     add_dependencies(${BINARY_NAME}
-      gtest gtest_main
-      gazebo_common
-      gazebo_math
-      gazebo_physics
-      gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
-      server_fixture
-      )
-
-
+      gtest
+      gtest_main
+    )
     target_link_libraries(${BINARY_NAME}
       libgtest.a
       libgtest_main.a
-      ${CMAKE_BINARY_DIR}/test/libserver_fixture.a
+    )
+    # gazebo_common required by AutoLogFixture
+    add_dependencies(${BINARY_NAME}
       gazebo_common
-      gazebo_math
-      gazebo_physics
-      gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
-      libgazebo
-      pthread
-      )
+    )
+    target_link_libraries(${BINARY_NAME}
+      gazebo_common
+    )
+    foreach (TEST_DEP ${TEST_DEPENDENCIES})
+      add_dependencies(${BINARY_NAME} ${TEST_DEP})
+      target_link_libraries(${BINARY_NAME} ${TEST_DEP})
+    endforeach()
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
 	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
