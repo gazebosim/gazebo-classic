@@ -55,6 +55,9 @@ namespace gazebo
       /// \param[in] _linkName Link name.
       public: void SetLink(std::string _linkName);
 
+      /// \brief TODO
+      private slots: void SetLink(QString _linkName);
+
       /// \brief Qt callback when the Apply button is pressed.
       private slots: void OnApply();
 

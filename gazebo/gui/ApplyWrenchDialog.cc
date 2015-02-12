@@ -50,6 +50,8 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   QLabel *linkLabel = new QLabel();
   linkLabel->setText(tr("Apply to link:"));
   this->dataPtr->linksComboBox = new QComboBox();
+  connect(this->dataPtr->linksComboBox, SIGNAL(currentIndexChanged (QString)),
+      this, SLOT(SetLink(QString)));
 
   linkLayout->addWidget(linkLabel);
   linkLayout->addWidget(this->dataPtr->linksComboBox);
@@ -429,6 +431,8 @@ void ApplyWrenchDialog::SetModel(std::string _modelName)
     return;
   }
 
+  this->dataPtr->modelName = _modelName;
+
   this->dataPtr->modelLabel->setText(
       ("Model: " + _modelName).c_str());
 
@@ -441,8 +445,6 @@ void ApplyWrenchDialog::SetModel(std::string _modelName)
     uint32_t flags = childVis->GetVisibilityFlags();
     if (!((flags != GZ_VISIBILITY_ALL) && (flags & GZ_VISIBILITY_GUI)))
     {
-      //this->dataPtr->linkList.push_back(childVis->GetName());
-
       std::string linkName = childVis->GetName();
       std::string unscopedLinkName = linkName.substr(linkName.find("::") + 2);
       this->dataPtr->linksComboBox->addItem(
@@ -454,7 +456,28 @@ void ApplyWrenchDialog::SetModel(std::string _modelName)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::SetLink(std::string _linkName)
 {
+  // Select on combo box
+  std::string unscopedLinkName = _linkName.substr(_linkName.find("::") + 2);
+  int index = -1;
+  for (int i = 0; i < this->dataPtr->linksComboBox->count(); ++i)
+  {
+    if (this->dataPtr->linksComboBox->itemText(i) == QString::fromStdString(unscopedLinkName))
+    {
+      index = i;
+      break;
+    }
+  }
+  if (index == -1)
+  {
+    gzerr << "Link [" << _linkName << "] could not be found." << std::endl;
+    this->reject();
+    return;
+  }
+  this->dataPtr->linksComboBox->setCurrentIndex(index);
+
   // Request link message to get CoM
+  this->dataPtr->requestPub.reset();
+  this->dataPtr->responseSub.reset();
   this->dataPtr->requestPub = this->dataPtr->node->Advertise<msgs::Request>(
       "~/request");
   this->dataPtr->responseSub = this->dataPtr->node->Subscribe(
@@ -474,6 +497,12 @@ void ApplyWrenchDialog::SetLink(std::string _linkName)
   // Main window
   this->dataPtr->mainWindow = gui::get_main_window();
   this->dataPtr->mainWindow->installEventFilter(this);
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::SetLink(QString _linkName)
+{
+  this->SetLink(this->dataPtr->modelName + "::" + _linkName.toStdString());
 }
 
 ///////////////////////////////////////////////////
@@ -626,9 +655,13 @@ void ApplyWrenchDialog::AttachVisuals()
 
     this->dataPtr->applyWrenchVisual->Load();
   }
-  else
+  else if (this->dataPtr->applyWrenchVisual->GetParent() == this->dataPtr->linkVisual)
   {
     this->dataPtr->applyWrenchVisual->SetVisible(true);
+  }
+  else
+  {
+    this->dataPtr->linkVisual->AttachVisual(this->dataPtr->applyWrenchVisual);
   }
 
   this->SetTorque(this->dataPtr->torqueVector);

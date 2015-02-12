@@ -34,6 +34,9 @@ namespace gazebo
       public: std::string linkName;
 
       /// TODO
+      public: std::string modelName;
+
+      /// TODO
       public: QLabel *modelLabel;
 
       /// TODO
