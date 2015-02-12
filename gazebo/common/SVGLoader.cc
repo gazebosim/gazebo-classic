@@ -17,7 +17,11 @@
 
 #include <algorithm>
 #include <tinyxml.h>
+
+
+#include "SVGLoaderPrivate.hh"
 #include "SVGLoader.hh"
+
 
 using namespace gazebo;
 using namespace common;
@@ -107,19 +111,19 @@ math::Vector2d SVGLoader::SubpathToPolyline(
   {
     if (cmd.cmd == 'm' || cmd.cmd == 'l')
     {
-       size_t i =0;
-       size_t count = cmd.numbers.size();
-       while (i < count)
-       {
-         math::Vector2d p;
-         p.x = cmd.numbers[i+0];
-         p.y = cmd.numbers[i+1];
-         // m and l cmds are relative to the last point
-         p.x += _last.x;
-         p.y += _last.y;
-         _polyline.push_back(p);
-         _last = p;
-         i += 2;
+      size_t i =0;
+      size_t count = cmd.numbers.size();
+      while (i < count)
+      {
+        math::Vector2d p;
+        p.x = cmd.numbers[i+0];
+        p.y = cmd.numbers[i+1];
+        // m and l cmds are relative to the last point
+        p.x += _last.x;
+        p.y += _last.y;
+        _polyline.push_back(p);
+        _last = p;
+        i += 2;
       }
     }
     else if (cmd.cmd == 'M' || cmd.cmd == 'L')
@@ -150,7 +154,7 @@ math::Vector2d SVGLoader::SubpathToPolyline(
         p2.y = cmd.numbers[i+3];
         p3.x = cmd.numbers[i+4];
         p3.y = cmd.numbers[i+5];
-        CubicBezier(p0, p1, p2, p3, resolution, _polyline);
+        CubicBezier(p0, p1, p2, p3, this->dataPtr->resolution, _polyline);
         _last = p3;
         i += 6;
       }
@@ -169,7 +173,7 @@ math::Vector2d SVGLoader::SubpathToPolyline(
         p2.y = cmd.numbers[i+3] + _last.y;
         p3.x = cmd.numbers[i+4] + _last.x;
         p3.y = cmd.numbers[i+5] + _last.y;
-        CubicBezier(p0, p1, p2, p3, resolution, _polyline);
+        CubicBezier(p0, p1, p2, p3, this->dataPtr->resolution, _polyline);
         _last = p3;
         i += 6;
       }
@@ -180,9 +184,24 @@ math::Vector2d SVGLoader::SubpathToPolyline(
 
 /////////////////////////////////////////////////
 SVGLoader::SVGLoader(unsigned int _samples)
-  :resolution(1.0/_samples)
 {
+  dataPtr = new SVGLoaderPrivate();
+  if (_samples == 0)
+  {
+    std::string m("The number of samples cannot be 0");
+    SvgError e(m);
+    throw e;
+  }
+  dataPtr->resolution = 1.0/_samples;
 }
+
+
+/////////////////////////////////////////////////
+SVGLoader::~SVGLoader()
+{
+  delete(dataPtr);
+}
+
 
 /////////////////////////////////////////////////
 void SVGLoader::SplitSubpaths(const std::vector<SVGCommand> &_cmds,
@@ -261,63 +280,62 @@ void SVGLoader::ExpandCommands(
 void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
                                   SVGPath &_path)
 {
-     std::vector <SVGCommand> cmds;
-     std::string lookup = "cCmMlLvVhHzZ";
-     char lastCmd = 'x';
-     std::vector<double> numbers;
+  std::vector <SVGCommand> cmds;
+  std::string lookup = "cCmMlLvVhHzZ";
+  char lastCmd = 'x';
+  std::vector<double> numbers;
 
-     for (std::string token: _tokens)
-     {
-       // new command?
-       if (lookup.find(token[0]) == std::string::npos)
-       {
-         // its just numbers
-         std::vector<std::string> numberStrs;
-         split(token, ',', numberStrs);
-         for (std::string numberStr : numberStrs)
-         {
-           double f = atof(numberStr.c_str());
-           numbers.push_back(f);
-         }
-       }
-       else
-       {
-         if (lastCmd != 'x')
-         {
-           SVGCommand c;
-           c.cmd = lastCmd;
-           c.numbers = numbers;
-           cmds.push_back(c);
-         }
-
-         // its new command
-         lastCmd = token[0];
-         numbers.resize(0);
-       }
-     }
-     // the last command
-     if (lastCmd != 'x')
-     {
-       SVGCommand c;
-       c.cmd = lastCmd;
-       c.numbers = numbers;
-       cmds.push_back(c);
-     }
-    // split the commands into sub_paths
-    std::vector< std::vector< SVGCommand> > subpaths;
-    this->SplitSubpaths(cmds, subpaths);
-    this->ExpandCommands(subpaths, _path);
-    // the starting point for the subpath
-    // it is the end point of the previous one
-    math::Vector2d p;
-    p.x = 0;
-    p.y = 0;
-    for (std::vector<SVGCommand> subpath : subpaths)
+  for (std::string token: _tokens)
+  {
+    // new command?
+    if (lookup.find(token[0]) == std::string::npos)
     {
-        _path.polylines.push_back(std::vector<math::Vector2d>());
-        std::vector<math::Vector2d> &polyline = _path.polylines.back();
-        p = this->SubpathToPolyline(subpath, p, polyline);
-    }
+      // its just numbers
+      std::vector<std::string> numberStrs;
+      split(token, ',', numberStrs);
+      for (std::string numberStr : numberStrs)
+      {
+        double f = atof(numberStr.c_str());
+        numbers.push_back(f);
+       }
+     }
+     else
+     {
+      if (lastCmd != 'x')
+      {
+        SVGCommand c;
+        c.cmd = lastCmd;
+        c.numbers = numbers;
+        cmds.push_back(c);
+       }
+       // its new command
+       lastCmd = token[0];
+       numbers.resize(0);
+     }
+  }
+  // the last command
+  if (lastCmd != 'x')
+  {
+    SVGCommand c;
+    c.cmd = lastCmd;
+    c.numbers = numbers;
+    cmds.push_back(c);
+  }
+  // split the commands into sub_paths
+  std::vector< std::vector< SVGCommand> > subpaths;
+  this->SplitSubpaths(cmds, subpaths);
+  this->ExpandCommands(subpaths, _path);
+  // the starting point for the subpath
+  // it is the end point of the previous one
+  math::Vector2d p;
+  p.x = 0;
+  p.y = 0;
+  for (std::vector<SVGCommand> subpath : subpaths)
+  {
+    _path.polylines.push_back(std::vector<math::Vector2d>());
+    std::vector<math::Vector2d> &polyline = _path.polylines.back();
+    p = this->SubpathToPolyline(subpath, p, polyline);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -370,7 +388,7 @@ void SVGLoader::GetSvgPaths(TiXmlNode* pParent, std::vector<SVGPath> &paths)
       if (name == "path")
       {
         SVGPath p;
-        GetPathAttribs(pParent->ToElement(), p);
+        this->GetPathAttribs(pParent->ToElement(), p);
         paths.push_back(p);
       }
       break;
@@ -383,7 +401,7 @@ void SVGLoader::GetSvgPaths(TiXmlNode* pParent, std::vector<SVGPath> &paths)
         pChild != 0;
         pChild = pChild->NextSibling())
   {
-    GetSvgPaths(pChild, paths);
+    this->GetSvgPaths(pChild, paths);
   }
 }
 

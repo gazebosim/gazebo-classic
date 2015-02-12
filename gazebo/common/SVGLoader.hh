@@ -31,6 +31,8 @@ namespace gazebo
 {
   namespace common
   {
+    class SVGLoaderPrivate;
+
     /// \brief Handles errors during SVG parsing
     class GAZEBO_VISIBLE SvgError: public std::runtime_error
     {
@@ -75,6 +77,9 @@ namespace gazebo
       /// \param[in] _samples The number of points for cubic spline segments
       public: SVGLoader(unsigned int _samples);
 
+      /// \brief destructor
+      public: ~SVGLoader();
+
       /// \brief Reads an SVG file and loads all the paths
       /// \param[in] _filename The SVG file
       /// \param[out] _paths Vector that receives path data
@@ -96,20 +101,20 @@ namespace gazebo
       /// \brief Gets data from an XML path element
       /// \param[in] _pElement The path Element
       /// \param[out] _path The path that receives the data.
-      private: void GetPathAttribs(TiXmlElement* _pElement, SVGPath &_path);
+      private: void GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path);
 
       /// \brief Reads the paths from the root XML element
       /// \param[in] _pParent The parent XML node of the SVG file
       /// \param[out] _paths The vector of paths that receives the data
-      private: void GetSvgPaths(TiXmlNode* _pParent,
+      private: void GetSvgPaths(TiXmlNode *_pParent,
                                   std::vector<SVGPath> &_paths);
 
       /// \brief Generates new commands for every repeat commands in subpaths
       /// \param[in] _subpaths The subpaths (with repeats)
       /// \param[out] _path The path that receives the data.
       private: void ExpandCommands(
-                      const std::vector< std::vector<SVGCommand> >&_subpaths,
-                      SVGPath &_path);
+                      const std::vector< std::vector<SVGCommand> > &_subpaths,
+                      SVGPath& _path);
 
       /// \brief Splits a list of commands into subpaths
       /// \param[in] _cmds The flat list of commands for all the subpaths
@@ -129,14 +134,15 @@ namespace gazebo
       /// \param[in] _subpath The subpath commands
       /// \param[in] _last The previous position (for relative path commands)
       /// \param[out] _polyline The polyline that receives the data
+      /// \return The last point of the subpath
       private: math::Vector2d SubpathToPolyline(
                       const std::vector<SVGCommand> &_subpath,
                       math::Vector2d _last,
                       std::vector<math::Vector2d> &_polyline);
 
-      /// \brief The step distance between 2 sampled points in a bezier curve
-      /// It is the inverse of the number of samples
-      private: double resolution;
+      /// \internal
+      /// \brief Pointer to private data
+      private: SVGLoaderPrivate *dataPtr;
     };
   }
 }
