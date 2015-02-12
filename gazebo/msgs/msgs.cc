@@ -1678,7 +1678,7 @@ namespace gazebo
     }
 
     ////////////////////////////////////////////////////////
-    void AddBoxLink(msgs::Model &_msg, double _mass,
+    void AddBoxLink(msgs::Model &_msg, const double _mass,
                     const math::Vector3 &_size)
     {
       _msg.add_link();

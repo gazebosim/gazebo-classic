@@ -404,7 +404,7 @@ namespace gazebo
     /// \param[in] _mass Mass of the box.
     /// \param[in] _size Size of the box.
     GAZEBO_VISIBLE
-    void AddBoxLink(msgs::Model &_msg, double _mass,
+    void AddBoxLink(msgs::Model &_msg, const double _mass,
                     const math::Vector3 &_size);
 
     /// \brief Create an SDF element from msgs::Model.
