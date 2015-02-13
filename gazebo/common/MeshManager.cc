@@ -499,13 +499,6 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
-  for (unsigned int i  = 0 ; i < _path.size(); ++i)
-  {
-    for (unsigned int j  = 0 ; j < _path[i].size(); ++j)
-      std::cerr << _path[i][j] << std::endl;
-      std::cerr << std::endl;
-   }
-
   // sanity check to make sure we have at least 3 points in the path
   // Remove last vertices if it's the same as the first one - the
   // delaunay triangluation algorithm should already assume the paths are closed
@@ -523,31 +516,6 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
       ++it;
     }
   }
-
-//  path.erase(path.begin()+1);
-/*  std::vector<std::vector<math::Vector2d> > path;
-
-  std::vector<math::Vector2d> subpath01;
-  subpath01.push_back(math::Vector2d(2.27467, 1.0967));
-  subpath01.push_back(math::Vector2d(1.81094, 2.35418));
-  subpath01.push_back(math::Vector2d(2.74009, 2.35418));
-//  subpath01.push_back(math::Vector2d(227.467, 109.67));
-
-  std::vector<math::Vector2d> subpath02;
-  subpath02.push_back(math::Vector2d(2.08173, 0.7599));
-  subpath02.push_back(math::Vector2d(2.4693, 0.7599));
-  subpath02.push_back(math::Vector2d(3.4323, 3.28672));
-  subpath02.push_back(math::Vector2d(3.07689, 3.28672));
-  subpath02.push_back(math::Vector2d(2.84672, 2.63851));
-  subpath02.push_back(math::Vector2d(1.7077, 2.63851));
-  subpath02.push_back(math::Vector2d(1.47753, 3.28672));
-  subpath02.push_back(math::Vector2d(1.11704, 3.28672));
-//  subpath02.push_back(math::Vector2d(208.173, 75.99));
-
-  path.push_back(subpath01);
-  path.push_back(subpath02);
-  _height = 1.0;
-*/
 
   #if HAVE_GTS
   {
