@@ -407,6 +407,15 @@ namespace gazebo
     sdf::ElementPtr MeshToSDF(const msgs::MeshGeom &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
+    /// \brief Create an SDF element from msgs::Joint.
+    /// \param[in] _msg The msgs::Joint object.
+    /// \param[in] _sdf if supplied, performs an update from _sdf instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr JointToSDF(const msgs::Joint &_msg,
+                      sdf::ElementPtr _sdf = sdf::ElementPtr());
+
     /// \cond
     GAZEBO_VISIBLE
     const google::protobuf::FieldDescriptor *GetFD(

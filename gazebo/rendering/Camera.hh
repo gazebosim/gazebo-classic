@@ -212,7 +212,7 @@ namespace gazebo
       /// \brief Set the clip distances
       /// \param[in] _near Near clip distance in meters
       /// \param[in] _far Far clip distance in meters
-      public: void SetClipDist(float _near, float _far);
+      public: virtual void SetClipDist(float _near, float _far);
 
       /// \brief Set the camera FOV (horizontal)
       /// \param[in] _radians Horizontal field of view
@@ -591,6 +591,9 @@ namespace gazebo
       /// \brief Internal function used to indicate that an animation has
       /// completed.
       protected: virtual void AnimationComplete();
+
+      /// \brief Update the camera's field of view.
+      protected: virtual void UpdateFOV();
 
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats
