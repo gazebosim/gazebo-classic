@@ -1561,3 +1561,311 @@ TEST_F(MsgsTest, JointToSDF)
   EXPECT_TRUE(suspensionElem->HasElement("erp"));
   EXPECT_DOUBLE_EQ(suspensionElem->Get<double>("erp"), suspension_erp);
 }
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, AddBoxLink)
+{
+  msgs::Model model;
+  EXPECT_EQ(model.link_size(), 0);
+
+  const double mass = 1.0;
+  const math::Vector3 size(1, 1, 1);
+  msgs::AddBoxLink(model, mass, size);
+  EXPECT_EQ(model.link_size(), 1);
+  {
+    auto link = model.link(0);
+    EXPECT_EQ(link.name(), std::string("link1"));
+
+    auto inertial = link.inertial();
+    EXPECT_DOUBLE_EQ(inertial.mass(), mass);
+    double ixx = inertial.ixx();
+    double iyy = inertial.iyy();
+    double izz = inertial.izz();
+    double ixy = inertial.ixy();
+    double ixz = inertial.ixz();
+    double iyz = inertial.iyz();
+    EXPECT_GT(ixx, 0.0);
+    EXPECT_GT(iyy, 0.0);
+    EXPECT_GT(izz, 0.0);
+    EXPECT_DOUBLE_EQ(ixy, 0.0);
+    EXPECT_DOUBLE_EQ(ixz, 0.0);
+    EXPECT_DOUBLE_EQ(iyz, 0.0);
+    // triangle inequality
+    EXPECT_GT(ixx + iyy, izz);
+    EXPECT_GT(iyy + izz, ixx);
+    EXPECT_GT(izz + ixx, iyy);
+
+    EXPECT_EQ(link.collision_size(), 1);
+    {
+      auto collision = link.collision(0);
+      auto geometry = collision.geometry();
+      EXPECT_EQ(geometry.type(), msgs::Geometry_Type_BOX);
+      EXPECT_EQ(msgs::Convert(geometry.box().size()), size);
+    }
+
+    EXPECT_EQ(link.visual_size(), 1);
+    {
+      auto visual = link.visual(0);
+      auto geometry = visual.geometry();
+      EXPECT_EQ(geometry.type(), msgs::Geometry_Type_BOX);
+      EXPECT_EQ(msgs::Convert(geometry.box().size()), size);
+    }
+  }
+
+  const double massRatio = 2.0;
+  msgs::AddBoxLink(model, mass*massRatio, size);
+  EXPECT_EQ(model.link_size(), 2);
+  {
+    auto link1 = model.link(0);
+    auto link2 = model.link(1);
+    EXPECT_EQ(link2.name(), std::string("link2"));
+
+    auto inertial1 = link1.inertial();
+    auto inertial2 = link2.inertial();
+
+    EXPECT_NEAR(massRatio * inertial1.mass(), inertial2.mass(), 1e-6);
+    EXPECT_NEAR(massRatio * inertial1.ixx(),  inertial2.ixx(),  1e-6);
+    EXPECT_NEAR(massRatio * inertial1.iyy(),  inertial2.iyy(),  1e-6);
+    EXPECT_NEAR(massRatio * inertial1.izz(),  inertial2.izz(),  1e-6);
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, AddCylinderLink)
+{
+  msgs::Model model;
+  EXPECT_EQ(model.link_size(), 0);
+
+  const double mass = 1.0;
+  const double radius = 0.5;
+  const double length = 2.5;
+  msgs::AddCylinderLink(model, mass, radius, length);
+  EXPECT_EQ(model.link_size(), 1);
+  {
+    auto link = model.link(0);
+    EXPECT_EQ(link.name(), std::string("link1"));
+
+    auto inertial = link.inertial();
+    EXPECT_DOUBLE_EQ(inertial.mass(), mass);
+    double ixx = inertial.ixx();
+    double iyy = inertial.iyy();
+    double izz = inertial.izz();
+    double ixy = inertial.ixy();
+    double ixz = inertial.ixz();
+    double iyz = inertial.iyz();
+    EXPECT_GT(ixx, 0.0);
+    EXPECT_GT(iyy, 0.0);
+    EXPECT_GT(izz, 0.0);
+    EXPECT_DOUBLE_EQ(ixy, 0.0);
+    EXPECT_DOUBLE_EQ(ixz, 0.0);
+    EXPECT_DOUBLE_EQ(iyz, 0.0);
+    // triangle inequality
+    EXPECT_GT(ixx + iyy, izz);
+    EXPECT_GT(iyy + izz, ixx);
+    EXPECT_GT(izz + ixx, iyy);
+
+    EXPECT_EQ(link.collision_size(), 1);
+    {
+      auto collision = link.collision(0);
+      auto geometry = collision.geometry();
+      EXPECT_EQ(geometry.type(), msgs::Geometry_Type_CYLINDER);
+      EXPECT_DOUBLE_EQ(geometry.cylinder().radius(), radius);
+      EXPECT_DOUBLE_EQ(geometry.cylinder().length(), length);
+    }
+
+    EXPECT_EQ(link.visual_size(), 1);
+    {
+      auto visual = link.visual(0);
+      auto geometry = visual.geometry();
+      EXPECT_EQ(geometry.type(), msgs::Geometry_Type_CYLINDER);
+      EXPECT_DOUBLE_EQ(geometry.cylinder().radius(), radius);
+      EXPECT_DOUBLE_EQ(geometry.cylinder().length(), length);
+    }
+  }
+
+  const double massRatio = 2.0;
+  msgs::AddCylinderLink(model, mass*massRatio, radius, length);
+  EXPECT_EQ(model.link_size(), 2);
+  {
+    auto link1 = model.link(0);
+    auto link2 = model.link(1);
+    EXPECT_EQ(link2.name(), std::string("link2"));
+
+    auto inertial1 = link1.inertial();
+    auto inertial2 = link2.inertial();
+
+    EXPECT_NEAR(massRatio * inertial1.mass(), inertial2.mass(), 1e-6);
+    EXPECT_NEAR(massRatio * inertial1.ixx(),  inertial2.ixx(),  1e-6);
+    EXPECT_NEAR(massRatio * inertial1.iyy(),  inertial2.iyy(),  1e-6);
+    EXPECT_NEAR(massRatio * inertial1.izz(),  inertial2.izz(),  1e-6);
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, AddSphereLink)
+{
+  msgs::Model model;
+  EXPECT_EQ(model.link_size(), 0);
+
+  const double mass = 1.0;
+  const double radius = 0.5;
+  msgs::AddSphereLink(model, mass, radius);
+  EXPECT_EQ(model.link_size(), 1);
+  {
+    auto link = model.link(0);
+    EXPECT_EQ(link.name(), std::string("link1"));
+
+    auto inertial = link.inertial();
+    EXPECT_DOUBLE_EQ(inertial.mass(), mass);
+    double ixx = inertial.ixx();
+    double iyy = inertial.iyy();
+    double izz = inertial.izz();
+    double ixy = inertial.ixy();
+    double ixz = inertial.ixz();
+    double iyz = inertial.iyz();
+    EXPECT_GT(ixx, 0.0);
+    EXPECT_GT(iyy, 0.0);
+    EXPECT_GT(izz, 0.0);
+    EXPECT_DOUBLE_EQ(ixy, 0.0);
+    EXPECT_DOUBLE_EQ(ixz, 0.0);
+    EXPECT_DOUBLE_EQ(iyz, 0.0);
+    // triangle inequality
+    EXPECT_GT(ixx + iyy, izz);
+    EXPECT_GT(iyy + izz, ixx);
+    EXPECT_GT(izz + ixx, iyy);
+
+    EXPECT_EQ(link.collision_size(), 1);
+    {
+      auto collision = link.collision(0);
+      auto geometry = collision.geometry();
+      EXPECT_EQ(geometry.type(), msgs::Geometry_Type_SPHERE);
+      EXPECT_DOUBLE_EQ(geometry.sphere().radius(), radius);
+    }
+
+    EXPECT_EQ(link.visual_size(), 1);
+    {
+      auto visual = link.visual(0);
+      auto geometry = visual.geometry();
+      EXPECT_EQ(geometry.type(), msgs::Geometry_Type_SPHERE);
+      EXPECT_DOUBLE_EQ(geometry.sphere().radius(), radius);
+    }
+  }
+
+  const double massRatio = 2.0;
+  msgs::AddSphereLink(model, mass*massRatio, radius);
+  EXPECT_EQ(model.link_size(), 2);
+  {
+    auto link1 = model.link(0);
+    auto link2 = model.link(1);
+    EXPECT_EQ(link2.name(), std::string("link2"));
+
+    auto inertial1 = link1.inertial();
+    auto inertial2 = link2.inertial();
+
+    EXPECT_NEAR(massRatio * inertial1.mass(), inertial2.mass(), 1e-6);
+    EXPECT_NEAR(massRatio * inertial1.ixx(),  inertial2.ixx(),  1e-6);
+    EXPECT_NEAR(massRatio * inertial1.iyy(),  inertial2.iyy(),  1e-6);
+    EXPECT_NEAR(massRatio * inertial1.izz(),  inertial2.izz(),  1e-6);
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, ModelToSDF)
+{
+  const std::string name("test_bicycle");
+  const math::Pose pose(math::Vector3(6, 1, 7),
+                        math::Quaternion(0.5, 0.5, 0.5, 0.5));
+
+  msgs::Model model;
+  model.set_name(name);
+  model.set_is_static(false);
+  msgs::Set(model.mutable_pose(), pose);
+  EXPECT_EQ(model.link_size(), 0);
+  EXPECT_EQ(model.joint_size(), 0);
+
+  // This will be a bicycle with two wheels.
+  // The frame is a box.
+  const double length = 1.5;
+  const double height = 0.9;
+  const double width = 0.1;
+  const math::Vector3 boxSize(length, width, height);
+  const double boxMass = 4.0;
+  AddBoxLink(model, boxMass, boxSize);
+  ASSERT_EQ(model.link_size(), 1);
+  EXPECT_EQ(model.joint_size(), 0);
+  model.mutable_link(0)->set_name("frame");
+
+  // The rear wheel is a cylinder.
+  const double radius = height / 2;
+  AddCylinderLink(model, 0.5, radius, radius);
+  ASSERT_EQ(model.link_size(), 2);
+  EXPECT_EQ(model.joint_size(), 0);
+  const math::Pose cylinderPose(-length/2, 0, -height/2, M_PI/2, 0, 0);
+  {
+    auto link = model.mutable_link(1);
+    msgs::Set(link->mutable_pose(), cylinderPose);
+    link->set_name("rear_wheel");
+  }
+
+  // The front wheel is a sphere.
+  AddSphereLink(model, 0.5, radius);
+  ASSERT_EQ(model.link_size(), 3);
+  EXPECT_EQ(model.joint_size(), 0);
+  const math::Pose spherePose(length/2, 0, -height/2, 0, 0, 0);
+  {
+    auto link = model.mutable_link(2);
+    msgs::Set(link->mutable_pose(), spherePose);
+    link->set_name("front_wheel");
+  }
+
+  // Add revolute joints for the wheels.
+  // Front wheel joint
+  model.add_joint();
+  ASSERT_EQ(model.joint_size(), 1);
+  auto frontJoint = model.mutable_joint(0);
+  frontJoint->set_name("front_hinge");
+  frontJoint->set_type(msgs::ConvertJointType("revolute"));
+  frontJoint->set_parent("frame");
+  frontJoint->set_child("front_wheel");
+  const math::Vector3 frontAxis(0, 1, 0);
+  msgs::Set(frontJoint->mutable_axis1()->mutable_xyz(), frontAxis);
+
+  // Rear wheel joint
+  model.add_joint();
+  ASSERT_EQ(model.joint_size(), 2);
+  auto rearJoint = model.mutable_joint(1);
+  rearJoint->set_name("rear_hinge");
+  rearJoint->set_type(msgs::ConvertJointType("revolute"));
+  rearJoint->set_parent("frame");
+  rearJoint->set_child("rear_wheel");
+  const math::Vector3 rearAxis(0, 0, 1);
+  msgs::Set(rearJoint->mutable_axis1()->mutable_xyz(), rearAxis);
+
+  sdf::ElementPtr modelSDF = msgs::ModelToSDF(model);
+  EXPECT_EQ(modelSDF->Get<std::string>("name"), name);
+  EXPECT_FALSE(modelSDF->Get<bool>("static"));
+  EXPECT_EQ(pose, modelSDF->Get<math::Pose>("pose"));
+
+  sdf::ElementPtr linkElem1 = modelSDF->GetElement("link");
+  EXPECT_EQ(linkElem1->Get<std::string>("name"), "frame");
+  EXPECT_EQ(linkElem1->Get<math::Pose>("pose"), math::Pose());
+
+  sdf::ElementPtr linkElem2 = linkElem1->GetNextElement("link");
+  EXPECT_EQ(linkElem2->Get<std::string>("name"), "rear_wheel");
+  EXPECT_EQ(linkElem2->Get<math::Pose>("pose"), cylinderPose);
+
+  sdf::ElementPtr linkElem3 = linkElem2->GetNextElement("link");
+  EXPECT_EQ(linkElem3->Get<std::string>("name"), "front_wheel");
+  EXPECT_EQ(linkElem3->Get<math::Pose>("pose"), spherePose);
+
+  sdf::ElementPtr jointElem1 = modelSDF->GetElement("joint");
+  EXPECT_EQ(jointElem1->Get<std::string>("name"), "front_hinge");
+  EXPECT_EQ(jointElem1->Get<std::string>("type"), "revolute");
+  EXPECT_EQ(jointElem1->Get<math::Pose>("pose"), math::Pose());
+
+  sdf::ElementPtr jointElem2 = jointElem1->GetNextElement("joint");
+  EXPECT_EQ(jointElem2->Get<std::string>("name"), "rear_hinge");
+  EXPECT_EQ(jointElem2->Get<std::string>("type"), "revolute");
+  EXPECT_EQ(jointElem2->Get<math::Pose>("pose"), math::Pose());
+}
+

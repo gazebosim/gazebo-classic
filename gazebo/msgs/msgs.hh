@@ -396,6 +396,50 @@ namespace gazebo
     sdf::ElementPtr MeshToSDF(const msgs::MeshGeom &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
+    /// \brief Add a simple box link to a Model message.
+    /// The size and mass of the box are specified, and a
+    /// single collision is added, along with an inertial
+    /// block corresponding to a box of uniform density.
+    /// \param[out] _model The msgs::Model to which the link is added.
+    /// \param[in] _mass Mass of the box.
+    /// \param[in] _size Size of the box.
+    GAZEBO_VISIBLE
+    void AddBoxLink(msgs::Model &_model, const double _mass,
+                    const math::Vector3 &_size);
+
+    /// \brief Add a simple cylinder link to a Model message.
+    /// The radius, length, and mass of the cylinder are specified, and a
+    /// single collision is added, along with an inertial
+    /// block corresponding to a cylinder of uniform density
+    /// with an axis of symmetry along the Z axis.
+    /// \param[out] _model The msgs::Model to which the link is added.
+    /// \param[in] _mass Mass of the cylinder.
+    /// \param[in] _radius Radius of the cylinder.
+    /// \param[in] _length Length of the cylinder.
+    GAZEBO_VISIBLE
+    void AddCylinderLink(msgs::Model &_model, const double _mass,
+                         const double _radius, const double _length);
+
+    /// \brief Add a simple sphere link to a Model message.
+    /// The size and mass of the sphere are specified, and a
+    /// single collision is added, along with an inertial
+    /// block corresponding to a sphere of uniform density.
+    /// \param[out] _model The msgs::Model to which the link is added.
+    /// \param[in] _mass Mass of the sphere.
+    /// \param[in] _radius Radius of the sphere.
+    GAZEBO_VISIBLE
+    void AddSphereLink(msgs::Model &_model, const double _mass,
+                    const double _radius);
+
+    /// \brief Create an SDF element from msgs::Model.
+    /// \param[in] _msg The msgs::Model object.
+    /// \param[in] _sdf if supplied, performs an update from _sdf instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr ModelToSDF(const msgs::Model &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
     /// \brief Create an SDF element from msgs::Joint.
     /// \param[in] _msg The msgs::Joint object.
     /// \param[in] _sdf if supplied, performs an update from _sdf instead of
