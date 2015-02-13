@@ -94,7 +94,7 @@ void cubicBezier(const math::Vector2d &_p0,
 
 /////////////////////////////////////////////////
 SvgError::SvgError(const std::string &_what)
-  :std::runtime_error(_what)
+  : std::runtime_error(_what)
 {
 }
 
@@ -182,20 +182,20 @@ math::Vector2d SVGLoader::SubpathToPolyline(
 /////////////////////////////////////////////////
 SVGLoader::SVGLoader(unsigned int _samples)
 {
-  dataPtr = new SVGLoaderPrivate();
+  this->dataPtr = new SVGLoaderPrivate();
   if (_samples == 0)
   {
     std::string m("The number of samples cannot be 0");
     SvgError e(m);
     throw e;
   }
-  dataPtr->resolution = 1.0/_samples;
+  this->dataPtr->resolution = 1.0/_samples;
 }
 
 /////////////////////////////////////////////////
 SVGLoader::~SVGLoader()
 {
-  delete(dataPtr);
+  delete(this->dataPtr);
 }
 
 /////////////////////////////////////////////////
@@ -338,7 +338,7 @@ void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
 {
   if ( !_pElement ) return;
 
-  TiXmlAttribute* pAttrib = _pElement->FirstAttribute();
+  TiXmlAttribute *pAttrib = _pElement->FirstAttribute();
   while (pAttrib)
   {
     std::string name = lowercase(pAttrib->Name());
@@ -368,7 +368,7 @@ void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
 }
 
 /////////////////////////////////////////////////
-void SVGLoader::GetSvgPaths(TiXmlNode *pParent, std::vector<SVGPath> &paths)
+void SVGLoader::GetSvgPaths(TiXmlNode *pParent, std::vector<SVGPath> &_paths)
 {
   if (!pParent)
     return;
@@ -384,7 +384,7 @@ void SVGLoader::GetSvgPaths(TiXmlNode *pParent, std::vector<SVGPath> &paths)
       {
         SVGPath p;
         this->GetPathAttribs(pParent->ToElement(), p);
-        paths.push_back(p);
+        _paths.push_back(p);
       }
       break;
 
@@ -396,12 +396,13 @@ void SVGLoader::GetSvgPaths(TiXmlNode *pParent, std::vector<SVGPath> &paths)
        pChild != 0;
        pChild = pChild->NextSibling())
   {
-    this->GetSvgPaths(pChild, paths);
+    this->GetSvgPaths(pChild, _paths);
   }
 }
 
 /////////////////////////////////////////////////
-void SVGLoader::Parse(const std::string &_filename, std::vector<SVGPath> &paths)
+void SVGLoader::Parse(const std::string &_filename,
+    std::vector<SVGPath> &_paths)
 {
   // load the named file and dump its structure to STDOUT
   TiXmlDocument doc(_filename.c_str());
@@ -414,7 +415,7 @@ void SVGLoader::Parse(const std::string &_filename, std::vector<SVGPath> &paths)
     throw x;
   }
 
-  this->GetSvgPaths(&doc, paths);
+  this->GetSvgPaths(&doc, _paths);
 }
 
 /////////////////////////////////////////////////
@@ -424,7 +425,7 @@ void SVGLoader::DumpPaths(const std::vector<SVGPath> &_paths,
   // this prints an html document that allows to debug
   // SVG parsing issues. The points are generated in
   // a loop between the header and footer.
-  std::string  header = R"***(
+  std::string header = R"***(
 <!DOCTYPE html>
 <html>
 
