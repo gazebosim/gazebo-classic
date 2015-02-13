@@ -67,44 +67,56 @@ void ApplyWrenchVisual::Load()
   dPtr->forceVisual.reset(new rendering::ArrowVisual(
       this->GetName() + "__FORCE_VISUAL__", shared_from_this()));
   dPtr->forceVisual->Load();
-  dPtr->forceVisual->SetMaterial("Gazebo/Orange");
-  dPtr->forceVisual->SetScale(math::Vector3(2, 2, 2));
+  dPtr->forceVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
+  dPtr->forceVisual->SetScale(math::Vector3(5, 5, 5));
   dPtr->forceVisual->GetSceneNode()->setInheritScale(false);
 
-  // Force line
-  double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
-  rendering::DynamicLines *forceLine = dPtr->forceVisual->
-      CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  forceLine->setMaterial("Gazebo/Orange");
-  forceLine->AddPoint(0, 0, 0);
-  forceLine->AddPoint(0, 0, linkDiagonal*0.5);
-
   // Torque visual
-  // Torque tube
   dPtr->torqueVisual.reset(new rendering::Visual(
        this->GetName() + "__TORQUE_VISUAL__", shared_from_this()));
   dPtr->torqueVisual->Load();
 
+  // Torque tube
   common::MeshManager::Instance()->CreateTube("torque_tube",
-      0.1, 0.15, 0.05, 1, 32);
+      0.1, 0.15, 0.05, 2, 32);
   this->InsertMesh("torque_tube");
 
-  Ogre::MovableObject *torqueObj =
+  Ogre::MovableObject *tubeObj =
     (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-        this->GetName()+"__TORQUE_VISUAL__", "torque_tube"));
+        this->GetName()+"__TORQUE_TUBE__", "torque_tube"));
 
-  Ogre::SceneNode *torqueNode =
+  Ogre::SceneNode *tubeNode =
       dPtr->torqueVisual->GetSceneNode()->createChildSceneNode(
-      this->GetName() + "__TORQUE_VISUAL_NODE__");
-  torqueNode->attachObject(torqueObj);
-  dPtr->torqueVisual->SetMaterial("Gazebo/Yellow");
+      this->GetName() + "__TORQUE_TUBE_NODE__");
+  tubeNode->attachObject(tubeObj);
+
+  // Torque arrow
+  this->InsertMesh("axis_head");
+
+  Ogre::MovableObject *headObj =
+    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+          this->GetName()+"__TORQUE_HEAD__", "axis_head"));
+
+  Ogre::SceneNode *headNode =
+      dPtr->torqueVisual->GetSceneNode()->createChildSceneNode(
+      this->GetName() + "__TORQUE_HEAD_NODE__");
+  headNode->attachObject(headObj);
+  headNode->setScale(3, 3, 1);
+  headNode->setPosition(-0.125, -0.02, 0);
+  math::Quaternion quat(1.57, 0, 0);
+  headNode->setOrientation(
+      Ogre::Quaternion(quat.w, quat.x, quat.y, quat.z));
+
+  dPtr->torqueVisual->SetMaterial("Gazebo/YellowTransparentOverlay");
+  dPtr->torqueVisual->SetScale(math::Vector3(2.5, 2.5, 2.5));
+  dPtr->torqueVisual->GetSceneNode()->setInheritScale(false);
 
   // Torque line
-  rendering::DynamicLines *torqueLine = dPtr->torqueVisual->
+  dPtr->torqueLine = dPtr->torqueVisual->
       CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  torqueLine->setMaterial("Gazebo/Yellow");
-  torqueLine->AddPoint(0, 0, 0);
-  torqueLine->AddPoint(0, 0, linkDiagonal*0.5 + 0.5);
+  dPtr->torqueLine->setMaterial("Gazebo/YellowTransparentOverlay");
+  dPtr->torqueLine->AddPoint(0, 0, 0);
+  dPtr->torqueLine->AddPoint(0, 0, 0.1);
 
   // Rotation manipulator
   dPtr->rotTool.reset(new rendering::SelectionObj(
@@ -260,8 +272,8 @@ void ApplyWrenchVisual::SetForceVisual()
 
   // make visible
   dPtr->forceVisual->SetVisible(true);
-  dPtr->forceVisual->SetMaterial("Gazebo/Orange");
-  dPtr->torqueVisual->SetMaterial("Gazebo/YellowTransparent");
+  dPtr->forceVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
+  dPtr->torqueVisual->SetMaterial("Gazebo/DarkYellowTransparentOverlay");
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
 
@@ -275,9 +287,7 @@ void ApplyWrenchVisual::SetForceVisual()
       math::Vector3(0, M_PI/2.0, 0)));
 
   // Set position
-  double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
-  //double arrowSize = this->forceVisual->GetBoundingBox().GetZLength();
-  dPtr->forceVisual->SetPosition(-normVec * (linkDiagonal*0.5 + 0.5)
+  dPtr->forceVisual->SetPosition(-normVec * 0.28 * dPtr->forceVisual->GetScale().z
       + dPtr->forcePosVector);
 
   // Rotation tool
@@ -294,8 +304,8 @@ void ApplyWrenchVisual::SetTorqueVisual()
 
   // make visible
   dPtr->torqueVisual->SetVisible(true);
-  dPtr->torqueVisual->SetMaterial("Gazebo/Yellow");
-  dPtr->forceVisual->SetMaterial("Gazebo/OrangeTransparent");
+  dPtr->torqueVisual->SetMaterial("Gazebo/YellowTransparentOverlay");
+  dPtr->forceVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
 
@@ -310,7 +320,8 @@ void ApplyWrenchVisual::SetTorqueVisual()
 
   // Set position
   double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
-  dPtr->torqueVisual->SetPosition(-normVec * (linkDiagonal*0.5 + 0.5));
+  dPtr->torqueVisual->SetPosition(normVec * (linkDiagonal*0.5 + 0.5));
+  dPtr->torqueLine->SetPoint(1, math::Vector3(0, 0, -linkDiagonal*0.5 - 0.5));
 
   // Rotation tool
   dPtr->rotTool->SetPosition(math::Vector3::Zero);

@@ -509,6 +509,86 @@ material Gazebo/GreenTransparentOverlay
   }
 }
 
+material Gazebo/YellowTransparentOverlay
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+      depth_check off
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 1 1 0
+        alpha_op_ex source1 src_manual src_current 0.8
+      }
+    }
+  }
+}
+
+material Gazebo/DarkYellowTransparentOverlay
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+      depth_check off
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0.6 0.6 0
+        alpha_op_ex source1 src_manual src_current 0.8
+      }
+    }
+  }
+}
+
+material Gazebo/OrangeTransparentOverlay
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+      depth_check off
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 1 0.5088 0.0468
+        alpha_op_ex source1 src_manual src_current 0.8
+      }
+    }
+  }
+}
+
+material Gazebo/DarkOrangeTransparentOverlay
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+      depth_check off
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0.6 0.305 0.028
+        alpha_op_ex source1 src_manual src_current 0.8
+      }
+    }
+  }
+}
+
 material Gazebo/RedTransparent
 {
   technique

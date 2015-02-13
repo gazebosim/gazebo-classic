@@ -41,6 +41,9 @@ namespace gazebo
       /// \brief TODO
       public: VisualPtr torqueVisual;
 
+      /// \brief TODO
+      public: rendering::DynamicLines *torqueLine;
+
       /// TODO
       public: math::Vector3 comVector;
 

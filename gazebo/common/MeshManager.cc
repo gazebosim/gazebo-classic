@@ -928,7 +928,7 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
   float deltaSegAngle = (2.0 * M_PI / segments);
 
   // Needs at lest 2 rings, and 3 segments
-  rings = std::max(rings, 1);
+  rings = std::max(rings, 2);
   segments = std::max(segments, 3);
 
   float radius = 0;

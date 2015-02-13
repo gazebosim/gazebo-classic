@@ -173,9 +173,9 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   this->dataPtr->forceMagSpin = new QDoubleSpinBox();
   this->dataPtr->forceMagSpin->setRange(0, GZ_DBL_MAX);
-  this->dataPtr->forceMagSpin->setSingleStep(0.1);
+  this->dataPtr->forceMagSpin->setSingleStep(100);
   this->dataPtr->forceMagSpin->setDecimals(3);
-  this->dataPtr->forceMagSpin->setValue(1000);
+  this->dataPtr->forceMagSpin->setValue(0);
   this->dataPtr->forceMagSpin->setMaximumWidth(100);
   this->dataPtr->forceMagSpin->installEventFilter(this);
   connect(this->dataPtr->forceMagSpin, SIGNAL(valueChanged(double)), this,
@@ -189,9 +189,9 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   this->dataPtr->forceXSpin = new QDoubleSpinBox();
   this->dataPtr->forceXSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->forceXSpin->setSingleStep(0.1);
+  this->dataPtr->forceXSpin->setSingleStep(100);
   this->dataPtr->forceXSpin->setDecimals(3);
-  this->dataPtr->forceXSpin->setValue(1);
+  this->dataPtr->forceXSpin->setValue(0);
   this->dataPtr->forceXSpin->setMaximumWidth(100);
   this->dataPtr->forceXSpin->installEventFilter(this);
   connect(this->dataPtr->forceXSpin, SIGNAL(valueChanged(double)), this,
@@ -205,7 +205,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   this->dataPtr->forceYSpin = new QDoubleSpinBox();
   this->dataPtr->forceYSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->forceYSpin->setSingleStep(0.1);
+  this->dataPtr->forceYSpin->setSingleStep(100);
   this->dataPtr->forceYSpin->setDecimals(3);
   this->dataPtr->forceYSpin->setValue(0);
   this->dataPtr->forceYSpin->setMaximumWidth(100);
@@ -221,7 +221,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   this->dataPtr->forceZSpin = new QDoubleSpinBox();
   this->dataPtr->forceZSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->forceZSpin->setSingleStep(0.1);
+  this->dataPtr->forceZSpin->setSingleStep(100);
   this->dataPtr->forceZSpin->setDecimals(3);
   this->dataPtr->forceZSpin->setValue(0);
   this->dataPtr->forceZSpin->setMaximumWidth(100);
@@ -284,7 +284,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   this->dataPtr->torqueMagSpin = new QDoubleSpinBox();
   this->dataPtr->torqueMagSpin->setRange(0, GZ_DBL_MAX);
-  this->dataPtr->torqueMagSpin->setSingleStep(0.1);
+  this->dataPtr->torqueMagSpin->setSingleStep(100);
   this->dataPtr->torqueMagSpin->setDecimals(3);
   this->dataPtr->torqueMagSpin->setValue(0);
   this->dataPtr->torqueMagSpin->setMaximumWidth(100);
@@ -300,7 +300,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   this->dataPtr->torqueXSpin = new QDoubleSpinBox();
   this->dataPtr->torqueXSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->torqueXSpin->setSingleStep(0.1);
+  this->dataPtr->torqueXSpin->setSingleStep(100);
   this->dataPtr->torqueXSpin->setDecimals(3);
   this->dataPtr->torqueXSpin->setValue(0);
   this->dataPtr->torqueXSpin->setMaximumWidth(100);
@@ -316,7 +316,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   this->dataPtr->torqueYSpin = new QDoubleSpinBox();
   this->dataPtr->torqueYSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->torqueYSpin->setSingleStep(0.1);
+  this->dataPtr->torqueYSpin->setSingleStep(100);
   this->dataPtr->torqueYSpin->setDecimals(3);
   this->dataPtr->torqueYSpin->setValue(0);
   this->dataPtr->torqueYSpin->setMaximumWidth(100);
@@ -332,7 +332,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   this->dataPtr->torqueZSpin = new QDoubleSpinBox();
   this->dataPtr->torqueZSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->torqueZSpin->setSingleStep(0.1);
+  this->dataPtr->torqueZSpin->setSingleStep(100);
   this->dataPtr->torqueZSpin->setDecimals(3);
   this->dataPtr->torqueZSpin->setValue(0);
   this->dataPtr->torqueZSpin->setMaximumWidth(100);
@@ -399,7 +399,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   this->dataPtr->mode = "force";
   this->dataPtr->comVector = math::Vector3::Zero;
-  this->dataPtr->forceVector = 1000 * math::Vector3::UnitX;
+  this->dataPtr->forceVector = math::Vector3::Zero;
   this->dataPtr->torqueVector = math::Vector3::Zero;
 
   connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
