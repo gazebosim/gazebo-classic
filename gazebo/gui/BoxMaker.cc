@@ -185,12 +185,6 @@ std::string BoxMaker::GetSDFString()
   }
   msgs::Set(model.mutable_pose(), math::Pose(0, 0, 0.5, 0, 0, 0));
   msgs::AddBoxLink(model, 1.0, math::Vector3::One);
-  auto link = model.mutable_link(0);
-  auto visual = link->mutable_visual(0);
-  auto script = visual->mutable_material()->mutable_script();
-  script->set_name("Gazebo/Grey");
-  script->add_uri();
-  script->set_uri(0, "file://media/materials/scripts/gazebo.material");
 
   return "<sdf version='" + std::string(SDF_VERSION) + "'>"
          + msgs::ModelToSDF(model)->ToString("")
