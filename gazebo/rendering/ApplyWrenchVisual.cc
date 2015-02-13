@@ -48,20 +48,52 @@ void ApplyWrenchVisual::Load()
 
   math::Vector3 linkSize = dPtr->parent->GetBoundingBox().GetSize();
 
+  // Origin visual
+  dPtr->originVisual.reset(new rendering::Visual(
+       this->GetName() + "__ORIGIN_VISUAL__", shared_from_this()));
+  dPtr->originVisual->Load();
+
+  rendering::DynamicLines *originXLines = dPtr->originVisual->
+      CreateDynamicLine(rendering::RENDERING_LINE_LIST);
+  originXLines->setMaterial("Gazebo/RedTransparent");
+  originXLines->AddPoint(math::Vector3(-linkSize.x, 0, 0));
+  originXLines->AddPoint(math::Vector3(linkSize.x,  0, 0));
+
+  rendering::DynamicLines *originYLines = dPtr->originVisual->
+      CreateDynamicLine(rendering::RENDERING_LINE_LIST);
+  originYLines->setMaterial("Gazebo/GreenTransparent");
+  originYLines->AddPoint(math::Vector3(0, -linkSize.y, 0));
+  originYLines->AddPoint(math::Vector3(0,  linkSize.y, 0));
+
+  rendering::DynamicLines *originZLines = dPtr->originVisual->
+      CreateDynamicLine(rendering::RENDERING_LINE_LIST);
+  originZLines->setMaterial("Gazebo/BlueTransparent");
+  originZLines->AddPoint(math::Vector3(0, 0, -linkSize.z));
+  originZLines->AddPoint(math::Vector3(0, 0,  linkSize.z));
+
   // CoM visual
   dPtr->comVisual.reset(new rendering::Visual(
        this->GetName() + "__CoM_VISUAL__", shared_from_this()));
   dPtr->comVisual->Load();
 
-  rendering::DynamicLines *comLines = dPtr->comVisual->
-      CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  comLines->setMaterial("Gazebo/SkyBlue");
-  comLines->AddPoint(math::Vector3(0, 0, -2*linkSize.z));
-  comLines->AddPoint(math::Vector3(0, 0,  2*linkSize.z));
-  comLines->AddPoint(math::Vector3(0, -2*linkSize.y, 0));
-  comLines->AddPoint(math::Vector3(0,  2*linkSize.y, 0));
-  comLines->AddPoint(math::Vector3(-2*linkSize.x, 0, 0));
-  comLines->AddPoint(math::Vector3(2*linkSize.x,  0, 0));
+  this->InsertMesh("unit_sphere");
+
+  Ogre::MovableObject *comObj =
+    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+          this->GetName()+"__CoM_SPHERE__", "unit_sphere"));
+
+  Ogre::SceneNode *comNode =
+      dPtr->comVisual->GetSceneNode()->createChildSceneNode(
+      this->GetName() + "__COM_SPHERE_NODE__");
+
+  comNode->attachObject(comObj);
+  math::Quaternion rot(1.57, 0, 0);
+  comNode->setOrientation(
+      Ogre::Quaternion(rot.w, rot.x, rot.y, rot.z));
+  dPtr->comVisual->SetMaterial("Gazebo/Chess");
+  double comScale = linkSize.GetMin() * 0.1;
+  dPtr->comVisual->SetScale(math::Vector3(comScale, comScale, comScale));
+  dPtr->comVisual->GetSceneNode()->setInheritScale(false);
 
   // Force visual
   dPtr->forceVisual.reset(new rendering::ArrowVisual(
@@ -107,14 +139,14 @@ void ApplyWrenchVisual::Load()
   headNode->setOrientation(
       Ogre::Quaternion(quat.w, quat.x, quat.y, quat.z));
 
-  dPtr->torqueVisual->SetMaterial("Gazebo/YellowTransparentOverlay");
+  dPtr->torqueVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
   dPtr->torqueVisual->SetScale(math::Vector3(2.5, 2.5, 2.5));
   dPtr->torqueVisual->GetSceneNode()->setInheritScale(false);
 
   // Torque line
   dPtr->torqueLine = dPtr->torqueVisual->
       CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  dPtr->torqueLine->setMaterial("Gazebo/YellowTransparentOverlay");
+  dPtr->torqueLine->setMaterial("Gazebo/OrangeTransparentOverlay");
   dPtr->torqueLine->AddPoint(0, 0, 0);
   dPtr->torqueLine->AddPoint(0, 0, 0.1);
 
@@ -124,6 +156,8 @@ void ApplyWrenchVisual::Load()
   dPtr->rotTool->Load();
   dPtr->rotTool->SetMode("rotate");
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_X, false);
+  dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Y, "Gazebo/MagentaTransparent");
+  dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Z, "Gazebo/MagentaTransparent");
 
   dPtr->forceVector = math::Vector3::UnitX;
   dPtr->torqueVector = math::Vector3::Zero;
@@ -273,7 +307,7 @@ void ApplyWrenchVisual::SetForceVisual()
   // make visible
   dPtr->forceVisual->SetVisible(true);
   dPtr->forceVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
-  dPtr->torqueVisual->SetMaterial("Gazebo/DarkYellowTransparentOverlay");
+  dPtr->torqueVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
 
@@ -304,7 +338,7 @@ void ApplyWrenchVisual::SetTorqueVisual()
 
   // make visible
   dPtr->torqueVisual->SetVisible(true);
-  dPtr->torqueVisual->SetMaterial("Gazebo/YellowTransparentOverlay");
+  dPtr->torqueVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
   dPtr->forceVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
@@ -321,7 +355,8 @@ void ApplyWrenchVisual::SetTorqueVisual()
   // Set position
   double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
   dPtr->torqueVisual->SetPosition(normVec * (linkDiagonal*0.5 + 0.5));
-  dPtr->torqueLine->SetPoint(1, math::Vector3(0, 0, -linkDiagonal*0.5 - 0.5));
+  dPtr->torqueLine->SetPoint(1,
+      math::Vector3(0, 0, -linkDiagonal*0.5 - 0.5)/dPtr->torqueVisual->GetScale());
 
   // Rotation tool
   dPtr->rotTool->SetPosition(math::Vector3::Zero);

@@ -509,6 +509,46 @@ material Gazebo/GreenTransparentOverlay
   }
 }
 
+material Gazebo/CyanTransparentOverlay
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+      depth_check off
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0 1 1
+        alpha_op_ex source1 src_manual src_current 0.5
+      }
+    }
+  }
+}
+
+material Gazebo/MagentaTransparentOverlay
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+      depth_check off
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 1 0 1
+        alpha_op_ex source1 src_manual src_current 0.5
+      }
+    }
+  }
+}
+
 material Gazebo/YellowTransparentOverlay
 {
   technique
@@ -650,6 +690,27 @@ material Gazebo/BlueTransparent
   }
 }
 
+material Gazebo/MagentaTransparent
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+
+      ambient 1.0 0.0 1.0 1
+      diffuse 1.0 0.0 1.0 1
+
+      texture_unit
+      {
+        colour_op_ex source1 src_current src_current 1 0 1
+        alpha_op_ex source1 src_manual src_current 0.5
+      }
+    }
+  }
+}
+
 material Gazebo/GreyTransparent
 {
   technique
@@ -785,6 +846,25 @@ material Gazebo/JointAnchor
   }
 }
 
+material Gazebo/Chess
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+      depth_check off
+
+      texture_unit
+      {
+        texture chess.png
+        filtering trilinear
+      }
+    }
+  }
+}
 
 material Gazebo/WoodFloor
 {

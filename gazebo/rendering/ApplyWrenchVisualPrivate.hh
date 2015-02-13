@@ -32,6 +32,9 @@ namespace gazebo
       /// \brief TODO
       public: VisualPtr comVisual;
 
+      /// \brief TODO
+      public: VisualPtr originVisual;
+
       /// TODO
       public: rendering::ArrowVisualPtr forceVisual;
 

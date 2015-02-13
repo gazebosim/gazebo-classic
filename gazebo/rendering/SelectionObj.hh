@@ -122,6 +122,11 @@ namespace gazebo
       /// \param[in] _visible Whether to show or not.
       public: void SetHandleVisible(SelectionMode _mode, bool _visible);
 
+      /// \brief Set the material for a specific handle.
+      /// \param[in] _mode Manipulation mode corresponding to the handle.
+      /// \param[in] _material Material name.
+      public: void SetHandleMaterial(SelectionMode _mode, std::string _material);
+
       /// \brief Get the visibility for a specific handle.
       /// \param[in] _mode Manipulation mode corresponding to the handle.
       /// \return _visible Whether it is visible or not.

@@ -704,3 +704,31 @@ bool SelectionObj::GetHandleVisible(SelectionMode _mode) const
   else
     return false;
 }
+
+/////////////////////////////////////////////////
+void SelectionObj::SetHandleMaterial(SelectionMode _mode, std::string _material)
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  if (_mode == TRANS_X)
+    dPtr->transXVisual->SetMaterial(_material, false);
+  else if (_mode == TRANS_Y)
+    dPtr->transYVisual->SetMaterial(_material, false);
+  else if (_mode == TRANS_Z)
+    dPtr->transZVisual->SetMaterial(_material, false);
+  else if (_mode == ROT_X)
+    dPtr->rotXVisual->SetMaterial(_material, false);
+  else if (_mode == ROT_Y)
+    dPtr->rotYVisual->SetMaterial(_material, false);
+  else if (_mode == ROT_Z)
+    dPtr->rotZVisual->SetMaterial(_material, false);
+  else if (_mode == SCALE_X)
+    dPtr->scaleXVisual->SetMaterial(_material, false);
+  else if (_mode == SCALE_Y)
+    dPtr->scaleYVisual->SetMaterial(_material, false);
+  else if (_mode == SCALE_Z)
+    dPtr->scaleZVisual->SetMaterial(_material, false);
+  else
+    gzwarn << "Not possible to set material for the input handle" << std::endl;
+}

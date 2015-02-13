@@ -3,6 +3,7 @@ set (files
   building_frame.png
   bricks.png
   ceiling_tiled.jpg
+  chess.png
   clouds.jpg
   dirt_diffusespecular.png
   dirt_normal.png
