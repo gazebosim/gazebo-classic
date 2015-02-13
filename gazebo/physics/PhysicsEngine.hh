@@ -39,6 +39,8 @@ namespace gazebo
     /// \brief Base class for a physics engine.
     class GAZEBO_VISIBLE PhysicsEngine
     {
+      protected: static const std::string paramNotFound;
+
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.
       public: explicit PhysicsEngine(WorldPtr _world);
@@ -256,6 +258,11 @@ namespace gazebo
       /// \sa SetParam
       /// \return The value of the parameter
       public: virtual boost::any GetParam(const std::string &_key) const;
+
+      /// \brief Check if the physics engine supports a parameter.
+      /// \param[in] _key Name of the parameter to check for.
+      /// \return True if the physics engine supports the parameter.
+      public: bool HasParam(const std::string &_key) const;
 
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;

@@ -1373,8 +1373,9 @@ boost::any SimbodyPhysics::GetParam(const std::string &_key) const
   else
   {
     gzwarn << "key [" << _key
-           << "] not supported, returning (int)0." << std::endl;
-    return 0;
+           << "] not supported, returning (std::string)paramNotFound."
+           << std::endl;
+    return PhysicsEngine::paramNotFound;
   }
 }
 

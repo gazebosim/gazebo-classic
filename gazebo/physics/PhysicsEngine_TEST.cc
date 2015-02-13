@@ -103,6 +103,29 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
     EXPECT_NO_THROW(physics->GetParam("fake_param_name"));
   }
 
+  // Test PhysicsEngine::HasParam()
+  {
+    physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+    if (_physicsEngine == "bullet")
+    {
+      EXPECT_TRUE(physics->HasParam("split_impulse"));
+      EXPECT_FALSE(physics->HasParam("this_param_does_not_exist"));
+      EXPECT_FALSE(physics->HasParam("contact_max_correcting_vel"));
+    }
+    else if (_physicsEngine == "simbody")
+    {
+      EXPECT_TRUE(physics->HasParam("max_transient_velocity"));
+      EXPECT_FALSE(physics->HasParam("this_param_does_not_exist"));
+      EXPECT_FALSE(physics->HasParam("split_impulse"));
+    }
+    else if (_physicsEngine == "ode")
+    {
+      EXPECT_TRUE(physics->HasParam("contact_max_correcting_vel"));
+      EXPECT_FALSE(physics->HasParam("this_param_does_not_exist"));
+      EXPECT_FALSE(physics->HasParam("max_transient_velocity"));
+    }
+  }
+
   physicsNode->Fini();
 }
 

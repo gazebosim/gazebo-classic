@@ -1423,6 +1423,6 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
   else
   {
     gzwarn << _key << " is not supported in ode" << std::endl;
-    return 0;
+    return PhysicsEngine::paramNotFound;
   }
 }

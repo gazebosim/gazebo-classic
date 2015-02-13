@@ -413,7 +413,7 @@ boost::any DARTPhysics::GetParam(const std::string &_key) const
   }
 
   gzerr << "We should not be here, something is wrong." << std::endl;
-  return 0;
+  return PhysicsEngine::paramNotFound;
 }
 
 //////////////////////////////////////////////////

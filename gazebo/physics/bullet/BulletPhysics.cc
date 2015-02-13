@@ -747,7 +747,7 @@ boost::any BulletPhysics::GetParam(const std::string &_key) const
   else
   {
     gzwarn << _key << " is not supported in bullet" << std::endl;
-    return 0;
+    return PhysicsEngine::paramNotFound;
   }
 }
 

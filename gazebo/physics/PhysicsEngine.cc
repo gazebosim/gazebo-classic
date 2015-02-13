@@ -35,6 +35,8 @@
 using namespace gazebo;
 using namespace physics;
 
+const std::string PhysicsEngine::paramNotFound = "Physics param not found!";
+
 //////////////////////////////////////////////////
 PhysicsEngine::PhysicsEngine(WorldPtr _world)
   : world(_world)
@@ -227,6 +229,21 @@ bool PhysicsEngine::SetParam(const std::string &/*_key*/,
 boost::any PhysicsEngine::GetParam(const std::string &/*_key*/) const
 {
   return 0;
+}
+
+//////////////////////////////////////////////////
+bool PhysicsEngine::HasParam(const std::string &_key) const
+{
+  std::string value;
+  try
+  {
+    value = boost::any_cast<std::string>(this->GetParam(_key));
+  }
+  catch (const boost::bad_any_cast& e)
+  {
+    return false;
+  }
+  return _key == PhysicsEngine::paramNotFound;
 }
 
 //////////////////////////////////////////////////
