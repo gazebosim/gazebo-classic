@@ -552,7 +552,8 @@ void ApplyWrenchDialog::OnApply()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnCancel()
 {
-  this->dataPtr->applyWrenchVisual->SetVisible(false);
+  // Hide mode visuals too
+  this->dataPtr->applyWrenchVisual->SetVisible(false, true);
 
   this->close();
 }

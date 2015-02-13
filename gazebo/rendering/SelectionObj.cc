@@ -711,24 +711,26 @@ void SelectionObj::SetHandleMaterial(SelectionMode _mode, std::string _material)
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
+  // FIXME: creating new materials all the time can't be good
+
   if (_mode == TRANS_X)
-    dPtr->transXVisual->SetMaterial(_material, false);
+    dPtr->transXVisual->SetMaterial(_material, true);
   else if (_mode == TRANS_Y)
-    dPtr->transYVisual->SetMaterial(_material, false);
+    dPtr->transYVisual->SetMaterial(_material, true);
   else if (_mode == TRANS_Z)
-    dPtr->transZVisual->SetMaterial(_material, false);
+    dPtr->transZVisual->SetMaterial(_material, true);
   else if (_mode == ROT_X)
-    dPtr->rotXVisual->SetMaterial(_material, false);
+    dPtr->rotXVisual->SetMaterial(_material, true);
   else if (_mode == ROT_Y)
-    dPtr->rotYVisual->SetMaterial(_material, false);
+    dPtr->rotYVisual->SetMaterial(_material, true);
   else if (_mode == ROT_Z)
-    dPtr->rotZVisual->SetMaterial(_material, false);
+    dPtr->rotZVisual->SetMaterial(_material, true);
   else if (_mode == SCALE_X)
-    dPtr->scaleXVisual->SetMaterial(_material, false);
+    dPtr->scaleXVisual->SetMaterial(_material, true);
   else if (_mode == SCALE_Y)
-    dPtr->scaleYVisual->SetMaterial(_material, false);
+    dPtr->scaleYVisual->SetMaterial(_material, true);
   else if (_mode == SCALE_Z)
-    dPtr->scaleZVisual->SetMaterial(_material, false);
+    dPtr->scaleZVisual->SetMaterial(_material, true);
   else
     gzwarn << "Not possible to set material for the input handle" << std::endl;
 }

@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _APPLYWRENCHVISUAL_PRIVATE_HH_
-#define _APPLYWRENCHVISUAL_PRIVATE_HH_
+#ifndef _GAZEBO_APPLYWRENCHVISUAL_PRIVATE_HH_
+#define _GAZEBO_APPLYWRENCHVISUAL_PRIVATE_HH_
 
 //#include <string>
 //#include "gazebo/rendering/RenderTypes.hh"

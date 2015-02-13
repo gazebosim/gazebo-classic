@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _APPLYWRENCHVISUAL_HH_
-#define _APPLYWRENCHVISUAL_HH_
+#ifndef _GAZEBO_APPLYWRENCHVISUAL_HH_
+#define _GAZEBO_APPLYWRENCHVISUAL_HH_
 
 #include "gazebo/rendering/Visual.hh"
 
@@ -76,7 +76,7 @@ namespace gazebo
       public: void SetTorqueVisual();
 
       // Documentation Inherited.
-      public: void SetVisible(bool _visible, bool _cascade = true);
+      public: void SetVisible(bool _visible, bool _cascade = false);
     };
     /// \}
   }

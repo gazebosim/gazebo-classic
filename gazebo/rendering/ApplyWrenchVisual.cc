@@ -17,7 +17,6 @@
 
 #include "gazebo/common/MeshManager.hh"
 
-//#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/ArrowVisual.hh"
@@ -156,14 +155,17 @@ void ApplyWrenchVisual::Load()
   dPtr->rotTool->Load();
   dPtr->rotTool->SetMode("rotate");
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_X, false);
-  dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Y, "Gazebo/MagentaTransparent");
-  dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Z, "Gazebo/MagentaTransparent");
+  dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Y, "Gazebo/DarkMagentaTransparent");
+  dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Z, "Gazebo/DarkMagentaTransparent");
 
-  dPtr->forceVector = math::Vector3::UnitX;
+  dPtr->forceVector = math::Vector3::Zero;
   dPtr->torqueVector = math::Vector3::Zero;
   dPtr->mode = "force";
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->SetForceVisual();
+  this->SetTorqueVisual();
+  this->SetWrenchMode("none");
 }
 
 ///////////////////////////////////////////////////
@@ -214,16 +216,31 @@ void ApplyWrenchVisual::SetWrenchMode(std::string _mode)
 
   if (_mode == "force")
   {
+    dPtr->forceVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
+    dPtr->torqueVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
+
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
+
     // set force visual visible and update direction
     this->SetForceVisual();
   }
   else if (_mode == "torque")
   {
+    dPtr->torqueVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
+    dPtr->forceVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
+
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
+
     // set torque visual visible and update direction
     this->SetTorqueVisual();
   }
   else if (_mode == "none")
   {
+    // Dark visuals
+    dPtr->forceVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
+    dPtr->torqueVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
     // hide rot
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, false);
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, false);
@@ -239,7 +256,13 @@ void ApplyWrenchVisual::SetCoM(math::Vector3 _comVector)
   // move com visual
   dPtr->comVisual->SetPosition(_comVector);
 
+  // scale
+  math::Vector3 linkSize = dPtr->parent->GetBoundingBox().GetSize();
+  double comScale = linkSize.GetMin() * 0.1;
+  dPtr->comVisual->SetScale(math::Vector3(comScale, comScale, comScale));
+
   dPtr->comVector = _comVector;
+  this->SetTorqueVisual();
 }
 
 ///////////////////////////////////////////////////
@@ -249,7 +272,7 @@ void ApplyWrenchVisual::SetForcePos(math::Vector3 _forcePosVector)
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
   dPtr->forcePosVector = _forcePosVector;
-  this->SetForce(dPtr->forceVector, false);
+  this->SetForceVisual();
 }
 
 ///////////////////////////////////////////////////
@@ -263,7 +286,7 @@ void ApplyWrenchVisual::SetForce(math::Vector3 _forceVector, bool _rotatedByMous
 
   if (_forceVector == math::Vector3::Zero)
   {
-    dPtr->forceVisual->SetVisible(false);
+//    dPtr->forceVisual->SetVisible(false);
     if (dPtr->torqueVector == math::Vector3::Zero)
       this->SetWrenchMode("none");
     else
@@ -286,7 +309,7 @@ void ApplyWrenchVisual::SetTorque(math::Vector3 _torqueVector, bool _rotatedByMo
 
   if (_torqueVector == math::Vector3::Zero)
   {
-    dPtr->torqueVisual->SetVisible(false);
+//    dPtr->torqueVisual->SetVisible(false);
     if (dPtr->forceVector == math::Vector3::Zero)
       this->SetWrenchMode("none");
     else
@@ -304,23 +327,21 @@ void ApplyWrenchVisual::SetForceVisual()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  // make visible
-  dPtr->forceVisual->SetVisible(true);
-  dPtr->forceVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
-  dPtr->torqueVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
-  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
-  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
-
   // position according to force and position vectors
 
-  // Set rotation
+  // Place it on X axis in case it is zero
   math::Vector3 normVec = dPtr->forceVector;
   normVec.Normalize();
+
+  if (normVec == math::Vector3::Zero)
+    normVec = math::Vector3::UnitX;
+
+  // Set rotation
   math::Quaternion quat = this->GetQuaternionFromVector(normVec);
   dPtr->forceVisual->SetRotation(quat * math::Quaternion(
       math::Vector3(0, M_PI/2.0, 0)));
 
-  // Set position
+  // Set position towards forcePosVector
   dPtr->forceVisual->SetPosition(-normVec * 0.28 * dPtr->forceVisual->GetScale().z
       + dPtr->forcePosVector);
 
@@ -336,25 +357,24 @@ void ApplyWrenchVisual::SetTorqueVisual()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  // make visible
-  dPtr->torqueVisual->SetVisible(true);
-  dPtr->torqueVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
-  dPtr->forceVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
-  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
-  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
-
   // position according to torque and position vectors
 
-  // Set rotation
+  // Place it on X axis in case it is zero
   math::Vector3 normVec = dPtr->torqueVector;
   normVec.Normalize();
+
+  if (normVec == math::Vector3::Zero)
+    normVec = math::Vector3::UnitX;
+
+  // Set rotation
   math::Quaternion quat = this->GetQuaternionFromVector(normVec);
   dPtr->torqueVisual->SetRotation(quat * math::Quaternion(
       math::Vector3(0, M_PI/2.0, 0)));
 
-  // Set position
+  // Set position towards comVector
   double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
-  dPtr->torqueVisual->SetPosition(normVec * (linkDiagonal*0.5 + 0.5));
+  dPtr->torqueVisual->SetPosition(normVec * (linkDiagonal*0.5 + 0.5)
+      + dPtr->comVector);
   dPtr->torqueLine->SetPoint(1,
       math::Vector3(0, 0, -linkDiagonal*0.5 - 0.5)/dPtr->torqueVisual->GetScale());
 
@@ -365,7 +385,7 @@ void ApplyWrenchVisual::SetTorqueVisual()
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchVisual::SetVisible(bool _visible, bool /*_cascade*/)
+void ApplyWrenchVisual::SetVisible(bool _visible, bool _cascade)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
@@ -373,14 +393,9 @@ void ApplyWrenchVisual::SetVisible(bool _visible, bool /*_cascade*/)
   if (_visible)
   {
     dPtr->comVisual->SetVisible(true);
-    if (dPtr->mode == "force" && dPtr->forceVector != math::Vector3::Zero)
-    {
-      dPtr->forceVisual->SetVisible(true);
-    }
-    else if (dPtr->mode == "torque" && dPtr->torqueVector != math::Vector3::Zero)
-    {
-      dPtr->torqueVisual->SetVisible(true);
-    }
+    dPtr->originVisual->SetVisible(true);
+    dPtr->forceVisual->SetVisible(true);
+    dPtr->torqueVisual->SetVisible(true);
 
     if (dPtr->mode != "none")
     {
@@ -391,9 +406,20 @@ void ApplyWrenchVisual::SetVisible(bool _visible, bool /*_cascade*/)
   else
   {
     dPtr->comVisual->SetVisible(false);
-    dPtr->forceVisual->SetVisible(false);
-    dPtr->torqueVisual->SetVisible(false);
+    dPtr->originVisual->SetVisible(false);
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, false);
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, false);
+
+    // Use cascade to hide mode visuals or not
+    if (_cascade)
+    {
+      dPtr->forceVisual->SetVisible(false);
+      dPtr->torqueVisual->SetVisible(false);
+    }
+    else
+    {
+      dPtr->forceVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
+      dPtr->torqueVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
+    }
   }
 }

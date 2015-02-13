@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _APPLY_WRENCH_DIALOG_PRIVATE_HH_
-#define _APPLY_WRENCH_DIALOG_PRIVATE_HH_
+#ifndef _GAZEBO_APPLY_WRENCH_DIALOG_PRIVATE_HH_
+#define _GAZEBO_APPLY_WRENCH_DIALOG_PRIVATE_HH_
 
 #include "gazebo/gui/qt.h"
 

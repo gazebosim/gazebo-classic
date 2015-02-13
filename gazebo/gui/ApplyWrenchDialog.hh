@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _APPLY_WRENCH_DIALOG_HH_
-#define _APPLY_WRENCH_DIALOG_HH_
+#ifndef _GAZEBO_APPLY_WRENCH_DIALOG_HH_
+#define _GAZEBO_APPLY_WRENCH_DIALOG_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/math/Vector2i.hh"
