@@ -167,6 +167,7 @@ std::string SphereMaker::GetSDFString()
   }
   msgs::Set(model.mutable_pose(), math::Pose(0, 0, 0.5, 0, 0, 0));
   msgs::AddSphereLink(model, 1.0, 0.5);
+  model.mutable_link(0)->set_name("link");
 
   return "<sdf version='" + std::string(SDF_VERSION) + "'>"
          + msgs::ModelToSDF(model)->ToString("")
