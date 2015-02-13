@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -168,7 +168,9 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   this->timer = new QTimer(this);
   connect(this->timer, SIGNAL(timeout()), this, SLOT(update()));
-  this->timer->start(44);
+
+  // Set update rate. 30Hz is good.
+  this->timer->start(1000.0 / 30.0);
 
   this->connections.push_back(
       gui::Events::ConnectFollow(

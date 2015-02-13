@@ -5,8 +5,6 @@ package gazebo.msgs;
 /// \brief A message that allows for control of the server functions
 
 
-import "header.proto";
-
 message ServerControl
 {
   optional string save_world_name = 1;

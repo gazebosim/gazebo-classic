@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,30 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   // Create the model editor tab
   this->modelPalette = new ModelEditorPalette(_mainWindow);
   this->Init("modelEditorTab", "Model Editor", this->modelPalette);
+
+  this->newAct = new QAction(tr("&New"), this->mainWindow);
+  this->newAct->setStatusTip(tr("New"));
+  this->newAct->setShortcut(tr("Ctrl+N"));
+  this->newAct->setCheckable(false);
+  connect(this->newAct, SIGNAL(triggered()), this, SLOT(New()));
+
+  this->saveAct = new QAction(tr("&Save"), this->mainWindow);
+  this->saveAct->setStatusTip(tr("Save"));
+  this->saveAct->setShortcut(tr("Ctrl+S"));
+  this->saveAct->setCheckable(false);
+  connect(this->saveAct, SIGNAL(triggered()), this, SLOT(Save()));
+
+  this->saveAsAct = new QAction(tr("&Save As"), this->mainWindow);
+  this->saveAsAct->setStatusTip(tr("Save As"));
+  this->saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
+  this->saveAsAct->setCheckable(false);
+  connect(this->saveAsAct, SIGNAL(triggered()), this, SLOT(SaveAs()));
+
+  this->exitAct = new QAction(tr("E&xit Model Editor"), this->mainWindow);
+  this->exitAct->setStatusTip(tr("Exit Model Editor"));
+  this->exitAct->setShortcut(tr("Ctrl+X"));
+  this->exitAct->setCheckable(false);
+  connect(this->exitAct, SIGNAL(triggered()), this, SLOT(Exit()));
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
@@ -145,11 +169,53 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
 
   connect(this->modelPalette->GetModelCreator()->GetJointMaker(),
       SIGNAL(JointAdded()), this, SLOT(OnJointAdded()));
+
+  this->menuBar = NULL;
 }
 
 /////////////////////////////////////////////////
 ModelEditor::~ModelEditor()
 {
+}
+
+////////////////////////////////////////////////
+void ModelEditor::Save()
+{
+  gui::model::Events::saveModelEditor();
+}
+
+////////////////////////////////////////////////
+void ModelEditor::SaveAs()
+{
+  gui::model::Events::saveAsModelEditor();
+}
+
+/////////////////////////////////////////////////
+void ModelEditor::New()
+{
+  gui::model::Events::newModelEditor();
+}
+
+/////////////////////////////////////////////////
+void ModelEditor::Exit()
+{
+  gui::model::Events::exitModelEditor();
+}
+
+/////////////////////////////////////////////////
+void ModelEditor::CreateMenus()
+{
+  if (this->menuBar)
+    return;
+
+  this->menuBar = new QMenuBar;
+  this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+  QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
+  fileMenu->addAction(this->newAct);
+  fileMenu->addAction(this->saveAct);
+  fileMenu->addAction(this->saveAsAct);
+  fileMenu->addAction(this->exitAct);
 }
 
 /////////////////////////////////////////////////
@@ -183,12 +249,15 @@ void ModelEditor::OnEdit(bool /*_checked*/)
 {
   if (!this->active)
   {
+    this->CreateMenus();
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("modelEditorTab");
+    this->mainWindow->ShowMenuBar(this->menuBar);
   }
   else
   {
     this->mainWindow->ShowLeftColumnWidget();
+    this->mainWindow->ShowMenuBar();
     this->mainWindow->Play();
   }
   this->active = !this->active;

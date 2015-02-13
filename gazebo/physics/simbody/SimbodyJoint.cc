@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -468,13 +468,6 @@ math::Vector3 SimbodyJoint::GetLinkTorque(unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
   return math::Vector3();
-}
-
-//////////////////////////////////////////////////
-void SimbodyJoint::SetAttribute(Attribute, unsigned int /*_index*/,
-    double /*_value*/)
-{
-  gzerr << "Not implement in Simbody\n";
 }
 
 //////////////////////////////////////////////////

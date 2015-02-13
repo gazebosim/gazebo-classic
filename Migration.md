@@ -1,6 +1,16 @@
 ## Gazebo 4.X to 5.X
 
+### C++11 compiler required
+
+Gazebo 5.x uses features from the new c++11 standard. This requires to have a compatible c++11 compiler. Note that some platforms (like Ubuntu Precise) do not include one by default.
+
 ### Modifications
+
+1. Privatized World::dirtyPoses
+    + World::dirtyPoses used to be a public attribute. This is now a private attribute, and specific "friends" have been added to the World file.
+
+1. Privatized Scene::skyx
+    + Scene::skyx used to be a public attribute. This is now a private attribute, and a GetSkyX() funcion has been added to access the sky object.
 
 1. **gazebo/rendering/Visual.hh**
     + The GetBoundingBox() function now returns a local bounding box without scale applied.
@@ -38,7 +48,7 @@
     + ***Deprecation:*** public: void RotateYaw(math::Angle _angle);
     + ***Replacement:*** public: void Yaw(const math::Angle &_angle,
                                         Ogre::Node::TransformSpace _relativeTo = Ogre::Node::TS_LOCAL);
-    
+
 1. **gazebo/rendering/AxisVisual.hh**
     + ***Removed:*** public: void ShowRotation(unsigned int _axis)
     + ***Replacement:*** public: void ShowAxisRotation(unsigned int _axis, bool _show)
@@ -54,6 +64,12 @@
 
 1. **gazebo/physics/World.hh**
     + EntityPtr GetSelectedEntity() const
+
+1. **gazebo/physics/bullet/BulletJoint.hh**
+    + void SetAttribute(Attribute, unsigned int, double)
+
+1. **gazebo/physics/simbody/SimbodyJoint.hh**
+    + void SetAttribute(Attribute, unsigned int, double)
 
 
 ## Gazebo 3.1 to 4.0

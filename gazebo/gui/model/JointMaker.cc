@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,10 @@
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/JointVisual.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
@@ -33,6 +35,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 
 #include "gazebo/gui/model/JointInspector.hh"
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 
 using namespace gazebo;
@@ -136,14 +139,30 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
     scene->RemoveVisual(joint->hotspot);
     scene->RemoveVisual(joint->visual);
     joint->visual->Fini();
+    if (joint->jointVisual)
+    {
+      rendering::JointVisualPtr parentAxisVis = joint->jointVisual
+          ->GetParentAxisVisual();
+      if (parentAxisVis)
+      {
+        parentAxisVis->GetParent()->DetachVisual(
+            parentAxisVis->GetName());
+        scene->RemoveVisual(parentAxisVis);
+      }
+      joint->jointVisual->GetParent()->DetachVisual(
+          joint->jointVisual->GetName());
+      scene->RemoveVisual(joint->jointVisual);
+    }
     joint->hotspot.reset();
     joint->visual.reset();
+    joint->jointVisual.reset();
     joint->parent.reset();
     joint->child.reset();
     joint->inspector->hide();
     delete joint->inspector;
     delete joint;
     this->joints.erase(_jointName);
+    gui::model::Events::modelChanged();
   }
 }
 
@@ -185,7 +204,6 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
     return false;
 
   // intercept mouse press events when user clicks on the joint hotspot visual
-  rendering::ScenePtr scene = camera->GetScene();
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
   if (vis)
   {
@@ -272,6 +290,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           this->AddJoint(JointMaker::JOINT_NONE);
 
           this->newJointCreated = true;
+          gui::model::Events::modelChanged();
         }
       }
     }
@@ -294,7 +313,7 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  math::Vector3 origin = this->GetPartWorldCentroid(_parent)
+  math::Vector3 origin = _parent->GetWorldPose().pos
       - _parent->GetParent()->GetWorldPose().pos;
   jointLine->AddPoint(origin);
   jointLine->AddPoint(origin + math::Vector3(0, 0, 0.1));
@@ -554,8 +573,6 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   rendering::VisualPtr hotspotVisual(
       new rendering::Visual(hotSpotName, _joint->visual, false));
 
-  _joint->hotspot = hotspotVisual;
-
   // create a cylinder to represent the joint
   hotspotVisual->InsertMesh("unit_cylinder");
   Ogre::MovableObject *hotspotObj =
@@ -594,11 +611,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   this->joints[hotSpotName] = _joint;
   camera->GetScene()->AddVisual(hotspotVisual);
 
-  // remove line as we are using a cylinder hotspot visual to
-  // represent the joint
-  _joint->visual->DeleteDynamicLine(_joint->line);
-
-  _joint->dirty = true;
+  _joint->hotspot = hotspotVisual;
 }
 
 /////////////////////////////////////////////////
@@ -617,55 +630,150 @@ void JointMaker::Update()
   for (it = this->joints.begin(); it != this->joints.end(); ++it)
   {
     JointData *joint = it->second;
-    if (joint->dirty)
+    if (joint->hotspot)
     {
       if (joint->child && joint->parent)
       {
-        // get centroid of parent part visuals
-        math::Vector3 parentCentroid =
-            this->GetPartWorldCentroid(joint->parent);
+        bool poseUpdate = false;
+        if (joint->parentPose != joint->parent->GetWorldPose() ||
+            joint->childPose != joint->child->GetWorldPose() ||
+            joint->childScale != joint->child->GetScale())
+         {
+           joint->parentPose = joint->parent->GetWorldPose();
+           joint->childPose = joint->child->GetWorldPose();
+           joint->childScale = joint->child->GetScale();
+           poseUpdate = true;
+         }
 
-        // get centroid of child part visuals
-        math::Vector3 childCentroid =
-            this->GetPartWorldCentroid(joint->child);
-
-        // set orientation of joint hotspot
-        math::Vector3 dPos = (childCentroid - parentCentroid);
-        math::Vector3 center = dPos/2.0;
-        joint->hotspot->SetScale(math::Vector3(0.02, 0.02, dPos.GetLength()));
-        joint->hotspot->SetWorldPosition(parentCentroid + center);
-        math::Vector3 u = dPos.Normalize();
-        math::Vector3 v = math::Vector3::UnitZ;
-        double cosTheta = v.Dot(u);
-        double angle = acos(cosTheta);
-        math::Vector3 w = (v.Cross(u)).Normalize();
-        math::Quaternion q;
-        q.SetFromAxis(w, angle);
-        joint->hotspot->SetWorldRotation(q);
-
-        // set new material if joint type has changed
-        std::string material = this->jointMaterials[joint->type];
-        if (joint->hotspot->GetMaterialName() != material)
+        if (joint->dirty || poseUpdate)
         {
-          // Note: issue setting material when there is a billboard child,
-          // seems to hang so detach before setting and re-attach later.
-          Ogre::SceneNode *handleNode = joint->handles->getParentSceneNode();
-          joint->handles->detachFromParent();
-          joint->hotspot->SetMaterial(material);
-          handleNode->attachObject(joint->handles);
-          Ogre::MaterialPtr mat =
-              Ogre::MaterialManager::getSingleton().getByName(material);
-          Ogre::ColourValue color =
-              mat->getTechnique(0)->getPass(0)->getDiffuse();
-          color.a = 0.5;
-          joint->handles->getBillboard(0)->setColour(color);
+          // get origin of parent part visuals
+          math::Vector3 parentOrigin = joint->parent->GetWorldPose().pos;
+
+          // get origin of child part visuals
+          math::Vector3 childOrigin = joint->child->GetWorldPose().pos;
+
+          // set orientation of joint hotspot
+          math::Vector3 dPos = (childOrigin - parentOrigin);
+          math::Vector3 center = dPos/2.0;
+          joint->hotspot->SetScale(math::Vector3(0.02, 0.02, dPos.GetLength()));
+          joint->hotspot->SetWorldPosition(parentOrigin + center);
+          math::Vector3 u = dPos.Normalize();
+          math::Vector3 v = math::Vector3::UnitZ;
+          double cosTheta = v.Dot(u);
+          double angle = acos(cosTheta);
+          math::Vector3 w = (v.Cross(u)).Normalize();
+          math::Quaternion q;
+          q.SetFromAxis(w, angle);
+          joint->hotspot->SetWorldRotation(q);
+
+          // set new material if joint type has changed
+          std::string material = this->jointMaterials[joint->type];
+          if (joint->hotspot->GetMaterialName() != material)
+          {
+            // Note: issue setting material when there is a billboard child,
+            // seems to hang so detach before setting and re-attach later.
+            Ogre::SceneNode *handleNode = joint->handles->getParentSceneNode();
+            joint->handles->detachFromParent();
+            joint->hotspot->SetMaterial(material);
+            handleNode->attachObject(joint->handles);
+            Ogre::MaterialPtr mat =
+                Ogre::MaterialManager::getSingleton().getByName(material);
+            Ogre::ColourValue color =
+                mat->getTechnique(0)->getPass(0)->getDiffuse();
+            color.a = 0.5;
+            joint->handles->getBillboard(0)->setColour(color);
+          }
+
+          // set pos of joint handle
+          joint->handles->getBillboard(0)->setPosition(
+              rendering::Conversions::Convert(parentOrigin -
+              joint->hotspot->GetWorldPose().pos));
+          joint->handles->_updateBounds();
         }
 
-        // set pos of joint handle
-        joint->handles->getBillboard(0)->setPosition(
-            rendering::Conversions::Convert(parentCentroid -
-            joint->hotspot->GetWorldPose().pos));
-        joint->handles->_updateBounds();
+        // Create / update joint visual
+        if (!joint->jointMsg || joint->dirty || poseUpdate)
+        {
+          joint->jointMsg.reset(new gazebo::msgs::Joint);
+          joint->jointMsg->set_parent(joint->parent->GetName());
+          joint->jointMsg->set_parent_id(joint->parent->GetId());
+          joint->jointMsg->set_child(joint->child->GetName());
+          joint->jointMsg->set_child_id(joint->child->GetId());
+          joint->jointMsg->set_name(joint->name);
+
+          msgs::Set(joint->jointMsg->mutable_pose(), joint->pose);
+          if (joint->type == JointMaker::JOINT_SLIDER)
+          {
+            joint->jointMsg->set_type(msgs::Joint::PRISMATIC);
+          }
+          else if (joint->type == JointMaker::JOINT_HINGE)
+          {
+            joint->jointMsg->set_type(msgs::Joint::REVOLUTE);
+          }
+          else if (joint->type == JointMaker::JOINT_HINGE2)
+          {
+            joint->jointMsg->set_type(msgs::Joint::REVOLUTE2);
+          }
+          else if (joint->type == JointMaker::JOINT_SCREW)
+          {
+            joint->jointMsg->set_type(msgs::Joint::SCREW);
+          }
+          else if (joint->type == JointMaker::JOINT_UNIVERSAL)
+          {
+            joint->jointMsg->set_type(msgs::Joint::UNIVERSAL);
+          }
+          else if (joint->type == JointMaker::JOINT_BALL)
+          {
+            joint->jointMsg->set_type(msgs::Joint::BALL);
+          }
+
+          int axisCount = JointMaker::GetJointAxisCount(joint->type);
+          for (int i = 0; i < axisCount; ++i)
+          {
+            msgs::Axis *axisMsg;
+            if (i == 0)
+            {
+              axisMsg = joint->jointMsg->mutable_axis1();
+            }
+            else if (i == 1)
+            {
+              axisMsg = joint->jointMsg->mutable_axis2();
+            }
+            else
+            {
+              gzerr << "Invalid axis index["
+                    << i
+                    << "]"
+                    << std::endl;
+              continue;
+            }
+            msgs::Set(axisMsg->mutable_xyz(), joint->axis[i]);
+
+            // Add angle field after we've checked that index i is valid
+            joint->jointMsg->add_angle(0);
+          }
+
+          if (joint->jointVisual)
+          {
+            joint->jointVisual->UpdateFromMsg(joint->jointMsg);
+          }
+          else
+          {
+            gazebo::rendering::JointVisualPtr jointVis(
+                new gazebo::rendering::JointVisual(
+                joint->name + "__JOINT_VISUAL__", joint->child));
+
+            jointVis->Load(joint->jointMsg);
+            joint->jointVisual = jointVis;
+          }
+
+          // Line now connects the child link to the joint frame
+          joint->line->SetPoint(0, joint->child->GetWorldPose().pos);
+          joint->line->SetPoint(1, joint->jointVisual->GetWorldPose().pos);
+          joint->line->setMaterial(this->jointMaterials[joint->type]);
+          joint->dirty = false;
+        }
       }
     }
   }
@@ -804,9 +912,17 @@ math::Vector3 JointMaker::GetPartWorldCentroid(
     const rendering::VisualPtr _visual)
 {
   math::Vector3 centroid;
+  int count = 0;
   for (unsigned int i = 0; i < _visual->GetChildCount(); ++i)
-    centroid += _visual->GetChild(i)->GetWorldPose().pos;
-  centroid /= _visual->GetChildCount();
+  {
+    if (_visual->GetChild(i)->GetName().find("_JOINT_VISUAL_") ==
+        std::string::npos)
+    {
+      centroid += _visual->GetChild(i)->GetWorldPose().pos;
+      count++;
+    }
+  }
+  centroid /= count;
   return centroid;
 }
 
@@ -830,4 +946,6 @@ void JointData::OnApply()
     this->lowerLimit[i] = this->inspector->GetLowerLimit(i);
     this->upperLimit[i] = this->inspector->GetUpperLimit(i);
   }
+  this->dirty = true;
+  gui::model::Events::modelChanged();
 }

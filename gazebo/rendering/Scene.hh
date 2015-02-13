@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,14 @@
  * limitations under the License.
  *
 */
+
 #ifndef _SCENE_HH_
 #define _SCENE_HH_
 
-#include <list>
-#include <map>
 #include <string>
 #include <vector>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/unordered/unordered_map.hpp>
-#include <boost/thread/recursive_mutex.hpp>
 
 #include <sdf/sdf.hh>
 
@@ -40,13 +37,11 @@
 namespace SkyX
 {
   class SkyX;
-  class BasicController;
 }
 
 namespace Ogre
 {
   class SceneManager;
-  class RaySceneQuery;
   class Node;
   class Entity;
   class Mesh;
@@ -54,20 +49,14 @@ namespace Ogre
   class Quaternion;
 }
 
-namespace boost
-{
-  class mutex;
-}
-
 namespace gazebo
 {
   namespace rendering
   {
-    class Projector;
-    class Light;
     class Visual;
     class Grid;
     class Heightmap;
+    class ScenePrivate;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -171,7 +160,6 @@ namespace gazebo
       /// \brief Get the number of cameras in this scene
       /// \return Number of cameras.
       public: uint32_t GetOculusCameraCount() const;
-
 #endif
 
       /// \brief Create depth camera
@@ -209,8 +197,11 @@ namespace gazebo
       ///
       /// A user camera is one design for use with a GUI.
       /// \param[in] _name Name of the UserCamera.
+      /// \param[in] _stereoEnabled True to enable stereo rendering. This is
+      /// here for compatibility with 3D monitors/TVs.
       /// \return A pointer to the new UserCamera.
-      public: UserCameraPtr CreateUserCamera(const std::string &_name);
+      public: UserCameraPtr CreateUserCamera(const std::string &_name,
+                  bool _stereoEnabled = false);
 
       /// \brief Get the number of user cameras in this scene
       /// \return The number of user cameras.
@@ -441,6 +432,10 @@ namespace gazebo
       /// \sa Scene::SkyXMode
       public: void SetSkyXMode(unsigned int _mode);
 
+      /// \brief Get the sky in the scene.
+      /// \return Pointer to the sky.
+      public: SkyX::SkyX *GetSkyX() const;
+
       /// \brief Return true if the Scene has been initialized.
       public: bool GetInitialized() const;
 
@@ -591,250 +586,9 @@ namespace gazebo
       private: void CreateCOMVisual(sdf::ElementPtr _elem,
                                     VisualPtr _linkVisual);
 
-      /// \brief Name of the scene.
-      private: std::string name;
-
-      /// \brief Scene SDF element.
-      private: sdf::ElementPtr sdf;
-
-      /// \brief All the cameras.
-      private: std::vector<CameraPtr> cameras;
-
-      /// \brief All the user cameras.
-      private: std::vector<UserCameraPtr> userCameras;
-
-#ifdef HAVE_OCULUS
-      /// \brief All the oculus cameras.
-      private: std::vector<OculusCameraPtr> oculusCameras;
-#endif
-
-      /// \brief The ogre scene manager.
-      private: Ogre::SceneManager *manager;
-
-      /// \brief A ray query used to locate distances to visuals.
-      private: Ogre::RaySceneQuery *raySceneQuery;
-
-      /// \brief All the grids in the scene.
-      private: std::vector<Grid *> grids;
-
-      /// \brief Unique ID counter.
-      private: static uint32_t idCounter;
-
-      /// \brief The unique ID of this scene.
-      private: uint32_t id;
-
-      /// \brief String form of the id.
-      private: std::string idString;
-
-      /// \def VisualMsgs_L
-      /// \brief List of visual messages.
-      typedef std::list<boost::shared_ptr<msgs::Visual const> > VisualMsgs_L;
-
-      /// \brief List of visual messages to process.
-      private: VisualMsgs_L visualMsgs;
-
-      /// \def LightMsgs_L.
-      /// \brief List of light messages.
-      typedef std::list<boost::shared_ptr<msgs::Light const> > LightMsgs_L;
-
-      /// \brief List of light message to process.
-      private: LightMsgs_L lightMsgs;
-
-      /// \def PoseMsgs_L.
-      /// \brief List of messages.
-      typedef std::map<uint32_t, msgs::Pose> PoseMsgs_M;
-
-      /// \brief List of pose message to process.
-      private: PoseMsgs_M poseMsgs;
-
-      /// \def SceneMsgs_L
-      /// \brief List of scene messages.
-      typedef std::list<boost::shared_ptr<msgs::Scene const> > SceneMsgs_L;
-
-      /// \brief List of scene message to process.
-      private: SceneMsgs_L sceneMsgs;
-
-      /// \def JointMsgs_L
-      /// \brief List of joint messages.
-      typedef std::list<boost::shared_ptr<msgs::Joint const> > JointMsgs_L;
-
-      /// \brief List of joint message to process.
-      private: JointMsgs_L jointMsgs;
-
-      /// \def LinkMsgs_L
-      /// \brief List of link messages.
-      typedef std::list<boost::shared_ptr<msgs::Link const> > LinkMsgs_L;
-
-      /// \brief List of link message to process.
-      private: LinkMsgs_L linkMsgs;
-
-      /// \def ModelMsgs_L
-      /// \brief List of model messages.
-      typedef std::list<boost::shared_ptr<msgs::Model const> > ModelMsgs_L;
-      /// \brief List of model message to process.
-      private: ModelMsgs_L modelMsgs;
-
-      /// \def SensorMsgs_L
-      /// \brief List of sensor messages.
-      typedef std::list<boost::shared_ptr<msgs::Sensor const> > SensorMsgs_L;
-
-      /// \brief List of sensor message to process.
-      private: SensorMsgs_L sensorMsgs;
-
-      /// \def RequestMsgs_L
-      /// \brief List of request messages.
-      typedef std::list<boost::shared_ptr<msgs::Request const> > RequestMsgs_L;
-      /// \brief List of request message to process.
-      private: RequestMsgs_L requestMsgs;
-
-      /// \def Visual_M
-      /// \brief Map of visuals and their names.
-      typedef std::map<uint32_t, VisualPtr> Visual_M;
-
-      /// \brief Map of all the visuals in this scene.
-      private: Visual_M visuals;
-
-      /// \def Light_M
-      /// \brief Map of lights
-      typedef std::map<std::string, LightPtr> Light_M;
-
-      /// \brief Map of all the lights in this scene.
-      private: Light_M lights;
-
-      /// \def SkeletonPoseMsgs_L
-      /// \brief List of skeleton messages.
-      typedef std::list<boost::shared_ptr<msgs::PoseAnimation const> >
-                                                          SkeletonPoseMsgs_L;
-      /// \brief List of skeleton message to process.
-      private: SkeletonPoseMsgs_L skeletonPoseMsgs;
-
-      /// \brief A message used to select an object.
-      private: boost::shared_ptr<msgs::Selection const> selectionMsg;
-
-      /// \brief Mutex to lock the various message buffers.
-      private: boost::mutex *receiveMutex;
-
-      /// \brief Mutex to lock the pose message buffers.
-      private: boost::recursive_mutex poseMsgMutex;
-
-      /// \brief Communication Node
-      private: transport::NodePtr node;
-
-      /// \brief Subscribe to sensor topic
-      private: transport::SubscriberPtr sensorSub;
-
-      /// \brief Subscribe to scene topic
-      private: transport::SubscriberPtr sceneSub;
-
-      /// \brief Subscribe to the request topic
-      private: transport::SubscriberPtr requestSub;
-
-      /// \brief Subscribe to visual topic
-      private: transport::SubscriberPtr visSub;
-
-      /// \brief Subscribe to light topics
-      private: transport::SubscriberPtr lightSub;
-
-      /// \brief Subscribe to pose updates
-      private: transport::SubscriberPtr poseSub;
-
-      /// \brief Subscribe to joint updates.
-      private: transport::SubscriberPtr jointSub;
-
-      /// \brief Subscribe to selection updates.
-      private: transport::SubscriberPtr selectionSub;
-
-      /// \brief Subscribe to reponses.
-      private: transport::SubscriberPtr responseSub;
-
-      /// \brief Subscribe to skeleton pose updates.
-      private: transport::SubscriberPtr skeletonPoseSub;
-
-      /// \brief Subscribe to sky updates.
-      private: transport::SubscriberPtr skySub;
-
-      /// \brief Subscribe to model info updates
-      private: transport::SubscriberPtr modelInfoSub;
-
-      /// \brief Publish light updates.
-      private: transport::PublisherPtr lightPub;
-
-      /// \brief Respond to requests.
-      private: transport::PublisherPtr responsePub;
-
-      /// \brief Publish requests
-      private: transport::PublisherPtr requestPub;
-
-      /// \brief Event connections
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief The top level in our tree of visuals
-      private: VisualPtr worldVisual;
-
-      /// \brief Pointer to a visual selected by a user via the GUI.
-      private: VisualPtr selectedVis;
-
-      /// \brief Selection mode (normal or move). Normal means the the
-      /// object is just selection, and not being moved by the user. Move
-      /// means the object is being actively moved by the user and the Scene
-      /// should then ignore pose updates from the physics engine until
-      /// after the move is complete.
-      private: std::string selectionMode;
-
-      /// \brief Keep around our request message.
-      private: msgs::Request *requestMsg;
-
-      /// \brief True if visualizations should be rendered.
-      private: bool enableVisualizations;
-
-      /// \brief The heightmap, if any.
-      private: Heightmap *terrain;
-
-      /// \brief All the projectors.
-      private: std::map<std::string, Projector *> projectors;
-
-      /// \brief Pointer to the sky.
-      public: SkyX::SkyX *skyx;
-
-      /// \brief Controls the sky.
-      private: SkyX::BasicController *skyxController;
-
-      /// \brief True when all COMs should be visualized.
-      private: bool showCOMs;
-
-      /// \brief True when all collisions should be visualized.
-      private: bool showCollisions;
-
-      /// \brief True when all joints should be visualized.
-      private: bool showJoints;
-
-      /// \brief True when all objects should be transparent.
-      private: bool transparent;
-
-      /// \brief True when all objects should be wireframe.
-      private: bool wireframe;
-
-      /// \brief Initialized.
-      private: bool initialized;
-
-      /// \brief SimTime of this Scene, as we receive PosesStamped from
-      /// the world, we update this time accordingly.
-      private: common::Time sceneSimTimePosesReceived;
-
-      /// \brief SimTime of this Scene, after applying PosesStamped to
-      /// scene, we update this time accordingly.
-      private: common::Time sceneSimTimePosesApplied;
-
-      /// \brief Keeps track of the visual ID for contact visualization.
-      private: uint32_t contactVisId;
-
-      /// \def JointMsgs_M
-      /// \brief Map of joint names to joint messages.
-      typedef boost::unordered_map<std::string,
-          boost::shared_ptr<msgs::Joint const> > JointMsgs_M;
-
-      /// \brief Keep track of data of joints.
-      private: JointMsgs_M joints;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: ScenePrivate *dataPtr;
     };
     /// \}
   }

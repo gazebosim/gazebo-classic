@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,8 @@ ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
   this->messageLabel = new QLabel;
   this->messageLabel->setText(
       tr("You can import a 3D mesh that you have \n"
-      "made with a modelling tool such as Blender \n"
-      "Maya, or SolidWorks. It will apear as a \n"
+      "made with a modelling tool such as Blender, \n"
+      "Maya or SolidWorks. It will appear as a \n"
       "part in the 3D View."));
 
   this->pathLineEdit = new QLineEdit;
