@@ -1829,7 +1829,7 @@ TEST_F(MsgsTest, ModelToSDF)
   frontJoint->set_child("front_wheel");
   const math::Vector3 frontAxis(0, 1, 0);
   msgs::Set(frontJoint->mutable_axis1()->mutable_xyz(), frontAxis);
-  
+
   // Rear wheel joint
   model.add_joint();
   ASSERT_EQ(model.joint_size(), 2);

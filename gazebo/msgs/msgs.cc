@@ -1850,7 +1850,6 @@ namespace gazebo
       return modelSDF;
     }
 
-
     ////////////////////////////////////////////////////////
     sdf::ElementPtr JointToSDF(const msgs::Joint &_msg, sdf::ElementPtr _sdf)
     {

@@ -1084,7 +1084,7 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
   auto link = model.mutable_link(0);
   link->set_name("body");
   link->mutable_collision(0)->set_name("geom");
- 
+
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
@@ -1112,7 +1112,7 @@ void ServerFixture::SpawnSphere(const std::string &_name,
   auto link = model.mutable_link(0);
   link->set_name("body");
   link->mutable_collision(0)->set_name("geom");
- 
+
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
@@ -1143,7 +1143,7 @@ void ServerFixture::SpawnSphere(const std::string &_name,
   link->mutable_collision(0)->set_name("geom");
   msgs::Set(link->mutable_inertial()->mutable_pose(),
             math::Pose(_cog, math::Quaternion()));
- 
+
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
