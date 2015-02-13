@@ -33,7 +33,6 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/OrbitViewController.hh"
 #include "gazebo/rendering/FPSViewController.hh"
-#include "gazebo/rendering/SelectionObj.hh"
 
 #include "gazebo/gui/ModelAlign.hh"
 #include "gazebo/gui/ModelSnap.hh"
@@ -813,7 +812,8 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
     gzerr << "Unable to connect to a running Gazebo master.\n";
 
   if (_scene->GetUserCameraCount() == 0)
-    this->userCamera = _scene->CreateUserCamera(cameraName);
+    this->userCamera = _scene->CreateUserCamera(cameraName,
+        gazebo::gui::getINIProperty<int>("rendering.stereo", 0));
   else
     this->userCamera = _scene->GetUserCamera(0);
 

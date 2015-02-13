@@ -34,6 +34,13 @@ namespace gazebo
 {
   namespace msgs
   {
+    /// \internal
+    /// \brief Internal function to create an SDF element from msgs::Axis.
+    /// It is only intended to be used by JointToSDF.
+    /// \param[in] _msg The msgs::Axis object.
+    /// \param[in] _sdf sdf::ElementPtr to fill with data.
+    void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf);
+
     /// Create a request message
     msgs::Request *CreateRequest(const std::string &_request,
         const std::string &_data)
@@ -818,7 +825,7 @@ namespace gazebo
       // Load the geometry
       if (_sdf->HasElement("geometry"))
       {
-        msgs::Geometry *geomMsg = result.mutable_geometry();
+        auto geomMsg = result.mutable_geometry();
         geomMsg->CopyFrom(GeometryFromSDF(_sdf->GetElement("geometry")));
       }
 
@@ -826,7 +833,7 @@ namespace gazebo
       if (_sdf->HasElement("material"))
       {
         sdf::ElementPtr elem = _sdf->GetElement("material");
-        msgs::Material *matMsg = result.mutable_material();
+        auto matMsg = result.mutable_material();
 
         if (elem->HasElement("script"))
         {
@@ -1768,6 +1775,102 @@ namespace gazebo
       sdf::readString(tmp, pluginSDF);
 
       return pluginSDF;
+    }
+
+    ////////////////////////////////////////////////////////
+    sdf::ElementPtr JointToSDF(const msgs::Joint &_msg, sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr jointSDF;
+
+      if (_sdf)
+      {
+        jointSDF = _sdf;
+      }
+      else
+      {
+        jointSDF.reset(new sdf::Element);
+        sdf::initFile("joint.sdf", jointSDF);
+      }
+
+      if (_msg.has_name())
+        jointSDF->GetAttribute("name")->Set(_msg.name());
+      if (_msg.has_type())
+        jointSDF->GetAttribute("type")->Set(ConvertJointType(_msg.type()));
+      // ignore the id field, since it's not used in sdformat
+      // ignore the parent_id field, since it's not used in sdformat
+      // ignore the child_id field, since it's not used in sdformat
+      // ignore the angle field, since it's not used in sdformat
+      if (_msg.has_parent())
+        jointSDF->GetElement("parent")->Set(_msg.parent());
+      if (_msg.has_child())
+        jointSDF->GetElement("child")->Set(_msg.child());
+      if (_msg.has_pose())
+        jointSDF->GetElement("pose")->Set(Convert(_msg.pose()));
+      if (_msg.has_axis1())
+        AxisToSDF(_msg.axis1(), jointSDF->GetElement("axis"));
+      if (_msg.has_axis2())
+        AxisToSDF(_msg.axis2(), jointSDF->GetElement("axis2"));
+
+      auto odePhysicsElem = jointSDF->GetElement("physics")->GetElement("ode");
+      if (_msg.has_cfm())
+        odePhysicsElem->GetElement("cfm")->Set(_msg.cfm());
+      if (_msg.has_bounce())
+        odePhysicsElem->GetElement("bounce")->Set(_msg.bounce());
+      if (_msg.has_velocity())
+        odePhysicsElem->GetElement("velocity")->Set(_msg.velocity());
+      if (_msg.has_fudge_factor())
+        odePhysicsElem->GetElement("fudge_factor")->Set(_msg.fudge_factor());
+
+      {
+        auto limitElem = odePhysicsElem->GetElement("limit");
+        if (_msg.has_limit_cfm())
+          limitElem->GetElement("cfm")->Set(_msg.limit_cfm());
+        if (_msg.has_limit_erp())
+          limitElem->GetElement("erp")->Set(_msg.limit_erp());
+      }
+
+      {
+        auto suspensionElem = odePhysicsElem->GetElement("suspension");
+        if (_msg.has_suspension_cfm())
+          suspensionElem->GetElement("cfm")->Set(_msg.suspension_cfm());
+        if (_msg.has_suspension_erp())
+          suspensionElem->GetElement("erp")->Set(_msg.suspension_erp());
+      }
+      /// \todo JointToSDF currently does not convert sensor data
+
+      return jointSDF;
+    }
+
+    ////////////////////////////////////////////////////////
+    void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf)
+    {
+      if (_msg.has_xyz())
+        _sdf->GetElement("xyz")->Set(Convert(_msg.xyz()));
+      if (_msg.has_use_parent_model_frame())
+      {
+        _sdf->GetElement("use_parent_model_frame")->Set(
+          _msg.use_parent_model_frame());
+      }
+
+      {
+        auto dynamicsElem = _sdf->GetElement("dynamics");
+        if (_msg.has_damping())
+          dynamicsElem->GetElement("damping")->Set(_msg.damping());
+        if (_msg.has_friction())
+          dynamicsElem->GetElement("friction")->Set(_msg.friction());
+      }
+
+      {
+        auto limitElem = _sdf->GetElement("limit");
+        if (_msg.has_limit_lower())
+          limitElem->GetElement("lower")->Set(_msg.limit_lower());
+        if (_msg.has_limit_upper())
+          limitElem->GetElement("upper")->Set(_msg.limit_upper());
+        if (_msg.has_limit_effort())
+          limitElem->GetElement("effort")->Set(_msg.limit_effort());
+        if (_msg.has_limit_velocity())
+          limitElem->GetElement("velocity")->Set(_msg.limit_velocity());
+      }
     }
   }
 }
