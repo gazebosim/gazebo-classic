@@ -1102,27 +1102,7 @@ void ServerFixture::SpawnSphere(const std::string &_name,
     const math::Vector3 &_pos, const math::Vector3 &_rpy,
     bool _wait, bool _static)
 {
-  msgs::Factory msg;
-  std::ostringstream newModelStr;
-  msgs::Model model;
-  model.set_name(_name);
-  model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
-  msgs::AddSphereLink(model, 1.0, 0.5);
-  auto link = model.mutable_link(0);
-  link->set_name("body");
-  link->mutable_collision(0)->set_name("geom");
-
-  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << msgs::ModelToSDF(model)->ToString("")
-    << "</sdf>";
-
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
-
-  // Wait for the entity to spawn
-  while (_wait && !this->HasEntity(_name))
-    common::Time::MSleep(100);
+  SpawnSphere(_name, _pos, _rpy, math::Vector3(), 0.5, _wait, _static);
 }
 
 /////////////////////////////////////////////////
