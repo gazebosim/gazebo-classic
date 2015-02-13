@@ -150,6 +150,13 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
     {
       EXPECT_NEAR(angleErrorMax.Value(), 0.0, g_tolerance);
     }
+
+    // Set upper joint limit to 4 pi rad and step another 1.5 seconds.
+    const math::Angle highStop(4*M_PI);
+    joint->SetHighStop(0, highStop);
+    EXPECT_EQ(highStop, joint->GetHighStop(0));
+    world->Step(stepSize * stepCount);
+    EXPECT_LT(joint->GetAngle(0), highStop);
   }
 }
 
