@@ -21,7 +21,7 @@
     <physics name="preset_2" type="ode">
       <max_step_size>0.02</max_step_size>
 
-      <!--<ode>
+      <ode>
         <solver>
           <min_step_size>0.002</min_step_size>
           <iters>100</iters>
@@ -32,7 +32,7 @@
           <erp>0.6</erp>
         </constraints>
 
-      </ode>-->
+      </ode>
       <!--<bullet>
         <solver>
           <min_step_size>0.002</min_step_size>
