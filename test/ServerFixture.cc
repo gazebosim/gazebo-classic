@@ -1077,17 +1077,24 @@ void ServerFixture::SpawnSphere(const std::string &_name,
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
-  msgs::Model model;
-  model.set_name(_name);
-  model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
-  msgs::AddSphereLink(model, 1.0, 0.5);
-  auto link = model.mutable_link(0);
-  link->set_name("body");
-  link->mutable_collision(0)->set_name("geom");
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << msgs::ModelToSDF(model)->ToString("")
+    << "<model name ='" << _name << "'>"
+    << "<static>" << _static << "</static>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<link name ='body'>"
+    << "  <collision name ='geom'>"
+    << "    <geometry>"
+    << "      <sphere><radius>.5</radius></sphere>"
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << "      <sphere><radius>.5</radius></sphere>"
+    << "    </geometry>"
+    << "  </visual>"
+    << "</link>"
+    << "</model>"
     << "</sdf>";
 
   msg.set_sdf(newModelStr.str());
