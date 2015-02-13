@@ -156,7 +156,7 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
     joint->SetHighStop(0, highStop);
     EXPECT_EQ(highStop, joint->GetHighStop(0));
     world->Step(stepSize * stepCount);
-    EXPECT_LT(joint->GetAngle(0), highStop);
+    EXPECT_LT(joint->GetAngle(0).Radian(), highStop.Radian() + g_tolerance);
   }
 }
 
