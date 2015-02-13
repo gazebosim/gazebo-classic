@@ -193,6 +193,15 @@ namespace gazebo
       /// \return True if stereo is enabled.
       public: bool StereoEnabled() const;
 
+      /// \brief Turn on/off stereo rendering. Stereo must be initially enable in 
+      /// the ~/.gazebo/gui.ini file using:
+      ///
+      ///     [rendering]
+      ///     stereo=1
+      ///
+      /// \param[in] _enable True to turn on stereo, false to turn off.
+      public: void EnableStereo(bool _enable);
+
       /// \brief Set the camera to be attached to a visual.
       ///
       /// This causes the camera to move in relation to the specified visual.

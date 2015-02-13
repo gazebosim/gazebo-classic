@@ -769,3 +769,28 @@ bool UserCamera::StereoEnabled() const
 {
   return this->dataPtr->stereoEnabled;
 }
+
+//////////////////////////////////////////////////
+void UserCamera::EnableStereo(bool _enable)
+{
+  if (this->dataPtr->rightViewport)
+  {
+    if (_enable)
+    {
+      this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
+      this->dataPtr->rightViewport->setAutoUpdated(true);
+      this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
+    }
+    else
+    {
+      this->dataPtr->rightViewport->setAutoUpdated(false);
+      this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK);
+      this->viewport->setDrawBuffer(Ogre::CBT_BACK);
+    }
+  }
+  else
+  {
+    gzwarn << "Tried to enable/disable stereo. "
+           << "However, stereo is turned on via the gui.ini file.\n";
+  }
+}
