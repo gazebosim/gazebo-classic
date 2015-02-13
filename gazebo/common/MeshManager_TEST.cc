@@ -20,12 +20,14 @@
 #include "test_config.h"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/MeshManager.hh"
+#include "gazebo/gazebo_config.h"
 #include "test/util.hh"
 
 using namespace gazebo;
 
 class MeshManager : public gazebo::testing::AutoLogFixture { };
 
+#ifdef HAVE_GTS
 /////////////////////////////////////////////////
 TEST_F(MeshManager, CreateExtrudedPolyline)
 {
@@ -147,6 +149,7 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
     EXPECT_TRUE((math::equal(v.z, 0.0) || math::equal(v.z, 2.0)));
   }
 }
+#endif
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

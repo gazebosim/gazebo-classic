@@ -91,6 +91,27 @@ set (headers
   ffmpeg_inc.h
  )
 
+set (gtest_sources
+  Animation_TEST.cc
+  ColladaExporter_TEST.cc
+  ColladaLoader_TEST.cc
+  Color_TEST.cc
+  CommonIface_TEST.cc
+  Console_TEST.cc
+  Dem_TEST.cc
+  Exception_TEST.cc
+  Event_TEST.cc
+  Image_TEST.cc
+  ImageHeightmap_TEST.cc
+  Material_TEST.cc
+  Mesh_TEST.cc
+  MeshManager_TEST.cc
+  MovingWindowFilter_TEST.cc
+  SphericalCoordinates_TEST.cc
+  SystemPaths_TEST.cc
+  Time_TEST.cc
+)
+
 if (HAVE_GTS)
 set (sources
   ${sources}
@@ -102,29 +123,12 @@ set (headers
   GTSMeshUtils.hh
   MeshCSG.hh
 )
-endif()
 
 set (gtest_sources
-  Animation_TEST.cc
-  ColladaExporter_TEST.cc
-  ColladaLoader_TEST.cc
-  Color_TEST.cc
-  CommonIface_TEST.cc
-  Console_TEST.cc
-  Dem_TEST.cc
-  Exception_TEST.cc
-  Event_TEST.cc
+  ${gtest_sources}
   GTSMeshUtils_TEST.cc
-  Image_TEST.cc
-  ImageHeightmap_TEST.cc
-  Material_TEST.cc
-  Mesh_TEST.cc
-  MeshManager_TEST.cc
-  MovingWindowFilter_TEST.cc
-  SphericalCoordinates_TEST.cc
-  SystemPaths_TEST.cc
-  Time_TEST.cc
 )
+endif()
 
 if (HAVE_FFMPEG)
   set (gtest_sources ${gtest_sources}
