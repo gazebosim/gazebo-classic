@@ -362,6 +362,10 @@ if (PKG_CONFIG_FOUND)
     add_definitions( -DLIBBULLET_VERSION=0.0 )
     BUILD_WARNING ("Bullet > 2.82 not found, for bullet physics engine option, please install libbullet2.82-dev.")
   endif()
+  
+  if (BULLET_VERSION VERSION_GREATER 2.82)
+    add_definitions( -DLIBBULLET_VERSION_GT_282 )
+  endif()
 
 else (PKG_CONFIG_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)

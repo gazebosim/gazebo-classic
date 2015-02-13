@@ -118,6 +118,7 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
     ASSERT_TRUE(joint != NULL);
 
     // set velocity to 2 pi rad/s and step forward 1.5 seconds.
+    // angle should reach 3 pi rad.
     double vel = 2*M_PI;
     unsigned int stepSize = 50;
     unsigned int stepCount = 30;
@@ -138,7 +139,17 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
       double time = world->GetSimTime().Double();
       angleErrorMax.InsertData(joint->GetAngle(0).Radian() - time*vel);
     }
-    EXPECT_NEAR(angleErrorMax.Value(), 0.0, g_tolerance);
+#ifndef LIBBULLET_VERSION_GT_282
+    if (_physicsEngine == "bullet")
+    {
+      gzerr << "Skipping portion of test, angle wrapping requires bullet 2.83"
+            << std::endl;
+    }
+    else
+#endif
+    {
+      EXPECT_NEAR(angleErrorMax.Value(), 0.0, g_tolerance);
+    }
   }
 }
 

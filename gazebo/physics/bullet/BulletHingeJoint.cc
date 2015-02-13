@@ -105,7 +105,11 @@ void BulletHingeJoint::Init()
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
+#ifdef LIBBULLET_VERSION_GT_282
+    this->bulletHinge = new btHingeAccumulatedAngleConstraint(
+#else
     this->bulletHinge = new btHingeConstraint(
+#endif
         *(bulletChildLink->GetBulletLink()),
         *(bulletParentLink->GetBulletLink()),
         BulletTypes::ConvertVector3(pivotChild),
@@ -117,7 +121,11 @@ void BulletHingeJoint::Init()
   // and the world.
   else if (bulletChildLink)
   {
+#ifdef LIBBULLET_VERSION_GT_282
+    this->bulletHinge = new btHingeAccumulatedAngleConstraint(
+#else
     this->bulletHinge = new btHingeConstraint(
+#endif
         *(bulletChildLink->GetBulletLink()),
         BulletTypes::ConvertVector3(pivotChild),
         BulletTypes::ConvertVector3(axisChild));
@@ -126,7 +134,11 @@ void BulletHingeJoint::Init()
   // and the world.
   else if (bulletParentLink)
   {
+#ifdef LIBBULLET_VERSION_GT_282
+    this->bulletHinge = new btHingeAccumulatedAngleConstraint(
+#else
     this->bulletHinge = new btHingeConstraint(
+#endif
         *(bulletParentLink->GetBulletLink()),
         BulletTypes::ConvertVector3(pivotParent),
         BulletTypes::ConvertVector3(axisParent));
@@ -219,7 +231,18 @@ math::Angle BulletHingeJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   math::Angle result;
   if (this->bulletHinge)
-    result = this->bulletHinge->getHingeAngle() - this->angleOffset;
+  {
+#ifdef LIBBULLET_VERSION_GT_282
+    btHingeAccumulatedAngleConstraint* hinge =
+      static_cast<btHingeAccumulatedAngleConstraint*>(this->bulletHinge);
+    if (hinge)
+      result = hinge->getAccumulatedHingeAngle();
+    else
+#else
+      result = this->bulletHinge->getHingeAngle();
+#endif
+    result -= this->angleOffset;
+  }
   return result;
 }
 
