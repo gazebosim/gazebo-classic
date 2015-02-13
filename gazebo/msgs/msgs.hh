@@ -407,6 +407,17 @@ namespace gazebo
     void AddBoxLink(msgs::Model &_model, const double _mass,
                     const math::Vector3 &_size);
 
+    /// \brief Add a simple sphere link to a Model message.
+    /// The size and mass of the sphere are specified, and a
+    /// single collision is added, along with an inertial
+    /// block corresponding to sphere of uniform density.
+    /// \param[out] _model The msgs::Model to which the link is added.
+    /// \param[in] _mass Mass of the sphere.
+    /// \param[in] _radius Radius of the sphere.
+    GAZEBO_VISIBLE
+    void AddSphereLink(msgs::Model &_model, const double _mass,
+                    const double _radius);
+
     /// \brief Create an SDF element from msgs::Model.
     /// \param[in] _msg The msgs::Model object.
     /// \param[in] _sdf if supplied, performs an update from _sdf instead of

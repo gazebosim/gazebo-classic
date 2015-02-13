@@ -1749,6 +1749,29 @@ namespace gazebo
     }
 
     ////////////////////////////////////////////////////////
+    void AddSphereLink(Model &_model, const double _mass,
+                    const double _radius)
+    {
+      Geometry geometry;
+      geometry.set_type(Geometry_Type_SPHERE);
+      geometry.mutable_sphere()->set_radius(_radius);
+
+      AddLinkGeom(_model, geometry);
+      int linkCount = _model.link_size();
+      auto link = _model.mutable_link(linkCount-1);
+
+      auto inertial = link->mutable_inertial();
+      inertial->set_mass(_mass);
+      const double ixx = _mass * 0.4 * _radius * _radius;
+      inertial->set_ixx(ixx);
+      inertial->set_iyy(ixx);
+      inertial->set_izz(ixx);
+      inertial->set_ixy(0.0);
+      inertial->set_ixz(0.0);
+      inertial->set_iyz(0.0);
+    }
+
+    ////////////////////////////////////////////////////////
     sdf::ElementPtr ModelToSDF(const msgs::Model &_msg, sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr modelSDF;
