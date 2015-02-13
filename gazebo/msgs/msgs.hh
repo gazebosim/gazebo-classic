@@ -399,7 +399,7 @@ namespace gazebo
     /// \brief Add a simple box link to a Model message.
     /// The size and mass of the box are specified, and a
     /// single collision is added, along with an inertial
-    /// block corresponding to box of uniform density.
+    /// block corresponding to a box of uniform density.
     /// \param[out] _model The msgs::Model to which the link is added.
     /// \param[in] _mass Mass of the box.
     /// \param[in] _size Size of the box.
@@ -407,10 +407,23 @@ namespace gazebo
     void AddBoxLink(msgs::Model &_model, const double _mass,
                     const math::Vector3 &_size);
 
+    /// \brief Add a simple cylinder link to a Model message.
+    /// The radius, length, and mass of the cylinder are specified, and a
+    /// single collision is added, along with an inertial
+    /// block corresponding to a cylinder of uniform density
+    /// with an axis of symmetry along the Z axis.
+    /// \param[out] _model The msgs::Model to which the link is added.
+    /// \param[in] _mass Mass of the cylinder.
+    /// \param[in] _radius Radius of the cylinder.
+    /// \param[in] _length Length of the cylinder.
+    GAZEBO_VISIBLE
+    void AddCylinderLink(msgs::Model &_model, const double _mass,
+                         const double _radius, const double _length);
+
     /// \brief Add a simple sphere link to a Model message.
     /// The size and mass of the sphere are specified, and a
     /// single collision is added, along with an inertial
-    /// block corresponding to sphere of uniform density.
+    /// block corresponding to a sphere of uniform density.
     /// \param[out] _model The msgs::Model to which the link is added.
     /// \param[in] _mass Mass of the sphere.
     /// \param[in] _radius Radius of the sphere.

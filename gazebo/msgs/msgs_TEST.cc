@@ -1631,6 +1631,77 @@ TEST_F(MsgsTest, AddBoxLink)
 }
 
 /////////////////////////////////////////////////
+TEST_F(MsgsTest, AddCylinderLink)
+{
+  msgs::Model model;
+  EXPECT_EQ(model.link_size(), 0);
+
+  const double mass = 1.0;
+  const double radius = 0.5;
+  const double length = 2.5;
+  msgs::AddCylinderLink(model, mass, radius, length);
+  EXPECT_EQ(model.link_size(), 1);
+  {
+    auto link = model.link(0);
+    EXPECT_EQ(link.name(), std::string("link1"));
+
+    auto inertial = link.inertial();
+    EXPECT_DOUBLE_EQ(inertial.mass(), mass);
+    double ixx = inertial.ixx();
+    double iyy = inertial.iyy();
+    double izz = inertial.izz();
+    double ixy = inertial.ixy();
+    double ixz = inertial.ixz();
+    double iyz = inertial.iyz();
+    EXPECT_GT(ixx, 0.0);
+    EXPECT_GT(iyy, 0.0);
+    EXPECT_GT(izz, 0.0);
+    EXPECT_DOUBLE_EQ(ixy, 0.0);
+    EXPECT_DOUBLE_EQ(ixz, 0.0);
+    EXPECT_DOUBLE_EQ(iyz, 0.0);
+    // triangle inequality
+    EXPECT_GT(ixx + iyy, izz);
+    EXPECT_GT(iyy + izz, ixx);
+    EXPECT_GT(izz + ixx, iyy);
+
+    EXPECT_EQ(link.collision_size(), 1);
+    {
+      auto collision = link.collision(0);
+      auto geometry = collision.geometry();
+      EXPECT_EQ(geometry.type(), msgs::Geometry_Type_CYLINDER);
+      EXPECT_DOUBLE_EQ(geometry.cylinder().radius(), radius);
+      EXPECT_DOUBLE_EQ(geometry.cylinder().length(), length);
+    }
+
+    EXPECT_EQ(link.visual_size(), 1);
+    {
+      auto visual = link.visual(0);
+      auto geometry = visual.geometry();
+      EXPECT_EQ(geometry.type(), msgs::Geometry_Type_CYLINDER);
+      EXPECT_DOUBLE_EQ(geometry.cylinder().radius(), radius);
+      EXPECT_DOUBLE_EQ(geometry.cylinder().length(), length);
+    }
+  }
+
+  const double massRatio = 2.0;
+  msgs::AddCylinderLink(model, mass*massRatio, radius, length);
+  EXPECT_EQ(model.link_size(), 2);
+  {
+    auto link1 = model.link(0);
+    auto link2 = model.link(1);
+    EXPECT_EQ(link2.name(), std::string("link2"));
+
+    auto inertial1 = link1.inertial();
+    auto inertial2 = link2.inertial();
+
+    EXPECT_NEAR(massRatio * inertial1.mass(), inertial2.mass(), 1e-6);
+    EXPECT_NEAR(massRatio * inertial1.ixx(),  inertial2.ixx(),  1e-6);
+    EXPECT_NEAR(massRatio * inertial1.iyy(),  inertial2.iyy(),  1e-6);
+    EXPECT_NEAR(massRatio * inertial1.izz(),  inertial2.izz(),  1e-6);
+  }
+}
+
+/////////////////////////////////////////////////
 TEST_F(MsgsTest, AddSphereLink)
 {
   msgs::Model model;

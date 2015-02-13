@@ -1749,8 +1749,36 @@ namespace gazebo
     }
 
     ////////////////////////////////////////////////////////
+    void AddCylinderLink(Model &_model,
+                         const double _mass,
+                         const double _radius,
+                         const double _length)
+    {
+      Geometry geometry;
+      geometry.set_type(Geometry_Type_CYLINDER);
+      geometry.mutable_cylinder()->set_radius(_radius);
+      geometry.mutable_cylinder()->set_length(_length);
+
+      AddLinkGeom(_model, geometry);
+      int linkCount = _model.link_size();
+      auto link = _model.mutable_link(linkCount-1);
+
+      auto inertial = link->mutable_inertial();
+      inertial->set_mass(_mass);
+      const double r2 = _radius * _radius;
+      const double ixx = _mass * (0.25 * r2 + _length*_length / 12.0);
+      const double izz = _mass * 0.5 * r2;
+      inertial->set_ixx(ixx);
+      inertial->set_iyy(ixx);
+      inertial->set_izz(izz);
+      inertial->set_ixy(0.0);
+      inertial->set_ixz(0.0);
+      inertial->set_iyz(0.0);
+    }
+
+    ////////////////////////////////////////////////////////
     void AddSphereLink(Model &_model, const double _mass,
-                    const double _radius)
+                       const double _radius)
     {
       Geometry geometry;
       geometry.set_type(Geometry_Type_SPHERE);
