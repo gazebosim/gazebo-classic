@@ -20,6 +20,7 @@
 #include "gazebo/math/Plane.hh"
 #include "gazebo/math/Matrix3.hh"
 #include "gazebo/math/Matrix4.hh"
+#include "gazebo/math/Vector2i.hh"
 
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
@@ -483,16 +484,12 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
 
 //////////////////////////////////////////////////
 void MeshManager::CreateExtrudedPolyline(const std::string &_name,
-    const std::vector<math::Vector2d> &_vertices,
-    const double &_height, const math::Vector2d & /*_uvCoords*/)
+    const std::vector<std::vector<math::Vector2d> > &_path, double _height)
 {
   if (this->HasMesh(_name))
   {
     return;
   }
-
-  int i;
-  int numSides = _vertices.size();
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
@@ -501,108 +498,200 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
+  // sanity check to make sure we have at least 3 points in the path
+  // Remove last vertices if it's the same as the first one - the
+  // delaunay triangluation algorithm should already assume the paths are closed
+  std::vector<std::vector<math::Vector2d> > path = _path;
+  std::vector<std::vector<math::Vector2d> >::iterator it;
+  for (it = path.begin(); it != path.end();)
+  {
+    unsigned int pathSize = (*it).size();
+    if (pathSize < 3)
+      it = path.erase(it);
+    else
+    {
+      if ((*it)[0] == (*it)[pathSize-1])
+        (*it).pop_back();
+      ++it;
+    }
+  }
+
   #if HAVE_GTS
   {
-    if (!GTSMeshUtils::CreateExtrudedPolyline(_vertices, _height, subMesh))
+    if (!GTSMeshUtils::DelaunayTriangulation(path, subMesh))
     {
-      gzerr << "Unable to create extruded polyline.\n";
+      gzerr << "Unable to triangulate polyline." << std::endl;
       delete mesh;
       return;
     }
   }
   #else
   {
-    gzerr << "GTS library not found.\n" <<
-             "Polylines rendered may be incorrect, if concave\n";
-
-    // Add the vertices
-    for (i = 0; i < numSides; ++i)
-    {
-      subMesh->AddVertex(_vertices[i].x, _vertices[i].y, 0.0);
-      subMesh->AddVertex(_vertices[i].x, _vertices[i].y, _height);
-    }
-
-    // Euler's Formula: numFaces = numEdges - numVertices + 2
-    //                           = numSides + 2
-    // # of SideFaces = numFaces - (upper face + lower face)
-    //                = numFaces - 2
-    //                = numSides
-
-    // for lower face
-    int startVert = 0;
-    int endVert = numSides * 2 - 2;
-    subMesh->AddIndex(startVert);
-    startVert += 2;
-    subMesh->AddIndex(startVert);
-    subMesh->AddIndex(endVert);
-    for (i = 1; i < numSides-2; ++i)
-    {
-      if (i%2)
-      {
-        subMesh->AddIndex(startVert);
-        startVert += 2;
-        subMesh->AddIndex(startVert);
-        subMesh->AddIndex(endVert);
-      }
-      else
-      {
-        subMesh->AddIndex(endVert);
-        endVert -= 2;
-        subMesh->AddIndex(startVert);
-        subMesh->AddIndex(endVert);
-      }
-    }
-
-    // for upper face
-    startVert = 1;
-    endVert = numSides*2-1;
-    subMesh->AddIndex(startVert);
-    startVert += 2;
-    subMesh->AddIndex(endVert);
-    subMesh->AddIndex(startVert);
-    for (i = 1; i < numSides-2; ++i)
-    {
-      if (!i%2)
-      {
-        subMesh->AddIndex(startVert);
-        startVert += 2;
-        subMesh->AddIndex(startVert);
-        subMesh->AddIndex(endVert);
-      }
-      else
-      {
-        subMesh->AddIndex(endVert);
-        endVert -= 2;
-        subMesh->AddIndex(endVert);
-        subMesh->AddIndex(startVert);
-      }
-    }
+    gzerr << "GTS library not found. Can not extrude polyline" << std::endl;
   }
   #endif
 
-  // for each sideface
-  for (i = 0; i < numSides; ++i)
+  // create a list of all exterior edges.
+  std::vector<std::vector<math::Vector2d> > edges;
+  for (unsigned int i = 0; i < path.size(); ++i)
   {
-    subMesh->AddVertex(_vertices[i].x, _vertices[i].y, 0.0);
-    subMesh->AddVertex(_vertices[i].x, _vertices[i].y, _height);
-  }
-  subMesh->AddVertex(_vertices[0].x, _vertices[0].y, 0.0);
-  subMesh->AddVertex(_vertices[0].x, _vertices[0].y, _height);
+    for (unsigned int j = 0; j < path[i].size(); ++j)
+    {
+      if (j == 0)
+        continue;
 
-  for (i = 0; i < numSides; ++i)
+      std::vector<math::Vector2d> edge;
+      edge.resize(2);
+      edge[0] = path[i][j-1];
+      edge[1] = path[i][j];
+      edges.push_back(edge);
+    }
+    std::vector<math::Vector2d> edge;
+    edge.resize(2);
+    edge[0] = path[i][path[i].size()-1];
+    edge[1] = path[i][0];
+    edges.push_back(edge);
+  }
+
+  std::vector<math::Vector2i> edgeIndices;
+
+  std::vector<math::Vector3> normals;
+  for (unsigned int i  = 0; i < edges.size(); ++i)
   {
-    subMesh->AddIndex(i*2+numSides*2);
-    subMesh->AddIndex(i*2+1+numSides*2);
-    subMesh->AddIndex(i*2+2+numSides*2);
+    std::vector<math::Vector2d> edge = edges[i];
 
-    subMesh->AddIndex(i*2+2+numSides*2);
-    subMesh->AddIndex(i*2+1+numSides*2);
-    subMesh->AddIndex(i*2+3+numSides*2);
+    for (unsigned int j = 0; j < subMesh->GetIndexCount(); j+=3)
+    {
+      math::Vector3 v0 = subMesh->GetVertex(subMesh->GetIndex(j));
+      math::Vector3 v1 = subMesh->GetVertex(subMesh->GetIndex(j+1));
+      math::Vector3 v2 = subMesh->GetVertex(subMesh->GetIndex(j+2));
+
+      std::vector<math::Vector3> triangle;
+      triangle.push_back(v0);
+      triangle.push_back(v1);
+      triangle.push_back(v2);
+
+      int ev0 = -1;
+      for (unsigned int k = 0; k < triangle.size(); ++k)
+      {
+        if (math::Vector2d(triangle[k].x, triangle[k].y) == edge[0])
+        {
+          // found a vertex in triangle that matches the vertex of the edge
+          ev0 = k;
+          break;
+        }
+      }
+      if (ev0 >=0)
+      {
+        int ev1 = -1;
+        int ev2 = -1;
+        for (unsigned int k = 0; k < triangle.size()-1; ++k)
+        {
+          int index = (ev0 + k + 1) % triangle.size();
+          math::Vector3 triV = triangle[index];
+          if (math::Vector2d(triV.x, triV.y) == edge[1])
+          {
+            // found another vertex in triangle that matches the vertex of the
+            // other edge.
+            ev1 = index;
+            // Store the index of the third triangle vertex.
+            // It's either 0, 1, or 2. Find it using simple bitwise operation.
+            ev2 =  ~(ev1 | ev0) & 0x03;
+            break;
+          }
+        }
+        if (ev1 >= 0 && ev2 >= 0 && ev0 != ev1 && ev0 != ev2)
+        {
+          // Found an edge in triangle that matches the exterior edge.
+          // Now find its normal.
+
+          math::Vector3 edgeVec = triangle[ev0] - triangle[ev1];
+          edgeVec.Normalize();
+          math::Vector3 normal(edgeVec.y, -edgeVec.x, 0);
+
+          math::Vector3 otherEdgeVec = triangle[ev0] - triangle[ev2];
+          otherEdgeVec.Normalize();
+          double angle0 = otherEdgeVec.Dot(normal);
+          double angle1 = otherEdgeVec.Dot(-normal);
+
+          if (angle0 > angle1)
+          {
+            if (angle0 >= 0)
+              normals.push_back(normal);
+          }
+          else
+          {
+            if (angle1 >= 0)
+              normals.push_back(-normal);
+          }
+          edgeIndices.push_back(math::Vector2i(j+ev1, j+ev0));
+        }
+      }
+    }
   }
 
-  if (subMesh->GetNormalCount() != subMesh->GetVertexCount())
-    subMesh->SetNormalCount(subMesh->GetVertexCount());
-  subMesh->RecalculateNormals();
+  // number of exterior edge normals found should be equal to the number of
+  // exterior edges
+  if (normals.size() != edges.size())
+  {
+    gzerr << "Unable to extrude mesh. Triangulation failed" << std::endl;
+    return;
+  }
+
+  // create the top face
+  unsigned int numVertices = subMesh->GetVertexCount();
+  for (unsigned int i = 0; i < numVertices; ++i)
+  {
+    math::Vector3 v = subMesh->GetVertex(i);
+    subMesh->AddVertex(v.x, v.y, _height);
+  }
+  unsigned int numIndices = subMesh->GetIndexCount();
+  for (unsigned int i = 0; i < numIndices; i+=3)
+  {
+    unsigned int i0 = subMesh->GetIndex(i);
+    unsigned int i1 = subMesh->GetIndex(i+1);
+    unsigned int i2 = subMesh->GetIndex(i+2);
+    subMesh->AddIndex(numVertices+i0);
+    subMesh->AddIndex(numVertices+i2);
+    subMesh->AddIndex(numVertices+i1);
+  }
+
+  // create the size faces
+  for (unsigned int i = 0; i < edges.size(); ++i)
+  {
+    math::Vector2d v0 = edges[i][0];
+    math::Vector2d v1 = edges[i][1];
+    math::Vector2d edge2d = v1 - v0;
+    math::Vector3 edge = math::Vector3(edge2d.x, edge2d.y, 0);
+    math::Vector3 cross = edge.Cross(normals[i]);
+
+    unsigned int vCount = subMesh->GetVertexCount();
+
+    subMesh->AddVertex(math::Vector3(v0.x, v0.y, 0));
+    if (cross.z >0)
+    {
+      subMesh->AddVertex(math::Vector3(v0.x, v0.y, _height));
+      subMesh->AddVertex(math::Vector3(v1.x, v1.y, _height));
+    }
+    else
+    {
+      subMesh->AddVertex(math::Vector3(v1.x, v1.y, _height));
+      subMesh->AddVertex(math::Vector3(v0.x, v0.y, _height));
+    }
+    subMesh->AddVertex(math::Vector3(v0.x, v0.y, 0));
+    if (cross.z >0)
+    {
+      subMesh->AddVertex(math::Vector3(v1.x, v1.y, _height));
+      subMesh->AddVertex(math::Vector3(v1.x, v1.y, 0));
+    }
+    else
+    {
+      subMesh->AddVertex(math::Vector3(v1.x, v1.y, 0));
+      subMesh->AddVertex(math::Vector3(v1.x, v1.y, _height));
+    }
+    for (unsigned int j = 0; j < 6; ++j)
+      subMesh->AddIndex(vCount++);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1123,4 +1212,3 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
   this->meshes.insert(std::make_pair(_name, mesh));
 }
 #endif
-
