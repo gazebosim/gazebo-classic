@@ -656,7 +656,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     subMesh->AddIndex(numVertices+i1);
   }
 
-  // create the size faces
+  // create the side faces
   for (unsigned int i = 0; i < edges.size(); ++i)
   {
     math::Vector2d v0 = edges[i][0];
