@@ -42,144 +42,36 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->setWindowTitle(tr("Apply Force and Torque"));
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
   this->setWindowModality(Qt::NonModal);
+  this->setStyleSheet(
+   "QPushButton{\
+      border-radius: 5px;\
+      border-radius: 5px;\
+    }");
 
   this->dataPtr->modelLabel = new QLabel();
 
   // Links list
   QHBoxLayout *linkLayout = new QHBoxLayout();
   QLabel *linkLabel = new QLabel();
-  linkLabel->setText(tr("Apply to link:"));
+  linkLabel->setText(tr("<b>Apply to link:<b> "));
   this->dataPtr->linksComboBox = new QComboBox();
+  this->dataPtr->linksComboBox->setMinimumWidth(200);
   connect(this->dataPtr->linksComboBox, SIGNAL(currentIndexChanged (QString)),
       this, SLOT(SetLink(QString)));
 
   linkLayout->addWidget(linkLabel);
   linkLayout->addWidget(this->dataPtr->linksComboBox);
 
-  // Force position
-  QCheckBox *forcePosCollapser = new QCheckBox();
-  forcePosCollapser->setChecked(false);
-  forcePosCollapser->setText("Reference Point");
-  forcePosCollapser->setStyleSheet(
-     "QCheckBox {\
-        color: #d0d0d0;\
-      }\
-      QCheckBox::indicator::unchecked {\
-        image: url(:/images/right_arrow.png);\
-      }\
-      QCheckBox::indicator::checked {\
-        image: url(:/images/down_arrow.png);\
-      }");
-  connect(forcePosCollapser, SIGNAL(toggled(bool)), this, SLOT(ToggleForcePos(bool)));
-
-  // CoM
-  QLabel *comLabel = new QLabel();
-  comLabel->setText(tr("Center of mass"));
-  this->dataPtr->comCheckBox = new QCheckBox();
-  this->dataPtr->comCheckBox->setChecked(true);
-  connect(this->dataPtr->comCheckBox, SIGNAL(toggled(bool)), this,
-      SLOT(ToggleComCheckBox(bool)));
-
-  // Force Position X
-  QLabel *forcePosXLabel = new QLabel();
-  forcePosXLabel->setText(tr("X:"));
-  QLabel *forcePosXUnitLabel = new QLabel();
-  forcePosXUnitLabel->setText(tr("m"));
-
-  this->dataPtr->forcePosXSpin = new QDoubleSpinBox();
-  this->dataPtr->forcePosXSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->forcePosXSpin->setSingleStep(0.1);
-  this->dataPtr->forcePosXSpin->setDecimals(3);
-  this->dataPtr->forcePosXSpin->setValue(0);
-  this->dataPtr->forcePosXSpin->setMaximumWidth(100);
-  this->dataPtr->forcePosXSpin->installEventFilter(this);
-  connect(this->dataPtr->forcePosXSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnForcePosXChanged(double)));
-
-  // Force Position Y
-  QLabel *forcePosYLabel = new QLabel();
-  forcePosYLabel->setText(tr("Y:"));
-  QLabel *forcePosYUnitLabel = new QLabel();
-  forcePosYUnitLabel->setText(tr("m"));
-
-  this->dataPtr->forcePosYSpin = new QDoubleSpinBox();
-  this->dataPtr->forcePosYSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->forcePosYSpin->setSingleStep(0.1);
-  this->dataPtr->forcePosYSpin->setDecimals(3);
-  this->dataPtr->forcePosYSpin->setValue(0);
-  this->dataPtr->forcePosYSpin->setMaximumWidth(100);
-  this->dataPtr->forcePosYSpin->installEventFilter(this);
-  connect(this->dataPtr->forcePosYSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnForcePosYChanged(double)));
-
-  // Force Position Z
-  QLabel *forcePosZLabel = new QLabel();
-  forcePosZLabel->setText(tr("Z:"));
-  QLabel *forcePosZUnitLabel = new QLabel();
-  forcePosZUnitLabel->setText(tr("m"));
-
-  this->dataPtr->forcePosZSpin = new QDoubleSpinBox();
-  this->dataPtr->forcePosZSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->forcePosZSpin->setSingleStep(0.1);
-  this->dataPtr->forcePosZSpin->setDecimals(3);
-  this->dataPtr->forcePosZSpin->setValue(0);
-  this->dataPtr->forcePosZSpin->setMaximumWidth(100);
-  this->dataPtr->forcePosZSpin->installEventFilter(this);
-  connect(this->dataPtr->forcePosZSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnForcePosZChanged(double)));
-
-  QGridLayout *forcePosCollapsible = new QGridLayout();
-  forcePosCollapsible->addWidget(comLabel, 0, 0);
-  forcePosCollapsible->addWidget(this->dataPtr->comCheckBox, 0, 1);
-  forcePosCollapsible->addWidget(forcePosXLabel, 1, 0);
-  forcePosCollapsible->addWidget(this->dataPtr->forcePosXSpin, 1, 1);
-  forcePosCollapsible->addWidget(forcePosXUnitLabel, 1, 2);
-  forcePosCollapsible->addWidget(forcePosYLabel, 2, 0);
-  forcePosCollapsible->addWidget(this->dataPtr->forcePosYSpin, 2, 1);
-  forcePosCollapsible->addWidget(forcePosYUnitLabel, 2, 2);
-  forcePosCollapsible->addWidget(forcePosZLabel, 3, 0);
-  forcePosCollapsible->addWidget(this->dataPtr->forcePosZSpin, 3, 1);
-  forcePosCollapsible->addWidget(forcePosZUnitLabel, 3, 2);
-
-  this->dataPtr->forcePosCollapsibleWidget = new QWidget();
-  this->dataPtr->forcePosCollapsibleWidget->setLayout(forcePosCollapsible);
-  this->dataPtr->forcePosCollapsibleWidget->hide();
-
-  QVBoxLayout *forcePosLayout = new QVBoxLayout();
-  forcePosLayout->addWidget(forcePosCollapser);
-  forcePosLayout->addWidget(this->dataPtr->forcePosCollapsibleWidget);
-
   // Force
-  QCheckBox *forceCollapser = new QCheckBox();
-  forceCollapser->setChecked(true);
-  forceCollapser->setText("Force");
-  forceCollapser->setStyleSheet(
-     "QCheckBox {\
-        color: #d0d0d0;\
-      }\
-      QCheckBox::indicator::unchecked {\
-        image: url(:/images/right_arrow.png);\
-      }\
-      QCheckBox::indicator::checked {\
-        image: url(:/images/down_arrow.png);\
-      }");
-  connect(forceCollapser, SIGNAL(toggled(bool)), this, SLOT(ToggleForce(bool)));
-
-  // Force magnitude
-  QLabel *forceMagLabel = new QLabel();
-  forceMagLabel->setText(tr("Total:"));
-  QLabel *forceMagUnitLabel = new QLabel();
-  forceMagUnitLabel->setText(tr("N"));
-
-  this->dataPtr->forceMagSpin = new QDoubleSpinBox();
-  this->dataPtr->forceMagSpin->setRange(0, GZ_DBL_MAX);
-  this->dataPtr->forceMagSpin->setSingleStep(100);
-  this->dataPtr->forceMagSpin->setDecimals(3);
-  this->dataPtr->forceMagSpin->setValue(0);
-  this->dataPtr->forceMagSpin->setMaximumWidth(100);
-  this->dataPtr->forceMagSpin->installEventFilter(this);
-  connect(this->dataPtr->forceMagSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnForceMagChanged(double)));
+  QLabel *forceLabel = new QLabel(tr(
+       "<font size=4>Force</font>"));
+  forceLabel->setObjectName("forceLabel");
+  forceLabel->setStyleSheet(
+   "QLabel#forceLabel{\
+      background-color: #444;\
+      border-radius: 5px;\
+      padding-left: 10px;\
+    }");
 
   // Force X
   QLabel *forceXLabel = new QLabel();
@@ -229,68 +121,163 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   connect(this->dataPtr->forceZSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForceZChanged(double)));
 
-  // Force clear
+  // Force total
+  QLabel *forceMagLabel = new QLabel();
+  forceMagLabel->setText(tr("Total:"));
+  QLabel *forceMagUnitLabel = new QLabel();
+  forceMagUnitLabel->setText(tr("N"));
+
+  this->dataPtr->forceMagSpin = new QDoubleSpinBox();
+  this->dataPtr->forceMagSpin->setRange(0, GZ_DBL_MAX);
+  this->dataPtr->forceMagSpin->setSingleStep(100);
+  this->dataPtr->forceMagSpin->setDecimals(3);
+  this->dataPtr->forceMagSpin->setValue(0);
+  this->dataPtr->forceMagSpin->setMaximumWidth(100);
+  this->dataPtr->forceMagSpin->installEventFilter(this);
+  connect(this->dataPtr->forceMagSpin, SIGNAL(valueChanged(double)), this,
+      SLOT(OnForceMagChanged(double)));
+
+  // Clear force
   QPushButton *forceClearButton = new QPushButton(tr("Clear"));
   connect(forceClearButton, SIGNAL(clicked()), this, SLOT(OnForceClear()));
 
+  // Force vector layout
   QGridLayout *forceVectorLayout = new QGridLayout();
-  forceVectorLayout->addWidget(forceXLabel, 0, 1);
-  forceVectorLayout->addWidget(this->dataPtr->forceXSpin, 0, 2);
-  forceVectorLayout->addWidget(forceXUnitLabel, 0, 3);
-  forceVectorLayout->addWidget(forceYLabel, 1, 1);
-  forceVectorLayout->addWidget(this->dataPtr->forceYSpin, 1, 2);
-  forceVectorLayout->addWidget(forceYUnitLabel, 1, 3);
-  forceVectorLayout->addWidget(forceZLabel, 2, 1);
-  forceVectorLayout->addWidget(this->dataPtr->forceZSpin, 2, 2);
-  forceVectorLayout->addWidget(forceZUnitLabel, 2, 3);
-  forceVectorLayout->addWidget(forceMagLabel, 3, 1);
-  forceVectorLayout->addWidget(this->dataPtr->forceMagSpin, 3, 2);
-  forceVectorLayout->addWidget(forceMagUnitLabel, 3, 3);
-  forceVectorLayout->addWidget(forceClearButton, 4, 0);
+  forceVectorLayout->addWidget(forceXLabel, 0, 0, Qt::AlignRight);
+  forceVectorLayout->addWidget(this->dataPtr->forceXSpin, 0, 1);
+  forceVectorLayout->addWidget(forceXUnitLabel, 0, 2);
+  forceVectorLayout->addWidget(forceYLabel, 1, 0, Qt::AlignRight);
+  forceVectorLayout->addWidget(this->dataPtr->forceYSpin, 1, 1);
+  forceVectorLayout->addWidget(forceYUnitLabel, 1, 2);
+  forceVectorLayout->addWidget(forceZLabel, 2, 0, Qt::AlignRight);
+  forceVectorLayout->addWidget(this->dataPtr->forceZSpin, 2, 1);
+  forceVectorLayout->addWidget(forceZUnitLabel, 2, 2);
+  forceVectorLayout->addWidget(forceMagLabel, 3, 0, Qt::AlignRight);
+  forceVectorLayout->addWidget(this->dataPtr->forceMagSpin, 3, 1);
+  forceVectorLayout->addWidget(forceMagUnitLabel, 3, 2);
+  forceVectorLayout->addWidget(forceClearButton, 4, 0, 1, 3, Qt::AlignLeft);
 
-  QVBoxLayout *forceCollapsible = new QVBoxLayout();
-  forceCollapsible->addLayout(forcePosLayout);
-  forceCollapsible->addLayout(forceVectorLayout);
+  // Vertical separator
+  QFrame *separator = new QFrame();
+  separator->setFrameShape(QFrame::VLine);
+  separator->setLineWidth(10);
 
-  this->dataPtr->forceCollapsibleWidget = new QWidget();
-  this->dataPtr->forceCollapsibleWidget->setLayout(forceCollapsible);
-  this->dataPtr->forceCollapsibleWidget->show();
+  // Force Position
+  QLabel *forcePosLabel = new QLabel(tr("Application Point:"));
 
-  QVBoxLayout *forceLayout = new QVBoxLayout();
-  forceLayout->addWidget(forceCollapser);
-  forceLayout->addWidget(this->dataPtr->forceCollapsibleWidget);
+  // CoM
+  QLabel *comLabel = new QLabel();
+  comLabel->setText(tr("Center of mass"));
+  this->dataPtr->comRadio = new QRadioButton();
+  this->dataPtr->forcePosRadio = new QRadioButton();
+  this->dataPtr->comRadio->setChecked(true);
+  connect(this->dataPtr->comRadio, SIGNAL(toggled(bool)), this,
+      SLOT(ToggleComRadio(bool)));
+
+  // Force Position X
+  QLabel *forcePosXLabel = new QLabel();
+  forcePosXLabel->setText(tr("X:"));
+  QLabel *forcePosXUnitLabel = new QLabel();
+  forcePosXUnitLabel->setText(tr("m"));
+
+  this->dataPtr->forcePosXSpin = new QDoubleSpinBox();
+  this->dataPtr->forcePosXSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dataPtr->forcePosXSpin->setSingleStep(0.1);
+  this->dataPtr->forcePosXSpin->setDecimals(3);
+  this->dataPtr->forcePosXSpin->setValue(0);
+  this->dataPtr->forcePosXSpin->setMaximumWidth(100);
+  this->dataPtr->forcePosXSpin->installEventFilter(this);
+  connect(this->dataPtr->forcePosXSpin, SIGNAL(valueChanged(double)), this,
+      SLOT(OnForcePosXChanged(double)));
+
+  // Force Position Y
+  QLabel *forcePosYLabel = new QLabel();
+  forcePosYLabel->setText(tr("Y:"));
+  QLabel *forcePosYUnitLabel = new QLabel();
+  forcePosYUnitLabel->setText(tr("m"));
+
+  this->dataPtr->forcePosYSpin = new QDoubleSpinBox();
+  this->dataPtr->forcePosYSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dataPtr->forcePosYSpin->setSingleStep(0.1);
+  this->dataPtr->forcePosYSpin->setDecimals(3);
+  this->dataPtr->forcePosYSpin->setValue(0);
+  this->dataPtr->forcePosYSpin->setMaximumWidth(100);
+  this->dataPtr->forcePosYSpin->installEventFilter(this);
+  connect(this->dataPtr->forcePosYSpin, SIGNAL(valueChanged(double)), this,
+      SLOT(OnForcePosYChanged(double)));
+
+  // Force Position Z
+  QLabel *forcePosZLabel = new QLabel();
+  forcePosZLabel->setText(tr("Z:"));
+  QLabel *forcePosZUnitLabel = new QLabel();
+  forcePosZUnitLabel->setText(tr("m"));
+
+  this->dataPtr->forcePosZSpin = new QDoubleSpinBox();
+  this->dataPtr->forcePosZSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dataPtr->forcePosZSpin->setSingleStep(0.1);
+  this->dataPtr->forcePosZSpin->setDecimals(3);
+  this->dataPtr->forcePosZSpin->setValue(0);
+  this->dataPtr->forcePosZSpin->setMaximumWidth(100);
+  this->dataPtr->forcePosZSpin->installEventFilter(this);
+  connect(this->dataPtr->forcePosZSpin, SIGNAL(valueChanged(double)), this,
+      SLOT(OnForcePosZChanged(double)));
+
+  QGridLayout *forcePosLayout = new QGridLayout();
+  forcePosLayout->addWidget(forcePosLabel, 0, 0, 1, 4, Qt::AlignLeft);
+  forcePosLayout->addWidget(this->dataPtr->comRadio, 1, 0);
+  forcePosLayout->addWidget(comLabel, 1, 1, 1, 3, Qt::AlignLeft);
+  forcePosLayout->addWidget(this->dataPtr->forcePosRadio, 2, 0);
+  forcePosLayout->addWidget(forcePosXLabel, 2, 1);
+  forcePosLayout->addWidget(this->dataPtr->forcePosXSpin, 2, 2);
+  forcePosLayout->addWidget(forcePosXUnitLabel, 2, 3);
+  forcePosLayout->addWidget(forcePosYLabel, 3, 1);
+  forcePosLayout->addWidget(this->dataPtr->forcePosYSpin, 3, 2);
+  forcePosLayout->addWidget(forcePosYUnitLabel, 3, 3);
+  forcePosLayout->addWidget(forcePosZLabel, 4, 1);
+  forcePosLayout->addWidget(this->dataPtr->forcePosZSpin, 4, 2);
+  forcePosLayout->addWidget(forcePosZUnitLabel, 4, 3);
+
+  // Apply force
+  QPushButton *applyForceButton = new QPushButton("Apply");
+  connect(applyForceButton, SIGNAL(clicked()), this, SLOT(OnApplyForce()));
+
+  // Force layout
+  QGridLayout *forceLayout = new QGridLayout();
+  forceLayout->setContentsMargins(0, 0, 0, 0);
+  forceLayout->addWidget(forceLabel, 0, 0, 1, 3);
+  forceLayout->addLayout(forceVectorLayout, 1, 0);
+  forceLayout->addWidget(separator, 1, 1);
+  forceLayout->addLayout(forcePosLayout, 1, 2);
+  forceLayout->addWidget(applyForceButton, 3, 0, 1, 3, Qt::AlignRight);
+
+  QFrame *forceFrame = new QFrame();
+  forceFrame->setLayout(forceLayout);
+  forceFrame->setObjectName("forceLayout");
+  forceFrame->setFrameShape(QFrame::StyledPanel);
+
+  forceFrame->setStyleSheet(
+   "QFrame#forceLayout{\
+      background-color: #666;\
+      border-radius: 10px;\
+    }");
+
+  QGraphicsDropShadowEffect *forceEffect = new QGraphicsDropShadowEffect;
+  forceEffect->setBlurRadius(5);
+  forceEffect->setXOffset(5);
+  forceEffect->setYOffset(5);
+  forceEffect->setColor(Qt::black);
+  forceFrame->setGraphicsEffect(forceEffect);
 
   // Torque
-  QCheckBox *torqueCollapser = new QCheckBox();
-  torqueCollapser->setChecked(false);
-  torqueCollapser->setText("Torque");
-  torqueCollapser->setStyleSheet(
-     "QCheckBox {\
-        color: #d0d0d0;\
-      }\
-      QCheckBox::indicator::unchecked {\
-        image: url(:/images/right_arrow.png);\
-      }\
-      QCheckBox::indicator::checked {\
-        image: url(:/images/down_arrow.png);\
-      }");
-  connect(torqueCollapser, SIGNAL(toggled(bool)), this, SLOT(ToggleTorque(bool)));
-
-  // Torque magnitude
-  QLabel *torqueMagLabel = new QLabel();
-  torqueMagLabel->setText(tr("Total:"));
-  QLabel *torqueMagUnitLabel = new QLabel();
-  torqueMagUnitLabel->setText(tr("Nm"));
-
-  this->dataPtr->torqueMagSpin = new QDoubleSpinBox();
-  this->dataPtr->torqueMagSpin->setRange(0, GZ_DBL_MAX);
-  this->dataPtr->torqueMagSpin->setSingleStep(100);
-  this->dataPtr->torqueMagSpin->setDecimals(3);
-  this->dataPtr->torqueMagSpin->setValue(0);
-  this->dataPtr->torqueMagSpin->setMaximumWidth(100);
-  this->dataPtr->torqueMagSpin->installEventFilter(this);
-  connect(this->dataPtr->torqueMagSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnTorqueMagChanged(double)));
+  QLabel *torqueLabel = new QLabel(tr(
+       "<font size=4>Torque</font>"));
+  torqueLabel->setObjectName("torqueLabel");
+  torqueLabel->setStyleSheet(
+   "QLabel#torqueLabel{\
+      background-color: #444;\
+      border-radius: 5px;\
+      padding-left: 10px;\
+    }");
 
   // Torque X
   QLabel *torqueXLabel = new QLabel();
@@ -340,53 +327,91 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   connect(this->dataPtr->torqueZSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnTorqueZChanged(double)));
 
-  // Torque clear
+  // Torque magnitude
+  QLabel *torqueMagLabel = new QLabel();
+  torqueMagLabel->setText(tr("Total:"));
+  QLabel *torqueMagUnitLabel = new QLabel();
+  torqueMagUnitLabel->setText(tr("Nm"));
+
+  this->dataPtr->torqueMagSpin = new QDoubleSpinBox();
+  this->dataPtr->torqueMagSpin->setRange(0, GZ_DBL_MAX);
+  this->dataPtr->torqueMagSpin->setSingleStep(100);
+  this->dataPtr->torqueMagSpin->setDecimals(3);
+  this->dataPtr->torqueMagSpin->setValue(0);
+  this->dataPtr->torqueMagSpin->setMaximumWidth(100);
+  this->dataPtr->torqueMagSpin->installEventFilter(this);
+  connect(this->dataPtr->torqueMagSpin, SIGNAL(valueChanged(double)), this,
+      SLOT(OnTorqueMagChanged(double)));
+
+  // Clear torque
   QPushButton *torqueClearButton = new QPushButton(tr("Clear"));
   connect(torqueClearButton, SIGNAL(clicked()), this, SLOT(OnTorqueClear()));
 
-  QGridLayout *torqueCollapsible = new QGridLayout();
-  torqueCollapsible->addWidget(torqueXLabel, 0, 1);
-  torqueCollapsible->addWidget(this->dataPtr->torqueXSpin, 0, 2);
-  torqueCollapsible->addWidget(torqueXUnitLabel, 0, 3);
-  torqueCollapsible->addWidget(torqueYLabel, 1, 1);
-  torqueCollapsible->addWidget(this->dataPtr->torqueYSpin, 1, 2);
-  torqueCollapsible->addWidget(torqueYUnitLabel, 1, 3);
-  torqueCollapsible->addWidget(torqueZLabel, 2, 1);
-  torqueCollapsible->addWidget(this->dataPtr->torqueZSpin, 2, 2);
-  torqueCollapsible->addWidget(torqueZUnitLabel, 2, 3);
-  torqueCollapsible->addWidget(torqueMagLabel, 3, 1);
-  torqueCollapsible->addWidget(this->dataPtr->torqueMagSpin, 3, 2);
-  torqueCollapsible->addWidget(torqueMagUnitLabel, 3, 3);
-  torqueCollapsible->addWidget(torqueClearButton, 4, 0);
+  // Torque vector layout
+  QGridLayout *torqueVectorLayout = new QGridLayout();
+  torqueVectorLayout->addWidget(torqueXLabel, 0, 0, Qt::AlignRight);
+  torqueVectorLayout->addWidget(this->dataPtr->torqueXSpin, 0, 1);
+  torqueVectorLayout->addWidget(torqueXUnitLabel, 0, 2);
+  torqueVectorLayout->addWidget(torqueYLabel, 1, 0, Qt::AlignRight);
+  torqueVectorLayout->addWidget(this->dataPtr->torqueYSpin, 1, 1);
+  torqueVectorLayout->addWidget(torqueYUnitLabel, 1, 2);
+  torqueVectorLayout->addWidget(torqueZLabel, 2, 0, Qt::AlignRight);
+  torqueVectorLayout->addWidget(this->dataPtr->torqueZSpin, 2, 1);
+  torqueVectorLayout->addWidget(torqueZUnitLabel, 2, 2);
+  torqueVectorLayout->addWidget(torqueMagLabel, 3, 0, Qt::AlignRight);
+  torqueVectorLayout->addWidget(this->dataPtr->torqueMagSpin, 3, 1);
+  torqueVectorLayout->addWidget(torqueMagUnitLabel, 3, 2);
+  torqueVectorLayout->addWidget(torqueClearButton, 4, 0, 1, 3, Qt::AlignLeft);
 
-  this->dataPtr->torqueCollapsibleWidget = new QWidget();
-  this->dataPtr->torqueCollapsibleWidget->setLayout(torqueCollapsible);
-  this->dataPtr->torqueCollapsibleWidget->hide();
+  // Apply torque
+  QPushButton *applyTorqueButton = new QPushButton("Apply");
+  connect(applyTorqueButton, SIGNAL(clicked()), this, SLOT(OnApplyTorque()));
 
-  QVBoxLayout *torqueLayout = new QVBoxLayout();
-  torqueLayout->addWidget(torqueCollapser);
-  torqueLayout->addWidget(this->dataPtr->torqueCollapsibleWidget);
+  // Torque layout
+  QGridLayout *torqueLayout = new QGridLayout();
+  torqueLayout->setContentsMargins(0, 0, 0, 0);
+  torqueLayout->addWidget(torqueLabel, 0, 0, 1, 2);
+  torqueLayout->addLayout(torqueVectorLayout, 1, 0);
+  torqueLayout->addWidget(applyTorqueButton, 3, 0, 1, 2, Qt::AlignRight);
+
+  QFrame *torqueFrame = new QFrame();
+  torqueFrame->setLayout(torqueLayout);
+  torqueFrame->setObjectName("torqueLayout");
+  torqueFrame->setFrameShape(QFrame::StyledPanel);
+
+  torqueFrame->setStyleSheet(
+   "QFrame#torqueLayout{\
+      background-color: #666;\
+      border-radius: 10px;\
+    }");
+
+  QGraphicsDropShadowEffect *torqueEffect = new QGraphicsDropShadowEffect;
+  torqueEffect->setBlurRadius(5);
+  torqueEffect->setXOffset(5);
+  torqueEffect->setYOffset(5);
+  torqueEffect->setColor(Qt::black);
+  torqueFrame->setGraphicsEffect(torqueEffect);
 
   // Buttons
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
-  QPushButton *applyButton = new QPushButton("Apply");
-  applyButton->setDefault(true);
-  connect(applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
+  QPushButton *applyAllButton = new QPushButton("Apply All");
+  applyAllButton->setDefault(true);
+  connect(applyAllButton, SIGNAL(clicked()), this, SLOT(OnApplyAll()));
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(cancelButton);
-  buttonsLayout->addWidget(applyButton);
+  buttonsLayout->addWidget(applyAllButton);
 
   // Main layout
-  QVBoxLayout *mainLayout = new QVBoxLayout;
+  QGridLayout *mainLayout = new QGridLayout();
   mainLayout->setSizeConstraint(QLayout::SetFixedSize);
-  mainLayout->addWidget(this->dataPtr->modelLabel);
-  mainLayout->addLayout(linkLayout);
-  mainLayout->addLayout(forceLayout);
-  mainLayout->addLayout(torqueLayout);
-  mainLayout->addLayout(buttonsLayout);
+  mainLayout->addWidget(this->dataPtr->modelLabel, 0, 0, 1, 2, Qt::AlignLeft);
+  mainLayout->addLayout(linkLayout, 1, 0, 1, 2, Qt::AlignLeft);
+  mainLayout->addWidget(forceFrame, 2, 0);
+  mainLayout->addWidget(torqueFrame, 2, 1);
+  mainLayout->addLayout(buttonsLayout, 3, 0, 1, 2, Qt::AlignRight);
 
   this->setLayout(mainLayout);
 
@@ -397,7 +422,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->requestPub.reset();
   this->dataPtr->responseSub.reset();
 
-  this->dataPtr->mode = "force";
+  this->dataPtr->mode = "none";
   this->dataPtr->comVector = math::Vector3::Zero;
   this->dataPtr->forceVector = math::Vector3::Zero;
   this->dataPtr->torqueVector = math::Vector3::Zero;
@@ -434,7 +459,7 @@ void ApplyWrenchDialog::SetModel(std::string _modelName)
   this->dataPtr->modelName = _modelName;
 
   this->dataPtr->modelLabel->setText(
-      ("Model: " + _modelName).c_str());
+      ("<b>Model:</b> " + _modelName).c_str());
 
   this->dataPtr->linksComboBox->clear();
 
@@ -538,13 +563,35 @@ void ApplyWrenchDialog::OnResponse(ConstResponsePtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::OnApply()
+void ApplyWrenchDialog::OnApplyAll()
 {
   // publish wrench msg
   msgs::Wrench msg;
   msgs::Set(msg.mutable_force(), this->dataPtr->forceVector);
   msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector);
   msgs::Set(msg.mutable_position(), this->dataPtr->forcePosVector);
+
+  this->dataPtr->wrenchPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::OnApplyForce()
+{
+  msgs::Wrench msg;
+  msgs::Set(msg.mutable_force(), this->dataPtr->forceVector);
+  msgs::Set(msg.mutable_torque(), math::Vector3::Zero);
+  msgs::Set(msg.mutable_position(), this->dataPtr->forcePosVector);
+
+  this->dataPtr->wrenchPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::OnApplyTorque()
+{
+  // publish wrench msg
+  msgs::Wrench msg;
+  msgs::Set(msg.mutable_force(), math::Vector3::Zero);
+  msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector);
 
   this->dataPtr->wrenchPub->Publish(msg);
 }
@@ -683,7 +730,7 @@ void ApplyWrenchDialog::ToggleForcePos(bool _checked)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::ToggleComCheckBox(bool _checked)
+void ApplyWrenchDialog::ToggleComRadio(bool _checked)
 {
   if (_checked)
   {
@@ -964,7 +1011,15 @@ void ApplyWrenchDialog::SetForcePos(math::Vector3 _forcePos)
   this->SetWrenchMode("force");
 
   // Check com box
-  this->dataPtr->comCheckBox->setChecked((_forcePos == this->dataPtr->comVector));
+  if (_forcePos == this->dataPtr->comVector)
+  {
+    this->dataPtr->comRadio->setChecked(true);
+  }
+  else
+  {
+    this->dataPtr->forcePosRadio->setChecked(true);
+
+  }
 
   // Visuals
   if (!this->dataPtr->applyWrenchVisual)

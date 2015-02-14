@@ -55,7 +55,10 @@ namespace gazebo
       public: QWidget *torqueCollapsibleWidget;
 
       /// TODO
-      public: QCheckBox *comCheckBox;
+      public: QRadioButton *comRadio;
+
+      /// TODO
+      public: QRadioButton *forcePosRadio;
 
       /// TODO
       public: QDoubleSpinBox *forcePosXSpin;

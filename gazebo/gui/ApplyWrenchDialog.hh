@@ -59,7 +59,13 @@ namespace gazebo
       private slots: void SetLink(QString _linkName);
 
       /// \brief Qt callback when the Apply button is pressed.
-      private slots: void OnApply();
+      private slots: void OnApplyAll();
+
+      /// \brief Qt callback when the Apply button is pressed.
+      private slots: void OnApplyForce();
+
+      /// \brief Qt callback when the Apply button is pressed.
+      private slots: void OnApplyTorque();
 
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
@@ -70,7 +76,7 @@ namespace gazebo
 
       /// \brief Qt callback to set position to CoM.
       /// \param[in] _checked Whether it is checked or not.
-      private slots: void ToggleComCheckBox(bool _checked);
+      private slots: void ToggleComRadio(bool _checked);
 
       /// \brief Qt callback to show/hide force options.
       /// \param[in] _checked Whether it is checked or not.
