@@ -48,7 +48,6 @@ namespace gazebo
 
       /// \brief Update the link config widget with a link msg.
       /// \param[in] _linkMsg Link message.
-//      public: void Update(const msgs::Link *_linkMsg);
       public: void Update(ConstLinkPtr _linkMsg);
 
       /// \brief Get the msg containing all link data.

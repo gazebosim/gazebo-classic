@@ -77,7 +77,7 @@ PartData::PartData()
 
   this->scale = math::Vector3::One;
 
-  this->inspector = new LinkInspector;
+  this->inspector = new LinkInspector();
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
   connect(this->inspector->GetVisualConfig(),

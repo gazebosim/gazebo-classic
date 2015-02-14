@@ -1695,7 +1695,7 @@ void ModelCreator::SetModelVisible(rendering::VisualPtr _visual, bool _visible)
   {
     // store original visibility
     this->serverModelVisible[_visual->GetId()] = _visual->GetVisible();
-     _visual->SetVisible(_visible);
+    _visual->SetVisible(_visible);
   }
   else
   {
@@ -1707,5 +1707,4 @@ void ModelCreator::SetModelVisible(rendering::VisualPtr _visual, bool _visible)
       _visual->SetVisible(it->second, false);
     }
   }
-
 }
