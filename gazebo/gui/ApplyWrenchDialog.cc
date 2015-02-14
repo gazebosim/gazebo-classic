@@ -168,6 +168,18 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   // CoM
   QLabel *comLabel = new QLabel();
   comLabel->setText(tr("Center of mass"));
+
+  QLabel *comPixLabel = new QLabel();
+  QPixmap comPixmap(":images/com.png");
+  comPixmap = comPixmap.scaled(QSize(20, 20));
+  comPixLabel->setPixmap(comPixmap);
+  comPixLabel->setMask(comPixmap.mask());
+  comPixLabel->show();
+
+  QHBoxLayout *comLabelLayout = new QHBoxLayout();
+  comLabelLayout->addWidget(comLabel);
+  comLabelLayout->addWidget(comPixLabel);
+
   this->dataPtr->comRadio = new QRadioButton();
   this->dataPtr->forcePosRadio = new QRadioButton();
   this->dataPtr->comRadio->setChecked(true);
@@ -225,7 +237,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   QGridLayout *forcePosLayout = new QGridLayout();
   forcePosLayout->addWidget(forcePosLabel, 0, 0, 1, 4, Qt::AlignLeft);
   forcePosLayout->addWidget(this->dataPtr->comRadio, 1, 0);
-  forcePosLayout->addWidget(comLabel, 1, 1, 1, 3, Qt::AlignLeft);
+  forcePosLayout->addLayout(comLabelLayout, 1, 1, 1, 3, Qt::AlignLeft);
   forcePosLayout->addWidget(this->dataPtr->forcePosRadio, 2, 0);
   forcePosLayout->addWidget(forcePosXLabel, 2, 1);
   forcePosLayout->addWidget(this->dataPtr->forcePosXSpin, 2, 2);
