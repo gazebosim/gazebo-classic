@@ -109,17 +109,15 @@ TEST_F(PresetManagerTest, SetCurrentProfile)
 
   std::vector<std::string> profileNames(presetManager->AllProfiles());
   EXPECT_EQ(profileNames.size(), 2);
-  for (auto name : profileNames)
-  {
-    std::cout << name << std::endl;
-  }
 
   //EXPECT_TRUE(presetManager->CurrentProfile("preset_2"));
+  presetManager->CurrentProfile("preset_2");
 
   EXPECT_EQ(presetManager->CurrentProfile(), "preset_2");
 
   // Need to reload the physics engine to see changes affected, since we changed physics engine type
-  world->Reset();
+  // 
+  //world->Reset();
 
   try
   {

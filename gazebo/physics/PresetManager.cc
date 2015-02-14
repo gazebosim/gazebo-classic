@@ -154,6 +154,7 @@ bool PresetManager::CurrentProfile(const std::string& _name)
   this->dataPtr->currentPreset = &(this->dataPtr->presetProfiles[_name]);
   //Preset* futurePreset = &this->dataPtr->presetProfiles[_name];
   bool result = true;
+  gzdbg << "Current preset size: " << this->CurrentPreset()->ParameterMap()->size() << std::endl;
   for (auto it = this->CurrentPreset()->ParameterMap()->begin();
      it != this->CurrentPreset()->ParameterMap()->end(); ++it)
   {
@@ -266,7 +267,7 @@ void PresetManager::CreateProfile(const std::string& _name)
   }
   else
   {
-    this->dataPtr->presetProfiles.emplace(_name, Preset(_name));
+    this->dataPtr->presetProfiles[_name] = Preset(_name);
   }
 }
 
@@ -310,24 +311,67 @@ void PresetManager::ProfileSDF(const std::string &_name,
 {
   this->dataPtr->presetProfiles[_name].SDF(_sdf);
 
-  this->dataPtr->presetProfiles[_name] = this->GeneratePresetFromSDF(_sdf);
+  this->GeneratePresetFromSDF(&this->dataPtr->presetProfiles[_name], _sdf);
 }
 
 //////////////////////////////////////////////////
-Preset PresetManager::GeneratePresetFromSDF(const sdf::ElementPtr _elem) const
+// This sort of duplicates a code block in the constructor of SDF::Param
+// (http://bit.ly/175LWfE)
+boost::any GetAnySDFValue(const sdf::ElementPtr _elem)
 {
-  Preset preset; 
+  boost::any ret;
 
+  if (typeid(int) == _elem->GetValue()->GetType())
+  {
+    ret = _elem->Get<int>();
+  }
+  else if (typeid(double) == _elem->GetValue()->GetType())
+  {
+    ret = _elem->Get<double>();
+  }
+  else if (typeid(float) == _elem->GetValue()->GetType())
+  {
+    ret = _elem->Get<float>();
+  }
+  else if (typeid(bool) == _elem->GetValue()->GetType())
+  {
+    ret = _elem->Get<bool>();
+  }
+  else if (typeid(std::string) == _elem->GetValue()->GetType())
+  {
+    ret = _elem->Get<std::string>();
+  }
+  else if (typeid(sdf::Vector3) == _elem->GetValue()->GetType())
+  {
+    // RISKY
+    ret = _elem->Get<gazebo::math::Vector3>();
+  }
+
+  return ret;
+}
+
+
+//////////////////////////////////////////////////
+void PresetManager::GeneratePresetFromSDF(Preset* _preset,
+    const sdf::ElementPtr _elem) const
+{
+  if (!_preset)
+    return;
   for (sdf::ElementPtr elem = _elem->GetFirstElement(); elem;
         elem = elem->GetNextElement())
   {
-    if (elem->HasAttribute("type"))
-      std::cout << "Setting element " << elem->GetName() << " as: " << elem->Get<std::string>() << " which has type " << elem->GetAttribute("type")->GetAsString() << std::endl;
-    // Need to change type! FIXME
-    preset.Param(elem->GetName(), elem->Get<std::string>());
+    //gzdbg << "Element name: " << elem->GetName() << std::endl;
+    if (_elem->GetValue() != NULL)
+    {
+      gzdbg << "setting preset" << std::endl;
+      _preset->Param(elem->GetName(), GetAnySDFValue(_elem));
+    }
+    else
+    {
+      // TODO: Make a traversal, since there are multiple levels
+      this->GeneratePresetFromSDF(_preset, _elem->GetFirstElement());
+    }
   }
-  preset.SDF(_elem);
-  return preset;
 }
 
 //////////////////////////////////////////////////
@@ -370,3 +414,4 @@ Preset* PresetManager::CurrentPreset() const
 {
   return this->dataPtr->currentPreset;
 }
+
