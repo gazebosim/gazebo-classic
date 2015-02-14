@@ -792,7 +792,7 @@ void UserCamera::EnableStereo(bool _enable)
   else
   {
     gzwarn << "Tried to enable/disable stereo. "
-           << "However, stereo is turned on via the gui.ini file.\n";
+           << "However, stereo is turned off via the gui.ini file.\n";
   }
 #else
     gzwarn << "Tried to enable/disable stereo. "
