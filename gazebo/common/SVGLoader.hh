@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __GAZEBO_SVGLOADER_HH
-#define __GAZEBO_SVGLOADER_HH
+#ifndef _GAZEBO_SVGLOADER_HH_
+#define _GAZEBO_SVGLOADER_HH_
 
 #include <stdexcept>
 #include <string>
@@ -38,7 +38,7 @@ namespace gazebo
     {
       /// \brief constructor
       /// \param[in] _what The error description
-      public: SvgError(const std::string& _what);
+      public: SvgError(const std::string &_what);
     };
 
     /// \brief SVG command data structure
@@ -150,4 +150,3 @@ namespace gazebo
 }
 
 #endif
-

@@ -18,10 +18,8 @@
 #include <algorithm>
 #include <tinyxml.h>
 
-
 #include "SVGLoaderPrivate.hh"
 #include "SVGLoader.hh"
-
 
 using namespace gazebo;
 using namespace common;
@@ -202,7 +200,7 @@ SVGLoader::~SVGLoader()
 void SVGLoader::SplitSubpaths(const std::vector<SVGCommand> &_cmds,
                               std::vector< std::vector<SVGCommand> > &_subpaths)
 {
-  if (_cmds.size() ==0)
+  if (_cmds.empty())
   {
     std::ostringstream os;
     os << "SVGPath has no commands";
@@ -347,17 +345,16 @@ void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
     {
       _path.style = value;
     }
-    if (name == "id")
+    else if (name == "id")
     {
       _path.id = value;
     }
-    if (name == "transform")
+    else if (name == "transform")
     {
       _path.transform = value;
     }
-    if (name == "d")
+    else if (name == "d")
     {
-      using namespace std;
       // this attribute contains a list of coordinates
       std::vector<std::string> tokens;
       split(value, ' ', tokens);
@@ -368,22 +365,22 @@ void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
 }
 
 /////////////////////////////////////////////////
-void SVGLoader::GetSvgPaths(TiXmlNode *pParent, std::vector<SVGPath> &_paths)
+void SVGLoader::GetSvgPaths(TiXmlNode *_pParent, std::vector<SVGPath> &_paths)
 {
-  if (!pParent)
+  if (!_pParent)
     return;
 
   TiXmlNode *pChild;
-  int t = pParent->Type();
+  int t = _pParent->Type();
   std::string name;
   switch ( t )
   {
     case TiXmlNode::TINYXML_ELEMENT:
-      name = lowercase(pParent->Value());
+      name = lowercase(_pParent->Value());
       if (name == "path")
       {
         SVGPath p;
-        this->GetPathAttribs(pParent->ToElement(), p);
+        this->GetPathAttribs(_pParent->ToElement(), p);
         _paths.push_back(p);
       }
       break;
@@ -392,7 +389,7 @@ void SVGLoader::GetSvgPaths(TiXmlNode *pParent, std::vector<SVGPath> &_paths)
       break;
   }
 
-  for (pChild = pParent->FirstChild();
+  for (pChild = _pParent->FirstChild();
        pChild != 0;
        pChild = pChild->NextSibling())
   {

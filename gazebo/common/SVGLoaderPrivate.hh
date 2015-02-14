@@ -15,12 +15,8 @@
  *
  */
 
-#ifndef __GAZEBO_SVGLOADERPRIVATE_HH
-#define __GAZEBO_SVGLOADERPRIVATE_HH
-
-#include <stdexcept>
-#include <string>
-#include <vector>
+#ifndef _GAZEBO_SVGLOADER_PRIVATE_HH_
+#define _GAZEBO_SVGLOADER_PRIVATE_HH_
 
 #include <gazebo/math/Vector2d.hh>
 
@@ -42,4 +38,3 @@ namespace gazebo
 }
 
 #endif
-
