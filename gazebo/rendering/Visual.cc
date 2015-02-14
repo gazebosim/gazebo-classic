@@ -1624,6 +1624,12 @@ bool Visual::GetCastShadows() const
 void Visual::SetVisible(bool _visible, bool _cascade)
 {
   this->dataPtr->sceneNode->setVisible(_visible, _cascade);
+  if (_cascade)
+  {
+    for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
+      this->dataPtr->children[i]->SetVisible(_visible);
+  }
+
   this->dataPtr->visible = _visible;
 }
 
@@ -2280,7 +2286,8 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     if (_msg->geometry().has_mesh() && _msg->geometry().mesh().has_filename())
         newGeometryName = _msg->geometry().mesh().filename();
 
-    if (newGeometryType != geometryType || newGeometryName != geometryName)
+    if (newGeometryType != geometryType ||
+        (newGeometryType == "mesh" && newGeometryName != geometryName))
     {
       std::string origMaterial = this->dataPtr->myMaterialName;
       float origTransparency = this->dataPtr->transparency;
@@ -2289,6 +2296,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       geomElem->ClearElements();
 
       this->DetachObjects();
+
       if (newGeometryType == "box" || newGeometryType == "cylinder" ||
           newGeometryType == "sphere" || newGeometryType == "plane")
       {
@@ -2297,24 +2305,21 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
         if (newGeometryType == "sphere" || newGeometryType == "cylinder")
           shapeElem->GetElement("radius")->Set(0.5);
       }
-      else
+      else if (newGeometryType == "mesh")
       {
-        if (newGeometryType == "mesh")
+        std::string filename = _msg->geometry().mesh().filename();
+        std::string meshName = common::find_file(filename);
+
+        if (meshName.empty())
         {
-          std::string filename = _msg->geometry().mesh().filename();
-          std::string meshName = common::find_file(filename);
-
-          if (meshName.empty())
-          {
-            meshName = "unit_box";
-            gzerr << "No mesh found, setting mesh to a unit box" << std::endl;
-          }
-
-          this->AttachMesh(meshName);
-          sdf::ElementPtr meshElem = geomElem->AddElement(newGeometryType);
-          if (!filename.empty())
-            meshElem->GetElement("uri")->Set(filename);
+          meshName = "unit_box";
+          gzerr << "No mesh found, setting mesh to a unit box" << std::endl;
         }
+
+        this->AttachMesh(meshName);
+        sdf::ElementPtr meshElem = geomElem->AddElement(newGeometryType);
+        if (!filename.empty())
+          meshElem->GetElement("uri")->Set(filename);
       }
       this->SetTransparency(origTransparency);
       this->SetMaterial(origMaterial);

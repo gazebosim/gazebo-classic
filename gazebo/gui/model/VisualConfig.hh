@@ -75,7 +75,7 @@ namespace gazebo
       /// \param[in] _name Name of visual to be updated.
       /// \param[in] _visualMsg Msg used to update the visual widget values.
       public: void UpdateVisual(const std::string &_name,
-          const msgs::Visual *_visualMsg);
+          ConstVisualPtr _visualMsg);
 
       /// \brief Reset the visual tab.
       public: void Reset();

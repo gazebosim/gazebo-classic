@@ -210,6 +210,11 @@ namespace gazebo
       /// \brief Generate the SDF from model part and joint visuals.
       public: void GenerateSDF();
 
+      /// \brief Helper function to generate link sdf from part data.
+      /// \param[in] _part Part data used to generate the sdf.
+      /// \return SDF element describing the part.
+      private: sdf::ElementPtr GenerateLinkSDF(PartData *_part);
+
       /// \brief QT callback when entering model edit mode
       /// \param[in] _checked True if the menu item is checked
       private slots: void OnEdit(bool _checked);
@@ -439,15 +444,15 @@ namespace gazebo
       /// model editor.
       private: std::string serverModelName;
 
-      /// \brief Pose of the model on the server.
-      private: math::Pose serverModelPose;
-
       /// \brief SDF element of the model on the server.
       private: sdf::ElementPtr serverModelSDF;
 
       /// \brief A map of all visuals of the model to be edited to their
       /// visibility.
       private: std::map<uint32_t, bool> serverModelVisible;
+
+      /// \brief Name of the canonical link in the model
+      private: std::string canonicalLink;
     };
     /// \}
   }

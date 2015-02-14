@@ -155,8 +155,8 @@ namespace gazebo
 
       /// \brief Create a joint from SDF. This is mainly used when editing
       /// existing models.
-      /// \param[_in] _jointElement SDF element to load.
-      /// \_modelName Name of the model that contains this joint.
+      /// \param[in] _jointElement SDF element to load.
+      /// \param[in] _modelName Name of the model that contains this joint.
       public: void CreateJointFromSDF(sdf::ElementPtr _jointElem,
           const std::string &_modelName = "");
 
@@ -210,7 +210,7 @@ namespace gazebo
       /// \brief Get the scoped name of a link.
       /// \param[in] _name Unscoped link name.
       /// \return Scoped link name.
-      private :std::string GetScopedLinkName(const std::string &_name);
+      private: std::string GetScopedLinkName(const std::string &_name);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
@@ -327,8 +327,17 @@ namespace gazebo
       /// \brief Joint upper limit.
       public: double upperLimit[2];
 
+      /// \brief Joint effort limit.
+      public: double effortLimit[2];
+
+      /// \brief Joint velocity limit.
+      public: double velocityLimit[2];
+
       /// \brief Use parent model frame flag.
       public: bool useParentModelFrame[2];
+
+      /// \brief Joint damping.
+      public: double damping[2];
 
       /// \brief Joint pose.
       public: math::Pose pose;

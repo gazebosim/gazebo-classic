@@ -61,9 +61,9 @@ LinkConfig::~LinkConfig()
 }
 
 /////////////////////////////////////////////////
-void LinkConfig::Update(const msgs::Link *_linkMsg)
+void LinkConfig::Update(ConstLinkPtr _linkMsg)
 {
-  this->configWidget->UpdateFromMsg(_linkMsg);
+  this->configWidget->UpdateFromMsg(_linkMsg.get());
 }
 
 /////////////////////////////////////////////////

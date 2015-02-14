@@ -26,6 +26,7 @@
 #include "gazebo/gui/model/LinkConfig.hh"
 #include "gazebo/gui/model/CollisionConfig.hh"
 
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/model/ModelData.hh"
 
 using namespace gazebo;
@@ -76,7 +77,7 @@ PartData::PartData()
 
   this->scale = math::Vector3::One;
 
-  this->inspector = new LinkInspector();
+  this->inspector = new LinkInspector;
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
   connect(this->inspector->GetVisualConfig(),
@@ -146,7 +147,7 @@ void PartData::SetScale(const math::Vector3 &_scale)
     std::string name = it->first->GetName();
     std::string partName = this->partVisual->GetName();
     std::string leafName =
-        name.substr(name.find(partName)+partName.size()+1);
+        name.substr(name.find(partName)+partName.size()+2);
     visualConfig->SetGeometry(leafName, it->first->GetScale());
   }
 
@@ -156,7 +157,7 @@ void PartData::SetScale(const math::Vector3 &_scale)
     std::string name = it->first->GetName();
     std::string partName = this->partVisual->GetName();
     std::string leafName =
-        name.substr(name.find(partName)+partName.size()+1);
+        name.substr(name.find(partName)+partName.size()+2);
     collisionConfig->SetGeometry(leafName,  it->first->GetScale());
   }
 
@@ -207,7 +208,7 @@ void PartData::Load(sdf::ElementPtr _sdf)
       inertialMsg->set_iyz(inertiaElem->Get<double>("iyz"));
       inertialMsg->set_izz(inertiaElem->Get<double>("izz"));
     }
-    linkConfig->Update(&linkMsg);
+    linkConfig->Update(ConstLinkPtr(&linkMsg));
   }
 
   if (_sdf->HasElement("sensor"))
@@ -529,7 +530,6 @@ void PartData::OnAddVisual(const std::string &_name)
     sdf::ElementPtr visualElem =  modelTemplateSDF->root
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     visVisual->Load(visualElem);
-    this->partVisual->GetScene()->AddVisual(visVisual);
   }
 
   msgs::Visual visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
@@ -537,7 +537,7 @@ void PartData::OnAddVisual(const std::string &_name)
   // store the correct transparency setting
   if (refVisual)
     visualMsg.set_transparency(this->visuals[refVisual].transparency());
-  visualConfig->UpdateVisual(_name, &visualMsg);
+  visualConfig->UpdateVisual(_name, ConstVisualPtr(&visualMsg));
   this->visuals[visVisual] = visualMsg;
   visVisual->SetTransparency(visualMsg.transparency() *
       (1-ModelData::GetEditTransparency()-0.1)
@@ -593,7 +593,7 @@ void PartData::OnAddCollision(const std::string &_name)
   msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
   geomMsg->CopyFrom(visualMsg.geometry());
 
-  collisionConfig->UpdateCollision(_name, &collisionMsg);
+  collisionConfig->UpdateCollision(_name, ConstCollisionPtr(&collisionMsg));
   this->collisions[collisionVis] = collisionMsg;
 
   collisionVis->SetTransparency(

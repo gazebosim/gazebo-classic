@@ -183,7 +183,8 @@ namespace gazebo
       /// \brief Spin box for configuring the upper limit of the axis.
       private: std::vector<QDoubleSpinBox *> upperLimitSpinBoxes;
 
-      /// \brief Spin box for configuring the upper limit of the axis.
+      /// \brief Spin box for configuring the use_parent_model_frame flag of
+      /// the  axis.
       private: std::vector<QCheckBox *> frameCheckBoxes;
 
       /// \brief Type of joint.

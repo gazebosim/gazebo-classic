@@ -56,6 +56,11 @@ CollisionConfig::CollisionConfig()
 /////////////////////////////////////////////////
 CollisionConfig::~CollisionConfig()
 {
+  while (!this->configs.empty())
+  {
+    auto config = this->configs.begin();
+    this->configs.erase(config);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -85,14 +90,14 @@ void CollisionConfig::Reset()
 
 /////////////////////////////////////////////////
 void CollisionConfig::UpdateCollision(const std::string &_name,
-    const msgs::Collision *_collisionMsg)
+    ConstCollisionPtr _collisionMsg)
 {
   for (auto &it : this->configs)
   {
     if (it.second->name == _name)
     {
       CollisionConfigData *configData = it.second;
-      configData->configWidget->UpdateFromMsg(_collisionMsg);
+      configData->configWidget->UpdateFromMsg(_collisionMsg.get());
       break;
     }
   }

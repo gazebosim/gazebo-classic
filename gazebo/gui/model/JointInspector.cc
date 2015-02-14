@@ -265,7 +265,7 @@ math::Pose JointInspector::GetPose() const
 /////////////////////////////////////////////////
 math::Vector3 JointInspector::GetAxis(unsigned int _index) const
 {
-  if (_index > this->axisXSpinBoxes.size())
+  if (_index >= this->axisXSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return math::Vector3::Zero;
@@ -279,7 +279,7 @@ math::Vector3 JointInspector::GetAxis(unsigned int _index) const
 /////////////////////////////////////////////////
 double JointInspector::GetLowerLimit(unsigned int _index) const
 {
-  if (_index > this->lowerLimitSpinBoxes.size())
+  if (_index >= this->lowerLimitSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return 0;
@@ -291,7 +291,7 @@ double JointInspector::GetLowerLimit(unsigned int _index) const
 /////////////////////////////////////////////////
 double JointInspector::GetUpperLimit(unsigned int _index) const
 {
-  if (_index > this->upperLimitSpinBoxes.size())
+  if (_index >= this->upperLimitSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return 0;
@@ -303,7 +303,7 @@ double JointInspector::GetUpperLimit(unsigned int _index) const
 /////////////////////////////////////////////////
 bool JointInspector::GetUseParentModelFrame(unsigned int _index) const
 {
-  if (_index > this->frameCheckBoxes.size())
+  if (_index >= this->frameCheckBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return 0;
@@ -387,7 +387,7 @@ void JointInspector::SetPose(const math::Pose &_pose)
 /////////////////////////////////////////////////
 void JointInspector::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
-  if (_index > this->axisXSpinBoxes.size())
+  if (_index >= this->axisXSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return;
@@ -401,7 +401,7 @@ void JointInspector::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 /////////////////////////////////////////////////
 void JointInspector::SetLowerLimit(unsigned int _index, double _lower)
 {
-  if (_index > this->lowerLimitSpinBoxes.size())
+  if (_index >= this->lowerLimitSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return;
@@ -413,7 +413,7 @@ void JointInspector::SetLowerLimit(unsigned int _index, double _lower)
 /////////////////////////////////////////////////
 void JointInspector::SetUpperLimit(unsigned int _index, double _upper)
 {
-  if (_index > this->upperLimitSpinBoxes.size())
+  if (_index >= this->upperLimitSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return;
@@ -425,7 +425,7 @@ void JointInspector::SetUpperLimit(unsigned int _index, double _upper)
 /////////////////////////////////////////////////
 void JointInspector::SetUseParentModelFrame(unsigned int _index, bool _use)
 {
-  if (_index > this->frameCheckBoxes.size())
+  if (_index >= this->frameCheckBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return;

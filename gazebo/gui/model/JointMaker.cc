@@ -33,6 +33,7 @@
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/MainWindow.hh"
 
 #include "gazebo/gui/model/JointInspector.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
@@ -75,7 +76,19 @@ JointMaker::JointMaker()
 /////////////////////////////////////////////////
 JointMaker::~JointMaker()
 {
-  this->Reset();
+  if (this->mouseJoint)
+  {
+    delete this->mouseJoint;
+    this->mouseJoint = NULL;
+  }
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    while (this->joints.size() > 0)
+    {
+      this->RemoveJoint(this->joints.begin()->first);
+    }
+    this->joints.clear();
+  }
 
   delete this->updateMutex;
 }
@@ -101,7 +114,9 @@ void JointMaker::Reset()
   this->scopedLinkedNames.clear();
 
   while (this->joints.size() > 0)
+  {
     this->RemoveJoint(this->joints.begin()->first);
+  }
   this->joints.clear();
 }
 
@@ -135,9 +150,10 @@ void JointMaker::DisableEventHandlers()
 void JointMaker::RemoveJoint(const std::string &_jointName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  if (this->joints.find(_jointName) != this->joints.end())
+  auto jointIt = this->joints.find(_jointName);
+  if (jointIt != this->joints.end())
   {
-    JointData *joint = this->joints[_jointName];
+    JointData *joint = jointIt->second;
     rendering::ScenePtr scene = joint->hotspot->GetScene();
     scene->GetManager()->destroyBillboardSet(joint->handles);
     scene->RemoveVisual(joint->hotspot);
@@ -165,7 +181,7 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
     joint->inspector->hide();
     delete joint->inspector;
     delete joint;
-    this->joints.erase(_jointName);
+    this->joints.erase(jointIt);
     gui::model::Events::modelChanged();
   }
 }
@@ -343,6 +359,13 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   connect(jointData->inspector, SIGNAL(Applied()),
       jointData, SLOT(OnApply()));
 
+  MainWindow *mainWindow = gui::get_main_window();
+  if (mainWindow)
+  {
+    connect(gui::get_main_window(), SIGNAL(Close()), jointData->inspector,
+        SLOT(close()));
+  }
+
   int axisCount = JointMaker::GetJointAxisCount(jointData->type);
   for (int i = 0; i < axisCount; ++i)
   {
@@ -353,6 +376,10 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
 
     jointData->lowerLimit[i] = -3.14;
     jointData->upperLimit[i] = 3.14;
+    jointData->effortLimit[i] = -1;
+    jointData->velocityLimit[i] = -1;
+    jointData->useParentModelFrame[i] = true;
+    jointData->damping[i] = 0;
   }
   jointData->pose = math::Pose::Zero;
   jointData->line->setMaterial(this->jointMaterials[jointData->type]);
@@ -889,9 +916,12 @@ void JointMaker::GenerateSDF()
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
       limitElem->GetElement("lower")->Set(joint->lowerLimit[i]);
       limitElem->GetElement("upper")->Set(joint->upperLimit[i]);
-
+      limitElem->GetElement("effort")->Set(joint->effortLimit[i]);
+      limitElem->GetElement("velocity")->Set(joint->velocityLimit[i]);
       axisElem->GetElement("use_parent_model_frame")->Set(
           joint->useParentModelFrame[i]);
+      axisElem->GetElement("dynamics")->GetElement("damping")->Set(
+          joint->damping[i]);
     }
   }
 }
@@ -1085,12 +1115,27 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 
     joint->axis[i] = axisElem->Get<math::Vector3>("xyz");
 
-    joint->lowerLimit[i] = axisElem->GetElement("limit")->Get<double>("lower");
-    joint->upperLimit[i] = axisElem->GetElement("limit")->Get<double>("upper");
+    if (axisElem->HasElement("limit"))
+    {
+      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
+      joint->lowerLimit[i] = limitElem->Get<double>("lower");
+      joint->upperLimit[i] = limitElem->Get<double>("upper");
+      joint->effortLimit[i] = limitElem->Get<double>("effort");
+      joint->velocityLimit[i] = limitElem->Get<double>("velocity");
+    }
 
     // Use parent model frame
-    bool useParent = axisElem->Get<bool>("use_parent_model_frame");
-    joint->useParentModelFrame[i] = useParent;
+    if (axisElem->HasElement("use_parent_model_frame"))
+    {
+      bool useParent = axisElem->Get<bool>("use_parent_model_frame");
+      joint->useParentModelFrame[i] = useParent;
+    }
+
+    if (axisElem->HasElement("dynamics"))
+    {
+      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+      joint->damping[i] = dynamicsElem->Get<double>("damping");
+    }
   }
 
   // Inspector

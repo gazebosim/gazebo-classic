@@ -310,6 +310,8 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   }
 #endif
 
+  emit Close();
+
   gazebo::shutdown();
 }
 

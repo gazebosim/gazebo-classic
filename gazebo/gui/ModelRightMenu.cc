@@ -145,12 +145,11 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
   menu.addAction(this->moveToAct);
   menu.addAction(this->followAct);
 
-  menu.addSeparator();
-  menu.addAction(this->editAct);
-  menu.addSeparator();
-
   if (_type == EntityTypes::MODEL)
   {
+    menu.addSeparator();
+    menu.addAction(this->editAct);
+    menu.addSeparator();
     // menu.addAction(this->snapBelowAct);
 
     // Create the view menu

@@ -41,6 +41,7 @@
 #include "gazebo/gui/ModelSnap.hh"
 #include "gazebo/gui/ModelAlign.hh"
 #include "gazebo/gui/SaveDialog.hh"
+#include "gazebo/gui/MainWindow.hh"
 
 #include "gazebo/gui/model/ModelData.hh"
 #include "gazebo/gui/model/LinkInspector.hh"
@@ -145,7 +146,10 @@ ModelCreator::ModelCreator()
 /////////////////////////////////////////////////
 ModelCreator::~ModelCreator()
 {
-  this->Reset();
+  while (!this->allParts.empty())
+    this->RemovePart(this->allParts.begin()->first);
+
+  this->allParts.clear();
   this->node->Fini();
   this->node.reset();
   this->modelTemplateSDF.reset();
@@ -153,6 +157,7 @@ ModelCreator::~ModelCreator()
   this->makerPub.reset();
   this->connections.clear();
 
+  delete this->saveDialog;
   delete this->updateMutex;
 
   delete jointMaker;
@@ -202,7 +207,11 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
 {
   if (!gui::get_active_camera() ||
       !gui::get_active_camera()->GetScene())
+  {
+    gzerr << "Unable to edit model. GUI camera or scene is NULL"
+        << std::endl;
     return;
+  }
 
   if (!this->active)
   {
@@ -254,8 +263,8 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
           }
 
           this->serverModelName = _modelName;
-          this->serverModelPose = serverModelPose;
           this->serverModelSDF = model;
+          this->modelPose = pose;
 
           return;
         }
@@ -264,6 +273,11 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
       gzwarn << "Couldn't find SDF for " << _modelName << ". Not loading it."
           << std::endl;
     }
+  }
+  else
+  {
+    GZ_ASSERT(response->type() == msg.GetTypeName(),
+        "Received incorrect response from 'world_sdf' request.");
   }
 }
 
@@ -438,9 +452,7 @@ void ModelCreator::OnExit()
   {
     case ALL_SAVED:
     {
-      QString msg("Once you exit the Model Editor, "
-      "your model will no longer be editable.\n\n"
-      "Are you ready to exit?\n\n");
+      QString msg("Are you ready to exit?\n\n");
       QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
       msgBox.addButton("Exit", QMessageBox::ApplyRole);
       QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
@@ -455,9 +467,7 @@ void ModelCreator::OnExit()
     case UNSAVED_CHANGES:
     case NEVER_SAVED:
     {
-      QString msg("Save Changes before exiting?\n\n"
-          "Note: Once you exit the Model Editor, "
-          "your model will no longer be editable.\n\n");
+      QString msg("Save Changes before exiting?\n\n");
 
       QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
       QPushButton *cancelButton = msgBox.addButton("Cancel",
@@ -594,6 +604,13 @@ std::string ModelCreator::AddShape(PartType _type,
 void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 {
   PartData *part = new PartData();
+  MainWindow *mainWindow = gui::get_main_window();
+  if (mainWindow)
+  {
+    connect(gui::get_main_window(), SIGNAL(Close()), part->inspector,
+        SLOT(close()));
+  }
+
   part->partVisual = _visual->GetParent();
   part->AddVisual(_visual);
 
@@ -629,11 +646,12 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
     leafName = partName.substr(idx+1);
 
   part->SetName(leafName);
-  part->SetPose(part->partVisual->GetWorldPose());
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allParts[partName] = part;
+    if (this->canonicalLink.empty())
+      this->canonicalLink = partName;
   }
 
   rendering::ScenePtr scene = part->partVisual->GetScene();
@@ -685,6 +703,12 @@ PartData *ModelCreator::ClonePart(const std::string &_partName)
 void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 {
   PartData *part = new PartData();
+  MainWindow *mainWindow = gui::get_main_window();
+  if (mainWindow)
+  {
+    connect(gui::get_main_window(), SIGNAL(Close()), part->inspector,
+        SLOT(close()));
+  }
 
   part->Load(_linkElem);
 
@@ -695,6 +719,9 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
   linkNameStream << this->previewName << "_" << this->modelCounter << "::";
   linkNameStream << leafName;
   std::string linkName = linkNameStream.str();
+
+  if (this->canonicalLink.empty())
+    this->canonicalLink = linkName;
 
   part->SetName(leafName);
 
@@ -842,7 +869,6 @@ void ModelCreator::RemovePart(const std::string &_partName)
   }
 
   PartData *part = NULL;
-
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     if (this->allParts.find(_partName) == this->allParts.end())
@@ -869,25 +895,21 @@ void ModelCreator::RemovePart(const std::string &_partName)
   scene->RemoveVisual(part->partVisual);
 
   part->partVisual.reset();
-  delete part->inspector;
-
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allParts.erase(_partName);
+    delete part;
   }
+
   this->ModelChanged();
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::Reset()
 {
-  if (!gui::get_active_camera() ||
-      !gui::get_active_camera()->GetScene())
-    return;
-
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-
+  delete this->saveDialog;
   this->saveDialog = new SaveDialog(SaveDialog::MODEL);
+
   this->jointMaker->Reset();
   this->selectedVisuals.clear();
   g_copyAct->setEnabled(false);
@@ -896,16 +918,14 @@ void ModelCreator::Reset()
   this->currentSaveState = NEVER_SAVED;
   this->SetModelName(this->modelDefaultName);
   this->serverModelName = "";
-  this->serverModelPose = math::Pose::Zero;
   this->serverModelSDF.reset();
   this->serverModelVisible.clear();
+  this->canonicalLink = "";
 
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
 
   this->modelSDF.reset(new sdf::SDF);
-
-  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
   this->isStatic = false;
   this->autoDisable = true;
@@ -914,6 +934,11 @@ void ModelCreator::Reset()
     this->RemovePart(this->allParts.begin()->first);
   this->allParts.clear();
 
+  if (!gui::get_active_camera() ||
+    !gui::get_active_camera()->GetScene())
+  return;
+
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
   if (this->previewVisual)
     scene->RemoveVisual(this->previewVisual);
 
@@ -1018,7 +1043,7 @@ void ModelCreator::CreateTheEntity()
   }
 
   msg.set_sdf(this->modelSDF->ToString());
-  msgs::Set(msg.mutable_pose(), this->modelPose + this->serverModelPose);
+  msgs::Set(msg.mutable_pose(), this->modelPose);
   this->makerPub->Publish(msg);
 }
 
@@ -1173,7 +1198,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         this->allParts.end())
     {
       PartData *part = this->allParts[this->mouseVisual->GetName()];
-      part->SetPose(this->mouseVisual->GetWorldPose());
+      part->SetPose(this->mouseVisual->GetWorldPose() - this->modelPose);
     }
 
     // reset and return
@@ -1342,7 +1367,7 @@ void ModelCreator::OpenInspector(const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   PartData *part = this->allParts[_name];
-  part->SetPose(part->partVisual->GetWorldPose());
+  part->SetPose(part->partVisual->GetWorldPose() - this->modelPose);
   part->UpdateConfig();
   part->inspector->move(QCursor::pos());
   part->inspector->show();
@@ -1428,9 +1453,6 @@ void ModelCreator::GenerateSDF()
   modelElem = this->modelSDF->root->GetElement("model");
 
   modelElem->ClearElements();
-  std::stringstream visualNameStream;
-  std::stringstream collisionNameStream;
-
   modelElem->GetAttribute("name")->Set(this->folderName);
 
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
@@ -1448,40 +1470,32 @@ void ModelCreator::GenerateSDF()
     this->modelPose.pos = mid;
   }
 
-  modelElem->GetElement("pose")->Set(this->modelPose);
 
-  // loop through all parts and generate sdf
+  // generate canonical link sdf first.
+  if (!this->canonicalLink.empty())
+  {
+    auto canonical = this->allParts.find(this->canonicalLink);
+    if (canonical != this->allParts.end())
+    {
+      PartData *part = canonical->second;
+      part->UpdateConfig();
+
+      sdf::ElementPtr newLinkElem = this->GenerateLinkSDF(part);
+      modelElem->InsertElement(newLinkElem);
+    }
+  }
+
+  // loop through rest of all parts and generate sdf
   for (auto &partsIt : this->allParts)
   {
-    visualNameStream.str("");
-    collisionNameStream.str("");
+    if (partsIt.first == this->canonicalLink)
+      continue;
 
     PartData *part = partsIt.second;
     part->UpdateConfig();
 
-    sdf::ElementPtr newLinkElem = part->partSDF->Clone();
-    newLinkElem->GetElement("pose")->Set(part->partVisual->GetWorldPose()
-        - this->modelPose - this->serverModelPose);
-
+    sdf::ElementPtr newLinkElem = this->GenerateLinkSDF(part);
     modelElem->InsertElement(newLinkElem);
-
-    // visuals
-    for (auto const &it : part->visuals)
-    {
-      rendering::VisualPtr visual = it.first;
-      msgs::Visual visualMsg = it.second;
-      sdf::ElementPtr visualElem = visual->GetSDF()->Clone();
-      visualElem->GetElement("transparency")->Set<double>(
-          visualMsg.transparency());
-      newLinkElem->InsertElement(visualElem);
-    }
-
-    // collisions
-    for (auto const &colIt : part->collisions)
-    {
-      sdf::ElementPtr collisionElem = msgs::CollisionToSDF(colIt.second);
-      newLinkElem->InsertElement(collisionElem);
-    }
   }
 
   // Add joint sdf elements
@@ -1515,6 +1529,38 @@ void ModelCreator::GenerateSDF()
       }
     }
   }
+}
+
+/////////////////////////////////////////////////
+sdf::ElementPtr ModelCreator::GenerateLinkSDF(PartData *_part)
+{
+  std::stringstream visualNameStream;
+  std::stringstream collisionNameStream;
+  visualNameStream.str("");
+  collisionNameStream.str("");
+
+  sdf::ElementPtr newLinkElem = _part->partSDF->Clone();
+  newLinkElem->GetElement("pose")->Set(_part->partVisual->GetWorldPose()
+      - this->modelPose);
+
+  // visuals
+  for (auto const &it : _part->visuals)
+  {
+    rendering::VisualPtr visual = it.first;
+    msgs::Visual visualMsg = it.second;
+    sdf::ElementPtr visualElem = visual->GetSDF()->Clone();
+    visualElem->GetElement("transparency")->Set<double>(
+        visualMsg.transparency());
+    newLinkElem->InsertElement(visualElem);
+  }
+
+  // collisions
+  for (auto const &colIt : _part->collisions)
+  {
+    sdf::ElementPtr collisionElem = msgs::CollisionToSDF(colIt.second);
+    newLinkElem->InsertElement(collisionElem);
+  }
+  return newLinkElem;
 }
 
 /////////////////////////////////////////////////
@@ -1592,7 +1638,7 @@ void ModelCreator::Update()
     PartData *part = partsIt.second;
     if (part->GetPose() != part->partVisual->GetWorldPose())
     {
-      part->SetPose(part->partVisual->GetWorldPose());
+      part->SetPose(part->partVisual->GetWorldPose() - this->modelPose);
       this->ModelChanged();
     }
     for (auto scaleIt : this->partScaleUpdate)
@@ -1600,6 +1646,8 @@ void ModelCreator::Update()
       if (part->partVisual->GetName() == scaleIt.first)
         part->SetScale(scaleIt.second);
     }
+    if (!this->partScaleUpdate.empty())
+      this->ModelChanged();
     this->partScaleUpdate.clear();
   }
 }
@@ -1640,11 +1688,14 @@ void ModelCreator::SetModelVisible(rendering::VisualPtr _visual, bool _visible)
   if (!_visual)
     return;
 
+  for (unsigned int i = 0; i < _visual->GetChildCount(); ++i)
+    this->SetModelVisible(_visual->GetChild(i), _visible);
+
   if (!_visible)
   {
-    // store original visibility and hide all visuals
+    // store original visibility
     this->serverModelVisible[_visual->GetId()] = _visual->GetVisible();
-    _visual->SetVisible(_visible);
+     _visual->SetVisible(_visible);
   }
   else
   {
@@ -1652,9 +1703,9 @@ void ModelCreator::SetModelVisible(rendering::VisualPtr _visual, bool _visible)
     std::map<uint32_t, bool>::iterator it =
         this->serverModelVisible.find(_visual->GetId());
     if (it != this->serverModelVisible.end())
-      _visual->SetVisible(it->second);
+    {
+      _visual->SetVisible(it->second, false);
+    }
   }
 
-  for (unsigned int i = 0; i < _visual->GetChildCount(); ++i)
-    this->SetModelVisible(_visual->GetChild(i), _visible);
 }

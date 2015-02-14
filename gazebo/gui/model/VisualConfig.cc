@@ -57,6 +57,11 @@ VisualConfig::VisualConfig()
 /////////////////////////////////////////////////
 VisualConfig::~VisualConfig()
 {
+  while (!this->configs.empty())
+  {
+    auto config = this->configs.begin();
+    this->configs.erase(config);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -189,14 +194,14 @@ void VisualConfig::AddVisual(const std::string &_name,
 
 /////////////////////////////////////////////////
 void VisualConfig::UpdateVisual(const std::string &_name,
-    const msgs::Visual *_visualMsg)
+    ConstVisualPtr _visualMsg)
 {
   for (auto &it : this->configs)
   {
     if (it.second->name == _name)
     {
       VisualConfigData *configData = it.second;
-      configData->configWidget->UpdateFromMsg(_visualMsg);
+      configData->configWidget->UpdateFromMsg(_visualMsg.get());
       break;
     }
   }

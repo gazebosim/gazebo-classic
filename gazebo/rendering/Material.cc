@@ -158,6 +158,7 @@ void Material::Update(const gazebo::common::Material *_mat)
   common::Color specular = _mat->GetSpecular();
   common::Color emissive = _mat->GetEmissive();
 
+
   pass->setLightingEnabled(_mat->GetLighting());
   pass->setDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
   pass->setAmbient(ambient.r, ambient.g, ambient.b);
@@ -208,7 +209,9 @@ bool Material::GetMaterialAsColor(const std::string &_materialName,
         _ambient = Conversions::Convert(pass->getAmbient());
         _diffuse = Conversions::Convert(pass->getDiffuse());
         _specular = Conversions::Convert(pass->getSpecular());
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
         _emissive = Conversions::Convert(pass->getEmissive());
+#endif
         return true;
       }
     }
