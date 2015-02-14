@@ -36,7 +36,7 @@ namespace gazebo
       public: VisualPtr originVisual;
 
       /// TODO
-      public: rendering::ArrowVisualPtr forceVisual;
+      public: VisualPtr forceVisual;
 
       /// TODO
       public: rendering::SelectionObjPtr rotTool;

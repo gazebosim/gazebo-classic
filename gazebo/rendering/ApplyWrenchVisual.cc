@@ -19,7 +19,7 @@
 
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/ArrowVisual.hh"
+#include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/ApplyWrenchVisualPrivate.hh"
 #include "gazebo/rendering/ApplyWrenchVisual.hh"
@@ -95,9 +95,41 @@ void ApplyWrenchVisual::Load()
   dPtr->comVisual->GetSceneNode()->setInheritScale(false);
 
   // Force visual
-  dPtr->forceVisual.reset(new rendering::ArrowVisual(
+  dPtr->forceVisual.reset(new rendering::Visual(
       this->GetName() + "__FORCE_VISUAL__", shared_from_this()));
   dPtr->forceVisual->Load();
+  dPtr->scene->AddVisual(dPtr->forceVisual);
+
+  // Force shaft
+  this->InsertMesh("axis_shaft");
+
+  Ogre::MovableObject *shaftObj =
+    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+          this->GetName()+"__FORCE_SHAFT__", "axis_shaft"));
+  shaftObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string(dPtr->forceVisual->GetName())));
+
+  Ogre::SceneNode *shaftNode =
+      dPtr->forceVisual->GetSceneNode()->createChildSceneNode(
+      this->GetName() + "__FORCE_SHAFT_NODE__");
+  shaftNode->attachObject(shaftObj);
+  shaftNode->setPosition(0, 0, 0.1);
+
+  // Force head
+  this->InsertMesh("axis_head");
+
+  Ogre::MovableObject *headObj =
+    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+          this->GetName()+"__FORCE_HEAD__", "axis_head"));
+  headObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string(dPtr->forceVisual->GetName())));
+
+  Ogre::SceneNode *headNode =
+      dPtr->forceVisual->GetSceneNode()->createChildSceneNode(
+      this->GetName() + "__FORCE_SHAFT_HEAD__");
+  headNode->attachObject(headObj);
+  headNode->setPosition(0, 0, 0.24);
+
   dPtr->forceVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
   dPtr->forceVisual->SetScale(math::Vector3(5, 5, 5));
   dPtr->forceVisual->GetSceneNode()->setInheritScale(false);
@@ -106,6 +138,7 @@ void ApplyWrenchVisual::Load()
   dPtr->torqueVisual.reset(new rendering::Visual(
        this->GetName() + "__TORQUE_VISUAL__", shared_from_this()));
   dPtr->torqueVisual->Load();
+  dPtr->scene->AddVisual(dPtr->torqueVisual);
 
   // Torque tube
   common::MeshManager::Instance()->CreateTube("torque_tube",
@@ -115,6 +148,8 @@ void ApplyWrenchVisual::Load()
   Ogre::MovableObject *tubeObj =
     (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
         this->GetName()+"__TORQUE_TUBE__", "torque_tube"));
+  tubeObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string(dPtr->torqueVisual->GetName())));
 
   Ogre::SceneNode *tubeNode =
       dPtr->torqueVisual->GetSceneNode()->createChildSceneNode(
@@ -124,18 +159,20 @@ void ApplyWrenchVisual::Load()
   // Torque arrow
   this->InsertMesh("axis_head");
 
-  Ogre::MovableObject *headObj =
+  Ogre::MovableObject *torqueHeadObj =
     (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
           this->GetName()+"__TORQUE_HEAD__", "axis_head"));
+  torqueHeadObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string(dPtr->torqueVisual->GetName())));
 
-  Ogre::SceneNode *headNode =
+  Ogre::SceneNode *torqueHeadNode =
       dPtr->torqueVisual->GetSceneNode()->createChildSceneNode(
       this->GetName() + "__TORQUE_HEAD_NODE__");
-  headNode->attachObject(headObj);
-  headNode->setScale(3, 3, 1);
-  headNode->setPosition(-0.125, -0.02, 0);
+  torqueHeadNode->attachObject(torqueHeadObj);
+  torqueHeadNode->setScale(3, 3, 1);
+  torqueHeadNode->setPosition(-0.125, -0.02, 0);
   math::Quaternion quat(1.57, 0, 0);
-  headNode->setOrientation(
+  torqueHeadNode->setOrientation(
       Ogre::Quaternion(quat.w, quat.x, quat.y, quat.z));
 
   dPtr->torqueVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
@@ -162,7 +199,8 @@ void ApplyWrenchVisual::Load()
   dPtr->torqueVector = math::Vector3::Zero;
   dPtr->mode = "force";
 
-  this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->SetVisibilityFlags(GZ_VISIBILITY_GUI |
+      GZ_VISIBILITY_SELECTABLE);
   this->SetForceVisual();
   this->SetTorqueVisual();
   this->SetWrenchMode("none");

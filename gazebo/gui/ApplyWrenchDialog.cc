@@ -807,8 +807,34 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent & _event)
 }
 
 /////////////////////////////////////////////////
-bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent & /*_event*/)
+bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent & _event)
 {
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
+    return false;
+
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos,
+        this->dataPtr->manipState);
+
+  if (vis)
+  {
+    if (vis->GetName().find("_FORCE_VISUAL_") != std::string::npos)
+    {
+      if (this->dataPtr->forceVector == math::Vector3::Zero)
+        this->SetForce(math::Vector3::UnitX);
+      else
+        this->SetForce(this->dataPtr->forceVector);
+      return true;
+    }
+    else if (vis->GetName().find("_TORQUE_VISUAL_") != std::string::npos)
+    {
+      if (this->dataPtr->torqueVector == math::Vector3::Zero)
+        this->SetTorque(math::Vector3::UnitX);
+      else
+        this->SetTorque(this->dataPtr->torqueVector);
+      return true;
+    }
+  }
   return false;
 }
 
