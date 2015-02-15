@@ -773,6 +773,7 @@ bool UserCamera::StereoEnabled() const
 //////////////////////////////////////////////////
 void UserCamera::EnableStereo(bool _enable)
 {
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
   if (this->dataPtr->rightViewport)
   {
     if (_enable)
@@ -791,6 +792,10 @@ void UserCamera::EnableStereo(bool _enable)
   else
   {
     gzwarn << "Tried to enable/disable stereo. "
-           << "However, stereo is turned on via the gui.ini file.\n";
+           << "However, stereo is turned off via the gui.ini file.\n";
   }
+#else
+    gzwarn << "Tried to enable/disable stereo. "
+           << "However, Ogre version >= 1.10.0 is required.\n";
+#endif
 }
