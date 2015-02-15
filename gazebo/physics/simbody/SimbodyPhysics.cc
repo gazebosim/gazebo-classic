@@ -1347,10 +1347,12 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->GetNormal());
 
         // store ContactGeometry pointer in SimbodyCollision object
-        const SimTK::ContactSurface &contactSurf =
-          this->matter.Ground().getBody().getContactSurface(surfNum);
+        SimTK::ContactSurface &contactSurf =
+          this->matter.Ground().updBody().updContactSurface(surfNum);
 
-        (*ci)->SetContactShape(contactSurf.getGeomtry());
+        SimbodyCollisionPtr sc =
+          boost::dynamic_pointer_cast<physics::SimbodyCollision>(*ci);
+        sc->SetCollisionShape(&contactSurf.updShape());
 
         // by default, simbody HalfSpace normal is in the -X direction
         // rotate it based on normal vector specified by user
