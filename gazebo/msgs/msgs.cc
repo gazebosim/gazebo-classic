@@ -41,15 +41,6 @@ namespace gazebo
     /// \param[in] _sdf sdf::ElementPtr to fill with data.
     void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf);
 
-    /// \internal
-    /// \brief Internal function to add a link with a collision and visual
-    /// of specified geometry to a model message.
-    /// It is only intended to be used by functions like AddBoxLink,
-    /// which compute the appropriate inertia values.
-    /// \param[out] _model The msgs::Model object to receive a new link.
-    /// \param[in] _geom Geometry to be added to collision and visual.
-    void AddLinkGeom(Model &_msg, const Geometry &_geom);
-
     /// Create a request message
     msgs::Request *CreateRequest(const std::string &_request,
         const std::string &_data)

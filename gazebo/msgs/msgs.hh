@@ -431,6 +431,13 @@ namespace gazebo
     void AddSphereLink(msgs::Model &_model, const double _mass,
                     const double _radius);
 
+    /// \brief Add a link with a collision and visual
+    /// of specified geometry to a model message.
+    /// It does not set any inertial values.
+    /// \param[out] _model The msgs::Model object to receive a new link.
+    /// \param[in] _geom Geometry to be added to collision and visual.
+    void AddLinkGeom(Model &_msg, const Geometry &_geom);
+
     /// \brief Create an SDF element from msgs::Model.
     /// \param[in] _msg The msgs::Model object.
     /// \param[in] _sdf if supplied, performs an update from _sdf instead of
