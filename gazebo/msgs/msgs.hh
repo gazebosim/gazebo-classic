@@ -436,6 +436,7 @@ namespace gazebo
     /// It does not set any inertial values.
     /// \param[out] _model The msgs::Model object to receive a new link.
     /// \param[in] _geom Geometry to be added to collision and visual.
+    GAZEBO_VISIBLE
     void AddLinkGeom(Model &_msg, const Geometry &_geom);
 
     /// \brief Create an SDF element from msgs::Model.
