@@ -7,6 +7,9 @@
 1. Added Visual, Material Msg-to-SDF conversion functions and ShaderType to string conversion functions.
     * [Pull request #1415](https://bitbucket.org/osrf/gazebo/pull-request/1415)
 
+1. Added ERB parsing to the `gz sdf` command line tool.
+    * [Pull request #1182](https://bitbucket.org/osrf/gazebo/pull-request/1182)
+
 ### Gazebo 5.0.0
 1. Support for using [digital elevation maps](http://gazebosim.org/tutorials?tut=dem) has been added to debian packages.
 

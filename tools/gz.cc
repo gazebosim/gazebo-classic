@@ -993,10 +993,20 @@ bool SDFCommand::RunImpl()
     boost::filesystem::path path = this->vm["convert"].as<std::string>();
 
     if (!boost::filesystem::exists(path))
+    {
       std::cerr << "Error: File doesn't exist[" << path.string() << "]\n";
+      return false;
+    }
+
+    std::string result;
+    if (sdf::erbFile(path.string(), result) || result.empty())
+    {
+      std::cerr << "Unable to ERB parse file[" << path.string() << "]\n";
+      return false;
+    }
 
     TiXmlDocument xmlDoc;
-    if (xmlDoc.LoadFile(path.string()))
+    if (xmlDoc.Parse(result.c_str()))
     {
       if (sdf::Converter::Convert(&xmlDoc, sdf::SDF::version, true))
       {
@@ -1015,7 +1025,7 @@ bool SDFCommand::RunImpl()
     }
     else
     {
-      std::cerr << "Unable to load file[" << path.string() << "]\n";
+      std::cerr << "Unable to parse file[" << path.string() << "]\n";
       return false;
     }
   }
