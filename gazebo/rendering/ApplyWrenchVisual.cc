@@ -79,6 +79,7 @@ void ApplyWrenchVisual::Load()
   Ogre::MovableObject *comObj =
     (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
           this->GetName()+"__CoM_SPHERE__", "unit_sphere"));
+  comObj->setCastShadows(false);
 
   Ogre::SceneNode *comNode =
       dPtr->comVisual->GetSceneNode()->createChildSceneNode(

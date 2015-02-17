@@ -19,6 +19,7 @@
 #define _GAZEBO_APPLY_WRENCH_DIALOG_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/math/Vector2i.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -156,6 +157,11 @@ namespace gazebo
       /// \param[in] _event The mouse move event
       /// \return True if handled by this function.
       private: bool OnMouseMove(const common::MouseEvent &_event);
+
+      /// \brief Callback for a key press event.
+      /// \param[in] _event The ley press event
+      /// \return True if handled by this function.
+      private: bool OnKeyPress(const common::KeyEvent &_event);
 
       /// \brief TODO
       private: void SetPublisher();

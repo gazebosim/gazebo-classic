@@ -26,6 +26,7 @@
 
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/ApplyWrenchDialogPrivate.hh"
 #include "gazebo/gui/ApplyWrenchDialog.hh"
@@ -1255,6 +1256,10 @@ void ApplyWrenchDialog::SetActive(bool _active)
     MouseEventHandler::Instance()->AddMoveFilter(
         "applyWrenchDialog_"+this->dataPtr->linkName,
         boost::bind(&ApplyWrenchDialog::OnMouseMove, this, _1));
+
+    KeyEventHandler::Instance()->AddPressFilter(
+        "applyWrenchDialog_"+this->dataPtr->linkName,
+        boost::bind(&ApplyWrenchDialog::OnKeyPress, this, _1));
   }
   else
   {
@@ -1265,6 +1270,9 @@ void ApplyWrenchDialog::SetActive(bool _active)
     MouseEventHandler::Instance()->RemoveReleaseFilter(
         "applyWrenchDialog_"+this->dataPtr->linkName);
     MouseEventHandler::Instance()->RemoveMoveFilter(
+        "applyWrenchDialog_"+this->dataPtr->linkName);
+
+    KeyEventHandler::Instance()->RemovePressFilter(
         "applyWrenchDialog_"+this->dataPtr->linkName);
   }
 }
@@ -1277,4 +1285,28 @@ void ApplyWrenchDialog::OnPreRender()
 
   if (!vis)
     this->reject();
+}
+
+/////////////////////////////////////////////////
+bool ApplyWrenchDialog::OnKeyPress(const common::KeyEvent &_event)
+{
+  if (_event.key == Qt::Key_F)
+  {
+  //copied from mouserelease
+    if (this->dataPtr->mode == "torque")
+    {
+      if (this->dataPtr->forceVector == math::Vector3::Zero)
+        this->SetForce(math::Vector3::UnitX);
+      else
+        this->SetForce(this->dataPtr->forceVector);
+    }
+    else
+    {
+      if (this->dataPtr->torqueVector == math::Vector3::Zero)
+        this->SetTorque(math::Vector3::UnitX);
+      else
+        this->SetTorque(this->dataPtr->torqueVector);
+    }
+  }
+  return false;
 }
