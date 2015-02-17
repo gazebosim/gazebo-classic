@@ -918,35 +918,36 @@ void MeshManager::CreateCone(const std::string &name, float radius,
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreateTube(const std::string &name, float innerRadius,
-    float outterRadius, float height, int rings, int segments, double arc)
+void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
+    float _outerRadius, float _height, int _rings, int _segments, double _arc)
 {
   math::Vector3 vert, norm;
   unsigned int verticeIndex = 0;
   int ring, seg;
-  float deltaSegAngle = (arc / segments);
 
   // Needs at lest 1 ring, and 3 segments
-  rings = std::max(rings, 1);
-  segments = std::max(segments, 3);
+  int rings = std::max(_rings, 1);
+  int segments = std::max(_segments, 3);
+
+  float deltaSegAngle = (_arc / segments);
 
   float radius = 0;
 
-  radius = outterRadius;
+  radius = _outerRadius;
 
-  if (this->HasMesh(name))
+  if (this->HasMesh(_name))
     return;
 
   Mesh *mesh = new Mesh();
-  mesh->SetName(name);
-  this->meshes.insert(std::make_pair(name, mesh));
+  mesh->SetName(_name);
+  this->meshes.insert(std::make_pair(_name, mesh));
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
   // Generate the group of rings for the outsides of the cylinder
   for (ring = 0; ring <= rings; ring++)
   {
-    vert.z = ring * height/rings - height/2.0;
+    vert.z = ring * _height/rings - _height/2.0;
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
@@ -1012,10 +1013,10 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
   }
 
   // Generate the group of rings for the inside of the cylinder
-  radius = innerRadius;
+  radius = _innerRadius;
   for (ring = 0; ring <= rings; ring++)
   {
-    vert.z = (height/2.0) - (ring * height/rings);
+    vert.z = (_height/2.0) - (ring * _height/rings);
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
@@ -1056,7 +1057,7 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
   }
 
   // Close ends in case it's not a full circle
-  if (arc != 2.0 * M_PI)
+  if (!math::equal(_arc, 2.0 * M_PI))
   {
     for (ring = 0; ring < rings; ring++)
     {
