@@ -7,21 +7,78 @@
 
 using namespace std;
 
+Node::Node()
+{
+  full = 0;
+  dst = 0;
+  priority = 0;
+}
+
+int Node::getXPos()
+{
+  return x_pos;
+}
+
+int Node::getYPos()
+{
+  return y_pos;
+}
+
+int Node::getFull()
+{
+  return full;
+}
+
+int Node::getDst()
+{
+  return dst;
+}
+
+int Node::getPriority()
+{
+  return priority;
+}
+
+Node *Node::getParent()
+{
+  return parent;
+}
+
+void Node::setFull(int x)
+{
+  full = x;
+}
+
+void Node::setDst(int x)
+{
+  dst = x;
+}
+
+void Node::setPriority(int x)
+{
+  priority = x;
+}
+
+void Node::setParent(Node *n)
+{
+  parent = n;
+}
+
 CollisionMapGrid::CollisionMapGrid(int xStart, int xDim, int yStart, int yDim)
 {
   x_start = xStart;
   x_dim = xDim;
   y_start = yStart;
   y_dim = yDim;
-  cells = new int[xDim * yDim];
+  nodes = new Node *[xDim * yDim];
   for (int i=0; i<(xDim*yDim); i++) {
-    cells[i] = 0;
+    nodes[i] = new Node();
   }
 }
 
 CollisionMapGrid::~CollisionMapGrid()
 {
-  delete [] cells;
+  delete [] nodes;
 }
 
 int CollisionMapGrid::getXDim()
@@ -46,12 +103,17 @@ int CollisionMapGrid::getYStart()
 
 bool CollisionMapGrid::isFree(int x, int y) 
 {
-  return !(cells[x + (y*y_dim)]);
+  return !(nodes[x + (y*y_dim)]->getFull());
 }
 
 void CollisionMapGrid::fill(int x, int y)
 {
-  cells[x + (y*y_dim)] = 1;
+  nodes[x + (y*y_dim)]->setFull(1);
+}
+
+Node *CollisionMapGrid::getNode(int x, int y)
+{
+  return nodes[x + (y*y_dim)];
 }
 
 void CollisionMapGrid::print(std::string filename)
@@ -66,7 +128,7 @@ void CollisionMapGrid::print(std::string filename)
   for (int i=0; i<y_dim; i++) {
     outfile << "|";
     for (int j=0; j<x_dim; j++) {    
-      outfile << cells[(y_dim * i) + j];
+      outfile << nodes[(y_dim * i) + j]->getFull();
     }
     outfile << "|\n";
   }
