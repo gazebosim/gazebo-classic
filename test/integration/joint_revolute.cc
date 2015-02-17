@@ -39,7 +39,9 @@ class JointTestRevolute : public JointTest
   /// Measure angular velocity of links, and verify proper axis orientation.
   /// Then set joint limits and verify that links remain within limits.
   /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void RevoluteJoint(const std::string &_physicsEngine);
+  /// \param[in] _solverType Type of solver to use.
+  public: void RevoluteJoint(const std::string &_physicsEngine,
+                             const std::string &_solverType="quick");
 
   /// \brief Load a simple pendulum, simulate and compare to numerical
   /// results from SimplePendulumIntegrator.
@@ -151,7 +153,8 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
 
 
 ////////////////////////////////////////////////////////////////////////
-void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
+void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
+                                      const std::string &_solverType)
 {
   math::Rand::SetSeed(0);
   // Load world
@@ -163,6 +166,9 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // Set solver type
+  physics->SetParam("solver_type", _solverType);
 
   // Model names
   std::vector<std::string> modelNames;
@@ -735,6 +741,11 @@ TEST_P(JointTestRevolute, PendulumEnergy)
 TEST_P(JointTestRevolute, RevoluteJoint)
 {
   RevoluteJoint(this->physicsEngine);
+}
+
+TEST_F(JointTestRevolute, RevoluteJointWorldStep)
+{
+  RevoluteJoint("ode", "world");
 }
 
 TEST_P(JointTestRevolute, SimplePendulum)
