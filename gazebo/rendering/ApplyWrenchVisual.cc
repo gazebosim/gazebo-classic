@@ -153,7 +153,7 @@ void ApplyWrenchVisual::Load()
 
   // Torque tube
   common::MeshManager::Instance()->CreateTube("torque_tube",
-      0.1, 0.15, 0.05, 2, 32);
+      0.1, 0.15, 0.05, 2, 32, 1.5*M_PI);
   this->InsertMesh("torque_tube");
 
   Ogre::MovableObject *tubeObj =
@@ -181,8 +181,8 @@ void ApplyWrenchVisual::Load()
       this->GetName() + "__TORQUE_HEAD_NODE__");
   torqueHeadNode->attachObject(torqueHeadObj);
   torqueHeadNode->setScale(3, 3, 1);
-  torqueHeadNode->setPosition(-0.125, -0.02, 0);
-  math::Quaternion quat(1.57, 0, 0);
+  torqueHeadNode->setPosition(-0.04, 0.125, 0);
+  math::Quaternion quat(0, -1.57, 0);
   torqueHeadNode->setOrientation(
       Ogre::Quaternion(quat.w, quat.x, quat.y, quat.z));
 

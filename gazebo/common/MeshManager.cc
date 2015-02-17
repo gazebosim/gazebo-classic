@@ -920,15 +920,15 @@ void MeshManager::CreateCone(const std::string &name, float radius,
 //////////////////////////////////////////////////
 void MeshManager::CreateTube(const std::string &name, float innerRadius,
     float outterRadius, float height, int rings,
-    int segments)
+    int segments, double arc)
 {
   math::Vector3 vert, norm;
   unsigned int verticeIndex = 0;
   int ring, seg;
-  float deltaSegAngle = (2.0 * M_PI / segments);
+  float deltaSegAngle = (arc / segments);
 
-  // Needs at lest 2 rings, and 3 segments
-  rings = std::max(rings, 2);
+  // Needs at lest 1 ring, and 3 segments
+  rings = std::max(rings, 1);
   segments = std::max(segments, 3);
 
   float radius = 0;
@@ -966,33 +966,43 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
           static_cast<float>(seg) / static_cast<float>(segments),
           static_cast<float>(ring) / static_cast<float>(rings));
 
+      // outer triangles connecting ring [ring] to ring [ring + 1]
       if (ring != rings)
       {
-        // each vertex (except the last) has six indices
-        subMesh->AddIndex(verticeIndex + segments + 1);
-        subMesh->AddIndex(verticeIndex);
-        subMesh->AddIndex(verticeIndex + segments);
-        subMesh->AddIndex(verticeIndex + segments + 1);
-        subMesh->AddIndex(verticeIndex + 1);
-        subMesh->AddIndex(verticeIndex);
+        if (seg != 0)
+        {
+          subMesh->AddIndex(verticeIndex + segments + 1);
+          subMesh->AddIndex(verticeIndex);
+          subMesh->AddIndex(verticeIndex + segments);
+        }
+        if (seg != segments)
+        {
+          subMesh->AddIndex(verticeIndex + segments + 1);
+          subMesh->AddIndex(verticeIndex + 1);
+          subMesh->AddIndex(verticeIndex);
+        }
       }
-      else
+      // ring [rings] is the edge of the top cap
+      else if (seg != segments)
       {
-        // This indices form the top cap
+        // These indices form the top cap
         subMesh->AddIndex(verticeIndex);
         subMesh->AddIndex(verticeIndex + segments + 1);
         subMesh->AddIndex(verticeIndex+1);
+
         subMesh->AddIndex(verticeIndex+1);
         subMesh->AddIndex(verticeIndex + segments + 1);
         subMesh->AddIndex(verticeIndex + segments + 2);
       }
 
-      // There indices form the bottom cap
+      // ring [0] is the edge of the bottom cap
       if (ring == 0 && seg < segments)
       {
+        // These indices form the bottom cap
         subMesh->AddIndex(verticeIndex+1);
         subMesh->AddIndex(verticeIndex + (segments+1) * (((rings+1)*2)-1));
         subMesh->AddIndex(verticeIndex);
+
         subMesh->AddIndex(verticeIndex + (segments+1) * (((rings+1)*2)-1) + 1);
         subMesh->AddIndex(verticeIndex + (segments+1) * (((rings+1)*2)-1));
         subMesh->AddIndex(verticeIndex+1);
@@ -1027,16 +1037,46 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
 
       if (ring != rings)
       {
-        // each vertex (except the last) has six indices
-        subMesh->AddIndex(verticeIndex + segments + 1);
-        subMesh->AddIndex(verticeIndex);
-        subMesh->AddIndex(verticeIndex + segments);
-
-        subMesh->AddIndex(verticeIndex + segments + 1);
-        subMesh->AddIndex(verticeIndex + 1);
-        subMesh->AddIndex(verticeIndex);
+        // each vertex has six indices (2 triangles)
+        if (seg != 0)
+        {
+          subMesh->AddIndex(verticeIndex + segments + 1);
+          subMesh->AddIndex(verticeIndex);
+          subMesh->AddIndex(verticeIndex + segments);
+        }
+        if (seg != segments)
+        {
+          subMesh->AddIndex(verticeIndex + segments + 1);
+          subMesh->AddIndex(verticeIndex + 1);
+          subMesh->AddIndex(verticeIndex);
+        }
       }
       verticeIndex++;
+    }
+  }
+
+  // Close ends in case it's not a full circle
+  if (arc != 2.0 * M_PI)
+  {
+    for (ring = 0; ring < rings; ring++)
+    {
+      // Close beginning
+      subMesh->AddIndex((segments+1)*(ring+1));
+      subMesh->AddIndex((segments+1)*ring);
+      subMesh->AddIndex((segments+1)*((rings+1)*2-2-ring));
+
+      subMesh->AddIndex((segments+1)*((rings+1)*2-2-ring));
+      subMesh->AddIndex((segments+1)*ring);
+      subMesh->AddIndex((segments+1)*((rings+1)*2-1-ring));
+
+      // Close end
+      subMesh->AddIndex((segments+1)*((rings+1)*2-2-ring)+segments);
+      subMesh->AddIndex((segments+1)*((rings+1)*2-1-ring)+segments);
+      subMesh->AddIndex((segments+1)*(ring+1)+segments);
+
+      subMesh->AddIndex((segments+1)*(ring+1)+segments);
+      subMesh->AddIndex((segments+1)*((rings+1)*2-1-ring)+segments);
+      subMesh->AddIndex((segments+1)*ring+segments);
     }
   }
 
