@@ -20,7 +20,6 @@
 
     <physics name="preset_2" type="ode">
       <max_step_size>0.02</max_step_size>
-
       <ode>
         <solver>
           <min_step_size>0.002</min_step_size>
@@ -31,22 +30,7 @@
           <cfm>0.02</cfm>
           <erp>0.6</erp>
         </constraints>
-
       </ode>
-      <!--<bullet>
-        <solver>
-          <min_step_size>0.002</min_step_size>
-          <iters>100</iters>
-          <sor>1.5</sor>
-        </solver>
-        <constraints>
-          <cfm>0.02</cfm>
-          <erp>0.6</erp>
-          <contact_surface_layer>0.004</contact_surface_layer>
-          <split_impulse>1</split_impulse>
-          <split_impulse_penetration_threshold>-0.04</split_impulse_penetration_threshold>
-        </constraints>
-      </bullet>-->
     </physics>
 
   </world>

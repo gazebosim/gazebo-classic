@@ -100,10 +100,11 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
           physicsElem = physicsElem->GetNextElement("physics"))
     {
       // Get our own copy of this physics element.
-      sdf::ElementPtr elemCopy = physicsElem->Clone();
+      //sdf::ElementPtr elemCopy = physicsElem->Clone();
 
       // Get name attribute
-      std::string name = this->CreateProfile(elemCopy);
+      //std::string name = this->CreateProfile(elemCopy);
+      std::string name = this->CreateProfile(physicsElem);
       if (name.size() > 0)
       {
         if (this->CurrentPreset() == NULL)
@@ -154,11 +155,9 @@ bool PresetManager::CurrentProfile(const std::string& _name)
   this->dataPtr->currentPreset = &(this->dataPtr->presetProfiles[_name]);
   //Preset* futurePreset = &this->dataPtr->presetProfiles[_name];
   bool result = true;
-  gzdbg << "Current preset size: " << this->CurrentPreset()->ParameterMap()->size() << std::endl;
   for (auto it = this->CurrentPreset()->ParameterMap()->begin();
      it != this->CurrentPreset()->ParameterMap()->end(); ++it)
   {
-    gzdbg << "Setting physics engine parameter " << it->first << std::endl;
     if (!this->dataPtr->physicsEngine->SetParam(it->first, it->second))
     {
       //gzerr << "Failed to set physics engine parameter" << std::endl;
@@ -230,7 +229,6 @@ bool PresetManager::CurrentProfileParam(const std::string& _key,
 {
   if (this->CurrentPreset() == NULL)
   {
-    gzdbg << "Current preset was null." << std::endl;
     return false;
   }
   this->CurrentPreset()->Param(_key, _value);
@@ -282,7 +280,7 @@ std::string PresetManager::CreateProfile(sdf::ElementPtr _elem)
 
   this->CreateProfile(name);
   this->ProfileSDF(name, _elem);
-  this->dataPtr->presetProfiles[name].Name(name);
+  //this->dataPtr->presetProfiles[name].Name(name);
   return name;
 }
 
@@ -355,22 +353,16 @@ boost::any GetAnySDFValue(const sdf::ElementPtr _elem)
 void PresetManager::GeneratePresetFromSDF(Preset* _preset,
     const sdf::ElementPtr _elem) const
 {
-  if (!_preset)
+  if (!_preset || !_elem)
     return;
   for (sdf::ElementPtr elem = _elem->GetFirstElement(); elem;
         elem = elem->GetNextElement())
   {
-    //gzdbg << "Element name: " << elem->GetName() << std::endl;
-    if (_elem->GetValue() != NULL)
+    if (elem->GetValue() != NULL)
     {
-      gzdbg << "setting preset" << std::endl;
-      _preset->Param(elem->GetName(), GetAnySDFValue(_elem));
+      _preset->Param(elem->GetName(), GetAnySDFValue(elem));
     }
-    else
-    {
-      // TODO: Make a traversal, since there are multiple levels
-      this->GeneratePresetFromSDF(_preset, _elem->GetFirstElement());
-    }
+    this->GeneratePresetFromSDF(_preset, elem);
   }
 }
 

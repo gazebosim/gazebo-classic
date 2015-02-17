@@ -33,28 +33,27 @@ class PresetManagerTest : public ServerFixture
 /////////////////////////////////////////////////
 TEST_F(PresetManagerTest, InitializeAllPhysicsEngines)
 {
+  Load("test/worlds/presets.world", false);
+  physics::WorldPtr world = physics::get_world("default");
 
-    Load("test/worlds/presets.world", false);
-    physics::WorldPtr world = physics::get_world("default");
-
-    physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
-    try
-    {
-      EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("max_step_size")), 0.01, 1e-4);
-      //EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("max_contacts")), 21);
-      EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("iters")), 50);
-      EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("cfm")), 0.01, 1e-4);
-      EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("erp")), 0.3, 1e-4);
-      EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("contact_max_correcting_vel")), 200, 1e-4);
-      EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("contact_surface_layer")), 0.002, 1e-4);
-      EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("sor")), 1.4, 1e-4);
-      EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("min_step_size")), 0.001, 1e-4);
-      EXPECT_TRUE(boost::any_cast<bool>(physicsEngine->GetParam("inertia_ratio_reduction")));
-    }
-    catch (const boost::bad_any_cast& e)
-    {
-      FAIL();
-    }
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  try
+  {
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("max_step_size")), 0.01, 1e-4);
+    //EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("max_contacts")), 21);
+    EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("iters")), 50);
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("cfm")), 0.01, 1e-4);
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("erp")), 0.3, 1e-4);
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("contact_max_correcting_vel")), 200, 1e-4);
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("contact_surface_layer")), 0.002, 1e-4);
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("sor")), 1.4, 1e-4);
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("min_step_size")), 0.001, 1e-4);
+    EXPECT_TRUE(boost::any_cast<bool>(physicsEngine->GetParam("inertia_ratio_reduction")));
+  }
+  catch (const boost::bad_any_cast& e)
+  {
+    FAIL();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -110,14 +109,9 @@ TEST_F(PresetManagerTest, SetCurrentProfile)
   std::vector<std::string> profileNames(presetManager->AllProfiles());
   EXPECT_EQ(profileNames.size(), 2);
 
-  //EXPECT_TRUE(presetManager->CurrentProfile("preset_2"));
   presetManager->CurrentProfile("preset_2");
 
   EXPECT_EQ(presetManager->CurrentProfile(), "preset_2");
-
-  // Need to reload the physics engine to see changes affected, since we changed physics engine type
-  // 
-  //world->Reset();
 
   try
   {
@@ -147,6 +141,71 @@ TEST_F(PresetManagerTest, CreateProfileFromSDF)
     FAIL();
   }
 
+  sdf::SDF worldSDF;
+  worldSDF.SetFromString(
+      "<sdf version=\"1.5\">\
+        <world name=\"default\">\
+          <physics name=\"preset_3\" type=\"ode\">\
+            <max_step_size>0.03</max_step_size>\
+            <ode>\
+              <solver>\
+                <min_step_size>0.003</min_step_size>\
+                <iters>150</iters>\
+                <sor>1.6</sor>\
+              </solver>\
+              <constraints>\
+                <cfm>0.03</cfm>\
+                <erp>0.7</erp>\
+              </constraints>\
+            </ode>\
+          </physics>\
+        </world>\
+      </sdf>");
+  sdf::ElementPtr physicsSDF = worldSDF.root->GetElement("world")->GetElement("physics");
+  presetManager->CreateProfile(physicsSDF);
+  presetManager->CurrentProfile("preset_3");
+  try
+  {
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("max_step_size")), 0.03, 1e-4);
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("min_step_size")), 0.003, 1e-4);
+    EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("iters")), 150);
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("cfm")), 0.03, 1e-4);
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("erp")), 0.7, 1e-4);
+  }
+  catch (const boost::bad_any_cast& e)
+  {
+    FAIL();
+  }
+}
+
+TEST_F(PresetManagerTest, BackwardsCompatibilityTest)
+{
+  Load("worlds/empty.world", false, "ode");
+  physics::WorldPtr world = physics::get_world("default");
+
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+
+  physics::PresetManager *presetManager = world->GetPresetManager();
+  if (!presetManager)
+  {
+    FAIL();
+  }
+  try
+  {
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("max_step_size")), 0.001, 1e-4);
+    EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("iters")), 50);
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("cfm")), 0.0, 1e-4);
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("erp")), 0.2, 1e-4);
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("contact_max_correcting_vel")), 100, 1e-4);
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("contact_surface_layer")), 0.001, 1e-4);
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("sor")), 1.3, 1e-4);
+    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("min_step_size")), 0.0001, 1e-4);
+    EXPECT_FALSE(boost::any_cast<bool>(physicsEngine->GetParam("inertia_ratio_reduction")));
+  }
+  catch (const boost::bad_any_cast& e)
+  {
+    FAIL();
+  }
 
 }
 
