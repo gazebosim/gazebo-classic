@@ -20,6 +20,7 @@
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/MovableText.hh"
 #include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/ApplyWrenchVisualPrivate.hh"
 #include "gazebo/rendering/ApplyWrenchVisual.hh"
@@ -45,30 +46,28 @@ void ApplyWrenchVisual::Load()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  math::Vector3 linkSize = dPtr->parent->GetBoundingBox().GetSize();
-
   // Origin visual
   dPtr->originVisual.reset(new rendering::Visual(
        this->GetName() + "__ORIGIN_VISUAL__", shared_from_this()));
   dPtr->originVisual->Load();
 
-  rendering::DynamicLines *originXLines = dPtr->originVisual->
+  dPtr->originXLines = dPtr->originVisual->
       CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  originXLines->setMaterial("Gazebo/RedTransparent");
-  originXLines->AddPoint(math::Vector3(-linkSize.x, 0, 0));
-  originXLines->AddPoint(math::Vector3(linkSize.x,  0, 0));
+  dPtr->originXLines->setMaterial("Gazebo/RedTransparent");
+  dPtr->originXLines->AddPoint(math::Vector3::Zero);
+  dPtr->originXLines->AddPoint(math::Vector3::Zero);
 
-  rendering::DynamicLines *originYLines = dPtr->originVisual->
+  dPtr->originYLines = dPtr->originVisual->
       CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  originYLines->setMaterial("Gazebo/GreenTransparent");
-  originYLines->AddPoint(math::Vector3(0, -linkSize.y, 0));
-  originYLines->AddPoint(math::Vector3(0,  linkSize.y, 0));
+  dPtr->originYLines->setMaterial("Gazebo/GreenTransparent");
+  dPtr->originYLines->AddPoint(math::Vector3::Zero);
+  dPtr->originYLines->AddPoint(math::Vector3::Zero);
 
-  rendering::DynamicLines *originZLines = dPtr->originVisual->
+  dPtr->originZLines = dPtr->originVisual->
       CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  originZLines->setMaterial("Gazebo/BlueTransparent");
-  originZLines->AddPoint(math::Vector3(0, 0, -linkSize.z));
-  originZLines->AddPoint(math::Vector3(0, 0,  linkSize.z));
+  dPtr->originZLines->setMaterial("Gazebo/BlueTransparent");
+  dPtr->originZLines->AddPoint(math::Vector3::Zero);
+  dPtr->originZLines->AddPoint(math::Vector3::Zero);
 
   // CoM visual
   dPtr->comVisual.reset(new rendering::Visual(
@@ -89,9 +88,7 @@ void ApplyWrenchVisual::Load()
   math::Quaternion rot(1.57, 0, 0);
   comNode->setOrientation(
       Ogre::Quaternion(rot.w, rot.x, rot.y, rot.z));
-  dPtr->comVisual->SetMaterial("Gazebo/Chess");
-  double comScale = linkSize.GetMin() * 0.1;
-  dPtr->comVisual->SetScale(math::Vector3(comScale, comScale, comScale));
+  dPtr->comVisual->SetMaterial("Gazebo/CoM");
   dPtr->comVisual->GetSceneNode()->setInheritScale(false);
 
   // Force visual
@@ -126,13 +123,27 @@ void ApplyWrenchVisual::Load()
 
   Ogre::SceneNode *headNode =
       dPtr->forceVisual->GetSceneNode()->createChildSceneNode(
-      this->GetName() + "__FORCE_SHAFT_HEAD__");
+      this->GetName() + "__FORCE_HEAD_NODE__");
   headNode->attachObject(headObj);
   headNode->setPosition(0, 0, 0.24);
 
   dPtr->forceVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
-  dPtr->forceVisual->SetScale(math::Vector3(5, 5, 5));
   dPtr->forceVisual->GetSceneNode()->setInheritScale(false);
+
+  // Force text
+  dPtr->forceText = new MovableText();
+  dPtr->forceText->Load(this->GetName()+"__FORCE_TEXT__",
+      "0N", "Arial", 0.03, common::Color(1, 0.6, 0));
+  dPtr->forceText->SetShowOnTop(true);
+
+  dPtr->forceText->MovableObject::getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string(dPtr->forceVisual->GetName())));
+
+  Ogre::SceneNode *forceTextNode =
+      dPtr->forceVisual->GetSceneNode()->createChildSceneNode(
+      this->GetName() + "__FORCE_TEXT_NODE__");
+  forceTextNode->attachObject(dPtr->forceText);
+  forceTextNode->setInheritScale(false);
 
   // Torque visual
   dPtr->torqueVisual.reset(new rendering::Visual(
@@ -176,7 +187,6 @@ void ApplyWrenchVisual::Load()
       Ogre::Quaternion(quat.w, quat.x, quat.y, quat.z));
 
   dPtr->torqueVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
-  dPtr->torqueVisual->SetScale(math::Vector3(2.5, 2.5, 2.5));
   dPtr->torqueVisual->GetSceneNode()->setInheritScale(false);
 
   // Torque line
@@ -185,6 +195,21 @@ void ApplyWrenchVisual::Load()
   dPtr->torqueLine->setMaterial("Gazebo/OrangeTransparentOverlay");
   dPtr->torqueLine->AddPoint(0, 0, 0);
   dPtr->torqueLine->AddPoint(0, 0, 0.1);
+
+  // Torque text
+  dPtr->torqueText = new MovableText();
+  dPtr->torqueText->Load(this->GetName()+"__TORQUE_TEXT__",
+      "0N", "Arial", 0.03, common::Color(1, 0.6, 0));
+  dPtr->torqueText->SetShowOnTop(true);
+
+  dPtr->torqueText->MovableObject::getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string(dPtr->torqueVisual->GetName())));
+
+  Ogre::SceneNode *torqueTextNode =
+      dPtr->torqueVisual->GetSceneNode()->createChildSceneNode(
+      this->GetName() + "__TORQUE_TEXT_NODE__");
+  torqueTextNode->attachObject(dPtr->torqueText);
+  torqueTextNode->setInheritScale(false);
 
   // Rotation manipulator
   dPtr->rotTool.reset(new rendering::SelectionObj(
@@ -195,12 +220,14 @@ void ApplyWrenchVisual::Load()
   dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Y, "Gazebo/DarkMagentaTransparent");
   dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Z, "Gazebo/DarkMagentaTransparent");
 
+  // Initialize
   dPtr->forceVector = math::Vector3::Zero;
   dPtr->torqueVector = math::Vector3::Zero;
   dPtr->mode = "force";
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI |
       GZ_VISIBILITY_SELECTABLE);
+  this->Resize();
   this->SetForceVisual();
   this->SetTorqueVisual();
   this->SetWrenchMode("none");
@@ -249,6 +276,12 @@ void ApplyWrenchVisual::SetWrenchMode(std::string _mode)
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
+  if (!dPtr->forceVisual || !dPtr->torqueVisual || !dPtr->rotTool)
+  {
+    gzwarn << "Some visual is missing!" << std::endl;
+    return;
+  }
+
   // Update variable
   dPtr->mode = _mode;
 
@@ -294,10 +327,7 @@ void ApplyWrenchVisual::SetCoM(math::Vector3 _comVector)
   // move com visual
   dPtr->comVisual->SetPosition(_comVector);
 
-  // scale
-  math::Vector3 linkSize = dPtr->parent->GetBoundingBox().GetSize();
-  double comScale = linkSize.GetMin() * 0.1;
-  dPtr->comVisual->SetScale(math::Vector3(comScale, comScale, comScale));
+  this->Resize();
 
   dPtr->comVector = _comVector;
   this->SetTorqueVisual();
@@ -322,6 +352,10 @@ void ApplyWrenchVisual::SetForce(math::Vector3 _forceVector, bool _rotatedByMous
   dPtr->forceVector = _forceVector;
   dPtr->rotatedByMouse = _rotatedByMouse;
 
+  std::ostringstream mag;
+  mag << std::fixed << std::setprecision(3) << _forceVector.GetLength();
+  dPtr->forceText->SetText(mag.str() + "N");
+
   if (_forceVector == math::Vector3::Zero)
   {
 //    dPtr->forceVisual->SetVisible(false);
@@ -345,6 +379,10 @@ void ApplyWrenchVisual::SetTorque(math::Vector3 _torqueVector, bool _rotatedByMo
   dPtr->torqueVector = _torqueVector;
   dPtr->rotatedByMouse = _rotatedByMouse;
 
+  std::ostringstream mag;
+  mag << std::fixed << std::setprecision(3) << _torqueVector.GetLength();
+  dPtr->torqueText->SetText(mag.str() + "Nm");
+
   if (_torqueVector == math::Vector3::Zero)
   {
 //    dPtr->torqueVisual->SetVisible(false);
@@ -364,6 +402,12 @@ void ApplyWrenchVisual::SetForceVisual()
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  if (!dPtr->forceVisual)
+  {
+    gzwarn << "No force visual" << std::endl;
+    return;
+  }
 
   // position according to force and position vectors
 
@@ -395,6 +439,12 @@ void ApplyWrenchVisual::SetTorqueVisual()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
+  if (!dPtr->torqueVisual)
+  {
+    gzwarn << "No torque visual" << std::endl;
+    return;
+  }
+
   // position according to torque and position vectors
 
   // Place it on X axis in case it is zero
@@ -411,10 +461,10 @@ void ApplyWrenchVisual::SetTorqueVisual()
 
   // Set position towards comVector
   double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
-  dPtr->torqueVisual->SetPosition(normVec * (linkDiagonal*0.5 + 0.5)
+  dPtr->torqueVisual->SetPosition(normVec * linkDiagonal*0.75
       + dPtr->comVector);
   dPtr->torqueLine->SetPoint(1,
-      math::Vector3(0, 0, -linkDiagonal*0.5 - 0.5)/dPtr->torqueVisual->GetScale());
+      math::Vector3(0, 0, -linkDiagonal*0.75)/dPtr->torqueVisual->GetScale());
 
   // Rotation tool
   dPtr->rotTool->SetPosition(math::Vector3::Zero);
@@ -427,6 +477,13 @@ void ApplyWrenchVisual::SetVisible(bool _visible, bool _cascade)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  if (!dPtr->forceVisual || !dPtr->torqueVisual || !dPtr->comVisual ||
+      !dPtr->rotTool)
+  {
+    gzwarn << "Some visual is missing!" << std::endl;
+    return;
+  }
 
   if (_visible)
   {
@@ -460,4 +517,46 @@ void ApplyWrenchVisual::SetVisible(bool _visible, bool _cascade)
       dPtr->torqueVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
     }
   }
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchVisual::Resize()
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  math::Vector3 linkSize = dPtr->parent->GetBoundingBox().GetSize();
+
+  // Origin visual
+  dPtr->originXLines->SetPoint(0, math::Vector3(-linkSize.x, 0, 0));
+  dPtr->originXLines->SetPoint(1, math::Vector3( linkSize.x,  0, 0));
+  dPtr->originYLines->SetPoint(0, math::Vector3(0, -linkSize.y, 0));
+  dPtr->originYLines->SetPoint(1, math::Vector3(0,  linkSize.y, 0));
+  dPtr->originZLines->SetPoint(0, math::Vector3(0, 0, -linkSize.z));
+  dPtr->originZLines->SetPoint(1, math::Vector3(0, 0,  linkSize.z));
+
+  // CoM visual
+  double comScale = linkSize.GetMin() * 0.1;
+  dPtr->comVisual->SetScale(math::Vector3(comScale, comScale, comScale));
+
+  // Force visual
+  dPtr->forceVisual->SetScale(math::Vector3(2*linkSize.GetLength(),
+                                            2*linkSize.GetLength(),
+                                            2*linkSize.GetLength()));
+
+  // Torque visual
+  dPtr->torqueVisual->SetScale(math::Vector3(linkSize.GetLength(),
+                                             linkSize.GetLength(),
+                                             linkSize.GetLength()));
+
+  // Texts
+  double fontSize = std::max(0.1*linkSize.GetLength(), 0.1);
+  dPtr->forceText->SetCharHeight(fontSize);
+  dPtr->torqueText->SetCharHeight(fontSize);
+  dPtr->forceText->SetBaseline(0.12*linkSize.GetLength());
+
+  // Rot tool
+  dPtr->rotTool->SetScale(math::Vector3(0.75*linkSize.GetLength(),
+                                        0.75*linkSize.GetLength(),
+                                        0.75*linkSize.GetLength()));
 }

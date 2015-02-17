@@ -35,6 +35,7 @@
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Material.hh"
+#include "gazebo/rendering/MovableText.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
 #include "gazebo/rendering/Visual.hh"
 
@@ -1044,6 +1045,16 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
       for (int j = 0; j < sn->numAttachedObjects(); j++)
       {
         Ogre::MovableObject *obj = sn->getAttachedObject(j);
+
+        MovableText *text = dynamic_cast<MovableText *>(obj);
+
+        if (text)
+        {
+          text->SetColor(common::Color(1, 0.6, 0));
+          //text->SetColor(rendering::material::GetMaterialAsColor(
+          //    this->dataPtr->myMaterialName));
+          continue;
+        }
 
         if (dynamic_cast<Ogre::Entity*>(obj))
           ((Ogre::Entity*)obj)->setMaterialName(this->dataPtr->myMaterialName);

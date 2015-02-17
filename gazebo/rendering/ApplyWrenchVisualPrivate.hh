@@ -35,8 +35,23 @@ namespace gazebo
       /// \brief TODO
       public: VisualPtr originVisual;
 
+      /// \brief TODO
+      public: DynamicLines *originXLines;
+
+      /// \brief TODO
+      public: DynamicLines *originYLines;
+
+      /// \brief TODO
+      public: DynamicLines *originZLines;
+
       /// TODO
       public: VisualPtr forceVisual;
+
+      /// TODO
+      public: MovableText *forceText;
+
+      /// TODO
+      public: MovableText *torqueText;
 
       /// TODO
       public: rendering::SelectionObjPtr rotTool;

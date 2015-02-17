@@ -867,21 +867,17 @@ material Gazebo/JointAnchor
   }
 }
 
-material Gazebo/Chess
+material Gazebo/CoM
 {
   technique
   {
     pass
     {
-      scene_blend alpha_blend
-      depth_write off
-      lighting off
-      depth_check off
+      ambient 0.5 0.5 0.5 1.000000
 
       texture_unit
       {
-        texture chess.png
-        filtering trilinear
+        texture com.png
       }
     }
   }

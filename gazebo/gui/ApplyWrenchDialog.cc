@@ -440,10 +440,6 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->torqueVector = math::Vector3::Zero;
 
   connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
-
-  this->dataPtr->connections.push_back(
-      event::Events::ConnectPreRender(
-      boost::bind(&ApplyWrenchDialog::OnPreRender, this)));
 }
 
 /////////////////////////////////////////////////
@@ -498,7 +494,8 @@ void ApplyWrenchDialog::SetLink(std::string _linkName)
   int index = -1;
   for (int i = 0; i < this->dataPtr->linksComboBox->count(); ++i)
   {
-    if (this->dataPtr->linksComboBox->itemText(i) == QString::fromStdString(unscopedLinkName))
+    if ((this->dataPtr->linksComboBox->itemText(i)).toStdString() ==
+        unscopedLinkName)
     {
       index = i;
       break;
@@ -534,6 +531,11 @@ void ApplyWrenchDialog::SetLink(std::string _linkName)
   // Main window
   this->dataPtr->mainWindow = gui::get_main_window();
   this->dataPtr->mainWindow->installEventFilter(this);
+
+  // PreRender
+  this->dataPtr->connections.push_back(
+      event::Events::ConnectPreRender(
+      boost::bind(&ApplyWrenchDialog::OnPreRender, this)));
 }
 
 /////////////////////////////////////////////////
@@ -611,10 +613,13 @@ void ApplyWrenchDialog::OnApplyTorque()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnCancel()
 {
-  // Hide mode visuals too
-  this->dataPtr->applyWrenchVisual->SetVisible(false, true);
 
   this->close();
+  this->dataPtr->connections.clear();
+
+  // Hide mode visuals too
+  if (this->dataPtr->applyWrenchVisual)
+    this->dataPtr->applyWrenchVisual->SetVisible(false, true);
 }
 
 /////////////////////////////////////////////////
@@ -708,6 +713,7 @@ void ApplyWrenchDialog::SetPublisher()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::AttachVisuals()
 {
+  // Attaching for the first time
   if (!this->dataPtr->applyWrenchVisual)
   {
     this->dataPtr->applyWrenchVisual.reset(new rendering::ApplyWrenchVisual(
@@ -715,13 +721,16 @@ void ApplyWrenchDialog::AttachVisuals()
 
     this->dataPtr->applyWrenchVisual->Load();
   }
+  // Same link as before
   else if (this->dataPtr->applyWrenchVisual->GetParent() == this->dataPtr->linkVisual)
   {
     this->dataPtr->applyWrenchVisual->SetVisible(true);
   }
+  // Different link
   else
   {
     this->dataPtr->linkVisual->AttachVisual(this->dataPtr->applyWrenchVisual);
+    this->dataPtr->applyWrenchVisual->Resize();
   }
 
   this->SetTorque(this->dataPtr->torqueVector);
@@ -1225,6 +1234,12 @@ void ApplyWrenchDialog::NewTorqueDirection(math::Vector3 _dir)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::SetActive(bool _active)
 {
+  if (!this->dataPtr->applyWrenchVisual)
+  {
+    gzwarn << "No visual" << std::endl;
+    return;
+  }
+
   if (_active)
   {
     this->dataPtr->applyWrenchVisual->SetVisible(true);

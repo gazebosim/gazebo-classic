@@ -75,6 +75,9 @@ namespace gazebo
       /// \brief TODO
       public: void SetTorqueVisual();
 
+      /// \brief TODO
+      public: void Resize();
+
       // Documentation Inherited.
       public: void SetVisible(bool _visible, bool _cascade = false);
     };
