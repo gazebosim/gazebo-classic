@@ -138,8 +138,10 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   msgs::Contacts contacts02;
 
   // let objects stablize
+  gzerr << "before"; getchar();
   world->Step(1000);
 
+  gzerr << "1000 steps"; getchar();
   int steps = 1000;
   while ((contacts01.contact_size() == 0 || contacts02.contact_size() == 0)
       && --steps > 0)
@@ -147,8 +149,13 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
     world->Step(1);
     contacts01 = contactSensor01->GetContacts();
     contacts02 = contactSensor02->GetContacts();
+    gzerr << "steps[" << steps
+          << "] contacts01[" << contacts01.contact_size()
+          << "] contacts02[" << contacts02.contact_size()
+          << "] to be > 0\n";
   }
   EXPECT_GT(steps, 0);
+  gzerr << "steps test"; getchar();
 
   std::vector<msgs::Contacts> contacts;
   contacts.push_back(contacts01);

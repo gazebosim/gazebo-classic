@@ -1339,9 +1339,9 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
            ContactSurface(ContactGeometry::HalfSpace(), material));
 
         // store ContactGeometry pointer in SimbodyCollision object
-        // SimTK::ContactSurface &contactSurf =
+        // SimTK::ContactSurface &groundContactSurf =
         //   this->matter.Ground().updBody().updContactSurface(surfNum);
-        // sc->SetCollisionShape(&contactSurf.updShape());
+        // sc->SetCollisionShape(&groundContactSurf.updShape());
 
         /* */
         // by default, simbody HalfSpace normal is in the -X direction
@@ -1362,7 +1362,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         SimTK::ContactSurface &contactSurf =
           _mobod.updBody().updContactSurface(surfNum);
         /// \TODO: uncomment below leads to segfault?
-        // sc->SetCollisionShape(&contactSurf.updShape());
+        sc->SetCollisionShape(&contactSurf.updShape());
       }
       break;
 
