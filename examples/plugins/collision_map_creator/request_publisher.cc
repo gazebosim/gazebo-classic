@@ -94,7 +94,7 @@ int main(int argc, char * argv[])
         imagePub->WaitForConnection();
         imagePub->Publish(request);
 
-	std::cout << "Request received!";
+	std::cout << "Request received!\n\n";
 
         gazebo::transport::fini();
         return 0;

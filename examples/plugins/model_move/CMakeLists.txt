@@ -14,8 +14,8 @@ find_package(sdformat REQUIRED)
 include (FindPkgConfig)
 if (PKG_CONFIG_FOUND)
   pkg_check_modules(GAZEBO gazebo)
+  pkg_check_modules(SDF sdformat)
 endif()
-
 
 # include appropriate directories
 include_directories(${GAZEBO_INCLUDE_DIRS})
@@ -24,13 +24,4 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 # Create libraries and executables
 
 add_library(model_move SHARED model_move.cc)
-target_link_libraries(model_move ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
-
-add_library(model_move_path SHARED model_move_path.cc)
-target_link_libraries(model_move_path ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
-
-add_executable(integrated_main integrated_main.cc)
-target_link_libraries(integrated_main ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread)
-
-add_executable(independent_listener independent_listener.cc)
-target_link_libraries(independent_listener ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread)
+target_link_libraries(model_move ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${SDF_LIBRARIES})

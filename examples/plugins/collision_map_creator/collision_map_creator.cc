@@ -12,6 +12,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "collision_map_request.pb.h"
+#include "collision_map_grid.h"
 
 
 namespace gazebo
@@ -73,10 +74,6 @@ public: void create(CollisionMapRequestPtr &msg)
         }
         double x,y;
 
-        boost::gil::gray8_pixel_t fill(255-msg->threshold());
-        boost::gil::gray8_pixel_t blank(255);
-        boost::gil::gray8_image_t image(count_horizontal, count_vertical);
-
         double dist;
         std::string entityName;
         math::Vector3 start, end;
@@ -89,7 +86,8 @@ public: void create(CollisionMapRequestPtr &msg)
               engine->CreateShape("ray", gazebo::physics::CollisionPtr()));
 
         std::cout << "Rasterizing model and checking collisions" << std::endl;
-        boost::gil::fill_pixels(image._view, blank);
+        CollisionMapGrid grid = CollisionMapGrid(
+              msg->upperleft().x(), count_horizontal, msg->upperleft().y(), count_vertical);
 
         for (int i = 0; i < count_vertical; ++i)
         {
@@ -107,20 +105,16 @@ public: void create(CollisionMapRequestPtr &msg)
                 ray->GetIntersection(dist, entityName);
                 if (!entityName.empty())
                 {
-                    image._view(i,j) = fill;
-                   // std::cout << ".";
+                    grid.fill(i, j);
                 }
             }
-            //std::cout << "|" << std::endl;
         }
-        //std::cout << std::endl;
 
-        std::cout << "Completed calculations, writing to image" << std::endl;
+        std::cout << "Completed calculations." << std::endl;
         if (!msg->filename().empty())
-        {
-            boost::gil::gray8_view_t view = image._view;
-            boost::gil::png_write_view(msg->filename(), view);
-        }
+	{
+	  grid.print(msg->filename());
+	}
     }
 };
 

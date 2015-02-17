@@ -1,8 +1,6 @@
-<?xml version="1.0"?> 
-<sdf version="1.4">
-  <world name="modelmove_world">
-
-    <!-- Ground Plane -->
+<?xml version ='1.0'?>
+<sdf version ='1.4'>
+  <world name='default'>
     <include>
       <uri>model://ground_plane</uri>
     </include>
@@ -12,7 +10,7 @@
     </include>
 
     <model name="box">
-      <pose>0 0 0 0 0 0</pose>
+      <pose>0 0 0.5 0 0 0</pose>
       <link name="link">
         <collision name="collision">
           <geometry>
@@ -30,12 +28,8 @@
           </geometry>
         </visual>
       </link>
+    </model> 
 
-      <plugin name="model_move" filename="libmodel_move.so">
-	<start_point>0 0 0</start_point>
-	<path>5 5 0 5 -5 0 0 0 0</path> 
-	<n_points>3</n_points>
-      </plugin>
-    </model>        
+    <plugin filename="libcollision_map_creator.so" name="collision_map_creator"/>
   </world>
 </sdf>
