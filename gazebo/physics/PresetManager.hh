@@ -19,6 +19,7 @@
 #define _PRESETMANAGER_HH_
 
 #include <string>
+#include <map>
 #include <vector>
 
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -67,7 +68,7 @@ namespace gazebo
       public: sdf::ElementPtr SDF() const;
 
       /// \brief Set this preset profile's SDF
-      /// \param[in] _sdfElement Pointer to an SDF physics element. 
+      /// \param[in] _sdfElement Pointer to an SDF physics element.
       public: void SDF(sdf::ElementPtr _sdfElement);
 
       /// \brief Private data pointer for PIMPL
@@ -113,7 +114,7 @@ namespace gazebo
       /// \brief Get a parameter for a certain profile.
       /// \param[in] _name The name of the accessed profile.
       /// \param[in] _key The key of the accessed parameter.
-      /// \return The value of the parameter. 
+      /// \return The value of the parameter.
       public: boost::any ProfileParam(const std::string &_name,
           const std::string& _key) const;
 
@@ -170,6 +171,6 @@ namespace gazebo
     };
 
   }  // namespace physics
-}  //namespace gazebo
+}  // namespace gazebo
 
 #endif

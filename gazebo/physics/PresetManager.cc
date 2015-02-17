@@ -99,11 +99,7 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
     for (sdf::ElementPtr physicsElem = _sdf->GetElement("physics"); physicsElem;
           physicsElem = physicsElem->GetNextElement("physics"))
     {
-      // Get our own copy of this physics element.
-      //sdf::ElementPtr elemCopy = physicsElem->Clone();
-
       // Get name attribute
-      //std::string name = this->CreateProfile(elemCopy);
       std::string name = this->CreateProfile(physicsElem);
       if (name.size() > 0)
       {
@@ -134,7 +130,7 @@ PresetManager::~PresetManager()
   {
     delete allProfiles[i];
   }*/
-  //delete this->dataPtr;
+  // delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////
@@ -153,25 +149,16 @@ bool PresetManager::CurrentProfile(const std::string& _name)
     return false;
   }
   this->dataPtr->currentPreset = &(this->dataPtr->presetProfiles[_name]);
-  //Preset* futurePreset = &this->dataPtr->presetProfiles[_name];
   bool result = true;
   for (auto it = this->CurrentPreset()->ParameterMap()->begin();
      it != this->CurrentPreset()->ParameterMap()->end(); ++it)
   {
     if (!this->dataPtr->physicsEngine->SetParam(it->first, it->second))
     {
-      //gzerr << "Failed to set physics engine parameter" << std::endl;
       result = false;
-      //break;
     }
   }
-  /*if (result)
-  {
-  }
-  else
-  {
-    // TODO: Set back all the changes in the physics engine
-  }*/
+
   return result;
 }
 
@@ -236,7 +223,7 @@ bool PresetManager::CurrentProfileParam(const std::string& _key,
   {
     return this->dataPtr->physicsEngine->SetParam(_key, _value);
   }
-  catch (const boost::bad_any_cast& e)
+  catch(const boost::bad_any_cast& e)
   {
     gzerr << "Couldn't set physics engine parameter! " << e.what() << std::endl;
     return false;
@@ -280,7 +267,6 @@ std::string PresetManager::CreateProfile(sdf::ElementPtr _elem)
 
   this->CreateProfile(name);
   this->ProfileSDF(name, _elem);
-  //this->dataPtr->presetProfiles[name].Name(name);
   return name;
 }
 
@@ -341,7 +327,6 @@ boost::any GetAnySDFValue(const sdf::ElementPtr _elem)
   }
   else if (typeid(sdf::Vector3) == _elem->GetValue()->GetType())
   {
-    // RISKY
     ret = _elem->Get<gazebo::math::Vector3>();
   }
 
@@ -367,15 +352,17 @@ void PresetManager::GeneratePresetFromSDF(Preset* _preset,
 }
 
 //////////////////////////////////////////////////
+// FIXME
 sdf::ElementPtr PresetManager::GenerateSDFFromPreset(Preset* _preset) const
 {
   sdf::ElementPtr elem(new sdf::Element);
   elem->SetName("physics");
   elem->AddAttribute("name", "string", "", true);
   sdf::ParamPtr nameParam = elem->GetAttribute("name");
-  if (_preset->Name().length()==0)
+  if (_preset->Name().length() == 0)
   {
-    gzwarn << "Name not set in parameter map, returning from GenerateSDFFromPreset!" << std::endl;
+    gzwarn << "Name not set in parameter map in GenerateSDFFromPreset!"
+           << std::endl;
     return elem;
   }
 
@@ -389,7 +376,7 @@ sdf::ElementPtr PresetManager::GenerateSDFFromPreset(Preset* _preset) const
     {
       value = boost::any_cast<std::string>(param.second);
     }
-    catch (const boost::bad_any_cast& e)
+    catch(const boost::bad_any_cast& e)
     {
       gzwarn << "Bad cast of boost::any in GenerateSDFFromPreset" << std::endl;
       return elem;

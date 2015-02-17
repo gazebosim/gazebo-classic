@@ -41,6 +41,6 @@ namespace gazebo
       public: PhysicsEnginePtr physicsEngine;
     };
   }  // namespace physics
-}  // namespace gazebo 
+}  // namespace gazebo
 
 #endif
