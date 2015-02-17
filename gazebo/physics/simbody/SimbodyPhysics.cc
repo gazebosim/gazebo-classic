@@ -508,6 +508,10 @@ void SimbodyPhysics::UpdateCollision()
 
               // Store the contact forces
               const SimTK::Vec3 f2 = detail.getForceOnSurface2();
+              // shift from contact point world frame to CG world frame
+              // per gazebo contact feedback convention
+
+              // copy.
               contactFeedback->wrench[j].body1Force.Set(-f2[0], -f2[1], -f2[2]);
               contactFeedback->wrench[j].body2Force.Set(f2[0], f2[1], f2[2]);
               contactFeedback->wrench[j].body1Torque.Set(0, 0, 0);
