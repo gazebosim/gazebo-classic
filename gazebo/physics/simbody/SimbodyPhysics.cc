@@ -1338,17 +1338,17 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
            Rotation(Pi/2, YAxis),
            ContactSurface(ContactGeometry::HalfSpace(), material));
 
-        Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->GetNormal());
-
         // store ContactGeometry pointer in SimbodyCollision object
-        SimTK::ContactSurface &contactSurf =
-          this->matter.Ground().updBody().updContactSurface(surfNum);
+        // SimTK::ContactSurface &contactSurf =
+        //   this->matter.Ground().updBody().updContactSurface(surfNum);
         // sc->SetCollisionShape(&contactSurf.updShape());
 
+        /* */
         // by default, simbody HalfSpace normal is in the -X direction
         // rotate it based on normal vector specified by user
         // Create a rotation whos x-axis is in the
         // negative normal vector direction
+        Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->GetNormal());
         Rotation R_XN(-UnitVec3(normal), XAxis);
 
         ContactSurface surface(ContactGeometry::HalfSpace(), material);
@@ -1359,7 +1359,9 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         surfNum = _mobod.updBody().addContactSurface(R_XN, surface);
 
         // store ContactGeometry pointer in SimbodyCollision object
-        contactSurf = _mobod.updBody().updContactSurface(surfNum);
+        SimTK::ContactSurface &contactSurf =
+          _mobod.updBody().updContactSurface(surfNum);
+        /// \TODO: uncomment below leads to segfault?
         // sc->SetCollisionShape(&contactSurf.updShape());
       }
       break;
