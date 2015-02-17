@@ -183,8 +183,9 @@ void PartData::Load(sdf::ElementPtr _sdf)
     sdf::ElementPtr inertialElem = _sdf->GetElement("inertial");
     this->partSDF->GetElement("inertial")->Copy(inertialElem);
 
-    msgs::Link linkMsg;
-    msgs::Inertial *inertialMsg = linkMsg.mutable_inertial();
+
+    msgs::LinkPtr linkMsgPtr(new msgs::Link);
+    msgs::Inertial *inertialMsg = linkMsgPtr->mutable_inertial();
 
     if (inertialElem->HasElement("mass"))
     {
@@ -208,7 +209,8 @@ void PartData::Load(sdf::ElementPtr _sdf)
       inertialMsg->set_iyz(inertiaElem->Get<double>("iyz"));
       inertialMsg->set_izz(inertiaElem->Get<double>("izz"));
     }
-    linkConfig->Update(ConstLinkPtr(&linkMsg));
+
+    linkConfig->Update(linkMsgPtr);
   }
 
   if (_sdf->HasElement("sensor"))
@@ -533,11 +535,13 @@ void PartData::OnAddVisual(const std::string &_name)
   }
 
   msgs::Visual visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
-
   // store the correct transparency setting
   if (refVisual)
     visualMsg.set_transparency(this->visuals[refVisual].transparency());
-  visualConfig->UpdateVisual(_name, ConstVisualPtr(&visualMsg));
+
+  msgs::VisualPtr visualMsgPtr(new msgs::Visual);
+  visualMsgPtr->CopyFrom(visualMsg);
+  visualConfig->UpdateVisual(_name, visualMsgPtr);
   this->visuals[visVisual] = visualMsg;
   visVisual->SetTransparency(visualMsg.transparency() *
       (1-ModelData::GetEditTransparency()-0.1)
@@ -593,7 +597,9 @@ void PartData::OnAddCollision(const std::string &_name)
   msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
   geomMsg->CopyFrom(visualMsg.geometry());
 
-  collisionConfig->UpdateCollision(_name, ConstCollisionPtr(&collisionMsg));
+  msgs::CollisionPtr collisionMsgPtr(new msgs::Collision);
+  collisionMsgPtr->CopyFrom(collisionMsg);
+  collisionConfig->UpdateCollision(_name, collisionMsgPtr);
   this->collisions[collisionVis] = collisionMsg;
 
   collisionVis->SetTransparency(

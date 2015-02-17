@@ -211,6 +211,9 @@ bool Material::GetMaterialAsColor(const std::string &_materialName,
         _specular = Conversions::Convert(pass->getSpecular());
 #if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
         _emissive = Conversions::Convert(pass->getEmissive());
+#else
+        common::Color empty;
+        _emissive = empty;
 #endif
         return true;
       }
