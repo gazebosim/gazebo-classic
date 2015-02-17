@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,9 @@ class GuiIface_TEST : public QTestFixture
 
   /// \brief Test reading an INI file that doesn't exist.
   private slots: void noINIFile();
+
+  /// \brief Test using the env variable GAZEBO_GUI_INI_FILE
+  private slots: void GUIINIPATHEnvVariable();
 
   /// \brief Test setting configuration properties.
   private slots: void setINIProperties();

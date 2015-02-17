@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/gazebo_config.h"
 #include "gazebo/rendering/Road2d.hh"
 #include "gazebo/rendering/Projector.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -63,6 +62,7 @@
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 
+#include "gazebo/rendering/ScenePrivate.hh"
 #include "gazebo/rendering/Scene.hh"
 
 #ifdef HAVE_OCULUS
@@ -72,8 +72,7 @@
 using namespace gazebo;
 using namespace rendering;
 
-
-uint32_t Scene::idCounter = 0;
+uint32_t ScenePrivate::idCounter = 0;
 
 struct VisualMessageLess {
     bool operator() (boost::shared_ptr<msgs::Visual const> _i,
@@ -83,204 +82,217 @@ struct VisualMessageLess {
     }
 } VisualMessageLessOp;
 
-
 //////////////////////////////////////////////////
 Scene::Scene(const std::string &_name, bool _enableVisualizations,
     bool _isServer)
+  : dataPtr(new ScenePrivate)
 {
   // \todo: This is a hack. There is no guarantee (other than the
   // improbability of creating an extreme number of visuals), that
   // this contactVisId is unique.
-  this->contactVisId = GZ_UINT32_MAX;
+  this->dataPtr->contactVisId = GZ_UINT32_MAX;
 
-  this->initialized = false;
-  this->showCOMs = false;
-  this->showCollisions = false;
-  this->showJoints = false;
-  this->transparent = false;
-  this->wireframe = false;
+  this->dataPtr->initialized = false;
+  this->dataPtr->showCOMs = false;
+  this->dataPtr->showCollisions = false;
+  this->dataPtr->showJoints = false;
+  this->dataPtr->transparent = false;
+  this->dataPtr->wireframe = false;
 
-  this->requestMsg = NULL;
-  this->enableVisualizations = _enableVisualizations;
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(_name);
-  this->id = idCounter++;
-  this->idString = boost::lexical_cast<std::string>(this->id);
+  this->dataPtr->requestMsg = NULL;
+  this->dataPtr->enableVisualizations = _enableVisualizations;
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init(_name);
+  this->dataPtr->id = ScenePrivate::idCounter++;
+  this->dataPtr->idString = boost::lexical_cast<std::string>(this->dataPtr->id);
 
-  this->name = _name;
-  this->manager = NULL;
-  this->raySceneQuery = NULL;
-  this->skyx = NULL;
+  this->dataPtr->name = _name;
+  this->dataPtr->manager = NULL;
+  this->dataPtr->raySceneQuery = NULL;
+  this->dataPtr->skyx = NULL;
 
-  this->receiveMutex = new boost::mutex();
+  this->dataPtr->receiveMutex = new boost::mutex();
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
-  this->sensorSub = this->node->Subscribe("~/sensor",
+  this->dataPtr->sensorSub = this->dataPtr->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this, true);
-  this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
+  this->dataPtr->visSub =
+      this->dataPtr->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
 
-  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+  this->dataPtr->lightPub =
+      this->dataPtr->node->Advertise<msgs::Light>("~/light");
 
-  this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
+  this->dataPtr->lightSub =
+      this->dataPtr->node->Subscribe("~/light", &Scene::OnLightMsg, this);
 
   if (_isServer)
   {
-    this->poseSub = this->node->Subscribe("~/pose/local/info",
+    this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/local/info",
         &Scene::OnPoseMsg, this);
   }
   else
   {
-    this->poseSub = this->node->Subscribe("~/pose/info",
+    this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/info",
         &Scene::OnPoseMsg, this);
   }
 
-  this->jointSub = this->node->Subscribe("~/joint", &Scene::OnJointMsg, this);
-  this->skeletonPoseSub = this->node->Subscribe("~/skeleton_pose/info",
-          &Scene::OnSkeletonPoseMsg, this);
-  this->selectionSub = this->node->Subscribe("~/selection",
+  this->dataPtr->jointSub =
+      this->dataPtr->node->Subscribe("~/joint", &Scene::OnJointMsg, this);
+  this->dataPtr->skeletonPoseSub =
+      this->dataPtr->node->Subscribe("~/skeleton_pose/info",
+      &Scene::OnSkeletonPoseMsg, this);
+  this->dataPtr->selectionSub = this->dataPtr->node->Subscribe("~/selection",
       &Scene::OnSelectionMsg, this);
-  this->skySub = this->node->Subscribe("~/sky", &Scene::OnSkyMsg, this);
-  this->modelInfoSub = this->node->Subscribe("~/model/info",
+  this->dataPtr->skySub =
+      this->dataPtr->node->Subscribe("~/sky", &Scene::OnSkyMsg, this);
+  this->dataPtr->modelInfoSub = this->dataPtr->node->Subscribe("~/model/info",
                                              &Scene::OnModelMsg, this);
 
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+  this->dataPtr->requestPub =
+      this->dataPtr->node->Advertise<msgs::Request>("~/request");
 
-  this->requestSub = this->node->Subscribe("~/request",
+  this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
       &Scene::OnRequest, this);
 
   // \TODO: This causes the Scene to occasionally miss the response to
   // scene_info
-  // this->responsePub = this->node->Advertise<msgs::Response>("~/response");
-  this->responseSub = this->node->Subscribe("~/response",
+  // this->responsePub =
+      this->dataPtr->node->Advertise<msgs::Response>("~/response");
+  this->dataPtr->responseSub = this->dataPtr->node->Subscribe("~/response",
       &Scene::OnResponse, this, true);
-  this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
+  this->dataPtr->sceneSub =
+      this->dataPtr->node->Subscribe("~/scene", &Scene::OnScene, this);
 
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("scene.sdf", this->sdf);
+  this->dataPtr->sdf.reset(new sdf::Element);
+  sdf::initFile("scene.sdf", this->dataPtr->sdf);
 
-  this->terrain = NULL;
-  this->selectedVis.reset();
+  this->dataPtr->terrain = NULL;
+  this->dataPtr->selectedVis.reset();
 
-  this->sceneSimTimePosesApplied = common::Time();
-  this->sceneSimTimePosesReceived = common::Time();
+  this->dataPtr->sceneSimTimePosesApplied = common::Time();
+  this->dataPtr->sceneSimTimePosesReceived = common::Time();
 }
 
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
-  this->node->Fini();
-  this->modelMsgs.clear();
-  this->visualMsgs.clear();
-  this->lightMsgs.clear();
-  this->poseMsgs.clear();
-  this->sceneMsgs.clear();
-  this->jointMsgs.clear();
-  this->joints.clear();
-  this->linkMsgs.clear();
-  this->cameras.clear();
-  this->userCameras.clear();
-  this->lights.clear();
+  this->dataPtr->node->Fini();
+  this->dataPtr->modelMsgs.clear();
+  this->dataPtr->visualMsgs.clear();
+  this->dataPtr->lightMsgs.clear();
+  this->dataPtr->poseMsgs.clear();
+  this->dataPtr->sceneMsgs.clear();
+  this->dataPtr->jointMsgs.clear();
+  this->dataPtr->joints.clear();
+  this->dataPtr->linkMsgs.clear();
+  this->dataPtr->cameras.clear();
+  this->dataPtr->userCameras.clear();
+  this->dataPtr->lights.clear();
 
-  delete this->terrain;
-  this->terrain = NULL;
+  delete this->dataPtr->terrain;
+  this->dataPtr->terrain = NULL;
 
   // Erase the world visual
-  this->visuals.erase(this->visuals.begin());
+  this->dataPtr->visuals.erase(this->dataPtr->visuals.begin());
 
-  while (!this->visuals.empty())
-    if (this->visuals.begin()->second)
-      this->RemoveVisual(this->visuals.begin()->second);
-  this->visuals.clear();
+  while (!this->dataPtr->visuals.empty())
+    if (this->dataPtr->visuals.begin()->second)
+      this->RemoveVisual(this->dataPtr->visuals.begin()->second);
+  this->dataPtr->visuals.clear();
 
-  for (uint32_t i = 0; i < this->grids.size(); i++)
-    delete this->grids[i];
-  this->grids.clear();
+  for (uint32_t i = 0; i < this->dataPtr->grids.size(); ++i)
+    delete this->dataPtr->grids[i];
+  this->dataPtr->grids.clear();
 
-  this->sensorMsgs.clear();
+  this->dataPtr->sensorMsgs.clear();
   RTShaderSystem::Instance()->Clear();
 
-  this->initialized = false;
+  this->dataPtr->initialized = false;
 }
 
 //////////////////////////////////////////////////
 Scene::~Scene()
 {
-  delete this->requestMsg;
-  delete this->receiveMutex;
-  delete this->raySceneQuery;
+  delete this->dataPtr->requestMsg;
+  delete this->dataPtr->receiveMutex;
+  delete this->dataPtr->raySceneQuery;
 
-  this->node->Fini();
-  this->node.reset();
-  this->visSub.reset();
-  this->lightSub.reset();
-  this->poseSub.reset();
-  this->jointSub.reset();
-  this->skeletonPoseSub.reset();
-  this->selectionSub.reset();
+  this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+  this->dataPtr->visSub.reset();
+  this->dataPtr->lightSub.reset();
+  this->dataPtr->poseSub.reset();
+  this->dataPtr->jointSub.reset();
+  this->dataPtr->skeletonPoseSub.reset();
+  this->dataPtr->selectionSub.reset();
 
   Visual_M::iterator iter;
-  this->visuals.clear();
-  this->jointMsgs.clear();
-  this->joints.clear();
-  this->linkMsgs.clear();
-  this->sceneMsgs.clear();
-  this->poseMsgs.clear();
-  this->lightMsgs.clear();
-  this->visualMsgs.clear();
+  this->dataPtr->visuals.clear();
+  this->dataPtr->jointMsgs.clear();
+  this->dataPtr->joints.clear();
+  this->dataPtr->linkMsgs.clear();
+  this->dataPtr->sceneMsgs.clear();
+  this->dataPtr->poseMsgs.clear();
+  this->dataPtr->lightMsgs.clear();
+  this->dataPtr->visualMsgs.clear();
 
-  this->worldVisual.reset();
-  this->selectionMsg.reset();
-  this->lights.clear();
+  this->dataPtr->worldVisual.reset();
+  this->dataPtr->selectionMsg.reset();
+  this->dataPtr->lights.clear();
 
   // Remove a scene
   RTShaderSystem::Instance()->RemoveScene(shared_from_this());
 
-  for (uint32_t i = 0; i < this->grids.size(); i++)
-    delete this->grids[i];
-  this->grids.clear();
+  for (uint32_t i = 0; i < this->dataPtr->grids.size(); ++i)
+    delete this->dataPtr->grids[i];
+  this->dataPtr->grids.clear();
 
-  for (unsigned int i = 0; i < this->cameras.size(); ++i)
-    this->cameras[i].reset();
-  this->cameras.clear();
+  for (unsigned int i = 0; i < this->dataPtr->cameras.size(); ++i)
+    this->dataPtr->cameras[i].reset();
+  this->dataPtr->cameras.clear();
 
-  for (unsigned int i = 0; i < this->userCameras.size(); ++i)
-    this->userCameras[i].reset();
-  this->userCameras.clear();
+  for (unsigned int i = 0; i < this->dataPtr->userCameras.size(); ++i)
+    this->dataPtr->userCameras[i].reset();
+  this->dataPtr->userCameras.clear();
 
-  if (this->manager)
+  if (this->dataPtr->manager)
   {
-    RenderEngine::Instance()->root->destroySceneManager(this->manager);
-    this->manager = NULL;
+    RenderEngine::Instance()->root->destroySceneManager(this->dataPtr->manager);
+    this->dataPtr->manager = NULL;
   }
-  this->connections.clear();
+  this->dataPtr->connections.clear();
 
-  this->sdf->Reset();
-  this->sdf.reset();
+  this->dataPtr->sdf->Reset();
+  this->dataPtr->sdf.reset();
+
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
 void Scene::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf->Copy(_sdf);
+  this->dataPtr->sdf->Copy(_sdf);
   this->Load();
 }
 
 //////////////////////////////////////////////////
 void Scene::Load()
 {
-  this->initialized = false;
+  this->dataPtr->initialized = false;
   Ogre::Root *root = RenderEngine::Instance()->root;
 
-  if (this->manager)
-    root->destroySceneManager(this->manager);
+  if (this->dataPtr->manager)
+    root->destroySceneManager(this->dataPtr->manager);
 
-  this->manager = root->createSceneManager(Ogre::ST_GENERIC);
-  this->manager->setAmbientLight(Ogre::ColourValue(0.1, 0.1, 0.1, 0.1));
+  this->dataPtr->manager = root->createSceneManager(Ogre::ST_GENERIC);
+  this->dataPtr->manager->setAmbientLight(
+      Ogre::ColourValue(0.1, 0.1, 0.1, 0.1));
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
-  this->manager->addRenderQueueListener(
+  this->dataPtr->manager->addRenderQueueListener(
       RenderEngine::Instance()->GetOverlaySystem());
 #endif
 }
@@ -288,15 +300,16 @@ void Scene::Load()
 //////////////////////////////////////////////////
 VisualPtr Scene::GetWorldVisual() const
 {
-  return this->worldVisual;
+  return this->dataPtr->worldVisual;
 }
 
 //////////////////////////////////////////////////
 void Scene::Init()
 {
-  this->worldVisual.reset(new Visual("__world_node__", shared_from_this()));
-  this->worldVisual->SetId(0);
-  this->visuals[0] = this->worldVisual;
+  this->dataPtr->worldVisual.reset(new Visual("__world_node__",
+      shared_from_this()));
+  this->dataPtr->worldVisual->SetId(0);
+  this->dataPtr->visuals[0] = this->dataPtr->worldVisual;
 
   // RTShader system self-enables if the render path type is FORWARD,
   RTShaderSystem::Instance()->AddScene(shared_from_this());
@@ -305,8 +318,8 @@ void Scene::Init()
   if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
     this->InitDeferredShading();
 
-  for (uint32_t i = 0; i < this->grids.size(); i++)
-    this->grids[i]->Init();
+  for (uint32_t i = 0; i < this->dataPtr->grids.size(); ++i)
+    this->dataPtr->grids[i]->Init();
 
   // Create Sky. This initializes SkyX, and makes it invisible. A Sky
   // message must be received (via a scene message or on the ~/sky topic).
@@ -320,9 +333,10 @@ void Scene::Init()
   }
 
   // Create Fog
-  if (this->sdf->HasElement("fog"))
+  if (this->dataPtr->sdf->HasElement("fog"))
   {
-    boost::shared_ptr<sdf::Element> fogElem = this->sdf->GetElement("fog");
+    boost::shared_ptr<sdf::Element> fogElem =
+        this->dataPtr->sdf->GetElement("fog");
     this->SetFog(fogElem->Get<std::string>("type"),
                  fogElem->Get<common::Color>("color"),
                  fogElem->Get<double>("density"),
@@ -331,25 +345,27 @@ void Scene::Init()
   }
 
   // Create ray scene query
-  this->raySceneQuery = this->manager->createRayQuery(Ogre::Ray());
-  this->raySceneQuery->setSortByDistance(true);
-  this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
+  this->dataPtr->raySceneQuery =
+      this->dataPtr->manager->createRayQuery(Ogre::Ray());
+  this->dataPtr->raySceneQuery->setSortByDistance(true);
+  this->dataPtr->raySceneQuery->setQueryMask(
+      Ogre::SceneManager::ENTITY_TYPE_MASK);
 
   // Force shadows on.
   this->SetShadowsEnabled(true);
 
-  this->requestPub->WaitForConnection();
-  this->requestMsg = msgs::CreateRequest("scene_info");
-  this->requestPub->Publish(*this->requestMsg);
+  this->dataPtr->requestPub->WaitForConnection();
+  this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
+  this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
 
   Road2d *road = new Road2d();
-  road->Load(this->worldVisual);
+  road->Load(this->dataPtr->worldVisual);
 }
 
 //////////////////////////////////////////////////
 bool Scene::GetInitialized() const
 {
-  return this->initialized;
+  return this->dataPtr->initialized;
 }
 
 //////////////////////////////////////////////////
@@ -399,7 +415,7 @@ void Scene::InitDeferredShading()
 
   int numVPLs = 400;
   Ogre::InstanceManager *im =
-    this->manager->createInstanceManager("VPL_InstanceMgr",
+    this->dataPtr->manager->createInstanceManager("VPL_InstanceMgr",
       "VPLMesh", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
           Ogre::InstanceManager::HWInstancingBasic, numVPLs, Ogre::IM_USEALL);
 
@@ -416,42 +432,43 @@ void Scene::InitDeferredShading()
 //////////////////////////////////////////////////
 Ogre::SceneManager *Scene::GetManager() const
 {
-  return this->manager;
+  return this->dataPtr->manager;
 }
 
 //////////////////////////////////////////////////
 std::string Scene::GetName() const
 {
-  return this->name;
+  return this->dataPtr->name;
 }
 
 //////////////////////////////////////////////////
 void Scene::SetAmbientColor(const common::Color &_color)
 {
-  this->sdf->GetElement("ambient")->Set(_color);
+  this->dataPtr->sdf->GetElement("ambient")->Set(_color);
 
   // Ambient lighting
-  if (this->manager &&
-      Conversions::Convert(this->manager->getAmbientLight()) != _color)
+  if (this->dataPtr->manager &&
+      Conversions::Convert(this->dataPtr->manager->getAmbientLight()) != _color)
   {
-    this->manager->setAmbientLight(Conversions::Convert(_color));
+    this->dataPtr->manager->setAmbientLight(Conversions::Convert(_color));
   }
 }
 
 //////////////////////////////////////////////////
 common::Color Scene::GetAmbientColor() const
 {
-  return this->sdf->Get<common::Color>("ambient");
+  return this->dataPtr->sdf->Get<common::Color>("ambient");
 }
 
 //////////////////////////////////////////////////
 void Scene::SetBackgroundColor(const common::Color &_color)
 {
-  this->sdf->GetElement("background")->Set(_color);
+  this->dataPtr->sdf->GetElement("background")->Set(_color);
   Ogre::ColourValue clr = Conversions::Convert(_color);
 
   std::vector<CameraPtr>::iterator iter;
-  for (iter = this->cameras.begin(); iter != this->cameras.end(); ++iter)
+  for (iter = this->dataPtr->cameras.begin();
+      iter != this->dataPtr->cameras.end(); ++iter)
   {
     if ((*iter)->GetViewport() &&
         (*iter)->GetViewport()->getBackgroundColour() != clr)
@@ -459,8 +476,8 @@ void Scene::SetBackgroundColor(const common::Color &_color)
   }
 
   std::vector<UserCameraPtr>::iterator iter2;
-  for (iter2 = this->userCameras.begin();
-       iter2 != this->userCameras.end(); ++iter2)
+  for (iter2 = this->dataPtr->userCameras.begin();
+       iter2 != this->dataPtr->userCameras.end(); ++iter2)
   {
     if ((*iter2)->GetViewport() &&
         (*iter2)->GetViewport()->getBackgroundColour() != clr)
@@ -473,7 +490,7 @@ void Scene::SetBackgroundColor(const common::Color &_color)
 //////////////////////////////////////////////////
 common::Color Scene::GetBackgroundColor() const
 {
-  return this->sdf->Get<common::Color>("background");
+  return this->dataPtr->sdf->Get<common::Color>("background");
 }
 
 //////////////////////////////////////////////////
@@ -482,35 +499,35 @@ void Scene::CreateGrid(uint32_t cell_count, float cell_length,
 {
   Grid *grid = new Grid(this, cell_count, cell_length, line_width, color);
 
-  if (this->manager)
+  if (this->dataPtr->manager)
     grid->Init();
 
-  this->grids.push_back(grid);
+  this->dataPtr->grids.push_back(grid);
 }
 
 //////////////////////////////////////////////////
 Grid *Scene::GetGrid(uint32_t index) const
 {
-  if (index >= this->grids.size())
+  if (index >= this->dataPtr->grids.size())
   {
     gzerr << "Scene::GetGrid() Invalid index\n";
     return NULL;
   }
 
-  return this->grids[index];
+  return this->dataPtr->grids[index];
 }
 
 //////////////////////////////////////////////////
 uint32_t Scene::GetGridCount() const
 {
-  return this->grids.size();
+  return this->dataPtr->grids.size();
 }
 
 //////////////////////////////////////////////////
 CameraPtr Scene::CreateCamera(const std::string &_name, bool _autoRender)
 {
   CameraPtr camera(new Camera(_name, shared_from_this(), _autoRender));
-  this->cameras.push_back(camera);
+  this->dataPtr->cameras.push_back(camera);
 
   return camera;
 }
@@ -519,9 +536,9 @@ CameraPtr Scene::CreateCamera(const std::string &_name, bool _autoRender)
 DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
                                         bool _autoRender)
 {
-  DepthCameraPtr camera(new DepthCamera(this->name + "::" + _name,
+  DepthCameraPtr camera(new DepthCamera(this->dataPtr->name + "::" + _name,
         shared_from_this(), _autoRender));
-  this->cameras.push_back(camera);
+  this->dataPtr->cameras.push_back(camera);
 
   return camera;
 }
@@ -530,9 +547,9 @@ DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
 GpuLaserPtr Scene::CreateGpuLaser(const std::string &_name,
                                         bool _autoRender)
 {
-  GpuLaserPtr camera(new GpuLaser(this->name + "::" + _name,
+  GpuLaserPtr camera(new GpuLaser(this->dataPtr->name + "::" + _name,
         shared_from_this(), _autoRender));
-  this->cameras.push_back(camera);
+  this->dataPtr->cameras.push_back(camera);
 
   return camera;
 }
@@ -540,7 +557,7 @@ GpuLaserPtr Scene::CreateGpuLaser(const std::string &_name,
 //////////////////////////////////////////////////
 uint32_t Scene::GetCameraCount() const
 {
-  return this->cameras.size();
+  return this->dataPtr->cameras.size();
 }
 
 //////////////////////////////////////////////////
@@ -548,8 +565,8 @@ CameraPtr Scene::GetCamera(uint32_t index) const
 {
   CameraPtr cam;
 
-  if (index < this->cameras.size())
-    cam = this->cameras[index];
+  if (index < this->dataPtr->cameras.size())
+    cam = this->dataPtr->cameras[index];
 
   return cam;
 }
@@ -559,7 +576,8 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
 {
   CameraPtr result;
   std::vector<CameraPtr>::const_iterator iter;
-  for (iter = this->cameras.begin(); iter != this->cameras.end(); ++iter)
+  for (iter = this->dataPtr->cameras.begin();
+      iter != this->dataPtr->cameras.end(); ++iter)
   {
     if ((*iter)->GetName() == _name)
       result = *iter;
@@ -568,8 +586,8 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
   return result;
 }
 
-//////////////////////////////////////////////////
 #ifdef HAVE_OCULUS
+//////////////////////////////////////////////////
 OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
 {
   OculusCameraPtr camera(new OculusCamera(_name, shared_from_this()));
@@ -578,7 +596,7 @@ OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
   {
     camera->Load();
     camera->Init();
-    this->oculusCameras.push_back(camera);
+    this->dataPtr->oculusCameras.push_back(camera);
   }
 
   return camera;
@@ -587,17 +605,19 @@ OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
 //////////////////////////////////////////////////
 uint32_t Scene::GetOculusCameraCount() const
 {
-  return this->oculusCameras.size();
+  return this->dataPtr->oculusCameras.size();
 }
 #endif
 
 //////////////////////////////////////////////////
-UserCameraPtr Scene::CreateUserCamera(const std::string &_name)
+UserCameraPtr Scene::CreateUserCamera(const std::string &_name,
+                                      bool _stereoEnabled)
 {
-  UserCameraPtr camera(new UserCamera(_name, shared_from_this()));
+  UserCameraPtr camera(new UserCamera(_name, shared_from_this(),
+        _stereoEnabled));
   camera->Load();
   camera->Init();
-  this->userCameras.push_back(camera);
+  this->dataPtr->userCameras.push_back(camera);
 
   return camera;
 }
@@ -605,7 +625,7 @@ UserCameraPtr Scene::CreateUserCamera(const std::string &_name)
 //////////////////////////////////////////////////
 uint32_t Scene::GetUserCameraCount() const
 {
-  return this->userCameras.size();
+  return this->dataPtr->userCameras.size();
 }
 
 //////////////////////////////////////////////////
@@ -613,8 +633,8 @@ UserCameraPtr Scene::GetUserCamera(uint32_t index) const
 {
   UserCameraPtr cam;
 
-  if (index < this->userCameras.size())
-    cam = this->userCameras[index];
+  if (index < this->dataPtr->userCameras.size())
+    cam = this->dataPtr->userCameras[index];
 
   return cam;
 }
@@ -623,13 +643,14 @@ UserCameraPtr Scene::GetUserCamera(uint32_t index) const
 void Scene::RemoveCamera(const std::string &_name)
 {
   std::vector<CameraPtr>::iterator iter;
-  for (iter = this->cameras.begin(); iter != this->cameras.end(); ++iter)
+  for (iter = this->dataPtr->cameras.begin();
+      iter != this->dataPtr->cameras.end(); ++iter)
   {
     if ((*iter)->GetName() == _name)
     {
       (*iter)->Fini();
       (*iter).reset();
-      this->cameras.erase(iter);
+      this->dataPtr->cameras.erase(iter);
       break;
     }
   }
@@ -640,8 +661,8 @@ LightPtr Scene::GetLight(const std::string &_name) const
 {
   LightPtr result;
   std::string n = this->StripSceneName(_name);
-  Light_M::const_iterator iter = this->lights.find(n);
-  if (iter != this->lights.end())
+  Light_M::const_iterator iter = this->dataPtr->lights.find(n);
+  if (iter != this->dataPtr->lights.end())
     result = iter->second;
   return result;
 }
@@ -649,23 +670,23 @@ LightPtr Scene::GetLight(const std::string &_name) const
 //////////////////////////////////////////////////
 uint32_t Scene::GetLightCount() const
 {
-  return this->lights.size();
+  return this->dataPtr->lights.size();
 }
 
 //////////////////////////////////////////////////
 LightPtr Scene::GetLight(uint32_t _index) const
 {
   LightPtr result;
-  if (_index < this->lights.size())
+  if (_index < this->dataPtr->lights.size())
   {
-    Light_M::const_iterator iter = this->lights.begin();
+    Light_M::const_iterator iter = this->dataPtr->lights.begin();
     std::advance(iter, _index);
     result = iter->second;
   }
   else
   {
     gzerr << "Error: light index(" << _index << ") larger than light count("
-          << this->lights.size() << "\n";
+          << this->dataPtr->lights.size() << "\n";
   }
 
   return result;
@@ -674,8 +695,8 @@ LightPtr Scene::GetLight(uint32_t _index) const
 //////////////////////////////////////////////////
 VisualPtr Scene::GetVisual(uint32_t _id) const
 {
-  Visual_M::const_iterator iter = this->visuals.find(_id);
-  if (iter != this->visuals.end())
+  Visual_M::const_iterator iter = this->dataPtr->visuals.find(_id);
+  if (iter != this->dataPtr->visuals.end())
     return iter->second;
   return VisualPtr();
 }
@@ -686,20 +707,26 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
   VisualPtr result;
 
   Visual_M::const_iterator iter;
-  for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
+  for (iter = this->dataPtr->visuals.begin();
+      iter != this->dataPtr->visuals.end(); ++iter)
+  {
     if (iter->second->GetName() == _name)
       break;
+  }
 
-  if (iter != this->visuals.end())
+  if (iter != this->dataPtr->visuals.end())
     result = iter->second;
   else
   {
     std::string otherName = this->GetName() + "::" + _name;
-    for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
+    for (iter = this->dataPtr->visuals.begin();
+        iter != this->dataPtr->visuals.end(); ++iter)
+    {
       if (iter->second->GetName() == otherName)
         break;
+    }
 
-    if (iter != this->visuals.end())
+    if (iter != this->dataPtr->visuals.end())
       result = iter->second;
   }
 
@@ -709,20 +736,20 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
 //////////////////////////////////////////////////
 uint32_t Scene::GetVisualCount() const
 {
-  return this->visuals.size();
+  return this->dataPtr->visuals.size();
 }
 
 //////////////////////////////////////////////////
 void Scene::SelectVisual(const std::string &_name, const std::string &_mode)
 {
-  this->selectedVis = this->GetVisual(_name);
-  this->selectionMode = _mode;
+  this->dataPtr->selectedVis = this->GetVisual(_name);
+  this->dataPtr->selectionMode = _mode;
 }
 
 //////////////////////////////////////////////////
 VisualPtr Scene::GetSelectedVisual() const
 {
-  return this->selectedVis;
+  return this->dataPtr->selectedVis;
 }
 
 //////////////////////////////////////////////////
@@ -739,11 +766,13 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
   {
     // Make sure we set the _mod only if we have found a selection object
     if (closestEntity->getName().substr(0, 15) == "__SELECTION_OBJ" &&
-        closestEntity->getUserAny().getType() == typeid(std::string))
+        closestEntity->getUserObjectBindings().getUserAny().getType()
+        == typeid(std::string))
     {
       try
       {
-        _mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
+        _mod = Ogre::any_cast<std::string>(
+            closestEntity->getUserObjectBindings().getUserAny());
       }
       catch(boost::bad_any_cast &e)
       {
@@ -754,7 +783,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
     try
     {
       visual = this->GetVisual(Ogre::any_cast<std::string>(
-            closestEntity->getUserAny()));
+            closestEntity->getUserObjectBindings().getUserAny()));
     }
     catch(boost::bad_any_cast &e)
     {
@@ -824,13 +853,16 @@ double Scene::GetHeightBelowPoint(const math::Vector3 &_pt)
   double height = 0;
   Ogre::Ray ray(Conversions::Convert(_pt), Ogre::Vector3(0, 0, -1));
 
-  if (!this->raySceneQuery)
-    this->raySceneQuery = this->manager->createRayQuery(Ogre::Ray());
-  this->raySceneQuery->setRay(ray);
-  this->raySceneQuery->setSortByDistance(true, 0);
+  if (!this->dataPtr->raySceneQuery)
+  {
+    this->dataPtr->raySceneQuery =
+        this->dataPtr->manager->createRayQuery(Ogre::Ray());
+  }
+  this->dataPtr->raySceneQuery->setRay(ray);
+  this->dataPtr->raySceneQuery->setSortByDistance(true, 0);
 
   // Perform the scene query
-  Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
+  Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter;
 
   for (iter = result.begin(); iter != result.end(); ++iter)
@@ -852,9 +884,10 @@ double Scene::GetHeightBelowPoint(const math::Vector3 &_pt)
 
   // The default ray scene query does not work with terrain, so we have to
   // check ourselves.
-  if (this->terrain)
+  if (this->dataPtr->terrain)
   {
-    double terrainHeight = this->terrain->GetHeight(_pt.x, _pt.y, _pt.z);
+    double terrainHeight =
+        this->dataPtr->terrain->GetHeight(_pt.x, _pt.y, _pt.z);
     if (terrainHeight <= _pt.z)
       height = std::max(height, terrainHeight);
   }
@@ -868,14 +901,17 @@ void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
 {
   Ogre::Ray ray(Conversions::Convert(_pt), Ogre::Vector3(0, 0, -1));
 
-  if (!this->raySceneQuery)
-    this->raySceneQuery = this->manager->createRayQuery(Ogre::Ray());
+  if (!this->dataPtr->raySceneQuery)
+  {
+    this->dataPtr->raySceneQuery =
+        this->dataPtr->manager->createRayQuery(Ogre::Ray());
+  }
 
-  this->raySceneQuery->setRay(ray);
-  this->raySceneQuery->setSortByDistance(true, 0);
+  this->dataPtr->raySceneQuery->setRay(ray);
+  this->dataPtr->raySceneQuery->setSortByDistance(true, 0);
 
   // Perform the scene query
-  Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
+  Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
 
   _visuals.clear();
@@ -898,7 +934,7 @@ void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
         try
         {
           VisualPtr v = this->GetVisual(Ogre::any_cast<std::string>(
-                                        ogreEntity->getUserAny()));
+                ogreEntity->getUserObjectBindings().getUserAny()));
           if (v)
             _visuals.push_back(v);
         }
@@ -924,7 +960,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
     try
     {
       visual = this->GetVisual(Ogre::any_cast<std::string>(
-            closestEntity->getUserAny()));
+            closestEntity->getUserObjectBindings().getUserAny()));
     }
     catch(boost::bad_any_cast &e)
     {
@@ -949,10 +985,10 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
       static_cast<float>(_mousePos.y) /
       ogreCam->getViewport()->getActualHeight());
 
-  this->raySceneQuery->setRay(mouseRay);
+  this->dataPtr->raySceneQuery->setRay(mouseRay);
 
   // Perform the scene query
-  Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
+  Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
   Ogre::Entity *closestEntity = NULL;
 
@@ -1041,11 +1077,11 @@ bool Scene::GetFirstContact(CameraPtr _camera,
       static_cast<float>(_mousePos.y) /
       ogreCam->getViewport()->getActualHeight());
 
-  this->raySceneQuery->setSortByDistance(true);
-  this->raySceneQuery->setRay(mouseRay);
+  this->dataPtr->raySceneQuery->setSortByDistance(true);
+  this->dataPtr->raySceneQuery->setRay(mouseRay);
 
   // Perform the scene query
-  Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
+  Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
 
   double distance = -1.0;
@@ -1106,11 +1142,11 @@ bool Scene::GetFirstContact(CameraPtr _camera,
   }
 
   // If nothing was hit, then check the terrain.
-  if (distance <= 0.0 && this->terrain)
+  if (distance <= 0.0 && this->dataPtr->terrain)
   {
     // The terrain uses a special ray intersection test.
     Ogre::TerrainGroup::RayResult terrainResult =
-      this->terrain->GetOgreTerrain()->rayIntersects(mouseRay);
+      this->dataPtr->terrain->GetOgreTerrain()->rayIntersects(mouseRay);
 
     if (terrainResult.hit)
     {
@@ -1133,7 +1169,7 @@ bool Scene::GetFirstContact(CameraPtr _camera,
 //////////////////////////////////////////////////
 void Scene::PrintSceneGraph()
 {
-  this->PrintSceneGraphHelper("", this->manager->getRootSceneNode());
+  this->PrintSceneGraphHelper("", this->dataPtr->manager->getRootSceneNode());
 }
 
 //////////////////////////////////////////////////
@@ -1161,7 +1197,7 @@ void Scene::PrintSceneGraphHelper(const std::string &prefix_, Ogre::Node *node_)
 
   std::cout << prefix_ << nodeName << "\n";
   std::cout << prefix_ << "  Num Objs[" << numAttachedObjs << "]\n";
-  for (int i = 0; i < numAttachedObjs; i++)
+  for (int i = 0; i < numAttachedObjs; ++i)
   {
     std::cout << prefix_
       << "    Obj[" << snode->getAttachedObject(i)->getName() << "]\n";
@@ -1173,7 +1209,7 @@ void Scene::PrintSceneGraphHelper(const std::string &prefix_, Ogre::Node *node_)
   std::cout << prefix_
     << "  Scale[" << scale.x << " " << scale.y << " " << scale.z << "]\n";
 
-  for (uint32_t i = 0; i < node_->numChildren(); i++)
+  for (uint32_t i = 0; i < node_->numChildren(); ++i)
   {
     this->PrintSceneGraphHelper(prefix_ + "  ", node_->getChild(i));
   }
@@ -1188,16 +1224,17 @@ void Scene::DrawLine(const math::Vector3 &start_,
   Ogre::ManualObject *obj = NULL;
   bool attached = false;
 
-  if (this->manager->hasManualObject(name_))
+  if (this->dataPtr->manager->hasManualObject(name_))
   {
-    sceneNode = this->manager->getSceneNode(name_);
-    obj = this->manager->getManualObject(name_);
+    sceneNode = this->dataPtr->manager->getSceneNode(name_);
+    obj = this->dataPtr->manager->getManualObject(name_);
     attached = true;
   }
   else
   {
-    sceneNode = this->manager->getRootSceneNode()->createChildSceneNode(name_);
-    obj = this->manager->createManualObject(name_);
+    sceneNode =
+        this->dataPtr->manager->getRootSceneNode()->createChildSceneNode(name_);
+    obj = this->dataPtr->manager->createManualObject(name_);
   }
 
   sceneNode->setVisible(true);
@@ -1226,7 +1263,7 @@ void Scene::SetFog(const std::string &_type, const common::Color &_color,
   else if (_type == "exp2")
     fogType = Ogre::FOG_EXP2;
 
-  sdf::ElementPtr elem = this->sdf->GetElement("fog");
+  sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("fog");
 
   elem->GetElement("type")->Set(_type);
   elem->GetElement("color")->Set(_color);
@@ -1234,31 +1271,31 @@ void Scene::SetFog(const std::string &_type, const common::Color &_color,
   elem->GetElement("start")->Set(_start);
   elem->GetElement("end")->Set(_end);
 
-  if (this->manager)
-    this->manager->setFog(fogType, Conversions::Convert(_color),
+  if (this->dataPtr->manager)
+    this->dataPtr->manager->setFog(fogType, Conversions::Convert(_color),
                            _density, _start, _end);
 }
 
 //////////////////////////////////////////////////
 void Scene::SetVisible(const std::string &name_, bool visible_)
 {
-  if (this->manager->hasSceneNode(name_))
-    this->manager->getSceneNode(name_)->setVisible(visible_);
+  if (this->dataPtr->manager->hasSceneNode(name_))
+    this->dataPtr->manager->getSceneNode(name_)->setVisible(visible_);
 
-  if (this->manager->hasManualObject(name_))
-    this->manager->getManualObject(name_)->setVisible(visible_);
+  if (this->dataPtr->manager->hasManualObject(name_))
+    this->dataPtr->manager->getManualObject(name_)->setVisible(visible_);
 }
 
 //////////////////////////////////////////////////
 uint32_t Scene::GetId() const
 {
-  return this->id;
+  return this->dataPtr->id;
 }
 
 //////////////////////////////////////////////////
 std::string Scene::GetIdString() const
 {
-  return this->idString;
+  return this->dataPtr->idString;
 }
 
 
@@ -1388,33 +1425,35 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
 bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
   {
-    boost::recursive_mutex::scoped_lock lock(this->poseMsgMutex);
-    for (int i = 0; i < _msg->model_size(); i++)
+    boost::recursive_mutex::scoped_lock lock(this->dataPtr->poseMsgMutex);
+    for (int i = 0; i < _msg->model_size(); ++i)
     {
-      PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg->model(i).id());
-      if (iter != this->poseMsgs.end())
+      PoseMsgs_M::iterator iter =
+          this->dataPtr->poseMsgs.find(_msg->model(i).id());
+      if (iter != this->dataPtr->poseMsgs.end())
         iter->second.CopyFrom(_msg->model(i).pose());
       else
-        this->poseMsgs.insert(
+        this->dataPtr->poseMsgs.insert(
             std::make_pair(_msg->model(i).id(), _msg->model(i).pose()));
 
-      this->poseMsgs[_msg->model(i).id()].set_name(_msg->model(i).name());
-      this->poseMsgs[_msg->model(i).id()].set_id(_msg->model(i).id());
+      this->dataPtr->poseMsgs[_msg->model(i).id()].set_name(
+          _msg->model(i).name());
+      this->dataPtr->poseMsgs[_msg->model(i).id()].set_id(_msg->model(i).id());
 
       this->ProcessModelMsg(_msg->model(i));
     }
   }
 
-  for (int i = 0; i < _msg->light_size(); i++)
+  for (int i = 0; i < _msg->light_size(); ++i)
   {
     boost::shared_ptr<msgs::Light> lm(new msgs::Light(_msg->light(i)));
-    this->lightMsgs.push_back(lm);
+    this->dataPtr->lightMsgs.push_back(lm);
   }
 
-  for (int i = 0; i < _msg->joint_size(); i++)
+  for (int i = 0; i < _msg->joint_size(); ++i)
   {
     boost::shared_ptr<msgs::Joint> jm(new msgs::Joint(_msg->joint(i)));
-    this->jointMsgs.push_back(jm);
+    this->dataPtr->jointMsgs.push_back(jm);
   }
 
   if (_msg->has_ambient())
@@ -1438,7 +1477,7 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 
   if (_msg->has_fog())
   {
-    sdf::ElementPtr elem = this->sdf->GetElement("fog");
+    sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("fog");
 
     if (_msg->fog().has_color())
       elem->GetElement("color")->Set(
@@ -1488,7 +1527,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   {
     boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
           _msg.visual(j)));
-    this->visualMsgs.push_back(vm);
+    this->dataPtr->visualMsgs.push_back(vm);
   }
 
   // Set the scale of the model visual
@@ -1503,20 +1542,20 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     vm->mutable_scale()->set_x(_msg.scale().x());
     vm->mutable_scale()->set_y(_msg.scale().y());
     vm->mutable_scale()->set_z(_msg.scale().z());
-    this->visualMsgs.push_back(vm);
+    this->dataPtr->visualMsgs.push_back(vm);
   }
 
   for (int j = 0; j < _msg.joint_size(); j++)
   {
     boost::shared_ptr<msgs::Joint> jm(new msgs::Joint(
           _msg.joint(j)));
-    this->jointMsgs.push_back(jm);
+    this->dataPtr->jointMsgs.push_back(jm);
 
     for (int k = 0; k < _msg.joint(j).sensor_size(); k++)
     {
       boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
             _msg.joint(j).sensor(k)));
-      this->sensorMsgs.push_back(sm);
+      this->dataPtr->sensorMsgs.push_back(sm);
     }
   }
 
@@ -1525,32 +1564,33 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     linkName = modelName + _msg.link(j).name();
 
     {
-      boost::recursive_mutex::scoped_lock lock(this->poseMsgMutex);
+      boost::recursive_mutex::scoped_lock lock(this->dataPtr->poseMsgMutex);
       if (_msg.link(j).has_pose())
       {
-        PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg.link(j).id());
-        if (iter != this->poseMsgs.end())
+        PoseMsgs_M::iterator iter =
+            this->dataPtr->poseMsgs.find(_msg.link(j).id());
+        if (iter != this->dataPtr->poseMsgs.end())
           iter->second.CopyFrom(_msg.link(j).pose());
         else
-          this->poseMsgs.insert(
+          this->dataPtr->poseMsgs.insert(
               std::make_pair(_msg.link(j).id(), _msg.link(j).pose()));
 
-        this->poseMsgs[_msg.link(j).id()].set_name(linkName);
-        this->poseMsgs[_msg.link(j).id()].set_id(_msg.link(j).id());
+        this->dataPtr->poseMsgs[_msg.link(j).id()].set_name(linkName);
+        this->dataPtr->poseMsgs[_msg.link(j).id()].set_id(_msg.link(j).id());
       }
     }
 
     if (_msg.link(j).has_inertial())
     {
       boost::shared_ptr<msgs::Link> lm(new msgs::Link(_msg.link(j)));
-      this->linkMsgs.push_back(lm);
+      this->dataPtr->linkMsgs.push_back(lm);
     }
 
     for (int k = 0; k < _msg.link(j).visual_size(); k++)
     {
       boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
             _msg.link(j).visual(k)));
-      this->visualMsgs.push_back(vm);
+      this->dataPtr->visualMsgs.push_back(vm);
     }
 
     for (int k = 0; k < _msg.link(j).collision_size(); k++)
@@ -1560,7 +1600,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
       {
         boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
               _msg.link(j).collision(k).visual(l)));
-        this->visualMsgs.push_back(vm);
+        this->dataPtr->visualMsgs.push_back(vm);
       }
     }
 
@@ -1568,7 +1608,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     {
       boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
             _msg.link(j).sensor(k)));
-      this->sensorMsgs.push_back(sm);
+      this->dataPtr->sensorMsgs.push_back(sm);
     }
   }
 
@@ -1578,15 +1618,15 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
 //////////////////////////////////////////////////
 void Scene::OnSensorMsg(ConstSensorPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  this->sensorMsgs.push_back(_msg);
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->sensorMsgs.push_back(_msg);
 }
 
 //////////////////////////////////////////////////
 void Scene::OnVisualMsg(ConstVisualPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  this->visualMsgs.push_back(_msg);
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->visualMsgs.push_back(_msg);
 }
 
 //////////////////////////////////////////////////
@@ -1597,7 +1637,8 @@ void Scene::PreRender()
 
   if (!first)
   {
-    Ogre::RenderSystem *renderSys = this->manager->getDestinationRenderSystem();
+    Ogre::RenderSystem *renderSys =
+        this->dataPtr->manager->getDestinationRenderSystem();
     Ogre::RenderSystem::RenderTargetIterator renderIter =
       renderSys->getRenderTargetIterator();
 
@@ -1612,19 +1653,21 @@ void Scene::PreRender()
         filename2 << "/tmp/render_targets/iter_"
                   << this->iterations << "_" << i << "_b.png";
 
-        Ogre::MultiRenderTarget *mtarget = dynamic_cast<Ogre::MultiRenderTarget*>(renderIter.current()->second);
+        Ogre::MultiRenderTarget *mtarget =
+            dynamic_cast<Ogre::MultiRenderTarget *>(
+            renderIter.current()->second);
         if (mtarget)
         {
           // std::cout << renderIter.current()->first << "\n";
           mtarget->getBoundSurface(0)->writeContentsToFile(filename.str());
 
           mtarget->getBoundSurface(1)->writeContentsToFile(filename2.str());
-          i++;
+          ++i;
         }
         else
         {
           renderIter.current()->second->writeContentsToFile(filename.str());
-          i++;
+          ++i;
         }
       }
     }
@@ -1654,36 +1697,38 @@ void Scene::PreRender()
   LinkMsgs_L linkMsgsCopy;
 
   {
-    boost::mutex::scoped_lock lock(*this->receiveMutex);
+    boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
 
-    std::copy(this->sceneMsgs.begin(), this->sceneMsgs.end(),
+    std::copy(this->dataPtr->sceneMsgs.begin(), this->dataPtr->sceneMsgs.end(),
               std::back_inserter(sceneMsgsCopy));
-    this->sceneMsgs.clear();
+    this->dataPtr->sceneMsgs.clear();
 
-    std::copy(this->modelMsgs.begin(), this->modelMsgs.end(),
+    std::copy(this->dataPtr->modelMsgs.begin(), this->dataPtr->modelMsgs.end(),
               std::back_inserter(modelMsgsCopy));
-    this->modelMsgs.clear();
+    this->dataPtr->modelMsgs.clear();
 
-    std::copy(this->sensorMsgs.begin(), this->sensorMsgs.end(),
+    std::copy(this->dataPtr->sensorMsgs.begin(),
+              this->dataPtr->sensorMsgs.end(),
               std::back_inserter(sensorMsgsCopy));
-    this->sensorMsgs.clear();
+    this->dataPtr->sensorMsgs.clear();
 
-    std::copy(this->lightMsgs.begin(), this->lightMsgs.end(),
+    std::copy(this->dataPtr->lightMsgs.begin(), this->dataPtr->lightMsgs.end(),
               std::back_inserter(lightMsgsCopy));
-    this->lightMsgs.clear();
+    this->dataPtr->lightMsgs.clear();
 
-    this->visualMsgs.sort(VisualMessageLessOp);
-    std::copy(this->visualMsgs.begin(), this->visualMsgs.end(),
+    this->dataPtr->visualMsgs.sort(VisualMessageLessOp);
+    std::copy(this->dataPtr->visualMsgs.begin(),
+              this->dataPtr->visualMsgs.end(),
               std::back_inserter(visualMsgsCopy));
-    this->visualMsgs.clear();
+    this->dataPtr->visualMsgs.clear();
 
-    std::copy(this->jointMsgs.begin(), this->jointMsgs.end(),
+    std::copy(this->dataPtr->jointMsgs.begin(), this->dataPtr->jointMsgs.end(),
               std::back_inserter(jointMsgsCopy));
-    this->jointMsgs.clear();
+    this->dataPtr->jointMsgs.clear();
 
-    std::copy(this->linkMsgs.begin(), this->linkMsgs.end(),
+    std::copy(this->dataPtr->linkMsgs.begin(), this->dataPtr->linkMsgs.end(),
               std::back_inserter(linkMsgsCopy));
-    this->linkMsgs.clear();
+    this->dataPtr->linkMsgs.clear();
   }
 
   // Process the scene messages. DO THIS FIRST
@@ -1691,9 +1736,9 @@ void Scene::PreRender()
   {
     if (this->ProcessSceneMsg(*sIter))
     {
-      if (!this->initialized)
+      if (!this->dataPtr->initialized)
         RTShaderSystem::Instance()->UpdateShaders();
-      this->initialized = true;
+      this->dataPtr->initialized = true;
       sceneMsgsCopy.erase(sIter++);
     }
     else
@@ -1755,60 +1800,60 @@ void Scene::PreRender()
   }
 
   // Process the request messages
-  for (rIter =  this->requestMsgs.begin();
-      rIter != this->requestMsgs.end(); ++rIter)
+  for (rIter =  this->dataPtr->requestMsgs.begin();
+      rIter != this->dataPtr->requestMsgs.end(); ++rIter)
   {
     this->ProcessRequestMsg(*rIter);
   }
-  this->requestMsgs.clear();
-
+  this->dataPtr->requestMsgs.clear();
 
   {
-    boost::mutex::scoped_lock lock(*this->receiveMutex);
+    boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
 
     std::copy(sceneMsgsCopy.begin(), sceneMsgsCopy.end(),
-        std::front_inserter(this->sceneMsgs));
+        std::front_inserter(this->dataPtr->sceneMsgs));
 
     std::copy(modelMsgsCopy.begin(), modelMsgsCopy.end(),
-        std::front_inserter(this->modelMsgs));
+        std::front_inserter(this->dataPtr->modelMsgs));
 
     std::copy(sensorMsgsCopy.begin(), sensorMsgsCopy.end(),
-        std::front_inserter(this->sensorMsgs));
+        std::front_inserter(this->dataPtr->sensorMsgs));
 
     std::copy(lightMsgsCopy.begin(), lightMsgsCopy.end(),
-        std::front_inserter(this->lightMsgs));
+        std::front_inserter(this->dataPtr->lightMsgs));
 
     std::copy(visualMsgsCopy.begin(), visualMsgsCopy.end(),
-        std::front_inserter(this->visualMsgs));
+        std::front_inserter(this->dataPtr->visualMsgs));
 
     std::copy(jointMsgsCopy.begin(), jointMsgsCopy.end(),
-        std::front_inserter(this->jointMsgs));
+        std::front_inserter(this->dataPtr->jointMsgs));
 
     std::copy(linkMsgsCopy.begin(), linkMsgsCopy.end(),
-        std::front_inserter(this->linkMsgs));
+        std::front_inserter(this->dataPtr->linkMsgs));
   }
 
   {
-    boost::recursive_mutex::scoped_lock lock(this->poseMsgMutex);
+    boost::recursive_mutex::scoped_lock lock(this->dataPtr->poseMsgMutex);
 
     // Process all the model messages last. Remove pose message from the list
     // only when a corresponding visual exits. We may receive pose updates
     // over the wire before  we recieve the visual
-    pIter = this->poseMsgs.begin();
-    while (pIter != this->poseMsgs.end())
+    pIter = this->dataPtr->poseMsgs.begin();
+    while (pIter != this->dataPtr->poseMsgs.end())
     {
-      Visual_M::iterator iter = this->visuals.find(pIter->first);
-      if (iter != this->visuals.end() && iter->second)
+      Visual_M::iterator iter = this->dataPtr->visuals.find(pIter->first);
+      if (iter != this->dataPtr->visuals.end() && iter->second)
       {
         // If an object is selected, don't let the physics engine move it.
-        if (!this->selectedVis || this->selectionMode != "move" ||
-            iter->first != this->selectedVis->GetId())
+        if (!this->dataPtr->selectedVis
+            || this->dataPtr->selectionMode != "move" ||
+            iter->first != this->dataPtr->selectedVis->GetId())
         {
           math::Pose pose = msgs::Convert(pIter->second);
           GZ_ASSERT(iter->second, "Visual pointer is NULL");
           iter->second->SetPose(pose);
           PoseMsgs_M::iterator prev = pIter++;
-          this->poseMsgs.erase(prev);
+          this->dataPtr->poseMsgs.erase(prev);
         }
         else
           ++pIter;
@@ -1818,21 +1863,23 @@ void Scene::PreRender()
     }
 
     // process skeleton pose msgs
-    spIter = this->skeletonPoseMsgs.begin();
-    while (spIter != this->skeletonPoseMsgs.end())
+    spIter = this->dataPtr->skeletonPoseMsgs.begin();
+    while (spIter != this->dataPtr->skeletonPoseMsgs.end())
     {
-      Visual_M::iterator iter = this->visuals.find((*spIter)->model_id());
-      for (int i = 0; i < (*spIter)->pose_size(); i++)
+      Visual_M::iterator iter =
+          this->dataPtr->visuals.find((*spIter)->model_id());
+      for (int i = 0; i < (*spIter)->pose_size(); ++i)
       {
         const msgs::Pose& pose_msg = (*spIter)->pose(i);
         if (pose_msg.has_id())
         {
-          Visual_M::iterator iter2 = this->visuals.find(pose_msg.id());
-          if (iter2 != this->visuals.end())
+          Visual_M::iterator iter2 = this->dataPtr->visuals.find(pose_msg.id());
+          if (iter2 != this->dataPtr->visuals.end())
           {
             // If an object is selected, don't let the physics engine move it.
-            if (!this->selectedVis || this->selectionMode != "move" ||
-              iter->first != this->selectedVis->GetId())
+            if (!this->dataPtr->selectedVis ||
+                this->dataPtr->selectionMode != "move" ||
+                iter->first != this->dataPtr->selectedVis->GetId())
             {
               math::Pose pose = msgs::Convert(pose_msg);
               iter2->second->SetPose(pose);
@@ -1841,23 +1888,27 @@ void Scene::PreRender()
         }
       }
 
-      if (iter != this->visuals.end())
+      if (iter != this->dataPtr->visuals.end())
       {
         iter->second->SetSkeletonPose(*(*spIter).get());
         SkeletonPoseMsgs_L::iterator prev = spIter++;
-        this->skeletonPoseMsgs.erase(prev);
+        this->dataPtr->skeletonPoseMsgs.erase(prev);
       }
       else
         ++spIter;
     }
 
     // official time stamp of approval
-    this->sceneSimTimePosesApplied = this->sceneSimTimePosesReceived;
+    this->dataPtr->sceneSimTimePosesApplied =
+        this->dataPtr->sceneSimTimePosesReceived;
 
-    if (this->selectionMsg)
+    if (this->dataPtr->selectionMsg)
     {
-      this->SelectVisual(this->selectionMsg->name(), "normal");
-      this->selectionMsg.reset();
+      if (!this->dataPtr->selectedVis ||
+          this->dataPtr->selectionMsg->name() !=
+          this->dataPtr->selectedVis->GetName())
+        this->SelectVisual(this->dataPtr->selectionMsg->name(), "normal");
+      this->dataPtr->selectionMsg.reset();
     }
   }
 }
@@ -1865,21 +1916,21 @@ void Scene::PreRender()
 /////////////////////////////////////////////////
 void Scene::OnJointMsg(ConstJointPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  this->jointMsgs.push_back(_msg);
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->jointMsgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////
 bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 {
-  if (!this->enableVisualizations)
+  if (!this->dataPtr->enableVisualizations)
     return true;
 
   if ((_msg->type() == "ray" || _msg->type() == "gpu_ray") && _msg->visualize()
       && !_msg->topic().empty())
   {
     std::string rayVisualName = _msg->parent() + "::" + _msg->name();
-    if (this->visuals.find(_msg->id()) == this->visuals.end())
+    if (this->dataPtr->visuals.find(_msg->id()) == this->dataPtr->visuals.end())
     {
       VisualPtr parentVis = this->GetVisual(_msg->parent_id());
       if (!parentVis)
@@ -1889,14 +1940,14 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
             rayVisualName+"_GUIONLY_laser_vis", parentVis, _msg->topic()));
       laserVis->Load();
       laserVis->SetId(_msg->id());
-      this->visuals[_msg->id()] = laserVis;
+      this->dataPtr->visuals[_msg->id()] = laserVis;
     }
   }
   else if ((_msg->type() == "sonar") && _msg->visualize()
       && !_msg->topic().empty())
   {
     std::string sonarVisualName = _msg->parent() + "::" + _msg->name();
-    if (this->visuals.find(_msg->id()) == this->visuals.end())
+    if (this->dataPtr->visuals.find(_msg->id()) == this->dataPtr->visuals.end())
     {
       VisualPtr parentVis = this->GetVisual(_msg->parent());
       if (!parentVis)
@@ -1906,16 +1957,16 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
             sonarVisualName+"_GUIONLY_sonar_vis", parentVis, _msg->topic()));
       sonarVis->Load();
       sonarVis->SetId(_msg->id());
-      this->visuals[_msg->id()] = sonarVis;
+      this->dataPtr->visuals[_msg->id()] = sonarVis;
     }
   }
   else if ((_msg->type() == "force_torque") && _msg->visualize()
       && !_msg->topic().empty())
   {
     std::string wrenchVisualName = _msg->parent() + "::" + _msg->name();
-    if (this->visuals.find(_msg->id()) == this->visuals.end())
+    if (this->dataPtr->visuals.find(_msg->id()) == this->dataPtr->visuals.end())
     {
-      ConstJointPtr jointMsg = this->joints[_msg->parent()];
+      ConstJointPtr jointMsg = this->dataPtr->joints[_msg->parent()];
 
       if (!jointMsg)
         return false;
@@ -1930,7 +1981,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
             _msg->topic()));
       wrenchVis->Load(jointMsg);
       wrenchVis->SetId(_msg->id());
-      this->visuals[_msg->id()] = wrenchVis;
+      this->dataPtr->visuals[_msg->id()] = wrenchVis;
     }
   }
   else if (_msg->type() == "camera" && _msg->visualize())
@@ -1943,8 +1994,8 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     if (_msg->camera().image_size().x() > 0 &&
         _msg->camera().image_size().y() > 0)
     {
-      Visual_M::iterator iter = this->visuals.find(_msg->id());
-      if (iter == this->visuals.end())
+      Visual_M::iterator iter = this->dataPtr->visuals.find(_msg->id());
+      if (iter == this->dataPtr->visuals.end())
       {
         CameraVisualPtr cameraVis(new CameraVisual(
               _msg->name()+"_GUIONLY_camera_vis", parentVis));
@@ -1954,12 +2005,9 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
         parentVis->AttachVisual(cameraVis);
 
         cameraVis->SetPose(msgs::Convert(_msg->pose()));
-
         cameraVis->SetId(_msg->id());
-        cameraVis->Load(_msg->camera().image_size().x(),
-            _msg->camera().image_size().y());
-
-        this->visuals[cameraVis->GetId()] = cameraVis;
+        cameraVis->Load(_msg->camera());
+        this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
       }
     }
   }
@@ -1968,11 +2016,11 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
   {
     ContactVisualPtr contactVis(new ContactVisual(
           _msg->name()+"__GUIONLY_CONTACT_VISUAL__",
-          this->worldVisual, _msg->topic()));
+          this->dataPtr->worldVisual, _msg->topic()));
     contactVis->SetId(_msg->id());
 
-    this->contactVisId = _msg->id();
-    this->visuals[contactVis->GetId()] = contactVis;
+    this->dataPtr->contactVisId = _msg->id();
+    this->dataPtr->visuals[contactVis->GetId()] = contactVis;
   }
   else if (_msg->type() == "rfidtag" && _msg->visualize() &&
            !_msg->topic().empty())
@@ -1985,7 +2033,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
           _msg->name() + "_GUIONLY_rfidtag_vis", parentVis, _msg->topic()));
     rfidVis->SetId(_msg->id());
 
-    this->visuals[rfidVis->GetId()] = rfidVis;
+    this->dataPtr->visuals[rfidVis->GetId()] = rfidVis;
   }
   else if (_msg->type() == "rfid" && _msg->visualize() &&
            !_msg->topic().empty())
@@ -1997,7 +2045,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     RFIDVisualPtr rfidVis(new RFIDVisual(
           _msg->name() + "_GUIONLY_rfid_vis", parentVis, _msg->topic()));
     rfidVis->SetId(_msg->id());
-    this->visuals[rfidVis->GetId()] = rfidVis;
+    this->dataPtr->visuals[rfidVis->GetId()] = rfidVis;
   }
   else if (_msg->type() == "wireless_transmitter" && _msg->visualize() &&
            !_msg->topic().empty())
@@ -2008,7 +2056,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 
     VisualPtr transmitterVis(new TransmitterVisual(
           _msg->name() + "_GUIONLY_transmitter_vis", parentVis, _msg->topic()));
-    this->visuals[transmitterVis->GetId()] = transmitterVis;
+    this->dataPtr->visuals[transmitterVis->GetId()] = transmitterVis;
     transmitterVis->Load();
   }
 
@@ -2041,12 +2089,13 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
   {
     std::string pname = _msg->name() + "::" + _msg->projector(i).name();
 
-    if (this->projectors.find(pname) == this->projectors.end())
+    if (this->dataPtr->projectors.find(pname) ==
+        this->dataPtr->projectors.end())
     {
       Projector *projector = new Projector(linkVis);
       projector->Load(_msg->projector(i));
       projector->Toggle();
-      this->projectors[pname] = projector;
+      this->dataPtr->projectors[pname] = projector;
     }
   }
 
@@ -2059,7 +2108,7 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
   VisualPtr childVis;
 
   if (_msg->has_child() && _msg->child() == "world")
-    childVis = this->worldVisual;
+    childVis = this->dataPtr->worldVisual;
   else if (_msg->has_child_id())
     childVis = this->GetVisual(_msg->child_id());
 
@@ -2067,13 +2116,13 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
     return false;
 
   JointVisualPtr jointVis(new JointVisual(
-        _msg->name() + "_JOINT_VISUAL__", childVis));
+      _msg->name() + "_JOINT_VISUAL__", childVis));
   jointVis->Load(_msg);
-  jointVis->SetVisible(this->showJoints);
+  jointVis->SetVisible(this->dataPtr->showJoints);
   if (_msg->has_id())
     jointVis->SetId(_msg->id());
 
-  this->visuals[jointVis->GetId()] = jointVis;
+  this->dataPtr->visuals[jointVis->GetId()] = jointVis;
 
   return true;
 }
@@ -2081,28 +2130,29 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnScene(ConstScenePtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  this->sceneMsgs.push_back(_msg);
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->sceneMsgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////
 void Scene::OnResponse(ConstResponsePtr &_msg)
 {
-  if (!this->requestMsg || _msg->id() != this->requestMsg->id())
+  if (!this->dataPtr->requestMsg ||
+      _msg->id() != this->dataPtr->requestMsg->id())
     return;
 
   msgs::Scene sceneMsg;
   sceneMsg.ParseFromString(_msg->serialized_data());
   boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
-  this->sceneMsgs.push_back(sm);
-  this->requestMsg = NULL;
+  this->dataPtr->sceneMsgs.push_back(sm);
+  this->dataPtr->requestMsg = NULL;
 }
 
 /////////////////////////////////////////////////
 void Scene::OnRequest(ConstRequestPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  this->requestMsgs.push_back(_msg);
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->requestMsgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////
@@ -2115,8 +2165,8 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     response.set_request(_msg->request());
 
     Light_M::iterator iter;
-    iter = this->lights.find(_msg->data());
-    if (iter != this->lights.end())
+    iter = this->dataPtr->lights.find(_msg->data());
+    if (iter != this->dataPtr->lights.end())
     {
       msgs::Light lightMsg;
       iter->second->FillMsg(lightMsg);
@@ -2134,12 +2184,12 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
   }
   else if (_msg->request() == "entity_delete")
   {
-    Light_M::iterator lightIter = this->lights.find(_msg->data());
+    Light_M::iterator lightIter = this->dataPtr->lights.find(_msg->data());
 
     // Check to see if the deleted entity is a light.
-    if (lightIter != this->lights.end())
+    if (lightIter != this->dataPtr->lights.end())
     {
-      this->lights.erase(lightIter);
+      this->dataPtr->lights.erase(lightIter);
     }
     // Otherwise delete a visual
     else
@@ -2148,7 +2198,8 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
       try
       {
         Visual_M::iterator iter;
-        iter = this->visuals.find(boost::lexical_cast<uint32_t>(_msg->data()));
+        iter = this->dataPtr->visuals.find(
+            boost::lexical_cast<uint32_t>(_msg->data()));
         visPtr = iter->second;
       } catch(...)
       {
@@ -2296,25 +2347,26 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 {
   bool result = false;
-  Visual_M::iterator iter = this->visuals.end();
+  Visual_M::iterator iter = this->dataPtr->visuals.end();
 
   if (_msg->has_id())
-    iter = this->visuals.find(_msg->id());
+    iter = this->dataPtr->visuals.find(_msg->id());
   else
   {
     VisualPtr vis = this->GetVisual(_msg->name());
-    iter = vis ? this->visuals.find(vis->GetId()) : this->visuals.end();
+    iter = vis ? this->dataPtr->visuals.find(vis->GetId()) :
+        this->dataPtr->visuals.end();
   }
 
   if (_msg->has_delete_me() && _msg->delete_me())
   {
-    if (iter != this->visuals.end())
+    if (iter != this->dataPtr->visuals.end())
     {
-      this->visuals.erase(iter);
+      this->dataPtr->visuals.erase(iter);
       result = true;
     }
   }
-  else if (iter != this->visuals.end())
+  else if (iter != this->dataPtr->visuals.end())
   {
     iter->second->UpdateFromMsg(_msg);
     result = true;
@@ -2329,14 +2381,14 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     {
       // Ignore collision visuals for the heightmap
       if (_msg->name().find("__COLLISION_VISUAL__") == std::string::npos &&
-          this->terrain == NULL)
+          this->dataPtr->terrain == NULL)
       {
         try
         {
-          if (!this->terrain)
+          if (!this->dataPtr->terrain)
           {
-            this->terrain = new Heightmap(shared_from_this());
-            this->terrain->LoadFromMsg(_msg);
+            this->dataPtr->terrain = new Heightmap(shared_from_this());
+            this->dataPtr->terrain->LoadFromMsg(_msg);
           }
           else
             gzerr << "Only one Heightmap can be created per Scene\n";
@@ -2352,20 +2404,21 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     if (_msg->has_parent_name() && _msg->parent_name() != this->GetName())
     {
       if (_msg->has_id())
-        iter = this->visuals.find(_msg->id());
+        iter = this->dataPtr->visuals.find(_msg->id());
       else
       {
         VisualPtr vis = this->GetVisual(_msg->name());
-        iter = vis ? this->visuals.find(vis->GetId()) : this->visuals.end();
+        iter = vis ? this->dataPtr->visuals.find(vis->GetId()) :
+            this->dataPtr->visuals.end();
       }
 
-      if (iter != this->visuals.end())
+      if (iter != this->dataPtr->visuals.end())
         gzerr << "Visual already exists. This shouldn't happen.\n";
 
       // Make sure the parent visual exists before trying to add a child
       // visual
-      iter = this->visuals.find(_msg->parent_id());
-      if (iter != this->visuals.end())
+      iter = this->dataPtr->visuals.find(_msg->parent_id());
+      if (iter != this->dataPtr->visuals.end())
       {
         visual.reset(new Visual(_msg->name(), iter->second));
         if (_msg->has_id())
@@ -2375,7 +2428,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     else
     {
       // Add a visual that is attached to the scene root
-      visual.reset(new Visual(_msg->name(), this->worldVisual));
+      visual.reset(new Visual(_msg->name(), this->dataPtr->worldVisual));
       if (_msg->has_id())
         visual->SetId(_msg->id());
     }
@@ -2384,7 +2437,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     {
       result = true;
       visual->LoadFromMsg(_msg);
-      this->visuals[visual->GetId()] = visual;
+      this->dataPtr->visuals[visual->GetId()] = visual;
       if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
           visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
       {
@@ -2392,11 +2445,11 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
         visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
       }
 
-      visual->ShowCOM(this->showCOMs);
-      visual->ShowCollision(this->showCollisions);
-      visual->ShowJoints(this->showJoints);
-      visual->SetTransparency(this->transparent ? 0.5 : 0.0);
-      visual->SetWireframe(this->wireframe);
+      visual->ShowCOM(this->dataPtr->showCOMs);
+      visual->ShowCollision(this->dataPtr->showCollisions);
+      visual->ShowJoints(this->dataPtr->showJoints);
+      visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
+      visual->SetWireframe(this->dataPtr->wireframe);
 
       visual->UpdateFromMsg(_msg);
     }
@@ -2408,24 +2461,25 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 /////////////////////////////////////////////////
 common::Time Scene::GetSimTime() const
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  return this->sceneSimTimePosesApplied;
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  return this->dataPtr->sceneSimTimePosesApplied;
 }
 
 /////////////////////////////////////////////////
 void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 {
-  boost::recursive_mutex::scoped_lock lock(this->poseMsgMutex);
-  this->sceneSimTimePosesReceived =
+  boost::recursive_mutex::scoped_lock lock(this->dataPtr->poseMsgMutex);
+  this->dataPtr->sceneSimTimePosesReceived =
     common::Time(_msg->time().sec(), _msg->time().nsec());
 
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
-    PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg->pose(i).id());
-    if (iter != this->poseMsgs.end())
+    PoseMsgs_M::iterator iter =
+        this->dataPtr->poseMsgs.find(_msg->pose(i).id());
+    if (iter != this->dataPtr->poseMsgs.end())
       iter->second.CopyFrom(_msg->pose(i));
     else
-      this->poseMsgs.insert(
+      this->dataPtr->poseMsgs.insert(
           std::make_pair(_msg->pose(i).id(), _msg->pose(i)));
   }
 }
@@ -2433,42 +2487,42 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   SkeletonPoseMsgs_L::iterator iter;
 
   // Find an old model message, and remove them
-  for (iter = this->skeletonPoseMsgs.begin();
-        iter != this->skeletonPoseMsgs.end(); ++iter)
+  for (iter = this->dataPtr->skeletonPoseMsgs.begin();
+        iter != this->dataPtr->skeletonPoseMsgs.end(); ++iter)
   {
     if ((*iter)->model_name() == _msg->model_name())
     {
-      this->skeletonPoseMsgs.erase(iter);
+      this->dataPtr->skeletonPoseMsgs.erase(iter);
       break;
     }
   }
 
-  this->skeletonPoseMsgs.push_back(_msg);
+  this->dataPtr->skeletonPoseMsgs.push_back(_msg);
 }
 
 
 /////////////////////////////////////////////////
 void Scene::OnLightMsg(ConstLightPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  this->lightMsgs.push_back(_msg);
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->lightMsgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////
 bool Scene::ProcessLightMsg(ConstLightPtr &_msg)
 {
   Light_M::iterator iter;
-  iter = this->lights.find(_msg->name());
+  iter = this->dataPtr->lights.find(_msg->name());
 
-  if (iter == this->lights.end())
+  if (iter == this->dataPtr->lights.end())
   {
     LightPtr light(new Light(shared_from_this()));
     light->LoadFromMsg(_msg);
-    this->lights[_msg->name()] = light;
+    this->dataPtr->lights[_msg->name()] = light;
     RTShaderSystem::Instance()->UpdateShaders();
   }
   else
@@ -2483,46 +2537,46 @@ bool Scene::ProcessLightMsg(ConstLightPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
-  this->selectionMsg = _msg;
+  this->dataPtr->selectionMsg = _msg;
 }
 
 /////////////////////////////////////////////////
 void Scene::OnModelMsg(ConstModelPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  this->modelMsgs.push_back(_msg);
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->modelMsgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////
 void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 {
-  if (!this->skyx)
+  if (!this->dataPtr->skyx)
     return;
 
-  this->skyx->setVisible(true);
+  this->dataPtr->skyx->setVisible(true);
 
   SkyX::VClouds::VClouds *vclouds =
-    this->skyx->getVCloudsManager()->getVClouds();
+    this->dataPtr->skyx->getVCloudsManager()->getVClouds();
 
   if (_msg->has_time())
   {
-    Ogre::Vector3 t = this->skyxController->getTime();
+    Ogre::Vector3 t = this->dataPtr->skyxController->getTime();
     t.x = math::clamp(_msg->time(), 0.0, 24.0);
-    this->skyxController->setTime(t);
+    this->dataPtr->skyxController->setTime(t);
   }
 
   if (_msg->has_sunrise())
   {
-    Ogre::Vector3 t = this->skyxController->getTime();
+    Ogre::Vector3 t = this->dataPtr->skyxController->getTime();
     t.y = math::clamp(_msg->sunrise(), 0.0, 24.0);
-    this->skyxController->setTime(t);
+    this->dataPtr->skyxController->setTime(t);
   }
 
   if (_msg->has_sunset())
   {
-    Ogre::Vector3 t = this->skyxController->getTime();
+    Ogre::Vector3 t = this->dataPtr->skyxController->getTime();
     t.z = math::clamp(_msg->sunset(), 0.0, 24.0);
-    this->skyxController->setTime(t);
+    this->dataPtr->skyxController->setTime(t);
   }
 
   if (_msg->has_wind_speed())
@@ -2554,28 +2608,29 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
                         math::clamp(_msg->mean_cloud_size(), 0.0, 1.0), true);
   }
 
-  this->skyx->update(0);
+  this->dataPtr->skyx->update(0);
 }
 
 /////////////////////////////////////////////////
 void Scene::SetSky()
 {
   // Create SkyX
-  this->skyxController = new SkyX::BasicController();
-  this->skyx = new SkyX::SkyX(this->manager, this->skyxController);
-  this->skyx->create();
+  this->dataPtr->skyxController = new SkyX::BasicController();
+  this->dataPtr->skyx = new SkyX::SkyX(this->dataPtr->manager,
+      this->dataPtr->skyxController);
+  this->dataPtr->skyx->create();
 
-  this->skyx->setTimeMultiplier(0);
+  this->dataPtr->skyx->setTimeMultiplier(0);
 
   // Set the time: x = current time[0-24], y = sunrise time[0-24],
   // z = sunset time[0-24]
-  this->skyxController->setTime(Ogre::Vector3(10.0, 6.0, 20.0f));
+  this->dataPtr->skyxController->setTime(Ogre::Vector3(10.0, 6.0, 20.0f));
 
   // Moon phase in [-1,1] range, where -1 means fully covered Moon,
   // 0 clear Moon and 1 fully covered Moon
-  this->skyxController->setMoonPhase(0);
+  this->dataPtr->skyxController->setMoonPhase(0);
 
-  this->skyx->getAtmosphereManager()->setOptions(
+  this->dataPtr->skyx->getAtmosphereManager()->setOptions(
       SkyX::AtmosphereManager::Options(
         9.77501f,   // Inner radius
         10.2963f,   // Outer radius
@@ -2586,13 +2641,13 @@ void Scene::SetSky()
         Ogre::Vector3(0.57f, 0.54f, 0.44f),  // Wavelength
         -0.991f, 2.5f, 4));
 
-  this->skyx->getVCloudsManager()->setWindSpeed(0.6);
+  this->dataPtr->skyx->getVCloudsManager()->setWindSpeed(0.6);
 
   // Use true to update volumetric clouds based on the time multiplier
-  this->skyx->getVCloudsManager()->setAutoupdate(false);
+  this->dataPtr->skyx->getVCloudsManager()->setAutoupdate(false);
 
   SkyX::VClouds::VClouds *vclouds =
-    this->skyx->getVCloudsManager()->getVClouds();
+    this->dataPtr->skyx->getVCloudsManager()->getVClouds();
 
   // Set wind direction in radians
   vclouds->setWindDirection(Ogre::Radian(0.0));
@@ -2609,20 +2664,21 @@ void Scene::SetSky()
   if (true)
   {
     // Create VClouds
-    if (!this->skyx->getVCloudsManager()->isCreated())
+    if (!this->dataPtr->skyx->getVCloudsManager()->isCreated())
     {
       // SkyX::MeshManager::getSkydomeRadius(...) works for both finite and
       // infinite(=0) camera far clip distances
-      this->skyx->getVCloudsManager()->create(2000.0);
-      // this->skyx->getMeshManager()->getSkydomeRadius(mRenderingCamera));
+      this->dataPtr->skyx->getVCloudsManager()->create(2000.0);
+      // this->dataPtr->skyx->getMeshManager()->getSkydomeRadius(
+      //    mRenderingCamera));
     }
   }
   else
   {
     // Remove VClouds
-    if (this->skyx->getVCloudsManager()->isCreated())
+    if (this->dataPtr->skyx->getVCloudsManager()->isCreated())
     {
-      this->skyx->getVCloudsManager()->remove();
+      this->dataPtr->skyx->getVCloudsManager()->remove();
     }
   }
 
@@ -2634,33 +2690,46 @@ void Scene::SetSky()
   // vclouds->getLightningManager()->setLightningTimeMultiplier(
   //    preset.vcLightningsTM);
 
-  Ogre::Root::getSingletonPtr()->addFrameListener(this->skyx);
+  Ogre::Root::getSingletonPtr()->addFrameListener(this->dataPtr->skyx);
 
-  this->skyx->update(0);
-  this->skyx->setVisible(false);
+  this->dataPtr->skyx->update(0);
+  this->dataPtr->skyx->setVisible(false);
 }
 
 /////////////////////////////////////////////////
 void Scene::SetShadowsEnabled(bool _value)
 {
-  this->sdf->GetElement("shadows")->Set(_value);
+  // If a usercamera is set to stereo mode, then turn off shadows.
+  // Our shadow mapping technique disables stereo.
+  bool stereoOverride = true;
+  for (std::vector<UserCameraPtr>::iterator iter =
+       this->dataPtr->userCameras.begin();
+       iter != this->dataPtr->userCameras.end() && stereoOverride; ++iter)
+  {
+    stereoOverride = !(*iter)->StereoEnabled();
+  }
+
+  _value = _value && stereoOverride;
+
+  this->dataPtr->sdf->GetElement("shadows")->Set(_value);
 
   if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
   {
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
-    this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
-    this->manager->setShadowTextureCasterMaterial(
+    this->dataPtr->manager->setShadowTechnique(
+        Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
+    this->dataPtr->manager->setShadowTextureCasterMaterial(
         "DeferredRendering/Shadows/RSMCaster_Spot");
-    this->manager->setShadowTextureCount(1);
-    this->manager->setShadowFarDistance(150);
+    this->dataPtr->manager->setShadowTextureCount(1);
+    this->dataPtr->manager->setShadowFarDistance(150);
     // Use a value of "2" to use a different depth buffer pool and
     // avoid sharing this with the Backbuffer's
-    this->manager->setShadowTextureConfig(0, 1024, 1024,
+    this->dataPtr->manager->setShadowTextureConfig(0, 1024, 1024,
         Ogre::PF_FLOAT32_RGBA, 0, 2);
-    this->manager->setShadowDirectionalLightExtrusionDistance(75);
-    this->manager->setShadowCasterRenderBackFaces(false);
-    this->manager->setShadowTextureSelfShadow(true);
-    this->manager->setShadowDirLightTextureOffset(1.75);
+    this->dataPtr->manager->setShadowDirectionalLightExtrusionDistance(75);
+    this->dataPtr->manager->setShadowCasterRenderBackFaces(false);
+    this->dataPtr->manager->setShadowTextureSelfShadow(true);
+    this->dataPtr->manager->setShadowDirLightTextureOffset(1.75);
 #endif
   }
   else if (RenderEngine::Instance()->GetRenderPathType() ==
@@ -2674,31 +2743,37 @@ void Scene::SetShadowsEnabled(bool _value)
   }
   else
   {
-    this->manager->setShadowCasterRenderBackFaces(false);
-    this->manager->setShadowTextureSize(512);
+    this->dataPtr->manager->setShadowCasterRenderBackFaces(false);
+    this->dataPtr->manager->setShadowTextureSize(512);
 
     // The default shadows.
-    if (_value && this->manager->getShadowTechnique()
+    if (_value && this->dataPtr->manager->getShadowTechnique()
         != Ogre::SHADOWTYPE_TEXTURE_ADDITIVE)
-      this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
+    {
+      this->dataPtr->manager->setShadowTechnique(
+          Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
+    }
     else
-      this->manager->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
+      this->dataPtr->manager->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
   }
 }
 
 /////////////////////////////////////////////////
 bool Scene::GetShadowsEnabled() const
 {
-  return this->sdf->Get<bool>("shadows");
+  return this->dataPtr->sdf->Get<bool>("shadows");
 }
 
 /////////////////////////////////////////////////
 void Scene::AddVisual(VisualPtr _vis)
 {
-  if (this->visuals.find(_vis->GetId()) != this->visuals.end())
+  if (this->dataPtr->visuals.find(_vis->GetId()) !=
+      this->dataPtr->visuals.end())
+  {
     gzerr << "Duplicate visuals detected[" << _vis->GetName() << "]\n";
+  }
 
-  this->visuals[_vis->GetId()] = _vis;
+  this->dataPtr->visuals[_vis->GetId()] = _vis;
 }
 
 /////////////////////////////////////////////////
@@ -2708,8 +2783,8 @@ void Scene::RemoveVisual(VisualPtr _vis)
   {
     // Remove all projectors attached to the visual
     std::map<std::string, Projector *>::iterator piter =
-      this->projectors.begin();
-    while (piter != this->projectors.end())
+      this->dataPtr->projectors.begin();
+    while (piter != this->dataPtr->projectors.end())
     {
       // Check to see if the projector is a child of the visual that is
       // being removed.
@@ -2717,22 +2792,23 @@ void Scene::RemoveVisual(VisualPtr _vis)
           _vis->GetRootVisual()->GetName())
       {
         delete piter->second;
-        this->projectors.erase(piter++);
+        this->dataPtr->projectors.erase(piter++);
       }
       else
         ++piter;
     }
 
     // Delete the visual
-    Visual_M::iterator iter = this->visuals.find(_vis->GetId());
-    if (iter != this->visuals.end())
+    Visual_M::iterator iter = this->dataPtr->visuals.find(_vis->GetId());
+    if (iter != this->dataPtr->visuals.end())
     {
       iter->second->Fini();
-      this->visuals.erase(iter);
+      this->dataPtr->visuals.erase(iter);
     }
 
-    if (this->selectedVis && this->selectedVis->GetId() == _vis->GetId())
-      this->selectedVis.reset();
+    if (this->dataPtr->selectedVis && this->dataPtr->selectedVis->GetId() ==
+        _vis->GetId())
+      this->dataPtr->selectedVis.reset();
   }
 }
 
@@ -2740,11 +2816,11 @@ void Scene::RemoveVisual(VisualPtr _vis)
 void Scene::AddLight(LightPtr _light)
 {
   std::string n = this->StripSceneName(_light->GetName());
-  Light_M::iterator iter = this->lights.find(n);
-  if (iter != this->lights.end())
+  Light_M::iterator iter = this->dataPtr->lights.find(n);
+  if (iter != this->dataPtr->lights.end())
     gzerr << "Duplicate lights detected[" << _light->GetName() << "]\n";
 
-  this->lights[n] = _light;
+  this->dataPtr->lights[n] = _light;
 }
 
 /////////////////////////////////////////////////
@@ -2754,28 +2830,28 @@ void Scene::RemoveLight(LightPtr _light)
   {
     // Delete the light
     std::string n = this->StripSceneName(_light->GetName());
-    this->lights.erase(n);
+    this->dataPtr->lights.erase(n);
   }
 }
 
 /////////////////////////////////////////////////
 void Scene::SetGrid(bool _enabled)
 {
-  if (_enabled && this->grids.empty())
+  if (_enabled && this->dataPtr->grids.empty())
   {
     Grid *grid = new Grid(this, 20, 1, 10, common::Color(0.3, 0.3, 0.3, 0.5));
     grid->Init();
-    this->grids.push_back(grid);
+    this->dataPtr->grids.push_back(grid);
 
     grid = new Grid(this, 4, 5, 20, common::Color(0.8, 0.8, 0.8, 0.5));
     grid->Init();
-    this->grids.push_back(grid);
+    this->dataPtr->grids.push_back(grid);
   }
   else
   {
-    for (uint32_t i = 0; i < this->grids.size(); ++i)
+    for (uint32_t i = 0; i < this->dataPtr->grids.size(); ++i)
     {
-      this->grids[i]->Enable(_enabled);
+      this->dataPtr->grids[i]->Enable(_enabled);
     }
   }
 }
@@ -2792,8 +2868,8 @@ std::string Scene::StripSceneName(const std::string &_name) const
 //////////////////////////////////////////////////
 Heightmap *Scene::GetHeightmap() const
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  return this->terrain;
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  return this->dataPtr->terrain;
 }
 
 /////////////////////////////////////////////////
@@ -2802,8 +2878,8 @@ void Scene::CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
   COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__",
                                     _linkVisual));
   comVis->Load(_msg);
-  comVis->SetVisible(this->showCOMs);
-  this->visuals[comVis->GetId()] = comVis;
+  comVis->SetVisible(this->dataPtr->showCOMs);
+  this->dataPtr->visuals[comVis->GetId()] = comVis;
 }
 
 /////////////////////////////////////////////////
@@ -2813,29 +2889,29 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
                                     _linkVisual));
   comVis->Load(_elem);
   comVis->SetVisible(false);
-  this->visuals[comVis->GetId()] = comVis;
+  this->dataPtr->visuals[comVis->GetId()] = comVis;
 }
 
 /////////////////////////////////////////////////
 void Scene::SetWireframe(bool _show)
 {
-  this->wireframe = _show;
-  for (Visual_M::iterator iter = this->visuals.begin();
-       iter != this->visuals.end(); ++iter)
+  this->dataPtr->wireframe = _show;
+  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
+       iter != this->dataPtr->visuals.end(); ++iter)
   {
     iter->second->SetWireframe(_show);
   }
 
-  if (this->terrain)
-    this->terrain->SetWireframe(_show);
+  if (this->dataPtr->terrain)
+    this->dataPtr->terrain->SetWireframe(_show);
 }
 
 /////////////////////////////////////////////////
 void Scene::SetTransparent(bool _show)
 {
-  this->transparent = _show;
-  for (Visual_M::iterator iter = this->visuals.begin();
-       iter != this->visuals.end(); ++iter)
+  this->dataPtr->transparent = _show;
+  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
+       iter != this->dataPtr->visuals.end(); ++iter)
   {
     iter->second->SetTransparency(_show ? 0.5 : 0.0);
   }
@@ -2844,9 +2920,9 @@ void Scene::SetTransparent(bool _show)
 /////////////////////////////////////////////////
 void Scene::ShowCOMs(bool _show)
 {
-  this->showCOMs = _show;
-  for (Visual_M::iterator iter = this->visuals.begin();
-       iter != this->visuals.end(); ++iter)
+  this->dataPtr->showCOMs = _show;
+  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
+       iter != this->dataPtr->visuals.end(); ++iter)
   {
     iter->second->ShowCOM(_show);
   }
@@ -2855,9 +2931,9 @@ void Scene::ShowCOMs(bool _show)
 /////////////////////////////////////////////////
 void Scene::ShowCollisions(bool _show)
 {
-  this->showCollisions = _show;
-  for (Visual_M::iterator iter = this->visuals.begin();
-       iter != this->visuals.end(); ++iter)
+  this->dataPtr->showCollisions = _show;
+  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
+       iter != this->dataPtr->visuals.end(); ++iter)
   {
     iter->second->ShowCollision(_show);
   }
@@ -2866,9 +2942,9 @@ void Scene::ShowCollisions(bool _show)
 /////////////////////////////////////////////////
 void Scene::ShowJoints(bool _show)
 {
-  this->showJoints = _show;
-  for (Visual_M::iterator iter = this->visuals.begin();
-       iter != this->visuals.end(); ++iter)
+  this->dataPtr->showJoints = _show;
+  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
+       iter != this->dataPtr->visuals.end(); ++iter)
   {
     iter->second->ShowJoints(_show);
   }
@@ -2879,17 +2955,17 @@ void Scene::ShowContacts(bool _show)
 {
   ContactVisualPtr vis;
 
-  if (this->contactVisId == GZ_UINT32_MAX && _show)
+  if (this->dataPtr->contactVisId == GZ_UINT32_MAX && _show)
   {
     vis.reset(new ContactVisual("__GUIONLY_CONTACT_VISUAL__",
-              this->worldVisual, "~/physics/contacts"));
+              this->dataPtr->worldVisual, "~/physics/contacts"));
     vis->SetEnabled(_show);
-    this->contactVisId = vis->GetId();
-    this->visuals[this->contactVisId] = vis;
+    this->dataPtr->contactVisId = vis->GetId();
+    this->dataPtr->visuals[this->dataPtr->contactVisId] = vis;
   }
   else
     vis = boost::dynamic_pointer_cast<ContactVisual>(
-        this->visuals[this->contactVisId]);
+        this->dataPtr->visuals[this->dataPtr->contactVisId]);
 
   if (vis)
     vis->SetEnabled(_show);
@@ -2900,14 +2976,14 @@ void Scene::ShowContacts(bool _show)
 /////////////////////////////////////////////////
 void Scene::ShowClouds(bool _show)
 {
-  if (!this->skyx)
+  if (!this->dataPtr->skyx)
     return;
 
-  SkyX::VCloudsManager *mgr = this->skyx->getVCloudsManager();
+  SkyX::VCloudsManager *mgr = this->dataPtr->skyx->getVCloudsManager();
   if (mgr)
   {
     SkyX::VClouds::VClouds *vclouds =
-        this->skyx->getVCloudsManager()->getVClouds();
+        this->dataPtr->skyx->getVCloudsManager()->getVClouds();
     if (vclouds)
       vclouds->setVisible(_show);
   }
@@ -2916,14 +2992,14 @@ void Scene::ShowClouds(bool _show)
 /////////////////////////////////////////////////
 bool Scene::GetShowClouds() const
 {
-  if (!this->skyx)
+  if (!this->dataPtr->skyx)
     return false;
 
-  SkyX::VCloudsManager *mgr = this->skyx->getVCloudsManager();
+  SkyX::VCloudsManager *mgr = this->dataPtr->skyx->getVCloudsManager();
   if (mgr)
   {
     SkyX::VClouds::VClouds *vclouds =
-        this->skyx->getVCloudsManager()->getVClouds();
+        this->dataPtr->skyx->getVCloudsManager()->getVClouds();
     if (vclouds)
       return vclouds->isVisible();
   }
@@ -2939,26 +3015,33 @@ void Scene::SetSkyXMode(unsigned int _mode)
   /// make sure it functions correctly when called during a render update,
   /// issue #693.
 
-  if (!this->skyx)
+  if (!this->dataPtr->skyx)
     return;
 
   bool enabled = _mode != GZ_SKYX_NONE;
-  this->skyx->setEnabled(enabled);
+  this->dataPtr->skyx->setEnabled(enabled);
 
   if (!enabled)
     return;
 
-  this->skyx->setCloudsEnabled(_mode & GZ_SKYX_CLOUDS);
-  this->skyx->setMoonEnabled(_mode & GZ_SKYX_MOON);
+  this->dataPtr->skyx->setCloudsEnabled(_mode & GZ_SKYX_CLOUDS);
+  this->dataPtr->skyx->setMoonEnabled(_mode & GZ_SKYX_MOON);
+}
+
+/////////////////////////////////////////////////
+SkyX::SkyX *Scene::GetSkyX() const
+{
+  return this->dataPtr->skyx;
 }
 
 /////////////////////////////////////////////////
 void Scene::RemoveProjectors()
 {
   for (std::map<std::string, Projector *>::iterator iter =
-      this->projectors.begin(); iter != this->projectors.end(); ++iter)
+      this->dataPtr->projectors.begin();
+      iter != this->dataPtr->projectors.end(); ++iter)
   {
     delete iter->second;
   }
-  this->projectors.clear();
+  this->dataPtr->projectors.clear();
 }

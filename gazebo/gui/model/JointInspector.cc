@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,54 +29,111 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
 {
   this->setObjectName("JointInspectorDialog");
   this->setWindowTitle(tr("Joint Inspector"));
+  this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   this->jointType = _jointType;
 
   QLabel *jointLabel = new QLabel(tr("Name:"));
-  this->jointNameLabel = new QLabel(tr(""));
+  this->jointNameLineEdit = new QLineEdit(tr(""));
 
   QHBoxLayout *nameLayout = new QHBoxLayout;
   nameLayout->addWidget(jointLabel);
-  nameLayout->addWidget(jointNameLabel);
+  nameLayout->addWidget(this->jointNameLineEdit);
 
   QLabel *typeLabel = new QLabel(tr("Type: "));
-  this->jointTypeLabel = new QLabel("");
+  this->jointTypeComboBox = new QComboBox;
+  this->jointTypeComboBox->addItem("revolute",
+    QVariant(JointMaker::JOINT_HINGE));
+  this->jointTypeComboBox->addItem("revolute2",
+      QVariant(JointMaker::JOINT_HINGE2));
+  this->jointTypeComboBox->addItem("prismatic",
+      QVariant(JointMaker::JOINT_SLIDER));
+  this->jointTypeComboBox->addItem("ball",
+      QVariant(JointMaker::JOINT_BALL));
+  this->jointTypeComboBox->addItem("universal",
+      QVariant(JointMaker::JOINT_UNIVERSAL));
+  this->jointTypeComboBox->addItem("screw",
+      QVariant(JointMaker::JOINT_SCREW));
+  connect(this->jointTypeComboBox, SIGNAL(currentIndexChanged(int)),
+      this, SLOT(OnJointTypeChanged(int)));
+
   QHBoxLayout *typeLayout = new QHBoxLayout;
   typeLayout->addWidget(typeLabel);
-  typeLayout->addWidget(this->jointTypeLabel);
+  typeLayout->addWidget(this->jointTypeComboBox);
 
-  QLabel *anchorXLabel = new QLabel(tr("x: "));
-  QLabel *anchorYLabel = new QLabel(tr("y: "));
-  QLabel *anchorZLabel = new QLabel(tr("z: "));
+  QLabel *parentLabel = new QLabel(tr("Parent: "));
+  this->jointParentLabel = new QLabel(tr(""));
 
-  this->anchorXSpinBox = new QDoubleSpinBox;
-  this->anchorXSpinBox->setRange(-1000, 1000);
-  this->anchorXSpinBox->setSingleStep(0.01);
-  this->anchorXSpinBox->setDecimals(3);
-  this->anchorXSpinBox->setValue(0.000);
+  QHBoxLayout *parentLayout = new QHBoxLayout;
+  parentLayout->addWidget(parentLabel);
+  parentLayout->addWidget(jointParentLabel);
 
-  this->anchorYSpinBox = new QDoubleSpinBox;
-  this->anchorYSpinBox->setRange(-1000, 1000);
-  this->anchorYSpinBox->setSingleStep(0.01);
-  this->anchorYSpinBox->setDecimals(3);
-  this->anchorYSpinBox->setValue(0.000);
+  QLabel *childLabel = new QLabel(tr("Child: "));
+  this->jointChildLabel = new QLabel(tr(""));
 
-  this->anchorZSpinBox = new QDoubleSpinBox;
-  this->anchorZSpinBox->setRange(-1000, 1000);
-  this->anchorZSpinBox->setSingleStep(0.01);
-  this->anchorZSpinBox->setDecimals(3);
-  this->anchorZSpinBox->setValue(0.000);
+  QHBoxLayout *childLayout = new QHBoxLayout;
+  childLayout->addWidget(childLabel);
+  childLayout->addWidget(jointChildLabel);
 
-  QGridLayout *anchorLayout = new QGridLayout;
-  anchorLayout->addWidget(anchorXLabel, 0, 0);
-  anchorLayout->addWidget(anchorXSpinBox, 0, 1);
-  anchorLayout->addWidget(anchorYLabel), 1, 0;
-  anchorLayout->addWidget(anchorYSpinBox, 1, 1);
-  anchorLayout->addWidget(anchorZLabel), 2, 0;
-  anchorLayout->addWidget(anchorZSpinBox, 2, 1);
+  QLabel *poseXLabel = new QLabel(tr("x: "));
+  QLabel *poseYLabel = new QLabel(tr("y: "));
+  QLabel *poseZLabel = new QLabel(tr("z: "));
+  QLabel *poseRollLabel = new QLabel(tr("roll: "));
+  QLabel *posePitchLabel = new QLabel(tr("pitch: "));
+  QLabel *poseYawLabel = new QLabel(tr("yaw: "));
 
-  QGroupBox *anchorGroupBox = new QGroupBox(tr("Anchor"));
-  anchorGroupBox->setLayout(anchorLayout);
+  this->poseXSpinBox = new QDoubleSpinBox;
+  this->poseXSpinBox->setRange(-1000, 1000);
+  this->poseXSpinBox->setSingleStep(0.01);
+  this->poseXSpinBox->setDecimals(3);
+  this->poseXSpinBox->setValue(0.000);
+
+  this->poseYSpinBox = new QDoubleSpinBox;
+  this->poseYSpinBox->setRange(-1000, 1000);
+  this->poseYSpinBox->setSingleStep(0.01);
+  this->poseYSpinBox->setDecimals(3);
+  this->poseYSpinBox->setValue(0.000);
+
+  this->poseZSpinBox = new QDoubleSpinBox;
+  this->poseZSpinBox->setRange(-1000, 1000);
+  this->poseZSpinBox->setSingleStep(0.01);
+  this->poseZSpinBox->setDecimals(3);
+  this->poseZSpinBox->setValue(0.000);
+
+  this->poseRollSpinBox = new QDoubleSpinBox;
+  this->poseRollSpinBox->setRange(-1000, 1000);
+  this->poseRollSpinBox->setSingleStep(0.01);
+  this->poseRollSpinBox->setDecimals(3);
+  this->poseRollSpinBox->setValue(0.000);
+
+  this->posePitchSpinBox = new QDoubleSpinBox;
+  this->posePitchSpinBox->setRange(-1000, 1000);
+  this->posePitchSpinBox->setSingleStep(0.01);
+  this->posePitchSpinBox->setDecimals(3);
+  this->posePitchSpinBox->setValue(0.000);
+
+  this->poseYawSpinBox = new QDoubleSpinBox;
+  this->poseYawSpinBox->setRange(-1000, 1000);
+  this->poseYawSpinBox->setSingleStep(0.01);
+  this->poseYawSpinBox->setDecimals(3);
+  this->poseYawSpinBox->setValue(0.000);
+
+  QGridLayout *poseLayout = new QGridLayout;
+  poseLayout->addWidget(poseXLabel, 0, 0);
+  poseLayout->addWidget(poseXSpinBox, 0, 1);
+  poseLayout->addWidget(poseYLabel, 1, 0);
+  poseLayout->addWidget(poseYSpinBox, 1, 1);
+  poseLayout->addWidget(poseZLabel, 2, 0);
+  poseLayout->addWidget(poseZSpinBox, 2, 1);
+  poseLayout->addWidget(poseRollLabel, 0, 2);
+  poseLayout->addWidget(poseRollSpinBox, 0, 3);
+  poseLayout->addWidget(posePitchLabel, 1, 2);
+  poseLayout->addWidget(posePitchSpinBox, 1, 3);
+  poseLayout->addWidget(poseYawLabel, 2, 2);
+  poseLayout->addWidget(poseYawSpinBox, 2, 3);
+
+  QGroupBox *poseGroupBox = new QGroupBox(tr("Pose"));
+  poseGroupBox->setLayout(poseLayout);
 
   int axisCount = 2;
   for (int i = 0; i < axisCount; ++i)
@@ -103,7 +160,7 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
     axisZSpinBox->setRange(-1000, 1000);
     axisZSpinBox->setSingleStep(0.01);
     axisZSpinBox->setDecimals(3);
-    axisZSpinBox->setValue(0.000);
+    axisZSpinBox->setValue(1.000);
     this->axisZSpinBoxes.push_back(axisZSpinBox);
 
     QGridLayout *axisLayout = new QGridLayout;
@@ -121,16 +178,13 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
     lowerLimitSpinBox->setRange(-1000, 1000);
     lowerLimitSpinBox->setSingleStep(0.01);
     lowerLimitSpinBox->setDecimals(3);
-    lowerLimitSpinBox->setValue(-1e16);
     this->lowerLimitSpinBoxes.push_back(lowerLimitSpinBox);
 
     QDoubleSpinBox *upperLimitSpinBox = new QDoubleSpinBox;
     upperLimitSpinBox->setRange(-1000, 1000);
     upperLimitSpinBox->setSingleStep(0.01);
     upperLimitSpinBox->setDecimals(3);
-    upperLimitSpinBox->setValue(1e16);
     this->upperLimitSpinBoxes.push_back(upperLimitSpinBox);
-
 
     QGridLayout *limitLayout = new QGridLayout;
     limitLayout->addWidget(lowerLimitLabel, 0, 0);
@@ -153,11 +207,11 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
   }
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
-  QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
+  QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
-  QPushButton *applyButton = new QPushButton(tr("&Apply"));
+  QPushButton *applyButton = new QPushButton(tr("Apply"));
   connect(applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
-  QPushButton *OKButton = new QPushButton(tr("&OK"));
+  QPushButton *OKButton = new QPushButton(tr("OK"));
   OKButton->setDefault(true);
   connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
   buttonsLayout->addWidget(cancelButton);
@@ -168,7 +222,9 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(nameLayout);
   mainLayout->addLayout(typeLayout);
-  mainLayout->addWidget(anchorGroupBox);
+  mainLayout->addLayout(parentLayout);
+  mainLayout->addLayout(childLayout);
+  mainLayout->addWidget(poseGroupBox);
   for (unsigned int i = 0; i < axisGroupBoxes.size(); ++i)
   {
     mainLayout->addWidget(this->axisGroupBoxes[i]);
@@ -176,6 +232,7 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
   }
   mainLayout->addLayout(buttonsLayout);
   this->setLayout(mainLayout);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
   if (this->jointType)
     this->SetType(this->jointType);
@@ -187,10 +244,12 @@ JointInspector::~JointInspector()
 }
 
 /////////////////////////////////////////////////
-math::Vector3 JointInspector::GetAnchor(unsigned int /*_index*/) const
+math::Pose JointInspector::GetPose() const
 {
-  return math::Vector3(this->anchorXSpinBox->value(),
-      this->anchorYSpinBox->value(), this->anchorZSpinBox->value());
+  return math::Pose(this->poseXSpinBox->value(),
+      this->poseYSpinBox->value(), this->poseZSpinBox->value(),
+      this->poseRollSpinBox->value(), this->posePitchSpinBox->value(),
+      this->poseYawSpinBox->value());
 }
 
 /////////////////////////////////////////////////
@@ -236,6 +295,11 @@ JointMaker::JointType JointInspector::GetType() const
 {
   return this->jointType;
 }
+/////////////////////////////////////////////////
+std::string JointInspector::GetName() const
+{
+  return this->jointNameLineEdit->text().toStdString();
+}
 
 /////////////////////////////////////////////////
 void JointInspector::SetType(JointMaker::JointType _type)
@@ -246,7 +310,16 @@ void JointInspector::SetType(JointMaker::JointType _type)
   int axisCount = JointMaker::GetJointAxisCount(_type);
   GZ_ASSERT(axisCount >= 0, "Invalid axis count");
 
-  this->jointTypeLabel->setText(tr(jointTypeStr.c_str()));
+
+  int index = this->jointTypeComboBox->findText(tr(jointTypeStr.c_str()));
+
+  if (index >= 0)
+    this->jointTypeComboBox->setCurrentIndex(index);
+  else
+  {
+    gzerr << "Joint type not found in inspector" << std::endl;
+    return;
+  }
 
   for (int i = 0; i < axisCount; ++i)
     this->axisGroupBoxes[i]->setVisible(true);
@@ -261,16 +334,32 @@ void JointInspector::SetType(JointMaker::JointType _type)
 /////////////////////////////////////////////////
 void JointInspector::SetName(const std::string &_name)
 {
-  this->jointNameLabel->setText(tr(_name.c_str()));
+  this->jointNameLineEdit->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////
-void JointInspector::SetAnchor(unsigned int /*_index*/,
-    const math::Vector3 &_anchor)
+void JointInspector::SetParent(const std::string &_parent)
 {
-  this->anchorXSpinBox->setValue(_anchor.x);
-  this->anchorYSpinBox->setValue(_anchor.y);
-  this->anchorZSpinBox->setValue(_anchor.z);
+  this->jointParentLabel->setText(tr(_parent.c_str()));
+}
+
+/////////////////////////////////////////////////
+void JointInspector::SetChild(const std::string &_child)
+{
+  this->jointChildLabel->setText(tr(_child.c_str()));
+}
+
+/////////////////////////////////////////////////
+void JointInspector::SetPose(const math::Pose &_pose)
+{
+  this->poseXSpinBox->setValue(_pose.pos.x);
+  this->poseYSpinBox->setValue(_pose.pos.y);
+  this->poseZSpinBox->setValue(_pose.pos.z);
+
+  math::Vector3 rot = _pose.rot.GetAsEuler();
+  this->poseRollSpinBox->setValue(rot.x);
+  this->posePitchSpinBox->setValue(rot.y);
+  this->poseYawSpinBox->setValue(rot.z);
 }
 
 /////////////////////////////////////////////////
@@ -312,6 +401,23 @@ void JointInspector::SetUpperLimit(unsigned int _index, double _upper)
 }
 
 /////////////////////////////////////////////////
+void JointInspector::OnJointTypeChanged(int _index)
+{
+  QVariant jointTypeData = this->jointTypeComboBox->itemData(_index);
+  this->jointType = static_cast<JointMaker::JointType>(jointTypeData.toInt());
+
+  int axisCount = JointMaker::GetJointAxisCount(this->jointType);
+  for (int i = 0; i < axisCount; ++i)
+    this->axisGroupBoxes[i]->setVisible(true);
+
+  for (int i = axisCount;
+      i < static_cast<int>(this->axisGroupBoxes.size()); ++i)
+  {
+    this->axisGroupBoxes[i]->setVisible(false);
+  }
+}
+
+/////////////////////////////////////////////////
 void JointInspector::OnCancel()
 {
   this->close();
@@ -328,4 +434,10 @@ void JointInspector::OnOK()
 {
   emit Applied();
   this->accept();
+}
+
+/////////////////////////////////////////////////
+void JointInspector::enterEvent(QEvent */*_event*/)
+{
+  QApplication::setOverrideCursor(Qt::ArrowCursor);
 }

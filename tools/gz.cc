@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -934,7 +934,7 @@ bool SDFCommand::RunImpl()
   try
   {
     // Initialize the informational logger. This will log warnings and errors.
-    gzLogInit("gzsdf.log");
+    gzLogInit("gz-", "gzsdf.log");
   }
   catch(gazebo::common::Exception &_e)
   {

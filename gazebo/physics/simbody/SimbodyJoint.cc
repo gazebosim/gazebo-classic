@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -471,13 +471,6 @@ math::Vector3 SimbodyJoint::GetLinkTorque(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAttribute(Attribute, unsigned int /*_index*/,
-    double /*_value*/)
-{
-  gzerr << "Not implement in Simbody\n";
-}
-
-//////////////////////////////////////////////////
 bool SimbodyJoint::SetParam(const std::string &/*_key*/,
     unsigned int /*_index*/, const boost::any &/*_value*/)
 {
@@ -486,11 +479,9 @@ bool SimbodyJoint::SetParam(const std::string &/*_key*/,
 }
 
 //////////////////////////////////////////////////
-double SimbodyJoint::GetParam(const std::string &/*_key*/,
-    unsigned int /*_index*/)
+double SimbodyJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  gzerr << "Not implement in Simbody\n";
-  return 0;
+  return Joint::GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ using namespace gui;
 event::EventT<void (std::string, std::string)> Events::createEntity;
 event::EventT<void (bool)> Events::moveMode;
 event::EventT<void (std::string)> Events::manipMode;
+event::EventT<void (std::string, std::string, std::string, bool)>
+    Events::alignMode;
 event::EventT<void (bool)> Events::fullScreen;
 event::EventT<void ()> Events::fps;
 event::EventT<void ()> Events::orbit;
@@ -31,3 +33,7 @@ event::EventT<void (const msgs::Model &)> Events::modelUpdate;
 event::EventT<void (const msgs::Light &)> Events::lightUpdate;
 event::EventT<void (int)> Events::inputStepSize;
 event::EventT<void (const std::string &)> Events::follow;
+event::EventT<void (bool)> Events::leftPaneVisibility;
+event::EventT<void ()> Events::mainWindowReady;
+event::EventT<void (const std::string &, const math::Vector3 &)>
+    Events::scaleEntity;

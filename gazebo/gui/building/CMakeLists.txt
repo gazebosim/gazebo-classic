@@ -12,21 +12,22 @@ set (sources
   DoorItem.cc
   EditorItem.cc
   EditorView.cc
-  FinishBuildingDialog.cc
   FloorItem.cc
   GrabberHandle.cc
   GridLines.cc
+  ImportImageDialog.cc
+  ImportImageView.cc
   LevelInspectorDialog.cc
   LevelWidget.cc
-  LineSegmentItem.cc
-  PolylineItem.cc
+  MeasureItem.cc
   RectItem.cc
   RotateHandle.cc
   ScaleWidget.cc
+  SegmentItem.cc
   StairsInspectorDialog.cc
   StairsItem.cc
   WallInspectorDialog.cc
-  WallItem.cc
+  WallSegmentItem.cc
   WindowDoorInspectorDialog.cc
   WindowItem.cc
 )
@@ -38,16 +39,18 @@ set (qt_headers
   DoorItem.hh
   EditorItem.hh
   EditorView.hh
-  FinishBuildingDialog.hh
   FloorItem.hh
+  ImportImageDialog.hh
+  ImportImageView.hh
   LevelInspectorDialog.hh
   LevelWidget.hh
+  MeasureItem.hh
   RectItem.hh
   ScaleWidget.hh
   StairsInspectorDialog.hh
   StairsItem.hh
   WallInspectorDialog.hh
-  WallItem.hh
+  WallSegmentItem.hh
   WindowDoorInspectorDialog.hh
   WindowItem.hh
 )
@@ -59,9 +62,8 @@ set (headers
   BuildingMaker.hh
   GrabberHandle.hh
   GridLines.hh
-  LineSegmentItem.hh
-  PolylineItem.hh
   RotateHandle.hh
+  SegmentItem.hh
 )
 
 set (resources ../resources.qrc)

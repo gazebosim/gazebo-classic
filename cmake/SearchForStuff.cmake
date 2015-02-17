@@ -100,23 +100,6 @@ if (PKG_CONFIG_FOUND)
     endif()
   endif ()
 
-  pkg_check_modules(CEGUI CEGUI)
-  pkg_check_modules(CEGUI_OGRE CEGUI-OGRE)
-  if (NOT CEGUI_FOUND)
-    BUILD_WARNING ("CEGUI not found, opengl GUI will be disabled.")
-    set (HAVE_CEGUI OFF CACHE BOOL "HAVE CEGUI" FORCE)
-  else()
-    message (STATUS "Looking for CEGUI, found")
-    if (NOT CEGUI_OGRE_FOUND)
-      BUILD_WARNING ("CEGUI-OGRE not found, opengl GUI will be disabled.")
-      set (HAVE_CEGUI OFF CACHE BOOL "HAVE CEGUI" FORCE)
-    else()
-      set (HAVE_CEGUI ON CACHE BOOL "HAVE CEGUI")
-      set (CEGUI_LIBRARIES "CEGUIBase;CEGUIOgreRenderer")
-      message (STATUS "Looking for CEGUI-OGRE, found")
-    endif()
-  endif()
-
   #################################################
   # Find Simbody
   set(SimTK_INSTALL_DIR ${SimTK_INSTALL_PREFIX})
@@ -131,7 +114,7 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore 4.1 QUIET)
+  find_package(DARTCore 4.3 QUIET)
   if (DARTCore_FOUND)
     message (STATUS "Looking for DARTCore - found")
     set (HAVE_DART TRUE)
@@ -207,7 +190,16 @@ if (PKG_CONFIG_FOUND)
   # Find OGRE
   execute_process(COMMAND pkg-config --modversion OGRE
                   OUTPUT_VARIABLE OGRE_VERSION)
-  string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
+
+  string (REGEX REPLACE "^([0-9]+).*" "\\1"
+    OGRE_MAJOR_VERSION "${OGRE_VERSION}")
+  string (REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1"
+    OGRE_MINOR_VERSION "${OGRE_VERSION}")
+  string (REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1"
+    OGRE_PATCH_VERSION ${OGRE_VERSION})
+
+  set(OGRE_VERSION
+    ${OGRE_MAJOR_VERSION}.${OGRE_MINOR_VERSION}.${OGRE_PATCH_VERSION})
 
   pkg_check_modules(OGRE-RTShaderSystem
                     OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
@@ -387,10 +379,10 @@ endif ()
 
 ########################################
 # Find SDFormat
-find_package(SDFormat 2.0.1)
+find_package(SDFormat 2.1.0)
 if (NOT SDFormat_FOUND)
   message (STATUS "Looking for SDFormat - not found")
-  BUILD_ERROR ("Missing: SDF version >=2.0.1. Required for reading and writing SDF files.")
+  BUILD_ERROR ("Missing: SDF version >=2.1.0. Required for reading and writing SDF files.")
 else()
   message (STATUS "Looking for SDFormat - found")
 endif()
@@ -441,7 +433,8 @@ if (NOT GDAL_FOUND)
 else ()
   message (STATUS "Looking for libgdal - found")
   set (HAVE_GDAL ON CACHE BOOL "HAVE GDAL" FORCE)
-endif ()
+  include_directories(${GDAL_INCLUDE_DIR})
+endif()
 
 ########################################
 # Find libusb
@@ -475,6 +468,18 @@ endif()
 include (${gazebo_cmake_dir}/Ronn2Man.cmake)
 include (${gazebo_cmake_dir}/Man.cmake)
 add_manpage_target()
+
+########################################
+# Find Space Navigator header and library
+find_library(SPNAV_LIBRARY NAMES spnav)
+find_file(SPNAV_HEADER NAMES spnav.h)
+if (SPNAV_LIBRARY AND SPNAV_HEADER)
+  message(STATUS "Looking for libspnav and spnav.h - found")
+  set(HAVE_SPNAV TRUE)
+else()
+  message(STATUS "Looking for libspnav and spnav.h - not found")
+  set(HAVE_SPNAV FALSE)
+endif()
 
 ########################################
 # Find QWT (QT graphing library)

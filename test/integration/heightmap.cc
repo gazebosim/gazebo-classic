@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
   }
 
   physics::ModelPtr model = GetModel("heightmap");
-  EXPECT_TRUE(model);
+  EXPECT_TRUE(model != NULL);
 
   physics::CollisionPtr collision =
     model->GetLink("link")->GetCollision("collision");
@@ -67,7 +67,7 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
     boost::dynamic_pointer_cast<physics::HeightmapShape>(
         collision->GetShape());
 
-  EXPECT_TRUE(shape);
+  EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   EXPECT_TRUE(shape->GetPos() == math::Vector3(0, 0, 0));
@@ -111,7 +111,7 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
 
   Load("worlds/white_alpha_heightmap.world", true, _physicsEngine);
   physics::ModelPtr model = GetModel("heightmap");
-  EXPECT_TRUE(model);
+  EXPECT_TRUE(model != NULL);
 
   physics::CollisionPtr collision =
     model->GetLink("link")->GetCollision("collision");
@@ -119,7 +119,7 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
   physics::HeightmapShapePtr shape =
     boost::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
 
-  EXPECT_TRUE(shape);
+  EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   int x, y;
@@ -143,7 +143,7 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
 
   Load("worlds/white_no_alpha_heightmap.world", true, _physicsEngine);
   physics::ModelPtr model = GetModel("heightmap");
-  EXPECT_TRUE(model);
+  EXPECT_TRUE(model != NULL);
 
   physics::CollisionPtr collision =
     model->GetLink("link")->GetCollision("collision");
@@ -151,7 +151,7 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
   physics::HeightmapShapePtr shape =
     boost::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
 
-  EXPECT_TRUE(shape);
+  EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   int x, y;

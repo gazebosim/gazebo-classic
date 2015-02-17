@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,15 +38,14 @@ TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
   dPtr->node = transport::NodePtr(new transport::Node());
   dPtr->node->Init(dPtr->scene->GetName());
 
+  dPtr->points = NULL;
+
   dPtr->signalPropagationSub = dPtr->node->Subscribe(_topicName,
       &TransmitterVisual::OnNewPropagationGrid, this);
 
   dPtr->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&TransmitterVisual::Update, this)));
-
-  dPtr->points = this->CreateDynamicLine(rendering::RENDERING_POINT_LIST);
-  dPtr->points->setMaterial("Gazebo/PointCloud");
 }
 
 /////////////////////////////////////////////////
@@ -63,6 +62,11 @@ TransmitterVisual::~TransmitterVisual()
 void TransmitterVisual::Load()
 {
   Visual::Load();
+
+  TransmitterVisualPrivate *dPtr =
+      reinterpret_cast<TransmitterVisualPrivate *>(this->dataPtr);
+  dPtr->points = this->CreateDynamicLine(rendering::RENDERING_POINT_LIST);
+  dPtr->points->setMaterial("Gazebo/PointCloud");
 }
 
 /////////////////////////////////////////////////

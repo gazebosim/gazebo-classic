@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,8 @@ Exception::~Exception()
 //////////////////////////////////////////////////
 void Exception::Print() const
 {
-  gzerr << "EXCEPTION: " << *this << std::endl;
+  (gazebo::common::Console::err(this->file, this->line)) << "EXCEPTION: "
+      << *this << std::endl;
 }
 
 //////////////////////////////////////////////////

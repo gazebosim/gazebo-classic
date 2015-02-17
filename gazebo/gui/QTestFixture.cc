@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ void QTestFixture::initTestCase()
 {
   // Initialize the informational logger. This will log warnings, and
   // errors.
-  gzLogInit("test.log");
+  gzLogInit("qtest-", "test.log");
 
   // Initialize the data logger. This will log state information.
   gazebo::util::LogRecord::Instance()->Init("test");
@@ -108,8 +108,6 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
 
   this->server->Run();
 
-  this->server->Fini();
-
   delete this->server;
   this->server = NULL;
 }
@@ -123,6 +121,19 @@ void QTestFixture::SetPause(bool _pause)
 /////////////////////////////////////////////////
 void QTestFixture::cleanup()
 {
+  if (this->server)
+  {
+    this->server->Stop();
+
+    if (this->serverThread)
+    {
+      this->serverThread->join();
+    }
+  }
+
+  delete this->serverThread;
+  this->serverThread = NULL;
+
   gazebo::gui::stop();
 
   double residentEnd, shareEnd;
@@ -141,19 +152,6 @@ void QTestFixture::cleanup()
   // Make sure the percent change values are reasonable.
   QVERIFY(resPercentChange < this->resMaxPercentChange);
   QVERIFY(sharePercentChange < this->shareMaxPercentChange);
-
-  if (this->server)
-  {
-    this->server->Stop();
-
-    if (this->serverThread)
-    {
-      this->serverThread->join();
-    }
-  }
-
-  delete this->serverThread;
-  this->serverThread = NULL;
 }
 
 /////////////////////////////////////////////////
