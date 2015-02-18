@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,17 @@
 #define _BUILDING_EDITOR_PALETTE_HH_
 
 #include <string>
-#include <vector>
-#include <list>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Events.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    /// Forward declare private data class.
+    class BuildingEditorPalettePrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -65,10 +65,17 @@ namespace gazebo
       /// \brief Qt callback when the draw stairs button is pressed.
       private slots: void OnAddStair();
 
-      /// \brief Qt callback when a brush is pressed, if it is a color button,
-      /// it is handled here.
-      /// \param[in] _colorId Id of the button clicked.
-      private slots: void OnColor(int _colorId);
+      /// \brief Qt callback when a brush is pressed.
+      /// \param[in] _buttonId Id of the button clicked.
+      private slots: void OnBrush(int _buttonId);
+
+      /// \brief Qt callback when a color brush is pressed.
+      /// \param[in] _buttonId Id of the button clicked.
+      private slots: void OnColor(int _buttonId);
+
+      /// \brief Qt callback when a texture brush is pressed.
+      /// \param[in] _buttonId Id of the button clicked.
+      private slots: void OnTexture(int _buttonId);
 
       /// \brief Qt callback when the Model Name field is changed.
       private slots: void OnNameChanged(const QString &_name);
@@ -91,29 +98,9 @@ namespace gazebo
       /// \param[in] _event Event.
       private: void mousePressEvent(QMouseEvent *_event);
 
-      /// \brief Default name of the building model.
-      private: std::string buildingDefaultName;
-
-      /// \brief Edit the name of the building model.
-      private: QLineEdit *modelNameEdit;
-
-      /// \brief All the brushes (wall, door, window, stair, etc).
-      private: QButtonGroup *brushes;
-
-      /// \brief Name of model.
-      private: std::string modelName;
-
-      /// \brief Save location.
-      private: std::string saveLocation;
-
-      /// \brief A list of gui editor events connected to this palette.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief The current draw mode, empty for none.
-      private: std::string currentMode;
-
-      /// \brief List of default colors to be picked.
-      private: std::vector<QColor> colorList;
+      /// \internal
+      /// \brief Private data pointer
+      private: BuildingEditorPalettePrivate *dataPtr;
     };
     /// \}
   }

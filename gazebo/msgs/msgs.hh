@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,13 +118,15 @@ namespace gazebo
 
     /// \brief Convert a string to a msgs::Joint::Type enum.
     /// \param[in] _str Joint type string.
-    /// \return A msgs::Joint::Type enum.
+    /// \return A msgs::Joint::Type enum. Defaults to REVOLUTE
+    /// if _str is unrecognized.
     GAZEBO_VISIBLE
     msgs::Joint::Type ConvertJointType(const std::string &_str);
 
     /// \brief Convert a msgs::Joint::Type to a string.
     /// \param[in] _type A msgs::Joint::Type enum.
-    /// \return Joint type string.
+    /// \return Joint type string. Returns "unknown" if
+    /// _type is unrecognized.
     GAZEBO_VISIBLE
     std::string ConvertJointType(const msgs::Joint::Type _type);
 
@@ -268,6 +270,38 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create an SDF element from a msgs::Visual
+    /// \param[in] _msg Visual messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr VisualToSDF(const msgs::Visual &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Material
+    /// \param[in] _msg Material messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr MaterialToSDF(const msgs::Material &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Convert a string to a msgs::Material::ShaderType enum.
+    /// \param[in] _str Shader type string.
+    /// \return A msgs::Material::ShaderType enum. Defaults to VERTEX
+    /// if _str is unrecognized.
+    GAZEBO_VISIBLE
+    msgs::Material::ShaderType ConvertShaderType(const std::string &_str);
+
+    /// \brief Convert a msgs::ShaderType to a string.
+    /// \param[in] _type A msgs::ShaderType enum.
+    /// \return Shader type string. Returns "unknown" if
+    /// _type is unrecognized.
+    GAZEBO_VISIBLE
+    std::string ConvertShaderType(const msgs::Material::ShaderType _type);
+
     /// \brief Create a msgs::Fog from a fog SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::Fog object
@@ -282,7 +316,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Light
     /// \param[in] _msg Light messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -291,7 +325,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::CameraSensor
     /// \param[in] _msg CameraSensor messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -300,7 +334,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Plugin
     /// \param[in] _msg Plugin messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -309,7 +343,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Collision
     /// \param[in] _msg Collision messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -319,7 +353,7 @@ namespace gazebo
     /// \internal
     /// \brief Create an SDF element from a msgs::Link.
     /// \param[in] _msg Link messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -328,7 +362,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Inertial
     /// \param[in] _msg Inertial messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -337,7 +371,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Surface
     /// \param[in] _msg Surface messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -346,7 +380,7 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Geometry
     /// \param[in] _msg Geometry messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
@@ -355,12 +389,21 @@ namespace gazebo
 
     /// \brief Create an SDF element from a msgs::Mesh
     /// \param[in] _msg Mesh messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
     sdf::ElementPtr MeshToSDF(const msgs::MeshGeom &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from msgs::Joint.
+    /// \param[in] _msg The msgs::Joint object.
+    /// \param[in] _sdf if supplied, performs an update from _sdf instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr JointToSDF(const msgs::Joint &_msg,
+                      sdf::ElementPtr _sdf = sdf::ElementPtr());
 
     /// \cond
     GAZEBO_VISIBLE

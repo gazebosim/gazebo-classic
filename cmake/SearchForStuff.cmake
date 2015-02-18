@@ -114,7 +114,7 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore 4.1 QUIET)
+  find_package(DARTCore 4.3 QUIET)
   if (DARTCore_FOUND)
     message (STATUS "Looking for DARTCore - found")
     set (HAVE_DART TRUE)
@@ -424,7 +424,8 @@ if (NOT GDAL_FOUND)
 else ()
   message (STATUS "Looking for libgdal - found")
   set (HAVE_GDAL ON CACHE BOOL "HAVE GDAL" FORCE)
-endif ()
+  include_directories(${GDAL_INCLUDE_DIR})
+endif()
 
 ########################################
 # Find libusb
