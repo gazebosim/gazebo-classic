@@ -945,12 +945,12 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
   mesh->AddSubMesh(subMesh);
 
   // Generate the group of rings for the outsides of the cylinder
-  for (ring = 0; ring <= rings; ring++)
+  for (ring = 0; ring <= rings; ++ring)
   {
     vert.z = ring * _height/rings - _height/2.0;
 
     // Generate the group of segments for the current ring
-    for (seg = 0; seg <= segments; seg++)
+    for (seg = 0; seg <= segments; ++seg)
     {
       vert.y = radius * cosf(seg * deltaSegAngle);
       vert.x = radius * sinf(seg * deltaSegAngle);
@@ -1014,12 +1014,12 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
 
   // Generate the group of rings for the inside of the cylinder
   radius = _innerRadius;
-  for (ring = 0; ring <= rings; ring++)
+  for (ring = 0; ring <= rings; ++ring)
   {
     vert.z = (_height/2.0) - (ring * _height/rings);
 
     // Generate the group of segments for the current ring
-    for (seg = 0; seg <= segments; seg++)
+    for (seg = 0; seg <= segments; ++seg)
     {
       vert.y = radius * cosf(seg * deltaSegAngle);
       vert.x = radius * sinf(seg * deltaSegAngle);
@@ -1059,7 +1059,7 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
   // Close ends in case it's not a full circle
   if (!math::equal(_arc, 2.0 * M_PI))
   {
-    for (ring = 0; ring < rings; ring++)
+    for (ring = 0; ring < rings; ++ring)
     {
       // Close beginning
       subMesh->AddIndex((segments+1)*(ring+1));
