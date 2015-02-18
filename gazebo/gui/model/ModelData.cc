@@ -388,7 +388,7 @@ void PartData::OnApply()
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
 
   this->partSDF = msgs::LinkToSDF(*linkConfig->GetData(), this->partSDF);
-  this->partVisual->SetWorldPose(this->GetPose());
+  this->partVisual->SetPose(this->GetPose());
 
   // update visuals
   if (!this->visuals.empty())

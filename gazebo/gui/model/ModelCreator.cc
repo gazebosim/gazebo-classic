@@ -360,8 +360,6 @@ void ModelCreator::OnNew()
       return;
   }
 
-  msg.append("Once you open a new canvas, your current model will no longer "
-             "be editable.");
   msgBox.setText(msg);
 
   msgBox.exec();
@@ -588,7 +586,7 @@ std::string ModelCreator::AddShape(PartType _type,
 
   linkVisual->SetTransparency(ModelData::GetEditTransparency());
   linkVisual->SetPose(_pose);
-  if (_pose == math::Pose::Zero)
+  if (this->modelPose == math::Pose::Zero)
   {
     linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
     _pose.pos.z + _size.z * 0.5));
@@ -1636,7 +1634,7 @@ void ModelCreator::Update()
   for (auto &partsIt : this->allParts)
   {
     PartData *part = partsIt.second;
-    if (part->GetPose() != part->partVisual->GetWorldPose())
+    if (part->GetPose() != part->partVisual->GetPose())
     {
       part->SetPose(part->partVisual->GetWorldPose() - this->modelPose);
       this->ModelChanged();

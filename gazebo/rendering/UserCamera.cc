@@ -771,9 +771,9 @@ bool UserCamera::StereoEnabled() const
 }
 
 //////////////////////////////////////////////////
-#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
 void UserCamera::EnableStereo(bool _enable)
 {
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
   if (this->dataPtr->rightViewport)
   {
     if (_enable)

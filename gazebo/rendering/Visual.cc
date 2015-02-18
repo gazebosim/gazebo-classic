@@ -903,9 +903,14 @@ void Visual::SetLighting(bool _lighting)
 
   if (this->dataPtr->useRTShader)
   {
-    // Detach from RTShaderSystem otherwise setting lighting here will have
-    // no effect if shaders are used.
-    RTShaderSystem::Instance()->DetachEntity(this);
+    if (this->dataPtr->lighting)
+      RTShaderSystem::Instance()->AttachEntity(this);
+    else
+    {
+      // Detach from RTShaderSystem otherwise setting lighting here will have
+      // no effect if shaders are used.
+      RTShaderSystem::Instance()->DetachEntity(this);
+    }
   }
 
   try
@@ -964,7 +969,6 @@ void Visual::SetLighting(bool _lighting)
   {
     (*iter)->SetLighting(this->dataPtr->lighting);
   }
-
 
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("lighting")->Set(this->dataPtr->lighting);

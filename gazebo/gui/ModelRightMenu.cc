@@ -147,9 +147,17 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
 
   if (_type == EntityTypes::MODEL)
   {
-    menu.addSeparator();
-    menu.addAction(this->editAct);
-    menu.addSeparator();
+    // disable editing planes for now
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+    rendering::ScenePtr scene = cam->GetScene();
+    rendering::VisualPtr vis = scene->GetVisual(this->modelName);
+    if (vis && !vis->IsPlane())
+    {
+      menu.addSeparator();
+      menu.addAction(this->editAct);
+      menu.addSeparator();
+    }
+
     // menu.addAction(this->snapBelowAct);
 
     // Create the view menu
