@@ -83,7 +83,18 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   if (!additionalPaths.empty())
   {
     common::SystemPaths::Instance()->AddModelPaths(additionalPaths);
-    this->UpdateLocalPath(additionalPaths);
+
+    // Get each path in the : separated list
+    std::string delim(":");
+    size_t pos1 = 0;
+    size_t pos2 = additionalPaths.find(delim);
+    while (pos2 != std::string::npos)
+    {
+      this->UpdateLocalPath(additionalPaths.substr(pos1, pos2-pos1));
+      pos1 = pos2+1;
+      pos2 = additionalPaths.find(delim, pos2+1);
+    }
+    this->UpdateLocalPath(additionalPaths.substr(pos1, additionalPaths.size()-pos1));
   }
 
   // Connect callbacks now that everything else is initialized

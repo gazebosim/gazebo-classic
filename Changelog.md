@@ -10,6 +10,9 @@
 1. Added ModelRightMenu::EntityTypes.
     * [Pull request #1414](https://bitbucket.org/osrf/gazebo/pull-request/1414)
 
+1. Added Gazebo/CoM material.
+    * [Pull request #1439](https://bitbucket.org/osrf/gazebo/pull-request/1439)
+
 1. Added arc parameter to MeshManager::CreateTube 
     * [Pull request #1436](https://bitbucket.org/osrf/gazebo/pull-request/1436)
 
