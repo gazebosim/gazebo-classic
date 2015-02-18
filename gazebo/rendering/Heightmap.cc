@@ -1401,7 +1401,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
 {
   bool compression = false;
 
-  _outStream << "#version 130\n\n";
+  _outStream << "#version 120\n\n";
 
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
   compression = _terrain->_getUseVertexCompression() &&
@@ -1411,21 +1411,21 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
   {
     // The parameter "in vec4 vertex;" is automatically bound by OGRE.
     // The parameter "in vec4 uv0'" is automatically bound by OGRE.
-    _outStream << "in vec4 vertex;\n"
-               << "in vec4 uv0;\n";
+    _outStream << "attribute vec4 vertex;\n"
+               << "attribute vec4 uv0;\n";
   }
   else
 #endif
   {
     // The parameter "in vec4 vertex;" is automatically bound by OGRE.
     // The parameter "in vec4 uv0'" is automatically bound by OGRE.
-    _outStream << "in vec4 vertex;\n"
-               << "in vec4 uv0;\n";
+    _outStream << "attribute vec4 vertex;\n"
+               << "attribute vec4 uv0;\n";
   }
 
   if (_tt != RENDER_COMPOSITE_MAP)
     // The parameter "in vec4 uv1'" is automatically bound by OGRE.
-    _outStream << "in vec4 uv1;\n";
+    _outStream << "attribute vec4 uv1;\n";
 
   _outStream <<
     "uniform mat4 worldMatrix;\n"
@@ -1454,10 +1454,10 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
     _outStream << "uniform vec4 uvMul" << i << ";\n";
 
   _outStream <<
-    "out vec4 position;\n";
+    "varying vec4 position;\n";
 
   unsigned int texCoordSet = 1;
-  _outStream << "out vec4 uvMisc;\n";
+  _outStream << "varying vec4 uvMisc;\n";
 
   // layer UV's premultiplied, packed as xy/zw
   unsigned int numUVSets = numLayers / 2;
@@ -1469,13 +1469,13 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
   {
     for (unsigned int i = 0; i < numUVSets; ++i)
     {
-      _outStream << "out vec4 layerUV" << i << ";\n";
+      _outStream << "varying vec4 layerUV" << i << ";\n";
     }
   }
 
   if (_prof->getParent()->getDebugLevel() && _tt != RENDER_COMPOSITE_MAP)
   {
-    _outStream << "out vec2 lodInfo;\n";
+    _outStream << "varying vec2 lodInfo;\n";
   }
 
   bool fog = _terrain->getSceneManager()->getFogMode() != Ogre::FOG_NONE &&
@@ -1485,7 +1485,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
   {
     _outStream <<
       "uniform vec4 fogParams;\n"
-      "out float fogVal;\n";
+      "varying float fogVal;\n";
   }
 
   if (_prof->isShadowingEnabled(_tt, _terrain))
@@ -1519,6 +1519,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
   {
     _outStream
       << "  vec4 pos = vertex;\n"
+      //<< "  vec4 pos = gl_Vertex;\n"
       << "  vec2 uv = vec2(uv0.x, uv0.y);\n";
   }
 
@@ -1593,6 +1594,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpFooter(
     TechniqueType _tt, Ogre::StringUtil::StrStreamType &_outStream)
 {
   _outStream << "  gl_Position = viewProjMatrix * worldPos;\n"
+  //_outStream << "  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;;\n"
              << "  uvMisc.xy = uv.xy;\n";
 
   bool fog = _terrain->getSceneManager()->getFogMode() != Ogre::FOG_NONE &&
@@ -1615,6 +1617,9 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpFooter(
     this->generateVpDynamicShadows(_prof, _terrain, _tt, _outStream);
 
   _outStream << "}\n";
+
+  std::cerr << "footer =============== " << std::endl;
+  std::cerr << _outStream.str() << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -1723,7 +1728,7 @@ generateVpDynamicShadowsParams(unsigned int _texCoord, const SM2Profile *_prof,
 
   for (unsigned int i = 0; i < numTextures; ++i)
   {
-    _outStream << "out vec4 lightSpacePos" << i << ";\n"
+    _outStream << "varying vec4 lightSpacePos" << i << ";\n"
                << "uniform mat4 texViewProjMatrix" << i << ";\n";
 
     // Don't add depth range params
@@ -1742,7 +1747,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
     const SM2Profile *_prof, const Ogre::Terrain *_terrain,
     TechniqueType _tt, Ogre::StringUtil::StrStreamType &_outStream)
 {
-  _outStream << "#version 130\n\n";
+  _outStream << "#version 120\n\n";
 
   _outStream <<
     "vec4 expand(vec4 v)\n"
@@ -1761,10 +1766,10 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
     this->generateFpDynamicShadowsHelpers(_prof, _terrain, _tt, _outStream);
 
   _outStream <<
-    "in vec4 position;\n";
+    "varying vec4 position;\n";
 
   Ogre::uint texCoordSet = 1;
-  _outStream << "in vec4 uvMisc;\n";
+  _outStream << "varying vec4 uvMisc;\n";
 
   // UV's premultiplied, packed as xy/zw
   Ogre::uint maxLayers = _prof->getMaxLayers(_terrain);
@@ -1784,13 +1789,13 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
     for (Ogre::uint i = 0; i < numUVSets; ++i)
     {
       _outStream <<
-        "in vec4 layerUV" << i << ";\n";
+        "varying vec4 layerUV" << i << ";\n";
     }
   }
 
   if (_prof->getParent()->getDebugLevel() && _tt != RENDER_COMPOSITE_MAP)
   {
-    _outStream << "in vec2 lodInfo;\n";
+    _outStream << "varying vec2 lodInfo;\n";
   }
 
   bool fog = _terrain->getSceneManager()->getFogMode() != Ogre::FOG_NONE &&
@@ -1800,7 +1805,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
   {
     _outStream <<
       "uniform vec3 fogColour;\n"
-      "in float fogVal;\n";
+      "varying float fogVal;\n";
   }
 
   Ogre::uint currentSamplerIdx = 0;
@@ -1864,19 +1869,19 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
         "Try reducing the number of layers.", __FUNCTION__);
   }
 
-  _outStream << "out vec4 outputCol;\n";
+  //_outStream << "out vec4 outputCol;\n";
 
   _outStream <<
     "void main()\n"
     "{\n"
     "  float shadow = 1.0;\n"
     "  vec2 uv = uvMisc.xy;\n"
-    "  outputCol = vec4(0.0, 0.0, 0.0, 1.0);\n";
+    "  vec4 outputCol = vec4(0.0, 0.0, 0.0, 1.0);\n";
 
   if (_tt != LOW_LOD)
   {
     // global normal
-    _outStream << "  vec3 normal = expand(texture(globalNormal, uv)).xyz;\n";
+    _outStream << "  vec3 normal = expand(texture2D(globalNormal, uv)).xyz;\n";
   }
 
   _outStream <<
@@ -1892,7 +1897,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
   {
     // we just do a single calculation from composite map
     _outStream <<
-      "  vec4 composite = texture(compositeMap, uv);\n"
+      "  vec4 composite = texture2D(compositeMap, uv);\n"
       "  diffuse = composite.xyz;\n";
     // TODO - specular; we'll need normals for this!
   }
@@ -1902,7 +1907,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
     for (Ogre::uint i = 0; i < numBlendTextures; ++i)
     {
       _outStream << "  vec4 blendTexVal" << i
-                 << " = texture(blendTex" << i << ", uv);\n";
+                 << " = texture2D(blendTex" << i << ", uv);\n";
     }
 
     if (_prof->isLayerNormalMappingEnabled())
@@ -1984,7 +1989,7 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsParams(
   for (Ogre::uint i = 0; i < numTextures; ++i)
   {
     _outStream <<
-      "in vec4 lightSpacePos" << i << ";\n" <<
+      "varying vec4 lightSpacePos" << i << ";\n" <<
       "uniform sampler2D shadowMap" << i << ";\n";
 
     *_sampler = *_sampler + 1;
@@ -2026,14 +2031,14 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpLayer(
     if (_prof->isLayerParallaxMappingEnabled() && _tt != RENDER_COMPOSITE_MAP)
     {
       // modify UV - note we have to sample an extra time
-      _outStream << "  displacement = texture(normtex" << _layer
+      _outStream << "  displacement = texture2D(normtex" << _layer
                  << ", uv" << _layer << ").w\n"
         "   * scaleBiasSpecular.x + scaleBiasSpecular.y;\n";
       _outStream << "  uv" << _layer << " += TSeyeDir.xy * displacement;\n";
     }
 
     // access TS normal map
-    _outStream << "  TSnormal = expand(texture(normtex" << _layer << ", uv"
+    _outStream << "  TSnormal = expand(texture2D(normtex" << _layer << ", uv"
                << _layer << ")).xyz;\n";
     _outStream << "  TShalfAngle = normalize(TSlightDir + TSeyeDir);\n";
 
@@ -2049,7 +2054,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpLayer(
 
   // sample diffuse texture
   _outStream << "  vec4 diffuseSpecTex" << _layer
-    << " = texture(difftex" << _layer << ", uv" << _layer << ");\n";
+    << " = texture2D(difftex" << _layer << ", uv" << _layer << ");\n";
 
   // apply to common
   if (!_layer)
@@ -2099,13 +2104,13 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpFooter(
         _prof->isGlobalColourMapEnabled())
     {
       // sample colour map and apply to diffuse
-      _outStream << "  diffuse *= texture(globalColourMap, uv).xyz;\n";
+      _outStream << "  diffuse *= texture2D(globalColourMap, uv).xyz;\n";
     }
 
     if (_prof->isLightmapEnabled())
     {
       // sample lightmap
-      _outStream << "  shadow = texture(lightMap, uv).x;\n";
+      _outStream << "  shadow = texture2D(lightMap, uv).x;\n";
     }
 
     if (_prof->isShadowingEnabled(_tt, _terrain))
@@ -2146,9 +2151,14 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpFooter(
     _outStream << "  outputCol.xyz = mix(outputCol.xyz, fogColour, fogVal);\n";
   }
 
+  //_outStream << "  outputCol = vec4(1.0, 0.0, 0.0, 1.0);\n";
+  _outStream << "  gl_FragColor = outputCol;\n";
 
   // Final return
   _outStream << "\n}\n";
+
+  std::cerr << " generate fp =================== " << std::endl;
+  std::cerr << _outStream.str() << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -2189,9 +2199,9 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsHelpers(
       "      // to avoid gradient issues inside loops\n"
       "      newUV = newUV / newUV.w;\n"
       // The following line used to be:
-      // "      float depth = tex2d(shadowMap, newUV.xy, 1.0, 1.0).x;\n"
-      "      float depth = textureGrad(shadowMap, newUV.xy, "
-      " vec2(1.0, 1.0), vec2(1.0, 1.0)).x;\n"
+       "      float depth = texture2D(shadowMap, newUV.xy).x;\n"
+      // "      float depth = textureGrad(shadowMap, newUV.xy, "
+      // " vec2(1.0, 1.0), vec2(1.0, 1.0)).x;\n"
       // "      if (depth >= 1.0 || depth >= uv.z)\n"
       "      if (depth >= 1.0 || depth >= newUV.z)\n"
       "        shadow += 1.0;\n"
@@ -2205,7 +2215,7 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsHelpers(
     _outStream <<
       "float calcSimpleShadow(sampler2D shadowMap, vec4 shadowMapPos)\n"
       "{\n"
-      "  return textureProj(shadowMap, shadowMapPos).x;\n"
+      "  return texture2DProj(shadowMap, shadowMapPos).x;\n"
       "}\n";
   }
 
