@@ -446,6 +446,9 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 /////////////////////////////////////////////////
 ApplyWrenchDialog::~ApplyWrenchDialog()
 {
+  MouseEventHandler::Instance()->RemoveReleaseFilter(
+    "applyWrenchDialog_"+this->dataPtr->linkName);
+
   this->dataPtr->node->Fini();
   this->dataPtr->connections.clear();
   delete this->dataPtr;
@@ -537,11 +540,20 @@ void ApplyWrenchDialog::SetLink(std::string _linkName)
   this->dataPtr->connections.push_back(
       event::Events::ConnectPreRender(
       boost::bind(&ApplyWrenchDialog::OnPreRender, this)));
+
+  // MouseRelease even when it's inactive, to regain focus
+  MouseEventHandler::Instance()->AddReleaseFilter(
+    "applyWrenchDialog_"+this->dataPtr->linkName,
+    boost::bind(&ApplyWrenchDialog::OnMouseRelease, this, _1));
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::SetLink(QString _linkName)
 {
+  // Remove previous link's filter
+  MouseEventHandler::Instance()->RemoveReleaseFilter(
+    "applyWrenchDialog_"+this->dataPtr->linkName);
+
   this->SetLink(this->dataPtr->modelName + "::" + _linkName.toStdString());
 }
 
@@ -734,8 +746,8 @@ void ApplyWrenchDialog::AttachVisuals()
     this->dataPtr->applyWrenchVisual->Resize();
   }
 
-  this->SetTorque(this->dataPtr->torqueVector);
-  this->SetForce(this->dataPtr->forceVector);
+  this->SetTorque(this->dataPtr->torqueVector, true);
+  this->SetForce(this->dataPtr->forceVector, true);
 }
 
 /////////////////////////////////////////////////
@@ -826,7 +838,9 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent & _event)
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos,
         this->dataPtr->manipState);
 
-  if (vis)
+  // Change mode
+  if (vis && vis->GetRootVisual() ==
+      this->dataPtr->applyWrenchVisual->GetRootVisual())
   {
     if (vis->GetName().find("_FORCE_VISUAL_") != std::string::npos)
     {
@@ -834,6 +848,10 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent & _event)
         this->SetForce(math::Vector3::UnitX);
       else
         this->SetForce(this->dataPtr->forceVector);
+
+      if (!this->isActiveWindow())
+        this->activateWindow();
+
       return true;
     }
     else if (vis->GetName().find("_TORQUE_VISUAL_") != std::string::npos)
@@ -842,6 +860,10 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent & _event)
         this->SetTorque(math::Vector3::UnitX);
       else
         this->SetTorque(this->dataPtr->torqueVector);
+
+      if (!this->isActiveWindow())
+        this->activateWindow();
+
       return true;
     }
   }
@@ -1249,10 +1271,6 @@ void ApplyWrenchDialog::SetActive(bool _active)
         "applyWrenchDialog_"+this->dataPtr->linkName,
         boost::bind(&ApplyWrenchDialog::OnMousePress, this, _1));
 
-    MouseEventHandler::Instance()->AddReleaseFilter(
-        "applyWrenchDialog_"+this->dataPtr->linkName,
-        boost::bind(&ApplyWrenchDialog::OnMouseRelease, this, _1));
-
     MouseEventHandler::Instance()->AddMoveFilter(
         "applyWrenchDialog_"+this->dataPtr->linkName,
         boost::bind(&ApplyWrenchDialog::OnMouseMove, this, _1));
@@ -1266,8 +1284,6 @@ void ApplyWrenchDialog::SetActive(bool _active)
     this->dataPtr->applyWrenchVisual->SetVisible(false);
 
     MouseEventHandler::Instance()->RemovePressFilter(
-        "applyWrenchDialog_"+this->dataPtr->linkName);
-    MouseEventHandler::Instance()->RemoveReleaseFilter(
         "applyWrenchDialog_"+this->dataPtr->linkName);
     MouseEventHandler::Instance()->RemoveMoveFilter(
         "applyWrenchDialog_"+this->dataPtr->linkName);

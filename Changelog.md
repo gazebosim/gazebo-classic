@@ -23,6 +23,9 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
+1. Added Joint Msg-to-SDF conversion functions and test.
+    * [Pull request #1419](https://bitbucket.org/osrf/gazebo/pull-request/1419)
+
 1. Added Visual, Material Msg-to-SDF conversion functions and ShaderType to string conversion functions.
     * [Pull request #1415](https://bitbucket.org/osrf/gazebo/pull-request/1415)
 
@@ -124,6 +127,10 @@
 
 1. Fixed crash on "permission denied" bug, added insert_model integration test.
     * [Pull request #1329](https://bitbucket.org/osrf/gazebo/pull-request/1329/)
+
+1. Enable simbody joint tests, implement `SimbodyJoint::GetParam`, create
+   `Joint::GetParam`, fix bug in `BulletHingeJoint::SetParam`.
+    * [Pull request #1404](https://bitbucket.org/osrf/gazebo/pull-request/1404/)
 
 1. Building editor updates
     1. Fixed inspector resizing.

@@ -468,7 +468,7 @@ void ApplyWrenchVisual::SetTorqueVisual()
       math::Vector3(0, 0, -linkDiagonal*0.75)/dPtr->torqueVisual->GetScale());
 
   // Rotation tool
-  dPtr->rotTool->SetPosition(math::Vector3::Zero);
+  dPtr->rotTool->SetPosition(dPtr->comVector);
   if (!dPtr->rotatedByMouse)
     dPtr->rotTool->SetRotation(quat);
 }
