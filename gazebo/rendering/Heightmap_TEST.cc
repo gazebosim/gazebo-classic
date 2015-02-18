@@ -31,7 +31,7 @@ TEST_F(Heightmap_TEST, splitTerrain)
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
-  ASSERT_TRUE(scene != NULL)
+  ASSERT_TRUE(scene != NULL);
 
   scene = gazebo::rendering::create_scene("default", false);
 
