@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,6 +108,10 @@ namespace gazebo
       /// \brief Set joint type.
       /// \param[in] _type joint type.
       public: void SetType(JointMaker::JointType _type);
+
+      /// \brief Qt event emiited when the mouse enters this widget.
+      /// \param[in] _event Qt event.
+      protected: virtual void enterEvent(QEvent *_event);
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();

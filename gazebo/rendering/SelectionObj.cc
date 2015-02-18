@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,9 +62,6 @@ SelectionObj::~SelectionObj()
 /////////////////////////////////////////////////
 void SelectionObj::Load()
 {
-  SelectionObjPrivate *dPtr =
-      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
-
   Visual::Load();
 
   this->CreateRotateVisual();
@@ -73,9 +70,9 @@ void SelectionObj::Load()
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
-  dPtr->transVisual->SetVisible(false);
-  dPtr->rotVisual->SetVisible(false);
-  dPtr->scaleVisual->SetVisible(false);
+  this->SetHandleVisible(TRANS, false);
+  this->SetHandleVisible(ROT, false);
+  this->SetHandleVisible(SCALE, false);
 
   this->GetSceneNode()->setInheritScale(false);
 }
@@ -173,16 +170,11 @@ void SelectionObj::SetMode(SelectionMode _mode)
 
   dPtr->mode = _mode;
 
-  dPtr->transVisual->SetVisible(false);
-  dPtr->rotVisual->SetVisible(false);
-  dPtr->scaleVisual->SetVisible(false);
+  this->SetHandleVisible(TRANS, false);
+  this->SetHandleVisible(ROT, false);
+  this->SetHandleVisible(SCALE, false);
 
-  if (dPtr->mode == TRANS)
-    dPtr->transVisual->SetVisible(true);
-  else if (dPtr->mode == ROT)
-    dPtr->rotVisual->SetVisible(true);
-  else if (dPtr->mode == SCALE)
-    dPtr->scaleVisual->SetVisible(true);
+  this->SetHandleVisible(dPtr->mode, true);
 }
 
 /////////////////////////////////////////////////
@@ -645,4 +637,70 @@ void SelectionObj::CreateScaleVisual()
   dPtr->scene->AddVisual(dPtr->scaleXVisual);
   dPtr->scene->AddVisual(dPtr->scaleYVisual);
   dPtr->scene->AddVisual(dPtr->scaleZVisual);
+}
+
+/////////////////////////////////////////////////
+void SelectionObj::SetHandleVisible(SelectionMode _mode, bool _visible)
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  if (_mode == TRANS)
+    dPtr->transVisual->SetVisible(_visible);
+  else if (_mode == ROT)
+    dPtr->rotVisual->SetVisible(_visible);
+  else if (_mode == SCALE)
+    dPtr->scaleVisual->SetVisible(_visible);
+  else if (_mode == TRANS_X)
+    dPtr->transXVisual->SetVisible(_visible);
+  else if (_mode == TRANS_Y)
+    dPtr->transYVisual->SetVisible(_visible);
+  else if (_mode == TRANS_Z)
+    dPtr->transZVisual->SetVisible(_visible);
+  else if (_mode == ROT_X)
+    dPtr->rotXVisual->SetVisible(_visible);
+  else if (_mode == ROT_Y)
+    dPtr->rotYVisual->SetVisible(_visible);
+  else if (_mode == ROT_Z)
+    dPtr->rotZVisual->SetVisible(_visible);
+  else if (_mode == SCALE_X)
+    dPtr->scaleXVisual->SetVisible(_visible);
+  else if (_mode == SCALE_Y)
+    dPtr->scaleYVisual->SetVisible(_visible);
+  else if (_mode == SCALE_Z)
+    dPtr->scaleZVisual->SetVisible(_visible);
+}
+
+/////////////////////////////////////////////////
+bool SelectionObj::GetHandleVisible(SelectionMode _mode) const
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  if (_mode == TRANS)
+    return dPtr->transVisual->GetVisible();
+  else if (_mode == ROT)
+    return dPtr->rotVisual->GetVisible();
+  else if (_mode == SCALE)
+    return dPtr->scaleVisual->GetVisible();
+  else if (_mode == TRANS_X)
+    return dPtr->transXVisual->GetVisible();
+  else if (_mode == TRANS_Y)
+    return dPtr->transYVisual->GetVisible();
+  else if (_mode == TRANS_Z)
+    return dPtr->transZVisual->GetVisible();
+  else if (_mode == ROT_X)
+    return dPtr->rotXVisual->GetVisible();
+  else if (_mode == ROT_Y)
+    return dPtr->rotYVisual->GetVisible();
+  else if (_mode == ROT_Z)
+    return dPtr->rotZVisual->GetVisible();
+  else if (_mode == SCALE_X)
+    return dPtr->scaleXVisual->GetVisible();
+  else if (_mode == SCALE_Y)
+    return dPtr->scaleYVisual->GetVisible();
+  else if (_mode == SCALE_Z)
+    return dPtr->scaleZVisual->GetVisible();
+  else
+    return false;
 }

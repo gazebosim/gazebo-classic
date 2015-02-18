@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ namespace gazebo
       {
         this->pollThread = NULL;
         this->stop = false;
+        this->buttons[0] = 0;
+        this->buttons[1] = 0;
       }
 
       /// \brief Destructor
@@ -63,6 +65,9 @@ namespace gazebo
 
       /// \brief Rotation values below which joystick values return zero.
       public: math::Vector3 deadbandRot;
+
+      /// \brief button states
+      public: int buttons[2];
     };
   }
 }
