@@ -42,8 +42,8 @@ TEST_F(RandTest, Rand)
   EXPECT_GE(i, 1);
 
   i = math::Rand::GetIntNormal(2, 3);
-  EXPECT_LE(i, 3);
-  EXPECT_GE(i, 2);
+  EXPECT_LE(i, GZ_INT32_MAX);
+  EXPECT_GE(i, -GZ_INT32_MAX);
 
   // Test setting the random number seed
   {
