@@ -24,6 +24,7 @@
 
 #include <unistd.h>
 #include <string.h>
+#include <vector>
 
 #include "player.h"
 #include "gazebo/util/system.hh"
