@@ -193,7 +193,7 @@ namespace gazebo
       /// \return True if stereo is enabled.
       public: bool StereoEnabled() const;
 
-      /// \brief Turn on/off stereo rendering. Stereo must be initially enable
+      /// \brief Turn on/off stereo rendering. Stereo must be initially enabled
       /// in the ~/.gazebo/gui.ini file using:
       ///
       ///     [rendering]
