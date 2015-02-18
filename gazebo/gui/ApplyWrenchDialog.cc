@@ -838,34 +838,33 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent & _event)
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos,
         this->dataPtr->manipState);
 
-  // Change mode
-  if (vis && vis->GetRootVisual() ==
-      this->dataPtr->applyWrenchVisual->GetRootVisual())
+  if (!vis)
+    return false;
+
+  // Set active and change mode
+  if (vis == this->dataPtr->applyWrenchVisual->GetForceVisual())
   {
-    if (vis->GetName().find("_FORCE_VISUAL_") != std::string::npos)
-    {
-      if (this->dataPtr->forceVector == math::Vector3::Zero)
-        this->SetForce(math::Vector3::UnitX);
-      else
-        this->SetForce(this->dataPtr->forceVector);
+    if (!this->isActiveWindow())
+      this->activateWindow();
 
-      if (!this->isActiveWindow())
-        this->activateWindow();
+    if (this->dataPtr->forceVector == math::Vector3::Zero)
+      this->SetForce(math::Vector3::UnitX);
+    else
+      this->SetForce(this->dataPtr->forceVector);
 
-      return true;
-    }
-    else if (vis->GetName().find("_TORQUE_VISUAL_") != std::string::npos)
-    {
-      if (this->dataPtr->torqueVector == math::Vector3::Zero)
-        this->SetTorque(math::Vector3::UnitX);
-      else
-        this->SetTorque(this->dataPtr->torqueVector);
+    return true;
+  }
+  else if (vis == this->dataPtr->applyWrenchVisual->GetTorqueVisual())
+  {
+    if (!this->isActiveWindow())
+      this->activateWindow();
 
-      if (!this->isActiveWindow())
-        this->activateWindow();
+    if (this->dataPtr->torqueVector == math::Vector3::Zero)
+      this->SetTorque(math::Vector3::UnitX);
+    else
+      this->SetTorque(this->dataPtr->torqueVector);
 
-      return true;
-    }
+    return true;
   }
   return false;
 }
@@ -1260,6 +1259,7 @@ void ApplyWrenchDialog::SetActive(bool _active)
   if (!this->dataPtr->applyWrenchVisual)
   {
     gzwarn << "No visual" << std::endl;
+    this->reject();
     return;
   }
 
