@@ -1266,6 +1266,7 @@ void ApplyWrenchDialog::SetActive(bool _active)
   if (_active)
   {
     this->dataPtr->applyWrenchVisual->SetVisible(true);
+    event::Events::setSelectedEntity(this->dataPtr->linkName, "normal");
 
     MouseEventHandler::Instance()->AddPressFilter(
         "applyWrenchDialog_"+this->dataPtr->linkName,
