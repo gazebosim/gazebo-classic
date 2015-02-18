@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,22 +19,21 @@
 #define _MEASURE_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/building/PolylineItem.hh"
+#include "gazebo/gui/building/SegmentItem.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class PolylineItem;
-    class LineSegmentItem;
+    class SegmentItem;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class MeasureItem MeasureItem.hh
     /// \brief Measurement lines and values.
-    class GAZEBO_VISIBLE MeasureItem : public PolylineItem
+    class GAZEBO_VISIBLE MeasureItem : public SegmentItem
     {
       Q_OBJECT
 
@@ -52,9 +51,11 @@ namespace gazebo
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
       /// \brief Get distance between end points
-      public: double GetDistance();
+      /// \return Distance between end points.
+      public: double GetDistance() const;
 
       /// \brief Set value in meters
+      /// \param[in] _value Value measured in meters.
       public: void SetValue(double _value);
 
       /// \brief Value measured in meters.

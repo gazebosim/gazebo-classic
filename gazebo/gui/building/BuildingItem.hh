@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,28 +37,6 @@ namespace gazebo
 
         /// \brief Destructor
         public: ~BuildingItem();
-
-        /// \brief Get the level in which this building item is located.
-        public: int GetLevel() const;
-
-        /// \brief Set the level of this building item.
-        /// \param[in] _level level number
-        public: void SetLevel(int _level);
-
-        /// \brief Get the base height of this level relative to the ground
-        /// plane.
-        public: double GetLevelBaseHeight() const;
-
-        /// \brief Set the base height of this level relative to the ground
-        /// plane.
-        /// \param[in] _height base height
-        public: void SetLevelBaseHeight(double _height);
-
-        /// \brief Level that this building item is in.
-        protected: int level;
-
-        /// \brief Base height of the level
-        protected: double levelBaseHeight;
     };
     /// \}
   }

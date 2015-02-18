@@ -606,22 +606,7 @@ material Gazebo/YellowTransparent
       texture_unit
       {
         colour_op_ex source1 src_current src_current 0 1 0
-        alpha_op_ex source1 src_manual src_current 0.4
-      }
-    }
-
-    pass
-    {
-      depth_write on
-
-      ambient 1.0 1.0 0.0 1
-      diffuse 1.0 1.0 0.0 1
-      polygon_mode points
-
-      texture_unit
-      {
-        colour_op_ex source1 src_current src_current 0 1 0
-        alpha_op_ex source1 src_manual src_current 0.4
+        alpha_op_ex source1 src_manual src_current 0.5
       }
     }
   }
@@ -939,6 +924,25 @@ material Gazebo/Wood
   }
 }
 
+material Gazebo/Bricks
+{
+  technique
+  {
+    pass
+    {
+      ambient 1.0 1.0 1.0 1.0
+      diffuse 1.0 1.0 1.0 1.0
+      specular 0.2 0.2 0.2 1.0 12.5
+
+      texture_unit
+      {
+        texture bricks.png
+        filtering trilinear
+      }
+    }
+  }
+}
+
 material Gazebo/Road
 {
   technique
@@ -957,7 +961,6 @@ material Gazebo/Road
     }
   }
 }
-
 
 material Gazebo/Residential
 {
@@ -1262,6 +1265,41 @@ material Gazebo/GaussianCameraNoise
   }
 }
 
+vertex_program Gazebo/CameraDistortionMapVS glsl
+{
+  source camera_distortion_map_vs.glsl
+}
+
+fragment_program Gazebo/CameraDistortionMapFS glsl
+{
+  source camera_distortion_map_fs.glsl
+  default_params
+  {
+    param_named RT int 0
+    param_named distortionMap int 1
+    param_named scale float3 1.0 1.0 1.0
+  }
+}
+
+material Gazebo/CameraDistortionMap
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/CameraDistortionMapVS { }
+      fragment_program_ref Gazebo/CameraDistortionMapFS { }
+
+      texture_unit RT
+      {
+        tex_coord_set 0
+        tex_address_mode border
+        filtering linear linear linear
+      }
+    }
+  }
+}
+
 material Gazebo/PointCloud
 {
    technique
@@ -1278,3 +1316,34 @@ material Gazebo/PointCloud
    }
 }
 
+material Gazebo/PointHandle
+{
+   technique
+   {
+      pass
+      {
+        lighting off
+        scene_blend alpha_blend
+        depth_write off
+      }
+   }
+}
+
+material Gazebo/BuildingFrame
+{
+  technique
+  {
+    pass
+    {
+      ambient 1.0 1.0 1.0 1.0
+      diffuse 1.0 1.0 1.0 1.0
+      specular 0.2 0.2 0.2 1.0 12.5
+
+      texture_unit
+      {
+        texture building_frame.png
+        filtering trilinear
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/math/Angle.hh"
 #include "gazebo/gui/building/ImportImageDialog.hh"
 #include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/GridLines.hh"
@@ -24,9 +25,8 @@
 #include "gazebo/gui/building/DoorItem.hh"
 #include "gazebo/gui/building/StairsItem.hh"
 #include "gazebo/gui/building/FloorItem.hh"
-#include "gazebo/gui/building/LineSegmentItem.hh"
-#include "gazebo/gui/building/PolylineItem.hh"
-#include "gazebo/gui/building/WallItem.hh"
+#include "gazebo/gui/building/GrabberHandle.hh"
+#include "gazebo/gui/building/WallSegmentItem.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/LevelInspectorDialog.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
@@ -47,19 +47,19 @@ EditorView::EditorView(QWidget *_parent)
   this->elementsVisible = true;
 
   this->connections.push_back(
-  gui::editor::Events::ConnectCreateBuildingEditorItem(
-    boost::bind(&EditorView::OnCreateEditorItem, this, _1)));
-
-/*  this->connections.push_back(
-  gui::editor::Events::ConnectSaveModel(
-    boost::bind(&EditorView::OnSaveModel, this, _1, _2)));*/
-
-/*  this->connections.push_back(
-  gui::editor::Events::ConnectDone(
-    boost::bind(&EditorView::OnDone, this)));*/
+      gui::editor::Events::ConnectCreateBuildingEditorItem(
+      boost::bind(&EditorView::OnCreateEditorItem, this, _1)));
 
   this->connections.push_back(
-      gui::editor::Events::ConnectDiscardBuildingModel(
+      gui::editor::Events::ConnectColorSelected(
+      boost::bind(&EditorView::OnColorSelected, this, _1)));
+
+  this->connections.push_back(
+      gui::editor::Events::ConnectTextureSelected(
+      boost::bind(&EditorView::OnTextureSelected, this, _1)));
+
+  this->connections.push_back(
+      gui::editor::Events::ConnectNewBuildingModel(
       boost::bind(&EditorView::OnDiscardModel, this)));
 
   this->connections.push_back(
@@ -121,6 +121,11 @@ EditorView::EditorView(QWidget *_parent)
 
   this->viewScale = 1.0;
   this->levelCounter = 0;
+
+  this->mouseTooltip = new QGraphicsTextItem;
+  this->mouseTooltip->setPlainText(
+      "Oops! Color and texture can only be added in the 3D view.");
+  this->mouseTooltip->setZValue(10);
 }
 
 /////////////////////////////////////////////////
@@ -168,6 +173,9 @@ void EditorView::resizeEvent(QResizeEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::contextMenuEvent(QContextMenuEvent *_event)
 {
+  if (this->drawMode == COLOR || this->drawMode == TEXTURE)
+    return;
+
   if (this->drawInProgress)
   {
     this->CancelDrawMode();
@@ -232,8 +240,8 @@ void EditorView::wheelEvent(QWheelEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::mousePressEvent(QMouseEvent *_event)
 {
-  if (!this->drawInProgress && this->drawMode != WALL
-      && (_event->button() != Qt::RightButton))
+  if (!this->drawInProgress && this->drawMode != WALL && this->drawMode != COLOR
+      && this->drawMode != TEXTURE && (_event->button() != Qt::RightButton))
   {
     QGraphicsItem *mouseItem =
         this->scene()->itemAt(this->mapToScene(_event->pos()));
@@ -253,50 +261,44 @@ void EditorView::mousePressEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::mouseReleaseEvent(QMouseEvent *_event)
 {
-  switch (this->drawMode)
+  if (this->drawMode == WALL)
   {
-    case NONE:
-      break;
-    case WALL:
-      this->DrawWall(_event->pos());
-      break;
-    case WINDOW:
-      if (this->drawInProgress)
+    this->DrawWall(_event->pos());
+  }
+  else if (this->drawMode != NONE)
+  {
+    if (this->drawInProgress)
+    {
+      if (this->drawMode == WINDOW)
       {
         this->windowList.push_back(dynamic_cast<WindowItem *>(
             this->currentMouseItem));
-        this->drawMode = NONE;
-        this->drawInProgress = false;
-        gui::editor::Events::createBuildingEditorItem(std::string());
       }
-      break;
-    case DOOR:
-      if (this->drawInProgress)
+      else if (this->drawMode == DOOR)
       {
         this->doorList.push_back(dynamic_cast<DoorItem *>(
             this->currentMouseItem));
-        this->drawMode = NONE;
-        this->drawInProgress = false;
-        gui::editor::Events::createBuildingEditorItem(std::string());
       }
-      break;
-    case STAIRS:
-      if (this->drawInProgress)
+      else if (this->drawMode == STAIRS)
       {
-        this->stairsList.push_back(dynamic_cast<StairsItem *>(
-            this->currentMouseItem));
+        StairsItem *stairsItem = dynamic_cast<StairsItem *>(
+            this->currentMouseItem);
+        stairsItem->Set3dTexture(QString(""));
+        stairsItem->Set3dColor(Qt::white);
+        this->stairsList.push_back(stairsItem);
         if ((this->currentLevel) < static_cast<int>(floorList.size()))
         {
-          EditorItem *item = dynamic_cast<EditorItem *>(this->currentMouseItem);
-          this->buildingMaker->AttachManip(this->itemToVisualMap[item],
+          this->buildingMaker->AttachManip(this->itemToVisualMap[stairsItem],
               this->itemToVisualMap[floorList[this->currentLevel]]);
         }
-        this->drawMode = NONE;
-        this->drawInProgress = false;
-        gui::editor::Events::createBuildingEditorItem(std::string());
       }
-    default:
-      break;
+      dynamic_cast<EditorItem *>(this->currentMouseItem)->
+          SetHighlighted(false);
+
+      this->drawMode = NONE;
+      this->drawInProgress = false;
+      gui::editor::Events::createBuildingEditorItem(std::string());
+    }
   }
 
   if (!this->drawInProgress)
@@ -314,51 +316,80 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
       break;
     case WALL:
     {
-      WallItem *wallItem = dynamic_cast<WallItem *>(this->currentMouseItem);
-      if (this->drawInProgress && wallItem)
+      WallSegmentItem *wallSegmentItem = dynamic_cast<WallSegmentItem *>(
+          this->currentMouseItem);
+      if (this->drawInProgress && wallSegmentItem)
       {
-        this->snapToCloseWall =false;
-        if (wallItem->GetVertexCount() >= 3)
+        this->snapToGrabber = false;
+        this->snapGrabberOther = NULL;
+        this->snapGrabberCurrent = NULL;
+
+        QPointF p1 = wallSegmentItem->line().p1();
+        QPointF p2 = this->mapToScene(_event->pos());
+        QPointF pf;
+        pf = p2;
+
+        if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
         {
-          // snap end point to initial start point
-          LineSegmentItem *segment = wallItem->GetSegment(0);
-          QPointF firstPoint = segment->mapToScene(segment->line().p1());
-          QPointF currentPoint = this->mapToScene(_event->pos());
           double distanceToClose = 30;
-          if (QVector2D(currentPoint - firstPoint).length() <= distanceToClose)
+
+          // Snap to other walls' points
+          QList<QGraphicsItem *> itemsList = this->scene()->items(QRectF(
+              QPointF(p2.x() - distanceToClose/2, p2.y() - distanceToClose/2),
+              QPointF(p2.x() + distanceToClose/2, p2.y() + distanceToClose/2)));
+          for (QList<QGraphicsItem *>::iterator it = itemsList.begin();
+              it  != itemsList.end(); ++it)
           {
-            wallItem->SetVertexPosition(wallItem->GetVertexCount()-1,
-                firstPoint);
-            this->snapToCloseWall = true;
+            WallSegmentItem *anotherWall = dynamic_cast<WallSegmentItem *>
+                (*it);
+            if (anotherWall && anotherWall != wallSegmentItem)
+            {
+              if (QVector2D(p2 - anotherWall->GetStartPoint()).length() <=
+                  distanceToClose)
+              {
+                pf = anotherWall->GetStartPoint();
+                this->snapGrabberOther = anotherWall->grabbers[0];
+                this->snapGrabberCurrent = wallSegmentItem->grabbers[1];
+                this->snapToGrabber = true;
+                break;
+              }
+              else if (QVector2D(p2 - anotherWall->GetEndPoint()).length() <=
+                  distanceToClose)
+              {
+                pf = anotherWall->GetEndPoint();
+                this->snapGrabberOther = anotherWall->grabbers[1];
+                this->snapGrabberCurrent = wallSegmentItem->grabbers[1];
+                this->snapToGrabber = true;
+                break;
+              }
+            }
+          }
+
+          if (!this->snapToGrabber)
+          {
+            // Snap to angular increments
+            QLineF newLine(p1, p2);
+            double angle = GZ_DTOR(QLineF(p1, p2).angle());
+            double range = GZ_DTOR(SegmentItem::SnapAngle);
+            int angleIncrement = angle / range;
+
+            if ((angle - range*angleIncrement) > range*0.5)
+              angleIncrement++;
+            angle = -range*angleIncrement;
+
+            // Snap to length increments
+            double newLength = newLine.length();
+            double lengthIncrement = SegmentItem::SnapLength /
+                wallSegmentItem->GetScale();
+            newLength  = round(newLength/lengthIncrement)*lengthIncrement-
+                wallSegmentItem->GetThickness();
+
+            pf.setX(p1.x() + qCos(angle)*newLength);
+            pf.setY(p1.y() + qSin(angle)*newLength);
           }
         }
-        if (!snapToCloseWall)
-        {
-          // snap walls to 0/90/180 degrees
-          LineSegmentItem *segment = wallItem->GetSegment(
-              wallItem->GetSegmentCount()-1);
-          QPointF p1 = segment->mapToScene(segment->line().p1());
-          QPointF p2 = this->mapToScene(_event->pos());
-          QLineF line(p1, p2);
-          double angle = line.angle();
-          double range = 10;
-          if ((angle < range) || (angle > (360 - range)) ||
-              ((angle > (180 - range)) && (angle < (180 + range))))
-          {
-            wallItem->SetVertexPosition(wallItem->GetVertexCount()-1,
-                QPointF(p2.x(), p1.y()));
-          }
-          else if (((angle > (90 - range)) && (angle < (90 + range))) ||
-              ((angle > (270 - range)) && (angle < (270 + range))))
-          {
-            wallItem->SetVertexPosition(wallItem->GetVertexCount()-1,
-                QPointF(p1.x(), p2.y()));
-          }
-          else
-          {
-            wallItem->SetVertexPosition(wallItem->GetVertexCount()-1, p2);
-          }
-        }
+        wallSegmentItem->SetEndPoint(pf);
+        wallSegmentItem->Update();
       }
       QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
       break;
@@ -372,6 +403,16 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
     case STAIRS:
       this->DrawStairs(_event->pos());
       break;
+    case COLOR:
+    case TEXTURE:
+    {
+      if (!this->mouseTooltip->scene())
+        this->scene()->addItem(this->mouseTooltip);
+
+      this->mouseTooltip->setPos(this->mapToScene(_event->pos()) +
+          QPointF(15, 15));
+      break;
+    }
     default:
       break;
   }
@@ -386,13 +427,13 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
   {
     if (grabber->parentItem())
     {
-      LineSegmentItem *wallSegment =
-            dynamic_cast<LineSegmentItem *>(grabber->parentItem());
-      if (wallSegment)
+      WallSegmentItem *wallSegmentItem =
+            dynamic_cast<WallSegmentItem *>(grabber->parentItem());
+      if (wallSegmentItem)
       {
-        QLineF segmentLine(wallSegment->line());
-        segmentLine.setP1(wallSegment->mapToScene(segmentLine.p1()));
-        segmentLine.setP2(wallSegment->mapToScene(segmentLine.p2()));
+        QLineF segmentLine(wallSegmentItem->line());
+        segmentLine.setP1(wallSegmentItem->mapToScene(segmentLine.p1()));
+        segmentLine.setP2(wallSegmentItem->mapToScene(segmentLine.p2()));
         QPointF mousePoint = this->mapToScene(_event->pos());
         QPointF deltaLine = segmentLine.p2() - segmentLine.p1();
         QPointF deltaMouse = mousePoint - segmentLine.p1();
@@ -407,8 +448,11 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         if (distance > 30 || t > 1.0 || t < 0.0)
         {
           editorItem->setParentItem(NULL);
+          wallSegmentItem->setZValue(wallSegmentItem->zValueIdle);
+          editorItem->SetPositionOnWall(0);
+          editorItem->SetAngleOnWall(0);
           this->buildingMaker->DetachManip(this->itemToVisualMap[editorItem],
-                this->itemToVisualMap[wallSegment]);
+                this->itemToVisualMap[wallSegmentItem]);
           editorItem->SetRotation(editorItem->GetRotation()
             - this->mousePressRotation);
           editorItem->SetPosition(mousePoint);
@@ -416,17 +460,17 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         else
         {
           QPointF closest(segmentLine.p1() + t*deltaLine);
-          grabber->setPos(wallSegment->mapFromScene(closest));
-          grabber->setRotation(wallSegment->rotation());
+          grabber->setPos(wallSegmentItem->mapFromScene(closest));
+          grabber->setRotation(wallSegmentItem->rotation());
 
           QPointF absPositionOnWall = grabber->pos() -
-              wallSegment->line().p1();
+              wallSegmentItem->line().p1();
           double positionLength = sqrt(absPositionOnWall.x()*
                                        absPositionOnWall.x() +
                                        absPositionOnWall.y()*
                                        absPositionOnWall.y());
           editorItem->SetPositionOnWall(positionLength /
-              wallSegment->line().length());
+              wallSegmentItem->line().length());
         }
         return;
       }
@@ -437,29 +481,31 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
           grabber, Qt::IntersectsItemBoundingRect);
       for (int i = 0; i < overlaps.size(); ++i)
       {
-        LineSegmentItem *wallSegment =
-            dynamic_cast<LineSegmentItem *>(overlaps[i]);
-        if (wallSegment)
+        WallSegmentItem *wallSegmentItem =
+            dynamic_cast<WallSegmentItem *>(overlaps[i]);
+        if (wallSegmentItem)
         {
           QPointF scenePos =  grabber->scenePos();
-          if (wallSegment->contains(wallSegment->mapFromScene(scenePos)))
+          if (wallSegmentItem->contains(wallSegmentItem->mapFromScene(
+              scenePos)))
           {
-            editorItem->setParentItem(wallSegment);
+            editorItem->setParentItem(wallSegmentItem);
+            wallSegmentItem->setZValue(wallSegmentItem->zValueIdle+5);
             this->buildingMaker->AttachManip(
                 this->itemToVisualMap[editorItem],
-                this->itemToVisualMap[wallSegment]);
-            editorItem->SetPosition(wallSegment->mapFromScene(scenePos));
-            this->mousePressRotation = -wallSegment->line().angle();
+                this->itemToVisualMap[wallSegmentItem]);
+            editorItem->SetPosition(wallSegmentItem->mapFromScene(scenePos));
+            this->mousePressRotation = -wallSegmentItem->line().angle();
             editorItem->SetRotation(this->mousePressRotation);
 
             QPointF absPositionOnWall = editorItem->pos() -
-                wallSegment->line().p1();
+                wallSegmentItem->line().p1();
             double positionLength = sqrt(absPositionOnWall.x()*
                                          absPositionOnWall.x() +
                                          absPositionOnWall.y()*
                                          absPositionOnWall.y());
             editorItem->SetPositionOnWall(positionLength /
-                wallSegment->line().length());
+                wallSegmentItem->line().length());
             return;
           }
         }
@@ -470,6 +516,16 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
   if (!drawInProgress)
   {
     QGraphicsView::mouseMoveEvent(_event);
+  }
+}
+
+/////////////////////////////////////////////////
+void EditorView::leaveEvent(QEvent */*_event*/)
+{
+  if (this->mouseTooltip &&
+      this->scene()->items().contains(this->mouseTooltip))
+  {
+    this->scene()->removeItem(this->mouseTooltip);
   }
 }
 
@@ -497,6 +553,9 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
   }
   else if (_event->key() == Qt::Key_Escape)
   {
+    if (this->mouseTooltip &&
+        this->scene()->items().contains(this->mouseTooltip))
+      this->scene()->removeItem(this->mouseTooltip);
     this->CancelDrawMode();
     gui::editor::Events::createBuildingEditorItem(std::string());
     this->releaseKeyboard();
@@ -508,26 +567,28 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
 {
   if (this->drawMode == WALL)
   {
-    WallItem* wallItem = dynamic_cast<WallItem*>(this->currentMouseItem);
-    wallItem->PopEndPoint();
-    if (this->snapToCloseWall)
-    {
-      wallItem->ClosePath();
-      this->snapToCloseWall = false;
-    }
+    WallSegmentItem *wallSegmentItem = dynamic_cast<WallSegmentItem *>(
+        this->currentMouseItem);
+    this->itemToVisualMap.erase(wallSegmentItem);
 
-    wallList.push_back(wallItem);
-    // this->buildingMaker->RemoveWall(this->lastWallSegmentName);
-    // this->lastWallSegmentName = "";
-    if (wallItem->GetLevel() > 0)
-      floorList[wallItem->GetLevel()-1]->AttachWall(wallItem);
+    this->UnlinkGrabbers(wallSegmentItem->grabbers[0]);
 
+    this->scene()->removeItem(this->currentMouseItem);
+    delete this->currentMouseItem;
+
+    this->snapToGrabber = false;
+    this->snapGrabberOther = NULL;
+    this->snapGrabberCurrent = NULL;
     this->currentMouseItem = NULL;
     this->drawMode = NONE;
     this->drawInProgress = false;
     this->releaseKeyboard();
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
     gui::editor::Events::createBuildingEditorItem(std::string());
+  }
+  else if (this->drawMode == COLOR || this->drawMode == TEXTURE)
+  {
+    return;
   }
   else
   {
@@ -545,11 +606,36 @@ void EditorView::DeleteItem(EditorItem *_item)
   if (!_item)
     return;
 
-  if (_item->GetType() == "Wall")
+  // To make holes in the final model, windows and doors are attached to walls,
+  // and stairs are attached to floors above them.
+  // Detach 3D manip, but 2D items may remain as children.
+  this->buildingMaker->DetachAllChildren(this->itemToVisualMap[_item]);
+
+  _item->SetHighlighted(false);
+
+  if (_item->GetType() == "WallSegment")
   {
-    this->wallList.erase(std::remove(this->wallList.begin(),
-        this->wallList.end(), dynamic_cast<WallItem *>(_item)),
-        this->wallList.end());
+    WallSegmentItem *wallSegmentItem = dynamic_cast<WallSegmentItem *>(_item);
+
+    // Delete item's child doors and windows before deleting item
+    for (int i = wallSegmentItem->childItems().size()-1; i >=0; --i)
+    {
+      // WallSegmentItems have other children besides RectItems
+      RectItem *rectItem = dynamic_cast<RectItem *>(
+          wallSegmentItem->childItems().at(i));
+
+      if (rectItem)
+      {
+        this->DeleteItem(rectItem);
+      }
+    }
+
+    this->UnlinkGrabbers(wallSegmentItem->grabbers[0]);
+    this->UnlinkGrabbers(wallSegmentItem->grabbers[1]);
+
+    this->wallSegmentList.erase(std::remove(this->wallSegmentList.begin(),
+        this->wallSegmentList.end(), dynamic_cast<WallSegmentItem *>(_item)),
+        this->wallSegmentList.end());
   }
   else if (_item->GetType() == "Window")
   {
@@ -576,69 +662,112 @@ void EditorView::DeleteItem(EditorItem *_item)
         this->floorList.end());
   }
 
-  if (_item->GetType() == "Line")
-  {
-    QGraphicsItem *qItem = dynamic_cast<QGraphicsItem *>(_item);
-    QGraphicsItem *itemParent = qItem->parentItem();
-    this->wallList.erase(std::remove(this->wallList.begin(),
-        this->wallList.end(), dynamic_cast<WallItem *>(itemParent)),
-        this->wallList.end());
-    this->itemToVisualMap.erase(_item);
-    delete dynamic_cast<WallItem *>(itemParent);
-  }
-  else
-  {
-    this->itemToVisualMap.erase(_item);
-    delete _item;
-  }
+  this->itemToVisualMap.erase(_item);
+  delete _item;
 }
 
 /////////////////////////////////////////////////
 void EditorView::DrawWall(const QPoint &_pos)
 {
-  WallItem *wallItem = NULL;
+  WallSegmentItem *wallSegmentItem = NULL;
+
+  // First point on the chain
   if (!this->drawInProgress)
   {
     QPointF pointStart = mapToScene(_pos);
     QPointF pointEnd = pointStart + QPointF(1, 0);
 
-    wallItem = new WallItem(pointStart, pointEnd, this->levelDefaultHeight);
-    wallItem->SetLevel(this->currentLevel);
-    wallItem->SetLevelBaseHeight(this->levels[this->currentLevel]->baseHeight);
-    this->scene()->addItem(wallItem);
-    this->currentMouseItem = wallItem;
+    wallSegmentItem = new WallSegmentItem(pointStart, pointEnd,
+        this->levelDefaultHeight);
+
+    if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
+    {
+      double distanceToClose = 30;
+
+      // Snap to other walls' points
+      QList<QGraphicsItem *> itemsList = this->scene()->items(QRectF(
+          QPointF(pointStart.x() - distanceToClose/2,
+                  pointStart.y() - distanceToClose/2),
+          QPointF(pointStart.x() + distanceToClose/2,
+                  pointStart.y() + distanceToClose/2)));
+      for (QList<QGraphicsItem *>::iterator it = itemsList.begin();
+          it  != itemsList.end(); ++it)
+      {
+        WallSegmentItem *anotherWall = dynamic_cast<WallSegmentItem *>(*it);
+        if (anotherWall)
+        {
+          if (QVector2D(pointStart - anotherWall->GetStartPoint()).length()
+              <= distanceToClose)
+          {
+            wallSegmentItem->SetStartPoint(anotherWall->GetStartPoint());
+            this->LinkGrabbers(anotherWall->grabbers[0],
+                wallSegmentItem->grabbers[0]);
+            break;
+          }
+          else if (QVector2D(pointStart - anotherWall->GetEndPoint()).length()
+              <= distanceToClose)
+          {
+            wallSegmentItem->SetStartPoint(anotherWall->GetEndPoint());
+            this->LinkGrabbers(anotherWall->grabbers[1],
+                wallSegmentItem->grabbers[0]);
+            break;
+          }
+        }
+      }
+    }
+
+    wallSegmentItem->SetLevel(this->currentLevel);
+    wallSegmentItem->SetLevelBaseHeight(this->levels[this->currentLevel]->
+        baseHeight);
+    this->scene()->addItem(wallSegmentItem);
+    this->currentMouseItem = wallSegmentItem;
     this->drawInProgress = true;
   }
+  // Subsequent points get linked in the chain
   else
   {
-    wallItem = dynamic_cast<WallItem *>(this->currentMouseItem);
-    if (wallItem)
+    // Snap currently finishing segment to a grabber in scene
+    if (this->snapToGrabber && this->snapGrabberOther &&
+        this->snapGrabberCurrent)
     {
-      LineSegmentItem *segment = wallItem->GetSegment(
-          wallItem->GetSegmentCount()-1);
-      wallItem->AddPoint(segment->mapToScene(segment->line().p2())
-          + QPointF(1, 0));
+      this->LinkGrabbers(this->snapGrabberOther, this->snapGrabberCurrent);
     }
+
+    // Reset and start a new segment
+    this->snapToGrabber = false;
+    this->snapGrabberOther = NULL;
+    this->snapGrabberCurrent = NULL;
+
+    wallSegmentItem = dynamic_cast<WallSegmentItem*>(this->currentMouseItem);
+    wallSegmentItem->Set3dTexture(QString(""));
+    wallSegmentItem->Set3dColor(Qt::white);
+    wallSegmentItem->SetHighlighted(false);
+    wallSegmentList.push_back(wallSegmentItem);
+    if (wallSegmentItem->GetLevel() > 0)
+    {
+      floorList[wallSegmentItem->GetLevel()-1]->AttachWallSegment(
+          wallSegmentItem);
+    }
+
+    // Start from previous segment's end
+    QPointF newPointStart = wallSegmentItem->GetEndPoint();
+    QPointF newPointEnd = newPointStart + QPointF(1, 0);
+    GrabberHandle *grabberStart = wallSegmentItem->grabbers[1];
+
+    wallSegmentItem = new WallSegmentItem(newPointStart,
+        newPointEnd, this->levelDefaultHeight);
+    wallSegmentItem->SetLevel(this->currentLevel);
+    wallSegmentItem->SetLevelBaseHeight(this->levels[
+       this->currentLevel]->baseHeight);
+    this->scene()->addItem(wallSegmentItem);
+    this->currentMouseItem = wallSegmentItem;
+
+    this->LinkGrabbers(grabberStart, wallSegmentItem->grabbers[0]);
   }
 
-  if (wallItem)
-  {
-    LineSegmentItem *segment = wallItem->GetSegment(
-        wallItem->GetSegmentCount()-1);
-
-    QVector3D segmentPosition = segment->GetScenePosition();
-    segmentPosition.setZ(wallItem->GetLevelBaseHeight() + segmentPosition.z());
-    QVector3D segmentSize = segment->GetSize();
-    segmentSize.setZ(wallItem->GetHeight());
-    std::string wallSegmentName = this->buildingMaker->AddWall(
-        segmentSize, segmentPosition, segment->GetSceneRotation());
-    // this->lastWallSegmentName = wallSegmentName;
-    this->buildingMaker->ConnectItem(wallSegmentName, segment);
-    this->buildingMaker->ConnectItem(wallSegmentName, wallItem);
-    this->itemToVisualMap[segment] = wallSegmentName;
-    if (segment->GetIndex() == 0)
-      wallItem->SetName(wallSegmentName);
-  }
+  // 3D counterpart
+  if (wallSegmentItem)
+    this->Create3DVisual(wallSegmentItem);
 }
 
 /////////////////////////////////////////////////
@@ -653,14 +782,7 @@ void EditorView::DrawWindow(const QPoint &_pos)
         this->levels[this->currentLevel]->baseHeight);
     this->scene()->addItem(windowItem);
     this->currentMouseItem = windowItem;
-
-    QVector3D windowPosition = windowItem->GetScenePosition();
-    windowPosition.setZ(windowItem->GetLevelBaseHeight() + windowPosition.z());
-    std::string windowName = this->buildingMaker->AddWindow(
-        windowItem->GetSize(), windowPosition, windowItem->GetSceneRotation());
-    this->buildingMaker->ConnectItem(windowName, windowItem);
-    this->itemToVisualMap[windowItem] = windowName;
-    windowItem->SetName(windowName);
+    this->Create3DVisual(windowItem);
     this->drawInProgress = true;
   }
   windowItem = dynamic_cast<WindowItem*>(this->currentMouseItem);
@@ -682,13 +804,7 @@ void EditorView::DrawDoor(const QPoint &_pos)
     doorItem->SetLevelBaseHeight(this->levels[this->currentLevel]->baseHeight);
     this->scene()->addItem(doorItem);
     this->currentMouseItem = doorItem;
-    QVector3D doorPosition = doorItem->GetScenePosition();
-    doorPosition.setZ(doorItem->GetLevelBaseHeight() + doorPosition.z());
-    std::string doorName = this->buildingMaker->AddDoor(
-        doorItem->GetSize(), doorPosition, doorItem->GetSceneRotation());
-    this->buildingMaker->ConnectItem(doorName, doorItem);
-    this->itemToVisualMap[doorItem] = doorName;
-    doorItem->SetName(doorName);
+    this->Create3DVisual(doorItem);
     this->drawInProgress = true;
   }
   doorItem = dynamic_cast<DoorItem*>(currentMouseItem);
@@ -712,15 +828,7 @@ void EditorView::DrawStairs(const QPoint &_pos)
     this->scene()->addItem(stairsItem);
     this->currentMouseItem = stairsItem;
 
-    QVector3D stairsPosition = stairsItem->GetScenePosition();
-    stairsPosition.setZ(stairsItem->GetLevelBaseHeight() + stairsPosition.z());
-    std::string stairsName = this->buildingMaker->AddStairs(
-        stairsItem->GetSize(), stairsPosition, stairsItem->GetSceneRotation(),
-        stairsItem->GetSteps());
-
-    this->buildingMaker->ConnectItem(stairsName, stairsItem);
-    this->itemToVisualMap[stairsItem] = stairsName;
-    stairsItem->SetName(stairsName);
+    this->Create3DVisual(stairsItem);
     this->drawInProgress = true;
   }
   stairsItem = dynamic_cast<StairsItem*>(this->currentMouseItem);
@@ -734,24 +842,48 @@ void EditorView::DrawStairs(const QPoint &_pos)
 /////////////////////////////////////////////////
 void EditorView::Create3DVisual(EditorItem *_item)
 {
+  QVector3D itemPosition = _item->GetScenePosition();
+  itemPosition.setZ(_item->GetLevelBaseHeight() + itemPosition.z());
+  QVector3D itemSize = _item->GetSize();
+  std::string itemName;
+
   if (_item->GetType() == "Stairs")
   {
     StairsItem *stairsItem = dynamic_cast<StairsItem *>(_item);
-    QVector3D stairsPosition = stairsItem->GetScenePosition();
-    stairsPosition.setZ(stairsItem->GetLevelBaseHeight() + stairsPosition.z());
-    std::string stairsName = this->buildingMaker->AddStairs(
-        stairsItem->GetSize(), stairsPosition, stairsItem->GetSceneRotation(),
+    itemName = this->buildingMaker->AddStairs(
+        itemSize, itemPosition, _item->GetSceneRotation(),
         stairsItem->GetSteps());
-    this->buildingMaker->ConnectItem(stairsName, stairsItem);
-    this->itemToVisualMap[stairsItem] = stairsName;
-    stairsItem->SetName(stairsName);
     if (stairsItem->GetLevel() < static_cast<int>(floorList.size()))
     {
-      this->buildingMaker->AttachManip(stairsName,
+      this->buildingMaker->AttachManip(itemName,
           this->itemToVisualMap[floorList[stairsItem->GetLevel()]]);
     }
   }
-  // TODO add implementation for other times
+  else if (_item->GetType() == "WallSegment")
+  {
+    WallSegmentItem *wallSegmentItem = dynamic_cast<WallSegmentItem *>(_item);
+    itemSize.setZ(wallSegmentItem->GetHeight());
+    itemName = this->buildingMaker->AddWall(
+        itemSize, itemPosition, _item->GetSceneRotation());
+  }
+  else if (_item->GetType() == "Window")
+  {
+    itemName = this->buildingMaker->AddWindow(
+        itemSize, itemPosition, _item->GetSceneRotation());
+  }
+  else if (_item->GetType() == "Door")
+  {
+    itemName = this->buildingMaker->AddDoor(
+        itemSize, itemPosition, _item->GetSceneRotation());
+  }
+  else if (_item->GetType() == "Floor")
+  {
+    itemName = this->buildingMaker->AddFloor(
+        itemSize, _item->GetScenePosition(), 0);
+  }
+  this->buildingMaker->ConnectItem(itemName, _item);
+  this->itemToVisualMap[_item] = itemName;
+  _item->SetName(itemName);
 }
 
 /////////////////////////////////////////////////
@@ -828,9 +960,31 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
+void EditorView::OnColorSelected(QColor _color)
+{
+  if (!_color.isValid())
+    return;
+
+  this->CancelDrawMode();
+  this->scene()->clearSelection();
+  this->drawMode = COLOR;
+}
+
+/////////////////////////////////////////////////
+void EditorView::OnTextureSelected(QString _texture)
+{
+  if (_texture == QString(""))
+    return;
+
+  this->CancelDrawMode();
+  this->scene()->clearSelection();
+  this->drawMode = TEXTURE;
+}
+
+/////////////////////////////////////////////////
 void EditorView::OnDiscardModel()
 {
-  this->wallList.clear();
+  this->wallSegmentList.clear();
   this->windowList.clear();
   this->doorList.clear();
   this->stairsList.clear();
@@ -866,7 +1020,7 @@ void EditorView::OnDiscardModel()
 /////////////////////////////////////////////////
 void EditorView::OnAddLevel()
 {
-  if (this->wallList.empty())
+  if (this->wallSegmentList.empty())
   {
     QMessageBox msgBox;
     msgBox.setText("Create new levels after adding walls.");
@@ -892,13 +1046,14 @@ void EditorView::OnAddLevel()
   this->levels.push_back(newLevel);
   gui::editor::Events::updateLevelWidget(this->currentLevel, levelName);
 
-  std::vector<WallItem *>::iterator wallIt = this->wallList.begin();
+  std::vector<WallSegmentItem *>::iterator wallIt =
+      this->wallSegmentList.begin();
   double wallHeight = (*wallIt)->GetHeight() + (*wallIt)->GetLevelBaseHeight();
   double maxHeight = wallHeight;
   int wallLevel = 0;
 
   ++wallIt;
-  for (wallIt; wallIt != this->wallList.end(); ++wallIt)
+  for (wallIt; wallIt != this->wallSegmentList.end(); ++wallIt)
   {
     wallHeight = (*wallIt)->GetHeight() + (*wallIt)->GetLevelBaseHeight();
     if ( wallHeight > maxHeight)
@@ -910,51 +1065,75 @@ void EditorView::OnAddLevel()
   newLevel->baseHeight = maxHeight;
 
   FloorItem *floorItem = new FloorItem();
-  std::vector<WallItem *> newWalls;
-  for (std::vector<WallItem *>::iterator it = wallList.begin();
-      it  != this->wallList.end(); ++it)
+  this->levels[this->currentLevel]->floorItem = floorItem;
+  std::vector<WallSegmentItem *> newWalls;
+  std::map<WallSegmentItem *, WallSegmentItem *> clonedWallMap;
+  for (std::vector<WallSegmentItem *>::iterator it = wallSegmentList.begin();
+      it  != this->wallSegmentList.end(); ++it)
   {
     if ((*it)->GetLevel() != wallLevel)
       continue;
 
-    WallItem *wallItem = (*it)->Clone();
-    wallItem->SetLevel(newLevelNum);
-    wallItem->SetLevelBaseHeight(this->levels[this->currentLevel]->baseHeight);
-    this->scene()->addItem(wallItem);
-    newWalls.push_back(wallItem);
-    for (unsigned int j = 0; j < wallItem->GetSegmentCount(); ++j)
-    {
-      LineSegmentItem *segment = wallItem->GetSegment(j);
-      QVector3D segmentSize = segment->GetSize();
-      segmentSize.setZ(wallItem->GetHeight());
-      QVector3D segmentPosition = segment->GetScenePosition();
-      segmentPosition.setZ(wallItem->GetLevelBaseHeight()
-          + segmentPosition.z());
-      std::string wallSegmentName = this->buildingMaker->AddWall(
-          segmentSize, segmentPosition, segment->GetSceneRotation());
-      this->buildingMaker->ConnectItem(wallSegmentName, segment);
-      this->buildingMaker->ConnectItem(wallSegmentName, wallItem);
-      this->itemToVisualMap[segment] = wallSegmentName;
-    }
-    floorItem->AttachWall(wallItem);
+    WallSegmentItem *wallSegmentItem = (*it)->Clone();
+    clonedWallMap[(*it)] = wallSegmentItem;
+    wallSegmentItem->SetLevel(newLevelNum);
+    wallSegmentItem->SetLevelBaseHeight(this->levels[this->currentLevel]->
+        baseHeight);
+    this->scene()->addItem(wallSegmentItem);
+    newWalls.push_back(wallSegmentItem);
+
+    this->Create3DVisual(wallSegmentItem);
+
+    floorItem->AttachWallSegment(wallSegmentItem);
+    wallSegmentItem->Set3dTexture(QString(""));
+    wallSegmentItem->Set3dColor(Qt::white);
+    wallSegmentItem->SetHighlighted(false);
   }
-  this->wallList.insert(this->wallList.end(), newWalls.begin(),
+
+  // Clone linked grabber relations
+  typedef std::map<WallSegmentItem *, WallSegmentItem *>::iterator clonedIt;
+  for (clonedIt iterator = clonedWallMap.begin(); iterator !=
+      clonedWallMap.end(); ++iterator)
+  {
+    WallSegmentItem *oldWall = iterator->first;
+    WallSegmentItem *newWall = iterator->second;
+
+    // start / end
+    for (int g = 0; g < 2; ++g)
+    {
+      for (unsigned int i = 0; i < oldWall->grabbers[g]->linkedGrabbers.size();
+          ++i)
+      {
+        WallSegmentItem *parentItem = dynamic_cast<WallSegmentItem*>(
+            oldWall->grabbers[g]->linkedGrabbers[i]->parentItem());
+        int index = oldWall->grabbers[g]->linkedGrabbers[i]->GetIndex();
+
+        newWall->grabbers[g]->linkedGrabbers.push_back(
+            clonedWallMap[parentItem]->grabbers[index]);
+      }
+    }
+  }
+
+  this->wallSegmentList.insert(this->wallSegmentList.end(), newWalls.begin(),
       newWalls.end());
 
   floorItem->SetLevel(this->currentLevel);
   floorItem->SetLevelBaseHeight(this->levels[this->currentLevel]->baseHeight);
-  std::string floorName = this->buildingMaker->AddFloor(
-      floorItem->GetSize(), floorItem->GetScenePosition(), 0);
+  this->Create3DVisual(floorItem);
   for (std::vector<StairsItem *>::iterator it = this->stairsList.begin();
       it != this->stairsList.end(); ++it)
   {
     if ((*it)->GetLevel() == (newLevelNum - 1))
-      buildingMaker->AttachManip(this->itemToVisualMap[(*it)], floorName);
+    {
+      buildingMaker->AttachManip(this->itemToVisualMap[(*it)],
+          floorItem->GetName());
+    }
   }
-  this->buildingMaker->ConnectItem(floorName, floorItem);
-  this->itemToVisualMap[floorItem] = floorName;
   this->scene()->addItem(floorItem);
   this->floorList.push_back(floorItem);
+  floorItem->Set3dTexture(QString(""));
+  floorItem->Set3dColor(Qt::white);
+  floorItem->SetHighlighted(false);
 }
 
 /////////////////////////////////////////////////
@@ -970,6 +1149,7 @@ void EditorView::DeleteLevel(int _level)
       || _level >= static_cast<int>(this->levels.size()))
     return;
 
+  // Delete current level and move to level below or above
   int newLevelIndex = _level - 1;
   if (newLevelIndex < 0)
     newLevelIndex = _level + 1;
@@ -1033,8 +1213,9 @@ void EditorView::DeleteLevel(int _level)
       (*it)->FloorChanged();
     }
   }
-  for (std::vector<WallItem *>::iterator it = this->wallList.begin();
-      it != this->wallList.end(); ++it)
+  for (std::vector<WallSegmentItem *>::iterator it =
+      this->wallSegmentList.begin();
+      it != this->wallSegmentList.end(); ++it)
   {
     if ((*it)->GetLevel() == _level)
       toBeDeleted.push_back(*it);
@@ -1042,7 +1223,7 @@ void EditorView::DeleteLevel(int _level)
     {
       (*it)->SetLevel((*it)->GetLevel()-1);
       (*it)->SetLevelBaseHeight((*it)->GetLevelBaseHeight()-deletedHeight);
-      (*it)->WallChanged();
+      (*it)->WallSegmentChanged();
     }
   }
 
@@ -1074,6 +1255,9 @@ void EditorView::DeleteLevel(int _level)
 /////////////////////////////////////////////////
 void EditorView::OnChangeLevel(int _level)
 {
+  if (_level < 0)
+    return;
+
   if (this->levels[this->currentLevel]->backgroundPixmap)
     this->levels[this->currentLevel]->backgroundPixmap->setVisible(false);
 
@@ -1092,6 +1276,18 @@ void EditorView::OnChangeLevel(int _level)
 void EditorView::OnOpenLevelInspector()
 {
   this->levelInspector->SetLevelName(this->levels[this->currentLevel]->name);
+  FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
+  if (floorItem)
+  {
+    this->levelInspector->floorWidget->show();
+    this->levelInspector->SetFloorColor(floorItem->Get3dColor());
+    this->levelInspector->SetFloorTexture(floorItem->Get3dTexture());
+  }
+  else
+  {
+    this->levelInspector->floorWidget->hide();
+  }
+  this->levelInspector->move(QCursor::pos());
   this->levelInspector->show();
 }
 
@@ -1103,6 +1299,14 @@ void EditorView::OnLevelApply()
 
   std::string newLevelName = dialog->GetLevelName();
   this->levels[this->currentLevel]->name = newLevelName;
+  FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
+  if (floorItem)
+  {
+    floorItem->Set3dTexture(dialog->GetFloorTexture());
+    floorItem->Set3dColor(dialog->GetFloorColor());
+    floorItem->Set3dTransparency(0.4);
+    floorItem->FloorChanged();
+  }
   gui::editor::Events::updateLevelWidget(this->currentLevel, newLevelName);
 }
 
@@ -1112,34 +1316,22 @@ void EditorView::CancelDrawMode()
   if (this->drawMode != NONE)
   {
     if (this->currentMouseItem)
-      {
+    {
       EditorItem *item = dynamic_cast<EditorItem *>(this->currentMouseItem);
       this->itemToVisualMap.erase(item);
-      if (drawMode == WALL)
+
+      WallSegmentItem *wallSegmentItem = dynamic_cast<WallSegmentItem *>(item);
+
+      if (wallSegmentItem)
       {
-        WallItem* wallItem = dynamic_cast<WallItem *>(this->currentMouseItem);
-        wallItem->PopEndPoint();
-        if (wallItem->GetVertexCount() >= 2)
-        {
-          wallList.push_back(wallItem);
-          // this->buildingMaker->RemoveWall(this->lastWallSegmentName);
-          // this->lastWallSegmentName = "";
-          if (wallItem->GetLevel() > 0)
-            floorList[wallItem->GetLevel()-1]->AttachWall(wallItem);
-        }
-        else
-        {
-          this->scene()->removeItem(this->currentMouseItem);
-          delete wallItem;
-        }
+        this->UnlinkGrabbers(wallSegmentItem->grabbers[0]);
       }
-      else
-      {
-        this->scene()->removeItem(this->currentMouseItem);
-        delete this->currentMouseItem;
-      }
+      this->scene()->removeItem(this->currentMouseItem);
+      delete this->currentMouseItem;
     }
-    this->snapToCloseWall = false;
+    this->snapToGrabber = false;
+    this->snapGrabberOther = NULL;
+    this->snapGrabberCurrent = NULL;
     this->drawMode = NONE;
     this->drawInProgress = false;
     this->currentMouseItem = NULL;
@@ -1168,8 +1360,8 @@ void EditorView::OnShowElements()
 /////////////////////////////////////////////////
 void EditorView::ShowCurrentLevelItems()
 {
-  for (std::vector<WallItem *>::iterator it = this->wallList.begin();
-      it != this->wallList.end(); ++it)
+  for (std::vector<WallSegmentItem *>::iterator it =
+      this->wallSegmentList.begin(); it != this->wallSegmentList.end(); ++it)
   {
     if ((*it)->GetLevel() != this->currentLevel)
       (*it)->setVisible(false);
@@ -1209,4 +1401,59 @@ void EditorView::ShowCurrentLevelItems()
     else
       (*it)->setVisible(this->elementsVisible);
   }
+}
+
+/////////////////////////////////////////////////
+void EditorView::LinkGrabbers(GrabberHandle *_grabber1,
+    GrabberHandle *_grabber2)
+{
+  if (_grabber1 && _grabber2 && _grabber1 != _grabber2)
+  {
+    // if _grabber2 is not yet linked to _grabber1
+    if (std::find(_grabber1->linkedGrabbers.begin(),
+                  _grabber1->linkedGrabbers.end(), _grabber2) ==
+                  _grabber1->linkedGrabbers.end())
+    {
+      // Add _grabber2 so it moves when _grabber1 is moved
+      _grabber1->linkedGrabbers.push_back(_grabber2);
+      // also link _grabber1 to all grabbers already linked to _grabber2
+      for (unsigned int i2 = 0; i2 < _grabber2->linkedGrabbers.size(); ++i2)
+      {
+        this->LinkGrabbers(_grabber1, _grabber2->linkedGrabbers[i2]);
+      }
+    }
+    // if _grabber1 is not yet linked to _grabber2
+    if (std::find(_grabber2->linkedGrabbers.begin(),
+                  _grabber2->linkedGrabbers.end(), _grabber1) ==
+                  _grabber2->linkedGrabbers.end())
+    {
+      // Add _grabber1 so it moves when _grabber2 is moved
+      _grabber2->linkedGrabbers.push_back(_grabber1);
+      // also link _grabber2 to all grabbers already linked to _grabber1
+      for (unsigned int i1 = 0; i1 < _grabber1->linkedGrabbers.size(); ++i1)
+      {
+        this->LinkGrabbers(_grabber2, _grabber1->linkedGrabbers[i1]);
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void EditorView::UnlinkGrabbers(GrabberHandle *_grabber1,
+    GrabberHandle *_grabber2)
+{
+  // If only one grabber, erase it from all grabbers it is linked
+  if (!_grabber2)
+  {
+    for (unsigned int i = 0; i < _grabber1->linkedGrabbers.size(); ++i)
+    {
+      _grabber1->linkedGrabbers[i]->linkedGrabbers.erase(
+          std::remove(_grabber1->linkedGrabbers[i]->linkedGrabbers.begin(),
+          _grabber1->linkedGrabbers[i]->linkedGrabbers.end(), _grabber1),
+          _grabber1->linkedGrabbers[i]->linkedGrabbers.end());
+    }
+  }
+
+  // TODO: add option to unlink grabbers besides when deleting one of them,
+  // perhaps using a hot-key or at the wall inspector
 }

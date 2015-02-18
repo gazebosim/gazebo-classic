@@ -3,27 +3,45 @@ include (${QT_USE_FILE})
 
 
 set (sources
+  CollisionConfig.cc
   ImportDialog.cc
   JointInspector.cc
   JointMaker.cc
+  LinkConfig.cc
+  LinkInspector.cc
   ModelCreator.cc
+  ModelData.cc
   ModelEditor.cc
   ModelEditorEvents.cc
   ModelEditorPalette.cc
+  VisualConfig.cc
 )
 
 set (qt_headers
+  CollisionConfig.hh
   ImportDialog.hh
   JointInspector.hh
   JointMaker.hh
+  LinkConfig.hh
+  LinkInspector.hh
   ModelCreator.hh
+  ModelData.hh
   ModelEditor.hh
   ModelEditorPalette.hh
+  VisualConfig.hh
 )
 
 set (headers
   ModelEditorEvents.hh
 )
+
+# MainWindow is using screen rendering
+if (ENABLE_SCREEN_TESTS)
+  set (qt_tests ${qt_tests} JointMaker_TEST.cc)
+endif()
+
+# Generate executables for each of the QT unit tests
+gz_build_qt_tests(${qt_tests})
 
 set (resources ../resources.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers})

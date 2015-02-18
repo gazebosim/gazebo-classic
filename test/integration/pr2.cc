@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,11 +59,11 @@ void PR2Test::LoadPR2(std::string _physicsEngine)
 
   sensors::SensorPtr sensor =
     sensors::get_sensor("narrow_stereo_gazebo_l_stereo_camera_sensor");
-  EXPECT_TRUE(sensor);
+  EXPECT_TRUE(sensor != NULL);
 
   sensors::CameraSensorPtr camSensor =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  EXPECT_TRUE(camSensor);
+  EXPECT_TRUE(camSensor != NULL);
 
   while (!camSensor->SaveFrame(paths->GetDefaultTestPath() + "/frame_10.jpg"))
     common::Time::MSleep(100);

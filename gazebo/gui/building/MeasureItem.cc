@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 */
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/math/Angle.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/EditorItem.hh"
-#include "gazebo/gui/building/LineSegmentItem.hh"
 #include "gazebo/gui/building/MeasureItem.hh"
 
 using namespace gazebo;
@@ -26,16 +26,17 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 MeasureItem::MeasureItem(const QPointF &_start, const QPointF &_end)
-    : PolylineItem(_start, _end)
+    : SegmentItem()
 {
   this->editorType = "Measure";
 
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
   this->setAcceptHoverEvents(true);
 
-  // Main line (polyline)
-  this->SetThickness(3);
-  this->SetColor(QColor(247, 142, 30));
+  this->SetLine(_start, _end);
+  this->zValueSelected = 8;
+  this->setZValue(this->zValueSelected);
+  this->ShowHandles(false);
 
   this->value = 0;
 }
@@ -49,34 +50,34 @@ MeasureItem::~MeasureItem()
 void MeasureItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
-  LineSegmentItem *segment = this->GetSegment(0);
-  QPointF p1 = segment->line().p1();
-  QPointF p2 = segment->line().p2();
-  QLineF line(p1, p2);
-  double PI = acos(-1);
-  double angle = line.angle()*PI/180.0;
+  QPointF p1 = this->line().p1();
+  QPointF p2 = this->line().p2();
+  double angle = GZ_DTOR(this->line().angle());
 
   QPen measurePen;
   measurePen.setStyle(Qt::SolidLine);
-  measurePen.setColor(QColor(247, 142, 30));
+  measurePen.setColor(QColor(247, 142, 30, 120));
   double tipLength = 10;
   measurePen.setWidth(3);
   _painter->setPen(measurePen);
 
-  // End tips
-  _painter->drawLine(QPointF(p1.x()+tipLength*qCos(angle+PI/2),
-                             p1.y()-tipLength*qSin(angle+PI/2)),
-                     QPointF(p1.x()-tipLength*qCos(angle+PI/2),
-                             p1.y()+tipLength*qSin(angle+PI/2)));
+  // Line
+  _painter->drawLine(this->line());
 
-  _painter->drawLine(QPointF(p2.x()+tipLength*qCos(angle+PI/2),
-                             p2.y()-tipLength*qSin(angle+PI/2)),
-                     QPointF(p2.x()-tipLength*qCos(angle+PI/2),
-                             p2.y()+tipLength*qSin(angle+PI/2)));
+  // End tips
+  _painter->drawLine(QPointF(p1.x()+tipLength*qCos(angle+M_PI/2.0),
+                             p1.y()-tipLength*qSin(angle+M_PI/2.0)),
+                     QPointF(p1.x()-tipLength*qCos(angle+M_PI/2.0),
+                             p1.y()+tipLength*qSin(angle+M_PI/2.0)));
+
+  _painter->drawLine(QPointF(p2.x()+tipLength*qCos(angle+M_PI/2.0),
+                             p2.y()-tipLength*qSin(angle+M_PI/2.0)),
+                     QPointF(p2.x()-tipLength*qCos(angle+M_PI/2.0),
+                             p2.y()+tipLength*qSin(angle+M_PI/2.0)));
 
   // Value
   std::ostringstream stream;
-  stream << std::fixed << std::setprecision(4)
+  stream << std::fixed << std::setprecision(3)
          << this->value << " m";
 
   double margin = 10;
@@ -86,20 +87,20 @@ void MeasureItem::paint(QPainter *_painter,
   float posX = (p1.x()+p2.x())/2;
   float posY = (p1.y()+p2.y())/2;
   double textAngle = angle;
-  if (textAngle > PI)
-    textAngle = textAngle - PI;
+  if (textAngle > M_PI)
+    textAngle = textAngle - M_PI;
 
-  if (textAngle > 0 && textAngle <= PI/2)
+  if (textAngle > 0 && textAngle <= M_PI/2.0)
   {
-    posX = (p1.x()+p2.x())/2 + margin*qCos(textAngle+PI/2)-textWidth;
-    posY = (p1.y()+p2.y())/2 - margin*qSin(textAngle+PI/2);
+    posX = (p1.x()+p2.x())/2 + margin*qCos(textAngle+M_PI/2.0)-textWidth;
+    posY = (p1.y()+p2.y())/2 - margin*qSin(textAngle+M_PI/2.0);
   }
-  else if (textAngle > PI/2 && textAngle < PI)
+  else if (textAngle > M_PI/2.0 && textAngle < M_PI)
   {
-    posX = (p1.x()+p2.x())/2 + margin*qCos(textAngle-PI/2);
-    posY = (p1.y()+p2.y())/2 - margin*qSin(textAngle-PI/2);
+    posX = (p1.x()+p2.x())/2 + margin*qCos(textAngle-M_PI/2.0);
+    posY = (p1.y()+p2.y())/2 - margin*qSin(textAngle-M_PI/2.0);
   }
-  else if (fabs(textAngle) < 0.01 || fabs(textAngle - PI) < 0.01)
+  else if (fabs(textAngle) < 0.01 || fabs(textAngle - M_PI) < 0.01)
   {
     posX = (p1.x()+p2.x())/2 - textWidth/2;
     posY = (p1.y()+p2.y())/2 - margin;
@@ -117,11 +118,9 @@ void MeasureItem::paint(QPainter *_painter,
 }
 
 /////////////////////////////////////////////////
-double MeasureItem::GetDistance()
+double MeasureItem::GetDistance() const
 {
-  LineSegmentItem *segment = this->GetSegment(0);
-
-  return segment->line().length();
+  return this->line().length();
 }
 
 /////////////////////////////////////////////////

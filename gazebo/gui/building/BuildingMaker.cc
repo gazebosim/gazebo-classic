@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 
 #include <sstream>
 #include <set>
-#include <boost/filesystem.hpp>
 
 #include "gazebo/common/Exception.hh"
 
@@ -32,6 +31,8 @@
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/EntityMaker.hh"
+#include "gazebo/gui/KeyEventHandler.hh"
+#include "gazebo/gui/MouseEventHandler.hh"
 
 #ifdef HAVE_GTS
   #include "gazebo/common/Mesh.hh"
@@ -40,24 +41,22 @@
 #endif
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/gui/building/FinishBuildingDialog.hh"
+#include "gazebo/gui/SaveDialog.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingModelManip.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 
-
 using namespace gazebo;
 using namespace gui;
 
 double BuildingMaker::conversionScale;
+const std::string BuildingMaker::buildingDefaultName = "Untitled";
+const std::string BuildingMaker::previewName = "BuildingPreview";
 
 /////////////////////////////////////////////////
-  BuildingMaker::BuildingMaker() : EntityMaker()
+BuildingMaker::BuildingMaker() : EntityMaker()
 {
-  this->buildingDefaultName = "BuildingDefaultName";
-  this->modelName = this->buildingDefaultName;
-
   this->conversionScale = 0.01;
 
   // Counters are only used for giving visuals unique names.
@@ -68,27 +67,42 @@ double BuildingMaker::conversionScale;
   this->doorCounter = 0;
   this->stairsCounter = 0;
   this->floorCounter = 0;
+  this->currentLevel = 0;
 
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
 
   this->connections.push_back(
-  gui::editor::Events::ConnectSaveBuildingEditor(
-    boost::bind(&BuildingMaker::OnSave, this, _1)));
+    gui::editor::Events::ConnectSaveBuildingEditor(
+      boost::bind(&BuildingMaker::OnSave, this)));
   this->connections.push_back(
-  gui::editor::Events::ConnectDiscardBuildingEditor(
-    boost::bind(&BuildingMaker::OnDiscard, this)));
+    gui::editor::Events::ConnectSaveAsBuildingEditor(
+      boost::bind(&BuildingMaker::OnSaveAs, this)));
   this->connections.push_back(
-  gui::editor::Events::ConnectDoneBuildingEditor(
-    boost::bind(&BuildingMaker::OnDone, this, _1)));
+    gui::editor::Events::ConnectNewBuildingEditor(
+      boost::bind(&BuildingMaker::OnNew, this)));
   this->connections.push_back(
-  gui::editor::Events::ConnectExitBuildingEditor(
-    boost::bind(&BuildingMaker::OnExit, this)));
+    gui::editor::Events::ConnectExitBuildingEditor(
+      boost::bind(&BuildingMaker::OnExit, this)));
+  this->connections.push_back(
+    gui::editor::Events::ConnectBuildingNameChanged(
+      boost::bind(&BuildingMaker::OnNameChanged, this, _1)));
+  this->connections.push_back(
+  gui::editor::Events::ConnectChangeBuildingLevel(
+    boost::bind(&BuildingMaker::OnChangeLevel, this, _1)));
+  this->connections.push_back(
+      gui::editor::Events::ConnectColorSelected(
+      boost::bind(&BuildingMaker::OnColorSelected, this, _1)));
+  this->connections.push_back(
+      gui::editor::Events::ConnectTextureSelected(
+      boost::bind(&BuildingMaker::OnTextureSelected, this, _1)));
+  this->connections.push_back(
+      gui::editor::Events::ConnectToggleEditMode(
+      boost::bind(&BuildingMaker::OnEdit, this, _1)));
 
-  this->saveDialog =
-      new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
-  this->finishDialog =
-      new FinishBuildingDialog(FinishBuildingDialog::MODEL_FINISH, 0);
+  this->saveDialog = new SaveDialog(SaveDialog::BUILDING);
+
+  this->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -97,8 +111,29 @@ BuildingMaker::~BuildingMaker()
 //  this->camera.reset();
   if (this->saveDialog)
     delete this->saveDialog;
-  if (this->finishDialog)
-    delete this->finishDialog;
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnEdit(bool _checked)
+{
+  if (_checked)
+  {
+    MouseEventHandler::Instance()->AddPressFilter("building_maker",
+        boost::bind(&BuildingMaker::On3dMousePress, this, _1));
+    MouseEventHandler::Instance()->AddReleaseFilter("building_maker",
+        boost::bind(&BuildingMaker::On3dMouseRelease, this, _1));
+    MouseEventHandler::Instance()->AddMoveFilter("building_maker",
+        boost::bind(&BuildingMaker::On3dMouseMove, this, _1));
+    KeyEventHandler::Instance()->AddPressFilter("building_maker",
+        boost::bind(&BuildingMaker::On3dKeyPress, this, _1));
+  }
+  else
+  {
+    MouseEventHandler::Instance()->RemovePressFilter("building_maker");
+    MouseEventHandler::Instance()->RemoveReleaseFilter("building_maker");
+    MouseEventHandler::Instance()->RemoveMoveFilter("building_maker");
+    KeyEventHandler::Instance()->RemovePressFilter("building_maker");
+  }
 }
 
 /////////////////////////////////////////////////
@@ -107,6 +142,9 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
 {
   BuildingModelManip *manip = this->allItems[_partName];
 
+  // Make sure each connection calls BuildingMaker::BuildingChanged
+
+  // item changes -> manip changes
   QObject::connect(_item, SIGNAL(SizeChanged(double, double, double)),
       manip, SLOT(OnSizeChanged(double, double, double)));
   QObject::connect(_item, SIGNAL(PoseChanged(double, double, double,
@@ -119,6 +157,14 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
       manip, SLOT(OnPositionChanged(double, double, double)));
   QObject::connect(_item, SIGNAL(RotationChanged(double, double, double)),
       manip, SLOT(OnRotationChanged(double, double, double)));
+  QObject::connect(_item, SIGNAL(LevelChanged(int)),
+      manip, SLOT(OnLevelChanged(int)));
+  QObject::connect(_item, SIGNAL(ColorChanged(QColor)),
+      manip, SLOT(OnColorChanged(QColor)));
+  QObject::connect(_item, SIGNAL(TextureChanged(QString)),
+      manip, SLOT(OnTextureChanged(QString)));
+  QObject::connect(_item, SIGNAL(TransparencyChanged(float)),
+      manip, SLOT(OnTransparencyChanged(float)));
 
   QObject::connect(_item, SIGNAL(WidthChanged(double)),
       manip, SLOT(OnWidthChanged(double)));
@@ -135,12 +181,33 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
   QObject::connect(_item, SIGNAL(YawChanged(double)),
       manip, SLOT(OnYawChanged(double)));
   QObject::connect(_item, SIGNAL(ItemDeleted()), manip, SLOT(OnDeleted()));
+
+  // manip changes -> item changes
+  QObject::connect(manip, SIGNAL(ColorChanged(QColor)),
+      _item, SLOT(OnColorChanged(QColor)));
+  QObject::connect(manip, SIGNAL(TextureChanged(QString)),
+      _item, SLOT(OnTextureChanged(QString)));
 }
 
 /////////////////////////////////////////////////
 void BuildingMaker::AttachManip(const std::string &_child,
     const std::string &_parent)
 {
+  std::map<std::string, BuildingModelManip *>::const_iterator it =
+      this->allItems.find(_child);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Child manip " << _child << " not found." << std::endl;
+    return;
+  }
+
+  it = this->allItems.find(_parent);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Parent manip " << _parent << " not found." << std::endl;
+    return;
+  }
+
   BuildingModelManip *child = this->allItems[_child];
   BuildingModelManip *parent = this->allItems[_parent];
   parent->AttachManip(child);
@@ -150,16 +217,49 @@ void BuildingMaker::AttachManip(const std::string &_child,
 void BuildingMaker::DetachManip(const std::string &_child,
     const std::string &_parent)
 {
+  std::map<std::string, BuildingModelManip *>::const_iterator it =
+      this->allItems.find(_child);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Child manip " << _child << " not found." << std::endl;
+    return;
+  }
+
+  it = this->allItems.find(_parent);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Parent manip " << _parent << " not found." << std::endl;
+    return;
+  }
+
   BuildingModelManip *child = this->allItems[_child];
   BuildingModelManip *parent = this->allItems[_parent];
   parent->DetachManip(child);
 }
 
 /////////////////////////////////////////////////
+void BuildingMaker::DetachAllChildren(const std::string &_manip)
+{
+  std::map<std::string, BuildingModelManip *>::const_iterator it =
+      this->allItems.find(_manip);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Manip " << _manip << " not found." << std::endl;
+    return;
+  }
+
+  BuildingModelManip *manip = this->allItems[_manip];
+  for (int i = manip->GetAttachedManipCount()-1; i >= 0; i--)
+  {
+    (manip->GetAttachedManip(i))->DetachFromParent();
+  }
+}
+
+/////////////////////////////////////////////////
 std::string BuildingMaker::CreateModel()
 {
   this->Reset();
-  return this->modelName;
+  return this->folderName;
 }
 
 /////////////////////////////////////////////////
@@ -181,28 +281,29 @@ std::string BuildingMaker::AddPart(const std::string &_type,
 std::string BuildingMaker::AddWall(const QVector3D &_size,
     const QVector3D &_pos, double _angle)
 {
-  if (!this->modelVisual)
+  if (!this->previewVisual)
   {
     this->Reset();
   }
 
   std::ostringstream linkNameStream;
-  linkNameStream << "Wall_" << wallCounter++;
+  linkNameStream << "Wall_" << this->wallCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName +
+      "::" + linkName, this->previewVisual));
   linkVisual->Load();
 
-
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual";
+  visualName << this->previewName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem = this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/OrangeTransparent");
+  visualElem->GetElement("material")->ClearElements();
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 1));
+  visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   BuildingModelManip *wallManip = new BuildingModelManip();
@@ -211,10 +312,13 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   wallManip->SetVisual(visVisual);
   visVisual->SetScale(scaledSize);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
+  wallManip->SetLevel(this->currentLevel);
   wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = wallManip;
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
+      GZ_VISIBILITY_SELECTABLE);
+  this->BuildingChanged();
   return linkName;
 }
 
@@ -222,7 +326,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
 std::string BuildingMaker::AddWindow(const QVector3D &_size,
     const QVector3D &_pos, double _angle)
 {
-  if (!this->modelVisual)
+  if (!this->previewVisual)
   {
     this->Reset();
   }
@@ -231,19 +335,20 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   linkNameStream << "Window_" << this->windowCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName +
+      "::" + linkName, this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual";
+  visualName << this->previewName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/BlueTransparent");
+  visualElem->GetElement("material")->GetElement("script")->GetElement("name")
+      ->Set("Gazebo/BuildingFrame");
+  visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
   BuildingModelManip *windowManip = new BuildingModelManip();
@@ -254,9 +359,11 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   visVisual->SetScale(scaledSize);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+  windowManip->SetLevel(this->currentLevel);
   this->allItems[linkName] = windowManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->BuildingChanged();
   return linkName;
 }
 
@@ -264,7 +371,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
 std::string BuildingMaker::AddDoor(const QVector3D &_size,
     const QVector3D &_pos, double _angle)
 {
-  if (!this->modelVisual)
+  if (!this->previewVisual)
   {
     this->Reset();
   }
@@ -274,19 +381,20 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   linkNameStream << "Door_" << this->doorCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName +
+      "::" + linkName, this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual";
+  visualName << this->previewName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/YellowTransparent");
+  visualElem->GetElement("material")->GetElement("script")->GetElement("name")
+      ->Set("Gazebo/BuildingFrame");
+  visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
   BuildingModelManip *doorManip = new BuildingModelManip();
@@ -297,9 +405,11 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   visVisual->SetScale(scaledSize);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   doorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+  doorManip->SetLevel(this->currentLevel);
   this->allItems[linkName] = doorManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->BuildingChanged();
   return linkName;
 }
 
@@ -307,7 +417,7 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
 std::string BuildingMaker::AddStairs(const QVector3D &_size,
     const QVector3D &_pos, double _angle, int _steps)
 {
-  if (!this->modelVisual)
+  if (!this->previewVisual)
   {
     this->Reset();
   }
@@ -316,12 +426,12 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   linkNameStream << "Stairs_" << this->stairsCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName +
+      "::" + linkName, this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual";
+  visualName << this->previewName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
@@ -334,6 +444,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   stairsManip->SetMaker(this);
   stairsManip->SetName(linkName);
   stairsManip->SetVisual(visVisual);
+  stairsManip->SetLevel(this->currentLevel);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
   double dSteps = static_cast<double>(_steps);
@@ -345,8 +456,10 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   visualStepName << visualName.str() << "step" << 0;
   rendering::VisualPtr baseStepVisual(new rendering::Visual(
       visualStepName.str(), visVisual));
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreenTransparent");
+  visualElem->GetElement("material")->ClearElements();
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 1));
+  visualElem->AddElement("cast_shadows")->Set(false);
   baseStepVisual->Load(visualElem);
 
   double rise = 1.0 / dSteps;
@@ -356,7 +469,6 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   math::Vector3 baseOffset(0, 0.5 - run/2.0,
       -0.5 + rise/2.0);
   baseStepVisual->SetPosition(baseOffset);
-
 
   for (int i = 1; i < _steps; ++i)
   {
@@ -369,7 +481,10 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
     stepVisual->SetRotation(baseStepVisual->GetRotation());
   }
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
+      GZ_VISIBILITY_SELECTABLE);
+  this->BuildingChanged();
+
   return linkName;
 }
 
@@ -377,7 +492,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
 std::string BuildingMaker::AddFloor(const QVector3D &_size,
     const QVector3D &_pos, double _angle)
 {
-  if (!this->modelVisual)
+  if (!this->previewVisual)
   {
     this->Reset();
   }
@@ -387,44 +502,52 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   linkNameStream << "Floor_" << this->floorCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->previewName +
+      "::" + linkName, this->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual";
+  visualName << this->previewName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/OrangeTransparent");
+  visualElem->GetElement("material")->ClearElements();
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 1));
+  visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
   BuildingModelManip *floorManip = new BuildingModelManip();
   floorManip->SetMaker(this);
   floorManip->SetName(linkName);
   floorManip->SetVisual(visVisual);
+  floorManip->SetLevel(this->currentLevel);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   floorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = floorManip;
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
+      GZ_VISIBILITY_SELECTABLE);
+  this->BuildingChanged();
   return linkName;
 }
 
 /////////////////////////////////////////////////
 void BuildingMaker::RemovePart(const std::string &_partName)
 {
-  BuildingModelManip *manip = this->allItems[_partName];
-  if (!manip)
+  std::map<std::string, BuildingModelManip *>::const_iterator it =
+      this->allItems.find(_partName);
+  if (it == this->allItems.end())
   {
     gzerr << _partName << " does not exist\n";
     return;
   }
+  BuildingModelManip *manip = this->allItems[_partName];
+
   rendering::VisualPtr vis = manip->GetVisual();
   rendering::VisualPtr visParent = vis->GetParent();
   rendering::ScenePtr scene = vis->GetScene();
@@ -433,6 +556,7 @@ void BuildingMaker::RemovePart(const std::string &_partName)
     scene->RemoveVisual(visParent);
   this->allItems.erase(_partName);
   delete manip;
+  this->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
@@ -451,12 +575,6 @@ void BuildingMaker::Start(const rendering::UserCameraPtr _camera)
 /////////////////////////////////////////////////
 void BuildingMaker::Stop()
 {
-//  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-//  scene->RemoveVisual(this->modelVisual);
-//  this->modelVisual.reset();
-//  this->visuals.clear();
-//  this->modelSDF.reset();
-//  this->modelVisual->SetVisible(false);
 }
 
 /////////////////////////////////////////////////
@@ -468,21 +586,25 @@ void BuildingMaker::Reset()
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
-  if (this->modelVisual)
-    scene->RemoveVisual(this->modelVisual);
+  if (!scene)
+  {
+    gzerr << "Couldn't get scene node from BuildingMaker" << std::endl;
+    return;
+  }
 
-  this->saved = false;
-  this->saveLocation = QDir::homePath().toStdString();
-  this->modelName = this->buildingDefaultName;
+  if (this->previewVisual)
+    scene->RemoveVisual(this->previewVisual);
 
-  this->modelVisual.reset(new rendering::Visual(this->modelName,
+  this->currentSaveState = NEVER_SAVED;
+  this->SetModelName(this->buildingDefaultName);
+
+  this->previewVisual.reset(new rendering::Visual(this->previewName,
       scene->GetWorldVisual()));
 
-  this->modelVisual->Load();
-  this->modelPose = math::Pose::Zero;
-  this->modelVisual->SetPose(this->modelPose);
-  this->modelVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  scene->AddVisual(this->modelVisual);
+  this->previewVisual->Load();
+  this->previewVisual->SetPose(math::Pose::Zero);
+  this->previewVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  scene->AddVisual(this->previewVisual);
 
   std::map<std::string, BuildingModelManip *>::iterator it;
   for (it = this->allItems.begin(); it != this->allItems.end(); ++it)
@@ -500,26 +622,26 @@ bool BuildingMaker::IsActive() const
 void BuildingMaker::SetModelName(const std::string &_modelName)
 {
   this->modelName = _modelName;
-}
+  this->saveDialog->SetModelName(_modelName);
 
-/////////////////////////////////////////////////
-void BuildingMaker::SaveToSDF(const std::string &_savePath)
-{
-  this->saveLocation = _savePath;
-  std::ofstream savefile;
-  boost::filesystem::path path;
-  path = boost::filesystem::operator/(this->saveLocation,
-      this->modelName + ".sdf");
-  savefile.open(path.string().c_str());
-  savefile << this->modelSDF->ToString();
-  savefile.close();
+  this->folderName = this->saveDialog->
+      GetFolderNameFromModelName(this->modelName);
+
+  if (this->currentSaveState == NEVER_SAVED)
+  {
+    // Set new saveLocation
+    boost::filesystem::path oldPath(this->saveDialog->GetSaveLocation());
+
+    boost::filesystem::path newPath = oldPath.parent_path() / this->folderName;
+    this->saveDialog->SetSaveLocation(newPath.string());
+  }
 }
 
 /////////////////////////////////////////////////
 void BuildingMaker::FinishModel()
 {
   this->CreateTheEntity();
-  this->Stop();
+  this->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -554,7 +676,11 @@ void BuildingMaker::GenerateSDF()
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;
 
-  modelElem->GetAttribute("name")->Set(this->modelName);
+  modelElem->GetAttribute("name")->Set(this->folderName);
+  math::Pose modelOrigin(
+      this->previewVisual->GetBoundingBox().GetCenter().x,
+      this->previewVisual->GetBoundingBox().GetCenter().y, 0, 0, 0, 0);
+  modelElem->GetElement("pose")->Set(modelOrigin);
 
   std::map<std::string, BuildingModelManip *>::iterator itemsIt;
 
@@ -572,12 +698,13 @@ void BuildingMaker::GenerateSDF()
     visualElem = newLinkElem->GetElement("visual");
     collisionElem = newLinkElem->GetElement("collision");
     newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
-    newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
+    newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose() -
+        modelOrigin);
 
+    // Only stairs have children
     if (visual->GetChildCount() == 0)
     {
-      // subdivide wall surface to create holes for representing
-      // window/doors
+      // Window / Door not attached to walls
       if (name.find("Window") != std::string::npos
           || name.find("Door") != std::string::npos)
       {
@@ -594,14 +721,16 @@ void BuildingMaker::GenerateSDF()
         collisionElem->GetElement("geometry")->GetElement("box")->
             GetElement("size")->Set(visual->GetScale());
       }
-      // check if walls have attached children, i.e. windows or doors
+      // Wall
       else if (name.find("Wall") != std::string::npos)
       {
+        // check if walls have attached children, i.e. windows or doors
         if (buildingModelManip->GetAttachedManipCount() != 0 )
         {
           std::vector<QRectF> holes;
           rendering::VisualPtr wallVis = visual;
-          math::Pose wallPose = wallVis->GetParent()->GetWorldPose();
+          math::Pose wallPose = wallVis->GetParent()->GetWorldPose() -
+              modelOrigin;
           math::Vector3 wallSize = wallVis->GetScale();
           for (unsigned int i = 0; i <
               buildingModelManip->GetAttachedManipCount(); ++i)
@@ -613,8 +742,8 @@ void BuildingMaker::GenerateSDF()
                 || objName.find("Door") != std::string::npos)
             {
               rendering::VisualPtr attachedVis = attachedObj->GetVisual();
-              math::Pose offset = attachedVis->GetParent()->GetWorldPose()
-                  - wallPose;
+              math::Pose offset = attachedVis->GetParent()->GetWorldPose() -
+                  modelOrigin - wallPose;
               math::Vector3 size = attachedVis->GetScale();
 
               offset.pos.z += attachedVis->GetPosition().z
@@ -636,7 +765,7 @@ void BuildingMaker::GenerateSDF()
           newLinkElem->ClearElements();
           newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
           newLinkElem->GetElement("pose")->Set(
-              visual->GetParent()->GetWorldPose());
+              visual->GetParent()->GetWorldPose() - modelOrigin);
           // create a link element of box geom for each subdivision
           for (unsigned int i = 0; i< subdivisions.size(); ++i)
           {
@@ -663,13 +792,18 @@ void BuildingMaker::GenerateSDF()
             math::Vector3 blockSize(subdivisions[i].width(),
                 wallVis->GetScale().y, subdivisions[i].height());
             visualElem->GetElement("geometry")->GetElement("box")->
-              GetElement("size")->Set(blockSize);
+                GetElement("size")->Set(blockSize);
             collisionElem->GetElement("geometry")->GetElement("box")->
-              GetElement("size")->Set(blockSize);
+                GetElement("size")->Set(blockSize);
+            visualElem->GetElement("material")->GetElement("ambient")->
+                Set(buildingModelManip->GetColor());
+            visualElem->GetElement("material")->GetElement("script")
+                ->GetElement("name")->Set(buildingModelManip->GetTexture());
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
         }
+        // Wall without windows or doors
         else
         {
           visualElem->GetAttribute("name")->Set(buildingModelManip->GetName()
@@ -682,16 +816,21 @@ void BuildingMaker::GenerateSDF()
               GetElement("size")->Set(visual->GetScale());
           collisionElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->GetScale());
+          visualElem->GetElement("material")->GetElement("ambient")->
+              Set(buildingModelManip->GetColor());
+          visualElem->GetElement("material")->GetElement("script")
+              ->GetElement("name")->Set(buildingModelManip->GetTexture());
         }
       }
-      // check if floors have attached children, i.e. stairs
+      // Floor
       else if (name.find("Floor") != std::string::npos)
       {
+        // check if floors have attached children, i.e. stairs
         if (buildingModelManip->GetAttachedManipCount() != 0 )
         {
           std::vector<QRectF> holes;
           rendering::VisualPtr floorVis = visual;
-          math::Pose floorPose = floorVis->GetWorldPose();
+          math::Pose floorPose = floorVis->GetWorldPose() - modelOrigin;
           math::Vector3 floorSize = floorVis->GetScale();
           for (unsigned int i = 0; i <
               buildingModelManip->GetAttachedManipCount(); ++i)
@@ -702,8 +841,8 @@ void BuildingMaker::GenerateSDF()
             if (objName.find("Stairs") != std::string::npos)
             {
               rendering::VisualPtr attachedVis = attachedObj->GetVisual();
-              math::Pose offset = attachedVis->GetParent()->GetWorldPose()
-                  - floorPose;
+              math::Pose offset = attachedVis->GetParent()->GetWorldPose() -
+                  modelOrigin - floorPose;
               math::Vector3 size = attachedVis->GetScale();
 
               QRectF rect(0, 0, size.x, size.y);
@@ -728,7 +867,7 @@ void BuildingMaker::GenerateSDF()
           newLinkElem->ClearElements();
           newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
           newLinkElem->GetElement("pose")->Set(
-              visual->GetParent()->GetWorldPose());
+              visual->GetParent()->GetWorldPose() - modelOrigin);
           // create a link element of box geom for each subdivision
           for (unsigned int i = 0; i< subdivisions.size(); ++i)
           {
@@ -755,13 +894,18 @@ void BuildingMaker::GenerateSDF()
             math::Vector3 blockSize(subdivisions[i].width(),
                 subdivisions[i].height(), floorVis->GetScale().z);
             visualElem->GetElement("geometry")->GetElement("box")->
-              GetElement("size")->Set(blockSize);
+                GetElement("size")->Set(blockSize);
             collisionElem->GetElement("geometry")->GetElement("box")->
-              GetElement("size")->Set(blockSize);
+                GetElement("size")->Set(blockSize);
+            visualElem->GetElement("material")->GetElement("ambient")->
+                Set(buildingModelManip->GetColor());
+            visualElem->GetElement("material")->GetElement("script")
+                ->GetElement("name")->Set(buildingModelManip->GetTexture());
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
         }
+        // Floor without stairs
         else
         {
           visualElem->GetAttribute("name")->Set(buildingModelManip->GetName()
@@ -774,12 +918,17 @@ void BuildingMaker::GenerateSDF()
               GetElement("size")->Set(visual->GetScale());
           collisionElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->GetScale());
+          visualElem->GetElement("material")->GetElement("ambient")->
+              Set(buildingModelManip->GetColor());
+          visualElem->GetElement("material")->GetElement("script")
+              ->GetElement("name")->Set(buildingModelManip->GetTexture());
         }
       }
     }
+    // Stairs
     else
     {
-      // TODO: This handles the special case for stairs where
+      // TODO: This handles the special case for stairs, where
       // there are nested visuals which SDF doesn't support.
       // Should somehow generalize/combine the code above and below
       newLinkElem->ClearElements();
@@ -795,7 +944,7 @@ void BuildingMaker::GenerateSDF()
             << "_Collision_" << i;
         collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
         rendering::VisualPtr childVisual = visual->GetChild(i);
-        math::Pose newPose(childVisual->GetWorldPose().pos,
+        math::Pose newPose(childVisual->GetWorldPose().pos - modelOrigin.pos,
             visual->GetParent()->GetRotation());
         visualElem->GetElement("pose")->Set(newPose);
         collisionElem->GetElement("pose")->Set(newPose);
@@ -803,7 +952,10 @@ void BuildingMaker::GenerateSDF()
             GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
         collisionElem->GetElement("geometry")->GetElement("box")->
             GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
-
+        visualElem->GetElement("material")->GetElement("ambient")->
+              Set(buildingModelManip->GetColor());
+        visualElem->GetElement("material")->GetElement("script")
+            ->GetElement("name")->Set(buildingModelManip->GetTexture());
         newLinkElem->InsertElement(visualElem);
         newLinkElem->InsertElement(collisionElem);
       }
@@ -845,7 +997,7 @@ void BuildingMaker::GenerateSDFWithCSG()
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;
 
-  modelElem->GetAttribute("name")->Set(this->modelName);
+  modelElem->GetAttribute("name")->Set(this->folderName);
 
   std::map<std::string, BuildingModelManip *>::iterator itemsIt;
   for (itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
@@ -956,7 +1108,7 @@ void BuildingMaker::GenerateSDFWithCSG()
       visGeomElem->ClearElements();
       sdf::ElementPtr meshElem = visGeomElem->AddElement("mesh");
       // TODO create the folder
-      std::string uri = "model://" + this->modelName + "/meshes/"
+      std::string uri = "model://" + this->folderName + "/meshes/"
           + booleanMeshName;
       meshElem->GetElement("uri")->Set(uri);
       visualElem->GetElement("pose")->Set(visual->GetPose());
@@ -1002,8 +1154,27 @@ void BuildingMaker::GenerateSDFWithCSG()
 /////////////////////////////////////////////////
 void BuildingMaker::CreateTheEntity()
 {
-  this->GenerateSDF();
+  if (!this->modelSDF->root->HasElement("model"))
+  {
+    gzerr << "Generated invalid SDF! Cannot create entity." << std::endl;
+    return;
+  }
+
   msgs::Factory msg;
+  // Create a new name if the model exists
+  sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
+  std::string modelElemName = modelElem->Get<std::string>("name");
+  if (has_entity_name(modelElemName))
+  {
+    int i = 0;
+    while (has_entity_name(modelElemName))
+    {
+      modelElemName = modelElem->Get<std::string>("name") + "_" +
+        boost::lexical_cast<std::string>(i++);
+    }
+    modelElem->GetAttribute("name")->Set(modelElemName);
+  }
+
   msg.set_sdf(this->modelSDF->ToString());
   this->makerPub->Publish(msg);
 }
@@ -1299,110 +1470,406 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnDiscard()
+void BuildingMaker::OnNew()
 {
-  int ret = QMessageBox::warning(0, QString("Discard"),
-      QString("Are you sure you want to discard\n"
-      "your model? All of your work will\n"
-      "be lost."),
-      QMessageBox::Discard | QMessageBox::Cancel,
-      QMessageBox::Cancel);
-
-  switch (ret)
+  if (this->allItems.empty())
   {
-    case QMessageBox::Discard:
-      gui::editor::Events::discardBuildingModel();
-      this->modelName = this->buildingDefaultName;
-      this->saveLocation = QDir::homePath().toStdString();
-      this->saved = false;
-      break;
-    case QMessageBox::Cancel:
-    // Do nothing
-    break;
-    default:
-    break;
+    this->Reset();
+    gui::editor::Events::newBuildingModel();
+    return;
   }
-}
+  QString msg;
+  QMessageBox msgBox(QMessageBox::Warning, QString("New"), msg);
+  QPushButton *cancelButton = msgBox.addButton("Cancel", QMessageBox::YesRole);
+  QPushButton *saveButton = msgBox.addButton("Save", QMessageBox::YesRole);
 
-/////////////////////////////////////////////////
-void BuildingMaker::OnSave(const std::string &_saveName)
-{
-  if (_saveName != "")
-    this->modelName = _saveName;
-
-  if (this->saved)
+  switch (this->currentSaveState)
   {
-    this->SetModelName(this->modelName);
-    this->GenerateSDF();
-    this->SaveToSDF(this->saveLocation);
-  }
-  else
-  {
-    this->saveDialog->SetModelName(this->modelName);
-    this->saveDialog->SetSaveLocation(this->saveLocation);
-    if (this->saveDialog->exec() == QDialog::Accepted)
+    case ALL_SAVED:
     {
-      this->modelName = this->saveDialog->GetModelName();
-      this->saveLocation = this->saveDialog->GetSaveLocation();
-      this->SetModelName(this->modelName);
-      this->GenerateSDF();
-      this->SaveToSDF(this->saveLocation);
-      this->saved = true;
+      msg.append("Are you sure you want to close this model and open a new "
+                 "canvas?\n\n");
+      msgBox.addButton("New Canvas", QMessageBox::ApplyRole);
+      saveButton->hide();
+      break;
     }
+    case UNSAVED_CHANGES:
+    case NEVER_SAVED:
+    {
+      msg.append("You have unsaved changes. Do you want to save this model "
+                 "and open a new canvas?\n\n");
+      msgBox.addButton("Don't Save", QMessageBox::ApplyRole);
+      break;
+    }
+    default:
+      return;
   }
-  gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
+
+  msg.append("Once you open a new canvas, your current model will no longer "
+             "be editable.");
+  msgBox.setText(msg);
+
+  msgBox.exec();
+
+  if (msgBox.clickedButton() != cancelButton)
+  {
+    if (msgBox.clickedButton() == saveButton)
+    {
+      if (!this->OnSave())
+      {
+        return;
+      }
+    }
+
+    this->Reset();
+    gui::editor::Events::newBuildingModel();
+  }
+}
+
+void BuildingMaker::SaveModelFiles()
+{
+  this->saveDialog->GenerateConfig();
+  this->saveDialog->SaveToConfig();
+  this->GenerateSDF();
+  this->saveDialog->SaveToSDF(this->modelSDF);
+  this->currentSaveState = ALL_SAVED;
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnDone(const std::string &_saveName)
+bool BuildingMaker::OnSave()
 {
-  if (_saveName != "")
-    this->modelName = _saveName;
-
-  this->finishDialog->SetModelName(this->modelName);
-  this->finishDialog->SetSaveLocation(this->saveLocation);
-  if (this->finishDialog->exec() == QDialog::Accepted)
+  switch (this->currentSaveState)
   {
-    this->modelName = this->finishDialog->GetModelName();
-    this->saveLocation = this->finishDialog->GetSaveLocation();
-    this->SetModelName(this->modelName);
-    this->GenerateSDF();
-    this->SaveToSDF(this->saveLocation);
-    this->FinishModel();
-    gui::editor::Events::discardBuildingModel();
-    gui::editor::Events::finishBuildingModel();
+    case UNSAVED_CHANGES:
+    {
+      // TODO: Subtle filesystem race condition
+      this->SaveModelFiles();
+      gui::editor::Events::saveBuildingModel(this->modelName);
+      return true;
+    }
+    case NEVER_SAVED:
+    {
+      return this->OnSaveAs();
+    }
+    default:
+      return false;
   }
+}
+
+/////////////////////////////////////////////////
+bool BuildingMaker::OnSaveAs()
+{
+  if (this->saveDialog->OnSaveAs())
+  {
+    // Prevent changing save location
+    this->currentSaveState = ALL_SAVED;
+    // Get name set by user
+    this->SetModelName(this->saveDialog->GetModelName());
+    // Update name on palette
+    gui::editor::Events::saveBuildingModel(this->modelName);
+    // Generate and save files
+    this->SaveModelFiles();
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnNameChanged(const std::string &_name)
+{
+  if (_name.compare(this->modelName) == 0)
+    return;
+
+  this->SetModelName(_name);
+  this->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
 void BuildingMaker::OnExit()
 {
-  int ret = QMessageBox::warning(0, QString("Exit"),
-      QString("Save Changes before exiting? If you do not\n"
-      "save, all of your work will be lost!\n\n"
-      "Note: Building Editor state is not maintained\n"
-      "between Gazebo sessions. Once you quit\n"
-      "Gazebo, your building will no longer be editable.\n\n"),
-//      "If you are done editing your model, select Done\n"),
-      QMessageBox::Discard | QMessageBox::Cancel | QMessageBox::Save,
-      QMessageBox::Save);
-
-  switch (ret)
+  if (this->allItems.empty())
   {
-    case QMessageBox::Discard:
-      gui::editor::Events::discardBuildingModel();
-      this->modelName = this->buildingDefaultName;
-      this->saveLocation = QDir::homePath().toStdString();
-      this->saved = false;
-      gui::editor::Events::finishBuildingModel();
-      break;
-    case QMessageBox::Cancel:
-      break;
-    case QMessageBox::Save:
-      this->OnSave();
-      gui::editor::Events::finishBuildingModel();
-      break;
-    default:
-      break;
+    this->Reset();
+    gui::editor::Events::newBuildingModel();
+    gui::editor::Events::finishBuildingModel();
+    return;
   }
+
+  switch (this->currentSaveState)
+  {
+    case ALL_SAVED:
+    {
+      QString msg("Once you exit the Building Editor, "
+      "your building will no longer be editable.\n\n"
+      "Are you ready to exit?\n\n");
+      QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
+      msgBox.addButton("Exit", QMessageBox::ApplyRole);
+      QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
+      msgBox.exec();
+      if (msgBox.clickedButton() == cancelButton)
+      {
+        return;
+      }
+      this->FinishModel();
+      break;
+    }
+    case UNSAVED_CHANGES:
+    case NEVER_SAVED:
+    {
+      QString msg("Save Changes before exiting?\n\n"
+          "Note: Once you exit the Building Editor, "
+          "your building will no longer be editable.\n\n");
+
+      QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
+      QPushButton *cancelButton = msgBox.addButton("Cancel",
+          QMessageBox::ApplyRole);
+      QPushButton *saveButton = msgBox.addButton("Save and Exit",
+          QMessageBox::ApplyRole);
+      msgBox.addButton("Don't Save, Exit", QMessageBox::ApplyRole);
+      msgBox.exec();
+      if (msgBox.clickedButton() == cancelButton)
+        return;
+
+      if (msgBox.clickedButton() == saveButton)
+      {
+        if (!this->OnSave())
+        {
+          return;
+        }
+      }
+      break;
+    }
+    default:
+      return;
+  }
+
+  // Create entity on main window up to the saved point
+  if (this->currentSaveState != NEVER_SAVED)
+    this->FinishModel();
+
+  this->Reset();
+
+  gui::editor::Events::newBuildingModel();
+  gui::editor::Events::finishBuildingModel();
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnColorSelected(QColor _color)
+{
+  this->selectedTexture = "";
+  this->selectedColor = _color;
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnTextureSelected(QString _texture)
+{
+  this->selectedColor = QColor::Invalid;
+  this->selectedTexture = _texture;
+}
+
+/////////////////////////////////////////////////
+bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
+{
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
+    return false;
+
+  if (_event.dragging)
+  {
+    userCamera->HandleMouseEvent(_event);
+    return true;
+  }
+
+  if (this->selectedTexture == QString("") && !this->selectedColor.isValid())
+  {
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    userCamera->HandleMouseEvent(_event);
+    return true;
+  }
+
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+  // Highlight visual on hover
+  if (vis)
+  {
+    std::string visName = vis->GetParent()->GetName();
+
+    // Stairs have nested visuals
+    if (visName.find("Stair") != std::string::npos)
+    {
+      vis = vis->GetParent();
+      visName = vis->GetParent()->GetName();
+    }
+
+    if (this->hoverVis && this->hoverVis != vis)
+      this->ResetHoverVis();
+
+    // Only handle items from building being edited
+    visName = visName.substr(visName.find("::")+2);
+    std::map<std::string, BuildingModelManip *>::const_iterator it =
+        this->allItems.find(visName);
+    if (it == this->allItems.end())
+    {
+      userCamera->HandleMouseEvent(_event);
+      return true;
+    }
+
+    if (visName.find("Wall") != std::string::npos ||
+        visName.find("Floor") != std::string::npos ||
+        visName.find("Stair") != std::string::npos)
+    {
+      this->hoverVis = vis;
+      if (this->selectedColor.isValid())
+      {
+        common::Color newColor(this->selectedColor.red(),
+                               this->selectedColor.green(),
+                               this->selectedColor.blue());
+        this->hoverVis->SetAmbient(newColor);
+      }
+      else if (this->selectedTexture != "")
+      {
+        std::string material = "Gazebo/Grey";
+        if (this->selectedTexture == ":wood.jpg")
+          material = "Gazebo/Wood";
+        else if (this->selectedTexture == ":tiles.jpg")
+          material = "Gazebo/CeilingTiled";
+        else if (this->selectedTexture == ":bricks.png")
+          material = "Gazebo/Bricks";
+
+        this->hoverVis->SetMaterial(material);
+        this->hoverVis->SetAmbient((*it).second->GetColor());
+      }
+
+      this->hoverVis->SetTransparency(0);
+    }
+    else
+    {
+      this->ResetHoverVis();
+    }
+  }
+  else
+  {
+    this->ResetHoverVis();
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool BuildingMaker::On3dMousePress(const common::MouseEvent &_event)
+{
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
+    return false;
+
+  userCamera->HandleMouseEvent(_event);
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &_event)
+{
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+
+  if (_event.dragging)
+  {
+    userCamera->HandleMouseEvent(_event);
+    return true;
+  }
+
+  if (_event.button != common::MouseEvent::LEFT)
+  {
+    this->StopMaterialModes();
+    return true;
+  }
+
+  if (this->hoverVis)
+  {
+    std::string hoverName = this->hoverVis->GetParent()->GetName();
+    hoverName = hoverName.substr(hoverName.find("::")+2);
+
+    std::map<std::string, BuildingModelManip *>::const_iterator it =
+        this->allItems.find(hoverName);
+    if (it == this->allItems.end())
+    {
+      gzerr << "Visual " << hoverName << " is not part of the building but "
+            << "was hovered. This should never happen." << std::endl;
+    }
+    else
+    {
+      BuildingModelManip *manip = this->allItems[hoverName];
+      if (this->selectedColor.isValid())
+      {
+        manip->SetColor(this->selectedColor);
+      }
+      else if (this->selectedTexture != "")
+      {
+        manip->SetTexture(this->selectedTexture);
+      }
+    }
+    this->hoverVis.reset();
+  }
+  else
+  {
+    userCamera->HandleMouseEvent(_event);
+    this->StopMaterialModes();
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool BuildingMaker::On3dKeyPress(const common::KeyEvent &_event)
+{
+  if (_event.key == Qt::Key_Escape)
+  {
+    this->StopMaterialModes();
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::StopMaterialModes()
+{
+  this->ResetHoverVis();
+  this->selectedColor = QColor::Invalid;
+  gui::editor::Events::colorSelected(this->selectedColor.convertTo(
+      QColor::Invalid));
+  gui::editor::Events::createBuildingEditorItem(std::string());
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::ResetHoverVis()
+{
+  if (this->hoverVis)
+  {
+    std::string hoverName = this->hoverVis->GetParent()->GetName();
+    hoverName = hoverName.substr(hoverName.find("::")+2);
+
+    std::map<std::string, BuildingModelManip *>::const_iterator it =
+        this->allItems.find(hoverName);
+    if (it == this->allItems.end())
+    {
+      gzerr << "Visual " << hoverName << " is not part of the building but "
+            << "was hovered. This should never happen." << std::endl;
+    }
+    else
+    {
+      BuildingModelManip *manip = this->allItems[hoverName];
+      this->hoverVis->SetAmbient(manip->GetColor());
+      this->hoverVis->SetMaterial(manip->GetTexture());
+      this->hoverVis->SetTransparency(manip->GetTransparency());
+    }
+    this->hoverVis.reset();
+  }
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnChangeLevel(int _level)
+{
+  this->currentLevel = _level;
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::BuildingChanged()
+{
+  if (this->currentSaveState != NEVER_SAVED)
+    this->currentSaveState = UNSAVED_CHANGES;
 }

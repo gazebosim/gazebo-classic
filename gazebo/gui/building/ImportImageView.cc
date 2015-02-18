@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 #include "gazebo/gui/building/ImportImageDialog.hh"
 #include "gazebo/gui/building/GridLines.hh"
 #include "gazebo/gui/building/EditorItem.hh"
-#include "gazebo/gui/building/LineSegmentItem.hh"
 #include "gazebo/gui/building/MeasureItem.hh"
 #include "gazebo/gui/building/ImportImageView.hh"
 
@@ -133,17 +132,16 @@ void ImportImageView::resizeEvent(QResizeEvent *_event)
         double scaleHeight = this->imageItem->pixmap().height() /
             static_cast<double>(this->pixmapHeightPx);
 
-        LineSegmentItem *segment = this->measureItem->GetSegment(0);
-        QPointF p1 = segment->mapToScene(segment->line().p1());
-        QPointF p2 = segment->mapToScene(segment->line().p2());
+        QPointF p1 = measureItem->mapToScene(measureItem->line().p1());
+        QPointF p2 = measureItem->mapToScene(measureItem->line().p2());
 
         p1.setX(p1.x() * scaleWidth);
         p2.setX(p2.x() * scaleWidth);
         p1.setY(p1.y() * scaleHeight);
         p2.setY(p2.y() * scaleHeight);
 
-        this->measureItem->SetVertexPosition(0, p1);
-        this->measureItem->SetVertexPosition(1, p2);
+        this->measureItem->SetStartPoint(p1);
+        this->measureItem->SetEndPoint(p2);
       }
     }
 
@@ -165,11 +163,10 @@ void ImportImageView::mouseMoveEvent(QMouseEvent *_event)
     if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
     {
       // snap to 0/90/180 degrees
-      LineSegmentItem *segment = this->measureItem->GetSegment(
-        this->measureItem->GetSegmentCount()-1);
-      QPointF p1 = segment->mapToScene(segment->line().p1());
-      QLineF line(p1, p2);
-      double angle = line.angle();
+      QPointF p1 = this->measureItem->mapToScene(
+          this->measureItem->line().p1());
+      QLineF newLine(p1, p2);
+      double angle = newLine.angle();
       double range = 10;
       if ((angle < range) || (angle > (360 - range)) ||
           ((angle > (180 - range)) && (angle < (180 + range))))
@@ -183,14 +180,19 @@ void ImportImageView::mouseMoveEvent(QMouseEvent *_event)
       }
     }
 
-    this->measureItem->SetVertexPosition(
-        this->measureItem->GetVertexCount()-1, p2);
+    this->measureItem->SetEndPoint(p2);
   }
 
   if (!drawInProgress)
   {
     QGraphicsView::mouseMoveEvent(_event);
   }
+}
+
+/////////////////////////////////////////////////
+void ImportImageView::mousePressEvent(QMouseEvent *_event)
+{
+  _event->setAccepted(true);
 }
 
 /////////////////////////////////////////////////
@@ -254,13 +256,6 @@ void ImportImageView::DrawMeasure(const QPoint &_pos)
     this->measureItem = dynamic_cast<MeasureItem *>(this->currentMouseItem);
     if (this->measureItem)
     {
-      LineSegmentItem *segment = this->measureItem->GetSegment(
-          this->measureItem->GetSegmentCount()-1);
-      this->measureItem->AddPoint(segment->mapToScene(segment->line().p2())
-          + QPointF(1, 0));
-
-      this->measureItem->PopEndPoint();
-
       this->measureScenePx = this->measureItem->GetDistance();
 
       this->parent->distanceSpin->setButtonSymbols(

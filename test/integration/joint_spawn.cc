@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,8 +72,9 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
                                         const std::string &_jointType)
 {
   /// \TODO: simbody not complete for this test
-  if (_physicsEngine == "simbody")  // &&
-  //    _jointType != "revolute" && _jointType != "prismatic")
+  if (_physicsEngine == "simbody" && (
+      _jointType == "gearbox" ||
+      _jointType == "revolute2"))
   {
     gzerr << "Aborting test for Simbody, see issues #859, #861.\n";
     return;
@@ -105,6 +106,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     ASSERT_TRUE(parent != NULL);
     EXPECT_EQ(parent->GetChildJoints().size(), 1u);
     EXPECT_EQ(parent->GetParentJoints().size(), 0u);
+    EXPECT_EQ(_jointType, msgs::ConvertJointType(joint->GetMsgType()));
     for (unsigned int i = 0; i < joint->GetAngleCount(); ++i)
     {
       CheckJointProperties(i, joint);
@@ -144,10 +146,18 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     gzerr << "Skip tests for child world link cases "
           << "since DART does not allow joint with world as child. "
           << "Please see issue #914. "
-          << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
-    return;
+          << "(https://bitbucket.org/osrf/gazebo/issue/914)"
+          << std::endl;
   }
-
+  else if (_physicsEngine == "simbody" && _jointType == "screw")
+  {
+    // SimbodyScrewJoint doesn't support joints with world child.
+    gzerr << "Skip SimbodyScrewJoint tests for child world link cases."
+          << "Please see issue #857. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/857)"
+          << std::endl;
+  }
+  else
   {
     gzdbg << "SpawnJoint " << _jointType << " world parent" << std::endl;
     physics::JointPtr joint = SpawnJoint(_jointType, true, false);
@@ -172,13 +182,6 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
 void JointSpawningTest::SpawnJointRotational(const std::string &_physicsEngine,
                                              const std::string &_jointType)
 {
-  /// \TODO: simbody not complete for this test
-  if (_physicsEngine == "simbody" && _jointType != "revolute")
-  {
-    gzerr << "Aborting test for Simbody, see issue #859.\n";
-    return;
-  }
-
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -290,12 +293,13 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   ASSERT_TRUE(world != NULL);
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
+  bool isOde = physics->GetType().compare("ode") == 0;
+  bool isBullet = physics->GetType().compare("bullet") == 0;
   double dt = physics->GetMaxStepSize();
 
   if (_joint->HasType(physics::Base::HINGE2_JOINT) ||
       _joint->HasType(physics::Base::GEARBOX_JOINT) ||
-      _joint->HasType(physics::Base::SCREW_JOINT) ||
-      _joint->HasType(physics::Base::UNIVERSAL_JOINT))
+      _joint->HasType(physics::Base::SCREW_JOINT))
   {
     gzerr << "This portion of the test fails for this joint type" << std::endl;
     return;
@@ -306,6 +310,9 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     return;
   }
 
+  // Reset world prior to testing SetVelocity
+  // This is needed for SimbodyUniversalJoint
+  world->Reset();
   double velocityMagnitude = 1.0;
   std::vector<double> velocities;
   velocities.push_back(velocityMagnitude);
@@ -358,6 +365,57 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     EXPECT_LT(_joint->GetAngle(_index).Radian(), angleStart);
   }
 
+  // Test Coloumb friction
+  if (isBullet && !_joint->HasType(physics::Base::HINGE_JOINT))
+  {
+    gzerr << "Skipping friction test for "
+          << physics->GetType()
+          << " "
+          << msgs::ConvertJointType(_joint->GetMsgType())
+          << " joint"
+          << std::endl;
+  }
+  else if (!isOde && !isBullet)
+  {
+    gzerr << "Skipping friction test for "
+          << physics->GetType()
+          << std::endl;
+  }
+  else
+  {
+    // reset world and expect joint to be stopped at home position
+    world->Reset();
+    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
+
+    // set friction to 1.0
+    const double friction = 1.0;
+    EXPECT_TRUE(_joint->SetParam("friction", _index, friction));
+    EXPECT_NEAR(_joint->GetParam("friction", _index), friction, g_tolerance);
+
+    for (unsigned int i = 0; i < 500; ++i)
+    {
+      // Apply force with smaller magnitude than friction
+      _joint->SetForce(_index, friction * 0.5);
+      world->Step(1);
+    }
+
+    // Expect no motion
+    EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+
+    for (unsigned int i = 0; i < 500; ++i)
+    {
+      // Apply force with larger magnitude than friction
+      _joint->SetForce(_index, friction * 1.5);
+      world->Step(1);
+    }
+
+    // Expect motion
+    EXPECT_GT(_joint->GetVelocity(_index), 0.2 * friction);
+    EXPECT_GT(_joint->GetAngle(_index).Radian(), 0.05 * friction);
+  }
+
   // SetHighStop
   {
     // reset world and expect joint to be stopped at home position
@@ -373,6 +431,10 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     world->Step(steps);
     EXPECT_LT(_joint->GetAngle(_index).Radian(), limit.Radian() + g_tolerance);
     EXPECT_EQ(_joint->GetHighStop(_index), limit);
+    {
+      boost::any value = _joint->GetParam("hi_stop", _index);
+      EXPECT_NEAR(boost::any_cast<double>(value), limit.Radian(), g_tolerance);
+    }
   }
 
   // SetLowStop
@@ -390,6 +452,10 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     world->Step(steps);
     EXPECT_GT(_joint->GetAngle(_index).Radian(), limit.Radian() - g_tolerance);
     EXPECT_EQ(_joint->GetLowStop(_index), limit);
+    {
+      boost::any value = _joint->GetParam("lo_stop", _index);
+      EXPECT_NEAR(boost::any_cast<double>(value), limit.Radian(), g_tolerance);
+    }
   }
 }
 
@@ -432,10 +498,10 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_Rotational,
                   , "ball")));
 
 // Skip prismatic, screw, and revolute2 because they allow translation
-// Skip universal because it can't be connected to world in bullet.
 INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_RotationalWorld,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
+                  , "universal"
                   , "ball")));
 
 int main(int argc, char **argv)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ TEST_F(GzWorld, Pause)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   EXPECT_FALSE(world->IsPaused());
 
@@ -53,7 +53,7 @@ TEST_F(GzWorld, Step)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   EXPECT_TRUE(world->IsPaused());
 

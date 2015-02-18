@@ -23,6 +23,7 @@ set (sources
   AlignWidget.cc
   BoxMaker.cc
   CloneWindow.cc
+  ConfigWidget.cc
   CylinderMaker.cc
   DataLogger.cc
   Editor.cc
@@ -57,6 +58,7 @@ set (qt_headers
   Actions.hh
   AlignWidget.hh
   CloneWindow.hh
+  ConfigWidget.hh
   DataLogger.hh
   Editor.hh
   GLWidget.hh
@@ -132,7 +134,15 @@ set (qt_tests
 
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
-  set (qt_tests   ${qt_tests} MainWindow_TEST.cc ModelListWidget_TEST.cc ModelSnap_TEST.cc)
+  set (qt_tests
+      ${qt_tests}
+      BuildingEditor_TEST.cc
+      ConfigWidget_TEST.cc
+      GLWidget_TEST.cc
+      GLWidget_TEST2.cc
+      MainWindow_TEST.cc
+      ModelListWidget_TEST.cc
+      ModelSnap_TEST.cc)
 endif()
 
 # Generate executables for each of the QT unit tests
@@ -143,11 +153,11 @@ set (resources resources.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-gz_add_executable(gzclient ${sources} main.cc ${headers_MOC} ${headers} ${resources_RCC})
 gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+gz_add_executable(gzclient main.cc)
 
 add_dependencies(gazebo_gui gazebo_msgs)
-add_dependencies(gzclient gazebo_msgs)
+add_dependencies(gzclient gazebo_gui)
 
 target_link_libraries(gazebo_gui
   gazebo_common
@@ -173,6 +183,7 @@ target_link_libraries(gzclient
   gazebo_rendering
   gazebo_sensors
   gazebo_msgs
+  gazebo_gui
   gazebo_gui_building
   gazebo_gui_model
   gazebo_gui_terrain
@@ -194,13 +205,13 @@ endif()
 add_definitions(${QT_DEFINITIONS})
 
 set (gui_headers "" CACHE INTERNAL "gui headers" FORCE)
-foreach (hdr ${install_headers})
+foreach (hdr ${headers} ${qt_headers})
   APPEND_TO_CACHED_STRING(gui_headers
     "GUI Headers" "#include \"gazebo/gui/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gui.hh.in ${CMAKE_CURRENT_BINARY_DIR}/gui.hh )
 
 gz_install_library(gazebo_gui)
-gz_install_includes("gui" ${install_headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
+gz_install_includes("gui" ${headers} ${qt_headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)
 manpage(gzclient 1)

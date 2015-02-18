@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,10 +159,19 @@ void BulletSliderJoint::Init()
   // Apply joint translation limits here.
   // TODO: velocity and effort limits.
   GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
-  sdf::ElementPtr limitElem;
-  limitElem = this->sdf->GetElement("axis")->GetElement("limit");
-  this->bulletSlider->setLowerLinLimit(limitElem->Get<double>("lower"));
-  this->bulletSlider->setUpperLinLimit(limitElem->Get<double>("upper"));
+  sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+  GZ_ASSERT(axisElem != NULL, "Joint axis sdf member is NULL");
+  {
+    sdf::ElementPtr limitElem;
+    limitElem = this->sdf->GetElement("axis")->GetElement("limit");
+    this->bulletSlider->setLowerLinLimit(limitElem->Get<double>("lower"));
+    this->bulletSlider->setUpperLinLimit(limitElem->Get<double>("upper"));
+  }
+
+  // Set Joint friction here in Init, since the bullet data structure didn't
+  // exist when the friction was set during Joint::Load
+  this->SetParam("friction", 0,
+    axisElem->GetElement("dynamics")->Get<double>("friction"));
 
   this->constraint = this->bulletSlider;
 
@@ -360,4 +369,71 @@ math::Angle BulletSliderJoint::GetAngleImpl(unsigned int _index) const
   math::Vector3 axis = this->GetGlobalAxis(_index);
   math::Pose poseParent = this->GetWorldPose();
   return math::Angle(axis.Dot(offset));
+}
+
+//////////////////////////////////////////////////
+bool BulletSliderJoint::SetParam(const std::string &_key,
+    unsigned int _index,
+    const boost::any &_value)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return false;
+  }
+
+  try
+  {
+    if (_key == "friction")
+    {
+      if (this->bulletSlider)
+      {
+        this->bulletSlider->setPoweredLinMotor(true);
+        this->bulletSlider->setTargetLinMotorVelocity(0.0);
+        this->bulletSlider->setMaxLinMotorForce(
+          boost::any_cast<double>(_value));
+      }
+      else
+      {
+        gzerr << "Joint must be created before setting " << _key << std::endl;
+        return false;
+      }
+    }
+    else
+    {
+      return BulletJoint::SetParam(_key, _index, _value);
+    }
+  }
+  catch(const boost::bad_any_cast &e)
+  {
+    gzerr << "SetParam(" << _key << ")"
+          << " boost any_cast error:" << e.what()
+          << std::endl;
+    return false;
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+double BulletSliderJoint::GetParam(const std::string &_key, unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return 0;
+  }
+
+  if (_key == "friction")
+  {
+    if (this->bulletSlider)
+    {
+      return this->bulletSlider->getMaxLinMotorForce();
+    }
+    else
+    {
+      gzerr << "Joint must be created before getting " << _key << std::endl;
+      return 0.0;
+    }
+  }
+  return BulletJoint::GetParam(_key, _index);
 }

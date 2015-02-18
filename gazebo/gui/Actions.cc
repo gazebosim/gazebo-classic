@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,8 +47,6 @@ QAction *gazebo::gui::g_quitAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_dataLoggerAct = 0;
 
-GAZEBO_VISIBLE
-QAction *gazebo::gui::g_newModelAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_resetModelsAct = 0;
 GAZEBO_VISIBLE
@@ -130,3 +128,6 @@ QAction *gazebo::gui::g_snapAct = 0;
 
 GAZEBO_VISIBLE
 QWidgetAction *gazebo::gui::g_alignAct = 0;
+
+GAZEBO_VISIBLE
+QAction *gazebo::gui::g_alignButtonAct = 0;
