@@ -769,3 +769,33 @@ bool UserCamera::StereoEnabled() const
 {
   return this->dataPtr->stereoEnabled;
 }
+
+//////////////////////////////////////////////////
+void UserCamera::EnableStereo(bool _enable)
+{
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
+  if (this->dataPtr->rightViewport)
+  {
+    if (_enable)
+    {
+      this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
+      this->dataPtr->rightViewport->setAutoUpdated(true);
+      this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
+    }
+    else
+    {
+      this->dataPtr->rightViewport->setAutoUpdated(false);
+      this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK);
+      this->viewport->setDrawBuffer(Ogre::CBT_BACK);
+    }
+  }
+  else
+  {
+    gzwarn << "Tried to enable/disable stereo. "
+           << "However, stereo is turned off via the gui.ini file.\n";
+  }
+#else
+    gzwarn << "Tried to enable/disable stereo. "
+           << "However, Ogre version >= 1.10.0 is required.\n";
+#endif
+}
