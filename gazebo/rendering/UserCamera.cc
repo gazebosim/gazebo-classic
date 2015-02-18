@@ -795,7 +795,8 @@ void UserCamera::EnableStereo(bool _enable)
            << "However, stereo is turned off via the gui.ini file.\n";
   }
 #else
-    gzwarn << "Tried to enable/disable stereo. "
-           << "However, Ogre version >= 1.10.0 is required.\n";
+  gzwarn << "Tried to EnableStereo("
+         << _enable
+         << "). However, Ogre version >= 1.10.0 is required.\n";
 #endif
 }
