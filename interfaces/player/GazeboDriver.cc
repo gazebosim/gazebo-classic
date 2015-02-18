@@ -179,7 +179,7 @@ void GazeboDriver::Update()
 {
   Driver::ProcessMessages();
 
-  for (auto &device: this->devices)
+  for (auto device: this->devices)
   {
     device->Update();
   }
@@ -352,7 +352,7 @@ int GazeboDriver::LoadDevices(ConfigFile *_cf, int _section)
 // Find a device according to a player_devaddr
 GazeboInterface *GazeboDriver::LookupDevice(player_devaddr_t _addr)
 {
-  for (auto &iface: this->devices)
+  for (auto iface: this->devices)
   {
     if (iface->device_addr.robot == _addr.robot &&
         iface->device_addr.interf == _addr.interf &&
