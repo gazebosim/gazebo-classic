@@ -137,6 +137,9 @@ namespace gazebo
       /// \brief Qt callback when the the torque clear button is clicked.
       private slots: void OnTorqueClear();
 
+      /// \brief Qt callback when TODO
+      private slots: void OnManipulation();
+
       /// \brief TODO
       private slots: bool eventFilter(QObject *_object, QEvent *_event);
 

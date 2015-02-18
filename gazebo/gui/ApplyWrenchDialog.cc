@@ -24,6 +24,7 @@
 #include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/ApplyWrenchVisual.hh"
 
+#include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
@@ -441,6 +442,9 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->torqueVector = math::Vector3::Zero;
 
   connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
+  connect(g_rotateAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
+  connect(g_translateAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
+  connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
 }
 
 /////////////////////////////////////////////////
@@ -1265,8 +1269,14 @@ void ApplyWrenchDialog::SetActive(bool _active)
 
   if (_active)
   {
+    // Set visible
     this->dataPtr->applyWrenchVisual->SetVisible(true);
+
+    // Set selected
     event::Events::setSelectedEntity(this->dataPtr->linkName, "normal");
+
+    // Set arrow mode
+    g_arrowAct->trigger();
 
     MouseEventHandler::Instance()->AddPressFilter(
         "applyWrenchDialog_"+this->dataPtr->linkName,
@@ -1326,4 +1336,10 @@ bool ApplyWrenchDialog::OnKeyPress(const common::KeyEvent &_event)
     }
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::OnManipulation()
+{
+  this->SetActive(false);
 }
