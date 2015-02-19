@@ -178,13 +178,12 @@ void PartData::Load(sdf::ElementPtr _sdf)
   this->SetName(_sdf->Get<std::string>("name"));
   this->SetPose(_sdf->Get<math::Pose>("pose"));
 
+  msgs::LinkPtr linkMsgPtr(new msgs::Link);
   if (_sdf->HasElement("inertial"))
   {
     sdf::ElementPtr inertialElem = _sdf->GetElement("inertial");
     this->partSDF->GetElement("inertial")->Copy(inertialElem);
 
-
-    msgs::LinkPtr linkMsgPtr(new msgs::Link);
     msgs::Inertial *inertialMsg = linkMsgPtr->mutable_inertial();
 
     if (inertialElem->HasElement("mass"))
@@ -210,8 +209,34 @@ void PartData::Load(sdf::ElementPtr _sdf)
       inertialMsg->set_izz(inertiaElem->Get<double>("izz"));
     }
 
-    linkConfig->Update(linkMsgPtr);
   }
+  if (_sdf->HasElement("self_collide"))
+  {
+    sdf::ElementPtr selfCollideSDF = _sdf->GetElement("self_collide");
+    linkMsgPtr->set_self_collide(selfCollideSDF->Get<bool>(""));
+    this->partSDF->InsertElement(selfCollideSDF->Clone());
+  }
+  if (_sdf->HasElement("kinematic"))
+  {
+    sdf::ElementPtr kinematicSDF = _sdf->GetElement("kinematic");
+    linkMsgPtr->set_kinematic(kinematicSDF->Get<bool>());
+    this->partSDF->InsertElement(kinematicSDF->Clone());
+  }
+  if (_sdf->HasElement("must_be_base_link"))
+  {
+    sdf::ElementPtr baseLinkSDF = _sdf->GetElement("must_be_base_link");
+    // TODO link.proto is missing the must_be_base_link field.
+    //linkMsgPtr->must_be_base_link(baseLinkSDF->Get<bool>());
+    this->partSDF->InsertElement(baseLinkSDF->Clone());
+  }
+  if (_sdf->HasElement("velocity_decay"))
+  {
+    sdf::ElementPtr velocityDecaySDF = _sdf->GetElement("velocity_decay");
+    // TODO link.proto is missing the velocity_decay field.
+    //linkMsgPtr->set_velocity_decay(velocityDecaySDF->Get<double>());
+    this->partSDF->InsertElement(velocityDecaySDF->Clone());
+  }
+  linkConfig->Update(linkMsgPtr);
 
   if (_sdf->HasElement("sensor"))
   {
