@@ -9,6 +9,8 @@ import "vector3d.proto";
 
 message Wrench
 {
-  required Vector3d force  = 1;
-  required Vector3d torque = 2;
+  required Vector3d force          = 1;
+  required Vector3d torque         = 2;
+
+  optional Vector3d force_position = 3;
 }
