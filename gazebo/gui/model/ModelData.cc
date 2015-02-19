@@ -596,17 +596,7 @@ void PartData::OnAddCollision(const std::string &_name)
     sdf::ElementPtr collisionElem =  modelTemplateSDF->root
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     collisionVis->Load(collisionElem);
-    // orange
-    common::Color ambient;
-    common::Color diffuse;
-    common::Color specular;
-    common::Color emissive;
-    rendering::Material::GetMaterialAsColor("Gazebo/Orange", ambient, diffuse,
-        specular, emissive);
-    collisionVis->SetAmbient(ambient);
-    collisionVis->SetDiffuse(diffuse);
-    collisionVis->SetSpecular(specular);
-    collisionVis->SetEmissive(emissive);
+    collisionVis->SetMaterial("Gazebo/Orange");
     this->partVisual->GetScene()->AddVisual(collisionVis);
   }
 

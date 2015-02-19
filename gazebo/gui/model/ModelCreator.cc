@@ -623,16 +623,7 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
       part->partVisual);
 
   // orange
-  common::Color ambient;
-  common::Color diffuse;
-  common::Color specular;
-  common::Color emissive;
-  rendering::Material::GetMaterialAsColor("Gazebo/Orange", ambient, diffuse,
-      specular, emissive);
-  collisionVis->SetAmbient(ambient);
-  collisionVis->SetDiffuse(diffuse);
-  collisionVis->SetSpecular(specular);
-  collisionVis->SetEmissive(emissive);
+  collisionVis->SetMaterial("Gazebo/Orange");
   collisionVis->SetTransparency(
       math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
   // fix for transparency alpha compositing
@@ -833,17 +824,7 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
 
     colVisual->Load(colVisualElem);
     colVisual->SetPose(collisionPose);
-    // orange
-    common::Color ambient;
-    common::Color diffuse;
-    common::Color specular;
-    common::Color emissive;
-    rendering::Material::GetMaterialAsColor("Gazebo/Orange", ambient, diffuse,
-        specular, emissive);
-    colVisual->SetAmbient(ambient);
-    colVisual->SetDiffuse(diffuse);
-    colVisual->SetSpecular(specular);
-    colVisual->SetEmissive(emissive);
+    colVisual->SetMaterial("Gazebo/Orange");
     colVisual->SetTransparency(
         math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
     // fix for transparency alpha compositing
