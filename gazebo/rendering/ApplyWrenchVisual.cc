@@ -497,6 +497,10 @@ void ApplyWrenchVisual::SetVisible(bool _visible, bool _cascade)
     {
       dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
       dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
+      if (dPtr->mode == "force")
+        dPtr->forceVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
+      else
+        dPtr->torqueVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
     }
   }
   else
