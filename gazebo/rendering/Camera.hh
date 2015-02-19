@@ -592,6 +592,9 @@ namespace gazebo
       /// completed.
       protected: virtual void AnimationComplete();
 
+      /// \brief Update the camera's field of view.
+      protected: virtual void UpdateFOV();
+
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats
       /// \param[in] _dst Destination buffer for the image data

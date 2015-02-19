@@ -28,19 +28,83 @@ using namespace gazebo;
 class ContactSensor : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
-  public: void EmptyWorld(const std::string &_physicsEngine);
+  /// \brief Test multiple contact sensors on a single link.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void MultipleSensors(const std::string &_physicsEngine);
   public: void StackTest(const std::string &_physicsEngine);
   public: void TorqueTest(const std::string &_physicsEngine);
+
+  /// \brief Callback for sensor subscribers in MultipleSensors test.
+  private: void Callback(const ConstContactsPtr &_msg);
 };
 
-void ContactSensor::EmptyWorld(const std::string &_physicsEngine)
+unsigned int g_messageCount = 0;
+
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::Callback(const ConstContactsPtr &/*_msg*/)
 {
-  Load("worlds/empty.world", false, _physicsEngine);
+  g_messageCount++;
 }
 
-TEST_P(ContactSensor, EmptyWorld)
+////////////////////////////////////////////////////////////////////////
+// Test having multiple contact sensors under a single link.
+// https://bitbucket.org/osrf/gazebo/issue/960
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
 {
-  EmptyWorld(GetParam());
+  Load("worlds/contact_sensors_multiple.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != NULL);
+
+  const std::string contactSensorName1("box_contact");
+  const std::string contactSensorName2("box_contact2");
+
+  {
+    sensors::SensorPtr sensor1 = sensors::get_sensor(contactSensorName1);
+    sensors::ContactSensorPtr contactSensor1 =
+        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor1);
+    ASSERT_TRUE(contactSensor1 != NULL);
+  }
+
+  {
+    sensors::SensorPtr sensor2 = sensors::get_sensor(contactSensorName2);
+    sensors::ContactSensorPtr contactSensor2 =
+        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor2);
+    ASSERT_TRUE(contactSensor2 != NULL);
+  }
+
+  // There should be 5 topics advertising Contacts messages
+  std::list<std::string> topicsExpected;
+  std::string prefix = "/gazebo/default/";
+  topicsExpected.push_back(prefix+"physics/contacts");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact/contacts");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact2/contacts");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact2");
+  std::list<std::string> topics =
+    transport::getAdvertisedTopics("gazebo.msgs.Contacts");
+  EXPECT_FALSE(topics.empty());
+  EXPECT_EQ(topics.size(), topicsExpected.size());
+  EXPECT_EQ(topics, topicsExpected);
+
+  // We should expect them all to publish.
+  for (auto const &topic : topics)
+  {
+    gzdbg << "Listening to " << topic << std::endl;
+    g_messageCount = 0;
+    transport::SubscriberPtr sub = this->node->Subscribe(topic,
+      &ContactSensor::Callback, this);
+
+    const int steps = 50;
+    world->Step(steps);
+    common::Time::MSleep(steps);
+    EXPECT_GT(g_messageCount, steps / 2);
+  }
+}
+
+TEST_P(ContactSensor, MultipleSensors)
+{
+  MultipleSensors(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////

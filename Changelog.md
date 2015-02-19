@@ -10,6 +10,12 @@
 1. Added ModelRightMenu::EntityTypes.
     * [Pull request #1414](https://bitbucket.org/osrf/gazebo/pull-request/1414)
 
+1. Added Gazebo/CoM material.
+    * [Pull request #1439](https://bitbucket.org/osrf/gazebo/pull-request/1439)
+
+1. Added arc parameter to MeshManager::CreateTube 
+    * [Pull request #1436](https://bitbucket.org/osrf/gazebo/pull-request/1436)
+
  1. Model editor updates
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
@@ -23,6 +29,9 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
+1. Added Joint Msg-to-SDF conversion functions and test.
+    * [Pull request #1419](https://bitbucket.org/osrf/gazebo/pull-request/1419)
+
 1. Added Visual, Material Msg-to-SDF conversion functions and ShaderType to string conversion functions.
     * [Pull request #1415](https://bitbucket.org/osrf/gazebo/pull-request/1415)
 
@@ -124,6 +133,10 @@
 
 1. Fixed crash on "permission denied" bug, added insert_model integration test.
     * [Pull request #1329](https://bitbucket.org/osrf/gazebo/pull-request/1329/)
+
+1. Enable simbody joint tests, implement `SimbodyJoint::GetParam`, create
+   `Joint::GetParam`, fix bug in `BulletHingeJoint::SetParam`.
+    * [Pull request #1404](https://bitbucket.org/osrf/gazebo/pull-request/1404/)
 
 1. Building editor updates
     1. Fixed inspector resizing.
