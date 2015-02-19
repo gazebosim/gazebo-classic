@@ -1,8 +1,4 @@
-
-1. **gazebo/gui/RenderWidget.hh**
-      + void InsertWidget(unsigned int _index, QWidget *_widget)
-      + unsigned int GetWidgetCount()
-      + void ShowTimePanel(bool _show)
+## Gazebo 5.X to 6.X
 
 ### Deletions
 
@@ -62,7 +58,8 @@ Gazebo 5.x uses features from the new c++11 standard. This requires to have a co
                                         Ogre::Node::TransformSpace _relativeTo = Ogre::Node::TS_LOCAL);
     + ***Deprecation:*** public: void RotateYaw(math::Angle _angle);
     + ***Replacement:*** public: void Yaw(const math::Angle &_angle,
-                                        Ogre::Node::TransformSpace _relativeTo = Ogre::Node::TS_LOCAL);         
+                                        Ogre::Node::TransformSpace _relativeTo = Ogre::Node::TS_LOCAL);
+
 1. **gazebo/rendering/AxisVisual.hh**
     + ***Removed:*** public: void ShowRotation(unsigned int _axis)
     + ***Replacement:*** public: void ShowAxisRotation(unsigned int _axis, bool _show)
@@ -70,7 +67,7 @@ Gazebo 5.x uses features from the new c++11 standard. This requires to have a co
 1. **gazebo/rendering/ArrowVisual.hh**
     + ***Removed:*** public: void ShowRotation()
     + ***Replacement:*** public: void ShowRotation(bool _show)
-    
+
 
 1. **gazebo/physics/Collision.hh**
     + unsigned int GetShapeType()

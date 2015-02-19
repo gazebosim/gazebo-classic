@@ -152,7 +152,7 @@ namespace gazebo
       public: static void DisconnectFollow(
               event::ConnectionPtr _subscriber)
               { follow.Disconnect(_subscriber); }
-              
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a signal to the main window ready signal
       public: template<typename T>

@@ -899,13 +899,9 @@ void Model::ProcessMsg(const msgs::Model &_msg)
     this->SetWorldPose(msgs::Convert(_msg.pose()));
   for (int i = 0; i < _msg.link_size(); i++)
   {
-    std::cerr << " link id " << _msg.link(i).id() << std::endl;
     LinkPtr link = this->GetLinkById(_msg.link(i).id());
     if (link)
-    {
-      std::cerr << " got link! "<< std::endl;
       link->ProcessMsg(_msg.link(i));
-    }
   }
 
   if (_msg.has_is_static())

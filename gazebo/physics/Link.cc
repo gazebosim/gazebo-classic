@@ -807,7 +807,6 @@ void Link::FillMsg(msgs::Link &_msg)
 //////////////////////////////////////////////////
 void Link::ProcessMsg(const msgs::Link &_msg)
 {
-  std::cerr << " in link process " << _msg.name() << std::endl;
   if (_msg.id() != this->GetId())
   {
     return;

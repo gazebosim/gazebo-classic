@@ -96,15 +96,6 @@ set (headers
   SphereMaker.hh
 )
 
-set (install_headers
-  ${headers}
-  Editor.hh
-  MainWindow.hh
-  ModelRightMenu.hh
-  RenderWidget.hh
-  TimePanel.hh
-)
-
 if (HAVE_OCULUS)
   set (sources ${sources}
     OculusWindow.cc
