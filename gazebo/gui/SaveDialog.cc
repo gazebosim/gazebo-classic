@@ -293,9 +293,12 @@ bool SaveDialog::OnSaveAs()
       QMessageBox msgBox(QMessageBox::Warning, QString("Files Exist"),
                          QString(msg.c_str()));
 
-      msgBox.addButton("Cancel", QMessageBox::ActionRole);
+      QPushButton *cancelButton =
+          msgBox.addButton("Cancel", QMessageBox::RejectRole);
       QPushButton *saveButton = msgBox.addButton("Save",
-          QMessageBox::ActionRole);
+          QMessageBox::AcceptRole);
+      msgBox.setDefaultButton(saveButton);
+      msgBox.setEscapeButton(cancelButton);
       msgBox.exec();
       if (msgBox.clickedButton() != saveButton)
       {
