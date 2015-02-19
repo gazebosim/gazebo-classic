@@ -18,8 +18,6 @@
 #ifndef _COMVISUAL_PRIVATE_HH_
 #define _COMVISUAL_PRIVATE_HH_
 
-#include <string>
-
 #include "gazebo/rendering/VisualPrivate.hh"
 
 namespace ogre

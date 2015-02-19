@@ -18,13 +18,11 @@
  * Author: Nate Koenig
  */
 
-#include "gazebo/common/MeshManager.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/Pose.hh"
 
 #include "gazebo/rendering/DynamicLines.hh"
-#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/COMVisualPrivate.hh"
 #include "gazebo/rendering/COMVisual.hh"
@@ -91,11 +89,11 @@ void COMVisual::Load(const math::Pose &_pose, double _radius)
 
   // CoM position indicator
   math::Vector3 p1(0, 0, -2*_radius);
-  math::Vector3 p2(0, 0,  2*_radius);
+  math::Vector3 p2(0, 0, 2*_radius);
   math::Vector3 p3(0, -2*_radius, 0);
-  math::Vector3 p4(0,  2*_radius, 0);
+  math::Vector3 p4(0, 2*_radius, 0);
   math::Vector3 p5(-2*_radius, 0, 0);
-  math::Vector3 p6( 2*_radius, 0, 0);
+  math::Vector3 p6(2*_radius, 0, 0);
   p1 += _pose.pos;
   p2 += _pose.pos;
   p3 += _pose.pos;

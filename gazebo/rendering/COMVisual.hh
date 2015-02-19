@@ -20,13 +20,8 @@
 
 #include <string>
 
-#include <sdf/sdf.hh>
-
 #include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

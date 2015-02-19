@@ -20,13 +20,8 @@
 
 #include <string>
 
-#include <sdf/sdf.hh>
-
 #include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +31,7 @@ namespace gazebo
     /// \{
 
     /// \class InertiaVisual InertiaVisual.hh rendering/rendering.hh
-    /// \brief Basic Center of Mass visualization
+    /// \brief Basic Inertia visualization
     class GAZEBO_VISIBLE InertiaVisual : public Visual
     {
       /// \brief Constructor
