@@ -57,7 +57,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   ASSERT_TRUE(world != NULL);
 
   unsigned int i;
-  double updateRate, now, then;
+  double updateRateHokuyo, updateRateImu, now, then;
 
   // get the sensor manager
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
@@ -73,9 +73,10 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   ASSERT_TRUE(imuSensor != NULL);
 
   // set update rate to 30 Hz
-  updateRate = 30.0;
-  sensor->SetUpdateRate(updateRate);
-  imuSensor->SetUpdateRate(updateRate);
+  updateRateHokuyo = 30.0;
+  updateRateImu = 1000.0;
+  sensor->SetUpdateRate(updateRateHokuyo);
+  imuSensor->SetUpdateRate(updateRateImu);
   gzdbg << sensor->GetScopedName() << " loaded with update rate of "
         << sensor->GetUpdateRate() << " Hz"
         << std::endl;
@@ -106,14 +107,16 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   unsigned int imuMsgCount = g_imuMsgCount;
   now = world->GetSimTime().Double();
 
-  gzdbg << "counted " << hokuyoMsgCount << " messages in "
+  gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
+        << now << " seconds\n";
+  gzdbg << "counted " << imuMsgCount << " imu messages in "
         << now << " seconds\n";
 
   // Expect at least 50% of specified update rate
   EXPECT_GT(static_cast<double>(hokuyoMsgCount),
-              updateRate*now * 0.5);
+              updateRateHokuyo*now * 0.5);
   EXPECT_GT(static_cast<double>(imuMsgCount),
-              updateRate*now * 0.5);
+              updateRateImu*now * 0.5);
 
   // Wait another 1.5 seconds
   for (i = 0; i < 15; ++i)
@@ -123,14 +126,16 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   imuMsgCount = g_imuMsgCount;
   now = world->GetSimTime().Double();
 
-  gzdbg << "counted " << hokuyoMsgCount << " messages in "
+  gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
+        << now << " seconds\n";
+  gzdbg << "counted " << imuMsgCount << " imu messages in "
         << now << " seconds\n";
 
   // Expect at least 50% of specified update rate
   EXPECT_GT(static_cast<double>(hokuyoMsgCount),
-              updateRate*now * 0.5);
+              updateRateHokuyo*now * 0.5);
   EXPECT_GT(static_cast<double>(imuMsgCount),
-              updateRate*now * 0.5);
+              updateRateImu*now * 0.5);
 
   // Send reset world message
   transport::PublisherPtr worldControlPub =
@@ -157,15 +162,17 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   hokuyoMsgCount = g_hokuyoMsgCount;
   imuMsgCount = g_imuMsgCount;
   now = world->GetSimTime().Double() - now;
-  gzdbg << "counted " << hokuyoMsgCount << " messages in "
-        << now << " seconds. Expected[" << updateRate * now * 0.5 << "]\n";
+  gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
+        << now << " seconds\n";
+  gzdbg << "counted " << imuMsgCount << " imu messages in "
+        << now << " seconds\n";
 
   // Expect at least 50% of specified update rate
   // Note: this is where the failure documented in issue #236 occurs
   EXPECT_GT(static_cast<double>(hokuyoMsgCount),
-              updateRate*now * 0.5);
+              updateRateHokuyo*now * 0.5);
   EXPECT_GT(static_cast<double>(imuMsgCount),
-              updateRate*now * 0.5);
+              updateRateImu*now * 0.5);
 
   // Count messages again for 2 more seconds
   then = now;
@@ -178,14 +185,16 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   hokuyoMsgCount = g_hokuyoMsgCount;
   imuMsgCount = g_imuMsgCount;
   now = world->GetSimTime().Double();
-  gzdbg << "counted " << hokuyoMsgCount << " messages in "
-        << now - then << " seconds\n";
+  gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
+        << now << " seconds\n";
+  gzdbg << "counted " << imuMsgCount << " imu messages in "
+        << now << " seconds\n";
 
   // Expect at least 50% of specified update rate
   EXPECT_GT(static_cast<double>(hokuyoMsgCount),
-              updateRate*(now-then) * 0.5);
+              updateRateHokuyo*(now-then) * 0.5);
   EXPECT_GT(static_cast<double>(imuMsgCount),
-              updateRate*(now-then) * 0.5);
+              updateRateImu*(now-then) * 0.5);
 }
 
 /////////////////////////////////////////////////
