@@ -270,7 +270,7 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf);
 
-    /// \brief Create an SDF element from a msgs::Visual
+    /// \brief Create or update an SDF element from a msgs::Visual
     /// \param[in] _msg Visual messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
@@ -279,7 +279,9 @@ namespace gazebo
     sdf::ElementPtr VisualToSDF(const msgs::Visual &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
-    /// \brief Create an SDF element from a msgs::Material
+    /// \brief Create or update an SDF element from a msgs::Material
+    /// If _sdf is supplied and _msg has script uri's
+    /// the <uri> elements will be removed from _sdf.
     /// \param[in] _msg Material messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
@@ -314,7 +316,7 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf);
 
-    /// \brief Create an SDF element from a msgs::Light
+    /// \brief Create or update an SDF element from a msgs::Light
     /// \param[in] _msg Light messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
@@ -323,7 +325,7 @@ namespace gazebo
     sdf::ElementPtr LightToSDF(const msgs::Light &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
-    /// \brief Create an SDF element from a msgs::CameraSensor
+    /// \brief Create or update an SDF element from a msgs::CameraSensor
     /// \param[in] _msg CameraSensor messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
@@ -332,7 +334,7 @@ namespace gazebo
     sdf::ElementPtr CameraSensorToSDF(const msgs::CameraSensor &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
-    /// \brief Create an SDF element from a msgs::Plugin
+    /// \brief Create or update an SDF element from a msgs::Plugin
     /// \param[in] _msg Plugin messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
@@ -341,7 +343,7 @@ namespace gazebo
     sdf::ElementPtr PluginToSDF(const msgs::Plugin &_plugin,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
-    /// \brief Create an SDF element from a msgs::Collision
+    /// \brief Create or update an SDF element from a msgs::Collision
     /// \param[in] _msg Collision messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
@@ -351,7 +353,9 @@ namespace gazebo
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
     /// \internal
-    /// \brief Create an SDF element from a msgs::Link.
+    /// \brief Create or update an SDF element from a msgs::Link.
+    /// If _sdf is supplied and _msg has any collisions or visuals,
+    /// the <collision> and <visual> elements will be removed from _sdf.
     /// \param[in] _msg Link messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
@@ -360,7 +364,7 @@ namespace gazebo
     sdf::ElementPtr LinkToSDF(const msgs::Link &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
-    /// \brief Create an SDF element from a msgs::Inertial
+    /// \brief Create or update an SDF element from a msgs::Inertial
     /// \param[in] _msg Inertial messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
@@ -369,7 +373,7 @@ namespace gazebo
     sdf::ElementPtr InertialToSDF(const msgs::Inertial &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
-    /// \brief Create an SDF element from a msgs::Surface
+    /// \brief Create or update an SDF element from a msgs::Surface
     /// \param[in] _msg Surface messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
@@ -378,7 +382,10 @@ namespace gazebo
     sdf::ElementPtr SurfaceToSDF(const msgs::Surface &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
-    /// \brief Create an SDF element from a msgs::Geometry
+    /// \brief Create or update an SDF element from a msgs::Geometry
+    /// If _sdf is supplied and the _msg has non-empty repeated elements,
+    /// any existing sdf elements will be removed from _sdf prior to adding
+    /// the new elements from _msg.
     /// \param[in] _msg Geometry messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
@@ -387,7 +394,7 @@ namespace gazebo
     sdf::ElementPtr GeometryToSDF(const msgs::Geometry &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
-    /// \brief Create an SDF element from a msgs::Mesh
+    /// \brief Create or update an SDF element from a msgs::Mesh
     /// \param[in] _msg Mesh messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
@@ -439,7 +446,9 @@ namespace gazebo
     GAZEBO_VISIBLE
     void AddLinkGeom(Model &_msg, const Geometry &_geom);
 
-    /// \brief Create an SDF element from msgs::Model.
+    /// \brief Create or update an SDF element from msgs::Model.
+    /// If _sdf is supplied and _msg has any links or joints,
+    /// the <link> and <joint> elements will be removed from _sdf.
     /// \param[in] _msg The msgs::Model object.
     /// \param[in] _sdf if supplied, performs an update from _sdf instead of
     /// creating a new sdf element.
@@ -448,7 +457,7 @@ namespace gazebo
     sdf::ElementPtr ModelToSDF(const msgs::Model &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
-    /// \brief Create an SDF element from msgs::Joint.
+    /// \brief Create or update an SDF element from msgs::Joint.
     /// \param[in] _msg The msgs::Joint object.
     /// \param[in] _sdf if supplied, performs an update from _sdf instead of
     /// creating a new sdf element.
