@@ -74,7 +74,7 @@ set (headers
   GpuLaser.hh
   Grid.hh
   Heightmap.hh
-  InertiaVisual.cc
+  InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
   SonarVisual.hh
