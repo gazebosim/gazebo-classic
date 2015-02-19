@@ -1335,9 +1335,9 @@ msgs::Visual Link::GetVisualMessage(const std::string &_name) const
 void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
 {
   math::Vector3 pos = math::Vector3::Zero;
-  if (_msg->has_position())
+  if (_msg->has_force_position())
   {
-    pos = msgs::Convert(_msg->position());
+    pos = msgs::Convert(_msg->force_position());
   }
   if (_msg->has_force())
   {
@@ -1347,10 +1347,8 @@ void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
     // AddRelativeForceAtRelativePosition
     force = this->GetWorldPose().rot.RotateVector(force);
 
-//    gzdbg << "Pos: " << pos.x << "  " << pos.y << "  " << pos.z
-//          << "  Force: " << force.x << "  " << force.y << "  " << force.z << std::endl;
-
     // AddForceAtRelativePosition seems to be relative to the CoM
+    // (only ODE tested), so we translate it to the link origin
    pos = pos - this->inertial->GetCoG();
 
     this->AddForceAtRelativePosition(force, pos);
