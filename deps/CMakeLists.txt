@@ -1,4 +1,5 @@
 add_subdirectory(opende)
+add_subdirectory(parallel_quickstep)
 
 if (NOT CCD_FOUND)
   add_subdirectory(libccd)

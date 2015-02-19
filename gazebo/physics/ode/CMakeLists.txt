@@ -1,6 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/parallel_quickstep/include)
 
 link_directories(
   ${CCD_LIBRARY_DIRS}
@@ -63,6 +64,7 @@ gz_build_tests(${gtest_sources})
 gz_add_library(gazebo_physics_ode ${headers} ${sources})
 target_link_libraries(gazebo_physics_ode
   gazebo_ode
+  gazebo_parallel_quickstep
   gazebo_opcode
   gazebo_math
   gazebo_common

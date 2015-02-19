@@ -142,20 +142,17 @@ if(DEFINED USE_CUDA)
 
   cuda_compile(CUDA_GEN_FILES ${CUDA_SOURCE_FILES} SHARED -fPic)
 
-  gz_add_library(parallel_quickstep 
+  gz_add_library(gazebo_parallel_quickstep 
     ${CUDA_GEN_FILES}
     ${CUDA_SOURCE_FILES}
     ${CUDA_SOLVER_SOURCE_FILES}
     )
   add_executable(parallel_quickstep_lib_test src/main_for_lib.cpp )
-  target_link_libraries(parallel_quickstep gazebo_ode)
-  target_link_libraries(parallel_quickstep ${CUDA_LIBRARIES})
-  target_link_libraries(parallel_quickstep ${Boost_LIBRARIES})
-  target_link_libraries(parallel_quickstep_lib_test parallel_quickstep)
+  target_link_libraries(gazebo_parallel_quickstep gazebo_ode)
+  target_link_libraries(gazebo_parallel_quickstep ${CUDA_LIBRARIES})
+  target_link_libraries(gazebo_parallel_quickstep ${Boost_LIBRARIES})
+  target_link_libraries(parallel_quickstep_lib_test gazebo_parallel_quickstep)
   cuda_build_clean_target()
-  add_dependencies(parallel_quickstep gazebo_ode)
-  gz_install_library(parallel_quickstep)
-  set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fopenmp ")
 
 elseif( DEFINED USE_OPENMP )
 
@@ -170,11 +167,11 @@ elseif( DEFINED USE_OPENMP )
     src/openmp_solver.cpp
     src/openmp_kernels.cpp )
 
-  gz_add_library(parallel_quickstep
+  gz_add_library(gazebo_parallel_quickstep
     ${OPENMP_SOLVER_SOURCE_FILES}
     )
-  target_link_libraries(parallel_quickstep gazebo_ode)
-  target_link_libraries(parallel_quickstep ${Boost_LIBRARIES})
+  target_link_libraries(gazebo_parallel_quickstep gazebo_ode)
+  target_link_libraries(gazebo_parallel_quickstep ${Boost_LIBRARIES})
   set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fopenmp ")
 
 elseif( DEFINED USE_OPENCL )
@@ -195,15 +192,15 @@ elseif( DEFINED USE_OPENCL )
     src/parallel_reduce.cpp
     src/parallel_quickstep.cpp)
 
-  gz_add_library(parallel_quickstep
+  gz_add_library(gazebo_parallel_quickstep
     ${OPENCL_SOLVER_SOURCE_FILES}
     )
 
-  target_link_libraries(parallel_quickstep gazebo_ode)
-  target_link_libraries(parallel_quickstep ${OPENCL_LIBRARIES})
-  target_link_libraries(parallel_quickstep ${Boost_LIBRARIES})
+  target_link_libraries(gazebo_parallel_quickstep gazebo_ode)
+  target_link_libraries(gazebo_parallel_quickstep ${OPENCL_LIBRARIES})
+  target_link_libraries(gazebo_parallel_quickstep ${Boost_LIBRARIES})
   add_executable(parallel_quickstep_lib_test src/main_for_lib.cpp src/test_lib.cpp)
-  target_link_libraries(parallel_quickstep_lib_test parallel_quickstep)
+  target_link_libraries(parallel_quickstep_lib_test gazebo_parallel_quickstep)
 
 elseif( DEFINED USE_CPU )
 
@@ -213,20 +210,42 @@ elseif( DEFINED USE_CPU )
     src/parallel_stepper.cpp
     src/parallel_quickstep.cpp)
 
-  gz_add_library(parallel_quickstep
+  gz_add_library(gazebo_parallel_quickstep
     ${CPU_SOLVER_SOURCE_FILES}
     )
 
-  target_link_libraries(parallel_quickstep gazebo_ode)
-  target_link_libraries(parallel_quickstep ${Boost_LIBRARIES})
+  target_link_libraries(gazebo_parallel_quickstep gazebo_ode)
+  target_link_libraries(gazebo_parallel_quickstep ${Boost_LIBRARIES})
   set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fopenmp ")
 
 endif()
 
+set ( headers 
+include/parallel_quickstep/cuda_common.h
+include/parallel_quickstep/cuda_solver.h
+include/parallel_quickstep/cuda_timer.h
+include/parallel_quickstep/cuda_utils.h
+include/parallel_quickstep/opencl_common.h
+include/parallel_quickstep/opencl_solver.h
+include/parallel_quickstep/opencl_utils.h
+include/parallel_quickstep/openmp_common.h
+include/parallel_quickstep/openmp_solver.h
+include/parallel_quickstep/parallel_array.h
+include/parallel_quickstep/parallel_batch.h
+include/parallel_quickstep/parallel_common.h
+include/parallel_quickstep/parallel_defines.h
+include/parallel_quickstep/parallel_math.h
+include/parallel_quickstep/parallel_memory.h
+include/parallel_quickstep/parallel_quickstep.h
+include/parallel_quickstep/parallel_reduce.h
+include/parallel_quickstep/parallel_solver.h
+include/parallel_quickstep/parallel_stepper.h
+include/parallel_quickstep/parallel_timer.h
+include/parallel_quickstep/parallel_utils.h
+include/parallel_quickstep/vector_types.h
+)
 
-
-
-
-
-
-
+add_dependencies(gazebo_parallel_quickstep gazebo_ode)
+gz_install_library(gazebo_parallel_quickstep)
+gz_install_includes("parallel_quickstep" ${headers})
+set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fopenmp ")

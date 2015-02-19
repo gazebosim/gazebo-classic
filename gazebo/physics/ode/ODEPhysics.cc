@@ -733,6 +733,8 @@ void ODEPhysics::SetStepType(const std::string &_type)
     this->physicsStepFunc = &dWorldQuickStep;
   else if (this->stepType == "world")
     this->physicsStepFunc = &dWorldStep;
+  else if (this->stepType == "parallel_quick")
+    this->physicsStepFunc = &dWorldParallelQuickStep;
   else
     gzerr << "Invalid step type[" << this->stepType << "]" << std::endl;
 }
