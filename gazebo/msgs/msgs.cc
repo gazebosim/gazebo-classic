@@ -1685,7 +1685,7 @@ namespace gazebo
       auto link = _model.mutable_link(linkCount-1);
       {
         std::ostringstream linkName;
-        linkName << "link" << linkCount;
+        linkName << "link_" << linkCount;
         link->set_name(linkName.str());
       }
 

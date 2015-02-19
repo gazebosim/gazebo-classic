@@ -1574,7 +1574,7 @@ TEST_F(MsgsTest, AddBoxLink)
   EXPECT_EQ(model.link_size(), 1);
   {
     auto link = model.link(0);
-    EXPECT_EQ(link.name(), std::string("link1"));
+    EXPECT_EQ(link.name(), std::string("link_1"));
 
     auto inertial = link.inertial();
     EXPECT_DOUBLE_EQ(inertial.mass(), mass);
@@ -1618,7 +1618,7 @@ TEST_F(MsgsTest, AddBoxLink)
   {
     auto link1 = model.link(0);
     auto link2 = model.link(1);
-    EXPECT_EQ(link2.name(), std::string("link2"));
+    EXPECT_EQ(link2.name(), std::string("link_2"));
 
     auto inertial1 = link1.inertial();
     auto inertial2 = link2.inertial();
@@ -1643,7 +1643,7 @@ TEST_F(MsgsTest, AddCylinderLink)
   EXPECT_EQ(model.link_size(), 1);
   {
     auto link = model.link(0);
-    EXPECT_EQ(link.name(), std::string("link1"));
+    EXPECT_EQ(link.name(), std::string("link_1"));
 
     auto inertial = link.inertial();
     EXPECT_DOUBLE_EQ(inertial.mass(), mass);
@@ -1689,7 +1689,7 @@ TEST_F(MsgsTest, AddCylinderLink)
   {
     auto link1 = model.link(0);
     auto link2 = model.link(1);
-    EXPECT_EQ(link2.name(), std::string("link2"));
+    EXPECT_EQ(link2.name(), std::string("link_2"));
 
     auto inertial1 = link1.inertial();
     auto inertial2 = link2.inertial();
@@ -1713,7 +1713,7 @@ TEST_F(MsgsTest, AddSphereLink)
   EXPECT_EQ(model.link_size(), 1);
   {
     auto link = model.link(0);
-    EXPECT_EQ(link.name(), std::string("link1"));
+    EXPECT_EQ(link.name(), std::string("link_1"));
 
     auto inertial = link.inertial();
     EXPECT_DOUBLE_EQ(inertial.mass(), mass);
@@ -1757,7 +1757,7 @@ TEST_F(MsgsTest, AddSphereLink)
   {
     auto link1 = model.link(0);
     auto link2 = model.link(1);
-    EXPECT_EQ(link2.name(), std::string("link2"));
+    EXPECT_EQ(link2.name(), std::string("link_2"));
 
     auto inertial1 = link1.inertial();
     auto inertial2 = link2.inertial();
