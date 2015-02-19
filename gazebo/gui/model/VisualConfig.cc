@@ -141,6 +141,7 @@ void VisualConfig::AddVisual(const std::string &_name,
       common::Color emissive;
       bool matFound = rendering::Material::GetMaterialAsColor(scriptMsg->name(),
           ambient, diffuse, specular, emissive);
+
       if (matFound)
       {
         msgs::Set(matMsg->mutable_ambient(), ambient);

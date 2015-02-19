@@ -378,7 +378,7 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
     jointData->upperLimit[i] = 3.14;
     jointData->effortLimit[i] = -1;
     jointData->velocityLimit[i] = -1;
-    jointData->useParentModelFrame[i] = true;
+    jointData->useParentModelFrame[i] = false;
     jointData->damping[i] = 0;
   }
   jointData->pose = math::Pose::Zero;

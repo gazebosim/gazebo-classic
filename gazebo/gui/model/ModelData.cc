@@ -284,8 +284,6 @@ void PartData::AddVisual(rendering::VisualPtr _visual)
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
   msgs::Visual visualMsg = msgs::VisualFromSDF(_visual->GetSDF());
 
-  // override transparency value
-  visualMsg.set_transparency(0.0);
   this->visuals[_visual] = visualMsg;
 
   std::string visName = _visual->GetName();
@@ -353,11 +351,18 @@ PartData* PartData::Clone(const std::string &_newName)
       newVisName = cloneVisName + newVisName.substr(idx-1);
     else
       newVisName = cloneVisName + "::" + newVisName;
-    clonePart->AddVisual(visIt->first->Clone(newVisName,
-        clonePart->partVisual));
+
+    rendering::VisualPtr cloneVis =
+        visIt->first->Clone(newVisName, clonePart->partVisual);
+
+    // override transparency
+    cloneVis->SetTransparency(visIt->second.transparency());
+    clonePart->AddVisual(cloneVis);
+    cloneVis->SetTransparency(visIt->second.transparency() *
+        (1-ModelData::GetEditTransparency()-0.1)
+        + ModelData::GetEditTransparency());
   }
 
-  linkVisual->SetTransparency(ModelData::GetEditTransparency());
   std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
   for (colIt = this->collisions.begin(); colIt != this->collisions.end();
       ++colIt)
@@ -419,16 +424,11 @@ void PartData::OnApply()
         common::Color specular;
         common::Color emissive;
 
-        std::string matName = it.first->GetMaterialName();
-        std::string uniqueMatName = name + "_MATERIAL_";
-        size_t visMatIdx = matName.find(uniqueMatName);
-        if (visMatIdx != std::string::npos)
-          matName = matName.substr(visMatIdx + uniqueMatName.size());
-
-        if (matName != scriptMsg->name() && !scriptMsg->name().empty())
+        if (!scriptMsg->name().empty())
         {
           rendering::Material::GetMaterialAsColor(scriptMsg->name(), ambient,
               diffuse, specular, emissive);
+
           visualConfig->SetMaterial(leafName, scriptMsg->name(), ambient,
               diffuse, specular, emissive);
 
@@ -447,9 +447,6 @@ void PartData::OnApply()
           {
             colorChanged = true;
           }
-
-          if (colorChanged)
-            scriptMsg->clear_name();
         }
 
         // update material or color, but not both
@@ -466,9 +463,6 @@ void PartData::OnApply()
         if (matScriptChanged || !colorChanged ||
             msgs::Convert(matMsg->emissive()) == emptyColor)
           matMsg->clear_emissive();
-
-        if (matMsg->has_diffuse())
-          matMsg->mutable_diffuse()->set_a(1.0-updateMsg->transparency());
 
         visualMsg.CopyFrom(*updateMsg);
         it.second = visualMsg;

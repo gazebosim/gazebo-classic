@@ -545,6 +545,7 @@ std::string ModelCreator::AddShape(PartType _type,
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
       this->previewVisual));
   linkVisual->Load();
+  linkVisual->SetTransparency(ModelData::GetEditTransparency());
 
   std::ostringstream visualName;
   visualName << linkName << "::visual";
@@ -583,8 +584,8 @@ std::string ModelCreator::AddShape(PartType _type,
   }
 
   visVisual->Load(visualElem);
+  this->CreatePart(visVisual);
 
-  linkVisual->SetTransparency(ModelData::GetEditTransparency());
   linkVisual->SetPose(_pose);
   if (this->modelPose == math::Pose::Zero)
   {
@@ -592,7 +593,6 @@ std::string ModelCreator::AddShape(PartType _type,
     _pose.pos.z + _size.z * 0.5));
   }
 
-  this->CreatePart(visVisual);
   this->mouseVisual = linkVisual;
 
   return linkName;
@@ -611,6 +611,11 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 
   part->partVisual = _visual->GetParent();
   part->AddVisual(_visual);
+
+  // override transparency
+  _visual->SetTransparency(_visual->GetTransparency() *
+      (1-ModelData::GetEditTransparency()-0.1)
+      + ModelData::GetEditTransparency());
 
   // create collision with identical geometry
   rendering::VisualPtr collisionVis =
@@ -742,6 +747,8 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
   if (_linkElem->HasElement("visual"))
     visualElem = _linkElem->GetElement("visual");
 
+  linkVisual->SetTransparency(ModelData::GetEditTransparency());
+
   while (visualElem)
   {
     // Visual name
@@ -774,9 +781,13 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
     // Add to part
     part->AddVisual(visVisual);
 
+    // override transparency
+    visVisual->SetTransparency(visVisual->GetTransparency() *
+        (1-ModelData::GetEditTransparency()-0.1)
+        + ModelData::GetEditTransparency());
+
     visualElem = visualElem->GetNextElement("visual");
   }
-  linkVisual->SetTransparency(ModelData::GetEditTransparency());
 
   // Collisions
   int collisionIndex = 0;
@@ -1428,7 +1439,6 @@ void ModelCreator::OnPaste()
     }
 
     clonedPart->partVisual->SetWorldPose(clonePose);
-    clonedPart->partVisual->SetTransparency(ModelData::GetEditTransparency());
     this->addPartType = PART_MESH;
     this->mouseVisual = clonedPart->partVisual;
   }
@@ -1547,6 +1557,7 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(PartData *_part)
     rendering::VisualPtr visual = it.first;
     msgs::Visual visualMsg = it.second;
     sdf::ElementPtr visualElem = visual->GetSDF()->Clone();
+
     visualElem->GetElement("transparency")->Set<double>(
         visualMsg.transparency());
     newLinkElem->InsertElement(visualElem);
