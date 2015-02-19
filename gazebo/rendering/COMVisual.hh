@@ -58,9 +58,11 @@ namespace gazebo
 
       /// \brief Load based on a math::Pose
       /// \param[in] _pose Pose of the COM visual
-      /// \param[in] _scale Scale factor for the COM visual.
+      /// \param[in] _scale Scale factor for the box visual.
+      /// \param[in] _radius Radius for the sphere visual.
       private: void Load(const math::Pose &_pose,
-               const math::Vector3 &_scale = math::Vector3(0.02, 0.02, 0.02));
+          const math::Vector3 &_scale = math::Vector3(0.02, 0.02, 0.02),
+          double _radius = 0.01);
     };
     /// \}
   }

@@ -88,17 +88,24 @@ void COMVisual::Load(ConstLinkPtr &_msg)
     boxScale.x = sqrt(6*(Izz + Iyy - Ixx) / mass);
     boxScale.y = sqrt(6*(Izz + Ixx - Iyy) / mass);
     boxScale.z = sqrt(6*(Ixx + Iyy - Izz) / mass);
-    this->Load(math::Pose(xyz, q), boxScale);
+
+    // Compute radius of sphere with density of lead and equivalent mass.
+    double sphereRadius;
+    double dLead = 11340;
+    sphereRadius = cbrt((0.75 * mass) / (M_PI * dLead));
+
+    this->Load(math::Pose(xyz, q), boxScale, sphereRadius);
   }
 }
 
 /////////////////////////////////////////////////
 void COMVisual::Load(const math::Pose &_pose,
-                     const math::Vector3 &_scale)
+    const math::Vector3 &_scale, double _radius)
 {
   COMVisualPrivate *dPtr =
       reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
 
+  // CoM position indicator
   math::Vector3 p1(0, 0, -2*_scale.z);
   math::Vector3 p2(0, 0,  2*_scale.z);
   math::Vector3 p3(0, -2*_scale.y, 0);
@@ -127,6 +134,26 @@ void COMVisual::Load(const math::Pose &_pose,
   dPtr->crossLines->AddPoint(p5);
   dPtr->crossLines->AddPoint(p6);
 
+  // Mass indicator: equivalent sphere with density of lead
+  this->InsertMesh("unit_sphere");
+
+  Ogre::MovableObject *sphereObj =
+    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+          this->GetName()+"__SPHERE__", "unit_sphere"));
+  sphereObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
+  ((Ogre::Entity*)sphereObj)->setMaterialName("Gazebo/CoM");
+  sphereObj->setCastShadows(false);
+
+  dPtr->sphereNode =
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SPHERE");
+
+  dPtr->sphereNode->attachObject(sphereObj);
+  dPtr->sphereNode->setScale(_radius*2, _radius*2, _radius*2);
+  dPtr->sphereNode->setPosition(_pose.pos.x, _pose.pos.y, _pose.pos.z);
+  dPtr->sphereNode->setOrientation(Ogre::Quaternion(_pose.rot.w, _pose.rot.x,
+                                                 _pose.rot.y, _pose.rot.z));
+
+  // Inertia indicator: equivalent box of uniform density
   this->InsertMesh("unit_box");
 
   Ogre::MovableObject *boxObj =
