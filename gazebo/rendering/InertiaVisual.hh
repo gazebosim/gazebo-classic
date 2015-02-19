@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _COMVISUAL_HH_
-#define _COMVISUAL_HH_
+#ifndef _GAZEBO_INERTIAVISUAL_HH_
+#define _GAZEBO_INERTIAVISUAL_HH_
 
 #include <string>
 
@@ -35,17 +35,17 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
-    /// \class COMVisual COMVisual.hh rendering/rendering.hh
+    /// \class InertiaVisual InertiaVisual.hh rendering/rendering.hh
     /// \brief Basic Center of Mass visualization
-    class GAZEBO_VISIBLE COMVisual : public Visual
+    class GAZEBO_VISIBLE InertiaVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the Visual
       /// \param[in] _vis Parent Visual
-      public: COMVisual(const std::string &_name, VisualPtr _vis);
+      public: InertiaVisual(const std::string &_name, VisualPtr _vis);
 
       /// \brief Destructor
-      public: virtual ~COMVisual();
+      public: virtual ~InertiaVisual();
 
       /// \brief Load the Visual from an SDF pointer
       /// \param[in] _elem SDF Element pointer
@@ -57,10 +57,10 @@ namespace gazebo
       public: virtual void Load(ConstLinkPtr &_msg);
 
       /// \brief Load based on a math::Pose
-      /// \param[in] _pose Pose of the COM visual
-      /// \param[in] _radius Radius for the sphere visual.
+      /// \param[in] _pose Pose of the Inertia visual
+      /// \param[in] _scale Scale factor for the box visual.
       private: void Load(const math::Pose &_pose,
-          double _radius = 0.01);
+          const math::Vector3 &_scale = math::Vector3(0.02, 0.02, 0.02));
     };
     /// \}
   }

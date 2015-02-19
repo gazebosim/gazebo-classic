@@ -134,11 +134,25 @@ namespace gazebo
       private slots: void CaptureScreenshot();
 
       private slots: void InsertModel();
+
+      /// \brief Qt callback when the show grid action is triggered
       private slots: void ShowGrid();
+
+      /// \brief Qt callback when the show collisions action is triggered
       private slots: void ShowCollisions();
+
+      /// \brief Qt callback when the show joints action is triggered
       private slots: void ShowJoints();
+
+      /// \brief Qt callback when the show contacts action is triggered
       private slots: void ShowContacts();
+
+      /// \brief Qt callback when the show center of mass action is triggered
       private slots: void ShowCOM();
+
+      /// \brief Qt callback when the show inertia action is triggered
+      private slots: void ShowInertia();
+
       private slots: void Reset();
       private slots: void FullScreen();
       private slots: void FPS();
