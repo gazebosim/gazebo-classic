@@ -77,35 +77,37 @@ void COMVisual::Load(ConstLinkPtr &_msg)
     double dLead = 11340;
     sphereRadius = cbrt((0.75 * mass) / (M_PI * dLead));
 
-    this->Load(math::Pose(xyz, q), sphereRadius);
+    // Get the link's bounding box
+    std::string name = _msg->name();
+    VisualPtr vis = this->GetScene()->GetVisual(name);
+    math::Box box;
+
+    if (vis)
+      box = vis->GetBoundingBox();
+
+    this->Load(math::Pose(xyz, q), sphereRadius, box);
   }
 }
 
 /////////////////////////////////////////////////
-void COMVisual::Load(const math::Pose &_pose, double _radius)
+void COMVisual::Load(const math::Pose &_pose, double _radius, math::Box _box)
 {
   COMVisualPrivate *dPtr =
       reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
 
   // CoM position indicator
-  math::Vector3 p1(0, 0, -2*_radius);
-  math::Vector3 p2(0, 0, 2*_radius);
-  math::Vector3 p3(0, -2*_radius, 0);
-  math::Vector3 p4(0, 2*_radius, 0);
-  math::Vector3 p5(-2*_radius, 0, 0);
-  math::Vector3 p6(2*_radius, 0, 0);
+  math::Vector3 p1(0, 0, _box.min.z - _pose.pos.z);
+  math::Vector3 p2(0, 0, _box.max.z - _pose.pos.z);
+  math::Vector3 p3(0, _box.min.y - _pose.pos.y, 0);
+  math::Vector3 p4(0, _box.max.y - _pose.pos.y, 0);
+  math::Vector3 p5(_box.min.x - _pose.pos.x, 0, 0);
+  math::Vector3 p6(_box.max.x - _pose.pos.x, 0, 0);
   p1 += _pose.pos;
   p2 += _pose.pos;
   p3 += _pose.pos;
   p4 += _pose.pos;
   p5 += _pose.pos;
   p6 += _pose.pos;
-  p1 = _pose.rot.RotateVector(p1);
-  p2 = _pose.rot.RotateVector(p2);
-  p3 = _pose.rot.RotateVector(p3);
-  p4 = _pose.rot.RotateVector(p4);
-  p5 = _pose.rot.RotateVector(p5);
-  p6 = _pose.rot.RotateVector(p6);
 
   dPtr->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
   dPtr->crossLines->setMaterial("Gazebo/Green");
@@ -134,6 +136,7 @@ void COMVisual::Load(const math::Pose &_pose, double _radius)
   dPtr->sphereNode->setPosition(_pose.pos.x, _pose.pos.y, _pose.pos.z);
   dPtr->sphereNode->setOrientation(Ogre::Quaternion(_pose.rot.w, _pose.rot.x,
                                                     _pose.rot.y, _pose.rot.z));
+  dPtr->sphereNode->setInheritScale(false);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
