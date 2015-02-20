@@ -2782,11 +2782,9 @@ void Visual::ShowJoints(bool _show)
   if (this->GetName().find("JOINT_VISUAL__") != std::string::npos)
     this->SetVisible(_show);
 
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  for (auto &child : this->dataPtr->children)
   {
-    (*iter)->ShowJoints(_show);
+    child->ShowJoints(_show);
   }
 }
 
@@ -2796,11 +2794,21 @@ void Visual::ShowCOM(bool _show)
   if (this->GetName().find("COM_VISUAL__") != std::string::npos)
     this->SetVisible(_show);
 
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  for (auto &child : this->dataPtr->children)
   {
-    (*iter)->ShowCOM(_show);
+    child->ShowCOM(_show);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::ShowInertia(bool _show)
+{
+  if (this->GetName().find("INERTIA_VISUAL__") != std::string::npos)
+    this->SetVisible(_show);
+
+  for (auto &child : this->dataPtr->children)
+  {
+    child->ShowInertia(_show);
   }
 }
 
