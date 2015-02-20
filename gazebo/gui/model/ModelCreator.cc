@@ -203,8 +203,10 @@ void ModelCreator::OnNew()
   }
   QString msg;
   QMessageBox msgBox(QMessageBox::Warning, QString("New"), msg);
-  QPushButton *cancelButton = msgBox.addButton("Cancel", QMessageBox::YesRole);
-  QPushButton *saveButton = msgBox.addButton("Save", QMessageBox::YesRole);
+  QPushButton *cancelButton = msgBox.addButton("Cancel",
+      QMessageBox::RejectRole);
+  msgBox.setEscapeButton(cancelButton);
+  QPushButton *saveButton = new QPushButton("Save");
 
   switch (this->currentSaveState)
   {
@@ -212,8 +214,9 @@ void ModelCreator::OnNew()
     {
       msg.append("Are you sure you want to close this model and open a new "
                  "canvas?\n\n");
-      msgBox.addButton("New Canvas", QMessageBox::ApplyRole);
-      saveButton->hide();
+      QPushButton *newButton =
+          msgBox.addButton("New Canvas", QMessageBox::AcceptRole);
+      msgBox.setDefaultButton(newButton);
       break;
     }
     case UNSAVED_CHANGES:
@@ -221,7 +224,9 @@ void ModelCreator::OnNew()
     {
       msg.append("You have unsaved changes. Do you want to save this model "
                  "and open a new canvas?\n\n");
-      msgBox.addButton("Don't Save", QMessageBox::ApplyRole);
+      msgBox.addButton("Don't Save", QMessageBox::DestructiveRole);
+      msgBox.addButton(saveButton, QMessageBox::AcceptRole);
+      msgBox.setDefaultButton(saveButton);
       break;
     }
     default:
@@ -322,8 +327,14 @@ void ModelCreator::OnExit()
       "your model will no longer be editable.\n\n"
       "Are you ready to exit?\n\n");
       QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
-      msgBox.addButton("Exit", QMessageBox::ApplyRole);
-      QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
+
+      QPushButton *cancelButton = msgBox.addButton("Cancel",
+          QMessageBox::RejectRole);
+      QPushButton *exitButton =
+          msgBox.addButton("Exit", QMessageBox::AcceptRole);
+      msgBox.setDefaultButton(exitButton);
+      msgBox.setEscapeButton(cancelButton);
+
       msgBox.exec();
       if (msgBox.clickedButton() == cancelButton)
       {
@@ -341,10 +352,13 @@ void ModelCreator::OnExit()
 
       QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
       QPushButton *cancelButton = msgBox.addButton("Cancel",
-          QMessageBox::ApplyRole);
+          QMessageBox::RejectRole);
+      msgBox.addButton("Don't Save, Exit", QMessageBox::DestructiveRole);
       QPushButton *saveButton = msgBox.addButton("Save and Exit",
-          QMessageBox::ApplyRole);
-      msgBox.addButton("Don't Save, Exit", QMessageBox::ApplyRole);
+          QMessageBox::AcceptRole);
+      msgBox.setDefaultButton(cancelButton);
+      msgBox.setDefaultButton(saveButton);
+
       msgBox.exec();
       if (msgBox.clickedButton() == cancelButton)
         return;
