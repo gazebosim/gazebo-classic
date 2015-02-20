@@ -122,9 +122,16 @@ namespace gazebo
       /// \param[in] _jointName Name of joint to be removed.
       public: void RemoveJoint(const std::string &_jointName);
 
-      /// \brief Remove all joints connected to part
-      /// \param[in] _partName Name of joint to be removed.
+      /// \brief Remove all joints connected to part.
+      /// \param[in] _partName Name of the part.
       public: void RemoveJointsByPart(const std::string &_partName);
+
+      /// \brief Get a vector containing data for all joints connected to 
+      /// the given part.
+      /// \param[in] _partName Name of the part.
+      /// \return Vector with joint data.
+      public: std::vector<JointData *> GetJointDataByPart(
+          const std::string &_partName);
 
       /// \brief Generate SDF for all joints.
       public: void GenerateSDF();
@@ -350,6 +357,12 @@ namespace gazebo
 
       /// \brief Inspector for configuring joint properties.
       public: JointInspector *inspector;
+
+      /// \brief Open the joint inspector.
+      public: void OpenInspector();
+
+      /// \brief Qt Callback when joint inspector is to be opened.
+      private slots: void OnOpenInspector();
 
       /// \brief Qt Callback when joint inspector configurations are to be
       /// applied.
