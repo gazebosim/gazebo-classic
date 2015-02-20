@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,6 +81,7 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->id = this->dataPtr->visualIdCount--;
   this->dataPtr->boundingBox = NULL;
   this->dataPtr->useRTShader = _useRTShader;
+  this->dataPtr->visibilityFlags = GZ_VISIBILITY_ALL;
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("visual.sdf", this->dataPtr->sdf);
@@ -944,8 +945,6 @@ void Visual::SetLighting(bool _lighting)
     (*iter)->SetLighting(this->dataPtr->lighting);
   }
 
-  // only set the sdf element if this is a visual sdf element or it has
-  // a geometry attached. Verify by checking if it has a geometry child element.
 
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("lighting")->Set(this->dataPtr->lighting);
@@ -1611,12 +1610,7 @@ void Visual::SetVisible(bool _visible, bool _cascade)
 //////////////////////////////////////////////////
 uint32_t Visual::GetVisibilityFlags()
 {
-  if (this->dataPtr->sceneNode->numAttachedObjects() > 0)
-  {
-    return this->dataPtr->sceneNode->getAttachedObject(0)->getVisibilityFlags();
-  }
-
-  return GZ_VISIBILITY_ALL;
+  return this->dataPtr->visibilityFlags;
 }
 
 //////////////////////////////////////////////////
@@ -2260,8 +2254,14 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
         msgs::ConvertGeometryType(_msg->geometry().type());
 
     std::string geometryType = this->GetGeometryType();
+    std::string geometryName = this->GetMeshName();
 
-    if (newGeometryType != geometryType)
+    std::string newGeometryName = geometryName;
+    if (_msg->geometry().has_mesh() && _msg->geometry().mesh().has_filename())
+        newGeometryName = _msg->geometry().mesh().filename();
+
+    if (newGeometryType != geometryType ||
+        (newGeometryType == "mesh" && newGeometryName != geometryName))
     {
       std::string origMaterial = this->dataPtr->myMaterialName;
       float origTransparency = this->dataPtr->transparency;
@@ -2270,6 +2270,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       geomElem->ClearElements();
 
       this->DetachObjects();
+
       if (newGeometryType == "box" || newGeometryType == "cylinder" ||
           newGeometryType == "sphere" || newGeometryType == "plane")
       {
@@ -2278,18 +2279,36 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
         if (newGeometryType == "sphere" || newGeometryType == "cylinder")
           shapeElem->GetElement("radius")->Set(0.5);
       }
-      else
+      else if (newGeometryType == "mesh")
       {
-        if (newGeometryType == "mesh")
+        std::string filename = _msg->geometry().mesh().filename();
+        std::string meshName = common::find_file(filename);
+        std::string submeshName;
+        bool centerSubmesh = false;
+
+        if (meshName.empty())
         {
-          std::string filename = _msg->geometry().mesh().filename();
-          std::string meshName = common::find_file(filename);
+          meshName = "unit_box";
+          gzerr << "No mesh found, setting mesh to a unit box" << std::endl;
+        }
+        else
+        {
+          if (_msg->geometry().mesh().has_submesh())
+            submeshName= _msg->geometry().mesh().submesh();
+          if (_msg->geometry().mesh().has_center_submesh())
+            centerSubmesh= _msg->geometry().mesh().center_submesh();
+        }
 
-          if (meshName.empty())
-            gzerr << "No mesh found\n";
+        this->AttachMesh(meshName, submeshName, centerSubmesh);
 
-          this->AttachMesh(meshName);
-          geomElem->AddElement(newGeometryType);
+        sdf::ElementPtr meshElem = geomElem->AddElement(newGeometryType);
+        if (!filename.empty())
+          meshElem->GetElement("uri")->Set(filename);
+        if (!submeshName.empty())
+        {
+          sdf::ElementPtr submeshElem = meshElem->GetElement("submesh");
+          submeshElem->GetElement("name")->Set(submeshName);
+          submeshElem->GetElement("center")->Set(centerSubmesh);
         }
       }
       this->SetTransparency(origTransparency);
@@ -2753,6 +2772,8 @@ void Visual::SetVisibilityFlags(uint32_t _flags)
     for (int j = 0; j < sn->numAttachedObjects(); ++j)
       sn->getAttachedObject(j)->setVisibilityFlags(_flags);
   }
+
+  this->dataPtr->visibilityFlags = _flags;
 }
 
 //////////////////////////////////////////////////

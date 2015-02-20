@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -404,6 +404,46 @@ TEST_F(Visual_TEST, Color)
     cylinderVis2->SetEmissive(color);
     EXPECT_EQ(cylinderVis2->GetEmissive(), color);
   }
+}
+
+/////////////////////////////////////////////////
+TEST_F(Visual_TEST, UpdateMeshFromMsg)
+{
+  Load("worlds/empty.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  sdf::ElementPtr meshUpdateSDF(new sdf::Element);
+  sdf::initFile("visual.sdf", meshUpdateSDF);
+  sdf::readString(GetVisualSDFString("visual_mesh_update"), meshUpdateSDF);
+  gazebo::rendering::VisualPtr meshUpdateVis(
+      new gazebo::rendering::Visual("visual_mesh_update_visual", scene));
+  meshUpdateVis->Load(meshUpdateSDF);
+
+  EXPECT_EQ(meshUpdateVis->GetMeshName(), "unit_box");
+  EXPECT_EQ(meshUpdateVis->GetSubMeshName(), "");
+
+  msgs::VisualPtr visualMsg(new msgs::Visual);
+  msgs::Geometry *geomMsg = visualMsg->mutable_geometry();
+  geomMsg->set_type(msgs::Geometry::MESH);
+  msgs::MeshGeom *meshMsg = geomMsg->mutable_mesh();
+  std::string meshFile = "polaris_ranger_ev/meshes/polaris.dae";
+  meshMsg->set_filename("model://" + meshFile);
+  meshMsg->set_submesh("Steering_Wheel");
+  meshUpdateVis->UpdateFromMsg(visualMsg);
+
+  // verify new mesh and submesh names
+  EXPECT_TRUE(meshUpdateVis->GetMeshName().find(meshFile) != std::string::npos);
+  EXPECT_EQ(meshUpdateVis->GetSubMeshName(), "Steering_Wheel");
+
+  // verify updated sdf
+  sdf::ElementPtr visualUpdateSDF = meshUpdateVis->GetSDF();
+  sdf::ElementPtr geomSDF = visualUpdateSDF->GetElement("geometry");
+  sdf::ElementPtr meshSDF = geomSDF->GetElement("mesh");
+  EXPECT_EQ(meshSDF->Get<std::string>("uri"), "model://" + meshFile);
+  sdf::ElementPtr submeshSDF = meshSDF->GetElement("submesh");
+  EXPECT_EQ(submeshSDF->Get<std::string>("name"), "Steering_Wheel");
 }
 
 /////////////////////////////////////////////////

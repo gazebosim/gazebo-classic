@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -306,7 +306,7 @@ void Node::InsertLatchedMsg(const std::string &_topic, MessagePtr _msg)
 std::string Node::GetMsgType(const std::string &_topic) const
 {
   Callback_M::const_iterator iter = this->callbacks.find(_topic);
-  if (iter != this->callbacks.end())
+  if (iter != this->callbacks.end() && !iter->second.empty())
     return iter->second.front()->GetMsgType();
 
   return std::string();

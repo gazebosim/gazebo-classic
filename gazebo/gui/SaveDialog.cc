@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -349,8 +349,13 @@ void SaveDialog::AddDirToModelPaths(const std::string &_path)
     gui::getINIProperty<std::string>("model_paths.filenames", "");
   if (additionalProperties.find(parentDirectory) == std::string::npos)
   {
-    // Add it to gui.ini
-    gui::setINIProperty("model_paths.filenames", parentDirectory);
+    // Append it to gui.ini
+    if (additionalProperties.empty())
+      additionalProperties = parentDirectory;
+    else
+      additionalProperties = additionalProperties + ":" + parentDirectory;
+
+    gui::setINIProperty("model_paths.filenames", additionalProperties);
 
     // Save any changes that were made to the property tree
     // TODO: check gui.ini env variable

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -407,4 +407,11 @@ void Sensor::ResetLastUpdateTime()
 {
   boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
   this->lastUpdateTime = 0.0;
+  // Reset lastMeasurementTime as well, since ImuSensor
+  // checks it before updating (see issue 236).
+  // This isn't a complete fix since the modifications
+  // to lastMeasurementTime by ImuSensor aren't protected
+  // by mutexLastUpdateTime, which is private to the
+  // Sensor class.
+  this->lastMeasurementTime = 0.0;
 }

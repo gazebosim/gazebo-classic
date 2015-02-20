@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -647,6 +647,7 @@ void Camera::SetClipDist(float _near, float _far)
 void Camera::SetHFOV(math::Angle _angle)
 {
   this->sdf->GetElement("horizontal_fov")->Set(_angle.Radian());
+  this->UpdateFOV();
 }
 
 //////////////////////////////////////////////////
@@ -1311,6 +1312,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     double hfov = this->GetHFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
+
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
 
@@ -1709,3 +1711,26 @@ DistortionPtr Camera::GetDistortion() const
 {
   return this->dataPtr->distortion;
 }
+
+//////////////////////////////////////////////////
+void Camera::UpdateFOV()
+{
+  if (this->viewport)
+  {
+    this->viewport->setDimensions(0, 0, 1, 1);
+    double ratio = static_cast<double>(this->viewport->getActualWidth()) /
+      static_cast<double>(this->viewport->getActualHeight());
+
+    double hfov =
+      this->sdf->Get<double>("horizontal_fov");
+    double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
+
+    this->camera->setAspectRatio(ratio);
+    this->camera->setFOVy(Ogre::Radian(vfov));
+
+    delete [] this->saveFrameBuffer;
+    this->saveFrameBuffer = NULL;
+  }
+}
+
+

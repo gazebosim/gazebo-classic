@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,39 +177,22 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 std::string BoxMaker::GetSDFString()
 {
-  std::ostringstream newModelStr;
-  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
-    << "<model name='unit_box_" << counter << "'>"
-    << "<pose>0 0 0.5 0 0 0</pose>"
-    << "<link name ='link'>"
-    <<   "<inertial><mass>1.0</mass></inertial>"
-    <<   "<collision name ='collision'>"
-    <<     "<geometry>"
-    <<       "<box>"
-    <<         "<size>1.0 1.0 1.0</size>"
-    <<       "</box>"
-    <<     "</geometry>"
-    << "</collision>"
-    << "<visual name ='visual'>"
-    <<     "<geometry>"
-    <<       "<box>"
-    <<         "<size>1.0 1.0 1.0</size>"
-    <<       "</box>"
-    <<     "</geometry>"
-    <<     "<material>"
-    <<       "<script>"
-    <<         "<uri>file://media/materials/scripts/gazebo.material</uri>"
-    <<         "<name>Gazebo/Grey</name>"
-    <<       "</script>"
-    <<     "</material>"
-    <<   "</visual>"
-    << "</link>"
-    << "</model>"
-    << "</sdf>";
+  msgs::Model model;
+  {
+    std::ostringstream modelName;
+    modelName << "unit_box_" << counter;
+    model.set_name(modelName.str());
+  }
+  msgs::Set(model.mutable_pose(), math::Pose(0, 0, 0.5, 0, 0, 0));
+  msgs::AddBoxLink(model, 1.0, math::Vector3::One);
+  model.mutable_link(0)->set_name("link");
 
-  return newModelStr.str();
+  return "<sdf version='" + std::string(SDF_VERSION) + "'>"
+         + msgs::ModelToSDF(model)->ToString("")
+         + "</sdf>";
 }
 
+/////////////////////////////////////////////////
 void BoxMaker::CreateTheEntity()
 {
   msgs::Factory msg;
