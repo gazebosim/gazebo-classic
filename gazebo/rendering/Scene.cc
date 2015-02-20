@@ -2948,10 +2948,9 @@ void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 void Scene::SetWireframe(bool _show)
 {
   this->dataPtr->wireframe = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->SetWireframe(_show);
+    visual.second->SetWireframe(_show);
   }
 
   if (this->dataPtr->terrain)
@@ -2962,10 +2961,9 @@ void Scene::SetWireframe(bool _show)
 void Scene::SetTransparent(bool _show)
 {
   this->dataPtr->transparent = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->SetTransparency(_show ? 0.5 : 0.0);
+    visual.second->SetTransparency(_show ? 0.5 : 0.0);
   }
 }
 
@@ -2973,10 +2971,9 @@ void Scene::SetTransparent(bool _show)
 void Scene::ShowCOMs(bool _show)
 {
   this->dataPtr->showCOMs = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->ShowCOM(_show);
+    visual.second->ShowCOM(_show);
   }
 }
 
@@ -2984,10 +2981,9 @@ void Scene::ShowCOMs(bool _show)
 void Scene::ShowInertias(bool _show)
 {
   this->dataPtr->showInertias = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->ShowInertia(_show);
+    visual.second->ShowInertia(_show);
   }
 }
 
@@ -2995,10 +2991,9 @@ void Scene::ShowInertias(bool _show)
 void Scene::ShowCollisions(bool _show)
 {
   this->dataPtr->showCollisions = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->ShowCollision(_show);
+    visual.second->ShowCollision(_show);
   }
 }
 
@@ -3006,10 +3001,9 @@ void Scene::ShowCollisions(bool _show)
 void Scene::ShowJoints(bool _show)
 {
   this->dataPtr->showJoints = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->ShowJoints(_show);
+    visual.second->ShowJoints(_show);
   }
 }
 

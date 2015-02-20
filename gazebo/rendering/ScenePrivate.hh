@@ -287,7 +287,7 @@ namespace gazebo
       /// \brief True when all COMs should be visualized.
       public: bool showCOMs;
 
-      /// \brief True when all inertiass should be visualized.
+      /// \brief True when all inertias should be visualized.
       public: bool showInertias;
 
       /// \brief True when all collisions should be visualized.
