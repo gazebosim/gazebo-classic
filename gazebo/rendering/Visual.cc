@@ -2320,17 +2320,33 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       {
         std::string filename = _msg->geometry().mesh().filename();
         std::string meshName = common::find_file(filename);
+        std::string submeshName;
+        bool centerSubmesh = false;
 
         if (meshName.empty())
         {
           meshName = "unit_box";
           gzerr << "No mesh found, setting mesh to a unit box" << std::endl;
         }
+        else
+        {
+          if (_msg->geometry().mesh().has_submesh())
+            submeshName= _msg->geometry().mesh().submesh();
+          if (_msg->geometry().mesh().has_center_submesh())
+            centerSubmesh= _msg->geometry().mesh().center_submesh();
+        }
 
-        this->AttachMesh(meshName);
+        this->AttachMesh(meshName, submeshName, centerSubmesh);
+
         sdf::ElementPtr meshElem = geomElem->AddElement(newGeometryType);
         if (!filename.empty())
           meshElem->GetElement("uri")->Set(filename);
+        if (!submeshName.empty())
+        {
+          sdf::ElementPtr submeshElem = meshElem->GetElement("submesh");
+          submeshElem->GetElement("name")->Set(submeshName);
+          submeshElem->GetElement("center")->Set(centerSubmesh);
+        }
       }
       this->SetTransparency(origTransparency);
       this->SetMaterial(origMaterial);
