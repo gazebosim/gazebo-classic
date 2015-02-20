@@ -105,8 +105,8 @@ namespace gazebo
       /// \param[in] _emissive Emissive color of visual.
       public: void SetMaterial(const std::string &_name,
           const std::string &_materialName,
-          common::Color ambient, common::Color diffuse, common::Color specular,
-          common::Color emissive);
+          const common::Color &_ambient, const common::Color &_diffuse,
+          const common::Color &_specular, const common::Color &_emissive);
 
       /// \brief Qt signal emitted when a visual is removed.
       /// \param[in] _name Name of visual removed.

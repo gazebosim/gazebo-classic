@@ -268,9 +268,9 @@ void VisualConfig::SetGeometry(const std::string &_name,
 
 /////////////////////////////////////////////////
 void VisualConfig::SetMaterial(const std::string &_name,
-    const std::string &_materialName,
-    common::Color _ambient, common::Color _diffuse, common::Color _specular,
-    common::Color _emissive)
+  const std::string &_materialName, const common::Color &_ambient,
+  const common::Color &_diffuse, const common::Color &_specular,
+  const common::Color &_emissive)
 {
   for (auto &it : this->configs)
   {

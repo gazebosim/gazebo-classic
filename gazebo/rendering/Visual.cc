@@ -1637,8 +1637,8 @@ void Visual::SetVisible(bool _visible, bool _cascade)
   this->dataPtr->sceneNode->setVisible(_visible, _cascade);
   if (_cascade)
   {
-    for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
-      this->dataPtr->children[i]->SetVisible(_visible);
+    for (auto child: this->dataPtr->children)
+      child->SetVisible(_visible);
   }
 
   this->dataPtr->visible = _visible;

@@ -208,7 +208,6 @@ void PartData::Load(sdf::ElementPtr _sdf)
       inertialMsg->set_iyz(inertiaElem->Get<double>("iyz"));
       inertialMsg->set_izz(inertiaElem->Get<double>("izz"));
     }
-
   }
   if (_sdf->HasElement("self_collide"))
   {
@@ -226,14 +225,14 @@ void PartData::Load(sdf::ElementPtr _sdf)
   {
     sdf::ElementPtr baseLinkSDF = _sdf->GetElement("must_be_base_link");
     // TODO link.proto is missing the must_be_base_link field.
-    //linkMsgPtr->must_be_base_link(baseLinkSDF->Get<bool>());
+    // linkMsgPtr->set_must_be_base_link(baseLinkSDF->Get<bool>());
     this->partSDF->InsertElement(baseLinkSDF->Clone());
   }
   if (_sdf->HasElement("velocity_decay"))
   {
     sdf::ElementPtr velocityDecaySDF = _sdf->GetElement("velocity_decay");
     // TODO link.proto is missing the velocity_decay field.
-    //linkMsgPtr->set_velocity_decay(velocityDecaySDF->Get<double>());
+    // linkMsgPtr->set_velocity_decay(velocityDecaySDF->Get<double>());
     this->partSDF->InsertElement(velocityDecaySDF->Clone());
   }
   linkConfig->Update(linkMsgPtr);
@@ -367,10 +366,9 @@ PartData* PartData::Clone(const std::string &_newName)
 
   clonePart->partVisual = linkVisual;
 
-  std::map<rendering::VisualPtr, msgs::Visual>::iterator visIt;
-  for (visIt = this->visuals.begin(); visIt != this->visuals.end(); ++visIt)
+  for (auto &visIt : this->visuals)
   {
-    std::string newVisName = visIt->first->GetName();
+    std::string newVisName = visIt.first->GetName();
     size_t idx = newVisName.find_last_of("::");
     if (idx != std::string::npos)
       newVisName = cloneVisName + newVisName.substr(idx-1);
@@ -378,27 +376,25 @@ PartData* PartData::Clone(const std::string &_newName)
       newVisName = cloneVisName + "::" + newVisName;
 
     rendering::VisualPtr cloneVis =
-        visIt->first->Clone(newVisName, clonePart->partVisual);
+        visIt.first->Clone(newVisName, clonePart->partVisual);
 
     // override transparency
-    cloneVis->SetTransparency(visIt->second.transparency());
+    cloneVis->SetTransparency(visIt.second.transparency());
     clonePart->AddVisual(cloneVis);
-    cloneVis->SetTransparency(visIt->second.transparency() *
+    cloneVis->SetTransparency(visIt.second.transparency() *
         (1-ModelData::GetEditTransparency()-0.1)
         + ModelData::GetEditTransparency());
   }
 
-  std::map<rendering::VisualPtr, msgs::Collision>::iterator colIt;
-  for (colIt = this->collisions.begin(); colIt != this->collisions.end();
-      ++colIt)
+  for (auto &colIt : this->collisions)
   {
-    std::string newColName = colIt->first->GetName();
+    std::string newColName = colIt.first->GetName();
     size_t idx = newColName.find_last_of("::");
     if (idx != std::string::npos)
       newColName = cloneVisName + newColName.substr(idx-1);
     else
       newColName = cloneVisName + "::" + newColName;
-    rendering::VisualPtr collisionVis = colIt->first->Clone(newColName,
+    rendering::VisualPtr collisionVis = colIt.first->Clone(newColName,
         clonePart->partVisual);
     collisionVis->SetTransparency(
        math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));

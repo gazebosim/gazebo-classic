@@ -659,8 +659,7 @@ PartData *ModelCreator::ClonePart(const std::string &_partName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-  std::map<std::string, PartData *>::iterator it
-      = this->allParts.find(_partName);
+  auto it = this->allParts.find(_partName);
   if (it == allParts.end())
   {
     gzerr << "No part with name: " << _partName << " found."  << std::endl;
@@ -668,9 +667,8 @@ PartData *ModelCreator::ClonePart(const std::string &_partName)
   }
 
   // generate unique name.
-  std::map<std::string, PartData *>::iterator itName;
   std::string newName = _partName + "_clone";
-  itName = this->allParts.find(newName);
+  auto itName = this->allParts.find(newName);
   int nameCounter = 0;
   while (itName != this->allParts.end())
   {
@@ -1113,8 +1111,8 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
   {
     if (!this->selectedVisuals.empty())
     {
-      for (std::vector<rendering::VisualPtr>::iterator it
-          = this->selectedVisuals.begin(); it != this->selectedVisuals.end();)
+      for (auto it = this->selectedVisuals.begin();
+          it != this->selectedVisuals.end();)
       {
         (*it)->SetHighlighted(false);
         this->OnDelete((*it)->GetName());
@@ -1232,8 +1230,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       // Multi-selection mode
       else
       {
-        std::vector<rendering::VisualPtr>::iterator it =
-            std::find(this->selectedVisuals.begin(),
+        auto it = std::find(this->selectedVisuals.begin(),
             this->selectedVisuals.end(), partVis);
         // Highlight and select clicked part if not already selected
         if (it == this->selectedVisuals.end())
@@ -1372,9 +1369,9 @@ void ModelCreator::OnCopy()
   if (!this->selectedVisuals.empty())
   {
     this->copiedPartNames.clear();
-    for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+    for (auto vis : this->selectedVisuals)
     {
-      this->copiedPartNames.push_back(this->selectedVisuals[i]->GetName());
+      this->copiedPartNames.push_back(vis->GetName());
     }
     g_pasteAct->setEnabled(true);
   }
@@ -1449,13 +1446,15 @@ void ModelCreator::GenerateSDF()
   if (this->serverModelName.empty())
   {
     // set center of all parts to be origin
+    // TODO set a better origin other than the centroid
     math::Vector3 mid;
     for (auto &partsIt : this->allParts)
     {
       PartData *part = partsIt.second;
       mid += part->GetPose().pos;
     }
-    mid /= this->allParts.size();
+    if (!this->allParts.empty())
+      mid /= this->allParts.size();
     this->modelPose.pos = mid;
   }
 
@@ -1566,9 +1565,9 @@ void ModelCreator::DeselectAll()
 {
   if (!this->selectedVisuals.empty())
   {
-    for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+    for (auto &vis : this->selectedVisuals)
     {
-      this->selectedVisuals[i]->SetHighlighted(false);
+      vis->SetHighlighted(false);
     }
     this->selectedVisuals.clear();
   }
@@ -1594,8 +1593,8 @@ void ModelCreator::OnManipMode(const std::string &_mode)
   // deselect 0 to n-1 models.
   if (this->selectedVisuals.size() > 1)
   {
-    for (std::vector<rendering::VisualPtr>::iterator it
-        = this->selectedVisuals.begin(); it != --this->selectedVisuals.end();)
+    for (auto it = this->selectedVisuals.begin();
+        it != --this->selectedVisuals.end();)
     {
        (*it)->SetHighlighted(false);
        it = this->selectedVisuals.erase(it);
@@ -1631,7 +1630,7 @@ void ModelCreator::Update()
       part->SetPose(part->partVisual->GetWorldPose() - this->modelPose);
       this->ModelChanged();
     }
-    for (auto scaleIt : this->partScaleUpdate)
+    for (auto &scaleIt : this->partScaleUpdate)
     {
       if (part->partVisual->GetName() == scaleIt.first)
         part->SetScale(scaleIt.second);
@@ -1690,8 +1689,7 @@ void ModelCreator::SetModelVisible(rendering::VisualPtr _visual, bool _visible)
   else
   {
     // restore original visibility
-    std::map<uint32_t, bool>::iterator it =
-        this->serverModelVisible.find(_visual->GetId());
+    auto it = this->serverModelVisible.find(_visual->GetId());
     if (it != this->serverModelVisible.end())
     {
       _visual->SetVisible(it->second, false);
