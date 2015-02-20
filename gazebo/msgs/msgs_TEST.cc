@@ -920,13 +920,16 @@ TEST_F(MsgsTest, MeshFromSDF)
 /////////////////////////////////////////////////
 TEST_F(MsgsTest, LinkToSDF)
 {
+  const std::string name("test_link");
+  const math::Pose pose(math::Vector3(3, 2, 1),
+                        math::Quaternion(0.5, -0.5, -0.5, 0.5));
+
   msgs::Link linkMsg;
-  linkMsg.set_name("test_link");
+  linkMsg.set_name(name);
   linkMsg.set_self_collide(false);
   linkMsg.set_gravity(true);
   linkMsg.set_kinematic(false);
-  msgs::Set(linkMsg.mutable_pose(), math::Pose(math::Vector3(3, 2, 1),
-      math::Quaternion(0.5, -0.5, -0.5, 0.5)));
+  msgs::Set(linkMsg.mutable_pose(), pose);
 
   const double laserRetro1 = 0.4;
   const double laserRetro2 = 0.5;
@@ -952,10 +955,11 @@ TEST_F(MsgsTest, LinkToSDF)
   inertialMsg->set_mass(3.5);
 
   sdf::ElementPtr linkSDF = msgs::LinkToSDF(linkMsg);
-  EXPECT_STREQ(linkSDF->Get<std::string>("name").c_str(), "test_link");
+  EXPECT_EQ(linkSDF->Get<std::string>("name"), name);
   EXPECT_FALSE(linkSDF->Get<bool>("self_collide"));
   EXPECT_TRUE(linkSDF->Get<bool>("gravity"));
   EXPECT_FALSE(linkSDF->Get<bool>("kinematic"));
+  EXPECT_EQ(pose, linkSDF->Get<math::Pose>("pose"));
 
   sdf::ElementPtr collisionElem1 = linkSDF->GetElement("collision");
   EXPECT_DOUBLE_EQ(collisionElem1->Get<double>("laser_retro"), laserRetro1);
@@ -1424,4 +1428,173 @@ TEST_F(MsgsTest, SurfaceToSDF)
   EXPECT_TRUE(contactElem->Get<bool>("collide_without_contact"));
   EXPECT_EQ(contactElem->Get<unsigned int>("collide_without_contact_bitmask"),
       static_cast<unsigned int>(0x0004));
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, JointToSDF)
+{
+  const std::string name("test_joint");
+  const msgs::Joint::Type type = msgs::Joint::UNIVERSAL;
+  const math::Pose pose(math::Vector3(9, 1, 1), math::Quaternion(0, 1, 0, 0));
+  const std::string parent("parent_link");
+  const std::string child("child_link");
+
+  const double cfm = 0.1;
+  const double bounce = 0.2;
+  const double velocity = 0.6;
+  const double fudge_factor = 0.7;
+  const double limit_cfm = 0.3;
+  const double limit_erp = 0.4;
+  const double suspension_cfm = 0.8;
+  const double suspension_erp = 0.9;
+  const math::Vector3 xyz1(0.6, 0.8, 0.0);
+  const math::Vector3 xyz2(0.0, 0.0, 1.0);
+  const double limit_lower1 = -2.0;
+  const double limit_lower2 = -4.0;
+  const double limit_upper1 = 12.0;
+  const double limit_upper2 = 24.0;
+  const double limit_effort1 = 1e3;
+  const double limit_effort2 = 1e4;
+  const double limit_velocity1 = 33;
+  const double limit_velocity2 = 44;
+  const double damping1 = 1e-2;
+  const double damping2 = 3e-2;
+  const double friction1 = 1e2;
+  const double friction2 = 3e2;
+  const bool useParentModelFrame1 = true;
+  // don't set use_parent_model_frame for axis2
+  // expect it to match sdformat default (false)
+
+  msgs::Joint jointMsg;
+  jointMsg.set_name(name);
+  jointMsg.set_type(type);
+  jointMsg.set_parent(parent);
+  jointMsg.set_child(child);
+  msgs::Set(jointMsg.mutable_pose(), pose);
+  jointMsg.set_cfm(cfm);
+  jointMsg.set_bounce(bounce);
+  jointMsg.set_velocity(velocity);
+  jointMsg.set_fudge_factor(fudge_factor);
+  jointMsg.set_limit_cfm(limit_cfm);
+  jointMsg.set_limit_erp(limit_erp);
+  jointMsg.set_suspension_cfm(suspension_cfm);
+  jointMsg.set_suspension_erp(suspension_erp);
+  {
+    auto axis1 = jointMsg.mutable_axis1();
+    msgs::Set(axis1->mutable_xyz(), xyz1);
+    axis1->set_limit_lower(limit_lower1);
+    axis1->set_limit_upper(limit_upper1);
+    axis1->set_limit_effort(limit_effort1);
+    axis1->set_limit_velocity(limit_velocity1);
+    axis1->set_damping(damping1);
+    axis1->set_friction(friction1);
+    axis1->set_use_parent_model_frame(useParentModelFrame1);
+  }
+  {
+    auto axis2 = jointMsg.mutable_axis2();
+    msgs::Set(axis2->mutable_xyz(), xyz2);
+    axis2->set_limit_lower(limit_lower2);
+    axis2->set_limit_upper(limit_upper2);
+    axis2->set_limit_effort(limit_effort2);
+    axis2->set_limit_velocity(limit_velocity2);
+    axis2->set_damping(damping2);
+    axis2->set_friction(friction2);
+  }
+
+  sdf::ElementPtr jointSDF = msgs::JointToSDF(jointMsg);
+  EXPECT_TRUE(jointSDF->HasAttribute("name"));
+  EXPECT_EQ(jointSDF->Get<std::string>("name"), name);
+  EXPECT_TRUE(jointSDF->HasAttribute("type"));
+  EXPECT_STREQ(jointSDF->Get<std::string>("type").c_str(), "universal");
+  EXPECT_TRUE(jointSDF->HasElement("parent"));
+  EXPECT_EQ(jointSDF->Get<std::string>("parent"), parent);
+  EXPECT_TRUE(jointSDF->HasElement("child"));
+  EXPECT_EQ(jointSDF->Get<std::string>("child"), child);
+  EXPECT_TRUE(jointSDF->HasElement("pose"));
+  EXPECT_EQ(pose, jointSDF->Get<math::Pose>("pose"));
+
+  EXPECT_TRUE(jointSDF->HasElement("axis"));
+  {
+    auto axisElem = jointSDF->GetElement("axis");
+    EXPECT_TRUE(axisElem->HasElement("xyz"));
+    EXPECT_EQ(xyz1, axisElem->Get<math::Vector3>("xyz"));
+    EXPECT_TRUE(axisElem->HasElement("use_parent_model_frame"));
+    EXPECT_EQ(useParentModelFrame1,
+              axisElem->Get<bool>("use_parent_model_frame"));
+
+    EXPECT_TRUE(axisElem->HasElement("dynamics"));
+    auto axisDynamics = axisElem->GetElement("dynamics");
+    EXPECT_TRUE(axisDynamics->HasElement("damping"));
+    EXPECT_DOUBLE_EQ(damping1, axisDynamics->Get<double>("damping"));
+    EXPECT_TRUE(axisDynamics->HasElement("friction"));
+    EXPECT_DOUBLE_EQ(friction1, axisDynamics->Get<double>("friction"));
+
+    EXPECT_TRUE(axisElem->HasElement("limit"));
+    auto axisLimit = axisElem->GetElement("limit");
+    EXPECT_TRUE(axisLimit->HasElement("lower"));
+    EXPECT_DOUBLE_EQ(limit_lower1, axisLimit->Get<double>("lower"));
+    EXPECT_TRUE(axisLimit->HasElement("upper"));
+    EXPECT_DOUBLE_EQ(limit_upper1, axisLimit->Get<double>("upper"));
+    EXPECT_TRUE(axisLimit->HasElement("effort"));
+    EXPECT_DOUBLE_EQ(limit_effort1, axisLimit->Get<double>("effort"));
+    EXPECT_TRUE(axisLimit->HasElement("velocity"));
+    EXPECT_DOUBLE_EQ(limit_velocity1, axisLimit->Get<double>("velocity"));
+  }
+
+  EXPECT_TRUE(jointSDF->HasElement("axis2"));
+  {
+    auto axisElem = jointSDF->GetElement("axis2");
+    EXPECT_TRUE(axisElem->HasElement("xyz"));
+    EXPECT_EQ(xyz2, axisElem->Get<math::Vector3>("xyz"));
+    // use_parent_model_frame is required in axis.proto
+    // so expect to to exist even if we don't set it
+    EXPECT_TRUE(axisElem->HasElement("use_parent_model_frame"));
+    // expect false (default sdformat value)
+    EXPECT_FALSE(axisElem->Get<bool>("use_parent_model_frame"));
+
+    EXPECT_TRUE(axisElem->HasElement("dynamics"));
+    auto axisDynamics = axisElem->GetElement("dynamics");
+    EXPECT_TRUE(axisDynamics->HasElement("damping"));
+    EXPECT_DOUBLE_EQ(damping2, axisDynamics->Get<double>("damping"));
+    EXPECT_TRUE(axisDynamics->HasElement("friction"));
+    EXPECT_DOUBLE_EQ(friction2, axisDynamics->Get<double>("friction"));
+
+    EXPECT_TRUE(axisElem->HasElement("limit"));
+    auto axisLimit = axisElem->GetElement("limit");
+    EXPECT_TRUE(axisLimit->HasElement("lower"));
+    EXPECT_DOUBLE_EQ(limit_lower2, axisLimit->Get<double>("lower"));
+    EXPECT_TRUE(axisLimit->HasElement("upper"));
+    EXPECT_DOUBLE_EQ(limit_upper2, axisLimit->Get<double>("upper"));
+    EXPECT_TRUE(axisLimit->HasElement("effort"));
+    EXPECT_DOUBLE_EQ(limit_effort2, axisLimit->Get<double>("effort"));
+    EXPECT_TRUE(axisLimit->HasElement("velocity"));
+    EXPECT_DOUBLE_EQ(limit_velocity2, axisLimit->Get<double>("velocity"));
+  }
+
+  EXPECT_TRUE(jointSDF->HasElement("physics"));
+  auto physicsElem = jointSDF->GetElement("physics");
+  EXPECT_TRUE(physicsElem->HasElement("ode"));
+  auto odePhysics = physicsElem->GetElement("ode");
+  EXPECT_TRUE(odePhysics->HasElement("cfm"));
+  EXPECT_DOUBLE_EQ(odePhysics->Get<double>("cfm"), cfm);
+  EXPECT_TRUE(odePhysics->HasElement("bounce"));
+  EXPECT_DOUBLE_EQ(odePhysics->Get<double>("bounce"), bounce);
+  EXPECT_TRUE(odePhysics->HasElement("velocity"));
+  EXPECT_DOUBLE_EQ(odePhysics->Get<double>("velocity"), velocity);
+  EXPECT_TRUE(odePhysics->HasElement("fudge_factor"));
+  EXPECT_DOUBLE_EQ(odePhysics->Get<double>("fudge_factor"), fudge_factor);
+
+  EXPECT_TRUE(odePhysics->HasElement("limit"));
+  auto limitElem = odePhysics->GetElement("limit");
+  EXPECT_TRUE(limitElem->HasElement("cfm"));
+  EXPECT_DOUBLE_EQ(limitElem->Get<double>("cfm"), limit_cfm);
+  EXPECT_TRUE(limitElem->HasElement("erp"));
+  EXPECT_DOUBLE_EQ(limitElem->Get<double>("erp"), limit_erp);
+
+  EXPECT_TRUE(odePhysics->HasElement("suspension"));
+  auto suspensionElem = odePhysics->GetElement("suspension");
+  EXPECT_TRUE(suspensionElem->HasElement("cfm"));
+  EXPECT_DOUBLE_EQ(suspensionElem->Get<double>("cfm"), suspension_cfm);
+  EXPECT_TRUE(suspensionElem->HasElement("erp"));
+  EXPECT_DOUBLE_EQ(suspensionElem->Get<double>("erp"), suspension_erp);
 }

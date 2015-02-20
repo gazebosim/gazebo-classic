@@ -97,7 +97,7 @@ def check_main():
                 else:
                     pid = m.group(1)
                     print("killing gzserver with pid %s" % (pid))
-                    subprocess.call(["kill", "%s" % (pid)])
+                    subprocess.call(["kill", "-9", "%s" % (pid)])
 
     print("Checking for test results in %s"%test_file)
     
