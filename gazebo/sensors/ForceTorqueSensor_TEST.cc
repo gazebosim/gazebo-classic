@@ -134,6 +134,24 @@ TEST_P(ForceTorqueSensor_TEST, ForceTorqueTestERB)
 }
 
 /////////////////////////////////////////////////
+TEST_P(ForceTorqueSensor_TEST, ForceTorqueTestERB2)
+{
+  ForceTorqueTestERB(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(ForceTorqueSensor_TEST, ForceTorqueTestERB3)
+{
+  ForceTorqueTestERB(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(ForceTorqueSensor_TEST, ForceTorqueTestERB4)
+{
+  ForceTorqueTestERB(GetParam());
+}
+
+/////////////////////////////////////////////////
 INSTANTIATE_TEST_CASE_P(PhysicsEngines,
                         ForceTorqueSensor_TEST,
                         PHYSICS_ENGINE_VALUES);
