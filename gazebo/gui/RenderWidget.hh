@@ -32,11 +32,10 @@ class QHBoxLayout;
 
 namespace gazebo
 {
-  class GLWidget;
-
   namespace gui
   {
-    class BuildingEditorWidget;
+    class GLWidget;
+    class TimePanel;
 
     class GAZEBO_VISIBLE RenderWidget : public QWidget
     {
@@ -47,9 +46,18 @@ namespace gazebo
       public: void RemoveScene(const std::string &_name);
       public: void CreateScene(const std::string &_name);
 
-      /// \brief Show editor widget in the main window
-      /// param[in] _show True to show the editor widget, false to hide it.
-      public: void ShowEditor(bool _show);
+      /// \brief Add a widget inside the render widget
+      /// \param[in] _widget Widget to be added.
+      /// \param[in] _index Index in the splitter to add the widget at.
+      public: void InsertWidget(unsigned int _index, QWidget *_widget);
+
+      /// \brief Show the time panel.
+      /// \para[in] _show True to show the panel, false to hide it.
+      public: void ShowTimePanel(bool _show);
+
+      /// brief Get the time panel widget.
+      /// \return the time panel widget.
+      public: TimePanel *GetTimePanel() const;
 
       /// \brief Display an overlay message
       /// \param[in] _msg Message to be displayed
@@ -92,9 +100,6 @@ namespace gazebo
       /// \brief Widget used to draw the scene.
       private: GLWidget *glWidget;
 
-      /// \brief Building editor widget for creating a building model
-      private: BuildingEditorWidget *buildingEditorWidget;
-
       /// \brief Frame that holds the contents of this widget.
       private: QFrame *mainFrame;
 
@@ -133,8 +138,14 @@ namespace gazebo
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
 
+      /// \brief Vertical splitter between widgets.
+      private: QSplitter *splitter;
+
       /// \brief All the gui plugins
       private: std::vector<gazebo::GUIPluginPtr> plugins;
+
+      /// \brief Time panel widget.
+      private: TimePanel *timePanel;
     };
   }
 }
