@@ -407,6 +407,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
           contacts.contact(i).wrench(j).body_2_wrench().torque().z();
       }
 
+      gzerr << j << " : " << actualTorque << "\n";
       // dart doesn't pass this portion of the test (#910)
       if (_physicsEngine != "dart")
       {

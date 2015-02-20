@@ -508,14 +508,28 @@ void SimbodyPhysics::UpdateCollision()
 
               // Store the contact forces
               const SimTK::Vec3 f2 = detail.getForceOnSurface2();
-              // shift from contact point world frame to CG world frame
-              // per gazebo contact feedback convention
+              const SimTK::SpatialVec s2 =
+                SimTK::SpatialVec(SimTK::Vec3(0, 0, 0), f2);
+              /// \TODO: get transform from point to CG, for now, assume
+              /// detail.getContactPoint() returns in body frame
+              // per gazebo contact feedback convention, pending more testing.
+              SimTK::SpatialVec s2cg = SimTK::shiftForceBy(s2,
+                -detail.getContactPoint());
+              gzerr << "offset: " << detail.getContactPoint() << "\n";
+              gzerr << "s2: " << s2 << "\n";
+              gzerr << "s2cg: " << s2cg << "\n";
+              SimTK::Vec3 t2cg = s2cg[0];
+              SimTK::Vec3 f2cg = s2cg[1];
 
               // copy.
-              contactFeedback->wrench[j].body1Force.Set(-f2[0], -f2[1], -f2[2]);
-              contactFeedback->wrench[j].body2Force.Set(f2[0], f2[1], f2[2]);
-              contactFeedback->wrench[j].body1Torque.Set(0, 0, 0);
-              contactFeedback->wrench[j].body2Torque.Set(0, 0, 0);
+              contactFeedback->wrench[j].body1Force.Set(
+                -f2cg[0], -f2cg[1], -f2cg[2]);
+              contactFeedback->wrench[j].body2Force.Set(
+                f2cg[0], f2cg[1], f2cg[2]);
+              contactFeedback->wrench[j].body1Torque.Set(
+                -t2cg[0], -t2cg[1], -t2cg[2]);
+              contactFeedback->wrench[j].body2Torque.Set(
+                t2cg[0], t2cg[1], t2cg[2]);
                   
               // Increase the counters
               ++count;
@@ -1343,7 +1357,6 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         //   this->matter.Ground().updBody().updContactSurface(surfNum);
         // sc->SetCollisionShape(&groundContactSurf.updShape());
 
-        /* */
         // by default, simbody HalfSpace normal is in the -X direction
         // rotate it based on normal vector specified by user
         // Create a rotation whos x-axis is in the
@@ -1361,7 +1374,6 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         // store ContactGeometry pointer in SimbodyCollision object
         SimTK::ContactSurface &contactSurf =
           _mobod.updBody().updContactSurface(surfNum);
-        /// \TODO: uncomment below leads to segfault?
         sc->SetCollisionShape(&contactSurf.updShape());
       }
       break;
