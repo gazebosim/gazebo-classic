@@ -1,6 +1,9 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
+1. Added Model Msg-to-SDF conversion functions and test.
+    * [Pull request #1429](https://bitbucket.org/osrf/gazebo/pull-request/1429)
+
 1. Added Joint Msg-to-SDF conversion functions and test.
     * [Pull request #1419](https://bitbucket.org/osrf/gazebo/pull-request/1419)
 

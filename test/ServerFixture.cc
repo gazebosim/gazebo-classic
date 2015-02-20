@@ -1361,3 +1361,11 @@ void ServerFixture::GetMemInfo(double &_resident, double &_share)
   return;
 #endif
 }
+
+/////////////////////////////////////////////////
+std::string ServerFixture::GetUniqueString(const std::string &_prefix)
+{
+  std::ostringstream stream;
+  stream << _prefix << this->uniqueCounter++;
+  return stream.str();
+}
