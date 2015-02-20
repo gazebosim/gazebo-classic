@@ -392,11 +392,4 @@ void Sensor::ResetLastUpdateTime()
 {
   boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
   this->lastUpdateTime = 0.0;
-  // Reset lastMeasurementTime as well, since ImuSensor
-  // checks it before updating (see issue 236).
-  // This isn't a complete fix since the modifications
-  // to lastMeasurementTime by ImuSensor aren't protected
-  // by mutexLastUpdateTime, which is private to the
-  // Sensor class.
-  this->lastMeasurementTime = 0.0;
 }
