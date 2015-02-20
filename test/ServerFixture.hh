@@ -203,6 +203,11 @@ class ServerFixture : public testing::Test
                  unsigned char **_imgData, unsigned int &_width,
                  unsigned int &_height);
 
+  /// \brief Spawn a model from a msgs::Model and return ModelPtr.
+  /// \param[in] _msg Model message.
+  /// \return Pointer to model.
+  protected: physics::ModelPtr SpawnModel(const msgs::Model &_msg);
+
   /// \brief Spawn a camera.
   /// \param[in] _modelName Name of the model.
   /// \param[in] _cameraName Name of the camera.
@@ -523,6 +528,9 @@ class ServerFixture : public testing::Test
   /// \param[out] _share Shared memory.
   protected: void GetMemInfo(double &_resident, double &_share);
 
+  /// \brief Get unique string.
+  protected: std::string GetUniqueString(const std::string &_prefix);
+
   /// \brief Pointer the Gazebo server.
   protected: Server *server;
 
@@ -567,5 +575,8 @@ class ServerFixture : public testing::Test
 
   /// \brief True if server is running.
   private: bool serverRunning;
+
+  /// \brief Counter for unique name generation.
+  private: int uniqueCounter;
 };
 #endif  // define _GAZEBO_SERVER_FIXTURE_HH_
