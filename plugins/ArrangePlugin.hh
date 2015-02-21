@@ -67,25 +67,14 @@ namespace gazebo
     /// \brief SDF pointer.
     protected: sdf::ElementPtr sdf;
 
-    /// \brief Class to store info about each object.
-    protected: class Object
-               {
-                 /// \brief Model pointer.
-                 public: physics::ModelPtr model;
-
-                 /// \brief Initial object pose.
-                 public: math::Pose pose;
-               };
-    typedef boost::shared_ptr<Object> ObjectPtr;
-
     /// \brief Map of strings to model pointers.
     typedef std::map<std::string, ObjectPtr> Object_M;
 
-    /// \brief Collection of models.
-    protected: Object_M objects;
-
     /// \brief Map of strings to model poses.
     typedef std::map<std::string, math::Pose> Pose_M;
+
+    /// \brief Initial model poses.
+    protected: Pose_M initialPoses;
 
     /// \brief Map of strings to Pose_M (arrangement map).
     typedef std::map<std::string, Pose_M> Arrangement_M;

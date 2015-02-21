@@ -52,14 +52,11 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
       while (elem)
       {
         // Add names to map
-        std::string modelName = elem->Get<std::string>();
+        modelName = elem->Get<std::string>();
         physics::ModelPtr model = world->GetModel(modelName);
         if (model)
         {
-          ObjectPtr object(new Object);
-          object->model = model;
-          object->pose = model->GetWorldPose();
-          this->objects[modelName] = object;
+          this->initialPoses[modelName] = model->GetWorldPose();
         }
         else
         {
@@ -163,6 +160,7 @@ void ArrangePlugin::Reset()
   this->SetArrangement(this->currentArrangementName);
 }
 
+/////////////////////////////////////////////////
 void ArrangePlugin::ArrangementCallback(ConstGzStringPtr &_msg)
 {
   // Set arrangement to the requested id
@@ -182,25 +180,35 @@ bool ArrangePlugin::SetArrangement(const std::string &_arrangement)
   }
 
   this->currentArrangementName = _arrangement;
-  Pose_M arrangement = this->arrangements[_arrangement];
+  auto arrangement = this->arrangements[_arrangement];
 
-  for (Object_M::iterator iter = this->objects.begin();
-        iter != this->objects.end(); ++iter)
+  for (auto const &initialPose: this->initialPoses)
   {
-    physics::ModelPtr model = iter->second->model;
+    auto modelName = initialPose.first;
+    auto model = world->GetModel(modelName);
+    if (!model)
+    {
+      // Model no longer exists
+      gzwarn << "Unable to SetWorldPose for "
+             << modelName
+             << "; was it deleted?"
+             << std::endl;
+      continue;
+    }
+
     math::Pose pose;
-    Pose_M::iterator poseIter = arrangement.find(iter->first);
+    auto const &poseIter = arrangement.find(modelName);
     if (poseIter != arrangement.end())
     {
       // object name found in arrangement
       // use arrangement pose
-      pose = poseIter->second;
+      pose = poseIter.second;
     }
     else
     {
       // object name not found in arrangement
       // use initial pose
-      pose = iter->second->pose;
+      pose = initialPose.second;
     }
     model->SetWorldPose(pose);
     model->ResetPhysicsStates();
