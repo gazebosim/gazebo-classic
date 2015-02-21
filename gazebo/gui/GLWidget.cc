@@ -741,6 +741,7 @@ void GLWidget::OnMouseReleaseNormal()
           ((modelHighlighted && !rightButton) || linkHighlighted))
       {
         selectVis = linkVis;
+        this->selectionLevel = SelectionLevels::LINK;
       }
       // Select model
       else
@@ -750,6 +751,7 @@ void GLWidget::OnMouseReleaseNormal()
           this->DeselectAllVisuals();
 
         selectVis = modelVis;
+        this->selectionLevel = SelectionLevels::MODEL;
       }
       this->SetSelectedVisual(selectVis);
       event::Events::setSelectedEntity(selectVis->GetName(), "normal");

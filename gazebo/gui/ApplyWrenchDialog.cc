@@ -40,6 +40,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   : QDialog(_parent), dataPtr(new ApplyWrenchDialogPrivate)
 {
   this->setObjectName("ApplyWrenchDialog");
+  this->dataPtr->mainWindow = gui::get_main_window();
 
   this->setWindowTitle(tr("Apply Force and Torque"));
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
@@ -440,11 +441,6 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->comVector = math::Vector3::Zero;
   this->dataPtr->forceVector = math::Vector3::Zero;
   this->dataPtr->torqueVector = math::Vector3::Zero;
-
-  connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
-  connect(g_rotateAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
-  connect(g_translateAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
-  connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
 }
 
 /////////////////////////////////////////////////
@@ -460,7 +456,45 @@ ApplyWrenchDialog::~ApplyWrenchDialog()
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetModel(std::string _modelName)
+void ApplyWrenchDialog::Init(std::string _modelName, std::string _linkName)
+{
+  if (!this->SetModel(_modelName))
+    return;
+
+  if (!this->SetLink(_linkName))
+    return;
+
+  connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
+  connect(g_rotateAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
+  connect(g_translateAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
+  connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
+
+  this->move(QCursor::pos());
+  this->show();
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::Fini()
+{
+  this->close();
+  this->dataPtr->connections.clear();
+
+  MouseEventHandler::Instance()->RemoveReleaseFilter(
+    "applyWrenchDialog_"+this->dataPtr->linkName);
+  MouseEventHandler::Instance()->RemovePressFilter(
+      "applyWrenchDialog_"+this->dataPtr->linkName);
+  MouseEventHandler::Instance()->RemoveMoveFilter(
+      "applyWrenchDialog_"+this->dataPtr->linkName);
+  KeyEventHandler::Instance()->RemovePressFilter(
+      "applyWrenchDialog_"+this->dataPtr->linkName);
+
+  // Remove mode visuals too
+  if (this->dataPtr->applyWrenchVisual)
+    this->dataPtr->applyWrenchVisual->Fini();
+}
+
+/////////////////////////////////////////////////
+bool ApplyWrenchDialog::SetModel(std::string _modelName)
 {
   rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
       GetVisual(_modelName);
@@ -468,8 +502,7 @@ void ApplyWrenchDialog::SetModel(std::string _modelName)
   if (!vis)
   {
     gzerr << "Model [" << _modelName << "] could not be found." << std::endl;
-    this->reject();
-    return;
+    return false;
   }
 
   this->dataPtr->modelName = _modelName;
@@ -477,25 +510,38 @@ void ApplyWrenchDialog::SetModel(std::string _modelName)
   this->dataPtr->modelLabel->setText(
       ("<b>Model:</b> " + _modelName).c_str());
 
+  // Don't fire signals while inserting items
+  this->dataPtr->linksComboBox->blockSignals(true);
   this->dataPtr->linksComboBox->clear();
 
   for (unsigned int i = 0; i < vis->GetChildCount(); ++i)
   {
     rendering::VisualPtr childVis = vis->GetChild(i);
+    std::string linkName = childVis->GetName();
 
-    uint32_t flags = childVis->GetVisibilityFlags();
-    if (!((flags != GZ_VISIBILITY_ALL) && (flags & GZ_VISIBILITY_GUI)))
+    // This is failing to get real links sometimes
+    // uint32_t flags = childVis->GetVisibilityFlags();
+    // if (!((flags != GZ_VISIBILITY_ALL) && (flags & GZ_VISIBILITY_GUI)))
+    if (linkName.find("_GL_MANIP_") == std::string::npos)
     {
-      std::string linkName = childVis->GetName();
       std::string unscopedLinkName = linkName.substr(linkName.find("::") + 2);
       this->dataPtr->linksComboBox->addItem(
           QString::fromStdString(unscopedLinkName));
     }
   }
+  this->dataPtr->linksComboBox->blockSignals(false);
+
+  if (this->dataPtr->linksComboBox->count() > 0)
+    return true;
+
+  gzerr << "Couldn't find links in model ' [" << _modelName << "]."
+        << std::endl;
+
+  return false;
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetLink(std::string _linkName)
+bool ApplyWrenchDialog::SetLink(std::string _linkName)
 {
   // Select on combo box
   std::string unscopedLinkName = _linkName.substr(_linkName.find("::") + 2);
@@ -511,9 +557,10 @@ void ApplyWrenchDialog::SetLink(std::string _linkName)
   }
   if (index == -1)
   {
-    gzerr << "Link [" << _linkName << "] could not be found." << std::endl;
+    gzerr << "Link [" << _linkName << "] could not be found in the combo box."
+          << std::endl;
     this->reject();
-    return;
+    return false;
   }
   this->dataPtr->linksComboBox->setCurrentIndex(index);
 
@@ -533,22 +580,29 @@ void ApplyWrenchDialog::SetLink(std::string _linkName)
   rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
       GetVisual(this->dataPtr->linkName);
 
+  if (!vis)
+  {
+    gzerr << "A visual named [" << this->dataPtr->linkName
+          << "] could not be found." << std::endl;
+    return false;
+  }
   this->dataPtr->linkVisual = vis;
   this->AttachVisuals();
 
   // Main window
-  this->dataPtr->mainWindow = gui::get_main_window();
   this->dataPtr->mainWindow->installEventFilter(this);
 
-  // PreRender
+  // Check if link hasn't been deleted on PreRender
   this->dataPtr->connections.push_back(
       event::Events::ConnectPreRender(
       boost::bind(&ApplyWrenchDialog::OnPreRender, this)));
 
   // MouseRelease even when it's inactive, to regain focus
   MouseEventHandler::Instance()->AddReleaseFilter(
-    "applyWrenchDialog_"+this->dataPtr->linkName,
-    boost::bind(&ApplyWrenchDialog::OnMouseRelease, this, _1));
+      "applyWrenchDialog_"+this->dataPtr->linkName,
+      boost::bind(&ApplyWrenchDialog::OnMouseRelease, this, _1));
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -630,9 +684,9 @@ void ApplyWrenchDialog::OnApplyTorque()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnCancel()
 {
-
   this->close();
   this->dataPtr->connections.clear();
+  this->dataPtr->mainWindow->removeEventFilter(this);
 
   // Hide mode visuals too
   if (this->dataPtr->applyWrenchVisual)
@@ -724,22 +778,32 @@ void ApplyWrenchDialog::SetPublisher()
   topicName += this->dataPtr->linkName + "/wrench";
   boost::replace_all(topicName, "::", "/");
 
-  this->dataPtr->wrenchPub = this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
+  this->dataPtr->wrenchPub =
+      this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::AttachVisuals()
 {
+  if (!this->dataPtr->linkVisual)
+  {
+    gzerr << "No link visual specified." << std::endl;
+    return;
+  }
+
   // Attaching for the first time
   if (!this->dataPtr->applyWrenchVisual)
   {
     this->dataPtr->applyWrenchVisual.reset(new rendering::ApplyWrenchVisual(
-        this->dataPtr->linkName + "__APPLY_WRENCH__", this->dataPtr->linkVisual));
+        this->dataPtr->linkName + "__APPLY_WRENCH__",
+        this->dataPtr->linkVisual));
 
     this->dataPtr->applyWrenchVisual->Load();
   }
   // Same link as before
-  else if (this->dataPtr->applyWrenchVisual->GetParent() == this->dataPtr->linkVisual)
+  else if (this->dataPtr->applyWrenchVisual->GetParent() &&
+      this->dataPtr->applyWrenchVisual->GetParent() ==
+      this->dataPtr->linkVisual)
   {
     this->dataPtr->applyWrenchVisual->SetVisible(true);
   }
@@ -1262,7 +1326,7 @@ void ApplyWrenchDialog::SetActive(bool _active)
 {
   if (!this->dataPtr->applyWrenchVisual)
   {
-    gzwarn << "No visual" << std::endl;
+    gzerr << "No apply wrench visual." << std::endl;
     this->reject();
     return;
   }
@@ -1311,7 +1375,7 @@ void ApplyWrenchDialog::OnPreRender()
       GetVisual(this->dataPtr->linkName);
 
   if (!vis)
-    this->reject();
+    this->Fini();
 }
 
 /////////////////////////////////////////////////

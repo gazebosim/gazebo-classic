@@ -240,6 +240,12 @@ rendering::VisualPtr ApplyWrenchVisual::GetForceVisual() const
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
+  if (!dPtr->forceVisual)
+  {
+    gzerr << "Force visual not found, but it should exist." << std::endl;
+    return NULL;
+  }
+
   return dPtr->forceVisual;
 }
 
@@ -249,6 +255,12 @@ rendering::VisualPtr ApplyWrenchVisual::GetTorqueVisual() const
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
+  if (!dPtr->torqueVisual)
+  {
+    gzerr << "Torque visual not found, but it should exist." << std::endl;
+    return NULL;
+  }
+
   return dPtr->torqueVisual;
 }
 
@@ -257,6 +269,12 @@ rendering::SelectionObjPtr ApplyWrenchVisual::GetRotTool() const
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  if (!dPtr->rotTool)
+  {
+    gzerr << "Rot tool not found, but it should exist." << std::endl;
+    return NULL;
+  }
 
   return dPtr->rotTool;
 }
@@ -279,7 +297,7 @@ void ApplyWrenchVisual::SetWrenchMode(std::string _mode)
 
   if (!dPtr->forceVisual || !dPtr->torqueVisual || !dPtr->rotTool)
   {
-    gzwarn << "Some visual is missing!" << std::endl;
+    gzerr << "Some visual is missing!" << std::endl;
     return;
   }
 
@@ -325,6 +343,12 @@ void ApplyWrenchVisual::SetCoM(math::Vector3 _comVector)
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
+  if (!dPtr->comVisual)
+  {
+    gzerr << "CoM visual not found, but it should exist." << std::endl;
+    return;
+  }
+
   // move com visual
   dPtr->comVisual->SetPosition(_comVector);
 
@@ -350,6 +374,12 @@ void ApplyWrenchVisual::SetForce(math::Vector3 _forceVector, bool _rotatedByMous
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
+  if (!dPtr->forceText)
+  {
+    gzerr << "Force text not found, but it should exist." << std::endl;
+    return;
+  }
+
   dPtr->forceVector = _forceVector;
   dPtr->rotatedByMouse = _rotatedByMouse;
 
@@ -359,7 +389,6 @@ void ApplyWrenchVisual::SetForce(math::Vector3 _forceVector, bool _rotatedByMous
 
   if (_forceVector == math::Vector3::Zero)
   {
-//    dPtr->forceVisual->SetVisible(false);
     if (dPtr->torqueVector == math::Vector3::Zero)
       this->SetWrenchMode("none");
     else
@@ -377,6 +406,12 @@ void ApplyWrenchVisual::SetTorque(math::Vector3 _torqueVector, bool _rotatedByMo
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
+  if (!dPtr->torqueText)
+  {
+    gzerr << "Torque text not found, but it should exist." << std::endl;
+    return;
+  }
+
   dPtr->torqueVector = _torqueVector;
   dPtr->rotatedByMouse = _rotatedByMouse;
 
@@ -386,7 +421,6 @@ void ApplyWrenchVisual::SetTorque(math::Vector3 _torqueVector, bool _rotatedByMo
 
   if (_torqueVector == math::Vector3::Zero)
   {
-//    dPtr->torqueVisual->SetVisible(false);
     if (dPtr->forceVector == math::Vector3::Zero)
       this->SetWrenchMode("none");
     else
@@ -404,7 +438,7 @@ void ApplyWrenchVisual::SetForceVisual()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  if (!dPtr->forceVisual)
+  if (!dPtr->forceVisual || !dPtr->rotTool)
   {
     gzwarn << "No force visual" << std::endl;
     return;
@@ -425,8 +459,8 @@ void ApplyWrenchVisual::SetForceVisual()
       math::Vector3(0, M_PI/2.0, 0)));
 
   // Set position towards forcePosVector
-  dPtr->forceVisual->SetPosition(-normVec * 0.28 * dPtr->forceVisual->GetScale().z
-      + dPtr->forcePosVector);
+  dPtr->forceVisual->SetPosition(-normVec * 0.28 *
+      dPtr->forceVisual->GetScale().z + dPtr->forcePosVector);
 
   // Rotation tool
   dPtr->rotTool->SetPosition(dPtr->forcePosVector);
@@ -440,7 +474,7 @@ void ApplyWrenchVisual::SetTorqueVisual()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  if (!dPtr->torqueVisual)
+  if (!dPtr->torqueVisual || !dPtr->rotTool)
   {
     gzwarn << "No torque visual" << std::endl;
     return;
@@ -480,7 +514,7 @@ void ApplyWrenchVisual::SetVisible(bool _visible, bool _cascade)
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
   if (!dPtr->forceVisual || !dPtr->torqueVisual || !dPtr->comVisual ||
-      !dPtr->rotTool)
+      !dPtr->rotTool || !dPtr->originVisual)
   {
     gzwarn << "Some visual is missing!" << std::endl;
     return;
@@ -529,6 +563,15 @@ void ApplyWrenchVisual::Resize()
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  if (!dPtr->parent || !dPtr->originXLines || !dPtr->originYLines ||
+      !dPtr->originZLines || !dPtr->comVisual || !dPtr->forceVisual ||
+      !dPtr->torqueVisual || !dPtr->forceText || !dPtr->torqueText ||
+      !dPtr->rotTool)
+  {
+    gzwarn << "ApplyWrenchVisual is incomplete." << std::endl;
+    return;
+  }
 
   math::Vector3 linkSize = dPtr->parent->GetBoundingBox().GetSize();
 

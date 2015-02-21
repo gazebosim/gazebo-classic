@@ -245,14 +245,12 @@ void ModelRightMenu::OnApplyWrench()
   }
   else
   {
-    gzerr << "Entity type does not correspont to entity." << std::endl;
+    gzerr << "Entity [" << this->entityName
+          << "]'s type does not correspond to entity visual." << std::endl;
     return;
   }
 
-  this->applyWrenchDialog->SetModel(modelName);
-  this->applyWrenchDialog->SetLink(linkName);
-  this->applyWrenchDialog->move(QCursor::pos());
-  this->applyWrenchDialog->show();
+  this->applyWrenchDialog->Init(modelName, linkName);
 }
 
 /////////////////////////////////////////////////
