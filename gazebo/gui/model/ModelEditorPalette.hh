@@ -105,6 +105,13 @@ namespace gazebo
       /// \brief Event received when the user starts a new model.
       private: void OnNewModel();
 
+      /// \brief Event received when the model properties changed..
+      /// \param[in] _static New static property of the model.
+      /// \param[in] _static New allow_auto_disable property of the model.
+      /// \param[in] _static New model pose.
+      private: void OnModelPropertiesChanged(bool _static, bool _autoDisable,
+          const math::Pose &_pose);
+
       /// \brief A list of gui editor events connected to this palette.
       private: std::vector<event::ConnectionPtr> connections;
 
