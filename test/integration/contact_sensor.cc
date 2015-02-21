@@ -96,7 +96,7 @@ void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
     transport::SubscriberPtr sub = this->node->Subscribe(*iter,
       &ContactSensor::Callback, this);
 
-    const int steps = 50;
+    const unsigned int steps = 50;
     world->Step(steps);
     common::Time::MSleep(steps);
     EXPECT_GT(g_messageCount, steps / 2);
