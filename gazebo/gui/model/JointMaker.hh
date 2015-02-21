@@ -153,6 +153,20 @@ namespace gazebo
       /// return Number of joints.
       public: unsigned int GetJointCount();
 
+      /// \brief Create a joint from SDF. This is mainly used when editing
+      /// existing models.
+      /// \param[in] _jointElement SDF element to load.
+      /// \param[in] _modelName Name of the model that contains this joint.
+      public: void CreateJointFromSDF(sdf::ElementPtr _jointElem,
+          const std::string &_modelName = "");
+
+      /// \brief Add a scoped link name. Nested model's link names are scoped
+      /// but the parent and child field in the joint SDF element may not be.
+      /// So keep track of scoped link names in order to generate the correct
+      /// SDF before spawning the model.
+      /// \param[in] _name Scoped link name.
+      public: void AddScopedLinkName(const std::string &_name);
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -187,6 +201,16 @@ namespace gazebo
       /// \brief Open joint inspector.
       /// \param[in] _name Name of joint.
       private: void OpenInspector(const std::string &_name);
+
+      /// \brief Convert a joint type string to enum.
+      /// \param[in] _type Joint type in string.
+      /// \return Joint type enum.
+      private: JointType ConvertJointType(const std::string &_type);
+
+      /// \brief Get the scoped name of a link.
+      /// \param[in] _name Unscoped link name.
+      /// \return Scoped link name.
+      private: std::string GetScopedLinkName(const std::string &_name);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
@@ -242,6 +266,9 @@ namespace gazebo
 
       /// \brief Selected joint.
       private: rendering::VisualPtr selectedJoint;
+
+      /// \brief A list of scoped link names.
+      private: std::vector<std::string> scopedLinkedNames;
     };
     /// \}
 
@@ -299,6 +326,18 @@ namespace gazebo
 
       /// \brief Joint upper limit.
       public: double upperLimit[2];
+
+      /// \brief Joint effort limit.
+      public: double effortLimit[2];
+
+      /// \brief Joint velocity limit.
+      public: double velocityLimit[2];
+
+      /// \brief Use parent model frame flag.
+      public: bool useParentModelFrame[2];
+
+      /// \brief Joint damping.
+      public: double damping[2];
 
       /// \brief Joint pose.
       public: math::Pose pose;

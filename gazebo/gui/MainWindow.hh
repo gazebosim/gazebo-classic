@@ -85,6 +85,9 @@ namespace gazebo
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();
 
+      /// \brief A signal to indicate the main window is about to close.
+      signals: void Close();
+
       protected: void closeEvent(QCloseEvent *_event);
 
       private: void OnGUI(ConstGUIPtr &_msg);

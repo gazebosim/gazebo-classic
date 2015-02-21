@@ -75,7 +75,7 @@ namespace gazebo
       /// \param[in] _name Name of visual to be updated.
       /// \param[in] _visualMsg Msg used to update the visual widget values.
       public: void UpdateVisual(const std::string &_name,
-          const msgs::Visual *_visualMsg);
+          ConstVisualPtr _visualMsg);
 
       /// \brief Reset the visual tab.
       public: void Reset();
@@ -95,6 +95,18 @@ namespace gazebo
       /// \param[in] _uri URI of the geometry.
       public: void SetGeometry(const std::string &_name,
           const math::Vector3 &_size, const std::string &_uri = "");
+
+      /// \brief Set the material of a visual
+      /// \param[in] _name Name of visual.
+      /// \param[in] _materialName Name of material.
+      /// \param[in] _ambient Ambient color of visual.
+      /// \param[in] _diffuse Diffuse color of visual.
+      /// \param[in] _specular Specular color of visual.
+      /// \param[in] _emissive Emissive color of visual.
+      public: void SetMaterial(const std::string &_name,
+          const std::string &_materialName,
+          const common::Color &_ambient, const common::Color &_diffuse,
+          const common::Color &_specular, const common::Color &_emissive);
 
       /// \brief Qt signal emitted when a visual is removed.
       /// \param[in] _name Name of visual removed.
