@@ -633,7 +633,7 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
 {
   if (!_terrain)
   {
-    std::cerr << "Invalid terrain\n";
+    gzerr << "Invalid terrain\n";
     return false;
   }
 
@@ -1641,9 +1641,6 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpFooter(
     this->generateVpDynamicShadows(_prof, _terrain, _tt, _outStream);
 
   _outStream << "}\n";
-
-  std::cerr << "footer =============== " << std::endl;
-  std::cerr << _outStream.str() << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -2188,9 +2185,6 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpFooter(
 
   // Final return
   _outStream << "\n}\n";
-
-  std::cerr << " generate fp =================== " << std::endl;
-  std::cerr << _outStream.str() << std::endl;
 }
 
 /////////////////////////////////////////////////
