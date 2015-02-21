@@ -28,7 +28,7 @@ using namespace gazebo;
 class Issue602Test : public ServerFixture
 {
   /// \brief Callback for sensor subscribers in MultipleSensors test.
-  private: void Callback(const ConstContactsPtr &_msg);
+  private: void Callback(const ConstWorldStatisticsPtr &_msg);
 };
 
 unsigned int g_messageCount = 0;
@@ -49,7 +49,7 @@ TEST_F(Issue602Test, Unsubscribe)
   {
     gzdbg << "Listening to " << topic << std::endl;
     transport::SubscriberPtr sub = this->node->Subscribe(topic,
-      &ContactSensor::Callback, this);
+      &Issue602Test::Callback, this);
 
     common::Time::MSleep(500);
     EXPECT_GE(g_messageCount, 2u);
