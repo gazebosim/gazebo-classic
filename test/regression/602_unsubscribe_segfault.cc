@@ -27,8 +27,12 @@
 using namespace gazebo;
 class Issue602Test : public ServerFixture
 {
+  /// \brief Test for Unsubscribe before delete subscriber.
+  public: void UnsubscribeTest();
+
   /// \brief Callback for sensor subscribers in MultipleSensors test.
-  private: void Callback(const ConstWorldStatisticsPtr &_msg);
+  /// \param[in] _msg World Statistics message.
+  public: void Callback(const ConstWorldStatisticsPtr &_msg);
 };
 
 unsigned int g_messageCount = 0;
@@ -41,6 +45,12 @@ void Issue602Test::Callback(const ConstWorldStatisticsPtr &/*_msg*/)
 
 /////////////////////////////////////////////////
 TEST_F(Issue602Test, Unsubscribe)
+{
+  UnsubscribeTest();
+}
+
+/////////////////////////////////////////////////
+void Issue602Test::UnsubscribeTest()
 {
   Load("worlds/empty.world");
 
