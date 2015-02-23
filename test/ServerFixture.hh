@@ -75,7 +75,8 @@ namespace gazebo
     /// paused/un-paused.
     /// \param[in] _worldFilename Name of the world to load.
     /// \param[in] _paused True to start the world paused.
-    protected: virtual void Load(const std::string &_worldFilename, bool _paused);
+    protected: virtual void Load(const std::string &_worldFilename,
+                                 bool _paused);
 
     /// \brief Load a world based on a filename and set simulation
     /// paused/un-paused, and specify physics engine.
@@ -135,7 +136,8 @@ namespace gazebo
     /// \param[in] _height Height of the image.
     /// \param[in] _depth Pixel depth.
     protected: void PrintImage(const std::string &_name, unsigned char **_image,
-                  unsigned int _width, unsigned int _height, unsigned int _depth);
+                  unsigned int _width, unsigned int _height,
+                  unsigned int _depth);
 
     /// \brief Print laser scan to screen. This is used to generate test data.
     /// \param[in] _name Name to associate with the printed data.
@@ -179,7 +181,8 @@ namespace gazebo
     /// \param[out] _diffAvg Average difference between the two arrays.
     protected: void ImageCompare(unsigned char *_imageA,
                    unsigned char *_imageB,
-                   unsigned int _width, unsigned int _height, unsigned int _depth,
+                   unsigned int _width, unsigned int _height,
+                   unsigned int _depth,
                    unsigned int &_diffMax, unsigned int &_diffSum,
                    double &_diffAvg);
 
@@ -336,7 +339,8 @@ namespace gazebo
     /// log message about the problem.
     /// \param[in] log_msg: error msg related to the timeout
     /// \param[in] timeoutCS: failing period (in centiseconds)
-    private: void launchTimeoutFailure(const char *_logMsg, const int _timeoutCS);
+    private: void launchTimeoutFailure(const char *_logMsg,
+                                       const int _timeoutCS);
 
     /// \brief Spawn an Wireless transmitter sensor on a link
     /// \param[in] _name Model name
@@ -412,7 +416,8 @@ namespace gazebo
     /// \param[in] _spotOuterAngle Outer angle ("spot" only).
     /// \param[in] _spotFallOff Fall off ("spot" only).
     /// \param[in] _castShadows True to cast shadows.
-    protected: void SpawnLight(const std::string &_name, const std::string &_type,
+    protected: void SpawnLight(const std::string &_name,
+                   const std::string &_type,
                    const math::Vector3 &_pos, const math::Vector3 &_rpy,
                    const common::Color &_diffuse = common::Color::White,
                    const common::Color &_specular = common::Color::White,
