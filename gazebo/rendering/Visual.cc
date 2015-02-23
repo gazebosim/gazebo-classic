@@ -2260,7 +2260,8 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     if (_msg->geometry().has_mesh() && _msg->geometry().mesh().has_filename())
         newGeometryName = _msg->geometry().mesh().filename();
 
-    if (newGeometryType != geometryType || newGeometryName != geometryName)
+    if (newGeometryType != geometryType ||
+        (newGeometryType == "mesh" && newGeometryName != geometryName))
     {
       std::string origMaterial = this->dataPtr->myMaterialName;
       float origTransparency = this->dataPtr->transparency;
@@ -2269,6 +2270,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       geomElem->ClearElements();
 
       this->DetachObjects();
+
       if (newGeometryType == "box" || newGeometryType == "cylinder" ||
           newGeometryType == "sphere" || newGeometryType == "plane")
       {
@@ -2277,23 +2279,36 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
         if (newGeometryType == "sphere" || newGeometryType == "cylinder")
           shapeElem->GetElement("radius")->Set(0.5);
       }
-      else
+      else if (newGeometryType == "mesh")
       {
-        if (newGeometryType == "mesh")
+        std::string filename = _msg->geometry().mesh().filename();
+        std::string meshName = common::find_file(filename);
+        std::string submeshName;
+        bool centerSubmesh = false;
+
+        if (meshName.empty())
         {
-          std::string filename = _msg->geometry().mesh().filename();
-          std::string meshName = common::find_file(filename);
+          meshName = "unit_box";
+          gzerr << "No mesh found, setting mesh to a unit box" << std::endl;
+        }
+        else
+        {
+          if (_msg->geometry().mesh().has_submesh())
+            submeshName= _msg->geometry().mesh().submesh();
+          if (_msg->geometry().mesh().has_center_submesh())
+            centerSubmesh= _msg->geometry().mesh().center_submesh();
+        }
 
-          if (meshName.empty())
-          {
-            meshName = "unit_box";
-            gzerr << "No mesh found, setting mesh to a unit box" << std::endl;
-          }
+        this->AttachMesh(meshName, submeshName, centerSubmesh);
 
-          this->AttachMesh(meshName);
-          sdf::ElementPtr meshElem = geomElem->AddElement(newGeometryType);
-          if (!filename.empty())
-            meshElem->GetElement("uri")->Set(filename);
+        sdf::ElementPtr meshElem = geomElem->AddElement(newGeometryType);
+        if (!filename.empty())
+          meshElem->GetElement("uri")->Set(filename);
+        if (!submeshName.empty())
+        {
+          sdf::ElementPtr submeshElem = meshElem->GetElement("submesh");
+          submeshElem->GetElement("name")->Set(submeshName);
+          submeshElem->GetElement("center")->Set(centerSubmesh);
         }
       }
       this->SetTransparency(origTransparency);
@@ -2767,11 +2782,9 @@ void Visual::ShowJoints(bool _show)
   if (this->GetName().find("JOINT_VISUAL__") != std::string::npos)
     this->SetVisible(_show);
 
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  for (auto &child : this->dataPtr->children)
   {
-    (*iter)->ShowJoints(_show);
+    child->ShowJoints(_show);
   }
 }
 
@@ -2781,11 +2794,21 @@ void Visual::ShowCOM(bool _show)
   if (this->GetName().find("COM_VISUAL__") != std::string::npos)
     this->SetVisible(_show);
 
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  for (auto &child : this->dataPtr->children)
   {
-    (*iter)->ShowCOM(_show);
+    child->ShowCOM(_show);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::ShowInertia(bool _show)
+{
+  if (this->GetName().find("INERTIA_VISUAL__") != std::string::npos)
+    this->SetVisible(_show);
+
+  for (auto &child : this->dataPtr->children)
+  {
+    child->ShowInertia(_show);
   }
 }
 

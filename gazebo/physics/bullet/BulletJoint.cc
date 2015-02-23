@@ -538,19 +538,7 @@ bool BulletJoint::SetParam(const std::string &/*_key*/,
 double BulletJoint::GetParam(const std::string &_key,
     unsigned int _index)
 {
-  if (_key == "hi_stop")
-  {
-    return this->GetHighStop(_index).Radian();
-  }
-  else if (_key == "lo_stop")
-  {
-    return this->GetLowStop(_index).Radian();
-  }
-  gzerr << "GetParam unrecognized parameter ["
-        << _key
-        << "]"
-        << std::endl;
-  return 0;
+  return Joint::GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////

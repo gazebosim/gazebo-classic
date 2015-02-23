@@ -999,8 +999,9 @@ namespace gazebo
         if (script.has_name())
           scriptElem->GetElement("name")->Set(script.name());
 
-        while (scriptElem->HasElement("uri"))
-          scriptElem->GetElement("uri")->RemoveFromParent();
+        if (script.uri_size() > 0)
+          while (scriptElem->HasElement("uri"))
+            scriptElem->GetElement("uri")->RemoveFromParent();
         for (int i = 0; i < script.uri_size(); ++i)
         {
           sdf::ElementPtr uriElem = scriptElem->AddElement("uri");
@@ -1416,15 +1417,17 @@ namespace gazebo
         sdf::ElementPtr inertialElem = linkSDF->GetElement("inertial");
         inertialElem = InertialToSDF(_msg.inertial(), inertialElem);
       }
-      while (linkSDF->HasElement("collision"))
-        linkSDF->GetElement("collision")->RemoveFromParent();
+      if (_msg.collision_size() > 0)
+        while (linkSDF->HasElement("collision"))
+          linkSDF->GetElement("collision")->RemoveFromParent();
       for (int i = 0; i < _msg.collision_size(); ++i)
       {
         sdf::ElementPtr collisionElem = linkSDF->AddElement("collision");
         collisionElem = CollisionToSDF(_msg.collision(i), collisionElem);
       }
-      while (linkSDF->HasElement("visual"))
-        linkSDF->GetElement("visual")->RemoveFromParent();
+      if (_msg.visual_size() > 0)
+        while (linkSDF->HasElement("visual"))
+          linkSDF->GetElement("visual")->RemoveFromParent();
       for (int i = 0; i < _msg.visual_size(); ++i)
       {
         sdf::ElementPtr visualElem = linkSDF->AddElement("visual");
@@ -1664,8 +1667,9 @@ namespace gazebo
           geom->GetElement("use_terrain_paging")->Set(
               heightmapGeom.use_terrain_paging());
         }
-        while (geom->HasElement("texture"))
-          geom->GetElement("texture")->RemoveFromParent();
+        if (heightmapGeom.texture_size() > 0)
+          while (geom->HasElement("texture"))
+            geom->GetElement("texture")->RemoveFromParent();
         for (int i = 0; i < heightmapGeom.texture_size(); ++i)
         {
           gazebo::msgs::HeightmapGeom_Texture textureMsg =
@@ -1675,8 +1679,9 @@ namespace gazebo
           textureElem->GetElement("normal")->Set(textureMsg.normal());
           textureElem->GetElement("size")->Set(textureMsg.size());
         }
-        while (geom->HasElement("blend"))
-          geom->GetElement("blend")->RemoveFromParent();
+        if (heightmapGeom.blend_size() > 0)
+          while (geom->HasElement("blend"))
+            geom->GetElement("blend")->RemoveFromParent();
         for (int i = 0; i < heightmapGeom.blend_size(); ++i)
         {
           gazebo::msgs::HeightmapGeom_Blend blendMsg =
@@ -1702,8 +1707,9 @@ namespace gazebo
         gazebo::msgs::Polyline polylineGeom = _msg.polyline();
         if (polylineGeom.has_height())
           geom->GetElement("height")->Set(polylineGeom.height());
-        while (geom->HasElement("point"))
-          geom->GetElement("point")->RemoveFromParent();
+        if (polylineGeom.point_size() > 0)
+          while (geom->HasElement("point"))
+            geom->GetElement("point")->RemoveFromParent();
 
         for (int i = 0; i < polylineGeom.point_size(); ++i)
         {
@@ -1774,6 +1780,172 @@ namespace gazebo
       sdf::readString(tmp, pluginSDF);
 
       return pluginSDF;
+    }
+
+    ////////////////////////////////////////////////////////
+    void AddLinkGeom(Model &_model, const Geometry &_geom)
+    {
+      _model.add_link();
+      int linkCount = _model.link_size();
+      auto link = _model.mutable_link(linkCount-1);
+      {
+        std::ostringstream linkName;
+        linkName << "link_" << linkCount;
+        link->set_name(linkName.str());
+      }
+
+      {
+        link->add_collision();
+        auto collision = link->mutable_collision(0);
+        collision->set_name("collision");
+        *(collision->mutable_geometry()) = _geom;
+      }
+
+      {
+        link->add_visual();
+        auto visual = link->mutable_visual(0);
+        visual->set_name("visual");
+        *(visual->mutable_geometry()) = _geom;
+
+        auto script = visual->mutable_material()->mutable_script();
+        script->add_uri();
+        script->set_uri(0, "file://media/materials/scripts/gazebo.material");
+        script->set_name("Gazebo/Grey");
+      }
+    }
+
+    ////////////////////////////////////////////////////////
+    void AddBoxLink(Model &_model, const double _mass,
+                    const math::Vector3 &_size)
+    {
+      Geometry geometry;
+      geometry.set_type(Geometry_Type_BOX);
+      Set(geometry.mutable_box()->mutable_size(), _size);
+
+      AddLinkGeom(_model, geometry);
+      int linkCount = _model.link_size();
+      auto link = _model.mutable_link(linkCount-1);
+
+      auto inertial = link->mutable_inertial();
+      inertial->set_mass(_mass);
+      {
+        double dx = _size.x;
+        double dy = _size.y;
+        double dz = _size.z;
+        double ixx = _mass/12.0 * (dy*dy + dz*dz);
+        double iyy = _mass/12.0 * (dz*dz + dx*dx);
+        double izz = _mass/12.0 * (dx*dx + dy*dy);
+        inertial->set_ixx(ixx);
+        inertial->set_iyy(iyy);
+        inertial->set_izz(izz);
+        inertial->set_ixy(0.0);
+        inertial->set_ixz(0.0);
+        inertial->set_iyz(0.0);
+      }
+    }
+
+    ////////////////////////////////////////////////////////
+    void AddCylinderLink(Model &_model,
+                         const double _mass,
+                         const double _radius,
+                         const double _length)
+    {
+      Geometry geometry;
+      geometry.set_type(Geometry_Type_CYLINDER);
+      geometry.mutable_cylinder()->set_radius(_radius);
+      geometry.mutable_cylinder()->set_length(_length);
+
+      AddLinkGeom(_model, geometry);
+      int linkCount = _model.link_size();
+      auto link = _model.mutable_link(linkCount-1);
+
+      auto inertial = link->mutable_inertial();
+      inertial->set_mass(_mass);
+      const double r2 = _radius * _radius;
+      const double ixx = _mass * (0.25 * r2 + _length*_length / 12.0);
+      const double izz = _mass * 0.5 * r2;
+      inertial->set_ixx(ixx);
+      inertial->set_iyy(ixx);
+      inertial->set_izz(izz);
+      inertial->set_ixy(0.0);
+      inertial->set_ixz(0.0);
+      inertial->set_iyz(0.0);
+    }
+
+    ////////////////////////////////////////////////////////
+    void AddSphereLink(Model &_model, const double _mass,
+                       const double _radius)
+    {
+      Geometry geometry;
+      geometry.set_type(Geometry_Type_SPHERE);
+      geometry.mutable_sphere()->set_radius(_radius);
+
+      AddLinkGeom(_model, geometry);
+      int linkCount = _model.link_size();
+      auto link = _model.mutable_link(linkCount-1);
+
+      auto inertial = link->mutable_inertial();
+      inertial->set_mass(_mass);
+      const double ixx = _mass * 0.4 * _radius * _radius;
+      inertial->set_ixx(ixx);
+      inertial->set_iyy(ixx);
+      inertial->set_izz(ixx);
+      inertial->set_ixy(0.0);
+      inertial->set_ixz(0.0);
+      inertial->set_iyz(0.0);
+    }
+
+    ////////////////////////////////////////////////////////
+    sdf::ElementPtr ModelToSDF(const msgs::Model &_msg, sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr modelSDF;
+
+      if (_sdf)
+      {
+        modelSDF = _sdf;
+      }
+      else
+      {
+        modelSDF.reset(new sdf::Element);
+        sdf::initFile("model.sdf", modelSDF);
+      }
+
+      if (_msg.has_name())
+        modelSDF->GetAttribute("name")->Set(_msg.name());
+      // ignore the id field, since it's not used in sdformat
+      if (_msg.has_is_static())
+        modelSDF->GetElement("static")->Set(_msg.is_static());
+      if (_msg.has_pose())
+        modelSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+
+      if (_msg.joint_size() > 0)
+        while (modelSDF->HasElement("joint"))
+          modelSDF->GetElement("joint")->RemoveFromParent();
+      for (int i = 0; i < _msg.joint_size(); ++i)
+      {
+        sdf::ElementPtr jointElem = modelSDF->AddElement("joint");
+        jointElem = JointToSDF(_msg.joint(i), jointElem);
+      }
+
+      if (_msg.link_size())
+        while (modelSDF->HasElement("link"))
+          modelSDF->GetElement("link")->RemoveFromParent();
+      for (int i = 0; i < _msg.link_size(); ++i)
+      {
+        sdf::ElementPtr linkElem = modelSDF->AddElement("link");
+        linkElem = LinkToSDF(_msg.link(i), linkElem);
+      }
+
+      // ignore the deleted field, since it's not used in sdformat
+      if (_msg.visual_size() > 0)
+      {
+        // model element in SDF cannot store visuals,
+        // so ignore them for now
+        gzerr << "Model visuals not yet parsed" << std::endl;
+      }
+      // ignore the scale field, since it's not used in sdformat
+
+      return modelSDF;
     }
 
     ////////////////////////////////////////////////////////
