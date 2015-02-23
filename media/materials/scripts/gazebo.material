@@ -599,6 +599,7 @@ material Gazebo/OrangeTransparentOverlay
       depth_write off
       lighting off
       depth_check off
+      ambient 1 0.5088 0.0468
 
       texture_unit
       {
@@ -619,6 +620,7 @@ material Gazebo/DarkOrangeTransparentOverlay
       depth_write off
       lighting off
       depth_check off
+      ambient 0.6 0.305 0.028
 
       texture_unit
       {
