@@ -64,8 +64,8 @@ echo "*:gazebo/common/STLLoader.cc:94" > $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:105" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:126" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:149" >> $SUPPRESS
-echo "*:gazebo/common/SVGLoader.hh:48" >> $SUPPRESS
-echo "*:gazebo/common/SVGLoader.cc:428" >> $SUPPRESS
+echo "*:gazebo/common/SVGLoader.hh:49" >> $SUPPRESS
+echo "*:gazebo/common/SVGLoader.cc:434" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 
 # Not defined FREEIMAGE_COLORORDER

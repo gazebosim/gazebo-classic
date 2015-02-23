@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 
+#include <gazebo/common/Console.hh>
 #include <gazebo/math/Vector2d.hh>
 
 class TiXmlElement;
@@ -83,8 +84,8 @@ namespace gazebo
       /// \brief Reads an SVG file and loads all the paths
       /// \param[in] _filename The SVG file
       /// \param[out] _paths Vector that receives path datai
-      /// \throws SvgError When the file cannot be processed
-      public: void Parse(const std::string &_filename,
+      /// \return false when the file cannot be processed
+      public: bool Parse(const std::string &_filename,
                          std::vector<SVGPath> &_paths);
 
       /// \brief Outputs the content of the paths to file (or console)

@@ -398,21 +398,29 @@ void SVGLoader::GetSvgPaths(TiXmlNode *_pParent, std::vector<SVGPath> &_paths)
 }
 
 /////////////////////////////////////////////////
-void SVGLoader::Parse(const std::string &_filename,
+bool SVGLoader::Parse(const std::string &_filename,
     std::vector<SVGPath> &_paths)
 {
-  // load the named file and dump its structure to STDOUT
-  TiXmlDocument doc(_filename.c_str());
-  bool loadOkay = doc.LoadFile();
-  if (!loadOkay)
+  try
   {
-    std::ostringstream os;
-    os << "Failed to load file " <<  _filename;
-    SvgError x(os.str());
-    throw x;
-  }
+    // load the named file and dump its structure to STDOUT
+    TiXmlDocument doc(_filename.c_str());
+    bool loadOkay = doc.LoadFile();
+    if (!loadOkay)
+    {
+      std::ostringstream os;
+      gzerr << "Failed to load file " <<  _filename << std::endl;
+      gzerr << os.str() << std::endl;
+    }
 
-  this->GetSvgPaths(&doc, _paths);
+    this->GetSvgPaths(&doc, _paths);
+    return true;
+  }
+  catch(SvgError &e)
+  {
+    gzerr << e.what() << std::endl;
+  }
+  return false;
 }
 
 /////////////////////////////////////////////////
