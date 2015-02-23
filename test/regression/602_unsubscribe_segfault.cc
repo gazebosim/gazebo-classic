@@ -32,13 +32,13 @@ class Issue602Test : public ServerFixture
 
   /// \brief Callback for sensor subscribers in MultipleSensors test.
   /// \param[in] _msg World Statistics message.
-  public: void Callback(const ConstWorldStatisticsPtr &_msg);
+  public: void Callback(const ConstContactsPtr &_msg);
 };
 
 unsigned int g_messageCount = 0;
 
 ////////////////////////////////////////////////////////////////////////
-void Issue602Test::Callback(const ConstWorldStatisticsPtr &/*_msg*/)
+void Issue602Test::Callback(const ConstContactsPtr &/*_msg*/)
 {
   g_messageCount++;
 }
@@ -52,20 +52,46 @@ TEST_F(Issue602Test, Unsubscribe)
 /////////////////////////////////////////////////
 void Issue602Test::UnsubscribeTest()
 {
-  Load("worlds/empty.world");
+  Load("worlds/contact_sensors_multiple.world", true);
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != NULL);
 
-  auto topics = transport::getAdvertisedTopics("gazebo.msgs.WorldStatistics");
-  for (auto const &topic: topics)
+  const std::string contactSensorName1("box_contact");
+  const std::string contactSensorName2("box_contact2");
+
+  {
+    sensors::SensorPtr sensor1 = sensors::get_sensor(contactSensorName1);
+    sensors::ContactSensorPtr contactSensor1 =
+        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor1);
+    ASSERT_TRUE(contactSensor1 != NULL);
+  }
+
+  {
+    sensors::SensorPtr sensor2 = sensors::get_sensor(contactSensorName2);
+    sensors::ContactSensorPtr contactSensor2 =
+        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor2);
+    ASSERT_TRUE(contactSensor2 != NULL);
+  }
+
+  auto topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
+  EXPECT_FALSE(topics.empty());
+  EXPECT_GE(topics.size(), 4u);
+
+  // We should expect them all to publish.
+  for (auto const &topic : topics)
   {
     gzdbg << "Listening to " << topic << std::endl;
+    g_messageCount = 0;
     transport::SubscriberPtr sub = this->node->Subscribe(topic,
       &Issue602Test::Callback, this);
 
-    common::Time::MSleep(500);
-    EXPECT_GE(g_messageCount, 2u);
+    const unsigned int steps = 50;
+    world->Step(steps);
+    common::Time::MSleep(steps);
+    EXPECT_GT(g_messageCount, steps / 2);
 
     sub->Unsubscribe();
-    common::Time::MSleep(50);
+    common::Time::MSleep(steps);
   }
 }
 
