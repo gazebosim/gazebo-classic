@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <tinyxml.h>
 
+#include "gazebo/common/Console.hh"
+
 #include "SVGLoaderPrivate.hh"
 #include "SVGLoader.hh"
 
@@ -104,76 +106,76 @@ math::Vector2d SVGLoader::SubpathToPolyline(
 {
   for (SVGCommand cmd: _subpath)
   {
-    if (cmd.cmd == 'm' || cmd.cmd == 'l')
+    size_t i = 0;
+    size_t count = cmd.numbers.size();
+
+    switch (cmd.cmd)
     {
-      size_t i =0;
-      size_t count = cmd.numbers.size();
-      while (i < count)
-      {
-        math::Vector2d p;
-        p.x = cmd.numbers[i+0];
-        p.y = cmd.numbers[i+1];
-        // m and l cmds are relative to the last point
-        p.x += _last.x;
-        p.y += _last.y;
-        _polyline.push_back(p);
-        _last = p;
-        i += 2;
-      }
-    }
-    else if (cmd.cmd == 'M' || cmd.cmd == 'L')
-    {
-      size_t i = 0;
-      size_t count = cmd.numbers.size();
-      while (i < count)
-      {
-        math::Vector2d p;
-        p.x = cmd.numbers[i+0];
-        p.y = cmd.numbers[i+1];
-        _polyline.push_back(p);
-        _last = p;
-        i += 2;
-      }
-    }
-    else if (cmd.cmd == 'C')
-    {
-      size_t i = 0;
-      size_t count = cmd.numbers.size();
-      while (i < count)
-      {
-        math::Vector2d p0 = _last;
-        math::Vector2d p1, p2, p3;
-        p1.x = cmd.numbers[i+0];
-        p1.y = cmd.numbers[i+1];
-        p2.x = cmd.numbers[i+2];
-        p2.y = cmd.numbers[i+3];
-        p3.x = cmd.numbers[i+4];
-        p3.y = cmd.numbers[i+5];
-        cubicBezier(p0, p1, p2, p3, this->dataPtr->resolution, _polyline);
-        _last = p3;
-        i += 6;
-      }
-    }
-    else if (cmd.cmd == 'c')
-    {
-      size_t i = 0;
-      size_t count = cmd.numbers.size();
-      while (i < count)
-      {
-        math::Vector2d p0 = _last;
-        math::Vector2d p1, p2, p3;
-        p1.x = cmd.numbers[i+0] + _last.x;
-        p1.y = cmd.numbers[i+1] + _last.y;
-        p2.x = cmd.numbers[i+2] + _last.x;
-        p2.y = cmd.numbers[i+3] + _last.y;
-        p3.x = cmd.numbers[i+4] + _last.x;
-        p3.y = cmd.numbers[i+5] + _last.y;
-        cubicBezier(p0, p1, p2, p3, this->dataPtr->resolution, _polyline);
-        _last = p3;
-        i += 6;
-      }
+      case 'm':
+      case 'l':
+        while (i < count)
+        {
+          math::Vector2d p;
+          p.x = cmd.numbers[i+0];
+          p.y = cmd.numbers[i+1];
+          // m and l cmds are relative to the last point
+          p.x += _last.x;
+          p.y += _last.y;
+          _polyline.push_back(p);
+          _last = p;
+          i += 2;
+        }
+        break;
+     
+      case 'M':
+      case 'L':
+        while (i < count)
+        {
+          math::Vector2d p;
+          p.x = cmd.numbers[i+0];
+          p.y = cmd.numbers[i+1];
+          _polyline.push_back(p);
+          _last = p;
+          i += 2;
+        }
+        break;
+      case 'C':
+        while (i < count)
+        {
+          math::Vector2d p0 = _last;
+          math::Vector2d p1, p2, p3;
+          p1.x = cmd.numbers[i+0];
+          p1.y = cmd.numbers[i+1];
+          p2.x = cmd.numbers[i+2];
+          p2.y = cmd.numbers[i+3];
+          p3.x = cmd.numbers[i+4];
+          p3.y = cmd.numbers[i+5];
+          cubicBezier(p0, p1, p2, p3, this->dataPtr->resolution, _polyline);
+          _last = p3;
+          i += 6;
+        }
+        break;
+      case 'c':
+        while (i < count)
+        {
+          math::Vector2d p0 = _last;
+          math::Vector2d p1, p2, p3;
+          p1.x = cmd.numbers[i+0] + _last.x;
+          p1.y = cmd.numbers[i+1] + _last.y;
+          p2.x = cmd.numbers[i+2] + _last.x;
+          p2.y = cmd.numbers[i+3] + _last.y;
+          p3.x = cmd.numbers[i+4] + _last.x;
+          p3.y = cmd.numbers[i+5] + _last.y;
+          cubicBezier(p0, p1, p2, p3, this->dataPtr->resolution, _polyline);
+          _last = p3;
+          i += 6;
+        }
+        break;
+      default:
+        gzerr << "Unexpected SVGCommand value: " << cmd.cmd;
     }
   }
+
   return _last;
 }
 
