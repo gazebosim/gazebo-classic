@@ -44,6 +44,10 @@ ModelRightMenu::ModelRightMenu()
   this->followAct->setStatusTip(tr("Follow the selection"));
   connect(this->followAct, SIGNAL(triggered()), this, SLOT(OnFollow()));
 
+  this->editAct = new QAction(tr("Edit model"), this);
+  this->editAct->setStatusTip(tr("Open on Model Editor"));
+  connect(this->editAct, SIGNAL(triggered()), this, SLOT(OnEdit()));
+
   this->applyWrenchAct = new QAction(tr("Apply Force/Torque"), this);
   this->applyWrenchAct->setStatusTip(tr("Apply force and torque to the model"));
   connect(this->applyWrenchAct, SIGNAL(triggered()), this, SLOT(OnApplyWrench()));
@@ -93,6 +97,13 @@ ModelRightMenu::ModelRightMenu()
   state = new ViewState(this, "show_com", "hide_com");
   state->action = new QAction(tr("Center of mass"), this);
   state->action->setStatusTip(tr("Show center of mass"));
+  state->action->setCheckable(true);
+  connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
+  this->viewStates.push_back(state);
+
+  state = new ViewState(this, "show_inertia", "hide_inertia");
+  state->action = new QAction(tr("Inertia"), this);
+  state->action->setStatusTip(tr("Show moments of inertia"));
   state->action->setCheckable(true);
   connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
   this->viewStates.push_back(state);
@@ -165,6 +176,17 @@ void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
 
   if (_type == EntityTypes::MODEL)
   {
+    // disable editing planes for now
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+    rendering::ScenePtr scene = cam->GetScene();
+    rendering::VisualPtr vis = scene->GetVisual(this->entityName);
+    if (vis && !vis->IsPlane())
+    {
+      menu.addSeparator();
+      menu.addAction(this->editAct);
+      menu.addSeparator();
+    }
+
     // menu.addAction(this->snapBelowAct);
 
     // Create the view menu
@@ -216,6 +238,13 @@ void ModelRightMenu::OnFollow()
   rendering::UserCameraPtr cam = gui::get_active_camera();
   cam->TrackVisual(this->entityName);
   gui::Events::follow(this->entityName);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnEdit()
+{
+  g_editModelAct->trigger();
+  gui::Events::editModel(this->entityName);
 }
 
 /////////////////////////////////////////////////

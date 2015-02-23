@@ -72,6 +72,9 @@ namespace gazebo
       /// \brief QT callback when follow has been selected.
       private slots: void OnFollow();
 
+      /// \brief QT callback when edit has been selected.
+      private slots: void OnEdit();
+
       /// \brief QT callback when apply force has been selected.
       private slots: void OnApplyWrench();
 
@@ -107,6 +110,9 @@ namespace gazebo
 
       /// \brief Action for attaching the camera to a model.
       private: QAction *followAct;
+
+      /// \brief Action for opening model on Model Editor.
+      private: QAction *editAct;
 
       /// \brief Action for applying force and torque to a model.
       private: QAction *applyWrenchAct;

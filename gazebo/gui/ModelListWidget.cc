@@ -434,7 +434,7 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   }
   else if (_msg->has_type() && _msg->type() == "error")
   {
-    if (_msg->response() == "nonexistant")
+    if (_msg->response() == "nonexistent")
     {
       this->removeEntityList.push_back(this->selectedEntityName);
     }

@@ -30,6 +30,7 @@ set (sources
   GpuLaser.cc
   Grid.cc
   Heightmap.cc
+  InertiaVisual.cc
   JointVisual.cc
   LaserVisual.cc
   SonarVisual.cc
@@ -75,6 +76,7 @@ set (headers
   GpuLaser.hh
   Grid.hh
   Heightmap.hh
+  InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
   SonarVisual.hh
