@@ -94,7 +94,8 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
       pos1 = pos2+1;
       pos2 = additionalPaths.find(delim, pos2+1);
     }
-    this->UpdateLocalPath(additionalPaths.substr(pos1, additionalPaths.size()-pos1));
+    this->UpdateLocalPath(additionalPaths.substr(pos1,
+        additionalPaths.size()-pos1));
   }
 
   // Connect callbacks now that everything else is initialized
