@@ -55,7 +55,7 @@ namespace gazebo
       /// \para[in] _show True to show the panel, false to hide it.
       public: void ShowTimePanel(bool _show);
 
-      /// brief Get the time panel widget.
+      /// \brief Get the time panel widget.
       /// \return the time panel widget.
       public: TimePanel *GetTimePanel() const;
 

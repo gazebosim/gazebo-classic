@@ -325,7 +325,7 @@ void RenderWidget::InsertWidget(unsigned int _index, QWidget *_widget)
     this->splitter->setStretchFactor(_index, 1);
   }
   else
-    gzerr << "Unabled to add widget, index out of range " << std::endl;
+    gzerr << "Unable to add widget, index out of range " << std::endl;
 }
 
 /////////////////////////////////////////////////
