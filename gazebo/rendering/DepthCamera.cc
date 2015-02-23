@@ -60,7 +60,7 @@ DepthCamera::~DepthCamera()
 }
 
 //////////////////////////////////////////////////
-void DepthCamera::Load(sdf::ElementPtr &_sdf)
+void DepthCamera::Load(sdf::ElementPtr _sdf)
 {
   Camera::Load(_sdf);
   this->outputPoints =

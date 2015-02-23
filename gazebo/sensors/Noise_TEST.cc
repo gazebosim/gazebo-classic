@@ -22,10 +22,14 @@
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 
-#include "test/ServerFixture.hh"
+#include "gazebo/math/Rand.hh"
 #include "gazebo/sensors/Noise.hh"
+#include "gazebo/sensors/GaussianNoiseModel.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
+
+class NoiseTest : public gazebo::testing::AutoLogFixture { };
 
 const unsigned int g_applyCount = 100;
 
@@ -57,62 +61,69 @@ sdf::ElementPtr NoiseSdf(const std::string &_type, double _mean,
 
 //////////////////////////////////////////////////
 // Test constructor
-TEST(NoiseTest, Constructor)
+TEST_F(NoiseTest, Constructor)
 {
   // Construct and nothing else
   {
-    sensors::Noise noise;
+    sensors::Noise noise(sensors::Noise::NONE);
   }
 
   // Construct and initialize
   {
-    sensors::Noise noise;
+    sensors::Noise noise(sensors::Noise::NONE);
     noise.Load(NoiseSdf("none", 0, 0, 0, 0, 0));
   }
 }
 
 //////////////////////////////////////////////////
 // Test noise types
-TEST(NoiseTest, Types)
+TEST_F(NoiseTest, Types)
 {
   // NONE type
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("none", 0, 0, 0, 0, 0));
-    EXPECT_EQ(noise.GetNoiseType(), sensors::Noise::NONE);
+    sensors::NoisePtr noise =
+        sensors::NoiseFactory::NewNoiseModel(NoiseSdf("none", 0, 0, 0, 0, 0));
+    EXPECT_EQ(noise->GetNoiseType(), sensors::Noise::NONE);
   }
 
   // GAUSSIAN type
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian", 0, 0, 0, 0, 0));
-    EXPECT_EQ(noise.GetNoiseType(), sensors::Noise::GAUSSIAN);
+    sensors::NoisePtr noise =
+        sensors::NoiseFactory::NewNoiseModel(
+        NoiseSdf("gaussian", 0, 0, 0, 0, 0));
+    EXPECT_EQ(noise->GetNoiseType(), sensors::Noise::GAUSSIAN);
   }
 
   // GAUSSIAN_QUANTIZED type
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian_quantized", 0, 0, 0, 0, 0));
-    EXPECT_EQ(noise.GetNoiseType(), sensors::Noise::GAUSSIAN_QUANTIZED);
+    sensors::NoisePtr noise =
+        sensors::NoiseFactory::NewNoiseModel(
+        NoiseSdf("gaussian_quantized", 0, 0, 0, 0, 0));
+    EXPECT_EQ(noise->GetNoiseType(), sensors::Noise::GAUSSIAN);
   }
 }
 
 //////////////////////////////////////////////////
 // Helper function for testing no noise
-void NoNoise(const sensors::Noise &_noise, unsigned int _count)
+void NoNoise(sensors::NoisePtr _noise, unsigned int _count)
 {
   // Expect no change in input value
   for (unsigned int i = 0; i < _count; ++i)
   {
     double x = math::Rand::GetDblUniform(-1e6, 1e6);
-    EXPECT_NEAR(x, _noise.Apply(x), 1e-6);
+    EXPECT_NEAR(x, _noise->Apply(x), 1e-6);
   }
 }
 
 //////////////////////////////////////////////////
 // Helper function for testing Gaussian noise
-void GaussianNoise(const sensors::Noise &_noise, unsigned int _count)
+void GaussianNoise(sensors::NoisePtr _noise, unsigned int _count)
 {
+  sensors::GaussianNoiseModelPtr noiseModel =
+      boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(_noise);
+
+  ASSERT_TRUE(noiseModel);
+
   // Use constant input and repeatedly add noise to it.
   double x = 42.0;
 
@@ -123,7 +134,7 @@ void GaussianNoise(const sensors::Noise &_noise, unsigned int _count)
 
   for (unsigned int i = 0; i < _count; ++i)
   {
-    double y = _noise.Apply(x);
+    double y = _noise->Apply(x);
     acc(y);
   }
 
@@ -131,8 +142,8 @@ void GaussianNoise(const sensors::Noise &_noise, unsigned int _count)
   // stddev / sqrt(_count)
   // https://onlinecourses.science.psu.edu/stat414/node/167
   // We will use 5 sigma (4e-5 chance of failure)
-  double mean = _noise.GetMean() + _noise.GetBias();
-  double stddev = _noise.GetStdDev();
+  double mean = noiseModel->GetMean() + noiseModel->GetBias();
+  double stddev = noiseModel->GetStdDev();
   double sampleStdDev = g_sigma*stddev / sqrt(_count);
   EXPECT_NEAR(boost::accumulators::mean(acc), x+mean, sampleStdDev);
 
@@ -148,15 +159,15 @@ void GaussianNoise(const sensors::Noise &_noise, unsigned int _count)
 
 //////////////////////////////////////////////////
 // Test noise application
-TEST(NoiseTest, ApplyNone)
+TEST_F(NoiseTest, ApplyNone)
 {
-  sensors::Noise noise;
-  noise.Load(NoiseSdf("none", 0, 0, 0, 0, 0));
+  sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
+      NoiseSdf("none", 0, 0, 0, 0, 0));
 
   NoNoise(noise, g_applyCount);
 }
 
-TEST(NoiseTest, ApplyGaussian)
+TEST_F(NoiseTest, ApplyGaussian)
 {
   double mean, stddev, biasMean, biasStddev;
 
@@ -167,9 +178,8 @@ TEST(NoiseTest, ApplyGaussian)
   biasMean = 0.0;
   biasStddev = 0.0;
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
-
+    sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
+        NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
     NoNoise(noise, g_applyCount);
   }
 
@@ -179,10 +189,11 @@ TEST(NoiseTest, ApplyGaussian)
   biasMean = 0.0;
   biasStddev = 0.0;
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
-    EXPECT_NEAR(noise.GetBias(), 0.0, 1e-6);
-
+    sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
+        NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
+    sensors::GaussianNoiseModelPtr gaussianNoise =
+      boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
+    EXPECT_NEAR(gaussianNoise->GetBias(), 0.0, 1e-6);
     GaussianNoise(noise, g_applyCount);
   }
 
@@ -192,9 +203,8 @@ TEST(NoiseTest, ApplyGaussian)
   biasMean = 100.0;
   biasStddev = 0.0;
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
-
+    sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
+        NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
     GaussianNoise(noise, g_applyCount);
   }
 
@@ -210,10 +220,11 @@ TEST(NoiseTest, ApplyGaussian)
 
     for (unsigned int i = 0; i < g_applyCount; ++i)
     {
-      sensors::Noise noise;
-      noise.Load(NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
-
-      acc(noise.GetBias());
+      sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
+          NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
+      sensors::GaussianNoiseModelPtr gaussianNoise =
+        boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
+      acc(gaussianNoise->GetBias());
     }
 
     // See comments in GaussianNoise function to explain these calculations.
@@ -227,7 +238,7 @@ TEST(NoiseTest, ApplyGaussian)
   }
 }
 
-TEST(NoiseTest, ApplyGaussianQuantized)
+TEST_F(NoiseTest, ApplyGaussianQuantized)
 {
   double mean, stddev, biasMean, biasStddev, precision;
 
@@ -239,9 +250,9 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   biasStddev = 0.0;
   precision = 0.0;
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
-                        biasStddev, precision));
+    sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
+        NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+        biasStddev, precision));
 
     NoNoise(noise, g_applyCount);
   }
@@ -254,10 +265,12 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   biasStddev = 0.0;
   precision = 0.0;
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
-                        biasStddev, precision));
-    EXPECT_NEAR(noise.GetBias(), 0.0, 1e-6);
+    sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
+        NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+        biasStddev, precision));
+    sensors::GaussianNoiseModelPtr gaussianNoise =
+      boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
+    EXPECT_NEAR(gaussianNoise->GetBias(), 0.0, 1e-6);
 
     GaussianNoise(noise, g_applyCount);
   }
@@ -270,9 +283,9 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   biasStddev = 0.0;
   precision = 0.0;
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
-                        biasStddev, precision));
+    sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
+        NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+        biasStddev, precision));
 
     GaussianNoise(noise, g_applyCount);
   }
@@ -290,11 +303,12 @@ TEST(NoiseTest, ApplyGaussianQuantized)
 
     for (unsigned int i = 0; i < g_applyCount; ++i)
     {
-      sensors::Noise noise;
-      noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
-                          biasStddev, precision));
-
-      acc(noise.GetBias());
+      sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
+          NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+          biasStddev, precision));
+      sensors::GaussianNoiseModelPtr gaussianNoise =
+        boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
+      acc(gaussianNoise->GetBias());
     }
 
     // See comments in GaussianNoise function to explain these calculations.
@@ -314,21 +328,46 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   biasStddev = 0.0;
   precision = 0.3;
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
-                        biasStddev, precision));
+    sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
+        NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+        biasStddev, precision));
 
-    EXPECT_NEAR(noise.Apply(0.32), 0.3, 1e-6);
-    EXPECT_NEAR(noise.Apply(0.31), 0.3, 1e-6);
-    EXPECT_NEAR(noise.Apply(0.30), 0.3, 1e-6);
-    EXPECT_NEAR(noise.Apply(0.29), 0.3, 1e-6);
-    EXPECT_NEAR(noise.Apply(0.28), 0.3, 1e-6);
+    EXPECT_NEAR(noise->Apply(0.32), 0.3, 1e-6);
+    EXPECT_NEAR(noise->Apply(0.31), 0.3, 1e-6);
+    EXPECT_NEAR(noise->Apply(0.30), 0.3, 1e-6);
+    EXPECT_NEAR(noise->Apply(0.29), 0.3, 1e-6);
+    EXPECT_NEAR(noise->Apply(0.28), 0.3, 1e-6);
 
-    EXPECT_NEAR(noise.Apply(-12.92), -12.9, 1e-6);
-    EXPECT_NEAR(noise.Apply(-12.91), -12.9, 1e-6);
-    EXPECT_NEAR(noise.Apply(-12.90), -12.9, 1e-6);
-    EXPECT_NEAR(noise.Apply(-12.89), -12.9, 1e-6);
-    EXPECT_NEAR(noise.Apply(-12.88), -12.9, 1e-6);
+    EXPECT_NEAR(noise->Apply(-12.92), -12.9, 1e-6);
+    EXPECT_NEAR(noise->Apply(-12.91), -12.9, 1e-6);
+    EXPECT_NEAR(noise->Apply(-12.90), -12.9, 1e-6);
+    EXPECT_NEAR(noise->Apply(-12.89), -12.9, 1e-6);
+    EXPECT_NEAR(noise->Apply(-12.88), -12.9, 1e-6);
+  }
+}
+
+//////////////////////////////////////////////////
+// Callback function for applying custom noise
+double OnApplyCustomNoise(double _in)
+{
+  return _in*2;
+}
+
+TEST_F(NoiseTest, OnApplyNoise)
+{
+  // Verify that the custom callback function is called if noise type is
+  // set to CUSTOM
+  sensors::NoisePtr noise(new sensors::Noise(sensors::Noise::CUSTOM));
+  ASSERT_TRUE(noise);
+  EXPECT_TRUE(noise->GetNoiseType() == sensors::Noise::CUSTOM);
+
+  noise->SetCustomNoiseCallback(
+    boost::bind(&OnApplyCustomNoise, _1));
+
+  for (double i = 0; i < 100; i += 1)
+  {
+    double value = noise->Apply(i);
+    EXPECT_DOUBLE_EQ(value, i*2);
   }
 }
 

@@ -33,7 +33,7 @@ class Inertial_TEST : public ServerFixture
 TEST_F(Inertial_TEST, InertialWorld)
 {
   // Load our inertial test world
-  Load("worlds/Inertial_TEST.world", true);
+  Load("worlds/inertial_test.world", true);
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
@@ -47,7 +47,7 @@ TEST_F(Inertial_TEST, InertialWorld)
   physics->SetGravity(math::Vector3(0, 0, -50));
 
   // simulate 1 step
-  world->StepWorld(1);
+  world->Step(1);
   double t = world->GetSimTime().Double();
 
   // get time step size

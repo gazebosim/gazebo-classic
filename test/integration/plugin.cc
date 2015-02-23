@@ -34,13 +34,13 @@ TEST_F(PluginTest, ModelExceptionConstructor)
   gazebo::physics::ModelPtr model = world->GetModel("box");
   ASSERT_TRUE(model != NULL);
 
-  world->StepWorld(100);
+  world->Step(100);
 
   char *home = getenv("HOME");
   ASSERT_TRUE(home);
 
   boost::filesystem::path path(home);
-  path /= "/.gazebo/test.log";
+  path /= "/.gazebo/default.log";
 
   // Open the log file, and read back the string
   std::ifstream ifs(path.string().c_str(), std::ios::in);
@@ -69,13 +69,13 @@ TEST_F(PluginTest, ModelExceptionInit)
   gazebo::physics::ModelPtr model = world->GetModel("box");
   ASSERT_TRUE(model != NULL);
 
-  world->StepWorld(100);
+  world->Step(100);
 
   char *home = getenv("HOME");
   ASSERT_TRUE(home);
 
   boost::filesystem::path path(home);
-  path /= "/.gazebo/test.log";
+  path /= "/.gazebo/default.log";
 
   // Open the log file, and read back the string
   std::ifstream ifs(path.string().c_str(), std::ios::in);
@@ -104,13 +104,13 @@ TEST_F(PluginTest, ModelExceptionLoad)
   gazebo::physics::ModelPtr model = world->GetModel("box");
   ASSERT_TRUE(model != NULL);
 
-  world->StepWorld(100);
+  world->Step(100);
 
   char *home = getenv("HOME");
   ASSERT_TRUE(home);
 
   boost::filesystem::path path(home);
-  path /= "/.gazebo/test.log";
+  path /= "/.gazebo/default.log";
 
   // Open the log file, and read back the string
   std::ifstream ifs(path.string().c_str(), std::ios::in);

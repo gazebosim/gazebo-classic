@@ -67,10 +67,14 @@ void Model::Load(sdf::ElementPtr _sdf)
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
   this->SetStatic(this->sdf->Get<bool>("static"));
-  this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
-      boost::bind(&Entity::IsStatic, this));
+  if (this->sdf->HasElement("static"))
+  {
+    this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
+        boost::bind(&Entity::IsStatic, this));
+  }
 
-  this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
+  if (this->sdf->HasElement("allow_auto_disable"))
+    this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
   this->LoadLinks();
 
   // Load the joints if the world is already loaded. Otherwise, the World
@@ -367,23 +371,31 @@ void Model::Reset()
 {
   Entity::Reset();
 
-  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
-  {
-    (*iter)->Reset();
-  }
-
-  // reset link velocities when resetting model
-  for (Link_V::iterator liter = this->links.begin();
-       liter != this->links.end(); ++liter)
-  {
-    (*liter)->ResetPhysicsStates();
-  }
+  this->ResetPhysicsStates();
 
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter != this->joints.end(); ++jiter)
   {
     (*jiter)->Reset();
+  }
+
+  // Reset plugins after links and joints,
+  // so that plugins can restore initial conditions
+  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); ++iter)
+  {
+    (*iter)->Reset();
+  }
+}
+
+//////////////////////////////////////////////////
+void Model::ResetPhysicsStates()
+{
+  // reset link velocities when resetting model
+  for (Link_V::iterator liter = this->links.begin();
+       liter != this->links.end(); ++liter)
+  {
+    (*liter)->ResetPhysicsStates();
   }
 }
 
@@ -558,18 +570,9 @@ JointPtr Model::GetJoint(const std::string &_name)
 
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
-    if ((*iter)->GetScopedName() == _name ||
-        (*iter)->GetName() == _name)
+    if ((*iter)->GetScopedName() == _name || (*iter)->GetName() == _name)
     {
       result = (*iter);
-      break;
-    }
-    else if ((*iter)->GetName() == _name)
-    {
-      // check again without scoped names, deprecated, warn
-      result = (*iter);
-      gzwarn << "Calling Model::GetJoint(" << _name
-             << ") with un-scoped joint name is deprecated, please scope\n";
       break;
     }
   }
@@ -584,7 +587,7 @@ LinkPtr Model::GetLinkById(unsigned int _id) const
 }
 
 //////////////////////////////////////////////////
-Link_V Model::GetLinks() const
+const Link_V &Model::GetLinks() const
 {
   return this->links;
 }
@@ -638,7 +641,8 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   if (this->GetJoint(joint->GetScopedName()) != NULL)
   {
     gzerr << "can't have two joint with the same name\n";
-    gzthrow("can't have two joint with the same name");
+    gzthrow("can't have two joints with the same name ["+
+      joint->GetScopedName() + "]\n");
   }
 
   this->joints.push_back(joint);
@@ -877,7 +881,7 @@ void Model::FillMsg(msgs::Model &_msg)
 //////////////////////////////////////////////////
 void Model::ProcessMsg(const msgs::Model &_msg)
 {
-  if (!(_msg.has_id() && _msg.id() == this->GetId()))
+  if (_msg.has_id() && _msg.id() != this->GetId())
   {
     gzerr << "Incorrect ID[" << _msg.id() << " != " << this->GetId() << "]\n";
     return;
@@ -909,7 +913,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
 //////////////////////////////////////////////////
 void Model::SetJointAnimation(
-    const std::map<std::string, common::NumericAnimationPtr> _anims,
+    const std::map<std::string, common::NumericAnimationPtr> &_anims,
     boost::function<void()> _onComplete)
 {
   boost::recursive_mutex::scoped_lock lock(this->updateMutex);
@@ -1101,4 +1105,42 @@ GripperPtr Model::GetGripper(size_t _index) const
 size_t Model::GetGripperCount() const
 {
   return this->grippers.size();
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergyPotential() const
+{
+  double e = 0;
+  for (Link_V::const_iterator iter = this->links.begin();
+    iter != this->links.end(); ++iter)
+  {
+    e += (*iter)->GetWorldEnergyPotential();
+  }
+  for (Joint_V::const_iterator iter = this->joints.begin();
+    iter != this->joints.end(); ++iter)
+  {
+    for (unsigned int j = 0; j < (*iter)->GetAngleCount(); ++j)
+    {
+      e += (*iter)->GetWorldEnergyPotentialSpring(j);
+    }
+  }
+  return e;
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergyKinetic() const
+{
+  double e = 0;
+  for (Link_V::const_iterator iter = this->links.begin();
+    iter != this->links.end(); ++iter)
+  {
+    e += (*iter)->GetWorldEnergyKinetic();
+  }
+  return e;
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergy() const
+{
+  return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
 }

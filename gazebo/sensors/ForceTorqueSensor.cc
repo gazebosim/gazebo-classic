@@ -55,11 +55,91 @@ std::string ForceTorqueSensor::GetTopic() const
 }
 
 //////////////////////////////////////////////////
+void ForceTorqueSensor::Load(const std::string &_worldName,
+                             sdf::ElementPtr _sdf)
+{
+  Sensor::Load(_worldName, _sdf);
+
+  sdf::ElementPtr forceTorqueElem = this->sdf->GetElement("force_torque");
+
+  GZ_ASSERT(forceTorqueElem,
+    "force_torque element should be present in a ForceTorqueSensor sdf");
+
+  // Handle frame setting
+  MeasureFrame defaultFrame = CHILD_LINK;
+  if (forceTorqueElem->HasElement("frame"))
+  {
+    sdf::ElementPtr frameElem = forceTorqueElem->GetElement("frame");
+    std::string measureFrameSDF;
+    frameElem->GetValue()->Get<std::string>(measureFrameSDF);
+    if (measureFrameSDF == "parent")
+    {
+      this->measureFrame = PARENT_LINK;
+    }
+    else if (measureFrameSDF == "child")
+    {
+      this->measureFrame = CHILD_LINK;
+    }
+    else if (measureFrameSDF == "sensor")
+    {
+      this->measureFrame = SENSOR;
+    }
+    else
+    {
+      gzwarn << "ignoring unknown force_torque frame \"" << measureFrameSDF
+             << "\", using default value" << std::endl;
+      this->measureFrame = defaultFrame;
+    }
+  }
+  else
+  {
+    this->measureFrame = defaultFrame;
+  }
+
+  // Save joint_child orientation, useful if the measure
+  // is expressed in joint orientation
+  GZ_ASSERT(this->parentJoint,
+            "parentJoint should be defined by single argument Load()");
+  math::Quaternion rotationChildSensor =
+    (this->pose + this->parentJoint->GetInitialAnchorPose()).rot;
+  this->rotationSensorChild =
+    rotationChildSensor.GetInverse().GetAsMatrix3();
+
+  // Handle measure direction
+  bool defaultDirectionIsParentToChild = false;
+  if (forceTorqueElem->HasElement("measure_direction"))
+  {
+    sdf::ElementPtr measureDirectionElem =
+      forceTorqueElem->GetElement("measure_direction");
+    std::string measureDirectionSDF;
+    measureDirectionElem->GetValue()->Get<std::string>(measureDirectionSDF);
+    if (measureDirectionSDF == "parent_to_child")
+    {
+      this->parentToChild = true;
+    }
+    else if (measureDirectionSDF == "child_to_parent")
+    {
+      this->parentToChild = false;
+    }
+    else
+    {
+      gzwarn << "ignoring unknown force_torque measure_direction \""
+             << measureDirectionSDF << "\", using default value" << std::endl;
+      this->parentToChild = defaultDirectionIsParentToChild;
+    }
+  }
+  else
+  {
+    this->parentToChild = defaultDirectionIsParentToChild;
+  }
+}
+
+//////////////////////////////////////////////////
 void ForceTorqueSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
   GZ_ASSERT(this->world != NULL,
-      "SonarSensor did not get a valid World pointer");
+      "ForceTorqueSensor did not get a valid World pointer");
 
   this->parentJoint = boost::dynamic_pointer_cast<physics::Joint>(
       this->world->GetByName(this->parentName));
@@ -108,7 +188,7 @@ math::Vector3 ForceTorqueSensor::GetTorque() const
 }
 
 //////////////////////////////////////////////////
-void ForceTorqueSensor::UpdateImpl(bool /*_force*/)
+bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
@@ -117,16 +197,63 @@ void ForceTorqueSensor::UpdateImpl(bool /*_force*/)
 
   physics::JointWrench wrench = this->parentJoint->GetForceTorque(0u);
 
-  // Get the force and torque in the parent frame.
+  // Get the force and torque in the appropriate frame.
+  math::Vector3 measuredForce;
+  math::Vector3 measuredTorque;
+
+  if (this->measureFrame == PARENT_LINK)
+  {
+    if (this->parentToChild)
+    {
+      measuredForce = wrench.body1Force;
+      measuredTorque = wrench.body1Torque;
+    }
+    else
+    {
+      measuredForce = -1*wrench.body1Force;
+      measuredTorque = -1*wrench.body1Torque;
+    }
+  }
+  else if (this->measureFrame == CHILD_LINK)
+  {
+    if (!this->parentToChild)
+    {
+      measuredForce = wrench.body2Force;
+      measuredTorque = wrench.body2Torque;
+    }
+    else
+    {
+      measuredForce = -1*wrench.body2Force;
+      measuredTorque = -1*wrench.body2Torque;
+    }
+  }
+  else
+  {
+    GZ_ASSERT(this->measureFrame == SENSOR,
+              "measureFrame must be PARENT_LINK, CHILD_LINK or SENSOR");
+    if (!this->parentToChild)
+    {
+      measuredForce = rotationSensorChild*wrench.body2Force;
+      measuredTorque = rotationSensorChild*wrench.body2Torque;
+    }
+    else
+    {
+      measuredForce = rotationSensorChild*(-1*wrench.body2Force);
+      measuredTorque = rotationSensorChild*(-1*wrench.body2Torque);
+    }
+  }
+
   msgs::Set(this->wrenchMsg.mutable_wrench()->mutable_force(),
-      wrench.body2Force);
+      measuredForce);
   msgs::Set(this->wrenchMsg.mutable_wrench()->mutable_torque(),
-      wrench.body2Torque);
+      measuredTorque);
 
   this->update(this->wrenchMsg);
 
   if (this->wrenchPub)
     this->wrenchPub->Publish(this->wrenchMsg);
+
+  return true;
 }
 
 //////////////////////////////////////////////////

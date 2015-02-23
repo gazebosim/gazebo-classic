@@ -24,6 +24,14 @@ foreach(lib @PKG_LIBRARIES@)
   list(APPEND @PKG_NAME@_LIBRARIES ${onelib})
 endforeach()
 
+# Get the install prefix for OGRE
+execute_process(COMMAND pkg-config --variable=prefix OGRE
+  OUTPUT_VARIABLE OGRE_INSTALL_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# Add the OGRE cmake path to CMAKE_MODULE_PATH
+set(CMAKE_MODULE_PATH
+  "${OGRE_INSTALL_PREFIX}/share/OGRE/cmake/modules;${OGRE_INSTALL_PREFIX}/CMake;${CMAKE_MODULE_PATH}")
+
 foreach(dep @PKG_DEPENDS@)
   if(NOT ${dep}_FOUND)
     find_package(${dep} REQUIRED)
@@ -38,8 +46,17 @@ foreach(dep @PKG_DEPENDS@)
   endif()
     
   list(APPEND @PKG_NAME@_LIBRARIES ${${dep_lib}_LIBRARIES})
+
+  # When including OGRE, also include the Terrain and Paging components
+  if (${dep} STREQUAL "OGRE")
+    list(APPEND GAZEBO_INCLUDE_DIRS ${OGRE_Terrain_INCLUDE_DIRS}
+      ${OGRE_Paging_INCLUDE_DIRS})
+    list(APPEND GAZEBO_LIBRARIES ${OGRE_Terrain_LIBRARIES}
+      ${OGRE_Paging_LIBRARIES})
+  endif()
+
 endforeach()
 
-list(APPEND @PKG_NAME@_LDFLAGS -Wl,-rpath,@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@,-rpath,@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins)
+list(APPEND @PKG_NAME@_LDFLAGS -Wl,-rpath,@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins)
 list(APPEND @PKG_NAME@_LDFLAGS -L@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@)
 list(APPEND @PKG_NAME@_LDFLAGS -L@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins)

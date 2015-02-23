@@ -17,6 +17,7 @@
 
 #include "gazebo/physics/simbody/simbody_inc.h"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
+#include "gazebo/physics/SurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -27,6 +28,7 @@ SimbodyCollision::SimbodyCollision(LinkPtr _parent)
 {
   this->SetName("Simbody_Collision");
   this->collisionShape = NULL;
+  this->surface.reset(new SurfaceParams());
 }
 
 //////////////////////////////////////////////////

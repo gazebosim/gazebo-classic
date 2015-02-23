@@ -87,33 +87,32 @@ ServerFixture::ServerFixture()
   this->imgData = NULL;
   this->serverThread = NULL;
 
-  common::Console::Instance()->Init("test.log");
+  gzLogInit("test.log");
+  gazebo::common::Console::SetQuiet(false);
   common::SystemPaths::Instance()->AddGazeboPaths(
       TEST_INTEGRATION_PATH);
 
   // Add local search paths
-  std::string path = TEST_INTEGRATION_PATH;
-  path += "/../..";
-  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+  boost::filesystem::path path;
 
-  path = TEST_INTEGRATION_PATH;
-  path += "/../../sdf";
-  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+  path = PROJECT_SOURCE_PATH;
+  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path.string());
 
-  path = TEST_INTEGRATION_PATH;
-  path += "/../../gazebo";
-  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
-
-  path = TEST_INTEGRATION_PATH;
-  path += "/../../build/plugins";
-  gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
+  path = PROJECT_SOURCE_PATH;
+  path /= "gazebo";
+  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path.string());
 
   path = PROJECT_BINARY_PATH;
-  path += "/test/plugins";
-  gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
+  path /= "plugins";
+  gazebo::common::SystemPaths::Instance()->AddPluginPaths(path.string());
+
+  path = PROJECT_BINARY_PATH;
+  path /= "test";
+  path /= "plugins";
+  gazebo::common::SystemPaths::Instance()->AddPluginPaths(path.string());
 
   path = TEST_PATH;
-  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path.string());
 }
 
 /////////////////////////////////////////////////
@@ -424,11 +423,10 @@ void ServerFixture::ImageCompare(unsigned char *_imageA,
 {
   _diffMax = 0;
   _diffSum = 0;
-  _diffAvg = 0;
 
-  for (unsigned int y = 0; y < _height; y++)
+  for (unsigned int y = 0; y < _height; ++y)
   {
-    for (unsigned int x = 0; x < _width*_depth; x++)
+    for (unsigned int x = 0; x < _width*_depth; ++x)
     {
       unsigned int a = _imageA[(y*_width*_depth)+x];
       unsigned int b = _imageB[(y*_width*_depth)+x];
@@ -547,8 +545,11 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
     const math::Vector3 &_pos, const math::Vector3 &_rpy,
     double _hMinAngle, double _hMaxAngle,
+    double _vMinAngle, double _vMaxAngle,
     double _minRange, double _maxRange,
     double _rangeResolution, unsigned int _samples,
+    unsigned int _vSamples, double _hResolution,
+    double _vResolution,
     const std::string &_noiseType, double _noiseMean,
     double _noiseStdDev)
 {
@@ -574,10 +575,16 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     << "      <scan>"
     << "        <horizontal>"
     << "          <samples>" << _samples << "</samples>"
-    << "          <resolution> 1 </resolution>"
+    << "          <resolution>" << _hResolution << "</resolution>"
     << "          <min_angle>" << _hMinAngle << "</min_angle>"
     << "          <max_angle>" << _hMaxAngle << "</max_angle>"
     << "        </horizontal>"
+    << "        <vertical>"
+    << "          <samples>" << _vSamples << "</samples>"
+    << "          <resolution>" << _vResolution << "</resolution>"
+    << "          <min_angle>" << _vMinAngle << "</min_angle>"
+    << "          <max_angle>" << _vMaxAngle << "</max_angle>"
+    << "        </vertical>"
     << "      </scan>"
     << "      <range>"
     << "        <min>" << _minRange << "</min>"
@@ -593,6 +600,7 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     << "      </noise>";
 
   newModelStr << "    </ray>"
+    << "    <visualize>true</visualize>"
     << "  </sensor>"
     << "</link>"
     << "</model>"
@@ -989,6 +997,71 @@ void ServerFixture::WaitUntilSensorSpawn(const std::string &_name,
     FAIL() << "ServerFixture timeout: max number of retries ("
            << _retries
            << ") exceeded while awaiting the spawn of " << _name;
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::SpawnLight(const std::string &_name,
+    const std::string &_type,
+    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const common::Color &_diffuse,
+    const common::Color &_specular,
+    const math::Vector3 &_direction,
+    double _attenuationRange,
+    double _attenuationConstant,
+    double _attenuationLinear,
+    double _attenuationQuadratic,
+    double _spotInnerAngle,
+    double _spotOuterAngle,
+    double _spotFallOff,
+    bool _castShadows)
+{
+  msgs::Factory msg;
+  std::ostringstream newLightStr;
+
+  newLightStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<light name ='" << _name << "' type = '" << _type << "'>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<diffuse>" << _diffuse << "</diffuse>"
+    << "<specular>" << _specular << "</specular>"
+    << "<direction>" << _direction << "</direction>"
+    << "<attenuation>"
+    << "  <range>" << _attenuationRange << "</range>"
+    << "  <constant>" << _attenuationConstant << "</constant>"
+    << "  <linear>" << _attenuationLinear << "</linear>"
+    << "  <quadratic>" << _attenuationQuadratic << "</quadratic>"
+    << "</attenuation>";
+
+  if (_type == "spot")
+  {
+    newLightStr << "<spot>"
+    << "  <inner_angle>" << _spotInnerAngle << "</inner_angle>"
+    << "  <outer_angle>" << _spotOuterAngle << "</outer_angle>"
+    << "  <falloff>" << _spotFallOff << "</falloff>"
+    << "</spot>";
+  }
+
+  newLightStr << "<cast_shadows>" << _castShadows << "</cast_shadows>"
+    << "</light>"
+    << "</sdf>";
+
+  msg.set_sdf(newLightStr.str());
+  this->factoryPub->Publish(msg);
+
+  physics::WorldPtr world = physics::get_world();
+  msgs::Scene sceneMsg;
+  int timeOutCount = 0;
+  int maxTimeOut = 10;
+  while (timeOutCount < maxTimeOut)
+  {
+    sceneMsg = world->GetSceneMsg();
+    for (int i = 0; i < sceneMsg.light_size(); ++i)
+    {
+      if (sceneMsg.light(i).name() == _name)
+        break;
+    }
+    timeOutCount++;
+    common::Time::MSleep(100);
+  }
 }
 
 /////////////////////////////////////////////////

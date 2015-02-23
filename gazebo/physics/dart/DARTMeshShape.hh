@@ -19,13 +19,16 @@
 #define _GAZEBO_DARTMESHSHAPE_HH_
 
 #include "gazebo/physics/MeshShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    class DARTMesh;
+
     /// \brief Triangle mesh collision.
-    class DARTMeshShape : public MeshShape
+    class GAZEBO_VISIBLE DARTMeshShape : public MeshShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.
@@ -43,20 +46,8 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Update();
 
-      /// \brief Transform matrix.
-      // private: dReal transform[16*2];
-
-      /// \brief Transform matrix index.
-      private: int transformIndex;
-
-      /// \brief Array of vertex values.
-      private: float *vertices;
-
-      /// \brief Array of index values.
-      private: int *indices;
-
-      /// \brief DART trimesh data.
-      // private: dTriMeshDataID odeData;
+      /// \brief DART collision mesh helper class
+      private: DARTMesh *dartMesh;
     };
   }
 }

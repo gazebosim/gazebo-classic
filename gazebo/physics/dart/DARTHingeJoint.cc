@@ -52,9 +52,9 @@ void DARTHingeJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTHingeJoint::GetAnchor(int /*index*/) const
+math::Vector3 DARTHingeJoint::GetAnchor(unsigned int /*index*/) const
 {
-  Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+  Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
@@ -62,13 +62,13 @@ math::Vector3 DARTHingeJoint::GetAnchor(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTHingeJoint::GetGlobalAxis(int _index) const
+math::Vector3 DARTHingeJoint::GetGlobalAxis(unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
   if (_index == 0)
   {
-    Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+    Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
                           this->dtJoint->getTransformFromChildBodyNode();
     Eigen::Vector3d axis = this->dtRevoluteJoint->getAxis();
     globalAxis = T.linear() * axis;
@@ -78,22 +78,16 @@ math::Vector3 DARTHingeJoint::GetGlobalAxis(int _index) const
     gzerr << "Invalid index[" << _index << "]\n";
   }
 
-  // TODO: Issue #494
-  // See: https://bitbucket.org/osrf/gazebo/issue/494/
-  // joint-axis-reference-frame-doesnt-match
   return DARTTypes::ConvVec3(globalAxis);
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetAxis(int _index, const math::Vector3& _axis)
+void DARTHingeJoint::SetAxis(unsigned int _index, const math::Vector3& _axis)
 {
   if (_index == 0)
   {
-    //--------------------------------------------------------------------------
-    // TODO: Issue #494
-    // See: https://bitbucket.org/osrf/gazebo/issue/494
-    // joint-axis-reference-frame-doesnt-match
-    Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
+    Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(
+        this->GetAxisFrameOffset(0).RotateVector(_axis));
     Eigen::Isometry3d dartTransfJointLeftToParentLink
         = this->dtJoint->getTransformFromParentBodyNode().inverse();
     dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
@@ -108,13 +102,13 @@ void DARTHingeJoint::SetAxis(int _index, const math::Vector3& _axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTHingeJoint::GetAngleImpl(int _index) const
+math::Angle DARTHingeJoint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
 
   if (_index == 0)
   {
-    double radianAngle = this->dtJoint->getGenCoord(0)->get_q();
+    double radianAngle = this->dtJoint->getPosition(0);
     result.SetFromRadian(radianAngle);
   }
   else
@@ -126,21 +120,24 @@ math::Angle DARTHingeJoint::GetAngleImpl(int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetVelocity(int _index, double _vel)
+void DARTHingeJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_dq(_vel);
+  {
+    this->dtJoint->setVelocity(0, _vel);
+    this->dtJoint->getSkeleton()->computeForwardKinematics(false, true, false);
+  }
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
 
 //////////////////////////////////////////////////
-double DARTHingeJoint::GetVelocity(int _index) const
+double DARTHingeJoint::GetVelocity(unsigned int _index) const
 {
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getGenCoord(0)->get_dq();
+    result = this->dtJoint->getVelocity(0);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -148,32 +145,43 @@ double DARTHingeJoint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetMaxForce(int _index, double _force)
+void DARTHingeJoint::SetMaxForce(unsigned int _index, double _force)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_tauMax(_force);
+  {
+    this->dtJoint->setForceLowerLimit(0, -_force);
+    this->dtJoint->setForceUpperLimit(0, _force);
+  }
   else
+  {
     gzerr << "Invalid index[" << _index << "]\n";
+  }
 }
 
 //////////////////////////////////////////////////
-double DARTHingeJoint::GetMaxForce(int _index)
+double DARTHingeJoint::GetMaxForce(unsigned int _index)
 {
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getGenCoord(0)->get_tauMax();
+  {
+    // Assume that the lower limit and upper limit has equal magnitute
+    // result = this->dtJoint->getForceLowerLimit(0);
+    result = this->dtJoint->getForceUpperLimit(0);
+  }
   else
+  {
     gzerr << "Invalid index[" << _index << "]\n";
+  }
 
   return result;
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetForceImpl(int _index, double _effort)
+void DARTHingeJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_tau(_effort);
+    this->dtJoint->setForce(0, _effort);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }

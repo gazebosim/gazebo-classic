@@ -17,6 +17,10 @@ set (plugins
   ExceptionModelPluginConstructor
   ExceptionModelPluginInit
   ExceptionModelPluginLoad
+  ForceTorqueModelRemovalTestPlugin
+  Issue1208Plugin
+  ModelTrajectoryTestPlugin
+  SpringTestPlugin
 )
 
 foreach (src ${plugins})

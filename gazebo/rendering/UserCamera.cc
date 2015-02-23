@@ -19,28 +19,21 @@
  * Date: 19 Jun 2008
  */
 
-#include <sstream>
-
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
 
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/GUIOverlay.hh"
-#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/WindowManager.hh"
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/OrbitViewController.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/RTShaderSystem.hh"
-#include "gazebo/rendering/Camera.hh"
-#include "gazebo/rendering/Visual.hh"
-#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/UserCameraPrivate.hh"
 #include "gazebo/rendering/UserCamera.hh"
 
 using namespace gazebo;
@@ -48,30 +41,36 @@ using namespace rendering;
 
 //////////////////////////////////////////////////
 UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
-  : Camera(_name, _scene)
+  : Camera(_name, _scene),
+    dataPtr(new UserCameraPrivate)
 {
-  this->gui = new GUIOverlay();
+  this->dataPtr->gui = new GUIOverlay();
 
-  this->orbitViewController = NULL;
-  this->fpsViewController = NULL;
-  this->viewController = NULL;
+  this->dataPtr->orbitViewController = NULL;
+  this->dataPtr->fpsViewController = NULL;
+  this->dataPtr->viewController = NULL;
 
-  this->selectionBuffer = NULL;
+  this->dataPtr->selectionBuffer = NULL;
 
   // Set default UserCamera render rate to 30Hz
   this->SetRenderRate(30.0);
+
+  this->SetUseSDFPose(false);
 }
 
 //////////////////////////////////////////////////
 UserCamera::~UserCamera()
 {
-  delete this->orbitViewController;
-  delete this->fpsViewController;
+  delete this->dataPtr->orbitViewController;
+  delete this->dataPtr->fpsViewController;
 
-  delete this->gui;
-  this->gui = NULL;
+  delete this->dataPtr->gui;
+  this->dataPtr->gui = NULL;
 
   this->connections.clear();
+
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -89,11 +88,11 @@ void UserCamera::Load()
 //////////////////////////////////////////////////
 void UserCamera::Init()
 {
-  this->orbitViewController = new OrbitViewController(
+  this->dataPtr->orbitViewController = new OrbitViewController(
       boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
-  this->fpsViewController = new FPSViewController(
+  this->dataPtr->fpsViewController = new FPSViewController(
       boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
-  this->viewController = this->orbitViewController;
+  this->dataPtr->viewController = this->dataPtr->orbitViewController;
 
   Camera::Init();
 
@@ -175,7 +174,7 @@ void UserCamera::Init()
 void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
   Camera::SetWorldPose(_pose);
-  this->viewController->Init();
+  this->dataPtr->viewController->Init();
 }
 
 //////////////////////////////////////////////////
@@ -183,14 +182,14 @@ void UserCamera::Update()
 {
   Camera::Update();
 
-  if (this->gui)
-    this->gui->Update();
+  if (this->dataPtr->gui)
+    this->dataPtr->gui->Update();
 }
 
 //////////////////////////////////////////////////
 void UserCamera::AnimationComplete()
 {
-  this->viewController->Init();
+  this->dataPtr->viewController->Init();
 }
 
 //////////////////////////////////////////////////
@@ -208,33 +207,45 @@ void UserCamera::Fini()
 //////////////////////////////////////////////////
 void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
-  if (!this->gui || !this->gui->HandleMouseEvent(_evt))
+  if (!this->dataPtr->gui || !this->dataPtr->gui->HandleMouseEvent(_evt))
   {
-    if (this->selectionBuffer)
-      this->selectionBuffer->Update();
+    if (this->dataPtr->selectionBuffer)
+      this->dataPtr->selectionBuffer->Update();
 
-    // DEBUG: this->selectionBuffer->ShowOverlay(true);
+    // DEBUG: this->dataPtr->selectionBuffer->ShowOverlay(true);
 
     // Don't update the camera if it's being animated.
     if (!this->animState)
-      this->viewController->HandleMouseEvent(_evt);
+      this->dataPtr->viewController->HandleMouseEvent(_evt);
   }
 }
 
 /////////////////////////////////////////////////
 void UserCamera::HandleKeyPressEvent(const std::string &_key)
 {
-  if (this->gui)
-    this->gui->HandleKeyPressEvent(_key);
-  this->viewController->HandleKeyPressEvent(_key);
+  if (this->dataPtr->gui)
+    this->dataPtr->gui->HandleKeyPressEvent(_key);
+  this->dataPtr->viewController->HandleKeyPressEvent(_key);
 }
 
 /////////////////////////////////////////////////
 void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
 {
-  if (this->gui)
-    this->gui->HandleKeyReleaseEvent(_key);
-  this->viewController->HandleKeyReleaseEvent(_key);
+  if (this->dataPtr->gui)
+    this->dataPtr->gui->HandleKeyReleaseEvent(_key);
+  this->dataPtr->viewController->HandleKeyReleaseEvent(_key);
+}
+
+/////////////////////////////////////////////////
+bool UserCamera::IsCameraSetInWorldFile()
+{
+  return this->dataPtr->isCameraSetInWorldFile;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetUseSDFPose(bool _value)
+{
+  this->dataPtr->isCameraSetInWorldFile = _value;
 }
 
 /////////////////////////////////////////////////
@@ -288,34 +299,34 @@ bool UserCamera::TrackVisualImpl(VisualPtr _visual)
 //////////////////////////////////////////////////
 void UserCamera::SetViewController(const std::string &type)
 {
-  if (this->viewController->GetTypeString() == type)
+  if (this->dataPtr->viewController->GetTypeString() == type)
     return;
 
   if (type == OrbitViewController::GetTypeString())
-    this->viewController = this->orbitViewController;
+    this->dataPtr->viewController = this->dataPtr->orbitViewController;
   else if (type == FPSViewController::GetTypeString())
-    this->viewController = this->fpsViewController;
+    this->dataPtr->viewController = this->dataPtr->fpsViewController;
   else
     gzthrow("Invalid view controller type: " + type);
 
-  this->viewController->Init();
+  this->dataPtr->viewController->Init();
 }
 
 //////////////////////////////////////////////////
 void UserCamera::SetViewController(const std::string &type,
                                     const math::Vector3 &_pos)
 {
-  if (this->viewController->GetTypeString() == type)
+  if (this->dataPtr->viewController->GetTypeString() == type)
     return;
 
   if (type == OrbitViewController::GetTypeString())
-    this->viewController = this->orbitViewController;
+    this->dataPtr->viewController = this->dataPtr->orbitViewController;
   else if (type == FPSViewController::GetTypeString())
-    this->viewController = this->fpsViewController;
+    this->dataPtr->viewController = this->dataPtr->fpsViewController;
   else
     gzthrow("Invalid view controller type: " + type);
 
-  this->viewController->Init(_pos);
+  this->dataPtr->viewController->Init(_pos);
 }
 
 //////////////////////////////////////////////////
@@ -345,9 +356,9 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
 
-    if (this->gui)
+    if (this->dataPtr->gui)
     {
-      this->gui->Resize(this->viewport->getActualWidth(),
+      this->dataPtr->gui->Resize(this->viewport->getActualWidth(),
                         this->viewport->getActualHeight());
     }
 
@@ -371,7 +382,7 @@ float UserCamera::GetAvgFPS() const
 }
 
 //////////////////////////////////////////////////
-float UserCamera::GetTriangleCount() const
+unsigned int UserCamera::GetTriangleCount() const
 {
   return RenderEngine::Instance()->GetWindowManager()->GetTriangleCount(
       this->windowId);
@@ -484,7 +495,8 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   this->animState->setLoop(false);
   this->prevAnimTime = common::Time::GetWallTime();
 
-  // this->orbitViewController->SetFocalPoint(_visual->GetWorldPose().pos);
+  // this->dataPtr->orbitViewController->SetFocalPoint(
+  //    _visual->GetWorldPose().pos);
   this->onAnimationComplete =
     boost::bind(&UserCamera::OnMoveToVisualComplete, this);
 }
@@ -492,8 +504,9 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 /////////////////////////////////////////////////
 void UserCamera::OnMoveToVisualComplete()
 {
-  this->orbitViewController->SetDistance(this->GetWorldPose().pos.Distance(
-        this->orbitViewController->GetFocalPoint()));
+  this->dataPtr->orbitViewController->SetDistance(
+      this->GetWorldPose().pos.Distance(
+      this->dataPtr->orbitViewController->GetFocalPoint()));
 }
 
 //////////////////////////////////////////////////
@@ -503,25 +516,25 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
 
-  if (this->gui)
-    this->gui->Init(this->renderTarget);
+  if (this->dataPtr->gui)
+    this->dataPtr->gui->Init(this->renderTarget);
 
   this->initialized = true;
 
-  this->selectionBuffer = new SelectionBuffer(this->name,
+  this->dataPtr->selectionBuffer = new SelectionBuffer(this->scopedUniqueName,
       this->scene->GetManager(), this->renderTarget);
 }
 
 //////////////////////////////////////////////////
 GUIOverlay *UserCamera::GetGUIOverlay()
 {
-  return this->gui;
+  return this->dataPtr->gui;
 }
 
 //////////////////////////////////////////////////
 void UserCamera::EnableViewController(bool _value) const
 {
-  this->viewController->SetEnabled(_value);
+  this->dataPtr->viewController->SetEnabled(_value);
 }
 
 //////////////////////////////////////////////////
@@ -530,14 +543,14 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
 {
   VisualPtr result;
 
-  if (!this->selectionBuffer)
+  if (!this->dataPtr->selectionBuffer)
     return result;
 
   // Update the selection buffer
-  this->selectionBuffer->Update();
+  this->dataPtr->selectionBuffer->Update();
 
   Ogre::Entity *entity =
-    this->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
+    this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
 
   _mod = "";
   if (entity)
@@ -579,7 +592,7 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
 //////////////////////////////////////////////////
 void UserCamera::SetFocalPoint(const math::Vector3 &_pt)
 {
-  this->orbitViewController->SetFocalPoint(_pt);
+  this->dataPtr->orbitViewController->SetFocalPoint(_pt);
 }
 
 //////////////////////////////////////////////////
@@ -588,7 +601,7 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
   VisualPtr result;
 
   Ogre::Entity *entity =
-    this->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
+    this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
 
   if (entity && !entity->getUserAny().isEmpty())
   {
@@ -602,6 +615,6 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
 //////////////////////////////////////////////////
 std::string UserCamera::GetViewControllerTypeString()
 {
-  GZ_ASSERT(this->viewController, "ViewController != NULL");
-  return this->viewController->GetTypeString();
+  GZ_ASSERT(this->dataPtr->viewController, "ViewController != NULL");
+  return this->dataPtr->viewController->GetTypeString();
 }

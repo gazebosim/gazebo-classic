@@ -20,6 +20,8 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/math/Box.hh"
 
+#include "gazebo/physics/SurfaceParams.hh"
+
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTLink.hh"
 #include "gazebo/physics/dart/DARTCollision.hh"
@@ -31,10 +33,12 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTCollision::DARTCollision(LinkPtr _link)
   : Collision(_link),
-    dtBodyNode(NULL),
     dtCollisionShape(NULL)
 {
   this->SetName("DART_Collision");
+  this->surface.reset(new SurfaceParams());
+  this->dtBodyNode
+      = boost::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode();
 }
 
 //////////////////////////////////////////////////
@@ -52,9 +56,6 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
     this->SetCategoryBits(GZ_FIXED_COLLIDE);
     this->SetCollideBits(~GZ_FIXED_COLLIDE);
   }
-
-  this->dtBodyNode
-      = boost::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode();
 }
 
 //////////////////////////////////////////////////
@@ -73,6 +74,15 @@ void DARTCollision::Init()
     {
       math::Pose relativePose = this->GetRelativePose();
       this->dtCollisionShape->setOffset(DARTTypes::ConvVec3(relativePose.pos));
+    }
+    else
+    {
+      // change ground plane to be near semi-infinite.
+      dart::dynamics::BoxShape *dtBoxShape =
+        dynamic_cast<dart::dynamics::BoxShape *>(this->dtCollisionShape);
+      dtBoxShape->setSize(Eigen::Vector3d(2100, 2100, 2100.0));
+      dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -2100.0/2.0));
+      // gzerr << "plane box modified\n";
     }
   }
 }

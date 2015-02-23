@@ -260,6 +260,18 @@ const Material *Mesh::GetMaterial(int index) const
 }
 
 //////////////////////////////////////////////////
+int Mesh::GetMaterialIndex(const Material *_mat) const
+{
+  for (unsigned int i = 0; i < this->materials.size(); ++i)
+  {
+    if (this->materials[i] == _mat)
+      return i;
+  }
+
+  return -1;
+}
+
+//////////////////////////////////////////////////
 void Mesh::FillArrays(float **_vertArr, int **_indArr) const
 {
   std::vector<SubMesh *>::const_iterator iter;
@@ -906,4 +918,10 @@ void SubMesh::SetName(const std::string &_n)
 std::string SubMesh::GetName() const
 {
   return this->name;
+}
+
+//////////////////////////////////////////////////
+NodeAssignment::NodeAssignment()
+  : vertexIndex(0), nodeIndex(0), weight(0.0)
+{
 }

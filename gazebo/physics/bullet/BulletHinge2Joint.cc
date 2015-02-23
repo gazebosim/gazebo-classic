@@ -96,13 +96,13 @@ void BulletHinge2Joint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletHinge2Joint::GetAnchor(int /*index*/) const
+math::Vector3 BulletHinge2Joint::GetAnchor(unsigned int /*index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletHinge2Joint::GetAxis(int /*index*/) const
+math::Vector3 BulletHinge2Joint::GetAxis(unsigned int /*index*/) const
 {
   if (!this->bulletHinge2)
   {
@@ -115,7 +115,7 @@ math::Vector3 BulletHinge2Joint::GetAxis(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHinge2Joint::GetAngle(int /*_index*/) const
+math::Angle BulletHinge2Joint::GetAngle(unsigned int /*_index*/) const
 {
   if (!this->bulletHinge2)
   {
@@ -127,20 +127,21 @@ math::Angle BulletHinge2Joint::GetAngle(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-double BulletHinge2Joint::GetVelocity(int /*_index*/) const
+double BulletHinge2Joint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetVelocity(int /*_index*/, double /*_angle*/)
+void BulletHinge2Joint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
+void BulletHinge2Joint::SetAxis(unsigned int /*_index*/,
+    const math::Vector3 &/*_axis*/)
 {
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
   // points
@@ -150,44 +151,59 @@ void BulletHinge2Joint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetForceImpl(int /*_index*/, double /*_torque*/)
+void BulletHinge2Joint::SetForceImpl(unsigned int /*_index*/,
+    double /*_torque*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetMaxForce(int /*_index*/, double /*_t*/)
+void BulletHinge2Joint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-double BulletHinge2Joint::GetMaxForce(int /*_index*/)
+double BulletHinge2Joint::GetMaxForce(unsigned int /*_index*/)
 {
   gzerr << "Not implemented";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetHighStop(int /*_index*/, const math::Angle &_angle)
+bool BulletHinge2Joint::SetHighStop(unsigned int /*_index*/,
+    const math::Angle &_angle)
 {
   if (this->bulletHinge2)
+  {
     this->bulletHinge2->setUpperLimit(_angle.Radian());
+    return true;
+  }
   else
+  {
     gzerr << "Joint must be created first.\n";
+    return false;
+  }
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetLowStop(int /*_index*/, const math::Angle &_angle)
+bool BulletHinge2Joint::SetLowStop(unsigned int /*_index*/,
+    const math::Angle &_angle)
 {
   if (this->bulletHinge2)
+  {
     this->bulletHinge2->setLowerLimit(_angle.Radian());
+    return true;
+  }
   else
+  {
     gzerr << "Joint must be created first.\n";
+    return false;
+  }
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHinge2Joint::GetHighStop(int _index)
+math::Angle BulletHinge2Joint::GetHighStop(unsigned int _index)
 {
   if (!this->bulletHinge2)
   {
@@ -205,10 +221,13 @@ math::Angle BulletHinge2Joint::GetHighStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHinge2Joint::GetLowStop(int _index)
+math::Angle BulletHinge2Joint::GetLowStop(unsigned int _index)
 {
   if (!this->bulletHinge2)
-    gzerr << "Joint must be created first.\n";
+  {
+    gzerr << "BulletHinge2Joint::bulletHigne2 not created yet, returning 0.\n";
+    return math::Angle(0.0);
+  }
 
   btRotationalLimitMotor *motor =
     this->bulletHinge2->getRotationalLimitMotor(_index);
@@ -220,14 +239,14 @@ math::Angle BulletHinge2Joint::GetLowStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletHinge2Joint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 BulletHinge2Joint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   gzerr << "BulletHinge2Joint::GetGlobalAxis not implemented\n";
   return math::Vector3();
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHinge2Joint::GetAngleImpl(int /*_index*/) const
+math::Angle BulletHinge2Joint::GetAngleImpl(unsigned int /*_index*/) const
 {
   gzerr << "BulletHinge2Joint::GetAngleImpl not implemented\n";
   return math::Angle();

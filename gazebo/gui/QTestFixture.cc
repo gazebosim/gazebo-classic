@@ -22,16 +22,14 @@
 
 #include <unistd.h>
 
-#include "gazebo/physics/PhysicsIface.hh"
-
-#include "gazebo/rendering/RenderingIface.hh"
-
-#include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/util/LogRecord.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/gazebo.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/QTestFixture.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/util/LogRecord.hh"
 
 /////////////////////////////////////////////////
 QTestFixture::QTestFixture()
@@ -46,7 +44,7 @@ void QTestFixture::initTestCase()
 {
   // Initialize the informational logger. This will log warnings, and
   // errors.
-  gazebo::common::Console::Instance()->Init("test.log");
+  gzLogInit("test.log");
 
   // Initialize the data logger. This will log state information.
   gazebo::util::LogRecord::Instance()->Init("test");
@@ -55,7 +53,7 @@ void QTestFixture::initTestCase()
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(PROJECT_SOURCE_PATH);
 
   std::string path = PROJECT_SOURCE_PATH;
-  path += "/sdf/worlds";
+  path += "/worlds";
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
   path = TEST_PATH;

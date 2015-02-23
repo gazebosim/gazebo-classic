@@ -19,10 +19,13 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Vector2d.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(Vector2dTest, Vector2d)
+class Vector2dTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(Vector2dTest, Vector2d)
 {
   {
     math::Vector2d v;
@@ -119,4 +122,14 @@ TEST(Vector2dTest, Vector2d)
   v.Set(6, 7);
   EXPECT_DOUBLE_EQ(6, v[0]);
   EXPECT_DOUBLE_EQ(7, v[1]);
+}
+
+/////////////////////////////////////////////////
+TEST_F(Vector2dTest, Dot)
+{
+  math::Vector2d v1(1, 2);
+  math::Vector2d v2(3, 4);
+
+  EXPECT_DOUBLE_EQ(v1.Dot(v2), (v1.x*v2.x) + (v1.y*v2.y));
+  EXPECT_DOUBLE_EQ(v1.Dot(v2), 11.0);
 }

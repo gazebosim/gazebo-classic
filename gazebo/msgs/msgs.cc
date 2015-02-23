@@ -160,6 +160,27 @@ namespace gazebo
       _t->set_nsec(_v.nsec);
     }
 
+    /////////////////////////////////////////////////
+    void Set(msgs::SphericalCoordinates *_s,
+             const common::SphericalCoordinates &_v)
+    {
+      switch (_v.GetSurfaceType())
+      {
+        case common::SphericalCoordinates::EARTH_WGS84:
+          _s->set_surface_model(msgs::SphericalCoordinates::EARTH_WGS84);
+          break;
+        default:
+          gzerr << "Unable to map surface type[" <<  _v.GetSurfaceType()
+            << "] to a SphericalCoordinates message.\n";
+          _s->set_surface_model(msgs::SphericalCoordinates::EARTH_WGS84);
+          break;
+      };
+
+      _s->set_latitude_deg(_v.GetLatitudeReference().Degree());
+      _s->set_longitude_deg(_v.GetLongitudeReference().Degree());
+      _s->set_heading_deg(_v.GetHeadingOffset().Degree());
+      _s->set_elevation(_v.GetElevationReference());
+    }
 
     /////////////////////////////////////////////////
     void Set(msgs::PlaneGeom *_p, const math::Plane &_v)
@@ -254,9 +275,97 @@ namespace gazebo
       return result;
     }
 
+    msgs::Joint::Type ConvertJointType(const std::string &_str)
+    {
+      msgs::Joint::Type result = msgs::Joint::REVOLUTE;
+      if (_str == "revolute")
+      {
+        result = msgs::Joint::REVOLUTE;
+      }
+      else if (_str == "revolute2")
+      {
+        result = msgs::Joint::REVOLUTE2;
+      }
+      else if (_str == "prismatic")
+      {
+        result = msgs::Joint::PRISMATIC;
+      }
+      else if (_str == "universal")
+      {
+        result = msgs::Joint::UNIVERSAL;
+      }
+      else if (_str == "ball")
+      {
+        result = msgs::Joint::BALL;
+      }
+      else if (_str == "screw")
+      {
+        result = msgs::Joint::SCREW;
+      }
+      else if (_str == "gearbox")
+      {
+        result = msgs::Joint::GEARBOX;
+      }
+      return result;
+    }
+
+    std::string ConvertJointType(const msgs::Joint::Type _type)
+    {
+      std::string result;
+      switch (_type)
+      {
+        case msgs::Joint::REVOLUTE:
+        {
+          result = "revolute";
+          break;
+        }
+        case msgs::Joint::REVOLUTE2:
+        {
+          result = "revolute2";
+          break;
+        }
+        case msgs::Joint::PRISMATIC:
+        {
+          result = "prismatic";
+          break;
+        }
+        case msgs::Joint::UNIVERSAL:
+        {
+          result = "universal";
+          break;
+        }
+        case msgs::Joint::BALL:
+        {
+          result = "ball";
+          break;
+        }
+        case msgs::Joint::SCREW:
+        {
+          result = "screw";
+          break;
+        }
+        case msgs::Joint::GEARBOX:
+        {
+          result = "gearbox";
+          break;
+        }
+        default:
+        {
+          result = "unknown";
+          break;
+        }
+      }
+      return result;
+    }
+
     math::Vector3 Convert(const msgs::Vector3d &_v)
     {
       return math::Vector3(_v.x(), _v.y(), _v.z());
+    }
+
+    math::Vector2d Convert(const msgs::Vector2d &_v)
+    {
+      return math::Vector2d(_v.x(), _v.y());
     }
 
     math::Quaternion Convert(const msgs::Quaternion &_q)
@@ -479,6 +588,19 @@ namespace gazebo
         msgs::Set(result.mutable_plane()->mutable_size(),
             geomElem->Get<math::Vector2d>("size"));
       }
+      else if (geomElem->GetName() == "polyline")
+      {
+        result.set_type(msgs::Geometry::POLYLINE);
+        result.mutable_polyline()->set_height(geomElem->Get<double>("height"));
+        sdf::ElementPtr pointElem = geomElem->GetElement("point");
+        while (pointElem)
+        {
+           math::Vector2d point = pointElem->Get<math::Vector2d>();
+           pointElem = pointElem->GetNextElement("point");
+           msgs::Vector2d *ptMsg = result.mutable_polyline()->add_point();
+           msgs::Set(ptMsg, point);
+        }
+      }
       else if (geomElem->GetName() == "image")
       {
         result.set_type(msgs::Geometry::IMAGE);
@@ -497,14 +619,11 @@ namespace gazebo
         msgs::Set(result.mutable_heightmap()->mutable_origin(),
             geomElem->Get<math::Vector3>("pos"));
 
-        common::Image img(geomElem->Get<std::string>("uri"));
-        msgs::Set(result.mutable_heightmap()->mutable_image(), img);
-
         sdf::ElementPtr textureElem = geomElem->GetElement("texture");
-        msgs::HeightmapGeom::Texture *tex;
         while (textureElem)
         {
-          tex = result.mutable_heightmap()->add_texture();
+          msgs::HeightmapGeom::Texture *tex =
+            result.mutable_heightmap()->add_texture();
           tex->set_diffuse(textureElem->Get<std::string>("diffuse"));
           tex->set_normal(textureElem->Get<std::string>("normal"));
           tex->set_size(textureElem->Get<double>("size"));
@@ -512,10 +631,10 @@ namespace gazebo
         }
 
         sdf::ElementPtr blendElem = geomElem->GetElement("blend");
-        msgs::HeightmapGeom::Blend *blend;
         while (blendElem)
         {
-          blend = result.mutable_heightmap()->add_blend();
+          msgs::HeightmapGeom::Blend *blend =
+            result.mutable_heightmap()->add_blend();
 
           blend->set_min_height(blendElem->Get<double>("min_height"));
           blend->set_fade_dist(blendElem->Get<double>("fade_dist"));
@@ -585,6 +704,11 @@ namespace gazebo
           }
         }
 
+        if (elem->HasElement("lighting"))
+        {
+          matMsg->set_lighting(elem->Get<bool>("lighting"));
+        }
+
         if (elem->HasElement("shader"))
         {
           sdf::ElementPtr shaderElem = elem->GetElement("shader");
@@ -651,6 +775,7 @@ namespace gazebo
       return result;
     }
 
+    /////////////////////////////////////////////////
     msgs::Fog FogFromSDF(sdf::ElementPtr _sdf)
     {
       msgs::Fog result;
@@ -724,6 +849,97 @@ namespace gazebo
         result.set_shadows(_sdf->Get<bool>("shadows"));
 
       return result;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr LightToSDF(const msgs::Light &_msg, sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr lightSDF;
+
+      if (_sdf)
+      {
+        lightSDF = _sdf;
+      }
+      else
+      {
+        lightSDF.reset(new sdf::Element);
+        sdf::initFile("light.sdf", lightSDF);
+      }
+
+      lightSDF->GetAttribute("name")->Set(_msg.name());
+
+      if (_msg.has_type() && _msg.type() == msgs::Light::POINT)
+        lightSDF->GetAttribute("type")->Set("point");
+      else if (_msg.has_type() && _msg.type() == msgs::Light::SPOT)
+        lightSDF->GetAttribute("type")->Set("spot");
+      else if (_msg.has_type() && _msg.type() == msgs::Light::DIRECTIONAL)
+        lightSDF->GetAttribute("type")->Set("directional");
+
+      if (_msg.has_pose())
+      {
+        lightSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+      }
+
+      if (_msg.has_diffuse())
+      {
+        lightSDF->GetElement("diffuse")->Set(msgs::Convert(_msg.diffuse()));
+      }
+
+      if (_msg.has_specular())
+      {
+        lightSDF->GetElement("specular")->Set(msgs::Convert(_msg.specular()));
+      }
+
+      if (_msg.has_direction())
+      {
+        lightSDF->GetElement("direction")->Set(msgs::Convert(_msg.direction()));
+      }
+
+      if (_msg.has_attenuation_constant())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("attenuation");
+        elem->GetElement("constant")->Set(_msg.attenuation_constant());
+      }
+
+      if (_msg.has_attenuation_linear())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("attenuation");
+        elem->GetElement("linear")->Set(_msg.attenuation_linear());
+      }
+
+      if (_msg.has_attenuation_quadratic())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("attenuation");
+        elem->GetElement("quadratic")->Set(_msg.attenuation_quadratic());
+      }
+
+      if (_msg.has_range())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("attenuation");
+        elem->GetElement("range")->Set(_msg.range());
+      }
+
+      if (_msg.has_cast_shadows())
+        lightSDF->GetElement("cast_shadows")->Set(_msg.cast_shadows());
+
+      if (_msg.has_spot_inner_angle())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("spot");
+        elem->GetElement("inner_angle")->Set(_msg.spot_inner_angle());
+      }
+
+      if (_msg.has_spot_outer_angle())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("spot");
+        elem->GetElement("outer_angle")->Set(_msg.spot_outer_angle());
+      }
+
+      if (_msg.has_spot_falloff())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("spot");
+        elem->GetElement("falloff")->Set(_msg.spot_falloff());
+      }
+      return lightSDF;
     }
   }
 }

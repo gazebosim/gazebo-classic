@@ -19,11 +19,10 @@
 #define _SONARVISUAL_HH_
 
 #include <string>
-#include <vector>
 
-#include "gazebo/rendering/Visual.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,11 +31,9 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    class DynamicLines;
-
     /// \class SonarVisual SonarVisual.hh rendering/rendering.hh
     /// \brief Visualization for sonar data.
-    class SonarVisual : public Visual
+    class GAZEBO_VISIBLE SonarVisual : public Visual
     {
       /// \brief Constructor.
       /// \param[in] _name Name of the visual.
@@ -56,30 +53,6 @@ namespace gazebo
 
       /// \brief Callback when sonar data is received.
       private: void OnMsg(ConstSonarStampedPtr &_msg);
-
-      /// \brief Pointer to a node that handles communication.
-      private: transport::NodePtr node;
-
-      /// \brief Subscription to the sonar data.
-      private: transport::SubscriberPtr sonarSub;
-
-      /// \brief Renders the sonar data reading.
-      private: DynamicLines *sonarRay;
-
-      /// \brief Renders the sonar cone.
-      private: Ogre::SceneNode *coneNode;
-
-      /// \brief The current sonar message.
-      private: boost::shared_ptr<msgs::SonarStamped const> sonarMsg;
-
-      /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Mutex to protect the contact message.
-      private: boost::mutex mutex;
-
-      /// \brief True if we have received a message.
-      private: bool receivedMsg;
     };
     /// \}
   }

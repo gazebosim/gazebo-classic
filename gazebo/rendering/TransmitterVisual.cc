@@ -18,6 +18,7 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/TransmitterVisualPrivate.hh"
 #include "gazebo/rendering/TransmitterVisual.hh"
 
 using namespace gazebo;
@@ -26,73 +27,92 @@ using namespace rendering;
 /////////////////////////////////////////////////
 TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
     const std::string &_topicName)
-: Visual(_name, _vis), isFirst(true), receivedMsg(false)
+    : Visual(*new TransmitterVisualPrivate, _name, _vis)
 {
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->scene->GetName());
+  TransmitterVisualPrivate *dPtr =
+      reinterpret_cast<TransmitterVisualPrivate *>(this->dataPtr);
 
-  this->signalPropagationSub = this->node->Subscribe(_topicName,
+  dPtr->isFirst = true;
+  dPtr->receivedMsg = false;
+
+  dPtr->node = transport::NodePtr(new transport::Node());
+  dPtr->node->Init(dPtr->scene->GetName());
+
+  dPtr->points = NULL;
+
+  dPtr->signalPropagationSub = dPtr->node->Subscribe(_topicName,
       &TransmitterVisual::OnNewPropagationGrid, this);
 
-  this->connections.push_back(
+  dPtr->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&TransmitterVisual::Update, this)));
-
-  this->points = this->CreateDynamicLine(rendering::RENDERING_POINT_LIST);
-  this->points->setMaterial("Gazebo/PointCloud");
 }
 
 /////////////////////////////////////////////////
 TransmitterVisual::~TransmitterVisual()
 {
-  DeleteDynamicLine(this->points);
-  this->signalPropagationSub.reset();
+  TransmitterVisualPrivate *dPtr =
+      reinterpret_cast<TransmitterVisualPrivate *>(this->dataPtr);
+
+  DeleteDynamicLine(dPtr->points);
+  dPtr->signalPropagationSub.reset();
 }
 
 /////////////////////////////////////////////////
 void TransmitterVisual::Load()
 {
   Visual::Load();
+
+  TransmitterVisualPrivate *dPtr =
+      reinterpret_cast<TransmitterVisualPrivate *>(this->dataPtr);
+  dPtr->points = this->CreateDynamicLine(rendering::RENDERING_POINT_LIST);
+  dPtr->points->setMaterial("Gazebo/PointCloud");
 }
 
 /////////////////////////////////////////////////
 void TransmitterVisual::OnNewPropagationGrid(ConstPropagationGridPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  TransmitterVisualPrivate *dPtr =
+      reinterpret_cast<TransmitterVisualPrivate *>(this->dataPtr);
+
+  boost::mutex::scoped_lock lock(dPtr->mutex);
 
   // Just copy the received data but do not update the UI
-  this->gridMsg = _msg;
-  this->receivedMsg = true;
+  dPtr->gridMsg = _msg;
+  dPtr->receivedMsg = true;
 }
 
 ////////////////////////////////////////////////
 void TransmitterVisual::Update()
 {
+  TransmitterVisualPrivate *dPtr =
+      reinterpret_cast<TransmitterVisualPrivate *>(this->dataPtr);
+
   gazebo::msgs::PropagationParticle p;
 
-  boost::mutex::scoped_lock lock(this->mutex);
+  boost::mutex::scoped_lock lock(dPtr->mutex);
 
-  if (!this->gridMsg || !this->receivedMsg)
+  if (!dPtr->gridMsg || !dPtr->receivedMsg)
     return;
 
   // Update the visualization of the last propagation grid received
-  this->receivedMsg = false;
+  dPtr->receivedMsg = false;
 
-  if (this->isFirst)
+  if (dPtr->isFirst)
   {
-    for (int i = 0; i < gridMsg->particle_size(); ++i)
+    for (int i = 0; i < dPtr->gridMsg->particle_size(); ++i)
     {
-      p = gridMsg->particle(i);
-      this->points->AddPoint(p.x(), p.y(), 0.0);
+      p = dPtr->gridMsg->particle(i);
+      dPtr->points->AddPoint(p.x(), p.y(), 0.0);
     }
-    this->isFirst = false;
+    dPtr->isFirst = false;
   }
 
   // Update the list of visual elements
-  for (int i = 0; i < gridMsg->particle_size(); ++i)
+  for (int i = 0; i < dPtr->gridMsg->particle_size(); ++i)
   {
-    p = gridMsg->particle(i);
-    this->points->SetPoint(i, math::Vector3(p.x(), p.y(), 0));
+    p = dPtr->gridMsg->particle(i);
+    dPtr->points->SetPoint(i, math::Vector3(p.x(), p.y(), 0));
 
     // Crop the signal strength between 0 and 255
     double strength = std::min(std::max(0.0, -p.signal_level()), 255.0);
@@ -101,6 +121,6 @@ void TransmitterVisual::Update()
 
     // Set the color in gray scale
     common::Color color(strength, strength, strength);
-    this->points->SetColor(i, color);
+    dPtr->points->SetColor(i, color);
   }
 }

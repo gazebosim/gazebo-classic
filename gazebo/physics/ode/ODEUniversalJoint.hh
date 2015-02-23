@@ -14,23 +14,23 @@
  * limitations under the License.
  *
 */
-/* Desc: A universal joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
-*/
-
 #ifndef _ODEUNIVERSALJOINT_HH_
 #define _ODEUNIVERSALJOINT_HH_
 
+#include <boost/any.hpp>
+#include <string>
+
+#include "gazebo/common/Exception.hh"
 #include "gazebo/physics/UniversalJoint.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A universal joint.
-    class ODEUniversalJoint : public UniversalJoint<ODEJoint>
+    class GAZEBO_VISIBLE ODEUniversalJoint : public UniversalJoint<ODEJoint>
     {
       /// \brief Constructor.
       /// \param[in] _worldId ODE world id.
@@ -41,37 +41,56 @@ namespace gazebo
       public: virtual ~ODEUniversalJoint();
 
       // Documentation inherited
-      public: virtual math::Vector3 GetAnchor(int _index) const;
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
+      public: virtual void SetAnchor(unsigned int _index,
+                  const math::Vector3 &_anchor);
 
       // Documentation inherited
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+      public: virtual void SetAxis(unsigned int _index,
+                  const math::Vector3 &_axis);
 
       // Documentation inherited
-      public: virtual math::Angle GetAngleImpl(int _index) const;
+      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual double GetVelocity(int _index) const;
+      public: virtual double GetVelocity(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetVelocity(int _index, double _angle);
+      public: virtual void SetVelocity(unsigned int _index, double _angle);
 
       // Documentation inherited
-      public: virtual void SetMaxForce(int _index, double _t);
+      public: virtual void SetMaxForce(unsigned int _index, double _t);
 
       // Documentation inherited
-      public: virtual double GetMaxForce(int _index);
+      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited
-      public: virtual void SetParam(int _parameter, double _value);
+      public: virtual void SetParam(unsigned int _parameter, double _value);
+
+      // Documentation inherited.
+      public: virtual bool SetHighStop(unsigned int _index,
+                  const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual bool SetLowStop(unsigned int _index,
+                  const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual bool SetParam(const std::string &_key,
+                                        unsigned int _index,
+                                        const boost::any &_value);
+
+      // Documentation inherited.
+      public: virtual double GetParam(const std::string &_key,
+                                                unsigned int _index);
 
       // Documentation inherited
-      protected: virtual void SetForceImpl(int _index, double _effort);
+      protected: virtual void SetForceImpl(unsigned int _index, double _effort);
     };
   }
 }

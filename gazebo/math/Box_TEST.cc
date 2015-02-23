@@ -18,8 +18,11 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/math/Box.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
+
+class BoxTest : public gazebo::testing::AutoLogFixture { };
 
 class ExampleBox : public ::testing::Test
 {
@@ -32,7 +35,7 @@ class ExampleBox : public ::testing::Test
     math::Box box;
 };
 
-TEST(BoxTest, EmptyConstructor)
+TEST_F(BoxTest, EmptyConstructor)
 {
   math::Box box;
   EXPECT_TRUE(box.min == math::Vector3(0, 0, 0));
@@ -76,20 +79,20 @@ TEST_F(ExampleBox, Merge)
                                math::Vector3(2, 2, 3)));
 }
 
-TEST(BoxTest, OperatorEqual)
+TEST_F(BoxTest, OperatorEqual)
 {
   math::Box box = math::Box(math::Vector3(1, 1, 1), math::Vector3(3, 3, 3));
   EXPECT_TRUE(box == math::Box(math::Vector3(1, 1, 1), math::Vector3(3, 3, 3)));
 }
 
-TEST(BoxTest, OperatorPlusEqual)
+TEST_F(BoxTest, OperatorPlusEqual)
 {
   math::Box box = math::Box(math::Vector3(1, 1, 1), math::Vector3(3, 3, 3));
   box += math::Box(math::Vector3(2, 2, 2), math::Vector3(4, 4, 4));
   EXPECT_TRUE(box == math::Box(math::Vector3(1, 1, 1), math::Vector3(4, 4, 4)));
 }
 
-TEST(BoxTest, OperatorPlus)
+TEST_F(BoxTest, OperatorPlus)
 {
   math::Box box = math::Box(math::Vector3(1, 1, 1), math::Vector3(4, 4, 4));
   box = box + math::Box(math::Vector3(-2, -2, -2), math::Vector3(4, 4, 4));

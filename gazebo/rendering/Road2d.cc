@@ -15,10 +15,12 @@
  *
 */
 
-#include "gazebo/transport/transport.hh"
+#include <algorithm>
 
+#include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Road2d.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -247,14 +249,10 @@ void Road2d::Segment::Load(msgs::Road _msg)
       vBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
   math::Vector3 pA, pB, tangent;
-  double factor = 1.0;
-  double theta = 0.0;
 
   math::Box bounds;
   bounds.min.Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
   bounds.max.Set(GZ_DBL_MIN, GZ_DBL_MIN, GZ_DBL_MIN);
-
-  float texCoord = 0.0;
 
   // length for each texture tile, same as road width as texture is square
   // (if texture size should change or made custom in a future version
@@ -267,7 +265,7 @@ void Road2d::Segment::Load(msgs::Road _msg)
   // Generate the triangles for the road
   for (unsigned int i = 0; i < this->points.size(); ++i)
   {
-    factor = 1.0;
+    double factor = 1.0;
 
     // update current road length
     if (i > 0)
@@ -277,7 +275,7 @@ void Road2d::Segment::Load(msgs::Road _msg)
 
     // assign texture coordinate as percentage of texture tile size
     // and let ogre/opengl handle the texture wrapping
-    texCoord = curLen/texMaxLen;
+    float texCoord = curLen/texMaxLen;
 
     // Start point is a special case
     if (i == 0)
@@ -307,7 +305,7 @@ void Road2d::Segment::Load(msgs::Road _msg)
 
     // The tangent is used to calculate the two verteces to either side of
     // the point. The vertices define the triangle mesh of the road
-    theta = atan2(tangent.x, -tangent.y);
+    double theta = atan2(tangent.x, -tangent.y);
 
     pA = pB = this->points[i];
     double w = (this->width * factor) * 0.5;
@@ -358,7 +356,27 @@ void Road2d::Segment::Load(msgs::Road _msg)
 
   vBuf->unlock();
 
-  this->setMaterial("Gazebo/Road");
+  if (_msg.has_material())
+  {
+    if (_msg.material().has_script())
+    {
+      for (int i = 0; i < _msg.material().script().uri_size(); ++i)
+      {
+        std::string matUri = _msg.material().script().uri(i);
+        if (!matUri.empty())
+          RenderEngine::Instance()->AddResourcePath(matUri);
+      }
+
+      std::string matName = _msg.material().script().name();
+
+      if (!matName.empty())
+        this->setMaterial(matName);
+     }
+  }
+  else
+  {
+    this->setMaterial("Gazebo/Road");
+  }
 }
 
 //////////////////////////////////////////////////

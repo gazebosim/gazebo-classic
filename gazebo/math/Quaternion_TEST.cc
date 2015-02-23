@@ -19,10 +19,14 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Quaternion.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(QuaternionTest, Quaternion)
+class QuaternionTest : public gazebo::testing::AutoLogFixture { };
+
+//////////////////////////////////////////////////
+TEST_F(QuaternionTest, Quaternion)
 {
   {
     math::Quaternion q;
@@ -256,3 +260,42 @@ TEST(QuaternionTest, Quaternion)
                 0, 0, 0, 1));
   }
 }
+
+//////////////////////////////////////////////////
+TEST_F(QuaternionTest, Integrate)
+{
+  // Integrate by zero, expect no change
+  {
+    const math::Quaternion q(0.5, 0.5, 0.5, 0.5);
+    EXPECT_EQ(q, q.Integrate(math::Vector3::Zero, 1.0));
+    EXPECT_EQ(q, q.Integrate(math::Vector3::UnitX, 0.0));
+    EXPECT_EQ(q, q.Integrate(math::Vector3::UnitY, 0.0));
+    EXPECT_EQ(q, q.Integrate(math::Vector3::UnitZ, 0.0));
+  }
+
+  // Integrate along single axes,
+  // expect linear change in roll, pitch, yaw
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    math::Quaternion qRoll  = q.Integrate(math::Vector3::UnitX, 1.0);
+    math::Quaternion qPitch = q.Integrate(math::Vector3::UnitY, 1.0);
+    math::Quaternion qYaw   = q.Integrate(math::Vector3::UnitZ, 1.0);
+    EXPECT_EQ(qRoll.GetAsEuler(),  math::Vector3::UnitX);
+    EXPECT_EQ(qPitch.GetAsEuler(), math::Vector3::UnitY);
+    EXPECT_EQ(qYaw.GetAsEuler(),   math::Vector3::UnitZ);
+  }
+
+  // Integrate a full rotation about different axes,
+  // expect no change.
+  {
+    const math::Quaternion q(0.5, 0.5, 0.5, 0.5);
+    const double fourPi = 4 * M_PI;
+    math::Quaternion qX = q.Integrate(math::Vector3::UnitX, fourPi);
+    math::Quaternion qY = q.Integrate(math::Vector3::UnitY, fourPi);
+    math::Quaternion qZ = q.Integrate(math::Vector3::UnitZ, fourPi);
+    EXPECT_EQ(q, qX);
+    EXPECT_EQ(q, qY);
+    EXPECT_EQ(q, qZ);
+  }
+}
+

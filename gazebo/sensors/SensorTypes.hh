@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_sensors
@@ -43,6 +44,8 @@ namespace gazebo
     class ForceTorqueSensor;
     class GpsSensor;
     class Noise;
+    class GaussianNoiseModel;
+    class ImageGaussianNoiseModel;
     class WirelessTransceiver;
     class WirelessTransmitter;
     class WirelessReceiver;
@@ -102,6 +105,14 @@ namespace gazebo
     /// \def NoisePtr
     /// \brief Shared pointer to Noise
     typedef boost::shared_ptr<Noise> NoisePtr;
+
+    /// \def GaussianNoisePtr
+    /// \brief Shared pointer to Noise
+    typedef boost::shared_ptr<GaussianNoiseModel> GaussianNoiseModelPtr;
+
+    /// \brief Shared pointer to Noise
+    typedef boost::shared_ptr<ImageGaussianNoiseModel>
+        ImageGaussianNoiseModelPtr;
 
     /// \def WirelessTransceiverPtr
     /// \brief Shared pointer to WirelessTransceiver

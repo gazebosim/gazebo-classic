@@ -23,6 +23,7 @@
 
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/MouseEvent.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,8 @@ namespace gazebo
   {
     /// \class MouseEventHandler MouseEventHandler.hh gui/Gui.hh
     /// \brief Processes and filters mouse events.
-    class MouseEventHandler : public SingletonT<MouseEventHandler>
+    class GAZEBO_VISIBLE MouseEventHandler
+      : public SingletonT<MouseEventHandler>
     {
       /// \def MouseEventFilter
       /// \brief Mouse event function pointer.
@@ -95,6 +97,12 @@ namespace gazebo
       public: void AddMoveFilter(const std::string &_name,
                   MouseEventFilter _filter);
 
+      /// \brief Add a filter to a mouse double click.
+      /// \param[in] _name Name associated with the filter.
+      /// \param[in] _filter Function to call when move event occurs.
+      public: void AddDoubleClickFilter(const std::string &_name,
+                  MouseEventFilter _filter);
+
       /// \brief Remove a filter from a mouse press.
       /// \param[in] _name Name associated with the filter to remove.
       public: void RemovePressFilter(const std::string &_name);
@@ -107,6 +115,10 @@ namespace gazebo
       /// \param[in] _name Name associated with the filter to remove.
       public: void RemoveMoveFilter(const std::string &_name);
 
+      /// \brief Remove a filter from a mouse click.
+      /// \param[in] _name Name associated with the filter to remove.
+      public: void RemoveDoubleClickFilter(const std::string &_name);
+
       /// \brief Process a mouse press event.
       /// \param[in] _event The mouse event.
       public: void HandlePress(const common::MouseEvent &_event);
@@ -118,6 +130,10 @@ namespace gazebo
       /// \brief Process a mouse move event.
       /// \param[in] _event The mouse event.
       public: void HandleMove(const common::MouseEvent &_event);
+
+      /// \brief Process a mouse double click event.
+      /// \param[in] _event The mouse event.
+      public: void HandleDoubleClick(const common::MouseEvent &_event);
 
       /// \brief Helper function to add a named filter to an event list.
       /// \param[in] _name Name associated with the _filter.
@@ -145,6 +161,9 @@ namespace gazebo
 
       /// \brief List of mouse move filters.
       private: std::list<Filter> moveFilters;
+
+      /// \brief List of mouse double click filters.
+      private: std::list<Filter> doubleClickFilters;
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<MouseEventHandler>;

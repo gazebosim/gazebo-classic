@@ -66,8 +66,8 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
 
   EXPECT_EQ(sensor->GetVerticalRayCount(), 1);
   EXPECT_EQ(sensor->GetVerticalRangeCount(), 1);
-  EXPECT_EQ(sensor->GetVerticalAngleMin(), -0.7554);
-  EXPECT_EQ(sensor->GetVerticalAngleMax(), 0.7554);
+  EXPECT_EQ(sensor->GetVerticalAngleMin(), 0.0);
+  EXPECT_EQ(sensor->GetVerticalAngleMax(), 0.0);
 
   EXPECT_TRUE(sensor->IsActive());
   EXPECT_TRUE(sensor->IsHorizontal());
@@ -82,15 +82,14 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
           _1, _2, _3, _4, _5));
 
   // wait for a few laser scans
+  int i = 0;
+  while (scanCount < 10 && i < 300)
   {
-    int i = 0;
-    while (scanCount < 10 && i < 300)
-    {
-      common::Time::MSleep(10);
-      i++;
-    }
-    EXPECT_LT(i, 300);
+    common::Time::MSleep(10);
+    mgr->Update();
+    i++;
   }
+  EXPECT_LT(i, 300);
 
   // Get all the range values
   std::vector<double> ranges;

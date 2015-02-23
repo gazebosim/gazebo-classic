@@ -22,20 +22,21 @@
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
 
-#include "gazebo/transport/TransportTypes.hh"
-
 #include "gazebo/rendering/RenderTypes.hh"
 
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    class ModelManipulatorPrivate;
+
     /// \class ModelManipulator ModelManipulator.hh gui/Gui.hh
     /// \brief Manipulator tool for translating/rotating/scaling models and
     /// links
-    class ModelManipulator : public SingletonT<ModelManipulator>
+    class GAZEBO_VISIBLE ModelManipulator : public SingletonT<ModelManipulator>
     {
       /// \brief Constructor
       private: ModelManipulator();
@@ -97,10 +98,43 @@ namespace gazebo
           const math::Vector3 &_axis,
           bool _local = false);
 
+      /// \brief Snap a point at intervals of a fixed distance. Currently used
+      /// to give a snapping behavior when moving models with a mouse.
+      /// \param[in] _point Input point.
+      /// \param[in] _interval Fixed distance interval at which the point
+      /// is snapped.
+      /// \param[in] _sensitivity Sensitivity of point snapping, in terms of a
+      /// percentage of the interval.
+      /// \return Snapped 3D point.
+      public: static math::Vector3 SnapPoint(const math::Vector3 &_point,
+          double _interval = 1.0, double _sensitivity = 0.4);
+
+      /// \brief Helper function to get the 3D position of mouse on ground
+      /// plane.
+      /// param[in] _camera Pointer to user camera.
+      /// param[in] _event Mouse event.
+      /// return Point of mouse-plane intersection in world coordinates.
+      public: static math::Vector3 GetMousePositionOnPlane(
+          rendering::CameraPtr _camera,
+          const common::MouseEvent &_event);
+
+      /// \brief Helper function to get the distance moved by the mouse.
+      /// \param[in] _camera Pointer to user camera.
+      /// \param[in] _pose Pose of origin.
+      /// \param[in] _axis Movement axis.
+      /// \param[in] _local True to get distance in local frame.
+      /// \return Mouse distance moved.
+      public: static math::Vector3 GetMouseMoveDistance(
+          rendering::CameraPtr _camera,
+          const math::Vector2i &_start, const math::Vector2i &_end,
+          const math::Pose &_pose, const math::Vector3 &_axis,
+          bool _local);
+
       /// \brief Helper function to get the distance moved by the mouse.
       /// \param[in] _pose Pose of origin.
       /// \param[in] _axis Movement axis.
-      /// \param[in] _local True to get distance in local frame set the _pose.
+      /// \param[in] _local True to get distance in local frame.
+      /// \return Mouse distance moved.
       private: math::Vector3 GetMouseMoveDistance(const math::Pose &_pose,
           const math::Vector3 &_axis, bool _local) const;
 
@@ -116,57 +150,12 @@ namespace gazebo
       /// \param[in] _vis Pointer to the visual whose scale is to be published.
       private: void PublishVisualScale(rendering::VisualPtr _vis);
 
-      /// \brief Selection object which users can interact with to manipulate
-      /// the model.
-      private: rendering::SelectionObjPtr selectionObj;
-
-      /// \brief The current manipulation mode.
-      private: std::string manipMode;
-
-      /// \brief Keep track of the mouse start pose before a move action.
-      private: math::Pose mouseMoveVisStartPose;
-
-      /// \brief Keep track of the mouse start screen position.
-      private: math::Vector2i mouseStart;
-
-      /// \brief The current selected visual.
-      private: rendering::VisualPtr selectedVis;
-
-      /// \brief The current visual attached to the mouse.
-      private: rendering::VisualPtr mouseMoveVis;
-
-      /// \brief Transportation node.
-      private: transport::NodePtr node;
-
-      /// \brief Model publisher that publishes model pose to the server.
-      private: transport::PublisherPtr modelPub;
-
-      /// \brief Light publisher that publishes light pose to the server.
-      private: transport::PublisherPtr lightPub;
-
-      /// \brief Pointer to the user camera.
-      private: rendering::UserCameraPtr userCamera;
-
-      /// \brief Pointer to the scene where models are in.
-      private: rendering::ScenePtr scene;
-
-      /// \brief Current mouse event.
-      private: common::MouseEvent mouseEvent;
-
-      /// \brief Current key event.
-      private: common::KeyEvent keyEvent;
-
-      /// \brief True if the model manipulator is initialized.
-      private: bool initialized;
-
-      /// \brief Scale of the visual attached to the mouse.
-      private: math::Vector3 mouseVisualScale;
-
-      /// \brief True to manipulate model in global frame.
-      private: bool globalManip;
-
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelManipulator>;
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: ModelManipulatorPrivate *dataPtr;
     };
   }
 }

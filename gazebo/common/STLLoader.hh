@@ -21,6 +21,7 @@
 #include <string>
 
 #include "gazebo/common/MeshLoader.hh"
+#include "gazebo/util/system.hh"
 
 #define LINE_MAX_LEN 256
 #define COR3_MAX 200000
@@ -36,7 +37,7 @@ namespace gazebo
 
     /// \class STLLoader STLLoader.hh common/common.hh
     /// \brief Class used to load STL mesh files
-    class STLLoader : public MeshLoader
+    class GAZEBO_VISIBLE STLLoader : public MeshLoader
     {
       /// \brief Constructor
       public: STLLoader();

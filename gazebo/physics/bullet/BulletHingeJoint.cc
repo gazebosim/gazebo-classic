@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A BulletHingeJoint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -137,11 +133,15 @@ void BulletHingeJoint::Init()
   // Throw an error if no links are given.
   else
   {
-    gzthrow("joint without links\n");
+    gzerr << "unable to create bullet hinge without links.\n";
+    return;
   }
 
   if (!this->bulletHinge)
-    gzthrow("unable to create bullet hinge constraint\n");
+  {
+    gzerr << "unable to create bullet hinge constraint\n";
+    return;
+  }
 
   // Give parent class BulletJoint a pointer to this constraint.
   this->constraint = this->bulletHinge;
@@ -171,7 +171,7 @@ void BulletHingeJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletHingeJoint::GetAnchor(int /*_index*/) const
+math::Vector3 BulletHingeJoint::GetAnchor(unsigned int /*_index*/) const
 {
   btTransform trans = this->bulletHinge->getAFrame();
   trans.getOrigin() +=
@@ -181,22 +181,16 @@ math::Vector3 BulletHingeJoint::GetAnchor(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
+void BulletHingeJoint::SetAxis(unsigned int /*_index*/,
+    const math::Vector3 &_axis)
 {
   // Note that _axis is given in a world frame,
   // but bullet uses a body-fixed frame
   if (this->bulletHinge == NULL)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
-
-    /// \TODO: currently we assume joint axis is specified in model frame,
-    /// this is incorrect, and should be corrected to be
-    /// joint frame which is specified in child link frame.
-    if (this->parentLink)
-      this->initialWorldAxis =
-        this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
-    else
-      this->initialWorldAxis = _axis;
+    math::Quaternion axisFrame = this->GetAxisFrame(0);
+    this->initialWorldAxis = axisFrame.RotateVector(_axis);
   }
   else
   {
@@ -211,18 +205,16 @@ void BulletHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetAngleImpl(int /*_index*/) const
+math::Angle BulletHingeJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   math::Angle result;
   if (this->bulletHinge)
     result = this->bulletHinge->getHingeAngle() - this->angleOffset;
-  else
-    gzwarn << "bulletHinge does not exist, returning default angle\n";
   return result;
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetVelocity(int _index, double _angle)
+void BulletHingeJoint::SetVelocity(unsigned int _index, double _angle)
 {
   // The following call should work, but doesn't:
   // this->bulletHinge->enableAngularMotor(true, _angle,
@@ -239,7 +231,7 @@ void BulletHingeJoint::SetVelocity(int _index, double _angle)
 }
 
 //////////////////////////////////////////////////
-double BulletHingeJoint::GetVelocity(int /*_index*/) const
+double BulletHingeJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0;
   math::Vector3 globalAxis = this->GetGlobalAxis(0);
@@ -251,19 +243,19 @@ double BulletHingeJoint::GetVelocity(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetMaxForce(int /*_index*/, double _t)
+void BulletHingeJoint::SetMaxForce(unsigned int /*_index*/, double _t)
 {
   this->bulletHinge->setMaxMotorImpulse(_t);
 }
 
 //////////////////////////////////////////////////
-double BulletHingeJoint::GetMaxForce(int /*_index*/)
+double BulletHingeJoint::GetMaxForce(unsigned int /*_index*/)
 {
   return this->bulletHinge->getMaxMotorImpulse();
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetForceImpl(int /*_index*/, double _effort)
+void BulletHingeJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 {
   if (this->bulletHinge)
   {
@@ -289,7 +281,7 @@ void BulletHingeJoint::SetForceImpl(int /*_index*/, double _effort)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetHighStop(int /*_index*/,
+bool BulletHingeJoint::SetHighStop(unsigned int /*_index*/,
                       const math::Angle &_angle)
 {
   Joint::SetHighStop(0, _angle);
@@ -300,11 +292,17 @@ void BulletHingeJoint::SetHighStop(int /*_index*/,
     // settings
     this->bulletHinge->setLimit(this->bulletHinge->getLowerLimit(),
                                 this->angleOffset + _angle.Radian());
+    return true;
+  }
+  else
+  {
+    gzerr << "bulletHinge not yet created.\n";
+    return false;
   }
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetLowStop(int /*_index*/,
+bool BulletHingeJoint::SetLowStop(unsigned int /*_index*/,
                      const math::Angle &_angle)
 {
   Joint::SetLowStop(0, _angle);
@@ -315,11 +313,17 @@ void BulletHingeJoint::SetLowStop(int /*_index*/,
     // settings
     this->bulletHinge->setLimit(this->angleOffset + _angle.Radian(),
                                 this->bulletHinge->getUpperLimit());
+    return true;
+  }
+  else
+  {
+    gzerr << "bulletHinge not yet created.\n";
+    return false;
   }
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetHighStop(int /*_index*/)
+math::Angle BulletHingeJoint::GetHighStop(unsigned int /*_index*/)
 {
   math::Angle result;
 
@@ -332,7 +336,7 @@ math::Angle BulletHingeJoint::GetHighStop(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetLowStop(int /*_index*/)
+math::Angle BulletHingeJoint::GetLowStop(unsigned int /*_index*/)
 {
   math::Angle result;
   if (this->bulletHinge)
@@ -344,9 +348,10 @@ math::Angle BulletHingeJoint::GetLowStop(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletHingeJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 BulletHingeJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
-  math::Vector3 result;
+  math::Vector3 result = this->initialWorldAxis;
+
   if (this->bulletHinge)
   {
     // I have not verified the following math, though I based it on internal
@@ -356,7 +361,6 @@ math::Vector3 BulletHingeJoint::GetGlobalAxis(int /*_index*/) const
       bulletHinge->getFrameOffsetA().getBasis().getColumn(2);
     result = BulletTypes::ConvertVector3(vec);
   }
-  else
-    gzwarn << "bulletHinge does not exist, returning fake axis\n";
+
   return result;
 }

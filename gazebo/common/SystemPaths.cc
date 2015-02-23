@@ -15,7 +15,6 @@
  *
  */
 
-#include <assert.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -27,10 +26,10 @@
 
 #include <sdf/sdf.hh>
 
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -44,10 +43,27 @@ SystemPaths::SystemPaths()
   this->pluginPaths.clear();
   this->modelPaths.clear();
 
+  try
+  {
+    // Get a path suitable for temporary files
+    this->tmpPath = boost::filesystem::temp_directory_path();
+
+    // Get a unique path suitable for temporary files. If there are multiple
+    // gazebo instances on the same machine, each one will have its own
+    // temporary directory
+    this->tmpInstancePath = boost::filesystem::unique_path("gazebo-%%%%%%");
+  }
+  catch(const boost::system::error_code &_ex)
+  {
+    gzerr << "Failed creating temp directory. Reason: "
+          << _ex.message() << "\n";
+    return;
+  }
+
   char *homePath = getenv("HOME");
   std::string home;
   if (!homePath)
-    home = "/tmp/gazebo";
+    home = this->GetTmpPath() + "/gazebo";
   else
     home = homePath;
 
@@ -59,7 +75,7 @@ SystemPaths::SystemPaths()
   std::string fullPath;
   if (!path)
   {
-    if (home != "/tmp/gazebo")
+    if (home != this->GetTmpPath() + "/gazebo")
       fullPath = home + "/.gazebo";
     else
       fullPath = home;
@@ -133,6 +149,24 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
 }
 
 /////////////////////////////////////////////////
+std::string SystemPaths::GetTmpPath()
+{
+  return this->tmpPath.string();
+}
+
+/////////////////////////////////////////////////
+std::string SystemPaths::GetTmpInstancePath()
+{
+  return this->tmpInstancePath.string();
+}
+
+/////////////////////////////////////////////////
+std::string SystemPaths::GetDefaultTestPath()
+{
+  return this->GetTmpInstancePath() + "/gazebo_test";
+}
+
+/////////////////////////////////////////////////
 void SystemPaths::UpdateModelPaths()
 {
   std::string delim(":");
@@ -141,12 +175,11 @@ void SystemPaths::UpdateModelPaths()
   char *pathCStr = getenv("GAZEBO_MODEL_PATH");
   if (!pathCStr || *pathCStr == '\0')
   {
-    // gzdbg << "gazeboPaths is empty and GAZEBO_RESOURCE_PATH doesn't exist. "
-    //  << "Set GAZEBO_RESOURCE_PATH to gazebo's installation path. "
-    //  << "...or are you using SystemPlugins?\n";
-    return;
+    // No env var; take the compile-time default.
+    path = GAZEBO_MODEL_PATH;
   }
-  path = pathCStr;
+  else
+    path = pathCStr;
 
   /// \TODO: Use boost to split string.
   size_t pos1 = 0;

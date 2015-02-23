@@ -22,17 +22,20 @@
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace common
   {
+    class SphericalCoordinatesPrivate;
+
     /// \addtogroup gazebo_common
     /// \{
 
     /// \class SphericalCoordinates SphericalCoordinates.hh commmon/common.hh
     /// \brief Convert spherical coordinates for planetary surfaces.
-    class SphericalCoordinates
+    class GAZEBO_VISIBLE SphericalCoordinates
     {
       /// \enum SurfaceType
       /// \brief Unique identifiers for planetary surface models.
@@ -69,20 +72,32 @@ namespace gazebo
       /// \param[in] _xyz Cartesian position vector in gazebo's world frame.
       /// \return Cooordinates: geodetic latitude (deg), longitude (deg),
       ///         altitude above sea level (m).
-      public: math::Vector3 SphericalFromLocal(const math::Vector3 &_xyz)
-              const;
+      public: math::Vector3 SphericalFromLocal(const math::Vector3 &_xyz) const;
 
       /// \brief Convert a Cartesian velocity vector in the local gazebo frame
       ///        to a global Cartesian frame with components East, North, Up.
       /// \param[in] _xyz Cartesian vector in gazebo's world frame.
       /// \return Rotated vector with components (x,y,z): (East, North, Up).
-      public: math::Vector3 GlobalFromLocal(const math::Vector3 &_xyz)
-              const;
+      public: math::Vector3 GlobalFromLocal(const math::Vector3 &_xyz) const;
 
       /// \brief Convert a string to a SurfaceType.
       /// \param[in] _str String to convert.
       /// \return Conversion to SurfaceType.
       public: static SurfaceType Convert(const std::string &_str);
+
+      /// \brief Get the distance between two points expressed in geographic
+      /// latitude and longitude. It assumes that both points are at sea level.
+      /// Example: _latA = 38.0016667 and _lonA = -123.0016667) represents
+      /// the point with latitude 38d 0'6.00"N and longitude 123d 0'6.00"W.
+      /// \param[in] _latA Latitude of point A.
+      /// \param[in] _longA Longitude of point A.
+      /// \param[in] _latB Latitude of point B.
+      /// \param[in] _longB Longitude of point B.
+      /// \return Distance in meters.
+      public: static double Distance(const math::Angle &_latA,
+                                     const math::Angle &_lonA,
+                                     const math::Angle &_latB,
+                                     const math::Angle &_lonB);
 
       /// \brief Get SurfaceType currently in use.
       /// \return Current SurfaceType value.
@@ -126,21 +141,9 @@ namespace gazebo
       /// \param[in] _angle Heading offset for gazebo frame.
       public: void SetHeadingOffset(const math::Angle &_angle);
 
-      /// \brief Type of surface being used.
-      private: SurfaceType surfaceType;
-
-      /// \brief Latitude of reference point.
-      private: math::Angle latitudeReference;
-
-      /// \brief Longitude of reference point.
-      private: math::Angle longitudeReference;
-
-      /// \brief Elevation of reference point relative to sea level in meters.
-      private: double elevationReference;
-
-      /// \brief Heading offset, expressed as angle from East to
-      ///        gazebo x-axis, or equivalently from North to gazebo y-axis.
-      private: math::Angle headingOffset;
+      /// internal
+      /// \brief Pointer to the private data
+      private: SphericalCoordinatesPrivate *dataPtr;
     };
     /// \}
   }

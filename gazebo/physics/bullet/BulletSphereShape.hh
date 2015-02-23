@@ -25,6 +25,7 @@
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/SphereShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet sphere collision
-    class BulletSphereShape : public SphereShape
+    class GAZEBO_VISIBLE BulletSphereShape : public SphereShape
     {
       /// \brief Constructor
       public: BulletSphereShape(CollisionPtr _parent) : SphereShape(_parent) {}

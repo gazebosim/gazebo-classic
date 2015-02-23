@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "gazebo/rendering/deferred_shading/MergeMaterialGenerator.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,8 @@ namespace gazebo
   {
     /// Class for handling materials who did not specify techniques for the
     /// merging step of deferred/inferred lighting.
-    class MergeSchemeHandler : public Ogre::MaterialManager::Listener
+    class GAZEBO_VISIBLE MergeSchemeHandler :
+      public Ogre::MaterialManager::Listener
     {
       public: MergeSchemeHandler(bool _useDSF) : useDSF(_useDSF)
       {

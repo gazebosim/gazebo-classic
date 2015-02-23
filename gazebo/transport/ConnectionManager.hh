@@ -29,6 +29,7 @@
 
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Connection.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +40,8 @@ namespace gazebo
 
     /// \class ConnectionManager ConnectionManager.hh transport/transport.hh
     /// \brief Manager of connections
-    class ConnectionManager : public SingletonT<ConnectionManager>
+    class GAZEBO_VISIBLE ConnectionManager :
+      public SingletonT<ConnectionManager>
     {
       /// \brief Constructor
       private: ConnectionManager();
@@ -47,12 +49,15 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~ConnectionManager();
 
-      /// \brief Initialize the connection manager
-      /// \param[in] _masterHost Host where the master is running
-      /// \param[in] _masterPort Port where the master is running
+      /// \brief Initialize the connection manager.
+      /// \param[in] _masterHost Host where the master is running.
+      /// \param[in] _masterPort Port where the master is running.
+      /// \param[in] _timeoutIterations Number of times to wait for
+      /// a connection to master.
       /// \return true if initialization succeeded, false otherwise
       public: bool Init(const std::string &_masterHost,
-                        unsigned int _masterPort);
+                        unsigned int _masterPort,
+                        uint32_t _timeoutIterations = 30);
 
       /// \brief Run the connection manager loop.  Does not return until
       /// stopped.
@@ -68,11 +73,11 @@ namespace gazebo
       /// \brief Stop the conneciton manager
       public: void Stop();
 
-      /// \brief Subscribe to a topic
-      /// \param[in] _topic The topic to subscribe to
-      /// \param[in] _msgType The type of the topic
+      /// \brief Subscribe to a topic.
+      /// \param[in] _topic The topic to subscribe to.
+      /// \param[in] _msgType The type of the topic.
       /// \param[in] _latching If true, latch the latest incoming message;
-      /// otherwise don't
+      /// otherwise don't.
       public: void Subscribe(const std::string &_topic,
                               const std::string &_msgType,
                               bool _latching);

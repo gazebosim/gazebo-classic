@@ -79,10 +79,15 @@ TEST_P(ExamplePlugins, Build)
 }
 
 INSTANTIATE_TEST_CASE_P(ExamplePlugins, ExamplePlugins, ::testing::Values(
-  "hello_world"
-  , "world_edit"
-  , "model_push"
+  "animate_joints"
+  , "animate_pose"
   , "factory"
+  , "hello_world"
+  , "model_push"
+  , "parameters"
+  , "projector"
+  , "system_gui_plugin"
+  , "world_edit"
 ));
 
 int main(int argc, char **argv)

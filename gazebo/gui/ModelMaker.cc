@@ -31,6 +31,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
+#include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/ModelMaker.hh"
@@ -43,6 +44,7 @@ using namespace gui;
 : EntityMaker()
 {
   this->state = 0;
+  this->leftMousePressed = false;
   this->clone = false;
 }
 
@@ -53,35 +55,39 @@ ModelMaker::~ModelMaker()
 }
 
 /////////////////////////////////////////////////
-// bool ModelMaker::InitFromModel(const std::string & /*_modelName*/)
-// {
-//   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-//   if (this->modelVisual)
-//   {
-//     scene->RemoveVisual(this->modelVisual);
-//     this->modelVisual.reset();
-//     this->visuals.clear();
-//   }
-//
-//   // This function is currently not executed. Commenting out the following
-//   // line to prevent a compile warning.
-//   // this->modelVisual =
-//   // scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
-//
-//   if (!this->modelVisual)
-//   {
-//     gzerr << "Unable to clone\n";
-//     return false;
-//   }
-//
-//   this->clone = true;
-//
-//   return true;
-// }
+bool ModelMaker::InitFromModel(const std::string & _modelName)
+{
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  if (this->modelVisual)
+  {
+    scene->RemoveVisual(this->modelVisual);
+    this->modelVisual.reset();
+    this->visuals.clear();
+  }
+
+  rendering::VisualPtr vis = scene->GetVisual(_modelName);
+  if (!vis)
+  {
+    gzerr << "Model: '" << _modelName << "' does not exist." << std::endl;
+    return false;
+  }
+
+  this->modelVisual = vis->Clone(
+      _modelName + "_clone_tmp", scene->GetWorldVisual());
+
+  if (!this->modelVisual)
+  {
+    gzerr << "Unable to clone\n";
+    return false;
+  }
+  this->clone = true;
+  return true;
+}
 
 /////////////////////////////////////////////////
 bool ModelMaker::InitFromSDFString(const std::string &_data)
 {
+  this->clone = false;
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
   if (this->modelVisual)
@@ -268,10 +274,16 @@ void ModelMaker::OnMousePush(const common::MouseEvent &/*_event*/)
 /////////////////////////////////////////////////
 void ModelMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
-  if (_event.button == common::MouseEvent::LEFT && !_event.dragging)
+  if (_event.button == common::MouseEvent::LEFT)
   {
-    this->CreateTheEntity();
-    this->Stop();
+    // Place if not dragging, or if dragged for less than 50 pixels.
+    // The 50 pixels is used to account for accidental mouse movement
+    // when placing an object.
+    if (!_event.dragging || _event.pressPos.Distance(_event.pos) < 50)
+    {
+      this->CreateTheEntity();
+      this->Stop();
+    }
   }
 }
 
@@ -279,41 +291,11 @@ void ModelMaker::OnMouseRelease(const common::MouseEvent &_event)
 void ModelMaker::OnMouseMove(const common::MouseEvent &_event)
 {
   math::Pose pose = this->modelVisual->GetWorldPose();
-
-  math::Vector3 origin1, dir1, p1;
-  math::Vector3 origin2, dir2, p2;
-
-  // Cast two rays from the camera into the world
-  this->camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
-      origin1, dir1);
-
-  // Compute the distance from the camera to plane of translation
-  math::Plane plane(math::Vector3(0, 0, 1), 0);
-
-  double dist1 = plane.Distance(origin1, dir1);
-
-  // Compute two points on the plane. The first point is the current
-  // mouse position, the second is the previous mouse position
-  p1 = origin1 + dir1 * dist1;
-  pose.pos = p1;
+  pose.pos = ModelManipulator::GetMousePositionOnPlane(this->camera, _event);
 
   if (!_event.shift)
   {
-    if (ceil(pose.pos.x) - pose.pos.x <= .4)
-      pose.pos.x = ceil(pose.pos.x);
-    else if (pose.pos.x - floor(pose.pos.x) <= .4)
-      pose.pos.x = floor(pose.pos.x);
-
-    if (ceil(pose.pos.y) - pose.pos.y <= .4)
-      pose.pos.y = ceil(pose.pos.y);
-    else if (pose.pos.y - floor(pose.pos.y) <= .4)
-      pose.pos.y = floor(pose.pos.y);
-
-    /*  if (ceil(pose.pos.z) - pose.pos.z <= .4)
-        pose.pos.z = ceil(pose.pos.z);
-        else if (pose.pos.z - floor(pose.pos.z) <= .4)
-        pose.pos.z = floor(pose.pos.z);
-        */
+    pose.pos = ModelManipulator::SnapPoint(pose.pos);
   }
   pose.pos.z = this->modelVisual->GetWorldPose().pos.z;
 

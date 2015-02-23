@@ -31,6 +31,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/CollisionState.hh"
 #include "gazebo/physics/Entity.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -40,7 +41,7 @@ namespace gazebo
     /// \{
 
     /// \brief Base class for all collision entities
-    class Collision : public Entity
+    class GAZEBO_VISIBLE Collision : public Entity
     {
       /// \brief Constructor.
       /// \param[in] _link Link that contains this collision object.
@@ -103,7 +104,14 @@ namespace gazebo
       /// \brief Get the shape type.
       /// \return The shape type.
       /// \sa EntityType
-      public: unsigned int GetShapeType();
+      public: unsigned int GetShapeType() const;
+
+      /// \brief Get the shape type.
+      /// Deprecated in favor of const version.
+      /// \return The shape type.
+      /// \sa EntityType
+      public: unsigned int GetShapeType()
+                           GAZEBO_DEPRECATED(4.0);
 
       /// \brief Set the shape for this collision.
       /// \param[in] _shape The shape for this collision object.
@@ -116,22 +124,6 @@ namespace gazebo
       /// \brief Set the scale of the collision.
       /// \param[in] _scale Scale to set the collision to.
       public: void SetScale(const math::Vector3 &_scale);
-
-      /// \brief Turn contact recording on or off.
-      /// Deprecated by?
-      /// \param[in] _enable True to enable collision contacts.
-      public: void SetContactsEnabled(bool _enable) GAZEBO_DEPRECATED(2.0);
-
-      /// \brief Return true of contacts are on.
-      /// Deprecated by?
-      /// \return True of contact are on.
-      public: bool GetContactsEnabled() const GAZEBO_DEPRECATED(2.0);
-
-      /// \brief Add an occurance of a contact to this collision.
-      /// Deprecated by?
-      /// \param[in] _contact The contact which was detected by a collision
-      /// engine.
-      public: void AddContact(const Contact &_contact) GAZEBO_DEPRECATED(2.0);
 
       /// \brief Get the linear velocity of the collision.
       /// \return The linear velocity relative to the parent model.
@@ -192,12 +184,20 @@ namespace gazebo
       /// \brief Number of contacts allowed for this collision.
       /// This overrides global value (in PhysicsEngine) if specified.
       /// \param[in] _maxContacts max num contacts allowed for this collision.
-      public: virtual void SetMaxContacts(double _maxContacts);
+      public: virtual void SetMaxContacts(unsigned int _maxContacts);
 
       /// \brief returns number of contacts allowed for this collision.
       /// This overrides global value (in PhysicsEngine) if specified.
       /// \return max num contacts allowed for this collision.
-      public: virtual int GetMaxContacts();
+      public: virtual unsigned int GetMaxContacts();
+
+      /// \brief Indicate that the world pose should be recalculated.
+      /// The recalculation will be done when Collision::GetWorldPose is
+      /// called.
+      public: void SetWorldPoseDirty();
+
+      // Documentation inherited.
+      public: virtual const math::Pose &GetWorldPose() const;
 
       /// \brief Helper function used to create a collision visual message.
       /// \return Visual message for a collision.
@@ -213,7 +213,7 @@ namespace gazebo
       protected: ShapePtr shape;
 
       /// \brief The surface parameters.
-      private: SurfaceParamsPtr surface;
+      protected: SurfaceParamsPtr surface;
 
       /// \brief The laser retro value.
       private: float laserRetro;
@@ -222,10 +222,13 @@ namespace gazebo
       private: CollisionState state;
 
       /// \brief Number of contact points allowed for this collision.
-      private: int maxContacts;
+      private: unsigned int maxContacts;
 
       /// \brief Unique id for collision visual.
       private: uint32_t collisionVisualId;
+
+      /// \brief True if the world pose should be recalculated.
+      private: mutable bool worldPoseDirty;
     };
     /// \}
   }

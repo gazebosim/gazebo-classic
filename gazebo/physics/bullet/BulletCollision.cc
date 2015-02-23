@@ -14,14 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: BulletCollision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
+
+#include "gazebo/physics/PlaneShape.hh"
 
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletSurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -32,6 +31,7 @@ BulletCollision::BulletCollision(LinkPtr _parent)
 {
   this->SetName("Bullet_Collision");
   this->collisionShape = NULL;
+  this->surface.reset(new BulletSurfaceParams());
 }
 
 //////////////////////////////////////////////////
@@ -106,6 +106,18 @@ math::Box BulletCollision::GetBoundingBox() const
 
     result.min.Set(btMin.x(), btMin.y(), btMin.z());
     result.max.Set(btMax.x(), btMax.y(), btMax.z());
+
+    if (this->GetShapeType() & PLANE_SHAPE)
+    {
+      PlaneShapePtr plane =
+        boost::dynamic_pointer_cast<PlaneShape>(this->shape);
+      math::Vector3 normal = plane->GetNormal();
+      if (normal == math::Vector3::UnitZ)
+      {
+        // Should check altitude, but it's not implemented
+        result.max.z =  0.0;
+      }
+    }
   }
   return result;
 }
@@ -136,4 +148,10 @@ btCollisionShape *BulletCollision::GetCollisionShape() const
 void BulletCollision::SetCompoundShapeIndex(int /*_index*/)
 {
   // this->compoundShapeIndex = 0;
+}
+
+/////////////////////////////////////////////////
+BulletSurfaceParamsPtr BulletCollision::GetBulletSurface() const
+{
+  return boost::dynamic_pointer_cast<BulletSurfaceParams>(this->surface);
 }

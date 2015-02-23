@@ -25,6 +25,7 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -40,7 +41,7 @@ namespace gazebo
     /// will intelligently generate fixed joints between the gripper and an
     /// object within the gripper. This allows the object to be manipulated
     /// without falling or behaving poorly.
-    class Gripper
+    class GAZEBO_VISIBLE Gripper
     {
       /// \brief Constructor
       /// \param[in] _model The model which contains the Gripper.
@@ -106,9 +107,7 @@ namespace gazebo
       private: std::vector<msgs::Contact> contacts;
 
       /// \brief Mutex used to protect reading/writing the sonar message.
-      /// static has little sense here but it was used to keep ABI stable
-      /// new releases already have it defined as a non-static member.
-      private: static boost::mutex mutexContacts;
+      private: boost::mutex mutexContacts;
 
       /// \brief True if the gripper has an object.
       private: bool attached;

@@ -16,6 +16,7 @@
 */
 #include <math.h>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/gzmath.hh"
 
@@ -56,6 +57,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->setObjectName("GLWidget");
   this->state = "select";
   this->sceneCreated = false;
+  this->copyEntityName = "";
 
   this->setFocusPolicy(Qt::StrongFocus);
 
@@ -63,12 +65,12 @@ GLWidget::GLWidget(QWidget *_parent)
 
   setAttribute(Qt::WA_OpaquePaintEvent, true);
   setAttribute(Qt::WA_PaintOnScreen, true);
-//  setMinimumSize(320, 240);
 
   this->renderFrame = new QFrame;
   this->renderFrame->setFrameShape(QFrame::NoFrame);
   this->renderFrame->setSizePolicy(QSizePolicy::Expanding,
                                    QSizePolicy::Expanding);
+  this->renderFrame->setContentsMargins(0, 0, 0, 0);
   this->renderFrame->show();
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(this->renderFrame);
@@ -135,11 +137,22 @@ GLWidget::GLWidget(QWidget *_parent)
 
   MouseEventHandler::Instance()->AddMoveFilter("glwidget",
       boost::bind(&GLWidget::OnMouseMove, this, _1));
+
+  MouseEventHandler::Instance()->AddDoubleClickFilter("glwidget",
+      boost::bind(&GLWidget::OnMouseDoubleClick, this, _1));
+
+  connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
+  connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
 }
 
 /////////////////////////////////////////////////
 GLWidget::~GLWidget()
 {
+  MouseEventHandler::Instance()->RemovePressFilter("glwidget");
+  MouseEventHandler::Instance()->RemoveReleaseFilter("glwidget");
+  MouseEventHandler::Instance()->RemoveMoveFilter("glwidget");
+  MouseEventHandler::Instance()->RemoveDoubleClickFilter("glwidget");
+
   this->connections.clear();
   this->node.reset();
   this->modelPub.reset();
@@ -164,14 +177,20 @@ bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
 void GLWidget::showEvent(QShowEvent *_event)
 {
   QApplication::flush();
-  this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
-    CreateWindow(this->GetOgreHandle(), this->width(), this->height());
+
+  if (this->windowId < 0)
+  {
+    this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
+        CreateWindow(this->GetOgreHandle(), this->width(), this->height());
+    if (this->userCamera)
+    {
+      rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+        this->windowId, this->userCamera);
+    }
+  }
 
   QWidget::showEvent(_event);
 
-  if (this->userCamera)
-    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-        this->windowId, this->userCamera);
   this->setFocus();
 }
 
@@ -271,6 +290,18 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   this->mouseEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
 
+  if (this->mouseEvent.control)
+  {
+    if (_event->key() == Qt::Key_C && this->selectedVis)
+    {
+      g_copyAct->trigger();
+    }
+    else if (_event->key() == Qt::Key_V && !this->copyEntityName.empty())
+    {
+      g_pasteAct->trigger();
+    }
+  }
+
   ModelManipulator::Instance()->OnKeyPressEvent(this->keyEvent);
 
   this->userCamera->HandleKeyPressEvent(this->keyText);
@@ -327,32 +358,36 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void GLWidget::mouseDoubleClickEvent(QMouseEvent * /*_event*/)
+void GLWidget::mouseDoubleClickEvent(QMouseEvent *_event)
 {
-  rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
-  if (vis)
-  {
-    if (vis->IsPlane())
-    {
-      math::Pose pose, camPose;
-      camPose = this->userCamera->GetWorldPose();
-      if (this->scene->GetFirstContact(this->userCamera,
-                                   this->mouseEvent.pos, pose.pos))
-      {
-        this->userCamera->SetFocalPoint(pose.pos);
+  if (!this->scene)
+    return;
 
-        math::Vector3 dir = pose.pos - camPose.pos;
-        pose.pos = camPose.pos + (dir * 0.8);
+  this->mouseEvent.pressPos.Set(_event->pos().x(), _event->pos().y());
+  this->mouseEvent.prevPos = this->mouseEvent.pressPos;
 
-        pose.rot = this->userCamera->GetWorldRotation();
-        this->userCamera->MoveToPosition(pose, 0.5);
-      }
-    }
-    else
-    {
-      this->userCamera->MoveToVisual(vis);
-    }
-  }
+  /// Set the button which cause the press event
+  if (_event->button() == Qt::LeftButton)
+    this->mouseEvent.button = common::MouseEvent::LEFT;
+  else if (_event->button() == Qt::RightButton)
+    this->mouseEvent.button = common::MouseEvent::RIGHT;
+  else if (_event->button() == Qt::MidButton)
+    this->mouseEvent.button = common::MouseEvent::MIDDLE;
+
+  this->mouseEvent.buttons = common::MouseEvent::NO_BUTTON;
+  this->mouseEvent.type = common::MouseEvent::PRESS;
+
+  this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
+    common::MouseEvent::LEFT : 0x0;
+  this->mouseEvent.buttons |= _event->buttons() & Qt::RightButton ?
+    common::MouseEvent::RIGHT : 0x0;
+  this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
+    common::MouseEvent::MIDDLE : 0x0;
+
+  this->mouseEvent.dragging = false;
+
+  // Process Mouse Events
+  MouseEventHandler::Instance()->HandleDoubleClick(this->mouseEvent);
 }
 
 /////////////////////////////////////////////////
@@ -427,6 +462,37 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
     ModelManipulator::Instance()->OnMouseMoveEvent(this->mouseEvent);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
+{
+  rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
+  if (vis && gui::get_entity_id(vis->GetRootVisual()->GetName()))
+  {
+    if (vis->IsPlane())
+    {
+      math::Pose pose, camPose;
+      camPose = this->userCamera->GetWorldPose();
+      if (this->scene->GetFirstContact(this->userCamera,
+                                   this->mouseEvent.pos, pose.pos))
+      {
+        this->userCamera->SetFocalPoint(pose.pos);
+        math::Vector3 dir = pose.pos - camPose.pos;
+        pose.pos = camPose.pos + (dir * 0.8);
+        pose.rot = this->userCamera->GetWorldRotation();
+        this->userCamera->MoveToPosition(pose, 0.5);
+      }
+    }
+    else
+    {
+      this->userCamera->MoveToVisual(vis);
+    }
+  }
+  else
+    return false;
 
   return true;
 }
@@ -576,15 +642,13 @@ void GLWidget::OnMouseReleaseNormal()
       this->userCamera->GetVisual(this->mouseEvent.pos);
     if (vis)
     {
+      vis = vis->GetRootVisual();
+      this->SetSelectedVisual(vis);
+      event::Events::setSelectedEntity(vis->GetName(), "normal");
+
       if (this->mouseEvent.button == common::MouseEvent::RIGHT)
       {
         g_modelRightMenu->Run(vis->GetName(), QCursor::pos());
-      }
-      else if (this->mouseEvent.button == common::MouseEvent::LEFT)
-      {
-        vis = vis->GetRootVisual();
-        this->SetSelectedVisual(vis);
-        event::Events::setSelectedEntity(vis->GetName(), "normal");
       }
     }
     else
@@ -597,8 +661,41 @@ void GLWidget::OnMouseReleaseNormal()
 //////////////////////////////////////////////////
 void GLWidget::ViewScene(rendering::ScenePtr _scene)
 {
+  // The user camera name.
+  std::string cameraBaseName = "gzclient_camera";
+  std::string cameraName = cameraBaseName;
+
+  transport::ConnectionPtr connection = transport::connectToMaster();
+  if (connection)
+  {
+    std::string topicData;
+    msgs::Packet packet;
+    msgs::Request request;
+    msgs::GzString_V topics;
+
+    request.set_id(0);
+    request.set_request("get_topics");
+    connection->EnqueueMsg(msgs::Package("request", request), true);
+    connection->Read(topicData);
+
+    packet.ParseFromString(topicData);
+    topics.ParseFromString(packet.serialized_data());
+
+    std::string searchable;
+    for (int i = 0; i < topics.data_size(); ++i)
+      searchable += topics.data(i);
+
+    int i = 0;
+    while (searchable.find(cameraName) != std::string::npos)
+    {
+      cameraName = cameraBaseName + boost::lexical_cast<std::string>(++i);
+    }
+  }
+  else
+    gzerr << "Unable to connect to a running Gazebo master.\n";
+
   if (_scene->GetUserCameraCount() == 0)
-    this->userCamera = _scene->CreateUserCamera("gzclient_camera");
+    this->userCamera = _scene->CreateUserCamera(cameraName);
   else
     this->userCamera = _scene->GetUserCamera(0);
 
@@ -662,7 +759,7 @@ std::string GLWidget::GetOgreHandle() const
   ogreHandle += boost::lexical_cast<std::string>(
       static_cast<uint32_t>(info.screen()));
   ogreHandle += ":";
-  assert(q_parent);
+  GZ_ASSERT(q_parent, "q_parent is null");
   ogreHandle += boost::lexical_cast<std::string>(
       static_cast<uint64_t>(q_parent->winId()));
 #endif
@@ -767,14 +864,12 @@ void GLWidget::OnFPS()
   this->userCamera->SetViewController(
       rendering::FPSViewController::GetTypeString());
 }
-
 /////////////////////////////////////////////////
 void GLWidget::OnOrbit()
 {
   this->userCamera->SetViewController(
       rendering::OrbitViewController::GetTypeString());
 }
-
 
 /////////////////////////////////////////////////
 void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
@@ -805,6 +900,11 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
   if (this->selectedVis && !this->selectedVis->IsPlane())
   {
     this->selectedVis->SetHighlighted(true);
+    g_copyAct->setEnabled(true);
+  }
+  else
+  {
+    g_copyAct->setEnabled(false);
   }
 }
 
@@ -820,19 +920,60 @@ void GLWidget::OnManipMode(const std::string &_mode)
 }
 
 /////////////////////////////////////////////////
-void GLWidget::Paste(const std::string &_object)
+void GLWidget::OnCopy()
 {
-  if (!_object.empty())
-  {
-    this->ClearSelection();
-    if (this->entityMaker)
-      this->entityMaker->Stop();
+  if (this->selectedVis)
+    this->Copy(this->selectedVis->GetName());
+}
 
-    // \todo Put this back in when pasting is enabled again
-    // this->modelMaker.InitFromModel(_object);
-    this->entityMaker = &this->modelMaker;
-    this->entityMaker->Start(this->userCamera);
-    gui::Events::manipMode("make_entity");
+/////////////////////////////////////////////////
+void GLWidget::OnPaste()
+{
+  this->Paste(this->copyEntityName);
+}
+
+/////////////////////////////////////////////////
+void GLWidget::Copy(const std::string &_name)
+{
+  this->copyEntityName = _name;
+  g_pasteAct->setEnabled(true);
+}
+
+/////////////////////////////////////////////////
+void GLWidget::Paste(const std::string &_name)
+{
+  if (!_name.empty())
+  {
+    bool isModel = false;
+    bool isLight = false;
+    if (scene->GetLight(_name))
+      isLight = true;
+    else if (scene->GetVisual(_name))
+      isModel = true;
+
+    if (isLight || isModel)
+    {
+      this->ClearSelection();
+      if (this->entityMaker)
+        this->entityMaker->Stop();
+
+      if (isLight && this->lightMaker.InitFromLight(_name))
+      {
+        this->entityMaker = &this->lightMaker;
+        this->entityMaker->Start(this->userCamera);
+        // this makes the entity appear at the mouse cursor
+        this->entityMaker->OnMouseMove(this->mouseEvent);
+        gui::Events::manipMode("make_entity");
+      }
+      else if (isModel && this->modelMaker.InitFromModel(_name))
+      {
+        this->entityMaker = &this->modelMaker;
+        this->entityMaker->Start(this->userCamera);
+        // this makes the entity appear at the mouse cursor
+        this->entityMaker->OnMouseMove(this->mouseEvent);
+        gui::Events::manipMode("make_entity");
+      }
+    }
   }
 }
 
@@ -853,7 +994,6 @@ void GLWidget::ClearSelection()
 /////////////////////////////////////////////////
 void GLWidget::OnSetSelectedEntity(const std::string &_name,
                                    const std::string &_mode)
-
 {
   if (!_name.empty())
   {
@@ -909,7 +1049,13 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
   {
     if (this->selectedVis && this->selectedVis->GetName() == _msg->data())
     {
+      this->selectedVis.reset();
       this->SetSelectedVisual(rendering::VisualPtr());
+    }
+    if (this->copyEntityName == _msg->data())
+    {
+      this->copyEntityName = "";
+      g_pasteAct->setEnabled(false);
     }
   }
 }

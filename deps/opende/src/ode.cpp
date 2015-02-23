@@ -1323,6 +1323,24 @@ dxJoint * dJointCreatePlane2D (dWorldID w, dJointGroupID group)
     return createJoint<dxJointPlane2D> (w,group);
 }
 
+dxJoint * dJointCreateDBall (dWorldID w, dJointGroupID group)
+{
+    dAASSERT (w);
+    return createJoint<dxJointDBall> (w,group);
+}
+
+dxJoint * dJointCreateDHinge (dWorldID w, dJointGroupID group)
+{
+    dAASSERT (w);
+    return createJoint<dxJointDHinge> (w,group);
+}
+
+dxJoint * dJointCreateGearbox (dWorldID w, dJointGroupID group)
+{
+    dAASSERT (w);
+    return createJoint<dxJointGearbox> (w,group);
+}
+
 void dJointDestroy (dxJoint *j)
 {
     dAASSERT (j);
@@ -1657,12 +1675,21 @@ dxWorld * dWorldCreate()
   w->qs.w = REAL(1.3);
   w->qs.num_chunks = 1;
   w->qs.num_overlap = 0;
-  w->qs.sor_lcp_tolerance = 0;
-  // NOTE: This feature creates a dynamics incompatibility with simulations
-  // that worked with Gazebo 2.2.2 and earlier. It was broken in Gazebo 2.2.3
-  // but with this patch can be disabled with the <use_dynamic_moi_rescaling>
-  // tag.
+  w->qs.sor_lcp_tolerance = -1;
+  w->qs.rms_dlambda[0] = 0;
+  w->qs.rms_dlambda[1] = 0;
+  w->qs.rms_dlambda[2] = 0;
+  w->qs.rms_dlambda[3] = 0;
+  w->qs.rms_constraint_residual[0] = 0;
+  w->qs.rms_constraint_residual[1] = 0;
+  w->qs.rms_constraint_residual[2] = 0;
+  w->qs.rms_constraint_residual[3] = 0;
+  w->qs.num_contacts = 0;
   w->qs.dynamic_inertia_reduction = true;
+  w->qs.smooth_contacts = 0.01;
+  w->qs.row_reorder1 = true;
+  w->qs.warm_start = 0.5;
+  w->qs.friction_iterations = 10;
 
   w->contactp.max_vel = dInfinity;
   w->contactp.min_depth = 0;
@@ -2174,6 +2201,12 @@ void dWorldSetMaxAngularSpeed(dWorldID w, dReal max_speed)
         w->max_angular_speed = max_speed;
 }
 
+double dWorldGetQuickStepTolerance (dWorldID w)
+{
+	dAASSERT(w);
+	return w->qs.sor_lcp_tolerance;
+}
+
 void dWorldSetQuickStepTolerance (dWorldID w, dReal tol)
 {
 	dAASSERT(w);
@@ -2241,12 +2274,23 @@ dReal dWorldGetQuickStepW (dWorldID w)
 	return w->qs.w;
 }
 
-dReal dWorldGetQuickStepRMSError (dWorldID w)
+dReal *dWorldGetQuickStepRMSDeltaLambda (dWorldID w)
 {
 	dAASSERT(w);
-	return w->qs.rms_error;
+	return w->qs.rms_dlambda;
 }
 
+dReal* dWorldGetQuickStepRMSConstraintResidual (dWorldID w)
+{
+	dAASSERT(w);
+	return w->qs.rms_constraint_residual;
+}
+
+int dWorldGetQuickStepNumContacts (dWorldID w)
+{
+	dAASSERT(w);
+	return w->qs.num_contacts;
+}
 
 /* experimental PGS */
 bool dWorldGetQuickStepInertiaRatioReduction (dWorldID w)
@@ -2255,11 +2299,61 @@ bool dWorldGetQuickStepInertiaRatioReduction (dWorldID w)
   return w->qs.dynamic_inertia_reduction;
 }
 
+dReal  dWorldGetQuickStepContactResidualSmoothing (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.smooth_contacts;
+}
+
+bool  dWorldGetQuickStepExperimentalRowReordering (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.row_reorder1;
+}
+
+dReal  dWorldGetQuickStepWarmStartFactor (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.warm_start;
+}
+
+int  dWorldGetQuickStepExtraFrictionIterations (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.friction_iterations;
+}
+
 void dWorldSetQuickStepInertiaRatioReduction (dWorldID w, bool irr)
 {
 	dAASSERT(w);
   w->qs.dynamic_inertia_reduction = irr;
 }
+
+void dWorldSetQuickStepContactResidualSmoothing (dWorldID w, dReal smoo)
+{
+	dAASSERT(w);
+  w->qs.smooth_contacts = smoo;
+}
+
+void dWorldSetQuickStepExperimentalRowReordering (dWorldID w, bool order)
+{
+	dAASSERT(w);
+  w->qs.row_reorder1 = order;
+}
+
+void dWorldSetQuickStepWarmStartFactor (dWorldID w, dReal warm)
+{
+	dAASSERT(w);
+  w->qs.warm_start = warm;
+}
+
+void dWorldSetQuickStepExtraFrictionIterations (dWorldID w, int iters)
+{
+	dAASSERT(w);
+  w->qs.friction_iterations = iters;
+}
+
+
 
 
 

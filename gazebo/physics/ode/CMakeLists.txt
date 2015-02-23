@@ -6,47 +6,56 @@ link_directories(
   ${CCD_LIBRARY_DIRS}
 )
 
-
-set (sources ODEPhysics.cc
-             ODECollision.cc
-             ODELink.cc
-             ODEJoint.cc
-             ODESliderJoint.cc
-             ODEHingeJoint.cc
-             ODEHinge2Joint.cc
-             ODEUniversalJoint.cc
-             ODEBallJoint.cc
-             ODEMeshShape.cc
-             ODERayShape.cc
-             ODEMultiRayShape.cc
-             ODEHeightmapShape.cc
-             ODEScrewJoint.cc
+set (sources
+  ODEBallJoint.cc
+  ODECollision.cc
+  ODEGearboxJoint.cc
+  ODEHeightmapShape.cc
+  ODEHinge2Joint.cc
+  ODEHingeJoint.cc
+  ODEJoint.cc
+  ODELink.cc
+  ODEMesh.cc
+  ODEMeshShape.cc
+  ODEMultiRayShape.cc
+  ODEPhysics.cc
+  ODEPolylineShape.cc
+  ODERayShape.cc
+  ODEScrewJoint.cc
+  ODESliderJoint.cc
+  ODESurfaceParams.cc
+  ODEUniversalJoint.cc
 )
 
 SET (headers
   ode_inc.h
-  ODEPhysics.hh
-  ODECollision.hh
-  ODELink.hh
-  ODEJoint.hh
-  ODESliderJoint.hh
-  ODEHingeJoint.hh
-  ODEHinge2Joint.hh
-  ODEUniversalJoint.hh
   ODEBallJoint.hh
-  ODEMeshShape.hh
-  ODERayShape.hh
-  ODEMultiRayShape.hh
-  ODEHeightmapShape.hh
-  ODESphereShape.hh
   ODEBoxShape.hh
-  ODEPlaneShape.hh
+  ODECollision.hh
   ODECylinderShape.hh
-  ODETypes.hh
+  ODEGearboxJoint.hh
+  ODEHeightmapShape.hh
+  ODEHinge2Joint.hh
+  ODEHingeJoint.hh
+  ODEJoint.hh
+  ODELink.hh
+  ODEMesh.hh
+  ODEMeshShape.hh
+  ODEMultiRayShape.hh
+  ODEPhysics.hh
+  ODEPlaneShape.hh
+  ODEPolylineShape.hh
+  ODERayShape.hh
   ODEScrewJoint.hh
+  ODESliderJoint.hh
+  ODESphereShape.hh
+  ODESurfaceParams.hh
+  ODETypes.hh
+  ODEUniversalJoint.hh
 )
 
 set (gtest_sources
+  ODEJoint_TEST.cc
   ODEPhysics_TEST.cc
 )
 gz_build_tests(${gtest_sources})
@@ -61,9 +70,9 @@ target_link_libraries(gazebo_physics_ode
 )
 
 gz_install_library(gazebo_physics_ode)
+gz_install_includes("physics/ode" ${headers})
 
 # unit tests
 set (gtest_sources
-  ODEJoint_TEST.cc
 )
 gz_build_tests(${gtest_sources})

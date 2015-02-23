@@ -23,6 +23,10 @@
 
 #include <sdf/sdf.hh>
 
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/util/system.hh"
+
 namespace gazebo
 {
   namespace sensors
@@ -30,69 +34,87 @@ namespace gazebo
     /// \addtogroup gazebo_sensors
     /// \{
 
-    /// \class Noise Noise.hh sensors/sensors.hh
+    /// \class NoiseFactory Noise.hh sensors/sensors.hh
+    /// \brief Use this noise manager for creating and loading noise models.
+    class GAZEBO_VISIBLE NoiseFactory
+    {
+      /// \brief Load a noise model based on the input sdf parameters and
+      /// sensor type.
+      /// \param[in] _sdf Noise sdf parameters.
+      /// \param[in] _sensorType Type of sensor. This is currently used to
+      /// distinguish between image and non image sensors in order to create
+      /// the appropriate noise model.
+      /// \return Pointer to the noise model created.
+      public: static NoisePtr NewNoiseModel(sdf::ElementPtr _sdf,
+          const std::string &_sensorType = "");
+    };
+
+    /// \class Noise Noise.hh
     /// \brief Noise models for sensor output signals.
-    class Noise
+    class GAZEBO_VISIBLE Noise
     {
       /// \brief Which noise types we support
       public: enum NoiseType
       {
         NONE,
-        GAUSSIAN,
-        GAUSSIAN_QUANTIZED
+        CUSTOM,
+        GAUSSIAN
       };
 
-      /// \brief Constructor.
-      public: Noise();
+      /// \brief Constructor. This should not be called directly unless creating
+      /// an empty noise model. Use NoiseFactory::NewNoiseModel to instantiate
+      /// a new noise model.
+      /// \param[in] _type Type of noise model.
+      /// \sa NoiseFactory::NewNoiseModel
+      public: explicit Noise(NoiseType _type);
 
       /// \brief Destructor.
-      public: ~Noise();
+      public: virtual ~Noise();
 
-      /// \brief Load parameters from sdf.
+      /// \brief Load noise parameters from sdf.
       /// \param[in] _sdf SDF parameters.
-      public: void Load(sdf::ElementPtr _sdf);
+      /// \param[in] _sensor Type of sensor.
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Apply noise to input data value.
       /// \param[in] _in Input data value.
       /// \return Data with noise applied.
-      public: double Apply(double _in) const;
+      public: double Apply(double _in);
+
+      /// \brief Apply noise to input data value. This gets overriden by
+      /// derived classes, and called by Apply.
+      /// \param[in] _in Input data value.
+      /// \return Data with noise applied.
+      public: virtual double ApplyImpl(double _in);
+
+      /// \brief Finalize the noise model
+      public: virtual void Fini();
 
       /// \brief Accessor for NoiseType.
       /// \return Type of noise currently in use.
       public: NoiseType GetNoiseType() const;
 
-      /// \brief Accessor for mean.
-      /// \return Mean of Gaussian noise.
-      public: double GetMean() const;
+      /// \brief Register a custom noise callback.
+      /// \param[in] _cb Callback function for applying a custom noise model.
+      /// This is useful if users want to use their own noise model from a
+      /// sensor plugin.
+      public: virtual void SetCustomNoiseCallback(
+          boost::function<double (double)> _cb);
 
-      /// \brief Accessor for stddev.
-      /// \return Standard deviation of Gaussian noise.
-      public: double GetStdDev() const;
-
-      /// \brief Accessor for bias.
-      /// \return Bias on output.
-      public: double GetBias() const;
-
-      /// \brief sdf data.
-      private: sdf::ElementPtr sdf;
+      /// \brief Set camera needed to create image noise. This is only needed
+      /// for image sensors, i.e. camera/multicamera/depth sensors, which use
+      /// shaders for more efficient noise generation.
+      /// \param[in] _camera Camera associated to an image sensor
+      public: virtual void SetCamera(rendering::CameraPtr _camera);
 
       /// \brief Which type of noise we're applying
       private: NoiseType type;
 
-      /// \brief If type starts with GAUSSIAN, the mean of the distribution
-      /// from which we sample when adding noise.
-      private: double mean;
+      /// \brief Noise sdf element.
+      private: sdf::ElementPtr sdf;
 
-      /// \brief If type starts with GAUSSIAN, the standard deviation of the
-      /// distribution from which we sample when adding noise.
-      private: double stdDev;
-
-      /// \brief If type starts with GAUSSIAN, the bias we'll add.
-      private: double bias;
-
-      /// \brief If type==GAUSSIAN_QUANTIZED, the precision to which
-      /// the output signal is rounded.
-      private: double precision;
+      /// \brief Callback function for applying custom noise to sensor data.
+      private: boost::function<double (double)> customNoiseCallback;
     };
     /// \}
   }

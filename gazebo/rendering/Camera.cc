@@ -18,6 +18,7 @@
 #include <dirent.h>
 #include <sstream>
 #include <boost/filesystem.hpp>
+#include <sdf/sdf.hh>
 
 // Moved to top to avoid osx compilation errors
 #include "gazebo/math/Rand.hh"
@@ -36,67 +37,19 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/CameraPrivate.hh"
 #include "gazebo/rendering/Camera.hh"
 
 using namespace gazebo;
 using namespace rendering;
 
 
-unsigned int Camera::cameraCounter = 0;
-
-namespace gazebo
-{
-namespace rendering
-{
-// We'll create an instance of this class for each camera, to be used to inject
-// random values on each render call.
-class GaussianNoiseCompositorListener
-  : public Ogre::CompositorInstance::Listener
-{
-  /// \brief Constructor, setting mean and standard deviation.
-  public: GaussianNoiseCompositorListener(double _mean, double _stddev):
-      mean(_mean), stddev(_stddev) {}
-
-  /// \brief Callback that OGRE will invoke for us on each render call
-  public: virtual void notifyMaterialRender(unsigned int _pass_id,
-                                            Ogre::MaterialPtr & _mat)
-  {
-    // modify material here (wont alter the base material!), called for
-    // every drawn geometry instance (i.e. compositor render_quad)
-
-    // Sample three values within the range [0,1.0] and set them for use in
-    // the fragment shader, which will interpret them as offsets from (0,0)
-    // to use when computing pseudo-random values.
-    Ogre::Vector3 offsets(math::Rand::GetDblUniform(0.0, 1.0),
-                          math::Rand::GetDblUniform(0.0, 1.0),
-                          math::Rand::GetDblUniform(0.0, 1.0));
-    // These calls are setting parameters that are declared in two places:
-    // 1. media/materials/scripts/gazebo.material, in
-    //    fragment_program Gazebo/GaussianCameraNoiseFS
-    // 2. media/materials/scripts/camera_noise_gaussian_fs.glsl
-    _mat->getTechnique(0)->getPass(_pass_id)->
-      getFragmentProgramParameters()->
-      setNamedConstant("offsets", offsets);
-    _mat->getTechnique(0)->getPass(_pass_id)->
-      getFragmentProgramParameters()->
-      setNamedConstant("mean", (Ogre::Real)this->mean);
-    _mat->getTechnique(0)->getPass(_pass_id)->
-      getFragmentProgramParameters()->
-      setNamedConstant("stddev", (Ogre::Real)this->stddev);
-  }
-
-  /// \brief Mean that we'll pass down to the GLSL fragment shader.
-  private: double mean;
-  /// \brief Standard deviation that we'll pass down to the GLSL fragment
-  /// shader.
-  private: double stddev;
-};
-}  // namespace rendering
-}  // namespace gazebo
+unsigned int CameraPrivate::cameraCounter = 0;
 
 //////////////////////////////////////////////////
-Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
+Camera::Camera(const std::string &_name, ScenePtr _scene,
                bool _autoRender)
+  : dataPtr(new CameraPrivate)
 {
   this->initialized = false;
   this->sdf.reset(new sdf::Element);
@@ -114,9 +67,10 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
   this->saveCount = 0;
   this->bayerFrameBuffer = NULL;
 
-  std::ostringstream stream;
-  stream << _namePrefix << "(" << this->cameraCounter++ << ")";
-  this->name = stream.str();
+  this->name = _name;
+  this->scopedName = this->scene->GetName() + "::" + _name;
+  this->scopedUniqueName = this->scopedName + "(" +
+    boost::lexical_cast<std::string>(++this->dataPtr->cameraCounter) + ")";
 
   this->renderTarget = NULL;
   this->renderTexture = NULL;
@@ -127,7 +81,6 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
   this->camera = NULL;
   this->viewport = NULL;
 
-  this->pitchNode = NULL;
   this->sceneNode = NULL;
 
   this->screenshotPath = getenv("HOME");
@@ -150,6 +103,9 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   // Set default render rate to unlimited
   this->SetRenderRate(0.0);
+
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
 }
 
 //////////////////////////////////////////////////
@@ -158,7 +114,6 @@ Camera::~Camera()
   delete [] this->saveFrameBuffer;
   delete [] this->bayerFrameBuffer;
 
-  this->pitchNode = NULL;
   this->sceneNode = NULL;
 
   if (this->renderTexture && this->scene->GetInitialized())
@@ -168,15 +123,17 @@ Camera::~Camera()
 
   if (this->camera && this->scene && this->scene->GetManager())
   {
-    this->scene->GetManager()->destroyCamera(this->name);
+    this->scene->GetManager()->destroyCamera(this->scopedUniqueName);
     this->camera = NULL;
   }
 
   this->connections.clear();
 
   this->sdf->Reset();
-  this->imageElem.reset();
   this->sdf.reset();
+
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -223,26 +180,12 @@ void Camera::Load()
     this->SetHFOV(angle);
   }
 
-  // Handle noise model settings.
-  this->noiseActive = false;
-  if (this->sdf->HasElement("noise"))
+  // Only create a command subscription for real cameras. Ignore camera's
+  // created for visualization purposes.
+  if (this->name.find("_GUIONLY_") == std::string::npos)
   {
-    sdf::ElementPtr noiseElem = this->sdf->GetElement("noise");
-    std::string type = noiseElem->Get<std::string>("type");
-    if (type == "gaussian")
-    {
-      this->noiseType = GAUSSIAN;
-      this->noiseMean = noiseElem->Get<double>("mean");
-      this->noiseStdDev = noiseElem->Get<double>("stddev");
-      this->noiseActive = true;
-      this->gaussianNoiseCompositorListener.reset(new
-        GaussianNoiseCompositorListener(this->noiseMean, this->noiseStdDev));
-      gzlog << "applying Gaussian noise model with mean " << this->noiseMean <<
-        " and stddev " << this->noiseStdDev << std::endl;
-    }
-    else
-      gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
-        std::endl;
+    this->dataPtr->cmdSub = this->dataPtr->node->Subscribe(
+        "~/" + this->GetName() + "/cmd", &Camera::OnCmdMsg, this, true);
   }
 }
 
@@ -251,11 +194,10 @@ void Camera::Init()
 {
   this->SetSceneNode(
       this->scene->GetManager()->getRootSceneNode()->createChildSceneNode(
-        this->GetName() + "_SceneNode"));
+        this->scopedUniqueName + "_SceneNode"));
 
   this->CreateCamera();
 
-  // Create a scene node to control pitch motion
   this->sceneNode->attachObject(this->camera);
   this->camera->setAutoAspectRatio(true);
 
@@ -271,12 +213,7 @@ void Camera::Fini()
 {
   this->initialized = false;
   this->connections.clear();
-
-  if (this->gaussianNoiseCompositorListener)
-  {
-    this->gaussianNoiseInstance->removeListener(
-      this->gaussianNoiseCompositorListener.get());
-  }
+  this->dataPtr->node.reset();
 
   RTShaderSystem::DetachViewport(this->viewport, this->scene);
 
@@ -310,14 +247,26 @@ void Camera::SetScene(ScenePtr _scene)
 //////////////////////////////////////////////////
 void Camera::Update()
 {
+  boost::mutex::scoped_lock lock(this->dataPtr->receiveMutex);
+
+  // Process all the command messages.
+  for (CameraPrivate::CameraCmdMsgs_L::iterator iter =
+      this->dataPtr->commandMsgs.begin();
+      iter != this->dataPtr->commandMsgs.end(); ++iter)
+  {
+    if ((*iter)->has_follow_model())
+      this->TrackVisual((*iter)->follow_model());
+  }
+  this->dataPtr->commandMsgs.clear();
+
   std::list<msgs::Request>::iterator iter = this->requests.begin();
   while (iter != this->requests.end())
   {
     bool erase = false;
     if ((*iter).request() == "track_visual")
     {
-      this->TrackVisualImpl((*iter).data());
-      erase = true;
+      if (this->TrackVisualImpl((*iter).data()))
+        erase = true;
     }
     else if ((*iter).request() == "attach_visual")
     {
@@ -366,17 +315,17 @@ void Camera::Update()
       if (this->onAnimationComplete)
         this->onAnimationComplete();
 
-      if (!this->moveToPositionQueue.empty())
+      if (!this->dataPtr->moveToPositionQueue.empty())
       {
-        this->MoveToPosition(this->moveToPositionQueue[0].first,
-                             this->moveToPositionQueue[0].second);
-        this->moveToPositionQueue.pop_front();
+        this->MoveToPosition(this->dataPtr->moveToPositionQueue[0].first,
+                             this->dataPtr->moveToPositionQueue[0].second);
+        this->dataPtr->moveToPositionQueue.pop_front();
       }
     }
   }
-  else if (this->trackedVisual)
+  else if (this->dataPtr->trackedVisual)
   {
-    math::Vector3 direction = this->trackedVisual->GetWorldPose().pos -
+    math::Vector3 direction = this->dataPtr->trackedVisual->GetWorldPose().pos -
                               this->GetWorldPose().pos;
 
     double yaw = atan2(direction.y, direction.x);
@@ -397,8 +346,10 @@ void Camera::Update()
     if (yawError < -M_PI)
       yawError += M_PI*2;
 
-    double pitchAdj = this->trackVisualPitchPID.Update(pitchError, 0.01);
-    double yawAdj = this->trackVisualYawPID.Update(yawError, 0.01);
+    double pitchAdj = this->dataPtr->trackVisualPitchPID.Update(
+        pitchError, 0.01);
+    double yawAdj = this->dataPtr->trackVisualYawPID.Update(
+        yawError, 0.01);
 
     this->SetWorldRotation(math::Quaternion(0, currPitch + pitchAdj,
           currYaw + yawAdj));
@@ -407,7 +358,7 @@ void Camera::Update()
     double distance = direction.GetLength();
     double error = origDistance - distance;
 
-    double scaling = this->trackVisualPID.Update(error, 0.3);
+    double scaling = this->dataPtr->trackVisualPID.Update(error, 0.3);
 
     math::Vector3 displacement = direction;
     displacement.Normalize();
@@ -421,19 +372,12 @@ void Camera::Update()
   }
 }
 
-
-//////////////////////////////////////////////////
-void Camera::Render()
-{
-  this->Render(false);
-}
-
 //////////////////////////////////////////////////
 void Camera::Render(bool _force)
 {
   if (this->initialized && (_force ||
        common::Time::GetWallTime() - this->lastRenderWallTime >=
-        this->renderPeriod))
+        this->dataPtr->renderPeriod))
   {
     this->newData = true;
     this->RenderImpl();
@@ -445,24 +389,13 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
-    // Render, but don't swap buffers.
-    this->renderTarget->update(false);
-
-    this->lastRenderWallTime = common::Time::GetWallTime();
+    this->renderTarget->update();
   }
 }
 
 //////////////////////////////////////////////////
-common::Time Camera::GetLastRenderWallTime()
+void Camera::ReadPixelBuffer()
 {
-  return this->lastRenderWallTime;
-}
-
-//////////////////////////////////////////////////
-void Camera::PostRender()
-{
-  this->renderTarget->swapBuffers();
-
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
     size_t size;
@@ -483,8 +416,67 @@ void Camera::PostRender()
         static_cast<Ogre::PixelFormat>(this->imageFormat),
         this->saveFrameBuffer);
 
-    this->viewport->getTarget()->copyContentsToMemory(box);
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
+    // Case for UserCamera where there is no RenderTexture but
+    // a RenderTarget (RenderWindow) exists. We can not call SetRenderTarget
+    // because that overrides the this->renderTarget variable
+    if (this->renderTarget && !this->renderTexture)
+    {
+      // Create the render texture
+      this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
+        this->renderTarget->getName() + "_tex",
+        "General",
+        Ogre::TEX_TYPE_2D,
+        this->GetImageWidth(),
+        this->GetImageHeight(),
+        0,
+        (Ogre::PixelFormat)this->imageFormat,
+        Ogre::TU_RENDERTARGET)).getPointer();
+        Ogre::RenderTexture *rtt
+            = this->renderTexture->getBuffer()->getRenderTarget();
 
+      // Setup the viewport to use the texture
+      Ogre::Viewport *vp = rtt->addViewport(this->camera);
+      vp->setClearEveryFrame(true);
+      vp->setShadowsEnabled(true);
+      vp->setOverlaysEnabled(false);
+    }
+
+    // This update is only needed for client side data captures
+    if (this->renderTexture->getBuffer()->getRenderTarget()
+        != this->renderTarget)
+      this->renderTexture->getBuffer()->getRenderTarget()->update();
+
+    // The code below is equivalent to
+    // this->viewport->getTarget()->copyContentsToMemory(box);
+    // which causes problems on some machines if running ogre-1.7.4
+    Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
+    pixelBuffer = this->renderTexture->getBuffer();
+    pixelBuffer->blitToMemory(box);
+#else
+    // There is a fix in ogre-1.8 for a buffer overrun problem in
+    // OgreGLXWindow.cpp's copyContentsToMemory(). It fixes reading
+    // pixels from buffer into memory.
+    this->viewport->getTarget()->copyContentsToMemory(box);
+#endif
+  }
+}
+
+//////////////////////////////////////////////////
+common::Time Camera::GetLastRenderWallTime()
+{
+  return this->lastRenderWallTime;
+}
+
+//////////////////////////////////////////////////
+void Camera::PostRender()
+{
+  this->ReadPixelBuffer();
+
+  this->lastRenderWallTime = common::Time::GetWallTime();
+
+  if (this->newData && (this->captureData || this->captureDataOnce))
+  {
     if (this->captureDataOnce)
     {
       this->SaveFrame(this->GetFrameFilename());
@@ -497,6 +489,8 @@ void Camera::PostRender()
       this->SaveFrame(this->GetFrameFilename());
     }
 
+    unsigned int width = this->GetImageWidth();
+    unsigned int height = this->GetImageHeight();
     const unsigned char *buffer = this->saveFrameBuffer;
 
     // do last minute conversion if Bayer pattern is requested, go from R8G8B8
@@ -523,12 +517,6 @@ void Camera::PostRender()
 }
 
 //////////////////////////////////////////////////
-math::Pose Camera::GetWorldPose()
-{
-  return math::Pose(this->GetWorldPosition(), this->GetWorldRotation());
-}
-
-//////////////////////////////////////////////////
 math::Vector3 Camera::GetWorldPosition() const
 {
   return Conversions::Convert(this->sceneNode->_getDerivedPosition());
@@ -546,6 +534,12 @@ void Camera::SetWorldPose(const math::Pose &_pose)
 {
   this->SetWorldPosition(_pose.pos);
   this->SetWorldRotation(_pose.rot);
+}
+
+//////////////////////////////////////////////////
+math::Pose Camera::GetWorldPose() const
+{
+  return math::Pose(this->GetWorldPosition(), this->GetWorldRotation());
 }
 
 //////////////////////////////////////////////////
@@ -899,23 +893,14 @@ math::Vector3 Camera::GetRight()
 }
 
 //////////////////////////////////////////////////
-void Camera::SetSceneNode(Ogre::SceneNode *node)
+void Camera::SetSceneNode(Ogre::SceneNode *_node)
 {
-  this->sceneNode = node;
+  this->sceneNode = _node;
 }
 
 //////////////////////////////////////////////////
 Ogre::SceneNode *Camera::GetSceneNode() const
 {
-  return this->sceneNode;
-}
-
-//////////////////////////////////////////////////
-Ogre::SceneNode *Camera::GetPitchNode() const
-{
-  gzerr << "Camera::GetPitchNode() is deprecated, will return sceneNode "
-        << "which contains all rotations of the Camera. "
-        << "Use GetSceneNode() instead.\n";
   return this->sceneNode;
 }
 
@@ -944,6 +929,12 @@ std::string Camera::GetName() const
 }
 
 //////////////////////////////////////////////////
+std::string Camera::GetScopedName() const
+{
+  return this->scopedName;
+}
+
+//////////////////////////////////////////////////
 bool Camera::SaveFrame(const std::string &_filename)
 {
   return Camera::SaveFrame(this->saveFrameBuffer, this->GetImageWidth(),
@@ -959,7 +950,7 @@ std::string Camera::GetFrameFilename()
   std::string path = saveElem->Get<std::string>("path");
   boost::filesystem::path pathToFile;
 
-  std::string friendlyName = this->GetName();
+  std::string friendlyName = this->scopedUniqueName;
 
   boost::replace_all(friendlyName, "::", "_");
 
@@ -1206,6 +1197,13 @@ void Camera::SetCaptureDataOnce()
 //////////////////////////////////////////////////
 void Camera::CreateRenderTexture(const std::string &_textureName)
 {
+  int fsaa = 4;
+
+  // Full-screen anti-aliasing only works correctly in 1.8 and above
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
+  fsaa = 0;
+#endif
+
   // Create the render texture
   this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
       _textureName,
@@ -1218,7 +1216,7 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
       Ogre::TU_RENDERTARGET,
       0,
       false,
-      4)).getPointer();
+      fsaa)).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
 
@@ -1234,7 +1232,8 @@ ScenePtr Camera::GetScene() const
 //////////////////////////////////////////////////
 void Camera::CreateCamera()
 {
-  this->camera = this->scene->GetManager()->createCamera(this->name);
+  this->camera = this->scene->GetManager()->createCamera(
+      this->scopedUniqueName);
 
   this->camera->setFixedYawAxis(false);
   this->camera->yaw(Ogre::Degree(-90.0));
@@ -1294,57 +1293,39 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
     {
       // Deferred shading GBuffer compositor
-      this->dsGBufferInstance =
+      this->dataPtr->dsGBufferInstance =
         Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
             "DeferredShading/GBuffer");
 
       // Deferred lighting GBuffer compositor
-      this->dlGBufferInstance =
+      this->dataPtr->dlGBufferInstance =
         Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
             "DeferredLighting/GBuffer");
 
       // Deferred shading: Merging compositor
-      this->dsMergeInstance =
+      this->dataPtr->dsMergeInstance =
         Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
             "DeferredShading/ShowLit");
 
       // Deferred lighting: Merging compositor
-      this->dlMergeInstance =
+      this->dataPtr->dlMergeInstance =
         Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
             "DeferredLighting/ShowLit");
 
       // Screen space ambient occlusion
-      // this->ssaoInstance =
+      // this->dataPtr->this->ssaoInstance =
       //  Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
       //      "DeferredShading/SSAO");
 
-      this->dsGBufferInstance->setEnabled(false);
-      this->dsMergeInstance->setEnabled(false);
+      this->dataPtr->dsGBufferInstance->setEnabled(false);
+      this->dataPtr->dsMergeInstance->setEnabled(false);
 
-      this->dlGBufferInstance->setEnabled(true);
-      this->dlMergeInstance->setEnabled(true);
+      this->dataPtr->dlGBufferInstance->setEnabled(true);
+      this->dataPtr->dlMergeInstance->setEnabled(true);
 
-      // this->ssaoInstance->setEnabled(false);
+      // this->dataPtr->this->ssaoInstance->setEnabled(false);
     }
 
-    // Noise
-    if (this->noiseActive)
-    {
-      switch (this->noiseType)
-      {
-        case GAUSSIAN:
-          this->gaussianNoiseInstance =
-            Ogre::CompositorManager::getSingleton().addCompositor(
-              this->viewport, "CameraNoise/Gaussian");
-          this->gaussianNoiseInstance->setEnabled(true);
-          // gaussianNoiseCompositorListener was allocated in Load()
-          this->gaussianNoiseInstance->addListener(
-            this->gaussianNoiseCompositorListener.get());
-          break;
-        default:
-          GZ_ASSERT(false, "Invalid noise model type");
-      }
-    }
 
     if (this->GetScene()->skyx != NULL)
       this->renderTarget->addListener(this->GetScene()->skyx);
@@ -1386,7 +1367,10 @@ void Camera::AttachToVisual(const std::string &_visualName,
   if (visual)
     track.set_id(visual->GetId());
   else
+  {
+    gzerr << "Unable to attach to visual with name[" << _visualName << "]\n";
     track.set_id(GZ_UINT32_MAX);
+  }
 
   track.set_name(_visualName);
   track.set_min_dist(_minDist);
@@ -1453,7 +1437,10 @@ bool Camera::TrackVisualImpl(const std::string &_name)
   if (visual)
     return this->TrackVisualImpl(visual);
   else
-    this->trackedVisual.reset();
+    this->dataPtr->trackedVisual.reset();
+
+  if (_name.empty())
+    return true;
 
   return false;
 }
@@ -1464,18 +1451,22 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
   // if (this->sceneNode->getParent())
   //  this->sceneNode->getParent()->removeChild(this->sceneNode);
 
+  bool result = false;
   if (_visual)
   {
-    this->trackVisualPID.Init(0.25, 0, 0, 0, 0, 1.0, 0.0);
-    this->trackVisualPitchPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
-    this->trackVisualYawPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
+    this->dataPtr->trackVisualPID.Init(0.25, 0, 0, 0, 0, 1.0, 0.0);
+    this->dataPtr->trackVisualPitchPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
+    this->dataPtr->trackVisualYawPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
 
-    this->trackedVisual = _visual;
+    this->dataPtr->trackedVisual = _visual;
+    result = true;
   }
   else
-    this->trackedVisual.reset();
+  {
+    this->dataPtr->trackedVisual.reset();
+  }
 
-  return true;
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -1500,6 +1491,7 @@ bool Camera::IsVisible(VisualPtr _visual)
     box.setMinimum(bbox.min.x, bbox.min.y, bbox.min.z);
     box.setMaximum(bbox.max.x, bbox.max.y, bbox.max.z);
 
+    box.transformAffine(_visual->GetSceneNode()->_getFullTransform());
     return this->camera->isVisible(box);
   }
 
@@ -1523,7 +1515,7 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
 {
   if (this->animState)
   {
-    this->moveToPositionQueue.push_back(std::make_pair(_pose, _time));
+    this->dataPtr->moveToPositionQueue.push_back(std::make_pair(_pose, _time));
     return false;
   }
 
@@ -1567,6 +1559,7 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
   key = strack->createNodeKeyFrame(_time);
   key->setTranslate(Ogre::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
   key->setRotation(pitchYawFinal);
+
 
   this->animState =
     this->scene->GetManager()->createAnimationState(trackName);
@@ -1655,15 +1648,15 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
 void Camera::SetRenderRate(double _hz)
 {
   if (_hz > 0.0)
-    this->renderPeriod = 1.0 / _hz;
+    this->dataPtr->renderPeriod = 1.0 / _hz;
   else
-    this->renderPeriod = 0.0;
+    this->dataPtr->renderPeriod = 0.0;
 }
 
 //////////////////////////////////////////////////
 double Camera::GetRenderRate() const
 {
-  return 1.0 / this->renderPeriod.Double();
+  return 1.0 / this->dataPtr->renderPeriod.Double();
 }
 
 //////////////////////////////////////////////////
@@ -1675,4 +1668,11 @@ void Camera::AnimationComplete()
 bool Camera::GetInitialized() const
 {
   return this->initialized && this->scene->GetInitialized();
+}
+
+//////////////////////////////////////////////////
+void Camera::OnCmdMsg(ConstCameraCmdPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(this->dataPtr->receiveMutex);
+  this->dataPtr->commandMsgs.push_back(_msg);
 }

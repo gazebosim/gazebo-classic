@@ -25,6 +25,7 @@
 #include "gazebo/physics/BallJoint.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/util/system.hh"
 
 class btPoint2PointConstraint;
 
@@ -37,7 +38,7 @@ namespace gazebo
     /// \{
 
     /// \brief BulletBallJoint class models a ball joint in Bullet.
-    class BulletBallJoint : public BallJoint<BulletJoint>
+    class GAZEBO_VISIBLE BulletBallJoint : public BallJoint<BulletJoint>
     {
       /// \brief Bullet Ball Joint Constructor
       public: BulletBallJoint(btDynamicsWorld *_world, BasePtr _parent);
@@ -51,41 +52,52 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void Init();
 
-      /// \brief Get joint's anchor point
-      public: math::Vector3 GetAnchor(int _index) const;
-
-      /// \brief Get the axis of rotation
-      public: virtual math::Vector3 GetAxis(int /*_index*/) const
-              {return math::Vector3();}
-
-      /// \brief Set the velocity of an axis(index).
-      public: virtual void SetVelocity(int _index, double _angle);
-
-      /// \brief Get the rotation rate of an axis(index)
-      public: virtual double GetVelocity(int _index) const;
-
-      /// \brief Get the max allowed force of an axis(index).
-      public: virtual double GetMaxForce(int _index);
-
-      /// \brief Set the max allowed force of an axis(index).
-      public: virtual void SetMaxForce(int _index, double _t);
-
-      /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
-
-      /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
+      // Documentation inherited.
+      public: math::Vector3 GetAnchor(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(int _index) const;
+      public: virtual math::Vector3 GetAxis(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+      public: virtual void SetVelocity(unsigned int _index, double _angle);
 
       // Documentation inherited.
-      protected: virtual void SetForceImpl(int _index, double _torque);
+      public: virtual double GetVelocity(unsigned int _index) const;
 
-      /// \brief Pointer to Bullet ball constraint
+      // Documentation inherited.
+      public: virtual double GetMaxForce(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual void SetMaxForce(unsigned int _index, double _t);
+
+      // Documentation inherited.
+      public: virtual bool SetHighStop(unsigned int _index,
+                  const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual bool SetLowStop(unsigned int _index,
+                  const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+
+      // Documentation inherited.
+      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+
+      // Documentation inherited.
+      protected: virtual void SetForceImpl(unsigned int _index, double _torque);
+
+      // Documentation inherited.
+      public: virtual void SetAxis(unsigned int _index,
+                                   const math::Vector3 &_axis);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetHighStop(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetLowStop(unsigned int _index);
+
+      /// \brief bullet ball constraint
       private: btPoint2PointConstraint *bulletBall;
     };
 

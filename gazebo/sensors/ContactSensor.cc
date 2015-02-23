@@ -92,6 +92,7 @@ void ContactSensor::Load(const std::string &_worldName)
 
   std::string entityName =
       this->world->GetEntity(this->parentName)->GetScopedName();
+  std::string filterName = entityName + "::" + this->GetName();
 
   // Get all the collision elements
   while (collisionElem)
@@ -112,7 +113,7 @@ void ContactSensor::Load(const std::string &_worldName)
     // this sensor
     physics::ContactManager *mgr =
         this->world->GetPhysicsEngine()->GetContactManager();
-    std::string topic = mgr->CreateFilter(entityName, this->collisions);
+    std::string topic = mgr->CreateFilter(filterName, this->collisions);
     if (!this->contactSub)
     {
       this->contactSub = this->node->Subscribe(topic,
@@ -128,15 +129,16 @@ void ContactSensor::Init()
 }
 
 //////////////////////////////////////////////////
-void ContactSensor::UpdateImpl(bool /*_force*/)
+bool ContactSensor::UpdateImpl(bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  std::vector<std::string>::iterator collIter;
-  std::string collision1;
 
   // Don't do anything if there is no new data to process.
   if (this->incomingContacts.empty())
-    return;
+    return false;
+
+  std::vector<std::string>::iterator collIter;
+  std::string collision1;
 
   // Clear the outgoing contact message.
   this->contactsMsg.clear_contact();
@@ -195,11 +197,24 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
     msgs::Set(this->contactsMsg.mutable_time(), this->lastMeasurementTime);
     this->contactsPub->Publish(this->contactsMsg);
   }
+
+  return true;
 }
 
 //////////////////////////////////////////////////
 void ContactSensor::Fini()
 {
+  if (this->world && this->world->GetRunning())
+  {
+    std::string entityName =
+        this->world->GetEntity(this->parentName)->GetScopedName();
+    std::string filterName = entityName + "::" + this->GetName();
+
+    physics::ContactManager *mgr =
+        this->world->GetPhysicsEngine()->GetContactManager();
+    mgr->RemoveFilter(filterName);
+  }
+
   this->contactSub.reset();
   this->contactsPub.reset();
   Sensor::Fini();

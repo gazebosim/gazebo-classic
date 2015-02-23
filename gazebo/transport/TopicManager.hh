@@ -37,6 +37,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Publication.hh"
 #include "gazebo/transport/Subscriber.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -47,7 +48,7 @@ namespace gazebo
 
     /// \class TopicManager TopicManager.hh transport/transport.hh
     /// \brief Manages topics and their subscriptions
-    class TopicManager : public SingletonT<TopicManager>
+    class GAZEBO_VISIBLE TopicManager : public SingletonT<TopicManager>
     {
       private: TopicManager();
       private: virtual ~TopicManager();
@@ -157,6 +158,10 @@ namespace gazebo
       /// \brief Unadvertise a topic
       /// \param[in] _topic The topic to be unadvertised
       public: void Unadvertise(const std::string &_topic);
+
+      /// \brief Unadvertise a publisher.
+      /// \param[in] _pub Publisher to unadvertise.
+      public: void Unadvertise(PublisherPtr _pub);
 
       /// \brief Send a message. Use a Publisher instead of calling this
       ///        function directly.

@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A bullet slider or primastic joint
- * Author: Nate Koenig
- * Date: 13 Oct 2009
- */
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -146,11 +141,15 @@ void BulletSliderJoint::Init()
   // Throw an error if no links are given.
   else
   {
-    gzthrow("joint without links\n");
+    gzerr << "joint without links\n";
+    return;
   }
 
   if (!this->bulletSlider)
-    gzthrow("unable to create bullet slider joint\n");
+  {
+    gzerr << "unable to create bullet slider joint\n";
+    return;
+  }
 
   // btSliderConstraint has 2 degrees-of-freedom (like a piston)
   // so disable the rotation.
@@ -179,39 +178,39 @@ void BulletSliderJoint::Init()
 }
 
 //////////////////////////////////////////////////
-double BulletSliderJoint::GetVelocity(int /*_index*/) const
+double BulletSliderJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0;
-  // I'm not sure this will work
-  if (this->bulletSlider)
-    result = this->bulletSlider->getTargetLinMotorVelocity();
+  math::Vector3 globalAxis = this->GetGlobalAxis(0);
+  if (this->childLink)
+    result += globalAxis.Dot(this->childLink->GetWorldLinearVel());
+  if (this->parentLink)
+    result -= globalAxis.Dot(this->parentLink->GetWorldLinearVel());
   return result;
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetVelocity(int /*_index*/, double _angle)
+void BulletSliderJoint::SetVelocity(unsigned int /*_index*/, double _angle)
 {
-  if (this->bulletSlider)
-    this->bulletSlider->setTargetLinMotorVelocity(_angle);
+  math::Vector3 desiredVel;
+  if (this->parentLink)
+    desiredVel = this->parentLink->GetWorldLinearVel();
+  desiredVel += _angle * this->GetGlobalAxis(0);
+  if (this->childLink)
+    this->childLink->SetLinearVel(desiredVel);
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
+void BulletSliderJoint::SetAxis(unsigned int /*_index*/,
+    const math::Vector3 &_axis)
 {
   // Note that _axis is given in a world frame,
   // but bullet uses a body-fixed frame
   if (!this->bulletSlider)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
-
-    /// \TODO: currently we assume joint axis is specified in model frame,
-    /// this is incorrect, and should be corrected to be
-    /// joint frame which is specified in child link frame.
-    if (this->parentLink)
-      this->initialWorldAxis =
-        this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
-    else
-      this->initialWorldAxis = _axis;
+    math::Quaternion axisFrame = this->GetAxisFrame(0);
+    this->initialWorldAxis = axisFrame.RotateVector(_axis);
   }
   else
   {
@@ -220,14 +219,16 @@ void BulletSliderJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetDamping(int /*index*/, const double _damping)
+void BulletSliderJoint::SetDamping(unsigned int /*index*/,
+    const double _damping)
 {
+  /// \TODO: special case bullet specific linear damping, this needs testing.
   if (this->bulletSlider)
     this->bulletSlider->setDampingDirLin(_damping);
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetForceImpl(int /*_index*/, double _effort)
+void BulletSliderJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 {
   if (this->bulletSlider && this->constraint)
   {
@@ -254,25 +255,41 @@ void BulletSliderJoint::SetForceImpl(int /*_index*/, double _effort)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetHighStop(int /*_index*/,
+bool BulletSliderJoint::SetHighStop(unsigned int /*_index*/,
                                     const math::Angle &_angle)
 {
   Joint::SetHighStop(0, _angle);
   if (this->bulletSlider)
+  {
     this->bulletSlider->setUpperLinLimit(_angle.Radian());
+    return true;
+  }
+  else
+  {
+    gzerr << "bulletSlider not yet created.\n";
+    return false;
+  }
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetLowStop(int /*_index*/,
+bool BulletSliderJoint::SetLowStop(unsigned int /*_index*/,
                                    const math::Angle &_angle)
 {
   Joint::SetLowStop(0, _angle);
   if (this->bulletSlider)
+  {
     this->bulletSlider->setLowerLinLimit(_angle.Radian());
+    return true;
+  }
+  else
+  {
+    gzerr << "bulletSlider not yet created.\n";
+    return false;
+  }
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetHighStop(int /*_index*/)
+math::Angle BulletSliderJoint::GetHighStop(unsigned int /*_index*/)
 {
   math::Angle result;
   if (this->bulletSlider)
@@ -283,7 +300,7 @@ math::Angle BulletSliderJoint::GetHighStop(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetLowStop(int /*_index*/)
+math::Angle BulletSliderJoint::GetLowStop(unsigned int /*_index*/)
 {
   math::Angle result;
   if (this->bulletSlider)
@@ -294,14 +311,14 @@ math::Angle BulletSliderJoint::GetLowStop(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetMaxForce(int /*_index*/, double _force)
+void BulletSliderJoint::SetMaxForce(unsigned int /*_index*/, double _force)
 {
   if (this->bulletSlider)
     this->bulletSlider->setMaxLinMotorForce(_force);
 }
 
 //////////////////////////////////////////////////
-double BulletSliderJoint::GetMaxForce(int /*_index*/)
+double BulletSliderJoint::GetMaxForce(unsigned int /*_index*/)
 {
   double result = 0;
   if (this->bulletSlider)
@@ -310,30 +327,42 @@ double BulletSliderJoint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletSliderJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
-  math::Vector3 result;
+  math::Vector3 result = this->initialWorldAxis;
+
   if (this->bulletSlider)
   {
-    // I have not verified the following math, though I based it on internal
-    // bullet code at line 250 of btHingeConstraint.cpp
+    // bullet uses x-axis for slider
     btVector3 vec =
       this->bulletSlider->getRigidBodyA().getCenterOfMassTransform().getBasis()
-      * this->bulletSlider->getFrameOffsetA().getBasis().getColumn(2);
+      * this->bulletSlider->getFrameOffsetA().getBasis().getColumn(0);
     result = BulletTypes::ConvertVector3(vec);
   }
-  else
-    gzwarn << "bulletHinge does not exist, returning fake axis\n";
+
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetAngleImpl(int /*_index*/) const
+math::Angle BulletSliderJoint::GetAngleImpl(unsigned int _index) const
 {
-  math::Angle result;
-  if (this->bulletSlider)
-    result = this->bulletSlider->getLinearPos();
-  else
-    gzwarn << "bulletSlider does not exist, returning default position\n";
-  return result;
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid axis index [" << _index << "]" << std::endl;
+    return math::Angle();
+  }
+
+  // The getLinearPos function seems to be off by one time-step
+  // https://github.com/bulletphysics/bullet3/issues/239
+  // if (this->bulletSlider)
+  //   result = this->bulletSlider->getLinearPos();
+  // else
+  //   gzwarn << "bulletSlider does not exist, returning default position\n";
+
+  // Compute slider angle from gazebo's cached poses instead
+  math::Vector3 offset = this->GetWorldPose().pos
+                 - this->GetParentWorldPose().pos;
+  math::Vector3 axis = this->GetGlobalAxis(_index);
+  math::Pose poseParent = this->GetWorldPose();
+  return math::Angle(axis.Dot(offset));
 }

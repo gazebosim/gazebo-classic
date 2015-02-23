@@ -24,6 +24,7 @@
 
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     /// \{
 
     /// \brief DART Link class
-    class DARTLink : public Link
+    class GAZEBO_VISIBLE DARTLink : public Link
     {
       /// \brief Constructor
       public: explicit DARTLink(EntityPtr _parent);
@@ -183,8 +184,11 @@ namespace gazebo
       /// \brief List of pointers to the child joints.
       private: std::vector<DARTJointPtr> dartChildJoints;
 
-      /// \biref If true, freeze link to world (inertial) frame.
+      /// \brief If true, freeze link to world (inertial) frame.
       private: bool staticLink;
+
+      /// \brief Weld joint constraint for SetLinkStatic()
+      private: dart::constraint::WeldJointConstraint *weldJointConst;
     };
     /// \}
   }

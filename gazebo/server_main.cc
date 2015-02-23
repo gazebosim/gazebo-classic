@@ -28,13 +28,10 @@ int main(int argc, char **argv)
   {
     // Initialize the informational logger. This will log warnings, and
     // errors.
-    gazebo::common::Console::Instance()->Init("gzserver.log");
+    gzLogInit("gzserver.log");
 
     // Initialize the data logger. This will log state information.
     gazebo::util::LogRecord::Instance()->Init("gzserver");
-
-    // Output the version of Gazebo.
-    gzlog << GAZEBO_VERSION_HEADER << std::endl;
 
     server = new gazebo::Server();
     if (!server->ParseArgs(argc, argv))

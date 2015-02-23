@@ -19,10 +19,13 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Angle.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(AngleTest, Angle)
+class AngleTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(AngleTest, Angle)
 {
   math::Angle angle1;
   EXPECT_TRUE(math::equal(0.0, angle1.Radian()));
