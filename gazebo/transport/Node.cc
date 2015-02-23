@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,13 +77,17 @@ void Node::Init(const std::string &_space)
   if (_space.empty())
   {
     this->topicNamespace = "default";
-    std::list<std::string> namespaces;
-    TopicManager::Instance()->GetTopicNamespaces(namespaces);
 
-    if (namespaces.empty())
-      gzerr << "No namespace found\n";
+    // wait at most 1 second for namespaces to appear.
+    if (transport::waitForNamespaces(common::Time(1, 0)))
+    {
+      std::list<std::string> namespaces;
+      TopicManager::Instance()->GetTopicNamespaces(namespaces);
+      this->topicNamespace = namespaces.empty() ? this->topicNamespace :
+        namespaces.front();
+    }
     else
-      this->topicNamespace = namespaces.front();
+      gzerr << "No namespace found\n";
   }
   else
     TopicManager::Instance()->RegisterTopicNamespace(_space);

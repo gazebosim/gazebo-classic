@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,9 @@ Light::~Light()
 {
   if (this->light)
     this->scene->GetManager()->destroyLight(this->GetName());
+
+  this->scene->GetManager()->destroyEntity(
+      this->GetName() + "_selection_sphere");
 
   this->visual->DeleteDynamicLine(this->line);
   delete this->line;
@@ -276,11 +279,14 @@ void Light::CreateVisual()
     // Make sure the unit_sphere has been inserted.
     this->visual->InsertMesh("unit_sphere");
 
+    Ogre::Entity *ent =
+        visSceneNode->getCreator()->createEntity(this->GetName() +
+        "_selection_sphere", "unit_sphere");
+
+    ent->setMaterialName("Gazebo/White");
+
     // Create the selection object.
-    Ogre::MovableObject *obj = static_cast<Ogre::MovableObject*>
-      (visSceneNode->getCreator()->createEntity(this->GetName() +
-                                                "_selection_sphere",
-                                                "unit_sphere"));
+    Ogre::MovableObject *obj = static_cast<Ogre::MovableObject*>(ent);
 
     // Attach the selection object to the light visual
     visSceneNode->attachObject(obj);
@@ -436,6 +442,12 @@ void Light::ToggleShowVisual()
 void Light::ShowVisual(bool _s)
 {
   this->visual->SetVisible(_s);
+}
+
+//////////////////////////////////////////////////
+bool Light::GetVisible() const
+{
+  return this->visual->GetVisible();
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,6 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   this->visualMsg->set_name(this->GetScopedName());
 
-  if (this->sdf->HasElement("pose"))
   {
     if (this->parent && this->parentEntity)
       this->worldPose = this->sdf->Get<math::Pose>("pose") +
@@ -144,7 +143,7 @@ void Entity::SetStatic(const bool &_s)
 
   this->isStatic = _s;
 
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     EntityPtr e = boost::dynamic_pointer_cast<Entity>(*iter);
     if (e)
@@ -276,7 +275,7 @@ void Entity::SetWorldTwist(const math::Vector3 &_linear,
     {
       // force an update of all children
       for  (Base_V::iterator iter = this->children.begin();
-            iter != this->childrenEnd; ++iter)
+            iter != this->children.end(); ++iter)
       {
         if ((*iter)->HasType(ENTITY))
         {
@@ -310,7 +309,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
   // update all children pose, moving them with the model.
   // The outer loop updates all the links.
   for (Base_V::iterator iter = this->children.begin();
-      iter != this->childrenEnd; ++iter)
+      iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(ENTITY))
     {
@@ -422,7 +421,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
   if (_updateChildren)
   {
     for (Base_V::iterator iter = this->children.begin();
-         iter != this->childrenEnd; ++iter)
+         iter != this->children.end(); ++iter)
     {
       if ((*iter)->HasType(LINK))
       {
@@ -438,7 +437,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
   if (this->IsStatic())
   {
     for (Base_V::iterator iter = this->children.begin();
-         iter != this->childrenEnd; ++iter)
+         iter != this->children.end(); ++iter)
     {
       CollisionPtr coll = boost::static_pointer_cast<Collision>(*iter);
       if (coll && (*iter)->HasType(COLLISION))

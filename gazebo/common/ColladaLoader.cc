@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -857,9 +857,12 @@ void ColladaLoader::LoadPositions(const std::string &_id,
 
 /////////////////////////////////////////////////
 void ColladaLoader::LoadNormals(const std::string &_id,
-    const math::Matrix4 &/*_transform*/,
+    const math::Matrix4 &_transform,
     std::vector<math::Vector3> &_values)
 {
+  math::Matrix4 rotMat = _transform;
+  rotMat.SetTranslate(math::Vector3::Zero);
+
   TiXmlElement *normalsXml = this->GetElementId("source", _id);
   if (!normalsXml)
   {
@@ -881,7 +884,11 @@ void ColladaLoader::LoadNormals(const std::string &_id,
     math::Vector3 vec;
     iss >> vec.x >> vec.y >> vec.z;
     if (iss)
+    {
+      vec = rotMat * vec;
+      vec.Normalize();
       _values.push_back(vec);
+    }
   } while (iss);
 }
 
@@ -1094,6 +1101,7 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
   }
   else if (typeElem->FirstChildElement("texture"))
   {
+    _mat->SetLighting(true);
     TiXmlElement *imageXml = NULL;
     std::string textureName =
       typeElem->FirstChildElement("texture")->Attribute("texture");

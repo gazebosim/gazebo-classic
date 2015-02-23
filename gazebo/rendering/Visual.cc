@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Ogre Visual Class
- * Author: Nate Koenig
- * Date: 14 Dec 2007
- */
-
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/rendering/CameraVisual.hh"
@@ -152,6 +147,7 @@ Visual::~Visual()
     this->sceneNode = NULL;
   }
 
+  this->scene.reset();
   this->sdf->Reset();
   this->sdf.reset();
   this->parent.reset();
@@ -599,9 +595,10 @@ void Visual::DetachVisual(const std::string &_name)
   {
     if ((*iter)->GetName() == _name)
     {
-      this->sceneNode->removeChild((*iter)->GetSceneNode());
-      (*iter)->parent.reset();
+      VisualPtr childVis = (*iter);
       this->children.erase(iter);
+      this->sceneNode->removeChild(childVis->GetSceneNode());
+      childVis->GetParent().reset();
       break;
     }
   }
@@ -711,7 +708,7 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
   this->InsertMesh(_meshName, _subMesh, _centerSubmesh);
 
   obj = (Ogre::MovableObject*)
-    (this->sceneNode->getCreator()->createEntity(objName, meshName));
+      (this->sceneNode->getCreator()->createEntity(objName, meshName));
 
   this->AttachObject(obj);
   return obj;
@@ -1180,6 +1177,9 @@ void Visual::SetTransparency(float _trans)
     entity = dynamic_cast<Ogre::Entity*>(obj);
 
     if (!entity)
+      continue;
+
+    if (entity->getName().find("__COLLISION_VISUAL__") != std::string::npos)
       continue;
 
     // For each ogre::entity
@@ -1902,6 +1902,10 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       {
         rendering::Material::Update(material);
         ogreSubMesh->setMaterialName(material->GetName());
+      }
+      else
+      {
+        ogreSubMesh->setMaterialName("Gazebo/White");
       }
 
       // Unlock

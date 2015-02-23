@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,6 @@ namespace gazebo
     class World : public boost::enable_shared_from_this<World>
     {
       /// \brief Constructor.
-      ///
       /// Constructor for the World. Must specify a unique name.
       /// \param[in] _name Name of the world.
       public: explicit World(const std::string &_name = "");
@@ -72,24 +71,20 @@ namespace gazebo
       public: ~World();
 
       /// \brief Load the world using SDF parameters.
-      ///
       /// Load a world from and SDF pointer.
       /// \param[in] _sdf SDF parameters.
       public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief Save a world to a file.
-      ///
       /// Save the current world and its state to a file.
       /// \param[in] _filename Name of the file to save into.
       public: void Save(const std::string &_filename);
 
       /// \brief Initialize the world.
-      ///
       /// This is called after Load.
       public: void Init();
 
       /// \brief Run the world in a thread.
-      ///
       /// Run the update loop.
       /// \param[in] _iterations Run for this many iterations, then stop.
       /// A value of zero disables run stop.
@@ -100,12 +95,10 @@ namespace gazebo
       public: bool GetRunning() const;
 
       /// \brief Stop the world.
-      ///
       /// Stop the update loop.
       public: void Stop();
 
       /// \brief Finalize the world.
-      ///
       /// Call this function to tear-down the world.
       public: void Fini();
 
@@ -119,7 +112,6 @@ namespace gazebo
       public: std::string GetName() const;
 
       /// \brief Return the physics engine.
-      ///
       /// Get a pointer to the physics engine used by the world.
       /// \return Pointer to the physics engine.
       public: PhysicsEnginePtr GetPhysicsEngine() const;
@@ -133,7 +125,6 @@ namespace gazebo
       public: unsigned int GetModelCount() const;
 
       /// \brief Get a model based on an index.
-      ///
       /// Get a Model using an index, where index must be greater than zero
       /// and less than World::GetModelCount()
       /// \param[in] _index The index of the model [0..GetModelCount)
@@ -145,7 +136,6 @@ namespace gazebo
       public: Model_V GetModels() const;
 
       /// \brief Reset with options.
-      ///
       /// The _type parameter specifies which type of eneities to reset. See
       /// Base::EntityType.
       /// \param[in] _type The type of reset.
@@ -158,13 +148,11 @@ namespace gazebo
       public: void Reset();
 
       /// \brief Get the selected Entity.
-      ///
       /// The selected entity is set via the GUI.
       /// \return A point to the Entity, NULL if nothing is selected.
       public: EntityPtr GetSelectedEntity() const;
 
       /// \brief Print Entity tree.
-      ///
       /// Prints alls the entities to stdout.
       public: void PrintEntityTree();
 
@@ -198,7 +186,6 @@ namespace gazebo
       public: void SetPaused(bool _p);
 
       /// \brief Get an element by name.
-      ///
       /// Searches the list of entities, and return a pointer to the model
       /// with a matching _name.
       /// \param[in] _name The name of the Model to find.
@@ -206,7 +193,6 @@ namespace gazebo
       public: BasePtr GetByName(const std::string &_name);
 
       /// \brief Get a model by name.
-      ///
       /// This function is the same as GetByName, but limits the search to
       /// only models.
       /// \param[in] _name The name of the Model to find.
@@ -214,22 +200,22 @@ namespace gazebo
       public: ModelPtr GetModel(const std::string &_name);
 
       /// \brief Get a pointer to an Entity based on a name.
-      ///
       /// This function is the same as GetByName, but limits the search to
       /// only Entities.
       /// \param[in] _name The name of the Entity to find.
       /// \return A pointer to the Entity, or NULL if no Entity was found.
       public: EntityPtr GetEntity(const std::string &_name);
 
-      /// \brief Get the nearest model below a point.
-      ///
+      /// \brief Get the nearest model below and not encapsulating a point.
+      /// Only objects below the start point can be returned. Any object
+      /// that encapsulates the start point can not be returned from this
+      /// function.
       /// This function makes use of World::GetEntityBelowPoint.
       /// \param[in] _pt The 3D point to search below.
       /// \return A pointer to nearest Model, NULL if none is found.
       public: ModelPtr GetModelBelowPoint(const math::Vector3 &_pt);
 
       /// \brief Get the nearest entity below a point.
-      ///
       /// Projects a Ray down (-Z axis) starting at the given point. The
       /// first entity hit by the Ray is returned.
       /// \param[in] _pt The 3D point to search below
@@ -241,19 +227,16 @@ namespace gazebo
       public: void SetState(const WorldState &_state);
 
       /// \brief Insert a model from an SDF file.
-      ///
       /// Spawns a model into the world base on and SDF file.
       /// \param[in] _sdfFilename The name of the SDF file (including path).
       public: void InsertModelFile(const std::string &_sdfFilename);
 
       /// \brief Insert a model from an SDF string.
-      ///
       /// Spawns a model into the world base on and SDF string.
       /// \param[in] _sdfString A string containing valid SDF markup.
       public: void InsertModelString(const std::string &_sdfString);
 
       /// \brief Insert a model using SDF.
-      ///
       /// Spawns a model into the world base on and SDF object.
       /// \param[in] _sdf A reference to an SDF object.
       public: void InsertModelSDF(const sdf::SDF &_sdf);
@@ -264,13 +247,11 @@ namespace gazebo
       public: std::string StripWorldName(const std::string &_name) const;
 
       /// \brief Enable all links in all the models.
-      ///
       /// Enable is a physics concept. Enabling means that the physics
       /// engine should update an entity.
       public: void EnableAllModels();
 
       /// \brief Disable all links in all the models.
-      ///
       /// Disable is a physics concept. Disabling means that the physics
       /// engine should not update an entity.
       public: void DisableAllModels();
@@ -322,7 +303,6 @@ namespace gazebo
       /// \cond
       /// This is an internal function.
       /// \brief Get a model by id.
-      ///
       /// Each Entity has a unique ID, this function finds a Model with
       /// a passed in _id.
       /// \param[in] _id The id of the Model
@@ -698,6 +678,13 @@ namespace gazebo
 
       /// \brief A cached list of models. This is here for performance.
       private: Model_V models;
+
+      /// \todo In gazebo 3.0 this should be move to the proper section.
+      /// \brief Run the world. This call blocks.
+      /// Run the update loop.
+      /// \param[in] _iterations Run for this many iterations, then stop.
+      /// A value of zero disables run stop.
+      public: void RunBlocking(unsigned int _iterations = 0);
     };
     /// \}
   }

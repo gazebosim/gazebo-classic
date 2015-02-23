@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -276,8 +276,9 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
 
     if (this->logs.find(_name)->second->GetRelativeFilename() != _filename)
     {
-      gzthrow(std::string("Attempting to add a duplicate log object named[")
-          + _name + "] with a filename of [" + _filename + "]\n");
+      gzerr << "Attempting to add a duplicate log object named["
+          << _name << "] with a filename of [" << _filename << "].\n";
+      return;
     }
     else
     {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -276,13 +276,13 @@ namespace gazebo
     /// \brief Correct any nan
     public: inline void Correct()
             {
-              if (!finite(this->x))
+              if (!std::isfinite(this->x))
                 this->x = 0;
-              if (!finite(this->y))
+              if (!std::isfinite(this->y))
                 this->y = 0;
-              if (!finite(this->z))
+              if (!std::isfinite(this->z))
                 this->z = 0;
-              if (!finite(this->w))
+              if (!std::isfinite(this->w))
                 this->w = 1;
 
               if (math::equal(this->w, 0.0) &&

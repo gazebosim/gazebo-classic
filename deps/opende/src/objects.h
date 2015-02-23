@@ -103,6 +103,7 @@ struct dxQuickStepParameters {
   int num_overlap;		// divide rows but over lap this many rows
   dReal sor_lcp_tolerance;	// the stop if rms_error falls below this
   dReal rms_error;      	// rms_error for this time step
+  bool dynamic_inertia_reduction;       // turn on/off quickstep inertia reduction
 };
 
 // robust-step parameters

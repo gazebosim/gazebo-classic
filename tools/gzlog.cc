@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,11 @@ class FilterBase
               else if (this->stamp == "real")
                 _stream << _state.GetRealTime().Double() << " ";
               else if (this->stamp == "wall")
-                _stream << _state.GetWallTime().Double() << " ";
+              {
+                _stream << std::setiosflags(std::ios::fixed) <<
+                  _state.GetWallTime().Double() <<
+                  std::resetiosflags(std::ios::fixed) << " ";
+              }
             }
 
             return _stream;
@@ -632,7 +636,7 @@ class StateFilter : public FilterBase
             result << this->filter.Filter(state);
 
             if (this->xmlOutput)
-              result << "</sdf></state>\n";
+              result << "</state></sdf>\n";
 
             this->prevTime = state.GetSimTime();
             return result.str();

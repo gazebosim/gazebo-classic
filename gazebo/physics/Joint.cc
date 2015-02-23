@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -279,6 +279,18 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
   // vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
   // vec.Round();
   return vec;
+}
+
+//////////////////////////////////////////////////
+void Joint::SetEffortLimit(unsigned int _index, double _effort)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->effortLimit[_index] = _effort;
+    return;
+  }
+
+  gzerr << "SetEffortLimit index[" << _index << "] out of range" << std::endl;
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -495,6 +495,12 @@ namespace gazebo
 
       /// \brief Angle used when the joint is parent of a static model.
       private: math::Angle staticAngle;
+
+      // Added in 2.1 down here to preserve ABI
+      /// \brief Set the effort limit on a joint axis.
+      /// \param[in] _index Index of the axis to set.
+      /// \param[in] _effort Effort limit for the axis.
+      public: virtual void SetEffortLimit(unsigned int _index, double _effort);
     };
     /// \}
   }

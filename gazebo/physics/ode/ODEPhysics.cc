@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -218,6 +218,16 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 
   dWorldSetQuickStepNumIterations(this->worldId, this->GetSORPGSIters());
   dWorldSetQuickStepW(this->worldId, this->GetSORPGSW());
+
+  if (odeElem->GetElement("solver")->HasElement("use_dynamic_moi_rescaling"))
+  {
+    dWorldSetQuickStepInertiaRatioReduction(this->worldId,
+        odeElem->GetElement("solver")->Get<bool>("use_dynamic_moi_rescaling"));
+  }
+  else
+  {
+    dWorldSetQuickStepInertiaRatioReduction(this->worldId, true);
+  }
 
   // Set the physics update function
   if (this->stepType == "quick")
@@ -894,10 +904,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   if (fd != math::Vector3::Zero)
   {
     // fdir1 is in body local frame, rotate it into world frame
-    /// \TODO: once issue #624 is fixed, switch to below:
-    /// fd = _collision1->GetWorldPose().rot.RotateVector(fd);
-    fd = (_collision1->GetRelativePose() +
-      _collision1->GetLink()->GetWorldPose()).rot.RotateVector(fd.Normalize());
+    fd = _collision1->GetWorldPose().rot.RotateVector(fd);
   }
 
   /// \TODO: Better treatment when both surfaces have fdir1 specified.
@@ -912,10 +919,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
         _collision1->GetSurface()->mu1 > _collision2->GetSurface()->mu1))
   {
     // fdir1 is in body local frame, rotate it into world frame
-    /// \TODO: once issue #624 is fixed, switch to below:
-    /// fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
-    fd = (_collision2->GetRelativePose() +
-      _collision2->GetLink()->GetWorldPose()).rot.RotateVector(fd2.Normalize());
+    fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
+
     /// \TODO: uncomment gzlog below once we confirm it does not affect
     /// performance
     /// if (fd2 != math::Vector3::Zero && fd != math::Vector3::Zero &&
@@ -1250,6 +1255,18 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       odeElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
       break;
     }
+    case INERTIA_RATIO_REDUCTION:
+    {
+      if (odeElem->GetElement("solver")->HasElement(
+            "use_dynamic_moi_rescaling"))
+      {
+        bool value = boost::any_cast<bool>(_value);
+        odeElem->GetElement("solver")->GetElement(
+            "use_dynamic_moi_rescaling")->Set(value);
+        dWorldSetQuickStepInertiaRatioReduction(this->worldId, value);
+      }
+      break;
+    }
     default:
     {
       gzwarn << "Param not supported in ode" << std::endl;
@@ -1283,6 +1300,8 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
     param = MAX_CONTACTS;
   else if (_key == "min_step_size")
     param = MIN_STEP_SIZE;
+  else if (_key == "inertia_ratio_reduction")
+    param = INERTIA_RATIO_REDUCTION;
   else
   {
     gzwarn << _key << " is not supported in ode" << std::endl;
@@ -1350,6 +1369,21 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
     case MIN_STEP_SIZE:
     {
       value = odeElem->GetElement("solver")->Get<double>("min_step_size");
+      break;
+    }
+    case INERTIA_RATIO_REDUCTION:
+    {
+      if (odeElem->GetElement("solver")->HasElement(
+            "use_dynamic_moi_rescaling"))
+      {
+        value = odeElem->GetElement("solver")->Get<bool>(
+            "use_dynamic_moi_rescaling");
+      }
+      else
+      {
+        value = true;
+      }
+
       break;
     }
     default:

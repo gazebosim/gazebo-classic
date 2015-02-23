@@ -63,6 +63,7 @@ set (headers
   Mesh.hh
   MeshLoader.hh
   MeshManager.hh
+  ModelDatabase.hh
   MouseEvent.hh
   PID.hh
   Plugin.hh
@@ -129,18 +130,23 @@ set_property(
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
 )
 
+link_directories(
+  ${tinyxml_LIBRARY_DIRS}
+)
+
 target_link_libraries(gazebo_common
   gazebo_math
   ${libdl_library}
   ${libtool_library}
   ${Boost_LIBRARIES}
-  ${freeimage_library}
-  ${tinyxml_libraries}
+  ${freeimage_LIBRARIES}
+  ${tinyxml_LIBRARIES}
   ${libavcodec_LIBRARIES}
   ${libavformat_LIBRARIES}
+  ${libavutil_LIBRARIES}
   ${CURL_LIBRARIES}
   ${libswscale_LIBRARIES}
-  ${libtar_libraries}
+  ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
   ${SDF_LIBRARIES}
   pthread

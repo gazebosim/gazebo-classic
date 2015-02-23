@@ -2,6 +2,29 @@
 
 ### New Deprecations
 
+1. **gazebo/gazebo.hh**
+    + ***Deprecation*** void fini()
+    + ***Deprecation*** void stop()
+    + ***Replacement*** bool shutdown()
+    + ***Note*** Replace fini and stop with shutdown
+    ---
+    + ***Deprecation*** bool load()
+    + ***Deprecation*** bool init()
+    + ***Deprecation*** bool run()
+    + ***Replacement*** bool setupClient()
+        + Use this function to setup gazebo for use as a client
+    + ***Replacement*** bool setupServer()
+        + Use this function to setup gazebo for use as a server
+    + ***Note*** Replace load+init+run with setupClient/setupServer
+    ---
+    + ***Deprecation*** std::string find_file(const std::string &_file)
+    + ***Replacement*** std::string common::find_file(const std::string &_file)
+    ---
+    + ***Deprecation*** void add_plugin(const std::string &_filename)
+    + ***Replacement*** void addPlugin(const std::string &_filename)
+    ---
+    + ***Deprecation*** void print_version()
+    + ***Replacement*** void printVersion()
 1. **gazebo/sensors/SensorsIface.hh**
     + ***Deprecation*** std::string sensors::create_sensor(sdf::ElementPtr _elem, const std::string &_worldName,const std::string &_parentName)
     + ***Replacement*** std::string sensors::create_sensor(sdf::ElementPtr _elem, const std::string &_worldName, const std::string &_parentName, uint32_t _parentId);
@@ -76,3 +99,15 @@
 1. **gazebo/common/Time.hh**
     + ***Removed*** static Time::NSleep(Time _time) `API change`
     + ***Replacement*** static Time NSleep(unsigned int _ns)
+
+### Deletions
+
+1. **gazebo/physics/Collision.hh**
+    + template<typename T> event::ConnectionPtr ConnectContact(T _subscriber)
+    + template<typename T> event::ConnectionPtr DisconnectContact(T _subscriber)
+    + ***Note:*** The ContactManager::CreateFilter functions can be used to
+      create a gazebo topic with contact messages filtered by the name(s)
+      of collision shapes. The topic can then be subscribed with a callback
+      to replicate this removed functionality. See
+      [gazebo pull request #713](https://bitbucket.org/osrf/gazebo/pull-request/713)
+      for an example migration.

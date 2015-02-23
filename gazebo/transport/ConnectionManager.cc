@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -551,20 +551,14 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &_publishers)
 void ConnectionManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 {
   if (!this->initialized)
+  {
+    gzerr << "Not initialized\n";
     return;
+  }
 
   _namespaces.clear();
 
   boost::mutex::scoped_lock lock(this->namespaceMutex);
-
-  if (!this->namespaces.size())
-  {
-    if (!this->namespaceCondition.timed_wait(lock,
-          boost::posix_time::milliseconds(60000)))
-    {
-      gzerr << "Unable to get namespaces from master\n";
-    }
-  }
 
   for (std::list<std::string>::iterator iter = this->namespaces.begin();
        iter != this->namespaces.end(); ++iter)

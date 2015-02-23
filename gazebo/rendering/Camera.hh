@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -327,7 +327,9 @@ namespace gazebo
       /// \return The scene node the camera is attached to
       public: Ogre::SceneNode *GetSceneNode() const;
 
-      /// \brief Get the camera's pitch scene node
+      /// \brief Get the camera's legacy pitch scene node
+      /// Given pitch, roll and yaw are in sceneNode, this funciton call
+      /// returns sceneNode instead.  Used GetSceneNode instead.
       /// \return The pitch node the camera is attached to
       public: Ogre::SceneNode *GetPitchNode() const;
 
@@ -602,10 +604,11 @@ namespace gazebo
       /// \brief Viewport the ogre camera uses.
       protected: Ogre::Viewport *viewport;
 
-      /// \brief Scene node that controls camera position.
+      /// \brief Scene node that controls camera position and orientation.
       protected: Ogre::SceneNode *sceneNode;
 
-      /// \brief Scene nod that controls camera pitch.
+      /// \brief Legacy scene node that used to control camera pitch,
+      /// but it should remain NULL, all orientation is contained in sceneNode.
       protected: Ogre::SceneNode *pitchNode;
 
       // \brief Buffer for a single image frame.

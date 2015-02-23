@@ -1,28 +1,29 @@
 include ( ${QT_USE_FILE} )
 add_definitions(${QT_DEFINITIONS})
 
-include_directories( 
-  ${tinyxml_include_dirs}
+include_directories(
+  ${tinyxml_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDF_INCLUDE_DIRS}
 )
 
-link_directories( 
+link_directories(
   ${SDF_LIBRARY_DIRS}
+  ${tinyxml_LIBRARY_DIRS}
 )
 
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
 endif()
 
-set (test_sources 
-  gzlog_TEST.cc 
+set (test_sources
+  gzlog_TEST.cc
 )
 
 gz_build_tests(${test_sources})
 
 add_executable(gzsdf gzsdf.cc)
-target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_common)
+target_link_libraries(gzsdf ${tinyxml_LIBRARIES} gazebo_common)
 gz_install_executable(gzsdf)
 
 add_executable(gztopic gztopic.cc)

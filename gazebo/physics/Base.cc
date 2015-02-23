@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ Base::~Base()
   this->SetParent(BasePtr());
 
   for (Base_V::iterator iter = this->children.begin();
-       iter != this->childrenEnd; ++iter)
+       iter != this->children.end(); ++iter)
   {
     if (*iter)
       (*iter)->SetParent(BasePtr());
@@ -107,7 +107,7 @@ void Base::Fini()
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     if (*iter)
       (*iter)->Fini();
 
@@ -127,7 +127,7 @@ void Base::Reset()
 void Base::Reset(Base::EntityType _resetType)
 {
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(_resetType))
       (*iter)->Reset();
@@ -203,7 +203,7 @@ void Base::AddChild(BasePtr _child)
 void Base::RemoveChild(unsigned int _id)
 {
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->GetId() == _id)
     {
@@ -248,7 +248,7 @@ void Base::RemoveChild(const std::string &_name)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->GetScopedName() == _name)
       break;
@@ -296,10 +296,9 @@ BasePtr Base::GetByName(const std::string &_name)
 
   BasePtr result;
   Base_V::const_iterator iter;
-  Base_V::const_iterator iterEnd = this->childrenEnd;
 
-  for (iter =  this->children.begin();
-      iter != iterEnd && result == NULL; ++iter)
+  for (iter = this->children.begin();
+      iter != this->children.end() && result == NULL; ++iter)
     result = (*iter)->GetByName(_name);
 
   return result;
@@ -343,7 +342,7 @@ void Base::Print(const std::string &_prefix)
   Base_V::iterator iter;
   gzmsg << _prefix << this->GetName() << "\n";
 
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     (*iter)->Print(_prefix + "  ");
 }
 
@@ -353,7 +352,7 @@ bool Base::SetSelected(bool _s)
   this->selected = _s;
 
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     (*iter)->SetSelected(_s);
 
   return true;
@@ -377,7 +376,7 @@ void Base::SetWorld(const WorldPtr &_newWorld)
   this->world = _newWorld;
 
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     (*iter)->SetWorld(this->world);
   }

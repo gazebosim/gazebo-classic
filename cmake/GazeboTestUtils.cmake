@@ -28,7 +28,7 @@ macro (gz_build_tests)
     target_link_libraries(${BINARY_NAME}
       libgtest.a
       libgtest_main.a
-      libserver_fixture.a
+      ${CMAKE_BINARY_DIR}/test/libserver_fixture.a
       gazebo_common
       gazebo_math
       gazebo_physics

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,6 +108,10 @@ ServerFixture::ServerFixture()
   path += "/../../build/plugins";
   gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
 
+  path = PROJECT_BINARY_PATH;
+  path += "/test/plugins";
+  gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
+
   path = TEST_PATH;
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 }
@@ -118,8 +122,10 @@ void ServerFixture::TearDown()
   this->Unload();
 }
 
+/////////////////////////////////////////////////
 void ServerFixture::Unload()
 {
+  gzdbg << "ServerFixture::Unload" << std::endl;
   this->serverRunning = false;
   if (this->node)
     this->node->Fini();
@@ -152,7 +158,7 @@ void ServerFixture::Load(const std::string &_worldFilename, bool _paused)
 
 /////////////////////////////////////////////////
 void ServerFixture::Load(const std::string &_worldFilename,
-                         bool _paused, const std::string &_physics)
+                  bool _paused, const std::string &_physics)
 {
   delete this->server;
   this->server = NULL;
@@ -169,9 +175,9 @@ void ServerFixture::Load(const std::string &_worldFilename,
          ++waitCount < maxWaitCount)
     common::Time::MSleep(100);
   gzdbg << "ServerFixture load in "
-         << static_cast<double>(waitCount)/100.0
+         << static_cast<double>(waitCount)/10.0
          << " seconds, timeout after "
-         << static_cast<double>(maxWaitCount)/100.0
+         << static_cast<double>(maxWaitCount)/10.0
          << " seconds\n";
 
   if (waitCount >= maxWaitCount)
@@ -214,7 +220,7 @@ void ServerFixture::RunServer(const std::string &_worldFilename)
 
 /////////////////////////////////////////////////
 rendering::ScenePtr ServerFixture::GetScene(
-                 const std::string &_sceneName)
+    const std::string &_sceneName)
 {
   // Wait for the scene to get loaded.
   int i = 0;
@@ -238,7 +244,7 @@ rendering::ScenePtr ServerFixture::GetScene(
 
 /////////////////////////////////////////////////
 void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
-                            const std::string &_physics)
+               const std::string &_physics)
 {
   ASSERT_NO_THROW(this->server = new Server());
   this->server->PreLoad();
@@ -247,24 +253,21 @@ void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
                                            _physics));
   else
     ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
-  ASSERT_NO_THROW(this->server->Init());
 
   if (!rendering::get_scene(
         gazebo::physics::get_world()->GetName()))
   {
-    rendering::create_scene(
-        gazebo::physics::get_world()->GetName(), false, true);
+    ASSERT_NO_THROW(rendering::create_scene(
+        gazebo::physics::get_world()->GetName(), false, true));
   }
 
-  this->SetPause(_paused);
+  ASSERT_NO_THROW(this->SetPause(_paused));
 
-  this->server->Run();
-
-  rendering::remove_scene(gazebo::physics::get_world()->GetName());
+  ASSERT_NO_THROW(this->server->Run());
 
   ASSERT_NO_THROW(this->server->Fini());
 
-  delete this->server;
+  ASSERT_NO_THROW(delete this->server);
   this->server = NULL;
 }
 
@@ -332,8 +335,8 @@ bool ServerFixture::HasEntity(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void PrintImage(const std::string &_name, unsigned char **_image,
-                 unsigned int _width, unsigned int _height, unsigned int _depth)
+void ServerFixture::PrintImage(const std::string &_name, unsigned char **_image,
+    unsigned int _width, unsigned int _height, unsigned int _depth)
 {
   unsigned int count = _height * _width * _depth;
   printf("\n");
@@ -354,7 +357,7 @@ void PrintImage(const std::string &_name, unsigned char **_image,
 
 /////////////////////////////////////////////////
 void ServerFixture::PrintScan(const std::string &_name, double *_scan,
-                            unsigned int _sampleCount)
+               unsigned int _sampleCount)
 {
   printf("static double __%s[] = {\n", _name.c_str());
   for (unsigned int i = 0; i < _sampleCount-1; ++i)
@@ -372,8 +375,8 @@ void ServerFixture::PrintScan(const std::string &_name, double *_scan,
 
 /////////////////////////////////////////////////
 void ServerFixture::FloatCompare(float *_scanA, float *_scanB,
-                 unsigned int _sampleCount, float &_diffMax,
-                 float &_diffSum, float &_diffAvg)
+    unsigned int _sampleCount, float &_diffMax,
+    float &_diffSum, float &_diffAvg)
 {
   _diffMax = 0;
   _diffSum = 0;
@@ -393,8 +396,8 @@ void ServerFixture::FloatCompare(float *_scanA, float *_scanB,
 
 /////////////////////////////////////////////////
 void ServerFixture::DoubleCompare(double *_scanA, double *_scanB,
-                 unsigned int _sampleCount, double &_diffMax,
-                 double &_diffSum, double &_diffAvg)
+    unsigned int _sampleCount, double &_diffMax,
+    double &_diffSum, double &_diffAvg)
 {
   _diffMax = 0;
   _diffSum = 0;
@@ -414,10 +417,10 @@ void ServerFixture::DoubleCompare(double *_scanA, double *_scanB,
 
 /////////////////////////////////////////////////
 void ServerFixture::ImageCompare(unsigned char *_imageA,
-                 unsigned char *_imageB,
-                 unsigned int _width, unsigned int _height, unsigned int _depth,
-                 unsigned int &_diffMax, unsigned int &_diffSum,
-                 double &_diffAvg)
+    unsigned char *_imageB,
+    unsigned int _width, unsigned int _height, unsigned int _depth,
+    unsigned int &_diffMax, unsigned int &_diffSum,
+    double &_diffAvg)
 {
   _diffMax = 0;
   _diffSum = 0;
@@ -443,9 +446,9 @@ void ServerFixture::ImageCompare(unsigned char *_imageA,
 
 /////////////////////////////////////////////////
 void ServerFixture::OnNewFrame(const unsigned char *_image,
-                              unsigned int _width, unsigned int _height,
-                              unsigned int _depth,
-                              const std::string &/*_format*/)
+                 unsigned int _width, unsigned int _height,
+                 unsigned int _depth,
+                 const std::string &/*_format*/)
 {
   memcpy(*this->imgData, _image, _width * _height * _depth);
   this->gotImage+= 1;
@@ -453,8 +456,8 @@ void ServerFixture::OnNewFrame(const unsigned char *_image,
 
 /////////////////////////////////////////////////
 void ServerFixture::GetFrame(const std::string &_cameraName,
-                 unsigned char **_imgData, unsigned int &_width,
-                 unsigned int &_height)
+    unsigned char **_imgData, unsigned int &_width,
+    unsigned int &_height)
 {
   sensors::SensorPtr sensor = sensors::get_sensor(_cameraName);
   EXPECT_TRUE(sensor);
@@ -486,13 +489,13 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnCamera(const std::string &_modelName,
-                 const std::string &_cameraName,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
-                 unsigned int _width, unsigned int _height,
-                 double _rate,
-                 const std::string &_noiseType,
-                 double _noiseMean,
-                 double _noiseStdDev)
+    const std::string &_cameraName,
+    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    unsigned int _width, unsigned int _height,
+    double _rate,
+    const std::string &_noiseType,
+    double _noiseMean,
+    double _noiseStdDev)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -541,13 +544,13 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnRaySensor(const std::string &_modelName,
-                 const std::string &_raySensorName,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
-                 double _hMinAngle, double _hMaxAngle,
-                 double _minRange, double _maxRange,
-                 double _rangeResolution, unsigned int _samples,
-                 const std::string &_noiseType, double _noiseMean,
-                 double _noiseStdDev)
+    const std::string &_raySensorName,
+    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    double _hMinAngle, double _hMaxAngle,
+    double _minRange, double _maxRange,
+    double _rangeResolution, unsigned int _samples,
+    const std::string &_noiseType, double _noiseMean,
+    double _noiseStdDev)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -604,13 +607,13 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
-                 const std::string &_raySensorName,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
-                 double _hMinAngle, double _hMaxAngle,
-                 double _minRange, double _maxRange,
-                 double _rangeResolution, unsigned int _samples,
-                 const std::string &_noiseType, double _noiseMean,
-                 double _noiseStdDev)
+    const std::string &_raySensorName,
+    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    double _hMinAngle, double _hMaxAngle,
+    double _minRange, double _maxRange,
+    double _rangeResolution, unsigned int _samples,
+    const std::string &_noiseType, double _noiseMean,
+    double _noiseStdDev)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -668,13 +671,13 @@ void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnImuSensor(const std::string &_modelName,
-                 const std::string &_imuSensorName,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
-                 const std::string &_noiseType,
-                 double _rateNoiseMean, double _rateNoiseStdDev,
-                 double _rateBiasMean, double _rateBiasStdDev,
-                 double _accelNoiseMean, double _accelNoiseStdDev,
-                 double _accelBiasMean, double _accelBiasStdDev)
+    const std::string &_imuSensorName,
+    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const std::string &_noiseType,
+    double _rateNoiseMean, double _rateNoiseStdDev,
+    double _rateBiasMean, double _rateBiasStdDev,
+    double _accelNoiseMean, double _accelNoiseStdDev,
+    double _accelBiasMean, double _accelBiasStdDev)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -742,9 +745,9 @@ void ServerFixture::SpawnImuSensor(const std::string &_modelName,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnUnitContactSensor(const std::string &_name,
-                 const std::string &_sensorName,
-                 const std::string &_collisionType, const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy, bool _static)
+    const std::string &_sensorName,
+    const std::string &_collisionType, const math::Vector3 &_pos,
+    const math::Vector3 &_rpy, bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -801,10 +804,10 @@ void ServerFixture::SpawnUnitContactSensor(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnUnitImuSensor(const std::string &_name,
-                 const std::string &_sensorName,
-                 const std::string &_collisionType,
-                 const std::string &_topic, const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy, bool _static)
+    const std::string &_sensorName,
+    const std::string &_collisionType,
+    const std::string &_topic, const math::Vector3 &_pos,
+    const math::Vector3 &_rpy, bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -859,20 +862,20 @@ void ServerFixture::SpawnUnitImuSensor(const std::string &_name,
 void ServerFixture::launchTimeoutFailure(const char *_logMsg,
                                          const int _timeoutCS)
 {
-    FAIL() << "ServerFixture timeout (wait more than " << _timeoutCS / 100
-           << "s): " << _logMsg;
+     FAIL() << "ServerFixture timeout (wait more than " << _timeoutCS / 100
+            << "s): " << _logMsg;
 }
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnWirelessTransmitterSensor(const std::string &_name,
-                 const std::string &_sensorName,
-                 const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy,
-                 const std::string &_essid,
-                 double _freq,
-                 double _power,
-                 double _gain,
-                 bool _visualize)
+    const std::string &_sensorName,
+    const math::Vector3 &_pos,
+    const math::Vector3 &_rpy,
+    const std::string &_essid,
+    double _freq,
+    double _power,
+    double _gain,
+    bool _visualize)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -907,15 +910,15 @@ void ServerFixture::SpawnWirelessTransmitterSensor(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnWirelessReceiverSensor(const std::string &_name,
-                 const std::string &_sensorName,
-                 const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy,
-                 double _minFreq,
-                 double _maxFreq,
-                 double _power,
-                 double _gain,
-                 double _sensitivity,
-                 bool _visualize)
+    const std::string &_sensorName,
+    const math::Vector3 &_pos,
+    const math::Vector3 &_rpy,
+    double _minFreq,
+    double _maxFreq,
+    double _power,
+    double _gain,
+    double _sensitivity,
+    bool _visualize)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -950,8 +953,8 @@ void ServerFixture::SpawnWirelessReceiverSensor(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::WaitUntilEntitySpawn(const std::string &_name,
-                                     unsigned int _sleepEach,
-                                     int _retries)
+                        unsigned int _sleepEach,
+                        int _retries)
 {
   int i = 0;
   // Wait for the entity to spawn
@@ -970,8 +973,8 @@ void ServerFixture::WaitUntilEntitySpawn(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::WaitUntilSensorSpawn(const std::string &_name,
-                                     unsigned int _sleepEach,
-                                     int _retries)
+                        unsigned int _sleepEach,
+                        int _retries)
 {
   int i = 0;
   // Wait for the sensor to spawn
@@ -990,8 +993,8 @@ void ServerFixture::WaitUntilSensorSpawn(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnCylinder(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
-                 bool _static)
+    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -1029,8 +1032,8 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnSphere(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
-                 bool _wait, bool _static)
+    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    bool _wait, bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -1064,9 +1067,9 @@ void ServerFixture::SpawnSphere(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnSphere(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
-                 const math::Vector3 &_cog, double _radius,
-                 bool _wait, bool _static)
+    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const math::Vector3 &_cog, double _radius,
+    bool _wait, bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -1103,8 +1106,8 @@ void ServerFixture::SpawnSphere(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnBox(const std::string &_name,
-                 const math::Vector3 &_size, const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy, bool _static)
+    const math::Vector3 &_size, const math::Vector3 &_pos,
+    const math::Vector3 &_rpy, bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -1138,9 +1141,9 @@ void ServerFixture::SpawnBox(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnTrimesh(const std::string &_name,
-                 const std::string &_modelPath, const math::Vector3 &_scale,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
-                 bool _static)
+    const std::string &_modelPath, const math::Vector3 &_scale,
+    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -1177,8 +1180,8 @@ void ServerFixture::SpawnTrimesh(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnEmptyLink(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
-                 bool _static)
+    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -1238,7 +1241,7 @@ void ServerFixture::SpawnSDF(const std::string &_sdf)
 
 /////////////////////////////////////////////////
 void ServerFixture::LoadPlugin(const std::string &_filename,
-                             const std::string &_name)
+                const std::string &_name)
 {
   // Get the first world...we assume it the only one running
   physics::WorldPtr world = physics::get_world();

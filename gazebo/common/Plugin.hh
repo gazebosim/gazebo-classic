@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,9 +83,6 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~PluginT()
             {
-#ifdef HAVE_DL
-              dlclose(this->dlHandle);
-#endif
             }
 
     /// \brief Get the name of the handler
@@ -112,15 +109,26 @@ namespace gazebo
               // PluginPtr result;
               struct stat st;
               bool found = false;
-              std::string fullname;
+              std::string fullname, filename(_filename);
               std::list<std::string>::iterator iter;
               std::list<std::string> pluginPaths =
                 common::SystemPaths::Instance()->GetPluginPaths();
 
+#ifdef __APPLE__
+              // This is a hack to work around issue #800,
+              // error loading plugin libraries with different extensions
+              {
+                size_t soSuffix = filename.rfind(".so");
+                const std::string macSuffix(".dylib");
+                if (soSuffix != std::string::npos)
+                  filename.replace(soSuffix, macSuffix.length(), macSuffix);
+              }
+#endif  // ifdef __APPLE__
+
               for (iter = pluginPaths.begin();
                    iter!= pluginPaths.end(); ++iter)
               {
-                fullname = (*iter)+std::string("/")+_filename;
+                fullname = (*iter)+std::string("/")+filename;
                 if (stat(fullname.c_str(), &st) == 0)
                 {
                   found = true;
@@ -129,7 +137,7 @@ namespace gazebo
               }
 
               if (!found)
-                fullname = _filename;
+                fullname = filename;
 
 #ifdef HAVE_DL
               fptr_union_t registerFunc;
@@ -206,7 +214,7 @@ namespace gazebo
 #endif  // HAVE_LTDL
 
               result->handle = _handle;
-              result->filename = _filename;
+              result->filename = filename;
 
               return result;
             }

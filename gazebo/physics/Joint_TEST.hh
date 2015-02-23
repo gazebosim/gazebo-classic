@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,8 @@ class Joint_TEST : public ServerFixture,
             if (test_info->value_param())
             {
               gzdbg << "Params: " << test_info->value_param() << std::endl;
-              std::tr1::tie(this->physicsEngine, this->jointType) = GetParam();
+              this->physicsEngine = std::tr1::get<0>(GetParam());
+              this->jointType = std::tr1::get<1>(GetParam());
             }
           }
 
@@ -104,7 +105,8 @@ class Joint_TEST : public ServerFixture,
   {
     /// \brief Constructor.
     public: SpawnJointOptions() : worldChild(false), worldParent(false),
-              axis(math::Vector3(1, 0, 0))
+              wait(common::Time(99, 0)),
+              noLinkPose(false), axis(math::Vector3(1, 0, 0))
             {
             }
 
@@ -134,6 +136,9 @@ class Joint_TEST : public ServerFixture,
 
     /// \brief Parent link pose for spawned model.
     public: math::Pose parentLinkPose;
+
+    /// \brief Flag to disable including link pose per issue #978.
+    public: bool noLinkPose;
 
     /// \brief Joint pose for spawned joint.
     public: math::Pose jointPose;
@@ -184,17 +189,21 @@ class Joint_TEST : public ServerFixture,
               << "  <pose>" << _opt.modelPose << "</pose>";
             if (!_opt.worldParent)
             {
-              modelStr
-                << "  <link name='parent'>"
-                << "    <pose>" << _opt.parentLinkPose << "</pose>"
-                << "  </link>";
+              modelStr << "  <link name='parent'>";
+              if (!_opt.noLinkPose)
+              {
+                modelStr << "    <pose>" << _opt.parentLinkPose << "</pose>";
+              }
+              modelStr << "  </link>";
             }
             if (!_opt.worldChild)
             {
-              modelStr
-                << "  <link name='child'>"
-                << "    <pose>" << _opt.childLinkPose << "</pose>"
-                << "  </link>";
+              modelStr << "  <link name='child'>";
+              if (!_opt.noLinkPose)
+              {
+                modelStr << "    <pose>" << _opt.childLinkPose << "</pose>";
+              }
+              modelStr << "  </link>";
             }
             modelStr
               << "  <joint name='joint' type='" << _opt.type << "'>"

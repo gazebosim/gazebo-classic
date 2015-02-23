@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,9 +166,9 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
           //        << ", " << contact.pos[1]
           //        << ", " << contact.pos[2]
           //        << ", " << "]"
-          //      << " ray[" << rayCollision->GetName() << "]"
+          //      << " ray[" << rayCollision->GetScopedName() << "]"
           //      << " pose[" << rayCollision->GetWorldPose() << "]"
-          //      << " hit[" << hitCollision->GetName() << "]"
+          //      << " hit[" << hitCollision->GetScopedName() << "]"
           //      << " pose[" << hitCollision->GetWorldPose() << "]"
           //      << "\n";
           shape->SetLength(contact.depth);

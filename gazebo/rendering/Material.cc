@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use _mat file except in compliance with the License.
@@ -150,7 +150,6 @@ void Material::Update(const gazebo::common::Material *_mat)
     matPtr = Ogre::MaterialManager::getSingleton().create(
         _mat->GetName(), "General");
 
-  matPtr->setReceiveShadows(false);
   Ogre::Pass *pass = matPtr->getTechnique(0)->getPass(0);
 
   common::Color ambient =  _mat->GetAmbient();

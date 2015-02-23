@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,6 +147,10 @@ namespace gazebo
     /// \return True if minimal comms is enabled.
     bool getMinimalComms();
 
+    /// \brief Blocks while waiting for topic namespaces from the Master.
+    /// This function will wait a maximum of _maxWait.
+    /// \return True if namespaces were found before _maxWait time.
+    bool waitForNamespaces(const gazebo::common::Time &_maxWait);
     /// \}
   }
 }

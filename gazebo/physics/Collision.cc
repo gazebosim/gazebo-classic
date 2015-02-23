@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -304,8 +304,12 @@ void Collision::FillMsg(msgs::Collision &_msg)
   this->surface->FillMsg(*_msg.mutable_surface());
 
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
-  _msg.add_visual()->CopyFrom(*this->visualMsg);
-  _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
+
+  if (!this->HasType(physics::Base::SENSOR_COLLISION))
+  {
+    _msg.add_visual()->CopyFrom(*this->visualMsg);
+    _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
+  }
 }
 
 //////////////////////////////////////////////////

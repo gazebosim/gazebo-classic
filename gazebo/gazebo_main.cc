@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ void help()
   << "  -h [ --help ]                 Produce this help message.\n"
   << "  -u [ --pause ]                Start the server in a paused state.\n"
   << "  -e [ --physics ] arg          Specify a physics engine "
-  << "(ode|bullet|simbody).\n"
+  << "(ode|bullet|dart|simbody).\n"
   << "  -p [ --play ] arg             Play a log file.\n"
   << "  -r [ --record ]               Record state data.\n"
   << "  --record_encoding arg (=zlib) Compression encoding format for log "
@@ -131,12 +131,27 @@ int main(int _argc, char **_argv)
   argvServer[_argc] = static_cast<char*>(NULL);
   argvClient[_argc] = static_cast<char*>(NULL);
 
+  // Need to check the return of wait function (8 lines below) to know
+  // what should be returned by the process
+  int returnValue = 0;
+
   if (pid1)
   {
     pid2 = fork();
     if (pid2)
     {
-      pid_t dead_child = wait(&status1);
+      int child_exit_status;
+      pid_t dead_child = wait(&child_exit_status);
+      // WIFEXITED will return zero if the process finished not reaching
+      // return or exit calls.
+      // WEXITSTATUS will check the value of the return function, not being
+      // zero means problems.
+      if ((WIFEXITED(child_exit_status)   == 0) || 
+          (WEXITSTATUS(child_exit_status) != 0))
+        returnValue = -1;
+      else
+        returnValue = 0;
+        
       if (dead_child == pid1)
         killed1 = true;
       else if (dead_child == pid2)
@@ -167,5 +182,5 @@ int main(int _argc, char **_argv)
   delete[] argvServer;
   delete[] argvClient;
 
-  return 0;
+  return returnValue;
 }

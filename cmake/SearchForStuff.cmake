@@ -126,7 +126,7 @@ if (PKG_CONFIG_FOUND)
   #################################################
   # Find Simbody
   set(SimTK_INSTALL_DIR ${SimTK_INSTALL_PREFIX})
-  #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake) 
+  #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake)
   find_package(Simbody)
   if (SIMBODY_FOUND)
     set (HAVE_SIMBODY TRUE)
@@ -136,28 +136,62 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   #################################################
+  # Find DART
+  find_package(DARTCore)
+  if (DARTCore_FOUND)
+    message (STATUS "Looking for DARTCore - found")
+    set (HAVE_DART TRUE)
+  else()
+    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core3.")
+    set (HAVE_DART FALSE)
+  endif()
+
+  #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
-  find_path (tinyxml_include_dir tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
-  if (NOT tinyxml_include_dir)
+  # Use pkg_check_modules and fallback to manual detection (needed, at least, for MacOS)
+  pkg_check_modules(tinyxml tinyxml)
+  if (NOT tinyxml_FOUND)
+      find_path (tinyxml_INCLUDE_DIRS tinyxml.h ${tinyxml_INCLUDE_DIRS} ENV CPATH)
+      find_library(tinyxml_LIBRARIES NAMES tinyxml)
+      set (tinyxml_FAIL False)
+      if (NOT tinyxml_INCLUDE_DIRS)
+        message (STATUS "Looking for tinyxml headers - not found")
+        set (tinyxml_FAIL True)
+      endif()
+      if (NOT tinyxml_LIBRARIES)
+        message (STATUS "Looking for tinyxml library - not found")
+        set (tinyxml_FAIL True)
+      endif()
+  endif()
+
+  if (tinyxml_FAIL)
     message (STATUS "Looking for tinyxml.h - not found")
     BUILD_ERROR("Missing: tinyxml")
-  else ()
-    message (STATUS "Looking for tinyxml.h - found")
-    set (tinyxml_include_dirs ${tinyxml_include_dir} CACHE STRING
-      "tinyxml include paths. Use this to override automatic detection.")
-    set (tinyxml_libraries "tinyxml" CACHE INTERNAL "tinyxml libraries")
-  endif ()
+  endif()
 
   #################################################
   # Find libtar.
-  find_path (libtar_include_dir libtar.h /usr/include /usr/local/include ENV CPATH)
-  if (NOT libtar_include_dir)
+  find_path (libtar_INCLUDE_DIRS libtar.h)
+  find_library(libtar_LIBRARIES tar)
+  set (LIBTAR_FOUND True)
+
+  if (NOT libtar_INCLUDE_DIRS)
     message (STATUS "Looking for libtar.h - not found")
-    BUILD_ERROR("Missing: libtar")
+    set (LIBTAR_FOUND False)
   else ()
     message (STATUS "Looking for libtar.h - found")
-    set (libtar_libraries "tar" CACHE INTERNAL "tinyxml libraries")
+    include_directories(${libtar_INCLUDE_DIRS})
   endif ()
+  if (NOT libtar_LIBRARIES)
+    message (STATUS "Looking for libtar.so - not found")
+    set (LIBTAR_FOUND False)
+  else ()
+    message (STATUS "Looking for libtar.so - found")
+  endif ()
+
+  if (NOT LIBTAR_FOUND)
+     BUILD_ERROR("Missing: libtar")
+  endif()
 
   #################################################
   # Use internal CCD (built as libgazebo_ccd.so)
@@ -202,9 +236,11 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
+  # There are some runtime problems to solve with ogre-1.9.
+  # Please read gazebo issues: 994, 995
   if (NOT OGRE_FOUND)
     BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
-  else (NOT OGRE_FOUND)
+  else ()
     set(ogre_ldflags ${ogre_ldflags} ${OGRE_LDFLAGS})
     set(ogre_include_dirs ${ogre_include_dirs} ${OGRE_INCLUDE_DIRS})
     set(ogre_libraries ${ogre_libraries};${OGRE_LIBRARIES})
@@ -261,6 +297,9 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(libswscale libswscale)
   if (NOT libswscale_FOUND)
     BUILD_WARNING ("libswscale not found. Audio-video capabilities will be disabled.")
+  else()
+    include_directories(${libswscale_INCLUDE_DIRS})
+    link_directories(${libswscale_LIBRARY_DIRS})
   endif ()
 
   ########################################
@@ -268,6 +307,9 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(libavformat libavformat)
   if (NOT libavformat_FOUND)
     BUILD_WARNING ("libavformat not found. Audio-video capabilities will be disabled.")
+  else()
+    include_directories(${libavformat_INCLUDE_DIRS})
+    link_directories(${libavformat_LIBRARY_DIRS})
   endif ()
 
   ########################################
@@ -275,9 +317,20 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(libavcodec libavcodec)
   if (NOT libavcodec_FOUND)
     BUILD_WARNING ("libavcodec not found. Audio-video capabilities will be disabled.")
+  else()
+    include_directories(${libavcodec_INCLUDE_DIRS})
+    link_directories(${libavcodec_LIBRARY_DIRS})
   endif ()
 
-  if (libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
+  ########################################
+  # Find avutil
+  pkg_check_modules(libavutil libavutil)
+  if (NOT libavutil_FOUND)
+    BUILD_WARNING ("libavutil not found. Audio-video capabilities will be disabled.")
+  endif ()
+
+
+  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
     set (HAVE_FFMPEG TRUE)
   else ()
     set (HAVE_FFMPEG FALSE)
@@ -285,7 +338,7 @@ if (PKG_CONFIG_FOUND)
 
   ########################################
   # Find Player
-  pkg_check_modules(PLAYER playercore>=3.0 playerc++)
+  pkg_check_modules(PLAYER playercore>=3.0 playerc++ playerwkb)
   if (NOT PLAYER_FOUND)
     set (INCLUDE_PLAYER OFF CACHE BOOL "Build gazebo plugin for player")
     BUILD_WARNING ("Player not found, gazebo plugin for player will not be built.")
@@ -312,8 +365,8 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find bullet
-  # First and preferred option is to look for bullet standard pkgconfig, 
-  # so check it first. if it is not present, check for the OSRF 
+  # First and preferred option is to look for bullet standard pkgconfig,
+  # so check it first. if it is not present, check for the OSRF
   # custom bullet2.82.pc file
   pkg_check_modules(BULLET bullet>=2.82)
   if (NOT BULLET_FOUND)
@@ -347,42 +400,6 @@ if (NOT Boost_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
   BUILD_ERROR ("Boost not found. Please install thread signals system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
 endif()
-
-########################################
-# Find avformat and avcodec
-IF (HAVE_FFMPEG)
-  SET (libavformat_search_path
-    /usr/include /usr/include/libavformat /usr/local/include
-    /usr/local/include/libavformat /usr/include/ffmpeg
-  )
-
-  SET (libavcodec_search_path
-    /usr/include /usr/include/libavcodec /usr/local/include
-    /usr/local/include/libavcodec /usr/include/ffmpeg
-  )
-
-  FIND_PATH(LIBAVFORMAT_PATH avformat.h ${libavformat_search_path})
-  IF (NOT LIBAVFORMAT_PATH)
-    MESSAGE (STATUS "Looking for avformat.h - not found")
-    BUILD_WARNING ("avformat.h not found. audio/video will not be built")
-    SET (LIBAVFORMAT_PATH /usr/include)
-  ELSE (NOT LIBAVFORMAT_PATH)
-    MESSAGE (STATUS "Looking for avformat.h - found")
-  ENDIF (NOT LIBAVFORMAT_PATH)
-
-  FIND_PATH(LIBAVCODEC_PATH avcodec.h ${libavcodec_search_path})
-  IF (NOT LIBAVCODEC_PATH)
-    MESSAGE (STATUS "Looking for avcodec.h - not found")
-    BUILD_WARNING ("avcodec.h not found. audio/video will not be built")
-    SET (LIBAVCODEC_PATH /usr/include)
-  ELSE (NOT LIBAVCODEC_PATH)
-    MESSAGE (STATUS "Looking for avcodec.h - found")
-  ENDIF (NOT LIBAVCODEC_PATH)
-
-ELSE (HAVE_FFMPEG)
-  SET (LIBAVFORMAT_PATH /usr/include)
-  SET (LIBAVCODEC_PATH /usr/include)
-ENDIF (HAVE_FFMPEG)
 
 ########################################
 # Find libtool
@@ -445,16 +462,16 @@ add_manpage_target()
 #find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
 #  /usr/include
 #  /usr/local/include
-#  "$ENV{LIB_DIR}/include" 
-#  "$ENV{INCLUDE}" 
+#  "$ENV{LIB_DIR}/include"
+#  "$ENV{INCLUDE}"
 #  PATH_SUFFIXES qwt-qt4 qwt qwt5
 #  )
 #
-#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS 
+#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
 #  /usr/lib
 #  /usr/local/lib
-#  "$ENV{LIB_DIR}/lib" 
-#  "$ENV{LIB}/lib" 
+#  "$ENV{LIB_DIR}/lib"
+#  "$ENV{LIB}/lib"
 #  )
 #
 #if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
