@@ -1440,7 +1440,7 @@ void World::ProcessRequestMsgs()
       else
       {
         response.set_type("error");
-        response.set_response("nonexistant");
+        response.set_response("nonexistent");
       }
     }
     else if (requestMsg.request() == "world_sdf")
@@ -2173,4 +2173,3 @@ void World::EnablePhysicsEngine(bool _enable)
 {
   this->dataPtr->enablePhysicsEngine = _enable;
 }
-

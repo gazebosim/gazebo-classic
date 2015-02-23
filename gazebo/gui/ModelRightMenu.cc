@@ -43,6 +43,9 @@ ModelRightMenu::ModelRightMenu()
   this->followAct->setStatusTip(tr("Follow the selection"));
   connect(this->followAct, SIGNAL(triggered()), this, SLOT(OnFollow()));
 
+  this->editAct = new QAction(tr("Edit model"), this);
+  this->editAct->setStatusTip(tr("Open on Model Editor"));
+  connect(this->editAct, SIGNAL(triggered()), this, SLOT(OnEdit()));
 
   // \todo Reimplement
   // this->snapBelowAct = new QAction(tr("Snap"), this);
@@ -151,6 +154,17 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
 
   if (_type == EntityTypes::MODEL)
   {
+    // disable editing planes for now
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+    rendering::ScenePtr scene = cam->GetScene();
+    rendering::VisualPtr vis = scene->GetVisual(this->modelName);
+    if (vis && !vis->IsPlane())
+    {
+      menu.addSeparator();
+      menu.addAction(this->editAct);
+      menu.addSeparator();
+    }
+
     // menu.addAction(this->snapBelowAct);
 
     // Create the view menu
@@ -199,6 +213,13 @@ void ModelRightMenu::OnFollow()
   rendering::UserCameraPtr cam = gui::get_active_camera();
   cam->TrackVisual(this->modelName);
   gui::Events::follow(this->modelName);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnEdit()
+{
+  g_editModelAct->trigger();
+  gui::Events::editModel(this->modelName);
 }
 
 /////////////////////////////////////////////////
