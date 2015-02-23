@@ -74,6 +74,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
       background-color: #444;\
       border-radius: 5px;\
       padding-left: 10px;\
+      min-height: 40px;\
     }");
 
   // Force X
@@ -167,6 +168,11 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   // Force Position
   QLabel *forcePosLabel = new QLabel(tr("Application Point:"));
+  forcePosLabel->setObjectName("forcePosLabel");
+  forcePosLabel->setStyleSheet(
+   "QLabel#forcePosLabel{\
+      max-height: 15px;\
+    }");
 
   // CoM
   QLabel *comLabel = new QLabel();
@@ -238,6 +244,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
       SLOT(OnForcePosZChanged(double)));
 
   QGridLayout *forcePosLayout = new QGridLayout();
+  forcePosLayout->setContentsMargins(0, 0, 0, 0);
   forcePosLayout->addWidget(forcePosLabel, 0, 0, 1, 4, Qt::AlignLeft);
   forcePosLayout->addWidget(this->dataPtr->comRadio, 1, 0);
   forcePosLayout->addLayout(comLabelLayout, 1, 1, 1, 3, Qt::AlignLeft);
@@ -259,11 +266,15 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   // Force layout
   QGridLayout *forceLayout = new QGridLayout();
   forceLayout->setContentsMargins(0, 0, 0, 0);
-  forceLayout->addWidget(forceLabel, 0, 0, 1, 3);
-  forceLayout->addLayout(forceVectorLayout, 1, 0);
-  forceLayout->addWidget(separator, 1, 1);
-  forceLayout->addLayout(forcePosLayout, 1, 2);
-  forceLayout->addWidget(applyForceButton, 3, 0, 1, 3, Qt::AlignRight);
+  forceLayout->addWidget(forceLabel, 0, 0, 1, 5);
+  forceLayout->addItem(new QSpacerItem(10, 10), 1, 0, 1, 5);
+  forceLayout->addLayout(forceVectorLayout, 2, 1);
+  forceLayout->addWidget(separator, 2, 2);
+  forceLayout->addLayout(forcePosLayout, 2, 3);
+  forceLayout->addItem(new QSpacerItem(10, 10), 3, 0, 1, 5);
+  forceLayout->addWidget(applyForceButton, 4, 1, 1, 3, Qt::AlignRight);
+  forceLayout->addItem(new QSpacerItem(5, 10), 5, 0);
+  forceLayout->addItem(new QSpacerItem(7, 10), 5, 4);
 
   QFrame *forceFrame = new QFrame();
   forceFrame->setLayout(forceLayout);
@@ -292,6 +303,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
       background-color: #444;\
       border-radius: 5px;\
       padding-left: 10px;\
+      min-height: 40px;\
     }");
 
   // Torque X
@@ -385,9 +397,13 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   // Torque layout
   QGridLayout *torqueLayout = new QGridLayout();
   torqueLayout->setContentsMargins(0, 0, 0, 0);
-  torqueLayout->addWidget(torqueLabel, 0, 0, 1, 2);
-  torqueLayout->addLayout(torqueVectorLayout, 1, 0);
-  torqueLayout->addWidget(applyTorqueButton, 3, 0, 1, 2, Qt::AlignRight);
+  torqueLayout->addWidget(torqueLabel, 0, 0, 1, 3);
+  torqueLayout->addItem(new QSpacerItem(10, 10), 1, 0, 1, 3);
+  torqueLayout->addLayout(torqueVectorLayout, 2, 1);
+  torqueLayout->addItem(new QSpacerItem(10, 10), 3, 0, 1, 3);
+  torqueLayout->addWidget(applyTorqueButton, 4, 1, 1, 1, Qt::AlignRight);
+  torqueLayout->addItem(new QSpacerItem(5, 10), 5, 0);
+  torqueLayout->addItem(new QSpacerItem(5, 10), 5, 2);
 
   QFrame *torqueFrame = new QFrame();
   torqueFrame->setLayout(torqueLayout);
