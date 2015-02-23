@@ -126,7 +126,7 @@ namespace gazebo
       /// \param[in] _partName Name of the part.
       public: void RemoveJointsByPart(const std::string &_partName);
 
-      /// \brief Get a vector containing data for all joints connected to 
+      /// \brief Get a vector containing data for all joints connected to
       /// the given part.
       /// \param[in] _partName Name of the part.
       /// \return Vector with joint data.
