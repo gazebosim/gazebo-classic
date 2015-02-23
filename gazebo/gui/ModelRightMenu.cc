@@ -96,6 +96,13 @@ ModelRightMenu::ModelRightMenu()
   connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
   this->viewStates.push_back(state);
 
+  state = new ViewState(this, "show_inertia", "hide_inertia");
+  state->action = new QAction(tr("Inertia"), this);
+  state->action->setStatusTip(tr("Show moments of inertia"));
+  state->action->setCheckable(true);
+  connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
+  this->viewStates.push_back(state);
+
   // \todo Reimplement
   // this->skeletonAction = new QAction(tr("Skeleton"), this);
   // this->skeletonAction->setStatusTip(tr("Show model skeleton"));

@@ -295,6 +295,13 @@ void ModelCreator::LoadSDF(sdf::ElementPtr _modelElem)
     this->modelPose = math::Pose::Zero;
   this->previewVisual->SetPose(this->modelPose);
 
+  if (_modelElem->HasElement("static"))
+    this->isStatic = _modelElem->Get<bool>("static");
+  if (_modelElem->HasElement("allow_auto_disable"))
+    this->autoDisable = _modelElem->Get<bool>("allow_auto_disable");
+  gui::model::Events::modelPropertiesChanged(this->isStatic, this->autoDisable,
+      this->modelPose);
+
   // Links
   if (!_modelElem->HasElement("link"))
   {
@@ -335,8 +342,10 @@ void ModelCreator::OnNew()
   }
   QString msg;
   QMessageBox msgBox(QMessageBox::Warning, QString("New"), msg);
-  QPushButton *cancelButton = msgBox.addButton("Cancel", QMessageBox::YesRole);
-  QPushButton *saveButton = msgBox.addButton("Save", QMessageBox::YesRole);
+  QPushButton *cancelButton = msgBox.addButton("Cancel",
+      QMessageBox::RejectRole);
+  msgBox.setEscapeButton(cancelButton);
+  QPushButton *saveButton = new QPushButton("Save");
 
   switch (this->currentSaveState)
   {
@@ -344,8 +353,9 @@ void ModelCreator::OnNew()
     {
       msg.append("Are you sure you want to close this model and open a new "
                  "canvas?\n\n");
-      msgBox.addButton("New Canvas", QMessageBox::ApplyRole);
-      saveButton->hide();
+      QPushButton *newButton =
+          msgBox.addButton("New Canvas", QMessageBox::AcceptRole);
+      msgBox.setDefaultButton(newButton);
       break;
     }
     case UNSAVED_CHANGES:
@@ -353,7 +363,9 @@ void ModelCreator::OnNew()
     {
       msg.append("You have unsaved changes. Do you want to save this model "
                  "and open a new canvas?\n\n");
-      msgBox.addButton("Don't Save", QMessageBox::ApplyRole);
+      msgBox.addButton("Don't Save", QMessageBox::DestructiveRole);
+      msgBox.addButton(saveButton, QMessageBox::AcceptRole);
+      msgBox.setDefaultButton(saveButton);
       break;
     }
     default:
@@ -452,8 +464,14 @@ void ModelCreator::OnExit()
     {
       QString msg("Are you ready to exit?\n\n");
       QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
-      msgBox.addButton("Exit", QMessageBox::ApplyRole);
-      QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
+
+      QPushButton *cancelButton = msgBox.addButton("Cancel",
+          QMessageBox::RejectRole);
+      QPushButton *exitButton =
+          msgBox.addButton("Exit", QMessageBox::AcceptRole);
+      msgBox.setDefaultButton(exitButton);
+      msgBox.setEscapeButton(cancelButton);
+
       msgBox.exec();
       if (msgBox.clickedButton() == cancelButton)
       {
@@ -469,10 +487,13 @@ void ModelCreator::OnExit()
 
       QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
       QPushButton *cancelButton = msgBox.addButton("Cancel",
-          QMessageBox::ApplyRole);
+          QMessageBox::RejectRole);
+      msgBox.addButton("Don't Save, Exit", QMessageBox::DestructiveRole);
       QPushButton *saveButton = msgBox.addButton("Save and Exit",
-          QMessageBox::ApplyRole);
-      msgBox.addButton("Don't Save, Exit", QMessageBox::ApplyRole);
+          QMessageBox::AcceptRole);
+      msgBox.setDefaultButton(cancelButton);
+      msgBox.setDefaultButton(saveButton);
+
       msgBox.exec();
       if (msgBox.clickedButton() == cancelButton)
         return;
@@ -587,11 +608,13 @@ std::string ModelCreator::AddShape(PartType _type,
   this->CreatePart(visVisual);
 
   linkVisual->SetPose(_pose);
-  if (this->modelPose == math::Pose::Zero)
-  {
-    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
-    _pose.pos.z + _size.z * 0.5));
-  }
+
+  // insert over ground plane for now
+  math::Vector3 linkPos = linkVisual->GetWorldPose().pos;
+  linkPos.z = _size.z * 0.5;
+  // override orientation as it's more natural to insert objects upright rather
+  // than inserting it in the model frame.
+  linkVisual->SetWorldPose(math::Pose(linkPos, math::Quaternion()));
 
   this->mouseVisual = linkVisual;
 
@@ -917,6 +940,8 @@ void ModelCreator::Reset()
 
   this->isStatic = false;
   this->autoDisable = true;
+  gui::model::Events::modelPropertiesChanged(this->isStatic, this->autoDisable,
+      this->modelPose);
 
   while (!this->allParts.empty())
     this->RemovePart(this->allParts.begin()->first);
@@ -1186,7 +1211,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         this->allParts.end())
     {
       PartData *part = this->allParts[this->mouseVisual->GetName()];
-      part->SetPose(this->mouseVisual->GetWorldPose() - this->modelPose);
+      part->SetPose(this->mouseVisual->GetWorldPose()-this->modelPose);
     }
 
     // reset and return
@@ -1372,7 +1397,7 @@ void ModelCreator::OpenInspector(const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   PartData *part = this->allParts[_name];
-  part->SetPose(part->partVisual->GetWorldPose() - this->modelPose);
+  part->SetPose(part->partVisual->GetWorldPose()-this->modelPose);
   part->UpdateConfig();
   part->inspector->move(QCursor::pos());
   part->inspector->show();

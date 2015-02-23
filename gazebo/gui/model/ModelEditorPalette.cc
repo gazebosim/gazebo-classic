@@ -181,6 +181,11 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->connections.push_back(
       gui::model::Events::ConnectNewModel(
       boost::bind(&ModelEditorPalette::OnNewModel, this)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectModelPropertiesChanged(
+      boost::bind(&ModelEditorPalette::OnModelPropertiesChanged, this, _1, _2,
+      _3)));
 }
 
 /////////////////////////////////////////////////
@@ -268,6 +273,14 @@ void ModelEditorPalette::OnAutoDisable()
 void ModelEditorPalette::OnStatic()
 {
   this->modelCreator->SetStatic(this->staticCheck->isChecked());
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnModelPropertiesChanged(
+  bool _static, bool _autoDisable, const math::Pose &/*_pose*/)
+{
+  this->staticCheck->setChecked(_static);
+  this->autoDisableCheck->setChecked(_autoDisable);
 }
 
 /////////////////////////////////////////////////

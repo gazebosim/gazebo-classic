@@ -16,6 +16,13 @@
 1. Added arc parameter to MeshManager::CreateTube 
     * [Pull request #1436](https://bitbucket.org/osrf/gazebo/pull-request/1436)
 
+1. Added View Inertia and InertiaVisual, changed COMVisual to sphere proportional to mass.
+    * [Pull request #1445](https://bitbucket.org/osrf/gazebo/pull-request/1445)
+
+1. Changed the position of Save and Cancel buttons on editor dialogs
+    * [Pull request #1442](https://bitbucket.org/osrf/gazebo/pull-request/1442)
+    * [Issue #1377](https://bitbucket.org/osrf/gazebo/issue/1377)
+
  1. Model editor updates
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
@@ -273,6 +280,10 @@
     * [Pull request #1271](https://bitbucket.org/osrf/gazebo/pull-request/1271)
 1. Fix loading collada meshes with unsupported input semantics.
     * [Pull request #1319](https://bitbucket.org/osrf/gazebo/pull-request/1319)
+1. Fix race condition with ImuSensor not publishing after Reset World.
+    * [Pull request #1448](https://bitbucket.org/osrf/gazebo/pull-request/1448)
+    * [Pull request #1446](https://bitbucket.org/osrf/gazebo/pull-request/1446)
+    * [Issue #236](https://bitbucket.org/osrf/gazebo/issue/236)
 
 ### Gazebo 4.0.2 (2014-09-23)
 
