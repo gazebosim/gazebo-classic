@@ -52,8 +52,8 @@
 
 #include "test_config.h"
 
-using namespace gazebo;
-
+namespace gazebo
+{
 std::string custom_exec(std::string _cmd);
 
 class ServerFixture : public testing::Test
@@ -568,4 +568,5 @@ class ServerFixture : public testing::Test
   /// \brief True if server is running.
   private: bool serverRunning;
 };
+}       // namespace gazebo
 #endif  // define _GAZEBO_SERVER_FIXTURE_HH_
