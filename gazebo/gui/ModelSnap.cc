@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,7 +113,8 @@ void ModelSnap::Reset()
 
   if (this->dataPtr->snapVisual)
   {
-    this->dataPtr->snapVisual->SetVisible(false);
+    if (this->dataPtr->snapVisual->GetVisible())
+      this->dataPtr->snapVisual->SetVisible(false);
     if (this->dataPtr->snapVisual->GetParent())
     {
       this->dataPtr->snapVisual->GetParent()->DetachVisual(
@@ -194,14 +195,28 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
   if (vis && !vis->IsPlane() &&
       this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
   {
-    // select first triangle on any mesh, if it's on the same mesh, update the
-    // triangle vertices.
-    if (!this->dataPtr->selectedVis ||
-       (vis->GetRootVisual()  == this->dataPtr->selectedVis->GetRootVisual()))
+    // Parent model or parent link
+    rendering::VisualPtr currentParent = vis->GetRootVisual();
+    rendering::VisualPtr previousParent;
+    if (gui::get_entity_id(currentParent->GetName()))
+    {
+      if (this->dataPtr->selectedVis)
+        previousParent = this->dataPtr->selectedVis->GetRootVisual();
+    }
+    else
+    {
+      currentParent = vis->GetParent();
+      if (this->dataPtr->selectedVis)
+        previousParent = this->dataPtr->selectedVis->GetParent();
+    }
+
+    // Select first triangle on any mesh
+    // Update triangle if the new triangle is on the same model/link
+    if (!this->dataPtr->selectedVis || (currentParent  == previousParent))
     {
       math::Vector3 intersect;
       this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
-          vis->GetRootVisual(), intersect, this->dataPtr->selectedTriangle);
+          currentParent, intersect, this->dataPtr->selectedTriangle);
 
       if (!this->dataPtr->selectedTriangle.empty())
       {
@@ -211,7 +226,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
       if (!this->dataPtr->renderConnection)
       {
         this->dataPtr->renderConnection = event::Events::ConnectRender(
-              boost::bind(&ModelSnap::Update, this));
+            boost::bind(&ModelSnap::Update, this));
       }
     }
     else
@@ -220,12 +235,11 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
       math::Vector3 intersect;
       std::vector<math::Vector3> vertices;
       this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
-          vis->GetRootVisual(), intersect, vertices);
+          currentParent, intersect, vertices);
 
       if (!vertices.empty())
       {
-        this->Snap(this->dataPtr->selectedTriangle, vertices,
-            this->dataPtr->selectedVis->GetRootVisual());
+        this->Snap(this->dataPtr->selectedTriangle, vertices, previousParent);
 
         this->Reset();
         gui::Events::manipMode("select");

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,31 +28,39 @@
 
 #include "test_config.h"
 
-gazebo::common::KeyEvent lastKeyEvent;
-bool SetKey(const gazebo::common::KeyEvent &_event)
+
+bool g_gotBoxSelection = false;
+void OnSelection(ConstSelectionPtr &_msg)
 {
-  lastKeyEvent = _event;
-  return true;
+  if (_msg->name() == "box" && _msg->has_selected() && _msg->selected())
+    g_gotBoxSelection = true;
 }
 
 /////////////////////////////////////////////////
-void GLWidget_TEST::KeyPresses()
+void GLWidget_TEST::SelectObject()
 {
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/blank.world", false, false, false);
+  this->Load("worlds/shapes.world", false, false, false);
+
+  gazebo::transport::NodePtr node;
+  gazebo::transport::SubscriberPtr sub;
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  node->Init();
+  sub = node->Subscribe("~/selection", &OnSelection, this);
 
   // Create the main window.
-  gazebo::gui::MainWindow mainWindow;
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
 
-  mainWindow.Load();
+  mainWindow->Load();
 
   gazebo::rendering::create_scene(
       gazebo::physics::get_world()->GetName(), false);
 
-  mainWindow.Init();
-  mainWindow.show();
+  mainWindow->Init();
+  mainWindow->show();
 
   gazebo::rendering::Events::createScene("default");
 
@@ -61,67 +69,24 @@ void GLWidget_TEST::KeyPresses()
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
-    mainWindow.repaint();
+    mainWindow->repaint();
   }
 
   // Get GLWidget
   gazebo::gui::GLWidget *glWidget =
-      mainWindow.findChild<gazebo::gui::GLWidget *>("GLWidget");
+      mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != NULL);
 
-  // Set up a keypress filter
-  gazebo::gui::KeyEventHandler::Instance()->
-      AddPressFilter("glWidget_TEST_filter", SetKey);
+  // Click in the center of the screen
+  QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
+  QTest::qWait(500);
 
-  // Simulate keypresses separated by 100 millisecond intervals
+  // Verify the box was selected
+  QVERIFY(g_gotBoxSelection);
 
-  // Case: Lowercase 'a', no modifier
-  QTest::keyClick(glWidget, 'a', Qt::NoModifier, 100);
-  QVERIFY(lastKeyEvent.key == Qt::Key_A);
-  QVERIFY(lastKeyEvent.text.compare("a") == 0);
-  QVERIFY(!lastKeyEvent.control);
-  QVERIFY(!lastKeyEvent.shift);
-  QVERIFY(!lastKeyEvent.alt);
-
-  // Case: Uppercase "A", no modifier
-  QTest::keyClick(glWidget, 'A', Qt::NoModifier, 100);
-  QVERIFY(lastKeyEvent.key == Qt::Key_A);
-  QVERIFY(lastKeyEvent.text.compare("A") == 0);
-  QVERIFY(!lastKeyEvent.control);
-  QVERIFY(!lastKeyEvent.shift);
-  QVERIFY(!lastKeyEvent.alt);
-
-  // Case: Lowercase 'b', shift modifier
-  QTest::keyClick(glWidget, 'b', Qt::ShiftModifier, 100);
-  QVERIFY(lastKeyEvent.key == Qt::Key_B);
-  QVERIFY(lastKeyEvent.text.compare("b") == 0);
-  QVERIFY(!lastKeyEvent.control);
-  QVERIFY(lastKeyEvent.shift);
-  QVERIFY(!lastKeyEvent.alt);
-
-  // Case: Uppercase 'b', shift modifier
-  QTest::keyClick(glWidget, 'B', Qt::ShiftModifier, 100);
-  QVERIFY(lastKeyEvent.key == Qt::Key_B);
-  QVERIFY(lastKeyEvent.text.compare("B") == 0);
-  QVERIFY(!lastKeyEvent.control);
-  QVERIFY(lastKeyEvent.shift);
-  QVERIFY(!lastKeyEvent.alt);
-
-  // Case: lowercase 'c', control modifier
-  QTest::keyClick(glWidget, 'c', Qt::ControlModifier, 100);
-  QVERIFY(lastKeyEvent.key == Qt::Key_C);
-  QVERIFY(lastKeyEvent.control);
-  QVERIFY(!lastKeyEvent.shift);
-  QVERIFY(!lastKeyEvent.alt);
-
-  // Case: lowercase 'd', control modifier
-  QTest::keyClick(glWidget, 'd', Qt::AltModifier, 100);
-  QVERIFY(lastKeyEvent.key == Qt::Key_D);
-  QVERIFY(!lastKeyEvent.control);
-  QVERIFY(!lastKeyEvent.shift);
-  QVERIFY(lastKeyEvent.alt);
-
-  mainWindow.close();
+  mainWindow->close();
+  delete mainWindow;
 }
 
 // Generate a main function for the test

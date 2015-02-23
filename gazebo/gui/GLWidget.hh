@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -211,6 +211,10 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;
+
+      /// \brief Publishes information about user selections.
+      private: transport::PublisherPtr selectionPub;
+
       private: transport::SubscriberPtr selectionSub, requestSub;
 
       private: std::string keyText;
@@ -229,6 +233,12 @@ namespace gazebo
       /// \brief Flag that is set to true when GLWidget has responded to
       ///  OnCreateScene
       private: bool sceneCreated;
+
+      /// \brief True if the model editor is up, false otherwise
+      private: bool modelEditorEnabled;
+
+      /// \brief Mutext to protect selectedVisuals array.
+      private: boost::mutex selectedVisMutex;
     };
   }
 }

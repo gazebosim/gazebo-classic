@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ void BuildingEditor_TEST::ExitBuildingEditor()
   }
 
   // simulate events to discard model and exit the building editor
-  gazebo::gui::editor::Events::discardBuildingModel();
+  gazebo::gui::editor::Events::newBuildingModel();
   gazebo::gui::editor::Events::finishBuildingModel();
 
   // Process some events, and draw the screen

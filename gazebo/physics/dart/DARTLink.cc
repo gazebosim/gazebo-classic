@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/WorldPrivate.hh"
 
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTPhysics.hh"
@@ -246,9 +247,28 @@ void DARTLink::OnPoseChange()
       P = this->dtBodyNode->getParentBodyNode()->getTransform();
 
     Eigen::Isometry3d Q = T1.inverse() * P.inverse() * W * InvT2;
-    // Set generalized coordinate and update the transformations only
-    freeJoint->setPositions(dart::math::logMap(Q));
+
+    // Convert homogeneous transformation matrix to 6-dimensional generalized
+    // coordinates. There are several ways of conversions. Here is the way of
+    // DART. The orientation part is converted by using logarithm map, which
+    // maps SO(3) to so(3), and it takes the first three components of the
+    // generalized coordinates. On the other hand, the position part just takes
+    // the last three components of the generalized coordinates without any
+    // conversion.
+    Eigen::Vector6d q;
+    q.head<3>() = dart::math::logMap(Q.linear());
+    q.tail<3>() = Q.translation();
+    freeJoint->setPositions(q);
+    // TODO: The above 4 lines will be reduced to single line as:
+    // freeJoint->setPositions(FreeJoint::convertToPositions(Q));
+    // after the following PR is merged:
+    // https://github.com/dartsim/dart/pull/322
+
+    // Update all the transformations of the links in the parent model.
     freeJoint->getSkeleton()->computeForwardKinematics(true, false, false);
+    // TODO: This kinematic updating will be done automatically after pull
+    // request (https://github.com/dartsim/dart/pull/319) is merged so that
+    // we don't need this line anymore.
   }
   else
   {
@@ -717,7 +737,7 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
 
   // Set the new pose to the world
   // (Below method can be changed in gazebo code)
-  this->world->dirtyPoses.push_back(this);
+  this->world->dataPtr->dirtyPoses.push_back(this);
 }
 
 //////////////////////////////////////////////////

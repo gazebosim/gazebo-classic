@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,8 +128,10 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
 
   QVBoxLayout *step2Layout = new QVBoxLayout;
   step2Layout->addWidget(step2Label);
+  step2Layout->addSpacing(20);
   step2Layout->addLayout(distanceLayout);
   step2Layout->addLayout(resolutionLayout);
+  step2Layout->addSpacing(40);
   step2Layout->addLayout(step2Buttons);
 
   QWidget *step2Widget = new QWidget();

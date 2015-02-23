@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -399,6 +399,10 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
         return false;
       }
     }
+    else
+    {
+      return BulletJoint::SetParam(_key, _index, _value);
+    }
   }
   catch(const boost::bad_any_cast &e)
   {
@@ -407,7 +411,7 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
           << std::endl;
     return false;
   }
-  return BulletJoint::SetParam(_key, _index, _value);
+  return true;
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -385,9 +385,10 @@ void ModelListWidget_TEST::ModelProperties()
   QCOMPARE(modelItem->text(0), tr(modelName.c_str()));
 
   // Get propery browser widget
+  QObject *propTreeObj =
+    modelListWidget->findChild<QObject *>("propTreeBrowser");
   QtTreePropertyBrowser *propTreeBrowser =
-    modelListWidget->findChild<QtTreePropertyBrowser *>(
-      "propTreeBrowser");
+    dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
 
   QVERIFY(propTreeBrowser != NULL);
   QCOMPARE(propTreeBrowser->properties().size(), 0);
@@ -655,9 +656,10 @@ void ModelListWidget_TEST::LinkProperties()
   QCOMPARE(modelItem->text(0), tr(modelName.c_str()));
 
   // Get propery browser widget
+  QObject *propTreeObj =
+    modelListWidget->findChild<QObject *>("propTreeBrowser");
   QtTreePropertyBrowser *propTreeBrowser =
-    modelListWidget->findChild<QtTreePropertyBrowser *>(
-      "propTreeBrowser");
+    dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
 
   QVERIFY(propTreeBrowser != NULL);
   QCOMPARE(propTreeBrowser->properties().size(), 0);

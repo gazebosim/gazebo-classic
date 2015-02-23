@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -198,6 +198,20 @@ namespace gazebo
       /// \brief Qt signal emitted when the editor item is being deleted.
       Q_SIGNALS: void ItemDeleted();
 
+      /// \brief Qt callback when the color has been changed from the 3D view.
+      /// \param[in] _color Color.
+      private slots: void OnColorChanged(QColor _color);
+
+      /// \brief Qt callback when the texture has been changed from the 3D view.
+      /// \param[in] _texture Texture.
+      private slots: void OnTextureChanged(QString _texture);
+
+      /// \brief Z ordering of the rect item when idle (unselected.)
+      public: int zValueIdle;
+
+      /// \brief Z ordering of the rect item when selected.
+      public: int zValueSelected;
+
       /// \brief Type of editor item.
       protected: std::string editorType;
 
@@ -219,6 +233,13 @@ namespace gazebo
 
       /// \brief Transparency of the associated 3D visual.
       protected: float visual3dTransparency;
+
+      /// \brief Flag to indicate whether this item is currently highlighted or
+      /// not.
+      protected: bool highlighted;
+
+      /// \brief Scale for converting from pixel to metric units.
+      protected: double itemScale;
     };
     /// \}
   }

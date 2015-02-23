@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,25 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_CEGUI_H_
-#define _GAZEBO_CEGUI_H_
 
-// This disables warning messages
-#pragma GCC system_header
+#include <gtest/gtest.h>
+#include <gazebo/rendering/rendering.hh>
+#include "ServerFixture.hh"
 
-#include "gazebo/gazebo_config.h"
+using namespace gazebo;
 
-#ifdef HAVE_CEGUI
-#include <CEGUI/CEGUI.h>
-#include <CEGUI/CEGUIEventArgs.h>
-#include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
-#endif
+class Issue351Test : public ServerFixture
+{
+};
 
-#endif
+/////////////////////////////////////////////////
+// \brief Test for issue #351
+TEST_F(Issue351Test, WorldStep)
+{
+  Load("worlds/world_step.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Take 500 steps; it passes if it doesn't seg-fault
+  world->Step(500);
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,11 @@ namespace gazebo
                   /// \brief Door mode
                   DOOR,
                   /// \brief Stairs mode
-                  STAIRS
+                  STAIRS,
+                  /// \brief Color mode
+                  COLOR,
+                  /// \brief Texture mode
+                  TEXTURE
                 };
 
       /// \brief Constructor
@@ -147,6 +151,10 @@ namespace gazebo
       /// \param[in] _event Qt mouse event.
       private: void mouseDoubleClickEvent(QMouseEvent *_event);
 
+      /// \brief Qt leave event.
+      /// \param[in] _event Qt mouse event.
+      private: void leaveEvent(QEvent *_event);
+
       /// \brief Qt key press event.
       /// \param[in] _event Qt key event.
       private: void keyPressEvent(QKeyEvent *_event);
@@ -175,8 +183,15 @@ namespace gazebo
       /// \param[in] _type Type of editor item to be created.
       private: void OnCreateEditorItem(const std::string &_type);
 
-      // private: void OnSaveModel(const std::string &_modelName,
-      //     const std::string &_savePath);
+      /// \brief Callback triggered when the user chooses a color on the
+      /// palette.
+      /// \param[in] _color Selected color.
+      private: void OnColorSelected(QColor _color);
+
+      /// \brief Callback triggered when the user chooses a texture on the
+      /// palette.
+      /// \param[in] _texture Selected texture.
+      private: void OnTextureSelected(QString _texture);
 
       /// \brief Callback received when the model has been completed and
       /// uploaded onto the server.
@@ -320,6 +335,9 @@ namespace gazebo
 
       /// \brief Currently held grabber which will be snapped.
       private: GrabberHandle *snapGrabberCurrent;
+
+      /// \brief Text tooltip to follow the mouse.
+      private: QGraphicsTextItem *mouseTooltip;
     };
     /// \}
   }

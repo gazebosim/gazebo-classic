@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ TEST_F(CameraTest, Follow)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   // Spawn a box to follow.
   SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(10, 10, 1),
@@ -44,10 +44,10 @@ TEST_F(CameraTest, Follow)
       cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
 
   rendering::ScenePtr scene = rendering::get_scene();
-  ASSERT_TRUE(scene);
+  ASSERT_TRUE(scene != NULL);
 
   rendering::CameraPtr camera = scene->GetCamera("test_camera");
-  ASSERT_TRUE(camera);
+  ASSERT_TRUE(camera != NULL);
 
   // Make sure the sensor is at the correct initial pose
   EXPECT_EQ(camera->GetWorldPose(), cameraStartPose);
@@ -85,7 +85,7 @@ TEST_F(CameraTest, Visible)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   // Spawn a box.
   SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(1, 0, 0.5),
@@ -99,14 +99,14 @@ TEST_F(CameraTest, Visible)
       cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
-  ASSERT_TRUE(sensor);
+  ASSERT_TRUE(sensor != NULL);
   // this makes sure a world step will trigger the camera render update
   sensor->SetUpdateRate(1000);
 
   rendering::ScenePtr scene = rendering::get_scene();
-  ASSERT_TRUE(scene);
+  ASSERT_TRUE(scene != NULL);
   rendering::CameraPtr camera = scene->GetCamera(cameraName);
-  ASSERT_TRUE(camera);
+  ASSERT_TRUE(camera != NULL);
 
   // Make sure the camera is at the correct initial pose
   EXPECT_EQ(camera->GetWorldPose(), cameraStartPose);
@@ -120,13 +120,13 @@ TEST_F(CameraTest, Visible)
     common::Time::MSleep(100);
     sleep++;
   }
-  ASSERT_TRUE(visual);
+  ASSERT_TRUE(visual != NULL);
 
   // box should be visible to the camera.
   EXPECT_TRUE(camera->IsVisible(visual));
 
   physics::ModelPtr box = world->GetModel("box");
-  ASSERT_TRUE(box);
+  ASSERT_TRUE(box != NULL);
 
   // move the box behind the camera and it should not be visible to the camera
   math::Pose pose = math::Pose(-1, 0, 0.5, 0, 0, 0);

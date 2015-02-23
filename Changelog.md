@@ -1,6 +1,27 @@
 ## Gazebo 5.0
 
+### Gazebo 5.1.0
+1. Added Joint Msg-to-SDF conversion functions and test.
+    * [Pull request #1419](https://bitbucket.org/osrf/gazebo/pull-request/1419)
+
+1. Added Visual, Material Msg-to-SDF conversion functions and ShaderType to string conversion functions.
+    * [Pull request #1415](https://bitbucket.org/osrf/gazebo/pull-request/1415)
+
 ### Gazebo 5.0.0
+1. Support for using [digital elevation maps](http://gazebosim.org/tutorials?tut=dem) has been added to debian packages.
+
+1. C++11 support (C++11 compatible compiler is now required)
+    * [Pull request #1340](https://bitbucket.org/osrf/gazebo/pull-request/1340)
+
+1. Implemented private data pointer for the World class.
+    * [Pull request #1383](https://bitbucket.org/osrf/gazebo/pull-request/1383)
+
+1. Implemented private data pointer for the Scene class.
+    * [Pull request #1385](https://bitbucket.org/osrf/gazebo/pull-request/1385)
+
+1. Added a events::Event::resetWorld event that is triggered when World::Reset is called.
+    * [Pull request #1332](https://bitbucket.org/osrf/gazebo/pull-request/1332)
+    * [Issue #1375](https://bitbucket.org/osrf/gazebo/issue/1375)
 
 1. Fixed `math::Box::GetCenter` functionality.
     * [Pull request #1278](https://bitbucket.org/osrf/gazebo/pull-request/1278)
@@ -76,6 +97,16 @@
 1. Added "button modifier" fields (control, shift, and alt) to common::KeyEvent.
     * [Pull request #1325](https://bitbucket.org/osrf/gazebo/pull-request/1325)
 
+1. Added inputs for environment variable GAZEBO_GUI_INI_FILE for reading a custom .ini file.
+    * [Pull request #1252](https://bitbucket.org/osrf/gazebo/pull-request/1252)
+
+1. Fixed crash on "permission denied" bug, added insert_model integration test.
+    * [Pull request #1329](https://bitbucket.org/osrf/gazebo/pull-request/1329/)
+
+1. Enable simbody joint tests, implement `SimbodyJoint::GetParam`, create
+   `Joint::GetParam`, fix bug in `BulletHingeJoint::SetParam`.
+    * [Pull request #1404](https://bitbucket.org/osrf/gazebo/pull-request/1404/)
+
 1. Building editor updates
     1. Fixed inspector resizing.
         * [Pull request #1230](https://bitbucket.org/osrf/gazebo/pull-request/1230)
@@ -131,6 +162,9 @@
     1. Snap walls to length increments, moved scale to SegmentItem and added Get/SetScale, added SegmentItem::SnapAngle and SegmentItem::SnapLength.
         * [Pull request #1311](https://bitbucket.org/osrf/gazebo/pull-request/1311)
 
+    1. Make buildings available in "Insert Models" tab, improve save flow.
+        * [Pull request #1312](https://bitbucket.org/osrf/gazebo/pull-request/1312)
+
     1. Added EditorItem::SetHighlighted.
         * [Pull request #1308](https://bitbucket.org/osrf/gazebo/pull-request/1308)
 
@@ -140,17 +174,42 @@
     1. Detach all child manips when item is deleted, added BuildingMaker::DetachAllChildren.
         * [Pull request #1316](https://bitbucket.org/osrf/gazebo/pull-request/1316)
 
-    1. Enabled multi-selection and align tool inside model editor.
-        * [Pull request #1302](https://bitbucket.org/osrf/gazebo/pull-request/1302)
-        * [Issue #1323](https://bitbucket.org/osrf/gazebo/issue/1323)
-
     1. Added texture picker to inspector dialogs.
         * [Pull request #1306](https://bitbucket.org/osrf/gazebo/pull-request/1306)
+
+    1. Measures for doors and windows. Added RectItem::angleOnWall and related Get/Set.
+        * [Pull request #1322](https://bitbucket.org/osrf/gazebo/pull-request/1322)
+        * [Issue #370](https://bitbucket.org/osrf/gazebo/issue/370)
+
+    1. Added Gazebo/BuildingFrame material to display holes for doors and windows on walls.
+        * [Pull request #1338](https://bitbucket.org/osrf/gazebo/pull-request/1338)
+
+    1. Added Gazebo/Bricks material to be used as texture on the building editor.
+        * [Pull request #1333](https://bitbucket.org/osrf/gazebo/pull-request/1333)
+
+    1. Pick colors from the palette and assign on 3D view. Added mouse and key event handlers to BuildingMaker, and events to communicate from BuildingModelManip to EditorItem.
+        * [Pull request #1336](https://bitbucket.org/osrf/gazebo/pull-request/1336)
+
+    1. Pick textures from the palette and assign in 3D view.
+        * [Pull request #1368](https://bitbucket.org/osrf/gazebo/pull-request/1368)
 
 1. Model editor updates
     1. Fix adding/removing event filters .
         * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
 
+    1. Enabled multi-selection and align tool inside model editor.
+        * [Pull request #1302](https://bitbucket.org/osrf/gazebo/pull-request/1302)
+        * [Issue #1323](https://bitbucket.org/osrf/gazebo/issue/1323)
+
+    1. Enabled snap mode inside model editor.
+        * [Pull request #1331](https://bitbucket.org/osrf/gazebo/pull-request/1331)
+        * [Issue #1318](https://bitbucket.org/osrf/gazebo/issue/1318)
+
+    1. Implemented copy/pasting of links.
+        * [Pull request #1330](https://bitbucket.org/osrf/gazebo/pull-request/1330)
+
+1. GUI publishes model selection information on ~/selection topic.
+    * [Pull request #1318](https://bitbucket.org/osrf/gazebo/pull-request/1318)
 
 ## Gazebo 4.0
 
@@ -177,6 +236,10 @@
     * [Pull request #1271](https://bitbucket.org/osrf/gazebo/pull-request/1271)
 1. Fix loading collada meshes with unsupported input semantics.
     * [Pull request #1319](https://bitbucket.org/osrf/gazebo/pull-request/1319)
+1. Fix race condition with ImuSensor not publishing after Reset World.
+    * [Pull request #1448](https://bitbucket.org/osrf/gazebo/pull-request/1448)
+    * [Pull request #1446](https://bitbucket.org/osrf/gazebo/pull-request/1446)
+    * [Issue #236](https://bitbucket.org/osrf/gazebo/issue/236)
 
 ### Gazebo 4.0.2 (2014-09-23)
 

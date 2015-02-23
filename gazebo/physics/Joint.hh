@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -460,7 +460,7 @@ namespace gazebo
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
       public: virtual double GetParam(const std::string &_key,
-                                      unsigned int _index) = 0;
+                                      unsigned int _index);
 
       /// \brief Get the child link
       /// \return Pointer to the child link.

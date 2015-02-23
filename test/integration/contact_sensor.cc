@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,19 +28,83 @@ using namespace gazebo;
 class ContactSensor : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
-  public: void EmptyWorld(const std::string &_physicsEngine);
+  /// \brief Test multiple contact sensors on a single link.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void MultipleSensors(const std::string &_physicsEngine);
   public: void StackTest(const std::string &_physicsEngine);
   public: void TorqueTest(const std::string &_physicsEngine);
+
+  /// \brief Callback for sensor subscribers in MultipleSensors test.
+  private: void Callback(const ConstContactsPtr &_msg);
 };
 
-void ContactSensor::EmptyWorld(const std::string &_physicsEngine)
+unsigned int g_messageCount = 0;
+
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::Callback(const ConstContactsPtr &/*_msg*/)
 {
-  Load("worlds/empty.world", false, _physicsEngine);
+  g_messageCount++;
 }
 
-TEST_P(ContactSensor, EmptyWorld)
+////////////////////////////////////////////////////////////////////////
+// Test having multiple contact sensors under a single link.
+// https://bitbucket.org/osrf/gazebo/issue/960
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
 {
-  EmptyWorld(GetParam());
+  Load("worlds/contact_sensors_multiple.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != NULL);
+
+  const std::string contactSensorName1("box_contact");
+  const std::string contactSensorName2("box_contact2");
+
+  {
+    sensors::SensorPtr sensor1 = sensors::get_sensor(contactSensorName1);
+    sensors::ContactSensorPtr contactSensor1 =
+        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor1);
+    ASSERT_TRUE(contactSensor1 != NULL);
+  }
+
+  {
+    sensors::SensorPtr sensor2 = sensors::get_sensor(contactSensorName2);
+    sensors::ContactSensorPtr contactSensor2 =
+        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor2);
+    ASSERT_TRUE(contactSensor2 != NULL);
+  }
+
+  // There should be 5 topics advertising Contacts messages
+  std::list<std::string> topicsExpected;
+  std::string prefix = "/gazebo/default/";
+  topicsExpected.push_back(prefix+"physics/contacts");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact/contacts");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact2/contacts");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact2");
+  std::list<std::string> topics =
+    transport::getAdvertisedTopics("gazebo.msgs.Contacts");
+  EXPECT_FALSE(topics.empty());
+  EXPECT_EQ(topics.size(), topicsExpected.size());
+  EXPECT_EQ(topics, topicsExpected);
+
+  // We should expect them all to publish.
+  for (auto const &topic : topics)
+  {
+    gzdbg << "Listening to " << topic << std::endl;
+    g_messageCount = 0;
+    transport::SubscriberPtr sub = this->node->Subscribe(topic,
+      &ContactSensor::Callback, this);
+
+    const unsigned int steps = 50;
+    world->Step(steps);
+    common::Time::MSleep(steps);
+    EXPECT_GT(g_messageCount, steps / 2);
+  }
+}
+
+TEST_P(ContactSensor, MultipleSensors)
+{
+  MultipleSensors(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -103,13 +167,13 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   sensors::ContactSensorPtr contactSensor01 =
       boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor01);
 
-  ASSERT_TRUE(contactSensor01);
+  ASSERT_TRUE(contactSensor01 != NULL);
 
   sensors::SensorPtr sensor02 = sensors::get_sensor(contactSensorName02);
   sensors::ContactSensorPtr contactSensor02 =
       boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor02);
 
-  ASSERT_TRUE(contactSensor02);
+  ASSERT_TRUE(contactSensor02 != NULL);
 
   sensors::SensorManager::Instance()->Init();
   sensors::SensorManager::Instance()->RunThreads();
@@ -130,8 +194,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
   physics::ModelPtr contactModel01 = world->GetModel(modelName01);
   physics::ModelPtr contactModel02 = world->GetModel(modelName02);
-  ASSERT_TRUE(contactModel01);
-  ASSERT_TRUE(contactModel02);
+  ASSERT_TRUE(contactModel01 != NULL);
+  ASSERT_TRUE(contactModel02 != NULL);
 
   std::vector<physics::ModelPtr> models;
   models.push_back(contactModel01);
@@ -177,7 +241,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
     unsigned int ColInd = 0;
     physics::CollisionPtr col = models[k]->GetLink()->GetCollision(ColInd);
-    ASSERT_TRUE(col);
+    ASSERT_TRUE(col != NULL);
 
     // calculate tolerance based on magnitude of force
     // Uncomment lines below once we are able to accurately determine the
@@ -329,7 +393,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   sensors::ContactSensorPtr contactSensor =
       boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
 
-  ASSERT_TRUE(contactSensor);
+  ASSERT_TRUE(contactSensor != NULL);
 
   sensors::SensorManager::Instance()->Init();
   sensors::SensorManager::Instance()->RunThreads();
@@ -344,7 +408,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   EXPECT_TRUE(contactSensor->IsActive());
 
   physics::ModelPtr contactModel = world->GetModel(modelName);
-  ASSERT_TRUE(contactModel);
+  ASSERT_TRUE(contactModel != NULL);
 
   double gravityZ = -9.8;
   physics->SetGravity(math::Vector3(0, 0, gravityZ));
@@ -370,7 +434,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   unsigned int ColInd = 0;
   physics::CollisionPtr col = contactModel->GetLink()->GetCollision(ColInd);
-  ASSERT_TRUE(col);
+  ASSERT_TRUE(col != NULL);
 
   // double tol = 2e-1;
   // loop through contact collision pairs

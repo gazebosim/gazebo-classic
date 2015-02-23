@@ -16,7 +16,7 @@
   <file>images/insertModel.png</file>
   <file>images/translate.png</file>
   <file>images/rotate.png</file>
-  <file>images/scale.png</file>  
+  <file>images/scale.png</file>
   <file>images/arrow.png</file>
   <file>images/down_arrow.png</file>
   <file>images/box_selection.png</file>
@@ -30,9 +30,9 @@
   <file>images/rotate_object.png</file>
   <file>images/scale_object.png</file>
   <file>images/door.svg</file>
-  <file>images/window.svg</file>  
+  <file>images/window.svg</file>
   <file>images/stairs.svg</file>
-  <file>images/wall.svg</file> 
+  <file>images/wall.svg</file>
   <file>images/record.png</file>
   <file>images/record_stop.png</file>
   <file>images/right_arrow.png</file>
@@ -48,9 +48,11 @@
   <file>images/y_center.png</file>
   <file>images/y_max.png</file>
   <file>images/z_min.png</file>
-  <file>images/z_center.png</file>  
+  <file>images/z_center.png</file>
   <file>images/z_max.png</file>
+  <file>images/draw_link.svg</file>
   <file alias='wood.jpg'>../../media/materials/textures/wood.jpg</file>
   <file alias='tiles.jpg'>../../media/materials/textures/ceiling_tiled.jpg</file>
+  <file alias='bricks.png'>../../media/materials/textures/bricks.png</file>
 </qresource>
 </RCC>
