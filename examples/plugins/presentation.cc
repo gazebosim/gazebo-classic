@@ -32,7 +32,7 @@ namespace gazebo
   class State
   {
     public: State(const std::string &_slide,
-                  const math::Vector3 _offset,
+                  const math::Vector3 &_offset,
                   double _pitch, double _yaw, double _duration)
             : slide(_slide), offset(_offset),
               pitch(_pitch), yaw(_yaw), duration(_duration) {}

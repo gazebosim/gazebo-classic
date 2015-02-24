@@ -40,7 +40,7 @@ boost::recursive_mutex *Graphics3dInterface::mutex = NULL;
 // Constructor
 Graphics3dInterface::Graphics3dInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
-: GazeboInterface(addr, driver, cf, section)
+: GazeboInterface(addr, driver, cf, section), gz_id(NULL), iface(NULL)
 {
   /*
   // Get the ID of the interface

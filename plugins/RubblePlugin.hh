@@ -45,8 +45,8 @@ namespace gazebo
     private: void MakeCinderBlock(const std::string &_name, math::Pose &_pose,
                                   math::Vector3 &_size, double _mass);
 
-    private: void MakeCylinder(const std::string &_name, math::Vector3 &_pos,
-                               math::Vector3 &_size, double _mass);
+    // private: void MakeCylinder(const std::string &_name, math::Vector3 &_pos,
+    //                           math::Vector3 &_size, double _mass);
 
     private: class Obj
              {
@@ -65,7 +65,7 @@ namespace gazebo
                public: std::vector<Obj> objects;
              };
 
-    private: void MakeCompound(const std::string &_name, CompoundObj &_obj);
+    // private: void MakeCompound(const std::string &_name, CompoundObj &_obj);
     private: physics::WorldPtr world;
   };
 }
