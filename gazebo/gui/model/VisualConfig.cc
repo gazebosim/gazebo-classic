@@ -15,7 +15,9 @@
  *
 */
 
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/rendering/Material.hh"
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/model/VisualConfig.hh"
 
@@ -55,6 +57,11 @@ VisualConfig::VisualConfig()
 /////////////////////////////////////////////////
 VisualConfig::~VisualConfig()
 {
+  while (!this->configs.empty())
+  {
+    auto config = this->configs.begin();
+    this->configs.erase(config);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -114,15 +121,38 @@ void VisualConfig::AddVisual(const std::string &_name,
 
   ConfigWidget *configWidget = new ConfigWidget;
 
+  msgs::Visual msgToLoad;
   if (_visualMsg)
+    msgToLoad = *_visualMsg;
+
+  // set default values
+  // TODO: auto-fill them with SDF defaults
+  msgs::Material *matMsg = msgToLoad.mutable_material();
+  if (!matMsg->has_lighting())
+      matMsg->set_lighting(true);
+  if (matMsg->has_script())
   {
-    configWidget->Load(_visualMsg);
+    msgs::Material::Script *scriptMsg = matMsg->mutable_script();
+    if (scriptMsg && scriptMsg->has_name())
+    {
+      common::Color ambient;
+      common::Color diffuse;
+      common::Color specular;
+      common::Color emissive;
+      bool matFound = rendering::Material::GetMaterialAsColor(scriptMsg->name(),
+          ambient, diffuse, specular, emissive);
+
+      if (matFound)
+      {
+        msgs::Set(matMsg->mutable_ambient(), ambient);
+        msgs::Set(matMsg->mutable_diffuse(), diffuse);
+        msgs::Set(matMsg->mutable_specular(), specular);
+        msgs::Set(matMsg->mutable_emissive(), emissive);
+      }
+    }
   }
-  else
-  {
-    msgs::Visual visualMsg;
-    configWidget->Load(&visualMsg);
-  }
+
+  configWidget->Load(&msgToLoad);
 
   configWidget->SetWidgetVisible("id", false);
   configWidget->SetWidgetVisible("name", false);
@@ -165,14 +195,14 @@ void VisualConfig::AddVisual(const std::string &_name,
 
 /////////////////////////////////////////////////
 void VisualConfig::UpdateVisual(const std::string &_name,
-    const msgs::Visual *_visualMsg)
+    ConstVisualPtr _visualMsg)
 {
   for (auto &it : this->configs)
   {
     if (it.second->name == _name)
     {
       VisualConfigData *configData = it.second;
-      configData->configWidget->UpdateFromMsg(_visualMsg);
+      configData->configWidget->UpdateFromMsg(_visualMsg.get());
       break;
     }
   }
@@ -231,6 +261,31 @@ void VisualConfig::SetGeometry(const std::string &_name,
           "geometry", dimensions, uri);
       it.second->configWidget->SetGeometryWidgetValue("geometry", type,
           _size, _uri);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::SetMaterial(const std::string &_name,
+  const std::string &_materialName, const common::Color &_ambient,
+  const common::Color &_diffuse, const common::Color &_specular,
+  const common::Color &_emissive)
+{
+  for (auto &it : this->configs)
+  {
+    if (it.second->name == _name)
+    {
+      it.second->configWidget->SetStringWidgetValue("material::script::name",
+          _materialName);
+      it.second->configWidget->SetColorWidgetValue("material::ambient",
+          _ambient);
+      it.second->configWidget->SetColorWidgetValue("material::diffuse",
+          _diffuse);
+      it.second->configWidget->SetColorWidgetValue("material::specular",
+          _specular);
+      it.second->configWidget->SetColorWidgetValue("material::emissive",
+          _emissive);
       break;
     }
   }

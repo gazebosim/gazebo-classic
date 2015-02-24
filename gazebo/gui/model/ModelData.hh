@@ -22,7 +22,12 @@
 #include <vector>
 
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/gui/qt.h"
+#include "gazebo/gui/model/LinkInspector.hh"
+
+namespace boost
+{
+  class recursive_mutex;
+}
 
 namespace boost
 {
@@ -74,6 +79,10 @@ namespace gazebo
       /// \param[in] _pose Pose of part.
       public: void SetPose(const math::Pose &_pose);
 
+      /// \brief Load the part with data from SDF.
+      /// \param[in] _sdf Link SDF element.
+      public: void Load(sdf::ElementPtr _sdf);
+
       /// \brief Get the scale of the part.
       /// \return Scale of part.
       public: math::Vector3 GetScale() const;
@@ -92,6 +101,11 @@ namespace gazebo
 
       /// \brief Update the inspector widget if necessary.
       public: void UpdateConfig();
+
+      /// \brief Clone the part data.
+      /// \param[in] _newName Name to give to the cloned part.
+      /// \return A clone of this part data.
+      public: PartData *Clone(const std::string &_newName);
 
       /// \brief Update callback on PreRender.
       private: void Update();
