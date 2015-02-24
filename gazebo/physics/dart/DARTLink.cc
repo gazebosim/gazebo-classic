@@ -214,7 +214,7 @@ void DARTLink::Init()
   // Friction coefficient
 
   /// \todo FIXME: Friction Parameters
-  /// Gazebo allows to have different friction parameters per collision objects,
+  /// Gazebo allows different friction parameters per collision objects,
   /// while DART stores the friction parameter per link (BodyNode in DART). For
   /// now, the average friction parameter of all the child collision objects is
   /// stored in this->dtBodyNode.

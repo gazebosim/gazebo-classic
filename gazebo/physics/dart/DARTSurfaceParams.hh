@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _DARTSURFACEPARAMS_HH_
-#define _DARTSURFACEPARAMS_HH_
+#ifndef _GAZEBO_DARTSURFACEPARAMS_HH_
+#define _GAZEBO_DARTSURFACEPARAMS_HH_
 
 #include <sdf/sdf.hh>
 
