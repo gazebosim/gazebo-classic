@@ -197,8 +197,11 @@ namespace gazebo
       ///
       /// A user camera is one design for use with a GUI.
       /// \param[in] _name Name of the UserCamera.
+      /// \param[in] _stereoEnabled True to enable stereo rendering. This is
+      /// here for compatibility with 3D monitors/TVs.
       /// \return A pointer to the new UserCamera.
-      public: UserCameraPtr CreateUserCamera(const std::string &_name);
+      public: UserCameraPtr CreateUserCamera(const std::string &_name,
+                  bool _stereoEnabled = false);
 
       /// \brief Get the number of user cameras in this scene
       /// \return The number of user cameras.
@@ -402,6 +405,10 @@ namespace gazebo
       /// \param[in] _show True to enable center of mass visualization.
       public: void ShowCOMs(bool _show);
 
+      /// \brief Enable or disable inertia visualization.
+      /// \param[in] _show True to enable inertia visualization.
+      public: void ShowInertias(bool _show);
+
       /// \brief Enable or disable joint visualization.
       /// \param[in] _show True to enable joint visualization.
       public: void ShowJoints(bool _show);
@@ -582,6 +589,18 @@ namespace gazebo
       /// \param[in] _linkVisual Pointer to the link's visual.
       private: void CreateCOMVisual(sdf::ElementPtr _elem,
                                     VisualPtr _linkVisual);
+
+      /// \brief Create a new inertia visual.
+      /// \param[in] _msg Message containing the link data.
+      /// \param[in] _linkVisual Pointer to the link's visual.
+      private: void CreateInertiaVisual(ConstLinkPtr &_msg,
+          VisualPtr _linkVisual);
+
+      /// \brief Create an inertia visual using SDF data.
+      /// \param[in] _elem SDF element data.
+      /// \param[in] _linkVisual Pointer to the link's visual.
+      private: void CreateInertiaVisual(sdf::ElementPtr _elem,
+          VisualPtr _linkVisual);
 
       /// \internal
       /// \brief Pointer to private data.

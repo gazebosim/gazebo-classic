@@ -434,7 +434,7 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   }
   else if (_msg->has_type() && _msg->type() == "error")
   {
-    if (_msg->response() == "nonexistant")
+    if (_msg->response() == "nonexistent")
     {
       this->removeEntityList.push_back(this->selectedEntityName);
     }
@@ -509,7 +509,8 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
   if (i >= 0)
   {
     g_modelRightMenu->Run(item->text(0).toStdString(),
-                          this->modelTreeWidget->mapToGlobal(_pt));
+                          this->modelTreeWidget->mapToGlobal(_pt),
+                          ModelRightMenu::EntityTypes::MODEL);
     return;
   }
 
@@ -518,7 +519,8 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
   if (i >= 0)
   {
     g_modelRightMenu->Run(item->text(0).toStdString(),
-                          this->modelTreeWidget->mapToGlobal(_pt));
+                          this->modelTreeWidget->mapToGlobal(_pt),
+                          ModelRightMenu::EntityTypes::LIGHT);
   }
 }
 

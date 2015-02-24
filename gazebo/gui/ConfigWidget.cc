@@ -47,14 +47,32 @@ void ConfigWidget::Load(const google::protobuf::Message *_msg)
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->setAlignment(Qt::AlignTop);
   mainLayout->addWidget(widget);
+
   this->setLayout(mainLayout);
+
+  // set up event filter for scrollable widgets to make sure they don't steal
+  // focus when embedded in a QScrollArea.
+  QList<QAbstractSpinBox *> spinBoxes =
+      this->findChildren<QAbstractSpinBox *>();
+  for (int i = 0; i < spinBoxes.size(); ++i)
+  {
+    spinBoxes[i]->installEventFilter(this);
+    spinBoxes[i]->setFocusPolicy(Qt::StrongFocus);
+  }
+  QList<QComboBox *> comboBoxes =
+      this->findChildren<QComboBox *>();
+  for (int i = 0; i < comboBoxes.size(); ++i)
+  {
+    comboBoxes[i]->installEventFilter(this);
+    comboBoxes[i]->setFocusPolicy(Qt::StrongFocus);
+  }
 }
 
 /////////////////////////////////////////////////
 void ConfigWidget::UpdateFromMsg(const google::protobuf::Message *_msg)
 {
   this->configMsg->CopyFrom(*_msg);
-  this->Parse(this->configMsg);
+  this->Parse(this->configMsg, true);
 }
 
 /////////////////////////////////////////////////
@@ -241,13 +259,14 @@ void ConfigWidget::SetPoseWidgetValue(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ConfigWidget::SetGeometryWidgetValue(const std::string &_name,
-    const std::string &_value, const math::Vector3 &_dimensions)
+    const std::string &_value, const math::Vector3 &_dimensions,
+    const std::string &_uri)
 {
   std::map <std::string, ConfigChildWidget *>::iterator iter =
       this->configWidgets.find(_name);
 
   if (iter != this->configWidgets.end())
-    this->UpdateGeometryWidget(iter->second, _value, _dimensions);
+    this->UpdateGeometryWidget(iter->second, _value, _dimensions, _uri);
 }
 
 /////////////////////////////////////////////////
@@ -349,19 +368,19 @@ math::Pose ConfigWidget::GetPoseWidgetValue(const std::string &_name) const
 
 /////////////////////////////////////////////////
 std::string ConfigWidget::GetGeometryWidgetValue(const std::string &_name,
-    math::Vector3 &_dimensions) const
+    math::Vector3 &_dimensions, std::string &_uri) const
 {
   std::string type;
   std::map <std::string, ConfigChildWidget *>::const_iterator iter =
       this->configWidgets.find(_name);
 
   if (iter != this->configWidgets.end())
-    type = this->GetGeometryWidgetValue(iter->second, _dimensions);
+    type = this->GetGeometryWidgetValue(iter->second, _dimensions, _uri);
   return type;
 }
 
 /////////////////////////////////////////////////
-QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
+QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
     const std::string &_name)
 {
   std::vector<QWidget *> newWidgets;
@@ -389,15 +408,19 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
     // TODO parse repeated fields and enum fields.
     if (!field->is_repeated())
     {
+      if (_update && !ref->HasField(*_msg, field))
+        continue;
+
       QWidget *newFieldWidget = NULL;
       ConfigChildWidget *configChildWidget = NULL;
 
       bool newWidget = true;
       std::string scopedName = _name.empty() ? name : _name + "::" + name;
       if (this->configWidgets.find(scopedName) != this->configWidgets.end())
+      {
         newWidget = false;
-      else
         configChildWidget = this->configWidgets[scopedName];
+      }
 
       switch (field->cpp_type())
       {
@@ -512,75 +535,81 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
                 valueMsg->GetDescriptor();
             const google::protobuf::FieldDescriptor *typeField =
                 valueDescriptor->FindFieldByName("type");
-            const google::protobuf::EnumValueDescriptor *typeValueDescriptor =
-                valueMsg->GetReflection()->GetEnum(*valueMsg, typeField);
 
-            std::string geometryTypeStr;
-            if (typeValueDescriptor)
+            if (valueMsg->GetReflection()->HasField(*valueMsg, typeField))
             {
-              geometryTypeStr =
-                  QString(typeValueDescriptor->name().c_str()).toLower().
-                  toStdString();
-            }
+              const google::protobuf::EnumValueDescriptor *typeValueDescriptor =
+                  valueMsg->GetReflection()->GetEnum(*valueMsg, typeField);
 
-            math::Vector3 dimensions;
-            // dimensions
-            for (int k = 0; k < valueDescriptor->field_count() ; ++k)
-            {
-              const google::protobuf::FieldDescriptor *geomField =
-                  valueDescriptor->field(k);
+              std::string geometryTypeStr;
+              if (typeValueDescriptor)
+              {
+                geometryTypeStr =
+                    QString(typeValueDescriptor->name().c_str()).toLower().
+                    toStdString();
+              }
 
-              if (geomField->is_repeated())
+              math::Vector3 dimensions;
+              // dimensions
+              for (int k = 0; k < valueDescriptor->field_count() ; ++k)
+              {
+                const google::protobuf::FieldDescriptor *geomField =
+                    valueDescriptor->field(k);
+
+                if (geomField->is_repeated())
+                    continue;
+
+                if (geomField->cpp_type() !=
+                    google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE ||
+                    !valueMsg->GetReflection()->HasField(*valueMsg, geomField))
                   continue;
 
-              if (geomField->cpp_type() !=
-                  google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE ||
-                  !valueMsg->GetReflection()->HasField(*valueMsg, geomField))
-                continue;
+                google::protobuf::Message *geomValueMsg =
+                    valueMsg->GetReflection()->MutableMessage(
+                    valueMsg, geomField);
+                const google::protobuf::Descriptor *geomValueDescriptor =
+                    geomValueMsg->GetDescriptor();
 
-              google::protobuf::Message *geomValueMsg =
-                valueMsg->GetReflection()->MutableMessage(valueMsg, geomField);
-              const google::protobuf::Descriptor *geomValueDescriptor =
-                  geomValueMsg->GetDescriptor();
-
-              std::string geomMsgName = geomField->message_type()->name();
-              if (geomMsgName == "BoxGeom")
-              {
-                google::protobuf::Message *geomDimMsg =
-                    geomValueMsg->GetReflection()->MutableMessage(geomValueMsg,
-                    geomValueDescriptor->field(0));
-                dimensions = this->ParseVector3(geomDimMsg);
-                break;
+                std::string geomMsgName = geomField->message_type()->name();
+                if (geomMsgName == "BoxGeom" || geomMsgName == "MeshGeom")
+                {
+                  int fieldIdx = (geomMsgName == "BoxGeom") ? 0 : 1;
+                  google::protobuf::Message *geomDimMsg =
+                      geomValueMsg->GetReflection()->MutableMessage(
+                      geomValueMsg, geomValueDescriptor->field(fieldIdx));
+                  dimensions = this->ParseVector3(geomDimMsg);
+                  break;
+                }
+                else if (geomMsgName == "CylinderGeom")
+                {
+                  const google::protobuf::FieldDescriptor *geomRadiusField =
+                      geomValueDescriptor->FindFieldByName("radius");
+                  double radius = geomValueMsg->GetReflection()->GetDouble(
+                      *geomValueMsg, geomRadiusField);
+                  const google::protobuf::FieldDescriptor *geomLengthField =
+                      geomValueDescriptor->FindFieldByName("length");
+                  double length = geomValueMsg->GetReflection()->GetDouble(
+                      *geomValueMsg, geomLengthField);
+                  dimensions.x = radius * 2.0;
+                  dimensions.y = dimensions.x;
+                  dimensions.z = length;
+                  break;
+                }
+                else if (geomMsgName == "SphereGeom")
+                {
+                  const google::protobuf::FieldDescriptor *geomRadiusField =
+                      geomValueDescriptor->FindFieldByName("radius");
+                  double radius = geomValueMsg->GetReflection()->GetDouble(
+                      *geomValueMsg, geomRadiusField);
+                  dimensions.x = radius * 2.0;
+                  dimensions.y = dimensions.x;
+                  dimensions.z = dimensions.x;
+                  break;
+                }
               }
-              else if (geomMsgName == "CylinderGeom")
-              {
-                const google::protobuf::FieldDescriptor *geomRadiusField =
-                    geomValueDescriptor->FindFieldByName("radius");
-                double radius = geomValueMsg->GetReflection()->GetDouble(
-                    *geomValueMsg, geomRadiusField);
-                const google::protobuf::FieldDescriptor *geomLengthField =
-                    geomValueDescriptor->FindFieldByName("length");
-                double length = geomValueMsg->GetReflection()->GetDouble(
-                    *geomValueMsg, geomLengthField);
-                dimensions.x = radius * 2.0;
-                dimensions.y = radius * 2.0;
-                dimensions.z = length;
-                break;
-              }
-              else if (geomMsgName == "SphereGeom")
-              {
-                const google::protobuf::FieldDescriptor *geomRadiusField =
-                    geomValueDescriptor->FindFieldByName("radius");
-                double radius = geomValueMsg->GetReflection()->GetDouble(
-                    *geomValueMsg, geomRadiusField);
-                dimensions.x = radius;
-                dimensions.y = radius;
-                dimensions.z = radius;
-                break;
-              }
+              this->UpdateGeometryWidget(configChildWidget,
+                  geometryTypeStr, dimensions);
             }
-            this->UpdateGeometryWidget(configChildWidget,
-                geometryTypeStr, dimensions);
           }
           // parse and create custom pose widgets
           else if (field->message_type()->name() == "Pose")
@@ -665,8 +694,13 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
             {
               const google::protobuf::FieldDescriptor *valueField =
                   valueDescriptor->field(j);
-              values.push_back(
-                  valueMsg->GetReflection()->GetFloat(*valueMsg, valueField));
+              if (valueMsg->GetReflection()->HasField(*valueMsg, valueField))
+              {
+                values.push_back(valueMsg->GetReflection()->GetFloat(
+                    *valueMsg, valueField));
+              }
+              else
+                values.push_back(0);
             }
             color.r = values[0];
             color.g = values[1];
@@ -677,13 +711,16 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
           else
           {
             // parse the message fields recursively
-            QWidget *groupBoxWidget = Parse(valueMsg, scopedName);
-            newFieldWidget = new ConfigChildWidget();
-            QVBoxLayout *groupBoxLayout = new QVBoxLayout;
-            groupBoxLayout->addWidget(groupBoxWidget);
-            newFieldWidget->setLayout(groupBoxLayout);
-            qobject_cast<ConfigChildWidget *>(newFieldWidget)->
-                widgets.push_back(groupBoxWidget);
+            QWidget *groupBoxWidget = Parse(valueMsg, _update, scopedName);
+            if (groupBoxWidget)
+            {
+              newFieldWidget = new ConfigChildWidget();
+              QVBoxLayout *groupBoxLayout = new QVBoxLayout;
+              groupBoxLayout->addWidget(groupBoxWidget);
+              newFieldWidget->setLayout(groupBoxLayout);
+              qobject_cast<ConfigChildWidget *>(newFieldWidget)->
+                  widgets.push_back(groupBoxWidget);
+            }
           }
 
           if (newWidget)
@@ -691,8 +728,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
             // create a group widget to collapse or expand child widgets
             // (contained in a group box).
             GroupWidget *groupWidget = new GroupWidget;
-            newFieldWidget->setStyleSheet(
-                "QGroupBox {border : 0px; padding-left : 20px}");
+            newFieldWidget->setStyleSheet("QGroupBox {border : 0px}");
 
             QVBoxLayout *configGroupLayout = new QVBoxLayout;
             configGroupLayout->setContentsMargins(0, 0, 0, 0);
@@ -794,7 +830,7 @@ ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key)
   QLabel *keyLabel = new QLabel(tr(_key.c_str()));
   widgetLayout->addWidget(keyLabel);
   QSpinBox *valueSpinBox = new QSpinBox;
-  valueSpinBox->setRange(0, 1e6);
+  valueSpinBox->setRange(0, 1e8);
   valueSpinBox->setAlignment(Qt::AlignRight);
   widgetLayout->addWidget(valueSpinBox);
   ConfigChildWidget *widget = new ConfigChildWidget();
@@ -811,7 +847,7 @@ ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key)
   QLabel *keyLabel = new QLabel(tr(_key.c_str()));
   widgetLayout->addWidget(keyLabel);
   QSpinBox *valueSpinBox = new QSpinBox;
-  valueSpinBox->setRange(-1e6, 1e6);
+  valueSpinBox->setRange(-1e8, 1e8);
   valueSpinBox->setAlignment(Qt::AlignRight);
   widgetLayout->addWidget(valueSpinBox);
   ConfigChildWidget *widget = new ConfigChildWidget();
@@ -828,7 +864,9 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key)
   QLabel *keyLabel = new QLabel(tr(_key.c_str()));
   widgetLayout->addWidget(keyLabel);
   QDoubleSpinBox *valueSpinBox = new QDoubleSpinBox;
-  valueSpinBox->setRange(-1e6, 1e6);
+  valueSpinBox->setRange(-1e12, 1e12);
+  valueSpinBox->setSingleStep(0.01);
+  valueSpinBox->setDecimals(6);
   valueSpinBox->setAlignment(Qt::AlignRight);
   widgetLayout->addWidget(valueSpinBox);
   ConfigChildWidget *widget = new ConfigChildWidget();
@@ -891,21 +929,21 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   QLabel *vecZLabel = new QLabel(tr("z"));
 
   QDoubleSpinBox *vecXSpinBox = new QDoubleSpinBox;
-  vecXSpinBox->setRange(-1e6, 1e6);
+  vecXSpinBox->setRange(-1e12, 1e12);
   vecXSpinBox->setSingleStep(0.01);
   vecXSpinBox->setDecimals(6);
   vecXSpinBox->setAlignment(Qt::AlignRight);
   vecXSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   QDoubleSpinBox *vecYSpinBox = new QDoubleSpinBox;
-  vecYSpinBox->setRange(-1e6, 1e6);
+  vecYSpinBox->setRange(-1e12, 1e12);
   vecYSpinBox->setSingleStep(0.01);
   vecYSpinBox->setDecimals(6);
   vecYSpinBox->setAlignment(Qt::AlignRight);
   vecYSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   QDoubleSpinBox *vecZSpinBox = new QDoubleSpinBox;
-  vecZSpinBox->setRange(-1e6, 1e6);
+  vecZSpinBox->setRange(-1e12, 1e12);
   vecZSpinBox->setSingleStep(0.01);
   vecZSpinBox->setDecimals(6);
   vecZSpinBox->setAlignment(Qt::AlignRight);
@@ -998,37 +1036,37 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/)
   QLabel *rotYLabel = new QLabel(tr("yaw"));
 
   QDoubleSpinBox *posXSpinBox = new QDoubleSpinBox;
-  posXSpinBox->setRange(-1e6, 1e6);
+  posXSpinBox->setRange(-1e12, 1e12);
   posXSpinBox->setSingleStep(0.01);
   posXSpinBox->setDecimals(6);
   posXSpinBox->setAlignment(Qt::AlignRight);
 
   QDoubleSpinBox *posYSpinBox = new QDoubleSpinBox;
-  posYSpinBox->setRange(-1e6, 1e6);
+  posYSpinBox->setRange(-1e12, 1e12);
   posYSpinBox->setSingleStep(0.01);
   posYSpinBox->setDecimals(6);
   posYSpinBox->setAlignment(Qt::AlignRight);
 
   QDoubleSpinBox *posZSpinBox = new QDoubleSpinBox;
-  posZSpinBox->setRange(-1e6, 1e6);
+  posZSpinBox->setRange(-1e12, 1e12);
   posZSpinBox->setSingleStep(0.01);
   posZSpinBox->setDecimals(6);
   posZSpinBox->setAlignment(Qt::AlignRight);
 
   QDoubleSpinBox *rotRSpinBox = new QDoubleSpinBox;
-  rotRSpinBox->setRange(-1e6, 1e6);
+  rotRSpinBox->setRange(-1e12, 1e12);
   rotRSpinBox->setSingleStep(0.01);
   rotRSpinBox->setDecimals(6);
   rotRSpinBox->setAlignment(Qt::AlignRight);
 
   QDoubleSpinBox *rotPSpinBox = new QDoubleSpinBox;
-  rotPSpinBox->setRange(-1e6, 1e6);
+  rotPSpinBox->setRange(-1e12, 1e12);
   rotPSpinBox->setSingleStep(0.01);
   rotPSpinBox->setDecimals(6);
   rotPSpinBox->setAlignment(Qt::AlignRight);
 
   QDoubleSpinBox *rotYSpinBox = new QDoubleSpinBox;
-  rotYSpinBox->setRange(-1e6, 1e6);
+  rotYSpinBox->setRange(-1e12, 1e12);
   rotYSpinBox->setSingleStep(0.01);
   rotYSpinBox->setDecimals(6);
   rotYSpinBox->setAlignment(Qt::AlignRight);
@@ -1078,7 +1116,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geometryComboBox->addItem(tr("box"));
   geometryComboBox->addItem(tr("cylinder"));
   geometryComboBox->addItem(tr("sphere"));
-  // geometryComboBox->addItem(tr("custom"));
+  geometryComboBox->addItem(tr("mesh"));
 
   QDoubleSpinBox *geomSizeXSpinBox = new QDoubleSpinBox;
   geomSizeXSpinBox->setRange(-1000, 1000);
@@ -1110,6 +1148,19 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomSizeLayout->addWidget(geomSizeZLabel);
   geomSizeLayout->addWidget(geomSizeZSpinBox);
 
+  QLabel *geomFilenameLabel = new QLabel(tr("uri"));
+  QLineEdit *geomFilenameLineEdit = new QLineEdit;
+  geomFilenameLineEdit->setSizePolicy(QSizePolicy::Minimum,
+      QSizePolicy::Fixed);
+
+  QHBoxLayout *geomFilenameLayout = new QHBoxLayout;
+  geomFilenameLayout->addWidget(geomFilenameLabel);
+  geomFilenameLayout->addWidget(geomFilenameLineEdit);
+
+  QVBoxLayout *geomSizeFilenameLayout = new QVBoxLayout;
+  geomSizeFilenameLayout->addLayout(geomSizeLayout);
+  geomSizeFilenameLayout->addLayout(geomFilenameLayout);
+
   QLabel *geomRadiusLabel = new QLabel(tr("radius"));
   QLabel *geomLengthLabel = new QLabel(tr("length"));
 
@@ -1134,7 +1185,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   QStackedWidget *geomDimensionWidget = new QStackedWidget;
 
   QWidget *geomSizeWidget = new QWidget;
-  geomSizeWidget->setLayout(geomSizeLayout);
+  geomSizeWidget->setLayout(geomSizeFilenameLayout);
   geomDimensionWidget->insertWidget(0, geomSizeWidget);
 
   QWidget *geomRLWidget = new QWidget;
@@ -1153,6 +1204,11 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   widget->geomDimensionWidget = geomDimensionWidget;
   widget->geomLengthSpinBox = geomLengthSpinBox;
   widget->geomLengthLabel = geomLengthLabel;
+  widget->geomFilenameLabel = geomFilenameLabel;
+  widget->geomFilenameLineEdit = geomFilenameLineEdit;
+
+  geomFilenameLabel->setVisible(false);
+  geomFilenameLineEdit->setVisible(false);
 
   connect(geometryComboBox,
     SIGNAL(currentIndexChanged(const QString)),
@@ -1167,6 +1223,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   widget->widgets.push_back(geomSizeZSpinBox);
   widget->widgets.push_back(geomRadiusSpinBox);
   widget->widgets.push_back(geomLengthSpinBox);
+  widget->widgets.push_back(geomFilenameLineEdit);
 
   return widget;
 }
@@ -1196,10 +1253,14 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
     // Update each field in the message
     // TODO update repeated fields and enum fields
-    if (!field->is_repeated() && ref->HasField(*_msg, field))
+    if (!field->is_repeated() /*&& ref->HasField(*_msg, field)*/)
     {
       std::string scopedName = _name.empty() ? name : _name + "::" + name;
       if (this->configWidgets.find(scopedName) == this->configWidgets.end())
+        continue;
+
+      // don't update msgs field that are associated with read-only widgets
+      if (this->GetWidgetReadOnly(scopedName))
         continue;
 
       ConfigChildWidget *childWidget = this->configWidgets[scopedName];
@@ -1285,7 +1346,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
             const google::protobuf::EnumDescriptor *typeEnumDescriptor =
                 typeField->enum_type();
 
-            if (geomType == "box")
+            if (geomType == "box" || geomType == "mesh")
             {
               double sizeX = qobject_cast<QDoubleSpinBox *>(
                   childWidget->widgets[1])->value();
@@ -1293,11 +1354,13 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
                   childWidget->widgets[2])->value();
               double sizeZ = qobject_cast<QDoubleSpinBox *>(
                   childWidget->widgets[3])->value();
-              math::Vector3 boxSize(sizeX, sizeY, sizeZ);
+              math::Vector3 geomSize(sizeX, sizeY, sizeZ);
 
               // set type
+              std::string typeStr =
+                  QString(tr(geomType.c_str())).toUpper().toStdString();
               const google::protobuf::EnumValueDescriptor *geometryType =
-                  typeEnumDescriptor->FindValueByName("BOX");
+                  typeEnumDescriptor->FindValueByName(typeStr);
               geomReflection->SetEnum(valueMsg, typeField, geometryType);
 
               // set dimensions
@@ -1305,10 +1368,22 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
                 valueDescriptor->FindFieldByName(geomType);
               google::protobuf::Message *geomValueMsg =
                   geomReflection->MutableMessage(valueMsg, geomFieldDescriptor);
+
+              int fieldIdx = (geomType == "box") ? 0 : 1;
               google::protobuf::Message *geomDimensionMsg =
                   geomValueMsg->GetReflection()->MutableMessage(geomValueMsg,
-                  geomValueMsg->GetDescriptor()->field(0));
-              this->UpdateVector3Msg(geomDimensionMsg, boxSize);
+                  geomValueMsg->GetDescriptor()->field(fieldIdx));
+              this->UpdateVector3Msg(geomDimensionMsg, geomSize);
+
+              if (geomType == "mesh")
+              {
+                 std::string uri = qobject_cast<QLineEdit *>(
+                      childWidget->widgets[6])->text().toStdString();
+                const google::protobuf::FieldDescriptor *uriFieldDescriptor =
+                    geomValueMsg->GetDescriptor()->field(0);
+                geomValueMsg->GetReflection()->SetString(geomValueMsg,
+                    uriFieldDescriptor, uri);
+              }
             }
             else if (geomType == "cylinder")
             {
@@ -1614,9 +1689,10 @@ void ConfigWidget::UpdatePoseWidget(ConfigChildWidget *_widget,
 
 /////////////////////////////////////////////////
 void ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
-    const std::string &_value, const math::Vector3 &_dimensions)
+    const std::string &_value, const math::Vector3 &_dimensions,
+    const std::string &_uri)
 {
-  if (_widget->widgets.size() != 6u)
+  if (_widget->widgets.size() != 7u)
   {
     gzerr << "Error updating Geometry Config widget " << std::endl;
     return;
@@ -1634,7 +1710,8 @@ void ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
 
   qobject_cast<QComboBox *>(_widget->widgets[0])->setCurrentIndex(index);
 
-  if (_value == "box")
+  bool isMesh =  _value == "mesh";
+  if (_value == "box" || isMesh)
   {
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->setValue(
         _dimensions.x);
@@ -1646,15 +1723,18 @@ void ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
   else if (_value == "cylinder")
   {
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->setValue(
-        _dimensions.x/2.0);
+        _dimensions.x*0.5);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[5])->setValue(
         _dimensions.z);
   }
   else if (_value == "sphere")
   {
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->setValue(
-        _dimensions.x/2.0);
+        _dimensions.x*0.5);
   }
+
+  if (isMesh)
+    qobject_cast<QLineEdit *>(_widget->widgets[6])->setText(tr(_uri.c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -1795,10 +1875,10 @@ math::Pose ConfigWidget::GetPoseWidgetValue(ConfigChildWidget *_widget) const
 
 /////////////////////////////////////////////////
 std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
-    math::Vector3 &_dimensions) const
+    math::Vector3 &_dimensions, std::string &_uri) const
 {
   std::string value;
-  if (_widget->widgets.size() != 6u)
+  if (_widget->widgets.size() != 7u)
   {
     gzerr << "Error getting value from Geometry Config widget " << std::endl;
     return value;
@@ -1807,7 +1887,8 @@ std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
   QComboBox *valueComboBox = qobject_cast<QComboBox *>(_widget->widgets[0]);
   value = valueComboBox->currentText().toStdString();
 
-  if (value == "box")
+  bool isMesh = value == "mesh";
+  if (value == "box" || isMesh)
   {
     _dimensions.x =
         qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->value();
@@ -1836,6 +1917,10 @@ std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
     gzerr << "Error getting geometry dimensions for type: '" << value << "'"
         << std::endl;
   }
+
+  if (isMesh)
+    _uri = qobject_cast<QLineEdit *>(_widget->widgets[6])->text().toStdString();
+
   return value;
 }
 
@@ -1845,6 +1930,39 @@ void ConfigWidget::OnItemSelection(QTreeWidgetItem *_item,
 {
   if (_item && _item->childCount() > 0)
     _item->setExpanded(!_item->isExpanded());
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::eventFilter(QObject *_obj, QEvent *_event)
+{
+  QAbstractSpinBox* spinBox = qobject_cast<QAbstractSpinBox *>(_obj);
+  QComboBox* comboBox = qobject_cast<QComboBox *>(_obj);
+  if (spinBox || comboBox)
+  {
+    QWidget *widget = qobject_cast<QWidget *>(_obj);
+    if (_event->type() == QEvent::Wheel)
+    {
+      if (widget->focusPolicy() == Qt::WheelFocus)
+      {
+        _event->accept();
+        return false;
+      }
+      else
+      {
+        _event->ignore();
+        return true;
+      }
+    }
+    else if (_event->type() == QEvent::FocusIn)
+    {
+      widget->setFocusPolicy(Qt::WheelFocus);
+    }
+    else if (_event->type() == QEvent::FocusOut)
+    {
+      widget->setFocusPolicy(Qt::StrongFocus);
+    }
+  }
+  return QObject::eventFilter(_obj, _event);
 }
 
 /////////////////////////////////////////////////
@@ -1864,7 +1982,8 @@ void GeometryConfigWidget::GeometryChanged(const QString _text)
   if (widget)
   {
     std::string textStr = _text.toStdString();
-    if (textStr == "box")
+    bool isMesh = (textStr == "mesh");
+    if (textStr == "box" || isMesh)
     {
       this->geomDimensionWidget->setCurrentIndex(0);
     }
@@ -1880,5 +1999,8 @@ void GeometryConfigWidget::GeometryChanged(const QString _text)
       this->geomLengthSpinBox->hide();
       this->geomLengthLabel->hide();
     }
+
+    this->geomFilenameLabel->setVisible(isMesh);
+    this->geomFilenameLineEdit->setVisible(isMesh);
   }
 }

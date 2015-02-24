@@ -122,4 +122,3 @@ math::Box WireBox::GetBox() const
 {
   return this->dataPtr->box;
 }
-
