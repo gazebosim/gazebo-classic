@@ -589,6 +589,48 @@ void ODELink::AddForceAtWorldPosition(const math::Vector3 &_force,
   }
 }
 
+//////////////////////////////////////////////////
+void ODELink::AddWorldForce(const math::Vector3 &_force,
+    const math::Vector3 &_offset)
+{
+  gzlog << "ODELink::AddWorldForce not yet implemented."
+        << std::endl;
+}
+
+//////////////////////////////////////////////////
+void ODELink::AddLinkForce(const math::Vector3 &_force,
+    const math::Vector3 &_offset)
+{
+  if (this->linkId)
+  {
+    // rotate force to relative position, because we don't have an
+    // AddRelativeForceAtRelativePosition
+    math::Vector3 force = this->GetWorldPose().rot.RotateVector(_force);
+
+    // AddForceAtRelativePosition seems to be relative to the CoM
+    // (only ODE tested), so we translate it to the link origin
+    math::Vector3 offset = _offset - this->inertial->GetCoG();
+
+    this->SetEnabled(true);
+    dBodyAddForceAtRelPos(this->linkId, force.x, force.y, force.z,
+                          offset.x, offset.y, offset.z);
+  }
+  else if (!this->IsStatic())
+  {
+    gzlog << "ODE body for link [" << this->GetScopedName() << "]"
+          << " does not exist, unable to AddForceAtRelativePosition"
+          << std::endl;
+  }
+}
+
+//////////////////////////////////////////////////
+void ODELink::AddInertialForce(const math::Vector3 &_force,
+    const math::Vector3 &_offset)
+{
+  gzlog << "ODELink::AddInertialForce not yet implemented."
+        << std::endl;
+}
+
 /////////////////////////////////////////////////
 void ODELink::AddTorque(const math::Vector3 &_torque)
 {

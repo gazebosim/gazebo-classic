@@ -92,6 +92,18 @@ namespace gazebo
                   const math::Vector3 &_relpos);
 
       // Documentation inherited
+      public: virtual void AddWorldForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero);
+
+      // Documentation inherited
+      public: virtual void AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero);
+
+      // Documentation inherited
+      public: virtual void AddInertialForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero);
+
+      // Documentation inherited
       public: virtual void AddTorque(const math::Vector3 &_torque);
 
       // Documentation inherited
