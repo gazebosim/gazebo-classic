@@ -37,8 +37,8 @@ std::string GetVisualSDFString(const std::string &_name,
     bool _lighting = true,
     const common::Color &_ambient = common::Color::White,
     const common::Color &_diffuse = common::Color::White,
-    const common::Color &_specular = common::Color::White,
-    const common::Color &_emissive = common::Color::White)
+    const common::Color &_specular = common::Color::Black,
+    const common::Color &_emissive = common::Color::Black)
 {
   std::stringstream visualString;
   visualString
@@ -348,7 +348,7 @@ TEST_F(Visual_TEST, Color)
 
   sdf::ElementPtr cylinderSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF2);
-  sdf::readString(GetVisualSDFString("visual_cylinder_black", "cylinder",
+  sdf::readString(GetVisualSDFString("visual_cylinder_color", "cylinder",
       gazebo::math::Pose::Zero, 0, true, "Gazebo/Grey", true,
       common::Color::Green, common::Color::Blue, common::Color::Red,
       common::Color::Yellow), cylinderSDF2);
@@ -404,6 +404,86 @@ TEST_F(Visual_TEST, Color)
     cylinderVis2->SetEmissive(color);
     EXPECT_EQ(cylinderVis2->GetEmissive(), color);
   }
+}
+
+/////////////////////////////////////////////////
+TEST_F(Visual_TEST, ColorMaterial)
+{
+  Load("worlds/empty.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  std::string visualName = "boxMaterialColor";
+  math::Pose visualPose = math::Pose::Zero;
+  std::string materialName = "Gazebo/Grey";
+
+  // test with a visual that only has a material name and no color components.
+  std::stringstream visualString;
+  visualString
+      << "<sdf version='1.5'>"
+      << "  <visual name='" << visualName << "'>"
+      << "    <pose>" << visualPose << "</pose>"
+      << "    <geometry>"
+      << "      <box>"
+      << "        <size>1.0 1.0 1.0</size>"
+      << "      </box>"
+      << "    </geometry>"
+      << "    <material>"
+      << "      <script>"
+      << "        <uri>file://media/materials/scripts/gazebo.material</uri>"
+      << "        <name>" << materialName << "</name>"
+      << "      </script>"
+      << "    </material>"
+      << "  </visual>"
+      << "</sdf>";
+
+  sdf::ElementPtr boxSDF(new sdf::Element);
+  sdf::initFile("visual.sdf", boxSDF);
+  sdf::readString(visualString.str(), boxSDF);
+  gazebo::rendering::VisualPtr boxVis(
+      new gazebo::rendering::Visual("box_visual", scene));
+  boxVis->Load(boxSDF);
+
+  EXPECT_TRUE(
+      boxVis->GetMaterialName().find(materialName) != std::string::npos);
+
+  // Verify the visual color components are the same as the ones specified in
+  // the material script
+  EXPECT_EQ(boxVis->GetAmbient(), common::Color(0.3, 0.3, 0.3, 1.0));
+  EXPECT_EQ(boxVis->GetDiffuse(), common::Color(0.7, 0.7, 0.7, 1.0));
+  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.01, 0.01, 0.01, 1.0));
+  EXPECT_EQ(boxVis->GetEmissive(), common::Color::Black);
+
+  // test changing diffuse colors and verify color again.
+  common::Color redColor(1.0, 0.0, 0.0, 1.0);
+  boxVis->SetDiffuse(redColor);
+  EXPECT_EQ(boxVis->GetDiffuse(), redColor);
+
+  // test setting a different material name
+  std::string greenMaterialName = "Gazebo/Green";
+  boxVis->SetMaterial(greenMaterialName);
+  EXPECT_TRUE(
+      boxVis->GetMaterialName().find(greenMaterialName) != std::string::npos);
+
+  // Verify the visual color components are the same as the ones in the new
+  // material script
+  EXPECT_EQ(boxVis->GetAmbient(), common::Color(0.0, 1.0, 0.0, 1.0));
+  EXPECT_EQ(boxVis->GetDiffuse(), common::Color(0.0, 1.0, 0.0, 1.0));
+  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.1, 0.1, 0.1, 1.0));
+  EXPECT_EQ(boxVis->GetEmissive(), common::Color::Black);
+
+  // test setting back to original material color
+  boxVis->SetMaterial(materialName);
+  EXPECT_TRUE(
+      boxVis->GetMaterialName().find(materialName) != std::string::npos);
+
+  // Verify the visual color components are the same as the ones in the
+  // original material script
+  EXPECT_EQ(boxVis->GetAmbient(), common::Color(0.3, 0.3, 0.3, 1.0));
+  EXPECT_EQ(boxVis->GetDiffuse(), common::Color(0.7, 0.7, 0.7, 1.0));
+  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.01, 0.01, 0.01, 1.0));
+  EXPECT_EQ(boxVis->GetEmissive(), common::Color::Black);
 }
 
 /////////////////////////////////////////////////
