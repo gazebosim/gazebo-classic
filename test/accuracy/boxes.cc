@@ -30,19 +30,22 @@ using namespace gazebo;
 typedef std::tr1::tuple<const char *
                       , double
                       , int
+                      , int
                       , bool
-                      > char1double1int1bool1;
+                      > char1double1int2bool1;
 class RigidBodyTest : public ServerFixture,
-                      public testing::WithParamInterface<char1double1int1bool1>
+                      public testing::WithParamInterface<char1double1int2bool1>
 {
   /// \brief Test accuracy of unconstrained rigid body motion.
   /// \param[in] _physicsEngine Physics engine to use.
   /// \param[in] _dt Max time step size.
   /// \param[in] _modelCount Number of boxes to spawn.
+  /// \param[in] _islandThreads Number of ODE island threads.
   /// \param[in] _nonlinear Flag for nonlinear trajectory on / off.
   public: void Boxes(const std::string &_physicsEngine
                    , double _dt
                    , int _modelCount
+                   , int _islandThreads
                    , bool _nonlinear
                    );
 };
@@ -54,6 +57,7 @@ class RigidBodyTest : public ServerFixture,
 void RigidBodyTest::Boxes(const std::string &_physicsEngine
                         , double _dt
                         , int _modelCount
+                        , int _islandThreads
                         , bool _nonlinear
                         )
 {
@@ -162,6 +166,10 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   const double simDuration = 10.0;
   int steps = ceil(simDuration / _dt);
 
+  // set number of island threads
+  if (_islandThreads > 0)
+    physics->SetParam("island_threads", _islandThreads);
+
   // variables to compute statistics on
   math::Vector3Stats linearPositionError;
   math::Vector3Stats linearVelocityError;
@@ -233,19 +241,23 @@ TEST_P(RigidBodyTest, Boxes)
   std::string physicsEngine = std::tr1::get<0>(GetParam());
   double dt                 = std::tr1::get<1>(GetParam());
   int modelCount            = std::tr1::get<2>(GetParam());
-  bool nonlinear            = std::tr1::get<3>(GetParam());
+  int islandThreads         = std::tr1::get<3>(GetParam());
+  bool nonlinear            = std::tr1::get<4>(GetParam());
   gzdbg << physicsEngine
         << ", dt: " << dt
         << ", modelCount: " << modelCount
+        << ", islandThreads: " << islandThreads
         << ", nonlinear: " << nonlinear
         << std::endl;
   RecordProperty("engine", physicsEngine);
   this->Record("dt", dt);
   RecordProperty("modelCount", modelCount);
+  RecordProperty("islandThreads", islandThreads);
   RecordProperty("nonlienar", nonlinear);
   Boxes(physicsEngine
       , dt
       , modelCount
+      , islandThreads
       , nonlinear
       );
 }
@@ -257,6 +269,7 @@ INSTANTIATE_TEST_CASE_P(EnginesDtLinear, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
   , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
   , ::testing::Values(1)
+  , ::testing::Values(0)
   , ::testing::Values(false)
   ));
 
@@ -264,16 +277,21 @@ INSTANTIATE_TEST_CASE_P(EnginesDtNonlinear, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
   , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
   , ::testing::Values(1)
+  , ::testing::Values(0)
   , ::testing::Values(true)
   ));
 
 #define MODELS_MIN 1
 #define MODELS_MAX 105
 #define MODELS_STEP 20
+#define ISLAND_THREADS_MIN 0
+#define ISLAND_THREADS_MAX 5
+#define ISLAND_THREADS_STEP 1
 INSTANTIATE_TEST_CASE_P(OdeBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("ode")
   , ::testing::Values(3.0e-4)
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
+  , ::testing::Range(ISLAND_THREADS_MIN, ISLAND_THREADS_MAX, ISLAND_THREADS_STEP)
   , ::testing::Values(true)
   ));
 
@@ -281,6 +299,7 @@ INSTANTIATE_TEST_CASE_P(BulletBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("bullet")
   , ::testing::Values(3.0e-4)
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
+  , ::testing::Values(0)
   , ::testing::Values(true)
   ));
 
@@ -288,6 +307,7 @@ INSTANTIATE_TEST_CASE_P(SimbodyBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("simbody")
   , ::testing::Values(7.0e-4)
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
+  , ::testing::Values(0)
   , ::testing::Values(true)
   ));
 
@@ -295,6 +315,7 @@ INSTANTIATE_TEST_CASE_P(DartBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("dart")
   , ::testing::Values(7.0e-4)
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
+  , ::testing::Values(0)
   , ::testing::Values(true)
   ));
 
