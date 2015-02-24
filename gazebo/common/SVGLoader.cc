@@ -18,7 +18,8 @@
 #include <algorithm>
 #include <tinyxml.h>
 
-#include "gazebo/common/Console.hh"
+#include <gazebo/common/Console.hh>
+#include <gazebo/common/Assert.hh>
 
 #include "SVGLoaderPrivate.hh"
 #include "SVGLoader.hh"
@@ -336,8 +337,7 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
 /////////////////////////////////////////////////
 void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
 {
-  if ( !_pElement ) return;
-
+  GZ_ASSERT(_pElement, "empty XML element where a path was expected");
   TiXmlAttribute *pAttrib = _pElement->FirstAttribute();
   while (pAttrib)
   {
@@ -354,6 +354,7 @@ void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
     else if (name == "transform")
     {
       _path.transform = value;
+      gzwarn << "transform attribute \"" << name  << "\" not implemented yet"  << std::endl;
     }
     else if (name == "d")
     {
@@ -361,6 +362,10 @@ void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
       std::vector<std::string> tokens;
       split(value, ' ', tokens);
       this->GetPathCommands(tokens, _path);
+    }
+    else
+    {
+      gzwarn << "Ignoring attribute \"" << name  << "\" in path"  << std::endl;
     }
     pAttrib = pAttrib->Next();
   }
@@ -375,20 +380,16 @@ void SVGLoader::GetSvgPaths(TiXmlNode *_pParent, std::vector<SVGPath> &_paths)
   TiXmlNode *pChild;
   int t = _pParent->Type();
   std::string name;
-  switch ( t )
+  if ( t == TiXmlNode::TINYXML_ELEMENT)
   {
-    case TiXmlNode::TINYXML_ELEMENT:
-      name = lowercase(_pParent->Value());
-      if (name == "path")
-      {
-        SVGPath p;
-        this->GetPathAttribs(_pParent->ToElement(), p);
-        _paths.push_back(p);
-      }
-      break;
-
-    default:
-      break;
+    name = lowercase(_pParent->Value());
+    if (name == "path")
+    {
+      TiXmlElement *element = _pParent->ToElement();
+      SVGPath p;
+      this->GetPathAttribs(element, p);
+      _paths.push_back(p);
+    }
   }
 
   for (pChild = _pParent->FirstChild();
