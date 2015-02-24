@@ -66,6 +66,11 @@ namespace gazebo
       /// \return Upper limit.
       public: double GetUpperLimit(unsigned int _index) const;
 
+      /// \brief Get whether the axis uses parent model frame.
+      /// \param[in] _index Index of axis
+      /// \return True if the axis uses parent model frame.
+      public: bool GetUseParentModelFrame(unsigned int _index) const;
+
       /// \brief Get joint type.
       /// \return Joint type.
       public: JointMaker::JointType GetType() const;
@@ -104,6 +109,11 @@ namespace gazebo
       /// \param[in] _index Index of axis.
       /// \param[in] _upper Upper limit.
       public: void SetUpperLimit(unsigned int _index, double _upper);
+
+      /// \brief Set the axis to use parent model frame.
+      /// \param[in] _index Index of axis
+      /// \param[in] True to use the parent model frame.
+      public: void SetUseParentModelFrame(unsigned int _index, bool _use);
 
       /// \brief Set joint type.
       /// \param[in] _type joint type.
@@ -172,6 +182,10 @@ namespace gazebo
 
       /// \brief Spin box for configuring the upper limit of the axis.
       private: std::vector<QDoubleSpinBox *> upperLimitSpinBoxes;
+
+      /// \brief Spin box for configuring the use_parent_model_frame flag of
+      /// the  axis.
+      private: std::vector<QCheckBox *> frameCheckBoxes;
 
       /// \brief Type of joint.
       private: JointMaker::JointType jointType;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _COMVISUAL_PRIVATE_HH_
-#define _COMVISUAL_PRIVATE_HH_
+#ifndef _GAZEBO_INERTIAVISUAL_PRIVATE_HH_
+#define _GAZEBO_INERTIAVISUAL_PRIVATE_HH_
 
 #include "gazebo/rendering/VisualPrivate.hh"
 
@@ -31,14 +31,14 @@ namespace gazebo
   {
     class DynamicLines;
 
-    /// \brief Private data for the COM Visual class
-    class COMVisualPrivate : public VisualPrivate
+    /// \brief Private data for the Inertia Visual class
+    class InertiaVisualPrivate : public VisualPrivate
     {
       /// \brief Lines that make the cross marking the center of mass.
       public: DynamicLines *crossLines;
 
-      /// \brief Sphere with density of lead and equivalent mass.
-      public: Ogre::SceneNode *sphereNode;
+      /// \brief Box with uniform density and equivalent inertia.
+      public: Ogre::SceneNode *boxNode;
     };
   }
 }

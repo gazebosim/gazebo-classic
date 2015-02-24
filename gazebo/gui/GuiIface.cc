@@ -293,6 +293,8 @@ bool gui::run(int _argc, char **_argv)
 
   gazebo::gui::fini();
   gazebo::shutdown();
+
+  delete g_main_win;
   return true;
 }
 
