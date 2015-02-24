@@ -36,6 +36,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 /// Include external headers
 #include <OGRE/Ogre.h>
+#include <OGRE/OgreFrameListener.h>
+#include <OGRE/OgreBillboard.h>
 
 /// Define the dll export qualifier if compiling for Windows
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
