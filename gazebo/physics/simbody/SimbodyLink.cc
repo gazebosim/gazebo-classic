@@ -526,26 +526,10 @@ void SimbodyLink::AddForceAtRelativePosition(const math::Vector3 &/*_force*/,
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::AddWorldForce(const math::Vector3 &/*_force*/,
-    const math::Vector3 &/*_offset*/)
-{
-  gzlog << "SimbodyLink::AddWorldForce not yet implemented."
-        << std::endl;
-}
-
-//////////////////////////////////////////////////
 void SimbodyLink::AddLinkForce(const math::Vector3 &/*_force*/,
     const math::Vector3 &/*_offset*/)
 {
   gzlog << "SimbodyLink::AddLinkForce not yet implemented."
-        << std::endl;
-}
-
-//////////////////////////////////////////////////
-void SimbodyLink::AddInertialForce(const math::Vector3 &/*_force*/,
-    const math::Vector3 &/*_offset*/)
-{
-  gzlog << "SimbodyLink::AddInertialForce not yet implemented."
         << std::endl;
 }
 

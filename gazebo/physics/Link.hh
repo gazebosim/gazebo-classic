@@ -165,49 +165,36 @@ namespace gazebo
       /// \param[in] _torque Torque value.
       public: virtual void SetTorque(const math::Vector3 &_torque) = 0;
 
-      /// \brief Add a force to the link's CoG.
-      /// \param[in] _force Force expressed in the world frame.
+      /// \brief Add a force to the body.
+      /// \param[in] _force Force to add.
       public: virtual void AddForce(const math::Vector3 &_force) = 0;
 
-      /// \brief Add a force to the link's CoG.
-      /// \param[in] _force Force expressed in the link's frame (not its
-      /// inertial frame).
+      /// \brief Add a force to the body, components are relative to the
+      /// body's own frame of reference.
+      /// \param[in] _force Force to add.
       public: virtual void AddRelativeForce(const math::Vector3 &_force) = 0;
 
-      /// \brief Add a force to the link at a given position.
-      /// \param[in] _force Force expressed in the world frame.
-      /// \param[in] _pos Position expressed in the world frame.
+      /// \brief Add a force to the body using a global position.
+      /// \param[in] _force Force to add.
+      /// \param[in] _pos Position in global coord frame to add the force.
       public: virtual void AddForceAtWorldPosition(const math::Vector3 &_force,
                   const math::Vector3 &_pos) = 0;
 
-      /// \brief Add a force to the link at a given position.
-      /// Note that force and position are expressed in different frames.
-      /// \param[in] _force Force expressed in the world frame.
-      /// \param[in] _pos Position expressed in the link's frame (not its
-      /// inertial frame).
+      /// \brief Add a force to the body at position expressed to the body's
+      /// own frame of reference.
+      /// \param[in] _force Force to add.
+      /// \param[in] _relPos Position on the link to add the force.
       public: virtual void AddForceAtRelativePosition(
                   const math::Vector3 &_force,
                   const math::Vector3 &_relPos) = 0;
 
-      /// \brief Add a force expressed in the world frame.
-      /// \param[in] _force Force expressed in the world frame.
-      /// \param[in] _offset Offset position with respect to the world frame. It
-      /// defaults to the world origin.
-      public: virtual void AddWorldForce(const math::Vector3 &_force,
-          const math::Vector3 &_offset = math::Vector3::Zero) = 0;
-
       /// \brief Add a force expressed in the link frame.
-      /// \param[in] _force Force expressed in the link frame.
-      /// \param[in] _offset Offset position with respect to the link frame. It
-      /// defaults to the link origin.
+      /// \param[in] _force Force is a free vector (a direction, orientation)
+      /// expressed in the link frame. Each component corresponds to the force
+      /// which will be added in that direction.
+      /// \param[in] _offset Offset position (translation) with respect to the
+      /// link frame. It defaults to the link origin.
       public: virtual void AddLinkForce(const math::Vector3 &_force,
-          const math::Vector3 &_offset = math::Vector3::Zero) = 0;
-
-      /// \brief Add a force expressed in the inertial frame.
-      /// \param[in] _force Force expressed in the inertial frame.
-      /// \param[in] _offset Offset position with respect to the inertial frame.
-      /// It defaults to the CoG.
-      public: virtual void AddInertialForce(const math::Vector3 &_force,
           const math::Vector3 &_offset = math::Vector3::Zero) = 0;
 
       /// \brief Add a torque to the body.
@@ -629,9 +616,6 @@ namespace gazebo
 
       /// \brief Cached list of collisions. This is here for performance.
       private: Collision_V collisions;
-
-      /// \brief Wrench subscriber.
-      private: transport::SubscriberPtr wrenchSub;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources

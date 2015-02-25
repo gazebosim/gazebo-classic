@@ -288,8 +288,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
 
   // Add opposing force in link frame and check that link stopped
-  force = math::Vector3(1, 0, 0);
-  link->AddLinkForce(force);
+  link->AddLinkForce(-force);
   world->Step(largeNumerOfSteps);
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldForce());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldTorque());
@@ -343,9 +342,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   EXPECT_EQ(oneStepAngularVel, link->GetWorldAngularVel());
 
   // Add opposing force in link frame and check that link stopped
-  force = math::Vector3(0, 0, -1);
-  forcePos = math::Vector3(-1, 0, 0);
-  link->AddLinkForce(force, forcePos);
+  link->AddLinkForce(-force, forcePos);
   world->Step(largeNumerOfSteps);
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldForce());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldTorque());
@@ -404,8 +401,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   EXPECT_EQ(oneStepAngularVel, link->GetWorldAngularVel());
 
   // Add opposing force in link frame and check that link stopped
-  force = math::Vector3(0, 0, -1);
-  link->AddLinkForce(force);
+  link->AddLinkForce(-force);
   world->Step(largeNumerOfSteps);
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldForce());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldTorque());

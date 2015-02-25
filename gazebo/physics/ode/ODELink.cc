@@ -590,21 +590,9 @@ void ODELink::AddForceAtWorldPosition(const math::Vector3 &_force,
 }
 
 //////////////////////////////////////////////////
-void ODELink::AddWorldForce(const math::Vector3 &/*_force*/,
-    const math::Vector3 &/*_offset*/)
-{
-  gzlog << "ODELink::AddWorldForce not yet implemented."
-        << std::endl;
-}
-
-//////////////////////////////////////////////////
 void ODELink::AddLinkForce(const math::Vector3 &_force,
     const math::Vector3 &_offset)
 {
-  // _force specifies a direction (free vector), while
-  // _offset specifies a translation.
-  // Together they describe 6 DOF for the force, of which 1 DOF is not useful
-  // (translation along the force direction)
   if (this->linkId)
   {
     // Force vector represents a direction only, so it should be rotated but
@@ -624,14 +612,6 @@ void ODELink::AddLinkForce(const math::Vector3 &_force,
           << " does not exist, unable to AddForceAtRelativePosition"
           << std::endl;
   }
-}
-
-//////////////////////////////////////////////////
-void ODELink::AddInertialForce(const math::Vector3 &/*_force*/,
-    const math::Vector3 &/*_offset*/)
-{
-  gzlog << "ODELink::AddInertialForce not yet implemented."
-        << std::endl;
 }
 
 /////////////////////////////////////////////////
