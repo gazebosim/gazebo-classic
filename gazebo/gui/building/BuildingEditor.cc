@@ -86,15 +86,13 @@ BuildingEditor::~BuildingEditor()
 ////////////////////////////////////////////////
 void BuildingEditor::Save()
 {
-  gui::editor::Events::saveBuildingEditor(
-    this->buildingPalette->GetModelName());
+  gui::editor::Events::saveBuildingEditor();
 }
 
 ////////////////////////////////////////////////
 void BuildingEditor::SaveAs()
 {
-  gui::editor::Events::saveAsBuildingEditor(
-      this->buildingPalette->GetModelName());
+  gui::editor::Events::saveAsBuildingEditor();
 }
 
 /////////////////////////////////////////////////
@@ -145,6 +143,7 @@ void BuildingEditor::OnEdit(bool _checked)
   }
   else
   {
+    this->buildingPalette->CustomColorDialog()->reject();
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->GetRenderWidget()->ShowEditor(false);
     this->mainWindow->ShowMenuBar();

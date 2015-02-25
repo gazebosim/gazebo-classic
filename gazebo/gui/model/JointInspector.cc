@@ -160,7 +160,7 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
     axisZSpinBox->setRange(-1000, 1000);
     axisZSpinBox->setSingleStep(0.01);
     axisZSpinBox->setDecimals(3);
-    axisZSpinBox->setValue(0.000);
+    axisZSpinBox->setValue(1.000);
     this->axisZSpinBoxes.push_back(axisZSpinBox);
 
     QGridLayout *axisLayout = new QGridLayout;
@@ -207,11 +207,11 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
   }
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
-  QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
+  QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
-  QPushButton *applyButton = new QPushButton(tr("&Apply"));
+  QPushButton *applyButton = new QPushButton(tr("Apply"));
   connect(applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
-  QPushButton *OKButton = new QPushButton(tr("&OK"));
+  QPushButton *OKButton = new QPushButton(tr("OK"));
   OKButton->setDefault(true);
   connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
   buttonsLayout->addWidget(cancelButton);
@@ -434,4 +434,10 @@ void JointInspector::OnOK()
 {
   emit Applied();
   this->accept();
+}
+
+/////////////////////////////////////////////////
+void JointInspector::enterEvent(QEvent */*_event*/)
+{
+  QApplication::setOverrideCursor(Qt::ArrowCursor);
 }

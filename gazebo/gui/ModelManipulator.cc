@@ -321,8 +321,86 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 
   // a bit hacky to check for unit sphere and cylinder simple shapes in order
   // to restrict the scaling dimensions.
-  if (this->dataPtr->keyEvent.key == Qt::Key_Shift ||
-      _vis->GetName().find("unit_sphere") != std::string::npos)
+  // also extended scaling to work in model editor mode by checking geometry
+  // type of first visual child.
+  if (_vis == _vis->GetRootVisual())
+  {
+    if (this->dataPtr->keyEvent.key == Qt::Key_Shift ||
+        _vis->GetName().find("unit_sphere") != std::string::npos)
+    {
+      scale = this->UpdateScale(_axis, scale, "sphere");
+    }
+    else if (_vis->GetName().find("unit_cylinder") != std::string::npos)
+    {
+      scale = this->UpdateScale(_axis, scale, "cylinder");
+    }
+    else if (_vis->GetName().find("unit_box") != std::string::npos ||
+        (_vis != _vis->GetRootVisual() && _vis->GetChildCount() > 0))
+    {
+      // keep new scale as it is
+    }
+    else
+    {
+      // TODO scaling for complex models are not yet functional.
+      // Limit scaling to simple shapes for now.
+      gzwarn << " Scaling is currently limited to simple shapes." << std::endl;
+      return;
+    }
+
+    math::Vector3 newScale = this->dataPtr->mouseVisualScale * scale.GetAbs();
+
+    if (this->dataPtr->mouseEvent.control)
+    {
+      newScale = SnapPoint(newScale);
+      // prevent setting zero scale
+      newScale.x = std::max(1e-4, newScale.x);
+      newScale.y = std::max(1e-4, newScale.y);
+      newScale.z = std::max(1e-4, newScale.z);
+    }
+    _vis->SetScale(newScale);
+  }
+  else
+  {
+    // model editor mode -> apply scaling to individual visuals
+    if (this->dataPtr->mouseChildVisualScale.size() != _vis->GetChildCount())
+    {
+      gzerr << "Incorrect number of child visuals to be scaled. " <<
+          "This should not happen" << std::endl;
+      return;
+    }
+
+    for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+    {
+      rendering::VisualPtr childVis = _vis->GetChild(i);
+      std::string geomType = childVis->GetGeometryType();
+      if (childVis != this->dataPtr->selectionObj &&
+          geomType != "" && geomType != "mesh")
+      {
+        math::Vector3 geomScale = this->UpdateScale(_axis, scale,
+            childVis->GetGeometryType());
+        math::Vector3 newScale = this->dataPtr->mouseChildVisualScale[i]
+            * geomScale.GetAbs();
+
+        if (this->dataPtr->mouseEvent.control)
+        {
+          newScale = SnapPoint(newScale);
+          // prevent setting zero scale
+          newScale.x = std::max(1e-4, newScale.x);
+          newScale.y = std::max(1e-4, newScale.y);
+          newScale.z = std::max(1e-4, newScale.z);
+        }
+        childVis->SetScale(newScale);
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+math::Vector3 ModelManipulator::UpdateScale(const math::Vector3 &_axis,
+    const math::Vector3 &_scale, const std::string &_geom)
+{
+  math::Vector3 scale = _scale;
+  if (_geom == "sphere")
   {
     if (_axis.x > 0)
     {
@@ -340,7 +418,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       scale.y = scale.z;
     }
   }
-  else if (_vis->GetName().find("unit_cylinder") != std::string::npos)
+  else if (_geom == "cylinder")
   {
     if (_axis.x > 0)
     {
@@ -351,29 +429,8 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       scale.x = scale.y;
     }
   }
-  else if (_vis->GetName().find("unit_box") != std::string::npos)
-  {
-  }
-  else
-  {
-    // TODO scaling for complex models are not yet functional.
-    // Limit scaling to simple shapes for now.
-    gzwarn << " Scaling is currently limited to simple shapes." << std::endl;
-    return;
-  }
 
-  math::Vector3 newScale = this->dataPtr->mouseVisualScale * scale.GetAbs();
-
-  if (this->dataPtr->mouseEvent.control)
-  {
-    newScale = SnapPoint(newScale);
-    // prevent setting zero scale
-    newScale.x = std::max(1e-4, newScale.x);
-    newScale.y = std::max(1e-4, newScale.y);
-    newScale.z = std::max(1e-4, newScale.z);
-  }
-
-  _vis->SetScale(newScale);
+  return scale;
 }
 
 /////////////////////////////////////////////////
@@ -713,6 +770,14 @@ void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
   if (_vis)
   {
     this->dataPtr->mouseVisualScale = _vis->GetScale();
+    this->dataPtr->mouseChildVisualScale.clear();
+    // keep track of all child visual scale for scaling to work in
+    // model editor mode.
+    for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+    {
+      rendering::VisualPtr childVis = _vis->GetChild(i);
+      this->dataPtr->mouseChildVisualScale.push_back(childVis->GetScale());
+    }
     this->dataPtr->mouseVisualBbox = _vis->GetBoundingBox();
   }
   else

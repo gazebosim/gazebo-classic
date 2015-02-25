@@ -76,6 +76,9 @@ namespace gazebo
       /// \brief Transparency value.
       public: float transparency;
 
+      /// \brief True if visual casts shadows.
+      public: bool castShadows;
+
       /// \brief True if the visual is static, which allows Ogre to improve
       /// performance.
       public: bool isStatic;
@@ -139,6 +142,27 @@ namespace gazebo
 
       /// \brief A list of visual plugins.
       public: std::vector<VisualPluginPtr> plugins;
+
+      /// \brief The visual's mesh name.
+      public: std::string meshName;
+
+      /// \brief The visual's submesh name.
+      public: std::string subMeshName;
+
+      /// \brief Ambient color of the visual.
+      public: common::Color ambient;
+
+      /// \brief Diffuse color of the visual.
+      public: common::Color diffuse;
+
+      /// \brief Specular color of the visual.
+      public: common::Color specular;
+
+      /// \brief Emissive color of the visual.
+      public: common::Color emissive;
+
+      /// \brief Visibility flags of the visual.
+      public: uint32_t visibilityFlags;
     };
     /// \}
   }

@@ -563,7 +563,7 @@ QTabWidget#mainTab::pane,
 QTabWidget#buildingEditorTab::pane,
 QTabWidget#modelEditorTab::pane,
 QTabWidget#terrainEditorTab::pane,
-QTabWidget#partInspectorTab::pane
+QTabWidget#linkInspectorTab::pane
 {
   border-left: 1px solid #101010;
   border-bottom: 1px solid #101010;

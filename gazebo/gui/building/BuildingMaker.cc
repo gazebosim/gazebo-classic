@@ -17,7 +17,6 @@
 
 #include <sstream>
 #include <set>
-#include <boost/filesystem.hpp>
 
 #include "gazebo/common/Exception.hh"
 
@@ -35,7 +34,6 @@
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 
-#include "gazebo/common/SystemPaths.hh"
 #ifdef HAVE_GTS
   #include "gazebo/common/Mesh.hh"
   #include "gazebo/common/MeshManager.hh"
@@ -43,7 +41,7 @@
 #endif
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/gui/building/FinishBuildingDialog.hh"
+#include "gazebo/gui/SaveDialog.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingModelManip.hh"
 #include "gazebo/gui/building/EditorItem.hh"
@@ -57,79 +55,8 @@ const std::string BuildingMaker::buildingDefaultName = "Untitled";
 const std::string BuildingMaker::previewName = "BuildingPreview";
 
 /////////////////////////////////////////////////
-// Helper function to generate a valid folder name from a human-readable model
-// name.
-std::string GetFolderNameFromModelName(const std::string &_modelName)
-{
-  // Auto-generate folder name based on model name
-  std::string foldername = _modelName;
-
-  std::vector<std::pair<std::string, std::string> > replacePairs;
-  replacePairs.push_back(std::pair<std::string, std::string>(" ", "_"));
-
-  for (unsigned int i = 0; i < replacePairs.size(); ++i)
-  {
-    std::string forbiddenChar = replacePairs[i].first;
-    std::string replaceChar = replacePairs[i].second;
-    size_t index = foldername.find(forbiddenChar);
-    while (index != std::string::npos)
-    {
-      foldername.replace(index, forbiddenChar.size(), replaceChar);
-      index = foldername.find(forbiddenChar);
-    }
-  }
-
-  return foldername;
-}
-
-/////////////////////////////////////////////////
-// Add the parent folder of _path to the model path represented by SystemPaths,
-// notify InsertModelWidget to display the model name in the "Insert Models"
-// tab, and write the parent folder filename to gui.ini
-void AddDirToModelPaths(const std::string& _path)
-{
-  std::string parentDirectory = boost::filesystem::path(_path)
-                                  .parent_path().string();
-
-  std::list<std::string> modelPaths =
-              gazebo::common::SystemPaths::Instance()->GetModelPaths();
-  std::list<std::string>::iterator iter;
-  for (iter = modelPaths.begin();
-       iter != modelPaths.end(); ++iter)
-  {
-    if (iter->compare(parentDirectory) == 0)
-    {
-      break;
-    }
-  }
-
-  gazebo::common::SystemPaths::Instance()->
-    AddModelPathsUpdate(parentDirectory);
-
-  std::string additionalProperties =
-    gui::getINIProperty<std::string>("model_paths.filenames", "");
-  if (additionalProperties.find(parentDirectory) == std::string::npos)
-  {
-    // Add it to gui.ini
-    gui::setINIProperty("model_paths.filenames", parentDirectory);
-
-    // Save any changes that were made to the property tree
-    // TODO: check gui.ini env variable
-    char *home = getenv("HOME");
-    if (home)
-    {
-      boost::filesystem::path guiINIPath = home;
-      guiINIPath  = guiINIPath / ".gazebo" / "gui.ini";
-      saveINI(guiINIPath);
-    }
-  }
-}
-
-/////////////////////////////////////////////////
 BuildingMaker::BuildingMaker() : EntityMaker()
 {
-  this->modelName = this->buildingDefaultName;
-
   this->conversionScale = 0.01;
 
   // Counters are only used for giving visuals unique names.
@@ -147,10 +74,10 @@ BuildingMaker::BuildingMaker() : EntityMaker()
 
   this->connections.push_back(
     gui::editor::Events::ConnectSaveBuildingEditor(
-      boost::bind(&BuildingMaker::OnSave, this, _1)));
+      boost::bind(&BuildingMaker::OnSave, this)));
   this->connections.push_back(
     gui::editor::Events::ConnectSaveAsBuildingEditor(
-      boost::bind(&BuildingMaker::OnSaveAs, this, _1)));
+      boost::bind(&BuildingMaker::OnSaveAs, this)));
   this->connections.push_back(
     gui::editor::Events::ConnectNewBuildingEditor(
       boost::bind(&BuildingMaker::OnNew, this)));
@@ -173,8 +100,9 @@ BuildingMaker::BuildingMaker() : EntityMaker()
       gui::editor::Events::ConnectToggleEditMode(
       boost::bind(&BuildingMaker::OnEdit, this, _1)));
 
-  this->saveDialog =
-      new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
+  this->saveDialog = new SaveDialog(SaveDialog::BUILDING);
+
+  this->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -331,7 +259,7 @@ void BuildingMaker::DetachAllChildren(const std::string &_manip)
 std::string BuildingMaker::CreateModel()
 {
   this->Reset();
-  return this->modelName;
+  return this->folderName;
 }
 
 /////////////////////////////////////////////////
@@ -669,10 +597,6 @@ void BuildingMaker::Reset()
 
   this->currentSaveState = NEVER_SAVED;
   this->SetModelName(this->buildingDefaultName);
-  this->defaultPath = (QDir::homePath() + "/building_editor_models")
-                        .toStdString();
-  this->saveLocation = defaultPath + "/" +
-                        GetFolderNameFromModelName(this->modelName);
 
   this->previewVisual.reset(new rendering::Visual(this->previewName,
       scene->GetWorldVisual()));
@@ -699,27 +623,18 @@ void BuildingMaker::SetModelName(const std::string &_modelName)
 {
   this->modelName = _modelName;
   this->saveDialog->SetModelName(_modelName);
-  this->BuildingChanged();
-  // send to palette?
-}
 
-/////////////////////////////////////////////////
-void BuildingMaker::SaveToSDF(const std::string &_savePath)
-{
-  std::ofstream savefile;
-  boost::filesystem::path path(_savePath);
-  path = path / "model.sdf";
+  this->folderName = this->saveDialog->
+      GetFolderNameFromModelName(this->modelName);
 
-  // FIXME
-  savefile.open(path.string().c_str());
-  if (!savefile.is_open())
+  if (this->currentSaveState == NEVER_SAVED)
   {
-    gzerr << "Couldn't open file for writing: " << path.string() << std::endl;
-    return;
+    // Set new saveLocation
+    boost::filesystem::path oldPath(this->saveDialog->GetSaveLocation());
+
+    boost::filesystem::path newPath = oldPath.parent_path() / this->folderName;
+    this->saveDialog->SetSaveLocation(newPath.string());
   }
-  savefile << this->modelSDF->ToString();
-  savefile.close();
-  gzdbg << "Saved file to " << path.string() << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -761,8 +676,7 @@ void BuildingMaker::GenerateSDF()
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;
 
-  modelElem->GetAttribute("name")->Set(
-      GetFolderNameFromModelName(this->modelName));
+  modelElem->GetAttribute("name")->Set(this->folderName);
   math::Pose modelOrigin(
       this->previewVisual->GetBoundingBox().GetCenter().x,
       this->previewVisual->GetBoundingBox().GetCenter().y, 0, 0, 0, 0);
@@ -1083,7 +997,7 @@ void BuildingMaker::GenerateSDFWithCSG()
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;
 
-  modelElem->GetAttribute("name")->Set(this->modelName);
+  modelElem->GetAttribute("name")->Set(this->folderName);
 
   std::map<std::string, BuildingModelManip *>::iterator itemsIt;
   for (itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
@@ -1194,7 +1108,7 @@ void BuildingMaker::GenerateSDFWithCSG()
       visGeomElem->ClearElements();
       sdf::ElementPtr meshElem = visGeomElem->AddElement("mesh");
       // TODO create the folder
-      std::string uri = "model://" + this->modelName + "/meshes/"
+      std::string uri = "model://" + this->folderName + "/meshes/"
           + booleanMeshName;
       meshElem->GetElement("uri")->Set(uri);
       visualElem->GetElement("pose")->Set(visual->GetPose());
@@ -1240,14 +1154,14 @@ void BuildingMaker::GenerateSDFWithCSG()
 /////////////////////////////////////////////////
 void BuildingMaker::CreateTheEntity()
 {
-  msgs::Factory msg;
-  // Create a new name if the model exists
   if (!this->modelSDF->root->HasElement("model"))
   {
     gzerr << "Generated invalid SDF! Cannot create entity." << std::endl;
     return;
   }
 
+  msgs::Factory msg;
+  // Create a new name if the model exists
   sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
   std::string modelElemName = modelElem->Get<std::string>("name");
   if (has_entity_name(modelElemName))
@@ -1307,24 +1221,6 @@ double BuildingMaker::Convert(double _value)
 double BuildingMaker::ConvertAngle(double _angle)
 {
   return GZ_DTOR(_angle);
-}
-
-/////////////////////////////////////////////////
-std::string BuildingMaker::GetTemplateConfigString()
-{
-  std::ostringstream newModelStr;
-  newModelStr << "<?xml version=\"1.0\"?>"
-  << "<model>"
-  <<   "<name>building_template_model</name>"
-  <<   "<version>1.0</version>"
-  <<   "<sdf version=\"1.5\">model.sdf</sdf>"
-  <<   "<author>"
-  <<     "<name>author_name</name>"
-  <<     "<email>author_email</email>"
-  <<   "</author>"
-  <<   "<description>Made with the Gazebo Building Editor</description>"
-  << "</model>";
-  return newModelStr.str();
 }
 
 /////////////////////////////////////////////////
@@ -1619,7 +1515,7 @@ void BuildingMaker::OnNew()
   {
     if (msgBox.clickedButton() == saveButton)
     {
-      if (!this->OnSave(this->modelName))
+      if (!this->OnSave())
       {
         return;
       }
@@ -1632,114 +1528,28 @@ void BuildingMaker::OnNew()
 
 void BuildingMaker::SaveModelFiles()
 {
-  this->SetModelName(this->modelName);
-  this->GenerateConfig();
-  this->SaveToConfig(this->saveLocation);
+  this->saveDialog->GenerateConfig();
+  this->saveDialog->SaveToConfig();
   this->GenerateSDF();
-  this->SaveToSDF(this->saveLocation);
+  this->saveDialog->SaveToSDF(this->modelSDF);
   this->currentSaveState = ALL_SAVED;
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::GenerateConfig()
+bool BuildingMaker::OnSave()
 {
-  // Create an xml config file
-  this->modelConfig.Clear();
-  this->modelConfig.Parse(this->GetTemplateConfigString().c_str());
-
-  TiXmlElement *modelXML = this->modelConfig.FirstChildElement("model");
-  if (!modelXML)
-  {
-    gzerr << "No model name in default config file\n";
-    return;
-  }
-  TiXmlElement *modelNameXML = modelXML->FirstChildElement("name");
-  modelNameXML->FirstChild()->SetValue(this->modelName);
-
-  TiXmlElement *versionXML = modelXML->FirstChildElement("version");
-  if (!versionXML)
-  {
-    gzerr << "Couldn't find model version" << std::endl;
-    versionXML->FirstChild()->SetValue("1.0");
-  }
-  else
-  {
-    versionXML->FirstChild()->SetValue(this->version);
-  }
-
-  TiXmlElement *descriptionXML = modelXML->FirstChildElement("description");
-  if (!descriptionXML)
-  {
-    gzerr << "Couldn't find model description" << std::endl;
-    descriptionXML->FirstChild()->SetValue("");
-  }
-  else
-  {
-    descriptionXML->FirstChild()->SetValue(this->description);
-  }
-
-  // TODO: Multiple authors
-  TiXmlElement *authorXML = modelXML->FirstChildElement("author");
-  if (!authorXML)
-  {
-    gzerr << "Couldn't find model author" << std::endl;
-  }
-  else
-  {
-    TiXmlElement *authorChild = authorXML->FirstChildElement("name");
-    if (!authorChild)
-    {
-      gzerr << "Couldn't find author name" << std::endl;
-      authorChild->FirstChild()->SetValue("");
-    }
-    else
-    {
-      authorChild->FirstChild()->SetValue(this->authorName);
-    }
-    authorChild = authorXML->FirstChildElement("email");
-    if (!authorChild)
-    {
-      gzerr << "Couldn't find author email" << std::endl;
-      authorChild->FirstChild()->SetValue("");
-    }
-    else
-    {
-      authorChild->FirstChild()->SetValue(this->authorEmail);
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-void BuildingMaker::SaveToConfig(const std::string &_savePath)
-{
-  boost::filesystem::path path(_savePath);
-  path = path / "model.config";
-  const char* modelConfigString = path.string().c_str();
-
-  this->modelConfig.SaveFile(modelConfigString);
-  gzdbg << "Saved file to " << modelConfigString << std::endl;
-}
-
-/////////////////////////////////////////////////
-bool BuildingMaker::OnSave(const std::string &_saveName)
-{
-  if (_saveName != "")
-    this->SetModelName(_saveName);
-
   switch (this->currentSaveState)
   {
     case UNSAVED_CHANGES:
     {
       // TODO: Subtle filesystem race condition
       this->SaveModelFiles();
-      AddDirToModelPaths(this->saveLocation);
-      gui::editor::Events::saveBuildingModel(this->modelName,
-          this->saveLocation);
+      gui::editor::Events::saveBuildingModel(this->modelName);
       return true;
     }
     case NEVER_SAVED:
     {
-      return this->OnSaveAs(_saveName);
+      return this->OnSaveAs();
     }
     default:
       return false;
@@ -1747,89 +1557,18 @@ bool BuildingMaker::OnSave(const std::string &_saveName)
 }
 
 /////////////////////////////////////////////////
-bool BuildingMaker::OnSaveAs(const std::string &_saveName)
+bool BuildingMaker::OnSaveAs()
 {
-  this->saveDialog->SetModelName(_saveName);
-
-  if (this->saveLocation.length() > 0)
+  if (this->saveDialog->OnSaveAs())
   {
-    this->saveDialog->SetSaveLocation(this->saveLocation);
-  }
-  if (this->saveDialog->exec() == QDialog::Accepted)
-  {
-    if (this->saveDialog->GetModelName().size() == 0)
-    {
-      QMessageBox msgBox(QMessageBox::Warning, QString("Empty Name"),
-                       QString("Please give your model a non-empty name."));
-
-      msgBox.exec();
-      return this->OnSaveAs(_saveName);
-    }
-    if (this->saveDialog->GetSaveLocation().size() == 0)
-    {
-      QMessageBox msgBox(QMessageBox::Warning, QString("Empty Location"),
-             QString("Please give a path to where your model will be saved."));
-
-      msgBox.exec();
-      return this->OnSaveAs(_saveName);
-    }
-
-    this->modelName = this->saveDialog->GetModelName();
-    this->saveLocation = this->saveDialog->GetSaveLocation();
-    this->authorName = this->saveDialog->GetAuthorName();
-    this->authorEmail = this->saveDialog->GetAuthorEmail();
-    this->description = this->saveDialog->GetDescription();
-    this->version = this->saveDialog->GetVersion();
-
-    if (this->modelName.compare(this->buildingDefaultName) == 0)
-    {
-      // Parse saveLocation and set model name
-      boost::filesystem::path saveLocPath(this->saveLocation);
-      this->SetModelName(saveLocPath.filename().string());
-    }
-
-    boost::filesystem::path path;
-    path = path / this->saveLocation;
-    if (!boost::filesystem::exists(path))
-    {
-      if (!boost::filesystem::create_directories(path))
-      {
-        gzerr << "Couldn't create folder for model files." << std::endl;
-        return false;
-      }
-      gzmsg << "Created folder " << path << " for model files." << std::endl;
-    }
-
-    boost::filesystem::path modelConfigPath = path / "model.config";
-
-    boost::filesystem::path sdfPath = path / "model.sdf";
-
-    // Before writing
-    if (boost::filesystem::exists(sdfPath) ||
-          boost::filesystem::exists(modelConfigPath))
-    {
-      std::string msg = "A model named " + this->modelName +
-                        " already exists in folder " + path.string() + ".\n\n"
-                        "Do you wish to overwrite the existing model files?\n";
-
-      QMessageBox msgBox(QMessageBox::Warning, QString("Files Exist"),
-                         QString(msg.c_str()));
-
-      QPushButton *saveButton = msgBox.addButton("Save",
-                                                 QMessageBox::ApplyRole);
-      msgBox.addButton(QMessageBox::Cancel);
-      msgBox.exec();
-      if (msgBox.clickedButton() != saveButton)
-      {
-        return this->OnSaveAs(this->modelName);
-      }
-    }
-
+    // Prevent changing save location
+    this->currentSaveState = ALL_SAVED;
+    // Get name set by user
+    this->SetModelName(this->saveDialog->GetModelName());
+    // Update name on palette
+    gui::editor::Events::saveBuildingModel(this->modelName);
+    // Generate and save files
     this->SaveModelFiles();
-
-    AddDirToModelPaths(this->saveLocation);
-
-    gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
     return true;
   }
   return false;
@@ -1839,21 +1578,9 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
 void BuildingMaker::OnNameChanged(const std::string &_name)
 {
   if (_name.compare(this->modelName) == 0)
-  {
     return;
-  }
+
   this->SetModelName(_name);
-
-  if (this->currentSaveState == NEVER_SAVED)
-  {
-    // Set new saveLocation
-    boost::filesystem::path oldPath(this->saveLocation);
-
-    boost::filesystem::path newPath = oldPath.parent_path() /
-          GetFolderNameFromModelName(_name);
-    this->saveLocation = newPath.string();
-  }
-
   this->BuildingChanged();
 }
 
@@ -1905,7 +1632,7 @@ void BuildingMaker::OnExit()
 
       if (msgBox.clickedButton() == saveButton)
       {
-        if (!this->OnSave(this->modelName))
+        if (!this->OnSave())
         {
           return;
         }
@@ -2040,6 +1767,14 @@ bool BuildingMaker::On3dMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &_event)
 {
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+
+  if (_event.dragging)
+  {
+    userCamera->HandleMouseEvent(_event);
+    return true;
+  }
+
   if (_event.button != common::MouseEvent::LEFT)
   {
     this->StopMaterialModes();
@@ -2074,7 +1809,6 @@ bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &_event)
   }
   else
   {
-    rendering::UserCameraPtr userCamera = gui::get_active_camera();
     userCamera->HandleMouseEvent(_event);
     this->StopMaterialModes();
   }

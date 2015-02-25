@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/gui/building/LevelInspectorDialog.hh"
 
 using namespace gazebo;
@@ -182,8 +183,7 @@ void LevelInspectorDialog::SetHeight(double _height)
 /////////////////////////////////////////////////
 void LevelInspectorDialog::SetFloorColor(const QColor _color)
 {
-  // Find index corresponding to color (only a few colors allowed so far)
-  int index = 0;
+  int index = -1;
   for (unsigned int i = 0; i < this->floorColorList.size(); ++i)
   {
     if (this->floorColorList[i] == _color)
@@ -192,6 +192,17 @@ void LevelInspectorDialog::SetFloorColor(const QColor _color)
       break;
     }
   }
+
+  if (index == -1)
+  {
+    // Add a new color
+    this->floorColorList.push_back(_color);
+    QPixmap colorIcon(15, 15);
+    colorIcon.fill(this->floorColorList.back());
+    this->floorColorComboBox->addItem(colorIcon, QString(""));
+    index = this->floorColorComboBox->count()-1;
+  }
+  GZ_ASSERT(index > 0, "Color index is broken < 0");
   this->floorColorComboBox->setCurrentIndex(index);
 }
 
