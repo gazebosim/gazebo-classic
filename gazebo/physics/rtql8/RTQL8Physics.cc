@@ -56,37 +56,22 @@ using namespace physics;
 
 GZ_REGISTER_PHYSICS_ENGINE("rtql8", RTQL8Physics)
 
-// extern ContactAddedCallback gContactAddedCallback;
-// extern ContactProcessedCallback gContactProcessedCallback;
-// 
-// //////////////////////////////////////////////////
-// bool ContactCallback(btManifoldPoint &/*_cp*/,
-//     const btCollisionObjectWrapper * /*_obj0*/, int /*_partId0*/,
-//     int /*_index0*/, const btCollisionObjectWrapper * /*_obj1*/,
-//     int /*_partId1*/, int /*_index1*/)
-// {
-//   return true;
-// }
-// 
-// //////////////////////////////////////////////////
-// bool ContactProcessed(btManifoldPoint &/*_cp*/, void * /*_body0*/,
-//                       void * /*_body1*/)
-// {
-//   return true;
-// }
-// 
 //////////////////////////////////////////////////
 RTQL8Physics::RTQL8Physics(WorldPtr _world)
     : PhysicsEngine(_world)
 {
   this->rtql8World = new rtql8::simulation::World;
+
+  // TODO: Gazebo does not support design-time and runtime concept now.
+  // Therefore, we basically set rtql8 world as runtime and never change it.
+  // When gazebo support the concept, we should apply it to rtql8 also.
+  //this->rtql8World->changeDesignTime(false);
 }
 
 //////////////////////////////////////////////////
 RTQL8Physics::~RTQL8Physics()
 {
   delete this->rtql8World;
-  //this->rtql8World = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -99,8 +84,8 @@ void RTQL8Physics::Load(sdf::ElementPtr _sdf)
   this->rtql8World->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
   
   // Time step
-  double timeStep = this->sdf->GetValueDouble("time_step");
-  this->rtql8World->setTimeStep(timeStep);
+  //double timeStep = this->sdf->GetValueDouble("time_step");
+  //this->rtql8World->setTimeStep(timeStep);
   
   // TODO: Elements for rtql8 settings
   //sdf::ElementPtr rtql8Elem = this->sdf->GetElement("rtql8");
@@ -111,6 +96,7 @@ void RTQL8Physics::Load(sdf::ElementPtr _sdf)
 void RTQL8Physics::Init()
 {
   this->rtql8World->init();
+  //this->rtql8World->setRuntimeMode();
 }
 
 //////////////////////////////////////////////////
@@ -148,9 +134,18 @@ void RTQL8Physics::UpdatePhysics()
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
     //this->physicsUpdateMutex->lock();
 
+//    std::vector<Eigen::VectorXd> dofs = this->rtql8World->getDofs();
+//    Eigen::VectorXd FirstDof = dofs[0];
+//    double state = FirstDof[0];
+
     //common::Time currTime =  this->world->GetRealTime();
-    //this->rtql8World->updatePhysics();
-    this->rtql8World->updateKinematics();
+    this->rtql8World->updatePhysics();
+
+//    dofs = this->rtql8World->getDofs();
+//    FirstDof = dofs[0];
+//    state = FirstDof[0];
+    //gzerr << (this->rtql8World->getDofs().at(0))[0];
+    //this->rtql8World->updateKinematics();
     //this->lastUpdateTime = currTime;
 
     // Update all the transformation of RTQL8's links to gazebo's links
@@ -158,15 +153,15 @@ void RTQL8Physics::UpdatePhysics()
     unsigned int modelCount = this->world->GetModelCount();
     ModelPtr modelItr;
 
-    for (int i = 0; i < modelCount; ++i)
+    for (unsigned int i = 0; i < modelCount; ++i)
     {
       modelItr = this->world->GetModel(i);
       // TODO: need to improve speed
       Link_V links = modelItr->GetLinks();
-      unsigned int linkCound = links.size();
+      unsigned int linkCount = links.size();
       RTQL8LinkPtr rtql8LinkItr;
 
-      for (int j = 0; j < linkCound; ++j)
+      for (unsigned int j = 0; j < linkCount; ++j)
       {
         rtql8LinkItr
             = boost::shared_dynamic_cast<RTQL8Link>(links.at(j));
@@ -175,6 +170,18 @@ void RTQL8Physics::UpdatePhysics()
     }
     //this->physicsUpdateMutex->unlock();
   }
+}
+
+//////////////////////////////////////////////////
+std::string RTQL8Physics::GetType() const
+{
+  return "rtql8";
+}
+
+//////////////////////////////////////////////////
+void RTQL8Physics::SetSeed(uint32_t /*_seed*/)
+{
+  gzerr << "Not implemented yet...\n";
 }
 
 //////////////////////////////////////////////////
@@ -269,18 +276,20 @@ JointPtr RTQL8Physics::CreateJoint(const std::string &_type, ModelPtr _parent)
 {
   JointPtr joint;
 
-  if (_type == "prismatic")
-    joint.reset(new RTQL8SliderJoint(_parent));
-  else if (_type == "screw")
-    joint.reset(new RTQL8ScrewJoint(_parent));
-  else if (_type == "revolute")
+//  if (_type == "prismatic")
+//    joint.reset(new RTQL8SliderJoint(_parent));
+//  else if (_type == "screw")
+//    joint.reset(new RTQL8ScrewJoint(_parent));
+//  else if (_type == "revolute")
+//    joint.reset(new RTQL8HingeJoint(_parent));
+//  else if (_type == "revolute2")
+//    joint.reset(new RTQL8Hinge2Joint(_parent));
+//  else if (_type == "ball")
+//    joint.reset(new RTQL8BallJoint(_parent));
+//  else if (_type == "universal")
+//    joint.reset(new RTQL8UniversalJoint(_parent));
+  if (_type == "revolute")
     joint.reset(new RTQL8HingeJoint(_parent));
-  else if (_type == "revolute2")
-    joint.reset(new RTQL8Hinge2Joint(_parent));
-  else if (_type == "ball")
-    joint.reset(new RTQL8BallJoint(_parent));
-  else if (_type == "universal")
-    joint.reset(new RTQL8UniversalJoint(_parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 
@@ -376,7 +385,7 @@ void RTQL8Physics::OnRequest(ConstRequestPtr &_msg)
   }
 }
 
-void RTQL8Physics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
+void RTQL8Physics::OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/)
 {
 //  if (_msg->has_dt())
 //  {

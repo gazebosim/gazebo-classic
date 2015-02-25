@@ -19,13 +19,21 @@
 #include "physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
 
+#define PHYSICS_TOL 1e-2
 using namespace gazebo;
 class PhysicsTest : public ServerFixture
 {
-  public: void EmptyWorld(std::string _worldFile);
+  public: void EmptyWorld_JS(std::string _worldFile);
+
+  public: void EmptyWorld(const std::string &_physicsEngine);
+  public: void SpawnDrop(const std::string &_physicsEngine);
+  public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
+  public: void RevoluteJoint(const std::string &_physicsEngine);
+  public: void SimplePendulum(const std::string &_physicsEngine);
+  public: void CollisionFiltering(const std::string &_physicsEngine);
 };
 
-void PhysicsTest::EmptyWorld(std::string _worldFile)
+void PhysicsTest::EmptyWorld_JS(std::string _worldFile)
 {
   // Load an empty world
   Load(_worldFile, true);
@@ -41,22 +49,11 @@ void PhysicsTest::EmptyWorld(std::string _worldFile)
   Unload();
 }
 
-TEST_F(PhysicsTest, EmptyWorldODE)
-{
-  //EmptyWorld("worlds/empty.world");
-}
-
 #ifdef HAVE_RTQL8
-TEST_F(PhysicsTest, EmptyWorldRTQL8)
+TEST_F(PhysicsTest, RTQL8_FIRST_TEST)
 {
-  //EmptyWorld("worlds/empty_rtql8.world");
-}
-#endif // HAVE_RTQL8
-
-#ifdef HAVE_RTQL8
-TEST_F(PhysicsTest, SimplePendulumRTQL8)
-{
-  EmptyWorld("worlds/simple_pendulum_rtql8.world");
+  EmptyWorld_JS("worlds/empty.world");
+  //EmptyWorld_JS("worlds/rtql8/simple_pendulum.world");
 }
 #endif // HAVE_RTQL8
 

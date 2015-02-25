@@ -31,6 +31,7 @@ namespace gazebo
     class RTQL8Physics;
     class RTQL8Model;
     class RTQL8Link;
+    class RTQL8Joint;
     class RTQL8Collision;
     class RTQL8RayShape;
 
@@ -45,6 +46,10 @@ namespace gazebo
     /// \def RTQL8LinkPtr
     /// \brief Boost shared point to RTQL8Link
     typedef boost::shared_ptr<RTQL8Link> RTQL8LinkPtr;
+
+    /// \def RTQL8JointPtr
+    /// \brief Boost shared point to RTQL8Joint
+    typedef boost::shared_ptr<RTQL8Joint> RTQL8JointPtr;
 
     /// \def RTQL8CollisionPtr
     /// \brief Boost shared point to RTQL8Collision

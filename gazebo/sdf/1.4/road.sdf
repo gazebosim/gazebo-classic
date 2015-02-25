@@ -1,0 +1,15 @@
+<!-- Model -->
+<element name="road" required="*">
+  <attribute name="name" type="string" default="__default__" required="1">
+    <description>Name of the road</description>
+  </attribute>
+
+  <element name="width" type="double" default="1.0" required="1">
+    <description>Width of the road</description>
+  </element>
+
+  <element name="point" type="vector3" default="0 0 0" required="+">
+    <description>A series of points define the path of the road.</description>
+  </element>
+
+</element>

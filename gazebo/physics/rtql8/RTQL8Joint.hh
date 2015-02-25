@@ -21,8 +21,9 @@
 #include <boost/any.hpp>
 #include <string>
 
-#include "gazebo/physics/rtql8/RTQL8Physics.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/rtql8/RTQL8Physics.hh"
 
 namespace gazebo
 {
@@ -75,18 +76,42 @@ namespace gazebo
       public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetAttribute(Attribute _attr, int _index,
-                                        double _value);
+      public: virtual void SetAttribute(const std::string &_key, int _index,
+                                      const boost::any &_value);
 
       // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &_key, int _index,
-                                        const boost::any &_value);
+      public: virtual double GetAttribute(const std::string &_key,
+                                        unsigned int _index);
 
       /// \brief
       protected: rtql8::kinematics::Joint* rtql8Joint;
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(int _index);
+
+      // Documentation inherited.
+      public: virtual JointWrench GetForceTorque(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual unsigned int GetAngleCount() const;
+
+      /// \brief
+      public: math::Pose GetPose_ParentLinkToJoint() const
+      {
+        return poseParentLinkToJoint;
+      }
+
+      /// \brief
+      public: math::Pose GetPose_JointToChildLink() const
+      {
+        return poseJointToChildLink;
+      }
+
+      /// \brief
+      protected: math::Pose poseParentLinkToJoint;
+
+      /// \brief
+      protected: math::Pose poseJointToChildLink;
     };
   }
 }

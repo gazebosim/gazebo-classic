@@ -52,8 +52,8 @@ namespace gazebo
 
       /// \brief Update the body
       public: virtual void Update();
-	  
-	  // Documentation inherited
+
+      // Documentation inherited
       public: virtual void OnPoseChange();
 
       // Documentation inherited
@@ -92,17 +92,26 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void AddForceAtRelativePosition(
-                  const math::Vector3 &_force,
-                  const math::Vector3 &_relpos);
+          const math::Vector3 &_force,
+          const math::Vector3 &_relpos);
 
       // Documentation inherited
       public: virtual void AddTorque(const math::Vector3 &_torque);
 
       // Documentation inherited
-      public: virtual void AddRelativeTorque(const math::Vector3 &_torque);
+      public: virtual void AddRelativeTorque(const math::Vector3& _torque);
 
       // Documentation inherited
-      public: virtual math::Vector3 GetWorldLinearVel() const;
+      public: virtual math::Vector3 GetWorldLinearVel(
+          const math::Vector3& _offset = math::Vector3(0, 0, 0)) const;
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldLinearVel(
+          const math::Vector3 &_offset,
+          const math::Quaternion &_q) const;
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldCoGLinearVel() const;
 
       // Documentation inherited
       public: virtual math::Vector3 GetWorldAngularVel() const;
@@ -117,10 +126,10 @@ namespace gazebo
       public: virtual void SetGravityMode(bool _mode);
 
       // Documentation inherited
-      public: virtual bool GetGravityMode();
+      public: virtual bool GetGravityMode() const;
 
       // Documentation inherited
-      public: void SetSelfCollide(bool _collide);
+      public: virtual void SetSelfCollide(bool _collide);
 
       // Documentation inherited
       public: virtual void SetLinearDamping(double _damping);
@@ -141,14 +150,35 @@ namespace gazebo
       public: void updateDirtyPoseFromRTQL8Transformation();
 
       /// \brief
-      public: rtql8::kinematics::BodyNode* GetBodyNode() const {return rtql8BodyNode;}
+      public: rtql8::dynamics::BodyNodeDynamics* GetBodyNode() const
+      {return rtql8BodyNode;}
 
       /// \brief
-      private: rtql8::kinematics::BodyNode* rtql8BodyNode;
-	  
-      /// \brief
-      private: RTQL8PhysicsPtr rtql8Physics;
+      public: RTQL8PhysicsPtr GetRTQL8Physics(void) const;
 
+      /// \brief
+      public: rtql8::simulation::World* GetRTQL8World(void) const;
+
+      /// \brief
+      public: RTQL8ModelPtr GetRTQL8Model() const;
+
+      /// \brief
+      public: void SetRTQL8ParentJoint(RTQL8JointPtr _rtql8ParentJoint);
+
+      /// \brief
+      public: void AddRTQL8ChildJoint(RTQL8JointPtr _rtql8ChildJoint);
+
+      /// \brief
+      private: rtql8::dynamics::BodyNodeDynamics* rtql8BodyNode;
+
+      /// \brief
+      //private: RTQL8PhysicsPtr rtql8Physics;
+
+      /// \brief
+      private: RTQL8JointPtr rtql8ParentJoint;
+
+      /// \brief
+      private: std::vector<RTQL8JointPtr> rtql8ChildJoints;
     };
     /// \}
   }

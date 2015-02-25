@@ -25,11 +25,13 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
 
+#include "gazebo/physics/rtql8/rtql8_inc.h"
+
 namespace gazebo
 {
   namespace physics
   {
-    /// \brief Base class for all ODE collisions.
+    /// \brief Base class for all RTQL8 collisions.
     class RTQL8Collision : public Collision
     {
       /// \brief Constructor.
@@ -41,6 +43,9 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual void Init();
 
       // Documentation inherited.
       public: virtual void Fini();
@@ -61,6 +66,11 @@ namespace gazebo
       // Documentation inherited.
       public: virtual math::Box GetBoundingBox() const;
 
+      /// @brief RTQL8 body node associated with this collision.
+      public: rtql8::dynamics::BodyNodeDynamics* rtql8BodyNode;
+
+      /// @brief RTQL8 collision shape associated with this collision.
+      public: rtql8::kinematics::Shape* rtql8CollShape;
     };
   }
 }

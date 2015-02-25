@@ -1,0 +1,39 @@
+<!-- gui -->
+<element name="gui" required="0">
+  <attribute name="fullscreen" type="bool" default="false" required="0">
+    <description></description>
+  </attribute>
+
+  <element name="camera" required="0">
+    <description> </description>
+
+    <attribute name="name" type="string" default="user_camera" required="1">
+      <description></description>
+    </attribute>
+
+
+    <element name="view_controller" type="string" default="orbit" required="0">
+      <description></description>
+    </element>
+
+    <element name="pose" type="pose" default="0 0 0 0 0 0" required="0">
+      <description></description>
+    </element>
+
+    <element name="track_visual" required="0">
+      <description></description>
+
+      <element name="name" type="string" default="__default__" required="1">
+        <description></description>
+      </element>
+
+      <element name="min_dist" type="double" default="0" required="0">
+        <description></description>
+      </element>
+
+      <element name="max_dist" type="double" default="0" required="0">
+        <description></description>
+      </element>
+    </element>
+  </element>
+</element>

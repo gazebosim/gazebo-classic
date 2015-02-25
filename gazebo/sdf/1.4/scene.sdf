@@ -1,0 +1,78 @@
+<!-- Scene -->
+<element name="scene" required="1">
+  <description>Specifies the look of the environment.</description>
+
+  <element name="ambient" type="color" default="0.2 0.2 0.2 1.0" required="1">
+    <description>Color of the ambient light.</description>
+  </element>
+
+  <element name="background" type="color" default=".7 .7 .7 1" required="1">
+    <description>Color of the background.</description>
+  </element>
+
+  <element name="sky" required="0">
+    <description>Properties for the sky</description>
+    <element name="time" type="double" default="10.0" required="0">
+      <description>Time of day [0..24]</description>
+    </element>
+    <element name="sunrise" type="double" default="6.0" required="0">
+      <description>Sunrise time [0..24]</description>
+    </element>
+    <element name="sunset" type="double" default="20.0" required="0">
+      <description>Sunset time [0..24]</description>
+    </element>
+
+    <element name="clouds" required="0">
+      <description>Sunset time [0..24]</description>
+      <element name="speed" type="double" default="0.6" min="0.0" required="0">
+        <description>Speed of the clouds</description>
+      </element>
+
+      <element name="direction" type="double" default="0.0"
+               min="0.0" max="3.1456" required="0">
+        <description>Direction of the cloud movement</description>
+      </element>
+      <element name="humidity" type="double" default="0.5"
+               min="0" max="1" required="0">
+        <description>Density of clouds</description>
+      </element>
+
+      <element name="mean_size" type="double" default="0.5"
+               min="0" max="1" required="0">
+        <description>Average size of the clouds</description>
+      </element>
+
+      <element name="ambient" type="color" default=".8 .8 .8 1" required="0">
+        <description>Ambient cloud color</description>
+      </element>
+    </element>
+  </element>
+
+  <element name="shadows" type="bool" default="true" required="1">
+    <description>Enable/disable shadows</description>
+   </element>
+
+  <element name="fog" required="0">
+    <description>Controls fog</description>
+    <element name="color" type="color" default="1 1 1 1" required="0">
+      <description>Fog color</description>
+    </element>
+    <element name="type" type="string" default="none" required="0">
+      <description>Fog type: constant, linear, quadratic</description>
+    </element>
+    <element name="start" type="double" default="1.0" min="0.0" required="0">
+      <description>Distance to start of fog</description>
+    </element>
+    <element name="end" type="double" default="100.0" min="0.0" required="0">
+      <description>Distance to end of fog</description>
+    </element>
+    <element name="density" type="double" default="1.0" min="0.0" required="0">
+      <description>Density of fog</description>
+    </element>
+  </element>
+
+  <element name="grid" type="bool" default="true" required="0">
+    <description>Enable/disable the grid</description>
+  </element>
+
+</element> <!-- End Scene -->
