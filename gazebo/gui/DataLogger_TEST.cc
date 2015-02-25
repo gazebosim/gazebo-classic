@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 */
 
 #include <boost/filesystem.hpp>
-#include "gazebo/math/Rand.hh"
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/DataLogger_TEST.hh"
+#include "gazebo/math/Rand.hh"
 
 /////////////////////////////////////////////////
 void DataLogger_TEST::RecordButton()
@@ -112,13 +113,16 @@ void DataLogger_TEST::StressTest()
 {
   QBENCHMARK
   {
+    gazebo::common::SystemPaths *paths =
+        gazebo::common::SystemPaths::Instance();
+
     // Cleanup test directory.
-    boost::filesystem::remove_all("/tmp/gazebo_test");
+    boost::filesystem::remove_all(paths->GetDefaultTestPath());
 
     this->Load("worlds/empty.world");
 
     // Cleanup test directory.
-    boost::filesystem::remove_all("/tmp/gazebo_test");
+    boost::filesystem::remove_all(paths->GetDefaultTestPath());
 
     gazebo::transport::NodePtr node;
     gazebo::transport::PublisherPtr pub;
@@ -129,7 +133,7 @@ void DataLogger_TEST::StressTest()
     pub = node->Advertise<gazebo::msgs::LogControl>("~/log/control");
 
     gazebo::msgs::LogControl msg;
-    msg.set_base_path("/tmp/gazebo_test");
+    msg.set_base_path(paths->GetDefaultTestPath());
     pub->Publish(msg);
 
     // Create a new data logger widget
@@ -150,16 +154,17 @@ void DataLogger_TEST::StressTest()
       gazebo::common::Time::MSleep(gazebo::math::Rand::GetIntUniform(10, 500));
     }
 
-    // There should be (count * 0.5) log directories in /tmp/gazebo_test
+    // There should be (count * 0.5) log directories in $TMP/gazebo_test
     // due to the record button being toggled.
     unsigned int dirCount = 0;
-    for (boost::filesystem::directory_iterator iter("/tmp/gazebo_test");
-        iter != boost::filesystem::directory_iterator(); ++iter, ++dirCount)
+    for (boost::filesystem::directory_iterator
+          iter(paths->GetDefaultTestPath());
+          iter != boost::filesystem::directory_iterator(); ++iter, ++dirCount)
     {
     }
 
     // Cleanup after ourselves.
-    boost::filesystem::remove_all("/tmp/gazebo_test");
+    boost::filesystem::remove_all(paths->GetDefaultTestPath());
 
     QVERIFY(dirCount == count / 2);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,13 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/ColladaLoader.hh"
+#include "gazebo/common/ColladaExporter.hh"
 #include "gazebo/common/STLLoader.hh"
 #include "gazebo/gazebo_config.h"
 
 #ifdef HAVE_GTS
   #include "gazebo/common/MeshCSG.hh"
+  #include "gazebo/common/GTSMeshUtils.hh"
 #endif
 
 #include "gazebo/common/MeshManager.hh"
@@ -42,6 +44,7 @@ using namespace common;
 MeshManager::MeshManager()
 {
   this->colladaLoader = new ColladaLoader();
+  this->colladaExporter = new ColladaExporter();
   this->stlLoader = new STLLoader();
 
   // Create some basic shapes
@@ -73,6 +76,7 @@ MeshManager::MeshManager()
 MeshManager::~MeshManager()
 {
   delete this->colladaLoader;
+  delete this->colladaExporter;
   delete this->stlLoader;
   std::map<std::string, Mesh*>::iterator iter;
   for (iter = this->meshes.begin(); iter != this->meshes.end(); ++iter)
@@ -159,6 +163,20 @@ const Mesh *MeshManager::Load(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
+void MeshManager::Export(const Mesh *_mesh, const std::string &_filename,
+    const std::string &_extension, bool _exportTextures)
+{
+  if (_extension == "dae")
+  {
+    this->colladaExporter->Export(_mesh, _filename, _exportTextures);
+  }
+  else
+  {
+    gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
+  }
+}
+
+//////////////////////////////////////////////////
 bool MeshManager::IsValidFilename(const std::string &_filename)
 {
   std::string extension;
@@ -231,7 +249,6 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   }
 
   int ring, seg;
-  float r0;
   float deltaSegAngle = (2.0 * M_PI / segments);
   float deltaRingAngle = (M_PI / rings);
   math::Vector3 vert, norm;
@@ -247,7 +264,7 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   // Generate the group of rings for the sphere
   for (ring = 0; ring <= rings; ring++)
   {
-    r0 = radius * sinf(ring * deltaRingAngle);
+    float r0 = radius * sinf(ring * deltaRingAngle);
     vert.y = radius * cosf(ring * deltaRingAngle);
 
     // Generate the group of segments for the current ring
@@ -461,6 +478,130 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   for (i = 0; i < 36; i++)
     subMesh->AddIndex(ind[i]);
 
+  subMesh->RecalculateNormals();
+}
+
+//////////////////////////////////////////////////
+void MeshManager::CreateExtrudedPolyline(const std::string &_name,
+    const std::vector<math::Vector2d> &_vertices,
+    const double &_height, const math::Vector2d & /*_uvCoords*/)
+{
+  if (this->HasMesh(_name))
+  {
+    return;
+  }
+
+  int i;
+  int numSides = _vertices.size();
+
+  Mesh *mesh = new Mesh();
+  mesh->SetName(_name);
+  this->meshes.insert(std::make_pair(_name, mesh));
+
+  SubMesh *subMesh = new SubMesh();
+  mesh->AddSubMesh(subMesh);
+
+  #if HAVE_GTS
+  {
+    if (!GTSMeshUtils::CreateExtrudedPolyline(_vertices, _height, subMesh))
+    {
+      gzerr << "Unable to create extruded polyline.\n";
+      delete mesh;
+      return;
+    }
+  }
+  #else
+  {
+    gzerr << "GTS library not found.\n" <<
+             "Polylines rendered may be incorrect, if concave\n";
+
+    // Add the vertices
+    for (i = 0; i < numSides; ++i)
+    {
+      subMesh->AddVertex(_vertices[i].x, _vertices[i].y, 0.0);
+      subMesh->AddVertex(_vertices[i].x, _vertices[i].y, _height);
+    }
+
+    // Euler's Formula: numFaces = numEdges - numVertices + 2
+    //                           = numSides + 2
+    // # of SideFaces = numFaces - (upper face + lower face)
+    //                = numFaces - 2
+    //                = numSides
+
+    // for lower face
+    int startVert = 0;
+    int endVert = numSides * 2 - 2;
+    subMesh->AddIndex(startVert);
+    startVert += 2;
+    subMesh->AddIndex(startVert);
+    subMesh->AddIndex(endVert);
+    for (i = 1; i < numSides-2; ++i)
+    {
+      if (i%2)
+      {
+        subMesh->AddIndex(startVert);
+        startVert += 2;
+        subMesh->AddIndex(startVert);
+        subMesh->AddIndex(endVert);
+      }
+      else
+      {
+        subMesh->AddIndex(endVert);
+        endVert -= 2;
+        subMesh->AddIndex(startVert);
+        subMesh->AddIndex(endVert);
+      }
+    }
+
+    // for upper face
+    startVert = 1;
+    endVert = numSides*2-1;
+    subMesh->AddIndex(startVert);
+    startVert += 2;
+    subMesh->AddIndex(endVert);
+    subMesh->AddIndex(startVert);
+    for (i = 1; i < numSides-2; ++i)
+    {
+      if (!i%2)
+      {
+        subMesh->AddIndex(startVert);
+        startVert += 2;
+        subMesh->AddIndex(startVert);
+        subMesh->AddIndex(endVert);
+      }
+      else
+      {
+        subMesh->AddIndex(endVert);
+        endVert -= 2;
+        subMesh->AddIndex(endVert);
+        subMesh->AddIndex(startVert);
+      }
+    }
+  }
+  #endif
+
+  // for each sideface
+  for (i = 0; i < numSides; ++i)
+  {
+    subMesh->AddVertex(_vertices[i].x, _vertices[i].y, 0.0);
+    subMesh->AddVertex(_vertices[i].x, _vertices[i].y, _height);
+  }
+  subMesh->AddVertex(_vertices[0].x, _vertices[0].y, 0.0);
+  subMesh->AddVertex(_vertices[0].x, _vertices[0].y, _height);
+
+  for (i = 0; i < numSides; ++i)
+  {
+    subMesh->AddIndex(i*2+numSides*2);
+    subMesh->AddIndex(i*2+1+numSides*2);
+    subMesh->AddIndex(i*2+2+numSides*2);
+
+    subMesh->AddIndex(i*2+2+numSides*2);
+    subMesh->AddIndex(i*2+1+numSides*2);
+    subMesh->AddIndex(i*2+3+numSides*2);
+  }
+
+  if (subMesh->GetNormalCount() != subMesh->GetVertexCount())
+    subMesh->SetNormalCount(subMesh->GetVertexCount());
   subMesh->RecalculateNormals();
 }
 
@@ -692,14 +833,12 @@ void MeshManager::CreateCone(const std::string &name, float radius,
 
   float deltaSegAngle = (2.0 * M_PI / segments);
 
-  double ringRadius;
-
   // Generate the group of rings for the cone
   for (ring = 0; ring < rings; ring++)
   {
     vert.z = ring * height/rings - height/2.0;
 
-    ringRadius = ((height - (vert.z+height/2.0)) / height) * radius;
+    double ringRadius = ((height - (vert.z+height/2.0)) / height) * radius;
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
@@ -908,8 +1047,8 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
 void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
     bool doubleSided)
 {
-  int vInc, uInc, v, u, iterations;
-  int vCount, uCount;
+  int vInc, v, iterations;
+  int uCount;
 
   if (doubleSided)
   {
@@ -929,10 +1068,10 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
   while (iterations--)
   {
     // Make tris in a zigzag pattern (compatible with strips)
-    u = 0;
-    uInc = 1;
+    int u = 0;
+    int uInc = 1;
 
-    vCount = meshHeight - 1;
+    int vCount = meshHeight - 1;
     while (vCount--)
     {
       uCount = meshWidth - 1;
@@ -984,3 +1123,4 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
   this->meshes.insert(std::make_pair(_name, mesh));
 }
 #endif
+

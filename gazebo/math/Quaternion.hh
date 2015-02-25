@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: External interfaces for Gazebo
- * Author: Nate Koenig
- * Date: 03 Apr 2007
- */
 
-#ifndef _QUATERNION_HH_
-#define _QUATERNION_HH_
+#ifndef _GAZEBO_MATH_QUATERNION_HH_
+#define _GAZEBO_MATH_QUATERNION_HH_
 
 #include <math.h>
 #include <iostream>
@@ -31,6 +27,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Matrix3.hh"
 #include "gazebo/math/Matrix4.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -41,7 +38,7 @@ namespace gazebo
 
   /// \class Quaternion Quaternion.hh math/gzmath.hh
   /// \brief A quaternion class
-  class Quaternion
+  class GAZEBO_VISIBLE Quaternion
   {
     /// \brief Default Constructor
     public: Quaternion();
@@ -276,13 +273,13 @@ namespace gazebo
     /// \brief Correct any nan
     public: inline void Correct()
             {
-              if (!finite(this->x))
+              if (!std::isfinite(this->x))
                 this->x = 0;
-              if (!finite(this->y))
+              if (!std::isfinite(this->y))
                 this->y = 0;
-              if (!finite(this->z))
+              if (!std::isfinite(this->z))
                 this->z = 0;
-              if (!finite(this->w))
+              if (!std::isfinite(this->w))
                 this->w = 1;
 
               if (math::equal(this->w, 0.0) &&
@@ -345,6 +342,14 @@ namespace gazebo
     public: static Quaternion Slerp(double _fT, const Quaternion &_rkP,
                 const Quaternion &_rkQ, bool _shortestPath = false);
 
+    /// \brief Integrate quaternion for constant angular velocity vector
+    /// along specified interval `_deltaT`.
+    /// \param[in] _angularVelocity Angular velocity vector, specified in
+    /// same reference frame as base of this quaternion.
+    /// \param[in] _deltaT Time interval in seconds to integrate over.
+    /// \return Quaternion at integrated configuration.
+    public: Quaternion Integrate(const Vector3 &_angularVelocity,
+                                 const double _deltaT) const;
 
     /// \brief Attributes of the quaternion
     public: double w;

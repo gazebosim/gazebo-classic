@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 #include "Connection.hh"
 #include "CallbackHelper.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
     /// transport/transport.hh
     /// \brief Handles sending data over the wire to
     /// remote subscribers
-    class SubscriptionTransport : public CallbackHelper
+    class GAZEBO_VISIBLE SubscriptionTransport : public CallbackHelper
     {
       /// \brief Constructor
       public: SubscriptionTransport();

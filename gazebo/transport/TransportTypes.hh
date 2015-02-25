@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,13 @@
 #define _TRANSPORT_TYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+// avoid collision from Mac OS X's ConditionalMacros.h
+// see gazebo issue #1289
+#ifdef __MACH__
+# undef TYPE_BOOL
+#endif
 #include <google/protobuf/message.h>
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_transport

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/CommonTypes.hh>
 #include <gazebo/math/Helpers.hh>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -44,7 +45,7 @@ namespace gazebo
     /// \internal
     // Private data members for Event class.
     // This must be in the header due to templatization.
-    class EventPrivate
+    class GAZEBO_VISIBLE EventPrivate
     {
       // \brief Constructor
       public: EventPrivate();
@@ -55,7 +56,7 @@ namespace gazebo
 
     /// \class Event Event.hh common/common.hh
     /// \brief Base class for all events
-    class Event
+    class GAZEBO_VISIBLE Event
     {
       /// \brief Constructor
       public: Event();
@@ -85,7 +86,7 @@ namespace gazebo
 
     /// \internal
     // Private data members for Connection class.
-    class ConnectionPrivate
+    class GAZEBO_VISIBLE ConnectionPrivate
     {
       /// \brief Constructor.
       public: ConnectionPrivate();
@@ -106,7 +107,7 @@ namespace gazebo
     };
 
     /// \brief A class that encapsulates a connection.
-    class Connection
+    class GAZEBO_VISIBLE Connection
     {
       /// \brief Constructor.
       public: Connection();
@@ -133,7 +134,7 @@ namespace gazebo
     /// \internal
     // Private data members for EventT<T> class.
     template< typename T>
-    class EventTPrivate : public EventPrivate
+    class GAZEBO_VISIBLE EventTPrivate : public EventPrivate
     {
       /// \def EvtConnectionMap
       /// \brief Event Connection map typedef.
@@ -152,7 +153,7 @@ namespace gazebo
     /// \class EventT Event.hh common/common.hh
     /// \brief A class for event processing.
     template< typename T>
-    class EventT : public Event
+    class GAZEBO_VISIBLE EventT : public Event
     {
       /// \def EvtConnectionMap.
       /// \brief Event Connection map typedef.

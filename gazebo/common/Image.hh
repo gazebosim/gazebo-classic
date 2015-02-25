@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 #include <string>
 
 #include "gazebo/common/Color.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -64,7 +65,7 @@ namespace gazebo
 
     /// \class Image Image.hh common/common.hh
     /// \brief Encapsulates an image
-    class Image
+    class GAZEBO_VISIBLE Image
     {
       /// \brief Pixel formats enumeration
       public: enum PixelFormat

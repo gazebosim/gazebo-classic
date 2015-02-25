@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 */
 
 #include "test/ServerFixture.hh"
+#include "test/integration/helper_physics_generator.hh"
 #include "gazebo/msgs/msgs.hh"
 
 using namespace gazebo;
 
-class PhysicsEngineTest : public ServerFixture
+class PhysicsEngineTest : public ServerFixture,
+                          public testing::WithParamInterface<const char*>
 {
   public: void OnPhysicsMsgResponse(ConstResponsePtr &_msg);
   public: void PhysicsEngineParam(const std::string &_physicsEngine);
@@ -44,7 +46,7 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
   physicsPubMsg.Clear();
   physicsResponseMsg.Clear();
 
-  Load("worlds/empty.world", false);
+  Load("worlds/empty.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -91,27 +93,27 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
   EXPECT_DOUBLE_EQ(physicsResponseMsg.real_time_factor(),
       physicsPubMsg.real_time_factor());
 
+  // Test PhysicsEngine::GetParam()
+  {
+    physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+    boost::any dt = physics->GetParam("max_step_size");
+    EXPECT_DOUBLE_EQ(boost::any_cast<double>(dt),
+      physicsPubMsg.max_step_size());
+
+    EXPECT_NO_THROW(physics->GetParam("fake_param_name"));
+  }
+
   physicsNode->Fini();
 }
 
-TEST_F(PhysicsEngineTest, PhysicsEngineParamODE)
+/////////////////////////////////////////////////
+TEST_P(PhysicsEngineTest, PhysicsEngineParam)
 {
-  PhysicsEngineParam("ode");
+  PhysicsEngineParam(GetParam());
 }
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsEngineTest, PhysicsEngineParamBullet)
-{
-  PhysicsEngineParam("bullet");
-}
-#endif  // HAVE_BULLET
-
-#ifdef HAVE_DART
-TEST_F(PhysicsEngineTest, PhysicsEngineParamDART)
-{
-  PhysicsEngineParam("dart");
-}
-#endif  // HAVE_DART
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsEngineTest,
+                        PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {

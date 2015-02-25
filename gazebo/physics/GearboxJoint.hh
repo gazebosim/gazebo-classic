@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
     /// \class GearboxJoint GearboxJoint.hh physics/physics.hh
     /// \brief A double axis gearbox joint
     template<class T>
-    class GearboxJoint : public T
+    class GAZEBO_VISIBLE GearboxJoint : public T
     {
       /// \brief Constructor
       /// \param[in] _parent Parent link
@@ -59,8 +60,12 @@ namespace gazebo
                 }
                 else
                 {
-                  gzerr << "should not see this\n";
+                  gzerr << "gearbox_ratio_not_specified, set to 1.\n";
                   this->gearRatio = 1.0;
+                  /* below should bring in default values for sdf 1.4+
+                  this->gearRatio =
+                    _sdf->Get<double>("gearbox_ratio");
+                  */
                 }
 
                 if (_sdf->HasElement("gearbox_reference_body"))
@@ -82,7 +87,7 @@ namespace gazebo
 
       /// \brief Get gearbox joint gear ratio.
       /// \return Gear ratio value.
-      public: virtual double GetGearRatio() const
+      public: virtual double GetGearboxRatio() const
               { return this->gearRatio; }
 
       /// \brief Set gearbox joint gear ratio.
@@ -90,7 +95,7 @@ namespace gazebo
       /// This must be implemented in a child class
       /// \param[in] _index Index of the axis.
       /// \param[in] _gearRatio Gear ratio value.
-      public: virtual void SetGearRatio(double _gearRatio) = 0;
+      public: virtual void SetGearboxRatio(double _gearRatio) = 0;
 
       /// \brief Gearbox gearRatio
       protected: double gearRatio;

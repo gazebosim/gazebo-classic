@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-
-/* Desc: A Light
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
-
 #ifndef _LIGHT_HH_
 #define _LIGHT_HH_
 
@@ -31,6 +25,7 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Color.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
@@ -54,7 +49,7 @@ namespace gazebo
     /// class encapsulates all three. Point lights are light light bulbs,
     /// spot lights project a cone of light, and directional lights are light
     /// sun light.
-    class Light
+    class GAZEBO_VISIBLE Light : public boost::enable_shared_from_this<Light>
     {
       /// \brief Constructor.
       /// \param[in] _scene Pointer to the scene that contains the Light.
@@ -75,6 +70,10 @@ namespace gazebo
       /// \param[in] _msg Containing the light information.
       public: void LoadFromMsg(ConstLightPtr &_msg);
 
+      /// \brief Load from a light message.
+      /// \param[in] _msg Message containing the light information.
+      public: void LoadFromMsg(const msgs::Light &_msg);
+
       /// \brief Set the name of the visual.
       /// \param[in] _name Name of the light source.
       public: void SetName(const std::string &_name);
@@ -94,6 +93,14 @@ namespace gazebo
       /// \brief Get the position of the light
       /// \return The position of the light
       public: math::Vector3 GetPosition() const;
+
+      /// \brief Set the rotation of the light
+      /// \param[in] _q New rotation for the light
+      public: void SetRotation(const math::Quaternion &_q);
+
+      /// \brief Get the rotation of the light
+      /// \return The rotation of the light
+      public: math::Quaternion GetRotation() const;
 
       /// \brief Set whether this entity has been selected by the user through
       /// the gui.
@@ -175,6 +182,12 @@ namespace gazebo
       /// \param[in] _msg Light message to update from
       public: void UpdateFromMsg(ConstLightPtr &_msg);
 
+      /// \brief Clone the light with a new name
+      /// \param[in] _name Name of the cloned light.
+      /// \param[in] _scene Scene to contain the light.
+      /// \return a clone of the light
+      public: LightPtr Clone(const std::string &_name, ScenePtr _scene);
+
       /// \brief On pose change callback
       protected: virtual void OnPoseChange() {}
 
@@ -186,7 +199,7 @@ namespace gazebo
 
       /// \brief Update SDF value based on a message.
       /// \param[in] _msg The light message to update from.
-      private: void UpdateSDFFromMsg(ConstLightPtr &_msg);
+      private: void UpdateSDFFromMsg(const msgs::Light &_msg);
 
       /// \brief The ogre light source
       private: Ogre::Light *light;

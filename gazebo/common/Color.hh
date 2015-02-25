@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <iostream>
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
 
     /// \class Color Color.hh common/common.hh
     /// \brief Defines a color
-    class Color
+    class GAZEBO_VISIBLE Color
     {
       /// \brief (1, 1, 1)
       public: static const Color White;

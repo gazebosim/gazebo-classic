@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2012-2014 Open Source Robotics Foundation
+* Copyright (C) 2012-2015 Open Source Robotics Foundation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,21 +16,9 @@
 */
 
 #include <gazebo/gazebo_config.h>
-#include <gazebo/common/Console.hh>
 #include <gazebo/common/AudioDecoder.hh>
-
-#ifdef HAVE_FFMPEG
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
-extern "C" {
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-#include <libavutil/opt.h>
-}
-#endif
+#include <gazebo/common/Console.hh>
+#include <gazebo/common/ffmpeg_inc.h>
 
 #define AUDIO_INBUF_SIZE (20480 * 2)
 #define AUDIO_REFILL_THRESH 4096

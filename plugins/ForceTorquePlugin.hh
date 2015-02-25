@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,12 @@
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   /// \brief An base class plugin for custom force torque sensor processing.
-  class ForceTorquePlugin : public SensorPlugin
+  class GAZEBO_VISIBLE ForceTorquePlugin : public SensorPlugin
   {
     /// \brief Constructor
     public: ForceTorquePlugin();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ TEST(Cmake, Config)
 {
   char cmd[1024];
 
-  snprintf(cmd, sizeof(cmd), "cmake %s", SOURCE_DIR);
+  snprintf(cmd, sizeof(cmd), "cmake %s -DGAZEBO_VERSION=%s",
+           SOURCE_DIR, GAZEBO_VERSION);
   ASSERT_EQ(system(cmd), 0);
   snprintf(cmd, sizeof(cmd), "make");
   ASSERT_EQ(system(cmd), 0);

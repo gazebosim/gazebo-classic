@@ -3,6 +3,39 @@
     <include>
       <uri>model://sun</uri>
     </include>
+    <physics type="ode">
+      <gravity>0.000000 0.000000 0</gravity>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>1000</iters>
+          <precon_iters>0</precon_iters>
+          <sor>1.000000</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <contact_max_correcting_vel>100.000000</contact_max_correcting_vel>
+          <contact_surface_layer>0.01000</contact_surface_layer>
+        </constraints>
+      </ode>
+      <bullet>
+        <solver>
+          <type>sequential_impulse</type>
+          <iters>1000</iters>
+          <sor>1.000000</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <split_impulse>true</split_impulse>
+          <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+          <contact_surface_layer>0.00000</contact_surface_layer>
+        </constraints>
+      </bullet>
+      <real_time_update_rate>0.000000</real_time_update_rate>
+      <max_step_size>0.001</max_step_size>
+    </physics>
     <model name="model_1">
       <link name="link_00">
         <gravity>true</gravity>
@@ -109,6 +142,7 @@
           </material>
         </visual>
       </link>
+      
       <joint name="joint_00" type="universal">
         <parent>world</parent>
         <child>link_00</child>
@@ -117,10 +151,10 @@
           <limit>
             <lower>-1.7</lower>
             <upper>1.7</upper>
-            <stiffness>1e12</stiffness>
+            <stiffness>1e6</stiffness>
           </limit>
           <dynamics>
-            <damping>0.1</damping>
+            <damping>0.0001</damping>
           </dynamics>
         </axis>
         <axis2>
@@ -128,10 +162,10 @@
           <limit>
             <lower>-1.7</lower>
             <upper>1.7</upper>
-            <stiffness>1e12</stiffness>
+            <stiffness>1e6</stiffness>
           </limit>
           <dynamics>
-            <damping>0.1</damping>
+            <damping>0.0001</damping>
           </dynamics>
         </axis2>
         <physics>
@@ -146,8 +180,8 @@
         <axis>
           <xyz>1 0 0</xyz>
           <limit>
-            <lower>-1.7</lower>
-            <upper>1.7</upper>
+            <lower>-1.4</lower>
+            <upper>1.4</upper>
           </limit>
           <dynamics>
             <damping>0.1</damping>
@@ -156,8 +190,8 @@
         <axis2>
           <xyz>0 1 0</xyz>
           <limit>
-            <lower>-1.57</lower>
-            <upper>1.57</upper>
+            <lower>-1.27</lower>
+            <upper>1.27</upper>
           </limit>
           <dynamics>
             <damping>0.1</damping>

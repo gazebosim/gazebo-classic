@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,8 +49,6 @@ ODEHingeJoint::~ODEHingeJoint()
 void ODEHingeJoint::Load(sdf::ElementPtr _sdf)
 {
   HingeJoint<ODEJoint>::Load(_sdf);
-
-  this->SetParam(dParamFMax, 0);
 }
 
 //////////////////////////////////////////////////
@@ -104,14 +102,9 @@ void ODEHingeJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
-  /// ODE needs global axis
-  /// \TODO: currently we assume joint axis is specified in model frame,
-  /// this is incorrect, and should be corrected to be
-  /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
-  if (this->parentLink)
-    globalAxis =
-      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+  // ODE needs global axis
+  math::Quaternion axisFrame = this->GetAxisFrame(0);
+  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
 
   if (this->jointId)
     dJointSetHingeAxis(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
@@ -145,9 +138,9 @@ double ODEHingeJoint::GetVelocity(unsigned int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetVelocity(unsigned int /*index*/, double _angle)
+void ODEHingeJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  this->SetParam(dParamVel, _angle);
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////

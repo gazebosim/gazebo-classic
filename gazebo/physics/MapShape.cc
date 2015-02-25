@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -340,6 +340,7 @@ void MapShape::BuildTree(QuadNode *_node)
     float newX, newY;
     float newW, newH;
 
+    newX = _node->x;
     newY = _node->y;
     newW = _node->width / 2.0;
     newH = _node->height / 2.0;

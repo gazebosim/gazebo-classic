@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,14 @@
 #include "gazebo/physics/HeightmapShape.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief ODE Height map collision.
-    class ODEHeightmapShape : public HeightmapShape
+    class GAZEBO_VISIBLE ODEHeightmapShape : public HeightmapShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Collision parent.

@@ -1,39 +1,64 @@
 set (files
   actor.world
-  actor_demo.world
-  actor_circle.world
+  arat.world
   blank.world
-  two_actors.world
   camera.world
-  gripper.world
-  joint_damping_demo.world
-  depth_camera.world
-  empty.world
-  empty_sky.world
-  force_torque_demo.world
-  force_torque_demo2.world
-  friction_demo.world
-  joints.world
-  heightmap.world
-  lights.world
-  model_nesting.world
-  pioneer2dx.world
-  openal.world
   cart_demo.world
-  double_pendulums.world
+  contact.world
+  depth_camera.world
+  empty_1_0.world
+  empty_bullet.world
+  empty_sky.world
+  empty.world
+  everything.world
+  force_torque_demo.world
+  friction_demo.world
+  gripper.world
+  heightmap_dem.world
+  heightmap.world
+  hydra_demo.world
+  initial_velocity.world
+  joint_damping_demo.world
+  joint_friction_demo.world
+  joints.world
+  lights.world
+  mud_bitmask.world
   mud.world
+  multilink_shape.world
+  openal.world
+  pioneer2dx.world
+  pioneer2dx_camera.world
+  pioneer2dx_laser.world
+  pioneer2dx_laser_camera.world
+  plane_demo.world
   plugin.world
+  polyline.world
+  population.world
   pr2.world
   presentation.world
+  pressure_sensor.world
   projector.world
+  quad_rotor_demo.world
+  quad_rotor_demo_2.world
   ray_cpu.world
-  robocup_3Dsim.world
+  ray_noise_plugin.world
+  road.world
+  road_textures.world
   robocup09_spl_field.world
   robocup14_spl_field.world
+  robocup_3Dsim.world
   rubble.world
   shapes.world
+  simple_arm.world
+  simple_gripper.world
+  single_rotor_demo.world
+  sonar_demo.world
   sphere_atlas_demo.world
-  weshare2012.world
-  willowgarage.world)
+  stacks.world
+  trigger.world
+  twin_rotor_demo.world
+  willowgarage.world
+  wireless_sensors.world
+)
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/worlds/)

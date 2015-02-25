@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
 
     /// \class SphereShape SphereShape.hh physics/physics.hh
     /// \brief Sphere collision shape.
-    class SphereShape : public Shape
+    class GAZEBO_VISIBLE SphereShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.

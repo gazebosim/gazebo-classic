@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,10 @@
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 
-#include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "test/util.hh"
 
@@ -35,7 +36,8 @@ TEST_F(LogRecord_TEST, Constructor)
   char *homePath = getenv("HOME");
   EXPECT_TRUE(homePath != NULL);
 
-  boost::filesystem::path logPath = "/tmp/gazebo";
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  boost::filesystem::path logPath = paths->GetTmpPath() + "/gazebo";
   if (homePath)
     logPath = boost::filesystem::path(homePath);
   logPath /= "/.gazebo/log/";

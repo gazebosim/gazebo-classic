@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,18 @@ class MainWindow_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Test copying and pasting a model and a light
+  private slots: void CopyPaste();
+
   /// \brief Test that trigger of the view wireframe action creates an
   /// appropriate request.
   private slots: void Wireframe();
+
+  /// \brief Test creating a main window with non-default world
+  private slots: void NonDefaultWorld();
+
+  /// \brief Test moving the user camera via a joystick message.
+  private slots: void UserCameraJoystick();
 };
 
 #endif

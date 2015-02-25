@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+
+#include <string>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -65,11 +67,10 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      /// \TODO: switch to GetElement so default values apply
-      /// \TODO: check all physics engines
-      if (dynamicsElem->HasElement("damping"))
+      if (dynamicsElem && dynamicsElem->HasElement("friction"))
       {
-        this->dissipationCoefficient[0] = dynamicsElem->Get<double>("damping");
+        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+        gzlog << "joint friction not implemented\n";
       }
     }
   }
@@ -81,11 +82,10 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      /// \TODO: switch to GetElement so default values apply
-      /// \TODO: check all physics engines
-      if (dynamicsElem->HasElement("damping"))
+      if (dynamicsElem && dynamicsElem->HasElement("friction"))
       {
-        this->dissipationCoefficient[1] = dynamicsElem->Get<double>("damping");
+        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+        gzlog << "joint friction not implemented\n";
       }
     }
   }
@@ -345,7 +345,30 @@ void SimbodyJoint::SaveForce(unsigned int _index, double _force)
 //////////////////////////////////////////////////
 void SimbodyJoint::SaveSimbodyState(const SimTK::State &/*_state*/)
 {
+/*
+  // Implementation not complete
   // Not implemented
+  // skip if not a free joint, state is saved in SimbodyJoint::mobod
+  if (!this->masterMobod.isEmptyHandle() &&
+      SimTK::MobilizedBody::Free::isInstanceOf(this->masterMobod))
+  {
+    if (this->simbodyQ.empty())
+      this->simbodyQ.resize(this->masterMobod.getNumQ(_state));
+
+    if (this->simbodyU.empty())
+      this->simbodyU.resize(this->masterMobod.getNumU(_state));
+
+    for (unsigned int i = 0; i < this->simbodyQ.size(); ++i)
+      this->simbodyQ[i] = this->masterMobod.getOneQ(_state, i);
+
+    for (unsigned int i = 0; i < this->simbodyU.size(); ++i)
+      this->simbodyU[i] = this->masterMobod.getOneU(_state, i);
+  }
+  else
+  {
+    // gzerr << "debug: joint name: " << this->GetScopedName() << "\n";
+  }
+*/
 }
 
 //////////////////////////////////////////////////
@@ -358,7 +381,7 @@ void SimbodyJoint::RestoreSimbodyState(SimTK::State &/*_state*/)
 void SimbodyJoint::SetAnchor(unsigned int /*_index*/,
     const gazebo::math::Vector3 & /*_anchor*/)
 {
-  gzdbg << "SimbodyJoint::SetAnchor:  Not implement in Simbody."
+  gzerr << "SimbodyJoint::SetAnchor:  Not implement in Simbody."
         << " Anchor is set during joint construction in SimbodyPhysics.cc\n";
 }
 
@@ -406,14 +429,21 @@ void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
     this->dissipationCoefficient[_index] = _damping;
     this->springReferencePosition[_index] = _reference;
 
-    // set damper coefficient
-    this->damper[_index].setDamping(
-      this->simbodyPhysics->integ->updAdvancedState(),
-      _damping);
+    if (this->physicsInitialized)
+    {
+      // set damper coefficient
+      this->damper[_index].setDamping(
+        this->simbodyPhysics->integ->updAdvancedState(),
+        _damping);
 
-    /// \TODO: add spring force element
-    gzdbg << "Joint [" << this->GetName()
-           << "] stiffness not implement in Simbody\n";
+      // set spring stiffness and reference position
+      this->spring[_index].setStiffness(
+        this->simbodyPhysics->integ->updAdvancedState(),
+        _stiffness);
+      this->spring[_index].setQZero(
+        this->simbodyPhysics->integ->updAdvancedState(),
+        _reference);
+    }
   }
   else
     gzerr << "SetStiffnessDamping _index too large.\n";
@@ -422,42 +452,163 @@ void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
 //////////////////////////////////////////////////
 math::Vector3 SimbodyJoint::GetAnchor(unsigned int /*_index*/) const
 {
-  gzdbg << "Not implement in Simbody\n";
+  gzerr << "Not implement in Simbody\n";
   return math::Vector3();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyJoint::GetLinkForce(unsigned int /*_index*/) const
 {
-  gzdbg << "Not implement in Simbody\n";
+  gzerr << "Not implement in Simbody\n";
   return math::Vector3();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyJoint::GetLinkTorque(unsigned int /*_index*/) const
 {
-  gzdbg << "Not implement in Simbody\n";
+  gzerr << "Not implement in Simbody\n";
   return math::Vector3();
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAttribute(Attribute, unsigned int /*_index*/,
-    double /*_value*/)
-{
-  gzdbg << "Not implement in Simbody\n";
-}
-
-//////////////////////////////////////////////////
-void SimbodyJoint::SetAttribute(const std::string &/*_key*/,
+bool SimbodyJoint::SetParam(const std::string &/*_key*/,
     unsigned int /*_index*/, const boost::any &/*_value*/)
 {
-  gzdbg << "Not implement in Simbody\n";
+  gzerr << "Not implement in Simbody\n";
+  return false;
 }
 
 //////////////////////////////////////////////////
-double SimbodyJoint::GetAttribute(const std::string &/*_key*/,
-    unsigned int /*_index*/)
+double SimbodyJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  gzdbg << "Not implement in Simbody\n";
-  return 0;
+  return Joint::GetParam(_key, _index);
+}
+
+//////////////////////////////////////////////////
+bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+{
+  Joint::SetHighStop(_index, _angle);
+
+  if (_index < this->GetAngleCount())
+  {
+    if (this->physicsInitialized)
+    {
+      if (!this->limitForce[_index].isEmptyHandle())
+      {
+        this->limitForce[_index].setBounds(
+          this->simbodyPhysics->integ->updAdvancedState(),
+          this->GetLowStop(_index).Radian(), _angle.Radian());
+      }
+      else
+      {
+        gzerr << "child link is NULL, force element not initialized, "
+              << "SetHighStop failed. Please file a report on issue tracker.\n";
+        return false;
+      }
+    }
+    else
+    {
+      gzerr << "SetHighStop: State not initialized, SetHighStop failed.\n";
+      return false;
+    }
+  }
+  else
+  {
+    gzerr << "SetHighStop: index out of bounds.\n";
+    return false;
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+{
+  Joint::SetLowStop(_index, _angle);
+
+  if (_index < this->GetAngleCount())
+  {
+    if (this->physicsInitialized)
+    {
+      if (!this->limitForce[_index].isEmptyHandle())
+      {
+        this->limitForce[_index].setBounds(
+          this->simbodyPhysics->integ->updAdvancedState(),
+          _angle.Radian(),
+          this->GetHighStop(_index).Radian());
+      }
+      else
+      {
+        gzerr << "child link is NULL, force element not initialized, "
+              << "SetLowStop failed. Please file a report on issue tracker.\n";
+        return false;
+      }
+    }
+    else
+    {
+      gzerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
+      return false;
+    }
+  }
+  else
+  {
+    gzerr << "SetLowStop: index out of bounds.\n";
+    return false;
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+math::Angle SimbodyJoint::GetHighStop(unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get high stop\n";
+    /// \TODO: should return NaN
+    return math::Angle(0.0);
+  }
+  else if (_index == 0)
+  {
+    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
+             ->Get<double>("upper"));
+  }
+  else if (_index == 1)
+  {
+    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
+             ->Get<double>("upper"));
+  }
+  else
+  {
+    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
+    /// \TODO: should return NaN
+    return math::Angle(0.0);
+  }
+}
+
+//////////////////////////////////////////////////
+math::Angle SimbodyJoint::GetLowStop(unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get low stop\n";
+    /// \TODO: should return NaN
+    return math::Angle(0.0);
+  }
+  else if (_index == 0)
+  {
+    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
+             ->Get<double>("lower"));
+  }
+  else if (_index == 1)
+  {
+    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
+             ->Get<double>("lower"));
+  }
+  else
+  {
+    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
+    /// \TODO: should return NaN
+    return math::Angle(0.0);
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@ class PhysicsMsgsTest : public ServerFixture,
 {
   public: void MoveTool(const std::string &_physicsEngine);
   public: void SetGravity(const std::string &_physicsEngine);
+  public: void LinkProperties(const std::string &_physicsEngine);
+  public: void LinkPose(const std::string &_physicsEngine);
   public: void SimpleShapeResize(const std::string &_physicsEngine);
 };
 
@@ -157,6 +159,224 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   }
 }
 
+/////////////////////////////////////////////////
+void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
+{
+  // TODO simbody currently fails this test
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting LinkProperties test for Simbody" << std::endl;
+    return;
+  }
+
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // spawn a box
+  std::string name = "test_box";
+  double z0 = 5;
+  math::Vector3 pos = math::Vector3(0, 0, z0);
+  math::Vector3 size = math::Vector3(1, 1, 1);
+  SpawnBox(name, size, pos, math::Vector3::Zero);
+
+  // advertise on "~/model/modify"
+  transport::PublisherPtr modelPub =
+    this->node->Advertise<msgs::Model>("~/model/modify");
+
+  physics::ModelPtr model = world->GetModel(name);
+  ASSERT_TRUE(model != NULL);
+
+  // change gravity mode and verify the msg gets through
+  physics::LinkPtr link = model->GetLink();
+  ASSERT_TRUE(link != NULL);
+
+  // check default link gravity and kinematic properties
+  {
+    // gravity mode should be enabled by default
+    EXPECT_TRUE(link->GetGravityMode());
+
+    // TODO Bullet currently fails this test
+    if (_physicsEngine != "bullet")
+    {
+      // kinematic mode should be disabled by default
+      EXPECT_TRUE(!link->GetKinematic());
+    }
+    else
+    {
+      gzerr << "Skipping LinkProperties's kinematic test for Bullet" <<
+          std::endl;
+    }
+
+    // self collide mode should be disabled by default
+    EXPECT_TRUE(!link->GetSelfCollide());
+  }
+
+  {
+    // change gravity mode and verify the msg gets through
+    msgs::Model msg;
+    msg.set_name(name);
+    msg.set_id(model->GetId());
+
+    msgs::Link *linkMsg = msg.add_link();
+    linkMsg->set_id(link->GetId());
+    linkMsg->set_name(link->GetScopedName());
+
+    bool newGravityMode = false;
+    EXPECT_TRUE(newGravityMode != link->GetGravityMode());
+    linkMsg->set_gravity(newGravityMode);
+    modelPub->Publish(msg);
+
+    int sleep = 0;
+    int maxSleep = 50;
+    while (link->GetGravityMode() != newGravityMode && sleep < maxSleep)
+    {
+      world->Step(1);
+      common::Time::MSleep(100);
+      sleep++;
+    }
+    ASSERT_TRUE(link->GetGravityMode() == newGravityMode);
+  }
+
+  // TODO Bullet and DART currently fail this test
+  if (_physicsEngine != "bullet" && _physicsEngine != "dart")
+  {
+    // change kinematic mode and verify the msg gets through
+    msgs::Model msg;
+    msg.set_name(name);
+    msg.set_id(model->GetId());
+
+    msgs::Link *linkMsg = msg.add_link();
+    linkMsg->set_id(link->GetId());
+    linkMsg->set_name(link->GetScopedName());
+
+    bool newKinematicMode = true;
+    EXPECT_TRUE(newKinematicMode != link->GetKinematic());
+    linkMsg->set_kinematic(newKinematicMode);
+    modelPub->Publish(msg);
+
+    int sleep = 0;
+    int maxSleep = 50;
+    while (link->GetKinematic() != newKinematicMode && sleep < maxSleep)
+    {
+      world->Step(1);
+      common::Time::MSleep(100);
+      sleep++;
+    }
+    EXPECT_TRUE(link->GetKinematic() == newKinematicMode);
+  }
+  else
+  {
+    gzerr << "Skipping LinkProperties's kinematic test for "
+          << _physicsEngine << std::endl;
+  }
+
+  {
+    // change self collide mode and verify the msg gets through
+    msgs::Model msg;
+    msg.set_name(name);
+    msg.set_id(model->GetId());
+
+    msgs::Link *linkMsg = msg.add_link();
+    linkMsg->set_id(link->GetId());
+    linkMsg->set_name(link->GetName());
+
+    bool newSelfCollideMode = true;
+    EXPECT_TRUE(newSelfCollideMode != link->GetSelfCollide());
+    linkMsg->set_self_collide(newSelfCollideMode);
+    modelPub->Publish(msg);
+
+    int sleep = 0;
+    int maxSleep = 50;
+    while (link->GetSelfCollide() != newSelfCollideMode && sleep < maxSleep)
+    {
+      world->Step(1);
+      common::Time::MSleep(100);
+      sleep++;
+    }
+    EXPECT_TRUE(link->GetSelfCollide() == newSelfCollideMode);
+  }
+}
+
+/////////////////////////////////////////////////
+void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
+{
+  Load("worlds/multilink_shape.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // set gravity to zero
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  physics->SetGravity(math::Vector3::Zero);
+
+  // advertise on "~/model/modify"
+  transport::PublisherPtr modelPub =
+    this->node->Advertise<msgs::Model>("~/model/modify");
+
+  double z0 = 5;
+  // list of poses to move to
+  std::vector<math::Pose> poses;
+  poses.push_back(math::Pose(5, 0, z0, 0, 0, 0));
+  poses.push_back(math::Pose(0, 8, z0, 0, 0, 0));
+  poses.push_back(math::Pose(-99, 0, z0, 0, 0, 0));
+  poses.push_back(math::Pose(0, 999, z0, 0, 0, 0));
+  poses.push_back(math::Pose(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
+  poses.push_back(math::Pose(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
+  poses.push_back(math::Pose(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
+  poses.push_back(math::Pose(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
+
+  std::string name = "multilink";
+  physics::ModelPtr model = world->GetModel(name);
+  ASSERT_TRUE(model != NULL);
+
+  {
+    for (unsigned int i = 0; i < model->GetLinks().size(); ++i)
+    {
+      physics::LinkPtr link = model->GetLinks()[i];
+      ASSERT_TRUE(link != NULL);
+
+      if (link->IsCanonicalLink())
+        continue;
+
+      for (std::vector<math::Pose>::iterator iter = poses.begin();
+           iter != poses.end(); ++iter)
+      {
+        msgs::Model msg;
+        msg.set_name(name);
+        msg.set_id(model->GetId());
+
+        msgs::Link *linkMsg = msg.add_link();
+        linkMsg->set_id(link->GetId());
+        linkMsg->set_name(link->GetScopedName());
+
+        msgs::Set(linkMsg->mutable_pose(), *iter);
+        modelPub->Publish(msg);
+
+        int sleep = 0;
+        int maxSleep = 50;
+        while (*iter != link->GetRelativePose() && sleep < maxSleep)
+        {
+          world->Step(1);
+          common::Time::MSleep(1);
+        }
+
+        // Take a few steps to verify the correct link pose.
+        // dart has a failure mode that was not exposed without
+        // this change to the test.
+        world->Step(10);
+
+        EXPECT_EQ(*iter, link->GetRelativePose());
+      }
+    }
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////
 // SimpleShapeResize: (Test adapted from PhysicsTest::SpawnDrop)
 // Load a world, check that gravity points along z axis, spawn simple
@@ -165,6 +385,12 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
 ////////////////////////////////////////////////////////////////////////
 void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for DART, see issue #1175.\n";
+    return;
+  }
+
   // load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -318,6 +544,18 @@ TEST_P(PhysicsMsgsTest, SetGravity)
 TEST_P(PhysicsMsgsTest, MoveTool)
 {
   MoveTool(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsMsgsTest, LinkProperties)
+{
+  LinkProperties(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsMsgsTest, LinkPose)
+{
+  LinkPose(GetParam());
 }
 
 /////////////////////////////////////////////////

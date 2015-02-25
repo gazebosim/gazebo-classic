@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,14 @@
 #include <boost/thread/mutex.hpp>
 
 #include "gazebo/common/Event.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace common
   {
     /// \brief Private class attributes for ModelDatabase.
-    class ModelDatabasePrivate
+    class GAZEBO_VISIBLE ModelDatabasePrivate
     {
       /// \brief Thread to update the model cache.
       public: boost::thread *updateCacheThread;
@@ -61,9 +62,6 @@ namespace gazebo
       /// \brief Boost function that is used to passback the model cache.
       public: typedef boost::function<
                void (const std::map<std::string, std::string> &)> CallbackFunc;
-
-      // \todo Remove this along with the deprecated version of GetModels.
-      public: std::list<CallbackFunc> deprecatedCallbacks;
 
       /// \brief Triggered when the model data has been updated after
       /// calling ModelDatabase::GetModels()

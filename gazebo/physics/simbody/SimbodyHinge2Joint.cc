@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,12 +44,6 @@ SimbodyHinge2Joint::~SimbodyHinge2Joint()
 void SimbodyHinge2Joint::Load(sdf::ElementPtr _sdf)
 {
   Hinge2Joint<SimbodyJoint>::Load(_sdf);
-}
-
-//////////////////////////////////////////////////
-void SimbodyHinge2Joint::Init()
-{
-  gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
@@ -105,34 +99,6 @@ double SimbodyHinge2Joint::GetMaxForce(unsigned int /*_index*/)
 {
   gzerr << "Not implemented";
   return 0;
-}
-
-//////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetHighStop(unsigned int /*_index*/,
-  const math::Angle &/*_angle*/)
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetLowStop(unsigned int /*_index*/,
-  const math::Angle &/*_angle*/)
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyHinge2Joint::GetHighStop(unsigned int /*_index*/)
-{
-  gzerr << "Not implemented";
-  return math::Angle();
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyHinge2Joint::GetLowStop(unsigned int /*_index*/)
-{
-  gzerr << "Not implemented";
-  return math::Angle();
 }
 
 //////////////////////////////////////////////////

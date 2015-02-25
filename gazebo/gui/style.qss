@@ -1,3 +1,7 @@
+ QGroupBox::title {
+  color: #f0f0f0;
+ }
+
 QToolButton
 {
   border: 0;
@@ -7,7 +11,7 @@ QToolButton
 
 QToolButton::disabled
 {
-  color: #303030;  
+  color: #303030;
 }
 
 QLabel
@@ -18,6 +22,8 @@ QLabel
 QFrame
 {
   background-color: transparent;
+  padding: 0px;
+  margin: 0px;
 }
 
 QDialog
@@ -116,6 +122,18 @@ QToolBar
   margin-left: 20px;
   border: 0px solid #404040;
   border-radius: 0px;
+}
+
+QToolButton#jointToolButton:pressed,
+QToolButton#jointToolButton:hover
+{
+  border: 0px;
+  background-color: #808080;
+}
+
+QToolBar#playToolBar
+{
+  max-height: 25px;
 }
 
 QToolButton
@@ -257,7 +275,7 @@ QSpinBox
   color: #353535;
   background: #737373;
   border-radius: 4;
-  margin-right: 20px;  
+  margin-right: 20px;
 }
 
 QSpinBox::up-button
@@ -637,6 +655,7 @@ QWidget#renderBottomFrame
 
 QWidget#timePanel
 {
+  max-height: 40px;
   background-color: #808080;
   border-bottom-right-radius: 10px;
 }
@@ -737,4 +756,9 @@ QwtScaleWidget
 {
   color: white;
   font-size: 11px;
+}
+
+#configWidget
+{
+  background-color: #808080;
 }

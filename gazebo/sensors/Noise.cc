@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,9 @@ NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
   std::string typeString = _sdf->Get<std::string>("type");
 
   NoisePtr noise;
+
+  // Check for 'gaussian' noise. The 'gaussian_quantized' type is kept for
+  // backward compatibility.
   if (typeString == "gaussian" ||
       typeString == "gaussian_quantized")
   {
@@ -45,13 +48,15 @@ NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
     else
       noise.reset(new GaussianNoiseModel());
 
-    GZ_ASSERT(noise->GetNoiseType() == Noise::GAUSSIAN ||
-        noise->GetNoiseType() == Noise::GAUSSIAN_QUANTIZED,
-        "Noise type should be 'gaussian' or 'gaussian_quantized'");
+    GZ_ASSERT(noise->GetNoiseType() == Noise::GAUSSIAN,
+        "Noise type should be 'gaussian'");
   }
   else if (typeString == "none" || typeString == "custom")
   {
-    noise.reset(new Noise());
+    // Return empty noise if 'none' or 'custom' is specified.
+    // if 'custom', the type will be set once the user calls the
+    // SetCustomNoiseCallback function.
+    noise.reset(new Noise(Noise::NONE));
     GZ_ASSERT(noise->GetNoiseType() == Noise::NONE,
         "Noise type should be 'none'");
   }
@@ -66,8 +71,8 @@ NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
 }
 
 //////////////////////////////////////////////////
-Noise::Noise()
-  : type(NONE),
+Noise::Noise(NoiseType _type)
+  : type(_type),
     customNoiseCallback(NULL)
 {
 }
@@ -82,21 +87,6 @@ void Noise::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
   GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
-  std::string typeString = this->sdf->Get<std::string>("type");
-  if (typeString == "none")
-    this->type = NONE;
-  else if (typeString == "gaussian")
-    this->type = GAUSSIAN;
-  else if (typeString == "gaussian_quantized")
-    this->type = GAUSSIAN_QUANTIZED;
-  else if (typeString == "custom")
-    this->type = CUSTOM;
-  else
-  {
-    gzerr << "Unrecognized noise type: [" << typeString << "]"
-          << ", using default [none]" << std::endl;
-    this->type = NONE;
-  }
 }
 
 //////////////////////////////////////////////////

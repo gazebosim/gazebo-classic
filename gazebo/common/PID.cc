@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -174,4 +174,46 @@ void PID::GetErrors(double &_pe, double &_ie, double &_de)
   _pe = this->pErr;
   _ie = this->iErr;
   _de = this->dErr;
+}
+
+/////////////////////////////////////////////////
+double PID::GetPGain() const
+{
+  return this->pGain;
+}
+
+/////////////////////////////////////////////////
+double PID::GetIGain() const
+{
+  return this->iGain;
+}
+
+/////////////////////////////////////////////////
+double PID::GetDGain() const
+{
+  return this->dGain;
+}
+
+/////////////////////////////////////////////////
+double PID::GetIMax() const
+{
+  return this->iMax;
+}
+
+/////////////////////////////////////////////////
+double PID::GetIMin() const
+{
+  return this->iMin;
+}
+
+/////////////////////////////////////////////////
+double PID::GetCmdMax() const
+{
+  return this->cmdMax;
+}
+
+/////////////////////////////////////////////////
+double PID::GetCmdMin() const
+{
+  return this->cmdMin;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,11 @@
 #include <boost/filesystem/path.hpp>
 
 #include <gazebo/gazebo_config.h>
+#include <gazebo/common/ffmpeg_inc.h>
 
-#ifdef HAVE_FFMPEG
-extern "C" {
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-}
-#endif
-
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/common/CommonIface.hh"
 
 using namespace gazebo;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include "gazebo/common/Color.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
 
     /// \class LaserVisual LaserVisual.hh rendering/rendering.hh
     /// \brief Visualization for laser data.
-    class LaserVisual : public Visual
+    class GAZEBO_VISIBLE LaserVisual : public Visual
     {
       /// \brief Constructor.
       /// \param[in] _name Name of the visual.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,12 @@
 #include <string>
 #include <vector>
 #include "gazebo/gui/qt.h"
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/Event.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +38,7 @@ namespace gazebo
 
     /// \class BuildingModelManip BuildingModelManip.hh
     /// \brief Manipulate a 3D visual associated to a 2D editor item.
-    class BuildingModelManip : public QObject
+    class GAZEBO_VISIBLE BuildingModelManip : public QObject
     {
       Q_OBJECT
 
@@ -52,6 +55,18 @@ namespace gazebo
       /// \brief Get the visual this manip manages.
       /// \return A pointer to the visual object.
       public: rendering::VisualPtr GetVisual() const;
+
+      /// \brief Get the transparency of the manip.
+      /// \return Transparency.
+      public: double GetTransparency() const;
+
+      /// \brief Get the color of the manip.
+      /// \return Color.
+      public: common::Color GetColor() const;
+
+      /// \brief Get the texture of the manip.
+      /// \return Texture.
+      public: std::string GetTexture() const;
 
       /// \brief Set the name of the manip object.
       /// \param[in] _name Name to set the manip to.
@@ -126,6 +141,40 @@ namespace gazebo
       /// \param[in] _depth Depth in pixels.
       /// \param[in] _height Height pixels.
       public: void SetSize(double _width, double _depth, double _height);
+
+      /// \brief Set the color of the manip.
+      /// \param[in] _color Color.
+      public: void SetColor(QColor _color);
+
+      /// \brief Set the texture of the manip.
+      /// \param[in] _texture Texture.
+      public: void SetTexture(QString _texture);
+
+      /// \brief Set the transparency of the manip.
+      /// \param[in] _transparency Transparency.
+      public: void SetTransparency(float _transparency);
+
+      /// \brief Set the visibility of the manip.
+      /// \param[in] _visible True for visible, false for invisible.
+      public: void SetVisible(bool _visible);
+
+      /// \brief Set the level for this manip.
+      /// \param[in] _level The level for this manip.
+      public: void SetLevel(const int _level);
+
+      /// \brief Get the level for this manip.
+      /// \return The level for this manip.
+      public: int GetLevel() const;
+
+      /// \brief Qt signal emitted when the manip's color has changed from the
+      /// 3D view.
+      /// \param[in] _color New color.
+      Q_SIGNALS: void ColorChanged(QColor _color);
+
+      /// \brief Qt signal emitted when the manip's texture has changed from the
+      /// 3D view.
+      /// \param[in] _texture New texture.
+      Q_SIGNALS: void TextureChanged(QString _texture);
 
       /// \brief Qt callback when the pose of the associated editor item has
       /// changed.
@@ -207,8 +256,34 @@ namespace gazebo
       /// \param[in] _posZ New yaw rotation in degrees.
       private slots: void OnYawChanged(double _yaw);
 
+      /// \brief Qt callback when the level of the associated editor item
+      /// has changed.
+      /// \param[in] _level New level.
+      private slots: void OnLevelChanged(int _level);
+
+      /// \brief Qt callback when the 3D visual's color has been changed from
+      /// the associated editor item.
+      /// \param[in] _color New color.
+      private slots: void OnColorChanged(QColor _color);
+
+      /// \brief Qt callback when the 3D visual's texture has been changed from
+      /// the associated editor item.
+      /// \param[in] _texture New texture.
+      private slots: void OnTextureChanged(QString _texture);
+
+      /// \brief Qt callback when the 3D visual's transparency has been changed
+      /// from the associated editor item.
+      /// \param[in] _transparency Transparency.
+      private slots: void OnTransparencyChanged(float _transparency);
+
       /// \brief Qt callback when the associated editor item has been deleted.
       private slots: void OnDeleted();
+
+      /// \brief Callback received when the building level being edited has
+      /// changed. Do not confuse with OnLevelChange, where the manip's level
+      /// is changed.
+      /// \param[in] _level The level that is currently being edited.
+      private: void OnChangeLevel(int _level);
 
       /// \brief Name of the manip.
       private: std::string name;
@@ -229,7 +304,22 @@ namespace gazebo
       private: std::vector<BuildingModelManip *> attachedManips;
 
       /// \brief Parent manip.
-      private: BuildingModelManip * parent;
+      private: BuildingModelManip *parent;
+
+      /// \brief Visual's transparency.
+      private: double transparency;
+
+      /// \brief Visual's color.
+      private: common::Color color;
+
+      /// \brief Visual's texture.
+      private: std::string texture;
+
+      /// \brief Level this manipulator is on.
+      private: int level;
+
+      /// \brief A list of gui editor events connected to this view.
+      private: std::vector<event::ConnectionPtr> connections;
     };
     /// \}
   }

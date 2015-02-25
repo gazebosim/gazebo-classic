@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -38,7 +39,7 @@ namespace gazebo
     /// \class Hinge2Joint Hinge2Joint.hh physics/physics.hh
     /// \brief A two axis hinge joint
     template< class T>
-    class Hinge2Joint : public T
+    class GAZEBO_VISIBLE Hinge2Joint : public T
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent link.

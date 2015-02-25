@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <model name="cube">
+      <pose>-0.4 0 0.275 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <mass>1</mass>
+          <geometry>
+            <box>
+              <size>0.45 0.5 0.45</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.45 0.5 0.45</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <actor name="actor1">
+      <static>true</static>
+      <origin pose="0 0 0 0 0 0" />
+      <skin filename="walk.dae" scale="1.0" />
+      <!-- resource files -->
+      <animation name="sit_down" filename="sit_down.dae" scale="1.0" />
+      <animation name="sitting" filename="sitting.dae" scale="1.0" />
+      <animation name="stand_up" filename="stand_up.dae" scale="1.0" />
+      <animation name="stand" filename="stand.dae" scale="1.0" />
+      <animation name="walking" filename="walk.dae" scale="1.0" interpolate_x="true" />
+      <animation name="running" filename="run.dae" scale="1.0" interpolate_x="true" />
+      <animation name="moonwalking" filename="moonwalk.dae" scale="1.0" interpolate_x="true" />
+      <script loop="true" delay_start="0.0" auto_start="true">
+        <!--stand at origin for 10 seconds -->
+        <trajectory id="0" type="stand">
+          <waypoint time="0.0" pose="0 0 0 0 0 0" />
+          <waypoint time="10.0" pose="0 0 0 0 0 0" />
+        </trajectory>
+        <!--sit down-->
+        <trajectory id="1" type="sit_down" />
+        <!--sit-->
+        <trajectory id="2" type="sitting" />
+        <!--stand up-->
+        <trajectory id="3" type="stand_up" />
+        <!--walk 5 meters forward in 10 seconds-->
+        <trajectory id="4" type="walking">
+          <waypoint time="0.0" pose="0 0 0 0 0 0" />
+          <waypoint time="10.0" pose="5 0 0 0 0 0" />
+        </trajectory>
+        <!--run 5 meters forward in 5 seconds-->
+        <trajectory id="5" type="running">
+          <waypoint time="0.0" pose="5 0 0 0 0 0" />
+          <waypoint time="5.0" pose="10 0 0 0 0 0" />
+        </trajectory>
+        <!--moonwalk bak to origin in 20 seconds-->
+        <trajectory id="6" type="moonwalking">
+          <waypoint time="0.0" pose="10 0 0 0 0 3.14159" />
+          <waypoint time="20.0" pose="0 0 0 0 0 3.14159" />
+        </trajectory>
+      </script>
+    </actor>
+  </world>
+</sdf>

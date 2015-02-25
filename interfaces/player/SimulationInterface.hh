@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include "GazeboInterface.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
@@ -55,7 +56,7 @@ namespace boost
 ///
 
 /// \brief The Simulation interface
-class SimulationInterface : public GazeboInterface
+class GAZEBO_VISIBLE SimulationInterface : public GazeboInterface
 {
   /// \brief Constructor
   public: SimulationInterface(player_devaddr_t addr, GazeboDriver *driver,

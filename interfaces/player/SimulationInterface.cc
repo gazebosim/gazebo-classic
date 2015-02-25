@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,7 +150,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     iter = this->entityPoses.find(req->name);
     if (iter != this->entityPoses.end())
     {
-      snprintf(this->pose3dReq.name, sizeof(this->pose3dReq.name),
+      snprintf(this->pose3dReq.name, strlen(this->pose3dReq.name),
           "%s", req->name);
       this->pose3dReq.name_count = strlen(this->pose3dReq.name);
 
@@ -181,7 +181,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     iter = this->entityPoses.find(req->name);
     if (iter != this->entityPoses.end())
     {
-      snprintf(this->pose3dReq.name, sizeof(this->pose3dReq.name),
+      snprintf(this->pose3dReq.name, strlen(this->pose3dReq.name),
           "%s", req->name);
       this->pose3dReq.name_count = strlen(this->pose3dReq.name);
 

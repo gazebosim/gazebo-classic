@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,12 @@
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   /// \brief A plugin for breakable joints, based on a ForceTorque sensor plugin
-  class BreakableJointPlugin : public ForceTorquePlugin
+  class GAZEBO_VISIBLE BreakableJointPlugin : public ForceTorquePlugin
   {
     /// \brief Constructor
     public: BreakableJointPlugin();

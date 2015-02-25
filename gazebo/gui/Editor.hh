@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -31,7 +32,7 @@ namespace gazebo
 
     /// \brief Base class for editors, such as BuildingEditor and
     /// TerrainEditor.
-    class Editor : public QObject
+    class GAZEBO_VISIBLE Editor : public QObject
     {
       Q_OBJECT
 
@@ -48,8 +49,11 @@ namespace gazebo
       /// style sheet.
       /// \param[in] _tabLabel String used for the tab label.
       /// \param[in] _widget Widget that is put inside the tab.
+      /// \param[in] _cornerWidget Optional widget to go on the top right
+      /// corner.
       protected: void Init(const std::string &_objName,
-                     const std::string &_tabLabel, QWidget *_widget);
+          const std::string &_tabLabel, QWidget *_widget,
+          QWidget *_cornerWidget = NULL);
 
       /// \brief The tab widget that holds the editor's set of buttons.
       protected: QTabWidget *tabWidget;

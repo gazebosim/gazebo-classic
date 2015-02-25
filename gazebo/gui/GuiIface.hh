@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,41 +21,68 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/filesystem.hpp>
 #include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/util/system.hh"
 
-extern boost::property_tree::ptree g_propTree;
+extern GAZEBO_VISIBLE boost::property_tree::ptree g_propTree;
 namespace gazebo
 {
   namespace gui
   {
+    class MainWindow;
+
     /// \brief Load the graphical interface.
     /// \return True on success.
+    GAZEBO_VISIBLE
     bool load();
 
+    GAZEBO_VISIBLE
     void init();
 
+    GAZEBO_VISIBLE
     bool run(int _argc, char **_argv);
+    GAZEBO_VISIBLE
     void stop();
 
+    GAZEBO_VISIBLE
     void set_world(const std::string& _name);
+    GAZEBO_VISIBLE
     std::string get_world();
 
+    GAZEBO_VISIBLE
     void set_active_camera(rendering::UserCameraPtr _cam);
+    GAZEBO_VISIBLE
     rendering::UserCameraPtr get_active_camera();
+    GAZEBO_VISIBLE
     void clear_active_camera();
 
+    /// \brief Return a pointer to the main graphical window.
+    GAZEBO_VISIBLE
+    MainWindow *get_main_window();
+
+    GAZEBO_VISIBLE
     unsigned int get_entity_id(const std::string &_name);
+    GAZEBO_VISIBLE
     bool has_entity_name(const std::string &_name);
 
-    /// \brief Load an INI configuration file.
-    /// \param[in] _file Full path to the INI file.
-    /// \return True on success.
-    bool loadINI(const boost::filesystem::path &_file);
+    /// \brief Locate and load the INI configuration file.
+    /// If the GAZEBO_GUI_INI_FILE environment variable is set and contains
+    /// valid content, load and return true. If GAZEBO_GUI_INI_FILE is
+    /// not set, load from ~/.gazebo/gui.ini (a gui.ini file will be created
+    /// if it doesn't exist) and return true.
+    /// If GAZEBO_GUI_INI_FILE is set but the path does not exist, or if it
+    /// exists and contains invalid content, do not load, and return false.
+    /// \param[in] _file Path to a gui.ini file. This will override
+    /// the environment variables.
+    /// \return True if an INI file was loaded, false otherwise.
+    GAZEBO_VISIBLE
+    bool loadINI(boost::filesystem::path _file = "");
 
     /// \brief Get a property from the GUI INI file.
     /// \param[in] _key String based key[ SECTION.VALUE ]
     /// \param[in] _default Default value to use if property is not found.
     /// \return Property value for the key.
     template<typename T>
+    GAZEBO_VISIBLE
     T getINIProperty(const std::string &_key, const T &_default)
     {
       try
@@ -75,6 +102,7 @@ namespace gazebo
     /// \param[in] _value Value for the key
     /// \sa gui::saveINI
     template<typename T>
+    GAZEBO_VISIBLE
     bool setINIProperty(const std::string &_key, const T &_value)
     {
       g_propTree.put(_key, _value);
@@ -84,6 +112,7 @@ namespace gazebo
     /// \brief Save the configuration parameters to file.
     /// \param[in] _file Filename in which to write the values.
     /// \return True on success.
+    GAZEBO_VISIBLE
     bool saveINI(const boost::filesystem::path &_file);
   }
 }

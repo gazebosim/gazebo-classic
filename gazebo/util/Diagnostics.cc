@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
  * Date: 2 Feb 2011
  */
 
-#include "gazebo/transport/transport.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
-
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/transport/transport.hh"
 #include "gazebo/util/Diagnostics.hh"
 
 using namespace gazebo;
@@ -34,9 +34,10 @@ DiagnosticManager::DiagnosticManager()
   // Get the base of the time logging path
   if (!getenv("HOME"))
   {
-    gzwarn << "HOME environment variable missing. Diagnostic timing "
-      << "information will be logged to /tmp/gazebo.\n";
-    this->logPath = "/tmp/gazebo";
+    common::SystemPaths *paths = common::SystemPaths::Instance();
+    gzwarn << "HOME environment variable missing. Diagnostic timing " <<
+      "information will be logged to " << paths->GetTmpPath() << "\n";
+    this->logPath = paths->GetTmpPath() + "/gazebo";
   }
   else
   {

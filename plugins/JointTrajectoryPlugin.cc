@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 
   for (physics::Joint_V::const_iterator j = this->model->GetJoints().begin();
                         j != this->model->GetJoints().end(); ++j)
-    (*j)->SetAngle(0, 0);
+    (*j)->SetPosition(0, 0);
 
   // New Mechanism for Updating every World Cycle
   // Listen to the update event. This event is broadcast every
@@ -56,27 +56,28 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 }
 
 /////////////////////////////////////////////////
-void JointTrajectoryPlugin::FixLink(physics::LinkPtr _link)
-{
-  this->joint = this->world->GetPhysicsEngine()->CreateJoint("revolute",
-      this->model);
-
-  this->joint->SetModel(this->model);
-  math::Pose pose = _link->GetWorldPose();
-  // math::Pose  pose(math::Vector3(0, 0, 0.2), math::Quaternion(1, 0, 0, 0));
-  this->joint->Load(physics::LinkPtr(), _link, pose);
-  this->joint->SetAxis(0, math::Vector3(0, 0, 0));
-  this->joint->SetHighStop(0, 0);
-  this->joint->SetLowStop(0, 0);
-  this->joint->SetAnchor(0, pose.pos);
-  this->joint->Init();
-}
+// void JointTrajectoryPlugin::FixLink(physics::LinkPtr _link)
+// {
+//   this->joint = this->world->GetPhysicsEngine()->CreateJoint("revolute",
+//       this->model);
+//
+//   this->joint->SetModel(this->model);
+//   math::Pose pose = _link->GetWorldPose();
+//   // math::Pose  pose(math::Vector3(0, 0, 0.2),
+//                       math::Quaternion(1, 0, 0, 0));
+//   this->joint->Load(physics::LinkPtr(), _link, pose);
+//   this->joint->SetAxis(0, math::Vector3(0, 0, 0));
+//   this->joint->SetHighStop(0, 0);
+//   this->joint->SetLowStop(0, 0);
+//   this->joint->SetAnchor(0, pose.pos);
+//   this->joint->Init();
+// }
 
 /////////////////////////////////////////////////
-void JointTrajectoryPlugin::UnfixLink()
-{
-  this->joint.reset();
-}
+// void JointTrajectoryPlugin::UnfixLink()
+// {
+//   this->joint.reset();
+// }
 
 /////////////////////////////////////////////////
 void JointTrajectoryPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)

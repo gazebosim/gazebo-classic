@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.4">
+<sdf version="1.5">
   <world name="default">
     <include>
       <uri>model://ground_plane</uri>
@@ -70,8 +70,13 @@
               <height>480</height>
               <format>R8G8B8</format>
             </image>
-            <clip near=".1" far="20" />
-            <save enabled="true" path="/tmp/camera" />
+            <clip>
+              <near>0.1</near>
+              <far>20</far>
+            </clip>
+            <save enabled="true">
+              <path>/tmp/camera</path>
+            </save>
           </camera>
           <plugin filename="libDepthCameraPlugin.so" name="depth_camera_plugin" />
           <always_on>true</always_on>

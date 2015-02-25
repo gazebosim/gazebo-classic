@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,8 +40,10 @@
 #include "gazebo/math/Plane.hh"
 #include "gazebo/math/Vector2i.hh"
 
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 // Forward Declarations
 namespace Ogre
@@ -73,7 +75,7 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class Camera : public boost::enable_shared_from_this<Camera>
+    class GAZEBO_VISIBLE Camera : public boost::enable_shared_from_this<Camera>
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.
@@ -106,16 +108,9 @@ namespace gazebo
       /// \brief Render the camera.
       /// Called after the pre-render signal. This function will generate
       /// camera images.
-      // \todo Deprecated in Gazebo 2.1. In Gazebo 3.0 remove this function,
-      // and change Render(bool _force) to have a default value of false.
-      public: void Render();
-
-      /// \brief Render the camera.
-      /// Called after the pre-render signal. This function will generate
-      /// camera images.
       /// \param[in] _force Force camera to render. Ignore camera update
       /// rate.
-      public: void Render(bool _force);
+      public: void Render(bool _force = false);
 
       /// \brief Post render
       ///
@@ -179,13 +174,40 @@ namespace gazebo
       /// \param[in] _direction The translation vector
       public: void Translate(const math::Vector3 &_direction);
 
-      /// \brief Rotate the camera around the yaw axis
+      /// \brief Rotate the camera around the x-axis
       /// \param[in] _angle Rotation amount
-      public: void RotateYaw(math::Angle _angle);
+      /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
+      /// are Ogre::TS_LOCAL, Ogre::TS_PARENT, and Ogre::TS_WORLD. Default
+      /// is Ogre::TS_LOCAL
+      public: void Roll(const math::Angle &_angle,
+                  Ogre::Node::TransformSpace _relativeTo =
+                  Ogre::Node::TS_LOCAL);
 
-      /// \brief Rotate the camera around the pitch axis
+      /// \brief Rotate the camera around the y-axis
       /// \param[in] _angle Pitch amount
-      public: void RotatePitch(math::Angle _angle);
+      /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
+      /// are Ogre::TS_LOCAL, Ogre::TS_PARENT, and Ogre::TS_WORLD. Default
+      /// is Ogre::TS_LOCAL
+      public: void Pitch(const math::Angle &_angle,
+                  Ogre::Node::TransformSpace _relativeTo =
+                  Ogre::Node::TS_LOCAL);
+
+      /// \brief Rotate the camera around the z-axis
+      /// \param[in] _angle Rotation amount
+      /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
+      /// are Ogre::TS_LOCAL, Ogre::TS_PARENT, and Ogre::TS_WORLD. Default
+      /// Ogre::TS_WORLD
+      public: void Yaw(const math::Angle &_angle,
+                  Ogre::Node::TransformSpace _relativeTo =
+                  Ogre::Node::TS_WORLD);
+
+      /// \brief Rotate the camera around the z-axis
+      /// \param[in] _angle Rotation amount
+      public: void RotateYaw(math::Angle _angle) GAZEBO_DEPRECATED(4.0);
+
+      /// \brief Rotate the camera around the y-axis
+      /// \param[in] _angle Pitch amount
+      public: void RotatePitch(math::Angle _angle) GAZEBO_DEPRECATED(4.0);
 
       /// \brief Set the clip distances
       /// \param[in] _near Near clip distance in meters
@@ -312,11 +334,11 @@ namespace gazebo
 
       /// \brief Get the average FPS
       /// \return The average frames per second
-      public: virtual float GetAvgFPS() {return 0;}
+      public: virtual float GetAvgFPS() const {return 0;}
 
       /// \brief Get the triangle count
       /// \return The current triangle count
-      public: virtual unsigned int GetTriangleCount() {return 0;}
+      public: virtual unsigned int GetTriangleCount() const {return 0;}
 
       /// \brief Set the aspect ratio
       /// \param[in] _ratio The aspect ratio (width / height) in pixels
@@ -333,10 +355,6 @@ namespace gazebo
       /// \brief Get the camera's scene node
       /// \return The scene node the camera is attached to
       public: Ogre::SceneNode *GetSceneNode() const;
-
-      /// \brief Deprecated: Get the camera's pitch scene node
-      /// \return NULL. Use GetSceheNode() instead.
-      public: Ogre::SceneNode *GetPitchNode() const GAZEBO_DEPRECATED(3.0);
 
       /// \brief Get a pointer to the image data
       ///
@@ -507,6 +525,10 @@ namespace gazebo
       /// \return Path to saved screenshots.
       public: std::string GetScreenshotPath() const;
 
+      /// \brief Get the distortion model of this camera.
+      /// \return Distortion model.
+      public: DistortionPtr GetDistortion() const;
+
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 
@@ -625,7 +647,7 @@ namespace gazebo
       /// \brief Scene node that controls camera position and orientation.
       protected: Ogre::SceneNode *sceneNode;
 
-      // \brief Buffer for a single image frame.
+      /// \brief Buffer for a single image frame.
       protected: unsigned char *saveFrameBuffer;
 
       /// \brief Buffer for a bayer image frame.

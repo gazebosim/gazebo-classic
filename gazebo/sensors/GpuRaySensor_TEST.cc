@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,6 +85,7 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
   while (scanCount < 10 && i < 300)
   {
     common::Time::MSleep(10);
+    mgr->Update();
     i++;
   }
   EXPECT_LT(i, 300);

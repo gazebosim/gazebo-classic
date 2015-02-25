@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <assert.h>
 
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
 
     /// \class Matrix3 Matrix3hh math/gzmath.hh
     /// \brief A 3x3 matrix class
-    class Matrix3
+    class GAZEBO_VISIBLE Matrix3
     {
       /// \brief Constructor
       public: Matrix3();
@@ -138,6 +139,17 @@ namespace gazebo
       /// \return True if equal (using the default tolerance of 1e-6)
       public: bool operator==(const Matrix3 &_m) const;
 
+      /// \brief Matrix times Vector3 operator
+      /// \param[in] _v a Vector3
+      /// \return this * _v
+      public: inline math::Vector3 operator*(const math::Vector3 &_v) const
+              {
+                return math::Vector3(
+                  this->m[0][0]*_v.x + this->m[0][1]*_v.y + this->m[0][2]*_v.z,
+                  this->m[1][0]*_v.x + this->m[1][1]*_v.y + this->m[1][2]*_v.z,
+                  this->m[2][0]*_v.x + this->m[2][1]*_v.y + this->m[2][2]*_v.z);
+              }
+
       /// \brief Array subscript operator
       /// \param[in] _row row index
       /// \return a pointer to the row
@@ -175,6 +187,12 @@ namespace gazebo
 
               return _out;
             }
+
+      /// \brief Identity matrix
+      public: static const Matrix3 IDENTITY;
+
+      /// \brief Zero matrix
+      public: static const Matrix3 ZERO;
 
       /// \brief the 3x3 matrix
       protected: double m[3][3];

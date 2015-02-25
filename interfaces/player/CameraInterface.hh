@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #define CAMERAINTERFACE_HH
 
 #include <string>
+#include "gazebo/util/system.hh"
 #include "GazeboInterface.hh"
 
 /// \addtogroup player_iface
@@ -31,7 +32,7 @@
 /// \brief Camera interface
 /// \{
 /// \brief Camera interface
-class CameraInterface : public GazeboInterface
+class GAZEBO_VISIBLE CameraInterface : public GazeboInterface
 {
   /// \brief Constructor
   public: CameraInterface(player_devaddr_t _addr, GazeboDriver *_driver,
@@ -58,7 +59,8 @@ class CameraInterface : public GazeboInterface
   private: void OnImage(ConstImageStampedPtr &_msg);
 
   /// Save a camera frame
-  private: void SaveFrame(const char *filename) const;
+  /// This function is commented out because it's not used.
+  /// private: void SaveFrame(const char *filename) const;
 
   /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
   private: std::string cameraName;

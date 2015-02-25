@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 
 #include "gazebo/math/Vector2i.hh"
 #include "gazebo/gui/EntityMaker.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -31,7 +32,7 @@ namespace gazebo
 
   namespace gui
   {
-    class SphereMaker : public EntityMaker
+    class GAZEBO_VISIBLE SphereMaker : public EntityMaker
     {
       public: SphereMaker();
       public: virtual ~SphereMaker();

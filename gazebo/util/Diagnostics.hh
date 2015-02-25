@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@
 #include "gazebo/common/Timer.hh"
 
 #include "gazebo/util/UtilTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -72,7 +73,8 @@ namespace gazebo
 
     /// \class DiagnosticManager Diagnostics.hh util/util.hh
     /// \brief A diagnostic manager class
-    class DiagnosticManager : public SingletonT<DiagnosticManager>
+    class GAZEBO_VISIBLE DiagnosticManager :
+      public SingletonT<DiagnosticManager>
     {
       /// \brief Constructor
       private: DiagnosticManager();
@@ -166,7 +168,7 @@ namespace gazebo
 
     /// \class DiagnosticTimer Diagnostics.hh util/util.hh
     /// \brief A timer designed for diagnostics
-    class DiagnosticTimer : public common::Timer
+    class GAZEBO_VISIBLE DiagnosticTimer : public common::Timer
     {
       /// \brief Constructor
       /// \param[in] _name Name of the timer

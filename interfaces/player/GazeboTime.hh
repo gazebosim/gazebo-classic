@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,13 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/util/system.hh"
 
 /// \addtogroup player
 /// \brief Gazebo player driver
 /// \{
   /// \brief Gazebo access to PlayerTime
-class GazeboTime : public PlayerTime
+class GAZEBO_VISIBLE GazeboTime : public PlayerTime
 {
   /// \brief Constructor
   public: GazeboTime();

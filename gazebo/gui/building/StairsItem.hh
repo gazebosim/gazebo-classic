@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/BuildingItem.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
 
     /// \class StairsItem StairsItem.hh
     /// \brief 2D representation of a staircase.
-    class StairsItem :  public RectItem, public BuildingItem
+    class GAZEBO_VISIBLE StairsItem :  public RectItem, public BuildingItem
     {
       Q_OBJECT
 
@@ -79,7 +80,7 @@ namespace gazebo
       private slots: void OnDeleteItem();
 
       /// \brief Emit stairs changed Qt signals.
-      private: void StairsChanged();
+      public: void StairsChanged();
 
       /// \brief Emit steps changed Qt signals.
       private: void StepsChanged();
@@ -101,9 +102,6 @@ namespace gazebo
 
       /// \brief Number of steps in the staircase item.
       private: int stairsSteps;
-
-      /// \brief Scale for converting pixels to metric units.
-      private: double scale;
 
       /// \brief Inspector for configuring the staircase item.
       private: StairsInspectorDialog *inspector;

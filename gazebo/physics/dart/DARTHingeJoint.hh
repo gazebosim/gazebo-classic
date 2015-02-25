@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,14 @@
 
 #include "gazebo/physics/HingeJoint.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A single axis hinge joint.
-    class DARTHingeJoint : public HingeJoint<DARTJoint>
+    class GAZEBO_VISIBLE DARTHingeJoint : public HingeJoint<DARTJoint>
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of the Joint

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *
 */
 #include <google/protobuf/descriptor.h>
+#include <set>
 #include "gazebo/transport/IOManager.hh"
 
 #include "Master.hh"
@@ -237,6 +238,35 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       }
       conn->EnqueueMsg(msgs::Package("publisher_list", msg), true);
     }
+    else if (req.request() == "get_topics")
+    {
+      std::set<std::string> topics;
+      msgs::GzString_V msg;
+
+      // Add all topics that are published
+      for (PubList::iterator iter = this->publishers.begin();
+          iter != this->publishers.end(); ++iter)
+      {
+        topics.insert(iter->first.topic());
+      }
+
+      // Add all topics that are subscribed
+      for (SubList::iterator iter = this->subscribers.begin();
+           iter != this->subscribers.end(); ++iter)
+      {
+        topics.insert(iter->first.topic());
+      }
+
+      // Construct the message of only unique names
+      for (std::set<std::string>::iterator iter =
+          topics.begin(); iter != topics.end(); ++iter)
+      {
+        msg.add_data(*iter);
+      }
+
+      // Send the topic list message
+      conn->EnqueueMsg(msgs::Package("topic_list", msg), true);
+    }
     else if (req.request() == "topic_info")
     {
       msgs::Publish pub = this->GetPublisher(req.data());
@@ -263,6 +293,11 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       {
         if (siter->first.topic() == req.data())
         {
+          // If the topic info message type has not been set or the
+          // topic info message type is an empty string, then set the topic
+          // info message type based on a subscriber's message type.
+          if (!ti.has_msg_type() || ti.msg_type().empty())
+            ti.set_msg_type(siter->first.msg_type());
           msgs::Subscribe *sub = ti.add_subscriber();
           sub->CopyFrom(siter->first);
         }

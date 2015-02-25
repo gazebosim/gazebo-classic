@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,14 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief Base class for all ODE collisions.
-    class ODECollision : public Collision
+    class GAZEBO_VISIBLE ODECollision : public Collision
     {
       /// \brief Constructor.
       /// \param[in] _link Parent Link

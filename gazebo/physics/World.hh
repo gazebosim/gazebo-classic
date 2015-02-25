@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: The world; all models are collected here
- * Author: Andrew Howard and Nate Koenig
- * Date: 3 Apr 2007
- */
-
-#ifndef _WORLD_HH_
-#define _WORLD_HH_
+#ifndef _GAZEBO_WORLD_HH_
+#define _GAZEBO_WORLD_HH_
 
 #include <vector>
 #include <list>
@@ -44,11 +39,15 @@
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    /// Forward declare private data class.
+    class WorldPrivate;
+
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -60,7 +59,7 @@ namespace gazebo
     /// (links, joints, sensors, plugins, etc), and WorldPlugin instances.
     /// Many core function are also handled in the World, including physics
     /// update, model updates, and message processing.
-    class World : public boost::enable_shared_from_this<World>
+    class GAZEBO_VISIBLE World : public boost::enable_shared_from_this<World>
     {
       /// \brief Constructor.
       /// Constructor for the World. Must specify a unique name.
@@ -147,11 +146,6 @@ namespace gazebo
       /// \brief Reset time and model poses, configurations in simulation.
       public: void Reset();
 
-      /// \brief Get the selected Entity.
-      /// The selected entity is set via the GUI.
-      /// \return A point to the Entity, NULL if nothing is selected.
-      public: EntityPtr GetSelectedEntity() const;
-
       /// \brief Print Entity tree.
       /// Prints alls the entities to stdout.
       public: void PrintEntityTree();
@@ -206,7 +200,10 @@ namespace gazebo
       /// \return A pointer to the Entity, or NULL if no Entity was found.
       public: EntityPtr GetEntity(const std::string &_name);
 
-      /// \brief Get the nearest model below a point.
+      /// \brief Get the nearest model below and not encapsulating a point.
+      /// Only objects below the start point can be returned. Any object
+      /// that encapsulates the start point can not be returned from this
+      /// function.
       /// This function makes use of World::GetEntityBelowPoint.
       /// \param[in] _pt The 3D point to search below.
       /// \return A pointer to nearest Model, NULL if none is found.
@@ -255,11 +252,6 @@ namespace gazebo
 
       /// \brief Step the world forward in time.
       /// \param[in] _steps The number of steps the World should take.
-      /// \note Deprecated. Please use World::Step
-      public: void StepWorld(int _steps) GAZEBO_DEPRECATED(3.0);
-
-      /// \brief Step the world forward in time.
-      /// \param[in] _steps The number of steps the World should take.
       public: void Step(unsigned int _steps);
 
       /// \brief Load a plugin
@@ -276,18 +268,15 @@ namespace gazebo
 
       /// \brief Get the set world pose mutex.
       /// \return Pointer to the mutex.
-      public: boost::mutex *GetSetWorldPoseMutex() const
-        {return this->setWorldPoseMutex;}
+      public: boost::mutex *GetSetWorldPoseMutex() const;
 
       /// \brief check if physics engine is enabled/disabled.
       /// \param True if the physics engine is enabled.
-      public: bool GetEnablePhysicsEngine()
-              {return this->enablePhysicsEngine;}
+      public: bool GetEnablePhysicsEngine();
 
       /// \brief enable/disable physics engine during World::Update.
       /// \param[in] _enable True to enable the physics engine.
-      public: void EnablePhysicsEngine(bool _enable)
-              {this->enablePhysicsEngine = _enable;}
+      public: void EnablePhysicsEngine(bool _enable);
 
       /// \brief Update the state SDF value from the current state.
       public: void UpdateStateSDF();
@@ -295,6 +284,10 @@ namespace gazebo
       /// \brief Return true if the world has been loaded.
       /// \return True if World::Load has completed.
       public: bool IsLoaded() const;
+
+      /// \brief Remove all entities from the world. Implementation of
+      /// World::Clear
+      public: void ClearModels();
 
       /// \brief Publish pose updates for a model.
       /// This list of models to publish is processed and cleared once every
@@ -305,6 +298,28 @@ namespace gazebo
       /// \brief Get the total number of iterations.
       /// \return Number of iterations that simulation has taken.
       public: uint32_t GetIterations() const;
+
+      /// \brief Get the current scene in message form.
+      /// \return The scene state as a protobuf message.
+      public: msgs::Scene GetSceneMsg() const;
+
+      /// \brief Run the world. This call blocks.
+      /// Run the update loop.
+      /// \param[in] _iterations Run for this many iterations, then stop.
+      /// A value of zero disables run stop.
+      public: void RunBlocking(unsigned int _iterations = 0);
+
+      /// \brief Remove a model. This function will block until
+      /// the physics engine is not locked. The duration of the block
+      /// is less than the time to complete a simulation iteration.
+      /// \param[in] _model Pointer to a model to remove.
+      public: void RemoveModel(ModelPtr _model);
+
+      /// \brief Remove a model by name. This function will block until
+      /// the physics engine is not locked. The duration of the block
+      /// is less than the time to complete a simulation iteration.
+      /// \param[in] _name Name of the model to remove.
+      public: void RemoveModel(const std::string &_name);
 
       /// \cond
       /// This is an internal function.
@@ -371,10 +386,6 @@ namespace gazebo
       /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
 
-      /// \brief Set the selected entity.
-      /// \param[in] _name Name of the entity to select.
-      private: void SetSelectedEntityCB(const std::string &_name);
-
       /// \brief Construct a scene message from the known world state
       /// \param[out] _scene Scene message to build.
       /// \param[in] _entity Pointer to entity from which to build the scene
@@ -420,11 +431,6 @@ namespace gazebo
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessFactoryMsgs();
 
-      /// \brief Remove a model from the cached list of models.
-      /// This does not delete the model.
-      /// \param[in] _name Name of the model to remove.
-      private: void RemoveModel(const std::string &_name);
-
       /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
@@ -441,256 +447,22 @@ namespace gazebo
       /// \brief Thread function for logging state data.
       private: void LogWorker();
 
-      /// \brief Remove all entities from the world. Implementation of
-      /// World::Clear
-      public: void ClearModels();
+      /// \brief Callback when a light message is received.
+      /// \param[in] _msg Pointer to the light message.
+      private: void OnLightMsg(ConstLightPtr &_msg);
 
-      /// \brief For keeping track of time step throttling.
-      private: common::Time prevStepWallTime;
+      /// \internal
+      /// \brief Private data pointer.
+      private: WorldPrivate *dataPtr;
 
-      /// \brief Pointer the physics engine.
-      private: PhysicsEnginePtr physicsEngine;
+      /// Friend ODELink so that it has access to dataPtr->dirtyPoses
+      private: friend class ODELink;
 
-      /// \brief Pointer the spherical coordinates data.
-      private: common::SphericalCoordinatesPtr sphericalCoordinates;
+      /// Friend DARTLink so that it has access to dataPtr->dirtyPoses
+      private: friend class DARTLink;
 
-      /// \brief The root of all entities in the world.
-      private: BasePtr rootElement;
-
-      /// \brief thread in which the world is updated.
-      private: boost::thread *thread;
-
-      /// \brief True to stop the world from running.
-      private: bool stop;
-
-      /// \brief The entity currently selected by the user.
-      private: EntityPtr selectedEntity;
-
-      /// \brief Name of the world.
-      private: std::string name;
-
-      /// \brief Current simulation time.
-      private: common::Time simTime;
-
-      /// \brief Amount of time simulation has been paused.
-      private: common::Time pauseTime;
-
-      /// \brief Clock time when simulation was started.
-      private: common::Time startTime;
-
-      /// \brief True if simulation is paused.
-      private: bool pause;
-
-      /// \brief Number of steps in increment by.
-      private: int stepInc;
-
-      /// \brief All the event connections.
-      private: event::Connection_V connections;
-
-      /// \brief Transportation node.
-      private: transport::NodePtr node;
-
-      /// \brief Publisher for selection messages.
-      private: transport::PublisherPtr selectionPub;
-
-      /// \brief Publisher for world statistics messages.
-      private: transport::PublisherPtr statPub;
-
-      /// \brief Publisher for diagnostic messages.
-      private: transport::PublisherPtr diagPub;
-
-      /// \brief Publisher for request response messages.
-      private: transport::PublisherPtr responsePub;
-
-      /// \brief Publisher for model messages.
-      private: transport::PublisherPtr modelPub;
-
-      /// \brief Publisher for gui messages.
-      private: transport::PublisherPtr guiPub;
-
-      /// \brief Publisher for light messages.
-      private: transport::PublisherPtr lightPub;
-
-      /// \brief Publisher for pose messages.
-      private: transport::PublisherPtr posePub;
-
-      /// \brief Publisher for local pose messages.
-      private: transport::PublisherPtr poseLocalPub;
-
-      /// \brief Subscriber to world control messages.
-      private: transport::SubscriberPtr controlSub;
-
-      /// \brief Subscriber to factory messages.
-      private: transport::SubscriberPtr factorySub;
-
-      /// \brief Subscriber to joint messages.
-      private: transport::SubscriberPtr jointSub;
-
-      /// \brief Subscriber to model messages.
-      private: transport::SubscriberPtr modelSub;
-
-      /// \brief Subscriber to request messages.
-      private: transport::SubscriberPtr requestSub;
-
-      /// \brief Outgoing world statistics message.
-      private: msgs::WorldStatistics worldStatsMsg;
-
-      /// \brief Outgoing scene message.
-      private: msgs::Scene sceneMsg;
-
-      /// \brief Function pointer to the model update function.
-      private: void (World::*modelUpdateFunc)();
-
-      /// \brief Last time a world statistics message was sent.
-      private: common::Time prevStatTime;
-
-      /// \brief Time at which pause started.
-      private: common::Time pauseStartTime;
-
-      /// \brief Used to compute a more accurate real time value.
-      private: common::Time realTimeOffset;
-
-      /// \brief Mutex to protect incoming message buffers.
-      private: boost::recursive_mutex *receiveMutex;
-
-      /// \brief Mutex to protext loading of models.
-      private: boost::mutex *loadModelMutex;
-
-      /// \TODO: Add an accessor for this, and make it private
-      /// Used in Entity.cc.
-      /// Entity::Reset to call Entity::SetWorldPose and Entity::SetRelativePose
-      /// Entity::SetWorldPose to call Entity::setWorldPoseFunc
-      private: boost::mutex *setWorldPoseMutex;
-
-      /// \brief Used by World classs in following calls:
-      /// World::Step for then entire function
-      /// World::StepWorld for changing World::stepInc,
-      /// and waits on setpInc on World::stepIhc as it's decremented.
-      /// World::Reset while World::ResetTime, entities, World::physicsEngine
-      /// World::SetPaused to assign world::pause
-      private: boost::recursive_mutex *worldUpdateMutex;
-
-      /// \brief THe world's SDF values.
-      private: sdf::ElementPtr sdf;
-
-      /// \brief All the plugins.
-      private: std::vector<WorldPluginPtr> plugins;
-
-      /// \brief List of entities to delete.
-      private: std::list<std::string> deleteEntity;
-
-      /// \brief when physics engine makes an update and changes a link pose,
-      /// this flag is set to trigger Entity::SetWorldPose on the
-      /// physics::Link in World::Update.
-      public: std::list<Entity*> dirtyPoses;
-
-      /// \brief Request message buffer.
-      private: std::list<msgs::Request> requestMsgs;
-
-      /// \brief Factory message buffer.
-      private: std::list<msgs::Factory> factoryMsgs;
-
-      /// \brief Model message buffer.
-      private: std::list<msgs::Model> modelMsgs;
-
-      /// \brief True to reset the world on next update.
-      private: bool needsReset;
-
-      /// \brief True to reset everything.
-      private: bool resetAll;
-
-      /// \brief True to reset only the time.
-      private: bool resetTimeOnly;
-
-      /// \brief True to reset only model poses.
-      private: bool resetModelOnly;
-
-      /// \brief True if the world has been initialized.
-      private: bool initialized;
-
-      /// \brief True if the world has been loaded.
-      private: bool loaded;
-
-      /// \brief True to enable the physics engine.
-      private: bool enablePhysicsEngine;
-
-      /// \brief Ray used to test for collisions when placing entities.
-      private: RayShapePtr testRay;
-
-      /// \brief True if the plugins have been loaded.
-      private: bool pluginsLoaded;
-
-      /// \brief sleep timing error offset due to clock wake up latency
-      private: common::Time sleepOffset;
-
-      /// \brief Last time incoming messages were processed.
-      private: common::Time prevProcessMsgsTime;
-
-      /// \brief Period over which messages should be processed.
-      private: common::Time processMsgsPeriod;
-
-      /// \brief Alternating buffer of states.
-      private: std::deque<WorldState> states[2];
-
-      /// \brief Keep track of current state buffer being updated
-      private: int currentStateBuffer;
-
-      private: WorldState prevStates[2];
-      private: int stateToggle;
-
-      private: sdf::ElementPtr logPlayStateSDF;
-      private: WorldState logPlayState;
-
-      /// \brief Store a factory SDF object to improve speed at which
-      /// objects are inserted via the factory.
-      private: sdf::SDFPtr factorySDF;
-
-      /// \brief The list of models that need to publish their pose.
-      private: std::set<ModelPtr> publishModelPoses;
-
-      /// \brief Info passed through the WorldUpdateBegin event.
-      private: common::UpdateInfo updateInfo;
-
-      /// \brief The number of simulation iterations.
-      private: uint64_t iterations;
-
-      /// \brief The number of simulation iterations to take before stopping.
-      private: uint64_t stopIterations;
-
-      /// \brief Condition used for log worker.
-      private: boost::condition_variable logCondition;
-
-      /// \brief Condition used to guarantee the log worker thread doesn't
-      /// skip an interation.
-      private: boost::condition_variable logContinueCondition;
-
-      /// \brief Last iteration recorded by the log worker thread.
-      private: uint64_t logPrevIteration;
-
-      /// \brief Real time value set from a log file.
-      private: common::Time logRealTime;
-
-      /// \brief Mutex to protect the log worker thread.
-      private: boost::mutex logMutex;
-
-      /// \brief Mutex to protect the log state buffers
-      private: boost::mutex logBufferMutex;
-
-      /// \brief Mutex to protect the deleteEntity list.
-      private: boost::mutex entityDeleteMutex;
-
-      /// \brief Worker thread for logging.
-      private: boost::thread *logThread;
-
-      /// \brief A cached list of models. This is here for performance.
-      private: Model_V models;
-
-      /// \todo In gazebo 3.0 this should be move to the proper section.
-      /// \brief Run the world. This call blocks.
-      /// Run the update loop.
-      /// \param[in] _iterations Run for this many iterations, then stop.
-      /// A value of zero disables run stop.
-      public: void RunBlocking(unsigned int _iterations = 0);
+      /// Friend SimbodyPhysics so that it has access to dataPtr->dirtyPoses
+      private: friend class SimbodyPhysics;
     };
     /// \}
   }

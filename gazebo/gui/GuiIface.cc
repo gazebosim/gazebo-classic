@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,12 @@
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/GuiIface.hh"
 
+#ifdef WIN32
+# define HOMEDIR "HOMEPATH"
+#else
+# define HOMEDIR "HOME"
+#endif  // WIN32
+
 // These are needed by QT. They need to stay valid during the entire
 // lifetime of the application, and argc > 0 and argv must contain one valid
 // character string
@@ -48,7 +54,7 @@ gui::ModelRightMenu *g_modelRightMenu = NULL;
 std::string g_worldname = "default";
 
 QApplication *g_app;
-gui::MainWindow *g_main_win;
+gui::MainWindow *g_main_win = NULL;
 rendering::UserCameraPtr g_active_camera;
 bool g_fullscreen = false;
 
@@ -161,9 +167,35 @@ void gui::init()
 }
 
 /////////////////////////////////////////////////
-bool gui::loadINI(const boost::filesystem::path &_file)
+bool gui::loadINI(boost::filesystem::path _file)
 {
   bool result = true;
+
+  // Only use the environment variables if _file is empty.
+  if (_file.empty())
+  {
+    // Get the gui.ini path environment variable
+    char *guiINIFile = getenv("GAZEBO_GUI_INI_FILE");
+    char *home = getenv(HOMEDIR);
+
+    // If the environment variable was specified
+    if (guiINIFile)
+    {
+      _file = guiINIFile;
+      if (!boost::filesystem::exists(_file))
+      {
+        gzerr << "GAZEBO_GUI_INI_FILE does not exist: " << _file << std::endl;
+        return false;
+      }
+    }
+    else if (home)
+    {
+      // Check the home directory
+      // Construct the path to gui.ini
+      _file = home;
+      _file = _file / ".gazebo" / "gui.ini";
+    }
+  }
 
   // Create the gui.ini file if it doesn't exist.
   if (!boost::filesystem::exists(_file))
@@ -171,6 +203,8 @@ bool gui::loadINI(const boost::filesystem::path &_file)
     gui::setINIProperty("geometry.x", 0);
     gui::setINIProperty("geometry.y", 0);
     gui::saveINI(_file);
+    gzwarn << "Couldn't locate specified .ini. Creating file at " << _file
+          << std::endl;
   }
 
   try
@@ -184,29 +218,14 @@ bool gui::loadINI(const boost::filesystem::path &_file)
     result = false;
   }
 
+  gzlog << "Loaded .ini file from: " << _file << std::endl;
   return result;
 }
 
 /////////////////////////////////////////////////
 bool gui::load()
 {
-  bool result = true;
-
-  // Get the HOME path
-  char *home = getenv("HOME");
-  if (home)
-  {
-    // Construct the path to gui.ini
-    boost::filesystem::path path = home;
-    path = path / ".gazebo" / "gui.ini";
-    result = gui::loadINI(path);
-  }
-  else
-  {
-    gzerr << "HOME environment variable not found. "
-      "Unable to read ~/.gazebo/gui.ini file.\n";
-    result = false;
-  }
+  gui::loadINI();
 
   g_modelRightMenu = new gui::ModelRightMenu();
 
@@ -228,20 +247,23 @@ bool gui::load()
   g_main_win->Load();
   g_main_win->resize(1024, 768);
 
-  return result;
+  return true;
 }
 
 /////////////////////////////////////////////////
 unsigned int gui::get_entity_id(const std::string &_name)
 {
-  return g_main_win->GetEntityId(_name);
+  if (g_main_win)
+    return g_main_win->GetEntityId(_name);
+  else
+    return 0;
 }
 
 /////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
 {
   // Initialize the informational logger. This will log warnings, and errors.
-  gzLogInit("gzclient.log");
+  gzLogInit("client-", "gzclient.log");
 
   // Make sure the model database has started
   gazebo::common::ModelDatabase::Instance()->Start();
@@ -249,7 +271,7 @@ bool gui::run(int _argc, char **_argv)
   if (!parse_args(_argc, _argv))
     return false;
 
-  if (!gazebo::setupClient())
+  if (!gazebo::setupClient(_argc, _argv))
     return false;
 
   if (!gazebo::gui::load())
@@ -332,4 +354,10 @@ bool gui::saveINI(const boost::filesystem::path &_file)
     result = false;
   }
   return result;
+}
+
+/////////////////////////////////////////////////
+gui::MainWindow *gui::get_main_window()
+{
+  return g_main_win;
 }

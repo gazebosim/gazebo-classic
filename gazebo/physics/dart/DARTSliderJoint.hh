@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,14 @@
 
 #include "gazebo/physics/SliderJoint.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A slider joint
-    class DARTSliderJoint : public SliderJoint<DARTJoint>
+    class GAZEBO_VISIBLE DARTSliderJoint : public SliderJoint<DARTJoint>
     {
       /// \brief Constructor
       /// \param[in] _parent Pointer to the Link that is the joint' parent

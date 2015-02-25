@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,10 @@ RenderEngine::RenderEngine()
   this->logManager = NULL;
   this->root = NULL;
 
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
+  this->overlaySystem = NULL;
+#endif
+
   this->dummyDisplay = NULL;
 
   this->initialized = false;
@@ -116,10 +120,12 @@ void RenderEngine::Load()
       gzthrow("Unable to create an Ogre rendering environment, no Root ");
     }
 
-#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
-    // Must be created after this->root, but before this->root is
-    // initialized.
-    this->overlaySystem = new Ogre::OverlaySystem();
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
+    // OgreOverlay is a component on its own in ogre 1.9 so must manually
+    // initialize it. Must be created after this->root, but before this->root
+    // is initialized.
+    if (!this->overlaySystem)
+      this->overlaySystem = new Ogre::OverlaySystem();
 #endif
 
     // Load all the plugins
@@ -268,7 +274,9 @@ void RenderEngine::Render()
 //////////////////////////////////////////////////
 void RenderEngine::PostRender()
 {
-  // _fireFrameRenderingQueued needs to be here for CEGUI to work
+  // _fireFrameRenderingQueued was here for CEGUI to work. Leaving because
+  // it shouldn't harm anything, and we don't want to introduce
+  // a regression.
   this->root->_fireFrameRenderingQueued();
   this->root->_fireFrameEnded();
 }
@@ -326,6 +334,11 @@ void RenderEngine::Fini()
     this->RemoveScene(this->scenes.front()->GetName());
   }
 
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
+  delete this->overlaySystem;
+  this->overlaySystem = NULL;
+#endif
+
   // TODO: this was causing a segfault. Need to debug, and put back in
   if (this->root)
   {
@@ -353,6 +366,10 @@ void RenderEngine::Fini()
 
   delete this->logManager;
   this->logManager = NULL;
+
+  for (unsigned int i = 0; i < this->scenes.size(); ++i)
+    this->scenes[i].reset();
+  this->scenes.clear();
 
 #ifndef Q_OS_MAC
   if (this->dummyDisplay)
@@ -403,6 +420,10 @@ void RenderEngine::LoadPlugins()
     plugins.push_back(path+"/"+prefix+"Plugin_ParticleFX");
     plugins.push_back(path+"/"+prefix+"Plugin_BSPSceneManager");
     plugins.push_back(path+"/"+prefix+"Plugin_OctreeSceneManager");
+
+#ifdef HAVE_OCULUS
+    plugins.push_back(path+"/Plugin_CgProgramManager");
+#endif
 
     for (piter = plugins.begin(); piter != plugins.end(); ++piter)
     {
@@ -764,7 +785,7 @@ WindowManagerPtr RenderEngine::GetWindowManager() const
   return this->windowManager;
 }
 
-#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
 /////////////////////////////////////////////////
 Ogre::OverlaySystem *RenderEngine::GetOverlaySystem() const
 {

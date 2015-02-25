@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <boost/thread/thread.hpp>
 #include <boost/asio.hpp>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,7 @@ namespace gazebo
 
     /// \class IOManager IOManager.hh transport/transport.hh
     /// \brief Manages boost::asio IO
-    class IOManager
+    class GAZEBO_VISIBLE IOManager
     {
       /// \brief Constructor
       public: IOManager();

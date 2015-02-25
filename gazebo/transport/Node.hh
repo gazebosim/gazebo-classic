@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/TopicManager.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
   {
     /// \cond
     /// \brief Task used by Node::Publish to publish on a one-time publisher
-    class PublishTask : public tbb::task
+    class GAZEBO_VISIBLE PublishTask : public tbb::task
     {
       /// \brief Constructor
       /// \param[in] _pub Publisher to publish the message on.
@@ -73,7 +74,7 @@ namespace gazebo
     /// \class Node Node.hh transport/transport.hh
     /// \brief A node can advertise and subscribe topics, publish on
     ///        advertised topics and listen to subscribed topics.
-    class Node : public boost::enable_shared_from_this<Node>
+    class GAZEBO_VISIBLE Node : public boost::enable_shared_from_this<Node>
     {
       /// \brief Constructor
       public: Node();

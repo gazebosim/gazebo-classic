@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -38,7 +39,7 @@ namespace gazebo
     /// This class is used to visualize a camera image generated from
     /// a CameraSensor. The sensor's image is drawn on a billboard in the 3D
     /// environment.
-    class CameraVisual : public Visual
+    class GAZEBO_VISIBLE CameraVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the Visual
@@ -49,9 +50,9 @@ namespace gazebo
       public: virtual ~CameraVisual();
 
       /// \brief Load the Visual
-      /// \param[in] _width Width of the Camera image
-      /// \param[in] _height Height of the Camera image
-      public: void Load(unsigned int _width, unsigned int _height);
+      /// \param[in] _msg Message describing the camera sensor.
+      public: void Load(const msgs::CameraSensor &_msg);
+      using Visual::Load;
 
       /// \brief Update the visual
       private: void Update();

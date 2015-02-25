@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,10 +34,6 @@ GZ_REGISTER_STATIC_SENSOR("gps", GpsSensor)
 GpsSensor::GpsSensor()
 : Sensor(sensors::OTHER)
 {
-  this->horizontalPositionNoise = NoisePtr(new Noise());
-  this->verticalPositionNoise = NoisePtr(new Noise());
-  this->horizontalVelocityNoise = NoisePtr(new Noise());
-  this->verticalVelocityNoise = NoisePtr(new Noise());
 }
 
 /////////////////////////////////////////////////
@@ -50,7 +46,7 @@ GpsSensor::~GpsSensor()
 }
 
 /////////////////////////////////////////////////
-void GpsSensor::Load(const std::string &_worldName, sdf::ElementPtr &_sdf)
+void GpsSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 }
@@ -78,18 +74,18 @@ void GpsSensor::Load(const std::string &_worldName)
   // Load position noise parameters
   {
     sdf::ElementPtr posElem = gpsElem->GetElement("position_sensing");
-    this->horizontalPositionNoise->Load(
+    this->horizontalPositionNoise = NoiseFactory::NewNoiseModel(
       posElem->GetElement("horizontal")->GetElement("noise"));
-    this->verticalPositionNoise->Load(
+    this->verticalPositionNoise = NoiseFactory::NewNoiseModel(
       posElem->GetElement("vertical")->GetElement("noise"));
   }
 
   // Load velocity noise parameters
   {
     sdf::ElementPtr velElem = gpsElem->GetElement("velocity_sensing");
-    this->horizontalPositionNoise->Load(
+    this->horizontalVelocityNoise = NoiseFactory::NewNoiseModel(
       velElem->GetElement("horizontal")->GetElement("noise"));
-    this->verticalPositionNoise->Load(
+    this->verticalVelocityNoise = NoiseFactory::NewNoiseModel(
       velElem->GetElement("vertical")->GetElement("noise"));
   }
 }

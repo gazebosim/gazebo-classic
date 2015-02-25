@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,23 @@
  * limitations under the License.
  *
 */
-/* Desc: A universal joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
-*/
-
 #ifndef _ODEUNIVERSALJOINT_HH_
 #define _ODEUNIVERSALJOINT_HH_
 
+#include <boost/any.hpp>
+#include <string>
+
+#include "gazebo/common/Exception.hh"
 #include "gazebo/physics/UniversalJoint.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A universal joint.
-    class ODEUniversalJoint : public UniversalJoint<ODEJoint>
+    class GAZEBO_VISIBLE ODEUniversalJoint : public UniversalJoint<ODEJoint>
     {
       /// \brief Constructor.
       /// \param[in] _worldId ODE world id.
@@ -71,6 +71,26 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetParam(unsigned int _parameter, double _value);
+
+      // Documentation inherited.
+      public: virtual bool SetHighStop(unsigned int _index,
+                  const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual bool SetLowStop(unsigned int _index,
+                  const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual bool SetParam(const std::string &_key,
+                                    unsigned int _index,
+                                    const boost::any &_value);
+
+      // Documentation inherited.
+      public: virtual double GetParam(const std::string &_key,
+                                      unsigned int _index);
+
+      // Documentation inherited
+      public: virtual double GetParam(unsigned int _parameter) const;
 
       // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);

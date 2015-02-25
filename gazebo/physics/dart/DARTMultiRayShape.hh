@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 #include "gazebo/physics/MultiRayShape.hh"
 #include "gazebo/physics/dart/DARTTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
     /// \{
 
     /// \brief DART specific version of MultiRayShape
-    class DARTMultiRayShape : public MultiRayShape
+    class GAZEBO_VISIBLE DARTMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

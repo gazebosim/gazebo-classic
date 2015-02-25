@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@
 #include "gazebo/math/Angle.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/physics/Contact.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -45,7 +46,7 @@ namespace gazebo
     /// \class ContactSensor ContactSensor.hh sensors/sensors.hh
     /// \brief Contact sensor. This sensor detects and reports contacts between
     ///  objects
-    class ContactSensor: public Sensor
+    class GAZEBO_VISIBLE ContactSensor: public Sensor
     {
       /// \brief Constructor.
       public: ContactSensor();

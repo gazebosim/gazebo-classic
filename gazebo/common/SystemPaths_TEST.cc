@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,22 +51,31 @@ TEST_F(SystemPathsTest, SystemPaths)
   paths->ClearOgrePaths();
   paths->ClearPluginPaths();
 
-  putenv(const_cast<char*>("GAZEBO_RESOURCE_PATH=/tmp/resource:/test/me/now"));
+  std::string gzResourcePath = "GAZEBO_RESOURCE_PATH=" + paths->GetTmpPath() +
+      "/resource:/test/me/now";
+  putenv(const_cast<char*>(gzResourcePath.c_str()));
   const std::list<std::string> pathList1 = paths->GetGazeboPaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList1.size());
-  EXPECT_STREQ("/tmp/resource", pathList1.front().c_str());
+  EXPECT_STREQ((paths->GetTmpPath() + "/resource").c_str(),
+      pathList1.front().c_str());
   EXPECT_STREQ("/test/me/now", pathList1.back().c_str());
 
-  putenv(const_cast<char*>("OGRE_RESOURCE_PATH=/tmp/ogre:/test/ogre/now"));
+  std::string ogreResourcePath = "OGRE_RESOURCE_PATH=" + paths->GetTmpPath() +
+      "/ogre:/test/ogre/now";
+  putenv(const_cast<char*>(ogreResourcePath.c_str()));
   const std::list<std::string> pathList2 = paths->GetOgrePaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList2.size());
-  EXPECT_STREQ("/tmp/ogre", pathList2.front().c_str());
+  EXPECT_STREQ((paths->GetTmpPath() + "/ogre").c_str(),
+      pathList2.front().c_str());
   EXPECT_STREQ("/test/ogre/now", pathList2.back().c_str());
 
-  putenv(const_cast<char*>("GAZEBO_PLUGIN_PATH=/tmp/plugin:/test/plugin/now"));
+  std::string gzPluginPath = "GAZEBO_PLUGIN_PATH=" + paths->GetTmpPath() +
+      "/plugin:/test/plugin/now";
+  putenv(const_cast<char*>(gzPluginPath.c_str()));
   const std::list<std::string> pathList3 = paths->GetPluginPaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList3.size());
-  EXPECT_STREQ("/tmp/plugin", pathList3.front().c_str());
+  EXPECT_STREQ((paths->GetTmpPath() + "/plugin").c_str(),
+      pathList3.front().c_str());
   EXPECT_STREQ("/test/plugin/now", pathList3.back().c_str());
 
   EXPECT_STREQ("/worlds", paths->GetWorldPathExtension().c_str());
@@ -76,7 +85,7 @@ TEST_F(SystemPathsTest, SystemPaths)
   EXPECT_STREQ("/other/gazebo", paths->GetGazeboPaths().back().c_str());
 
   paths->AddPluginPaths("/plugin/path:/other/plugin");
-  EXPECT_EQ(static_cast<unsigned int>(4), paths->GetGazeboPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(4), paths->GetPluginPaths().size());
   EXPECT_STREQ("/other/plugin", paths->GetPluginPaths().back().c_str());
 
   paths->AddOgrePaths("/ogre/path:/other/ogre");

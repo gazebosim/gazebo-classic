@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,15 @@
 #ifndef SONARINTERFACE_HH
 #define SONARINTERFACE_HH
 
+#include "gazebo/util/system.hh"
+
 #include "GazeboInterface.hh"
 
 // Forward declarations
 typedef struct gz_sonar gz_sonar_t;
 
 /// \brief Sonar interface
-class SonarInterface : public GazeboInterface
+class GAZEBO_VISIBLE SonarInterface : public GazeboInterface
 {
   /// @brief Constructor
   public: SonarInterface(player_devaddr_t addr, GazeboDriver *driver,

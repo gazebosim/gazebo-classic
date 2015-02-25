@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,71 @@
  * limitations under the License.
  *
 */
-/* Desc: common::Parameters for contact joints
- * Author: Nate Koenig
- * Date: 30 July 2003
- */
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/math/Helpers.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
+
+//////////////////////////////////////////////////
+FrictionPyramid::FrictionPyramid()
+{
+  this->mu[0] = 1.0;
+  this->mu[1] = 1.0;
+}
+
+//////////////////////////////////////////////////
+FrictionPyramid::~FrictionPyramid()
+{
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::GetMuPrimary()
+{
+  return this->GetMu(0);
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::GetMuSecondary()
+{
+  return this->GetMu(1);
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetMuPrimary(double _mu)
+{
+  this->SetMu(0, _mu);
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetMuSecondary(double _mu)
+{
+  this->SetMu(1, _mu);
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::GetMu(unsigned int _index)
+{
+  GZ_ASSERT(_index < 2, "Invalid _index to GetMu");
+  return this->mu[_index];
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetMu(unsigned int _index, double _mu)
+{
+  GZ_ASSERT(_index < 2, "Invalid _index to SetMu");
+  if (_mu < 0)
+  {
+    this->mu[_index] = GZ_FLT_MAX;
+  }
+  else
+  {
+    this->mu[_index] = _mu;
+  }
+}
 
 //////////////////////////////////////////////////
 SurfaceParams::SurfaceParams()

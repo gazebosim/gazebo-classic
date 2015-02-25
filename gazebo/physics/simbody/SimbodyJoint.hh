@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
     /// \{
 
     /// \brief Base class for all joints
-    class SimbodyJoint : public Joint
+    class GAZEBO_VISIBLE SimbodyJoint : public Joint
     {
       /// \brief Constructor
       public: SimbodyJoint(BasePtr _parent);
@@ -81,17 +82,13 @@ namespace gazebo
       // Documentation inherited.
       public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
 
-      /// \brief Set a parameter for the joint
-      public: virtual void SetAttribute(Attribute, unsigned int _index,
-                                        double _value);
-
       // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &_key,
+      public: virtual bool SetParam(const std::string &_key,
                                         unsigned int _index,
                                         const boost::any &_value);
 
       // Documentation inherited.
-      public: virtual double GetAttribute(const std::string &_key,
+      public: virtual double GetParam(const std::string &_key,
                   unsigned int _index);
 
       // Save current Simbody State
@@ -149,6 +146,13 @@ namespace gazebo
       /// \brief default mobilizer pose
       public: SimTK::Transform defxAB;
 
+      /// \brief: Spring force element for enforcing joint stiffness.
+      /// The element is assigned when constructing Simbody model in
+      /// SimbodyPhysics::AddDynamicModelToSimbodySystem.
+      /// \TODO: Also, consider moving this into individual joint type subclass
+      /// so we can specify custom springs for special joints like ball joints.
+      public: SimTK::Force::MobilityLinearSpring spring[MAX_JOINT_AXIS];
+
       /// \brief: for enforcing joint damping forces.
       /// Set when we build the Simbody model.
       /// \TODO: Also, consider moving this into individual joint type subclass
@@ -182,6 +186,20 @@ namespace gazebo
 
       // Keeps track if simbody physics has been initialized
       public: bool physicsInitialized;
+
+      // Documentation inherited.
+      public: virtual bool SetHighStop(unsigned int _index,
+                                       const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual bool SetLowStop(unsigned int _index,
+                                      const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetHighStop(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       /// \brief Simbody Multibody System
       protected: SimTK::MultibodySystem *world;

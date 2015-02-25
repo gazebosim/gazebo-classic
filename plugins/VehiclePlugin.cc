@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,17 +73,17 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     return;
   }
 
-  this->joints[0]->SetAttribute("suspension_erp", 0, 0.15);
-  this->joints[0]->SetAttribute("suspension_cfm", 0, 0.04);
+  this->joints[0]->SetParam("suspension_erp", 0, 0.15);
+  this->joints[0]->SetParam("suspension_cfm", 0, 0.04);
 
-  this->joints[1]->SetAttribute("suspension_erp", 0, 0.15);
-  this->joints[1]->SetAttribute("suspension_cfm", 0, 0.04);
+  this->joints[1]->SetParam("suspension_erp", 0, 0.15);
+  this->joints[1]->SetParam("suspension_cfm", 0, 0.04);
 
-  this->joints[2]->SetAttribute("suspension_erp", 0, 0.15);
-  this->joints[2]->SetAttribute("suspension_cfm", 0, 0.04);
+  this->joints[2]->SetParam("suspension_erp", 0, 0.15);
+  this->joints[2]->SetParam("suspension_cfm", 0, 0.04);
 
-  this->joints[3]->SetAttribute("suspension_erp", 0, 0.15);
-  this->joints[3]->SetAttribute("suspension_cfm", 0, 0.04);
+  this->joints[3]->SetParam("suspension_erp", 0, 0.15);
+  this->joints[3]->SetParam("suspension_cfm", 0, 0.04);
 
   this->gasJoint = this->model->GetJoint(_sdf->Get<std::string>("gas"));
   this->brakeJoint = this->model->GetJoint(_sdf->Get<std::string>("brake"));
@@ -199,17 +199,17 @@ void VehiclePlugin::OnUpdate()
                     this->wheelRadius;
 
   // Set velocity and max force for each wheel
-  this->joints[0]->SetVelocity(1, -jointVel);
-  this->joints[0]->SetMaxForce(1, (gas + brake) * this->frontPower);
+  this->joints[0]->SetVelocityLimit(1, -jointVel);
+  this->joints[0]->SetForce(1, (gas + brake) * this->frontPower);
 
-  this->joints[1]->SetVelocity(1, -jointVel);
-  this->joints[1]->SetMaxForce(1, (gas + brake) * this->frontPower);
+  this->joints[1]->SetVelocityLimit(1, -jointVel);
+  this->joints[1]->SetForce(1, (gas + brake) * this->frontPower);
 
-  this->joints[2]->SetVelocity(1, -jointVel);
-  this->joints[2]->SetMaxForce(1, (gas + brake) * this->rearPower);
+  this->joints[2]->SetVelocityLimit(1, -jointVel);
+  this->joints[2]->SetForce(1, (gas + brake) * this->rearPower);
 
-  this->joints[3]->SetVelocity(1, -jointVel);
-  this->joints[3]->SetMaxForce(1, (gas + brake) * this->rearPower);
+  this->joints[3]->SetVelocityLimit(1, -jointVel);
+  this->joints[3]->SetForce(1, (gas + brake) * this->rearPower);
 
   // Set the front-left wheel angle
   this->joints[0]->SetLowStop(0, wheelAngle);
@@ -235,15 +235,13 @@ void VehiclePlugin::OnUpdate()
   math::Vector3 hingePoint;
   math::Vector3 axis;
 
-  double displacement;
-
   for (int ix = 0; ix < 4; ++ix)
   {
     hingePoint = this->joints[ix]->GetAnchor(0);
     bodyPoint = this->joints[ix]->GetAnchor(1);
 
     axis = this->joints[ix]->GetGlobalAxis(0).Round();
-    displacement = (bodyPoint - hingePoint).Dot(axis);
+    double displacement = (bodyPoint - hingePoint).Dot(axis);
 
     float amt = displacement * this->swayForce;
     if (displacement > 0)

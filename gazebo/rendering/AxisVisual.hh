@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class AxisVisual AxisVisual.hh rendering/rendering.hh
     /// \brief Basic axis visualization
-    class AxisVisual : public Visual
+    class GAZEBO_VISIBLE AxisVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the AxisVisual
@@ -45,8 +46,20 @@ namespace gazebo
       /// \brief Load the axis visual
       public: virtual void Load();
 
-      /// \brief Load the rotation tube
-      public: void ShowRotation(unsigned int _axis);
+      /// \brief Show the rotation tube
+      /// \param[in] _axis Axis index. 0: x, 1: y, 2: z
+      /// \param[in] _show True to show the axis rotation tube.
+      public: void ShowAxisRotation(unsigned int _axis, bool _show);
+
+      /// \brief Show the axis arrow shaft.
+      /// \param[in] _axis Axis index. 0: x, 1: y, 2: z
+      /// \param[in] _show True to show the axis arrow shaft.
+      public: void ShowAxisShaft(unsigned int _axis, bool _show);
+
+      /// \brief Show the axis arrow head.
+      /// \param[in] _axis Axis index. 0: x, 1: y, 2: z
+      /// \param[in] _show True to show the axis arrow head.
+      public: void ShowAxisHead(unsigned int _axis, bool _show);
 
       /// \brief Scale the X axis
       /// \param[in] _scale Scaling factor
@@ -65,6 +78,11 @@ namespace gazebo
       /// \param[in] _material The name of the material to apply to the axis
       public: void SetAxisMaterial(unsigned int _axis,
                                    const std::string &_material);
+
+      /// \brief Set whether the axis will be visible
+      /// \param[in] _axis The number of the axis (0, 1, 2 = x,y,z)
+      /// \param[in] _visible True to set the axis to be visible.
+      public: void SetAxisVisible(unsigned int _axis, bool _visible);
     };
     /// \}
   }

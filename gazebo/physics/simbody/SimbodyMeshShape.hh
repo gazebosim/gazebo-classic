@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,20 @@
 #define _SIMBODY_MESHSHAPE_HH_
 
 #include "gazebo/physics/MeshShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    class SimbodyMesh;
+
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_simbody Simbody Physics
     /// \{
 
     /// \brief Triangle mesh collision
-    class SimbodyMeshShape : public MeshShape
+    class GAZEBO_VISIBLE SimbodyMeshShape : public MeshShape
     {
       /// \brief Constructor
       public: SimbodyMeshShape(CollisionPtr _parent);
@@ -42,6 +45,9 @@ namespace gazebo
 
       // Documentation inherited
       protected: virtual void Init();
+
+      /// \brief Simbody collision mesh helper class
+      private: SimbodyMesh *simbodyMesh;
     };
     /// \}
   }

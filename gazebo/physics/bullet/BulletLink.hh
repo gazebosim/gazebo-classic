@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/util/system.hh"
 
 class btRigidBody;
 
@@ -40,7 +41,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet Link class
-    class BulletLink : public Link
+    class GAZEBO_VISIBLE BulletLink : public Link
     {
       /// \brief Constructor
       public: BulletLink(EntityPtr _parent);

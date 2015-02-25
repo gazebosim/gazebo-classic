@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,14 @@
 #ifndef _ROAD_HH_
 #define _ROAD_HH_
 
+#include <string>
 #include <vector>
+#include <algorithm>
 
+#include <gazebo/math/Vector3.hh>
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/Base.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +36,7 @@ namespace gazebo
 
     /// \class Road Road.hh physics/physics.hh
     /// \brief for building a Road from SDF
-    class Road : public Base
+    class GAZEBO_VISIBLE Road : public Base
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of this road object.
@@ -47,6 +51,14 @@ namespace gazebo
 
       /// \brief Initialize the road.
       public: virtual void Init();
+
+      /// \brief Get the point that define the road.
+      /// \return The vector of points that define the road.
+      public: const std::vector<math::Vector3> &GetPoints() const;
+
+      /// \brief Get the road width in meters.
+      /// \return Road width in meters.
+      public: double GetWidth() const;
 
       /// \brief Width of the road.
       private: double width;

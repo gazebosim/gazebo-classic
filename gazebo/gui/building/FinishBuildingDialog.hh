@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 #include <string>
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
 
     /// \class FinishBuildingDialog FinishBuildingDialog.hh
     /// \brief Dialog for saving the building model.
-    class FinishBuildingDialog : public QDialog
+    class GAZEBO_VISIBLE FinishBuildingDialog : public QDialog
     {
       Q_OBJECT
 
@@ -67,6 +68,22 @@ namespace gazebo
       /// \param[in] _location Location to save to.
       public: void SetSaveLocation(const std::string &_location);
 
+      /// \brief Get the model's author's name.
+      /// \return The author's name.
+      public: std::string GetAuthorName() const;
+
+      /// \brief Get the model's author's email.
+      /// \return The author's email.
+      public: std::string GetAuthorEmail() const;
+
+      /// \brief Get the model's description.
+      /// \return The model's description.
+      public: std::string GetDescription() const;
+
+      /// \brief Get the model's version.
+      /// \return The model's version.
+      public: std::string GetVersion() const;
+
       /// \brief Qt callback when the file directory browse button is pressed.
       private slots: void OnBrowse();
 
@@ -76,8 +93,29 @@ namespace gazebo
       /// \brief Qt callback when the Done button is pressed.
       private slots: void OnFinish();
 
+      /// \brief Qt callback to show/hide advanced model saving options.
+      private slots: void ToggleAdvancedOptions(bool _checked);
+
+      /// \brief Widget container to hold advanced model saving options.
+      private: QWidget *advancedOptionsWidget;
+
+      /// \brief Label appearing at the top of the dialog box.
+      private: QLabel *messageLabel;
+
       /// \brief Editable line that holds the model name.
       private: QLineEdit* modelNameLineEdit;
+
+      /// \brief Editable line that holds the model's version.
+      private: QLineEdit* modelVersionLineEdit;
+
+      /// \brief Editable line that holds the model's description.
+      private: QLineEdit* modelDescriptionLineEdit;
+
+      /// \brief Editable line that holds the model's author's name.
+      private: QLineEdit* modelAuthorNameLineEdit;
+
+      /// \brief Editable line that holds the model's author's email.
+      private: QLineEdit* modelAuthorEmailLineEdit;
 
       /// \brief Editable line that holds the model's save location.
       private: QLineEdit* modelLocationLineEdit;

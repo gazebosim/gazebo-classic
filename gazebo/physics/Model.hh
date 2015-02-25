@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ModelState.hh"
 #include "gazebo/physics/Entity.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
@@ -48,7 +49,7 @@ namespace gazebo
 
     /// \class Model Model.hh physics/physics.hh
     /// \brief A model is a collection of links, joints, and plugins.
-    class Model : public Entity
+    class GAZEBO_VISIBLE Model : public Entity
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent object.
@@ -84,9 +85,14 @@ namespace gazebo
       /// \brief Remove a child.
       /// \param[in] _child Remove a child entity.
       public: virtual void RemoveChild(EntityPtr _child);
+      using Base::RemoveChild;
 
       /// \brief Reset the model.
       public: void Reset();
+
+      /// \brief Reset the velocity, acceleration, force and torque of
+      /// all child links.
+      public: void ResetPhysicsStates();
 
       /// \brief Set the linear velocity of the model, and all its links.
       /// \param[in] _vel The new linear velocity.
@@ -149,7 +155,7 @@ namespace gazebo
       /// \brief Construct and return a vector of Link's in this model
       /// Note this constructs the vector of Link's on the fly, could be costly
       /// \return a vector of Link's in this model
-      public: Link_V GetLinks() const;
+      public: const Link_V &GetLinks() const;
 
       /// \brief Get the joints.
       /// \return Vector of joints.
@@ -212,8 +218,8 @@ namespace gazebo
       /// \param[in] _onComplete Callback function for when the animation
       /// completes.
       public: void SetJointAnimation(
-                 const std::map<std::string, common::NumericAnimationPtr> _anim,
-                 boost::function<void()> _onComplete = NULL);
+               const std::map<std::string, common::NumericAnimationPtr> &_anims,
+               boost::function<void()> _onComplete = NULL);
 
       /// \brief Stop the current animations.
       public: virtual void StopAnimation();
@@ -305,6 +311,23 @@ namespace gazebo
       /// \sa Model::GetGripper()
       public: size_t GetGripperCount() const;
 
+      /// \brief Returns the potential energy of all links
+      /// and joint springs in the model.
+      /// \return this link's potential energy,
+      public: double GetWorldEnergyPotential() const;
+
+      /// \brief Returns sum of the kinetic energies of all links
+      /// in this model.  Computed using link's CoG velocity in
+      /// the inertial (world) frame.
+      /// \return this link's kinetic energy
+      public: double GetWorldEnergyKinetic() const;
+
+      /// \brief Returns this model's total energy, or
+      /// sum of Model::GetWorldEnergyPotential() and
+      /// Model::GetWorldEnergyKinetic().
+      /// \return this link's total energy
+      public: double GetWorldEnergy() const;
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
@@ -359,17 +382,11 @@ namespace gazebo
       /// \brief Callback used when a joint animation completes.
       private: boost::function<void()> onJointAnimationComplete;
 
-      /// \brief Previous time of the animation update.
-      private: common::Time prevAnimationTime;
-
       /// \brief Mutex used during the update cycle.
       private: mutable boost::recursive_mutex updateMutex;
 
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;
-
-      /// \brief True if plugins have been loaded.
-      private: bool pluginsLoaded;
     };
     /// \}
   }

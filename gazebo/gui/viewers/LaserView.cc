@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -172,11 +172,10 @@ void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
   // Compute the final ray index
   rayOffset *= _msg->scan().count();
 
-  double r;
   for (unsigned int i = 0;
        i < static_cast<unsigned int>(_msg->scan().count()); i++)
   {
-    r = _msg->scan().ranges(i+rayOffset);
+    double r = _msg->scan().ranges(i+rayOffset);
 
     if (i+1 >= this->laserItem->GetRangeCount())
       this->laserItem->AddRange(r);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,6 +193,7 @@ void SonarSensor::Init()
   Sensor::Init();
   this->sonarMsg.mutable_sonar()->set_frame(this->parentName);
   msgs::Set(this->sonarMsg.mutable_time(), this->world->GetSimTime());
+  this->sonarMsg.mutable_sonar()->set_range(this->rangeMax);
 
   if (this->sonarPub)
     this->sonarPub->Publish(this->sonarMsg);
@@ -201,6 +202,13 @@ void SonarSensor::Init()
 //////////////////////////////////////////////////
 void SonarSensor::Fini()
 {
+  if (this->world && this->world->GetRunning())
+  {
+    physics::ContactManager *mgr =
+        this->world->GetPhysicsEngine()->GetContactManager();
+    mgr->RemoveFilter(this->sonarCollision->GetScopedName());
+  }
+
   this->sonarPub.reset();
   this->contactSub.reset();
   Sensor::Fini();
@@ -238,12 +246,12 @@ bool SonarSensor::UpdateImpl(bool /*_force*/)
 
   this->lastMeasurementTime = this->world->GetSimTime();
   msgs::Set(this->sonarMsg.mutable_time(), this->lastMeasurementTime);
-  this->sonarMsg.mutable_sonar()->set_range(0);
 
   math::Pose referencePose = this->pose + this->parentEntity->GetWorldPose();
   math::Vector3 pos;
 
-  this->sonarMsg.mutable_sonar()->set_range(this->rangeMax);
+  if (!this->incomingContacts.empty())
+    this->sonarMsg.mutable_sonar()->set_range(this->rangeMax);
 
   // Iterate over all the contact messages
   for (ContactMsgs_L::iterator iter = this->incomingContacts.begin();

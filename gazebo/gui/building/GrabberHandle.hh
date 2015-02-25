@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,15 @@
 #ifndef _GRABBER_HANDLE_HH_
 #define _GRABBER_HANDLE_HH_
 
+#include <vector>
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class GrabberHandle : public QGraphicsItem
+    class GAZEBO_VISIBLE GrabberHandle : public QGraphicsItem
     {
       /// \brief Constructor
       /// \param[in] _parent Parent graphics item
@@ -129,6 +131,9 @@ namespace gazebo
       /// \brief Qt mouse move event during drag and drop.
       /// \param[in] _event Qt mouse drag and drop event.
       protected: void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
+
+      /// \brief A list of grabbers linked to this grabber.
+      public: std::vector<GrabberHandle*> linkedGrabbers;
 
       /// \brief Index of this corner grabber.
       private: int index;

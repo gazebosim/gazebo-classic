@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
@@ -51,7 +52,7 @@ namespace gazebo
     /// \brief Adaptor to Ogre3d
     ///
     /// Provides the interface to load, initialize the rendering engine.
-    class RenderEngine : public SingletonT<RenderEngine>
+    class GAZEBO_VISIBLE RenderEngine : public SingletonT<RenderEngine>
     {
       /// \enum RenderPathType
       /// \brief The type of rendering path used by the rendering engine.

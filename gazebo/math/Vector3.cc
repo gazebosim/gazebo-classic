@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -331,7 +331,8 @@ bool Vector3::operator!=(const Vector3 &_pt) const
 //////////////////////////////////////////////////
 bool Vector3::IsFinite() const
 {
-  return finite(this->x) && finite(this->y) && finite(this->z);
+  return std::isfinite(this->x) && std::isfinite(this->y) &&
+         std::isfinite(this->z);
 }
 
 //////////////////////////////////////////////////

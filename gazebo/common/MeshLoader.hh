@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define MESHLOADER_HH
 
 #include <string>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class MeshLoader MeshLoader.hh common/common.hh
     /// \brief Base class for loading meshes
-    class MeshLoader
+    class GAZEBO_VISIBLE MeshLoader
     {
       /// \brief Constructor
       public: MeshLoader();

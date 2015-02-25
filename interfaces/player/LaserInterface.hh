@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 #include <string>
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 #include "GazeboInterface.hh"
 
 /// \addtogroup player_iface Interfaces
@@ -33,7 +34,7 @@
 /// \{
 
 /// \brief Plugin Player interface for a Gazebo laser
-class LaserInterface : public GazeboInterface
+class GAZEBO_VISIBLE LaserInterface : public GazeboInterface
 {
   /// \brief Constructor
   /// \param addr Plaer device address
@@ -64,7 +65,7 @@ class LaserInterface : public GazeboInterface
   ///        GazeboDriver::Unsubscribe
   public: virtual void Unsubscribe();
 
-  private: void OnScan(ConstLaserScanPtr &_msg);
+  private: void OnScan(ConstLaserScanStampedPtr &_msg);
 
   private: std::string laserName;
 
