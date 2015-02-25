@@ -41,7 +41,8 @@ boost::recursive_mutex *FiducialInterface::mutex = NULL;
 FiducialInterface::FiducialInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf,
     int section)
-: GazeboInterface(addr, driver, cf, section)
+: GazeboInterface(addr, driver, cf, section), iface(NULL), gz_id(NULL),
+  datatime(0.0)
 {
   /*
   // Get the ID of the interface
