@@ -590,8 +590,8 @@ void ODELink::AddForceAtWorldPosition(const math::Vector3 &_force,
 }
 
 //////////////////////////////////////////////////
-void ODELink::AddWorldForce(const math::Vector3 &_force,
-    const math::Vector3 &_offset)
+void ODELink::AddWorldForce(const math::Vector3 &/*_force*/,
+    const math::Vector3 &/*_offset*/)
 {
   gzlog << "ODELink::AddWorldForce not yet implemented."
         << std::endl;
@@ -601,19 +601,22 @@ void ODELink::AddWorldForce(const math::Vector3 &_force,
 void ODELink::AddLinkForce(const math::Vector3 &_force,
     const math::Vector3 &_offset)
 {
+  // _force specifies a direction (free vector), while
+  // _offset specifies a translation.
+  // Together they describe 6 DOF for the force, of which 1 DOF is not useful
+  // (translation along the force direction)
   if (this->linkId)
   {
-    // rotate force to relative position, because we don't have an
-    // AddRelativeForceAtRelativePosition
-    math::Vector3 force = this->GetWorldPose().rot.RotateVector(_force);
-
-    // AddForceAtRelativePosition seems to be relative to the CoM
-    // (only ODE tested), so we translate it to the link origin
-    math::Vector3 offset = _offset - this->inertial->GetCoG();
+    // Force vector represents a direction only, so it should be rotated but
+    // not translated
+    math::Vector3 forceWorld = this->GetWorldPose().rot.RotateVector(_force);
+    // Does this need to be rotated?
+    math::Vector3 offsetCoG = _offset - this->inertial->GetCoG();
 
     this->SetEnabled(true);
-    dBodyAddForceAtRelPos(this->linkId, force.x, force.y, force.z,
-                          offset.x, offset.y, offset.z);
+    dBodyAddForceAtRelPos(this->linkId,
+        forceWorld.x, forceWorld.y, forceWorld.z,
+        offsetCoG.x, offsetCoG.y, offsetCoG.z);
   }
   else if (!this->IsStatic())
   {
@@ -624,8 +627,8 @@ void ODELink::AddLinkForce(const math::Vector3 &_force,
 }
 
 //////////////////////////////////////////////////
-void ODELink::AddInertialForce(const math::Vector3 &_force,
-    const math::Vector3 &_offset)
+void ODELink::AddInertialForce(const math::Vector3 &/*_force*/,
+    const math::Vector3 &/*_offset*/)
 {
   gzlog << "ODELink::AddInertialForce not yet implemented."
         << std::endl;

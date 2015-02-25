@@ -178,7 +178,6 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   math::Vector3 size(1, 1, 1);
   math::Vector3 pos0(0, 0, 0);
   math::Vector3 rot0(0, 0, 0);
-  math::Quaternion quat0(rot0);
   SpawnBox("box", size, pos0, rot0, false);
   physics::ModelPtr model = world->GetModel("box");
   ASSERT_TRUE(model != NULL);
@@ -200,6 +199,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
 
   /////////////////////////////////////////////////
   // Force at link frame
+  /////////////////////////////////////////////////
   // CASE 1
   // Apply upwards (World Z+ == Link Z+) at link/world origin
   // causing no rotation
@@ -209,6 +209,10 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   math::Vector3 newLinearAccel = force/mass;
   math::Vector3 newLinearVel = dt*force/mass;
 
+  // Check force and torque in world frame
+  EXPECT_EQ(force, link->GetWorldForce());
+  EXPECT_EQ(math::Vector3::Zero, link->GetWorldTorque());
+
   // Check acceleration in world frame
   EXPECT_EQ(newLinearAccel, link->GetWorldLinearAccel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularAccel());
@@ -228,23 +232,20 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   EXPECT_EQ(newLinearVel, link->GetWorldLinearVel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
 
-  // Add opposing force in link frame and check that link returned to initial
-  // pose and stopped
+  // Add opposing force in link frame and check that link stopped
   force = math::Vector3(0, 0, -1);
   link->AddLinkForce(force);
   world->Step(largeNumerOfSteps);
-  EXPECT_EQ(pos0, link->GetWorldPose().pos);
-  EXPECT_EQ(quat0, link->GetWorldPose().rot);
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldLinearVel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldLinearAccel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularAccel());
 
+  /////////////////////////////////////////////////
   // CASE 2
-  // Dislocate model so that World Z+ == Link X- and there's an offset
+  // Dislocate model so that World Z+ // Link X- and there's an offset
   pos0 = math::Vector3(2, 0, 0);
   rot0 = math::Vector3(0, M_PI/2.0, 0);
-  quat0 = math::Quaternion(rot0);
   model->SetLinkWorldPose(math::Pose(pos0, rot0), link);
 
   // Apply upwards (World Z+ == Link X-) at link origin
@@ -253,6 +254,11 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   link->AddLinkForce(force);
   world->Step(1);
 
+  // Check force and torque in world frame
+  math::Vector3 forceWorld = link->GetWorldPose().rot.RotateVector(force);
+  EXPECT_EQ(forceWorld, link->GetWorldForce());
+  EXPECT_EQ(math::Vector3::Zero, link->GetWorldTorque());
+
   // Check acceleration in world frame
   EXPECT_EQ(newLinearAccel, link->GetWorldLinearAccel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularAccel());
@@ -272,33 +278,41 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   EXPECT_EQ(newLinearVel, link->GetWorldLinearVel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
 
-  // Add opposing force in link frame and check that link returned to initial
-  // pose and stopped
+  // Add opposing force in link frame and check that link stopped
   force = math::Vector3(1, 0, 0);
   link->AddLinkForce(force);
   world->Step(largeNumerOfSteps);
-  EXPECT_EQ(pos0, link->GetWorldPose().pos);
-  EXPECT_EQ(quat0, link->GetWorldPose().rot);
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldLinearVel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldLinearAccel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularAccel());
 
+  /////////////////////////////////////////////////
   // CASE 3
-  // Apply upwards (World Z+ == Link X-) at
-  // world point (1, 0, 0) == link point (0, 0, -1)
+  // Bring model back to the pose of CASE 2
+  pos0 = math::Vector3::Zero;
+  rot0 = math::Vector3::Zero;
+  model->SetLinkWorldPose(math::Pose(pos0, rot0), link);
+
+  // Apply upwards (World Z+ == Link Z+) at
+  // world/link point (-1, 0, 0)
   // causing rotation about world Y+
-  force = math::Vector3(-1, 0, 0);
-  math::Vector3 forcePos = math::Vector3(0, 0, -1);
+  force = math::Vector3(0, 0, 1);
+  math::Vector3 forcePos = math::Vector3(-1, 0, 0);
   link->AddLinkForce(force, forcePos);
   world->Step(1);
-//  double radius = forcePos.GetLength();
-//  math::Vector3 newAngularAccel = newLinearAccel/radius;
-//  math::Vector3 newAngularVel = newLinearVel/radius;
+
+  // Check force and torque in world frame
+  EXPECT_EQ(force, link->GetWorldForce());
+  math::Vector3 torqueWorld = forcePos.Cross(force);
+  EXPECT_EQ(torqueWorld, link->GetWorldTorque());
 
   // Check acceleration in world frame
   EXPECT_EQ(newLinearAccel, link->GetWorldLinearAccel());
-//  EXPECT_EQ(newAngularAccel, link->GetWorldAngularAccel());
+
+  math::Vector3 newAngularAccel =
+      torqueWorld/link->GetInertial()->GetPrincipalMoments();
+  EXPECT_EQ(newAngularAccel, link->GetWorldAngularAccel());
   EXPECT_NEAR(0, link->GetWorldAngularAccel().x, g_tolerance);
   EXPECT_LT(0, link->GetWorldAngularAccel().y);
   EXPECT_NEAR(0, link->GetWorldAngularAccel().z, g_tolerance);
@@ -321,24 +335,21 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   EXPECT_EQ(newLinearVel, link->GetWorldLinearVel());
   EXPECT_EQ(newAngularVel, link->GetWorldAngularVel());
 
-  // Add opposing force in link frame and check that link returned to initial
-  // pose and stopped
+  // Add opposing force in link frame and check that link stopped
   force = math::Vector3(1, 0, 0);
   forcePos = math::Vector3(0, 0, -1);
   link->AddLinkForce(force, forcePos);
   world->Step(largeNumerOfSteps);
-  EXPECT_EQ(pos0, link->GetWorldPose().pos);
-  EXPECT_EQ(quat0, link->GetWorldPose().rot);
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldLinearVel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldLinearAccel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularAccel());
 
+  /////////////////////////////////////////////////
   // CASE 4
   // Dislocate CoG to make sure we're acting on link frame, not inertial frame
   pos0 = math::Vector3::Zero;
   rot0 = math::Vector3::Zero;
-  quat0 = math::Quaternion(rot0);
   model->SetLinkWorldPose(math::Pose(pos0, rot0), link);
 
   math::Pose inertialPose = math::Pose(math::Vector3(1, 0, 0),
@@ -377,13 +388,10 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   EXPECT_EQ(newLinearVel, link->GetWorldLinearVel());
   EXPECT_EQ(newAngularVel, link->GetWorldAngularVel());
 
-  // Add opposing force in link frame and check that link returned to initial
-  // pose and stopped
+  // Add opposing force in link frame and check that link stopped
   force = math::Vector3(0, 0, -1);
   link->AddLinkForce(force);
   world->Step(largeNumerOfSteps);
-  EXPECT_EQ(pos0, link->GetWorldPose().pos);
-  EXPECT_EQ(quat0, link->GetWorldPose().rot);
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldLinearVel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldLinearAccel());
