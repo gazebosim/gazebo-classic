@@ -301,7 +301,8 @@ void Heightmap::Load()
   Ogre::RenderSystemCapabilities::ShaderProfiles profiles;
   Ogre::RenderSystemCapabilities::ShaderProfiles::const_iterator iter;
 
-  capabilities = Ogre::Root::getSingleton().getRenderSystem()->getCapabilities();
+  capabilities =
+      Ogre::Root::getSingleton().getRenderSystem()->getCapabilities();
   Ogre::DriverVersion glVersion;
   glVersion.build = 0;
   glVersion.major = 3;
