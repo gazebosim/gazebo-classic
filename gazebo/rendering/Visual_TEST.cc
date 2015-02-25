@@ -414,14 +414,41 @@ TEST_F(Visual_TEST, ColorMaterial)
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
 
-  std::string visualName = "boxMaterialColor";
-  math::Pose visualPose = math::Pose::Zero;
-  std::string materialName = "Gazebo/Grey";
+  // test setup - create a material for testing
+  std::string materialName = "Test/Grey";
+  common::Color ambient(0.3, 0.3, 0.3, 1.0);
+  common::Color diffuse(0.7, 0.7, 0.7, 1.0);
+  common::Color specular(0.01, 0.01, 0.01, 1.0);
+  common::Color emissive = common::Color::Black;
+  Ogre::MaterialPtr ogreMaterial =
+      Ogre::MaterialManager::getSingleton().create(materialName, "General");
+  for (unsigned int i = 0; i < ogreMaterial->getNumTechniques(); ++i)
+  {
+    Ogre::Technique *technique = ogreMaterial->getTechnique(i);
+    for (unsigned int j = 0; j < technique->getNumPasses(); ++j)
+    {
+      Ogre::Pass *pass = technique->getPass(j);
+      pass->setAmbient(rendering::Conversions::Convert(ambient));
+      pass->setDiffuse(rendering::Conversions::Convert(diffuse));
+      pass->setSpecular(rendering::Conversions::Convert(specular));
+      pass->setSelfIllumination(rendering::Conversions::Convert(emissive));
+      EXPECT_EQ(rendering::Conversions::Convert(pass->getAmbient()),
+          common::Color(0.3, 0.3, 0.3, 1.0));
+      EXPECT_EQ(rendering::Conversions::Convert(pass->getDiffuse()),
+          common::Color(0.7, 0.7, 0.7, 1.0));
+      EXPECT_EQ(rendering::Conversions::Convert(pass->getSpecular()),
+          common::Color(0.01, 0.01, 0.01, 1.0));
+      EXPECT_EQ(rendering::Conversions::Convert(pass->getSelfIllumination()),
+          common::Color::Black);
+    }
+  }
 
   // test with a visual that only has a material name and no color components.
+  std::string visualName = "boxMaterialColor";
+  math::Pose visualPose = math::Pose::Zero;
   std::stringstream visualString;
   visualString
-      << "<sdf version='1.5'>"
+      << "<sdf version='" << SDF_VERSION << "'>"
       << "  <visual name='" << visualName << "'>"
       << "    <pose>" << visualPose << "</pose>"
       << "    <geometry>"
@@ -458,7 +485,10 @@ TEST_F(Visual_TEST, ColorMaterial)
   // test changing diffuse colors and verify color again.
   common::Color redColor(1.0, 0.0, 0.0, 1.0);
   boxVis->SetDiffuse(redColor);
+  EXPECT_EQ(boxVis->GetAmbient(), common::Color(0.3, 0.3, 0.3, 1.0));
   EXPECT_EQ(boxVis->GetDiffuse(), redColor);
+  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.01, 0.01, 0.01, 1.0));
+  EXPECT_EQ(boxVis->GetEmissive(), common::Color::Black);
 
   // test setting a different material name
   std::string greenMaterialName = "Gazebo/Green";
