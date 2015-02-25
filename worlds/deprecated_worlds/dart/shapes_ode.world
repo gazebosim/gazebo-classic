@@ -1,0 +1,81 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+    <world name="default">
+        <include>
+            <uri>model://sun</uri>
+        </include>
+        <physics type="ode">
+            <gravity>0 0 -10.0</gravity>
+        </physics>
+        <model name="model_box1">
+            <static>true</static>
+            <pose>-2 0 0 0 0 0</pose>
+            <link name="link_box1">
+                <pose>0 0 0 0 0 0</pose>
+                <inertial>
+                    <inertia>
+                        <ixx>1</ixx>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyy>1</iyy>
+                        <iyz>0</iyz>
+                        <izz>1</izz>
+                    </inertia>
+                    <mass>1.0</mass>
+                </inertial>
+                <visual name="visual_box1">
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>1 1 1</size>
+                        </box>
+                    </geometry>
+                </visual>
+                <collision name="coll_box1">
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>1 1 1</size>
+                        </box>
+                    </geometry>
+                </collision>
+            </link>
+        </model>
+        <model name="model_cylinder1">
+            <static>true</static>
+            <pose>2 0 0 0 0 0</pose>
+            <link name="link_cylinder1">
+                <pose>0 0 0 0 0 0</pose>
+                <inertial>
+                    <inertia>
+                        <ixx>1</ixx>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyy>1</iyy>
+                        <iyz>0</iyz>
+                        <izz>1</izz>
+                    </inertia>
+                    <mass>1.0</mass>
+                </inertial>
+                <visual name="visual_cylinder1">
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <radius>0.5</radius>
+                            <length>1</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+                <collision name="coll_cylinder1">
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <radius>0.5</radius>
+                            <length>1</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+            </link>
+        </model>
+    </world>
+</sdf>

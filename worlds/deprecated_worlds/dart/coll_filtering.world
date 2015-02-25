@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <physics type="dart">
+        <gravity>0 0 -10.0</gravity>
+    </physics>
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+
+  <model name ='multiLinkModel'>
+  <pose>0 0 2 0 -0 0</pose>
+
+  <link name ='link01'>
+    <pose>0 0.1 0 0 -0 0</pose>
+    <collision name ='geom'>
+      <geometry>
+        <box><size>1 1 1</size></box>
+      </geometry>
+    </collision>
+    <visual name ='visual'>
+      <geometry>
+        <box><size>1 1 1</size></box>
+      </geometry>
+    </visual>
+  </link>
+
+  <link name ='link02'>
+    <pose>0 -0.1 0 0 -0 0</pose>
+    <collision name ='geom'>
+      <geometry>
+        <box><size>1 1 1</size></box>
+      </geometry>
+    </collision>
+    <visual name ='visual'>
+      <geometry>
+        <box><size>1 1 1</size></box>
+      </geometry>
+    </visual>
+  </link>
+
+  </model>
+
+
+  </world>
+</sdf>

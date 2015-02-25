@@ -1,0 +1,176 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+    <world name="default">
+        <include>
+            <uri>model://sun</uri>
+        </include>
+        <physics type="dart">
+            <gravity>0 0 -10.0</gravity>
+        </physics>
+
+	<include>
+	<uri>model://ground_plane</uri>
+	</include>
+
+	<model name ='small_centered_sphere'>
+	<static>0</static>
+	<pose>0 0 3.5 0 0 0</pose>
+	<link name ='body'>
+	  <inertial>
+	    <pose>0 0 0 0 0 0</pose>
+	  </inertial>
+	  <collision name ='geom'>
+	    <geometry>
+	      <sphere><radius>0.5</radius></sphere>
+	    </geometry>
+	  </collision>
+	  <visual name ='visual'>
+	    <geometry>
+	      <sphere><radius>0.5</radius></sphere>
+	    </geometry>
+	  </visual>
+	</link>
+	</model>
+
+	<model name ='large_centered_sphere'>
+	<static>0</static>
+	<pose>4 0 4.5 0 0 0</pose>
+	<link name ='body'>
+	  <inertial>
+	    <pose>0 0 0 0 0 0</pose>
+	  </inertial>
+	  <collision name ='geom'>
+	    <geometry>
+	      <sphere><radius>1.5</radius></sphere>
+	    </geometry>
+	  </collision>
+	  <visual name ='visual'>
+	    <geometry>
+	      <sphere><radius>1.5</radius></sphere>
+	    </geometry>
+	  </visual>
+	</link>
+	</model>
+
+	<model name ='lowered_cog_sphere'>
+	<static>0</static>
+	<pose>8 0 4.5 0 0 0</pose>
+	<link name ='body'>
+	  <inertial>
+	    <pose>0 0 -0.5 0 0 0</pose>
+	  </inertial>
+	  <collision name ='geom'>
+	    <geometry>
+	      <sphere><radius>1.5</radius></sphere>
+	    </geometry>
+	  </collision>
+	  <visual name ='visual'>
+	    <geometry>
+	      <sphere><radius>1.5</radius></sphere>
+	    </geometry>
+	  </visual>
+	</link>
+	</model>
+
+	<model name ='raised_cog_sphere'>
+	<static>0</static>
+	<pose>-4 0 4.5 0 0 0</pose>
+	<link name ='body'>
+	  <inertial>
+	    <pose>0 0 0.5 0 0 0</pose>
+	  </inertial>
+	  <collision name ='geom'>
+	    <geometry>
+	      <sphere><radius>1.5</radius></sphere>
+	    </geometry>
+	  </collision>
+	  <visual name ='visual'>
+	    <geometry>
+	      <sphere><radius>1.5</radius></sphere>
+	    </geometry>
+	  </visual>
+	</link>
+	</model>
+
+	<model name ='cog_y_offset_sphere'>
+	<static>0</static>
+	<pose>-8 0 4.5 0 0 0</pose>
+	<link name ='body'>
+	  <inertial>
+	    <pose>0 0.5 0 0 0 0</pose>
+	  </inertial>
+	  <collision name ='geom'>
+	    <geometry>
+	      <sphere><radius>1.5</radius></sphere>
+	    </geometry>
+	  </collision>
+	  <visual name ='visual'>
+	    <geometry>
+	      <sphere><radius>1.5</radius></sphere>
+	    </geometry>
+	  </visual>
+	</link>
+	</model>
+
+	<model name ='cog_x_offset_sphere'>
+	<static>0</static>
+	<pose>15 0 4.5 0 0 0</pose>
+	<link name ='body'>
+	  <inertial>
+	    <pose>0.5 0 0 0 0 0</pose>
+	  </inertial>
+	  <collision name ='geom'>
+	    <geometry>
+	      <sphere><radius>1.5</radius></sphere>
+	    </geometry>
+	  </collision>
+	  <visual name ='visual'>
+	    <geometry>
+	      <sphere><radius>1.5</radius></sphere>
+	    </geometry>
+	  </visual>
+	</link>
+	</model>
+
+	<model name ='cog_xy_45deg_offset_sphere'>
+	<static>0</static>
+	<pose>0 8 4.5 0 0 0</pose>
+	<link name ='body'>
+	  <inertial>
+	    <pose>0.353553 0.353553 0 0 0 0</pose>
+	  </inertial>
+	  <collision name ='geom'>
+	    <geometry>
+	      <sphere><radius>1.5</radius></sphere>
+	    </geometry>
+	  </collision>
+	  <visual name ='visual'>
+	    <geometry>
+	      <sphere><radius>1.5</radius></sphere>
+	    </geometry>
+	  </visual>
+	</link>
+	</model>
+
+	<model name ='cog_xy_-30deg_offset_sphere'>
+	<static>0</static>
+	<pose>0 -8 4.5 0 0 0</pose>
+	<link name ='body'>
+	  <inertial>
+	    <pose>0.433013 -0.25 0 0 0 0</pose>
+	  </inertial>
+	  <collision name ='geom'>
+	    <geometry>
+	      <sphere><radius>1.5</radius></sphere>
+	    </geometry>
+	  </collision>
+	  <visual name ='visual'>
+	    <geometry>
+	      <sphere><radius>1.5</radius></sphere>
+	    </geometry>
+	  </visual>
+	</link>
+	</model>
+
+    </world>
+</sdf>
