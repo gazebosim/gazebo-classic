@@ -218,11 +218,6 @@ QListView
   background: #808080;
   alternate-background-color: #606060;
 
-  /*selection-color: #ffffff;
-  selection-background-color: transparent;
-
-  selection-color: #f58113;
-  */
   selection-background-color: transparent;
   show-decoration-selected: 0;
 
