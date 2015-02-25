@@ -210,9 +210,9 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
 
 /////////////////////////////////////////////////
 std::vector<JointData *> JointMaker::GetJointDataByPart(
-    const std::string &_partName)
+    const std::string &_partName) const
 {
-  std::vector<JointData *> joints;
+  std::vector<JointData *> partJoints;
   for (auto jointIt : this->joints)
   {
     JointData *jointData = jointIt.second;
@@ -220,10 +220,10 @@ std::vector<JointData *> JointMaker::GetJointDataByPart(
     if (jointData->child->GetName() == _partName ||
         jointData->parent->GetName() == _partName)
     {
-      joints.push_back(jointData);
+      partJoints.push_back(jointData);
     }
   }
-  return joints;
+  return partJoints;
 }
 
 /////////////////////////////////////////////////

@@ -131,7 +131,7 @@ namespace gazebo
       /// \param[in] _partName Name of the part.
       /// \return Vector with joint data.
       public: std::vector<JointData *> GetJointDataByPart(
-          const std::string &_partName);
+          const std::string &_partName) const;
 
       /// \brief Generate SDF for all joints.
       public: void GenerateSDF();
