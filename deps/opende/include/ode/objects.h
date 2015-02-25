@@ -1308,6 +1308,7 @@ ODE_API void dBodyAddRelForceAtRelPos (dBodyID, dReal fx, dReal fy, dReal fz,
  * @ingroup bodies
  */
 ODE_API const dReal * dBodyGetForce (dBodyID);
+ODE_API const dReal * dBodyGetForceLast (dBodyID);
 
 /**
  * @brief Return the current accumulated torque vector.
@@ -1319,6 +1320,7 @@ ODE_API const dReal * dBodyGetForce (dBodyID);
  * @ingroup bodies
  */
 ODE_API const dReal * dBodyGetTorque (dBodyID);
+ODE_API const dReal * dBodyGetTorqueLast (dBodyID);
 
 /**
  * @brief Set the body force accumulation vector.

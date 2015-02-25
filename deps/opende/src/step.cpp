@@ -889,6 +889,14 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
     dxBody *const *const bodyend = body + nb;
     for (dxBody *const *bodycurr = body; bodycurr != bodyend; ++bodycurr) {
       dxBody *b = *bodycurr;
+      b->facc_last[0] = b->facc[0];
+      b->facc_last[1] = b->facc[1];
+      b->facc_last[2] = b->facc[2];
+      b->facc_last[3] = b->facc[3];
+      b->tacc_last[0] = b->tacc[0];
+      b->tacc_last[1] = b->tacc[1];
+      b->tacc_last[2] = b->tacc[2];
+      b->tacc_last[3] = b->tacc[3];
       b->facc[0] = 0;
       b->facc[1] = 0;
       b->facc[2] = 0;

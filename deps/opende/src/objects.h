@@ -160,6 +160,7 @@ struct dxBody : public dObject {
   dVector3 lvel,avel;		// linear and angular velocity of POR
   dVector3 facc,tacc;		// force and torque accumulators
   dVector3 finite_rot_axis;	// finite rotation axis, unit length or 0=none
+  dVector3 facc_last, tacc_last; // previous values of facc, tacc
 
   // auto-disable information
   dxAutoDisable adis;		// auto-disable parameters

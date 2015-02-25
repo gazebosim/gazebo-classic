@@ -2659,6 +2659,12 @@ void dxQuickStepper (dxWorldProcessContext *context,
     dxBody *const *const bodyend = body + nb;
     for (dxBody *const *bodycurr = body; bodycurr != bodyend; bodycurr++) {
       dxBody *b_ptr = *bodycurr;
+      b_ptr->facc_last[0] = b_ptr->facc[0];
+      b_ptr->facc_last[1] = b_ptr->facc[1];
+      b_ptr->facc_last[2] = b_ptr->facc[2];
+      b_ptr->tacc_last[0] = b_ptr->tacc[0];
+      b_ptr->tacc_last[1] = b_ptr->tacc[1];
+      b_ptr->tacc_last[2] = b_ptr->tacc[2];
       dSetZero (b_ptr->facc,3);
       dSetZero (b_ptr->tacc,3);
     }
