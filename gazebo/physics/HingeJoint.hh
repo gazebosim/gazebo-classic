@@ -22,6 +22,7 @@
 #ifndef _HINGEJOINT_HH_
 #define _HINGEJOINT_HH_
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
@@ -55,6 +56,60 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf)
               {
                 T::Load(_sdf);
+              }
+
+      /// \brief Get joint velocity, defined as rotation of child relative
+      /// to parent along joint axis.
+      /// \param[in] _index Joint axis index.
+      /// \return Joint velocity in rad/s.
+      public: virtual double GetVelocity(unsigned int /*_index*/) const
+              {
+                double v = 0;
+                math::Vector3 globalAxis = this->GetGlobalAxis(0);
+                if (this->childLink)
+                  v += globalAxis.Dot(this->childLink->GetWorldAngularVel());
+                if (this->parentLink)
+                  v -= globalAxis.Dot(this->parentLink->GetWorldAngularVel());
+                return v;
+              }
+
+      /// \brief Set joint velocity, defined as rotation of child relative
+      /// to parent along joint axis.
+      /// \param[in] _index Joint axis index.
+      /// \param[in] _rate Joint velocity in rad/s.
+      public: virtual void SetVelocity(unsigned int /*_index*/, double _rate)
+              {
+                // All vectors are expressed in the world frame.
+                math::Vector3 globalAxis = this->GetGlobalAxis(0);
+                math::Vector3 desiredAngularVel = _rate * globalAxis;
+                if (this->childLink)
+                {
+                  math::Vector3 desiredLinearVel;
+                  if (this->parentLink)
+                  {
+                    desiredAngularVel += this->parentLink->GetWorldAngularVel();
+                    desiredLinearVel = this->parentLink->GetWorldLinearVel(
+                      this->parentAnchorPose.pos);
+                  }
+                  this->childLink->SetAngularVel(desiredAngularVel);
+                  math::Vector3 cogOffset = 
+                    this->childLink->GetWorldCoGPose().pos -
+                    this->GetWorldPose().pos;
+                  desiredLinearVel +=
+                    desiredAngularVel.Cross(cogOffset);
+                  this->childLink->SetLinearVel(desiredLinearVel);
+                }
+                else
+                {
+                  GZ_ASSERT(this->parentLink,
+                    "parentLink must exist if child link does not");
+                  this->parentLink->SetAngularVel(-desiredAngularVel);
+                  math::Vector3 cogOffset =
+                    this->parentLink->GetWorldCoGPose().pos -
+                    this->GetParentWorldPose().pos;
+                  this->parentLink->SetLinearVel(-desiredAngularVel.Cross(
+                    cogOffset));
+                }
               }
 
       /// \brief Initialize joint

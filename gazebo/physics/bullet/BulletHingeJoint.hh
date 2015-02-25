@@ -58,12 +58,6 @@ namespace gazebo
                   const math::Vector3 &_axis);
 
       // Documentation inherited.
-      public: virtual void SetVelocity(unsigned int _index, double _vel);
-
-      // Documentation inherited.
-      public: virtual double GetVelocity(unsigned int _index) const;
-
-      // Documentation inherited.
       public: virtual void SetMaxForce(unsigned int _index, double _t);
 
       // Documentation inherited.
