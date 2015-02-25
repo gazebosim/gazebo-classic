@@ -1,0 +1,174 @@
+material Rubble/Bark
+{
+    receive_shadows off
+
+    technique
+    {
+        pass
+        {
+            #lighting off
+			ambient 0.5 0.5 0.5 1.0
+			diffuse 1.0 1.0 1.0 1.0
+			specular 0.0 0.0 0.0 1.0 0.5
+
+            texture_unit
+            {
+                texture bark.jpg
+                filtering trilinear
+				#filtering anistropic
+                #max_anisotropy 16
+                scale 2 2 2
+            }
+        }
+    }
+}
+
+material Rubble/Brick
+{
+    receive_shadows off
+
+    technique
+    {
+        pass
+        {
+            #lighting off
+			ambient 0.5 0.5 0.5 1.0
+			diffuse 1.0 1.0 1.0 1.0
+			specular 0.0 0.0 0.0 1.0 0.5
+
+            texture_unit
+            {
+                texture red_brick.jpg
+                filtering trilinear
+				#filtering anistropic
+                #max_anisotropy 16
+                scale 0.1 0.1 0.1
+            }
+        }
+    }
+}
+
+material Rubble/Rock1
+{
+    receive_shadows off
+
+    technique
+    {
+        pass
+        {
+            #lighting off
+			ambient 0.5 0.5 0.5 1.0
+			diffuse 1.0 1.0 1.0 1.0
+			specular 0.0 0.0 0.0 1.0 0.5
+
+            texture_unit
+            {
+                texture rock_craggy.jpg
+                filtering trilinear
+				#filtering anistropic
+                #max_anisotropy 16
+                scale 2 2 2
+            }
+        }
+    }
+}
+
+material Rubble/RoughStone
+{
+    receive_shadows off
+
+    technique
+    {
+        pass
+        {
+            #lighting off
+			ambient 0.5 0.5 0.5 1.0
+			diffuse 1.0 1.0 1.0 1.0
+			specular 0.0 0.0 0.0 1.0 0.5
+
+            texture_unit
+            {
+                texture rough_ground.jpg
+                filtering trilinear
+				#filtering anistropic
+                #max_anisotropy 16
+                scale 2 2 2
+            }
+        }
+    }
+}
+
+material Rubble/CinderBlock
+{
+    receive_shadows off
+
+    technique
+    {
+        pass
+        {
+            #lighting off
+			ambient 0.5 0.5 0.5 1.0
+			diffuse 1.0 1.0 1.0 1.0
+			specular 0.0 0.0 0.0 1.0 0.5
+
+            texture_unit
+            {
+                texture cinder_block.jpg
+                filtering trilinear
+				#filtering anistropic
+                #max_anisotropy 16
+                scale 1 1 1
+            }
+        }
+    }
+}
+
+material Rubble/CementCracked
+{
+    receive_shadows off
+
+    technique
+    {
+        pass
+        {
+            #lighting off
+            ambient 0.5 0.5 0.5 1.0
+            diffuse 1.0 1.0 1.0 1.0
+            specular 0.0 0.0 0.0 1.0 0.5
+
+            texture_unit
+            {
+                texture cement_cracked.jpg
+                filtering trilinear
+		#filtering anistropic
+                #max_anisotropy 16
+                scale 1 1 1
+            }
+        }
+    }
+}
+
+material Rubble/WoodPlank
+{
+    receive_shadows off
+
+    technique
+    {
+        pass
+        {
+            #lighting off
+                        ambient 0.5 0.5 0.5 1.0
+                        diffuse 1.0 1.0 1.0 1.0
+                        specular 0.0 0.0 0.0 1.0 0.5
+
+            texture_unit
+            {
+                texture wood_planks.jpg
+                filtering trilinear
+                #filtering anistropic
+                #max_anisotropy 16
+                scale 1 1 1
+            }
+        }
+    }
+}
