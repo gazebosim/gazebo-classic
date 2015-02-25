@@ -270,20 +270,17 @@ QTreeView::branch:selected:active
 QTreeView::branch:selected:!active
 {
   background-color: #808080;
-  border-image: none;
 }
 
 QTreeView::branch:!open:has-children
 {
   image: url(:/images/right_arrow.png);
-  border-image: none;
 }
 
 QTreeView::branch:open:has-children:!has-siblings,
 QTreeView::branch:open:has-children:has-siblings
 {
   image: url(:/images/down_arrow.png);
-  border-image: none;
 }
 
 QTreeView QHeaderView:section
