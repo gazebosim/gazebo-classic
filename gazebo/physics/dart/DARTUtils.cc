@@ -35,7 +35,7 @@ void DARTUtils::ConvPoseToMat(Eigen::Matrix4d* _mat, const math::Pose& _pose)
 
   Eigen::Quaterniond quat(_pose.rot.w, _pose.rot.x,
                           _pose.rot.y, _pose.rot.z);
-  _mat->topLeftCorner<3,3>() = dart_math::quatToMatrix(quat);
+  _mat->topLeftCorner<3,3>() = dart::math::quatToMatrix(quat);
 
   (*_mat)(0, 3) = _pose.pos.x;
   (*_mat)(1, 3) = _pose.pos.y;
@@ -54,54 +54,8 @@ void DARTUtils::ConvMatToPose(math::Pose* _pose, const Eigen::Matrix4d& _mat)
 
   // Set rotation
   Eigen::Matrix3d mat3x3 = _mat.topLeftCorner<3,3>();
-  Eigen::Quaterniond quat = dart_math::matrixToQuat(mat3x3);
+  Eigen::Quaterniond quat = dart::math::matrixToQuat(mat3x3);
   _pose->rot.Set(quat.w(), quat.x(), quat.y(), quat.z());
-}
-
-//////////////////////////////////////////////////
-kinematics::TrfmTranslate* DARTUtils::CreateTrfmTranslate(
-    const math::Vector3& _vec)
-{
-  kinematics::Dof* dofX = new kinematics::Dof(_vec.x);
-  kinematics::Dof* dofY = new kinematics::Dof(_vec.y);
-  kinematics::Dof* dofZ = new kinematics::Dof(_vec.z);
-
-  kinematics::TrfmTranslate* ret
-      = new kinematics::TrfmTranslate(dofX, dofY, dofZ);
-
-  return ret;
-}
-
-//////////////////////////////////////////////////
-kinematics::TrfmRotateQuat* DARTUtils::CreateTrfmRotateQuat(
-    const math::Quaternion& _quat)
-{
-  kinematics::Dof* dofW = new kinematics::Dof(_quat.w);
-  kinematics::Dof* dofX = new kinematics::Dof(_quat.x);
-  kinematics::Dof* dofY = new kinematics::Dof(_quat.y);
-  kinematics::Dof* dofZ = new kinematics::Dof(_quat.z);
-
-  kinematics::TrfmRotateQuat* ret
-      = new kinematics::TrfmRotateQuat(dofW, dofX, dofY, dofZ);
-
-  return ret;
-}
-
-//////////////////////////////////////////////////
-void DARTUtils::AddTransformToDARTJoint(kinematics::Joint* _rtl8Joint,
-                                          const math::Pose& _pose)
-{
-  kinematics::TrfmTranslate* trfmTrans
-      = DARTUtils::CreateTrfmTranslate(_pose.pos);
-
-  _rtl8Joint->addTransform(trfmTrans, false);
-
-  kinematics::TrfmRotateQuat* trfmRot
-      = DARTUtils::CreateTrfmRotateQuat(_pose.rot);
-
-  _rtl8Joint->addTransform(trfmRot, false);
-
-
 }
 
 //////////////////////////////////////////////////

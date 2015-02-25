@@ -12,8 +12,11 @@
 	<uri>model://ground_plane</uri>
 	</include>
 
+           
   <model name="double_pendulum_with_base">
+  <pose>1.48 0 0 0 0 0</pose>
     <link name="base">
+      <pose>0 0 0 0 0 0</pose>
       <inertial>
         <mass>100</mass>
       </inertial>
