@@ -26,23 +26,27 @@ using namespace gazebo;
 // physics engine
 // dt
 // number of boxes to spawn
+// collision shape on / off
 // nonlinear trajectory on / off
 typedef std::tr1::tuple<const char *
                       , double
                       , int
                       , bool
-                      > char1double1int1bool1;
+                      , bool
+                      > char1double1int1bool2;
 class RigidBodyTest : public ServerFixture,
-                      public testing::WithParamInterface<char1double1int1bool1>
+                      public testing::WithParamInterface<char1double1int1bool2>
 {
   /// \brief Test accuracy of unconstrained rigid body motion.
   /// \param[in] _physicsEngine Physics engine to use.
   /// \param[in] _dt Max time step size.
   /// \param[in] _modelCount Number of boxes to spawn.
+  /// \param[in] _collision Flag for collision shape on / off.
   /// \param[in] _nonlinear Flag for nonlinear trajectory on / off.
   public: void Boxes(const std::string &_physicsEngine
                    , double _dt
                    , int _modelCount
+                   , bool _collision
                    , bool _nonlinear
                    );
 };
@@ -54,6 +58,7 @@ class RigidBodyTest : public ServerFixture,
 void RigidBodyTest::Boxes(const std::string &_physicsEngine
                         , double _dt
                         , int _modelCount
+                        , bool _collision
                         , bool _nonlinear
                         )
 {
@@ -90,6 +95,11 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   // Create box with inertia based on box of uniform density
   msgs::Model msgModel;
   msgs::AddBoxLink(msgModel, mass, math::Vector3(dx, dy, dz));
+  if (!_collision)
+  {
+    // Test without collision shapes.
+    msgModel.mutable_link(0)->clear_collision();
+  }
 
   // spawn multiple boxes
   // compute error statistics only on the last box
@@ -233,19 +243,23 @@ TEST_P(RigidBodyTest, Boxes)
   std::string physicsEngine = std::tr1::get<0>(GetParam());
   double dt                 = std::tr1::get<1>(GetParam());
   int modelCount            = std::tr1::get<2>(GetParam());
-  bool nonlinear            = std::tr1::get<3>(GetParam());
+  bool collision            = std::tr1::get<3>(GetParam());
+  bool nonlinear            = std::tr1::get<4>(GetParam());
   gzdbg << physicsEngine
         << ", dt: " << dt
         << ", modelCount: " << modelCount
+        << ", collision: " << collision
         << ", nonlinear: " << nonlinear
         << std::endl;
   RecordProperty("engine", physicsEngine);
   this->Record("dt", dt);
   RecordProperty("modelCount", modelCount);
-  RecordProperty("nonlienar", nonlinear);
+  RecordProperty("collision", collision);
+  RecordProperty("nonlinear", nonlinear);
   Boxes(physicsEngine
       , dt
       , modelCount
+      , collision
       , nonlinear
       );
 }
@@ -257,6 +271,7 @@ INSTANTIATE_TEST_CASE_P(EnginesDtLinear, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
   , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
   , ::testing::Values(1)
+  , ::testing::Values(true)
   , ::testing::Values(false)
   ));
 
@@ -264,6 +279,7 @@ INSTANTIATE_TEST_CASE_P(EnginesDtNonlinear, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
   , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
   , ::testing::Values(1)
+  , ::testing::Values(true)
   , ::testing::Values(true)
   ));
 
@@ -274,6 +290,7 @@ INSTANTIATE_TEST_CASE_P(OdeBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("ode")
   , ::testing::Values(3.0e-4)
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
+  , ::testing::Bool()
   , ::testing::Values(true)
   ));
 
@@ -281,6 +298,7 @@ INSTANTIATE_TEST_CASE_P(BulletBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("bullet")
   , ::testing::Values(3.0e-4)
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
+  , ::testing::Bool()
   , ::testing::Values(true)
   ));
 
@@ -288,6 +306,7 @@ INSTANTIATE_TEST_CASE_P(SimbodyBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("simbody")
   , ::testing::Values(7.0e-4)
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
+  , ::testing::Bool()
   , ::testing::Values(true)
   ));
 
@@ -295,6 +314,7 @@ INSTANTIATE_TEST_CASE_P(DartBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("dart")
   , ::testing::Values(7.0e-4)
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
+  , ::testing::Bool()
   , ::testing::Values(true)
   ));
 
