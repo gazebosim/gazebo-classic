@@ -102,7 +102,18 @@ namespace gazebo
 
       /// \brief Store the value of the stepTime parameter to improve efficiency
       //private: double stepTimeDouble;
-      
+
+      /// \brief virtual callback for gztopic "~/request".
+      /// \param[in] _msg Request message.
+      protected: virtual void OnRequest(ConstRequestPtr &_msg);
+
+      /// \brief virtual callback for gztopic "~/physics".
+      /// \param[in] _msg Physics message.
+      protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);
+
+      /// \brief
+      public: rtql8::simulation::World* GetRTQL8World() {return rtql8World;}
+
       /// \brief 
       private: rtql8::simulation::World* rtql8World;
       

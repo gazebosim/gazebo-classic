@@ -15,6 +15,9 @@
  *
 */
 
+#include "gazebo/physics/World.hh"
+
+#include "gazebo/physics/rtql8/RTQL8Physics.hh"
 #include "gazebo/physics/rtql8/RTQL8Model.hh"
 
 using namespace gazebo;
@@ -37,12 +40,24 @@ RTQL8Model::~RTQL8Model()
 //////////////////////////////////////////////////
 void RTQL8Model::Load(sdf::ElementPtr _sdf)
 {
-  Model::Load(_sdf);
-
   if (rtql8SkeletonDynamics)
     delete rtql8SkeletonDynamics;
 
   rtql8SkeletonDynamics = new rtql8::dynamics::SkeletonDynamics();
+
+  // add skeleton to world
+  //boost::shared_dynamic_cast<RTQL8World>(this->world);
+  // TODO: How to access to rtql8's world in here?
+  RTQL8PhysicsPtr rtql8Physics =
+      boost::shared_dynamic_cast<RTQL8Physics>(this->GetWorld()->GetPhysicsEngine());
+
+  rtql8Physics->GetRTQL8World()->addSkeleton(rtql8SkeletonDynamics);
+
+  Model::Load(_sdf);
+
+  // TODO:
+  // This should be set by sdf.
+  rtql8SkeletonDynamics->setImmobileState(false);
 }
 
 //////////////////////////////////////////////////

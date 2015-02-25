@@ -19,6 +19,8 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
 
+#include "gazebo/transport/Publisher.hh"
+
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/World.hh"
@@ -46,7 +48,6 @@
 
 #include "gazebo/physics/rtql8/RTQL8Model.hh"
 #include "gazebo/physics/rtql8/RTQL8Link.hh"
-
 
 #include "RTQL8Physics.hh"
 
@@ -144,21 +145,43 @@ void RTQL8Physics::UpdatePhysics()
 {
   {
     // need to lock, otherwise might conflict with world resetting
-    this->physicsUpdateMutex->lock();
+    boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
+    //this->physicsUpdateMutex->lock();
 
     //common::Time currTime =  this->world->GetRealTime();
     //this->rtql8World->updatePhysics();
+    this->rtql8World->updateKinematics();
     //this->lastUpdateTime = currTime;
 
-    this->physicsUpdateMutex->unlock();
+    // Update all the transformation of RTQL8's links to gazebo's links
+    // TODO: How to visit all the links in the world?
+    unsigned int modelCount = this->world->GetModelCount();
+    ModelPtr modelItr;
+
+    for (int i = 0; i < modelCount; ++i)
+    {
+      modelItr = this->world->GetModel(i);
+      // TODO: need to improve speed
+      Link_V links = modelItr->GetLinks();
+      unsigned int linkCound = links.size();
+      RTQL8LinkPtr rtql8LinkItr;
+
+      for (int j = 0; j < linkCound; ++j)
+      {
+        rtql8LinkItr
+            = boost::shared_dynamic_cast<RTQL8Link>(links.at(j));
+        rtql8LinkItr->updateDirtyPoseFromRTQL8Transformation();
+      }
+    }
+    //this->physicsUpdateMutex->unlock();
   }
 }
 
 //////////////////////////////////////////////////
 void RTQL8Physics::SetStepTime(double _value)
 {
-   this->sdf->GetElement("rtql8")->GetElement(
-       "solver")->GetAttribute("dt")->Set(_value);
+//   this->sdf->GetElement("rtql8")->GetElement(
+//       "solver")->GetAttribute("dt")->Set(_value);
 
    this->rtql8World->setTimeStep(_value);
 }
@@ -322,4 +345,88 @@ void RTQL8Physics::DebugPrint() const
 //   }
 }
 
+void RTQL8Physics::OnRequest(ConstRequestPtr &_msg)
+{
+  msgs::Response response;
+  response.set_id(_msg->id());
+  response.set_request(_msg->request());
+  response.set_response("success");
+  std::string *serializedData = response.mutable_serialized_data();
+
+  if (_msg->request() == "physics_info")
+  {
+    msgs::Physics physicsMsg;
+//    physicsMsg.set_type(msgs::Physics::RTQL8);
+//    physicsMsg.set_update_rate(this->GetUpdateRate());
+//    physicsMsg.set_solver_type(this->stepType);
+//    physicsMsg.set_dt(this->stepTimeDouble);
+//    physicsMsg.set_iters(this->GetSORPGSIters());
+    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
+//    physicsMsg.set_sor(this->GetSORPGSW());
+//    physicsMsg.set_cfm(this->GetWorldCFM());
+//    physicsMsg.set_erp(this->GetWorldERP());
+//    physicsMsg.set_contact_max_correcting_vel(
+//        this->GetContactMaxCorrectingVel());
+//    physicsMsg.set_contact_surface_layer(this->GetContactSurfaceLayer());
+//    physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+
+//    response.set_type(physicsMsg.GetTypeName());
+    physicsMsg.SerializeToString(serializedData);
+    this->responsePub->Publish(response);
+  }
+}
+
+void RTQL8Physics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
+{
+//  if (_msg->has_dt())
+//  {
+//    this->SetStepTime(_msg->dt());
+//  }
+
+//  if (_msg->has_update_rate())
+//    this->SetUpdateRate(_msg->update_rate());
+
+//  if (_msg->has_solver_type())
+//  {
+//    sdf::ElementPtr solverElem =
+//      this->sdf->GetElement("ode")->GetElement("solver");
+//    if (_msg->solver_type() == "quick")
+//    {
+//      solverElem->GetAttribute("type")->Set("quick");
+//      this->physicsStepFunc = &dWorldQuickStep;
+//    }
+//    else if (_msg->solver_type() == "world")
+//    {
+//      solverElem->GetAttribute("type")->Set("world");
+//      this->physicsStepFunc = &dWorldStep;
+//    }
+//  }
+
+//  if (_msg->has_iters())
+//    this->SetSORPGSIters(_msg->iters());
+
+//  if (_msg->has_sor())
+//    this->SetSORPGSW(_msg->sor());
+
+//  if (_msg->has_cfm())
+//    this->SetWorldCFM(_msg->cfm());
+
+//  if (_msg->has_erp())
+//    this->SetWorldERP(_msg->erp());
+
+//  if (_msg->has_enable_physics())
+//    this->world->EnablePhysicsEngine(_msg->enable_physics());
+
+//  if (_msg->has_contact_max_correcting_vel())
+//    this->SetContactMaxCorrectingVel(_msg->contact_max_correcting_vel());
+
+//  if (_msg->has_contact_surface_layer())
+//    this->SetContactSurfaceLayer(_msg->contact_surface_layer());
+
+//  if (_msg->has_gravity())
+//    this->SetGravity(msgs::Convert(_msg->gravity()));
+
+  /// Make sure all models get at least on update cycle.
+  this->world->EnableAllModels();
+}
 

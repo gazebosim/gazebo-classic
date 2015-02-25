@@ -137,6 +137,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetAutoDisable(bool _disable);
 
+      // TODO: (in test)
+      public: void updateDirtyPoseFromRTQL8Transformation();
+
       /// \brief
       public: rtql8::kinematics::BodyNode* GetBodyNode() const {return rtql8BodyNode;}
 
