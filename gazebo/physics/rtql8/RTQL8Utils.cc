@@ -31,7 +31,7 @@ void RTQL8Utils::ConvPoseToMat(Eigen::Matrix4d* _mat, const math::Pose& _pose)
 {
   assert(_mat);
 
-  _mat->setZero();
+  _mat->setIdentity();
 
   Eigen::Quaterniond quat(_pose.rot.w, _pose.rot.x,
                           _pose.rot.y, _pose.rot.z);
@@ -41,7 +41,7 @@ void RTQL8Utils::ConvPoseToMat(Eigen::Matrix4d* _mat, const math::Pose& _pose)
   (*_mat)(1, 3) = _pose.pos.y;
   (*_mat)(2, 3) = _pose.pos.z;
 
-  (*_mat)(3, 3) = 1.0;
+  //(*_mat)(3, 3) = 1.0;
 }
 
 //////////////////////////////////////////////////
@@ -53,7 +53,7 @@ void RTQL8Utils::ConvMatToPose(math::Pose* _pose, const Eigen::Matrix4d& _mat)
   _pose->pos.Set(_mat(0,3), _mat(1,3), _mat(2,3));
 
   // Set rotation
-  Eigen::Matrix3d mat3x3 = _mat.topLeftCorner(3,3);
+  Eigen::Matrix3d mat3x3 = _mat.topLeftCorner<3,3>();
   Eigen::Quaterniond quat = rtql8::utils::rotation::matrixToQuat(mat3x3);
   _pose->rot.Set(quat.w(), quat.x(), quat.y(), quat.z());
 }
@@ -91,15 +91,17 @@ rtql8::kinematics::TrfmRotateQuat* RTQL8Utils::createTrfmRotateQuat(
 void RTQL8Utils::addTransformToRTQL8Joint(rtql8::kinematics::Joint* _rtl8Joint,
                                           const math::Pose& _pose)
 {
+  rtql8::kinematics::TrfmTranslate* trfmTrans
+      = RTQL8Utils::createTrfmTranslate(_pose.pos);
+
+  _rtl8Joint->addTransform(trfmTrans, false);
+
   rtql8::kinematics::TrfmRotateQuat* trfmRot
       = RTQL8Utils::createTrfmRotateQuat(_pose.rot);
 
   _rtl8Joint->addTransform(trfmRot, false);
 
-  rtql8::kinematics::TrfmTranslate* trfmTrans
-      = RTQL8Utils::createTrfmTranslate(_pose.pos);
 
-  _rtl8Joint->addTransform(trfmTrans, false);
 }
 
 //////////////////////////////////////////////////

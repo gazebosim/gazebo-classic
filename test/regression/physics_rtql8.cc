@@ -52,8 +52,9 @@ void PhysicsTest::EmptyWorld_JS(std::string _worldFile)
 #ifdef HAVE_RTQL8
 TEST_F(PhysicsTest, RTQL8_FIRST_TEST)
 {
-  EmptyWorld_JS("worlds/empty.world");
-  //EmptyWorld_JS("worlds/rtql8/simple_pendulum.world");
+  //EmptyWorld_JS("worlds/empty.world");
+  EmptyWorld_JS("worlds/rtql8/simple_pendulum2.world");
+  //EmptyWorld_JS("worlds/rtql8/sp_test.world");
 }
 #endif // HAVE_RTQL8
 
