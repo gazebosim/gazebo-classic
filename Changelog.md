@@ -13,7 +13,7 @@
 1. Added Gazebo/CoM material.
     * [Pull request #1439](https://bitbucket.org/osrf/gazebo/pull-request/1439)
 
-1. Added arc parameter to MeshManager::CreateTube 
+1. Added arc parameter to MeshManager::CreateTube
     * [Pull request #1436](https://bitbucket.org/osrf/gazebo/pull-request/1436)
 
 1. Added View Inertia and InertiaVisual, changed COMVisual to sphere proportional to mass.
@@ -258,6 +258,9 @@
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
+
+1. Fixed heightmap on OSX
+    * [Pull request #1455](https://bitbucket.org/osrf/gazebo/pull-request/1455)
 
 ### Gazebo 4.1.0 (2014-11-20)
 
