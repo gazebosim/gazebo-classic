@@ -86,7 +86,12 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   params["parentWindowHandle"] = _ogreHandle;
 #endif
   params["externalGLControl"] = true;
-  params["FSAA"] = "4";
+
+  if (_width > 1 && _height > 1)
+  {
+    params["FSAA"] = "4";
+    params["stereoMode"] = "Frame Sequential";
+  }
 
   // Set the macAPI for Ogre based on the Qt implementation
 #ifdef QT_MAC_USE_COCOA

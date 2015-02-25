@@ -50,6 +50,9 @@ namespace gazebo
       /// \param[in] _sdf Parameters for the camera.
       public: void Load(sdf::ElementPtr _sdf);
 
+      // Documentation inherited
+      public: virtual void SetClipDist(float _near, float _far);
+
       /// \brief Generic load function
       public: void Load();
 
