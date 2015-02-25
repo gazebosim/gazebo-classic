@@ -120,11 +120,18 @@ namespace gazebo
                              const math::Vector3 &_sides,
                              const math::Vector2d &_uvCoords);
 
-      /// \brief Create an extruded mesh from polylines
+      /// \brief Create an extruded mesh from polylines. The polylines are
+      /// assumed to be closed and non-intersecting. Delaunay triangulation is
+      /// applied to create the resulting mesh. If there is more than one
+      /// polyline, a ray casting algorithm will be used to identify the
+      /// exterior/interior edges and remove holes from the 2D shape before
+      /// extrusion.
       /// \param[in] _name the name of the new mesh
-      /// \param[in] _vertices the x y  dimentions of eah vertex in meter
+      /// \param[in] _vertices A multidimensional vector of polylines and their
+      /// vertices. Each element in the outer vector consists of a vector of
+      /// vertices that describe one polyline.
+      /// edges and remove the holes in the shape.
       /// \param[in] _height the height of extrusion
-      /// \param[in] _uvCoords the texture coordinates
       public: void CreateExtrudedPolyline(const std::string &_name,
                   const std::vector<std::vector<math::Vector2d> > &_vertices,
                   double _height);
