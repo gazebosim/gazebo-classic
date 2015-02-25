@@ -1342,16 +1342,7 @@ void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
   if (_msg->has_force())
   {
     math::Vector3 force = msgs::Convert(_msg->force());
-
-    // rotate force to relative position, because we don't have an
-    // AddRelativeForceAtRelativePosition
-    force = this->GetWorldPose().rot.RotateVector(force);
-
-    // AddForceAtRelativePosition seems to be relative to the CoM
-    // (only ODE tested), so we translate it to the link origin
-   pos = pos - this->inertial->GetCoG();
-
-    this->AddForceAtRelativePosition(force, pos);
+    this->AddLinkForce(force, pos);
   }
   if (_msg->has_torque())
   {
