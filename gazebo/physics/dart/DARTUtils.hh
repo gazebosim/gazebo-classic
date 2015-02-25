@@ -55,9 +55,9 @@ namespace gazebo
           const math::Pose& _pose);
 
       /// \brief Add 6dof joint for free floating body.
-      public: static void Add6DOFToDARTJoint(
-          kinematics::Joint* _dartJoint,
-          const math::Pose& _initialPose);
+//      public: static void Add6DOFToDARTJoint(
+//          kinematics::Joint* _dartJoint,
+//          const math::Pose& _initialPose);
     };
     /// \}
   }

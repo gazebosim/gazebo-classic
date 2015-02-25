@@ -35,7 +35,7 @@ void DARTUtils::ConvPoseToMat(Eigen::Matrix4d* _mat, const math::Pose& _pose)
 
   Eigen::Quaterniond quat(_pose.rot.w, _pose.rot.x,
                           _pose.rot.y, _pose.rot.z);
-  _mat->topLeftCorner<3, 3>() = dart_math::quatToMatrix(quat);
+  _mat->topLeftCorner<3,3>() = dart_math::quatToMatrix(quat);
 
   (*_mat)(0, 3) = _pose.pos.x;
   (*_mat)(1, 3) = _pose.pos.y;
@@ -105,10 +105,10 @@ void DARTUtils::AddTransformToDARTJoint(kinematics::Joint* _rtl8Joint,
 }
 
 //////////////////////////////////////////////////
-void DARTUtils::Add6DOFToDARTJoint(kinematics::Joint* /*_dartJoint*/,
-                                     const math::Pose& /*_initialPose*/)
-{
-}
+//void DARTUtils::Add6DOFToDARTJoint(kinematics::Joint* /*_dartJoint*/,
+//                                     const math::Pose& /*_initialPose*/)
+//{
+//}
 
 
 
