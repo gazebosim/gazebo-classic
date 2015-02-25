@@ -37,6 +37,8 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
 
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -440,12 +442,14 @@ void MainWindow::Save()
     msg.ParseFromString(response->serialized_data());
 
     // Parse the string into sdf, so that we can insert user camera settings.
-    sdf::SDF sdf_parsed;
-    sdf_parsed.SetFromString(msg.data());
+    // Also, remove all the lights from the parsed sdf and insert lights from
+    // the current Scene.
+    sdf::SDF sdfParsed;
+    sdfParsed.SetFromString(msg.data());
     // Check that sdf contains world
-    if (sdf_parsed.root->HasElement("world"))
+    if (sdfParsed.root->HasElement("world"))
     {
-      sdf::ElementPtr world = sdf_parsed.root->GetElement("world");
+      sdf::ElementPtr world = sdfParsed.root->GetElement("world");
       sdf::ElementPtr guiElem = world->GetElement("gui");
 
       if (guiElem->HasAttribute("fullscreen"))
@@ -458,7 +462,30 @@ void MainWindow::Save()
       cameraElem->GetElement("view_controller")->Set(
           cam->GetViewControllerTypeString());
       // TODO: export track_visual properties as well.
-      msgData = sdf_parsed.root->ToString("");
+
+      // Remove lights from parsed sdf
+      sdf::ElementPtr current, next;
+      next = world->GetElement("light");
+      while (next)
+      {
+        next->RemoveFromParent();
+        next = world->GetElement("light");
+      }
+
+      // Get lights from current scene.
+      rendering::ScenePtr scene = cam->GetScene();
+      uint32_t i;
+      rendering::LightPtr light;
+      for (i = 0; i < scene->GetLightCount(); i++)
+      {
+        sdf::ElementPtr elem;
+        light = scene->GetLight(i);
+        // Clone light sdf and insert into world
+        elem = light->CloneSDF();
+        world->InsertElement(elem);
+      }
+
+      msgData = sdfParsed.root->ToString("");
     }
     else
     {
