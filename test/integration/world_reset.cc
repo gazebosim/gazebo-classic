@@ -17,14 +17,14 @@
 #include <string.h>
 
 #include "gazebo/physics/physics.hh"
-#include "ServerFixture.hh"
+#include "test/PhysicsFixture.hh"
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
 
 typedef std::tr1::tuple<const char *, const char *, int> string2_int;
 
-class WorldResetTest : public ServerFixture,
+class WorldResetTest : public PhysicsFixture,
                        public ::testing::WithParamInterface<string2_int>
 {
   public: void WorldName(const std::string &_physicsEngine,
@@ -42,13 +42,7 @@ void WorldResetTest::WorldName(const std::string &_physicsEngine,
     return;
   }
 
-  Load(_world, true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld(_world, true, _physicsEngine);
 
   double dt = physics->GetMaxStepSize();
   unsigned int steps = 250;

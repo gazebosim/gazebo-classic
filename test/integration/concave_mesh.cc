@@ -15,14 +15,14 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "test/PhysicsFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
 
-class ConcaveMeshTest : public ServerFixture,
+class ConcaveMeshTest : public PhysicsFixture,
                         public testing::WithParamInterface<const char*>
 {
   public: void RayTest(const std::string &_physicsEngine);
@@ -33,9 +33,8 @@ class ConcaveMeshTest : public ServerFixture,
 /////////////////////////////////////////////////
 void ConcaveMeshTest::SubmeshNoCollisionTest(const std::string &_physicsEngine)
 {
-  Load("worlds/concave_submesh_no_collision_test.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  LoadWorld("worlds/concave_submesh_no_collision_test.world",
+            true, _physicsEngine);
 
   world->Step(100);
 
@@ -52,9 +51,8 @@ void ConcaveMeshTest::SubmeshNoCollisionTest(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void ConcaveMeshTest::SubmeshCollisionTest(const std::string &_physicsEngine)
 {
-  Load("worlds/concave_submesh_collision_test.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  LoadWorld("worlds/concave_submesh_collision_test.world",
+            true, _physicsEngine);
 
   world->Step(100);
 
@@ -88,9 +86,7 @@ void ConcaveMeshTest::SubmeshCollisionTest(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void ConcaveMeshTest::RayTest(const std::string &_physicsEngine)
 {
-  Load("worlds/concave_mesh_test.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  LoadWorld("worlds/concave_mesh_test.world", true, _physicsEngine);
 
   world->Step(100);
 

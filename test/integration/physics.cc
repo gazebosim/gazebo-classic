@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "ServerFixture.hh"
+#include "test/PhysicsFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -28,7 +28,7 @@
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
 
-class PhysicsTest : public ServerFixture,
+class PhysicsTest : public PhysicsFixture,
                     public testing::WithParamInterface<const char*>
 {
   public: void InelasticCollision(const std::string &_physicsEngine);
@@ -49,14 +49,7 @@ class PhysicsTest : public ServerFixture,
 void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
 {
   // Load an empty world
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   // simulate 1 step
   world->Step(1);
@@ -87,14 +80,9 @@ TEST_P(PhysicsTest, EmptyWorld)
 void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 {
   // load an empty world
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
   // Assume gravity vector points down z axis only.
   EXPECT_EQ(g.x, 0);
@@ -361,14 +349,9 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   }
 
   // load an empty world
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
   // Assume gravity vector points down z axis only.
   EXPECT_EQ(g.x, 0);
@@ -624,9 +607,7 @@ TEST_P(PhysicsTest, SpawnDropCoGOffset)
 // TEST_F(PhysicsTest, State)
 // {
   /*
-  Load("worlds/empty.world");
-  physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  LoadWorld("worlds/empty.world");
 
   physics::WorldState worldState = world->GetState();
   physics::ModelState modelState = worldState.GetModelState(0);
@@ -642,9 +623,7 @@ TEST_P(PhysicsTest, SpawnDropCoGOffset)
   EXPECT_EQ(pose, collisionState.GetPose());
 
   Unload();
-  Load("worlds/shapes.world");
-  world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  LoadWorld("worlds/shapes.world");
   worldState = world->GetState();
 
   for (unsigned int i = 0; i < worldState.GetModelStateCount(); ++i)
@@ -687,9 +666,7 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 {
   // Random seed is set to prevent brittle failures (gazebo issue #479)
   math::Rand::SetSeed(18420503);
-  Load("worlds/damp_test.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  LoadWorld("worlds/damp_test.world", true, _physicsEngine);
 
   int i = 0;
   while (!this->HasEntity("model_4_mass_1_ixx_1_damping_10") && i < 20)
@@ -757,9 +734,7 @@ TEST_P(PhysicsTest, JointDampingTest)
 ////////////////////////////////////////////////////////////////////////
 void PhysicsTest::DropStuff(const std::string &_physicsEngine)
 {
-  Load("worlds/drop_test.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  LoadWorld("worlds/drop_test.world", true, _physicsEngine);
 
   int i = 0;
   while (!this->HasEntity("cylinder") && i < 20)
@@ -912,9 +887,7 @@ TEST_F(PhysicsTest, DropStuffDART)
 void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
 {
   // check conservation of mementum for linear inelastic collision
-  Load("worlds/collision_test.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  LoadWorld("worlds/collision_test.world", true, _physicsEngine);
 
   int i = 0;
   while (!this->HasEntity("sphere") && i < 20)
@@ -929,7 +902,7 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
   {
     // todo: get parameters from drop_test.world
     double test_duration = 1.1;
-    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+    double dt = physics->GetMaxStepSize();
 
     physics::ModelPtr box_model = world->GetModel("box");
     physics::LinkPtr box_link = box_model->GetLink("link");
@@ -1054,13 +1027,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
     return;
   }
 
-  Load("worlds/sphere_atlas_demo.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/sphere_atlas_demo.world", true, _physicsEngine);
 
   physics->SetGravity(math::Vector3(0, 0, 0));
 
@@ -1238,9 +1205,7 @@ TEST_P(PhysicsTest, SphereAtlasLargeError)
 void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
 {
   // load an empty world
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   std::stringstream newModelStr;
 
@@ -1343,10 +1308,7 @@ TEST_P(PhysicsTest, CollisionFiltering)
 TEST_F(PhysicsTest, ZeroMaxContactsODE)
 {
   // Load an empty world
-  Load("worlds/zero_max_contacts.world");
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
+  LoadWorld("worlds/zero_max_contacts.world", false, "ode");
   physics::ModelPtr model = world->GetModel("ground_plane");
   ASSERT_TRUE(model != NULL);
 }

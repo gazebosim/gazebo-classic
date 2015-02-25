@@ -23,12 +23,12 @@
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/CameraSensor.hh"
-#include "ServerFixture.hh"
+#include "test/PhysicsFixture.hh"
 #include "images_cmp.h"
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
-class FactoryTest : public ServerFixture,
+class FactoryTest : public PhysicsFixture,
                     public testing::WithParamInterface<const char*>
 {
   public: void BoxSdf(const std::string &_physicsEngine);
@@ -46,9 +46,7 @@ class FactoryTest : public ServerFixture,
 void FactoryTest::BoxSdf(const std::string &_physicsEngine)
 {
   math::Pose setPose, testPose;
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   unsigned int entityCount = 6;
 

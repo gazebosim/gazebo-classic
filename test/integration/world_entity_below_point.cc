@@ -18,11 +18,11 @@
 #include <gtest/gtest.h>
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/common/Time.hh"
-#include "test/ServerFixture.hh"
+#include "test/PhysicsFixture.hh"
 #include "test/integration/helper_physics_generator.hh"
 
 using namespace gazebo;
-class WorldTest : public ServerFixture,
+class WorldTest : public PhysicsFixture,
                   public testing::WithParamInterface<const char*>
 {
   /// \brief Test World::GetEntityBelowPoint
@@ -34,9 +34,7 @@ class WorldTest : public ServerFixture,
 void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
 {
   // Load in a world with lasers
-  Load("worlds/shapes.world", false, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  LoadWorld("worlds/shapes.world", false, _physicsEngine);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("box");

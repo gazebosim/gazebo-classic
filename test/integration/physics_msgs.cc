@@ -19,13 +19,13 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
-#include "ServerFixture.hh"
+#include "test/PhysicsFixture.hh"
 #include "helper_physics_generator.hh"
 
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
 
-class PhysicsMsgsTest : public ServerFixture,
+class PhysicsMsgsTest : public PhysicsFixture,
                         public testing::WithParamInterface<const char*>
 {
   public: void MoveTool(const std::string &_physicsEngine);
@@ -38,14 +38,9 @@ class PhysicsMsgsTest : public ServerFixture,
 /////////////////////////////////////////////////
 void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
 {
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
 
   // Assume gravity vector points down z axis only.
@@ -91,14 +86,9 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
 {
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   // set gravity to zero
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
   physics->SetGravity(math::Vector3::Zero);
 
   // spawn a box
@@ -169,13 +159,7 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
     return;
   }
 
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   // spawn a box
   std::string name = "test_box";
@@ -305,14 +289,9 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
 {
-  Load("worlds/multilink_shape.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  LoadWorld("worlds/multilink_shape.world", true, _physicsEngine);
 
   // set gravity to zero
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
   physics->SetGravity(math::Vector3::Zero);
 
   // advertise on "~/model/modify"
@@ -392,14 +371,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   }
 
   // load an empty world
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
   // Assume gravity vector points down z axis only.
   EXPECT_EQ(g.x, 0);

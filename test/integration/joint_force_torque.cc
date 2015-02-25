@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Joint.hh"
-#include "test/ServerFixture.hh"
+#include "test/PhysicsFixture.hh"
 #include "test/integration/helper_physics_generator.hh"
 
 #define TOL 1e-6
@@ -26,7 +26,7 @@
 
 using namespace gazebo;
 
-class JointForceTorqueTest : public ServerFixture,
+class JointForceTorqueTest : public PhysicsFixture,
                              public testing::WithParamInterface<const char*>
 {
   /// \brief Load example world with a few joints
@@ -59,16 +59,7 @@ class JointForceTorqueTest : public ServerFixture,
 void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
 {
   // Load our force torque test world
-  Load("worlds/force_torque_test.world", true, _physicsEngine);
-
-  // Get a pointer to the world, make sure world loads
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/force_torque_test.world", true, _physicsEngine);
 
   physics->SetGravity(math::Vector3(0, 0, -50));
 
@@ -168,16 +159,7 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
 void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
 {
   // Load our force torque test world
-  Load("worlds/force_torque_test.world", true, _physicsEngine);
-
-  // Get a pointer to the world, make sure world loads
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/force_torque_test.world", true, _physicsEngine);
 
   physics->SetGravity(math::Vector3(0, 0, -50));
 
@@ -322,16 +304,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
   }
 
   // Load our force torque test world
-  Load("worlds/force_torque_test2.world", true, _physicsEngine);
-
-  // Get a pointer to the world, make sure world loads
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/force_torque_test2.world", true, _physicsEngine);
 
   physics->SetGravity(math::Vector3(0, 0, -50));
 
@@ -442,16 +415,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
 void JointForceTorqueTest::JointTorqueTest(const std::string &_physicsEngine)
 {
   // Load our inertial test world
-  Load("worlds/joint_test.world", true, _physicsEngine);
-
-  // Get a pointer to the world, make sure world loads
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/joint_test.world", true, _physicsEngine);
 
   {
     // get model
