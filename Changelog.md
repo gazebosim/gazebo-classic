@@ -259,9 +259,6 @@
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
 
-1. Fixed heightmap on OSX
-    * [Pull request #1455](https://bitbucket.org/osrf/gazebo/pull-request/1455)
-
 ### Gazebo 4.1.0 (2014-11-20)
 
 1. Add ArrangePlugin for arranging groups of models.
