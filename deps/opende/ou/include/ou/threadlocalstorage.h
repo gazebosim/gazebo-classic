@@ -42,7 +42,6 @@
 #else // #if _OU_TARGET_OS != _OU_TARGET_OS_WINDOWS
 
 #include <pthread.h>
-#include <gazebo/util/system.hh>
 
 
 #endif // #if _OU_TARGET_OS == ...
@@ -156,7 +155,7 @@ private:
 //////////////////////////////////////////////////////////////////////////
 // API declaration
 
-class GAZEBO_VISIBLE CThreadLocalStorage
+class CThreadLocalStorage
 {
 public: // Safe methods
 	/*
@@ -261,7 +260,7 @@ private:
 //////////////////////////////////////////////////////////////////////////
 // Initialization/finalization
 
-class GAZEBO_VISIBLE CTLSInitialization
+class CTLSInitialization
 {
 public:
 	enum EINITIALIZATIONFLAGS

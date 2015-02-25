@@ -34,14 +34,13 @@
 #include <ou/namespace.h>
 
 #include <stddef.h>
-#include <gazebo/util/system.hh>
 
 
 BEGIN_NAMESPACE_OU()
 
 
 template<typename ContainerType>
-class GAZEBO_VISIBLE CSimpleFlagsTemplate
+class CSimpleFlagsTemplate
 {
 public:
 	_OU_INLINE _OU_CONVENTION_METHOD CSimpleFlagsTemplate():

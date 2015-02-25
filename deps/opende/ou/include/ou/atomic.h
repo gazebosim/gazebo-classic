@@ -98,8 +98,6 @@
 #include <ou/namespace.h>
 #include <ou/platform.h>
 
-#include <gazebo/util/system.hh>
-
 
 /**
  *	\typedef atomicord32

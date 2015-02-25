@@ -33,7 +33,6 @@
 #include <ou/platform.h>
 
 #include <stddef.h>
-#include <gazebo/util/system.hh>
 
 
 BEGIN_NAMESPACE_OU()
@@ -78,7 +77,7 @@ typedef void (_OU_CONVENTION_CALLBACK *CAssertionFailedProcedure)(EASSERTIONFAIL
 	const char *szAssertionExpression, const char *szAssertionFileName, unsigned int uiAssertionSourceLine);
 
 
-class GAZEBO_VISIBLE CAssertionCheckCustomization
+class CAssertionCheckCustomization
 {
 public:
 	static _OU_ALWAYSINLINE_PRE CAssertionFailedProcedure _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
@@ -108,7 +107,7 @@ typedef void *(_OU_CONVENTION_CALLBACK *CMemoryReallocationProcedure)(void *pv_E
 typedef void (_OU_CONVENTION_CALLBACK *CMemoryDeallocationProcedure)(void *pv_ExistingBlock);
 
 
-class GAZEBO_VISIBLE CMemoryManagerCustomization
+class CMemoryManagerCustomization
 {
 public:
 	static _OU_ALWAYSINLINE_PRE CMemoryAllocationProcedure _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
