@@ -108,6 +108,15 @@ namespace gazebo
       /// \brief Initial value of joint axis, expressed as unit vector
       ///        in world frame.
       private: math::Vector3 initialWorldAxis;
+
+      // Documentation inherited.
+      public: virtual bool SetParam(const std::string &_key,
+                                        unsigned int _index,
+                                        const boost::any &_value);
+
+      // Documentation inherited.
+      public: virtual double GetParam(const std::string &_key,
+                                          unsigned int _index);
     };
 
   /// \}
