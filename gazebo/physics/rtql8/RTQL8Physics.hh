@@ -15,27 +15,26 @@
  *
 */
 
-#ifndef _RTQL8PHYSICS_HH
-#define _RTQL8PHYSICS_HH
+#ifndef _RTQL8PHYSICS_HH_
+#define _RTQL8PHYSICS_HH_
 
 #include <string>
 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "physics/rtql8/rtql8_inc.h"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Shape.hh"
 
-#include "physics/PhysicsEngine.hh"
-#include "physics/Collision.hh"
-#include "physics/Shape.hh"
+#include "gazebo/physics/rtql8/rtql8_inc.h"
+#include "gazebo/physics/rtql8/RTQL8Types.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    class Entity;
-    class XMLConfigNode;
-    class Mass;
+    //class Entity;
 
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_rtql8 RTQL8 Physics
@@ -77,23 +76,23 @@ namespace gazebo
       /// \brief Get the simulation step time
       public: virtual double GetStepTime();
 
-      /// \brief Create a new model (js: in test)
-      //public: virtual ModelPtr CreateModel(ModelPtr _parent);
+      /// \brief Create a new model
+      public: virtual ModelPtr CreateModel(BasePtr _parent);
       
       /// \brief Create a new body
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
       /// \brief Create a new collision
       public: virtual CollisionPtr CreateCollision(const std::string& _type,
-						    LinkPtr _body);
+                                                   LinkPtr _body);
 
       /// \brief Create a new joint
       public: virtual JointPtr CreateJoint(const std::string& _type,
-					    ModelPtr _parent);
+                                           ModelPtr _parent);
       
       /// \brief Create a new shape
       public: virtual ShapePtr CreateShape(const std::string& _shapeType,
-					    CollisionPtr _collision);
+                                           CollisionPtr _collision);
 
       /// \brief Set the gavity vector
       public: virtual void SetGravity(const gazebo::math::Vector3& gravity);
@@ -101,14 +100,11 @@ namespace gazebo
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const;
 
-      ///// \brief 
-      //private: common::Time lastUpdateTime;
- 
       /// \brief Store the value of the stepTime parameter to improve efficiency
-      private: double stepTimeDouble;
+      //private: double stepTimeDouble;
       
       /// \brief 
-      private: simulation::World* rtql8World;
+      private: rtql8::simulation::World* rtql8World;
       
     };
 

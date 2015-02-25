@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A screw or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
 #ifndef _RTQL8SCREWJOINT_HH_
 #define _RTQL8SCREWJOINT_HH_

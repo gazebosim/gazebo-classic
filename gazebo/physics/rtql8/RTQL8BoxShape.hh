@@ -42,18 +42,18 @@ namespace gazebo
       public: virtual ~RTQL8BoxShape() {}
 
       // Documentation inherited.
-      public: virtual void SetSize(const math::Vector3 &_size)
+      public: virtual void SetSize(const math::Vector3 & /*_size*/)
       {
-//         BoxShape::SetSize(_size);
+//      BoxShape::SetSize(_size);
 // 
-//         RTQL8CollisionPtr oParent;
-//         oParent = boost::shared_dynamic_cast<RTQL8Collision>(
-//             this->collisionParent);
+//      RTQL8CollisionPtr oParent;
+//      oParent = boost::shared_dynamic_cast<RTQL8Collision>(
+//          this->collisionParent);
 // 
-//         if (oParent->GetCollisionId() == NULL)
-//           oParent->SetCollision(dCreateBox(0, _size.x, _size.y, _size.z), true);
-//         else
-//           dGeomBoxSetLengths(oParent->GetCollisionId(),
+//      if (oParent->GetCollisionId() == NULL)
+//        oParent->SetCollision(dCreateBox(0, _size.x, _size.y, _size.z), true);
+//      else
+//        dGeomBoxSetLengths(oParent->GetCollisionId(),
 //                              _size.x, _size.y, _size.z);
       }
     };

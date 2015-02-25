@@ -1,11 +1,8 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-INCLUDE_DIRECTORIES(/usr/local/include)
-INCLUDE_DIRECTORIES(/usr/local/include/rtql8)
-INCLUDE_DIRECTORIES(/usr/local/include/eigen-3.1.2)
+include_directories(${RTQL8_INCLUDE_DIRS})
 
-LINK_DIRECTORIES(/usr/local/lib)
-SET(RTQL8_LIBRARIES collision dynamics geometry integration kinematics lcpsolver optimizer renderer utils yui simulation)
+link_directories(${RTQL8_LIBRARY_DIRS})
 
 set (sources
              RTQL8Physics.cc

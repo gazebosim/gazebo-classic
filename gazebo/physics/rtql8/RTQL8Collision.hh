@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Collision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
 
 #ifndef _RTQL8COLLISION_HH_
 #define _RTQL8COLLISION_HH_

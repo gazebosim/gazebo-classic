@@ -14,20 +14,16 @@
  * limitations under the License.
  *
  */
-/* Desc: RTQL8Collision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
 
 #include <sstream>
 
-#include "common/Console.hh"
-#include "math/Box.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/math/Box.hh"
 
-//#include "physics/SurfaceParams.hh"
-//#include "physics/rtql8/RTQL8Physics.hh"
-//#include "physics/rtql8/RTQL8Link.hh"
-#include "physics/rtql8/RTQL8Collision.hh"
+//#include "gazebo/physics/SurfaceParams.hh"
+//#include "gazebo/physics/rtql8/RTQL8Physics.hh"
+//#include "gazebo/physics/rtql8/RTQL8Link.hh"
+#include "gazebo/physics/rtql8/RTQL8Collision.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -50,7 +46,7 @@ RTQL8Collision::~RTQL8Collision()
 }
 
 //////////////////////////////////////////////////
-void RTQL8Collision::Load(sdf::ElementPtr _sdf)
+void RTQL8Collision::Load(sdf::ElementPtr /*_sdf*/)
 {
 //   Collision::Load(_sdf);
 // 
@@ -81,7 +77,7 @@ void RTQL8Collision::Fini()
 }
 
 //////////////////////////////////////////////////
-void RTQL8Collision::SetCollision(bool _placeable)
+void RTQL8Collision::SetCollision(bool /*_placeable*/)
 {
 //   // Must go first in this function
 //   this->collisionId = _collisionId;
@@ -122,7 +118,7 @@ void RTQL8Collision::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-void RTQL8Collision::SetCategoryBits(unsigned int _bits)
+void RTQL8Collision::SetCategoryBits(unsigned int /*_bits*/)
 {
 //   if (this->collisionId)
 //     dGeomSetCategoryBits(this->collisionId, _bits);
@@ -131,7 +127,7 @@ void RTQL8Collision::SetCategoryBits(unsigned int _bits)
 }
 
 //////////////////////////////////////////////////
-void RTQL8Collision::SetCollideBits(unsigned int _bits)
+void RTQL8Collision::SetCollideBits(unsigned int /*_bits*/)
 {
 //   if (this->collisionId)
 //     dGeomSetCollideBits(this->collisionId, _bits);

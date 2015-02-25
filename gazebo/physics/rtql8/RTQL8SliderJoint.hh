@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A slider or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
 #ifndef _RTQL8SLIDERJOINT_HH_
 #define _RTQL8SLIDERJOINT_HH_
@@ -69,14 +65,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual double GetMaxForce(int _index);
 
-      // Documentation inherited
-      public: virtual double GetParam(int _parameter) const;
-
-      // Documentation inherited
-      public: virtual void SetParam(int _parameter, double _value);
-
       /// \brief callback to apply damping force to joint
       public: void ApplyDamping();
+
     };
   }
 }

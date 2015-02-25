@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A universal joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
-*/
 
 #ifndef _RTQL8UNIVERSALJOINT_HH_
 #define _RTQL8UNIVERSALJOINT_HH_

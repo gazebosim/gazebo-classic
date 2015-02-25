@@ -14,17 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: A ray
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
 
-#include "physics/World.hh"
-#include "physics/Link.hh"
-#include "physics/rtql8/RTQL8Physics.hh"
-#include "physics/rtql8/RTQL8Types.hh"
-#include "physics/rtql8/RTQL8Collision.hh"
-#include "physics/rtql8/RTQL8RayShape.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/rtql8/RTQL8Physics.hh"
+#include "gazebo/physics/rtql8/RTQL8Types.hh"
+#include "gazebo/physics/rtql8/RTQL8Collision.hh"
+#include "gazebo/physics/rtql8/RTQL8RayShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -103,7 +99,7 @@ void RTQL8RayShape::Update()
 }
 
 //////////////////////////////////////////////////
-void RTQL8RayShape::GetIntersection(double &_dist, std::string &_entity)
+void RTQL8RayShape::GetIntersection(double &/*_dist*/, std::string &/*_entity*/)
 {
 //   if (this->physicsEngine)
 //   {
@@ -124,8 +120,8 @@ void RTQL8RayShape::GetIntersection(double &_dist, std::string &_entity)
 }
 
 //////////////////////////////////////////////////
-void RTQL8RayShape::SetPoints(const math::Vector3 &_posStart,
-                            const math::Vector3 &_posEnd)
+void RTQL8RayShape::SetPoints(const math::Vector3 &/*_posStart*/,
+                            const math::Vector3 &/*_posEnd*/)
 {
 //   math::Vector3 dir;
 //   RayShape::SetPoints(_posStart, _posEnd);

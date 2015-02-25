@@ -22,7 +22,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 RTQL8Model::RTQL8Model(BasePtr _parent)
-  : Model(_parent)
+  : Model(_parent), rtql8SkeletonDynamics(NULL)
 {
   
 }
@@ -30,7 +30,8 @@ RTQL8Model::RTQL8Model(BasePtr _parent)
 //////////////////////////////////////////////////
 RTQL8Model::~RTQL8Model()
 {
-  
+  if (rtql8SkeletonDynamics)
+    delete rtql8SkeletonDynamics;
 }
 
 //////////////////////////////////////////////////
@@ -38,6 +39,10 @@ void RTQL8Model::Load(sdf::ElementPtr _sdf)
 {
   Model::Load(_sdf);
 
+  if (rtql8SkeletonDynamics)
+    delete rtql8SkeletonDynamics;
+
+  rtql8SkeletonDynamics = new rtql8::dynamics::SkeletonDynamics();
 }
 
 //////////////////////////////////////////////////

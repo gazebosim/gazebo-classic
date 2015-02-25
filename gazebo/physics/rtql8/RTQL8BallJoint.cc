@@ -14,14 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: An ODE ball joint
- * Author: Nate Koenig
- * Date: k13 Oct 2009
- */
 
-#include "gazebo_config.h"
-#include "common/Console.hh"
-#include "physics/rtql8/RTQL8BallJoint.hh"
+#include "gazebo/gazebo_config.h"
+#include "gazebo/common/Console.hh"
+#include "gazebo/physics/rtql8/RTQL8BallJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -49,13 +45,13 @@ math::Vector3 RTQL8BallJoint::GetAnchor(int /*_index*/) const
 
 
 //////////////////////////////////////////////////
-void RTQL8BallJoint::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
+void RTQL8BallJoint::SetAnchor(int /*_index*/, const math::Vector3 &/*_anchor*/)
 {
   //dJointSetBallAnchor(jointId, _anchor.x, _anchor.y, _anchor.z);
 }
 
 //////////////////////////////////////////////////
-void RTQL8BallJoint::SetDamping(int /*_index*/, double _damping)
+void RTQL8BallJoint::SetDamping(int /*_index*/, double /*_damping*/)
 {
   //dJointSetDamping(this->jointId, _damping);
 }

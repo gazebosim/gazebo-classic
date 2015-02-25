@@ -14,10 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: A screw or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
 #include <boost/bind.hpp>
 
@@ -43,7 +39,7 @@ RTQL8ScrewJoint::~RTQL8ScrewJoint()
 }
 
 //////////////////////////////////////////////////
-void RTQL8ScrewJoint::Load(sdf::ElementPtr _sdf)
+void RTQL8ScrewJoint::Load(sdf::ElementPtr /*_sdf*/)
 {
 //   ScrewJoint<ODEJoint>::Load(_sdf);
 //   this->SetThreadPitch(0, this->threadPitch);
@@ -82,13 +78,13 @@ double RTQL8ScrewJoint::GetVelocity(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void RTQL8ScrewJoint::SetVelocity(int /*index*/, double _angle)
+void RTQL8ScrewJoint::SetVelocity(int /*index*/, double /*_angle*/)
 {
 //   this->SetParam(dParamVel, _angle);
 }
 
 //////////////////////////////////////////////////
-void RTQL8ScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
+void RTQL8ScrewJoint::SetAxis(int /*index*/, const math::Vector3 &/*_axis*/)
 {
 //   if (this->childLink) this->childLink->SetEnabled(true);
 //   if (this->parentLink) this->parentLink->SetEnabled(true);
@@ -97,14 +93,14 @@ void RTQL8ScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void RTQL8ScrewJoint::SetDamping(int /*index*/, double _damping)
+void RTQL8ScrewJoint::SetDamping(int /*index*/, double /*_damping*/)
 {
 //   this->damping_coefficient = _damping;
 //   dJointSetDamping(this->jointId, this->damping_coefficient);
 }
 
 //////////////////////////////////////////////////
-void RTQL8ScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
+void RTQL8ScrewJoint::SetThreadPitch(int /*_index*/, double /*_threadPitch*/)
 {
 //   dJointSetScrewThreadPitch(this->jointId, _threadPitch);
 }
@@ -117,7 +113,7 @@ void RTQL8ScrewJoint::ApplyDamping()
 }
 
 //////////////////////////////////////////////////
-void RTQL8ScrewJoint::SetForce(int /*index*/, double _force)
+void RTQL8ScrewJoint::SetForce(int /*index*/, double /*_force*/)
 {
 //   if (this->childLink) this->childLink->SetEnabled(true);
 //   if (this->parentLink) this->parentLink->SetEnabled(true);
@@ -126,14 +122,14 @@ void RTQL8ScrewJoint::SetForce(int /*index*/, double _force)
 }
 
 //////////////////////////////////////////////////
-void RTQL8ScrewJoint::SetParam(int _parameter, double _value)
+void RTQL8ScrewJoint::SetParam(int /*_parameter*/, double /*_value*/)
 {
 //   ODEJoint::SetParam(_parameter, _value);
 //   dJointSetScrewParam(this->jointId, _parameter, _value);
 }
 
 //////////////////////////////////////////////////
-double RTQL8ScrewJoint::GetParam(int _parameter) const
+double RTQL8ScrewJoint::GetParam(int /*_parameter*/) const
 {
 //   double result = dJointGetScrewParam(this->jointId, _parameter);
 // 
@@ -143,7 +139,7 @@ double RTQL8ScrewJoint::GetParam(int _parameter) const
 }
 
 //////////////////////////////////////////////////
-void RTQL8ScrewJoint::SetMaxForce(int /*_index*/, double _t)
+void RTQL8ScrewJoint::SetMaxForce(int /*_index*/, double /*_t*/)
 {
 //   this->SetParam(dParamFMax, _t);
 }
