@@ -89,6 +89,34 @@ std::string GetVisualSDFString(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+void CreateColorMaterial(const std::string &_materialName,
+    const common::Color &_ambient, const common::Color &_diffuse,
+    const common::Color &_specular, const common::Color &_emissive)
+{
+  // test setup - create a material for testing
+  Ogre::MaterialPtr ogreMaterial =
+      Ogre::MaterialManager::getSingleton().create(_materialName, "General");
+  for (unsigned int i = 0; i < ogreMaterial->getNumTechniques(); ++i)
+  {
+    Ogre::Technique *technique = ogreMaterial->getTechnique(i);
+    for (unsigned int j = 0; j < technique->getNumPasses(); ++j)
+    {
+      Ogre::Pass *pass = technique->getPass(j);
+      pass->setAmbient(rendering::Conversions::Convert(_ambient));
+      pass->setDiffuse(rendering::Conversions::Convert(_diffuse));
+      pass->setSpecular(rendering::Conversions::Convert(_specular));
+      pass->setSelfIllumination(rendering::Conversions::Convert(_emissive));
+      EXPECT_EQ(rendering::Conversions::Convert(pass->getAmbient()), _ambient);
+      EXPECT_EQ(rendering::Conversions::Convert(pass->getDiffuse()), _diffuse);
+      EXPECT_EQ(rendering::Conversions::Convert(pass->getSpecular()),
+          _specular);
+      EXPECT_EQ(rendering::Conversions::Convert(pass->getSelfIllumination()),
+          _emissive);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 TEST_F(Visual_TEST, BoundingBox)
 {
   Load("worlds/empty.world");
@@ -414,34 +442,10 @@ TEST_F(Visual_TEST, ColorMaterial)
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
 
-  // test setup - create a material for testing
   std::string materialName = "Test/Grey";
-  common::Color ambient(0.3, 0.3, 0.3, 1.0);
-  common::Color diffuse(0.7, 0.7, 0.7, 1.0);
-  common::Color specular(0.01, 0.01, 0.01, 1.0);
-  common::Color emissive = common::Color::Black;
-  Ogre::MaterialPtr ogreMaterial =
-      Ogre::MaterialManager::getSingleton().create(materialName, "General");
-  for (unsigned int i = 0; i < ogreMaterial->getNumTechniques(); ++i)
-  {
-    Ogre::Technique *technique = ogreMaterial->getTechnique(i);
-    for (unsigned int j = 0; j < technique->getNumPasses(); ++j)
-    {
-      Ogre::Pass *pass = technique->getPass(j);
-      pass->setAmbient(rendering::Conversions::Convert(ambient));
-      pass->setDiffuse(rendering::Conversions::Convert(diffuse));
-      pass->setSpecular(rendering::Conversions::Convert(specular));
-      pass->setSelfIllumination(rendering::Conversions::Convert(emissive));
-      EXPECT_EQ(rendering::Conversions::Convert(pass->getAmbient()),
-          common::Color(0.3, 0.3, 0.3, 1.0));
-      EXPECT_EQ(rendering::Conversions::Convert(pass->getDiffuse()),
-          common::Color(0.7, 0.7, 0.7, 1.0));
-      EXPECT_EQ(rendering::Conversions::Convert(pass->getSpecular()),
-          common::Color(0.01, 0.01, 0.01, 1.0));
-      EXPECT_EQ(rendering::Conversions::Convert(pass->getSelfIllumination()),
-          common::Color::Black);
-    }
-  }
+  CreateColorMaterial(materialName, common::Color(0.3, 0.3, 0.3, 1.0),
+      common::Color(0.7, 0.7, 0.7, 1.0), common::Color(0.01, 0.01, 0.01, 1.0),
+      common::Color::Black);
 
   // test with a visual that only has a material name and no color components.
   std::string visualName = "boxMaterialColor";
@@ -491,7 +495,10 @@ TEST_F(Visual_TEST, ColorMaterial)
   EXPECT_EQ(boxVis->GetEmissive(), common::Color::Black);
 
   // test setting a different material name
-  std::string greenMaterialName = "Gazebo/Green";
+  std::string greenMaterialName = "Test/Green";
+  CreateColorMaterial(greenMaterialName, common::Color(0.0, 1.0, 0.0, 1.0),
+      common::Color(0.0, 1.0, 0.0, 1.0), common::Color(0.1, 0.1, 0.1, 1.0),
+      common::Color::Black);
   boxVis->SetMaterial(greenMaterialName);
   EXPECT_TRUE(
       boxVis->GetMaterialName().find(greenMaterialName) != std::string::npos);
