@@ -77,6 +77,12 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
   EXPECT_NEAR(-1.4, jointLower->GetLowStop(0).Radian(), g_tolerance);
   EXPECT_NEAR(-1.27, jointLower->GetLowStop(1).Radian(), g_tolerance);
 
+  // check joint limits from sdf
+  EXPECT_NEAR(1.4, jointLower->GetHighStop(0).Radian(), g_tolerance);
+  EXPECT_NEAR(1.27, jointLower->GetHighStop(1).Radian(), g_tolerance);
+  EXPECT_NEAR(-1.4, jointLower->GetLowStop(0).Radian(), g_tolerance);
+  EXPECT_NEAR(-1.27, jointLower->GetLowStop(1).Radian(), g_tolerance);
+
   // freeze upper joint
   jointUpper->SetHighStop(0, 1e-6);
   jointUpper->SetHighStop(1, 1e-6);
