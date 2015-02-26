@@ -600,7 +600,7 @@ unsigned int Connection::GetRemotePort() const
 std::size_t Connection::ParseHeader(const std::string &header)
 {
   std::size_t data_size = 0;
-  std::istringstream is(header);
+  std::istringstream is(header.substr(0, HEADER_LENGTH));
 
   if (!(is >> std::hex >> data_size))
   {
