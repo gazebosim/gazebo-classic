@@ -241,6 +241,8 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
 
   double dt = (timestamp - this->lastMeasurementTime).Double();
 
+  this->lastMeasurementTime = timestamp;
+
   if (dt > 0.0)
   {
     boost::mutex::scoped_lock lock(this->mutex);
@@ -286,8 +288,6 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
     // Set the IMU orientation
     msgs::Set(this->imuMsg.mutable_orientation(),
               (imuPose - this->referencePose).rot);
-
-    this->lastMeasurementTime = timestamp;
 
     if (this->noiseActive)
     {
