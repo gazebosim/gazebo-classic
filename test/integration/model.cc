@@ -17,6 +17,7 @@
 #include <string.h>
 #include "ServerFixture.hh"
 
+using namespace gazebo;
 class ModelTest : public ServerFixture
 {
 };
