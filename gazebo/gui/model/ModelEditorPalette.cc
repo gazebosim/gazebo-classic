@@ -252,7 +252,8 @@ void ModelEditorPalette::OnCustom()
         extrudeDialog.deleteLater();
         if (extrudeDialog.exec() == QDialog::Accepted)
         {
-          // tada
+          this->modelCreator->AddShape(ModelCreator::PART_MESH,
+              math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
         }
       }
     }

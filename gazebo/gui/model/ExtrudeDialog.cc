@@ -43,8 +43,8 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
   this->dataPtr->unitCombo->addItem(tr("m"));
   this->dataPtr->unitCombo->addItem(tr("px"));
   this->dataPtr->unitCombo->addItem(tr("in"));
-//  connect(this->dataPtr->unitCombo, SIGNAL(valueChanged(double)), this,
-//      SLOT(OnChangeUnit(double)));
+//  connect(this->dataPtr->unitCombo, SIGNAL(currentIndexChanged(QString)), this,
+//      SLOT(OnChangeUnit(QString)));
 
   QHBoxLayout *unitComboLayout = new QHBoxLayout;
   unitComboLayout->addWidget(new QLabel("Unit:"));
@@ -87,13 +87,13 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
 
   // Buttons
   QHBoxLayout *buttonsLayout = new QHBoxLayout();
-  QPushButton *cancelButton = new QPushButton(tr("Cancel"));
-//  connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
+  QPushButton *backButton = new QPushButton(tr("Back"));
+  connect(backButton, SIGNAL(clicked()), this, SLOT(OnReject()));
 
   QPushButton *okButton = new QPushButton("Ok");
   okButton->setDefault(true);
-//  connect(okButton, SIGNAL(clicked()), this, SLOT(OnOk()));
-  buttonsLayout->addWidget(cancelButton);
+  connect(okButton, SIGNAL(clicked()), this, SLOT(OnAccept()));
+  buttonsLayout->addWidget(backButton);
   buttonsLayout->addWidget(okButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
@@ -113,8 +113,8 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
   QGraphicsScene *scene = new QGraphicsScene();
   scene->setBackgroundBrush(Qt::white);
 
-  this->dataPtr->imageDisplayWidth = 700;
-  this->dataPtr->imageDisplayHeight = 500;
+  this->dataPtr->imageDisplayWidth = 300;
+  this->dataPtr->imageDisplayHeight = 300;
   scene->setSceneRect(0, 0, this->dataPtr->imageDisplayWidth,
                             this->dataPtr->imageDisplayHeight);
 
@@ -153,4 +153,16 @@ ExtrudeDialog::~ExtrudeDialog()
 {
   delete this->dataPtr;
   this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
+void ExtrudeDialog::OnAccept()
+{
+  this->accept();
+}
+
+/////////////////////////////////////////////////
+void ExtrudeDialog::OnReject()
+{
+  this->reject();
 }

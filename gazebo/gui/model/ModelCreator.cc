@@ -590,9 +590,39 @@ std::string ModelCreator::AddShape(PartType _type,
   }
   else if (_type == PART_MESH)
   {
-    sdf::ElementPtr meshElem = geomElem->AddElement("mesh");
-    meshElem->GetElement("scale")->Set(_size);
-    meshElem->GetElement("uri")->Set(_uri);
+    QFileInfo info(QString::fromStdString(_uri));
+    if (!info.isFile())
+    {
+      gzerr << "File [" << _uri << "] not found!" << std::endl;
+      return std::string();
+    }
+
+    if (info.completeSuffix() == "svg")
+    {
+      common::SVGLoader svgLoader(5);
+      std::vector<common::SVGPath> paths;
+      svgLoader.Parse(_uri, paths);
+      for (common::SVGPath p: paths)
+      {
+        for (std::vector<math::Vector2d> poly : p.polylines)
+        {
+          sdf::ElementPtr polylineElem = geomElem->AddElement("polyline");
+          polylineElem->GetElement("height")->Set(1.0);
+
+          for (math::Vector2d pt : poly)
+          {
+            sdf::ElementPtr pointElem = polylineElem->AddElement("point");
+            pointElem->Set(pt);
+          }
+        }
+      }
+    }
+    else
+    {
+      sdf::ElementPtr meshElem = geomElem->AddElement("mesh");
+      meshElem->GetElement("scale")->Set(_size);
+      meshElem->GetElement("uri")->Set(_uri);
+    }
   }
   else
   {

@@ -43,6 +43,12 @@ namespace gazebo
       /// \brief Destructor.
       public: ~ExtrudeDialog();
 
+      /// \brief Qt callback when the dialog is accepted.
+      private slots: void OnAccept();
+
+      /// \brief Qt callback when the dialog is rejected.
+      private slots: void OnReject();
+
       /// \internal
       /// \brief Pointer to private data.
       private: ExtrudeDialogPrivate *dataPtr;
