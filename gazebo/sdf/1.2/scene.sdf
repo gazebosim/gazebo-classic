@@ -1,0 +1,42 @@
+<!-- Scene -->
+<element name="scene" required="1">
+  <description>Specifies the look of the environment.</description>
+
+  <element name="ambient" type="color" default="0.0 0.0 0.0 1.0" required="1">
+    <description>Color of the ambient light.</description>
+  </element>
+
+  <element name="background" type="color" default=".1 .1 .1 1" required="1">
+    <description>Color of the background.</description>
+  </element>
+
+  <element name="shadows" type="bool" default="true" required="1">
+    <description>Enable/disable shadows</description>
+   </element>
+
+  <element name="fog" required="0">
+    <description>Controls fog</description>
+    <element name="color" type="color" default="1 1 1 1" required="0">
+      <description>Fog color</description>
+    </element>
+    <element name="type" type="string" default="none" required="0">
+      <description>Fog type: constant, linear, quadratic</description>
+    </element>
+    <element name="start" type="double" default="1.0" min="0.0" required="0">
+      <description>Distance to start of fog</description>
+    </element>
+    <element name="end" type="double" default="100.0" min="0.0" required="0">
+      <description>Distance to end of fog</description>
+    </element>
+    <element name="density" type="double" default="1.0" min="0.0" required="0">
+      <description>Density of fog</description>
+    </element>
+  </element>
+
+  <element name="grid" type="bool" default="true" required="0">
+    <description>Enable/disable the grid</description>
+  </element>
+
+  <include filename="sky.sdf" required="0"/>
+
+</element> <!-- End Scene -->

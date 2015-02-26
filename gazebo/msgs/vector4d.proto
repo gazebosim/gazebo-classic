@@ -1,0 +1,16 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Vector4d 
+/// \brief Message for a vector4 double
+/// \verbatim
+
+message Vector4d
+{
+  required double x = 1;
+  required double y = 2;
+  required double z = 3;
+  required double w = 4;
+}
+
+/// \endverbatim

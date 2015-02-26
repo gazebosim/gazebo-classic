@@ -1,0 +1,100 @@
+<element name="sky" required="0">
+  <description>Properties for the sky</description>
+
+  <element name="enabled" type="bool" default="true" required="1">
+    <description>
+      Enable (true) or disable(false) the sky. When the sky is disabled,
+      the scene's background color is used.
+    </description>
+  </element>
+
+
+  <element name="time" type="double" default="10.0" required="1"
+           min="0" max="24">
+    <description>Time of day [0..24]</description>
+  </element>
+
+  <element name="sunrise" type="double" default="6.0" required="1"
+           min="0" max="24">
+    <description>Sunrise time [0..24]</description>
+  </element>
+
+  <element name="sunset" type="double" default="20.0" required="1"
+           min="0" max="24">
+    <description>Sunset time [0..24]</description>
+  </element>
+
+  <element name="moon_phase" type="double" default="0" required="1"
+           min="-1" max="1">
+    <description>
+      Moon phase in [-1,1] range, where -1 means fully covered Moon,
+      0 clear Moon and 1 fully covered Moon
+    </description>
+  </element>
+
+  <element name="lightning" required="0">
+    <description>Lighting parameters</description>
+
+    <element name="mean_time" type="double" default="1.0" min="0.0"
+             required="1">
+      <description>
+        Mean time between lighting occurances in seconds
+      </description>
+    </element>
+
+    <element name="time_multiplier" type="double" default="0.0"
+             required="1">
+      <description>
+        Time multiplier.
+      </description>
+    </element>
+
+    <element name="color" type="color" default="1.0 1.0 1.0 1.0"
+             required="1">
+      <description>
+        Color of the lighting. 
+      </description>
+    </element>
+  </element>
+
+  <element name="clouds" required="0">
+    <description>Cloud parameters</description>
+
+    <element name="speed" type="double" default="0.6" min="0.0" required="1">
+      <description>Speed of the clouds</description>
+    </element>
+
+    <element name="direction" type="double" default="0.0"
+             min="0.0" max="3.1456" required="1">
+      <description>Direction of the cloud movement in radians</description>
+    </element>
+    <element name="humidity" type="double" default="0.5"
+             min="0" max="1" required="1">
+      <description>Density of clouds</description>
+    </element>
+
+    <element name="mean_size" type="double" default="0.5"
+             min="0" max="1" required="1">
+      <description>Average size of the clouds</description>
+    </element>
+
+    <element name="ambient" type="color" default=".9 .9 .9 1" required="1">
+      <description>Ambient cloud color</description>
+    </element>
+
+    <element name="ambient_factors" type="vector4"
+             default="0.45 0.3 0.6 0.1" required="1">
+      <description>Ambient cloud color factors</description>
+    </element>
+
+    <element name="light_response" type="vector4"
+             default="0.9 0.6 0.5 0.3" required="1">
+      <description>
+        x=sun light power, y=sun beta multiplier,
+        z=ambient color multiplier, w=distance attenuation
+      </description>
+    </element>
+
+  </element> <!-- End Clouds -->
+
+</element><!-- End Sky -->
