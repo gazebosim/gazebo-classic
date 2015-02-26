@@ -292,6 +292,8 @@
     * [Pull request #1448](https://bitbucket.org/osrf/gazebo/pull-request/1448)
     * [Pull request #1446](https://bitbucket.org/osrf/gazebo/pull-request/1446)
     * [Issue #236](https://bitbucket.org/osrf/gazebo/issue/236)
+1. Fixed heightmap on OSX
+    * [Pull request #1455](https://bitbucket.org/osrf/gazebo/pull-request/1455)
 
 ### Gazebo 4.0.2 (2014-09-23)
 
