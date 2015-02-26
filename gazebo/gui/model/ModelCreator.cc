@@ -21,6 +21,7 @@
 #include <string>
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/SVGLoader.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Material.hh"
@@ -602,7 +603,7 @@ std::string ModelCreator::AddShape(PartType _type,
       common::SVGLoader svgLoader(5);
       std::vector<common::SVGPath> paths;
       svgLoader.Parse(_uri, paths);
-      for (common::SVGPath p: paths)
+      for (common::SVGPath p : paths)
       {
         for (std::vector<math::Vector2d> poly : p.polylines)
         {
