@@ -1,0 +1,97 @@
+<element name="surface" required="0">
+  <description>The surface parameters</description>
+  <element name="bounce" required="0">
+    <description></description>
+    <element name="restitution_coefficient" type="double" default="0" min="0.0" max="1.0" required="0">
+      <description>Bounciness coefficient of restitution, from [0...1], where 0=no bounciness.</description>
+    </element>
+    <element name="threshold" type="double" default="100000" required="0">
+      <description>Bounce capture velocity, below which effective coefficient of restitution is 0.</description>
+    </element>
+  </element> <!-- End Bounce -->
+
+  <element name="friction" required="0">
+    <description></description>
+    <element name="ode" required="0">
+      <description>ODE friction parameters</description>
+      <element name="mu" type="double" default="-1" min="0.0" max="1.0" required="0">
+        <description>Coefficient of friction in the range of [0..1].</description>
+      </element>
+      <element name="mu2" type="double" default="-1" min="0.0" max="1.0" required="0">
+        <description>Second coefficient of friction in the range of [0..1]</description>
+      </element>
+      <element name="fdir1" type="vector3" default="0 0 0" required="0">
+        <description>3-tuple specifying direction of mu1 in the collision local reference frame.</description>
+      </element>
+      <element name="slip1" type="double" default="0.0" min="0.0" max="1.0" required="0">
+        <description>Force dependent slip direction 1 in collision local frame, between the range of [0..1].</description>
+      </element>
+      <element name="slip2" type="double" default="0.0" min="0.0" max="1.0" required="0">
+        <description>Force dependent slip direction 2 in collision local frame, between the range of [0..1].</description>
+      </element>
+    </element> <!-- End ODE -->
+    <element name="bullet" required="0">
+      <element name="friction" type="double" default="-1" min="0.0" max="1.0" required="0">
+        <description>Coefficient of friction in the range of [0..1].</description>
+      </element>
+      <element name="friction2" type="double" default="-1" min="0.0" max="1.0" required="0">
+        <description>Coefficient of friction in the range of [0..1].</description>
+      </element>
+      <element name="fdir1" type="vector3" default="0 0 0" required="0">
+        <description>3-tuple specifying direction of mu1 in the collision local reference frame.</description>
+      </element>
+      <element name="rolling_friction" type="double" default="-1" min="0.0" max="1.0" required="0">
+        <description> coefficient of friction in the range of [0..1]</description>
+      </element>
+    </element> <!-- End Bullet -->
+  </element> <!-- End Friction -->
+
+  <element name="contact" required="0">
+    <description></description>
+    <element name="collide_without_contact" type="bool" default="0" required="0">
+      <description>Flag to disable contact force generation, while still allowing collision checks and contact visualization to occur.</description>
+    </element>
+    <element name="ode" required="0">
+      <description>ODE contact parameters</description>
+      <element name="soft_cfm" type="double" default="0" required="0">
+        <description>Soft constraint force mixing.</description>
+      </element>
+      <element name="soft_erp" type="double" default="0.2" required="0">
+        <description>Soft error reduction parameter</description>
+      </element>
+      <element name="kp" type="double" default="1000000000000.0" required="0">
+        <description>dynamically "stiffness"-equivalent coefficient for contact joints</description>
+      </element>
+      <element name="kd" type="double" default="1.0" required="0">
+        <description>dynamically "damping"-equivalent coefficient for contact joints</description>
+      </element>
+      <element name="max_vel" type="double" default="0.01" required="0">
+        <description>maximum contact correction velocity truncation term.</description>
+      </element>
+      <element name="min_depth" type="double" default="0" required="0">
+        <description>minimum allowable depth before contact correction impulse is applied</description>
+      </element>
+    </element> <!-- End ODE -->
+    <element name="bullet" required="0">
+      <description>Bullet contact parameters</description>
+      <element name="soft_cfm" type="double" default="0" required="0">
+        <description>Soft constraint force mixing.</description>
+      </element>
+      <element name="soft_erp" type="double" default="0.2" required="0">
+        <description>Soft error reduction parameter</description>
+      </element>
+      <element name="kp" type="double" default="1000000000000.0" required="0">
+        <description>dynamically "stiffness"-equivalent coefficient for contact joints</description>
+      </element>
+      <element name="kd" type="double" default="1.0" required="0">
+        <description>dynamically "damping"-equivalent coefficient for contact joints</description>
+      </element>
+      <element name="split_impulse" type="bool" default="1" required="1">
+        <description>Similar to ODE's max_vel implementation.  See http://bulletphysics.org/mediawiki-1.5.8/index.php/BtContactSolverInfo#Split_Impulse for more information.</description>
+      </element>
+      <element name="split_impulse_penetration_threshold" type="double" default="-0.01" required="1">
+        <description>Similar to ODE's max_vel implementation.  See http://bulletphysics.org/mediawiki-1.5.8/index.php/BtContactSolverInfo#Split_Impulse for more information.</description>
+      </element>
+    </element> <!-- End Bullet -->
+  </element> <!-- End Contact -->
+</element> <!-- End Surface -->
