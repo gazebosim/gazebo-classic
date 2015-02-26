@@ -209,6 +209,24 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
 }
 
 /////////////////////////////////////////////////
+std::vector<JointData *> JointMaker::GetJointDataByPart(
+    const std::string &_partName) const
+{
+  std::vector<JointData *> partJoints;
+  for (auto jointIt : this->joints)
+  {
+    JointData *jointData = jointIt.second;
+
+    if (jointData->child->GetName() == _partName ||
+        jointData->parent->GetName() == _partName)
+    {
+      partJoints.push_back(jointData);
+    }
+  }
+  return partJoints;
+}
+
+/////////////////////////////////////////////////
 bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 {
   rendering::UserCameraPtr camera = gui::get_active_camera();
@@ -555,35 +573,7 @@ void JointMaker::OnOpenInspector()
 void JointMaker::OpenInspector(const std::string &_name)
 {
   JointData *joint = this->joints[_name];
-  joint->inspector->SetType(joint->type);
-  joint->inspector->SetName(joint->name);
-
-  std::string parentName = joint->parent->GetName();
-  std::string parentLeafName = parentName;
-  size_t pIdx = parentName.find_last_of("::");
-  if (pIdx != std::string::npos)
-    parentLeafName = parentName.substr(pIdx+1);
-  joint->inspector->SetParent(parentLeafName);
-
-  std::string childName = joint->child->GetName();
-  std::string childLeafName = childName;
-  size_t cIdx = childName.find_last_of("::");
-  if (cIdx != std::string::npos)
-    childLeafName = childName.substr(cIdx+1);
-  joint->inspector->SetChild(childLeafName);
-
-  joint->inspector->SetPose(joint->pose);
-  int axisCount = JointMaker::GetJointAxisCount(joint->type);
-  for (int i = 0; i < axisCount; ++i)
-  {
-    joint->inspector->SetAxis(i, joint->axis[i]);
-    joint->inspector->SetAxis(i, joint->axis[i]);
-    joint->inspector->SetLowerLimit(i, joint->lowerLimit[i]);
-    joint->inspector->SetUpperLimit(i, joint->upperLimit[i]);
-    joint->inspector->SetUseParentModelFrame(i, joint->useParentModelFrame[i]);
-  }
-  joint->inspector->move(QCursor::pos());
-  joint->inspector->show();
+  joint->OpenInspector();
 }
 
 /////////////////////////////////////////////////
@@ -1056,6 +1046,46 @@ void JointData::OnApply()
   }
   this->dirty = true;
   gui::model::Events::modelChanged();
+}
+
+/////////////////////////////////////////////////
+void JointData::OnOpenInspector()
+{
+  this->OpenInspector();
+}
+
+/////////////////////////////////////////////////
+void JointData::OpenInspector()
+{
+  this->inspector->SetType(this->type);
+  this->inspector->SetName(this->name);
+
+  std::string parentName = this->parent->GetName();
+  std::string parentLeafName = parentName;
+  size_t pIdx = parentName.find_last_of("::");
+  if (pIdx != std::string::npos)
+    parentLeafName = parentName.substr(pIdx+1);
+  this->inspector->SetParent(parentLeafName);
+
+  std::string childName = this->child->GetName();
+  std::string childLeafName = childName;
+  size_t cIdx = childName.find_last_of("::");
+  if (cIdx != std::string::npos)
+    childLeafName = childName.substr(cIdx+1);
+  this->inspector->SetChild(childLeafName);
+
+  this->inspector->SetPose(this->pose);
+  int axisCount = JointMaker::GetJointAxisCount(this->type);
+  for (int i = 0; i < axisCount; ++i)
+  {
+    this->inspector->SetAxis(i, this->axis[i]);
+    this->inspector->SetAxis(i, this->axis[i]);
+    this->inspector->SetLowerLimit(i, this->lowerLimit[i]);
+    this->inspector->SetUpperLimit(i, this->upperLimit[i]);
+    this->inspector->SetUseParentModelFrame(i, this->useParentModelFrame[i]);
+  }
+  this->inspector->move(QCursor::pos());
+  this->inspector->show();
 }
 
 /////////////////////////////////////////////////

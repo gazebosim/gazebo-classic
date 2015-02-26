@@ -84,7 +84,7 @@ gazebo::math::Vector3 Convert(const gazebo::math::Vector3 &_vec)
   return result;
 }
 
-void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
+void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
 {
   const gazebo::common::Mesh *mesh;
 
@@ -99,7 +99,7 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
     const gazebo::common::SubMesh *subMesh = mesh->GetSubMesh(i);
     printf("mesh2 {\n");
     printf("  vertex_vectors {\n");
-    printf("    %d, \n    ", subMesh->GetVertexCount());
+    printf("    %u, \n    ", subMesh->GetVertexCount());
     for (unsigned int v = 0; v < subMesh->GetVertexCount(); v++)
     {
       gazebo::math::Vector3 vert = subMesh->GetVertex(v);
@@ -109,7 +109,7 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
     printf("  }\n");
 
     printf("  normal_vectors {\n");
-    printf("    %d, \n    ", subMesh->GetNormalCount());
+    printf("    %u, \n    ", subMesh->GetNormalCount());
     for (unsigned int n = 0; n < subMesh->GetNormalCount(); n++)
     {
       gazebo::math::Vector3 norm = subMesh->GetNormal(n);
@@ -118,7 +118,7 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
     printf("  }\n");
 
     printf("  uv_vectors {\n");
-    printf("    %d, \n", subMesh->GetTexCoordCount());
+    printf("    %u, \n", subMesh->GetTexCoordCount());
     for (unsigned int j = 0; j < subMesh->GetTexCoordCount(); j++)
     {
       printf("    <%f, %f>, \n", subMesh->GetTexCoord(j).x,
@@ -161,12 +161,12 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
     {
       if (mat)
       {
-        printf("    <%d, %d, %d>, 0\n", subMesh->GetIndex(j),
+        printf("    <%u, %u, %u>, 0\n", subMesh->GetIndex(j),
             subMesh->GetIndex(j+1), subMesh->GetIndex(j+2));
       }
       else
       {
-        printf("    <%d, %d, %d>\n", subMesh->GetIndex(j),
+        printf("    <%u, %u, %u>\n", subMesh->GetIndex(j),
             subMesh->GetIndex(j+1), subMesh->GetIndex(j+2));
       }
     }
@@ -176,7 +176,7 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
     printf("    %d, \n", subMesh->GetIndexCount() / 3);
     for (unsigned int j = 0; j < subMesh->GetIndexCount(); j+= 3)
     {
-      printf("    <%d, %d, %d>, \n", subMesh->GetIndex(j),
+      printf("    <%u, %u, %u>, \n", subMesh->GetIndex(j),
         subMesh->GetIndex(j+1), subMesh->GetIndex(j+2));
     }
     printf("  }\n");
