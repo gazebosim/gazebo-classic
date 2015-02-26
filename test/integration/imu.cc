@@ -344,13 +344,6 @@ TEST_P(ImuTest, ImuSensorTestWorld)
 
 void ImuTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 {
-  // static models not fully working in simbody yet
-  // if (_physicsEngine == "simbody")
-  // {
-  //   gzerr << "Aborting test for Simbody, see issue #860.\n";
-  //   return;
-  // }
-
   Load("worlds/empty.world", true, _physicsEngine);
 
   std::string modelName = "imu_model";
@@ -396,13 +389,6 @@ TEST_P(ImuTest, EmptyWorld)
 
 void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
 {
-  // static models not fully working in simbody yet
-  // if (_physicsEngine == "simbody")
-  // {
-  //   gzerr << "Aborting test for Simbody, see issue #860.\n";
-  //   return;
-  // }
-
   Load("worlds/empty.world", true, _physicsEngine);
 
   std::string modelName = "imu_model";
@@ -483,13 +469,6 @@ TEST_P(ImuTest, EmptyWorldNoise)
 
 void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
 {
-  // static models not fully working in simbody yet
-  // if (_physicsEngine == "simbody")
-  // {
-  //   gzerr << "Aborting test for Simbody, see issue #860.\n";
-  //   return;
-  // }
-
   Load("worlds/empty.world", true, _physicsEngine);
 
   std::string modelName = "imu_model";
