@@ -1,10 +1,10 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface LogControl
-/// \brief A message that allows for control of logging functions
+/// \interface LogRecordControl
+/// \brief A message that allows for control of log recording functions
 
-message LogControl
+message LogRecordControl
 {
   optional bool start           = 1;
   optional bool stop            = 2;
