@@ -1152,10 +1152,13 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   QLineEdit *geomFilenameLineEdit = new QLineEdit;
   geomFilenameLineEdit->setSizePolicy(QSizePolicy::Minimum,
       QSizePolicy::Fixed);
+  QPushButton *geomFilenameButton = new QPushButton(tr("..."));
+  geomFilenameButton->setMaximumWidth(30);
 
   QHBoxLayout *geomFilenameLayout = new QHBoxLayout;
   geomFilenameLayout->addWidget(geomFilenameLabel);
   geomFilenameLayout->addWidget(geomFilenameLineEdit);
+  geomFilenameLayout->addWidget(geomFilenameButton);
 
   QVBoxLayout *geomSizeFilenameLayout = new QVBoxLayout;
   geomSizeFilenameLayout->addLayout(geomSizeLayout);
@@ -1206,13 +1209,15 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   widget->geomLengthLabel = geomLengthLabel;
   widget->geomFilenameLabel = geomFilenameLabel;
   widget->geomFilenameLineEdit = geomFilenameLineEdit;
+  widget->geomFilenameButton = geomFilenameButton;
 
   geomFilenameLabel->setVisible(false);
   geomFilenameLineEdit->setVisible(false);
+  geomFilenameButton->setVisible(false);
 
-  connect(geometryComboBox,
-    SIGNAL(currentIndexChanged(const QString)),
-    widget, SLOT(GeometryChanged(const QString)));
+  connect(geometryComboBox, SIGNAL(currentIndexChanged(const QString)),
+      widget, SLOT(GeometryChanged(const QString)));
+  connect(geomFilenameButton, SIGNAL(clicked()), widget, SLOT(OnSelectFile()));
 
   widgetLayout->setContentsMargins(0, 0, 0, 0);
   widget->setLayout(widgetLayout);
@@ -1224,6 +1229,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   widget->widgets.push_back(geomRadiusSpinBox);
   widget->widgets.push_back(geomLengthSpinBox);
   widget->widgets.push_back(geomFilenameLineEdit);
+  widget->widgets.push_back(geomFilenameButton);
 
   return widget;
 }
@@ -1692,7 +1698,7 @@ void ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
     const std::string &_value, const math::Vector3 &_dimensions,
     const std::string &_uri)
 {
-  if (_widget->widgets.size() != 7u)
+  if (_widget->widgets.size() != 8u)
   {
     gzerr << "Error updating Geometry Config widget " << std::endl;
     return;
@@ -1878,7 +1884,7 @@ std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
     math::Vector3 &_dimensions, std::string &_uri) const
 {
   std::string value;
-  if (_widget->widgets.size() != 7u)
+  if (_widget->widgets.size() != 8u)
   {
     gzerr << "Error getting value from Geometry Config widget " << std::endl;
     return value;
@@ -2002,5 +2008,24 @@ void GeometryConfigWidget::GeometryChanged(const QString _text)
 
     this->geomFilenameLabel->setVisible(isMesh);
     this->geomFilenameLineEdit->setVisible(isMesh);
+    this->geomFilenameButton->setVisible(isMesh);
+  }
+}
+
+/////////////////////////////////////////////////
+void GeometryConfigWidget::OnSelectFile()
+{
+  QWidget *widget= qobject_cast<QWidget *>(QObject::sender());
+
+  if (widget)
+  {
+    std::string filename = QFileDialog::getOpenFileName(this,
+        tr("Open Image"), "", tr("Mesh Files (*.dae *.stl)")).toStdString();
+
+    if (!filename.empty())
+    {
+      dynamic_cast<QLineEdit *>(this->geomFilenameLineEdit)->setText(
+          QString::fromStdString(filename));
+    }
   }
 }

@@ -85,9 +85,15 @@ namespace gazebo
       /// \brief A label for the mesh filename widget.
       public: QWidget *geomFilenameLabel;
 
+      /// \brief A button for selecting the mesh filename.
+      public: QWidget *geomFilenameButton;
+
       /// brief Callback when the geometry type is changed.
       /// \param[in] _text New geometry type in string.
       private slots: void GeometryChanged(const QString _text);
+
+      /// brief Callback when the file button is clicked.
+      private slots: void OnSelectFile();
     };
 
     /// \class GroupWidget ConfigWidget.hh
