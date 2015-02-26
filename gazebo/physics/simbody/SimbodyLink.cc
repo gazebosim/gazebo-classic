@@ -474,11 +474,7 @@ math::Vector3 SimbodyLink::GetWorldForce() const
     fg = SimbodyPhysics::Vec3ToVector3(fs);
   }
 
-  // add gravitational force
   std::cout << "fg [" << fg.x << ", " << fg.y << ", " << fg.z << "]\n";
-  // fg -= this->GetWorldPose().rot.GetInverse().RotateVector(
-  //   this->GetWorld()->GetPhysicsEngine()->GetGravity());
-  // gzerr << " fg wiht g [" << fg << "]\n";
 
   return fg;
 }
