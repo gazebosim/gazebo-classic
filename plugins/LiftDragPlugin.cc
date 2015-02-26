@@ -36,6 +36,9 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.01), rho(1.2041)
   this->upward = math::Vector3(0, 0, 1);
   this->area = 1.0;
   this->alpha0 = 0.0;
+  this->alpha = 0.0;
+  this->sweep = 0.0;
+  this->velocityStall = 0.0;
 
   // 90 deg stall
   this->alphaStall = 0.5*M_PI;
