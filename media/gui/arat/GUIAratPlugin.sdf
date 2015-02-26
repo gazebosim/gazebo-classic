@@ -1,0 +1,311 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <plugin name="GUIAratPlugin" filename="libGUIAratPlugin.so">
+      <circleSize>10</circleSize>
+      <handImgDimensions>250 250</handImgDimensions>
+      <iconDimensions>60 60</iconDimensions>
+      <forceMin>0</forceMin>
+      <forceMax>200</forceMax>
+      <colorMin>255 227 32</colorMin>
+      <colorMax>255 102 102</colorMax>
+      <handSide>r</handSide>
+
+      <contacts>
+        <contact name="ThDistal">155 116</contact>
+        <contact name="IndDistal">130 46</contact>
+        <contact name="MidDistal">90 35</contact>
+        <contact name="RingDistal">50 47</contact>
+        <contact name="LittleDistal">20 83</contact>
+
+        <contact name="ThMedial">145 141</contact>
+        <contact name="IndMedial">124 81</contact>
+        <contact name="MidMedial">90 71</contact>
+        <contact name="RingMedial">55 81</contact>
+        <contact name="LittleMedial">30 109</contact>
+      </contacts>
+
+
+      <taskGroup name="Grasp">
+        <task id="grasp_1" icon="file://media/gui/arat/arat_icons/grasp_1.jpg"
+              name="Block 10cm"
+              instructions="Pick up the 10 cm block and place it on top of the box."></task>
+        <task id="grasp_2" icon="file://media/gui/arat/arat_icons/grasp_2.jpg"
+              name="Block 2.5cm"
+              instructions="Pick up the 2.5 cm block and place it on top of the box."></task>
+        <task id="grasp_3" icon="file://media/gui/arat/arat_icons/grasp_3.jpg"
+              name="Block 5cm"
+              instructions="Pick up the 5 cm block and place it on top of the box."></task>
+        <task id="grasp_4" icon="file://media/gui/arat/arat_icons/grasp_4.jpg"
+              name="Block 7.5cm"
+              instructions="Pick up the 7.5 cm block and place it on top of the box."></task>
+        <task id="grasp_5" icon="file://media/gui/arat/arat_icons/grasp_5.jpg"
+              name="Cricket ball"
+              instructions="Pick up the cricket ball and place it on top of the box, inside of the tin lid."></task>
+        <task id="grasp_6" icon="file://media/gui/arat/arat_icons/grasp_6.jpg"
+              name="Stone"
+              instructions="Pick up the stone and place it on top of the box."></task>
+      </taskGroup>
+
+      <taskGroup name="Grip">
+        <task id="grip_1" icon="file://media/gui/arat/arat_icons/grip_1.jpg"
+              name="Cups"
+              instructions="Pour the contents of the filled cup into the empty cup."></task>
+        <task id="grip_2" icon="file://media/gui/arat/arat_icons/grip_2.jpg"
+              name="Tube 2.25cm"
+              instructions="Pick up the 2.25cm diameter tube and place it on the wooden peg."></task>
+        <task id="grip_3" icon="file://media/gui/arat/arat_icons/grip_3.jpg"
+              name="Tube 1cm"
+              instructions="Pick up the 1cm diameter tube and place it on the metal peg."></task>
+        <task id="grip_4" icon="file://media/gui/arat/arat_icons/grip_4.jpg"
+              name="Washer"
+              instructions="Pick up the washer and place it on the metal peg."></task>
+      </taskGroup>
+      
+      <taskGroup name="Pinch">
+        <task id="pinch_1" icon="file://media/gui/arat/arat_icons/pinch_1.jpg"
+              name="Ball bearing"
+              instructions="Pick up the ball bearing and place it on top of the box, inside of the tin lid."></task>
+        <task id="pinch_2" icon="file://media/gui/arat/arat_icons/pinch_2.jpg"
+              name="Marble"
+              instructions="Pick up the marble and place it on top of the box, inside of the tin lid."></task>
+      </taskGroup>
+
+      <commands>
+        <command button="-"
+        name="motor_little_ab_ad"
+        increment=0.05
+        ></command>
+
+        <command button="_"
+        name="motor_little_ab_ad"
+        increment=-0.05
+        ></command>
+
+        <command button="p"
+        name="motor_little_mcp"
+        increment=0.05
+        ></command>
+
+        <command button="P"
+        name="motor_little_mcp"
+        increment=-0.05
+        ></command>
+
+        <command button="0"
+        name="motor_ring_ab_ad"
+        increment=0.05
+        ></command>
+
+        <command button=")"
+        name="motor_ring_ab_ad"
+        increment=-0.05
+        ></command>
+
+        <command button="o"
+        name="motor_ring_mcp"
+        increment=0.05
+        ></command>
+
+        <command button="O"
+        name="motor_ring_mcp"
+        increment=-0.05
+        ></command>
+
+        <command button="9"
+        name="motor_middle_ab_ad"
+        increment=0.05
+        ></command>
+
+        <command button="("
+        name="motor_middle_ab_ad"
+        increment=-0.05
+        ></command>
+
+        <command button="i"
+        name="motor_middle_mcp"
+        increment=0.05
+        ></command>
+
+        <command button="I"
+        name="motor_middle_mcp"
+        increment=-0.05
+        ></command>
+
+        <command button="8"
+        name="motor_index_ab_ad"
+        increment=0.05
+        ></command>
+
+        <command button="*"
+        name="motor_index_ab_ad"
+        increment=-0.05
+        ></command>
+
+        <command button="u"
+        name="motor_index_mcp"
+        increment=0.05
+        ></command>
+
+        <command button="U"
+        name="motor_index_mcp"
+        increment=-0.05
+        ></command>
+
+        <command button="7"
+        name="motor_thumb_cmc_ab_ad"
+        increment=0.05
+        ></command>
+
+        <command button="&amp;"
+        name="motor_thumb_cmc_ab_ad"
+        increment=-0.05
+        ></command>
+
+        <command button="6"
+        name="motor_thumb_cmc_fe"
+        increment=0.05
+        ></command>
+
+        <command button="^"
+        name="motor_thumb_cmc_fe"
+        increment=-0.05
+        ></command>
+
+        <command button="y"
+        name="motor_thumb_mcp"
+        increment=0.05
+        ></command>
+
+        <command button="Y"
+        name="motor_thumb_mcp"
+        increment=-0.05
+        ></command>
+
+        <command button="k"
+        name="motor_wrist_rot"
+        increment=0.05
+        ></command>
+
+        <command button="K"
+        name="motor_wrist_rot"
+        increment=-0.05
+        ></command>
+
+        <command button="l"
+        name="motor_wrist_dev"
+        increment=0.05
+        ></command>
+
+        <command button="L"
+        name="motor_wrist_dev"
+        increment=-0.05
+        ></command>
+
+        <command button=";"
+        name="motor_wrist_fe"
+        increment=0.05
+        ></command>
+
+        <command button=":"
+        name="motor_wrist_fe"
+        increment=-0.05
+        ></command>
+        
+        <command button="g"
+        name="arm_pos_x"
+        increment=0.025
+        ></command>
+
+        <command button="G"
+        name="arm_pos_x"
+        increment=-0.025
+        ></command>
+
+        <command button="h"
+        name="arm_pos_y"
+        increment=0.025
+        ></command>
+
+        <command button="H"
+        name="arm_pos_y"
+        increment=-0.025
+        ></command>
+
+        <command button="j"
+        name="arm_pos_z"
+        increment=0.025
+        ></command>
+
+        <command button="J"
+        name="arm_pos_z"
+        increment=-0.025
+        ></command>
+
+        <command button="b"
+        name="arm_rot_x"
+        increment=0.025
+        ></command>
+
+        <command button="B"
+        name="arm_rot_x"
+        increment=-0.025
+        ></command>
+
+        <command button="n"
+        name="arm_rot_y"
+        increment=0.025
+        ></command>
+
+        <command button="N"
+        name="arm_rot_y"
+        increment=-0.025
+        ></command>
+
+        <command button="m"
+        name="arm_rot_z"
+        increment=0.025
+        ></command>
+
+        <command button="M"
+        name="arm_rot_z"
+        increment=-0.025
+        ></command>
+      </commands>
+
+      <indices>
+        <index name="motor_wrist_rot" num="0"></index>
+        <index name="motor_wrist_dev" num="1"></index>
+        <index name="motor_wrist_fe" num="2"></index>
+        <index name="motor_index_dip" num="3"></index>
+        <index name="motor_index_mcp" num="4"></index>
+        <index name="motor_index_pip" num="5"></index>
+        <index name="motor_little_dip" num="6"></index>
+        <index name="motor_little_mcp" num="7"></index>
+        <index name="motor_little_pip" num="8"></index>
+        <index name="motor_middle_dip" num="9"></index>
+        <index name="motor_middle_mcp" num="10"></index>
+        <index name="motor_middle_pip" num="11"></index>
+        <index name="motor_thumb_cmc_ab_ad" num="12"></index>
+        <index name="motor_little_ab_ad" num="13"></index>
+        <index name="motor_ring_ab_ad" num="14"></index>
+        <index name="motor_middle_ab_ad" num="15"></index>
+        <index name="motor_index_ab_ad" num="16"></index>
+        <index name="motor_thumb_cmc_fe" num="17"></index>
+        <index name="motor_ring_dip" num="18"></index>
+        <index name="motor_ring_mcp" num="19"></index>
+        <index name="motor_ring_pip" num="20"></index>
+        <index name="motor_thumb_mcp" num="21"></index>
+        <index name="motor_thumb_dip" num="22"></index>
+
+        <index name="arm_pos_x" num="0"></index>
+        <index name="arm_pos_y" num="1"></index>
+        <index name="arm_pos_z" num="2"></index>
+        <index name="arm_rot_x" num="3"></index>
+        <index name="arm_rot_y" num="4"></index>
+        <index name="arm_rot_z" num="5"></index>
+      </indices>
+
+    </plugin>
+  </world>
+</sdf>
