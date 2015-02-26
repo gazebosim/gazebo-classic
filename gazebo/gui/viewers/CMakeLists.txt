@@ -45,6 +45,7 @@ target_link_libraries(gazebo_gui_viewers
   gazebo_common
   gazebo_transport
   gazebo_rendering
-  gazebo_msgs)
+  gazebo_msgs
+  ${QT_LIBRARIES})
 
 gz_install_library(gazebo_gui_viewers)

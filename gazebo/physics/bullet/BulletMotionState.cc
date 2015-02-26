@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@
  * Date: 25 May 2009
  */
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletMotionState.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 
@@ -47,9 +49,23 @@ void BulletMotionState::getWorldTransform(btTransform &_cogWorldTrans) const
 }
 
 //////////////////////////////////////////////////
-void BulletMotionState::setWorldTransform(const btTransform &_cogWorldTrans)
+void BulletMotionState::setWorldTransform(const btTransform &/*_cogWorldTrans*/)
 {
-  math::Pose pose = BulletTypes::ConvertPose(_cogWorldTrans);
+  // _cogWorldTrans seems to be one time-step behind
+  // for now get transform from btRigidBody directly
+  physics::BulletLinkPtr bulletLink =
+    boost::static_pointer_cast<BulletLink>(this->link);
+  GZ_ASSERT(bulletLink, "parent link must be valid");
+  math::Pose pose;
+  if (bulletLink->GetBulletLink())
+  {
+    pose = BulletTypes::ConvertPose(
+      bulletLink->GetBulletLink()->getCenterOfMassTransform());
+  }
+  else
+  {
+    pose = bulletLink->GetWorldCoGPose();
+  }
 
   // transform pose from cg location to link location
   // cg: pose of cg in link frame, so -cg is transform from cg to

@@ -695,10 +695,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = @CMAKE_SOURCE_DIR@/gazebo/gui \
-                         @CMAKE_SOURCE_DIR@/gazebo/physics/ode \
-                         @CMAKE_SOURCE_DIR@/gazebo/physics/bullet \
-                         @CMAKE_SOURCE_DIR@/gazebo/rendering/ogretest \
+EXCLUDE                = @CMAKE_SOURCE_DIR@/gazebo/rendering/ogretest \
                          @CMAKE_SOURCE_DIR@/gazebo/rendering/skyx \
                          @CMAKE_SOURCE_DIR@/gazebo/rendering/selection_buffer \
                          @CMAKE_SOURCE_DIR@/gazebo/rendering/deferred_shading
@@ -1222,7 +1219,7 @@ MATHJAX_EXTENSIONS     =
 # typically be disabled. For large projects the javascript based search engine
 # can be slow, then enabling SERVER_BASED_SEARCH may provide a better solution.
 
-SEARCHENGINE           = YES
+SEARCHENGINE           = NO
 
 # When the SERVER_BASED_SEARCH tag is enabled the search engine will be
 # implemented using a PHP enabled web server instead of at the web client
@@ -1241,7 +1238,7 @@ SERVER_BASED_SEARCH    = NO
 # If the GENERATE_LATEX tag is set to YES (the default) Doxygen will
 # generate Latex output.
 
-GENERATE_LATEX         = YES
+GENERATE_LATEX         = NO
 
 # The LATEX_OUTPUT tag is used to specify where the LaTeX docs will be put.
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +32,6 @@ class PR2Test : public ServerFixture,
 ////////////////////////////////////////////////////////////////////////
 void PR2Test::LoadPR2(std::string _physicsEngine)
 {
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Abort test since simbody does not support screw joints in PR2, "
-          << "Please see issue #857.\n";
-    return;
-  }
   if (_physicsEngine == "dart")
   {
     gzerr << "Abort test since dart does not support ray sensor in PR2, "
@@ -65,11 +59,11 @@ void PR2Test::LoadPR2(std::string _physicsEngine)
 
   sensors::SensorPtr sensor =
     sensors::get_sensor("narrow_stereo_gazebo_l_stereo_camera_sensor");
-  EXPECT_TRUE(sensor);
+  EXPECT_TRUE(sensor != NULL);
 
   sensors::CameraSensorPtr camSensor =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  EXPECT_TRUE(camSensor);
+  EXPECT_TRUE(camSensor != NULL);
 
   while (!camSensor->SaveFrame(paths->GetDefaultTestPath() + "/frame_10.jpg"))
     common::Time::MSleep(100);
@@ -99,12 +93,6 @@ void PR2Test::ScrewJoint(std::string _physicsEngine)
   if (_physicsEngine == "bullet")
   {
     gzerr << "Abort test since bullet screw joints don't work yet\n";
-    return;
-  }
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Abort test since simbody does not support screw joints in PR2, "
-          << "Please see issue #857.\n";
     return;
   }
   if (_physicsEngine == "dart")
@@ -141,7 +129,7 @@ void PR2Test::ScrewJoint(std::string _physicsEngine)
   world->Step(300);
 
   // Set a fixed velocity on revolute joint that connects to the screw joint
-  unsigned int steps = 100;
+  unsigned int steps = 1000;
   for (unsigned int i = 0; i < steps; ++i)
   {
     motor->SetForce(0, 10);
@@ -165,8 +153,10 @@ void PR2Test::StaticPR2(std::string _physicsEngine)
 {
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Abort test since simbody does not support screw joints in PR2, "
-          << "Please see issue #857.\n";
+    gzerr << "Abort test since simbody does not support static models "
+          << "with pose offsets, "
+          << "please see issue #860."
+          << std::endl;
     return;
   }
   if (_physicsEngine == "dart")

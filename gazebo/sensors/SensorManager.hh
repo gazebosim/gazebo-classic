@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Class to manager all sensors
- * Author: Nate Koenig
- * Date: 18 Dec 2009
- */
-
 #ifndef _SENSORMANAGER_HH_
 #define _SENSORMANAGER_HH_
 
@@ -122,11 +116,6 @@ namespace gazebo
       /// \brief Get all the sensor types
       /// \param[out] All the sensor types.
       public: void GetSensorTypes(std::vector<std::string> &_types) const;
-
-      /// \brief Deprecated.
-      public: std::string CreateSensor(sdf::ElementPtr _elem,
-                  const std::string &_worldName,
-                  const std::string &_parentName) GAZEBO_DEPRECATED(2.0);
 
       /// \brief Add a sensor from an SDF element. This function will also Load
       /// and Init the sensor.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,6 +105,9 @@ namespace gazebo
 
       /// \brief The current contacts.
       private: std::vector<msgs::Contact> contacts;
+
+      /// \brief Mutex used to protect reading/writing the sonar message.
+      private: boost::mutex mutexContacts;
 
       /// \brief True if the gripper has an object.
       private: bool attached;

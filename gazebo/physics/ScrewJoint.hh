@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A screw or primastic/rotational joint
- * Author: Nate Koenig, John Hsu
- * Date: 21 May 2003
- */
-
 #ifndef _SCREWJOINT_HH_
 #define _SCREWJOINT_HH_
 
@@ -57,81 +52,38 @@ namespace gazebo
                  {
                    T::Load(_sdf);
 
-                   if (_sdf->HasElement("thread_pitch"))
-                   {
-                     this->threadPitch =
-                       _sdf->GetElement("thread_pitch")->Get<double>();
-                   }
-                   else
-                   {
-                     this->threadPitch = 1.0;
-                     gzwarn << "<thread_pitch> element not specified. "
-                            << "Using default value of "
-                            << this->threadPitch
-                            << ". \n";
-                   }
-
-                   if (_sdf->HasElement("axis"))
-                   {
-                     sdf::ElementPtr axisElem = _sdf->GetElement("axis");
-                     this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
-                     if (axisElem->HasElement("limit"))
-                     {
-                       sdf::ElementPtr limitElem =
-                         _sdf->GetElement("axis")->GetElement("limit");
-
-                       // Perform this three step ordering to ensure the
-                       // parameters are set properly. This is taken from
-                       // the ODE wiki.
-                       this->SetHighStop(0, limitElem->Get<double>("upper"));
-                       this->SetLowStop(0, limitElem->Get<double>("lower"));
-                       this->SetHighStop(0, limitElem->Get<double>("upper"));
-                     }
-                   }
+                   this->threadPitch =
+                     _sdf->GetElement("thread_pitch")->Get<double>();
                  }
 
-      /// \brief Set the anchor.
-      /// \param[in] _index Index of the axis. Not Used.
-      /// \param[in] _anchor Anchor value for the joint.
-      public: virtual void SetAnchor(unsigned int _index,
-                  const math::Vector3 &_anchor);
-
-      /// \brief Get the anchor.
-      /// \param[in] _index Index of the axis. Not Used.
-      /// \return Anchor for the joint.
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
-
       /// \brief Set screw joint thread pitch.
-      ///
+      /// Thread Pitch is defined as angular motion per linear
+      /// motion or rad / m in metric.
       /// This must be implemented in a child class
-      /// \param[in] _index Index of the axis.
+      /// To clarify direction, these are modeling right handed threads
+      /// with positive thread_pitch, i.e. the child Link is the nut
+      /// (interior threads) while the parent Link is the bolt/screw
+      /// (exterior threads).
       /// \param[in] _threadPitch Thread pitch value.
-      public: virtual void SetThreadPitch(unsigned int _index,
-                  double _threadPitch) = 0;
+      public: virtual void SetThreadPitch(double _threadPitch) = 0;
 
       /// \brief Get screw joint thread pitch.
-      ///
+      /// Thread Pitch is defined as angular motion per linear
+      /// motion or rad / m in metric.
       /// This must be implemented in a child class
-      /// \param[in] _index Index of the axis.
       /// \return _threadPitch Thread pitch value.
-      public: virtual double GetThreadPitch(unsigned int _index) = 0;
-
-      /// \brief The anchor value is not used internally.
-      protected: math::Vector3 fakeAnchor;
+      public: virtual double GetThreadPitch() = 0;
 
       /// \brief Pitch of the thread.
       protected: double threadPitch;
+
+      /// \brief Initialize joint
+      protected: virtual void Init()
+                 {
+                   T::Init();
+                 }
     };
     /// \}
-
-    template<class T>
-    void ScrewJoint<T>::SetAnchor(unsigned int /*_index*/,
-                                  const math::Vector3 &_anchor)
-    {this->fakeAnchor = _anchor;}
-
-    template<class T>
-    math::Vector3 ScrewJoint<T>::GetAnchor(unsigned int /*_index*/) const
-    {return this->fakeAnchor;}
   }
 }
 #endif

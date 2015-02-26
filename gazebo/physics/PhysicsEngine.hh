@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The base class for all physics engines
- * Author: Nate Koenig
- */
-
 #ifndef _PHYSICSENGINE_HH_
 #define _PHYSICSENGINE_HH_
 
@@ -170,24 +166,6 @@ namespace gazebo
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Access functions to set ODE parameters.
-      /// \param[in] _iter Number of iterations.
-      public: virtual void SetSORPGSPreconIters(unsigned int _iters);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _iter Number of iterations.
-      public: virtual void SetSORPGSIters(unsigned int _iters);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _w SORPGSW value.
-      public: virtual void SetSORPGSW(double _w);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
       /// \param[in] _vel Max correcting velocity.
       public: virtual void SetContactMaxCorrectingVel(double _vel);
 
@@ -222,24 +200,6 @@ namespace gazebo
       public: virtual bool GetAutoDisableFlag() {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief access functions to set ODE parameters.
-      /// \return SORPGS precondition iterations.
-      public: virtual int GetSORPGSPreconIters() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief access functions to set ODE parameters.
-      /// \return SORPGS iterations.
-      public: virtual int GetSORPGSIters() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map.
-      /// \brief access functions to set ODE parameters
-      /// \return SORPGSW value.
-      public: virtual double GetSORPGSW() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
       /// property map.
       /// \brief access functions to set ODE parameters.
       /// \return Max correcting velocity.
@@ -257,14 +217,43 @@ namespace gazebo
       /// \return Maximum number of allows contacts.
       public: virtual unsigned int GetMaxContacts() {return 0;}
 
-      /// \brief Set a parameter of the physics engine
+      /// \brief Set a parameter of the physics engine.
+      /// See SetParam documentation for descriptions of duplicate parameters.
       /// \param[in] _key String key
+      /// Below is a list of _key parameter definitions:
+      ///       -# "solver_type" (string) - returns solver used by engine, e.g.
+      ///          "sequential_impulse' for Bullet, "quick" for ODE
+      ///          "Featherstone and Lemkes" for DART and
+      ///          "Spatial Algebra and Elastic Foundation" for Simbody.
+      ///       -# "cfm" (double) - global CFM
+      ///       -# "erp" (double) - global ERP
+      ///       -# "precon_iters" (bool) - precondition iterations
+      ///          (experimental).
+      ///       -# "iters" (int) - number of LCP PGS iterations. If
+      ///          sor_lcp_tolerance is negative, full iteration count is
+      ///          executed.  Otherwise, PGS may stop iteration early if
+      ///          sor_lcp_tolerance is satisfied by the total RMS residual.
+      ///       -# "sor" (double) - relaxation parameter for Projected
+      ///          Gauss-Seidel (PGS) updates.
+      ///       -# "contact_max_correcting_vel" (double) - truncates correction
+      ///          impulses from ERP by this value.
+      ///       -# "contact_surface_layer" (double) - ERP is 0 for
+      ///          interpenetration depths below this value.
+      ///       -# "max_contacts" (int) - max number of contact constraints
+      ///          between any pair of collision bodies.
+      ///       -# "min_step_size" (double) - minimum internal step size.
+      ///          (defined but not used in ode).
+      ///       -# "max_step_size" (double) - maximum physics step size when
+      ///          physics update step must return.
+      ///
       /// \param[in] _value The value to set to
-      public: virtual void SetParam(const std::string &_key,
+      /// \return true if SetParam is successful, false if operation fails.
+      public: virtual bool SetParam(const std::string &_key,
                   const boost::any &_value);
 
       /// \brief Get an parameter of the physics engine
       /// \param[in] _attr String key
+      /// \sa SetParam
       /// \return The value of the parameter
       public: virtual boost::any GetParam(const std::string &_key) const;
 

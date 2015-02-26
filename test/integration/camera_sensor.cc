@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,15 +36,17 @@ unsigned char* img = NULL;
 unsigned char* img2 = NULL;
 int imageCount = 0;
 int imageCount2 = 0;
+std::string pixelFormat = "";
 
 /////////////////////////////////////////////////
 void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
                   const unsigned char *_image,
                   unsigned int _width, unsigned int _height,
                   unsigned int _depth,
-                  const std::string &/*_format*/)
+                  const std::string &_format)
 {
   boost::mutex::scoped_lock lock(mutex);
+  pixelFormat = _format;
   memcpy(_imageDest, _image, _width * _height * _depth);
   *_imageCounter += 1;
 }
@@ -325,6 +327,97 @@ TEST_F(CameraSensor, CheckNoise)
   delete[] img2;
 }
 
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, CheckDistortion)
+{
+  Load("worlds/empty.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // Spawn two cameras in the same location, one with noise and one without.
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  std::string modelNameDistorted = "camera_model_distorted";
+  std::string cameraNameDistorted = "camera_sensor_distorted";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+
+  math::Pose setPose(
+      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.pos,
+      setPose.rot.GetAsEuler(), width, height, updateRate);
+  // spawn a camera with barrel distortion
+  SpawnCamera(modelNameDistorted, cameraNameDistorted, setPose.pos,
+      setPose.rot.GetAsEuler(), width, height, updateRate,
+      "", 0, 0, true, -0.25349, 0.11868, 0.0, -0.00028, 0.00005, 0.5, 0.5);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  sensor = sensors::get_sensor(cameraNameDistorted);
+  sensors::CameraSensorPtr camSensorDistorted =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+  imageCount = 0;
+  imageCount2 = 0;
+  img = new unsigned char[width * height*3];
+  img2 = new unsigned char[width * height*3];
+  event::ConnectionPtr c =
+    camSensor->GetCamera()->ConnectNewImageFrame(
+        boost::bind(&::OnNewCameraFrame, &imageCount, img,
+          _1, _2, _3, _4, _5));
+  event::ConnectionPtr c2 =
+    camSensorDistorted->GetCamera()->ConnectNewImageFrame(
+        boost::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          _1, _2, _3, _4, _5));
+
+  // Get some images
+  while (imageCount < 10 || imageCount2 < 10)
+    common::Time::MSleep(10);
+
+  unsigned int diffMax = 0, diffSum = 0;
+  double diffAvg = 0.0;
+  this->ImageCompare(img, img2, width, height, 3,
+                     diffMax, diffSum, diffAvg);
+
+  // We expect that there will be some non-zero difference between the two
+  // images.
+  EXPECT_NE(diffSum, 0u);
+
+  // Compare colors. Distorted image should have more darker pixels than the
+  // original as the ground plane has been warped to occupy more of the image.
+  unsigned int colorSum = 0;
+  unsigned int colorSum2 = 0;
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3)];
+      unsigned int g = img[(y*width*3)+1];
+      unsigned int b = img[(y*width*3)+2];
+      colorSum += r + g + b;
+      unsigned int r2 = img2[(y*width*3)];
+      unsigned int g2 = img2[(y*width*3)+1];
+      unsigned int b2 = img2[(y*width*3)+2];
+      colorSum2 += r2 + g2 + b2;
+    }
+  }
+  EXPECT_GT(colorSum, colorSum2);
+
+  // We expect that there will be some non-zero difference between the two
+  // images.
+  EXPECT_NE(diffSum, 0u);
+  delete[] img;
+  delete[] img2;
+}
+
 int main(int argc, char **argv)
 {
   // Set a specific seed to avoid occasional test failures due to
@@ -408,14 +501,17 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
     while (imageCount < 1 || imageCount2 < 1)
       common::Time::MSleep(10);
 
-    unsigned int diffMax = 0, diffSum = 0;
-    double diffAvg = 0.0;
-    unsigned int diffMax2 = 0, diffSum2 = 0;
-    double diffAvg2 = 0.0;
-    unsigned int diffMax12 = 0, diffSum12 = 0;
+    unsigned int diffMax12 = 0;
+    unsigned int diffSum12 = 0;
+    unsigned int diffSum = 0;
+    unsigned int diffSum2 = 0;
     double diffAvg12 = 0.0;
-
     {
+      unsigned int diffMax = 0;
+      double diffAvg = 0.0;
+      unsigned int diffMax2 = 0;
+      double diffAvg2 = 0.0;
+
       boost::mutex::scoped_lock lock(mutex);
       this->ImageCompare(img, prevImg, width, height, 3,
                          diffMax, diffSum, diffAvg);

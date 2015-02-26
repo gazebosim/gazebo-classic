@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,35 +55,39 @@ ModelMaker::~ModelMaker()
 }
 
 /////////////////////////////////////////////////
-// bool ModelMaker::InitFromModel(const std::string & /*_modelName*/)
-// {
-//   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-//   if (this->modelVisual)
-//   {
-//     scene->RemoveVisual(this->modelVisual);
-//     this->modelVisual.reset();
-//     this->visuals.clear();
-//   }
-//
-//   // This function is currently not executed. Commenting out the following
-//   // line to prevent a compile warning.
-//   // this->modelVisual =
-//   // scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
-//
-//   if (!this->modelVisual)
-//   {
-//     gzerr << "Unable to clone\n";
-//     return false;
-//   }
-//
-//   this->clone = true;
-//
-//   return true;
-// }
+bool ModelMaker::InitFromModel(const std::string & _modelName)
+{
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  if (this->modelVisual)
+  {
+    scene->RemoveVisual(this->modelVisual);
+    this->modelVisual.reset();
+    this->visuals.clear();
+  }
+
+  rendering::VisualPtr vis = scene->GetVisual(_modelName);
+  if (!vis)
+  {
+    gzerr << "Model: '" << _modelName << "' does not exist." << std::endl;
+    return false;
+  }
+
+  this->modelVisual = vis->Clone(
+      _modelName + "_clone_tmp", scene->GetWorldVisual());
+
+  if (!this->modelVisual)
+  {
+    gzerr << "Unable to clone\n";
+    return false;
+  }
+  this->clone = true;
+  return true;
+}
 
 /////////////////////////////////////////////////
 bool ModelMaker::InitFromSDFString(const std::string &_data)
 {
+  this->clone = false;
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
   if (this->modelVisual)

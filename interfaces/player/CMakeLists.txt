@@ -18,7 +18,7 @@ set (sources GazeboDriver.cc
              #ImuInterface.cc
 
 include_directories( 
-  ${SDF_INCLUDE_DIRS} 
+  ${SDFormat_INCLUDE_DIRS} 
   ${PLAYER_INCLUDE_DIRS} 
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
@@ -26,14 +26,13 @@ include_directories(
 )
 
 link_directories( 
-  ${SDF_LIBRARY_DIRS} 
+  ${SDFormat_LIBRARY_DIRS} 
 )
 
 link_directories(${PLAYER_LINK_DIRS} ${Boost_LIBRARY_DIRS})
 
 gz_add_library(gazebo_player ${sources})
 target_link_libraries(gazebo_player ${PLAYER_LINK_LIBS}
-gazebo_player
 gazebo_common
 gazebo_transport
 gazebo_msgs

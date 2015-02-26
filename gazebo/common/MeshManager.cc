@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,13 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/ColladaLoader.hh"
+#include "gazebo/common/ColladaExporter.hh"
 #include "gazebo/common/STLLoader.hh"
 #include "gazebo/gazebo_config.h"
 
 #ifdef HAVE_GTS
   #include "gazebo/common/MeshCSG.hh"
+  #include "gazebo/common/GTSMeshUtils.hh"
 #endif
 
 #include "gazebo/common/MeshManager.hh"
@@ -42,6 +44,7 @@ using namespace common;
 MeshManager::MeshManager()
 {
   this->colladaLoader = new ColladaLoader();
+  this->colladaExporter = new ColladaExporter();
   this->stlLoader = new STLLoader();
 
   // Create some basic shapes
@@ -73,6 +76,7 @@ MeshManager::MeshManager()
 MeshManager::~MeshManager()
 {
   delete this->colladaLoader;
+  delete this->colladaExporter;
   delete this->stlLoader;
   std::map<std::string, Mesh*>::iterator iter;
   for (iter = this->meshes.begin(); iter != this->meshes.end(); ++iter)
@@ -156,6 +160,20 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     gzerr << "Unable to find file[" << _filename << "]\n";
 
   return mesh;
+}
+
+//////////////////////////////////////////////////
+void MeshManager::Export(const Mesh *_mesh, const std::string &_filename,
+    const std::string &_extension, bool _exportTextures)
+{
+  if (_extension == "dae")
+  {
+    this->colladaExporter->Export(_mesh, _filename, _exportTextures);
+  }
+  else
+  {
+    gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
+  }
 }
 
 //////////////////////////////////////////////////
@@ -460,6 +478,130 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   for (i = 0; i < 36; i++)
     subMesh->AddIndex(ind[i]);
 
+  subMesh->RecalculateNormals();
+}
+
+//////////////////////////////////////////////////
+void MeshManager::CreateExtrudedPolyline(const std::string &_name,
+    const std::vector<math::Vector2d> &_vertices,
+    const double &_height, const math::Vector2d & /*_uvCoords*/)
+{
+  if (this->HasMesh(_name))
+  {
+    return;
+  }
+
+  int i;
+  int numSides = _vertices.size();
+
+  Mesh *mesh = new Mesh();
+  mesh->SetName(_name);
+  this->meshes.insert(std::make_pair(_name, mesh));
+
+  SubMesh *subMesh = new SubMesh();
+  mesh->AddSubMesh(subMesh);
+
+  #if HAVE_GTS
+  {
+    if (!GTSMeshUtils::CreateExtrudedPolyline(_vertices, _height, subMesh))
+    {
+      gzerr << "Unable to create extruded polyline.\n";
+      delete mesh;
+      return;
+    }
+  }
+  #else
+  {
+    gzerr << "GTS library not found.\n" <<
+             "Polylines rendered may be incorrect, if concave\n";
+
+    // Add the vertices
+    for (i = 0; i < numSides; ++i)
+    {
+      subMesh->AddVertex(_vertices[i].x, _vertices[i].y, 0.0);
+      subMesh->AddVertex(_vertices[i].x, _vertices[i].y, _height);
+    }
+
+    // Euler's Formula: numFaces = numEdges - numVertices + 2
+    //                           = numSides + 2
+    // # of SideFaces = numFaces - (upper face + lower face)
+    //                = numFaces - 2
+    //                = numSides
+
+    // for lower face
+    int startVert = 0;
+    int endVert = numSides * 2 - 2;
+    subMesh->AddIndex(startVert);
+    startVert += 2;
+    subMesh->AddIndex(startVert);
+    subMesh->AddIndex(endVert);
+    for (i = 1; i < numSides-2; ++i)
+    {
+      if (i%2)
+      {
+        subMesh->AddIndex(startVert);
+        startVert += 2;
+        subMesh->AddIndex(startVert);
+        subMesh->AddIndex(endVert);
+      }
+      else
+      {
+        subMesh->AddIndex(endVert);
+        endVert -= 2;
+        subMesh->AddIndex(startVert);
+        subMesh->AddIndex(endVert);
+      }
+    }
+
+    // for upper face
+    startVert = 1;
+    endVert = numSides*2-1;
+    subMesh->AddIndex(startVert);
+    startVert += 2;
+    subMesh->AddIndex(endVert);
+    subMesh->AddIndex(startVert);
+    for (i = 1; i < numSides-2; ++i)
+    {
+      if (!i%2)
+      {
+        subMesh->AddIndex(startVert);
+        startVert += 2;
+        subMesh->AddIndex(startVert);
+        subMesh->AddIndex(endVert);
+      }
+      else
+      {
+        subMesh->AddIndex(endVert);
+        endVert -= 2;
+        subMesh->AddIndex(endVert);
+        subMesh->AddIndex(startVert);
+      }
+    }
+  }
+  #endif
+
+  // for each sideface
+  for (i = 0; i < numSides; ++i)
+  {
+    subMesh->AddVertex(_vertices[i].x, _vertices[i].y, 0.0);
+    subMesh->AddVertex(_vertices[i].x, _vertices[i].y, _height);
+  }
+  subMesh->AddVertex(_vertices[0].x, _vertices[0].y, 0.0);
+  subMesh->AddVertex(_vertices[0].x, _vertices[0].y, _height);
+
+  for (i = 0; i < numSides; ++i)
+  {
+    subMesh->AddIndex(i*2+numSides*2);
+    subMesh->AddIndex(i*2+1+numSides*2);
+    subMesh->AddIndex(i*2+2+numSides*2);
+
+    subMesh->AddIndex(i*2+2+numSides*2);
+    subMesh->AddIndex(i*2+1+numSides*2);
+    subMesh->AddIndex(i*2+3+numSides*2);
+  }
+
+  if (subMesh->GetNormalCount() != subMesh->GetVertexCount())
+    subMesh->SetNormalCount(subMesh->GetVertexCount());
   subMesh->RecalculateNormals();
 }
 
@@ -776,39 +918,39 @@ void MeshManager::CreateCone(const std::string &name, float radius,
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreateTube(const std::string &name, float innerRadius,
-    float outterRadius, float height, int rings,
-    int segments)
+void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
+    float _outerRadius, float _height, int _rings, int _segments, double _arc)
 {
   math::Vector3 vert, norm;
   unsigned int verticeIndex = 0;
   int ring, seg;
-  float deltaSegAngle = (2.0 * M_PI / segments);
 
-  // Needs at lest 2 rings, and 3 segments
-  rings = std::max(rings, 1);
-  segments = std::max(segments, 3);
+  // Needs at lest 1 ring, and 3 segments
+  int rings = std::max(_rings, 1);
+  int segments = std::max(_segments, 3);
+
+  float deltaSegAngle = (_arc / segments);
 
   float radius = 0;
 
-  radius = outterRadius;
+  radius = _outerRadius;
 
-  if (this->HasMesh(name))
+  if (this->HasMesh(_name))
     return;
 
   Mesh *mesh = new Mesh();
-  mesh->SetName(name);
-  this->meshes.insert(std::make_pair(name, mesh));
+  mesh->SetName(_name);
+  this->meshes.insert(std::make_pair(_name, mesh));
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
   // Generate the group of rings for the outsides of the cylinder
-  for (ring = 0; ring <= rings; ring++)
+  for (ring = 0; ring <= rings; ++ring)
   {
-    vert.z = ring * height/rings - height/2.0;
+    vert.z = ring * _height/rings - _height/2.0;
 
     // Generate the group of segments for the current ring
-    for (seg = 0; seg <= segments; seg++)
+    for (seg = 0; seg <= segments; ++seg)
     {
       vert.y = radius * cosf(seg * deltaSegAngle);
       vert.x = radius * sinf(seg * deltaSegAngle);
@@ -824,33 +966,43 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
           static_cast<float>(seg) / static_cast<float>(segments),
           static_cast<float>(ring) / static_cast<float>(rings));
 
+      // outer triangles connecting ring [ring] to ring [ring + 1]
       if (ring != rings)
       {
-        // each vertex (except the last) has six indices
-        subMesh->AddIndex(verticeIndex + segments + 1);
-        subMesh->AddIndex(verticeIndex);
-        subMesh->AddIndex(verticeIndex + segments);
-        subMesh->AddIndex(verticeIndex + segments + 1);
-        subMesh->AddIndex(verticeIndex + 1);
-        subMesh->AddIndex(verticeIndex);
+        if (seg != 0)
+        {
+          subMesh->AddIndex(verticeIndex + segments + 1);
+          subMesh->AddIndex(verticeIndex);
+          subMesh->AddIndex(verticeIndex + segments);
+        }
+        if (seg != segments)
+        {
+          subMesh->AddIndex(verticeIndex + segments + 1);
+          subMesh->AddIndex(verticeIndex + 1);
+          subMesh->AddIndex(verticeIndex);
+        }
       }
-      else
+      // ring [rings] is the edge of the top cap
+      else if (seg != segments)
       {
-        // This indices form the top cap
+        // These indices form the top cap
         subMesh->AddIndex(verticeIndex);
         subMesh->AddIndex(verticeIndex + segments + 1);
         subMesh->AddIndex(verticeIndex+1);
+
         subMesh->AddIndex(verticeIndex+1);
         subMesh->AddIndex(verticeIndex + segments + 1);
         subMesh->AddIndex(verticeIndex + segments + 2);
       }
 
-      // There indices form the bottom cap
+      // ring [0] is the edge of the bottom cap
       if (ring == 0 && seg < segments)
       {
+        // These indices form the bottom cap
         subMesh->AddIndex(verticeIndex+1);
         subMesh->AddIndex(verticeIndex + (segments+1) * (((rings+1)*2)-1));
         subMesh->AddIndex(verticeIndex);
+
         subMesh->AddIndex(verticeIndex + (segments+1) * (((rings+1)*2)-1) + 1);
         subMesh->AddIndex(verticeIndex + (segments+1) * (((rings+1)*2)-1));
         subMesh->AddIndex(verticeIndex+1);
@@ -861,13 +1013,13 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
   }
 
   // Generate the group of rings for the inside of the cylinder
-  radius = innerRadius;
-  for (ring = 0; ring <= rings; ring++)
+  radius = _innerRadius;
+  for (ring = 0; ring <= rings; ++ring)
   {
-    vert.z = (height/2.0) - (ring * height/rings);
+    vert.z = (_height/2.0) - (ring * _height/rings);
 
     // Generate the group of segments for the current ring
-    for (seg = 0; seg <= segments; seg++)
+    for (seg = 0; seg <= segments; ++seg)
     {
       vert.y = radius * cosf(seg * deltaSegAngle);
       vert.x = radius * sinf(seg * deltaSegAngle);
@@ -883,18 +1035,49 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
           static_cast<float>(seg) / static_cast<float>(segments),
           static_cast<float>(ring) / static_cast<float>(rings));
 
+      // inner triangles connecting ring [ring] to ring [ring + 1]
       if (ring != rings)
       {
-        // each vertex (except the last) has six indices
-        subMesh->AddIndex(verticeIndex + segments + 1);
-        subMesh->AddIndex(verticeIndex);
-        subMesh->AddIndex(verticeIndex + segments);
-
-        subMesh->AddIndex(verticeIndex + segments + 1);
-        subMesh->AddIndex(verticeIndex + 1);
-        subMesh->AddIndex(verticeIndex);
+        // each vertex has six indices (2 triangles)
+        if (seg != 0)
+        {
+          subMesh->AddIndex(verticeIndex + segments + 1);
+          subMesh->AddIndex(verticeIndex);
+          subMesh->AddIndex(verticeIndex + segments);
+        }
+        if (seg != segments)
+        {
+          subMesh->AddIndex(verticeIndex + segments + 1);
+          subMesh->AddIndex(verticeIndex + 1);
+          subMesh->AddIndex(verticeIndex);
+        }
       }
       verticeIndex++;
+    }
+  }
+
+  // Close ends in case it's not a full circle
+  if (!math::equal(_arc, 2.0 * M_PI))
+  {
+    for (ring = 0; ring < rings; ++ring)
+    {
+      // Close beginning
+      subMesh->AddIndex((segments+1)*(ring+1));
+      subMesh->AddIndex((segments+1)*ring);
+      subMesh->AddIndex((segments+1)*((rings+1)*2-2-ring));
+
+      subMesh->AddIndex((segments+1)*((rings+1)*2-2-ring));
+      subMesh->AddIndex((segments+1)*ring);
+      subMesh->AddIndex((segments+1)*((rings+1)*2-1-ring));
+
+      // Close end
+      subMesh->AddIndex((segments+1)*((rings+1)*2-2-ring)+segments);
+      subMesh->AddIndex((segments+1)*((rings+1)*2-1-ring)+segments);
+      subMesh->AddIndex((segments+1)*(ring+1)+segments);
+
+      subMesh->AddIndex((segments+1)*(ring+1)+segments);
+      subMesh->AddIndex((segments+1)*((rings+1)*2-1-ring)+segments);
+      subMesh->AddIndex((segments+1)*ring+segments);
     }
   }
 
@@ -981,3 +1164,4 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
   this->meshes.insert(std::make_pair(_name, mesh));
 }
 #endif
+

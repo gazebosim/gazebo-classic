@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 
+#include "gazebo/gui/GuiPlugin.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GLWidget.hh"
@@ -52,7 +53,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolFrame->setObjectName("toolFrame");
   toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-  QToolBar *toolbar = new QToolBar;
+  this->toolbar = new QToolBar;
   QHBoxLayout *toolLayout = new QHBoxLayout;
   toolLayout->setContentsMargins(0, 0, 0, 0);
 
@@ -61,25 +62,48 @@ RenderWidget::RenderWidget(QWidget *_parent)
   actionGroup->addAction(g_translateAct);
   actionGroup->addAction(g_rotateAct);
   actionGroup->addAction(g_scaleAct);
+  actionGroup->addAction(g_snapAct);
 
-  toolbar->addAction(g_arrowAct);
-  toolbar->addAction(g_translateAct);
-  toolbar->addAction(g_rotateAct);
-  toolbar->addAction(g_scaleAct);
+  this->toolbar->addAction(g_arrowAct);
+  this->toolbar->addAction(g_translateAct);
+  this->toolbar->addAction(g_rotateAct);
+  this->toolbar->addAction(g_scaleAct);
 
-  toolbar->addSeparator();
-  toolbar->addAction(g_boxCreateAct);
-  toolbar->addAction(g_sphereCreateAct);
-  toolbar->addAction(g_cylinderCreateAct);
-  toolbar->addSeparator();
-  toolbar->addAction(g_pointLghtCreateAct);
-  toolbar->addAction(g_spotLghtCreateAct);
-  toolbar->addAction(g_dirLghtCreateAct);
-  toolbar->addSeparator();
-  toolbar->addAction(g_screenshotAct);
+  this->toolbar->addSeparator();
+  this->toolbar->addAction(g_boxCreateAct);
+  this->toolbar->addAction(g_sphereCreateAct);
+  this->toolbar->addAction(g_cylinderCreateAct);
+  this->toolbar->addSeparator();
+  this->toolbar->addAction(g_pointLghtCreateAct);
+  this->toolbar->addAction(g_spotLghtCreateAct);
+  this->toolbar->addAction(g_dirLghtCreateAct);
+  this->toolbar->addSeparator();
+  this->toolbar->addAction(g_screenshotAct);
+
+  this->toolbar->addSeparator();
+  this->toolbar->addAction(g_copyAct);
+  this->toolbar->addAction(g_pasteAct);
+
+  this->toolbar->addSeparator();
+
+  QToolButton *alignButton = new QToolButton;
+  alignButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  alignButton->setIcon(QIcon(":/images/align.png"));
+  alignButton->setToolTip(
+      tr("In Selection Mode, hold Ctrl and select 2 objects to align"));
+  alignButton->setArrowType(Qt::NoArrow);
+  QMenu *alignMenu = new QMenu(alignButton);
+  alignMenu->addAction(g_alignAct);
+  alignButton->setMenu(alignMenu);
+  alignButton->setPopupMode(QToolButton::InstantPopup);
+  g_alignButtonAct = this->toolbar->addWidget(alignButton);
+  connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
+
+  this->toolbar->addSeparator();
+  this->toolbar->addAction(g_snapAct);
 
   toolLayout->addSpacing(10);
-  toolLayout->addWidget(toolbar);
+  toolLayout->addWidget(this->toolbar);
   toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
@@ -144,17 +168,57 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   this->timer = new QTimer(this);
   connect(this->timer, SIGNAL(timeout()), this, SLOT(update()));
-  this->timer->start(44);
+
+  // Set update rate. 30Hz is good.
+  this->timer->start(1000.0 / 30.0);
 
   this->connections.push_back(
       gui::Events::ConnectFollow(
         boost::bind(&RenderWidget::OnFollow, this, _1)));
+
+  // Load all GUI Plugins
+  std::string filenames = getINIProperty<std::string>(
+      "overlay_plugins.filenames", "");
+  std::vector<std::string> pluginFilenames;
+
+  // Split the colon separated libraries
+  boost::split(pluginFilenames, filenames, boost::is_any_of(":"));
+
+  // Load each plugin
+  for (std::vector<std::string>::iterator iter = pluginFilenames.begin();
+       iter != pluginFilenames.end(); ++iter)
+  {
+    // Make sure the string is not empty
+    if (!(*iter).empty())
+    {
+      // Try to create the plugin
+      gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(*iter, *iter);
+
+      if (!plugin)
+      {
+        gzerr << "Unable to create gui overlay plugin with filename["
+          << *iter << "]\n";
+      }
+      else
+      {
+        gzlog << "Loaded GUI plugin[" << *iter << "]\n";
+
+        // Set the plugin's parent and store the plugin
+        plugin->setParent(this->glWidget);
+        this->plugins.push_back(plugin);
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
 RenderWidget::~RenderWidget()
 {
   delete this->glWidget;
+  this->glWidget = NULL;
+
+  delete this->toolbar;
+  this->toolbar = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -231,9 +295,10 @@ void RenderWidget::ShowEditor(bool _show)
   if (_show)
   {
     this->buildingEditorWidget->show();
-    this->baseOverlayMsg = "Building is View Only";
+    this->baseOverlayMsg = "Building is view-only";
     this->OnClearOverlayMsg();
     this->bottomFrame->hide();
+    this->ShowToolbar(false);
   }
   else
   {
@@ -241,6 +306,7 @@ void RenderWidget::ShowEditor(bool _show)
     this->baseOverlayMsg = "";
     this->OnClearOverlayMsg();
     this->bottomFrame->show();
+    this->ShowToolbar(true);
   }
 }
 
@@ -285,6 +351,28 @@ std::string RenderWidget::GetOverlayMsg() const
 }
 
 /////////////////////////////////////////////////
+void RenderWidget::ShowToolbar(const bool _show)
+{
+  if (this->toolbar)
+  {
+    if (_show)
+    {
+      this->toolbar->show();
+    }
+    else
+    {
+      this->toolbar->hide();
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+QToolBar *RenderWidget::GetToolbar() const
+{
+  return this->toolbar;
+}
+
+/////////////////////////////////////////////////
 void RenderWidget::OnClearOverlayMsg()
 {
   this->DisplayOverlayMsg("");
@@ -303,4 +391,17 @@ void RenderWidget::OnFollow(const std::string &_modelName)
     g_translateAct->setEnabled(false);
     g_rotateAct->setEnabled(false);
   }
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem)
+{
+  // Set the plugin's parent and store the plugin
+  _plugin->setParent(this->glWidget);
+  this->plugins.push_back(_plugin);
+
+  // Load the plugin.
+  _plugin->Load(_elem);
+
+  _plugin->show();
 }

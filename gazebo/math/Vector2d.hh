@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,10 +66,10 @@ namespace gazebo
       /// \param[in] _y value along y
       public: void Set(double _x, double _y);
 
-      /// \brief Return the cross product of this vector and _v
+      /// \brief Return the dot product of this vector and _v
       /// \param[in] _v the vector
-      /// \return the cross product
-      public: Vector2d Cross(const Vector2d &_v) const;
+      /// \return the dot product
+      public: double Dot(const Vector2d &_v) const;
 
       /// \brief Assignment operator
       /// \param[in] _v a value for x and y element

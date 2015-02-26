@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,10 +131,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
 
-      /// \brief Get an parameter of the physics engine
-      /// \param[in] _param A parameter listed in the ODEParam enum
-      /// \return The value of the parameter
-      public: virtual boost::any GetParam(DARTParam _param) const;
+      // Documentation inherited
+      public: virtual bool SetParam(const std::string &_key,
+                  const boost::any &_value);
 
       /// \brief Get pointer to DART World associated with this DART Physics.
       /// \return The pointer to DART World.

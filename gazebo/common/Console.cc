@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 #include <string>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/regex.hpp>
 #include <sstream>
 
@@ -121,7 +122,8 @@ int Logger::Buffer::sync()
 
 /////////////////////////////////////////////////
 FileLogger::FileLogger(const std::string &_filename)
-  : std::ostream(new Buffer(_filename))
+  : std::ostream(new Buffer(_filename)),
+    logDirectory("")
 {
   this->setf(std::ios_base::unitbuf);
 }
@@ -133,7 +135,7 @@ FileLogger::~FileLogger()
 }
 
 /////////////////////////////////////////////////
-void FileLogger::Init(const std::string &_filename)
+void FileLogger::Init(const std::string &_prefix, const std::string &_filename)
 {
   if (!getenv("HOME"))
   {
@@ -146,7 +148,19 @@ void FileLogger::Init(const std::string &_filename)
       this->rdbuf());
 
   boost::filesystem::path logPath(getenv("HOME"));
-  logPath = logPath / ".gazebo/" / _filename;
+
+  // Create a subdirectory for the informational log. The name of the directory
+  // will be <PREFIX><MASTER_PORT>. E.g.: server-11346. If the environment
+  // variable GAZEBO_MASTER_URI is not present or invalid, <MASTER_PORT> will
+  // be replaced by "default".
+  boost::filesystem::path subdir(_prefix + FileLogger::GetMasterPort());
+  logPath = logPath / ".gazebo/" / subdir;
+
+  // Create the log directory if it doesn't exist.
+  if (!boost::filesystem::exists(logPath))
+    boost::filesystem::create_directories(logPath);
+
+  logPath /= _filename;
 
   // Check if the Init method has been already called, and if so
   // remove current buffer.
@@ -160,11 +174,11 @@ void FileLogger::Init(const std::string &_filename)
     boost::system::error_code ec;
     boost::filesystem::rename(logPath, newPath, ec);
     if (ec == 0)
-      std::cerr << "Deprecated log directory [" << logPath
+      std::cerr << "Existing log directory [" << logPath
                 << "] renamed to [" << newPath << "]" << std::endl;
     else
     {
-      std::cerr << "Unable to rename deprecated log directory [" << logPath
+      std::cerr << "Unable to rename existing log directory [" << logPath
                 << "] to [" << newPath << "]. Reason: " << ec.message();
       return;
     }
@@ -176,6 +190,12 @@ void FileLogger::Init(const std::string &_filename)
 
   // Output the version of gazebo.
   (*buf->stream) << GAZEBO_VERSION_HEADER << std::endl;
+
+  // Update the log directory name.
+  if (boost::filesystem::is_directory(logPath))
+    this->logDirectory = logPath.string();
+  else
+    this->logDirectory = logPath.branch_path().string();
 }
 
 /////////////////////////////////////////////////
@@ -193,6 +213,29 @@ FileLogger &FileLogger::operator()(const std::string &_file, int _line)
     << _file.substr(index , _file.size() - index) << ":" << _line << "]";
 
   return (*this);
+}
+
+/////////////////////////////////////////////////
+std::string FileLogger::GetMasterPort()
+{
+  char *charURI = getenv("GAZEBO_MASTER_URI");
+
+  // Set to default port.
+  if (charURI && strlen(charURI) > 0)
+  {
+    std::string masterURI = charURI;
+    size_t lastColon = masterURI.find_last_of(":");
+    if (lastColon != std::string::npos && lastColon != masterURI.size() - 1)
+      return masterURI.substr(lastColon + 1, std::string::npos);
+  }
+
+  return boost::lexical_cast<std::string>(GAZEBO_DEFAULT_MASTER_PORT);
+}
+
+/////////////////////////////////////////////////
+std::string FileLogger::GetLogDirectory() const
+{
+  return this->logDirectory;
 }
 
 /////////////////////////////////////////////////

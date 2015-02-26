@@ -35,6 +35,7 @@ set (sources
   Link.cc
   LinkState.cc
   MapShape.cc
+  MeshShape.cc
   Model.cc
   ModelState.cc
   MultiRayShape.cc
@@ -42,13 +43,14 @@ set (sources
   PhysicsEngine.cc
   PhysicsFactory.cc
   PlaneShape.cc
+  PolylineShape.cc
+  Population.cc
   RayShape.cc
   Road.cc
   Shape.cc
   SphereShape.cc
   State.cc
   SurfaceParams.cc
-  MeshShape.cc
   World.cc
   WorldState.cc
 )
@@ -77,6 +79,7 @@ set (headers
   Link.hh
   LinkState.hh
   MapShape.hh
+  MeshShape.hh
   Model.hh
   ModelState.hh
   MultiRayShape.hh
@@ -85,6 +88,8 @@ set (headers
   PhysicsFactory.hh
   PhysicsTypes.hh
   PlaneShape.hh
+  PolylineShape.hh
+  Population.hh
   RayShape.hh
   Road.hh
   Shape.hh
@@ -93,7 +98,6 @@ set (headers
   SphereShape.hh
   State.hh
   SurfaceParams.hh
-  MeshShape.hh
   UniversalJoint.hh
   World.hh
   WorldState.hh)
@@ -138,7 +142,9 @@ set (gtest_sources
   ContactManager_TEST.cc
   CylinderShape_TEST.cc
   Inertial_TEST.cc
+  JointController_TEST.cc
   PhysicsEngine_TEST.cc
+  Road_TEST.cc
   SphereShape_TEST.cc
 )
 gz_build_tests(${gtest_sources})

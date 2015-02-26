@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,11 +100,21 @@ namespace gazebo
 
       /// \brief Process a key press event.
       /// \param[in] _event The key event.
-      public: void HandlePress(const common::KeyEvent &_event);
+      /// \return Whether or not the event was handled.
+      public: bool HandlePress(const common::KeyEvent &_event);
 
       /// \brief Process a key release event.
       /// \param[in] _event The key event.
-      public: void HandleRelease(const common::KeyEvent &_event);
+      /// \return Whether or not the event was handled.
+      public: bool HandleRelease(const common::KeyEvent &_event);
+
+      /// \brief Method to check if autorepeats are toggled.
+      /// \return Whether or not autorepeats are toggled for key presses.
+      public: bool GetAutoRepeat() const;
+
+      /// \brief Toggle the allowance of autorepeats on key presses.
+      /// \param[in] _autorepeat Whether or not to allow autorepeats.
+      public: void SetAutoRepeat(const bool _autorepeat);
 
       /// \brief Helper function to add a named filter to an event list.
       /// \param[in] _name Name associated with the _filter.
@@ -121,7 +131,8 @@ namespace gazebo
       /// \brief Helper function to process a filters in an event list.
       /// \param[in] _event Key event to process.
       /// \param[in] _list List which contains the filters to process.
-      private: void Handle(const common::KeyEvent &_event,
+      /// \return Whether or not the event was handled.
+      private: bool Handle(const common::KeyEvent &_event,
                    std::list<Filter> &_list);
 
       /// \brief List of key press filters.
@@ -132,6 +143,10 @@ namespace gazebo
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<KeyEventHandler>;
+
+      /// \brief Boolean to toggle autorepeats (events that occur continuously
+      /// while a key held down by the user) for key presses.
+      private: bool autoRepeat;
     };
   }
 }

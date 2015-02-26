@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The base class for all physics engines
- * Author: Nate Koenig
- */
-
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -196,21 +192,6 @@ void PhysicsEngine::SetAutoDisableFlag(bool /*_autoDisable*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetSORPGSPreconIters(unsigned int /*_iters*/)
-{
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetSORPGSIters(unsigned int /*_iters*/)
-{
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetSORPGSW(double /*_w*/)
-{
-}
-
-//////////////////////////////////////////////////
 void PhysicsEngine::SetContactMaxCorrectingVel(double /*_vel*/)
 {
 }
@@ -236,9 +217,10 @@ void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetParam(const std::string &/*_key*/,
+bool PhysicsEngine::SetParam(const std::string &/*_key*/,
     const boost::any &/*_value*/)
 {
+  return true;
 }
 
 //////////////////////////////////////////////////

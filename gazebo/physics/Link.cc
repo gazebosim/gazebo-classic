@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -450,12 +450,6 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
   }
 #endif
 
-  // Apply our linear accel
-  // this->SetForce(this->linearAccel);
-
-  // Apply our angular accel
-  // this->SetTorque(this->angularAccel);
-
   // FIXME: race condition on factory-based model loading!!!!!
    /*if (this->GetEnabled() != this->enabled)
    {
@@ -575,7 +569,7 @@ void Link::SetLinearAccel(const math::Vector3 &_accel)
 void Link::SetAngularAccel(const math::Vector3 &_accel)
 {
   this->SetEnabled(true);
-  this->angularAccel = _accel * this->inertial->GetMass();
+  this->angularAccel = _accel;
 }
 
 //////////////////////////////////////////////////
@@ -1100,19 +1094,45 @@ void Link::SetScale(const math::Vector3 &_scale)
     }
   }
 
-/*  for (unsigned int i = 0; i < this->visuals.size(); ++i)
+  this->scale = _scale;
+
+  // update the visual sdf to ensure cloning gets the correct values.
+  this->UpdateVisualSDF();
+}
+
+//////////////////////////////////////////////////
+void Link::UpdateVisualSDF()
+{
+  // TODO: this shouldn't be in the physics sim
+  if (this->sdf->HasElement("visual"))
   {
-    msgs::Visual msg;
-    msg.set_name(this->visuals[i]);
-    if (this->parent)
-      msg.set_parent_name(this->parent->GetScopedName());
-    else
-      msg.set_parent_name("");
+    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    while (visualElem)
+    {
+      sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
 
-    msgs::Set(msg.mutable_scale(), _scale);
+      if (geomElem->HasElement("box"))
+      {
+        geomElem->GetElement("box")->GetElement("size")->Set(this->scale);
+      }
+      else if (geomElem->HasElement("sphere"))
+      {
+        geomElem->GetElement("sphere")->GetElement("radius")->Set(
+            this->scale.x/2.0);
+      }
+      else if (geomElem->HasElement("cylinder"))
+      {
+        geomElem->GetElement("cylinder")->GetElement("radius")
+            ->Set(this->scale.x/2.0);
+        geomElem->GetElement("cylinder")->GetElement("length")->Set(
+            this->scale.z);
+      }
+      else if (geomElem->HasElement("mesh"))
+        geomElem->GetElement("mesh")->GetElement("scale")->Set(this->scale);
 
-    this->visPub->Publish(msg);
-  }*/
+      visualElem = visualElem->GetNextElement("visual");
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1155,4 +1175,154 @@ double Link::GetWorldEnergyKinetic() const
 double Link::GetWorldEnergy() const
 {
   return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
+}
+
+/////////////////////////////////////////////////
+void Link::MoveFrame(const math::Pose &_worldReferenceFrameSrc,
+                     const math::Pose &_worldReferenceFrameDst)
+{
+  math::Pose targetWorldPose = (this->GetWorldPose() - _worldReferenceFrameSrc)
+    + _worldReferenceFrameDst;
+  this->SetWorldPose(targetWorldPose);
+  this->SetWorldTwist(math::Vector3(0, 0, 0), math::Vector3(0, 0, 0));
+}
+
+/////////////////////////////////////////////////
+bool Link::FindAllConnectedLinksHelper(const LinkPtr &_originalParentLink,
+  Link_V &_connectedLinks, bool _fistLink)
+{
+  // debug
+  // std::string pn;
+  // if (_originalParentLink) pn = _originalParentLink->GetName();
+  // gzerr << "subsequent call to find connected links: "
+  //       << " parent " << pn
+  //       << " this link " << this->GetName() << "\n";
+
+  // get all child joints from this link
+  Link_V childLinks = this->GetChildJointsLinks();
+
+  // gzerr << "debug: child links are: ";
+  // for (Link_V::iterator li = childLinks.begin();
+  //                       li != childLinks.end(); ++li)
+  //   std::cout << (*li)->GetName() << " ";
+  // std::cout << "\n";
+
+  // loop through all joints where this link is a parent link of the joint
+  for (Link_V::iterator li = childLinks.begin();
+                        li != childLinks.end(); ++li)
+  {
+    // gzerr << "debug: checking " << (*li)->GetName() << "\n";
+
+    // check child link of each child joint recursively
+    if ((*li).get() == _originalParentLink.get())
+    {
+      // if parent is a child, failed search to find a nice subset of links
+      gzdbg << "we have a loop! cannot find nice subset of connected links,"
+            << " this link " << this->GetName() << " connects back to"
+            << " parent " << _originalParentLink->GetName() << ".\n";
+      _connectedLinks.clear();
+      return false;
+    }
+    else if (this->ContainsLink(_connectedLinks, (*li)))
+    {
+      // do nothing
+      // gzerr << "debug: do nothing with " << (*li)->GetName() << "\n";
+    }
+    else
+    {
+      // gzerr << "debug: add and recurse " << (*li)->GetName() << "\n";
+      // add child link to list
+      _connectedLinks.push_back((*li));
+
+      // recursively check if child link has already been checked
+      // if it returns false, it looped back to parent, mark flag and break
+      // from current for-loop.
+      if (!(*li)->FindAllConnectedLinksHelper(_originalParentLink,
+        _connectedLinks))
+      {
+        // one of the recursed link is the parent link
+        return false;
+      }
+    }
+  }
+
+  /// \todo: later we can optimize loop below by merging and using a flag.
+
+  // search parents, but if this is the first search, keep going, otherwise
+  // flag failure
+  // get all parent joints from this link
+  Link_V parentLinks = this->GetParentJointsLinks();
+
+  // loop through all joints where this link is a parent link of the joint
+  for (Link_V::iterator li = parentLinks.begin();
+                        li != parentLinks.end(); ++li)
+  {
+    // check child link of each child joint recursively
+    if ((*li).get() == _originalParentLink.get())
+    {
+      if (_fistLink)
+      {
+        // this is the first child link, simply skip if the parent is
+        // the _originalParentLink
+      }
+      else
+      {
+        // if parent is a child, failed search to find a nice subset of links
+        gzdbg << "we have a loop! cannot find nice subset of connected links,"
+              << " this link " << this->GetName() << " connects back to"
+              << " parent " << _originalParentLink->GetName() << ".\n";
+        _connectedLinks.clear();
+        return false;
+      }
+    }
+    else if (this->ContainsLink(_connectedLinks, (*li)))
+    {
+      // do nothing
+    }
+    else
+    {
+      // add parent link to list
+      _connectedLinks.push_back((*li));
+
+      // recursively check if parent link has already been checked
+      // if it returns false, it looped back to parent, mark flag and break
+      // from current for-loop.
+      if (!(*li)->FindAllConnectedLinksHelper(_originalParentLink,
+        _connectedLinks))
+      {
+        // one of the recursed link is the parent link
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Link::ContainsLink(const Link_V &_vector, const LinkPtr &_value)
+{
+  for (Link_V::const_iterator iter = _vector.begin();
+       iter != _vector.end(); ++iter)
+  {
+    if ((*iter).get() == _value.get())
+      return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+msgs::Visual Link::GetVisualMessage(const std::string &_name) const
+{
+  msgs::Visual result;
+
+  Visuals_M::const_iterator iter;
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
+    if (iter->second.name() == _name)
+      break;
+
+  if (iter != this->visuals.end())
+    result = iter->second;
+
+  return result;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ void DARTBallJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTBallJoint::GetAnchor(unsigned int /*_index*/) const
 {
-  Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+  Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
@@ -73,6 +73,7 @@ void DARTBallJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 //////////////////////////////////////////////////
 double DARTBallJoint::GetVelocity(unsigned int /*_index*/) const
 {
+  gzerr << "DARTBallJoint::GetVelocity not implemented" << std::endl;
   return 0;
 }
 
@@ -90,11 +91,49 @@ void DARTBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 //////////////////////////////////////////////////
 math::Angle DARTBallJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
+  gzerr << "DARTBallJoint::GetAngleImpl not implemented" << std::endl;
   return math::Angle(0);
 }
 
 //////////////////////////////////////////////////
 void DARTBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 {
-  gzerr << "Not implemented";
+  gzerr << "DARTBallJoint::SetForceImpl not implemented";
+}
+
+//////////////////////////////////////////////////
+void DARTBallJoint::SetAxis(unsigned int /*_index*/,
+                            const math::Vector3 &/*_axis*/)
+{
+  gzerr << "DARTBallJoint::SetAxis not implemented" << std::endl;
+}
+
+//////////////////////////////////////////////////
+math::Angle DARTBallJoint::GetHighStop(unsigned int /*_index*/)
+{
+  gzerr << "DARTBallJoint::GetHighStop not implemented" << std::endl;
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+math::Angle DARTBallJoint::GetLowStop(unsigned int /*_index*/)
+{
+  gzerr << "DARTBallJoint::GetLowStop not implemented" << std::endl;
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+bool DARTBallJoint::SetHighStop(unsigned int /*_index*/,
+                                const math::Angle &/*_angle*/)
+{
+  gzerr << "DARTBallJoint::SetHighStop not implemented" << std::endl;
+  return false;
+}
+
+//////////////////////////////////////////////////
+bool DARTBallJoint::SetLowStop(unsigned int /*_index*/,
+                               const math::Angle &/*_angle*/)
+{
+  gzerr << "DARTBallJoint::SetLowStop not implemented" << std::endl;
+  return false;
 }

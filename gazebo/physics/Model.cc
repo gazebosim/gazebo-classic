@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,10 +67,14 @@ void Model::Load(sdf::ElementPtr _sdf)
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
   this->SetStatic(this->sdf->Get<bool>("static"));
-  this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
-      boost::bind(&Entity::IsStatic, this));
+  if (this->sdf->HasElement("static"))
+  {
+    this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
+        boost::bind(&Entity::IsStatic, this));
+  }
 
-  this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
+  if (this->sdf->HasElement("allow_auto_disable"))
+    this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
   this->LoadLinks();
 
   // Load the joints if the world is already loaded. Otherwise, the World
@@ -367,23 +371,31 @@ void Model::Reset()
 {
   Entity::Reset();
 
-  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
-  {
-    (*iter)->Reset();
-  }
-
-  // reset link velocities when resetting model
-  for (Link_V::iterator liter = this->links.begin();
-       liter != this->links.end(); ++liter)
-  {
-    (*liter)->ResetPhysicsStates();
-  }
+  this->ResetPhysicsStates();
 
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter != this->joints.end(); ++jiter)
   {
     (*jiter)->Reset();
+  }
+
+  // Reset plugins after links and joints,
+  // so that plugins can restore initial conditions
+  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); ++iter)
+  {
+    (*iter)->Reset();
+  }
+}
+
+//////////////////////////////////////////////////
+void Model::ResetPhysicsStates()
+{
+  // reset link velocities when resetting model
+  for (Link_V::iterator liter = this->links.begin();
+       liter != this->links.end(); ++liter)
+  {
+    (*liter)->ResetPhysicsStates();
   }
 }
 
@@ -558,18 +570,9 @@ JointPtr Model::GetJoint(const std::string &_name)
 
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
-    if ((*iter)->GetScopedName() == _name ||
-        (*iter)->GetName() == _name)
+    if ((*iter)->GetScopedName() == _name || (*iter)->GetName() == _name)
     {
       result = (*iter);
-      break;
-    }
-    else if ((*iter)->GetName() == _name)
-    {
-      // check again without scoped names, deprecated, warn
-      result = (*iter);
-      gzwarn << "Calling Model::GetJoint(" << _name
-             << ") with un-scoped joint name is deprecated, please scope\n";
       break;
     }
   }
@@ -584,7 +587,7 @@ LinkPtr Model::GetLinkById(unsigned int _id) const
 }
 
 //////////////////////////////////////////////////
-Link_V Model::GetLinks() const
+const Link_V &Model::GetLinks() const
 {
   return this->links;
 }
@@ -737,8 +740,27 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string pluginName = _sdf->Get<std::string>("name");
   std::string filename = _sdf->Get<std::string>("filename");
-  gazebo::ModelPluginPtr plugin =
-    gazebo::ModelPlugin::Create(filename, pluginName);
+
+  gazebo::ModelPluginPtr plugin;
+
+  try
+  {
+    plugin = gazebo::ModelPlugin::Create(filename, pluginName);
+  }
+  catch(...)
+  {
+    gzerr << "Exception occured in the constructor of plugin with name["
+      << pluginName << "] and filename[" << filename << "]. "
+      << "This plugin will not run.\n";
+
+    // Log the message. gzerr has problems with this in 1.9. Remove the
+    // gzlog command in gazebo2.
+    gzlog << "Exception occured in the constructor of plugin with name["
+      << pluginName << "] and filename[" << filename << "]. "
+      << "This plugin will not run." << std::endl;
+    return;
+  }
+
   if (plugin)
   {
     if (plugin->GetType() != MODEL_PLUGIN)
@@ -751,8 +773,43 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
     }
 
     ModelPtr myself = boost::static_pointer_cast<Model>(shared_from_this());
-    plugin->Load(myself, _sdf);
-    plugin->Init();
+
+    try
+    {
+      plugin->Load(myself, _sdf);
+    }
+    catch(...)
+    {
+      gzerr << "Exception occured in the Load function of plugin with name["
+        << pluginName << "] and filename[" << filename << "]. "
+        << "This plugin will not run.\n";
+
+      // Log the message. gzerr has problems with this in 1.9. Remove the
+      // gzlog command in gazebo2.
+      gzlog << "Exception occured in the Load function of plugin with name["
+        << pluginName << "] and filename[" << filename << "]. "
+        << "This plugin will not run." << std::endl;
+      return;
+    }
+
+    try
+    {
+      plugin->Init();
+    }
+    catch(...)
+    {
+      gzerr << "Exception occured in the Init function of plugin with name["
+        << pluginName << "] and filename[" << filename << "]. "
+        << "This plugin will not run\n";
+
+      // Log the message. gzerr has problems with this in 1.9. Remove the
+      // gzlog command in gazebo2.
+      gzlog << "Exception occured in the Init function of plugin with name["
+        << pluginName << "] and filename[" << filename << "]. "
+        << "This plugin will not run." << std::endl;
+      return;
+    }
+
     this->plugins.push_back(plugin);
   }
 }

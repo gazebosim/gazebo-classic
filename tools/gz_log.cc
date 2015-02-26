@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,12 +38,16 @@ std::ostringstream &FilterBase::Out(std::ostringstream &_stream,
 {
   if (!this->xmlOutput && !this->stamp.empty())
   {
+    std::ios_base::fmtflags flags = _stream.flags();
+
+    _stream.setf(std::ios::fixed);
     if (this->stamp == "sim")
       _stream << _state.GetSimTime().Double() << " ";
     else if (this->stamp == "real")
       _stream << _state.GetRealTime().Double() << " ";
     else if (this->stamp == "wall")
       _stream << _state.GetWallTime().Double() << " ";
+    _stream.setf(flags);
   }
 
   return _stream;
@@ -549,7 +553,7 @@ std::string StateFilter::Filter(const std::string &_stateString)
   result << this->filter.Filter(state);
 
   if (this->xmlOutput)
-    result << "</sdf></state>\n";
+    result << "</state></sdf>\n";
 
   this->prevTime = state.GetSimTime();
   return result.str();

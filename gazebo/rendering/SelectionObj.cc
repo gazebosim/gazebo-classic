@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ SelectionObj::SelectionObj(const std::string &_name, VisualPtr _vis)
   dPtr->state = SELECTION_NONE;
   dPtr->mode = SELECTION_NONE;
 
-  dPtr->maxScale = 3.0;
+  dPtr->maxScale = 2.5;
   dPtr->minScale = 0.5;
 
   dPtr->xAxisMatOverlay = "Gazebo/RedTransparentOverlay";
@@ -62,9 +62,6 @@ SelectionObj::~SelectionObj()
 /////////////////////////////////////////////////
 void SelectionObj::Load()
 {
-  SelectionObjPrivate *dPtr =
-      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
-
   Visual::Load();
 
   this->CreateRotateVisual();
@@ -73,9 +70,9 @@ void SelectionObj::Load()
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
-  dPtr->transVisual->SetVisible(false);
-  dPtr->rotVisual->SetVisible(false);
-  dPtr->scaleVisual->SetVisible(false);
+  this->SetHandleVisible(TRANS, false);
+  this->SetHandleVisible(ROT, false);
+  this->SetHandleVisible(SCALE, false);
 
   this->GetSceneNode()->setInheritScale(false);
 }
@@ -173,16 +170,11 @@ void SelectionObj::SetMode(SelectionMode _mode)
 
   dPtr->mode = _mode;
 
-  dPtr->transVisual->SetVisible(false);
-  dPtr->rotVisual->SetVisible(false);
-  dPtr->scaleVisual->SetVisible(false);
+  this->SetHandleVisible(TRANS, false);
+  this->SetHandleVisible(ROT, false);
+  this->SetHandleVisible(SCALE, false);
 
-  if (dPtr->mode == TRANS)
-    dPtr->transVisual->SetVisible(true);
-  else if (dPtr->mode == ROT)
-    dPtr->rotVisual->SetVisible(true);
-  else if (dPtr->mode == SCALE)
-    dPtr->scaleVisual->SetVisible(true);
+  this->SetHandleVisible(dPtr->mode, true);
 }
 
 /////////////////////////////////////////////////
@@ -353,8 +345,10 @@ void SelectionObj::CreateTranslateVisual()
   transHeadXNode->attachObject(headXObj);
   transHeadXNode->setScale(0.5, 0.5, 0.5);
   transHeadXNode->setPosition(0, 0, 0.22);
-  shaftXObj->setUserAny(Ogre::Any(std::string("trans_x")));
-  headXObj->setUserAny(Ogre::Any(std::string("trans_x")));
+  shaftXObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("trans_x")));
+  headXObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("trans_x")));
   shaftXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   headXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
@@ -376,8 +370,10 @@ void SelectionObj::CreateTranslateVisual()
   transHeadYNode->attachObject(headYObj);
   transHeadYNode->setScale(0.5, 0.5, 0.5);
   transHeadYNode->setPosition(0, 0, 0.22);
-  shaftYObj->setUserAny(Ogre::Any(std::string("trans_y")));
-  headYObj->setUserAny(Ogre::Any(std::string("trans_y")));
+  shaftYObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("trans_y")));
+  headYObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("trans_y")));
   shaftYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   headYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
@@ -399,8 +395,10 @@ void SelectionObj::CreateTranslateVisual()
   transHeadZNode->attachObject(headZObj);
   transHeadZNode->setScale(0.5, 0.5, 0.5);
   transHeadZNode->setPosition(0, 0, 0.22);
-  shaftZObj->setUserAny(Ogre::Any(std::string("trans_z")));
-  headZObj->setUserAny(Ogre::Any(std::string("trans_z")));
+  shaftZObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("trans_z")));
+  headZObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("trans_z")));
   shaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   headZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
@@ -458,7 +456,8 @@ void SelectionObj::CreateRotateVisual()
       dPtr->rotXVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__ROT_NODE_X__"  + this->GetName());
   xNode->attachObject(rotXObj);
-  rotXObj->setUserAny(Ogre::Any(std::string("rot_x")));
+  rotXObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("rot_x")));
   rotXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *rotYObj =
@@ -468,7 +467,8 @@ void SelectionObj::CreateRotateVisual()
       dPtr->rotYVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__ROT_NODE_Y__"  + this->GetName());
   yNode->attachObject(rotYObj);
-  rotYObj->setUserAny(Ogre::Any(std::string("rot_y")));
+  rotYObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("rot_y")));
   rotYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *rotZObj =
@@ -478,7 +478,8 @@ void SelectionObj::CreateRotateVisual()
       dPtr->rotZVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__ROT_NODE_Z__"  + this->GetName());
   zNode->attachObject(rotZObj);
-  rotZObj->setUserAny(Ogre::Any(std::string("rot_z")));
+  rotZObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("rot_z")));
   rotZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   dPtr->rotXVisual->Load();
@@ -557,8 +558,10 @@ void SelectionObj::CreateScaleVisual()
   scaleHeadXNode->attachObject(scaleHeadXObj);
   scaleHeadXNode->setScale(0.02, 0.02, 0.02);
   scaleHeadXNode->setPosition(0, 0, 0.21);
-  scaleShaftXObj->setUserAny(Ogre::Any(std::string("scale_x")));
-  scaleHeadXObj->setUserAny(Ogre::Any(std::string("scale_x")));
+  scaleShaftXObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("scale_x")));
+  scaleHeadXObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("scale_x")));
   scaleShaftXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   scaleHeadXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
@@ -580,8 +583,10 @@ void SelectionObj::CreateScaleVisual()
   scaleHeadYNode->attachObject(scaleHeadYObj);
   scaleHeadYNode->setScale(0.02, 0.02, 0.02);
   scaleHeadYNode->setPosition(0, 0, 0.21);
-  scaleShaftYObj->setUserAny(Ogre::Any(std::string("scale_y")));
-  scaleHeadYObj->setUserAny(Ogre::Any(std::string("scale_y")));
+  scaleShaftYObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("scale_y")));
+  scaleHeadYObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("scale_y")));
   scaleShaftYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   scaleHeadYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
@@ -603,8 +608,10 @@ void SelectionObj::CreateScaleVisual()
   scaleHeadZNode->attachObject(scaleHeadZObj);
   scaleHeadZNode->setScale(0.02, 0.02, 0.02);
   scaleHeadZNode->setPosition(0, 0, 0.21);
-  scaleShaftZObj->setUserAny(Ogre::Any(std::string("scale_z")));
-  scaleHeadZObj->setUserAny(Ogre::Any(std::string("scale_z")));
+  scaleShaftZObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("scale_z")));
+  scaleHeadZObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("scale_z")));
   scaleShaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   scaleHeadZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
@@ -630,4 +637,70 @@ void SelectionObj::CreateScaleVisual()
   dPtr->scene->AddVisual(dPtr->scaleXVisual);
   dPtr->scene->AddVisual(dPtr->scaleYVisual);
   dPtr->scene->AddVisual(dPtr->scaleZVisual);
+}
+
+/////////////////////////////////////////////////
+void SelectionObj::SetHandleVisible(SelectionMode _mode, bool _visible)
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  if (_mode == TRANS)
+    dPtr->transVisual->SetVisible(_visible);
+  else if (_mode == ROT)
+    dPtr->rotVisual->SetVisible(_visible);
+  else if (_mode == SCALE)
+    dPtr->scaleVisual->SetVisible(_visible);
+  else if (_mode == TRANS_X)
+    dPtr->transXVisual->SetVisible(_visible);
+  else if (_mode == TRANS_Y)
+    dPtr->transYVisual->SetVisible(_visible);
+  else if (_mode == TRANS_Z)
+    dPtr->transZVisual->SetVisible(_visible);
+  else if (_mode == ROT_X)
+    dPtr->rotXVisual->SetVisible(_visible);
+  else if (_mode == ROT_Y)
+    dPtr->rotYVisual->SetVisible(_visible);
+  else if (_mode == ROT_Z)
+    dPtr->rotZVisual->SetVisible(_visible);
+  else if (_mode == SCALE_X)
+    dPtr->scaleXVisual->SetVisible(_visible);
+  else if (_mode == SCALE_Y)
+    dPtr->scaleYVisual->SetVisible(_visible);
+  else if (_mode == SCALE_Z)
+    dPtr->scaleZVisual->SetVisible(_visible);
+}
+
+/////////////////////////////////////////////////
+bool SelectionObj::GetHandleVisible(SelectionMode _mode) const
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  if (_mode == TRANS)
+    return dPtr->transVisual->GetVisible();
+  else if (_mode == ROT)
+    return dPtr->rotVisual->GetVisible();
+  else if (_mode == SCALE)
+    return dPtr->scaleVisual->GetVisible();
+  else if (_mode == TRANS_X)
+    return dPtr->transXVisual->GetVisible();
+  else if (_mode == TRANS_Y)
+    return dPtr->transYVisual->GetVisible();
+  else if (_mode == TRANS_Z)
+    return dPtr->transZVisual->GetVisible();
+  else if (_mode == ROT_X)
+    return dPtr->rotXVisual->GetVisible();
+  else if (_mode == ROT_Y)
+    return dPtr->rotYVisual->GetVisible();
+  else if (_mode == ROT_Z)
+    return dPtr->rotZVisual->GetVisible();
+  else if (_mode == SCALE_X)
+    return dPtr->scaleXVisual->GetVisible();
+  else if (_mode == SCALE_Y)
+    return dPtr->scaleYVisual->GetVisible();
+  else if (_mode == SCALE_Z)
+    return dPtr->scaleZVisual->GetVisible();
+  else
+    return false;
 }

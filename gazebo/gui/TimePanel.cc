@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ TimePanel::TimePanel(QWidget *_parent)
   scrollArea->setFrameShadow(QFrame::Plain);
   scrollArea->setWidgetResizable(true);
   scrollArea->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-
+  scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
   // Play control (Play/Step/Pause)
   QSpinBox *stepSpinBox = new QSpinBox;
@@ -71,16 +71,13 @@ TimePanel::TimePanel(QWidget *_parent)
   connect(stepSpinBox, SIGNAL(editingFinished()), stepMenu,
       SLOT(hide()));
 
-
   QFrame *frame = new QFrame(scrollArea);
-
   frame->setFrameShape(QFrame::NoFrame);
-  frame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  frame->setFixedHeight(25);
-  frame->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   scrollArea->setWidget(frame);
 
   QToolBar *playToolbar = new QToolBar;
+  playToolbar->setObjectName("playToolBar");
+  playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   playToolbar->addAction(g_playAct);
   playToolbar->addAction(g_pauseAct);
 
@@ -89,7 +86,6 @@ TimePanel::TimePanel(QWidget *_parent)
   playToolbar->addAction(g_stepAct);
   playToolbar->addWidget(stepToolBarLabel);
   playToolbar->addWidget(this->stepButton);
-
 
   this->percentRealTimeEdit = new QLineEdit;
   this->percentRealTimeEdit->setObjectName("timePanelPercentRealTime");

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 
 // Include Rand.hh first to avoid osx compilation errors
 #include "gazebo/math/Rand.hh"
+#include "gazebo/common/Plugin.hh"
 #include "gazebo/rendering/rendering.hh"
-#include "gazebo/gazebo.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

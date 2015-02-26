@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,12 +52,6 @@ math::Vector3 SimbodyBallJoint::GetAnchor(unsigned int /*_index*/) const
 }
 
 /////////////////////////////////////////////////
-void SimbodyBallJoint::Init()
-{
-  gzerr << "Not implemented\n";
-}
-
-/////////////////////////////////////////////////
 void SimbodyBallJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
   gzerr << "Not implemented\n";
@@ -103,3 +97,41 @@ void SimbodyBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented";
 }
+
+//////////////////////////////////////////////////
+void SimbodyBallJoint::SetAxis(unsigned int /*_index*/,
+                               const math::Vector3 &/*_axis*/)
+{
+  gzerr << "SimbodyBallJoint::SetAxis not implemented" << std::endl;
+}
+
+//////////////////////////////////////////////////
+math::Angle SimbodyBallJoint::GetHighStop(unsigned int /*_index*/)
+{
+  gzerr << "SimbodyBallJoint::GetHighStop not implemented" << std::endl;
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+math::Angle SimbodyBallJoint::GetLowStop(unsigned int /*_index*/)
+{
+  gzerr << "SimbodyBallJoint::GetLowStop not implemented" << std::endl;
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+bool SimbodyBallJoint::SetHighStop(unsigned int /*_index*/,
+                                   const math::Angle &/*_angle*/)
+{
+  gzerr << "SimbodyBallJoint::SetHighStop not implemented" << std::endl;
+  return false;
+}
+
+//////////////////////////////////////////////////
+bool SimbodyBallJoint::SetLowStop(unsigned int /*_index*/,
+                                  const math::Angle &/*_angle*/)
+{
+  gzerr << "SimbodyBallJoint::SetLowStop not implemented" << std::endl;
+  return false;
+}
+

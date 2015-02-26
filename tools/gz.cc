@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -370,6 +370,9 @@ ModelCommand::ModelCommand()
     ("delete,d", "Delete a model.")
     ("spawn-file,f", po::value<std::string>(), "Spawn model from SDF file.")
     ("spawn-string,s", "Spawn model from SDF string, pass by a pipe.")
+    ("info,i", "Output model state information to the terminal.")
+    ("pose,p",
+     "Output model pose as a space separated 6-tuple: x y z roll pitch yaw.")
     ("pose-x,x", po::value<double>(), "x value")
     ("pose-y,y", po::value<double>(), "y value")
     ("pose-z,z", po::value<double>(), "z value")
@@ -486,6 +489,28 @@ bool ModelCommand::RunImpl()
     }
 
     return this->ProcessSpawn(sdf, modelName, pose, node);
+  }
+  else if (this->vm.count("info") || this->vm.count("pose"))
+  {
+    boost::shared_ptr<msgs::Response> response = gazebo::transport::request(
+        worldName, "entity_info", modelName);
+    gazebo::msgs::Model modelMsg;
+
+    if (response->has_serialized_data() &&
+        !response->serialized_data().empty() &&
+        modelMsg.ParseFromString(response->serialized_data()))
+    {
+      if (this->vm.count("info"))
+        std::cout << modelMsg.DebugString() << std::endl;
+      else if (this->vm.count("pose"))
+        std::cout << gazebo::msgs::Convert(modelMsg.pose()) << std::endl;
+    }
+    else
+    {
+      std::string tmpWorldName = worldName.empty() ? "default" : worldName;
+      std::cout << "Unable to get info on model[" << modelName << "] in "
+        << "the world[" << tmpWorldName << "]\n";
+    }
   }
   else
   {
@@ -909,7 +934,7 @@ bool SDFCommand::RunImpl()
   try
   {
     // Initialize the informational logger. This will log warnings and errors.
-    gzLogInit("gzsdf.log");
+    gzLogInit("gz-", "gzsdf.log");
   }
   catch(gazebo::common::Exception &_e)
   {

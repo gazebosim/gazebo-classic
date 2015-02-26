@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,23 +171,35 @@ double BulletHinge2Joint::GetMaxForce(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetHighStop(unsigned int /*_index*/,
+bool BulletHinge2Joint::SetHighStop(unsigned int /*_index*/,
     const math::Angle &_angle)
 {
   if (this->bulletHinge2)
+  {
     this->bulletHinge2->setUpperLimit(_angle.Radian());
+    return true;
+  }
   else
+  {
     gzerr << "Joint must be created first.\n";
+    return false;
+  }
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetLowStop(unsigned int /*_index*/,
+bool BulletHinge2Joint::SetLowStop(unsigned int /*_index*/,
     const math::Angle &_angle)
 {
   if (this->bulletHinge2)
+  {
     this->bulletHinge2->setLowerLimit(_angle.Radian());
+    return true;
+  }
   else
+  {
     gzerr << "Joint must be created first.\n";
+    return false;
+  }
 }
 
 //////////////////////////////////////////////////

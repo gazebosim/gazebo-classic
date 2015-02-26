@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,10 +47,9 @@ namespace gazebo
       /// \brief Destructor
       public: ~JointInspector();
 
-      /// \brief Get anchor position.
-      /// \param[in] _index Index of anchor
-      /// \return Anchor position.
-      public: math::Vector3 GetAnchor(unsigned int _index) const;
+      /// \brief Get joint pose.
+      /// \return Joint pose.
+      public: math::Pose GetPose() const;
 
       /// \brief Get axis.
       /// \param[in] _index Index of axis
@@ -67,18 +66,34 @@ namespace gazebo
       /// \return Upper limit.
       public: double GetUpperLimit(unsigned int _index) const;
 
+      /// \brief Get whether the axis uses parent model frame.
+      /// \param[in] _index Index of axis
+      /// \return True if the axis uses parent model frame.
+      public: bool GetUseParentModelFrame(unsigned int _index) const;
+
       /// \brief Get joint type.
       /// \return Joint type.
       public: JointMaker::JointType GetType() const;
 
-      /// \brief Set the item name.
+      /// \brief Get joint name.
+      /// \return Joint name.
+      public: std::string GetName() const;
+
+      /// \brief Set the joint name.
       /// \param[in] _name Name to set to.
       public: void SetName(const std::string &_name);
 
-      /// \brief Set anchor position.
-      /// \param[in] _index Index of anchor.
-      /// \param[in] _anchor Anchor position.
-      public: void SetAnchor(unsigned int _index, const math::Vector3 &_anchor);
+      /// \brief Set the joint parent name.
+      /// \param[in] _name Name of joint parent.
+      public: void SetParent(const std::string &_parent);
+
+      /// \brief Set the joint child name.
+      /// \param[in] _name Name of joint child.
+      public: void SetChild(const std::string &_child);
+
+      /// \brief Set joint pose.
+      /// \param[in] _pose Joint pose.
+      public: void SetPose(const math::Pose &_pose);
 
       /// \brief Set axis.
       /// \param[in] _index Index of axis.
@@ -95,12 +110,24 @@ namespace gazebo
       /// \param[in] _upper Upper limit.
       public: void SetUpperLimit(unsigned int _index, double _upper);
 
+      /// \brief Set the axis to use parent model frame.
+      /// \param[in] _index Index of axis
+      /// \param[in] True to use the parent model frame.
+      public: void SetUseParentModelFrame(unsigned int _index, bool _use);
+
       /// \brief Set joint type.
       /// \param[in] _type joint type.
       public: void SetType(JointMaker::JointType _type);
 
+      /// \brief Qt event emiited when the mouse enters this widget.
+      /// \param[in] _event Qt event.
+      protected: virtual void enterEvent(QEvent *_event);
+
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
+
+      /// \brief Qt callback when the joint type combox index has changed.
+      private slots: void OnJointTypeChanged(int _index);
 
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
@@ -111,20 +138,35 @@ namespace gazebo
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
-      /// \brief Label that displays the name of the joint.
-      private: QLabel* jointNameLabel;
+      /// \brief Line edit that displays the name of the joint.
+      private: QLineEdit* jointNameLineEdit;
 
-      /// \brief Label that displays the type of the joint.
-      private: QLabel *jointTypeLabel;
+      /// \brief Label that displays the parent name of the joint.
+      private: QLabel* jointParentLabel;
 
-      /// \brief Spin box for configuring the X position of the anchor.
-      private: QDoubleSpinBox *anchorXSpinBox;
+      /// \brief Label that displays the child name of the joint.
+      private: QLabel* jointChildLabel;
 
-      /// \brief Spin box for configuring the Y position of the anchor.
-      private: QDoubleSpinBox *anchorYSpinBox;
+      /// \brief ComboBox that displays the type of the joint.
+      private: QComboBox *jointTypeComboBox;
 
-      /// \brief Spin box for configuring the Z position of the anchor.
-      private: QDoubleSpinBox *anchorZSpinBox;
+      /// \brief Spin box for configuring the X position of the joint.
+      private: QDoubleSpinBox *poseXSpinBox;
+
+      /// \brief Spin box for configuring the Y position of the joint.
+      private: QDoubleSpinBox *poseYSpinBox;
+
+      /// \brief Spin box for configuring the Z position of joint.
+      private: QDoubleSpinBox *poseZSpinBox;
+
+      /// \brief Spin box for configuring the roll of the joint.
+      private: QDoubleSpinBox *poseRollSpinBox;
+
+      /// \brief Spin box for configuring the pitch of the joint.
+      private: QDoubleSpinBox *posePitchSpinBox;
+
+      /// \brief Spin box for configuring the yaw of the joint.
+      private: QDoubleSpinBox *poseYawSpinBox;
 
       /// \brief Spin box for configuring the X direction of the axis.
       private: std::vector<QDoubleSpinBox *> axisXSpinBoxes;
@@ -140,6 +182,10 @@ namespace gazebo
 
       /// \brief Spin box for configuring the upper limit of the axis.
       private: std::vector<QDoubleSpinBox *> upperLimitSpinBoxes;
+
+      /// \brief Spin box for configuring the use_parent_model_frame flag of
+      /// the  axis.
+      private: std::vector<QCheckBox *> frameCheckBoxes;
 
       /// \brief Type of joint.
       private: JointMaker::JointType jointType;

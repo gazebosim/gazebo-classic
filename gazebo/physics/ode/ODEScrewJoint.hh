@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: A screw or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _ODESCREWJOINT_HH_
 #define _ODESCREWJOINT_HH_
 
+#include <string>
 #include "gazebo/physics/ScrewJoint.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
 #include "gazebo/util/system.hh"
@@ -45,6 +41,13 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+
+      // Documentation inherited
+      public: virtual void SetAnchor(unsigned int _index,
+                  const math::Vector3 &_anchor);
+
+      // Documentation inherited
       public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited
@@ -56,7 +59,13 @@ namespace gazebo
                   double _threadPitch);
 
       // Documentation inherited
+      public: virtual void SetThreadPitch(double _threadPitch);
+
+      // Documentation inherited
       public: virtual double GetThreadPitch(unsigned int _index);
+
+      // Documentation inherited
+      public: virtual double GetThreadPitch();
 
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
@@ -78,6 +87,15 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetParam(unsigned int _parameter, double _value);
+
+      // Documentation inherited.
+      public: virtual bool SetParam(const std::string &_key,
+                                        unsigned int _index,
+                                        const boost::any &_value);
+
+      // Documentation inherited.
+      public: virtual double GetParam(const std::string &_key,
+                                                unsigned int _index);
 
       // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);

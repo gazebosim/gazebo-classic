@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all sensors
- * Author: Nathan Koenig
- * Date: 25 May 2007
- */
-
 #ifndef _SENSOR_HH_
 #define _SENSOR_HH_
 
@@ -90,11 +85,6 @@ namespace gazebo
 
       /// \brief Initialize the sensor.
       public: virtual void Init();
-
-      /// \brief Set the parent of the sensor.
-      /// \param[in] _name Name of the parent.
-      public: virtual void SetParent(const std::string &_name)
-              GAZEBO_DEPRECATED(2.0);
 
       /// \brief Set the sensor's parent.
       /// \param[in] _name The sensor's parent's name.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -260,6 +260,18 @@ const Material *Mesh::GetMaterial(int index) const
 }
 
 //////////////////////////////////////////////////
+int Mesh::GetMaterialIndex(const Material *_mat) const
+{
+  for (unsigned int i = 0; i < this->materials.size(); ++i)
+  {
+    if (this->materials[i] == _mat)
+      return i;
+  }
+
+  return -1;
+}
+
+//////////////////////////////////////////////////
 void Mesh::FillArrays(float **_vertArr, int **_indArr) const
 {
   std::vector<SubMesh *>::const_iterator iter;
@@ -404,6 +416,12 @@ SubMesh::SubMesh()
 //////////////////////////////////////////////////
 SubMesh::SubMesh(const SubMesh *_mesh)
 {
+  if (!_mesh)
+  {
+    gzerr << "Submesh is NULL." << std::endl;
+    return;
+  }
+
   this->name = _mesh->name;
   this->materialIndex = _mesh->materialIndex;
   this->primitiveType = _mesh->primitiveType;

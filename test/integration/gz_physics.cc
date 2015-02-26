@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,11 +34,11 @@ TEST_F(GzPhysics, Gravity)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   // Get a pointer to the model
   physics::ModelPtr model = world->GetModel("box");
-  ASSERT_TRUE(model);
+  ASSERT_TRUE(model != NULL);
 
   EXPECT_EQ(model->GetWorldPose(), math::Pose(0, 0, .5, 0, 0, 0));
 
@@ -60,8 +60,8 @@ TEST_F(GzPhysics, StepSize)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
-  ASSERT_TRUE(world->GetPhysicsEngine());
+  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world->GetPhysicsEngine() != NULL);
 
   // Change step size
   custom_exec("gz physics -s 0.002");
@@ -80,16 +80,22 @@ TEST_F(GzPhysics, Iters)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
-  ASSERT_TRUE(world->GetPhysicsEngine());
+  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world->GetPhysicsEngine() != NULL);
 
   // Change iterations
-  custom_exec("gz physics -i 35");
-  EXPECT_EQ(world->GetPhysicsEngine()->GetSORPGSIters(), 35);
+  {
+    custom_exec("gz physics -i 35");
+    boost::any iters = world->GetPhysicsEngine()->GetParam("iters");
+    EXPECT_EQ(boost::any_cast<int>(iters), 35);
+  }
 
   // Change iterations
-  custom_exec("gz physics -i 200");
-  EXPECT_EQ(world->GetPhysicsEngine()->GetSORPGSIters(), 200);
+  {
+    custom_exec("gz physics -i 200");
+    boost::any iters = world->GetPhysicsEngine()->GetParam("iters");
+    EXPECT_EQ(boost::any_cast<int>(iters), 200);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -100,8 +106,8 @@ TEST_F(GzPhysics, UpdateRate)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
-  ASSERT_TRUE(world->GetPhysicsEngine());
+  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world->GetPhysicsEngine() != NULL);
 
   // Change update rate
   custom_exec("gz physics -u 2.0");

@@ -20,6 +20,7 @@ set (sources
   AudioDecoder.cc
   Base64.cc
   BVHLoader.cc
+  ColladaExporter.cc
   ColladaLoader.cc
   Color.cc
   CommonIface.cc
@@ -33,6 +34,7 @@ set (sources
   KeyFrame.cc
   Material.cc
   Mesh.cc
+  MeshExporter.cc
   MeshLoader.cc
   MeshManager.cc
   ModelDatabase.cc
@@ -59,7 +61,6 @@ set (headers
   Color.hh
   Console.hh
   Dem.hh
-  DemPrivate.hh
   Event.hh
   Events.hh
   Exception.hh
@@ -81,7 +82,6 @@ set (headers
   Skeleton.hh
   SingletonT.hh
   SphericalCoordinates.hh
-  SphericalCoordinatesPrivate.hh
   STLLoader.hh
   SystemPaths.hh
   Time.hh
@@ -94,16 +94,19 @@ set (headers
 if (HAVE_GTS)
 set (sources
   ${sources}
+  GTSMeshUtils.cc
   MeshCSG.cc
 )
 set (headers
   ${headers}
+  GTSMeshUtils.hh
   MeshCSG.hh
 )
 endif()
 
 set (gtest_sources
   Animation_TEST.cc
+  ColladaExporter_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
   CommonIface_TEST.cc
@@ -138,12 +141,18 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_
 gz_add_library(gazebo_common ${sources})
 
 set_property(
-  SOURCE SystemPaths.cc SystemPaths_TEST.cc ModelDatabase.cc
+  SOURCE SystemPaths.cc SystemPaths_TEST.cc ModelDatabase.cc Console.cc
   PROPERTY COMPILE_DEFINITIONS
   GAZEBO_PLUGIN_PATH="${GAZEBO_PLUGIN_PATH}"
+  GAZEBO_MODEL_PATH="${GAZEBO_MODEL_PATH}"
   GAZEBO_RESOURCE_PATH="${GAZEBO_RESOURCE_PATH}"
   GAZEBO_MODEL_DATABASE_URI="${GAZEBO_MODEL_DATABASE_URI}"
+  GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
+)
+
+link_directories(
+  ${tinyxml_LIBRARY_DIRS}
 )
 
 target_link_libraries(gazebo_common
@@ -155,11 +164,12 @@ target_link_libraries(gazebo_common
   ${tinyxml_LIBRARIES}
   ${libavcodec_LIBRARIES}
   ${libavformat_LIBRARIES}
+  ${libavutil_LIBRARIES}
   ${CURL_LIBRARIES}
   ${libswscale_LIBRARIES}
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
-  ${SDF_LIBRARIES}
+  ${SDFormat_LIBRARIES}
   pthread
 )
 

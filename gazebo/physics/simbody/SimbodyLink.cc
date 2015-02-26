@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,20 +199,39 @@ void SimbodyLink::OnPoseChange()
   if (this->masterMobod.isEmptyHandle())
     return;
 
-  /// Limited functionality for now:
-  /// Setting 6 dof pose of a link works in simbody only if
-  /// the inboard joint is a free joint to the ground for now.
-  /// If the inboard joint is not free, simbody tries to project
-  /// target pose into available DOF's.
+  // debug
+  // gzerr << "original: [" << SimbodyPhysics::Transform2Pose(
+  //   this->masterMobod.getBodyTransform(
+  //   this->simbodyPhysics->integ->updAdvancedState()))
+  //       << "]\n";
 
-  /// Only change pose if parent is ground, otherwise do nothing
-  if (!this->masterMobod.isGround() &&
-      this->masterMobod.getParentMobilizedBody().isGround())
+  if (!this->masterMobod.isGround())
   {
-    this->masterMobod.setQToFitTransform(
-       this->simbodyPhysics->integ->updAdvancedState(),
-       SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
-
+    if (this->masterMobod.getParentMobilizedBody().isGround())
+    {
+      /// If parent is ground:
+      /// Setting 6 dof pose of a link works in simbody only if
+      /// the inboard joint is a free joint to the ground for now.
+      this->masterMobod.setQToFitTransform(
+         this->simbodyPhysics->integ->updAdvancedState(),
+         SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
+    }
+    else
+    {
+      gzerr << "SetWorldPose (OnPoseChange) for child links need testing.\n";
+      /*
+      /// If the inboard joint is not free, simbody tries to project
+      /// target pose into available DOF's.
+      /// But first convert to relative pose to parent mobod.
+      math::Pose parentPose = SimbodyPhysics::Transform2Pose(
+        this->masterMobod.getBodyTransform(
+        this->simbodyPhysics->integ->updAdvancedState()));
+      math::Pose relPose = this->GetWorldPose() - parentPose;
+      this->masterMobod.setQToFitTransform(
+         this->simbodyPhysics->integ->updAdvancedState(),
+         SimbodyPhysics::Pose2Transform(relPose));
+      */
+    }
     // realize system after updating Q's
     this->simbodyPhysics->system.realize(
       this->simbodyPhysics->integ->getState(), SimTK::Stage::Position);
@@ -311,8 +330,13 @@ void SimbodyLink::SetEnabled(bool /*_enable*/) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetLinearVel(const math::Vector3 & /*_vel*/)
+void SimbodyLink::SetLinearVel(const math::Vector3 & _vel)
 {
+  this->masterMobod.setUToFitLinearVelocity(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    SimbodyPhysics::Vector3ToVec3(_vel));
+  this->simbodyPhysics->system.realize(
+    this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
 }
 
 //////////////////////////////////////////////////
@@ -393,8 +417,13 @@ math::Vector3 SimbodyLink::GetWorldCoGLinearVel() const
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetAngularVel(const math::Vector3 &/*_vel*/)
+void SimbodyLink::SetAngularVel(const math::Vector3 &_vel)
 {
+  this->masterMobod.setUToFitAngularVelocity(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    SimbodyPhysics::Vector3ToVec3(_vel));
+  this->simbodyPhysics->system.realize(
+    this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
 }
 
 //////////////////////////////////////////////////
@@ -456,33 +485,44 @@ math::Vector3 SimbodyLink::GetWorldTorque() const
 //////////////////////////////////////////////////
 void SimbodyLink::SetLinearDamping(double /*_damping*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyLink::SetAngularDamping(double /*_damping*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddForce(const math::Vector3 &/*_force*/)
+void SimbodyLink::AddForce(const math::Vector3 &_force)
 {
+  SimTK::Vec3 f(SimbodyPhysics::Vector3ToVec3(_force));
+
+  this->simbodyPhysics->discreteForces.addForceToBodyPoint(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    this->masterMobod,
+    SimTK::Vec3(0), f);
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::AddRelativeForce(const math::Vector3 &/*_force*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::AddForceAtWorldPosition(const math::Vector3 &/*_force*/,
                                          const math::Vector3 &/*_pos*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::AddForceAtRelativePosition(const math::Vector3 &/*_force*/,
                   const math::Vector3 &/*_relpos*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
@@ -493,11 +533,13 @@ void SimbodyLink::AddTorque(const math::Vector3 &/*_torque*/)
 /////////////////////////////////////////////////
 void SimbodyLink::AddRelativeTorque(const math::Vector3 &/*_torque*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::SetAutoDisable(bool /*_disable*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////

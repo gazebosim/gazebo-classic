@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,6 @@ void ScaleWidget::OnChangeZoom(double _zoomFactor)
 {
   std::stringstream str;
   double places = pow(10.0, 2);
-  str << round(_zoomFactor * places) / places << " m";
+  str << round((1.0/_zoomFactor) * places) / places << " m";
   this->scaleText = str.str();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,8 +54,9 @@ namespace gazebo
     class CylinderShape;
     class MeshShape;
     class SphereShape;
-    class MeshShape;
+    class PlaneShape;
     class HeightmapShape;
+    class PolylineShape;
     class ModelState;
     class LinkState;
     class JointState;
@@ -140,13 +141,21 @@ namespace gazebo
     /// \brief Boost shared pointer to a CylinderShape object
     typedef boost::shared_ptr<CylinderShape> CylinderShapePtr;
 
-    /// \def SphereShapePtr
-    /// \brief Boost shared pointer to a SphereShape object
-    typedef boost::shared_ptr<SphereShape> SphereShapePtr;
+    /// \def PlaneShapePtr
+    /// \brief Boost shared pointer to a PlaneShape object
+    typedef boost::shared_ptr<PlaneShape> PlaneShapePtr;
 
     /// \def MeshShapePtr
     /// \brief Boost shared pointer to a MeshShape object
     typedef boost::shared_ptr<MeshShape> MeshShapePtr;
+
+    /// \def PolylineShapePtr
+    /// \brief Boost shared pointer to a Polyline shape object
+    typedef boost::shared_ptr<PolylineShape> PolylineShapePtr;
+
+    /// \def SphereShapePtr
+    /// \brief Boost shared pointer to a SphereShape object
+    typedef boost::shared_ptr<SphereShape> SphereShapePtr;
 
     /// \def GripperPtr
     /// \brief Boost shared pointer to a Gripper object

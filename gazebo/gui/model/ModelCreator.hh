@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +17,27 @@
 #ifndef _MODEL_CREATOR_HH_
 #define _MODEL_CREATOR_HH_
 
+#include <sdf/sdf.hh>
+
 #include <list>
+#include <map>
 #include <string>
 #include <vector>
 
-#include <boost/unordered/unordered_map.hpp>
-
-#include <sdf/sdf.hh>
-
 #include "gazebo/common/KeyEvent.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
-
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/gui/model/LinkInspector.hh"
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/model/JointMaker.hh"
+
 #include "gazebo/util/system.hh"
+
+namespace boost
+{
+  class recursive_mutex;
+}
 
 namespace gazebo
 {
@@ -44,6 +49,8 @@ namespace gazebo
   namespace gui
   {
     class PartData;
+    class SaveDialog;
+    class JointMaker;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -67,7 +74,21 @@ namespace gazebo
         /// \brief Cylinder
         PART_CYLINDER,
         /// \brief Custom
-        PART_CUSTOM
+        PART_MESH
+      };
+
+      /// \enum SaveState
+      /// \brief Save states for the model editor.
+      private: enum SaveState
+      {
+        // NEVER_SAVED: The model has never been saved.
+        NEVER_SAVED,
+
+        // ALL_SAVED: All changes have been saved.
+        ALL_SAVED,
+
+        // UNSAVED_CHANGES: Has been saved before, but has unsaved changes.
+        UNSAVED_CHANGES
       };
 
       /// \brief Constructor
@@ -84,8 +105,45 @@ namespace gazebo
       /// \return Name of model.
       public: std::string GetModelName() const;
 
+      /// \brief Set save state upon a change to the model.
+      public: void ModelChanged();
+
+      /// \brief Callback for newing the model.
+      private: void OnNew();
+
+      /// \brief Helper function to manage writing files to disk.
+      private: void SaveModelFiles();
+
+      /// \brief Callback for saving the model.
+      /// \return True if the user chose to save, false if the user cancelled.
+      private: bool OnSave();
+
+      /// \brief Callback for selecting a folder and saving the model.
+      /// \return True if the user chose to save, false if the user cancelled.
+      private: bool OnSaveAs();
+
+      /// \brief Callback for when the name is changed through the Palette.
+      /// \param[in] _modelName The newly entered model name.
+      private: void OnNameChanged(const std::string &_modelName);
+
+      /// \brief Callback received when exiting the editor mode.
+      private: void OnExit();
+
+      /// \brief Update callback on PreRender.
+      private: void Update();
+
       /// \brief Finish the model and create the entity on the gzserver.
-       public: void FinishModel();
+      public: void FinishModel();
+
+      /// \brief Add a part to the model.
+      /// \param[in] _type Type of part to add: box, cylinder, or sphere.
+      /// \param[in] _size Size of the part.
+      /// \param[in] _pose Pose of the part.
+      /// \return Name of the part that has been added.
+      public: std::string AddShape(PartType _type,
+          const math::Vector3 &_size = math::Vector3::One,
+          const math::Pose &_pose = math::Pose::Zero,
+          const std::string &_uri = "");
 
       /// \brief Add a box to the model.
       /// \param[in] _size Size of the box.
@@ -121,8 +179,7 @@ namespace gazebo
 
       /// \brief Add a joint to the model.
       /// \param[in] _type Type of joint to add.
-      /// \return Name of the joint that has been added.
-      public: void AddJoint(JointMaker::JointType _type);
+      public: void AddJoint(const std::string &_type);
 
       /// \brief Remove a part from the model.
       /// \param[in] _partName Name of the part to remove
@@ -135,10 +192,6 @@ namespace gazebo
       /// \brief Set the model to allow auto disable at rest.
       /// \param[in] _auto True to allow the model to auto disable.
       public: void SetAutoDisable(bool _auto);
-
-      /// \brief Save model to SDF format.
-      /// \param[in] _savePath Path to save the SDF to.
-      public: void SaveToSDF(const std::string &_savePath);
 
       /// \brief Reset the model creator and the SDF.
       public: void Reset();
@@ -157,29 +210,80 @@ namespace gazebo
       /// \brief Generate the SDF from model part and joint visuals.
       public: void GenerateSDF();
 
-      /// \brief Mouse event filter callback when mouse is moved.
+      /// \brief Helper function to generate link sdf from part data.
+      /// \param[in] _part Part data used to generate the sdf.
+      /// \return SDF element describing the part.
+      private: sdf::ElementPtr GenerateLinkSDF(PartData *_part);
+
+      /// \brief QT callback when entering model edit mode
+      /// \param[in] _checked True if the menu item is checked
+      private slots: void OnEdit(bool _checked);
+
+      /// \brief QT callback when there's a request to edit an existing model.
+      /// \param[in] _modelName Name of model to be edited.
+      private slots: void OnEditModel(const std::string &_modelName);
+
+      /// \brief Qt callback when the copy action is triggered.
+      private slots: void OnCopy();
+
+      /// \brief Qt callback when the paste action is triggered.
+      private slots: void OnPaste();
+
+      /// \brief Mouse event filter callback when mouse is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMouseMovePart(const common::MouseEvent &_event);
+      private: bool OnMousePress(const common::MouseEvent &_event);
 
       /// \brief Mouse event filter callback when mouse is released.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMouseReleasePart(const common::MouseEvent &_event);
+      private: bool OnMouseRelease(const common::MouseEvent &_event);
+
+      /// \brief Mouse event filter callback when mouse is moved.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMouseMove(const common::MouseEvent &_event);
 
       /// \brief Mouse event filter callback when mouse is double clicked.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMouseDoubleClickPart(const common::MouseEvent &_event);
+      private: bool OnMouseDoubleClick(const common::MouseEvent &_event);
 
       /// \brief Key event filter callback when key is pressed.
       /// \param[in] _event The key event.
       /// \return True if the event was handled
-      private: bool OnKeyPressPart(const common::KeyEvent &_event);
+      private: bool OnKeyPress(const common::KeyEvent &_event);
 
-      /// \brief Create part with default properties from a visual
+      /// \brief Callback when the manipulation mode has changed.
+      /// \param[in] _mode New manipulation mode.
+      private: void OnManipMode(const std::string &_mode);
+
+      /// \brief Callback when an entity is selected.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _mode Select model
+      private: void OnSetSelectedEntity(const std::string &_name,
+          const std::string &_mode);
+
+      /// \brief Create part with default properties from a visual. This
+      /// function creates a link that will become the parent of the
+      /// input visual. A collision visual with the same geometry as the input
+      /// visual will also be added to the link.
       /// \param[in] _visual Visual used to create the part.
       private: void CreatePart(const rendering::VisualPtr &_visual);
+
+      /// \brief Clone an existing part.
+      /// \param[in] _partName Name of part to be cloned.
+      /// \return Cloned part.
+      private: PartData *ClonePart(const std::string &_partName);
+
+      /// \brief Create a part from an SDF.
+      /// \param[in] _link SDF element of the link that will be used to
+      /// recreate its visual representation in the model editor.
+      private: void CreatePartFromSDF(sdf::ElementPtr _linkElem);
+
+      /// \brief Open the part inspector.
+      /// \param[in] _name Name of part.
+      private: void OpenInspector(const std::string &_name);
 
       // Documentation inherited
       private: virtual void CreateTheEntity();
@@ -191,13 +295,49 @@ namespace gazebo
       /// \return Name of the model created.
       private: std::string CreateModel();
 
-      /// \brief Get a template SDF string of a simple model.
-      /// \return Template SDF string of a simple model.
-      private: std::string GetTemplateSDFString();
+      /// \brief Load a model SDF file and create visuals in the model editor.
+      /// This is used mainly when editing existing models.
+      /// \param[in] _sdf SDF of a model to be loaded
+      private: void LoadSDF(sdf::ElementPtr _sdf);
+
+      /// \brief Callback when a specific alignment configuration is set.
+      /// \param[in] _axis Axis of alignment: x, y, or z.
+      /// \param[in] _config Configuration: min, center, or max.
+      /// \param[in] _target Target of alignment: first or last.
+      /// \param[in] _bool True to preview alignment without publishing
+      /// to server.
+      private: void OnAlignMode(const std::string &_axis,
+          const std::string &_config, const std::string &_target,
+          bool _preview);
+
+      /// \brief Callback when an entity's scale has changed.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _scale New scale.
+      private: void OnEntityScaleChanged(const std::string &_name,
+          const math::Vector3 &_scale);
+
+      /// \brief Deselect all currently selected visuals.
+      private: void DeselectAll();
+
+      /// \brief Set visibilty of a visual recursively while storing their
+      /// original values
+      /// \param[in] _name Name of visual.
+      /// \param[in] _visible True to set the visual to be visible.
+      private: void SetModelVisible(const std::string &_name, bool _visible);
+
+      /// \brief Set visibilty of a visual recursively while storing their
+      /// original values
+      /// \param[in] _visual Pointer to the visual.
+      /// \param[in] _visible True to set the visual to be visible.
+      private: void SetModelVisible(rendering::VisualPtr _visual,
+          bool _visible);
 
       /// \brief Qt callback when a delete signal has been emitted.
-      /// \param[in] _name Name of the part or model to delete.
+      /// \param[in] _name Name of the entity to delete.
       private slots: void OnDelete(const std::string &_name="");
+
+      /// \brief Qt Callback to open part inspector
+      private slots: void OnOpenInspector();
 
       /// \brief Qt signal when the a part has been added.
       Q_SIGNALS: void PartAdded();
@@ -211,8 +351,14 @@ namespace gazebo
       /// \brief Name of the model.
       private: std::string modelName;
 
+      /// \brief Folder name, which is the model name without spaces.
+      private: std::string folderName;
+
+      /// \brief Name of the model preview.
+      private: static const std::string previewName;
+
       /// \brief The root visual of the model.
-      private: rendering::VisualPtr modelVisual;
+      private: rendering::VisualPtr previewVisual;
 
       /// \brief The root visual of the model.
       private: rendering::VisualPtr mouseVisual;
@@ -229,17 +375,8 @@ namespace gazebo
       /// \brief A list of gui editor events connected to the model creator.
       private: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief Counter for the number of boxes in the model.
-      private: int boxCounter;
-
-      /// \brief Counter for the number of cylinders in the model.
-      private: int cylinderCounter;
-
-      /// \brief Counter for the number of spheres in the model.
-      private: int sphereCounter;
-
-      /// \brief Counter for the number of custom parts in the model.
-      private: int customCounter;
+      /// \brief Counter for the number of parts in the model.
+      private: int partCounter;
 
       /// \brief Counter for generating a unique model name.
       private: int modelCounter;
@@ -248,7 +385,7 @@ namespace gazebo
       private: PartType addPartType;
 
       /// \brief A map of model part names to and their visuals.
-      private: boost::unordered_map<std::string, PartData *> allParts;
+      private: std::map<std::string, PartData *> allParts;
 
       /// \brief Transport node
       private: transport::NodePtr node;
@@ -267,67 +404,58 @@ namespace gazebo
       /// \brief origin of the model.
       private: math::Pose origin;
 
-      /// \brief Selected partv visual;
-      private: rendering::VisualPtr selectedVis;
+      /// \brief A list of selected visuals.
+      private: std::vector<rendering::VisualPtr> selectedVisuals;
+
+      /// \brief Names of parts copied through g_copyAct
+      private: std::vector<std::string> copiedPartNames;
+
+      /// \brief The last mouse event
+      private: common::MouseEvent lastMouseEvent;
+
+      /// \brief Qt action for opening the part inspector.
+      private: QAction *inspectAct;
+
+      /// \brief Part visual that is currently being inspected.
+      private: rendering::VisualPtr inspectVis;
+
+      /// \brief True if the model editor mode is active.
+      private: bool active;
+
+      /// \brief Current model manipulation mode.
+      private: std::string manipMode;
+
+      /// \brief Default name of the model.
+      private: static const std::string modelDefaultName;
+
+      /// \brief A dialog with options to save the model.
+      private: SaveDialog *saveDialog;
+
+      /// \brief Store the current save state of the model.
+      private: enum SaveState currentSaveState;
+
+      /// \brief Mutex to protect updates
+      private: boost::recursive_mutex *updateMutex;
+
+      /// \brief A list of part names whose scale has changed externally.
+      private: std::map<std::string, math::Vector3> partScaleUpdate;
+
+      /// \brief Name of model on the server that is being edited here in the
+      /// model editor.
+      private: std::string serverModelName;
+
+      /// \brief SDF element of the model on the server.
+      private: sdf::ElementPtr serverModelSDF;
+
+      /// \brief A map of all visuals of the model to be edited to their
+      /// visibility.
+      private: std::map<uint32_t, bool> serverModelVisible;
+
+      /// \brief Name of the canonical link in the model
+      private: std::string canonicalLink;
     };
     /// \}
-
-    /// \class SensorData SensorData.hh
-    /// \brief Helper class to store sensor data
-    class GAZEBO_VISIBLE SensorData
-    {
-      /// \brief Name of sensor.
-      public: std::string name;
-
-      /// \brief Type of sensor.
-      public: std::string type;
-
-      /// \brief Pose of sensor.
-      public: math::Vector3 pose;
-
-      /// \brief True to visualize sensor.
-      public: bool visualize;
-
-      /// \brief True to set sensor to be always on.
-      public: bool alwaysOn;
-
-      /// \brief Sensor topic name.
-      public: std::string topicName;
-    };
-
-    /// \class PartData PartData.hh
-    /// \brief Helper class to store part data
-    class GAZEBO_VISIBLE PartData : public QObject
-    {
-      Q_OBJECT
-
-      /// \brief Name of part.
-      public: std::string name;
-
-      /// \brief Visuals of the part.
-      public: std::vector<rendering::VisualPtr> visuals;
-
-      /// \brief True to enable gravity on part.
-      public: bool gravity;
-
-      /// \brief True to allow self collision.
-      public: bool selfCollide;
-
-      /// \brief True to make part kinematic.
-      public: bool kinematic;
-
-      /// \brief Pose of part.
-      public: math::Pose pose;
-
-      /// \brief Name of part.
-      public: physics::Inertial *inertial;
-
-      /// \brief Name of part.
-      public: std::vector<physics::CollisionPtr> collisions;
-
-      /// \brief Sensor data
-      public: SensorData *sensorData;
-    };
   }
 }
+
 #endif

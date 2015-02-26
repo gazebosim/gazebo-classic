@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #ifndef _WIREBOX_PRIVATE_HH_
 #define _WIREBOX_PRIVATE_HH_
 
+#include "gazebo/math/Box.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 
@@ -27,6 +28,9 @@ namespace gazebo
     /// \brief Private data for the WireBox class
     class WireBoxPrivate
     {
+      /// \brief Copy of bounding box.
+      public: math::Box box;
+
       /// \brief The lines which outline the box.
       public: DynamicLines *lines;
 

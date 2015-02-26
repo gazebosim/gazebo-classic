@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ void ODEGearboxJoint_TEST::GearboxTest(const std::string &_physicsEngine)
   physics::JointPtr gearboxJoint = model->GetJoint("joint_13");
   ASSERT_TRUE(gearboxJoint != NULL);
   ASSERT_TRUE(gearboxJoint->HasType(physics::Base::GEARBOX_JOINT));
-  double gearboxRatio = gearboxJoint->GetAttribute("gearbox_ratio", 0);
+  double gearboxRatio = gearboxJoint->GetParam("gearbox_ratio", 0);
   EXPECT_NEAR(gearboxRatio, -1.5, TOL);
   double force3 = 1.0;
   double force1 = force3 * gearboxRatio;
@@ -120,9 +120,9 @@ void ODEGearboxJoint_TEST::SetGearboxRatio(const std::string &_physicsEngine)
   ASSERT_TRUE(gearboxJoint != NULL);
   ASSERT_TRUE(gearboxJoint->HasType(physics::Base::GEARBOX_JOINT));
   double gearboxRatio = -2.5;
-  gearboxJoint->SetAttribute("gearbox_ratio", 0, gearboxRatio);
+  gearboxJoint->SetParam("gearbox_ratio", 0, gearboxRatio);
   EXPECT_NEAR(gearboxRatio,
-    gearboxJoint->GetAttribute("gearbox_ratio", 0), TOL);
+    gearboxJoint->GetParam("gearbox_ratio", 0), TOL);
   double force3 = 1.0;
   double force1 = force3 * gearboxRatio;
 

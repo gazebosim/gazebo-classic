@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use _mat file except in compliance with the License.
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -17,6 +17,7 @@
 #include "gazebo/common/Color.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/Console.hh"
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Material.hh"
 
 using namespace gazebo;
@@ -150,13 +151,13 @@ void Material::Update(const gazebo::common::Material *_mat)
     matPtr = Ogre::MaterialManager::getSingleton().create(
         _mat->GetName(), "General");
 
-  matPtr->setReceiveShadows(false);
   Ogre::Pass *pass = matPtr->getTechnique(0)->getPass(0);
 
   common::Color ambient =  _mat->GetAmbient();
   common::Color diffuse =  _mat->GetDiffuse();
   common::Color specular = _mat->GetSpecular();
   common::Color emissive = _mat->GetEmissive();
+
 
   pass->setLightingEnabled(_mat->GetLighting());
   pass->setDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
@@ -182,4 +183,37 @@ void Material::Update(const gazebo::common::Material *_mat)
     texState->setTextureName(_mat->GetTextureImage());
     texState->setName(_mat->GetTextureImage());
   }
+}
+
+//////////////////////////////////////////////////
+bool Material::GetMaterialAsColor(const std::string &_materialName,
+          common::Color &_ambient, common::Color &_diffuse,
+          common::Color &_specular, common::Color &_emissive)
+{
+  Ogre::MaterialPtr matPtr;
+
+  if (Ogre::MaterialManager::getSingleton().resourceExists(_materialName))
+  {
+    matPtr = Ogre::MaterialManager::getSingleton().getByName(_materialName,
+        "General");
+
+    if (matPtr.isNull())
+      return false;
+
+    Ogre::Technique *technique = matPtr->getTechnique(0);
+    if (technique)
+    {
+      Ogre::Pass *pass = technique->getPass(0);
+      if (pass)
+      {
+        _ambient = Conversions::Convert(pass->getAmbient());
+        _diffuse = Conversions::Convert(pass->getDiffuse());
+        _specular = Conversions::Convert(pass->getSpecular());
+        _emissive = Conversions::Convert(pass->getSelfIllumination());
+        return true;
+      }
+    }
+  }
+
+  return false;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
     gazebo::msgs::Set(msg.mutable_position(),
                       gazebo::math::Vector3(cmd->vel.px, cmd->vel.py, 0));
     gazebo::msgs::Set(msg.mutable_orientation(),
-                      gazebo::math::Quaternion(0, 0, cmd->vel.pa));
+                      gazebo::math::Quaternion(0, 0, -cmd->vel.pa));
     this->velPub->Publish(msg);
 
     result = 0;
@@ -222,7 +222,7 @@ void Position2dInterface::Unsubscribe()
 }
 
 //////////////////////////////////////////////////
-void Position2dInterface::OnPoseMsg(ConstPose_VPtr &_msg)
+void Position2dInterface::OnPoseMsg(ConstPosesStampedPtr &_msg)
 {
   // Iterate through all the pose messages
   for (int i = 0; i < _msg->pose_size(); ++i)
@@ -233,23 +233,13 @@ void Position2dInterface::OnPoseMsg(ConstPose_VPtr &_msg)
     player_position2d_data_t data;
     memset(&data, 0, sizeof(data));
 
-    this->datatime = gazebo::common::Time::GetWallTime().Double();
+    this->datatime = gazebo::msgs::Convert(_msg->time()).Double();
+
     data.pos.px = _msg->pose(i).position().x();
     data.pos.py = _msg->pose(i).position().y();
-    data.pos.pa = _msg->pose(i).position().z();
-
-    // TODO:
-    /*
-       struct timeval ts;
-       ts.tv_sec = (int) (this->iface->data->head.time);
-       ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
-
-       data.vel.px = this->iface->data->velocity.pos.x;
-       data.vel.py = this->iface->data->velocity.pos.y;
-       data.vel.pa = this->iface->data->velocity.yaw;
-
-       data.stall = (uint8_t) this->iface->data->stall;
-       */
+    gazebo::math::Quaternion quat =
+      gazebo::msgs::Convert(_msg->pose(i).orientation());
+    data.pos.pa = quat.GetYaw();
 
     this->driver->Publish(this->device_addr,
         PLAYER_MSGTYPE_DATA,

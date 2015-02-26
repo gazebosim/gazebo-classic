@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _RENDERTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include "gazebo/gazebo_config.h"
 #include "gazebo/util/system.hh"
 
 /// \def GZ_VISIBILITY_ALL
@@ -57,10 +58,17 @@ namespace gazebo
     class ArrowVisual;
     class ContactVisual;
     class COMVisual;
+    class InertiaVisual;
     class RFIDVisual;
     class RFIDTagVisual;
     class WindowManager;
     class SelectionObj;
+    class RayQuery;
+    class Distortion;
+
+#ifdef HAVE_OCULUS
+    class OculusCamera;
+#endif
 
     /// \def ScenePtr
     /// \brief Shared pointer to Scene
@@ -130,6 +138,10 @@ namespace gazebo
     /// \brief Shared pointer to COMVisual
     typedef boost::shared_ptr<COMVisual> COMVisualPtr;
 
+    /// \def InertiaVisualPtr
+    /// \brief Shared pointer to InertiaVisual
+    typedef boost::shared_ptr<InertiaVisual> InertiaVisualPtr;
+
     /// \def RFIDVisual
     /// \brief Shared pointer to RFIDVisual
     typedef boost::shared_ptr<RFIDVisual> RFIDVisualPtr;
@@ -142,9 +154,23 @@ namespace gazebo
     /// \brief Shared pointer to WindowManager
     typedef boost::shared_ptr<WindowManager> WindowManagerPtr;
 
-    /// \def ContactVisualPtr
+    /// \def SelectionObj
     /// \brief Shared pointer to SelectionObj
     typedef boost::shared_ptr<SelectionObj> SelectionObjPtr;
+
+    /// \def RayQueryPtr
+    /// \brief Shared pointer to RayQuery
+    typedef boost::shared_ptr<RayQuery> RayQueryPtr;
+
+    /// \def DistortionPtr
+    /// \brief Shared pointer to Distortion
+    typedef boost::shared_ptr<Distortion> DistortionPtr;
+
+#ifdef HAVE_OCULUS
+    /// \def OculusCameraPtr
+    /// \brief Shared pointer to OculusCamera
+    typedef boost::shared_ptr<OculusCamera> OculusCameraPtr;
+#endif
 
     /// \enum RenderOpType
     /// \brief Type of render operation for a drawable

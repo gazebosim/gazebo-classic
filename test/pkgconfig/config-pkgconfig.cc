@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,19 @@ TEST(PkgConfig, Config)
   snprintf(cmd, sizeof(cmd), "make");
   ASSERT_EQ(system(cmd), 0);
 }
+
+#ifndef WIN32
+TEST(PkgConfig, CC)
+{
+  char cmd[1024];
+
+  snprintf(cmd, sizeof(cmd),
+     "cc -fPIC -shared `pkg-config --cflags gazebo`\
+     `pkg-config --libs gazebo` -o hello_world.so \
+     %s/../../testfiles/hello_world.cc", SOURCE_DIR);
+  ASSERT_EQ(system(cmd), 0);
+}
+#endif
 
 int main(int argc, char **argv)
 {

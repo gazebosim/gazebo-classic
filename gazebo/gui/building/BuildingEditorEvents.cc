@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,24 @@
 using namespace gazebo;
 using namespace gui;
 
+event::EventT<void (bool)> editor::Events::toggleEditMode;
 event::EventT<void (std::string)> editor::Events::createBuildingEditorItem;
-event::EventT<void (std::string, std::string)>
-    editor::Events::saveBuildingModel;
+event::EventT<void (QColor)> editor::Events::colorSelected;
+event::EventT<void (QString)> editor::Events::textureSelected;
+event::EventT<void (std::string)> editor::Events::saveBuildingModel;
 event::EventT<void ()> editor::Events::finishBuildingModel;
-event::EventT<void ()> editor::Events::discardBuildingModel;
+event::EventT<void ()> editor::Events::newBuildingModel;
 event::EventT<void (int)> editor::Events::changeBuildingLevel;
 event::EventT<void ()> editor::Events::addBuildingLevel;
-event::EventT<void (int)> editor::Events::deleteBuildingLevel;
-event::EventT<void (int, std::string)> editor::Events::changeBuildingLevelName;
+event::EventT<void ()> editor::Events::deleteBuildingLevel;
+event::EventT<void ()> editor::Events::showFloorplan;
+event::EventT<void ()> editor::Events::triggerShowFloorplan;
+event::EventT<void ()> editor::Events::showElements;
+event::EventT<void ()> editor::Events::triggerShowElements;
+event::EventT<void (int, std::string)> editor::Events::updateLevelWidget;
 event::EventT<void (double)> editor::Events::changeBuildingEditorZoom;
-
-event::EventT<void ()> editor::Events::saveBuildingEditor;
-event::EventT<void ()> editor::Events::discardBuildingEditor;
-event::EventT<void ()> editor::Events::doneBuildingEditor;
+event::EventT<bool ()> editor::Events::saveAsBuildingEditor;
+event::EventT<bool ()> editor::Events::saveBuildingEditor;
+event::EventT<void ()> editor::Events::newBuildingEditor;
 event::EventT<void ()> editor::Events::exitBuildingEditor;
+event::EventT<void (std::string)> editor::Events::buildingNameChanged;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
 #ifndef _COMVISUAL_PRIVATE_HH_
 #define _COMVISUAL_PRIVATE_HH_
 
-#include <string>
-
 #include "gazebo/rendering/VisualPrivate.hh"
 
 namespace ogre
@@ -36,11 +34,11 @@ namespace gazebo
     /// \brief Private data for the COM Visual class
     class COMVisualPrivate : public VisualPrivate
     {
-      /// \brief Lines that make the cross marking the center of mass
+      /// \brief Lines that make the cross marking the center of mass.
       public: DynamicLines *crossLines;
 
-      /// \brief Box that make the cross marking the center of mass
-      public: Ogre::SceneNode *boxNode;
+      /// \brief Sphere with density of lead and equivalent mass.
+      public: Ogre::SceneNode *sphereNode;
     };
   }
 }

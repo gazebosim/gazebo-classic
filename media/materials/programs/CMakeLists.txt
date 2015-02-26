@@ -1,6 +1,10 @@
 add_subdirectory(deferred_rendering)
 
 set (files
+  camera_distortion_map_fs.glsl
+  camera_distortion_map_vs.glsl
+  camera_noise_gaussian_fs.glsl
+  camera_noise_gaussian_vs.glsl
   grid_fp.glsl
   grid_vp.glsl
   shadow_caster_fp.glsl
@@ -26,8 +30,8 @@ set (files
   laser_2nd_pass.vert
   plain_color_vs.glsl
   plain_color_fs.glsl
-  camera_noise_gaussian_fs.glsl
-  camera_noise_gaussian_vs.glsl
+  warp.vert
+  warpWithChromeAb.frag
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/media/materials/programs/)

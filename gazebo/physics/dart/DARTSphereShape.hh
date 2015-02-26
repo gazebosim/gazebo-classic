@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,9 +77,9 @@ namespace gazebo
           dart::dynamics::EllipsoidShape *dtEllipsoidShape =
               dynamic_cast<dart::dynamics::EllipsoidShape*>(
                 dartCollisionParent->GetDARTCollisionShape());
-          dtEllipsoidShape->setDim(Eigen::Vector3d(_radius*2.0,
-                                                   _radius*2.0,
-                                                   _radius*2.0));
+          dtEllipsoidShape->setSize(Eigen::Vector3d(_radius*2.0,
+                                                    _radius*2.0,
+                                                    _radius*2.0));
         }
       }
     };

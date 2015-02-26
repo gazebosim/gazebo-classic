@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera for viewing the world
- * Author: Nate Koenig
- * Date: 19 Jun 2008
- */
-
-#ifndef _USERCAMERA_HH_
-#define _USERCAMERA_HH_
+#ifndef _GAZEBO_USERCAMERA_HH_
+#define _GAZEBO_USERCAMERA_HH_
 
 #include <string>
 #include <vector>
@@ -36,8 +31,6 @@ namespace gazebo
 
   namespace rendering
   {
-    class GUIOverlay;
-
     /// \addtogroup gazebo_rendering
     /// \{
 
@@ -48,7 +41,10 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _name Name of the camera.
       /// \param[in] _scene Scene to put the camera in.
-      public: UserCamera(const std::string &_name, ScenePtr _scene);
+      /// \param[in] _stereoEnabled True to enable stereo rendering. This is
+      /// here for compatibility with 3D monitors/TVs.
+      public: UserCamera(const std::string &_name, ScenePtr _scene,
+                  bool _stereoEnabled = false);
 
       /// \brief Destructor
       public: virtual ~UserCamera();
@@ -56,6 +52,9 @@ namespace gazebo
       /// \brief Load the user camera.
       /// \param[in] _sdf Parameters for the camera.
       public: void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited
+      public: virtual void SetClipDist(float _near, float _far);
 
       /// \brief Generic load function
       public: void Load();
@@ -141,12 +140,6 @@ namespace gazebo
       /// \param[in] _target The new rendering target.
       public: virtual void SetRenderTarget(Ogre::RenderTarget *_target);
 
-      /// \brief Get the GUI overlay
-      ///
-      /// An overlay allows you to draw 2D elements on the viewport.
-      /// \return Pointer to the GUIOverlay.
-      public: GUIOverlay *GetGUIOverlay();
-
       /// \brief Set whether the view controller is enabled.
       ///
       /// The view controller is used to handle user camera movements.
@@ -184,6 +177,31 @@ namespace gazebo
       /// \param[in] _value True if the camera pose changed in the world file.
       public: void SetUseSDFPose(bool _value);
 
+      /// brief Enable or disable camera control through ~/user_camera/joy_twist
+      /// gz topic. Defaults to true.
+      /// \param[in] _value True to enable camera pose control by
+      /// gz topic ~/user_camera/joy_twist.
+      public: void SetJoyTwistControl(bool _value);
+
+      /// brief Enable or disable camera control through ~/user_camera/joy_pose
+      /// gz topic. Defaults to true.
+      /// \param[in] _value True to enable camera pose control by
+      /// gz topic ~/user_camera/joy_pose.
+      public: void SetJoyPoseControl(bool _value);
+
+      /// \brief Get whether stereo is enabled.
+      /// \return True if stereo is enabled.
+      public: bool StereoEnabled() const;
+
+      /// \brief Turn on/off stereo rendering. Stereo must be initially enabled
+      /// in the ~/.gazebo/gui.ini file using:
+      ///
+      ///     [rendering]
+      ///     stereo=1
+      ///
+      /// \param[in] _enable True to turn on stereo, false to turn off.
+      public: void EnableStereo(bool _enable);
+
       /// \brief Set the camera to be attached to a visual.
       ///
       /// This causes the camera to move in relation to the specified visual.
@@ -209,6 +227,8 @@ namespace gazebo
       /// \return True if the camera is now tracking the visual.
       protected: virtual bool TrackVisualImpl(VisualPtr _visual);
 
+      // Documentation inherited.
+      protected: virtual void UpdateFOV();
 
       /// \brief Toggle whether to show the visual.
       private: void ToggleShowVisual();
@@ -221,6 +241,18 @@ namespace gazebo
       /// \brief Callback used when the camera has finished moving to
       /// a visual.
       private: void OnMoveToVisualComplete();
+
+      /// \brief Handles incoming relative joystick messages.
+      /// Incoming joystick messages are used to control
+      /// translation and rotation rates of the camera position.
+      /// \param[in] _msg New joystick message.
+      private: void OnJoyTwist(ConstJoystickPtr &_msg);
+
+      /// \brief Handles incoming absolute joystick messages.
+      /// Incoming joystick messages are used to control
+      /// camera's world pose.
+      /// \param[in] _msg New pose message.
+      private: void OnJoyPose(ConstPosePtr &_msg);
 
       /// \internal
       /// \brief Pointer to private data.
