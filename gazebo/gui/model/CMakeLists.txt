@@ -4,6 +4,7 @@ include (${QT_USE_FILE})
 
 set (sources
   CollisionConfig.cc
+  ExtrudeDialog.cc
   ImportDialog.cc
   JointInspector.cc
   JointMaker.cc
@@ -19,6 +20,7 @@ set (sources
 
 set (qt_headers
   CollisionConfig.hh
+  ExtrudeDialog.hh
   ImportDialog.hh
   JointInspector.hh
   JointMaker.hh

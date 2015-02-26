@@ -27,6 +27,7 @@
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/model/ExtrudeDialog.hh"
 #include "gazebo/gui/model/ImportDialog.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
@@ -235,10 +236,26 @@ void ModelEditorPalette::OnCustom()
   importDialog.deleteLater();
   if (importDialog.exec() == QDialog::Accepted)
   {
-    event::Events::setSelectedEntity("", "normal");
-    g_arrowAct->trigger();
-    this->modelCreator->AddShape(ModelCreator::PART_MESH,
-        math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
+    QFileInfo info(QString::fromStdString(importDialog.GetImportPath()));
+    if (info.isFile())
+    {
+      event::Events::setSelectedEntity("", "normal");
+      g_arrowAct->trigger();
+      if (info.completeSuffix() == "dae" || info.completeSuffix() == "stl")
+      {
+        this->modelCreator->AddShape(ModelCreator::PART_MESH,
+            math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
+      }
+      else if (info.completeSuffix() == "svg")
+      {
+        ExtrudeDialog extrudeDialog(importDialog.GetImportPath(), this);
+        extrudeDialog.deleteLater();
+        if (extrudeDialog.exec() == QDialog::Accepted)
+        {
+          // tada
+        }
+      }
+    }
   }
   else
   {
