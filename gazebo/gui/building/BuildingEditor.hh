@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,9 +73,16 @@ namespace gazebo
       /// \brief Our custom menubar
       private: QMenuBar *menuBar;
 
+      /// \brief Action to save model.
       private: QAction *saveAct;
+
+      /// \brief Action to save model as.
       private: QAction *saveAsAct;
+
+      /// \brief Action to start a new model.
       private: QAction *newAct;
+
+      /// \brief Action to exit the editor.
       private: QAction *exitAct;
     };
   }

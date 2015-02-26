@@ -9,7 +9,7 @@ project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
-set (GAZEBO_MAJOR_VERSION 5)
+set (GAZEBO_MAJOR_VERSION 6)
 set (GAZEBO_MINOR_VERSION 0)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the

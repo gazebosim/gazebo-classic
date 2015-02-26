@@ -10,7 +10,7 @@
 #define GAZEBO_VERSION "${GAZEBO_VERSION}"
 #define GAZEBO_VERSION_FULL "${GAZEBO_VERSION_FULL}"
 
-#define GAZEBO_VERSION_HEADER "Gazebo multi-robot simulator, version ${GAZEBO_VERSION_FULL}\nCopyright (C) 2012-2014 Open Source Robotics Foundation.\nReleased under the Apache 2 License.\nhttp://gazebosim.org\n\n"
+#define GAZEBO_VERSION_HEADER "Gazebo multi-robot simulator, version ${GAZEBO_VERSION_FULL}\nCopyright (C) 2012-2015 Open Source Robotics Foundation.\nReleased under the Apache 2 License.\nhttp://gazebosim.org\n\n"
 
 #cmakedefine BUILD_TYPE_PROFILE 1
 #cmakedefine BUILD_TYPE_DEBUG 1

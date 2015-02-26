@@ -1,0 +1,67 @@
+<sdf version='1.5'>
+  <world name='default'>
+    <!-- include sun and ground plane -->
+    <include><uri>model://sun</uri></include>
+    <include><uri>model://ground_plane</uri></include>
+
+    <model name="sensor_box">
+      <static>true</static>
+      <link name="link">
+        <pose>0 0 0.251  0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>4 4 0.5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>4 4 0.5</size>
+            </box>
+          </geometry>
+          <material><script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script></material>
+        </visual>
+        <collision name="collision2">
+          <pose>0 0 1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>4 4 0.5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual2">
+          <pose>0 0 1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>4 4 0.5</size>
+            </box>
+          </geometry>
+          <material><script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script></material>
+        </visual>
+        <sensor name="box_contact" type="contact">
+          <always_on>true</always_on>
+          <update_rate>1000</update_rate>
+          <contact>
+            <collision>collision</collision>
+          </contact>
+        </sensor>
+        <sensor name="box_contact2" type="contact">
+          <always_on>true</always_on>
+          <update_rate>1000</update_rate>
+          <contact>
+            <collision>collision2</collision>
+          </contact>
+        </sensor>
+      </link>
+    </model>
+
+  </world>
+</sdf>

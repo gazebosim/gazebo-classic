@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,8 @@ boost::recursive_mutex *IRInterface::mutex = NULL;
 /////////////////////////////////////////////////
 IRInterface::IRInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
-: GazeboInterface(addr, driver, cf, section)
+: GazeboInterface(addr, driver, cf, section), iface(NULL), gz_id(NULL),
+  datatime(0.0)
 {
   /*
   // Get the ID of the interface

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -538,19 +538,7 @@ bool BulletJoint::SetParam(const std::string &/*_key*/,
 double BulletJoint::GetParam(const std::string &_key,
     unsigned int _index)
 {
-  if (_key == "hi_stop")
-  {
-    return this->GetHighStop(_index).Radian();
-  }
-  else if (_key == "lo_stop")
-  {
-    return this->GetLowStop(_index).Radian();
-  }
-  gzerr << "GetParam unrecognized parameter ["
-        << _key
-        << "]"
-        << std::endl;
-  return 0;
+  return Joint::GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////

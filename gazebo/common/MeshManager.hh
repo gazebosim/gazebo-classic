@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -164,12 +164,14 @@ namespace gazebo
       /// \param[in] _height the height along z
       /// \param[in] _rings the number of circles along the height
       /// \param[in] _segments the number of segment per circle
+      /// \param[in] _arc the arc angle in radians
       public: void CreateTube(const std::string &_name,
                               float _innerRadius,
                               float _outterRadius,
                               float _height,
                               int _rings,
-                              int _segments);
+                              int _segments,
+                              double _arc = 2.0 * M_PI);
 
       /// \brief Create mesh for a plane
       /// \param[in] _name
