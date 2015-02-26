@@ -88,12 +88,11 @@ void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
   EXPECT_EQ(topics, topicsExpected);
 
   // We should expect them all to publish.
-  for (std::list<std::string>::iterator iter = topics.begin();
-                                       iter != topics.end(); ++iter)
+  for (auto const &topic : topics)
   {
-    gzdbg << "Listening to " << *iter << std::endl;
+    gzdbg << "Listening to " << topic << std::endl;
     g_messageCount = 0;
-    transport::SubscriberPtr sub = this->node->Subscribe(*iter,
+    transport::SubscriberPtr sub = this->node->Subscribe(topic,
       &ContactSensor::Callback, this);
 
     const unsigned int steps = 50;
@@ -168,13 +167,13 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   sensors::ContactSensorPtr contactSensor01 =
       boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor01);
 
-  ASSERT_TRUE(contactSensor01);
+  ASSERT_TRUE(contactSensor01 != NULL);
 
   sensors::SensorPtr sensor02 = sensors::get_sensor(contactSensorName02);
   sensors::ContactSensorPtr contactSensor02 =
       boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor02);
 
-  ASSERT_TRUE(contactSensor02);
+  ASSERT_TRUE(contactSensor02 != NULL);
 
   sensors::SensorManager::Instance()->Init();
   sensors::SensorManager::Instance()->RunThreads();
@@ -195,8 +194,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
   physics::ModelPtr contactModel01 = world->GetModel(modelName01);
   physics::ModelPtr contactModel02 = world->GetModel(modelName02);
-  ASSERT_TRUE(contactModel01);
-  ASSERT_TRUE(contactModel02);
+  ASSERT_TRUE(contactModel01 != NULL);
+  ASSERT_TRUE(contactModel02 != NULL);
 
   std::vector<physics::ModelPtr> models;
   models.push_back(contactModel01);
@@ -242,7 +241,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
     unsigned int ColInd = 0;
     physics::CollisionPtr col = models[k]->GetLink()->GetCollision(ColInd);
-    ASSERT_TRUE(col);
+    ASSERT_TRUE(col != NULL);
 
     // calculate tolerance based on magnitude of force
     // Uncomment lines below once we are able to accurately determine the
@@ -394,7 +393,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   sensors::ContactSensorPtr contactSensor =
       boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
 
-  ASSERT_TRUE(contactSensor);
+  ASSERT_TRUE(contactSensor != NULL);
 
   sensors::SensorManager::Instance()->Init();
   sensors::SensorManager::Instance()->RunThreads();
@@ -409,7 +408,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   EXPECT_TRUE(contactSensor->IsActive());
 
   physics::ModelPtr contactModel = world->GetModel(modelName);
-  ASSERT_TRUE(contactModel);
+  ASSERT_TRUE(contactModel != NULL);
 
   double gravityZ = -9.8;
   physics->SetGravity(math::Vector3(0, 0, gravityZ));
@@ -435,7 +434,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   unsigned int ColInd = 0;
   physics::CollisionPtr col = contactModel->GetLink()->GetCollision(ColInd);
-  ASSERT_TRUE(col);
+  ASSERT_TRUE(col != NULL);
 
   // double tol = 2e-1;
   // loop through contact collision pairs

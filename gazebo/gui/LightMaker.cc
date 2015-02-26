@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,6 +99,7 @@ bool LightMaker::Init()
 
   this->light.reset(new rendering::Light(scene));
   this->light->Load();
+  scene->AddLight(this->light);
 
   this->light->SetLightType(this->lightTypename);
   this->light->SetPosition(math::Vector3(0, 0, 1));

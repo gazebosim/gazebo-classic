@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
     boost::static_pointer_cast<sensors::RaySensor>(
         sensors::SensorManager::Instance()->GetSensor(raySensorName));
 
-  ASSERT_TRUE(laser);
+  ASSERT_TRUE(laser != NULL);
   laser->Init();
   laser->Update(true);
 
@@ -116,7 +116,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   {
     common::Time prevTime;
     physics::WorldPtr world = physics::get_world("default");
-    ASSERT_TRUE(world);
+    ASSERT_TRUE(world != NULL);
 
     physics::ModelPtr model = world->GetModel(modelName);
 

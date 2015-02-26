@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,6 @@
 #include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/EditorItem.hh"
-#include "gazebo/gui/building/LineSegmentItem.hh"
-#include "gazebo/gui/building/PolylineItem.hh"
-#include "gazebo/gui/building/WallItem.hh"
 #include "gazebo/gui/building/LevelWidget.hh"
 #include "gazebo/gui/building/ScaleWidget.hh"
 #include "gazebo/gui/building/BuildingEditorWidget.hh"
@@ -59,11 +56,6 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   view->centerOn(QPointF(0, 0));
   view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
   view->setDragMode(QGraphicsView::ScrollHandDrag);
-
-  // TODO remove this wall and make sure scene updates without any items in it
-  WallItem *wallItem = new WallItem(QPointF(0, 0), QPointF(0, 0));
-  wallItem->SetThickness(0);
-  this->scene->addItem(wallItem);
 
   this->levelWidget = new LevelWidget(this);
   this->levelWidget->resize(250, 50);

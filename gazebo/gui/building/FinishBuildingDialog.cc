@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,29 +31,54 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   else if (_mode == MODEL_SAVE)
     this->setWindowTitle(tr("Save Model"));
 
-  QLabel *messageLabel = new QLabel;
+  this->messageLabel = new QLabel;
   if (_mode == MODEL_FINISH)
   {
-    messageLabel->setText(
+    this->messageLabel->setText(
         tr("Before we finalize your model, please make sure that\n"
         "the following information is correct:\n"));
   }
   else if (_mode == MODEL_SAVE)
   {
-    messageLabel->setText(
-        tr("Please give your model a name:\n"));
+    this->messageLabel->setText(
+        tr("Pick a location for your model \"Untitled\":\n"));
   }
 
   QLabel *modelLabel = new QLabel;
-  modelLabel->setText(tr("Name"));
+  modelLabel->setText(tr("Model Name: "));
   this->modelNameLineEdit = new QLineEdit;
-  this->modelNameLineEdit->setText(tr("BuildingDefaultName"));
+
+  QLabel *modelHeader = new QLabel;
+  modelHeader->setText(tr("<b>Model</b>"));
+
   QLabel *modelLocation = new QLabel;
-  modelLocation->setText(tr("Location"));
+  modelLocation->setText(tr("  Location:"));
   this->modelLocationLineEdit = new QLineEdit;
-  this->modelLocationLineEdit->setText(QDir::homePath());
+  // Try to get path to home folder
+  this->modelLocationLineEdit->setText(QDir::homePath()+
+                                       "/building_editor_models/Untitled");
+
   QPushButton *browseButton = new QPushButton(tr("Browse"));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
+
+  QLabel *authorHeader = new QLabel;
+  authorHeader->setText(tr("<b>Author</b>"));
+  QLabel *modelAuthorName = new QLabel;
+  modelAuthorName->setText(tr("  Name:"));
+  this->modelAuthorNameLineEdit = new QLineEdit;
+  QLabel *modelAuthorEmail = new QLabel;
+  modelAuthorEmail->setText(tr("  Email:"));
+  this->modelAuthorEmailLineEdit = new QLineEdit;
+
+  QLabel *modelVersion = new QLabel;
+  modelVersion->setText(tr("  Version:"));
+  this->modelVersionLineEdit = new QLineEdit;
+  this->modelVersionLineEdit->setText(tr("1.0"));
+
+  QLabel *modelDescription = new QLabel;
+  modelDescription->setText(tr("  Description:"));
+  this->modelDescriptionLineEdit = new QLineEdit;
+
 
 /*  QString contributeText(
       tr("Contribute this model to the Model Database so that\n"
@@ -72,25 +97,73 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   QPushButton *finishButton = new QPushButton(tr(finishButtonText.c_str()));
   finishButton->setDefault(true);
   connect(finishButton, SIGNAL(clicked()), this, SLOT(OnFinish()));
-  buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addWidget(finishButton);
+  buttonsLayout->addWidget(cancelButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
-  QGridLayout *gridLayout = new QGridLayout;
-  gridLayout->addWidget(modelLabel, 0, 0);
-  gridLayout->addWidget(modelNameLineEdit, 0, 1);
-  gridLayout->addWidget(modelLocation, 1, 0);
-  gridLayout->addWidget(this->modelLocationLineEdit, 1, 1);
-  gridLayout->addWidget(browseButton, 1, 2);
+  QHBoxLayout *locationLayout = new QHBoxLayout;
+
+  locationLayout->addWidget(modelLocation);
+  locationLayout->addWidget(this->modelLocationLineEdit);
+  locationLayout->addWidget(browseButton);
+
+  QRadioButton *advancedOptionsCollapser = new QRadioButton();
+  advancedOptionsCollapser->setChecked(false);
+  advancedOptionsCollapser->setText("Advanced Options");
+  advancedOptionsCollapser->setStyleSheet(
+     "QRadioButton {\
+        color: #d0d0d0;\
+      }\
+      QRadioButton::indicator::unchecked {\
+        image: url(:/images/right_arrow.png);\
+      }\
+      QRadioButton::indicator::checked {\
+        image: url(:/images/down_arrow.png);\
+      }");
+  // initialize as "closed" (unchecked)
+  // Button behavior: when "open", show advancedOptionsGrid
+  connect(advancedOptionsCollapser, SIGNAL(toggled(bool)), this,
+           SLOT(ToggleAdvancedOptions(bool)));
+
+  QHBoxLayout *advancedOptions = new QHBoxLayout();
+  advancedOptions->addWidget(advancedOptionsCollapser);
+
+  // Advanced options
+  QGridLayout *advancedOptionsGrid = new QGridLayout();
+  advancedOptionsGrid->addWidget(modelLabel, 0, 0);
+  advancedOptionsGrid->addWidget(modelNameLineEdit, 0, 1);
+
+  advancedOptionsGrid->addWidget(modelHeader, 1, 0);
+  advancedOptionsGrid->addWidget(modelVersion, 2, 0);
+  advancedOptionsGrid->addWidget(this->modelVersionLineEdit, 2, 1);
+  advancedOptionsGrid->addWidget(modelDescription, 3, 0);
+  advancedOptionsGrid->addWidget(this->modelDescriptionLineEdit, 3, 1);
+
+  advancedOptionsGrid->addWidget(authorHeader, 4, 0);
+  advancedOptionsGrid->addWidget(modelAuthorName, 5, 0);
+  advancedOptionsGrid->addWidget(this->modelAuthorNameLineEdit, 5, 1);
+  advancedOptionsGrid->addWidget(modelAuthorEmail, 6, 0);
+  advancedOptionsGrid->addWidget(this->modelAuthorEmailLineEdit, 6, 1);
+
+  this->advancedOptionsWidget = new QWidget();
+  this->advancedOptionsWidget->setLayout(advancedOptionsGrid);
+  this->advancedOptionsWidget->hide();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(messageLabel);
-  mainLayout->addLayout(gridLayout);
+  mainLayout->addWidget(this->messageLabel);
+  mainLayout->addLayout(locationLayout);
+
+  mainLayout->addLayout(advancedOptions);
+  mainLayout->addWidget(this->advancedOptionsWidget);
 //  if (_mode == MODEL_FINISH)
 //    mainLayout->addWidget(contributeCheckBox);
   mainLayout->addLayout(buttonsLayout);
+  mainLayout->setAlignment(Qt::AlignTop);
 
   this->setLayout(mainLayout);
+  this->setMinimumSize(400, 150);
+  this->setMaximumSize(400, 380);
+  this->resize(this->minimumSize());
 }
 
 /////////////////////////////////////////////////
@@ -111,9 +184,36 @@ std::string FinishBuildingDialog::GetSaveLocation() const
 }
 
 /////////////////////////////////////////////////
+std::string FinishBuildingDialog::GetAuthorName() const
+{
+  return this->modelAuthorNameLineEdit->text().toStdString();
+}
+
+/////////////////////////////////////////////////
+std::string FinishBuildingDialog::GetAuthorEmail() const
+{
+  return this->modelAuthorEmailLineEdit->text().toStdString();
+}
+
+/////////////////////////////////////////////////
+std::string FinishBuildingDialog::GetDescription() const
+{
+  return this->modelDescriptionLineEdit->text().toStdString();
+}
+
+/////////////////////////////////////////////////
+std::string FinishBuildingDialog::GetVersion() const
+{
+  return this->modelVersionLineEdit->text().toStdString();
+}
+
+/////////////////////////////////////////////////
 void FinishBuildingDialog::SetModelName(const std::string &_name)
 {
   this->modelNameLineEdit->setText(tr(_name.c_str()));
+  std::string label = "Pick a location for your model \""
+                      + _name + "\":\n";
+  this->messageLabel->setText(QString(label.c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -142,4 +242,19 @@ void FinishBuildingDialog::OnCancel()
 void FinishBuildingDialog::OnFinish()
 {
   this->accept();
+}
+
+/////////////////////////////////////////////////
+void FinishBuildingDialog::ToggleAdvancedOptions(bool _checked)
+{
+  if (_checked)
+  {
+    this->advancedOptionsWidget->show();
+    this->resize(this->maximumSize());
+  }
+  else
+  {
+    this->advancedOptionsWidget->hide();
+    this->resize(this->minimumSize());
+  }
 }

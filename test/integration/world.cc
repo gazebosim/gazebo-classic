@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 #include "gazebo/physics/physics.hh"
 
 using namespace gazebo;
-
 class WorldTest : public ServerFixture
 {
 };
@@ -30,7 +29,7 @@ TEST_F(WorldTest, ClearEmptyWorld)
 {
   Load("worlds/blank.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   EXPECT_EQ(world->GetModelCount(), 0u);
 
@@ -52,7 +51,7 @@ TEST_F(WorldTest, Clear)
 {
   Load("worlds/pioneer2dx.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   EXPECT_EQ(world->GetModelCount(), 2u);
 
@@ -72,7 +71,7 @@ TEST_F(WorldTest, ModifyLight)
 {
   Load("worlds/empty.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   // Make sure there is only one light, and it is named "sun"
   {
@@ -202,13 +201,13 @@ TEST_F(WorldTest, RemoveModelPaused)
 {
   Load("worlds/shapes.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr sphereModel = world->GetModel("sphere");
   physics::ModelPtr boxModel = world->GetModel("box");
 
-  EXPECT_TRUE(sphereModel);
-  EXPECT_TRUE(boxModel);
+  EXPECT_TRUE(sphereModel != NULL);
+  EXPECT_TRUE(boxModel != NULL);
 
   world->RemoveModel(sphereModel);
   world->RemoveModel("box");
@@ -216,8 +215,8 @@ TEST_F(WorldTest, RemoveModelPaused)
   sphereModel = world->GetModel("sphere");
   boxModel = world->GetModel("box");
 
-  EXPECT_FALSE(sphereModel);
-  EXPECT_FALSE(boxModel);
+  EXPECT_FALSE(sphereModel != NULL);
+  EXPECT_FALSE(boxModel != NULL);
 }
 
 /////////////////////////////////////////////////
@@ -225,13 +224,13 @@ TEST_F(WorldTest, RemoveModelUnPaused)
 {
   Load("worlds/shapes.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr sphereModel = world->GetModel("sphere");
   physics::ModelPtr boxModel = world->GetModel("box");
 
-  EXPECT_TRUE(sphereModel);
-  EXPECT_TRUE(boxModel);
+  EXPECT_TRUE(sphereModel != NULL);
+  EXPECT_TRUE(boxModel != NULL);
 
   world->RemoveModel(sphereModel);
   world->RemoveModel("box");
@@ -239,8 +238,8 @@ TEST_F(WorldTest, RemoveModelUnPaused)
   sphereModel = world->GetModel("sphere");
   boxModel = world->GetModel("box");
 
-  EXPECT_FALSE(sphereModel);
-  EXPECT_FALSE(boxModel);
+  EXPECT_FALSE(sphereModel != NULL);
+  EXPECT_FALSE(boxModel != NULL);
 }
 
 /////////////////////////////////////////////////

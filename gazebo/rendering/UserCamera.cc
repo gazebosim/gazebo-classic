@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera for viewing the world
- * Author: Nate Koenig
- * Date: 19 Jun 2008
- */
-
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Assert.hh"
@@ -27,7 +22,6 @@
 
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
 #include "gazebo/rendering/RenderEngine.hh"
-#include "gazebo/rendering/GUIOverlay.hh"
 #include "gazebo/rendering/WindowManager.hh"
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/OrbitViewController.hh"
@@ -44,13 +38,13 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   : Camera(_name, _scene),
     dataPtr(new UserCameraPrivate)
 {
-  this->dataPtr->gui = new GUIOverlay();
-
   this->dataPtr->orbitViewController = NULL;
   this->dataPtr->fpsViewController = NULL;
   this->dataPtr->viewController = NULL;
-
   this->dataPtr->selectionBuffer = NULL;
+  this->dataPtr->joyTwistControl = true;
+  this->dataPtr->joystickButtonToggleLast = false;
+  this->dataPtr->joyPoseControl = true;
 
   // Set default UserCamera render rate to 30Hz
   this->SetRenderRate(30.0);
@@ -63,9 +57,6 @@ UserCamera::~UserCamera()
 {
   delete this->dataPtr->orbitViewController;
   delete this->dataPtr->fpsViewController;
-
-  delete this->dataPtr->gui;
-  this->dataPtr->gui = NULL;
 
   this->connections.clear();
 
@@ -83,6 +74,14 @@ void UserCamera::Load(sdf::ElementPtr _sdf)
 void UserCamera::Load()
 {
   Camera::Load();
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+  this->dataPtr->joySubTwist =
+    this->dataPtr->node->Subscribe("~/user_camera/joy_twist",
+    &UserCamera::OnJoyTwist, this);
+  this->dataPtr->joySubPose =
+    this->dataPtr->node->Subscribe("~/user_camera/joy_pose",
+    &UserCamera::OnJoyPose, this);
 }
 
 //////////////////////////////////////////////////
@@ -182,8 +181,8 @@ void UserCamera::Update()
 {
   Camera::Update();
 
-  if (this->dataPtr->gui)
-    this->dataPtr->gui->Update();
+  if (this->dataPtr->viewController)
+    this->dataPtr->viewController->Update();
 }
 
 //////////////////////////////////////////////////
@@ -207,45 +206,55 @@ void UserCamera::Fini()
 //////////////////////////////////////////////////
 void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
-  if (!this->dataPtr->gui || !this->dataPtr->gui->HandleMouseEvent(_evt))
-  {
-    if (this->dataPtr->selectionBuffer)
-      this->dataPtr->selectionBuffer->Update();
+  if (this->dataPtr->selectionBuffer)
+    this->dataPtr->selectionBuffer->Update();
 
-    // DEBUG: this->dataPtr->selectionBuffer->ShowOverlay(true);
+  // DEBUG: this->dataPtr->selectionBuffer->ShowOverlay(true);
 
-    // Don't update the camera if it's being animated.
-    if (!this->animState)
-      this->dataPtr->viewController->HandleMouseEvent(_evt);
-  }
+  // Don't update the camera if it's being animated.
+  if (!this->animState)
+    this->dataPtr->viewController->HandleMouseEvent(_evt);
 }
 
 /////////////////////////////////////////////////
 void UserCamera::HandleKeyPressEvent(const std::string &_key)
 {
-  if (this->dataPtr->gui)
-    this->dataPtr->gui->HandleKeyPressEvent(_key);
   this->dataPtr->viewController->HandleKeyPressEvent(_key);
 }
 
 /////////////////////////////////////////////////
 void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
 {
-  if (this->dataPtr->gui)
-    this->dataPtr->gui->HandleKeyReleaseEvent(_key);
   this->dataPtr->viewController->HandleKeyReleaseEvent(_key);
 }
 
 /////////////////////////////////////////////////
 bool UserCamera::IsCameraSetInWorldFile()
 {
+  // note: this function is used in rendering::Heightmap
+  // to check if user specified custom pose for the camera.
+  // Otherwise, camera is raised based on heightmap height
+  // automatically.
   return this->dataPtr->isCameraSetInWorldFile;
 }
 
 //////////////////////////////////////////////////
 void UserCamera::SetUseSDFPose(bool _value)
 {
+  // true if user specified custom pose for the camera.
   this->dataPtr->isCameraSetInWorldFile = _value;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetJoyTwistControl(bool _value)
+{
+  this->dataPtr->joyTwistControl = _value;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetJoyPoseControl(bool _value)
+{
+  this->dataPtr->joyPoseControl = _value;
 }
 
 /////////////////////////////////////////////////
@@ -268,8 +277,8 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
       pitch = acos(zDiff/dist);
     }
 
-    this->RotateYaw(yaw);
-    this->RotatePitch(pitch);
+    this->Yaw(yaw);
+    this->Pitch(pitch);
 
     math::Box bb = _visual->GetBoundingBox();
     math::Vector3 pos = bb.GetCenter();
@@ -355,12 +364,6 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
-
-    if (this->dataPtr->gui)
-    {
-      this->dataPtr->gui->Resize(this->viewport->getActualWidth(),
-                        this->viewport->getActualHeight());
-    }
 
     delete [] this->saveFrameBuffer;
     this->saveFrameBuffer = NULL;
@@ -516,19 +519,10 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
 
-  if (this->dataPtr->gui)
-    this->dataPtr->gui->Init(this->renderTarget);
-
   this->initialized = true;
 
   this->dataPtr->selectionBuffer = new SelectionBuffer(this->scopedUniqueName,
       this->scene->GetManager(), this->renderTarget);
-}
-
-//////////////////////////////////////////////////
-GUIOverlay *UserCamera::GetGUIOverlay()
-{
-  return this->dataPtr->gui;
 }
 
 //////////////////////////////////////////////////
@@ -557,12 +551,14 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
   {
     // Make sure we set the _mod only if we have found a selection object
     if (entity->getName().substr(0, 15) == "__SELECTION_OBJ" &&
-        !entity->getUserAny().isEmpty() &&
-        entity->getUserAny().getType() == typeid(std::string))
+        !entity->getUserObjectBindings().getUserAny().isEmpty() &&
+        entity->getUserObjectBindings().getUserAny().getType() ==
+        typeid(std::string))
     {
       try
       {
-        _mod = Ogre::any_cast<std::string>(entity->getUserAny());
+        _mod = Ogre::any_cast<std::string>(
+            entity->getUserObjectBindings().getUserAny());
       }
       catch(Ogre::Exception &e)
       {
@@ -571,12 +567,13 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
       }
     }
 
-    if (!entity->getUserAny().isEmpty())
+    if (!entity->getUserObjectBindings().getUserAny().isEmpty())
     {
       try
       {
         result = this->scene->GetVisual(
-            Ogre::any_cast<std::string>(entity->getUserAny()));
+            Ogre::any_cast<std::string>(
+              entity->getUserObjectBindings().getUserAny()));
       }
       catch(Ogre::Exception &e)
       {
@@ -603,10 +600,11 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
   Ogre::Entity *entity =
     this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
 
-  if (entity && !entity->getUserAny().isEmpty())
+  if (entity && !entity->getUserObjectBindings().getUserAny().isEmpty())
   {
     result = this->scene->GetVisual(
-        Ogre::any_cast<std::string>(entity->getUserAny()));
+        Ogre::any_cast<std::string>(
+          entity->getUserObjectBindings().getUserAny()));
   }
 
   return result;
@@ -617,4 +615,71 @@ std::string UserCamera::GetViewControllerTypeString()
 {
   GZ_ASSERT(this->dataPtr->viewController, "ViewController != NULL");
   return this->dataPtr->viewController->GetTypeString();
+}
+
+//////////////////////////////////////////////////
+void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
+{
+  // Scaling factor applied to rotations.
+  static math::Vector3 rpyFactor(0, 0.01, 0.05);
+
+  // toggle using joystick to move camera
+  if (this->dataPtr->joystickButtonToggleLast == false &&
+      _msg->buttons().size() == 2 && _msg->buttons(0) == 1)
+  {
+    this->dataPtr->joyTwistControl =
+      !this->dataPtr->joyTwistControl;
+
+    this->dataPtr->joystickButtonToggleLast = true;
+
+    if (this->dataPtr->joyTwistControl)
+      gzmsg << "Joystick camera viewpoint control active.\n";
+    else
+      gzmsg << "Joystick camera viewpoint control deactivated.\n";
+  }
+  else if (_msg->buttons().size() == 2 && _msg->buttons(0) == 0)
+  {
+    // detect button release
+    this->dataPtr->joystickButtonToggleLast = false;
+  }
+
+  // This function was establish when integrating the space navigator
+  // joystick.
+  if (this->dataPtr->joyTwistControl &&
+      (_msg->has_translation() || _msg->has_rotation()))
+  {
+    math::Pose pose = this->GetWorldPose();
+
+    // Get the joystick XYZ
+    if (_msg->has_translation())
+    {
+      const double transRotRatio = 0.05;
+      math::Vector3 trans = msgs::Convert(_msg->translation()) * transRotRatio;
+      pose.pos = pose.rot.RotateVector(trans) + pose.pos;
+    }
+
+    // Get the jostick RPY. We are disabling rotation around x.
+    if (_msg->has_rotation())
+    {
+      math::Vector3 rot = msgs::Convert(_msg->rotation()) * rpyFactor;
+      pose.rot.SetFromEuler(pose.rot.GetAsEuler() + rot);
+    }
+
+    this->SetWorldPose(pose);
+  }
+}
+
+//////////////////////////////////////////////////
+void UserCamera::OnJoyPose(ConstPosePtr &_msg)
+{
+  if (!this->dataPtr->joyPoseControl)
+    return;
+
+  if (_msg->has_position() && _msg->has_orientation())
+  {
+    // Get the XYZ
+    math::Pose pose(msgs::Convert(_msg->position()),
+                    msgs::Convert(_msg->orientation()));
+    this->SetWorldPose(pose);
+  }
 }

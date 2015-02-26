@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
 
   std::string titleStr = dialogModeStr + " Inspector";
   this->setWindowTitle(tr(titleStr.c_str()));
+  this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   std::string itemLabelStr = dialogModeStr + " Name:";
   QLabel *itemlLabel = new QLabel(tr(itemLabelStr.c_str()));
@@ -140,6 +141,7 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 /////////////////////////////////////////////////

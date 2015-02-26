@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
           << std::endl;
     return;
   }
-  if (_physicsEngine == "simbody" || _physicsEngine == "dart")
+  if (_physicsEngine == "dart")
   {
     gzerr << "Skipping this test for " << _physicsEngine
           << " since it consistently gives"

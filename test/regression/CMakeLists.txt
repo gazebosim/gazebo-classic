@@ -33,6 +33,7 @@ set(tests
   1124_collision_pose.cc
   1146_collision_bounding_box.cc
   1208_world_plugin_init.cc
+  1375_world_reset.cc
 )
 
 gz_build_tests(${tests})

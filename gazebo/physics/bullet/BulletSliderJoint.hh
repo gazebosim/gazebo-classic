@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _BULLETSLIDERJOINT_HH_
-#define _BULLETSLIDERJOINT_HH_
+#ifndef _GAZEBO_BULLETSLIDERJOINT_HH_
+#define _GAZEBO_BULLETSLIDERJOINT_HH_
+
+#include <string>
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
@@ -87,6 +89,15 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+
+      // Documentation inherited.
+      public: virtual bool SetParam(const std::string &_key,
+                                    unsigned int _index,
+                                    const boost::any &_value);
+
+      // Documentation inherited.
+      public: virtual double GetParam(const std::string &_key,
+                                      unsigned int _index);
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,13 +44,13 @@ namespace gazebo
       /// triggered.
       private slots: void Save();
 
-      /// \brief Qt callback when the building editor's discard action is
+      /// \brief Qt callback when the building editor's save as action is
       /// triggered.
-      private slots: void Discard();
+      private slots: void SaveAs();
 
-      /// \brief Qt callback when the building editor's done action is
+      /// \brief Qt callback when the building editor's new action is
       /// triggered.
-      private slots: void Done();
+      private slots: void New();
 
       /// \brief Qt callback when the building editor's exit action is
       /// triggered.
@@ -74,8 +74,8 @@ namespace gazebo
       private: QMenuBar *menuBar;
 
       private: QAction *saveAct;
-      private: QAction *discardAct;
-      private: QAction *doneAct;
+      private: QAction *saveAsAct;
+      private: QAction *newAct;
       private: QAction *exitAct;
     };
   }
