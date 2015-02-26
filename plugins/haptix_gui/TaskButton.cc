@@ -42,14 +42,14 @@ TaskButton::TaskButton(const std::string &_name, const std::string &_id,
       "}"
 
       "QToolButton:hover {"
-        "background-color: rgba(200, 200, 200, 255);"
+        "background-color: #7A95D6;"
         "border: 0px;"
         "border-radius: 4px;"
         "color: #ffffff;"
       "}"
 
       "QToolButton:checked {"
-        "background-color: rgba(23, 85, 138, 255);"
+        "background-color: rgba(83, 101, 146, 255);"
         "border: 0px;"
         "border-radius: 4px;"
         "color: #ffffff;"
