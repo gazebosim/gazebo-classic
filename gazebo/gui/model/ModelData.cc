@@ -76,6 +76,8 @@ PartData::PartData()
   this->partSDF.reset(new sdf::Element);
   sdf::initFile("link.sdf", this->partSDF);
 
+  this->scale = math::Vector3::One;
+
   this->inspector = new LinkInspector();
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
@@ -135,6 +137,39 @@ void PartData::SetPose(const math::Pose &_pose)
 
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
   linkConfig->SetPose(_pose);
+}
+
+/////////////////////////////////////////////////
+void PartData::SetScale(const math::Vector3 &_scale)
+{
+  VisualConfig *visualConfig = this->inspector->GetVisualConfig();
+  std::string uri;
+  for (auto it = this->visuals.begin(); it != this->visuals.end(); ++it)
+  {
+    std::string name = it->first->GetName();
+    std::string partName = this->partVisual->GetName();
+    std::string leafName =
+        name.substr(name.find(partName)+partName.size()+1);
+    visualConfig->SetGeometry(leafName, it->first->GetScale());
+  }
+
+  CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
+  for (auto it = this->collisions.begin(); it != this->collisions.end(); ++it)
+  {
+    std::string name = it->first->GetName();
+    std::string partName = this->partVisual->GetName();
+    std::string leafName =
+        name.substr(name.find(partName)+partName.size()+1);
+    collisionConfig->SetGeometry(leafName,  it->first->GetScale());
+  }
+
+  this->scale = _scale;
+}
+
+/////////////////////////////////////////////////
+math::Vector3 PartData::GetScale() const
+{
+  return this->scale;
 }
 
 /////////////////////////////////////////////////

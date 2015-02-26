@@ -74,6 +74,14 @@ namespace gazebo
       /// \param[in] _pose Pose of part.
       public: void SetPose(const math::Pose &_pose);
 
+      /// \brief Get the scale of the part.
+      /// \return Scale of part.
+      public: math::Vector3 GetScale() const;
+
+      /// \brief Set the scale of the part.
+      /// \param[in] _scale Scale of part.
+      public: void SetScale(const math::Vector3 &_scale);
+
       /// \brief Add a visual to the part.
       /// \param[in] _visual Visual to be added.
       public: void AddVisual(rendering::VisualPtr _visual);
