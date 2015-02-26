@@ -421,13 +421,18 @@ void RenderEngine::LoadPlugins()
     std::string extension = ".so";
 #endif
 
-    plugins.push_back(path+"/"+prefix+"RenderSystem_GL");
+    boost::filesystem::path p(path);
+    plugins.push_back((p / prefix / "RenderSystem_GL").string());
+    plugins.push_back((p / prefix / "Plugin_ParticleFX").string());
+    plugins.push_back((p / prefix / "Plugin_BSPSceneManager").string());
+    plugins.push_back((p / prefix / "Plugin_OctreeSceneManager").string());
+/*    plugins.push_back(path+"/"+prefix+"RenderSystem_GL");
     plugins.push_back(path+"/"+prefix+"Plugin_ParticleFX");
     plugins.push_back(path+"/"+prefix+"Plugin_BSPSceneManager");
-    plugins.push_back(path+"/"+prefix+"Plugin_OctreeSceneManager");
+    plugins.push_back(path+"/"+prefix+"Plugin_OctreeSceneManager");*/
 
 #ifdef HAVE_OCULUS
-    plugins.push_back(path+"/Plugin_CgProgramManager");
+    plugins.push_back((p / prefix / "Plugin_CgProgramManager").string());
 #endif
 
     for (piter = plugins.begin(); piter != plugins.end(); ++piter)
@@ -575,34 +580,36 @@ void RenderEngine::SetupResources()
     {
       std::string prefix = (*iter) + "/" + (*mediaIter);
 
+      boost::filesystem::path p(prefix);
+
       archNames.push_back(
-          std::make_pair(prefix, "General"));
+          std::make_pair(p.string(), "General"));
       archNames.push_back(
-          std::make_pair(prefix + "/skyx", "SkyX"));
+          std::make_pair((p/"skyx").string(), "SkyX"));
       archNames.push_back(
-          std::make_pair(prefix + "/rtshaderlib", "General"));
+          std::make_pair((p/"rtshaderlib").string(), "General"));
       archNames.push_back(
-          std::make_pair(prefix + "/materials/programs", "General"));
+          std::make_pair((p/"materials"/"programs").string(), "General"));
       archNames.push_back(
-          std::make_pair(prefix + "/materials/scripts", "General"));
+          std::make_pair((p/"materials"/"scripts").string(), "General"));
       archNames.push_back(
-          std::make_pair(prefix + "/materials/textures", "General"));
+          std::make_pair((p/"materials"/"textures").string(), "General"));
       archNames.push_back(
-          std::make_pair(prefix + "/media/models", "General"));
+          std::make_pair((p/"media"/"models").string(), "General"));
       archNames.push_back(
-          std::make_pair(prefix + "/fonts", "Fonts"));
+          std::make_pair((p/"fonts").string(), "Fonts"));
       archNames.push_back(
-          std::make_pair(prefix + "/gui/looknfeel", "LookNFeel"));
+          std::make_pair((p/"gui"/"looknfeel").string(), "LookNFeel"));
       archNames.push_back(
-          std::make_pair(prefix + "/gui/schemes", "Schemes"));
+          std::make_pair((p/"gui"/"schemes").string(), "Schemes"));
       archNames.push_back(
-          std::make_pair(prefix + "/gui/imagesets", "Imagesets"));
+          std::make_pair((p/"gui"/"imagesets").string(), "Imagesets"));
       archNames.push_back(
-          std::make_pair(prefix + "/gui/fonts", "Fonts"));
+          std::make_pair((p/"gui"/"fonts").string(), "Fonts"));
       archNames.push_back(
-          std::make_pair(prefix + "/gui/layouts", "Layouts"));
+          std::make_pair((p/"gui"/"layouts").string(), "Layouts"));
       archNames.push_back(
-          std::make_pair(prefix + "/gui/animations", "Animations"));
+          std::make_pair((p/"gui"/"animations").string(), "Animations"));
     }
 
     for (aiter = archNames.begin(); aiter != archNames.end(); ++aiter)
