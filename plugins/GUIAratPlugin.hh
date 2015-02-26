@@ -52,6 +52,18 @@ namespace gazebo
         KeyCommand(){index = 0; }
     };
 
+    class Grasp
+    {
+      public:
+        float sliderValue;
+        std::vector<float> desiredGrasp;
+        char incKey;
+        char decKey;
+        void SliderChanged(char key, float inc);
+        Grasp(char i, char d) : incKey(i), decKey(d) { sliderValue = 0; }
+        Grasp() {}
+    };
+
     class QTaskButton : public QToolButton
     {
       Q_OBJECT
@@ -73,7 +85,23 @@ namespace gazebo
                              QTextDocument* instructions, const int index);
     };
 
-    class GUIAratPlugin : public gazebo::GUIPlugin
+    // Digital clock adapted from
+    // http://qt-project.org/doc/qt-4.8/widgets-digitalclock.html
+    class DigitalClock : public QLCDNumber
+    {
+       Q_OBJECT
+       
+       public: DigitalClock(QWidget *parent = 0);
+       public: void StopClock();
+       private: QTime lastStartTime;
+       private: bool running;
+
+       protected slots: void ShowTime();
+
+      private slots: void OnStartStop();
+    };
+
+    class GUIAratPlugin : public gazebo::GUIPlugin 
     {
       Q_OBJECT
 
@@ -91,6 +119,8 @@ namespace gazebo
                                        const int index);
       protected slots: void OnResetClicked(); 
       protected slots: void OnNextClicked(); 
+      protected slots: void OnStartStopClicked();
+
       private: void PublishTaskMessage(const std::string &task_name); 
 
       /// \brief Node used to establish communication with gzserver.
@@ -104,13 +134,15 @@ namespace gazebo
       private: std::map<char, KeyCommand> armCommands;
       private: std::map<char, KeyCommand> handCommands;
       private: std::map<std::string, std::vector<char> > buttonNames;
+      // The mapping between a button and the grasp it is commanding
+      private: std::map<char, std::string> graspCommands;
+      private: std::map<std::string, Grasp> grasps;
 
       /// \brief Publisher of factory messages.
       private: gazebo::transport::PublisherPtr taskPub;
 
       /// \brief Subscriber to finger contact sensors.
       private: std::vector<transport::SubscriberPtr> contactSubscribers;
-
 
       /// \brief Maximum number tasks.
       /// \sa taskNum
@@ -121,12 +153,18 @@ namespace gazebo
       private: std::string handImgFilename;
       private: std::string configFilename;
 
+      private: float GUIScaleFactor;
       private: int circleSize;
       private: math::Vector2d iconSize;
       private: math::Vector3 colorMin;
       private: math::Vector3 colorMax;
       private: float forceMin;
       private: float forceMax;
+      private: float graspIncrement;
+
+      private: bool isTestRunning;
+      private: QString startButtonStyle;
+      private: QString stopButtonStyle;
 
       private: std::string handSide;
       
@@ -137,9 +175,17 @@ namespace gazebo
 
       private: std::vector<QTextDocument*> instructionsList;
 
+      private: QVBoxLayout* mainLayout;
+
+      private: QDockWidget* handDockWidget; //used for relative positioning
+
       private: QTextEdit* instructionsView;
 
       private: QGraphicsScene *handScene;
+
+      private: QPushButton *startStopButton;
+  
+      private: DigitalClock *digitalClock;
 
       private: std::vector<event::ConnectionPtr> connections;
 
@@ -150,10 +196,9 @@ namespace gazebo
       /// \brief Number of the current task.
       private: int currentTaskIndex;
 
-      private: void InitializeHandView(QLayout* mainLayout);
+      private: void InitializeHandView();
 
-      private: void InitializeTaskView(QLayout* mainLayout,
-                                       sdf::ElementPtr elem,
+      private: void InitializeTaskView(sdf::ElementPtr elem,
                                        common::SystemPaths* paths);
 
       private: void OnFingerContact(ConstContactsPtr &msg);
