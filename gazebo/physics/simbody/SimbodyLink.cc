@@ -451,13 +451,36 @@ void SimbodyLink::SetForce(const math::Vector3 &_force)
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldForce() const
 {
-  SimTK::SpatialVec sv = this->simbodyPhysics->discreteForces.getOneBodyForce(
-    this->simbodyPhysics->integ->getState(), this->masterMobod);
+  math::Vector3 fg;
 
-  // get translational component
-  SimTK::Vec3 f = sv[1];
+  if (this->physicsInitialized)
+  {
+    boost::recursive_mutex::scoped_lock lock(
+      *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
 
-  return SimbodyPhysics::Vec3ToVector3(f);
+    // get current state
+    const SimTK::State &state = this->simbodyPhysics->integ->getAdvancedState();
+
+    // force calculation of reaction forces
+    this->simbodyPhysics->system.realize(state, SimTK::Stage::Acceleration);
+
+    // Get forces acting on the parent link in ground frame
+    // at the parent frame origin
+    SimTK::SpatialVec spatialForceOnInboardBodyInGround =
+      this->masterMobod.findMobilizerReactionOnParentAtFInGround(state);
+
+    // get translational component
+    SimTK::Vec3 fs = spatialForceOnInboardBodyInGround[1];
+    fg = SimbodyPhysics::Vec3ToVector3(fs);
+  }
+
+  // add gravitational force
+  std::cout << "fg [" << fg.x << ", " << fg.y << ", " << fg.z << "]\n";
+  // fg -= this->GetWorldPose().rot.GetInverse().RotateVector(
+  //   this->GetWorld()->GetPhysicsEngine()->GetGravity());
+  // gzerr << " fg wiht g [" << fg << "]\n";
+
+  return fg;
 }
 
 //////////////////////////////////////////////////
@@ -473,13 +496,29 @@ void SimbodyLink::SetTorque(const math::Vector3 &_torque)
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldTorque() const
 {
-  SimTK::SpatialVec sv = this->simbodyPhysics->discreteForces.getOneBodyForce(
-    this->simbodyPhysics->integ->getState(), this->masterMobod);
+  math::Vector3 fg;
+  if (this->physicsInitialized)
+  {
+    boost::recursive_mutex::scoped_lock lock(
+      *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
 
-  // get rotational component
-  SimTK::Vec3 t = sv[0];
+    // get current state
+    const SimTK::State &state = this->simbodyPhysics->integ->getAdvancedState();
 
-  return SimbodyPhysics::Vec3ToVector3(t);
+    // force calculation of reaction forces
+    this->simbodyPhysics->system.realize(state);
+
+    // Get forces acting on the parent link in ground frame
+    // at the parent frame origin
+    SimTK::SpatialVec spatialForceOnInboardBodyInGround =
+      this->masterMobod.findMobilizerReactionOnParentAtFInGround(state);
+
+    // get translational component
+    SimTK::Vec3 fs = spatialForceOnInboardBodyInGround[0];
+    fg = SimbodyPhysics::Vec3ToVector3(fs);
+  }
+
+  return fg;
 }
 
 //////////////////////////////////////////////////
