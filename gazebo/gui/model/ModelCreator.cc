@@ -1237,8 +1237,26 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       if (_event.button == common::MouseEvent::RIGHT)
       {
         this->inspectVis = vis->GetParent();
+
         QMenu menu;
         menu.addAction(this->inspectAct);
+
+        std::vector<JointData *> joints = this->jointMaker->GetJointDataByPart(
+            this->inspectVis->GetName());
+
+        if (!joints.empty())
+        {
+          QMenu *jointsMenu = menu.addMenu(tr("Open Joint Inspector"));
+
+          for (auto joint : joints)
+          {
+            QAction *jointAct = new QAction(tr(joint->name.c_str()), this);
+            connect(jointAct, SIGNAL(triggered()), joint,
+                SLOT(OnOpenInspector()));
+            jointsMenu->addAction(jointAct);
+          }
+        }
+
         menu.exec(QCursor::pos());
         return true;
       }

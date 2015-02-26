@@ -32,7 +32,6 @@ TEST_F(Connection, IPWhiteList)
   transport::Connection *connection = new transport::Connection();
   EXPECT_TRUE(connection->GetIPWhiteList().empty());
   delete connection;
-  connection = NULL;
 
   // Get original value
   char *ipEnv = getenv("GAZEBO_IP_WHITE_LIST");
