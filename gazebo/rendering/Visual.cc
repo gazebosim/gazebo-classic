@@ -1248,7 +1248,9 @@ void Visual::SetDiffuse(const common::Color &_color)
         for (passCount = 0; passCount < technique->getNumPasses(); passCount++)
         {
           pass = technique->getPass(passCount);
-          pass->setDiffuse(Conversions::Convert(_color));
+          dc = Conversions::Convert(_color);
+          pass->setDiffuse(dc);
+          this->dataPtr->transparency = 1.0f - dc.a;
         }
       }
     }
@@ -1558,8 +1560,9 @@ void Visual::SetTransparencyInnerLoop()
           }
 
           dc = pass->getDiffuse();
-          dc.a =(1.0f - this->dataPtr->transparency);
+          dc.a = (1.0f - this->dataPtr->transparency);
           pass->setDiffuse(dc);
+          this->dataPtr->diffuse = Conversions::Convert(dc);
         }
       }
     }
@@ -1569,7 +1572,7 @@ void Visual::SetTransparencyInnerLoop()
 //////////////////////////////////////////////////
 void Visual::SetTransparency(float _trans)
 {
-  if (math::equal(_trans, this->dataPtr->transparency))
+  if (math::equal(this->dataPtr->transparency, _trans))
     return;
 
   this->dataPtr->transparency = std::min(
@@ -2421,9 +2424,6 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     this->SetScale(geomScale);
   }
 
-  if (_msg->has_transparency())
-    this->SetTransparency(_msg->transparency());
-
   if (_msg->has_material())
   {
     if (_msg->material().has_lighting())
@@ -2486,6 +2486,11 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       if (_msg->material().has_normal_map())
         this->SetNormalMap(_msg->material().normal_map());
     }
+  }
+
+  if (_msg->has_transparency())
+  {
+    this->SetTransparency(_msg->transparency());
   }
 
   /*if (msg->points.size() > 0)

@@ -521,6 +521,30 @@ TEST_F(Visual_TEST, ColorMaterial)
   EXPECT_EQ(boxVis->GetDiffuse(), common::Color(0.7, 0.7, 0.7, 1.0));
   EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.01, 0.01, 0.01, 1.0));
   EXPECT_EQ(boxVis->GetEmissive(), common::Color::Black);
+
+  // test with a semi-transparent color material
+  std::string redTransparentMaterialName = "Test/RedTransparent";
+  CreateColorMaterial(redTransparentMaterialName,
+      common::Color(1.0, 0.0, 0.0, 0.2), common::Color(1.0, 0.0, 0.0, 0.4),
+      common::Color(0.1, 0.1, 0.1, 0.6), common::Color(1.0, 0.0, 0.0, 0.8));
+  boxVis->SetMaterial(redTransparentMaterialName);
+  EXPECT_TRUE(boxVis->GetMaterialName().find(redTransparentMaterialName)
+      != std::string::npos);
+
+  // Verify the visual color components are the same as the ones in the new
+  // material script
+  EXPECT_EQ(boxVis->GetAmbient(), common::Color(1.0, 0.0, 0.0, 0.2));
+  EXPECT_EQ(boxVis->GetDiffuse(), common::Color(1.0, 0.0, 0.0, 0.4));
+  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.1, 0.1, 0.1, 0.6));
+  EXPECT_EQ(boxVis->GetEmissive(), common::Color(1.0, 0.0, 0.0, 0.8));
+
+  // update transparency and verify diffuse alpha value has changed
+  boxVis->SetTransparency(0.5f);
+  EXPECT_DOUBLE_EQ(boxVis->GetTransparency(), 0.5f);
+  EXPECT_EQ(boxVis->GetAmbient(), common::Color(1.0, 0.0, 0.0, 0.2));
+  EXPECT_EQ(boxVis->GetDiffuse(), common::Color(1.0, 0.0, 0.0, 0.5));
+  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.1, 0.1, 0.1, 0.6));
+  EXPECT_EQ(boxVis->GetEmissive(), common::Color(1.0, 0.0, 0.0, 0.8));
 }
 
 /////////////////////////////////////////////////
