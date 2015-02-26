@@ -173,7 +173,7 @@ math::Vector2d SVGLoader::SubpathToPolyline(
         }
         break;
       default:
-        gzerr << "Unexpected SVGCommand value: " << cmd.cmd;
+        gzerr << "Unexpected SVGCommand value: " << cmd.cmd << std::endl;
     }
   }
 
