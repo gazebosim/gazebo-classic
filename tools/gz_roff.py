@@ -55,7 +55,7 @@ def outputCommand(_command):
     i = i + 1
 
 
-f.write('.TH "GZ" "1" "September 2014" "" ""\n')
+f.write('.TH "GZ" "1" "January 2015" "" ""\n')
 f.write('.\n')
 f.write('.SH "NAME"\n')
 f.write('\\fBgz\\fR \- Gazebo command line tool for control and analysis.\n')
