@@ -157,9 +157,9 @@ TEST_F(PresetManagerTest, CreateProfileFromSDF)
 
   sdf::SDF worldSDF;
   worldSDF.SetFromString(
-      "<sdf version\=\"1.5\">\
-        <world name\=\"default\">\
-          <physics name\=\"preset_3\" type\=\"ode\">\
+      "<sdf version=\"1.5\">\
+        <world name=\"default\">\
+          <physics name=\"preset_3\" type=\"ode\">\
             <max_step_size>0.03</max_step_size>\
             <ode>\
               <solver>\
