@@ -23,6 +23,9 @@
     * [Pull request #1442](https://bitbucket.org/osrf/gazebo/pull-request/1442)
     * [Issue #1377](https://bitbucket.org/osrf/gazebo/issue/1377)
 
+1. Added PresetManager to physics libraries and corresponding integration test.
+    * [Pull request ##](https://bitbucket.org/osrf/gazebo/pull-request/#)
+
  1. Model editor updates
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
