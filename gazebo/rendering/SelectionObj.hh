@@ -125,7 +125,11 @@ namespace gazebo
       /// \brief Set the material for a specific handle.
       /// \param[in] _mode Manipulation mode corresponding to the handle.
       /// \param[in] _material Material name.
-      public: void SetHandleMaterial(SelectionMode _mode, std::string _material);
+      /// \param[in] _unique True to make the material unique, which
+      /// allows the material to change without changing materials that
+      /// originally had the same name.
+      public: void SetHandleMaterial(SelectionMode _mode, std::string _material,
+          bool _unique = true);
 
       /// \brief Get the visibility for a specific handle.
       /// \param[in] _mode Manipulation mode corresponding to the handle.
