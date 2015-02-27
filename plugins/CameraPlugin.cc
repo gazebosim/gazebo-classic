@@ -21,7 +21,8 @@ using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(CameraPlugin)
 
 /////////////////////////////////////////////////
-CameraPlugin::CameraPlugin() : SensorPlugin()
+CameraPlugin::CameraPlugin()
+: SensorPlugin(), width(0), height(0), depth(0)
 {
 }
 

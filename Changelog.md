@@ -36,6 +36,10 @@
     1. Edit existing model.
         * [Pull request #1425](https://bitbucket.org/osrf/gazebo/pull-request/1425)
 
+    1. Add joint inspector to link's context menu.
+        * [Pull request #1449](https://bitbucket.org/osrf/gazebo/pull-request/1449)
+        * [Issue #1443](https://bitbucket.org/osrf/gazebo/issue/1443)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
@@ -284,6 +288,8 @@
     * [Pull request #1448](https://bitbucket.org/osrf/gazebo/pull-request/1448)
     * [Pull request #1446](https://bitbucket.org/osrf/gazebo/pull-request/1446)
     * [Issue #236](https://bitbucket.org/osrf/gazebo/issue/236)
+1. Fixed heightmap on OSX
+    * [Pull request #1455](https://bitbucket.org/osrf/gazebo/pull-request/1455)
 
 ### Gazebo 4.0.2 (2014-09-23)
 
