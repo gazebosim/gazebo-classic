@@ -469,26 +469,10 @@ void DARTLink::AddForceAtRelativePosition(const math::Vector3 &_force,
 }
 
 //////////////////////////////////////////////////
-void DARTLink::AddWorldForce(const math::Vector3 &/*_force*/,
-    const math::Vector3 &/*_offset*/)
-{
-  gzlog << "DARTLink::AddWorldForce not yet implemented."
-        << std::endl;
-}
-
-//////////////////////////////////////////////////
 void DARTLink::AddLinkForce(const math::Vector3 &/*_force*/,
     const math::Vector3 &/*_offset*/)
 {
   gzlog << "DARTLink::AddLinkForce not yet implemented."
-        << std::endl;
-}
-
-//////////////////////////////////////////////////
-void DARTLink::AddInertialForce(const math::Vector3 &/*_force*/,
-    const math::Vector3 &/*_offset*/)
-{
-  gzlog << "DARTLink::AddInertialForce not yet implemented."
         << std::endl;
 }
 

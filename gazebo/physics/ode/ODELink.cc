@@ -590,20 +590,15 @@ void ODELink::AddForceAtWorldPosition(const math::Vector3 &_force,
 }
 
 //////////////////////////////////////////////////
-void ODELink::AddWorldForce(const math::Vector3 &/*_force*/,
-    const math::Vector3 &/*_offset*/)
-{
-  gzlog << "ODELink::AddWorldForce not yet implemented."
-        << std::endl;
-}
-
-//////////////////////////////////////////////////
 void ODELink::AddLinkForce(const math::Vector3 &_force,
     const math::Vector3 &_offset)
 {
   if (this->linkId)
   {
+    // Force vector represents a direction only, so it should be rotated but
+    // not translated
     math::Vector3 forceWorld = this->GetWorldPose().rot.RotateVector(_force);
+    // Does this need to be rotated?
     math::Vector3 offsetCoG = _offset - this->inertial->GetCoG();
 
     this->SetEnabled(true);
@@ -617,14 +612,6 @@ void ODELink::AddLinkForce(const math::Vector3 &_force,
           << " does not exist, unable to AddForceAtRelativePosition"
           << std::endl;
   }
-}
-
-//////////////////////////////////////////////////
-void ODELink::AddInertialForce(const math::Vector3 &/*_force*/,
-    const math::Vector3 &/*_offset*/)
-{
-  gzlog << "ODELink::AddInertialForce not yet implemented."
-        << std::endl;
 }
 
 /////////////////////////////////////////////////
