@@ -69,7 +69,8 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   // Check force and torque (at CoG?) in world frame
   math::Vector3 forceWorld = _link->GetWorldPose().rot.RotateVector(_force);
   EXPECT_EQ(forceWorld, _link->GetWorldForce());
-  math::Vector3 worldOffset = _offset - _link->GetInertial()->GetCoG();
+  math::Vector3 worldOffset = _link->GetWorldPose().rot.RotateVector(
+      _offset - _link->GetInertial()->GetCoG());
   math::Vector3 angularImpulse = dt*worldOffset.Cross(forceWorld);
   EXPECT_EQ(angularImpulse, _link->GetWorldTorque());
 
@@ -182,7 +183,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   gzdbg << "World == link != inertial frames, no offset" << std::endl;
   model->SetLinkWorldPose(math::Pose(), link);
   math::Pose inertialPose = math::Pose(math::Vector3(1, 5, 8),
-      math::Vector3(M_PI/2.0, M_PI, M_PI/4));
+      math::Vector3(M_PI/3.0, M_PI*1.5, M_PI/4));
   link->GetInertial()->SetCoG(inertialPose);
   EXPECT_EQ(math::Pose(), link->GetWorldPose());
   EXPECT_EQ(inertialPose, link->GetWorldInertialPose());
