@@ -31,7 +31,7 @@ class PhysicsLinkTest : public ServerFixture,
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void AddForce(const std::string &_physicsEngine);
 
-  /// \brief Use AddLinkForce on the given direction and then the opposite 
+  /// \brief Use AddLinkForce on the given direction and then the opposite
   /// direction so they cancel out.
   /// \param[in] _world World pointer.
   /// \param[in] _link Link pointer.
