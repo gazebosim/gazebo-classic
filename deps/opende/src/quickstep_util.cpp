@@ -117,6 +117,7 @@ void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
 }
 
 // compute out = J*in.
+
 void multiply_J (int m, dRealPtr J, int *jb,
   dRealPtr in, dRealMutablePtr out)
 {
@@ -139,6 +140,9 @@ void multiply_J (int m, dRealPtr J, int *jb,
 
 
 // compute out = (J*inv(M)*J' + cfm)*in.
+// use z as an nb*6 temporary.
+// not used ---> used when we have to split cg_lcp later
+// warm starting
 void multiply_J_invM_JT (int m, int nb, dRealMutablePtr J, dRealMutablePtr iMJ, int *jb,
   dRealPtr cfm, dRealMutablePtr z, dRealMutablePtr in, dRealMutablePtr out)
 {
