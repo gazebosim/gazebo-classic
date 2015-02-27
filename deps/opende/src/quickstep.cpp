@@ -132,7 +132,7 @@ static void CG_LCP (dxWorldProcessContext *context,
 #endif
 }
 
-#endif 
+#endif
 
 void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
                       dRealPtr MOI, dxBody * const *body,
@@ -2160,6 +2160,4 @@ size_t dxEstimateQuickStepMemoryRequirements (
 
   return res;
 }
-
-
 
