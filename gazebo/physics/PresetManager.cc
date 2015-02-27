@@ -305,7 +305,7 @@ void PresetManager::ProfileSDF(const std::string &_name,
 {
   if (this->dataPtr->presetProfiles.find(_name) ==
       this->dataPtr->presetProfiles.end())
-    return NULL;
+    return;
   this->dataPtr->presetProfiles[_name].SDF(_sdf);
 
   this->GeneratePresetFromSDF(&this->dataPtr->presetProfiles[_name], _sdf);
