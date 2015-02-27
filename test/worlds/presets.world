@@ -16,6 +16,24 @@
           <contact_surface_layer>0.002</contact_surface_layer>
         </constraints>
       </ode>
+      <simbody>
+        <min_step_size>0.001</min_step_size>
+        <accuracy>0.01</accuracy>
+        <max_transient_velocity>0.001</max_transient_velocity>
+      </simbody>
+      <bullet>
+        <solver>
+          <min_step_size>0.001</min_step_size>
+          <iters>50</iters>
+          <sor>1.4</sor>
+        </solver>
+        <constraints>
+          <cfm>0.01</cfm>
+          <erp>0.3</erp>
+          <split_impulse>false</split_impulse>
+          <contact_surface_layer>0.002</contact_surface_layer>
+        </constraints>
+      </bullet>
     </physics>
 
     <physics name="preset_2" type="ode">
