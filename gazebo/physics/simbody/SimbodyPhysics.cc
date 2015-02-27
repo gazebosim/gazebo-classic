@@ -1384,10 +1384,10 @@ bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
   /// \TODO fill this out, see issue #1116
   if (_key == "accuracy")
   {
-    int value;
+    double value;
     try
     {
-      value = boost::any_cast<int>(_value);
+      value = boost::any_cast<double>(_value);
     }
     catch(const boost::bad_any_cast &e)
     {

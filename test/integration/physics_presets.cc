@@ -20,6 +20,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PresetManager.hh"
+#include "test/integration/helper_physics_generator.hh"
 
 using namespace gazebo;
 
@@ -32,10 +33,18 @@ class PresetManagerTest : public ServerFixture,
 TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
 {
   const std::string physicsEngineName = GetParam();
-  Load("test/worlds/presets.world", false);
+  Load("test/worlds/presets.world", false, physicsEngineName);
   physics::WorldPtr world = physics::get_world("default");
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+
+  // SimbodyPhysics::SetParam is not implemented, so we can't expect any of the
+  // parameter setting to work.
+
+  if (physicsEngineName == "simbody")
+  {
+    return;
+  }
   try
   {
     EXPECT_NEAR(boost::any_cast<double>(
@@ -65,11 +74,6 @@ TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
     {
       EXPECT_FALSE(boost::any_cast<bool>(
           physicsEngine->GetParam("split_impulse")));
-    }
-    else if (physicsEngineName == "simbody")
-    {
-      EXPECT_NEAR(boost::any_cast<double>(
-          physicsEngine->GetParam("max_transient_velocity")), 0.001, 1e-4);
     }
   }
   catch(const boost::bad_any_cast& e)
@@ -175,9 +179,9 @@ TEST_F(PresetManagerTest, CreateProfileFromSDF)
 
   sdf::SDF worldSDF;
   worldSDF.SetFromString(
-      "<sdf version=\"1.5\">\
-        <world name=\"default\">\
-          <physics name=\"preset_3\" type=\"ode\">\
+      "<sdf version = \"1.5\">\
+        <world name = \"default\">\
+          <physics name = \"preset_3\" type=\"ode\">\
             <max_step_size>0.03</max_step_size>\
             <ode>\
               <solver>\
@@ -252,6 +256,9 @@ TEST_F(PresetManagerTest, BackwardsCompatibilityTest)
     FAIL();
   }
 }
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, PresetManagerTest,
+                        PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

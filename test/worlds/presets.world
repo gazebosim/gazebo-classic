@@ -1,5 +1,10 @@
 <sdf version="1.5">
   <world name="default">
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
     <physics name="preset_1" type="ode" default="true">
       <max_step_size>0.01</max_step_size>
       <ode>

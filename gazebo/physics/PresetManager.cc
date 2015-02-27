@@ -62,7 +62,7 @@ boost::any Preset::Param(const std::string& _key) const
   {
     gzwarn << "Parameter " << _key << " is not a member of Preset"
            << this->Name() << std::endl;
-    return 0;
+    return false;
   }
   return this->dataPtr->parameterMap[_key];
 }
@@ -125,17 +125,18 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
 //////////////////////////////////////////////////
 PresetManager::~PresetManager()
 {
-/*  std::vector<Preset*> allProfiles = this->GetAllProfiles();
-  for (unsigned int i = 0; i < allProfiles.size(); i++)
-  {
-    delete allProfiles[i];
-  }*/
-  // delete this->dataPtr;
+  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////
 bool PresetManager::CurrentProfile(const std::string& _name)
 {
+  if (_name == this->CurrentProfile())
+    return true;
+
+  if (_name.size() <= 0)
+    return false;
+
   if (this->dataPtr->presetProfiles.find(_name) ==
       this->dataPtr->presetProfiles.end())
   {
@@ -165,9 +166,8 @@ bool PresetManager::CurrentProfile(const std::string& _name)
 //////////////////////////////////////////////////
 std::string PresetManager::CurrentProfile() const
 {
-  if (!this->CurrentPreset())
+  if (this->CurrentPreset() == NULL)
   {
-    gzwarn << "No current preset." << std::endl;
     return "";
   }
   return this->CurrentPreset()->Name();
@@ -244,16 +244,19 @@ boost::any PresetManager::CurrentProfileParam(const std::string& _key)
 //////////////////////////////////////////////////
 void PresetManager::CreateProfile(const std::string& _name)
 {
+  if (_name.size() <= 0)
+  {
+    gzwarn << "Specified profile name was invalid. Aborting." << std::endl;
+    return;
+  }
   if (this->dataPtr->presetProfiles.find(_name) !=
       this->dataPtr->presetProfiles.end())
   {
     gzwarn << "Warning: profile " << _name << " already exists! Overwriting."
            << std::endl;
   }
-  else
-  {
-    this->dataPtr->presetProfiles[_name] = Preset(_name);
-  }
+
+  this->dataPtr->presetProfiles[_name] = Preset(_name);
 }
 
 //////////////////////////////////////////////////
@@ -264,6 +267,8 @@ std::string PresetManager::CreateProfile(sdf::ElementPtr _elem)
     return "";
   }
   const std::string name = _elem->Get<std::string>("name");
+  if (name.size() <= 0)
+    return "";
 
   this->CreateProfile(name);
   this->ProfileSDF(name, _elem);
@@ -285,14 +290,21 @@ void PresetManager::RemoveProfile(const std::string& _name)
 //////////////////////////////////////////////////
 sdf::ElementPtr PresetManager::ProfileSDF(const std::string &_name) const
 {
+  if (this->dataPtr->presetProfiles.find(_name) ==
+      this->dataPtr->presetProfiles.end())
+    return NULL;
+
   this->dataPtr->presetProfiles[_name].SDF(this->ProfileSDF(_name));
   return this->dataPtr->presetProfiles[_name].SDF();
 }
 
 //////////////////////////////////////////////////
 void PresetManager::ProfileSDF(const std::string &_name,
-  sdf::ElementPtr _sdf)
+    sdf::ElementPtr _sdf)
 {
+  if (this->dataPtr->presetProfiles.find(_name) ==
+      this->dataPtr->presetProfiles.end())
+    return;
   this->dataPtr->presetProfiles[_name].SDF(_sdf);
 
   this->GeneratePresetFromSDF(&this->dataPtr->presetProfiles[_name], _sdf);
@@ -352,7 +364,6 @@ void PresetManager::GeneratePresetFromSDF(Preset* _preset,
 }
 
 //////////////////////////////////////////////////
-// FIXME
 sdf::ElementPtr PresetManager::GenerateSDFFromPreset(Preset* _preset) const
 {
   sdf::ElementPtr elem(new sdf::Element);
