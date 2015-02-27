@@ -2019,12 +2019,20 @@ void GeometryConfigWidget::OnSelectFile()
 
   if (widget)
   {
-    QString filename = QFileDialog::getOpenFileName(this,
-        tr("Open Image"), "", tr("Mesh Files (*.dae *.stl)"));
-
-    if (!filename.isEmpty())
+    QFileDialog fd(this, tr("Select mesh file"), QDir::homePath(),
+      tr("Mesh files (*.dae *.stl)"));
+    fd.setFilter(QDir::AllDirs | QDir::Hidden);
+    fd.setFileMode(QFileDialog::ExistingFile);
+    if (fd.exec())
     {
-      dynamic_cast<QLineEdit *>(this->geomFilenameLineEdit)->setText(filename);
+      if (!fd.selectedFiles().isEmpty())
+      {
+        QString file = fd.selectedFiles().at(0);
+        if (!file.isEmpty())
+        {
+          dynamic_cast<QLineEdit *>(this->geomFilenameLineEdit)->setText(file);
+        }
+      }
     }
   }
 }
