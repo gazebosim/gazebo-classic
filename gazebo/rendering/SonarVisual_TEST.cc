@@ -22,6 +22,7 @@
 #include "gazebo/rendering/SonarVisual.hh"
 #include "test/ServerFixture.hh"
 
+using namespace gazebo;
 class SonarVisual_TEST : public ServerFixture
 {
 };
