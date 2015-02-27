@@ -108,7 +108,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.")
     ("profile,o", po::value<std::string>()->default_value(""),
-     "Specify a preset profile in the world file.");
+     "Specify a preset profile name from the options in the world file.");
 
   po::options_description hiddenDesc("Hidden options");
   hiddenDesc.add_options()
@@ -265,6 +265,11 @@ bool Server::ParseArgs(int _argc, char **_argv)
     // Load the server
     if (!this->LoadFile(configFilename, physics))
       return false;
+    if (this->vm.count("profile"))
+    {
+      physics::get_world()->GetPresetManager()->CurrentProfile(
+          this->vm["profile"].as<std::string>());
+    }
   }
 
   this->ProcessParams();
