@@ -32,4 +32,5 @@ message Physics
   optional double real_time_factor           = 13;
   optional double real_time_update_rate      = 14;
   optional double max_step_size              = 15;
+  optional string name                       = 16;
 }

@@ -265,7 +265,9 @@ bool Server::ParseArgs(int _argc, char **_argv)
     // Load the server
     if (!this->LoadFile(configFilename, physics))
       return false;
-    if (this->vm.count("profile"))
+
+    if (this->vm.count("profile") &&
+        this->vm["profile"].as<std::string>().size() > 0)
     {
       physics::get_world()->GetPresetManager()->CurrentProfile(
           this->vm["profile"].as<std::string>());

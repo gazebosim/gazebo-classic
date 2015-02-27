@@ -289,7 +289,8 @@ PhysicsCommand::PhysicsCommand()
      "eg: -g 0,0,-9.8")
     ("step-size,s", po::value<double>(), "Maximum step size (seconds).")
     ("iters,i", po::value<double>(), "Number of iterations.")
-    ("update-rate,u", po::value<double>(), "Target real-time update rate.");
+    ("update-rate,u", po::value<double>(), "Target real-time update rate.")
+    ("profile,p", po::value<std::string>(), "Preset physics profile.");
 }
 
 /////////////////////////////////////////////////
@@ -348,6 +349,13 @@ bool PhysicsCommand::RunImpl()
     msg.mutable_gravity()->set_x(boost::lexical_cast<double>(values[0]));
     msg.mutable_gravity()->set_y(boost::lexical_cast<double>(values[1]));
     msg.mutable_gravity()->set_z(boost::lexical_cast<double>(values[2]));
+    good = true;
+  }
+
+  if (this->vm.count("profile") &&
+      this->vm["profile"].as<std::string>().size() > 0)
+  {
+    msg.set_name(this->vm["profile"].as<std::string>());
     good = true;
   }
 

@@ -207,8 +207,9 @@ void PhysicsEngine::OnRequest(ConstRequestPtr &/*_msg*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/)
+void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  this->world->GetPresetManager()->CurrentProfile(_msg->name());
 }
 
 //////////////////////////////////////////////////
