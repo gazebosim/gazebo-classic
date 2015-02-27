@@ -163,6 +163,77 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
   }
 }
 
+////////////////////////////////////////////////////////////////////////
+// CollideBitmask:
+// Load the collide_bitmask test world. It drops three boxes onto
+// a ground plane. Each model has the following bitmask
+//    - ground_plane: 0xff
+//    - box1: 0x01
+//    - box2: 0x02
+//    - box3: 0x03
+// This set of bitmasks will make box1 collide with the ground plane,
+// box2 to pass through box1 and collide with the ground plane, and
+// box3 will collide with both box1 and box2.
+////////////////////////////////////////////////////////////////////////
+void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
+{
+  // load an empty world
+  Load("worlds/collide_bitmask.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the gravity vector
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  math::Vector3 g = physics->GetGravity();
+  // Assume gravity vector points down z axis only.
+  EXPECT_EQ(g.x, 0);
+  EXPECT_EQ(g.y, 0);
+  EXPECT_LE(g.z, -9.8);
+
+  // get physics time step
+  double dt = physics->GetMaxStepSize();
+  EXPECT_GT(dt, 0);
+
+  // get pointers to the falling boxes.
+  physics::ModelPtr box1, box2, box3;
+  box1 = world->GetModel("box1");
+  box2 = world->GetModel("box2");
+  box3 = world->GetModel("box3");
+  ASSERT_TRUE(box1 != NULL);
+  ASSERT_TRUE(box2 != NULL);
+  ASSERT_TRUE(box3 != NULL);
+
+  // Step forward 0.2 s
+  double stepTime = 0.2;
+  unsigned int steps = floor(stepTime / dt);
+  world->Step(steps);
+
+  // Expect boxes to be falling
+  double fallVelocity = g.z * stepTime;
+  EXPECT_LT(box1->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+  EXPECT_LT(box2->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+  EXPECT_LT(box3->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+
+  // Step forward 10s, which should put all the boxes at rest
+  steps = floor(stepTime / 10.0);
+  world->Step(steps);
+
+  // Expect boxes to be stationary
+  double fallVelocity = g.z * stepTime;
+  EXPECT_DOUBLE_EQ(box1->GetWorldLinearVel().z, 0);
+  EXPECT_DOUBLE_EQ(box2->GetWorldLinearVel().z, 0);
+  EXPECT_DOUBLE_EQ(box3->GetWorldLinearVel().z, 0);
+
+  // The first and second boxes should be on the ground plane
+  EXPECT_DOUBLE_EQ(box1->GetWorldPose().z, 0.5);
+  EXPECT_DOUBLE_EQ(box2->GetWorldPose().z, 0.5);
+
+  // The third boxs should be ontop of the firs two boxes
+  EXPECT_DOUBLE_EQ(box3->GetWorldLinearVel().z, 1.5);
+}
+
 TEST_P(SurfaceTest, CollideWithoutContact)
 {
   CollideWithoutContact(GetParam());
