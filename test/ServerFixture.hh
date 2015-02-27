@@ -27,8 +27,6 @@
 #include <map>
 #include <string>
 
-#include "gazebo/transport/transport.hh"
-
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
@@ -38,6 +36,7 @@
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/Server.hh"

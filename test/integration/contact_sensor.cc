@@ -19,6 +19,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "scans_cmp.h"
 #include "helper_physics_generator.hh"
 
