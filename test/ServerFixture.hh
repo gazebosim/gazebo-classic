@@ -533,7 +533,9 @@ namespace gazebo
     /// \param[out] _share Shared memory.
     protected: void GetMemInfo(double &_resident, double &_share);
 
-    /// \brief Get unique string.
+    /// \brief Get unique string with a specified prefix.
+    /// \param[in] _prefix Prefix for unique string.
+    /// \return String with prefix and unique number as suffix.
     protected: std::string GetUniqueString(const std::string &_prefix);
 
     /// \brief Pointer the Gazebo server.
