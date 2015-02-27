@@ -23,7 +23,7 @@
 using namespace gazebo;
 
 /////////////////////////////////////////////////
-std::string custom_exec(std::string _cmd)
+std::string gazebo::custom_exec(std::string _cmd)
 {
   _cmd += " 2>/dev/null";
   FILE* pipe = popen(_cmd.c_str(), "r");
@@ -1049,28 +1049,17 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
+  msgs::Model model;
+  model.set_name(_name);
+  model.set_is_static(_static);
+  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
+  msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
+  auto link = model.mutable_link(0);
+  link->set_name("body");
+  link->mutable_collision(0)->set_name("geom");
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << "<model name ='" << _name << "'>"
-    << "<static>" << _static << "</static>"
-    << "<pose>" << _pos << " " << _rpy << "</pose>"
-    << "<link name ='body'>"
-    << "  <collision name ='geom'>"
-    << "    <geometry>"
-    << "      <cylinder>"
-    << "        <radius>.5</radius><length>1.0</length>"
-    << "      </cylinder>"
-    << "    </geometry>"
-    << "  </collision>"
-    << "  <visual name ='visual'>"
-    << "    <geometry>"
-    << "      <cylinder>"
-    << "        <radius>.5</radius><length>1.0</length>"
-    << "      </cylinder>"
-    << "    </geometry>"
-    << "  </visual>"
-    << "</link>"
-    << "</model>"
+    << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
   msg.set_sdf(newModelStr.str());
@@ -1124,27 +1113,19 @@ void ServerFixture::SpawnSphere(const std::string &_name,
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
+  msgs::Model model;
+  model.set_name(_name);
+  model.set_is_static(_static);
+  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
+  msgs::AddSphereLink(model, 1.0, _radius);
+  auto link = model.mutable_link(0);
+  link->set_name("body");
+  link->mutable_collision(0)->set_name("geom");
+  msgs::Set(link->mutable_inertial()->mutable_pose(),
+            math::Pose(_cog, math::Quaternion()));
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << "<model name ='" << _name << "'>"
-    << "<static>" << _static << "</static>"
-    << "<pose>" << _pos << " " << _rpy << "</pose>"
-    << "<link name ='body'>"
-    << "  <inertial>"
-    << "    <pose>" << _cog << " 0 0 0</pose>"
-    << "  </inertial>"
-    << "  <collision name ='geom'>"
-    << "    <geometry>"
-    << "      <sphere><radius>" << _radius << "</radius></sphere>"
-    << "    </geometry>"
-    << "  </collision>"
-    << "  <visual name ='visual'>"
-    << "    <geometry>"
-    << "      <sphere><radius>" << _radius << "</radius></sphere>"
-    << "    </geometry>"
-    << "  </visual>"
-    << "</link>"
-    << "</model>"
+    << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
   msg.set_sdf(newModelStr.str());
@@ -1162,24 +1143,17 @@ void ServerFixture::SpawnBox(const std::string &_name,
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
+  msgs::Model model;
+  model.set_name(_name);
+  model.set_is_static(_static);
+  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
+  msgs::AddBoxLink(model, 1.0, _size);
+  auto link = model.mutable_link(0);
+  link->set_name("body");
+  link->mutable_collision(0)->set_name("geom");
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << "<model name ='" << _name << "'>"
-    << "<static>" << _static << "</static>"
-    << "<pose>" << _pos << " " << _rpy << "</pose>"
-    << "<link name ='body'>"
-    << "  <collision name ='geom'>"
-    << "    <geometry>"
-    << "      <box><size>" << _size << "</size></box>"
-    << "    </geometry>"
-    << "  </collision>"
-    << "  <visual name ='visual'>"
-    << "    <geometry>"
-    << "      <box><size>" << _size << "</size></box>"
-    << "    </geometry>"
-    << "  </visual>"
-    << "</link>"
-    << "</model>"
+    << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
   msg.set_sdf(newModelStr.str());
@@ -1236,14 +1210,15 @@ void ServerFixture::SpawnEmptyLink(const std::string &_name,
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
+  msgs::Model model;
+  model.set_name(_name);
+  model.set_is_static(_static);
+  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
+  model.add_link();
+  model.mutable_link(0)->set_name("body");
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << "<model name ='" << _name << "'>"
-    << "<static>" << _static << "</static>"
-    << "<pose>" << _pos << " " << _rpy << "</pose>"
-    << "<link name ='body'>"
-    << "</link>"
-    << "</model>"
+    << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
   msg.set_sdf(newModelStr.str());
