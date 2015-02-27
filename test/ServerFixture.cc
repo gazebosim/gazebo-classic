@@ -18,7 +18,17 @@
 #include <stdio.h>
 #include <string>
 
+// The following is needed to enable the GetMemInfo function for OSX
+#ifdef __MACH__
+# include <mach/mach.h>
+#endif  // __MACH__
+
+#include <sdf/sdf.hh>
+
+#include <boost/filesystem.hpp>
+
 #include "ServerFixture.hh"
+#include "test_config.h"
 
 using namespace gazebo;
 

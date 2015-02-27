@@ -21,16 +21,8 @@
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wshadow"
 
-// The following is needed to enable the GetMemInfo function for OSX
-#ifdef __MACH__
-# include <mach/mach.h>
-#endif  // __MACH__
-
-#include <sdf/sdf.hh>
-
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
-#include <boost/filesystem.hpp>
 
 #include <map>
 #include <string>
@@ -49,8 +41,6 @@
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/Server.hh"
-
-#include "test_config.h"
 
 namespace gazebo
 {

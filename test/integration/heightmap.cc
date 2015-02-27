@@ -24,6 +24,7 @@
 #include "helper_physics_generator.hh"
 #include "images_cmp.h"
 #include "ServerFixture.hh"
+#include "test_config.h"
 
 using namespace gazebo;
 

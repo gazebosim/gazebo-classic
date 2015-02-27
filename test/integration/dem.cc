@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/filesystem.hpp>
 #include "gazebo/common/Dem.hh"
 #include "gazebo/math/Angle.hh"
 #include "gazebo/sensors/GpsSensor.hh"

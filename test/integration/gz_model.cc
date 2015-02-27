@@ -17,6 +17,7 @@
 
 #include <boost/filesystem.hpp>
 #include "ServerFixture.hh"
+#include "test_config.h"
 
 using namespace gazebo;
 class GzModel : public ServerFixture
