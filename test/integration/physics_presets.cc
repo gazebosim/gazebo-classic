@@ -23,13 +23,15 @@
 
 using namespace gazebo;
 
-class PresetManagerTest : public ServerFixture
+class PresetManagerTest : public ServerFixture,
+    public testing::WithParamInterface<const char*>
 {
 };
 
 /////////////////////////////////////////////////
-TEST_F(PresetManagerTest, InitializeAllPhysicsEngines)
+TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
 {
+  const std::string physicsEngineName = GetParam();
   Load("test/worlds/presets.world", false);
   physics::WorldPtr world = physics::get_world("default");
 
@@ -38,21 +40,37 @@ TEST_F(PresetManagerTest, InitializeAllPhysicsEngines)
   {
     EXPECT_NEAR(boost::any_cast<double>(
         physicsEngine->GetParam("max_step_size")), 0.01, 1e-4);
-    EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("iters")), 50);
-    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("cfm")),
-        0.01, 1e-4);
-    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("erp")),
-        0.3, 1e-4);
-    EXPECT_NEAR(boost::any_cast<double>(
-        physicsEngine->GetParam("contact_max_correcting_vel")), 200, 1e-4);
-    EXPECT_NEAR(boost::any_cast<double>(
-        physicsEngine->GetParam("contact_surface_layer")), 0.002, 1e-4);
-    EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("sor")),
-        1.4, 1e-4);
     EXPECT_NEAR(boost::any_cast<double>(
         physicsEngine->GetParam("min_step_size")), 0.001, 1e-4);
-    EXPECT_TRUE(boost::any_cast<bool>(
-        physicsEngine->GetParam("inertia_ratio_reduction")));
+    if (physicsEngineName == "ode" || physicsEngineName == "bullet")
+    {
+      EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("cfm")),
+          0.01, 1e-4);
+      EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("erp")),
+          0.3, 1e-4);
+      EXPECT_NEAR(boost::any_cast<double>(
+          physicsEngine->GetParam("contact_surface_layer")), 0.002, 1e-4);
+      EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("sor")),
+          1.4, 1e-4);
+      EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("iters")), 50);
+    }
+    if (physicsEngineName == "ode")
+    {
+      EXPECT_TRUE(boost::any_cast<bool>(
+          physicsEngine->GetParam("inertia_ratio_reduction")));
+      EXPECT_NEAR(boost::any_cast<double>(
+          physicsEngine->GetParam("contact_max_correcting_vel")), 200, 1e-4);
+    }
+    if (physicsEngineName == "bullet")
+    {
+      EXPECT_FALSE(boost::any_cast<bool>(
+          physicsEngine->GetParam("split_impulse")));
+    }
+    else if (physicsEngineName == "simbody")
+    {
+      EXPECT_NEAR(boost::any_cast<double>(
+          physicsEngine->GetParam("max_transient_velocity")), 0.001, 1e-4);
+    }
   }
   catch(const boost::bad_any_cast& e)
   {
@@ -157,9 +175,9 @@ TEST_F(PresetManagerTest, CreateProfileFromSDF)
 
   sdf::SDF worldSDF;
   worldSDF.SetFromString(
-      "<sdf version\=\"1.5\">\
-        <world name\=\"default\">\
-          <physics name\=\"preset_3\" type\=\"ode\">\
+      "<sdf version=\"1.5\">\
+        <world name=\"default\">\
+          <physics name=\"preset_3\" type=\"ode\">\
             <max_step_size>0.03</max_step_size>\
             <ode>\
               <solver>\
