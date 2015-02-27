@@ -12,6 +12,7 @@ include_directories(
 link_directories(
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
+  ${CURL_LIBRARY_DIRS}
 )
 
 include (${QT_USE_FILE})
