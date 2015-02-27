@@ -1536,6 +1536,11 @@ namespace gazebo
         contactElem->GetElement("collide_without_contact_bitmask")->Set(
             _msg.collide_without_contact_bitmask());
       }
+      if (_msg.has_collide_bitmask())
+      {
+        contactElem->GetElement("collide_bitmask")->Set(
+            _msg.collide_bitmask());
+      }
 
       sdf::ElementPtr odeElem = contactElem->GetElement("ode");
       sdf::ElementPtr bulletElem = contactElem->GetElement("bullet");

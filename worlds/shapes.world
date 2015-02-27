@@ -16,13 +16,6 @@
               <size>1 1 1</size>
             </box>
           </geometry>
-          <!--
-          <surface>
-            <contact>
-              <collide_bitmask>2</collide_bitmask>
-            </contact>
-          </surface>
--->
         </collision>
         <visual name="visual">
           <geometry>

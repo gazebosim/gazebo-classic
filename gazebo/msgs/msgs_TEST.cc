@@ -1402,6 +1402,7 @@ TEST_F(MsgsTest, SurfaceToSDF)
   msg.set_min_depth(0.0001);
   msg.set_collide_without_contact(true);
   msg.set_collide_without_contact_bitmask(0x0004);
+  msg.set_collide_bitmask(0x01);
 
   sdf::ElementPtr surfaceSDF = msgs::SurfaceToSDF(msg);
   sdf::ElementPtr frictionElem = surfaceSDF->GetElement("friction");
@@ -1428,6 +1429,8 @@ TEST_F(MsgsTest, SurfaceToSDF)
   EXPECT_TRUE(contactElem->Get<bool>("collide_without_contact"));
   EXPECT_EQ(contactElem->Get<unsigned int>("collide_without_contact_bitmask"),
       static_cast<unsigned int>(0x0004));
+  EXPECT_EQ(contactElem->Get<unsigned int>("collide_bitmask"),
+      static_cast<unsigned int>(0x01));
 }
 
 /////////////////////////////////////////////////
