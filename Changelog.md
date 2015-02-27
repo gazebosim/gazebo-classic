@@ -1,3 +1,8 @@
+## Gazebo 6.0
+
+1. Use collide_bitmask from SDF to perform collision filtering
+    * [Pull request #1470](https://bitbucket.org/osrf/gazebo/pull-request/1470)
+
 1. Added various Get functions to Visual. Also added a ConvertGeometryType function to msgs.
     * [Pull request #1402](https://bitbucket.org/osrf/gazebo/pull-request/1402)
 
@@ -23,7 +28,7 @@
     * [Pull request #1442](https://bitbucket.org/osrf/gazebo/pull-request/1442)
     * [Issue #1377](https://bitbucket.org/osrf/gazebo/issue/1377)
 
- 1. Model editor updates
+1. Model editor updates
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
 
