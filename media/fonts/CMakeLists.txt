@@ -3,8 +3,6 @@ SET (files arial.ttf
            font_arial.png
            font_matisse_itc.png
            Gazebo.fontdef
-           maiden.ttf
-           sample.fontdef
            solo5.ttf
 )
 
