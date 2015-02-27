@@ -109,8 +109,12 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
         contactElem->Get<bool>("collide_without_contact");
       this->collideWithoutContactBitmask =
           contactElem->Get<unsigned int>("collide_without_contact_bitmask");
-      this->collideBitmask =
+
+      if (contactElem->HasElement("collide_bitmask"))
+      {
+        this->collideBitmask =
           contactElem->Get<unsigned int>("collide_bitmask");
+      }
     }
   }
 }
