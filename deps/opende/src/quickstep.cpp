@@ -33,7 +33,7 @@
 #include "lcp.h"
 #include "util.h"
 
-#include <sys/time.h> 
+#include <sys/time.h>
 #include "quickstep_util.h"
 
 
