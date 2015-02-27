@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,7 +115,7 @@ void OptitrackPlugin::StartReception()
     return;
   }
 
-  // Bind the socket to the "OptitrackPlugin tracking updates" port.
+  // Bind the socket to the "Optitrack tracking updates" port.
   struct sockaddr_in mySocketAddr;
   memset(&mySocketAddr, 0, sizeof(mySocketAddr));
   mySocketAddr.sin_family = AF_INET;
@@ -127,16 +127,21 @@ void OptitrackPlugin::StartReception()
     gzerr << "Binding to a local port failed." << std::endl;
     return;
   }
-  // Join the multicast group.
-  struct ip_mreq mreq;
-  mreq.imr_multiaddr.s_addr = inet_addr(this->MulticastAddress.c_str());
-  mreq.imr_interface.s_addr = inet_addr(this->myIPAddress.c_str());
-  if (setsockopt(this->dataSocket, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-    reinterpret_cast<const char*>(&mreq), sizeof(mreq)) != 0)
+
+  // Join the multicast group. We apply IP_ADD_MEMBERSHIP to all our network
+  // interfaces to receive multicast datagrams from everywhere.
+  for (const auto &interface : this->myNetworkInterfaces)
   {
-    gzerr << "Error setting socket option (IP_ADD_MEMBERSHIP)."
-              << std::endl;
-    return;
+    struct ip_mreq mreq;
+    mreq.imr_multiaddr.s_addr = inet_addr(this->multicastAddress.c_str());
+    mreq.imr_interface.s_addr = inet_addr(interface.c_str());
+    if (setsockopt(this->dataSocket, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+      reinterpret_cast<const char*>(&mreq), sizeof(mreq)) != 0)
+    {
+      gzerr << "Error setting socket option (IP_ADD_MEMBERSHIP) for interface ["
+            << interface << "]" << std::endl;
+      return;
+    }
   }
 
   this->gzNode = transport::NodePtr(new transport::Node());
@@ -169,18 +174,21 @@ void OptitrackPlugin::RunReceptionTask()
   char buffer[20000];
   socklen_t addr_len = sizeof(struct sockaddr);
   sockaddr_in theirAddress;
-
+  int iterations = 0;
   while (1)
   {
     // Block until we receive a datagram from the network (from anyone
-    //  including ourselves)
+    // including ourselves)
     if (recvfrom(this->dataSocket, buffer, sizeof(buffer), 0,
          reinterpret_cast<sockaddr *>(&theirAddress), &addr_len) < 0)
     {
-      gzerr << "OptitrackPlugin::RunReceptionTask() Recvfrom failed"
-            << std::endl;
+      gzerr << "Optitrack::RunReceptionTask() Recvfrom failed" << std::endl;
       continue;
     }
+
+    // Broadcast that the optitrack is alive and sending us data.
+    this->optitrackAlivePub->Publish(
+      gazebo::msgs::Convert(gazebo::common::Time::GetWallTime()));
 
     // Dispatch the data received.
     this->Unpack(buffer);
@@ -197,11 +205,13 @@ void OptitrackPlugin::RunReceptionTask()
       }
       else
       {
-        std::cout << "Model name " << it->first << " not found!" << std::endl;
+        if (iterations % 1000 == 0)
+          gzwarn << "Model name " << it->first << " not found!" << std::endl;
       }
     }
 
     this->lastModelMap.clear();
+    iterations++;
   }
   this->active = false;
 }
@@ -226,7 +236,40 @@ void OptitrackPlugin::Unpack(char *pData)
   memcpy(&nBytes, ptr, 2);
   ptr += 2;
 
-  if (MessageID == 7)      // FRAME OF MOCAP DATA packet
+  if (MessageID == 666)      // Frame from OptiTrack bridge.
+  {
+    TrackingInfo_t trackingInfo;
+    if (!this->comms.Unpack(pData, trackingInfo))
+    {
+      std::cerr << "Error unpacking" << std::endl;
+      return;
+    }
+
+    for (const auto &body : trackingInfo.bodies)
+    {
+      float x  = body.second.body.at(0);
+      float y  = body.second.body.at(1);
+      float z  = body.second.body.at(2);
+      float qx = body.second.body.at(3);
+      float qy = body.second.body.at(4);
+      float qz = body.second.body.at(5);
+      float qw = body.second.body.at(6);
+      this->lastModelMap[body.first] = gazebo::math::Pose(
+        gazebo::math::Vector3(x, y, z),
+        gazebo::math::Quaternion(qw, qx, qy, qz));
+
+      // Debug output.
+      /*for (const auto &marker : body.second.markers)
+      {
+        x = marker.at(0);
+        y = marker.at(1);
+        z = marker.at(2);
+        std::cout << "\tMarker " << " : [x="
+               << x << ",y=" << y << ",z=" << z << "]" << std::endl;
+      }*/
+    }
+  }
+  else if (MessageID == 7)      // FRAME OF MOCAP DATA packet
   {
     // frame number
     int frameNumber = 0;
@@ -523,7 +566,7 @@ void OptitrackPlugin::Unpack(char *pData)
     }
 
     // labeled markers (version 2.3 and later)
-    if (((major == 2) && (minor >= 3)) || (major>2))
+    if (((major == 2) && (minor >= 3)) || (major > 2))
     {
       int nLabeledMarkers = 0;
       memcpy(&nLabeledMarkers, ptr, 4);
@@ -620,9 +663,8 @@ void OptitrackPlugin::Unpack(char *pData)
   }
   else if (MessageID == 5)  // Data Descriptions
   {
-    int nDatasets = 0;
-    memcpy(&nDatasets, ptr, 4);
-    ptr += 4;
+    // number of datasets
+    int nDatasets = 0; memcpy(&nDatasets, ptr, 4); ptr += 4;
     output << "Dataset Count : " << nDatasets << std::endl;
 
     for (int i = 0; i < nDatasets; i++)
@@ -762,35 +804,13 @@ void OptitrackPlugin::Unpack(char *pData)
 }
 
 /////////////////////////////////////////////////
-bool OptitrackPlugin::TimecodeStringify(unsigned int _inTimecode,
-  unsigned int _inTimecodeSubframe, char * /*_buffer*/, int /*_bufferSize*/)
-{
-  bool bValid;
-  int hour, minute, second, frame, subframe;
-  bValid = this->DecodeTimecode(_inTimecode, _inTimecodeSubframe,
-    &hour, &minute, &second, &frame, &subframe);
-
-  return bValid;
-}
-
-/////////////////////////////////////////////////
-bool OptitrackPlugin::DecodeTimecode(unsigned int _inTimecode,
-  unsigned int _inTimecodeSubframe, int *_hour, int *_minute, int *_second,
-  int *_frame, int *_subframe)
-{
-  bool bValid = true;
-
-  *_hour     = (_inTimecode >> 24) & 255;
-  *_minute   = (_inTimecode >> 16) & 255;
-  *_second   = (_inTimecode >> 8) & 255;
-  *_frame    = _inTimecode & 255;
-  *_subframe = _inTimecodeSubframe;
-
-  return bValid;
-}
-
-/////////////////////////////////////////////////
 void OptitrackPlugin::SetWorld(const std::string &_world)
 {
   this->world = _world;
+}
+
+/////////////////////////////////////////////////
+void OptitrackPlugin::SetVerbose(const bool _verbose)
+{
+  this->verbose = _verbose;
 }
