@@ -127,7 +127,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   // Force total
   QLabel *forceMagLabel = new QLabel();
-  forceMagLabel->setText(tr("Total:"));
+  forceMagLabel->setText(tr("Mag:"));
   QLabel *forceMagUnitLabel = new QLabel();
   forceMagUnitLabel->setText(tr("N"));
 
@@ -260,7 +260,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   forcePosLayout->addWidget(forcePosZUnitLabel, 4, 3);
 
   // Apply force
-  QPushButton *applyForceButton = new QPushButton("Apply");
+  QPushButton *applyForceButton = new QPushButton("Apply Force");
   connect(applyForceButton, SIGNAL(clicked()), this, SLOT(OnApplyForce()));
 
   // Force layout
@@ -356,7 +356,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   // Torque magnitude
   QLabel *torqueMagLabel = new QLabel();
-  torqueMagLabel->setText(tr("Total:"));
+  torqueMagLabel->setText(tr("Mag:"));
   QLabel *torqueMagUnitLabel = new QLabel();
   torqueMagUnitLabel->setText(tr("Nm"));
 
@@ -391,7 +391,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   torqueVectorLayout->addWidget(torqueClearButton, 4, 0, 1, 3, Qt::AlignLeft);
 
   // Apply torque
-  QPushButton *applyTorqueButton = new QPushButton("Apply");
+  QPushButton *applyTorqueButton = new QPushButton("Apply Torque");
   connect(applyTorqueButton, SIGNAL(clicked()), this, SLOT(OnApplyTorque()));
 
   // Torque layout

@@ -46,52 +46,6 @@ void ApplyWrenchVisual::Load()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  // Origin visual
-  dPtr->originVisual.reset(new rendering::Visual(
-       this->GetName() + "__ORIGIN_VISUAL__", shared_from_this()));
-  dPtr->originVisual->Load();
-
-  dPtr->originXLines = dPtr->originVisual->
-      CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  dPtr->originXLines->setMaterial("Gazebo/RedTransparent");
-  dPtr->originXLines->AddPoint(math::Vector3::Zero);
-  dPtr->originXLines->AddPoint(math::Vector3::Zero);
-
-  dPtr->originYLines = dPtr->originVisual->
-      CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  dPtr->originYLines->setMaterial("Gazebo/GreenTransparent");
-  dPtr->originYLines->AddPoint(math::Vector3::Zero);
-  dPtr->originYLines->AddPoint(math::Vector3::Zero);
-
-  dPtr->originZLines = dPtr->originVisual->
-      CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  dPtr->originZLines->setMaterial("Gazebo/BlueTransparent");
-  dPtr->originZLines->AddPoint(math::Vector3::Zero);
-  dPtr->originZLines->AddPoint(math::Vector3::Zero);
-
-  // CoM visual
-  dPtr->comVisual.reset(new rendering::Visual(
-       this->GetName() + "__CoM_VISUAL__", shared_from_this()));
-  dPtr->comVisual->Load();
-
-  this->InsertMesh("unit_sphere");
-
-  Ogre::MovableObject *comObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__CoM_SPHERE__", "unit_sphere"));
-  comObj->setCastShadows(false);
-
-  Ogre::SceneNode *comNode =
-      dPtr->comVisual->GetSceneNode()->createChildSceneNode(
-      this->GetName() + "__COM_SPHERE_NODE__");
-
-  comNode->attachObject(comObj);
-  math::Quaternion rot(1.57, 0, 0);
-  comNode->setOrientation(
-      Ogre::Quaternion(rot.w, rot.x, rot.y, rot.z));
-  dPtr->comVisual->SetMaterial("Gazebo/CoM");
-  dPtr->comVisual->GetSceneNode()->setInheritScale(false);
-
   // Force visual
   dPtr->forceVisual.reset(new rendering::Visual(
       this->GetName() + "__FORCE_VISUAL__", shared_from_this()));
@@ -343,17 +297,6 @@ void ApplyWrenchVisual::SetCoM(math::Vector3 _comVector)
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  if (!dPtr->comVisual)
-  {
-    gzerr << "CoM visual not found, but it should exist." << std::endl;
-    return;
-  }
-
-  // move com visual
-  dPtr->comVisual->SetPosition(_comVector);
-
-  this->Resize();
-
   dPtr->comVector = _comVector;
   this->SetTorqueVisual();
 }
@@ -513,8 +456,7 @@ void ApplyWrenchVisual::SetVisible(bool _visible, bool _cascade)
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  if (!dPtr->forceVisual || !dPtr->torqueVisual || !dPtr->comVisual ||
-      !dPtr->rotTool || !dPtr->originVisual)
+  if (!dPtr->forceVisual || !dPtr->torqueVisual || !dPtr->rotTool)
   {
     gzwarn << "Some visual is missing!" << std::endl;
     return;
@@ -522,8 +464,6 @@ void ApplyWrenchVisual::SetVisible(bool _visible, bool _cascade)
 
   if (_visible)
   {
-    dPtr->comVisual->SetVisible(true);
-    dPtr->originVisual->SetVisible(true);
     dPtr->forceVisual->SetVisible(true);
     dPtr->torqueVisual->SetVisible(true);
 
@@ -539,8 +479,6 @@ void ApplyWrenchVisual::SetVisible(bool _visible, bool _cascade)
   }
   else
   {
-    dPtr->comVisual->SetVisible(false);
-    dPtr->originVisual->SetVisible(false);
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, false);
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, false);
 
@@ -564,28 +502,14 @@ void ApplyWrenchVisual::Resize()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  if (!dPtr->parent || !dPtr->originXLines || !dPtr->originYLines ||
-      !dPtr->originZLines || !dPtr->comVisual || !dPtr->forceVisual ||
-      !dPtr->torqueVisual || !dPtr->forceText || !dPtr->torqueText ||
-      !dPtr->rotTool)
+  if (!dPtr->parent || !dPtr->forceVisual || !dPtr->torqueVisual || 
+      !dPtr->forceText || !dPtr->torqueText || !dPtr->rotTool)
   {
     gzwarn << "ApplyWrenchVisual is incomplete." << std::endl;
     return;
   }
 
   math::Vector3 linkSize = dPtr->parent->GetBoundingBox().GetSize();
-
-  // Origin visual
-  dPtr->originXLines->SetPoint(0, math::Vector3(-linkSize.x, 0, 0));
-  dPtr->originXLines->SetPoint(1, math::Vector3( linkSize.x,  0, 0));
-  dPtr->originYLines->SetPoint(0, math::Vector3(0, -linkSize.y, 0));
-  dPtr->originYLines->SetPoint(1, math::Vector3(0,  linkSize.y, 0));
-  dPtr->originZLines->SetPoint(0, math::Vector3(0, 0, -linkSize.z));
-  dPtr->originZLines->SetPoint(1, math::Vector3(0, 0,  linkSize.z));
-
-  // CoM visual
-  double comScale = linkSize.GetMin() * 0.1;
-  dPtr->comVisual->SetScale(math::Vector3(comScale, comScale, comScale));
 
   // Force visual
   dPtr->forceVisual->SetScale(math::Vector3(2*linkSize.GetLength(),

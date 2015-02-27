@@ -29,21 +29,6 @@ namespace gazebo
     /// \brief Private data for the Apply Wrench Visual class.
     class ApplyWrenchVisualPrivate : public VisualPrivate
     {
-      /// \brief TODO
-      public: VisualPtr comVisual;
-
-      /// \brief TODO
-      public: VisualPtr originVisual;
-
-      /// \brief TODO
-      public: DynamicLines *originXLines;
-
-      /// \brief TODO
-      public: DynamicLines *originYLines;
-
-      /// \brief TODO
-      public: DynamicLines *originZLines;
-
       /// TODO
       public: VisualPtr forceVisual;
 
