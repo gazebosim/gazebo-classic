@@ -90,6 +90,9 @@ void ServerFixtureTest::SpawnSDF(const std::string &_physicsType)
   ASSERT_TRUE(world != NULL);
   EXPECT_TRUE(world->IsPaused());
 
+  // Take some steps with an empty world to test issue #1471
+  world->Step(10);
+
   std::stringstream sdfStr;
   math::Pose pose(1, 2, 3, 0, 0, 0);
   sdfStr << "<sdf version='" << SDF_VERSION << "'>"
