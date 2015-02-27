@@ -145,7 +145,7 @@ void multiply_J_invM_JT (int m, int nb, dRealMutablePtr J, dRealMutablePtr iMJ, 
   for (int i=0; i<m; i++) out[i] += cfm[i] * in[i];
 }
 
-dReal dot (int n, dRealPtr x, dRealPtr y)
+dReal dot_n (int n, dRealPtr x, dRealPtr y)
 {
   dReal sum=0;
   for (int i=0; i<n; i++) sum += x[i]*y[i];
@@ -153,7 +153,7 @@ dReal dot (int n, dRealPtr x, dRealPtr y)
 }
 
 // x = y + z*alpha
-void add (int n, dRealMutablePtr x, dRealPtr y, dRealPtr z, dReal alpha)
+inline void scaled_add (int n, dRealMutablePtr x, dRealPtr y, dRealPtr z, dReal alpha)
 {
   for (int i=0; i<n; i++) x[i] = y[i] + z[i]*alpha;
 }

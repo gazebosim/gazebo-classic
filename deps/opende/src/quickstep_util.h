@@ -173,10 +173,10 @@ void multiply_J_invM_JT (int m, int nb, dRealMutablePtr J, dRealMutablePtr iMJ, 
   dRealPtr cfm, dRealMutablePtr z, dRealMutablePtr in, dRealMutablePtr out);
 
 // dot product of two vector x, y with length of n
-dReal dot (int n, dRealPtr x, dRealPtr y); 
+dReal dot_n (int n, dRealPtr x, dRealPtr y); 
 
 // x = y + z*alpha
-void add (int n, dRealMutablePtr x, dRealPtr y, dRealPtr z, dReal alpha);
+inline void scaled_add (int n, dRealMutablePtr x, dRealPtr y, dRealPtr z, dReal alpha);
 
 // dot product of two vector a and b with length 6
 dReal dot6(dRealPtr a, dRealPtr b);

@@ -94,7 +94,7 @@ static void CG_LCP (dxWorldProcessContext *context,
 
   for (int iteration=0; iteration < num_iterations; iteration++) {
     for (int i=0; i<m; i++) z[i] = r[i]*Ad[i];  // z = inv(M)*r
-    dReal rho = dot (m,r,z);    // rho = r'*z
+    dReal rho = dot_n (m,r,z);    // rho = r'*z
 
     // @@@
     // we must check for convergence, otherwise rho will go to 0 if
@@ -108,15 +108,15 @@ static void CG_LCP (dxWorldProcessContext *context,
       memcpy (p,z,m*sizeof(dReal));  // p = z
     }
     else {
-      add (m,p,z,p,rho/last_rho);  // p = z + (rho/last_rho)*p
+      scaled_add (m,p,z,p,rho/last_rho);  // p = z + (rho/last_rho)*p
     }
 
     // compute q = (J*inv(M)*J')*p
     multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,cforce,p,q);
 
-    dReal alpha = rho/dot (m,p,q);    // alpha = rho/(p'*q)
-    add (m,lambda,lambda,p,alpha);    // lambda = lambda + alpha*p
-    add (m,r,r,q,-alpha);      // r = r - alpha*q
+    dReal alpha = rho/dot_n (m,p,q);    // alpha = rho/(p'*q)
+    scaled_add (m,lambda,lambda,p,alpha);    // lambda = lambda + alpha*p
+    scaled_add (m,r,r,q,-alpha);      // r = r - alpha*q
     last_rho = rho;
   }
 
