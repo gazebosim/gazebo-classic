@@ -20,6 +20,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PresetManager.hh"
+#include "test/integration/helper_physics_generator.hh"
 
 using namespace gazebo;
 
@@ -252,6 +253,9 @@ TEST_F(PresetManagerTest, BackwardsCompatibilityTest)
     FAIL();
   }
 }
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, PresetManagerTest,
+                        PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
