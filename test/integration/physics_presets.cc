@@ -33,10 +33,18 @@ class PresetManagerTest : public ServerFixture,
 TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
 {
   const std::string physicsEngineName = GetParam();
-  Load("test/worlds/presets.world", false);
+  Load("test/worlds/presets.world", false, physicsEngineName);
   physics::WorldPtr world = physics::get_world("default");
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+
+  // SimbodyPhysics::SetParam is not implemented, so we can't expect any of the
+  // parameter setting to work.
+
+  if (physicsEngineName == "simbody")
+  {
+    return;
+  }
   try
   {
     EXPECT_NEAR(boost::any_cast<double>(
@@ -66,11 +74,6 @@ TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
     {
       EXPECT_FALSE(boost::any_cast<bool>(
           physicsEngine->GetParam("split_impulse")));
-    }
-    else if (physicsEngineName == "simbody")
-    {
-      EXPECT_NEAR(boost::any_cast<double>(
-          physicsEngine->GetParam("max_transient_velocity")), 0.001, 1e-4);
     }
   }
   catch(const boost::bad_any_cast& e)

@@ -166,9 +166,8 @@ bool PresetManager::CurrentProfile(const std::string& _name)
 //////////////////////////////////////////////////
 std::string PresetManager::CurrentProfile() const
 {
-  if (!this->CurrentPreset())
+  if (this->CurrentPreset() == NULL)
   {
-    gzwarn << "No current preset." << std::endl;
     return "";
   }
   return this->CurrentPreset()->Name();
