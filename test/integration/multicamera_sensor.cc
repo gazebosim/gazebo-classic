@@ -22,6 +22,7 @@
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/sensors/MultiCameraSensor.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 #include "ServerFixture.hh"
 #include "scans_cmp.h"

@@ -15,6 +15,7 @@
  *
 */
 #include "ServerFixture.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 using namespace gazebo;
 class FactoryStressTest : public ServerFixture

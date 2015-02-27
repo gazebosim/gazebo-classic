@@ -19,6 +19,7 @@
 #include "ServerFixture.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/common/SystemPaths.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 
 using namespace gazebo;

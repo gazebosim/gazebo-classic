@@ -22,6 +22,8 @@
 #include <list>
 
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
 #include "gazebo/util/system.hh"
 
 namespace Ogre

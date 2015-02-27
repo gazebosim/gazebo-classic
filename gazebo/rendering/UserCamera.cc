@@ -18,6 +18,7 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
 
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"

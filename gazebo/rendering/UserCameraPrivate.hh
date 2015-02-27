@@ -18,6 +18,9 @@
 #ifndef _USERCAMERA_PRIVATE_HH_
 #define _USERCAMERA_PRIVATE_HH_
 
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
+
 namespace gazebo
 {
   namespace rendering

@@ -21,6 +21,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 using namespace gazebo;
 class GripperTest : public ServerFixture

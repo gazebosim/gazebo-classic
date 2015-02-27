@@ -16,6 +16,7 @@
 */
 
 #include <boost/thread.hpp>
+#include "gazebo/transport/TransportIface.hh"
 #include "ServerFixture.hh"
 
 using namespace gazebo;

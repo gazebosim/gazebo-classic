@@ -20,6 +20,7 @@
 
 #include "ServerFixture.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 // #include "gazebo/physics/physics.hh"
 #include "helper_physics_generator.hh"

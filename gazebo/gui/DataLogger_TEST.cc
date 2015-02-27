@@ -20,6 +20,7 @@
 #include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/DataLogger_TEST.hh"
 #include "gazebo/math/Rand.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 /////////////////////////////////////////////////
 void DataLogger_TEST::RecordButton()

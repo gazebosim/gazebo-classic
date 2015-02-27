@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/transport/TransportIface.hh"
 #include "ServerFixture.hh"
 
 using namespace gazebo;

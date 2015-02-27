@@ -18,6 +18,9 @@
 #include "test/ServerFixture.hh"
 #include "test/integration/helper_physics_generator.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Subscriber.hh"
 
 using namespace gazebo;
 

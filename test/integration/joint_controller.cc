@@ -21,6 +21,7 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/JointController.hh"
 #include "gazebo/common/PID.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "test/ServerFixture.hh"
 #include "test_config.h"
 

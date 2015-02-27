@@ -26,6 +26,9 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Projector.hh"
 
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
+
 using namespace gazebo;
 using namespace rendering;
 

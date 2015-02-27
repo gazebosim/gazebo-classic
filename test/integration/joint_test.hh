@@ -25,6 +25,7 @@
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/transport/Publisher.hh"
 
 using namespace gazebo;
 

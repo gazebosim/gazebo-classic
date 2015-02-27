@@ -20,6 +20,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "test/integration/helper_physics_generator.hh"
 
 using namespace gazebo;

@@ -28,8 +28,9 @@
 #include <string>
 
 #include "gazebo/common/CommonIface.hh"
-#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/PhysicsIface.hh"

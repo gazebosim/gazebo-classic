@@ -17,6 +17,7 @@
 
 #include <unistd.h>
 
+#include "gazebo/transport/TransportIface.hh"
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
 
