@@ -156,7 +156,6 @@ struct dxSORLCPParameters {
 // multiply block of B matrix (q x 6) with 12 dReal per row with C vektor (q)
 void Multiply1_12q1 (dReal *A, const dReal *B, const dReal *C, int q);
 
-
 // compute iMJ = inv(M)*J'
 void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
   dxBody * const *body, dRealPtr invMOI);

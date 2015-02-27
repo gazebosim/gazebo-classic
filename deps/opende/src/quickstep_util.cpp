@@ -67,12 +67,10 @@ void Multiply1_12q1 (dReal *A, const dReal *B, const dReal *C, int q)
   A[5] = f;
 }
 
-
 //***************************************************************************
 // various common computations involving the matrix J
 
 // compute iMJ = inv(M)*J'
-
 void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
   dxBody * const *body, dRealPtr invMOI)
 {
@@ -94,7 +92,6 @@ void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
   }
 }
 
-// warm starting
 // compute out = inv(M)*J'*in.
 void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
   dRealPtr in, dRealMutablePtr out)
@@ -117,7 +114,6 @@ void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
 }
 
 // compute out = J*in.
-
 void multiply_J (int m, dRealPtr J, int *jb,
   dRealPtr in, dRealMutablePtr out)
 {
@@ -138,11 +134,7 @@ void multiply_J (int m, dRealPtr J, int *jb,
   }
 }
 
-
 // compute out = (J*inv(M)*J' + cfm)*in.
-// use z as an nb*6 temporary.
-// not used ---> used when we have to split cg_lcp later
-// warm starting
 void multiply_J_invM_JT (int m, int nb, dRealMutablePtr J, dRealMutablePtr iMJ, int *jb,
   dRealPtr cfm, dRealMutablePtr z, dRealMutablePtr in, dRealMutablePtr out)
 {
@@ -153,7 +145,6 @@ void multiply_J_invM_JT (int m, int nb, dRealMutablePtr J, dRealMutablePtr iMJ, 
   for (int i=0; i<m; i++) out[i] += cfm[i] * in[i];
 }
 
-
 dReal dot (int n, dRealPtr x, dRealPtr y)
 {
   dReal sum=0;
@@ -161,9 +152,7 @@ dReal dot (int n, dRealPtr x, dRealPtr y)
   return sum;
 }
 
-
 // x = y + z*alpha
-
 void add (int n, dRealMutablePtr x, dRealPtr y, dRealPtr z, dReal alpha)
 {
   for (int i=0; i<n; i++) x[i] = y[i] + z[i]*alpha;
@@ -216,7 +205,6 @@ int compare_index_error (const void *a, const void *b)
 }
 #endif
 
-//***************************************************************************
 // Modifying inertia along constrained axes without modifying dynamics.
 void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const int b1, const int b2,
                             const dJointWithInfo1 *jicurr,
@@ -272,7 +260,6 @@ void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const int b1,
          Jinfo.J1a[1+j*Jinfo.rowskip],
          Jinfo.J1a[2+j*Jinfo.rowskip] };
       dNormalize3(S);
-
       // temporary vector used for matrix/vector math
       dVector3 tmp31;
 
