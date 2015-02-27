@@ -17,7 +17,11 @@
 
 #include "ServerFixture.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "helper_physics_generator.hh"
 

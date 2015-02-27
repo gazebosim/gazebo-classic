@@ -15,6 +15,7 @@
  *
 */
 #include "ServerFixture.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"

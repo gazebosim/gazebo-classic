@@ -16,9 +16,17 @@
 */
 
 #include "ServerFixture.hh"
-#include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/sensors.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/common.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/sensors/SensorsIface.hh"
+#include "gazebo/sensors/sensors.hh"
+#include "gazebo/transport/transport.hh"
 #include "scans_cmp.h"
 #include "helper_physics_generator.hh"
 

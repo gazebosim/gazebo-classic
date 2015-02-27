@@ -18,6 +18,7 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/math/Vector3.hh>
 #include <gazebo/common/Color.hh>
+#include <gazebo/physics/World.hh>
 
 namespace gazebo
 {

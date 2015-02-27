@@ -17,6 +17,9 @@
 
 #include <string>
 #include <vector>
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
 #include "gazebo/math/Vector3.hh"

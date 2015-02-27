@@ -16,7 +16,12 @@
 */
 #include <string.h>
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODETypes.hh"

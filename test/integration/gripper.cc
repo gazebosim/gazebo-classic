@@ -16,11 +16,12 @@
 */
 
 #include "ServerFixture.hh"
-#include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Gripper.hh"
-#include "gazebo/physics/World.hh"
-#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 
 using namespace gazebo;

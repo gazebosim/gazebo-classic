@@ -15,6 +15,13 @@
  *
 */
 
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/sensors/SensorsIface.hh"
 #include "ServerFixture.hh"
 

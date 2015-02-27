@@ -17,6 +17,7 @@
 
 #include <boost/filesystem.hpp>
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"

@@ -16,6 +16,10 @@
 */
 #include <string.h>
 
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
 #include "gazebo/physics/physics.hh"
 #include "test/ServerFixture.hh"
 #include "helper_physics_generator.hh"

@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/physics/ContactManager.hh"
+#include "gazebo/physics/physics.hh"
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;

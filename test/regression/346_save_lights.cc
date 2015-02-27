@@ -16,6 +16,8 @@
 */
 
 #include <gtest/gtest.h>
+#include <gazebo/physics/PhysicsIface.hh>
+#include "gazebo/physics/World.hh"
 #include <gazebo/rendering/rendering.hh>
 #include "ServerFixture.hh"
 

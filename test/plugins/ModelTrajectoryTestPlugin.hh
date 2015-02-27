@@ -18,6 +18,7 @@
 #define _GAZEBO_MODEL_TRAJECTORY_TEST_PLUGIN_HH_
 
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"

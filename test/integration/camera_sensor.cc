@@ -16,7 +16,9 @@
 */
 
 #include "gazebo/physics/physics.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/sensors.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/common/Timer.hh"
 #include "gazebo/rendering/Camera.hh"

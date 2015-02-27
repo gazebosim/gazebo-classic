@@ -15,8 +15,11 @@
  *
 */
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/rendering/rendering.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/sensors.hh"
+#include "gazebo/transport/transport.hh"
 #include "ServerFixture.hh"
 
 using namespace gazebo;

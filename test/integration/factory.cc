@@ -15,7 +15,13 @@
  *
 */
 #include <string.h>
+#include "gazebo/common/Console.hh"
 #include "gazebo/math/Helpers.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/Node.hh"

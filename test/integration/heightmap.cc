@@ -17,7 +17,11 @@
 
 #include <string.h>
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/common.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/common/SystemPaths.hh"

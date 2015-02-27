@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/physics.hh"
 #include "plugins/SpringTestPlugin.hh"
 

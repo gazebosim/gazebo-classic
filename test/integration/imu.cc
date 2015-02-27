@@ -16,8 +16,12 @@
 */
 
 #include "ServerFixture.hh"
-#include "gazebo/sensors/sensors.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/common.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/sensors/sensors.hh"
 #include "helper_physics_generator.hh"
 
 // How tightly to compare for deterministic values

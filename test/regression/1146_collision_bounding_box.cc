@@ -17,6 +17,11 @@
 
 #include "ServerFixture.hh"
 #include "gazebo/math/Box.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
 
 using namespace gazebo;
 

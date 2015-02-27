@@ -15,6 +15,9 @@
  *
 */
 
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "ServerFixture.hh"
 

@@ -21,6 +21,7 @@
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/gazebo.hh"
+#include "gazebo/physics/Model.hh"
 
 namespace gazebo
 {

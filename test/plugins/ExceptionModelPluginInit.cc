@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include "gazebo/physics/Model.hh"
 #include "plugins/ExceptionModelPluginInit.hh"
 
 using namespace gazebo;

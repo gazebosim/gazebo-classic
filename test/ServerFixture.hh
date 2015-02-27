@@ -25,6 +25,7 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"

@@ -15,6 +15,7 @@
  *
 */
 #include "plugins/ExceptionModelPluginConstructor.hh"
+#include "gazebo/physics/Model.hh"
 
 using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(ExceptionModelPluginConstructor)

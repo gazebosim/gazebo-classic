@@ -16,7 +16,10 @@
 */
 
 #include <gtest/gtest.h>
+#include "gazebo/common/Console.hh"
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
 #include "gazebo/common/Time.hh"
 #include "test/ServerFixture.hh"
 #include "test/integration/helper_physics_generator.hh"

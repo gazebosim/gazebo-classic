@@ -16,8 +16,12 @@
 */
 
 #include <gtest/gtest.h>
-#include "gazebo/physics/physics.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/physics.hh"
 #include "test/integration/helper_physics_generator.hh"
 #include "test/integration/joint_test.hh"
 

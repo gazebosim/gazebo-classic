@@ -19,11 +19,16 @@
 #include <string>
 #include <vector>
 
-#include "ServerFixture.hh"
-#include "gazebo/physics/physics.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 #include "gazebo/common/PID.hh"
-#include "SimplePendulumIntegrator.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/physics.hh"
+#include "SimplePendulumIntegrator.hh"
+#include "ServerFixture.hh"
 
 #define TOL 5e-5
 using namespace gazebo;

@@ -16,6 +16,8 @@
 */
 
 #include "gazebo/common/Events.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
 #include "ServerFixture.hh"
 #include "test/integration/helper_physics_generator.hh"
 #include "test/integration/joint_test.hh"

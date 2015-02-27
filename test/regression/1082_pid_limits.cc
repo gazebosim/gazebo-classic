@@ -17,10 +17,14 @@
 
 #include <gtest/gtest.h>
 
-#include "gazebo/physics/World.hh"
-#include "gazebo/physics/Model.hh"
-#include "gazebo/physics/JointController.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/PID.hh"
+#include "gazebo/physics/JointController.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/transport/transport.hh"
 #include "test/ServerFixture.hh"
 #include "test_config.h"
 

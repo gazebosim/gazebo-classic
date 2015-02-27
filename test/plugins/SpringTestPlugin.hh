@@ -20,6 +20,7 @@
 #include <string>
 
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/util/system.hh"
 

@@ -22,6 +22,7 @@
 #include <boost/filesystem.hpp>
 
 #include <gazebo/common/CommonIface.hh>
+#include <gazebo/common/Console.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 

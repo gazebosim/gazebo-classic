@@ -15,6 +15,7 @@
  *
 */
 #include <gazebo/gazebo.hh>
+#include "gazebo/physics/World.hh"
 #include <gazebo/physics/physics.hh>
 
 namespace gazebo

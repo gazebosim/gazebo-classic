@@ -16,7 +16,11 @@
 */
 
 #include "ServerFixture.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
 #include "gazebo/rendering/rendering.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/sensors.hh"
 
 #define LASER_TOL 1e-5

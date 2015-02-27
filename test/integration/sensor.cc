@@ -15,6 +15,8 @@
  *
 */
 #include <string.h>
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 #include "ServerFixture.hh"
 
 using namespace gazebo;

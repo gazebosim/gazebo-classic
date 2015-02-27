@@ -15,6 +15,13 @@
  *
 */
 
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/rendering/rendering.hh"
+#include "gazebo/sensors/SensorsIface.hh"
+#include "gazebo/sensors/sensors.hh"
+#include "gazebo/transport/transport.hh"
 #include "ServerFixture.hh"
 
 using namespace gazebo;
