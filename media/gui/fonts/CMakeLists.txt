@@ -1,5 +1,4 @@
 set (files Font.xsd
-           baemuk.txt
            DejaVuSans-10.font
            DejaVuSans.ttf
            FairChar-30.font
