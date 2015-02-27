@@ -35,5 +35,6 @@ event::EventT<void (int)> Events::inputStepSize;
 event::EventT<void (const std::string &)> Events::follow;
 event::EventT<void (bool)> Events::leftPaneVisibility;
 event::EventT<void ()> Events::mainWindowReady;
+event::EventT<void (const std::string &)> Events::editModel;
 event::EventT<void (const std::string &, const math::Vector3 &)>
     Events::scaleEntity;
