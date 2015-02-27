@@ -106,7 +106,9 @@ bool Server::ParseArgs(int _argc, char **_argv)
     ("iters",  po::value<unsigned int>(), "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
-     "Load a plugin.");
+     "Load a plugin.")
+    ("profile,o", po::value<std::string>()->default_value(""),
+     "Specify a preset profile in the world file.");
 
   po::options_description hiddenDesc("Hidden options");
   hiddenDesc.add_options()
