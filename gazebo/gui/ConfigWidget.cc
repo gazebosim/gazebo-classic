@@ -1383,17 +1383,12 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
               if (geomType == "mesh")
               {
-                QFileInfo info(qobject_cast<QLineEdit *>(
-                    childWidget->widgets[6])->text());
-
-                if (info.isFile() && (info.completeSuffix() == "dae" ||
-                    info.completeSuffix() == "stl"))
-                {
-                  const google::protobuf::FieldDescriptor *uriFieldDescriptor =
-                      geomValueMsg->GetDescriptor()->field(0);
-                  geomValueMsg->GetReflection()->SetString(geomValueMsg,
-                      uriFieldDescriptor, info.filePath().toStdString());
-                }
+                std::string uri = qobject_cast<QLineEdit *>(
+                     childWidget->widgets[6])->text().toStdString();
+                const google::protobuf::FieldDescriptor *uriFieldDescriptor =
+                    geomValueMsg->GetDescriptor()->field(0);
+                geomValueMsg->GetReflection()->SetString(geomValueMsg,
+                    uriFieldDescriptor, uri);
               }
             }
             else if (geomType == "cylinder")

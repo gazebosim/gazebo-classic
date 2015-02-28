@@ -416,6 +416,9 @@ void PartData::OnApply()
   this->partSDF = msgs::LinkToSDF(*linkConfig->GetData(), this->partSDF);
   this->partVisual->SetPose(this->GetPose());
 
+  std::vector<msgs::Visual *> visualUpdateMsgsTemp;
+  std::vector<msgs::Collision *> collisionUpdateMsgsTemp;
+
   // update visuals
   if (!this->visuals.empty())
   {
@@ -431,6 +434,25 @@ void PartData::OnApply()
       if (updateMsg)
       {
         msgs::Visual visualMsg = it.second;
+
+        // check if the geometry is valid
+        msgs::Geometry *geomMsg = updateMsg->mutable_geometry();
+        if (geomMsg->type() == msgs::Geometry::MESH)
+        {
+          msgs::MeshGeom *meshGeom = geomMsg->mutable_mesh();
+          QFileInfo info(QString::fromStdString(meshGeom->filename()));
+          if (!info.isFile() || (info.completeSuffix() != "dae" &&
+              info.completeSuffix() != "stl"))
+          {
+            std::string msg = "\"" + meshGeom->filename() +
+                "\" is not a valid mesh file.\nPlease select another file for ["
+                + leafName + "].";
+
+            QMessageBox::warning(linkConfig, QString("Invalid Mesh File"),
+                QString(msg.c_str()), QMessageBox::Ok, QMessageBox::Ok);
+            return;
+          }
+        }
 
         // update the visualMsg that will be used to generate the sdf.
         updateMsg->clear_scale();
@@ -488,7 +510,7 @@ void PartData::OnApply()
         visualMsg.CopyFrom(*updateMsg);
         it.second = visualMsg;
 
-        this->visualUpdateMsgs.push_back(updateMsg);
+        visualUpdateMsgsTemp.push_back(updateMsg);
       }
     }
   }
@@ -509,13 +531,39 @@ void PartData::OnApply()
       if (updateMsg)
       {
         msgs::Collision collisionMsg = it.second;
+
+        // check if the geometry is valid
+        msgs::Geometry *geomMsg = updateMsg->mutable_geometry();
+        if (geomMsg->type() == msgs::Geometry::MESH)
+        {
+          msgs::MeshGeom *meshGeom = geomMsg->mutable_mesh();
+          QFileInfo info(QString::fromStdString(meshGeom->filename()));
+          if (!info.isFile() || (info.completeSuffix() != "dae" &&
+              info.completeSuffix() != "stl"))
+          {
+            std::string msg = "\"" + meshGeom->filename() +
+                "\" is not a valid mesh file.\nPlease select another file for ["
+                + leafName + "].";
+
+            QMessageBox::warning(linkConfig, QString("Invalid Mesh File"),
+                QString(msg.c_str()), QMessageBox::Ok, QMessageBox::Ok);
+            return;
+          }
+        }
+
         collisionMsg.CopyFrom(*updateMsg);
         it.second = collisionMsg;
 
-        this->collisionUpdateMsgs.push_back(updateMsg);
+        collisionUpdateMsgsTemp.push_back(updateMsg);
       }
     }
   }
+
+  // Only send update messages if all visuals and collisions are valid
+  this->visualUpdateMsgs.insert(this->visualUpdateMsgs.end(),
+      visualUpdateMsgsTemp.begin(), visualUpdateMsgsTemp.end());
+  this->collisionUpdateMsgs.insert(this->collisionUpdateMsgs.end(),
+      collisionUpdateMsgsTemp.begin(), collisionUpdateMsgsTemp.end());
 }
 
 /////////////////////////////////////////////////
