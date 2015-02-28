@@ -132,8 +132,7 @@ void LinkInspector::OnApply()
 /////////////////////////////////////////////////
 void LinkInspector::OnOK()
 {
-  emit Applied();
-  this->accept();
+  emit Accepted();
 }
 
 /////////////////////////////////////////////////

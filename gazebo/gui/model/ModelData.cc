@@ -80,6 +80,7 @@ PartData::PartData()
   this->inspector = new LinkInspector();
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
+  connect(this->inspector, SIGNAL(Accepted()), this, SLOT(OnAccept()));
   connect(this->inspector->GetVisualConfig(),
       SIGNAL(VisualAdded(const std::string &)),
       this, SLOT(OnAddVisual(const std::string &)));
@@ -408,7 +409,20 @@ PartData* PartData::Clone(const std::string &_newName)
 }
 
 /////////////////////////////////////////////////
+void PartData::OnAccept()
+{
+  if (this->Apply())
+    this->inspector->accept();
+}
+
+/////////////////////////////////////////////////
 void PartData::OnApply()
+{
+  this->Apply();
+}
+
+/////////////////////////////////////////////////
+bool PartData::Apply()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
@@ -450,7 +464,7 @@ void PartData::OnApply()
 
             QMessageBox::warning(linkConfig, QString("Invalid Mesh File"),
                 QString(msg.c_str()), QMessageBox::Ok, QMessageBox::Ok);
-            return;
+            return false;
           }
         }
 
@@ -547,7 +561,7 @@ void PartData::OnApply()
 
             QMessageBox::warning(linkConfig, QString("Invalid Mesh File"),
                 QString(msg.c_str()), QMessageBox::Ok, QMessageBox::Ok);
-            return;
+            return false;
           }
         }
 
@@ -564,6 +578,7 @@ void PartData::OnApply()
       visualUpdateMsgsTemp.begin(), visualUpdateMsgsTemp.end());
   this->collisionUpdateMsgs.insert(this->collisionUpdateMsgs.end(),
       collisionUpdateMsgsTemp.begin(), collisionUpdateMsgsTemp.end());
+  return true;
 }
 
 /////////////////////////////////////////////////
