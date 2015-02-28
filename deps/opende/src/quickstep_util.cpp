@@ -33,8 +33,10 @@
 #include <sys/time.h>
 #include "quickstep_util.h"
 
+using namespace ode;
+
 // multiply block of B matrix (q x 6) with 12 dReal per row with C vektor (q)
-void Multiply1_12q1 (dReal *A, const dReal *B, const dReal *C, int q)
+void quickstep::Multiply1_12q1 (dReal *A, const dReal *B, const dReal *C, int q)
 {
   dIASSERT (q>0 && A && B && C);
 
@@ -71,7 +73,7 @@ void Multiply1_12q1 (dReal *A, const dReal *B, const dReal *C, int q)
 // various common computations involving the matrix J
 
 // compute iMJ = inv(M)*J'
-void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
+void quickstep::compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
   dxBody * const *body, dRealPtr invMOI)
 {
   dRealMutablePtr iMJ_ptr = iMJ;
@@ -93,7 +95,7 @@ void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
 }
 
 // compute out = inv(M)*J'*in.
-void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
+void quickstep::multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
   dRealPtr in, dRealMutablePtr out)
 {
   dSetZero (out,6*nb);
@@ -114,7 +116,7 @@ void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
 }
 
 // compute out = J*in.
-void multiply_J (int m, dRealPtr J, int *jb,
+void quickstep::multiply_J (int m, dRealPtr J, int *jb,
   dRealPtr in, dRealMutablePtr out)
 {
   dRealPtr J_ptr = J;
@@ -134,8 +136,9 @@ void multiply_J (int m, dRealPtr J, int *jb,
   }
 }
 
+#ifdef USE_CG_LCP
 // compute out = (J*inv(M)*J' + cfm)*in.
-void multiply_J_invM_JT (int m, int nb, dRealMutablePtr J, dRealMutablePtr iMJ, int *jb,
+void quickstep::multiply_J_invM_JT (int m, int nb, dRealMutablePtr J, dRealMutablePtr iMJ, int *jb,
   dRealPtr cfm, dRealMutablePtr z, dRealMutablePtr in, dRealMutablePtr out)
 {
   multiply_invM_JT (m,nb,iMJ,jb,in,z);
@@ -144,56 +147,10 @@ void multiply_J_invM_JT (int m, int nb, dRealMutablePtr J, dRealMutablePtr iMJ, 
   // add cfm
   for (int i=0; i<m; i++) out[i] += cfm[i] * in[i];
 }
-
-dReal dot_n (int n, dRealPtr x, dRealPtr y)
-{
-  dReal sum=0;
-  for (int i=0; i<n; i++) sum += x[i]*y[i];
-  return sum;
-}
-
-// x = y + z*alpha
-inline void scaled_add (int n, dRealMutablePtr x, dRealPtr y, dRealPtr z, dReal alpha)
-{
-  for (int i=0; i<n; i++) x[i] = y[i] + z[i]*alpha;
-}
-
-dReal dot6(dRealPtr a, dRealPtr b)
-{
-#ifdef SSE
-  __m128d d = _mm_load_pd(a+0) * _mm_load_pd(b+0) + _mm_load_pd(a+2) * _mm_load_pd(b+2) + _mm_load_pd(a+4) * _mm_load_pd(b+4);
-  double r[2];
-  _mm_store_pd(r, d);
-  return r[0] + r[1];
-#else
-  return a[0] * b[0] +
-         a[1] * b[1] +
-         a[2] * b[2] +
-         a[3] * b[3] +
-         a[4] * b[4] +
-         a[5] * b[5];
 #endif
-}
-
-void sum6(dRealMutablePtr a, dReal delta, dRealPtr b)
-{
-#ifdef SSE
-  __m128d __delta = Kf(delta);
-  _mm_store_pd(a + 0, _mm_load_pd(a + 0) + __delta * _mm_load_pd(b + 0));
-  _mm_store_pd(a + 2, _mm_load_pd(a + 2) + __delta * _mm_load_pd(b + 2));
-  _mm_store_pd(a + 4, _mm_load_pd(a + 4) + __delta * _mm_load_pd(b + 4));
-#else
-  a[0] += delta * b[0];
-  a[1] += delta * b[1];
-  a[2] += delta * b[2];
-  a[3] += delta * b[3];
-  a[4] += delta * b[4];
-  a[5] += delta * b[5];
-#endif
-}
 
 #ifdef REORDER_CONSTRAINTS
-int compare_index_error (const void *a, const void *b)
+int quickstep::compare_index_error (const void *a, const void *b)
 {
   const IndexError *i1 = (IndexError*) a;
   const IndexError *i2 = (IndexError*) b;
@@ -206,7 +163,7 @@ int compare_index_error (const void *a, const void *b)
 #endif
 
 // Modifying inertia along constrained axes without modifying dynamics.
-void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const int b1, const int b2,
+void quickstep::DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const int b1, const int b2,
                             const dJointWithInfo1 *jicurr,
                             dRealMutablePtr invMOI, dRealMutablePtr MOI)
 {

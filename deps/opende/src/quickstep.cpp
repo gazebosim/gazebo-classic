@@ -36,6 +36,8 @@
 #include <sys/time.h>
 #include "quickstep_util.h"
 
+using namespace ode;
+using namespace quickstep;
 
 
 //***************************************************************************
