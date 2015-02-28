@@ -1175,7 +1175,6 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
     int value;
     if (!PhysicsEngine::AnyCastInt(_value, value))
       return false;
-    
     odeElem->GetElement("solver")->GetElement("precon_iters")->Set(value);
     dWorldSetQuickStepPreconIterations(this->dataPtr->worldId, value);
   }

@@ -269,15 +269,11 @@ namespace gazebo
       public: boost::recursive_mutex *GetPhysicsUpdateMutex() const
               {return this->physicsUpdateMutex;}
 
-      /// \brief Utility function to help with casting boost::any
+      /// \brief Utility function to help casting boost::any
       public: template <class _Type> static bool AnyCast(
                   const boost::any &_value, _Type &_ret);
 
-      /// \brief Utility function to help with casting boost::any
-      public: static bool AnyCastDouble(const boost::any &_value,
-                  double &_ret);
-
-      /// \brief Utility function to help with casting boost::any
+      /// \brief Utility function to help casting boost::any to int
       public: static bool AnyCastInt(const boost::any &_value,
                   int &_ret);
 
