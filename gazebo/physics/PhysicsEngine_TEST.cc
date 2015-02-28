@@ -68,6 +68,8 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
     type = msgs::Physics::BULLET;
   else if (_physicsEngine == "dart")
     type = msgs::Physics::DART;
+  else if (_physicsEngine == "simbody")
+    type = msgs::Physics::SIMBODY;
   else
     type = msgs::Physics::ODE;
   physicsPubMsg.set_type(type);

@@ -1344,7 +1344,7 @@ boost::any SimbodyPhysics::GetParam(const std::string &_key) const
 {
   if (_key == "type")
   {
-    gzwarn << "Please use keyword `solver_typ` in the future.\n";
+    gzwarn << "Please use keyword `solver_type` in the future.\n";
     return this->GetParam("solver_type");
   }
   else if (_key == "solver_type")
@@ -1381,60 +1381,94 @@ boost::any SimbodyPhysics::GetParam(const std::string &_key) const
 //////////////////////////////////////////////////
 bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
-  /// \TODO fill this out, see issue #1116
   if (_key == "accuracy")
   {
-    int value;
-    try
-    {
-      value = boost::any_cast<int>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    double value;
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
       return false;
-    }
-    gzerr << "Setting [" << _key << "] in Simbody to [" << value
-          << "] not yet supported.\n";
-    return false;
+    this->integ->setAccuracy(value);
   }
   else if (_key == "max_transient_velocity")
   {
     double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
       return false;
-    }
-    gzerr << "Setting [" << _key << "] in Simbody to [" << value
-          << "] not yet supported.\n";
-    return false;
+    this->contact.setTransitionVelocity(value);
   }
   else if (_key == "max_step_size")
   {
     double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
       return false;
-    }
-    gzerr << "Setting [" << _key << "] in Simbody to [" << value
-          << "] not yet supported.\n";
-    return false;
+    this->SetMaxStepSize(value);
+  }
+  else if (_key == "stiffness")
+  {
+    double value;
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
+      return false;
+    this->contactMaterialStiffness = value;
+  }
+  else if (_key == "dissipation")
+  {
+    double value;
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
+      return false;
+    this->contactMaterialDissipation = value;
+  }
+  else if (_key == "plastic_coef_restitution")
+  {
+    double value;
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
+      return false;
+    this->contactMaterialPlasticCoefRestitution = value;
+  }
+  else if (_key == "plastic_impact_velocity")
+  {
+    double value;
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
+      return false;
+    this->contactMaterialPlasticImpactVelocity = value;
+  }
+  else if (_key == "static_friction")
+  {
+    double value;
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
+      return false;
+    this->contactMaterialStaticFriction = value;
+  }
+  else if (_key == "dynamic_friction")
+  {
+    double value;
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
+      return false;
+    this->contactMaterialDynamicFriction = value;
+  }
+  else if (_key == "viscous_friction")
+  {
+    double value;
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
+      return false;
+    this->contactMaterialViscousFriction = value;
+  }
+  else if (_key == "override_impact_capture_velocity")
+  {
+    double value;
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
+      return false;
+    this->contactMaterialPlasticImpactVelocity = value;
+  }
+  else if (_key == "override_stiction_transition_velocity")
+  {
+    double value;
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
+      return false;
+    this->contactImpactCaptureVelocity = value;
   }
   else
   {
     gzwarn << _key << " is not supported in Simbody" << std::endl;
     return false;
   }
-  // should never get here
-  return false;
+  return true;
 }

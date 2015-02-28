@@ -423,45 +423,26 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
   if (_key == "max_contacts")
   {
     int value;
-    try
-    {
-      value = boost::any_cast<int>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCast<int>(_value, value))
       return false;
-    }
     gzerr << "Setting [" << _key << "] in DART to [" << value
           << "] not yet supported.\n";
+    return false;
   }
   else if (_key == "min_step_size")
   {
     double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
       return false;
-    }
     gzerr << "Setting [" << _key << "] in DART to [" << value
           << "] not yet supported.\n";
+    return false;
   }
   else if (_key == "max_step_size")
   {
     double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
       return false;
-    }
     this->dtWorld->setTimeStep(value);
   }
   else

@@ -516,15 +516,8 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   if (_key == "solver_type")
   {
     std::string value;
-    try
-    {
-      value = boost::any_cast<std::string>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCast<std::string>(_value, value))
       return false;
-    }
     if (value == "sequential_impulse")
     {
       bulletElem->GetElement("solver")->GetElement("type")->Set(value);
@@ -540,112 +533,56 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "cfm")
   {
     double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
       return false;
-    }
     bulletElem->GetElement("constraints")->GetElement("cfm")->Set(value);
     info.m_globalCfm = value;
   }
   else if (_key == "erp")
   {
     double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
       return false;
-    }
     bulletElem->GetElement("constraints")->GetElement("erp")->Set(value);
     info.m_erp = value;
   }
   else if (_key == "iters")
   {
     int value;
-    try
-    {
-      try
-      {
-        value = boost::any_cast<int>(_value);
-      }
-      catch(const boost::bad_any_cast &e)
-      {
-        value = boost::any_cast<unsigned int>(_value);
-      }
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCastInt(_value, value))
       return false;
-    }
     bulletElem->GetElement("solver")->GetElement("iters")->Set(value);
     info.m_numIterations = value;
   }
   else if (_key == "sor")
   {
     double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
       return false;
-    }
     bulletElem->GetElement("solver")->GetElement("sor")->Set(value);
     info.m_sor = value;
   }
   else if (_key == "contact_surface_layer")
   {
     double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
       return false;
-    }
     bulletElem->GetElement("constraints")->GetElement(
         "contact_surface_layer")->Set(value);
   }
   else if (_key == "split_impulse")
   {
     bool value;
-    try
-    {
-      value = boost::any_cast<bool>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCast<bool>(_value, value))
       return false;
-    }
     bulletElem->GetElement("constraints")->GetElement(
         "split_impulse")->Set(value);
   }
   else if (_key == "split_impulse_penetration_threshold")
   {
     double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
       return false;
-    }
     bulletElem->GetElement("constraints")->GetElement(
         "split_impulse_penetration_threshold")->Set(value);
   }
@@ -653,51 +590,23 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   {
     /// TODO: Implement max contacts param
     int value;
-    try
-    {
-      try
-      {
-        value = boost::any_cast<int>(_value);
-      }
-      catch(const boost::bad_any_cast &e)
-      {
-        value = boost::any_cast<unsigned int>(_value);
-      }
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCastInt(_value, value))
       return false;
-    }
     this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
   }
   else if (_key == "min_step_size")
   {
     /// TODO: Implement min step size param
     double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
       return false;
-    }
     bulletElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
   }
   else if (_key == "max_step_size")
   {
     double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
       return false;
-    }
     this->SetMaxStepSize(value);
   }
   else

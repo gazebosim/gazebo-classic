@@ -234,3 +234,67 @@ ContactManager *PhysicsEngine::GetContactManager() const
 {
   return this->contactManager;
 }
+
+//////////////////////////////////////////////////
+bool PhysicsEngine::AnyCastDouble(const boost::any &_value, double &_ret)
+{
+  /*try
+  {
+   _ret = boost::any_cast<double>(_value);
+  }
+  catch(const boost::bad_any_cast &e)
+  {
+    gzerr << "boost any_cast error:" << e.what() << "\n";
+    return false;
+  }
+  return true;*/
+  return PhysicsEngine::AnyCast<double>(_value, _ret);
+}
+
+template <class _Type> bool PhysicsEngine::AnyCast(const boost::any &_value,
+    _Type &_ret)
+{
+  try
+  {
+   _ret = boost::any_cast<_Type>(_value);
+  }
+  catch(const boost::bad_any_cast &e)
+  {
+    gzerr << "boost any_cast error:" << e.what() << "\n";
+    return false;
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool PhysicsEngine::AnyCastInt(const boost::any &_value, int &_ret)
+{
+  if (!PhysicsEngine::AnyCast<int>(_value, _ret))
+  {
+    unsigned int uret;
+    if (!PhysicsEngine::AnyCast<unsigned int>(_value, uret))
+      return false;
+    _ret = (int) uret;
+  }
+  return true;
+  /*try
+  {
+    try
+    {
+      _ret = boost::any_cast<int>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      _ret = boost::any_cast<unsigned int>(_value);
+    }
+  }
+  catch(const boost::bad_any_cast &e)
+  {
+    gzerr << "boost any_cast error:" << e.what() << "\n";
+    return false;
+  }
+  return true;*/
+}
+
+template bool PhysicsEngine::AnyCast<std::string>(const boost::any &_value, std::string &_ret);
+template bool PhysicsEngine::AnyCast<bool>(const boost::any &_value, bool &_ret);
