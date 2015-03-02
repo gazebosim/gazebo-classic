@@ -5,7 +5,7 @@
       <uri>model://ground_plane</uri>
     </include>
 
-    <physics name="preset_1" type="ode" default="true">
+    <physics name="preset_1" type="ode">
       <max_step_size>0.01</max_step_size>
       <ode>
         <solver>
@@ -56,7 +56,7 @@
       </ode>
     </physics>
 
-    <physics name="unused" type="ode" default="true">
+    <physics name="unused" type="ode">
       <max_step_size>0.04</max_step_size>
       <ode>
         <solver>

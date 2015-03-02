@@ -38,6 +38,12 @@ TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
+  physics::PresetManager *presetManager = world->GetPresetManager();
+  if (!presetManager)
+  {
+    FAIL();
+  }
+
   // SimbodyPhysics::SetParam is not implemented, so we can't expect any of the
   // parameter setting to work.
 
@@ -80,6 +86,38 @@ TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
   {
     FAIL();
   }
+}
+
+/////////////////////////////////////////////////
+TEST_F(PresetManagerTest, MultipleDefaults)
+{
+  Load("test/worlds/presets.world", false, "ode");
+  physics::WorldPtr world = physics::get_world("default");
+
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+
+  physics::PresetManager *presetManager = world->GetPresetManager();
+  if (!presetManager)
+  {
+    FAIL();
+  }
+  EXPECT_EQ(presetManager->CurrentProfile(), "preset_1");
+}
+
+/////////////////////////////////////////////////
+TEST_F(PresetManagerTest, NoDefault)
+{
+  Load("test/worlds/presets_nodefault.world", false, "ode");
+  physics::WorldPtr world = physics::get_world("default");
+
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+
+  physics::PresetManager *presetManager = world->GetPresetManager();
+  if (!presetManager)
+  {
+    FAIL();
+  }
+  EXPECT_EQ(presetManager->CurrentProfile(), "preset_1");
 }
 
 /////////////////////////////////////////////////
@@ -139,7 +177,7 @@ TEST_F(PresetManagerTest, SetCurrentProfile)
   }
 
   std::vector<std::string> profileNames(presetManager->AllProfiles());
-  EXPECT_EQ(profileNames.size(), 2);
+  EXPECT_EQ(profileNames.size(), 3);
 
   presetManager->CurrentProfile("preset_2");
 
