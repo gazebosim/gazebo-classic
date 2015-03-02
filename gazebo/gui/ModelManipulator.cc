@@ -325,12 +325,6 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
   std::string geomType;
   if (_vis == _vis->GetRootVisual())
   {
-    if (_vis->GetBoundingBox().GetCenter() != math::Vector3::Zero)
-    {
-      gzwarn << "Scaling is currently limited to simple shapes with their " <<
-          "origin in the centroid." << std::endl;
-      return;
-    }
     // link-level visuals
     for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
     {
