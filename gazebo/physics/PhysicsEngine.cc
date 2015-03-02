@@ -236,8 +236,8 @@ ContactManager *PhysicsEngine::GetContactManager() const
 }
 
 //////////////////////////////////////////////////
-template <class _Type> bool PhysicsEngine::AnyCast(const boost::any &_value,
-    _Type &_ret)
+template <class _Type> bool PhysicsEngine::AnyCast(const std::string &_key,
+    const boost::any &_value, _Type &_ret)
 {
   try
   {
@@ -245,28 +245,30 @@ template <class _Type> bool PhysicsEngine::AnyCast(const boost::any &_value,
   }
   catch(const boost::bad_any_cast &e)
   {
-    gzerr << "boost any_cast error:" << e.what() << std::endl;
+    gzerr << "boost any_cast exception on key << " << _key << ":" << e.what()
+          << std::endl;
     return false;
   }
   return true;
 }
 
 //////////////////////////////////////////////////
-bool PhysicsEngine::AnyCastInt(const boost::any &_value, int &_ret)
+bool PhysicsEngine::AnyCastInt(const std::string &_key,
+    const boost::any &_value, int &_ret)
 {
-  if (!PhysicsEngine::AnyCast<int>(_value, _ret))
+  if (!PhysicsEngine::AnyCast<int>(_key, _value, _ret))
   {
     unsigned int uret;
-    if (!PhysicsEngine::AnyCast<unsigned int>(_value, uret))
+    if (!PhysicsEngine::AnyCast<unsigned int>(_key, _value, uret))
       return false;
     _ret = static_cast<int>(uret);
   }
   return true;
 }
 
-template bool PhysicsEngine::AnyCast<double>(const boost::any &_value,
-    double &_ret);
-template bool PhysicsEngine::AnyCast<std::string>(const boost::any &_value,
-    std::string &_ret);
-template bool PhysicsEngine::AnyCast<bool>(const boost::any &_value,
-    bool &_ret);
+template bool PhysicsEngine::AnyCast<double>(const std::string &_key,
+    const boost::any &_value, double &_ret);
+template bool PhysicsEngine::AnyCast<std::string>(const std::string &_key,
+    const boost::any &_value, std::string &_ret);
+template bool PhysicsEngine::AnyCast<bool>(const std::string &_key,
+    const boost::any &_value, bool &_ret);

@@ -1384,84 +1384,84 @@ bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
   if (_key == "accuracy")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     this->integ->setAccuracy(value);
   }
   else if (_key == "max_transient_velocity")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     this->contact.setTransitionVelocity(value);
   }
   else if (_key == "max_step_size")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     this->SetMaxStepSize(value);
   }
   else if (_key == "stiffness")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     this->contactMaterialStiffness = value;
   }
   else if (_key == "dissipation")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     this->contactMaterialDissipation = value;
   }
   else if (_key == "plastic_coef_restitution")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     this->contactMaterialPlasticCoefRestitution = value;
   }
   else if (_key == "plastic_impact_velocity")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     this->contactMaterialPlasticImpactVelocity = value;
   }
   else if (_key == "static_friction")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     this->contactMaterialStaticFriction = value;
   }
   else if (_key == "dynamic_friction")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     this->contactMaterialDynamicFriction = value;
   }
   else if (_key == "viscous_friction")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     this->contactMaterialViscousFriction = value;
   }
   else if (_key == "override_impact_capture_velocity")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     this->contactMaterialPlasticImpactVelocity = value;
   }
   else if (_key == "override_stiction_transition_velocity")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     this->contactImpactCaptureVelocity = value;
   }

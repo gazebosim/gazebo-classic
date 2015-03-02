@@ -516,7 +516,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   if (_key == "solver_type")
   {
     std::string value;
-    if (!PhysicsEngine::AnyCast<std::string>(_value, value))
+    if (!PhysicsEngine::AnyCast<std::string>(_key, _value, value))
       return false;
     if (value == "sequential_impulse")
     {
@@ -533,7 +533,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "cfm")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     bulletElem->GetElement("constraints")->GetElement("cfm")->Set(value);
     info.m_globalCfm = value;
@@ -541,7 +541,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "erp")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     bulletElem->GetElement("constraints")->GetElement("erp")->Set(value);
     info.m_erp = value;
@@ -549,7 +549,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "iters")
   {
     int value;
-    if (!PhysicsEngine::AnyCastInt(_value, value))
+    if (!PhysicsEngine::AnyCastInt(_key, _value, value))
       return false;
     bulletElem->GetElement("solver")->GetElement("iters")->Set(value);
     info.m_numIterations = value;
@@ -557,7 +557,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "sor")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     bulletElem->GetElement("solver")->GetElement("sor")->Set(value);
     info.m_sor = value;
@@ -565,7 +565,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "contact_surface_layer")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     bulletElem->GetElement("constraints")->GetElement(
         "contact_surface_layer")->Set(value);
@@ -573,7 +573,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "split_impulse")
   {
     bool value;
-    if (!PhysicsEngine::AnyCast<bool>(_value, value))
+    if (!PhysicsEngine::AnyCast<bool>(_key, _value, value))
       return false;
     bulletElem->GetElement("constraints")->GetElement(
         "split_impulse")->Set(value);
@@ -581,7 +581,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "split_impulse_penetration_threshold")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     bulletElem->GetElement("constraints")->GetElement(
         "split_impulse_penetration_threshold")->Set(value);
@@ -590,7 +590,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   {
     /// TODO: Implement max contacts param
     int value;
-    if (!PhysicsEngine::AnyCastInt(_value, value))
+    if (!PhysicsEngine::AnyCastInt(_key, _value, value))
       return false;
     this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
   }
@@ -598,14 +598,14 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   {
     /// TODO: Implement min step size param
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     bulletElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
   }
   else if (_key == "max_step_size")
   {
     double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
+    if (!PhysicsEngine::AnyCast<double>(_key, _value, value))
       return false;
     this->SetMaxStepSize(value);
   }
