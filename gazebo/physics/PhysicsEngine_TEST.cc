@@ -95,7 +95,7 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
   EXPECT_DOUBLE_EQ(physicsResponseMsg.real_time_factor(),
       physicsPubMsg.real_time_factor());
 
-  // Test PhysicsEngine::GetParam()
+  // Test PhysicsEngine::[GS]etParam()
   {
     physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
     boost::any dt = physics->GetParam("max_step_size");
@@ -103,6 +103,10 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
       physicsPubMsg.max_step_size());
 
     EXPECT_NO_THROW(physics->GetParam("fake_param_name"));
+    EXPECT_NO_THROW(physics->SetParam("fake_param_name", 0));
+
+    // Try SetParam with wrong type
+    EXPECT_NO_THROW(physics->SetParam("iters", "wrong"));
   }
 
   physicsNode->Fini();

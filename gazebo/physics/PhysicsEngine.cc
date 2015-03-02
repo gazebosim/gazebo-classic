@@ -245,7 +245,7 @@ template <class _Type> bool PhysicsEngine::AnyCast(const std::string &_key,
   }
   catch(const boost::bad_any_cast &e)
   {
-    gzerr << "boost any_cast exception on key << " << _key << ":" << e.what()
+    gzerr << "boost any_cast exception on key[" << _key << "]: " << e.what()
           << std::endl;
     return false;
   }
