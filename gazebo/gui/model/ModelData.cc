@@ -455,8 +455,8 @@ bool PartData::Apply()
         {
           msgs::MeshGeom *meshGeom = geomMsg->mutable_mesh();
           QFileInfo info(QString::fromStdString(meshGeom->filename()));
-          if (!info.isFile() || (info.completeSuffix() != "dae" &&
-              info.completeSuffix() != "stl"))
+          if (!info.isFile() || (info.completeSuffix().toLower() != "dae" &&
+              info.completeSuffix().toLower() != "stl"))
           {
             std::string msg = "\"" + meshGeom->filename() +
                 "\" is not a valid mesh file.\nPlease select another file for ["
@@ -552,8 +552,8 @@ bool PartData::Apply()
         {
           msgs::MeshGeom *meshGeom = geomMsg->mutable_mesh();
           QFileInfo info(QString::fromStdString(meshGeom->filename()));
-          if (!info.isFile() || (info.completeSuffix() != "dae" &&
-              info.completeSuffix() != "stl"))
+          if (!info.isFile() || (info.completeSuffix().toLower() != "dae" &&
+              info.completeSuffix().toLower() != "stl"))
           {
             std::string msg = "\"" + meshGeom->filename() +
                 "\" is not a valid mesh file.\nPlease select another file for ["

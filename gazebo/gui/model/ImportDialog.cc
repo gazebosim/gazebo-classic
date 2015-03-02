@@ -133,8 +133,8 @@ void ImportDialog::OnCancel()
 void ImportDialog::OnImport()
 {
   QFileInfo info(this->pathLineEdit->text());
-  if (info.isFile() && (info.completeSuffix() == "dae" ||
-      info.completeSuffix() == "stl"))
+  if (info.isFile() && (info.completeSuffix().toLower() == "dae" ||
+      info.completeSuffix().toLower() == "stl"))
   {
     this->accept();
   }
