@@ -760,32 +760,62 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
     }
   }
 
-  /// The top cap vertex
-  subMesh->AddVertex(0, 0, height/2.0);
-  subMesh->AddNormal(0, 0, 1);
-  subMesh->AddTexCoord(0, 0);
-
-  // The bottom cap vertex
-  subMesh->AddVertex(0, 0, -height/2.0);
-  subMesh->AddNormal(0, 0, -1);
-  subMesh->AddTexCoord(0, 0);
-
-  // Create the top fan
-  verticeIndex += segments + 1;
-  for (seg = 0; seg < segments; seg++)
+  // This block generates the top cap
   {
-    subMesh->AddIndex(verticeIndex);
-    subMesh->AddIndex(verticeIndex - segments + seg);
-    subMesh->AddIndex(verticeIndex - segments + seg - 1);
+    vert.z = height/2.0;
+    // Generate the group of segments for the top ring
+    for (seg = 0; seg <= segments; ++seg)
+    {
+      vert.y = radius * cosf(seg * deltaSegAngle);
+      vert.x = radius * sinf(seg * deltaSegAngle);
+      subMesh->AddVertex(vert);
+      subMesh->AddNormal(0, 0, 1);
+      subMesh->AddTexCoord(
+            static_cast<float>(seg) / static_cast<float>(segments), 1.0);
+    }
+
+    // The top-middle cap vertex
+    subMesh->AddVertex(0, 0, height/2.0);
+    subMesh->AddNormal(0, 0, 1);
+    subMesh->AddTexCoord(0, 0);
+
+    // Create the top fan
+    verticeIndex = subMesh->GetVertexCount()-1;
+    for (seg = 0; seg < segments; seg++)
+    {
+      subMesh->AddIndex(verticeIndex);
+      subMesh->AddIndex(verticeIndex - segments + seg);
+      subMesh->AddIndex(verticeIndex - segments + seg - 1);
+    }
   }
 
-  // Create the bottom fan
-  verticeIndex++;
-  for (seg = 0; seg < segments; seg++)
+  // This block generates the bottom cap
   {
-    subMesh->AddIndex(verticeIndex);
-    subMesh->AddIndex(seg);
-    subMesh->AddIndex(seg+1);
+    vert.z = -height/2.0;
+    // Generate the group of segments for the bottom ring
+    for (seg = 0; seg <= segments; ++seg)
+    {
+      vert.y = radius * cosf(seg * deltaSegAngle);
+      vert.x = radius * sinf(seg * deltaSegAngle);
+      subMesh->AddVertex(vert);
+      subMesh->AddNormal(0, 0, -1);
+      subMesh->AddTexCoord(
+            static_cast<float>(seg) / static_cast<float>(segments), 0.0);
+    }
+
+    // The bottom-middle cap vertex
+    subMesh->AddVertex(0, 0, -height/2.0);
+    subMesh->AddNormal(0, 0, -1);
+    subMesh->AddTexCoord(0, 0);
+
+    // Create the bottom fan
+    verticeIndex = subMesh->GetVertexCount()-1;
+    for (seg = 0; seg < segments; seg++)
+    {
+      subMesh->AddIndex(verticeIndex);
+      subMesh->AddIndex(verticeIndex - segments + seg - 1);
+      subMesh->AddIndex(verticeIndex - segments + seg);
+    }
   }
 }
 
