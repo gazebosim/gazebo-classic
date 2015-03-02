@@ -19,6 +19,7 @@
 #include <gazebo/rendering/rendering.hh>
 #include "ServerFixture.hh"
 
+using namespace gazebo;
 class Issue846Test : public ServerFixture
 {
 };
