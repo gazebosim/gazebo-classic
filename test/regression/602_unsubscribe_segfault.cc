@@ -73,6 +73,8 @@ void Issue602Test::UnsubscribeTest()
     ASSERT_TRUE(contactSensor2 != NULL);
   }
 
+  // Sleep to ensure transport topics are all advertised
+  common::Time::MSleep(100);
   auto topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
   EXPECT_FALSE(topics.empty());
   EXPECT_GE(topics.size(), 4u);
