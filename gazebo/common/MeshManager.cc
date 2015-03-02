@@ -535,11 +535,8 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   std::vector<std::vector<math::Vector2d> > edges;
   for (unsigned int i = 0; i < path.size(); ++i)
   {
-    for (unsigned int j = 0; j < path[i].size(); ++j)
+    for (unsigned int j = 1; j < path[i].size(); ++j)
     {
-      if (j == 0)
-        continue;
-
       std::vector<math::Vector2d> edge;
       edge.resize(2);
       edge[0] = path[i][j-1];

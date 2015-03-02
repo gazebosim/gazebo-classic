@@ -53,8 +53,6 @@ namespace gazebo
       /// \brief Perform delaunay triangulation on input vertices.
       /// \param[in] _path A path can contain multiple subpath, which in turn
       /// is composed of a list of vertices.
-      /// \param[out] _submesh A submesh that will be populated with the
-      /// resulting triangles.
       /// \return Triangulated GTS surface.
       private: static GtsSurface *DelaunayTriangulation(
                   const std::vector<std::vector<math::Vector2d> > &_path);
