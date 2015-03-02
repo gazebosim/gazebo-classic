@@ -501,9 +501,8 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   // sanity check to make sure we have at least 3 points in the path
   // Remove last vertices if it's the same as the first one - the
   // delaunay triangluation algorithm should already assume the paths are closed
-  std::vector<std::vector<math::Vector2d> > path = _path;
-  std::vector<std::vector<math::Vector2d> >::iterator it;
-  for (it = path.begin(); it != path.end();)
+  auto path = _path;
+  for (auto it = path.begin(); it != path.end();)
   {
     unsigned int pathSize = (*it).size();
     if (pathSize < 3)
