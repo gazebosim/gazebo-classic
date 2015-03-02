@@ -1,6 +1,10 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
+1. Fix simple shape normals.
+    * [Pull request #1477](https://bitbucket.org/osrf/gazebo/pull-request/1477)
+    * [Issue #1369](https://bitbucket.org/osrf/gazebo/issue/1369)
+
 1. Added Joint Msg-to-SDF conversion functions and test.
     * [Pull request #1419](https://bitbucket.org/osrf/gazebo/pull-request/1419)
 
