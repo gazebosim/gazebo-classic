@@ -335,10 +335,26 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
     {
       rendering::VisualPtr childVis = _vis->GetChild(i);
+
+      if (childVis->GetPose().pos != math::Vector3::Zero)
+      {
+        gzwarn << "Scaling is currently limited to simple shapes with their "
+            << "origin in the centroid." << std::endl;
+        return;
+      }
       // visual/collision level visuals
       for (unsigned int j = 0; j < childVis->GetChildCount(); ++j)
       {
-        std::string thisGeomType = childVis->GetChild(j)->GetGeometryType();
+        rendering::VisualPtr grandChildVis = childVis->GetChild(j);
+        std::string thisGeomType = grandChildVis->GetGeometryType();
+
+        if (grandChildVis->GetPose().pos != math::Vector3::Zero)
+        {
+          gzwarn << "Scaling is currently limited to simple shapes with their "
+              << "origin in the centroid." << std::endl;
+          return;
+        }
+
         if (thisGeomType == "")
           continue;
 
