@@ -130,27 +130,6 @@ void VisualConfig::AddVisual(const std::string &_name,
   msgs::Material *matMsg = msgToLoad.mutable_material();
   if (!matMsg->has_lighting())
       matMsg->set_lighting(true);
-  if (matMsg->has_script())
-  {
-    msgs::Material::Script *scriptMsg = matMsg->mutable_script();
-    if (scriptMsg && scriptMsg->has_name())
-    {
-      common::Color ambient;
-      common::Color diffuse;
-      common::Color specular;
-      common::Color emissive;
-      bool matFound = rendering::Material::GetMaterialAsColor(scriptMsg->name(),
-          ambient, diffuse, specular, emissive);
-
-      if (matFound)
-      {
-        msgs::Set(matMsg->mutable_ambient(), ambient);
-        msgs::Set(matMsg->mutable_diffuse(), diffuse);
-        msgs::Set(matMsg->mutable_specular(), specular);
-        msgs::Set(matMsg->mutable_emissive(), emissive);
-      }
-    }
-  }
 
   configWidget->Load(&msgToLoad);
 

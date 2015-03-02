@@ -23,6 +23,10 @@
     * [Pull request #1442](https://bitbucket.org/osrf/gazebo/pull-request/1442)
     * [Issue #1377](https://bitbucket.org/osrf/gazebo/issue/1377)
 
+1. Fixed Visual material updates
+    * [Pull request #1454](https://bitbucket.org/osrf/gazebo/pull-request/1454)
+    * [Issue #1455](https://bitbucket.org/osrf/gazebo/issue/1455)
+
  1. Model editor updates
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
@@ -43,6 +47,10 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
+1. Implement Coulomb joint friction for DART
+  * [Pull request #1427](https://bitbucket.org/osrf/gazebo/pull-request/1427)
+  * [Issue #1281](https://bitbucket.org/osrf/gazebo/issue/1281)
+
 1. Added Joint Msg-to-SDF conversion functions and test.
     * [Pull request #1419](https://bitbucket.org/osrf/gazebo/pull-request/1419)
 
@@ -102,7 +110,7 @@
   * [Issue #381](https://bitbucket.org/osrf/gazebo/issue/381)
 
 1. Implement Coulomb joint friction for BulletHingeJoint
-  * [Pull request #1221](https://bitbucket.org/osrf/gazebo/pull-request/1317)
+  * [Pull request #1317](https://bitbucket.org/osrf/gazebo/pull-request/1317)
   * [Issue #1348](https://bitbucket.org/osrf/gazebo/issue/1348)
 
 1. Implemented camera lens distortion.
@@ -288,6 +296,8 @@
     * [Pull request #1448](https://bitbucket.org/osrf/gazebo/pull-request/1448)
     * [Pull request #1446](https://bitbucket.org/osrf/gazebo/pull-request/1446)
     * [Issue #236](https://bitbucket.org/osrf/gazebo/issue/236)
+1. Fixed heightmap on OSX
+    * [Pull request #1455](https://bitbucket.org/osrf/gazebo/pull-request/1455)
 
 ### Gazebo 4.0.2 (2014-09-23)
 
