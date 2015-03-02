@@ -320,23 +320,50 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
   math::Vector3 scale = (bboxSize + pose.rot.RotateVectorReverse(distance))
       / bboxSize;
 
-  // a bit hacky to check for unit sphere and cylinder simple shapes in order
-  // to restrict the scaling dimensions.
-  // also extended scaling to work in model editor mode by checking geometry
+  // extended scaling to work in model editor mode by checking geometry
   // type of first visual child.
+  std::string geomType;
   if (_vis == _vis->GetRootVisual())
   {
-    if (this->dataPtr->keyEvent.key == Qt::Key_Shift ||
-        _vis->GetName().find("unit_sphere") != std::string::npos)
+    if (_vis->GetBoundingBox().GetCenter() != math::Vector3::Zero)
+    {
+      gzwarn << "Scaling is currently limited to simple shapes with their " <<
+          "origin in the centroid." << std::endl;
+      return;
+    }
+    // link-level visuals
+    for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+    {
+      rendering::VisualPtr childVis = _vis->GetChild(i);
+      // visual/collision level visuals
+      for (unsigned int j = 0; j < childVis->GetChildCount(); ++j)
+      {
+        std::string thisGeomType = childVis->GetChild(j)->GetGeometryType();
+        if (thisGeomType == "")
+          continue;
+
+        if (geomType == "")
+        {
+          geomType = thisGeomType;
+        }
+        else if (thisGeomType != geomType)
+        {
+          gzwarn << "Scaling is currently limited to models consisting of a " <<
+              "single simple geometry type." << std::endl;
+          return;
+        }
+      }
+    }
+
+    if (this->dataPtr->keyEvent.key == Qt::Key_Shift || geomType == "sphere")
     {
       scale = this->UpdateScale(_axis, scale, "sphere");
     }
-    else if (_vis->GetName().find("unit_cylinder") != std::string::npos)
+    else if (geomType == "cylinder")
     {
       scale = this->UpdateScale(_axis, scale, "cylinder");
     }
-    else if (_vis->GetName().find("unit_box") != std::string::npos ||
-        (_vis != _vis->GetRootVisual() && _vis->GetChildCount() > 0))
+    else if (geomType == "box")
     {
       // keep new scale as it is
     }
@@ -374,7 +401,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
     {
       rendering::VisualPtr childVis = _vis->GetChild(i);
-      std::string geomType = childVis->GetGeometryType();
+      geomType = childVis->GetGeometryType();
       if (childVis != this->dataPtr->selectionObj &&
           geomType != "" && geomType != "mesh")
       {
