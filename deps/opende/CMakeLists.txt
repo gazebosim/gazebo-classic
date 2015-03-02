@@ -178,6 +178,8 @@ src/optimize.cpp
 src/plane.cpp
 src/quickstep.cpp
 src/quickstep_util.cpp
+src/quickstep_pgs_lcp.cpp
+src/quickstep_cg_lcp.cpp
 src/ray.cpp
 src/robuststep.cpp
 src/rotation.cpp
