@@ -198,13 +198,15 @@ void SurfaceTest::CollideBitmask(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // get pointers to the falling boxes.
-  physics::ModelPtr box1, box2, box3;
+  physics::ModelPtr box1, box2, box3, box4;
   box1 = world->GetModel("box1");
   box2 = world->GetModel("box2");
   box3 = world->GetModel("box3");
+  box4 = world->GetModel("box4");
   ASSERT_TRUE(box1 != NULL);
   ASSERT_TRUE(box2 != NULL);
   ASSERT_TRUE(box3 != NULL);
+  ASSERT_TRUE(box4 != NULL);
 
   // Step forward 0.2 s
   double stepTime = 0.2;
@@ -216,11 +218,12 @@ void SurfaceTest::CollideBitmask(const std::string &_physicsEngine)
   EXPECT_LT(box1->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
   EXPECT_LT(box2->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
   EXPECT_LT(box3->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+  EXPECT_LT(box4->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
 
   // Another 2000 steps should put the boxes at rest
   world->Step(2000);
 
-  // Expect boxes to be stationary
+  // Expect 3 boxes to be stationary
   EXPECT_NEAR(box1->GetWorldLinearVel().z, 0, 1e-3);
   EXPECT_NEAR(box2->GetWorldLinearVel().z, 0, 1e-3);
   EXPECT_NEAR(box3->GetWorldLinearVel().z, 0, 1e-3);
@@ -231,6 +234,11 @@ void SurfaceTest::CollideBitmask(const std::string &_physicsEngine)
 
   // The third boxs should be ontop of the firs two boxes
   EXPECT_NEAR(box3->GetWorldPose().pos.z, 1.5, 1e-3);
+
+  // Expect 4th box to still be falling
+  fallVelocity = g.z * world->GetSimTime().Double();
+  EXPECT_LT(box4->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+
   Unload();
 }
 
