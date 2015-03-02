@@ -438,52 +438,41 @@ void PartData::OnApply()
         msgs::Material::Script *scriptMsg = matMsg->mutable_script();
 
         common::Color emptyColor;
-        bool matScriptChanged = false;
-        bool colorChanged = false;
-        common::Color ambient;
-        common::Color diffuse;
-        common::Color specular;
-        common::Color emissive;
+        common::Color matAmbient;
+        common::Color matDiffuse;
+        common::Color matSpecular;
+        common::Color matEmissive;
+        rendering::Material::GetMaterialAsColor(scriptMsg->name(), matAmbient,
+            matDiffuse, matSpecular, matEmissive);
 
-        if (!scriptMsg->name().empty())
+        common::Color ambient = msgs::Convert(matMsg->ambient());
+        common::Color diffuse = msgs::Convert(matMsg->diffuse());
+        common::Color specular = msgs::Convert(matMsg->specular());
+        common::Color emissive = msgs::Convert(matMsg->emissive());
+
+        if (ambient == emptyColor)
         {
-          rendering::Material::GetMaterialAsColor(scriptMsg->name(), ambient,
-              diffuse, specular, emissive);
-
-          visualConfig->SetMaterial(leafName, scriptMsg->name(), ambient,
-              diffuse, specular, emissive);
-
-          matScriptChanged = true;
-        }
-        else
-        {
-          ambient = msgs::Convert(matMsg->ambient());
-          diffuse = msgs::Convert(matMsg->diffuse());
-          specular = msgs::Convert(matMsg->specular());
-          emissive = msgs::Convert(matMsg->emissive());
-          if (ambient != it.first->GetAmbient()
-              || diffuse != it.first->GetDiffuse()
-              || specular != it.first->GetSpecular()
-              || emissive != it.first->GetEmissive())
-          {
-            colorChanged = true;
-          }
-        }
-
-        // update material or color, but not both
-        // clear empty colors so they are not used by visual updates
-        if (matScriptChanged || !colorChanged ||
-            msgs::Convert(matMsg->ambient()) == emptyColor)
           matMsg->clear_ambient();
-        if (matScriptChanged || !colorChanged ||
-            msgs::Convert(matMsg->diffuse()) == emptyColor)
+          ambient = matAmbient;
+        }
+        if (diffuse == emptyColor)
+        {
           matMsg->clear_diffuse();
-        if (matScriptChanged || !colorChanged ||
-            msgs::Convert(matMsg->specular()) == emptyColor)
+          diffuse = matDiffuse;
+        }
+        if (specular == emptyColor)
+        {
           matMsg->clear_specular();
-        if (matScriptChanged || !colorChanged ||
-            msgs::Convert(matMsg->emissive()) == emptyColor)
+          specular = matSpecular;
+        }
+        if (emissive == emptyColor)
+        {
           matMsg->clear_emissive();
+          emissive = matEmissive;
+        }
+
+        visualConfig->SetMaterial(leafName, scriptMsg->name(), ambient,
+            diffuse, specular, emissive);
 
         visualMsg.CopyFrom(*updateMsg);
         it.second = visualMsg;

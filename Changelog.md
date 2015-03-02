@@ -13,7 +13,7 @@
 1. Added Gazebo/CoM material.
     * [Pull request #1439](https://bitbucket.org/osrf/gazebo/pull-request/1439)
 
-1. Added arc parameter to MeshManager::CreateTube 
+1. Added arc parameter to MeshManager::CreateTube
     * [Pull request #1436](https://bitbucket.org/osrf/gazebo/pull-request/1436)
 
 1. Added View Inertia and InertiaVisual, changed COMVisual to sphere proportional to mass.
@@ -22,6 +22,10 @@
 1. Changed the position of Save and Cancel buttons on editor dialogs
     * [Pull request #1442](https://bitbucket.org/osrf/gazebo/pull-request/1442)
     * [Issue #1377](https://bitbucket.org/osrf/gazebo/issue/1377)
+
+1. Fixed Visual material updates
+    * [Pull request #1454](https://bitbucket.org/osrf/gazebo/pull-request/1454)
+    * [Issue #1455](https://bitbucket.org/osrf/gazebo/issue/1455)
 
 1. Added PresetManager to physics libraries and corresponding integration test.
     * [Pull request #1471](https://bitbucket.org/osrf/gazebo/pull-request/1471)
