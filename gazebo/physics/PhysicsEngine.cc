@@ -217,15 +217,64 @@ void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
 }
 
 //////////////////////////////////////////////////
-bool PhysicsEngine::SetParam(const std::string &/*_key*/,
-    const boost::any &/*_value*/)
+bool PhysicsEngine::SetParam(const std::string &_key,
+    const boost::any &_value)
 {
+  if (_key == "gravity")
+  {
+    math::Vector3 value;
+    if (!PhysicsEngine::AnyCast<math::Vector3>(_value, value))
+      return false;
+    this->SetGravity(value);
+  }
+  else if (_key == "max_contacts")
+  {
+    int value;
+    if (!PhysicsEngine::AnyCast<int>(_value, value))
+      return false;
+    this->SetMaxContacts(value);
+  }
+  else if (_key == "max_step_size")
+  {
+    double value;
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
+      return false;
+    this->SetMaxStepSize(value);
+  }
+  else if (_key == "real_time_factor")
+  {
+    double value;
+    if (!PhysicsEngine::AnyCast<double>(_value, value))
+      return false;
+    this->SetTargetRealTimeFactor(value);
+  }
+  else
+  {
+    // Key not found
+    return false;
+  }
   return true;
 }
 
 //////////////////////////////////////////////////
-boost::any PhysicsEngine::GetParam(const std::string &/*_key*/) const
+boost::any PhysicsEngine::GetParam(const std::string &_key) const
 {
+  if (_key == "gravity")
+  {
+    return this->GetGravity();
+  }
+  else if (_key == "max_contacts")
+  {
+    return this->GetMaxContacts();
+  }
+  else if (_key == "max_step_size")
+  {
+    return this->GetMaxStepSize();
+  }
+  else if (_key == "real_time_factor")
+  {
+    return this->GetTargetRealTimeFactor();
+  }
   return 0;
 }
 
@@ -234,3 +283,41 @@ ContactManager *PhysicsEngine::GetContactManager() const
 {
   return this->contactManager;
 }
+
+//////////////////////////////////////////////////
+template <class _Type> bool PhysicsEngine::AnyCast(const boost::any &_value,
+    _Type &_ret)
+{
+  try
+  {
+    _ret = boost::any_cast<_Type>(_value);
+  }
+  catch(const boost::bad_any_cast &e)
+  {
+    gzerr << "boost any_cast error:" << e.what() << std::endl;
+    return false;
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool PhysicsEngine::AnyCastInt(const boost::any &_value, int &_ret)
+{
+  if (!PhysicsEngine::AnyCast<int>(_value, _ret))
+  {
+    unsigned int uret;
+    if (!PhysicsEngine::AnyCast<unsigned int>(_value, uret))
+      return false;
+    _ret = static_cast<int>(uret);
+  }
+  return true;
+}
+
+template bool PhysicsEngine::AnyCast<double>(const boost::any &_value,
+    double &_ret);
+template bool PhysicsEngine::AnyCast<std::string>(const boost::any &_value,
+    std::string &_ret);
+template bool PhysicsEngine::AnyCast<bool>(const boost::any &_value,
+    bool &_ret);
+template bool PhysicsEngine::AnyCast<math::Vector3>(const boost::any &_value,
+    math::Vector3 &_ret);

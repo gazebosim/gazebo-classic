@@ -702,8 +702,8 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   }
   else
   {
-    gzwarn << _key << " is not supported in bullet" << std::endl;
-    return false;
+    //gzwarn << _key << " is not supported in bullet" << std::endl;
+    return PhysicsEngine::SetParam(_key, _value);
   }
 
   return true;
@@ -746,8 +746,8 @@ boost::any BulletPhysics::GetParam(const std::string &_key) const
     return this->GetMaxStepSize();
   else
   {
-    gzwarn << _key << " is not supported in bullet" << std::endl;
-    return 0;
+    //gzwarn << _key << " is not supported in bullet" << std::endl;
+    return PhysicsEngine::GetParam(_key);
   }
 }
 

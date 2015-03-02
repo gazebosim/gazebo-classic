@@ -1372,9 +1372,9 @@ boost::any SimbodyPhysics::GetParam(const std::string &_key) const
   }
   else
   {
-    gzwarn << "key [" << _key
-           << "] not supported, returning (int)0." << std::endl;
-    return 0;
+    /*gzwarn << "key [" << _key
+           << "] not supported, returning (int)0." << std::endl;*/
+    return PhysicsEngine::GetParam(_key);
   }
 }
 
@@ -1432,8 +1432,8 @@ bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
   }
   else
   {
-    gzwarn << _key << " is not supported in Simbody" << std::endl;
-    return false;
+    //gzwarn << _key << " is not supported in Simbody" << std::endl;
+    return PhysicsEngine::SetParam(_key, _value);
   }
   // should never get here
   return false;
