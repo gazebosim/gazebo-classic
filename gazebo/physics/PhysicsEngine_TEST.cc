@@ -106,7 +106,7 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
     EXPECT_NO_THROW(physics->SetParam("fake_param_name", 0));
 
     // Try SetParam with wrong type
-    EXPECT_NO_THROW(physics->SetParam("iters", "wrong"));
+    EXPECT_NO_THROW(physics->SetParam("iters", std::string("wrong")));
   }
 
   physicsNode->Fini();
