@@ -8,7 +8,7 @@
     * [Pull request #1415](https://bitbucket.org/osrf/gazebo/pull-request/1415)
 
 1. Implement Coulomb joint friction for BulletSliderJoint
-  * [Pull request #1221](https://bitbucket.org/osrf/gazebo/pull-request/1452)
+  * [Pull request #1452](https://bitbucket.org/osrf/gazebo/pull-request/1452)
   * [Issue #1348](https://bitbucket.org/osrf/gazebo/issue/1348)
 
 ### Gazebo 5.0.0
