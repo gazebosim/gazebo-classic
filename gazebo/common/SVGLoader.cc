@@ -127,7 +127,6 @@ math::Vector2d SVGLoader::SubpathToPolyline(
           i += 2;
         }
         break;
-     
       case 'M':
       case 'L':
         while (i < count)
@@ -173,7 +172,7 @@ math::Vector2d SVGLoader::SubpathToPolyline(
         }
         break;
       default:
-        gzerr << "Unexpected SVGCommand value: " << cmd.cmd;
+        gzerr << "Unexpected SVGCommand value: " << cmd.cmd << std::endl;
     }
   }
 
@@ -354,7 +353,8 @@ void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
     else if (name == "transform")
     {
       _path.transform = value;
-      gzwarn << "transform attribute \"" << name  << "\" not implemented yet"  << std::endl;
+      gzwarn << "transform attribute \"" << name
+        << "\" not implemented yet"  << std::endl;
     }
     else if (name == "d")
     {
