@@ -47,6 +47,10 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
+1. Implement Coulomb joint friction for DART
+  * [Pull request #1427](https://bitbucket.org/osrf/gazebo/pull-request/1427)
+  * [Issue #1281](https://bitbucket.org/osrf/gazebo/issue/1281)
+
 1. Added Joint Msg-to-SDF conversion functions and test.
     * [Pull request #1419](https://bitbucket.org/osrf/gazebo/pull-request/1419)
 
@@ -106,7 +110,7 @@
   * [Issue #381](https://bitbucket.org/osrf/gazebo/issue/381)
 
 1. Implement Coulomb joint friction for BulletHingeJoint
-  * [Pull request #1221](https://bitbucket.org/osrf/gazebo/pull-request/1317)
+  * [Pull request #1317](https://bitbucket.org/osrf/gazebo/pull-request/1317)
   * [Issue #1348](https://bitbucket.org/osrf/gazebo/issue/1348)
 
 1. Implemented camera lens distortion.
