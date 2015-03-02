@@ -17,6 +17,7 @@
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 
+using namespace gazebo;
 class WorldTest : public ServerFixture
 {
 };
