@@ -16,6 +16,10 @@
 1. Added Visual, Material Msg-to-SDF conversion functions and ShaderType to string conversion functions.
     * [Pull request #1415](https://bitbucket.org/osrf/gazebo/pull-request/1415)
 
+1. Implement Coulomb joint friction for BulletSliderJoint
+  * [Pull request #1452](https://bitbucket.org/osrf/gazebo/pull-request/1452)
+  * [Issue #1348](https://bitbucket.org/osrf/gazebo/issue/1348)
+
 ### Gazebo 5.0.0
 1. Support for using [digital elevation maps](http://gazebosim.org/tutorials?tut=dem) has been added to debian packages.
 
