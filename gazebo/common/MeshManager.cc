@@ -262,18 +262,17 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   mesh->AddSubMesh(subMesh);
 
   // Generate the group of rings for the sphere
-  for (ring = 0; ring <= rings; ring++)
+  for (ring = 0; ring <= rings; ++ring)
   {
     float r0 = radius * sinf(ring * deltaRingAngle);
     vert.y = radius * cosf(ring * deltaRingAngle);
 
     // Generate the group of segments for the current ring
-    for (seg = 0; seg <= segments; seg++)
+    for (seg = 0; seg <= segments; ++seg)
     {
       vert.x = r0 * sinf(seg * deltaSegAngle);
       vert.z = r0 * cosf(seg * deltaSegAngle);
 
-      // TODO: Don't think these normals are correct.
       norm = vert;
       norm.Normalize();
 
@@ -298,8 +297,6 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
       }
     }
   }
-
-  mesh->RecalculateNormals();
 }
 
 //////////////////////////////////////////////////
@@ -404,21 +401,25 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   // Vertex values
   float v[8][3] =
   {
-    {-1, -1, -1}, {-1, -1, +1}, {+1, -1, +1}, {+1, -1, -1},
-    {-1, +1, -1}, {-1, +1, +1}, {+1, +1, +1}, {+1, +1, -1}
+    {-1, -1, -1},
+    {-1, -1, +1},
+    {+1, -1, +1},
+    {+1, -1, -1},
+    {-1, +1, -1},
+    {-1, +1, +1},
+    {+1, +1, +1},
+    {+1, +1, -1}
   };
 
   // Normals for each vertex
-  float n[8][3]=
+  float n[6][3]=
   {
-    {-0.577350, -0.577350, -0.577350},
-    {-0.577350, -0.577350, 0.577350},
-    {0.577350, -0.577350, 0.577350},
-    {0.577350, -0.577350, -0.577350},
-    {-0.577350, 0.577350, -0.577350},
-    {-0.577350, 0.577350, 0.577350},
-    {0.577350, 0.577350, 0.577350},
-    {0.577350, 0.577350, -0.577350}
+    {+0, -1, +0},
+    {+0, +1, +0},
+    {+0, +0, +1},
+    {-1, +0, +0},
+    {+0, +0, -1},
+    {+1, +0, +0},
   };
 
   // Texture coords
@@ -453,7 +454,7 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   };
 
   // Compute the vertices
-  for (i = 0; i < 8; i++)
+  for (i = 0; i < 8; ++i)
   {
     v[i][0] *= sides.x * 0.5;
     v[i][1] *= sides.y * 0.5;
@@ -461,15 +462,15 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   }
 
   // For each face
-  for (i = 0; i < 6; i++)
+  for (i = 0; i < 6; ++i)
   {
     // For each vertex in the face
     for (k = 0; k < 4; k++)
     {
-      subMesh->AddVertex(v[faces[i][k]][0], v[faces[i][k]][1],
-          v[faces[i][k]][2]);
-      subMesh->AddNormal(n[faces[i][k]][0], n[faces[i][k]][1],
-          n[faces[i][k]][2]);
+      subMesh->AddVertex(v[faces[i][k]][0],
+                         v[faces[i][k]][1],
+                         v[faces[i][k]][2]);
+      subMesh->AddNormal(n[i][0], n[i][1], n[i][2]);
       subMesh->AddTexCoord(t[k][0], t[k][1]);
     }
   }
@@ -477,8 +478,6 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   // Set the indices
   for (i = 0; i < 36; i++)
     subMesh->AddIndex(ind[i]);
-
-  subMesh->RecalculateNormals();
 }
 
 //////////////////////////////////////////////////
@@ -724,20 +723,20 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
-
   // Generate the group of rings for the sphere
-  for (ring = 0; ring <= rings; ring++)
+  for (ring = 0; ring <= rings; ++ring)
   {
     vert.z = ring * height/rings - height/2.0;
 
     // Generate the group of segments for the current ring
-    for (seg = 0; seg <= segments; seg++)
+    for (seg = 0; seg <= segments; ++seg)
     {
       vert.y = radius * cosf(seg * deltaSegAngle);
       vert.x = radius * sinf(seg * deltaSegAngle);
 
       // TODO: Don't think these normals are correct.
       norm = vert;
+      norm.z = 0;
       norm.Normalize();
 
       // Add one vertex to the strip which makes up the sphere
@@ -788,23 +787,6 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
     subMesh->AddIndex(seg);
     subMesh->AddIndex(seg+1);
   }
-
-  // Fix all the normals
-  for (i = 0; i+3 < subMesh->GetIndexCount(); i+= 3)
-  {
-    norm.Set();
-
-    for (j = 0; j < 3; j++)
-      norm += subMesh->GetNormal(subMesh->GetIndex(i+j));
-
-    norm /= 3;
-    norm.Normalize();
-
-    for (j = 0; j < 3; j++)
-      subMesh->SetNormal(subMesh->GetIndex(i+j), norm);
-  }
-
-  mesh->RecalculateNormals();
 }
 
 //////////////////////////////////////////////////
