@@ -44,6 +44,10 @@
         * [Pull request #1449](https://bitbucket.org/osrf/gazebo/pull-request/1449)
         * [Issue #1443](https://bitbucket.org/osrf/gazebo/issue/1443)
 
+    1. Added button to select mesh file on inspector.
+        * [Pull request #1460](https://bitbucket.org/osrf/gazebo/pull-request/1460)
+        * [Issue #1450](https://bitbucket.org/osrf/gazebo/issue/1450)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
