@@ -55,10 +55,10 @@ TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
   {
     EXPECT_NEAR(boost::any_cast<double>(
         physicsEngine->GetParam("max_step_size")), 0.01, 1e-4);
-    EXPECT_NEAR(boost::any_cast<double>(
-        physicsEngine->GetParam("min_step_size")), 0.001, 1e-4);
     if (physicsEngineName == "ode" || physicsEngineName == "bullet")
     {
+      EXPECT_NEAR(boost::any_cast<double>(
+          physicsEngine->GetParam("min_step_size")), 0.001, 1e-4);
       EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("cfm")),
           0.01, 1e-4);
       EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("erp")),
