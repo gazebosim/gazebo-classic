@@ -361,11 +361,11 @@ LinkData* LinkData::Clone(const std::string &_newName)
     cloneVisName = linkVisualName.substr(0, linkIdx+2) + _newName;
 
   // clone linkVisual;
-  rendering::VisualPtr linkVisual(new rendering::Visual(cloneVisName,
+  rendering::VisualPtr linkVis(new rendering::Visual(cloneVisName,
       this->linkVisual->GetParent()));
-  linkVisual->Load();
+  linkVis->Load();
 
-  cloneLink->linkVisual = linkVisual;
+  cloneLink->linkVisual = linkVis;
 
   for (auto &visIt : this->visuals)
   {

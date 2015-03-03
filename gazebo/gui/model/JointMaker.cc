@@ -723,6 +723,7 @@ void JointMaker::Update()
             Ogre::SceneNode *handleNode = joint->handles->getParentSceneNode();
             joint->handles->detachFromParent();
             joint->hotspot->SetMaterial(material);
+            joint->hotspot->SetTransparency(0.5);
             handleNode->attachObject(joint->handles);
             Ogre::MaterialPtr mat =
                 Ogre::MaterialManager::getSingleton().getByName(material);

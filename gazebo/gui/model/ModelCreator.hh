@@ -61,8 +61,8 @@ namespace gazebo
     {
       Q_OBJECT
 
-      /// \enum Joint types
-      /// \brief Unique identifiers for joint types that can be created.
+      /// \enum Link types
+      /// \brief Unique identifiers for link types that can be created.
       public: enum LinkType
       {
         /// \brief none
