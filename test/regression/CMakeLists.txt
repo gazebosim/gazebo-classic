@@ -24,6 +24,7 @@ endif()
 set(tests
   351_world_step.cc
   494_joint_axis_frame.cc
+  602_unsubscribe_segfault.cc
   624_collision_world_pose.cc
   876_random_number_generator.cc
   940_force_torque_sensor_frame.cc
