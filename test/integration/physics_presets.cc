@@ -43,14 +43,6 @@ TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
   {
     FAIL();
   }
-
-  // SimbodyPhysics::SetParam is not implemented, so we can't expect any of the
-  // parameter setting to work.
-
-  if (physicsEngineName == "simbody")
-  {
-    return;
-  }
   try
   {
     EXPECT_NEAR(boost::any_cast<double>(
@@ -80,6 +72,13 @@ TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
     {
       EXPECT_FALSE(boost::any_cast<bool>(
           physicsEngine->GetParam("split_impulse")));
+    }
+    if (physicsEngineName == "simbody")
+    {
+      EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("accuracy")),
+          0.01, 1e-4);
+      EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam(
+          "max_transient_velocity")), 0.001, 1e-4);
     }
   }
   catch(const boost::bad_any_cast& e)
