@@ -9,6 +9,9 @@
 1. Get and Set visibility of SelectionObj's handles, with unit test.
     * [Pull request #1417](https://bitbucket.org/osrf/gazebo/pull-request/1417)
 
+1. Set material of SelectionObj's handles.
+    * [Pull request #1472](https://bitbucket.org/osrf/gazebo/pull-request/1472)
+
 1. Allow link selection with the mouse if parent model already selected.
     * [Pull request #1409](https://bitbucket.org/osrf/gazebo/pull-request/1409)
 
@@ -18,7 +21,7 @@
 1. Added Gazebo/CoM material.
     * [Pull request #1439](https://bitbucket.org/osrf/gazebo/pull-request/1439)
 
-1. Added arc parameter to MeshManager::CreateTube 
+1. Added arc parameter to MeshManager::CreateTube
     * [Pull request #1436](https://bitbucket.org/osrf/gazebo/pull-request/1436)
 
 1. Added View Inertia and InertiaVisual, changed COMVisual to sphere proportional to mass.
@@ -27,6 +30,10 @@
 1. Changed the position of Save and Cancel buttons on editor dialogs
     * [Pull request #1442](https://bitbucket.org/osrf/gazebo/pull-request/1442)
     * [Issue #1377](https://bitbucket.org/osrf/gazebo/issue/1377)
+
+1. Fixed Visual material updates
+    * [Pull request #1454](https://bitbucket.org/osrf/gazebo/pull-request/1454)
+    * [Issue #1455](https://bitbucket.org/osrf/gazebo/issue/1455)
 
 1. Model editor updates
     1. Joint preview using JointVisuals.
@@ -45,12 +52,22 @@
         * [Pull request #1449](https://bitbucket.org/osrf/gazebo/pull-request/1449)
         * [Issue #1443](https://bitbucket.org/osrf/gazebo/issue/1443)
 
+    1. Added button to select mesh file on inspector.
+        * [Pull request #1460](https://bitbucket.org/osrf/gazebo/pull-request/1460)
+        * [Issue #1450](https://bitbucket.org/osrf/gazebo/issue/1450)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
 1. Implement Coulomb joint friction for DART
   * [Pull request #1427](https://bitbucket.org/osrf/gazebo/pull-request/1427)
   * [Issue #1281](https://bitbucket.org/osrf/gazebo/issue/1281)
+
+1. Use Msg-to-SDF conversion functions in tests, add ServerFixture::SpawnModel(msgs::Model).
+    * [Pull request #1466](https://bitbucket.org/osrf/gazebo/pull-request/1466)
+
+1. Added Model Msg-to-SDF conversion functions and test.
+    * [Pull request #1429](https://bitbucket.org/osrf/gazebo/pull-request/1429)
 
 1. Added Joint Msg-to-SDF conversion functions and test.
     * [Pull request #1419](https://bitbucket.org/osrf/gazebo/pull-request/1419)

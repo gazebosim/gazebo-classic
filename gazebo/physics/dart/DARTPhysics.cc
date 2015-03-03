@@ -420,53 +420,34 @@ boost::any DARTPhysics::GetParam(const std::string &_key) const
 bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
   /// \TODO fill this out, see issue #1115
-  if (_key == "max_contacts")
+  try
   {
-    int value;
-    try
+    if (_key == "max_contacts")
     {
-      value = boost::any_cast<int>(_value);
+      int value = boost::any_cast<int>(_value);
+      gzerr << "Setting [" << _key << "] in DART to [" << value
+            << "] not yet supported.\n";
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "min_step_size")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+      double value = boost::any_cast<double>(_value);
+      gzerr << "Setting [" << _key << "] in DART to [" << value
+            << "] not yet supported.\n";
+    }
+    else if (_key == "max_step_size")
+    {
+      this->dtWorld->setTimeStep(boost::any_cast<double>(_value));
+    }
+    else
+    {
+      gzwarn << _key << " is not supported in DART" << std::endl;
       return false;
     }
-    gzerr << "Setting [" << _key << "] in DART to [" << value
-          << "] not yet supported.\n";
   }
-  else if (_key == "min_step_size")
+  catch(boost::bad_any_cast &e)
   {
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    gzerr << "Setting [" << _key << "] in DART to [" << value
-          << "] not yet supported.\n";
-  }
-  else if (_key == "max_step_size")
-  {
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    this->dtWorld->setTimeStep(value);
-  }
-  else
-  {
-    gzwarn << _key << " is not supported in DART" << std::endl;
+    gzerr << "DARTPhysics::SetParam(" << _key << ") boost::any_cast error: "
+          << e.what() << std::endl;
     return false;
   }
   return true;

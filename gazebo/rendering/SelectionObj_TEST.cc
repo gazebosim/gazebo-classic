@@ -49,26 +49,62 @@ TEST_F(SelectionObj_TEST, SelectionObjTest)
   // Selection none = no handles visible
   obj->SetMode(rendering::SelectionObj::SELECTION_NONE);
   EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::TRANS));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::TRANS_X));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::TRANS_Y));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::TRANS_Z));
   EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::ROT));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::ROT_X));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::ROT_Y));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::ROT_Z));
   EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::SCALE));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::SCALE_X));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::SCALE_Y));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::SCALE_Z));
 
-  // Translate handles visible
+  // Translate group visible
   obj->SetMode(rendering::SelectionObj::TRANS);
   EXPECT_TRUE(obj->GetHandleVisible(rendering::SelectionObj::TRANS));
+  EXPECT_TRUE(obj->GetHandleVisible(rendering::SelectionObj::TRANS_X));
+  EXPECT_TRUE(obj->GetHandleVisible(rendering::SelectionObj::TRANS_Y));
+  EXPECT_TRUE(obj->GetHandleVisible(rendering::SelectionObj::TRANS_Z));
   EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::ROT));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::ROT_X));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::ROT_Y));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::ROT_Z));
   EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::SCALE));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::SCALE_X));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::SCALE_Y));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::SCALE_Z));
 
-  // Rotate handles visible
+  // Rotate group visible
   obj->SetMode(rendering::SelectionObj::ROT);
   EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::TRANS));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::TRANS_X));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::TRANS_Y));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::TRANS_Z));
   EXPECT_TRUE(obj->GetHandleVisible(rendering::SelectionObj::ROT));
+  EXPECT_TRUE(obj->GetHandleVisible(rendering::SelectionObj::ROT_X));
+  EXPECT_TRUE(obj->GetHandleVisible(rendering::SelectionObj::ROT_Y));
+  EXPECT_TRUE(obj->GetHandleVisible(rendering::SelectionObj::ROT_Z));
   EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::SCALE));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::SCALE_X));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::SCALE_Y));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::SCALE_Z));
 
-  // Scale handles visible
+  // Scale group visible
   obj->SetMode(rendering::SelectionObj::SCALE);
   EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::TRANS));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::TRANS_X));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::TRANS_Y));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::TRANS_Z));
   EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::ROT));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::ROT_X));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::ROT_Y));
+  EXPECT_FALSE(obj->GetHandleVisible(rendering::SelectionObj::ROT_Z));
   EXPECT_TRUE(obj->GetHandleVisible(rendering::SelectionObj::SCALE));
+  EXPECT_TRUE(obj->GetHandleVisible(rendering::SelectionObj::SCALE_X));
+  EXPECT_TRUE(obj->GetHandleVisible(rendering::SelectionObj::SCALE_Y));
+  EXPECT_TRUE(obj->GetHandleVisible(rendering::SelectionObj::SCALE_Z));
 
   // Set child handles
   obj->SetHandleVisible(rendering::SelectionObj::TRANS_X, true);
