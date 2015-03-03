@@ -707,7 +707,6 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
 {
   math::Vector3 vert, norm;
   unsigned int verticeIndex = 0;
-  unsigned int i;
   int ring, seg;
   float deltaSegAngle = (2.0 * M_PI / segments);
 
