@@ -14,6 +14,11 @@
     + ***Removed:*** public: std::vector<math::Vector2d> GetVertices() const
     + ***Replacement:*** public: std::vector<std::vector<math::Vector2d> > GetVertices() const
 
+### Deletions
+
+1. **gazebo/gui/RenderWidget.hh**
+    + The ShowEditor(bool _show)
+
 ## Gazebo 4.X to 5.X
 
 ### C++11 compiler required

@@ -4,6 +4,9 @@
 1. Get and Set visibility of SelectionObj's handles, with unit test.
     * [Pull request #1417](https://bitbucket.org/osrf/gazebo/pull-request/1417)
 
+1. Set material of SelectionObj's handles.
+    * [Pull request #1472](https://bitbucket.org/osrf/gazebo/pull-request/1472)
+
 1. Allow link selection with the mouse if parent model already selected.
     * [Pull request #1409](https://bitbucket.org/osrf/gazebo/pull-request/1409)
 
@@ -43,6 +46,10 @@
     1. Add joint inspector to link's context menu.
         * [Pull request #1449](https://bitbucket.org/osrf/gazebo/pull-request/1449)
         * [Issue #1443](https://bitbucket.org/osrf/gazebo/issue/1443)
+
+    1. Added button to select mesh file on inspector.
+        * [Pull request #1460](https://bitbucket.org/osrf/gazebo/pull-request/1460)
+        * [Issue #1450](https://bitbucket.org/osrf/gazebo/issue/1450)
 
 ## Gazebo 5.0
 
