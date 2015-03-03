@@ -265,6 +265,15 @@ namespace gazebo
       /// \return Angular acceleration of the body.
       public: math::Vector3 GetRelativeAngularAccel() const;
 
+      /// \brief Get the angular momentum of the body CoG in the world frame,
+      /// which is computed as (I^-1 * (T - w x L)), where
+      /// I: inertia matrix in world frame
+      /// T: sum of external torques in world frame
+      /// L: angular momentum of CoG in world frame
+      /// w: angular velocity in world frame
+      /// \return Angular momentum of the body.
+      public: math::Vector3 GetWorldAngularMomentum() const;
+
       /// \brief Get the angular acceleration of the body in the world
       /// frame.
       /// \return Angular acceleration of the body in the world frame.
