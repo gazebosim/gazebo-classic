@@ -110,6 +110,14 @@ namespace gazebo
       /// \brief Update callback on PreRender.
       private: void Update();
 
+      /// \brief Apply inspector configurations.
+      /// \return True if successful.
+      private: bool Apply();
+
+      /// \brief Qt Callback when part inspector configurations are to be
+      /// applied and inspector should be closed.
+      private slots: void OnAccept();
+
       /// \brief Qt Callback when part inspector configurations are to be
       /// applied.
       private slots: void OnApply();

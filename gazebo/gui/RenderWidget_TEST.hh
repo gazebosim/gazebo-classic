@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,18 @@
  *
 */
 
-#ifndef _GAZEBO_DART_INC_H_
-#define _GAZEBO_DART_INC_H_
+#ifndef _RENDERWIDGET_TEST_HH_
+#define _RENDERWIDGET_TEST_HH_
 
-// This disables warning messages for ODE
-#pragma GCC system_header
+#include "gazebo/gui/QTestFixture.hh"
 
-#include <dart/common/common.h>
-#include <dart/math/math.h>
-#include <dart/collision/collision.h>
-#include <dart/integration/integration.h>
-#include <dart/dynamics/dynamics.h>
-#include <dart/constraint/constraint.h>
-#include <dart/simulation/simulation.h>
+/// \brief A test class for the RenderWidget.
+class RenderWidget_TEST : public QTestFixture
+{
+  Q_OBJECT
+
+  /// \brief Test inserting widgets to the render widget
+  private slots: void InsertWidget();
+};
 
 #endif

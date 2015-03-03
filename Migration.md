@@ -1,3 +1,10 @@
+## Gazebo 5.X to 6.X
+
+### Deletions
+
+1. **gazebo/gui/RenderWidget.hh**
+    + The ShowEditor(bool _show)
+
 ## Gazebo 4.X to 5.X
 
 ### C++11 compiler required

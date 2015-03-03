@@ -1147,225 +1147,123 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
 
-  if (_key == "solver_type")
+  try
   {
-    std::string value;
-    try
+    if (_key == "solver_type")
     {
-      value = boost::any_cast<std::string>(_value);
+      this->SetStepType(boost::any_cast<std::string>(_value));
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "cfm")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("constraints")->GetElement("cfm")->Set(value);
+      dWorldSetCFM(this->dataPtr->worldId, value);
     }
-    this->SetStepType(value);
-  }
-  else if (_key == "cfm")
-  {
-    double value;
-    try
+    else if (_key == "erp")
     {
-      value = boost::any_cast<double>(_value);
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("constraints")->GetElement("erp")->Set(value);
+      dWorldSetERP(this->dataPtr->worldId, value);
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "precon_iters")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      int value = boost::any_cast<int>(_value);
+      odeElem->GetElement("solver")->GetElement("precon_iters")->Set(value);
+      dWorldSetQuickStepPreconIterations(this->dataPtr->worldId, value);
     }
-    odeElem->GetElement("constraints")->GetElement("cfm")->Set(value);
-    dWorldSetCFM(this->dataPtr->worldId, value);
-  }
-  else if (_key == "erp")
-  {
-    double value;
-    try
+    else if (_key == "iters")
     {
-      value = boost::any_cast<double>(_value);
+      int value = boost::any_cast<int>(_value);
+      odeElem->GetElement("solver")->GetElement("iters")->Set(value);
+      dWorldSetQuickStepNumIterations(this->dataPtr->worldId, value);
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "sor")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("solver")->GetElement("sor")->Set(value);
+      dWorldSetQuickStepW(this->dataPtr->worldId, value);
     }
-    odeElem->GetElement("constraints")->GetElement("erp")->Set(value);
-    dWorldSetERP(this->dataPtr->worldId, value);
-  }
-  else if (_key == "precon_iters")
-  {
-    int value;
-    try
+    else if (_key == "contact_max_correcting_vel")
     {
-      try
-      {
-        value = boost::any_cast<int>(_value);
-      }
-      catch(const boost::bad_any_cast &e)
-      {
-        value = boost::any_cast<unsigned int>(_value);
-      }
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("constraints")->GetElement(
+          "contact_max_correcting_vel")->Set(value);
+      dWorldSetContactMaxCorrectingVel(this->dataPtr->worldId, value);
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "contact_surface_layer")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("constraints")->GetElement(
+          "contact_surface_layer")->Set(value);
+      dWorldSetContactSurfaceLayer(this->dataPtr->worldId, value);
     }
-    odeElem->GetElement("solver")->GetElement("precon_iters")->Set(value);
-    dWorldSetQuickStepPreconIterations(this->dataPtr->worldId, value);
-  }
-  else if (_key == "iters")
-  {
-    int value;
-    try
+    else if (_key == "max_contacts")
     {
-      try
-      {
-        value = boost::any_cast<int>(_value);
-      }
-      catch(const boost::bad_any_cast &e)
-      {
-        value = boost::any_cast<unsigned int>(_value);
-      }
+      int value = boost::any_cast<int>(_value);
+      this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "min_step_size")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      /// TODO: Implement min step size param
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
     }
-    odeElem->GetElement("solver")->GetElement("iters")->Set(value);
-    dWorldSetQuickStepNumIterations(this->dataPtr->worldId, value);
-  }
-  else if (_key == "sor")
-  {
-    double value = boost::any_cast<double>(_value);
-    odeElem->GetElement("solver")->GetElement("sor")->Set(value);
-    dWorldSetQuickStepW(this->dataPtr->worldId, value);
-  }
-  else if (_key == "contact_max_correcting_vel")
-  {
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    odeElem->GetElement("constraints")->GetElement(
-        "contact_max_correcting_vel")->Set(value);
-    dWorldSetContactMaxCorrectingVel(this->dataPtr->worldId, value);
-  }
-  else if (_key == "contact_surface_layer")
-  {
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    odeElem->GetElement("constraints")->GetElement(
-        "contact_surface_layer")->Set(value);
-    dWorldSetContactSurfaceLayer(this->dataPtr->worldId, value);
-  }
-  else if (_key == "max_contacts")
-  {
-    int value;
-    try
-    {
-      try
-      {
-        value = boost::any_cast<int>(_value);
-      }
-      catch(const boost::bad_any_cast &e)
-      {
-        value = boost::any_cast<unsigned int>(_value);
-      }
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
-  }
-  else if (_key == "min_step_size")
-  {
-    /// TODO: Implement min step size param
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    odeElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
-  }
-  else if (_key == "max_step_size")
-  {
-    try
+    else if (_key == "max_step_size")
     {
       this->SetMaxStepSize(boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "sor_lcp_tolerance")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+      dWorldSetQuickStepTolerance(this->dataPtr->worldId,
+          boost::any_cast<double>(_value));
+    }
+    else if (_key == "rms_error_tolerance")
+    {
+      gzwarn << "please use sor_lcp_tolerance in the future.\n";
+      dWorldSetQuickStepTolerance(this->dataPtr->worldId,
+          boost::any_cast<double>(_value));
+    }
+    else if (_key == "inertia_ratio_reduction")
+    {
+      bool value = boost::any_cast<bool>(_value);
+      dWorldSetQuickStepInertiaRatioReduction(this->dataPtr->worldId, value);
+      if (odeElem->GetElement("solver")->HasElement(
+            "use_dynamic_moi_rescaling"))
+      {
+        odeElem->GetElement("solver")->GetElement(
+            "use_dynamic_moi_rescaling")->Set(value);
+      }
+    }
+    else if (_key == "contact_residual_smoothing")
+    {
+      dWorldSetQuickStepContactResidualSmoothing(this->dataPtr->worldId,
+        boost::any_cast<double>(_value));
+    }
+    else if (_key == "experimental_row_reordering")
+    {
+      dWorldSetQuickStepExperimentalRowReordering(this->dataPtr->worldId,
+        boost::any_cast<bool>(_value));
+    }
+    else if (_key == "warm_start_factor")
+    {
+      dWorldSetQuickStepWarmStartFactor(this->dataPtr->worldId,
+        boost::any_cast<double>(_value));
+    }
+    else if (_key == "extra_friction_iterations")
+    {
+      dWorldSetQuickStepExtraFrictionIterations(this->dataPtr->worldId,
+        boost::any_cast<int>(_value));
+    }
+    else
+    {
+      gzwarn << _key << " is not supported in ode" << std::endl;
       return false;
     }
   }
-  else if (_key == "sor_lcp_tolerance")
+  catch(boost::bad_any_cast &e)
   {
-    dWorldSetQuickStepTolerance(this->dataPtr->worldId,
-        boost::any_cast<double>(_value));
-  }
-  else if (_key == "rms_error_tolerance")
-  {
-    gzwarn << "please use sor_lcp_tolerance in the future.\n";
-    dWorldSetQuickStepTolerance(this->dataPtr->worldId,
-        boost::any_cast<double>(_value));
-  }
-  else if (_key == "inertia_ratio_reduction")
-  {
-    bool value = boost::any_cast<bool>(_value);
-    dWorldSetQuickStepInertiaRatioReduction(this->dataPtr->worldId, value);
-    if (odeElem->GetElement("solver")->HasElement(
-          "use_dynamic_moi_rescaling"))
-    {
-      odeElem->GetElement("solver")->GetElement(
-          "use_dynamic_moi_rescaling")->Set(value);
-    }
-  }
-  else if (_key == "contact_residual_smoothing")
-  {
-    dWorldSetQuickStepContactResidualSmoothing(this->dataPtr->worldId,
-      boost::any_cast<double>(_value));
-  }
-  else if (_key == "experimental_row_reordering")
-  {
-    dWorldSetQuickStepExperimentalRowReordering(this->dataPtr->worldId,
-      boost::any_cast<bool>(_value));
-  }
-  else if (_key == "warm_start_factor")
-  {
-    dWorldSetQuickStepWarmStartFactor(this->dataPtr->worldId,
-      boost::any_cast<double>(_value));
-  }
-  else if (_key == "extra_friction_iterations")
-  {
-    dWorldSetQuickStepExtraFrictionIterations(this->dataPtr->worldId,
-      boost::any_cast<int>(_value));
-  }
-  else
-  {
-    gzwarn << _key << " is not supported in ode" << std::endl;
+    gzerr << "ODEPhysics::SetParam(" << _key << ") boost::any_cast error: "
+          << e.what() << std::endl;
     return false;
   }
   return true;
