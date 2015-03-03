@@ -80,6 +80,7 @@ PartData::PartData()
   this->inspector = new LinkInspector();
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
+  connect(this->inspector, SIGNAL(Accepted()), this, SLOT(OnAccept()));
   connect(this->inspector->GetVisualConfig(),
       SIGNAL(VisualAdded(const std::string &)),
       this, SLOT(OnAddVisual(const std::string &)));
@@ -408,13 +409,29 @@ PartData* PartData::Clone(const std::string &_newName)
 }
 
 /////////////////////////////////////////////////
+void PartData::OnAccept()
+{
+  if (this->Apply())
+    this->inspector->accept();
+}
+
+/////////////////////////////////////////////////
 void PartData::OnApply()
+{
+  this->Apply();
+}
+
+/////////////////////////////////////////////////
+bool PartData::Apply()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
 
   this->partSDF = msgs::LinkToSDF(*linkConfig->GetData(), this->partSDF);
   this->partVisual->SetPose(this->GetPose());
+
+  std::vector<msgs::Visual *> visualUpdateMsgsTemp;
+  std::vector<msgs::Collision *> collisionUpdateMsgsTemp;
 
   // update visuals
   if (!this->visuals.empty())
@@ -432,63 +449,71 @@ void PartData::OnApply()
       {
         msgs::Visual visualMsg = it.second;
 
+        // check if the geometry is valid
+        msgs::Geometry *geomMsg = updateMsg->mutable_geometry();
+        if (geomMsg->type() == msgs::Geometry::MESH)
+        {
+          msgs::MeshGeom *meshGeom = geomMsg->mutable_mesh();
+          QFileInfo info(QString::fromStdString(meshGeom->filename()));
+          if (!info.isFile() || (info.completeSuffix().toLower() != "dae" &&
+              info.completeSuffix().toLower() != "stl"))
+          {
+            std::string msg = "\"" + meshGeom->filename() +
+                "\" is not a valid mesh file.\nPlease select another file for ["
+                + leafName + "].";
+
+            QMessageBox::warning(linkConfig, QString("Invalid Mesh File"),
+                QString(msg.c_str()), QMessageBox::Ok, QMessageBox::Ok);
+            return false;
+          }
+        }
+
         // update the visualMsg that will be used to generate the sdf.
         updateMsg->clear_scale();
         msgs::Material *matMsg = updateMsg->mutable_material();
         msgs::Material::Script *scriptMsg = matMsg->mutable_script();
 
         common::Color emptyColor;
-        bool matScriptChanged = false;
-        bool colorChanged = false;
-        common::Color ambient;
-        common::Color diffuse;
-        common::Color specular;
-        common::Color emissive;
+        common::Color matAmbient;
+        common::Color matDiffuse;
+        common::Color matSpecular;
+        common::Color matEmissive;
+        rendering::Material::GetMaterialAsColor(scriptMsg->name(), matAmbient,
+            matDiffuse, matSpecular, matEmissive);
 
-        if (!scriptMsg->name().empty())
+        common::Color ambient = msgs::Convert(matMsg->ambient());
+        common::Color diffuse = msgs::Convert(matMsg->diffuse());
+        common::Color specular = msgs::Convert(matMsg->specular());
+        common::Color emissive = msgs::Convert(matMsg->emissive());
+
+        if (ambient == emptyColor)
         {
-          rendering::Material::GetMaterialAsColor(scriptMsg->name(), ambient,
-              diffuse, specular, emissive);
-
-          visualConfig->SetMaterial(leafName, scriptMsg->name(), ambient,
-              diffuse, specular, emissive);
-
-          matScriptChanged = true;
-        }
-        else
-        {
-          ambient = msgs::Convert(matMsg->ambient());
-          diffuse = msgs::Convert(matMsg->diffuse());
-          specular = msgs::Convert(matMsg->specular());
-          emissive = msgs::Convert(matMsg->emissive());
-          if (ambient != it.first->GetAmbient()
-              || diffuse != it.first->GetDiffuse()
-              || specular != it.first->GetSpecular()
-              || emissive != it.first->GetEmissive())
-          {
-            colorChanged = true;
-          }
-        }
-
-        // update material or color, but not both
-        // clear empty colors so they are not used by visual updates
-        if (matScriptChanged || !colorChanged ||
-            msgs::Convert(matMsg->ambient()) == emptyColor)
           matMsg->clear_ambient();
-        if (matScriptChanged || !colorChanged ||
-            msgs::Convert(matMsg->diffuse()) == emptyColor)
+          ambient = matAmbient;
+        }
+        if (diffuse == emptyColor)
+        {
           matMsg->clear_diffuse();
-        if (matScriptChanged || !colorChanged ||
-            msgs::Convert(matMsg->specular()) == emptyColor)
+          diffuse = matDiffuse;
+        }
+        if (specular == emptyColor)
+        {
           matMsg->clear_specular();
-        if (matScriptChanged || !colorChanged ||
-            msgs::Convert(matMsg->emissive()) == emptyColor)
+          specular = matSpecular;
+        }
+        if (emissive == emptyColor)
+        {
           matMsg->clear_emissive();
+          emissive = matEmissive;
+        }
+
+        visualConfig->SetMaterial(leafName, scriptMsg->name(), ambient,
+            diffuse, specular, emissive);
 
         visualMsg.CopyFrom(*updateMsg);
         it.second = visualMsg;
 
-        this->visualUpdateMsgs.push_back(updateMsg);
+        visualUpdateMsgsTemp.push_back(updateMsg);
       }
     }
   }
@@ -509,13 +534,40 @@ void PartData::OnApply()
       if (updateMsg)
       {
         msgs::Collision collisionMsg = it.second;
+
+        // check if the geometry is valid
+        msgs::Geometry *geomMsg = updateMsg->mutable_geometry();
+        if (geomMsg->type() == msgs::Geometry::MESH)
+        {
+          msgs::MeshGeom *meshGeom = geomMsg->mutable_mesh();
+          QFileInfo info(QString::fromStdString(meshGeom->filename()));
+          if (!info.isFile() || (info.completeSuffix().toLower() != "dae" &&
+              info.completeSuffix().toLower() != "stl"))
+          {
+            std::string msg = "\"" + meshGeom->filename() +
+                "\" is not a valid mesh file.\nPlease select another file for ["
+                + leafName + "].";
+
+            QMessageBox::warning(linkConfig, QString("Invalid Mesh File"),
+                QString(msg.c_str()), QMessageBox::Ok, QMessageBox::Ok);
+            return false;
+          }
+        }
+
         collisionMsg.CopyFrom(*updateMsg);
         it.second = collisionMsg;
 
-        this->collisionUpdateMsgs.push_back(updateMsg);
+        collisionUpdateMsgsTemp.push_back(updateMsg);
       }
     }
   }
+
+  // Only send update messages if all visuals and collisions are valid
+  this->visualUpdateMsgs.insert(this->visualUpdateMsgs.end(),
+      visualUpdateMsgsTemp.begin(), visualUpdateMsgsTemp.end());
+  this->collisionUpdateMsgs.insert(this->collisionUpdateMsgs.end(),
+      collisionUpdateMsgsTemp.begin(), collisionUpdateMsgsTemp.end());
+  return true;
 }
 
 /////////////////////////////////////////////////

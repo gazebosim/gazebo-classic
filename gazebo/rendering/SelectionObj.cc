@@ -694,8 +694,8 @@ bool SelectionObj::GetHandleVisible(SelectionMode _mode) const
 }
 
 /////////////////////////////////////////////////
-void SelectionObj::SetHandleMaterial(SelectionMode _mode, std::string _material,
-    bool _unique)
+void SelectionObj::SetHandleMaterial(SelectionMode _mode, const std::string 
+    &_material, bool _unique)
 {
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);

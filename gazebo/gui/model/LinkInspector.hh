@@ -72,6 +72,10 @@ namespace gazebo
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
 
+      /// \brief Qt signal emitted to indicate that changes should be applied
+      /// and the inspector closed.
+      Q_SIGNALS: void Accepted();
+
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
 
