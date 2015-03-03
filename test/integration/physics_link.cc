@@ -57,8 +57,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
     math::Vector3 _offset)
 {
   // Get state before adding force
-  math::Vector3 linearVelWorld0 = _link->GetWorldLinearVel(
-      _link->GetInertial()->GetCoG());
+  math::Vector3 linearVelWorld0 = _link->GetWorldCoGLinearVel();
   math::Vector3 angularVelWorld0 = _link->GetWorldAngularVel();
   math::Pose poseWorld0 = _link->GetWorldPose();
 
@@ -93,8 +92,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   // Check velocity in world frame
   math::Vector3 oneStepLinearVel = linearVelWorld0 +
       dt*forceWorld/_link->GetInertial()->GetMass();
-  EXPECT_EQ(oneStepLinearVel, _link->GetWorldLinearVel(
-      _link->GetInertial()->GetCoG()));
+  EXPECT_EQ(oneStepLinearVel, _link->GetWorldCoGLinearVel();
 
   math::Vector3 oneStepAngularVel = angularVelWorld0 + angularImpulse /
       _link->GetInertial()->GetPrincipalMoments();
@@ -112,8 +110,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldAngularAccel());
 
   // Check that velocity hasn't changed
-  EXPECT_EQ(oneStepLinearVel, _link->GetWorldLinearVel(
-      _link->GetInertial()->GetCoG()));
+  EXPECT_EQ(oneStepLinearVel, _link->GetWorldCoGLinearVel();
   EXPECT_EQ(oneStepAngularVel, _link->GetWorldAngularVel());
 
   // Add opposing force in link frame and check that link is back to initial
@@ -126,8 +123,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   _world->Step(moreThanOneStep);
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldForce());
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldTorque());
-  EXPECT_EQ(linearVelWorld0, _link->GetWorldLinearVel(
-      _link->GetInertial()->GetCoG()));
+  EXPECT_EQ(linearVelWorld0, _link->GetWorldCoGLinearVel();
   EXPECT_EQ(angularVelWorld0, _link->GetWorldAngularVel());
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldLinearAccel());
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldAngularAccel());
