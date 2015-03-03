@@ -18,47 +18,19 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
-#include "test/ServerFixture.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "test/accuracy/boxes.hh"
 
 using namespace gazebo;
-
-// physics engine
-// dt
-// number of boxes to spawn
-// collision shape on / off
-// nonlinear trajectory on / off
-typedef std::tr1::tuple < const char *
-                        , double
-                        , int
-                        , bool
-                        , bool
-                        > char1double1int1bool2;
-class RigidBodyTest : public ServerFixture,
-                      public testing::WithParamInterface<char1double1int1bool2>
-{
-  /// \brief Test accuracy of unconstrained rigid body motion.
-  /// \param[in] _physicsEngine Physics engine to use.
-  /// \param[in] _dt Max time step size.
-  /// \param[in] _modelCount Number of boxes to spawn.
-  /// \param[in] _collision Flag for collision shape on / off.
-  /// \param[in] _nonlinear Flag for nonlinear trajectory on / off.
-  public: void Boxes(const std::string &_physicsEngine
-                   , double _dt
-                   , int _modelCount
-                   , bool _collision
-                   , bool _nonlinear);
-};
 
 /////////////////////////////////////////////////
 // Boxes:
 // Spawn a single box and record accuracy for momentum and enery
 // conservation
-void RigidBodyTest::Boxes(const std::string &_physicsEngine
-                        , double _dt
-                        , int _modelCount
-                        , bool _collision
-                        , bool _nonlinear)
+void BoxesTest::Boxes(const std::string &_physicsEngine
+                    , double _dt
+                    , int _modelCount
+                    , bool _collision
+                    , bool _nonlinear)
 {
   // Load a blank world (no ground plane)
   Load("worlds/blank.world", true, _physicsEngine);
@@ -236,7 +208,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
 }
 
 /////////////////////////////////////////////////
-TEST_P(RigidBodyTest, Boxes)
+TEST_P(BoxesTest, Boxes)
 {
   std::string physicsEngine = std::tr1::get<0>(GetParam());
   double dt                 = std::tr1::get<1>(GetParam());
@@ -259,59 +231,4 @@ TEST_P(RigidBodyTest, Boxes)
       , modelCount
       , collision
       , nonlinear);
-}
-
-#define DT_MIN 1e-4
-#define DT_MAX 1.01e-3
-#define DT_STEP 3.0e-4
-INSTANTIATE_TEST_CASE_P(EnginesDtLinear, RigidBodyTest,
-  ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
-  , ::testing::Values(1)
-  , ::testing::Values(true)
-  , ::testing::Values(false)));
-
-INSTANTIATE_TEST_CASE_P(EnginesDtNonlinear, RigidBodyTest,
-  ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
-  , ::testing::Values(1)
-  , ::testing::Values(true)
-  , ::testing::Values(true)));
-
-#define MODELS_MIN 1
-#define MODELS_MAX 105
-#define MODELS_STEP 20
-INSTANTIATE_TEST_CASE_P(OdeBoxes, RigidBodyTest,
-  ::testing::Combine(::testing::Values("ode")
-  , ::testing::Values(3.0e-4)
-  , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
-  , ::testing::Bool()
-  , ::testing::Values(true)));
-
-INSTANTIATE_TEST_CASE_P(BulletBoxes, RigidBodyTest,
-  ::testing::Combine(::testing::Values("bullet")
-  , ::testing::Values(3.0e-4)
-  , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
-  , ::testing::Bool()
-  , ::testing::Values(true)));
-
-INSTANTIATE_TEST_CASE_P(SimbodyBoxes, RigidBodyTest,
-  ::testing::Combine(::testing::Values("simbody")
-  , ::testing::Values(7.0e-4)
-  , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
-  , ::testing::Bool()
-  , ::testing::Values(true)));
-
-INSTANTIATE_TEST_CASE_P(DartBoxes, RigidBodyTest,
-  ::testing::Combine(::testing::Values("dart")
-  , ::testing::Values(7.0e-4)
-  , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
-  , ::testing::Bool()
-  , ::testing::Values(true)));
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

@@ -22,8 +22,14 @@ if(HAVE_DART)
   link_directories ( ${DARTCore_LIBRARY_DIRS} )
 endif()
 
+set(boxes_tests
+  boxes_dt.cc
+  boxes_model_count.cc
+)
+set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS boxes.cc)
+gz_build_tests(${boxes_tests})
+
 set(tests
-  boxes.cc
   joints.cc
 )
 
@@ -31,7 +37,8 @@ gz_build_tests(${tests})
 
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout
-  set_tests_properties(${TEST_TYPE}_boxes PROPERTIES TIMEOUT 10000)
+  set_tests_properties(${TEST_TYPE}_boxes_dt PROPERTIES TIMEOUT 500)
+  set_tests_properties(${TEST_TYPE}_boxes_model_count PROPERTIES TIMEOUT 2500)
   set_tests_properties(${TEST_TYPE}_joints PROPERTIES TIMEOUT 10000)
 endif()
 
