@@ -608,13 +608,15 @@ math::Vector3 Link::GetWorldLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeAngularAccel() const
 {
-  return this->GetRelativeTorque() / this->inertial->GetMass();
+  // Should also subtract gyroscopic torques.
+  return this->inertial->GetMOI().Inverse() * this->GetRelativeTorque();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetWorldAngularAccel() const
 {
-  return this->GetWorldTorque() / this->inertial->GetMass();
+  // Should also subtract gyroscopic torques.
+  return this->GetWorldInertiaMatrix().Inverse() * this->GetWorldTorque();
 }
 
 //////////////////////////////////////////////////
