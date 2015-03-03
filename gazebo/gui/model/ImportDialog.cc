@@ -24,14 +24,14 @@ using namespace gui;
 ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("ImportDialog");
-  this->setWindowTitle("Custom Part");
+  this->setWindowTitle("Custom Link");
 
   this->messageLabel = new QLabel;
   this->messageLabel->setText(
       tr("You can import a 3D mesh that you have \n"
       "made with a modelling tool such as Blender, \n"
       "Maya or SolidWorks. It will appear as a \n"
-      "part in the 3D View."));
+      "link in the 3D View."));
 
   this->pathLineEdit = new QLineEdit;
   this->pathLineEdit->setText(QDir::homePath());
@@ -39,7 +39,7 @@ ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
 
   QLabel *nameLabel = new QLabel;
-  nameLabel->setText(tr("Part Name:"));
+  nameLabel->setText(tr("Link Name:"));
   this->nameLineEdit = new QLineEdit;
   this->nameLineEdit->setText(tr("DefaultName"));
 
@@ -74,7 +74,7 @@ ImportDialog::~ImportDialog()
 }
 
 /////////////////////////////////////////////////
-std::string ImportDialog::GetPartName() const
+std::string ImportDialog::GetLinkName() const
 {
   return this->nameLineEdit->text().toStdString();
 }
@@ -86,7 +86,7 @@ std::string ImportDialog::GetImportPath() const
 }
 
 /////////////////////////////////////////////////
-void ImportDialog::SetPartName(const std::string &_name)
+void ImportDialog::SetLinkName(const std::string &_name)
 {
   this->nameLineEdit->setText(tr(_name.c_str()));
 }
@@ -106,7 +106,7 @@ void ImportDialog::SetTitle(const std::string &_title)
 /////////////////////////////////////////////////
 void ImportDialog::OnBrowse()
 {
-  QFileDialog fd(this, tr("Import Part"), QDir::homePath(),
+  QFileDialog fd(this, tr("Import Link"), QDir::homePath(),
       tr("Mesh files (*.dae *.stl)"));
   fd.setFilter(QDir::AllDirs | QDir::Hidden);
   fd.setFileMode(QFileDialog::ExistingFile);
