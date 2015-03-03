@@ -467,6 +467,11 @@ bool PartData::Apply()
             return false;
           }
         }
+        else if (geomMsg->type() == msgs::Geometry::POLYLINE)
+        {
+        gzerr << "AAA" << std::endl;
+        return false;
+        }
 
         // update the visualMsg that will be used to generate the sdf.
         updateMsg->clear_scale();
