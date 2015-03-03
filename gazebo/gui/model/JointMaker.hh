@@ -122,16 +122,16 @@ namespace gazebo
       /// \param[in] _jointName Name of joint to be removed.
       public: void RemoveJoint(const std::string &_jointName);
 
-      /// \brief Remove all joints connected to part.
-      /// \param[in] _partName Name of the part.
-      public: void RemoveJointsByPart(const std::string &_partName);
+      /// \brief Remove all joints connected to link.
+      /// \param[in] _linkName Name of the link.
+      public: void RemoveJointsByLink(const std::string &_linkName);
 
       /// \brief Get a vector containing data for all joints connected to
-      /// the given part.
-      /// \param[in] _partName Name of the part.
+      /// the given link.
+      /// \param[in] _linkName Name of the link.
       /// \return Vector with joint data.
-      public: std::vector<JointData *> GetJointDataByPart(
-          const std::string &_partName) const;
+      public: std::vector<JointData *> GetJointDataByLink(
+          const std::string &_linkName) const;
 
       /// \brief Generate SDF for all joints.
       public: void GenerateSDF();
@@ -199,10 +199,10 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
 
-      /// \brief Get the centroid of the part visual in world coordinates.
-      /// \param[in] _visual Visual of the part.
+      /// \brief Get the centroid of the link visual in world coordinates.
+      /// \param[in] _visual Visual of the link.
       /// \return Centroid in world coordinates;
-      private: math::Vector3 GetPartWorldCentroid(
+      private: math::Vector3 GetLinkWorldCentroid(
           const rendering::VisualPtr _visual);
 
       /// \brief Open joint inspector.

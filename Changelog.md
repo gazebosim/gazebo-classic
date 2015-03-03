@@ -1,3 +1,8 @@
+## Gazebo 6.0
+
+1. Use collide_bitmask from SDF to perform collision filtering
+    * [Pull request #1470](https://bitbucket.org/osrf/gazebo/pull-request/1470)
+
 1. Added various Get functions to Visual. Also added a ConvertGeometryType function to msgs.
     * [Pull request #1402](https://bitbucket.org/osrf/gazebo/pull-request/1402)
 
@@ -30,7 +35,7 @@
     * [Pull request #1454](https://bitbucket.org/osrf/gazebo/pull-request/1454)
     * [Issue #1455](https://bitbucket.org/osrf/gazebo/issue/1455)
 
- 1. Model editor updates
+1. Model editor updates
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
 
@@ -51,12 +56,19 @@
         * [Pull request #1460](https://bitbucket.org/osrf/gazebo/pull-request/1460)
         * [Issue #1450](https://bitbucket.org/osrf/gazebo/issue/1450)
 
+    1. Renamed Part to Link.
+        * [Pull request #1478](https://bitbucket.org/osrf/gazebo/pull-request/1478)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
 1. Implement Coulomb joint friction for DART
   * [Pull request #1427](https://bitbucket.org/osrf/gazebo/pull-request/1427)
   * [Issue #1281](https://bitbucket.org/osrf/gazebo/issue/1281)
+
+1. Fix simple shape normals.
+    * [Pull request #1477](https://bitbucket.org/osrf/gazebo/pull-request/1477)
+    * [Issue #1369](https://bitbucket.org/osrf/gazebo/issue/1369)
 
 1. Use Msg-to-SDF conversion functions in tests, add ServerFixture::SpawnModel(msgs::Model).
     * [Pull request #1466](https://bitbucket.org/osrf/gazebo/pull-request/1466)
