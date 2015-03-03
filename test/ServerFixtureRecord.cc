@@ -35,11 +35,10 @@ void ServerFixture::Record(const std::string &_name, double _data)
 void ServerFixture::Record(const std::string &_prefix,
                            const math::SignalStats &_stats)
 {
-  std::map<std::string, double> map = _stats.Map();
-  for (std::map<std::string, double>::iterator iter = map.begin();
-       iter != map.end(); ++iter)
+  auto map = _stats.Map();
+  for (auto const &iter : map)
   {
-    Record(_prefix + iter->first, iter->second);
+    Record(_prefix + iter.first, iter.second);
   }
 }
 
