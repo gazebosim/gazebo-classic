@@ -1447,7 +1447,9 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
             }
             else if (geomType == "polyline")
             {
-              // do nothing
+              const google::protobuf::EnumValueDescriptor *geometryType =
+                  typeEnumDescriptor->FindValueByName("POLYLINE");
+              geomReflection->SetEnum(valueMsg, typeField, geometryType);
             }
           }
           // update pose msg field

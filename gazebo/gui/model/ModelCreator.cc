@@ -674,7 +674,10 @@ std::string ModelCreator::AddShape(PartType _type,
 
   // insert over ground plane for now
   math::Vector3 linkPos = linkVisual->GetWorldPose().pos;
-  linkPos.z = _size.z * 0.5;
+  if (_type != PART_MESH)
+  {
+    linkPos.z = _size.z * 0.5;
+  }
   // override orientation as it's more natural to insert objects upright rather
   // than inserting it in the model frame.
   linkVisual->SetWorldPose(math::Pose(linkPos, math::Quaternion()));

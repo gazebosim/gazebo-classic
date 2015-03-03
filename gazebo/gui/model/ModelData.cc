@@ -469,8 +469,24 @@ bool PartData::Apply()
         }
         else if (geomMsg->type() == msgs::Geometry::POLYLINE)
         {
-        gzerr << "AAA" << std::endl;
-        return false;
+          for (auto &vis : this->visuals)
+          {
+            if (vis.second.name() == updateMsg->name())
+            {
+              if (vis.second.mutable_geometry()->type() != geomMsg->type())
+              {
+                std::string msg =
+                    "It's not possible to change into polyline.\n"
+                    "Please select another geometry type for ["
+                    + leafName + "].";
+
+                QMessageBox::warning(linkConfig, QString(
+                    "Invalid geometry conversion"), QString(msg.c_str()),
+                    QMessageBox::Ok, QMessageBox::Ok);
+                return false;
+              }
+            }
+          }
         }
 
         // update the visualMsg that will be used to generate the sdf.
@@ -556,6 +572,27 @@ bool PartData::Apply()
             QMessageBox::warning(linkConfig, QString("Invalid Mesh File"),
                 QString(msg.c_str()), QMessageBox::Ok, QMessageBox::Ok);
             return false;
+          }
+        }
+        else if (geomMsg->type() == msgs::Geometry::POLYLINE)
+        {
+          for (auto &col : this->collisions)
+          {
+            if (col.second.name() == updateMsg->name())
+            {
+              if (col.second.mutable_geometry()->type() != geomMsg->type())
+              {
+                std::string msg =
+                    "It's not possible to change into polyline.\n"
+                    "Please select another geometry type for ["
+                    + leafName + "].";
+
+                QMessageBox::warning(linkConfig, QString(
+                    "Invalid geometry conversion"), QString(msg.c_str()),
+                    QMessageBox::Ok, QMessageBox::Ok);
+                return false;
+              }
+            }
           }
         }
 
