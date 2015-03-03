@@ -86,6 +86,10 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
       forceWorld/_link->GetInertial()->GetMass();
   EXPECT_EQ(oneStepLinearAccel, _link->GetWorldLinearAccel());
 
+  // Compute angular accel by multiplying world torque
+  // by inverse of world inertia matrix.
+  // In this case, the gyroscopic coupling terms are zero
+  // since the model is a unit box.
   math::Vector3 oneStepAngularAccel =
       _link->GetWorldInertiaMatrix().Inverse() * torqueWorld;
   EXPECT_EQ(oneStepAngularAccel, _link->GetWorldAngularAccel());
