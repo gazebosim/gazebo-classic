@@ -134,7 +134,7 @@ namespace gazebo
       /// \param[in] _unique True to make the material unique, which
       /// allows the material to change without changing materials that
       /// originally had the same name.
-      public: void SetHandleMaterial(SelectionMode _mode, const std::string 
+      public: void SetHandleMaterial(SelectionMode _mode, const std::string
           &_material, bool _unique = true);
 
       /// \brief Helper function to create scale visuals.
