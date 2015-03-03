@@ -48,6 +48,9 @@
         * [Pull request #1460](https://bitbucket.org/osrf/gazebo/pull-request/1460)
         * [Issue #1450](https://bitbucket.org/osrf/gazebo/issue/1450)
 
+    1. Renamed Part to Link.
+        * [Pull request #1478](https://bitbucket.org/osrf/gazebo/pull-request/1478)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
