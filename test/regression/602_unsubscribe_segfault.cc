@@ -90,7 +90,6 @@ void Issue602Test::UnsubscribeTest()
     const unsigned int steps = 50;
     world->Step(steps);
     common::Time::MSleep(steps);
-    EXPECT_GT(g_messageCount, steps / 2);
 
     sub->Unsubscribe();
     common::Time::MSleep(steps);
