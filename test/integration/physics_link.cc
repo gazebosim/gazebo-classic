@@ -90,11 +90,11 @@ void PhysicsLinkTest::LinkGetWorldInertia(const std::string &_physicsEngine)
 {
   // Load a blank world (no ground plane)
   Load("worlds/blank.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
+  auto world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  auto physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -102,11 +102,11 @@ void PhysicsLinkTest::LinkGetWorldInertia(const std::string &_physicsEngine)
   physics->SetGravity(math::Vector3::Zero);
 
   // Box size
-  double dx = 1.0;
-  double dy = 4.0;
-  double dz = 9.0;
-  double mass = 10.0;
-  double angle = M_PI / 3.0;
+  const double dx = 1.0;
+  const double dy = 4.0;
+  const double dz = 9.0;
+  const double mass = 10.0;
+  const double angle = M_PI / 3.0;
 
   const unsigned int testCases = 4;
   for (unsigned int i = 0; i < testCases; ++i)
@@ -146,18 +146,18 @@ void PhysicsLinkTest::LinkGetWorldInertia(const std::string &_physicsEngine)
     }
 
     {
-      msgs::Link *msgLink = msgModel.mutable_link(0);
-      msgs::Inertial *msgInertial = msgLink->mutable_inertial();
+      auto msgLink = msgModel.mutable_link(0);
+      auto msgInertial = msgLink->mutable_inertial();
 
       msgs::Set(msgModel.mutable_pose(), modelPose);
       msgs::Set(msgLink->mutable_pose(), linkPose);
       msgs::Set(msgInertial->mutable_pose(), inertialPose);
     }
 
-    physics::ModelPtr model = this->SpawnModel(msgModel);
+    auto model = this->SpawnModel(msgModel);
     ASSERT_TRUE(model != NULL);
 
-    physics::LinkPtr link = model->GetLink();
+    auto link = model->GetLink();
     ASSERT_TRUE(link != NULL);
 
     EXPECT_EQ(model->GetWorldPose(), modelPose);

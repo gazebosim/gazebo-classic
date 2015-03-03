@@ -1,11 +1,25 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
+1. Implement Coulomb joint friction for DART
+  * [Pull request #1427](https://bitbucket.org/osrf/gazebo/pull-request/1427)
+  * [Issue #1281](https://bitbucket.org/osrf/gazebo/issue/1281)
+
+1. Use Msg-to-SDF conversion functions in tests, add ServerFixture::SpawnModel(msgs::Model).
+    * [Pull request #1466](https://bitbucket.org/osrf/gazebo/pull-request/1466)
+
+1. Added Model Msg-to-SDF conversion functions and test.
+    * [Pull request #1429](https://bitbucket.org/osrf/gazebo/pull-request/1429)
+
 1. Added Joint Msg-to-SDF conversion functions and test.
     * [Pull request #1419](https://bitbucket.org/osrf/gazebo/pull-request/1419)
 
 1. Added Visual, Material Msg-to-SDF conversion functions and ShaderType to string conversion functions.
     * [Pull request #1415](https://bitbucket.org/osrf/gazebo/pull-request/1415)
+
+1. Implement Coulomb joint friction for BulletSliderJoint
+  * [Pull request #1452](https://bitbucket.org/osrf/gazebo/pull-request/1452)
+  * [Issue #1348](https://bitbucket.org/osrf/gazebo/issue/1348)
 
 ### Gazebo 5.0.0
 1. Support for using [digital elevation maps](http://gazebosim.org/tutorials?tut=dem) has been added to debian packages.
@@ -57,7 +71,7 @@
   * [Issue #381](https://bitbucket.org/osrf/gazebo/issue/381)
 
 1. Implement Coulomb joint friction for BulletHingeJoint
-  * [Pull request #1221](https://bitbucket.org/osrf/gazebo/pull-request/1317)
+  * [Pull request #1317](https://bitbucket.org/osrf/gazebo/pull-request/1317)
   * [Issue #1348](https://bitbucket.org/osrf/gazebo/issue/1348)
 
 1. Implemented camera lens distortion.
@@ -240,6 +254,8 @@
     * [Pull request #1448](https://bitbucket.org/osrf/gazebo/pull-request/1448)
     * [Pull request #1446](https://bitbucket.org/osrf/gazebo/pull-request/1446)
     * [Issue #236](https://bitbucket.org/osrf/gazebo/issue/236)
+1. Fixed heightmap on OSX
+    * [Pull request #1455](https://bitbucket.org/osrf/gazebo/pull-request/1455)
 
 ### Gazebo 4.0.2 (2014-09-23)
 

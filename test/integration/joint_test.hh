@@ -34,7 +34,7 @@ typedef std::tr1::tuple<const char *, const char *> std_string2;
 class JointTest : public ServerFixture,
                   public ::testing::WithParamInterface<std_string2>
 {
-  protected: JointTest() : ServerFixture(), spawnCount(0)
+  protected: JointTest() : ServerFixture()
              {
              }
 
@@ -154,7 +154,7 @@ class JointTest : public ServerFixture,
             {
               msg.add_link();
               int linkCount = msg.link_size();
-              msgs::Link *link = msg.mutable_link(linkCount-1);
+              auto link = msg.mutable_link(linkCount-1);
 
               link->set_name("parent");
               if (!_opt.noLinkPose)
@@ -166,7 +166,7 @@ class JointTest : public ServerFixture,
             {
               msg.add_link();
               int linkCount = msg.link_size();
-              msgs::Link *link = msg.mutable_link(linkCount-1);
+              auto link = msg.mutable_link(linkCount-1);
 
               link->set_name("child");
               if (!_opt.noLinkPose)
@@ -175,7 +175,7 @@ class JointTest : public ServerFixture,
               }
             }
             msg.add_joint();
-            msgs::Joint *jointMsg = msg.mutable_joint(0);
+            auto jointMsg = msg.mutable_joint(0);
             jointMsg->set_name("joint");
             jointMsg->set_type(msgs::ConvertJointType(_opt.type));
             msgs::Set(jointMsg->mutable_pose(), _opt.jointPose);
@@ -197,19 +197,19 @@ class JointTest : public ServerFixture,
             }
 
             {
-              msgs::Axis *axis = jointMsg->mutable_axis1();
+              auto axis = jointMsg->mutable_axis1();
               msgs::Set(axis->mutable_xyz(), _opt.axis);
               axis->set_use_parent_model_frame(_opt.useParentModelFrame);
             }
             // Hack: hardcode a second axis for universal joints
             if (_opt.type == "universal")
             {
-              msgs::Axis *axis2 = jointMsg->mutable_axis2();
+              auto axis2 = jointMsg->mutable_axis2();
               msgs::Set(axis2->mutable_xyz(), math::Vector3(0, 1, 0));
               axis2->set_use_parent_model_frame(_opt.useParentModelFrame);
             }
 
-            physics::ModelPtr model = this->SpawnModel(msg);
+            auto model = this->SpawnModel(msg);
             physics::JointPtr joint;
             if (model != NULL)
               joint = model->GetJoint("joint");
@@ -222,8 +222,5 @@ class JointTest : public ServerFixture,
 
   /// \brief Joint type for test.
   protected: std::string jointType;
-
-  /// \brief Count of spawned models, used to ensure unique model names.
-  private: unsigned int spawnCount;
 };
 #endif
