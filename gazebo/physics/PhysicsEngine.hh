@@ -136,11 +136,11 @@ namespace gazebo
       public: virtual JointPtr CreateJoint(const std::string &_type,
                                            ModelPtr _parent = ModelPtr()) = 0;
 
-      /// \brief Return the gavity vector.
+      /// \brief Return the gravity vector.
       /// \return The gavity vector.
       public: virtual math::Vector3 GetGravity() const;
 
-      /// \brief Set the gavity vector.
+      /// \brief Set the gravity vector.
       /// \param[in] _gravity New gravity vector.
       public: virtual void SetGravity(
                   const gazebo::math::Vector3 &_gravity) = 0;
@@ -179,7 +179,7 @@ namespace gazebo
       /// property map
       /// \brief access functions to set ODE parameters
       /// \param[in] _maxContacts Maximum number of contacts.
-      public: virtual void SetMaxContacts(unsigned int _maxContacts);
+      public: virtual void SetMaxContacts(unsigned int _maxContacts) = 0;
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -215,7 +215,7 @@ namespace gazebo
       /// property map.
       /// \brief access functions to set ODE parameters.
       /// \return Maximum number of allows contacts.
-      public: virtual unsigned int GetMaxContacts() {return 0;}
+      public: virtual unsigned int GetMaxContacts() const;
 
       /// \brief Set a parameter of the physics engine.
       /// See SetParam documentation for descriptions of duplicate parameters.

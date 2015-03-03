@@ -150,6 +150,12 @@ double PhysicsEngine::GetRealTimeUpdateRate() const
 }
 
 //////////////////////////////////////////////////
+unsigned int PhysicsEngine::GetMaxContacts() const
+{
+  return this->sdf->Get<int>("max_contacts");
+}
+
+//////////////////////////////////////////////////
 double PhysicsEngine::GetMaxStepSize() const
 {
   return this->maxStepSize;
@@ -196,10 +202,11 @@ void PhysicsEngine::SetContactMaxCorrectingVel(double /*_vel*/)
 {
 }
 
-//////////////////////////////////////////////////
-void PhysicsEngine::SetMaxContacts(unsigned int /*_maxContacts*/)
+/*//////////////////////////////////////////////////
+void PhysicsEngine::SetMaxContacts(unsigned int _maxContacts)
 {
-}
+  this->sdf->GetElement("max_contacts")->Set(_maxContacts);
+}*/
 
 //////////////////////////////////////////////////
 void PhysicsEngine::OnRequest(ConstRequestPtr &/*_msg*/)
@@ -220,37 +227,34 @@ void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
 bool PhysicsEngine::SetParam(const std::string &_key,
     const boost::any &_value)
 {
-  if (_key == "gravity")
+  try
   {
-    math::Vector3 value;
-    if (!PhysicsEngine::AnyCast<math::Vector3>(_value, value))
+    if (_key == "gravity")
+    {
+      this->SetGravity(boost::any_cast<math::Vector3>(_value));
+    }
+    else if (_key == "max_contacts")
+    {
+      this->SetMaxContacts(boost::any_cast<int>(_value));
+    }
+    else if (_key == "max_step_size")
+    {
+      this->SetMaxStepSize(boost::any_cast<double>(_value));
+    }
+    else if (_key == "real_time_factor")
+    {
+      this->SetTargetRealTimeFactor(boost::any_cast<double>(_value));
+    }
+    else
+    {
+      // Key not found
       return false;
-    this->SetGravity(value);
+    }
   }
-  else if (_key == "max_contacts")
+  catch (boost::bad_any_cast &e)
   {
-    int value;
-    if (!PhysicsEngine::AnyCast<int>(_value, value))
-      return false;
-    this->SetMaxContacts(value);
-  }
-  else if (_key == "max_step_size")
-  {
-    double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
-      return false;
-    this->SetMaxStepSize(value);
-  }
-  else if (_key == "real_time_factor")
-  {
-    double value;
-    if (!PhysicsEngine::AnyCast<double>(_value, value))
-      return false;
-    this->SetTargetRealTimeFactor(value);
-  }
-  else
-  {
-    // Key not found
+    gzerr << "PhysicsEngine::SetParam(" << _key << ") boost::any_cast error: "
+          << e.what() << std::endl;
     return false;
   }
   return true;
@@ -283,41 +287,3 @@ ContactManager *PhysicsEngine::GetContactManager() const
 {
   return this->contactManager;
 }
-
-//////////////////////////////////////////////////
-template <class _Type> bool PhysicsEngine::AnyCast(const boost::any &_value,
-    _Type &_ret)
-{
-  try
-  {
-    _ret = boost::any_cast<_Type>(_value);
-  }
-  catch(const boost::bad_any_cast &e)
-  {
-    gzerr << "boost any_cast error:" << e.what() << std::endl;
-    return false;
-  }
-  return true;
-}
-
-//////////////////////////////////////////////////
-bool PhysicsEngine::AnyCastInt(const boost::any &_value, int &_ret)
-{
-  if (!PhysicsEngine::AnyCast<int>(_value, _ret))
-  {
-    unsigned int uret;
-    if (!PhysicsEngine::AnyCast<unsigned int>(_value, uret))
-      return false;
-    _ret = static_cast<int>(uret);
-  }
-  return true;
-}
-
-template bool PhysicsEngine::AnyCast<double>(const boost::any &_value,
-    double &_ret);
-template bool PhysicsEngine::AnyCast<std::string>(const boost::any &_value,
-    std::string &_ret);
-template bool PhysicsEngine::AnyCast<bool>(const boost::any &_value,
-    bool &_ret);
-template bool PhysicsEngine::AnyCast<math::Vector3>(const boost::any &_value,
-    math::Vector3 &_ret);
