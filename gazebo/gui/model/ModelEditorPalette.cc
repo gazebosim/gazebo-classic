@@ -241,19 +241,24 @@ void ModelEditorPalette::OnCustom()
     {
       event::Events::setSelectedEntity("", "normal");
       g_arrowAct->trigger();
-      if (info.completeSuffix() == "dae" || info.completeSuffix() == "stl")
+      if (info.completeSuffix().toLower() == "dae" ||
+          info.completeSuffix().toLower() == "stl")
       {
         this->modelCreator->AddShape(ModelCreator::PART_MESH,
             math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
       }
-      else if (info.completeSuffix() == "svg")
+      else if (info.completeSuffix().toLower() == "svg")
       {
         ExtrudeDialog extrudeDialog(importDialog.GetImportPath(), this);
         extrudeDialog.deleteLater();
         if (extrudeDialog.exec() == QDialog::Accepted)
         {
           this->modelCreator->AddShape(ModelCreator::PART_MESH,
-              math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
+              math::Vector3(1.0/extrudeDialog.GetResolution(),
+              1.0/extrudeDialog.GetResolution(),
+              extrudeDialog.GetThickness()),
+              math::Pose::Zero, importDialog.GetImportPath(),
+              extrudeDialog.GetSamples());
         }
       }
     }

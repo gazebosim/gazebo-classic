@@ -43,6 +43,15 @@ namespace gazebo
       /// \brief Destructor.
       public: ~ExtrudeDialog();
 
+      /// \brief TODO.
+      public: double GetThickness() const;
+
+      /// \brief TODO.
+      public: unsigned int GetSamples() const;
+
+      /// \brief TODO.
+      public: unsigned int GetResolution() const;
+
       /// \brief Qt callback when the dialog is accepted.
       private slots: void OnAccept();
 

@@ -33,37 +33,33 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
       "<b>Extrude Link</b><br>"
       "Extrude a 2D image into a 3D mesh<br>"));
 
-  // Unit
-  QLabel *unitLabel = new QLabel(tr(
-      "<b>Unit</b><br>"
-      "Choose the units used in your image file."));
+//  // Unit
+//  QLabel *unitLabel = new QLabel(tr(
+//      "<b>Unit</b><br>"
+//      "Choose the units used in your image file."));
 
-  this->dataPtr->unitCombo = new QComboBox();
-  this->dataPtr->unitCombo->setMinimumWidth(100);
-  this->dataPtr->unitCombo->addItem(tr("m"));
-  this->dataPtr->unitCombo->addItem(tr("px"));
-  this->dataPtr->unitCombo->addItem(tr("in"));
-//  connect(this->dataPtr->unitCombo, SIGNAL(currentIndexChanged(QString)), this,
-//      SLOT(OnChangeUnit(QString)));
+//  this->dataPtr->unitCombo = new QComboBox();
+//  this->dataPtr->unitCombo->setMinimumWidth(100);
+//  this->dataPtr->unitCombo->addItem(tr("m"));
+//  this->dataPtr->unitCombo->addItem(tr("px"));
+//  this->dataPtr->unitCombo->addItem(tr("in"));
+////  connect(this->dataPtr->unitCombo, SIGNAL(currentIndexChanged(QString)), this,
+////      SLOT(OnChangeUnit(QString)));
 
-  QHBoxLayout *unitComboLayout = new QHBoxLayout;
-  unitComboLayout->addWidget(new QLabel("Unit:"));
-  unitComboLayout->addStretch(1);
-  unitComboLayout->addWidget(this->dataPtr->unitCombo);
+//  QHBoxLayout *unitComboLayout = new QHBoxLayout;
+//  unitComboLayout->addWidget(new QLabel("Unit:"));
+//  unitComboLayout->addStretch(1);
+//  unitComboLayout->addWidget(this->dataPtr->unitCombo);
 
-  QVBoxLayout *unitLayout = new QVBoxLayout;
-  unitLayout->addWidget(unitLabel);
-  unitLayout->addSpacing(20);
-  unitLayout->addLayout(unitComboLayout);
+//  QVBoxLayout *unitLayout = new QVBoxLayout;
+//  unitLayout->addWidget(unitLabel);
+//  unitLayout->addSpacing(20);
+//  unitLayout->addLayout(unitComboLayout);
 
-  QWidget *unitWidget = new QWidget();
-  unitWidget->setLayout(unitLayout);
+//  QWidget *unitWidget = new QWidget();
+//  unitWidget->setLayout(unitLayout);
 
   // Thickness
-  QLabel *thicknessLabel = new QLabel(tr(
-      "<b>Thickness</b><br>"
-      "Choose the extrusion thickness."));
-
   this->dataPtr->thicknessSpin = new QDoubleSpinBox;
   this->dataPtr->thicknessSpin->setRange(0.001, 1000);
   this->dataPtr->thicknessSpin->setSingleStep(0.1);
@@ -72,18 +68,40 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
 //  connect(this->dataPtr->thicknessSpin, SIGNAL(valueChanged(double)), this,
 //      SLOT(OnChangeThickness(double)));
 
-  QHBoxLayout *thicknessSpinLayout = new QHBoxLayout;
-  thicknessSpinLayout->addWidget(new QLabel("Thickness (m):"));
-  thicknessSpinLayout->addStretch(1);
-  thicknessSpinLayout->addWidget(this->dataPtr->thicknessSpin);
+  QHBoxLayout *thicknessLayout = new QHBoxLayout;
+  thicknessLayout->addWidget(new QLabel("Thickness:"));
+  thicknessLayout->addStretch(1);
+  thicknessLayout->addWidget(this->dataPtr->thicknessSpin);
+  thicknessLayout->addWidget(new QLabel("m"));
 
-  QVBoxLayout *thicknessLayout = new QVBoxLayout;
-  thicknessLayout->addWidget(thicknessLabel);
-  thicknessLayout->addSpacing(20);
-  thicknessLayout->addLayout(thicknessSpinLayout);
+  // Resolution
+  this->dataPtr->resolutionSpin = new QDoubleSpinBox;
+  this->dataPtr->resolutionSpin->setRange(1, 1000);
+  this->dataPtr->resolutionSpin->setSingleStep(10);
+  this->dataPtr->resolutionSpin->setDecimals(3);
+  this->dataPtr->resolutionSpin->setValue(300);
+//  connect(this->dataPtr->resolutionSpin, SIGNAL(valueChanged(double)), this,
+//      SLOT(OnChangeResolution(double)));
 
-  QWidget *thicknessWidget = new QWidget();
-  thicknessWidget->setLayout(thicknessLayout);
+  QHBoxLayout *resolutionLayout = new QHBoxLayout;
+  resolutionLayout->addWidget(new QLabel("Resolution:"));
+  resolutionLayout->addStretch(1);
+  resolutionLayout->addWidget(this->dataPtr->resolutionSpin);
+  resolutionLayout->addWidget(new QLabel("px/m"));
+
+  // Samples
+  this->dataPtr->samplesSpin = new QDoubleSpinBox;
+  this->dataPtr->samplesSpin->setRange(2, 100);
+  this->dataPtr->samplesSpin->setSingleStep(1);
+  this->dataPtr->samplesSpin->setDecimals(0);
+  this->dataPtr->samplesSpin->setValue(5);
+//  connect(this->dataPtr->samplesSpin, SIGNAL(valueChanged(double)), this,
+//      SLOT(OnChangeSamples(double)));
+
+  QHBoxLayout *samplesLayout = new QHBoxLayout;
+  samplesLayout->addWidget(new QLabel("# of samples per segment:"));
+  samplesLayout->addStretch(1);
+  samplesLayout->addWidget(this->dataPtr->samplesSpin);
 
   // Buttons
   QHBoxLayout *buttonsLayout = new QHBoxLayout();
@@ -104,8 +122,9 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
   QVBoxLayout *leftColumnLayout = new QVBoxLayout();
   leftColumn->setLayout(leftColumnLayout);
   leftColumnLayout->addWidget(titleLabel);
-  leftColumnLayout->addWidget(unitWidget);
-  leftColumnLayout->addWidget(thicknessWidget);
+  leftColumnLayout->addLayout(thicknessLayout);
+  leftColumnLayout->addLayout(resolutionLayout);
+  leftColumnLayout->addLayout(samplesLayout);
   leftColumnLayout->addLayout(buttonsLayout);
 
   // Image view
@@ -165,4 +184,22 @@ void ExtrudeDialog::OnAccept()
 void ExtrudeDialog::OnReject()
 {
   this->reject();
+}
+
+/////////////////////////////////////////////////
+double ExtrudeDialog::GetThickness() const
+{
+  return this->dataPtr->thicknessSpin->value();
+}
+
+/////////////////////////////////////////////////
+unsigned int ExtrudeDialog::GetSamples() const
+{
+  return this->dataPtr->samplesSpin->value();
+}
+
+/////////////////////////////////////////////////
+unsigned int ExtrudeDialog::GetResolution() const
+{
+  return this->dataPtr->resolutionSpin->value();
 }

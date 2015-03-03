@@ -33,6 +33,12 @@ namespace gazebo
       /// \brief Thickness spin box.
       public: QDoubleSpinBox *thicknessSpin;
 
+      /// \brief Resolution spin box.
+      public: QDoubleSpinBox *resolutionSpin;
+
+      /// \brief Samples spin box.
+      public: QDoubleSpinBox *samplesSpin;
+
       /// \brief Import image view width.
       public: int imageDisplayWidth;
 
