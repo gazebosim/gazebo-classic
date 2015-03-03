@@ -122,6 +122,7 @@ set (qt_tests
   DataLogger_TEST.cc
   GuiIface_TEST.cc
   ModelAlign_TEST.cc
+  RenderWidget_TEST.cc
   TimePanel_TEST.cc
 )
 

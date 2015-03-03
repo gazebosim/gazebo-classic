@@ -645,29 +645,23 @@ void SelectionObj::SetHandleVisible(SelectionMode _mode, bool _visible)
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
-  if (_mode == TRANS)
-    dPtr->transVisual->SetVisible(_visible);
-  else if (_mode == ROT)
-    dPtr->rotVisual->SetVisible(_visible);
-  else if (_mode == SCALE)
-    dPtr->scaleVisual->SetVisible(_visible);
-  else if (_mode == TRANS_X)
+  if (_mode == TRANS || _mode == TRANS_X)
     dPtr->transXVisual->SetVisible(_visible);
-  else if (_mode == TRANS_Y)
+  if (_mode == TRANS || _mode == TRANS_Y)
     dPtr->transYVisual->SetVisible(_visible);
-  else if (_mode == TRANS_Z)
+  if (_mode == TRANS || _mode == TRANS_Z)
     dPtr->transZVisual->SetVisible(_visible);
-  else if (_mode == ROT_X)
+  if (_mode == ROT || _mode == ROT_X)
     dPtr->rotXVisual->SetVisible(_visible);
-  else if (_mode == ROT_Y)
+  if (_mode == ROT || _mode == ROT_Y)
     dPtr->rotYVisual->SetVisible(_visible);
-  else if (_mode == ROT_Z)
+  if (_mode == ROT || _mode == ROT_Z)
     dPtr->rotZVisual->SetVisible(_visible);
-  else if (_mode == SCALE_X)
+  if (_mode == SCALE || _mode == SCALE_X)
     dPtr->scaleXVisual->SetVisible(_visible);
-  else if (_mode == SCALE_Y)
+  if (_mode == SCALE || _mode == SCALE_Y)
     dPtr->scaleYVisual->SetVisible(_visible);
-  else if (_mode == SCALE_Z)
+  if (_mode == SCALE || _mode == SCALE_Z)
     dPtr->scaleZVisual->SetVisible(_visible);
 }
 
@@ -677,60 +671,51 @@ bool SelectionObj::GetHandleVisible(SelectionMode _mode) const
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
-  if (_mode == TRANS)
-    return dPtr->transVisual->GetVisible();
-  else if (_mode == ROT)
-    return dPtr->rotVisual->GetVisible();
-  else if (_mode == SCALE)
-    return dPtr->scaleVisual->GetVisible();
-  else if (_mode == TRANS_X)
+  if (_mode == TRANS || _mode == TRANS_X)
     return dPtr->transXVisual->GetVisible();
-  else if (_mode == TRANS_Y)
+  if (_mode == TRANS_Y)
     return dPtr->transYVisual->GetVisible();
-  else if (_mode == TRANS_Z)
+  if (_mode == TRANS_Z)
     return dPtr->transZVisual->GetVisible();
-  else if (_mode == ROT_X)
+  if (_mode == ROT || _mode == ROT_X)
     return dPtr->rotXVisual->GetVisible();
-  else if (_mode == ROT_Y)
+  if (_mode == ROT_Y)
     return dPtr->rotYVisual->GetVisible();
-  else if (_mode == ROT_Z)
+  if (_mode == ROT_Z)
     return dPtr->rotZVisual->GetVisible();
-  else if (_mode == SCALE_X)
+  if (_mode == SCALE || _mode == SCALE_X)
     return dPtr->scaleXVisual->GetVisible();
-  else if (_mode == SCALE_Y)
+  if (_mode == SCALE_Y)
     return dPtr->scaleYVisual->GetVisible();
-  else if (_mode == SCALE_Z)
+  if (_mode == SCALE_Z)
     return dPtr->scaleZVisual->GetVisible();
-  else
-    return false;
+
+  return false;
 }
 
 /////////////////////////////////////////////////
-void SelectionObj::SetHandleMaterial(SelectionMode _mode, std::string _material,
-    bool _unique)
+void SelectionObj::SetHandleMaterial(SelectionMode _mode, const std::string
+    &_material, bool _unique)
 {
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
-  if (_mode == TRANS_X)
+  if (_mode == TRANS || _mode == TRANS_X)
     dPtr->transXVisual->SetMaterial(_material, _unique);
-  else if (_mode == TRANS_Y)
+  if (_mode == TRANS || _mode == TRANS_Y)
     dPtr->transYVisual->SetMaterial(_material, _unique);
-  else if (_mode == TRANS_Z)
+  if (_mode == TRANS || _mode == TRANS_Z)
     dPtr->transZVisual->SetMaterial(_material, _unique);
-  else if (_mode == ROT_X)
+  if (_mode == ROT || _mode == ROT_X)
     dPtr->rotXVisual->SetMaterial(_material, _unique);
-  else if (_mode == ROT_Y)
+  if (_mode == ROT || _mode == ROT_Y)
     dPtr->rotYVisual->SetMaterial(_material, _unique);
-  else if (_mode == ROT_Z)
+  if (_mode == ROT || _mode == ROT_Z)
     dPtr->rotZVisual->SetMaterial(_material, _unique);
-  else if (_mode == SCALE_X)
+  if (_mode == SCALE || _mode == SCALE_X)
     dPtr->scaleXVisual->SetMaterial(_material, _unique);
-  else if (_mode == SCALE_Y)
+  if (_mode == SCALE || _mode == SCALE_Y)
     dPtr->scaleYVisual->SetMaterial(_material, _unique);
-  else if (_mode == SCALE_Z)
+  if (_mode == SCALE || _mode == SCALE_Z)
     dPtr->scaleZVisual->SetMaterial(_material, _unique);
-  else
-    gzwarn << "Not possible to set material for handle [" << _mode <<
-        "]" << std::endl;
 }

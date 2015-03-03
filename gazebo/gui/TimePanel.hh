@@ -45,6 +45,26 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~TimePanel();
 
+      /// \brief Show real time factor.
+      /// \param[in] _show True to display real time factor.
+      public: void ShowRealTimeFactor(bool _show);
+
+      /// \brief Show real time
+      /// \param[in] _show True to display real time.
+      public: void ShowRealTime(bool _show);
+
+      /// \brief Show sim time
+      /// \param[in] _show True to display sim time.
+      public: void ShowSimTime(bool _show);
+
+      /// \brief Show the step widget.
+      /// \param[in] _show True to show the step widget.
+      public: void ShowIterations(bool _show);
+
+      /// \brief Show the step widget.
+      /// \param[in] _show True to show the step widget.
+      public: void ShowStepWidget(bool _show);
+
       /// \brief A signal used to set the sim time line edit.
       /// \param[in] _string String representation of sim time.
       signals: void SetSimTime(QString _string);
@@ -114,6 +134,24 @@ namespace gazebo
 
       /// \brief Tool button that holds the step widget
       private: QToolButton *stepButton;
+
+      /// \brief Real time factor label.
+      private: QLabel *realTimeFactorLabel;
+
+      /// \brief Sim time label.
+      private: QLabel *simTimeLabel;
+
+      /// \brief Real time label.
+      private: QLabel *realTimeLabel;
+
+      /// \brief Iterations label.
+      private: QLabel *iterationsLabel;
+
+      /// \brief Action associated with the step label in the toolbar.
+      private: QAction *stepToolBarLabelAction;
+
+      /// \brief Action associated with the step button in the toolbar.
+      private: QAction *stepButtonAction;
     };
   }
 }
