@@ -347,7 +347,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   }
 
   // Test Coloumb friction
-  if (isBullet && !_joint->HasType(physics::Base::HINGE_JOINT))
+  if (isBullet && _joint->HasType(physics::Base::UNIVERSAL_JOINT))
   {
     gzerr << "Skipping friction test for "
           << physics->GetType()
