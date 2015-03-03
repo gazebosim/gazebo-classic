@@ -51,61 +51,61 @@ namespace gazebo
       public: static double GetEditTransparency();
     };
 
-    /// \class PartData PartData.hh
-    /// \brief Helper class to store part data
-    class PartData : public QObject
+    /// \class LinkData LinkData.hh
+    /// \brief Helper class to store link data
+    class LinkData : public QObject
     {
       Q_OBJECT
 
       /// \brief Constructor
-      public: PartData();
+      public: LinkData();
 
       /// \brief Destructor
-      public: ~PartData();
+      public: ~LinkData();
 
-      /// \brief Get the name of the part.
-      /// \return Name of part.
+      /// \brief Get the name of the link.
+      /// \return Name of link.
       public: std::string GetName() const;
 
-      /// \brief Set the name of the part.
-      /// \param[in] _name Name of part.
+      /// \brief Set the name of the link.
+      /// \param[in] _name Name of link.
       public: void SetName(const std::string &_name);
 
-      /// \brief Get the pose of the part.
-      /// \return Pose of part.
+      /// \brief Get the pose of the link.
+      /// \return Pose of link.
       public: math::Pose GetPose() const;
 
-      /// \brief Set the pose of the part.
-      /// \param[in] _pose Pose of part.
+      /// \brief Set the pose of the link.
+      /// \param[in] _pose Pose of link.
       public: void SetPose(const math::Pose &_pose);
 
-      /// \brief Load the part with data from SDF.
+      /// \brief Load the link with data from SDF.
       /// \param[in] _sdf Link SDF element.
       public: void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Get the scale of the part.
-      /// \return Scale of part.
+      /// \brief Get the scale of the link.
+      /// \return Scale of link.
       public: math::Vector3 GetScale() const;
 
-      /// \brief Set the scale of the part.
-      /// \param[in] _scale Scale of part.
+      /// \brief Set the scale of the link.
+      /// \param[in] _scale Scale of link.
       public: void SetScale(const math::Vector3 &_scale);
 
-      /// \brief Add a visual to the part.
+      /// \brief Add a visual to the link.
       /// \param[in] _visual Visual to be added.
       public: void AddVisual(rendering::VisualPtr _visual);
 
-      /// \brief Add a collision to the part.
+      /// \brief Add a collision to the link.
       /// \param[in] _collisionVis Visual representing the collision.
       public: void AddCollision(rendering::VisualPtr _collisionVis);
 
       /// \brief Update the inspector widget if necessary.
       public: void UpdateConfig();
 
-      /// \brief Clone the part data.
-      /// \param[in] _newName Name to give to the cloned part.
-      /// \return A clone of this part data.
-      public: PartData *Clone(const std::string &_newName);
+      /// \brief Clone the link data.
+      /// \param[in] _newName Name to give to the cloned link.
+      /// \return A clone of this link data.
+      public: LinkData *Clone(const std::string &_newName);
 
       /// \brief Update callback on PreRender.
       private: void Update();
@@ -114,11 +114,11 @@ namespace gazebo
       /// \return True if successful.
       private: bool Apply();
 
-      /// \brief Qt Callback when part inspector configurations are to be
+      /// \brief Qt Callback when link inspector configurations are to be
       /// applied and inspector should be closed.
       private slots: void OnAccept();
 
-      /// \brief Qt Callback when part inspector configurations are to be
+      /// \brief Qt Callback when link inspector configurations are to be
       /// applied.
       private slots: void OnApply();
 
@@ -144,16 +144,16 @@ namespace gazebo
       /// \brief Mutex to protect visual and collision update messages.
       private: boost::recursive_mutex *updateMutex;
 
-      /// \brief SDF representing the part data.
-      public: sdf::ElementPtr partSDF;
+      /// \brief SDF representing the link data.
+      public: sdf::ElementPtr linkSDF;
 
-      /// \brief Scale of part.
+      /// \brief Scale of link.
       public: math::Vector3 scale;
 
-      /// \brief Visual representing this part.
-      public: rendering::VisualPtr partVisual;
+      /// \brief Visual representing this link.
+      public: rendering::VisualPtr linkVisual;
 
-      /// \brief Visuals of the part.
+      /// \brief Visuals of the link.
       public: std::map<rendering::VisualPtr, msgs::Visual> visuals;
 
       /// \brief Msgs for updating visuals.
@@ -162,10 +162,10 @@ namespace gazebo
       /// \brief Msgs for updating collision visuals.
       public: std::vector<msgs::Collision *> collisionUpdateMsgs;
 
-      /// \brief Collisions of the part.
+      /// \brief Collisions of the link.
       public: std::map<rendering::VisualPtr, msgs::Collision> collisions;
 
-      /// \brief Inspector for configuring part properties.
+      /// \brief Inspector for configuring link properties.
       public: LinkInspector *inspector;
     };
   }
