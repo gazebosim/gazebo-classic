@@ -78,4 +78,4 @@ target_link_libraries(TimerGUIPlugin libgazebo gazebo_sensors ${ogre_libraries} 
 install (TARGETS TimerGUIPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
 
 add_subdirectory(events)
-
+add_subdirectory(rest_web)
