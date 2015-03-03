@@ -47,6 +47,7 @@
     <model name="box1">
       <link name="link">
         <pose>0 0 1.0 0 0 0</pose>
+        <self_collide>1</self_collide>
         <inertial>
           <mass>1</mass>
           <inertia>
@@ -81,6 +82,7 @@
 
       <link name="link1">
         <pose>-1.5 1.5 3.0 0 0 1.57</pose>
+        <self_collide>1</self_collide>
         <inertial>
           <mass>1</mass>
           <inertia>
@@ -115,6 +117,7 @@
 
       <link name="link2">
         <pose>0 1.5 6.0 0 0 2.24</pose>
+        <self_collide>1</self_collide>
         <inertial>
           <mass>1</mass>
           <inertia>
@@ -148,6 +151,7 @@
       </link>
       <link name="link3">
         <pose>0 -3 1.0 0 0 0</pose>
+        <self_collide>1</self_collide>
         <inertial>
           <mass>1</mass>
           <inertia>
