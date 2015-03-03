@@ -1794,14 +1794,15 @@ void dxQuickStepper (dxWorldProcessContext *context,
     // add stepsize * invM * fe to the body velocity
     const dReal *invMOIrow = invMOI;
     dxBody *const *const bodyend = body + nb;
+    dReal tmp_tacc[3];
     for (dxBody *const *bodycurr = body; bodycurr != bodyend; invMOIrow += 12, bodycurr++) {
       dxBody *b_ptr = *bodycurr;
       dReal body_invMass_mul_stepsize = stepsize * b_ptr->invMass;
       for (int j=0; j<3; j++) {
         b_ptr->lvel[j] += body_invMass_mul_stepsize * b_ptr->facc[j];
-        b_ptr->tacc[j] *= stepsize;
+        tmp_tacc[j] = b_ptr->tacc[j] * stepsize;
       }
-      dMultiplyAdd0_331 (b_ptr->avel, invMOIrow, b_ptr->tacc);
+      dMultiplyAdd0_331 (b_ptr->avel, invMOIrow, tmp_tacc);
       // printf("fe [%f %f %f] [%f %f %f]\n"
       //   ,b_ptr->facc[0] ,b_ptr->facc[1] ,b_ptr->facc[2]
       //   ,b_ptr->tacc[0] ,b_ptr->tacc[1] ,b_ptr->tacc[2]);
