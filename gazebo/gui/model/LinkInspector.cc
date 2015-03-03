@@ -36,18 +36,18 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
   this->setWindowTitle(tr("Link Inspector"));
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-  QLabel *partLabel = new QLabel(tr("Name:"));
-  this->partNameLabel = new QLabel(tr(""));
+  QLabel *linkLabel = new QLabel(tr("Name:"));
+  this->linkNameLabel = new QLabel(tr(""));
 
   QHBoxLayout *nameLayout = new QHBoxLayout;
-  nameLayout->addWidget(partLabel);
-  nameLayout->addWidget(partNameLabel);
+  nameLayout->addWidget(linkLabel);
+  nameLayout->addWidget(linkNameLabel);
 
   this->linkConfig = new LinkConfig;
   this->visualConfig = new VisualConfig;
   this->collisionConfig = new CollisionConfig;
 
-  // Create the main tab widget for all components in a part
+  // Create the main tab widget for all components in a link
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("linkInspectorTab");
   this->tabWidget->setMinimumHeight(800);
@@ -90,13 +90,13 @@ LinkInspector::~LinkInspector()
 /////////////////////////////////////////////////
 void LinkInspector::SetName(const std::string &_name)
 {
-  this->partNameLabel->setText(tr(_name.c_str()));
+  this->linkNameLabel->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////
 std::string LinkInspector::GetName() const
 {
-  return this->partNameLabel->text().toStdString();
+  return this->linkNameLabel->text().toStdString();
 }
 
 /////////////////////////////////////////////////
