@@ -458,6 +458,7 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
 physics::ModelPtr ServerFixture::SpawnModel(const msgs::Model &_msg)
 {
   physics::WorldPtr world = physics::get_world();
+  ServerFixture::CheckPointer(world);
   world->InsertModelString(
     "<sdf version='" + std::string(SDF_VERSION) + "'>"
     + msgs::ModelToSDF(_msg)->ToString("")
