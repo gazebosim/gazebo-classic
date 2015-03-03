@@ -338,7 +338,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
           const int infom = jicurr->info.m;
 
           // we need a copy of Jacobian for joint feedbacks
-          // because it gets destroyed by SOR solver
+          // because it gets destroyed by PGS solver
           // instead of saving all Jacobian, we can save just rows
           // for joints, that requested feedback (which is normally much less)
           if (joint->feedback) {
@@ -515,7 +515,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
       }
     }
 
-    // note that the SOR method overwrites rhs and J at this point, so
+    // note that the PGS method overwrites rhs and J at this point, so
     // they should not be used again.
     {
       IFTIMING (dTimerNow ("velocity update due to constraint forces"));
@@ -738,7 +738,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
         */
         b_ptr->lvel[j] += dv;
         b_ptr->avel[j] += da;
-        /* think about minimize J*v somehow without SORLCP...
+        /* think about minimize J*v somehow without PGSLCP...
         */
         /* minimize final velocity test 1,
         if (v0 * dv < 0) {
@@ -904,7 +904,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for iMJ
 #endif
         {
-          // for SOR_LCP
+          // for PGS_LCP
           size_t sub3_res1 = EstimatePGS_LCPMemoryRequirements(m,nb);
 
           size_t sub3_res2 = 0;

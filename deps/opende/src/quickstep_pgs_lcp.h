@@ -29,6 +29,7 @@
 namespace ode {
     namespace quickstep{
 
+// PGS_LCP was previously named SOR_LCP
 void PGS_LCP (dxWorldProcessContext *context,
   const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, dRealMutablePtr vnew, int *jb, dxBody * const *body,
   dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
@@ -42,6 +43,7 @@ void PGS_LCP (dxWorldProcessContext *context,
   const dReal stepsize); 
 
 size_t EstimatePGS_LCPMemoryRequirements(int m,int /*nb*/);
+
     } // namespace quickstep
 } // namespace ode
 #endif
