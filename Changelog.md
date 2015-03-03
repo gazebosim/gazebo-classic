@@ -5,6 +5,12 @@
   * [Pull request #1427](https://bitbucket.org/osrf/gazebo/pull-request/1427)
   * [Issue #1281](https://bitbucket.org/osrf/gazebo/issue/1281)
 
+1. Use Msg-to-SDF conversion functions in tests, add ServerFixture::SpawnModel(msgs::Model).
+    * [Pull request #1466](https://bitbucket.org/osrf/gazebo/pull-request/1466)
+
+1. Added Model Msg-to-SDF conversion functions and test.
+    * [Pull request #1429](https://bitbucket.org/osrf/gazebo/pull-request/1429)
+
 1. Added Joint Msg-to-SDF conversion functions and test.
     * [Pull request #1419](https://bitbucket.org/osrf/gazebo/pull-request/1419)
 

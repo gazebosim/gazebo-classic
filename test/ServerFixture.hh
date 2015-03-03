@@ -206,6 +206,21 @@ namespace gazebo
                    unsigned char **_imgData, unsigned int &_width,
                    unsigned int &_height);
 
+    /// \brief Spawn a model from a msgs::Model and return ModelPtr.
+    /// \param[in] _msg Model message.
+    /// \return Pointer to model.
+    protected: physics::ModelPtr SpawnModel(const msgs::Model &_msg);
+
+    /// \brief Check that a pointer is not NULL. A function is created
+    /// for this purpose, since ASSERT's cannot be called from non-void
+    /// functions.
+    /// \param[in] _ptr Pointer to verify is not NULL.
+    protected: template<typename T>
+      static void CheckPointer(boost::shared_ptr<T> _ptr)
+      {
+        ASSERT_TRUE(_ptr != NULL);
+      }
+
     /// \brief Spawn a camera.
     /// \param[in] _modelName Name of the model.
     /// \param[in] _cameraName Name of the camera.
@@ -528,6 +543,11 @@ namespace gazebo
     /// \param[out] _share Shared memory.
     protected: void GetMemInfo(double &_resident, double &_share);
 
+    /// \brief Get unique string with a specified prefix.
+    /// \param[in] _prefix Prefix for unique string.
+    /// \return String with prefix and unique number as suffix.
+    protected: std::string GetUniqueString(const std::string &_prefix);
+
     /// \brief Pointer the Gazebo server.
     protected: Server *server;
 
@@ -572,6 +592,9 @@ namespace gazebo
 
     /// \brief True if server is running.
     private: bool serverRunning;
+
+    /// \brief Counter for unique name generation.
+    private: int uniqueCounter;
   };
 }       // namespace gazebo
 #endif  // define _GAZEBO_SERVER_FIXTURE_HH_
