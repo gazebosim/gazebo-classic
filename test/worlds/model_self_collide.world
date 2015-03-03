@@ -40,7 +40,7 @@
       </link>
 
       <link name="link1">
-        <pose>-1.5 1.5 3.0 0 0 1.57</pose>
+        <pose>0 0 3.0 0 0 0</pose>
         <inertial>
           <mass>1</mass>
           <inertia>
@@ -69,7 +69,7 @@
       </link>
 
       <link name="link2">
-        <pose>0 1.5 6.0 0 0 2.24</pose>
+        <pose>0 0 6.0 0 0 0</pose>
         <inertial>
           <mass>1</mass>
           <inertia>
@@ -133,7 +133,7 @@
       </link>
 
       <link name="link1">
-        <pose>-1.5 1.5 3.0 0 0 1.57</pose>
+        <pose>0 0 3.0 0 0 0</pose>
         <self_collide>false</self_collide>
         <inertial>
           <mass>1</mass>
@@ -163,7 +163,7 @@
       </link>
 
       <link name="link2">
-        <pose>0 1.5 6.0 0 0 2.24</pose>
+        <pose>0 0 6.0 0 0 0</pose>
         <inertial>
           <mass>1</mass>
           <inertia>
@@ -225,7 +225,7 @@
       </link>
 
       <link name="link1">
-        <pose>-1.5 1.5 3.0 0 0 1.57</pose>
+        <pose>0 0 3.0 0 0 0</pose>
         <inertial>
           <mass>1</mass>
           <inertia>
@@ -254,7 +254,7 @@
       </link>
 
       <link name="link2">
-        <pose>0 1.5 6.0 0 0 2.24</pose>
+        <pose>0 0 6.0 0 0 0</pose>
         <inertial>
           <mass>1</mass>
           <inertia>

@@ -24,6 +24,7 @@ using namespace gazebo;
 
 const double g_tolerance = 1e-4;
 const double g_big = 1e29;
+const double g_physics_tol = 1e-2;
 
 class PhysicsCollisionTest : public ServerFixture,
                              public testing::WithParamInterface<const char*>
@@ -31,6 +32,10 @@ class PhysicsCollisionTest : public ServerFixture,
   /// \brief Test Collision::GetBoundingBox.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void GetBoundingBox(const std::string &_physicsEngine);
+
+  /// \brief Test self_collide property of Model.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void ModelSelfCollide(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
@@ -64,10 +69,82 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
+void PhysicsCollisionTest::ModelSelfCollide(const std::string &_physicsEngine)
+{
+  if (_physicsEngine == "bullet" || _physicsEngine == "simbody")
+    return;
+  Load("worlds/model_self_collide.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the gravity vector
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  math::Vector3 g = physics->GetGravity();
+  // Assume gravity vector points down z axis only.
+  EXPECT_EQ(g.x, 0);
+  EXPECT_EQ(g.y, 0);
+  EXPECT_LE(g.z, -9.8);
+
+  // get physics time step
+  double dt = physics->GetMaxStepSize();
+  EXPECT_GT(dt, 0);
+
+  // 3 models: all_collide, some_collide, and no_collide
+  physics::ModelPtr all_collide, some_collide, no_collide;
+  all_collide = world->GetModel("all_collide");
+  some_collide = world->GetModel("some_collide");
+  no_collide = world->GetModel("no_collide");
+  ASSERT_TRUE(all_collide != NULL);
+  ASSERT_TRUE(some_collide != NULL);
+  ASSERT_TRUE(no_collide != NULL);
+
+  // Step forward 0.2 s
+  double stepTime = 0.2;
+  unsigned int steps = floor(stepTime / dt);
+  world->Step(steps);
+
+  // Expect boxes to be falling
+  double fallVelocity = g.z * stepTime;
+  EXPECT_LT(all_collide->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+  EXPECT_LT(some_collide->GetWorldLinearVel().z,
+      fallVelocity*(1-g_physics_tol));
+  EXPECT_LT(no_collide->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+
+  // Another 3000 steps should put the boxes at rest
+  world->Step(3000);
+
+  // Expect 3 boxes to be stationary
+  EXPECT_NEAR(all_collide->GetWorldLinearVel().z, 0, 1e-2);
+  EXPECT_NEAR(some_collide->GetWorldLinearVel().z, 0, 1e-2);
+  EXPECT_NEAR(no_collide->GetWorldLinearVel().z, 0, 1e-2);
+
+  // link2 of all_collide should have the highest z-coordinate (around 3)
+  EXPECT_NEAR(all_collide->GetLink("link2")->GetWorldPose().pos.z, 2.5, 1e-2);
+
+  // link2 of some_collide should have a middling z-coordinate (around 2)
+  EXPECT_NEAR(some_collide->GetLink("link2")->GetWorldPose().pos.z, 1.5, 1e-2);
+
+  // link2 of no_collide should have a low z-coordinate (around 1)
+  EXPECT_NEAR(no_collide->GetLink("link2")->GetWorldPose().pos.z, 0.5, 1e-2);
+
+  Unload();
+}
+
+/////////////////////////////////////////////////
 TEST_P(PhysicsCollisionTest, GetBoundingBox)
 {
   GetBoundingBox(GetParam());
 }
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsCollisionTest, ModelSelfCollide)
+{
+  ModelSelfCollide(GetParam());
+}
+
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsCollisionTest,
                         PHYSICS_ENGINE_VALUES);
