@@ -148,32 +148,8 @@ namespace gazebo
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Access functions to set ODE parameters.
-      /// \param[in] _cfm Constraint force mixing.
-      public: virtual void SetWorldCFM(double _cfm);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _erp Error reduction parameter.
-      public: virtual void SetWorldERP(double _erp);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
       /// \param[in] _autoDisable True to enable auto disabling of bodies.
       public: virtual void SetAutoDisableFlag(bool _autoDisable);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _vel Max correcting velocity.
-      public: virtual void SetContactMaxCorrectingVel(double _vel);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _layerDepth Surface layer depth
-      public: virtual void SetContactSurfaceLayer(double _layerDepth);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -183,33 +159,9 @@ namespace gazebo
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
-      /// \brief Get World CFM.
-      /// \return World CFM.
-      public: virtual double GetWorldCFM() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Get World ERP.
-      /// \return World ERP.
-      public: virtual double GetWorldERP() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
       /// \brief access functions to set ODE parameters..
       /// \return Auto disable flag.
       public: virtual bool GetAutoDisableFlag() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map.
-      /// \brief access functions to set ODE parameters.
-      /// \return Max correcting velocity.
-      public: virtual double GetContactMaxCorrectingVel() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map.
-      /// \brief access functions to set ODE parameters.
-      /// \return Contact suerface layer depth.
-      public: virtual double GetContactSurfaceLayer() {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map.
@@ -225,20 +177,6 @@ namespace gazebo
       ///          "sequential_impulse' for Bullet, "quick" for ODE
       ///          "Featherstone and Lemkes" for DART and
       ///          "Spatial Algebra and Elastic Foundation" for Simbody.
-      ///       -# "cfm" (double) - global CFM
-      ///       -# "erp" (double) - global ERP
-      ///       -# "precon_iters" (bool) - precondition iterations
-      ///          (experimental).
-      ///       -# "iters" (int) - number of LCP PGS iterations. If
-      ///          sor_lcp_tolerance is negative, full iteration count is
-      ///          executed.  Otherwise, PGS may stop iteration early if
-      ///          sor_lcp_tolerance is satisfied by the total RMS residual.
-      ///       -# "sor" (double) - relaxation parameter for Projected
-      ///          Gauss-Seidel (PGS) updates.
-      ///       -# "contact_max_correcting_vel" (double) - truncates correction
-      ///          impulses from ERP by this value.
-      ///       -# "contact_surface_layer" (double) - ERP is 0 for
-      ///          interpenetration depths below this value.
       ///       -# "max_contacts" (int) - max number of contact constraints
       ///          between any pair of collision bodies.
       ///       -# "min_step_size" (double) - minimum internal step size.

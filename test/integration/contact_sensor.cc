@@ -420,7 +420,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   msgs::Contacts contacts;
 
-  physics->SetContactMaxCorrectingVel(0);
+  physics->SetParam("contact_max_correcting_vel", 0);
   physics->SetParam("iters", 100);
 
   world->Step(1);

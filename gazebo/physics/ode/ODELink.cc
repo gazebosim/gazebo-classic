@@ -124,8 +124,19 @@ void ODELink::Init()
           // Set max_vel and min_depth
           if (g->GetODESurface()->maxVel < 0)
           {
-            g->GetODESurface()->maxVel =
-             this->GetWorld()->GetPhysicsEngine()->GetContactMaxCorrectingVel();
+            try
+            {
+              double value = boost::any_cast<double>(
+                this->GetWorld()->GetPhysicsEngine()->
+                  GetParam("contact_max_correcting_vel"));
+              g->GetODESurface()->maxVel = value;
+            }
+            catch(boost::bad_any_cast &_e)
+            {
+              gzwarn << "Couldn't cast contact_max_correcting_vel in ODELink: "
+                     << _e.what() << std::endl;
+              continue;
+            }
           }
           dBodySetMaxVel(this->linkId, g->GetODESurface()->maxVel);
           dBodySetMinDepth(this->linkId, g->GetODESurface()->minDepth);

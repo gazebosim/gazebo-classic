@@ -189,7 +189,24 @@ namespace gazebo
       public: virtual bool SetParam(const std::string &_key,
                   const boost::any &_value);
 
-      /// Documentation inherited
+      /// \brief Set a parameter of the physics engine.
+      /// See SetParam documentation for descriptions of duplicate parameters.
+      /// \param[in] _key String key
+      /// Below is a list of _key parameter definitions specific to ODE:
+      ///       -# "cfm" (double) - global CFM
+      ///       -# "erp" (double) - global ERP
+      ///       -# "precon_iters" (bool) - precondition iterations
+      ///          (experimental).
+      ///       -# "iters" (int) - number of LCP PGS iterations. If
+      ///          sor_lcp_tolerance is negative, full iteration count is
+      ///          executed.  Otherwise, PGS may stop iteration early if
+      ///          sor_lcp_tolerance is satisfied by the total RMS residual.
+      ///       -# "sor" (double) - relaxation parameter for Projected
+      ///          Gauss-Seidel (PGS) updates.
+      ///       -# "contact_max_correcting_vel" (double) - truncates correction
+      ///          impulses from ERP by this value.
+      ///       -# "contact_surface_layer" (double) - ERP is 0 for
+      ///          interpenetration depths below this value.
       public: virtual boost::any GetParam(const std::string &_key) const;
 
       /// \brief Return the world space id.

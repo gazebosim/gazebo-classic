@@ -177,22 +177,7 @@ void PhysicsEngine::SetMaxStepSize(double _stepSize)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetWorldCFM(double /*_cfm*/)
-{
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetWorldERP(double /*_erp*/)
-{
-}
-
-//////////////////////////////////////////////////
 void PhysicsEngine::SetAutoDisableFlag(bool /*_autoDisable*/)
-{
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetContactMaxCorrectingVel(double /*_vel*/)
 {
 }
 
@@ -208,11 +193,6 @@ void PhysicsEngine::OnRequest(ConstRequestPtr &/*_msg*/)
 
 //////////////////////////////////////////////////
 void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/)
-{
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
 {
 }
 
