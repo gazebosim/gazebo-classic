@@ -4,6 +4,9 @@
 1. Get and Set visibility of SelectionObj's handles, with unit test.
     * [Pull request #1417](https://bitbucket.org/osrf/gazebo/pull-request/1417)
 
+1. Set material of SelectionObj's handles.
+    * [Pull request #1472](https://bitbucket.org/osrf/gazebo/pull-request/1472)
+
 1. Allow link selection with the mouse if parent model already selected.
     * [Pull request #1409](https://bitbucket.org/osrf/gazebo/pull-request/1409)
 
