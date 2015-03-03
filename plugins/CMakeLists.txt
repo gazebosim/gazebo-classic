@@ -34,6 +34,7 @@ set (plugins
   ContactPlugin
   DepthCameraPlugin
   DiffDrivePlugin
+  FoosballDemoPlugin
   ForceTorquePlugin
   GpuRayPlugin
   ImuSensorPlugin
@@ -53,10 +54,16 @@ set (plugins
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins ${plugins}
+    FoosballPlugin
     HydraPlugin
     HydraDemoPlugin
   )
 endif()
+
+set (GUIplugins
+  TimerGUIPlugin
+  FoosballGUIPlugin
+)
 
 set(GAZEBO_PLUGIN_INSTALL_DIR
   ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/
@@ -73,10 +80,12 @@ set_target_properties(BreakableJointPlugin PROPERTIES
   INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
 )
 
-QT4_WRAP_CPP(TimerGUIPlugin_MOC TimerGUIPlugin.hh)
-add_library(TimerGUIPlugin SHARED TimerGUIPlugin.cc ${TimerGUIPlugin_MOC})
-target_link_libraries(TimerGUIPlugin libgazebo gazebo_sensors ${ogre_libraries} ${QT_LIBRARIES})
-install (TARGETS TimerGUIPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+foreach (src ${GUIplugins})
+  QT4_WRAP_CPP(${src}_MOC ${src}.hh)
+  add_library(${src} SHARED ${src}.cc ${${src}_MOC})
+  target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries} ${QT_LIBRARIES})
+  install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+endforeach (src ${GUIplugins})
 
 add_subdirectory(events)
 

@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A foosball table -->
+    <model name="foosball">
+      <include>
+        <uri>model://foosball</uri>
+      </include>
+
+      <!-- Load the plugin to control the foosball players -->
+      <plugin name="foosball_table" filename='libFoosballPlugin.so'>
+        <!-- Parameters -->
+      </plugin>
+    </model>
+
+    <!-- Load the plugin for Razer Hydra -->
+    <plugin name="hydra" filename="libHydraPlugin.so"></plugin>
+
+    <!-- Load a plugin to control the foosball demo -->
+    <plugin name='foosball_demo' filename='libFoosballDemoPlugin.so'>
+      <!-- Parameters -->
+    </plugin>
+
+  </world>
+</sdf>
