@@ -28,12 +28,12 @@ using namespace gazebo;
 // number of boxes to spawn
 // collision shape on / off
 // nonlinear trajectory on / off
-typedef std::tr1::tuple<const char *
-                      , double
-                      , int
-                      , bool
-                      , bool
-                      > char1double1int1bool2;
+typedef std::tr1::tuple < const char *
+                        , double
+                        , int
+                        , bool
+                        , bool
+                        > char1double1int1bool2;
 class RigidBodyTest : public ServerFixture,
                       public testing::WithParamInterface<char1double1int1bool2>
 {
@@ -47,8 +47,7 @@ class RigidBodyTest : public ServerFixture,
                    , double _dt
                    , int _modelCount
                    , bool _collision
-                   , bool _nonlinear
-                   );
+                   , bool _nonlinear);
 };
 
 /////////////////////////////////////////////////
@@ -59,8 +58,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
                         , double _dt
                         , int _modelCount
                         , bool _collision
-                        , bool _nonlinear
-                        )
+                        , bool _nonlinear)
 {
   // Load a blank world (no ground plane)
   Load("worlds/blank.world", true, _physicsEngine);
@@ -260,8 +258,7 @@ TEST_P(RigidBodyTest, Boxes)
       , dt
       , modelCount
       , collision
-      , nonlinear
-      );
+      , nonlinear);
 }
 
 #define DT_MIN 1e-4
@@ -272,16 +269,14 @@ INSTANTIATE_TEST_CASE_P(EnginesDtLinear, RigidBodyTest,
   , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
   , ::testing::Values(1)
   , ::testing::Values(true)
-  , ::testing::Values(false)
-  ));
+  , ::testing::Values(false)));
 
 INSTANTIATE_TEST_CASE_P(EnginesDtNonlinear, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
   , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
   , ::testing::Values(1)
   , ::testing::Values(true)
-  , ::testing::Values(true)
-  ));
+  , ::testing::Values(true)));
 
 #define MODELS_MIN 1
 #define MODELS_MAX 105
@@ -291,32 +286,28 @@ INSTANTIATE_TEST_CASE_P(OdeBoxes, RigidBodyTest,
   , ::testing::Values(3.0e-4)
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
   , ::testing::Bool()
-  , ::testing::Values(true)
-  ));
+  , ::testing::Values(true)));
 
 INSTANTIATE_TEST_CASE_P(BulletBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("bullet")
   , ::testing::Values(3.0e-4)
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
   , ::testing::Bool()
-  , ::testing::Values(true)
-  ));
+  , ::testing::Values(true)));
 
 INSTANTIATE_TEST_CASE_P(SimbodyBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("simbody")
   , ::testing::Values(7.0e-4)
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
   , ::testing::Bool()
-  , ::testing::Values(true)
-  ));
+  , ::testing::Values(true)));
 
 INSTANTIATE_TEST_CASE_P(DartBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("dart")
   , ::testing::Values(7.0e-4)
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
   , ::testing::Bool()
-  , ::testing::Values(true)
-  ));
+  , ::testing::Values(true)));
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

@@ -37,15 +37,15 @@ using namespace gazebo;
 //  number of models to spawn
 // bool
 //  ode implicit spring on / off
-typedef std::tr1::tuple<const char *
-                      , const char *
-                      , double
-                      , double
-                      , double
-                      , int
-                      , int
-                      , bool
-                      > char2double3int2bool1;
+typedef std::tr1::tuple < const char *
+                        , const char *
+                        , double
+                        , double
+                        , double
+                        , int
+                        , int
+                        , bool
+                        > char2double3int2bool1;
 class JointsTest : public ServerFixture,
                    public testing::WithParamInterface<char2double3int2bool1>
 {
@@ -65,8 +65,7 @@ class JointsTest : public ServerFixture,
                    , double _disturbance
                    , int _iterations
                    , int _modelCount
-                   , bool _implicit
-                   );
+                   , bool _implicit);
 };
 
 /////////////////////////////////////////////////
@@ -81,8 +80,7 @@ void JointsTest::OneDof(const std::string &_physicsEngine
                         , double _disturbance
                         , int _iterations
                         , int _modelCount
-                        , bool _implicit
-                        )
+                        , bool _implicit)
 {
   // Load a blank world (no ground plane)
   Load("worlds/blank.world", true, _physicsEngine);
@@ -377,8 +375,7 @@ TEST_P(JointsTest, OneDof)
       , disturbance
       , iterations
       , modelCount
-      , implicit
-      );
+      , implicit);
 }
 
 #define JOINT_TYPES ::testing::Values("revolute", "prismatic")
@@ -406,8 +403,7 @@ INSTANTIATE_TEST_CASE_P(LinearDtItersOde, JointsTest,
   , ::testing::Values(99.0)
   , ITERS_VALUES
   , ::testing::Values(1)
-  , ::testing::Values(false)
-  ));
+  , ::testing::Values(false)));
 INSTANTIATE_TEST_CASE_P(LinearDt, JointsTest,
     ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
   , JOINT_TYPES
@@ -416,8 +412,7 @@ INSTANTIATE_TEST_CASE_P(LinearDt, JointsTest,
   , ::testing::Values(99.0)
   , ::testing::Values(50)
   , ::testing::Values(1)
-  , ::testing::Values(false)
-  ));
+  , ::testing::Values(false)));
 
 // Nonlinear trajectory with disturbances
 // dt = 1e-3
@@ -432,8 +427,7 @@ INSTANTIATE_TEST_CASE_P(NonlinearDtItersOde, JointsTest,
   , ::testing::Values(99.0)
   , ITERS_VALUES
   , ::testing::Values(1)
-  , ::testing::Bool()
-  ));
+  , ::testing::Bool()));
 INSTANTIATE_TEST_CASE_P(NonlinearDt, JointsTest,
     ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
   , JOINT_TYPES
@@ -442,8 +436,7 @@ INSTANTIATE_TEST_CASE_P(NonlinearDt, JointsTest,
   , ::testing::Values(99.0)
   , ::testing::Values(50)
   , ::testing::Values(1)
-  , ::testing::Values(false)
-  ));
+  , ::testing::Values(false)));
 
 // #define MODELS_MIN 1
 // #define MODELS_MAX 105
