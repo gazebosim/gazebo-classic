@@ -411,7 +411,7 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
     {+1, +1, -1}
   };
 
-  // Normals for each vertex
+  // Normals for each face
   float n[6][3]=
   {
     {+0, -1, +0},
@@ -722,7 +722,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
-  // Generate the group of rings for the sphere
+  // Generate the group of rings for the cylinder
   for (ring = 0; ring <= rings; ++ring)
   {
     vert.z = ring * height/rings - height/2.0;
