@@ -135,4 +135,4 @@ size_t quickstep::EstimateGR_LCPMemoryRequirements(int m)
   res += 5 * dEFFICIENT_SIZE(sizeof(dReal) * m); // for r, z, p, q, Ad
   return res;
 }
-#endif 
+#endif
