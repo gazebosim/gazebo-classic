@@ -269,14 +269,6 @@ namespace gazebo
       public: boost::recursive_mutex *GetPhysicsUpdateMutex() const
               {return this->physicsUpdateMutex;}
 
-      /// \brief Utility function to help casting boost::any
-      public: template <class _Type> static bool AnyCast(
-              const std::string &_key, const boost::any &_value, _Type &_ret);
-
-      /// \brief Utility function to help casting boost::any to int
-      public: static bool AnyCastInt(const std::string &_key,
-                  const boost::any &_value, int &_ret);
-
       /// \brief virtual callback for gztopic "~/request".
       /// \param[in] _msg Request message.
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
