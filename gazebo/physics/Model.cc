@@ -73,8 +73,14 @@ void Model::Load(sdf::ElementPtr _sdf)
         boost::bind(&Entity::IsStatic, this));
   }
 
+  if (this->sdf->HasElement("self_collide"))
+  {
+    this->sdf->Get<bool>("self_collide");
+  }
+
   if (this->sdf->HasElement("allow_auto_disable"))
     this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
+
   this->LoadLinks();
 
   // Load the joints if the world is already loaded. Otherwise, the World
@@ -1071,6 +1077,18 @@ void Model::SetAutoDisable(bool _auto)
 bool Model::GetAutoDisable() const
 {
   return this->sdf->Get<bool>("allow_auto_disable");
+}
+
+/////////////////////////////////////////////////
+void Model::SetSelfCollide(bool _self_collide)
+{
+  this->sdf->GetElement("self_collide")->Set(_self_collide);
+}
+
+/////////////////////////////////////////////////
+bool Model::GetSelfCollide() const
+{
+  return this->sdf->Get<bool>("self_collide");
 }
 
 /////////////////////////////////////////////////

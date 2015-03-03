@@ -119,9 +119,20 @@ void Link::Load(sdf::ElementPtr _sdf)
 
   Entity::Load(_sdf);
 
-  // before loading child collsion, we have to figure out of selfCollide is true
-  // and modify parent class Entity so this body has its own spaceId
-  this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
+  // before loading child collision, we have to figure out of selfCollide is
+  // true and modify parent class Entity so this body has its own spaceId
+  if (this->sdf->HasElement("self_collide"))
+  {
+    this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
+  }
+  else if (this->GetModel()->GetSelfCollide())
+  {
+    this->SetSelfCollide(true);
+  }
+  else
+  {
+    this->SetSelfCollide(false);
+  }
   this->sdf->GetElement("self_collide")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetSelfCollide, this));
 
@@ -324,7 +335,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
   if (this->sdf->Get<bool>("gravity") != this->GetGravityMode())
     this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
-  // before loading child collsiion, we have to figure out if
+  // before loading child collision, we have to figure out if
   // selfCollide is true and modify parent class Entity so this
   // body has its own spaceId
   this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));

@@ -178,6 +178,14 @@ namespace gazebo
       /// \return Pointer to the link, NULL if the name is invalid.
       public: LinkPtr GetLink(const std::string &_name ="canonical") const;
 
+      /// \brief If this model allows self-collisions by default.
+      /// \return True if self-collide enabled for this model, false otherwise.
+      public: bool GetSelfCollide() const;
+
+      /// \brief Set this model's self_collide property
+      /// \param[in] _self_collide Whether or not self-collisions enabled by default.
+      public: void SetSelfCollide(bool _self_collide);
+
       /// \brief Set the gravity mode of the model.
       /// \param[in] _value False to turn gravity on for the model.
       public: void SetGravityMode(const bool &_value);
