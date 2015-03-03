@@ -98,7 +98,7 @@ struct dxDampingParameters {
 struct dxQuickStepParameters {
   int precon_iterations;	// number of preconditioned PGS iterations to perform (without error correction)
   int num_iterations;		// number of PGS iterations to perform
-  dReal w;			// the SOR over-relaxation parameter
+  dReal w;			// the PGS over-relaxation parameter
   int num_chunks;		// divide rows to these many chunks
   int num_overlap;		// divide rows but over lap this many rows
 	// stop iteration if total rms_constraint_residual falls below this value
