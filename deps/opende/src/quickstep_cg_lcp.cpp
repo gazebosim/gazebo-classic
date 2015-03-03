@@ -128,15 +128,11 @@ void quickstep::CG_LCP (dxWorldProcessContext *context,
   printf ("lambda error = %10.6e\n",error);
 #endif
 }
-
-#endif 
-
-#ifdef USE_CG_LCP
-size_t quickstep::EstimateGR_LCPMemoryRequirements(int m);
+ 
+size_t quickstep::EstimateGR_LCPMemoryRequirements(int m)
 {
   size_t res = dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for iMJ
   res += 5 * dEFFICIENT_SIZE(sizeof(dReal) * m); // for r, z, p, q, Ad
   return res;
 }
 #endif 
- 

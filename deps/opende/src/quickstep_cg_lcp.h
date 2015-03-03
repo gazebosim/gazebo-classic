@@ -25,19 +25,17 @@
 
 #include <ode/common.h>
 #include "quickstep_util.h"
- 
+
 namespace ode {
     namespace quickstep{
 #ifdef USE_CG_LCP
-  void CG_LCP (dxWorldProcessContext *context,
-  int m, int nb, dRealMutablePtr J, int *jb, dxBody * const *body,
-  dRealPtr invMOI, dRealMutablePtr lambda, dRealMutablePtr cforce, dRealMutablePtr rhs,
-  dRealMutablePtr lo, dRealMutablePtr hi, dRealPtr cfm, int *findex,
-  dxQuickStepParameters *qs); 
-#endif 
+        void CG_LCP (dxWorldProcessContext *context,
+                int m, int nb, dRealMutablePtr J, int *jb, dxBody * const *body,
+                dRealPtr invMOI, dRealMutablePtr lambda, dRealMutablePtr cforce, dRealMutablePtr rhs,
+                dRealMutablePtr lo, dRealMutablePtr hi, dRealPtr cfm, int *findex,
+                dxQuickStepParameters *qs); 
 
-#ifdef USE_CG_LCP
-size_t quickstep::EstimateGR_LCPMemoryRequirements(int m);
+        size_t quickstep::EstimateGR_LCPMemoryRequirements(int m);
 #endif
     } // namespace quickstep
 } // namespace ode
