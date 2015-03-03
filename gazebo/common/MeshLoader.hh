@@ -18,6 +18,7 @@
 #define MESHLOADER_HH
 
 #include <string>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class MeshLoader MeshLoader.hh common/common.hh
     /// \brief Base class for loading meshes
-    class MeshLoader
+    class GAZEBO_VISIBLE MeshLoader
     {
       /// \brief Constructor
       public: MeshLoader();

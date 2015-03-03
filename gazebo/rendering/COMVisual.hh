@@ -14,22 +14,19 @@
  * limitations under the License.
  *
 */
-/* Desc: Center of Mass Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _COMVISUAL_HH_
 #define _COMVISUAL_HH_
 
 #include <string>
 
-#include "gazebo/rendering/Visual.hh"
-#include "gazebo/msgs/msgs.hh"
+#include <sdf/sdf.hh>
 
-namespace ogre
-{
-  class SceneNode;
-}
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -38,11 +35,9 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
-    class DynamicLines;
-
     /// \class COMVisual COMVisual.hh rendering/rendering.hh
     /// \brief Basic Center of Mass visualization
-    class COMVisual : public Visual
+    class GAZEBO_VISIBLE COMVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the Visual
@@ -55,6 +50,7 @@ namespace gazebo
       /// \brief Load the Visual from an SDF pointer
       /// \param[in] _elem SDF Element pointer
       public: virtual void Load(sdf::ElementPtr _elem);
+      using Visual::Load;
 
       /// \brief Load from a message
       /// \param[in] _msg Pointer to the message
@@ -65,12 +61,6 @@ namespace gazebo
       /// \param[in] _scale Scale factor for the COM visual.
       private: void Load(const math::Pose &_pose,
                const math::Vector3 &_scale = math::Vector3(0.02, 0.02, 0.02));
-
-      /// \brief Lines that make the cross marking the center of mass
-      private: DynamicLines *crossLines;
-
-      /// \brief Box that make the cross marking the center of mass
-      private: Ogre::SceneNode *boxNode;
     };
     /// \}
   }

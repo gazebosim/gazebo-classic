@@ -16,6 +16,8 @@
 */
 
 #include <boost/filesystem.hpp>
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "ServerFixture.hh"
@@ -51,10 +53,11 @@ void onPoseInfo(ConstPose_VPtr &_msg)
 /// Record a log file
 TEST(StateLogTest, PR2Record)
 {
-  custom_exec("gzserver -r --record_path /tmp/gazebo_test "
-    "--iters 1000 --seed 12345 worlds/pr2.world");
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  custom_exec(("gzserver -r --record_path " + paths->GetDefaultTestPath()
+    + " --iters 1000 --seed 12345 worlds/pr2.world").c_str());
 
-  boost::filesystem::path path = "/tmp/gazebo_test/state.log";
+  boost::filesystem::path path = paths->GetDefaultTestPath() + "/state.log";
   EXPECT_TRUE(boost::filesystem::exists(path) != false);
 }
 
@@ -66,8 +69,9 @@ TEST(StateLogTest, PR2PlaybackZipped)
   custom_exec("killall -9 gzserver");
 
   // Run playback
+  common::SystemPaths *paths = common::SystemPaths::Instance();
   boost::thread *play = new boost::thread(boost::bind(&custom_exec,
-        "gzserver -u -p /tmp/gazebo_test/state.log"));
+    ("gzserver -u -p " + paths->GetDefaultTestPath() "/state.log").c_str()));
 
   // Setup transportation
   gazebo::transport::init();
@@ -129,12 +133,13 @@ TEST(StateLogTest, PR2PlaybackTxt)
   g_msgCount = 0;
 
   // Convert the zipped state to txt and set a Hz filter.
-  custom_exec("gzlog echo /tmp/gazebo_test/state.log -z 30 > "
-      "/tmp/gazebo_test/state_txt.log");
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  custom_exec(("gzlog echo " + paths->GetDefaultTestPath() + "/state.log" +
+    " -z 30 > " + paths->GetDefaultTestPath() + "/state_txt.log").c_str());
 
   // Run playback
   boost::thread *play = new boost::thread(boost::bind(&custom_exec,
-        "gzserver -u -p /tmp/gazebo_test/state.log"));
+    ("gzserver -u -p " + paths->GetDefaultTestPath() "/state.log").c_str()));
 
   // Setup transportation
   gazebo::transport::init();
@@ -152,7 +157,6 @@ TEST(StateLogTest, PR2PlaybackTxt)
   // Subscribe to pose info
   gazebo::transport::SubscriberPtr sub = node->Subscribe(
       "/gazebo/default/pose/info", &onPoseInfo);
-
 
   // Unpause gzserver
   gazebo::msgs::WorldControl msg;
@@ -189,14 +193,15 @@ TEST(StateLogTest, PR2PlaybackTxt)
 int main(int argc, char **argv)
 {
   // Cleanup test directory and create a new one.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
-  boost::filesystem::create_directories("/tmp/gazebo_test");
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  boost::filesystem::remove_all(paths->GetDefaultTestPath());
+  boost::filesystem::create_directories(paths->GetDefaultTestPath());
 
   ::testing::InitGoogleTest(&argc, argv);
   int result = RUN_ALL_TESTS();
 
   // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
+  boost::filesystem::remove_all(paths->GetDefaultTestPath());
 
   return result;
 }

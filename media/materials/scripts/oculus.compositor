@@ -1,0 +1,43 @@
+compositor OculusLeft
+{
+    technique
+    {
+        texture rt0 1024 1024 PF_R8G8B8
+
+        target rt0 { input previous }
+
+        target_output
+        {
+            // Start with clear output
+            input none
+
+            pass render_quad
+            {
+                material Ogre/Compositor/Oculus
+                input 0 rt0
+            }
+        }
+    }
+}
+
+compositor OculusRight
+{
+    technique
+    {
+        texture rt0 1024 1024 PF_R8G8B8
+
+        target rt0 { input previous }
+
+        target_output
+        {
+            // Start with clear output
+            input none
+
+            pass render_quad
+            {
+                material Ogre/Compositor/Oculus
+                input 0 rt0
+            }
+        }
+    }
+}

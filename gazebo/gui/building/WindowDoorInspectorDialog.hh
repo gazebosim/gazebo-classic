@@ -20,12 +20,13 @@
 
 #include <string>
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class WindowDoorInspectorDialog : public QDialog
+    class GAZEBO_VISIBLE WindowDoorInspectorDialog : public QDialog
     {
       Q_OBJECT
 

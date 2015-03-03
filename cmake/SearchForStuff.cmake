@@ -67,12 +67,6 @@ endif ()
 ########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
-
-  pkg_check_modules(SDF sdformat>=1.4.7)
-  if (NOT SDF_FOUND)
-    BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
-  endif()
-
   pkg_check_modules(CURL libcurl)
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
@@ -126,7 +120,7 @@ if (PKG_CONFIG_FOUND)
   #################################################
   # Find Simbody
   set(SimTK_INSTALL_DIR ${SimTK_INSTALL_PREFIX})
-  #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake) 
+  #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake)
   find_package(Simbody)
   if (SIMBODY_FOUND)
     set (HAVE_SIMBODY TRUE)
@@ -137,12 +131,13 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore)
+  find_package(DARTCore 4.1 QUIET)
   if (DARTCore_FOUND)
     message (STATUS "Looking for DARTCore - found")
     set (HAVE_DART TRUE)
   else()
-    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core3.")
+    message (STATUS "Looking for DARTCore - not found")
+    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core4-dev.")
     set (HAVE_DART FALSE)
   endif()
 
@@ -153,17 +148,17 @@ if (PKG_CONFIG_FOUND)
   if (NOT tinyxml_FOUND)
       find_path (tinyxml_INCLUDE_DIRS tinyxml.h ${tinyxml_INCLUDE_DIRS} ENV CPATH)
       find_library(tinyxml_LIBRARIES NAMES tinyxml)
-      set (tinyxml_FAIL False) 
+      set (tinyxml_FAIL False)
       if (NOT tinyxml_INCLUDE_DIRS)
         message (STATUS "Looking for tinyxml headers - not found")
-        set (tinyxml_FAIL True) 
+        set (tinyxml_FAIL True)
       endif()
       if (NOT tinyxml_LIBRARIES)
         message (STATUS "Looking for tinyxml library - not found")
-        set (tinyxml_FAIL True) 
+        set (tinyxml_FAIL True)
       endif()
   endif()
-        
+
   if (tinyxml_FAIL)
     message (STATUS "Looking for tinyxml.h - not found")
     BUILD_ERROR("Missing: tinyxml")
@@ -192,12 +187,6 @@ if (PKG_CONFIG_FOUND)
   if (NOT LIBTAR_FOUND)
      BUILD_ERROR("Missing: libtar")
   endif()
-
-  #################################################
-  # Use internal CCD (built as libgazebo_ccd.so)
-  #
-  set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
-  set(CCD_LIBRARIES gazebo_ccd)
 
   #################################################
   # Find TBB
@@ -236,13 +225,10 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
-  # There are some runtime problems to solve with ogre-1.9. 
-  # Please read gazebo issues: 994, 995, 996
-  pkg_check_modules(MAX_VALID_OGRE OGRE<=1.8.9)
+  # There are some runtime problems to solve with ogre-1.9.
+  # Please read gazebo issues: 994, 995
   if (NOT OGRE_FOUND)
     BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
-  elseif (NOT MAX_VALID_OGRE_FOUND)
-    BUILD_ERROR("Bad Ogre3d version: gazebo using ${OGRE_VERSION} ogre version has known bugs in runtime (issue #996). Please use 1.7 or 1.8 series")
   else ()
     set(ogre_ldflags ${ogre_ldflags} ${OGRE_LDFLAGS})
     set(ogre_include_dirs ${ogre_include_dirs} ${OGRE_INCLUDE_DIRS})
@@ -283,6 +269,15 @@ if (PKG_CONFIG_FOUND)
   else()
     # This variable will be substituted into cmake/setup.sh.in
     set (OGRE_PLUGINDIR ${_pkgconfig_invoke_result})
+  endif()
+
+  ########################################
+  # Check and find libccd (if needed)
+  pkg_check_modules(CCD ccd>=1.4)
+  if (NOT CCD_FOUND)
+    message(STATUS "Using internal copy of libccd")
+    set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
+    set(CCD_LIBRARIES gazebo_ccd)
   endif()
 
   ########################################
@@ -368,8 +363,8 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find bullet
-  # First and preferred option is to look for bullet standard pkgconfig, 
-  # so check it first. if it is not present, check for the OSRF 
+  # First and preferred option is to look for bullet standard pkgconfig,
+  # so check it first. if it is not present, check for the OSRF
   # custom bullet2.82.pc file
   pkg_check_modules(BULLET bullet>=2.82)
   if (NOT BULLET_FOUND)
@@ -382,6 +377,7 @@ if (PKG_CONFIG_FOUND)
   else()
     set (HAVE_BULLET FALSE)
     add_definitions( -DLIBBULLET_VERSION=0.0 )
+    BUILD_WARNING ("Bullet > 2.82 not found, for bullet physics engine option, please install libbullet2.82-dev.")
   endif()
 
 else (PKG_CONFIG_FOUND)
@@ -389,6 +385,18 @@ else (PKG_CONFIG_FOUND)
   BUILD_ERROR ("Error: pkg-config not found")
 endif ()
 
+########################################
+# Find SDFormat
+find_package(SDFormat 2.0.1)
+if (NOT SDFormat_FOUND)
+  message (STATUS "Looking for SDFormat - not found")
+  BUILD_ERROR ("Missing: SDF version >=2.0.1. Required for reading and writing SDF files.")
+else()
+  message (STATUS "Looking for SDFormat - found")
+endif()
+
+########################################
+# Find QT
 find_package (Qt4)
 if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
@@ -405,37 +413,11 @@ if (NOT Boost_FOUND)
 endif()
 
 ########################################
-# Find libtool
-find_path(libtool_include_dir ltdl.h /usr/include /usr/local/include)
-if (NOT libtool_include_dir)
-  message (STATUS "Looking for ltdl.h - not found")
-  BUILD_WARNING ("ltdl.h not found")
-  set (libtool_include_dir /usr/include)
-else (NOT libtool_include_dir)
-  message (STATUS "Looking for ltdl.h - found")
-endif (NOT libtool_include_dir)
-
-find_library(libtool_library ltdl /usr/lib /usr/local/lib)
-if (NOT libtool_library)
-  message (STATUS "Looking for libltdl - not found")
-else (NOT libtool_library)
-  message (STATUS "Looking for libltdl - found")
-endif (NOT libtool_library)
-
-if (libtool_library AND libtool_include_dir)
-  set (HAVE_LTDL TRUE)
-else ()
-  set (HAVE_LTDL FALSE)
-  set (libtool_library "" CACHE STRING "" FORCE)
-endif ()
-
-
-########################################
 # Find libdl
 find_path(libdl_include_dir dlfcn.h /usr/include /usr/local/include)
 if (NOT libdl_include_dir)
   message (STATUS "Looking for dlfcn.h - not found")
-  BUILD_WARNING ("dlfcn.h not found, plugins will not be supported.")
+  BUILD_ERROR ("Missing libdl: Required for plugins.")
   set (libdl_include_dir /usr/include)
 else (NOT libdl_include_dir)
   message (STATUS "Looking for dlfcn.h - found")
@@ -444,20 +426,54 @@ endif ()
 find_library(libdl_library dl /usr/lib /usr/local/lib)
 if (NOT libdl_library)
   message (STATUS "Looking for libdl - not found")
-  BUILD_WARNING ("libdl not found, plugins will not be supported.")
+  BUILD_ERROR ("Missing libdl: Required for plugins.")
 else (NOT libdl_library)
   message (STATUS "Looking for libdl - found")
 endif ()
 
-if (libdl_library AND libdl_include_dir)
-  SET (HAVE_DL TRUE)
-else (libdl_library AND libdl_include_dir)
-  SET (HAVE_DL FALSE)
+########################################
+# Find gdal
+include (FindGDAL)
+if (NOT GDAL_FOUND)
+  message (STATUS "Looking for libgdal - not found")
+  BUILD_WARNING ("GDAL not found, Digital elevation terrains support will be disabled.")
+  set (HAVE_GDAL OFF CACHE BOOL "HAVE GDAL" FORCE)
+else ()
+  message (STATUS "Looking for libgdal - found")
+  set (HAVE_GDAL ON CACHE BOOL "HAVE GDAL" FORCE)
 endif ()
+
+########################################
+# Find libusb
+pkg_check_modules(libusb-1.0 libusb-1.0)
+if (NOT libusb-1.0_FOUND)
+  BUILD_WARNING ("libusb-1.0 not found. USB peripherals support will be disabled.")
+  set (HAVE_USB OFF CACHE BOOL "HAVE USB" FORCE)
+else()
+  message (STATUS "Looking for libusb-1.0 - found. USB peripherals support enabled.")
+  set (HAVE_USB ON CACHE BOOL "HAVE USB" FORCE)
+  include_directories(${libusb-1.0_INCLUDE_DIRS})
+  link_directories(${libusb-1.0_LIBRARY_DIRS})
+endif ()
+
+#################################################
+# Find Oculus SDK.
+pkg_check_modules(OculusVR OculusVR)
+
+if (HAVE_USB AND OculusVR_FOUND)
+  message (STATUS "Oculus Rift support enabled.")
+  set (HAVE_OCULUS ON CACHE BOOL "HAVE OCULUS" FORCE)
+  include_directories(SYSTEM ${OculusVR_INCLUDE_DIRS})
+  link_directories(${OculusVR_LIBRARY_DIRS})
+else ()
+  BUILD_WARNING ("Oculus Rift support will be disabled.")
+  set (HAVE_OCULUS OFF CACHE BOOL "HAVE OCULUS" FORCE)
+endif()
 
 ########################################
 # Include man pages stuff
 include (${gazebo_cmake_dir}/Ronn2Man.cmake)
+include (${gazebo_cmake_dir}/Man.cmake)
 add_manpage_target()
 
 ########################################
@@ -465,16 +481,16 @@ add_manpage_target()
 #find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
 #  /usr/include
 #  /usr/local/include
-#  "$ENV{LIB_DIR}/include" 
-#  "$ENV{INCLUDE}" 
+#  "$ENV{LIB_DIR}/include"
+#  "$ENV{INCLUDE}"
 #  PATH_SUFFIXES qwt-qt4 qwt qwt5
 #  )
 #
-#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS 
+#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
 #  /usr/lib
 #  /usr/local/lib
-#  "$ENV{LIB_DIR}/lib" 
-#  "$ENV{LIB}/lib" 
+#  "$ENV{LIB_DIR}/lib"
+#  "$ENV{LIB}/lib"
 #  )
 #
 #if (QWT_INCLUDE_DIR AND QWT_LIBRARY)

@@ -28,6 +28,7 @@
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -42,7 +43,7 @@ namespace gazebo
     /// \class MapShape MapShape.hh physics/physics.hh
     /// \brief Creates box extrusions based on an image.
     /// This function is not yet complete, to be implemented.
-    class MapShape : public Shape
+    class GAZEBO_VISIBLE MapShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.
@@ -148,7 +149,7 @@ namespace gazebo
 
     /// \class QuadNode MapShape.hh physics/physics.hh
     /// \cond
-    class QuadNode
+    class GAZEBO_VISIBLE QuadNode
     {
       /// \brief Constructor
       /// \param[in] _parent Parent quad tree node.

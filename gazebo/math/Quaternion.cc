@@ -598,3 +598,31 @@ Quaternion Quaternion::Slerp(double _fT, const Quaternion &_rkP,
     return t;
   }
 }
+
+//////////////////////////////////////////////////
+// Implementation based on:
+// http://physicsforgames.blogspot.com/2010/02/quaternions.html
+Quaternion Quaternion::Integrate(const Vector3 &_angularVelocity,
+                                 const double _deltaT) const
+{
+  Quaternion deltaQ;
+  Vector3 theta = _angularVelocity * _deltaT * 0.5;
+  double thetaMagSq = theta.GetSquaredLength();
+  double s;
+  if (thetaMagSq * thetaMagSq / 24.0 < GZ_DBL_MIN)
+  {
+    deltaQ.w = 1.0 - thetaMagSq / 2.0;
+    s = 1.0 - thetaMagSq / 6.0;
+  }
+  else
+  {
+    double thetaMag = sqrt(thetaMagSq);
+    deltaQ.w = cos(thetaMag);
+    s = sin(thetaMag) / thetaMag;
+  }
+  deltaQ.x = theta.x * s;
+  deltaQ.y = theta.y * s;
+  deltaQ.z = theta.z * s;
+  return deltaQ * (*this);
+}
+

@@ -46,6 +46,12 @@ bool CallbackHelper::GetLatching() const
 }
 
 /////////////////////////////////////////////////
+void CallbackHelper::SetLatching(bool _latch)
+{
+  this->latching = _latch;
+}
+
+/////////////////////////////////////////////////
 unsigned int CallbackHelper::GetId() const
 {
   return this->id;

@@ -27,12 +27,14 @@
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Plane.hh"
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace common
   {
     class ColladaLoader;
+    class ColladaExporter;
     class STLLoader;
     class Mesh;
     class Plane;
@@ -43,7 +45,7 @@ namespace gazebo
 
     /// \class MeshManager MeshManager.hh common/common.hh
     /// \brief Maintains and manages all meshes
-    class MeshManager : public SingletonT<MeshManager>
+    class GAZEBO_VISIBLE MeshManager : public SingletonT<MeshManager>
     {
       /// \brief Constructor
       private: MeshManager();
@@ -57,6 +59,15 @@ namespace gazebo
       /// \param[in] _filename the path to the mesh
       /// \return a pointer to the created mesh
       public: const Mesh *Load(const std::string &_filename);
+
+      /// \brief Export a mesh to a file
+      /// \param[in] _mesh Pointer to the mesh to be exported
+      /// \param[in] _filename Exported file's path and name
+      /// \param[in] _extension Exported file's format ("dae" for Collada)
+      /// \param[in] _exportTextures True to export texture images to
+      /// '../materials/textures' folder
+      public: void Export(const Mesh *_mesh, const std::string &_filename,
+          const std::string &_extension, bool _exportTextures = false);
 
       /// \brief Checks a path extension against the list of valid extensions.
       /// \return true if the file extension is loadable
@@ -109,6 +120,16 @@ namespace gazebo
                              const math::Vector3 &_sides,
                              const math::Vector2d &_uvCoords);
 
+      /// \brief Create a Extruded Polyline mesh
+      /// \param[in] _name the name of the new mesh
+      /// \param[in] _vertices the x y  dimentions of eah vertex in meter
+      /// \param[in] _height the height of the polyline
+      /// \param[in] _uvCoords the texture coordinates
+      public: void CreateExtrudedPolyline(const std::string &_name,
+                  const std::vector<math::Vector2d> &_vertices,
+                  const double &_height,
+                  const math::Vector2d &_uvCoords);
+
       /// \brief Create a cylinder mesh
       /// \param[in] _name the name of the new mesh
       /// \param[in] _radius the radius of the cylinder in the x y plane
@@ -116,7 +137,7 @@ namespace gazebo
       /// \param[in] _rings the number of circles along the height
       /// \param[in] _segments the number of segment per circle
       public: void CreateCylinder(const std::string &_name,
-                              float _radius,
+                                  float _radius,
                                   float _height,
                                   int _rings,
                                   int _segments);
@@ -128,7 +149,7 @@ namespace gazebo
       /// \param[in] _rings the number of circles along the height
       /// \param[in] _segments the number of segment per circle
       public: void CreateCone(const std::string &_name,
-                          float _radius,
+                              float _radius,
                               float _height,
                               int _rings,
                               int _segments);
@@ -205,6 +226,9 @@ namespace gazebo
 
       /// \brief 3D mesh loader for COLLADA files
       private: ColladaLoader *colladaLoader;
+
+      /// \brief 3D mesh exporter for COLLADA files
+      private: ColladaExporter *colladaExporter;
 
       /// \brief 3D mesh loader for STL files
       private: STLLoader *stlLoader;

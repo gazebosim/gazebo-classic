@@ -27,7 +27,6 @@
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
 #include "gazebo/common/ModelDatabase.hh"
-#include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonIface.hh"
@@ -44,15 +43,14 @@
 #include "gazebo/Master.hh"
 #include "gazebo/Server.hh"
 
+namespace po = boost::program_options;
 using namespace gazebo;
 
 bool Server::stop = true;
-bool Server::initialized = false;
 
 /////////////////////////////////////////////////
 Server::Server()
 {
-  this->receiveMutex = new boost::mutex();
   this->initialized = false;
 }
 
@@ -60,7 +58,6 @@ Server::Server()
 Server::~Server()
 {
   fflush(stdout);
-  delete this->receiveMutex;
 }
 
 /////////////////////////////////////////////////
@@ -74,21 +71,22 @@ void Server::PrintUsage()
 }
 
 /////////////////////////////////////////////////
-bool Server::ParseArgs(int argc, char **argv)
+bool Server::ParseArgs(int _argc, char **_argv)
 {
-  // save a copy of argc and argv for consumption by system plugins
-  this->systemPluginsArgc = argc;
-  this->systemPluginsArgv = new char*[argc];
-  for (int i = 0; i < argc; ++i)
+  // Save a copy of argc and argv for consumption by system plugins
+  this->systemPluginsArgc = _argc;
+  this->systemPluginsArgv = new char*[_argc];
+  for (int i = 0; i < _argc; ++i)
   {
-    int argvLen = strlen(argv[i]) + 1;
+    int argvLen = strlen(_argv[i]) + 1;
     this->systemPluginsArgv[i] = new char[argvLen];
-    snprintf(this->systemPluginsArgv[i], argvLen, "%s", argv[i]);
+    snprintf(this->systemPluginsArgv[i], argvLen, "%s", _argv[i]);
   }
 
-  po::options_description v_desc("Options");
-  v_desc.add_options()
-    ("quiet,q", "Reduce output to stdout.")
+  po::options_description visibleDesc("Options");
+  visibleDesc.add_options()
+    ("version,v", "Output version information.")
+    ("verbose", "Increase the messages written to the terminal.")
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
     ("physics,e", po::value<std::string>(),
@@ -103,28 +101,26 @@ bool Server::ParseArgs(int argc, char **argv)
      "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(),
      "Number of iterations to simulate.")
-    ("minimal_comms", "Reduce the messages output by gzserver")
+    ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
 
-  po::options_description h_desc("Hidden options");
-  h_desc.add_options()
-    ("world_file", po::value<std::string>(), "SDF world to load.");
-
-  h_desc.add_options()
+  po::options_description hiddenDesc("Hidden options");
+  hiddenDesc.add_options()
+    ("world_file", po::value<std::string>(), "SDF world to load.")
     ("pass_through", po::value<std::vector<std::string> >(),
      "not used, passed through to system plugins.");
 
   po::options_description desc("Options");
-  desc.add(v_desc).add(h_desc);
+  desc.add(visibleDesc).add(hiddenDesc);
 
-  po::positional_options_description p_desc;
-  p_desc.add("world_file", 1).add("pass_through", -1);
+  po::positional_options_description positionalDesc;
+  positionalDesc.add("world_file", 1).add("pass_through", -1);
 
   try
   {
-    po::store(po::command_line_parser(argc, argv).options(desc).positional(
-          p_desc).allow_unregistered().run(), this->vm);
+    po::store(po::command_line_parser(_argc, _argv).options(desc).positional(
+          positionalDesc).allow_unregistered().run(), this->vm);
 
     po::notify(this->vm);
   }
@@ -136,17 +132,24 @@ bool Server::ParseArgs(int argc, char **argv)
     return false;
   }
 
-  if (this->vm.count("help"))
+  if (this->vm.count("version"))
   {
-    this->PrintUsage();
-    std::cerr << v_desc << "\n";
+    std::cout << GAZEBO_VERSION_HEADER << std::endl;
     return false;
   }
 
-  if (this->vm.count("quiet"))
-    gazebo::common::Console::Instance()->SetQuiet(true);
-  else
+  if (this->vm.count("help"))
+  {
+    this->PrintUsage();
+    std::cerr << visibleDesc << "\n";
+    return false;
+  }
+
+  if (this->vm.count("verbose"))
+  {
     gazebo::printVersion();
+    gazebo::common::Console::SetQuiet(false);
+  }
 
   if (this->vm.count("minimal_comms"))
     gazebo::transport::setMinimalComms(true);
@@ -263,10 +266,6 @@ bool Server::ParseArgs(int argc, char **argv)
 
   return true;
 }
-
-/////////////////////////////////////////////////
-void Server::Init()
-{ }
 
 /////////////////////////////////////////////////
 bool Server::GetInitialized() const
@@ -529,7 +528,7 @@ void Server::SetParams(const common::StrStr_M &_params)
 /////////////////////////////////////////////////
 void Server::OnControl(ConstServerControlPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   this->controlMsgs.push_back(*_msg);
 }
 

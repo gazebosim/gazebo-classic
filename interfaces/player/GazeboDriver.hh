@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include "player.h"
+#include "gazebo/util/system.hh"
 
 /// \addtogroup player
 /// \brief Gazebo player driver
@@ -34,7 +35,7 @@
 class GazeboInterface;
 
 /// \brief Gazebo player driver
-class GazeboDriver : public Driver
+class GAZEBO_VISIBLE GazeboDriver : public Driver
 {
   /// \brief Constructor
   public: GazeboDriver(ConfigFile *_cf, int _section);

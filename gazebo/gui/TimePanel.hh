@@ -26,6 +26,7 @@
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/util/system.hh"
 
 class QLineEdit;
 class QLabel;
@@ -34,7 +35,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class TimePanel : public QWidget
+    class GAZEBO_VISIBLE TimePanel : public QWidget
     {
       Q_OBJECT
 
@@ -58,6 +59,9 @@ namespace gazebo
 
       /// \brief Update the data output.
       private slots: void Update();
+
+      /// \brief Qt call back when the step value in the spinbox changed
+      private slots: void OnStepValueChanged(int _value);
 
       /// \brief Called when the GUI enters/leaves full-screen mode.
       /// \param[in] _value True when entering full screen, false when
@@ -107,6 +111,9 @@ namespace gazebo
 
       /// \brief Mutex to protect the memeber variables.
       private: boost::mutex mutex;
+
+      /// \brief Tool button that holds the step widget
+      private: QToolButton *stepButton;
     };
   }
 }

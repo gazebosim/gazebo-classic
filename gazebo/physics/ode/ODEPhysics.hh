@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The ODE physics engine wrapper
- * Author: Nate Koenig
- * Date: 11 June 2007
- */
-
 #ifndef _ODEPHYSICS_HH_
 #define _ODEPHYSICS_HH_
 
@@ -37,13 +32,14 @@
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/gazebo_config.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief Data structure for contact feedbacks
-    class ODEJointFeedback
+    class GAZEBO_VISIBLE ODEJointFeedback
     {
       public: ODEJointFeedback() : contact(NULL), count(0) {}
 
@@ -58,7 +54,7 @@ namespace gazebo
     };
 
     /// \brief ODE physics engine.
-    class ODEPhysics : public PhysicsEngine
+    class GAZEBO_VISIBLE ODEPhysics : public PhysicsEngine
     {
       /// \enum ODEParam
       /// \brief ODE Physics parameter types.
@@ -92,7 +88,11 @@ namespace gazebo
         MAX_CONTACTS,
 
         /// \brief Minimum step size
-        MIN_STEP_SIZE
+        MIN_STEP_SIZE,
+
+        /// \brief Limit ratios of inertias of adjacent links (note that the
+        /// corresponding SDF tag is "use_dynamic_moi_rescaling")
+        INERTIA_RATIO_REDUCTION
       };
 
       /// \brief Constructor.
@@ -191,7 +191,7 @@ namespace gazebo
       public: virtual double GetContactSurfaceLayer();
 
       // Documentation inherited
-      public: virtual int GetMaxContacts();
+      public: virtual unsigned int GetMaxContacts();
 
       // Documentation inherited
       public: virtual void DebugPrint() const;
@@ -199,23 +199,12 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetSeed(uint32_t _seed);
 
-      /// \brief Set a parameter of the bullet physics engine
-      /// \param[in] _param A parameter listed in the ODEParam enum
-      /// \param[in] _value The value to set to
-      public: virtual void SetParam(ODEParam _param,
-                  const boost::any &_value);
-
       /// Documentation inherited
-      public: virtual void SetParam(const std::string &_key,
+      public: virtual bool SetParam(const std::string &_key,
                   const boost::any &_value);
 
       /// Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
-
-      /// \brief Get an parameter of the physics engine
-      /// \param[in] _param A parameter listed in the ODEParam enum
-      /// \return The value of the parameter
-      public: virtual boost::any GetParam(ODEParam _param) const;
 
       /// \brief Return the world space id.
       /// \return The space id for the world.
@@ -324,7 +313,7 @@ namespace gazebo
       private: int indices[MAX_CONTACT_JOINTS];
 
       /// \brief Maximum number of contact points per collision pair.
-      private: int maxContacts;
+      private: unsigned int maxContacts;
     };
   }
 }

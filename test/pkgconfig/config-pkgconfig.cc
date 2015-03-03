@@ -27,6 +27,19 @@ TEST(PkgConfig, Config)
   ASSERT_EQ(system(cmd), 0);
 }
 
+#ifndef WIN32
+TEST(PkgConfig, CC)
+{
+  char cmd[1024];
+
+  snprintf(cmd, sizeof(cmd),
+     "cc -fPIC -shared `pkg-config --cflags gazebo`\
+     `pkg-config --libs gazebo` -o hello_world.so \
+     %s/../../testfiles/hello_world.cc", SOURCE_DIR);
+  ASSERT_EQ(system(cmd), 0);
+}
+#endif
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

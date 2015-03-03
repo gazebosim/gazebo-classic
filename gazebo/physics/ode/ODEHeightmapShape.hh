@@ -27,13 +27,14 @@
 #include "gazebo/physics/HeightmapShape.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief ODE Height map collision.
-    class ODEHeightmapShape : public HeightmapShape
+    class GAZEBO_VISIBLE ODEHeightmapShape : public HeightmapShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Collision parent.

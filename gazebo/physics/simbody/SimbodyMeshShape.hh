@@ -19,17 +19,20 @@
 #define _SIMBODY_MESHSHAPE_HH_
 
 #include "gazebo/physics/MeshShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    class SimbodyMesh;
+
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_simbody Simbody Physics
     /// \{
 
     /// \brief Triangle mesh collision
-    class SimbodyMeshShape : public MeshShape
+    class GAZEBO_VISIBLE SimbodyMeshShape : public MeshShape
     {
       /// \brief Constructor
       public: SimbodyMeshShape(CollisionPtr _parent);
@@ -42,6 +45,9 @@ namespace gazebo
 
       // Documentation inherited
       protected: virtual void Init();
+
+      /// \brief Simbody collision mesh helper class
+      private: SimbodyMesh *simbodyMesh;
     };
     /// \}
   }

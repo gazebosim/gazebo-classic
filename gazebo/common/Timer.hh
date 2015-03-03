@@ -24,6 +24,7 @@
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
 
     /// \class Timer Timer.hh common/common.hh
     /// \brief A timer class, used to time things in real world walltime
-    class Timer
+    class GAZEBO_VISIBLE Timer
     {
       /// \brief Constructor
       public: Timer();

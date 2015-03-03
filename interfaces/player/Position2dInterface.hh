@@ -23,6 +23,8 @@
 #define GAZEBO_POSITION2DINTERFACE_HH
 
 #include <string>
+
+#include "gazebo/util/system.hh"
 #include "GazeboInterface.hh"
 
 /// \addtogroup player_iface
@@ -31,7 +33,7 @@
 /// \brief Position2d Player interface
 /// \{
 /// \brief Position2d Player interface
-class Position2dInterface : public GazeboInterface
+class GAZEBO_VISIBLE Position2dInterface : public GazeboInterface
 {
   /// \brief Constructor
   public: Position2dInterface(player_devaddr_t _addr, GazeboDriver *_driver,
@@ -57,7 +59,7 @@ class Position2dInterface : public GazeboInterface
 
   /// \brief Process pose messages.
   /// \param[in] _msg A new pose message.
-  private: void OnPoseMsg(ConstPose_VPtr &_msg);
+  private: void OnPoseMsg(ConstPosesStampedPtr &_msg);
 
   /// \brief Timestamp on last data update
   private: double datatime;

@@ -13,29 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
+
 #ifndef _WIREBOX_HH_
 #define _WIREBOX_HH_
 
-#include <string>
-
 #include "gazebo/math/Box.hh"
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace rendering
   {
+    class WireBoxPrivate;
+
     /// \addtogroup gazebo_rendering
     /// \{
 
     /// \class WireBox WireBox.hh rendering/rendering.hh
     /// \brief Draws a wireframe box.
-    class WireBox
+    class GAZEBO_VISIBLE WireBox
     {
       /// \brief Constructor
-      /// \param[in] _box Dimenision of the box to draw.
+      /// \param[in] _box Dimension of the box to draw.
+      /// \param[in] _parent Parent visual of the box.
       public: explicit WireBox(VisualPtr _parent, const math::Box &_box);
 
       /// \brief Destructor.
@@ -49,11 +51,17 @@ namespace gazebo
       /// \param[in] _visible True to make the box visible, False to hide.
       public: void SetVisible(bool _visible);
 
-      /// \brief The lines which outline the box.
-      private: DynamicLines *lines;
+      /// \brief Get the visibility of the box.
+      /// \return True if the box is visual.
+      public: bool GetVisible() const;
 
-      /// \brief The visual which this box is attached to.
-      private: VisualPtr parent;
+      /// \brief Get the wireframe box.
+      /// \return The wireframe box.
+      public: math::Box GetBox() const;
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: WireBoxPrivate *dataPtr;
     };
     /// \}
   }

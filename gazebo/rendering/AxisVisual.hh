@@ -14,16 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: 3D Axis Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _AXISVISUAL_HH_
 #define _AXISVISUAL_HH_
 
 #include <string>
 
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +33,7 @@ namespace gazebo
 
     /// \class AxisVisual AxisVisual.hh rendering/rendering.hh
     /// \brief Basic axis visualization
-    class AxisVisual : public Visual
+    class GAZEBO_VISIBLE AxisVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the AxisVisual
@@ -67,10 +66,6 @@ namespace gazebo
       /// \param[in] _material The name of the material to apply to the axis
       public: void SetAxisMaterial(unsigned int _axis,
                                    const std::string &_material);
-
-      private: ArrowVisualPtr xAxis;
-      private: ArrowVisualPtr yAxis;
-      private: ArrowVisualPtr zAxis;
     };
     /// \}
   }

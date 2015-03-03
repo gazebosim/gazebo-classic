@@ -219,7 +219,7 @@ void ImuSensor::SetReferencePose()
 }
 
 //////////////////////////////////////////////////
-void ImuSensor::UpdateImpl(bool /*_force*/)
+bool ImuSensor::UpdateImpl(bool /*_force*/)
 {
   msgs::LinkData msg;
   int readIndex = 0;
@@ -229,7 +229,7 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
 
     // Don't do anything if there is no new data to process.
     if (!this->dataDirty)
-      return;
+      return false;
 
     readIndex = this->dataIndex;
     this->dataIndex ^= 1;
@@ -242,6 +242,8 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
   common::Time timestamp = msgs::Convert(msg.time());
 
   double dt = (timestamp - this->lastMeasurementTime).Double();
+
+  this->lastMeasurementTime = timestamp;
 
   if (dt > 0.0)
   {
@@ -282,8 +284,6 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
               (imuPose - this->referencePose).rot);
 
     this->lastLinearVel = imuWorldLinearVel;
-
-    this->lastMeasurementTime = timestamp;
 
     if (this->noiseActive)
     {
@@ -328,6 +328,8 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
     if (this->pub)
       this->pub->Publish(this->imuMsg);
   }
+
+  return true;
 }
 
 //////////////////////////////////////////////////

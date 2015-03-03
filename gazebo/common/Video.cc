@@ -15,23 +15,10 @@
  *
 */
 
-#include <gazebo/common/Video.hh>
 #include <gazebo/common/Console.hh>
+#include <gazebo/common/Video.hh>
 #include <gazebo/gazebo_config.h>
-
-#ifdef HAVE_FFMPEG
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
-extern "C"
-{
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
-}
-#endif
+#include <gazebo/common/ffmpeg_inc.h>
 
 using namespace gazebo;
 using namespace common;
@@ -61,6 +48,7 @@ Video::Video()
   this->swsCtx = NULL;
   this->avFrame = NULL;
   this->pic = NULL;
+  this->videoStream = -1;
 
 #ifdef HAVE_FFMPEG
   this->pic = new AVPicture;
@@ -216,7 +204,6 @@ bool Video::GetNextFrame(unsigned char **_buffer)
 
   if (packet.stream_index == this->videoStream)
   {
-    int processedLength = 0;
     tmpPacket.data = packet.data;
     tmpPacket.size = packet.size;
 
@@ -224,7 +211,7 @@ bool Video::GetNextFrame(unsigned char **_buffer)
     while (tmpPacket.size > 0)
     {
       // sending data to libavcodec
-      processedLength = avcodec_decode_video2(this->codecCtx, this->avFrame,
+      int processedLength = avcodec_decode_video2(this->codecCtx, this->avFrame,
           &frameAvailable, &tmpPacket);
       if (processedLength < 0)
       {

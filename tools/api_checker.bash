@@ -8,7 +8,7 @@
 # We assume that your system is already configured to use the OSRF apt 
 # repository (build.osrfoundation.org).  If you haven't done that step yet, read
 # about it here:
-#   http://gazebosim.org/wiki/2.0/install#Ubuntu_Debians
+#   http://gazebosim.org/tutorials?tut=install&cat=get_started
 
 USAGE=$'api_checker.bash [-n] <gazebo_source_dir>
   -n : Do not install latest Gazebo via apt-get (assumes that you have already installed the version that you want to compare against)'
@@ -76,7 +76,6 @@ sudo apt-get install cmake \
      libxml2-dev \
      pkg-config \
      libqt4-dev \
-     libltdl-dev \
      libboost-thread-dev \
      libboost-signals-dev \
      libboost-system-dev \

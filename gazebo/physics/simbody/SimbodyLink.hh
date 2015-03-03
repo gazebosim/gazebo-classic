@@ -24,6 +24,7 @@
 #include "gazebo/physics/Link.hh"
 
 #include "gazebo/physics/simbody/simbody_inc.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     /// \{
 
     /// \brief Simbody Link class
-    class SimbodyLink : public Link
+    class GAZEBO_VISIBLE SimbodyLink : public Link
     {
       /// \brief Constructor
       public: SimbodyLink(EntityPtr _parent);
@@ -156,8 +157,12 @@ namespace gazebo
 
       public: void SetDirtyPose(const math::Pose &_pose);
 
-      /// \brief Internal call to make link static if
-      /// staticLinkDirty and staticLink are true.
+      /// \brief Internal call to change effect of gravity on Link
+      /// based on gravityMode if gravityModeDirty is true.
+      private: void ProcessSetGravityMode();
+
+      /// \brief Internal call to set link static
+      /// based on staticLink if staticLinkDirty is true.
       private: void ProcessSetLinkStatic();
 
       /// \brief: Force this link to be a base body, where its inboard
@@ -181,14 +186,20 @@ namespace gazebo
       /// \brief store gravity mode given link might not be around
       private: bool gravityMode;
 
-      /// \biref Trigger setting of link according to staticLink.
+      /// \brief Trigger setting of link according to staticLink.
       private: bool staticLinkDirty;
 
-      /// \biref If true, freeze link to world (inertial) frame.
+      /// \brief Trigger setting of link gravity mode
+      private: bool gravityModeDirty;
+
+      /// \brief If true, freeze link to world (inertial) frame.
       private: bool staticLink;
 
       /// \brief Event connection for SetLinkStatic
       private: event::ConnectionPtr staticLinkConnection;
+
+      /// \brief Event connection for SetGravityMode
+      private: event::ConnectionPtr gravityModeConnection;
 
       /// \brief save simbody free state for reconstructing simbody model graph
       private: std::vector<double> simbodyQ;

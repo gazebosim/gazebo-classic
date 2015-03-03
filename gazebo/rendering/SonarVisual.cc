@@ -21,6 +21,7 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/SonarVisualPrivate.hh"
 #include "gazebo/rendering/SonarVisual.hh"
 
 using namespace gazebo;
@@ -29,34 +30,22 @@ using namespace rendering;
 /////////////////////////////////////////////////
 SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
                          const std::string &_topicName)
-: Visual(_name, _vis)
+  : Visual(*new SonarVisualPrivate, _name, _vis)
 {
-  this->receivedMsg = false;
+  SonarVisualPrivate *dPtr =
+      reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->scene->GetName());
+  dPtr->receivedMsg = false;
 
-  this->sonarSub = this->node->Subscribe(_topicName,
+  dPtr->node = transport::NodePtr(new transport::Node());
+  dPtr->node->Init(dPtr->scene->GetName());
+
+  dPtr->sonarSub = dPtr->node->Subscribe(_topicName,
       &SonarVisual::OnMsg, this, true);
 
-  this->sonarRay = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  this->sonarRay->setMaterial("Gazebo/RedGlow");
-  this->sonarRay->AddPoint(0, 0, 0);
-  this->sonarRay->AddPoint(0, 0, 0);
+  dPtr->sonarRay = NULL;
 
-  // Make sure the meshes are in Ogre
-  this->InsertMesh("unit_cone");
-  Ogre::MovableObject *coneObj =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
-          this->GetName()+"__SONAR_CONE__", "unit_cone"));
-  ((Ogre::Entity*)coneObj)->setMaterialName("Gazebo/BlueLaser");
-
-  this->coneNode =
-    this->sceneNode->createChildSceneNode(this->GetName() + "_SONAR_CONE");
-  this->coneNode->attachObject(coneObj);
-  this->coneNode->setPosition(0, 0, 0);
-
-  this->connections.push_back(
+  dPtr->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&SonarVisual::Update, this)));
 }
@@ -64,14 +53,38 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
 /////////////////////////////////////////////////
 SonarVisual::~SonarVisual()
 {
-  delete this->sonarRay;
-  this->sonarRay = NULL;
+  SonarVisualPrivate *dPtr =
+      reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
+
+  delete dPtr->sonarRay;
+  dPtr->sonarRay = NULL;
 }
 
 /////////////////////////////////////////////////
 void SonarVisual::Load()
 {
   Visual::Load();
+
+  SonarVisualPrivate *dPtr =
+      reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
+
+  dPtr->sonarRay = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
+  dPtr->sonarRay->setMaterial("Gazebo/RedGlow");
+  dPtr->sonarRay->AddPoint(0, 0, 0);
+  dPtr->sonarRay->AddPoint(0, 0, 0);
+
+  // Make sure the meshes are in Ogre
+  this->InsertMesh("unit_cone");
+  Ogre::MovableObject *coneObj =
+    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+          this->GetName()+"__SONAR_CONE__", "unit_cone"));
+  ((Ogre::Entity*)coneObj)->setMaterialName("Gazebo/BlueLaser");
+
+  dPtr->coneNode =
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SONAR_CONE");
+  dPtr->coneNode->attachObject(coneObj);
+  dPtr->coneNode->setPosition(0, 0, 0);
+
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   this->SetCastShadows(false);
 }
@@ -79,17 +92,23 @@ void SonarVisual::Load()
 /////////////////////////////////////////////////
 void SonarVisual::OnMsg(ConstSonarStampedPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
-  this->sonarMsg = _msg;
-  this->receivedMsg = true;
+  SonarVisualPrivate *dPtr =
+      reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
+
+  boost::mutex::scoped_lock lock(dPtr->mutex);
+  dPtr->sonarMsg = _msg;
+  dPtr->receivedMsg = true;
 }
 
 /////////////////////////////////////////////////
 void SonarVisual::Update()
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  SonarVisualPrivate *dPtr =
+      reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
 
-  if (!this->sonarMsg || !this->receivedMsg)
+  boost::mutex::scoped_lock lock(dPtr->mutex);
+
+  if (!dPtr->sonarMsg || !dPtr->receivedMsg)
     return;
 
   // Skip the update if the user is moving the sonar.
@@ -100,29 +119,29 @@ void SonarVisual::Update()
     return;
   }
 
-  float rangeDelta = this->sonarMsg->sonar().range_max()
-      - this->sonarMsg->sonar().range_min();
-  float radiusScale = this->sonarMsg->sonar().radius()*2.0;
+  float rangeDelta = dPtr->sonarMsg->sonar().range_max()
+      - dPtr->sonarMsg->sonar().range_min();
+  float radiusScale = dPtr->sonarMsg->sonar().radius()*2.0;
 
-  if (!math::equal(this->coneNode->getScale().z, rangeDelta) ||
-      !math::equal(this->coneNode->getScale().x, radiusScale))
+  if (!math::equal(dPtr->coneNode->getScale().z, rangeDelta) ||
+      !math::equal(dPtr->coneNode->getScale().x, radiusScale))
   {
-    this->coneNode->setScale(radiusScale, radiusScale, rangeDelta);
-    this->sonarRay->SetPoint(0, math::Vector3(0, 0, rangeDelta * 0.5));
+    dPtr->coneNode->setScale(radiusScale, radiusScale, rangeDelta);
+    dPtr->sonarRay->SetPoint(0, math::Vector3(0, 0, rangeDelta * 0.5));
   }
 
-  math::Pose pose = msgs::Convert(this->sonarMsg->sonar().world_pose());
+  math::Pose pose = msgs::Convert(dPtr->sonarMsg->sonar().world_pose());
   this->SetPose(pose);
 
-  if (this->sonarMsg->sonar().has_contact())
+  if (dPtr->sonarMsg->sonar().has_contact())
   {
-    math::Vector3 pos = msgs::Convert(this->sonarMsg->sonar().contact());
-    this->sonarRay->SetPoint(1, pos);
+    math::Vector3 pos = msgs::Convert(dPtr->sonarMsg->sonar().contact());
+    dPtr->sonarRay->SetPoint(1, pos);
   }
   else
   {
-    this->sonarRay->SetPoint(1, math::Vector3(0, 0,
-          (rangeDelta * 0.5) - this->sonarMsg->sonar().range()));
+    dPtr->sonarRay->SetPoint(1, math::Vector3(0, 0,
+          (rangeDelta * 0.5) - dPtr->sonarMsg->sonar().range()));
   }
-  this->receivedMsg = false;
+  dPtr->receivedMsg = false;
 }

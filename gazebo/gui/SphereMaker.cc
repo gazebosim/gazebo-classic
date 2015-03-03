@@ -39,6 +39,7 @@ SphereMaker::SphereMaker()
   : EntityMaker()
 {
   this->state = 0;
+  this->leftMousePressed = false;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::SPHERE);
 

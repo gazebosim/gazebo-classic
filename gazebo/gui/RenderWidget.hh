@@ -22,6 +22,7 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
+#include "gazebo/util/system.hh"
 
 class QLineEdit;
 class QLabel;
@@ -36,7 +37,7 @@ namespace gazebo
   {
     class BuildingEditorWidget;
 
-    class RenderWidget : public QWidget
+    class GAZEBO_VISIBLE RenderWidget : public QWidget
     {
       Q_OBJECT
       public: RenderWidget(QWidget *_parent = 0);
@@ -58,9 +59,6 @@ namespace gazebo
       /// \brief Get the overlay message being displayed
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
-
-      /// \brief Qt call back when the step value in the spinbox changed
-      private slots: void OnStepValueChanged(int _value);
 
       private slots: virtual void update();
 
@@ -115,9 +113,6 @@ namespace gazebo
 
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
-
-      /// \brief Tool button that holds the step widget
-      private: QToolButton *stepButton;
     };
   }
 }

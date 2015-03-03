@@ -34,6 +34,15 @@ std::vector<gazebo::SystemPluginPtr> g_plugins;
 gazebo::Master *g_master = NULL;
 
 /////////////////////////////////////////////////
+struct g_vectorStringDup
+{
+  char *operator()(const std::string &_s)
+  {
+    return strdup(_s.c_str());
+  }
+};
+
+/////////////////////////////////////////////////
 // This function is used by both setupClient and setupServer
 bool setup(int _argc, char **_argv)
 {
@@ -44,8 +53,7 @@ bool setup(int _argc, char **_argv)
 
   // Initialize the informational logger. This will log warnings, and
   // errors.
-  if (!gazebo::common::Console::Instance()->IsInitialized())
-    gazebo::common::Console::Instance()->Init("default.log");
+  gzLogInit("default.log");
 
   // Load all the system plugins
   for (std::vector<gazebo::SystemPluginPtr>::iterator iter =
@@ -77,21 +85,9 @@ bool setup(int _argc, char **_argv)
 }
 
 /////////////////////////////////////////////////
-void gazebo::print_version()
-{
-  fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
-}
-
-/////////////////////////////////////////////////
 void gazebo::printVersion()
 {
   fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
-}
-
-/////////////////////////////////////////////////
-void gazebo::add_plugin(const std::string &_filename)
-{
-  gazebo::addPlugin(_filename);
 }
 
 /////////////////////////////////////////////////
@@ -113,47 +109,6 @@ void gazebo::addPlugin(const std::string &_filename)
     }
     g_plugins.push_back(plugin);
   }
-}
-
-/////////////////////////////////////////////////
-bool gazebo::load(int _argc, char **_argv)
-{
-  return gazebo::setupClient(_argc, _argv);
-}
-
-/////////////////////////////////////////////////
-bool gazebo::init()
-{
-  for (std::vector<SystemPluginPtr>::iterator iter = g_plugins.begin();
-       iter != g_plugins.end(); ++iter)
-  {
-    (*iter)->Init();
-  }
-
-  return true;
-}
-
-/////////////////////////////////////////////////
-void gazebo::run()
-{
-  // Run transport loop. Starts a thread
-  gazebo::transport::run();
-}
-
-/////////////////////////////////////////////////
-void gazebo::stop()
-{
-  util::LogRecord::Instance()->Stop();
-  gazebo::transport::stop();
-}
-
-/////////////////////////////////////////////////
-void gazebo::fini()
-{
-  boost::mutex::scoped_lock lock(fini_mutex);
-  util::LogRecord::Instance()->Fini();
-  g_plugins.clear();
-  gazebo::transport::fini();
 }
 
 /////////////////////////////////////////////////
@@ -196,6 +151,22 @@ bool gazebo::setupServer(int _argc, char **_argv)
 }
 
 /////////////////////////////////////////////////
+bool gazebo::setupServer(const std::vector<std::string> &_args)
+{
+  std::vector<char *> pointers(_args.size());
+  std::transform(_args.begin(), _args.end(), pointers.begin(),
+                 g_vectorStringDup());
+  pointers.push_back(0);
+  bool result = gazebo::setupServer(_args.size(), &pointers[0]);
+
+  // Deallocate memory for the command line arguments alloocated with strdup.
+  for (size_t i = 0; i < pointers.size(); ++i)
+    free(pointers.at(i));
+
+  return result;
+}
+
+/////////////////////////////////////////////////
 bool gazebo::setupClient(int _argc, char **_argv)
 {
   if (!setup(_argc, _argv))
@@ -222,6 +193,22 @@ bool gazebo::setupClient(int _argc, char **_argv)
   }
 
   return true;
+}
+
+/////////////////////////////////////////////////
+bool gazebo::setupClient(const std::vector<std::string> &_args)
+{
+  std::vector<char *> pointers(_args.size());
+  std::transform(_args.begin(), _args.end(), pointers.begin(),
+                 g_vectorStringDup());
+  pointers.push_back(0);
+  bool result = gazebo::setupClient(_args.size(), &pointers[0]);
+
+  // Deallocate memory for the command line arguments alloocated with strdup.
+  for (size_t i = 0; i < pointers.size(); ++i)
+    free(pointers.at(i));
+
+  return result;
 }
 
 /////////////////////////////////////////////////

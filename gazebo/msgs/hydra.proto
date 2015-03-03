@@ -1,0 +1,52 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Hydra
+/// \brief Message that contains information about a Hydra Razer controller
+
+import "pose.proto";
+
+message Hydra
+{
+  message Paddle
+  {
+    // Pose of the paddle
+    required Pose pose          = 1;
+
+    // The button labeled LB
+    required bool button_bumper = 2;
+
+    // Button 1
+    required bool button_1      = 3;
+
+    // Button 2
+    required bool button_2      = 4;
+
+    // Button 3
+    required bool button_3      = 5;
+
+    // Button 4
+    required bool button_4      = 6;
+
+    // Button that is activated by pressing down on the joystick.
+    required bool button_joy    = 7;
+
+    // The button located between button 1 and 2.
+    required bool button_center = 8;
+
+    // Range(-1, 1) where -1 == back, and +1 == forward.
+    required double joy_x       = 9;
+
+    // Range(-1, 1) where -1 == left, and +1 == right.
+    required double joy_y       = 10;
+
+    // Range(0, 1) where 0 is no press, and 1 is full press.
+    required double trigger     = 11;
+  }
+
+  // Info for the right paddle
+  required Paddle right = 1;
+
+  // Info for the left paddle
+  required Paddle left  = 2;
+}

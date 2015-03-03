@@ -30,6 +30,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -44,7 +45,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet physics engine
-    class BulletPhysics : public PhysicsEngine
+    class GAZEBO_VISIBLE BulletPhysics : public PhysicsEngine
     {
       /// \enum BulletParam
       /// \brief Bullet physics parameter types.
@@ -156,23 +157,12 @@ namespace gazebo
 
       public: virtual void DebugPrint() const;
 
-      /// \brief Set a parameter of the bullet physics engine
-      /// \param[in] _param A parameter listed in the BulletParam enum
-      /// \param[in] _value The value to set to
-      public: virtual void SetParam(BulletParam _param,
-                  const boost::any &_value);
-
       /// Documentation inherited
-      public: virtual void SetParam(const std::string &_key,
+      public: virtual bool SetParam(const std::string &_key,
                   const boost::any &_value);
 
       /// Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
-
-      /// \brief Get an parameter of the physics engine
-      /// \param[in] _param A parameter listed in the BulletParam enum
-      /// \return The value of the parameter
-      public: virtual boost::any GetParam(BulletParam _param) const;
 
       // Documentation inherited
       public: virtual void SetSORPGSIters(unsigned int iters);

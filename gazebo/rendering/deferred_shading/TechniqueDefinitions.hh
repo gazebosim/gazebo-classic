@@ -18,12 +18,13 @@
 #define _TECHNIQUEDEFINITIONS_HH_
 
 #include <string>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace rendering
   {
-    class NullTechnique
+    class GAZEBO_VISIBLE NullTechnique
     {
       protected: std::string GetMaterialPrefix() const
                  {return "NullTechnique";}
@@ -32,7 +33,7 @@ namespace gazebo
       protected: bool UseMaterialProperties() const
                  {return true;}
     };
-    class DeferredShading
+    class GAZEBO_VISIBLE DeferredShading
     {
       protected: std::string GetMaterialPrefix() const
                  {return "DeferredShading";}
@@ -41,7 +42,7 @@ namespace gazebo
       protected: bool UseMaterialProperties() const
                  {return true;}
     };
-    class DeferredLighting
+    class GAZEBO_VISIBLE DeferredLighting
     {
       protected: std::string GetMaterialPrefix() const
                  {return "DeferredLighting";}
@@ -50,7 +51,7 @@ namespace gazebo
       protected: bool UseMaterialProperties() const
                  {return false;}
     };
-    class InferredLighting
+    class GAZEBO_VISIBLE InferredLighting
     {
       protected: std::string GetMaterialPrefix() const
                  {return "InferredLighting";}

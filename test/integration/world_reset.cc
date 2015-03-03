@@ -35,12 +35,6 @@ class WorldResetTest : public ServerFixture,
 void WorldResetTest::WorldName(const std::string &_physicsEngine,
                                const std::string &_world, int _resets)
 {
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Abort test since simbody does not support screw joints in PR2, "
-          << "Please see issue #857.\n";
-    return;
-  }
   if (_physicsEngine == "dart")
   {
     gzerr << "Abort test since dart does not support ray sensor in PR2, "
@@ -60,7 +54,7 @@ void WorldResetTest::WorldName(const std::string &_physicsEngine,
   unsigned int steps = 250;
 
   // Step forward, verify time increasing
-  world->StepWorld(steps);
+  world->Step(steps);
   double simTime = world->GetSimTime().Double();
   EXPECT_NEAR(simTime, dt*steps, dt);
 
@@ -73,7 +67,7 @@ void WorldResetTest::WorldName(const std::string &_physicsEngine,
     EXPECT_NEAR(simTime, 0.0, dt);
 
     // Step forward, verify time increasing
-    world->StepWorld(steps);
+    world->Step(steps);
     simTime = world->GetSimTime().Double();
     EXPECT_NEAR(simTime, dt*steps, dt);
   }

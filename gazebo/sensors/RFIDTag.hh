@@ -29,6 +29,7 @@
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +40,7 @@ namespace gazebo
 
     /// \class RFIDTag RFIDTag.hh sensors/sensors.hh
     /// \brief RFIDTag to interact with RFIDTagSensors
-    class RFIDTag: public Sensor
+    class GAZEBO_VISIBLE RFIDTag: public Sensor
     {
       /// \brief Constructor.
       public: RFIDTag();
@@ -49,7 +50,7 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void Load(const std::string & _worldName,
-                                sdf::ElementPtr &_sdf);
+                                sdf::ElementPtr _sdf);
 
       // Documentation inherited
       public: virtual void Load(const std::string & _worldName);
@@ -58,7 +59,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual void UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited
       public: virtual void Fini();

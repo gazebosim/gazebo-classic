@@ -17,15 +17,22 @@ if(HAVE_BULLET)
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 if(HAVE_DART)
-  include_directories ( ${DART_INCLUDE_DIRS} )
-  link_directories ( ${DART_LIBRARY_DIRS} )
+  include_directories ( ${DARTCore_INCLUDE_DIRS} )
+  link_directories ( ${DARTCore_LIBRARY_DIRS} )
 endif()
 
 set(tests
+  351_world_step.cc
+  494_joint_axis_frame.cc
   624_collision_world_pose.cc
-  846_typo_in_camera.cc
   876_random_number_generator.cc
+  940_force_torque_sensor_frame.cc
   978_joint_anchor.cc
+  1082_pid_limits.cc
+  1112_force_torque_model_removal.cc
+  1124_collision_pose.cc
+  1146_collision_bounding_box.cc
+  1208_world_plugin_init.cc
 )
 
 gz_build_tests(${tests})
@@ -37,6 +44,14 @@ set(display_tests
 gz_build_display_tests(${display_tests})
 
 set(dri_tests
+  346_save_lights.cc
+  846_typo_in_camera.cc
 )
 
 gz_build_dri_tests(${dri_tests})
+
+if (ENABLE_TESTS_COMPILATION)
+  add_dependencies(${TEST_TYPE}_1112_force_torque_model_removal
+                   ForceTorqueModelRemovalTestPlugin)
+  add_dependencies(${TEST_TYPE}_1208_world_plugin_init Issue1208Plugin)
+endif()

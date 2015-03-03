@@ -15,11 +15,6 @@
  *
 */
 
-/* Desc: A Light
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
-
 #include <boost/bind.hpp>
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -56,12 +51,19 @@ Light::Light(ScenePtr _scene)
 Light::~Light()
 {
   if (this->light)
+  {
     this->scene->GetManager()->destroyLight(this->GetName());
+  }
 
-  this->visual->DeleteDynamicLine(this->line);
-  delete this->line;
-  this->scene->RemoveVisual(this->visual);
-  this->visual.reset();
+  this->scene->GetManager()->destroyEntity(
+      this->GetName() + "_selection_sphere");
+
+  if (this->visual)
+  {
+    this->visual->DeleteDynamicLine(this->line);
+    this->scene->RemoveVisual(this->visual);
+    this->visual.reset();
+  }
 
   this->sdf->Reset();
   this->sdf.reset();
@@ -74,6 +76,7 @@ void Light::Load(sdf::ElementPtr _sdf)
 {
   this->sdf->Copy(_sdf);
   this->Load();
+  this->scene->AddLight(shared_from_this());
 }
 
 //////////////////////////////////////////////////
@@ -134,101 +137,43 @@ void Light::Update()
 }
 
 //////////////////////////////////////////////////
-void Light::UpdateSDFFromMsg(ConstLightPtr &_msg)
+void Light::UpdateSDFFromMsg(const msgs::Light &_msg)
 {
-  this->sdf->GetAttribute("name")->Set(_msg->name());
-
-  if (_msg->has_type() && _msg->type() == msgs::Light::POINT)
-    this->sdf->GetAttribute("type")->Set("point");
-  else if (_msg->has_type() && _msg->type() == msgs::Light::SPOT)
-    this->sdf->GetAttribute("type")->Set("spot");
-  else if (_msg->has_type() && _msg->type() == msgs::Light::DIRECTIONAL)
-    this->sdf->GetAttribute("type")->Set("directional");
-
-  if (_msg->has_diffuse())
-  {
-    this->sdf->GetElement("diffuse")->Set(
-        msgs::Convert(_msg->diffuse()));
-  }
-
-  if (_msg->has_specular())
-  {
-    this->sdf->GetElement("specular")->Set(
-        msgs::Convert(_msg->specular()));
-  }
-
-  if (_msg->has_direction())
-  {
-    this->sdf->GetElement("direction")->Set(
-        msgs::Convert(_msg->direction()));
-  }
-
-  if (_msg->has_attenuation_constant())
-  {
-    sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
-    elem->GetElement("constant")->Set(_msg->attenuation_constant());
-  }
-
-  if (_msg->has_attenuation_linear())
-  {
-    sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
-    elem->GetElement("linear")->Set(_msg->attenuation_linear());
-  }
-
-  if (_msg->has_attenuation_quadratic())
-  {
-    sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
-    elem->GetElement("quadratic")->Set(_msg->attenuation_quadratic());
-  }
-
-  if (_msg->has_range())
-  {
-    sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
-    elem->GetElement("range")->Set(_msg->range());
-  }
-
-  if (_msg->has_cast_shadows())
-    this->sdf->GetElement("cast_shadows")->Set(_msg->cast_shadows());
-
-  if (_msg->has_spot_inner_angle())
-  {
-    sdf::ElementPtr elem = this->sdf->GetElement("spot");
-    elem->GetElement("inner_angle")->Set(_msg->spot_inner_angle());
-  }
-
-  if (_msg->has_spot_outer_angle())
-  {
-    sdf::ElementPtr elem = this->sdf->GetElement("spot");
-    elem->GetElement("outer_angle")->Set(_msg->spot_outer_angle());
-  }
-
-  if (_msg->has_spot_falloff())
-  {
-    sdf::ElementPtr elem = this->sdf->GetElement("spot");
-    elem->GetElement("falloff")->Set(_msg->spot_falloff());
-  }
+  msgs::LightToSDF(_msg, this->sdf);
 }
 
 //////////////////////////////////////////////////
 void Light::UpdateFromMsg(ConstLightPtr &_msg)
 {
-  this->UpdateSDFFromMsg(_msg);
+  this->UpdateSDFFromMsg(*_msg);
 
   this->Update();
 
   if (_msg->has_pose())
+  {
     this->SetPosition(msgs::Convert(_msg->pose().position()));
+    this->SetRotation(msgs::Convert(_msg->pose().orientation()));
+  }
 }
 
 //////////////////////////////////////////////////
-void Light::LoadFromMsg(ConstLightPtr &_msg)
+void Light::LoadFromMsg(const msgs::Light &_msg)
 {
   this->UpdateSDFFromMsg(_msg);
 
   this->Load();
 
-  if (_msg->has_pose())
-    this->SetPosition(msgs::Convert(_msg->pose().position()));
+  if (_msg.has_pose())
+  {
+    this->SetPosition(msgs::Convert(_msg.pose().position()));
+    this->SetRotation(msgs::Convert(_msg.pose().orientation()));
+  }
+}
+
+//////////////////////////////////////////////////
+void Light::LoadFromMsg(ConstLightPtr &_msg)
+{
+  this->LoadFromMsg(*_msg);
 }
 
 //////////////////////////////////////////////////
@@ -276,11 +221,14 @@ void Light::CreateVisual()
     // Make sure the unit_sphere has been inserted.
     this->visual->InsertMesh("unit_sphere");
 
+    Ogre::Entity *ent =
+        visSceneNode->getCreator()->createEntity(this->GetName() +
+        "_selection_sphere", "unit_sphere");
+
+    ent->setMaterialName("Gazebo/White");
+
     // Create the selection object.
-    Ogre::MovableObject *obj = static_cast<Ogre::MovableObject*>
-      (visSceneNode->getCreator()->createEntity(this->GetName() +
-                                                "_selection_sphere",
-                                                "unit_sphere"));
+    Ogre::MovableObject *obj = static_cast<Ogre::MovableObject*>(ent);
 
     // Attach the selection object to the light visual
     visSceneNode->attachObject(obj);
@@ -410,6 +358,18 @@ void Light::SetPosition(const math::Vector3 &_p)
 math::Vector3 Light::GetPosition() const
 {
   return this->visual->GetPosition();
+}
+
+//////////////////////////////////////////////////
+void Light::SetRotation(const math::Quaternion &_q)
+{
+  this->visual->SetRotation(_q);
+}
+
+//////////////////////////////////////////////////
+math::Quaternion Light::GetRotation() const
+{
+  return this->visual->GetRotation();
 }
 
 //////////////////////////////////////////////////
@@ -632,7 +592,7 @@ void Light::FillMsg(msgs::Light &_msg) const
     _msg.set_type(msgs::Light::DIRECTIONAL);
 
   msgs::Set(_msg.mutable_pose()->mutable_position(), this->GetPosition());
-  msgs::Set(_msg.mutable_pose()->mutable_orientation(), math::Quaternion());
+  msgs::Set(_msg.mutable_pose()->mutable_orientation(), this->GetRotation());
   msgs::Set(_msg.mutable_diffuse(), this->GetDiffuseColor());
   msgs::Set(_msg.mutable_specular(), this->GetSpecularColor());
   msgs::Set(_msg.mutable_direction(), this->GetDirection());
@@ -652,4 +612,19 @@ void Light::FillMsg(msgs::Light &_msg) const
     _msg.set_spot_outer_angle(elem->Get<double>("outer_angle"));
     _msg.set_spot_falloff(elem->Get<double>("falloff"));
   }
+}
+
+//////////////////////////////////////////////////
+LightPtr Light::Clone(const std::string &_name, ScenePtr _scene)
+{
+  LightPtr result(new Light(_scene));
+  sdf::ElementPtr sdfCopy(new sdf::Element);
+  sdfCopy->Copy(this->sdf);
+  sdfCopy->GetAttribute("name")->Set(_name);
+  result->Load(sdfCopy);
+
+  result->SetPosition(this->GetPosition());
+  result->SetRotation(this->GetRotation());
+
+  return result;
 }

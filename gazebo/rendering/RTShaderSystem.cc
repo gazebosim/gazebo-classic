@@ -18,9 +18,9 @@
 #include <sys/stat.h>
 #include <boost/bind.hpp>
 
-#include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
-
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -36,7 +36,7 @@ RTShaderSystem::RTShaderSystem()
   this->entityMutex = new boost::mutex();
   this->initialized = false;
   this->shadowsApplied = false;
-  this->pssmSetup = NULL;
+  this->pssmSetup.setNull();
 }
 
 //////////////////////////////////////////////////
@@ -102,6 +102,7 @@ void RTShaderSystem::Fini()
     this->shaderGenerator = NULL;
   }
 
+  this->pssmSetup.setNull();
   this->entities.clear();
   this->scenes.clear();
   this->initialized = false;
@@ -374,7 +375,10 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
           // Get the tmp dir
           tmpdir = getenv("TMP");
           if (!tmpdir)
-            tmpdir = const_cast<char*>("/tmp");
+          {
+            common::SystemPaths *paths = common::SystemPaths::Instance();
+            tmpdir = const_cast<char*>(paths->GetTmpPath().c_str());
+          }
           // Get the user
           user = getenv("USER");
           if (!user)
@@ -476,28 +480,32 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   // pssmCasterPass->setFog(true);
 
   // shadow camera setup
-
-  // issue #925 workaround for gazebo 1.9 branch. DO NOT merge back to
-  // gazebo 3.0 as there is a better fix in place (pull request #867).
-  this->pssmSetup = new Ogre::PSSMShadowCameraSetup();
+  if (this->pssmSetup.isNull())
+  {
+    this->pssmSetup =
+        Ogre::ShadowCameraSetupPtr(new Ogre::PSSMShadowCameraSetup());
+  }
 
   double shadowFarDistance = 500;
   double cameraNearClip = 0.1;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
-  this->pssmSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance);
-  this->pssmSetup->setSplitPadding(4);
-  this->pssmSetup->setOptimalAdjustFactor(0, 2);
-  this->pssmSetup->setOptimalAdjustFactor(1, 1);
-  this->pssmSetup->setOptimalAdjustFactor(2, .5);
+  Ogre::PSSMShadowCameraSetup *cameraSetup =
+      dynamic_cast<Ogre::PSSMShadowCameraSetup*>(this->pssmSetup.get());
 
-  sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(this->pssmSetup));
+  cameraSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance);
+  cameraSetup->setSplitPadding(4);
+  cameraSetup->setOptimalAdjustFactor(0, 2);
+  cameraSetup->setOptimalAdjustFactor(1, 1);
+  cameraSetup->setOptimalAdjustFactor(2, .5);
+
+  sceneMgr->setShadowCameraSetup(this->pssmSetup);
 
   // These values do not seem to help at all. Leaving here until I have time
   // to properly fix shadow z-fighting.
-  // this->pssmSetup->setOptimalAdjustFactor(0, 4);
-  // this->pssmSetup->setOptimalAdjustFactor(1, 1);
-  // this->pssmSetup->setOptimalAdjustFactor(2, 0.5);
+  // cameraSetup->setOptimalAdjustFactor(0, 4);
+  // cameraSetup->setOptimalAdjustFactor(1, 1);
+  // cameraSetup->setOptimalAdjustFactor(2, 0.5);
 
   this->shadowRenderState = this->shaderGenerator->createSubRenderState(
       Ogre::RTShader::IntegratedPSSM3::Type);
@@ -505,7 +513,8 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
     static_cast<Ogre::RTShader::IntegratedPSSM3*>(this->shadowRenderState);
 
   const Ogre::PSSMShadowCameraSetup::SplitPointList &srcSplitPoints =
-    this->pssmSetup->getSplitPoints();
+    cameraSetup->getSplitPoints();
+
   Ogre::RTShader::IntegratedPSSM3::SplitPointList dstSplitPoints;
 
   for (unsigned int i = 0; i < srcSplitPoints.size(); ++i)
@@ -527,5 +536,5 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
 /////////////////////////////////////////////////
 Ogre::PSSMShadowCameraSetup *RTShaderSystem::GetPSSMShadowCameraSetup() const
 {
-  return this->pssmSetup;
+  return dynamic_cast<Ogre::PSSMShadowCameraSetup *>(this->pssmSetup.get());
 }

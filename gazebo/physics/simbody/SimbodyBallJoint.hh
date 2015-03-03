@@ -21,6 +21,7 @@
 #include "gazebo/physics/BallJoint.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -31,7 +32,7 @@ namespace gazebo
     /// \{
 
     /// \brief SimbodyBallJoint class models a ball joint in Simbody.
-    class SimbodyBallJoint : public BallJoint<SimbodyJoint>
+    class GAZEBO_VISIBLE SimbodyBallJoint : public BallJoint<SimbodyJoint>
     {
       /// \brief Simbody Ball Joint Constructor
       public: SimbodyBallJoint(SimTK::MultibodySystem *_world, BasePtr _parent);
@@ -42,46 +43,51 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Set joint damping, not yet implemented
-      /// \sa Joint::SetDamping
-      public: virtual void SetDamping(int _index, double _damping);
+      // Documentation inherited.
+      public: math::Vector3 GetAnchor(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void Init();
-
-      // Documentation inherited.
-      public: math::Vector3 GetAnchor(int _index) const;
-
-      // Documentation inherited.
-      public: virtual math::Vector3 GetAxis(int /*_index*/) const
+      public: virtual math::Vector3 GetAxis(unsigned int /*_index*/) const
               {return math::Vector3();}
 
       // Documentation inherited.
-      public: virtual void SetVelocity(int _index, double _angle);
+      public: virtual void SetVelocity(unsigned int _index, double _angle);
 
       // Documentation inherited.
-      public: virtual double GetVelocity(int _index) const;
+      public: virtual double GetVelocity(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual double GetMaxForce(int _index);
+      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual void SetMaxForce(int _index, double _t);
+      public: virtual void SetMaxForce(unsigned int _index, double _t);
 
       // Documentation inherited.
-      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
+      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
+      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(int _index) const;
+      public: virtual void SetAxis(unsigned int _index,
+                                   const math::Vector3 &_axis);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+      public: virtual math::Angle GetHighStop(unsigned int _index);
 
       // Documentation inherited.
-      protected: virtual void SetForceImpl(int _index, double _torque);
+      public: virtual math::Angle GetLowStop(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual bool SetHighStop(unsigned int _index,
+                                       const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual bool SetLowStop(unsigned int _index,
+                                      const math::Angle &_angle);
+
+      // Documentation inherited.
+      protected: virtual void SetForceImpl(unsigned int _index, double _torque);
     };
     /// \}
   }

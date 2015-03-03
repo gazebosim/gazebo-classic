@@ -17,6 +17,8 @@
 #ifndef _KEYEVENT_HH_
 #define _KEYEVENT_HH_
 
+#include "gazebo/util/system.hh"
+
 namespace gazebo
 {
   namespace common
@@ -26,7 +28,7 @@ namespace gazebo
 
     /// \class KeyEvent KeyEvent.hh common/common.hh
     /// \brief Generic description of a keyboard event.
-    class KeyEvent
+    class GAZEBO_VISIBLE KeyEvent
     {
       /// \brief Key event types enumeration.
       public: enum EventType {NO_EVENT, PRESS, RELEASE};

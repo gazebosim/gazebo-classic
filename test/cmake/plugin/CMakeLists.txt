@@ -4,7 +4,9 @@ find_package(Boost REQUIRED COMPONENTS system)
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 
-find_package(gazebo REQUIRED)
+# This GAZEBO_VERSION does not come from gazebo cmake system, it is passed
+# to this test using add_definitions in the CMakeLists.txt in ../ directory 
+find_package(gazebo ${GAZEBO_VERSION} REQUIRED)
 if (NOT gazebo_FOUND)
   message(FATAL_ERROR "Didn't find Gazebo")
 endif()
@@ -17,5 +19,5 @@ endif()
 
 include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
-add_library(hello_world SHARED hello_world.cc)
+add_library(hello_world SHARED ../../testfiles/hello_world.cc)
 target_link_libraries(hello_world ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})

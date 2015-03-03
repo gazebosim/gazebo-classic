@@ -18,6 +18,7 @@
 #define _SELECTIONBUFFER_HH_
 
 #include <string>
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
@@ -37,7 +38,7 @@ namespace gazebo
     class SelectionRenderListener;
     class Scene;
 
-    class SelectionBuffer
+    class GAZEBO_VISIBLE SelectionBuffer
     {
       /// \brief Constructor
       /// \param[in] _camera Name of the camera to generate a selection

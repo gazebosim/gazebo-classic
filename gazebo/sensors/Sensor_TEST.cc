@@ -25,7 +25,8 @@ class Sensor_TEST : public ServerFixture
 {
 };
 
-boost::condition_variable g_countCondition;
+boost::condition_variable g_hokuyoCountCondition;
+boost::condition_variable g_imuCountCondition;
 
 // global variable and callback for tracking hokuyo sensor messages
 unsigned int g_hokuyoMsgCount;
@@ -33,7 +34,16 @@ void ReceiveHokuyoMsg(ConstLaserScanStampedPtr &/*_msg*/)
 {
   g_hokuyoMsgCount++;
   if (g_hokuyoMsgCount >= 20)
-    g_countCondition.notify_one();
+    g_hokuyoCountCondition.notify_one();
+}
+
+// global variable and callback for tracking imu sensor messages
+unsigned int g_imuMsgCount;
+void ReceiveImuMsg(ConstLaserScanStampedPtr &/*_msg*/)
+{
+  g_imuMsgCount++;
+  if (g_imuMsgCount >= 20)
+    g_imuCountCondition.notify_one();
 }
 
 /////////////////////////////////////////////////
@@ -47,7 +57,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   ASSERT_TRUE(world != NULL);
 
   unsigned int i;
-  double updateRate, now, then;
+  double updateRateHokuyo, updateRateImu, now, then;
 
   // get the sensor manager
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
@@ -58,50 +68,74 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   sensor = mgr->GetSensor("default::hokuyo::link::laser");
   ASSERT_TRUE(sensor != NULL);
 
+  sensors::SensorPtr imuSensor;
+  imuSensor = mgr->GetSensor("default::box_model::box_link::box_imu_sensor");
+  ASSERT_TRUE(imuSensor != NULL);
+
   // set update rate to 30 Hz
-  updateRate = 30.0;
-  sensor->SetUpdateRate(updateRate);
+  updateRateHokuyo = 30.0;
+  updateRateImu = 1000.0;
+  sensor->SetUpdateRate(updateRateHokuyo);
+  imuSensor->SetUpdateRate(updateRateImu);
   gzdbg << sensor->GetScopedName() << " loaded with update rate of "
-        << sensor->GetUpdateRate() << " Hz\n";
+        << sensor->GetUpdateRate() << " Hz"
+        << std::endl;
+  gzdbg << imuSensor->GetScopedName() << " loaded with update rate of "
+        << imuSensor->GetUpdateRate() << " Hz"
+        << std::endl;
 
   g_hokuyoMsgCount = 0;
+  g_imuMsgCount = 0;
 
-  // Subscribe to hokuyo laser scan messages
+  // Subscribe to sensor messages
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
-  transport::SubscriberPtr sceneSub = node->Subscribe(
+  transport::SubscriberPtr laserSub = node->Subscribe(
       "~/hokuyo/link/laser/scan", &ReceiveHokuyoMsg);
+  transport::SubscriberPtr imuSub = node->Subscribe(
+      "~/box_model/box_link/box_imu_sensor/imu", &ReceiveImuMsg);
 
   // Wait for messages to arrive
   {
     boost::mutex countMutex;
     boost::mutex::scoped_lock lock(countMutex);
-    g_countCondition.wait(lock);
+    g_hokuyoCountCondition.wait(lock);
+    g_imuCountCondition.wait(lock);
   }
 
   unsigned int hokuyoMsgCount = g_hokuyoMsgCount;
+  unsigned int imuMsgCount = g_imuMsgCount;
   now = world->GetSimTime().Double();
 
-  gzdbg << "counted " << hokuyoMsgCount << " messages in "
+  gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
+        << now << " seconds\n";
+  gzdbg << "counted " << imuMsgCount << " imu messages in "
         << now << " seconds\n";
 
   // Expect at least 50% of specified update rate
   EXPECT_GT(static_cast<double>(hokuyoMsgCount),
-              updateRate*now * 0.5);
+              updateRateHokuyo*now * 0.5);
+  EXPECT_GT(static_cast<double>(imuMsgCount),
+              updateRateImu*now * 0.5);
 
   // Wait another 1.5 seconds
   for (i = 0; i < 15; ++i)
     common::Time::MSleep(100);
 
   hokuyoMsgCount = g_hokuyoMsgCount;
+  imuMsgCount = g_imuMsgCount;
   now = world->GetSimTime().Double();
 
-  gzdbg << "counted " << hokuyoMsgCount << " messages in "
+  gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
+        << now << " seconds\n";
+  gzdbg << "counted " << imuMsgCount << " imu messages in "
         << now << " seconds\n";
 
   // Expect at least 50% of specified update rate
   EXPECT_GT(static_cast<double>(hokuyoMsgCount),
-              updateRate*now * 0.5);
+              updateRateHokuyo*now * 0.5);
+  EXPECT_GT(static_cast<double>(imuMsgCount),
+              updateRateImu*now * 0.5);
 
   // Send reset world message
   transport::PublisherPtr worldControlPub =
@@ -120,99 +154,47 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
 
   // Count messages again for 2 second
   g_hokuyoMsgCount = 0;
+  g_imuMsgCount = 0;
   for (i = 0; i < 20; ++i)
   {
     common::Time::MSleep(100);
   }
   hokuyoMsgCount = g_hokuyoMsgCount;
+  imuMsgCount = g_imuMsgCount;
   now = world->GetSimTime().Double() - now;
-  gzdbg << "counted " << hokuyoMsgCount << " messages in "
-        << now << " seconds. Expected[" << updateRate * now * 0.5 << "]\n";
+  gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
+        << now << " seconds\n";
+  gzdbg << "counted " << imuMsgCount << " imu messages in "
+        << now << " seconds\n";
 
   // Expect at least 50% of specified update rate
   // Note: this is where the failure documented in issue #236 occurs
   EXPECT_GT(static_cast<double>(hokuyoMsgCount),
-              updateRate*now * 0.5);
+              updateRateHokuyo*now * 0.5);
+  EXPECT_GT(static_cast<double>(imuMsgCount),
+              updateRateImu*now * 0.5);
 
   // Count messages again for 2 more seconds
   then = now;
   g_hokuyoMsgCount = 0;
+  g_imuMsgCount = 0;
   for (i = 0; i < 20; ++i)
   {
     common::Time::MSleep(100);
   }
   hokuyoMsgCount = g_hokuyoMsgCount;
+  imuMsgCount = g_imuMsgCount;
   now = world->GetSimTime().Double();
-  gzdbg << "counted " << hokuyoMsgCount << " messages in "
-        << now - then << " seconds\n";
+  gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
+        << now << " seconds\n";
+  gzdbg << "counted " << imuMsgCount << " imu messages in "
+        << now << " seconds\n";
 
   // Expect at least 50% of specified update rate
   EXPECT_GT(static_cast<double>(hokuyoMsgCount),
-              updateRate*(now-then) * 0.5);
-}
-
-/////////////////////////////////////////////////
-/// \brief Reset world a bunch of times and verify that no assertions happen
-/// The assert "SensorManager.cc(479): Took negative time to update a sensor."
-/// has been observed in Jenkins testing.
-TEST_F(Sensor_TEST, ResetWorldStressTest)
-{
-  // Load in a world with lasers
-  Load("worlds/ray_test.world");
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // get the sensor manager
-  sensors::SensorManager *mgr = sensors::SensorManager::Instance();
-  EXPECT_TRUE(mgr->SensorsInitialized());
-
-  // get the hokuyo sensor
-  sensors::SensorPtr sensor;
-  sensor = mgr->GetSensor("default::hokuyo::link::laser");
-  ASSERT_TRUE(sensor != NULL);
-
-  // set update rate to unlimited
-  double updateRate = 0.0;
-  sensor->SetUpdateRate(updateRate);
-  gzdbg << sensor->GetScopedName() << " loaded with update rate of "
-        << sensor->GetUpdateRate() << " Hz\n";
-
-  g_hokuyoMsgCount = 0;
-
-  // Subscribe to hokuyo laser scan messages
-  transport::NodePtr node = transport::NodePtr(new transport::Node());
-  node->Init();
-  transport::SubscriberPtr sceneSub = node->Subscribe(
-      "~/hokuyo/link/laser/scan", &ReceiveHokuyoMsg);
-
-  // Wait for messages to arrive
-  {
-    boost::mutex countMutex;
-    boost::mutex::scoped_lock lock(countMutex);
-    g_countCondition.wait(lock);
-    gzdbg << "counted " << g_hokuyoMsgCount << " hokuyo messages\n";
-  }
-
-  EXPECT_GT(g_hokuyoMsgCount, 19u);
-
-  // Send reset world message
-  transport::PublisherPtr worldControlPub =
-    node->Advertise<msgs::WorldControl>("~/world_control");
-
-  // Copied from MainWindow::OnResetWorld
-  msgs::WorldControl msg;
-  msg.mutable_reset()->set_all(true);
-  worldControlPub->Publish(msg);
-
-  common::Time::MSleep(300);
-
-  int i;
-  for (i = 0; i < 20; ++i)
-  {
-    worldControlPub->Publish(msg);
-    gzdbg << "counted " << g_hokuyoMsgCount << " hokuyo messages\n";
-    common::Time::MSleep(200);
-  }
+              updateRateHokuyo*(now-then) * 0.5);
+  EXPECT_GT(static_cast<double>(imuMsgCount),
+              updateRateImu*(now-then) * 0.5);
 }
 
 /////////////////////////////////////////////////

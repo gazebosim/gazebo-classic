@@ -18,13 +18,15 @@
 #define _NULLSCHEMEHANDLER_HH_
 
 #include <OgreMaterialManager.h>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace rendering
   {
     /// \brief Class for skipping materials which do not have the scheme defined
-    class NullSchemeHandler : public Ogre::MaterialManager::Listener
+    class GAZEBO_VISIBLE NullSchemeHandler :
+      public Ogre::MaterialManager::Listener
     {
       /** @copydoc MaterialManager::Listener::handleSchemeNotFound */
       public: virtual Ogre::Technique *handleSchemeNotFound(

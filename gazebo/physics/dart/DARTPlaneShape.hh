@@ -19,13 +19,14 @@
 
 #include "gazebo/physics/PlaneShape.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief An DART Plane shape.
-    class DARTPlaneShape : public PlaneShape
+    class GAZEBO_VISIBLE DARTPlaneShape : public PlaneShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

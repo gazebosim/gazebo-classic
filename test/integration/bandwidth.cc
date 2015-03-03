@@ -42,13 +42,6 @@ void BandwidthMsg(const std::string &_msg)
 
 void BandwidthTest::Bandwidth(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Abort test since simbody does not support screw joints in PR2, "
-          << "Please see issue #857.\n";
-    return;
-  }
-
   if (_physicsEngine == "dart")
   {
     gzerr << "Abort test since dart does not support closed loops in PR2, "

@@ -23,6 +23,7 @@
 #define BUMPERINTERFACE_HH
 
 #include "GazeboInterface.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
@@ -39,7 +40,7 @@ namespace libgazebo
   class BumperIface;
 
   /// \brief Bumper interface
-  class BumperInterface : public GazeboInterface
+  class GAZEBO_VISIBLE BumperInterface : public GazeboInterface
   {
     /// \brief Constructor
     public: BumperInterface(player_devaddr_t addr, GazeboDriver *driver,

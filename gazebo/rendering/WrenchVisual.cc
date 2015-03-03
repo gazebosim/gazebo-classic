@@ -21,6 +21,7 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/WrenchVisualPrivate.hh"
 #include "gazebo/rendering/WrenchVisual.hh"
 
 using namespace gazebo;
@@ -29,69 +30,72 @@ using namespace rendering;
 /////////////////////////////////////////////////
 WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
     const std::string &_topicName)
-: Visual(_name, _vis)
+  : Visual(*new WrenchVisualPrivate, _name, _vis)
 {
-  this->enabled = true;
-  this->receivedMsg = false;
+  WrenchVisualPrivate *dPtr =
+      reinterpret_cast<WrenchVisualPrivate *>(this->dataPtr);
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->scene->GetName());
+  dPtr->enabled = true;
+  dPtr->receivedMsg = false;
 
-  this->wrenchSub = this->node->Subscribe(_topicName,
+  dPtr->node = transport::NodePtr(new transport::Node());
+  dPtr->node->Init(dPtr->scene->GetName());
+
+  dPtr->wrenchSub = dPtr->node->Subscribe(_topicName,
       &WrenchVisual::OnMsg, this, true);
 
   // Make sure the meshes are in Ogre
   this->InsertMesh("unit_cone");
   Ogre::MovableObject *coneXObj =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
           this->GetName()+"__WRENCH_X_CONE__", "unit_cone"));
   ((Ogre::Entity*)coneXObj)->setMaterialName("__GAZEBO_TRANS_RED_MATERIAL__");
 
   Ogre::MovableObject *coneYObj =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
           this->GetName()+"__WRENCH_Y_CONE__", "unit_cone"));
   ((Ogre::Entity*)coneYObj)->setMaterialName("__GAZEBO_TRANS_GREEN_MATERIAL__");
 
   Ogre::MovableObject *coneZObj =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
           this->GetName()+"__WRENCH_Z_CONE__", "unit_cone"));
   ((Ogre::Entity*)coneZObj)->setMaterialName("__GAZEBO_TRANS_BLUE_MATERIAL__");
 
   math::Quaternion q;
 
-  this->coneXNode =
-    this->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_X_CONE");
-  this->coneXNode->attachObject(coneXObj);
+  dPtr->coneXNode =
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_X_CONE");
+  dPtr->coneXNode->attachObject(coneXObj);
   q.SetFromAxis(0, 1, 0, GZ_DTOR(-90));
-  this->coneXNode->setOrientation(q.w, q.x, q.y, q.z);
-  this->coneXNode->setScale(0.02, 0.02, 0.02);
+  dPtr->coneXNode->setOrientation(q.w, q.x, q.y, q.z);
+  dPtr->coneXNode->setScale(0.02, 0.02, 0.02);
 
-  this->coneYNode =
-    this->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_Y_CONE");
-  this->coneYNode->attachObject(coneYObj);
+  dPtr->coneYNode =
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_Y_CONE");
+  dPtr->coneYNode->attachObject(coneYObj);
   q.SetFromAxis(1, 0, 0, GZ_DTOR(90));
-  this->coneYNode->setOrientation(q.w, q.x, q.y, q.z);
-  this->coneYNode->setScale(0.02, 0.02, 0.02);
+  dPtr->coneYNode->setOrientation(q.w, q.x, q.y, q.z);
+  dPtr->coneYNode->setScale(0.02, 0.02, 0.02);
 
-  this->coneZNode =
-    this->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_Z_CONE");
-  this->coneZNode->attachObject(coneZObj);
+  dPtr->coneZNode =
+    dPtr->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_Z_CONE");
+  dPtr->coneZNode->attachObject(coneZObj);
   q.SetFromAxis(1, 0, 0, GZ_DTOR(180));
-  this->coneZNode->setOrientation(q.w, q.x, q.y, q.z);
-  this->coneZNode->setScale(0.02, 0.02, 0.02);
+  dPtr->coneZNode->setOrientation(q.w, q.x, q.y, q.z);
+  dPtr->coneZNode->setScale(0.02, 0.02, 0.02);
 
-  this->forceLine = new DynamicLines(RENDERING_LINE_LIST);
-  this->forceLine->AddPoint(math::Vector3(0, 0, 0));
-  this->forceLine->AddPoint(math::Vector3(0, 0, 0));
-  this->forceLine->setMaterial("__GAZEBO_TRANS_PURPLE_MATERIAL__");
+  dPtr->forceLine = new DynamicLines(RENDERING_LINE_LIST);
+  dPtr->forceLine->AddPoint(math::Vector3(0, 0, 0));
+  dPtr->forceLine->AddPoint(math::Vector3(0, 0, 0));
+  dPtr->forceLine->setMaterial("__GAZEBO_TRANS_PURPLE_MATERIAL__");
 
-  this->forceNode = this->sceneNode->createChildSceneNode(this->GetName() +
+  dPtr->forceNode = dPtr->sceneNode->createChildSceneNode(this->GetName() +
       "_WRENCH_FORCE_NODE_");
-  this->forceNode->attachObject(this->forceLine);
+  dPtr->forceNode->attachObject(dPtr->forceLine);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
-  this->connections.push_back(
+  dPtr->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&WrenchVisual::Update, this)));
 }
@@ -99,14 +103,17 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
 /////////////////////////////////////////////////
 WrenchVisual::~WrenchVisual()
 {
-  this->node.reset();
-  this->connections.clear();
+  WrenchVisualPrivate *dPtr =
+      reinterpret_cast<WrenchVisualPrivate *>(this->dataPtr);
 
-  delete this->forceLine;
-  this->forceLine = NULL;
+  dPtr->node.reset();
+  dPtr->connections.clear();
 
-  delete this->forceNode;
-  this->forceNode = NULL;
+  delete dPtr->forceLine;
+  dPtr->forceLine = NULL;
+
+  delete dPtr->forceNode;
+  dPtr->forceNode = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -120,9 +127,12 @@ void WrenchVisual::Load(ConstJointPtr &_msg)
 /////////////////////////////////////////////////
 void WrenchVisual::Update()
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  WrenchVisualPrivate *dPtr =
+      reinterpret_cast<WrenchVisualPrivate *>(this->dataPtr);
 
-  if (!this->wrenchMsg || !this->receivedMsg)
+  boost::mutex::scoped_lock lock(dPtr->mutex);
+
+  if (!dPtr->wrenchMsg || !dPtr->receivedMsg)
     return;
 
   double magScale = 100;
@@ -133,39 +143,42 @@ void WrenchVisual::Update()
 
   // Scaling factor.
   double xScale = (2.0 * vRange) / (1 +
-      exp(-this->wrenchMsg->wrench().torque().x() / magScale)) - offset;
+      exp(-dPtr->wrenchMsg->wrench().torque().x() / magScale)) - offset;
 
   double yScale = (2.0 * vRange) / (1 +
-      exp(-this->wrenchMsg->wrench().torque().y() / magScale)) - offset;
+      exp(-dPtr->wrenchMsg->wrench().torque().y() / magScale)) - offset;
 
   double zScale = (2.0 * vRange) / (1 +
-      exp(-this->wrenchMsg->wrench().torque().z() / magScale)) - offset;
+      exp(-dPtr->wrenchMsg->wrench().torque().z() / magScale)) - offset;
 
   magScale = 50000;
-  math::Vector3 force = msgs::Convert(this->wrenchMsg->wrench().force());
+  math::Vector3 force = msgs::Convert(dPtr->wrenchMsg->wrench().force());
   double forceScale = (2.0 * vRange) / (1 +
       exp(force.GetSquaredLength() / magScale)) - offset;
 
-  this->forceLine->SetPoint(1, force*forceScale);
-  this->forceLine->Update();
+  dPtr->forceLine->SetPoint(1, force*forceScale);
+  dPtr->forceLine->Update();
 
-  this->coneXNode->setScale(0.02, 0.02, xScale);
-  this->coneXNode->setPosition(xScale * 0.5, 0, 0);
+  dPtr->coneXNode->setScale(0.02, 0.02, xScale);
+  dPtr->coneXNode->setPosition(xScale * 0.5, 0, 0);
 
-  this->coneYNode->setScale(0.02, 0.02, yScale);
-  this->coneYNode->setPosition(0, yScale * 0.5, 0);
+  dPtr->coneYNode->setScale(0.02, 0.02, yScale);
+  dPtr->coneYNode->setPosition(0, yScale * 0.5, 0);
 
-  this->coneZNode->setScale(0.02, 0.02, zScale);
-  this->coneZNode->setPosition(0, 0, zScale * 0.5);
+  dPtr->coneZNode->setScale(0.02, 0.02, zScale);
+  dPtr->coneZNode->setPosition(0, 0, zScale * 0.5);
 }
 
 /////////////////////////////////////////////////
 void WrenchVisual::OnMsg(ConstWrenchStampedPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
-  if (this->enabled)
+  WrenchVisualPrivate *dPtr =
+      reinterpret_cast<WrenchVisualPrivate *>(this->dataPtr);
+
+  boost::mutex::scoped_lock lock(dPtr->mutex);
+  if (dPtr->enabled)
   {
-    this->wrenchMsg = _msg;
-    this->receivedMsg = true;
+    dPtr->wrenchMsg = _msg;
+    dPtr->receivedMsg = true;
   }
 }

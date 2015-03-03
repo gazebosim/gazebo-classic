@@ -27,6 +27,7 @@
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -40,7 +41,7 @@ namespace gazebo
     /// \{
     /// \brief Depth camera sensor
     /// This sensor is used for simulating standard monocular cameras
-    class DepthCameraSensor : public Sensor
+    class GAZEBO_VISIBLE DepthCameraSensor : public Sensor
     {
       /// \brief Constructor
       public: DepthCameraSensor();
@@ -52,7 +53,7 @@ namespace gazebo
       /// \param[in] _sdf SDF Sensor parameters
       /// \param[in] _worldName Name of world to load from
       protected: virtual void Load(const std::string &_worldName,
-                                   sdf::ElementPtr &_sdf);
+                                   sdf::ElementPtr _sdf);
 
       /// \brief Load the sensor with default parameters
       /// \param[in] _worldName Name of world to load from
@@ -61,9 +62,8 @@ namespace gazebo
       /// \brief Initialize the camera
       protected: virtual void Init();
 
-      /// \brief Update the sensor information
-      /// \param[in] _force True if update is forced, false if not
-      protected: virtual void UpdateImpl(bool _force);
+      // Documentation inherited
+      protected: virtual bool UpdateImpl(bool _force);
 
       /// Finalize the camera
       protected: virtual void Fini();
@@ -82,13 +82,16 @@ namespace gazebo
       /// \return True if saved, false if not
       public: bool SaveFrame(const std::string &_filename);
 
+      /// \brief Handle the render event.
+      private: void Render();
+
+      /// \brief Pointer to the camera.
       private: rendering::DepthCameraPtr camera;
 
-      private: rendering::ScenePtr scene;
+      /// \brief True if the sensor was rendered.
+      private: bool rendered;
     };
     /// \}
   }
 }
 #endif
-
-

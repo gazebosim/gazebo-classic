@@ -24,13 +24,14 @@
 #include "gazebo/physics/Collision.hh"
 
 #include "gazebo/physics/dart/dart_inc.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief Base class for all DART collisions.
-    class DARTCollision : public Collision
+    class GAZEBO_VISIBLE DARTCollision : public Collision
     {
       /// \brief Constructor.
       /// \param[in] _link Parent Link

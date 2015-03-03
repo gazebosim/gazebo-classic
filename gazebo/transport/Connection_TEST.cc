@@ -20,11 +20,14 @@
 #include <stdlib.h>
 
 #include "gazebo/transport/Connection.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
+class Connection : public gazebo::testing::AutoLogFixture { };
+
 /////////////////////////////////////////////////
-TEST(Connection, IPWhiteList)
+TEST_F(Connection, IPWhiteList)
 {
   transport::Connection *connection = new transport::Connection();
   EXPECT_TRUE(connection->GetIPWhiteList().empty());

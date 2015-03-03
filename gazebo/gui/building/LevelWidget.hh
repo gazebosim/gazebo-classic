@@ -22,6 +22,7 @@
 #include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class GridLines GridLines.hh
     /// \brief A widget for adding and changing building levels.
-    class LevelWidget : public QWidget
+    class GAZEBO_VISIBLE LevelWidget : public QWidget
     {
       Q_OBJECT
 

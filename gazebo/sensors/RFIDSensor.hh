@@ -32,6 +32,7 @@
 #include "gazebo/math/Pose.hh"
 
 #include "gazebo/sensors/Sensor.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -46,7 +47,7 @@ namespace gazebo
 
     /// \class RFIDSensor RFIDSensor.hh sensors/sensors.hh
     /// \brief Sensor class for RFID type of sensor
-    class RFIDSensor: public Sensor
+    class GAZEBO_VISIBLE RFIDSensor: public Sensor
     {
       /// \brief Constructor
       public: RFIDSensor();
@@ -67,7 +68,8 @@ namespace gazebo
       // Documentation inherited
       public: void AddTag(RFIDTag *_tag);
 
-      protected: virtual void UpdateImpl(bool _force);
+      // Documentation inherited.
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited
       public: virtual void Fini();

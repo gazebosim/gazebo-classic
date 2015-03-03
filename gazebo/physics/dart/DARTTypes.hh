@@ -21,6 +21,7 @@
 #include <boost/shared_ptr.hpp>
 #include "gazebo/math/Pose.hh"
 #include "gazebo/physics/dart/dart_inc.h"
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_physics
@@ -50,7 +51,7 @@ namespace gazebo
     /// \class DARTTypes DARTTypes.hh
     /// \brief A set of functions for converting between the math types used
     ///        by gazebo and dart.
-    class DARTTypes
+    class GAZEBO_VISIBLE DARTTypes
     {
       /// \brief
       public: static Eigen::Vector3d ConvVec3(const math::Vector3 &_vec3)

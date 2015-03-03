@@ -20,6 +20,7 @@
 #include <string>
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -31,7 +32,7 @@ namespace gazebo
     /// \class DynamicRenderable DynamicRenderable.hh rendering/rendering.hh
     /// \brief Abstract base class providing mechanisms for dynamically
     /// growing hardware buffers.
-    class DynamicRenderable : public Ogre::SimpleRenderable
+    class GAZEBO_VISIBLE DynamicRenderable : public Ogre::SimpleRenderable
     {
       /// \brief Constructor
       public: DynamicRenderable();

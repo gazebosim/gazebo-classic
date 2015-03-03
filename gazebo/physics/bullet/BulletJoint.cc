@@ -19,6 +19,8 @@
  * Date: 15 May 2009
  */
 
+#include <string>
+
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 
@@ -37,7 +39,7 @@ BulletJoint::BulletJoint(BasePtr _parent)
   this->constraint = NULL;
   this->bulletWorld = NULL;
   this->feedback = NULL;
-  this->dampingInitialized = false;
+  this->stiffnessDampingInitialized = false;
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
 }
@@ -61,10 +63,6 @@ void BulletJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(0, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
@@ -80,10 +78,6 @@ void BulletJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(1, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
@@ -106,7 +100,7 @@ void BulletJoint::Reset()
 }
 
 //////////////////////////////////////////////////
-LinkPtr BulletJoint::GetJointLink(int _index) const
+LinkPtr BulletJoint::GetJointLink(unsigned int _index) const
 {
   LinkPtr result;
 
@@ -363,27 +357,78 @@ void BulletJoint::SetupJointFeedback()
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetDamping(int /*_index*/, double _damping)
+void BulletJoint::SetDamping(unsigned int _index, double _damping)
 {
-  this->dampingCoefficient = _damping;
-
-  // \TODO: implement on a per axis basis (requires additional sdf parameters)
-
-  /// \TODO:  this check might not be needed?  attaching an object to a static
-  /// body should not affect damping application.
-  bool parentStatic = this->GetParent() ? this->GetParent()->IsStatic() : false;
-  bool childStatic = this->GetChild() ? this->GetChild()->IsStatic() : false;
-
-  if (!this->dampingInitialized && !parentStatic && !childStatic)
+  if (_index < this->GetAngleCount())
   {
-    this->applyDamping = physics::Joint::ConnectJointUpdate(
-      boost::bind(&BulletJoint::ApplyDamping, this));
-    this->dampingInitialized = true;
+    this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
+      _damping);
+  }
+  else
+  {
+     gzerr << "BulletJoint::SetDamping: index[" << _index
+           << "] is out of bounds (GetAngleCount() = "
+           << this->GetAngleCount() << ").\n";
+     return;
   }
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetForce(int _index, double _force)
+void BulletJoint::SetStiffness(unsigned int _index, double _stiffness)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->SetStiffnessDamping(_index, _stiffness,
+      this->dissipationCoefficient[_index]);
+  }
+  else
+  {
+     gzerr << "BulletJoint::SetStiffness: index[" << _index
+           << "] is out of bounds (GetAngleCount() = "
+           << this->GetAngleCount() << ").\n";
+     return;
+  }
+}
+
+//////////////////////////////////////////////////
+void BulletJoint::SetStiffnessDamping(unsigned int _index,
+  double _stiffness, double _damping, double _reference)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->stiffnessCoefficient[_index] = _stiffness;
+    this->dissipationCoefficient[_index] = _damping;
+    this->springReferencePosition[_index] = _reference;
+
+    /// \TODO: this check might not be needed?  attaching an object to a static
+    /// body should not affect damping application.
+    bool parentStatic =
+      this->GetParent() ? this->GetParent()->IsStatic() : false;
+    bool childStatic =
+      this->GetChild() ? this->GetChild()->IsStatic() : false;
+
+    if (!this->stiffnessDampingInitialized)
+    {
+      if (!parentStatic && !childStatic)
+      {
+        this->applyDamping = physics::Joint::ConnectJointUpdate(
+          boost::bind(&BulletJoint::ApplyStiffnessDamping, this));
+        this->stiffnessDampingInitialized = true;
+      }
+      else
+      {
+        gzwarn << "Spring Damper for Joint[" << this->GetName()
+               << "] is not initialized because either parent[" << parentStatic
+               << "] or child[" << childStatic << "] is static.\n";
+      }
+    }
+  }
+  else
+    gzerr << "SetStiffnessDamping _index too large.\n";
+}
+
+//////////////////////////////////////////////////
+void BulletJoint::SetForce(unsigned int _index, double _force)
 {
   double force = Joint::CheckAndTruncateForce(_index, _force);
   this->SaveForce(_index, force);
@@ -395,11 +440,11 @@ void BulletJoint::SetForce(int _index, double _force)
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SaveForce(int _index, double _force)
+void BulletJoint::SaveForce(unsigned int _index, double _force)
 {
   // this bit of code actually doesn't do anything physical,
   // it simply records the forces commanded inside forceApplied.
-  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
     if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
     {
@@ -432,14 +477,92 @@ double BulletJoint::GetForce(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::ApplyDamping()
+void BulletJoint::ApplyStiffnessDamping()
 {
-  // Take absolute value of dampingCoefficient, since negative values of
-  // dampingCoefficient are used for adaptive damping to enforce stability.
-  double dampingForce = -fabs(this->dampingCoefficient) * this->GetVelocity(0);
+  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  {
+    // Take absolute value of dissipationCoefficient, since negative values of
+    // dissipationCoefficient are used for adaptive damping to
+    // enforce stability.
+    double dampingForce = -fabs(this->dissipationCoefficient[i])
+      * this->GetVelocity(i);
 
-  // do not change forceApplied if setting internal damping forces
-  this->SetForceImpl(0, dampingForce);
+    double springForce = this->stiffnessCoefficient[i]
+      * (this->springReferencePosition[i] - this->GetAngle(i).Radian());
 
-  // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
+    // do not change forceApplied if setting internal damping forces
+    this->SetForceImpl(i, dampingForce + springForce);
+
+    // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
+  }
+}
+
+//////////////////////////////////////////////////
+void BulletJoint::SetAnchor(unsigned int /*_index*/,
+    const gazebo::math::Vector3 & /*_anchor*/)
+{
+  // nothing to do here for bullet.
+}
+
+//////////////////////////////////////////////////
+math::Vector3 BulletJoint::GetAnchor(unsigned int /*_index*/) const
+{
+  gzerr << "Not implement in Bullet\n";
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+math::Vector3 BulletJoint::GetLinkForce(unsigned int /*_index*/) const
+{
+  gzerr << "Not implement in Bullet\n";
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+math::Vector3 BulletJoint::GetLinkTorque(unsigned int /*_index*/) const
+{
+  gzerr << "Not implement in Bullet\n";
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+void BulletJoint::SetAttribute(Attribute, unsigned int /*_index*/,
+    double /*_value*/)
+{
+  gzdbg << "Not implement in Bullet\n";
+}
+
+//////////////////////////////////////////////////
+bool BulletJoint::SetParam(const std::string &/*_key*/,
+    unsigned int /*_index*/,
+    const boost::any &/*_value*/)
+{
+  gzdbg << "Not implement in Bullet\n";
+  return false;
+}
+
+//////////////////////////////////////////////////
+double BulletJoint::GetParam(const std::string &/*_key*/,
+    unsigned int /*_index*/)
+{
+  gzdbg << "Not implement in Bullet\n";
+  return 0;
+}
+
+//////////////////////////////////////////////////
+math::Angle BulletJoint::GetHighStop(unsigned int _index)
+{
+  return this->GetUpperLimit(_index);
+}
+
+//////////////////////////////////////////////////
+math::Angle BulletJoint::GetLowStop(unsigned int _index)
+{
+  return this->GetLowerLimit(_index);
+}
+
+//////////////////////////////////////////////////
+bool BulletJoint::SetPosition(unsigned int _index, double _position)
+{
+  return Joint::SetPositionMaximal(_index, _position);
 }

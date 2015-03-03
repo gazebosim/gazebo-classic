@@ -14,14 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef _MESH_HH_
-#define _MESH_HH_
+#ifndef _GAZEBO_MESH_HH_
+#define _GAZEBO_MESH_HH_
 
 #include <vector>
 #include <string>
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
 
     /// \class Mesh Mesh.hh common/common.hh
     /// \brief A 3D mesh
-    class Mesh
+    class GAZEBO_VISIBLE Mesh
     {
       /// \brief Constructor
       public: Mesh();
@@ -106,6 +107,11 @@ namespace gazebo
       /// \param[in] _index the index
       /// \return the material or NULL if the index is out of bounds
       public: const Material *GetMaterial(int _index) const;
+
+      /// \brief Get the index of material
+      /// \param[in] _mat the material
+      /// \return the index of the material or -1 if not found.
+      public: int GetMaterialIndex(const Material *_mat) const;
 
       /// \brief Get a child mesh
       /// \param[in] _i the index
@@ -184,20 +190,23 @@ namespace gazebo
 
     /// \brief Vertex to node weighted assignement for skeleton animation
     /// visualization
-    struct NodeAssignment
+    class GAZEBO_VISIBLE NodeAssignment
     {
+      /// \brief Constructor.
+      public: NodeAssignment();
+
       /// \brief index of the vertex
-      unsigned int vertexIndex;
+      public: unsigned int vertexIndex;
 
       /// \brief node (or bone) index
-      unsigned int nodeIndex;
+      public: unsigned int nodeIndex;
 
       /// \brief the weight (between 0 and 1)
-      float weight;
+      public: float weight;
     };
 
     /// \brief A child mesh
-    class SubMesh
+    class GAZEBO_VISIBLE SubMesh
     {
       /// \brief An enumeration of the geometric mesh primitives
       public: enum PrimitiveType {POINTS, LINES, LINESTRIPS, TRIANGLES,

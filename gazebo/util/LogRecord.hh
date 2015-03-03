@@ -37,6 +37,7 @@
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/util/system.hh"
 
 #define GZ_LOG_VERSION "1.0"
 
@@ -64,7 +65,7 @@ namespace gazebo
     /// guarantees that all data is stored.
     ///
     /// \sa Logplay, State
-    class LogRecord : public SingletonT<LogRecord>
+    class GAZEBO_VISIBLE LogRecord : public SingletonT<LogRecord>
     {
       /// \brief Constructor
       private: LogRecord();

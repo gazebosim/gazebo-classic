@@ -23,6 +23,7 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/common/MeshManager.hh"
+#include "gazebo/rendering/RFIDTagVisualPrivate.hh"
 #include "gazebo/rendering/RFIDTagVisual.hh"
 
 using namespace gazebo;
@@ -31,12 +32,15 @@ using namespace rendering;
 /////////////////////////////////////////////////
 RFIDTagVisual::RFIDTagVisual(const std::string &_name, VisualPtr _vis,
                              const std::string &_topicName)
-  : Visual(_name, _vis)
+  : Visual(*new RFIDTagVisualPrivate, _name, _vis)
 {
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->scene->GetName());
+  RFIDTagVisualPrivate *dPtr =
+      reinterpret_cast<RFIDTagVisualPrivate *>(this->dataPtr);
 
-  this->rfidSub = this->node->Subscribe(_topicName,
+  dPtr->node = transport::NodePtr(new transport::Node());
+  dPtr->node->Init(dPtr->scene->GetName());
+
+  dPtr->rfidSub = dPtr->node->Subscribe(_topicName,
       &RFIDTagVisual::OnScan, this);
 
   common::MeshManager::Instance()->CreateSphere("contact_sphere", .2, 10, 10);

@@ -15,6 +15,8 @@
  *
 */
 
+#include <string>
+
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyModel.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
@@ -28,6 +30,7 @@
 #include "gazebo/physics/simbody/SimbodyBoxShape.hh"
 #include "gazebo/physics/simbody/SimbodyCylinderShape.hh"
 #include "gazebo/physics/simbody/SimbodyMeshShape.hh"
+#include "gazebo/physics/simbody/SimbodyPolylineShape.hh"
 #include "gazebo/physics/simbody/SimbodyRayShape.hh"
 
 #include "gazebo/physics/simbody/SimbodyHingeJoint.hh"
@@ -45,6 +48,7 @@
 #include "gazebo/physics/SurfaceParams.hh"
 #include "gazebo/physics/MapShape.hh"
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
@@ -67,16 +71,22 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
       gravity(forces, matter, -SimTK::ZAxis, 0),
       discreteForces(forces, matter),
       tracker(system), contact(system, tracker),  integ(NULL)
+      , contactMaterialStiffness(0.0)
+      , contactMaterialDissipation(0.0)
+      , contactMaterialPlasticCoefRestitution(0.0)
+      , contactMaterialPlasticImpactVelocity(0.0)
+      , contactMaterialStaticFriction(0.0)
+      , contactMaterialDynamicFriction(0.0)
+      , contactMaterialViscousFriction(0.0)
+      , contactImpactCaptureVelocity(0.0)
+      , contactStictionTransitionVelocity(0.0)
+      , dynamicsWorld(NULL)
+      , stepTimeDouble(0.0)
 {
   // Instantiate the Multibody System
   // Instantiate the Simbody Matter Subsystem
   // Instantiate the Simbody General Force Subsystem
 
-  // Create an integrator
-  // this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
-  // this->integ = new SimTK::RungeKutta3Integrator(system);
-  // this->integ = new SimTK::RungeKutta2Integrator(system);
-  this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
   this->simbodyPhysicsInitialized = false;
   this->simbodyPhysicsStepped = false;
 }
@@ -101,6 +111,28 @@ ModelPtr SimbodyPhysics::CreateModel(BasePtr _parent)
 void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
+
+  // Create an integrator
+  /// \TODO: get from sdf for simbody physics
+  /// \TODO: use this when pgs rigid body solver is implemented
+  this->solverType = "elastic_foundation";
+
+  /// \TODO: get from sdf for simbody physics
+  this->integratorType = "semi_explicit_euler";
+
+  if (this->integratorType == "rk_merson")
+    this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
+  else if (this->integratorType == "rk3")
+    this->integ = new SimTK::RungeKutta3Integrator(system);
+  else if (this->integratorType == "rk2")
+    this->integ = new SimTK::RungeKutta2Integrator(system);
+  else if (this->integratorType == "semi_explicit_euler")
+    this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
+  else
+  {
+    gzerr << "type not specified, using SemiExplicitEuler2Integrator.\n";
+    this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
+  }
 
   this->stepTimeDouble = this->GetMaxStepSize();
 
@@ -129,13 +161,13 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
     simbodyContactElem->Get<double>("viscous_friction");
 
   // below are not used yet, but should work it into the system
-  this->contactMaterialViscousFriction =
-    simbodyContactElem->Get<double>("plastic_coef_restitution");
   this->contactMaterialPlasticCoefRestitution =
-    simbodyContactElem->Get<double>("plastic_impact_velocity");
+    simbodyContactElem->Get<double>("plastic_coef_restitution");
   this->contactMaterialPlasticImpactVelocity =
-    simbodyContactElem->Get<double>("override_impact_capture_velocity");
+    simbodyContactElem->Get<double>("plastic_impact_velocity");
   this->contactImpactCaptureVelocity =
+    simbodyContactElem->Get<double>("override_impact_capture_velocity");
+  this->contactStictionTransitionVelocity =
     simbodyContactElem->Get<double>("override_stiction_transition_velocity");
 }
 
@@ -152,18 +184,10 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::SIMBODY);
-    // physicsMsg.set_solver_type(this->stepType);
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(this->GetMaxStepSize());
-    // physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
-    // physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
-    // physicsMsg.set_sor(this->GetSORPGSW());
-    // physicsMsg.set_cfm(this->GetWorldCFM());
-    // physicsMsg.set_erp(this->GetWorldERP());
-    // physicsMsg.set_contact_max_correcting_vel(
-    //     this->GetContactMaxCorrectingVel());
-    // physicsMsg.set_contact_surface_layer(this->GetContactSurfaceLayer());
+
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
@@ -178,45 +202,8 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  // if (_msg->has_solver_type())
-  // {
-  //   sdf::ElementPtr solverElem =
-  //     this->sdf->GetElement("ode")->GetElement("solver");
-  //   if (_msg->solver_type() == "quick")
-  //   {
-  //     solverElem->GetElement("type")->Set("quick");
-  //     this->physicsStepFunc = &dWorldQuickStep;
-  //   }
-  //   else if (_msg->solver_type() == "world")
-  //   {
-  //     solverElem->GetElement("type")->Set("world");
-  //     this->physicsStepFunc = &dWorldStep;
-  //   }
-  // }
-
-  // if (_msg->has_precon_iters())
-  //   this->SetSORPGSPreconIters(_msg->precon_iters());
-
-  // if (_msg->has_iters())
-  //   this->SetSORPGSIters(_msg->iters());
-
-  // if (_msg->has_sor())
-  //   this->SetSORPGSW(_msg->sor());
-
-  // if (_msg->has_cfm())
-  //   this->SetWorldCFM(_msg->cfm());
-
-  // if (_msg->has_erp())
-  //   this->SetWorldERP(_msg->erp());
-
   if (_msg->has_enable_physics())
     this->world->EnablePhysicsEngine(_msg->enable_physics());
-
-  // if (_msg->has_contact_max_correcting_vel())
-  //   this->SetContactMaxCorrectingVel(_msg->contact_max_correcting_vel());
-
-  // if (_msg->has_contact_surface_layer())
-  //   this->SetContactSurfaceLayer(_msg->contact_surface_layer());
 
   if (_msg->has_gravity())
     this->SetGravity(msgs::Convert(_msg->gravity()));
@@ -225,17 +212,31 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetTargetRealTimeFactor(_msg->real_time_factor());
 
   if (_msg->has_real_time_update_rate())
-  {
     this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
-  }
 
   if (_msg->has_max_step_size())
-  {
     this->SetMaxStepSize(_msg->max_step_size());
+
+  /* below will set accuracy for simbody if the messages exist
+  // Set integrator accuracy (measured with Richardson Extrapolation)
+  if (_msg->has_accuracy())
+  {
+    this->integ->setAccuracy(_msg->simbody().accuracy());
   }
+
+  // Set stiction max slip velocity to make it less stiff.
+  if (_msg->has_max_transient_velocity())
+  {
+    this->contact.setTransitionVelocity(
+    _msg->simbody().max_transient_velocity());
+  }
+  */
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
+
+  // Parent class handles many generic parameters
+  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 //////////////////////////////////////////////////
@@ -363,22 +364,8 @@ void SimbodyPhysics::InitModel(const physics::ModelPtr _model)
   // initialize integrator from state
   this->integ->initialize(state);
 
-  // set gravity mode
-  Link_V links = _model->GetLinks();
-  for (Link_V::iterator li = links.begin(); li != links.end(); ++li)
-  {
-    physics::SimbodyLinkPtr simbodyLink =
-      boost::dynamic_pointer_cast<physics::SimbodyLink>(*li);
-    if (simbodyLink)
-      simbodyLink->SetGravityMode(simbodyLink->GetGravityMode());
-    else
-      gzerr << "failed to cast link [" << (*li)->GetName()
-            << "] as simbody link\n";
-  }
-
-  this->system.realize(this->integ->getAdvancedState(), Stage::Velocity);
-
   // mark links as initialized
+  Link_V links = _model->GetLinks();
   for (Link_V::iterator li = links.begin(); li != links.end(); ++li)
   {
     physics::SimbodyLinkPtr simbodyLink =
@@ -426,17 +413,20 @@ void SimbodyPhysics::UpdatePhysics()
   common::Time currTime =  this->world->GetRealTime();
 
 
-  while (integ->getTime() < this->world->GetSimTime().Double())
+  bool trying = true;
+  while (trying && integ->getTime() < this->world->GetSimTime().Double())
   {
-    // try
-    // {
+    try
+    {
       this->integ->stepTo(this->world->GetSimTime().Double(),
                          this->world->GetSimTime().Double());
-    // }
-    // catch (...)
-    // {
-    //   gzerr << "simbody step failed\n";
-    // }
+    }
+    catch(const std::exception& e)
+    {
+      gzerr << "simbody stepTo() failed with message:\n"
+            << e.what() << "\nWill stop trying now.\n";
+      trying = false;
+    }
   }
 
   this->simbodyPhysicsStepped = true;
@@ -530,6 +520,8 @@ ShapePtr SimbodyPhysics::CreateShape(const std::string &_type,
     shape.reset(new SimbodyCylinderShape(collision));
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new SimbodyMeshShape(collision));
+  else if (_type == "polyline")
+    shape.reset(new SimbodyPolylineShape(collision));
   else if (_type == "heightmap")
     shape.reset(new SimbodyHeightmapShape(collision));
   else if (_type == "multiray")
@@ -577,7 +569,7 @@ void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
-    if (this->simbodyPhysicsInitialized)
+    if (this->simbodyPhysicsInitialized && this->world->GetModelCount() > 0)
       this->gravity.setGravityVector(this->integ->updAdvancedState(),
          SimbodyPhysics::Vector3ToVec3(_gravity));
     else
@@ -754,7 +746,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       // There is no corresponding Gazebo joint for this mobilizer.
       // Create the joint and set its default position to be the default
       // pose of the base link relative to the Ground frame.
-      assert(type == "free");  // May add more types later
+      // Currently only `free` is allowed, we may add more types later
+      GZ_ASSERT(type == "free", "type is not 'free', not allowed.");
       if (type == "free")
       {
         MobilizedBody::Free freeJoint(
@@ -809,10 +802,136 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         freeJoint.setDefaultTransform(defX_FM);
         mobod = freeJoint;
       }
-      else if (type == "revolute")
+      else if (type == "screw")
       {
         UnitVec3 axis(
-          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
+          SimbodyPhysics::Vector3ToVec3(
+            gzJoint->GetAxisFrameOffset(0).RotateVector(
+            gzJoint->GetLocalAxis(0))));
+
+        double pitch =
+          dynamic_cast<physics::SimbodyScrewJoint*>(gzJoint)->GetThreadPitch(0);
+
+        if (math::equal(pitch, 0.0))
+        {
+          gzerr << "thread pitch should not be zero (joint is a slider?)"
+                << " using pitch = 1.0e6\n";
+          pitch = 1.0e6;
+        }
+
+        // Simbody's screw joint axis (both rotation and translation) is along Z
+        Rotation R_JZ(axis, ZAxis);
+        Transform X_IF(X_IF0.R()*R_JZ, X_IF0.p());
+        Transform X_OM(X_OM0.R()*R_JZ, X_OM0.p());
+        MobilizedBody::Screw screwJoint(
+            parentMobod,      X_IF,
+            massProps,        X_OM,
+            -1.0/pitch,
+            direction);
+        mobod = screwJoint;
+
+        gzdbg << "Setting limitForce[0] for [" << gzJoint->GetName() << "]\n";
+
+        double low = gzJoint->GetLowerLimit(0u).Radian();
+        double high = gzJoint->GetUpperLimit(0u).Radian();
+
+        // initialize stop stiffness and dissipation from joint parameters
+        gzJoint->limitForce[0] =
+          Force::MobilityLinearStop(this->forces, mobod,
+          SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
+          gzJoint->GetStopDissipation(0), low, high);
+
+        // gzdbg << "SimbodyPhysics SetDamping ("
+        //       << gzJoint->GetDampingCoefficient()
+        //       << ")\n";
+        // Create a damper for every joint even if damping coefficient
+        // is zero.  This will allow user to change damping coefficients
+        // on the fly.
+        gzJoint->damper[0] =
+          Force::MobilityLinearDamper(this->forces, mobod, 0,
+                                   gzJoint->GetDamping(0));
+
+        // add spring (stiffness proportional to mass)
+        gzJoint->spring[0] =
+          Force::MobilityLinearSpring(this->forces, mobod, 0,
+            gzJoint->GetStiffness(0),
+            gzJoint->GetSpringReferencePosition(0));
+      }
+      else if (type == "universal")
+      {
+        UnitVec3 axis1(SimbodyPhysics::Vector3ToVec3(
+          gzJoint->GetAxisFrameOffset(0).RotateVector(
+          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_PARENT))));
+        /// \TODO: check if this is right, or GetAxisFrameOffset(1) is needed.
+        UnitVec3 axis2(SimbodyPhysics::Vector3ToVec3(
+          gzJoint->GetAxisFrameOffset(0).RotateVector(
+          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_CHILD))));
+
+        // Simbody's univeral joint is along axis1=Y and axis2=X
+        // note X and Y are reversed because Simbody defines universal joint
+        // rotation in body-fixed frames, whereas Gazebo/ODE uses space-fixed
+        // frames.
+        Rotation R_JF(axis1, XAxis, axis2, YAxis);
+        Transform X_IF(X_IF0.R()*R_JF, X_IF0.p());
+        Transform X_OM(X_OM0.R()*R_JF, X_OM0.p());
+        MobilizedBody::Universal uJoint(
+            parentMobod,      X_IF,
+            massProps,        X_OM,
+            direction);
+        mobod = uJoint;
+
+        for (unsigned int nj = 0; nj < 2; ++nj)
+        {
+          double low = gzJoint->GetLowerLimit(nj).Radian();
+          double high = gzJoint->GetUpperLimit(nj).Radian();
+
+          // initialize stop stiffness and dissipation from joint parameters
+          gzJoint->limitForce[nj] =
+            Force::MobilityLinearStop(this->forces, mobod,
+            SimTK::MobilizerQIndex(nj), gzJoint->GetStopStiffness(nj),
+            gzJoint->GetStopDissipation(nj), low, high);
+
+          // gzdbg << "stop stiffness [" << gzJoint->GetStopStiffness(nj)
+          //       << "] low [" << low
+          //       << "] high [" << high
+          //       << "]\n";
+
+          // gzdbg << "SimbodyPhysics SetDamping ("
+          //       << gzJoint->GetDampingCoefficient()
+          //       << ")\n";
+          // Create a damper for every joint even if damping coefficient
+          // is zero.  This will allow user to change damping coefficients
+          // on the fly.
+          gzJoint->damper[nj] =
+            Force::MobilityLinearDamper(this->forces, mobod, nj,
+                                     gzJoint->GetDamping(nj));
+          // add spring (stiffness proportional to mass)
+          gzJoint->spring[nj] =
+            Force::MobilityLinearSpring(this->forces, mobod, nj,
+              gzJoint->GetStiffness(nj),
+              gzJoint->GetSpringReferencePosition(nj));
+        }
+      }
+      else if (type == "revolute")
+      {
+        // rotation from axis frame to child link frame
+        // simbody assumes links are in child link frame, but gazebo
+        // sdf 1.4 and earlier assumes joint axis are defined in model frame.
+        // Use function Joint::GetAxisFrame() to remedy this situation.
+        // Joint::GetAxisFrame() returns the frame joint axis is defined:
+        // either model frame or child link frame.
+        // simbody always assumes axis is specified in the child link frame.
+        // \TODO: come up with a test case where we might need to
+        // flip transform based on isReversed flag.
+        UnitVec3 axis(
+          SimbodyPhysics::Vector3ToVec3(
+            gzJoint->GetAxisFrameOffset(0).RotateVector(
+            gzJoint->GetLocalAxis(0))));
+
+        // gzerr << "[" << gzJoint->GetAxisFrameOffset(0).GetAsEuler()
+        //       << "] ["
+        //       << gzJoint->GetAxisFrameOffset(0).RotateVector(
+        //          gzJoint->GetLocalAxis(0)) << "]\n";
 
         // Simbody's pin is along Z
         Rotation R_JZ(axis, ZAxis);
@@ -824,21 +943,14 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             direction);
         mobod = pinJoint;
 
-        gzdbg << "Setting limitForce for [" << gzJoint->GetName() << "]\n";
-
         double low = gzJoint->GetLowerLimit(0u).Radian();
         double high = gzJoint->GetUpperLimit(0u).Radian();
 
-        /// \TODO: get these from joint.sdf
-        const double stopStiffness = 1.0e8;
-        const double stopDissipation = 1.0;
-
-        /// \TODO: make stop stiffness, damping with parameters
-        /// FIXME: remove hardcoded values.
-        gzJoint->limitForce =
+        // initialize stop stiffness and dissipation from joint parameters
+        gzJoint->limitForce[0] =
           Force::MobilityLinearStop(this->forces, mobod,
-          SimTK::MobilizerQIndex(0), stopStiffness, stopDissipation,
-          low, high);
+          SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
+          gzJoint->GetStopDissipation(0), low, high);
 
         // gzdbg << "SimbodyPhysics SetDamping ("
         //       << gzJoint->GetDampingCoefficient()
@@ -846,20 +958,21 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // Create a damper for every joint even if damping coefficient
         // is zero.  This will allow user to change damping coefficients
         // on the fly.
-        gzJoint->damper =
+        gzJoint->damper[0] =
           Force::MobilityLinearDamper(this->forces, mobod, 0,
-                                   gzJoint->GetDampingCoefficient());
+                                   gzJoint->GetDamping(0));
 
-        #ifdef ADD_JOINT_SPRINGS
-        // KLUDGE add spring (stiffness proportional to mass)
-        Force::MobilityLinearSpring(this->forces, mobod, 0,
-                                    30*massProps.getMass(), 0);
-        #endif
+        // add spring (stiffness proportional to mass)
+        gzJoint->spring[0] =
+          Force::MobilityLinearSpring(this->forces, mobod, 0,
+            gzJoint->GetStiffness(0),
+            gzJoint->GetSpringReferencePosition(0));
       }
       else if (type == "prismatic")
       {
-        UnitVec3 axis(
-          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
+        UnitVec3 axis(SimbodyPhysics::Vector3ToVec3(
+            gzJoint->GetAxisFrameOffset(0).RotateVector(
+            gzJoint->GetLocalAxis(0))));
 
         // Simbody's slider is along X
         Rotation R_JX(axis, XAxis);
@@ -874,29 +987,24 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         double low = gzJoint->GetLowerLimit(0u).Radian();
         double high = gzJoint->GetUpperLimit(0u).Radian();
 
-        /// \TODO: get these from joint.sdf
-        const double stopStiffness = 1.0e8;
-        const double stopDissipation = 1.0;
-
-        /// \TODO: make stop stiffness, damping with parameters
-        /// FIXME: remove hardcoded values.
-        gzJoint->limitForce =
+        // initialize stop stiffness and dissipation from joint parameters
+        gzJoint->limitForce[0] =
           Force::MobilityLinearStop(this->forces, mobod,
-          SimTK::MobilizerQIndex(0), stopStiffness, stopDissipation,
-          low, high);
+          SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
+          gzJoint->GetStopDissipation(0), low, high);
 
         // Create a damper for every joint even if damping coefficient
         // is zero.  This will allow user to change damping coefficients
         // on the fly.
-        gzJoint->damper =
+        gzJoint->damper[0] =
           Force::MobilityLinearDamper(this->forces, mobod, 0,
-                                   gzJoint->GetDampingCoefficient());
+                                   gzJoint->GetDamping(0));
 
-        #ifdef ADD_JOINT_SPRINGS
-        // KLUDGE add spring (stiffness proportional to mass)
-        Force::MobilityLinearSpring(this->forces, mobod, 0,
-                                    30*massProps.getMass(), 0);
-        #endif
+        // add spring (stiffness proportional to mass)
+        gzJoint->spring[0] =
+          Force::MobilityLinearSpring(this->forces, mobod, 0,
+            gzJoint->GetStiffness(0),
+            gzJoint->GetSpringReferencePosition(0));
       }
       else if (type == "ball")
       {
@@ -1064,6 +1172,9 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
     Transform X_LC =
       SimbodyPhysics::Pose2Transform((*ci)->GetRelativePose());
 
+// Remove these pragmas when non-const GetShapeType is removed
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     switch ((*ci)->GetShapeType() & (~physics::Entity::SHAPE))
     {
       case physics::Entity::PLANE_SHAPE:
@@ -1136,9 +1247,10 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
           (boost::dynamic_pointer_cast<physics::BoxShape>(
           (*ci)->GetShape()))->GetSize())/2;
 
-        /// \TODO: make collision resolution an adjustable parameter
+        /// \TODO: harcoded resolution, make collision resolution
+        /// an adjustable parameter (#980)
         // number times to chop the longest side.
-        const int resolution = 2;
+        const int resolution = 6;
         // const int resolution = 10 * (int)(max(hsz)/min(hsz) + 0.5);
         const PolygonalMesh mesh = PolygonalMesh::
             createBrickMesh(hsz, resolution);
@@ -1158,6 +1270,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
               << "] unimplemented\n";
         break;
     }
+#pragma GCC diagnostic pop
   }
 }
 
@@ -1227,4 +1340,104 @@ SimTK::Transform SimbodyPhysics::GetPose(sdf::ElementPtr _element)
 std::string SimbodyPhysics::GetTypeString(unsigned int _type)
 {
   return GetTypeString(physics::Base::EntityType(_type));
+}
+
+//////////////////////////////////////////////////
+boost::any SimbodyPhysics::GetParam(const std::string &_key) const
+{
+  if (_key == "type")
+  {
+    gzwarn << "Please use keyword `solver_typ` in the future.\n";
+    return this->GetParam("solver_type");
+  }
+  else if (_key == "solver_type")
+  {
+    return "Spatial Algebra and Elastic Foundation";
+  }
+  else if (_key == "integrator_type")
+  {
+    return this->integratorType;
+  }
+  else if (_key == "accuracy")
+  {
+    if (this->integ)
+      return this->integ->getAccuracyInUse();
+    else
+      return 0.0f;
+  }
+  else if (_key == "max_transient_velocity")
+  {
+    return this->contact.getTransitionVelocity();
+  }
+  else if (_key == "max_step_size")
+  {
+    return this->GetMaxStepSize();
+  }
+  else
+  {
+    gzwarn << "key [" << _key
+           << "] not supported, returning (int)0." << std::endl;
+    return 0;
+  }
+}
+
+//////////////////////////////////////////////////
+bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
+{
+  /// \TODO fill this out, see issue #1116
+  if (_key == "accuracy")
+  {
+    int value;
+    try
+    {
+      value = boost::any_cast<int>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    gzerr << "Setting [" << _key << "] in Simbody to [" << value
+          << "] not yet supported.\n";
+    return false;
+  }
+  else if (_key == "max_transient_velocity")
+  {
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    gzerr << "Setting [" << _key << "] in Simbody to [" << value
+          << "] not yet supported.\n";
+    return false;
+  }
+  else if (_key == "max_step_size")
+  {
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    gzerr << "Setting [" << _key << "] in Simbody to [" << value
+          << "] not yet supported.\n";
+    return false;
+  }
+  else
+  {
+    gzwarn << _key << " is not supported in Simbody" << std::endl;
+    return false;
+  }
+  // should never get here
+  return false;
 }

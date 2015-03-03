@@ -16,7 +16,7 @@
 */
 /* Desc: RFID Sensor Visualization Class
  * Author:
- * Date: 
+ * Date:
  */
 
 #include "gazebo/transport/transport.hh"
@@ -24,6 +24,7 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/common/MeshManager.hh"
 
+#include "gazebo/rendering/RFIDVisualPrivate.hh"
 #include "gazebo/rendering/RFIDVisual.hh"
 
 using namespace gazebo;
@@ -32,12 +33,15 @@ using namespace rendering;
 /////////////////////////////////////////////////
 RFIDVisual::RFIDVisual(const std::string &_name, VisualPtr _vis,
                        const std::string &_topicName)
-: Visual(_name, _vis)
+  : Visual(*new RFIDVisualPrivate, _name, _vis)
 {
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->scene->GetName());
+  RFIDVisualPrivate *dPtr =
+      reinterpret_cast<RFIDVisualPrivate *>(this->dataPtr);
 
-  this->rfidSub = this->node->Subscribe(_topicName, &RFIDVisual::OnScan, this);
+  dPtr->node = transport::NodePtr(new transport::Node());
+  dPtr->node->Init(dPtr->scene->GetName());
+
+  dPtr->rfidSub = dPtr->node->Subscribe(_topicName, &RFIDVisual::OnScan, this);
 
   common::MeshManager::Instance()->CreateSphere("rfid_sphere", 5.0, 20, 20);
   this->AttachMesh("rfid_sphere");

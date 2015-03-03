@@ -29,6 +29,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/DynamicRenderable.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +40,7 @@ namespace gazebo
 
     /// \class DynamicLines DynamicLines.hh rendering/rendering.hh
     /// \brief Class for drawing lines that can change
-    class DynamicLines : public DynamicRenderable
+    class GAZEBO_VISIBLE DynamicLines : public DynamicRenderable
     {
       /// \brief Constructor
       /// \param[in] _opType The type of Line

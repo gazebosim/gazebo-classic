@@ -19,8 +19,9 @@
 #include <math.h>
 
 #include "gazebo/common/Console.hh"
-
 #include "gazebo/common/SphericalCoordinates.hh"
+#include "gazebo/common/SphericalCoordinatesPrivate.hh"
+
 
 using namespace gazebo;
 using namespace common;
@@ -32,6 +33,8 @@ using namespace common;
 // wikipedia: World_Geodetic_System#A_new_World_Geodetic_System:_WGS_84
 const double g_EarthWGS84AxisEquatorial = 6378137.0;
 const double g_EarthWGS84AxisPolar = 6356752.314245;
+
+const double g_EarthSphere = 6371000.0;
 // const double g_EarthWGS84Flattening = 1/298.257223563;
 
 //////////////////////////////////////////////////
@@ -40,7 +43,7 @@ SphericalCoordinates::SurfaceType SphericalCoordinates::Convert(
 {
   if ("EARTH_WGS84" == _str)
     return EARTH_WGS84;
-  // else
+
   gzerr << "SurfaceType string not recognized, "
         << "EARTH_WGS84 returned by default" << std::endl;
   return EARTH_WGS84;
@@ -48,103 +51,112 @@ SphericalCoordinates::SurfaceType SphericalCoordinates::Convert(
 
 //////////////////////////////////////////////////
 SphericalCoordinates::SphericalCoordinates()
-  : surfaceType(EARTH_WGS84),
-    elevationReference(0.0)
+  : dataPtr(new SphericalCoordinatesPrivate)
 {
+  this->SetSurfaceType(EARTH_WGS84);
+  this->SetElevationReference(0.0);
 }
 
 //////////////////////////////////////////////////
 SphericalCoordinates::SphericalCoordinates(const SurfaceType _type)
-  : surfaceType(_type)
+  : dataPtr(new SphericalCoordinatesPrivate)
 {
+  this->SetSurfaceType(_type);
+  this->SetElevationReference(0.0);
 }
 
 //////////////////////////////////////////////////
-SphericalCoordinates::SphericalCoordinates(
-    const SurfaceType _type, const math::Angle &_latitude,
-    const math::Angle &_longitude, double _elevation,
-    const math::Angle &_heading) :
-      surfaceType(_type), latitudeReference(_latitude),
-      longitudeReference(_longitude), elevationReference(_elevation),
-      headingOffset(_heading)
+SphericalCoordinates::SphericalCoordinates(const SurfaceType _type,
+                                           const math::Angle &_latitude,
+                                           const math::Angle &_longitude,
+                                           double _elevation,
+                                           const math::Angle &_heading)
+  : dataPtr(new SphericalCoordinatesPrivate)
 {
+  this->SetSurfaceType(_type);
+  this->SetLatitudeReference(_latitude);
+  this->SetLongitudeReference(_longitude);
+  this->SetElevationReference(_elevation);
+  this->SetHeadingOffset(_heading);
 }
 
 //////////////////////////////////////////////////
 SphericalCoordinates::~SphericalCoordinates()
 {
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
 SphericalCoordinates::SurfaceType SphericalCoordinates::GetSurfaceType() const
 {
-  return this->surfaceType;
+  return this->dataPtr->surfaceType;
 }
 
 //////////////////////////////////////////////////
 math::Angle SphericalCoordinates::GetLatitudeReference() const
 {
-  return this->latitudeReference;
+  return this->dataPtr->latitudeReference;
 }
 
 //////////////////////////////////////////////////
 math::Angle SphericalCoordinates::GetLongitudeReference() const
 {
-  return this->longitudeReference;
+  return this->dataPtr->longitudeReference;
 }
 
 //////////////////////////////////////////////////
 double SphericalCoordinates::GetElevationReference() const
 {
-  return this->elevationReference;
+  return this->dataPtr->elevationReference;
 }
 
 //////////////////////////////////////////////////
 math::Angle SphericalCoordinates::GetHeadingOffset() const
 {
-  return this->headingOffset;
+  return this->dataPtr->headingOffset;
 }
 
 //////////////////////////////////////////////////
 void SphericalCoordinates::SetSurfaceType(const SurfaceType &_type)
 {
-  this->surfaceType = _type;
+  this->dataPtr->surfaceType = _type;
 }
 
 //////////////////////////////////////////////////
 void SphericalCoordinates::SetLatitudeReference(const math::Angle &_angle)
 {
-  this->latitudeReference.SetFromRadian(_angle.Radian());
+  this->dataPtr->latitudeReference.SetFromRadian(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void SphericalCoordinates::SetLongitudeReference(const math::Angle &_angle)
 {
-  this->longitudeReference.SetFromRadian(_angle.Radian());
+  this->dataPtr->longitudeReference.SetFromRadian(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void SphericalCoordinates::SetElevationReference(double _elevation)
 {
-  this->elevationReference = _elevation;
+  this->dataPtr->elevationReference = _elevation;
 }
 
 //////////////////////////////////////////////////
 void SphericalCoordinates::SetHeadingOffset(const math::Angle &_angle)
 {
-  this->headingOffset.SetFromRadian(_angle.Radian());
+  this->dataPtr->headingOffset.SetFromRadian(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SphericalCoordinates::SphericalFromLocal(
-                                      const math::Vector3 &_xyz) const
+    const math::Vector3 &_xyz) const
 {
   double radiusMeridional = 1.0;
   double radiusNormal = 1.0;
-  double headingSine = sin(this->headingOffset.Radian());
-  double headingCosine = cos(this->headingOffset.Radian());
+  double headingSine = sin(this->dataPtr->headingOffset.Radian());
+  double headingCosine = cos(this->dataPtr->headingOffset.Radian());
 
-  switch (this->surfaceType)
+  switch (this->dataPtr->surfaceType)
   {
     case EARTH_WGS84:
       // Currently uses radius of curvature equations from wikipedia
@@ -153,8 +165,8 @@ math::Vector3 SphericalCoordinates::SphericalFromLocal(
         double a = g_EarthWGS84AxisEquatorial;
         double b = g_EarthWGS84AxisPolar;
         double ab = a*b;
-        double cosLat = cos(this->latitudeReference.Radian());
-        double sinLat = sin(this->latitudeReference.Radian());
+        double cosLat = cos(this->dataPtr->latitudeReference.Radian());
+        double sinLat = sin(this->dataPtr->latitudeReference.Radian());
         double denom = (a*cosLat)*(a*cosLat) + (b*sinLat)*(b*sinLat);
         radiusMeridional = ab*ab / denom / sqrt(denom);
         radiusNormal = a*a / sqrt(denom);
@@ -173,21 +185,40 @@ math::Vector3 SphericalCoordinates::SphericalFromLocal(
   math::Angle deltaLatitude(north / radiusMeridional);
   math::Angle deltaLongitude(east / radiusNormal);
   // geodetic latitude in degrees
-  spherical.x = this->latitudeReference.Degree() + deltaLatitude.Degree();
+  spherical.x = this->dataPtr->latitudeReference.Degree() +
+                deltaLatitude.Degree();
   // geodetic longitude in degrees
-  spherical.y = this->longitudeReference.Degree() + deltaLongitude.Degree();
+  spherical.y = this->dataPtr->longitudeReference.Degree() +
+                deltaLongitude.Degree();
   // altitude relative to sea level
-  spherical.z = this->elevationReference + _xyz.z;
+  spherical.z = this->dataPtr->elevationReference + _xyz.z;
   return spherical;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SphericalCoordinates::GlobalFromLocal(const math::Vector3 &_xyz)
-  const
+    const
 {
-  double headingSine = sin(this->headingOffset.Radian());
-  double headingCosine = cos(this->headingOffset.Radian());
+  double headingSine = sin(this->dataPtr->headingOffset.Radian());
+  double headingCosine = cos(this->dataPtr->headingOffset.Radian());
   double east  = _xyz.x * headingCosine - _xyz.y * headingSine;
   double north = _xyz.x * headingSine   + _xyz.y * headingCosine;
   return math::Vector3(east, north, _xyz.z);
+}
+
+//////////////////////////////////////////////////
+/// Based on Haversine formula (http://en.wikipedia.org/wiki/Haversine_formula).
+double SphericalCoordinates::Distance(const math::Angle &_latA,
+                                      const math::Angle &_lonA,
+                                      const math::Angle &_latB,
+                                      const math::Angle &_lonB)
+{
+  math::Angle dLat = _latB - _latA;
+  math::Angle dLon = _lonB - _lonA;
+  double a = sin(dLat.Radian() / 2) * sin(dLat.Radian() / 2) +
+             sin(dLon.Radian() / 2) * sin(dLon.Radian() / 2) *
+             cos(_latA.Radian()) * cos(_latB.Radian());
+  double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+  double d = g_EarthSphere * c;
+  return d;
 }

@@ -28,6 +28,7 @@
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/ModelState.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -42,7 +43,7 @@ namespace gazebo
     /// Instances of this class contain the state of a World at a specific
     /// time. World state includes the state of all models, and their
     /// children.
-    class WorldState : public State
+    class GAZEBO_VISIBLE WorldState : public State
     {
       /// \brief Default constructor
       public: WorldState();

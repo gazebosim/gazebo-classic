@@ -51,7 +51,7 @@ void ODEHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEHinge2Joint::GetAnchor(int _index) const
+math::Vector3 ODEHinge2Joint::GetAnchor(unsigned int _index) const
 {
   dVector3 result;
 
@@ -69,7 +69,8 @@ math::Vector3 ODEHinge2Joint::GetAnchor(int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
+void ODEHinge2Joint::SetAnchor(unsigned int /*_index*/,
+    const math::Vector3 &_anchor)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -83,7 +84,7 @@ void ODEHinge2Joint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
+void ODEHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -113,7 +114,7 @@ void ODEHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEHinge2Joint::GetGlobalAxis(int _index) const
+math::Vector3 ODEHinge2Joint::GetGlobalAxis(unsigned int _index) const
 {
   dVector3 result;
 
@@ -126,7 +127,7 @@ math::Vector3 ODEHinge2Joint::GetGlobalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEHinge2Joint::GetAngleImpl(int _index) const
+math::Angle ODEHinge2Joint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
 
@@ -142,7 +143,7 @@ math::Angle ODEHinge2Joint::GetAngleImpl(int _index) const
 }
 
 //////////////////////////////////////////////////
-double ODEHinge2Joint::GetVelocity(int _index) const
+double ODEHinge2Joint::GetVelocity(unsigned int _index) const
 {
   double result = 0;
 
@@ -160,7 +161,7 @@ double ODEHinge2Joint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetVelocity(int _index, double _angle)
+void ODEHinge2Joint::SetVelocity(unsigned int _index, double _angle)
 {
   if (_index == 0)
     this->SetParam(dParamVel, _angle);
@@ -169,7 +170,7 @@ void ODEHinge2Joint::SetVelocity(int _index, double _angle)
 }
 
 //////////////////////////////////////////////////
-double ODEHinge2Joint::GetMaxForce(int _index)
+double ODEHinge2Joint::GetMaxForce(unsigned int _index)
 {
   if (_index == 0)
     return this->GetParam(dParamFMax);
@@ -179,7 +180,7 @@ double ODEHinge2Joint::GetMaxForce(int _index)
 
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetMaxForce(int _index, double _t)
+void ODEHinge2Joint::SetMaxForce(unsigned int _index, double _t)
 {
   if (_index == 0)
     this->SetParam(dParamFMax, _t);
@@ -189,7 +190,7 @@ void ODEHinge2Joint::SetMaxForce(int _index, double _t)
 
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetForceImpl(int _index, double _effort)
+void ODEHinge2Joint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (this->jointId)
   {
@@ -203,7 +204,7 @@ void ODEHinge2Joint::SetForceImpl(int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
-double ODEHinge2Joint::GetParam(int _parameter) const
+double ODEHinge2Joint::GetParam(unsigned int _parameter) const
 {
   double result = 0;
 
@@ -216,7 +217,7 @@ double ODEHinge2Joint::GetParam(int _parameter) const
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetParam(int _parameter, double _value)
+void ODEHinge2Joint::SetParam(unsigned int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
   if (this->jointId)

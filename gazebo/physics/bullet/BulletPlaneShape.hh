@@ -26,6 +26,7 @@
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/PlaneShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet collision for an infinite plane.
-    class BulletPlaneShape : public PlaneShape
+    class GAZEBO_VISIBLE BulletPlaneShape : public PlaneShape
     {
       /// \brief Constructor
       public: BulletPlaneShape(CollisionPtr _parent) : PlaneShape(_parent) {}

@@ -16,7 +16,7 @@
 */
 
 #include <sstream>
-#include "gazebo/gui/building/EditorEvents.hh"
+#include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/ScaleWidget.hh"
 
 using namespace gazebo;

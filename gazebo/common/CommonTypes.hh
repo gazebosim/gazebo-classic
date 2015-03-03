@@ -21,6 +21,7 @@
 #include <map>
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include "gazebo/util/system.hh"
 
 /////////////////////////////////////////////////////////////////////////////
 // Defines
@@ -129,7 +130,7 @@ namespace gazebo
     /// \brief boost::shared_ptr to a DiagnosticTimer class
     typedef boost::shared_ptr<DiagnosticTimer> DiagnosticTimerPtr;
 
-    /// \def  SphericalCoordinatesPtr
+    /// \def SphericalCoordinatesPtr
     /// \brief Boost shared pointer to a SphericalCoordinates object
     typedef boost::shared_ptr<SphericalCoordinates> SphericalCoordinatesPtr;
   }

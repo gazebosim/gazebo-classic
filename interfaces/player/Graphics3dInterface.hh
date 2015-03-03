@@ -23,19 +23,20 @@
 #define GRAPHICS3DINTERFACE_HH
 
 #include "GazeboInterface.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
-  class recursive_mutex;
+  class GAZEBO_VISIBLE recursive_mutex;
 }
 
 namespace libgazebo
 {
   // Forward declarations
-  class Graphics3dIface;
+  class GAZEBO_VISIBLE Graphics3dIface;
 
   /// \brief Graphics3d interface
-  class Graphics3dInterface : public GazeboInterface
+  class GAZEBO_VISIBLE Graphics3dInterface : public GazeboInterface
   {
     /// \brief Constructor
     public: Graphics3dInterface(player_devaddr_t addr, GazeboDriver *driver,

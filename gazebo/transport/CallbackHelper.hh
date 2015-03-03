@@ -29,6 +29,7 @@
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +40,7 @@ namespace gazebo
 
     /// \class CallbackHelper CallbackHelper.hh transport/transport.hh
     /// \brief A helper class to handle callbacks when messages arrive
-    class CallbackHelper
+    class GAZEBO_VISIBLE CallbackHelper
     {
       /// \brief Constructor
       /// \param[in] _latching Set to true to make the callback helper
@@ -76,6 +77,11 @@ namespace gazebo
       /// \return true if the callback is latching, false otherwise
       public: bool GetLatching() const;
 
+      /// \brief Set whether this callback is latching.
+      /// This function should only be used by the Transport library.
+      /// \param[in] _latch False to turn off latching.
+      public: void SetLatching(bool _latch);
+
       /// \brief Get the unique ID of this callback.
       /// \return The unique ID of this callback.
       public: unsigned int GetId() const;
@@ -98,7 +104,7 @@ namespace gazebo
     /// \class CallbackHelperT CallbackHelper.hh transport/transport.hh
     /// \brief Callback helper Template
     template<class M>
-    class CallbackHelperT : public CallbackHelper
+    class GAZEBO_VISIBLE CallbackHelperT : public CallbackHelper
     {
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages
@@ -162,7 +168,7 @@ namespace gazebo
     /// \brief Used to connect publishers to subscribers, where the
     /// subscriber wants the raw data from the publisher. Raw means that the
     /// data has not been converted into a protobuf message.
-    class RawCallbackHelper : public CallbackHelper
+    class GAZEBO_VISIBLE RawCallbackHelper : public CallbackHelper
     {
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages

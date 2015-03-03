@@ -21,6 +21,7 @@
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -31,7 +32,7 @@ namespace gazebo
 
     /// \class TopicSelector TopicSelector.hh gui/TopicSelector.hh
     /// \brief A widget that provides a list of topics to select from.
-    class TopicSelector : public QDialog
+    class GAZEBO_VISIBLE TopicSelector : public QDialog
     {
       Q_OBJECT
 

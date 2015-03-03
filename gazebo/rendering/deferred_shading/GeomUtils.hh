@@ -19,12 +19,13 @@
 
 #include <OgreString.h>
 #include <OgreVertexIndexData.h>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace rendering
   {
-    class GeomUtils
+    class GAZEBO_VISIBLE GeomUtils
     {
       /// \brief Create a sphere Mesh with a given name, radius, number of
       /// rings and number of segments

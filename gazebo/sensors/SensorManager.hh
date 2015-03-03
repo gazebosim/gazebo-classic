@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Class to manager all sensors
- * Author: Nate Koenig
- * Date: 18 Dec 2009
- */
-
 #ifndef _SENSORMANAGER_HH_
 #define _SENSORMANAGER_HH_
 
@@ -34,6 +28,7 @@
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -43,7 +38,7 @@ namespace gazebo
   {
     /// \cond
     /// \brief A simulation time event
-    class SimTimeEvent
+    class GAZEBO_VISIBLE SimTimeEvent
     {
       /// \brief The time at which to trigger the condition.
       public: common::Time time;
@@ -54,7 +49,7 @@ namespace gazebo
 
     /// \brief Monitors simulation time, and notifies conditions when
     /// a specified time has been reached.
-    class SimTimeEventHandler
+    class GAZEBO_VISIBLE SimTimeEventHandler
     {
       /// \brief Constructor
       public: SimTimeEventHandler();
@@ -89,7 +84,7 @@ namespace gazebo
     /// \{
     /// \class SensorManager SensorManager.hh sensors/sensors.hh
     /// \brief Class to manage and update all sensors
-    class SensorManager : public SingletonT<SensorManager>
+    class GAZEBO_VISIBLE SensorManager : public SingletonT<SensorManager>
     {
       /// \brief This is a singletone class. Use SensorManager::Instance()
       /// to get a pointer to this class.
@@ -121,11 +116,6 @@ namespace gazebo
       /// \brief Get all the sensor types
       /// \param[out] All the sensor types.
       public: void GetSensorTypes(std::vector<std::string> &_types) const;
-
-      /// \brief Deprecated.
-      public: std::string CreateSensor(sdf::ElementPtr _elem,
-                  const std::string &_worldName,
-                  const std::string &_parentName) GAZEBO_DEPRECATED(2.0);
 
       /// \brief Add a sensor from an SDF element. This function will also Load
       /// and Init the sensor.

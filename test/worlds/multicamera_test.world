@@ -24,7 +24,7 @@
         </visual>
 
         <sensor name="cam1" type="multicamera">
-          <update_rate>15</update_rate>
+          <update_rate>10</update_rate>
           <camera name="left">
             <horizontal_fov>1.3962634</horizontal_fov>
             <image>
@@ -61,13 +61,13 @@
         </visual>
 
         <sensor name="cam2" type="multicamera">
-          <update_rate>15</update_rate>
+          <update_rate>20</update_rate>
           <camera name="left">
             <horizontal_fov>1.3962634</horizontal_fov>
             <image>
               <width>1024</width>
               <height>544</height>
-              <format>R8G8B8</format>
+              <format>L8</format>
             </image>
             <clip>
               <near>0.02</near>
@@ -80,7 +80,7 @@
             <image>
               <width>1024</width>
               <height>544</height>
-              <format>R8G8B8</format>
+              <format>L8</format>
             </image>
             <clip>
               <near>0.02</near>
@@ -111,7 +111,7 @@
         </visual>
 
         <sensor name="cam3" type="multicamera">
-          <update_rate>15</update_rate>
+          <update_rate>30</update_rate>
           <camera name="top_left">
             <pose>0 -0.1 0.1 0 0 0</pose>
             <horizontal_fov>1.3962634</horizontal_fov>
@@ -177,7 +177,7 @@
         </visual>
 
         <sensor name="cam4" type="multicamera">
-          <update_rate>15</update_rate>
+          <update_rate>40</update_rate>
           <camera name="top_left">
             <pose>0 -0.1 0.1 0 0 0</pose>
             <horizontal_fov>1.3962634</horizontal_fov>
@@ -257,7 +257,7 @@
         </visual>
 
         <sensor name="cam5" type="multicamera">
-          <update_rate>15</update_rate>
+          <update_rate>50</update_rate>
           <camera name="top_left">
             <pose>0 -0.1 0.1 0 0 0</pose>
             <horizontal_fov>1.3962634</horizontal_fov>
@@ -351,7 +351,7 @@
         </visual>
 
         <sensor name="cam6" type="multicamera">
-          <update_rate>15</update_rate>
+          <update_rate>60</update_rate>
           <camera name="top_left">
             <pose>0 -0.1 0.1 0 0 0</pose>
             <horizontal_fov>1.3962634</horizontal_fov>

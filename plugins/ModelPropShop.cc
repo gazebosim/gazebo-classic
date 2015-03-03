@@ -105,6 +105,9 @@ void ModelPropShop::Load(int _argc, char **_argv)
 /////////////////////////////////////////////
 void ModelPropShop::Init()
 {
+  this->worldCreatedConn = event::Events::ConnectWorldCreated(
+        boost::bind(&ModelPropShop::OnWorldCreated, this));
+
   this->updateConn = event::Events::ConnectWorldUpdateBegin(
         boost::bind(&ModelPropShop::Update, this));
 
@@ -114,6 +117,11 @@ void ModelPropShop::Init()
       "/gazebo/server/control");
 
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
+}
+
+/////////////////////////////////////////////
+void ModelPropShop::OnWorldCreated()
+{
   this->factoryPub->WaitForConnection();
 
   if (this->sdf)
@@ -146,6 +154,27 @@ void ModelPropShop::Update()
     this->camera->SetImageWidth(960);
     this->camera->SetImageHeight(540);
     this->camera->CreateRenderTexture("ModelPropShop_RttTex");
+
+    // Create a light
+    gazebo::msgs::Light lightMsg;
+    lightMsg.set_name("propshop_light");
+    lightMsg.set_type(gazebo::msgs::Light::DIRECTIONAL);
+    gazebo::msgs::Set(lightMsg.mutable_diffuse(),
+                      gazebo::common::Color(1, 1, 1, 1));
+    gazebo::msgs::Set(lightMsg.mutable_specular(),
+                      gazebo::common::Color(.2, .2, .2, 1));
+    gazebo::msgs::Set(lightMsg.mutable_direction(),
+                      gazebo::math::Vector3(-0.5, 0.1, -0.9));
+    lightMsg.set_cast_shadows(false);
+    lightMsg.set_range(1000);
+    lightMsg.set_attenuation_constant(1);
+    lightMsg.set_attenuation_linear(0);
+    lightMsg.set_attenuation_quadratic(0);
+
+    this->light.reset(new gazebo::rendering::Light(this->scene));
+    light->LoadFromMsg(lightMsg);
+    gazebo::rendering::RTShaderSystem::Instance()->UpdateShaders();
+    return;
   }
 
   if (this->camera && this->scene)
@@ -178,16 +207,17 @@ void ModelPropShop::Update()
       // Perspective view
       pose.pos.Set(1.6, -1.6, 1.2);
       pose.rot.SetFromEuler(0, GZ_DTOR(30), GZ_DTOR(-225));
+      this->light->SetDirection(math::Vector3(-0.4, 0.4, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
       this->camera->PostRender();
-      this->camera->SaveFrame(
-          (this->savePath / "1.png").string());
+      this->camera->SaveFrame((this->savePath / "1.png").string());
 
       // Top view
       pose.pos.Set(0, 0, 2.2);
       pose.rot.SetFromEuler(0, GZ_DTOR(90), 0);
+      this->light->SetDirection(math::Vector3(0, 0, -1.0));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -197,6 +227,7 @@ void ModelPropShop::Update()
       // Front view
       pose.pos.Set(2.2, 0, 0);
       pose.rot.SetFromEuler(0, 0, GZ_DTOR(-180));
+      this->light->SetDirection(math::Vector3(-0.6, 0.0, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -206,6 +237,7 @@ void ModelPropShop::Update()
       // Side view
       pose.pos.Set(0, 2.2, 0);
       pose.rot.SetFromEuler(0, 0, GZ_DTOR(-90));
+      this->light->SetDirection(math::Vector3(0, -0.6, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -215,18 +247,22 @@ void ModelPropShop::Update()
       // Back view
       pose.pos.Set(-2.2, 0, 0);
       pose.rot.SetFromEuler(0, 0, 0);
+      this->light->SetDirection(math::Vector3(0.6, 0, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
       this->camera->PostRender();
       this->camera->SaveFrame((this->savePath / "5.png").string());
 
+      event::Events::DisconnectWorldCreated(this->worldCreatedConn);
+      this->worldCreatedConn.reset();
 
       event::Events::DisconnectWorldUpdateBegin(this->updateConn);
       this->updateConn.reset();
 
       // Clean up the camera.
       this->camera.reset();
+      this->light.reset();
       this->scene->RemoveCamera("propshopcamera");
 
       // Tell the server to stop.

@@ -70,15 +70,24 @@ bool transport::get_master_uri(std::string &_masterHost,
   }
   else
   {
-    _masterPort = boost::lexical_cast<unsigned int>(
-        masterURI.substr(lastColon + 1, masterURI.size() - (lastColon + 1)));
+    try
+    {
+      _masterPort = boost::lexical_cast<unsigned int>(
+          masterURI.substr(lastColon + 1, masterURI.size() - (lastColon + 1)));
+    }
+    catch(...)
+    {
+      gzerr << "Unable to port from GAZEBO_MASTER_URI[" << masterURI << "]."
+        << "Using the default port number of 11345.\n";
+    }
   }
 
   return true;
 }
 
 /////////////////////////////////////////////////
-bool transport::init(const std::string &_masterHost, unsigned int _masterPort)
+bool transport::init(const std::string &_masterHost, unsigned int _masterPort,
+    uint32_t _timeoutIterations)
 {
   std::string host = _masterHost;
   unsigned int port = _masterPort;
@@ -87,7 +96,9 @@ bool transport::init(const std::string &_masterHost, unsigned int _masterPort)
     get_master_uri(host, port);
 
   transport::TopicManager::Instance()->Init();
-  if (!transport::ConnectionManager::Instance()->Init(host, port))
+
+  if (!transport::ConnectionManager::Instance()->Init(host, port,
+        _timeoutIterations))
     return false;
 
   return true;
@@ -112,6 +123,7 @@ void transport::stop()
 {
   g_stopped = true;
   g_responseCondition.notify_all();
+
   transport::ConnectionManager::Instance()->Stop();
 }
 
@@ -119,14 +131,13 @@ void transport::stop()
 void transport::fini()
 {
   transport::stop();
-  transport::TopicManager::Instance()->Fini();
-
   if (g_runThread)
   {
     g_runThread->join();
     delete g_runThread;
     g_runThread = NULL;
   }
+  transport::TopicManager::Instance()->Fini();
   transport::ConnectionManager::Instance()->Fini();
 }
 
@@ -145,7 +156,7 @@ void transport::pause_incoming(bool _pause)
 /////////////////////////////////////////////////
 void on_response(ConstResponsePtr &_msg)
 {
-  if (g_requests.empty())
+  if (g_requests.empty() || g_stopped)
     return;
 
   std::list<msgs::Request *>::iterator iter;
@@ -159,6 +170,7 @@ void on_response(ConstResponsePtr &_msg)
   if (iter == g_requests.end())
     return;
 
+  boost::mutex::scoped_lock lock(requestMutex);
   boost::shared_ptr<msgs::Response> response(new msgs::Response);
   response->CopyFrom(*_msg);
   g_responses.push_back(response);
@@ -177,8 +189,6 @@ boost::shared_ptr<msgs::Response> transport::request(
     const std::string &_worldName, const std::string &_request,
     const std::string &_data)
 {
-  boost::mutex::scoped_lock lock(requestMutex);
-
   msgs::Request *request = msgs::CreateRequest(_request, _data);
 
   g_requests.push_back(request);
@@ -186,18 +196,19 @@ boost::shared_ptr<msgs::Response> transport::request(
   NodePtr node = NodePtr(new Node());
   node->Init(_worldName);
 
+  SubscriberPtr responseSub = node->Subscribe("~/response", &on_response);
+
   PublisherPtr requestPub = node->Advertise<msgs::Request>("~/request");
   requestPub->WaitForConnection();
 
-  SubscriberPtr responseSub = node->Subscribe("~/response", &on_response);
-
+  boost::mutex::scoped_lock lock(requestMutex);
   requestPub->Publish(*request, true);
 
   boost::shared_ptr<msgs::Response> response;
   std::list<boost::shared_ptr<msgs::Response> >::iterator iter;
 
   bool valid = false;
-  while (!valid)
+  while (!valid && !g_stopped)
   {
     // Wait for a response
     g_responseCondition.wait(lock);
@@ -328,6 +339,65 @@ void transport::setMinimalComms(bool _enabled)
 bool transport::getMinimalComms()
 {
   return g_minimalComms;
+}
+
+/////////////////////////////////////////////////
+transport::ConnectionPtr transport::connectToMaster()
+{
+  std::string data, namespacesData, publishersData;
+  msgs::Packet packet;
+
+  std::string host;
+  unsigned int port;
+  transport::get_master_uri(host, port);
+
+  // Connect to the master
+  transport::ConnectionPtr connection(new transport::Connection());
+
+  if (connection->Connect(host, port))
+  {
+    try
+    {
+      // Read the verification message
+      connection->Read(data);
+      connection->Read(namespacesData);
+      connection->Read(publishersData);
+    }
+    catch(...)
+    {
+      gzerr << "Unable to read from master\n";
+      return transport::ConnectionPtr();
+    }
+
+    packet.ParseFromString(data);
+    if (packet.type() == "version_init")
+    {
+      msgs::GzString msg;
+      msg.ParseFromString(packet.serialized_data());
+      if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION)
+        std::cerr << "Conflicting gazebo versions\n";
+    }
+    else
+    {
+      gzerr  << "Failed to received version_init packet from master. "
+        << "Connection to master failed\n";
+      connection.reset();
+    }
+  }
+  else
+  {
+    gzerr << "Unable to connect to master.\n";
+    connection.reset();
+  }
+
+  if (connection && !connection->IsOpen())
+  {
+    gzerr << "Connection to master instatiated, but socket is not open."
+      << "Connection to master failed\n";
+    connection.reset();
+  }
+
+  return connection;
 }
 
 /////////////////////////////////////////////////

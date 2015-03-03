@@ -49,8 +49,7 @@ Exception::~Exception()
 //////////////////////////////////////////////////
 void Exception::Print() const
 {
-  gazebo::common::Console::Instance()->ColorErr("Exception",
-      this->file, this->line, 31) << *this << "\n";
+  gzerr << "EXCEPTION: " << *this << std::endl;
 }
 
 //////////////////////////////////////////////////

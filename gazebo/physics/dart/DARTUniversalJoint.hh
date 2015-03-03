@@ -20,13 +20,14 @@
 
 #include "gazebo/physics/UniversalJoint.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A universal joint.
-    class DARTUniversalJoint : public UniversalJoint<DARTJoint>
+    class GAZEBO_VISIBLE DARTUniversalJoint : public UniversalJoint<DARTJoint>
     {
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the Link that is the joint' parent
@@ -42,31 +43,32 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      public: virtual math::Vector3 GetAnchor(int _index) const;
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+      public: virtual void SetAxis(unsigned int _index,
+                  const math::Vector3 &_axis);
 
       // Documentation inherited
-      public: virtual math::Angle GetAngleImpl(int _index) const;
+      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual double GetVelocity(int _index) const;
+      public: virtual double GetVelocity(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetVelocity(int _index, double _vel);
+      public: virtual void SetVelocity(unsigned int _index, double _vel);
 
       // Documentation inherited
-      public: virtual void SetMaxForce(int _index, double _force);
+      public: virtual void SetMaxForce(unsigned int _index, double _force);
 
       // Documentation inherited
-      public: virtual double GetMaxForce(int _index);
+      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited
-      protected: virtual void SetForceImpl(int _index, double _effort);
+      protected: virtual void SetForceImpl(unsigned int _index, double _effort);
 
       /// \brief Universal joint of DART
       protected: dart::dynamics::UniversalJoint *dtUniveralJoint;

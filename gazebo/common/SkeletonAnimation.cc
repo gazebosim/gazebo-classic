@@ -17,6 +17,7 @@
 
 #include "gazebo/common/SkeletonAnimation.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Assert.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -47,7 +48,7 @@ std::string NodeAnimation::GetName() const
 }
 
 //////////////////////////////////////////////////
-void NodeAnimation::AddKeyFrame(const double _time, const math::Matrix4 _trans)
+void NodeAnimation::AddKeyFrame(const double _time, const math::Matrix4 &_trans)
 {
   if (_time > this->length)
     this->length = _time;
@@ -56,7 +57,7 @@ void NodeAnimation::AddKeyFrame(const double _time, const math::Matrix4 _trans)
 }
 
 //////////////////////////////////////////////////
-void NodeAnimation::AddKeyFrame(const double _time, const math::Pose _pose)
+void NodeAnimation::AddKeyFrame(const double _time, const math::Pose &_pose)
 {
   math::Matrix4 mat(_pose.rot.GetAsMatrix4());
   mat.SetTranslate(_pose.pos);
@@ -141,7 +142,7 @@ math::Matrix4 NodeAnimation::GetFrameAt(double _time, bool _loop) const
   math::Matrix4 prevTrans = it2->second;
 
   double t = (time - prevKey) / (nextKey - prevKey);
-  assert(t >= 0.0 && t <= 1.0);
+  GZ_ASSERT(t >= 0.0 && t <= 1.0, "t is not in the range 0.0..1.0");
 
   math::Vector3 nextPos = nextTrans.GetTranslation();
   math::Vector3 prevPos = prevTrans.GetTranslation();
@@ -229,7 +230,7 @@ bool SkeletonAnimation::HasNode(const std::string& _node) const
 
 //////////////////////////////////////////////////
 void SkeletonAnimation::AddKeyFrame(const std::string& _node,
-    const double _time, const math::Matrix4 _mat)
+    const double _time, const math::Matrix4 &_mat)
 {
   if (this->animations.find(_node) == this->animations.end())
     this->animations[_node] = new NodeAnimation(_node);
@@ -242,7 +243,7 @@ void SkeletonAnimation::AddKeyFrame(const std::string& _node,
 
 //////////////////////////////////////////////////
 void SkeletonAnimation::AddKeyFrame(const std::string& _node,
-      const double _time, const math::Pose _pose)
+      const double _time, const math::Pose &_pose)
 {
   if (this->animations.find(_node) == this->animations.end())
     this->animations[_node] = new NodeAnimation(_node);

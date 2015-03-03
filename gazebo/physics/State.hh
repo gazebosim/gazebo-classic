@@ -27,6 +27,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +40,7 @@ namespace gazebo
     /// \brief State of an entity.
     ///
     /// This is the base class for all State information.
-    class State
+    class GAZEBO_VISIBLE State
     {
       /// \brief Default constructor
       public: State();

@@ -23,6 +23,7 @@
 #define GPSINTERFACE_HH
 
 #include "GazeboInterface.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
@@ -34,7 +35,7 @@ namespace boost
 typedef struct gz_gps gz_gps_t;
 
 /// \brief GPS interface
-class GpsInterface : public GazeboInterface
+class GAZEBO_VISIBLE GpsInterface : public GazeboInterface
 {
   /// @brief Constructor
   public: GpsInterface(player_devaddr_t addr, GazeboDriver *driver,

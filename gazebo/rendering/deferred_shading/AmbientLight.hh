@@ -20,6 +20,7 @@
 #include <OgreSimpleRenderable.h>
 
 #include "gazebo/rendering/deferred_shading/GeomUtils.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,8 @@ namespace gazebo
     // XXX Could make this a singleton/make it private to the
     // DeferredShadingSystem e.g.
     template<class techniquePolicy>
-    class AmbientLight : public Ogre::SimpleRenderable, public techniquePolicy
+    class GAZEBO_VISIBLE AmbientLight
+      : public Ogre::SimpleRenderable, public techniquePolicy
     {
       /// \brief Constructor
       public: AmbientLight()

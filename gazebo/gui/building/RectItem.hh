@@ -21,6 +21,7 @@
 #include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/EditorItem.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
 
     /// \class RectItem RectItem.hh
     /// \brief 2D rectangle.
-    class RectItem : public EditorItem, public QGraphicsRectItem
+    class GAZEBO_VISIBLE RectItem : public EditorItem, public QGraphicsRectItem
     {
       Q_OBJECT
 

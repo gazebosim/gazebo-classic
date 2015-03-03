@@ -81,7 +81,8 @@ ConnectionManager::~ConnectionManager()
 
 //////////////////////////////////////////////////
 bool ConnectionManager::Init(const std::string &_masterHost,
-                             unsigned int master_port)
+                             unsigned int _masterPort,
+                             uint32_t _timeoutIterations)
 {
   this->stop = false;
   this->masterConn.reset(new Connection());
@@ -92,35 +93,31 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   this->serverConn->Listen(0,
       boost::bind(&ConnectionManager::OnAccept, this, _1));
 
-  gzmsg << "Waiting for master";
+  gzmsg << "Waiting for master." << std::endl;
   uint32_t timeoutCount = 0;
   uint32_t waitDurationMS = 1000;
-  uint32_t timeoutCountMax = 30;
 
-  while (!this->masterConn->Connect(_masterHost, master_port) &&
-      this->IsRunning() && timeoutCount < timeoutCountMax)
+  while (!this->masterConn->Connect(_masterHost, _masterPort) &&
+      this->IsRunning() && timeoutCount < _timeoutIterations)
   {
-    if (!common::Console::Instance()->GetQuiet())
-    {
-      printf(".");
-      fflush(stdout);
-    }
-    common::Time::MSleep(waitDurationMS);
     ++timeoutCount;
-  }
-  if (!common::Console::Instance()->GetQuiet())
-    printf("\n");
 
-  if (timeoutCount >= timeoutCountMax)
+    if (timeoutCount < _timeoutIterations)
+      common::Time::MSleep(waitDurationMS);
+  }
+
+
+  if (timeoutCount >= _timeoutIterations)
   {
     gzerr << "Failed to connect to master in "
-          << (timeoutCount * waitDurationMS) / 1000.0 << " seconds.\n";
+          << (timeoutCount * waitDurationMS) / 1000.0 << " seconds."
+          << std::endl;
     return false;
   }
 
   if (!this->IsRunning())
   {
-    gzerr << "Connection Manager is not running\n";
+    gzerr << "Connection Manager is not running" << std::endl;
     return false;
   }
 
@@ -134,7 +131,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   }
   catch(...)
   {
-    gzerr << "Unable to read from master\n";
+    gzerr << "Unable to read from master" << std::endl;
     return false;
   }
 
@@ -149,16 +146,16 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     {
       // TODO: set some flag.. maybe start "serverConn" when initialized
       gzmsg << "Connected to gazebo master @ "
-            << this->masterConn->GetRemoteURI() << "\n";
+            << this->masterConn->GetRemoteURI() << std::endl;
     }
     else
     {
       // TODO: MAke this a proper error
-      gzerr << "Conflicting gazebo versions\n";
+      gzerr << "Conflicting gazebo versions" << std::endl;
     }
   }
   else
-    gzerr << "Didn't receive an init from the master\n";
+    gzerr << "Didn't receive an init from the master" << std::endl;
 
   packet.ParseFromString(namespacesData);
   if (packet.type() == "topic_namepaces_init")
@@ -174,7 +171,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     this->namespaceCondition.notify_all();
   }
   else
-    gzerr << "Did not get topic_namespaces_init msg from master\n";
+    gzerr << "Did not get topic_namespaces_init msg from master" << std::endl;
 
   packet.ParseFromString(publishersData);
   if (packet.type() == "publishers_init")
@@ -190,7 +187,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     }
   }
   else
-    gzerr << "Did not get publishers_init msg from master\n";
+    gzerr << "Did not get publishers_init msg from master" << std::endl;
 
   this->masterConn->AsyncRead(
       boost::bind(&ConnectionManager::OnMasterRead, this, _1));
@@ -199,7 +196,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
 
   // Tell the user what address will be publicized to other nodes.
   gzmsg << "Publicized address: "
-        << this->masterConn->GetLocalHostname() << "\n";
+        << this->masterConn->GetLocalHostname() << std::endl;
 
   return true;
 }
@@ -650,8 +647,6 @@ ConnectionPtr ConnectionManager::ConnectToRemoteHost(const std::string &_host,
       return ConnectionPtr();
     }
   }
-  // else
-  //  printf("Found Connections\n");
 
   return conn;
 }

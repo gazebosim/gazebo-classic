@@ -77,13 +77,13 @@ void GazeboDriver_Register(DriverTable *_table)
 // need the extern to avoid C++ name-mangling
 extern "C"
 {
+  GAZEBO_VISIBLE
   int player_driver_init(DriverTable *_table)
   {
     GazeboDriver_Register(_table);
     return(0);
   }
 }
-
 
 //////////////////////////////////////////////////
 // Retrieve options from the configuration file and do any
@@ -180,13 +180,12 @@ int GazeboDriver::Unsubscribe(player_devaddr_t addr)
 void GazeboDriver::Update()
 {
   int i;
-  GazeboInterface *iface;
 
   Driver::ProcessMessages();
 
   for (i = 0; i < this->deviceCount; i++)
   {
-    iface = this->devices[i];
+    GazeboInterface *iface = this->devices[i];
     iface->Update();
   }
 
@@ -361,11 +360,10 @@ int GazeboDriver::LoadDevices(ConfigFile *_cf, int _section)
 GazeboInterface *GazeboDriver::LookupDevice(player_devaddr_t _addr)
 {
   int i;
-  GazeboInterface *iface = NULL;
 
   for (i = 0; i < static_cast<int>(this->deviceCount); ++i)
   {
-    iface = static_cast<GazeboInterface*>(this->devices[i]);
+    GazeboInterface *iface = static_cast<GazeboInterface*>(this->devices[i]);
 
     if (iface->device_addr.robot == _addr.robot &&
         iface->device_addr.interf == _addr.interf &&
@@ -375,5 +373,3 @@ GazeboInterface *GazeboDriver::LookupDevice(player_devaddr_t _addr)
 
   return NULL;
 }
-
-

@@ -15,11 +15,14 @@
  *
 */
 
-#include "test/ServerFixture.hh"
+#include "test/util.hh"
+#include "gazebo/physics/SphereShape.hh"
 
 using namespace gazebo;
 
-TEST(SphereShapeTest, Scale)
+class SphereShapeTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(SphereShapeTest, Scale)
 {
   std::ostringstream sphereStr;
   sphereStr << "<sdf version ='" << SDF_VERSION << "'>"

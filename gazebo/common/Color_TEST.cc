@@ -18,10 +18,13 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/common/Color.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(Color, Color)
+class Color : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(Color, Color)
 {
   common::Color clr(.1, .2, .3, 1.0);
   EXPECT_FLOAT_EQ(0.1f, clr.r);

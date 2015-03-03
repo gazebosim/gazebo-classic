@@ -23,6 +23,7 @@
 #define OPAQUEINTERFACE_HH
 
 #include "GazeboInterface.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
@@ -40,7 +41,7 @@ namespace libgazebo
 class OpaqueIface;
 
 /// \brief Opaque Player interface
-class OpaqueInterface : public GazeboInterface
+class GAZEBO_VISIBLE OpaqueInterface : public GazeboInterface
 {
   /// \brief Constructor
     public: OpaqueInterface(player_devaddr_t addr, GazeboDriver *driver,

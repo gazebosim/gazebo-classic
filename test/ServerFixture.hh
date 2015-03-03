@@ -242,8 +242,11 @@ class ServerFixture : public testing::Test
                  const std::string &_raySensorName,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
+                 double _vMinAngle = -1.0, double _vMaxAngle = 1.0,
                  double _minRange = 0.08, double _maxRange = 10,
                  double _rangeResolution = 0.01, unsigned int _samples = 640,
+                 unsigned int _vSamples = 1, double _hResolution = 1.0,
+                 double _vResolution = 1.0,
                  const std::string &_noiseType = "", double _noiseMean = 0.0,
                  double _noiseStdDev = 0.0);
 
@@ -371,7 +374,7 @@ class ServerFixture : public testing::Test
   /// \param[in] _name Model name
   /// \param[in] _sleepEach Number of milliseconds to sleep in each iteration
   /// \param[in] _retries Number of iterations until give up
-  private: void WaitUntilEntitySpawn(const std::string &_name,
+  protected: void WaitUntilEntitySpawn(const std::string &_name,
                                      unsigned int _sleepEach,
                                      int _retries);
 
@@ -379,9 +382,39 @@ class ServerFixture : public testing::Test
   /// \param[in] _name Sensor name
   /// \param[in] _sleepEach Number of milliseconds to sleep in each iteration
   /// \param[in] _retries Number of iterations until give up
-  private: void WaitUntilSensorSpawn(const std::string &_name,
+  protected: void WaitUntilSensorSpawn(const std::string &_name,
                                      unsigned int _sleepEach,
                                      int _retries);
+
+  /// \brief Spawn a light.
+  /// \param[in] _name Name for the light.
+  /// \param[in] _size Type of light - "spot", "directional", or "point".
+  /// \param[in] _pos Position for the light.
+  /// \param[in] _rpy Roll, pitch, yaw for the light.
+  /// \param[in] _diffuse Diffuse color of the light.
+  /// \param[in] _specular Specular color of the light.
+  /// \param[in] _direction Direction of the light ("spot" and "directional").
+  /// \param[in] _attenuationRange Range of attenuation.
+  /// \param[in] _attenuationConstant Constant component of attenuation
+  /// \param[in] _attenuationLinear Linear component of attenuation
+  /// \param[in] _attenuationQuadratic Quadratic component of attenuation
+  /// \param[in] _spotInnerAngle Inner angle ("spot" only).
+  /// \param[in] _spotOuterAngle Outer angle ("spot" only).
+  /// \param[in] _spotFallOff Fall off ("spot" only).
+  /// \param[in] _castShadows True to cast shadows.
+  protected: void SpawnLight(const std::string &_name, const std::string &_type,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const common::Color &_diffuse = common::Color::White,
+                 const common::Color &_specular = common::Color::White,
+                 const math::Vector3 &_direction = -math::Vector3::UnitZ,
+                 double _attenuationRange = 20,
+                 double _attenuationConstant = 0.5,
+                 double _attenuationLinear = 0.01,
+                 double _attenuationQuadratic = 0.001,
+                 double _spotInnerAngle = 0,
+                 double _spotOuterAngle = 0,
+                 double _spotFallOff = 0,
+                 bool _castShadows = true);
 
   /// \brief Spawn a cylinder
   /// \param[in] _name Name for the model.

@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A slider or primastic joint
- * Author: Nate Koenig
- * Date: 24 May 2009
- */
-
 #ifndef _BULLETSLIDERJOINT_HH_
 #define _BULLETSLIDERJOINT_HH_
 #include "gazebo/math/Angle.hh"
@@ -26,6 +21,7 @@
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/SliderJoint.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/util/system.hh"
 
 class btSliderConstraint;
 
@@ -38,7 +34,7 @@ namespace gazebo
     /// \{
 
     /// \brief A slider joint
-    class BulletSliderJoint : public SliderJoint<BulletJoint>
+    class GAZEBO_VISIBLE BulletSliderJoint : public SliderJoint<BulletJoint>
     {
       /// \brief Constructor
       public: BulletSliderJoint(btDynamicsWorld *world, BasePtr _parent);
@@ -53,43 +49,47 @@ namespace gazebo
       protected: virtual void Init();
 
       // Documentation inherited.
-      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+      public: virtual void SetAxis(unsigned int _index,
+                  const math::Vector3 &_axis);
 
       // Documentation inherited.
-      public: virtual void SetDamping(int _index, const double _damping);
+      public: virtual void SetDamping(unsigned int _index,
+                  const double _damping);
 
-      /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
+      // Documentation inherited.
+      public: virtual bool SetHighStop(unsigned int _index,
+                  const math::Angle &_angle);
 
-      /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
+      // Documentation inherited.
+      public: virtual bool SetLowStop(unsigned int _index,
+                  const math::Angle &_angle);
 
-      /// \brief Get the high stop of an axis(index).
-      public: virtual math::Angle GetHighStop(int _index);
+      // Documentation inherited.
+      public: virtual math::Angle GetHighStop(unsigned int _index);
 
-      /// \brief Get the low stop of an axis(index).
-      public: virtual math::Angle GetLowStop(int _index);
+      // Documentation inherited.
+      public: virtual math::Angle GetLowStop(unsigned int _index);
 
-      /// \brief Get the rate of change
-      public: virtual double GetVelocity(int _index) const;
+      // Documentation inherited.
+      public: virtual double GetVelocity(unsigned int _index) const;
 
-       /// \brief Set the velocity of an axis(index).
-      public: virtual void SetVelocity(int _index, double _angle);
+      // Documentation inherited.
+      public: virtual void SetVelocity(unsigned int _index, double _angle);
 
-      /// \brief Set the max allowed force of an axis(index).
-      public: virtual void SetMaxForce(int _index, double _force);
+      // Documentation inherited.
+      public: virtual void SetMaxForce(unsigned int _index, double _force);
 
-      /// \brief Get the max allowed force of an axis(index).
-      public: virtual double GetMaxForce(int _index);
+      // Documentation inherited.
+      public: virtual double GetMaxForce(unsigned int _index);
 
-      /// \brief Get the axis of rotation
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+      // Documentation inherited.
+      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
-      /// \brief Get the angle of rotation
-      public: virtual math::Angle GetAngleImpl(int _index) const;
+      // Documentation inherited.
+      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
-      /// \brief Set the slider force
-      protected: virtual void SetForceImpl(int _index, double _effort);
+      // Documentation inherited.
+      protected: virtual void SetForceImpl(unsigned int _index, double _effort);
 
       /// \brief Pointer to bullet slider constraint
       private: btSliderConstraint *bulletSlider;

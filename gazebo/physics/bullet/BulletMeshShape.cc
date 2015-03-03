@@ -14,13 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh shape
- * Author: Nate Koenig
- * Date: 21 May 2009
- */
 
 #include "gazebo/common/Mesh.hh"
 
+#include "gazebo/physics/bullet/BulletMesh.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
@@ -33,12 +30,13 @@ using namespace physics;
 BulletMeshShape::BulletMeshShape(CollisionPtr _parent)
   : MeshShape(_parent)
 {
+  this->bulletMesh = new BulletMesh();
 }
-
 
 //////////////////////////////////////////////////
 BulletMeshShape::~BulletMeshShape()
 {
+  delete this->bulletMesh;
 }
 
 //////////////////////////////////////////////////
@@ -55,50 +53,14 @@ void BulletMeshShape::Init()
   BulletCollisionPtr bParent =
     boost::static_pointer_cast<BulletCollision>(this->collisionParent);
 
-  float *vertices = NULL;
-  int *indices = NULL;
-
-  btTriangleMesh *mTriMesh = new btTriangleMesh();
-
-  unsigned int numVertices = this->mesh->GetVertexCount();
-  unsigned int numIndices = this->mesh->GetIndexCount();
-
-  // Get all the vertex and index data
-  this->mesh->FillArrays(&vertices, &indices);
-
-  // Scale the vertex data
-  for (unsigned int j = 0;  j < numVertices; j++)
+  if (this->submesh)
   {
-    vertices[j*3+0] = vertices[j*3+0] *
-      this->sdf->Get<math::Vector3>("scale").x;
-    vertices[j*3+1] = vertices[j*3+1] *
-      this->sdf->Get<math::Vector3>("scale").y;
-    vertices[j*3+2] = vertices[j*3+2] *
-      this->sdf->Get<math::Vector3>("scale").z;
+    this->bulletMesh->Init(this->submesh, bParent,
+        this->sdf->Get<math::Vector3>("scale"));
   }
-
-  // Create the Bullet trimesh
-  for (unsigned int j = 0; j < numIndices; j += 3)
+  else
   {
-    btVector3 bv0(vertices[indices[j]*3+0],
-                  vertices[indices[j]*3+1],
-                  vertices[indices[j]*3+2]);
-
-    btVector3 bv1(vertices[indices[j+1]*3+0],
-                  vertices[indices[j+1]*3+1],
-                  vertices[indices[j+1]*3+2]);
-
-    btVector3 bv2(vertices[indices[j+2]*3+0],
-                  vertices[indices[j+2]*3+1],
-                  vertices[indices[j+2]*3+2]);
-
-    mTriMesh->addTriangle(bv0, bv1, bv2);
+    this->bulletMesh->Init(this->mesh, bParent,
+        this->sdf->Get<math::Vector3>("scale"));
   }
-
-  btConvexShape* convexShape = new btConvexTriangleMeshShape(mTriMesh, true);
-  convexShape->setMargin(0.001f);
-  bParent->SetCollisionShape(convexShape);
-
-  delete [] vertices;
-  delete [] indices;
 }

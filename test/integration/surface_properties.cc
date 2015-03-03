@@ -73,7 +73,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
   // Step forward 0.2 s
   double stepTime = 0.2;
   unsigned int steps = floor(stepTime / dt);
-  world->StepWorld(steps);
+  world->Step(steps);
 
   // Expect boxes to be falling
   double fallVelocity = g.z * stepTime;
@@ -81,7 +81,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
   EXPECT_LT(collideBox->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
 
   // Step forward another 0.2 s
-  world->StepWorld(steps);
+  world->Step(steps);
   fallVelocity = g.z * 2*stepTime;
   // Expect contactBox to be resting on contact sensor box
   EXPECT_NEAR(contactBox->GetWorldLinearVel().z, 0.0, g_physics_tol);
@@ -93,7 +93,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
     msgs::Contacts contacts;
     while (contacts.contact_size() == 0 && --steps > 0)
     {
-      world->StepWorld(1);
+      world->Step(1);
       contacts = contactSensor->GetContacts();
     }
 
@@ -123,7 +123,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
   // Step forward another 0.4 s
   // The collideBox should have fallen through the ground and not
   // be in contact with the sensor
-  world->StepWorld(steps*2);
+  world->Step(steps*2);
   fallVelocity = g.z * 4*stepTime;
   // Expect contactBox to still be resting on contact sensor box
   EXPECT_NEAR(contactBox->GetWorldLinearVel().z, 0.0, g_physics_tol);
@@ -135,7 +135,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
     msgs::Contacts contacts;
     while (contacts.contact_size() == 0 && --steps > 0)
     {
-      world->StepWorld(1);
+      world->Step(1);
       contacts = contactSensor->GetContacts();
     }
 

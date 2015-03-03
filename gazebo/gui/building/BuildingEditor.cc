@@ -17,10 +17,10 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/building/EditorEvents.hh"
-#include "gazebo/gui/building/BuildingEditorPalette.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/RenderWidget.hh"
+#include "gazebo/gui/building/BuildingEditorEvents.hh"
+#include "gazebo/gui/building/BuildingEditorPalette.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
 
 using namespace gazebo;
@@ -106,7 +106,8 @@ void BuildingEditor::OnFinish()
 /////////////////////////////////////////////////
 void BuildingEditor::CreateMenus()
 {
-  delete this->menuBar;
+  if (this->menuBar)
+    return;
 
   this->menuBar = new QMenuBar;
   this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

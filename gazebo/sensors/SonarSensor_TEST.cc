@@ -93,6 +93,8 @@ void SonarSensor_TEST::CreateSonar(const std::string &_physicsEngine,
   EXPECT_DOUBLE_EQ(sensor->GetRangeMax(), 1.0);
   EXPECT_DOUBLE_EQ(sensor->GetRadius(), 0.3);
   EXPECT_DOUBLE_EQ(sensor->GetRange(), 1.0);
+
+  EXPECT_TRUE(sensor->IsActive());
 }
 
 /////////////////////////////////////////////////
@@ -104,7 +106,7 @@ void SonarSensor_TEST::DemoWorld(const std::string &_physicsEngine,
 
   physics::WorldPtr world = physics::get_world();
   ASSERT_TRUE(world);
-  world->StepWorld(100);
+  world->Step(100);
 
   // Sonar sensor name
   std::string sensorName = "sonar";

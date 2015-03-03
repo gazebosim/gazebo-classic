@@ -52,7 +52,7 @@ void ODESliderJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODESliderJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 ODESliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   dVector3 result;
   if (this->jointId)
@@ -64,7 +64,7 @@ math::Vector3 ODESliderJoint::GetGlobalAxis(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle ODESliderJoint::GetAngleImpl(int /*_index*/) const
+math::Angle ODESliderJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   math::Angle result;
   if (this->jointId)
@@ -76,7 +76,7 @@ math::Angle ODESliderJoint::GetAngleImpl(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-double ODESliderJoint::GetVelocity(int /*index*/) const
+double ODESliderJoint::GetVelocity(unsigned int /*index*/) const
 {
   double result = 0;
   if (this->jointId)
@@ -88,26 +88,22 @@ double ODESliderJoint::GetVelocity(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetVelocity(int /*index*/, double _angle)
+void ODESliderJoint::SetVelocity(unsigned int /*index*/, double _angle)
 {
   this->SetParam(dParamVel, _angle);
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
+void ODESliderJoint::SetAxis(unsigned int /*index*/, const math::Vector3 &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
-
-  /// ODE needs global axis
-  /// \TODO: currently we assume joint axis is specified in model frame,
-  /// this is incorrect, and should be corrected to be
-  /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
   if (this->parentLink)
-    globalAxis =
-      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+    this->parentLink->SetEnabled(true);
+
+  // ODE needs global axis
+  math::Quaternion axisFrame = this->GetAxisFrame(0);
+  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
 
   if (this->jointId)
   {
@@ -119,7 +115,7 @@ void ODESliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetForceImpl(int /*_index*/, double _effort)
+void ODESliderJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 {
   if (this->jointId)
     dJointAddSliderForce(this->jointId, _effort);
@@ -128,14 +124,14 @@ void ODESliderJoint::SetForceImpl(int /*_index*/, double _effort)
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetParam(int _parameter, double _value)
+void ODESliderJoint::SetParam(unsigned int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
   dJointSetSliderParam(this->jointId, _parameter, _value);
 }
 
 //////////////////////////////////////////////////
-double ODESliderJoint::GetParam(int _parameter) const
+double ODESliderJoint::GetParam(unsigned int _parameter) const
 {
   double result = 0;
 
@@ -148,13 +144,28 @@ double ODESliderJoint::GetParam(int _parameter) const
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetMaxForce(int /*_index*/, double _t)
+void ODESliderJoint::SetMaxForce(unsigned int /*_index*/, double _t)
 {
   this->SetParam(dParamFMax, _t);
 }
 
 //////////////////////////////////////////////////
-double ODESliderJoint::GetMaxForce(int /*_index*/)
+double ODESliderJoint::GetMaxForce(unsigned int /*_index*/)
 {
   return this->GetParam(dParamFMax);
+}
+
+//////////////////////////////////////////////////
+math::Vector3 ODESliderJoint::GetAnchor(unsigned int /*_index*/) const
+{
+  dVector3 result;
+  gzlog << "ODESliderJoint::GetAnchor not implemented.\n";
+  return math::Vector3(result[0], result[1], result[2]);
+}
+
+//////////////////////////////////////////////////
+void ODESliderJoint::SetAnchor(unsigned int /*_index*/,
+  const math::Vector3 &/*_anchor*/)
+{
+  gzlog << "ODESliderJoint::SetAnchor not implemented.\n";
 }

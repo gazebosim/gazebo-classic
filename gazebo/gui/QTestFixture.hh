@@ -19,14 +19,14 @@
 #define _QTESTFIXTURE_HH_
 
 #include <string>
-#include <boost/thread.hpp>
 
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include <boost/thread.hpp>
 # include "gazebo/Server.hh"
+# include "gazebo/physics/physics.hh"
+# include "gazebo/rendering/rendering.hh"
 #endif
 
-#include "gazebo/physics/physics.hh"
-#include "gazebo/rendering/rendering.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/qt_test.h"
 

@@ -14,27 +14,26 @@
  * limitations under the License.
  *
  */
-#include <iomanip>
+
+#include <boost/date_time.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
 #include <boost/iostreams/filter/zlib.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
-#include <boost/date_time.hpp>
-
-#include "gazebo/math/Rand.hh"
-
-#include "gazebo/transport/transport.hh"
+#include <iomanip>
 
 #include "gazebo/common/Assert.hh"
-#include "gazebo/common/Events.hh"
-#include "gazebo/common/Time.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
 #include "gazebo/common/Base64.hh"
-#include "gazebo/util/LogRecord.hh"
-
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/gazebo_config.h"
+#include "gazebo/math/Rand.hh"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/util/LogRecord.hh"
 
 using namespace gazebo;
 using namespace util;
@@ -57,7 +56,10 @@ LogRecord::LogRecord()
   GZ_ASSERT(homePath, "HOME environment variable is missing");
 
   if (!homePath)
-    this->logBasePath = boost::filesystem::path("/tmp/gazebo");
+  {
+    common::SystemPaths *paths = common::SystemPaths::Instance();
+    this->logBasePath = paths->GetTmpPath() + "/gazebo";
+  }
   else
     this->logBasePath = boost::filesystem::path(homePath);
 

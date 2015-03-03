@@ -20,6 +20,7 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,7 +38,7 @@ namespace gazebo
 
     /// \class EntityMaker EntityMaker.hh gui/gui.hh
     /// \brief to make an entity base class
-    class EntityMaker
+    class GAZEBO_VISIBLE EntityMaker
     {
       /// \def CreateCallback
       /// \brief boost::function with vector3 pos and vector3 scale
@@ -65,12 +66,15 @@ namespace gazebo
       /// \brief Callback for pushing entity with mouse
       /// \param[in] _event MouseEvent object
       public: virtual void OnMousePush(const common::MouseEvent &_event);
+
       /// \brief Callback for releasing mouse button
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
+
       /// \brief Callback for dragging with mouse
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+
       /// \brief Callback when moving mouse
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseMove(const common::MouseEvent &_event);

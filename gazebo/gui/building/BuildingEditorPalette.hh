@@ -24,6 +24,7 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Events.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
 
     /// \class BuildingEditorPalette BuildingEditorPalette.hh
     /// \brief A palette of building items which can be added to the editor.
-    class BuildingEditorPalette : public QWidget
+    class GAZEBO_VISIBLE BuildingEditorPalette : public QWidget
     {
       Q_OBJECT
 

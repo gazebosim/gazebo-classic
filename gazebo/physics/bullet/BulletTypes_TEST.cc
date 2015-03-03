@@ -21,14 +21,17 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "test_config.h"
+#include "test/util.hh"
 
 #define NEAR_TOL 2e-5
 
 using namespace gazebo;
 
+class BulletTypes : public gazebo::testing::AutoLogFixture { };
+
 /////////////////////////////////////////////////
 /// Check Vector3 conversions
-TEST(BulletTypes, ConvertVector3)
+TEST_F(BulletTypes, ConvertVector3)
 {
   {
     math::Vector3 vec, vec2;
@@ -53,7 +56,7 @@ TEST(BulletTypes, ConvertVector3)
 
 /////////////////////////////////////////////////
 /// Check Vector4 conversions
-TEST(BulletTypes, ConvertVector4)
+TEST_F(BulletTypes, ConvertVector4)
 {
   {
     math::Vector4 vec, vec2;
@@ -80,7 +83,7 @@ TEST(BulletTypes, ConvertVector4)
 
 /////////////////////////////////////////////////
 /// Check Pose conversions
-TEST(BulletTypes, ConvertPose)
+TEST_F(BulletTypes, ConvertPose)
 {
   {
     math::Pose pose, pose2;
