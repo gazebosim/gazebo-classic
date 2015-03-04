@@ -30,34 +30,7 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
 
   // Title
   QLabel *titleLabel = new QLabel(tr(
-      "<b>Extrude Link</b><br>"
-      "Extrude a 2D image into a 3D mesh<br>"));
-
-//  // Unit
-//  QLabel *unitLabel = new QLabel(tr(
-//      "<b>Unit</b><br>"
-//      "Choose the units used in your image file."));
-
-//  this->dataPtr->unitCombo = new QComboBox();
-//  this->dataPtr->unitCombo->setMinimumWidth(100);
-//  this->dataPtr->unitCombo->addItem(tr("m"));
-//  this->dataPtr->unitCombo->addItem(tr("px"));
-//  this->dataPtr->unitCombo->addItem(tr("in"));
-////  connect(this->dataPtr->unitCombo, SIGNAL(currentIndexChanged(QString)), this,
-////      SLOT(OnChangeUnit(QString)));
-
-//  QHBoxLayout *unitComboLayout = new QHBoxLayout;
-//  unitComboLayout->addWidget(new QLabel("Unit:"));
-//  unitComboLayout->addStretch(1);
-//  unitComboLayout->addWidget(this->dataPtr->unitCombo);
-
-//  QVBoxLayout *unitLayout = new QVBoxLayout;
-//  unitLayout->addWidget(unitLabel);
-//  unitLayout->addSpacing(20);
-//  unitLayout->addLayout(unitComboLayout);
-
-//  QWidget *unitWidget = new QWidget();
-//  unitWidget->setLayout(unitLayout);
+      "Extrude a 2D polyline into a 3D mesh.<br>"));
 
   // Thickness
   this->dataPtr->thicknessSpin = new QDoubleSpinBox;
@@ -65,14 +38,6 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
   this->dataPtr->thicknessSpin->setSingleStep(0.1);
   this->dataPtr->thicknessSpin->setDecimals(4);
   this->dataPtr->thicknessSpin->setValue(1);
-//  connect(this->dataPtr->thicknessSpin, SIGNAL(valueChanged(double)), this,
-//      SLOT(OnChangeThickness(double)));
-
-  QHBoxLayout *thicknessLayout = new QHBoxLayout;
-  thicknessLayout->addWidget(new QLabel("Thickness:"));
-  thicknessLayout->addStretch(1);
-  thicknessLayout->addWidget(this->dataPtr->thicknessSpin);
-  thicknessLayout->addWidget(new QLabel("m"));
 
   // Resolution
   this->dataPtr->resolutionSpin = new QDoubleSpinBox;
@@ -80,14 +45,6 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
   this->dataPtr->resolutionSpin->setSingleStep(10);
   this->dataPtr->resolutionSpin->setDecimals(3);
   this->dataPtr->resolutionSpin->setValue(300);
-//  connect(this->dataPtr->resolutionSpin, SIGNAL(valueChanged(double)), this,
-//      SLOT(OnChangeResolution(double)));
-
-  QHBoxLayout *resolutionLayout = new QHBoxLayout;
-  resolutionLayout->addWidget(new QLabel("Resolution:"));
-  resolutionLayout->addStretch(1);
-  resolutionLayout->addWidget(this->dataPtr->resolutionSpin);
-  resolutionLayout->addWidget(new QLabel("px/m"));
 
   // Samples
   this->dataPtr->samplesSpin = new QDoubleSpinBox;
@@ -95,13 +52,20 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
   this->dataPtr->samplesSpin->setSingleStep(1);
   this->dataPtr->samplesSpin->setDecimals(0);
   this->dataPtr->samplesSpin->setValue(5);
-//  connect(this->dataPtr->samplesSpin, SIGNAL(valueChanged(double)), this,
-//      SLOT(OnChangeSamples(double)));
+  QLabel *samplesTips = new QLabel(tr("<b><font size=4>?</font></b>"));
+  samplesTips->setToolTip(
+      "Number of points to divide each curve segment into.");
 
-  QHBoxLayout *samplesLayout = new QHBoxLayout;
-  samplesLayout->addWidget(new QLabel("# of samples per segment:"));
-  samplesLayout->addStretch(1);
-  samplesLayout->addWidget(this->dataPtr->samplesSpin);
+  QGridLayout *inputsLayout = new QGridLayout();
+  inputsLayout->addWidget(new QLabel("Thickness:"), 0, 0);
+  inputsLayout->addWidget(this->dataPtr->thicknessSpin, 0, 1);
+  inputsLayout->addWidget(new QLabel("m"), 0, 2);
+  inputsLayout->addWidget(new QLabel("Resolution:"), 1, 0);
+  inputsLayout->addWidget(this->dataPtr->resolutionSpin, 1, 1);
+  inputsLayout->addWidget(new QLabel("px/m"), 1, 2);
+  inputsLayout->addWidget(new QLabel("Samples per segment:"), 2, 0);
+  inputsLayout->addWidget(this->dataPtr->samplesSpin, 2, 1);
+  inputsLayout->addWidget(samplesTips, 2, 2);
 
   // Buttons
   QHBoxLayout *buttonsLayout = new QHBoxLayout();
@@ -122,9 +86,8 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
   QVBoxLayout *leftColumnLayout = new QVBoxLayout();
   leftColumn->setLayout(leftColumnLayout);
   leftColumnLayout->addWidget(titleLabel);
-  leftColumnLayout->addLayout(thicknessLayout);
-  leftColumnLayout->addLayout(resolutionLayout);
-  leftColumnLayout->addLayout(samplesLayout);
+  leftColumnLayout->addLayout(inputsLayout);
+  leftColumnLayout->addSpacing(30);
   leftColumnLayout->addLayout(buttonsLayout);
 
   // Image view
@@ -146,18 +109,10 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
   this->dataPtr->importImageView->setDragMode(QGraphicsView::ScrollHandDrag);
 
   QPixmap *imagePixmap = new QPixmap(QString::fromStdString(_filename));
-//  this->imageWidthPx = this->imagePixmap->width();
   QGraphicsPixmapItem *imageItem = new QGraphicsPixmapItem(
       imagePixmap->scaled(scene->sceneRect().width(),
       scene->sceneRect().height(), Qt::KeepAspectRatio));
-
-//  this->pixmapWidthPx = this->imageItem->pixmap().width();
-//  this->pixmapHeightPx = this->imageItem->pixmap().height();
-
-  if (imageItem)
-  {
-    scene->addItem(imageItem);
-  }
+  scene->addItem(imageItem);
 
   // Main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;

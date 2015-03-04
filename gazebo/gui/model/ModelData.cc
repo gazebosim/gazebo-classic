@@ -451,6 +451,53 @@ bool LinkData::Apply()
 
         // check if the geometry is valid
         msgs::Geometry *geomMsg = updateMsg->mutable_geometry();
+
+        // warnings when changing from/to polyline
+        for (auto &vis : this->visuals)
+        {
+          if (vis.second.name() != updateMsg->name())
+            continue;
+
+          if (vis.second.mutable_geometry()->type() != geomMsg->type())
+          {
+            // Changing from polyline, give option to cancel
+            if (vis.second.mutable_geometry()->type() ==
+                msgs::Geometry::POLYLINE)
+            {
+              std::string msg =
+                  "Once you change the geometry, you can't go "
+                  "back to polyline.\n\n"
+                  "Do you wish to continue?\n";
+
+              QMessageBox msgBox(QMessageBox::Warning,
+                  QString("Changing polyline geometry"), QString(msg.c_str()));
+
+              QPushButton *cancelButton =
+                  msgBox.addButton("Cancel", QMessageBox::RejectRole);
+              QPushButton *saveButton = msgBox.addButton("Ok",
+                  QMessageBox::AcceptRole);
+              msgBox.setDefaultButton(saveButton);
+              msgBox.setEscapeButton(cancelButton);
+              msgBox.exec();
+              if (msgBox.clickedButton() != saveButton)
+                return false;
+            }
+            // Changing to polyline: not allowed
+            else if (geomMsg->type() == msgs::Geometry::POLYLINE)
+            {
+              std::string msg =
+                  "It's not possible to change into polyline.\n"
+                  "Please select another geometry type for ["
+                  + leafName + "].";
+
+              QMessageBox::warning(linkConfig, QString(
+                  "Invalid geometry conversion"), QString(msg.c_str()),
+                  QMessageBox::Ok, QMessageBox::Ok);
+              return false;
+            }
+          }
+        }
+
         if (geomMsg->type() == msgs::Geometry::MESH)
         {
           msgs::MeshGeom *meshGeom = geomMsg->mutable_mesh();
@@ -465,27 +512,6 @@ bool LinkData::Apply()
             QMessageBox::warning(linkConfig, QString("Invalid Mesh File"),
                 QString(msg.c_str()), QMessageBox::Ok, QMessageBox::Ok);
             return false;
-          }
-        }
-        else if (geomMsg->type() == msgs::Geometry::POLYLINE)
-        {
-          for (auto &vis : this->visuals)
-          {
-            if (vis.second.name() == updateMsg->name())
-            {
-              if (vis.second.mutable_geometry()->type() != geomMsg->type())
-              {
-                std::string msg =
-                    "It's not possible to change into polyline.\n"
-                    "Please select another geometry type for ["
-                    + leafName + "].";
-
-                QMessageBox::warning(linkConfig, QString(
-                    "Invalid geometry conversion"), QString(msg.c_str()),
-                    QMessageBox::Ok, QMessageBox::Ok);
-                return false;
-              }
-            }
           }
         }
 
