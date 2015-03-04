@@ -75,7 +75,7 @@ void Model::Load(sdf::ElementPtr _sdf)
 
   if (this->sdf->HasElement("self_collide"))
   {
-    this->sdf->Get<bool>("self_collide");
+    this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
   }
 
   if (this->sdf->HasElement("allow_auto_disable"))
