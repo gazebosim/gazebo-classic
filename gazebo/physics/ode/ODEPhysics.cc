@@ -1334,6 +1334,37 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
   else
   {
     gzwarn << _key << " is not supported in ode" << std::endl;
-    return 0;
+    return "PHYSICS_ENGINE_ERROR_STRING";
   }
+}
+
+//////////////////////////////////////////////////
+bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
+{
+  _value = this->GetParam(_key);
+  if (_value.type() == typeid(std::string))
+  {
+    if (boost::any_cast<std::string>(_value) == "PHYSICS_ENGINE_ERROR_STRING")
+      return false;
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+template <typename Type> bool ODEPhysics::GetParam(const std::string &_key,
+    Type &_value) const
+{
+  boost::any value;
+  if (!this->GetParam(_key, value))
+    return false;
+  try
+  {
+    _value = boost::any_cast<Type>(value);
+  }
+  catch(boost::bad_any_cast &_e)
+  {
+    gzwarn << "Failed boost::any_cast in GetParam: " << _e.what() << std::endl;
+    return false;
+  }
+  return true;
 }
