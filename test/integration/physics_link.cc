@@ -116,7 +116,17 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
     math::Vector3 H = link->GetWorldAngularMomentum();
     angularMomentumError.InsertData((H - H0) / H0mag);
   }
-  EXPECT_LT(angularMomentumError.Mag().Map()[stat], g_tolerance * 10);
+  if (_physicsEngine == "dart")
+  {
+    gzdbg << "dart has higher error for this test, "
+          << "so a larger tolerance is used."
+          << std::endl;
+    EXPECT_LT(angularMomentumError.Mag().Map()[stat], g_tolerance * 1e3);
+  }
+  else
+  {
+    EXPECT_LT(angularMomentumError.Mag().Map()[stat], g_tolerance * 10);
+  }
 }
 
 /////////////////////////////////////////////////
