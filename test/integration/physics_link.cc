@@ -16,7 +16,7 @@
 */
 #include <string.h>
 
-#include "gazebo/math/SignalStats.hh"
+#include "gazebo/math/Vector3Stats.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "test/ServerFixture.hh"
@@ -116,7 +116,7 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
     math::Vector3 H = link->GetWorldAngularMomentum();
     angularMomentumError.InsertData((H - H0) / H0mag);
   }
-  EXPECT_LT(angularMomentumError.Map()[stat], g_tolerance);
+  EXPECT_LT(angularMomentumError.Mag().Map()[stat], g_tolerance * 10);
 }
 
 /////////////////////////////////////////////////
@@ -393,6 +393,12 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   EXPECT_NEAR(rpy.x, 0.0, g_tolerance);
   EXPECT_NEAR(rpy.y, vel2.y*dt, g_tolerance);
   EXPECT_NEAR(rpy.z, 0.0, g_tolerance);
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsLinkTest, GetWorldAngularMomentum)
+{
+  GetWorldAngularMomentum(GetParam());
 }
 
 /////////////////////////////////////////////////
