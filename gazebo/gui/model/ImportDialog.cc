@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/common/SVGLoader.hh"
+
 #include "gazebo/gui/model/ImportDialog.hh"
 
 using namespace gazebo;
@@ -135,16 +137,36 @@ void ImportDialog::OnImport()
 {
   QFileInfo info(this->pathLineEdit->text());
   if (info.isFile() && (info.completeSuffix().toLower() == "dae" ||
-      info.completeSuffix().toLower() == "stl" ||
-      info.completeSuffix().toLower() == "svg"))
+      info.completeSuffix().toLower() == "stl"))
   {
     this->accept();
   }
+  else if (info.completeSuffix().toLower() == "svg")
+  {
+    // Check if the SVG has any paths before accepting
+    std::string filename = this->pathLineEdit->text().toStdString();
+    common::SVGLoader svgLoader(2);
+    std::vector<common::SVGPath> paths;
+    svgLoader.Parse(filename, paths);
+
+    if (paths.empty())
+    {
+      std::string msg = "No paths found on file \"" + filename +
+          "\"\n\nPlease select another file.";
+      QMessageBox::warning(this, QString("Invalid File"),
+          QString(msg.c_str()), QMessageBox::Ok,
+          QMessageBox::Ok);
+    }
+    else
+    {
+      this->accept();
+    }
+  }
   else
   {
-    std::string msg = this->pathLineEdit->text().toStdString() +
-        " is not a valid mesh or image file.\nPlease select another file.";
-    QMessageBox::warning(this, QString("Invalid Mesh or Image File"),
+    std::string msg = "\"" + this->pathLineEdit->text().toStdString() +
+        "\" is not a valid mesh or image file.\nPlease select another file.";
+    QMessageBox::warning(this, QString("Invalid File"),
         QString(msg.c_str()), QMessageBox::Ok,
         QMessageBox::Ok);
   }
