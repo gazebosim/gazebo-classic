@@ -44,6 +44,7 @@ set (sources
   SphericalCoordinates.cc
   STLLoader.cc
   SystemPaths.cc
+  SVGLoader.cc
   Time.cc
   Timer.cc
   Video.cc
@@ -84,6 +85,7 @@ set (headers
   SphericalCoordinates.hh
   STLLoader.hh
   SystemPaths.hh
+  SVGLoader.hh
   Time.hh
   Timer.hh
   UpdateInfo.hh
@@ -109,6 +111,7 @@ set (gtest_sources
   MovingWindowFilter_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
+  SVGLoader_TEST.cc
   Time_TEST.cc
 )
 
