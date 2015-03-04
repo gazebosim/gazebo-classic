@@ -183,7 +183,7 @@ namespace gazebo
       public: bool GetSelfCollide() const;
 
       /// \brief Set this model's self_collide property
-      /// \param[in] _self_collide Whether or not self-collisions enabled by default.
+      /// \param[in] _self_collide True if self-collisions enabled by default.
       public: void SetSelfCollide(bool _self_collide);
 
       /// \brief Set the gravity mode of the model.
