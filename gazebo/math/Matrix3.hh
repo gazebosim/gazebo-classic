@@ -77,8 +77,7 @@ namespace gazebo
       public: void SetCol(unsigned int _c, const Vector3 &_v);
 
       /// \brief Return the inverse matrix
-      /// \return Inverse of this matrix if it exists,
-      /// otherwise returns matrix of zeros.
+      /// \return Inverse of this matrix.
       public: Matrix3 Inverse() const;
 
       /// \brief returns the element wise difference of two matrices
