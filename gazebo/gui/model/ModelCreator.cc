@@ -67,7 +67,7 @@ ModelCreator::ModelCreator()
   this->updateMutex = new boost::recursive_mutex();
 
   this->manipMode = "";
-  this->partCounter = 0;
+  this->linkCounter = 0;
   this->modelCounter = 0;
 
   this->node = transport::NodePtr(new transport::Node());
@@ -147,10 +147,10 @@ ModelCreator::ModelCreator()
 /////////////////////////////////////////////////
 ModelCreator::~ModelCreator()
 {
-  while (!this->allParts.empty())
-    this->RemovePart(this->allParts.begin()->first);
+  while (!this->allLinks.empty())
+    this->RemoveLink(this->allLinks.begin()->first);
 
-  this->allParts.clear();
+  this->allLinks.clear();
   this->node->Fini();
   this->node.reset();
   this->modelTemplateSDF.reset();
@@ -312,7 +312,7 @@ void ModelCreator::LoadSDF(sdf::ElementPtr _modelElem)
   sdf::ElementPtr linkElem = _modelElem->GetElement("link");
   while (linkElem)
   {
-    this->CreatePartFromSDF(linkElem);
+    this->CreateLinkFromSDF(linkElem);
     linkElem = linkElem->GetNextElement("link");
   }
 
@@ -335,7 +335,7 @@ void ModelCreator::OnNew()
 {
   this->Stop();
 
-  if (this->allParts.empty())
+  if (this->allLinks.empty())
   {
     this->Reset();
     gui::model::Events::newModel();
@@ -449,7 +449,7 @@ void ModelCreator::OnExit()
 {
   this->Stop();
 
-  if (this->allParts.empty())
+  if (this->allLinks.empty())
   {
     if (!this->serverModelName.empty())
       this->SetModelVisible(this->serverModelName, true);
@@ -550,7 +550,7 @@ void ModelCreator::AddJoint(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
-std::string ModelCreator::AddShape(PartType _type,
+std::string ModelCreator::AddShape(LinkType _type,
     const math::Vector3 &_size, const math::Pose &_pose,
     const std::string &_uri, unsigned int _samples)
 {
@@ -561,7 +561,7 @@ std::string ModelCreator::AddShape(PartType _type,
 
   std::stringstream linkNameStream;
   linkNameStream << this->previewName << "_" << this->modelCounter
-      << "::part_" << this->partCounter++;
+      << "::link_" << this->linkCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
@@ -579,17 +579,17 @@ std::string ModelCreator::AddShape(PartType _type,
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
 
-  if (_type == PART_CYLINDER)
+  if (_type == LINK_CYLINDER)
   {
     sdf::ElementPtr cylinderElem = geomElem->AddElement("cylinder");
     (cylinderElem->GetElement("radius"))->Set(_size.x*0.5);
     (cylinderElem->GetElement("length"))->Set(_size.z);
   }
-  else if (_type == PART_SPHERE)
+  else if (_type == LINK_SPHERE)
   {
     ((geomElem->AddElement("sphere"))->GetElement("radius"))->Set(_size.x*0.5);
   }
-  else if (_type == PART_MESH)
+  else if (_type == LINK_MESH)
   {
     QFileInfo info(QString::fromStdString(_uri));
     if (!info.isFile())
@@ -659,22 +659,22 @@ std::string ModelCreator::AddShape(PartType _type,
   }
   else
   {
-    if (_type != PART_BOX)
+    if (_type != LINK_BOX)
     {
-      gzwarn << "Unknown part type '" << _type << "'. " <<
+      gzwarn << "Unknown link type '" << _type << "'. " <<
           "Adding a box" << std::endl;
     }
     ((geomElem->AddElement("box"))->GetElement("size"))->Set(_size);
   }
 
   visVisual->Load(visualElem);
-  this->CreatePart(visVisual);
+  this->CreateLink(visVisual);
 
   linkVisual->SetPose(_pose);
 
   // insert over ground plane for now
   math::Vector3 linkPos = linkVisual->GetWorldPose().pos;
-  if (_type != PART_MESH)
+  if (_type != LINK_MESH)
   {
     linkPos.z = _size.z * 0.5;
   }
@@ -688,18 +688,18 @@ std::string ModelCreator::AddShape(PartType _type,
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
+void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
 {
-  PartData *part = new PartData();
+  LinkData *link = new LinkData();
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
   {
-    connect(gui::get_main_window(), SIGNAL(Close()), part->inspector,
+    connect(gui::get_main_window(), SIGNAL(Close()), link->inspector,
         SLOT(close()));
   }
 
-  part->partVisual = _visual->GetParent();
-  part->AddVisual(_visual);
+  link->linkVisual = _visual->GetParent();
+  link->AddVisual(_visual);
 
   // override transparency
   _visual->SetTransparency(_visual->GetTransparency() *
@@ -708,8 +708,8 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 
   // create collision with identical geometry
   rendering::VisualPtr collisionVis =
-      _visual->Clone(part->partVisual->GetName() + "::collision",
-      part->partVisual);
+      _visual->Clone(link->linkVisual->GetName() + "::collision",
+      link->linkVisual);
 
   // orange
   collisionVis->SetMaterial("Gazebo/Orange");
@@ -719,83 +719,83 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
       getAttachedObject(0);
   colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
-  part->AddCollision(collisionVis);
+  link->AddCollision(collisionVis);
 
-  std::string partName = part->partVisual->GetName();
+  std::string linkName = link->linkVisual->GetName();
 
-  std::string leafName = partName;
-  size_t idx = partName.find_last_of("::");
+  std::string leafName = linkName;
+  size_t idx = linkName.find_last_of("::");
   if (idx != std::string::npos)
-    leafName = partName.substr(idx+1);
+    leafName = linkName.substr(idx+1);
 
-  part->SetName(leafName);
+  link->SetName(leafName);
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->allParts[partName] = part;
+    this->allLinks[linkName] = link;
     if (this->canonicalLink.empty())
-      this->canonicalLink = partName;
+      this->canonicalLink = linkName;
   }
 
-  rendering::ScenePtr scene = part->partVisual->GetScene();
-  scene->AddVisual(part->partVisual);
+  rendering::ScenePtr scene = link->linkVisual->GetScene();
+  scene->AddVisual(link->linkVisual);
 
   this->ModelChanged();
 }
 
 /////////////////////////////////////////////////
-PartData *ModelCreator::ClonePart(const std::string &_partName)
+LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-  auto it = this->allParts.find(_partName);
-  if (it == allParts.end())
+  auto it = this->allLinks.find(_linkName);
+  if (it == allLinks.end())
   {
-    gzerr << "No part with name: " << _partName << " found."  << std::endl;
+    gzerr << "No link with name: " << _linkName << " found."  << std::endl;
     return NULL;
   }
 
   // generate unique name.
-  std::string newName = _partName + "_clone";
-  auto itName = this->allParts.find(newName);
+  std::string newName = _linkName + "_clone";
+  auto itName = this->allLinks.find(newName);
   int nameCounter = 0;
-  while (itName != this->allParts.end())
+  while (itName != this->allLinks.end())
   {
-    std::stringstream newPartName;
-    newPartName << _partName << "_clone_" << nameCounter++;
-    newName = newPartName.str();
-    itName = this->allParts.find(newName);
+    std::stringstream newLinkName;
+    newLinkName << _linkName << "_clone_" << nameCounter++;
+    newName = newLinkName.str();
+    itName = this->allLinks.find(newName);
   }
 
   std::string leafName = newName;
   size_t idx = newName.find_last_of("::");
   if (idx != std::string::npos)
     leafName = newName.substr(idx+1);
-  PartData *part = it->second->Clone(leafName);
+  LinkData *link = it->second->Clone(leafName);
 
-  this->allParts[newName] = part;
+  this->allLinks[newName] = link;
 
   this->ModelChanged();
 
-  return part;
+  return link;
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
+void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
 {
-  PartData *part = new PartData();
+  LinkData *link = new LinkData();
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
   {
-    connect(gui::get_main_window(), SIGNAL(Close()), part->inspector,
+    connect(gui::get_main_window(), SIGNAL(Close()), link->inspector,
         SLOT(close()));
   }
 
-  part->Load(_linkElem);
+  link->Load(_linkElem);
 
   // Link
   std::stringstream linkNameStream;
-  std::string leafName = part->GetName();
+  std::string leafName = link->GetName();
 
   linkNameStream << this->previewName << "_" << this->modelCounter << "::";
   linkNameStream << leafName;
@@ -804,7 +804,7 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
   if (this->canonicalLink.empty())
     this->canonicalLink = linkName;
 
-  part->SetName(leafName);
+  link->SetName(leafName);
 
   // if link name is scoped, it could mean that it's from an included model.
   // The joint maker needs to know about this in order to specify the correct
@@ -815,8 +815,8 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
       this->previewVisual));
   linkVisual->Load();
-  linkVisual->SetPose(part->GetPose());
-  part->partVisual = linkVisual;
+  linkVisual->SetPose(link->GetPose());
+  link->linkVisual = linkVisual;
 
   // Visuals
   int visualIndex = 0;
@@ -856,8 +856,8 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
       visualPose.Set(0, 0, 0, 0, 0, 0);
     visVisual->SetPose(visualPose);
 
-    // Add to part
-    part->AddVisual(visVisual);
+    // Add to link
+    link->AddVisual(visVisual);
 
     // override transparency
     visVisual->SetTransparency(visVisual->GetTransparency() *
@@ -919,25 +919,25 @@ void ModelCreator::CreatePartFromSDF(sdf::ElementPtr _linkElem)
         getAttachedObject(0);
     colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
 
-    // Add to part
-    part->AddCollision(colVisual);
+    // Add to link
+    link->AddCollision(colVisual);
 
     collisionElem = collisionElem->GetNextElement("collision");
   }
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->allParts[linkName] = part;
+    this->allLinks[linkName] = link;
   }
 
-  rendering::ScenePtr scene = part->partVisual->GetScene();
-  scene->AddVisual(part->partVisual);
+  rendering::ScenePtr scene = link->linkVisual->GetScene();
+  scene->AddVisual(link->linkVisual);
 
   this->ModelChanged();
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::RemovePart(const std::string &_partName)
+void ModelCreator::RemoveLink(const std::string &_linkName)
 {
   if (!this->previewVisual)
   {
@@ -945,37 +945,37 @@ void ModelCreator::RemovePart(const std::string &_partName)
     return;
   }
 
-  PartData *part = NULL;
+  LinkData *link = NULL;
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    if (this->allParts.find(_partName) == this->allParts.end())
+    if (this->allLinks.find(_linkName) == this->allLinks.end())
       return;
-    part = this->allParts[_partName];
+    link = this->allLinks[_linkName];
   }
 
-  if (!part)
+  if (!link)
     return;
 
-  rendering::ScenePtr scene = part->partVisual->GetScene();
-  for (auto &it : part->visuals)
+  rendering::ScenePtr scene = link->linkVisual->GetScene();
+  for (auto &it : link->visuals)
   {
     rendering::VisualPtr vis = it.first;
     scene->RemoveVisual(vis);
   }
-  scene->RemoveVisual(part->partVisual);
-  for (auto &colIt : part->collisions)
+  scene->RemoveVisual(link->linkVisual);
+  for (auto &colIt : link->collisions)
   {
     rendering::VisualPtr vis = colIt.first;
     scene->RemoveVisual(vis);
   }
 
-  scene->RemoveVisual(part->partVisual);
+  scene->RemoveVisual(link->linkVisual);
 
-  part->partVisual.reset();
+  link->linkVisual.reset();
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->allParts.erase(_partName);
-    delete part;
+    this->allLinks.erase(_linkName);
+    delete link;
   }
 
   this->ModelChanged();
@@ -1009,9 +1009,9 @@ void ModelCreator::Reset()
   gui::model::Events::modelPropertiesChanged(this->isStatic, this->autoDisable,
       this->modelPose);
 
-  while (!this->allParts.empty())
-    this->RemovePart(this->allParts.begin()->first);
-  this->allParts.clear();
+  while (!this->allLinks.empty())
+    this->RemoveLink(this->allLinks.begin()->first);
+  this->allLinks.clear();
 
   if (!gui::get_active_camera() ||
     !gui::get_active_camera()->GetScene())
@@ -1127,7 +1127,7 @@ void ModelCreator::CreateTheEntity()
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::AddPart(PartType _type)
+void ModelCreator::AddLink(LinkType _type)
 {
   if (!this->previewVisual)
   {
@@ -1136,20 +1136,20 @@ void ModelCreator::AddPart(PartType _type)
 
   this->Stop();
 
-  this->addPartType = _type;
-  if (_type != PART_NONE)
+  this->addLinkType = _type;
+  if (_type != LINK_NONE)
     this->AddShape(_type);
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::Stop()
 {
-  if (this->addPartType != PART_NONE && this->mouseVisual)
+  if (this->addLinkType != LINK_NONE && this->mouseVisual)
   {
     for (unsigned int i = 0; i < this->mouseVisual->GetChildCount(); ++i)
-        this->RemovePart(this->mouseVisual->GetName());
+        this->RemoveLink(this->mouseVisual->GetName());
     this->mouseVisual.reset();
-    emit PartAdded();
+    emit LinkAdded();
   }
   if (this->jointMaker)
     this->jointMaker->Stop();
@@ -1161,11 +1161,11 @@ void ModelCreator::OnDelete(const std::string &_entity)
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
   // if it's a link
-  if (this->allParts.find(_entity) != this->allParts.end())
+  if (this->allLinks.find(_entity) != this->allLinks.end())
   {
     if (this->jointMaker)
-      this->jointMaker->RemoveJointsByPart(_entity);
-    this->RemovePart(_entity);
+      this->jointMaker->RemoveJointsByLink(_entity);
+    this->RemoveLink(_entity);
     return;
   }
 
@@ -1177,14 +1177,14 @@ void ModelCreator::OnDelete(const std::string &_entity)
     rendering::VisualPtr parentLink = vis->GetParent();
     std::string parentLinkName = parentLink->GetName();
 
-    if (this->allParts.find(parentLinkName) != this->allParts.end())
+    if (this->allLinks.find(parentLinkName) != this->allLinks.end())
     {
       // remove the parent link if it's the only child
       if (parentLink->GetChildCount() == 1)
       {
         if (this->jointMaker)
-          this->jointMaker->RemoveJointsByPart(parentLink->GetName());
-        this->RemovePart(parentLink->GetName());
+          this->jointMaker->RemoveJointsByLink(parentLink->GetName());
+        this->RemoveLink(parentLink->GetName());
         return;
       }
     }
@@ -1272,34 +1272,34 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     if (_event.button == common::MouseEvent::RIGHT)
       return true;
 
-    // set the part data pose
-    if (this->allParts.find(this->mouseVisual->GetName()) !=
-        this->allParts.end())
+    // set the link data pose
+    if (this->allLinks.find(this->mouseVisual->GetName()) !=
+        this->allLinks.end())
     {
-      PartData *part = this->allParts[this->mouseVisual->GetName()];
-      part->SetPose(this->mouseVisual->GetWorldPose()-this->modelPose);
+      LinkData *link = this->allLinks[this->mouseVisual->GetName()];
+      link->SetPose(this->mouseVisual->GetWorldPose()-this->modelPose);
     }
 
     // reset and return
-    emit PartAdded();
+    emit LinkAdded();
     this->mouseVisual.reset();
-    this->AddPart(PART_NONE);
+    this->AddLink(LINK_NONE);
     return true;
   }
 
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
   if (vis)
   {
-    rendering::VisualPtr partVis = vis->GetParent();
-    // Is part
-    if (this->allParts.find(partVis->GetName()) !=
-        this->allParts.end())
+    rendering::VisualPtr linkVis = vis->GetParent();
+    // Is link
+    if (this->allLinks.find(linkVis->GetName()) !=
+        this->allLinks.end())
     {
       // Handle snap from GLWidget
       if (g_snapAct->isChecked())
         return false;
 
-      // trigger part inspector on right click
+      // trigger link inspector on right click
       if (_event.button == common::MouseEvent::RIGHT)
       {
         this->inspectVis = vis->GetParent();
@@ -1307,7 +1307,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         QMenu menu;
         menu.addAction(this->inspectAct);
 
-        std::vector<JointData *> joints = this->jointMaker->GetJointDataByPart(
+        std::vector<JointData *> joints = this->jointMaker->GetJointDataByLink(
             this->inspectVis->GetName());
 
         if (!joints.empty())
@@ -1332,25 +1332,25 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       {
         this->DeselectAll();
 
-        // Highlight and selected clicked part
-        partVis->SetHighlighted(true);
-        this->selectedVisuals.push_back(partVis);
+        // Highlight and selected clicked link
+        linkVis->SetHighlighted(true);
+        this->selectedVisuals.push_back(linkVis);
       }
       // Multi-selection mode
       else
       {
         auto it = std::find(this->selectedVisuals.begin(),
-            this->selectedVisuals.end(), partVis);
-        // Highlight and select clicked part if not already selected
+            this->selectedVisuals.end(), linkVis);
+        // Highlight and select clicked link if not already selected
         if (it == this->selectedVisuals.end())
         {
-          partVis->SetHighlighted(true);
-          this->selectedVisuals.push_back(partVis);
+          linkVis->SetHighlighted(true);
+          this->selectedVisuals.push_back(linkVis);
         }
         // Deselect if already selected
         else
         {
-          partVis->SetHighlighted(false);
+          linkVis->SetHighlighted(false);
           this->selectedVisuals.erase(it);
         }
       }
@@ -1365,7 +1365,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 
       return true;
     }
-    // Not part
+    // Not link
     else
     {
       this->DeselectAll();
@@ -1394,8 +1394,8 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
     if (vis && !vis->IsPlane())
     {
       // Main window models always handled here
-      if (this->allParts.find(vis->GetParent()->GetName()) ==
-          this->allParts.end())
+      if (this->allLinks.find(vis->GetParent()->GetName()) ==
+          this->allLinks.end())
       {
         // Prevent highlighting for snapping
         if (this->manipMode == "snap" || this->manipMode == "select" ||
@@ -1434,15 +1434,15 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
 {
-  // open the part inspector on double click
+  // open the link inspector on double click
   rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
   if (!vis)
     return false;
 
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-  if (this->allParts.find(vis->GetParent()->GetName()) !=
-      this->allParts.end())
+  if (this->allLinks.find(vis->GetParent()->GetName()) !=
+      this->allLinks.end())
   {
     this->OpenInspector(vis->GetParent()->GetName());
     return true;
@@ -1462,11 +1462,11 @@ void ModelCreator::OnOpenInspector()
 void ModelCreator::OpenInspector(const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  PartData *part = this->allParts[_name];
-  part->SetPose(part->partVisual->GetWorldPose()-this->modelPose);
-  part->UpdateConfig();
-  part->inspector->move(QCursor::pos());
-  part->inspector->show();
+  LinkData *link = this->allLinks[_name];
+  link->SetPose(link->linkVisual->GetWorldPose()-this->modelPose);
+  link->UpdateConfig();
+  link->inspector->move(QCursor::pos());
+  link->inspector->show();
 }
 
 /////////////////////////////////////////////////
@@ -1477,10 +1477,10 @@ void ModelCreator::OnCopy()
 
   if (!this->selectedVisuals.empty())
   {
-    this->copiedPartNames.clear();
+    this->copiedLinkNames.clear();
     for (auto vis : this->selectedVisuals)
     {
-      this->copiedPartNames.push_back(vis->GetName());
+      this->copiedLinkNames.push_back(vis->GetName());
     }
     g_pasteAct->setEnabled(true);
   }
@@ -1489,7 +1489,7 @@ void ModelCreator::OnCopy()
 /////////////////////////////////////////////////
 void ModelCreator::OnPaste()
 {
-  if (this->copiedPartNames.empty() || !g_editModelAct->isChecked())
+  if (this->copiedLinkNames.empty() || !g_editModelAct->isChecked())
   {
     return;
   }
@@ -1497,11 +1497,11 @@ void ModelCreator::OnPaste()
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
   // For now, only copy the last selected model
-  auto it = this->allParts.find(this->copiedPartNames.back());
-  if (it != this->allParts.end())
+  auto it = this->allLinks.find(this->copiedLinkNames.back());
+  if (it != this->allLinks.end())
   {
-    PartData *copiedPart = it->second;
-    if (!copiedPart)
+    LinkData *copiedLink = it->second;
+    if (!copiedLink)
       return;
 
     this->Stop();
@@ -1512,9 +1512,9 @@ void ModelCreator::OnPaste()
       this->Reset();
     }
 
-    PartData* clonedPart = this->ClonePart(it->first);
+    LinkData* clonedLink = this->CloneLink(it->first);
 
-    math::Pose clonePose = copiedPart->partVisual->GetWorldPose();
+    math::Pose clonePose = copiedLink->linkVisual->GetWorldPose();
     rendering::UserCameraPtr userCamera = gui::get_active_camera();
     if (userCamera)
     {
@@ -1525,9 +1525,9 @@ void ModelCreator::OnPaste()
       clonePose.pos.y = mousePosition.y;
     }
 
-    clonedPart->partVisual->SetWorldPose(clonePose);
-    this->addPartType = PART_MESH;
-    this->mouseVisual = clonedPart->partVisual;
+    clonedLink->linkVisual->SetWorldPose(clonePose);
+    this->addLinkType = LINK_MESH;
+    this->mouseVisual = clonedLink->linkVisual;
   }
 }
 
@@ -1554,16 +1554,16 @@ void ModelCreator::GenerateSDF()
 
   if (this->serverModelName.empty())
   {
-    // set center of all parts to be origin
+    // set center of all links to be origin
     // TODO set a better origin other than the centroid
     math::Vector3 mid;
-    for (auto &partsIt : this->allParts)
+    for (auto &linksIt : this->allLinks)
     {
-      PartData *part = partsIt.second;
-      mid += part->GetPose().pos;
+      LinkData *link = linksIt.second;
+      mid += link->GetPose().pos;
     }
-    if (!this->allParts.empty())
-      mid /= this->allParts.size();
+    if (!this->allLinks.empty())
+      mid /= this->allLinks.size();
     this->modelPose.pos = mid;
   }
 
@@ -1571,27 +1571,27 @@ void ModelCreator::GenerateSDF()
   // generate canonical link sdf first.
   if (!this->canonicalLink.empty())
   {
-    auto canonical = this->allParts.find(this->canonicalLink);
-    if (canonical != this->allParts.end())
+    auto canonical = this->allLinks.find(this->canonicalLink);
+    if (canonical != this->allLinks.end())
     {
-      PartData *part = canonical->second;
-      part->UpdateConfig();
+      LinkData *link = canonical->second;
+      link->UpdateConfig();
 
-      sdf::ElementPtr newLinkElem = this->GenerateLinkSDF(part);
+      sdf::ElementPtr newLinkElem = this->GenerateLinkSDF(link);
       modelElem->InsertElement(newLinkElem);
     }
   }
 
-  // loop through rest of all parts and generate sdf
-  for (auto &partsIt : this->allParts)
+  // loop through rest of all links and generate sdf
+  for (auto &linksIt : this->allLinks)
   {
-    if (partsIt.first == this->canonicalLink)
+    if (linksIt.first == this->canonicalLink)
       continue;
 
-    PartData *part = partsIt.second;
-    part->UpdateConfig();
+    LinkData *link = linksIt.second;
+    link->UpdateConfig();
 
-    sdf::ElementPtr newLinkElem = this->GenerateLinkSDF(part);
+    sdf::ElementPtr newLinkElem = this->GenerateLinkSDF(link);
     modelElem->InsertElement(newLinkElem);
   }
 
@@ -1629,19 +1629,19 @@ void ModelCreator::GenerateSDF()
 }
 
 /////////////////////////////////////////////////
-sdf::ElementPtr ModelCreator::GenerateLinkSDF(PartData *_part)
+sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
 {
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;
   visualNameStream.str("");
   collisionNameStream.str("");
 
-  sdf::ElementPtr newLinkElem = _part->partSDF->Clone();
-  newLinkElem->GetElement("pose")->Set(_part->partVisual->GetWorldPose()
+  sdf::ElementPtr newLinkElem = _link->linkSDF->Clone();
+  newLinkElem->GetElement("pose")->Set(_link->linkVisual->GetWorldPose()
       - this->modelPose);
 
   // visuals
-  for (auto const &it : _part->visuals)
+  for (auto const &it : _link->visuals)
   {
     rendering::VisualPtr visual = it.first;
     msgs::Visual visualMsg = it.second;
@@ -1653,7 +1653,7 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(PartData *_part)
   }
 
   // collisions
-  for (auto const &colIt : _part->collisions)
+  for (auto const &colIt : _link->collisions)
   {
     sdf::ElementPtr collisionElem = msgs::CollisionToSDF(colIt.second);
     newLinkElem->InsertElement(collisionElem);
@@ -1730,23 +1730,23 @@ void ModelCreator::Update()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-  // Check if any parts have been moved or resized and trigger ModelChanged
-  for (auto &partsIt : this->allParts)
+  // Check if any links have been moved or resized and trigger ModelChanged
+  for (auto &linksIt : this->allLinks)
   {
-    PartData *part = partsIt.second;
-    if (part->GetPose() != part->partVisual->GetPose())
+    LinkData *link = linksIt.second;
+    if (link->GetPose() != link->linkVisual->GetPose())
     {
-      part->SetPose(part->partVisual->GetWorldPose() - this->modelPose);
+      link->SetPose(link->linkVisual->GetWorldPose() - this->modelPose);
       this->ModelChanged();
     }
-    for (auto &scaleIt : this->partScaleUpdate)
+    for (auto &scaleIt : this->linkScaleUpdate)
     {
-      if (part->partVisual->GetName() == scaleIt.first)
-        part->SetScale(scaleIt.second);
+      if (link->linkVisual->GetName() == scaleIt.first)
+        link->SetScale(scaleIt.second);
     }
-    if (!this->partScaleUpdate.empty())
+    if (!this->linkScaleUpdate.empty())
       this->ModelChanged();
-    this->partScaleUpdate.clear();
+    this->linkScaleUpdate.clear();
   }
 }
 
@@ -1755,12 +1755,12 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
   const math::Vector3 &_scale)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  for (auto partsIt : this->allParts)
+  for (auto linksIt : this->allLinks)
   {
-    if (_name == partsIt.first ||
-        _name.find(partsIt.first) != std::string::npos)
+    if (_name == linksIt.first ||
+        _name.find(linksIt.first) != std::string::npos)
     {
-      this->partScaleUpdate[partsIt.first] = _scale;
+      this->linkScaleUpdate[linksIt.first] = _scale;
       break;
     }
   }

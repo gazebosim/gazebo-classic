@@ -70,10 +70,10 @@ double ModelData::GetEditTransparency()
 }
 
 /////////////////////////////////////////////////
-PartData::PartData()
+LinkData::LinkData()
 {
-  this->partSDF.reset(new sdf::Element);
-  sdf::initFile("link.sdf", this->partSDF);
+  this->linkSDF.reset(new sdf::Element);
+  sdf::initFile("link.sdf", this->linkSDF);
 
   this->scale = math::Vector3::One;
 
@@ -100,55 +100,55 @@ PartData::PartData()
   // note the destructor removes this connection with the assumption that it is
   // the first one in the vector
   this->connections.push_back(event::Events::ConnectPreRender(
-      boost::bind(&PartData::Update, this)));
+      boost::bind(&LinkData::Update, this)));
   this->updateMutex = new boost::recursive_mutex();
 }
 
 /////////////////////////////////////////////////
-PartData::~PartData()
+LinkData::~LinkData()
 {
   event::Events::DisconnectPreRender(this->connections[0]);
   delete this->inspector;
 }
 
 /////////////////////////////////////////////////
-std::string PartData::GetName() const
+std::string LinkData::GetName() const
 {
-  return this->partSDF->Get<std::string>("name");
+  return this->linkSDF->Get<std::string>("name");
 }
 
 /////////////////////////////////////////////////
-void PartData::SetName(const std::string &_name)
+void LinkData::SetName(const std::string &_name)
 {
-  this->partSDF->GetAttribute("name")->Set(_name);
+  this->linkSDF->GetAttribute("name")->Set(_name);
   this->inspector->SetName(_name);
 }
 
 /////////////////////////////////////////////////
-math::Pose PartData::GetPose() const
+math::Pose LinkData::GetPose() const
 {
-  return this->partSDF->Get<math::Pose>("pose");
+  return this->linkSDF->Get<math::Pose>("pose");
 }
 
 /////////////////////////////////////////////////
-void PartData::SetPose(const math::Pose &_pose)
+void LinkData::SetPose(const math::Pose &_pose)
 {
-  this->partSDF->GetElement("pose")->Set(_pose);
+  this->linkSDF->GetElement("pose")->Set(_pose);
 
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
   linkConfig->SetPose(_pose);
 }
 
 /////////////////////////////////////////////////
-void PartData::SetScale(const math::Vector3 &_scale)
+void LinkData::SetScale(const math::Vector3 &_scale)
 {
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
   for (auto it = this->visuals.begin(); it != this->visuals.end(); ++it)
   {
     std::string name = it->first->GetName();
-    std::string partName = this->partVisual->GetName();
+    std::string linkName = this->linkVisual->GetName();
     std::string leafName =
-        name.substr(name.find(partName)+partName.size()+2);
+        name.substr(name.find(linkName)+linkName.size()+2);
     visualConfig->SetGeometry(leafName, it->first->GetScale());
   }
 
@@ -156,9 +156,9 @@ void PartData::SetScale(const math::Vector3 &_scale)
   for (auto it = this->collisions.begin(); it != this->collisions.end(); ++it)
   {
     std::string name = it->first->GetName();
-    std::string partName = this->partVisual->GetName();
+    std::string linkName = this->linkVisual->GetName();
     std::string leafName =
-        name.substr(name.find(partName)+partName.size()+2);
+        name.substr(name.find(linkName)+linkName.size()+2);
     collisionConfig->SetGeometry(leafName,  it->first->GetScale());
   }
 
@@ -166,13 +166,13 @@ void PartData::SetScale(const math::Vector3 &_scale)
 }
 
 /////////////////////////////////////////////////
-math::Vector3 PartData::GetScale() const
+math::Vector3 LinkData::GetScale() const
 {
   return this->scale;
 }
 
 /////////////////////////////////////////////////
-void PartData::Load(sdf::ElementPtr _sdf)
+void LinkData::Load(sdf::ElementPtr _sdf)
 {
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
 
@@ -183,7 +183,7 @@ void PartData::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("inertial"))
   {
     sdf::ElementPtr inertialElem = _sdf->GetElement("inertial");
-    this->partSDF->GetElement("inertial")->Copy(inertialElem);
+    this->linkSDF->GetElement("inertial")->Copy(inertialElem);
 
     msgs::Inertial *inertialMsg = linkMsgPtr->mutable_inertial();
 
@@ -214,27 +214,27 @@ void PartData::Load(sdf::ElementPtr _sdf)
   {
     sdf::ElementPtr selfCollideSDF = _sdf->GetElement("self_collide");
     linkMsgPtr->set_self_collide(selfCollideSDF->Get<bool>(""));
-    this->partSDF->InsertElement(selfCollideSDF->Clone());
+    this->linkSDF->InsertElement(selfCollideSDF->Clone());
   }
   if (_sdf->HasElement("kinematic"))
   {
     sdf::ElementPtr kinematicSDF = _sdf->GetElement("kinematic");
     linkMsgPtr->set_kinematic(kinematicSDF->Get<bool>());
-    this->partSDF->InsertElement(kinematicSDF->Clone());
+    this->linkSDF->InsertElement(kinematicSDF->Clone());
   }
   if (_sdf->HasElement("must_be_base_link"))
   {
     sdf::ElementPtr baseLinkSDF = _sdf->GetElement("must_be_base_link");
     // TODO link.proto is missing the must_be_base_link field.
     // linkMsgPtr->set_must_be_base_link(baseLinkSDF->Get<bool>());
-    this->partSDF->InsertElement(baseLinkSDF->Clone());
+    this->linkSDF->InsertElement(baseLinkSDF->Clone());
   }
   if (_sdf->HasElement("velocity_decay"))
   {
     sdf::ElementPtr velocityDecaySDF = _sdf->GetElement("velocity_decay");
     // TODO link.proto is missing the velocity_decay field.
     // linkMsgPtr->set_velocity_decay(velocityDecaySDF->Get<double>());
-    this->partSDF->InsertElement(velocityDecaySDF->Clone());
+    this->linkSDF->InsertElement(velocityDecaySDF->Clone());
   }
   linkConfig->Update(linkMsgPtr);
 
@@ -243,14 +243,14 @@ void PartData::Load(sdf::ElementPtr _sdf)
     sdf::ElementPtr sensorElem = _sdf->GetElement("sensor");
     while (sensorElem)
     {
-      this->partSDF->InsertElement(sensorElem->Clone());
+      this->linkSDF->InsertElement(sensorElem->Clone());
       sensorElem = sensorElem->GetNextElement("sensor");
     }
   }
 }
 
 /////////////////////////////////////////////////
-void PartData::UpdateConfig()
+void LinkData::UpdateConfig()
 {
   // set new geom size if scale has changed.
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
@@ -304,7 +304,7 @@ void PartData::UpdateConfig()
 }
 
 /////////////////////////////////////////////////
-void PartData::AddVisual(rendering::VisualPtr _visual)
+void LinkData::AddVisual(rendering::VisualPtr _visual)
 {
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
   msgs::Visual visualMsg = msgs::VisualFromSDF(_visual->GetSDF());
@@ -321,7 +321,7 @@ void PartData::AddVisual(rendering::VisualPtr _visual)
 }
 
 /////////////////////////////////////////////////
-void PartData::AddCollision(rendering::VisualPtr _collisionVis)
+void LinkData::AddCollision(rendering::VisualPtr _collisionVis)
 {
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
   msgs::Visual visualMsg = msgs::VisualFromSDF(_collisionVis->GetSDF());
@@ -347,25 +347,25 @@ void PartData::AddCollision(rendering::VisualPtr _collisionVis)
 }
 
 /////////////////////////////////////////////////
-PartData* PartData::Clone(const std::string &_newName)
+LinkData* LinkData::Clone(const std::string &_newName)
 {
-  PartData *clonePart = new PartData();
+  LinkData *cloneLink = new LinkData();
 
-  clonePart->Load(this->partSDF);
-  clonePart->SetName(_newName);
+  cloneLink->Load(this->linkSDF);
+  cloneLink->SetName(_newName);
 
-  std::string partVisualName = this->partVisual->GetName();
+  std::string linkVisualName = this->linkVisual->GetName();
   std::string cloneVisName = _newName;
-  size_t partIdx = partVisualName.find("::");
-  if (partIdx != std::string::npos)
-    cloneVisName = partVisualName.substr(0, partIdx+2) + _newName;
+  size_t linkIdx = linkVisualName.find("::");
+  if (linkIdx != std::string::npos)
+    cloneVisName = linkVisualName.substr(0, linkIdx+2) + _newName;
 
-  // clone partVisual;
-  rendering::VisualPtr linkVisual(new rendering::Visual(cloneVisName,
-      this->partVisual->GetParent()));
-  linkVisual->Load();
+  // clone linkVisual;
+  rendering::VisualPtr linkVis(new rendering::Visual(cloneVisName,
+      this->linkVisual->GetParent()));
+  linkVis->Load();
 
-  clonePart->partVisual = linkVisual;
+  cloneLink->linkVisual = linkVis;
 
   for (auto &visIt : this->visuals)
   {
@@ -377,11 +377,11 @@ PartData* PartData::Clone(const std::string &_newName)
       newVisName = cloneVisName + "::" + newVisName;
 
     rendering::VisualPtr cloneVis =
-        visIt.first->Clone(newVisName, clonePart->partVisual);
+        visIt.first->Clone(newVisName, cloneLink->linkVisual);
 
     // override transparency
     cloneVis->SetTransparency(visIt.second.transparency());
-    clonePart->AddVisual(cloneVis);
+    cloneLink->AddVisual(cloneVis);
     cloneVis->SetTransparency(visIt.second.transparency() *
         (1-ModelData::GetEditTransparency()-0.1)
         + ModelData::GetEditTransparency());
@@ -396,39 +396,39 @@ PartData* PartData::Clone(const std::string &_newName)
     else
       newColName = cloneVisName + "::" + newColName;
     rendering::VisualPtr collisionVis = colIt.first->Clone(newColName,
-        clonePart->partVisual);
+        cloneLink->linkVisual);
     collisionVis->SetTransparency(
        math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
     // fix for transparency alpha compositing
     Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
         getAttachedObject(0);
     colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
-    clonePart->AddCollision(collisionVis);
+    cloneLink->AddCollision(collisionVis);
   }
-  return clonePart;
+  return cloneLink;
 }
 
 /////////////////////////////////////////////////
-void PartData::OnAccept()
+void LinkData::OnAccept()
 {
   if (this->Apply())
     this->inspector->accept();
 }
 
 /////////////////////////////////////////////////
-void PartData::OnApply()
+void LinkData::OnApply()
 {
   this->Apply();
 }
 
 /////////////////////////////////////////////////
-bool PartData::Apply()
+bool LinkData::Apply()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
 
-  this->partSDF = msgs::LinkToSDF(*linkConfig->GetData(), this->partSDF);
-  this->partVisual->SetPose(this->GetPose());
+  this->linkSDF = msgs::LinkToSDF(*linkConfig->GetData(), this->linkSDF);
+  this->linkVisual->SetPose(this->GetPose());
 
   std::vector<msgs::Visual *> visualUpdateMsgsTemp;
   std::vector<msgs::Collision *> collisionUpdateMsgsTemp;
@@ -613,13 +613,13 @@ bool PartData::Apply()
 }
 
 /////////////////////////////////////////////////
-void PartData::OnAddVisual(const std::string &_name)
+void LinkData::OnAddVisual(const std::string &_name)
 {
   // add a visual when the user adds a visual via the inspector's visual tab
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
 
   std::ostringstream visualName;
-  visualName << this->partVisual->GetName() << "::" << _name;
+  visualName << this->linkVisual->GetName() << "::" << _name;
 
   rendering::VisualPtr visVisual;
   rendering::VisualPtr refVisual;
@@ -627,7 +627,7 @@ void PartData::OnAddVisual(const std::string &_name)
   {
     // add new visual by cloning last instance
     refVisual = this->visuals.rbegin()->first;
-    visVisual = refVisual->Clone(visualName.str(), this->partVisual);
+    visVisual = refVisual->Clone(visualName.str(), this->linkVisual);
   }
   else
   {
@@ -637,7 +637,7 @@ void PartData::OnAddVisual(const std::string &_name)
         ModelData::GetTemplateSDFString());
 
     visVisual.reset(new rendering::Visual(visualName.str(),
-        this->partVisual));
+        this->linkVisual));
     sdf::ElementPtr visualElem =  modelTemplateSDF->root
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     visVisual->Load(visualElem);
@@ -658,21 +658,21 @@ void PartData::OnAddVisual(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void PartData::OnAddCollision(const std::string &_name)
+void LinkData::OnAddCollision(const std::string &_name)
 {
   // add a collision when the user adds a collision via the inspector's
   // collision tab
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
 
   std::stringstream collisionName;
-  collisionName << this->partVisual->GetName() << "::" << _name;
+  collisionName << this->linkVisual->GetName() << "::" << _name;
 
   rendering::VisualPtr collisionVis;
   if (!this->collisions.empty())
   {
     // add new collision by cloning last instance
     collisionVis = this->collisions.rbegin()->first->Clone(collisionName.str(),
-        this->partVisual);
+        this->linkVisual);
   }
   else
   {
@@ -682,12 +682,12 @@ void PartData::OnAddCollision(const std::string &_name)
         ModelData::GetTemplateSDFString());
 
     collisionVis.reset(new rendering::Visual(collisionName.str(),
-        this->partVisual));
+        this->linkVisual));
     sdf::ElementPtr collisionElem =  modelTemplateSDF->root
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     collisionVis->Load(collisionElem);
     collisionVis->SetMaterial("Gazebo/Orange");
-    this->partVisual->GetScene()->AddVisual(collisionVis);
+    this->linkVisual->GetScene()->AddVisual(collisionVis);
   }
 
   msgs::Visual visualMsg = msgs::VisualFromSDF(collisionVis->GetSDF());
@@ -711,20 +711,20 @@ void PartData::OnAddCollision(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void PartData::OnRemoveVisual(const std::string &_name)
+void LinkData::OnRemoveVisual(const std::string &_name)
 {
   // find and remove visual when the user removes it in the
   // inspector's visual tab
   std::ostringstream name;
-  name << this->partVisual->GetName() << "::" << _name;
+  name << this->linkVisual->GetName() << "::" << _name;
   std::string visualName = name.str();
 
   for (auto it = this->visuals.begin(); it != this->visuals.end(); ++it)
   {
     if (visualName == it->first->GetName())
     {
-      this->partVisual->DetachVisual(it->first);
-      this->partVisual->GetScene()->RemoveVisual(it->first);
+      this->linkVisual->DetachVisual(it->first);
+      this->linkVisual->GetScene()->RemoveVisual(it->first);
       this->visuals.erase(it);
       break;
     }
@@ -732,20 +732,20 @@ void PartData::OnRemoveVisual(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void PartData::OnRemoveCollision(const std::string &_name)
+void LinkData::OnRemoveCollision(const std::string &_name)
 {
   // find and remove collision visual when the user removes it in the
   // inspector's collision tab
   std::ostringstream name;
-  name << this->partVisual->GetName() << "::" << _name;
+  name << this->linkVisual->GetName() << "::" << _name;
   std::string collisionName = name.str();
 
   for (auto it = this->collisions.begin(); it != this->collisions.end(); ++it)
   {
     if (collisionName == it->first->GetName())
     {
-      this->partVisual->DetachVisual(it->first);
-      this->partVisual->GetScene()->RemoveVisual(it->first);
+      this->linkVisual->DetachVisual(it->first);
+      this->linkVisual->GetScene()->RemoveVisual(it->first);
       this->collisions.erase(it);
       break;
     }
@@ -753,7 +753,7 @@ void PartData::OnRemoveCollision(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void PartData::Update()
+void LinkData::Update()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
