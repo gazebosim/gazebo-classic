@@ -37,7 +37,7 @@ namespace gazebo
       public: QDoubleSpinBox *resolutionSpin;
 
       /// \brief Samples spin box.
-      public: QDoubleSpinBox *samplesSpin;
+      public: QSpinBox *samplesSpin;
 
       /// \brief Import image view width.
       public: int imageDisplayWidth;

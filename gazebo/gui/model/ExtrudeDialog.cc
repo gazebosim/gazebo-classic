@@ -33,24 +33,24 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
       "Extrude a 2D polyline into a 3D mesh.<br>"));
 
   // Thickness
-  this->dataPtr->thicknessSpin = new QDoubleSpinBox;
+  this->dataPtr->thicknessSpin = new QDoubleSpinBox();
   this->dataPtr->thicknessSpin->setRange(0.001, 1000);
   this->dataPtr->thicknessSpin->setSingleStep(0.1);
   this->dataPtr->thicknessSpin->setDecimals(4);
   this->dataPtr->thicknessSpin->setValue(1);
 
   // Resolution
-  this->dataPtr->resolutionSpin = new QDoubleSpinBox;
-  this->dataPtr->resolutionSpin->setRange(1, 1000);
+  this->dataPtr->resolutionSpin = new QDoubleSpinBox();
+  this->dataPtr->resolutionSpin->setRange(1, 100000);
   this->dataPtr->resolutionSpin->setSingleStep(10);
   this->dataPtr->resolutionSpin->setDecimals(3);
-  this->dataPtr->resolutionSpin->setValue(300);
+  // 3543.3 px/m == 90 dpi
+  this->dataPtr->resolutionSpin->setValue(3543.3);
 
   // Samples
-  this->dataPtr->samplesSpin = new QDoubleSpinBox;
+  this->dataPtr->samplesSpin = new QSpinBox();
   this->dataPtr->samplesSpin->setRange(2, 100);
   this->dataPtr->samplesSpin->setSingleStep(1);
-  this->dataPtr->samplesSpin->setDecimals(0);
   this->dataPtr->samplesSpin->setValue(5);
   QLabel *samplesTips = new QLabel(tr("<b><font size=4>?</font></b>"));
   samplesTips->setToolTip(
