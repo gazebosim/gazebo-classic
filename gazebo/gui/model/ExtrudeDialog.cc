@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/common/SVGLoader.hh"
+
 #include "gazebo/gui/model/ExtrudeDialogPrivate.hh"
 #include "gazebo/gui/model/ExtrudeDialog.hh"
 
@@ -95,24 +97,75 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
   QGraphicsScene *scene = new QGraphicsScene();
   scene->setBackgroundBrush(Qt::white);
 
-  this->dataPtr->imageDisplayWidth = 300;
-  this->dataPtr->imageDisplayHeight = 300;
+  common::SVGLoader svgLoader(this->GetSamples());
+  std::vector<common::SVGPath> paths;
+  svgLoader.Parse(_filename, paths);
+
+  if (paths.empty())
+  {
+    gzerr << "No paths found on file [" << _filename << "]" << std::endl;
+    return;
+  }
+
+  // Find extreme values to center the polylines
+  math::Vector2d min(paths[0].polylines[0][0]);
+  math::Vector2d max(min);
+  for (common::SVGPath p : paths)
+  {
+    for (std::vector<math::Vector2d> poly : p.polylines)
+    {
+      for (math::Vector2d pt : poly)
+      {
+        if (pt.x < min.x)
+          min.x = pt.x;
+        if (pt.y < min.y)
+          min.y = pt.y;
+        if (pt.x > max.x)
+          max.x = pt.x;
+        if (pt.y > max.y)
+          max.y = pt.y;
+      }
+    }
+  }\
+
+  double svgWidth = 500;
+  double svgHeight = (max.y - min.y) * svgWidth / (max.x - min.x);
+  int margin = 50;
+  this->dataPtr->imageDisplayWidth = svgWidth + 2*margin;
+  this->dataPtr->imageDisplayHeight = svgHeight + 2*margin;
   scene->setSceneRect(0, 0, this->dataPtr->imageDisplayWidth,
                             this->dataPtr->imageDisplayHeight);
 
   this->dataPtr->importImageView->setSizePolicy(QSizePolicy::Expanding,
-                                       QSizePolicy::Expanding);
+      QSizePolicy::Expanding);
   this->dataPtr->importImageView->setScene(scene);
-  this->dataPtr->importImageView->centerOn(QPointF(0, 0));
   this->dataPtr->importImageView->setViewportUpdateMode(
       QGraphicsView::FullViewportUpdate);
   this->dataPtr->importImageView->setDragMode(QGraphicsView::ScrollHandDrag);
 
-  QPixmap *imagePixmap = new QPixmap(QString::fromStdString(_filename));
-  QGraphicsPixmapItem *imageItem = new QGraphicsPixmapItem(
-      imagePixmap->scaled(scene->sceneRect().width(),
-      scene->sceneRect().height(), Qt::KeepAspectRatio));
-  scene->addItem(imageItem);
+  for (common::SVGPath p : paths)
+  {
+    for (std::vector<math::Vector2d> poly : p.polylines)
+    {
+      QVector<QPointF> polygonPts;
+      for (math::Vector2d pt : poly)
+      {
+        pt = pt - min - (max-min)*0.5;
+        pt = math::Vector2d(pt.x * svgWidth/(max.x-min.x), pt.y * svgHeight/(max.y-min.y));
+        polygonPts.push_back(QPointF(pt.x, pt.y));
+        QGraphicsEllipseItem *ptItem = new QGraphicsEllipseItem(
+            this->dataPtr->imageDisplayWidth/2.0 + pt.x - 5/2.0,
+            this->dataPtr->imageDisplayHeight/2.0 + pt.y - 5/2.0, 5, 5);
+        ptItem->setBrush(Qt::red);
+        ptItem->setZValue(5);
+        scene->addItem(ptItem);
+      }
+      QGraphicsPolygonItem *polyItem = new QGraphicsPolygonItem(QPolygonF(polygonPts));
+      polyItem->setPos(this->dataPtr->imageDisplayWidth/2.0, this->dataPtr->imageDisplayHeight/2.0);
+      polyItem->setPen(QPen(Qt::black, 3, Qt::SolidLine));
+      scene->addItem(polyItem);
+    }
+  }
 
   // Main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
