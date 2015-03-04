@@ -76,29 +76,38 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
                                     contactSurfaceLayer));
 
   boost::any value;
-  value = odePhysics->GetParam("solver_type");
-  std::string typeRet = boost::any_cast<std::string>(value);
+  std::string typeRet;
+  EXPECT_TRUE(odePhysics->GetParam("solver_type", typeRet));
   EXPECT_EQ(type, typeRet);
-  value = odePhysics->GetParam("precon_iters");
-  int preconItersRet = boost::any_cast<int>(value);
+  int preconItersRet;
+  EXPECT_TRUE(odePhysics->GetParam("precon_iters", preconItersRet));
   EXPECT_EQ(preconIters, preconItersRet);
-  value = odePhysics->GetParam("iters");
-  int itersRet = boost::any_cast<int>(value);
+  int itersRet;
+  EXPECT_TRUE(odePhysics->GetParam("iters", itersRet));
   EXPECT_EQ(iters, itersRet);
-  value = odePhysics->GetParam("sor");
-  double sorRet = boost::any_cast<double>(value);
+  double sorRet;
+  EXPECT_TRUE(odePhysics->GetParam("sor", sorRet));
   EXPECT_DOUBLE_EQ(sor, sorRet);
-  value = odePhysics->GetParam("cfm");
-  double cfmRet = boost::any_cast<double>(value);
+  //value = odePhysics->GetParam("cfm");
+  //double cfmRet = boost::any_cast<double>(value);
+  double cfmRet;
+  EXPECT_TRUE(odePhysics->GetParam("cfm", cfmRet));
   EXPECT_DOUBLE_EQ(cfm, cfmRet);
-  value = odePhysics->GetParam("erp");
-  double erpRet = boost::any_cast<double>(value);
+  //value = odePhysics->GetParam("erp");
+  //double erpRet = boost::any_cast<double>(value);
+  double erpRet;
+  EXPECT_TRUE(odePhysics->GetParam("erp", erpRet));
   EXPECT_DOUBLE_EQ(erp, erpRet);
-  value = odePhysics->GetParam("contact_max_correcting_vel");
-  double contactMaxCorrectingVelRet = boost::any_cast<double>(value);
+  //value = odePhysics->GetParam("contact_max_correcting_vel");
+  //double contactMaxCorrectingVelRet = boost::any_cast<double>(value);
+  double contactMaxCorrectingVelRet;
+  EXPECT_TRUE(odePhysics->GetParam("contact_max_correcting_vel",
+      contactMaxCorrectingVelRet));
   EXPECT_DOUBLE_EQ(contactMaxCorrectingVel, contactMaxCorrectingVelRet);
-  value = odePhysics->GetParam("contact_surface_layer");
-  double contactSurfaceLayerRet = boost::any_cast<double>(value);
+  //value = odePhysics->GetParam("contact_surface_layer");
+  //double contactSurfaceLayerRet = boost::any_cast<double>(value);
+  double contactSurfaceLayerRet;
+  EXPECT_TRUE(odePhysics->GetParam("contact_surface_layer", contactSurfaceLayerRet));
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
 
   // verify against equivalent functions
@@ -152,11 +161,11 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   value = odePhysics->GetParam("erp");
   erpRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(erp, erpRet);
-  value = odePhysics->GetParam("contact_max_correcting_vel");
-  contactMaxCorrectingVelRet = boost::any_cast<double>(value);
+  EXPECT_TRUE(odePhysics->GetParam("contact_max_correcting_vel", contactMaxCorrectingVelRet));
   EXPECT_DOUBLE_EQ(contactMaxCorrectingVel, contactMaxCorrectingVelRet);
-  value = odePhysics->GetParam("contact_surface_layer");
-  contactSurfaceLayerRet = boost::any_cast<double>(value);
+  //value = odePhysics->GetParam("contact_surface_layer");
+  //contactSurfaceLayerRet = boost::any_cast<double>(value);
+  EXPECT_TRUE(odePhysics->GetParam("contact_surface_layer", contactSurfaceLayer));
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
 
   EXPECT_EQ(type, odePhysics->GetStepType());
