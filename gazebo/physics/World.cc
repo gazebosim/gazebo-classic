@@ -241,21 +241,7 @@ void World::Load(sdf::ElementPtr _sdf)
       "~/light");
 
   // This should come before loading of entities
-  // TODO: search multiple physics blocks for default name
   sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
-  /*if (this->dataPtr->sdf->HasAttribute("default_physics"))
-  {
-    std::string defaultName =
-        this->dataPtr->sdf->GetAttribute("default_physics")->GetAsString();
-    while (physicsElem)
-    {
-      if (physicsElem->GetAttribute("name")->GetAsString() == defaultName)
-      {
-        break;
-      }
-      physicsElem = physicsElem->GetNextElement("physics");
-    }
-  }*/
 
   std::string type = physicsElem->Get<std::string>("type");
   this->dataPtr->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
