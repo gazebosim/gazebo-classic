@@ -13,7 +13,7 @@
 1. **gazebo/physics/PolylineShape.hh**
     + ***Removed:*** public: std::vector<math::Vector2d> GetVertices() const
     + ***Replacement:*** public: std::vector<std::vector<math::Vector2d> > GetVertices() const
-    
+
 ### Deletions
 
 1. **gazebo/gui/RenderWidget.hh**
@@ -79,6 +79,7 @@ Gazebo 5.x uses features from the new c++11 standard. This requires to have a co
     + ***Removed:*** public: void ShowRotation()
     + ***Replacement:*** public: void ShowRotation(bool _show)
 
+### Deletions
 
 1. **gazebo/physics/Collision.hh**
     + unsigned int GetShapeType()
