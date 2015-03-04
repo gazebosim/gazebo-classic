@@ -22,7 +22,6 @@
 #include <map>
 #include <vector>
 
-//#include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 
 // TODO: check for non-physics element in Preset::SDF (set)
