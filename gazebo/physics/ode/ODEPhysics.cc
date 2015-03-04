@@ -823,9 +823,9 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactGeom *_contactCollisions)
 {
   // Filter collisions based on collide bitmask.
-  if ((_collision1->GetSurface()->collideBitmask &
-        _collision2->GetSurface()->collideBitmask) == 0)
-    return;
+  // if ((_collision1->GetSurface()->collideBitmask &
+  //      _collision2->GetSurface()->collideBitmask) == 0)
+  //  return;
 
   // Filter collisions based on contact bitmask if collide_without_contact is
   // on.The bitmask is set mainly for speed improvements otherwise a collision
