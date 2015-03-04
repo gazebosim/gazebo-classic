@@ -864,6 +864,7 @@ void Model::FillMsg(msgs::Model &_msg)
 {
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
+  _msg.set_self_collide(this->GetSelfCollide());
   msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
   _msg.set_id(this->GetId());
   msgs::Set(_msg.mutable_scale(), this->scale);
