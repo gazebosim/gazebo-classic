@@ -15,14 +15,15 @@
  *
 */
 
-#ifndef _PRESETMANAGER_HH_
-#define _PRESETMANAGER_HH_
+#ifndef _GAZEBO_PHYSICS_PRESETMANAGER_HH_
+#define _GAZEBO_PHYSICS_PRESETMANAGER_HH_
 
 #include <string>
 #include <map>
 #include <vector>
 
-#include "gazebo/physics/PhysicsEngine.hh"
+//#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 
 // TODO: check for non-physics element in Preset::SDF (set)
 namespace gazebo

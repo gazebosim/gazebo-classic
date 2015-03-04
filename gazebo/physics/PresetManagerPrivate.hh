@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _PRESETMANAGER_PRIVATE_HH_
-#define _PRESETMANAGER_PRIVATE_HH_
+#ifndef _GAZEBO_PHYSICS_PRESETMANAGER_PRIVATE_HH_
+#define _GAZEBO_PHYSICS_PRESETMANAGER_PRIVATE_HH_
 
 #include <map>
 #include <string>
