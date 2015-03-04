@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_EXTRUDE_DIALOG_HH_
 #define _GAZEBO_EXTRUDE_DIALOG_HH_
 
+#include <string>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -43,13 +45,13 @@ namespace gazebo
       /// \brief Destructor.
       public: ~ExtrudeDialog();
 
-      /// \brief TODO.
+      /// \brief Get the thickness value.
       public: double GetThickness() const;
 
-      /// \brief TODO.
+      /// \brief Get the number of samples per segment.
       public: unsigned int GetSamples() const;
 
-      /// \brief TODO.
+      /// \brief Get the resolution in px/m.
       public: unsigned int GetResolution() const;
 
       /// \brief Qt callback when the dialog is accepted.

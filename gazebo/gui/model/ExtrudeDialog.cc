@@ -36,7 +36,7 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
   this->dataPtr->thicknessSpin = new QDoubleSpinBox();
   this->dataPtr->thicknessSpin->setRange(0.001, 1000);
   this->dataPtr->thicknessSpin->setSingleStep(0.1);
-  this->dataPtr->thicknessSpin->setDecimals(4);
+  this->dataPtr->thicknessSpin->setDecimals(3);
   this->dataPtr->thicknessSpin->setValue(1);
 
   // Resolution
@@ -138,6 +138,7 @@ void ExtrudeDialog::OnAccept()
 /////////////////////////////////////////////////
 void ExtrudeDialog::OnReject()
 {
+  // back to import
   this->reject();
 }
 

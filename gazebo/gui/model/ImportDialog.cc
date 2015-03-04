@@ -24,14 +24,15 @@ using namespace gui;
 ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("ImportDialog");
-  this->setWindowTitle("Custom Link");
+  this->setWindowTitle("Import Link");
 
   this->messageLabel = new QLabel;
   this->messageLabel->setText(
-      tr("You can import a 3D mesh that you have \n"
-      "made with a modelling tool such as Blender, \n"
-      "Maya or SolidWorks. It will appear as a \n"
-      "link in the 3D View."));
+      tr("You can import a 3D mesh (.dae, .stl) \n"
+      "that you have made with a modelling tool \n"
+      "such as Blender, Maya or SolidWorks.\n\n"
+      "You can also extrude a 2D image (.svg) to \n"
+      "create a 3D mesh."));
 
   this->pathLineEdit = new QLineEdit;
   this->pathLineEdit->setText(QDir::homePath());
