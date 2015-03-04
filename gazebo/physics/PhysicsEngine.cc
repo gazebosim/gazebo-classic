@@ -230,7 +230,46 @@ boost::any PhysicsEngine::GetParam(const std::string &/*_key*/) const
 }
 
 //////////////////////////////////////////////////
+bool PhysicsEngine::GetParam(const std::string &/*_key*/,
+    boost::any &/*_value*/) const
+{
+  return true;
+}
+
+//////////////////////////////////////////////////
+template <typename Type> bool PhysicsEngine::GetParam(const std::string &_key,
+    Type &_value) const
+{
+  boost::any value;
+  if (!this->GetParam(_key, value))
+    return false;
+  try
+  {
+    _value = boost::any_cast<Type>(value);
+  }
+  catch(boost::bad_any_cast &_e)
+  {
+    gzwarn << "Failed boost::any_cast in GetParam: " << _e.what() << std::endl;
+    return false;
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
 ContactManager *PhysicsEngine::GetContactManager() const
 {
   return this->contactManager;
 }
+
+//////////////////////////////////////////////////
+// Template declarations
+template bool PhysicsEngine::GetParam<double>(const std::string &_key,
+    double &_value) const;
+template bool PhysicsEngine::GetParam<int>(const std::string &_key,
+    int &_value) const;
+template bool PhysicsEngine::GetParam<std::string>(const std::string &_key,
+    std::string &_value) const;
+template bool PhysicsEngine::GetParam<math::Vector3>(const std::string &_key,
+    math::Vector3 &_value) const;
+template bool PhysicsEngine::GetParam<bool>(const std::string &_key,
+    bool &_value) const;

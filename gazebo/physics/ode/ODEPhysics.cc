@@ -1277,93 +1277,74 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 //////////////////////////////////////////////////
 boost::any ODEPhysics::GetParam(const std::string &_key) const
 {
-  sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
-  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
-
-  if (_key == "solver_type")
-  {
-    return odeElem->GetElement("solver")->Get<std::string>("type");
-  }
-  else if (_key == "cfm")
-  {
-    return odeElem->GetElement("constraints")->Get<double>("cfm");
-  }
-  else if (_key == "erp")
-    return odeElem->GetElement("constraints")->Get<double>("erp");
-  else if (_key == "precon_iters")
-    return odeElem->GetElement("solver")->Get<int>("precon_iters");
-  else if (_key == "iters")
-    return odeElem->GetElement("solver")->Get<int>("iters");
-  else if (_key == "sor")
-    return odeElem->GetElement("solver")->Get<double>("sor");
-  else if (_key == "contact_max_correcting_vel")
-    return odeElem->GetElement("constraints")->Get<double>(
-        "contact_max_correcting_vel");
-  else if (_key == "contact_surface_layer")
-    return odeElem->GetElement("constraints")->Get<double>(
-        "contact_surface_layer");
-  else if (_key == "max_contacts")
-    return this->sdf->Get<int>("max_contacts");
-  else if (_key == "min_step_size")
-    return odeElem->GetElement("solver")->Get<double>("min_step_size");
-  else if (_key == "max_step_size")
-    return this->GetMaxStepSize();
-  else if (_key == "sor_lcp_tolerance")
-    return dWorldGetQuickStepTolerance(this->dataPtr->worldId);
-  else if (_key == "rms_error_tolerance")
-  {
-    gzwarn << "please use sor_lcp_tolerance in the future.\n";
-    return dWorldGetQuickStepTolerance(this->dataPtr->worldId);
-  }
-  else if (_key == "rms_error")
-    return dWorldGetQuickStepRMSDeltaLambda(this->dataPtr->worldId);
-  else if (_key == "constraint_residual")
-    return dWorldGetQuickStepRMSConstraintResidual(this->dataPtr->worldId);
-  else if (_key == "num_contacts")
-    return dWorldGetQuickStepNumContacts(this->dataPtr->worldId);
-  else if (_key == "inertia_ratio_reduction")
-    return dWorldGetQuickStepInertiaRatioReduction(this->dataPtr->worldId);
-  else if (_key == "contact_residual_smoothing")
-    return dWorldGetQuickStepContactResidualSmoothing (this->dataPtr->worldId);
-  else if (_key == "experimental_row_reordering")
-    return dWorldGetQuickStepExperimentalRowReordering (this->dataPtr->worldId);
-  else if (_key == "warm_start_factor")
-    return dWorldGetQuickStepWarmStartFactor (this->dataPtr->worldId);
-  else if (_key == "extra_friction_iterations")
-    return dWorldGetQuickStepExtraFrictionIterations (this->dataPtr->worldId);
-  else
-  {
-    gzwarn << _key << " is not supported in ode" << std::endl;
-    return "PHYSICS_ENGINE_ERROR_STRING";
-  }
+  boost::any value;
+  this->GetParam(_key, value);
+  return value;
 }
 
 //////////////////////////////////////////////////
 bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
 {
-  _value = this->GetParam(_key);
-  if (_value.type() == typeid(std::string))
-  {
-    if (boost::any_cast<std::string>(_value) == "PHYSICS_ENGINE_ERROR_STRING")
-      return false;
-  }
-  return true;
-}
+  sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
+  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
 
-//////////////////////////////////////////////////
-template <typename Type> bool ODEPhysics::GetParam(const std::string &_key,
-    Type &_value) const
-{
-  boost::any value;
-  if (!this->GetParam(_key, value))
-    return false;
-  try
+  if (_key == "solver_type")
   {
-    _value = boost::any_cast<Type>(value);
+    _value = odeElem->GetElement("solver")->Get<std::string>("type");
   }
-  catch(boost::bad_any_cast &_e)
+  else if (_key == "cfm")
   {
-    gzwarn << "Failed boost::any_cast in GetParam: " << _e.what() << std::endl;
+    _value = odeElem->GetElement("constraints")->Get<double>("cfm");
+  }
+  else if (_key == "erp")
+    _value = odeElem->GetElement("constraints")->Get<double>("erp");
+  else if (_key == "precon_iters")
+    _value = odeElem->GetElement("solver")->Get<int>("precon_iters");
+  else if (_key == "iters")
+    _value = odeElem->GetElement("solver")->Get<int>("iters");
+  else if (_key == "sor")
+    _value = odeElem->GetElement("solver")->Get<double>("sor");
+  else if (_key == "contact_max_correcting_vel")
+    _value = odeElem->GetElement("constraints")->Get<double>(
+        "contact_max_correcting_vel");
+  else if (_key == "contact_surface_layer")
+    _value = odeElem->GetElement("constraints")->Get<double>(
+        "contact_surface_layer");
+  else if (_key == "max_contacts")
+    _value = this->sdf->Get<int>("max_contacts");
+  else if (_key == "min_step_size")
+    _value = odeElem->GetElement("solver")->Get<double>("min_step_size");
+  else if (_key == "max_step_size")
+    _value = this->GetMaxStepSize();
+  else if (_key == "sor_lcp_tolerance")
+    _value = dWorldGetQuickStepTolerance(this->dataPtr->worldId);
+  else if (_key == "rms_error_tolerance")
+  {
+    gzwarn << "please use sor_lcp_tolerance in the future.\n";
+    _value = dWorldGetQuickStepTolerance(this->dataPtr->worldId);
+  }
+  else if (_key == "rms_error")
+    _value = dWorldGetQuickStepRMSDeltaLambda(this->dataPtr->worldId);
+  else if (_key == "constraint_residual")
+    _value = dWorldGetQuickStepRMSConstraintResidual(this->dataPtr->worldId);
+  else if (_key == "num_contacts")
+    _value = dWorldGetQuickStepNumContacts(this->dataPtr->worldId);
+  else if (_key == "inertia_ratio_reduction")
+    _value = dWorldGetQuickStepInertiaRatioReduction(this->dataPtr->worldId);
+  else if (_key == "contact_residual_smoothing")
+    _value = dWorldGetQuickStepContactResidualSmoothing(this->dataPtr->worldId);
+  else if (_key == "experimental_row_reordering")
+  {
+    _value = dWorldGetQuickStepExperimentalRowReordering
+        (this->dataPtr->worldId);
+  }
+  else if (_key == "warm_start_factor")
+    _value = dWorldGetQuickStepWarmStartFactor (this->dataPtr->worldId);
+  else if (_key == "extra_friction_iterations")
+    _value = dWorldGetQuickStepExtraFrictionIterations (this->dataPtr->worldId);
+  else
+  {
+    gzwarn << _key << " is not supported in ode" << std::endl;
     return false;
   }
   return true;
