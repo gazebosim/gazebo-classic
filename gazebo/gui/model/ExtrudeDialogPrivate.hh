@@ -27,8 +27,8 @@ namespace gazebo
     /// \brief Private data for the ExtrudeDialog class
     class ExtrudeDialogPrivate
     {
-      /// \brief Unit combo box.
-      public: QComboBox *unitCombo;
+      /// \brief TODO.
+      public: std::string filename;
 
       /// \brief Thickness spin box.
       public: QDoubleSpinBox *thicknessSpin;

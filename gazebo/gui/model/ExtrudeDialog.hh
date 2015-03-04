@@ -45,6 +45,9 @@ namespace gazebo
       /// \brief Destructor.
       public: ~ExtrudeDialog();
 
+      /// \brief TODO.
+      public: bool UpdateView();
+
       /// \brief Get the thickness value.
       public: double GetThickness() const;
 
@@ -59,6 +62,9 @@ namespace gazebo
 
       /// \brief Qt callback when the dialog is rejected.
       private slots: void OnReject();
+
+      /// \brief TODO.
+      private slots: void OnUpdateView(int _value);
 
       /// \internal
       /// \brief Pointer to private data.

@@ -57,6 +57,8 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
   QLabel *samplesTips = new QLabel(tr("<b><font size=4>?</font></b>"));
   samplesTips->setToolTip(
       "Number of points to divide each curve segment into.");
+  connect(this->dataPtr->samplesSpin, SIGNAL(valueChanged(int)),
+      this, SLOT(OnUpdateView(int)));
 
   QGridLayout *inputsLayout = new QGridLayout();
   inputsLayout->addWidget(new QLabel("Thickness:"), 0, 0);
@@ -93,49 +95,11 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
   leftColumnLayout->addLayout(buttonsLayout);
 
   // Image view
+  this->dataPtr->filename = _filename;
+
   this->dataPtr->importImageView = new QGraphicsView(this);
   QGraphicsScene *scene = new QGraphicsScene();
   scene->setBackgroundBrush(Qt::white);
-
-  common::SVGLoader svgLoader(this->GetSamples());
-  std::vector<common::SVGPath> paths;
-  svgLoader.Parse(_filename, paths);
-
-  if (paths.empty())
-  {
-    gzerr << "No paths found on file [" << _filename << "]" << std::endl;
-    return;
-  }
-
-  // Find extreme values to center the polylines
-  math::Vector2d min(paths[0].polylines[0][0]);
-  math::Vector2d max(min);
-  for (common::SVGPath p : paths)
-  {
-    for (std::vector<math::Vector2d> poly : p.polylines)
-    {
-      for (math::Vector2d pt : poly)
-      {
-        if (pt.x < min.x)
-          min.x = pt.x;
-        if (pt.y < min.y)
-          min.y = pt.y;
-        if (pt.x > max.x)
-          max.x = pt.x;
-        if (pt.y > max.y)
-          max.y = pt.y;
-      }
-    }
-  }\
-
-  double svgWidth = 500;
-  double svgHeight = (max.y - min.y) * svgWidth / (max.x - min.x);
-  int margin = 50;
-  this->dataPtr->imageDisplayWidth = svgWidth + 2*margin;
-  this->dataPtr->imageDisplayHeight = svgHeight + 2*margin;
-  scene->setSceneRect(0, 0, this->dataPtr->imageDisplayWidth,
-                            this->dataPtr->imageDisplayHeight);
-
   this->dataPtr->importImageView->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Expanding);
   this->dataPtr->importImageView->setScene(scene);
@@ -143,28 +107,9 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
       QGraphicsView::FullViewportUpdate);
   this->dataPtr->importImageView->setDragMode(QGraphicsView::ScrollHandDrag);
 
-  for (common::SVGPath p : paths)
+  if (!this->UpdateView())
   {
-    for (std::vector<math::Vector2d> poly : p.polylines)
-    {
-      QVector<QPointF> polygonPts;
-      for (math::Vector2d pt : poly)
-      {
-        pt = pt - min - (max-min)*0.5;
-        pt = math::Vector2d(pt.x * svgWidth/(max.x-min.x), pt.y * svgHeight/(max.y-min.y));
-        polygonPts.push_back(QPointF(pt.x, pt.y));
-        QGraphicsEllipseItem *ptItem = new QGraphicsEllipseItem(
-            this->dataPtr->imageDisplayWidth/2.0 + pt.x - 5/2.0,
-            this->dataPtr->imageDisplayHeight/2.0 + pt.y - 5/2.0, 5, 5);
-        ptItem->setBrush(Qt::red);
-        ptItem->setZValue(5);
-        scene->addItem(ptItem);
-      }
-      QGraphicsPolygonItem *polyItem = new QGraphicsPolygonItem(QPolygonF(polygonPts));
-      polyItem->setPos(this->dataPtr->imageDisplayWidth/2.0, this->dataPtr->imageDisplayHeight/2.0);
-      polyItem->setPen(QPen(Qt::black, 3, Qt::SolidLine));
-      scene->addItem(polyItem);
-    }
+    // Close this somehow
   }
 
   // Main layout
@@ -211,4 +156,85 @@ unsigned int ExtrudeDialog::GetSamples() const
 unsigned int ExtrudeDialog::GetResolution() const
 {
   return this->dataPtr->resolutionSpin->value();
+}
+
+/////////////////////////////////////////////////
+void ExtrudeDialog::OnUpdateView(int /*_value*/)
+{
+  this->UpdateView();
+}
+
+/////////////////////////////////////////////////
+bool ExtrudeDialog::UpdateView()
+{
+  QGraphicsScene *scene = this->dataPtr->importImageView->scene();
+  scene->clear();
+
+  common::SVGLoader svgLoader(this->GetSamples());
+  std::vector<common::SVGPath> paths;
+  svgLoader.Parse(this->dataPtr->filename, paths);
+
+  if (paths.empty())
+  {
+    std::string msg = "No paths found on file " + this->dataPtr->filename +
+        "\nPlease select another file.";
+    QMessageBox::warning(this, QString("Invalid File"),
+        QString(msg.c_str()), QMessageBox::Ok,
+        QMessageBox::Ok);
+    return false;
+  }
+
+  // Find extreme values to center the polylines
+  math::Vector2d min(paths[0].polylines[0][0]);
+  math::Vector2d max(min);
+  for (common::SVGPath p : paths)
+  {
+    for (std::vector<math::Vector2d> poly : p.polylines)
+    {
+      for (math::Vector2d pt : poly)
+      {
+        if (pt.x < min.x)
+          min.x = pt.x;
+        if (pt.y < min.y)
+          min.y = pt.y;
+        if (pt.x > max.x)
+          max.x = pt.x;
+        if (pt.y > max.y)
+          max.y = pt.y;
+      }
+    }
+  }\
+
+  double svgWidth = 500;
+  double svgHeight = (max.y - min.y) * svgWidth / (max.x - min.x);
+  int margin = 50;
+  this->dataPtr->imageDisplayWidth = svgWidth + 2*margin;
+  this->dataPtr->imageDisplayHeight = svgHeight + 2*margin;
+  scene->setSceneRect(0, 0, this->dataPtr->imageDisplayWidth,
+                            this->dataPtr->imageDisplayHeight);
+
+  for (common::SVGPath p : paths)
+  {
+    for (std::vector<math::Vector2d> poly : p.polylines)
+    {
+      QVector<QPointF> polygonPts;
+      for (math::Vector2d pt : poly)
+      {
+        pt = pt - min - (max-min)*0.5;
+        pt = math::Vector2d(pt.x * svgWidth/(max.x-min.x), pt.y * svgHeight/(max.y-min.y));
+        polygonPts.push_back(QPointF(pt.x, pt.y));
+        QGraphicsEllipseItem *ptItem = new QGraphicsEllipseItem(
+            this->dataPtr->imageDisplayWidth/2.0 + pt.x - 5/2.0,
+            this->dataPtr->imageDisplayHeight/2.0 + pt.y - 5/2.0, 5, 5);
+        ptItem->setBrush(Qt::red);
+        ptItem->setZValue(5);
+        scene->addItem(ptItem);
+      }
+      QGraphicsPolygonItem *polyItem = new QGraphicsPolygonItem(QPolygonF(polygonPts));
+      polyItem->setPos(this->dataPtr->imageDisplayWidth/2.0, this->dataPtr->imageDisplayHeight/2.0);
+      polyItem->setPen(QPen(Qt::black, 3, Qt::SolidLine));
+      scene->addItem(polyItem);
+    }
+  }
+  return true;
 }
