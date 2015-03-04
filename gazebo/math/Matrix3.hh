@@ -76,6 +76,10 @@ namespace gazebo
       /// \param[in] _v The value to set in each row of the column
       public: void SetCol(unsigned int _c, const Vector3 &_v);
 
+      /// \brief Return the inverse matrix
+      /// \return Inverse of this matrix.
+      public: Matrix3 Inverse() const;
+
       /// \brief returns the element wise difference of two matrices
       public: Matrix3 operator-(const Matrix3 &_m) const
       {
