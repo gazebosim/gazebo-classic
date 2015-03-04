@@ -170,14 +170,14 @@ namespace gazebo
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _vel Max correcting velocity.
       public: virtual void SetContactMaxCorrectingVel(double /*_vel*/)
-                  GAZEBO_DEPRECATED(6.0){}
+                  GAZEBO_DEPRECATED(6.0) {}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _layerDepth Surface layer depth
       public: virtual void SetContactSurfaceLayer(double /*_layerDepth*/)
-                  GAZEBO_DEPRECATED(6.0){}
+                  GAZEBO_DEPRECATED(6.0) {}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
