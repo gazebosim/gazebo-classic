@@ -32,10 +32,6 @@ class PhysicsCollisionTest : public ServerFixture,
   /// \brief Test Collision::GetBoundingBox.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void GetBoundingBox(const std::string &_physicsEngine);
-
-  /// \brief Test self_collide property of Model.
-  /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void ModelSelfCollide(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
@@ -69,11 +65,10 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
-void PhysicsCollisionTest::ModelSelfCollide(const std::string &_physicsEngine)
+TEST_F(PhysicsCollisionTest, ModelSelfCollide)
 {
-  if (_physicsEngine == "bullet" || _physicsEngine == "simbody")
-    return;
-  Load("worlds/model_self_collide.world", true, _physicsEngine);
+  // self_collide is only implemented in ODE
+  Load("worlds/model_self_collide.world", true, "ode");
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -81,7 +76,6 @@ void PhysicsCollisionTest::ModelSelfCollide(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
 
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
   // Assume gravity vector points down z axis only.
   EXPECT_EQ(g.x, 0);
@@ -138,13 +132,6 @@ TEST_P(PhysicsCollisionTest, GetBoundingBox)
 {
   GetBoundingBox(GetParam());
 }
-
-/////////////////////////////////////////////////
-TEST_P(PhysicsCollisionTest, ModelSelfCollide)
-{
-  ModelSelfCollide(GetParam());
-}
-
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsCollisionTest,
                         PHYSICS_ENGINE_VALUES);
