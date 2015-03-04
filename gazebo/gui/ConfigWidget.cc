@@ -694,8 +694,13 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
             {
               const google::protobuf::FieldDescriptor *valueField =
                   valueDescriptor->field(j);
-              values.push_back(
-                  valueMsg->GetReflection()->GetFloat(*valueMsg, valueField));
+              if (valueMsg->GetReflection()->HasField(*valueMsg, valueField))
+              {
+                values.push_back(valueMsg->GetReflection()->GetFloat(
+                    *valueMsg, valueField));
+              }
+              else
+                values.push_back(0);
             }
             color.r = values[0];
             color.g = values[1];
@@ -825,7 +830,7 @@ ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key)
   QLabel *keyLabel = new QLabel(tr(_key.c_str()));
   widgetLayout->addWidget(keyLabel);
   QSpinBox *valueSpinBox = new QSpinBox;
-  valueSpinBox->setRange(0, 1e6);
+  valueSpinBox->setRange(0, 1e8);
   valueSpinBox->setAlignment(Qt::AlignRight);
   widgetLayout->addWidget(valueSpinBox);
   ConfigChildWidget *widget = new ConfigChildWidget();
@@ -842,7 +847,7 @@ ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key)
   QLabel *keyLabel = new QLabel(tr(_key.c_str()));
   widgetLayout->addWidget(keyLabel);
   QSpinBox *valueSpinBox = new QSpinBox;
-  valueSpinBox->setRange(-1e6, 1e6);
+  valueSpinBox->setRange(-1e8, 1e8);
   valueSpinBox->setAlignment(Qt::AlignRight);
   widgetLayout->addWidget(valueSpinBox);
   ConfigChildWidget *widget = new ConfigChildWidget();
@@ -859,7 +864,9 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key)
   QLabel *keyLabel = new QLabel(tr(_key.c_str()));
   widgetLayout->addWidget(keyLabel);
   QDoubleSpinBox *valueSpinBox = new QDoubleSpinBox;
-  valueSpinBox->setRange(-1e6, 1e6);
+  valueSpinBox->setRange(-1e12, 1e12);
+  valueSpinBox->setSingleStep(0.01);
+  valueSpinBox->setDecimals(6);
   valueSpinBox->setAlignment(Qt::AlignRight);
   widgetLayout->addWidget(valueSpinBox);
   ConfigChildWidget *widget = new ConfigChildWidget();
@@ -922,21 +929,21 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   QLabel *vecZLabel = new QLabel(tr("z"));
 
   QDoubleSpinBox *vecXSpinBox = new QDoubleSpinBox;
-  vecXSpinBox->setRange(-1e6, 1e6);
+  vecXSpinBox->setRange(-1e12, 1e12);
   vecXSpinBox->setSingleStep(0.01);
   vecXSpinBox->setDecimals(6);
   vecXSpinBox->setAlignment(Qt::AlignRight);
   vecXSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   QDoubleSpinBox *vecYSpinBox = new QDoubleSpinBox;
-  vecYSpinBox->setRange(-1e6, 1e6);
+  vecYSpinBox->setRange(-1e12, 1e12);
   vecYSpinBox->setSingleStep(0.01);
   vecYSpinBox->setDecimals(6);
   vecYSpinBox->setAlignment(Qt::AlignRight);
   vecYSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   QDoubleSpinBox *vecZSpinBox = new QDoubleSpinBox;
-  vecZSpinBox->setRange(-1e6, 1e6);
+  vecZSpinBox->setRange(-1e12, 1e12);
   vecZSpinBox->setSingleStep(0.01);
   vecZSpinBox->setDecimals(6);
   vecZSpinBox->setAlignment(Qt::AlignRight);
@@ -1029,37 +1036,37 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/)
   QLabel *rotYLabel = new QLabel(tr("yaw"));
 
   QDoubleSpinBox *posXSpinBox = new QDoubleSpinBox;
-  posXSpinBox->setRange(-1e6, 1e6);
+  posXSpinBox->setRange(-1e12, 1e12);
   posXSpinBox->setSingleStep(0.01);
   posXSpinBox->setDecimals(6);
   posXSpinBox->setAlignment(Qt::AlignRight);
 
   QDoubleSpinBox *posYSpinBox = new QDoubleSpinBox;
-  posYSpinBox->setRange(-1e6, 1e6);
+  posYSpinBox->setRange(-1e12, 1e12);
   posYSpinBox->setSingleStep(0.01);
   posYSpinBox->setDecimals(6);
   posYSpinBox->setAlignment(Qt::AlignRight);
 
   QDoubleSpinBox *posZSpinBox = new QDoubleSpinBox;
-  posZSpinBox->setRange(-1e6, 1e6);
+  posZSpinBox->setRange(-1e12, 1e12);
   posZSpinBox->setSingleStep(0.01);
   posZSpinBox->setDecimals(6);
   posZSpinBox->setAlignment(Qt::AlignRight);
 
   QDoubleSpinBox *rotRSpinBox = new QDoubleSpinBox;
-  rotRSpinBox->setRange(-1e6, 1e6);
+  rotRSpinBox->setRange(-1e12, 1e12);
   rotRSpinBox->setSingleStep(0.01);
   rotRSpinBox->setDecimals(6);
   rotRSpinBox->setAlignment(Qt::AlignRight);
 
   QDoubleSpinBox *rotPSpinBox = new QDoubleSpinBox;
-  rotPSpinBox->setRange(-1e6, 1e6);
+  rotPSpinBox->setRange(-1e12, 1e12);
   rotPSpinBox->setSingleStep(0.01);
   rotPSpinBox->setDecimals(6);
   rotPSpinBox->setAlignment(Qt::AlignRight);
 
   QDoubleSpinBox *rotYSpinBox = new QDoubleSpinBox;
-  rotYSpinBox->setRange(-1e6, 1e6);
+  rotYSpinBox->setRange(-1e12, 1e12);
   rotYSpinBox->setSingleStep(0.01);
   rotYSpinBox->setDecimals(6);
   rotYSpinBox->setAlignment(Qt::AlignRight);
@@ -1145,10 +1152,13 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   QLineEdit *geomFilenameLineEdit = new QLineEdit;
   geomFilenameLineEdit->setSizePolicy(QSizePolicy::Minimum,
       QSizePolicy::Fixed);
+  QPushButton *geomFilenameButton = new QPushButton(tr("..."));
+  geomFilenameButton->setMaximumWidth(30);
 
   QHBoxLayout *geomFilenameLayout = new QHBoxLayout;
   geomFilenameLayout->addWidget(geomFilenameLabel);
   geomFilenameLayout->addWidget(geomFilenameLineEdit);
+  geomFilenameLayout->addWidget(geomFilenameButton);
 
   QVBoxLayout *geomSizeFilenameLayout = new QVBoxLayout;
   geomSizeFilenameLayout->addLayout(geomSizeLayout);
@@ -1199,13 +1209,15 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   widget->geomLengthLabel = geomLengthLabel;
   widget->geomFilenameLabel = geomFilenameLabel;
   widget->geomFilenameLineEdit = geomFilenameLineEdit;
+  widget->geomFilenameButton = geomFilenameButton;
 
   geomFilenameLabel->setVisible(false);
   geomFilenameLineEdit->setVisible(false);
+  geomFilenameButton->setVisible(false);
 
-  connect(geometryComboBox,
-    SIGNAL(currentIndexChanged(const QString)),
-    widget, SLOT(GeometryChanged(const QString)));
+  connect(geometryComboBox, SIGNAL(currentIndexChanged(const QString)),
+      widget, SLOT(GeometryChanged(const QString)));
+  connect(geomFilenameButton, SIGNAL(clicked()), widget, SLOT(OnSelectFile()));
 
   widgetLayout->setContentsMargins(0, 0, 0, 0);
   widget->setLayout(widgetLayout);
@@ -1217,6 +1229,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   widget->widgets.push_back(geomRadiusSpinBox);
   widget->widgets.push_back(geomLengthSpinBox);
   widget->widgets.push_back(geomFilenameLineEdit);
+  widget->widgets.push_back(geomFilenameButton);
 
   return widget;
 }
@@ -1370,8 +1383,8 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
               if (geomType == "mesh")
               {
-                 std::string uri = qobject_cast<QLineEdit *>(
-                      childWidget->widgets[6])->text().toStdString();
+                std::string uri = qobject_cast<QLineEdit *>(
+                     childWidget->widgets[6])->text().toStdString();
                 const google::protobuf::FieldDescriptor *uriFieldDescriptor =
                     geomValueMsg->GetDescriptor()->field(0);
                 geomValueMsg->GetReflection()->SetString(geomValueMsg,
@@ -1685,7 +1698,7 @@ void ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
     const std::string &_value, const math::Vector3 &_dimensions,
     const std::string &_uri)
 {
-  if (_widget->widgets.size() != 7u)
+  if (_widget->widgets.size() != 8u)
   {
     gzerr << "Error updating Geometry Config widget " << std::endl;
     return;
@@ -1871,7 +1884,7 @@ std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
     math::Vector3 &_dimensions, std::string &_uri) const
 {
   std::string value;
-  if (_widget->widgets.size() != 7u)
+  if (_widget->widgets.size() != 8u)
   {
     gzerr << "Error getting value from Geometry Config widget " << std::endl;
     return value;
@@ -1995,5 +2008,31 @@ void GeometryConfigWidget::GeometryChanged(const QString _text)
 
     this->geomFilenameLabel->setVisible(isMesh);
     this->geomFilenameLineEdit->setVisible(isMesh);
+    this->geomFilenameButton->setVisible(isMesh);
+  }
+}
+
+/////////////////////////////////////////////////
+void GeometryConfigWidget::OnSelectFile()
+{
+  QWidget *widget= qobject_cast<QWidget *>(QObject::sender());
+
+  if (widget)
+  {
+    QFileDialog fd(this, tr("Select mesh file"), QDir::homePath(),
+      tr("Mesh files (*.dae *.stl)"));
+    fd.setFilter(QDir::AllDirs | QDir::Hidden);
+    fd.setFileMode(QFileDialog::ExistingFile);
+    if (fd.exec())
+    {
+      if (!fd.selectedFiles().isEmpty())
+      {
+        QString file = fd.selectedFiles().at(0);
+        if (!file.isEmpty())
+        {
+          dynamic_cast<QLineEdit *>(this->geomFilenameLineEdit)->setText(file);
+        }
+      }
+    }
   }
 }

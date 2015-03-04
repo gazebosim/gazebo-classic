@@ -57,49 +57,77 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolLayout->setContentsMargins(0, 0, 0, 0);
 
   QActionGroup *actionGroup = new QActionGroup(toolFrame);
-  actionGroup->addAction(g_arrowAct);
-  actionGroup->addAction(g_translateAct);
-  actionGroup->addAction(g_rotateAct);
-  actionGroup->addAction(g_scaleAct);
-  actionGroup->addAction(g_snapAct);
-
-  this->toolbar->addAction(g_arrowAct);
-  this->toolbar->addAction(g_translateAct);
-  this->toolbar->addAction(g_rotateAct);
-  this->toolbar->addAction(g_scaleAct);
-
-  this->toolbar->addSeparator();
-  this->toolbar->addAction(g_boxCreateAct);
-  this->toolbar->addAction(g_sphereCreateAct);
-  this->toolbar->addAction(g_cylinderCreateAct);
-  this->toolbar->addSeparator();
-  this->toolbar->addAction(g_pointLghtCreateAct);
-  this->toolbar->addAction(g_spotLghtCreateAct);
-  this->toolbar->addAction(g_dirLghtCreateAct);
-  this->toolbar->addSeparator();
-  this->toolbar->addAction(g_screenshotAct);
-
-  this->toolbar->addSeparator();
-  this->toolbar->addAction(g_copyAct);
-  this->toolbar->addAction(g_pasteAct);
+  if (g_arrowAct)
+  {
+    actionGroup->addAction(g_arrowAct);
+    this->toolbar->addAction(g_arrowAct);
+  }
+  if (g_translateAct)
+  {
+    actionGroup->addAction(g_translateAct);
+    this->toolbar->addAction(g_translateAct);
+  }
+  if (g_rotateAct)
+  {
+    actionGroup->addAction(g_rotateAct);
+    this->toolbar->addAction(g_rotateAct);
+  }
+  if (g_scaleAct)
+  {
+    actionGroup->addAction(g_scaleAct);
+    this->toolbar->addAction(g_scaleAct);
+  }
 
   this->toolbar->addSeparator();
 
-  QToolButton *alignButton = new QToolButton;
-  alignButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  alignButton->setIcon(QIcon(":/images/align.png"));
-  alignButton->setToolTip(
-      tr("In Selection Mode, hold Ctrl and select 2 objects to align"));
-  alignButton->setArrowType(Qt::NoArrow);
-  QMenu *alignMenu = new QMenu(alignButton);
-  alignMenu->addAction(g_alignAct);
-  alignButton->setMenu(alignMenu);
-  alignButton->setPopupMode(QToolButton::InstantPopup);
-  g_alignButtonAct = this->toolbar->addWidget(alignButton);
-  connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
+  if (g_boxCreateAct)
+    this->toolbar->addAction(g_boxCreateAct);
+  if (g_sphereCreateAct)
+    this->toolbar->addAction(g_sphereCreateAct);
+  if (g_cylinderCreateAct)
+    this->toolbar->addAction(g_cylinderCreateAct);
+  this->toolbar->addSeparator();
+  if (g_pointLghtCreateAct)
+    this->toolbar->addAction(g_pointLghtCreateAct);
+  if (g_spotLghtCreateAct)
+    this->toolbar->addAction(g_spotLghtCreateAct);
+  if (g_dirLghtCreateAct)
+    this->toolbar->addAction(g_dirLghtCreateAct);
+  this->toolbar->addSeparator();
+  if (g_screenshotAct)
+    this->toolbar->addAction(g_screenshotAct);
 
   this->toolbar->addSeparator();
-  this->toolbar->addAction(g_snapAct);
+  if (g_copyAct)
+    this->toolbar->addAction(g_copyAct);
+  if (g_pasteAct)
+    this->toolbar->addAction(g_pasteAct);
+
+  this->toolbar->addSeparator();
+
+  if (g_alignAct)
+  {
+    QToolButton *alignButton = new QToolButton;
+    alignButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    alignButton->setIcon(QIcon(":/images/align.png"));
+    alignButton->setToolTip(
+        tr("In Selection Mode, hold Ctrl and select 2 objects to align"));
+    alignButton->setArrowType(Qt::NoArrow);
+    QMenu *alignMenu = new QMenu(alignButton);
+    alignMenu->addAction(g_alignAct);
+    alignButton->setMenu(alignMenu);
+    alignButton->setPopupMode(QToolButton::InstantPopup);
+    g_alignButtonAct = this->toolbar->addWidget(alignButton);
+    connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
+  }
+
+  this->toolbar->addSeparator();
+
+  if (g_snapAct)
+  {
+    actionGroup->addAction(g_snapAct);
+    this->toolbar->addAction(g_snapAct);
+  }
 
   toolLayout->addSpacing(10);
   toolLayout->addWidget(this->toolbar);
@@ -287,11 +315,13 @@ void RenderWidget::update()
 /////////////////////////////////////////////////
 void RenderWidget::InsertWidget(unsigned int _index, QWidget *_widget)
 {
-  if (_index < static_cast<unsigned int>(this->splitter->count()))
+  if (static_cast<int>(_index) <= this->splitter->count())
   {
     // set equal size for now. There should always be at least one widget
     // (render3DFrame) in the splitter.
     QList<int> sizes = this->splitter->sizes();
+    GZ_ASSERT(sizes.size() > 0, "RenderWidget splitter has no child widget");
+
     sizes.insert(_index, sizes[0]);
 
     this->splitter->insertWidget(_index, _widget);
@@ -299,7 +329,7 @@ void RenderWidget::InsertWidget(unsigned int _index, QWidget *_widget)
     this->splitter->setStretchFactor(_index, 1);
   }
   else
-    gzerr << "Unabled to add widget, index out of range " << std::endl;
+    gzerr << "Unable to add widget, index out of range " << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -318,7 +348,7 @@ void RenderWidget::ShowTimePanel(bool _show)
 }
 
 /////////////////////////////////////////////////
-TimePanel *RenderWidget::GetTimePanel()
+TimePanel *RenderWidget::GetTimePanel() const
 {
   return this->timePanel;
 }

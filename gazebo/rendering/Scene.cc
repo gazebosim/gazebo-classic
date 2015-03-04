@@ -34,6 +34,7 @@
 #include "gazebo/rendering/CameraVisual.hh"
 #include "gazebo/rendering/JointVisual.hh"
 #include "gazebo/rendering/COMVisual.hh"
+#include "gazebo/rendering/InertiaVisual.hh"
 #include "gazebo/rendering/ContactVisual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Light.hh"
@@ -94,6 +95,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
 
   this->dataPtr->initialized = false;
   this->dataPtr->showCOMs = false;
+  this->dataPtr->showInertias = false;
   this->dataPtr->showCollisions = false;
   this->dataPtr->showJoints = false;
   this->dataPtr->transparent = false;
@@ -2085,6 +2087,11 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     this->CreateCOMVisual(_msg, linkVis);
   }
 
+  if (!this->GetVisual(_msg->name() + "_INERTIA_VISUAL__"))
+  {
+    this->CreateInertiaVisual(_msg, linkVis);
+  }
+
   for (int i = 0; i < _msg->projector_size(); ++i)
   {
     std::string pname = _msg->name() + "::" + _msg->projector(i).name();
@@ -2276,7 +2283,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
       if (vis)
         vis->ShowCOM(true);
       else
-        gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+        gzerr << "Unable to find COM visual[" << _msg->data() << "]\n";
     }
   }
   else if (_msg->request() == "hide_com")
@@ -2288,6 +2295,30 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
       VisualPtr vis = this->GetVisual(_msg->data());
       if (vis)
         vis->ShowCOM(false);
+    }
+  }
+  else if (_msg->request() == "show_inertia")
+  {
+    if (_msg->data() == "all")
+      this->ShowInertias(true);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowInertia(true);
+      else
+        gzerr << "Unable to find inertia visual[" << _msg->data() << "]\n";
+    }
+  }
+  else if (_msg->request() == "hide_inertia")
+  {
+    if (_msg->data() == "all")
+      this->ShowInertias(false);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowInertia(false);
     }
   }
   else if (_msg->request() == "set_transparent")
@@ -2446,6 +2477,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       }
 
       visual->ShowCOM(this->dataPtr->showCOMs);
+      visual->ShowInertia(this->dataPtr->showInertias);
       visual->ShowCollision(this->dataPtr->showCollisions);
       visual->ShowJoints(this->dataPtr->showJoints);
       visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
@@ -2893,13 +2925,32 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 }
 
 /////////////////////////////////////////////////
+void Scene::CreateInertiaVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
+{
+  InertiaVisualPtr inertiaVis(new InertiaVisual(_msg->name() +
+      "_INERTIA_VISUAL__", _linkVisual));
+  inertiaVis->Load(_msg);
+  inertiaVis->SetVisible(this->dataPtr->showInertias);
+  this->dataPtr->visuals[inertiaVis->GetId()] = inertiaVis;
+}
+
+/////////////////////////////////////////////////
+void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
+{
+  InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->GetName() +
+      "_Inertia_VISUAL__", _linkVisual));
+  inertiaVis->Load(_elem);
+  inertiaVis->SetVisible(false);
+  this->dataPtr->visuals[inertiaVis->GetId()] = inertiaVis;
+}
+
+/////////////////////////////////////////////////
 void Scene::SetWireframe(bool _show)
 {
   this->dataPtr->wireframe = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->SetWireframe(_show);
+    visual.second->SetWireframe(_show);
   }
 
   if (this->dataPtr->terrain)
@@ -2910,10 +2961,9 @@ void Scene::SetWireframe(bool _show)
 void Scene::SetTransparent(bool _show)
 {
   this->dataPtr->transparent = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->SetTransparency(_show ? 0.5 : 0.0);
+    visual.second->SetTransparency(_show ? 0.5 : 0.0);
   }
 }
 
@@ -2921,10 +2971,19 @@ void Scene::SetTransparent(bool _show)
 void Scene::ShowCOMs(bool _show)
 {
   this->dataPtr->showCOMs = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->ShowCOM(_show);
+    visual.second->ShowCOM(_show);
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowInertias(bool _show)
+{
+  this->dataPtr->showInertias = _show;
+  for (auto visual : this->dataPtr->visuals)
+  {
+    visual.second->ShowInertia(_show);
   }
 }
 
@@ -2932,10 +2991,9 @@ void Scene::ShowCOMs(bool _show)
 void Scene::ShowCollisions(bool _show)
 {
   this->dataPtr->showCollisions = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->ShowCollision(_show);
+    visual.second->ShowCollision(_show);
   }
 }
 
@@ -2943,10 +3001,9 @@ void Scene::ShowCollisions(bool _show)
 void Scene::ShowJoints(bool _show)
 {
   this->dataPtr->showJoints = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->ShowJoints(_show);
+    visual.second->ShowJoints(_show);
   }
 }
 

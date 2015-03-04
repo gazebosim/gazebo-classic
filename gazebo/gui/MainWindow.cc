@@ -309,6 +309,8 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   }
 #endif
 
+  emit Close();
+
   gazebo::shutdown();
 }
 
@@ -831,6 +833,17 @@ void MainWindow::ShowCOM()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ShowInertia()
+{
+  if (g_showInertiaAct->isChecked())
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_inertia", "all");
+  else
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_inertia", "all");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ShowContacts()
 {
   if (g_showContactsAct->isChecked())
@@ -1132,12 +1145,19 @@ void MainWindow::CreateActions()
   connect(g_viewWireframeAct, SIGNAL(triggered()), this,
           SLOT(SetWireframe()));
 
-  g_showCOMAct = new QAction(tr("Center of Mass / Inertia"), this);
-  g_showCOMAct->setStatusTip(tr("Show COM/MOI"));
+  g_showCOMAct = new QAction(tr("Center of Mass"), this);
+  g_showCOMAct->setStatusTip(tr("Show center of mass"));
   g_showCOMAct->setCheckable(true);
   g_showCOMAct->setChecked(false);
   connect(g_showCOMAct, SIGNAL(triggered()), this,
           SLOT(ShowCOM()));
+
+  g_showInertiaAct = new QAction(tr("Inertias"), this);
+  g_showInertiaAct->setStatusTip(tr("Show moments of inertia"));
+  g_showInertiaAct->setCheckable(true);
+  g_showInertiaAct->setChecked(false);
+  connect(g_showInertiaAct, SIGNAL(triggered()), this,
+      SLOT(ShowInertia()));
 
   g_showContactsAct = new QAction(tr("Contacts"), this);
   g_showContactsAct->setStatusTip(tr("Show Contacts"));
@@ -1359,7 +1379,6 @@ void MainWindow::CreateMenuBar()
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
 
-  // \TODO: Add this back in when implementing the full Model Editor spec.
   editMenu->addAction(g_editModelAct);
 
   QMenu *viewMenu = bar->addMenu(tr("&View"));
@@ -1372,6 +1391,7 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_showCollisionsAct);
   viewMenu->addAction(g_showJointsAct);
   viewMenu->addAction(g_showCOMAct);
+  viewMenu->addAction(g_showInertiaAct);
   viewMenu->addAction(g_showContactsAct);
   viewMenu->addSeparator();
 

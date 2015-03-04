@@ -21,7 +21,8 @@ using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(GpuRayPlugin)
 
 /////////////////////////////////////////////////
-GpuRayPlugin::GpuRayPlugin() : SensorPlugin()
+GpuRayPlugin::GpuRayPlugin()
+: SensorPlugin(), width(0), height(0)
 {
 }
 

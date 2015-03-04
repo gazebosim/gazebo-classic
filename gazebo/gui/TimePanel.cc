@@ -78,15 +78,19 @@ TimePanel::TimePanel(QWidget *_parent)
   QToolBar *playToolbar = new QToolBar;
   playToolbar->setObjectName("playToolBar");
   playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  playToolbar->addAction(g_playAct);
-  playToolbar->addAction(g_pauseAct);
+  if (g_playAct)
+    playToolbar->addAction(g_playAct);
+  if (g_pauseAct)
+    playToolbar->addAction(g_pauseAct);
 
   QLabel *emptyLabel = new QLabel(tr("  "));
   playToolbar->addWidget(emptyLabel);
 
-  playToolbar->addAction(g_stepAct);
+  if (g_stepAct)
+    playToolbar->addAction(g_stepAct);
   this->stepToolBarLabelAction = playToolbar->addWidget(stepToolBarLabel);
-  this->stepButtonAction =  playToolbar->addWidget(this->stepButton);
+  this->stepButtonAction = playToolbar->addWidget(this->stepButton);
+  this->stepButtonAction->setObjectName("timePanelStepAction");
 
   this->percentRealTimeEdit = new QLineEdit;
   this->percentRealTimeEdit->setObjectName("timePanelPercentRealTime");
@@ -106,6 +110,7 @@ TimePanel::TimePanel(QWidget *_parent)
   this->iterationsEdit = new QLineEdit;
   this->iterationsEdit->setReadOnly(true);
   this->iterationsEdit->setFixedWidth(110);
+  this->iterationsEdit->setObjectName("timePanelIterations");
 
   QPushButton *timeResetButton = new QPushButton("Reset");
   timeResetButton->setFocusPolicy(Qt::NoFocus);
@@ -229,7 +234,8 @@ void TimePanel::ShowIterations(bool _show)
 /////////////////////////////////////////////////
 void TimePanel::ShowStepWidget(bool _show)
 {
-  g_stepAct->setVisible(_show);
+  if (g_stepAct)
+    g_stepAct->setVisible(_show);
   this->stepToolBarLabelAction->setVisible(_show);
   this->stepButtonAction->setVisible(_show);
 }

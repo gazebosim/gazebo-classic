@@ -705,6 +705,21 @@ material Gazebo/JointAnchor
   }
 }
 
+material Gazebo/CoM
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.5 0.5 0.5 1.000000
+
+      texture_unit
+      {
+        texture com.png
+      }
+    }
+  }
+}
 
 material Gazebo/WoodFloor
 {

@@ -32,10 +32,9 @@ class QHBoxLayout;
 
 namespace gazebo
 {
-  class GLWidget;
-
   namespace gui
   {
+    class GLWidget;
     class TimePanel;
 
     class GAZEBO_VISIBLE RenderWidget : public QWidget
@@ -60,16 +59,15 @@ namespace gazebo
       /// \para[in] _show True to show the panel, false to hide it.
       public: void ShowTimePanel(bool _show);
 
-
-      /// brief Get the time panel widget.
-      public: TimePanel *GetTimePanel();
+      /// \brief Get the time panel widget.
+      /// \return the time panel widget.
+      public: TimePanel *GetTimePanel() const;
 
       /// \brief Display an overlay message
       /// \param[in] _msg Message to be displayed
       /// \param [in] _duration Duration in milliseconds
       public: void DisplayOverlayMsg(const std::string &_msg,
           int _duration = -1);
-
 
       /// \brief Add a widget to the bottom row stack of widgets.
       /// \param[in] _name Name of the widget
@@ -117,9 +115,6 @@ namespace gazebo
 
       /// \brief Widget used to draw the scene.
       private: GLWidget *glWidget;
-
-      /// \brief Building editor widget for creating a building model
-      //private: BuildingEditorWidget *buildingEditorWidget;
 
       /// \brief Frame that holds the contents of this widget.
       private: QFrame *mainFrame;
