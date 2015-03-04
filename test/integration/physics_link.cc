@@ -16,6 +16,7 @@
 */
 #include <string.h>
 
+#include "gazebo/math/SignalStats.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "test/ServerFixture.hh"
@@ -28,18 +29,95 @@ const double g_tolerance = 1e-4;
 class PhysicsLinkTest : public ServerFixture,
                         public testing::WithParamInterface<const char*>
 {
+  /// \brief Test GetWorldAngularMomentum.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void GetWorldAngularMomentum(const std::string &_physicsEngine);
+
   /// \brief Test GetWorldEnergy* functions.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void GetWorldEnergy(const std::string &_physicsEngine);
 
   /// \brief Test Link::GetWorldInertia* functions.
   /// \param[in] _physicsEngine Physics engine to use.
-  public: void LinkGetWorldInertia(const std::string &_physicsEngine);
+  public: void GetWorldInertia(const std::string &_physicsEngine);
 
   /// \brief Test velocity setting functions.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void SetVelocity(const std::string &_physicsEngine);
 };
+
+/////////////////////////////////////////////////
+// GetWorldAngularMomentum:
+// Spawn box and verify Link::GetWorldAngularMomentum functions
+// Make dimensions unequal and give angular velocity that causes
+// gyroscopic tumbling.
+void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
+{
+  // Load a blank world (no ground plane)
+  Load("worlds/blank.world", true, _physicsEngine);
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  auto physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // disable gravity
+  physics->SetGravity(math::Vector3::Zero);
+
+  physics::ModelPtr model;
+  {
+    // Box size
+    const double dx = 0.1;
+    const double dy = 0.4;
+    const double dz = 0.9;
+    const double mass = 10.0;
+
+    msgs::Model msgModel;
+    msgModel.set_name(this->GetUniqueString("model"));
+    msgs::AddBoxLink(msgModel, mass, math::Vector3(dx, dy, dz));
+    model = this->SpawnModel(msgModel);
+  }
+  ASSERT_TRUE(model != NULL);
+
+  // inertia matrix, recompute if dimensions change
+  const double Ixx = 0.80833333;
+  const double Iyy = 0.68333333;
+  const double Izz = 0.14166667;
+  const math::Matrix3 I0(Ixx, 0.0, 0.0
+                       , 0.0, Iyy, 0.0
+                       , 0.0, 0.0, Izz);
+
+  // Since Ixx > Iyy > Izz,
+  // angular velocity with large y component
+  // will cause gyroscopic tumbling
+  const math::Vector3 w0(1e-3, 1.5e0, 1.5e-2);
+  model->SetAngularVel(w0);
+
+  // Get link and verify inertia and initial velocity
+  auto link = model->GetLink();
+  ASSERT_TRUE(link != NULL);
+  ASSERT_EQ(w0, link->GetWorldAngularVel());
+  ASSERT_EQ(I0, link->GetWorldInertiaMatrix());
+
+  // Compute initial angular momentum
+  const math::Vector3 H0(I0 * w0);
+  ASSERT_EQ(H0, link->GetWorldAngularMomentum());
+  const double H0mag = H0.GetLength();
+
+  math::Vector3Stats angularMomentumError;
+  const std::string stat("maxAbs");
+  EXPECT_TRUE(angularMomentumError.InsertStatistic(stat));
+  const int steps = 5000;
+  for (int i = 0; i < steps; ++i)
+  {
+    world->Step(1);
+    math::Vector3 H = link->GetWorldAngularMomentum();
+    angularMomentumError.InsertData((H - H0) / H0mag);
+  }
+  EXPECT_LT(angularMomentumError.Map()[stat], g_tolerance);
+}
 
 /////////////////////////////////////////////////
 void PhysicsLinkTest::GetWorldEnergy(const std::string &_physicsEngine)
@@ -84,9 +162,9 @@ void PhysicsLinkTest::GetWorldEnergy(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
-// LinkGetWorldInertia:
+// GetWorldInertia:
 // Spawn boxes and verify Link::GetWorldInertia* functions
-void PhysicsLinkTest::LinkGetWorldInertia(const std::string &_physicsEngine)
+void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
 {
   // Load a blank world (no ground plane)
   Load("worlds/blank.world", true, _physicsEngine);
@@ -324,9 +402,9 @@ TEST_P(PhysicsLinkTest, GetWorldEnergy)
 }
 
 /////////////////////////////////////////////////
-TEST_P(PhysicsLinkTest, LinkGetWorldInertia)
+TEST_P(PhysicsLinkTest, GetWorldInertia)
 {
-  LinkGetWorldInertia(GetParam());
+  GetWorldInertia(GetParam());
 }
 
 /////////////////////////////////////////////////
