@@ -95,8 +95,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   EXPECT_EQ(oneStepAngularAccel, _link->GetWorldAngularAccel());
 
   // Check velocity in world frame
-  math::Vector3 oneStepLinearVel = linearVelWorld0 +
-      dt*forceWorld/_link->GetInertial()->GetMass();
+  math::Vector3 oneStepLinearVel = linearVelWorld0 + dt*oneStepLinearAccel;
   EXPECT_EQ(oneStepLinearVel, _link->GetWorldCoGLinearVel());
 
   math::Vector3 oneStepAngularVel = angularVelWorld0 + angularImpulse /
@@ -140,8 +139,9 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   // TODO bullet, dart and simbody currently fail this test
   if (_physicsEngine != "ode")
   {
-    gzerr << "Aborting AddForce test for Bullet, DART and Simbody."
-        << std::endl;
+    gzerr << "Aborting AddForce test for Bullet, DART and Simbody. "
+          << "See issues #1476, #1477, and #1478."
+          << std::endl;
     return;
   }
 
