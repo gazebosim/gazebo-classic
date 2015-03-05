@@ -125,13 +125,9 @@ void Link::Load(sdf::ElementPtr _sdf)
   {
     this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
   }
-  else if (this->GetModel()->GetSelfCollide())
-  {
-    this->SetSelfCollide(true);
-  }
   else
   {
-    this->SetSelfCollide(false);
+    this->SetSelfCollide(this->GetModel()->GetSelfCollide());
   }
   this->sdf->GetElement("self_collide")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetSelfCollide, this));
