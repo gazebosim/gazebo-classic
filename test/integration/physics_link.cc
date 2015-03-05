@@ -83,23 +83,27 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
 
   math::Vector3 worldOffset = poseWorld0.rot.RotateVector(
       _offset - _link->GetInertial()->GetCoG());
-  math::Vector3 angularImpulse = dt*worldOffset.Cross(forceWorld);
-  EXPECT_EQ(angularImpulse, _link->GetWorldTorque());
+  math::Vector3 torqueWorld = worldOffset.Cross(forceWorld);
+  EXPECT_EQ(torqueWorld, _link->GetWorldTorque());
 
   // Check acceleration in world frame
   math::Vector3 oneStepLinearAccel =
       forceWorld/_link->GetInertial()->GetMass();
   EXPECT_EQ(oneStepLinearAccel, _link->GetWorldLinearAccel());
 
-  math::Vector3 oneStepAngularAccel = angularImpulse;
+  // Compute angular accel by multiplying world torque
+  // by inverse of world inertia matrix.
+  // In this case, the gyroscopic coupling terms are zero
+  // since the model is a unit box.
+  math::Vector3 oneStepAngularAccel =
+      _link->GetWorldInertiaMatrix().Inverse() * torqueWorld;
   EXPECT_EQ(oneStepAngularAccel, _link->GetWorldAngularAccel());
 
   // Check velocity in world frame
   math::Vector3 oneStepLinearVel = linearVelWorld0 + dt*oneStepLinearAccel;
   EXPECT_EQ(oneStepLinearVel, _link->GetWorldCoGLinearVel());
 
-  math::Vector3 oneStepAngularVel = angularVelWorld0 + angularImpulse /
-      _link->GetInertial()->GetPrincipalMoments();
+  math::Vector3 oneStepAngularVel = angularVelWorld0 + dt*oneStepAngularAccel;
   EXPECT_EQ(oneStepAngularVel, _link->GetWorldAngularVel());
 
   // Step forward and check again

@@ -608,13 +608,26 @@ math::Vector3 Link::GetWorldLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeAngularAccel() const
 {
-  return this->GetRelativeTorque() / this->inertial->GetMass();
+  return this->GetWorldPose().rot.RotateVectorReverse(
+    this->GetWorldAngularAccel());
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetWorldAngularAccel() const
 {
-  return this->GetWorldTorque() / this->inertial->GetMass();
+  // I: inertia matrix in world frame
+  // T: sum of external torques in world frame
+  // L: angular momentum of CoG in world frame
+  // w: angular velocity in world frame
+  // return I^-1 * (T - w x L)
+  return this->GetWorldInertiaMatrix().Inverse() * (this->GetWorldTorque()
+    - this->GetWorldAngularVel().Cross(this->GetWorldAngularMomentum()));
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Link::GetWorldAngularMomentum() const
+{
+  return this->GetWorldInertiaMatrix() * this->GetWorldAngularVel();
 }
 
 //////////////////////////////////////////////////
