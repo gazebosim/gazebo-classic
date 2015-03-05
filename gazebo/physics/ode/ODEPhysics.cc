@@ -264,7 +264,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_solver_type(this->dataPtr->stepType);
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(
-        boost::any_cast<double>(this->GetParam("min_step_size")));
+        boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
     physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
     physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
@@ -1274,6 +1274,48 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
   return true;
 }
 
+boost::any ODEPhysics::GetParam(const int _key) const
+{
+  switch(_key)
+  {
+    case SOLVER_TYPE:
+      return odeElem->GetElement("solver")->Get<std::string>("type");
+      break;
+    case GLOBAL_CFM:
+      return odeElem->GetElement("constraints")->Get<double>("cfm");
+      break;
+    case GLOBAL_ERP:
+      return odeElem->GetElement("constraints")->Get<double>("erp");
+      break;
+    case SOR_PRECON_ITERS:
+      return odeElem->GetElement("solver")->Get<int>("precon_iters");
+      break;
+    case PGS_ITERS:
+      return odeElem->GetElement("solver")->Get<int>("iters");
+      break;
+    case SOR:
+      return odeElem->GetElement("solver")->Get<double>("sor");
+      break;
+    case CONTACT_MAX_CORRECTING_VEL:
+      return odeElem->GetElement("constraints")->Get<double>(
+          "contact_max_correcting_vel");
+      break;
+    case CONTACT_SURFACE_LAYER:
+      return odeElem->GetElement("constraints")->Get<double>(
+        "contact_surface_layer");
+      break;
+    case MAX_CONTACTS:
+      return this->sdf->Get<int>("max_contacts");
+      break;
+    case MIN_STEP_SIZE:
+      return odeElem->GetElement("solver")->Get<double>("min_step_size");
+      break;
+    case INERTIA_RATIO_REDUCTION:
+      return dWorldGetQuickStepInertiaRatioReduction(this->dataPtr->worldId);
+      break;
+  }
+}
+
 //////////////////////////////////////////////////
 boost::any ODEPhysics::GetParam(const std::string &_key) const
 {
@@ -1282,30 +1324,28 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
 
   if (_key == "solver_type")
   {
-    return odeElem->GetElement("solver")->Get<std::string>("type");
+    return this->GetParam(SOLVER_TYPE);
   }
   else if (_key == "cfm")
   {
-    return odeElem->GetElement("constraints")->Get<double>("cfm");
+    return this->GetParam(GLOBAL_CFM);
   }
   else if (_key == "erp")
-    return odeElem->GetElement("constraints")->Get<double>("erp");
+    return this->GetParam(GLOBAL_ERP);
   else if (_key == "precon_iters")
-    return odeElem->GetElement("solver")->Get<int>("precon_iters");
+    return this->GetParam(SOR_PRECON_ITERS);
   else if (_key == "iters")
-    return odeElem->GetElement("solver")->Get<int>("iters");
+    return this->GetParam(PGS_ITERS);
   else if (_key == "sor")
-    return odeElem->GetElement("solver")->Get<double>("sor");
+    return this->GetParam(SOR);
   else if (_key == "contact_max_correcting_vel")
-    return odeElem->GetElement("constraints")->Get<double>(
-        "contact_max_correcting_vel");
+    return this->GetParam(CONTACT_MAX_CORRECTING_VEL);
   else if (_key == "contact_surface_layer")
-    return odeElem->GetElement("constraints")->Get<double>(
-        "contact_surface_layer");
+    return this->GetParam(CONTACT_SURFACE_LAYER);
   else if (_key == "max_contacts")
-    return this->sdf->Get<int>("max_contacts");
+    return this->GetParam(MAX_CONTACTS);
   else if (_key == "min_step_size")
-    return odeElem->GetElement("solver")->Get<double>("min_step_size");
+    return this->GetParam(MIN_STEP_SIZE);
   else if (_key == "max_step_size")
     return this->GetMaxStepSize();
   else if (_key == "sor_lcp_tolerance")
@@ -1322,7 +1362,7 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
   else if (_key == "num_contacts")
     return dWorldGetQuickStepNumContacts(this->dataPtr->worldId);
   else if (_key == "inertia_ratio_reduction")
-    return dWorldGetQuickStepInertiaRatioReduction(this->dataPtr->worldId);
+    return this->GetParam(INERTIA_RATIO_REDUCTION);
   else if (_key == "contact_residual_smoothing")
     return dWorldGetQuickStepContactResidualSmoothing (this->dataPtr->worldId);
   else if (_key == "experimental_row_reordering")
