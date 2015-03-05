@@ -30,6 +30,9 @@
     <!-- Load a plugin to control the foosball demo -->
     <plugin name='foosball_demo' filename='libFoosballDemoPlugin.so'>
       <!-- Parameters -->
+      <ball>foosball_ball</ball>
+      <goalA>foosball_table::goal_a</goalA>
+      <goalB>foosball_table::goal_b</goalB>
     </plugin>
 
   </world>

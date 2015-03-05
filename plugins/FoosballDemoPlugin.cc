@@ -18,7 +18,10 @@
 #include <sdf/sdf.hh>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "plugins/FoosballDemoPlugin.hh"
 
 using namespace gazebo;
@@ -37,4 +40,10 @@ void FoosballDemoPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   this->world = _world;
   GZ_ASSERT(_sdf, "FoosballDemoPlugin _sdf pointer is NULL");
   this->sdf = _sdf;
+
+  this->gzNode = transport::NodePtr(new transport::Node());
+  this->gzNode->Init();
+  this->timePub = this->gzNode->Advertise<msgs::Time>("~/foosball_demo/time");
+  this->timePub =
+    this->gzNode->Advertise<msgs::GzString>("~/foosball_demo/score");
 }

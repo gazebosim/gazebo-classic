@@ -21,6 +21,7 @@
 #include <sdf/sdf.hh>
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -39,6 +40,15 @@ namespace gazebo
 
     /// \brief SDF for this plugin.
     private: sdf::ElementPtr sdf;
+
+    /// \brief Pointer to a node for communication.
+    private: transport::NodePtr gzNode;
+
+    /// \brief Time publisher.
+    private: transport::PublisherPtr timePub;
+
+    /// \brief Score publisher.
+    private: transport::PublisherPtr scorePub;
   };
 }
 #endif
