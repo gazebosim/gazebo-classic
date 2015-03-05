@@ -120,6 +120,7 @@ namespace gazebo
       /// \brief Set whether this body will collide with others in the
       /// model. Bodies connected by a joint are exempt from this, and will
       /// never collide.
+      /// \sa GetSelfCollide
       /// \param[in] _collide True to enable collisions.
       public: virtual void SetSelfCollide(bool _collide) = 0;
 

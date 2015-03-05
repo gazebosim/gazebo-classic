@@ -186,6 +186,7 @@ namespace gazebo
       public: bool GetSelfCollide() const;
 
       /// \brief Set this model's self_collide property
+      /// \sa GetSelfCollide
       /// \param[in] _self_collide True if self-collisions enabled by default.
       public: void SetSelfCollide(bool _self_collide);
 
