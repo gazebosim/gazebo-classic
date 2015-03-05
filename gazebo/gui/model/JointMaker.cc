@@ -187,7 +187,7 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::RemoveJointsByPart(const std::string &_partName)
+void JointMaker::RemoveJointsByLink(const std::string &_linkName)
 {
   std::vector<std::string> toDelete;
   boost::unordered_map<std::string, JointData *>::iterator it;
@@ -195,8 +195,8 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
   {
     JointData *joint = it->second;
 
-    if (joint->child->GetName() == _partName ||
-        joint->parent->GetName() == _partName)
+    if (joint->child->GetName() == _linkName ||
+        joint->parent->GetName() == _linkName)
     {
       toDelete.push_back(it->first);
     }
@@ -206,6 +206,24 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
     this->RemoveJoint(toDelete[i]);
 
   toDelete.clear();
+}
+
+/////////////////////////////////////////////////
+std::vector<JointData *> JointMaker::GetJointDataByLink(
+    const std::string &_linkName) const
+{
+  std::vector<JointData *> linkJoints;
+  for (auto jointIt : this->joints)
+  {
+    JointData *jointData = jointIt.second;
+
+    if (jointData->child->GetName() == _linkName ||
+        jointData->parent->GetName() == _linkName)
+    {
+      linkJoints.push_back(jointData);
+    }
+  }
+  return linkJoints;
 }
 
 /////////////////////////////////////////////////
@@ -282,7 +300,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           return true;
         }
 
-        // Pressed parent part
+        // Pressed parent link
         if (!this->selectedVis)
         {
           if (this->mouseJoint)
@@ -296,7 +314,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           this->mouseJoint = this->CreateJoint(this->selectedVis,
               rendering::VisualPtr());
         }
-        // Pressed child part
+        // Pressed child link
         else if (this->selectedVis != this->hoverVis)
         {
           if (this->hoverVis)
@@ -494,7 +512,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     if (this->hoverVis && this->hoverVis != this->selectedVis)
       this->hoverVis->SetEmissive(common::Color(0.0, 0.0, 0.0));
 
-    // only highlight editor parts by making sure it's not an item in the
+    // only highlight editor links by making sure it's not an item in the
     // gui tree widget or a joint hotspot.
     rendering::VisualPtr rootVis = vis->GetRootVisual();
     if (rootVis->IsPlane())
@@ -509,21 +527,21 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     }
   }
 
-  // Case when a parent part is already selected and currently
-  // extending the joint line to a child part
+  // Case when a parent link is already selected and currently
+  // extending the joint line to a child link
   if (this->selectedVis && this->hoverVis
       && this->mouseJoint && this->mouseJoint->line)
   {
     math::Vector3 parentPos;
-    // Set end point to center of child part
+    // Set end point to center of child link
     if (!this->hoverVis->IsPlane())
     {
       if (this->mouseJoint->parent)
       {
-        parentPos =  this->GetPartWorldCentroid(this->mouseJoint->parent)
+        parentPos =  this->GetLinkWorldCentroid(this->mouseJoint->parent)
             - this->mouseJoint->line->GetPoint(0);
         this->mouseJoint->line->SetPoint(1,
-            this->GetPartWorldCentroid(this->hoverVis) - parentPos);
+            this->GetLinkWorldCentroid(this->hoverVis) - parentPos);
       }
     }
     else
@@ -534,10 +552,10 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
           math::Plane(math::Vector3(0, 0, 1)), pt);
       if (this->mouseJoint->parent)
       {
-        parentPos = this->GetPartWorldCentroid(this->mouseJoint->parent)
+        parentPos = this->GetLinkWorldCentroid(this->mouseJoint->parent)
             - this->mouseJoint->line->GetPoint(0);
         this->mouseJoint->line->SetPoint(1,
-            this->GetPartWorldCentroid(this->hoverVis) - parentPos + pt);
+            this->GetLinkWorldCentroid(this->hoverVis) - parentPos + pt);
       }
     }
   }
@@ -555,35 +573,7 @@ void JointMaker::OnOpenInspector()
 void JointMaker::OpenInspector(const std::string &_name)
 {
   JointData *joint = this->joints[_name];
-  joint->inspector->SetType(joint->type);
-  joint->inspector->SetName(joint->name);
-
-  std::string parentName = joint->parent->GetName();
-  std::string parentLeafName = parentName;
-  size_t pIdx = parentName.find_last_of("::");
-  if (pIdx != std::string::npos)
-    parentLeafName = parentName.substr(pIdx+1);
-  joint->inspector->SetParent(parentLeafName);
-
-  std::string childName = joint->child->GetName();
-  std::string childLeafName = childName;
-  size_t cIdx = childName.find_last_of("::");
-  if (cIdx != std::string::npos)
-    childLeafName = childName.substr(cIdx+1);
-  joint->inspector->SetChild(childLeafName);
-
-  joint->inspector->SetPose(joint->pose);
-  int axisCount = JointMaker::GetJointAxisCount(joint->type);
-  for (int i = 0; i < axisCount; ++i)
-  {
-    joint->inspector->SetAxis(i, joint->axis[i]);
-    joint->inspector->SetAxis(i, joint->axis[i]);
-    joint->inspector->SetLowerLimit(i, joint->lowerLimit[i]);
-    joint->inspector->SetUpperLimit(i, joint->upperLimit[i]);
-    joint->inspector->SetUseParentModelFrame(i, joint->useParentModelFrame[i]);
-  }
-  joint->inspector->move(QCursor::pos());
-  joint->inspector->show();
+  joint->OpenInspector();
 }
 
 /////////////////////////////////////////////////
@@ -704,10 +694,10 @@ void JointMaker::Update()
 
         if (joint->dirty || poseUpdate)
         {
-          // get origin of parent part visuals
+          // get origin of parent link visuals
           math::Vector3 parentOrigin = joint->parent->GetWorldPose().pos;
 
-          // get origin of child part visuals
+          // get origin of child link visuals
           math::Vector3 childOrigin = joint->child->GetWorldPose().pos;
 
           // set orientation of joint hotspot
@@ -733,6 +723,7 @@ void JointMaker::Update()
             Ogre::SceneNode *handleNode = joint->handles->getParentSceneNode();
             joint->handles->detachFromParent();
             joint->hotspot->SetMaterial(material);
+            joint->hotspot->SetTransparency(0.5);
             handleNode->attachObject(joint->handles);
             Ogre::MaterialPtr mat =
                 Ogre::MaterialManager::getSingleton().getByName(material);
@@ -1015,7 +1006,7 @@ JointMaker::JointType JointMaker::GetState() const
 }
 
 /////////////////////////////////////////////////
-math::Vector3 JointMaker::GetPartWorldCentroid(
+math::Vector3 JointMaker::GetLinkWorldCentroid(
     const rendering::VisualPtr _visual)
 {
   math::Vector3 centroid;
@@ -1056,6 +1047,46 @@ void JointData::OnApply()
   }
   this->dirty = true;
   gui::model::Events::modelChanged();
+}
+
+/////////////////////////////////////////////////
+void JointData::OnOpenInspector()
+{
+  this->OpenInspector();
+}
+
+/////////////////////////////////////////////////
+void JointData::OpenInspector()
+{
+  this->inspector->SetType(this->type);
+  this->inspector->SetName(this->name);
+
+  std::string parentName = this->parent->GetName();
+  std::string parentLeafName = parentName;
+  size_t pIdx = parentName.find_last_of("::");
+  if (pIdx != std::string::npos)
+    parentLeafName = parentName.substr(pIdx+1);
+  this->inspector->SetParent(parentLeafName);
+
+  std::string childName = this->child->GetName();
+  std::string childLeafName = childName;
+  size_t cIdx = childName.find_last_of("::");
+  if (cIdx != std::string::npos)
+    childLeafName = childName.substr(cIdx+1);
+  this->inspector->SetChild(childLeafName);
+
+  this->inspector->SetPose(this->pose);
+  int axisCount = JointMaker::GetJointAxisCount(this->type);
+  for (int i = 0; i < axisCount; ++i)
+  {
+    this->inspector->SetAxis(i, this->axis[i]);
+    this->inspector->SetAxis(i, this->axis[i]);
+    this->inspector->SetLowerLimit(i, this->lowerLimit[i]);
+    this->inspector->SetUpperLimit(i, this->upperLimit[i]);
+    this->inspector->SetUseParentModelFrame(i, this->useParentModelFrame[i]);
+  }
+  this->inspector->move(QCursor::pos());
+  this->inspector->show();
 }
 
 /////////////////////////////////////////////////

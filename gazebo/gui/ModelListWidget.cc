@@ -93,6 +93,8 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   this->variantManager = new QtVariantPropertyManager();
   this->propTreeBrowser = new QtTreePropertyBrowser();
   this->propTreeBrowser->setObjectName("propTreeBrowser");
+  this->propTreeBrowser->setStyleSheet(
+      "QTreeView::branch:selected:active { background-color: transparent; }");
   this->variantFactory = new QtVariantEditorFactory();
   this->propTreeBrowser->setFactoryForManager(this->variantManager,
                                               this->variantFactory);

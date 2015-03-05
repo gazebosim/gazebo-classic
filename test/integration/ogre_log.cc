@@ -19,6 +19,7 @@
 
 #include "ServerFixture.hh"
 
+using namespace gazebo;
 class OgreLog : public ServerFixture
 {
 };
