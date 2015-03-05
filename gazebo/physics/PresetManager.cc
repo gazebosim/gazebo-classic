@@ -82,6 +82,7 @@ sdf::ElementPtr Preset::SDF() const
 //////////////////////////////////////////////////
 void Preset::SDF(sdf::ElementPtr _sdfElement)
 {
+  // TODO: check for non-physics element in Preset::SDF (set)
   this->dataPtr->elementSDF = _sdfElement;
 }
 

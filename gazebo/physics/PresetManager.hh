@@ -24,7 +24,6 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 
-// TODO: check for non-physics element in Preset::SDF (set)
 namespace gazebo
 {
   namespace physics
@@ -47,12 +46,12 @@ namespace gazebo
 
       /// \brief Set the profile name.
       /// \param[in] _name The new of the preset profile.
-      public: void Name(const std::string& _name);
+      public: void Name(const std::string &_name);
 
       /// \brief Get a profile parameter.
       /// \param[in] _key The key of the parameter to retrieve.
       /// \return The parameter value at the input key.
-      public: boost::any Param(const std::string& _key) const;
+      public: boost::any Param(const std::string &_key) const;
 
       /// \brief Set a profile parameter.
       /// \param[in] _key The key of the parameter to change.
@@ -92,7 +91,7 @@ namespace gazebo
       /// \brief Set the current profile.
       /// \param[in] _name The name of the new current profile.
       /// \return True if the profile switch was successful.
-      public: bool CurrentProfile(const std::string& _name);
+      public: bool CurrentProfile(const std::string &_name);
 
       /// \brief Get the name of the current profile.
       /// \return The name of the current profile.
@@ -107,8 +106,8 @@ namespace gazebo
       /// \param[in] _key The key of the parameter to change.
       /// \param[in] _value The value of the parameter to change.
       /// \return True if setting the parameter was successful.
-      public: bool ProfileParam(const std::string& _profileName,
-                                   const std::string& _key,
+      public: bool ProfileParam(const std::string &_profileName,
+                                   const std::string &_key,
                                    const boost::any &_value);
 
       /// \brief Get a parameter for a certain profile.
@@ -116,23 +115,23 @@ namespace gazebo
       /// \param[in] _key The key of the accessed parameter.
       /// \return The value of the parameter.
       public: boost::any ProfileParam(const std::string &_name,
-          const std::string& _key) const;
+          const std::string &_key) const;
 
       /// \brief Set a parameter for the current profile.
       /// \param[in] _key The key of the parameter to be set.
       /// \param[in] _value The value of the parameter to be set.
       /// \return True if setting the parameter was successful.
-      public: bool CurrentProfileParam(const std::string& _key,
+      public: bool CurrentProfileParam(const std::string &_key,
                                        const boost::any &_value);
 
       /// \brief Get a parameter for the current profile.
       /// \param[in] _key The key of the accessed parameter.
       /// \return The value of the accessed parameter.
-      public: boost::any CurrentProfileParam(const std::string& _key);
+      public: boost::any CurrentProfileParam(const std::string &_key);
 
       /// \brief Create a new profile.
       /// \param[in] _name The name of the new profile.
-      public: void CreateProfile(const std::string& _name);
+      public: void CreateProfile(const std::string &_name);
 
       /// \brief Create a new profile from SDF. SDF determines the profile name
       /// \param[in] _sdf Pointer to a physics SDF element.
@@ -141,7 +140,7 @@ namespace gazebo
 
       /// \brief Remove a profile.
       /// \param[in] _name The name of the profile to remove.
-      public: void RemoveProfile(const std::string& _name);
+      public: void RemoveProfile(const std::string &_name);
 
       /// \brief Get the SDF for a profile.
       /// \param[in] _name The name of the profile to be accessed.
