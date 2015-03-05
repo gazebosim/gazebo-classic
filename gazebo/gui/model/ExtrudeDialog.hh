@@ -74,7 +74,7 @@ namespace gazebo
       /// \param[in] _value New value, not used but needed for the slot.
       private slots: void OnUpdateView(double _value);
 
-      /// \brief Qt event filter currently used to filter mouse wheel events.
+      /// \brief Qt event filter used to filter child widget events.
       /// \param[in] _obj Object that is watched by the event filter.
       /// \param[in] _event Qt event.
       /// \return True if the event is handled.

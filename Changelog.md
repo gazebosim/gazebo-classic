@@ -35,6 +35,9 @@
     * [Pull request #1454](https://bitbucket.org/osrf/gazebo/pull-request/1454)
     * [Issue #1455](https://bitbucket.org/osrf/gazebo/issue/1455)
 
+1. Added Matrix3::Inverse() and tests 
+    * [Pull request #1481](https://bitbucket.org/osrf/gazebo/pull-request/1481)
+
 1. Model editor updates
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
