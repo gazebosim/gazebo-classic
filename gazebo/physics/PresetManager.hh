@@ -50,13 +50,15 @@ namespace gazebo
 
       /// \brief Get a profile parameter.
       /// \param[in] _key The key of the parameter to retrieve.
-      /// \return The parameter value at the input key.
-      public: boost::any Param(const std::string &_key) const;
+      /// \param[out] The parameter value at the input key.
+      /// \return True if the parameter exists in the map, false otherwise.
+      public: bool GetParam(const std::string &_key, boost::any &_value) const;
 
       /// \brief Set a profile parameter.
       /// \param[in] _key The key of the parameter to change.
       /// \param[in] _value The new value of the parameter.
-      public: void Param(const std::string& _key, const boost::any& _value);
+      /// \return True if the parameter was successfully set.
+      public: bool SetParam(const std::string& _key, const boost::any& _value);
 
       /// \brief Get this preset's parameter map (used for iteration)
       /// \return A pointer to this preset profile's parameter map.
@@ -106,28 +108,31 @@ namespace gazebo
       /// \param[in] _key The key of the parameter to change.
       /// \param[in] _value The value of the parameter to change.
       /// \return True if setting the parameter was successful.
-      public: bool ProfileParam(const std::string &_profileName,
+      public: bool SetProfileParam(const std::string &_profileName,
                                    const std::string &_key,
                                    const boost::any &_value);
 
       /// \brief Get a parameter for a certain profile.
       /// \param[in] _name The name of the accessed profile.
       /// \param[in] _key The key of the accessed parameter.
-      /// \return The value of the parameter.
-      public: boost::any ProfileParam(const std::string &_name,
-          const std::string &_key) const;
+      /// \param[out] _value The value of the accessed parameter.
+      /// \return True if the parameter existed in profile "_name".
+      public: bool GetProfileParam(const std::string &_name,
+          const std::string &_key, boost::any &_value) const;
 
       /// \brief Set a parameter for the current profile.
       /// \param[in] _key The key of the parameter to be set.
       /// \param[in] _value The value of the parameter to be set.
       /// \return True if setting the parameter was successful.
-      public: bool CurrentProfileParam(const std::string &_key,
+      public: bool SetCurrentProfileParam(const std::string &_key,
                                        const boost::any &_value);
 
       /// \brief Get a parameter for the current profile.
       /// \param[in] _key The key of the accessed parameter.
-      /// \return The value of the accessed parameter.
-      public: boost::any CurrentProfileParam(const std::string &_key);
+      /// \param[out] _value The value of the accessed parameter.
+      /// \return True if the parameter existed in profile "_name".
+      public: bool GetCurrentProfileParam(const std::string &_key,
+          boost::any &_value);
 
       /// \brief Create a new profile.
       /// \param[in] _name The name of the new profile.

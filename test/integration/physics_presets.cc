@@ -133,7 +133,7 @@ TEST_F(PresetManagerTest, SetProfileParam)
     FAIL();
   }
 
-  EXPECT_TRUE(presetManager->CurrentProfileParam("max_step_size", 10.0));
+  EXPECT_TRUE(presetManager->SetCurrentProfileParam("max_step_size", 10.0));
   try
   {
     EXPECT_NEAR(boost::any_cast<double>(
@@ -141,7 +141,8 @@ TEST_F(PresetManagerTest, SetProfileParam)
 
     // preset_2 is not the current profile, so we do not expect to see a change
     // in the physics engine when we change preset_2.
-    EXPECT_TRUE(presetManager->ProfileParam("preset_2", "max_step_size", 20));
+    EXPECT_TRUE(presetManager->SetProfileParam("preset_2", "max_step_size",
+        20));
     EXPECT_NEAR(boost::any_cast<double>(
         physicsEngine->GetParam("max_step_size")), 10.0, 1e-4);
   }
@@ -151,13 +152,13 @@ TEST_F(PresetManagerTest, SetProfileParam)
   }
 
   // Trying to set a preset profile that does not exist should return false.
-  EXPECT_FALSE(presetManager->ProfileParam("this_preset_does_not_exist",
+  EXPECT_FALSE(presetManager->SetProfileParam("this_preset_does_not_exist",
       "max_step_size", 10));
 
   // Trying to set a parameter for the current preset that does not exist will
   // return false, since the physics engine doesn't know what to do with it.
-  EXPECT_FALSE(presetManager->CurrentProfileParam("this_param_does_not_exist",
-      10.0));
+  EXPECT_FALSE(presetManager->SetCurrentProfileParam(
+      "this_param_does_not_exist", 10.0));
 }
 
 /////////////////////////////////////////////////
