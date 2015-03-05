@@ -35,6 +35,9 @@
     * [Pull request #1454](https://bitbucket.org/osrf/gazebo/pull-request/1454)
     * [Issue #1455](https://bitbucket.org/osrf/gazebo/issue/1455)
 
+1. Added Matrix3::Inverse() and tests 
+    * [Pull request #1481](https://bitbucket.org/osrf/gazebo/pull-request/1481)
+
 1. Added PresetManager to physics libraries and corresponding integration test.
     * [Pull request #1471](https://bitbucket.org/osrf/gazebo/pull-request/1471)
 
