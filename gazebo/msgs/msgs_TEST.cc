@@ -1218,7 +1218,7 @@ TEST_F(MsgsTest, GeometryToSDF)
   // polyline
   msgs::Geometry polylineMsg;
   polylineMsg.set_type(msgs::Geometry::POLYLINE);
-  msgs::Polyline *polylineGeom = polylineMsg.mutable_polyline();
+  msgs::Polyline *polylineGeom = polylineMsg.add_polyline();
   polylineGeom->set_height(2.33);
   msgs::Set(polylineGeom->add_point(), math::Vector2d(0.5, 0.7));
   msgs::Set(polylineGeom->add_point(), math::Vector2d(3.5, 4.7));
@@ -1402,6 +1402,7 @@ TEST_F(MsgsTest, SurfaceToSDF)
   msg.set_min_depth(0.0001);
   msg.set_collide_without_contact(true);
   msg.set_collide_without_contact_bitmask(0x0004);
+  msg.set_collide_bitmask(0x01);
 
   sdf::ElementPtr surfaceSDF = msgs::SurfaceToSDF(msg);
   sdf::ElementPtr frictionElem = surfaceSDF->GetElement("friction");
@@ -1428,6 +1429,8 @@ TEST_F(MsgsTest, SurfaceToSDF)
   EXPECT_TRUE(contactElem->Get<bool>("collide_without_contact"));
   EXPECT_EQ(contactElem->Get<unsigned int>("collide_without_contact_bitmask"),
       static_cast<unsigned int>(0x0004));
+  EXPECT_EQ(contactElem->Get<unsigned int>("collide_bitmask"),
+      static_cast<unsigned int>(0x01));
 }
 
 /////////////////////////////////////////////////

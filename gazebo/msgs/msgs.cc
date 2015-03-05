@@ -735,15 +735,21 @@ namespace gazebo
       }
       else if (geomElem->GetName() == "polyline")
       {
+        sdf::ElementPtr polylineElem = geomElem;
         result.set_type(msgs::Geometry::POLYLINE);
-        result.mutable_polyline()->set_height(geomElem->Get<double>("height"));
-        sdf::ElementPtr pointElem = geomElem->GetElement("point");
-        while (pointElem)
+        while (polylineElem)
         {
-           math::Vector2d point = pointElem->Get<math::Vector2d>();
-           pointElem = pointElem->GetNextElement("point");
-           msgs::Vector2d *ptMsg = result.mutable_polyline()->add_point();
-           msgs::Set(ptMsg, point);
+          msgs::Polyline *polylineMsg = result.add_polyline();
+          polylineMsg->set_height(polylineElem->Get<double>("height"));
+          sdf::ElementPtr pointElem = polylineElem->GetElement("point");
+          while (pointElem)
+          {
+             math::Vector2d point = pointElem->Get<math::Vector2d>();
+             pointElem = pointElem->GetNextElement("point");
+             msgs::Vector2d *ptMsg = polylineMsg->add_point();
+             msgs::Set(ptMsg, point);
+          }
+          polylineElem = polylineElem->GetNextElement("polyline");
         }
       }
       else if (geomElem->GetName() == "image")
@@ -1536,6 +1542,11 @@ namespace gazebo
         contactElem->GetElement("collide_without_contact_bitmask")->Set(
             _msg.collide_without_contact_bitmask());
       }
+      if (_msg.has_collide_bitmask())
+      {
+        contactElem->GetElement("collide_bitmask")->Set(
+            _msg.collide_bitmask());
+      }
 
       sdf::ElementPtr odeElem = contactElem->GetElement("ode");
       sdf::ElementPtr bulletElem = contactElem->GetElement("bullet");
@@ -1701,20 +1712,22 @@ namespace gazebo
         geom = msgs::MeshToSDF(meshGeom, geom);
       }
       else if (_msg.type() == msgs::Geometry::POLYLINE &&
-          _msg.has_polyline())
+          _msg.polyline_size() > 0)
       {
-        sdf::ElementPtr geom = geometrySDF->GetElement("polyline");
-        gazebo::msgs::Polyline polylineGeom = _msg.polyline();
-        if (polylineGeom.has_height())
-          geom->GetElement("height")->Set(polylineGeom.height());
-        if (polylineGeom.point_size() > 0)
-          while (geom->HasElement("point"))
-            geom->GetElement("point")->RemoveFromParent();
+        if (_msg.polyline_size() > 0)
+          while (geometrySDF->HasElement("polyline"))
+            geometrySDF->GetElement("polyline")->RemoveFromParent();
 
-        for (int i = 0; i < polylineGeom.point_size(); ++i)
+        for (int j = 0; j < _msg.polyline_size(); ++j)
         {
-          sdf::ElementPtr pointElem = geom->AddElement("point");
-          pointElem->Set(msgs::Convert(polylineGeom.point(i)));
+          sdf::ElementPtr polylineElem = geometrySDF->AddElement("polyline");
+          if (_msg.polyline(j).has_height())
+            polylineElem->GetElement("height")->Set(_msg.polyline(j).height());
+          for (int i = 0; i < _msg.polyline(j).point_size(); ++i)
+          {
+            sdf::ElementPtr pointElem = polylineElem->AddElement("point");
+            pointElem->Set(msgs::Convert(_msg.polyline(j).point(i)));
+          }
         }
       }
       else
