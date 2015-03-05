@@ -722,7 +722,7 @@ TEST_F(MsgsTest, VisualFromSDF_BadGeometryType)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
-  EXPECT_FALSE(sdf::readString(
+  EXPECT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <visual name='visual'>\
            <pose>1 1 1 1 2 3</pose>\

@@ -370,7 +370,7 @@ endif ()
 
 ########################################
 # Find SDFormat
-find_package(SDFormat 2.1.0)
+find_package(SDFormat 2.3.1)
 if (NOT SDFormat_FOUND)
   find_package(SDFormat 3)
 endif()
