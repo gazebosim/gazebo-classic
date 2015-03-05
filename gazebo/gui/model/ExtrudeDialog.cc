@@ -221,12 +221,12 @@ void ExtrudeDialog::UpdateView()
   for (double r = 0; r <= viewHeight; r += sceneMeter/10.0)
   {
     scene->addLine(- margin, r, this->dataPtr->viewWidth + margin, r,
-        QPen(QColor(190, 190, 255)));
+        QPen(QColor(230, 230, 255)));
   }
   for (double c = 0; c <= this->dataPtr->viewWidth; c += sceneMeter/10.0)
   {
     scene->addLine(c, - margin, c, viewHeight + margin,
-        QPen(QColor(190, 190, 255)));
+        QPen(QColor(230, 230, 255)));
   }
   for (double r = 0; r <= viewHeight; r += sceneMeter)
   {

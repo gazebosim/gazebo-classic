@@ -62,6 +62,9 @@
     1. Renamed Part to Link.
         * [Pull request #1478](https://bitbucket.org/osrf/gazebo/pull-request/1478)
 
+    1. Added ExtrudeDialog.
+        * [Pull request #1483](https://bitbucket.org/osrf/gazebo/pull-request/1483)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0

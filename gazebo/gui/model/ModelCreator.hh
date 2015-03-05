@@ -141,6 +141,7 @@ namespace gazebo
       /// \param[in] _type Type of link to add: box, cylinder, or sphere.
       /// \param[in] _size Size of the link.
       /// \param[in] _pose Pose of the link.
+      /// \param[in] _samples Number of samples for polyline.
       /// \return Name of the link that has been added.
       public: std::string AddShape(LinkType _type,
           const math::Vector3 &_size = math::Vector3::One,
