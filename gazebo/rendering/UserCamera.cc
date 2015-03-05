@@ -52,8 +52,9 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
 
   this->dataPtr->selectionBuffer = NULL;
 
-  // Set default UserCamera render rate to 30Hz
-  this->SetRenderRate(30.0);
+  // We want a render rate of 60Hz. Setting the target to 70Hz to account
+  // for some slop
+  this->SetRenderRate(70.0);
 
   this->SetUseSDFPose(false);
 }
@@ -377,8 +378,15 @@ void UserCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
 //////////////////////////////////////////////////
 float UserCamera::GetAvgFPS() const
 {
-  return RenderEngine::Instance()->GetWindowManager()->GetAvgFPS(
-      this->windowId);
+  float avgFPS = 0;
+
+  if (this->renderTarget)
+  {
+    float lastFPS, bestFPS, worstFPS = 0;
+    this->renderTarget->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
+  }
+
+  return avgFPS;
 }
 
 //////////////////////////////////////////////////
