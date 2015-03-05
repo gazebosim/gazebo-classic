@@ -27,7 +27,7 @@ namespace gazebo
     /// \brief Private data for the ExtrudeDialog class
     class ExtrudeDialogPrivate
     {
-      /// \brief TODO.
+      /// \brief Full file path of the SVG file.
       public: std::string filename;
 
       /// \brief Thickness spin box.
@@ -39,11 +39,8 @@ namespace gazebo
       /// \brief Samples spin box.
       public: QSpinBox *samplesSpin;
 
-      /// \brief Import image view width.
-      public: int imageDisplayWidth;
-
-      /// \brief Import image view height.
-      public: int imageDisplayHeight;
+      /// \brief Width of the graphics view in px.
+      public: int viewWidth;
 
       /// \brief Import image view.
       public: QGraphicsView *importImageView;

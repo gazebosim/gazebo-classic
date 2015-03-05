@@ -45,8 +45,9 @@ namespace gazebo
       /// \brief Destructor.
       public: ~ExtrudeDialog();
 
-      /// \brief TODO.
-      public: bool UpdateView();
+      /// \brief Reload SVG file to update the view with the current data in 
+      /// the dialog.
+      public: void UpdateView();
 
       /// \brief Get the thickness value.
       public: double GetThickness() const;
@@ -63,8 +64,21 @@ namespace gazebo
       /// \brief Qt callback when the dialog is rejected.
       private slots: void OnReject();
 
-      /// \brief TODO.
+      /// \brief Qt callback when an int value was changed and the view 
+      /// should be updated.
+      /// \param[in] _value New value, not used but needed for the slot.
       private slots: void OnUpdateView(int _value);
+
+      /// \brief Qt callback when a double value was changed and the view 
+      /// should be updated.
+      /// \param[in] _value New value, not used but needed for the slot.
+      private slots: void OnUpdateView(double _value);
+
+      /// \brief Qt event filter currently used to filter mouse wheel events.
+      /// \param[in] _obj Object that is watched by the event filter.
+      /// \param[in] _event Qt event.
+      /// \return True if the event is handled.
+      private: bool eventFilter(QObject *_obj, QEvent *_event);
 
       /// \internal
       /// \brief Pointer to private data.

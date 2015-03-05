@@ -1961,8 +1961,8 @@ void ConfigWidget::OnItemSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 bool ConfigWidget::eventFilter(QObject *_obj, QEvent *_event)
 {
-  QAbstractSpinBox* spinBox = qobject_cast<QAbstractSpinBox *>(_obj);
-  QComboBox* comboBox = qobject_cast<QComboBox *>(_obj);
+  QAbstractSpinBox *spinBox = qobject_cast<QAbstractSpinBox *>(_obj);
+  QComboBox *comboBox = qobject_cast<QComboBox *>(_obj);
   if (spinBox || comboBox)
   {
     QWidget *widget = qobject_cast<QWidget *>(_obj);
