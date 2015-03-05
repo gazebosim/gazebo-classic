@@ -19,13 +19,13 @@
 #define _GAZEBO_FOOSBALL_DEMO_PLUGIN_HH_
 
 #include <sdf/sdf.hh>
+#include "gazebo/common/Time.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
-
   /// \brief A world plugin that...
   class GAZEBO_VISIBLE FoosballDemoPlugin : public WorldPlugin
   {
@@ -35,11 +35,31 @@ namespace gazebo
     // Documentation Inherited.
     public: virtual void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
 
+    // Documentation inherited.
+    public: virtual void Reset();
+
+    /// \brief Update the state of the game: time, score, ball position in case
+    /// of goals.
+    /// \param[in] _info Information used in the update event.
+    private: void Update(const common::UpdateInfo &_info);
+
+    /// \brief Restart a game.
+    private: void RestartGame();
+
+    /// \brief Restart ball.
+    private: void RestartBall();
+
+    /// \brief Default game time in seconds.
+    private: int kDefaultGameTime = 180;
+
     /// \brief World pointer.
     private: physics::WorldPtr world;
 
     /// \brief SDF for this plugin.
     private: sdf::ElementPtr sdf;
+
+    /// \brief Pointer to the ball.
+    private: physics::ModelPtr ball;
 
     /// \brief Pointer to a node for communication.
     private: transport::NodePtr gzNode;
@@ -49,6 +69,24 @@ namespace gazebo
 
     /// \brief Score publisher.
     private: transport::PublisherPtr scorePub;
+
+    /// \brief Pointer to the update event connection.
+    private: event::ConnectionPtr updateConnection;
+
+    /// \brief Sim time at which the game started.
+    private: common::Time startTimeSim;
+
+    /// \brief Game duration.
+    private: common::Time gameDuration;
+
+    /// \brief Seconds remaining to finish the game.
+    private: common::Time gameTime;
+
+    /// \brief Player "A" score.
+    private: int scoreA;
+
+    /// \brief Player "B" score.
+    private: int scoreB;
   };
 }
 #endif

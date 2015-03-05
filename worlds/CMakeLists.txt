@@ -10,6 +10,7 @@ set (files
   empty_sky.world
   empty.world
   everything.world
+  foosball.world
   force_torque_demo.world
   friction_demo.world
   gripper.world

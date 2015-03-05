@@ -24,6 +24,13 @@
       </plugin>
     </model>
 
+    <!-- A ball -->
+    <include>
+      <pose>0 0 0 0 0 0</pose>
+      <uri>model://robocup_3Dsim_ball</uri>
+      <name>foosball_ball</name>
+    </include>
+
     <!-- Load the plugin for Razer Hydra -->
     <plugin name="hydra" filename="libHydraPlugin.so"></plugin>
 
@@ -33,6 +40,7 @@
       <ball>foosball_ball</ball>
       <goalA>foosball_table::goal_a</goalA>
       <goalB>foosball_table::goal_b</goalB>
+      <game_duration>180</game_duration>
     </plugin>
 
   </world>
