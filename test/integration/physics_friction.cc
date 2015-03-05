@@ -49,11 +49,10 @@ class PhysicsFrictionTest : public ServerFixture,
               physics::Collision_V::iterator iter = collisions.begin();
               if (iter != collisions.end())
               {
-                physics::SurfaceParamsPtr surface = (*iter)->GetSurface();
-                // Average the mu1 and mu2 values
-                this->friction = (
-                  surface->GetFrictionPyramid()->GetMuPrimary() +
-                  surface->GetFrictionPyramid()->GetMuSecondary() ) / 2.0;
+                physics::SurfaceParamsPtr surf = (*iter)->GetSurface();
+                // Use the Secondary friction value,
+                // since that is the direction gravity it slides
+                this->friction = surf->GetFrictionPyramid()->GetMuSecondary();
               }
             }
     public: ~FrictionDemoBox() {}
