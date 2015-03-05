@@ -1524,6 +1524,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   else
     item->setValue(true);
   this->AddProperty(item, _parent);
+  item->setEnabled(false);
 
   // gravity
   item = this->variantManager->addProperty(QVariant::Bool, tr("gravity"));
