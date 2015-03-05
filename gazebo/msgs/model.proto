@@ -16,11 +16,11 @@ message Model
   required string name         = 1;
   optional uint32 id           = 2;
   optional bool is_static      = 3;
-  optional bool self_collide   = 4;
-  optional Pose pose           = 5;
-  repeated Joint joint         = 6;
-  repeated Link link           = 7;
-  optional bool deleted        = 8;
-  repeated Visual visual       = 9;
-  optional Vector3d scale      = 10;
+  optional Pose pose           = 4;
+  repeated Joint joint         = 5;
+  repeated Link link           = 6;
+  optional bool deleted        = 7;
+  repeated Visual visual       = 8;
+  optional Vector3d scale      = 9;
+  optional bool self_collide   = 10;
 }
