@@ -214,20 +214,28 @@ void ExtrudeDialog::UpdateView()
   double viewHeight = svgHeight + 2*margin;
   scene->setSceneRect(0, 0, this->dataPtr->viewWidth, viewHeight);
 
-  // From pixels to view units
-
   // Draw grid lines
   double sceneMeter = 1 * this->GetResolution() * resolutionView;
-
   for (double r = 0; r <= viewHeight; r += sceneMeter/10.0)
-    scene->addLine(- margin, r, this->dataPtr->viewWidth + margin, r, QPen(QColor(190, 190, 255)));
+  {
+    scene->addLine(- margin, r, this->dataPtr->viewWidth + margin, r,
+        QPen(QColor(190, 190, 255)));
+  }
   for (double c = 0; c <= this->dataPtr->viewWidth; c += sceneMeter/10.0)
-    scene->addLine(c, - margin, c, viewHeight + margin, QPen(QColor(190, 190, 255)));
-
+  {
+    scene->addLine(c, - margin, c, viewHeight + margin,
+        QPen(QColor(190, 190, 255)));
+  }
   for (double r = 0; r <= viewHeight; r += sceneMeter)
-    scene->addLine(- margin, r, this->dataPtr->viewWidth + margin, r, QPen(QColor(108, 108, 255)));
+  {
+    scene->addLine(- margin, r, this->dataPtr->viewWidth + margin, r,
+        QPen(QColor(108, 108, 255)));
+  }
   for (double c = 0; c <= this->dataPtr->viewWidth; c += sceneMeter)
-    scene->addLine(c, - margin, c, viewHeight + margin, QPen(QColor(108, 108, 255)));
+  {
+    scene->addLine(c, - margin, c, viewHeight + margin,
+        QPen(QColor(108, 108, 255)));
+  }
 
   // Draw polygons
   for (common::SVGPath p : paths)

@@ -260,6 +260,10 @@ void ModelEditorPalette::OnCustom()
               math::Pose::Zero, importDialog.GetImportPath(),
               extrudeDialog.GetSamples());
         }
+        else
+        {
+          this->OnCustom();
+        }
       }
     }
   }
