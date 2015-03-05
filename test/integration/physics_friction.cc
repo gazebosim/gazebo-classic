@@ -51,7 +51,7 @@ class PhysicsFrictionTest : public ServerFixture,
               {
                 physics::SurfaceParamsPtr surf = (*iter)->GetSurface();
                 // Use the Secondary friction value,
-                // since that is the direction gravity it slides
+                // since gravity has a non-zero component in the y direction
                 this->friction = surf->GetFrictionPyramid()->GetMuSecondary();
               }
             }
