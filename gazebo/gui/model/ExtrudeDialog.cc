@@ -108,6 +108,7 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
   this->dataPtr->importImageView->setViewportUpdateMode(
       QGraphicsView::FullViewportUpdate);
   this->dataPtr->importImageView->setDragMode(QGraphicsView::ScrollHandDrag);
+  this->dataPtr->importImageView->setMinimumWidth(200);
   this->dataPtr->viewWidth = 500;
   this->dataPtr->importImageView->installEventFilter(this);
   this->UpdateView();
@@ -236,6 +237,18 @@ void ExtrudeDialog::UpdateView()
     scene->addLine(c, - margin, c, viewHeight + margin,
         QPen(QColor(108, 108, 255)));
   }
+
+  // Draw origin
+  scene->addLine(this->dataPtr->viewWidth/2.0 - this->dataPtr->viewWidth/30.0,
+                 viewHeight/2.0,
+                 this->dataPtr->viewWidth/2.0 + this->dataPtr->viewWidth/30.0,
+                 viewHeight/2.0,
+                 QPen(QColor(50, 50, 255), 2));
+  scene->addLine(this->dataPtr->viewWidth/2.0,
+                 viewHeight/2.0 - this->dataPtr->viewWidth/30.0,
+                 this->dataPtr->viewWidth/2.0,
+                 viewHeight/2.0 + this->dataPtr->viewWidth/30.0,
+                 QPen(QColor(50, 50, 255), 2));
 
   // Draw polygons
   for (common::SVGPath p : paths)
