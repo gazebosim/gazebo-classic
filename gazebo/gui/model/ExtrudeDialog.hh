@@ -45,7 +45,7 @@ namespace gazebo
       /// \brief Destructor.
       public: ~ExtrudeDialog();
 
-      /// \brief Reload SVG file to update the view with the current data in 
+      /// \brief Reload SVG file to update the view with the current data in
       /// the dialog.
       public: void UpdateView();
 
@@ -64,12 +64,12 @@ namespace gazebo
       /// \brief Qt callback when the dialog is rejected.
       private slots: void OnReject();
 
-      /// \brief Qt callback when an int value was changed and the view 
+      /// \brief Qt callback when an int value was changed and the view.
       /// should be updated.
       /// \param[in] _value New value, not used but needed for the slot.
       private slots: void OnUpdateView(int _value);
 
-      /// \brief Qt callback when a double value was changed and the view 
+      /// \brief Qt callback when a double value was changed and the view.
       /// should be updated.
       /// \param[in] _value New value, not used but needed for the slot.
       private slots: void OnUpdateView(double _value);

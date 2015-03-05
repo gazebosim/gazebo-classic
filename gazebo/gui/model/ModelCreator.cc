@@ -591,70 +591,67 @@ std::string ModelCreator::AddShape(LinkType _type,
   }
   else if (_type == LINK_MESH)
   {
+    sdf::ElementPtr meshElem = geomElem->AddElement("mesh");
+    meshElem->GetElement("scale")->Set(_size);
+    meshElem->GetElement("uri")->Set(_uri);
+  }
+  else if (_type == LINK_POLYLINE)
+  {
     QFileInfo info(QString::fromStdString(_uri));
-    if (!info.isFile())
+    if (!info.isFile() || info.completeSuffix().toLower() != "svg")
     {
-      gzerr << "File [" << _uri << "] not found!" << std::endl;
+      gzerr << "File [" << _uri << "] not found or invalid!" << std::endl;
       return std::string();
     }
 
-    if (info.completeSuffix().toLower() == "svg")
+    common::SVGLoader svgLoader(_samples);
+    std::vector<common::SVGPath> paths;
+    svgLoader.Parse(_uri, paths);
+
+    if (paths.empty())
     {
-      common::SVGLoader svgLoader(_samples);
-      std::vector<common::SVGPath> paths;
-      svgLoader.Parse(_uri, paths);
+      gzerr << "No paths found on file [" << _uri << "]" << std::endl;
+      return std::string();
+    }
 
-      if (paths.empty())
+    // Find extreme values to center the polylines
+    math::Vector2d min(paths[0].polylines[0][0]);
+    math::Vector2d max(min);
+    for (common::SVGPath p : paths)
+    {
+      for (std::vector<math::Vector2d> poly : p.polylines)
       {
-        gzerr << "No paths found on file [" << _uri << "]" << std::endl;
-        return std::string();
-      }
-
-      // Find extreme values to center the polylines
-      math::Vector2d min(paths[0].polylines[0][0]);
-      math::Vector2d max(min);
-      for (common::SVGPath p : paths)
-      {
-        for (std::vector<math::Vector2d> poly : p.polylines)
+        for (math::Vector2d pt : poly)
         {
-          for (math::Vector2d pt : poly)
-          {
-            if (pt.x < min.x)
-              min.x = pt.x;
-            if (pt.y < min.y)
-              min.y = pt.y;
-            if (pt.x > max.x)
-              max.x = pt.x;
-            if (pt.y > max.y)
-              max.y = pt.y;
-          }
-        }
-      }
-
-      for (common::SVGPath p : paths)
-      {
-        for (std::vector<math::Vector2d> poly : p.polylines)
-        {
-          sdf::ElementPtr polylineElem = geomElem->AddElement("polyline");
-          polylineElem->GetElement("height")->Set(_size.z);
-
-          for (math::Vector2d pt : poly)
-          {
-            // Translate to center
-            pt = pt - min - (max-min)*0.5;
-            // Swap X and Y so Z will point up
-            // (in 2D it points into the screen)
-            sdf::ElementPtr pointElem = polylineElem->AddElement("point");
-            pointElem->Set(math::Vector2d(pt.y*_size.y, pt.x*_size.x));
-          }
+          if (pt.x < min.x)
+            min.x = pt.x;
+          if (pt.y < min.y)
+            min.y = pt.y;
+          if (pt.x > max.x)
+            max.x = pt.x;
+          if (pt.y > max.y)
+            max.y = pt.y;
         }
       }
     }
-    else
+
+    for (common::SVGPath p : paths)
     {
-      sdf::ElementPtr meshElem = geomElem->AddElement("mesh");
-      meshElem->GetElement("scale")->Set(_size);
-      meshElem->GetElement("uri")->Set(_uri);
+      for (std::vector<math::Vector2d> poly : p.polylines)
+      {
+        sdf::ElementPtr polylineElem = geomElem->AddElement("polyline");
+        polylineElem->GetElement("height")->Set(_size.z);
+
+        for (math::Vector2d pt : poly)
+        {
+          // Translate to center
+          pt = pt - min - (max-min)*0.5;
+          // Swap X and Y so Z will point up
+          // (in 2D it points into the screen)
+          sdf::ElementPtr pointElem = polylineElem->AddElement("point");
+          pointElem->Set(math::Vector2d(pt.y*_size.y, pt.x*_size.x));
+        }
+      }
     }
   }
   else
@@ -674,7 +671,7 @@ std::string ModelCreator::AddShape(LinkType _type,
 
   // insert over ground plane for now
   math::Vector3 linkPos = linkVisual->GetWorldPose().pos;
-  if (_type != LINK_MESH)
+  if (_type == LINK_BOX || _type == LINK_CYLINDER || _type == LINK_SPHERE)
   {
     linkPos.z = _size.z * 0.5;
   }

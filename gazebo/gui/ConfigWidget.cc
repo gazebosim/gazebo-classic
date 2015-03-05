@@ -609,7 +609,6 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
                 else if (geomMsgName == "PolylineGeom")
                 {
                   continue;
-                  break;
                 }
               }
               this->UpdateGeometryWidget(configChildWidget,

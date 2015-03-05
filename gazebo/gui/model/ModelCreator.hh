@@ -73,8 +73,10 @@ namespace gazebo
         LINK_SPHERE,
         /// \brief Cylinder
         LINK_CYLINDER,
-        /// \brief Custom
-        LINK_MESH
+        /// \brief Imported 3D mesh
+        LINK_MESH,
+        /// \brief Extruded polyline
+        LINK_POLYLINE
       };
 
       /// \enum SaveState

@@ -253,7 +253,7 @@ void ModelEditorPalette::OnCustom()
         extrudeDialog.deleteLater();
         if (extrudeDialog.exec() == QDialog::Accepted)
         {
-          this->modelCreator->AddShape(ModelCreator::LINK_MESH,
+          this->modelCreator->AddShape(ModelCreator::LINK_POLYLINE,
               math::Vector3(1.0/extrudeDialog.GetResolution(),
               1.0/extrudeDialog.GetResolution(),
               extrudeDialog.GetThickness()),

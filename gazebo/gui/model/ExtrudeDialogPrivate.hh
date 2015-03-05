@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_EXTRUDE_DIALOG_PRIVATE_HH_
 #define _GAZEBO_EXTRUDE_DIALOG_PRIVATE_HH_
 
+#include <string>
+
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -42,8 +44,8 @@ namespace gazebo
       /// \brief Width of the graphics view in px.
       public: int viewWidth;
 
-      /// \brief Import image view.
-      public: QGraphicsView *importImageView;
+      /// \brief Display the SVG paths.
+      public: QGraphicsView *view;
     };
   }
 }

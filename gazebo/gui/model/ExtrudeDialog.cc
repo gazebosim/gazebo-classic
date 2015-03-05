@@ -74,13 +74,14 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
   inputsLayout->addWidget(samplesTips, 2, 2);
 
   // Buttons
-  QHBoxLayout *buttonsLayout = new QHBoxLayout();
   QPushButton *backButton = new QPushButton(tr("Back"));
   connect(backButton, SIGNAL(clicked()), this, SLOT(OnReject()));
 
   QPushButton *okButton = new QPushButton("Ok");
   okButton->setDefault(true);
   connect(okButton, SIGNAL(clicked()), this, SLOT(OnAccept()));
+
+  QHBoxLayout *buttonsLayout = new QHBoxLayout();
   buttonsLayout->addWidget(backButton);
   buttonsLayout->addWidget(okButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
@@ -99,24 +100,24 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
   // Image view
   this->dataPtr->filename = _filename;
 
-  this->dataPtr->importImageView = new QGraphicsView(this);
+  this->dataPtr->view = new QGraphicsView(this);
   QGraphicsScene *scene = new QGraphicsScene();
   scene->setBackgroundBrush(Qt::white);
-  this->dataPtr->importImageView->setSizePolicy(QSizePolicy::Expanding,
+  this->dataPtr->view->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Expanding);
-  this->dataPtr->importImageView->setScene(scene);
-  this->dataPtr->importImageView->setViewportUpdateMode(
+  this->dataPtr->view->setScene(scene);
+  this->dataPtr->view->setViewportUpdateMode(
       QGraphicsView::FullViewportUpdate);
-  this->dataPtr->importImageView->setDragMode(QGraphicsView::ScrollHandDrag);
-  this->dataPtr->importImageView->setMinimumWidth(200);
+  this->dataPtr->view->setDragMode(QGraphicsView::ScrollHandDrag);
+  this->dataPtr->view->setMinimumWidth(200);
   this->dataPtr->viewWidth = 500;
-  this->dataPtr->importImageView->installEventFilter(this);
+  this->dataPtr->view->installEventFilter(this);
   this->UpdateView();
 
   // Main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addWidget(leftColumn, 0, Qt::AlignTop);
-  mainLayout->addWidget(this->dataPtr->importImageView);
+  mainLayout->addWidget(this->dataPtr->view);
 
   this->setLayout(mainLayout);
 }
@@ -174,7 +175,7 @@ void ExtrudeDialog::OnUpdateView(double /*_value*/)
 /////////////////////////////////////////////////
 void ExtrudeDialog::UpdateView()
 {
-  QGraphicsScene *scene = this->dataPtr->importImageView->scene();
+  QGraphicsScene *scene = this->dataPtr->view->scene();
   scene->clear();
 
   common::SVGLoader svgLoader(this->GetSamples());
@@ -206,13 +207,13 @@ void ExtrudeDialog::UpdateView()
           max.y = pt.y;
       }
     }
-  }\
+  }
 
   int margin = 50;
   double svgWidth = this->dataPtr->viewWidth - margin * 2;
-  double resolutionView = svgWidth/(max.x-min.x);
+  double resolutionView = svgWidth / (max.x-min.x);
   double svgHeight = (max.y - min.y) * resolutionView;
-  double viewHeight = svgHeight + 2*margin;
+  double viewHeight = svgHeight + 2 * margin;
   scene->setSceneRect(0, 0, this->dataPtr->viewWidth, viewHeight);
 
   // Draw grid lines
@@ -278,7 +279,8 @@ void ExtrudeDialog::UpdateView()
         scene->addItem(ptItem);
       }
       // Draw polygon
-      QGraphicsPolygonItem *polyItem = new QGraphicsPolygonItem(QPolygonF(polygonPts));
+      QGraphicsPolygonItem *polyItem = new QGraphicsPolygonItem(
+          QPolygonF(polygonPts));
       polyItem->setPen(QPen(Qt::black, 3, Qt::SolidLine));
       scene->addItem(polyItem);
     }
@@ -292,7 +294,6 @@ bool ExtrudeDialog::eventFilter(QObject *_obj, QEvent *_event)
   if (graphicsView && _event->type() == QEvent::Resize)
   {
     QResizeEvent *resizeEv = dynamic_cast<QResizeEvent *>(_event);
-
     this->dataPtr->viewWidth = resizeEv->size().width() - 20;
     this->UpdateView();
   }
