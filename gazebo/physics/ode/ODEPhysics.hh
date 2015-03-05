@@ -193,7 +193,7 @@ namespace gazebo
       public: virtual boost::any GetParam(const std::string &_key) const;
 
       /// Documentation inherited
-      public: virtual boost::any GetParam(const int &_key) const;
+      public: virtual boost::any GetParam(const int _key) const;
 
       /// \brief Return the world space id.
       /// \return The space id for the world.

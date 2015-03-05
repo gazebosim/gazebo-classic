@@ -1276,52 +1276,45 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 
 boost::any ODEPhysics::GetParam(const int _key) const
 {
-  switch(_key)
+  sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
+  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
+
+  switch (_key)
   {
     case SOLVER_TYPE:
       return odeElem->GetElement("solver")->Get<std::string>("type");
-      break;
     case GLOBAL_CFM:
       return odeElem->GetElement("constraints")->Get<double>("cfm");
-      break;
     case GLOBAL_ERP:
       return odeElem->GetElement("constraints")->Get<double>("erp");
-      break;
     case SOR_PRECON_ITERS:
       return odeElem->GetElement("solver")->Get<int>("precon_iters");
-      break;
     case PGS_ITERS:
       return odeElem->GetElement("solver")->Get<int>("iters");
-      break;
     case SOR:
       return odeElem->GetElement("solver")->Get<double>("sor");
-      break;
     case CONTACT_MAX_CORRECTING_VEL:
       return odeElem->GetElement("constraints")->Get<double>(
           "contact_max_correcting_vel");
-      break;
     case CONTACT_SURFACE_LAYER:
       return odeElem->GetElement("constraints")->Get<double>(
         "contact_surface_layer");
-      break;
     case MAX_CONTACTS:
       return this->sdf->Get<int>("max_contacts");
-      break;
     case MIN_STEP_SIZE:
       return odeElem->GetElement("solver")->Get<double>("min_step_size");
-      break;
     case INERTIA_RATIO_REDUCTION:
       return dWorldGetQuickStepInertiaRatioReduction(this->dataPtr->worldId);
+    default:
       break;
   }
+  gzwarn << "Enum " << _key << " not in ODEPhysics" << std::endl;
+  return 0;
 }
 
 //////////////////////////////////////////////////
 boost::any ODEPhysics::GetParam(const std::string &_key) const
 {
-  sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
-  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
-
   if (_key == "solver_type")
   {
     return this->GetParam(SOLVER_TYPE);
