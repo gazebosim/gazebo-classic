@@ -178,9 +178,9 @@ namespace gazebo
       /// \return Pointer to the link, NULL if the name is invalid.
       public: LinkPtr GetLink(const std::string &_name ="canonical") const;
 
-      /// \brief If this model allows self-collisions by default. \n
+      /// \brief If true, all links within the model will collide by default.
       /// Two links within the same model will not collide if both have
-      /// self_collide == false. \n
+      /// link.self_collide == false.
       /// link 1 and link2 collide = link1.self_collide || link2.self_collide
       /// Bodies connected by a joint are exempt from this, and will
       /// never collide.
