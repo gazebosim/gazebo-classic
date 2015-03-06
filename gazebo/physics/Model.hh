@@ -182,6 +182,8 @@ namespace gazebo
       /// Two links within the same model will not collide if both have
       /// self_collide == false. \n
       /// link 1 and link2 collide = link1.self_collide || link2.self_collide
+      /// Bodies connected by a joint are exempt from this, and will
+      /// never collide.
       /// \return True if self-collide enabled for this model, false otherwise.
       public: bool GetSelfCollide() const;
 
