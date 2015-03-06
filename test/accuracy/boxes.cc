@@ -132,7 +132,7 @@ void BoxesTest::Boxes(const std::string &_physicsEngine
   math::Vector3 p0 = link->GetWorldInertialPose().pos;
 
   // initial angular momentum in global frame
-  math::Vector3 H0 = link->GetWorldInertiaMatrix() * link->GetWorldAngularVel();
+  math::Vector3 H0 = link->GetWorldAngularMomentum();
   ASSERT_EQ(H0, math::Vector3(Ixx, Iyy, Izz) * w0);
   double H0mag = H0.GetLength();
 
@@ -176,7 +176,7 @@ void BoxesTest::Boxes(const std::string &_physicsEngine
     linearPositionError.InsertData(p - (p0 + v0 * t + 0.5*g*t*t));
 
     // angular momentum error
-    math::Vector3 H = link->GetWorldInertiaMatrix()*link->GetWorldAngularVel();
+    math::Vector3 H = link->GetWorldAngularMomentum();
     angularMomentumError.InsertData((H - H0) / H0mag);
 
     // angular position error
