@@ -121,7 +121,6 @@ set (gtest_sources_dri
   Heightmap_TEST.cc
   SonarVisual_TEST.cc
   TransmitterVisual_TEST.cc
-  UserCamera_TEST.cc
   Visual_TEST.cc
 )
 
