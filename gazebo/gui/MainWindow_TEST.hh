@@ -25,9 +25,6 @@ class MainWindow_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test user camera frames per second
-  private slots: void UserCameraFPS();
-
   /// \brief Test copying and pasting a model and a light
   private slots: void CopyPaste();
 
@@ -40,6 +37,9 @@ class MainWindow_TEST : public QTestFixture
 
   /// \brief Test moving the user camera via a joystick message.
   private slots: void UserCameraJoystick();
+
+  /// \brief Test user camera frames per second
+  private slots: void UserCameraFPS();
 };
 
 #endif
