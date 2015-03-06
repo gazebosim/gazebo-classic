@@ -17,10 +17,14 @@
 
 #include <algorithm>
 #include <iostream>
+#include <mutex>
 #include <string>
 #include <sdf/sdf.hh>
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -32,7 +36,117 @@ using namespace gazebo;
 GZ_REGISTER_WORLD_PLUGIN(FoosballDemoPlugin)
 
 /////////////////////////////////////////////////
-FoosballDemoPlugin::FoosballDemoPlugin()
+void KickoffState::Initialize()
+{
+  State::Initialize();
+
+  // Move the ball to the centre of the table.
+  float ballHeight = this->plugin->tableHeight + 0.2;
+  math::Pose newPose(math::Pose(0, 0, ballHeight, 0, 0, 0));
+  math::Vector3 newVel(0, 0, 0);
+  this->plugin->ball->SetWorldPose(newPose);
+  this->plugin->ball->SetLinearVel(newVel);
+}
+
+/////////////////////////////////////////////////
+void KickoffState::Update()
+{
+  // After some time, go to play mode.
+  common::Time elapsed = this->timer.GetElapsed();
+  if (elapsed.sec > 2)
+    this->plugin->SetCurrentState(this->plugin->playState);
+}
+
+/////////////////////////////////////////////////
+void GoalAState::Initialize()
+{
+  State::Initialize();
+  this->plugin->scoreA++;
+}
+
+/////////////////////////////////////////////////
+void GoalAState::Update()
+{
+  // After some time, go to kickoff mode.
+  common::Time elapsed = this->timer.GetElapsed();
+  if (elapsed.sec > 2)
+    this->plugin->SetCurrentState(this->plugin->kickoffState);
+}
+
+/////////////////////////////////////////////////
+void GoalBState::Initialize()
+{
+  State::Initialize();
+  this->plugin->scoreB++;
+}
+
+/////////////////////////////////////////////////
+void GoalBState::Update()
+{
+  // After some time, go to kickoff mode.
+  common::Time elapsed = this->timer.GetElapsed();
+  if (elapsed.sec > 2)
+    this->plugin->SetCurrentState(this->plugin->kickoffState);
+}
+
+/////////////////////////////////////////////////
+void PlayState::Initialize()
+{
+  State::Initialize();
+
+  // Launch the ball and start the game!
+  math::Vector3 newVel(0, 0.5, -0.2);
+  this->plugin->ball->SetLinearVel(newVel);
+}
+
+/////////////////////////////////////////////////
+void PlayState::Update()
+{
+  // Is the game done?
+  if (this->plugin->gameTime == 0)
+  {
+    this->plugin->SetCurrentState(this->plugin->finishedState);
+    return;
+  }
+
+  math::Pose ballPose = this->plugin->ball->GetWorldPose();
+
+  // Does player "A" score?
+  if (ballPose.pos.x > this->plugin->tableLength)
+  {
+    this->plugin->SetCurrentState(this->plugin->goalAState);
+    return;
+  }
+
+  // Does player "B" score?
+  if (ballPose.pos.x < -this->plugin->tableLength)
+  {
+    this->plugin->SetCurrentState(this->plugin->goalBState);
+    return;
+  }
+}
+
+/////////////////////////////////////////////////
+void FinishedState::Initialize()
+{
+  State::Initialize();
+
+  // Move the ball to the centre of the table.
+  float ballHeight = this->plugin->tableHeight + 0.2;
+  math::Pose newPose(math::Pose(0, 0, ballHeight, 0, 0, 0));
+  math::Vector3 newVel(0, 0, 0);
+  this->plugin->ball->SetWorldPose(newPose);
+  this->plugin->ball->SetLinearVel(newVel);
+}
+
+/////////////////////////////////////////////////
+void FinishedState::Update()
+{
+  // Stay here forever unless someone restarts the game.
+}
+
+/////////////////////////////////////////////////
+FoosballDemoPlugin::~FoosballDemoPlugin()
 {
   event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
 }
@@ -58,11 +172,31 @@ void FoosballDemoPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     return;
   }
 
+  // Read the table length.
+  if (!_sdf->HasElement("table_length"))
+  {
+    std::cerr << "Unable to find the [table_length] parameter" << std::endl;
+    return;
+  }
+  this->tableLength = _sdf->Get<float>("table_length");
+
+  // Read the table height.
+  if (!_sdf->HasElement("table_height"))
+  {
+    std::cerr << "Unable to find the [table_height] parameter" << std::endl;
+    return;
+  }
+  this->tableHeight = _sdf->Get<float>("table_height");
+
   // Initialize game duration.
-  if (_sdf->HasElement("game_time"))
-    this->gameDuration = gazebo::common::Time(_sdf->Get<int>("game_time"), 0);
+  if (_sdf->HasElement("game_duration"))
+    this->gameDuration = common::Time(_sdf->Get<int>("game_duration"), 0);
   else
-    this->gameDuration = gazebo::common::Time(kDefaultGameTime, 0);
+  {
+    std::cerr << "Unable to find the [game_duration] parameter."
+                 " Using the default duration" << std::endl;
+    this->gameDuration = common::Time(kDefaultGameTime, 0);
+  }
 
   // Initialize transport.
   this->gzNode = transport::NodePtr(new transport::Node());
@@ -70,27 +204,35 @@ void FoosballDemoPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   this->timePub = this->gzNode->Advertise<msgs::Time>("~/foosball_demo/time");
   this->scorePub =
     this->gzNode->Advertise<msgs::GzString>("~/foosball_demo/score");
+  this->statePub =
+    this->gzNode->Advertise<msgs::GzString>("~/foosball_demo/state");
+  this->restartBallSub =
+    this->gzNode->Subscribe("~/foosball_demo/restart_ball",
+    &FoosballDemoPlugin::OnRestartBall, this);
+  this->restartGameSub =
+    this->gzNode->Subscribe("~/foosball_demo/restart_game",
+    &FoosballDemoPlugin::OnRestartGame, this);
 
   // Connect to the update event.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&FoosballDemoPlugin::Update, this, _1));
 
-  this->RestartGame();
+  this->OnRestartGame(nullptr);
 }
 
 /////////////////////////////////////////////////
 void FoosballDemoPlugin::Reset()
 {
-  this->RestartGame();
+  this->OnRestartGame(nullptr);
 }
 
 /////////////////////////////////////////////////
 void FoosballDemoPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
-  // Check for goals.
-  math::Pose ballPose = this->ball->GetWorldPose();
+  std::lock_guard<std::mutex> lock(this->mutex);
 
-  // If goal, update score and restart ball.
+  // Step.
+  this->currentState->Update();
 
   // Update and publish game time.
   common::Time elapsed = this->world->GetSimTime() - this->startTimeSim;
@@ -103,21 +245,42 @@ void FoosballDemoPlugin::Update(const common::UpdateInfo &/*_info*/)
   msgs::GzString scoreMsg;
   scoreMsg.set_data(score);
   this->scorePub->Publish(scoreMsg);
+
+  // Publish game state.
+  msgs::GzString stateMsg;
+  stateMsg.set_data(this->currentState->GetName());
+  this->statePub->Publish(stateMsg);
 }
 
 /////////////////////////////////////////////////
-void FoosballDemoPlugin::RestartGame()
+void FoosballDemoPlugin::SetCurrentState(State<FoosballDemoPlugin> &_newState)
 {
+  // Only update the state if _newState is different than the current state.
+  if (this->currentState->GetName() != _newState.GetName())
+  {
+    this->currentState = &_newState;
+    this->currentState->Initialize();
+  }
+}
+
+/////////////////////////////////////////////////
+void FoosballDemoPlugin::OnRestartBall(ConstIntPtr &/*_unused*/)
+{
+  std::lock_guard<std::mutex> lock(this->mutex);
+
+  this->currentState = &kickoffState;
+  this->currentState->Initialize();
+}
+
+/////////////////////////////////////////////////
+void FoosballDemoPlugin::OnRestartGame(ConstIntPtr &/*_unused*/)
+{
+  std::lock_guard<std::mutex> lock(this->mutex);
+
   this->startTimeSim = this->world->GetSimTime();
   this->gameTime = this->gameDuration;
   scoreA = scoreB = 0;
-}
 
-/////////////////////////////////////////////////
-void FoosballDemoPlugin::RestartBall()
-{
-  math::Pose newPose(math::Pose(0, 0, 0.2, 0, 0, 0));
-  math::Vector3 newVel(0, 0.5, -0.2);
-  this->ball->SetWorldPose(newPose);
-  this->ball->SetLinearVel(newVel);
+  this->currentState = &kickoffState;
+  this->currentState->Initialize();
 }

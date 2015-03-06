@@ -38,9 +38,9 @@
     <plugin name='foosball_demo' filename='libFoosballDemoPlugin.so'>
       <!-- Parameters -->
       <ball>foosball_ball</ball>
-      <goalA>foosball_table::goal_a</goalA>
-      <goalB>foosball_table::goal_b</goalB>
-      <game_duration>180</game_duration>
+      <table_length>2.0</table_length>
+      <table_height>1.0</table_height>
+      <game_duration>10</game_duration>
     </plugin>
 
   </world>
