@@ -39,7 +39,10 @@ set (headers
 
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
-  set (qt_tests ${qt_tests} JointMaker_TEST.cc)
+  set (qt_tests ${qt_tests} 
+    JointMaker_TEST.cc
+    ExtrudeDialog_TEST.cc
+  )
 endif()
 
 # Generate executables for each of the QT unit tests

@@ -50,13 +50,16 @@ namespace gazebo
       public: void UpdateView();
 
       /// \brief Get the thickness value.
+      /// \return Thickness value.
       public: double GetThickness() const;
 
       /// \brief Get the number of samples per segment.
+      /// \return Number of samples.
       public: unsigned int GetSamples() const;
 
       /// \brief Get the resolution in px/m.
-      public: unsigned int GetResolution() const;
+      /// \return Resolution value.
+      public: double GetResolution() const;
 
       /// \brief Qt callback when the dialog is accepted.
       private slots: void OnAccept();

@@ -110,7 +110,7 @@ void ImportDialog::SetTitle(const std::string &_title)
 void ImportDialog::OnBrowse()
 {
   QFileDialog fd(this, tr("Import Link"), QDir::homePath(),
-      tr("Accepted (*.svg *.dae *.stl)"));
+      tr("Files (*.svg *.dae *.stl)"));
   fd.setFilter(QDir::AllDirs | QDir::Hidden);
   fd.setFileMode(QFileDialog::ExistingFile);
   if (fd.exec())

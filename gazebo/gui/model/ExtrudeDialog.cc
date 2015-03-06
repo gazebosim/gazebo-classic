@@ -36,6 +36,7 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
 
   // Thickness
   this->dataPtr->thicknessSpin = new QDoubleSpinBox();
+  this->dataPtr->thicknessSpin->setObjectName("thicknessSpin");
   this->dataPtr->thicknessSpin->setRange(0.001, 1000);
   this->dataPtr->thicknessSpin->setSingleStep(0.1);
   this->dataPtr->thicknessSpin->setDecimals(3);
@@ -43,6 +44,7 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
 
   // Resolution
   this->dataPtr->resolutionSpin = new QDoubleSpinBox();
+  this->dataPtr->resolutionSpin->setObjectName("resolutionSpin");
   this->dataPtr->resolutionSpin->setRange(1, 100000);
   this->dataPtr->resolutionSpin->setSingleStep(100);
   this->dataPtr->resolutionSpin->setDecimals(3);
@@ -53,6 +55,7 @@ ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
 
   // Samples
   this->dataPtr->samplesSpin = new QSpinBox();
+  this->dataPtr->samplesSpin->setObjectName("samplesSpin");
   this->dataPtr->samplesSpin->setRange(2, 100);
   this->dataPtr->samplesSpin->setSingleStep(1);
   this->dataPtr->samplesSpin->setValue(5);
@@ -155,7 +158,7 @@ unsigned int ExtrudeDialog::GetSamples() const
 }
 
 /////////////////////////////////////////////////
-unsigned int ExtrudeDialog::GetResolution() const
+double ExtrudeDialog::GetResolution() const
 {
   return this->dataPtr->resolutionSpin->value();
 }
@@ -191,11 +194,11 @@ void ExtrudeDialog::UpdateView()
   // Find extreme values to center and scale
   math::Vector2d min(paths[0].polylines[0][0]);
   math::Vector2d max(min);
-  for (common::SVGPath p : paths)
+  for (auto p : paths)
   {
-    for (std::vector<math::Vector2d> poly : p.polylines)
+    for (auto poly : p.polylines)
     {
-      for (math::Vector2d pt : poly)
+      for (auto pt : poly)
       {
         if (pt.x < min.x)
           min.x = pt.x;

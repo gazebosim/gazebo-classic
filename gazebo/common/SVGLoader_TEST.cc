@@ -57,7 +57,7 @@ TEST_F(SVGLoader, LoadPaths)
   }
 
   // the test file has 3 paths inside
-  EXPECT_EQ(3, paths.size());
+  EXPECT_EQ((unsigned long)3, paths.size());
   common::SVGPath &a = paths[0];
   EXPECT_EQ("letterA", a.id);
 
@@ -84,7 +84,7 @@ TEST_F(SVGLoader, LoadPaths)
   EXPECT_EQ(8, p2.subpaths[0].size());
   // since it has splines, there are more
   // points than commands
-  EXPECT_EQ(61, p2.polylines[0].size());
+  EXPECT_EQ(67, p2.polylines[0].size());
 }
 
 /////////////////////////////////////////////////
