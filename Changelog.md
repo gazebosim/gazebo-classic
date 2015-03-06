@@ -62,6 +62,10 @@
     1. Renamed Part to Link.
         * [Pull request #1478](https://bitbucket.org/osrf/gazebo/pull-request/1478)
 
+    1. Fix snapping inside editor and rotate snap in absolute coordinates.
+        * [Pull request #1489](https://bitbucket.org/osrf/gazebo/pull-request/1489)
+        * [Issue #1457](https://bitbucket.org/osrf/gazebo/issue/1457)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
