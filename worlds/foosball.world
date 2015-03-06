@@ -40,7 +40,7 @@
       <ball>foosball_ball</ball>
       <table_length>2.0</table_length>
       <table_height>1.0</table_height>
-      <game_duration>10</game_duration>
+      <game_duration>180</game_duration>
     </plugin>
 
   </world>

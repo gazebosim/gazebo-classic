@@ -158,14 +158,14 @@ namespace gazebo
   /// The game has the following states:
   ///   * Kickoff : The ball is still in the center of the table.
   ///   * Play    : The ball is thrown and the game starts.
-  ///   * GameA   : Player "A" scores a goal. After a few seconds the game
+  ///   * GoalA   : Player "A" scores a goal. After a few seconds the game
   ///               transitions to Kickoff state.
-  ///   * GameB   : Similar to the previous state but triggered when "B" scores.
+  ///   * GoalB   : Similar to the previous state but triggered when "B" scores.
   ///   * Finished: End of the game.
   ///
   /// The plugin periodically publishes the following information:
   ///   * Game time [~/foosball_demo/time] : Remaining game time (s).
-  ///   * Score [~/foosball_demo/score] : The format is "<ScoreA>:<ScoreB>".
+  ///   * Score [~/foosball_demo/score] : The format is "<goals_A>:<goals_B>".
   ///   * State [~/foosball_demo/state] : Game state in string format.
   ///
   /// The plugin can receive two messages that triggers the following actions:
