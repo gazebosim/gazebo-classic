@@ -187,7 +187,7 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::RemoveJointsByPart(const std::string &_partName)
+void JointMaker::RemoveJointsByLink(const std::string &_linkName)
 {
   std::vector<std::string> toDelete;
   boost::unordered_map<std::string, JointData *>::iterator it;
@@ -195,8 +195,8 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
   {
     JointData *joint = it->second;
 
-    if (joint->child->GetName() == _partName ||
-        joint->parent->GetName() == _partName)
+    if (joint->child->GetName() == _linkName ||
+        joint->parent->GetName() == _linkName)
     {
       toDelete.push_back(it->first);
     }
@@ -209,21 +209,21 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
 }
 
 /////////////////////////////////////////////////
-std::vector<JointData *> JointMaker::GetJointDataByPart(
-    const std::string &_partName) const
+std::vector<JointData *> JointMaker::GetJointDataByLink(
+    const std::string &_linkName) const
 {
-  std::vector<JointData *> partJoints;
+  std::vector<JointData *> linkJoints;
   for (auto jointIt : this->joints)
   {
     JointData *jointData = jointIt.second;
 
-    if (jointData->child->GetName() == _partName ||
-        jointData->parent->GetName() == _partName)
+    if (jointData->child->GetName() == _linkName ||
+        jointData->parent->GetName() == _linkName)
     {
-      partJoints.push_back(jointData);
+      linkJoints.push_back(jointData);
     }
   }
-  return partJoints;
+  return linkJoints;
 }
 
 /////////////////////////////////////////////////
@@ -300,7 +300,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           return true;
         }
 
-        // Pressed parent part
+        // Pressed parent link
         if (!this->selectedVis)
         {
           if (this->mouseJoint)
@@ -314,7 +314,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           this->mouseJoint = this->CreateJoint(this->selectedVis,
               rendering::VisualPtr());
         }
-        // Pressed child part
+        // Pressed child link
         else if (this->selectedVis != this->hoverVis)
         {
           if (this->hoverVis)
@@ -512,7 +512,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     if (this->hoverVis && this->hoverVis != this->selectedVis)
       this->hoverVis->SetEmissive(common::Color(0.0, 0.0, 0.0));
 
-    // only highlight editor parts by making sure it's not an item in the
+    // only highlight editor links by making sure it's not an item in the
     // gui tree widget or a joint hotspot.
     rendering::VisualPtr rootVis = vis->GetRootVisual();
     if (rootVis->IsPlane())
@@ -527,21 +527,21 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     }
   }
 
-  // Case when a parent part is already selected and currently
-  // extending the joint line to a child part
+  // Case when a parent link is already selected and currently
+  // extending the joint line to a child link
   if (this->selectedVis && this->hoverVis
       && this->mouseJoint && this->mouseJoint->line)
   {
     math::Vector3 parentPos;
-    // Set end point to center of child part
+    // Set end point to center of child link
     if (!this->hoverVis->IsPlane())
     {
       if (this->mouseJoint->parent)
       {
-        parentPos =  this->GetPartWorldCentroid(this->mouseJoint->parent)
+        parentPos =  this->GetLinkWorldCentroid(this->mouseJoint->parent)
             - this->mouseJoint->line->GetPoint(0);
         this->mouseJoint->line->SetPoint(1,
-            this->GetPartWorldCentroid(this->hoverVis) - parentPos);
+            this->GetLinkWorldCentroid(this->hoverVis) - parentPos);
       }
     }
     else
@@ -552,10 +552,10 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
           math::Plane(math::Vector3(0, 0, 1)), pt);
       if (this->mouseJoint->parent)
       {
-        parentPos = this->GetPartWorldCentroid(this->mouseJoint->parent)
+        parentPos = this->GetLinkWorldCentroid(this->mouseJoint->parent)
             - this->mouseJoint->line->GetPoint(0);
         this->mouseJoint->line->SetPoint(1,
-            this->GetPartWorldCentroid(this->hoverVis) - parentPos + pt);
+            this->GetLinkWorldCentroid(this->hoverVis) - parentPos + pt);
       }
     }
   }
@@ -694,10 +694,10 @@ void JointMaker::Update()
 
         if (joint->dirty || poseUpdate)
         {
-          // get origin of parent part visuals
+          // get origin of parent link visuals
           math::Vector3 parentOrigin = joint->parent->GetWorldPose().pos;
 
-          // get origin of child part visuals
+          // get origin of child link visuals
           math::Vector3 childOrigin = joint->child->GetWorldPose().pos;
 
           // set orientation of joint hotspot
@@ -723,6 +723,7 @@ void JointMaker::Update()
             Ogre::SceneNode *handleNode = joint->handles->getParentSceneNode();
             joint->handles->detachFromParent();
             joint->hotspot->SetMaterial(material);
+            joint->hotspot->SetTransparency(0.5);
             handleNode->attachObject(joint->handles);
             Ogre::MaterialPtr mat =
                 Ogre::MaterialManager::getSingleton().getByName(material);
@@ -1005,7 +1006,7 @@ JointMaker::JointType JointMaker::GetState() const
 }
 
 /////////////////////////////////////////////////
-math::Vector3 JointMaker::GetPartWorldCentroid(
+math::Vector3 JointMaker::GetLinkWorldCentroid(
     const rendering::VisualPtr _visual)
 {
   math::Vector3 centroid;

@@ -84,8 +84,8 @@ namespace gazebo
       /// \brief Qt callback when custom button is clicked.
       private slots: void OnCustom();
 
-      /// \brief Qt callback when a part has been added.
-      private slots: void OnPartAdded();
+      /// \brief Qt callback when a link has been added.
+      private slots: void OnLinkAdded();
 
       /// \brief Qt callback when the model is to be made static.
       private slots: void OnStatic();
@@ -115,8 +115,8 @@ namespace gazebo
       /// \brief A list of gui editor events connected to this palette.
       private: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief Parts button group.
-      private: QButtonGroup *partButtonGroup;
+      /// \brief Links button group.
+      private: QButtonGroup *linkButtonGroup;
 
       /// \brief Model creator.
       private: ModelCreator *modelCreator;
