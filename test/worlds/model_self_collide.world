@@ -282,5 +282,97 @@
         </visual>
       </link>
     </model>
+    <!-- Demonstrate that self_collide=false produces same behavior as above-->
+    <model name="explicit_no_collide">
+      <self_collide>false</self_collide>
+      <pose>0 12 0 0 0 0</pose>
+      <link name="link">
+        <pose>0 0 1.0 0 0 0</pose>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.166667</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>2.166667</iyy>
+            <iyz>0</iyz>
+            <izz>2.166667</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>5 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>5 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+
+      <link name="link1">
+        <pose>0 0 3.0 0 0 0</pose>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.166667</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>2.166667</iyy>
+            <iyz>0</iyz>
+            <izz>2.166667</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>5 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>5 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+
+      <link name="link2">
+        <pose>0 0 6.0 0 0 0</pose>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.166667</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>2.166667</iyy>
+            <iyz>0</iyz>
+            <izz>2.166667</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>5 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>5 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
   </world>
 </sdf>

@@ -86,14 +86,16 @@ TEST_F(PhysicsCollisionTest, ModelSelfCollide)
   double dt = physics->GetMaxStepSize();
   EXPECT_GT(dt, 0);
 
-  // 3 models: all_collide, some_collide, and no_collide
-  physics::ModelPtr all_collide, some_collide, no_collide;
+  // 3 models: all_collide, some_collide, no_collide, and explicit_no_collide
+  physics::ModelPtr all_collide, some_collide, no_collide, explicit_no_collide;
   all_collide = world->GetModel("all_collide");
   some_collide = world->GetModel("some_collide");
   no_collide = world->GetModel("no_collide");
+  explicit_no_collide = world->GetModel("explicit_no_collide");
   ASSERT_TRUE(all_collide != NULL);
   ASSERT_TRUE(some_collide != NULL);
   ASSERT_TRUE(no_collide != NULL);
+  ASSERT_TRUE(explicit_no_collide != NULL);
 
   // Step forward 0.2 s
   double stepTime = 0.2;
@@ -106,6 +108,8 @@ TEST_F(PhysicsCollisionTest, ModelSelfCollide)
   EXPECT_LT(some_collide->GetWorldLinearVel().z,
       fallVelocity*(1-g_physics_tol));
   EXPECT_LT(no_collide->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+  EXPECT_NEAR(no_collide->GetWorldLinearVel().z,
+      explicit_no_collide->GetWorldLinearVel().z, 1e-4);
 
   // Another 3000 steps should put the boxes at rest
   world->Step(3000);
@@ -114,6 +118,8 @@ TEST_F(PhysicsCollisionTest, ModelSelfCollide)
   EXPECT_NEAR(all_collide->GetWorldLinearVel().z, 0, 1e-2);
   EXPECT_NEAR(some_collide->GetWorldLinearVel().z, 0, 1e-2);
   EXPECT_NEAR(no_collide->GetWorldLinearVel().z, 0, 1e-2);
+  EXPECT_NEAR(no_collide->GetWorldLinearVel().z,
+      explicit_no_collide->GetWorldLinearVel().z, 1e-2);
 
   // link2 of all_collide should have the highest z-coordinate (around 3)
   EXPECT_NEAR(all_collide->GetLink("link2")->GetWorldPose().pos.z, 2.5, 1e-2);
@@ -123,6 +129,10 @@ TEST_F(PhysicsCollisionTest, ModelSelfCollide)
 
   // link2 of no_collide should have a low z-coordinate (around 1)
   EXPECT_NEAR(no_collide->GetLink("link2")->GetWorldPose().pos.z, 0.5, 1e-2);
+
+  // link2 of explicit_no_collide should have the same z-coordinate as above
+  EXPECT_NEAR(explicit_no_collide->GetLink("link2")->GetWorldPose().pos.z,
+      no_collide->GetLink("link2")->GetWorldPose().pos.z, 1e-4);
 
   Unload();
 }
