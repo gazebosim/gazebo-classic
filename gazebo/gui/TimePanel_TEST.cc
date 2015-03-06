@@ -16,6 +16,9 @@
 */
 
 #include "gazebo/gui/TimePanel.hh"
+#include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/gui/TimePanel_TEST.hh"
 
 /////////////////////////////////////////////////
