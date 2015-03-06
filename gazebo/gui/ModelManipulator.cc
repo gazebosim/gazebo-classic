@@ -411,7 +411,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 
     math::Vector3 newScale = this->dataPtr->mouseVisualScale * scale.GetAbs();
 
-    if (this->dataPtr->mouseEvent.control)
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier)
     {
       newScale = SnapPoint(newScale);
       // prevent setting zero scale
@@ -444,7 +444,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
         math::Vector3 newScale = this->dataPtr->mouseChildVisualScale[i]
             * geomScale.GetAbs();
 
-        if (this->dataPtr->mouseEvent.control)
+        if (QApplication::keyboardModifiers() & Qt::ControlModifier)
         {
           newScale = SnapPoint(newScale);
           // prevent setting zero scale
@@ -506,7 +506,7 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
 
   pose.pos = this->dataPtr->mouseMoveVisStartPose.pos + distance;
 
-  if (this->dataPtr->mouseEvent.control)
+  if (QApplication::keyboardModifiers() & Qt::ControlModifier)
   {
     pose.pos = SnapPoint(pose.pos);
   }
