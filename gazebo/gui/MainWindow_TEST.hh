@@ -25,6 +25,9 @@ class MainWindow_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Test user camera frames per second
+  private slots: void UserCameraFPS();
+
   /// \brief Test copying and pasting a model
   private slots: void CopyPasteModel();
 
