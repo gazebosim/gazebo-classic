@@ -137,8 +137,32 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
   if (signTest < 0 )
     angle *= -1;
 
-  if (this->dataPtr->mouseEvent.control)
+  if (QApplication::keyboardModifiers() & Qt::ControlModifier)
+  {
     angle = rint(angle / (M_PI * 0.25)) * (M_PI * 0.25);
+
+    if (_axis.x > 0)
+    {
+      this->dataPtr->mouseMoveVisStartPose.rot.SetFromEuler(
+          0,
+          this->dataPtr->mouseMoveVisStartPose.rot.GetPitch(),
+          this->dataPtr->mouseMoveVisStartPose.rot.GetYaw());
+    }
+    else if (_axis.y > 0)
+    {
+      this->dataPtr->mouseMoveVisStartPose.rot.SetFromEuler(
+          this->dataPtr->mouseMoveVisStartPose.rot.GetRoll(),
+          0,
+          this->dataPtr->mouseMoveVisStartPose.rot.GetYaw());
+    }
+    else if (_axis.z > 0)
+    {
+      this->dataPtr->mouseMoveVisStartPose.rot.SetFromEuler(
+          this->dataPtr->mouseMoveVisStartPose.rot.GetRoll(),
+          this->dataPtr->mouseMoveVisStartPose.rot.GetPitch(),
+          0);
+    }
+  }
 
   math::Quaternion rot(_axis, angle);
 
