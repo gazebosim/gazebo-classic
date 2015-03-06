@@ -19,15 +19,18 @@
 using namespace gazebo;
 using namespace common;
 
-  KeyFrame::KeyFrame(double _time)
+/////////////////////////////////////////////////
+KeyFrame::KeyFrame(double _time)
 : time(_time)
 {
 }
 
+/////////////////////////////////////////////////
 KeyFrame::~KeyFrame()
 {
 }
 
+/////////////////////////////////////////////////
 double KeyFrame::GetTime() const
 {
   return this->time;
@@ -35,52 +38,84 @@ double KeyFrame::GetTime() const
 
 
 
-  PoseKeyFrame::PoseKeyFrame(double _time)
+/////////////////////////////////////////////////
+PoseKeyFrame::PoseKeyFrame(double _time)
 : KeyFrame(_time)
 {
 }
 
+/////////////////////////////////////////////////
 PoseKeyFrame::~PoseKeyFrame()
 {
 }
 
+/////////////////////////////////////////////////
 void PoseKeyFrame::SetTranslation(const math::Vector3 &_trans)
 {
   this->translate = _trans;
 }
 
+/////////////////////////////////////////////////
+void PoseKeyFrame::SetTranslation(const ignition::math::Vector3d &_trans)
+{
+  this->translate = _trans;
+}
+
+/////////////////////////////////////////////////
 const math::Vector3 &PoseKeyFrame::GetTranslation() const
 {
   return this->translate;
 }
 
+/////////////////////////////////////////////////
+const ignition::math::Vector3d &PoseKeyFrame::GetTranslationIgn() const
+{
+  return this->translate.Ign();
+}
+
+/////////////////////////////////////////////////
 void PoseKeyFrame::SetRotation(const math::Quaternion &_rot)
 {
   this->rotate = _rot;
 }
 
+/////////////////////////////////////////////////
+void PoseKeyFrame::SetRotation(const ignition::math::Quaterniond &_rot)
+{
+  this->rotate = _rot;
+}
+
+/////////////////////////////////////////////////
 const math::Quaternion &PoseKeyFrame::GetRotation() const
 {
   return this->rotate;
 }
 
-  NumericKeyFrame::NumericKeyFrame(double _time)
+/////////////////////////////////////////////////
+const ignition::math::Quaterniond &PoseKeyFrame::GetRotationIgn() const
+{
+  return this->rotate.Ign();
+}
+
+/////////////////////////////////////////////////
+NumericKeyFrame::NumericKeyFrame(double _time)
 : KeyFrame(_time)
 {
 }
 
+/////////////////////////////////////////////////
 NumericKeyFrame::~NumericKeyFrame()
 {
 }
 
+/////////////////////////////////////////////////
 void NumericKeyFrame::SetValue(const double &_value)
 {
   this->value = _value;
 }
 
+/////////////////////////////////////////////////
 const double &NumericKeyFrame::GetValue() const
 {
   return this->value;
 }
-
-

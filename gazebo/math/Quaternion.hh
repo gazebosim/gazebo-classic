@@ -21,6 +21,7 @@
 #include <math.h>
 #include <iostream>
 #include <cmath>
+#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Angle.hh"
@@ -77,6 +78,15 @@ namespace gazebo
     /// \brief Equal operator
     /// \param[in] _qt Quaternion to copy
     public: Quaternion &operator =(const Quaternion &_qt);
+
+    /// \brief Convert this quaternion to an ignition::math::Quaterniond.
+    /// \return This quaternion as an ignition::math::Quaterniond.
+    public: ignition::math::Quaterniond Ign() const;
+
+    /// \brief Assignment operator for ignition math
+    /// \param[in] _v a new value
+    /// \return this
+    public: Quaternion &operator =(const ignition::math::Quaterniond &_v);
 
     /// \brief Invert the quaternion
     public: void Invert();

@@ -166,6 +166,7 @@ link_directories(
 
 target_link_libraries(gazebo_common
   gazebo_math
+  ${IGNITION-MATH_LIBRARIES}
   ${libdl_library}
   ${libtool_library}
   ${Boost_LIBRARIES}

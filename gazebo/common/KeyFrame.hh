@@ -17,6 +17,10 @@
 #ifndef _KEYFRAME_HH_
 #define _KEYFRAME_HH_
 
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Quaternion.hh>
+
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/util/system.hh"
@@ -59,19 +63,43 @@ namespace gazebo
 
       /// \brief Set the translation for the keyframe
       /// \param[in] _trans Translation amount
-      public: void SetTranslation(const math::Vector3 &_trans);
+      /// \deprecated See function that uses ignition::math
+      public: void SetTranslation(
+                  const math::Vector3 &_trans) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Set the translation for the keyframe
+      /// \param[in] _trans Translation amount
+      public: void SetTranslation(const ignition::math::Vector3d &_trans);
 
       /// \brief Get the translation of the keyframe
       /// \return The translation amount
-      public: const math::Vector3 &GetTranslation() const;
+      /// \deprecated See GetTranslationIgn
+      public: const math::Vector3 &GetTranslation() const
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the translation of the keyframe
+      /// \return The translation amount
+      public: const ignition::math::Vector3d &GetTranslationIgn() const;
 
       /// \brief Set the rotation for the keyframe
       /// \param[in] _rot Rotation amount
-      public: void SetRotation(const math::Quaternion &_rot);
+      /// \deprecated See function that uses ignition::math
+      public: void SetRotation(const math::Quaternion &_rot)
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Set the rotation for the keyframe
+      /// \param[in] _rot Rotation amount
+      public: void SetRotation(const ignition::math::Quaterniond &_rot);
 
       /// \brief Get the rotation of the keyframe
       /// \return The rotation amount
-      public: const math::Quaternion &GetRotation() const;
+      /// \deprecated See GetRotationIgn
+      public: const math::Quaternion &GetRotation() const
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the rotation of the keyframe
+      /// \return The rotation amount
+      public: const ignition::math::Quaterniond &GetRotationIgn() const;
 
       /// \brief the translation vector
       protected: math::Vector3 translate;

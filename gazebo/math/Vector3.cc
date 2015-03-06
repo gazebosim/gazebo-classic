@@ -368,3 +368,18 @@ bool Vector3::Equal(const Vector3 &_v) const
          math::equal(this->y, _v.y) &&
          math::equal(this->z, _v.z);
 }
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Vector3::Ign() const
+{
+  return ignition::math::Vector3d(this->x, this->y, this->z);
+}
+
+//////////////////////////////////////////////////
+Vector3 &Vector3::operator=(const ignition::math::Vector3d &_v)
+{
+  this->x = _v.X();
+  this->y = _v.Y();
+  this->z = _v.Z();
+  return *this;
+}

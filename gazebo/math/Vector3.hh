@@ -25,6 +25,7 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/util/system.hh"
@@ -167,6 +168,15 @@ namespace gazebo
       /// \brief Get the minimum value in the vector
       /// \return the minimum element
       public: double GetMin() const;
+
+      /// \brief Convert this vector to an ignition::math::Vector3d.
+      /// \return This vector as an ignition::math::Vector3d.
+      public: ignition::math::Vector3d Ign() const;
+
+      /// \brief Assignment operator for ignition math
+      /// \param[in] _v a new value
+      /// \return this
+      public: Vector3 &operator =(const ignition::math::Vector3d &_v);
 
       /// \brief Assignment operator
       /// \param[in] _v a new value
