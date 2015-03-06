@@ -157,6 +157,8 @@ void CollisionConfig::AddCollision(const std::string &_name,
     surfaceMsg->set_max_vel(0.01);
   if (!surfaceMsg->has_collide_without_contact_bitmask())
     surfaceMsg->set_collide_without_contact_bitmask(1);
+  if (!surfaceMsg->has_collide_bitmask())
+    surfaceMsg->set_collide_bitmask(1);
   msgs::Friction *frictionMsg = surfaceMsg->mutable_friction();
   if (!frictionMsg->has_mu())
     frictionMsg->set_mu(1.0);
