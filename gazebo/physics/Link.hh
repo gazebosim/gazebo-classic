@@ -118,7 +118,7 @@ namespace gazebo
       public: virtual bool GetGravityMode() const = 0;
 
       /// \brief Set whether this body will collide with others in the
-      /// model. 
+      /// model.
       /// \sa GetSelfCollide
       /// \param[in] _collide True to enable collisions.
       public: virtual void SetSelfCollide(bool _collide) = 0;
