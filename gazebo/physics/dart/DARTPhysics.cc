@@ -381,9 +381,17 @@ void DARTPhysics::DebugPrint() const
 //////////////////////////////////////////////////
 boost::any DARTPhysics::GetParam(const std::string &_key) const
 {
+  boost::any value;
+  this->GetParam(_key, value);
+  return value;
+}
+
+//////////////////////////////////////////////////
+bool DARTPhysics::GetParam(const std::string &_key, boost::any &_value) const
+{
   if (_key == "max_step_size")
   {
-    return this->GetMaxStepSize();
+    _value = this->GetMaxStepSize();
   }
 
   sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
@@ -395,25 +403,24 @@ boost::any DARTPhysics::GetParam(const std::string &_key) const
           << ", unable to get param ["
           << _key << "]"
           << std::endl;
-    return 0;
+    return false;
   }
 
   if (_key == "max_contacts")
   {
-    return dartElem->GetElement("max_contacts")->Get<int>();
+    _value = dartElem->GetElement("max_contacts")->Get<int>();
   }
   else if (_key == "min_step_size")
   {
-    return dartElem->GetElement("solver")->Get<double>("min_step_size");
+    _value = dartElem->GetElement("solver")->Get<double>("min_step_size");
   }
   else
   {
     gzwarn << _key << " is not supported in dart" << std::endl;
-    return 0;
+    return false;
   }
 
-  gzerr << "We should not be here, something is wrong." << std::endl;
-  return 0;
+  return true;
 }
 
 //////////////////////////////////////////////////
