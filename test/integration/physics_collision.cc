@@ -14,7 +14,8 @@
  * limitations under the License.
  *
 */
-#include <string.h>
+#include <map>
+#include <string>
 
 #include "gazebo/physics/physics.hh"
 #include "test/ServerFixture.hh"
@@ -86,16 +87,18 @@ TEST_F(PhysicsCollisionTest, ModelSelfCollide)
   double dt = physics->GetMaxStepSize();
   EXPECT_GT(dt, 0);
 
-  // 3 models: all_collide, some_collide, no_collide, and explicit_no_collide
-  physics::ModelPtr all_collide, some_collide, no_collide, explicit_no_collide;
-  all_collide = world->GetModel("all_collide");
-  some_collide = world->GetModel("some_collide");
-  no_collide = world->GetModel("no_collide");
-  explicit_no_collide = world->GetModel("explicit_no_collide");
-  ASSERT_TRUE(all_collide != NULL);
-  ASSERT_TRUE(some_collide != NULL);
-  ASSERT_TRUE(no_collide != NULL);
-  ASSERT_TRUE(explicit_no_collide != NULL);
+  // 4 models: all_collide, some_collide, no_collide, and explicit_no_collide
+  std::map<std::string, physics::ModelPtr> models;
+  models["all_collide"]         = physics::ModelPtr();
+  models["some_collide"]        = physics::ModelPtr();
+  models["no_collide"]          = physics::ModelPtr();
+  models["explicit_no_collide"] = physics::ModelPtr();
+  for (auto &iter : models)
+  {
+    gzdbg << "Getting model " << iter.first << std::endl;
+    iter.second = world->GetModel(iter.first);
+    ASSERT_TRUE(iter.second != NULL);
+  }
 
   // Step forward 0.2 s
   double stepTime = 0.2;
@@ -104,35 +107,50 @@ TEST_F(PhysicsCollisionTest, ModelSelfCollide)
 
   // Expect boxes to be falling
   double fallVelocity = g.z * stepTime;
-  EXPECT_LT(all_collide->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
-  EXPECT_LT(some_collide->GetWorldLinearVel().z,
-      fallVelocity*(1-g_physics_tol));
-  EXPECT_LT(no_collide->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
-  EXPECT_NEAR(no_collide->GetWorldLinearVel().z,
-      explicit_no_collide->GetWorldLinearVel().z, 1e-4);
+  for (auto &iter : models)
+  {
+    auto links = iter.second->GetLinks();
+    for (auto &link : links)
+    {
+      ASSERT_TRUE(link != NULL);
+      gzdbg << "Check falling: " << link->GetScopedName() << std::endl;
+      EXPECT_LT(link->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+    }
+  }
 
   // Another 3000 steps should put the boxes at rest
   world->Step(3000);
 
   // Expect 3 boxes to be stationary
-  EXPECT_NEAR(all_collide->GetWorldLinearVel().z, 0, 1e-2);
-  EXPECT_NEAR(some_collide->GetWorldLinearVel().z, 0, 1e-2);
-  EXPECT_NEAR(no_collide->GetWorldLinearVel().z, 0, 1e-2);
-  EXPECT_NEAR(no_collide->GetWorldLinearVel().z,
-      explicit_no_collide->GetWorldLinearVel().z, 1e-2);
+  for (auto &iter : models)
+  {
+    auto links = iter.second->GetLinks();
+    for (auto &link : links)
+    {
+      ASSERT_TRUE(link != NULL);
+      gzdbg << "Check resting: " << link->GetScopedName() << std::endl;
+      EXPECT_NEAR(link->GetWorldLinearVel().z, 0, g_physics_tol);
+    }
+  }
+
+  gzdbg << "Check resting positions" << std::endl;
 
   // link2 of all_collide should have the highest z-coordinate (around 3)
-  EXPECT_NEAR(all_collide->GetLink("link2")->GetWorldPose().pos.z, 2.5, 1e-2);
+  EXPECT_NEAR(models["all_collide"]->GetLink("link2")->GetWorldPose().pos.z,
+              2.5, g_physics_tol);
 
   // link2 of some_collide should have a middling z-coordinate (around 2)
-  EXPECT_NEAR(some_collide->GetLink("link2")->GetWorldPose().pos.z, 1.5, 1e-2);
+  EXPECT_NEAR(models["some_collide"]->GetLink("link2")->GetWorldPose().pos.z,
+              1.5, g_physics_tol);
 
   // link2 of no_collide should have a low z-coordinate (around 1)
-  EXPECT_NEAR(no_collide->GetLink("link2")->GetWorldPose().pos.z, 0.5, 1e-2);
+  EXPECT_NEAR(models["no_collide"]->GetLink("link2")->GetWorldPose().pos.z,
+              0.5, g_physics_tol);
 
   // link2 of explicit_no_collide should have the same z-coordinate as above
-  EXPECT_NEAR(explicit_no_collide->GetLink("link2")->GetWorldPose().pos.z,
-      no_collide->GetLink("link2")->GetWorldPose().pos.z, 1e-4);
+  EXPECT_NEAR(models["no_collide"]->GetLink("link2")->GetWorldPose().pos.z,
+     models["explicit_no_collide"]->GetLink("link2")->GetWorldPose().pos.z,
+     g_physics_tol);
 
   Unload();
 }
