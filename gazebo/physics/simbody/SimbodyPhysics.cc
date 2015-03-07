@@ -1357,7 +1357,7 @@ bool SimbodyPhysics::GetParam(const std::string &_key, boost::any &_value) const
   }
   else if (_key == "solver_type")
   {
-    _value = "Spatial Algebra and Elastic Foundation";
+    _value = std::string("Spatial Algebra and Elastic Foundation");
   }
   else if (_key == "integrator_type")
   {
