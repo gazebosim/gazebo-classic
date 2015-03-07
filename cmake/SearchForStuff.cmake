@@ -374,7 +374,6 @@ find_package(SDFormat 2.3.1)
 if (NOT SDFormat_FOUND)
   find_package(SDFormat 3)
 endif()
-
 if (NOT SDFormat_FOUND)
   message (STATUS "Looking for SDFormat - not found")
   BUILD_ERROR ("Missing: SDF version >=2.3.1. Required for reading and writing SDF files.")
