@@ -609,7 +609,7 @@ void ODELink::AddLinkForce(const math::Vector3 &_force,
   else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
-          << " does not exist, unable to AddForceAtRelativePosition"
+          << " does not exist, unable to AddLinkForce"
           << std::endl;
   }
 }

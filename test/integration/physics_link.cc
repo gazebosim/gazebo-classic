@@ -67,8 +67,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
     math::Vector3 _offset)
 {
   // Get state before adding force
-  math::Vector3 linearVelWorld0 = _link->GetWorldLinearVel(
-      _link->GetInertial()->GetCoG());
+  math::Vector3 linearVelWorld0 = _link->GetWorldCoGLinearVel();
   math::Vector3 angularVelWorld0 = _link->GetWorldAngularVel();
   math::Pose poseWorld0 = _link->GetWorldPose();
 
@@ -89,25 +88,27 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
 
   math::Vector3 worldOffset = poseWorld0.rot.RotateVector(
       _offset - _link->GetInertial()->GetCoG());
-  math::Vector3 angularImpulse = dt*worldOffset.Cross(forceWorld);
-  EXPECT_EQ(angularImpulse, _link->GetWorldTorque());
+  math::Vector3 torqueWorld = worldOffset.Cross(forceWorld);
+  EXPECT_EQ(torqueWorld, _link->GetWorldTorque());
 
   // Check acceleration in world frame
   math::Vector3 oneStepLinearAccel =
       forceWorld/_link->GetInertial()->GetMass();
   EXPECT_EQ(oneStepLinearAccel, _link->GetWorldLinearAccel());
 
-  math::Vector3 oneStepAngularAccel = angularImpulse;
+  // Compute angular accel by multiplying world torque
+  // by inverse of world inertia matrix.
+  // In this case, the gyroscopic coupling terms are zero
+  // since the model is a unit box.
+  math::Vector3 oneStepAngularAccel =
+      _link->GetWorldInertiaMatrix().Inverse() * torqueWorld;
   EXPECT_EQ(oneStepAngularAccel, _link->GetWorldAngularAccel());
 
   // Check velocity in world frame
-  math::Vector3 oneStepLinearVel = linearVelWorld0 +
-      dt*forceWorld/_link->GetInertial()->GetMass();
-  EXPECT_EQ(oneStepLinearVel, _link->GetWorldLinearVel(
-      _link->GetInertial()->GetCoG()));
+  math::Vector3 oneStepLinearVel = linearVelWorld0 + dt*oneStepLinearAccel;
+  EXPECT_EQ(oneStepLinearVel, _link->GetWorldCoGLinearVel());
 
-  math::Vector3 oneStepAngularVel = angularVelWorld0 + angularImpulse /
-      _link->GetInertial()->GetPrincipalMoments();
+  math::Vector3 oneStepAngularVel = angularVelWorld0 + dt*oneStepAngularAccel;
   EXPECT_EQ(oneStepAngularVel, _link->GetWorldAngularVel());
 
   // Step forward and check again
@@ -122,8 +123,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldAngularAccel());
 
   // Check that velocity hasn't changed
-  EXPECT_EQ(oneStepLinearVel, _link->GetWorldLinearVel(
-      _link->GetInertial()->GetCoG()));
+  EXPECT_EQ(oneStepLinearVel, _link->GetWorldCoGLinearVel());
   EXPECT_EQ(oneStepAngularVel, _link->GetWorldAngularVel());
 
   // Add opposing force in link frame and check that link is back to initial
@@ -136,8 +136,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   _world->Step(moreThanOneStep);
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldForce());
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldTorque());
-  EXPECT_EQ(linearVelWorld0, _link->GetWorldLinearVel(
-      _link->GetInertial()->GetCoG()));
+  EXPECT_EQ(linearVelWorld0, _link->GetWorldCoGLinearVel());
   EXPECT_EQ(angularVelWorld0, _link->GetWorldAngularVel());
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldLinearAccel());
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldAngularAccel());
@@ -149,8 +148,9 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   // TODO bullet, dart and simbody currently fail this test
   if (_physicsEngine != "ode")
   {
-    gzerr << "Aborting AddForce test for Bullet, DART and Simbody."
-        << std::endl;
+    gzerr << "Aborting AddForce test for Bullet, DART and Simbody. "
+          << "See issues #1476, #1477, and #1478."
+          << std::endl;
     return;
   }
 

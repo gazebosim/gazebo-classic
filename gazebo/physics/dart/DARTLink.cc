@@ -472,7 +472,7 @@ void DARTLink::AddForceAtRelativePosition(const math::Vector3 &_force,
 void DARTLink::AddLinkForce(const math::Vector3 &/*_force*/,
     const math::Vector3 &/*_offset*/)
 {
-  gzlog << "DARTLink::AddLinkForce not yet implemented."
+  gzlog << "DARTLink::AddLinkForce not yet implemented (issue #1477)."
         << std::endl;
 }
 
