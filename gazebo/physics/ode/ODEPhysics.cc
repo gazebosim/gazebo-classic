@@ -1340,9 +1340,9 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
         (this->dataPtr->worldId);
   }
   else if (_key == "warm_start_factor")
-    _value = dWorldGetQuickStepWarmStartFactor (this->dataPtr->worldId);
+    _value = dWorldGetQuickStepWarmStartFactor(this->dataPtr->worldId);
   else if (_key == "extra_friction_iterations")
-    _value = dWorldGetQuickStepExtraFrictionIterations (this->dataPtr->worldId);
+    _value = dWorldGetQuickStepExtraFrictionIterations(this->dataPtr->worldId);
   else
   {
     gzwarn << _key << " is not supported in ode" << std::endl;

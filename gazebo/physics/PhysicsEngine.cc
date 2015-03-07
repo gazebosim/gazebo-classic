@@ -233,7 +233,7 @@ boost::any PhysicsEngine::GetParam(const std::string &/*_key*/) const
 bool PhysicsEngine::GetParam(const std::string &/*_key*/,
     boost::any &/*_value*/) const
 {
-  return true;
+  return false;
 }
 
 //////////////////////////////////////////////////
