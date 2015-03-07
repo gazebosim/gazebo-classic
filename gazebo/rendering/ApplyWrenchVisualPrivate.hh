@@ -18,8 +18,8 @@
 #ifndef _GAZEBO_APPLYWRENCHVISUAL_PRIVATE_HH_
 #define _GAZEBO_APPLYWRENCHVISUAL_PRIVATE_HH_
 
-//#include <string>
-//#include "gazebo/rendering/RenderTypes.hh"
+#include <string>
+
 #include "gazebo/rendering/VisualPrivate.hh"
 
 namespace gazebo
@@ -29,7 +29,7 @@ namespace gazebo
     /// \brief Private data for the Apply Wrench Visual class.
     class ApplyWrenchVisualPrivate : public VisualPrivate
     {
-      /// Arrow representing force.
+      /// \brief Arrow representing force.
       public: VisualPtr forceVisual;
 
       /// \brief Tube and line representing torque.
