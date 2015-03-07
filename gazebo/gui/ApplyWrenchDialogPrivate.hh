@@ -30,118 +30,101 @@ namespace gazebo
       /// \brief Node for communication.
       public: transport::NodePtr node;
 
-      /// TODO
-      public: std::string linkName;
-
-      /// TODO
+      /// Name of the model this is connected to.
       public: std::string modelName;
 
-      /// TODO
+      /// Name of the link currently targeted.
+      public: std::string linkName;
+
+      /// Label holding the model name.
       public: QLabel *modelLabel;
 
-      /// TODO
-      public: std::vector<std::string> linkList;
-
-      /// TODO
+      /// Dropdown holding all link names.
       public: QComboBox *linksComboBox;
 
-      /// TODO
-      public: QWidget *forcePosCollapsibleWidget;
-
-      /// TODO
-      public: QWidget *forceCollapsibleWidget;
-
-      /// TODO
-      public: QWidget *torqueCollapsibleWidget;
-
-      /// TODO
+      /// Radio button for CoM.
       public: QRadioButton *comRadio;
 
-      /// TODO
+      /// Radio button for force position.
       public: QRadioButton *forcePosRadio;
 
-      /// TODO
+      /// Spin for force position X.
       public: QDoubleSpinBox *forcePosXSpin;
 
-      /// TODO
+      /// Spin for force position Y.
       public: QDoubleSpinBox *forcePosYSpin;
 
-      /// TODO
+      /// Spin for force position Z.
       public: QDoubleSpinBox *forcePosZSpin;
 
-      /// TODO
+      /// Spin for force magnitude.
       public: QDoubleSpinBox *forceMagSpin;
 
-      /// TODO
+      /// Spin for force X.
       public: QDoubleSpinBox *forceXSpin;
 
-      /// TODO
+      /// Spin for force Y.
       public: QDoubleSpinBox *forceYSpin;
 
-      /// TODO
+      /// Spin for force Z.
       public: QDoubleSpinBox *forceZSpin;
 
-      /// TODO
+      /// Spin for torque magnitude.
       public: QDoubleSpinBox *torqueMagSpin;
 
-      /// TODO
+      /// Spin for torque X.
       public: QDoubleSpinBox *torqueXSpin;
 
-      /// TODO
+      /// Spin for torque Y.
       public: QDoubleSpinBox *torqueYSpin;
 
-      /// TODO
+      /// Spin for torque Z.
       public: QDoubleSpinBox *torqueZSpin;
 
-      /// TODO
+      /// CoM coordinates in link frame.
       public: math::Vector3 comVector;
 
-      /// TODO
+      /// Forse position coordinates in link frame.
       public: math::Vector3 forcePosVector;
 
-      /// TODO
+      /// Force vector.
       public: math::Vector3 forceVector;
 
-      /// TODO
+      /// Torque vector.
       public: math::Vector3 torqueVector;
 
       /// \brief Publishes the wrench message.
       public: transport::PublisherPtr wrenchPub;
 
-      /// TODO
+      /// Visual of the targeted link.
       public: rendering::VisualPtr linkVisual;
 
-      /// TODO
+      /// Interactive visual which represents the wrench applied.
       public: rendering::ApplyWrenchVisualPtr applyWrenchVisual;
 
-      /// TODO
-      public: math::Vector2i dragStart;
+      /// Indicate whether mousepress is dragging on top the rotation tool or
+      /// not.
+      public: bool draggingTool;
 
-      /// TODO
-      public: math::Vector3 dragStartNormal;
-
-      /// TODO
+      /// World pose of the rotation tool the moment dragging started.
       public: math::Pose dragStartPose;
 
-      /// TODO
+      /// State of the manipulation tool, here only using "rot_y" and "tor_z"
       public: std::string manipState;
 
-      /// TODO
+      /// Current mode, either "force", "torque" or "none".
       public: std::string mode;
 
-      /// TODO
+      /// Message to request for entity info.
       public: msgs::Request *requestMsg;
 
-      /// TODO
+      /// Publishes the request message.
       public: transport::PublisherPtr requestPub;
 
-      /// TODO
+      /// Subscribes to response messages.
       public: transport::SubscriberPtr responseSub;
 
-      /// TODO
-      public: msgs::Link linkMsg;
-
-      /// TODO
+      /// Pointer to the main window.
       public: MainWindow *mainWindow;
 
       /// \brief A list of events connected to this.
