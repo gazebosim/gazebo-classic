@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_APPLY_WRENCH_DIALOG_HH_
 #define _GAZEBO_APPLY_WRENCH_DIALOG_HH_
 
+#include <string>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/math/Vector2i.hh"

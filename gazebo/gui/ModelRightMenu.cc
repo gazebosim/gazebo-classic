@@ -50,7 +50,8 @@ ModelRightMenu::ModelRightMenu()
 
   this->applyWrenchAct = new QAction(tr("Apply Force/Torque"), this);
   this->applyWrenchAct->setStatusTip(tr("Apply force and torque to the model"));
-  connect(this->applyWrenchAct, SIGNAL(triggered()), this, SLOT(OnApplyWrench()));
+  connect(this->applyWrenchAct, SIGNAL(triggered()), this,
+      SLOT(OnApplyWrench()));
 
   // \todo Reimplement
   // this->snapBelowAct = new QAction(tr("Snap"), this);
@@ -388,12 +389,14 @@ void ViewState::Callback()
 //
 //   if (this->skeletonAction->isChecked())
 //   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->entityName);
+//     this->requestMsg = msgs::CreateRequest("show_skeleton",
+//         this->entityName);
 //     this->requestMsg->set_dbl_data(1.0);
 //   }
 //   else
 //   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->entityName);
+//     this->requestMsg = msgs::CreateRequest("show_skeleton",
+//         this->entityName);
 //     this->requestMsg->set_dbl_data(0.0);
 //   }
 //

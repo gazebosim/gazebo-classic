@@ -20,6 +20,7 @@
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/MovableText.hh"
 #include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/ApplyWrenchVisualPrivate.hh"
@@ -86,9 +87,12 @@ void ApplyWrenchVisual::Load()
   dPtr->forceVisual->GetSceneNode()->setInheritScale(false);
 
   // Force text
+  common::Color matAmbient, matDiffuse, matSpecular, matEmissive;
+  rendering::Material::GetMaterialAsColor("Gazebo/OrangeTransparentOverlay",
+      matAmbient, matDiffuse, matSpecular, matEmissive);
   dPtr->forceText = new MovableText();
   dPtr->forceText->Load(this->GetName()+"__FORCE_TEXT__",
-      "0N", "Arial", 0.03, common::Color(1, 0.6, 0));
+      "0N", "Arial", 0.03, matAmbient);
   dPtr->forceText->SetShowOnTop(true);
 
   dPtr->forceText->MovableObject::getUserObjectBindings().setUserAny(
@@ -154,7 +158,7 @@ void ApplyWrenchVisual::Load()
   // Torque text
   dPtr->torqueText = new MovableText();
   dPtr->torqueText->Load(this->GetName()+"__TORQUE_TEXT__",
-      "0N", "Arial", 0.03, common::Color(1, 0.6, 0));
+      "0N", "Arial", 0.03, matAmbient);
   dPtr->torqueText->SetShowOnTop(true);
 
   dPtr->torqueText->MovableObject::getUserObjectBindings().setUserAny(
@@ -172,8 +176,10 @@ void ApplyWrenchVisual::Load()
   dPtr->rotTool->Load();
   dPtr->rotTool->SetMode("rotate");
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_X, false);
-  dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Y, "Gazebo/DarkMagentaTransparent");
-  dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Z, "Gazebo/DarkMagentaTransparent");
+  dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Y,
+      "Gazebo/DarkMagentaTransparent");
+  dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Z,
+      "Gazebo/DarkMagentaTransparent");
 
   // Initialize
   dPtr->forceVector = math::Vector3::Zero;
@@ -183,9 +189,9 @@ void ApplyWrenchVisual::Load()
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI |
       GZ_VISIBILITY_SELECTABLE);
   this->Resize();
-  this->SetForceVisual();
-  this->SetTorqueVisual();
-  this->SetWrenchMode("none");
+  this->UpdateForceVisual();
+  this->UpdateTorqueVisual();
+  this->SetMode("none");
 }
 
 ///////////////////////////////////////////////////
@@ -244,7 +250,7 @@ math::Quaternion ApplyWrenchVisual::GetQuaternionFromVector(math::Vector3 _vec)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchVisual::SetWrenchMode(std::string _mode)
+void ApplyWrenchVisual::SetMode(std::string _mode)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
@@ -255,7 +261,6 @@ void ApplyWrenchVisual::SetWrenchMode(std::string _mode)
     return;
   }
 
-  // Update variable
   dPtr->mode = _mode;
 
   if (_mode == "force")
@@ -266,8 +271,7 @@ void ApplyWrenchVisual::SetWrenchMode(std::string _mode)
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
 
-    // set force visual visible and update direction
-    this->SetForceVisual();
+    this->UpdateForceVisual();
   }
   else if (_mode == "torque")
   {
@@ -277,8 +281,7 @@ void ApplyWrenchVisual::SetWrenchMode(std::string _mode)
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
 
-    // set torque visual visible and update direction
-    this->SetTorqueVisual();
+    this->UpdateTorqueVisual();
   }
   else if (_mode == "none")
   {
@@ -298,7 +301,7 @@ void ApplyWrenchVisual::SetCoM(math::Vector3 _comVector)
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
   dPtr->comVector = _comVector;
-  this->SetTorqueVisual();
+  this->UpdateTorqueVisual();
 }
 
 ///////////////////////////////////////////////////
@@ -308,11 +311,12 @@ void ApplyWrenchVisual::SetForcePos(math::Vector3 _forcePosVector)
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
   dPtr->forcePosVector = _forcePosVector;
-  this->SetForceVisual();
+  this->UpdateForceVisual();
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetForce(math::Vector3 _forceVector, bool _rotatedByMouse)
+void ApplyWrenchVisual::SetForce(math::Vector3 _forceVector,
+    bool _rotatedByMouse)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
@@ -333,18 +337,19 @@ void ApplyWrenchVisual::SetForce(math::Vector3 _forceVector, bool _rotatedByMous
   if (_forceVector == math::Vector3::Zero)
   {
     if (dPtr->torqueVector == math::Vector3::Zero)
-      this->SetWrenchMode("none");
+      this->SetMode("none");
     else
-      this->SetWrenchMode("torque");
+      this->SetMode("torque");
   }
   else
   {
-    this->SetWrenchMode("force");
+    this->SetMode("force");
   }
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetTorque(math::Vector3 _torqueVector, bool _rotatedByMouse)
+void ApplyWrenchVisual::SetTorque(math::Vector3 _torqueVector,
+    bool _rotatedByMouse)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
@@ -365,18 +370,18 @@ void ApplyWrenchVisual::SetTorque(math::Vector3 _torqueVector, bool _rotatedByMo
   if (_torqueVector == math::Vector3::Zero)
   {
     if (dPtr->forceVector == math::Vector3::Zero)
-      this->SetWrenchMode("none");
+      this->SetMode("none");
     else
-      this->SetWrenchMode("force");
+      this->SetMode("force");
   }
   else
   {
-    this->SetWrenchMode("torque");
+    this->SetMode("torque");
   }
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetForceVisual()
+void ApplyWrenchVisual::UpdateForceVisual()
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
@@ -387,21 +392,19 @@ void ApplyWrenchVisual::SetForceVisual()
     return;
   }
 
-  // position according to force and position vectors
-
-  // Place it on X axis in case it is zero
   math::Vector3 normVec = dPtr->forceVector;
   normVec.Normalize();
 
+  // Place it on X axis in case it is zero
   if (normVec == math::Vector3::Zero)
     normVec = math::Vector3::UnitX;
 
-  // Set rotation
+  // Set rotation in the vector direction
   math::Quaternion quat = this->GetQuaternionFromVector(normVec);
   dPtr->forceVisual->SetRotation(quat * math::Quaternion(
       math::Vector3(0, M_PI/2.0, 0)));
 
-  // Set position towards forcePosVector
+  // Set arrow tip to forcePosVector
   dPtr->forceVisual->SetPosition(-normVec * 0.28 *
       dPtr->forceVisual->GetScale().z + dPtr->forcePosVector);
 
@@ -412,7 +415,7 @@ void ApplyWrenchVisual::SetForceVisual()
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetTorqueVisual()
+void ApplyWrenchVisual::UpdateTorqueVisual()
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
@@ -423,21 +426,19 @@ void ApplyWrenchVisual::SetTorqueVisual()
     return;
   }
 
-  // position according to torque and position vectors
-
-  // Place it on X axis in case it is zero
   math::Vector3 normVec = dPtr->torqueVector;
   normVec.Normalize();
 
+  // Place it on X axis in case it is zero
   if (normVec == math::Vector3::Zero)
     normVec = math::Vector3::UnitX;
 
-  // Set rotation
+  // Set rotation in the vector direction
   math::Quaternion quat = this->GetQuaternionFromVector(normVec);
   dPtr->torqueVisual->SetRotation(quat * math::Quaternion(
       math::Vector3(0, M_PI/2.0, 0)));
 
-  // Set position towards comVector
+  // Position towards comVector
   double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
   dPtr->torqueVisual->SetPosition(normVec * linkDiagonal*0.75
       + dPtr->comVector);
@@ -502,7 +503,7 @@ void ApplyWrenchVisual::Resize()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  if (!dPtr->parent || !dPtr->forceVisual || !dPtr->torqueVisual || 
+  if (!dPtr->parent || !dPtr->forceVisual || !dPtr->torqueVisual ||
       !dPtr->forceText || !dPtr->torqueText || !dPtr->rotTool)
   {
     gzwarn << "ApplyWrenchVisual is incomplete." << std::endl;

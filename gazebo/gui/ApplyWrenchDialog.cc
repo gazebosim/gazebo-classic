@@ -46,7 +46,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
   this->setWindowModality(Qt::NonModal);
   this->setStyleSheet(
-   "QPushButton{\
+    "QPushButton {\
       border-radius: 5px;\
       border-radius: 5px;\
     }");
@@ -59,7 +59,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   linkLabel->setText(tr("<b>Apply to link:<b> "));
   this->dataPtr->linksComboBox = new QComboBox();
   this->dataPtr->linksComboBox->setMinimumWidth(200);
-  connect(this->dataPtr->linksComboBox, SIGNAL(currentIndexChanged (QString)),
+  connect(this->dataPtr->linksComboBox, SIGNAL(currentIndexChanged(QString)),
       this, SLOT(SetLink(QString)));
 
   linkLayout->addWidget(linkLabel);
@@ -70,7 +70,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
        "<font size=4>Force</font>"));
   forceLabel->setObjectName("forceLabel");
   forceLabel->setStyleSheet(
-   "QLabel#forceLabel{\
+    "QLabel#forceLabel {\
       background-color: #444;\
       border-radius: 5px;\
       padding-left: 10px;\
@@ -170,7 +170,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   QLabel *forcePosLabel = new QLabel(tr("Application Point:"));
   forcePosLabel->setObjectName("forcePosLabel");
   forcePosLabel->setStyleSheet(
-   "QLabel#forcePosLabel{\
+    "QLabel#forcePosLabel {\
       max-height: 15px;\
     }");
 
@@ -282,7 +282,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   forceFrame->setFrameShape(QFrame::StyledPanel);
 
   forceFrame->setStyleSheet(
-   "QFrame#forceLayout{\
+    "QFrame#forceLayout {\
       background-color: #666;\
       border-radius: 10px;\
     }");
@@ -299,7 +299,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
        "<font size=4>Torque</font>"));
   torqueLabel->setObjectName("torqueLabel");
   torqueLabel->setStyleSheet(
-   "QLabel#torqueLabel{\
+    "QLabel#torqueLabel {\
       background-color: #444;\
       border-radius: 5px;\
       padding-left: 10px;\
@@ -411,7 +411,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   torqueFrame->setFrameShape(QFrame::StyledPanel);
 
   torqueFrame->setStyleSheet(
-   "QFrame#torqueLayout{\
+    "QFrame#torqueLayout {\
       background-color: #666;\
       border-radius: 10px;\
     }");
@@ -975,7 +975,8 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
     vec.z = -sin(rotEuler.y);
 
     // To local frame
-    vec = this->dataPtr->linkVisual->GetWorldPose().rot.RotateVectorReverse(vec);
+    vec = this->dataPtr->linkVisual->GetWorldPose().rot.RotateVectorReverse(
+        vec);
 
     // Normalize new vector;
     if (vec == math::Vector3::Zero)
@@ -1124,7 +1125,6 @@ void ApplyWrenchDialog::SetForcePos(math::Vector3 _forcePos)
   else
   {
     this->dataPtr->forcePosRadio->setChecked(true);
-
   }
 
   // Visuals

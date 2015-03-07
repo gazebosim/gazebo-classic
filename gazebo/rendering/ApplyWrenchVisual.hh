@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_APPLYWRENCHVISUAL_HH_
 #define _GAZEBO_APPLYWRENCHVISUAL_HH_
 
+#include <string>
+
 #include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
@@ -39,46 +41,70 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ApplyWrenchVisual();
 
-      /// \brief TODO
+      /// \brief Load the visual with default parameters.
       public: void Load();
 
-      /// \brief TODO
+      /// \brief Returns the force visual.
+      /// \return Pointer to force visual.
       public: rendering::VisualPtr GetForceVisual() const;
 
-      /// \brief TODO
+      /// \brief Returns the torque visual.
+      /// \return Pointer to torque visual.
       public: rendering::VisualPtr GetTorqueVisual() const;
 
-      /// \brief TODO
+      /// \brief Returns the rotation tool.
+      /// \return Pointer to rotation tool.
       public: rendering::SelectionObjPtr GetRotTool() const;
 
-      /// \brief TODO
-      public: math::Quaternion GetQuaternionFromVector(math::Vector3 _vec);
+      /// \brief Get the rotation to point the positive Z axis to the
+      /// given direction.
+      /// _direction Direction vector.
+      public: math::Quaternion GetQuaternionFromVector(math::Vector3 _dir);
 
-      /// \brief TODO
-      public: void SetWrenchMode(std::string _mode);
+      /// \brief Set the mode to "force", "torque" or "none", update colors
+      /// and visibility accordingly.
+      /// \param[in] _mode New mode.
+      public: void SetMode(std::string _mode);
 
-      /// \brief TODO
+      /// \brief Set the CoM vector and update the position of the torque
+      /// visual.
+      /// \param[in] _comVector New vector.
       public: void SetCoM(math::Vector3 _comVector);
 
-      /// \brief TODO
+      /// \brief Set the force position vector and update the position of the
+      /// force visual.
+      /// \param[in] _forcePosVector New vector.
       public: void SetForcePos(math::Vector3 _forcePosVector);
 
-      /// \brief TODO
+      /// \brief Update force vector, force text and mode.
+      /// \param[in] _forceVector New vector.
+      /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
+      /// or not.
       public: void SetForce(math::Vector3 _forceVector, bool _rotatedByMouse);
 
-      /// \brief TODO
+      /// \brief Update torque vector, torque text and mode.
+      /// \param[in] _torqueVector New vector.
+      /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
+      /// or not.
       public: void SetTorque(math::Vector3 _torqueVector, bool _rotatedByMouse);
 
-      /// \brief TODO
-      public: void SetForceVisual();
+      /// \brief Update the force visual according to the force and force
+      /// position vectors.
+      public: void UpdateForceVisual();
 
-      /// \brief TODO
-      public: void SetTorqueVisual();
+      /// \brief Update the torque visual according to the torque and CoM
+      /// vectors.
+      public: void UpdateTorqueVisual();
 
-      /// \brief TODO
+      /// \brief Resize all children according to target link's size.
       public: void Resize();
 
-      // Documentation Inherited.
+      /// \brief Set this to be visible or not.
+      /// \param[in] _visible If true, force and torque visuals will be visible
+      /// and the rot tool will be visible if mode is not "none".
+      /// \param[in] _cascade Only needed when _visible is false. If _cascade is
+      /// true, force and torque visuals are hidden. If false, they are still
+      /// visible but with disabled colors.
       public: void SetVisible(bool _visible, bool _cascade = false);
     };
     /// \}

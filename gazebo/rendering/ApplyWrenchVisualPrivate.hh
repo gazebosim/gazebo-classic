@@ -29,40 +29,41 @@ namespace gazebo
     /// \brief Private data for the Apply Wrench Visual class.
     class ApplyWrenchVisualPrivate : public VisualPrivate
     {
-      /// TODO
+      /// Arrow representing force.
       public: VisualPtr forceVisual;
 
-      /// TODO
-      public: MovableText *forceText;
-
-      /// TODO
-      public: MovableText *torqueText;
-
-      /// TODO
-      public: rendering::SelectionObjPtr rotTool;
-
-      /// \brief TODO
+      /// \brief Tube and line representing torque.
       public: VisualPtr torqueVisual;
 
-      /// \brief TODO
+      /// \brief Text displaying the force magnitude.
+      public: MovableText *forceText;
+
+      /// \brief Text displaying the torque magnitude.
+      public: MovableText *torqueText;
+
+      /// \brief Line connecting the torque visual to the CoM.
       public: rendering::DynamicLines *torqueLine;
 
-      /// TODO
+      /// \brief Rotation tool.
+      public: rendering::SelectionObjPtr rotTool;
+
+      /// \brief CoM position in link coordinates.
       public: math::Vector3 comVector;
 
-      /// TODO
+      /// \brief Force application point in link coordinates.
       public: math::Vector3 forcePosVector;
 
-      /// TODO
+      /// \brief Force vector expressed in the link frame.
       public: math::Vector3 forceVector;
 
-      /// TODO
+      /// \brief Torque vector expressed in the link frame.
       public: math::Vector3 torqueVector;
 
-      /// TODO
+      /// \brief Current mode, either "force", "torque" or "none".
       public: std::string mode;
 
-      /// TODO
+      /// \brief If true, the rotation tool was rotated by the mouse and
+      /// shouldn't be oriented again according to the vector.
       public: bool rotatedByMouse;
     };
   }

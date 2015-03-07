@@ -17,6 +17,9 @@
 #ifndef _GAZEBO_APPLY_WRENCH_DIALOG_PRIVATE_HH_
 #define _GAZEBO_APPLY_WRENCH_DIALOG_PRIVATE_HH_
 
+#include <string>
+#include <vector>
+
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
