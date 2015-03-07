@@ -120,7 +120,8 @@ TEST_P(PhysicsEngineTest, PhysicsEngineParam)
 }
 
 /////////////////////////////////////////////////
-void PhysicsEngineTest::PhysicsEngineGetParamBool(const std::string &_physicsEngine)
+void PhysicsEngineTest::PhysicsEngineGetParamBool
+    (const std::string &_physicsEngine)
 {
   Load("worlds/empty.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
