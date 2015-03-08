@@ -1034,7 +1034,7 @@ static void ComputeRows(
         /// repeat for position projection
         //////////////////////////////////////////////////////
         if (constraint_index < 0)
-       {
+        {
           // delta_erp: unthrottled version compute for rhs with custom erp
           // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
           delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
