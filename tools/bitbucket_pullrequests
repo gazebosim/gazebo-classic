@@ -179,14 +179,11 @@ class BitbucketPullRequests
     return ids
   end
 
-  # check the current branch:
   # check files changed by the parent commit
-  # if this branch has an open pull request, check that branch
   def checkCurrent(fork=true)
     files = getFilesFromDiff(`hg log -r . --patch`)
     changeset = `hg id`[0..11]
     checkFiles(files, changeset)
-    puts branch=`hg branch`
   end
 
   # check changed files in pull request by id
