@@ -137,7 +137,7 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
   if (signTest < 0 )
     angle *= -1;
 
-  // Using Qt control modifier instead of Gazebo's for now. 
+  // Using Qt control modifier instead of Gazebo's for now.
   // See GLWidget::keyPressEvent
   if (QApplication::keyboardModifiers() & Qt::ControlModifier)
     angle = rint(angle / (M_PI * 0.25)) * (M_PI * 0.25);
