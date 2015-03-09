@@ -240,7 +240,9 @@ opt_parser = OptionParser.new do |o|
        "List open pull requests with fields:\n" + " "*37 +
        "[id] [source] [dest] [branch]") { |o| options["list"] = o }
   o.on("-c", "--check [id]", Integer,
-       "")  { |o| options["check_id"] = o; options["check"] = true }
+       "Run code_check on files changed by pull request [id]\n" + " "*37 +
+       "if [id] is not supplied, check all open pull requests\n" + " "*37 +
+       "if [id] is 0, check files changed by parent commit")  { |o| options["check_id"] = o; options["check"] = true }
   o.on("-d", "--diff [id]", Integer,
        "Show diff from pull request") { |o| options["diff"] = o }
   o.on("-f", "--files [id]", Integer,
