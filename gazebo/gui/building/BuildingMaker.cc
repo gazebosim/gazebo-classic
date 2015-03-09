@@ -1749,6 +1749,7 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
         else if (this->selectedTexture == ":bricks.png")
           material = "Gazebo/Bricks";
 
+        // Must set material before color, otherwise color is overwritten
         this->hoverVis->SetMaterial(material);
         this->hoverVis->SetAmbient((*it).second->GetColor());
       }
@@ -1867,6 +1868,7 @@ void BuildingMaker::ResetHoverVis()
     else
     {
       BuildingModelManip *manip = this->allItems[hoverName];
+      // Must set material before color, otherwise color is overwritten
       this->hoverVis->SetMaterial(manip->GetTexture());
       this->hoverVis->SetAmbient(manip->GetColor());
       this->hoverVis->SetTransparency(manip->GetTransparency());
