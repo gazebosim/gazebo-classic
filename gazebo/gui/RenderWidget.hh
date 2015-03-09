@@ -82,8 +82,6 @@ namespace gazebo
       /// \param[in] _show Whether or not to show the toolbar.
       public: void ShowToolbar(const bool _show);
 
-      private slots: virtual void update();
-
       /// \brief Qt callback to clear overlay message if a duration is
       /// specified
       private slots: void OnClearOverlayMsg();
@@ -127,13 +125,6 @@ namespace gazebo
 
       /// \brief An overlay label on the 3D render widget
       private: QLabel *msgOverlayLabel;
-
-      private: bool clear;
-      private: std::string clearName;
-
-      private: bool create;
-      private: std::string createName;
-      private: QTimer *timer;
 
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
