@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,11 +64,10 @@ physics::WorldPtr physics::get_world(const std::string &_name)
   }
   else
   {
-    for (std::vector<WorldPtr>::iterator iter = g_worlds.begin();
-        iter != g_worlds.end(); ++iter)
+    for (auto const &world : g_worlds)
     {
-      if ((*iter)->GetName() == _name)
-        return (*iter);
+      if (world->GetName() == _name)
+        return world;
     }
   }
 
@@ -80,41 +79,36 @@ physics::WorldPtr physics::get_world(const std::string &_name)
 /////////////////////////////////////////////////
 void physics::load_worlds(sdf::ElementPtr _sdf)
 {
-  std::vector<WorldPtr>::iterator iter;
-  for (iter = g_worlds.begin(); iter != g_worlds.end(); ++iter)
-    (*iter)->Load(_sdf);
+  for (auto &world : g_worlds)
+    world->Load(_sdf);
 }
 
 /////////////////////////////////////////////////
 void physics::init_worlds()
 {
-  std::vector<WorldPtr>::iterator iter;
-  for (iter = g_worlds.begin(); iter != g_worlds.end(); ++iter)
-    (*iter)->Init();
+  for (auto &world : g_worlds)
+    world->Init();
 }
 
 /////////////////////////////////////////////////
 void physics::run_worlds(unsigned int _steps)
 {
-  std::vector<WorldPtr>::iterator iter;
-  for (iter = g_worlds.begin(); iter != g_worlds.end(); ++iter)
-    (*iter)->Run(_steps);
+  for (auto &world : g_worlds)
+    world->Run(_steps);
 }
 
 /////////////////////////////////////////////////
 void physics::pause_worlds(bool _pause)
 {
-  std::vector<WorldPtr>::iterator iter;
-  for (iter = g_worlds.begin(); iter != g_worlds.end(); ++iter)
-    (*iter)->SetPaused(_pause);
+  for (auto &world : g_worlds)
+    world->SetPaused(_pause);
 }
 
 /////////////////////////////////////////////////
 void physics::stop_worlds()
 {
-  std::vector<WorldPtr>::iterator iter;
-  for (iter = g_worlds.begin(); iter != g_worlds.end(); ++iter)
-    (*iter)->Stop();
+  for (auto &world : g_worlds)
+    world->Stop();
 }
 
 /////////////////////////////////////////////////
@@ -150,11 +144,10 @@ void physics::stop_world(WorldPtr _world)
 /////////////////////////////////////////////////
 void physics::remove_worlds()
 {
-  for (std::vector<WorldPtr>::iterator iter = g_worlds.begin();
-      iter != g_worlds.end(); ++iter)
+  for (auto &world : g_worlds)
   {
-    (*iter)->Fini();
-    (*iter).reset();
+    world->Fini();
+    world.reset();
   }
 
   g_worlds.clear();
@@ -163,10 +156,9 @@ void physics::remove_worlds()
 /////////////////////////////////////////////////
 bool physics::worlds_running()
 {
-  for (std::vector<WorldPtr>::const_iterator iter = g_worlds.begin();
-      iter != g_worlds.end(); ++iter)
+  for (auto const &world : g_worlds)
   {
-    if ((*iter)->GetRunning())
+    if (world->GetRunning())
       return true;
   }
 

@@ -1,6 +1,7 @@
- QGroupBox::title {
+QGroupBox::title
+{
   color: #f0f0f0;
- }
+}
 
 QToolButton
 {
@@ -217,8 +218,7 @@ QListView
   background: #808080;
   alternate-background-color: #606060;
 
-  selection-color: #f58113;
-  selection-background-color: #808080;
+  selection-background-color: transparent;
   show-decoration-selected: 0;
 
   border: 1px solid #737373;
@@ -234,32 +234,48 @@ QListView::item
 QTreeView
 {
   color: #d0d0d0;
-  background: #808080;
-  alternate-background-color: #606060;
-
-  selection-color: #f58113;
   selection-background-color: transparent;
+  alternate-background-color: #606060;
   border-radius: 4;
   show-decoration-selected: 0;
 }
 
-QTreeView::branch:selected,
-QTreeView::branch:selected:active
-QTreeView::branch:selected:!active
-{
-  color: #f58113;
-}
-
-QTreeView::item:!selected,
-QTreeView::branch:!selected
-{
-  color: #d0d0d0;
-}
-
-QTreeView::item:selected,
 QTreeView::item:hover
 {
+  background: #808080;
+  color: #ffffff;
+}
+
+QTreeView::item:selected
+{
   color: #f58113;
+  background: #808080;
+}
+
+QTreeView::branch:selected
+{
+  background-color: #808080;
+}
+
+QTreeView::branch:selected:active
+{
+  background-color: #808080;
+}
+
+QTreeView::branch:selected:!active
+{
+  background-color: #808080;
+}
+
+QTreeView::branch:!open:has-children
+{
+  image: url(:/images/right_arrow.png);
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings
+{
+  image: url(:/images/down_arrow.png);
 }
 
 QTreeView QHeaderView:section
@@ -270,45 +286,6 @@ QTreeView QHeaderView:section
   border: 0px;
 }
 
-QSpinBox
-{
-  color: #353535;
-  background: #737373;
-  border-radius: 4;
-  margin-right: 20px;
-}
-
-QSpinBox::up-button
-{
-  subcontrol-origin: margin;
-  subcontrol-position: top right;
-
-  border: 1px outset #727272;
-  border-radius: 1px;
-  background: #737373;
-}
-
-QSpinBox::up-button:pressed
-{
-  border: 2px inset #727272;
-}
-
-QSpinBox::down-button
-{
-  subcontrol-origin: margin;
-  subcontrol-position: bottom right;
-
-  border: 1px outset #727272;
-  border-radius: 1px;
-  background: #737373;
-}
-
-QSpinBox::down-button:pressed
-{
-  border: 2px inset #727272;
-}
-
-QDoubleSpinBox,
 QLineEdit
 {
   color: #353535;
@@ -319,42 +296,6 @@ QLineEdit
 QLineEdit:disabled
 {
   color: #909090;
-}
-
-QDoubleSpinBox
-{
-  margin-right: 20px;
-}
-
-QDoubleSpinBox::up-button
-{
-  subcontrol-origin: margin;
-  subcontrol-position: top right;
-
-  border: 1px outset #727272;
-  border-radius: 1px;
-  background: #737373;
-}
-
-QDoubleSpinBox::up-button:pressed
-{
-  border: 2px inset #727272;
-}
-
-
-QDoubleSpinBox::down-button
-{
-  subcontrol-origin: margin;
-  subcontrol-position: bottom right;
-
-  border: 1px outset #727272;
-  border-radius: 1px;
-  background: #737373;
-}
-
-QDoubleSpinBox::down-button:pressed
-{
-  border: 2px inset #727272;
 }
 
 QPushButton
@@ -563,7 +504,7 @@ QTabWidget#mainTab::pane,
 QTabWidget#buildingEditorTab::pane,
 QTabWidget#modelEditorTab::pane,
 QTabWidget#terrainEditorTab::pane,
-QTabWidget#partInspectorTab::pane
+QTabWidget#linkInspectorTab::pane
 {
   border-left: 1px solid #101010;
   border-bottom: 1px solid #101010;
@@ -761,4 +702,62 @@ QwtScaleWidget
 #configWidget
 {
   background-color: #808080;
+}
+
+QAbstractSpinBox
+{
+  padding-top: 2px;
+  padding-bottom: 2px;
+  border: 0px;
+
+  background-color: #737373;
+  color: #353535;
+  selection-color: #ffffff;
+  selection-background-color: #434343;
+
+  border-radius: 3px;
+  min-width: 75px;
+}
+
+QAbstractSpinBox:up-button
+{
+  background-color: transparent;
+  subcontrol-origin: border;
+  subcontrol-position: top right;
+}
+QAbstractSpinBox:down-button
+{
+  background-color: transparent;
+  subcontrol-origin: border;
+  subcontrol-position: bottom right;
+}
+
+QAbstractSpinBox::up-arrow,
+QAbstractSpinBox::up-arrow:disabled,
+QAbstractSpinBox::up-arrow:off
+{
+  image: url(:/images/up_spin_arrow_disabled.png);
+  width: 10px;
+  height: 10px;
+}
+QAbstractSpinBox::up-arrow:hover
+{
+  image: url(:/images/up_spin_arrow.png);
+  width: 10px;
+  height: 10px;
+}
+
+QAbstractSpinBox::down-arrow,
+QAbstractSpinBox::down-arrow:disabled,
+QAbstractSpinBox::down-arrow:off
+{
+  image: url(:/images/down_spin_arrow_disabled.png);
+  width: 10px;
+  height: 10px;
+}
+QAbstractSpinBox::down-arrow:hover
+{
+  image: url(:/images/down_spin_arrow.png);
+  width: 10px;
+  height: 10px;
 }

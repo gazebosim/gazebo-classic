@@ -5,7 +5,6 @@ package gazebo.msgs;
 /// \brief A message statiscs about a world
 
 
-import "header.proto";
 import "time.proto";
 
 message WorldStatistics

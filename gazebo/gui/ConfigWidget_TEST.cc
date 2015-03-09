@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -251,8 +251,9 @@ void ConfigWidget_TEST::VisualMsgWidget()
 
     // geometry
     gazebo::math::Vector3 dimensions;
-    QVERIFY(visualConfigWidget->GetGeometryWidgetValue("geometry", dimensions)
-        ==  "box");
+    std::string uri;
+    QVERIFY(visualConfigWidget->GetGeometryWidgetValue("geometry", dimensions,
+        uri) == "box");
     QCOMPARE(dimensions, gazebo::math::Vector3(5.0, 3.0, 4.0));
 
     // material

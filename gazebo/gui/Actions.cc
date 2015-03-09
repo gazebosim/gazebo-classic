@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,6 +93,8 @@ GAZEBO_VISIBLE
 QAction *gazebo::gui::g_showJointsAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_showCOMAct = 0;
+GAZEBO_VISIBLE
+QAction *gazebo::gui::g_showInertiaAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_transparentAct = 0;
 GAZEBO_VISIBLE

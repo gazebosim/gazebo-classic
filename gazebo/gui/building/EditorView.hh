@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,9 @@ namespace gazebo
                   /// \brief Stairs mode
                   STAIRS,
                   /// \brief Color mode
-                  COLOR
+                  COLOR,
+                  /// \brief Texture mode
+                  TEXTURE
                 };
 
       /// \brief Constructor
@@ -186,8 +188,10 @@ namespace gazebo
       /// \param[in] _color Selected color.
       private: void OnColorSelected(QColor _color);
 
-      // private: void OnSaveModel(const std::string &_modelName,
-      //     const std::string &_savePath);
+      /// \brief Callback triggered when the user chooses a texture on the
+      /// palette.
+      /// \param[in] _texture Selected texture.
+      private: void OnTextureSelected(QString _texture);
 
       /// \brief Callback received when the model has been completed and
       /// uploaded onto the server.

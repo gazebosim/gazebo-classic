@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,6 +105,27 @@ void Matrix3::SetCol(unsigned int _i, const Vector3 &_v)
   m[0][_i] = _v.x;
   m[1][_i] = _v.y;
   m[2][_i] = _v.z;
+}
+
+//////////////////////////////////////////////////
+Matrix3 Matrix3::Inverse() const
+{
+  double t0 = + (this->m[2][2]*this->m[1][1] - this->m[2][1]*this->m[1][2]);
+  double t1 = - (this->m[2][2]*this->m[1][0] - this->m[2][0]*this->m[1][2]);
+  double t2 = + (this->m[2][1]*this->m[1][0] - this->m[2][0]*this->m[1][1]);
+
+  double invDet = 1 / (t0*this->m[0][0] + t1*this->m[0][1] + t2*this->m[0][2]);
+
+  return invDet * Matrix3(
+      t0,
+      - (this->m[2][2]*this->m[0][1] - this->m[2][1]*this->m[0][2]),
+      + (this->m[1][2]*this->m[0][1] - this->m[1][1]*this->m[0][2]),
+      t1,
+      + (this->m[2][2]*this->m[0][0] - this->m[2][0]*this->m[0][2]),
+      - (this->m[1][2]*this->m[0][0] - this->m[1][0]*this->m[0][2]),
+      t2,
+      - (this->m[2][1]*this->m[0][0] - this->m[2][0]*this->m[0][1]),
+      + (this->m[1][1]*this->m[0][0] - this->m[1][0]*this->m[0][1]));
 }
 
 //////////////////////////////////////////////////

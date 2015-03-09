@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,7 +124,7 @@ void JointMaker_TEST::CreateRemoveJoint()
   QCOMPARE(jointMaker->GetJointCount(), 3u);
 
   // Remove the two joints connected to the sphere
-  jointMaker->RemoveJointsByPart(sphereLink->GetName());
+  jointMaker->RemoveJointsByLink(sphereLink->GetName());
   QCOMPARE(jointMaker->GetJointCount(), 1u);
 
   // Remove the last joint

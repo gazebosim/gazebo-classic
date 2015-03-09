@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- Ground -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- Pioneer2dx model -->
+    <model name="pioneer2dx">
+      <include>
+        <uri>model://pioneer2dx</uri>
+      </include>
+
+      <include>
+        <uri>model://hokuyo</uri>
+        <pose>0.2 0 .38 0 0 0</pose>
+      </include>
+
+      <include>
+        <uri>model://camera</uri>
+        <pose>0.2 0 .3 0 0 0</pose>
+      </include>
+
+      <joint name="camera_joint" type="revolute">
+        <parent>pioneer2dx::pioneer2dx::chassis</parent>
+        <child>pioneer2dx::camera::link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
+      </joint>
+
+      <joint name="laser_joint" type="revolute">
+        <parent>pioneer2dx::pioneer2dx::chassis</parent>
+        <child>pioneer2dx::hokuyo::link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
+      </joint>
+
+    </model>
+
+  </world>
+</sdf>

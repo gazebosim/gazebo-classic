@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,13 +77,13 @@ void GazeboDriver_Register(DriverTable *_table)
 // need the extern to avoid C++ name-mangling
 extern "C"
 {
+  GAZEBO_VISIBLE
   int player_driver_init(DriverTable *_table)
   {
     GazeboDriver_Register(_table);
     return(0);
   }
 }
-
 
 //////////////////////////////////////////////////
 // Retrieve options from the configuration file and do any
@@ -92,8 +92,6 @@ GazeboDriver::GazeboDriver(ConfigFile *_cf, int _section)
     : Driver(_cf, _section, false, 4096)
 {
   printf("GazeboDriver::GazeboDriver\n");
-  this->devices = NULL;
-  this->deviceCount = 0;
   this->deviceMaxCount = 0;
 
   if (this->LoadDevices(_cf, _section) < 0)
@@ -179,14 +177,11 @@ int GazeboDriver::Unsubscribe(player_devaddr_t addr)
 // Main function for device thread
 void GazeboDriver::Update()
 {
-  int i;
-
   Driver::ProcessMessages();
 
-  for (i = 0; i < this->deviceCount; i++)
+  for (auto device: this->devices)
   {
-    GazeboInterface *iface = this->devices[i];
-    iface->Update();
+    device->Update();
   }
 
   return;
@@ -196,10 +191,8 @@ void GazeboDriver::Update()
 // Helper function to load all devices on startup
 int GazeboDriver::LoadDevices(ConfigFile *_cf, int _section)
 {
-  // Get the device count, and create the device array
+  // Get the device count
   this->deviceMaxCount = _cf->GetTupleCount(_section, "provides");
-  this->devices = static_cast<GazeboInterface**>(realloc(this->devices,
-      this->deviceMaxCount * sizeof(this->devices[0])));
 
   if (!player_quiet_startup)
   {
@@ -337,7 +330,7 @@ int GazeboDriver::LoadDevices(ConfigFile *_cf, int _section)
       }
 
       // store the Interaface in our device list
-      this->devices[this->deviceCount++] = ifsrc;
+      this->devices.push_back(ifsrc);
     }
     else
     {
@@ -359,12 +352,8 @@ int GazeboDriver::LoadDevices(ConfigFile *_cf, int _section)
 // Find a device according to a player_devaddr
 GazeboInterface *GazeboDriver::LookupDevice(player_devaddr_t _addr)
 {
-  int i;
-
-  for (i = 0; i < static_cast<int>(this->deviceCount); ++i)
+  for (auto iface: this->devices)
   {
-    GazeboInterface *iface = static_cast<GazeboInterface*>(this->devices[i]);
-
     if (iface->device_addr.robot == _addr.robot &&
         iface->device_addr.interf == _addr.interf &&
         iface->device_addr.index == _addr.index)
@@ -373,5 +362,3 @@ GazeboInterface *GazeboDriver::LookupDevice(player_devaddr_t _addr)
 
   return NULL;
 }
-
-

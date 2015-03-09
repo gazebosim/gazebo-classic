@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/RenderWidget.hh"
+#include "gazebo/gui/building/BuildingEditorWidget.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingEditorPalette.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
@@ -75,6 +76,15 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
       gui::editor::Events::ConnectFinishBuildingModel(
       boost::bind(&BuildingEditor::OnFinish, this)));
 
+  this->buildingEditorWidget = new BuildingEditorWidget(
+      this->mainWindow->GetRenderWidget());
+  this->buildingEditorWidget->setSizePolicy(QSizePolicy::Expanding,
+      QSizePolicy::Expanding);
+  this->buildingEditorWidget->hide();
+
+  this->mainWindow->GetRenderWidget()->InsertWidget(0,
+      this->buildingEditorWidget);
+
   this->menuBar = NULL;
 }
 
@@ -86,15 +96,13 @@ BuildingEditor::~BuildingEditor()
 ////////////////////////////////////////////////
 void BuildingEditor::Save()
 {
-  gui::editor::Events::saveBuildingEditor(
-    this->buildingPalette->GetModelName());
+  gui::editor::Events::saveBuildingEditor();
 }
 
 ////////////////////////////////////////////////
 void BuildingEditor::SaveAs()
 {
-  gui::editor::Events::saveAsBuildingEditor(
-      this->buildingPalette->GetModelName());
+  gui::editor::Events::saveAsBuildingEditor();
 }
 
 /////////////////////////////////////////////////
@@ -141,12 +149,20 @@ void BuildingEditor::OnEdit(bool _checked)
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("buildingEditorTab");
     this->mainWindow->ShowMenuBar(this->menuBar);
-    this->mainWindow->GetRenderWidget()->ShowEditor(true);
+    this->buildingEditorWidget->show();
+    this->mainWindow->GetRenderWidget()->DisplayOverlayMsg(
+        "Building is View Only");
+    this->mainWindow->GetRenderWidget()->ShowTimePanel(false);
+    this->mainWindow->GetRenderWidget()->ShowToolbar(false);
   }
   else
   {
+    this->buildingPalette->CustomColorDialog()->reject();
     this->mainWindow->ShowLeftColumnWidget();
-    this->mainWindow->GetRenderWidget()->ShowEditor(false);
+    this->buildingEditorWidget->hide();
+    this->mainWindow->GetRenderWidget()->DisplayOverlayMsg("");
+    this->mainWindow->GetRenderWidget()->ShowTimePanel(true);
+    this->mainWindow->GetRenderWidget()->ShowToolbar(true);
     this->mainWindow->ShowMenuBar();
     this->mainWindow->Play();
   }
