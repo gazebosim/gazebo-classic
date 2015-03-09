@@ -26,18 +26,9 @@ void ExtrudeDialog_TEST::BadFilename()
   // Check that bad filenames don't break anything
   std::string bad("/not/a/file.svg");
 
-  bool exceptionSeen = false;
-  gazebo::gui::ExtrudeDialog *extrudeDialog;
-  try
-  {
-    extrudeDialog = new gazebo::gui::ExtrudeDialog(bad);
-  }
-  catch(...)
-  {
-    exceptionSeen = true;
-  }
-
-  QCOMPARE(exceptionSeen, false);
+  gazebo::gui::ExtrudeDialog *extrudeDialog =
+      new gazebo::gui::ExtrudeDialog(bad);
+  QVERIFY(extrudeDialog != NULL);
 
   delete extrudeDialog;
 }
