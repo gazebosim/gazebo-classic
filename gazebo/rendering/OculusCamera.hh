@@ -20,12 +20,13 @@
 
 #include <string>
 #include <vector>
+#include <OVR_CAPI.h>
 
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 
-namespace OVR
+/*OLD namespace OVR
 {
   class HMDDevice;
   class SensorFusion;
@@ -40,7 +41,7 @@ namespace OVR
       class StereoConfig;
     }
   }
-}
+}*/
 
 namespace Ogre
 {
@@ -138,6 +139,8 @@ namespace gazebo
       /// \return True when Oculus is ready to use.
       public: bool Ready();
 
+      protected: virtual void RenderImpl();
+
       /// \brief Set the camera to be attached to a visual.
       ///
       /// This causes the camera to move in relation to the specified visual.
@@ -169,29 +172,33 @@ namespace gazebo
 
       /// \brief Ogre camera for the right Oculus screen.
       protected: Ogre::Camera *rightCamera;
+      protected: Ogre::Camera *externalCamera;
 
       /// \brief View poer for the right camera.
       protected: Ogre::Viewport *rightViewport;
+      protected: Ogre::Viewport *externalViewport;
+      protected: Ogre::SceneManager *externalSceneManager;
 
       /// \brief Ogre Compositors
       private: Ogre::CompositorInstance *compositors[2];
 
       /// \brief Oculus deviceManager. Manages when the devices are inserted,
       /// removed, or the number of devices present.
-      private: OVR::DeviceManager *deviceManager;
+      // OLD: private: OVR::DeviceManager *deviceManager;
 
       /// \brief An Oculus Head-Mounted display.
-      private: OVR::HMDDevice *hmd;
+      // OLD: private: OVR::HMDDevice *hmd;
+      private: ovrHmd hmd;
 
       /// \brief Maintains a scene stereo state.
-      private: OVR::Util::Render::StereoConfig *stereoConfig;
+      // OLD: private: OVR::Util::Render::StereoConfig *stereoConfig;
 
       /// \brief An interface to sensor data
-      private: OVR::SensorDevice *sensor;
+      //OLD: private: OVR::SensorDevice *sensor;
 
       /// \brief Accumulates sensor notification messages to keep track of
       /// orientation.
-      private: OVR::SensorFusion *sensorFusion;
+      // OLD: private: OVR::SensorFusion *sensorFusion;
 
       /// \brief Horizontal projection center offset as a distance away from the
       /// one-eye [-1,1] unit viewport.
@@ -205,6 +212,10 @@ namespace gazebo
 
       /// \brief True when Oculus is connected and ready to use.
       private: bool ready;
+
+      private: Ogre::TexturePtr renderTextureRight;
+      private: Ogre::TexturePtr renderTextureLeft;
+      private: unsigned int frameIndex;
     };
     /// \}
   }

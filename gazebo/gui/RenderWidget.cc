@@ -166,10 +166,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  this->timer = new QTimer(this);
-  connect(this->timer, SIGNAL(timeout()), this, SLOT(update()));
-  this->timer->start(44);
-
   this->connections.push_back(
       gui::Events::ConnectFollow(
         boost::bind(&RenderWidget::OnFollow, this, _1)));
@@ -220,74 +216,6 @@ RenderWidget::~RenderWidget()
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::update()
-{
-  if (this->clear)
-  {
-    rendering::remove_scene(this->clearName);
-    this->clear = false;
-    return;
-  }
-  else if (this->create)
-  {
-    rendering::create_scene(this->createName, true);
-    this->create = false;
-    return;
-  }
-
-  rendering::UserCameraPtr cam = this->glWidget->GetCamera();
-
-  if (!cam || !cam->GetInitialized())
-  {
-    event::Events::preRender();
-    return;
-  }
-
-  // float fps = cam->GetAvgFPS();
-  // int triangleCount = cam->GetTriangleCount();
-  // math::Pose pose = cam->GetWorldPose();
-
-  // std::ostringstream stream;
-
-  // stream << std::fixed << std::setprecision(2) << pose.pos.x;
-  // this->xPosEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  // stream << std::fixed << std::setprecision(2) << pose.pos.y;
-  // this->yPosEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  // stream << std::fixed << std::setprecision(2) << pose.pos.z;
-  // this->zPosEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  // stream << std::fixed << std::setprecision(2)
-  //        << GZ_RTOD(pose.rot.GetAsEuler().x);
-  // this->rollEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  // stream << std::fixed << std::setprecision(2)
-  //        << GZ_RTOD(pose.rot.GetAsEuler().y);
-  // this->pitchEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  // stream << std::fixed << std::setprecision(2)
-  //        << GZ_RTOD(pose.rot.GetAsEuler().z);
-  // this->yawEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  /*stream << std::fixed << std::setprecision(1) << fps;
-  this->fpsEdit->setText(tr(stream.str().c_str()));
-  stream.str("");
-
-  stream << std::fixed << std::setprecision(2) << triangleCount;
-  this->trianglesEdit->setText(tr(stream.str().c_str()));
-  */
-
-  this->glWidget->update();
-}
-
-/////////////////////////////////////////////////
 void RenderWidget::ShowEditor(bool _show)
 {
   if (_show)
@@ -313,6 +241,8 @@ void RenderWidget::RemoveScene(const std::string &_name)
 {
   this->clear = true;
   this->clearName = _name;
+
+  rendering::remove_scene(this->clearName);
 }
 
 /////////////////////////////////////////////////
@@ -320,6 +250,7 @@ void RenderWidget::CreateScene(const std::string &_name)
 {
   this->create = true;
   this->createName = _name;
+  rendering::create_scene(this->createName, true);
 }
 
 /////////////////////////////////////////////////

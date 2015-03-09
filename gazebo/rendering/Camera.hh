@@ -334,7 +334,11 @@ namespace gazebo
 
       /// \brief Get the average FPS
       /// \return The average frames per second
-      public: virtual float GetAvgFPS() const {return 0;}
+      public: virtual float GetAvgFPS() const;
+
+      /// \brief Get the last FPS
+      /// \return The last frames per second
+      public: virtual float GetLastFPS() const;
 
       /// \brief Get the triangle count
       /// \return The current triangle count
@@ -715,6 +719,8 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data.
       private: CameraPrivate *dataPtr;
+
+      private: gazebo::common::PID fpsPID;
     };
     /// \}
   }
