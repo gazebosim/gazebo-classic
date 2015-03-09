@@ -10,7 +10,7 @@ Installation
 ------------
 Instructions are located at
 
-  http://gazebosim.org/install
+  http://gazebosim.org/tutorials?cat=install
 
 Gazebo cmake parameters available at configuring time:
 
@@ -18,9 +18,11 @@ Gazebo cmake parameters available at configuring time:
    Check the building machine for supported compiler optimizations and use 
    them to build the software.
  - USE_UPSTREAM_CFLAGS (bool) [default True]
-   Use the recommend gazebo developers compiler optimizations flags
+   Use the recommend gazebo developers compiler optimizations flags.
  - ENABLE_TESTS_COMPILATION (bool) [default True]
-   Enabled or disable the test suite compilation. 
+   Enable or disable the test suite compilation. 
+ - ENABLE_EXAMPLES_COMPILATION (bool) [default True]
+   Enable or disable the examples compilation.
  - USE_LOW_MEMORY_TEST (bool) [default False]
    Use reduced version of tests which need less quantity of RAM memory
    available.
@@ -34,10 +36,8 @@ Gazebo cmake parameters available at configuring time:
 
 Uninstallation
 --------------
-Read the uninstallation instructions (http://gazebosim.org/uninstall)
-in the online manual for generic instructions.  For most people, the following sequence will suffice:
 
-  $ make uninstall (inside the gazebo-trunk/build directory)
-
+  $ cd gazebo/build
+  $ make uninstall (or sudo make uninstall)
 
 - Nate Koenig

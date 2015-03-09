@@ -105,6 +105,16 @@ set (MIN_FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}
 include (${gazebo_cmake_dir}/DissectVersion.cmake)
 
 #####################################
+# By default enable the example compilation
+if (NOT DEFINED ENABLE_EXAMPLES_COMPILATION)
+  set(ENABLE_EXAMPLES_COMPILATION true)
+endif()
+
+if (NOT ENABLE_EXAMPLES_COMPILATION)
+  message(STATUS "Examples compilation is disabled")
+endif()
+
+#####################################
 # Check for low memory version to use in some tests
 if(NOT DEFINED USE_LOW_MEMORY_TESTS)
   set (USE_LOW_MEMORY_TESTS FALSE)
