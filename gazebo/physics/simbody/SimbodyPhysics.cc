@@ -1374,15 +1374,9 @@ bool SimbodyPhysics::GetParam(const std::string &_key, boost::any &_value) const
   {
     _value = this->contact.getTransitionVelocity();
   }
-  else if (_key == "max_step_size")
-  {
-    _value = this->GetMaxStepSize();
-  }
   else
   {
-    gzwarn << "key [" << _key
-           << "] not supported, returning (int)0." << std::endl;
-    return false;
+    return PhysicsEngine::GetParam(_key, _value);
   }
   return true;
 }

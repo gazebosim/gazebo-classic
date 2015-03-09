@@ -1315,8 +1315,6 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = this->sdf->Get<int>("max_contacts");
   else if (_key == "min_step_size")
     _value = odeElem->GetElement("solver")->Get<double>("min_step_size");
-  else if (_key == "max_step_size")
-    _value = this->GetMaxStepSize();
   else if (_key == "sor_lcp_tolerance")
     _value = dWorldGetQuickStepTolerance(this->dataPtr->worldId);
   else if (_key == "rms_error_tolerance")
@@ -1345,8 +1343,7 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = dWorldGetQuickStepExtraFrictionIterations(this->dataPtr->worldId);
   else
   {
-    gzwarn << _key << " is not supported in ode" << std::endl;
-    return false;
+    return PhysicsEngine::GetParam(_key, _value);
   }
   return true;
 }
