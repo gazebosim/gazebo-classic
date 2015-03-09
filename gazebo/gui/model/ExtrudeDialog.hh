@@ -39,8 +39,9 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor.
+      /// \param[in] _filename Full path to the SVG file.
       /// \param[in] _parent Parent QWidget.
-      public: ExtrudeDialog(std::string _filename, QWidget *_parent = 0);
+      public: ExtrudeDialog(const std::string &_filename, QWidget *_parent = 0);
 
       /// \brief Destructor.
       public: ~ExtrudeDialog();

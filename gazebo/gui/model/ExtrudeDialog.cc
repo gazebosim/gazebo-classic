@@ -24,7 +24,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-ExtrudeDialog::ExtrudeDialog(std::string _filename, QWidget *_parent)
+ExtrudeDialog::ExtrudeDialog(const std::string &_filename, QWidget *_parent)
   : QDialog(_parent), dataPtr(new ExtrudeDialogPrivate)
 {
   this->setObjectName("ExtrudeDialog");
