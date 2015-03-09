@@ -333,12 +333,17 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
     else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
     {
-      sdf::ElementPtr elem = geomElem->AddElement("polyline");
-      elem->GetElement("height")->Set(_msg->geometry().polyline().height());
-      for (int i = 0; i < _msg->geometry().polyline().point_size(); ++i)
+      while (geomElem->HasElement("polyline"))
+        geomElem->GetElement("polyline")->RemoveFromParent();
+
+      for (int j = 0; j < _msg->geometry().polyline_size(); ++j)
       {
-        elem->AddElement("point")->Set(
-            msgs::Convert(_msg->geometry().polyline().point(i)));
+        sdf::ElementPtr polylineElem = geomElem->AddElement("polyline");
+        for (int i = 0; i < _msg->geometry().polyline(j).point_size(); ++i)
+        {
+          sdf::ElementPtr pointElem = polylineElem->AddElement("point");
+          pointElem->Set(msgs::Convert(_msg->geometry().polyline(j).point(i)));
+        }
       }
     }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
@@ -548,7 +553,11 @@ void Visual::Load()
     sdf::ElementPtr matElem =
         this->dataPtr->sdf->GetElement("material");
 
-    bool useMaterialScript = false;
+    // clone the material sdf to preserve the new values to be set
+    // as updating the material name via SetMaterial can affect the
+    // ambient/diffuse/specular/emissive color sdf elements.
+    sdf::ElementPtr matElemClone = matElem->Clone();
+
     if (matElem->HasElement("script"))
     {
       sdf::ElementPtr scriptElem = matElem->GetElement("script");
@@ -566,23 +575,17 @@ void Visual::Load()
       std::string matName = scriptElem->Get<std::string>("name");
 
       if (!matName.empty())
-      {
         this->SetMaterial(matName);
-        useMaterialScript = true;
-      }
     }
 
-    if (!useMaterialScript)
-    {
-      if (matElem->HasElement("ambient"))
-        this->SetAmbient(matElem->Get<common::Color>("ambient"));
-      if (matElem->HasElement("diffuse"))
-        this->SetDiffuse(matElem->Get<common::Color>("diffuse"));
-      if (matElem->HasElement("specular"))
-        this->SetSpecular(matElem->Get<common::Color>("specular"));
-      if (matElem->HasElement("emissive"))
-        this->SetEmissive(matElem->Get<common::Color>("emissive"));
-    }
+    if (matElemClone->HasElement("ambient"))
+      this->SetAmbient(matElemClone->Get<common::Color>("ambient"));
+    if (matElemClone->HasElement("diffuse"))
+      this->SetDiffuse(matElemClone->Get<common::Color>("diffuse"));
+    if (matElemClone->HasElement("specular"))
+      this->SetSpecular(matElemClone->Get<common::Color>("specular"));
+    if (matElemClone->HasElement("emissive"))
+      this->SetEmissive(matElemClone->Get<common::Color>("emissive"));
 
     if (matElem->HasElement("lighting"))
     {
@@ -993,6 +996,13 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   if (_materialName.empty() || _materialName == "__default__")
     return;
 
+  common::Color matAmbient;
+  common::Color matDiffuse;
+  common::Color matSpecular;
+  common::Color matEmissive;
+  bool matColor = rendering::Material::GetMaterialAsColor(
+      _materialName, matAmbient, matDiffuse, matSpecular, matEmissive);
+
   if (_unique)
   {
     // Create a custom material name
@@ -1000,7 +1010,11 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
     newMaterialName = this->dataPtr->sceneNode->getName() + "_MATERIAL_" +
         _materialName;
 
-    if (this->GetMaterialName() == newMaterialName)
+    if (this->GetMaterialName() == newMaterialName &&
+        matAmbient == this->GetAmbient() &&
+        matDiffuse == this->GetDiffuse() &&
+        matSpecular == this->GetSpecular() &&
+        matEmissive == this->GetEmissive())
       return;
 
     this->dataPtr->myMaterialName = newMaterialName;
@@ -1054,16 +1068,19 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
 
   try
   {
-    for (int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects(); i++)
+    for (unsigned int i = 0;
+        i < this->dataPtr->sceneNode->numAttachedObjects(); ++i)
     {
       Ogre::MovableObject *obj = this->dataPtr->sceneNode->getAttachedObject(i);
-
-      if (dynamic_cast<Ogre::Entity*>(obj))
-        ((Ogre::Entity*)obj)->setMaterialName(this->dataPtr->myMaterialName);
-      else if (dynamic_cast<Ogre::SimpleRenderable*>(obj))
+      Ogre::Entity *entity = dynamic_cast<Ogre::Entity *>(obj);
+      if (entity)
+        entity->setMaterialName(this->dataPtr->myMaterialName);
+      else
       {
-        ((Ogre::SimpleRenderable*)obj)->setMaterial(
-            this->dataPtr->myMaterialName);
+        Ogre::SimpleRenderable *simpleRenderable =
+            dynamic_cast<Ogre::SimpleRenderable *>(obj);
+        if (simpleRenderable)
+          simpleRenderable->setMaterial(this->dataPtr->myMaterialName);
       }
     }
 
@@ -1092,6 +1109,15 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
            << "] to Geometry["
            << this->dataPtr->sceneNode->getName()
            << ". Object will appear white.\n";
+  }
+
+  // check if material has color components, if so, set them.
+  if (matColor)
+  {
+    this->SetAmbient(matAmbient);
+    this->SetDiffuse(matDiffuse);
+    this->SetSpecular(matSpecular);
+    this->SetEmissive(matEmissive);
   }
 
   // Re-apply the transparency filter for the last known transparency value
@@ -1227,7 +1253,9 @@ void Visual::SetDiffuse(const common::Color &_color)
         for (passCount = 0; passCount < technique->getNumPasses(); passCount++)
         {
           pass = technique->getPass(passCount);
-          pass->setDiffuse(Conversions::Convert(_color));
+          dc = Conversions::Convert(_color);
+          pass->setDiffuse(dc);
+          this->dataPtr->transparency = 1.0f - dc.a;
         }
       }
     }
@@ -1537,8 +1565,9 @@ void Visual::SetTransparencyInnerLoop()
           }
 
           dc = pass->getDiffuse();
-          dc.a =(1.0f - this->dataPtr->transparency);
+          dc.a = (1.0f - this->dataPtr->transparency);
           pass->setDiffuse(dc);
+          this->dataPtr->diffuse = Conversions::Convert(dc);
         }
       }
     }
@@ -1548,7 +1577,7 @@ void Visual::SetTransparencyInnerLoop()
 //////////////////////////////////////////////////
 void Visual::SetTransparency(float _trans)
 {
-  if (math::equal(_trans, this->dataPtr->transparency))
+  if (math::equal(this->dataPtr->transparency, _trans))
     return;
 
   this->dataPtr->transparency = std::min(
@@ -2400,9 +2429,6 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     this->SetScale(geomScale);
   }
 
-  if (_msg->has_transparency())
-    this->SetTransparency(_msg->transparency());
-
   if (_msg->has_material())
   {
     if (_msg->material().has_lighting())
@@ -2410,7 +2436,6 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       this->SetLighting(_msg->material().lighting());
     }
 
-    bool useMaterialScript = false;
     if (_msg->material().has_script())
     {
       for (int i = 0; i < _msg->material().script().uri_size(); ++i)
@@ -2421,25 +2446,22 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       if (_msg->material().script().has_name() &&
           !_msg->material().script().name().empty())
       {
-        useMaterialScript = true;
         this->SetMaterial(_msg->material().script().name());
       }
     }
 
-    if (!useMaterialScript)
-    {
-      if (_msg->material().has_ambient())
-        this->SetAmbient(msgs::Convert(_msg->material().ambient()));
+    if (_msg->material().has_ambient())
+      this->SetAmbient(msgs::Convert(_msg->material().ambient()));
 
-      if (_msg->material().has_diffuse())
-        this->SetDiffuse(msgs::Convert(_msg->material().diffuse()));
+    if (_msg->material().has_diffuse())
+      this->SetDiffuse(msgs::Convert(_msg->material().diffuse()));
 
-      if (_msg->material().has_specular())
-        this->SetSpecular(msgs::Convert(_msg->material().specular()));
+    if (_msg->material().has_specular())
+      this->SetSpecular(msgs::Convert(_msg->material().specular()));
 
-      if (_msg->material().has_emissive())
-        this->SetEmissive(msgs::Convert(_msg->material().emissive()));
-    }
+    if (_msg->material().has_emissive())
+      this->SetEmissive(msgs::Convert(_msg->material().emissive()));
+
 
     if (_msg->material().has_shader_type())
     {
@@ -2469,6 +2491,11 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       if (_msg->material().has_normal_map())
         this->SetNormalMap(_msg->material().normal_map());
     }
+  }
+
+  if (_msg->has_transparency())
+  {
+    this->SetTransparency(_msg->transparency());
   }
 
   /*if (msg->points.size() > 0)
@@ -2569,21 +2596,26 @@ std::string Visual::GetMeshName() const
 
       if (!meshManager->IsValidFilename(polyLineName))
       {
-        std::vector<math::Vector2d> vertices;
-        sdf::ElementPtr pointElem =
-          geomElem->GetElement("polyline")->GetElement("point");
+        sdf::ElementPtr polylineElem = geomElem->GetElement("polyline");
 
-        while (pointElem)
+        std::vector<std::vector<math::Vector2d> > polylines;
+        while (polylineElem)
         {
-          math::Vector2d point = pointElem->Get<math::Vector2d>();
-          vertices.push_back(point);
-          pointElem = pointElem->GetNextElement("point");
+          std::vector<math::Vector2d> vertices;
+          sdf::ElementPtr pointElem = polylineElem->GetElement("point");
+          while (pointElem)
+          {
+            math::Vector2d point = pointElem->Get<math::Vector2d>();
+            vertices.push_back(point);
+            pointElem = pointElem->GetNextElement("point");
+          }
+          polylineElem = polylineElem->GetNextElement("polyline");
+          polylines.push_back(vertices);
         }
 
-        meshManager->CreateExtrudedPolyline(polyLineName, vertices,
-            geomElem->GetElement("polyline")->Get<double>("height"),
-            math::Vector2d(1, 1));
-       }
+        meshManager->CreateExtrudedPolyline(polyLineName, polylines,
+            geomElem->GetElement("polyline")->Get<double>("height"));
+      }
       return polyLineName;
     }
     else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))

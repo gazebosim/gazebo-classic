@@ -619,6 +619,12 @@ math::Vector3 Link::GetWorldAngularAccel() const
 }
 
 //////////////////////////////////////////////////
+math::Vector3 Link::GetWorldAngularMomentum() const
+{
+  return this->GetWorldInertiaMatrix() * this->GetWorldAngularVel();
+}
+
+//////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeForce() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldForce());
