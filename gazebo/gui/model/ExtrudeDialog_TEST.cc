@@ -32,7 +32,7 @@ void ExtrudeDialog_TEST::BadFilename()
   {
     extrudeDialog = new gazebo::gui::ExtrudeDialog(bad);
   }
-  catch (...)
+  catch(...)
   {
     exceptionSeen = true;
   }
