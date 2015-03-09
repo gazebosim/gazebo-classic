@@ -190,10 +190,10 @@ namespace gazebo
                   const math::Vector3 &_relPos) = 0;
 
       /// \brief Add a force expressed in the link frame.
-      /// \param[in] _force Direction vector expressed in the link frame. Each 
+      /// \param[in] _force Direction vector expressed in the link frame. Each
       /// component corresponds to the force which will be added in that axis
       /// and the vector's magnitude corresponds to the total force.
-      /// \param[in] _offset Offset position expressed in the link frame. It 
+      /// \param[in] _offset Offset position expressed in the link frame. It
       /// defaults to the link origin.
       public: virtual void AddLinkForce(const math::Vector3 &_force,
           const math::Vector3 &_offset = math::Vector3::Zero) = 0;
