@@ -236,13 +236,13 @@ bool PhysicsEngine::GetParam(const std::string &_key,
   if (_key == "type")
     _value = this->sdf->Get<std::string>("type");
   else if (_key == "max_step_size")
-    _value = this->maxStepSize;
+    _value = this->GetMaxStepSize();
   else if (_key == "real_time_update_rate")
-    _value = this->realTimeUpdateRate;
+    _value = this->GetRealTimeUpdateRate();
   else if (_key == "real_time_factor")
-    _value = this->targetRealTimeFactor;
+    _value = this->GetTargetRealTimeFactor();
   else if (_key == "gravity")
-    _value = this->sdf->Get<math::Vector3>("gravity");
+    _value = this->GetGravity();
   else if (_key == "magnetic_field")
     _value = this->sdf->Get<math::Vector3>("magnetic_field");
   else
