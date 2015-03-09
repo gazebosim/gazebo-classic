@@ -1867,8 +1867,8 @@ void BuildingMaker::ResetHoverVis()
     else
     {
       BuildingModelManip *manip = this->allItems[hoverName];
-      this->hoverVis->SetAmbient(manip->GetColor());
       this->hoverVis->SetMaterial(manip->GetTexture());
+      this->hoverVis->SetAmbient(manip->GetColor());
       this->hoverVis->SetTransparency(manip->GetTransparency());
     }
     this->hoverVis.reset();
