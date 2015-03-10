@@ -122,11 +122,11 @@ void ODELink::Init()
           dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
 
           // Set max_vel and min_depth
-          if (g->GetODESurface()->maxVel < 0)
+          boost::any value;
+          if (g->GetODESurface()->maxVel < 0 && this->GetWorld()->
+              GetPhysicsEngine()->GetParam("contact_max_correcting_vel", value))
           {
-            g->GetODESurface()->maxVel = boost::any_cast<double>(
-                this->GetWorld()->GetPhysicsEngine()->GetParam(
-                    "contact_max_correcting_vel"));
+            g->GetODESurface()->maxVel = boost::any_cast<double>(value);
           }
           dBodySetMaxVel(this->linkId, g->GetODESurface()->maxVel);
           dBodySetMinDepth(this->linkId, g->GetODESurface()->minDepth);
