@@ -454,7 +454,6 @@ void Visual::Load(sdf::ElementPtr _sdf)
 {
   this->dataPtr->sdf->Copy(_sdf);
   this->Load();
-//  this->dataPtr->scene->AddVisual(shared_from_this());
 }
 
 //////////////////////////////////////////////////
