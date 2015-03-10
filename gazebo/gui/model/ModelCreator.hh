@@ -73,8 +73,10 @@ namespace gazebo
         LINK_SPHERE,
         /// \brief Cylinder
         LINK_CYLINDER,
-        /// \brief Custom
-        LINK_MESH
+        /// \brief Imported 3D mesh
+        LINK_MESH,
+        /// \brief Extruded polyline
+        LINK_POLYLINE
       };
 
       /// \enum SaveState
@@ -139,11 +141,12 @@ namespace gazebo
       /// \param[in] _type Type of link to add: box, cylinder, or sphere.
       /// \param[in] _size Size of the link.
       /// \param[in] _pose Pose of the link.
+      /// \param[in] _samples Number of samples for polyline.
       /// \return Name of the link that has been added.
       public: std::string AddShape(LinkType _type,
           const math::Vector3 &_size = math::Vector3::One,
           const math::Pose &_pose = math::Pose::Zero,
-          const std::string &_uri = "");
+          const std::string &_uri = "", unsigned int _samples = 5);
 
       /// \brief Add a box to the model.
       /// \param[in] _size Size of the box.
