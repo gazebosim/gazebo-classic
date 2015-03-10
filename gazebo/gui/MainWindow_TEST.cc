@@ -65,7 +65,7 @@ void MainWindow_TEST::Selection()
   // get model at center of window - should get the ground plane
   gazebo::rendering::VisualPtr vis =
       cam->GetVisual(gazebo::math::Vector2i(0, 0));
-  QVERIFY(vis);
+  QVERIFY(vis != NULL);
   QVERIFY(vis->IsPlane());
 
   // move camera to look at the box
@@ -77,7 +77,7 @@ void MainWindow_TEST::Selection()
   // verify we get a box
   gazebo::rendering::VisualPtr vis2 =
       cam->GetVisual(gazebo::math::Vector2i(0, 0));
-  QVERIFY(vis2);
+  QVERIFY(vis2 != NULL);
   QVERIFY(vis2->GetRootVisual()->GetName() == "box");
 
   // look upwards
@@ -88,7 +88,7 @@ void MainWindow_TEST::Selection()
   // verify there is nothing in the middle of the window
   gazebo::rendering::VisualPtr vis3 =
       cam->GetVisual(gazebo::math::Vector2i(0, 0));
-  QVERIFY(!vis3);
+  QVERIFY(vis3 == NULL);
 
   // reset orientation
   gazebo::math::Quaternion identityRot(gazebo::math::Vector3(0, 0, 0));
@@ -98,7 +98,7 @@ void MainWindow_TEST::Selection()
   // verify we can still get the box
   gazebo::rendering::VisualPtr vis4 =
       cam->GetVisual(gazebo::math::Vector2i(0, 0));
-  QVERIFY(vis4);
+  QVERIFY(vis4 != NULL);
   QVERIFY(vis4->GetRootVisual()->GetName() == "box");
 
   // hide the box
