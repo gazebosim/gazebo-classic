@@ -207,9 +207,6 @@ void UserCamera::Fini()
 //////////////////////////////////////////////////
 void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
-  if (this->dataPtr->selectionBuffer)
-    this->dataPtr->selectionBuffer->Update();
-
   // DEBUG: this->dataPtr->selectionBuffer->ShowOverlay(true);
 
   // Don't update the camera if it's being animated.
@@ -547,9 +544,6 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
 
   if (!this->dataPtr->selectionBuffer)
     return result;
-
-  // Update the selection buffer
-  this->dataPtr->selectionBuffer->Update();
 
   Ogre::Entity *entity =
     this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
