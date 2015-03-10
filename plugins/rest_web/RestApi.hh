@@ -51,9 +51,11 @@ namespace gazebo
     /// \param[in] _json the data to send to the server
     public: void PostJsonData(const char* _route, const char *_json);
 
-    /// \brief a Request/Response
-    /// \param[in] the request
+    /// \brief Returns the username
+    public: std::string GetUser();
 
+    /// \brief a Request/Respone (can be used for GET and POST)
+    /// \param[in] the request
     /// \return the response
     private: std::string Request(const char* _request,
                                  const char *_postStr = NULL);

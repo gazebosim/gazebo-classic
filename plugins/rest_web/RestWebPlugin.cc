@@ -73,28 +73,16 @@ void RestWebPlugin::Load(int /*_argc*/, char ** /*_argv*/)
   // npthing to do for now
 }
 
-///////////////////////////////////////////////////////////////////////////////
-void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
-{
-  gzmsg << "SIM EVENT\n";
-  gzmsg << " type: " << _msg->type() << std::endl;
-  gzmsg << " name: " << _msg->name() << std::endl;
-  gzmsg << " data: " << _msg->data() << std::endl;
-
-  msgs::WorldStatistics ws = _msg->world_statistics();
-  
-}
-
-///////////////////////////////////////////////////////////////////////////////
 //  adapted from TimePanel
-std::string FormatTime(common::Time &_t)
+///////////////////////////////////////////////////////////////////////////////
+std::string FormatTime(int _sec, int _nsec)
 {
   std::ostringstream stream;
   unsigned int day, hour, min, sec, msec;
 
   stream.str("");
 
-  sec = _t.sec;
+  sec = _sec;
 
   day = sec / 86400;
   sec -= day * 86400;
@@ -105,7 +93,7 @@ std::string FormatTime(common::Time &_t)
   min = sec / 60;
   sec -= min * 60;
 
-  msec = rint(_t.nsec * 1e-6);
+  msec = rint(_nsec * 1e-6);
 
   stream << std::setw(2) << std::setfill('0') << day << " ";
   stream << std::setw(2) << std::setfill('0') << hour << ":";
@@ -114,6 +102,76 @@ std::string FormatTime(common::Time &_t)
   stream << std::setw(3) << std::setfill('0') << msec;
 
   return stream.str();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
+{
+  // where to post the data on the REST server
+  std::string route = "/events/new";
+
+  std::string eType = _msg->type();
+  std::string name = _msg->name();
+  std::string data = _msg->data();
+
+  msgs::WorldStatistics ws = _msg->world_statistics();
+  msgs::Time simT = ws.sim_time();
+  msgs::Time realT = ws.real_time();
+  msgs::Time pauseT = ws.pause_time();
+  bool paused = ws.paused();
+  // uint64_t iterations = ws.iterations();
+
+  std::string worldName = physics::get_world()->GetName();
+  std::string event = "{\n";
+
+  event += "\"session\": \"" + this->session + "\", ";
+  event += "\"name\": \"" + name + "\", ";
+  event += "\"type\": \"" + eType + "\",\n";
+  event += "\"data\": " + data + ", ";
+
+  event += "\"world\": {";
+  event += "\"name\": ";
+  event += "\"";
+  event += worldName;
+  event += "\", ";
+
+  event += "\"paused\": ";
+  event += "\"";
+  if (paused)
+    event += "true";
+  else
+    event += "false";
+  event += "\", ";
+
+  event += "\"clock_time\": ";
+  event += "\"";
+  event += common::Time::GetWallTimeAsISOString();
+  event += "\", ";
+
+  event += "\"real_time\": ";
+  event += "\"";
+  event += FormatTime(realT.sec(), realT.nsec());
+  event += "\", ";
+
+  event += "\"sim_time\": ";
+  event += "\"";
+  event += FormatTime(simT.sec(), simT.nsec());
+  event += "\", ";
+
+  event += "\"pause_time\": ";
+  event += "\"";
+  event += FormatTime(pauseT.sec(), pauseT.nsec());
+  event += "\"";
+
+  event += "}\n";  // world element
+  event += "}";    // root element
+
+  gzmsg << "Posting sim event\n";
+  gzmsg << "event:\n" << event << "\n\n" <<  std::endl;
+
+  restApi.PostJsonData(route.c_str(), event.c_str());
+
+  gzmsg << "POSTED to: " << route << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -142,7 +200,6 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
       event += world->GetName();
       event += "\", ";
 
-
       if (!world->IsPaused())
       {
         event += "\"is_running\": \"true\", ";
@@ -151,8 +208,8 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
       {
         event +=  "\"is_running\": \"false\", ";
       }
-      common::Time t;
 
+      common::Time t;
       event += "\"clock_time\": ";
       event += "\"";
       event += common::Time::GetWallTimeAsISOString();
@@ -161,19 +218,19 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
       event += "\"real_time\": ";
       event += "\"";
       t = world->GetRealTime();
-      event += FormatTime(t);
+      event += FormatTime(t.sec, t.nsec);
       event += "\", ";
 
       event += "\"sim_time\": ";
       event += "\"";
       t = world->GetSimTime();
-      event += FormatTime(t);
+      event += FormatTime(t.sec, t.nsec);
       event += "\", ";
 
       event += "\"pause_time\": ";
       event += "\"";
       t = world->GetPauseTime();
-      event += FormatTime(t);
+      event += FormatTime(t.sec, t.nsec);
       event += "\" ";
 
       event += "}";
@@ -209,9 +266,9 @@ void RestWebPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
   try
   {
     restApi.Login(_msg->url().c_str(),
-                  "/login",
-                  _msg->username().c_str(),
-                  _msg->password().c_str());
+        "/login",
+        _msg->username().c_str(),
+        _msg->password().c_str());
   }
   catch(RestException &x)
   {

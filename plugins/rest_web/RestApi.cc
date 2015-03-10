@@ -48,7 +48,7 @@ static void dump(const char *text,
   if (nohex)
     // without the hex output, we can fit more on screen
     width = 0x40;
-  long int s = size;
+  int64 s = size;
   fprintf(stream, "%s, %10.10ld bytes (0x%8.8lx)\n",
           text, s, s);
 
@@ -196,8 +196,9 @@ std::string RestApi::Login(const char* urlStr,
   this->pass = passStr;
 
   this->loginRoute = route;
-  std::string resp;
-  resp = this->Request(loginRoute.c_str());
+  std::string resp = this->Request(loginRoute.c_str());
+
+  gzmsg << "RESP: " << resp << "\n";
 
   this->isLoggedIn = true;
   this->SendUnpostedPosts();
@@ -220,18 +221,22 @@ void RestApi::SendUnpostedPosts()
   }
   else
   {
-    // gzmsg << posts.size() << " post(s) queued to be sent" << endl;
+    gzmsg << posts.size() << " post(s) queued to be sent" << std::endl;
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
 {
+  using namespace std;
+
   if (this->url.empty())
     throw RestException("A URL must be specified for web service");
   if (this->user.empty())
-    throw RestException("No user specified for the web service. Please login.");
-
+  {
+    std::string e = "No user specified for the web service. Please login.";
+    throw RestException(e.c_str());
+  }
   std::string path = url + _reqUrl;
   CURL *curl = curl_easy_init();
   curl_easy_setopt(curl, CURLOPT_URL, path.c_str() );
@@ -242,6 +247,7 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
     gzmsg << "RestApi::Request" << std::endl;
     gzmsg << "  path: " << path << std::endl;
     gzmsg << "  data: " << _postJsonStr << std::endl;
+    gzmsg << std::endl;
 
     struct data config;
     config.trace_ascii = 1;  //  enable ascii tracing
@@ -254,9 +260,9 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
 
   struct MemoryStruct chunk;
   // will be grown as needed by the realloc above
-  chunk.memory = reinterpret_cast<char*>(malloc(1));
-  // no data at this point
-  chunk.size = 0;
+  chunk.memory = static_cast<char*>(malloc(1));
+
+  chunk.size = 0;            // no data at this point
   bool secure = false;
   if (!secure)
   {
@@ -269,10 +275,11 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
   // send all data to this function
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
   //  we pass our 'chunk' struct to the callback function
-  // curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+  //  curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
   curl_easy_setopt(curl,
                    CURLOPT_WRITEDATA,
-                   reinterpret_cast<void *>(&chunk));
+                   static_cast<void *>(&chunk));
+
   // some servers don't like requests that are made without a user-agent
   // field, so we provide one
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
@@ -280,7 +287,7 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
   // set user name and password for the authentication
   // curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_ANY);
   curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-  std::string userpass = this->user + ":" + this->pass;
+  string userpass = this->user + ":" + this->pass;
   curl_easy_setopt(curl, CURLOPT_USERPWD, userpass.c_str());
 
   // connection timeout
@@ -309,7 +316,7 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
   if (res != CURLE_OK)
   {
     gzerr << "Request to " << url << " failed: ";
-    gzerr << curl_easy_strerror(res) << std::endl;
+    gzerr << curl_easy_strerror(res) << endl;
     throw RestException(curl_easy_strerror(res));
   }
   // copy the data into a string
@@ -317,16 +324,13 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
 
   if (http_code != 200)
   {
-    gzerr << "Request to " << url << " error: " << response << std::endl;
+    gzerr << "Request to " << url << " error: " << response << endl;
     throw RestException(response.c_str());
   }
-
   // clean up
   curl_slist_free_all(slist);
-
   if (chunk.memory)
     free(chunk.memory);
-
   return response;
 }
 
