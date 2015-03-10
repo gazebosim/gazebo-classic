@@ -389,11 +389,6 @@ boost::any DARTPhysics::GetParam(const std::string &_key) const
 //////////////////////////////////////////////////
 bool DARTPhysics::GetParam(const std::string &_key, boost::any &_value) const
 {
-  if (_key == "max_step_size")
-  {
-    _value = this->GetMaxStepSize();
-  }
-
   sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
   // physics dart element not yet added to sdformat
   // GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
@@ -416,8 +411,7 @@ bool DARTPhysics::GetParam(const std::string &_key, boost::any &_value) const
   }
   else
   {
-    gzwarn << _key << " is not supported in dart" << std::endl;
-    return false;
+    return PhysicsEngine::GetParam(_key, _value);
   }
 
   return true;

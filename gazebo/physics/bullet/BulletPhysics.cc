@@ -645,12 +645,9 @@ bool BulletPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = this->sdf->GetElement("max_contacts")->Get<int>();
   else if (_key == "min_step_size")
     _value = bulletElem->GetElement("solver")->Get<double>("min_step_size");
-  else if (_key == "max_step_size")
-    _value = this->GetMaxStepSize();
   else
   {
-    gzwarn << _key << " is not supported in bullet" << std::endl;
-    return false;
+    return PhysicsEngine::GetParam(_key, _value);
   }
   return true;
 }

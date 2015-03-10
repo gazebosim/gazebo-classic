@@ -131,6 +131,14 @@ void PhysicsEngineTest::PhysicsEngineGetParamBool
 
   // Initialize to failure conditions
   boost::any value;
+
+  // Test shared physics engine parameter(s)
+
+  EXPECT_TRUE(physics->GetParam("real_time_factor", value));
+  EXPECT_NEAR(boost::any_cast<double>(value), 1.0, 1e-6);
+  EXPECT_TRUE(physics->GetParam("max_step_size", value));
+  EXPECT_NEAR(boost::any_cast<double>(value), 0.001, 1e-6);
+
   if (_physicsEngine == "ode" || _physicsEngine == "bullet")
   {
     EXPECT_TRUE(physics->GetParam("iters", value));
@@ -139,12 +147,14 @@ void PhysicsEngineTest::PhysicsEngineGetParamBool
   else if (_physicsEngine == "dart")
   {
     gzwarn << "DARTPhysics::GetParam not yet implemented." << std::endl;
+    return;
   }
   else if (_physicsEngine == "simbody")
   {
     EXPECT_TRUE(physics->GetParam("accuracy", value));
     EXPECT_NEAR(boost::any_cast<double>(value), 1e-3, 1e-6);
   }
+
   EXPECT_FALSE(physics->GetParam("param_does_not_exist", value));
 }
 
