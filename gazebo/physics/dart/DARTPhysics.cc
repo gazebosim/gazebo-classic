@@ -389,17 +389,13 @@ boost::any DARTPhysics::GetParam(const std::string &_key) const
 //////////////////////////////////////////////////
 bool DARTPhysics::GetParam(const std::string &_key, boost::any &_value) const
 {
+  if (!this->sdf->HasElement("dart"))
+  {
+    return PhysicsEngine::GetParam(_key, _value);
+  }
   sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
   // physics dart element not yet added to sdformat
   // GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
-  if (dartElem == NULL)
-  {
-    gzerr << "DART SDF element not found"
-          << ", unable to get param ["
-          << _key << "]"
-          << std::endl;
-    return false;
-  }
 
   if (_key == "max_contacts")
   {

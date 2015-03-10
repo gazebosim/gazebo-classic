@@ -133,11 +133,16 @@ void PhysicsEngineTest::PhysicsEngineGetParamBool
   boost::any value;
 
   // Test shared physics engine parameter(s)
-
-  EXPECT_TRUE(physics->GetParam("real_time_factor", value));
-  EXPECT_NEAR(boost::any_cast<double>(value), 1.0, 1e-6);
+  EXPECT_TRUE(physics->GetParam("gravity", value));
+  EXPECT_EQ(boost::any_cast<math::Vector3>(value), math::Vector3(0, 0, -9.8));
   EXPECT_TRUE(physics->GetParam("max_step_size", value));
   EXPECT_NEAR(boost::any_cast<double>(value), 0.001, 1e-6);
+  EXPECT_TRUE(physics->GetParam("real_time_factor", value));
+  EXPECT_NEAR(boost::any_cast<double>(value), 1.0, 1e-6);
+  EXPECT_TRUE(physics->GetParam("real_time_update_rate", value));
+  EXPECT_NEAR(boost::any_cast<double>(value), 1000.0, 1e-6);
+  EXPECT_TRUE(physics->GetParam("type", value));
+  EXPECT_EQ(boost::any_cast<std::string>(value), _physicsEngine);
 
   if (_physicsEngine == "ode" || _physicsEngine == "bullet")
   {
