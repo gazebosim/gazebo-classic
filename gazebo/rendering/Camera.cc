@@ -1747,3 +1747,4 @@ unsigned int Camera::GetTriangleCount() const
 {
   return this->renderTarget->getTriangleCount();
 }
+
