@@ -48,7 +48,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
 
   // We want a render rate of 60Hz. Setting the target to 70Hz to account
   // for some slop
-  this->SetRenderRate(65.0);
+  this->SetRenderRate(70.0);
 
   this->SetUseSDFPose(false);
 }

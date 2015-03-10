@@ -104,7 +104,6 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 
   // Set default render rate to unlimited
   this->SetRenderRate(0.0);
-  this->fpsPID.Init(.01);
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
@@ -384,8 +383,8 @@ void Camera::Update()
 void Camera::Render(bool _force)
 {
   if (this->initialized && (_force ||
-        common::Time::GetWallTime() - this->lastRenderWallTime >=
-        this->dataPtr->renderPeriod))
+      common::Time::GetWallTime() - this->lastRenderWallTime >=
+      this->dataPtr->renderPeriod))
   {
     this->newData = true;
     this->RenderImpl();
@@ -481,6 +480,11 @@ void Camera::PostRender()
 {
   this->ReadPixelBuffer();
 
+  // Only record last render time if data was actually generated
+  // (If a frame was rendered).
+  if (this->newData)
+    this->lastRenderWallTime = common::Time::GetWallTime();
+
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
     if (this->captureDataOnce)
@@ -518,9 +522,6 @@ void Camera::PostRender()
     this->newImageFrame(buffer, width, height, this->GetImageDepth(),
                     this->GetImageFormat());
   }
-
-  if (this->newData)
-    this->lastRenderWallTime = common::Time::GetWallTime();
 
   this->newData = false;
 }
@@ -1301,7 +1302,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->viewport->setShadowsEnabled(true);
     this->viewport->setOverlaysEnabled(false);
 
-    //RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
+    RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
     this->viewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
@@ -1677,15 +1678,9 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
 void Camera::SetRenderRate(double _hz)
 {
   if (_hz > 0.0)
-  {
-    this->dataPtr->targetHz = _hz;
     this->dataPtr->renderPeriod = 1.0 / _hz;
-  }
   else
-  {
-    this->dataPtr->targetHz = GZ_DBL_MAX;
     this->dataPtr->renderPeriod = 0.0;
-  }
 }
 
 //////////////////////////////////////////////////
