@@ -234,7 +234,7 @@ bool PhysicsEngine::GetParam(const std::string &_key,
     boost::any &_value) const
 {
   if (_key == "type")
-    _value = this->sdf->Get<std::string>("type");
+    _value = this->GetType();
   else if (_key == "max_step_size")
     _value = this->GetMaxStepSize();
   else if (_key == "real_time_update_rate")
