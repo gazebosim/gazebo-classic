@@ -261,7 +261,7 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->ShowMenuBar();
     this->mainWindow->GetRenderWidget()->ShowTimePanel(true);
-    if (this->mainWindowPaused)
+    if (!this->mainWindowPaused)
       this->mainWindow->Play();
   }
   this->active = !this->active;
