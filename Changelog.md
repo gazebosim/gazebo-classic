@@ -35,6 +35,9 @@
     * [Pull request #1454](https://bitbucket.org/osrf/gazebo/pull-request/1454)
     * [Issue #1455](https://bitbucket.org/osrf/gazebo/issue/1455)
 
+1. Added Matrix3::Inverse() and tests 
+    * [Pull request #1481](https://bitbucket.org/osrf/gazebo/pull-request/1481)
+
 1. Model editor updates
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
@@ -59,9 +62,22 @@
     1. Renamed Part to Link.
         * [Pull request #1478](https://bitbucket.org/osrf/gazebo/pull-request/1478)
 
+    1. Fix snapping inside editor.
+        * [Pull request #1489](https://bitbucket.org/osrf/gazebo/pull-request/1489)
+        * [Issue #1457](https://bitbucket.org/osrf/gazebo/issue/1457)
+
+    1. Added ExtrudeDialog.
+        * [Pull request #1483](https://bitbucket.org/osrf/gazebo/pull-request/1483)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
+1. Allow sdformat 2.3.1+ or 3+ and fix tests
+  * [Pull request #1484](https://bitbucket.org/osrf/gazebo/pull-request/1484)
+
+1. Add Link::GetWorldAngularMomentum function and test.
+  * [Pull request #1482](https://bitbucket.org/osrf/gazebo/pull-request/1482)
+
 1. Implement Coulomb joint friction for DART
   * [Pull request #1427](https://bitbucket.org/osrf/gazebo/pull-request/1427)
   * [Issue #1281](https://bitbucket.org/osrf/gazebo/issue/1281)
@@ -299,6 +315,9 @@
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
+
+1. Modified GUI rendering to improve the rendering update rate.
+    * [Pull request #1487](https://bitbucket.org/osrf/gazebo/pull-request/1487)
 
 ### Gazebo 4.1.0 (2014-11-20)
 
