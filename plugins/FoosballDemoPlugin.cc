@@ -112,14 +112,14 @@ void PlayState::Update()
   math::Pose ballPose = this->plugin->ball->GetWorldPose();
 
   // Does player "A" score?
-  if (ballPose.pos.x > this->plugin->tableLength)
+  if (ballPose.pos.x > this->plugin->tableLength / 2.0)
   {
     this->plugin->SetCurrentState(this->plugin->goalAState);
     return;
   }
 
   // Does player "B" score?
-  if (ballPose.pos.x < -this->plugin->tableLength)
+  if (ballPose.pos.x < -this->plugin->tableLength / 2.0)
   {
     this->plugin->SetCurrentState(this->plugin->goalBState);
     return;
@@ -223,6 +223,7 @@ void FoosballDemoPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void FoosballDemoPlugin::Reset()
 {
+  std::lock_guard<std::mutex> lock(this->mutex);
   this->OnRestartGame(nullptr);
 }
 
