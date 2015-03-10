@@ -217,9 +217,41 @@ void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
 }
 
 //////////////////////////////////////////////////
-bool PhysicsEngine::SetParam(const std::string &/*_key*/,
-    const boost::any &/*_value*/)
+bool PhysicsEngine::SetParam(const std::string &_key,
+    const boost::any &_value)
 {
+  try
+  {
+    if (_key == "type")
+    {
+      gzwarn << "Cannot set physics engine type from GetParam." << std::endl;
+      return false;
+    }
+    if (_key == "max_step_size")
+      this->SetMaxStepSize(boost::any_cast<double>(_value));
+    else if (_key == "real_time_update_rate")
+      this->SetRealTimeUpdateRate(boost::any_cast<double>(_value));
+    else if (_key == "real_time_factor")
+      this->SetTargetRealTimeFactor(boost::any_cast<double>(_value));
+    else if (_key == "gravity")
+      this->SetGravity(boost::any_cast<math::Vector3>(_value));
+    else if (_key == "magnetic_field")
+    {
+      this->sdf->GetElement("magnetic_field")->
+          Set(boost::any_cast<math::Vector3>(_value));
+    }
+    else
+    {
+      gzwarn << "Parameter [" << _key << "] not found in physics engine"
+             << this->GetType() << std::endl;
+      return false;
+    }
+  }
+  catch(boost::bad_any_cast &_e)
+  {
+    gzerr << "Caught bad any_cast in PhysicsEngine::SetParam: " << _e.what()
+          << std::endl;
+  }
   return true;
 }
 

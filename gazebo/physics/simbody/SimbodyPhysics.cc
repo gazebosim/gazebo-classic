@@ -1391,10 +1391,6 @@ bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
     {
       this->contact.setTransitionVelocity(boost::any_cast<double>(_value));
     }
-    else if (_key == "max_step_size")
-    {
-      this->SetMaxStepSize(boost::any_cast<double>(_value));
-    }
     else if (_key == "stiffness")
     {
       this->contactMaterialStiffness = boost::any_cast<double>(_value);
@@ -1436,8 +1432,7 @@ bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
     }
     else
     {
-      gzwarn << _key << " is not supported in Simbody" << std::endl;
-      return false;
+      return PhysicsEngine::SetParam(_key, _value);
     }
   }
   catch(boost::bad_any_cast &e)
