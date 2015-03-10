@@ -247,8 +247,8 @@ bool PhysicsEngine::GetParam(const std::string &_key,
     _value = this->sdf->Get<math::Vector3>("magnetic_field");
   else
   {
-    gzwarn << "Key [" << _key << "] is not supported in "
-           << this->sdf->Get<std::string>("type") << std::endl;
+    gzwarn << "Key [" << _key << "] is not supported in " << this->GetType()
+           << std::endl;
     return false;
   }
 
