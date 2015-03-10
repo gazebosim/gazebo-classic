@@ -13,7 +13,7 @@
 1. **gazebo/physics/PolylineShape.hh**
     + ***Removed:*** public: std::vector<math::Vector2d> GetVertices() const
     + ***Replacement:*** public: std::vector<std::vector<math::Vector2d> > GetVertices() const
-    
+
 ### Deletions
 
 1. **gazebo/gui/RenderWidget.hh**

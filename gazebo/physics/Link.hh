@@ -118,8 +118,8 @@ namespace gazebo
       public: virtual bool GetGravityMode() const = 0;
 
       /// \brief Set whether this body will collide with others in the
-      /// model. Bodies connected by a joint are exempt from this, and will
-      /// never collide.
+      /// model.
+      /// \sa GetSelfCollide
       /// \param[in] _collide True to enable collisions.
       public: virtual void SetSelfCollide(bool _collide) = 0;
 
@@ -133,8 +133,12 @@ namespace gazebo
       /// ghost: collides with everything else but other ghost
       public: void SetCollideMode(const std::string &_mode);
 
-      /// \brief Get Self-Collision Flag, if this is true, this body will
-      /// collide with other bodies even if they share the same parent.
+      /// \brief Get Self-Collision Flag.
+      /// Two links within the same model will not collide if both have
+      /// self_collide == false. \n
+      /// link 1 and link2 collide = link1.self_collide || link2.self_collide
+      /// Bodies connected by a joint are exempt from this, and will
+      /// never collide.
       /// \return True if self collision is enabled.
       public: bool GetSelfCollide() const;
 
