@@ -175,13 +175,13 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
     QLabel *upperLimitLabel = new QLabel(tr("Upper: "));
 
     QDoubleSpinBox *lowerLimitSpinBox = new QDoubleSpinBox;
-    lowerLimitSpinBox->setRange(-1000, 1000);
+    lowerLimitSpinBox->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
     lowerLimitSpinBox->setSingleStep(0.01);
     lowerLimitSpinBox->setDecimals(3);
     this->lowerLimitSpinBoxes.push_back(lowerLimitSpinBox);
 
     QDoubleSpinBox *upperLimitSpinBox = new QDoubleSpinBox;
-    upperLimitSpinBox->setRange(-1000, 1000);
+    upperLimitSpinBox->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
     upperLimitSpinBox->setSingleStep(0.01);
     upperLimitSpinBox->setDecimals(3);
     this->upperLimitSpinBoxes.push_back(upperLimitSpinBox);
@@ -317,6 +317,7 @@ JointMaker::JointType JointInspector::GetType() const
 {
   return this->jointType;
 }
+
 /////////////////////////////////////////////////
 std::string JointInspector::GetName() const
 {

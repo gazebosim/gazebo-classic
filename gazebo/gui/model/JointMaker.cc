@@ -45,9 +45,9 @@ using namespace gui;
 /////////////////////////////////////////////////
 JointMaker::JointMaker()
 {
-  this->UnitVectors.push_back(math::Vector3::UnitX);
-  this->UnitVectors.push_back(math::Vector3::UnitY);
-  this->UnitVectors.push_back(math::Vector3::UnitZ);
+  this->unitVectors.push_back(math::Vector3::UnitX);
+  this->unitVectors.push_back(math::Vector3::UnitY);
+  this->unitVectors.push_back(math::Vector3::UnitZ);
 
   this->newJointCreated = false;
   this->mouseJoint = NULL;
@@ -387,13 +387,13 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   int axisCount = JointMaker::GetJointAxisCount(jointData->type);
   for (int i = 0; i < axisCount; ++i)
   {
-    if (i < static_cast<int>(this->UnitVectors.size()))
-      jointData->axis[i] = this->UnitVectors[i];
+    if (i < static_cast<int>(this->unitVectors.size()))
+      jointData->axis[i] = this->unitVectors[i];
     else
-      jointData->axis[i] = this->UnitVectors[0];
+      jointData->axis[i] = this->unitVectors[0];
 
-    jointData->lowerLimit[i] = -3.14;
-    jointData->upperLimit[i] = 3.14;
+    jointData->lowerLimit[i] = -GZ_DBL_MAX;
+    jointData->upperLimit[i] = GZ_DBL_MAX;
     jointData->effortLimit[i] = -1;
     jointData->velocityLimit[i] = -1;
     jointData->useParentModelFrame[i] = false;

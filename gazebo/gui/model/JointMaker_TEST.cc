@@ -19,6 +19,7 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/model/JointInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/JointMaker_TEST.hh"
 
@@ -134,6 +135,114 @@ void JointMaker_TEST::CreateRemoveJoint()
   // delete jointMaker;
   mainWindow->close();
   delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void JointMaker_TEST::JointDefaultProperties()
+{
+
+  // FIXME Test passes but segfaults when QTestFixture clean up
+  // Problem: JointMaker's destructor resets visual shared_ptrs
+  // but this later causes a segfault in Visual's destructor when exiting the
+  // program.
+
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, true);
+
+  gui::JointMaker *jointMaker = new gui::JointMaker();
+  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
+  QCOMPARE(jointMaker->GetJointCount(), 0u);
+
+  gui::MainWindow *mainWindow = new gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  Q_ASSERT(cam);
+  rendering::ScenePtr scene = cam->GetScene();
+  Q_ASSERT(scene);
+
+  rendering::VisualPtr boxLink = scene->GetVisual("box::link");
+  rendering::VisualPtr sphereLink = scene->GetVisual("sphere::link");
+  rendering::VisualPtr cylinderLink = scene->GetVisual("cylinder::link");
+
+  Q_ASSERT(boxLink.get());
+  Q_ASSERT(sphereLink.get());
+  Q_ASSERT(cylinderLink.get());
+
+  // Add a revolute2 joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_HINGE2);
+  gui::JointData *revoluteJointData =
+      jointMaker->CreateJoint(boxLink, sphereLink);
+  jointMaker->CreateHotSpot(revoluteJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 1u);
+
+  // verify connected joints
+  std::vector<gui::JointData *> boxJointData =
+      jointMaker->GetJointDataByLink("box::link");
+  QCOMPARE(static_cast<unsigned int>(boxJointData.size()), 1u);
+
+  gui::JointData *rev2joint = boxJointData[0];
+  QVERIFY(rev2joint != NULL);
+  QVERIFY(rev2joint->inspector != NULL);
+
+  // verify default values
+  QVERIFY(rev2joint->inspector->GetType() == gui::JointMaker::JOINT_HINGE2);
+  QVERIFY(rev2joint->inspector->GetUseParentModelFrame(0) == false);
+  QVERIFY(rev2joint->inspector->GetUseParentModelFrame(1) == false);
+  QVERIFY(rev2joint->inspector->GetPose() == math::Pose::Zero);
+  QVERIFY(rev2joint->inspector->GetAxis(0) == math::Vector3::UnitX);
+  QVERIFY(rev2joint->inspector->GetAxis(1) == math::Vector3::UnitY);
+  qFuzzyCompare(rev2joint->inspector->GetLowerLimit(0), -GZ_DBL_MAX);
+  qFuzzyCompare(rev2joint->inspector->GetUpperLimit(0), GZ_DBL_MAX);
+  qFuzzyCompare(rev2joint->inspector->GetLowerLimit(1), -GZ_DBL_MAX);
+  qFuzzyCompare(rev2joint->inspector->GetUpperLimit(1), GZ_DBL_MAX);
+
+  // Add a prismatic joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_SLIDER);
+  gui::JointData *prismaticJointData =
+      jointMaker->CreateJoint(sphereLink, cylinderLink);
+  jointMaker->CreateHotSpot(prismaticJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 2u);
+
+  // verify connected joints
+  std::vector<gui::JointData *> sphereJointData =
+      jointMaker->GetJointDataByLink("sphere::link");
+  QCOMPARE(static_cast<unsigned int>(sphereJointData.size()), 2u);
+
+  std::vector<gui::JointData *> cylinderJointData =
+      jointMaker->GetJointDataByLink("cylinder::link");
+  QCOMPARE(static_cast<unsigned int>(cylinderJointData.size()), 1u);
+
+  gui::JointData *prisJoint = cylinderJointData[0];
+  QVERIFY(prisJoint != NULL);
+  QVERIFY(prisJoint->inspector != NULL);
+
+  // verify default values
+  QVERIFY(prisJoint->type == gui::JointMaker::JOINT_SLIDER);
+  QVERIFY(prisJoint->useParentModelFrame[0] == false);
+  QVERIFY(prisJoint->pose == math::Pose::Zero);
+  QVERIFY(prisJoint->axis[0] == math::Vector3::UnitX);
+  qFuzzyCompare(prisJoint->lowerLimit[0], -GZ_DBL_MAX);
+  qFuzzyCompare(prisJoint->upperLimit[0], GZ_DBL_MAX);
+  QVERIFY(prisJoint->inspector->GetType() == gui::JointMaker::JOINT_SLIDER);
+  QVERIFY(prisJoint->inspector->GetUseParentModelFrame(0) == false);
+  QVERIFY(prisJoint->inspector->GetPose() == math::Pose::Zero);
+  QVERIFY(prisJoint->inspector->GetAxis(0) == math::Vector3::UnitX);
+  qFuzzyCompare(prisJoint->inspector->GetLowerLimit(0), -GZ_DBL_MAX);
+  qFuzzyCompare(prisJoint->inspector->GetUpperLimit(0), GZ_DBL_MAX);
 }
 
 // Generate a main function for the test

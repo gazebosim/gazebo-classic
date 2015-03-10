@@ -226,7 +226,7 @@ namespace gazebo
       private slots: void OnOpenInspector();
 
       /// \brief Constant vector containing [UnitX, UnitY, UnitZ].
-      private: std::vector<math::Vector3> UnitVectors;
+      private: std::vector<math::Vector3> unitVectors;
 
       /// \brief Type of joint to create
       private: JointMaker::JointType jointType;
