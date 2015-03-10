@@ -250,7 +250,7 @@ void ModelEditor::OnEdit(bool /*_checked*/)
   if (!this->active)
   {
     this->CreateMenus();
-    this->mainWindowPaused = g_pauseAct->isVisible();
+    this->mainWindowPaused = this->mainWindow->IsPaused();
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("modelEditorTab");
     this->mainWindow->ShowMenuBar(this->menuBar);
