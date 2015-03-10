@@ -285,7 +285,7 @@
     <!-- Demonstrate that self_collide=false produces same behavior as above-->
     <model name="explicit_no_collide">
       <self_collide>false</self_collide>
-      <pose>0 12 0 0 0 0</pose>
+      <pose>0 15 0 0 0 0</pose>
       <link name="link">
         <pose>0 0 1.0 0 0 0</pose>
         <inertial>
