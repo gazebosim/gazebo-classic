@@ -65,6 +65,13 @@
     1. Renamed Part to Link.
         * [Pull request #1478](https://bitbucket.org/osrf/gazebo/pull-request/1478)
 
+    1. Fix snapping inside editor.
+        * [Pull request #1489](https://bitbucket.org/osrf/gazebo/pull-request/1489)
+        * [Issue #1457](https://bitbucket.org/osrf/gazebo/issue/1457)
+
+    1. Added ExtrudeDialog.
+        * [Pull request #1483](https://bitbucket.org/osrf/gazebo/pull-request/1483)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
@@ -312,6 +319,9 @@
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
+
+1. Modified GUI rendering to improve the rendering update rate.
+    * [Pull request #1487](https://bitbucket.org/osrf/gazebo/pull-request/1487)
 
 ### Gazebo 4.1.0 (2014-11-20)
 
