@@ -66,6 +66,9 @@
         * [Pull request #1489](https://bitbucket.org/osrf/gazebo/pull-request/1489)
         * [Issue #1457](https://bitbucket.org/osrf/gazebo/issue/1457)
 
+    1. Added ExtrudeDialog.
+        * [Pull request #1483](https://bitbucket.org/osrf/gazebo/pull-request/1483)
+
     1. Hide time panel inside editor and keep main window's paused state.
         * [Pull request #1500](https://bitbucket.org/osrf/gazebo/pull-request/1500)
 
