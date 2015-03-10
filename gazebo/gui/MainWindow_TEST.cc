@@ -40,7 +40,7 @@ void MainWindow_TEST::SceneDestruction()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world", false, false, false);
+  this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
@@ -61,7 +61,52 @@ void MainWindow_TEST::SceneDestruction()
   mainWindow->close();
   delete mainWindow;
 
+  // verify that this test case has the only scene shared pointer remaining.
   QVERIFY(scene.use_count() == 1u);
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::UserCameraFPS()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+
+  // Wait a little bit for the average FPS to even out.
+  for (unsigned int i = 0; i < 10000; ++i)
+  {
+    gazebo::common::Time::NSleep(500000);
+    QCoreApplication::processEvents();
+  }
+
+  std::cerr << "\nFPS[" << cam->GetAvgFPS() << "]\n" << std::endl;
+
+  QVERIFY(cam->GetAvgFPS() > 55.0);
+  QVERIFY(cam->GetAvgFPS() < 75.0);
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
 }
 
 /////////////////////////////////////////////////
@@ -77,9 +122,6 @@ void MainWindow_TEST::CopyPaste()
 
   // Create the main window.
   mainWindow->Load();
-
-  gazebo::rendering::create_scene(
-      gazebo::physics::get_world()->GetName(), false);
 
   mainWindow->Init();
   mainWindow->show();
@@ -145,7 +187,13 @@ void MainWindow_TEST::CopyPaste()
     QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
     QTest::qWait(500);
 
-    QCoreApplication::processEvents();
+    // Process some events, and draw the screen
+    for (unsigned int i = 0; i < 10; ++i)
+    {
+      gazebo::common::Time::MSleep(30);
+      QCoreApplication::processEvents();
+      mainWindow->repaint();
+    }
 
     // Verify there is a clone of the model
     gazebo::rendering::VisualPtr modelVisClone;

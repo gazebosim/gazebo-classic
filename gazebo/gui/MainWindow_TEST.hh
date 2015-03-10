@@ -28,6 +28,9 @@ class MainWindow_TEST : public QTestFixture
   /// \brief Test scene destruction on shutdown
   private slots: void SceneDestruction();
 
+  /// \brief Test user camera frames per second
+  private slots: void UserCameraFPS();
+
   /// \brief Test copying and pasting a model and a light
   private slots: void CopyPaste();
 
