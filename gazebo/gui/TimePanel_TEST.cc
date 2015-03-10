@@ -16,6 +16,9 @@
 */
 
 #include "gazebo/gui/TimePanel.hh"
+#include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/gui/TimePanel_TEST.hh"
 
 /////////////////////////////////////////////////
@@ -23,7 +26,24 @@ void TimePanel_TEST::ValidTimes()
 {
   QBENCHMARK
   {
-    this->Load("empty.world");
+    this->Load("empty.world", false, false, true);
+
+    gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+    QVERIFY(mainWindow != NULL);
+    // Create the main window.
+    mainWindow->Load();
+    mainWindow->Init();
+    mainWindow->show();
+
+    // Process some events, and draw the screen
+    for (unsigned int i = 0; i < 10; ++i)
+    {
+      gazebo::common::Time::MSleep(30);
+      QCoreApplication::processEvents();
+      mainWindow->repaint();
+    }
+    gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+    QVERIFY(cam != NULL);
 
     // Create a new time panel widget
     gazebo::gui::TimePanel *timePanel = new gazebo::gui::TimePanel;
@@ -40,14 +60,18 @@ void TimePanel_TEST::ValidTimes()
     QLineEdit *realTimeEdit = timePanel->findChild<QLineEdit*>(
         "timePanelRealTime");
 
+    // Get the fps line
+    QLineEdit *fpsEdit = timePanel->findChild<QLineEdit*>("timePanelFPS");
+
     QVERIFY(percentEdit != NULL);
     QVERIFY(simTimeEdit != NULL);
     QVERIFY(realTimeEdit != NULL);
+    QVERIFY(fpsEdit != NULL);
 
     // Wait a little bit so that time increases.
-    for (unsigned int i = 0; i < 10; ++i)
+    for (unsigned int i = 0; i < 10000; ++i)
     {
-      gazebo::common::Time::MSleep(100);
+      gazebo::common::Time::NSleep(500000);
       QCoreApplication::processEvents();
     }
 
@@ -68,6 +92,16 @@ void TimePanel_TEST::ValidTimes()
     txt = percentEdit->text().toStdString();
     value = boost::lexical_cast<double>(txt.substr(0, txt.find(" ")));
     QVERIFY(value > 0.0);
+
+    // Make sure the percent real time is greater than zero
+    txt = fpsEdit->text().toStdString();
+    value = boost::lexical_cast<double>(txt.substr(0, txt.find(" ")));
+    QVERIFY(value > 55.0);
+    QVERIFY(value < 75.0);
+
+    cam->Fini();
+    mainWindow->close();
+    delete mainWindow;
   }
 }
 

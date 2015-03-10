@@ -27,6 +27,7 @@
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/model/ExtrudeDialog.hh"
 #include "gazebo/gui/model/ImportDialog.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
@@ -107,11 +108,11 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   customLayout->addWidget(customButton, 0, 0);
 
   // Button group
-  this->partButtonGroup = new QButtonGroup;
-  this->partButtonGroup->addButton(cylinderButton);
-  this->partButtonGroup->addButton(sphereButton);
-  this->partButtonGroup->addButton(boxButton);
-  this->partButtonGroup->addButton(customButton);
+  this->linkButtonGroup = new QButtonGroup;
+  this->linkButtonGroup->addButton(cylinderButton);
+  this->linkButtonGroup->addButton(sphereButton);
+  this->linkButtonGroup->addButton(boxButton);
+  this->linkButtonGroup->addButton(customButton);
 
   // Model Settings
   QLabel *settingsLabel = new QLabel(tr(
@@ -147,7 +148,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   settingsLayout->addWidget(this->autoDisableCheck, 2, 1);
 
   this->modelCreator = new ModelCreator();
-  connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
+  connect(modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
 
   // Horizontal separator
   QFrame *separator = new QFrame(this);
@@ -207,7 +208,7 @@ void ModelEditorPalette::OnCylinder()
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  this->modelCreator->AddPart(ModelCreator::PART_CYLINDER);
+  this->modelCreator->AddLink(ModelCreator::LINK_CYLINDER);
 }
 
 /////////////////////////////////////////////////
@@ -216,7 +217,7 @@ void ModelEditorPalette::OnSphere()
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  this->modelCreator->AddPart(ModelCreator::PART_SPHERE);
+  this->modelCreator->AddLink(ModelCreator::LINK_SPHERE);
 }
 
 /////////////////////////////////////////////////
@@ -225,7 +226,7 @@ void ModelEditorPalette::OnBox()
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  this->modelCreator->AddPart(ModelCreator::PART_BOX);
+  this->modelCreator->AddLink(ModelCreator::LINK_BOX);
 }
 
 /////////////////////////////////////////////////
@@ -235,15 +236,41 @@ void ModelEditorPalette::OnCustom()
   importDialog.deleteLater();
   if (importDialog.exec() == QDialog::Accepted)
   {
-    event::Events::setSelectedEntity("", "normal");
-    g_arrowAct->trigger();
-    this->modelCreator->AddShape(ModelCreator::PART_MESH,
-        math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
+    QFileInfo info(QString::fromStdString(importDialog.GetImportPath()));
+    if (info.isFile())
+    {
+      event::Events::setSelectedEntity("", "normal");
+      g_arrowAct->trigger();
+      if (info.completeSuffix().toLower() == "dae" ||
+          info.completeSuffix().toLower() == "stl")
+      {
+        this->modelCreator->AddShape(ModelCreator::LINK_MESH,
+            math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
+      }
+      else if (info.completeSuffix().toLower() == "svg")
+      {
+        ExtrudeDialog extrudeDialog(importDialog.GetImportPath(), this);
+        extrudeDialog.deleteLater();
+        if (extrudeDialog.exec() == QDialog::Accepted)
+        {
+          this->modelCreator->AddShape(ModelCreator::LINK_POLYLINE,
+              math::Vector3(1.0/extrudeDialog.GetResolution(),
+              1.0/extrudeDialog.GetResolution(),
+              extrudeDialog.GetThickness()),
+              math::Pose::Zero, importDialog.GetImportPath(),
+              extrudeDialog.GetSamples());
+        }
+        else
+        {
+          this->OnCustom();
+        }
+      }
+    }
   }
   else
   {
     // this unchecks the custom button
-    this->OnPartAdded();
+    this->OnLinkAdded();
   }
 }
 
@@ -255,12 +282,12 @@ void ModelEditorPalette::AddJoint(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnPartAdded()
+void ModelEditorPalette::OnLinkAdded()
 {
-  this->partButtonGroup->setExclusive(false);
-  if (this->partButtonGroup->checkedButton())
-    this->partButtonGroup->checkedButton()->setChecked(false);
-  this->partButtonGroup->setExclusive(true);
+  this->linkButtonGroup->setExclusive(false);
+  if (this->linkButtonGroup->checkedButton())
+    this->linkButtonGroup->checkedButton()->setChecked(false);
+  this->linkButtonGroup->setExclusive(true);
 }
 
 /////////////////////////////////////////////////
@@ -289,7 +316,7 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
   if (_event.key == Qt::Key_Escape)
   {
     // call the slots to uncheck the buttons
-    this->OnPartAdded();
+    this->OnLinkAdded();
   }
   if (_event.key == Qt::Key_Delete)
   {

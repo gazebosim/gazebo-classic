@@ -59,13 +59,13 @@ typedef dReal *dRealMutablePtr;
 //***************************************************************************
 // configuration
 
-// for the SOR and CG methods:
+// for the PGS and CG methods:
 // warm starting:
 // this definitely help for motor-driven joints.
 // unfortunately it appears to hurt with high-friction contacts
-// using the SOR method. use with care
+// using the PGS method. use with care
 
-// for the SOR method:
+// for the PGS method:
 // uncomment the following line to determine a new constraint-solving
 // order for each iteration. however, the qsort per iteration is expensive,
 // and the optimal order is somewhat problem dependent.
@@ -73,7 +73,7 @@ typedef dReal *dRealMutablePtr;
 
 // #define REORDER_CONSTRAINTS 1
 
-// for the SOR method:
+// for the PGS method:
 // uncomment the following line to randomly reorder constraint rows
 // during the solution. depending on the situation, this can help a lot
 // or hardly at all, but it doesn't seem to hurt.
@@ -81,9 +81,9 @@ typedef dReal *dRealMutablePtr;
 // #define RANDOMLY_REORDER_CONSTRAINTS 1
 #undef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
 
-/// scale SOR for contact to reduce overshoot in solution for contacts
+/// scale PGS for contact to reduce overshoot in solution for contacts
 /// \TODO: make this a parameter
-#define CONTACT_SOR_SCALE 0.25
+#define CONTACT_PGS_SCALE 0.25
 
 //***************************************************************************
 // testing stuff
@@ -111,8 +111,8 @@ struct IndexError {
   int index;    // row index
 };
 
-// structure for passing variable pointers in SOR_LCP
-struct dxSORLCPParameters {
+// structure for passing variable pointers in PGS_LCP
+struct dxPGSLCPParameters {
     dxQuickStepParameters *qs;
     int nStart;   // 0
     int nChunkSize;
