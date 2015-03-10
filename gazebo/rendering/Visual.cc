@@ -232,6 +232,7 @@ void Visual::Fini()
   }
 
   RTShaderSystem::Instance()->DetachEntity(this);
+  this->dataPtr->scene.reset();
 }
 
 /////////////////////////////////////////////////
@@ -453,7 +454,7 @@ void Visual::Load(sdf::ElementPtr _sdf)
 {
   this->dataPtr->sdf->Copy(_sdf);
   this->Load();
-  this->dataPtr->scene->AddVisual(shared_from_this());
+//  this->dataPtr->scene->AddVisual(shared_from_this());
 }
 
 //////////////////////////////////////////////////
@@ -601,6 +602,7 @@ void Visual::Load()
   // Allow the mesh to cast shadows
   this->SetCastShadows(this->dataPtr->sdf->Get<bool>("cast_shadows"));
   this->LoadPlugins();
+  this->dataPtr->scene->AddVisual(shared_from_this());
 }
 
 //////////////////////////////////////////////////

@@ -187,28 +187,51 @@ void Scene::Clear()
   this->dataPtr->poseMsgs.clear();
   this->dataPtr->sceneMsgs.clear();
   this->dataPtr->jointMsgs.clear();
-  this->dataPtr->joints.clear();
   this->dataPtr->linkMsgs.clear();
-  this->dataPtr->cameras.clear();
-  this->dataPtr->userCameras.clear();
-  this->dataPtr->lights.clear();
+  this->dataPtr->sensorMsgs.clear();
+
+  this->dataPtr->poseSub.reset();
+  this->dataPtr->jointSub.reset();
+  this->dataPtr->skeletonPoseSub.reset();
+  this->dataPtr->selectionSub.reset();
+  this->dataPtr->visSub.reset();
+  this->dataPtr->lightSub.reset();
+  this->dataPtr->selectionMsg.reset();
+
+  this->dataPtr->joints.clear();
 
   delete this->dataPtr->terrain;
   this->dataPtr->terrain = NULL;
-
-  // Erase the world visual
-  this->dataPtr->visuals.erase(this->dataPtr->visuals.begin());
 
   while (!this->dataPtr->visuals.empty())
     if (this->dataPtr->visuals.begin()->second)
       this->RemoveVisual(this->dataPtr->visuals.begin()->second);
   this->dataPtr->visuals.clear();
 
+  if (this->dataPtr->worldVisual)
+  {
+    this->dataPtr->worldVisual->Fini();
+    this->dataPtr->worldVisual.reset();
+  }
+
+  while (!this->dataPtr->lights.empty())
+    if (this->dataPtr->lights.begin()->second)
+      this->RemoveLight(this->dataPtr->lights.begin()->second);
+  this->dataPtr->lights.clear();
+
   for (uint32_t i = 0; i < this->dataPtr->grids.size(); ++i)
     delete this->dataPtr->grids[i];
   this->dataPtr->grids.clear();
 
-  this->dataPtr->sensorMsgs.clear();
+  for (unsigned int i = 0; i < this->dataPtr->cameras.size(); ++i)
+    this->dataPtr->cameras[i]->Fini();
+  this->dataPtr->cameras.clear();
+
+  for (unsigned int i = 0; i < this->dataPtr->userCameras.size(); ++i)
+    this->dataPtr->userCameras[i]->Fini();
+  this->dataPtr->userCameras.clear();
+
+  RTShaderSystem::Instance()->RemoveScene(this->GetName());
   RTShaderSystem::Instance()->Clear();
 
   this->dataPtr->initialized = false;
@@ -218,53 +241,14 @@ void Scene::Clear()
 Scene::~Scene()
 {
   delete this->dataPtr->requestMsg;
+  this->dataPtr->requestMsg = NULL;
   delete this->dataPtr->receiveMutex;
-  delete this->dataPtr->raySceneQuery;
+  this->dataPtr->receiveMutex = NULL;
 
-  this->dataPtr->node->Fini();
-  this->dataPtr->node.reset();
-  this->dataPtr->visSub.reset();
-  this->dataPtr->lightSub.reset();
-  this->dataPtr->poseSub.reset();
-  this->dataPtr->jointSub.reset();
-  this->dataPtr->skeletonPoseSub.reset();
-  this->dataPtr->selectionSub.reset();
+  // raySceneQuery deletion handled by ogre
+  this->dataPtr->raySceneQuery= NULL;
 
-  Visual_M::iterator iter;
-  this->dataPtr->visuals.clear();
-  this->dataPtr->jointMsgs.clear();
-  this->dataPtr->joints.clear();
-  this->dataPtr->linkMsgs.clear();
-  this->dataPtr->sceneMsgs.clear();
-  this->dataPtr->poseMsgs.clear();
-  this->dataPtr->lightMsgs.clear();
-  this->dataPtr->visualMsgs.clear();
-
-  this->dataPtr->worldVisual.reset();
-  this->dataPtr->selectionMsg.reset();
-  this->dataPtr->lights.clear();
-
-  // Remove a scene
-  RTShaderSystem::Instance()->RemoveScene(shared_from_this());
-
-  for (uint32_t i = 0; i < this->dataPtr->grids.size(); ++i)
-    delete this->dataPtr->grids[i];
-  this->dataPtr->grids.clear();
-
-  for (unsigned int i = 0; i < this->dataPtr->cameras.size(); ++i)
-    this->dataPtr->cameras[i].reset();
-  this->dataPtr->cameras.clear();
-
-  for (unsigned int i = 0; i < this->dataPtr->userCameras.size(); ++i)
-    this->dataPtr->userCameras[i].reset();
-  this->dataPtr->userCameras.clear();
-
-  if (this->dataPtr->manager)
-  {
-    RenderEngine::Instance()->root->destroySceneManager(this->dataPtr->manager);
-    this->dataPtr->manager = NULL;
-  }
-  this->dataPtr->connections.clear();
+  this->Clear();
 
   this->dataPtr->sdf->Reset();
   this->dataPtr->sdf.reset();
@@ -2891,7 +2875,7 @@ void Scene::SetGrid(bool _enabled)
 //////////////////////////////////////////////////
 std::string Scene::StripSceneName(const std::string &_name) const
 {
-  if (_name.find(this->GetName() + "::") == 0)
+  if (_name.find(this->GetName() + "::") != std::string::npos)
     return _name.substr(this->GetName().size() + 2);
   else
     return _name;

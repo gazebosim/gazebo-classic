@@ -134,7 +134,8 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
-  rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
+  this->createName = gui::get_world();
+  rendering::ScenePtr scene = rendering::create_scene(this->createName, true);
 
   this->msgOverlayLabel = new QLabel(this->glWidget);
   this->msgOverlayLabel->setStyleSheet(
@@ -238,6 +239,9 @@ RenderWidget::~RenderWidget()
 
   delete this->toolbar;
   this->toolbar = NULL;
+
+  // we created the scene here we are responsible for removing it.
+  rendering::remove_scene(this->createName);
 }
 
 /////////////////////////////////////////////////

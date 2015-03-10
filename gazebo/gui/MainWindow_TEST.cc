@@ -35,6 +35,36 @@ void OnRequest(ConstRequestPtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void MainWindow_TEST::SceneDestruction()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  // Create the main window.
+  mainWindow->Load();
+
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != NULL);
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+
+  QVERIFY(scene.use_count() == 1u);
+}
+
+/////////////////////////////////////////////////
 void MainWindow_TEST::CopyPaste()
 {
   this->resMaxPercentChange = 5.0;

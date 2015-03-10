@@ -113,22 +113,11 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 Camera::~Camera()
 {
   delete [] this->saveFrameBuffer;
+  this->saveFrameBuffer = NULL;
   delete [] this->bayerFrameBuffer;
+  this->bayerFrameBuffer = NULL;
 
-  this->sceneNode = NULL;
-
-  if (this->renderTexture && this->scene->GetInitialized())
-    Ogre::TextureManager::getSingleton().remove(this->renderTexture->getName());
-  this->renderTexture = NULL;
-  this->renderTarget = NULL;
-
-  if (this->camera && this->scene && this->scene->GetManager())
-  {
-    this->scene->GetManager()->destroyCamera(this->scopedUniqueName);
-    this->camera = NULL;
-  }
-
-  this->connections.clear();
+  this->Fini();
 
   this->sdf->Reset();
   this->sdf.reset();
@@ -219,17 +208,29 @@ void Camera::Init()
 void Camera::Fini()
 {
   this->initialized = false;
-  this->connections.clear();
   this->dataPtr->node.reset();
 
-  RTShaderSystem::DetachViewport(this->viewport, this->scene);
+  if (this->viewport && this->scene)
+    RTShaderSystem::DetachViewport(this->viewport, this->scene);
 
-  if (this->renderTarget && this->scene->GetInitialized())
+  if (this->renderTarget)
     this->renderTarget->removeAllViewports();
-
-  this->viewport = NULL;
   this->renderTarget = NULL;
 
+  if (this->renderTexture)
+    Ogre::TextureManager::getSingleton().remove(this->renderTexture->getName());
+  this->renderTexture = NULL;
+
+  if (this->camera)
+  {
+    this->scene->GetManager()->destroyCamera(this->scopedUniqueName);
+    this->camera = NULL;
+  }
+
+  this->sceneNode = NULL;
+  this->viewport = NULL;
+
+  this->scene.reset();
   this->connections.clear();
 }
 
@@ -1732,5 +1733,3 @@ void Camera::UpdateFOV()
     this->saveFrameBuffer = NULL;
   }
 }
-
-

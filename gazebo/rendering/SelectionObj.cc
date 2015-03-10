@@ -309,6 +309,7 @@ void SelectionObj::CreateTranslateVisual()
   dPtr->transVisual.reset(new rendering::Visual(
       this->GetName() + "__SELECTION_OBJ_TRANS__",
       shared_from_this()));
+  dPtr->transVisual->Load();
 
   dPtr->transXVisual.reset(
       new rendering::Visual(
@@ -436,6 +437,7 @@ void SelectionObj::CreateRotateVisual()
   dPtr->rotVisual.reset(new rendering::Visual(
       this->GetName() + "__SELECTION_OBJ_ROT__",
       shared_from_this()));
+  dPtr->rotVisual->Load();
 
   dPtr->rotXVisual.reset(
       new rendering::Visual(
@@ -523,6 +525,7 @@ void SelectionObj::CreateScaleVisual()
   dPtr->scaleVisual.reset(new rendering::Visual(
       this->GetName() + "__SELECTION_OBJ_SCALE__",
       shared_from_this()));
+  dPtr->scaleVisual->Load();
 
   dPtr->scaleXVisual.reset(
       new rendering::Visual(

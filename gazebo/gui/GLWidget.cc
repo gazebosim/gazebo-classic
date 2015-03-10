@@ -172,7 +172,12 @@ GLWidget::~GLWidget()
   this->selectionSub.reset();
   this->selectionPub.reset();
 
+  ModelManipulator::Instance()->Clear();
+  ModelSnap::Instance()->Clear();
+  ModelAlign::Instance()->Clear();
+
   this->userCamera.reset();
+  this->scene.reset();
 }
 
 /////////////////////////////////////////////////
