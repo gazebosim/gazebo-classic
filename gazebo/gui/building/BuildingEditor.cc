@@ -146,7 +146,7 @@ void BuildingEditor::OnEdit(bool _checked)
   if (_checked)
   {
     this->CreateMenus();
-    this->mainWindowPaused = g_pauseAct->isVisible();
+    this->mainWindowPaused = g_playAct->isVisible();
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("buildingEditorTab");
     this->mainWindow->ShowMenuBar(this->menuBar);
