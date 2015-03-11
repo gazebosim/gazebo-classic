@@ -199,6 +199,18 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(rev2joint->inspector != NULL);
 
   // verify default values
+  QVERIFY(rev2joint->type == gui::JointMaker::JOINT_HINGE2);
+  QVERIFY(rev2joint->useParentModelFrame[0] == false);
+  QVERIFY(rev2joint->useParentModelFrame[1] == false);
+  QVERIFY(rev2joint->pose == math::Pose::Zero);
+  QVERIFY(rev2joint->axis[0] == math::Vector3::UnitX);
+  QVERIFY(rev2joint->axis[1] == math::Vector3::UnitY);
+  qFuzzyCompare(rev2joint->lowerLimit[0], -GZ_DBL_MAX);
+  qFuzzyCompare(rev2joint->upperLimit[0], GZ_DBL_MAX);
+  qFuzzyCompare(rev2joint->lowerLimit[1], -GZ_DBL_MAX);
+  qFuzzyCompare(rev2joint->upperLimit[1], GZ_DBL_MAX);
+
+  rev2joint->OpenInspector();
   QVERIFY(rev2joint->inspector->GetType() == gui::JointMaker::JOINT_HINGE2);
   QVERIFY(rev2joint->inspector->GetUseParentModelFrame(0) == false);
   QVERIFY(rev2joint->inspector->GetUseParentModelFrame(1) == false);
@@ -237,6 +249,8 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(prisJoint->axis[0] == math::Vector3::UnitX);
   qFuzzyCompare(prisJoint->lowerLimit[0], -GZ_DBL_MAX);
   qFuzzyCompare(prisJoint->upperLimit[0], GZ_DBL_MAX);
+
+  prisJoint->OpenInspector();
   QVERIFY(prisJoint->inspector->GetType() == gui::JointMaker::JOINT_SLIDER);
   QVERIFY(prisJoint->inspector->GetUseParentModelFrame(0) == false);
   QVERIFY(prisJoint->inspector->GetPose() == math::Pose::Zero);
