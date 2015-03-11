@@ -1731,9 +1731,9 @@ void ModelCreator::Update()
   for (auto &linksIt : this->allLinks)
   {
     LinkData *link = linksIt.second;
-    if (link->GetPose() != link->linkVisual->GetPose())
+    if (link->GetPose() != (link->linkVisual->GetWorldPose()-this->modelPose))
     {
-      link->SetPose(link->linkVisual->GetWorldPose() - this->modelPose);
+      link->SetPose(link->linkVisual->GetWorldPose()-this->modelPose);
       this->ModelChanged();
     }
     for (auto &scaleIt : this->linkScaleUpdate)
@@ -1801,4 +1801,9 @@ void ModelCreator::SetModelVisible(rendering::VisualPtr _visual, bool _visible)
       _visual->SetVisible(it->second, false);
     }
   }
+}
+/////////////////////////////////////////////////
+ModelCreator::SaveState ModelCreator::GetCurrentSaveState() const
+{
+  return this->currentSaveState;
 }

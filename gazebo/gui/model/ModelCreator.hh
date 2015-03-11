@@ -81,7 +81,7 @@ namespace gazebo
 
       /// \enum SaveState
       /// \brief Save states for the model editor.
-      private: enum SaveState
+      public: enum SaveState
       {
         // NEVER_SAVED: The model has never been saved.
         NEVER_SAVED,
@@ -114,7 +114,7 @@ namespace gazebo
       private: void OnNew();
 
       /// \brief Helper function to manage writing files to disk.
-      private: void SaveModelFiles();
+      public: void SaveModelFiles();
 
       /// \brief Callback for saving the model.
       /// \return True if the user chose to save, false if the user cancelled.
@@ -205,6 +205,10 @@ namespace gazebo
       /// \brief Get joint maker
       /// \return Joint maker
       public: JointMaker *GetJointMaker() const;
+
+      /// \brief Get current save state.
+      /// \return Current saave state.
+      public: enum SaveState GetCurrentSaveState() const;
 
       /// \brief Add a link to the model
       /// \param[in] _type Type of link to be added
