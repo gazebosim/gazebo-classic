@@ -32,7 +32,8 @@ class SpeedTest : public ServerFixture,
   public: void ShapesWorld(const std::string &_physicsEngine);
 
   /// \brief Unthrottle real-time update rate and call World::Step
-  /// in an empty world. Verify that it goes faster than real-time.
+  /// in an empty world.
+  /// Verify that it goes at least 2 times faster than real-time.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void UnthrottledStep(const std::string &_physicsEngine);
 };
