@@ -146,6 +146,7 @@ void BuildingEditor::OnEdit(bool _checked)
   if (_checked)
   {
     this->CreateMenus();
+    this->mainWindowPaused = g_playAct->isVisible();
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("buildingEditorTab");
     this->mainWindow->ShowMenuBar(this->menuBar);
@@ -164,7 +165,8 @@ void BuildingEditor::OnEdit(bool _checked)
     this->mainWindow->GetRenderWidget()->ShowTimePanel(true);
     this->mainWindow->GetRenderWidget()->ShowToolbar(true);
     this->mainWindow->ShowMenuBar();
-    this->mainWindow->Play();
+    if (!this->mainWindowPaused)
+      this->mainWindow->Play();
   }
   gui::editor::Events::toggleEditMode(_checked);
 }
