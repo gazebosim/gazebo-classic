@@ -20,6 +20,8 @@
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/gui/TimePanel.hh"
 
 using namespace gazebo;
@@ -78,14 +80,19 @@ TimePanel::TimePanel(QWidget *_parent)
   QToolBar *playToolbar = new QToolBar;
   playToolbar->setObjectName("playToolBar");
   playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  playToolbar->addAction(g_playAct);
-  playToolbar->addAction(g_pauseAct);
+  if (g_playAct)
+    playToolbar->addAction(g_playAct);
+  if (g_pauseAct)
+    playToolbar->addAction(g_pauseAct);
 
   QLabel *emptyLabel = new QLabel(tr("  "));
   playToolbar->addWidget(emptyLabel);
-  playToolbar->addAction(g_stepAct);
-  playToolbar->addWidget(stepToolBarLabel);
-  playToolbar->addWidget(this->stepButton);
+
+  if (g_stepAct)
+    playToolbar->addAction(g_stepAct);
+  this->stepToolBarLabelAction = playToolbar->addWidget(stepToolBarLabel);
+  this->stepButtonAction = playToolbar->addWidget(this->stepButton);
+  this->stepButtonAction->setObjectName("timePanelStepAction");
 
   this->percentRealTimeEdit = new QLineEdit;
   this->percentRealTimeEdit->setObjectName("timePanelPercentRealTime");
@@ -105,6 +112,12 @@ TimePanel::TimePanel(QWidget *_parent)
   this->iterationsEdit = new QLineEdit;
   this->iterationsEdit->setReadOnly(true);
   this->iterationsEdit->setFixedWidth(110);
+  this->iterationsEdit->setObjectName("timePanelIterations");
+
+  this->fpsEdit = new QLineEdit;
+  this->fpsEdit->setReadOnly(true);
+  this->fpsEdit->setFixedWidth(90);
+  this->fpsEdit->setObjectName("timePanelFPS");
 
   QPushButton *timeResetButton = new QPushButton("Reset");
   timeResetButton->setFocusPolicy(Qt::NoFocus);
@@ -117,17 +130,25 @@ TimePanel::TimePanel(QWidget *_parent)
                              QSizePolicy::Minimum));
   frameLayout->addWidget(playToolbar);
 
-  frameLayout->addWidget(new QLabel(tr("Real Time Factor:")));
+  this->realTimeFactorLabel = new QLabel(tr("Real Time Factor:"));
+  frameLayout->addWidget(this->realTimeFactorLabel);
   frameLayout->addWidget(this->percentRealTimeEdit);
 
-  frameLayout->addWidget(new QLabel(tr("Sim Time:")));
+  this->simTimeLabel = new QLabel(tr("Sim Time:"));
+  frameLayout->addWidget(this->simTimeLabel);
   frameLayout->addWidget(this->simTimeEdit);
 
-  frameLayout->addWidget(new QLabel(tr("Real Time:")));
+  this->realTimeLabel = new QLabel(tr("Real Time:"));
+  frameLayout->addWidget(this->realTimeLabel);
   frameLayout->addWidget(this->realTimeEdit);
 
-  frameLayout->addWidget(new QLabel(tr("Iterations:")));
+  this->iterationsLabel = new QLabel(tr("Iterations:"));
+  frameLayout->addWidget(this->iterationsLabel);
   frameLayout->addWidget(this->iterationsEdit);
+
+  this->fpsLabel = new QLabel(tr("FPS:"));
+  frameLayout->addWidget(this->fpsLabel);
+  frameLayout->addWidget(this->fpsEdit);
 
   frameLayout->addWidget(timeResetButton);
 
@@ -161,6 +182,11 @@ TimePanel::TimePanel(QWidget *_parent)
 
   this->show();
 
+  // Create a QueuedConnection to set avg fps.
+  // This is used for thread safety.
+  connect(this, SIGNAL(SetFPS(QString)),
+          this->fpsEdit, SLOT(setText(QString)), Qt::QueuedConnection);
+
   // Create a QueuedConnection to set iterations.
   // This is used for thread safety.
   connect(this, SIGNAL(SetIterations(QString)),
@@ -191,6 +217,50 @@ void TimePanel::OnFullScreen(bool & /*_value*/)
 TimePanel::~TimePanel()
 {
   this->node.reset();
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowRealTimeFactor(bool _show)
+{
+  this->realTimeFactorLabel->setVisible(_show);
+  this->percentRealTimeEdit->setVisible(_show);
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowRealTime(bool _show)
+{
+  this->realTimeLabel->setVisible(_show);
+  this->realTimeEdit->setVisible(_show);
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowSimTime(bool _show)
+{
+  this->simTimeLabel->setVisible(_show);
+  this->simTimeEdit->setVisible(_show);
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowIterations(bool _show)
+{
+  this->iterationsLabel->setVisible(_show);
+  this->iterationsEdit->setVisible(_show);
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowFPS(bool _show)
+{
+  this->fpsLabel->setVisible(_show);
+  this->fpsEdit->setVisible(_show);
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowStepWidget(bool _show)
+{
+  if (g_stepAct)
+    g_stepAct->setVisible(_show);
+  this->stepToolBarLabelAction->setVisible(_show);
+  this->stepButtonAction->setVisible(_show);
 }
 
 /////////////////////////////////////////////////
@@ -289,6 +359,17 @@ void TimePanel::Update()
     percent << "0";
 
   this->percentRealTimeEdit->setText(tr(percent.str().c_str()));
+
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  if (cam)
+  {
+    std::ostringstream avgFPS;
+    avgFPS << cam->GetAvgFPS();
+
+    // Set the avg fps
+    this->SetFPS(QString::fromStdString(
+          boost::lexical_cast<std::string>(avgFPS.str().c_str())));
+  }
 }
 
 /////////////////////////////////////////////////

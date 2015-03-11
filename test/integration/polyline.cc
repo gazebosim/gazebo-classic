@@ -54,33 +54,33 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
 
   EXPECT_DOUBLE_EQ(polyShape->GetHeight(), 1.0);
 
-  std::vector<math::Vector2d> vertices = polyShape->GetVertices();
-  EXPECT_EQ(vertices[0], math::Vector2d(-0.5, -0.5));
-  EXPECT_EQ(vertices[1], math::Vector2d(-0.5, 0.5));
-  EXPECT_EQ(vertices[2], math::Vector2d(0.5, 0.5));
-  EXPECT_EQ(vertices[3], math::Vector2d(0.0, 0.0));
-  EXPECT_EQ(vertices[4], math::Vector2d(0.5, -0.5));
+  std::vector<std::vector<math::Vector2d> > vertices = polyShape->GetVertices();
+  EXPECT_EQ(vertices[0][0], math::Vector2d(-0.5, -0.5));
+  EXPECT_EQ(vertices[0][1], math::Vector2d(-0.5, 0.5));
+  EXPECT_EQ(vertices[0][2], math::Vector2d(0.5, 0.5));
+  EXPECT_EQ(vertices[0][3], math::Vector2d(0.0, 0.0));
+  EXPECT_EQ(vertices[0][4], math::Vector2d(0.5, -0.5));
 
   // Check the FillMsg function
   {
     msgs::Geometry msg;
     polyShape->FillMsg(msg);
     EXPECT_EQ(msg.type(), msgs::Geometry::POLYLINE);
-    EXPECT_DOUBLE_EQ(msg.polyline().height(), 1);
-    EXPECT_DOUBLE_EQ(msg.polyline().point(0).x(), -0.5);
-    EXPECT_DOUBLE_EQ(msg.polyline().point(0).y(), -0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).height(), 1);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(0).x(), -0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(0).y(), -0.5);
 
-    EXPECT_DOUBLE_EQ(msg.polyline().point(1).x(), -0.5);
-    EXPECT_DOUBLE_EQ(msg.polyline().point(1).y(), 0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(1).x(), -0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(1).y(), 0.5);
 
-    EXPECT_DOUBLE_EQ(msg.polyline().point(2).x(), 0.5);
-    EXPECT_DOUBLE_EQ(msg.polyline().point(2).y(), 0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(2).x(), 0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(2).y(), 0.5);
 
-    EXPECT_DOUBLE_EQ(msg.polyline().point(3).x(), 0.0);
-    EXPECT_DOUBLE_EQ(msg.polyline().point(3).y(), 0.0);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(3).x(), 0.0);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(3).y(), 0.0);
 
-    EXPECT_DOUBLE_EQ(msg.polyline().point(4).x(), 0.5);
-    EXPECT_DOUBLE_EQ(msg.polyline().point(4).y(), -0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(4).x(), 0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(4).y(), -0.5);
   }
 
   // Spawn a sphere over the polyline shape, and check that it doesn't pass
