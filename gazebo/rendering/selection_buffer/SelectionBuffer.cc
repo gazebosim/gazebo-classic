@@ -27,7 +27,7 @@ using namespace rendering;
 /////////////////////////////////////////////////
 SelectionBuffer::SelectionBuffer(const std::string &_cameraName,
     Ogre::SceneManager *_mgr, Ogre::RenderTarget *_renderTarget)
-: sceneMgr(_mgr), renderTarget(_renderTarget),
+: sceneMgr(_mgr), renderTarget(_renderTarget), renderTexture(0),
   buffer(0), pixelBox(0)
 {
   this->camera = this->sceneMgr->getCamera(_cameraName);
