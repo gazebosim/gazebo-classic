@@ -38,6 +38,9 @@
 1. Added Matrix3::Inverse() and tests 
     * [Pull request #1481](https://bitbucket.org/osrf/gazebo/pull-request/1481)
 
+1. Implemented AddLinkForce for ODE.
+    * [Pull request #1456](https://bitbucket.org/osrf/gazebo/pull-request/1456)
+
 1. Model editor updates
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
@@ -66,9 +69,16 @@
         * [Pull request #1489](https://bitbucket.org/osrf/gazebo/pull-request/1489)
         * [Issue #1457](https://bitbucket.org/osrf/gazebo/issue/1457)
 
+    1. Added ExtrudeDialog.
+        * [Pull request #1483](https://bitbucket.org/osrf/gazebo/pull-request/1483)
+
+    1. Hide time panel inside editor and keep main window's paused state.
+        * [Pull request #1500](https://bitbucket.org/osrf/gazebo/pull-request/1500)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
+
 1. Allow sdformat 2.3.1+ or 3+ and fix tests
   * [Pull request #1484](https://bitbucket.org/osrf/gazebo/pull-request/1484)
 
