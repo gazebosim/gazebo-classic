@@ -46,8 +46,9 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   this->dataPtr->joystickButtonToggleLast = false;
   this->dataPtr->joyPoseControl = true;
 
-  // Set default UserCamera render rate to 30Hz
-  this->SetRenderRate(30.0);
+  // We want a render rate of 60Hz. Setting the target to 70Hz to account
+  // for some slop
+  this->SetRenderRate(70.0);
 
   this->SetUseSDFPose(false);
 }
@@ -206,9 +207,6 @@ void UserCamera::Fini()
 //////////////////////////////////////////////////
 void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
-  if (this->dataPtr->selectionBuffer)
-    this->dataPtr->selectionBuffer->Update();
-
   // DEBUG: this->dataPtr->selectionBuffer->ShowOverlay(true);
 
   // Don't update the camera if it's being animated.
@@ -380,8 +378,15 @@ void UserCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
 //////////////////////////////////////////////////
 float UserCamera::GetAvgFPS() const
 {
-  return RenderEngine::Instance()->GetWindowManager()->GetAvgFPS(
-      this->windowId);
+  float avgFPS = 0;
+
+  if (this->renderTarget)
+  {
+    float lastFPS, bestFPS, worstFPS = 0;
+    this->renderTarget->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
+  }
+
+  return avgFPS;
 }
 
 //////////////////////////////////////////////////
@@ -539,9 +544,6 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
 
   if (!this->dataPtr->selectionBuffer)
     return result;
-
-  // Update the selection buffer
-  this->dataPtr->selectionBuffer->Update();
 
   Ogre::Entity *entity =
     this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
