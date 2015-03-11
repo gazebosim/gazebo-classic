@@ -130,7 +130,7 @@ void ODELink::Init()
             {
               g->GetODESurface()->maxVel = boost::any_cast<double>(value);
             }
-            catch (boost::bad_any_cast &_e)
+            catch(boost::bad_any_cast &_e)
             {
               gzerr << "Failed boost::any_cast in ODELink.cc: " << _e.what();
             }
