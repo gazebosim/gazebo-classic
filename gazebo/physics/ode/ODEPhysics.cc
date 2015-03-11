@@ -264,8 +264,15 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_solver_type(this->dataPtr->stepType);
     // min_step_size is defined but not yet used
     boost::any min_step_size;
-    if (this->GetParam("min_step_size", min_step_size))
-      physicsMsg.set_min_step_size(boost::any_cast<double>(min_step_size));
+    try
+    {
+      if (this->GetParam("min_step_size", min_step_size))
+        physicsMsg.set_min_step_size(boost::any_cast<double>(min_step_size));
+    }
+    catch(boost::bad_any_cast &_e)
+    {
+      gzerr << "Failed boost::any_cast in ODEPhysics.cc: " << _e.what();
+    }
     physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
     physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
