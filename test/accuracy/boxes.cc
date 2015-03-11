@@ -54,7 +54,7 @@ void BoxesTest::Boxes(const std::string &_physicsEngine
   const double dy = 0.4;
   const double dz = 0.9;
   const double mass = 10.0;
-  // inertia matrix, recompute if the above change
+  // expected inertia matrix, recompute if the above change
   const double Ixx = 0.80833333;
   const double Iyy = 0.68333333;
   const double Izz = 0.14166667;
