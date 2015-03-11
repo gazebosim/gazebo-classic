@@ -73,8 +73,14 @@ void Model::Load(sdf::ElementPtr _sdf)
         boost::bind(&Entity::IsStatic, this));
   }
 
+  if (this->sdf->HasElement("self_collide"))
+  {
+    this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
+  }
+
   if (this->sdf->HasElement("allow_auto_disable"))
     this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
+
   this->LoadLinks();
 
   // Load the joints if the world is already loaded. Otherwise, the World
@@ -858,6 +864,7 @@ void Model::FillMsg(msgs::Model &_msg)
 {
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
+  _msg.set_self_collide(this->GetSelfCollide());
   msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
   _msg.set_id(this->GetId());
   msgs::Set(_msg.mutable_scale(), this->scale);
@@ -1071,6 +1078,18 @@ void Model::SetAutoDisable(bool _auto)
 bool Model::GetAutoDisable() const
 {
   return this->sdf->Get<bool>("allow_auto_disable");
+}
+
+/////////////////////////////////////////////////
+void Model::SetSelfCollide(bool _self_collide)
+{
+  this->sdf->GetElement("self_collide")->Set(_self_collide);
+}
+
+/////////////////////////////////////////////////
+bool Model::GetSelfCollide() const
+{
+  return this->sdf->Get<bool>("self_collide");
 }
 
 /////////////////////////////////////////////////
