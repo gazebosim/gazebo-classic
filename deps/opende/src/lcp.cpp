@@ -107,7 +107,7 @@ when a row/column is removed from C, all we have to do is swap two
 rows/columns and manipulate C.
 
 */
-
+#include<iostream>
 #include <ode/common.h>
 #include <ode/matrix.h>
 #include <ode/misc.h>
@@ -537,7 +537,15 @@ void dLCP::transfer_i_to_C (int i)
       m_d[nC] = dRecip (AROW(i)[i] - dDot(m_ell,m_Dell,nC));
     }
     else {
-      m_d[0] = dRecip (AROW(i)[i]);
+        try{
+            if(AROW(i)[i] < 1e-16)
+                throw "zero denominator detected: ";
+        } catch(const char* Message) {
+            std::cout << "Warning: " << Message
+                << ", cfm = 1e-6 would be added to the denominator " << std::endl;
+                AROW(i)[i] += 1e-6;
+        }
+        m_d[0] = dRecip (AROW(i)[i]);
     }
 
     swapProblem (m_A,m_x,m_b,m_w,m_lo,m_hi,m_p,m_state,m_findex,m_n,m_nC,i,m_nskip,1);
@@ -585,7 +593,15 @@ void dLCP::transfer_i_from_N_to_C (int i)
       m_d[nC] = dRecip (AROW(i)[i] - dDot(m_ell,m_Dell,nC));
     }
     else {
-      m_d[0] = dRecip (AROW(i)[i]);
+        try{
+            if(AROW(i)[i] < 1e-16)
+                throw "zero denominator detected: ";
+        }catch(const char* Message){
+            std::cout << "Warning: " << Message
+                << ", cfm = 1e-6 would be added to the denominator " << std::endl;
+                AROW(i)[i] += 1e-6;
+        }
+        m_d[0] = dRecip (AROW(i)[i]);
     }
 
     swapProblem (m_A,m_x,m_b,m_w,m_lo,m_hi,m_p,m_state,m_findex,m_n,m_nC,i,m_nskip,1);
