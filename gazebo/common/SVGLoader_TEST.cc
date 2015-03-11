@@ -36,7 +36,7 @@ TEST_F(SVGLoader, LoadPaths)
   std::vector<common::SVGPath> paths;
 
   // bad path
-  bool success = false;
+  bool success;
   std::string bad = "/not/a/file.svg";
   success = loader.Parse(bad, paths);
   EXPECT_EQ(true, success);
