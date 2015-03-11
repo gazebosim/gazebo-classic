@@ -1742,8 +1742,10 @@ float Camera::GetAvgFPS() const
 {
   return this->renderTarget->getAverageFPS();
 }
+
 //////////////////////////////////////////////////
 unsigned int Camera::GetTriangleCount() const
 {
   return this->renderTarget->getTriangleCount();
 }
+
