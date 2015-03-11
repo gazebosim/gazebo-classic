@@ -344,6 +344,8 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
           sdf::ElementPtr pointElem = polylineElem->AddElement("point");
           pointElem->Set(msgs::Convert(_msg->geometry().polyline(j).point(i)));
         }
+        polylineElem->GetElement("height")->Set(
+            _msg->geometry().polyline(j).height());
       }
     }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)

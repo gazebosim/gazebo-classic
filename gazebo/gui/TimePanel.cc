@@ -20,6 +20,8 @@
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/gui/TimePanel.hh"
 
 using namespace gazebo;
@@ -112,6 +114,11 @@ TimePanel::TimePanel(QWidget *_parent)
   this->iterationsEdit->setFixedWidth(110);
   this->iterationsEdit->setObjectName("timePanelIterations");
 
+  this->fpsEdit = new QLineEdit;
+  this->fpsEdit->setReadOnly(true);
+  this->fpsEdit->setFixedWidth(90);
+  this->fpsEdit->setObjectName("timePanelFPS");
+
   QPushButton *timeResetButton = new QPushButton("Reset");
   timeResetButton->setFocusPolicy(Qt::NoFocus);
   connect(timeResetButton, SIGNAL(clicked()),
@@ -138,6 +145,10 @@ TimePanel::TimePanel(QWidget *_parent)
   this->iterationsLabel = new QLabel(tr("Iterations:"));
   frameLayout->addWidget(this->iterationsLabel);
   frameLayout->addWidget(this->iterationsEdit);
+
+  this->fpsLabel = new QLabel(tr("FPS:"));
+  frameLayout->addWidget(this->fpsLabel);
+  frameLayout->addWidget(this->fpsEdit);
 
   frameLayout->addWidget(timeResetButton);
 
@@ -170,6 +181,11 @@ TimePanel::TimePanel(QWidget *_parent)
         boost::bind(&TimePanel::OnFullScreen, this, _1)));
 
   this->show();
+
+  // Create a QueuedConnection to set avg fps.
+  // This is used for thread safety.
+  connect(this, SIGNAL(SetFPS(QString)),
+          this->fpsEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 
   // Create a QueuedConnection to set iterations.
   // This is used for thread safety.
@@ -229,6 +245,13 @@ void TimePanel::ShowIterations(bool _show)
 {
   this->iterationsLabel->setVisible(_show);
   this->iterationsEdit->setVisible(_show);
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowFPS(bool _show)
+{
+  this->fpsLabel->setVisible(_show);
+  this->fpsEdit->setVisible(_show);
 }
 
 /////////////////////////////////////////////////
@@ -336,6 +359,17 @@ void TimePanel::Update()
     percent << "0";
 
   this->percentRealTimeEdit->setText(tr(percent.str().c_str()));
+
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  if (cam)
+  {
+    std::ostringstream avgFPS;
+    avgFPS << cam->GetAvgFPS();
+
+    // Set the avg fps
+    this->SetFPS(QString::fromStdString(
+          boost::lexical_cast<std::string>(avgFPS.str().c_str())));
+  }
 }
 
 /////////////////////////////////////////////////
