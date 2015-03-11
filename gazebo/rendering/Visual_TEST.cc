@@ -37,8 +37,8 @@ std::string GetVisualSDFString(const std::string &_name,
     bool _lighting = true,
     const common::Color &_ambient = common::Color::White,
     const common::Color &_diffuse = common::Color::White,
-    const common::Color &_specular = common::Color::White,
-    const common::Color &_emissive = common::Color::White)
+    const common::Color &_specular = common::Color::Black,
+    const common::Color &_emissive = common::Color::Black)
 {
   std::stringstream visualString;
   visualString
@@ -86,6 +86,34 @@ std::string GetVisualSDFString(const std::string &_name,
       << "  </visual>"
       << "</sdf>";
   return visualString.str();
+}
+
+/////////////////////////////////////////////////
+void CreateColorMaterial(const std::string &_materialName,
+    const common::Color &_ambient, const common::Color &_diffuse,
+    const common::Color &_specular, const common::Color &_emissive)
+{
+  // test setup - create a material for testing
+  Ogre::MaterialPtr ogreMaterial =
+      Ogre::MaterialManager::getSingleton().create(_materialName, "General");
+  for (unsigned int i = 0; i < ogreMaterial->getNumTechniques(); ++i)
+  {
+    Ogre::Technique *technique = ogreMaterial->getTechnique(i);
+    for (unsigned int j = 0; j < technique->getNumPasses(); ++j)
+    {
+      Ogre::Pass *pass = technique->getPass(j);
+      pass->setAmbient(rendering::Conversions::Convert(_ambient));
+      pass->setDiffuse(rendering::Conversions::Convert(_diffuse));
+      pass->setSpecular(rendering::Conversions::Convert(_specular));
+      pass->setSelfIllumination(rendering::Conversions::Convert(_emissive));
+      EXPECT_EQ(rendering::Conversions::Convert(pass->getAmbient()), _ambient);
+      EXPECT_EQ(rendering::Conversions::Convert(pass->getDiffuse()), _diffuse);
+      EXPECT_EQ(rendering::Conversions::Convert(pass->getSpecular()),
+          _specular);
+      EXPECT_EQ(rendering::Conversions::Convert(pass->getSelfIllumination()),
+          _emissive);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -348,7 +376,7 @@ TEST_F(Visual_TEST, Color)
 
   sdf::ElementPtr cylinderSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF2);
-  sdf::readString(GetVisualSDFString("visual_cylinder_black", "cylinder",
+  sdf::readString(GetVisualSDFString("visual_cylinder_color", "cylinder",
       gazebo::math::Pose::Zero, 0, true, "Gazebo/Grey", true,
       common::Color::Green, common::Color::Blue, common::Color::Red,
       common::Color::Yellow), cylinderSDF2);
@@ -404,6 +432,159 @@ TEST_F(Visual_TEST, Color)
     cylinderVis2->SetEmissive(color);
     EXPECT_EQ(cylinderVis2->GetEmissive(), color);
   }
+}
+
+/////////////////////////////////////////////////
+TEST_F(Visual_TEST, ColorMaterial)
+{
+  Load("worlds/empty.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  std::string materialName = "Test/Grey";
+  CreateColorMaterial(materialName, common::Color(0.3, 0.3, 0.3, 1.0),
+      common::Color(0.7, 0.7, 0.7, 1.0), common::Color(0.01, 0.01, 0.01, 1.0),
+      common::Color::Black);
+
+  // test with a visual that only has a material name and no color components.
+  std::string visualName = "boxMaterialColor";
+  math::Pose visualPose = math::Pose::Zero;
+  std::stringstream visualString;
+  visualString
+      << "<sdf version='" << SDF_VERSION << "'>"
+      << "  <visual name='" << visualName << "'>"
+      << "    <pose>" << visualPose << "</pose>"
+      << "    <geometry>"
+      << "      <box>"
+      << "        <size>1.0 1.0 1.0</size>"
+      << "      </box>"
+      << "    </geometry>"
+      << "    <material>"
+      << "      <script>"
+      << "        <uri>file://media/materials/scripts/gazebo.material</uri>"
+      << "        <name>" << materialName << "</name>"
+      << "      </script>"
+      << "    </material>"
+      << "  </visual>"
+      << "</sdf>";
+
+  sdf::ElementPtr boxSDF(new sdf::Element);
+  sdf::initFile("visual.sdf", boxSDF);
+  sdf::readString(visualString.str(), boxSDF);
+  gazebo::rendering::VisualPtr boxVis(
+      new gazebo::rendering::Visual("box_visual", scene));
+  boxVis->Load(boxSDF);
+
+  EXPECT_TRUE(
+      boxVis->GetMaterialName().find(materialName) != std::string::npos);
+
+  // Verify the visual color components are the same as the ones specified in
+  // the material script
+  EXPECT_EQ(boxVis->GetAmbient(), common::Color(0.3, 0.3, 0.3, 1.0));
+  EXPECT_EQ(boxVis->GetDiffuse(), common::Color(0.7, 0.7, 0.7, 1.0));
+  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.01, 0.01, 0.01, 1.0));
+  EXPECT_EQ(boxVis->GetEmissive(), common::Color::Black);
+
+  // test changing diffuse colors and verify color again.
+  common::Color redColor(1.0, 0.0, 0.0, 1.0);
+  boxVis->SetDiffuse(redColor);
+  EXPECT_EQ(boxVis->GetAmbient(), common::Color(0.3, 0.3, 0.3, 1.0));
+  EXPECT_EQ(boxVis->GetDiffuse(), redColor);
+  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.01, 0.01, 0.01, 1.0));
+  EXPECT_EQ(boxVis->GetEmissive(), common::Color::Black);
+
+  // test setting a different material name
+  std::string greenMaterialName = "Test/Green";
+  CreateColorMaterial(greenMaterialName, common::Color(0.0, 1.0, 0.0, 1.0),
+      common::Color(0.0, 1.0, 0.0, 1.0), common::Color(0.1, 0.1, 0.1, 1.0),
+      common::Color::Black);
+  boxVis->SetMaterial(greenMaterialName);
+  EXPECT_TRUE(
+      boxVis->GetMaterialName().find(greenMaterialName) != std::string::npos);
+
+  // Verify the visual color components are the same as the ones in the new
+  // material script
+  EXPECT_EQ(boxVis->GetAmbient(), common::Color(0.0, 1.0, 0.0, 1.0));
+  EXPECT_EQ(boxVis->GetDiffuse(), common::Color(0.0, 1.0, 0.0, 1.0));
+  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.1, 0.1, 0.1, 1.0));
+  EXPECT_EQ(boxVis->GetEmissive(), common::Color::Black);
+
+  // test setting back to original material color
+  boxVis->SetMaterial(materialName);
+  EXPECT_TRUE(
+      boxVis->GetMaterialName().find(materialName) != std::string::npos);
+
+  // Verify the visual color components are the same as the ones in the
+  // original material script
+  EXPECT_EQ(boxVis->GetAmbient(), common::Color(0.3, 0.3, 0.3, 1.0));
+  EXPECT_EQ(boxVis->GetDiffuse(), common::Color(0.7, 0.7, 0.7, 1.0));
+  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.01, 0.01, 0.01, 1.0));
+  EXPECT_EQ(boxVis->GetEmissive(), common::Color::Black);
+
+  // test with a semi-transparent color material
+  std::string redTransparentMaterialName = "Test/RedTransparent";
+  CreateColorMaterial(redTransparentMaterialName,
+      common::Color(1.0, 0.0, 0.0, 0.2), common::Color(1.0, 0.0, 0.0, 0.4),
+      common::Color(0.1, 0.1, 0.1, 0.6), common::Color(1.0, 0.0, 0.0, 0.8));
+  boxVis->SetMaterial(redTransparentMaterialName);
+  EXPECT_TRUE(boxVis->GetMaterialName().find(redTransparentMaterialName)
+      != std::string::npos);
+
+  // Verify the visual color components are the same as the ones in the new
+  // material script
+  EXPECT_EQ(boxVis->GetAmbient(), common::Color(1.0, 0.0, 0.0, 0.2));
+  EXPECT_EQ(boxVis->GetDiffuse(), common::Color(1.0, 0.0, 0.0, 0.4));
+  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.1, 0.1, 0.1, 0.6));
+  EXPECT_EQ(boxVis->GetEmissive(), common::Color(1.0, 0.0, 0.0, 0.8));
+
+  // update transparency and verify diffuse alpha value has changed
+  boxVis->SetTransparency(0.5f);
+  EXPECT_DOUBLE_EQ(boxVis->GetTransparency(), 0.5f);
+  EXPECT_EQ(boxVis->GetAmbient(), common::Color(1.0, 0.0, 0.0, 0.2));
+  EXPECT_EQ(boxVis->GetDiffuse(), common::Color(1.0, 0.0, 0.0, 0.5));
+  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.1, 0.1, 0.1, 0.6));
+  EXPECT_EQ(boxVis->GetEmissive(), common::Color(1.0, 0.0, 0.0, 0.8));
+}
+
+/////////////////////////////////////////////////
+TEST_F(Visual_TEST, UpdateMeshFromMsg)
+{
+  Load("worlds/empty.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  sdf::ElementPtr meshUpdateSDF(new sdf::Element);
+  sdf::initFile("visual.sdf", meshUpdateSDF);
+  sdf::readString(GetVisualSDFString("visual_mesh_update"), meshUpdateSDF);
+  gazebo::rendering::VisualPtr meshUpdateVis(
+      new gazebo::rendering::Visual("visual_mesh_update_visual", scene));
+  meshUpdateVis->Load(meshUpdateSDF);
+
+  EXPECT_EQ(meshUpdateVis->GetMeshName(), "unit_box");
+  EXPECT_EQ(meshUpdateVis->GetSubMeshName(), "");
+
+  msgs::VisualPtr visualMsg(new msgs::Visual);
+  msgs::Geometry *geomMsg = visualMsg->mutable_geometry();
+  geomMsg->set_type(msgs::Geometry::MESH);
+  msgs::MeshGeom *meshMsg = geomMsg->mutable_mesh();
+  std::string meshFile = "polaris_ranger_ev/meshes/polaris.dae";
+  meshMsg->set_filename("model://" + meshFile);
+  meshMsg->set_submesh("Steering_Wheel");
+  meshUpdateVis->UpdateFromMsg(visualMsg);
+
+  // verify new mesh and submesh names
+  EXPECT_TRUE(meshUpdateVis->GetMeshName().find(meshFile) != std::string::npos);
+  EXPECT_EQ(meshUpdateVis->GetSubMeshName(), "Steering_Wheel");
+
+  // verify updated sdf
+  sdf::ElementPtr visualUpdateSDF = meshUpdateVis->GetSDF();
+  sdf::ElementPtr geomSDF = visualUpdateSDF->GetElement("geometry");
+  sdf::ElementPtr meshSDF = geomSDF->GetElement("mesh");
+  EXPECT_EQ(meshSDF->Get<std::string>("uri"), "model://" + meshFile);
+  sdf::ElementPtr submeshSDF = meshSDF->GetElement("submesh");
+  EXPECT_EQ(submeshSDF->Get<std::string>("name"), "Steering_Wheel");
 }
 
 /////////////////////////////////////////////////

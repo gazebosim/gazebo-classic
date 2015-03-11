@@ -53,7 +53,7 @@ namespace gazebo
     };
 
     /// \class CollisionConfig CollisionConfig.hh
-    /// \brief A tab for configuring collision properties of a part.
+    /// \brief A tab for configuring collision properties of a link.
     class CollisionConfig : public QWidget
     {
       Q_OBJECT
@@ -76,7 +76,7 @@ namespace gazebo
       /// \param[in] _collisionMsg Msg used to update the collision widget
       /// values.
       public: void UpdateCollision(const std::string &_name,
-          const msgs::Collision *_collisionMsg);
+          ConstCollisionPtr _collisionMsg);
 
       /// \brief Reset the collision tab.
       public: void Reset();

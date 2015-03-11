@@ -46,12 +46,16 @@ namespace gazebo
       /// \brief Destructor
       public: ~LinkConfig();
 
+      /// \brief Update the link config widget with a link msg.
+      /// \param[in] _linkMsg Link message.
+      public: void Update(ConstLinkPtr _linkMsg);
+
       /// \brief Get the msg containing all link data.
       /// \return Link msg.
       public: msgs::Link *GetData() const;
 
-      /// \brief Set the pose of the part.
-      /// \param[in] _pose Pose to set the part to.
+      /// \brief Set the pose of the link.
+      /// \param[in] _pose Pose to set the link to.
       public: void SetPose(const math::Pose &_pose);
 
       /// \brief config widget for configuring link properties.

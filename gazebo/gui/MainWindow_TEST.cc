@@ -34,6 +34,130 @@ void OnRequest(ConstRequestPtr &_msg)
     g_gotSetWireframe = true;
 }
 
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::Selection()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+
+  // get model at center of window - should get the ground plane
+  gazebo::rendering::VisualPtr vis =
+      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+  QVERIFY(vis != NULL);
+  QVERIFY(vis->IsPlane());
+
+  // move camera to look at the box
+  gazebo::math::Pose cameraPose(gazebo::math::Vector3(-1, 0, 0.5),
+      gazebo::math::Vector3(0, 0, 0));
+  cam->SetWorldPose(cameraPose);
+  QVERIFY(cam->GetWorldPose() == cameraPose);
+
+  // verify we get a box
+  gazebo::rendering::VisualPtr vis2 =
+      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+  QVERIFY(vis2 != NULL);
+  QVERIFY(vis2->GetRootVisual()->GetName() == "box");
+
+  // look upwards
+  gazebo::math::Quaternion pitch90(gazebo::math::Vector3(0, -1.57, 0));
+  cam->SetWorldRotation(pitch90);
+  QVERIFY(cam->GetWorldRotation() == pitch90);
+
+  // verify there is nothing in the middle of the window
+  gazebo::rendering::VisualPtr vis3 =
+      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+  QVERIFY(vis3 == NULL);
+
+  // reset orientation
+  gazebo::math::Quaternion identityRot(gazebo::math::Vector3(0, 0, 0));
+  cam->SetWorldRotation(identityRot);
+  QVERIFY(cam->GetWorldRotation() == identityRot);
+
+  // verify we can still get the box
+  gazebo::rendering::VisualPtr vis4 =
+      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+  QVERIFY(vis4 != NULL);
+  QVERIFY(vis4->GetRootVisual()->GetName() == "box");
+
+  // hide the box
+  vis4->SetVisible(false);
+  gazebo::rendering::VisualPtr vis5 =
+      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+
+  // verify we don't get anything now
+  QVERIFY(vis5 == NULL);
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::UserCameraFPS()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+
+  // Wait a little bit for the average FPS to even out.
+  for (unsigned int i = 0; i < 10000; ++i)
+  {
+    gazebo::common::Time::NSleep(500000);
+    QCoreApplication::processEvents();
+  }
+
+  std::cerr << "\nFPS[" << cam->GetAvgFPS() << "]\n" << std::endl;
+
+  QVERIFY(cam->GetAvgFPS() > 55.0);
+  QVERIFY(cam->GetAvgFPS() < 75.0);
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
 /////////////////////////////////////////////////
 void MainWindow_TEST::CopyPaste()
 {

@@ -473,6 +473,10 @@ namespace gazebo
       /// \param[in] _show True to show center of mass visualizations.
       public: void ShowCOM(bool _show);
 
+      /// \brief Display inertia visuals.
+      /// \param[in] _show True to show inertia visualizations.
+      public: void ShowInertia(bool _show);
+
       /// \brief Set animation skeleton pose.
       /// \param[in] _pose Skelton message
       public: void SetSkeletonPose(const msgs::PoseAnimation &_pose);

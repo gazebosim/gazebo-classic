@@ -53,7 +53,8 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene,
 
   // Set default UserCamera render rate to 120Hz when stereo rendering is
   // enabled. Otherwise use 60Hz.
-  this->SetRenderRate(_stereoEnabled ? 120.0 : 60.0);
+  // Some padding is added for safety.
+  this->SetRenderRate(_stereoEnabled ? 130.0 : 70.0);
 
   this->SetUseSDFPose(false);
 }
@@ -237,9 +238,6 @@ void UserCamera::Fini()
 //////////////////////////////////////////////////
 void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
-  if (this->dataPtr->selectionBuffer)
-    this->dataPtr->selectionBuffer->Update();
-
   // DEBUG: this->dataPtr->selectionBuffer->ShowOverlay(true);
 
   // Don't update the camera if it's being animated.
@@ -411,20 +409,6 @@ void UserCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
                                        float /*w_*/, float /*h_*/)
 {
   // this->viewport->setDimensions(x, y, w, h);
-}
-
-//////////////////////////////////////////////////
-float UserCamera::GetAvgFPS() const
-{
-  float avgFPS, lastFPS, bestFPS, worstFPS = 0;
-  this->renderTarget->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
-  return avgFPS;
-}
-
-//////////////////////////////////////////////////
-unsigned int UserCamera::GetTriangleCount() const
-{
-  return this->renderTarget->getTriangleCount();
 }
 
 //////////////////////////////////////////////////
@@ -602,9 +586,6 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
 
   if (!this->dataPtr->selectionBuffer)
     return result;
-
-  // Update the selection buffer
-  this->dataPtr->selectionBuffer->Update();
 
   Ogre::Entity *entity =
     this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
@@ -795,7 +776,8 @@ void UserCamera::EnableStereo(bool _enable)
            << "However, stereo is turned off via the gui.ini file.\n";
   }
 #else
-    gzwarn << "Tried to enable/disable stereo. "
-           << "However, Ogre version >= 1.10.0 is required.\n";
+  gzwarn << "Tried to EnableStereo("
+         << _enable
+         << "). However, Ogre version >= 1.10.0 is required.\n";
 #endif
 }

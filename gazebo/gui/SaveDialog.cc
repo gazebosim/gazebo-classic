@@ -100,8 +100,8 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
   QPushButton *saveButton = new QPushButton(tr(saveButtonText.c_str()));
   saveButton->setDefault(true);
   connect(saveButton, SIGNAL(clicked()), this, SLOT(OnAcceptSave()));
-  buttonsLayout->addWidget(saveButton);
   buttonsLayout->addWidget(cancelButton);
+  buttonsLayout->addWidget(saveButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
   QHBoxLayout *locationLayout = new QHBoxLayout;
@@ -293,9 +293,12 @@ bool SaveDialog::OnSaveAs()
       QMessageBox msgBox(QMessageBox::Warning, QString("Files Exist"),
                          QString(msg.c_str()));
 
+      QPushButton *cancelButton =
+          msgBox.addButton("Cancel", QMessageBox::RejectRole);
       QPushButton *saveButton = msgBox.addButton("Save",
-                                                 QMessageBox::ApplyRole);
-      msgBox.addButton(QMessageBox::Cancel);
+          QMessageBox::AcceptRole);
+      msgBox.setDefaultButton(saveButton);
+      msgBox.setEscapeButton(cancelButton);
       msgBox.exec();
       if (msgBox.clickedButton() != saveButton)
       {
