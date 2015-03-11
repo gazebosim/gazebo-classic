@@ -420,8 +420,12 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   msgs::Contacts contacts;
 
-  EXPECT_TRUE(physics->SetParam("contact_max_correcting_vel", 0));
-  EXPECT_TRUE(physics->SetParam("iters", 100));
+  if (_physicsEngine == "_ode" || _physicsEngine == "bullet")
+  {
+    EXPECT_TRUE(physics->SetParam("iters", 100));
+    if (_physicsEngine == "ode")
+      EXPECT_TRUE(physics->SetParam("contact_max_correcting_vel", 0));
+  }
 
   world->Step(1);
 
