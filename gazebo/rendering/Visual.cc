@@ -1900,7 +1900,7 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
 DynamicLines *Visual::CreateDynamicLine(RenderOpType _type)
 {
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
-      boost::bind(&Visual::Update, shared_from_this()));
+      boost::bind(&Visual::Update, this));
 
   DynamicLines *line = new DynamicLines(_type);
   this->dataPtr->lines.push_back(line);
