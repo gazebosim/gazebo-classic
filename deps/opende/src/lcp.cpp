@@ -107,6 +107,7 @@ when a row/column is removed from C, all we have to do is swap two
 rows/columns and manipulate C.
 
 */
+
 #include <ode/common.h>
 #include <ode/matrix.h>
 #include <ode/misc.h>
