@@ -27,6 +27,9 @@ class MainWindow_TEST : public QTestFixture
 
   /// \brief Test scene destruction on shutdown
   private slots: void SceneDestruction();
+  
+  /// \brief Test user camera entity selection
+  private slots: void Selection();
 
   /// \brief Test user camera frames per second
   private slots: void UserCameraFPS();

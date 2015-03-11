@@ -88,6 +88,9 @@ namespace gazebo
 
       /// \brief Action to exit the editor.
       private: QAction *exitAct;
+
+      /// \brief Save the main window paused state to use when returning.
+      private: bool mainWindowPaused;
     };
   }
 }
