@@ -365,7 +365,7 @@ namespace gazebo
       public: void RemoveVisual(uint32_t _id);
 
       /// \internal
-      /// \brief Set the id of a visual. Internally used when visuals id's
+      /// \brief Set the id of a visual. Internally used when visual ids'
       /// are required to be updated from visual msgs.
       /// \param[in] _vis Pointer to visual.
       /// \param[in] _id New id to set to.
