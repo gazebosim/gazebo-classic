@@ -606,6 +606,10 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
                   dimensions.z = dimensions.x;
                   break;
                 }
+                else if (geomMsgName == "PolylineGeom")
+                {
+                  continue;
+                }
               }
               this->UpdateGeometryWidget(configChildWidget,
                   geometryTypeStr, dimensions);
@@ -1117,6 +1121,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geometryComboBox->addItem(tr("cylinder"));
   geometryComboBox->addItem(tr("sphere"));
   geometryComboBox->addItem(tr("mesh"));
+  geometryComboBox->addItem(tr("polyline"));
 
   QDoubleSpinBox *geomSizeXSpinBox = new QDoubleSpinBox;
   geomSizeXSpinBox->setRange(-1000, 1000);
@@ -1152,10 +1157,13 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   QLineEdit *geomFilenameLineEdit = new QLineEdit;
   geomFilenameLineEdit->setSizePolicy(QSizePolicy::Minimum,
       QSizePolicy::Fixed);
+  QPushButton *geomFilenameButton = new QPushButton(tr("..."));
+  geomFilenameButton->setMaximumWidth(30);
 
   QHBoxLayout *geomFilenameLayout = new QHBoxLayout;
   geomFilenameLayout->addWidget(geomFilenameLabel);
   geomFilenameLayout->addWidget(geomFilenameLineEdit);
+  geomFilenameLayout->addWidget(geomFilenameButton);
 
   QVBoxLayout *geomSizeFilenameLayout = new QVBoxLayout;
   geomSizeFilenameLayout->addLayout(geomSizeLayout);
@@ -1206,13 +1214,15 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   widget->geomLengthLabel = geomLengthLabel;
   widget->geomFilenameLabel = geomFilenameLabel;
   widget->geomFilenameLineEdit = geomFilenameLineEdit;
+  widget->geomFilenameButton = geomFilenameButton;
 
   geomFilenameLabel->setVisible(false);
   geomFilenameLineEdit->setVisible(false);
+  geomFilenameButton->setVisible(false);
 
-  connect(geometryComboBox,
-    SIGNAL(currentIndexChanged(const QString)),
-    widget, SLOT(GeometryChanged(const QString)));
+  connect(geometryComboBox, SIGNAL(currentIndexChanged(const QString)),
+      widget, SLOT(GeometryChanged(const QString)));
+  connect(geomFilenameButton, SIGNAL(clicked()), widget, SLOT(OnSelectFile()));
 
   widgetLayout->setContentsMargins(0, 0, 0, 0);
   widget->setLayout(widgetLayout);
@@ -1224,6 +1234,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   widget->widgets.push_back(geomRadiusSpinBox);
   widget->widgets.push_back(geomLengthSpinBox);
   widget->widgets.push_back(geomFilenameLineEdit);
+  widget->widgets.push_back(geomFilenameButton);
 
   return widget;
 }
@@ -1377,8 +1388,8 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
               if (geomType == "mesh")
               {
-                 std::string uri = qobject_cast<QLineEdit *>(
-                      childWidget->widgets[6])->text().toStdString();
+                std::string uri = qobject_cast<QLineEdit *>(
+                     childWidget->widgets[6])->text().toStdString();
                 const google::protobuf::FieldDescriptor *uriFieldDescriptor =
                     geomValueMsg->GetDescriptor()->field(0);
                 geomValueMsg->GetReflection()->SetString(geomValueMsg,
@@ -1432,6 +1443,12 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
                   geomValueMsg->GetDescriptor()->field(0);
               geomValueMsg->GetReflection()->SetDouble(geomValueMsg,
                   geomRadiusField, radius);
+            }
+            else if (geomType == "polyline")
+            {
+              const google::protobuf::EnumValueDescriptor *geometryType =
+                  typeEnumDescriptor->FindValueByName("POLYLINE");
+              geomReflection->SetEnum(valueMsg, typeField, geometryType);
             }
           }
           // update pose msg field
@@ -1692,7 +1709,7 @@ void ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
     const std::string &_value, const math::Vector3 &_dimensions,
     const std::string &_uri)
 {
-  if (_widget->widgets.size() != 7u)
+  if (_widget->widgets.size() != 8u)
   {
     gzerr << "Error updating Geometry Config widget " << std::endl;
     return;
@@ -1731,6 +1748,10 @@ void ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
   {
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->setValue(
         _dimensions.x*0.5);
+  }
+  else if (_value == "polyline")
+  {
+    // do nothing
   }
 
   if (isMesh)
@@ -1878,7 +1899,7 @@ std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
     math::Vector3 &_dimensions, std::string &_uri) const
 {
   std::string value;
-  if (_widget->widgets.size() != 7u)
+  if (_widget->widgets.size() != 8u)
   {
     gzerr << "Error getting value from Geometry Config widget " << std::endl;
     return value;
@@ -1912,6 +1933,10 @@ std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
     _dimensions.y = _dimensions.x;
     _dimensions.z = _dimensions.x;
   }
+  else if (value == "polyline")
+  {
+    // do nothing
+  }
   else
   {
     gzerr << "Error getting geometry dimensions for type: '" << value << "'"
@@ -1935,8 +1960,8 @@ void ConfigWidget::OnItemSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 bool ConfigWidget::eventFilter(QObject *_obj, QEvent *_event)
 {
-  QAbstractSpinBox* spinBox = qobject_cast<QAbstractSpinBox *>(_obj);
-  QComboBox* comboBox = qobject_cast<QComboBox *>(_obj);
+  QAbstractSpinBox *spinBox = qobject_cast<QAbstractSpinBox *>(_obj);
+  QComboBox *comboBox = qobject_cast<QComboBox *>(_obj);
   if (spinBox || comboBox)
   {
     QWidget *widget = qobject_cast<QWidget *>(_obj);
@@ -1985,22 +2010,55 @@ void GeometryConfigWidget::GeometryChanged(const QString _text)
     bool isMesh = (textStr == "mesh");
     if (textStr == "box" || isMesh)
     {
+      this->geomDimensionWidget->show();
       this->geomDimensionWidget->setCurrentIndex(0);
     }
     else if (textStr == "cylinder")
     {
+      this->geomDimensionWidget->show();
       this->geomDimensionWidget->setCurrentIndex(1);
       this->geomLengthSpinBox->show();
       this->geomLengthLabel->show();
     }
     else if (textStr == "sphere")
     {
+      this->geomDimensionWidget->show();
       this->geomDimensionWidget->setCurrentIndex(1);
       this->geomLengthSpinBox->hide();
       this->geomLengthLabel->hide();
     }
+    else if (textStr == "polyline")
+    {
+      this->geomDimensionWidget->hide();
+    }
 
     this->geomFilenameLabel->setVisible(isMesh);
     this->geomFilenameLineEdit->setVisible(isMesh);
+    this->geomFilenameButton->setVisible(isMesh);
+  }
+}
+
+/////////////////////////////////////////////////
+void GeometryConfigWidget::OnSelectFile()
+{
+  QWidget *widget= qobject_cast<QWidget *>(QObject::sender());
+
+  if (widget)
+  {
+    QFileDialog fd(this, tr("Select mesh file"), QDir::homePath(),
+      tr("Mesh files (*.dae *.stl)"));
+    fd.setFilter(QDir::AllDirs | QDir::Hidden);
+    fd.setFileMode(QFileDialog::ExistingFile);
+    if (fd.exec())
+    {
+      if (!fd.selectedFiles().isEmpty())
+      {
+        QString file = fd.selectedFiles().at(0);
+        if (!file.isEmpty())
+        {
+          dynamic_cast<QLineEdit *>(this->geomFilenameLineEdit)->setText(file);
+        }
+      }
+    }
   }
 }

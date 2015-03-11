@@ -41,23 +41,23 @@ namespace gazebo
       /// \brief Destructor
       public: ~LinkInspector();
 
-      /// \brief Set the name of the part.
-      /// \param[in] Name to set the part to.
+      /// \brief Set the name of the link.
+      /// \param[in] Name to set the link to.
       public: void SetName(const std::string &_name);
 
-      /// \brief Get the name of the part.
-      /// \return Name of the part.
+      /// \brief Get the name of the link.
+      /// \return Name of the link.
       public: std::string GetName() const;
 
       /// \brief Get configurations of the link.
       /// \return Tab widget with link configurations.
       public: LinkConfig *GetLinkConfig() const;
 
-      /// \brief Get visual configurations of the part.
+      /// \brief Get visual configurations of the link.
       /// \return Tab widget with visual configurations.
       public: VisualConfig *GetVisualConfig() const;
 
-      /// \brief Get collision configurations of the part.
+      /// \brief Get collision configurations of the link.
       /// \return Tab widget with visual configurations.
       public: CollisionConfig *GetCollisionConfig() const;
 
@@ -72,6 +72,10 @@ namespace gazebo
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
 
+      /// \brief Qt signal emitted to indicate that changes should be applied
+      /// and the inspector closed.
+      Q_SIGNALS: void Accepted();
+
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
 
@@ -81,11 +85,11 @@ namespace gazebo
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
-      /// \brief Main tab widget within the part inspector.
+      /// \brief Main tab widget within the link inspector.
       private: QTabWidget *tabWidget;
 
-      /// \brief Label that displays the name of the part.
-      private: QLabel* partNameLabel;
+      /// \brief Label that displays the name of the link.
+      private: QLabel* linkNameLabel;
 
       /// \brief Widget with configurable link properties.
       private: LinkConfig *linkConfig;

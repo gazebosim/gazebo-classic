@@ -54,8 +54,8 @@ namespace gazebo
       /// \return Link msg.
       public: msgs::Link *GetData() const;
 
-      /// \brief Set the pose of the part.
-      /// \param[in] _pose Pose to set the part to.
+      /// \brief Set the pose of the link.
+      /// \param[in] _pose Pose to set the link to.
       public: void SetPose(const math::Pose &_pose);
 
       /// \brief config widget for configuring link properties.

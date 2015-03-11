@@ -23,7 +23,7 @@
 using namespace gazebo;
 
 /////////////////////////////////////////////////
-std::string custom_exec(std::string _cmd)
+std::string gazebo::custom_exec(std::string _cmd)
 {
   _cmd += " 2>/dev/null";
   FILE* pipe = popen(_cmd.c_str(), "r");
@@ -54,6 +54,7 @@ ServerFixture::ServerFixture()
   this->gotImage = 0;
   this->imgData = NULL;
   this->serverThread = NULL;
+  this->uniqueCounter = 0;
 
   gzLogInit("test-", "test.log");
   gazebo::common::Console::SetQuiet(false);
@@ -451,6 +452,33 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
     common::Time::MSleep(100);
 
   camSensor->GetCamera()->DisconnectNewImageFrame(c);
+}
+
+/////////////////////////////////////////////////
+physics::ModelPtr ServerFixture::SpawnModel(const msgs::Model &_msg)
+{
+  physics::WorldPtr world = physics::get_world();
+  ServerFixture::CheckPointer(world);
+  world->InsertModelString(
+    "<sdf version='" + std::string(SDF_VERSION) + "'>"
+    + msgs::ModelToSDF(_msg)->ToString("")
+    + "</sdf>");
+
+  common::Time wait(10, 0);
+  common::Time wallStart = common::Time::GetWallTime();
+  unsigned int waitCount = 0;
+  while (wait > (common::Time::GetWallTime() - wallStart) &&
+         !this->HasEntity(_msg.name()))
+  {
+    common::Time::MSleep(10);
+    if (++waitCount % 100 == 0)
+    {
+      gzwarn << "Waiting " << waitCount / 100 << " seconds for "
+             << "box to spawn." << std::endl;
+    }
+  }
+
+  return world->GetModel(_msg.name());
 }
 
 /////////////////////////////////////////////////
@@ -1333,4 +1361,12 @@ void ServerFixture::GetMemInfo(double &_resident, double &_share)
   gzerr << "Unsupported architecture\n";
   return;
 #endif
+}
+
+/////////////////////////////////////////////////
+std::string ServerFixture::GetUniqueString(const std::string &_prefix)
+{
+  std::ostringstream stream;
+  stream << _prefix << this->uniqueCounter++;
+  return stream.str();
 }

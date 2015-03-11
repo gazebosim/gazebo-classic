@@ -53,7 +53,7 @@ namespace gazebo
     };
 
     /// \class CollisionConfig CollisionConfig.hh
-    /// \brief A tab for configuring collision properties of a part.
+    /// \brief A tab for configuring collision properties of a link.
     class CollisionConfig : public QWidget
     {
       Q_OBJECT

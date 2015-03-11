@@ -93,6 +93,8 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   this->variantManager = new QtVariantPropertyManager();
   this->propTreeBrowser = new QtTreePropertyBrowser();
   this->propTreeBrowser->setObjectName("propTreeBrowser");
+  this->propTreeBrowser->setStyleSheet(
+      "QTreeView::branch:selected:active { background-color: transparent; }");
   this->variantFactory = new QtVariantEditorFactory();
   this->propTreeBrowser->setFactoryForManager(this->variantManager,
                                               this->variantFactory);
@@ -1522,6 +1524,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   else
     item->setValue(true);
   this->AddProperty(item, _parent);
+  item->setEnabled(false);
 
   // gravity
   item = this->variantManager->addProperty(QVariant::Bool, tr("gravity"));
@@ -2056,6 +2059,14 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
   else
     item->setValue(false);
   /// \todo Dynamically setting a model static doesn't currently work.
+  item->setEnabled(false);
+  this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Bool, tr("self_collide"));
+  if (_msg.has_self_collide())
+    item->setValue(_msg.self_collide());
+  else
+    item->setValue(false);
   item->setEnabled(false);
   this->propTreeBrowser->addProperty(item);
 

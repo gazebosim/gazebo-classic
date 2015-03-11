@@ -22,6 +22,7 @@
 #include "gazebo/rendering/JointVisual.hh"
 #include "test/ServerFixture.hh"
 
+using namespace gazebo;
 class JointVisual_TEST : public ServerFixture
 {
 };

@@ -116,6 +116,10 @@ namespace gazebo
       /// \brief Custom collision filtering used when collideWithoutContact is
       /// true.
       public: unsigned int collideWithoutContactBitmask;
+
+      /// \brief Custom collision filtering. Will override
+      /// collideWithoutContact.
+      public: unsigned int collideBitmask;
     };
     /// \}
   }

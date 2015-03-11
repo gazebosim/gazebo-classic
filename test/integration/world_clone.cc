@@ -19,6 +19,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 
+using namespace gazebo;
 class WorldClone : public ServerFixture
 {
 };

@@ -480,7 +480,10 @@ void Camera::PostRender()
 {
   this->ReadPixelBuffer();
 
-  this->lastRenderWallTime = common::Time::GetWallTime();
+  // Only record last render time if data was actually generated
+  // (If a frame was rendered).
+  if (this->newData)
+    this->lastRenderWallTime = common::Time::GetWallTime();
 
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
@@ -1733,4 +1736,14 @@ void Camera::UpdateFOV()
   }
 }
 
+//////////////////////////////////////////////////
+float Camera::GetAvgFPS() const
+{
+  return this->renderTarget->getAverageFPS();
+}
 
+//////////////////////////////////////////////////
+unsigned int Camera::GetTriangleCount() const
+{
+  return this->renderTarget->getTriangleCount();
+}
