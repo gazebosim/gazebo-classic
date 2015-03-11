@@ -38,6 +38,9 @@
 1. Added Matrix3::Inverse() and tests 
     * [Pull request #1481](https://bitbucket.org/osrf/gazebo/pull-request/1481)
 
+1. Implemented AddLinkForce for ODE.
+    * [Pull request #1456](https://bitbucket.org/osrf/gazebo/pull-request/1456)
+
 1. Model editor updates
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
@@ -75,6 +78,7 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
+
 1. Allow sdformat 2.3.1+ or 3+ and fix tests
   * [Pull request #1484](https://bitbucket.org/osrf/gazebo/pull-request/1484)
 

@@ -193,6 +193,15 @@ namespace gazebo
                   const math::Vector3 &_force,
                   const math::Vector3 &_relPos) = 0;
 
+      /// \brief Add a force expressed in the link frame.
+      /// \param[in] _force Direction vector expressed in the link frame. Each
+      /// component corresponds to the force which will be added in that axis
+      /// and the vector's magnitude corresponds to the total force.
+      /// \param[in] _offset Offset position expressed in the link frame. It
+      /// defaults to the link origin.
+      public: virtual void AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero) = 0;
+
       /// \brief Add a torque to the body.
       /// \param[in] _torque Torque value to add to the link.
       public: virtual void AddTorque(const math::Vector3 &_torque) = 0;
@@ -268,8 +277,12 @@ namespace gazebo
       /// \return Angular momentum of the body.
       public: math::Vector3 GetWorldAngularMomentum() const;
 
-      /// \brief Get the angular acceleration of the body in the world
-      /// frame.
+      /// \brief Get the angular acceleration of the body in the world frame,
+      /// which is computed as (I^-1 * (T - w x L)), where
+      /// I: inertia matrix in world frame
+      /// T: sum of external torques in world frame
+      /// L: angular momentum of CoG in world frame
+      /// w: angular velocity in world frame
       /// \return Angular acceleration of the body in the world frame.
       public: math::Vector3 GetWorldAngularAccel() const;
 
