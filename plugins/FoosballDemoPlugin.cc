@@ -21,9 +21,10 @@
 #include <string>
 #include <sdf/sdf.hh>
 #include "gazebo/common/Assert.hh"
-#include "gazebo/common/Time.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/math/Pose.hh"
+#include "gazebo/math/Rand.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
@@ -58,30 +59,22 @@ void KickoffState::Update()
 }
 
 /////////////////////////////////////////////////
-void GoalAState::Initialize()
+GoalState::GoalState(const std::string &_name, FoosballDemoPlugin *_plugin,
+  int *_score)
+  : State(_name, _plugin),
+    score(_score)
+{
+}
+
+/////////////////////////////////////////////////
+void GoalState::Initialize()
 {
   State::Initialize();
-  this->plugin->scoreA++;
+  (*this->score)++;
 }
 
 /////////////////////////////////////////////////
-void GoalAState::Update()
-{
-  // After some time, go to kickoff mode.
-  common::Time elapsed = this->timer.GetElapsed();
-  if (elapsed.sec > 2)
-    this->plugin->SetCurrentState(this->plugin->kickoffState);
-}
-
-/////////////////////////////////////////////////
-void GoalBState::Initialize()
-{
-  State::Initialize();
-  this->plugin->scoreB++;
-}
-
-/////////////////////////////////////////////////
-void GoalBState::Update()
+void GoalState::Update()
 {
   // After some time, go to kickoff mode.
   common::Time elapsed = this->timer.GetElapsed();
@@ -95,7 +88,8 @@ void PlayState::Initialize()
   State::Initialize();
 
   // Launch the ball and start the game!
-  math::Vector3 newVel(0, 0.5, -0.2);
+  double randomOffset = math::Rand::GetDblUniform(-0.1, 0.1);
+  math::Vector3 newVel(randomOffset, 0.5, -0.2);
   this->plugin->ball->SetLinearVel(newVel);
 }
 

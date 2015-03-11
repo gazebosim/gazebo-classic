@@ -90,32 +90,23 @@ namespace gazebo
     public: virtual void Update();
   };
 
-  /// \class GoalAState FoosballDemoPlugin.hh
-  /// \brief State for representing a goal scored by team "A".
-  class GoalAState : public State<FoosballDemoPlugin>
+  /// \class GoalState FoosballDemoPlugin.hh
+  /// \brief State for representing a goal scored by a team.
+  class GoalState : public State<FoosballDemoPlugin>
   {
-    /// Inherit constructor from State.
-    using State<FoosballDemoPlugin>::State;
+    /// \brief Class constructor.
+    /// \param _score Pointer to the variable that stores the number of goals.
+    public: GoalState(const std::string &_name, FoosballDemoPlugin *_plugin,
+                      int *_score);
 
     /// Documentation inherited.
     public: virtual void Initialize();
 
     // Documentation inherited
     public: virtual void Update();
-  };
 
-  /// \class GoalBState FoosballDemoPlugin.hh
-  /// \brief State for representing a goal scored by team "B".
-  class GoalBState : public State<FoosballDemoPlugin>
-  {
-    /// Inherit constructor from State.
-    using State<FoosballDemoPlugin>::State;
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
+    /// \brief Pointer to the score managed by this object.
+    private: int *score;
   };
 
   /// \class playState FoosballDemoPlugin.hh
@@ -224,10 +215,10 @@ namespace gazebo
     public: KickoffState kickoffState = {"kickoff", this};
 
     /// \brief State to represent a goal scored by team "A".
-    public: GoalAState goalAState = {"goalA", this};
+    public: GoalState goalAState = {"goalA", this, &this->scoreA};
 
     /// \brief State to represent a goal scored by team "B".
-    public: GoalBState goalBState = {"goalB", this};
+    public: GoalState goalBState = {"goalB", this, &this->scoreB};
 
     /// \brief State to represent the regular foosball play.
     public: PlayState playState = {"play", this};
