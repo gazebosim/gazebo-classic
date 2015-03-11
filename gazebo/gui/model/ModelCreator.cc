@@ -1564,6 +1564,11 @@ void ModelCreator::GenerateSDF()
     this->modelPose.pos = mid;
   }
 
+    for (auto &linksIt : this->allLinks)
+    {
+      LinkData *link = linksIt.second;
+      link->SetPose(link->linkVisual->GetWorldPose() - this->modelPose);
+    }
 
   // generate canonical link sdf first.
   if (!this->canonicalLink.empty())
@@ -1731,9 +1736,9 @@ void ModelCreator::Update()
   for (auto &linksIt : this->allLinks)
   {
     LinkData *link = linksIt.second;
-    if (link->GetPose() != (link->linkVisual->GetWorldPose()-this->modelPose))
+    if (link->GetPose() != link->linkVisual->GetWorldPose() - this->modelPose)
     {
-      link->SetPose(link->linkVisual->GetWorldPose()-this->modelPose);
+      link->SetPose(link->linkVisual->GetWorldPose() - this->modelPose);
       this->ModelChanged();
     }
     for (auto &scaleIt : this->linkScaleUpdate)
