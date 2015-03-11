@@ -645,7 +645,6 @@ void LinkData::OnAddCollision(const std::string &_name)
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     collisionVis->Load(collisionElem);
     collisionVis->SetMaterial("Gazebo/Orange");
-    this->linkVisual->GetScene()->AddVisual(collisionVis);
   }
 
   msgs::Visual visualMsg = msgs::VisualFromSDF(collisionVis->GetSDF());

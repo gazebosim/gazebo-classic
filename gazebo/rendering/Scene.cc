@@ -2786,7 +2786,7 @@ void Scene::AddVisual(VisualPtr _vis)
   if (this->dataPtr->visuals.find(_vis->GetId()) !=
       this->dataPtr->visuals.end())
   {
-    gzerr << "Duplicate visuals detected[" << _vis->GetName() << "]\n";
+    gzwarn << "Duplicate visuals detected[" << _vis->GetName() << "]\n";
   }
 
   this->dataPtr->visuals[_vis->GetId()] = _vis;
