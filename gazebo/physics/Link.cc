@@ -1355,9 +1355,9 @@ msgs::Visual Link::GetVisualMessage(const std::string &_name) const
 void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
 {
   math::Vector3 pos = math::Vector3::Zero;
-  if (_msg->has_force_position())
+  if (_msg->has_force_offset())
   {
-    pos = msgs::Convert(_msg->force_position());
+    pos = msgs::Convert(_msg->force_offset());
   }
   if (_msg->has_force())
   {

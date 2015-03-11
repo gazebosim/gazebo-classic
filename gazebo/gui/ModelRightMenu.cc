@@ -49,7 +49,7 @@ ModelRightMenu::ModelRightMenu()
   connect(this->editAct, SIGNAL(triggered()), this, SLOT(OnEdit()));
 
   this->applyWrenchAct = new QAction(tr("Apply Force/Torque"), this);
-  this->applyWrenchAct->setStatusTip(tr("Apply force and torque to the model"));
+  this->applyWrenchAct->setStatusTip(tr("Apply force and torque to a link"));
   connect(this->applyWrenchAct, SIGNAL(triggered()), this,
       SLOT(OnApplyWrench()));
 
@@ -145,16 +145,12 @@ bool ModelRightMenu::OnKeyRelease(const common::KeyEvent &_event)
 ModelRightMenu::~ModelRightMenu()
 {
   this->node->Fini();
-  delete this->applyWrenchDialog;
-  this->applyWrenchDialog = NULL;
 }
 
 /////////////////////////////////////////////////
 void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     EntityTypes _type)
 {
-  this->entityType = _type;
-
   if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
   {
     this->entityName = _entityName.substr(0, _entityName.find("::"));
@@ -251,7 +247,7 @@ void ModelRightMenu::OnEdit()
 /////////////////////////////////////////////////
 void ModelRightMenu::OnApplyWrench()
 {
-  this->applyWrenchDialog = new ApplyWrenchDialog();
+  ApplyWrenchDialog *applyWrenchDialog = new ApplyWrenchDialog();
 
   rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
       GetVisual(this->entityName);
@@ -263,24 +259,19 @@ void ModelRightMenu::OnApplyWrench()
   }
 
   std::string modelName, linkName;
-  if (this->entityType == MODEL && vis == vis->GetRootVisual())
+  if (vis == vis->GetRootVisual())
   {
     modelName = this->entityName;
+    // If model selected just take the first link
     linkName = vis->GetChild(0)->GetName();
   }
-  else if (this->entityType == LINK && vis != vis->GetRootVisual())
+  else
   {
     modelName = vis->GetRootVisual()->GetName();
     linkName = this->entityName;
   }
-  else
-  {
-    gzerr << "Entity [" << this->entityName
-          << "]'s type does not correspond to entity visual." << std::endl;
-    return;
-  }
 
-  this->applyWrenchDialog->Init(modelName, linkName);
+  applyWrenchDialog->Init(modelName, linkName);
 }
 
 /////////////////////////////////////////////////

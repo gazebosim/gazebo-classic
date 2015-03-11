@@ -671,7 +671,7 @@ void ApplyWrenchDialog::OnApplyAll()
   msgs::Wrench msg;
   msgs::Set(msg.mutable_force(), this->dataPtr->forceVector);
   msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector);
-  msgs::Set(msg.mutable_force_position(), this->dataPtr->forcePosVector);
+  msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector);
 
   this->dataPtr->wrenchPub->Publish(msg);
 }
@@ -682,7 +682,7 @@ void ApplyWrenchDialog::OnApplyForce()
   msgs::Wrench msg;
   msgs::Set(msg.mutable_force(), this->dataPtr->forceVector);
   msgs::Set(msg.mutable_torque(), math::Vector3::Zero);
-  msgs::Set(msg.mutable_force_position(), this->dataPtr->forcePosVector);
+  msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector);
 
   this->dataPtr->wrenchPub->Publish(msg);
 }

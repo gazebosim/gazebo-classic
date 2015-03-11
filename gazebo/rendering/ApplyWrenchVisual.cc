@@ -47,6 +47,9 @@ void ApplyWrenchVisual::Load()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
+  dPtr->selectedMaterial = "Gazebo/OrangeTransparentOverlay";
+  dPtr->unselectedMaterial = "Gazebo/DarkOrangeTransparentOverlay";
+
   // Force visual
   dPtr->forceVisual.reset(new rendering::Visual(
       this->GetName() + "__FORCE_VISUAL__", shared_from_this()));
@@ -83,12 +86,12 @@ void ApplyWrenchVisual::Load()
   headNode->attachObject(headObj);
   headNode->setPosition(0, 0, 0.24);
 
-  dPtr->forceVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
+  dPtr->forceVisual->SetMaterial(dPtr->selectedMaterial);
   dPtr->forceVisual->GetSceneNode()->setInheritScale(false);
 
   // Force text
   common::Color matAmbient, matDiffuse, matSpecular, matEmissive;
-  rendering::Material::GetMaterialAsColor("Gazebo/OrangeTransparentOverlay",
+  rendering::Material::GetMaterialAsColor(dPtr->selectedMaterial,
       matAmbient, matDiffuse, matSpecular, matEmissive);
   dPtr->forceText = new MovableText();
   dPtr->forceText->Load(this->GetName()+"__FORCE_TEXT__",
@@ -145,13 +148,13 @@ void ApplyWrenchVisual::Load()
   torqueHeadNode->setOrientation(
       Ogre::Quaternion(quat.w, quat.x, quat.y, quat.z));
 
-  dPtr->torqueVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
+  dPtr->torqueVisual->SetMaterial(dPtr->selectedMaterial);
   dPtr->torqueVisual->GetSceneNode()->setInheritScale(false);
 
   // Torque line
   dPtr->torqueLine = dPtr->torqueVisual->
       CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  dPtr->torqueLine->setMaterial("Gazebo/OrangeTransparentOverlay");
+  dPtr->torqueLine->setMaterial(dPtr->selectedMaterial);
   dPtr->torqueLine->AddPoint(0, 0, 0);
   dPtr->torqueLine->AddPoint(0, 0, 0.1);
 
@@ -265,8 +268,8 @@ void ApplyWrenchVisual::SetMode(std::string _mode)
 
   if (_mode == "force")
   {
-    dPtr->forceVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
-    dPtr->torqueVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
+    dPtr->forceVisual->SetMaterial(dPtr->selectedMaterial);
+    dPtr->torqueVisual->SetMaterial(dPtr->unselectedMaterial);
 
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
@@ -275,8 +278,8 @@ void ApplyWrenchVisual::SetMode(std::string _mode)
   }
   else if (_mode == "torque")
   {
-    dPtr->torqueVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
-    dPtr->forceVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
+    dPtr->torqueVisual->SetMaterial(dPtr->selectedMaterial);
+    dPtr->forceVisual->SetMaterial(dPtr->unselectedMaterial);
 
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
@@ -286,8 +289,8 @@ void ApplyWrenchVisual::SetMode(std::string _mode)
   else if (_mode == "none")
   {
     // Dark visuals
-    dPtr->forceVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
-    dPtr->torqueVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
+    dPtr->forceVisual->SetMaterial(dPtr->unselectedMaterial);
+    dPtr->torqueVisual->SetMaterial(dPtr->unselectedMaterial);
     // hide rot
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, false);
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, false);
@@ -473,9 +476,9 @@ void ApplyWrenchVisual::SetVisible(bool _visible, bool _cascade)
       dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
       dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
       if (dPtr->mode == "force")
-        dPtr->forceVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
+        dPtr->forceVisual->SetMaterial(dPtr->selectedMaterial);
       else
-        dPtr->torqueVisual->SetMaterial("Gazebo/OrangeTransparentOverlay");
+        dPtr->torqueVisual->SetMaterial(dPtr->selectedMaterial);
     }
   }
   else
@@ -491,8 +494,8 @@ void ApplyWrenchVisual::SetVisible(bool _visible, bool _cascade)
     }
     else
     {
-      dPtr->forceVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
-      dPtr->torqueVisual->SetMaterial("Gazebo/DarkOrangeTransparentOverlay");
+      dPtr->forceVisual->SetMaterial(dPtr->unselectedMaterial);
+      dPtr->torqueVisual->SetMaterial(dPtr->unselectedMaterial);
     }
   }
 }

@@ -75,7 +75,7 @@ namespace gazebo
       /// \brief QT callback when edit has been selected.
       private slots: void OnEdit();
 
-      /// \brief QT callback when apply force has been selected.
+      /// \brief QT callback when apply force/torque has been selected.
       private slots: void OnApplyWrench();
 
       /// \brief QT callback when delete has been selected.
@@ -116,12 +116,6 @@ namespace gazebo
 
       /// \brief Action for applying force and torque to a model.
       private: QAction *applyWrenchAct;
-
-      /// \brief TODO
-      private: ApplyWrenchDialog *applyWrenchDialog;
-
-      /// \brief TODO
-      private: EntityTypes entityType;
 
       /// \brief Action for snapping an object to another object below the
       /// first.

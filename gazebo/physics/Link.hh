@@ -576,7 +576,7 @@ namespace gazebo
       private: void UpdateVisualSDF();
 
       /// \brief Called when a new wrench message arrives. The wrench's force,
-      /// torque and force_position are described in the link frame,
+      /// torque and force offset are described in the link frame,
       /// \param[in] _msg The message to set the wrench from.
       private: void OnWrenchMsg(ConstWrenchPtr &_msg);
 

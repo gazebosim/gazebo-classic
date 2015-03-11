@@ -29,6 +29,12 @@ namespace gazebo
     /// \brief Private data for the Apply Wrench Visual class.
     class ApplyWrenchVisualPrivate : public VisualPrivate
     {
+      /// \brief Material for the current mode.
+      public: std::string selectedMaterial;
+
+      /// \brief Material for the unselected mode.
+      public: std::string unselectedMaterial;
+
       /// \brief Arrow representing force.
       public: VisualPtr forceVisual;
 
