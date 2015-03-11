@@ -432,6 +432,7 @@ void SelectionObj::CreateRotateVisual()
   dPtr->rotVisual.reset(new rendering::Visual(
       this->GetName() + "__SELECTION_OBJ_ROT__",
       shared_from_this()));
+  dPtr->rotVisual->Load();
 
   dPtr->rotXVisual.reset(
       new rendering::Visual(
