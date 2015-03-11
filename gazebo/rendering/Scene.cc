@@ -204,8 +204,8 @@ void Scene::Clear()
   this->dataPtr->terrain = NULL;
 
   while (!this->dataPtr->visuals.empty())
-    if (this->dataPtr->visuals.begin()->second)
-      this->RemoveVisual(this->dataPtr->visuals.begin()->second);
+    this->RemoveVisual(this->dataPtr->visuals.begin()->first);
+
   this->dataPtr->visuals.clear();
 
   if (this->dataPtr->worldVisual)
@@ -2793,19 +2793,21 @@ void Scene::AddVisual(VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
-void Scene::RemoveVisual(VisualPtr _vis)
+void Scene::RemoveVisual(uint32_t _id)
 {
-  if (_vis)
+  // Delete the visual
+  auto iter = this->dataPtr->visuals.find(_id);
+  if (iter != this->dataPtr->visuals.end())
   {
+    VisualPtr vis = iter->second;
     // Remove all projectors attached to the visual
-    std::map<std::string, Projector *>::iterator piter =
-      this->dataPtr->projectors.begin();
+    auto piter = this->dataPtr->projectors.begin();
     while (piter != this->dataPtr->projectors.end())
     {
       // Check to see if the projector is a child of the visual that is
       // being removed.
       if (piter->second->GetParent()->GetRootVisual()->GetName() ==
-          _vis->GetRootVisual()->GetName())
+          vis->GetRootVisual()->GetName())
       {
         delete piter->second;
         this->dataPtr->projectors.erase(piter++);
@@ -2814,17 +2816,32 @@ void Scene::RemoveVisual(VisualPtr _vis)
         ++piter;
     }
 
-    // Delete the visual
-    Visual_M::iterator iter = this->dataPtr->visuals.find(_vis->GetId());
-    if (iter != this->dataPtr->visuals.end())
-    {
-      iter->second->Fini();
-      this->dataPtr->visuals.erase(iter);
-    }
-
+    vis->Fini();
+    this->dataPtr->visuals.erase(iter);
     if (this->dataPtr->selectedVis && this->dataPtr->selectedVis->GetId() ==
-        _vis->GetId())
+        vis->GetId())
       this->dataPtr->selectedVis.reset();
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::RemoveVisual(VisualPtr _vis)
+{
+  this->RemoveVisual(_vis->GetId());
+}
+
+/////////////////////////////////////////////////
+void Scene::SetVisualId(VisualPtr _vis, uint32_t _id)
+{
+  if (!_vis)
+    return;
+
+  auto iter = this->dataPtr->visuals.find(_vis->GetId());
+  if (iter != this->dataPtr->visuals.end())
+  {
+    this->dataPtr->visuals.erase(_vis->GetId());
+    this->dataPtr->visuals[_id] = _vis;
+    _vis->SetId(_id);
   }
 }
 

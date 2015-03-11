@@ -3000,6 +3000,11 @@ uint32_t Visual::GetId() const
 //////////////////////////////////////////////////
 void Visual::SetId(uint32_t _id)
 {
+  if (this->dataPtr->id == _id)
+    return;
+
+  // set new id and also let the scene know that the id has changed.
+  this->dataPtr->scene->SetVisualId(shared_from_this(), _id);
   this->dataPtr->id = _id;
 }
 
