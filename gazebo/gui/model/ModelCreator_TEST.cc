@@ -59,6 +59,9 @@ void ModelCreator_TEST::SaveState()
 
   // Inserting a link and it still is never saved
   modelCreator->AddShape(gui::ModelCreator::LINK_CYLINDER);
+  gazebo::rendering::VisualPtr cylinder =
+      scene->GetVisual("ModelPreview_0::link_0");
+  QVERIFY(cylinder != NULL);
   QCOMPARE(modelCreator->GetCurrentSaveState(),
       gui::ModelCreator::NEVER_SAVED);
 
@@ -69,6 +72,33 @@ void ModelCreator_TEST::SaveState()
 
   // Insert another link to have unsaved changes
   modelCreator->AddShape(gui::ModelCreator::LINK_BOX);
+  QCOMPARE(modelCreator->GetCurrentSaveState(),
+      gui::ModelCreator::UNSAVED_CHANGES);
+
+  // Save all changes
+  modelCreator->SaveModelFiles();
+  QCOMPARE(modelCreator->GetCurrentSaveState(),
+      gui::ModelCreator::ALL_SAVED);
+
+  // Move a link to have unsaved changes
+  cylinder->SetWorldPose(math::Pose(1, 2, 3, 4, 5, 6));
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+  QCOMPARE(modelCreator->GetCurrentSaveState(),
+      gui::ModelCreator::UNSAVED_CHANGES);
+
+  // Save all changes
+  modelCreator->SaveModelFiles();
+  QCOMPARE(modelCreator->GetCurrentSaveState(),
+      gui::ModelCreator::ALL_SAVED);
+
+  // Remove a link to have unsaved changes
+  modelCreator->RemoveLink(cylinder->GetName());
   QCOMPARE(modelCreator->GetCurrentSaveState(),
       gui::ModelCreator::UNSAVED_CHANGES);
 
