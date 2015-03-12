@@ -207,7 +207,7 @@ namespace gazebo
       public: JointMaker *GetJointMaker() const;
 
       /// \brief Get current save state.
-      /// \return Current saave state.
+      /// \return Current save state.
       public: enum SaveState GetCurrentSaveState() const;
 
       /// \brief Add a link to the model
