@@ -78,6 +78,11 @@
     1. Hide time panel inside editor and keep main window's paused state.
         * [Pull request #1500](https://bitbucket.org/osrf/gazebo/pull-request/1500)
 
+    1. Fixed pose issues and added ModelCreator_TEST.
+        * [Pull request #1509](https://bitbucket.org/osrf/gazebo/pull-request/1509)
+        * [Issue #1497](https://bitbucket.org/osrf/gazebo/issue/1497)
+        * [Issue #1509](https://bitbucket.org/osrf/gazebo/issue/1509)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
