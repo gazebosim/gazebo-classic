@@ -26,11 +26,13 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/ColladaLoader.hh"
+#include "gazebo/common/ColladaExporter.hh"
 #include "gazebo/common/STLLoader.hh"
 #include "gazebo/gazebo_config.h"
 
 #ifdef HAVE_GTS
   #include "gazebo/common/MeshCSG.hh"
+  #include "gazebo/common/GTSMeshUtils.hh"
 #endif
 
 #include "gazebo/common/MeshManager.hh"
@@ -42,6 +44,7 @@ using namespace common;
 MeshManager::MeshManager()
 {
   this->colladaLoader = new ColladaLoader();
+  this->colladaExporter = new ColladaExporter();
   this->stlLoader = new STLLoader();
 
   // Create some basic shapes
@@ -73,6 +76,7 @@ MeshManager::MeshManager()
 MeshManager::~MeshManager()
 {
   delete this->colladaLoader;
+  delete this->colladaExporter;
   delete this->stlLoader;
   std::map<std::string, Mesh*>::iterator iter;
   for (iter = this->meshes.begin(); iter != this->meshes.end(); ++iter)
@@ -156,6 +160,20 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     gzerr << "Unable to find file[" << _filename << "]\n";
 
   return mesh;
+}
+
+//////////////////////////////////////////////////
+void MeshManager::Export(const Mesh *_mesh, const std::string &_filename,
+    const std::string &_extension, bool _exportTextures)
+{
+  if (_extension == "dae")
+  {
+    this->colladaExporter->Export(_mesh, _filename, _exportTextures);
+  }
+  else
+  {
+    gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
+  }
 }
 
 //////////////////////////////////////////////////
@@ -460,6 +478,130 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   for (i = 0; i < 36; i++)
     subMesh->AddIndex(ind[i]);
 
+  subMesh->RecalculateNormals();
+}
+
+//////////////////////////////////////////////////
+void MeshManager::CreateExtrudedPolyline(const std::string &_name,
+    const std::vector<math::Vector2d> &_vertices,
+    const double &_height, const math::Vector2d & /*_uvCoords*/)
+{
+  if (this->HasMesh(_name))
+  {
+    return;
+  }
+
+  int i;
+  int numSides = _vertices.size();
+
+  Mesh *mesh = new Mesh();
+  mesh->SetName(_name);
+  this->meshes.insert(std::make_pair(_name, mesh));
+
+  SubMesh *subMesh = new SubMesh();
+  mesh->AddSubMesh(subMesh);
+
+  #if HAVE_GTS
+  {
+    if (!GTSMeshUtils::CreateExtrudedPolyline(_vertices, _height, subMesh))
+    {
+      gzerr << "Unable to create extruded polyline.\n";
+      delete mesh;
+      return;
+    }
+  }
+  #else
+  {
+    gzerr << "GTS library not found.\n" <<
+             "Polylines rendered may be incorrect, if concave\n";
+
+    // Add the vertices
+    for (i = 0; i < numSides; ++i)
+    {
+      subMesh->AddVertex(_vertices[i].x, _vertices[i].y, 0.0);
+      subMesh->AddVertex(_vertices[i].x, _vertices[i].y, _height);
+    }
+
+    // Euler's Formula: numFaces = numEdges - numVertices + 2
+    //                           = numSides + 2
+    // # of SideFaces = numFaces - (upper face + lower face)
+    //                = numFaces - 2
+    //                = numSides
+
+    // for lower face
+    int startVert = 0;
+    int endVert = numSides * 2 - 2;
+    subMesh->AddIndex(startVert);
+    startVert += 2;
+    subMesh->AddIndex(startVert);
+    subMesh->AddIndex(endVert);
+    for (i = 1; i < numSides-2; ++i)
+    {
+      if (i%2)
+      {
+        subMesh->AddIndex(startVert);
+        startVert += 2;
+        subMesh->AddIndex(startVert);
+        subMesh->AddIndex(endVert);
+      }
+      else
+      {
+        subMesh->AddIndex(endVert);
+        endVert -= 2;
+        subMesh->AddIndex(startVert);
+        subMesh->AddIndex(endVert);
+      }
+    }
+
+    // for upper face
+    startVert = 1;
+    endVert = numSides*2-1;
+    subMesh->AddIndex(startVert);
+    startVert += 2;
+    subMesh->AddIndex(endVert);
+    subMesh->AddIndex(startVert);
+    for (i = 1; i < numSides-2; ++i)
+    {
+      if (!i%2)
+      {
+        subMesh->AddIndex(startVert);
+        startVert += 2;
+        subMesh->AddIndex(startVert);
+        subMesh->AddIndex(endVert);
+      }
+      else
+      {
+        subMesh->AddIndex(endVert);
+        endVert -= 2;
+        subMesh->AddIndex(endVert);
+        subMesh->AddIndex(startVert);
+      }
+    }
+  }
+  #endif
+
+  // for each sideface
+  for (i = 0; i < numSides; ++i)
+  {
+    subMesh->AddVertex(_vertices[i].x, _vertices[i].y, 0.0);
+    subMesh->AddVertex(_vertices[i].x, _vertices[i].y, _height);
+  }
+  subMesh->AddVertex(_vertices[0].x, _vertices[0].y, 0.0);
+  subMesh->AddVertex(_vertices[0].x, _vertices[0].y, _height);
+
+  for (i = 0; i < numSides; ++i)
+  {
+    subMesh->AddIndex(i*2+numSides*2);
+    subMesh->AddIndex(i*2+1+numSides*2);
+    subMesh->AddIndex(i*2+2+numSides*2);
+
+    subMesh->AddIndex(i*2+2+numSides*2);
+    subMesh->AddIndex(i*2+1+numSides*2);
+    subMesh->AddIndex(i*2+3+numSides*2);
+  }
+
+  if (subMesh->GetNormalCount() != subMesh->GetVertexCount())
+    subMesh->SetNormalCount(subMesh->GetVertexCount());
   subMesh->RecalculateNormals();
 }
 
@@ -981,3 +1123,4 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
   this->meshes.insert(std::make_pair(_name, mesh));
 }
 #endif
+

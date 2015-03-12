@@ -23,7 +23,7 @@
 
 #include <string>
 
-#include <gazebo/gazebo.hh>
+#include <gazebo/common/Plugin.hh>
 #include <gazebo/sensors/sensors.hh>
 #include "gazebo/util/system.hh"
 

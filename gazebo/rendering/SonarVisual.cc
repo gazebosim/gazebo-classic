@@ -43,22 +43,7 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
   dPtr->sonarSub = dPtr->node->Subscribe(_topicName,
       &SonarVisual::OnMsg, this, true);
 
-  dPtr->sonarRay = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  dPtr->sonarRay->setMaterial("Gazebo/RedGlow");
-  dPtr->sonarRay->AddPoint(0, 0, 0);
-  dPtr->sonarRay->AddPoint(0, 0, 0);
-
-  // Make sure the meshes are in Ogre
-  this->InsertMesh("unit_cone");
-  Ogre::MovableObject *coneObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__SONAR_CONE__", "unit_cone"));
-  ((Ogre::Entity*)coneObj)->setMaterialName("Gazebo/BlueLaser");
-
-  dPtr->coneNode =
-      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SONAR_CONE");
-  dPtr->coneNode->attachObject(coneObj);
-  dPtr->coneNode->setPosition(0, 0, 0);
+  dPtr->sonarRay = NULL;
 
   dPtr->connections.push_back(
       event::Events::ConnectPreRender(
@@ -79,6 +64,27 @@ SonarVisual::~SonarVisual()
 void SonarVisual::Load()
 {
   Visual::Load();
+
+  SonarVisualPrivate *dPtr =
+      reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
+
+  dPtr->sonarRay = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
+  dPtr->sonarRay->setMaterial("Gazebo/RedGlow");
+  dPtr->sonarRay->AddPoint(0, 0, 0);
+  dPtr->sonarRay->AddPoint(0, 0, 0);
+
+  // Make sure the meshes are in Ogre
+  this->InsertMesh("unit_cone");
+  Ogre::MovableObject *coneObj =
+    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+          this->GetName()+"__SONAR_CONE__", "unit_cone"));
+  ((Ogre::Entity*)coneObj)->setMaterialName("Gazebo/BlueLaser");
+
+  dPtr->coneNode =
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SONAR_CONE");
+  dPtr->coneNode->attachObject(coneObj);
+  dPtr->coneNode->setPosition(0, 0, 0);
+
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   this->SetCastShadows(false);
 }

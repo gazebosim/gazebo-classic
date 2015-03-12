@@ -25,6 +25,8 @@ namespace gazebo
 {
   namespace physics
   {
+    class SimbodyMesh;
+
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_simbody Simbody Physics
     /// \{
@@ -43,6 +45,9 @@ namespace gazebo
 
       // Documentation inherited
       protected: virtual void Init();
+
+      /// \brief Simbody collision mesh helper class
+      private: SimbodyMesh *simbodyMesh;
     };
     /// \}
   }

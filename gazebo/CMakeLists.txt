@@ -3,13 +3,13 @@ include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
-  ${SDF_INCLUDE_DIRS}
+  ${SDFormat_INCLUDE_DIRS}
 )
 
 link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
-  ${SDF_LIBRARY_DIRS}
+  ${SDFormat_LIBRARY_DIRS}
   ${PROJECT_BINARY_DIR}/test
 )
 

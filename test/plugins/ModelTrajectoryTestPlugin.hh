@@ -17,10 +17,9 @@
 #ifndef _GAZEBO_MODEL_TRAJECTORY_TEST_PLUGIN_HH_
 #define _GAZEBO_MODEL_TRAJECTORY_TEST_PLUGIN_HH_
 
-#include "gazebo/common/common.hh"
+#include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/gazebo.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

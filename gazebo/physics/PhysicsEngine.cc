@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The base class for all physics engines
- * Author: Nate Koenig
- */
-
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -192,21 +188,6 @@ void PhysicsEngine::SetWorldERP(double /*_erp*/)
 
 //////////////////////////////////////////////////
 void PhysicsEngine::SetAutoDisableFlag(bool /*_autoDisable*/)
-{
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetSORPGSPreconIters(unsigned int /*_iters*/)
-{
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetSORPGSIters(unsigned int /*_iters*/)
-{
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetSORPGSW(double /*_w*/)
 {
 }
 

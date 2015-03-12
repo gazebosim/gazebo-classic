@@ -1,17 +1,29 @@
 #!/usr/bin/env ruby
 
+require 'rubygems'
 require 'tmpdir'
+
+begin
+  require 'zip'
+rescue LoadError
+  puts "Requires the rubyzip gem. To install:"
+  puts "    gem install rubyzip"
+  exit
+end
 
 #################################################
 # Display help information
 def help
-  puts "gzprop -- Create a model tarball for upload to thepropshop.org\n"
+  puts "gzprop -- Create a model zip for upload to thepropshop.org\n"
   puts "\n"
-  puts "'gzprop' <model_file>\n"
+  puts "'gzprop' <model_sdf_file>\n"
   puts "\n"
-  puts "Package an existing model directory into a tarball suitable"
-  puts "for upload to thepropshop.org. A working instanstance of"
-  puts "Gazebo >3.0 is required.\n"
+  puts "Package an existing model SDF, materials, and meshes\n"
+  puts "into a zip suitable for upload to thepropshop.org. A \n"
+  puts "working instanstance of Gazebo >4.0 is required.\n"
+  puts "\n"
+  puts "Example Usage:\n"
+  puts "  $ gzprop ~/.gazebo/models/ground_plane/model.sdf\n"
   puts "\n"
 end
 
@@ -28,12 +40,10 @@ end
 modelFile = File.absolute_path(ARGV[0])
 
 modelParts = modelFile.split('/')
-modelDir = modelParts[0, modelParts.size()-1].join('/')
+modelDir = modelParts[0, modelParts.size() - 1].join('/')
 
 # Make sure there is a model.sdf file in the model directory
-if !File.exists?(modelFile)
-  abort("Missing model file [#{modelFile}]")
-end
+abort("Missing model file [#{modelFile}]") unless File.exist?(modelFile)
 
 # Get the name of the model (last part of the directory name)
 modelName = modelParts[-2]
@@ -41,25 +51,31 @@ modelName = modelParts[-2]
 ## Make a temporary directory
 Dir.mktmpdir { |dir|
 
-  metaDir = File.join(dir, modelName, "meta")
+  metaDir = File.join(dir, "meta")
 
   # Copy the model information into a temp directory
-  `cp -r "#{modelDir}" #{dir}`
- 
+  FileUtils.cp_r Dir[modelDir + '/*'], dir
+
   # Create the meta directory
-  if RUBY_VERSION < "1.9"
-    Dir.mkdir(metaDir)
-  else
-    Dir.mkdir(metaDir)
-  end
+  Dir.mkdir(metaDir)
 
   # Create a set of images
   `gzserver -s libModelPropShop.so worlds/blank.world --propshop-save "#{metaDir}" --propshop-model "#{modelFile}"`
-  
-  # Create a tarball for the model
-  `tar czvf #{modelName}.tar.gz -C #{dir} "#{modelName}"`
+
+  # Create a zip file for the model
+  zipFilename = File.join(Dir.pwd, modelName + '.zip')
+  if !File.exists?(zipFilename)
+    Zip::File.open(zipFilename, Zip::File::CREATE) { |zipfile|
+      Dir[File.join(dir, '**', '**')].each do |file|
+        zipfile.add(file.sub(dir + '/', ''), file)
+      end
+    }
+  else
+    puts "Error: #{zipFilename} already exists. Please move or rename."
+    exit
+  end
 }
 
 # Completion message
 puts "Propshop model created.\n"
-puts "Upload [#{modelName}.tar.gz] to thepropshop.org"
+puts "Upload [#{modelName}.zip] to thepropshop.org"

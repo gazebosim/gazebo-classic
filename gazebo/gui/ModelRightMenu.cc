@@ -139,6 +139,7 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   QMenu menu;
   menu.addAction(this->moveToAct);
   menu.addAction(this->followAct);
+
   // menu.addAction(this->snapBelowAct);
 
   // Create the view menu
@@ -155,6 +156,13 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
       (*iter)->action->setChecked((*iter)->globalEnable);
     else
       (*iter)->action->setChecked(modelIter->second);
+  }
+
+  if (g_copyAct && g_pasteAct)
+  {
+    menu.addSeparator();
+    menu.addAction(g_copyAct);
+    menu.addAction(g_pasteAct);
   }
 
   menu.addSeparator();

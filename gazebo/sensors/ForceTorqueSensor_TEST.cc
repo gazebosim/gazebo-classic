@@ -17,10 +17,14 @@
 
 #include <gtest/gtest.h>
 #include "test/ServerFixture.hh"
+#include "test/integration/helper_physics_generator.hh"
+
 
 using namespace gazebo;
-class ForceTorqueSensor_TEST : public ServerFixture
+class ForceTorqueSensor_TEST : public ServerFixture,
+                               public testing::WithParamInterface<const char*>
 {
+    public: void ForceTorqueTest(const std::string &_physicsEngine);
 };
 
 static std::string forceTorqueSensorString =
@@ -33,9 +37,9 @@ static std::string forceTorqueSensorString =
 
 /////////////////////////////////////////////////
 /// \brief Test Creation of a ForceTorque sensor
-TEST_F(ForceTorqueSensor_TEST, CreateForceTorque)
+void ForceTorqueSensor_TEST::ForceTorqueTest(const std::string &_physicsEngine)
 {
-  Load("worlds/pioneer2dx.world", true);
+  Load("worlds/pioneer2dx.world", true, _physicsEngine);
 
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
@@ -71,6 +75,16 @@ TEST_F(ForceTorqueSensor_TEST, CreateForceTorque)
 
   EXPECT_TRUE(sensor->IsActive());
 }
+
+/////////////////////////////////////////////////
+TEST_P(ForceTorqueSensor_TEST, ForceTorqueTest)
+{
+  ForceTorqueTest(GetParam());
+}
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines,
+                        ForceTorqueSensor_TEST,
+                        PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

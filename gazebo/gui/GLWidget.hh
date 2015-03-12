@@ -143,9 +143,6 @@ namespace gazebo
 
       private: void ClearSelection();
 
-      /// \brief Copy an object by name
-      private: void Paste(const std::string &_object);
-
       private: void PushHistory(const std::string &_visName,
                                 const math::Pose &_pose);
       private: void PopHistory();
@@ -153,6 +150,20 @@ namespace gazebo
       /// \brief Set the selected visual, which will highlight the
       /// visual
       private: void SetSelectedVisual(rendering::VisualPtr _vis);
+
+      /// \brief Copy an entity by name
+      /// \param[in] _name Name of entity to be copied.
+      private: void Copy(const std::string &_name);
+
+      /// \brief Paste an entity by name
+      /// \param[in] _name Name of entity to be pasted.
+      private: void Paste(const std::string &_name);
+
+      /// \brief Qt callback when the copy action is triggered.
+      private slots: void OnCopy();
+
+      /// \brief Qt callback when the paste action is triggered.
+      private slots: void OnPaste();
 
       private: int windowId;
 
@@ -176,6 +187,9 @@ namespace gazebo
       private: SpotLightMaker spotLightMaker;
       private: DirectionalLightMaker directionalLightMaker;
 
+      /// \brief Light maker
+      private: LightMaker lightMaker;
+
       private: rendering::VisualPtr hoverVis, selectedVis;
 
       private: transport::NodePtr node;
@@ -191,6 +205,9 @@ namespace gazebo
       private: std::string state;
 
       private: std::list<std::pair<std::string, math::Pose> > moveHistory;
+
+      /// \brief Name of entity that is being copied.
+      private: std::string copyEntityName;
 
       /// \brief Flag that is set to true when GLWidget has responded to
       ///  OnCreateScene

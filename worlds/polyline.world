@@ -1,0 +1,137 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <model name="triangle">
+      <link name="link">
+        <inertial>
+          <pose>0 0 0.5 0 0 0</pose>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.1666</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.1666</iyy>
+            <iyz>0</iyz>
+            <izz>0.1666</izz>
+          </inertia>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <polyline>
+              <point>-0.5 -0.5</point>
+              <point>-0.5 0.5</point>
+              <point>0.5 0.5</point>
+              <point>0 0</point>
+              <point>0.5 -0.5</point>
+              <height>1</height>
+            </polyline>
+          </geometry>
+        </collision>
+
+        <visual name="triangle">
+          <geometry>
+            <polyline>
+              <point>-0.5 -0.5</point>
+              <point>-0.5 0.5</point>
+              <point>0.5 0.5</point>
+              <point>0 0</point>
+              <point>0.5 -0.5</point>
+              <height>1</height>
+            </polyline>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Red</name>
+            </script>
+          </material>
+        </visual>  
+      </link>
+    </model>
+
+    <model name="pentagon">
+      <static>true</static>
+      <pose>0 2 5 0 0 0</pose>
+      <link name="polyLine2">
+        <pose>1 1 0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <polyline>
+              <point>-3 5</point>
+              <point>3 3</point>
+              <point>3 -3</point>
+              <point>-3 -5</point>
+              <point>-5 0</point>
+              <height>4</height>
+            </polyline>
+          </geometry>
+        </collision>
+
+        <visual name="polyLineGeom2">
+          <geometry>
+            <polyline>
+              <point>-3 5</point>
+              <point>3 3</point>
+              <point>3 -3</point>
+              <point>-3 -5</point>
+              <point>-5 0</point>
+              <height>4</height>
+            </polyline>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Blue</name>
+            </script>
+          </material>
+        </visual>  
+      </link>
+    </model>
+
+    <model name="cube">
+      <pose>2 2 0 0 0 0</pose>
+      <static>true</static>
+      <link name="polyLine2">
+        <collision name="collision">
+          <geometry>
+            <polyline>
+              <point>0 0</point>
+              <point>0 1</point>
+              <point>1 1</point>
+              <point>1 0 </point>
+              <height>1.5</height>
+            </polyline>
+          </geometry>
+        </collision>
+
+        <visual name="polyLineGeom2">
+          <geometry>
+            <polyline>
+              <point>0 0</point>
+              <point>0 1</point>
+              <point>1 1</point>
+              <point>1 0 </point>
+              <height>1.5</height>
+            </polyline>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Yellow</name>
+            </script>
+          </material>
+        </visual>  
+      </link>
+    </model>
+  </world>
+</sdf>

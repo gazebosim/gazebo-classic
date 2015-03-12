@@ -256,7 +256,7 @@ double SimbodyScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 //////////////////////////////////////////////////
 double SimbodyScrewJoint::GetThreadPitch()
 {
-  if (this->physicsInitialized &&
+  if (!this->mobod.isEmptyHandle() && this->physicsInitialized &&
       this->simbodyPhysics->simbodyPhysicsInitialized)
   {
     // downcast mobod to screw mobod first
@@ -270,14 +270,6 @@ double SimbodyScrewJoint::GetThreadPitch()
            << " to initialize. Returning thread pitch from SDF.\n";
     return this->threadPitch;
   }
-}
-
-//////////////////////////////////////////////////
-void SimbodyScrewJoint::SetAttribute(const std::string &_key,
-  unsigned int _index,
-  const boost::any &_value)
-{
-  this->SetParam(_key, _index, _value);
 }
 
 //////////////////////////////////////////////////
@@ -304,13 +296,6 @@ bool SimbodyScrewJoint::SetParam(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-double SimbodyScrewJoint::GetAttribute(const std::string &_key,
-  unsigned int _index)
-{
-  return this->GetParam(_key, _index);
-}
-
-//////////////////////////////////////////////////
 double SimbodyScrewJoint::GetParam(const std::string &_key,
   unsigned int _index)
 {
@@ -330,6 +315,14 @@ bool SimbodyScrewJoint::SetHighStop(
   {
     if (this->physicsInitialized)
     {
+      // check if limitForce is initialized
+      if (this->limitForce[_index].isEmptyHandle())
+      {
+        gzerr << "child link is NULL, force element not initialized, "
+              << "SetHighStop failed. Please file a report on issue tracker.\n";
+        return false;
+      }
+
       if (_index == 0)
       {
         // angular limit is specified
@@ -399,6 +392,14 @@ bool SimbodyScrewJoint::SetLowStop(
   {
     if (this->physicsInitialized)
     {
+      // check if limitForce is initialized
+      if (this->limitForce[_index].isEmptyHandle())
+      {
+        gzerr << "child link is NULL, force element not initialized, "
+              << "SetHighStop failed. Please file a report on issue tracker.\n";
+        return false;
+      }
+
       if (_index == 0)
       {
         // angular limit is specified

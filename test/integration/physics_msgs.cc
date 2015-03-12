@@ -271,8 +271,8 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
   }
   else
   {
-    gzerr << "Skipping LinkProperties's kinematic test for Bullet" <<
-        std::endl;
+    gzerr << "Skipping LinkProperties's kinematic test for "
+          << _physicsEngine << std::endl;
   }
 
   {
@@ -385,6 +385,12 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
 ////////////////////////////////////////////////////////////////////////
 void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for DART, see issue #1175.\n";
+    return;
+  }
+
   // load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");

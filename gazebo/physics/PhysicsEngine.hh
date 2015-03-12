@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The base class for all physics engines
- * Author: Nate Koenig
- */
-
 #ifndef _PHYSICSENGINE_HH_
 #define _PHYSICSENGINE_HH_
 
@@ -170,26 +166,6 @@ namespace gazebo
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Access functions to set ODE parameters.
-      /// \param[in] _iter Number of iterations.
-      public: virtual void SetSORPGSPreconIters(unsigned int _iters)
-              GAZEBO_DEPRECATED(3.0);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _iter Number of iterations.
-      public: virtual void SetSORPGSIters(unsigned int _iters)
-              GAZEBO_DEPRECATED(3.0);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _w SORPGSW value.
-      public: virtual void SetSORPGSW(double _w) GAZEBO_DEPRECATED(3.0);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
       /// \param[in] _vel Max correcting velocity.
       public: virtual void SetContactMaxCorrectingVel(double _vel);
 
@@ -224,27 +200,6 @@ namespace gazebo
       public: virtual bool GetAutoDisableFlag() {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief access functions to set ODE parameters.
-      /// \return SORPGS precondition iterations.
-      public: virtual int GetSORPGSPreconIters() GAZEBO_DEPRECATED(3.0)
-              {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief access functions to set ODE parameters.
-      /// \return SORPGS iterations.
-      public: virtual int GetSORPGSIters() GAZEBO_DEPRECATED(3.0)
-              {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map.
-      /// \brief access functions to set ODE parameters
-      /// \return SORPGSW value.
-      public: virtual double GetSORPGSW() GAZEBO_DEPRECATED(3.0)
-              {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
       /// property map.
       /// \brief access functions to set ODE parameters.
       /// \return Max correcting velocity.
@@ -270,7 +225,6 @@ namespace gazebo
       ///          "sequential_impulse' for Bullet, "quick" for ODE
       ///          "Featherstone and Lemkes" for DART and
       ///          "Spatial Algebra and Elastic Foundation" for Simbody.
-      ///       -# "type" (string) - deprecated, use keyword "solver_type".
       ///       -# "cfm" (double) - global CFM
       ///       -# "erp" (double) - global ERP
       ///       -# "precon_iters" (bool) - precondition iterations

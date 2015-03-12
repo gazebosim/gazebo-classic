@@ -65,7 +65,8 @@ namespace gazebo
       "ray",
       "plane",
       "sphere",
-      "trimesh"
+      "trimesh",
+      "polyline"
     };
 
     /// \class Base Base.hh physics/physics.hh
@@ -129,6 +130,8 @@ namespace gazebo
                 SPHERE_SHAPE    = 0x01000000,
                 /// \brief MeshShape type
                 MESH_SHAPE      = 0x02000000,
+                /// \brief PolylineShape type
+                POLYLINE_SHAPE  = 0x04000000,
 
                 /// \brief Indicates a collision shape used for sensing
                 SENSOR_COLLISION = 0x10000000
@@ -258,9 +261,12 @@ namespace gazebo
       public: unsigned int GetType() const;
 
       /// \brief Return the name of this entity with the model scope
-      /// world::model1::...::modelN::entityName
+      /// model1::...::modelN::entityName
+      /// \param[in] _prependWorldName True to prended the returned string
+      /// with the world name. The result will be
+      /// world::model1::...::modelN::entityName.
       /// \return The scoped name.
-      public: std::string GetScopedName() const;
+      public: std::string GetScopedName(bool _prependWorldName = false) const;
 
       /// \brief Print this object to screen via gzmsg.
       /// \param[in] _prefix Usually a set of spaces.

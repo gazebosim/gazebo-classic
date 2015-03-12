@@ -46,7 +46,7 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 
   for (physics::Joint_V::const_iterator j = this->model->GetJoints().begin();
                         j != this->model->GetJoints().end(); ++j)
-    (*j)->SetAngle(0, 0);
+    (*j)->SetPosition(0, 0);
 
   // New Mechanism for Updating every World Cycle
   // Listen to the update event. This event is broadcast every

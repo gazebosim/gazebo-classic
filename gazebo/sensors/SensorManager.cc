@@ -226,18 +226,6 @@ void SensorManager::GetSensorTypes(std::vector<std::string> &_types) const
 //////////////////////////////////////////////////
 std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
                                         const std::string &_worldName,
-                                        const std::string &_parentName)
-{
-  SensorPtr parentSensor = sensors::get_sensor(_parentName);
-  GZ_ASSERT(parentSensor, "Unable to get parent sensor");
-
-  return this->CreateSensor(_elem, _worldName, _parentName,
-      parentSensor->GetId());
-}
-
-//////////////////////////////////////////////////
-std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
-                                        const std::string &_worldName,
                                         const std::string &_parentName,
                                         uint32_t _parentId)
 {

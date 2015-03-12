@@ -15,10 +15,12 @@
  *
 */
 
-#include "gazebo/transport/transport.hh"
+#include <algorithm>
 
+#include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Road2d.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -354,7 +356,27 @@ void Road2d::Segment::Load(msgs::Road _msg)
 
   vBuf->unlock();
 
-  this->setMaterial("Gazebo/Road");
+  if (_msg.has_material())
+  {
+    if (_msg.material().has_script())
+    {
+      for (int i = 0; i < _msg.material().script().uri_size(); ++i)
+      {
+        std::string matUri = _msg.material().script().uri(i);
+        if (!matUri.empty())
+          RenderEngine::Instance()->AddResourcePath(matUri);
+      }
+
+      std::string matName = _msg.material().script().name();
+
+      if (!matName.empty())
+        this->setMaterial(matName);
+     }
+  }
+  else
+  {
+    this->setMaterial("Gazebo/Road");
+  }
 }
 
 //////////////////////////////////////////////////

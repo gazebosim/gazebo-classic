@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh geometry
- * Author: Nate Koenig
- * Date: 16 Oct 2009
- */
 
 #ifndef _ODEMESHSHAPE_HH_
 #define _ODEMESHSHAPE_HH_
@@ -29,6 +25,8 @@ namespace gazebo
 {
   namespace physics
   {
+    class ODEMesh;
+
     /// \brief Triangle mesh collision.
     class GAZEBO_VISIBLE ODEMeshShape : public MeshShape
     {
@@ -48,20 +46,8 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Update();
 
-      /// \brief Transform matrix.
-      private: dReal transform[16*2];
-
-      /// \brief Transform matrix index.
-      private: int transformIndex;
-
-      /// \brief Array of vertex values.
-      private: float *vertices;
-
-      /// \brief Array of index values.
-      private: int *indices;
-
-      /// \brief ODE trimesh data.
-      private: dTriMeshDataID odeData;
+      /// \brief ODE collsion mesh helper class.
+      private: ODEMesh *odeMesh;
     };
   }
 }

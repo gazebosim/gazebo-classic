@@ -234,6 +234,22 @@ TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
   EXPECT_TRUE(math::equal(1.0, v.d));
 }
 
+void CompareMsgsJointTypeToString(const msgs::Joint::Type _type)
+{
+  EXPECT_EQ(_type, msgs::ConvertJointType(msgs::ConvertJointType(_type)));
+}
+
+TEST_F(MsgsTest, ConvertMsgsJointTypeToString)
+{
+  CompareMsgsJointTypeToString(msgs::Joint::REVOLUTE);
+  CompareMsgsJointTypeToString(msgs::Joint::REVOLUTE2);
+  CompareMsgsJointTypeToString(msgs::Joint::PRISMATIC);
+  CompareMsgsJointTypeToString(msgs::Joint::UNIVERSAL);
+  CompareMsgsJointTypeToString(msgs::Joint::BALL);
+  CompareMsgsJointTypeToString(msgs::Joint::SCREW);
+  CompareMsgsJointTypeToString(msgs::Joint::GEARBOX);
+}
+
 TEST_F(MsgsTest, SetVector3)
 {
   msgs::Vector3d msg;
@@ -689,7 +705,10 @@ TEST_F(MsgsTest, VisualFromSDF_BadGeometryType)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
-  EXPECT_FALSE(sdf::readString(
+  // As of sdformat pull request 148 (released in version 2.3.1),
+  // unknown elements are now ignored with a warning message
+  // rather than causing an error.
+  EXPECT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <visual name='visual'>\
            <pose>1 1 1 1 2 3</pose>\

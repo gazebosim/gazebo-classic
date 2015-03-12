@@ -78,6 +78,10 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolbar->addSeparator();
   toolbar->addAction(g_screenshotAct);
 
+  toolbar->addSeparator();
+  toolbar->addAction(g_copyAct);
+  toolbar->addAction(g_pasteAct);
+
   toolLayout->addSpacing(10);
   toolLayout->addWidget(toolbar);
   toolFrame->setLayout(toolLayout);
@@ -141,10 +145,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
-
-  this->timer = new QTimer(this);
-  connect(this->timer, SIGNAL(timeout()), this, SLOT(update()));
-  this->timer->start(44);
 
   this->connections.push_back(
       gui::Events::ConnectFollow(

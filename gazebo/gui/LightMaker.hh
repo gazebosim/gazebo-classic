@@ -45,6 +45,16 @@ namespace gazebo
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
       public: virtual void OnMouseDrag(const common::MouseEvent &) {}
+
+      /// \brief Initialize the light maker from an existing light in the scene.
+      /// \param[in] _lightName Name of existing light in the scene.
+      /// \return True if initialization is successful.
+      public: bool InitFromLight(const std::string & _lightName);
+
+      /// \brief Initialize the light maker.
+      /// \return True if the light maker is initialized successfully.
+      protected: virtual bool Init();
+
       protected: virtual void CreateTheEntity();
 
       protected: int state;
@@ -52,7 +62,9 @@ namespace gazebo
       protected: transport::PublisherPtr lightPub;
       private: static unsigned int counter;
       protected: std::string lightTypename;
-      private: rendering::Light *light;
+
+      /// \brief Pointer to the light being spawned.
+      private: rendering::LightPtr light;
     };
 
     class GAZEBO_VISIBLE PointLightMaker : public LightMaker
@@ -96,6 +108,3 @@ namespace gazebo
   }
 }
 #endif
-
-
-

@@ -308,7 +308,7 @@ void Node::InsertLatchedMsg(const std::string &_topic, MessagePtr _msg)
 std::string Node::GetMsgType(const std::string &_topic) const
 {
   Callback_M::const_iterator iter = this->callbacks.find(_topic);
-  if (iter != this->callbacks.end())
+  if (iter != this->callbacks.end() && !iter->second.empty())
     return iter->second.front()->GetMsgType();
 
   return std::string();

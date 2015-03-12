@@ -20,9 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/common/common.hh"
+#include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/gazebo.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

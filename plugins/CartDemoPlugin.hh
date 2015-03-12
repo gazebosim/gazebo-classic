@@ -17,10 +17,9 @@
 #ifndef _GAZEBO_CART_DEMO_PLUGIN_HH_
 #define _GAZEBO_CART_DEMO_PLUGIN_HH_
 
-#include "gazebo/common/common.hh"
+#include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/gazebo.hh"
 #include "gazebo/util/system.hh"
 
 #define NUM_JOINTS 3

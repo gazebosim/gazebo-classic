@@ -18,7 +18,8 @@
 #ifndef _GAZEBO_FORCETORQUE_MODEL_REMOVAL_TEST_PLUGIN_HH_
 #define _GAZEBO_FORCETORQUE_MODEL_REMOVAL_TEST_PLUGIN_HH_
 
-#include <gazebo/gazebo.hh>
+#include <gazebo/common/Plugin.hh>
+#include <gazebo/common/UpdateInfo.hh>
 #include <string>
 
 namespace gazebo

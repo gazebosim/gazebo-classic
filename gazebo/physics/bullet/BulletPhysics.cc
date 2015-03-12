@@ -29,6 +29,7 @@
 #include "gazebo/physics/bullet/BulletBoxShape.hh"
 #include "gazebo/physics/bullet/BulletCylinderShape.hh"
 #include "gazebo/physics/bullet/BulletMeshShape.hh"
+#include "gazebo/physics/bullet/BulletPolylineShape.hh"
 #include "gazebo/physics/bullet/BulletRayShape.hh"
 
 #include "gazebo/physics/bullet/BulletHingeJoint.hh"
@@ -504,59 +505,6 @@ void BulletPhysics::SetSORPGSIters(unsigned int _iters)
       "solver")->GetElement("iters")->Set(_iters);
 }
 
-
-//////////////////////////////////////////////////
-bool BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
-{
-  if (!this->dynamicsWorld)
-    return false;
-
-  gzwarn << "Deprecated by "
-         << "bool SetParam(const std::string&, const boost::any&).\n";
-
-  switch (_param)
-  {
-    case SOLVER_TYPE:
-    {
-      return this->SetParam("solver_type", _value);
-    }
-    case GLOBAL_CFM:
-    {
-      return this->SetParam("cfm", _value);
-    }
-    case GLOBAL_ERP:
-    {
-      return this->SetParam("erp", _value);
-    }
-    case PGS_ITERS:
-    {
-      return this->SetParam("iters", _value);
-    }
-    case SOR:
-    {
-      return this->SetParam("sor", _value);
-    }
-    case CONTACT_SURFACE_LAYER:
-    {
-      return this->SetParam("contact_surface_layer", _value);
-    }
-    case MAX_CONTACTS:
-    {
-      return this->SetParam("max_contacts", _value);
-    }
-    case MIN_STEP_SIZE:
-    {
-      return this->SetParam("min_step_size", _value);
-    }
-    default:
-    {
-      gzwarn << "Param not supported in bullet" << std::endl;
-      return false;
-    }
-  }
-  return true;
-}
-
 //////////////////////////////////////////////////
 bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
@@ -565,13 +513,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
 
-  if (_key == "type")
-  {
-    gzwarn << "keyword `type` for GetParam/SetParam is deprecated, please"
-           << " use `solver_type`.\n";
-    return this->SetParam("solver_type", _value);
-  }
-  else if (_key == "solver_type")
+  if (_key == "solver_type")
   {
     std::string value;
     try
@@ -768,64 +710,12 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 }
 
 //////////////////////////////////////////////////
-boost::any BulletPhysics::GetParam(BulletParam _param) const
-{
-  boost::any value = 0;
-  switch (_param)
-  {
-    case SOLVER_TYPE:
-    {
-      return this->GetParam("solver_type");
-    }
-    case GLOBAL_CFM:
-    {
-      return this->GetParam("cfm");
-    }
-    case GLOBAL_ERP:
-    {
-      return this->GetParam("erp");
-    }
-    case PGS_ITERS:
-    {
-      return this->GetParam("iters");
-    }
-    case SOR:
-    {
-      return this->GetParam("sor");
-    }
-    case CONTACT_SURFACE_LAYER:
-    {
-      return this->GetParam("contact_surface_layer");
-    }
-    case MAX_CONTACTS:
-    {
-      return this->GetParam("max_contacts");
-    }
-    case MIN_STEP_SIZE:
-    {
-      return this->GetParam("min_step_size");
-    }
-    default:
-    {
-      gzwarn << "Param not supported in bullet" << std::endl;
-      return value;
-    }
-  }
-}
-
-//////////////////////////////////////////////////
 boost::any BulletPhysics::GetParam(const std::string &_key) const
 {
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
   GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
-  if (_key == "type")
-  {
-    gzwarn << "keyword `type` for GetParam/SetParam is deprecated, please"
-           << " use `solver_type`.\n";
-    return this->GetParam("solver_type");
-  }
-  else if (_key == "solver_type")
+  if (_key == "solver_type")
     return bulletElem->GetElement("solver")->Get<std::string>("type");
   else if (_key == "cfm")
     return bulletElem->GetElement("constraints")->Get<double>("cfm");
@@ -902,6 +792,8 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
     shape.reset(new BulletCylinderShape(collision));
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new BulletMeshShape(collision));
+  else if (_type == "polyline")
+    shape.reset(new BulletPolylineShape(collision));
   else if (_type == "heightmap")
     shape.reset(new BulletHeightmapShape(collision));
   else if (_type == "multiray")

@@ -327,7 +327,7 @@ void JointController::SetJointPositions(
 void JointController::SetJointPosition(
   JointPtr _joint, double _position, int _index)
 {
-  _joint->SetAngle(_index, math::Angle(_position));
+  _joint->SetPosition(_index, _position);
 }
 
 /////////////////////////////////////////////////

@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A screw or primastic/rotational joint
- * Author: Nate Koenig, John Hsu
- * Date: 21 May 2003
- */
-
 #ifndef _SCREWJOINT_HH_
 #define _SCREWJOINT_HH_
 
@@ -65,32 +60,12 @@ namespace gazebo
       /// Thread Pitch is defined as angular motion per linear
       /// motion or rad / m in metric.
       /// This must be implemented in a child class
-      /// Deprecated, please use the index-less version in the future:
-      /// virtual void SetThreadPitch(double _threadPitch) = 0;
-      /// \param[in] _index Index of the axis.
-      /// \param[in] _threadPitch Thread pitch value.
-      public: virtual void SetThreadPitch(unsigned int _index,
-                  double _threadPitch) GAZEBO_DEPRECATED(3.0) = 0;
-
-      /// \brief Set screw joint thread pitch.
-      /// Thread Pitch is defined as angular motion per linear
-      /// motion or rad / m in metric.
-      /// This must be implemented in a child class
       /// To clarify direction, these are modeling right handed threads
       /// with positive thread_pitch, i.e. the child Link is the nut
       /// (interior threads) while the parent Link is the bolt/screw
       /// (exterior threads).
       /// \param[in] _threadPitch Thread pitch value.
       public: virtual void SetThreadPitch(double _threadPitch) = 0;
-
-      /// \brief Get screw joint thread pitch.
-      /// Thread Pitch is defined as angular motion per linear
-      /// motion or rad / m in metric.
-      /// This must be implemented in a child class
-      /// \param[in] _index Index of the axis.
-      /// \return _threadPitch Thread pitch value.
-      public: virtual double GetThreadPitch(unsigned int _index)
-        GAZEBO_DEPRECATED(3.0) = 0;
 
       /// \brief Get screw joint thread pitch.
       /// Thread Pitch is defined as angular motion per linear

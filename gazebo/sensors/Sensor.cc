@@ -135,12 +135,6 @@ void Sensor::Init()
 }
 
 //////////////////////////////////////////////////
-void Sensor::SetParent(const std::string &_name)
-{
-  this->parentName = _name;
-}
-
-//////////////////////////////////////////////////
 void Sensor::SetParent(const std::string &_name, uint32_t _id)
 {
   this->parentName = _name;
@@ -251,7 +245,7 @@ std::string Sensor::GetName() const
 std::string Sensor::GetScopedName() const
 {
   return this->world->GetName() + "::" + this->parentName + "::" +
-         this->GetName();
+    this->GetName();
 }
 
 //////////////////////////////////////////////////

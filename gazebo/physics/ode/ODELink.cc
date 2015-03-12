@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Link class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
 #include <math.h>
 #include <sstream>
 
@@ -190,6 +185,21 @@ void ODELink::MoveCallback(dBodyID _id)
   self->world->dirtyPoses.push_back(self);
 
   // self->poseMutex->unlock();
+
+  // get force and applied to this body
+  if (_id)
+  {
+    // \TODO: there are hacks here to preserve ABI
+    // see bitbucket.org/osrf/gazebo/issue/1354
+
+    const dReal *dforce = dBodyGetForce(_id);
+    // After gazebo4, replace Link::linearAccel with ODELink::force
+    self->linearAccel.Set(dforce[0], dforce[1], dforce[2]);
+
+    const dReal *dtorque = dBodyGetTorque(_id);
+    // After gazebo4, replace Link::angularAccel with ODELink::torque
+    self->angularAccel.Set(dtorque[0], dtorque[1], dtorque[2]);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -612,51 +622,19 @@ void ODELink::AddRelativeTorque(const math::Vector3 &_torque)
 /////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldForce() const
 {
-  math::Vector3 force;
-
-  if (this->linkId)
-  {
-    const dReal *dforce;
-
-    dforce = dBodyGetForce(this->linkId);
-
-    force.x = dforce[0];
-    force.y = dforce[1];
-    force.z = dforce[2];
-  }
-  else if (!this->IsStatic() && this->initialized)
-  {
-    gzlog << "ODE body for link [" << this->GetScopedName() << "]"
-          << " does not exist, GetWorldForce returns default of "
-          << force << std::endl;
-  }
-
-  return force;
+  // \TODO: there are hacks here to preserve ABI
+  // see bitbucket.org/osrf/gazebo/issue/1354
+  // After gazebo4, replace Link::linearAccel with ODELink::force
+  return this->linearAccel;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldTorque() const
 {
-  math::Vector3 torque;
-
-  if (this->linkId)
-  {
-    const dReal *dtorque;
-
-    dtorque = dBodyGetTorque(this->linkId);
-
-    torque.x = dtorque[0];
-    torque.y = dtorque[1];
-    torque.z = dtorque[2];
-  }
-  else if (!this->IsStatic() && this->initialized)
-  {
-    gzlog << "ODE body for link [" << this->GetScopedName() << "]"
-          << " does not exist, GetWorldTorque returns default of "
-          << torque << std::endl;
-  }
-
-  return torque;
+  // \TODO: there are hacks here to preserve ABI
+  // see bitbucket.org/osrf/gazebo/issue/1354
+  // After gazebo4, replace Link::angularAccel with ODELink::torque
+  return this->angularAccel;
 }
 
 //////////////////////////////////////////////////
