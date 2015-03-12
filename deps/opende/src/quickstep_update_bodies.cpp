@@ -49,8 +49,8 @@ void quickstep::dxUpdateBodies(
   dRealMutablePtr const caccel_erp, dRealPtr Jcopy,  dRealPtr invMOI)
 {
   // note that the PGS method overwrites rhs and J at this point, so
-    // they should not be used again.
-    if(m>0){
+  // they should not be used again.
+  if(m>0){
     {
       IFTIMING (dTimerNow ("velocity update due to constraint forces"));
       //
