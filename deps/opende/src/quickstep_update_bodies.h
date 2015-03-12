@@ -39,7 +39,7 @@ namespace ode {
                 dRealMutablePtr const lambda, dRealMutablePtr const  caccel,
                 dRealMutablePtr const caccel_erp, dRealPtr Jcopy,  dRealPtr invMOI);
 
-        size_t Estimate_Update_Bodies_MemoryRequirements(int m, int nb);
+        size_t dxUpdateBodiesMemoryRequirements(int m, int nb);
     } // namespace quickstep
 } // namespace ode
 #endif

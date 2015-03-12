@@ -1137,7 +1137,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   delete mutex;
 }
 
-size_t quickstep::EstimatePGS_LCPMemoryRequirements(int m,int /*nb*/)
+size_t quickstep::dxPGSMemoryRequirements(int m,int /*nb*/)
 {
   size_t res = dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for iMJ
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for Ad

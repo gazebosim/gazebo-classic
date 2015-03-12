@@ -603,12 +603,12 @@ size_t dxEstimateQuickStepMemoryRequirements (
 #endif
         {
           // for PGS_LCP
-          size_t sub3_res1 = EstimatePGS_LCPMemoryRequirements(m,nb);
+          size_t sub3_res1 = dxPGSMemoryRequirements(m,nb);
           size_t sub3_res2 = 0;
 #ifdef CHECK_VELOCITY_OBEYS_CONSTRAINT
           {
             // for Update Body velocity and position
-            size_t sub4_res1 = Estimate_Update_Bodies_MemoryRequirements(m, nb);
+            size_t sub4_res1 = dxUpdateBodiesMemoryRequirements(m, nb);
             size_t sub4_res2 = 0;
             sub3_res2 += (sub4_res1 >= sub4_res2) ? sub4_res1 : sub4_res2;
           }
@@ -625,4 +625,3 @@ size_t dxEstimateQuickStepMemoryRequirements (
 
   return res;
 }
-

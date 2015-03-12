@@ -42,7 +42,7 @@ void PGS_LCP (dxWorldProcessContext *context,
 #endif
   const dReal stepsize); 
 
-size_t EstimatePGS_LCPMemoryRequirements(int m,int /*nb*/);
+size_t dxPGSMemoryRequirements(int m,int /*nb*/);
 
     } // namespace quickstep
 } // namespace ode

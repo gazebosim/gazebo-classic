@@ -365,7 +365,7 @@ void quickstep::dxUpdateBodies(
   IFTIMING (if (m > 0) dTimerReport (stdout,1));
 }
 
-size_t quickstep::Estimate_Update_Bodies_MemoryRequirements(int m, int nb)
+size_t quickstep::dxUpdateBodiesMemoryRequirements(int m, int nb)
 {
   // for vel
   size_t res = dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb);
