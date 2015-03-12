@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,17 @@
 #define _BUILDING_EDITOR_PALETTE_HH_
 
 #include <string>
-#include <vector>
-#include <list>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Events.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    /// Forward declare private data class.
+    class BuildingEditorPalettePrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -46,10 +46,12 @@ namespace gazebo
       /// \brief Destructor
       public: ~BuildingEditorPalette();
 
+      /// \brief Get model name
+      /// \return Model name
+      public: std::string GetModelName() const;
+
       /// \brief Qt callback when the draw wall button is pressed.
       private slots: void OnDrawWall();
-
-      // private slots: void OnImportImage();
 
       /// \brief Qt callback when the draw window button is pressed.
       private slots: void OnAddWindow();
@@ -57,17 +59,26 @@ namespace gazebo
       /// \brief Qt callback when the draw door button is pressed.
       private slots: void OnAddDoor();
 
+      /// \brief Qt callback when the import image button is pressed.
+      private slots: void OnImportImage();
+
       /// \brief Qt callback when the draw stairs button is pressed.
       private slots: void OnAddStair();
 
-      /// \brief Qt callback when the discard button is pressed.
-      private slots: void OnDiscard();
+      /// \brief Qt callback when a brush is pressed.
+      /// \param[in] _buttonId Id of the button clicked.
+      private slots: void OnBrush(int _buttonId);
 
-      /// \brief Qt callback when the save button is pressed.
-      private slots: void OnSave();
+      /// \brief Qt callback when a color brush is pressed.
+      /// \param[in] _buttonId Id of the button clicked.
+      private slots: void OnColor(int _buttonId);
 
-      /// \brief Qt callback when the done button is pressed.
-      private slots: void OnDone();
+      /// \brief Qt callback when a texture brush is pressed.
+      /// \param[in] _buttonId Id of the button clicked.
+      private slots: void OnTexture(int _buttonId);
+
+      /// \brief Qt callback when the Model Name field is changed.
+      private slots: void OnNameChanged(const QString &_name);
 
       /// \brief Callback when user has provided information on where to save
       /// the model to.
@@ -77,29 +88,19 @@ namespace gazebo
           const std::string &_saveLocation);
 
       /// \brief Event received when an editor item is selected.
-      /// \param[in] _type Type of item to add.
-      private: void OnCreateEditorItem(const std::string &_type);
+      /// \param[in] _mode Type of item to add or empty for none.
+      private: void OnCreateEditorItem(const std::string &_mode);
 
-      /// \brief Event received when a building model has been discarded.
-      private: void OnDiscardModel();
+      /// \brief Event received when the user starts a new building model.
+      private: void OnNewModel();
 
-      /// \brief A label that displays the name of the building model.
-      private: QLabel *modelNameLabel;
+      /// \brief Qt callback when the palette is pressed.
+      /// \param[in] _event Event.
+      private: void mousePressEvent(QMouseEvent *_event);
 
-      /// \brief Save button.
-      private: QPushButton *saveButton;
-
-      /// \brief All the brushes (wall, door, window, stair, etc).
-      private: std::list<QPushButton *> brushes;
-
-      /// \brief Name of model.
-      private: std::string modelName;
-
-      /// \brief Save location.
-      private: std::string saveLocation;
-
-      /// \brief A list of gui editor events connected to this palette.
-      private: std::vector<event::ConnectionPtr> connections;
+      /// \internal
+      /// \brief Private data pointer
+      private: BuildingEditorPalettePrivate *dataPtr;
     };
     /// \}
   }

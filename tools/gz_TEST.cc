@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -301,9 +301,6 @@ TEST_F(gzTest, Model)
 
     waitForMsg("gz model -w default -m my_box -f " + filename);
 
-    std::ifstream ifs(filename.c_str());
-    EXPECT_TRUE(ifs);
-
     boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));
 
@@ -325,9 +322,6 @@ TEST_F(gzTest, Model)
     std::string cmd = "cat ";
     cmd += filename + " | gz model -w default -m my_box -s";
     waitForMsg(cmd);
-
-    std::ifstream ifs(filename.c_str());
-    EXPECT_TRUE(ifs);
 
     boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));
@@ -364,20 +358,24 @@ TEST_F(gzTest, Model)
     modelInfo = custom_exec_str("gz model -m my_box -p");
     boost::algorithm::trim(modelInfo);
 
-    // Split the string into parts.
-    std::vector<std::string> parts;
-    boost::split(parts, modelInfo, boost::is_any_of(" "));
+    // Split the string into parts p.
+    std::vector<std::string> p;
+    boost::split(p, modelInfo, boost::is_any_of(" "));
 
     // Make sure we have the right number of parts.
-    ASSERT_EQ(parts.size(), 6u);
+    // Don't ASSERT_EQ, because we need to run fini at end of test
+    EXPECT_EQ(p.size(), 6u);
 
     // Make sure the pose is correct.
-    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[0]), 0.0);
-    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[1]), 0.0);
-    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[2]), 0.5);
-    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[3]), 0.0);
-    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[4]), 0.0);
-    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[5]), 0.0);
+    if (p.size() == 6u)
+    {
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[0]), 0.0));
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[1]), 0.0));
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[2]), 0.5));
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[3]), 0.0));
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[4]), 0.0));
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[5]), 0.0));
+    }
   }
 
   // Test model delete

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,8 @@ Editor::~Editor()
 }
 
 /////////////////////////////////////////////////
-void Editor::Init(const std::string &_objName,
-                  const std::string &_tabLabel, QWidget *_widget)
+void Editor::Init(const std::string &_objName, const std::string &_tabLabel,
+    QWidget *_widget, QWidget *_cornerWidget)
 {
   if (this->tabWidget)
     delete this->tabWidget;
@@ -49,6 +49,9 @@ void Editor::Init(const std::string &_objName,
       QSizePolicy::Expanding);
   this->tabWidget->setMinimumWidth(250);
   this->tabWidget->hide();
+
+  if (_cornerWidget)
+    this->tabWidget->setCornerWidget(_cornerWidget);
 
   this->mainWindow->AddToLeftColumn(_objName, this->tabWidget);
 }

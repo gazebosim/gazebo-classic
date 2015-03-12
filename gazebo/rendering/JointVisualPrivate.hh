@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,9 @@ namespace gazebo
     {
       /// \brief The visual used to draw the joint.
       public: AxisVisualPtr axisVisual;
+
+      /// \brief Second joint visual for hinge2 and universal joints.
+      public: JointVisualPtr parentAxisVis;
     };
   }
 }

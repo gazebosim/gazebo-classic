@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,17 +199,17 @@ void VehiclePlugin::OnUpdate()
                     this->wheelRadius;
 
   // Set velocity and max force for each wheel
-  this->joints[0]->SetVelocity(1, -jointVel);
-  this->joints[0]->SetMaxForce(1, (gas + brake) * this->frontPower);
+  this->joints[0]->SetVelocityLimit(1, -jointVel);
+  this->joints[0]->SetForce(1, (gas + brake) * this->frontPower);
 
-  this->joints[1]->SetVelocity(1, -jointVel);
-  this->joints[1]->SetMaxForce(1, (gas + brake) * this->frontPower);
+  this->joints[1]->SetVelocityLimit(1, -jointVel);
+  this->joints[1]->SetForce(1, (gas + brake) * this->frontPower);
 
-  this->joints[2]->SetVelocity(1, -jointVel);
-  this->joints[2]->SetMaxForce(1, (gas + brake) * this->rearPower);
+  this->joints[2]->SetVelocityLimit(1, -jointVel);
+  this->joints[2]->SetForce(1, (gas + brake) * this->rearPower);
 
-  this->joints[3]->SetVelocity(1, -jointVel);
-  this->joints[3]->SetMaxForce(1, (gas + brake) * this->rearPower);
+  this->joints[3]->SetVelocityLimit(1, -jointVel);
+  this->joints[3]->SetForce(1, (gas + brake) * this->rearPower);
 
   // Set the front-left wheel angle
   this->joints[0]->SetLowStop(0, wheelAngle);

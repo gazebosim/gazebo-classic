@@ -1,3 +1,7 @@
+ QGroupBox::title {
+  color: #f0f0f0;
+ }
+
 QToolButton
 {
   border: 0;
@@ -118,6 +122,13 @@ QToolBar
   margin-left: 20px;
   border: 0px solid #404040;
   border-radius: 0px;
+}
+
+QToolButton#jointToolButton:pressed,
+QToolButton#jointToolButton:hover
+{
+  border: 0px;
+  background-color: #808080;
 }
 
 QToolBar#playToolBar
@@ -745,4 +756,9 @@ QwtScaleWidget
 {
   color: white;
   font-size: 11px;
+}
+
+#configWidget
+{
+  background-color: #808080;
 }

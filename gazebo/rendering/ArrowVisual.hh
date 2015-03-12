@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,8 +44,17 @@ namespace gazebo
       /// \brief Load the visual with default parameters
       public: virtual void Load();
 
-      /// \brief Show the rotation of the visual
-      public: void ShowRotation();
+      /// \brief Show the rotation of the arrow visual.
+      /// \param[in] _show True to show the arrow rotation.
+      public: void ShowRotation(bool _show);
+
+      /// \brief Show the shaft of the arrow visual.
+      /// \param[in] _show True to show the arrow shaft.
+      public: void ShowShaft(bool _show);
+
+      /// \brief Show the head of the arrow visual.
+      /// \param[in] _show True to show the arrow head.
+      public: void ShowHead(bool _show);
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ struct g_vectorStringDup
 
 /////////////////////////////////////////////////
 // This function is used by both setupClient and setupServer
-bool setup(int _argc, char **_argv)
+bool setup(const std::string &_prefix, int _argc, char **_argv)
 {
   gazebo::common::load();
 
@@ -53,7 +53,7 @@ bool setup(int _argc, char **_argv)
 
   // Initialize the informational logger. This will log warnings, and
   // errors.
-  gzLogInit("default.log");
+  gzLogInit(_prefix, "default.log");
 
   // Load all the system plugins
   for (std::vector<gazebo::SystemPluginPtr>::iterator iter =
@@ -123,7 +123,7 @@ bool gazebo::setupServer(int _argc, char **_argv)
   g_master->Init(port);
   g_master->RunThread();
 
-  if (!setup(_argc, _argv))
+  if (!setup("server-", _argc, _argv))
   {
     gzerr << "Unable to setup Gazebo\n";
     return false;
@@ -159,7 +159,7 @@ bool gazebo::setupServer(const std::vector<std::string> &_args)
   pointers.push_back(0);
   bool result = gazebo::setupServer(_args.size(), &pointers[0]);
 
-  // Deallocate memory for the command line arguments alloocated with strdup.
+  // Deallocate memory for the command line arguments allocated with strdup.
   for (size_t i = 0; i < pointers.size(); ++i)
     free(pointers.at(i));
 
@@ -169,7 +169,7 @@ bool gazebo::setupServer(const std::vector<std::string> &_args)
 /////////////////////////////////////////////////
 bool gazebo::setupClient(int _argc, char **_argv)
 {
-  if (!setup(_argc, _argv))
+  if (!setup("client-", _argc, _argv))
   {
     gzerr << "Unable to setup Gazebo\n";
     return false;
