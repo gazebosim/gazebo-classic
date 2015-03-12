@@ -91,7 +91,7 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
     math::Vector3 v = submesh->GetVertex(i);
     math::Vector3 n = submesh->GetNormal(i);
 
-    // vertex at 0 be a bottom face or side face
+    // vertex at 0 could be a bottom face or side face
     if (math::equal(v.z, 0.0))
     {
       if (math::equal(n.z, 0.0))
@@ -199,7 +199,7 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
     math::Vector3 v = submesh->GetVertex(i);
     math::Vector3 n = submesh->GetNormal(i);
 
-    // vertex at 0 be a bottom face or side face
+    // vertex at 0 could be a bottom face or side face
     if (math::equal(v.z, 0.0))
     {
       if (math::equal(n.z, 0.0))
