@@ -518,14 +518,14 @@ void dxQuickStepper (dxWorldProcessContext *context,
       }
     }
 
-} // if (m>0)
+  } // if (m>0)
 
-dxUpdateBodies(
+  dxUpdateBodies(
 #ifdef CHECK_VELOCITY_OBEYS_CONSTRAINT
-                context, findex, cforce, &world->qs,
+                 context, findex, cforce, &world->qs,
 #endif
-                m, mfb, body, nb, jointiinfos, nj, stepsize,
-                lambda, caccel, caccel_erp, Jcopy, invMOI);
+                 m, mfb, body, nb, jointiinfos, nj, stepsize,
+                 lambda, caccel, caccel_erp, Jcopy, invMOI);
 
 }
 
@@ -604,15 +604,12 @@ size_t dxEstimateQuickStepMemoryRequirements (
         {
           // for PGS_LCP
           size_t sub3_res1 = EstimatePGS_LCPMemoryRequirements(m,nb);
-
           size_t sub3_res2 = 0;
 #ifdef CHECK_VELOCITY_OBEYS_CONSTRAINT
           {
-
-          	size_t sub4_res1 = Estimate_Update_Bodies_MemoryRequirements(m, nb);
-
+            // for Update Body velocity and position
+            size_t sub4_res1 = Estimate_Update_Bodies_MemoryRequirements(m, nb);
             size_t sub4_res2 = 0;
-
             sub3_res2 += (sub4_res1 >= sub4_res2) ? sub4_res1 : sub4_res2;
           }
 #endif
