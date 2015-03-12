@@ -1001,6 +1001,11 @@ bool ApplyWrenchDialog::eventFilter(QObject *_object, QEvent *_event)
       }
     }
   }
+  // Activate when changing spinboxes with mousewheel
+  else if (_event->type() == QEvent::Wheel)
+  {
+    this->SetActive(true);
+  }
 
   return false;
 }
@@ -1177,7 +1182,6 @@ void ApplyWrenchDialog::SetActive(bool _active)
     this->reject();
     return;
   }
-
   if (_active)
   {
     // Set visible
