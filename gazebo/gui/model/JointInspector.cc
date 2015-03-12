@@ -195,9 +195,19 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
     QGroupBox *limitGroupBox = new QGroupBox(tr("Limit"));
     limitGroupBox->setLayout(limitLayout);
 
+    QLabel *frameLabel = new QLabel(tr("Use parent model frame: "));
+    QCheckBox *frameCheckbox = new QCheckBox;
+    frameCheckbox->setCheckable(true);
+    this->frameCheckBoxes.push_back(frameCheckbox);
+
+    QHBoxLayout *frameLayout = new QHBoxLayout;
+    frameLayout->addWidget(frameLabel);
+    frameLayout->addWidget(frameCheckbox);
+
     QVBoxLayout *axisAllLayout = new QVBoxLayout;
     axisAllLayout->addLayout(axisLayout);
     axisAllLayout->addWidget(limitGroupBox);
+    axisAllLayout->addLayout(frameLayout);
 
     std::stringstream ss;
     ss << "Axis" << (i+1);
@@ -207,11 +217,11 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
   }
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
-  QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
+  QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
-  QPushButton *applyButton = new QPushButton(tr("&Apply"));
+  QPushButton *applyButton = new QPushButton(tr("Apply"));
   connect(applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
-  QPushButton *OKButton = new QPushButton(tr("&OK"));
+  QPushButton *OKButton = new QPushButton(tr("OK"));
   OKButton->setDefault(true);
   connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
   buttonsLayout->addWidget(cancelButton);
@@ -255,7 +265,7 @@ math::Pose JointInspector::GetPose() const
 /////////////////////////////////////////////////
 math::Vector3 JointInspector::GetAxis(unsigned int _index) const
 {
-  if (_index > this->axisXSpinBoxes.size())
+  if (_index >= this->axisXSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return math::Vector3::Zero;
@@ -269,7 +279,7 @@ math::Vector3 JointInspector::GetAxis(unsigned int _index) const
 /////////////////////////////////////////////////
 double JointInspector::GetLowerLimit(unsigned int _index) const
 {
-  if (_index > this->lowerLimitSpinBoxes.size())
+  if (_index >= this->lowerLimitSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return 0;
@@ -281,13 +291,25 @@ double JointInspector::GetLowerLimit(unsigned int _index) const
 /////////////////////////////////////////////////
 double JointInspector::GetUpperLimit(unsigned int _index) const
 {
-  if (_index > this->upperLimitSpinBoxes.size())
+  if (_index >= this->upperLimitSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return 0;
   }
 
   return this->upperLimitSpinBoxes[_index]->value();
+}
+
+/////////////////////////////////////////////////
+bool JointInspector::GetUseParentModelFrame(unsigned int _index) const
+{
+  if (_index >= this->frameCheckBoxes.size())
+  {
+    gzerr << "Axis index is out of range" << std::endl;
+    return 0;
+  }
+
+  return this->frameCheckBoxes[_index]->isChecked();
 }
 
 /////////////////////////////////////////////////
@@ -365,7 +387,7 @@ void JointInspector::SetPose(const math::Pose &_pose)
 /////////////////////////////////////////////////
 void JointInspector::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
-  if (_index > this->axisXSpinBoxes.size())
+  if (_index >= this->axisXSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return;
@@ -379,7 +401,7 @@ void JointInspector::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 /////////////////////////////////////////////////
 void JointInspector::SetLowerLimit(unsigned int _index, double _lower)
 {
-  if (_index > this->lowerLimitSpinBoxes.size())
+  if (_index >= this->lowerLimitSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return;
@@ -391,13 +413,25 @@ void JointInspector::SetLowerLimit(unsigned int _index, double _lower)
 /////////////////////////////////////////////////
 void JointInspector::SetUpperLimit(unsigned int _index, double _upper)
 {
-  if (_index > this->upperLimitSpinBoxes.size())
+  if (_index >= this->upperLimitSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return;
   }
 
   this->upperLimitSpinBoxes[_index]->setValue(_upper);
+}
+
+/////////////////////////////////////////////////
+void JointInspector::SetUseParentModelFrame(unsigned int _index, bool _use)
+{
+  if (_index >= this->frameCheckBoxes.size())
+  {
+    gzerr << "Axis index is out of range" << std::endl;
+    return;
+  }
+
+  this->frameCheckBoxes[_index]->setChecked(_use);
 }
 
 /////////////////////////////////////////////////
@@ -434,4 +468,10 @@ void JointInspector::OnOK()
 {
   emit Applied();
   this->accept();
+}
+
+/////////////////////////////////////////////////
+void JointInspector::enterEvent(QEvent */*_event*/)
+{
+  QApplication::setOverrideCursor(Qt::ArrowCursor);
 }

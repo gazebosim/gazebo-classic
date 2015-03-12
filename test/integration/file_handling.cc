@@ -59,12 +59,18 @@ TEST_F(FileHandling, Save)
 
   // Wait until the file exists
   i = 0;
-  while (i < 10 && (file = fopen(filename.str().c_str(), "r")) == NULL)
+  while (i < 10)
   {
+    file = fopen(filename.str().c_str(), "r");
+    if (file != NULL)
+    {
+      fclose(file);
+      break;
+    }
+
     i++;
     common::Time::MSleep(100);
   }
-  fclose(file);
 
   EXPECT_LT(i, 10);
 

@@ -29,7 +29,7 @@
 using namespace gazebo;
 
 const double g_angle_y_tol = 0.21;
-const double g_angle_z_tol = 0.21;
+const double g_angle_z_tol = 0.23;
 
 class PhysicsTest : public ServerFixture,
                     public testing::WithParamInterface<const char*>

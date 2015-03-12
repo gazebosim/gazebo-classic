@@ -117,6 +117,26 @@ namespace gazebo
       /// \brief Update selection object size to match the parent visual.
       public: void UpdateSize();
 
+      /// \brief Set the visibility for a specific handle or handle group.
+      /// \param[in] _mode Manipulation mode corresponding to the handle.
+      /// \param[in] _visible Whether to show or not.
+      public: void SetHandleVisible(SelectionMode _mode, bool _visible);
+
+      /// \brief Get the visibility for a specific handle. If a handle group
+      /// is specified, the X component's visibility is returned.
+      /// \param[in] _mode Manipulation mode corresponding to the handle.
+      /// \return Whether it is visible or not.
+      public: bool GetHandleVisible(SelectionMode _mode) const;
+
+      /// \brief Set the material for a specific handle or handle group.
+      /// \param[in] _mode Manipulation mode corresponding to the handle.
+      /// \param[in] _material Material name.
+      /// \param[in] _unique True to make the material unique, which
+      /// allows the material to change without changing materials that
+      /// originally had the same name.
+      public: void SetHandleMaterial(SelectionMode _mode, const std::string
+          &_material, bool _unique = true);
+
       /// \brief Helper function to create scale visuals.
       private: void CreateScaleVisual();
 
