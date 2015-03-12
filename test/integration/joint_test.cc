@@ -439,22 +439,28 @@ void JointTests::DynamicJointVisualization(const std::string &_physicsEngine)
   // Get link pointers
   physics::LinkPtr parent = model->GetLink();
   physics::LinkPtr child  = model2->GetLink();
+  ASSERT_TRUE(parent != NULL);
+  ASSERT_TRUE(child  != NULL);
 
   // Create dynamic joint
-  std::string name = "dynamic_joint_unique";
-  physics::JointPtr joint;
-  joint = physics->CreateJoint("revolute", model);
-  joint->Load(parent, child, math::Pose(0, 0, 0.5, 0, 0, 0));
-  joint->Attach(parent, child);
-  joint->SetModel(model);
+  const std::string jointName("dynamic_joint_unique");
+  {
+    msgs::Joint jointMsg;
+    jointMsg.set_name(jointName);
+    jointMsg.set_type(msgs::Joint::REVOLUTE);
+    jointMsg.set_parent(parent->GetScopedName());
+    jointMsg.set_child(child->GetScopedName());
+    msgs::Set(jointMsg.mutable_pose(), math::Pose(0, 0, 0.5, 0, 0, 0));
+    model->LoadJoint(msgs::JointToSDF(jointMsg));
+  }
+  physics::JointPtr joint = model->GetJoint(jointName);
+  ASSERT_TRUE(joint != NULL);
   joint->Init();
-  joint->SetName(name);
 
   // Get model joints (used for visualization)
   physics::Joint_V joints = model->GetJoints();
-  physics::Joint_V::iterator iter;
   bool jointFound = false;
-  for (iter = joints.begin(); iter != joints.end(); ++iter)
+  for (auto iter = joints.begin(); iter != joints.end(); ++iter)
   {
     if ((*iter)->GetName() == name)
     {
