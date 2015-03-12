@@ -79,7 +79,7 @@
         * [Pull request #1500](https://bitbucket.org/osrf/gazebo/pull-request/1500)
 
     1. Fixed pose issues and added ModelCreator_TEST.
-        * [Pull request #1508](https://bitbucket.org/osrf/gazebo/pull-request/1508)
+        * [Pull request #1509](https://bitbucket.org/osrf/gazebo/pull-request/1509)
         * [Issue #1497](https://bitbucket.org/osrf/gazebo/issue/1497)
         * [Issue #1509](https://bitbucket.org/osrf/gazebo/issue/1509)
 
