@@ -514,26 +514,27 @@ void ApplyWrenchVisual::Resize()
     return;
   }
 
-  math::Vector3 linkSize = dPtr->parent->GetBoundingBox().GetSize();
+  double linkSize = std::max (0.1,
+      dPtr->parent->GetBoundingBox().GetSize().GetLength());
 
   // Force visual
-  dPtr->forceVisual->SetScale(math::Vector3(2*linkSize.GetLength(),
-                                            2*linkSize.GetLength(),
-                                            2*linkSize.GetLength()));
+  dPtr->forceVisual->SetScale(math::Vector3(2*linkSize,
+                                            2*linkSize,
+                                            2*linkSize));
 
   // Torque visual
-  dPtr->torqueVisual->SetScale(math::Vector3(linkSize.GetLength(),
-                                             linkSize.GetLength(),
-                                             linkSize.GetLength()));
+  dPtr->torqueVisual->SetScale(math::Vector3(linkSize,
+                                             linkSize,
+                                             linkSize));
 
   // Texts
-  double fontSize = std::max(0.1*linkSize.GetLength(), 0.1);
+  double fontSize = 0.1*linkSize;
   dPtr->forceText->SetCharHeight(fontSize);
   dPtr->torqueText->SetCharHeight(fontSize);
-  dPtr->forceText->SetBaseline(0.12*linkSize.GetLength());
+  dPtr->forceText->SetBaseline(0.12*linkSize);
 
   // Rot tool
-  dPtr->rotTool->SetScale(math::Vector3(0.75*linkSize.GetLength(),
-                                        0.75*linkSize.GetLength(),
-                                        0.75*linkSize.GetLength()));
+  dPtr->rotTool->SetScale(math::Vector3(0.75*linkSize,
+                                        0.75*linkSize,
+                                        0.75*linkSize));
 }
