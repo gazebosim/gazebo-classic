@@ -1739,7 +1739,7 @@ void ModelCreator::Update()
   for (auto &linksIt : this->allLinks)
   {
     LinkData *link = linksIt.second;
-    if (link->GetPose() != link->linkVisual->GetWorldPose() - this->modelPose)
+    if (link->GetPose() != link->linkVisual->GetPose())
     {
       link->SetPose(link->linkVisual->GetWorldPose() - this->modelPose);
       this->ModelChanged();
