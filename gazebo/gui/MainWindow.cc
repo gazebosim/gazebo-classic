@@ -244,7 +244,7 @@ void MainWindow::Init()
   this->renderWidget->show();
 
   // Default window size is entire desktop.
-  QSize winSize = QApplication::desktop()->screenGeometry()->size();
+  QSize winSize = QApplication::desktop()->screenGeometry().size();
 
   // Get the size properties from the INI file.
   int winWidth = getINIProperty<int>("geometry.width", winSize.width());
