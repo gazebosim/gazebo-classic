@@ -175,69 +175,50 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   connect(this->dataPtr->comRadio, SIGNAL(toggled(bool)), this,
       SLOT(ToggleComRadio(bool)));
 
-  // Force Position X
-  QLabel *forcePosXLabel = new QLabel();
-  forcePosXLabel->setText(tr("X:"));
-  QLabel *forcePosXUnitLabel = new QLabel();
-  forcePosXUnitLabel->setText(tr("m"));
 
-  this->dataPtr->forcePosXSpin = new QDoubleSpinBox();
-  this->dataPtr->forcePosXSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->forcePosXSpin->setSingleStep(0.1);
-  this->dataPtr->forcePosXSpin->setDecimals(3);
-  this->dataPtr->forcePosXSpin->setValue(0);
-  this->dataPtr->forcePosXSpin->setMaximumWidth(100);
-  this->dataPtr->forcePosXSpin->installEventFilter(this);
-  connect(this->dataPtr->forcePosXSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnForcePosChanged(double)));
-
-  // Force Position Y
-  QLabel *forcePosYLabel = new QLabel();
-  forcePosYLabel->setText(tr("Y:"));
-  QLabel *forcePosYUnitLabel = new QLabel();
-  forcePosYUnitLabel->setText(tr("m"));
-
-  this->dataPtr->forcePosYSpin = new QDoubleSpinBox();
-  this->dataPtr->forcePosYSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->forcePosYSpin->setSingleStep(0.1);
-  this->dataPtr->forcePosYSpin->setDecimals(3);
-  this->dataPtr->forcePosYSpin->setValue(0);
-  this->dataPtr->forcePosYSpin->setMaximumWidth(100);
-  this->dataPtr->forcePosYSpin->installEventFilter(this);
-  connect(this->dataPtr->forcePosYSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnForcePosChanged(double)));
-
-  // Force Position Z
-  QLabel *forcePosZLabel = new QLabel();
-  forcePosZLabel->setText(tr("Z:"));
-  QLabel *forcePosZUnitLabel = new QLabel();
-  forcePosZUnitLabel->setText(tr("m"));
-
-  this->dataPtr->forcePosZSpin = new QDoubleSpinBox();
-  this->dataPtr->forcePosZSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->forcePosZSpin->setSingleStep(0.1);
-  this->dataPtr->forcePosZSpin->setDecimals(3);
-  this->dataPtr->forcePosZSpin->setValue(0);
-  this->dataPtr->forcePosZSpin->setMaximumWidth(100);
-  this->dataPtr->forcePosZSpin->installEventFilter(this);
-  connect(this->dataPtr->forcePosZSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnForcePosChanged(double)));
-
+  // Force Position layout
   QGridLayout *forcePosLayout = new QGridLayout();
   forcePosLayout->setContentsMargins(0, 0, 0, 0);
   forcePosLayout->addWidget(forcePosLabel, 0, 0, 1, 4, Qt::AlignLeft);
   forcePosLayout->addWidget(this->dataPtr->comRadio, 1, 0);
   forcePosLayout->addLayout(comLabelLayout, 1, 1, 1, 3, Qt::AlignLeft);
   forcePosLayout->addWidget(this->dataPtr->forcePosRadio, 2, 0);
-  forcePosLayout->addWidget(forcePosXLabel, 2, 1);
-  forcePosLayout->addWidget(this->dataPtr->forcePosXSpin, 2, 2);
-  forcePosLayout->addWidget(forcePosXUnitLabel, 2, 3);
-  forcePosLayout->addWidget(forcePosYLabel, 3, 1);
-  forcePosLayout->addWidget(this->dataPtr->forcePosYSpin, 3, 2);
-  forcePosLayout->addWidget(forcePosYUnitLabel, 3, 3);
-  forcePosLayout->addWidget(forcePosZLabel, 4, 1);
-  forcePosLayout->addWidget(this->dataPtr->forcePosZSpin, 4, 2);
-  forcePosLayout->addWidget(forcePosZUnitLabel, 4, 3);
+
+  // Force Position Vector
+  this->dataPtr->forcePosXSpin = new QDoubleSpinBox();
+  this->dataPtr->forcePosYSpin = new QDoubleSpinBox();
+  this->dataPtr->forcePosZSpin = new QDoubleSpinBox();
+
+  std::vector<QDoubleSpinBox *> forcePosSpins;
+  forcePosSpins.push_back(this->dataPtr->forcePosXSpin);
+  forcePosSpins.push_back(this->dataPtr->forcePosYSpin);
+  forcePosSpins.push_back(this->dataPtr->forcePosZSpin);
+
+  for (unsigned int i = 0; i < forcePosSpins.size(); ++i)
+  {
+    QLabel *forcePosElementLabel = new QLabel();
+    if (i == 0)
+      forcePosElementLabel->setText(tr("X:"));
+    else if (i == 1)
+      forcePosElementLabel->setText(tr("Y:"));
+    else if (i == 2)
+      forcePosElementLabel->setText(tr("Z:"));
+    QLabel *forcePosUnitLabel = new QLabel();
+    forcePosUnitLabel->setText(tr("m"));
+
+    forcePosSpins[i]->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+    forcePosSpins[i]->setSingleStep(0.1);
+    forcePosSpins[i]->setDecimals(3);
+    forcePosSpins[i]->setValue(0);
+    forcePosSpins[i]->setMaximumWidth(100);
+    forcePosSpins[i]->installEventFilter(this);
+    connect(forcePosSpins[i], SIGNAL(valueChanged(double)), this,
+        SLOT(OnForcePosChanged(double)));
+
+    forcePosLayout->addWidget(forcePosElementLabel, i+2, 1, Qt::AlignRight);
+    forcePosLayout->addWidget(forcePosSpins[i], i+2, 2);
+    forcePosLayout->addWidget(forcePosUnitLabel, i+2, 3);
+  }
 
   // Apply force
   QPushButton *applyForceButton = new QPushButton("Apply Force");
@@ -309,7 +290,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
     else if (i == 2)
       torqueElementLabel->setText(tr("Z:"));
     QLabel *torqueUnitLabel = new QLabel();
-    torqueUnitLabel->setText(tr("N"));
+    torqueUnitLabel->setText(tr("Nm"));
 
     torqueSpins[i]->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
     torqueSpins[i]->setSingleStep(100);

@@ -60,34 +60,37 @@ namespace gazebo
       /// given direction.
       /// \param[in] _dir Direction vector.
       /// \return Resulting quaternion
-      public: math::Quaternion GetQuaternionFromVector(math::Vector3 _dir);
+      public: math::Quaternion GetQuaternionFromVector(
+          const math::Vector3 &_dir);
 
       /// \brief Set the mode to "force", "torque" or "none", update colors
       /// and visibility accordingly.
       /// \param[in] _mode New mode.
-      public: void SetMode(std::string _mode);
+      public: void SetMode(const std::string &_mode);
 
       /// \brief Set the CoM vector and update the position of the torque
       /// visual.
       /// \param[in] _comVector New vector.
-      public: void SetCoM(math::Vector3 _comVector);
+      public: void SetCoM(const math::Vector3 &_comVector);
 
       /// \brief Set the force position vector and update the position of the
       /// force visual.
       /// \param[in] _forcePosVector New vector.
-      public: void SetForcePos(math::Vector3 _forcePosVector);
+      public: void SetForcePos(const math::Vector3 &_forcePosVector);
 
       /// \brief Update force vector, force text and mode.
       /// \param[in] _forceVector New vector.
       /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
       /// or not.
-      public: void SetForce(math::Vector3 _forceVector, bool _rotatedByMouse);
+      public: void SetForce(const math::Vector3 &_forceVector,
+          bool _rotatedByMouse);
 
       /// \brief Update torque vector, torque text and mode.
       /// \param[in] _torqueVector New vector.
       /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
       /// or not.
-      public: void SetTorque(math::Vector3 _torqueVector, bool _rotatedByMouse);
+      public: void SetTorque(const math::Vector3 &_torqueVector,
+          bool _rotatedByMouse);
 
       /// \brief Update the force visual according to the force and force
       /// position vectors.

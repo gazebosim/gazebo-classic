@@ -243,7 +243,8 @@ rendering::SelectionObjPtr ApplyWrenchVisual::GetRotTool() const
 }
 
 ///////////////////////////////////////////////////
-math::Quaternion ApplyWrenchVisual::GetQuaternionFromVector(math::Vector3 _vec)
+math::Quaternion ApplyWrenchVisual::GetQuaternionFromVector(
+    const math::Vector3 &_vec)
 {
   double roll = 0;
   double pitch = -atan2(_vec.z, sqrt(pow(_vec.x, 2) + pow(_vec.y, 2)));
@@ -253,7 +254,7 @@ math::Quaternion ApplyWrenchVisual::GetQuaternionFromVector(math::Vector3 _vec)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchVisual::SetMode(std::string _mode)
+void ApplyWrenchVisual::SetMode(const std::string &_mode)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
@@ -298,7 +299,7 @@ void ApplyWrenchVisual::SetMode(std::string _mode)
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetCoM(math::Vector3 _comVector)
+void ApplyWrenchVisual::SetCoM(const math::Vector3 &_comVector)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
@@ -308,7 +309,7 @@ void ApplyWrenchVisual::SetCoM(math::Vector3 _comVector)
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetForcePos(math::Vector3 _forcePosVector)
+void ApplyWrenchVisual::SetForcePos(const math::Vector3 &_forcePosVector)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
@@ -318,7 +319,7 @@ void ApplyWrenchVisual::SetForcePos(math::Vector3 _forcePosVector)
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetForce(math::Vector3 _forceVector,
+void ApplyWrenchVisual::SetForce(const math::Vector3 &_forceVector,
     bool _rotatedByMouse)
 {
   ApplyWrenchVisualPrivate *dPtr =
@@ -351,7 +352,7 @@ void ApplyWrenchVisual::SetForce(math::Vector3 _forceVector,
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetTorque(math::Vector3 _torqueVector,
+void ApplyWrenchVisual::SetTorque(const math::Vector3 &_torqueVector,
     bool _rotatedByMouse)
 {
   ApplyWrenchVisualPrivate *dPtr =
