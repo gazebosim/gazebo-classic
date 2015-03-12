@@ -735,7 +735,6 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
   }
 
   rendering::ScenePtr scene = link->linkVisual->GetScene();
-  scene->AddVisual(link->linkVisual);
 
   this->ModelChanged();
 }
@@ -928,7 +927,6 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
   }
 
   rendering::ScenePtr scene = link->linkVisual->GetScene();
-  scene->AddVisual(link->linkVisual);
 
   this->ModelChanged();
 }
@@ -1024,7 +1022,6 @@ void ModelCreator::Reset()
   this->previewVisual->Load();
   this->modelPose = math::Pose::Zero;
   this->previewVisual->SetPose(this->modelPose);
-  scene->AddVisual(this->previewVisual);
 }
 
 /////////////////////////////////////////////////

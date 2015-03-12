@@ -229,6 +229,9 @@ RenderWidget::~RenderWidget()
 
   delete this->toolbar;
   this->toolbar = NULL;
+
+  // we created the scene here we are responsible for removing it.
+  rendering::remove_scene(gui::get_world());
 }
 
 /////////////////////////////////////////////////

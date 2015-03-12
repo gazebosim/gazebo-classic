@@ -647,7 +647,7 @@ void World::Step(unsigned int _steps)
   bool wait = true;
   while (wait)
   {
-    common::Time::MSleep(1);
+    common::Time::NSleep(1);
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
     if (this->dataPtr->stepInc == 0 || this->dataPtr->stop)
       wait = false;

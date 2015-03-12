@@ -3,6 +3,9 @@
 1. Use collide_bitmask from SDF to perform collision filtering
     * [Pull request #1470](https://bitbucket.org/osrf/gazebo/pull-request/1470)
 
+1. Pass Coulomb surface friction parameters to DART.
+    * [Pull request #1420](https://bitbucket.org/osrf/gazebo/pull-request/1420)
+
 1. Added various Get functions to Visual. Also added a ConvertGeometryType function to msgs.
     * [Pull request #1402](https://bitbucket.org/osrf/gazebo/pull-request/1402)
 

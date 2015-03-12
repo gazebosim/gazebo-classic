@@ -137,3 +137,9 @@ void SurfaceParams::ProcessMsg(const msgs::Surface &_msg)
   if (_msg.has_collide_bitmask())
     this->collideBitmask = _msg.collide_bitmask();
 }
+
+/////////////////////////////////////////////////
+FrictionPyramidPtr SurfaceParams::GetFrictionPyramid() const
+{
+  return FrictionPyramidPtr();
+}

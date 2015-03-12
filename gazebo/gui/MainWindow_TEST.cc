@@ -115,6 +115,37 @@ void MainWindow_TEST::Selection()
 }
 
 /////////////////////////////////////////////////
+void MainWindow_TEST::SceneDestruction()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  // Create the main window.
+  mainWindow->Load();
+
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != NULL);
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+
+  // verify that this test case has the only scene shared pointer remaining.
+  QVERIFY(scene.use_count() == 1u);
+}
+
+/////////////////////////////////////////////////
 void MainWindow_TEST::UserCameraFPS()
 {
   this->resMaxPercentChange = 5.0;
@@ -171,9 +202,6 @@ void MainWindow_TEST::CopyPaste()
 
   // Create the main window.
   mainWindow->Load();
-
-  gazebo::rendering::create_scene(
-      gazebo::physics::get_world()->GetName(), false);
 
   mainWindow->Init();
   mainWindow->show();
@@ -233,7 +261,7 @@ void MainWindow_TEST::CopyPaste()
 
     // Paste the model
     QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier);
-    QTest::qWait(500);
+    QTest::qWait(1000);
 
     // Release and spawn the model
     QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
@@ -248,7 +276,7 @@ void MainWindow_TEST::CopyPaste()
     while (!modelVisClone && sleep < maxSleep)
     {
       modelVisClone = scene->GetVisual(modelName + "_clone");
-      QTest::qWait(30);
+      QTest::qWait(100);
       sleep++;
     }
     QVERIFY(modelVisClone != NULL);
