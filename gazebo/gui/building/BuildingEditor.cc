@@ -166,7 +166,7 @@ void BuildingEditor::OnEdit(bool _checked)
     this->mainWindow->GetRenderWidget()->ShowTimePanel(true);
     this->mainWindow->GetRenderWidget()->ShowToolbar(true);
     this->mainWindow->ShowMenuBar();
-    if (this->mainWindowPaused)
+    if (!this->mainWindowPaused)
       this->mainWindow->Play();
   }
   gui::editor::Events::toggleEditMode(_checked);
