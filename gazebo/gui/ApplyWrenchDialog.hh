@@ -55,7 +55,8 @@ namespace gazebo
       /// \param[in] _linkName Scoped name of a link within the model to which
       /// a wrench will be applied. The link might be changed later, but not
       /// the model.
-      public: void Init(std::string _modelName, std::string _linkName);
+      public: void Init(const std::string &_modelName,
+          const std::string &_linkName);
 
       /// \brief Finish the dialog.
       public: void Fini();
@@ -63,16 +64,16 @@ namespace gazebo
       /// \brief Set model to which wrench will be applied.
       /// \param[in] _modelName Scoped model name.
       /// \return True if model was properly set.
-      private: bool SetModel(std::string _modelName);
+      private: bool SetModel(const std::string &_modelName);
 
       /// \brief Set link to which wrench will be applied.
       /// \param[in] _linkName Scoped link name.
       /// \return True if link was properly set.
-      private: bool SetLink(std::string _linkName);
+      private: bool SetLink(const std::string &_linkName);
 
       /// \brief Set link from combo box.
       /// \param[in] _linkName Link leaf name.
-      private slots: void SetLink(QString _linkName);
+      private slots: void SetLink(const QString _linkName);
 
       /// \brief Qt callback when the Apply All button is pressed.
       private slots: void OnApplyAll();
@@ -157,39 +158,39 @@ namespace gazebo
       private: void SetSpinValue(QDoubleSpinBox *_spin, double _value);
 
       /// \brief Set the mode to either "force", "torque" or "none".
-      private: void SetMode(std::string _mode);
+      private: void SetMode(const std::string &_mode);
 
       /// \brief Set CoM vector and send it to visuals.
       /// \param[in] _com CoM position in link frame.
-      private: void SetCoM(math::Vector3 _com);
+      private: void SetCoM(const math::Vector3 &_com);
 
       /// \brief Set force position vector and update spins and visuals.
       /// \param[in] _forcePos New force position.
-      private: void SetForcePos(math::Vector3 _forcePos);
+      private: void SetForcePos(const math::Vector3 &_forcePos);
 
       /// \brief Set force vector and update spins and visuals.
       /// \param[in] _force New force.
       /// \param[in] _rotatedByMouse If rotated by mouse, update force visual
       /// but not the rot tool.
-      private: void SetForce(math::Vector3 _force,
+      private: void SetForce(const math::Vector3 &_force,
           bool _rotatedByMouse = false);
 
       /// \brief Update force vector with direction given by mouse, magnitude
       /// from spin.
       /// \param[in] _dir New direction.
-      private: void NewForceDirection(math::Vector3 _dir);
+      private: void NewForceDirection(const math::Vector3 &_dir);
 
       /// \brief Set torque vector and update spins and visuals.
       /// \param[in] _torque New torque.
       /// \param[in] _rotatedByMouse If rotated by mouse, update torque visual
       /// but not the rot tool.
-      private: void SetTorque(math::Vector3 _torque,
+      private: void SetTorque(const math::Vector3 &_torque,
           bool _rotatedByMouse = false);
 
       /// \brief Update torque vector with direction given by mouse, magnitude
       /// from spin.
       /// \param[in] _dir New direction.
-      private: void NewTorqueDirection(math::Vector3 _dir);
+      private: void NewTorqueDirection(const math::Vector3 &_dir);
 
       /// \brief Callback when receiving a response message. Used to get the
       /// CoM from the server.

@@ -144,7 +144,7 @@ void ApplyWrenchVisual::Load()
   torqueHeadNode->attachObject(torqueHeadObj);
   torqueHeadNode->setScale(3, 3, 1);
   torqueHeadNode->setPosition(-0.04, 0.125, 0);
-  math::Quaternion quat(0, -1.57, 0);
+  math::Quaternion quat(0, -M_PI/2.0, 0);
   torqueHeadNode->setOrientation(
       Ogre::Quaternion(quat.w, quat.x, quat.y, quat.z));
 

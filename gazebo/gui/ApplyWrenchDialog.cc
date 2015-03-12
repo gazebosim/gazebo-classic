@@ -77,53 +77,44 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
       min-height: 40px;\
     }");
 
-  // Force X
-  QLabel *forceXLabel = new QLabel();
-  forceXLabel->setText(tr("X:"));
-  QLabel *forceXUnitLabel = new QLabel();
-  forceXUnitLabel->setText(tr("N"));
+  // Force vector layout
+  QGridLayout *forceVectorLayout = new QGridLayout();
 
+  // Force Vector
   this->dataPtr->forceXSpin = new QDoubleSpinBox();
-  this->dataPtr->forceXSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->forceXSpin->setSingleStep(100);
-  this->dataPtr->forceXSpin->setDecimals(3);
-  this->dataPtr->forceXSpin->setValue(0);
-  this->dataPtr->forceXSpin->setMaximumWidth(100);
-  this->dataPtr->forceXSpin->installEventFilter(this);
-  connect(this->dataPtr->forceXSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnForceChanged(double)));
-
-  // Force Y
-  QLabel *forceYLabel = new QLabel();
-  forceYLabel->setText(tr("Y:"));
-  QLabel *forceYUnitLabel = new QLabel();
-  forceYUnitLabel->setText(tr("N"));
-
   this->dataPtr->forceYSpin = new QDoubleSpinBox();
-  this->dataPtr->forceYSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->forceYSpin->setSingleStep(100);
-  this->dataPtr->forceYSpin->setDecimals(3);
-  this->dataPtr->forceYSpin->setValue(0);
-  this->dataPtr->forceYSpin->setMaximumWidth(100);
-  this->dataPtr->forceYSpin->installEventFilter(this);
-  connect(this->dataPtr->forceYSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnForceChanged(double)));
-
-  // Force Z
-  QLabel *forceZLabel = new QLabel();
-  forceZLabel->setText(tr("Z:"));
-  QLabel *forceZUnitLabel = new QLabel();
-  forceZUnitLabel->setText(tr("N"));
-
   this->dataPtr->forceZSpin = new QDoubleSpinBox();
-  this->dataPtr->forceZSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->forceZSpin->setSingleStep(100);
-  this->dataPtr->forceZSpin->setDecimals(3);
-  this->dataPtr->forceZSpin->setValue(0);
-  this->dataPtr->forceZSpin->setMaximumWidth(100);
-  this->dataPtr->forceZSpin->installEventFilter(this);
-  connect(this->dataPtr->forceZSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnForceChanged(double)));
+
+  std::vector<QDoubleSpinBox *> forceSpins;
+  forceSpins.push_back(this->dataPtr->forceXSpin);
+  forceSpins.push_back(this->dataPtr->forceYSpin);
+  forceSpins.push_back(this->dataPtr->forceZSpin);
+
+  for (unsigned int i = 0; i < forceSpins.size(); ++i)
+  {
+    QLabel *forceElementLabel = new QLabel();
+    if (i == 0)
+      forceElementLabel->setText(tr("X:"));
+    else if (i == 1)
+      forceElementLabel->setText(tr("Y:"));
+    else if (i == 2)
+      forceElementLabel->setText(tr("Z:"));
+    QLabel *forceUnitLabel = new QLabel();
+    forceUnitLabel->setText(tr("N"));
+
+    forceSpins[i]->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+    forceSpins[i]->setSingleStep(100);
+    forceSpins[i]->setDecimals(3);
+    forceSpins[i]->setValue(0);
+    forceSpins[i]->setMaximumWidth(100);
+    forceSpins[i]->installEventFilter(this);
+    connect(forceSpins[i], SIGNAL(valueChanged(double)), this,
+        SLOT(OnForceChanged(double)));
+
+    forceVectorLayout->addWidget(forceElementLabel, i, 0, Qt::AlignRight);
+    forceVectorLayout->addWidget(forceSpins[i], i, 1);
+    forceVectorLayout->addWidget(forceUnitLabel, i, 2);
+  }
 
   // Force total
   QLabel *forceMagLabel = new QLabel();
@@ -141,24 +132,13 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   connect(this->dataPtr->forceMagSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnForceMagChanged(double)));
 
-  // Clear force
-  QPushButton *forceClearButton = new QPushButton(tr("Clear"));
-  connect(forceClearButton, SIGNAL(clicked()), this, SLOT(OnForceClear()));
-
-  // Force vector layout
-  QGridLayout *forceVectorLayout = new QGridLayout();
-  forceVectorLayout->addWidget(forceXLabel, 0, 0, Qt::AlignRight);
-  forceVectorLayout->addWidget(this->dataPtr->forceXSpin, 0, 1);
-  forceVectorLayout->addWidget(forceXUnitLabel, 0, 2);
-  forceVectorLayout->addWidget(forceYLabel, 1, 0, Qt::AlignRight);
-  forceVectorLayout->addWidget(this->dataPtr->forceYSpin, 1, 1);
-  forceVectorLayout->addWidget(forceYUnitLabel, 1, 2);
-  forceVectorLayout->addWidget(forceZLabel, 2, 0, Qt::AlignRight);
-  forceVectorLayout->addWidget(this->dataPtr->forceZSpin, 2, 1);
-  forceVectorLayout->addWidget(forceZUnitLabel, 2, 2);
   forceVectorLayout->addWidget(forceMagLabel, 3, 0, Qt::AlignRight);
   forceVectorLayout->addWidget(this->dataPtr->forceMagSpin, 3, 1);
   forceVectorLayout->addWidget(forceMagUnitLabel, 3, 2);
+
+  // Clear force
+  QPushButton *forceClearButton = new QPushButton(tr("Clear"));
+  connect(forceClearButton, SIGNAL(clicked()), this, SLOT(OnForceClear()));
   forceVectorLayout->addWidget(forceClearButton, 4, 0, 1, 3, Qt::AlignLeft);
 
   // Vertical separator
@@ -306,53 +286,44 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
       min-height: 40px;\
     }");
 
-  // Torque X
-  QLabel *torqueXLabel = new QLabel();
-  torqueXLabel->setText(tr("X:"));
-  QLabel *torqueXUnitLabel = new QLabel();
-  torqueXUnitLabel->setText(tr("Nm"));
+  // Torque vector layout
+  QGridLayout *torqueVectorLayout = new QGridLayout();
 
+  // Torque Vector
   this->dataPtr->torqueXSpin = new QDoubleSpinBox();
-  this->dataPtr->torqueXSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->torqueXSpin->setSingleStep(100);
-  this->dataPtr->torqueXSpin->setDecimals(3);
-  this->dataPtr->torqueXSpin->setValue(0);
-  this->dataPtr->torqueXSpin->setMaximumWidth(100);
-  this->dataPtr->torqueXSpin->installEventFilter(this);
-  connect(this->dataPtr->torqueXSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnTorqueChanged(double)));
-
-  // Torque Y
-  QLabel *torqueYLabel = new QLabel();
-  torqueYLabel->setText(tr("Y:"));
-  QLabel *torqueYUnitLabel = new QLabel();
-  torqueYUnitLabel->setText(tr("Nm"));
-
   this->dataPtr->torqueYSpin = new QDoubleSpinBox();
-  this->dataPtr->torqueYSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->torqueYSpin->setSingleStep(100);
-  this->dataPtr->torqueYSpin->setDecimals(3);
-  this->dataPtr->torqueYSpin->setValue(0);
-  this->dataPtr->torqueYSpin->setMaximumWidth(100);
-  this->dataPtr->torqueYSpin->installEventFilter(this);
-  connect(this->dataPtr->torqueYSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnTorqueChanged(double)));
-
-  // Torque Z
-  QLabel *torqueZLabel = new QLabel();
-  torqueZLabel->setText(tr("Z:"));
-  QLabel *torqueZUnitLabel = new QLabel();
-  torqueZUnitLabel->setText(tr("Nm"));
-
   this->dataPtr->torqueZSpin = new QDoubleSpinBox();
-  this->dataPtr->torqueZSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-  this->dataPtr->torqueZSpin->setSingleStep(100);
-  this->dataPtr->torqueZSpin->setDecimals(3);
-  this->dataPtr->torqueZSpin->setValue(0);
-  this->dataPtr->torqueZSpin->setMaximumWidth(100);
-  this->dataPtr->torqueZSpin->installEventFilter(this);
-  connect(this->dataPtr->torqueZSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnTorqueChanged(double)));
+
+  std::vector<QDoubleSpinBox *> torqueSpins;
+  torqueSpins.push_back(this->dataPtr->torqueXSpin);
+  torqueSpins.push_back(this->dataPtr->torqueYSpin);
+  torqueSpins.push_back(this->dataPtr->torqueZSpin);
+
+  for (unsigned int i = 0; i < torqueSpins.size(); ++i)
+  {
+    QLabel *torqueElementLabel = new QLabel();
+    if (i == 0)
+      torqueElementLabel->setText(tr("X:"));
+    else if (i == 1)
+      torqueElementLabel->setText(tr("Y:"));
+    else if (i == 2)
+      torqueElementLabel->setText(tr("Z:"));
+    QLabel *torqueUnitLabel = new QLabel();
+    torqueUnitLabel->setText(tr("N"));
+
+    torqueSpins[i]->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+    torqueSpins[i]->setSingleStep(100);
+    torqueSpins[i]->setDecimals(3);
+    torqueSpins[i]->setValue(0);
+    torqueSpins[i]->setMaximumWidth(100);
+    torqueSpins[i]->installEventFilter(this);
+    connect(torqueSpins[i], SIGNAL(valueChanged(double)), this,
+        SLOT(OnTorqueChanged(double)));
+
+    torqueVectorLayout->addWidget(torqueElementLabel, i, 0, Qt::AlignRight);
+    torqueVectorLayout->addWidget(torqueSpins[i], i, 1);
+    torqueVectorLayout->addWidget(torqueUnitLabel, i, 2);
+  }
 
   // Torque magnitude
   QLabel *torqueMagLabel = new QLabel();
@@ -370,24 +341,13 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   connect(this->dataPtr->torqueMagSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnTorqueMagChanged(double)));
 
-  // Clear torque
-  QPushButton *torqueClearButton = new QPushButton(tr("Clear"));
-  connect(torqueClearButton, SIGNAL(clicked()), this, SLOT(OnTorqueClear()));
-
-  // Torque vector layout
-  QGridLayout *torqueVectorLayout = new QGridLayout();
-  torqueVectorLayout->addWidget(torqueXLabel, 0, 0, Qt::AlignRight);
-  torqueVectorLayout->addWidget(this->dataPtr->torqueXSpin, 0, 1);
-  torqueVectorLayout->addWidget(torqueXUnitLabel, 0, 2);
-  torqueVectorLayout->addWidget(torqueYLabel, 1, 0, Qt::AlignRight);
-  torqueVectorLayout->addWidget(this->dataPtr->torqueYSpin, 1, 1);
-  torqueVectorLayout->addWidget(torqueYUnitLabel, 1, 2);
-  torqueVectorLayout->addWidget(torqueZLabel, 2, 0, Qt::AlignRight);
-  torqueVectorLayout->addWidget(this->dataPtr->torqueZSpin, 2, 1);
-  torqueVectorLayout->addWidget(torqueZUnitLabel, 2, 2);
   torqueVectorLayout->addWidget(torqueMagLabel, 3, 0, Qt::AlignRight);
   torqueVectorLayout->addWidget(this->dataPtr->torqueMagSpin, 3, 1);
   torqueVectorLayout->addWidget(torqueMagUnitLabel, 3, 2);
+
+  // Clear torque
+  QPushButton *torqueClearButton = new QPushButton(tr("Clear"));
+  connect(torqueClearButton, SIGNAL(clicked()), this, SLOT(OnTorqueClear()));
   torqueVectorLayout->addWidget(torqueClearButton, 4, 0, 1, 3, Qt::AlignLeft);
 
   // Apply torque
@@ -472,7 +432,8 @@ ApplyWrenchDialog::~ApplyWrenchDialog()
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::Init(std::string _modelName, std::string _linkName)
+void ApplyWrenchDialog::Init(const std::string &_modelName,
+    const std::string &_linkName)
 {
   if (!this->SetModel(_modelName))
     return;
@@ -510,8 +471,11 @@ void ApplyWrenchDialog::Fini()
 }
 
 /////////////////////////////////////////////////
-bool ApplyWrenchDialog::SetModel(std::string _modelName)
+bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
 {
+  if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene())
+    return false;
+
   rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
       GetVisual(_modelName);
 
@@ -562,8 +526,11 @@ bool ApplyWrenchDialog::SetModel(std::string _modelName)
 }
 
 /////////////////////////////////////////////////
-bool ApplyWrenchDialog::SetLink(std::string _linkName)
+bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
 {
+  if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene())
+    return false;
+
   // Select on combo box
   std::string unscopedLinkName = _linkName.substr(_linkName.find("::") + 2);
   int index = -1;
@@ -622,7 +589,7 @@ bool ApplyWrenchDialog::SetLink(std::string _linkName)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetLink(QString _linkName)
+void ApplyWrenchDialog::SetLink(const QString _linkName)
 {
   // Remove previous link's filter
   MouseEventHandler::Instance()->RemoveReleaseFilter(
@@ -1066,14 +1033,8 @@ void ApplyWrenchDialog::changeEvent(QEvent *_event)
     if (!this->dataPtr->mainWindow)
       return;
 
-    if (this->isActiveWindow() || this->dataPtr->mainWindow->isActiveWindow())
-    {
-      this->SetActive(true);
-    }
-    else
-    {
-      this->SetActive(false);
-    }
+    this->SetActive(this->isActiveWindow() ||
+        this->dataPtr->mainWindow->isActiveWindow());
   }
 }
 
@@ -1086,13 +1047,13 @@ void ApplyWrenchDialog::SetSpinValue(QDoubleSpinBox *_spin, double _value)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetMode(std::string _mode)
+void ApplyWrenchDialog::SetMode(const std::string &_mode)
 {
   this->dataPtr->mode = _mode;
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetCoM(math::Vector3 _com)
+void ApplyWrenchDialog::SetCoM(const math::Vector3 &_com)
 {
   // Set com vector and send it to visuals
   this->dataPtr->comVector = _com;
@@ -1105,7 +1066,7 @@ void ApplyWrenchDialog::SetCoM(math::Vector3 _com)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetForcePos(math::Vector3 _forcePos)
+void ApplyWrenchDialog::SetForcePos(const math::Vector3 &_forcePos)
 {
   this->dataPtr->forcePosVector = _forcePos;
 
@@ -1135,7 +1096,8 @@ void ApplyWrenchDialog::SetForcePos(math::Vector3 _forcePos)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetForce(math::Vector3 _force, bool _rotatedByMouse)
+void ApplyWrenchDialog::SetForce(const math::Vector3 &_force,
+    bool _rotatedByMouse)
 {
   this->dataPtr->forceVector = _force;
 
@@ -1166,7 +1128,7 @@ void ApplyWrenchDialog::SetForce(math::Vector3 _force, bool _rotatedByMouse)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::NewForceDirection(math::Vector3 _dir)
+void ApplyWrenchDialog::NewForceDirection(const math::Vector3 &_dir)
 {
   // Normalize direction
   math::Vector3 v = _dir;
@@ -1180,7 +1142,8 @@ void ApplyWrenchDialog::NewForceDirection(math::Vector3 _dir)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetTorque(math::Vector3 _torque, bool _rotatedByMouse)
+void ApplyWrenchDialog::SetTorque(const math::Vector3 &_torque,
+    bool _rotatedByMouse)
 {
   this->dataPtr->torqueVector = _torque;
 
@@ -1211,7 +1174,7 @@ void ApplyWrenchDialog::SetTorque(math::Vector3 _torque, bool _rotatedByMouse)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::NewTorqueDirection(math::Vector3 _dir)
+void ApplyWrenchDialog::NewTorqueDirection(const math::Vector3 &_dir)
 {
   // Normalize direction
   math::Vector3 v = _dir;
@@ -1270,6 +1233,9 @@ void ApplyWrenchDialog::SetActive(bool _active)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnPreRender()
 {
+  if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene())
+    return;
+
   rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
       GetVisual(this->dataPtr->linkName);
 

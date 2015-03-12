@@ -58,7 +58,8 @@ namespace gazebo
 
       /// \brief Get the rotation to point the positive Z axis to the
       /// given direction.
-      /// _direction Direction vector.
+      /// \param[in] _dir Direction vector.
+      /// \return Resulting quaternion
       public: math::Quaternion GetQuaternionFromVector(math::Vector3 _dir);
 
       /// \brief Set the mode to "force", "torque" or "none", update colors
