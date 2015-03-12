@@ -73,7 +73,7 @@ namespace gazebo
       /// \return True if paused, false otherwise.
       public: bool IsPaused() const;
 
-      /// \brief Set whether to diplay the simulation as paused.
+      /// \brief Set whether to display the simulation as paused.
       /// \param[in] _p True to display the simulation as paused. False
       /// indicates the simulation is running
       public: void SetPaused(bool _paused);

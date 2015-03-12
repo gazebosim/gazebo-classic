@@ -200,9 +200,6 @@ namespace gazebo
       /// \brief Create menus.
       private: void CreateMenus();
 
-      /// \brief Create the toolbars.
-      private: void CreateToolbars();
-
       /// \brief Create the main menu bar.
       private: void CreateMenuBar();
 

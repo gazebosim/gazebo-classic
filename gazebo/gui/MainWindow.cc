@@ -1441,15 +1441,6 @@ void MainWindow::CreateMenus()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::CreateToolbars()
-{
-  this->playToolbar = this->addToolBar(tr("Play"));
-  this->playToolbar->addAction(g_playAct);
-  this->playToolbar->addAction(g_pauseAct);
-  this->playToolbar->addAction(g_stepAct);
-}
-
-/////////////////////////////////////////////////
 void MainWindow::OnMoveMode(bool _mode)
 {
   if (_mode)
