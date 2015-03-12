@@ -140,7 +140,6 @@ void JointMaker_TEST::CreateRemoveJoint()
 /////////////////////////////////////////////////
 void JointMaker_TEST::JointDefaultProperties()
 {
-
   // FIXME Test passes but segfaults when QTestFixture clean up
   // Problem: JointMaker's destructor resets visual shared_ptrs
   // but this later causes a segfault in Visual's destructor when exiting the
