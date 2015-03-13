@@ -403,8 +403,9 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 /////////////////////////////////////////////////
 ApplyWrenchDialog::~ApplyWrenchDialog()
 {
-  MouseEventHandler::Instance()->RemoveReleaseFilter(
-    "applyWrenchDialog_"+this->dataPtr->linkName);
+  if (this->dataPtr->applyWrenchVisual)
+    MouseEventHandler::Instance()->RemoveReleaseFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
 
   this->dataPtr->node->Fini();
   this->dataPtr->connections.clear();
@@ -436,19 +437,23 @@ void ApplyWrenchDialog::Fini()
 {
   this->close();
   this->dataPtr->connections.clear();
+  this->dataPtr->mainWindow->removeEventFilter(this);
 
-  MouseEventHandler::Instance()->RemoveReleaseFilter(
-    "applyWrenchDialog_"+this->dataPtr->linkName);
-  MouseEventHandler::Instance()->RemovePressFilter(
-      "applyWrenchDialog_"+this->dataPtr->linkName);
-  MouseEventHandler::Instance()->RemoveMoveFilter(
-      "applyWrenchDialog_"+this->dataPtr->linkName);
-  KeyEventHandler::Instance()->RemovePressFilter(
-      "applyWrenchDialog_"+this->dataPtr->linkName);
-
-  // Remove visuals
   if (this->dataPtr->applyWrenchVisual)
+  {
+    MouseEventHandler::Instance()->RemoveReleaseFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+    MouseEventHandler::Instance()->RemovePressFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+    MouseEventHandler::Instance()->RemoveMoveFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+    KeyEventHandler::Instance()->RemovePressFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
     this->dataPtr->applyWrenchVisual->Fini();
+  }
+  this->dataPtr->applyWrenchVisual.reset();
+
+  this->deleteLater();
 }
 
 /////////////////////////////////////////////////
@@ -485,7 +490,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
     rendering::VisualPtr childVis = vis->GetChild(i);
     std::string linkName = childVis->GetName();
 
-    // This is failing to get real links sometimes:
+    // FIXME: This is failing to get real links sometimes:
     // uint32_t flags = childVis->GetVisibilityFlags();
     // if (!((flags != GZ_VISIBILITY_ALL) && (flags & GZ_VISIBILITY_GUI)))
     if (linkName.find("_GL_MANIP_") == std::string::npos)
@@ -528,7 +533,6 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   {
     gzerr << "Link [" << _linkName << "] could not be found in the combo box."
           << std::endl;
-    this->reject();
     return false;
   }
   this->dataPtr->linksComboBox->setCurrentIndex(index);
@@ -562,9 +566,12 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   this->dataPtr->mainWindow->installEventFilter(this);
 
   // MouseRelease even when it's inactive, to regain focus
-  MouseEventHandler::Instance()->AddReleaseFilter(
-      "applyWrenchDialog_"+this->dataPtr->linkName,
-      boost::bind(&ApplyWrenchDialog::OnMouseRelease, this, _1));
+  if (this->dataPtr->applyWrenchVisual)
+  {
+    MouseEventHandler::Instance()->AddReleaseFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
+        boost::bind(&ApplyWrenchDialog::OnMouseRelease, this, _1));
+  }
 
   return true;
 }
@@ -573,10 +580,12 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
 void ApplyWrenchDialog::SetLink(const QString _linkName)
 {
   // Remove previous link's filter
-  MouseEventHandler::Instance()->RemoveReleaseFilter(
-    "applyWrenchDialog_"+this->dataPtr->linkName);
+  if (this->dataPtr->applyWrenchVisual)
+    MouseEventHandler::Instance()->RemoveReleaseFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
 
-  this->SetLink(this->dataPtr->modelName + "::" + _linkName.toStdString());
+  if (!this->SetLink(this->dataPtr->modelName + "::" + _linkName.toStdString()))
+    this->Fini();
 }
 
 ///////////////////////////////////////////////////
@@ -649,13 +658,7 @@ void ApplyWrenchDialog::OnApplyTorque()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnCancel()
 {
-  this->close();
-  this->dataPtr->connections.clear();
-  this->dataPtr->mainWindow->removeEventFilter(this);
-
-  // Hide mode visuals too
-  if (this->dataPtr->applyWrenchVisual)
-    this->dataPtr->applyWrenchVisual->SetVisible(false, true);
+  this->Fini();
 }
 
 /////////////////////////////////////////////////
@@ -744,6 +747,11 @@ void ApplyWrenchDialog::SetPublisher()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::AttachVisuals()
 {
+  if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene())
+  {
+    gzerr << "Camera or scene missing" << std::endl;
+    return;
+  }
   if (!this->dataPtr->linkVisual)
   {
     gzerr << "No link visual specified." << std::endl;
@@ -753,9 +761,23 @@ void ApplyWrenchDialog::AttachVisuals()
   // Attaching for the first time
   if (!this->dataPtr->applyWrenchVisual)
   {
+    // Generate unique name
+    std::string visNameBase = this->dataPtr->modelName + "__APPLY_WRENCH__";
+    rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
+        GetVisual(visNameBase);
+
+    std::string visName(visNameBase);
+    int count = 0;
+    while (vis)
+    {
+      visName = visNameBase + std::to_string(count);
+      vis = gui::get_active_camera()->GetScene()->
+        GetVisual(visName);
+      ++count;
+    }
+
     this->dataPtr->applyWrenchVisual.reset(new rendering::ApplyWrenchVisual(
-        this->dataPtr->linkName + "__APPLY_WRENCH__",
-        this->dataPtr->linkVisual));
+        visName, this->dataPtr->linkVisual));
 
     this->dataPtr->applyWrenchVisual->Load();
   }
@@ -771,6 +793,12 @@ void ApplyWrenchDialog::AttachVisuals()
   {
     this->dataPtr->linkVisual->AttachVisual(this->dataPtr->applyWrenchVisual);
     this->dataPtr->applyWrenchVisual->Resize();
+  }
+
+  if (!this->dataPtr->applyWrenchVisual)
+  {
+    gzerr << "Failed to attach visual. Closing dialog." << std::endl;
+    this->Fini();
   }
 
   this->SetTorque(this->dataPtr->torqueVector, true);
@@ -790,7 +818,7 @@ void ApplyWrenchDialog::ToggleComRadio(bool _checked)
 bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent & _event)
 {
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
-  if (!userCamera)
+  if (!userCamera || !this->dataPtr->applyWrenchVisual)
     return false;
 
   this->dataPtr->draggingTool = false;
@@ -820,7 +848,7 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent & _event)
 bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent & _event)
 {
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
-  if (!userCamera)
+  if (!userCamera || !this->dataPtr->applyWrenchVisual)
     return false;
 
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos,
@@ -861,7 +889,7 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent & _event)
 bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
 {
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
-  if (!userCamera)
+  if (!userCamera || !this->dataPtr->applyWrenchVisual)
     return false;
 
   // Dragging tool, slightly modified from ModelManipulator::RotateEntity
@@ -1179,7 +1207,7 @@ void ApplyWrenchDialog::SetActive(bool _active)
   if (!this->dataPtr->applyWrenchVisual)
   {
     gzerr << "No apply wrench visual." << std::endl;
-    this->reject();
+    this->Fini();
     return;
   }
   if (_active)
@@ -1194,11 +1222,11 @@ void ApplyWrenchDialog::SetActive(bool _active)
     g_arrowAct->trigger();
 
     MouseEventHandler::Instance()->AddPressFilter(
-        "applyWrenchDialog_"+this->dataPtr->linkName,
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
         boost::bind(&ApplyWrenchDialog::OnMousePress, this, _1));
 
     MouseEventHandler::Instance()->AddMoveFilter(
-        "applyWrenchDialog_"+this->dataPtr->linkName,
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
         boost::bind(&ApplyWrenchDialog::OnMouseMove, this, _1));
   }
   else
@@ -1206,12 +1234,12 @@ void ApplyWrenchDialog::SetActive(bool _active)
     this->dataPtr->applyWrenchVisual->SetVisible(false);
 
     MouseEventHandler::Instance()->RemovePressFilter(
-        "applyWrenchDialog_"+this->dataPtr->linkName);
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
     MouseEventHandler::Instance()->RemoveMoveFilter(
-        "applyWrenchDialog_"+this->dataPtr->linkName);
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
 
     KeyEventHandler::Instance()->RemovePressFilter(
-        "applyWrenchDialog_"+this->dataPtr->linkName);
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
   }
 }
 

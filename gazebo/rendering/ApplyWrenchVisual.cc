@@ -39,6 +39,31 @@ ApplyWrenchVisual::ApplyWrenchVisual(const std::string &_name,
 /////////////////////////////////////////////////
 ApplyWrenchVisual::~ApplyWrenchVisual()
 {
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  Ogre::SceneManager *manager = dPtr->scene->GetManager();
+
+  manager->destroyMovableObject(
+      manager->getEntity(this->GetName()+"__FORCE_SHAFT__"));
+  manager->destroySceneNode(
+      manager->getSceneNode(this->GetName()+"__FORCE_SHAFT_NODE__"));
+  manager->destroyMovableObject(
+      manager->getEntity(this->GetName()+"__FORCE_HEAD__"));
+  manager->destroySceneNode(
+      manager->getSceneNode(this->GetName()+"__FORCE_HEAD_NODE__"));
+  manager->destroyMovableObject(
+      manager->getEntity(this->GetName()+"__TORQUE_TUBE__"));
+  manager->destroySceneNode(
+      manager->getSceneNode(this->GetName()+"__TORQUE_TUBE_NODE__"));
+  manager->destroyMovableObject(
+      manager->getEntity(this->GetName()+"__TORQUE_HEAD__"));
+  manager->destroySceneNode(
+      manager->getSceneNode(this->GetName()+"__TORQUE_HEAD_NODE__"));
+  manager->destroySceneNode(
+      manager->getSceneNode(this->GetName()+"__FORCE_TEXT_NODE__"));
+  manager->destroySceneNode(
+      manager->getSceneNode(this->GetName()+"__TORQUE_TEXT_NODE__"));
 }
 
 ///////////////////////////////////////////////////
@@ -514,7 +539,7 @@ void ApplyWrenchVisual::Resize()
     return;
   }
 
-  double linkSize = std::max (0.1,
+  double linkSize = std::max(0.1,
       dPtr->parent->GetBoundingBox().GetSize().GetLength());
 
   // Force visual
