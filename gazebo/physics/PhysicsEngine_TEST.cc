@@ -99,11 +99,12 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
   // Test PhysicsEngine::[GS]etParam()
   {
     physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-    boost::any dt = physics->GetParam("max_step_size");
-    EXPECT_DOUBLE_EQ(boost::any_cast<double>(dt),
-      physicsPubMsg.max_step_size());
+    double dt;
+    EXPECT_TRUE(physics->GetParam("max_step_size", dt));
+    EXPECT_DOUBLE_EQ(dt, physicsPubMsg.max_step_size());
 
     EXPECT_NO_THROW(physics->GetParam("fake_param_name"));
+    EXPECT_FALSE(physics->GetParam("fake_param_name", dt));
     EXPECT_NO_THROW(physics->SetParam("fake_param_name", 0));
 
     // Try SetParam with wrong type
@@ -130,24 +131,27 @@ void PhysicsEngineTest::PhysicsEngineGetParamBool
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
 
   // Initialize to failure conditions
-  boost::any value;
 
   // Test shared physics engine parameter(s)
-  EXPECT_TRUE(physics->GetParam("gravity", value));
-  EXPECT_EQ(boost::any_cast<math::Vector3>(value), math::Vector3(0, 0, -9.8));
+  math::Vector3 gravity;
+  EXPECT_TRUE(physics->GetParam("gravity", gravity));
+  EXPECT_EQ(gravity, math::Vector3(0, 0, -9.8));
+  double value;
   EXPECT_TRUE(physics->GetParam("max_step_size", value));
-  EXPECT_NEAR(boost::any_cast<double>(value), 0.001, 1e-6);
+  EXPECT_NEAR(value, 0.001, 1e-6);
   EXPECT_TRUE(physics->GetParam("real_time_factor", value));
-  EXPECT_NEAR(boost::any_cast<double>(value), 1.0, 1e-6);
+  EXPECT_NEAR(value, 1.0, 1e-6);
   EXPECT_TRUE(physics->GetParam("real_time_update_rate", value));
-  EXPECT_NEAR(boost::any_cast<double>(value), 1000.0, 1e-6);
-  EXPECT_TRUE(physics->GetParam("type", value));
-  EXPECT_EQ(boost::any_cast<std::string>(value), _physicsEngine);
+  EXPECT_NEAR(value, 1000.0, 1e-6);
+  std::string type;
+  EXPECT_TRUE(physics->GetParam("type", type));
+  EXPECT_EQ(type, _physicsEngine);
 
   if (_physicsEngine == "ode" || _physicsEngine == "bullet")
   {
-    EXPECT_TRUE(physics->GetParam("iters", value));
-    EXPECT_EQ(boost::any_cast<int>(value), 50);
+    int iters;
+    EXPECT_TRUE(physics->GetParam("iters", iters));
+    EXPECT_EQ(iters, 50);
   }
   else if (_physicsEngine == "dart")
   {
@@ -157,7 +161,7 @@ void PhysicsEngineTest::PhysicsEngineGetParamBool
   else if (_physicsEngine == "simbody")
   {
     EXPECT_TRUE(physics->GetParam("accuracy", value));
-    EXPECT_NEAR(boost::any_cast<double>(value), 1e-3, 1e-6);
+    EXPECT_NEAR(value, 1e-3, 1e-6);
   }
 
   EXPECT_FALSE(physics->GetParam("param_does_not_exist", value));

@@ -132,7 +132,7 @@ namespace gazebo
       public: virtual boost::any GetParam(const std::string &_key) const;
 
       // Documentation inherited
-      public: virtual bool GetParam(const std::string &_key,
+      protected: virtual bool GetParam(const std::string &_key,
                   boost::any &_value) const;
 
       // Documentation inherited

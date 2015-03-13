@@ -86,15 +86,18 @@ TEST_F(GzPhysics, Iters)
   // Change iterations
   {
     custom_exec("gz physics -i 35");
-    boost::any iters = world->GetPhysicsEngine()->GetParam("iters");
-    EXPECT_EQ(boost::any_cast<int>(iters), 35);
+    int iters;
+    EXPECT_TRUE(world->GetPhysicsEngine()->GetParam("iters", iters));
+    //boost::any iters = world->GetPhysicsEngine()->GetParam("iters");
+    EXPECT_EQ(iters, 35);
   }
 
   // Change iterations
   {
     custom_exec("gz physics -i 200");
-    boost::any iters = world->GetPhysicsEngine()->GetParam("iters");
-    EXPECT_EQ(boost::any_cast<int>(iters), 200);
+    EXPECT_TRUE(world->GetPhysicsEngine()->GetParam("iters", iters));
+    //boost::any iters = world->GetPhysicsEngine()->GetParam("iters");
+    EXPECT_EQ(iters, 200);
   }
 }
 

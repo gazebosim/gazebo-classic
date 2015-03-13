@@ -190,10 +190,10 @@ namespace gazebo
                   const boost::any &_value);
 
       /// Documentation inherited
-      public: virtual boost::any GetParam(const std::string &_key) const;
+      private: virtual boost::any GetParam(const std::string &_key) const;
 
       /// Documentation inherited
-      private: virtual bool GetParam(const std::string &_key,
+      protected: virtual bool GetParam(const std::string &_key,
                   boost::any &_value) const;
 
       /// \brief Return the world space id.

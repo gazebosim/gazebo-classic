@@ -263,11 +263,11 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_type(msgs::Physics::ODE);
     physicsMsg.set_solver_type(this->dataPtr->stepType);
     // min_step_size is defined but not yet used
-    boost::any min_step_size;
     try
     {
+      double min_step_size;
       if (this->GetParam("min_step_size", min_step_size))
-        physicsMsg.set_min_step_size(boost::any_cast<double>(min_step_size));
+        physicsMsg.set_min_step_size(min_step_size);
     }
     catch(boost::bad_any_cast &_e)
     {

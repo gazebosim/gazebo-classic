@@ -262,7 +262,7 @@ namespace gazebo
           boost::any &_value) const;
 
       public: template<typename T> bool GetParam(const std::string &_key,
-          T _value) const
+          T &_value) const
           {
             boost::any value;
             bool success = this->GetParam(_key, value);
@@ -278,6 +278,9 @@ namespace gazebo
             }
             return success;
           }
+
+      //bool GetParam<double>(const std::string &_key, double &_value);
+      //bool GetParam<int>(const std::string &_key, int &_value);
 
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;
