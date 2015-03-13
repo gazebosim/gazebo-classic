@@ -25,6 +25,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/util/system.hh"
+#include "gazebo/common/Console.hh"
 
 namespace gazebo
 {
@@ -256,6 +257,27 @@ namespace gazebo
       /// \sa SetParam
       /// \return The value of the parameter
       public: virtual boost::any GetParam(const std::string &_key) const;
+
+      protected: virtual bool GetParam(const std::string &_key,
+          boost::any &_value) const;
+
+      public: template<typename T> bool GetParam(const std::string &_key,
+          T _value) const
+          {
+            boost::any value;
+            bool success = this->GetParam(_key, value);
+            try
+            {
+              _value = boost::any_cast<T>(value);
+            }
+            catch(boost::bad_any_cast &_e)
+            {
+              gzerr << "Bad any cast in templated PhysicsEngine::GetParam: "
+                    << _e.what();
+              return false;
+            }
+            return success;
+          }
 
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;
