@@ -39,13 +39,22 @@ void FoosballPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   GZ_ASSERT(_sdf, "FoosballPlugin _sdf pointer is NULL");
   this->sdf = _sdf;
 
-  this->leftModel = this->model->GetJoint("Foosball::rotA0");
-  if (!this->leftModel)
-    gzerr << "Unable to get Foosball::shaftA0 joint\n";
+  this->leftModelRot = this->model->GetJoint("Foosball::rotB0");
+  if (!this->leftModelRot)
+    gzerr << "Unable to get Foosball::rotB0 joint\n";
 
-  this->rightModel = this->model->GetJoint("Foosball::rotA2");
-  if (!this->rightModel)
-    gzerr << "Unable to get Foosball::shaftA2 joint\n";
+  this->leftModelTrans = this->model->GetJoint("Foosball::transB0");
+  if (!this->leftModelTrans)
+    gzerr << "Unable to get Foosball::transB0 joint\n";
+
+  this->rightModelRot = this->model->GetJoint("Foosball::rotB2");
+  if (!this->rightModelRot)
+    gzerr << "Unable to get Foosball::rotB2 joint\n";
+
+  this->rightModelTrans = this->model->GetJoint("Foosball::transB2");
+  if (!this->rightModelTrans)
+    gzerr << "Unable to get Foosball::transB2 joint\n";
+
 
   // Subscribe to Hydra updates by registering OnHydra() callback.
   this->node = transport::NodePtr(new transport::Node());
@@ -74,7 +83,6 @@ void FoosballPlugin::Update(const common::UpdateInfo & /*_info*/)
     {
       if ((*iter)->right().button_bumper() && (*iter)->left().button_bumper())
       {
-        std::cout << "Activated!" << std::endl;
         this->activated = true;
         this->resetPoseRight = msgs::Convert((*iter)->right().pose());
         this->resetPoseLeft = msgs::Convert((*iter)->left().pose());
@@ -105,6 +113,11 @@ void FoosballPlugin::Update(const common::UpdateInfo & /*_info*/)
         leftPose.rot * this->resetPoseLeft.rot.GetInverse() *
         this->basePoseLeft.rot);
 
+    this->leftModelRot->SetPosition(0, -leftAdjust.rot.GetRoll());
+    this->leftModelTrans->SetPosition(0, -leftAdjust.pos.x);
+    this->rightModelRot->SetPosition(0, -rightAdjust.rot.GetRoll());
+    this->rightModelTrans->SetPosition(0, -rightAdjust.pos.x);
+
   }
 }
 
@@ -124,8 +137,6 @@ void FoosballPlugin::OnHydra(ConstHydraPtr &_msg)
 /////////////////////////////////////////////////
 void FoosballPlugin::Restart()
 {
-  std::cout << "Restart!" << std::endl;
-
   this->basePoseLeft = this->leftStartPose;
   this->basePoseRight = this->rightStartPose;
   this->activated = false;

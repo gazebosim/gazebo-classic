@@ -78,7 +78,8 @@ namespace gazebo
     /// \brief Hydra messages.
     private: std::list<boost::shared_ptr<msgs::Hydra const>> hydraMsgs;
 
-    private: physics::JointPtr rightModel, leftModel;
+    private: physics::JointPtr rightModelRot, leftModelRot;
+    private: physics::JointPtr rightModelTrans, leftModelTrans;
     private: math::Pose basePoseRight;
     private: math::Pose basePoseLeft;
     private: math::Pose leftStartPose;
