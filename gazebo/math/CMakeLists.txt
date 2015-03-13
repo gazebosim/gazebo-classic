@@ -75,7 +75,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gzmath.hh.in
 
 
 gz_add_library(gazebo_math ${sources})
-target_link_libraries(gazebo_math ${Boost_LIBRARIES})
+target_link_libraries(gazebo_math ${Boost_LIBRARIES} ${IGNITION-MATH_LIBRARIES})
 
 gz_install_library(gazebo_math)
 gz_install_includes("math" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gzmath.hh)
