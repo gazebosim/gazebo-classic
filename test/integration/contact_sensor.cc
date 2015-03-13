@@ -81,8 +81,13 @@ void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
   topicsExpected.push_back(prefix+"sensor_box/link/box_contact");
   topicsExpected.push_back(prefix+"sensor_box/link/box_contact2/contacts");
   topicsExpected.push_back(prefix+"sensor_box/link/box_contact2");
+  topicsExpected.sort();
+
+  // Sleep to ensure transport topics are all advertised
+  common::Time::MSleep(100);
   std::list<std::string> topics =
     transport::getAdvertisedTopics("gazebo.msgs.Contacts");
+  topics.sort();
   EXPECT_FALSE(topics.empty());
   EXPECT_EQ(topics.size(), topicsExpected.size());
   EXPECT_EQ(topics, topicsExpected);
@@ -95,7 +100,7 @@ void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
     transport::SubscriberPtr sub = this->node->Subscribe(topic,
       &ContactSensor::Callback, this);
 
-    const int steps = 50;
+    const unsigned int steps = 50;
     world->Step(steps);
     common::Time::MSleep(steps);
     EXPECT_GT(g_messageCount, steps / 2);

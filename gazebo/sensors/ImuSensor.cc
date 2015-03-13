@@ -243,6 +243,8 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
 
   double dt = (timestamp - this->lastMeasurementTime).Double();
 
+  this->lastMeasurementTime = timestamp;
+
   if (dt > 0.0)
   {
     boost::mutex::scoped_lock lock(this->mutex);
@@ -282,8 +284,6 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
               (imuPose - this->referencePose).rot);
 
     this->lastLinearVel = imuWorldLinearVel;
-
-    this->lastMeasurementTime = timestamp;
 
     if (this->noiseActive)
     {

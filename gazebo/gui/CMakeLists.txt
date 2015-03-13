@@ -144,11 +144,11 @@ set (resources resources.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-gz_add_executable(gzclient ${sources} main.cc ${headers_MOC} ${headers} ${resources_RCC})
 gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+gz_add_executable(gzclient main.cc)
 
 add_dependencies(gazebo_gui gazebo_msgs)
-add_dependencies(gzclient gazebo_msgs)
+add_dependencies(gzclient gazebo_gui)
 
 target_link_libraries(gazebo_gui
   gazebo_common
@@ -174,6 +174,7 @@ target_link_libraries(gzclient
   gazebo_rendering
   gazebo_sensors
   gazebo_msgs
+  gazebo_gui
   gazebo_gui_building
   gazebo_gui_model
   gazebo_gui_terrain
