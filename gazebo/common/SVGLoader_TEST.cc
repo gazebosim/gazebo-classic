@@ -36,7 +36,7 @@ TEST_F(SVGLoader, LoadPaths)
   std::vector<common::SVGPath> paths;
 
   // bad path
-  bool success = false;
+  bool success;
   std::string bad = "/not/a/file.svg";
   success = loader.Parse(bad, paths);
   EXPECT_EQ(true, success);
@@ -57,34 +57,34 @@ TEST_F(SVGLoader, LoadPaths)
   }
 
   // the test file has 3 paths inside
-  EXPECT_EQ(3, paths.size());
+  EXPECT_EQ(3u, paths.size());
   common::SVGPath &a = paths[0];
   EXPECT_EQ("letterA", a.id);
 
   // the letter A has 2 subpaths:
-  EXPECT_EQ(2, a.subpaths.size());
+  EXPECT_EQ(2u, a.subpaths.size());
 
   // The hole of A
   // 4 commands
-  EXPECT_EQ(4, a.subpaths[0].size());
+  EXPECT_EQ(4u, a.subpaths[0].size());
   // 4 points
-  EXPECT_EQ(4, a.polylines[0].size());
+  EXPECT_EQ(4u, a.polylines[0].size());
   // THe A contour has 9
-  EXPECT_EQ(9, a.polylines[1].size());
+  EXPECT_EQ(9u, a.polylines[1].size());
 
   // see what's going on
   loader.DumpPaths(paths, std::cout);
 
   // the second path
   common::SVGPath &p2 = paths[1];
-  EXPECT_EQ(1, p2.subpaths.size());
+  EXPECT_EQ(1u, p2.subpaths.size());
   EXPECT_EQ("path2984", p2.id);
 
   // 8 commands
-  EXPECT_EQ(8, p2.subpaths[0].size());
+  EXPECT_EQ(8u, p2.subpaths[0].size());
   // since it has splines, there are more
   // points than commands
-  EXPECT_EQ(61, p2.polylines[0].size());
+  EXPECT_EQ(67u, p2.polylines[0].size());
 }
 
 /////////////////////////////////////////////////

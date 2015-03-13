@@ -3,6 +3,9 @@
 1. Use collide_bitmask from SDF to perform collision filtering
     * [Pull request #1470](https://bitbucket.org/osrf/gazebo/pull-request/1470)
 
+1. Pass Coulomb surface friction parameters to DART.
+    * [Pull request #1420](https://bitbucket.org/osrf/gazebo/pull-request/1420)
+
 1. Added various Get functions to Visual. Also added a ConvertGeometryType function to msgs.
     * [Pull request #1402](https://bitbucket.org/osrf/gazebo/pull-request/1402)
 
@@ -38,6 +41,9 @@
 1. Added Matrix3::Inverse() and tests 
     * [Pull request #1481](https://bitbucket.org/osrf/gazebo/pull-request/1481)
 
+1. Implemented AddLinkForce for ODE.
+    * [Pull request #1456](https://bitbucket.org/osrf/gazebo/pull-request/1456)
+
 1. Model editor updates
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
@@ -62,9 +68,31 @@
     1. Renamed Part to Link.
         * [Pull request #1478](https://bitbucket.org/osrf/gazebo/pull-request/1478)
 
+    1. Fix snapping inside editor.
+        * [Pull request #1489](https://bitbucket.org/osrf/gazebo/pull-request/1489)
+        * [Issue #1457](https://bitbucket.org/osrf/gazebo/issue/1457)
+
+    1. Added ExtrudeDialog.
+        * [Pull request #1483](https://bitbucket.org/osrf/gazebo/pull-request/1483)
+
+    1. Hide time panel inside editor and keep main window's paused state.
+        * [Pull request #1500](https://bitbucket.org/osrf/gazebo/pull-request/1500)
+
+    1. Fixed pose issues and added ModelCreator_TEST.
+        * [Pull request #1509](https://bitbucket.org/osrf/gazebo/pull-request/1509)
+        * [Issue #1497](https://bitbucket.org/osrf/gazebo/issue/1497)
+        * [Issue #1509](https://bitbucket.org/osrf/gazebo/issue/1509)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
+
+1. Allow sdformat 2.3.1+ or 3+ and fix tests
+  * [Pull request #1484](https://bitbucket.org/osrf/gazebo/pull-request/1484)
+
+1. Add Link::GetWorldAngularMomentum function and test.
+  * [Pull request #1482](https://bitbucket.org/osrf/gazebo/pull-request/1482)
+
 1. Implement Coulomb joint friction for DART
   * [Pull request #1427](https://bitbucket.org/osrf/gazebo/pull-request/1427)
   * [Issue #1281](https://bitbucket.org/osrf/gazebo/issue/1281)
@@ -302,6 +330,9 @@
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
+
+1. Modified GUI rendering to improve the rendering update rate.
+    * [Pull request #1487](https://bitbucket.org/osrf/gazebo/pull-request/1487)
 
 ### Gazebo 4.1.0 (2014-11-20)
 
