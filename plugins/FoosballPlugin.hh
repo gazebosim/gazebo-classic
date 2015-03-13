@@ -18,25 +18,71 @@
 #ifndef _GAZEBO_FOOSBALL_PLUGIN_HH_
 #define _GAZEBO_FOOSBALL_PLUGIN_HH_
 
+#include <list>
+#include <mutex>
 #include <sdf/sdf.hh>
+#include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
   class GAZEBO_VISIBLE FoosballPlugin : public ModelPlugin
   {
-    /// \brief Constructor
+    /// \brief Constructor.
     public: FoosballPlugin();
 
     // Documentation Inherited.
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
+    /// \brief Update the controller
+    /// \param[in] _info Update information provided by the server.
+    private: void Update(const common::UpdateInfo &_info);
+
+    /// \brief Callback executed every time a new hydra message is received.
+    /// \param[in] _msg The hydra message.
+    private: void OnHydra(ConstHydraPtr &_msg);
+
+    /// \brief Initialize the starting position of the Hydra controllers.
+    private: void Restart();
+
     /// \brief Pointer to model containing this plugin.
     private: physics::ModelPtr model;
 
-    /// \brief SDF for this plugin;
+    /// \brief SDF for this plugin.
     private: sdf::ElementPtr sdf;
+
+    /// \brief Pointer to the update event connection.
+    private: event::ConnectionPtr updateConnection;
+
+    /// \brief Node used for using Gazebo communications.
+    private: transport::NodePtr node;
+
+    /// \brief Subscriber pointer.
+    private: transport::SubscriberPtr hydraSub;
+
+    /// \brief Reset pose of the left Hydra controller.
+    private: math::Pose resetPoseLeft;
+
+    /// \brief Reset pose of the right Hydra controller.
+    private: math::Pose resetPoseRight;
+
+    /// \brief Is Hydra control activated?
+    private: bool activated = false;
+
+    /// \brief Mutex to protect the hydra messages.
+    private: std::mutex msgMutex;
+
+    /// \brief Hydra messages.
+    private: std::list<boost::shared_ptr<msgs::Hydra const>> hydraMsgs;
+
+    private: physics::JointPtr rightModel, leftModel;
+    private: math::Pose basePoseRight;
+    private: math::Pose basePoseLeft;
+    private: math::Pose leftStartPose;
+    private: math::Pose rightStartPose;
   };
 }
 #endif
