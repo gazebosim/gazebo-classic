@@ -33,6 +33,8 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
+#include "gazebo/util/system.hh"
+
 namespace gazebo
 {
   namespace common
