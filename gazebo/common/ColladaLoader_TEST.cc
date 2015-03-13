@@ -49,7 +49,7 @@ TEST_F(ColladaLoader, LoadBox)
 }
 
 /////////////////////////////////////////////////
-TEST(ColladaLoader, ShareVertices)
+TEST_F(ColladaLoader, ShareVertices)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(

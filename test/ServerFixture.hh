@@ -548,6 +548,23 @@ namespace gazebo
     /// \return String with prefix and unique number as suffix.
     protected: std::string GetUniqueString(const std::string &_prefix);
 
+    /// \brief \TODO
+    /// \param[in] _name \TODO
+    /// \param[in] _data \TODO
+    protected: void Record(const std::string &_name, double _data);
+
+    /// \brief \TODO
+    /// \param[in] _name \TODO
+    /// \param[in] _stats \TODO
+    protected: void Record(const std::string &_prefix,
+                           const math::SignalStats &_stats);
+
+    /// \brief \TODO
+    /// \param[in] _name \TODO
+    /// \param[in] _stats \TODO
+    protected: void Record(const std::string &_prefix,
+                           const math::Vector3Stats &_stats);
+
     /// \brief Pointer the Gazebo server.
     protected: Server *server;
 

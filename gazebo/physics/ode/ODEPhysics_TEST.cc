@@ -180,6 +180,9 @@ void ODEPhysics_TEST::OnPhysicsMsgResponse(ConstResponsePtr &_msg)
 /////////////////////////////////////////////////
 void ODEPhysics_TEST::PhysicsMsgParam()
 {
+  // a special test case for just ode world.
+  // we should expand this test to all different engines.
+  // or deprecate this in favor of PhysicsParam test above
   physicsPubMsg.Clear();
   physicsResponseMsg.Clear();
 
@@ -206,12 +209,13 @@ void ODEPhysics_TEST::PhysicsMsgParam()
   physicsPubMsg.set_max_step_size(0.001);
   physicsPubMsg.set_real_time_update_rate(800);
   physicsPubMsg.set_real_time_factor(1.1);
-  physicsPubMsg.set_iters(60);
-  physicsPubMsg.set_sor(1.5);
-  physicsPubMsg.set_cfm(0.1);
-  physicsPubMsg.set_erp(0.25);
-  physicsPubMsg.set_contact_max_correcting_vel(10);
-  physicsPubMsg.set_contact_surface_layer(0.01);
+
+  // physicsPubMsg.set_iters(60);
+  // physicsPubMsg.set_sor(1.5);
+  // physicsPubMsg.set_cfm(0.1);
+  // physicsPubMsg.set_erp(0.25);
+  // physicsPubMsg.set_contact_max_correcting_vel(10);
+  // physicsPubMsg.set_contact_surface_layer(0.01);
 
   physicsPubMsg.set_type(msgs::Physics::ODE);
   physicsPubMsg.set_solver_type("quick");
@@ -236,16 +240,16 @@ void ODEPhysics_TEST::PhysicsMsgParam()
       physicsPubMsg.solver_type());
   EXPECT_EQ(physicsResponseMsg.enable_physics(),
       physicsPubMsg.enable_physics());
-  EXPECT_EQ(physicsResponseMsg.iters(),
-      physicsPubMsg.iters());
-  EXPECT_DOUBLE_EQ(physicsResponseMsg.sor(),
-      physicsPubMsg.sor());
-  EXPECT_DOUBLE_EQ(physicsResponseMsg.cfm(),
-      physicsPubMsg.cfm());
-  EXPECT_DOUBLE_EQ(physicsResponseMsg.contact_max_correcting_vel(),
-      physicsPubMsg.contact_max_correcting_vel());
-  EXPECT_DOUBLE_EQ(physicsResponseMsg.contact_surface_layer(),
-      physicsPubMsg.contact_surface_layer());
+  // EXPECT_EQ(physicsResponseMsg.iters(),
+  //     physicsPubMsg.iters());
+  // EXPECT_DOUBLE_EQ(physicsResponseMsg.sor(),
+  //     physicsPubMsg.sor());
+  // EXPECT_DOUBLE_EQ(physicsResponseMsg.cfm(),
+  //     physicsPubMsg.cfm());
+  // EXPECT_DOUBLE_EQ(physicsResponseMsg.contact_max_correcting_vel(),
+  //     physicsPubMsg.contact_max_correcting_vel());
+  // EXPECT_DOUBLE_EQ(physicsResponseMsg.contact_surface_layer(),
+  //     physicsPubMsg.contact_surface_layer());
 
   phyNode->Fini();
 }
