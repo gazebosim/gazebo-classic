@@ -4,6 +4,7 @@
 
 /////////////////////////////////////////////////
 // Example gazebo class that exposes an API using math::Box
+// Release: Gazebo5
 class SomeGazeboClass
 {
   public: SomeGazeboClass()
@@ -21,6 +22,7 @@ class SomeGazeboClass
 
 /////////////////////////////////////////////////
 // The above gazebo class that is transitioned to ignition math
+// Release: Gazebo6
 class SomeGazeboClassTransition
 {
   public: SomeGazeboClassTransition()
@@ -44,7 +46,31 @@ class SomeGazeboClassTransition
 };
 
 /////////////////////////////////////////////////
+// The above gazebo class that is finalized to ignition math
+// Release: Gazebo7
+class SomeGazeboClassFinal
+{
+  public: SomeGazeboClassFinal()
+          : box(0, 1, 2, 3, 4, 5) {}
+
+  public: ignition::math::Box Get() const
+          {return this->box;}
+
+  public: void Set(const ignition::math::Box &_box)
+          {this->box = _box;}
+
+  private: ignition::math::Box box;
+};
+
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+// Classes that use the above Gazebo examples
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
 // Example class that uses the original gazebo class
+// Works with: Gazebo 5&6
 class ExampleA
 {
   public: ExampleA()
@@ -53,41 +79,59 @@ class ExampleA
             cls.Set(gazebo::math::Box(gazebo::math::Vector3(6, 7, 8),
                                       gazebo::math::Vector3(9, 10, 11)));
             std::cout << cls.Get() << std::endl;
+            box = cls.Get();
           }
 
   private: SomeGazeboClass cls;
+  private: gazebo::math::Box box;
 };
 
 /////////////////////////////////////////////////
 // Example class that uses the transitioned gazebo class
-class ExampleB
+// Works with: Gazebo 6&7
+class ExampleATransition
 {
-  public: ExampleB()
+  public: ExampleATransition()
           {
-            std::cout << cls.Get() << std::endl;
-            cls.Set(gazebo::math::Box(
-                  gazebo::math::Vector3(6, 7, 8),
-                  gazebo::math::Vector3(9, 10, 11)));
-            std::cout << cls.Get() << std::endl;
-            gzBox = cls.Get();
+            std::cout << cls.GetIgn() << std::endl;
+            cls.Set(ignition::math::Box(6, 7, 8, 9, 10, 11));
 
-            cls.Set(ignition::math::Box(12, 13, 14, 15, 16, 17));
-            std::cout << cls.Get() << std::endl;
-            ignBox = cls.GetIgn();
+            std::cout << cls.GetIgn() << std::endl;
+            box = cls.GetIgn();
           }
 
   private: SomeGazeboClassTransition cls;
-  private: gazebo::math::Box gzBox;
-  private: ignition::math::Box ignBox;
+  private: ignition::math::Box box;
 };
 
+/////////////////////////////////////////////////
+// Example class that uses the final gazebo class
+// Release: Gazebo7
+class ExampleAFinal
+{
+  public: ExampleAFinal()
+          {
+            std::cout << cls.Get() << std::endl;
+            cls.Set(ignition::math::Box(6, 7, 8, 9, 10, 11));
+
+            std::cout << cls.Get() << std::endl;
+            box = cls.Get();
+          }
+
+  private: SomeGazeboClassFinal cls;
+  private: ignition::math::Box box;
+};
 
 int main()
 {
   std::cout << "Example A:\n";
   ExampleA a;
 
-  std::cout << "Example B:\n";
-  ExampleB b;
+  std::cout << "Example A Transition:\n";
+  ExampleATransition b;
+
+  std::cout << "Example A Final:\n";
+  ExampleAFinal c;
+
   return 0;
 }
