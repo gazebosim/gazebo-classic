@@ -3,6 +3,9 @@
 1. Use collide_bitmask from SDF to perform collision filtering
     * [Pull request #1470](https://bitbucket.org/osrf/gazebo/pull-request/1470)
 
+1. Pass Coulomb surface friction parameters to DART.
+    * [Pull request #1420](https://bitbucket.org/osrf/gazebo/pull-request/1420)
+
 1. Added various Get functions to Visual. Also added a ConvertGeometryType function to msgs.
     * [Pull request #1402](https://bitbucket.org/osrf/gazebo/pull-request/1402)
 
@@ -77,6 +80,11 @@
 
     1. Hide time panel inside editor and keep main window's paused state.
         * [Pull request #1500](https://bitbucket.org/osrf/gazebo/pull-request/1500)
+
+    1. Fixed pose issues and added ModelCreator_TEST.
+        * [Pull request #1509](https://bitbucket.org/osrf/gazebo/pull-request/1509)
+        * [Issue #1497](https://bitbucket.org/osrf/gazebo/issue/1497)
+        * [Issue #1509](https://bitbucket.org/osrf/gazebo/issue/1509)
 
 ## Gazebo 5.0
 

@@ -381,39 +381,36 @@ void DARTPhysics::DebugPrint() const
 //////////////////////////////////////////////////
 boost::any DARTPhysics::GetParam(const std::string &_key) const
 {
-  if (_key == "max_step_size")
-  {
-    return this->GetMaxStepSize();
-  }
+  boost::any value;
+  this->GetParam(_key, value);
+  return value;
+}
 
+//////////////////////////////////////////////////
+bool DARTPhysics::GetParam(const std::string &_key, boost::any &_value) const
+{
+  if (!this->sdf->HasElement("dart"))
+  {
+    return PhysicsEngine::GetParam(_key, _value);
+  }
   sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
   // physics dart element not yet added to sdformat
   // GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
-  if (dartElem == NULL)
-  {
-    gzerr << "DART SDF element not found"
-          << ", unable to get param ["
-          << _key << "]"
-          << std::endl;
-    return 0;
-  }
 
   if (_key == "max_contacts")
   {
-    return dartElem->GetElement("max_contacts")->Get<int>();
+    _value = dartElem->GetElement("max_contacts")->Get<int>();
   }
   else if (_key == "min_step_size")
   {
-    return dartElem->GetElement("solver")->Get<double>("min_step_size");
+    _value = dartElem->GetElement("solver")->Get<double>("min_step_size");
   }
   else
   {
-    gzwarn << _key << " is not supported in dart" << std::endl;
-    return 0;
+    return PhysicsEngine::GetParam(_key, _value);
   }
 
-  gzerr << "We should not be here, something is wrong." << std::endl;
-  return 0;
+  return true;
 }
 
 //////////////////////////////////////////////////

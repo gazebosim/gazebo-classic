@@ -108,8 +108,13 @@ void BulletLink::Init()
       collision = boost::static_pointer_cast<BulletCollision>(*iter);
       btCollisionShape *shape = collision->GetCollisionShape();
 
-      hackMu1 = collision->GetBulletSurface()->frictionPyramid.GetMuPrimary();
-      hackMu2 = collision->GetBulletSurface()->frictionPyramid.GetMuSecondary();
+      SurfaceParamsPtr surface = collision->GetSurface();
+      GZ_ASSERT(surface, "Surface pointer for is invalid");
+      FrictionPyramidPtr friction = surface->GetFrictionPyramid();
+      GZ_ASSERT(friction, "Friction pointer is invalid");
+
+      hackMu1 = friction->GetMuPrimary();
+      hackMu2 = friction->GetMuSecondary();
       // gzerr << "link[" << this->GetName()
       //       << "] mu[" << hackMu1
       //       << "] mu2[" << hackMu2 << "]\n";
