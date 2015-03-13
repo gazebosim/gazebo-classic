@@ -67,6 +67,10 @@ JointMaker::JointMaker()
       event::Events::ConnectPreRender(
         boost::bind(&JointMaker::Update, this)));
 
+  this->connections.push_back(
+      gui::model::Events::ConnectOpenJointInspector(
+      boost::bind(&JointMaker::OpenInspector, this, _1)));
+
   this->inspectAct = new QAction(tr("Open Joint Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this, SLOT(OnOpenInspector()));
 
@@ -183,6 +187,7 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
     delete joint;
     this->joints.erase(jointIt);
     gui::model::Events::modelChanged();
+    gui::model::Events::jointRemoved(_jointName);
   }
 }
 
@@ -573,6 +578,11 @@ void JointMaker::OnOpenInspector()
 void JointMaker::OpenInspector(const std::string &_name)
 {
   JointData *joint = this->joints[_name];
+  if (!joint)
+  {
+    gzerr << "Joint [" << _name << "] not found." << std::endl;
+    return;
+  }
   joint->OpenInspector();
 }
 
@@ -659,7 +669,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   camera->GetScene()->AddVisual(hotspotVisual);
 
   _joint->hotspot = hotspotVisual;
-  gui::model::Events::jointInserted(_joint->name);
+  gui::model::Events::jointInserted(hotSpotName);
 }
 
 /////////////////////////////////////////////////

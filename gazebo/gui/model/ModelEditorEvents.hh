@@ -191,6 +191,62 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { jointInserted.Disconnect(_subscriber); }
 
+        /// \brief TODOTODO 
+        /// \brief Connect a Gazebo event to the new model signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectLinkRemoved(T _subscriber)
+          { return linkRemoved.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the new model signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectLinkRemoved(
+            event::ConnectionPtr _subscriber)
+          { linkRemoved.Disconnect(_subscriber); }
+
+        /// \brief TODOTODO 
+        /// \brief Connect a Gazebo event to the new model signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectJointRemoved(T _subscriber)
+          { return jointRemoved.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the new model signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectJointRemoved(
+            event::ConnectionPtr _subscriber)
+          { jointRemoved.Disconnect(_subscriber); }
+
+        /// \brief TODOTODO 
+        /// \brief Connect a Gazebo event to the new model signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectOpenLinkInspector(T _subscriber)
+          { return openLinkInspector.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the new model signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectOpenLinkInspector(
+            event::ConnectionPtr _subscriber)
+          { openLinkInspector.Disconnect(_subscriber); }
+
+        /// \brief TODOTODO 
+        /// \brief Connect a Gazebo event to the new model signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectOpenJointInspector(T _subscriber)
+          { return openJointInspector.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the new model signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectOpenJointInspector(
+            event::ConnectionPtr _subscriber)
+          { openJointInspector.Disconnect(_subscriber); }
+
         public: static event::EventT<void ()> finishModel;
 
         /// \brief Request to save the model.
@@ -226,6 +282,18 @@ namespace gazebo
 
         /// \brief TODO
         public: static event::EventT<void (std::string)> jointInserted;
+
+        /// \brief TODO
+        public: static event::EventT<void (std::string)> linkRemoved;
+
+        /// \brief TODO
+        public: static event::EventT<void (std::string)> jointRemoved;
+
+        /// \brief TODO
+        public: static event::EventT<void (std::string)> openLinkInspector;
+
+        /// \brief TODO
+        public: static event::EventT<void (std::string)> openJointInspector;
       };
     }
   }

@@ -186,7 +186,7 @@ namespace gazebo
 
       /// \brief Remove a link from the model.
       /// \param[in] _linkName Name of the link to remove
-      public: void RemoveLink(const std::string &_linkName);
+      public: void RemoveLink(const std::string _linkName);
 
       /// \brief Set the model to be static
       /// \param[in] _static True to make the model static.

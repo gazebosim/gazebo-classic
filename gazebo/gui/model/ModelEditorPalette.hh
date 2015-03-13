@@ -28,6 +28,11 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace gazebo
 {
   namespace rendering
@@ -98,14 +103,23 @@ namespace gazebo
       private slots: void OnNameChanged(const QString &_name);
 
       /// TODO
-      private slots: void OnSelection(QTreeWidgetItem *item, int column);
+      private slots: void OnDoubleClick(QTreeWidgetItem *item, int column);
 
       /// TODO
-      private slots: void OnLinkInserted(std::string _linkName);
+      private: void OnLinkInserted(std::string _linkName);
 
       /// TODO
-      private slots: void OnJointInserted(std::string _jointName);
-      
+      private: void OnJointInserted(std::string _jointName);
+
+      /// TODO
+      private: void OnLinkRemoved(std::string _linkName);
+
+      /// TODO
+      private: void OnJointRemoved(std::string _jointName);
+
+      /// TODO
+      private: void ClearModelTree();
+
       /// \brief Callback when user has provided information on where to save
       /// the model to.
       /// \param[in] _saveName Name of model being saved.
@@ -142,7 +156,7 @@ namespace gazebo
 
       /// \brief Edit the name of the model.
       private: QLineEdit *modelNameEdit;
-      
+
       /// TODO
       private: QTreeWidget *modelTreeWidget;
 
@@ -151,6 +165,9 @@ namespace gazebo
 
       /// TODO
       private: QTreeWidgetItem *jointsItem;
+
+      /// \brief Mutex to protect updates
+      private: boost::recursive_mutex *updateMutex;
     };
   }
 }
