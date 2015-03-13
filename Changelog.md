@@ -84,7 +84,7 @@
         * [Issue #1509](https://bitbucket.org/osrf/gazebo/issue/1509)
 
     1. Added list of links and joints.
-        * [Pull request #1514](https://bitbucket.org/osrf/gazebo/pull-request/1514)
+        * [Pull request #1515](https://bitbucket.org/osrf/gazebo/pull-request/1515)
         * [Issue #1418](https://bitbucket.org/osrf/gazebo/issue/1418)
 
 ## Gazebo 5.0
