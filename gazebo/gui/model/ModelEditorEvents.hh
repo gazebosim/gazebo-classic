@@ -257,7 +257,7 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { jointNameChanged.Disconnect(_subscriber); }
 
-        /// \brief Request to finish the model.
+        /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishModel;
 
         /// \brief Request to save the model.

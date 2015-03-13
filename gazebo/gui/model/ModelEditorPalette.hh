@@ -100,7 +100,7 @@ namespace gazebo
       /// \brief Qt callback when a tree item has been double clicked.
       /// \param[in] _item Item clicked.
       /// \param[in] _column Column index.
-      private slots: void OnDoubleClick(QTreeWidgetItem *item, int column);
+      private slots: void OnItemDoubleClick(QTreeWidgetItem *item, int column);
 
       /// \brief Add a link to the tree.
       /// \param[in] _linkName Scoped link name.
@@ -173,7 +173,7 @@ namespace gazebo
       /// \brief Parent item for all joints.
       private: QTreeWidgetItem *jointsItem;
 
-      /// \brief Mutex to protect updates
+      /// \brief Mutex to protect updates.
       private: boost::recursive_mutex *updateMutex;
     };
   }

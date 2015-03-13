@@ -196,7 +196,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   connect(this->modelTreeWidget,
       SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
-      this, SLOT(OnDoubleClick(QTreeWidgetItem *, int)));
+      this, SLOT(OnItemDoubleClick(QTreeWidgetItem *, int)));
 
   // Model layout
   QVBoxLayout *modelLayout = new QVBoxLayout();
@@ -425,7 +425,8 @@ void ModelEditorPalette::OnSaveModel(const std::string &_saveName)
 
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnDoubleClick(QTreeWidgetItem *_item, int /*_column*/)
+void ModelEditorPalette::OnItemDoubleClick(QTreeWidgetItem *_item,
+    int /*_column*/)
 {
   if (_item)
   {
