@@ -150,23 +150,79 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->modelCreator = new ModelCreator();
   connect(modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
 
-  // Horizontal separator
-  QFrame *separator = new QFrame(this);
-  separator->setFrameShape(QFrame::HLine);
-  separator->setFrameShadow(QFrame::Sunken);
-  separator->setLineWidth(1);
+  // Palette layout
+  QVBoxLayout *paletteLayout = new QVBoxLayout();
+  paletteLayout->addWidget(shapesLabel);
+  paletteLayout->addLayout(shapesLayout);
+  paletteLayout->addWidget(customShapesLabel);
+  paletteLayout->addLayout(customLayout);
+  paletteLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
+      QSizePolicy::Minimum));
+  paletteLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+  QWidget *paletteWidget = new QWidget();
+  paletteWidget->setLayout(paletteLayout); 
+
+
+  // Model tree
+  this->modelTreeWidget = new QTreeWidget();
+  this->modelTreeWidget->setObjectName("modelTreeWidget");
+  this->modelTreeWidget->setColumnCount(1);
+  this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  this->modelTreeWidget->header()->hide();
+  this->modelTreeWidget->setFocusPolicy(Qt::NoFocus);
+  this->modelTreeWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  this->modelTreeWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+  this->modelTreeWidget->setVerticalScrollMode(
+      QAbstractItemView::ScrollPerPixel);
+
+  // Links
+  this->linksItem = new QTreeWidgetItem(
+      static_cast<QTreeWidgetItem*>(0),
+      QStringList(QString("%1").arg(tr("Links"))));
+  this->linksItem->setData(0, Qt::UserRole, QVariant(tr("Links")));
+  this->modelTreeWidget->addTopLevelItem(this->linksItem);
+
+  // Joints
+  this->jointsItem = new QTreeWidgetItem(
+      static_cast<QTreeWidgetItem*>(0),
+      QStringList(QString("%1").arg(tr("Joints"))));
+  this->jointsItem->setData(0, Qt::UserRole, QVariant(tr("Joints")));
+  this->modelTreeWidget->addTopLevelItem(this->jointsItem);
+
+  connect(this->modelTreeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
+          this, SLOT(OnSelection(QTreeWidgetItem *, int)));
+  connect(this->modelTreeWidget,
+      SIGNAL(customContextMenuRequested(const QPoint &)),
+      this, SLOT(OnCustomContextMenu(const QPoint &)));
+
+
+
+  // Model layout
+  QVBoxLayout *modelLayout = new QVBoxLayout();
+  modelLayout->addWidget(settingsLabel);
+  modelLayout->addLayout(settingsLayout);
+  modelLayout->addWidget(this->modelTreeWidget);
+  modelLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+  QWidget *modelWidget = new QWidget();
+  modelWidget->setLayout(modelLayout); 
 
   // Main layout
-  mainLayout->addWidget(shapesLabel);
-  mainLayout->addLayout(shapesLayout);
-  mainLayout->addWidget(customShapesLabel);
-  mainLayout->addLayout(customLayout);
-  mainLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
-      QSizePolicy::Minimum));
-  mainLayout->addWidget(separator);
-  mainLayout->addWidget(settingsLabel);
-  mainLayout->addLayout(settingsLayout);
-  mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+  QFrame *frame = new QFrame;
+  QVBoxLayout *frameLayout = new QVBoxLayout;
+
+  QSplitter *splitter = new QSplitter(Qt::Vertical, this);
+  splitter->addWidget(paletteWidget);
+  splitter->addWidget(modelWidget);
+  splitter->setStretchFactor(0, 1);
+  splitter->setStretchFactor(1, 2);
+  splitter->setCollapsible(0, false);
+  splitter->setCollapsible(1, false);
+
+  frameLayout->addWidget(splitter);
+  frameLayout->setContentsMargins(0, 0, 0, 0);
+  frame->setLayout(frameLayout);
+
+  mainLayout->addWidget(frame);
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
@@ -187,6 +243,14 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       gui::model::Events::ConnectModelPropertiesChanged(
       boost::bind(&ModelEditorPalette::OnModelPropertiesChanged, this, _1, _2,
       _3)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectLinkInserted(
+      boost::bind(&ModelEditorPalette::OnLinkInserted, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectJointInserted(
+      boost::bind(&ModelEditorPalette::OnJointInserted, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -348,4 +412,48 @@ void ModelEditorPalette::OnNewModel()
 void ModelEditorPalette::OnSaveModel(const std::string &_saveName)
 {
   this->modelNameEdit->setText(tr(_saveName.c_str()));
+}
+
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnSelection(QTreeWidgetItem *_item, int /*_column*/)
+{
+  if (_item)
+  {
+
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnLinkInserted(std::string _linkName)
+{
+  std::string leafName = _linkName;
+  size_t idx = _linkName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+1);
+ 
+  QTreeWidgetItem *newLinkItem = new QTreeWidgetItem(this->linksItem,
+      QStringList(QString("%1").arg(QString::fromStdString(leafName))));
+
+  newLinkItem->setData(0, Qt::UserRole, _linkName.c_str());
+  this->modelTreeWidget->addTopLevelItem(newLinkItem);
+
+  this->linksItem->setExpanded(true);
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnJointInserted(std::string _jointName)
+{
+  std::string leafName = _jointName;
+  size_t idx = _jointName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _jointName.substr(idx+1);
+ 
+  QTreeWidgetItem *newLinkItem = new QTreeWidgetItem(this->jointsItem,
+      QStringList(QString("%1").arg(QString::fromStdString(leafName))));
+
+  newLinkItem->setData(0, Qt::UserRole, _jointName.c_str());
+  this->modelTreeWidget->addTopLevelItem(newLinkItem);
+
+  this->jointsItem->setExpanded(true);
 }

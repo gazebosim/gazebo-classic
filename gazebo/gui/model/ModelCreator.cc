@@ -1275,6 +1275,8 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     {
       LinkData *link = this->allLinks[this->mouseVisual->GetName()];
       link->SetPose(this->mouseVisual->GetWorldPose()-this->modelPose);
+    
+      gui::model::Events::linkInserted(this->mouseVisual->GetName());
     }
 
     // reset and return

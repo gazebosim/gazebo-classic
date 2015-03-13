@@ -97,6 +97,15 @@ namespace gazebo
       /// \param[in] _name New name.
       private slots: void OnNameChanged(const QString &_name);
 
+      /// TODO
+      private slots: void OnSelection(QTreeWidgetItem *item, int column);
+
+      /// TODO
+      private slots: void OnLinkInserted(std::string _linkName);
+
+      /// TODO
+      private slots: void OnJointInserted(std::string _jointName);
+      
       /// \brief Callback when user has provided information on where to save
       /// the model to.
       /// \param[in] _saveName Name of model being saved.
@@ -133,6 +142,15 @@ namespace gazebo
 
       /// \brief Edit the name of the model.
       private: QLineEdit *modelNameEdit;
+      
+      /// TODO
+      private: QTreeWidget *modelTreeWidget;
+
+      /// TODO
+      private: QTreeWidgetItem *linksItem;
+
+      /// TODO
+      private: QTreeWidgetItem *jointsItem;
     };
   }
 }

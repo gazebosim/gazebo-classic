@@ -32,3 +32,6 @@ event::EventT<void (bool, bool, const math::Pose &)>
 
 event::EventT<void (std::string)> model::Events::saveModel;
 event::EventT<void ()> model::Events::newModel;
+
+event::EventT<void (std::string)> model::Events::linkInserted;
+event::EventT<void (std::string)> model::Events::jointInserted;

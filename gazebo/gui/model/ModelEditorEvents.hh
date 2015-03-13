@@ -163,7 +163,34 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { newModel.Disconnect(_subscriber); }
 
-        /// \brief A model has been completed and uploaded onto the server.
+        /// \brief TODOTODO A model has been completed and uploaded onto the server.
+        /// \brief Connect a Gazebo event to the new model signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectLinkInserted(T _subscriber)
+          { return linkInserted.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the new model signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectLinkInserted(
+            event::ConnectionPtr _subscriber)
+          { linkInserted.Disconnect(_subscriber); }
+
+        /// \brief TODOTODO A model has been completed and uploaded onto the server.
+        /// \brief Connect a Gazebo event to the new model signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectJointInserted(T _subscriber)
+          { return jointInserted.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the new model signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectJointInserted(
+            event::ConnectionPtr _subscriber)
+          { jointInserted.Disconnect(_subscriber); }
+
         public: static event::EventT<void ()> finishModel;
 
         /// \brief Request to save the model.
@@ -193,6 +220,12 @@ namespace gazebo
 
         /// \brief Notify that model has been newed.
         public: static event::EventT<void ()> newModel;
+
+        /// \brief TODO
+        public: static event::EventT<void (std::string)> linkInserted;
+
+        /// \brief TODO
+        public: static event::EventT<void (std::string)> jointInserted;
       };
     }
   }
