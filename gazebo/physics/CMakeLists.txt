@@ -147,4 +147,8 @@ set (gtest_sources
   Road_TEST.cc
   SphereShape_TEST.cc
 )
+set (TEST_DEPENDENCIES
+  gazebo_physics
+  server_fixture
+)
 gz_build_tests(${gtest_sources})

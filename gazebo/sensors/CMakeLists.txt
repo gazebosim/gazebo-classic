@@ -61,8 +61,16 @@ set (gtest_sources
   WirelessTransmitter_TEST.cc
 )
 
+set (TEST_DEPENDENCIES
+  gazebo_sensors
+  server_fixture
+)
 gz_build_tests(${gtest_sources})
 
+set (TEST_DEPENDENCIES
+  gazebo_sensors
+  server_fixture
+)
 set (gtest_sources_dri
   GpuRaySensor_TEST.cc
   SensorManager_TEST.cc

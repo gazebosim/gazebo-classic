@@ -39,6 +39,9 @@ set(ServerFixtureSources
 )
 add_library(server_fixture STATIC ${ServerFixtureSources})
 add_dependencies(server_fixture gazebo_msgs)
+target_link_libraries(server_fixture
+  libgazebo
+)
 set(SERVER_FIXTURE_LIBRARY "${PROJECT_BINARY_DIR}/test/libserver_fixture.a")
 
 execute_process(COMMAND cmake -E remove_directory ${CMAKE_BINARY_DIR}/test_results)
