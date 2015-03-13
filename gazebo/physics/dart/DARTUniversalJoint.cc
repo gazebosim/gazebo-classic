@@ -86,9 +86,6 @@ math::Vector3 DARTUniversalJoint::GetGlobalAxis(unsigned int _index) const
     gzerr << "Invalid index[" << _index << "]\n";
   }
 
-  // TODO: Issue #494
-  // See: https://bitbucket.org/osrf/gazebo/issue/494
-  // joint-axis-reference-frame-doesnt-match
   return DARTTypes::ConvVec3(globalAxis);
 }
 
@@ -96,28 +93,18 @@ math::Vector3 DARTUniversalJoint::GetGlobalAxis(unsigned int _index) const
 void DARTUniversalJoint::SetAxis(unsigned int _index,
     const math::Vector3 &_axis)
 {
-  Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(_axis);
+  Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(
+      this->GetAxisFrameOffset(_index).RotateVector(_axis));
+  Eigen::Isometry3d dtTransfJointLeftToParentLink
+      = this->dtJoint->getTransformFromParentBodyNode().inverse();
+  dtAxis = dtTransfJointLeftToParentLink.linear() * dtAxis;
 
   if (_index == 0)
   {
-    // TODO: Issue #494
-    // See: https://bitbucket.org/osrf/gazebo/issue/494
-    // joint-axis-reference-frame-doesnt-match
-    Eigen::Isometry3d dtTransfJointLeftToParentLink
-        = this->dtJoint->getTransformFromParentBodyNode().inverse();
-    dtAxis = dtTransfJointLeftToParentLink.linear() * dtAxis;
-
     this->dtUniveralJoint->setAxis1(dtAxis);
   }
   else if (_index == 1)
   {
-    // TODO: Issue #494
-    // See: https://bitbucket.org/osrf/gazebo/issue/494
-    // joint-axis-reference-frame-doesnt-match
-    Eigen::Isometry3d dtTransfJointLeftToParentLink
-        = this->dtJoint->getTransformFromParentBodyNode().inverse();
-    dtAxis = dtTransfJointLeftToParentLink.linear() * dtAxis;
-
     this->dtUniveralJoint->setAxis2(dtAxis);
   }
   else
@@ -167,10 +154,11 @@ double DARTUniversalJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void DARTUniversalJoint::SetVelocity(unsigned int _index, double _vel)
 {
-  if (_index == 0)
-    this->dtJoint->setVelocity(0, _vel);
-  else if (_index == 1)
-    this->dtJoint->setVelocity(1, _vel);
+  if (_index < this->GetAngleCount())
+  {
+    this->dtJoint->setVelocity(_index, _vel);
+    this->dtJoint->getSkeleton()->computeForwardKinematics(false, true, false);
+  }
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }

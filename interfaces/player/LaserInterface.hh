@@ -65,7 +65,7 @@ class GAZEBO_VISIBLE LaserInterface : public GazeboInterface
   ///        GazeboDriver::Unsubscribe
   public: virtual void Unsubscribe();
 
-  private: void OnScan(ConstLaserScanPtr &_msg);
+  private: void OnScan(ConstLaserScanStampedPtr &_msg);
 
   private: std::string laserName;
 

@@ -381,8 +381,22 @@ void DARTPhysics::DebugPrint() const
 //////////////////////////////////////////////////
 boost::any DARTPhysics::GetParam(const std::string &_key) const
 {
+  if (_key == "max_step_size")
+  {
+    return this->GetMaxStepSize();
+  }
+
   sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
-  GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
+  // physics dart element not yet added to sdformat
+  // GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
+  if (dartElem == NULL)
+  {
+    gzerr << "DART SDF element not found"
+          << ", unable to get param ["
+          << _key << "]"
+          << std::endl;
+    return 0;
+  }
 
   if (_key == "max_contacts")
   {

@@ -330,8 +330,13 @@ void SimbodyLink::SetEnabled(bool /*_enable*/) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetLinearVel(const math::Vector3 & /*_vel*/)
+void SimbodyLink::SetLinearVel(const math::Vector3 & _vel)
 {
+  this->masterMobod.setUToFitLinearVelocity(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    SimbodyPhysics::Vector3ToVec3(_vel));
+  this->simbodyPhysics->system.realize(
+    this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
 }
 
 //////////////////////////////////////////////////
@@ -412,8 +417,13 @@ math::Vector3 SimbodyLink::GetWorldCoGLinearVel() const
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetAngularVel(const math::Vector3 &/*_vel*/)
+void SimbodyLink::SetAngularVel(const math::Vector3 &_vel)
 {
+  this->masterMobod.setUToFitAngularVelocity(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    SimbodyPhysics::Vector3ToVec3(_vel));
+  this->simbodyPhysics->system.realize(
+    this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
 }
 
 //////////////////////////////////////////////////
@@ -518,7 +528,6 @@ void SimbodyLink::AddForceAtRelativePosition(const math::Vector3 &/*_force*/,
 /////////////////////////////////////////////////
 void SimbodyLink::AddTorque(const math::Vector3 &/*_torque*/)
 {
-  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////

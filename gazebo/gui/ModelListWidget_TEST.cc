@@ -385,9 +385,10 @@ void ModelListWidget_TEST::ModelProperties()
   QCOMPARE(modelItem->text(0), tr(modelName.c_str()));
 
   // Get propery browser widget
+  QObject *propTreeObj =
+    modelListWidget->findChild<QObject *>("propTreeBrowser");
   QtTreePropertyBrowser *propTreeBrowser =
-    modelListWidget->findChild<QtTreePropertyBrowser *>(
-      "propTreeBrowser");
+    dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
 
   QVERIFY(propTreeBrowser != NULL);
   QCOMPARE(propTreeBrowser->properties().size(), 0);
@@ -655,9 +656,10 @@ void ModelListWidget_TEST::LinkProperties()
   QCOMPARE(modelItem->text(0), tr(modelName.c_str()));
 
   // Get propery browser widget
+  QObject *propTreeObj =
+    modelListWidget->findChild<QObject *>("propTreeBrowser");
   QtTreePropertyBrowser *propTreeBrowser =
-    modelListWidget->findChild<QtTreePropertyBrowser *>(
-      "propTreeBrowser");
+    dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
 
   QVERIFY(propTreeBrowser != NULL);
   QCOMPARE(propTreeBrowser->properties().size(), 0);

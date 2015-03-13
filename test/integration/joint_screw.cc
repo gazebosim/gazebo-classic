@@ -59,11 +59,6 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
     gzerr << "Aborting test for bullet, see issues #1074.\n";
     return;
   }
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for dart, see issues #1096.\n";
-    return;
-  }
 
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);

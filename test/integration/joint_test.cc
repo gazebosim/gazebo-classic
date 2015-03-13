@@ -185,6 +185,12 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
     gzerr << "Aborting test for bullet, see issue #887.\n";
     return;
   }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for " << _physicsEngine
+          << ", see issue #975.\n";
+    return;
+  }
 
   // Load our inertial test world
   Load("worlds/spring_damper_test.world", true, _physicsEngine);

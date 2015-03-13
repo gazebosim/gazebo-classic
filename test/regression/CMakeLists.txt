@@ -22,6 +22,7 @@ if(HAVE_DART)
 endif()
 
 set(tests
+  351_world_step.cc
   494_joint_axis_frame.cc
   624_collision_world_pose.cc
   876_random_number_generator.cc

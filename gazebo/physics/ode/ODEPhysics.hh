@@ -88,7 +88,11 @@ namespace gazebo
         MAX_CONTACTS,
 
         /// \brief Minimum step size
-        MIN_STEP_SIZE
+        MIN_STEP_SIZE,
+
+        /// \brief Limit ratios of inertias of adjacent links (note that the
+        /// corresponding SDF tag is "use_dynamic_moi_rescaling")
+        INERTIA_RATIO_REDUCTION
       };
 
       /// \brief Constructor.

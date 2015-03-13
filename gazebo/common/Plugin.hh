@@ -201,8 +201,8 @@ namespace gazebo
 
   /// \class WorldPlugin Plugin.hh common/common.hh
   /// \brief A plugin with access to physics::World.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
+  /// <a href="http://gazebosim.org/tutorials/?tut=plugins_world
+  /// &cat=write_plugin">reference</a>.
   class GAZEBO_VISIBLE WorldPlugin : public PluginT<WorldPlugin>
   {
     /// \brief Constructor
@@ -226,8 +226,8 @@ namespace gazebo
   };
 
   /// \brief A plugin with access to physics::Model.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
+  /// <a href="http://gazebosim.org/tutorials?tut=plugins_model
+  /// &cat=write_plugin">reference</a>.
   class GAZEBO_VISIBLE ModelPlugin : public PluginT<ModelPlugin>
   {
     /// \brief Constructor
@@ -255,8 +255,8 @@ namespace gazebo
 
   /// \class SensorPlugin Plugin.hh common/common.hh
   /// \brief A plugin with access to physics::Sensor.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
+  /// <a href="http://gazebosim.org/tutorials?tut=plugins_hello_world
+  /// &cat=write_plugin">reference</a>.
   class GAZEBO_VISIBLE SensorPlugin : public PluginT<SensorPlugin>
   {
     /// \brief Constructor
@@ -283,8 +283,8 @@ namespace gazebo
   };
 
   /// \brief A plugin loaded within the gzserver on startup.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
+  /// <a href="http://gazebosim.org/tutorials?tut=system_plugin
+  /// &cat=write_plugin">reference</a>
   /// @todo how to make doxygen reference to the file gazebo.cc#g_plugins?
   class GAZEBO_VISIBLE SystemPlugin : public PluginT<SystemPlugin>
   {
@@ -312,8 +312,8 @@ namespace gazebo
   };
 
   /// \brief A plugin loaded within the gzserver on startup.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
+  /// <a href="http://gazebosim.org/tutorials?tut=plugins_hello_world
+  /// &cat=write_plugin">reference</a>.
   class GAZEBO_VISIBLE VisualPlugin : public PluginT<VisualPlugin>
   {
     public: VisualPlugin()

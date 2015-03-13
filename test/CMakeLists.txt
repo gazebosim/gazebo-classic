@@ -2,7 +2,7 @@ include_directories (
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
-  ${SDF_INCLUDE_DIRS}
+  ${SDFormat_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/test/gtest/include
   ${PROJECT_SOURCE_DIR}/test/gtest
@@ -13,7 +13,7 @@ link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
   ${ODE_LIBRARY_DIRS}
-  ${SDF_LIBRARY_DIRS}
+  ${SDFormat_LIBRARY_DIRS}
 )
 
 if (HAVE_BULLET)

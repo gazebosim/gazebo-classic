@@ -78,12 +78,6 @@ endif()
 ########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
-
-  pkg_check_modules(SDF sdformat>=2.0.0)
-  if (NOT SDF_FOUND)
-    BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
-  endif()
-
   pkg_check_modules(CURL libcurl)
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
@@ -402,6 +396,22 @@ else (PKG_CONFIG_FOUND)
   BUILD_ERROR ("Error: pkg-config not found")
 endif ()
 
+########################################
+# Find SDFormat
+find_package(SDFormat 2.0.1)
+if (NOT SDFormat_FOUND)
+  find_package(SDFormat 3)
+endif()
+
+if (NOT SDFormat_FOUND)
+  message (STATUS "Looking for SDFormat - not found")
+  BUILD_ERROR ("Missing: SDF version >=2.0.1. Required for reading and writing SDF files.")
+else()
+  message (STATUS "Looking for SDFormat - found")
+endif()
+
+########################################
+# Find QT
 find_package (Qt4)
 if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")

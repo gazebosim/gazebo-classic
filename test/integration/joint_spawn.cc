@@ -339,11 +339,6 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
-    if (isBullet && _joint->HasType(physics::Base::SLIDER_JOINT))
-    {
-      gzerr << "Bullet is off by one time step (#1081)" << std::endl;
-      world->Step(1);
-    }
     EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
     EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
 

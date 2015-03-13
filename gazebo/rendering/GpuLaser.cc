@@ -463,8 +463,11 @@ const float* GpuLaser::GetLaserData()
 /////////////////////////////////////////////////
 void GpuLaser::CreateOrthoCam()
 {
+  this->pitchNodeOrtho =
+    this->GetScene()->GetWorldVisual()->GetSceneNode()->createChildSceneNode();
+
   this->orthoCam = this->scene->GetManager()->createCamera(
-        this->GetName() + "_ortho_cam");
+        this->pitchNodeOrtho->getName() + "_ortho_cam");
 
   // Use X/Y as horizon, Z up
   this->orthoCam->pitch(Ogre::Degree(90));
@@ -473,10 +476,6 @@ void GpuLaser::CreateOrthoCam()
   this->orthoCam->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
 
   this->orthoCam->setDirection(1, 0, 0);
-
-  this->pitchNodeOrtho =
-    this->GetScene()->GetWorldVisual()->GetSceneNode()->createChildSceneNode(
-      this->GetName()+"OrthoPitchNode");
 
   this->pitchNodeOrtho->attachObject(this->orthoCam);
   this->orthoCam->setAutoAspectRatio(true);

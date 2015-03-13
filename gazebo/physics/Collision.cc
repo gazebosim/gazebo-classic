@@ -162,6 +162,12 @@ ModelPtr Collision::GetModel() const
 }
 
 //////////////////////////////////////////////////
+unsigned int Collision::GetShapeType() const
+{
+  return this->shape->GetType();
+}
+
+//////////////////////////////////////////////////
 unsigned int Collision::GetShapeType()
 {
   return this->shape->GetType();

@@ -146,7 +146,13 @@ void FileLogger::Init(const std::string &_filename)
       this->rdbuf());
 
   boost::filesystem::path logPath(getenv("HOME"));
-  logPath = logPath / ".gazebo/" / _filename;
+  logPath = logPath / ".gazebo/";
+
+  // Create the log directory if it doesn't exist.
+  if (!boost::filesystem::exists(logPath))
+    boost::filesystem::create_directories(logPath);
+
+  logPath /= _filename;
 
   // Check if the Init method has been already called, and if so
   // remove current buffer.

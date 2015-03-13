@@ -104,7 +104,14 @@ namespace gazebo
       /// \brief Get the shape type.
       /// \return The shape type.
       /// \sa EntityType
-      public: unsigned int GetShapeType();
+      public: unsigned int GetShapeType() const;
+
+      /// \brief Get the shape type.
+      /// Deprecated in favor of const version.
+      /// \return The shape type.
+      /// \sa EntityType
+      public: unsigned int GetShapeType()
+                           GAZEBO_DEPRECATED(4.0);
 
       /// \brief Set the shape for this collision.
       /// \param[in] _shape The shape for this collision object.
