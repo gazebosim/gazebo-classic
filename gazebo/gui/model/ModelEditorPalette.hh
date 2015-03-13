@@ -72,11 +72,6 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
 
-      /// \brief Received item selection user input.
-      /// \param[in] _item Item selected.
-      /// \param[in] _column Column index.
-      private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
-
       /// \brief Qt callback when cylinder button is clicked.
       private slots: void OnCylinder();
 
@@ -102,25 +97,33 @@ namespace gazebo
       /// \param[in] _name New name.
       private slots: void OnNameChanged(const QString &_name);
 
-      /// TODO
+      /// \brief Qt callback when a tree item has been double clicked.
+      /// \param[in] _item Item clicked.
+      /// \param[in] _column Column index.
       private slots: void OnDoubleClick(QTreeWidgetItem *item, int column);
 
-      /// TODO
-      private: void OnLinkInserted(std::string _linkName);
+      /// \brief Add a link to the tree.
+      /// \param[in] _linkName Scoped link name.
+      private: void OnLinkInserted(const std::string &_linkName);
 
-      /// TODO
-      private: void OnJointInserted(std::string _jointName);
+      /// \brief Add a joint to the tree.
+      /// \param[in] _jointName Unique joint identifying name.
+      private: void OnJointInserted(const std::string &_jointName);
 
-      /// TODO
-      private: void OnLinkRemoved(std::string _linkName);
+      /// \brief Remove a link from the tree.
+      /// \param[in] _linkName Scoped link name.
+      private: void OnLinkRemoved(const std::string &_linkName);
 
-      /// TODO
-      private: void OnJointRemoved(std::string _jointName);
+      /// \brief Remove a joint from the tree.
+      /// \param[in] _jointName Unique joint identifying name.
+      private: void OnJointRemoved(const std::string &_jointName);
 
-      /// TODO
+      /// \brief Remove all links and joints from the tree.
       private: void ClearModelTree();
 
-      /// TODO
+      /// \brief Update a joint item text in the tree.
+      /// \param[in] _jointIdName Unique joint identifying name.
+      /// \param[in] _newJointName New joint name.
       private: void OnJointNameChanged(const std::string &_jointIdName,
           const std::string &_newJointName);
 
@@ -161,13 +164,13 @@ namespace gazebo
       /// \brief Edit the name of the model.
       private: QLineEdit *modelNameEdit;
 
-      /// TODO
+      /// \brief The tree holding all links and joints.
       private: QTreeWidget *modelTreeWidget;
 
-      /// TODO
+      /// \brief Parent item for all links.
       private: QTreeWidgetItem *linksItem;
 
-      /// TODO
+      /// \brief Parent item for all joints.
       private: QTreeWidgetItem *jointsItem;
 
       /// \brief Mutex to protect updates

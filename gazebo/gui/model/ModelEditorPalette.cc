@@ -180,6 +180,10 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       static_cast<QTreeWidgetItem*>(0),
       QStringList(QString("%1").arg(tr("Links"))));
   this->linksItem->setData(0, Qt::UserRole, QVariant(tr("Links")));
+  QFont linksFont = this->linksItem->font(0);
+  linksFont.setBold(true);
+  linksFont.setPointSize(1.1 * linksFont.pointSize());
+  this->linksItem->setFont(0, linksFont);
   this->modelTreeWidget->addTopLevelItem(this->linksItem);
 
   // Joints
@@ -187,6 +191,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       static_cast<QTreeWidgetItem*>(0),
       QStringList(QString("%1").arg(tr("Joints"))));
   this->jointsItem->setData(0, Qt::UserRole, QVariant(tr("Joints")));
+  this->jointsItem->setFont(0, linksFont);
   this->modelTreeWidget->addTopLevelItem(this->jointsItem);
 
   connect(this->modelTreeWidget,
@@ -266,14 +271,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 /////////////////////////////////////////////////
 ModelEditorPalette::~ModelEditorPalette()
 {
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnItemSelection(QTreeWidgetItem *_item,
-                                         int /*_column*/)
-{
-  if (_item && _item->childCount() > 0)
-    _item->setExpanded(!_item->isExpanded());
 }
 
 /////////////////////////////////////////////////
@@ -443,7 +440,7 @@ void ModelEditorPalette::OnDoubleClick(QTreeWidgetItem *_item, int /*_column*/)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnLinkInserted(std::string _linkName)
+void ModelEditorPalette::OnLinkInserted(const std::string &_linkName)
 {
   std::string leafName = _linkName;
   size_t idx = _linkName.find_last_of("::");
@@ -461,7 +458,7 @@ void ModelEditorPalette::OnLinkInserted(std::string _linkName)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnJointInserted(std::string _jointName)
+void ModelEditorPalette::OnJointInserted(const std::string &_jointName)
 {
   std::string leafName = _jointName;
   size_t begin = _jointName.find_last_of("::");
@@ -487,7 +484,7 @@ void ModelEditorPalette::OnJointInserted(std::string _jointName)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnLinkRemoved(std::string _linkName)
+void ModelEditorPalette::OnLinkRemoved(const std::string &_linkName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   for (int i = 0; i < this->linksItem->childCount(); ++i)
@@ -506,7 +503,7 @@ void ModelEditorPalette::OnLinkRemoved(std::string _linkName)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnJointRemoved(std::string _jointName)
+void ModelEditorPalette::OnJointRemoved(const std::string &_jointName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   for (int i = 0; i < this->jointsItem->childCount(); ++i)

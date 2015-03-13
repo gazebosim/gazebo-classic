@@ -942,7 +942,7 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::RemoveLink(const std::string _linkName)
+void ModelCreator::RemoveLink(const std::string &_linkName)
 {
   if (!this->previewVisual)
   {
@@ -960,6 +960,9 @@ void ModelCreator::RemoveLink(const std::string _linkName)
 
   if (!link)
     return;
+
+  // Copy before reference is deleted.
+  std::string linkName(_linkName);
 
   rendering::ScenePtr scene = link->linkVisual->GetScene();
   for (auto &it : link->visuals)
@@ -982,7 +985,7 @@ void ModelCreator::RemoveLink(const std::string _linkName)
     this->allLinks.erase(_linkName);
     delete link;
   }
-  gui::model::Events::linkRemoved(_linkName);
+  gui::model::Events::linkRemoved(linkName);
 
   this->ModelChanged();
 }
@@ -1152,8 +1155,7 @@ void ModelCreator::Stop()
 {
   if (this->addLinkType != LINK_NONE && this->mouseVisual)
   {
-    for (unsigned int i = 0; i < this->mouseVisual->GetChildCount(); ++i)
-        this->RemoveLink(this->mouseVisual->GetChild(i)->GetName());
+    this->RemoveLink(this->mouseVisual->GetName());
     this->mouseVisual.reset();
     emit LinkAdded();
   }
