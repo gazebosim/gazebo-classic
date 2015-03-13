@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,7 +105,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   sensors::ImuSensorPtr imuSensor =
       boost::dynamic_pointer_cast<sensors::ImuSensor>(sensor);
 
-  ASSERT_TRUE(imuSensor);
+  ASSERT_TRUE(imuSensor != NULL);
 
   sensors::SensorManager::Instance()->Init();
   imuSensor->SetActive(true);

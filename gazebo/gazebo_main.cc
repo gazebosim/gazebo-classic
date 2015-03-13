@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,12 +53,13 @@ void help()
   << "data \n"
   << "                                (zlib|bz2|txt).\n"
   << "  --record_path arg             Absolute path in which to store "
-  << "state data\n"
+  << "state data.\n"
   << "  --seed arg                    Start with a given random number seed.\n"
   << "  --iters arg                   Number of iterations to simulate.\n"
   << "  --minimal_comms               Reduce the TCP/IP traffic output by "
-  <<                                  "gazebo\n"
-  << "  -s [ --server-plugin ] arg    Load a plugin.\n\n";
+  <<                                  "gazebo.\n"
+  << "  -g [ --gui-plugin ] arg       Load a GUI plugin.\n"
+  << "  -s [ --server-plugin ] arg    Load a server plugin.\n\n";
 }
 
 /////////////////////////////////////////////////

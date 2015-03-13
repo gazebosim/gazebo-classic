@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *
 */
 
+#include <sstream>
 #include <gazebo/math/Rand.hh>
 #include <gazebo/physics/World.hh>
 #include "RubblePlugin.hh"
@@ -371,7 +372,7 @@ void RubblePlugin::MakeCompound(const std::string &_name, CompoundObj &_obj)
                << "<iyz>" << 0.0 << "</iyz>"
                << "</inertial>";
 
-    newModelStr << inertiaStr;
+    newModelStr << inertiaStr.str();
 
     newModelStr << "    <collision name ='collision_" << i << "'>"
                 << "      <pose>" << (*iter).pose << "</pose>"

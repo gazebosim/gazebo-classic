@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ class ExampleBox : public ::testing::Test
   protected:
     virtual void SetUp()
     {
-       box = math::Box(math::Vector3(0, 1, 2), math::Vector3(1, 2, 3));
+      box = math::Box(math::Vector3(0, -1, 2), math::Vector3(1, -2, 3));
     }
 
     math::Box box;
@@ -44,8 +44,8 @@ TEST_F(BoxTest, EmptyConstructor)
 
 TEST_F(ExampleBox, Constructor)
 {
-  EXPECT_TRUE(box.min == math::Vector3(0, 1, 2));
-  EXPECT_TRUE(box.max == math::Vector3(1, 2, 3));
+  EXPECT_TRUE(box.min == math::Vector3(0, -2, 2));
+  EXPECT_TRUE(box.max == math::Vector3(1, -1, 3));
 }
 
 TEST_F(ExampleBox, CopyConstructor)
@@ -69,13 +69,13 @@ TEST_F(ExampleBox, GetSize)
 
 TEST_F(ExampleBox, GetCenter)
 {
-  EXPECT_TRUE(box.GetCenter() == math::Vector3(0.5, 1.5, 2.5));
+  EXPECT_TRUE(box.GetCenter() == math::Vector3(0.5, -1.5, 2.5));
 }
 
 TEST_F(ExampleBox, Merge)
 {
   box.Merge(math::Box(math::Vector3(-1, -1, -1), math::Vector3(2, 2, 2)));
-  EXPECT_TRUE(box == math::Box(math::Vector3(-1, -1, -1),
+  EXPECT_TRUE(box == math::Box(math::Vector3(-1, -2, -1),
                                math::Vector3(2, 2, 3)));
 }
 

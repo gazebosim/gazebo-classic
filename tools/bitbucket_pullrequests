@@ -5,11 +5,18 @@
 
 # to install dependencies on Ubuntu (tested with Precise, Quantal, and Raring):
 #sudo apt-get install rubygems ruby-rest-client ruby-json
-require 'rubygems'
-require 'rest_client'
-require 'json'
-require 'optparse'
-require 'date'
+begin
+  require 'rubygems'
+  require 'rest_client'
+  require 'json'
+  require 'optparse'
+  require 'date'
+rescue LoadError => e
+  puts "Error: " + e.message
+  gem = e.message.match(/ -- (.*)/)[1]
+  puts "Please install missing gem: $ gem install #{gem}"
+  exit
+end
 
 $stderr.sync = true
 
@@ -110,6 +117,31 @@ class BitbucketPullRequests
     return Summary.new(jsonHash, @options)
   end
 
+  ###############################################
+  # Output a pull request summary based based on a branch and revision.
+  # @param[in] _range A two part array, where the first is a branch name 
+  # and the second a revision.
+  def getPullRequestSummaryFromRange(range)
+    if range.nil?
+      puts "Invalid range for --summary-range option."
+      return
+    elsif range.size < 2
+      puts "Error: --summary-range option requires two comma " +
+           "separated arguments."
+      return
+    end
+
+    origin = range[0]
+    dest   = range[1]
+    # get the list of summaries from the log. Need to be cleaned up
+    summaries_hg=`hg log -b #{origin} -P #{dest} | grep "(pull request.*)"`
+    summaries_hg.split("\n").each { |sum|
+      id = sum.scan(/#[0-9]*\)/).to_s()[/([0-9])+/]
+        jsonHash = getJson(@url_pullrequests + "/" + id)
+      puts "[pr #{id}] " + jsonHash["title"]
+    }
+  end
+
   # diff of pull request
   def getPullRequestDiff(id)
     response = getUrl(@url_pullrequests + "/" + id.to_s + "/diff")
@@ -182,6 +214,7 @@ options["check"]    = false
 options["check_id"] = nil
 options["diff"]     = nil
 options["files"]    = nil
+options["range"]    = nil
 options["show-url"] = false
 options["title"]    = false
 options["verbose"]  = false
@@ -196,11 +229,13 @@ opt_parser = OptionParser.new do |o|
        "Show diff from pull request") { |o| options["diff"] = o }
   o.on("-f", "--files [id]", Integer,
        "Show changed files in a pull request") { |o| options["files"] = o }
+  o.on("--summary-range [changeset1],[changeset2]", Array,
+       "Display all summaries from pull request\n\t\t\t\t\tmerged between changeset1 and changeset2")  { |o| options["range"] = o }
   o.on("-s", "--summary [id]", Integer,
        "Summarize a pull request with fields:\n" + " "*37 +
        "[id] [source] [dest] [branch]")  { |o| options["summary"] = o }
   o.on("-t", "--title",
-       "Show pull request title with --list, --summary") { |o| options["title"] = o }
+       "Show pull request title with --list,\n\t\t\t\t\t--summary") { |o| options["title"] = o }
   o.on("-u", "--show-url",
        "Show urls accessed") { |o| options["show-url"] = o }
   o.on("-v", "--verbose",
@@ -217,6 +252,8 @@ if options["list"]
   puts client.listPullRequests()
 elsif !options["summary"].nil?
   puts client.getPullRequestSummary(options["summary"])
+elsif !options["range"].nil?
+  client.getPullRequestSummaryFromRange(options["range"])
 elsif !options["diff"].nil?
   puts client.getPullRequestDiff(options["diff"])
 elsif !options["files"].nil?

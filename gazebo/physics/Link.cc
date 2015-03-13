@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -616,6 +616,12 @@ math::Vector3 Link::GetRelativeAngularAccel() const
 math::Vector3 Link::GetWorldAngularAccel() const
 {
   return this->GetWorldTorque() / this->inertial->GetMass();
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Link::GetWorldAngularMomentum() const
+{
+  return this->GetWorldInertiaMatrix() * this->GetWorldAngularVel();
 }
 
 //////////////////////////////////////////////////
@@ -1326,6 +1332,3 @@ msgs::Visual Link::GetVisualMessage(const std::string &_name) const
 
   return result;
 }
-
-
-

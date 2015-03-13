@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,21 @@ namespace gazebo
 
       // Documentation inherited from parent
       public: void HandleKeyPressEvent(const std::string &_key);
+
+      /// \brief The current velocity of the camera.
+      private: math::Pose velocity;
+
+      /// \brief Translation velocity factor along the x-axis
+      private: float xVelocityFactor;
+
+      /// \brief Translation velocity factor along the y-axis
+      private: float yVelocityFactor;
+
+      /// \brief Translation velocity along the x-axis
+      private: math::Vector3 xVelocity;
+
+      /// \brief Translation velocity along the y-axis
+      private: math::Vector3 yVelocity;
     };
     /// \}
   }

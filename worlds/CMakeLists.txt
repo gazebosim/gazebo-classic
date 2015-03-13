@@ -19,6 +19,7 @@ set (files
   hydra_demo.world
   initial_velocity.world
   joint_damping_demo.world
+  joint_friction_demo.world
   joints.world
   lights.world
   mud_bitmask.world
@@ -32,6 +33,7 @@ set (files
   plane_demo.world
   plugin.world
   polyline.world
+  population.world
   pr2.world
   presentation.world
   pressure_sensor.world

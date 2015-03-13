@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -218,11 +218,7 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
     {
       physics::CollisionPtr collision = collisions[j];
       physics::CollisionPtr collisionClone = collisionClones[j];
-// Remove these pragmas when non-const GetShapeType is removed
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
       EXPECT_EQ(collision->GetShapeType(), collisionClone->GetShapeType());
-#pragma GCC diagnostic pop
       EXPECT_EQ(collision->GetMaxContacts(), collisionClone->GetMaxContacts());
 
       // Check surface
