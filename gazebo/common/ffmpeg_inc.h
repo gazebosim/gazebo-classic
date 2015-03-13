@@ -20,11 +20,11 @@
 
 #pragma GCC system_header
 
-#ifdef HAVE_FFMPEG
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
+# ifdef HAVE_FFMPEG
+#  ifndef INT64_C
+#   define INT64_C(c) (c ## LL)
+#   define UINT64_C(c) (c ## ULL)
+#  endif
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -32,6 +32,17 @@ extern "C" {
 #include <libavutil/opt.h>
 #include <libswscale/swscale.h>
 }
-#endif  // ifdef HAVE_FFMPEG
 
+namespace gazebo
+{
+  namespace common
+  {
+    /// \brief Helper function to avoid deprecation warnings.
+    AVFrame *AVFrameAlloc(void);
+
+    /// \brief Helper function to avoid deprecation warnings.
+    void AVFrameUnref(AVFrame *_frame);
+  }
+}
+# endif  // ifdef HAVE_FFMPEG
 #endif  // ifndef _GAZEBO_FFMPEG_INC_HH

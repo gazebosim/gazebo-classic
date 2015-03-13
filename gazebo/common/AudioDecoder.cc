@@ -88,14 +88,14 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 
   if (!decodedFrame)
   {
-    if (!(decodedFrame = avcodec_alloc_frame()))
+    if (!(decodedFrame = AVFrameAlloc()))
     {
       gzerr << "Audio decoder out of memory\n";
       result = false;
     }
   }
   else
-    avcodec_get_frame_defaults(decodedFrame);
+    AVFrameUnref(decodedFrame);
 
   av_init_packet(&packet);
   while (av_read_frame(this->formatCtx, &packet) == 0)
