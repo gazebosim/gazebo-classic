@@ -261,26 +261,26 @@ namespace gazebo
       protected: virtual bool GetParam(const std::string &_key,
           boost::any &_value) const;
 
-      public: template<typename T> bool GetParam(const std::string &_key,
+      public: template<typename T> inline bool GetParam(const std::string &_key,
           T &_value) const
           {
-            boost::any value;
-            bool success = this->GetParam(_key, value);
-            try
-            {
-              _value = boost::any_cast<T>(value);
-            }
-            catch(boost::bad_any_cast &_e)
-            {
-              gzerr << "Bad any cast in templated PhysicsEngine::GetParam: "
-                    << _e.what();
-              return false;
-            }
+            #define GAZEBO_TEMPLATE_GETPARAMS \
+            boost::any value;\
+            bool success = this->GetParam(_key, value);\
+            try\
+            {\
+              _value = boost::any_cast<T>(value);\
+            }\
+            catch(boost::bad_any_cast &_e)\
+            {\
+              gzerr << "Bad any cast in templated PhysicsEngine::GetParam: "\
+                    << _e.what();\
+              return false;\
+            }\
             return success;
-          }
 
-      //bool GetParam<double>(const std::string &_key, double &_value);
-      //bool GetParam<int>(const std::string &_key, int &_value);
+            GAZEBO_TEMPLATE_GETPARAMS
+          }
 
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;

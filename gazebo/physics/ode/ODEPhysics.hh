@@ -193,8 +193,14 @@ namespace gazebo
       private: virtual boost::any GetParam(const std::string &_key) const;
 
       /// Documentation inherited
-      protected: virtual bool GetParam(const std::string &_key,
+      private: virtual bool GetParam(const std::string &_key,
                   boost::any &_value) const;
+
+      public: template<typename T> inline bool GetParam(const std::string &_key,
+          T &_value) const
+          {
+            GAZEBO_TEMPLATE_GETPARAMS
+          }
 
       /// \brief Return the world space id.
       /// \return The space id for the world.

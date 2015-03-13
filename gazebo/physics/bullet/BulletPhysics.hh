@@ -164,6 +164,12 @@ namespace gazebo
       /// Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
 
+      public: template<typename T> inline bool GetParam(const std::string &_key,
+          T &_value) const
+          {
+            GAZEBO_TEMPLATE_GETPARAMS
+          }
+
       /// Documentation inherited
       protected: virtual bool GetParam(const std::string &_key,
           boost::any &_value) const;

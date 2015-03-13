@@ -319,8 +319,11 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   // but can lead to improper stacking of objects, see
   // http://web.archive.org/web/20120430155635/http://bulletphysics.org/
   //     mediawiki-1.5.8/index.php/BtContactSolverInfo#Split_Impulse
-  info.m_splitImpulse =
-      boost::any_cast<bool>(this->GetParam("split_impulse"));
+  bool split_impulse = true;
+  if (this->GetParam("split_impulse", split_impulse))
+  {
+    info.m_splitImpulse = split_impulse;
+  }
   info.m_splitImpulsePenetrationThreshold =
     boost::any_cast<double>(
     this->GetParam("split_impulse_penetration_threshold"));

@@ -266,7 +266,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     try
     {
       double min_step_size;
-      if (this->GetParam("min_step_size", min_step_size))
+      if (PhysicsEngine::GetParam("min_step_size", min_step_size))
         physicsMsg.set_min_step_size(min_step_size);
     }
     catch(boost::bad_any_cast &_e)
