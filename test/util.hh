@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_TEST_UTIL_HH_
 #define _GAZEBO_TEST_UTIL_HH_
 
+#include <fstream>
 #include <gtest/gtest.h>
 #include <string>
 
@@ -45,7 +46,7 @@ namespace gazebo
         this->logFilename = testCaseName + "_" + testName + ".log";
 
         // Initialize Console
-#ifdef _GAZEBO_CONSOLE_HH
+#ifdef gzLogInit
         gzLogInit("test_logs-", this->logFilename);
         gazebo::common::Console::SetQuiet(false);
 
