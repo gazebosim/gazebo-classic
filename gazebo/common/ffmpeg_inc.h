@@ -38,9 +38,11 @@ namespace gazebo
   namespace common
   {
     /// \brief Helper function to avoid deprecation warnings.
+    GAZEBO_VISIBLE
     AVFrame *AVFrameAlloc(void);
 
     /// \brief Helper function to avoid deprecation warnings.
+    GAZEBO_VISIBLE
     void AVFrameUnref(AVFrame *_frame);
   }
 }
