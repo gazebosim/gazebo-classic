@@ -120,6 +120,10 @@ namespace gazebo
       /// TODO
       private: void ClearModelTree();
 
+      /// TODO
+      private: void OnJointNameChanged(const std::string &_jointIdName,
+          const std::string &_newJointName);
+
       /// \brief Callback when user has provided information on where to save
       /// the model to.
       /// \param[in] _saveName Name of model being saved.

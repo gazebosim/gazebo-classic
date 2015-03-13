@@ -1046,6 +1046,10 @@ void JointData::OnApply()
 {
   this->pose = this->inspector->GetPose();
   this->type = this->inspector->GetType();
+
+  if (this->name != this->inspector->GetName())
+    gui::model::Events::jointNameChanged(this->hotspot->GetName(),
+        this->inspector->GetName());
   this->name = this->inspector->GetName();
 
   int axisCount = JointMaker::GetJointAxisCount(this->type);
