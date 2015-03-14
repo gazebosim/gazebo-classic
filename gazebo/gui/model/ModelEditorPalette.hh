@@ -110,7 +110,7 @@ namespace gazebo
       /// \param[in] _autoDisable New allow_auto_disable property of the model.
       /// \param[in] _pose New model pose.
       private: void OnModelPropertiesChanged(bool _static, bool _autoDisable,
-          const math::Pose &_pose);
+          const math::Pose &_pose, const std::string &_name);
 
       /// \brief A list of gui editor events connected to this palette.
       private: std::vector<event::ConnectionPtr> connections;
