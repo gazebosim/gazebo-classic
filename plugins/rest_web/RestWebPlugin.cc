@@ -166,12 +166,8 @@ void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
   event += "}\n";  // world element
   event += "}";    // root element
 
-  gzmsg << "Posting sim event\n";
-  gzmsg << "event:\n" << event << "\n\n" <<  std::endl;
-
+  // post it with curl
   restApi.PostJsonData(route.c_str(), event.c_str());
-
-  gzmsg << "POSTED to: " << route << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -25,8 +25,18 @@
 
 using namespace gazebo;
 
-// enable this flag to get more curl details
-// about each request
+
+// This code is adapted from the curl C examples (http://curl.haxx.se/libcurl/c/)
+// mostly modified to adhere to the Gazebo code check tool.
+// It implements the following features:
+//  - HTML POST, sending and receiving data
+//  - Authentication (Basic Auth)
+//  - https (SSL, but accepting non signed certificates)
+
+
+// You can enable this flag to get more curl details
+// about each request (will provide  SSL negociation and TCP dumps of the
+// requests and responses)
 bool trace_requests = false;
 
 struct data {
@@ -35,7 +45,7 @@ struct data {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-static void dump(const char *text,
+static void DumpRequest(const char *text,
           FILE *stream,
           unsigned char *ptr,
           size_t size,
@@ -48,7 +58,7 @@ static void dump(const char *text,
   if (nohex)
     // without the hex output, we can fit more on screen
     width = 0x40;
-  int64 s = size;
+  int64_t s = size;
   fprintf(stream, "%s, %10.10ld bytes (0x%8.8lx)\n",
           text, s, s);
 
@@ -87,10 +97,14 @@ static void dump(const char *text,
   fflush(stream);
 }
 
+
+// Callback given to curl that outputs data about the reuest
 ////////////////////////////////////////////////////////////////////////////////
-static int my_trace(CURL *handle, curl_infotype type,
-             char *data, size_t size,
-             void *userp)
+static int TraceRequest(CURL *handle,
+                        curl_infotype type,
+                        char *data,
+                        size_t size,
+                        void *userp)
 {
   struct data *config = (struct data *)userp;
   const char *text;
@@ -125,7 +139,7 @@ static int my_trace(CURL *handle, curl_infotype type,
 
   if (trace_requests)
   {
-    dump(text, stderr, (unsigned char *)data, size, config->trace_ascii);
+    DumpRequest(text, stderr, (unsigned char *)data, size, config->trace_ascii);
   }
   return 0;
 }
@@ -148,7 +162,7 @@ static size_t WriteMemoryCallback(void *contents,
   size_t realsize = size * nmemb;
   struct MemoryStruct *mem = (struct MemoryStruct *)userp;
   size_t newsize = mem->size + realsize + 1;
-  mem->memory = reinterpret_cast<char*>(realloc(mem->memory, newsize));
+  mem->memory = static_cast<char*> (realloc(mem->memory, newsize));
   if (mem->memory == NULL)
   {
     // out of memory!
@@ -185,20 +199,20 @@ void RestApi::PostJsonData(const char* _route, const char *_json)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string RestApi::Login(const char* urlStr,
-                           const char *route,
-                           const char* userStr,
-                           const char* passStr)
+std::string RestApi::Login(const char* _urlStr,
+                           const char* _route,
+                           const char* _userStr,
+                           const char* _passStr)
 {
   this->isLoggedIn = false;
-  this->url = urlStr;
-  this->user = userStr;
-  this->pass = passStr;
+  this->url = _urlStr;
+  this->user = _userStr;
+  this->pass = _passStr;
 
-  this->loginRoute = route;
+  this->loginRoute = _route;
+  gzmsg << "login route: " << this->loginRoute << "\n";
   std::string resp = this->Request(loginRoute.c_str());
-
-  gzmsg << "RESP: " << resp << "\n";
+  gzmsg << "login response: " << resp << "\n";
 
   this->isLoggedIn = true;
   this->SendUnpostedPosts();
@@ -213,6 +227,7 @@ void RestApi::SendUnpostedPosts()
     while (!this->posts.empty())
     {
       Post post = this->posts.front();
+      //  You can generate a similar request on the cmd line like so:
       //  curl --verbose --connect-timeout 5 -X POST
       //    -H \"Content-Type: application/json \" -k --user"
       this->Request(post.route.c_str(), post.json.c_str());
@@ -223,6 +238,12 @@ void RestApi::SendUnpostedPosts()
   {
     gzmsg << posts.size() << " post(s) queued to be sent" << std::endl;
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string RestApi::GetUser()
+{
+  return this->user;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -251,7 +272,7 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
 
     struct data config;
     config.trace_ascii = 1;  //  enable ascii tracing
-    curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, TraceRequest);
     curl_easy_setopt(curl, CURLOPT_DEBUGDATA, &config);
 
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
@@ -261,7 +282,6 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
   struct MemoryStruct chunk;
   // will be grown as needed by the realloc above
   chunk.memory = static_cast<char*>(malloc(1));
-
   chunk.size = 0;            // no data at this point
   bool secure = false;
   if (!secure)
@@ -275,7 +295,6 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
   // send all data to this function
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
   //  we pass our 'chunk' struct to the callback function
-  //  curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
   curl_easy_setopt(curl,
                    CURLOPT_WRITEDATA,
                    static_cast<void *>(&chunk));
@@ -285,15 +304,12 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
 
   // set user name and password for the authentication
-  // curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_ANY);
   curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
   string userpass = this->user + ":" + this->pass;
   curl_easy_setopt(curl, CURLOPT_USERPWD, userpass.c_str());
 
-  // connection timeout
+  // connection timeout 10 sec
   curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 10);
-  // 10 sec total timeout
-  // curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
 
   // is this a POST?
   struct curl_slist *slist = NULL;
@@ -308,10 +324,14 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, slist);
   }
 
-  CURLcode res = curl_easy_perform(curl);
+  CURLcode res;
+  res = curl_easy_perform(curl);
+
   // get HTTP response code
-  int http_code = 0;
+  int64_t http_code = 0;
+
   curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+
   curl_easy_cleanup(curl);
   if (res != CURLE_OK)
   {
@@ -333,4 +353,3 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
     free(chunk.memory);
   return response;
 }
-
