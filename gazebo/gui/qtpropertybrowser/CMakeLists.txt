@@ -1,5 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
-include ( ${QT_USE_FILE} )
+add_definitions(${Qt5Core_DEFINITIONS})
+include_directories(${Qt5Core_INCLUDE_DIRS})
+#include ( ${QT_USE_FILE} )
 
 set (sources qtpropertybrowser.cpp 
              qtpropertymanager.cpp
@@ -22,8 +24,8 @@ set (qt_headers qtpropertybrowser.h
   )
 
 set (resources qtpropertybrowser.qrc)
-QT4_WRAP_CPP(headers_MOC ${qt_headers})
-QT4_ADD_RESOURCES(resources_RCC ${resources})
+QT5_WRAP_CPP(headers_MOC ${qt_headers})
+QT5_ADD_RESOURCES(resources_RCC ${resources})
 
 add_library(gzqtpropertybrowser STATIC ${sources} ${headers_MOC} ${resources_RCC})
 set_target_properties(gzqtpropertybrowser PROPERTIES POSITION_INDEPENDENT_CODE ON)

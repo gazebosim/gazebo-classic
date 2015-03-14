@@ -20,19 +20,47 @@
 
 #pragma GCC system_header
 
-#include <QtGui>
-#include <QX11Info>
-#include <QWidget>
-#include <QPushButton>
-#include <QPoint>
-#include <QFrame>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QGroupBox>
-#include <QApplication>
-#include <qmainwindow.h>
-#include <QAction>
+#include <QtX11Extras/QX11Info>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QPushButton>
+#include <QtCore/QtCore>
+#include <QtCore/QPoint>
+#include <QtWidgets/QWidgetAction>
+#include <QtWidgets/QFrame>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QTreeWidget>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QVBoxLayout>
+#include <QtGui/QPainter>
+#include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QSplitter>
+#include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QDoubleSpinBox>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/qmainwindow.h>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QScrollArea>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QColorDialog>
+#include <QtWidgets/QMessageBox>
+#include <QtCore/QSignalMapper>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QToolButton>
+#include <QtWidgets/QStackedLayout>
+#include <QtWidgets/QToolBar>
+#include <QtGui/QResizeEvent>
+#include <QtWidgets/QListWidget>
+#include <QtWidgets/QRadioButton>
+#include <QtWidgets/QGraphicsSceneHoverEvent>
+#include <QtGui/QVector3D>
+#include <QtCore/QPointF>
 
 #endif

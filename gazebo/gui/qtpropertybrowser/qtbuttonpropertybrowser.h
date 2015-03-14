@@ -42,9 +42,9 @@
 #ifndef QTBUTTONPROPERTYBROWSER_H
 #define QTBUTTONPROPERTYBROWSER_H
 
-#include <QtGui/QToolButton>
-#include <QtGui/QLabel>
-#include <QtGui/QGridLayout>
+#include <QtWidgets/QToolButton>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QGridLayout>
 
 #include "qtpropertybrowser.h"
 

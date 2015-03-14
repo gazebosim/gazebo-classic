@@ -43,7 +43,7 @@
 
 #include <QtCore/QSet>
 #include <QtGui/QIcon>
-#include <QtGui/QLineEdit>
+#include <QtWidgets/QLineEdit>
 
 #include "qtpropertybrowser.h"
 

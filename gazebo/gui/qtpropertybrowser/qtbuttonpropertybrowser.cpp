@@ -44,7 +44,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QTimer>
 #include <QtCore/QMap>
-#include <QtGui/QStyle>
+#include <QtWidgets/QStyle>
 
 #include "qtbuttonpropertybrowser.h"
 

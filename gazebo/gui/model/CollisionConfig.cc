@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #include "gazebo/common/Console.hh"
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/model/CollisionConfig.hh"

@@ -1,6 +1,3 @@
-include ( ${QT_USE_FILE} )
-add_definitions(${QT_DEFINITIONS})
-
 include_directories(
   ${tinyxml_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
@@ -31,7 +28,7 @@ gz_build_tests(${test_sources})
 add_executable(gz gz.cc gz_topic.cc gz_log.cc)
 target_link_libraries(gz
  gazebo_msgs gazebo_common gazebo_transport gazebo_gui gazebo_physics
- gazebo_sensors ${QT_LIBRARIES} ${Boost_LIBRARIES} pthread)
+ gazebo_sensors ${QT5Core_LIBRARIES} ${Boost_LIBRARIES} pthread)
 gz_install_executable(gz)
 
 roffman(gz 1)

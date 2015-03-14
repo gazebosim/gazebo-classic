@@ -1,6 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-include ( ${QT_USE_FILE} )
+# include ( ${QT_USE_FILE} )
 
 link_directories(
   ${Boost_LIBRARY_DIRS}
@@ -8,9 +8,10 @@ link_directories(
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/deps
+  ${Qt5Core_INCLUDE_DIRS}
 )
 
-add_definitions(${QT_DEFINITIONS})
+add_definitions(${Qt5Core_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
 add_subdirectory(building)
@@ -142,8 +143,8 @@ gz_build_qt_tests(${qt_tests})
 
 set (resources resources.qrc)
 
-QT4_WRAP_CPP(headers_MOC ${qt_headers})
-QT4_ADD_RESOURCES(resources_RCC ${resources})
+QT5_WRAP_CPP(headers_MOC ${qt_headers})
+QT5_ADD_RESOURCES(resources_RCC ${resources})
 
 gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 gz_add_executable(gzclient main.cc)
@@ -163,7 +164,7 @@ target_link_libraries(gazebo_gui
   gazebo_gui_viewers
   gzqtpropertybrowser
   libgazebo
-  ${QT_LIBRARIES}
+  ${QT5Core_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
   pthread

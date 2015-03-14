@@ -46,8 +46,8 @@
 #define QTTREEPROPERTYBROWSER_H
 
 #include <QtCore/QModelIndex>
-#include <QtGui/QTreeWidget>
-#include <QtGui/QItemDelegate>
+#include <QtWidgets/QTreeWidget>
+#include <QtWidgets/QItemDelegate>
 #include "qtpropertybrowser.h"
 
 #if QT_VERSION >= 0x040400
