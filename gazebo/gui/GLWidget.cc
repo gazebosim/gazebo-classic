@@ -15,6 +15,7 @@
  *
 */
 #include <math.h>
+#include <QtX11Extras/QX11Info>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
@@ -869,13 +870,12 @@ std::string GLWidget::GetOgreHandle() const
 #if defined(WIN32) || defined(__APPLE__)
   ogreHandle = boost::lexical_cast<std::string>(this->winId());
 #else
-  QX11Info info = x11Info();
   QWidget *q_parent = dynamic_cast<QWidget*>(this->renderFrame);
   ogreHandle = boost::lexical_cast<std::string>(
-      reinterpret_cast<uint64_t>(info.display()));
+      reinterpret_cast<uint64_t>(QX11Info::display()));
   ogreHandle += ":";
   ogreHandle += boost::lexical_cast<std::string>(
-      static_cast<uint32_t>(info.screen()));
+      static_cast<uint32_t>(QX11Info::appScreen()));
   ogreHandle += ":";
   GZ_ASSERT(q_parent, "q_parent is null");
   ogreHandle += boost::lexical_cast<std::string>(

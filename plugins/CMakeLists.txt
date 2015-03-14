@@ -3,6 +3,7 @@ include_directories(
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
+  ${Qt5Core_INCLUDE_DIRS}
 )
 
 # Tinyxml are used since the plugins are linking against gazebo_common
@@ -72,7 +73,7 @@ set_target_properties(BreakableJointPlugin PROPERTIES
 
 QT5_WRAP_CPP(TimerGUIPlugin_MOC TimerGUIPlugin.hh)
 add_library(TimerGUIPlugin SHARED TimerGUIPlugin.cc ${TimerGUIPlugin_MOC})
-target_link_libraries(TimerGUIPlugin libgazebo gazebo_sensors ${ogre_libraries} ${QT5Core_LIBRARIES})
+target_link_libraries(TimerGUIPlugin libgazebo gazebo_sensors ${ogre_libraries} ${Qt5Core_LIBRARIES})
 install (TARGETS TimerGUIPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
 
 add_subdirectory(events)

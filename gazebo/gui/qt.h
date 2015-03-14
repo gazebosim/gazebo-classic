@@ -20,7 +20,6 @@
 
 #pragma GCC system_header
 
-#include <QtX11Extras/QX11Info>
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QPushButton>
 #include <QtCore/QtCore>
@@ -58,7 +57,12 @@
 #include <QtWidgets/QToolBar>
 #include <QtGui/QResizeEvent>
 #include <QtWidgets/QListWidget>
+#include <QtWidgets/QTextBrowser>
 #include <QtWidgets/QRadioButton>
+#include <QtWidgets/QItemDelegate>
+#include <QtWidgets/QSizeGrip>
+#include <QtWidgets/QShortcut>
+#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QGraphicsSceneHoverEvent>
 #include <QtGui/QVector3D>
 #include <QtCore/QPointF>
