@@ -304,7 +304,7 @@ void ModelEditorPalette::OnStatic()
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnModelPropertiesChanged(
-    bool _static, bool _autoDisable, const math::Pose &/*_pose*/, 
+    bool _static, bool _autoDisable, const math::Pose &/*_pose*/,
     const std::string &_name)
 {
   this->staticCheck->setChecked(_static);
