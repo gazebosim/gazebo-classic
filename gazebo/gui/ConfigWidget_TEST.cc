@@ -223,7 +223,7 @@ void ConfigWidget_TEST::JointMsgWidget()
     QCOMPARE(jointConfigWidget->GetVector3WidgetValue("axis1::xyz"),
         gazebo::math::Vector3::UnitY);
     QCOMPARE(jointConfigWidget->GetBoolWidgetValue(
-        "axis::use_parent_model_frame"), true);
+        "axis1::use_parent_model_frame"), true);
     QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis1::limit_lower"),
         -1.2);
     QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis1::limit_upper"),
@@ -276,7 +276,7 @@ void ConfigWidget_TEST::JointMsgWidget()
     QCOMPARE(quat.GetAsEuler().z, 1.57);
 
     // axis
-    gazebo::msgs::Axis *axisMsg = jointMsg.mutable_axis1();
+    gazebo::msgs::Axis *axisMsg = retJointMsg->mutable_axis1();
     QCOMPARE(axisMsg->xyz().x(), 0.0);
     QCOMPARE(axisMsg->xyz().y(), 1.0);
     QCOMPARE(axisMsg->xyz().z(), 0.0);
