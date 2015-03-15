@@ -270,6 +270,17 @@ void ConfigWidget::SetGeometryWidgetValue(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+void ConfigWidget::SetEnumWidgetValue(const std::string &_name,
+    const std::string &_value)
+{
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
+
+  if (iter != this->configWidgets.end())
+    this->UpdateEnumWidget(iter->second, _value);
+}
+
+/////////////////////////////////////////////////
 int ConfigWidget::GetIntWidgetValue(const std::string &_name) const
 {
   int value = 0;
@@ -377,6 +388,18 @@ std::string ConfigWidget::GetGeometryWidgetValue(const std::string &_name,
   if (iter != this->configWidgets.end())
     type = this->GetGeometryWidgetValue(iter->second, _dimensions, _uri);
   return type;
+}
+
+/////////////////////////////////////////////////
+std::string ConfigWidget::GetEnumWidgetValue(const std::string &_name) const
+{
+  std::string value;
+  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
+      this->configWidgets.find(_name);
+
+  if (iter != this->configWidgets.end())
+    value = this->GetEnumWidgetValue(iter->second);
+  return value;
 }
 
 /////////////////////////////////////////////////
@@ -756,10 +779,30 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           break;
         }
         case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
-          // const google::protobuf::EnumValueDescriptor *value =
-          //    ref->GetEnum(*_msg, field);
-          // TODO Implement enum parsing
+        {
+           const google::protobuf::EnumValueDescriptor *value =
+              ref->GetEnum(*_msg, field);
+          if (newWidget)
+          {
+            std::vector<std::string> enumValues;
+            const google::protobuf::EnumDescriptor *descriptor = value->type();
+            for (int j = 0; j < descriptor->value_count(); ++j)
+            {
+              const google::protobuf::EnumValueDescriptor *valueDescriptor =
+                  descriptor->value(j);
+              enumValues.push_back(valueDescriptor->name());
+            }
+            configChildWidget = this->CreateEnumWidget(name, enumValues);
+            // connect enum config widget event so that we can fire an other
+            // event from ConfigWidget that has the name of this field
+            connect(qobject_cast<EnumConfigWidget *>(configChildWidget),
+                SIGNAL(EnumValueChanged(const QString &)), this,
+                SLOT(OnEnumValueChanged(const QString &)));
+            newFieldWidget = configChildWidget;
+          }
+          this->UpdateEnumWidget(configChildWidget, value->name());
           break;
+        }
         default:
           break;
       }
@@ -1039,6 +1082,10 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/)
   QLabel *rotPLabel = new QLabel(tr("pitch"));
   QLabel *rotYLabel = new QLabel(tr("yaw"));
 
+  posXLabel->setStyleSheet("QLabel { color : red; }");
+  posYLabel->setStyleSheet("QLabel { color : green; }");
+  posZLabel->setStyleSheet("QLabel { color : blue; }");
+
   QDoubleSpinBox *posXSpinBox = new QDoubleSpinBox;
   posXSpinBox->setRange(-1e12, 1e12);
   posXSpinBox->setSingleStep(0.01);
@@ -1236,6 +1283,31 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   widget->widgets.push_back(geomFilenameLineEdit);
   widget->widgets.push_back(geomFilenameButton);
 
+  return widget;
+}
+
+/////////////////////////////////////////////////
+ConfigChildWidget *ConfigWidget::CreateEnumWidget(
+    const std::string &_key, const std::vector<std::string> &_values)
+{
+  QLabel *enumLabel = new QLabel(tr(_key.c_str()));
+  QComboBox *enumComboBox = new QComboBox;
+
+  for (unsigned int i = 0; i < _values.size(); ++i)
+    enumComboBox->addItem(tr(_values[i].c_str()));
+
+  QHBoxLayout *enumLayout = new QHBoxLayout;
+  enumLayout->addWidget(enumLabel);
+  enumLayout->addWidget(enumComboBox);
+
+  EnumConfigWidget *widget = new EnumConfigWidget();
+
+  connect(enumComboBox, SIGNAL(currentIndexChanged(const QString &)),
+      widget, SLOT(EnumChanged(const QString &)));
+
+  enumLayout->setContentsMargins(0, 0, 0, 0);
+  widget->setLayout(enumLayout);
+  widget->widgets.push_back(enumComboBox);
   return widget;
 }
 
@@ -1553,8 +1625,17 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
           break;
         }
         case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
-          // todo update enum fields.
+        {
+          QComboBox *valueComboBox =
+              qobject_cast<QComboBox *>(childWidget->widgets[0]);
+          std::string valueStr = valueComboBox->currentText().toStdString();
+          const google::protobuf::EnumDescriptor *enumDescriptor =
+              field->enum_type();
+          const google::protobuf::EnumValueDescriptor *enumValue =
+              enumDescriptor->FindValueByName(valueStr);
+          ref->SetEnum(_msg, field, enumValue);
           break;
+        }
         default:
           break;
       }
@@ -1758,6 +1839,30 @@ void ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
     qobject_cast<QLineEdit *>(_widget->widgets[6])->setText(tr(_uri.c_str()));
 }
 
+
+/////////////////////////////////////////////////
+void ConfigWidget::UpdateEnumWidget(ConfigChildWidget *_widget,
+    const std::string &_value)
+{
+  if (_widget->widgets.size() != 1u)
+  {
+    gzerr << "Error updating Geometry Config widget " << std::endl;
+    return;
+  }
+
+  QComboBox * valueComboBox = qobject_cast<QComboBox *>(_widget->widgets[0]);
+  int index = valueComboBox->findText(tr(_value.c_str()));
+
+  if (index < 0)
+  {
+    gzerr << "Error updating Enum Config widget: '" << _value <<
+      "' not found" << std::endl;
+    return;
+  }
+
+  qobject_cast<QComboBox *>(_widget->widgets[0])->setCurrentIndex(index);
+}
+
 /////////////////////////////////////////////////
 int ConfigWidget::GetIntWidgetValue(ConfigChildWidget *_widget) const
 {
@@ -1950,11 +2055,44 @@ std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
 }
 
 /////////////////////////////////////////////////
+std::string ConfigWidget::GetEnumWidgetValue(ConfigChildWidget *_widget) const
+{
+  std::string value;
+  if (_widget->widgets.size() != 1u)
+  {
+    gzerr << "Error getting value from Enum Config widget " << std::endl;
+    return value;
+  }
+
+  QComboBox *valueComboBox = qobject_cast<QComboBox *>(_widget->widgets[0]);
+  value = valueComboBox->currentText().toStdString();
+
+  return value;
+}
+
+/////////////////////////////////////////////////
 void ConfigWidget::OnItemSelection(QTreeWidgetItem *_item,
                                          int /*_column*/)
 {
   if (_item && _item->childCount() > 0)
     _item->setExpanded(!_item->isExpanded());
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnEnumValueChanged(const QString &_value)
+{
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(QObject::sender());
+
+  for (auto iter : this->configWidgets)
+  {
+    if (iter.second == widget)
+    {
+      std::string scopedName = iter.first;
+      emit EnumValueChanged(tr(scopedName.c_str()), _value);
+      return;
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -2061,4 +2199,10 @@ void GeometryConfigWidget::OnSelectFile()
       }
     }
   }
+}
+
+/////////////////////////////////////////////////
+void EnumConfigWidget::EnumChanged(const QString &_value)
+{
+  emit EnumValueChanged(_value);
 }
