@@ -22,19 +22,19 @@ using namespace gazebo;
 
 AVFrame *common::AVFrameAlloc(void)
 {
-# if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 28, 1)
-      return av_frame_alloc();
-# else
-      return avcodec_alloc_frame();
-# endif
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 28, 1)
+  return av_frame_alloc();
+#else
+  return avcodec_alloc_frame();
+#endif
 }
 
 void common::AVFrameUnref(AVFrame *_frame)
 {
-# if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 28, 1)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 28, 1)
   av_frame_unref(_frame);
-# else
+#else
   avcodec_get_frame_defaults(_frame);
-# endif
+#endif
 }
 #endif  // ifdef HAVE_FFMPEG
