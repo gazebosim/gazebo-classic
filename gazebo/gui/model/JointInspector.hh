@@ -31,6 +31,7 @@ namespace gazebo
   namespace gui
   {
     class JointMaker;
+    class ConfigWidget;
 
     /// \class JointInspector gui/JointInspector.hh
     /// \brief A class to inspect and modify joints.
@@ -41,11 +42,27 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _mode Dialog mode
       /// \param[in] _parent Parent QWidget.
-      public: JointInspector(JointMaker::JointType _jointType,
+      public: JointInspector(/*JointMaker::JointType _jointType,*/
           QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~JointInspector();
+
+      /// \brief Update the joint config widget with a joint msg.
+      /// \param[in] _jointMsg Joint message.
+      public: void Update(ConstJointPtr _jointMsg);
+
+      /// \brief Get the msg containing all joint data.
+      /// \return Joint msg.
+      public: msgs::Joint *GetData() const;
+
+      /// \brief Set the pose of the joint.
+      /// \param[in] _pose Pose to set the joint to.
+      public: void SetPose(const math::Pose &_pose);
+
+      /// \brief config widget for configuring joint properties.
+      private: ConfigWidget *configWidget;
+/*
 
       /// \brief Get joint pose.
       /// \return Joint pose.
@@ -118,16 +135,23 @@ namespace gazebo
       /// \brief Set joint type.
       /// \param[in] _type joint type.
       public: void SetType(JointMaker::JointType _type);
-
+*/
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
 
+      /// \brief Qt callback when the joint type has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New joint type value in string.
+      private slots: void OnJointTypeChanged(const QString &_name,
+          const QString &_value);
+
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
 
-      /// \brief Qt callback when the joint type combox index has changed.
-      private slots: void OnJointTypeChanged(int _index);
+//      /// \brief Qt callback when the joint type combox index has changed.
+//      private slots: void OnJointTypeChanged(int _index);
 
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
@@ -137,7 +161,7 @@ namespace gazebo
 
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
-
+/*
       /// \brief Line edit that displays the name of the joint.
       private: QLineEdit* jointNameLineEdit;
 
@@ -191,7 +215,7 @@ namespace gazebo
       private: JointMaker::JointType jointType;
 
       /// \brief A list of group boxes for configuring joint axis properties.
-      private: std::vector<QGroupBox *> axisGroupBoxes;
+      private: std::vector<QGroupBox *> axisGroupBoxes;*/
     };
     /// \}
   }

@@ -42,6 +42,8 @@
 using namespace gazebo;
 using namespace gui;
 
+std::map<JointMaker::JointType, std::string> JointMaker::jointTypes;
+
 /////////////////////////////////////////////////
 JointMaker::JointMaker()
 {
@@ -62,6 +64,16 @@ JointMaker::JointMaker()
   this->jointMaterials[JOINT_SCREW]     = "Gazebo/Black";
   this->jointMaterials[JOINT_UNIVERSAL] = "Gazebo/Blue";
   this->jointMaterials[JOINT_BALL]      = "Gazebo/Purple";
+
+
+  jointTypes[JOINT_FIXED]     = "fixed";
+  jointTypes[JOINT_HINGE]     = "revolute";
+  jointTypes[JOINT_HINGE2]    = "revolute2";
+  jointTypes[JOINT_SLIDER]    = "prismatic";
+  jointTypes[JOINT_SCREW]     = "screw";
+  jointTypes[JOINT_UNIVERSAL] = "universal";
+  jointTypes[JOINT_BALL]      = "ball";
+  jointTypes[JOINT_NONE]      = "none";
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
@@ -190,15 +202,14 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
 void JointMaker::RemoveJointsByLink(const std::string &_linkName)
 {
   std::vector<std::string> toDelete;
-  boost::unordered_map<std::string, JointData *>::iterator it;
-  for (it = this->joints.begin(); it != this->joints.end(); ++it)
+  for (auto it : this->joints)
   {
-    JointData *joint = it->second;
+    JointData *joint = it.second;
 
     if (joint->child->GetName() == _linkName ||
         joint->parent->GetName() == _linkName)
     {
-      toDelete.push_back(it->first);
+      toDelete.push_back(it.first);
     }
   }
 
@@ -309,10 +320,11 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           this->hoverVis->SetEmissive(common::Color(0, 0, 0));
           this->selectedVis = this->hoverVis;
           this->hoverVis.reset();
+
           // Create joint data with selected visual as parent
           // the child will be set on the second mouse release.
-          this->mouseJoint = this->CreateJoint(this->selectedVis,
-              rendering::VisualPtr());
+          this->mouseJoint = this->CreateJointLine("JOINT_LINE",
+              this->selectedVis);
         }
         // Pressed child link
         else if (this->selectedVis != this->hoverVis)
@@ -321,13 +333,12 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
             this->hoverVis->SetEmissive(common::Color(0, 0, 0));
           if (this->selectedVis)
             this->selectedVis->SetEmissive(common::Color(0, 0, 0));
+
           this->mouseJoint->child = this->hoverVis;
-
-          // reset variables.
-          this->selectedVis.reset();
-          this->hoverVis.reset();
-          this->AddJoint(JointMaker::JOINT_NONE);
-
+          JointData *newJoint = this->CreateJoint(this->mouseJoint->parent,
+              this->mouseJoint->child);
+          this->Stop();
+          this->mouseJoint = newJoint;
           this->newJointCreated = true;
           gui::model::Events::modelChanged();
         }
@@ -342,13 +353,11 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
-    rendering::VisualPtr _child)
+JointData *JointMaker::CreateJointLine(const std::string &_name,
+    rendering::VisualPtr _parent)
 {
-  std::stringstream ss;
-  ss << _parent->GetName() << "_JOINT_" << this->jointCounter++;
   rendering::VisualPtr jointVis(
-      new rendering::Visual(ss.str(), _parent->GetParent()));
+      new rendering::Visual(_name, _parent->GetParent()));
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
@@ -359,20 +368,35 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   jointVis->GetSceneNode()->setInheritScale(false);
   jointVis->GetSceneNode()->setInheritOrientation(false);
 
-  JointData *jointData = new JointData();
   std::string jointVisName = jointVis->GetName();
   std::string leafName = jointVisName;
   size_t pIdx = jointVisName.find_last_of("::");
   if (pIdx != std::string::npos)
     leafName = jointVisName.substr(pIdx+1);
-  jointData->name = leafName;
+
+  JointData *jointData = new JointData();
   jointData->dirty = false;
+  jointData->name = leafName;
   jointData->visual = jointVis;
   jointData->parent = _parent;
-  jointData->child = _child;
   jointData->line = jointLine;
   jointData->type = this->jointType;
-  jointData->inspector = new JointInspector(JointMaker::JOINT_NONE);
+  jointData->line->setMaterial(this->jointMaterials[jointData->type]);
+
+  return jointData;
+}
+
+/////////////////////////////////////////////////
+JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
+    rendering::VisualPtr _child)
+{
+  std::stringstream ss;
+  ss << _parent->GetName() << "_JOINT_" << this->jointCounter++;
+
+  JointData *jointData = this->CreateJointLine(ss.str(), _parent);
+  jointData->child = _child;
+
+  jointData->inspector = new JointInspector();
   jointData->inspector->setModal(false);
   connect(jointData->inspector, SIGNAL(Applied()),
       jointData, SLOT(OnApply()));
@@ -384,58 +408,83 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
         SLOT(close()));
   }
 
-  int axisCount = JointMaker::GetJointAxisCount(jointData->type);
-  for (int i = 0; i < axisCount; ++i)
+  // setup the joint msg
+  jointData->jointMsg.reset(new msgs::Joint);
+  jointData->jointMsg->set_name(jointData->name);
+  if (jointData->parent)
   {
-    if (i < static_cast<int>(this->UnitVectors.size()))
-      jointData->axis[i] = this->UnitVectors[i];
-    else
-      jointData->axis[i] = this->UnitVectors[0];
+    std::string jointParentName = jointData->parent->GetName();
+    std::string leafName = jointParentName;
+    size_t pIdx = jointParentName.find_last_of("::");
+    if (pIdx != std::string::npos)
+      leafName = jointParentName.substr(pIdx+1);
 
-    jointData->lowerLimit[i] = -3.14;
-    jointData->upperLimit[i] = 3.14;
-    jointData->effortLimit[i] = -1;
-    jointData->velocityLimit[i] = -1;
-    jointData->useParentModelFrame[i] = false;
-    jointData->damping[i] = 0;
+    jointData->jointMsg->set_parent(leafName);
+    jointData->jointMsg->set_parent_id(jointData->parent->GetId());
   }
-  jointData->pose = math::Pose::Zero;
-  jointData->line->setMaterial(this->jointMaterials[jointData->type]);
+  if (jointData->child)
+  {
+    std::string jointChildName = jointData->child->GetName();
+    std::string leafName = jointChildName;
+    size_t pIdx = jointChildName.find_last_of("::");
+    if (pIdx != std::string::npos)
+      leafName = jointChildName.substr(pIdx+1);
 
+    jointData->jointMsg->set_child(leafName);
+    jointData->jointMsg->set_child_id(jointData->child->GetId());
+  }
+  msgs::Set(jointData->jointMsg->mutable_pose(), math::Pose::Zero);
+
+  jointData->jointMsg->set_type(
+      msgs::ConvertJointType(this->GetTypeAsString(jointData->type)));
+
+  unsigned int axisCount = JointMaker::GetJointAxisCount(jointData->type);
+  for (unsigned int i = 0; i < axisCount; ++i)
+  {
+    msgs::Axis *axisMsg;
+    if (i == 0u)
+    {
+      axisMsg = jointData->jointMsg->mutable_axis1();
+    }
+    else if (i == 1u)
+    {
+      axisMsg = jointData->jointMsg->mutable_axis2();
+    }
+    else
+    {
+      gzerr << "Invalid axis index["
+            << i
+            << "]"
+            << std::endl;
+      continue;
+    }
+    msgs::Set(axisMsg->mutable_xyz(),
+        this->UnitVectors[i%this->UnitVectors.size()]);
+    axisMsg->set_use_parent_model_frame(false);
+    axisMsg->set_limit_lower(-GZ_DBL_MAX);
+    axisMsg->set_limit_upper(GZ_DBL_MAX);
+    axisMsg->set_limit_effort(-1);
+    axisMsg->set_limit_velocity(-1);
+    axisMsg->set_damping(0);
+
+    // Add angle field after we've checked that index i is valid
+    jointData->jointMsg->add_angle(0);
+  }
+  jointData->jointMsg->set_limit_erp(0.2);
+  jointData->jointMsg->set_suspension_erp(0.2);
+
+  jointData->inspector->Update(jointData->jointMsg);
   return jointData;
 }
 
 /////////////////////////////////////////////////
 JointMaker::JointType JointMaker::ConvertJointType(const std::string &_type)
 {
-  if (_type == "revolute")
-  {
-    return JointMaker::JOINT_HINGE;
-  }
-  else if (_type == "revolute2")
-  {
-    return JointMaker::JOINT_HINGE2;
-  }
-  else if (_type == "prismatic")
-  {
-    return JointMaker::JOINT_SLIDER;
-  }
-  else if (_type == "ball")
-  {
-    return JointMaker::JOINT_BALL;
-  }
-  else if (_type == "universal")
-  {
-    return JointMaker::JOINT_UNIVERSAL;
-  }
-  else if (_type == "screw")
-  {
-    return JointMaker::JOINT_SCREW;
-  }
-  else
-  {
-    return JointMaker::JOINT_NONE;
-  }
+  for (auto iter : jointTypes)
+    if (iter.second == _type)
+      return iter.first;
+
+  return JOINT_NONE;
 }
 
 /////////////////////////////////////////////////
@@ -476,7 +525,7 @@ void JointMaker::Stop()
       rendering::ScenePtr scene = this->mouseJoint->visual->GetScene();
       scene->RemoveVisual(this->mouseJoint->visual);
       this->mouseJoint->visual.reset();
-      delete this->mouseJoint->inspector;
+//      delete this->mouseJoint->inspector;
       delete this->mouseJoint;
       this->mouseJoint = NULL;
     }
@@ -628,7 +677,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(hotSpotName));
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial(this->jointMaterials[_joint->type]);
-  hotspotVisual->SetTransparency(0.5);
+  hotspotVisual->SetTransparency(0.75);
 
   // create a handle at the parent end
   Ogre::BillboardSet *handleSet =
@@ -673,10 +722,9 @@ void JointMaker::Update()
   }
 
   // update joint line and hotspot position.
-  boost::unordered_map<std::string, JointData *>::iterator it;
-  for (it = this->joints.begin(); it != this->joints.end(); ++it)
+  for (auto it : this->joints)
   {
-    JointData *joint = it->second;
+    JointData *joint = it.second;
     if (joint->hotspot)
     {
       if (joint->child && joint->parent)
@@ -702,8 +750,9 @@ void JointMaker::Update()
 
           // set orientation of joint hotspot
           math::Vector3 dPos = (childOrigin - parentOrigin);
-          math::Vector3 center = dPos/2.0;
-          joint->hotspot->SetScale(math::Vector3(0.02, 0.02, dPos.GetLength()));
+          math::Vector3 center = dPos * 0.5;
+          joint->hotspot->SetScale(
+              math::Vector3(0.005, 0.005, dPos.GetLength()));
           joint->hotspot->SetWorldPosition(parentOrigin + center);
           math::Vector3 u = dPos.Normalize();
           math::Vector3 v = math::Vector3::UnitZ;
@@ -723,7 +772,7 @@ void JointMaker::Update()
             Ogre::SceneNode *handleNode = joint->handles->getParentSceneNode();
             joint->handles->detachFromParent();
             joint->hotspot->SetMaterial(material);
-            joint->hotspot->SetTransparency(0.5);
+            joint->hotspot->SetTransparency(0.75);
             handleNode->attachObject(joint->handles);
             Ogre::MaterialPtr mat =
                 Ogre::MaterialManager::getSingleton().getByName(material);
@@ -741,71 +790,21 @@ void JointMaker::Update()
         }
 
         // Create / update joint visual
-        if (!joint->jointMsg || joint->dirty || poseUpdate)
+        if (joint->dirty || poseUpdate)
         {
-          joint->jointMsg.reset(new gazebo::msgs::Joint);
-          joint->jointMsg->set_parent(joint->parent->GetName());
-          joint->jointMsg->set_parent_id(joint->parent->GetId());
-          joint->jointMsg->set_child(joint->child->GetName());
-          joint->jointMsg->set_child_id(joint->child->GetId());
-          joint->jointMsg->set_name(joint->name);
-
-          msgs::Set(joint->jointMsg->mutable_pose(), joint->pose);
-          if (joint->type == JointMaker::JOINT_SLIDER)
+          msgs::JointPtr jointUpdateMsg = joint->jointMsg;
+          unsigned int axisCount = JointMaker::GetJointAxisCount(joint->type);
+          for (unsigned int i = axisCount; i < 2u; ++i)
           {
-            joint->jointMsg->set_type(msgs::Joint::PRISMATIC);
-          }
-          else if (joint->type == JointMaker::JOINT_HINGE)
-          {
-            joint->jointMsg->set_type(msgs::Joint::REVOLUTE);
-          }
-          else if (joint->type == JointMaker::JOINT_HINGE2)
-          {
-            joint->jointMsg->set_type(msgs::Joint::REVOLUTE2);
-          }
-          else if (joint->type == JointMaker::JOINT_SCREW)
-          {
-            joint->jointMsg->set_type(msgs::Joint::SCREW);
-          }
-          else if (joint->type == JointMaker::JOINT_UNIVERSAL)
-          {
-            joint->jointMsg->set_type(msgs::Joint::UNIVERSAL);
-          }
-          else if (joint->type == JointMaker::JOINT_BALL)
-          {
-            joint->jointMsg->set_type(msgs::Joint::BALL);
-          }
-
-          int axisCount = JointMaker::GetJointAxisCount(joint->type);
-          for (int i = 0; i < axisCount; ++i)
-          {
-            msgs::Axis *axisMsg;
-            if (i == 0)
-            {
-              axisMsg = joint->jointMsg->mutable_axis1();
-            }
-            else if (i == 1)
-            {
-              axisMsg = joint->jointMsg->mutable_axis2();
-            }
-            else
-            {
-              gzerr << "Invalid axis index["
-                    << i
-                    << "]"
-                    << std::endl;
-              continue;
-            }
-            msgs::Set(axisMsg->mutable_xyz(), joint->axis[i]);
-            axisMsg->set_use_parent_model_frame(joint->useParentModelFrame[i]);
-
-            // Add angle field after we've checked that index i is valid
-            joint->jointMsg->add_angle(0);
+            if (i == 0u)
+              jointUpdateMsg->clear_axis1();
+            else if (i == 1u)
+              jointUpdateMsg->clear_axis2();
           }
 
           if (joint->jointVisual)
           {
-            joint->jointVisual->UpdateFromMsg(joint->jointMsg);
+            joint->jointVisual->UpdateFromMsg(jointUpdateMsg);
           }
           else
           {
@@ -818,7 +817,7 @@ void JointMaker::Update()
             gazebo::rendering::JointVisualPtr jointVis(
                 new gazebo::rendering::JointVisual(jointVisName, joint->child));
 
-            jointVis->Load(joint->jointMsg);
+            jointVis->Load(jointUpdateMsg);
             joint->jointVisual = jointVis;
           }
 
@@ -862,18 +861,24 @@ void JointMaker::GenerateSDF()
   sdf::initFile("model.sdf", this->modelSDF);
   this->modelSDF->ClearElements();
 
-  boost::unordered_map<std::string, JointData *>::iterator jointsIt;
   // loop through all joints
-  for (jointsIt = this->joints.begin(); jointsIt != this->joints.end();
-      ++jointsIt)
+  for (auto jointsIt : this->joints)
   {
-    JointData *joint = jointsIt->second;
+    JointData *joint = jointsIt.second;
     sdf::ElementPtr jointElem = this->modelSDF->AddElement("joint");
 
-    jointElem->GetAttribute("name")->Set(joint->name);
-    jointElem->GetAttribute("type")->Set(GetTypeAsString(joint->type));
-    sdf::ElementPtr parentElem = jointElem->GetElement("parent");
+    msgs::JointPtr jointMsg = joint->jointMsg;
+    unsigned int axisCount = GetJointAxisCount(joint->type);
+    for (unsigned int i = axisCount; i < 2u; ++i)
+    {
+      if (i == 0u)
+        jointMsg->clear_axis1();
+      else if (i == 1u)
+        jointMsg->clear_axis2();
+    }
+    jointElem = msgs::JointToSDF(*jointMsg.get(), jointElem);
 
+    sdf::ElementPtr parentElem = jointElem->GetElement("parent");
     std::string parentName = joint->parent->GetName();
     std::string parentLeafName = parentName;
     size_t pIdx = parentName.find_last_of("::");
@@ -891,29 +896,6 @@ void JointMaker::GenerateSDF()
       childLeafName = childName.substr(cIdx+1);
     childLeafName = this->GetScopedLinkName(childLeafName);
     childElem->Set(childLeafName);
-
-    sdf::ElementPtr poseElem = jointElem->GetElement("pose");
-    poseElem->Set(joint->pose);
-    int axisCount = GetJointAxisCount(joint->type);
-    for (int i = 0; i < axisCount; ++i)
-    {
-      std::stringstream ss;
-      ss << "axis";
-      if (i > 0)
-        ss << (i+1);
-      sdf::ElementPtr axisElem = jointElem->GetElement(ss.str());
-      axisElem->GetElement("xyz")->Set(joint->axis[i]);
-
-      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
-      limitElem->GetElement("lower")->Set(joint->lowerLimit[i]);
-      limitElem->GetElement("upper")->Set(joint->upperLimit[i]);
-      limitElem->GetElement("effort")->Set(joint->effortLimit[i]);
-      limitElem->GetElement("velocity")->Set(joint->velocityLimit[i]);
-      axisElem->GetElement("use_parent_model_frame")->Set(
-          joint->useParentModelFrame[i]);
-      axisElem->GetElement("dynamics")->GetElement("damping")->Set(
-          joint->damping[i]);
-    }
   }
 }
 
@@ -928,44 +910,15 @@ std::string JointMaker::GetTypeAsString(JointMaker::JointType _type)
 {
   std::string jointTypeStr = "";
 
-  if (_type == JointMaker::JOINT_FIXED)
-  {
-    jointTypeStr = "fixed";
-  }
-  else if (_type == JointMaker::JOINT_SLIDER)
-  {
-    jointTypeStr = "prismatic";
-  }
-  else if (_type == JointMaker::JOINT_HINGE)
-  {
-    jointTypeStr = "revolute";
-  }
-  else if (_type == JointMaker::JOINT_HINGE2)
-  {
-    jointTypeStr = "revolute2";
-  }
-  else if (_type == JointMaker::JOINT_SCREW)
-  {
-    jointTypeStr = "screw";
-  }
-  else if (_type == JointMaker::JOINT_UNIVERSAL)
-  {
-    jointTypeStr = "universal";
-  }
-  else if (_type == JointMaker::JOINT_BALL)
-  {
-    jointTypeStr = "ball";
-  }
-  else if (_type == JointMaker::JOINT_NONE)
-  {
-    jointTypeStr = "none";
-  }
+  auto iter = jointTypes.find(_type);
+  if (iter != jointTypes.end())
+    jointTypeStr = iter->second;
 
   return jointTypeStr;
 }
 
 /////////////////////////////////////////////////
-int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
+unsigned int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
 {
   if (_type == JOINT_FIXED)
   {
@@ -1033,18 +986,9 @@ unsigned int JointMaker::GetJointCount()
 /////////////////////////////////////////////////
 void JointData::OnApply()
 {
-  this->pose = this->inspector->GetPose();
-  this->type = this->inspector->GetType();
-  this->name = this->inspector->GetName();
-
-  int axisCount = JointMaker::GetJointAxisCount(this->type);
-  for (int i = 0; i < axisCount; ++i)
-  {
-    this->axis[i] = this->inspector->GetAxis(i);
-    this->lowerLimit[i] = this->inspector->GetLowerLimit(i);
-    this->upperLimit[i] = this->inspector->GetUpperLimit(i);
-    this->useParentModelFrame[i] = this->inspector->GetUseParentModelFrame(i);
-  }
+  this->jointMsg->CopyFrom(*this->inspector->GetData());
+  this->type = JointMaker::ConvertJointType(
+      msgs::ConvertJointType(this->jointMsg->type()));
   this->dirty = true;
   gui::model::Events::modelChanged();
 }
@@ -1058,33 +1002,7 @@ void JointData::OnOpenInspector()
 /////////////////////////////////////////////////
 void JointData::OpenInspector()
 {
-  this->inspector->SetType(this->type);
-  this->inspector->SetName(this->name);
-
-  std::string parentName = this->parent->GetName();
-  std::string parentLeafName = parentName;
-  size_t pIdx = parentName.find_last_of("::");
-  if (pIdx != std::string::npos)
-    parentLeafName = parentName.substr(pIdx+1);
-  this->inspector->SetParent(parentLeafName);
-
-  std::string childName = this->child->GetName();
-  std::string childLeafName = childName;
-  size_t cIdx = childName.find_last_of("::");
-  if (cIdx != std::string::npos)
-    childLeafName = childName.substr(cIdx+1);
-  this->inspector->SetChild(childLeafName);
-
-  this->inspector->SetPose(this->pose);
-  int axisCount = JointMaker::GetJointAxisCount(this->type);
-  for (int i = 0; i < axisCount; ++i)
-  {
-    this->inspector->SetAxis(i, this->axis[i]);
-    this->inspector->SetAxis(i, this->axis[i]);
-    this->inspector->SetLowerLimit(i, this->lowerLimit[i]);
-    this->inspector->SetUpperLimit(i, this->upperLimit[i]);
-    this->inspector->SetUseParentModelFrame(i, this->useParentModelFrame[i]);
-  }
+  this->inspector->Update(this->jointMsg);
   this->inspector->move(QCursor::pos());
   this->inspector->show();
 }
@@ -1128,49 +1046,115 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 
   JointData *joint = new JointData();
   joint->name = jointName;
-  joint->pose = jointPose;
   joint->parent = parentVis;
   joint->child = childVis;
   joint->type = this->ConvertJointType(type);
-  std::string jointVisName = _modelName + "::" + joint->name;
+  std::string jointVisName = _modelName + "::" + jointName;
 
-  // Axes
-  int axisCount = JointMaker::GetJointAxisCount(joint->type);
-  for (int i = 0; i < axisCount; ++i)
+  joint->jointMsg.reset(new msgs::Joint);
+  joint->jointMsg->set_name(jointName);
+  joint->jointMsg->set_parent(joint->parent->GetName());
+  joint->jointMsg->set_parent_id(joint->parent->GetId());
+  joint->jointMsg->set_child(joint->child->GetName());
+  joint->jointMsg->set_child_id(joint->child->GetId());
+  msgs::Set(joint->jointMsg->mutable_pose(), jointPose);
+
+  joint->jointMsg->set_type(
+      msgs::ConvertJointType(this->GetTypeAsString(joint->type)));
+
+  unsigned int axisCount = JointMaker::GetJointAxisCount(joint->type);
+  for (unsigned int i = 0; i < axisCount; ++i)
   {
+    msgs::Axis *axisMsg;
     sdf::ElementPtr axisElem;
-    if (i == 0)
+    if (i == 0u)
+    {
+      axisMsg = joint->jointMsg->mutable_axis1();
       axisElem = _jointElem->GetElement("axis");
-    else
+    }
+    else if (i == 1u)
+    {
+      axisMsg = joint->jointMsg->mutable_axis2();
       axisElem = _jointElem->GetElement("axis2");
-
-    joint->axis[i] = axisElem->Get<math::Vector3>("xyz");
-
+    }
+    else
+    {
+      gzerr << "Invalid axis index["
+            << i
+            << "]"
+            << std::endl;
+      continue;
+    }
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
-      joint->lowerLimit[i] = limitElem->Get<double>("lower");
-      joint->upperLimit[i] = limitElem->Get<double>("upper");
-      joint->effortLimit[i] = limitElem->Get<double>("effort");
-      joint->velocityLimit[i] = limitElem->Get<double>("velocity");
+      axisMsg->set_limit_lower(limitElem->Get<double>("lower"));
+      axisMsg->set_limit_upper(limitElem->Get<double>("upper"));
+      axisMsg->set_limit_effort(limitElem->Get<double>("effort"));
+      axisMsg->set_limit_velocity(limitElem->Get<double>("velocity"));
     }
-
     // Use parent model frame
     if (axisElem->HasElement("use_parent_model_frame"))
     {
       bool useParent = axisElem->Get<bool>("use_parent_model_frame");
-      joint->useParentModelFrame[i] = useParent;
+      axisMsg->set_use_parent_model_frame(useParent);
     }
-
     if (axisElem->HasElement("dynamics"))
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-      joint->damping[i] = dynamicsElem->Get<double>("damping");
+      axisMsg->set_damping(dynamicsElem->Get<double>("damping"));
+      axisMsg->set_friction(dynamicsElem->Get<double>("friction"));
+    }
+
+    msgs::Set(axisMsg->mutable_xyz(), axisElem->Get<math::Vector3>("xyz"));
+
+    // Add angle field after we've checked that index i is valid
+    joint->jointMsg->add_angle(0);
+  }
+
+  if (_jointElem->HasElement("physics"))
+  {
+    sdf::ElementPtr physicsElem = _jointElem->GetElement("physics");
+    if (physicsElem->HasElement("ode"))
+    {
+      sdf::ElementPtr odeElem = physicsElem->GetElement("ode");
+      if (odeElem->HasElement("cfm"))
+        joint->jointMsg->set_cfm(odeElem->Get<double>("cfm"));
+      if (odeElem->HasElement("bounce"))
+        joint->jointMsg->set_bounce(odeElem->Get<double>("bounce"));
+      if (odeElem->HasElement("velocity"))
+        joint->jointMsg->set_velocity(odeElem->Get<double>("velocity"));
+      if (odeElem->HasElement("fudge_factor"))
+        joint->jointMsg->set_fudge_factor(odeElem->Get<double>("fudge_factor"));
+
+      if (odeElem->HasElement("limit"))
+      {
+        sdf::ElementPtr odeLimitElem = odeElem->GetElement("limit");
+        if (odeLimitElem->HasElement("cfm"))
+          joint->jointMsg->set_limit_cfm(odeLimitElem->Get<double>("cfm"));
+        if (odeLimitElem->HasElement("erp"))
+          joint->jointMsg->set_limit_erp(odeLimitElem->Get<double>("erp"));
+      }
+      if (odeElem->HasElement("suspension"))
+      {
+        sdf::ElementPtr odeSuspensionElem = odeElem->GetElement("suspension");
+        if (odeSuspensionElem->HasElement("cfm"))
+        {
+          joint->jointMsg->set_suspension_cfm(
+              odeSuspensionElem->Get<double>("cfm"));
+        }
+        if (odeSuspensionElem->HasElement("erp"))
+        {
+          joint->jointMsg->set_suspension_erp(
+              odeSuspensionElem->Get<double>("erp"));
+        }
+      }
     }
   }
 
   // Inspector
-  joint->inspector = new JointInspector(joint->type);
+  joint->inspector = new JointInspector();
+  joint->inspector->Update(joint->jointMsg);
   joint->inspector->setModal(false);
   connect(joint->inspector, SIGNAL(Applied()),
       joint, SLOT(OnApply()));

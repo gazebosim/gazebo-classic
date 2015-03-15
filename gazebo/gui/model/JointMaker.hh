@@ -141,12 +141,18 @@ namespace gazebo
 
       /// \brief Get the axis count for joint type.
       /// \param[in] _type Type of joint.
-      public: static int GetJointAxisCount(JointMaker::JointType _type);
+      public: static unsigned int GetJointAxisCount(
+          JointMaker::JointType _type);
 
       /// \brief Get the joint type in string.
       /// \param[in] _type Type of joint.
       /// \return Joint type in string.
       public: static std::string GetTypeAsString(JointMaker::JointType _type);
+
+      /// \brief Convert a joint type string to enum.
+      /// \param[in] _type Joint type in string.
+      /// \return Joint type enum.
+      public: static JointType ConvertJointType(const std::string &_type);
 
       /// \brief Get state
       /// \return State of JointType if joint creation is in process, otherwise
@@ -209,15 +215,17 @@ namespace gazebo
       /// \param[in] _name Name of joint.
       private: void OpenInspector(const std::string &_name);
 
-      /// \brief Convert a joint type string to enum.
-      /// \param[in] _type Joint type in string.
-      /// \return Joint type enum.
-      private: JointType ConvertJointType(const std::string &_type);
-
       /// \brief Get the scoped name of a link.
       /// \param[in] _name Unscoped link name.
       /// \return Scoped link name.
       private: std::string GetScopedLinkName(const std::string &_name);
+
+      /// \brief Create a joint line.
+      /// \param[in] _name Name to give the visual that contains the joint line.
+      /// \param[in] _parent Parent of the joint.
+      /// \return joint data.
+      private: JointData *CreateJointLine(const std::string &_name,
+          rendering::VisualPtr _parent);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
@@ -244,7 +252,7 @@ namespace gazebo
       private: rendering::VisualPtr inspectVis;
 
       /// \brief All joints created by joint maker.
-      private: boost::unordered_map<std::string, JointData *> joints;
+      private: std::map<std::string, JointData *> joints;
 
       /// \brief Joint currently being created.
       private: JointData *mouseJoint;
@@ -256,7 +264,7 @@ namespace gazebo
       private: bool newJointCreated;
 
       /// \brief A map of joint type to its corresponding material.
-      private: boost::unordered_map<JointMaker::JointType, std::string>
+      private: std::map<JointMaker::JointType, std::string>
           jointMaterials;
 
       /// \brief The SDF element pointer to the model that contains the joints.
@@ -276,6 +284,9 @@ namespace gazebo
 
       /// \brief A list of scoped link names.
       private: std::vector<std::string> scopedLinkedNames;
+
+      /// \brief A map of joint type to its string value.
+      private: static std::map<JointMaker::JointType, std::string> jointTypes;
     };
     /// \}
 
@@ -325,7 +336,7 @@ namespace gazebo
       /// \brief Type of joint.
       public: JointMaker::JointType type;
 
-      /// \brief Joint axis direction.
+/*      /// \brief Joint axis direction.
       public: math::Vector3 axis[2];
 
       /// \brief Joint lower limit.
@@ -347,7 +358,7 @@ namespace gazebo
       public: double damping[2];
 
       /// \brief Joint pose.
-      public: math::Pose pose;
+      public: math::Pose pose;*/
 
       /// \brief True if the joint visual needs update.
       public: bool dirty;

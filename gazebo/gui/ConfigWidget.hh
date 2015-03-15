@@ -96,6 +96,21 @@ namespace gazebo
       private slots: void OnSelectFile();
     };
 
+    /// \class EnumConfigWidget ConfigWidget.hh
+    /// \brief A widget for configuring enum values.
+    class GAZEBO_VISIBLE EnumConfigWidget : public ConfigChildWidget
+    {
+      Q_OBJECT
+
+      /// brief Signal an enum value change event.
+      /// \param[in] _value New enum value in string.
+      Q_SIGNALS: void EnumValueChanged(const QString &_value);
+
+      /// brief Callback when the enum value is changed.
+      /// \param[in] _value New enum value in string.
+      private slots: void EnumChanged(const QString &_value);
+    };
+
     /// \class GroupWidget ConfigWidget.hh
     /// \brief A collapsible widget that holds child widgets.
     class GAZEBO_VISIBLE GroupWidget : public QWidget
@@ -207,6 +222,12 @@ namespace gazebo
           const std::string &_value, const math::Vector3 &_dimensions,
           const std::string &_uri = "");
 
+      /// \brief Set an enum value to a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _value Value to set to.
+      public: void SetEnumWidgetValue(const std::string &_name,
+          const std::string &_value);
+
       /// \brief Get an integer value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Integer value.
@@ -254,6 +275,11 @@ namespace gazebo
       /// \return Type of geometry.
       public: std::string GetGeometryWidgetValue(const std::string &_name,
           math::Vector3 &_dimensions, std::string &_uri) const;
+
+      /// \brief Get an enum value from a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \return Enum value.
+      public: std::string GetEnumWidgetValue(const std::string &_name) const;
 
       /// \brief Parse the input message and either create widgets for
       /// configuring fields of the message, or update the widgets with values
@@ -329,6 +355,12 @@ namespace gazebo
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateGeometryWidget(const std::string &_key);
 
+      /// \brief Create a widget for configuring an enum value.
+      /// \param[in] _key A key that is used as a label for the widget.
+      /// \return The newly created widget.
+      private: ConfigChildWidget *CreateEnumWidget(const std::string &_key,
+          const std::vector<std::string> &_values);
+
       /// \brief Update a child widget with an unsigned integer value.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
@@ -384,6 +416,12 @@ namespace gazebo
           const std::string &_value, const math::Vector3 &_dimensions,
           const std::string &_uri = "");
 
+      /// \brief Update a child widget with an enum value.
+      /// \param[in] _widget Pointer to the child widget.
+      /// \param[in] _value Value to set to.
+      private: void UpdateEnumWidget(ConfigChildWidget *_widget,
+          const std::string &_value);
+
       /// \brief Get an integer value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
       /// \return Value of the widget.
@@ -436,10 +474,25 @@ namespace gazebo
       private: std::string GetGeometryWidgetValue(ConfigChildWidget *_widget,
           math::Vector3 &_dimensions, std::string &_uri) const;
 
+      /// \brief Get an enum value from a child widget.
+      /// \param[in] _widget Pointer to the child widget.
+      /// \return Value of the widget.
+      private: std::string GetEnumWidgetValue(ConfigChildWidget *_widget) const;
+
       /// \brief Received item selection user input.
       /// \param[in] _item Item selected.
       /// \param[in] _column Column index.
       private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
+
+      /// \brief Callback when an enum config widget's enum value has changed.
+      /// \param[in] _value New enum value in string.
+      private slots: void OnEnumValueChanged(const QString &_value);
+
+      /// \brief Signal that an enum config widget's enum value has changed.
+      /// \param[in] _name Scoped name of widget.
+      /// \param[in] _name New enum value string.
+      Q_SIGNALS: void EnumValueChanged(const QString &_name,
+          const QString &_value);
 
       /// \brief Qt event filter currently used to filter mouse wheel events.
       /// \param[in] _obj Object that is watched by the event filter.
