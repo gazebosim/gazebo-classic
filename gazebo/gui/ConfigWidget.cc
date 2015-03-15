@@ -273,8 +273,7 @@ void ConfigWidget::SetGeometryWidgetValue(const std::string &_name,
 void ConfigWidget::SetEnumWidgetValue(const std::string &_name,
     const std::string &_value)
 {
-  std::map <std::string, ConfigChildWidget *>::iterator iter =
-      this->configWidgets.find(_name);
+  auto iter = this->configWidgets.find(_name);
 
   if (iter != this->configWidgets.end())
     this->UpdateEnumWidget(iter->second, _value);
@@ -394,8 +393,7 @@ std::string ConfigWidget::GetGeometryWidgetValue(const std::string &_name,
 std::string ConfigWidget::GetEnumWidgetValue(const std::string &_name) const
 {
   std::string value;
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->configWidgets.find(_name);
+  auto iter = this->configWidgets.find(_name);
 
   if (iter != this->configWidgets.end())
     value = this->GetEnumWidgetValue(iter->second);
