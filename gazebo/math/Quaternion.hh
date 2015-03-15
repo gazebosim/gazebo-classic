@@ -144,7 +144,7 @@ namespace gazebo
     public: void Set(double _u, double _x, double _y, double _z);
 
     /// \brief Set the quaternion from Euler angles. The order of operations
-    /// are roll, pitch, yaw around a fixed body frame axis
+    /// is roll, pitch, yaw around a fixed body frame axis
     /// (the original frame of the object before rotation is applied).
     /// Roll is a rotation about x, pitch is about y, yaw is about z.
     /// \param[in] _vec Euler angle
@@ -160,28 +160,30 @@ namespace gazebo
     /// \return This quaternion as an Euler vector
     public: Vector3 GetAsEuler() const;
 
-    /// \brief Convert euler angles to quatern.
-    /// \param[in]
+    /// \brief Convert euler angles to a quaternion.
+    /// \param[in] _vec The vector of angles to convert.
+    /// \return The converted quaternion.
     public: static Quaternion EulerToQuaternion(const Vector3 &_vec);
 
     /// \brief Convert euler angles to quatern.
     /// \param[in] _x rotation along x
     /// \param[in] _y rotation along y
     /// \param[in] _z rotation along z
+    /// \return The converted quaternion.
     public: static Quaternion EulerToQuaternion(double _x,
                                                 double _y,
                                                 double _z);
 
     /// \brief Get the Euler roll angle in radians
-    /// \return the roll
+    /// \return the roll component
     public: double GetRoll();
 
     /// \brief Get the Euler pitch angle in radians
-    /// \return the pitch
+    /// \return the pitch component
     public: double GetPitch();
 
     /// \brief Get the Euler yaw angle in radians
-    /// \return the yaw
+    /// \return the yaw component
     public: double GetYaw();
 
     /// \brief Return rotation as axis and angle
@@ -203,12 +205,12 @@ namespace gazebo
     /// \return this quaternion + qt
     public: Quaternion operator+=(const Quaternion &_qt);
 
-    /// \brief Substraction operator
+    /// \brief Subtraction operator
     /// \param[in] _qt quaternion to substract
     /// \return this quaternion - _qt
     public: Quaternion operator-(const Quaternion &_qt) const;
 
-    /// \brief Substraction operator
+    /// \brief Subtraction operator
     /// \param[in] _qt Quaternion for substraction
     /// \return This quatern - qt
     public: Quaternion operator-=(const Quaternion &_qt);
@@ -225,9 +227,9 @@ namespace gazebo
                   this->w*_q.z + this->x*_q.y - this->y*_q.x + this->z*_q.w);
             }
 
-    /// \brief Multiplication operator
+    /// \brief Multiplication operator by a scalar.
     /// \param[in] _f factor
-    /// \return quaternion multiplied by _f
+    /// \return quaternion multiplied by the scalar
     public: Quaternion operator*(const double &_f) const;
 
     /// \brief Multiplication operator
@@ -404,4 +406,3 @@ namespace gazebo
   }
 }
 #endif
-
