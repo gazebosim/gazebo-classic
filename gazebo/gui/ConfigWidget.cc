@@ -778,7 +778,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
         }
         case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
         {
-           const google::protobuf::EnumValueDescriptor *value =
+          const google::protobuf::EnumValueDescriptor *value =
               ref->GetEnum(*_msg, field);
           if (newWidget)
           {
