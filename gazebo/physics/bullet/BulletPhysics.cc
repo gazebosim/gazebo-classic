@@ -607,43 +607,49 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 //////////////////////////////////////////////////
 boost::any BulletPhysics::GetParam(const std::string &_key) const
 {
+  boost::any value;
+  this->GetParam(_key, value);
+  return value;
+}
+
+//////////////////////////////////////////////////
+bool BulletPhysics::GetParam(const std::string &_key, boost::any &_value) const
+{
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
   GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
   if (_key == "solver_type")
-    return bulletElem->GetElement("solver")->Get<std::string>("type");
+    _value = bulletElem->GetElement("solver")->Get<std::string>("type");
   else if (_key == "cfm")
-    return bulletElem->GetElement("constraints")->Get<double>("cfm");
+    _value = bulletElem->GetElement("constraints")->Get<double>("cfm");
   else if (_key == "erp")
-    return bulletElem->GetElement("constraints")->Get<double>("erp");
+    _value = bulletElem->GetElement("constraints")->Get<double>("erp");
   else if (_key == "iters")
-    return bulletElem->GetElement("solver")->Get<int>("iters");
+    _value = bulletElem->GetElement("solver")->Get<int>("iters");
   else if (_key == "sor")
-    return bulletElem->GetElement("solver")->Get<double>("sor");
+    _value = bulletElem->GetElement("solver")->Get<double>("sor");
   else if (_key == "contact_surface_layer")
-    return bulletElem->GetElement("constraints")->Get<double>(
+    _value = bulletElem->GetElement("constraints")->Get<double>(
         "contact_surface_layer");
   else if (_key == "split_impulse")
   {
-    return bulletElem->GetElement("constraints")->Get<bool>(
+    _value = bulletElem->GetElement("constraints")->Get<bool>(
       "split_impulse");
   }
   else if (_key == "split_impulse_penetration_threshold")
   {
-    return bulletElem->GetElement("constraints")->Get<double>(
+    _value = bulletElem->GetElement("constraints")->Get<double>(
       "split_impulse_penetration_threshold");
   }
   else if (_key == "max_contacts")
-    return this->sdf->GetElement("max_contacts")->Get<int>();
+    _value = this->sdf->GetElement("max_contacts")->Get<int>();
   else if (_key == "min_step_size")
-    return bulletElem->GetElement("solver")->Get<double>("min_step_size");
-  else if (_key == "max_step_size")
-    return this->GetMaxStepSize();
+    _value = bulletElem->GetElement("solver")->Get<double>("min_step_size");
   else
   {
-    gzwarn << _key << " is not supported in bullet" << std::endl;
-    return 0;
+    return PhysicsEngine::GetParam(_key, _value);
   }
+  return true;
 }
 
 //////////////////////////////////////////////////
