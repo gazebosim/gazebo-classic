@@ -9,8 +9,7 @@ else()
   )
 endif()
 
-set (sources
-  ${sources}
+set (sources ${sources}
   Box.cc
   Helpers.cc
   Kmeans.cc
@@ -84,10 +83,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gzmath.hh.in
 
 
 gz_add_library(gazebo_math ${sources})
-target_link_libraries(gazebo_math
-  ${Boost_LIBRARIES}
-  ${IGNITION-MATH_LIBRARIES}
-)
+target_link_libraries(gazebo_math ${Boost_LIBRARIES})
+if (HAVE_IGNITION_MATH)
+  target_link_libraries(gazebo_math ${IGNITION-MATH_LIBRARIES})
+endif()
 
 gz_install_library(gazebo_math)
 gz_install_includes("math" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gzmath.hh)
