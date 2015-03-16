@@ -500,6 +500,14 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
           QString::fromStdString(unscopedLinkName));
     }
   }
+  // Sort alphabetically
+  QSortFilterProxyModel *proxy = new QSortFilterProxyModel(
+      this->dataPtr->linksComboBox);
+  proxy->setSourceModel(this->dataPtr->linksComboBox->model());
+  this->dataPtr->linksComboBox->model()->setParent(proxy);
+  this->dataPtr->linksComboBox->setModel(proxy);
+  this->dataPtr->linksComboBox->model()->sort(0);
+
   this->dataPtr->linksComboBox->blockSignals(false);
 
   if (this->dataPtr->linksComboBox->count() > 0)
