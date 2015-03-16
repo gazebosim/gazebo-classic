@@ -108,7 +108,7 @@ math::Angle DARTSliderJoint::GetAngleImpl(unsigned int _index) const
   if (_index == 0)
   {
     double radianAngle = this->dtJoint->getPosition(0);
-    result.SetFromRadian(radianAngle);
+    result.Radian(radianAngle);
   }
   else
   {

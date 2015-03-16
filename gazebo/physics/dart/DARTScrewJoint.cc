@@ -189,7 +189,7 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
     if (_index == 0)
     {
       // angular position
-      result.SetFromRadian(this->dartScrewJoint->getPosition(0));
+      result.Radian(this->dartScrewJoint->getPosition(0));
     }
     else if (_index == 1)
     {

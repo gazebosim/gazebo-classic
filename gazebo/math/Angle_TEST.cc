@@ -30,7 +30,7 @@ TEST_F(AngleTest, Angle)
   math::Angle angle1;
   EXPECT_TRUE(math::equal(0.0, angle1.Radian()));
 
-  angle1.SetFromDegree(180.0);
+  angle1.Degree(180.0);
   EXPECT_TRUE(angle1 == M_PI);
 
   angle1 = math::Angle(0.1) - math::Angle(0.3);
@@ -39,7 +39,7 @@ TEST_F(AngleTest, Angle)
   math::Angle angle(0.5);
   EXPECT_TRUE(math::equal(0.5, angle.Radian()));
 
-  angle.SetFromRadian(M_PI);
+  angle.Radian(M_PI);
   EXPECT_TRUE(math::equal(GZ_RTOD(M_PI), angle.Degree()));
 
   angle.Normalize();

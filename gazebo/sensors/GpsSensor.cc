@@ -161,7 +161,7 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
 math::Angle GpsSensor::GetLongitude() const
 {
   math::Angle angle;
-  angle.SetFromDegree(this->lastGpsMsg.longitude_deg());
+  angle.Degree(this->lastGpsMsg.longitude_deg());
   return angle;
 }
 
@@ -169,7 +169,7 @@ math::Angle GpsSensor::GetLongitude() const
 math::Angle GpsSensor::GetLatitude() const
 {
   math::Angle angle;
-  angle.SetFromDegree(this->lastGpsMsg.latitude_deg());
+  angle.Degree(this->lastGpsMsg.latitude_deg());
   return angle;
 }
 

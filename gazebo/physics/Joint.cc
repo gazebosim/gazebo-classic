@@ -421,7 +421,7 @@ void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 void Joint::Reset()
 {
   this->SetVelocity(0, 0);
-  this->staticAngle.SetFromRadian(0);
+  this->staticAngle.Radian(0);
 }
 
 //////////////////////////////////////////////////

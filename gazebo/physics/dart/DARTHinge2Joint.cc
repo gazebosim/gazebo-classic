@@ -132,12 +132,12 @@ math::Angle DARTHinge2Joint::GetAngleImpl(unsigned int _index) const
   if (_index == 0)
   {
     double radianAngle = this->dtJoint->getPosition(0);
-    result.SetFromRadian(radianAngle);
+    result.Radian(radianAngle);
   }
   else if (_index == 1)
   {
     double radianAngle = this->dtJoint->getPosition(1);
-    result.SetFromRadian(radianAngle);
+    result.Radian(radianAngle);
   }
   else
   {

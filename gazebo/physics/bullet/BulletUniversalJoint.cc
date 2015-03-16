@@ -362,9 +362,9 @@ math::Angle BulletUniversalJoint::GetHighStop(unsigned int _index)
     btScalar limit1, limit2;
     this->bulletUniversal->getLowerLimit(limit1, limit2);
     if (_index == 1)
-      result.SetFromRadian(-limit1);
+      result.Radian(-limit1);
     else if (_index == 0)
-      result.SetFromRadian(-limit2);
+      result.Radian(-limit2);
     else
       gzerr << "Invalid axis index[" << _index << "]" << std::endl;
   }
@@ -382,9 +382,9 @@ math::Angle BulletUniversalJoint::GetLowStop(unsigned int _index)
     btScalar limit1, limit2;
     this->bulletUniversal->getUpperLimit(limit1, limit2);
     if (_index == 1)
-      result.SetFromRadian(-limit1);
+      result.Radian(-limit1);
     else if (_index == 0)
-      result.SetFromRadian(-limit2);
+      result.Radian(-limit2);
     else
       gzerr << "Invalid axis index[" << _index << "]" << std::endl;
   }

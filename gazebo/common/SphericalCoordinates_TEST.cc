@@ -187,10 +187,10 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
 TEST_F(SphericalCoordinatesTest, Distance)
 {
   math::Angle latA, longA, latB, longB;
-  latA.SetFromDegree(46.250944);
-  longA.SetFromDegree(-122.249972);
-  latB.SetFromDegree(46.124953);
-  longB.SetFromDegree(-122.251683);
+  latA.Degree(46.250944);
+  longA.Degree(-122.249972);
+  latB.Degree(46.124953);
+  longB.Degree(-122.251683);
   double d = common::SphericalCoordinates::Distance(latA, longA, latB, longB);
 
   EXPECT_NEAR(14002, d, 20);
