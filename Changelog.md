@@ -85,7 +85,7 @@
 
 1. Building editor updates
     1. Make palette tips tooltip clickable to open.
-        * [Pull request #1518](https://bitbucket.org/osrf/gazebo/pull-request/1518)
+        * [Pull request #1519](https://bitbucket.org/osrf/gazebo/pull-request/1519)
         * [Issue #1370](https://bitbucket.org/osrf/gazebo/issue/1370)
 
 ## Gazebo 5.0
