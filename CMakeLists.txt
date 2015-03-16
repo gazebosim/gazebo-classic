@@ -323,6 +323,11 @@ else (build_errors)
     set (APPLE_PKGCONFIG_LIBS "${APPLE_PKGCONFIG_LIBS} -lstdc++")
   ENDIF (APPLE)
 
+  # require ignition-math if it is available
+  if (HAVE_IGNITION_MATH)
+    set(IGNITION_MATH_REQUIRED ignition-math)
+  endif()
+
   foreach (pkgconfig ${pkgconfig_files})
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
@@ -369,6 +374,9 @@ else (build_errors)
   endif()
 
   set(PKG_DEPENDS Boost Protobuf SDFormat OGRE)
+  if (HAVE_IGNITION_MATH)
+    set(PKG_DEPENDS ${PKG_DEPENDS} IGNITION-MATH)
+  endif()
 
   set(cmake_conf_file "cmake/gazebo-config.cmake")
   set(cmake_conf_version_file "cmake/gazebo-config-version.cmake")

@@ -50,6 +50,9 @@ target_link_libraries(gazebo_util
   gazebo_math
   gazebo_msgs
 )
+if (HAVE_IGNITION_MATH)
+  target_link_libraries(gazebo_util ${IGNITION-MATH_LIBRARIES})
+endif()
 
 gz_install_library(gazebo_util)
 gz_install_includes("util" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/util.hh)

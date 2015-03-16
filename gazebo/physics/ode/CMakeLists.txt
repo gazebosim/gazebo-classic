@@ -68,6 +68,9 @@ target_link_libraries(gazebo_physics_ode
   gazebo_common
   ${TBB_LIBRARIES}
 )
+if (HAVE_IGNITION_MATH)
+  target_link_libraries(gazebo_physics_ode ${IGNITION-MATH_LIBRARIES})
+endif()
 
 gz_install_library(gazebo_physics_ode)
 gz_install_includes("physics/ode" ${headers})

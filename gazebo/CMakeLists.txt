@@ -93,6 +93,9 @@ target_link_libraries(libgazebo
   gazebo_math
   pthread
 )
+if (HAVE_IGNITION_MATH)
+  target_link_libraries(libgazebo ${IGNITION-MATH_LIBRARIES})
+endif()
 
 add_dependencies(libgazebo gazebo_msgs)
 gz_install_library(libgazebo)
