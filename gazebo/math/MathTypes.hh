@@ -31,7 +31,6 @@ namespace gazebo
     class Vector4;
     class Box;
     class Plane;
-    class Angle;
     class Matrix3;
     class Matrix4;
     class Rand;
