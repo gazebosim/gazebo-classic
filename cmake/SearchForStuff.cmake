@@ -67,7 +67,7 @@ endif ()
 ########################################
 find_package(ignition-math QUIET)
 if (NOT ignition-math_FOUND)
-  BUILD_ERROR ("Missing: Ignition math library.")
+  BUILD_WARNING ("Ignition math library not found.")
   message(STATUS "Looking for ignition-math-config.cmake - not found")
   set (HAVE_IGNITION_MATH OFF CACHE BOOL "HAVE Ignition Math" FORCE)
 else()
