@@ -37,8 +37,8 @@
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/OculusCameraPrivate.hh"
 #include "gazebo/rendering/OculusCamera.hh"
-
 
 using namespace gazebo;
 using namespace rendering;
@@ -48,15 +48,11 @@ const float g_defaultFarClip = 500.0f;
 
 //////////////////////////////////////////////////
 OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
-  : Camera(_name, _scene), frameIndex(1)
+  : Camera(_name, _scene), dataPtr(new OculusCameraPrivate)
 {
-  // Oculus is not ready yet.
-  this->ready = false;
-
-
   ovr_Initialize();
-  this->hmd = ovrHmd_Create(0);
-  if (!this->hmd)
+  this->dataPtr->hmd = ovrHmd_Create(0);
+  if (!this->dataPtr->hmd)
   {
     gzerr << "Oculus Rift not detected. "
           << "Oculus error["
@@ -65,7 +61,7 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
     return;
   }
 
-  if (this->hmd->ProductName[0] == '\0')
+  if (this->dataPtr->hmd->ProductName[0] == '\0')
   {
     gzerr << "Oculus Rift detected, display not enabled. "
           << "Oculus error["
@@ -77,7 +73,7 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   // These are the suggested refresh rates for dk1 and dk2
   //   dk1: 60Hz
   //   dk2: 75Hz
-  switch (this->hmd->Type)
+  switch (this->dataPtr->hmd->Type)
   {
     case ovrHmd_DK1:
       this->SetRenderRate(70.0);
@@ -95,43 +91,44 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
       gzerr << "Unable to handle Oculus with type 'Other'\n";
       return;
     default:
-      gzerr << "Unknown Oculus type '" << this->hmd->Type << "'\n";
+      gzerr << "Unknown Oculus type '" << this->dataPtr->hmd->Type << "'\n";
       return;
   };
 
   // Log some useful information
   gzmsg << "Oculus Rift found." << std::endl;
-  gzmsg << "\tType: " << this->hmd->Type << std::endl;
-  gzmsg << "\tProduct Name: " << this->hmd->ProductName << std::endl;
-  gzmsg << "\tProduct ID: " << this->hmd->ProductId << std::endl;
-  gzmsg << "\tFirmware: " << this->hmd->FirmwareMajor << "."
-    << this->hmd->FirmwareMinor << std::endl;
-  gzmsg << "\tResolution: " << this->hmd->Resolution.w << "x"
-    << this->hmd->Resolution.h << std::endl;
+  gzmsg << "\tType: " << this->dataPtr->hmd->Type << std::endl;
+  gzmsg << "\tProduct Name: " << this->dataPtr->hmd->ProductName << std::endl;
+  gzmsg << "\tProduct ID: " << this->dataPtr->hmd->ProductId << std::endl;
+  gzmsg << "\tFirmware: " << this->dataPtr->hmd->FirmwareMajor << "."
+    << this->dataPtr->hmd->FirmwareMinor << std::endl;
+  gzmsg << "\tResolution: " << this->dataPtr->hmd->Resolution.w << "x"
+    << this->dataPtr->hmd->Resolution.h << std::endl;
   gzmsg << "\tPosition tracking: "
-    << (this->hmd->TrackingCaps & ovrTrackingCap_Position) << std::endl;
+    << (this->dataPtr->hmd->TrackingCaps & ovrTrackingCap_Position)
+    << std::endl;
 
   // Start the sensor which informs of the Rift's pose and motion
-  if (!ovrHmd_ConfigureTracking(this->hmd, ovrTrackingCap_Orientation
+  if (!ovrHmd_ConfigureTracking(this->dataPtr->hmd, ovrTrackingCap_Orientation
       | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position, 0))
   {
     gzerr << "No tracking\n";
   }
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
 
-  this->controlSub = this->node->Subscribe("~/world_control",
+  this->dataPtr->controlSub = this->dataPtr->node->Subscribe("~/world_control",
                                            &OculusCamera::OnControl, this);
 
   // Oculus is now ready.
-  this->ready = true;
+  this->dataPtr->ready = true;
 }
 
 //////////////////////////////////////////////////
 OculusCamera::~OculusCamera()
 {
-  ovrHmd_Destroy(this->hmd);
+  ovrHmd_Destroy(this->dataPtr->hmd);
   ovr_Shutdown();
 
   this->connections.clear();
@@ -170,21 +167,21 @@ void OculusCamera::Init()
 
   // Oculus
   {
-    this->rightCamera = this->scene->GetManager()->createCamera(
+    this->dataPtr->rightCamera = this->scene->GetManager()->createCamera(
       "OculusUserRight");
-    this->rightCamera->pitch(Ogre::Degree(90));
+    this->dataPtr->rightCamera->pitch(Ogre::Degree(90));
 
     // Don't yaw along variable axis, causes leaning
-    this->rightCamera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
-    this->rightCamera->setDirection(1, 0, 0);
+    this->dataPtr->rightCamera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+    this->dataPtr->rightCamera->setDirection(1, 0, 0);
 
-    this->sceneNode->attachObject(this->rightCamera);
+    this->sceneNode->attachObject(this->dataPtr->rightCamera);
 
-    this->rightCamera->setAutoAspectRatio(false);
+    this->dataPtr->rightCamera->setAutoAspectRatio(false);
     this->camera->setAutoAspectRatio(false);
 
-    this->rightCamera->setNearClipDistance(g_defaultNearClip);
-    this->rightCamera->setFarClipDistance(g_defaultFarClip);
+    this->dataPtr->rightCamera->setNearClipDistance(g_defaultNearClip);
+    this->dataPtr->rightCamera->setFarClipDistance(g_defaultFarClip);
 
     this->camera->setNearClipDistance(g_defaultNearClip);
     this->camera->setFarClipDistance(g_defaultFarClip);
@@ -215,12 +212,12 @@ void OculusCamera::Init()
 //////////////////////////////////////////////////
 void OculusCamera::RenderImpl()
 {
-  ovrHmd_BeginFrameTiming(this->hmd, this->frameIndex);
-  this->renderTextureLeft->getBuffer()->getRenderTarget()->update();
-  this->renderTextureRight->getBuffer()->getRenderTarget()->update();
+  ovrHmd_BeginFrameTiming(this->dataPtr->hmd, this->dataPtr->frameIndex);
+  this->dataPtr->renderTextureLeft->getBuffer()->getRenderTarget()->update();
+  this->dataPtr->renderTextureRight->getBuffer()->getRenderTarget()->update();
   this->renderTarget->update();
-  ovrHmd_EndFrameTiming(this->hmd);
-  this->frameIndex++;
+  ovrHmd_EndFrameTiming(this->dataPtr->hmd);
+  this->dataPtr->frameIndex++;
 }
 
 //////////////////////////////////////////////////
@@ -231,22 +228,36 @@ void OculusCamera::Update()
 
   Camera::Update();
 
-  ovrFrameTiming frameTiming = ovrHmd_GetFrameTiming(this->hmd,
-      this->frameIndex);
+  ovrFrameTiming frameTiming = ovrHmd_GetFrameTiming(this->dataPtr->hmd,
+      this->dataPtr->frameIndex);
 
   ovrTrackingState ts = ovrHmd_GetTrackingState(
-      this->hmd, frameTiming.ScanoutMidpointSeconds);
+      this->dataPtr->hmd, frameTiming.ScanoutMidpointSeconds);
 
   // Only doing orientation tracking for now. Position tracking is an option
   // for dk2
   if (ts.StatusFlags & ovrStatus_OrientationTracked)
   {
+    if (this->dataPtr->oculusTrackingWarned)
+    {
+      gzmsg << "Oculus: Head tracking enabled.\n";
+      this->dataPtr->oculusTrackingWarned = false;
+    }
+
     ovrPosef ovrpose = ts.HeadPose.ThePose;
     this->sceneNode->setOrientation(Ogre::Quaternion(
         ovrpose.Orientation.w,
         -ovrpose.Orientation.z,
         -ovrpose.Orientation.x,
         ovrpose.Orientation.y));
+  }
+  else if (!this->dataPtr->oculusTrackingWarned)
+  {
+    gzwarn << "Oculus: No head tracking.\n\t"
+      << "If you do not see a following message about 'Head tracking enabled'"
+      << ", then try rebooting while leaving the Oculus turned on."
+      << std::endl;
+    this->dataPtr->oculusTrackingWarned = true;
   }
 
   this->sceneNode->needUpdate();
@@ -260,7 +271,7 @@ void OculusCamera::ResetSensor()
 //////////////////////////////////////////////////
 bool OculusCamera::Ready()
 {
-  return this->ready;
+  return this->dataPtr->ready;
 }
 
 //////////////////////////////////////////////////
@@ -333,7 +344,7 @@ void OculusCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
   if (this->viewport)
   {
     this->viewport->setDimensions(0, 0, 0.5, 1);
-    this->rightViewport->setDimensions(0.5, 0, 0.5, 1);
+    this->dataPtr->rightViewport->setDimensions(0.5, 0, 0.5, 1);
 
     delete [] this->saveFrameBuffer;
     this->saveFrameBuffer = NULL;
@@ -450,7 +461,7 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   this->Oculus();
 
   Ogre::RenderTexture *rt =
-    this->renderTextureLeft->getBuffer()->getRenderTarget();
+    this->dataPtr->renderTextureLeft->getBuffer()->getRenderTarget();
 
   rt->addViewport(this->camera);
   rt->getViewport(0)->setClearEveryFrame(true);
@@ -462,8 +473,8 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   RTShaderSystem::AttachViewport(rt->getViewport(0), this->GetScene());
 
-  rt = this->renderTextureRight->getBuffer()->getRenderTarget();
-  rt->addViewport(this->rightCamera);
+  rt = this->dataPtr->renderTextureRight->getBuffer()->getRenderTarget();
+  rt->addViewport(this->dataPtr->rightCamera);
   rt->getViewport(0)->setClearEveryFrame(true);
   rt->getViewport(0)->setShadowsEnabled(true);
   rt->getViewport(0)->setOverlaysEnabled(false);
@@ -473,8 +484,8 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   RTShaderSystem::AttachViewport(rt->getViewport(0), this->GetScene());
 
-  ovrFovPort fovLeft = this->hmd->DefaultEyeFov[ovrEye_Left];
-  ovrFovPort fovRight = this->hmd->DefaultEyeFov[ovrEye_Right];
+  ovrFovPort fovLeft = this->dataPtr->hmd->DefaultEyeFov[ovrEye_Left];
+  ovrFovPort fovRight = this->dataPtr->hmd->DefaultEyeFov[ovrEye_Right];
 
   float combinedTanHalfFovHorizontal =
     std::max(fovLeft.LeftTan, fovLeft.RightTan);
@@ -483,7 +494,7 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   float aspectRatio = combinedTanHalfFovHorizontal / combinedTanHalfFovVertical;
 
   this->camera->setAspectRatio(aspectRatio);
-  this->rightCamera->setAspectRatio(aspectRatio);
+  this->dataPtr->rightCamera->setAspectRatio(aspectRatio);
 
   ovrMatrix4f projL = ovrMatrix4f_Projection(fovLeft, 0.001, 500.0, true);
   ovrMatrix4f projR = ovrMatrix4f_Projection(fovRight, 0.001, 500.0, true);
@@ -495,7 +506,7 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
       projL.M[2][0], projL.M[2][1], projL.M[2][2], projL.M[2][3],
       projL.M[3][0], projL.M[3][1], projL.M[3][2], projL.M[3][3]));
 
-  this->rightCamera->setCustomProjectionMatrix(true,
+  this->dataPtr->rightCamera->setCustomProjectionMatrix(true,
     Ogre::Matrix4(
       projR.M[0][0], projR.M[0][1], projR.M[0][2], projR.M[0][3],
       projR.M[1][0], projR.M[1][1], projR.M[1][2], projR.M[1][3],
@@ -515,7 +526,7 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
       projL.M[2][0], projL.M[2][1], projL.M[2][2], projL.M[2][3],
       projL.M[3][0], projL.M[3][1], projL.M[3][2], projL.M[3][3]));
 
-  this->rightCamera->setCustomProjectionMatrix(false,
+  this->dataPtr->rightCamera->setCustomProjectionMatrix(false,
     Ogre::Matrix4(
       projR.M[0][0], projR.M[0][1], projR.M[0][2], projR.M[0][3],
       projR.M[1][0], projR.M[1][1], projR.M[1][2], projR.M[1][3],
@@ -534,18 +545,19 @@ void OculusCamera::Oculus()
   // Create a separate scene manager to holds a distorted mesh and a camera.
   // The distorted mesh receives the left and right camera images, and the
   // camera in the externalSceneManager renders the distorted meshes.
-  this->externalSceneManager =
+  this->dataPtr->externalSceneManager =
     RenderEngine::Instance()->root->createSceneManager(Ogre::ST_GENERIC);
-  this->externalSceneManager->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
+  this->dataPtr->externalSceneManager->setAmbientLight(
+      Ogre::ColourValue(0.5, 0.5, 0.5));
 
   // Get the texture sizes
-  ovrSizei textureSizeLeft = ovrHmd_GetFovTextureSize(this->hmd,
-       ovrEye_Left, this->hmd->DefaultEyeFov[0], 1.0f);
-  ovrSizei textureSizeRight = ovrHmd_GetFovTextureSize(this->hmd,
-      ovrEye_Right, hmd->DefaultEyeFov[1], 1.0f);
+  ovrSizei textureSizeLeft = ovrHmd_GetFovTextureSize(this->dataPtr->hmd,
+       ovrEye_Left, this->dataPtr->hmd->DefaultEyeFov[0], 1.0f);
+  ovrSizei textureSizeRight = ovrHmd_GetFovTextureSize(this->dataPtr->hmd,
+      ovrEye_Right, this->dataPtr->hmd->DefaultEyeFov[1], 1.0f);
 
   // Create the left and right render textures.
-  this->renderTextureLeft =
+  this->dataPtr->renderTextureLeft =
     Ogre::TextureManager::getSingleton().createManual(
       "OculusRiftRenderTextureLeft",
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -556,7 +568,7 @@ void OculusCamera::Oculus()
       Ogre::PF_R8G8B8,
       Ogre::TU_RENDERTARGET);
 
-  this->renderTextureRight =
+  this->dataPtr->renderTextureRight =
     Ogre::TextureManager::getSingleton().createManual(
       "OculusRiftRenderTextureRight",
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -575,16 +587,16 @@ void OculusCamera::Oculus()
 
   // Attach materials to the render textures.
   matLeft->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTexture(
-      this->renderTextureLeft);
+      this->dataPtr->renderTextureLeft);
   matRight->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTexture(
-      this->renderTextureRight);
+      this->dataPtr->renderTextureRight);
 
   // Get eye description information
   ovrEyeRenderDesc eyeRenderDesc[2];
   eyeRenderDesc[0] = ovrHmd_GetRenderDesc(
-      this->hmd, ovrEye_Left, this->hmd->DefaultEyeFov[0]);
+      this->dataPtr->hmd, ovrEye_Left, this->dataPtr->hmd->DefaultEyeFov[0]);
   eyeRenderDesc[1] = ovrHmd_GetRenderDesc(
-      this->hmd, ovrEye_Right, this->hmd->DefaultEyeFov[1]);
+      this->dataPtr->hmd, ovrEye_Right, this->dataPtr->hmd->DefaultEyeFov[1]);
 
   // Hold some values that are needed when creating the distortion meshes.
   ovrVector2f uvScaleOffset[2];
@@ -601,7 +613,8 @@ void OculusCamera::Oculus()
   // Create a scene node in the external scene to hold the distortion
   // meshes.
   Ogre::SceneNode *meshNode =
-    this->externalSceneManager->getRootSceneNode()->createChildSceneNode();
+    this->dataPtr->externalSceneManager->getRootSceneNode()
+    ->createChildSceneNode();
 
   // Create the Distortion Meshes:
   for (int eyeIndex = 0; eyeIndex < 2; ++eyeIndex)
@@ -622,7 +635,7 @@ void OculusCamera::Oculus()
     }
 
     ovrHmd_CreateDistortionMesh(
-        this->hmd,
+        this->dataPtr->hmd,
         eyeRenderDesc[eyeIndex].Eye,
         eyeRenderDesc[eyeIndex].Fov,
         0,
@@ -654,20 +667,20 @@ void OculusCamera::Oculus()
     // create ManualObject
     // TODO: Destroy the manual objects!!
     Ogre::ManualObject *manual;
-    if(eyeIndex == 0)
+    if (eyeIndex == 0)
     {
-      manual = this->externalSceneManager->createManualObject(
+      manual = this->dataPtr->externalSceneManager->createManualObject(
           "OculusRiftRenderObjectLeft");
       manual->begin("Oculus/LeftEye", Ogre::RenderOperation::OT_TRIANGLE_LIST);
     }
     else
     {
-      manual = this->externalSceneManager->createManualObject(
+      manual = this->dataPtr->externalSceneManager->createManualObject(
           "OculusRiftRenderObjectRight");
       manual->begin("Oculus/RightEye", Ogre::RenderOperation::OT_TRIANGLE_LIST);
     }
 
-    for(unsigned int i = 0; i < meshData.VertexCount; ++i)
+    for (unsigned int i = 0; i < meshData.VertexCount; ++i)
     {
       ovrDistortionVertex v = meshData.pVertexData[i];
       manual->position(v.ScreenPosNDC.x, v.ScreenPosNDC.y, 0);
@@ -679,7 +692,7 @@ void OculusCamera::Oculus()
       manual->colour(vig, vig, vig, vig);
     }
 
-    for(unsigned int i = 0; i < meshData.IndexCount; ++i)
+    for (unsigned int i = 0; i < meshData.IndexCount; ++i)
     {
       manual->index(meshData.pIndexData[i]);
     }
@@ -699,25 +712,27 @@ void OculusCamera::Oculus()
   meshNode->setScale(1, 1, -1);
 
   // Create the external camera
-  this->externalCamera = this->externalSceneManager->createCamera(
-      "_OculusRiftExternalCamera_INTERNAL_");
-  this->externalCamera->setFarClipDistance(50);
-  this->externalCamera->setNearClipDistance(0.001);
-  this->externalCamera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
-  this->externalCamera->setOrthoWindow(2, 2);
-  this->externalSceneManager->getRootSceneNode()->attachObject(
-      this->externalCamera);
+  this->dataPtr->externalCamera =
+    this->dataPtr->externalSceneManager->createCamera(
+        "_OculusRiftExternalCamera_INTERNAL_");
+  this->dataPtr->externalCamera->setFarClipDistance(50);
+  this->dataPtr->externalCamera->setNearClipDistance(0.001);
+  this->dataPtr->externalCamera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
+  this->dataPtr->externalCamera->setOrthoWindow(2, 2);
+  this->dataPtr->externalSceneManager->getRootSceneNode()->attachObject(
+      this->dataPtr->externalCamera);
 
   // Create the external viewport
-  this->externalViewport = this->renderTarget->addViewport(
-      this->externalCamera);
-  this->externalViewport->setBackgroundColour(Ogre::ColourValue::Black);
-  this->externalViewport->setOverlaysEnabled(true);
+  this->dataPtr->externalViewport = this->renderTarget->addViewport(
+      this->dataPtr->externalCamera);
+  this->dataPtr->externalViewport->setBackgroundColour(
+      Ogre::ColourValue::Black);
+  this->dataPtr->externalViewport->setOverlaysEnabled(true);
 
   // Set up IPD in meters:
-  float ipd = ovrHmd_GetFloat(this->hmd, OVR_KEY_IPD,  0.064f);
+  float ipd = ovrHmd_GetFloat(this->dataPtr->hmd, OVR_KEY_IPD,  0.064f);
   this->camera->setPosition(-ipd * 0.5, 0, 0);
-  this->rightCamera->setPosition(ipd * 0.5, 0, 0);
+  this->dataPtr->rightCamera->setPosition(ipd * 0.5, 0, 0);
 }
 
 /////////////////////////////////////////////////
@@ -728,7 +743,7 @@ void OculusCamera::AdjustAspect(double _v)
 
   for (int i = 0; i < 2; ++i)
   {
-    Ogre::Camera *cam = i == 0 ? this->camera : this->rightCamera;
+    Ogre::Camera *cam = i == 0 ? this->camera : this->dataPtr->rightCamera;
     cam->setAspectRatio(cam->getAspectRatio() + _v);
   }
 }

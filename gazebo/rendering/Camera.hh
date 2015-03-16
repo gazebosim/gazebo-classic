@@ -719,8 +719,6 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data.
       private: CameraPrivate *dataPtr;
-
-      private: gazebo::common::PID fpsPID;
     };
     /// \}
   }
