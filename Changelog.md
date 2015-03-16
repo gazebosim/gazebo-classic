@@ -38,7 +38,7 @@
     * [Pull request #1454](https://bitbucket.org/osrf/gazebo/pull-request/1454)
     * [Issue #1455](https://bitbucket.org/osrf/gazebo/issue/1455)
 
-1. Added Matrix3::Inverse() and tests 
+1. Added Matrix3::Inverse() and tests
     * [Pull request #1481](https://bitbucket.org/osrf/gazebo/pull-request/1481)
 
 1. Implemented AddLinkForce for ODE.
@@ -82,6 +82,11 @@
         * [Pull request #1509](https://bitbucket.org/osrf/gazebo/pull-request/1509)
         * [Issue #1497](https://bitbucket.org/osrf/gazebo/issue/1497)
         * [Issue #1509](https://bitbucket.org/osrf/gazebo/issue/1509)
+
+1. Building editor updates
+    1. Make palette tips tooltip clickable to open.
+        * [Pull request #1518](https://bitbucket.org/osrf/gazebo/pull-request/1518)
+        * [Issue #1370](https://bitbucket.org/osrf/gazebo/issue/1370)
 
 ## Gazebo 5.0
 
