@@ -3,6 +3,9 @@
 1. Use collide_bitmask from SDF to perform collision filtering
     * [Pull request #1470](https://bitbucket.org/osrf/gazebo/pull-request/1470)
 
+1. Pass Coulomb surface friction parameters to DART.
+    * [Pull request #1420](https://bitbucket.org/osrf/gazebo/pull-request/1420)
+
 1. Added various Get functions to Visual. Also added a ConvertGeometryType function to msgs.
     * [Pull request #1402](https://bitbucket.org/osrf/gazebo/pull-request/1402)
 
@@ -35,8 +38,11 @@
     * [Pull request #1454](https://bitbucket.org/osrf/gazebo/pull-request/1454)
     * [Issue #1455](https://bitbucket.org/osrf/gazebo/issue/1455)
 
-1. Added Matrix3::Inverse() and tests 
+1. Added Matrix3::Inverse() and tests
     * [Pull request #1481](https://bitbucket.org/osrf/gazebo/pull-request/1481)
+
+1. Implemented AddLinkForce for ODE.
+    * [Pull request #1456](https://bitbucket.org/osrf/gazebo/pull-request/1456)
 
 1. Model editor updates
     1. Joint preview using JointVisuals.
@@ -66,12 +72,30 @@
         * [Pull request #1489](https://bitbucket.org/osrf/gazebo/pull-request/1489)
         * [Issue #1457](https://bitbucket.org/osrf/gazebo/issue/1457)
 
+    1. Keep loaded model's name.
+        * [Pull request #1516](https://bitbucket.org/osrf/gazebo/pull-request/1516)
+        * [Issue #1504](https://bitbucket.org/osrf/gazebo/issue/1504)
+
     1. Added ExtrudeDialog.
         * [Pull request #1483](https://bitbucket.org/osrf/gazebo/pull-request/1483)
+
+    1. Hide time panel inside editor and keep main window's paused state.
+        * [Pull request #1500](https://bitbucket.org/osrf/gazebo/pull-request/1500)
+
+    1. Fixed pose issues and added ModelCreator_TEST.
+        * [Pull request #1509](https://bitbucket.org/osrf/gazebo/pull-request/1509)
+        * [Issue #1497](https://bitbucket.org/osrf/gazebo/issue/1497)
+        * [Issue #1509](https://bitbucket.org/osrf/gazebo/issue/1509)
+
+1. Building editor updates
+    1. Make palette tips tooltip clickable to open.
+        * [Pull request #1519](https://bitbucket.org/osrf/gazebo/pull-request/1519)
+        * [Issue #1370](https://bitbucket.org/osrf/gazebo/issue/1370)
 
 ## Gazebo 5.0
 
 ### Gazebo 5.1.0
+
 1. Allow sdformat 2.3.1+ or 3+ and fix tests
   * [Pull request #1484](https://bitbucket.org/osrf/gazebo/pull-request/1484)
 
