@@ -326,7 +326,6 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
   {
     gzdbg << "Spawn ring " << ring+1 << " of boxes" << std::endl;
     for (int i = 0; i < boxes; ++i)
-    //for (int i = 10; i < 11; ++i)
     {
       // Set box size and anisotropic friction
       SpawnFrictionBoxOptions opt;
@@ -362,7 +361,7 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
     }
   }
 
-  world->Step(500);
+  world->Step(1500);
 
   gzdbg << "Checking position of boxes" << std::endl;
   std::map<physics::ModelPtr, double>::iterator iter;
