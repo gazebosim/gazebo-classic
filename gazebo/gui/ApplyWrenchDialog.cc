@@ -55,8 +55,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   // Links list
   QHBoxLayout *linkLayout = new QHBoxLayout();
-  QLabel *linkLabel = new QLabel();
-  linkLabel->setText(tr("<b>Apply to link:<b> "));
+  QLabel *linkLabel = new QLabel(tr("<b>Apply to link:<b> "));
   this->dataPtr->linksComboBox = new QComboBox();
   this->dataPtr->linksComboBox->setMinimumWidth(200);
   connect(this->dataPtr->linksComboBox, SIGNAL(currentIndexChanged(QString)),
@@ -99,8 +98,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
       forceElementLabel->setText(tr("Y:"));
     else if (i == 2)
       forceElementLabel->setText(tr("Z:"));
-    QLabel *forceUnitLabel = new QLabel();
-    forceUnitLabel->setText(tr("N"));
+    QLabel *forceUnitLabel = new QLabel(tr("N"));
 
     forceSpins[i]->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
     forceSpins[i]->setSingleStep(100);
@@ -117,10 +115,8 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   }
 
   // Force total
-  QLabel *forceMagLabel = new QLabel();
-  forceMagLabel->setText(tr("Mag:"));
-  QLabel *forceMagUnitLabel = new QLabel();
-  forceMagUnitLabel->setText(tr("N"));
+  QLabel *forceMagLabel = new QLabel(tr("Mag:"));
+  QLabel *forceMagUnitLabel = new QLabel(tr("N"));
 
   this->dataPtr->forceMagSpin = new QDoubleSpinBox();
   this->dataPtr->forceMagSpin->setRange(0, GZ_DBL_MAX);
@@ -155,15 +151,13 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
     }");
 
   // CoM
-  QLabel *comLabel = new QLabel();
-  comLabel->setText(tr("Center of mass"));
+  QLabel *comLabel = new QLabel(tr("Center of mass"));
 
   QLabel *comPixLabel = new QLabel();
   QPixmap comPixmap(":images/com.png");
   comPixmap = comPixmap.scaled(QSize(20, 20));
   comPixLabel->setPixmap(comPixmap);
   comPixLabel->setMask(comPixmap.mask());
-  comPixLabel->show();
 
   QHBoxLayout *comLabelLayout = new QHBoxLayout();
   comLabelLayout->addWidget(comLabel);
@@ -203,8 +197,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
       forcePosElementLabel->setText(tr("Y:"));
     else if (i == 2)
       forcePosElementLabel->setText(tr("Z:"));
-    QLabel *forcePosUnitLabel = new QLabel();
-    forcePosUnitLabel->setText(tr("m"));
+    QLabel *forcePosUnitLabel = new QLabel(tr("m"));
 
     forcePosSpins[i]->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
     forcePosSpins[i]->setSingleStep(0.1);
@@ -289,8 +282,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
       torqueElementLabel->setText(tr("Y:"));
     else if (i == 2)
       torqueElementLabel->setText(tr("Z:"));
-    QLabel *torqueUnitLabel = new QLabel();
-    torqueUnitLabel->setText(tr("Nm"));
+    QLabel *torqueUnitLabel = new QLabel(tr("Nm"));
 
     torqueSpins[i]->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
     torqueSpins[i]->setSingleStep(100);
@@ -307,10 +299,8 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   }
 
   // Torque magnitude
-  QLabel *torqueMagLabel = new QLabel();
-  torqueMagLabel->setText(tr("Mag:"));
-  QLabel *torqueMagUnitLabel = new QLabel();
-  torqueMagUnitLabel->setText(tr("Nm"));
+  QLabel *torqueMagLabel = new QLabel(tr("Mag:"));
+  QLabel *torqueMagUnitLabel = new QLabel(tr("Nm"));
 
   this->dataPtr->torqueMagSpin = new QDoubleSpinBox();
   this->dataPtr->torqueMagSpin->setRange(0, GZ_DBL_MAX);
