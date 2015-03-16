@@ -26,6 +26,7 @@ class PhysicsEngineTest : public ServerFixture,
 {
   public: void OnPhysicsMsgResponse(ConstResponsePtr &_msg);
   public: void PhysicsEngineParam(const std::string &_physicsEngine);
+  public: void PhysicsEngineGetParamBool(const std::string &_physicsEngine);
   public: static msgs::Physics physicsPubMsg;
   public: static msgs::Physics physicsResponseMsg;
 };
@@ -68,6 +69,8 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
     type = msgs::Physics::BULLET;
   else if (_physicsEngine == "dart")
     type = msgs::Physics::DART;
+  else if (_physicsEngine == "simbody")
+    type = msgs::Physics::SIMBODY;
   else
     type = msgs::Physics::ODE;
   physicsPubMsg.set_type(type);
@@ -93,7 +96,7 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
   EXPECT_DOUBLE_EQ(physicsResponseMsg.real_time_factor(),
       physicsPubMsg.real_time_factor());
 
-  // Test PhysicsEngine::GetParam()
+  // Test PhysicsEngine::[GS]etParam()
   {
     physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
     boost::any dt = physics->GetParam("max_step_size");
@@ -101,6 +104,10 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
       physicsPubMsg.max_step_size());
 
     EXPECT_NO_THROW(physics->GetParam("fake_param_name"));
+    EXPECT_NO_THROW(physics->SetParam("fake_param_name", 0));
+
+    // Try SetParam with wrong type
+    EXPECT_NO_THROW(physics->SetParam("iters", std::string("wrong")));
   }
 
   physicsNode->Fini();
@@ -110,6 +117,56 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
 TEST_P(PhysicsEngineTest, PhysicsEngineParam)
 {
   PhysicsEngineParam(GetParam());
+}
+
+/////////////////////////////////////////////////
+void PhysicsEngineTest::PhysicsEngineGetParamBool
+    (const std::string &_physicsEngine)
+{
+  Load("worlds/empty.world", false, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+
+  // Initialize to failure conditions
+  boost::any value;
+
+  // Test shared physics engine parameter(s)
+  EXPECT_TRUE(physics->GetParam("gravity", value));
+  EXPECT_EQ(boost::any_cast<math::Vector3>(value), math::Vector3(0, 0, -9.8));
+  EXPECT_TRUE(physics->GetParam("max_step_size", value));
+  EXPECT_NEAR(boost::any_cast<double>(value), 0.001, 1e-6);
+  EXPECT_TRUE(physics->GetParam("real_time_factor", value));
+  EXPECT_NEAR(boost::any_cast<double>(value), 1.0, 1e-6);
+  EXPECT_TRUE(physics->GetParam("real_time_update_rate", value));
+  EXPECT_NEAR(boost::any_cast<double>(value), 1000.0, 1e-6);
+  EXPECT_TRUE(physics->GetParam("type", value));
+  EXPECT_EQ(boost::any_cast<std::string>(value), _physicsEngine);
+
+  if (_physicsEngine == "ode" || _physicsEngine == "bullet")
+  {
+    EXPECT_TRUE(physics->GetParam("iters", value));
+    EXPECT_EQ(boost::any_cast<int>(value), 50);
+  }
+  else if (_physicsEngine == "dart")
+  {
+    gzwarn << "DARTPhysics::GetParam not yet implemented." << std::endl;
+    return;
+  }
+  else if (_physicsEngine == "simbody")
+  {
+    EXPECT_TRUE(physics->GetParam("accuracy", value));
+    EXPECT_NEAR(boost::any_cast<double>(value), 1e-3, 1e-6);
+  }
+
+  EXPECT_FALSE(physics->GetParam("param_does_not_exist", value));
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsEngineTest, PhysicsEngineGetParamBool)
+{
+  PhysicsEngineGetParamBool(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsEngineTest,

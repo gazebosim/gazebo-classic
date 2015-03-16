@@ -11,7 +11,7 @@
 //
 //	Typical users of ANN should not need to access this file.
 //----------------------------------------------------------------------
-// Copyright (c) 1997-2010 University of Maryland and Sunil Arya and
+// Copyright (c) 1997-2015 University of Maryland and Sunil Arya and
 // David Mount.  All Rights Reserved.
 // 
 // This software and related documentation is part of the Approximate

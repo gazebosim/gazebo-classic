@@ -4,6 +4,7 @@ set (files
   bricks.png
   ceiling_tiled.jpg
   clouds.jpg
+  com.png
   dirt_diffusespecular.png
   dirt_normal.png
   flat_normal.png

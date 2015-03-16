@@ -383,8 +383,8 @@ void Camera::Update()
 void Camera::Render(bool _force)
 {
   if (this->initialized && (_force ||
-      common::Time::GetWallTime() - this->lastRenderWallTime >=
-      this->dataPtr->renderPeriod))
+       common::Time::GetWallTime() - this->lastRenderWallTime >=
+        this->dataPtr->renderPeriod))
   {
     this->newData = true;
     this->RenderImpl();
@@ -650,6 +650,7 @@ void Camera::SetClipDist(float _near, float _far)
 void Camera::SetHFOV(math::Angle _angle)
 {
   this->sdf->GetElement("horizontal_fov")->Set(_angle.Radian());
+  this->UpdateFOV();
 }
 
 //////////////////////////////////////////////////
@@ -1314,6 +1315,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     double hfov = this->GetHFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
+
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
 
@@ -1714,29 +1716,34 @@ DistortionPtr Camera::GetDistortion() const
 }
 
 //////////////////////////////////////////////////
-float Camera::GetAvgFPS() const
+void Camera::UpdateFOV()
 {
-  float avgFPS = 0;
-
-  if (this->renderTarget)
+  if (this->viewport)
   {
-    float lastFPS, bestFPS, worstFPS = 0;
-    this->renderTarget->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
-  }
+    this->viewport->setDimensions(0, 0, 1, 1);
+    double ratio = static_cast<double>(this->viewport->getActualWidth()) /
+      static_cast<double>(this->viewport->getActualHeight());
 
-  return avgFPS;
+    double hfov =
+      this->sdf->Get<double>("horizontal_fov");
+    double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
+
+    this->camera->setAspectRatio(ratio);
+    this->camera->setFOVy(Ogre::Radian(vfov));
+
+    delete [] this->saveFrameBuffer;
+    this->saveFrameBuffer = NULL;
+  }
 }
 
 //////////////////////////////////////////////////
-float Camera::GetLastFPS() const
+float Camera::GetAvgFPS() const
 {
-  float lastFPS = 0;
+  return this->renderTarget->getAverageFPS();
+}
 
-  if (this->renderTarget)
-  {
-    float avgFPS, bestFPS, worstFPS = 0;
-    this->renderTarget->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
-  }
-
-  return lastFPS;
+//////////////////////////////////////////////////
+unsigned int Camera::GetTriangleCount() const
+{
+  return this->renderTarget->getTriangleCount();
 }

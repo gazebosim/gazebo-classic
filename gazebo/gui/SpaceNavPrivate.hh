@@ -34,6 +34,8 @@ namespace gazebo
       {
         this->pollThread = NULL;
         this->stop = false;
+        this->buttons[0] = 0;
+        this->buttons[1] = 0;
       }
 
       /// \brief Destructor
@@ -63,6 +65,9 @@ namespace gazebo
 
       /// \brief Rotation values below which joystick values return zero.
       public: math::Vector3 deadbandRot;
+
+      /// \brief button states
+      public: int buttons[2];
     };
   }
 }

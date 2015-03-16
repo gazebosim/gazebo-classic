@@ -62,10 +62,28 @@ GZ_REGISTER_WORLD_PLUGIN(RazerHydra)
 
 /////////////////////////////////////////////////
 RazerHydra::RazerHydra()
-: hidrawFd(0)
+: hidrawFd(0), lastCycleStart(common::Time::GetWallTime())
 {
   this->stop = false;
-  this->lastCycleStart = common::Time::GetWallTime();
+  this->pollThread = NULL;
+
+  for (auto &v: this->analog)
+    v = 0;
+
+  for (auto &v: this->rawAnalog)
+    v = 0;
+
+  for (auto &v: this->rawButtons)
+    v = 0;
+
+  for (auto &v: this->rawQuat)
+    v = 0;
+
+  for (auto &v: this->rawPos)
+    v = 0;
+
+  for (auto &v: this->buttons)
+    v = 0;
 
   // magic number for 50% mix at each step
   this->periodEstimate.SetFc(0.11, 1.0);

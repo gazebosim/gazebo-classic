@@ -51,6 +51,15 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \enum SelectionLevels
+      /// \brief Unique identifiers for all selection levels supported.
+      public: enum SelectionLevels {
+                  /// \brief Model level
+                  MODEL,
+                  /// \brief Link level
+                  LINK
+                };
+
       public: GLWidget(QWidget *_parent = 0);
       public: virtual ~GLWidget();
 
@@ -151,6 +160,9 @@ namespace gazebo
       /// visual
       private: void SetSelectedVisual(rendering::VisualPtr _vis);
 
+      /// \brief Deselect all visuals, removing highlight and publishing message
+      private: void DeselectAllVisuals();
+
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _axis Axis of alignment: x, y, or z.
       /// \param[in] _config Configuration: min, center, or max.
@@ -208,6 +220,9 @@ namespace gazebo
 
       /// \brief A list of selected visuals.
       private: std::vector<rendering::VisualPtr> selectedVisuals;
+
+      /// \brief Indicates how deep into the model to select.
+      private: SelectionLevels selectionLevel;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;

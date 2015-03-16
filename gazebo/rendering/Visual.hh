@@ -106,6 +106,14 @@ namespace gazebo
       /// \brief Update the visual.
       public: void Update();
 
+      /// \brief Get the visual SDF. Note that visuals are abstract. This SDF
+      /// could be associated with a visual that represents a model, a link,
+      /// a visual (inside a link), or a visualization object
+      /// (e.g. LaserVisual). Therefore this SDF may store more fields than
+      /// actually used.
+      /// \return SDF of the visual.
+      public: sdf::ElementPtr GetSDF() const;
+
       /// \brief Set the name of the visual
       /// \param[in] _name Name of the visual
       public: void SetName(const std::string &_name);
@@ -171,6 +179,10 @@ namespace gazebo
       /// \return The scaling factor.
       public: math::Vector3 GetScale();
 
+      /// \brief Get whether or not lighting is enabled.
+      /// \return True if lighting is enabled.
+      public: bool GetLighting() const;
+
       /// \brief Set whether or not to enable or disable lighting.
       /// \param[in] _lighting True to enable lighting.
       public: void SetLighting(bool _lighting);
@@ -194,6 +206,22 @@ namespace gazebo
       /// \brief Set the specular color of the visual.
       /// \param[in] _color Specular color.
       public: void SetSpecular(const common::Color &_color);
+
+      /// \brief Get the ambient color of the visual.
+      /// \return Ambient color.
+      public: common::Color GetAmbient() const;
+
+      /// \brief Get the diffuse color of the visual.
+      /// \return Diffuse color.
+      public: common::Color GetDiffuse() const;
+
+      /// \brief Get the specular color of the visual.
+      /// \return Specular color.
+      public: common::Color GetSpecular() const;
+
+      /// \brief Get the emissive color of the visual.
+      /// \return Emissive color.
+      public: common::Color GetEmissive() const;
 
       /// \brief Attach visualization axes
       public: void AttachAxes();
@@ -228,6 +256,10 @@ namespace gazebo
       /// \brief Set the emissive value.
       /// \param[in] _color The emissive color.
       public: virtual void SetEmissive(const common::Color &_color);
+
+      /// \brief Get whether the visual casts shadows.
+      /// \return True if the visual casts shadows.
+      public: bool GetCastShadows() const;
 
       /// \brief Set whether the visual should cast shadows.
       /// \param[in] _shadows True to enable shadows.
@@ -441,6 +473,10 @@ namespace gazebo
       /// \param[in] _show True to show center of mass visualizations.
       public: void ShowCOM(bool _show);
 
+      /// \brief Display inertia visuals.
+      /// \param[in] _show True to show inertia visualizations.
+      public: void ShowInertia(bool _show);
+
       /// \brief Set animation skeleton pose.
       /// \param[in] _pose Skelton message
       public: void SetSkeletonPose(const msgs::PoseAnimation &_pose);
@@ -462,6 +498,10 @@ namespace gazebo
 
       /// \brief Set the id associated with this visual
       public: void SetId(uint32_t _id);
+
+      /// \brief Get the geometry type.
+      /// \return Type of geometry in string.
+      public: std::string GetGeometryType() const;
 
       /// \brief The name of the mesh set in the visual's SDF.
       /// \return Name of the mesh.
