@@ -26,6 +26,7 @@ if (NOT freeimage_FOUND)
                 COMPILE_DEFINITIONS "-I${freeimage_INCLUDE_DIRS}"
                 COMPILE_OUTPUT_VARIABLE FREEIMAGE_COMPILE_OUTPUT)
     if (NOT FREEIMAGE_RUNS)
+      message (STATUS "${FREEIMAGE_COMPILE_OUTPUT}")
       BUILD_ERROR("Invalid FreeImage Version. Requires ${MIN_FREEIMAGE_VERSION}")
     else (NOT FREEIMAGE_RUNS)
        message (STATUS "  Looking for FreeImage.h - found")

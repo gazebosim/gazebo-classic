@@ -7,7 +7,7 @@ set (CMAKE_LINK_FLAGS_COVERAGE " --coverage" CACHE INTERNAL "Link flags for stat
 
 set (CMAKE_C_FLAGS_RELEASE "")
 if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND NOT MSVC)
-  # -s doesn't work with clang, see alternative in link below:
+  # -s doesn't work with clang or Visual Studio, see alternative in link below:
   # http://stackoverflow.com/questions/6085491/gcc-vs-clang-symbol-strippingu
   set (CMAKE_C_FLAGS_RELEASE "-s")
 endif()
