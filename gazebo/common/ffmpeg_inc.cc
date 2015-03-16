@@ -20,6 +20,7 @@
 #ifdef HAVE_FFMPEG
 using namespace gazebo;
 
+//////////////////////////////////////////////////
 AVFrame *common::AVFrameAlloc(void)
 {
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 28, 1)
@@ -29,6 +30,7 @@ AVFrame *common::AVFrameAlloc(void)
 #endif
 }
 
+//////////////////////////////////////////////////
 void common::AVFrameUnref(AVFrame *_frame)
 {
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 28, 1)
@@ -37,4 +39,6 @@ void common::AVFrameUnref(AVFrame *_frame)
   avcodec_get_frame_defaults(_frame);
 #endif
 }
-#endif  // ifdef HAVE_FFMPEG
+
+// ifdef HAVE_FFMPEG
+#endif
