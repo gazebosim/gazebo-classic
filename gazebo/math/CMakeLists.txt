@@ -1,8 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 if (HAVE_IGNITION_MATH)
-  include_directories(${IGNITION-MATH_INCLUDE_DIRS})
-  include_directories(${IGNITION-MATH_LIBRARY_DIRS})
+  link_directories(${IGNITION-MATH_LIBRARY_DIRS})
 else()
   set (sources
     Angle.cc

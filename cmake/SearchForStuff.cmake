@@ -73,6 +73,7 @@ if (NOT ignition-math_FOUND)
 else()
   message(STATUS "Looking for ignition-math-config.cmake - found")
   set (HAVE_IGNITION_MATH ON CACHE BOOL "HAVE Ignition Math" FORCE)
+  include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 endif()
 
 ########################################
