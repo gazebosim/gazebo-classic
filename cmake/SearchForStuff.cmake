@@ -65,6 +65,17 @@ else ()
 endif ()
 
 ########################################
+find_package(ignition-math QUIET)
+if (NOT ignition-math_FOUND)
+  BUILD_ERROR ("Missing: Ignition math library.")
+  message(STATUS "Looking for ignition-math-config.cmake - not found")
+  set (HAVE_IGNITION_MATH OFF CACHE BOOL "HAVE Ignition Math" FORCE)
+else()
+  message(STATUS "Looking for ignition-math-config.cmake - found")
+  set (HAVE_IGNITION_MATH ON CACHE BOOL "HAVE Ignition Math" FORCE)
+endif()
+
+########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
   pkg_check_modules(CURL libcurl)
