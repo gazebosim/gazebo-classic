@@ -1,7 +1,16 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+if (HAVE_IGNITION_MATH)
+  include_directories(${IGNITION-MATH_INCLUDE_DIRS})
+  include_directories(${IGNITION-MATH_LIBRARY_DIRS})
+else()
+  set (sources
+    Angle.cc
+  )
+endif()
+
 set (sources
-  Angle.cc
+  ${sources}
   Box.cc
   Helpers.cc
   Kmeans.cc
@@ -75,7 +84,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gzmath.hh.in
 
 
 gz_add_library(gazebo_math ${sources})
-target_link_libraries(gazebo_math ${Boost_LIBRARIES})
+target_link_libraries(gazebo_math
+  ${Boost_LIBRARIES}
+  ${IGNITION-MATH_LIBRARIES}
+)
 
 gz_install_library(gazebo_math)
 gz_install_includes("math" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gzmath.hh)
