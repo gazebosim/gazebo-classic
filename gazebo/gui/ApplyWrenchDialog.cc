@@ -860,8 +860,7 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent & _event)
   // Set active and change mode
   if (vis == this->dataPtr->applyWrenchVisual->GetForceVisual())
   {
-    if (!this->isActiveWindow())
-      this->activateWindow();
+    this->ActivateWindow();
 
     if (this->dataPtr->forceVector == math::Vector3::Zero)
       this->SetForce(math::Vector3::UnitX);
@@ -872,8 +871,7 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent & _event)
   }
   else if (vis == this->dataPtr->applyWrenchVisual->GetTorqueVisual())
   {
-    if (!this->isActiveWindow())
-      this->activateWindow();
+    this->ActivateWindow();
 
     if (this->dataPtr->torqueVector == math::Vector3::Zero)
       this->SetTorque(math::Vector3::UnitX);
@@ -1260,4 +1258,17 @@ void ApplyWrenchDialog::OnPreRender()
 void ApplyWrenchDialog::OnManipulation()
 {
   this->SetActive(false);
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::ActivateWindow()
+{
+  if (!this->isActiveWindow())
+  {
+    // Clear focus before activating not to trigger mode change due to FucusIn
+    QWidget *focusedWidget = this->focusWidget();
+    if (focusedWidget)
+      focusedWidget->clearFocus();
+    this->activateWindow();
+  }
 }

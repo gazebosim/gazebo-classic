@@ -206,6 +206,9 @@ namespace gazebo
       /// deleted.
       private: void OnPreRender();
 
+      /// \brief Set this dialog window to be active.
+      private: void ActivateWindow();
+
       /// \internal
       /// \brief Pointer to private data.
       private: ApplyWrenchDialogPrivate *dataPtr;
