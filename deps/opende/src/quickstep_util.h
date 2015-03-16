@@ -53,6 +53,8 @@
 #include "ode/odeinit.h"
 #endif
 
+//cone friction
+#define USE_FRICTION_CONE
 typedef const dReal *dRealPtr;
 typedef dReal *dRealMutablePtr;
 
