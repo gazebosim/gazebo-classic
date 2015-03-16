@@ -22,9 +22,8 @@
 #include "RestUiPlugin.hh"
 
 using namespace gazebo;
-using namespace std;
 
-
+/////////////////////////////////////////////////
 RestUiPlugin::RestUiPlugin()
   :widget(NULL)
 {
@@ -32,24 +31,21 @@ RestUiPlugin::RestUiPlugin()
   loginTitle = "Web service login";
   urlLabel = "url";
   defaultUrl = "https://";
-  cout << "RestUiPlugin()" << endl;
 }
 
+/////////////////////////////////////////////////
 RestUiPlugin::~RestUiPlugin()
 {
-  cout << "~RestUiPlugin()" << endl;
+  // nothing to do
 }
 
+/////////////////////////////////////////////////
 void RestUiPlugin::Load(int _argc, char ** _argv)
 {
-  cout << "RestUiPlugin::Load()" << endl;
-  cout << "looking for [menu=, title=, label=, url=" << endl;
-  cout << _argc << " args" << endl;
+  gzmsg << "RestUiPlugin: cmd line arguments (menu=, title=, label=, url=)\n";
   for (int i = 0; i < _argc; i++)
   {
     std::string arg = _argv[i];
-    cout << " " << i << ": " << arg << endl;
-
     if (arg.find("menu=") == 0)
     {
         this->menuTitle = arg.substr(5);
@@ -67,8 +63,13 @@ void RestUiPlugin::Load(int _argc, char ** _argv)
         this->defaultUrl = arg.substr(4);
     }
   }
+  gzmsg << "   menu title: " << this->menuTitle  << std::endl;
+  gzmsg << "   Login window title: " << this->loginTitle  << std::endl;
+  gzmsg << "   Login window label: " << this->label  << std::endl;
+  gzmsg << "   Web servide URL: " << this->defaultUrl  << std::endl;
 }
 
+/////////////////////////////////////////////////
 void RestUiPlugin::Init()
 {
   // Connect to the sensor update event.
@@ -79,10 +80,9 @@ void RestUiPlugin::Init()
   this->connections.push_back(
         event::Events::ConnectPreRender(
         boost::bind(&RestUiPlugin::Update, this)));
-
-  std::cerr << "RestUiPlugin::Init() done" <<  std::endl;
 }
 
+/////////////////////////////////////////////////
 void RestUiPlugin::Update()
 {
   if (widget)
@@ -91,9 +91,9 @@ void RestUiPlugin::Update()
   }
 }
 
+/////////////////////////////////////////////////
 void RestUiPlugin::OnMainWindowReady()
 {
-  cout << "RestUiPlugin::OnMainWindowReady()" << endl;
   // add menu for this plugin
   std::string menuStr("&");
   menuStr += this->menuTitle;
