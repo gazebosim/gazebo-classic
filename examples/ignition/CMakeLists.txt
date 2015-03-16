@@ -12,3 +12,6 @@ target_link_libraries(vector3 ${GAZEBO_LIBRARIES} ${IGNITION-MATH_LIBRARIES})
 
 add_executable(box box.cc)
 target_link_libraries(box ${GAZEBO_LIBRARIES} ${IGNITION-MATH_LIBRARIES})
+
+add_executable(angle angle.cc)
+target_link_libraries(angle ${GAZEBO_LIBRARIES} ${IGNITION-MATH_LIBRARIES})
