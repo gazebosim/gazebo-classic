@@ -143,12 +143,12 @@ if (PKG_CONFIG_FOUND)
     set (HAVE_DART FALSE)
   endif()
 
-  # Go for external tinyxml if not set  value
+  # Go for external tinyxml if not set
   if (NOT DEFINED USE_EXTERNAL_TINYXML)
-    set (USE_EXTERNAL_TINYXML False)
+    set (USE_EXTERNAL_TINYXML True)
   endif()
 
-  if (USE_EXTERNAL_TINXYML)
+  if (USE_EXTERNAL_TINYXML)
     #################################################
     # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
     # Use pkg_check_modules and fallback to manual detection (needed, at least, for MacOS)
@@ -173,6 +173,7 @@ if (PKG_CONFIG_FOUND)
     endif()
   else()
     # Needed in WIN32 since in UNIX the flag is added in the code installed
+    message (STATUS "Skipping search for tinyxml")
     add_definitions(-DTIXML_USE_STL)
     set (tinyxml_INCLUDE_DIRS "")
     set (tinyxml_LIBRARIES "")
@@ -225,9 +226,9 @@ if (PKG_CONFIG_FOUND)
   # On Windows, we assume that all the OGRE* defines are passed in manually
   # to CMake.
   if (NOT WIN32)
-    string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
     execute_process(COMMAND pkg-config --modversion OGRE
                     OUTPUT_VARIABLE OGRE_VERSION)
+    string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
 
     string (REGEX REPLACE "^([0-9]+).*" "\\1"
       OGRE_MAJOR_VERSION "${OGRE_VERSION}")
