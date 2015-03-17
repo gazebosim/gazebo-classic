@@ -41,8 +41,8 @@ namespace gazebo
     /// \class Private data pointer for PresetManager class
     class PresetManagerPrivate
     {
-      /// \brief Pointer to the current preset
-      public: Preset* currentPreset;
+      /// \brief Name of the current preset
+      public: std::string currentPreset;
       /// \brief Map of all known preset profile pairs keyed by name
       public: std::map<std::string, Preset> presetProfiles;
       /// \brief Physics engine instrumented by this PresetManager

@@ -288,7 +288,7 @@ namespace gazebo
       public: std::list<Entity*> dirtyPoses;
 
       /// \brief Class to manage preset simulation parameter profiles.
-      public: PresetManager* presetManager;
+      public: PresetManagerPtr presetManager;
     };
   }
 }

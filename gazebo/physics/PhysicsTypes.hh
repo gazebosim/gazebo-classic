@@ -43,6 +43,7 @@ namespace gazebo
     class Joint;
     class JointController;
     class Contact;
+    class PresetManager;
     class PhysicsEngine;
     class Mass;
     class Road;
@@ -105,6 +106,10 @@ namespace gazebo
     /// \def  PhysicsEnginePtr
     /// \brief Boost shared pointer to a PhysicsEngine object
     typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
+
+    /// \def  PresetManagerPtr
+    /// \brief Boost shared pointer to a PresetManager object
+    typedef boost::shared_ptr<PresetManager> PresetManagerPtr;
 
     /// \def ShapePtr
     /// \brief Boost shared pointer to a Shape object

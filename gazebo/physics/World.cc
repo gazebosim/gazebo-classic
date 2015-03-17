@@ -818,7 +818,7 @@ PhysicsEnginePtr World::GetPhysicsEngine() const
 }
 
 //////////////////////////////////////////////////
-PresetManager* World::GetPresetManager() const
+PresetManagerPtr World::GetPresetManager() const
 {
   return this->dataPtr->presetManager;
 }

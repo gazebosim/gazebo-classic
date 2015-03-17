@@ -118,7 +118,7 @@ namespace gazebo
 
       /// \brief Return the preset manager.
       /// \return Pointer to the preset manager.
-      public: PresetManager *GetPresetManager() const;
+      public: PresetManagerPtr GetPresetManager() const;
 
       /// \brief Return the spherical coordinates converter.
       /// \return Pointer to the spherical coordinates converter.

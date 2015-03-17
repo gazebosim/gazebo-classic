@@ -30,7 +30,9 @@ namespace gazebo
   {
     class PresetPrivate;
 
-    /// \class A preset profile class.
+    /// \class Preset PresetManager.hh gazebo/physics/PresetManager.hh
+    /// \brief Representation of a preset physics profile
+
     class Preset
     {
       /// \brief Constructor.
@@ -56,13 +58,15 @@ namespace gazebo
 
       /// \brief Set a profile parameter.
       /// \param[in] _key The key of the parameter to change.
-      /// \param[in] _value The new value of the parameter.
-      /// \return True if the parameter was successfully set.
-      public: bool SetParam(const std::string& _key, const boost::any& _value);
+      /// \param[out] _value The new value of the parameter.
+      public: void SetParam(const std::string &_key, const boost::any &_value);
+
+      /// \brief Check if profile parameter is set.
+      public: bool HasParam(const std::string &_key) const;
 
       /// \brief Get this preset's parameter map (used for iteration)
       /// \return A pointer to this preset profile's parameter map.
-      public: std::map<std::string, boost::any>* ParameterMap();
+      public: std::map<std::string, boost::any> *ParameterMap();
 
       /// \brief Get this preset profile's SDF
       /// \return An SDF element pointer representing a <physics> element
@@ -78,7 +82,8 @@ namespace gazebo
 
     class PresetManagerPrivate;
 
-    /// \class A class for managing preset profiles.
+    /// \class PresetManager PresetManager.hh gazebo/physics/PresetManager.hh
+    /// \brief Class to manage preset physics profiles.
     class GAZEBO_VISIBLE PresetManager
     {
       /// \brief Constructor
@@ -159,22 +164,21 @@ namespace gazebo
 
       /// \brief Generate a Preset object from an SDF pointer
       /// \param[in] _sdf The SDF physics element for the profile.
-      private: void GeneratePresetFromSDF(Preset* _preset,
+      private: void GeneratePresetFromSDF(Preset *_preset,
           const sdf::ElementPtr _elem) const;
 
       /// \brief Generate an SDF element from a Preset object
       /// \param[in] _paramMap Pointer to a Preset object
-      private: sdf::ElementPtr GenerateSDFFromPreset(Preset* _paramMap) const;
+      private: sdf::ElementPtr GenerateSDFFromPreset(Preset *_paramMap) const;
 
       /// \brief Get a pointer to the current profile preset.
       /// \return Pointer to the current profile preset object.
-      private: Preset* CurrentPreset() const;
+      private: Preset *CurrentPreset() const;
 
       /// \brief Private data pointer for PIMPL.
       private: PresetManagerPrivate *dataPtr;
     };
-
-  }  // namespace physics
-}  // namespace gazebo
+  }
+}
 
 #endif
