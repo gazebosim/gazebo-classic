@@ -206,13 +206,13 @@ namespace gazebo
     public: Quaternion operator+=(const Quaternion &_qt);
 
     /// \brief Subtraction operator
-    /// \param[in] _qt quaternion to substract
+    /// \param[in] _qt quaternion to subtract
     /// \return this quaternion - _qt
     public: Quaternion operator-(const Quaternion &_qt) const;
 
     /// \brief Subtraction operator
-    /// \param[in] _qt Quaternion for substraction
-    /// \return This quatern - qt
+    /// \param[in] _qt Quaternion for subtraction
+    /// \return This quaternion - qt
     public: Quaternion operator-=(const Quaternion &_qt);
 
     /// \brief Multiplication operator

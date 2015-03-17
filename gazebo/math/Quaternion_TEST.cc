@@ -205,6 +205,29 @@ TEST_F(QuaternionTest, Quaternion)
     EXPECT_TRUE(q.GetInverse().GetZAxis() == math::Vector3(0, 0, 1));
   }
 
+  // Test RPY fixed-body-frame convention:
+  // Rotate each unit vector in roll and pitch
+  {
+    q = math::Quaternion(M_PI/2.0, M_PI/2.0, 0);
+    math::Vector3 v1(1, 0, 0);
+    math::Vector3 r1 = q.RotateVector(v1);
+    // 90 degrees about X does nothing,
+    // 90 degrees about Y sends point down to -Z
+    EXPECT_TRUE(r1 == math::Vector3(0, 0, -1));
+
+    math::Vector3 v2(0, 1, 0);
+    math::Vector3 r2 = q.RotateVector(v2);
+    // 90 degrees about X sends point to +Z
+    // 90 degrees about Y sends point to +X
+    EXPECT_TRUE(r2 == math::Vector3(1, 0, 0));
+
+    math::Vector3 v3(0, 0, 1);
+    math::Vector3 r3 = q.RotateVector(v3);
+    // 90 degrees about X sends point to -Y
+    // 90 degrees about Y does nothing
+    EXPECT_TRUE(r3 == math::Vector3(0, -1, 0));
+  }
+
   {
     // now try a harder case (axis[1,2,3], rotation[0.3*pi])
     // verified with octave
