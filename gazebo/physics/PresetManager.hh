@@ -64,9 +64,15 @@ namespace gazebo
       /// \brief Check if profile parameter is set.
       public: bool HasParam(const std::string &_key) const;
 
-      /// \brief Get this preset's parameter map (used for iteration)
-      /// \return A pointer to this preset profile's parameter map.
-      public: std::map<std::string, boost::any> *ParameterMap();
+      /// \brief Get an iterator at the beginning of this preset's parameter map
+      /// \return An iterator at the beginning of the parameter map.
+      public: std::map<std::string, boost::any>::iterator
+          ParameterMapBegin() const;
+
+      /// \brief Get an iterator at the end of this preset's parameter map
+      /// \return An iterator at the end of the parameter map.
+      public: std::map<std::string, boost::any>::iterator
+          ParameterMapEnd() const;
 
       /// \brief Get this preset profile's SDF
       /// \return An SDF element pointer representing a <physics> element

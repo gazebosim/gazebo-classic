@@ -37,9 +37,15 @@ Preset::Preset(const std::string &_name) : dataPtr(new PresetPrivate)
 }
 
 //////////////////////////////////////////////////
-std::map<std::string, boost::any> *Preset::ParameterMap()
+std::map<std::string, boost::any>::iterator Preset::ParameterMapBegin() const
 {
-  return &this->dataPtr->parameterMap;
+  return this->dataPtr->parameterMap.begin();
+}
+
+//////////////////////////////////////////////////
+std::map<std::string, boost::any>::iterator Preset::ParameterMapEnd() const
+{
+  return this->dataPtr->parameterMap.end();
 }
 
 //////////////////////////////////////////////////
@@ -89,7 +95,7 @@ sdf::ElementPtr Preset::SDF() const
 //////////////////////////////////////////////////
 void Preset::SDF(sdf::ElementPtr _sdfElement)
 {
-// TODO: check for non-physics element in Preset::SDF (set)
+  // TODO: check for non-physics element in Preset::SDF (set)
   this->dataPtr->elementSDF = _sdfElement;
 }
 
@@ -116,9 +122,7 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
         }
         if (physicsElem->HasAttribute("default"))
         {
-          if (!physicsElem->Get<bool>("default"))
-            continue;
-          if (!defaultSet)
+          if (physicsElem->Get<bool>("default") && !defaultSet)
           {
             this->CurrentProfile(name);
             defaultSet = true;
@@ -158,8 +162,8 @@ bool PresetManager::CurrentProfile(const std::string &_name)
   }
   this->dataPtr->currentPreset = _name;
   bool result = true;
-  for (auto it = this->CurrentPreset()->ParameterMap()->begin();
-     it != this->CurrentPreset()->ParameterMap()->end(); ++it)
+  for (auto it = this->CurrentPreset()->ParameterMapBegin();
+     it != this->CurrentPreset()->ParameterMapEnd(); ++it)
   {
     if (!this->dataPtr->physicsEngine->SetParam(it->first, it->second))
     {
@@ -402,7 +406,8 @@ sdf::ElementPtr PresetManager::GenerateSDFFromPreset(Preset *_preset) const
 
   nameParam->Set(_preset->Name());
 
-  for (auto &param : *_preset->ParameterMap())
+  for (auto param = _preset->ParameterMapBegin();
+     it != _preset->ParameterMapEnd(); ++it)
   {
     std::string key = param.first;
     std::string value;

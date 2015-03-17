@@ -35,6 +35,7 @@ namespace gazebo
       /// \brief SDF for the physics element represented by this object
       public: sdf::ElementPtr elementSDF;
     };
+    class PresetManager
 
     class Preset;
 
