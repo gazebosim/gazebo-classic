@@ -213,19 +213,19 @@ TEST_F(QuaternionTest, Quaternion)
     math::Vector3 r1 = q.RotateVector(v1);
     // 90 degrees about X does nothing,
     // 90 degrees about Y sends point down to -Z
-    EXPECT_TRUE(r1 == math::Vector3(0, 0, -1));
+    EXPECT_EQ(r1, math::Vector3(0, 0, -1));
 
     math::Vector3 v2(0, 1, 0);
     math::Vector3 r2 = q.RotateVector(v2);
     // 90 degrees about X sends point to +Z
     // 90 degrees about Y sends point to +X
-    EXPECT_TRUE(r2 == math::Vector3(1, 0, 0));
+    EXPECT_EQ(r2, math::Vector3(1, 0, 0));
 
     math::Vector3 v3(0, 0, 1);
     math::Vector3 r3 = q.RotateVector(v3);
     // 90 degrees about X sends point to -Y
     // 90 degrees about Y does nothing
-    EXPECT_TRUE(r3 == math::Vector3(0, -1, 0));
+    EXPECT_EQ(r3, math::Vector3(0, -1, 0));
   }
 
   {
