@@ -62,7 +62,10 @@ namespace gazebo
       public: QGraphicsPolygonItem *pauseItem;
 
       /// \brief TODO
-      public: QGraphicsPathItem *stepItem;
+      public: QGraphicsPathItem *stepForwardItem;
+
+      /// \brief TODO
+      public: QGraphicsPathItem *stepBackItem;
 
       /// \brief TODO
       public: QGraphicsSimpleTextItem *timeText;

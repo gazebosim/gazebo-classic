@@ -162,14 +162,23 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
   this->dataPtr->pauseItem->setPos(100, (sceneHeight-buttonHeight)/2);
   this->dataPtr->pauseItem->setVisible(true);
 
-  // Step
-  QPainterPath stepPath(QPointF(0, 0));
-  stepPath.lineTo(buttonHeight/2, buttonHeight/2);
-  stepPath.lineTo(0, buttonHeight);
-  this->dataPtr->stepItem = new QGraphicsPathItem(stepPath);
-  this->dataPtr->stepItem->setPen(QPen(Qt::red, 5, Qt::SolidLine));
-  graphicsScene->addItem(this->dataPtr->stepItem);
-  this->dataPtr->stepItem->setPos(150, (sceneHeight-buttonHeight)/2);
+  // StepForward
+  QPainterPath stepForwardPath(QPointF(0, 0));
+  stepForwardPath.lineTo(buttonHeight/2, buttonHeight/2);
+  stepForwardPath.lineTo(0, buttonHeight);
+  this->dataPtr->stepForwardItem = new QGraphicsPathItem(stepForwardPath);
+  this->dataPtr->stepForwardItem->setPen(QPen(Qt::red, 5, Qt::SolidLine));
+  graphicsScene->addItem(this->dataPtr->stepForwardItem);
+  this->dataPtr->stepForwardItem->setPos(150, (sceneHeight-buttonHeight)/2);
+
+  // StepBack
+  QPainterPath stepBackPath(QPointF(buttonHeight/2, 0));
+  stepBackPath.lineTo(0, buttonHeight/2);
+  stepBackPath.lineTo(buttonHeight/2, buttonHeight);
+  this->dataPtr->stepBackItem = new QGraphicsPathItem(stepBackPath);
+  this->dataPtr->stepBackItem->setPen(QPen(Qt::red, 5, Qt::SolidLine));
+  graphicsScene->addItem(this->dataPtr->stepBackItem);
+  this->dataPtr->stepBackItem->setPos(50, (sceneHeight-buttonHeight)/2);
 
   // Time
   this->dataPtr->timeText = graphicsScene->addSimpleText("00 00:00:00.000");
@@ -208,9 +217,13 @@ void LogPlayView::mouseReleaseEvent(QMouseEvent *_event)
     {
       msg.set_pause(true);
     }
-    else if (mouseItem == this->dataPtr->stepItem)
+    else if (mouseItem == this->dataPtr->stepForwardItem)
     {
       msg.set_multi_step(1);
+    }
+    else if (mouseItem == this->dataPtr->stepBackItem)
+    {
+      // msg.set_multi_step(-1);
     }
 
     if (msg.has_pause() || msg.has_multi_step())
