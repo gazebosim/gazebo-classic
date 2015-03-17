@@ -32,19 +32,20 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
   : Editor(_mainWindow)
 {
   // Tips
-  QLabel *tipsLabel = new QLabel(tr(
+  this->tipsLabel = new QLabel(tr(
       "<font size=4 color='white'><b>?</b></font>"));
-  tipsLabel->setToolTip(tr("<font size=3><p><b> Tips: </b></b>"
+  this->tipsLabel->setToolTip(tr("<font size=3><p><b> Tips: </b></b>"
       "<p>Double-click an object to open an Inspector with configuration "
       "options.</p>"
       "<p>Currently, windows & doors are simple holes in the wall.</p>"
       "<p>Because Gazebo only supports simple primitive shapes, all floors "
       "will be rectangular.</p>"));
+  this->tipsLabel->installEventFilter(this);
 
   // Create the building editor tab
   this->buildingPalette = new BuildingEditorPalette;
   this->Init("buildingEditorTab", "Building Editor", this->buildingPalette,
-      tipsLabel);
+      this->tipsLabel);
 
   this->newAct = new QAction(tr("&New"), this->mainWindow);
   this->newAct->setStatusTip(tr("New"));
@@ -169,4 +170,18 @@ void BuildingEditor::OnEdit(bool _checked)
       this->mainWindow->Play();
   }
   gui::editor::Events::toggleEditMode(_checked);
+}
+
+/////////////////////////////////////////////////
+bool BuildingEditor::eventFilter(QObject *_obj, QEvent *_event)
+{
+  QLabel *label = qobject_cast<QLabel *>(_obj);
+  if (label && label == this->tipsLabel &&
+      _event->type() == QEvent::MouseButtonRelease)
+  {
+    QToolTip::showText(this->tipsLabel->mapToGlobal(QPoint()),
+        this->tipsLabel->toolTip());
+    return true;
+  }
+  return false;
 }

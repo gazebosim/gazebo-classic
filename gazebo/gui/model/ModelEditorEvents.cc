@@ -27,7 +27,7 @@ event::EventT<void ()> model::Events::newModelEditor;
 event::EventT<void ()> model::Events::exitModelEditor;
 event::EventT<void ()> model::Events::modelChanged;
 event::EventT<void (std::string)> model::Events::modelNameChanged;
-event::EventT<void (bool, bool, const math::Pose &)>
+event::EventT<void (bool, bool, const math::Pose &, const std::string &)>
     model::Events::modelPropertiesChanged;
 
 event::EventT<void (std::string)> model::Events::saveModel;
