@@ -38,7 +38,7 @@ TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
-  physics::PresetManager *presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->GetPresetManager();
   if (!presetManager)
   {
     FAIL();
@@ -95,7 +95,7 @@ TEST_F(PresetManagerTest, MultipleDefaults)
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
-  physics::PresetManager *presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->GetPresetManager();
   if (!presetManager)
   {
     FAIL();
@@ -111,7 +111,7 @@ TEST_F(PresetManagerTest, NoDefault)
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
-  physics::PresetManager *presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->GetPresetManager();
   if (!presetManager)
   {
     FAIL();
@@ -127,7 +127,7 @@ TEST_F(PresetManagerTest, SetProfileParam)
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
-  physics::PresetManager *presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->GetPresetManager();
   if (!presetManager)
   {
     FAIL();
@@ -177,7 +177,7 @@ TEST_F(PresetManagerTest, SetCurrentProfile)
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
-  physics::PresetManager *presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->GetPresetManager();
 
   if (!presetManager)
   {
@@ -217,7 +217,7 @@ TEST_F(PresetManagerTest, CreateProfileFromSDF)
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
-  physics::PresetManager *presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->GetPresetManager();
   if (!presetManager)
   {
     FAIL();
@@ -272,7 +272,7 @@ TEST_F(PresetManagerTest, BackwardsCompatibilityTest)
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
-  physics::PresetManager *presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->GetPresetManager();
   if (!presetManager)
   {
     FAIL();
