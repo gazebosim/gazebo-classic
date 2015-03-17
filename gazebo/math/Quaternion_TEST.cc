@@ -205,6 +205,24 @@ TEST_F(QuaternionTest, Quaternion)
     EXPECT_TRUE(q.GetInverse().GetZAxis() == math::Vector3(0, 0, 1));
   }
 
+  // Try Euler angle rotation across multiple axes
+  {
+    q = math::Quaternion(M_PI/2.0, M_PI/2.0, 0);
+    math::Vector3 v1(1, 0, 0);
+    math::Vector3 r1 = q.RotateVector(v1);
+    std::cout << "rotated x unit vec: " <<  r1 << std::endl;
+    EXPECT_TRUE(r1 == math::Vector3(0, 0, 1));
+
+    math::Vector3 v2(0, 1, 0);
+    math::Vector3 r2 = q.RotateVector(v2);
+    EXPECT_TRUE(r2 == math::Vector3(1, 0, 0));
+
+    math::Vector3 v3(0, 0, 1);
+    math::Vector3 r3 = q.RotateVector(v3);
+    EXPECT_TRUE(r2 == math::Vector3(0, 1, 0));
+    
+  }
+
   {
     // now try a harder case (axis[1,2,3], rotation[0.3*pi])
     // verified with octave
