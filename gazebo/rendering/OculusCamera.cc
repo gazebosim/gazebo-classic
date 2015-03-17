@@ -28,15 +28,11 @@
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Conversions.hh"
-#include "gazebo/rendering/WindowManager.hh"
-#include "gazebo/rendering/FPSViewController.hh"
-#include "gazebo/rendering/OrbitViewController.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/OculusCameraPrivate.hh"
 #include "gazebo/rendering/OculusCamera.hh"
 
@@ -57,7 +53,10 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
     gzerr << "Oculus Rift not detected. "
           << "Oculus error["
           << ovrHmd_GetLastError(NULL) << "]. "
-          << "Is the oculusd service running?" << std::endl;
+          << "Is the oculusd service running?\n"
+          << "Did you copy the udev rules from the oculussdk repo?\n"
+          << "See: http://gazebosim.org/tutorials?tut=oculus"
+          << std::endl;
     return;
   }
 
@@ -76,9 +75,11 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   switch (this->dataPtr->hmd->Type)
   {
     case ovrHmd_DK1:
+      // A little bit extra for safety
       this->SetRenderRate(70.0);
       break;
     case ovrHmd_DK2:
+      // A little bit extra for safety
       this->SetRenderRate(80.0);
       break;
     case ovrHmd_None:
@@ -112,7 +113,8 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   if (!ovrHmd_ConfigureTracking(this->dataPtr->hmd, ovrTrackingCap_Orientation
       | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position, 0))
   {
-    gzerr << "No tracking\n";
+    gzerr << "Tracking capability not found. "
+      << "The Oculus viewpoint will not move.\n";
   }
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
@@ -135,6 +137,8 @@ OculusCamera::~OculusCamera()
   ovr_Shutdown();
 
   this->connections.clear();
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
