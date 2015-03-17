@@ -73,7 +73,7 @@ void ConfigWidget_TEST::JointMsgWidget()
     gazebo::math::Quaternion quat(0.0, 1.57, 0.0);
     gazebo::msgs::Set(jointMsg.mutable_pose(), gazebo::math::Pose(pos, quat));
 
-    // axis
+    // axis1
     gazebo::msgs::Axis *axisMsg = jointMsg.mutable_axis1();
     gazebo::msgs::Set(axisMsg->mutable_xyz(), gazebo::math::Vector3::UnitX);
     axisMsg->set_use_parent_model_frame(false);
@@ -126,7 +126,7 @@ void ConfigWidget_TEST::JointMsgWidget()
     QCOMPARE(quat.GetAsEuler().y, 1.57);
     QCOMPARE(quat.GetAsEuler().z, 0.0);
 
-    // axis
+    // axis1
     gazebo::msgs::Axis *axisMsg = jointMsg.mutable_axis1();
     QCOMPARE(axisMsg->xyz().x(), 1.0);
     QCOMPARE(axisMsg->xyz().y(), 0.0);
@@ -151,6 +151,7 @@ void ConfigWidget_TEST::JointMsgWidget()
 
   // update fields in the config widget and
   // verify that the new message contains the updated values.
+  // Joint type revolute -> universal
   {
     // joint
     jointConfigWidget->SetStringWidgetValue("name", "test_joint_updated");
@@ -165,7 +166,7 @@ void ConfigWidget_TEST::JointMsgWidget()
     // type
     jointConfigWidget->SetEnumWidgetValue("type",
         gazebo::msgs::Joint_Type_Name(
-        gazebo::msgs::Joint_Type_PRISMATIC));
+        gazebo::msgs::Joint_Type_UNIVERSAL));
 
     // pose
     gazebo::math::Vector3 pos(2.0, 9.0, -4.0);
@@ -173,7 +174,7 @@ void ConfigWidget_TEST::JointMsgWidget()
     jointConfigWidget->SetPoseWidgetValue("pose",
         gazebo::math::Pose(pos, quat));
 
-    // axis
+    // axis1
     jointConfigWidget->SetVector3WidgetValue("axis1::xyz",
         gazebo::math::Vector3::UnitY);
     jointConfigWidget->SetBoolWidgetValue("axis1::use_parent_model_frame",
@@ -183,6 +184,17 @@ void ConfigWidget_TEST::JointMsgWidget()
     jointConfigWidget->SetDoubleWidgetValue("axis1::limit_effort", 1.0);
     jointConfigWidget->SetDoubleWidgetValue("axis1::limit_velocity", 100.0);
     jointConfigWidget->SetDoubleWidgetValue("axis1::damping", 0.9);
+
+    // axis2
+    jointConfigWidget->SetVector3WidgetValue("axis2::xyz",
+        gazebo::math::Vector3::UnitZ);
+    jointConfigWidget->SetBoolWidgetValue("axis2::use_parent_model_frame",
+        true);
+    jointConfigWidget->SetDoubleWidgetValue("axis2::limit_lower", -3.2);
+    jointConfigWidget->SetDoubleWidgetValue("axis2::limit_upper", -3.0);
+    jointConfigWidget->SetDoubleWidgetValue("axis2::limit_effort", 3.0);
+    jointConfigWidget->SetDoubleWidgetValue("axis2::limit_velocity", 300.0);
+    jointConfigWidget->SetDoubleWidgetValue("axis2::damping", 3.9);
 
     // other joint physics properties
     jointConfigWidget->SetDoubleWidgetValue("cfm", 0.9);
@@ -211,7 +223,7 @@ void ConfigWidget_TEST::JointMsgWidget()
     // type
     QCOMPARE(jointConfigWidget->GetEnumWidgetValue("type"),
         gazebo::msgs::Joint_Type_Name(
-        gazebo::msgs::Joint_Type_PRISMATIC));
+        gazebo::msgs::Joint_Type_UNIVERSAL));
 
     // pose
     gazebo::math::Vector3 pos(2.0, 9.0, -4.0);
@@ -219,7 +231,7 @@ void ConfigWidget_TEST::JointMsgWidget()
     QCOMPARE(jointConfigWidget->GetPoseWidgetValue("pose"),
         gazebo::math::Pose(pos, quat));
 
-    // axis
+    // axis1
     QCOMPARE(jointConfigWidget->GetVector3WidgetValue("axis1::xyz"),
         gazebo::math::Vector3::UnitY);
     QCOMPARE(jointConfigWidget->GetBoolWidgetValue(
@@ -233,6 +245,21 @@ void ConfigWidget_TEST::JointMsgWidget()
     QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis1::limit_velocity"),
         100.0);
     QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis1::damping"), 0.9);
+
+    // axis2
+    QCOMPARE(jointConfigWidget->GetVector3WidgetValue("axis2::xyz"),
+        gazebo::math::Vector3::UnitZ);
+    QCOMPARE(jointConfigWidget->GetBoolWidgetValue(
+        "axis1::use_parent_model_frame"), true);
+    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis2::limit_lower"),
+        -3.2);
+    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis2::limit_upper"),
+        -3.0);
+    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis2::limit_effort"),
+        3.0);
+    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis2::limit_velocity"),
+        300.0);
+    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis2::damping"), 3.9);
 
     // other joint physics properties
     QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("cfm"), 0.9);
@@ -260,7 +287,7 @@ void ConfigWidget_TEST::JointMsgWidget()
     QCOMPARE(retJointMsg->child_id(), 2u);
 
     // type
-    QCOMPARE(retJointMsg->type(), gazebo::msgs::ConvertJointType("prismatic"));
+    QCOMPARE(retJointMsg->type(), gazebo::msgs::ConvertJointType("universal"));
 
     // pose
     const gazebo::msgs::Pose poseMsg = retJointMsg->pose();
@@ -275,7 +302,7 @@ void ConfigWidget_TEST::JointMsgWidget()
     QCOMPARE(quat.GetAsEuler().y, 0.0);
     QCOMPARE(quat.GetAsEuler().z, 1.57);
 
-    // axis
+    // axis1
     gazebo::msgs::Axis *axisMsg = retJointMsg->mutable_axis1();
     QCOMPARE(axisMsg->xyz().x(), 0.0);
     QCOMPARE(axisMsg->xyz().y(), 1.0);
@@ -287,6 +314,18 @@ void ConfigWidget_TEST::JointMsgWidget()
     QCOMPARE(axisMsg->limit_velocity(), 100.0);
     QCOMPARE(axisMsg->damping(), 0.9);
 
+    // axis2
+    gazebo::msgs::Axis *axis2Msg = retJointMsg->mutable_axis2();
+    QCOMPARE(axis2Msg->xyz().x(), 0.0);
+    QCOMPARE(axis2Msg->xyz().y(), 0.0);
+    QCOMPARE(axis2Msg->xyz().z(), 1.0);
+    QCOMPARE(axis2Msg->use_parent_model_frame(), true);
+    QCOMPARE(axis2Msg->limit_lower(), -3.2);
+    QCOMPARE(axis2Msg->limit_upper(), -3.0);
+    QCOMPARE(axis2Msg->limit_effort(), 3.0);
+    QCOMPARE(axis2Msg->limit_velocity(), 300.0);
+    QCOMPARE(axis2Msg->damping(), 3.9);
+
     // other joint physics properties
     QCOMPARE(retJointMsg->cfm(), 0.9);
     QCOMPARE(retJointMsg->bounce(), 0.8);
@@ -296,6 +335,118 @@ void ConfigWidget_TEST::JointMsgWidget()
     QCOMPARE(retJointMsg->limit_erp(), 0.4);
     QCOMPARE(retJointMsg->suspension_cfm(), 0.3);
     QCOMPARE(retJointMsg->suspension_erp(), 0.2);
+  }
+
+  // update fields in the config widget and
+  // verify that the new message contains the updated values.
+  // Joint type universal -> ball
+  {
+    // joint
+    jointConfigWidget->SetStringWidgetValue("name", "test_joint_updated2");
+    jointConfigWidget->SetUIntWidgetValue("id", 2222222u);
+    jointConfigWidget->SetStringWidgetValue("parent",
+        "test_joint_parent_updated2");
+    jointConfigWidget->SetUIntWidgetValue("parent_id", 10u);
+    jointConfigWidget->SetStringWidgetValue("child",
+        "test_joint_child_updated2");
+    jointConfigWidget->SetUIntWidgetValue("child_id", 20u);
+
+    // type
+    jointConfigWidget->SetEnumWidgetValue("type",
+        gazebo::msgs::Joint_Type_Name(
+        gazebo::msgs::Joint_Type_BALL));
+
+    // pose
+    gazebo::math::Vector3 pos(-2.0, 1.0, 2.0);
+    gazebo::math::Quaternion quat(0.0, 0.0, 0.0);
+    jointConfigWidget->SetPoseWidgetValue("pose",
+        gazebo::math::Pose(pos, quat));
+
+    // other joint physics properties
+    jointConfigWidget->SetDoubleWidgetValue("cfm", 0.19);
+    jointConfigWidget->SetDoubleWidgetValue("bounce", 0.18);
+    jointConfigWidget->SetDoubleWidgetValue("velocity", 2.7);
+    jointConfigWidget->SetDoubleWidgetValue("fudge_factor", 0.26);
+    jointConfigWidget->SetDoubleWidgetValue("limit_cfm", 0.15);
+    jointConfigWidget->SetDoubleWidgetValue("limit_erp", 0.24);
+    jointConfigWidget->SetDoubleWidgetValue("suspension_cfm", 0.13);
+    jointConfigWidget->SetDoubleWidgetValue("suspension_erp", 0.12);
+  }
+
+  // verify widget values
+  {
+    // joint
+    QVERIFY(jointConfigWidget->GetStringWidgetValue("name") ==
+        "test_joint_updated2");
+    QCOMPARE(jointConfigWidget->GetUIntWidgetValue("id"), 2222222u);
+    QVERIFY(jointConfigWidget->GetStringWidgetValue("parent") ==
+        "test_joint_parent_updated2");
+    QCOMPARE(jointConfigWidget->GetUIntWidgetValue("parent_id"), 10u);
+    QVERIFY(jointConfigWidget->GetStringWidgetValue("child") ==
+        "test_joint_child_updated2");
+    QCOMPARE(jointConfigWidget->GetUIntWidgetValue("child_id"), 20u);
+
+    // type
+    QCOMPARE(jointConfigWidget->GetEnumWidgetValue("type"),
+        gazebo::msgs::Joint_Type_Name(
+        gazebo::msgs::Joint_Type_BALL));
+
+    // pose
+    gazebo::math::Vector3 pos(-2.0, 1.0, 2.0);
+    gazebo::math::Quaternion quat(0.0, 0.0, 0.0);
+    QCOMPARE(jointConfigWidget->GetPoseWidgetValue("pose"),
+        gazebo::math::Pose(pos, quat));
+
+    // other joint physics properties
+    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("cfm"), 0.19);
+    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("bounce"), 0.18);
+    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("velocity"), 2.7);
+    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("fudge_factor"), 0.26);
+    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("limit_cfm"), 0.15);
+    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("limit_erp"), 0.24);
+    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("suspension_cfm"), 0.13);
+    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("suspension_erp"), 0.12);
+  }
+
+  // verify updates in new msg
+  {
+    gazebo::msgs::Joint *retJointMsg =
+        dynamic_cast<gazebo::msgs::Joint *>(jointConfigWidget->GetMsg());
+    QVERIFY(retJointMsg != NULL);
+
+    // joint
+    QVERIFY(retJointMsg->name() == "test_joint_updated2");
+    QCOMPARE(retJointMsg->id(), 2222222u);
+    QVERIFY(retJointMsg->parent() == "test_joint_parent_updated2");
+    QCOMPARE(retJointMsg->parent_id(), 10u);
+    QVERIFY(retJointMsg->child() == "test_joint_child_updated2");
+    QCOMPARE(retJointMsg->child_id(), 20u);
+
+    // type
+    QCOMPARE(retJointMsg->type(), gazebo::msgs::ConvertJointType("ball"));
+
+    // pose
+    const gazebo::msgs::Pose poseMsg = retJointMsg->pose();
+    const gazebo::msgs::Vector3d posMsg = poseMsg.position();
+    QCOMPARE(posMsg.x(), -2.0);
+    QCOMPARE(posMsg.y(), 1.0);
+    QCOMPARE(posMsg.z(), 2.0);
+    const gazebo::msgs::Quaternion quatMsg = poseMsg.orientation();
+    gazebo::math::Quaternion quat(quatMsg.w(), quatMsg.x(), quatMsg.y(),
+        quatMsg.z());
+    QCOMPARE(quat.GetAsEuler().x, 0.0);
+    QCOMPARE(quat.GetAsEuler().y, 0.0);
+    QCOMPARE(quat.GetAsEuler().z, 0.0);
+
+    // other joint physics properties
+    QCOMPARE(retJointMsg->cfm(), 0.19);
+    QCOMPARE(retJointMsg->bounce(), 0.18);
+    QCOMPARE(retJointMsg->velocity(), 2.7);
+    QCOMPARE(retJointMsg->fudge_factor(), 0.26);
+    QCOMPARE(retJointMsg->limit_cfm(), 0.15);
+    QCOMPARE(retJointMsg->limit_erp(), 0.24);
+    QCOMPARE(retJointMsg->suspension_cfm(), 0.13);
+    QCOMPARE(retJointMsg->suspension_erp(), 0.12);
   }
 }
 
