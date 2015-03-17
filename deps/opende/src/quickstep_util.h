@@ -45,6 +45,17 @@
 
 #undef CHECK_VELOCITY_OBEYS_CONSTRAINT
 
+//hdf5
+//#undef TIMING
+//#define INSTRUMENT
+
+#ifndef TIMING
+#ifdef INSTRUMENT
+#define DUMP
+#include <ode/h5dump.h>
+#define DATA_FILE  "ode_frames.hdf5"
+#endif  // instrument
+#endif  // timing
 
 #ifdef USE_TPROW
 // added for threading per constraint rows
@@ -94,6 +105,11 @@ typedef dReal *dRealMutablePtr;
 #define IFTIMING(x) ((void)0)
 #endif
 
+#ifdef DUMP
+#define IFDUMP(x) x
+#else
+#define IFDUMP(x) ((void)0)
+#endif
 // ****************************************************************
 // ******************* Struct Definition **************************
 // ****************************************************************

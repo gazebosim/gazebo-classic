@@ -162,6 +162,8 @@ src/cylinder.cpp
 src/error.cpp
 src/export-dif.cpp
 src/heightfield.cpp
+src/io.cpp
+src/ioh5.cpp
 src/lcp.cpp
 src/mass.cpp
 src/mat.cpp
@@ -224,6 +226,7 @@ include/ode/compatibility.h
 include/ode/contact.h
 include/ode/error.h
 include/ode/export-dif.h
+include/ode/h5dump.h
 include/ode/mass.h
 include/ode/matrix.h
 include/ode/memory.h
@@ -240,7 +243,7 @@ include/ode/rotation.h
 include/ode/timer.h
 )
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -DdNODEBUG -DdDOUBLE -DHAVE_CONFIG_H -DPIC")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -std=c++0x -DdNODEBUG -DdDOUBLE -DHAVE_CONFIG_H -DPIC -DMBSFCLIB_HDF")
 
 if (SSE2_FOUND OR SSE3_FOUND OR SSSE3_FOUND OR SSE4_1_FOUND OR SSE4_2_FOUND)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSSE")
@@ -253,6 +256,8 @@ target_link_libraries(gazebo_ode
   gazebo_opcode
   gazebo_gimpact
   gazebo_opende_ou
+  hdf5_cpp
+  hdf5
   ${CCD_LIBRARIES}
   ${Boost_LIBRARIES})
 
