@@ -42,6 +42,7 @@ std::vector<dReal> errors;
 #endif   //timing
 
 using namespace ode;
+ 
 static void ComputeRows(
 #ifdef SHOW_CONVERGENCE
                 int thread_id,
