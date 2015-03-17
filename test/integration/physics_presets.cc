@@ -159,6 +159,14 @@ TEST_F(PresetManagerTest, SetProfileParam)
   // return false, since the physics engine doesn't know what to do with it.
   EXPECT_FALSE(presetManager->SetCurrentProfileParam(
       "this_param_does_not_exist", 10.0));
+
+  boost::any value;
+  // Trying to get from a nonexistent preset profile should return false.
+  EXPECT_FALSE(presetManager->GetProfileParam("this_preset_does_not_exist",
+      "max_step_size", value));
+  // Trying to get a nonexistent param should return false.
+  EXPECT_FALSE(presetManager->GetProfileParam("preset_1",
+      "this_param_does_not_exist", value));
 }
 
 /////////////////////////////////////////////////
