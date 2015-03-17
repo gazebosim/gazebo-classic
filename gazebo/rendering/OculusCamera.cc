@@ -594,12 +594,22 @@ void OculusCamera::Oculus()
   matRight->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTexture(
       this->dataPtr->renderTextureRight);
 
+  ovrFovPort fovLeft = this->dataPtr->hmd->DefaultEyeFov[ovrEye_Left];
+  ovrFovPort fovRight = this->dataPtr->hmd->DefaultEyeFov[ovrEye_Right];
+
   // Get eye description information
   ovrEyeRenderDesc eyeRenderDesc[2];
   eyeRenderDesc[0] = ovrHmd_GetRenderDesc(
-      this->dataPtr->hmd, ovrEye_Left, this->dataPtr->hmd->DefaultEyeFov[0]);
+      this->dataPtr->hmd, ovrEye_Left, fovLeft);
   eyeRenderDesc[1] = ovrHmd_GetRenderDesc(
-      this->dataPtr->hmd, ovrEye_Right, this->dataPtr->hmd->DefaultEyeFov[1]);
+      this->dataPtr->hmd, ovrEye_Right, fovRight);
+
+  double combinedTanHalfFovHorizontal = std::max(
+    std::max(fovLeft.LeftTan, fovLeft.RightTan),
+    std::max(fovRight.LeftTan, fovRight.RightTan));
+  double combinedTanHalfFovVertical = std::max(
+    std::max(fovLeft.UpTan, fovLeft.DownTan),
+    std::max(fovRight.UpTan, fovRight.DownTan));
 
   // Hold some values that are needed when creating the distortion meshes.
   ovrVector2f uvScaleOffset[2];
@@ -626,16 +636,10 @@ void OculusCamera::Oculus()
 
     // Make the FOV symmetrical. Refer to Section 8.5.2 of the oculus SDF
     // developers manual.
-    if (eyeIndex == 0)
-    {
-      eyeRenderDesc[eyeIndex].Fov.RightTan =
-        eyeRenderDesc[eyeIndex].Fov.LeftTan;
-    }
-    else
-    {
-      eyeRenderDesc[eyeIndex].Fov.LeftTan =
-        eyeRenderDesc[eyeIndex].Fov.RightTan;
-    }
+    eyeRenderDesc[eyeIndex].Fov.RightTan = combinedTanHalfFovHorizontal;
+    eyeRenderDesc[eyeIndex].Fov.LeftTan = combinedTanHalfFovHorizontal;
+    eyeRenderDesc[eyeIndex].Fov.UpTan = combinedTanHalfFovVertical;
+    eyeRenderDesc[eyeIndex].Fov.DownTan = combinedTanHalfFovVertical;
 
     ovrHmd_CreateDistortionMesh(
         this->dataPtr->hmd,
