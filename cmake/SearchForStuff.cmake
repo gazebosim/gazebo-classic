@@ -242,9 +242,9 @@ if (PKG_CONFIG_FOUND)
   # On Windows, we assume that all the OGRE* defines are passed in manually
   # to CMake.
   if (NOT WIN32)
-    string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
     execute_process(COMMAND pkg-config --modversion OGRE
                     OUTPUT_VARIABLE OGRE_VERSION)
+    string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
 
     string (REGEX REPLACE "^([0-9]+).*" "\\1"
       OGRE_MAJOR_VERSION "${OGRE_VERSION}")
