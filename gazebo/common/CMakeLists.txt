@@ -47,6 +47,7 @@ set (sources
   Time.cc
   Timer.cc
   Video.cc
+  ffmpeg_inc.cc
 )
 
 set (headers
