@@ -69,7 +69,8 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
   EXPECT_EQ(submesh->GetMin(), math::Vector3(0, 0, 0));
   EXPECT_EQ(submesh->GetMax(), math::Vector3(1.0, 1.0, 10.0));
 
-  for (unsigned int i = 0; i < mesh->GetSubMeshCount(); ++i)
+  // check vertices
+  for (unsigned int i = 0; i < submesh->GetVertexCount(); ++i)
   {
     math::Vector3 v = submesh->GetVertex(i);
 
@@ -79,6 +80,46 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
 
     // check extruded height
     EXPECT_TRUE((math::equal(v.z, 0.0) || math::equal(v.z, 10.0)));
+  }
+
+  // verify same number of normals and vertices
+  EXPECT_EQ(submesh->GetVertexCount(), submesh->GetNormalCount());
+
+  // check normals
+  for (unsigned int i = 0; i < submesh->GetNormalCount(); ++i)
+  {
+    math::Vector3 v = submesh->GetVertex(i);
+    math::Vector3 n = submesh->GetNormal(i);
+
+    // vertex at 0 could be a bottom face or side face
+    if (math::equal(v.z, 0.0))
+    {
+      if (math::equal(n.z, 0.0))
+      {
+        // side face - check non-zero normal
+        EXPECT_TRUE(!(math::equal(n.x, 0.0) && math::equal(n.y, 0.0)));
+      }
+      else
+      {
+        // bottom face - normal in -z direction
+        EXPECT_TRUE((n == -math::Vector3::UnitZ) || (math::equal(n.z, 0.0)));
+      }
+    }
+
+    // vertex at height could be a top face or side face
+    if (math::equal(v.z, 10.0))
+    {
+      if (math::equal(n.z, 0.0))
+      {
+        // side face - check non-zero normal
+        EXPECT_TRUE(!(math::equal(n.x, 0.0) && math::equal(n.y, 0.0)));
+      }
+      else
+      {
+        // top face - normal in +z direction
+        EXPECT_TRUE((n == math::Vector3::UnitZ) || (math::equal(n.z, 0.0)));
+      }
+    }
   }
 }
 
@@ -128,7 +169,7 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
   EXPECT_EQ(submesh->GetMin(), math::Vector3(1.11704, 0.7599, 0));
   EXPECT_EQ(submesh->GetMax(), math::Vector3(3.4323, 3.28672, 2.0));
 
-  for (unsigned int i = 0; i < mesh->GetSubMeshCount(); ++i)
+  for (unsigned int i = 0; i < submesh->GetVertexCount(); ++i)
   {
     math::Vector3 v = submesh->GetVertex(i);
 
@@ -147,6 +188,46 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
 
     // check extruded height
     EXPECT_TRUE((math::equal(v.z, 0.0) || math::equal(v.z, 2.0)));
+  }
+
+  // verify same number of normals and vertices
+  EXPECT_EQ(submesh->GetVertexCount(), submesh->GetNormalCount());
+
+  // check normals
+  for (unsigned int i = 0; i < submesh->GetNormalCount(); ++i)
+  {
+    math::Vector3 v = submesh->GetVertex(i);
+    math::Vector3 n = submesh->GetNormal(i);
+
+    // vertex at 0 could be a bottom face or side face
+    if (math::equal(v.z, 0.0))
+    {
+      if (math::equal(n.z, 0.0))
+      {
+        // side face - check non-zero normal
+        EXPECT_TRUE(!(math::equal(n.x, 0.0) && math::equal(n.y, 0.0)));
+      }
+      else
+      {
+        // bottom face - normal in -z direction
+        EXPECT_TRUE((n == -math::Vector3::UnitZ) || (math::equal(n.z, 0.0)));
+      }
+    }
+
+    // vertex at height could be a top face or side face
+    if (math::equal(v.z, 10.0))
+    {
+      if (math::equal(n.z, 0.0))
+      {
+        // side face - check non-zero normal
+        EXPECT_TRUE(!(math::equal(n.x, 0.0) && math::equal(n.y, 0.0)));
+      }
+      else
+      {
+        // top face - normal in +z direction
+        EXPECT_TRUE((n == math::Vector3::UnitZ) || (math::equal(n.z, 0.0)));
+      }
+    }
   }
 }
 #endif
