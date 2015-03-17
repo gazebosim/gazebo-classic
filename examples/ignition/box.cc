@@ -19,7 +19,7 @@
 #include <ignition/math/Box.hh>
 
 /////////////////////////////////////////////////
-// How to migrate from gazebo::math::Box to ignition::math::Box
+// Migration from gazebo::math::Box to ignition::math::Box examples
 // See Ignition documentation http://ignitionrobotics.org/libraries/ign_math/api
 int main()
 {

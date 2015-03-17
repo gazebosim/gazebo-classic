@@ -19,7 +19,7 @@
 #include <ignition/math/Vector3.hh>
 
 /////////////////////////////////////////////////
-// How to migrate from gazebo::math::Vector3 to ignition::math::Vector3
+// Migrattion from gazebo::math::Vector3 to ignition::math::Vector3 examples
 // See Ignition documentation http://ignitionrobotics.org/libraries/ign_math/api
 int main()
 {

@@ -79,7 +79,7 @@ namespace gazebo
       public: void Merge(const Box &_box);
 
       /// \brief Convert this box to an ignition::math::Box.
-      /// \return This Box as an ignition::math::Vector3d.
+      /// \return This Box as an ignition::math::Box.
       public: ignition::math::Box Ign() const;
 
       /// \brief Assignment operator for ignition math

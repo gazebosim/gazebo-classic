@@ -180,7 +180,7 @@ namespace gazebo
       /// \brief Assignment operator for ignition math
       /// \param[in] _v a new value
       /// \return this
-      public: Vector3 &operator =(const ignition::math::Vector3d &_v);
+      public: Vector3 &operator=(const ignition::math::Vector3d &_v);
 
       /// \brief Assignment operator
       /// \param[in] _v a new value
