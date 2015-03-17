@@ -379,10 +379,10 @@ endif ()
 
 ########################################
 # Find SDFormat
-find_package(SDFormat 2.1.0)
+find_package(SDFormat 3.0.0)
 if (NOT SDFormat_FOUND)
   message (STATUS "Looking for SDFormat - not found")
-  BUILD_ERROR ("Missing: SDF version >=2.1.0. Required for reading and writing SDF files.")
+  BUILD_ERROR ("Missing: SDF version >=3.0.0. Required for reading and writing SDF files.")
 else()
   message (STATUS "Looking for SDFormat - found")
 endif()
@@ -478,6 +478,13 @@ if (SPNAV_LIBRARY AND SPNAV_HEADER)
 else()
   message(STATUS "Looking for libspnav and spnav.h - not found")
   set(HAVE_SPNAV FALSE)
+endif()
+
+########################################
+# Find xsltproc, which is used by tools/check_test_ran.py
+find_program(XSLTPROC xsltproc)
+if (NOT EXISTS ${XSLTPROC})
+  BUILD_WARNING("xsltproc not found. The check_test_ran.py script will cause tests to fail.")
 endif()
 
 ########################################

@@ -57,13 +57,17 @@ namespace gazebo
       /// \param[in] _show True to display sim time.
       public: void ShowSimTime(bool _show);
 
-      /// \brief Show the step widget.
-      /// \param[in] _show True to show the step widget.
+      /// \brief Show the iterations.
+      /// \param[in] _show True to show the iterations widget.
       public: void ShowIterations(bool _show);
 
       /// \brief Show the step widget.
       /// \param[in] _show True to show the step widget.
       public: void ShowStepWidget(bool _show);
+
+      /// \brief Show fps.
+      /// \param[in] _show True to show the fps widget.
+      public: void ShowFPS(bool _show);
 
       /// \brief A signal used to set the sim time line edit.
       /// \param[in] _string String representation of sim time.
@@ -76,6 +80,10 @@ namespace gazebo
       /// \brief A signal used to set the iterations line edit.
       /// \param[in] _string String representation of iterations.
       signals: void SetIterations(QString _string);
+
+      /// \brief A signal used to set the avg fps line edit.
+      /// \param[in] _string String representation of avg fps.
+      signals: void SetFPS(QString _string);
 
       /// \brief Update the data output.
       private slots: void Update();
@@ -110,6 +118,9 @@ namespace gazebo
 
       /// \brief Display the number of iterations.
       private: QLineEdit *iterationsEdit;
+
+      /// \brief Display the average frames per second.
+      private: QLineEdit *fpsEdit;
 
       /// \brief Node used for communication.
       private: transport::NodePtr node;
@@ -146,6 +157,9 @@ namespace gazebo
 
       /// \brief Iterations label.
       private: QLabel *iterationsLabel;
+
+      /// \brief FPS label.
+      private: QLabel *fpsLabel;
 
       /// \brief Action associated with the step label in the toolbar.
       private: QAction *stepToolBarLabelAction;

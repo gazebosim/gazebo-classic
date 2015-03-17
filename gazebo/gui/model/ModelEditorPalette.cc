@@ -27,6 +27,7 @@
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/model/ExtrudeDialog.hh"
 #include "gazebo/gui/model/ImportDialog.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
@@ -185,7 +186,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->connections.push_back(
       gui::model::Events::ConnectModelPropertiesChanged(
       boost::bind(&ModelEditorPalette::OnModelPropertiesChanged, this, _1, _2,
-      _3)));
+      _3, _4)));
 }
 
 /////////////////////////////////////////////////
@@ -235,10 +236,36 @@ void ModelEditorPalette::OnCustom()
   importDialog.deleteLater();
   if (importDialog.exec() == QDialog::Accepted)
   {
-    event::Events::setSelectedEntity("", "normal");
-    g_arrowAct->trigger();
-    this->modelCreator->AddShape(ModelCreator::LINK_MESH,
-        math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
+    QFileInfo info(QString::fromStdString(importDialog.GetImportPath()));
+    if (info.isFile())
+    {
+      event::Events::setSelectedEntity("", "normal");
+      g_arrowAct->trigger();
+      if (info.completeSuffix().toLower() == "dae" ||
+          info.completeSuffix().toLower() == "stl")
+      {
+        this->modelCreator->AddShape(ModelCreator::LINK_MESH,
+            math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
+      }
+      else if (info.completeSuffix().toLower() == "svg")
+      {
+        ExtrudeDialog extrudeDialog(importDialog.GetImportPath(), this);
+        extrudeDialog.deleteLater();
+        if (extrudeDialog.exec() == QDialog::Accepted)
+        {
+          this->modelCreator->AddShape(ModelCreator::LINK_POLYLINE,
+              math::Vector3(1.0/extrudeDialog.GetResolution(),
+              1.0/extrudeDialog.GetResolution(),
+              extrudeDialog.GetThickness()),
+              math::Pose::Zero, importDialog.GetImportPath(),
+              extrudeDialog.GetSamples());
+        }
+        else
+        {
+          this->OnCustom();
+        }
+      }
+    }
   }
   else
   {
@@ -277,10 +304,12 @@ void ModelEditorPalette::OnStatic()
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnModelPropertiesChanged(
-  bool _static, bool _autoDisable, const math::Pose &/*_pose*/)
+    bool _static, bool _autoDisable, const math::Pose &/*_pose*/,
+    const std::string &_name)
 {
   this->staticCheck->setChecked(_static);
   this->autoDisableCheck->setChecked(_autoDisable);
+  this->modelNameEdit->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////
