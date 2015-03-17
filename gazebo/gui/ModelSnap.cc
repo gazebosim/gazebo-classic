@@ -62,7 +62,12 @@ void ModelSnap::Clear()
 {
   this->dataPtr->selectedTriangleDirty = false;
   this->dataPtr->hoverTriangleDirty = false;
+  this->dataPtr->selectedTriangle.clear();
+  this->dataPtr->hoverTriangle.clear();
+  this->dataPtr->selectedVis.reset();
+  this->dataPtr->hoverVis.reset();
 
+  this->dataPtr->node.reset();
   this->dataPtr->modelPub.reset();
 
   if (this->dataPtr->updateMutex)
@@ -71,6 +76,10 @@ void ModelSnap::Clear()
     delete this->dataPtr->snapLines;
     this->dataPtr->snapLines = NULL;
     this->dataPtr->snapVisual.reset();
+
+    delete this->dataPtr->snapHighlight;
+    this->dataPtr->snapHighlight = NULL;
+    this->dataPtr->highlightVisual.reset();
   }
 
   if (this->dataPtr->renderConnection)
@@ -82,6 +91,7 @@ void ModelSnap::Clear()
 
   this->dataPtr->scene.reset();
   this->dataPtr->userCamera.reset();
+  this->dataPtr->rayQuery.reset();
 
   this->dataPtr->initialized = false;
 }

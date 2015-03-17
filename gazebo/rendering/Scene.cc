@@ -192,16 +192,28 @@ void Scene::Clear()
 
   this->dataPtr->poseSub.reset();
   this->dataPtr->jointSub.reset();
+  this->dataPtr->sensorSub.reset();
+  this->dataPtr->sceneSub.reset();
   this->dataPtr->skeletonPoseSub.reset();
   this->dataPtr->selectionSub.reset();
   this->dataPtr->visSub.reset();
+  this->dataPtr->skySub.reset();
   this->dataPtr->lightSub.reset();
+  this->dataPtr->requestSub.reset();
+  this->dataPtr->responseSub.reset();
+  this->dataPtr->modelInfoSub.reset();
+  this->dataPtr->lightPub.reset();
+  this->dataPtr->responsePub.reset();
+  this->dataPtr->requestPub.reset();
   this->dataPtr->selectionMsg.reset();
 
   this->dataPtr->joints.clear();
 
   delete this->dataPtr->terrain;
   this->dataPtr->terrain = NULL;
+
+  delete this->dataPtr->skyx;
+  this->dataPtr->skyx = NULL;
 
   while (!this->dataPtr->visuals.empty())
     this->RemoveVisual(this->dataPtr->visuals.begin()->first);
@@ -233,6 +245,8 @@ void Scene::Clear()
 
   RTShaderSystem::Instance()->RemoveScene(this->GetName());
   RTShaderSystem::Instance()->Clear();
+
+  this->dataPtr->connections.clear();
 
   this->dataPtr->initialized = false;
 }
