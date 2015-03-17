@@ -128,6 +128,9 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
 //////////////////////////////////////////////////
 OculusCamera::~OculusCamera()
 {
+  RenderEngine::Instance()->root->destroySceneManager(
+      this->dataPtr->externalSceneManager);
+
   ovrHmd_Destroy(this->dataPtr->hmd);
   ovr_Shutdown();
 
@@ -670,45 +673,48 @@ void OculusCamera::Oculus()
     params->setNamedConstant("eyeToSourceUVOffset",
         Ogre::Vector4(uvScaleOffset[1].x, uvScaleOffset[1].y, 0, 0));
 #endif
+    Ogre::ManualObject *externalObj;
 
     // create ManualObject
-    // TODO: Destroy the manual objects!!
-    Ogre::ManualObject *manual;
     if (eyeIndex == 0)
     {
-      manual = this->dataPtr->externalSceneManager->createManualObject(
-          "OculusRiftRenderObjectLeft");
-      manual->begin("Oculus/LeftEye", Ogre::RenderOperation::OT_TRIANGLE_LIST);
+      externalObj =
+        this->dataPtr->externalSceneManager->createManualObject(
+            "OculusRiftRenderObjectLeft");
+      externalObj->begin("Oculus/LeftEye",
+          Ogre::RenderOperation::OT_TRIANGLE_LIST);
     }
     else
     {
-      manual = this->dataPtr->externalSceneManager->createManualObject(
-          "OculusRiftRenderObjectRight");
-      manual->begin("Oculus/RightEye", Ogre::RenderOperation::OT_TRIANGLE_LIST);
+      externalObj =
+        this->dataPtr->externalSceneManager->createManualObject(
+            "OculusRiftRenderObjectRight");
+      externalObj->begin("Oculus/RightEye",
+          Ogre::RenderOperation::OT_TRIANGLE_LIST);
     }
 
     for (unsigned int i = 0; i < meshData.VertexCount; ++i)
     {
       ovrDistortionVertex v = meshData.pVertexData[i];
-      manual->position(v.ScreenPosNDC.x, v.ScreenPosNDC.y, 0);
-      manual->textureCoord(v.TanEyeAnglesR.x, v.TanEyeAnglesR.y);
-      manual->textureCoord(v.TanEyeAnglesG.x, v.TanEyeAnglesG.y);
-      manual->textureCoord(v.TanEyeAnglesB.x, v.TanEyeAnglesB.y);
+      externalObj->position(v.ScreenPosNDC.x, v.ScreenPosNDC.y, 0);
+      externalObj->textureCoord(v.TanEyeAnglesR.x, v.TanEyeAnglesR.y);
+      externalObj->textureCoord(v.TanEyeAnglesG.x, v.TanEyeAnglesG.y);
+      externalObj->textureCoord(v.TanEyeAnglesB.x, v.TanEyeAnglesB.y);
 
       float vig = std::max(v.VignetteFactor, 0.0f);
-      manual->colour(vig, vig, vig, vig);
+      externalObj->colour(vig, vig, vig, vig);
     }
 
     for (unsigned int i = 0; i < meshData.IndexCount; ++i)
     {
-      manual->index(meshData.pIndexData[i]);
+      externalObj->index(meshData.pIndexData[i]);
     }
 
     // Manual render object complete
-    manual->end();
+    externalObj->end();
 
-    // Attach manual object to the node
-    meshNode->attachObject(manual);
+    // Attach externalObj object to the node
+    meshNode->attachObject(externalObj);
 
     // Free up memory
     ovrHmd_DestroyDistortionMesh(&meshData);
