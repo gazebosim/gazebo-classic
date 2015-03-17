@@ -737,8 +737,6 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allLinks[linkName] = link;
-    gui::model::Events::linkInserted(linkName);
-
     if (this->canonicalLink.empty())
       this->canonicalLink = linkName;
   }
@@ -780,7 +778,6 @@ LinkData *ModelCreator::CloneLink(const std::string &_linkName)
   LinkData *link = it->second->Clone(leafName);
 
   this->allLinks[newName] = link;
-  gui::model::Events::linkInserted(newName);
 
   this->ModelChanged();
 
@@ -1289,6 +1286,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     {
       LinkData *link = this->allLinks[this->mouseVisual->GetName()];
       link->SetPose(this->mouseVisual->GetWorldPose()-this->modelPose);
+      gui::model::Events::linkInserted(this->mouseVisual->GetName());
     }
 
     // reset and return

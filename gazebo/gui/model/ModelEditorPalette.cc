@@ -177,7 +177,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   // Links
   this->linksItem = new QTreeWidgetItem(
-      static_cast<QTreeWidgetItem*>(0),
+      static_cast<QTreeWidgetItem *>(0),
       QStringList(QString("%1").arg(tr("Links"))));
   this->linksItem->setData(0, Qt::UserRole, QVariant(tr("Links")));
   QFont linksFont = this->linksItem->font(0);

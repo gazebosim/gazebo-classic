@@ -243,7 +243,6 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { openJointInspector.Disconnect(_subscriber); }
 
-        /// \brief TODOTODO
         /// \brief Connect a Gazebo event to the joint name changed signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
