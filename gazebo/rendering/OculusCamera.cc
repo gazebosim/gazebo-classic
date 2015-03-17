@@ -359,20 +359,6 @@ void OculusCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 }
 
 //////////////////////////////////////////////////
-float OculusCamera::GetAvgFPS() const
-{
-  return RenderEngine::Instance()->GetWindowManager()->GetAvgFPS(
-      this->windowId);
-}
-
-//////////////////////////////////////////////////
-unsigned int OculusCamera::GetTriangleCount() const
-{
-  return RenderEngine::Instance()->GetWindowManager()->GetTriangleCount(
-      this->windowId);
-}
-
-//////////////////////////////////////////////////
 bool OculusCamera::MoveToPosition(const math::Pose &_pose, double _time)
 {
   return Camera::MoveToPosition(_pose, _time);

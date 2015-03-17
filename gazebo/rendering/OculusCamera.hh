@@ -21,8 +21,6 @@
 #include <string>
 
 #include "gazebo/rendering/Camera.hh"
-// #include "gazebo/rendering/RenderTypes.hh"
-// #include "gazebo/common/CommonTypes.hh"
 
 namespace gazebo
 {
@@ -68,14 +66,6 @@ namespace gazebo
       /// \param[in] _w Width of the camera image.
       /// \param[in] _h Height of the camera image.
       public: void Resize(unsigned int _w, unsigned int _h);
-
-      /// \brief Get the average frames per second
-      /// \return The average rendering frames per second
-      public: float GetAvgFPS() const;
-
-      /// \brief Get the triangle count.
-      /// \return The number of triangles currently being rendered.
-      public: unsigned int GetTriangleCount() const;
 
       /// \brief Move the camera to focus on a visual.
       /// \param[in] _visual Visual to move the camera to.
