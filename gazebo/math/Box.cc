@@ -170,7 +170,7 @@ Box Box::operator-(const Vector3 &_v)
 //////////////////////////////////////////////////
 ignition::math::Box Box::Ign() const
 {
-  return ignition::math::Box();//this->min.Ign(), this->max.Ign());
+  return ignition::math::Box(this->min.Ign(), this->max.Ign());
 }
 
 //////////////////////////////////////////////////
