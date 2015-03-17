@@ -148,7 +148,7 @@ World::World(const std::string &_name)
 //////////////////////////////////////////////////
 World::~World()
 {
-  delete this->dataPtr->presetManager;
+  this->dataPtr->presetManager.reset();
   delete this->dataPtr->receiveMutex;
   this->dataPtr->receiveMutex = NULL;
   delete this->dataPtr->loadModelMutex;
@@ -349,8 +349,8 @@ void World::Init()
   // Initialize the physics engine
   this->dataPtr->physicsEngine->Init();
 
-  this->dataPtr->presetManager =
-    new PresetManager(this->dataPtr->physicsEngine, this->dataPtr->sdf);
+  this->dataPtr->presetManager = PresetManagerPtr(new PresetManager(this->dataPtr->physicsEngine,
+      this->dataPtr->sdf));
 
   this->dataPtr->testRay = boost::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
