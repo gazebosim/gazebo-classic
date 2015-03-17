@@ -49,27 +49,35 @@ std::string Preset::Name() const
 }
 
 //////////////////////////////////////////////////
-void Preset::Name(const std::string& _name)
+void Preset::Name(const std::string &_name)
 {
   this->dataPtr->name = _name;
 }
 
 //////////////////////////////////////////////////
-bool Preset::GetParam(const std::string& _key, boost::any &_value) const
+bool Preset::GetParam(const std::string &_key, boost::any &_value) const
 {
-  if (this->dataPtr->parameterMap.find(_key) ==
-      this->dataPtr->parameterMap.end())
+  bool result = false;
+  std::map<std::string, boost::any>::const_iterator iter =
+    this->dataPtr->parameterMap.find(_key);
+
+  if (iter == this->dataPtr->parameterMap.end())
   {
     gzwarn << "Parameter " << _key << " is not a member of Preset"
            << this->Name() << std::endl;
-    return false;
+    result = false;
   }
-  _value = this->dataPtr->parameterMap[_key];
-  return true;
+  else
+  {
+    _value = iter->second;
+    result = true;
+  }
+
+  return result;
 }
 
 //////////////////////////////////////////////////
-bool Preset::SetParam(const std::string& _key, const boost::any& _value)
+bool Preset::SetParam(const std::string &_key, const boost::any &_value)
 {
   this->dataPtr->parameterMap[_key] = _value;
   return true;
@@ -84,7 +92,7 @@ sdf::ElementPtr Preset::SDF() const
 //////////////////////////////////////////////////
 void Preset::SDF(sdf::ElementPtr _sdfElement)
 {
-// TODO: check for non-physics element in Preset::SDF (set)
+  // TODO: check for non-physics element in Preset::SDF (set)
   this->dataPtr->elementSDF = _sdfElement;
 }
 
@@ -112,9 +120,7 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
         }
         if (physicsElem->HasAttribute("default"))
         {
-          if (!physicsElem->Get<bool>("default"))
-            continue;
-          if (!defaultSet)
+          if (physicsElem->Get<bool>("default") && !defaultSet)
           {
             this->CurrentProfile(name);
             defaultSet = true;
@@ -132,7 +138,7 @@ PresetManager::~PresetManager()
 }
 
 //////////////////////////////////////////////////
-bool PresetManager::CurrentProfile(const std::string& _name)
+bool PresetManager::CurrentProfile(const std::string &_name)
 {
   if (_name == this->CurrentProfile())
     return true;
@@ -152,6 +158,7 @@ bool PresetManager::CurrentProfile(const std::string& _name)
     gzwarn << "Physics engine was NULL!" << std::endl;
     return false;
   }
+
   this->dataPtr->currentPreset = &(this->dataPtr->presetProfiles[_name]);
   bool result = true;
   for (auto it = this->CurrentPreset()->ParameterMap()->begin();
@@ -189,8 +196,8 @@ std::vector<std::string> PresetManager::AllProfiles() const
 }
 
 //////////////////////////////////////////////////
-bool PresetManager::SetProfileParam(const std::string& _profileName,
-    const std::string& _key, const boost::any &_value)
+bool PresetManager::SetProfileParam(const std::string &_profileName,
+    const std::string &_key, const boost::any &_value)
 {
   if (_profileName == this->CurrentProfile())
   {
@@ -207,7 +214,7 @@ bool PresetManager::SetProfileParam(const std::string& _profileName,
 
 //////////////////////////////////////////////////
 bool PresetManager::GetProfileParam(const std::string &_name,
-    const std::string& _key, boost::any &_value) const
+    const std::string &_key, boost::any &_value) const
 {
   return this->dataPtr->presetProfiles[_name].GetParam(_key, _value);
 }
@@ -227,7 +234,7 @@ bool PresetManager::SetCurrentProfileParam(const std::string& _key,
   {
     return this->dataPtr->physicsEngine->SetParam(_key, _value);
   }
-  catch(const boost::bad_any_cast& e)
+  catch(const boost::bad_any_cast &e)
   {
     gzerr << "Couldn't set physics engine parameter! " << e.what() << std::endl;
     return false;
@@ -236,7 +243,7 @@ bool PresetManager::SetCurrentProfileParam(const std::string& _key,
 }
 
 //////////////////////////////////////////////////
-bool PresetManager::GetCurrentProfileParam(const std::string& _key,
+bool PresetManager::GetCurrentProfileParam(const std::string &_key,
     boost::any &_value)
 {
   if (!this->CurrentPreset())
@@ -248,13 +255,14 @@ bool PresetManager::GetCurrentProfileParam(const std::string& _key,
 }
 
 //////////////////////////////////////////////////
-void PresetManager::CreateProfile(const std::string& _name)
+void PresetManager::CreateProfile(const std::string &_name)
 {
   if (_name.empty())
   {
     gzwarn << "Specified profile name was invalid. Aborting." << std::endl;
     return;
   }
+
   if (this->dataPtr->presetProfiles.find(_name) !=
       this->dataPtr->presetProfiles.end())
   {
@@ -272,6 +280,7 @@ std::string PresetManager::CreateProfile(sdf::ElementPtr _elem)
   {
     return "";
   }
+
   const std::string name = _elem->Get<std::string>("name");
   if (name.empty())
     return "";
@@ -282,7 +291,7 @@ std::string PresetManager::CreateProfile(sdf::ElementPtr _elem)
 }
 
 //////////////////////////////////////////////////
-void PresetManager::RemoveProfile(const std::string& _name)
+void PresetManager::RemoveProfile(const std::string &_name)
 {
   if (_name == this->CurrentProfile())
   {
@@ -351,9 +360,8 @@ boost::any GetAnySDFValue(const sdf::ElementPtr _elem)
   return ret;
 }
 
-
 //////////////////////////////////////////////////
-void PresetManager::GeneratePresetFromSDF(Preset* _preset,
+void PresetManager::GeneratePresetFromSDF(Preset *_preset,
     const sdf::ElementPtr _elem) const
 {
   if (!_preset || !_elem)
@@ -370,7 +378,7 @@ void PresetManager::GeneratePresetFromSDF(Preset* _preset,
 }
 
 //////////////////////////////////////////////////
-sdf::ElementPtr PresetManager::GenerateSDFFromPreset(Preset* _preset) const
+sdf::ElementPtr PresetManager::GenerateSDFFromPreset(Preset *_preset) const
 {
   sdf::ElementPtr elem(new sdf::Element);
   elem->SetName("physics");
@@ -393,7 +401,7 @@ sdf::ElementPtr PresetManager::GenerateSDFFromPreset(Preset* _preset) const
     {
       value = boost::any_cast<std::string>(param.second);
     }
-    catch(const boost::bad_any_cast& e)
+    catch(const boost::bad_any_cast &e)
     {
       gzwarn << "Bad cast of boost::any in GenerateSDFFromPreset" << std::endl;
       return elem;
@@ -406,8 +414,7 @@ sdf::ElementPtr PresetManager::GenerateSDFFromPreset(Preset* _preset) const
 }
 
 //////////////////////////////////////////////////
-Preset* PresetManager::CurrentPreset() const
+Preset *PresetManager::CurrentPreset() const
 {
   return this->dataPtr->currentPreset;
 }
-
