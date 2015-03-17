@@ -1675,7 +1675,7 @@ dxWorld * dWorldCreate()
   w->qs.w = REAL(1.3);
   w->qs.num_chunks = 1;
   w->qs.num_overlap = 0;
-  w->qs.sor_lcp_tolerance = -1;
+  w->qs.pgs_lcp_tolerance = -1;
   w->qs.rms_dlambda[0] = 0;
   w->qs.rms_dlambda[1] = 0;
   w->qs.rms_dlambda[2] = 0;
@@ -2204,13 +2204,13 @@ void dWorldSetMaxAngularSpeed(dWorldID w, dReal max_speed)
 double dWorldGetQuickStepTolerance (dWorldID w)
 {
 	dAASSERT(w);
-	return w->qs.sor_lcp_tolerance;
+	return w->qs.pgs_lcp_tolerance;
 }
 
 void dWorldSetQuickStepTolerance (dWorldID w, dReal tol)
 {
 	dAASSERT(w);
-	w->qs.sor_lcp_tolerance = tol;
+	w->qs.pgs_lcp_tolerance = tol;
 }
 
 void dWorldSetQuickStepNumChunks (dWorldID w, int num)

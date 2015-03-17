@@ -21,6 +21,7 @@
 #include <string>
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/SVGLoader.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Material.hh"
@@ -289,6 +290,9 @@ void ModelCreator::LoadSDF(sdf::ElementPtr _modelElem)
 
   // Model general info
   // Keep previewModel with previewName to avoid conflicts
+  if (_modelElem->HasAttribute("name"))
+    this->SetModelName(_modelElem->Get<std::string>("name"));
+
   if (_modelElem->HasElement("pose"))
     this->modelPose = _modelElem->Get<math::Pose>("pose");
   else
@@ -300,7 +304,7 @@ void ModelCreator::LoadSDF(sdf::ElementPtr _modelElem)
   if (_modelElem->HasElement("allow_auto_disable"))
     this->autoDisable = _modelElem->Get<bool>("allow_auto_disable");
   gui::model::Events::modelPropertiesChanged(this->isStatic, this->autoDisable,
-      this->modelPose);
+      this->modelPose, this->GetModelName());
 
   // Links
   if (!_modelElem->HasElement("link"))
@@ -551,7 +555,7 @@ void ModelCreator::AddJoint(const std::string &_type)
 /////////////////////////////////////////////////
 std::string ModelCreator::AddShape(LinkType _type,
     const math::Vector3 &_size, const math::Pose &_pose,
-    const std::string &_uri)
+    const std::string &_uri, unsigned int _samples)
 {
   if (!this->previewVisual)
   {
@@ -594,6 +598,65 @@ std::string ModelCreator::AddShape(LinkType _type,
     meshElem->GetElement("scale")->Set(_size);
     meshElem->GetElement("uri")->Set(_uri);
   }
+  else if (_type == LINK_POLYLINE)
+  {
+    QFileInfo info(QString::fromStdString(_uri));
+    if (!info.isFile() || info.completeSuffix().toLower() != "svg")
+    {
+      gzerr << "File [" << _uri << "] not found or invalid!" << std::endl;
+      return std::string();
+    }
+
+    common::SVGLoader svgLoader(_samples);
+    std::vector<common::SVGPath> paths;
+    svgLoader.Parse(_uri, paths);
+
+    if (paths.empty())
+    {
+      gzerr << "No paths found on file [" << _uri << "]" << std::endl;
+      return std::string();
+    }
+
+    // Find extreme values to center the polylines
+    math::Vector2d min(paths[0].polylines[0][0]);
+    math::Vector2d max(min);
+    for (common::SVGPath p : paths)
+    {
+      for (std::vector<math::Vector2d> poly : p.polylines)
+      {
+        for (math::Vector2d pt : poly)
+        {
+          if (pt.x < min.x)
+            min.x = pt.x;
+          if (pt.y < min.y)
+            min.y = pt.y;
+          if (pt.x > max.x)
+            max.x = pt.x;
+          if (pt.y > max.y)
+            max.y = pt.y;
+        }
+      }
+    }
+
+    for (common::SVGPath p : paths)
+    {
+      for (std::vector<math::Vector2d> poly : p.polylines)
+      {
+        sdf::ElementPtr polylineElem = geomElem->AddElement("polyline");
+        polylineElem->GetElement("height")->Set(_size.z);
+
+        for (math::Vector2d pt : poly)
+        {
+          // Translate to center
+          pt = pt - min - (max-min)*0.5;
+          // Swap X and Y so Z will point up
+          // (in 2D it points into the screen)
+          sdf::ElementPtr pointElem = polylineElem->AddElement("point");
+          pointElem->Set(math::Vector2d(pt.y*_size.y, pt.x*_size.x));
+        }
+      }
+    }
+  }
   else
   {
     if (_type != LINK_BOX)
@@ -611,7 +674,10 @@ std::string ModelCreator::AddShape(LinkType _type,
 
   // insert over ground plane for now
   math::Vector3 linkPos = linkVisual->GetWorldPose().pos;
-  linkPos.z = _size.z * 0.5;
+  if (_type == LINK_BOX || _type == LINK_CYLINDER || _type == LINK_SPHERE)
+  {
+    linkPos.z = _size.z * 0.5;
+  }
   // override orientation as it's more natural to insert objects upright rather
   // than inserting it in the model frame.
   linkVisual->SetWorldPose(math::Pose(linkPos, math::Quaternion()));
@@ -941,7 +1007,7 @@ void ModelCreator::Reset()
   this->isStatic = false;
   this->autoDisable = true;
   gui::model::Events::modelPropertiesChanged(this->isStatic, this->autoDisable,
-      this->modelPose);
+      this->modelPose, this->GetModelName());
 
   while (!this->allLinks.empty())
     this->RemoveLink(this->allLinks.begin()->first);
@@ -1501,6 +1567,14 @@ void ModelCreator::GenerateSDF()
     this->modelPose.pos = mid;
   }
 
+  // Update preview model and link poses in case they changed
+  for (auto &linksIt : this->allLinks)
+  {
+    this->previewVisual->SetWorldPose(this->modelPose);
+    LinkData *link = linksIt.second;
+    link->SetPose(link->linkVisual->GetWorldPose() - this->modelPose);
+    link->linkVisual->SetPose(link->GetPose());
+  }
 
   // generate canonical link sdf first.
   if (!this->canonicalLink.empty())
@@ -1738,4 +1812,9 @@ void ModelCreator::SetModelVisible(rendering::VisualPtr _visual, bool _visible)
       _visual->SetVisible(it->second, false);
     }
   }
+}
+/////////////////////////////////////////////////
+ModelCreator::SaveState ModelCreator::GetCurrentSaveState() const
+{
+  return this->currentSaveState;
 }

@@ -481,6 +481,14 @@ else()
 endif()
 
 ########################################
+# Find xsltproc, which is used by tools/check_test_ran.py
+find_program(XSLTPROC xsltproc)
+if (NOT EXISTS ${XSLTPROC})
+  BUILD_WARNING("xsltproc not found. The check_test_ran.py script will cause tests to fail.")
+endif()
+
+########################################
+# Find ignition math
 find_package(ignition-math QUIET)
 if (NOT ignition-math_FOUND)
   message(STATUS "Looking for ignition-math-config.cmake - not found")
@@ -488,7 +496,6 @@ if (NOT ignition-math_FOUND)
 else()
   message(STATUS "Looking for ignition-math-config.cmake - found")
 endif()
-
 
 ########################################
 # Find QWT (QT graphing library)

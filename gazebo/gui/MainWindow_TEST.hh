@@ -25,6 +25,12 @@ class MainWindow_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Test user camera entity selection
+  private slots: void Selection();
+
+  /// \brief Test user camera frames per second
+  private slots: void UserCameraFPS();
+
   /// \brief Test copying and pasting a model and a light
   private slots: void CopyPaste();
 
