@@ -25,7 +25,7 @@ int main()
 {
   // Construction
   gazebo::math::Angle gzAngle(0.1);
-  ignition::math::Angle ignVec(0.1);
+  ignition::math::Angle ignAngle(0.1);
 
   // Get
   std::cout << gzAngle.Radian() << std::endl;

@@ -588,8 +588,8 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
   this->animation->GetInterpolatedKeyFrame(kf);
 
   math::Pose offset;
-  offset.pos = kf.GetTranslation();
-  offset.rot = kf.GetRotation();
+  offset.pos = kf.Translation();
+  offset.rot = kf.Rotation();
 
   this->SetWorldPose(offset);
   this->prevAnimationTime = _info.simTime;

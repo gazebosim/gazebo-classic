@@ -26,7 +26,7 @@ int main()
   // Construction
   gazebo::math::Box gzBox(gazebo::math::Vector3(1, 2, 3),
                           gazebo::math::Vector3(4, 5, 6));
-  ignition::math::Box ignVec(1, 2, 3, 4, 5, 6);
+  ignition::math::Box ignBox(1, 2, 3, 4, 5, 6);
 
   // Get
   std::cout << gzBox.min << std::endl;

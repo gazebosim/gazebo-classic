@@ -69,43 +69,43 @@ namespace gazebo
 
       /// \brief Set the translation for the keyframe
       /// \param[in] _trans Translation amount
-      public: void SetTranslation(const ignition::math::Vector3d &_trans);
+      public: void Translation(const ignition::math::Vector3d &_trans);
 
       /// \brief Get the translation of the keyframe
       /// \return The translation amount
-      /// \deprecated See GetTranslationIgn
-      public: const math::Vector3 &GetTranslation() const
+      /// \deprecated See GetTranslation
+      public: math::Vector3 GetTranslation() const
               GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get the translation of the keyframe
       /// \return The translation amount
-      public: const ignition::math::Vector3d &GetTranslationIgn() const;
+      public: ignition::math::Vector3d Translation() const;
 
       /// \brief Set the rotation for the keyframe
       /// \param[in] _rot Rotation amount
-      /// \deprecated See function that uses ignition::math
+      /// \deprecated See Rotation function that uses ignition::math
       public: void SetRotation(const math::Quaternion &_rot)
               GAZEBO_DEPRECATED(6.0);
 
       /// \brief Set the rotation for the keyframe
       /// \param[in] _rot Rotation amount
-      public: void SetRotation(const ignition::math::Quaterniond &_rot);
+      public: void Rotation(const ignition::math::Quaterniond &_rot);
 
       /// \brief Get the rotation of the keyframe
       /// \return The rotation amount
-      /// \deprecated See GetRotationIgn
-      public: const math::Quaternion &GetRotation() const
+      /// \deprecated See Rotation
+      public: math::Quaternion GetRotation() const
               GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get the rotation of the keyframe
       /// \return The rotation amount
-      public: const ignition::math::Quaterniond &GetRotationIgn() const;
+      public: ignition::math::Quaterniond Rotation() const;
 
       /// \brief the translation vector
-      protected: math::Vector3 translate;
+      protected: ignition::math::Vector3d translate;
 
       /// \brief the rotation quaternion
-      protected: math::Quaternion rotate;
+      protected: ignition::math::Quaterniond rotate;
     };
 
     /// \brief A keyframe for a NumericAnimation

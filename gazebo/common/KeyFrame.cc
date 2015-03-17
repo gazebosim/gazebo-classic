@@ -37,7 +37,6 @@ double KeyFrame::GetTime() const
 }
 
 
-
 /////////////////////////////////////////////////
 PoseKeyFrame::PoseKeyFrame(double _time)
 : KeyFrame(_time)
@@ -52,49 +51,51 @@ PoseKeyFrame::~PoseKeyFrame()
 /////////////////////////////////////////////////
 void PoseKeyFrame::SetTranslation(const math::Vector3 &_trans)
 {
-  this->translate = _trans;
+  this->translate.Set(_trans.x, _trans.y, _trans.z);
 }
 
 /////////////////////////////////////////////////
-void PoseKeyFrame::SetTranslation(const ignition::math::Vector3d &_trans)
+void PoseKeyFrame::Translation(const ignition::math::Vector3d &_trans)
 {
   this->translate = _trans;
 }
 
 /////////////////////////////////////////////////
-const math::Vector3 &PoseKeyFrame::GetTranslation() const
+math::Vector3 PoseKeyFrame::GetTranslation() const
+{
+  return gazebo::math::Vector3(this->translate.X(), this->translate.Y(),
+                               this->translate.Z());
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d PoseKeyFrame::Translation() const
 {
   return this->translate;
 }
 
 /////////////////////////////////////////////////
-const ignition::math::Vector3d &PoseKeyFrame::GetTranslationIgn() const
-{
-  return this->translate.Ign();
-}
-
-/////////////////////////////////////////////////
 void PoseKeyFrame::SetRotation(const math::Quaternion &_rot)
 {
-  this->rotate = _rot;
+  this->rotate.Set(_rot.w, _rot.x, _rot.y, _rot.z);
 }
 
 /////////////////////////////////////////////////
-void PoseKeyFrame::SetRotation(const ignition::math::Quaterniond &_rot)
+void PoseKeyFrame::Rotation(const ignition::math::Quaterniond &_rot)
 {
   this->rotate = _rot;
 }
 
 /////////////////////////////////////////////////
-const math::Quaternion &PoseKeyFrame::GetRotation() const
+math::Quaternion PoseKeyFrame::GetRotation() const
+{
+  return gazebo::math::Quaternion(this->rotate.W(),
+      this->rotate.X(), this->rotate.Y(), this->rotate.Z());
+}
+
+/////////////////////////////////////////////////
+ignition::math::Quaterniond PoseKeyFrame::Rotation() const
 {
   return this->rotate;
-}
-
-/////////////////////////////////////////////////
-const ignition::math::Quaterniond &PoseKeyFrame::GetRotationIgn() const
-{
-  return this->rotate.Ign();
 }
 
 /////////////////////////////////////////////////
