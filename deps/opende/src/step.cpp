@@ -272,7 +272,7 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
     }
   }
 
-  h5dump_world("ode_frames.h5", world, stepsize);
+  h5dump_world("ode_frames.hdf5", world, stepsize);
   // get m = total constraint dimension, nub = number of unbounded variables.
   // create constraint offset array and number-of-rows array for all joints.
   // the constraints are re-ordered as follows: the purely unbounded
