@@ -75,6 +75,10 @@ namespace gazebo
 
       /// \brief Qt mouse release event.
       /// \param[in] _event Qt mouse event.
+      public: void SetTotalTime(QString _time);
+
+      /// \brief Qt mouse release event.
+      /// \param[in] _event Qt mouse event.
       public: void SetIterations(QString _time);
 
       /// \brief Qt mouse release event.

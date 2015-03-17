@@ -59,13 +59,16 @@ namespace gazebo
       public: QGraphicsPolygonItem *playItem;
 
       /// \brief TODO
-      public: QGraphicsSimpleTextItem *playText;
+      public: QGraphicsPolygonItem *pauseItem;
 
       /// \brief TODO
-      public: QGraphicsSimpleTextItem *stepText;
+      public: QGraphicsPathItem *stepItem;
 
       /// \brief TODO
       public: QGraphicsSimpleTextItem *timeText;
+
+      /// \brief TODO
+      public: QGraphicsSimpleTextItem *totalTimeText;
 
       /// \brief TODO
       public: QGraphicsSimpleTextItem *itText;
