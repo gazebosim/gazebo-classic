@@ -659,10 +659,17 @@ void OculusCamera::Oculus()
         matRight->getTechnique(0)->getPass(0)->getVertexProgramParameters();
     }
 
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR  >= 9
     params->setNamedConstant("eyeToSourceUVScale",
         Ogre::Vector2(uvScaleOffset[0].x, uvScaleOffset[0].y));
     params->setNamedConstant("eyeToSourceUVOffset",
         Ogre::Vector2(uvScaleOffset[1].x, uvScaleOffset[1].y));
+#else
+    params->setNamedConstant("eyeToSourceUVScale",
+        Ogre::Vector4(uvScaleOffset[0].x, uvScaleOffset[0].y, 0, 0));
+    params->setNamedConstant("eyeToSourceUVOffset",
+        Ogre::Vector4(uvScaleOffset[1].x, uvScaleOffset[1].y, 0, 0));
+#endif
 
     // create ManualObject
     // TODO: Destroy the manual objects!!
