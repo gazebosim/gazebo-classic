@@ -56,6 +56,9 @@ namespace gazebo
       public: transport::NodePtr node;
 
       /// \brief TODO
+      public: QGraphicsPolygonItem *playItem;
+
+      /// \brief TODO
       public: QGraphicsSimpleTextItem *playText;
 
       /// \brief TODO

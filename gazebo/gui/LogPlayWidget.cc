@@ -118,6 +118,18 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
   this->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
   // Add items
+  QVector<QPointF> playPts;
+  playPts.push_back(QPointF(0, 0));
+  playPts.push_back(QPointF(1, 0));
+  playPts.push_back(QPointF(1, 1));
+  this->dataPtr->playItem = new QGraphicsPolygonItem(QPolygonF(playPts));
+  this->dataPtr->playItem->setPen(QPen(Qt::red, 3, Qt::SolidLine));
+  graphicsScene->addItem(this->dataPtr->playItem);
+
+
+
+
+
   this->dataPtr->playText = graphicsScene->addSimpleText("Pause");
 
   this->dataPtr->stepText = graphicsScene->addSimpleText("Step");
