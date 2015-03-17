@@ -89,6 +89,12 @@ app.get('/',
 
     res.write('<body onload="fillEventList()">');
     res.write(' <h1>' + all_events.length + ' events</h1>');
+    colors = ['LightGrey', 'LightGreen'];
+    for (var i=0; i < all_events.length; i++)
+    {
+      var s = JSON.stringify(all_events[i]);
+      res.write('<div>' + i + '</div><div style="background:' + colors[i%2] + '">' + s + '</div>');
+    }
     res.write(' <div id="list"/>'); 
     res.write('</body>');
     res.end('</html>');
@@ -98,8 +104,9 @@ app.post('/events/new',
   passport.authenticate('basic', { session: false }),
   function(req, res){
    console.log("-----\nNEW EVENT:\n\n" + util.inspect(req.body));
-   all_events.push(req.body);    
-   res.jsonp({ username: req.user.username, email: req.user.email, Event: req.body });
+   var r = { username: req.user.username, Event: req.body };
+   all_events.push(r);    
+   res.jsonp(r);
   });
 
 app.use(express.static(__dirname));
