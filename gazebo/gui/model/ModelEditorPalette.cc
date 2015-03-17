@@ -243,7 +243,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->connections.push_back(
       gui::model::Events::ConnectModelPropertiesChanged(
       boost::bind(&ModelEditorPalette::OnModelPropertiesChanged, this, _1, _2,
-      _3)));
+      _3, _4)));
 
   this->connections.push_back(
       gui::model::Events::ConnectLinkInserted(
@@ -375,10 +375,12 @@ void ModelEditorPalette::OnStatic()
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnModelPropertiesChanged(
-  bool _static, bool _autoDisable, const math::Pose &/*_pose*/)
+    bool _static, bool _autoDisable, const math::Pose &/*_pose*/,
+    const std::string &_name)
 {
   this->staticCheck->setChecked(_static);
   this->autoDisableCheck->setChecked(_autoDisable);
+  this->modelNameEdit->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////

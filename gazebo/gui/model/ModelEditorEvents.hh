@@ -279,8 +279,9 @@ namespace gazebo
         public: static event::EventT<void (std::string)> modelNameChanged;
 
         /// \brief Notify that model properties have been changed.
-        public: static event::EventT<void (bool, bool, const math::Pose &)>
-            modelPropertiesChanged;
+        // The properties are: is_static, auto_disable, pose, name
+        public: static event::EventT<void (bool, bool, const math::Pose &,
+            const std::string &)> modelPropertiesChanged;
 
         /// \brief Notify that model has been saved.
         public: static event::EventT<void (std::string)> saveModel;

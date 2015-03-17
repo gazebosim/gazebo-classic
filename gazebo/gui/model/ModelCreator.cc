@@ -294,6 +294,9 @@ void ModelCreator::LoadSDF(sdf::ElementPtr _modelElem)
 
   // Model general info
   // Keep previewModel with previewName to avoid conflicts
+  if (_modelElem->HasAttribute("name"))
+    this->SetModelName(_modelElem->Get<std::string>("name"));
+
   if (_modelElem->HasElement("pose"))
     this->modelPose = _modelElem->Get<math::Pose>("pose");
   else
@@ -305,7 +308,7 @@ void ModelCreator::LoadSDF(sdf::ElementPtr _modelElem)
   if (_modelElem->HasElement("allow_auto_disable"))
     this->autoDisable = _modelElem->Get<bool>("allow_auto_disable");
   gui::model::Events::modelPropertiesChanged(this->isStatic, this->autoDisable,
-      this->modelPose);
+      this->modelPose, this->GetModelName());
 
   // Links
   if (!_modelElem->HasElement("link"))
@@ -1016,7 +1019,7 @@ void ModelCreator::Reset()
   this->isStatic = false;
   this->autoDisable = true;
   gui::model::Events::modelPropertiesChanged(this->isStatic, this->autoDisable,
-      this->modelPose);
+      this->modelPose, this->GetModelName());
 
   while (!this->allLinks.empty())
     this->RemoveLink(this->allLinks.begin()->first);
