@@ -407,13 +407,13 @@ sdf::ElementPtr PresetManager::GenerateSDFFromPreset(Preset *_preset) const
   nameParam->Set(_preset->Name());
 
   for (auto param = _preset->ParameterMapBegin();
-     it != _preset->ParameterMapEnd(); ++it)
+     param != _preset->ParameterMapEnd(); ++param)
   {
-    std::string key = param.first;
+    std::string key = param->first;
     std::string value;
     try
     {
-      value = boost::any_cast<std::string>(param.second);
+      value = boost::any_cast<std::string>(param->second);
     }
     catch(const boost::bad_any_cast &e)
     {
