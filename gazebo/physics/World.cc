@@ -349,8 +349,8 @@ void World::Init()
   // Initialize the physics engine
   this->dataPtr->physicsEngine->Init();
 
-  this->dataPtr->presetManager = PresetManagerPtr(new PresetManager(this->dataPtr->physicsEngine,
-      this->dataPtr->sdf));
+  this->dataPtr->presetManager = PresetManagerPtr(
+      new PresetManager(this->dataPtr->physicsEngine, this->dataPtr->sdf));
 
   this->dataPtr->testRay = boost::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
