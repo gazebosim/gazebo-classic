@@ -867,6 +867,7 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
   rendering::ScenePtr scene = link->linkVisual->GetScene();
   scene->AddVisual(link->linkVisual);
 
+  gui::model::Events::linkAdded(leafName);
   this->ModelChanged();
 }
 
@@ -912,6 +913,11 @@ void ModelCreator::RemoveLink(const std::string &_linkName)
     delete link;
   }
 
+  std::string leafName = _linkName;
+  size_t idx = _linkName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+1);
+  gui::model::Events::linkRemoved(leafName);
   this->ModelChanged();
 }
 
@@ -1212,6 +1218,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     {
       LinkData *link = this->allLinks[this->mouseVisual->GetName()];
       link->SetPose(this->mouseVisual->GetWorldPose()-this->modelPose);
+      gui::model::Events::linkAdded(link->GetName());
     }
 
     // reset and return
