@@ -25,6 +25,7 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/LogPlayWidget.hh"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/RenderWidget.hh"
 
@@ -140,14 +141,16 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
 
-  this->timePanel = new TimePanel(this);
+  // this->timePanel = new TimePanel(this);
+  this->logPlayWidget = new LogPlayWidget(this);
 
   this->bottomFrame = new QFrame;
   this->bottomFrame->setObjectName("renderBottomFrame");
   this->bottomFrame->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Minimum);
 
-  bottomPanelLayout->addWidget(this->timePanel, 0);
+  // bottomPanelLayout->addWidget(this->timePanel, 0);
+  bottomPanelLayout->addWidget(this->logPlayWidget, 0);
   bottomPanelLayout->setSpacing(0);
   bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
   this->bottomFrame->setLayout(bottomPanelLayout);
