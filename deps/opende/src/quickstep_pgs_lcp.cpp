@@ -35,6 +35,7 @@
 #include "quickstep_pgs_lcp.h"
 
 using namespace ode;
+ 
 using namespace quickstep;
 static void ComputeRows(
 #ifdef SHOW_CONVERGENCE
