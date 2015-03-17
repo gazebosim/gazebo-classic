@@ -40,9 +40,9 @@ namespace gazebo
       /// \param[in] _url Label the title of the url (ex: super webservice url)
       /// \param[in] _default Url text for the url (ex: https://superweb.com)
       public: RestUiLoginDialog(QWidget *_parent,
-                              const char* _title,
-                              const char* _urlLabel,
-                              const char* _defautlUrl);
+                              const std::string &_title,
+                              const std::string &_urlLabel,
+                              const std::string &_defautlUrl);
 
       /// \brief Emitted when the user presses the login button
       /// \param[in] _url The web server url
@@ -51,6 +51,15 @@ namespace gazebo
       signals: void acceptLogin(QString &_url,
                                 QString& _username,
                                 QString& _password);
+
+      /// \brief Getter for User name (of the basic auth REST service)
+      public: std::string getUsername();
+
+      /// \brief Getter for the password
+      public: std::string getPassword();
+
+      /// \brief Getter for the Url (https)
+      public: std::string getUrl();
 
       /// slot for the AcceptLogin event
       public slots: void slotAcceptLogin();
@@ -79,20 +88,14 @@ namespace gazebo
       /// \brief The standard dialog buttons
       private: QDialogButtonBox *buttons;
 
-      /// \brief Getter for User name (of the basic auth REST service)
-      public: std::string getUsername() {return username;}
+      /// \brief The username
+      private: std::string username;
 
-      /// \brief Getter for the password
-      public: std::string getPassword() {return password;}
+      /// \brief The user password
+      private: std::string password;
 
-      /// \brief Getter for the Url (https)
-      public: std::string getUrl() {return url;}
-
-      private:
-        /// \brief login information
-        std::string username;
-        std::string password;
-        std::string url;
+      /// \brief The web server url
+      private: std::string url;
     };
   }
 }

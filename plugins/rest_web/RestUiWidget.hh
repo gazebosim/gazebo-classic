@@ -34,16 +34,16 @@ namespace gazebo
 
     /// \brief ctor
     public: RestUiWidget(QWidget *_parent,
-                         const char* _menuTitle,
-                         const char* _title,
-                         const char* _urlLabel,
-                         const char* _defautlUrl);
+                         const std::string &_menuTitle,
+                         const std::string &_title,
+                         const std::string &_urlLabel,
+                         const std::string &_defautlUrl);
 
     /// \brief dtor
     public: virtual ~RestUiWidget();
 
-    /// \brief QT callback (MOOC/Login menu)
-    public slots: void LoginMOOC();
+    /// \brief QT callback (from the login menu)
+    public slots: void Login();
 
     /// \brief called before rendering, from the GUI thread
     /// this is called from the plugin's update

@@ -90,10 +90,6 @@ namespace gazebo
     private: std::list< boost::shared_ptr<const gazebo::msgs::RestLogin> >
               msgLoginQ;
 
-    /// \brief a list to accumulate pending request
-    private: std::list< boost::shared_ptr<const gazebo::msgs::RestPost> >
-              msgEventQ;
-
     /// \brief a thread to process requests without stopping the simulation
     private: boost::thread *requestQThread;
 

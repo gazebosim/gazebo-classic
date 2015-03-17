@@ -37,14 +37,14 @@ namespace gazebo
     public: virtual ~RestApi();
 
     /// \brief Connects to the Rest service.
-    /// \param[in] _url the web service url
-    /// \param[in] _user the user name
-    /// \param[in] _pass the user password
-    /// \returns message from the REST server
-    public: std::string Login(const char* _url,
-                              const char* _route,
-                              const char* _user,
-                              const char* _pass);
+    /// \param[in] _url The web service url
+    /// \param[in] _user The user name
+    /// \param[in] _pass The user password
+    /// \return The response message from the REST server
+    public: std::string Login(const std::string &_url,
+                              const std::string &_route,
+                              const std::string &_user,
+                              const std::string &_pass);
 
     /// \brief Notify the service with a http POST
     /// \param[in] _route on the web server
@@ -52,13 +52,15 @@ namespace gazebo
     public: void PostJsonData(const char* _route, const char *_json);
 
     /// \brief Returns the username
+    /// \return The user name
     public: std::string GetUser();
 
     /// \brief a Request/Respone (can be used for GET and POST)
-    /// \param[in] the request
-    /// \return the response
-    private: std::string Request(const char* _request,
-                                 const char *_postStr = NULL);
+    /// \param[in] _requestUrl The request url.
+    /// \param[in] _postStr The data to post
+    /// \return The web server response
+    private: std::string Request(const std::string &_requestUrl,
+                                 const std::string &_postStr);
 
     /// \brief Login information: Rest service host url
     private: std::string url;

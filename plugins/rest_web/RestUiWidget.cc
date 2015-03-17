@@ -20,14 +20,13 @@
 #include "RestUiWidget.hh"
 
 using namespace gazebo;
-using namespace std;
 
 /////////////////////////////////////////////////
 RestUiWidget::RestUiWidget(QWidget *_parent,
-                            const char* _menuTitle,
-                            const char* _loginTitle,
-                            const char* _urlLabel,
-                            const char* _defautlUrl)
+                            const std::string &_menuTitle,
+                            const std::string &_loginTitle,
+                            const std::string &_urlLabel,
+                            const std::string &_defautlUrl)
   : QWidget(_parent),
     title(_menuTitle),
     node(new gazebo::transport::Node()),
@@ -45,11 +44,11 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
 /////////////////////////////////////////////////
 RestUiWidget::~RestUiWidget()
 {
-  cout << "RestUiWidget::~RestUiWidget()" << endl;
+  // no clean up necessary
 }
 
 /////////////////////////////////////////////////
-void RestUiWidget::LoginMOOC()
+void RestUiWidget::Login()
 {
   if (dialog.exec() != QDialog::Rejected)
   {
@@ -64,9 +63,9 @@ void RestUiWidget::LoginMOOC()
 /////////////////////////////////////////////////
 void RestUiWidget::OnResponse(ConstRestErrorPtr &_msg )
 {
-  gzerr << "Error received:" << endl;
-  gzerr << " type: " << _msg->type() << endl;
-  gzerr << " msg:  " << _msg->msg() << endl;
+  gzerr << "Error received:" << std::endl;
+  gzerr << " type: " << _msg->type() << std::endl;
+  gzerr << " msg:  " << _msg->msg() << std::endl;
 
   // add msg to queue for later processing from
   // the GUI thread
@@ -74,6 +73,7 @@ void RestUiWidget::OnResponse(ConstRestErrorPtr &_msg )
   msgRespQ.push_back(_msg);
 }
 
+/////////////////////////////////////////////////
 void  RestUiWidget::Update()
 {
   // Login problem?
@@ -81,7 +81,7 @@ void  RestUiWidget::Update()
   {
     ConstRestErrorPtr msg = msgRespQ.front();
     msgRespQ.pop_front();
-    if (msg->type().c_str() == string("Error"))
+    if (msg->type() == "Error")
     {
       QMessageBox::critical(this,
                             tr(this->title.c_str()),

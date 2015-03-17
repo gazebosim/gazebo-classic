@@ -26,21 +26,20 @@
 
 using namespace gazebo;
 using namespace gui;
-using namespace std;
 
 
 /////////////////////////////////////////////////
 RestUiLoginDialog::RestUiLoginDialog(QWidget *_parent,
-                                     const char* _title,
-                                     const char* _urlLabel,
-                                     const char* _defaultUrl)
-    : QDialog(_parent), url(_defaultUrl)
+                                     const std::string &_title,
+                                     const std::string &_urlLabel,
+                                     const std::string &_defaultUrl)
+    : QDialog(_parent), url(_defaultUrl.c_str())
 {
-  setWindowTitle(tr(_title));
+  setWindowTitle(tr(_title.c_str()));
   setModal(true);
 
   labelUrl = new QLabel(this);
-  labelUrl->setText(tr(_urlLabel));
+  labelUrl->setText(tr(_urlLabel.c_str()));
   editUrl = new QLineEdit(this);
   editUrl->setText(tr(url.c_str()));
   editUrl->setFixedWidth(400);
@@ -89,6 +88,24 @@ RestUiLoginDialog::RestUiLoginDialog(QWidget *_parent,
           SIGNAL(clicked()),
           this,
           SLOT(slotAcceptLogin()));
+}
+
+/////////////////////////////////////////////////
+std::string RestUiLoginDialog::getUsername()
+{
+  return this->username;
+}
+
+/////////////////////////////////////////////////
+std::string RestUiLoginDialog::getPassword()
+{
+  return this->password;
+}
+
+/////////////////////////////////////////////////
+std::string RestUiLoginDialog::getUrl()
+{
+  return this->url;
 }
 
 /////////////////////////////////////////////////

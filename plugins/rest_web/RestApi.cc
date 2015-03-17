@@ -199,19 +199,21 @@ void RestApi::PostJsonData(const char* _route, const char *_json)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string RestApi::Login(const char* _urlStr,
-                           const char* _route,
-                           const char* _userStr,
-                           const char* _passStr)
+std::string RestApi::Login(const std::string &_urlStr,
+                           const std::string &_route,
+                           const std::string &_userStr,
+                           const std::string &_passStr)
 {
   this->isLoggedIn = false;
   this->url = _urlStr;
   this->user = _userStr;
   this->pass = _passStr;
 
+  // at this point we want to test the (user supplied) login data
+  // so we're hitting the server on the login route ('/login')
   this->loginRoute = _route;
   gzmsg << "login route: " << this->loginRoute << "\n";
-  std::string resp = this->Request(loginRoute.c_str());
+  std::string resp = this->Request(loginRoute, "");
   gzmsg << "login response: " << resp << "\n";
 
   this->isLoggedIn = true;
@@ -247,17 +249,18 @@ std::string RestApi::GetUser()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
+std::string RestApi::Request(const std::string &_reqUrl,
+                             const std::string &_postJsonStr)
 {
-  using namespace std;
-
   if (this->url.empty())
     throw RestException("A URL must be specified for web service");
+
   if (this->user.empty())
   {
     std::string e = "No user specified for the web service. Please login.";
     throw RestException(e.c_str());
   }
+  // build full url (with server)
   std::string path = url + _reqUrl;
   CURL *curl = curl_easy_init();
   curl_easy_setopt(curl, CURLOPT_URL, path.c_str() );
@@ -305,7 +308,7 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
 
   // set user name and password for the authentication
   curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-  string userpass = this->user + ":" + this->pass;
+  std::string userpass = this->user + ":" + this->pass;
   curl_easy_setopt(curl, CURLOPT_USERPWD, userpass.c_str());
 
   // connection timeout 10 sec
@@ -313,11 +316,11 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
 
   // is this a POST?
   struct curl_slist *slist = NULL;
-  if (_postJsonStr)
+  if (!_postJsonStr.empty())
   {
     curl_easy_setopt(curl, CURLOPT_UPLOAD, 0L);  // disable PUT
     curl_easy_setopt(curl, CURLOPT_POST, 1);  // enable POST
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, _postJsonStr);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, _postJsonStr.c_str());
 
     slist = curl_slist_append(slist, "Content-Type: application/json");
     slist = curl_slist_append(slist, "charsets: utf-8");
@@ -336,7 +339,7 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
   if (res != CURLE_OK)
   {
     gzerr << "Request to " << url << " failed: ";
-    gzerr << curl_easy_strerror(res) << endl;
+    gzerr << curl_easy_strerror(res) << std::endl;
     throw RestException(curl_easy_strerror(res));
   }
   // copy the data into a string
@@ -344,7 +347,7 @@ std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
 
   if (http_code != 200)
   {
-    gzerr << "Request to " << url << " error: " << response << endl;
+    gzerr << "Request to " << url << " error: " << response << std::endl;
     throw RestException(response.c_str());
   }
   // clean up

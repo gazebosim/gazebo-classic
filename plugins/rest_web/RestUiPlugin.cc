@@ -65,7 +65,7 @@ void RestUiPlugin::Load(int _argc, char ** _argv)
   }
   gzmsg << "   menu title: " << this->menuTitle  << std::endl;
   gzmsg << "   Login window title: " << this->loginTitle  << std::endl;
-  gzmsg << "   Login window label: " << this->label  << std::endl;
+  gzmsg << "   Login window label: " << this->urlLabel  << std::endl;
   gzmsg << "   Web servide URL: " << this->defaultUrl  << std::endl;
 }
 

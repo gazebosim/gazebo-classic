@@ -306,7 +306,7 @@ void RestWebPlugin::ProcessRestPostEvent(ConstRestPostPtr _msg)
 void RestWebPlugin::RunRequestQ()
 {
   // be ready to send errors back to the UI
-  pub = node->Advertise<gazebo::msgs::RestError>("/gazebo/event/rest_error");
+  this->pub = node->Advertise<gazebo::msgs::RestError>("/gazebo/event/rest_error");
   // process any login or post data that ha been received
   while (!stopMsgProcessing)
   {
@@ -314,8 +314,7 @@ void RestWebPlugin::RunRequestQ()
     try
     {
       boost::shared_ptr<const gazebo::msgs::RestLogin> login;
-      boost::shared_ptr<const gazebo::msgs::RestPost> post;
-      // Grab the mutex and remove first message in each queue
+      // Grab the mutex and remove first message the queue
       {
         boost::mutex::scoped_lock lock(this->requestQMutex);
         if (!msgLoginQ.empty())
@@ -323,19 +322,10 @@ void RestWebPlugin::RunRequestQ()
           login = msgLoginQ.front();
           msgLoginQ.pop_front();
         }
-        if (!msgEventQ.empty())
-        {
-          post = msgEventQ.front();
-          msgEventQ.pop_front();
-        }
       }
       if (login)
       {
         this->ProcessLoginRequest(login);
-      }
-      if (post)
-      {
-        this->ProcessRestPostEvent(post);
       }
     }
     catch(...)
