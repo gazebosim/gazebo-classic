@@ -35,9 +35,6 @@ namespace gazebo
       /// \brief Subscriber to the statistics topic.
       public: transport::SubscriberPtr statsSub;
 
-      /// \brief Used to start, stop, and step simulation.
-      public: transport::PublisherPtr worldControlPub;
-
       /// \brief Event based connections.
       public: std::vector<event::ConnectionPtr> connections;
 
@@ -55,6 +52,9 @@ namespace gazebo
     /// \brief Private data for the LogPlayView class
     class LogPlayViewPrivate
     {
+      /// \brief Node used for communication.
+      public: transport::NodePtr node;
+
       /// \brief TODO
       public: QGraphicsSimpleTextItem *playText;
 
@@ -66,6 +66,9 @@ namespace gazebo
 
       /// \brief TODO
       public: QGraphicsSimpleTextItem *itText;
+
+      /// \brief Used to start, stop, and step simulation.
+      public: transport::PublisherPtr worldControlPub;
     };
   }
 }

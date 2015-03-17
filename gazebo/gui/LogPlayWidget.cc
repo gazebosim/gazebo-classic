@@ -46,8 +46,6 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 
   this->dataPtr->statsSub =
     this->dataPtr->node->Subscribe("~/world_stats", &LogPlayWidget::OnStats, this);
-  this->dataPtr->worldControlPub =
-    this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
 
   this->show();
 }
@@ -65,18 +63,8 @@ void LogPlayWidget::OnStats(ConstWorldStatisticsPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
 
-  if (_msg->paused() && (g_playAct && !g_playAct->isVisible()))
-  {
-    g_playAct->setVisible(true);
-    g_pauseAct->setVisible(false);
-  }
-  else if (!_msg->paused() && (g_pauseAct && !g_pauseAct->isVisible()))
-  {
-    g_pauseAct->setVisible(true);
-    g_playAct->setVisible(false);
-  }
-
   // Set paused state
+  this->dataPtr->view->SetPaused(_msg->paused());
 
   // Set simulation time
   this->dataPtr->view->SetTime(QString::fromStdString(FormatTime(_msg->sim_time())));
@@ -127,9 +115,10 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
   graphicsScene->setBackgroundBrush(Qt::white);
   this->setScene(graphicsScene);
   this->setMinimumWidth(200);
+  this->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
   // Add items
-  this->dataPtr->playText = graphicsScene->addSimpleText("Play");
+  this->dataPtr->playText = graphicsScene->addSimpleText("Pause");
 
   this->dataPtr->stepText = graphicsScene->addSimpleText("Step");
   this->dataPtr->playText->setPos(-100, 0);
@@ -139,6 +128,13 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
 
   this->dataPtr->itText = graphicsScene->addSimpleText("0");
   this->dataPtr->itText->setPos(100, 0);
+
+  // Publisher
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+
+  this->dataPtr->worldControlPub =
+    this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
 }
 
 /////////////////////////////////////////////////
@@ -148,23 +144,24 @@ void LogPlayView::mouseReleaseEvent(QMouseEvent *_event)
       this->scene()->itemAt(this->mapToScene(_event->pos()));
   if (mouseItem)
   {
+    msgs::WorldControl msg;
+
     if (mouseItem == this->dataPtr->playText)
     {
       if (this->dataPtr->playText->text() == "Play")
       {
-        g_playAct->trigger();
-        this->dataPtr->playText->setText("Pause");
+        msg.set_pause(false);
       }
       else
       {
-        g_pauseAct->trigger();
-        this->dataPtr->playText->setText("Play");
+        msg.set_pause(true);
       }
     }
     else if (mouseItem == this->dataPtr->stepText)
     {
-      g_stepAct->trigger();
+      msg.set_multi_step(1);
     }
+    this->dataPtr->worldControlPub->Publish(msg);
   }
   QGraphicsView::mouseReleaseEvent(_event);
 }
@@ -180,3 +177,17 @@ void LogPlayView::SetIterations(QString _it)
 {
   this->dataPtr->itText->setText(_it);
 }
+
+/////////////////////////////////////////////////
+void LogPlayView::SetPaused(bool _paused)
+{
+  if (_paused)
+  {
+    this->dataPtr->playText->setText("Play");
+  }
+  else
+  {
+    this->dataPtr->playText->setText("Pause");
+  }
+}
+

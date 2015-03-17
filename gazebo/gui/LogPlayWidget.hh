@@ -79,6 +79,10 @@ namespace gazebo
 
       /// \brief Qt mouse release event.
       /// \param[in] _event Qt mouse event.
+      public: void SetPaused(bool _paused);
+
+      /// \brief Qt mouse release event.
+      /// \param[in] _event Qt mouse event.
       private: void mouseReleaseEvent(QMouseEvent *_event);
 
       /// \internal
