@@ -181,8 +181,16 @@ endif()
 
 #####################################
 # Handle CFlags
-unset (CMAKE_C_FLAGS_ALL CACHE)
-unset (CMAKE_CXX_FLAGS CACHE)
+# USE_UPSTREAM_CFLAGS (default TRUE)
+if(NOT DEFINED USE_UPSTREAM_CFLAGS)
+    set (USE_UPSTREAM_CFLAGS True)
+endif()
+
+if(USE_UPSTREAM_CFLAGS)
+  # clean up previous defined flags
+  unset (CMAKE_C_FLAGS_ALL CACHE)
+  unset (CMAKE_CXX_FLAGS CACHE)
+endif()
 
 # USE_HOST_CFLAGS (default TRUE)
 # Will check building host machine for proper cflags
@@ -191,9 +199,10 @@ if(NOT DEFINED USE_HOST_CFLAGS OR USE_HOST_CFLAGS)
   include (${gazebo_cmake_dir}/HostCFlags.cmake)
 endif()
 
-# USE_UPSTREAM_CFLAGS (default TRUE)
 # Will use predefined gazebo developers cflags
-if(NOT DEFINED USE_UPSTREAM_CFLAGS OR USE_UPSTREAM_CFLAGS)
+# this needs to be called after HostCFlags 
+if(USE_UPSTREAM_CFLAGS)
+  # use gazebo own set of flags
   message(STATUS "Enable upstream CFlags")
   include(${gazebo_cmake_dir}/DefaultCFlags.cmake)
 endif()
