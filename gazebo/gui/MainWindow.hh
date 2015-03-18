@@ -72,6 +72,10 @@ namespace gazebo
       /// \return A pointer to the render widget.
       public: RenderWidget *GetRenderWidget() const;
 
+      /// \brief Returns the state of the simulation, true if paused.
+      /// \return True if paused, false otherwise.
+      public: bool IsPaused() const;
+
       /// \brief Play simulation.
       public slots: void Play();
 
@@ -200,9 +204,6 @@ namespace gazebo
       /// \brief Create menus.
       private: void CreateMenus();
 
-      /// \brief Create the toolbars.
-      private: void CreateToolbars();
-
       /// \brief Create the main menu bar.
       private: void CreateMenuBar();
 
@@ -226,7 +227,6 @@ namespace gazebo
       private: void OnManipMode(const std::string &_mode);
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
-      private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
       /// \brief Handle event for changing the manual step size.
       /// \param[in] _value New input step size.
