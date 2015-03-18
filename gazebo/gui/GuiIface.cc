@@ -321,6 +321,7 @@ std::string gui::get_world()
 void gui::set_active_camera(rendering::UserCameraPtr _cam)
 {
   g_active_camera = _cam;
+  std::cerr << " set active cam "  << std::endl;
 }
 
 /////////////////////////////////////////////////

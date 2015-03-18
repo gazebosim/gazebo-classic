@@ -187,6 +187,7 @@ bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
 /////////////////////////////////////////////////
 void GLWidget::showEvent(QShowEvent *_event)
 {
+  std::cerr << " show event " << std::endl;
   QApplication::flush();
 
   if (this->windowId < 0)
@@ -203,6 +204,7 @@ void GLWidget::showEvent(QShowEvent *_event)
   QWidget::showEvent(_event);
 
   this->setFocus();
+  std::cerr << " done show event " << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -228,34 +230,51 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   // Timing may cause GLWidget to miss the OnCreateScene event. So, we check
   // here to make sure it's handled.
   if (!this->sceneCreated && rendering::get_scene())
+  {
     this->OnCreateScene(rendering::get_scene()->GetName());
+    std::cerr << "paint on create scene " << std::endl;
+  }
 
-  rendering::UserCameraPtr cam = gui::get_active_camera();
+//  rendering::UserCameraPtr cam = gui::get_active_camera();
+  rendering::UserCameraPtr cam = this->userCamera;
+    
+  std::cerr << " paint cam " << std::endl;
   if (cam && cam->GetInitialized())
   {
+  std::cerr << " prerender " << std::endl;
     event::Events::preRender();
 
+  std::cerr << " prerender done " << std::endl;
     // Tell all the cameras to render
     event::Events::render();
 
+  std::cerr << " render done " << std::endl;
     event::Events::postRender();
+
+  std::cerr << " post render done " << std::endl;
   }
 
   _e->accept();
+
+  std::cerr << "done paint " << std::endl;
 }
 
 /////////////////////////////////////////////////
 void GLWidget::resizeEvent(QResizeEvent *_e)
 {
+  std::cerr << "resize " << std::endl;
+ 
   if (!this->scene)
     return;
 
   if (this->windowId >= 0)
   {
+  std::cerr << "resizing window " << std::endl;
     rendering::RenderEngine::Instance()->GetWindowManager()->Resize(
         this->windowId, _e->size().width(), _e->size().height());
     this->userCamera->Resize(_e->size().width(), _e->size().height());
   }
+  std::cerr << "done resize " << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -722,7 +741,10 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
     gzerr << "Unable to connect to a running Gazebo master.\n";
 
   if (_scene->GetUserCameraCount() == 0)
+  {
     this->userCamera = _scene->CreateUserCamera(cameraName);
+    std::cerr << " create user camera " << std::endl;
+  }
   else
     this->userCamera = _scene->GetUserCamera(0);
 

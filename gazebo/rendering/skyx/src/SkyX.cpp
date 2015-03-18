@@ -86,8 +86,8 @@ namespace SkyX
 
     mGPUManager->_notifySkydomeMaterialChanged();
 
-    mMeshManager->create();
     mMeshManager->setMaterialName(mGPUManager->getSkydomeMaterialName());
+    mMeshManager->create();
 
     mAtmosphereManager->_update(mAtmosphereManager->getOptions(), true);
 

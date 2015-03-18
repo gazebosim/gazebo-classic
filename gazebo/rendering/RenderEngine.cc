@@ -565,22 +565,23 @@ void RenderEngine::SetupResources()
 
   for (iter = paths.begin(); iter != paths.end(); ++iter)
   {
+    boost::filesystem::path gzPath(*iter);
     DIR *dir;
-    if ((dir = opendir((*iter).c_str())) == NULL)
+    if ((dir = opendir(gzPath.string().c_str())) == NULL)
     {
       continue;
     }
     closedir(dir);
 
     archNames.push_back(
-        std::make_pair((*iter)+"/", "General"));
+        std::make_pair(gzPath.string(), "General"));
 
     for (std::list<std::string>::iterator mediaIter = mediaDirs.begin();
          mediaIter != mediaDirs.end(); ++mediaIter)
     {
-      std::string prefix = (*iter) + "/" + (*mediaIter);
+      boost::filesystem::path p = gzPath / (*mediaIter);
 
-      boost::filesystem::path p(prefix);
+      //boost::filesystem::path p(prefix);
 
       archNames.push_back(
           std::make_pair(p.string(), "General"));

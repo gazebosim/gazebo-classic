@@ -401,6 +401,7 @@ void Camera::Render(bool _force)
 //////////////////////////////////////////////////
 void Camera::RenderImpl()
 {
+  std::cerr << " camera render imp " << std::endl;
   if (this->renderTarget)
   {
     this->renderTarget->update();
@@ -1702,6 +1703,7 @@ void Camera::AnimationComplete()
 //////////////////////////////////////////////////
 bool Camera::GetInitialized() const
 {
+  std::cerr << "cam get init " << this->GetName() <<  " " << this->scene << std::endl;
   return this->initialized && this->scene->GetInitialized();
 }
 

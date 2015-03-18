@@ -312,7 +312,7 @@ void Scene::Init()
   // message must be received (via a scene message or on the ~/sky topic).
   try
   {
-    this->SetSky();
+    // this->SetSky();
   }
   catch(...)
   {
@@ -344,6 +344,7 @@ void Scene::Init()
 
   Road2d *road = new Road2d();
   road->Load(this->worldVisual);
+  std::cerr << "scene init " << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -1481,6 +1482,7 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 //////////////////////////////////////////////////
 bool Scene::ProcessModelMsg(const msgs::Model &_msg)
 {
+  std::cerr << "scene proc msg " << std::endl;
   std::string modelName, linkName;
 
   modelName = _msg.name() + "::";
@@ -1592,6 +1594,7 @@ void Scene::OnVisualMsg(ConstVisualPtr &_msg)
 //////////////////////////////////////////////////
 void Scene::PreRender()
 {
+  std::cerr << "scene prerender " << std::endl;
   /* Deferred shading debug code. Delete me soon (July 17, 2012)
   static bool first = true;
 
@@ -1689,11 +1692,14 @@ void Scene::PreRender()
   // Process the scene messages. DO THIS FIRST
   for (sIter = sceneMsgsCopy.begin(); sIter != sceneMsgsCopy.end();)
   {
+    std::cerr << " got scene msg " << std::endl;
     if (this->ProcessSceneMsg(*sIter))
     {
+      std::cerr << " proc scene msg " << std::endl;
       if (!this->initialized)
         RTShaderSystem::Instance()->UpdateShaders();
       this->initialized = true;
+      std::cerr << " scene init!!!" << std::endl;
       sceneMsgsCopy.erase(sIter++);
     }
     else
