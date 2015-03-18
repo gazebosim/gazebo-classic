@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include "gazebo/gazebo_config.h"
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -391,6 +393,10 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
       {
         this->bulletSlider->setPoweredLinMotor(true);
         this->bulletSlider->setTargetLinMotorVelocity(0.0);
+#ifdef LIBBULLET_VERSION_GT_282
+        this->bulletSlider->setMaxLinMotorForce(
+          boost::any_cast<double>(_value));
+#else
         // there is an upstream bug in bullet 2.82 and earlier
         // the maxLinMotorForce parameter is inadvertently divided
         // by timestep when attempting to compute an impulse in
@@ -401,6 +407,7 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
         double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
         this->bulletSlider->setMaxLinMotorForce(
           dt*dt * boost::any_cast<double>(_value));
+#endif
       }
       else
       {
@@ -436,6 +443,9 @@ double BulletSliderJoint::GetParam(const std::string &_key, unsigned int _index)
   {
     if (this->bulletSlider)
     {
+#ifdef LIBBULLET_VERSION_GT_282
+      return this->bulletSlider->getMaxLinMotorForce();
+#else
       // there is an upstream bug in bullet 2.82 and earlier
       // the maxLinMotorForce parameter is inadvertently divided
       // by timestep when attempting to compute an impulse in
@@ -445,6 +455,7 @@ double BulletSliderJoint::GetParam(const std::string &_key, unsigned int _index)
       // parameter by dt^2 when getting
       double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
       return this->bulletSlider->getMaxLinMotorForce() / (dt*dt);
+#endif
     }
     else
     {

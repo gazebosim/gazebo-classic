@@ -20,6 +20,7 @@
 #cmakedefine HAVE_FFMPEG 1
 #cmakedefine ENABLE_SHADOWS 1
 #cmakedefine HAVE_BULLET 1
+#cmakedefine LIBBULLET_VERSION_GT_282 1
 #cmakedefine HAVE_SIMBODY 1
 #cmakedefine HAVE_DART 1
 #cmakedefine INCLUDE_RTSHADER 1
