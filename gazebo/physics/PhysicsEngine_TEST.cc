@@ -112,6 +112,8 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
 
   {
     // Test SetParam for non-implementation-specific parameters
+    physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+    boost::any value;
     double maxStepSize = 0.02;
     double realTimeUpdateRate = 0.03;
     double realTimeFactor = 0.04;
@@ -119,27 +121,27 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
     gazebo::math::Vector3 magneticField(0.1, 0.1, 0.1);
     try
     {
-      EXPECT_TRUE(odePhysics->SetParam("max_step_size", maxStepSize));
-      EXPECT_TRUE(odePhysics->GetParam("max_step_size", value));
+      EXPECT_TRUE(physics->SetParam("max_step_size", maxStepSize));
+      EXPECT_TRUE(physics->GetParam("max_step_size", value));
       EXPECT_NEAR(boost::any_cast<double>(value), maxStepSize, 1e-6);
-      EXPECT_TRUE(odePhysics->SetParam("real_time_update_rate",
+      EXPECT_TRUE(physics->SetParam("real_time_update_rate",
           realTimeUpdateRate));
-      EXPECT_TRUE(odePhysics->GetParam("real_time_update_rate", value));
+      EXPECT_TRUE(physics->GetParam("real_time_update_rate", value));
       EXPECT_NEAR(boost::any_cast<double>(value), realTimeUpdateRate, 1e-6);
-      EXPECT_TRUE(odePhysics->SetParam("real_time_factor",
+      EXPECT_TRUE(physics->SetParam("real_time_factor",
           realTimeFactor));
-      EXPECT_TRUE(odePhysics->GetParam("real_time_factor", value));
+      EXPECT_TRUE(physics->GetParam("real_time_factor", value));
       EXPECT_NEAR(boost::any_cast<double>(value), realTimeFactor, 1e-6);
-      EXPECT_TRUE(odePhysics->SetParam("gravity", gravity));
-      EXPECT_TRUE(odePhysics->GetParam("gravity", value));
+      EXPECT_TRUE(physics->SetParam("gravity", gravity));
+      EXPECT_TRUE(physics->GetParam("gravity", value));
       EXPECT_EQ(boost::any_cast<gazebo::math::Vector3>(value), gravity);
-      EXPECT_TRUE(odePhysics->SetParam("magnetic_field", magneticField));
-      EXPECT_TRUE(odePhysics->GetParam("magnetic_field", value));
+      EXPECT_TRUE(physics->SetParam("magnetic_field", magneticField));
+      EXPECT_TRUE(physics->GetParam("magnetic_field", value));
       EXPECT_EQ(boost::any_cast<gazebo::math::Vector3>(value), magneticField);
     }
     catch(boost::bad_any_cast &_e)
     {
-      std::cout << "Bad any_cast in ODEPhysics::GetParam test: " << _e.what()
+      std::cout << "Bad any_cast in PhysicsEngine::SetParam test: " << _e.what()
                 << std::endl;
       FAIL();
     }
