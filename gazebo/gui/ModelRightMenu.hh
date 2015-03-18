@@ -63,6 +63,16 @@ namespace gazebo
       public: void Run(const std::string &_modelName, const QPoint &_pt,
           EntityTypes _type = MODEL);
 
+      /// \brief Show the right menu with extra menu options.
+      /// \param[in] _modelName Name of the model that is active.
+      /// \param[in] _pt Point on the GUI that has received the right-click
+      /// request.
+      /// \param[in] _customActions Additional menu items to be shown.
+      /// \param[in] _type Type of the entity clicked.
+      public: void Run(const std::string &_modelName, const QPoint &_pt,
+          const std::vector<QAction *> &_customActions,
+          EntityTypes _type = MODEL);
+
       /// \brief QT callback when move to has been selected.
       private slots: void OnMoveTo();
 

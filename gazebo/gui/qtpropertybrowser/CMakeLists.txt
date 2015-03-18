@@ -1,7 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include ( ${QT_USE_FILE} )
 
-set (sources qtpropertybrowser.cpp 
+set (sources qtpropertybrowser.cpp
              qtpropertymanager.cpp
              qteditorfactory.cpp
              qtvariantproperty.cpp
@@ -9,9 +9,9 @@ set (sources qtpropertybrowser.cpp
              qtbuttonpropertybrowser.cpp
              qtgroupboxpropertybrowser.cpp
              qtpropertybrowserutils.cpp
- ) 
+ )
 
-set (qt_headers qtpropertybrowser.h 
+set (qt_headers qtpropertybrowser.h
                 qtpropertymanager.h
                 qteditorfactory.h
                 qtvariantproperty.h

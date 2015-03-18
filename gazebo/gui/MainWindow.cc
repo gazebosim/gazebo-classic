@@ -114,7 +114,6 @@ MainWindow::MainWindow()
   this->AddToLeftColumn("default", this->tabWidget);
 
   this->toolsWidget = new ToolsWidget();
-
   this->renderWidget = new RenderWidget(mainWidget);
 
   this->CreateEditors();
@@ -1780,6 +1779,12 @@ void MainWindow::CreateDisabledIcon(const std::string &_pixmap, QAction *_act)
   p.drawPixmap(0, 0, pixmap);
   icon.addPixmap(disabledPixmap, QIcon::Disabled);
   _act->setIcon(icon);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::AddMenu(QMenu *_menu)
+{
+  this->menuBar->addMenu(_menu);
 }
 
 /////////////////////////////////////////////////

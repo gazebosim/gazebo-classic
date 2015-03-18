@@ -65,3 +65,5 @@ target_link_libraries(gazebo_gui_model
   gazebo_msgs)
 
 gz_install_library(gazebo_gui_model)
+gz_install_includes("gui/model" ${headers})
+

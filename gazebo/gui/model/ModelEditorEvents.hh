@@ -163,6 +163,58 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { newModel.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the link added signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectLinkAdded(T _subscriber)
+          { return linkAdded.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the link added signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectLinkAdded(
+            event::ConnectionPtr _subscriber)
+          { linkAdded.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the link removed signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectLinkRemoved(T _subscriber)
+          { return linkRemoved.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the link removed signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectLinkRemoved(
+            event::ConnectionPtr _subscriber)
+          { linkRemoved.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the joint added signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectJointAdded(T _subscriber)
+          { return jointAdded.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the joint added signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectJointAdded(
+            event::ConnectionPtr _subscriber)
+          { jointAdded.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the joint removed signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectJointRemoved(T _subscriber)
+          { return jointRemoved.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the joint removed signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectJointRemoved(
+            event::ConnectionPtr _subscriber)
+          { jointRemoved.Disconnect(_subscriber); }
+
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishModel;
 
@@ -194,6 +246,20 @@ namespace gazebo
 
         /// \brief Notify that model has been newed.
         public: static event::EventT<void ()> newModel;
+
+        /// \brief A new link has been added to the model.
+        public: static event::EventT<void (std::string)> linkAdded;
+
+        /// \brief A link has been removed from the model.
+        public: static event::EventT<void (std::string)> linkRemoved;
+
+        /// \brief A new joint has been added to the model.
+        public: static event::EventT<void (std::string, std::string)>
+            jointAdded;
+
+        /// \brief A joint has been removed from the model.
+        public: static event::EventT<void (std::string, std::string)>
+            jointRemoved;
       };
     }
   }

@@ -35,7 +35,6 @@ class QPushButton;
 class QtTreePropertyBrowser;
 class QtVariantPropertyManager;
 class QtProperty;
-class QtTreePropertyItem;
 class QtBrowserItem;
 class QtVariantEditorFactory;
 

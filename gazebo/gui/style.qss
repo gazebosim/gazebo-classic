@@ -500,10 +500,9 @@ QTabBar::tab:!selected
   margin-top: 2px;
 }
 
-QTabWidget#mainTab::pane,
-QTabWidget#buildingEditorTab::pane,
-QTabWidget#modelEditorTab::pane,
-QTabWidget#terrainEditorTab::pane,
+
+QTabWidget::pane,
+QTabWidget#mainTab::pane
 QTabWidget#linkInspectorTab::pane
 {
   border-left: 1px solid #101010;
@@ -697,6 +696,11 @@ QwtScaleWidget
 {
   color: white;
   font-size: 11px;
+}
+
+QRadioButton::indicator
+{
+  color: #d0d0d0;
 }
 
 #configWidget

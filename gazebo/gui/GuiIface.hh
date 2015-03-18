@@ -29,6 +29,7 @@ namespace gazebo
   namespace gui
   {
     class MainWindow;
+    class ModelRightMenu;
 
     /// \brief Load the graphical interface.
     /// \return True on success.
@@ -63,6 +64,9 @@ namespace gazebo
     unsigned int get_entity_id(const std::string &_name);
     GAZEBO_VISIBLE
     bool has_entity_name(const std::string &_name);
+
+    GAZEBO_VISIBLE
+    ModelRightMenu *get_context_menu();
 
     /// \brief Locate and load the INI configuration file.
     /// If the GAZEBO_GUI_INI_FILE environment variable is set and contains
