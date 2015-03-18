@@ -473,10 +473,15 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
       // select model
       vis = rootVis;
     }
-    else if (vis->GetParent() != rootVis)
+    else if (vis->GetParent() != rootVis &&
+        vis->GetParent() != this->dataPtr->scene->GetWorldVisual())
     {
       // select link
       vis = vis->GetParent();
+    }
+    else
+    {
+      // select light
     }
 
     this->dataPtr->mouseMoveVisStartPose = vis->GetWorldPose();
