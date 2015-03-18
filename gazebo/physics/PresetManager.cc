@@ -63,7 +63,7 @@ void Preset::Name(const std::string &_name)
 //////////////////////////////////////////////////
 bool Preset::HasParam(const std::string &_key) const
 {
-  return (this->dataPtr->parameterMap.find(_key) ==
+  return (this->dataPtr->parameterMap.find(_key) !=
       this->dataPtr->parameterMap.end());
 }
 
