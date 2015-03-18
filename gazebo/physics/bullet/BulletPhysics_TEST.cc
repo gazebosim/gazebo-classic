@@ -120,7 +120,6 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
 
   int maxContacts = 32;
   double minStepSize = 32.32;
-  double maxStepSize = 3232.32;
 
   bulletPhysics->SetParam("solver_type", type);
   bulletPhysics->SetParam("iters", iters);
@@ -175,7 +174,7 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   EXPECT_DOUBLE_EQ(minStepSize, minStepSizeRet);
 
   // Test SetParam for non-Bullet-specific parameters
-  double maxStepSize = 0.02;
+  double maxStepSize = 3232.32;
   double realTimeUpdateRate = 0.03;
   double realTimeFactor = 0.04;
   gazebo::math::Vector3 gravity(0, 0, 0);
@@ -203,7 +202,7 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   catch(boost::bad_any_cast &_e)
   {
     std::cout << "Bad any_cast in BulletPhysics::GetParam test" << _e.what()
-              << std::endl; 
+              << std::endl;
     FAIL();
   }
 }
