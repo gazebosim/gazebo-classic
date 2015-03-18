@@ -134,7 +134,6 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   EXPECT_TRUE(odePhysics->SetParam("contact_surface_layer",
                                     contactSurfaceLayer));
 
-
   value = odePhysics->GetParam("solver_type");
   typeRet = boost::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
@@ -169,39 +168,6 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   EXPECT_DOUBLE_EQ(contactMaxCorrectingVel,
       odePhysics->GetContactMaxCorrectingVel());
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, odePhysics->GetContactSurfaceLayer());
-
-  // Test SetParam for non-ODE-specific parameters
-  double maxStepSize = 0.02;
-  double realTimeUpdateRate = 0.03;
-  double realTimeFactor = 0.04;
-  gazebo::math::Vector3 gravity(0, 0, 0);
-  gazebo::math::Vector3 magneticField(0.1, 0.1, 0.1);
-  try
-  {
-    EXPECT_TRUE(odePhysics->SetParam("max_step_size", maxStepSize));
-    EXPECT_TRUE(odePhysics->GetParam("max_step_size", value));
-    EXPECT_NEAR(boost::any_cast<double>(value), maxStepSize, 1e-6);
-    EXPECT_TRUE(odePhysics->SetParam("real_time_update_rate",
-        realTimeUpdateRate));
-    EXPECT_TRUE(odePhysics->GetParam("real_time_update_rate", value));
-    EXPECT_NEAR(boost::any_cast<double>(value), realTimeUpdateRate, 1e-6);
-    EXPECT_TRUE(odePhysics->SetParam("real_time_factor",
-        realTimeFactor));
-    EXPECT_TRUE(odePhysics->GetParam("real_time_factor", value));
-    EXPECT_NEAR(boost::any_cast<double>(value), realTimeFactor, 1e-6);
-    EXPECT_TRUE(odePhysics->SetParam("gravity", gravity));
-    EXPECT_TRUE(odePhysics->GetParam("gravity", value));
-    EXPECT_EQ(boost::any_cast<gazebo::math::Vector3>(value), gravity);
-    EXPECT_TRUE(odePhysics->SetParam("magnetic_field", magneticField));
-    EXPECT_TRUE(odePhysics->GetParam("magnetic_field", value));
-    EXPECT_EQ(boost::any_cast<gazebo::math::Vector3>(value), magneticField);
-  }
-  catch(boost::bad_any_cast &_e)
-  {
-    std::cout << "Bad any_cast in ODEPhysics::GetParam test: " << _e.what()
-              << std::endl;
-    FAIL();
-  }
 }
 
 /////////////////////////////////////////////////
@@ -238,7 +204,8 @@ void ODEPhysics_TEST::PhysicsMsgParam()
 
   physicsPubMsg.set_enable_physics(true);
   physicsPubMsg.set_max_step_size(0.001);
-  physicsPubMsg.set_real_time_update_rate(800); physicsPubMsg.set_real_time_factor(1.1);
+  physicsPubMsg.set_real_time_update_rate(800);
+  physicsPubMsg.set_real_time_factor(1.1);
   physicsPubMsg.set_iters(60);
   physicsPubMsg.set_sor(1.5);
   physicsPubMsg.set_cfm(0.1);
