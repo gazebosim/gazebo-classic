@@ -198,7 +198,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   }
   catch(boost::bad_any_cast &_e)
   {
-    std::cout << "Bad any_cast in BulletPhysics::GetParam test" << _e.what()
+    std::cout << "Bad any_cast in ODEPhysics::GetParam test: " << _e.what()
               << std::endl;
     FAIL();
   }
@@ -238,8 +238,7 @@ void ODEPhysics_TEST::PhysicsMsgParam()
 
   physicsPubMsg.set_enable_physics(true);
   physicsPubMsg.set_max_step_size(0.001);
-  physicsPubMsg.set_real_time_update_rate(800);
-  physicsPubMsg.set_real_time_factor(1.1);
+  physicsPubMsg.set_real_time_update_rate(800); physicsPubMsg.set_real_time_factor(1.1);
   physicsPubMsg.set_iters(60);
   physicsPubMsg.set_sor(1.5);
   physicsPubMsg.set_cfm(0.1);

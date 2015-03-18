@@ -201,7 +201,7 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   }
   catch(boost::bad_any_cast &_e)
   {
-    std::cout << "Bad any_cast in BulletPhysics::GetParam test" << _e.what()
+    std::cout << "Bad any_cast in BulletPhysics::GetParam test: " << _e.what()
               << std::endl;
     FAIL();
   }
