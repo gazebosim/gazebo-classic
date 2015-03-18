@@ -165,19 +165,14 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
 
   int maxContactsRet;
   double minStepSizeRet;
-  double maxStepSizeRet;
   bulletPhysics->SetParam("max_contacts", maxContacts);
   bulletPhysics->SetParam("min_step_size", minStepSize);
-  bulletPhysics->SetParam("max_step_size", maxStepSize);
   value = bulletPhysics->GetParam("max_contacts");
   maxContactsRet = boost::any_cast<int>(value);
   EXPECT_DOUBLE_EQ(maxContacts, maxContactsRet);
   value = bulletPhysics->GetParam("min_step_size");
   minStepSizeRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(minStepSize, minStepSizeRet);
-  value = bulletPhysics->GetParam("max_step_size");
-  maxStepSizeRet = boost::any_cast<double>(value);
-  EXPECT_DOUBLE_EQ(maxStepSize, maxStepSizeRet);
 
   // Test SetParam for non-Bullet-specific parameters
   double maxStepSize = 0.02;
@@ -185,15 +180,32 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   double realTimeFactor = 0.04;
   gazebo::math::Vector3 gravity(0, 0, 0);
   gazebo::math::Vector3 magneticField(0.1, 0.1, 0.1);
-  EXPECT_TRUE(bulletPhysics->SetParam("max_step_size", maxStepSize));
-  EXPECT_EQ(bulletPhysics->GetParam("max_step_size"), maxStepSize);
-  EXPECT_TRUE(bulletPhysics->SetParam("real_time_update_rate",
-      realTimeUpdateRate));
-  EXPECT_EQ(bulletPhysics->GetParam("real_time_update_rate", realTimeUpdateRate));
-  EXPECT_TRUE(bulletPhysics->SetParam("gravity", gravity));
-  EXPECT_EQ(bulletPhysics->GetParam("gravity"), gravity);
-  EXPECT_TRUE(bulletPhysics->SetParam("magnetic_field", magneticField));
-  EXPECT_EQ(bulletPhysics->GetParam("magnetic_field"), magneticField);
+  try
+  {
+    EXPECT_TRUE(bulletPhysics->SetParam("max_step_size", maxStepSize));
+    EXPECT_TRUE(bulletPhysics->GetParam("max_step_size", value));
+    EXPECT_NEAR(boost::any_cast<double>(value), maxStepSize, 1e-6);
+    EXPECT_TRUE(bulletPhysics->SetParam("real_time_update_rate",
+        realTimeUpdateRate));
+    EXPECT_TRUE(bulletPhysics->GetParam("real_time_update_rate", value));
+    EXPECT_NEAR(boost::any_cast<double>(value), realTimeUpdateRate, 1e-6);
+    EXPECT_TRUE(bulletPhysics->SetParam("real_time_factor",
+        realTimeFactor));
+    EXPECT_TRUE(bulletPhysics->GetParam("real_time_factor", value));
+    EXPECT_NEAR(boost::any_cast<double>(value), realTimeFactor, 1e-6);
+    EXPECT_TRUE(bulletPhysics->SetParam("gravity", gravity));
+    EXPECT_TRUE(bulletPhysics->GetParam("gravity", value));
+    EXPECT_EQ(boost::any_cast<gazebo::math::Vector3>(value), gravity);
+    EXPECT_TRUE(bulletPhysics->SetParam("magnetic_field", magneticField));
+    EXPECT_TRUE(bulletPhysics->GetParam("magnetic_field", value));
+    EXPECT_EQ(boost::any_cast<gazebo::math::Vector3>(value), magneticField);
+  }
+  catch(boost::bad_any_cast &_e)
+  {
+    std::cout << "Bad any_cast in BulletPhysics::GetParam test" << _e.what()
+              << std::endl; 
+    FAIL();
+  }
 }
 
 /////////////////////////////////////////////////
