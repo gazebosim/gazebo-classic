@@ -178,6 +178,22 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   value = bulletPhysics->GetParam("max_step_size");
   maxStepSizeRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(maxStepSize, maxStepSizeRet);
+
+  // Test SetParam for non-Bullet-specific parameters
+  double maxStepSize = 0.02;
+  double realTimeUpdateRate = 0.03;
+  double realTimeFactor = 0.04;
+  gazebo::math::Vector3 gravity(0, 0, 0);
+  gazebo::math::Vector3 magneticField(0.1, 0.1, 0.1);
+  EXPECT_TRUE(bulletPhysics->SetParam("max_step_size", maxStepSize));
+  EXPECT_EQ(bulletPhysics->GetParam("max_step_size"), maxStepSize);
+  EXPECT_TRUE(bulletPhysics->SetParam("real_time_update_rate",
+      realTimeUpdateRate));
+  EXPECT_EQ(bulletPhysics->GetParam("real_time_update_rate", realTimeUpdateRate));
+  EXPECT_TRUE(bulletPhysics->SetParam("gravity", gravity));
+  EXPECT_EQ(bulletPhysics->GetParam("gravity"), gravity);
+  EXPECT_TRUE(bulletPhysics->SetParam("magnetic_field", magneticField));
+  EXPECT_EQ(bulletPhysics->GetParam("magnetic_field"), magneticField);
 }
 
 /////////////////////////////////////////////////

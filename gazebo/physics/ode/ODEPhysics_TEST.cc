@@ -134,6 +134,22 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   EXPECT_TRUE(odePhysics->SetParam("contact_surface_layer",
                                     contactSurfaceLayer));
 
+  // Test SetParam for non-ODE-specific parameters
+  double maxStepSize = 0.02;
+  double realTimeUpdateRate = 0.03;
+  double realTimeFactor = 0.04;
+  gazebo::math::Vector3 gravity(0, 0, 0);
+  gazebo::math::Vector3 magneticField(0.1, 0.1, 0.1);
+  EXPECT_TRUE(odePhysics->SetParam("max_step_size", maxStepSize));
+  EXPECT_EQ(odePhysics->GetParam("max_step_size"), maxStepSize);
+  EXPECT_TRUE(odePhysics->SetParam("real_time_update_rate",
+      realTimeUpdateRate));
+  EXPECT_EQ(odePhysics->GetParam("real_time_update_rate", realTimeUpdateRate));
+  EXPECT_TRUE(odePhysics->SetParam("gravity", gravity));
+  EXPECT_EQ(odePhysics->GetParam("gravity"), gravity);
+  EXPECT_TRUE(odePhysics->SetParam("magnetic_field", magneticField));
+  EXPECT_EQ(odePhysics->GetParam("magnetic_field"), magneticField);
+
   value = odePhysics->GetParam("solver_type");
   typeRet = boost::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
