@@ -522,7 +522,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     if (rootVis->IsPlane())
       this->hoverVis = vis->GetParent();
     else if (!gui::get_entity_id(rootVis->GetName()) &&
-        vis->GetName().find("_HOTSPOT_") == std::string::npos)
+        vis->GetName().find("_UNIQUE_ID_") == std::string::npos)
     {
       this->hoverVis = vis->GetParent();
       if (!this->selectedVis ||
