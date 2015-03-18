@@ -92,8 +92,9 @@ app.get('/',
     colors = ['LightGrey', 'LightGreen'];
     for (var i=0; i < all_events.length; i++)
     {
-      var s = JSON.stringify(all_events[i]);
-      res.write('<div>' + i + '</div><div style="background:' + colors[i%2] + '">' + s + '</div>');
+      // get a nice formatted string for display
+      var s = JSON.stringify(all_events[i], null, "  ");
+      res.write('<div>' + i + '</div><pre style="background:' + colors[i%2] + '">' + s + '</pre>');
     }
     res.write(' <div id="list"/>'); 
     res.write('</body>');

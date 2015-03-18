@@ -306,7 +306,8 @@ void RestWebPlugin::ProcessRestPostEvent(ConstRestPostPtr _msg)
 void RestWebPlugin::RunRequestQ()
 {
   // be ready to send errors back to the UI
-  this->pub = node->Advertise<gazebo::msgs::RestError>("/gazebo/event/rest_error");
+  std::string path("/gazebo/event/rest_error");
+  this->pub = node->Advertise<gazebo::msgs::RestError>(path);
   // process any login or post data that ha been received
   while (!stopMsgProcessing)
   {

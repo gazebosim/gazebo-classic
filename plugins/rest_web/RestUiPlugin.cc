@@ -108,7 +108,7 @@ void RestUiPlugin::OnMainWindowReady()
                             this->loginTitle.c_str(),
                             this->urlLabel.c_str(),
                             this->defaultUrl.c_str());
-  QObject::connect(loginAct, SIGNAL(triggered()), widget, SLOT(LoginMOOC()));
+  QObject::connect(loginAct, SIGNAL(triggered()), widget, SLOT(Login()));
   menu->addAction(loginAct);
   mainWindow->AddMenu(menu);
 }
