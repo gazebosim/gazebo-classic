@@ -251,6 +251,7 @@ bool PhysicsEngine::SetParam(const std::string &_key,
   {
     gzerr << "Caught bad any_cast in PhysicsEngine::SetParam: " << _e.what()
           << std::endl;
+    return false;
   }
   return true;
 }
