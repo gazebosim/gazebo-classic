@@ -69,6 +69,15 @@ namespace gazebo
       /// \param[in] _show True to show the fps widget.
       public: void ShowFPS(bool _show);
 
+      /// \brief Returns if the simulation is displayed as paused.
+      /// \return True if paused, false otherwise.
+      public: bool IsPaused() const;
+
+      /// \brief Set whether to display the simulation as paused.
+      /// \param[in] _p True to display the simulation as paused. False
+      /// indicates the simulation is running
+      public: void SetPaused(bool _paused);
+
       /// \brief A signal used to set the sim time line edit.
       /// \param[in] _string String representation of sim time.
       signals: void SetSimTime(QString _string);
@@ -166,6 +175,9 @@ namespace gazebo
 
       /// \brief Action associated with the step button in the toolbar.
       private: QAction *stepButtonAction;
+
+      /// \brief Paused state of the simulation.
+      private: bool paused;
     };
   }
 }
