@@ -151,10 +151,10 @@ void JointMaker::DisableEventHandlers()
 }
 
 /////////////////////////////////////////////////
-void JointMaker::RemoveJoint(const std::string &_jointName)
+void JointMaker::RemoveJoint(const std::string &_jointId)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  auto jointIt = this->joints.find(_jointName);
+  auto jointIt = this->joints.find(_jointId);
   if (jointIt != this->joints.end())
   {
     JointData *joint = jointIt->second;
@@ -187,7 +187,7 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
     delete joint;
     this->joints.erase(jointIt);
     gui::model::Events::modelChanged();
-    gui::model::Events::jointRemoved(_jointName);
+    gui::model::Events::jointRemoved(_jointId);
   }
 }
 
@@ -195,15 +195,14 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
 void JointMaker::RemoveJointsByLink(const std::string &_linkName)
 {
   std::vector<std::string> toDelete;
-  boost::unordered_map<std::string, JointData *>::iterator it;
-  for (it = this->joints.begin(); it != this->joints.end(); ++it)
+  for (auto it : this->joints)
   {
-    JointData *joint = it->second;
+    JointData *joint = it.second;
 
     if (joint->child->GetName() == _linkName ||
         joint->parent->GetName() == _linkName)
     {
-      toDelete.push_back(it->first);
+      toDelete.push_back(it.first);
     }
   }
 
@@ -575,12 +574,12 @@ void JointMaker::OnOpenInspector()
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OpenInspector(const std::string &_name)
+void JointMaker::OpenInspector(const std::string &_jointId)
 {
-  JointData *joint = this->joints[_name];
+  JointData *joint = this->joints[_jointId];
   if (!joint)
   {
-    gzerr << "Joint [" << _name << "] not found." << std::endl;
+    gzerr << "Joint [" << _jointId << "] not found." << std::endl;
     return;
   }
   joint->OpenInspector();
@@ -626,16 +625,17 @@ void JointMaker::CreateHotSpot(JointData *_joint)
 
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
-  std::string hotSpotName = _joint->visual->GetName() + "_HOTSPOT_";
+  // Joint hotspot visual name is the JointId for easy access when clicking
+  std::string jointId = _joint->visual->GetName() + "_UNIQUE_ID_";
   rendering::VisualPtr hotspotVisual(
-      new rendering::Visual(hotSpotName, _joint->visual, false));
+      new rendering::Visual(jointId, _joint->visual, false));
 
   // create a cylinder to represent the joint
   hotspotVisual->InsertMesh("unit_cylinder");
   Ogre::MovableObject *hotspotObj =
       (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
       _joint->visual->GetName(), "unit_cylinder"));
-  hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(hotSpotName));
+  hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(jointId));
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial(this->jointMaterials[_joint->type]);
   hotspotVisual->SetTransparency(0.5);
@@ -665,11 +665,11 @@ void JointMaker::CreateHotSpot(JointData *_joint)
       GZ_VISIBILITY_SELECTABLE);
   hotspotVisual->GetSceneNode()->setInheritScale(false);
 
-  this->joints[hotSpotName] = _joint;
+  this->joints[jointId] = _joint;
   camera->GetScene()->AddVisual(hotspotVisual);
 
   _joint->hotspot = hotspotVisual;
-  gui::model::Events::jointInserted(hotSpotName);
+  gui::model::Events::jointInserted(jointId, _joint->name);
 }
 
 /////////////////////////////////////////////////

@@ -251,7 +251,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   this->connections.push_back(
       gui::model::Events::ConnectJointInserted(
-      boost::bind(&ModelEditorPalette::OnJointInserted, this, _1)));
+      boost::bind(&ModelEditorPalette::OnJointInserted, this, _1, _2)));
 
   this->connections.push_back(
       gui::model::Events::ConnectLinkRemoved(
@@ -461,25 +461,18 @@ void ModelEditorPalette::OnLinkInserted(const std::string &_linkName)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnJointInserted(const std::string &_jointName)
+void ModelEditorPalette::OnJointInserted(const std::string &_jointId,
+    const std::string &_jointName)
 {
   std::string leafName = _jointName;
-  size_t begin = _jointName.find_last_of("::");
-  size_t end = _jointName.find("_HOTSPOT_");
-
-  if (begin == std::string::npos)
-    begin == 0;
-  else
-    begin += 1;
-  if (end == std::string::npos)
-    end == _jointName.length() - 1;
-
-  leafName = _jointName.substr(begin, end - begin);
+  size_t idx = _jointName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _jointName.substr(idx+1);
 
   QTreeWidgetItem *newJointItem = new QTreeWidgetItem(this->jointsItem,
       QStringList(QString("%1").arg(QString::fromStdString(leafName))));
 
-  newJointItem->setData(0, Qt::UserRole, _jointName.c_str());
+  newJointItem->setData(0, Qt::UserRole, _jointId.c_str());
   newJointItem->setData(1, Qt::UserRole, "Joint");
   this->modelTreeWidget->addTopLevelItem(newJointItem);
 
@@ -487,7 +480,7 @@ void ModelEditorPalette::OnJointInserted(const std::string &_jointName)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnLinkRemoved(const std::string &_linkName)
+void ModelEditorPalette::OnLinkRemoved(const std::string &_linkId)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   for (int i = 0; i < this->linksItem->childCount(); ++i)
@@ -497,7 +490,7 @@ void ModelEditorPalette::OnLinkRemoved(const std::string &_linkName)
       continue;
     std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
 
-    if (listData == _linkName)
+    if (listData == _linkId)
     {
       this->linksItem->takeChild(this->linksItem->indexOfChild(item));
       break;
@@ -506,7 +499,7 @@ void ModelEditorPalette::OnLinkRemoved(const std::string &_linkName)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnJointRemoved(const std::string &_jointName)
+void ModelEditorPalette::OnJointRemoved(const std::string &_jointId)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   for (int i = 0; i < this->jointsItem->childCount(); ++i)
@@ -516,7 +509,7 @@ void ModelEditorPalette::OnJointRemoved(const std::string &_jointName)
       continue;
     std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
 
-    if (listData == _jointName)
+    if (listData == _jointId)
     {
       this->jointsItem->takeChild(this->jointsItem->indexOfChild(item));
       break;
@@ -535,7 +528,7 @@ void ModelEditorPalette::ClearModelTree()
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnJointNameChanged(const std::string &_jointIdName,
+void ModelEditorPalette::OnJointNameChanged(const std::string &_jointId,
     const std::string &_newJointName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
@@ -546,7 +539,7 @@ void ModelEditorPalette::OnJointNameChanged(const std::string &_jointIdName,
       continue;
     std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
 
-    if (listData == _jointIdName)
+    if (listData == _jointId)
     {
       item->setText(0, QString::fromStdString(_newJointName));
       break;

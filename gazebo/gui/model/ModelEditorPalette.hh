@@ -107,24 +107,26 @@ namespace gazebo
       private: void OnLinkInserted(const std::string &_linkName);
 
       /// \brief Add a joint to the tree.
-      /// \param[in] _jointName Unique joint identifying name.
-      private: void OnJointInserted(const std::string &_jointName);
+      /// \param[in] _jointId Unique joint identifying name.
+      /// \param[in] _jointName Scoped name which can be changed by the user.
+      private: void OnJointInserted(const std::string &_jointId,
+          const std::string &_jointName);
 
       /// \brief Remove a link from the tree.
-      /// \param[in] _linkName Scoped link name.
-      private: void OnLinkRemoved(const std::string &_linkName);
+      /// \param[in] _linkId Unique link identifying name.
+      private: void OnLinkRemoved(const std::string &_linkId);
 
       /// \brief Remove a joint from the tree.
-      /// \param[in] _jointName Unique joint identifying name.
-      private: void OnJointRemoved(const std::string &_jointName);
+      /// \param[in] _jointId Unique joint identifying name.
+      private: void OnJointRemoved(const std::string &_jointId);
 
       /// \brief Remove all links and joints from the tree.
       private: void ClearModelTree();
 
       /// \brief Update a joint item text in the tree.
-      /// \param[in] _jointIdName Unique joint identifying name.
-      /// \param[in] _newJointName New joint name.
-      private: void OnJointNameChanged(const std::string &_jointIdName,
+      /// \param[in] _jointId Unique joint identifying name.
+      /// \param[in] _newJointName New scoped joint name.
+      private: void OnJointNameChanged(const std::string &_jointId,
           const std::string &_newJointName);
 
       /// \brief Callback when user has provided information on where to save
