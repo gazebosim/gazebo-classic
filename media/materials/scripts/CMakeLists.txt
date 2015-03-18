@@ -7,7 +7,6 @@ deferred_post_minilight.material
 deferred_post.program
 distortion.compositor
 gazebo.material
-glsl120.program
 grid.material
 kitchen.material
 noise.compositor
