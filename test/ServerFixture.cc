@@ -121,12 +121,14 @@ void ServerFixture::Load(const std::string &_worldFilename)
 /////////////////////////////////////////////////
 void ServerFixture::Load(const std::string &_worldFilename, bool _paused)
 {
-  this->Load(_worldFilename, _paused, "");
+  std::string s("");
+  this->Load(_worldFilename, _paused, s);
 }
 
 /////////////////////////////////////////////////
 void ServerFixture::Load(const std::string &_worldFilename,
-                  bool _paused, const std::string &_physics)
+                  bool _paused, const std::string &_physics,
+                  int _argc, char **_argv)
 {
   delete this->server;
   this->server = NULL;
@@ -134,7 +136,7 @@ void ServerFixture::Load(const std::string &_worldFilename,
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
      boost::bind(&ServerFixture::RunServer, this, _worldFilename,
-                 _paused, _physics));
+                 _paused, _physics, _argc, _argv));
 
   // Wait for the server to come up
   // Use a 60 second timeout.
@@ -180,6 +182,7 @@ void ServerFixture::Load(const std::string &_worldFilename,
   this->requestPub->WaitForConnection();
 }
 
+
 /////////////////////////////////////////////////
 void ServerFixture::RunServer(const std::string &_worldFilename)
 {
@@ -187,29 +190,39 @@ void ServerFixture::RunServer(const std::string &_worldFilename)
 }
 
 /////////////////////////////////////////////////
-rendering::ScenePtr ServerFixture::GetScene(
-    const std::string &_sceneName)
+void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
+               const std::string &_physics, int _argc, char ** _argv)
 {
-  // Wait for the scene to get loaded.
-  int i = 0;
-  int timeoutDS = 20;
-  while (rendering::get_scene(_sceneName) == NULL && i < timeoutDS)
+  ASSERT_NO_THROW(this->server = new Server());
+  // parse arguments. For example, to load system plugins:
+  //    char *argv[] = {"program name", "-s", "libRestWebPlugin.so"};
+  //    int argc = 3;
+  this->server->ParseArgs(_argc, _argv);
+
+  if (_physics.length())
+    ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
+                                           _physics));
+  else
+    ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
+
+  if (!rendering::get_scene(
+        gazebo::physics::get_world()->GetName()))
   {
-    common::Time::MSleep(100);
-    ++i;
+    ASSERT_NO_THROW(rendering::create_scene(
+        gazebo::physics::get_world()->GetName(), false, true));
   }
 
-  if (i >= timeoutDS)
-  {
-    gzerr << "Unable to load the rendering scene.\n"
-          << "Test will fail";
-    this->launchTimeoutFailure(
-        "while waiting to load rendering scene", i);
-  }
+  ASSERT_NO_THROW(this->SetPause(_paused));
 
-  return rendering::get_scene(_sceneName);
+  ASSERT_NO_THROW(this->server->Run());
+
+  ASSERT_NO_THROW(this->server->Fini());
+
+  ASSERT_NO_THROW(delete this->server);
+  this->server = NULL;
 }
 
+/*
 /////////////////////////////////////////////////
 void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
                const std::string &_physics)
@@ -238,6 +251,32 @@ void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
   ASSERT_NO_THROW(delete this->server);
   this->server = NULL;
 }
+*/
+
+/////////////////////////////////////////////////
+rendering::ScenePtr ServerFixture::GetScene(
+    const std::string &_sceneName)
+{
+  // Wait for the scene to get loaded.
+  int i = 0;
+  int timeoutDS = 20;
+  while (rendering::get_scene(_sceneName) == NULL && i < timeoutDS)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i >= timeoutDS)
+  {
+    gzerr << "Unable to load the rendering scene.\n"
+          << "Test will fail";
+    this->launchTimeoutFailure(
+        "while waiting to load rendering scene", i);
+  }
+
+  return rendering::get_scene(_sceneName);
+}
+
 
 /////////////////////////////////////////////////
 void ServerFixture::OnStats(ConstWorldStatisticsPtr &_msg)

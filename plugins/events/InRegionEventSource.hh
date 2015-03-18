@@ -86,6 +86,9 @@ namespace gazebo
     /// \brief Called every simulation step
     public: void Update();
 
+    /// \brief Prints data about the event source to the log (useful for debug)
+    public: void dump();
+
     /// \brief Loads the full name of the model and the region from the world
     /// file.
     /// \param[in] _sdf

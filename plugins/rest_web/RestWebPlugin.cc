@@ -54,12 +54,11 @@ RestWebPlugin::~RestWebPlugin()
 ////////////////////////////////////////////////////////////////////////////////
 void RestWebPlugin::Init()
 {
-  std::cerr << "RestWebPlugin::Init() setting up pubs/sub node" <<  std::endl;
   // setup our node for communication
   node->Init();
-  subRequest = node->Subscribe("/gazebo/event/rest_login",
+  subRequest = node->Subscribe("/gazebo/rest/rest_login",
                                &RestWebPlugin::OnRestLoginRequest, this);
-  subEvent = node->Subscribe("/gazebo/event/rest_post",
+  subEvent = node->Subscribe("/gazebo/rest/rest_post",
                              &RestWebPlugin::OnEventRestPost, this);
   subSimEvent = node->Subscribe("/gazebo/sim_events",
                                 &RestWebPlugin::OnSimEvent, this);
@@ -243,7 +242,7 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
     msg.set_type("Error");
     msg.set_msg(errorMsg);
     // alert the user via the gui plugin
-    cerr << "ERROR in REST request: " << errorMsg << std::endl;
+    gzerr << "ERROR in REST request: " << errorMsg << std::endl;
     this->pub->Publish(msg);
   }
 }
@@ -275,7 +274,7 @@ void RestWebPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
     msg.set_type("Error");
     msg.set_msg(errorMsg);
     // alert the user via the gui plugin
-    cerr << "ERROR in REST request. : " << errorMsg << std::endl;
+    gzerr << "ERROR in REST login request. : " << errorMsg << std::endl;
     this->pub->Publish(msg);
   }
 }
@@ -306,7 +305,7 @@ void RestWebPlugin::ProcessRestPostEvent(ConstRestPostPtr _msg)
 void RestWebPlugin::RunRequestQ()
 {
   // be ready to send errors back to the UI
-  std::string path("/gazebo/event/rest_error");
+  std::string path("/gazebo/rest/rest_error");
   this->pub = node->Advertise<gazebo::msgs::RestError>(path);
   // process any login or post data that ha been received
   while (!stopMsgProcessing)

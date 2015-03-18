@@ -27,7 +27,7 @@
         <name>end</name>
         <volume>
           <!-- around 10,10  -->
-          <min>7 7 0</min>
+          <min>7 7 -3</min>
           <max>13 13 3</max>
         </volume>
       </region>

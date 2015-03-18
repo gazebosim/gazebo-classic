@@ -79,29 +79,38 @@ namespace gazebo
                                  bool _paused);
 
     /// \brief Load a world based on a filename and set simulation
-    /// paused/un-paused, and specify physics engine.
+    /// paused/un-paused, and specify physics engine. This versions allows
+    /// plugins to be loaded (via the cmd line args)
     /// \param[in] _worldFilename Name of the world to load.
     /// \param[in] _paused True to start the world paused.
     /// \param[in] _physics Name of the physics engine.
+    /// \param[in] _argc nb of arguments (for example to load system plugins)
+    /// \param[in] _argv array of arguments
     protected: virtual void Load(const std::string &_worldFilename,
-                                 bool _paused, const std::string &_physics);
+                                 bool _paused, const std::string &_physics,
+                                 int _argc = 0, char **_argv = NULL);
 
     /// \brief Run the server.
     /// \param[in] _worldFilename Name of the world to run in simulation.
     protected: void RunServer(const std::string &_worldFilename);
-
-    /// \brief Get a pointer to the rendering scene.
-    /// \param[in] _sceneName Name of the scene to get.
-    protected: rendering::ScenePtr GetScene(
-                   const std::string &_sceneName = "default");
 
     /// \brief Run the server, start paused/unpaused, and specify the physics
     /// engine.
     /// \param[in] _worldFilename Name of the world to load.
     /// \param[in] _paused True to start the world paused.
     /// \param[in] _physics Name of the physics engine.
+    /// \param[in] _argc Argument count
+    /// \param[in] _argv Argument array
     protected: void RunServer(const std::string &_worldFilename, bool _paused,
-                              const std::string &_physics);
+                              const std::string &_physics,
+                              int _argc = 0, char **_argv = NULL);
+
+
+    /// \brief Get a pointer to the rendering scene.
+    /// \param[in] _sceneName Name of the scene to get.
+    protected: rendering::ScenePtr GetScene(
+                   const std::string &_sceneName = "default");
+
 
     /// \brief Function that received world stastics messages.
     /// \param[in] _msg World statistics message.

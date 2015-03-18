@@ -33,10 +33,10 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
     dialog(this, _loginTitle, _urlLabel, _defautlUrl)
 {
   node->Init();
-  pub = node->Advertise<gazebo::msgs::RestLogin>("/gazebo/event/rest_login");
+  pub = node->Advertise<gazebo::msgs::RestLogin>("/gazebo/rest/rest_login");
   // this for a problem where the server cannot subscribe to the topic
   pub->WaitForConnection();
-  sub = node->Subscribe("/gazebo/event/rest_error",
+  sub = node->Subscribe("/gazebo/rest/rest_error",
                         &RestUiWidget::OnResponse,
                         this);
 }
