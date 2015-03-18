@@ -113,14 +113,14 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
   {
     // Test SetParam for non-implementation-specific parameters
     physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-    boost::any value;
-    double maxStepSize = 0.02;
-    double realTimeUpdateRate = 0.03;
-    double realTimeFactor = 0.04;
-    gazebo::math::Vector3 gravity(0, 0, 0);
-    gazebo::math::Vector3 magneticField(0.1, 0.1, 0.1);
     try
     {
+      boost::any value;
+      double maxStepSize = 0.02;
+      double realTimeUpdateRate = 0.03;
+      double realTimeFactor = 0.04;
+      gazebo::math::Vector3 gravity(0, 0, 0);
+      gazebo::math::Vector3 magneticField(0.1, 0.1, 0.1);
       EXPECT_TRUE(physics->SetParam("max_step_size", maxStepSize));
       EXPECT_TRUE(physics->GetParam("max_step_size", value));
       EXPECT_NEAR(boost::any_cast<double>(value), maxStepSize, 1e-6);
