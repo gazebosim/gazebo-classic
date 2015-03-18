@@ -36,7 +36,7 @@ TEST_F(SVGLoader, LoadPaths)
   std::vector<common::SVGPath> paths;
 
   // bad path
-  bool success = false;
+  bool success;
   std::string bad = "/not/a/file.svg";
   success = loader.Parse(bad, paths);
   EXPECT_EQ(true, success);
@@ -84,7 +84,7 @@ TEST_F(SVGLoader, LoadPaths)
   EXPECT_EQ(8u, p2.subpaths[0].size());
   // since it has splines, there are more
   // points than commands
-  EXPECT_EQ(61u, p2.polylines[0].size());
+  EXPECT_EQ(67u, p2.polylines[0].size());
 }
 
 /////////////////////////////////////////////////

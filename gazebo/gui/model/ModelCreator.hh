@@ -73,13 +73,15 @@ namespace gazebo
         LINK_SPHERE,
         /// \brief Cylinder
         LINK_CYLINDER,
-        /// \brief Custom
-        LINK_MESH
+        /// \brief Imported 3D mesh
+        LINK_MESH,
+        /// \brief Extruded polyline
+        LINK_POLYLINE
       };
 
       /// \enum SaveState
       /// \brief Save states for the model editor.
-      private: enum SaveState
+      public: enum SaveState
       {
         // NEVER_SAVED: The model has never been saved.
         NEVER_SAVED,
@@ -112,7 +114,7 @@ namespace gazebo
       private: void OnNew();
 
       /// \brief Helper function to manage writing files to disk.
-      private: void SaveModelFiles();
+      public: void SaveModelFiles();
 
       /// \brief Callback for saving the model.
       /// \return True if the user chose to save, false if the user cancelled.
@@ -139,11 +141,12 @@ namespace gazebo
       /// \param[in] _type Type of link to add: box, cylinder, or sphere.
       /// \param[in] _size Size of the link.
       /// \param[in] _pose Pose of the link.
+      /// \param[in] _samples Number of samples for polyline.
       /// \return Name of the link that has been added.
       public: std::string AddShape(LinkType _type,
           const math::Vector3 &_size = math::Vector3::One,
           const math::Pose &_pose = math::Pose::Zero,
-          const std::string &_uri = "");
+          const std::string &_uri = "", unsigned int _samples = 5);
 
       /// \brief Add a box to the model.
       /// \param[in] _size Size of the box.
@@ -202,6 +205,10 @@ namespace gazebo
       /// \brief Get joint maker
       /// \return Joint maker
       public: JointMaker *GetJointMaker() const;
+
+      /// \brief Get current save state.
+      /// \return Current save state.
+      public: enum SaveState GetCurrentSaveState() const;
 
       /// \brief Add a link to the model
       /// \param[in] _type Type of link to be added

@@ -91,6 +91,8 @@ void cubicBezier(const math::Vector2d &_p0,
     _points.push_back(p);
     t += _step;
   }
+  // close the loop
+  _points.push_back(_p3);
 }
 
 /////////////////////////////////////////////////

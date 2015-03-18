@@ -13,7 +13,11 @@
 1. **gazebo/physics/PolylineShape.hh**
     + ***Removed:*** public: std::vector<math::Vector2d> GetVertices() const
     + ***Replacement:*** public: std::vector<std::vector<math::Vector2d> > GetVertices() const
-    
+
+1. **gazebo/physics/SurfaceParams.hh**
+    + ***Removed:*** public: FrictionPyramid frictionPyramid
+    + ***Replacement:*** public: FrictionPyramidPtr GetFrictionPyramid() const
+
 ### Deletions
 
 1. **gazebo/gui/RenderWidget.hh**
