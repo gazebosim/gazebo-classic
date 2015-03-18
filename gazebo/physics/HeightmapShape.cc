@@ -22,8 +22,11 @@
 #include <gazebo/gazebo_config.h>
 
 #ifdef HAVE_GDAL
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wfloat-equal"
 # include <gdalwarper.h>
 # include <gdal_priv.h>
+# pragma GCC diagnostic pop
 #endif
 
 #include <algorithm>

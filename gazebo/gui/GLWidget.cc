@@ -65,8 +65,8 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->windowId = -1;
 
-  setAttribute(Qt::WA_OpaquePaintEvent, true);
-  setAttribute(Qt::WA_PaintOnScreen, true);
+  this->setAttribute(Qt::WA_OpaquePaintEvent, true);
+  this->setAttribute(Qt::WA_PaintOnScreen, true);
 
   this->renderFrame = new QFrame;
   this->renderFrame->setFrameShape(QFrame::NoFrame);
@@ -244,7 +244,12 @@ void GLWidget::paintEvent(QPaintEvent *_e)
 
     event::Events::postRender();
   }
+  else
+  {
+    event::Events::preRender();
+  }
 
+  this->update();
   _e->accept();
 }
 
