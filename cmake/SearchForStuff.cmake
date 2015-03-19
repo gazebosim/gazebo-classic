@@ -201,6 +201,8 @@ if (PKG_CONFIG_FOUND)
     if (NOT LIBTAR_FOUND)
        BUILD_ERROR("Missing: libtar")
     endif()
+  else()
+    set(libtar_LIBRARIES "")
   endif()
 
   #################################################
