@@ -548,6 +548,21 @@ namespace gazebo
     /// \return String with prefix and unique number as suffix.
     protected: std::string GetUniqueString(const std::string &_prefix);
 
+    /// \brief Helper to record data to gtest xml output.
+    /// \param[in] _name Name of data.
+    /// \param[in] _data Floating point number to store.
+    void Record(const std::string &_name, double _data);
+
+    /// \brief Helper to record signal statistics to gtest xml output.
+    /// \param[in] _prefix Prefix string for data names.
+    /// \param[in] _stats Signal statistics to store.
+    void Record(const std::string &_prefix, const math::SignalStats &_stats);
+
+    /// \brief Helper to record Vector3 signal statistics to gtest xml output.
+    /// \param[in] _prefix Prefix string for data names.
+    /// \param[in] _stats Vector3 signal statistics to store.
+    void Record(const std::string &_prefix, const math::Vector3Stats &_stats);
+
     /// \brief Pointer the Gazebo server.
     protected: Server *server;
 
