@@ -98,6 +98,18 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
   target_link_libraries(gzserver gcov)
 endif()
 
+if (HAVE_BULLET)
+  target_link_libraries(gzserver gazebo_physics_bullet)
+endif()
+
+if (HAVE_DART)
+  target_link_libraries(gzserver gazebo_physics_dart)
+endif()
+
+if (HAVE_SIMBODY)
+  target_link_libraries(gzserver gazebo_physics_simbody)
+endif()
+
 gz_install_executable(gzserver)
 #gz_install_executable(gazebo)
 manpage(gzserver 1)

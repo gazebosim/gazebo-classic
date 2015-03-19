@@ -48,8 +48,6 @@ GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_dataLoggerAct = 0;
 
 GZ_GUI_VISIBLE
-QAction *gazebo::gui::g_newModelAct = 0;
-GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_resetModelsAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_resetWorldAct = 0;
@@ -96,6 +94,8 @@ QAction *gazebo::gui::g_showJointsAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_showCOMAct = 0;
 GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_showInertiaAct = 0;
+GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_transparentAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_viewWireframeAct = 0;
@@ -130,3 +130,5 @@ QAction *gazebo::gui::g_snapAct = 0;
 
 GZ_GUI_VISIBLE
 QWidgetAction *gazebo::gui::g_alignAct = 0;
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_alignButtonAct = 0;

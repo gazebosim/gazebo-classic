@@ -109,7 +109,7 @@ set (msgs_tests_sources
   msgs_TEST.cc
   MsgFactory_TEST.cc
 )
-gz_build_tests(${msgs_tests_sources})
+# gz_build_tests(${msgs_tests_sources})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

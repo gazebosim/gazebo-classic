@@ -24,9 +24,6 @@
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/UserCamera.hh"
 
-#include "gazebo/physics/World.hh"
-#include "gazebo/physics/PhysicsIface.hh"
-
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -96,13 +93,6 @@ ModelBuilderWidget::ModelBuilderWidget(QWidget *_parent)
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
-
-  // TODO: Use messages so that the gui doesn't depend upon physics
-  physics::init();
-  this->world = physics::create_world("model_builder");
-  this->world->Load(sdf::ElementPtr());
-  this->world->Init();
-  this->world->SetPaused(true);
 
   msgs::Factory msg;
   std::ostringstream newModelStr;

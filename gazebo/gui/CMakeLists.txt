@@ -120,16 +120,6 @@ if (HAVE_OCULUS)
   )
 endif ()
 
-#if (HAVE_QWT)
-#  set (sources ${sources}
-#    Diagnostics.cc
-#    IncrementalPlot.cc
-#  )
-#  set (qt_headers ${qt_headers}
-#    Diagnostics.hh
-#    IncrementalPlot.hh
-#  )
-#endif()
 
 set (qt_tests
   DataLogger_TEST.cc
@@ -153,7 +143,7 @@ if (ENABLE_SCREEN_TESTS)
 endif()
 
 # Generate executables for each of the QT unit tests
-gz_build_qt_tests(${qt_tests})
+# gz_build_qt_tests(${qt_tests})
 
 set (resources resources.qrc)
 
@@ -162,7 +152,7 @@ QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
 
-gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC} gazebo.cc)
 gz_add_executable(gzclient main.cc)
 
 add_dependencies(gazebo_gui gazebo_msgs)
@@ -172,14 +162,13 @@ target_link_libraries(gazebo_gui
   gazebo_common
   gazebo_transport
   gazebo_rendering
-  gazebo_sensors
   gazebo_msgs
   gazebo_gui_building
   gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
+  gazebo_util
   gzqtpropertybrowser
-  libgazebo
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
@@ -194,9 +183,6 @@ target_link_libraries(gzclient
   gazebo_common
   gazebo_transport
   gazebo_rendering
-  gazebo_sensors
-  gazebo_physics
-  gazebo_physics_ode
   gazebo_msgs
   gazebo_gui
   gazebo_gui_building
@@ -205,7 +191,6 @@ target_link_libraries(gzclient
   gazebo_gui_viewers
   gazebo_skyx
   gzqtpropertybrowser
-  libgazebo
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
@@ -233,4 +218,4 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gui.hh.in ${CMAKE_CURRENT_BINARY_DIR
 gz_install_library(gazebo_gui)
 gz_install_includes("gui" ${headers} ${qt_headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)
-manpage(gzclient 1)
+#manpage(gzclient 1)

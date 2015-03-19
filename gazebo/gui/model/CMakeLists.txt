@@ -36,12 +36,12 @@ set (headers
 )
 
 # MainWindow is using screen rendering
-if (ENABLE_SCREEN_TESTS)
-  set (qt_tests ${qt_tests} JointMaker_TEST.cc)
-endif()
+#if (ENABLE_SCREEN_TESTS)
+#  set (qt_tests ${qt_tests} JointMaker_TEST.cc)
+#endif()
 
 # Generate executables for each of the QT unit tests
-gz_build_qt_tests(${qt_tests})
+#gz_build_qt_tests(${qt_tests})
 
 set (resources ../resources.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers})

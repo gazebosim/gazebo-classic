@@ -270,7 +270,8 @@ void TopicManager::ConnectPubToSub(const std::string &_topic,
                                    const SubscriptionTransportPtr _sublink)
 {
   PublicationPtr publication = this->FindPublication(_topic);
-  publication->AddSubscription(_sublink);
+  if (publication)
+    publication->AddSubscription(_sublink);
 }
 
 //////////////////////////////////////////////////

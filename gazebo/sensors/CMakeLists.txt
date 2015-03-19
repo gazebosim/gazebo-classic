@@ -67,7 +67,7 @@ set (gtest_sources
   WirelessTransmitter_TEST.cc
 )
 
-gz_build_tests(${gtest_sources})
+# gz_build_tests(${gtest_sources})
 
 set (gtest_sources_dri
   GpuRaySensor_TEST.cc

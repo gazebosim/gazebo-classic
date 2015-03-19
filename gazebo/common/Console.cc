@@ -72,7 +72,7 @@ Logger &Logger::operator()()
 }
 
 /////////////////////////////////////////////////
-Logger &Logger::operator()(const std::string &_file, int _line)
+Logger &Logger::operator()(const std::string & /*_file*/, int /*_line*/)
 {
   // int index = _file.find_last_of("/") + 1;
 

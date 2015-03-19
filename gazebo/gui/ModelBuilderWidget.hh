@@ -18,7 +18,6 @@
 #define _MODEL_BUILDER_WIDGET_HH_
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
@@ -52,8 +51,6 @@ namespace gazebo
 
       private: GLWidget *glWidget;
       private: QAction *boxCreateAct, *sphereCreateAct, *cylinderCreateAct;
-
-      private: physics::WorldPtr world;
 
       protected: transport::NodePtr node;
       protected: transport::PublisherPtr factoryPub;
