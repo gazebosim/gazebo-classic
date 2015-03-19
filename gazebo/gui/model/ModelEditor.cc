@@ -31,6 +31,10 @@
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
 
+#ifdef HAVE_GRAPHVIZ
+#include "gazebo/gui/model/SchematicViewWidget.hh"
+#endif
+
 using namespace gazebo;
 using namespace gui;
 
@@ -42,6 +46,16 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   // Create the model editor tab
   this->modelPalette = new ModelEditorPalette(_mainWindow);
   this->Init("modelEditorTab", "Model Editor", this->modelPalette);
+
+#ifdef HAVE_GRAPHVIZ
+  RenderWidget *renderWidget = _mainWindow->GetRenderWidget();
+  this->svWidget = new gazebo::gui::SchematicViewWidget(renderWidget);
+  this->svWidget->setSizePolicy(QSizePolicy::Expanding,
+      QSizePolicy::Expanding);
+  this->svWidget->Init();
+  renderWidget->InsertWidget(0, this->svWidget);
+//  this->svWidget->hide();
+#endif
 
   this->newAct = new QAction(tr("&New"), this->mainWindow);
   this->newAct->setStatusTip(tr("New"));

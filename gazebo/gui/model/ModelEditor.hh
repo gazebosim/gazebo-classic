@@ -27,6 +27,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class SchematicViewWidget;
     class ModelEditorPalette;
 
     /// \class ModelEditor ModelEditor.hh gui/gui.hh
@@ -127,6 +128,8 @@ namespace gazebo
 
       /// \brief Save the main window paused state to use when returning.
       private: bool mainWindowPaused;
+
+      private: SchematicViewWidget *svWidget;
     };
   }
 }
