@@ -33,6 +33,8 @@
 #include <ou/assert.h>
 #include <ou/platform.h>
 #include <ou/namespace.h>
+#include <ou/ou_dll.h>
+
 
 #if _OU_TARGET_OS == _OU_TARGET_OS_WINDOWS
 
@@ -64,7 +66,7 @@ typedef unsigned int tlsindextype;
 typedef void (_OU_CONVENTION_CALLBACK *CTLSValueDestructor)(tlsvaluetype vValueData);
 
 
-#define OU_TLS_VALUE_AS_POINTER(value)	(value)
+#define OU_TLS_VALUE_AS_POINTER(value)  (value)
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -75,212 +77,212 @@ struct CTLSStorageArray;
 struct CTLSStorageBlock
 {
 /*
- *	Implementation Note:
- *	1) Value destructors are stored in separate array since those are 
- *	rarely accessed values and not intermixing them with data
- *	potentially simplifies data access (well, just theoretically, of course :)).
- *	2) Destructors are stored with negative offset to allow accessing them 
- *	without the knowledge of value count.
- *	3) Well, intermixing or not intermixing has really minor impact on 
- *	implementation characteristics, so why not to choose it after the current mood? :)
+ *  Implementation Note:
+ *  1) Value destructors are stored in separate array since those are
+ *  rarely accessed values and not intermixing them with data
+ *  potentially simplifies data access (well, just theoretically, of course :)).
+ *  2) Destructors are stored with negative offset to allow accessing them
+ *  without the knowledge of value count.
+ *  3) Well, intermixing or not intermixing has really minor impact on
+ *  implementation characteristics, so why not to choose it after the current mood? :)
  */
 private:
-	enum
-	{
-		TSB_RESERVEDPOINTER_HOSTARRAY,
-			
-		TSB_RESERVEDPOINTER__MAX
-	};
+  enum
+  {
+    TSB_RESERVEDPOINTER_HOSTARRAY,
+
+    TSB_RESERVEDPOINTER__MAX
+  };
 
 public:
-	enum
-	{
-		TSB_LARGEST_ALIGNMENT = sizeof(void *) > sizeof(tlsvaluetype) ? sizeof(void *) : sizeof(tlsvaluetype)
-	};
-	
-public:
-	static inline size_t GetRequiredSize(tlsindextype iValueCount)
-	{
-		return OU_ALIGNED_SIZE(iValueCount * (sizeof(tlsvaluetype) + sizeof(CTLSValueDestructor)) + TSB_RESERVEDPOINTER__MAX * sizeof(void *), TSB_LARGEST_ALIGNMENT);
-	}
-
-	static inline size_t GetZeroOffset(tlsindextype iValueCount)
-	{
-		// Since pointers and values are stored in different directions,
-		// alignment correction must fall entirely to either side and 
-		// required size will not be exceeded.
-		return OU_ALIGNED_SIZE(iValueCount * sizeof(CTLSValueDestructor) + TSB_RESERVEDPOINTER__MAX * sizeof(void *), TSB_LARGEST_ALIGNMENT);
-	}
+  enum
+  {
+    TSB_LARGEST_ALIGNMENT = sizeof(void *) > sizeof(tlsvaluetype) ? sizeof(void *) : sizeof(tlsvaluetype)
+  };
 
 public:
-	inline void SetValueData(tlsindextype iValueIndex, tlsvaluetype vValueData)
-	{
-		un.m_av_ValueDatas[iValueIndex] = vValueData;
-	}
+  static inline size_t GetRequiredSize(tlsindextype iValueCount)
+  {
+    return OU_ALIGNED_SIZE(iValueCount * (sizeof(tlsvaluetype) + sizeof(CTLSValueDestructor)) + TSB_RESERVEDPOINTER__MAX * sizeof(void *), TSB_LARGEST_ALIGNMENT);
+  }
 
-	inline tlsvaluetype GetValueData(tlsindextype iValueIndex) const
-	{
-		return un.m_av_ValueDatas[iValueIndex];
-	}
+  static inline size_t GetZeroOffset(tlsindextype iValueCount)
+  {
+    // Since pointers and values are stored in different directions,
+    // alignment correction must fall entirely to either side and
+    // required size will not be exceeded.
+    return OU_ALIGNED_SIZE(iValueCount * sizeof(CTLSValueDestructor) + TSB_RESERVEDPOINTER__MAX * sizeof(void *), TSB_LARGEST_ALIGNMENT);
+  }
 
-	inline void SetHostArray(CTLSStorageArray *psaInstance)
-	{
-		un.m_asaHostArrays[(ptrdiff_t)0 - (1 + TSB_RESERVEDPOINTER_HOSTARRAY)] = psaInstance;
-	}
-	
-	inline CTLSStorageArray *GetHostArray() const
-	{
-		return un.m_asaHostArrays[(ptrdiff_t)0 - (1 + TSB_RESERVEDPOINTER_HOSTARRAY)];
-	}
+public:
+  inline void SetValueData(tlsindextype iValueIndex, tlsvaluetype vValueData)
+  {
+    un.m_av_ValueDatas[iValueIndex] = vValueData;
+  }
 
-	inline void SetValueDestructor(tlsindextype iValueIndex, CTLSValueDestructor fvValue)
-	{
-		un.m_afnValueDestructors[-((ptrdiff_t)iValueIndex) - (1 + TSB_RESERVEDPOINTER__MAX)] = fvValue;
-	}
-	
-	inline CTLSValueDestructor GetValueDestructor(tlsindextype iValueIndex) const
-	{
-		return un.m_afnValueDestructors[-((ptrdiff_t)iValueIndex) - (1 + TSB_RESERVEDPOINTER__MAX)];
-	}
+  inline tlsvaluetype GetValueData(tlsindextype iValueIndex) const
+  {
+    return un.m_av_ValueDatas[iValueIndex];
+  }
+
+  inline void SetHostArray(CTLSStorageArray *psaInstance)
+  {
+    un.m_asaHostArrays[(ptrdiff_t)0 - (1 + TSB_RESERVEDPOINTER_HOSTARRAY)] = psaInstance;
+  }
+
+  inline CTLSStorageArray *GetHostArray() const
+  {
+    return un.m_asaHostArrays[(ptrdiff_t)0 - (1 + TSB_RESERVEDPOINTER_HOSTARRAY)];
+  }
+
+  inline void SetValueDestructor(tlsindextype iValueIndex, CTLSValueDestructor fvValue)
+  {
+    un.m_afnValueDestructors[-((ptrdiff_t)iValueIndex) - (1 + TSB_RESERVEDPOINTER__MAX)] = fvValue;
+  }
+
+  inline CTLSValueDestructor GetValueDestructor(tlsindextype iValueIndex) const
+  {
+    return un.m_afnValueDestructors[-((ptrdiff_t)iValueIndex) - (1 + TSB_RESERVEDPOINTER__MAX)];
+  }
 
 private:
-	union
-	{
-		tlsvaluetype		m_av_ValueDatas[1];
-		CTLSValueDestructor	m_afnValueDestructors[1];
-		CTLSStorageArray	*m_asaHostArrays[1];
-	} un;
+  union
+  {
+    tlsvaluetype		m_av_ValueDatas[1];
+    CTLSValueDestructor	m_afnValueDestructors[1];
+    CTLSStorageArray	*m_asaHostArrays[1];
+  } un;
 };
 
 
 //////////////////////////////////////////////////////////////////////////
 // API declaration
 
-class GAZEBO_VISIBLE CThreadLocalStorage
+class OU_VISIBLE CThreadLocalStorage
 {
 public: // Safe methods
-	/*
-	 *	Implementation Note:
-	 *	Since the function is potentially slow and should not be frequently
-	 *	called anyway, there is no sense in creating additional overload without
-	 *	destructor parameter which would preserve current destructor procedure.
-	 */
-	static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API 
-	/*bool */SetStorageValue(const HTLSKEY &hskStorageKey, tlsindextype iValueIndex, tlsvaluetype vValueData, CTLSValueDestructor fnValueDestructor=NULL)
-	{
-		bool bResult;
-		
-		CTLSStorageBlock *psbStorageBlock = gzGetKeyStorageBlock(hskStorageKey);
-			
-		if (psbStorageBlock)
-		{
-			psbStorageBlock->SetValueData(iValueIndex, vValueData);
-			psbStorageBlock->SetValueDestructor(iValueIndex, fnValueDestructor);
-			
-			bResult = true;
-		}
-		else
-		{
-			bResult = AllocateAndSetStorageValue(hskStorageKey, iValueIndex, vValueData, fnValueDestructor);
-		}
+  /*
+   *  Implementation Note:
+   *  Since the function is potentially slow and should not be frequently
+   *  called anyway, there is no sense in creating additional overload without
+   *  destructor parameter which would preserve current destructor procedure.
+   */
+  static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+  /*bool */SetStorageValue(const HTLSKEY &hskStorageKey, tlsindextype iValueIndex, tlsvaluetype vValueData, CTLSValueDestructor fnValueDestructor=NULL)
+  {
+    bool bResult;
 
-		return bResult;
-	}
+    CTLSStorageBlock *psbStorageBlock = gzGetKeyStorageBlock(hskStorageKey);
 
-	static _OU_ALWAYSINLINE_PRE tlsvaluetype _OU_ALWAYSINLINE_IN _OU_CONVENTION_API 
-	/*tlsvaluetype */gzGetStorageValue(const HTLSKEY &hskStorageKey, tlsindextype iValueIndex)
-	{
-		tlsvaluetype vValueData = 0;
-		
-		CTLSStorageBlock *psbStorageBlock = gzGetKeyStorageBlock(hskStorageKey);
+    if (psbStorageBlock)
+    {
+    	psbStorageBlock->SetValueData(iValueIndex, vValueData);
+    	psbStorageBlock->SetValueDestructor(iValueIndex, fnValueDestructor);
 
-		if (psbStorageBlock)
-		{
-			vValueData = psbStorageBlock->GetValueData(iValueIndex);
-		}
-		
-		return vValueData;
-	}
+    	bResult = true;
+    }
+    else
+    {
+    	bResult = AllocateAndSetStorageValue(hskStorageKey, iValueIndex, vValueData, fnValueDestructor);
+    }
+
+    return bResult;
+  }
+
+  static _OU_ALWAYSINLINE_PRE tlsvaluetype _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+  /*tlsvaluetype */gzGetStorageValue(const HTLSKEY &hskStorageKey, tlsindextype iValueIndex)
+  {
+    tlsvaluetype vValueData = 0;
+
+    CTLSStorageBlock *psbStorageBlock = gzGetKeyStorageBlock(hskStorageKey);
+
+    if (psbStorageBlock)
+    {
+    	vValueData = psbStorageBlock->GetValueData(iValueIndex);
+    }
+
+    return vValueData;
+  }
 
 public: // Unsafe methods
-	static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API 
-	/*void */UnsafeSetStorageValue(const HTLSKEY &hskStorageKey, tlsindextype iValueIndex, tlsvaluetype vValueData)
-	{
-		CTLSStorageBlock *psbStorageBlock = gzGetKeyStorageBlock(hskStorageKey);
-		psbStorageBlock->SetValueData(iValueIndex, vValueData);
-	}
+  static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+  /*void */UnsafeSetStorageValue(const HTLSKEY &hskStorageKey, tlsindextype iValueIndex, tlsvaluetype vValueData)
+  {
+    CTLSStorageBlock *psbStorageBlock = gzGetKeyStorageBlock(hskStorageKey);
+    psbStorageBlock->SetValueData(iValueIndex, vValueData);
+  }
 
-	static _OU_ALWAYSINLINE_PRE tlsvaluetype _OU_ALWAYSINLINE_IN _OU_CONVENTION_API 
-	/*tlsvaluetype */UnsafeGetStorageValue(const HTLSKEY &hskStorageKey, tlsindextype iValueIndex)
-	{
-		CTLSStorageBlock *psbStorageBlock = gzGetKeyStorageBlock(hskStorageKey);
-		return psbStorageBlock->GetValueData(iValueIndex);
-	}
+  static _OU_ALWAYSINLINE_PRE tlsvaluetype _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+  /*tlsvaluetype */UnsafeGetStorageValue(const HTLSKEY &hskStorageKey, tlsindextype iValueIndex)
+  {
+    CTLSStorageBlock *psbStorageBlock = gzGetKeyStorageBlock(hskStorageKey);
+    return psbStorageBlock->GetValueData(iValueIndex);
+  }
 
 private:
-	static bool _OU_CONVENTION_API AllocateAndSetStorageValue(const HTLSKEYSELECTOR &hksKeySelector,
-		tlsindextype iValueIndex, tlsvaluetype vValueData, CTLSValueDestructor fnValueDestructor);
-	
+  static bool _OU_CONVENTION_API AllocateAndSetStorageValue(const HTLSKEYSELECTOR &hksKeySelector,
+    tlsindextype iValueIndex, tlsvaluetype vValueData, CTLSValueDestructor fnValueDestructor);
+
 private:
-	friend class CTLSInitialization;
-	
-	static inline void _OU_CONVENTION_API SetKeyStorageBlock(const HTLSKEYSELECTOR &hskStorageKey, CTLSStorageBlock *psbInstance)
-	{
-#if _OU_TARGET_OS == _OU_TARGET_OS_WINDOWS
-		
-		::TlsSetValue((DWORD)(size_t)(HTLSKEYVALUE::value_type)(*(HTLSKEYSELECTOR::value_type)hskStorageKey), (LPVOID)psbInstance);
-		
-		
-#else // #if _OU_TARGET_OS != _OU_TARGET_OS_WINDOWS
-		
-		pthread_setspecific((pthread_key_t)(size_t)(HTLSKEYVALUE::value_type)(*(HTLSKEYSELECTOR::value_type)hskStorageKey), (void *)psbInstance);
-		
-		
-#endif // #if _OU_TARGET_OS == ...
-	}
+  friend class CTLSInitialization;
 
-	static inline CTLSStorageBlock *_OU_CONVENTION_API gzGetKeyStorageBlock(const HTLSKEYSELECTOR &hskStorageKey)
-	{
+  static inline void _OU_CONVENTION_API SetKeyStorageBlock(const HTLSKEYSELECTOR &hskStorageKey, CTLSStorageBlock *psbInstance)
+  {
 #if _OU_TARGET_OS == _OU_TARGET_OS_WINDOWS
-		
-		CTLSStorageBlock *psbStorageBlock = (CTLSStorageBlock *)::TlsGetValue((DWORD)(size_t)(HTLSKEYVALUE::value_type)(*(HTLSKEYSELECTOR::value_type)hskStorageKey));
-		
-		
+
+    ::TlsSetValue((DWORD)(size_t)(HTLSKEYVALUE::value_type)(*(HTLSKEYSELECTOR::value_type)hskStorageKey), (LPVOID)psbInstance);
+
+
 #else // #if _OU_TARGET_OS != _OU_TARGET_OS_WINDOWS
-	
-		CTLSStorageBlock *psbStorageBlock = (CTLSStorageBlock *)pthread_getspecific((pthread_key_t)(size_t)(HTLSKEYVALUE::value_type)(*(HTLSKEYSELECTOR::value_type)hskStorageKey));
-		
-		
+
+    pthread_setspecific((pthread_key_t)(size_t)(HTLSKEYVALUE::value_type)(*(HTLSKEYSELECTOR::value_type)hskStorageKey), (void *)psbInstance);
+
+
+#endif // #if _OU_TARGET_OS == ...
+  }
+
+  static inline CTLSStorageBlock *_OU_CONVENTION_API gzGetKeyStorageBlock(const HTLSKEYSELECTOR &hskStorageKey)
+  {
+#if _OU_TARGET_OS == _OU_TARGET_OS_WINDOWS
+
+    CTLSStorageBlock *psbStorageBlock = (CTLSStorageBlock *)::TlsGetValue((DWORD)(size_t)(HTLSKEYVALUE::value_type)(*(HTLSKEYSELECTOR::value_type)hskStorageKey));
+
+
+#else // #if _OU_TARGET_OS != _OU_TARGET_OS_WINDOWS
+
+    CTLSStorageBlock *psbStorageBlock = (CTLSStorageBlock *)pthread_getspecific((pthread_key_t)(size_t)(HTLSKEYVALUE::value_type)(*(HTLSKEYSELECTOR::value_type)hskStorageKey));
+
+
 #endif // #if _OU_TARGET_OS == ...
 
-		return psbStorageBlock;
-	}
+    return psbStorageBlock;
+  }
 };
 
 
 //////////////////////////////////////////////////////////////////////////
 // Initialization/finalization
 
-class GAZEBO_VISIBLE CTLSInitialization
+class OU_VISIBLE CTLSInitialization
 {
 public:
-	enum EINITIALIZATIONFLAGS
-	{
-		SIF_MANUAL_CLEANUP_ON_THREAD_EXIT	= 0x00000001
-	};
+  enum EINITIALIZATIONFLAGS
+  {
+    SIF_MANUAL_CLEANUP_ON_THREAD_EXIT	= 0x00000001
+  };
 
 public:
-	// Initialization must be performed from main thread
-	static bool _OU_CONVENTION_API InitializeTLSAPI(HTLSKEY &hskOutStorageKey, tlsindextype iValueCount,
-		unsigned int uiInitializationFlags=0);
-	static void _OU_CONVENTION_API FinalizeTLSAPI();
+  // Initialization must be performed from main thread
+  static bool _OU_CONVENTION_API InitializeTLSAPI(HTLSKEY &hskOutStorageKey, tlsindextype iValueCount,
+    unsigned int uiInitializationFlags=0);
+  static void _OU_CONVENTION_API FinalizeTLSAPI();
 
-	static void _OU_CONVENTION_API CleanupOnThreadExit();
+  static void _OU_CONVENTION_API CleanupOnThreadExit();
 
 private:
-	static bool _OU_CONVENTION_API InitializeTLSAPIValidated(unsigned int uiInstanceKind, 
-		tlsindextype iValueCount, unsigned int uiInitializationFlags);
-	static void _OU_CONVENTION_API FinalizeTLSAPIValidated(unsigned int uiInstanceKind);
+  static bool _OU_CONVENTION_API InitializeTLSAPIValidated(unsigned int uiInstanceKind,
+    tlsindextype iValueCount, unsigned int uiInitializationFlags);
+  static void _OU_CONVENTION_API FinalizeTLSAPIValidated(unsigned int uiInstanceKind);
 };
 
 

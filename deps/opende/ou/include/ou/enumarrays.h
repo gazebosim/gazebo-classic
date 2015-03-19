@@ -32,7 +32,7 @@
 #include <ou/macros.h>
 #include <ou/platform.h>
 #include <ou/namespace.h>
-#include <gazebo/util/system.hh>
+#include <ou/ou_dll.h>
 
 
 BEGIN_NAMESPACE_OU()
@@ -40,23 +40,23 @@ BEGIN_NAMESPACE_OU()
 
 //////////////////////////////////////////////////////////////////////////
 // Helper template definitions
-	
+
 template<typename ElementType>
 struct CTypeStandardEqual
 {
-	_OU_INLINE bool _OU_CONVENTION_METHOD operator ()(const ElementType &etLeftElement, const ElementType &etRightElement) const
-	{
-		return etLeftElement == etRightElement;
-	}
+  _OU_INLINE bool _OU_CONVENTION_METHOD operator ()(const ElementType &etLeftElement, const ElementType &etRightElement) const
+  {
+    return etLeftElement == etRightElement;
+  }
 };
 
 template<typename ElementType>
 struct CTypeStandardLess
 {
-	_OU_INLINE bool _OU_CONVENTION_METHOD operator ()(const ElementType &etLeftElement, const ElementType &etRightElement) const
-	{
-		return etLeftElement < etRightElement;
-	}
+  _OU_INLINE bool _OU_CONVENTION_METHOD operator ()(const ElementType &etLeftElement, const ElementType &etRightElement) const
+  {
+    return etLeftElement < etRightElement;
+  }
 };
 
 
@@ -64,190 +64,203 @@ struct CTypeStandardLess
 // CEnumUnsortedElementArray definition
 
 /*
- *	Implementation Note:
- *	The array is intended to store static constant data. 
- *	Therefore CElementEqualType should not ever need a nontrivial constructor
- *	and it is acceptable to have it as template parameter.
+ *  Implementation Note:
+ *  The array is intended to store static constant data.
+ *  Therefore CElementEqualType should not ever need a nontrivial constructor
+ *  and it is acceptable to have it as template parameter.
  */
 
+// The visibility on this class is tricky because a particular templated
+// instance is declared inside the ODE library (in odeou.cpp).
 template<typename EnumType, const EnumType EnumMax, typename ElementType, const int Instance=0, class CElementEqualType=CTypeStandardEqual<ElementType> >
-class GAZEBO_VISIBLE CEnumUnsortedElementArray
+
+class
+#if defined ODE_API
+  ODE_API
+#else
+#if defined(_MSC_VER)
+    __declspec(dllimport)
+  #else
+    OU_VISIBLE
+  #endif
+#endif
+CEnumUnsortedElementArray
 {
 public:
-	_OU_CONVENTION_METHOD CEnumUnsortedElementArray()
-	{
+  _OU_CONVENTION_METHOD CEnumUnsortedElementArray()
+  {
 #if !defined(NDEBUG)
 
 #if _OU_COMPILER != _OU_COMPILER_GCC || _OU_COMPILER_VERSION == _OU_COMPILER_VERSION_GCCLT4
 
-		OU_ASSERT(OU_ARRAY_SIZE(m_aetElementArray) == EnumMax);
+    OU_ASSERT(OU_ARRAY_SIZE(m_aetElementArray) == EnumMax);
 
 
 #endif // #if _OU_COMPILER != _OU_COMPILER_GCC || _OU_COMPILER_VERSION == _OU_COMPILER_VERSION_GCCLT4
 
 
 #endif // #if !defined(NDEBUG)
-	}
-	
+  }
+
 public:
-	static _OU_ALWAYSINLINE_PRE const EnumType _OU_ALWAYSINLINE_IN _OU_CONVENTION_API 
-	/*const EnumType */Decode(const ElementType &etValue)
-	{
-		const ElementType *itElementFound = FindValueSequentially(m_aetElementArray, m_aetElementArray + EnumMax, etValue);
+  static _OU_ALWAYSINLINE_PRE const EnumType _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+  /*const EnumType */Decode(const ElementType &etValue)
+  {
+    const ElementType *itElementFound = FindValueSequentially(m_aetElementArray, m_aetElementArray + EnumMax, etValue);
 
-		EnumType etResult = (EnumType)(itElementFound - m_aetElementArray);
-		return etResult;
-	}
-	
-	static _OU_ALWAYSINLINE_PRE const ElementType &_OU_ALWAYSINLINE_IN _OU_CONVENTION_API 
-	/*const ElementType &*/Encode(const EnumType &etValue)
-	{
-		OU_ASSERT(sizeof(EnumType) <= sizeof(int));
-		OU_ASSERT(OU_IN_INT_RANGE(etValue, 0, EnumMax));
+    EnumType etResult = (EnumType)(itElementFound - m_aetElementArray);
+    return etResult;
+  }
 
-		return m_aetElementArray[etValue];
-	}
-	
-	static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API 
-	/*bool */IsValidDecode(const EnumType &etValue)
-	{
-		return etValue != EnumMax;
-	}
-	
-	static _OU_ALWAYSINLINE_PRE const ElementType *_OU_ALWAYSINLINE_IN _OU_CONVENTION_API 
-	/*const ElementType **/GetStoragePointer()
-	{
-		return m_aetElementArray;
-	}
-	
-private:
-	static const ElementType *_OU_CONVENTION_API FindValueSequentially(const ElementType *petArrayBegin, const ElementType *petArrayEnd, const ElementType &etValue)
-	{
-		const CElementEqualType etElementEqual = CElementEqualType();
+  static _OU_ALWAYSINLINE_PRE const ElementType &_OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+  /*const ElementType &*/Encode(const EnumType &etValue)
+  {
+    OU_ASSERT(sizeof(EnumType) <= sizeof(int));
+    OU_ASSERT(OU_IN_INT_RANGE(etValue, 0, EnumMax));
 
-		const ElementType *petCurrentElement = petArrayBegin;
+    return m_aetElementArray[etValue];
+  }
 
-		for (; petCurrentElement != petArrayEnd; ++petCurrentElement)
-		{
-			if (etElementEqual(*petCurrentElement, etValue))
-			{
-				break;
-			}
-		}
+  static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+  /*bool */IsValidDecode(const EnumType &etValue)
+  {
+    return etValue != EnumMax;
+  }
 
-		return petCurrentElement;
-	}
+  static _OU_ALWAYSINLINE_PRE const ElementType *_OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+  /*const ElementType **/GetStoragePointer()
+  {
+    return m_aetElementArray;
+  }
 
 private:
-	static const ElementType m_aetElementArray[];
+  static const ElementType *_OU_CONVENTION_API FindValueSequentially(const ElementType *petArrayBegin, const ElementType *petArrayEnd, const ElementType &etValue)
+  {
+    const CElementEqualType etElementEqual = CElementEqualType();
+
+    const ElementType *petCurrentElement = petArrayBegin;
+
+    for (; petCurrentElement != petArrayEnd; ++petCurrentElement)
+    {
+      if (etElementEqual(*petCurrentElement, etValue))
+      {
+      	break;
+      }
+    }
+
+    return petCurrentElement;
+  }
+
+private:
+  static const ElementType m_aetElementArray[];
 };
-	
+
 
 //////////////////////////////////////////////////////////////////////////
 // CEnumSortedElementArray definition
 
 /*
- *	Implementation Note:
- *	The array is intended to store static constant data. 
- *	Therefore CElementLessType and CElementEqualType should not ever need 
- *	a nontrivial constructor and it is acceptable to have them 
- *	as template parameters.
+ *  Implementation Note:
+ *  The array is intended to store static constant data.
+ *  Therefore CElementLessType and CElementEqualType should not ever need
+ *  a nontrivial constructor and it is acceptable to have them
+ *  as template parameters.
  */
 
 template<typename EnumType, const EnumType EnumMax, typename ElementType, const int Instance=0, class CElementLessType=CTypeStandardLess<ElementType> >
-class GAZEBO_VISIBLE CEnumSortedElementArray
+class OU_VISIBLE CEnumSortedElementArray
 {
 public:
-	_OU_INLINE _OU_CONVENTION_METHOD CEnumSortedElementArray()
-	{
+  _OU_INLINE _OU_CONVENTION_METHOD CEnumSortedElementArray()
+  {
 #if !defined(NDEBUG)
 
 #if _OU_COMPILER != _OU_COMPILER_GCC || _OU_COMPILER_VERSION == _OU_COMPILER_VERSION_GCCLT4
 
-		OU_ASSERT(OU_ARRAY_SIZE(m_aetElementArray) == EnumMax);
+    OU_ASSERT(OU_ARRAY_SIZE(m_aetElementArray) == EnumMax);
 
 
 #endif // #if _OU_COMPILER != _OU_COMPILER_GCC || _OU_COMPILER_VERSION == _OU_COMPILER_VERSION_GCCLT4
 
-		const CElementLessType ltElementLess = CElementLessType();
+    const CElementLessType ltElementLess = CElementLessType();
 
-		for (unsigned nElementIndex = 1; nElementIndex < EnumMax; ++nElementIndex)
-		{
-			OU_ASSERT(ltElementLess(m_aetElementArray[nElementIndex - 1], m_aetElementArray[nElementIndex])); // Element values must be sorted
-		}
+    for (unsigned nElementIndex = 1; nElementIndex < EnumMax; ++nElementIndex)
+    {
+      OU_ASSERT(ltElementLess(m_aetElementArray[nElementIndex - 1], m_aetElementArray[nElementIndex])); // Element values must be sorted
+    }
 
 
 #endif // #if !defined(NDEBUG)
-	}
-	
-	static _OU_ALWAYSINLINE_PRE const EnumType _OU_ALWAYSINLINE_IN _OU_CONVENTION_API 
-	/*const EnumType */Decode(const ElementType &etValue)
-	{
-		const CElementLessType ltElementLess = CElementLessType();
-		
-		EnumType etResult = EnumMax;
+  }
 
-		const ElementType *itElementFound = FindValueLowerBound(m_aetElementArray, m_aetElementArray + EnumMax, etValue);
-		
-		if (itElementFound != m_aetElementArray + EnumMax)
-		{
-			if (!ltElementLess(etValue, *itElementFound))
-			{
-				etResult = (EnumType)(itElementFound - m_aetElementArray);
-			}
-		}
-		
-		return etResult;
-	}
-	
-	static _OU_ALWAYSINLINE_PRE const ElementType &_OU_ALWAYSINLINE_IN _OU_CONVENTION_API 
-	/*const ElementType &*/Encode(const EnumType &etValue)
-	{
-		OU_ASSERT(sizeof(EnumType) <= sizeof(int));
-		OU_ASSERT(OU_IN_INT_RANGE(etValue, 0, EnumMax));
+  static _OU_ALWAYSINLINE_PRE const EnumType _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+  /*const EnumType */Decode(const ElementType &etValue)
+  {
+    const CElementLessType ltElementLess = CElementLessType();
 
-		return m_aetElementArray[etValue];
-	}
-	
-	static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API 
-	/*bool */IsValidDecode(const EnumType &etValue)
-	{
-		return etValue != EnumMax;
-	}
-	
-	static _OU_ALWAYSINLINE_PRE const ElementType *_OU_ALWAYSINLINE_IN _OU_CONVENTION_API 
-	/*const ElementType **/GetStoragePointer()
-	{
-		return m_aetElementArray;
-	}
+    EnumType etResult = EnumMax;
 
-private:
-	static const ElementType *_OU_CONVENTION_API FindValueLowerBound(const ElementType *petArrayBegin, const ElementType *petArrayEnd, const ElementType &etValue)
-	{
-		const CElementLessType ltElementLess = CElementLessType();
+    const ElementType *itElementFound = FindValueLowerBound(m_aetElementArray, m_aetElementArray + EnumMax, etValue);
 
-		const ElementType *petCurrentRangeBegin = petArrayBegin;
-		const ElementType *petCurrentRangeEnd = petArrayEnd;
+    if (itElementFound != m_aetElementArray + EnumMax)
+    {
+      if (!ltElementLess(etValue, *itElementFound))
+      {
+      	etResult = (EnumType)(itElementFound - m_aetElementArray);
+      }
+    }
 
-		while (petCurrentRangeBegin != petCurrentRangeEnd)
-		{
-			const ElementType *petCurrentRangeMiddle = petCurrentRangeBegin + (petCurrentRangeEnd - petCurrentRangeBegin) / 2;
+    return etResult;
+  }
 
-			if (ltElementLess(*petCurrentRangeMiddle, etValue))
-			{
-				petCurrentRangeBegin = petCurrentRangeMiddle + 1;
-			}
-			else
-			{
-				petCurrentRangeEnd = petCurrentRangeMiddle;
-			}
-		}
+  static _OU_ALWAYSINLINE_PRE const ElementType &_OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+  /*const ElementType &*/Encode(const EnumType &etValue)
+  {
+    OU_ASSERT(sizeof(EnumType) <= sizeof(int));
+    OU_ASSERT(OU_IN_INT_RANGE(etValue, 0, EnumMax));
 
-		return petCurrentRangeBegin;
-	}
+    return m_aetElementArray[etValue];
+  }
+
+  static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+  /*bool */IsValidDecode(const EnumType &etValue)
+  {
+    return etValue != EnumMax;
+  }
+
+  static _OU_ALWAYSINLINE_PRE const ElementType *_OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+  /*const ElementType **/GetStoragePointer()
+  {
+    return m_aetElementArray;
+  }
 
 private:
-	static const ElementType m_aetElementArray[];
+  static const ElementType *_OU_CONVENTION_API FindValueLowerBound(const ElementType *petArrayBegin, const ElementType *petArrayEnd, const ElementType &etValue)
+  {
+    const CElementLessType ltElementLess = CElementLessType();
+
+    const ElementType *petCurrentRangeBegin = petArrayBegin;
+    const ElementType *petCurrentRangeEnd = petArrayEnd;
+
+    while (petCurrentRangeBegin != petCurrentRangeEnd)
+    {
+      const ElementType *petCurrentRangeMiddle = petCurrentRangeBegin + (petCurrentRangeEnd - petCurrentRangeBegin) / 2;
+
+      if (ltElementLess(*petCurrentRangeMiddle, etValue))
+      {
+      	petCurrentRangeBegin = petCurrentRangeMiddle + 1;
+      }
+      else
+      {
+      	petCurrentRangeEnd = petCurrentRangeMiddle;
+      }
+    }
+
+    return petCurrentRangeBegin;
+  }
+
+private:
+  static const ElementType m_aetElementArray[];
 };
 
 

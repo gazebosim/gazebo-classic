@@ -15,6 +15,7 @@ include_directories(SYSTEM
 
 link_directories(  
   ${CCD_LIBRARY_DIRS} 
+  ${Boost_LIBRARY_DIR}
 )
 
 add_subdirectory(OPCODE)
@@ -246,9 +247,18 @@ if (SSE2_FOUND OR SSE3_FOUND OR SSSE3_FOUND OR SSE4_1_FOUND OR SSE4_2_FOUND)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSSE")
 endif()
 
+if (WIN32)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWIN32 -DODE_DLL")
+endif()
+
 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
 
-gz_add_library(gazebo_ode ${sources})
+if (WIN32)
+  add_library(gazebo_ode SHARED ${sources})
+else()
+  gz_add_library(gazebo_ode ${sources})
+endif()
+
 target_link_libraries(gazebo_ode
   gazebo_opcode
   gazebo_gimpact
