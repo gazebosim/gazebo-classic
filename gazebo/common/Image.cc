@@ -367,8 +367,9 @@ Color Image::GetMaxColor() const
 }
 
 //////////////////////////////////////////////////
-void Image::Rescale(int _width, int _height)
+void Image::Rescale(int /*_width*/, int /*_height*/)
 {
+  // PUT THIS BACK IN!!
   //this->bitmap = FreeImage_Rescale(this->bitmap, _width, _height,
    //   FILTER_LANCZOS3);
 }

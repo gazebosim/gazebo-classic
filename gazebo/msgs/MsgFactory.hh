@@ -72,10 +72,7 @@ namespace gazebo
     /// does not allow visibility on definitions
     #define GZ_REGISTER_STATIC_MSG(_msgtype, _classname) \
     GAZEBO_VISIBLE \
-    boost::shared_ptr<google::protobuf::Message> New##_classname();
-
-    #define GZ_REGISTER_STATIC_MSG(_msgtype, _classname) \
-    boost::shared_ptr<google::protobuf::Message> New##_classname() \
+    boost::shared_ptr<google::protobuf::Message> New##_classname()\
     { \
       return boost::shared_ptr<gazebo::msgs::_classname>(\
           new gazebo::msgs::_classname); \
