@@ -41,7 +41,7 @@ void MainWindow_TEST::Selection()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
@@ -62,11 +62,18 @@ void MainWindow_TEST::Selection()
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
   QVERIFY(cam != NULL);
 
-  // get model at center of window - should get the ground plane
+  gazebo::gui::GLWidget *glWidget =
+    mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+  QVERIFY(glWidget != NULL);
+
+  gazebo::math::Vector2i glWidgetCenter(
+      glWidget->width()*0.5, glWidget->height()*0.5);
+
+  // get model at center of window - should get the box
   gazebo::rendering::VisualPtr vis =
-      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+      cam->GetVisual(glWidgetCenter);
   QVERIFY(vis != NULL);
-  QVERIFY(vis->IsPlane());
+  QVERIFY(vis->GetRootVisual()->GetName() == "box");
 
   // move camera to look at the box
   gazebo::math::Pose cameraPose(gazebo::math::Vector3(-1, 0, 0.5),
@@ -86,8 +93,7 @@ void MainWindow_TEST::Selection()
   QVERIFY(cam->GetWorldRotation() == pitch90);
 
   // verify there is nothing in the middle of the window
-  gazebo::rendering::VisualPtr vis3 =
-      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+  gazebo::rendering::VisualPtr vis3 = cam->GetVisual(glWidgetCenter);
   QVERIFY(vis3 == NULL);
 
   // reset orientation
@@ -103,8 +109,7 @@ void MainWindow_TEST::Selection()
 
   // hide the box
   vis4->SetVisible(false);
-  gazebo::rendering::VisualPtr vis5 =
-      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+  gazebo::rendering::VisualPtr vis5 = cam->GetVisual(glWidgetCenter);
 
   // verify we don't get anything now
   QVERIFY(vis5 == NULL);
@@ -202,7 +207,6 @@ void MainWindow_TEST::CopyPaste()
 
   // Create the main window.
   mainWindow->Load();
-
   mainWindow->Init();
   mainWindow->show();
 
