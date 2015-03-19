@@ -263,6 +263,14 @@ namespace gazebo
       /// \return The value of the parameter
       public: virtual boost::any GetParam(const std::string &_key) const;
 
+      /// \brief Get a parameter from the physics engine with a boolean to
+      /// indicate success or failure
+      /// \param[in] _key Key of the accessed param
+      /// \param[out] _value Value of the accessed param
+      /// \return True if the parameter was successfully retrieved
+      public: virtual bool GetParam(const std::string &_key,
+                  boost::any &_value) const;
+
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;
 

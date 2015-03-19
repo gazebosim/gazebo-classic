@@ -210,6 +210,32 @@ boost::any PhysicsEngine::GetParam(const std::string &/*_key*/) const
 }
 
 //////////////////////////////////////////////////
+bool PhysicsEngine::GetParam(const std::string &_key,
+    boost::any &_value) const
+{
+  if (_key == "type")
+    _value = this->GetType();
+  else if (_key == "max_step_size")
+    _value = this->GetMaxStepSize();
+  else if (_key == "real_time_update_rate")
+    _value = this->GetRealTimeUpdateRate();
+  else if (_key == "real_time_factor")
+    _value = this->GetTargetRealTimeFactor();
+  else if (_key == "gravity")
+    _value = this->GetGravity();
+  else if (_key == "magnetic_field")
+    _value = this->sdf->Get<math::Vector3>("magnetic_field");
+  else
+  {
+    gzwarn << "Key [" << _key << "] is not supported in " << this->GetType()
+           << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
+//////////////////////////////////////////////////
 ContactManager *PhysicsEngine::GetContactManager() const
 {
   return this->contactManager;

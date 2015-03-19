@@ -633,12 +633,18 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     return;
   }
 
-  // create the top face
   unsigned int numVertices = subMesh->GetVertexCount();
+
+  // add normal for bottom face
+  for (unsigned int i = 0; i < numVertices; ++i)
+    subMesh->AddNormal(-math::Vector3::UnitZ);
+
+  // create the top face
   for (unsigned int i = 0; i < numVertices; ++i)
   {
     math::Vector3 v = subMesh->GetVertex(i);
     subMesh->AddVertex(v.x, v.y, _height);
+    subMesh->AddNormal(math::Vector3::UnitZ);
   }
   unsigned int numIndices = subMesh->GetIndexCount();
   for (unsigned int i = 0; i < numIndices; i+=3)
@@ -685,7 +691,10 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
       subMesh->AddVertex(math::Vector3(v1.x, v1.y, _height));
     }
     for (unsigned int j = 0; j < 6; ++j)
+    {
       subMesh->AddIndex(vCount++);
+      subMesh->AddNormal(normals[i]);
+    }
   }
 }
 
