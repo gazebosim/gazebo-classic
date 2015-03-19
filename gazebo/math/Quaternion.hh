@@ -68,7 +68,7 @@ namespace gazebo
     public: Quaternion(const Vector3 &_rpy);
 
     /// \brief Copy constructor
-    /// \param qt Quaternion to copy
+    /// \param[in] _qt Quaternion to copy
     public: Quaternion(const Quaternion &_qt);
 
     /// \brief Destructor
@@ -82,7 +82,7 @@ namespace gazebo
     public: void Invert();
 
     /// \brief Get the inverse of this quaternion
-    /// \return Inverse quarenion
+    /// \return Inverse quaternion
     public: inline Quaternion GetInverse() const
             {
               double s = 0;
@@ -110,7 +110,7 @@ namespace gazebo
               return q;
             }
 
-    /// \brief Set the quatern to the identity
+    /// \brief Set the quaternion to the identity
     public: void SetToIdentity();
 
     /// \brief Return the logarithm
@@ -144,42 +144,46 @@ namespace gazebo
     public: void Set(double _u, double _x, double _y, double _z);
 
     /// \brief Set the quaternion from Euler angles. The order of operations
-    /// are roll, pitch, yaw.
-    /// \param[in] vec  Euler angle
+    /// is roll, pitch, yaw around a fixed body frame axis
+    /// (the original frame of the object before rotation is applied).
+    /// Roll is a rotation about x, pitch is about y, yaw is about z.
+    /// \param[in] _vec Euler angle
     public: void SetFromEuler(const Vector3 &_vec);
 
     /// \brief Set the quaternion from Euler angles.
     /// \param[in] _roll Roll angle (radians).
-    /// \param[in] _pitch Roll angle (radians).
-    /// \param[in] _yaw Roll angle (radians).
+    /// \param[in] _pitch Pitch angle (radians).
+    /// \param[in] _yaw Yaw angle (radians).
     public: void SetFromEuler(double _roll, double _pitch, double _yaw);
 
     /// \brief Return the rotation in Euler angles
     /// \return This quaternion as an Euler vector
     public: Vector3 GetAsEuler() const;
 
-    /// \brief Convert euler angles to quatern.
-    /// \param[in]
+    /// \brief Convert euler angles to a quaternion.
+    /// \param[in] _vec The vector of angles to convert.
+    /// \return The converted quaternion.
     public: static Quaternion EulerToQuaternion(const Vector3 &_vec);
 
     /// \brief Convert euler angles to quatern.
     /// \param[in] _x rotation along x
     /// \param[in] _y rotation along y
     /// \param[in] _z rotation along z
+    /// \return The converted quaternion.
     public: static Quaternion EulerToQuaternion(double _x,
                                                 double _y,
                                                 double _z);
 
     /// \brief Get the Euler roll angle in radians
-    /// \return the roll
+    /// \return the roll component
     public: double GetRoll();
 
     /// \brief Get the Euler pitch angle in radians
-    /// \return the pitch
+    /// \return the pitch component
     public: double GetPitch();
 
     /// \brief Get the Euler yaw angle in radians
-    /// \return the yaw
+    /// \return the yaw component
     public: double GetYaw();
 
     /// \brief Return rotation as axis and angle
@@ -201,18 +205,18 @@ namespace gazebo
     /// \return this quaternion + qt
     public: Quaternion operator+=(const Quaternion &_qt);
 
-    /// \brief Substraction operator
-    /// \param[in] _qt quaternion to substract
+    /// \brief Subtraction operator
+    /// \param[in] _qt quaternion to subtract
     /// \return this quaternion - _qt
     public: Quaternion operator-(const Quaternion &_qt) const;
 
-    /// \brief Substraction operator
-    /// \param[in] _qt Quaternion for substraction
-    /// \return This quatern - qt
+    /// \brief Subtraction operator
+    /// \param[in] _qt Quaternion for subtraction
+    /// \return This quaternion - qt
     public: Quaternion operator-=(const Quaternion &_qt);
 
     /// \brief Multiplication operator
-    /// \param[in] _qt Quaternion for multiplication
+    /// \param[in] _q Quaternion for multiplication
     /// \return This quaternion multiplied by the parameter
     public: inline Quaternion operator*(const Quaternion &_q) const
             {
@@ -223,18 +227,19 @@ namespace gazebo
                   this->w*_q.z + this->x*_q.y - this->y*_q.x + this->z*_q.w);
             }
 
-    /// \brief Multiplication operator
+    /// \brief Multiplication operator by a scalar.
     /// \param[in] _f factor
-    /// \return quaternion multiplied by _f
+    /// \return quaternion multiplied by the scalar
     public: Quaternion operator*(const double &_f) const;
 
     /// \brief Multiplication operator
     /// \param[in] _qt Quaternion for multiplication
-    /// \return This quatern multiplied by the parameter
+    /// \return This quaternion multiplied by the parameter
     public: Quaternion operator*=(const Quaternion &qt);
 
     /// \brief Vector3 multiplication operator
     /// \param[in] _v vector to multiply
+    /// \return The result of the vector multiplication
     public: Vector3 operator*(const Vector3 &_v) const;
 
     /// \brief Equal to operator
@@ -263,14 +268,14 @@ namespace gazebo
 
     /// \brief Do the reverse rotation of a vector by this quaternion
     /// \param[in] _vec the vector
-    /// \return the
+    /// \return the reversed vector
     public: Vector3 RotateVectorReverse(Vector3 _vec) const;
 
-    /// \brief See if a quatern is finite (e.g., not nan)
-    /// \return True if quatern is finite
+    /// \brief See if a quaternion is finite (e.g., not nan)
+    /// \return True if quaternion is finite
     public: bool IsFinite() const;
 
-    /// \brief Correct any nan
+    /// \brief Correct any nan values in this quaternion
     public: inline void Correct()
             {
               if (!std::isfinite(this->x))
@@ -292,6 +297,7 @@ namespace gazebo
             }
 
     /// \brief Get the quaternion as a 3x3 matrix
+    /// \return The 3x3 matrix form of the quaternion
     public: Matrix3 GetAsMatrix3() const;
 
     /// \brief Get the quaternion as a 4x4 matrix
@@ -299,15 +305,15 @@ namespace gazebo
     public: Matrix4 GetAsMatrix4() const;
 
     /// \brief Return the X axis
-    /// \return the vector
+    /// \return the X axis of the vector
     public: Vector3 GetXAxis() const;
 
     /// \brief Return the Y axis
-    /// \return the vector
+    /// \return the Y axis of the vector
     public: Vector3 GetYAxis() const;
 
     /// \brief Return the Z axis
-    /// \return the vector
+    /// \return the Z axis of the vector
     public: Vector3 GetZAxis() const;
 
     /// \brief Round all values to _precision decimal places
@@ -328,6 +334,7 @@ namespace gazebo
     /// \param[in] _rkQ the end quaternion
     /// \param[in] _shortestPath when true, the rotation may be inverted to
     /// get to minimize rotation
+    /// \return The result of the quadratic interpolation
     public: static Quaternion Squad(double _fT, const Quaternion &_rkP,
                 const Quaternion &_rkA, const Quaternion &_rkB,
                 const Quaternion &_rkQ, bool _shortestPath = false);
@@ -339,6 +346,7 @@ namespace gazebo
     /// \param[in] _rkQ the end quaternion
     /// \param[in] _shortestPath when true, the rotation may be inverted to
     /// get to minimize rotation
+    /// \return The result of the linear interpolation
     public: static Quaternion Slerp(double _fT, const Quaternion &_rkP,
                 const Quaternion &_rkQ, bool _shortestPath = false);
 
@@ -351,16 +359,16 @@ namespace gazebo
     public: Quaternion Integrate(const Vector3 &_angularVelocity,
                                  const double _deltaT) const;
 
-    /// \brief Attributes of the quaternion
+    /// \brief w value of the quaternion
     public: double w;
 
-    /// \brief Attributes of the quaternion
+    /// \brief x value of the quaternion
     public: double x;
 
-    /// \brief Attributes of the quaternion
+    /// \brief y value of the quaternion
     public: double y;
 
-    /// \brief Attributes of the quaternion
+    /// \brief z value of the quaternion
     public: double z;
 
     /// \brief Stream insertion operator
@@ -398,4 +406,3 @@ namespace gazebo
   }
 }
 #endif
-
