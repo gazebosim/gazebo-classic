@@ -18,9 +18,12 @@ These are the routes provided by the server:
 
 Installation:
 
-  make sure nodejs is installed:
-     sudo apt-get install nodejs nodejs-legacy npm)
+  make sure nodejs is installed (skip if you have it already):
+     sudo apt-get install nodejs nodejs-legacy npm
   
+  now setup the local test server:
+     cd <gazebo-src>/test/plugins/rest-web
+     npm install
 
 Running the server:
   
