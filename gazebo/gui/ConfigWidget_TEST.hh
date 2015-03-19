@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,12 @@ class ConfigWidget_TEST : public QTestFixture
 
   /// \brief Test creating a config widget from a visual message.
   private slots: void VisualMsgWidget();
+
+  /// \brief Test setting visibility of a field in config widget.
+  private slots: void ConfigWidgetVisible();
+
+  /// \brief Test setting a field to be read-only in config widget.
+  private slots: void ConfigWidgetReadOnly();
 };
 
 #endif

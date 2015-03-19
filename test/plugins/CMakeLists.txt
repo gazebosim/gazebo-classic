@@ -18,6 +18,9 @@ if (WIN32)
 endif()
 
 set (plugins
+  ExceptionModelPluginConstructor
+  ExceptionModelPluginInit
+  ExceptionModelPluginLoad
   ForceTorqueModelRemovalTestPlugin
   Issue1208Plugin
   ModelTrajectoryTestPlugin

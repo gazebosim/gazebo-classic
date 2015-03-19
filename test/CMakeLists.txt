@@ -16,6 +16,7 @@ if (WIN32)
 endif()
 
 link_directories(
+  ${CCD_LIBRARY_DIRS}
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
   ${ODE_LIBRARY_DIRS}

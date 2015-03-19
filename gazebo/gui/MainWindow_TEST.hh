@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,8 @@ class MainWindow_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test copying and pasting a model
-  private slots: void CopyPasteModel();
-
-  /// \brief Test copying and pasting a light
-  private slots: void CopyPasteLight();
+  /// \brief Test copying and pasting a model and a light
+  private slots: void CopyPaste();
 
   /// \brief Test that trigger of the view wireframe action creates an
   /// appropriate request.

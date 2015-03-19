@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "helper_physics_generator.hh"
 
+using namespace gazebo;
 class PolylineTest : public ServerFixture,
                      public testing::WithParamInterface<const char*>
 {
@@ -35,51 +36,51 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr triangleModel = world->GetModel("triangle");
-  EXPECT_TRUE(triangleModel);
+  EXPECT_TRUE(triangleModel != NULL);
 
   physics::LinkPtr triangleLink = triangleModel->GetLink("link");
-  EXPECT_TRUE(triangleLink);
+  EXPECT_TRUE(triangleLink != NULL);
 
   physics::CollisionPtr triangleColl = triangleLink->GetCollision("collision");
-  EXPECT_TRUE(triangleColl);
+  EXPECT_TRUE(triangleColl != NULL);
 
   physics::ShapePtr shape = triangleColl->GetShape();
-  EXPECT_TRUE(shape);
+  EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::POLYLINE_SHAPE));
 
   physics::PolylineShapePtr polyShape =
     boost::dynamic_pointer_cast<physics::PolylineShape>(shape);
-  EXPECT_TRUE(polyShape);
+  EXPECT_TRUE(polyShape != NULL);
 
   EXPECT_DOUBLE_EQ(polyShape->GetHeight(), 1.0);
 
-  std::vector<math::Vector2d> vertices = polyShape->GetVertices();
-  EXPECT_EQ(vertices[0], math::Vector2d(-0.5, -0.5));
-  EXPECT_EQ(vertices[1], math::Vector2d(-0.5, 0.5));
-  EXPECT_EQ(vertices[2], math::Vector2d(0.5, 0.5));
-  EXPECT_EQ(vertices[3], math::Vector2d(0.0, 0.0));
-  EXPECT_EQ(vertices[4], math::Vector2d(0.5, -0.5));
+  std::vector<std::vector<math::Vector2d> > vertices = polyShape->GetVertices();
+  EXPECT_EQ(vertices[0][0], math::Vector2d(-0.5, -0.5));
+  EXPECT_EQ(vertices[0][1], math::Vector2d(-0.5, 0.5));
+  EXPECT_EQ(vertices[0][2], math::Vector2d(0.5, 0.5));
+  EXPECT_EQ(vertices[0][3], math::Vector2d(0.0, 0.0));
+  EXPECT_EQ(vertices[0][4], math::Vector2d(0.5, -0.5));
 
   // Check the FillMsg function
   {
     msgs::Geometry msg;
     polyShape->FillMsg(msg);
     EXPECT_EQ(msg.type(), msgs::Geometry::POLYLINE);
-    EXPECT_DOUBLE_EQ(msg.polyline().height(), 1);
-    EXPECT_DOUBLE_EQ(msg.polyline().point(0).x(), -0.5);
-    EXPECT_DOUBLE_EQ(msg.polyline().point(0).y(), -0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).height(), 1);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(0).x(), -0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(0).y(), -0.5);
 
-    EXPECT_DOUBLE_EQ(msg.polyline().point(1).x(), -0.5);
-    EXPECT_DOUBLE_EQ(msg.polyline().point(1).y(), 0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(1).x(), -0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(1).y(), 0.5);
 
-    EXPECT_DOUBLE_EQ(msg.polyline().point(2).x(), 0.5);
-    EXPECT_DOUBLE_EQ(msg.polyline().point(2).y(), 0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(2).x(), 0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(2).y(), 0.5);
 
-    EXPECT_DOUBLE_EQ(msg.polyline().point(3).x(), 0.0);
-    EXPECT_DOUBLE_EQ(msg.polyline().point(3).y(), 0.0);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(3).x(), 0.0);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(3).y(), 0.0);
 
-    EXPECT_DOUBLE_EQ(msg.polyline().point(4).x(), 0.5);
-    EXPECT_DOUBLE_EQ(msg.polyline().point(4).y(), -0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(4).x(), 0.5);
+    EXPECT_DOUBLE_EQ(msg.polyline(0).point(4).y(), -0.5);
   }
 
   // Spawn a sphere over the polyline shape, and check that it doesn't pass

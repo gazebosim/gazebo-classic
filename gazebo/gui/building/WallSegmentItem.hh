@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,6 +73,9 @@ namespace gazebo
       /// \brief Update inspector with current values.
       public: void UpdateInspector();
 
+      // Documentation inherited
+      public: void SetHighlighted(bool _highlighted);
+
       /// \brief Update wall segment when segment updated.
       protected: void SegmentUpdated();
 
@@ -105,9 +108,6 @@ namespace gazebo
 
       /// \brief Height of the wall segment in meters.
       private: double wallHeight;
-
-      /// \brief Scale for converting pixels to metric units.
-      private: double scale;
 
       /// \brief This wall segment's measure item.
       private: MeasureItem *measure;

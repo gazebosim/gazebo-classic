@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,14 @@ using namespace gui;
 ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("ImportDialog");
-  this->setWindowTitle("Custom Part");
+  this->setWindowTitle("Custom Link");
 
   this->messageLabel = new QLabel;
   this->messageLabel->setText(
       tr("You can import a 3D mesh that you have \n"
-      "made with a modelling tool such as Blender \n"
-      "Maya, or SolidWorks. It will apear as a \n"
-      "part in the 3D View."));
+      "made with a modelling tool such as Blender, \n"
+      "Maya or SolidWorks. It will appear as a \n"
+      "link in the 3D View."));
 
   this->pathLineEdit = new QLineEdit;
   this->pathLineEdit->setText(QDir::homePath());
@@ -39,7 +39,7 @@ ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
 
   QLabel *nameLabel = new QLabel;
-  nameLabel->setText(tr("Part Name:"));
+  nameLabel->setText(tr("Link Name:"));
   this->nameLineEdit = new QLineEdit;
   this->nameLineEdit->setText(tr("DefaultName"));
 
@@ -74,7 +74,7 @@ ImportDialog::~ImportDialog()
 }
 
 /////////////////////////////////////////////////
-std::string ImportDialog::GetPartName() const
+std::string ImportDialog::GetLinkName() const
 {
   return this->nameLineEdit->text().toStdString();
 }
@@ -86,7 +86,7 @@ std::string ImportDialog::GetImportPath() const
 }
 
 /////////////////////////////////////////////////
-void ImportDialog::SetPartName(const std::string &_name)
+void ImportDialog::SetLinkName(const std::string &_name)
 {
   this->nameLineEdit->setText(tr(_name.c_str()));
 }
@@ -106,7 +106,7 @@ void ImportDialog::SetTitle(const std::string &_title)
 /////////////////////////////////////////////////
 void ImportDialog::OnBrowse()
 {
-  QFileDialog fd(this, tr("Import Part"), QDir::homePath(),
+  QFileDialog fd(this, tr("Import Link"), QDir::homePath(),
       tr("Mesh files (*.dae *.stl)"));
   fd.setFilter(QDir::AllDirs | QDir::Hidden);
   fd.setFileMode(QFileDialog::ExistingFile);
@@ -133,7 +133,8 @@ void ImportDialog::OnCancel()
 void ImportDialog::OnImport()
 {
   QFileInfo info(this->pathLineEdit->text());
-  if (info.isFile())
+  if (info.isFile() && (info.completeSuffix().toLower() == "dae" ||
+      info.completeSuffix().toLower() == "stl"))
   {
     this->accept();
   }
@@ -141,7 +142,7 @@ void ImportDialog::OnImport()
   {
     std::string msg = this->pathLineEdit->text().toStdString() +
         " is not a valid mesh file.\nPlease select another file.";
-    QMessageBox::warning(0, QString("Invalid Mesh File"),
+    QMessageBox::warning(this, QString("Invalid Mesh File"),
         QString(msg.c_str()), QMessageBox::Ok,
         QMessageBox::Ok);
   }

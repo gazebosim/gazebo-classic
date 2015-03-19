@@ -74,7 +74,7 @@ struct dxWorldProcessMemoryManager:
   typedef void *(*alloc_block_fn_t)(size_t block_size);
   typedef void *(*shrink_block_fn_t)(void *block_pointer, size_t block_current_size, size_t block_smaller_size);
   typedef void (*free_block_fn_t)(void *block_pointer, size_t block_current_size);
-  
+
   dxWorldProcessMemoryManager(alloc_block_fn_t fnAlloc, shrink_block_fn_t fnShrink, free_block_fn_t fnFree)
   {
     Assign(fnAlloc, fnShrink, fnFree);
@@ -136,7 +136,7 @@ struct dxWorldProcessContext
 
   bool IsStructureValid() const
   {
-    return !m_pPreallocationcContext && m_pAllocBegin && m_pAllocEnd && m_pAllocBegin <= m_pAllocEnd && m_pAllocCurrent == m_pAllocBegin && m_pArenaBegin && m_pArenaBegin <= m_pAllocBegin; 
+    return !m_pPreallocationcContext && m_pAllocBegin && m_pAllocEnd && m_pAllocBegin <= m_pAllocEnd && m_pAllocCurrent == m_pAllocBegin && m_pArenaBegin && m_pArenaBegin <= m_pAllocBegin;
   }
 
   size_t GetMemorySize() const
@@ -227,12 +227,12 @@ typedef void (*dstepper_fn_t) (dxWorldProcessContext *context,  // put island st
 void dxProcessIslands (dxWorld *world, dReal stepsize, dstepper_fn_t stepper);
 
 
-typedef size_t (*dmemestimate_fn_t) (dxBody * const *body, int nb, 
+typedef size_t (*dmemestimate_fn_t) (dxBody * const *body, int nb,
   dxJoint * const *_joint, int _nj);
 
-bool dxReallocateWorldProcessContext (dxWorld *world, 
+bool dxReallocateWorldProcessContext (dxWorld *world,
   dReal stepsize, dmemestimate_fn_t stepperestimate);
-dxWorldProcessContext *dxReallocateTemporayWorldProcessContext(dxWorldProcessContext *oldcontext, 
+dxWorldProcessContext *dxReallocateTemporayWorldProcessContext(dxWorldProcessContext *oldcontext,
   size_t memreq, const dxWorldProcessMemoryManager *memmgr/*=NULL*/, const dxWorldProcessMemoryReserveInfo *reserveinfo/*=NULL*/);
 void dxFreeWorldProcessContext (dxWorldProcessContext *context);
 
@@ -281,7 +281,7 @@ public:
     }
   }
 
-public: 
+public:
   dxWorldProcessContext *GetWorldProcessingContext() const { return m_ppcProcessingContext; }
   void SetWorldProcessingContext(dxWorldProcessContext *ppcInstance) { m_ppcProcessingContext = ppcInstance; }
 
@@ -299,9 +299,9 @@ public:
 
   const dxWorldProcessMemoryManager *GetMemoryManager() const { return m_pmmMemoryManager; }
   const dxWorldProcessMemoryManager *SureGetMemoryManager() const { return m_pmmMemoryManager ? m_pmmMemoryManager : &g_WorldProcessMallocMemoryManager; }
-  void SetMemoryManager(dxWorldProcessMemoryManager::alloc_block_fn_t fnAlloc, 
-    dxWorldProcessMemoryManager::shrink_block_fn_t fnShrink, 
-    dxWorldProcessMemoryManager::free_block_fn_t fnFree) 
+  void SetMemoryManager(dxWorldProcessMemoryManager::alloc_block_fn_t fnAlloc,
+    dxWorldProcessMemoryManager::shrink_block_fn_t fnShrink,
+    dxWorldProcessMemoryManager::free_block_fn_t fnFree)
   {
     if (m_pmmMemoryManager) { m_pmmMemoryManager->Assign(fnAlloc, fnShrink, fnFree); }
     else { m_pmmMemoryManager = new dxWorldProcessMemoryManager(fnAlloc, fnShrink, fnFree); }

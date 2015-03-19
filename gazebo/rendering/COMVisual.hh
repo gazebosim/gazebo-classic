@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,8 @@
 
 #include <string>
 
-#include <sdf/sdf.hh>
-
 #include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -57,10 +52,11 @@ namespace gazebo
       public: virtual void Load(ConstLinkPtr &_msg);
 
       /// \brief Load based on a math::Pose
-      /// \param[in] _pose Pose of the COM visual
-      /// \param[in] _scale Scale factor for the COM visual.
+      /// \param[in] _pose Pose of the COM visual.
+      /// \param[in] _radius Radius for the sphere visual.
+      /// \param[in] _box Link's bounding box.
       private: void Load(const math::Pose &_pose,
-               const math::Vector3 &_scale = math::Vector3(0.02, 0.02, 0.02));
+          double _radius = 0.01, math::Box _box = math::Box());
     };
     /// \}
   }

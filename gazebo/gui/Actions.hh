@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ namespace gazebo
 
     extern GZ_GUI_VISIBLE QAction *g_dataLoggerAct;
 
-    extern GZ_GUI_VISIBLE QAction *g_newModelAct;
     extern GZ_GUI_VISIBLE QAction *g_resetModelsAct;
     extern GZ_GUI_VISIBLE QAction *g_resetWorldAct;
     extern GZ_GUI_VISIBLE QAction *g_editBuildingAct;
@@ -64,6 +63,7 @@ namespace gazebo
     extern GZ_GUI_VISIBLE QAction *g_showContactsAct;
     extern GZ_GUI_VISIBLE QAction *g_showJointsAct;
     extern GZ_GUI_VISIBLE QAction *g_showCOMAct;
+    extern GZ_GUI_VISIBLE QAction *g_showInertiaAct;
     extern GZ_GUI_VISIBLE QAction *g_transparentAct;
 
     extern GZ_GUI_VISIBLE QAction *g_resetAct;
@@ -88,6 +88,7 @@ namespace gazebo
     extern GZ_GUI_VISIBLE QAction *g_pasteAct;
 
     extern GZ_GUI_VISIBLE QWidgetAction *g_alignAct;
+    extern GZ_GUI_VISIBLE QAction *g_alignButtonAct;
     extern GZ_GUI_VISIBLE QAction *g_snapAct;
 
     /// \class DeleteAction Actions.hh gui/gui.hh

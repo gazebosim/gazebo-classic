@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,6 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/OrbitViewController.hh"
 #include "gazebo/rendering/FPSViewController.hh"
-#include "gazebo/rendering/SelectionObj.hh"
 
 #include "gazebo/gui/ModelAlign.hh"
 #include "gazebo/gui/ModelSnap.hh"
@@ -132,8 +131,15 @@ GLWidget::GLWidget(QWidget *_parent)
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
 
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
+
+  // Subscribes to selection messages.
   this->selectionSub = this->node->Subscribe("~/selection",
       &GLWidget::OnSelectionMsg, this);
+
+  // Publishes information about user selections.
+  this->selectionPub =
+    this->node->Advertise<msgs::Selection>("~/selection");
+
   this->requestSub = this->node->Subscribe("~/request",
       &GLWidget::OnRequest, this);
 
@@ -154,6 +160,9 @@ GLWidget::GLWidget(QWidget *_parent)
 
   connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
   connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+
+  connect(g_editModelAct, SIGNAL(toggled(bool)), this,
+      SLOT(OnModelEditor(bool)));
 }
 
 /////////////////////////////////////////////////
@@ -168,6 +177,7 @@ GLWidget::~GLWidget()
   this->node.reset();
   this->modelPub.reset();
   this->selectionSub.reset();
+  this->selectionPub.reset();
 
   this->userCamera.reset();
 }
@@ -187,7 +197,6 @@ bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
 /////////////////////////////////////////////////
 void GLWidget::showEvent(QShowEvent *_event)
 {
-  std::cerr << " show event " << std::endl;
   QApplication::flush();
 
   if (this->windowId < 0)
@@ -204,7 +213,6 @@ void GLWidget::showEvent(QShowEvent *_event)
   QWidget::showEvent(_event);
 
   this->setFocus();
-  std::cerr << " done show event " << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -230,51 +238,34 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   // Timing may cause GLWidget to miss the OnCreateScene event. So, we check
   // here to make sure it's handled.
   if (!this->sceneCreated && rendering::get_scene())
-  {
     this->OnCreateScene(rendering::get_scene()->GetName());
-    std::cerr << "paint on create scene " << std::endl;
-  }
 
-//  rendering::UserCameraPtr cam = gui::get_active_camera();
-  rendering::UserCameraPtr cam = this->userCamera;
-    
-  std::cerr << " paint cam " << std::endl;
+  rendering::UserCameraPtr cam = gui::get_active_camera();
   if (cam && cam->GetInitialized())
   {
-  std::cerr << " prerender " << std::endl;
     event::Events::preRender();
 
-  std::cerr << " prerender done " << std::endl;
     // Tell all the cameras to render
     event::Events::render();
 
-  std::cerr << " render done " << std::endl;
     event::Events::postRender();
-
-  std::cerr << " post render done " << std::endl;
   }
 
   _e->accept();
-
-  std::cerr << "done paint " << std::endl;
 }
 
 /////////////////////////////////////////////////
 void GLWidget::resizeEvent(QResizeEvent *_e)
 {
-  std::cerr << "resize " << std::endl;
- 
   if (!this->scene)
     return;
 
   if (this->windowId >= 0)
   {
-  std::cerr << "resizing window " << std::endl;
     rendering::RenderEngine::Instance()->GetWindowManager()->Resize(
         this->windowId, _e->size().width(), _e->size().height());
     this->userCamera->Resize(_e->size().width(), _e->size().height());
   }
-  std::cerr << "done resize " << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -301,10 +292,25 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
 
   // Trigger a model delete if the Delete key was pressed, and a model
   // is currently selected.
-  if (_event->key() == Qt::Key_Delete)
+  if (_event->key() == Qt::Key_Delete &&
+      this->selectionLevel == SelectionLevels::MODEL)
   {
+    boost::mutex::scoped_lock lock(this->selectedVisMutex);
     while (!this->selectedVisuals.empty())
-      g_deleteAct->Signal(this->selectedVisuals.back()->GetName());
+    {
+      std::string name = this->selectedVisuals.back()->GetName();
+      int id = this->selectedVisuals.back()->GetId();
+      this->selectedVisuals.pop_back();
+
+      // Publish message about visual deselection
+      msgs::Selection msg;
+      msg.set_id(id);
+      msg.set_name(name);
+      msg.set_selected(false);
+      this->selectionPub->Publish(msg);
+
+      g_deleteAct->Signal(name);
+    }
   }
 
   if (_event->key() == Qt::Key_Escape)
@@ -317,20 +323,26 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     }
   }
 
-  this->mouseEvent.control =
+  this->keyEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;
-  this->mouseEvent.shift =
+  this->keyEvent.shift =
     this->keyModifiers & Qt::ShiftModifier ? true : false;
-  this->mouseEvent.alt =
+  this->keyEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
+
+  this->mouseEvent.control = this->keyEvent.control;
+  this->mouseEvent.shift = this->keyEvent.shift;
+  this->mouseEvent.alt = this->keyEvent.alt;
 
   if (this->mouseEvent.control)
   {
-    if (_event->key() == Qt::Key_C && !this->selectedVisuals.empty())
+    if (_event->key() == Qt::Key_C && !this->selectedVisuals.empty()
+       && !this->modelEditorEnabled)
     {
       g_copyAct->trigger();
     }
-    else if (_event->key() == Qt::Key_V && !this->copyEntityName.empty())
+    else if (_event->key() == Qt::Key_V && !this->copyEntityName.empty()
+       && !this->modelEditorEnabled)
     {
       g_pasteAct->trigger();
     }
@@ -339,6 +351,12 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   // Process Key Events
   if (!KeyEventHandler::Instance()->HandlePress(this->keyEvent))
   {
+    // model editor exit pop-up message is modal so can block event propagation.
+    // So using hotkeys to exit will leave the control variable in a bad state.
+    // Manually override and reset the control value.
+    if (this->modelEditorEnabled && this->mouseEvent.control)
+      this->mouseEvent.control = false;
+
     ModelManipulator::Instance()->OnKeyPressEvent(this->keyEvent);
     this->userCamera->HandleKeyPressEvent(this->keyText);
   }
@@ -377,13 +395,16 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
       g_arrowAct->trigger();
   }
 
-  this->mouseEvent.control =
+  this->keyEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;
-  this->mouseEvent.shift =
+  this->keyEvent.shift =
     this->keyModifiers & Qt::ShiftModifier ? true : false;
-  this->mouseEvent.alt =
+  this->keyEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
 
+  this->mouseEvent.control = this->keyEvent.control;
+  this->mouseEvent.shift = this->keyEvent.shift;
+  this->mouseEvent.alt = this->keyEvent.alt;
 
   ModelManipulator::Instance()->OnKeyReleaseEvent(this->keyEvent);
   this->keyText = "";
@@ -481,10 +502,7 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
 {
   if (this->state == "make_entity")
     this->OnMouseReleaseMakeEntity();
-  // Auto switch to select mode if control is pressed to allow multi-object
-  // selection. Remove this once multi-object manipulation is implemented in
-  // RTS modes, issue #213
-  else if (this->state == "select"  || this->mouseEvent.control)
+  else if (this->state == "select")
     this->OnMouseReleaseNormal();
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
@@ -686,15 +704,75 @@ void GLWidget::OnMouseReleaseNormal()
   {
     rendering::VisualPtr vis =
       this->userCamera->GetVisual(this->mouseEvent.pos);
+
     if (vis)
     {
-      vis = vis->GetRootVisual();
-      this->SetSelectedVisual(vis);
-      event::Events::setSelectedEntity(vis->GetName(), "normal");
-
-      if (this->mouseEvent.button == common::MouseEvent::RIGHT)
+      rendering::VisualPtr selectVis;
+      rendering::VisualPtr linkVis = vis->GetParent();
+      if (!linkVis)
       {
-        g_modelRightMenu->Run(vis->GetName(), QCursor::pos());
+        gzerr << "Link visual not found, this should not happen." << std::endl;
+        return;
+      }
+      rendering::VisualPtr modelVis = vis->GetRootVisual();
+      if (!modelVis)
+      {
+        gzerr << "Model visual not found, this should not happen." << std::endl;
+        return;
+      }
+
+      // Flags to check if we should select a link or a model
+      bool rightButton = (this->mouseEvent.button == common::MouseEvent::RIGHT);
+      bool modelHighlighted = modelVis->GetHighlighted();
+      int linkCount = 0;
+      bool linkHighlighted = false;
+      for (unsigned int i = 0; i < modelVis->GetChildCount(); ++i)
+      {
+        // Find out if there's only one link in the model
+        uint32_t flags = modelVis->GetChild(i)->GetVisibilityFlags();
+        if ((flags != GZ_VISIBILITY_ALL) && (flags & GZ_VISIBILITY_GUI))
+        {
+          continue;
+        }
+        linkCount++;
+
+        // A link from the same model is currently selected
+        if (modelVis->GetChild(i)->GetHighlighted())
+        {
+          linkHighlighted = true;
+        }
+      }
+
+      // Select link
+      if (linkCount > 1 && !this->mouseEvent.control &&
+          ((modelHighlighted && !rightButton) || linkHighlighted))
+      {
+        selectVis = linkVis;
+      }
+      // Select model
+      else
+      {
+        // Can't select a link and a model at the same time
+        if (this->selectionLevel == SelectionLevels::LINK)
+          this->DeselectAllVisuals();
+
+        selectVis = modelVis;
+      }
+      this->SetSelectedVisual(selectVis);
+      event::Events::setSelectedEntity(selectVis->GetName(), "normal");
+
+      // Open context menu
+      if (rightButton)
+      {
+        if (selectVis == modelVis)
+        {
+          g_modelRightMenu->Run(selectVis->GetName(), QCursor::pos(),
+              ModelRightMenu::EntityTypes::MODEL);
+        }
+        else if (selectVis == linkVis)
+        {
+          // TODO: Open link right menu
+        }
       }
     }
     else
@@ -741,10 +819,8 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
     gzerr << "Unable to connect to a running Gazebo master.\n";
 
   if (_scene->GetUserCameraCount() == 0)
-  {
-    this->userCamera = _scene->CreateUserCamera(cameraName);
-    std::cerr << " create user camera " << std::endl;
-  }
+    this->userCamera = _scene->CreateUserCamera(cameraName,
+        gazebo::gui::getINIProperty<int>("rendering.stereo", 0));
   else
     this->userCamera = _scene->GetUserCamera(0);
 
@@ -925,16 +1001,9 @@ void GLWidget::OnOrbit()
 /////////////////////////////////////////////////
 void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
-  if (_msg->has_selected())
+  if (_msg->has_selected() && _msg->selected())
   {
-    if (_msg->selected())
-    {
-      this->SetSelectedVisual(this->scene->GetVisual(_msg->name()));
-    }
-    else
-    {
-      this->SetSelectedVisual(rendering::VisualPtr());
-    }
+    this->OnSetSelectedEntity(_msg->name(), "normal");
   }
 }
 
@@ -944,23 +1013,28 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
   // deselect all if not in multi-selection mode.
   if (!this->mouseEvent.control)
   {
-    for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
-    {
-      this->selectedVisuals[i]->SetHighlighted(false);
-    }
-    this->selectedVisuals.clear();
+    this->DeselectAllVisuals();
   }
+
+  boost::mutex::scoped_lock lock(this->selectedVisMutex);
+
+  msgs::Selection msg;
 
   if (_vis && !_vis->IsPlane())
   {
+    if (_vis == _vis->GetRootVisual())
+      this->selectionLevel = SelectionLevels::MODEL;
+    else
+      this->selectionLevel = SelectionLevels::LINK;
+
     _vis->SetHighlighted(true);
 
     // enable multi-selection if control is pressed
     if (this->selectedVisuals.empty() || this->mouseEvent.control)
     {
       std::vector<rendering::VisualPtr>::iterator it =
-          std::find(this->selectedVisuals.begin(),
-          this->selectedVisuals.end(), _vis);
+        std::find(this->selectedVisuals.begin(),
+            this->selectedVisuals.end(), _vis);
       if (it == this->selectedVisuals.end())
         this->selectedVisuals.push_back(_vis);
       else
@@ -972,6 +1046,11 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
       }
     }
     g_copyAct->setEnabled(true);
+
+    msg.set_id(_vis->GetId());
+    msg.set_name(_vis->GetName());
+    msg.set_selected(true);
+    this->selectionPub->Publish(msg);
   }
   else
   {
@@ -982,12 +1061,30 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
+void GLWidget::DeselectAllVisuals()
+{
+  boost::mutex::scoped_lock lock(this->selectedVisMutex);
+
+  msgs::Selection msg;
+  for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+  {
+    this->selectedVisuals[i]->SetHighlighted(false);
+    msg.set_id(this->selectedVisuals[i]->GetId());
+    msg.set_name(this->selectedVisuals[i]->GetName());
+    msg.set_selected(false);
+    this->selectionPub->Publish(msg);
+  }
+  this->selectedVisuals.clear();
+}
+
+/////////////////////////////////////////////////
 void GLWidget::OnManipMode(const std::string &_mode)
 {
   this->state = _mode;
 
   if (!this->selectedVisuals.empty())
   {
+    boost::mutex::scoped_lock lock(this->selectedVisMutex);
     ModelManipulator::Instance()->SetAttachedVisual(
         this->selectedVisuals.back());
   }
@@ -997,6 +1094,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
 
   if (this->state != "select")
   {
+    boost::mutex::scoped_lock lock(this->selectedVisMutex);
     // only support multi-model selection in select mode for now.
     // deselect 0 to n-1 models.
     if (this->selectedVisuals.size() > 1)
@@ -1014,14 +1112,18 @@ void GLWidget::OnManipMode(const std::string &_mode)
 /////////////////////////////////////////////////
 void GLWidget::OnCopy()
 {
-  if (!this->selectedVisuals.empty())
+  boost::mutex::scoped_lock lock(this->selectedVisMutex);
+  if (!this->selectedVisuals.empty() && !this->modelEditorEnabled)
+  {
     this->Copy(this->selectedVisuals.back()->GetName());
+  }
 }
 
 /////////////////////////////////////////////////
 void GLWidget::OnPaste()
 {
-  this->Paste(this->copyEntityName);
+  if (!this->modelEditorEnabled)
+    this->Paste(this->copyEntityName);
 }
 
 /////////////////////////////////////////////////
@@ -1092,10 +1194,20 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
     std::string name = _name;
     boost::replace_first(name, gui::get_world()+"::", "");
 
-    this->SetSelectedVisual(this->scene->GetVisual(name));
-    this->scene->SelectVisual(name, _mode);
+    rendering::VisualPtr selection = this->scene->GetVisual(name);
+
+    std::vector<rendering::VisualPtr>::iterator it =
+      std::find(this->selectedVisuals.begin(),
+          this->selectedVisuals.end(), selection);
+
+    // Shortcircuit the case when GLWidget already selected the visual.
+    if (it == this->selectedVisuals.end() || _name != (*it)->GetName())
+    {
+      this->SetSelectedVisual(selection);
+      this->scene->SelectVisual(name, _mode);
+    }
   }
-  else
+  else if (!this->selectedVisuals.empty())
   {
     this->SetSelectedVisual(rendering::VisualPtr());
     this->scene->SelectVisual("", _mode);
@@ -1139,6 +1251,7 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
   {
+    boost::mutex::scoped_lock lock(this->selectedVisMutex);
     if (!this->selectedVisuals.empty())
     {
       for (std::vector<rendering::VisualPtr>::iterator it =
@@ -1147,6 +1260,7 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
       {
         if ((*it)->GetName() == _msg->data())
         {
+          ModelManipulator::Instance()->Detach();
           this->selectedVisuals.erase(it);
           break;
         }
@@ -1167,4 +1281,15 @@ void GLWidget::OnAlignMode(const std::string &_axis, const std::string &_config,
 {
   ModelAlign::Instance()->AlignVisuals(this->selectedVisuals, _axis, _config,
       _target, !_preview);
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnModelEditor(bool _checked)
+{
+  this->modelEditorEnabled = _checked;
+  g_arrowAct->trigger();
+  event::Events::setSelectedEntity("", "normal");
+
+  // Manually deselect, in case the editor was opened with Ctrl
+  this->DeselectAllVisuals();
 }

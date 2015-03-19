@@ -59,6 +59,7 @@ set (sources
   SphericalCoordinates.cc
   STLLoader.cc
   SystemPaths.cc
+  SVGLoader.cc
   Time.cc
   Timer.cc
   Video.cc
@@ -108,25 +109,13 @@ set (headers
   SphericalCoordinates.hh
   STLLoader.hh
   SystemPaths.hh
+  SVGLoader.hh
   Time.hh
   Timer.hh
   UpdateInfo.hh
   Video.hh
   ffmpeg_inc.h
  )
-
-if (HAVE_GTS)
-set (sources
-  ${sources}
-  GTSMeshUtils.cc
-  MeshCSG.cc
-)
-set (headers
-  ${headers}
-  GTSMeshUtils.hh
-  MeshCSG.hh
-)
-endif()
 
 set (gtest_sources
   Animation_TEST.cc
@@ -142,11 +131,31 @@ set (gtest_sources
   ImageHeightmap_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc
+  MeshManager_TEST.cc
   MovingWindowFilter_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
+  SVGLoader_TEST.cc
   Time_TEST.cc
 )
+
+if (HAVE_GTS)
+set (sources
+  ${sources}
+  GTSMeshUtils.cc
+  MeshCSG.cc
+)
+set (headers
+  ${headers}
+  GTSMeshUtils.hh
+  MeshCSG.hh
+)
+
+set (gtest_sources
+  ${gtest_sources}
+  GTSMeshUtils_TEST.cc
+)
+endif()
 
 if (HAVE_FFMPEG)
   set (gtest_sources ${gtest_sources}
@@ -177,6 +186,10 @@ set_property(
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
 )
 
+link_directories(
+  ${tinyxml_LIBRARY_DIRS}
+)
+
 target_link_libraries(gazebo_common
   gazebo_math
   ${libdl_library}
@@ -193,6 +206,7 @@ target_link_libraries(gazebo_common
   ${TBB_LIBRARIES}
   ${SDFormat_LIBRARIES}
 )
+
 if (UNIX)
   target_link_libraries(gazebo_common pthread)
 endif()

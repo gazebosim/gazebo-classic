@@ -2,15 +2,15 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
-  ${CEGUI_INCLUDE_DIRS}
   ${TBB_INCLUDEDIR}
   skyx
   skyx/include
 )
 
-if (${OGRE_VERSION} GREATER 1.7.4)
+if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
   add_subdirectory(deferred_shading)
 endif()
+
 add_subdirectory(skyx)
 add_subdirectory(selection_buffer)
 
@@ -36,8 +36,8 @@ set (sources
   FPSViewController.cc
   GpuLaser.cc
   Grid.cc
-  GUIOverlay.cc
   Heightmap.cc
+  InertiaVisual.cc
   JointVisual.cc
   LaserVisual.cc
   SonarVisual.cc
@@ -90,8 +90,8 @@ set (headers
   FPSViewController.hh
   GpuLaser.hh
   Grid.hh
-  GUIOverlay.hh
   Heightmap.hh
+  InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
   SonarVisual.hh
@@ -120,7 +120,6 @@ set (headers
   WindowManager.hh
   WrenchVisual.hh
   ogre_gazebo.h
-  cegui.h
 )
 
 if (HAVE_OCULUS)
@@ -141,8 +140,10 @@ set (gtest_sources_dri
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
   JointVisual_TEST.cc
+  SelectionObj_TEST.cc
   SonarVisual_TEST.cc
   TransmitterVisual_TEST.cc
+  Visual_TEST.cc
 )
 
 gz_build_dri_tests(${gtest_sources_dri})
@@ -174,7 +175,6 @@ target_link_libraries(gazebo_rendering
   gazebo_transport
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
-  ${CEGUI_LIBRARIES}
   ${tinyxml_LIBRARIES}
 )
 
@@ -188,7 +188,7 @@ if (NOT APPLE AND NOT WIN32)
   target_link_libraries(gazebo_rendering X11)
 endif()
 
-if (${OGRE_VERSION} GREATER 1.7.4)
+if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
   target_link_libraries(gazebo_rendering gazebo_rendering_deferred)
 endif()
 

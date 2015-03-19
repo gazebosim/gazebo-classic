@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ void TimePanel_TEST::ValidTimes()
   {
     this->Load("empty.world");
 
-    // Create a new data logger widget
+    // Create a new time panel widget
     gazebo::gui::TimePanel *timePanel = new gazebo::gui::TimePanel;
 
     // Get the percent real time line
@@ -69,6 +69,67 @@ void TimePanel_TEST::ValidTimes()
     value = boost::lexical_cast<double>(txt.substr(0, txt.find(" ")));
     QVERIFY(value > 0.0);
   }
+}
+
+/////////////////////////////////////////////////
+void TimePanel_TEST::Visibility()
+{
+  this->Load("empty.world");
+
+  // Create a new time panel widget
+  gazebo::gui::TimePanel *timePanel = new gazebo::gui::TimePanel;
+
+  // Get the percent real time line
+  QLineEdit *percentEdit = timePanel->findChild<QLineEdit *>(
+      "timePanelPercentRealTime");
+
+  // Get the sim time line
+  QLineEdit *simTimeEdit = timePanel->findChild<QLineEdit *>(
+      "timePanelSimTime");
+
+  // Get the real time line
+  QLineEdit *realTimeEdit = timePanel->findChild<QLineEdit *>(
+      "timePanelRealTime");
+
+  // Get the step button
+  QAction *stepButton = timePanel->findChild<QAction *>(
+      "timePanelStepAction");
+
+  QLineEdit *iterationsEdit = timePanel->findChild<QLineEdit *>(
+      "timePanelIterations");
+
+  // visible by default
+  QVERIFY(percentEdit->isVisible());
+  QVERIFY(simTimeEdit->isVisible());
+  QVERIFY(realTimeEdit->isVisible());
+  QVERIFY(stepButton->isVisible());
+  QVERIFY(iterationsEdit->isVisible());
+
+  // hide the widgets
+  timePanel->ShowRealTimeFactor(false);
+  timePanel->ShowSimTime(false);
+  timePanel->ShowRealTime(false);
+  timePanel->ShowStepWidget(false);
+  timePanel->ShowIterations(false);
+
+  QVERIFY(!percentEdit->isVisible());
+  QVERIFY(!simTimeEdit->isVisible());
+  QVERIFY(!realTimeEdit->isVisible());
+  QVERIFY(!stepButton->isVisible());
+  QVERIFY(!iterationsEdit->isVisible());
+
+  // show the widgets again
+  timePanel->ShowRealTimeFactor(true);
+  timePanel->ShowSimTime(true);
+  timePanel->ShowRealTime(true);
+  timePanel->ShowStepWidget(true);
+  timePanel->ShowIterations(true);
+
+  QVERIFY(percentEdit->isVisible());
+  QVERIFY(simTimeEdit->isVisible());
+  QVERIFY(realTimeEdit->isVisible());
+  QVERIFY(stepButton->isVisible());
+  QVERIFY(iterationsEdit->isVisible());
 }
 
 // Generate a main function for the test

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ LevelWidget::LevelWidget(QWidget *_parent) : QWidget(_parent)
       boost::bind(&LevelWidget::OnTriggerShowElements, this)));
 
   this->connections.push_back(
-      gui::editor::Events::ConnectDiscardBuildingModel(
+      gui::editor::Events::ConnectNewBuildingModel(
       boost::bind(&LevelWidget::OnDiscard, this)));
 
   this->setLayout(levelLayout);

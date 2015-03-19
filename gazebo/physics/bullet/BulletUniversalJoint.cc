@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -446,4 +446,31 @@ math::Angle BulletUniversalJoint::GetAngleImpl(unsigned int _index) const
     gzlog << "bulletUniversal does not yet exist" << std::endl;
 
   return result;
+}
+
+//////////////////////////////////////////////////
+bool BulletUniversalJoint::SetParam(const std::string &_key,
+    unsigned int _index,
+    const boost::any &_value)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return false;
+  }
+
+  return BulletJoint::SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+double BulletUniversalJoint::GetParam(const std::string &_key,
+                                      unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return 0;
+  }
+
+  return BulletJoint::GetParam(_key, _index);
 }

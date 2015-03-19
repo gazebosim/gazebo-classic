@@ -1,6 +1,41 @@
-## Gazebo 4.X to 5.X
+## Gazebo 5.X to 6.X
 
 ### Modifications
+
+1. **gazebo/common/MeshManager.hh**
+    + ***Removed:*** void CreateExtrudedPolyline(const std::string &_name, const std::vector<math::Vector2d> &_vertices, const double &_height, const math::Vector2d &_uvCoords)
+    + ***Replacement:*** void CreateExtrudedPolyline(const std::string &_name, const const std::vector<std::vector<math::Vector2d> > &_vertices, const double &_height, const math::Vector2d &_uvCoords)
+
+1. **gazebo/common/GTSMeshUtils.hh**
+    + ***Removed:*** public: static bool CreateExtrudedPolyline(const std::vector<math::Vector2d> &_vertices, const double &_height, SubMesh *_submesh)
+    + ***Replacement:*** public: static bool DelaunayTriangulation(const std::vector<std::vector<math::Vector2d> > &_path, SubMesh *_submesh)
+
+1. **gazebo/physics/PolylineShape.hh**
+    + ***Removed:*** public: std::vector<math::Vector2d> GetVertices() const
+    + ***Replacement:*** public: std::vector<std::vector<math::Vector2d> > GetVertices() const
+    
+### Deletions
+
+1. **gazebo/gui/RenderWidget.hh**
+    + The ShowEditor(bool _show)
+
+
+## Gazebo 4.X to 5.X
+
+### C++11 compiler required
+
+Gazebo 5.x uses features from the new c++11 standard. This requires to have a compatible c++11 compiler. Note that some platforms (like Ubuntu Precise) do not include one by default.
+
+### Modifications
+
+1. Privatized World::dirtyPoses
+    + World::dirtyPoses used to be a public attribute. This is now a private attribute, and specific "friends" have been added to the World file.
+
+1. Privatized Scene::skyx
+    + Scene::skyx used to be a public attribute. This is now a private attribute, and a GetSkyX() funcion has been added to access the sky object.
+
+1. **gazebo/rendering/Visual.hh**
+    + The GetBoundingBox() function now returns a local bounding box without scale applied.
 
 1. **gazebo/math/Box.hh**
     + The constructor that takes two math::Vector3 values now treats these as two corners, and computes the minimum and maximum values automatically. This change is API and ABI compatible.
@@ -28,6 +63,14 @@
     + ***Removed:*** private: void OnJoy(ConstJoystickPtr &_msg)
     + ***Replacement:*** private: void OnJoyTwist(ConstJoystickPtr &_msg)
 
+1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** public: void RotatePitch(math::Angle _angle);
+    + ***Replacement:*** public: void Pitch(const math::Angle &_angle,
+                                        Ogre::Node::TransformSpace _relativeTo = Ogre::Node::TS_LOCAL);
+    + ***Deprecation:*** public: void RotateYaw(math::Angle _angle);
+    + ***Replacement:*** public: void Yaw(const math::Angle &_angle,
+                                        Ogre::Node::TransformSpace _relativeTo = Ogre::Node::TS_LOCAL);
+
 1. **gazebo/rendering/AxisVisual.hh**
     + ***Removed:*** public: void ShowRotation(unsigned int _axis)
     + ***Replacement:*** public: void ShowAxisRotation(unsigned int _axis, bool _show)
@@ -40,6 +83,16 @@
 
 1. **gazebo/physics/Collision.hh**
     + unsigned int GetShapeType()
+
+1. **gazebo/physics/World.hh**
+    + EntityPtr GetSelectedEntity() const
+
+1. **gazebo/physics/bullet/BulletJoint.hh**
+    + void SetAttribute(Attribute, unsigned int, double)
+
+1. **gazebo/physics/simbody/SimbodyJoint.hh**
+    + void SetAttribute(Attribute, unsigned int, double)
+
 
 ## Gazebo 3.1 to 4.0
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 #include <gazebo/util/system.hh>
 
 #ifdef HAVE_GDAL
-# include <gdal/gdal_priv.h>
 # include <string>
 # include <vector>
 

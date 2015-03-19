@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -249,6 +249,8 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
 
   double dt = (timestamp - this->lastMeasurementTime).Double();
 
+  this->lastMeasurementTime = timestamp;
+
   if (dt > 0.0)
   {
     boost::mutex::scoped_lock lock(this->mutex);
@@ -288,8 +290,6 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
               (imuPose - this->referencePose).rot);
 
     this->lastLinearVel = imuWorldLinearVel;
-
-    this->lastMeasurementTime = timestamp;
 
     if (this->noiseActive)
     {

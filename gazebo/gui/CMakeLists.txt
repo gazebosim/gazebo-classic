@@ -132,10 +132,10 @@ endif ()
 #endif()
 
 set (qt_tests
-  ConfigWidget_TEST.cc
   DataLogger_TEST.cc
   GuiIface_TEST.cc
   ModelAlign_TEST.cc
+  RenderWidget_TEST.cc
   TimePanel_TEST.cc
 )
 
@@ -144,6 +144,9 @@ if (ENABLE_SCREEN_TESTS)
   set (qt_tests
       ${qt_tests}
       BuildingEditor_TEST.cc
+      ConfigWidget_TEST.cc
+      GLWidget_TEST.cc
+      GLWidget_TEST2.cc
       MainWindow_TEST.cc
       ModelListWidget_TEST.cc
       ModelSnap_TEST.cc)
@@ -157,14 +160,13 @@ set (resources resources.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-gz_add_executable(gzclient ${sources} main.cc ${headers_MOC} ${headers} ${resources_RCC})
-
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
 
 gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+gz_add_executable(gzclient main.cc)
 
 add_dependencies(gazebo_gui gazebo_msgs)
-add_dependencies(gzclient gazebo_msgs)
+add_dependencies(gzclient gazebo_gui)
 
 target_link_libraries(gazebo_gui
   gazebo_common
@@ -196,6 +198,7 @@ target_link_libraries(gzclient
   gazebo_physics
   gazebo_physics_ode
   gazebo_msgs
+  gazebo_gui
   gazebo_gui_building
   gazebo_gui_model
   gazebo_gui_terrain

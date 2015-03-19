@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,6 +85,9 @@ namespace gazebo
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();
 
+      /// \brief A signal to indicate the main window is about to close.
+      signals: void Close();
+
       protected: void closeEvent(QCloseEvent *_event);
 
       private: void OnGUI(ConstGUIPtr &_msg);
@@ -104,7 +107,6 @@ namespace gazebo
 
       private slots: void About();
       private slots: void Step();
-      private slots: void NewModel();
       private slots: void Arrow();
 
       /// \brief Qt callback when the translate mode is triggered.
@@ -135,11 +137,25 @@ namespace gazebo
       private slots: void CaptureScreenshot();
 
       private slots: void InsertModel();
+
+      /// \brief Qt callback when the show grid action is triggered.
       private slots: void ShowGrid();
+
+      /// \brief Qt callback when the show collisions action is triggered.
       private slots: void ShowCollisions();
+
+      /// \brief Qt callback when the show joints action is triggered.
       private slots: void ShowJoints();
+
+      /// \brief Qt callback when the show contacts action is triggered.
       private slots: void ShowContacts();
+
+      /// \brief Qt callback when the show center of mass action is triggered.
       private slots: void ShowCOM();
+
+      /// \brief Qt callback when the show inertia action is triggered.
+      private slots: void ShowInertia();
+
       private slots: void Reset();
       private slots: void FullScreen();
       private slots: void FPS();
@@ -164,6 +180,10 @@ namespace gazebo
 
       /// \brief Callback for adding plugins.
       private slots: void OnAddPlugins();
+
+      /// \brief Qt call back when one of the editor actions is triggered.
+      /// \param[in] _action Action in the group which was triggered.
+      private slots: void OnEditorGroup(QAction *_action);
 
       /// \brief Toggle full screen display.
       /// \param[in] _value True to display in full screen mode.
@@ -228,7 +248,6 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::PublisherPtr worldControlPub;
       private: transport::PublisherPtr serverControlPub;
-      private: transport::PublisherPtr selectionPub;
       private: transport::PublisherPtr requestPub;
       private: transport::PublisherPtr scenePub;
       private: transport::SubscriberPtr responseSub;

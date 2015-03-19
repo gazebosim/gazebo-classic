@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -456,12 +456,6 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
   }
 #endif
 
-  // Apply our linear accel
-  // this->SetForce(this->linearAccel);
-
-  // Apply our angular accel
-  // this->SetTorque(this->angularAccel);
-
   // FIXME: race condition on factory-based model loading!!!!!
    /*if (this->GetEnabled() != this->enabled)
    {
@@ -581,7 +575,7 @@ void Link::SetLinearAccel(const math::Vector3 &_accel)
 void Link::SetAngularAccel(const math::Vector3 &_accel)
 {
   this->SetEnabled(true);
-  this->angularAccel = _accel * this->inertial->GetMass();
+  this->angularAccel = _accel;
 }
 
 //////////////////////////////////////////////////
@@ -628,6 +622,12 @@ math::Vector3 Link::GetRelativeAngularAccel() const
 math::Vector3 Link::GetWorldAngularAccel() const
 {
   return this->GetWorldTorque() / this->inertial->GetMass();
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Link::GetWorldAngularMomentum() const
+{
+  return this->GetWorldInertiaMatrix() * this->GetWorldAngularVel();
 }
 
 //////////////////////////////////////////////////
