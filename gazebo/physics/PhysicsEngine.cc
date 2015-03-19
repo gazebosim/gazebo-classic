@@ -242,7 +242,7 @@ bool PhysicsEngine::SetParam(const std::string &_key,
     }
     else
     {
-      gzwarn << "Parameter [" << _key << "] not found in physics engine"
+      gzwarn << "SetParam failed for [" << _key << "] in physics engine "
              << this->GetType() << std::endl;
       return false;
     }
@@ -280,8 +280,8 @@ bool PhysicsEngine::GetParam(const std::string &_key,
     _value = this->sdf->Get<math::Vector3>("magnetic_field");
   else
   {
-    gzwarn << "Key [" << _key << "] is not supported in " << this->GetType()
-           << std::endl;
+    gzwarn << "GetParam failed for [" << _key << "] in physics engine "
+           << this->GetType() << std::endl;
     return false;
   }
 
