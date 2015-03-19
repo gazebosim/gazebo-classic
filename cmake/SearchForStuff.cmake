@@ -467,7 +467,10 @@ endif()
 ########################################
 # Find Boost, if not specified manually
 if (WIN32)
-  set(Boost_USE_STATIC_LIBS       OFF) 
+  # Boost source compiles static lib by default 
+  # and ogre use static too by default. No more
+  # reasons to choose boost static libs
+  set(Boost_USE_STATIC_LIBS        ON) 
   set(Boost_USE_MULTITHREADED      ON)
   set(Boost_USE_STATIC_RUNTIME    OFF)
 endif()
