@@ -30,11 +30,97 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 {
   this->setObjectName("logPlayWidget");
 
+
+  QSize bigSize(70, 70);
+  QSize bigIconSize(40, 40);
+  QSize smallSize(50, 50);
+  QSize smallIconSize(30, 30);
+
+  // Play
+  QToolButton *playButton = new QToolButton(this);
+  playButton->setFixedSize(bigSize);
+  playButton->setCheckable(false);
+  playButton->setIcon(QPixmap(":/images/log_play.png"));
+  playButton->setIconSize(bigIconSize);
+  playButton->setToolTip("Play");
+  playButton->setStyleSheet(
+      QString("border-radius: %1px").arg(bigSize.width()/2-2));
+  connect(playButton, SIGNAL(clicked()), this, SLOT(OnPlay()));
+  connect(this, SIGNAL(ShowPlay()), playButton, SLOT(show()));
+  connect(this, SIGNAL(HidePlay()), playButton, SLOT(hide()));
+
+  // Pause
+  QToolButton *pauseButton = new QToolButton(this);
+  pauseButton->setFixedSize(bigSize);
+  pauseButton->setCheckable(false);
+  pauseButton->setIcon(QPixmap(":/images/log_pause.png"));
+  pauseButton->setIconSize(bigIconSize);
+  pauseButton->setToolTip("Play");
+  pauseButton->setStyleSheet(
+      QString("border-radius: %1px").arg(bigSize.width()/2-2));
+  connect(pauseButton, SIGNAL(clicked()), this, SLOT(OnPause()));
+  connect(this, SIGNAL(ShowPause()), pauseButton, SLOT(show()));
+  connect(this, SIGNAL(HidePause()), pauseButton, SLOT(hide()));
+
+  // Step forward
+  QToolButton *stepForwardButton = new QToolButton(this);
+  stepForwardButton->setFixedSize(smallSize);
+  stepForwardButton->setCheckable(false);
+  stepForwardButton->setIcon(QPixmap(":/images/log_step_forward.png"));
+  stepForwardButton->setIconSize(smallIconSize);
+  stepForwardButton->setToolTip("Play");
+  stepForwardButton->setStyleSheet(
+      QString("border-radius: %1px").arg(smallSize.width()/2-2));
+  connect(stepForwardButton, SIGNAL(clicked()), this, SLOT(OnStepForward()));
+
+  // Step back
+  QToolButton *stepBackButton = new QToolButton(this);
+  stepBackButton->setFixedSize(smallSize);
+  stepBackButton->setCheckable(false);
+  stepBackButton->setIcon(QPixmap(":/images/log_step_back.png"));
+  stepBackButton->setIconSize(smallIconSize);
+  stepBackButton->setToolTip("Play");
+  stepBackButton->setStyleSheet(
+      QString("border-radius: %1px").arg(smallSize.width()/2-2));
+
+  // Jump start
+  QToolButton *jumpStartButton = new QToolButton(this);
+  jumpStartButton->setFixedSize(smallSize);
+  jumpStartButton->setCheckable(false);
+  jumpStartButton->setIcon(QPixmap(":/images/log_jump_start.png"));
+  jumpStartButton->setIconSize(smallIconSize);
+  jumpStartButton->setToolTip("Play");
+  jumpStartButton->setStyleSheet(
+      QString("border-radius: %1px").arg(smallSize.width()/2-2));
+
+  // Jump end
+  QToolButton *jumpEndButton = new QToolButton(this);
+  jumpEndButton->setFixedSize(smallSize);
+  jumpEndButton->setCheckable(false);
+  jumpEndButton->setIcon(QPixmap(":/images/log_jump_end.png"));
+  jumpEndButton->setIconSize(smallIconSize);
+  jumpEndButton->setToolTip("Play");
+  jumpEndButton->setStyleSheet(
+      QString("border-radius: %1px").arg(smallSize.width()/2-2));
+
+
+  // Play layout
+  QHBoxLayout *playLayout = new QHBoxLayout();
+  playLayout->addWidget(jumpStartButton);
+  playLayout->addWidget(stepBackButton);
+  playLayout->addWidget(playButton);
+  playLayout->addWidget(pauseButton);
+  playLayout->addWidget(stepForwardButton);
+  playLayout->addWidget(jumpEndButton);
+
+
+
   // View
   this->dataPtr->view = new LogPlayView(this);
 
   // Main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
+  mainLayout->addLayout(playLayout);
   mainLayout->addWidget(this->dataPtr->view);
   this->setLayout(mainLayout);
 
@@ -46,6 +132,8 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 
   this->dataPtr->statsSub =
     this->dataPtr->node->Subscribe("~/world_stats", &LogPlayWidget::OnStats, this);
+  this->dataPtr->worldControlPub =
+    this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
 
   this->show();
 }
@@ -64,6 +152,7 @@ void LogPlayWidget::OnStats(ConstWorldStatisticsPtr &_msg)
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
 
   // Set paused state
+  this->SetPaused(_msg->paused());
   this->dataPtr->view->SetPaused(_msg->paused());
 
   // Set simulation time
@@ -109,6 +198,60 @@ std::string LogPlayWidget::FormatTime(const msgs::Time &_msg)
 }
 
 /////////////////////////////////////////////////
+void LogPlayWidget::SetPaused(bool _paused)
+{
+  if (_paused)
+  {
+    emit ShowPlay();
+    emit HidePause();
+  }
+  else
+  {
+    emit HidePlay();
+    emit ShowPause();
+  }
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnPlay()
+{
+  msgs::WorldControl msg;
+  msg.set_pause(false);
+  this->dataPtr->worldControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnPause()
+{
+  msgs::WorldControl msg;
+  msg.set_pause(true);
+  this->dataPtr->worldControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnStepForward()
+{
+  msgs::WorldControl msg;
+  msg.set_multi_step(1);
+  this->dataPtr->worldControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnStepBack()
+{
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnJumpStart()
+{
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnJumpEnd()
+{
+}
+
+/////////////////////////////////////////////////
 LogPlayView::LogPlayView(LogPlayWidget *_parent)
   : QGraphicsView(_parent), dataPtr(new LogPlayViewPrivate)
 {
@@ -126,59 +269,6 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
   this->setSceneRect(0, 0, sceneWidth, sceneHeight);
 
   graphicsScene->addItem(new QGraphicsRectItem(0, 0, sceneWidth, sceneHeight));
-
-
-  // Add items
-  int buttonHeight = 30;
-
-  // Play
-  QVector<QPointF> playPts;
-  playPts.push_back(QPointF(0, 0));
-  playPts.push_back(QPointF(0, buttonHeight));
-  playPts.push_back(QPointF(buttonHeight/2, buttonHeight/2));
-  this->dataPtr->playItem = new QGraphicsPolygonItem(QPolygonF(playPts));
-  this->dataPtr->playItem->setPen(QPen(Qt::red, 3, Qt::SolidLine));
-  this->dataPtr->playItem->setBrush(QBrush(Qt::red));
-  graphicsScene->addItem(this->dataPtr->playItem);
-  this->dataPtr->playItem->setPos(100, (sceneHeight-buttonHeight)/2);
-  this->dataPtr->playItem->setVisible(false);
-
-  // Pause
-  QVector<QPointF> pausePts;
-  pausePts.push_back(QPointF(0, 0));
-  pausePts.push_back(QPointF(0, buttonHeight));
-  pausePts.push_back(QPointF(buttonHeight*0.2, buttonHeight));
-  pausePts.push_back(QPointF(buttonHeight*0.2, 0));
-  pausePts.push_back(QPointF(0, 0));
-  pausePts.push_back(QPointF(buttonHeight*0.4, 0));
-  pausePts.push_back(QPointF(buttonHeight*0.4, buttonHeight));
-  pausePts.push_back(QPointF(buttonHeight*0.6, buttonHeight));
-  pausePts.push_back(QPointF(buttonHeight*0.6, 0));
-  pausePts.push_back(QPointF(buttonHeight*0.4, 0));
-  this->dataPtr->pauseItem = new QGraphicsPolygonItem(QPolygonF(pausePts));
-  this->dataPtr->pauseItem->setPen(QPen(Qt::NoPen));
-  this->dataPtr->pauseItem->setBrush(QBrush(Qt::red));
-  graphicsScene->addItem(this->dataPtr->pauseItem);
-  this->dataPtr->pauseItem->setPos(100, (sceneHeight-buttonHeight)/2);
-  this->dataPtr->pauseItem->setVisible(true);
-
-  // StepForward
-  QPainterPath stepForwardPath(QPointF(0, 0));
-  stepForwardPath.lineTo(buttonHeight/2, buttonHeight/2);
-  stepForwardPath.lineTo(0, buttonHeight);
-  this->dataPtr->stepForwardItem = new QGraphicsPathItem(stepForwardPath);
-  this->dataPtr->stepForwardItem->setPen(QPen(Qt::red, 5, Qt::SolidLine));
-  graphicsScene->addItem(this->dataPtr->stepForwardItem);
-  this->dataPtr->stepForwardItem->setPos(150, (sceneHeight-buttonHeight)/2);
-
-  // StepBack
-  QPainterPath stepBackPath(QPointF(buttonHeight/2, 0));
-  stepBackPath.lineTo(0, buttonHeight/2);
-  stepBackPath.lineTo(buttonHeight/2, buttonHeight);
-  this->dataPtr->stepBackItem = new QGraphicsPathItem(stepBackPath);
-  this->dataPtr->stepBackItem->setPen(QPen(Qt::red, 5, Qt::SolidLine));
-  graphicsScene->addItem(this->dataPtr->stepBackItem);
-  this->dataPtr->stepBackItem->setPos(50, (sceneHeight-buttonHeight)/2);
 
   // Time
   this->dataPtr->timeText = graphicsScene->addSimpleText("00 00:00:00.000");
@@ -207,29 +297,29 @@ void LogPlayView::mouseReleaseEvent(QMouseEvent *_event)
       this->scene()->itemAt(this->mapToScene(_event->pos()));
   if (mouseItem)
   {
-    msgs::WorldControl msg;
-
-    if (mouseItem == this->dataPtr->playItem)
-    {
-      msg.set_pause(false);
-    }
-    else if (mouseItem == this->dataPtr->pauseItem)
-    {
-      msg.set_pause(true);
-    }
-    else if (mouseItem == this->dataPtr->stepForwardItem)
-    {
-      msg.set_multi_step(1);
-    }
-    else if (mouseItem == this->dataPtr->stepBackItem)
-    {
-      // msg.set_multi_step(-1);
-    }
-
-    if (msg.has_pause() || msg.has_multi_step())
-    {
-      this->dataPtr->worldControlPub->Publish(msg);
-    }
+//    msgs::WorldControl msg;
+//
+//    if (mouseItem == this->dataPtr->playItem)
+//    {
+//      msg.set_pause(false);
+//    }
+//    else if (mouseItem == this->dataPtr->pauseItem)
+//    {
+//      msg.set_pause(true);
+//    }
+//    else if (mouseItem == this->dataPtr->stepForwardItem)
+//    {
+//      msg.set_multi_step(1);
+//    }
+//    else if (mouseItem == this->dataPtr->stepBackItem)
+//    {
+//      // msg.set_multi_step(-1);
+//    }
+//
+//    if (msg.has_pause() || msg.has_multi_step())
+//    {
+//      this->dataPtr->worldControlPub->Publish(msg);
+//    }
   }
   QGraphicsView::mouseReleaseEvent(_event);
 }
@@ -255,7 +345,7 @@ void LogPlayView::SetTotalTime(QString _time)
 /////////////////////////////////////////////////
 void LogPlayView::SetPaused(bool _paused)
 {
-  this->dataPtr->playItem->setVisible(_paused);
-  this->dataPtr->pauseItem->setVisible(!_paused);
+//  this->dataPtr->playItem->setVisible(_paused);
+//  this->dataPtr->pauseItem->setVisible(!_paused);
 }
 

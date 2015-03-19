@@ -46,6 +46,9 @@ namespace gazebo
 
       /// TODO
       public: LogPlayView *view;
+
+      /// \brief Used to start, stop, and step simulation.
+      public: transport::PublisherPtr worldControlPub;
     };
 
     /// \class LogPlayViewPrivate LogPlayViewPrivate.hh
@@ -54,18 +57,6 @@ namespace gazebo
     {
       /// \brief Node used for communication.
       public: transport::NodePtr node;
-
-      /// \brief TODO
-      public: QGraphicsPolygonItem *playItem;
-
-      /// \brief TODO
-      public: QGraphicsPolygonItem *pauseItem;
-
-      /// \brief TODO
-      public: QGraphicsPathItem *stepForwardItem;
-
-      /// \brief TODO
-      public: QGraphicsPathItem *stepBackItem;
 
       /// \brief TODO
       public: QGraphicsSimpleTextItem *timeText;

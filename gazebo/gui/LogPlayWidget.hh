@@ -48,6 +48,39 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~LogPlayWidget();
 
+      /// \brief Play simulation.
+      public slots: void OnPlay();
+
+      /// \brief Pause simulation.
+      public slots: void OnPause();
+
+      /// \brief Play simulation.
+      public slots: void OnStepForward();
+
+      /// \brief Play simulation.
+      public slots: void OnStepBack();
+
+      /// \brief Play simulation.
+      public slots: void OnJumpStart();
+
+      /// \brief Play simulation.
+      public slots: void OnJumpEnd();
+
+      /// \brief Qt signal when the joint creation process has ended.
+      Q_SIGNALS: void ShowPlay();
+
+      /// \brief Qt signal when the joint creation process has ended.
+      Q_SIGNALS: void HidePlay();
+
+      /// \brief Qt signal when the joint creation process has ended.
+      Q_SIGNALS: void ShowPause();
+
+      /// \brief Qt signal when the joint creation process has ended.
+      Q_SIGNALS: void HidePause();
+
+      /// \brief Play simulation.
+      private: void SetPaused(bool _paused);
+
       /// \brief Called when a world stats message is received.
       /// \param[in] _msg World statistics message.
       private: void OnStats(ConstWorldStatisticsPtr &_msg);
