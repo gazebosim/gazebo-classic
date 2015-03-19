@@ -1,4 +1,4 @@
-@set build_type=Release
+@set build_type=Debug
 @if not "%1"=="" set build_type=%1
 @echo Configuring for build type %build_type%
 
@@ -14,9 +14,13 @@ set CURL_LIBRARY_NAME=libcurl_a
 @if "%build_type%"=="Debug" set CURL_LIBRARY_NAME=libcurl_a_debug
 
 @REM @set FREEIMAGE_PATH=%cd%\..\..\FreeImage-vc12-x64-release-debug
+@REM @set FREEIMAGE_LIBRARY_DIR=%FREEIMAGE_PATH%\x64\%build_type%\DLL
+@REM @set FREEIMAGE_INCLUDE_DIR=%FREEIMAGE_PATH%\Source
+
 @set FREEIMAGE_PATH=%cd%\..\..\FreeImage
-@set FREEIMAGE_LIBRARY_DIR=%FREEIMAGE_PATH%\x64\%build_type%\DLL
-@set FREEIMAGE_INCLUDE_DIR=%FREEIMAGE_PATH%\Source
+@set FREEIMAGE_LIBRARY_DIR=%FREEIMAGE_PATH%\Dist\x64
+@set FREEIMAGE_INCLUDE_DIR=%FREEIMAGE_PATH%\Dist\x64
+
 
 @set SDFORMAT_PATH=%cd%\..\..\sdformat\build\install\%build_type%
 
