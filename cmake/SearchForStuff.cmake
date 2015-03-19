@@ -481,6 +481,13 @@ else()
 endif()
 
 ########################################
+# Find xsltproc, which is used by tools/check_test_ran.py
+find_program(XSLTPROC xsltproc)
+if (NOT EXISTS ${XSLTPROC})
+  BUILD_WARNING("xsltproc not found. The check_test_ran.py script will cause tests to fail.")
+endif()
+
+########################################
 # Find QWT (QT graphing library)
 #find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
 #  /usr/include

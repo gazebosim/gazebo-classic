@@ -38,7 +38,7 @@
     * [Pull request #1454](https://bitbucket.org/osrf/gazebo/pull-request/1454)
     * [Issue #1455](https://bitbucket.org/osrf/gazebo/issue/1455)
 
-1. Added Matrix3::Inverse() and tests 
+1. Added Matrix3::Inverse() and tests
     * [Pull request #1481](https://bitbucket.org/osrf/gazebo/pull-request/1481)
 
 1. Implemented AddLinkForce for ODE.
@@ -75,6 +75,10 @@
         * [Pull request #1489](https://bitbucket.org/osrf/gazebo/pull-request/1489)
         * [Issue #1457](https://bitbucket.org/osrf/gazebo/issue/1457)
 
+    1. Keep loaded model's name.
+        * [Pull request #1516](https://bitbucket.org/osrf/gazebo/pull-request/1516)
+        * [Issue #1504](https://bitbucket.org/osrf/gazebo/issue/1504)
+
     1. Added ExtrudeDialog.
         * [Pull request #1483](https://bitbucket.org/osrf/gazebo/pull-request/1483)
 
@@ -85,6 +89,11 @@
         * [Pull request #1509](https://bitbucket.org/osrf/gazebo/pull-request/1509)
         * [Issue #1497](https://bitbucket.org/osrf/gazebo/issue/1497)
         * [Issue #1509](https://bitbucket.org/osrf/gazebo/issue/1509)
+
+1. Building editor updates
+    1. Make palette tips tooltip clickable to open.
+        * [Pull request #1519](https://bitbucket.org/osrf/gazebo/pull-request/1519)
+        * [Issue #1370](https://bitbucket.org/osrf/gazebo/issue/1370)
 
 ## Gazebo 5.0
 
