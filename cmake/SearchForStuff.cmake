@@ -127,6 +127,19 @@ if (PKG_CONFIG_FOUND)
   #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
   # Use pkg_check_modules and fallback to manual detection (needed, at least, for MacOS)
+
+  # Use of tinyxml. System installation on UNIX. Internal copy on WIN
+  if (UNIX)
+    message (STATUS "Using system tinyxml")
+    set (USE_EXTERNAL_TINYXML True)
+  elseif(WIN32)
+    message (STATUS "Using internal tinyxml code")
+    set (USE_EXTERNAL_TINYXML False)
+  else()
+    message (STATUS "Unknown platform")
+    BUILD_ERROR("Unknown platform")
+  endif()
+
   pkg_check_modules(tinyxml tinyxml)
   if (NOT tinyxml_FOUND)
       find_path (tinyxml_INCLUDE_DIRS tinyxml.h ${tinyxml_INCLUDE_DIRS} ENV CPATH)
