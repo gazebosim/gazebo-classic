@@ -106,7 +106,7 @@ namespace gazebo
       public: QWidget *childWidget;
 
       /// \brief Callback that collapses or expands the child widget.
-      private slots: void Toggle();
+      private slots: void Toggle(bool _checked);
     };
 
     /// \class ConfigWidget ConfigWidget.hh
@@ -128,6 +128,12 @@ namespace gazebo
       /// \brief Get the updated message.
       /// \return Updated message.
       public: google::protobuf::Message *GetMsg();
+
+      /// \brief Create a human readable name, capitalizing the first letter
+      /// and removing characters like "_".
+      /// \param[in] _name Non-human-readable name.
+      /// \return Human-redadable name.
+      public: std::string GetHumanReadableString(std::string _name);
 
       /// \brief Set whether a child widget should be visible.
       /// \param[in] _name Name of the child widget.
