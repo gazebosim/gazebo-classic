@@ -127,7 +127,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
 
   // Subscribes to selection messages.
-  this->selectionSub = this->node->Subscribe("~/selection",
+  this->selectionSub = this->node->Subscribe("~/selection/server",
       &GLWidget::OnSelectionMsg, this);
 
   // Publishes information about user selections.
