@@ -69,6 +69,15 @@ Quaternion::Quaternion(const Quaternion &_qt)
 }
 
 //////////////////////////////////////////////////
+Quaternion::Quaternion(const ignition::math::Quaterniond &_qt)
+{
+  this->w = _qt.W();
+  this->x = _qt.X();
+  this->y = _qt.Y();
+  this->z = _qt.Z();
+}
+
+//////////////////////////////////////////////////
 Quaternion::~Quaternion()
 {
 }

@@ -72,6 +72,10 @@ namespace gazebo
     /// \param qt Quaternion to copy
     public: Quaternion(const Quaternion &_qt);
 
+    /// \brief Copy constructor for ignition::math::Quaterniond
+    /// \param qt Ignition math duaterniond to copy
+    public: Quaternion(const ignition::math::Quaterniond &_qt);
+
     /// \brief Destructor
     public: ~Quaternion();
 
