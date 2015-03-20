@@ -18,7 +18,7 @@ These are the routes provided by the server:
 
 Installation:
 
-  make sure nodejs is installed (skip if you have it already):
+  make sure nodejs is installed (skip if you have node installed already):
      sudo apt-get install nodejs nodejs-legacy npm
   
   now setup the local test server:
@@ -33,14 +33,14 @@ Running the server:
     https://localhost:3000
 
 
-Send messages from Gazebo:
+Send messages from Gazebo to the web server:
 
-  start the simulation server:
+  start the simulation server (<gazebo-src>/test/plugins/rest-web/gzserver.bash):
 
     gzserver --verbose  -s libRestWebPlugin.so ../../worlds/rest_web.world
+    
 
-
-  start the simulation client:
+  start the simulation client (<gazebo-src>/test/plugins/rest-web/gzserver.bash):
 
     gzclient --verbose -g libRestUiPlugin.so menu="REST-web" title="test server" label="Login" url="https://localhost:3000"
 
