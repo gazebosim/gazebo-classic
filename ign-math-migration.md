@@ -2,7 +2,7 @@
 
 `libigntion-math` is a dependency of Gazebo. See: [http://ignitionrobotics.org/libraries/math](http://ignitionrobotics.org/libraries/math)
 
-## `gazebo/common`
+## gazebo/common
 
 1. **gazebo/common/KeyFrame.hh**
     + ***Deprecated** public: void SetTranslation(const math::Vector3 &_trans)
@@ -18,7 +18,7 @@
     + **Replacement** public: ignition::math::Quaterniond Rotation() const
 
 
-## `gazebo/math/Angle.hh`
+## gazebo/math/Angle.hh
 
     + **Added** public: Angle(const ignition::math::Angle &_angle)
     + **Added** public: ignition::math::Angle Ign() const
@@ -26,20 +26,20 @@
     + **Added** public: Angle &operator=(const ignition::math::Angle &_angle)
     
 
-## `gazebo/math/Box.hh`
+## gazebo/math/Box.hh
 
     + **Added** public: Box(const ignition::math::Box &_box)
     + **Added** public: ignition::math::Box Ign() const
     + **Added**  public: Box &operator=(const ignition::math::Box &_b)
 
-## `gazebo/math/Quaternion.hh`
+## gazebo/math/Quaternion.hh
 
     + **Added** public: Quaternion(const ignition::math::Quaterniond &_qt)
     + **Added** public: ignition::math::Quaterniond Ign() const
     + **Added** public: Quaternion &operator =(const ignition::math::Quaterniond &_v)
 
 
-## `gazebo/math/Vector3.hh`
+## gazebo/math/Vector3.hh
 
   + **Added** public: Vector3(const ignition::math::Vector3d &_v)
   + **Added** public: ignition::math::Vector3d Ign() const
