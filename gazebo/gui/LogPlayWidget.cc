@@ -115,7 +115,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 
   // Time
   QLineEdit *currentTime = new QLineEdit();
-  currentTime->setMaximumWidth(150);
+  currentTime->setMaximumWidth(110);
   connect(this, SIGNAL(CurrentTime(const QString &)), currentTime,
       SLOT(setText(const QString &)));
 
@@ -279,10 +279,6 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
   this->setSceneRect(0, 0,
       this->dataPtr->sceneWidth, this->dataPtr->sceneHeight);
 
-  // Debug rect
-  graphicsScene->addItem(new QGraphicsRectItem(0, 0,
-      this->dataPtr->sceneWidth, this->dataPtr->sceneHeight));
-
   // Time line
   QGraphicsLineItem *line = new QGraphicsLineItem(this->dataPtr->margin,
       this->dataPtr->sceneHeight/2,
@@ -292,12 +288,9 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
   graphicsScene->addItem(line);
 
   // Current time line
-  int currentTimeLineHeight = 50;
-  this->dataPtr->currentTimeItem = new QGraphicsLineItem(
-      0, -currentTimeLineHeight/2, 0, currentTimeLineHeight/2);
+  this->dataPtr->currentTimeItem = new CurrentTimeItem();
   this->dataPtr->currentTimeItem->setPos(this->dataPtr->margin,
       this->dataPtr->sceneHeight/2);
-  this->dataPtr->currentTimeItem->setPen(QPen(Qt::black, 3));
   graphicsScene->addItem(this->dataPtr->currentTimeItem);
 
   // Publisher
@@ -398,7 +391,39 @@ void LogPlayView::SetTotalTime(int _msec)
       (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
       this->dataPtr->sceneHeight/2 - 3 * tickHeight);
     this->scene()->addItem(tickText);
-
-
   }
 }
+
+/////////////////////////////////////////////////
+void CurrentTimeItem::paint(QPainter *_painter,
+    const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
+{
+//  if (this->isSelected())
+
+  int lineHeight = 50;
+
+  // Line
+  QLineF vLine(0, -lineHeight/2, 0, lineHeight/2);
+
+  QPen linePen;
+  linePen.setColor(Qt::black);
+  linePen.setWidth(3);
+
+  _painter->setPen(linePen);
+  _painter->drawLine(vLine);
+
+  // Triangle
+  QVector<QPointF> trianglePts;
+  trianglePts.push_back(QPointF(-8, -lineHeight/2 - 1));
+  trianglePts.push_back(QPointF(8, -lineHeight/2 - 1));
+  trianglePts.push_back(QPointF(0, -lineHeight/2 + 10));
+  QPolygonF triangle(trianglePts);
+
+  QPen trianglePen(Qt::red, 0);
+  QBrush triangleBrush(Qt::red);
+
+  _painter->setPen(trianglePen);
+  _painter->setBrush(triangleBrush);
+  _painter->drawPolygon(triangle);
+}
+

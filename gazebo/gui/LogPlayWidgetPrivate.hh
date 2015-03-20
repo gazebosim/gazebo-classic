@@ -59,7 +59,7 @@ namespace gazebo
       public: transport::NodePtr node;
 
       /// \brief TODO
-      public: QGraphicsLineItem *currentTimeItem;
+      public: CurrentTimeItem *currentTimeItem;
 
       /// \brief Used to start, stop, and step simulation.
       public: transport::PublisherPtr worldControlPub;

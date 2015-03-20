@@ -128,6 +128,20 @@ namespace gazebo
       /// \brief Pointer to private data.
       private: LogPlayViewPrivate *dataPtr;
     };
+
+    // TODO
+    class GAZEBO_VISIBLE CurrentTimeItem: public QObject,
+        public QGraphicsLineItem
+    {
+      Q_OBJECT
+
+      /// \brief Constructor;
+      public: CurrentTimeItem() {};
+
+      // Documentation inherited
+      private: virtual void paint(QPainter *_painter,
+          const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+    };
   }
 }
 

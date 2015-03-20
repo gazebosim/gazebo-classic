@@ -84,6 +84,7 @@ TimePanel::TimePanel(QWidget *_parent)
     playToolbar->addAction(g_playAct);
   if (g_pauseAct)
     playToolbar->addAction(g_pauseAct);
+  this->paused = false;
 
   QLabel *emptyLabel = new QLabel(tr("  "));
   playToolbar->addWidget(emptyLabel);
@@ -255,6 +256,23 @@ void TimePanel::ShowFPS(bool _show)
 }
 
 /////////////////////////////////////////////////
+bool TimePanel::IsPaused() const
+{
+  return this->paused;
+}
+
+/////////////////////////////////////////////////
+void TimePanel::SetPaused(bool _paused)
+{
+  if (g_pauseAct)
+    g_pauseAct->setVisible(!_paused);
+  if (g_playAct)
+    g_playAct->setVisible(_paused);
+
+  this->paused = _paused;
+}
+
+/////////////////////////////////////////////////
 void TimePanel::ShowStepWidget(bool _show)
 {
   if (g_stepAct)
@@ -276,16 +294,8 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   if (this->realTimes.size() > 20)
     this->realTimes.pop_front();
 
-  if (_msg->paused() && (g_playAct && !g_playAct->isVisible()))
-  {
-    g_playAct->setVisible(true);
-    g_pauseAct->setVisible(false);
-  }
-  else if (!_msg->paused() && (g_pauseAct && !g_pauseAct->isVisible()))
-  {
-    g_pauseAct->setVisible(true);
-    g_playAct->setVisible(false);
-  }
+  if (_msg->has_paused())
+    this->SetPaused(_msg->paused());
 
   // Set simulation time
   this->SetSimTime(QString::fromStdString(FormatTime(_msg->sim_time())));

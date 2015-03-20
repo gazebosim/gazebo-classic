@@ -74,6 +74,12 @@ namespace gazebo
       /// \brief Create menus
       private: void CreateMenus();
 
+      /// \brief Qt event filter currently used to filter tips label events.
+      /// \param[in] _obj Object that is watched by the event filter.
+      /// \param[in] _event Qt event.
+      /// \return True if the event is handled.
+      private: bool eventFilter(QObject *_obj, QEvent *_event);
+
       /// \brief Our custom menubar
       private: QMenuBar *menuBar;
 
@@ -91,6 +97,9 @@ namespace gazebo
 
       /// \brief Save the main window paused state to use when returning.
       private: bool mainWindowPaused;
+
+      /// \brief Label which shows tips when clicked or hovered.
+      private: QLabel *tipsLabel;
     };
   }
 }
