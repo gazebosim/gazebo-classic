@@ -65,42 +65,42 @@ extern const unsigned int __LINE__;
 
 enum EASSERTIONFAILURESEVERITY
 {
-  AFS__MIN,
+	AFS__MIN,
 
-  AFS_ASSERT = AFS__MIN,
-  AFS_CHECK,
+	AFS_ASSERT = AFS__MIN,
+	AFS_CHECK,
 
-  AFS__MAX
+	AFS__MAX
 };
 
 
-typedef void (_OU_CONVENTION_CALLBACK *CAssertionFailedProcedure)(EASSERTIONFAILURESEVERITY fsFailureSeverity,
-  const char *szAssertionExpression, const char *szAssertionFileName, unsigned int uiAssertionSourceLine);
+typedef void (_OU_CONVENTION_CALLBACK *CAssertionFailedProcedure)(EASSERTIONFAILURESEVERITY fsFailureSeverity, 
+	const char *szAssertionExpression, const char *szAssertionFileName, unsigned int uiAssertionSourceLine);
 
 
 class OU_VISIBLE CAssertionCheckCustomization
 {
 public:
-  static _OU_ALWAYSINLINE_PRE CAssertionFailedProcedure _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
-  /*CAssertionFailedProcedure */GetAssertFailureCustomHandler()
-  {
-  	return g_fnAssertFailureHandler;
-  }
+	static _OU_ALWAYSINLINE_PRE CAssertionFailedProcedure _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+	/*CAssertionFailedProcedure */GetAssertFailureCustomHandler()
+	{
+		return g_fnAssertFailureHandler;
+	}
 
-  static _OU_INLINE void _OU_CONVENTION_API CustomizeAssertionChecks(CAssertionFailedProcedure fnAssertionFailureProcedure)
-  {
-  	g_fnAssertFailureHandler = fnAssertionFailureProcedure;
-  }
+	static _OU_INLINE void _OU_CONVENTION_API CustomizeAssertionChecks(CAssertionFailedProcedure fnAssertionFailureProcedure)
+	{
+		g_fnAssertFailureHandler = fnAssertionFailureProcedure;
+	}
 
 private:
-  static CAssertionFailedProcedure g_fnAssertFailureHandler;
-};
+	static CAssertionFailedProcedure g_fnAssertFailureHandler;
+};	
 
 
 //////////////////////////////////////////////////////////////////////////
 // Memory manager customization
 
-#define _OU_MEMORY_REQUIRED_ALIGNMENT  	sizeof(_OU_NAMESPACE::uint64ou)
+#define _OU_MEMORY_REQUIRED_ALIGNMENT		sizeof(_OU_NAMESPACE::uint64ou)
 
 
 typedef void *(_OU_CONVENTION_CALLBACK *CMemoryAllocationProcedure)(size_t nBlockSize);
@@ -111,36 +111,36 @@ typedef void (_OU_CONVENTION_CALLBACK *CMemoryDeallocationProcedure)(void *pv_Ex
 class OU_VISIBLE CMemoryManagerCustomization
 {
 public:
-  static _OU_ALWAYSINLINE_PRE CMemoryAllocationProcedure _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
-  /*CMemoryAllocationProcedure */GetMemoryAllocationCustomProcedure()
-  {
-  	return g_fnMemoryAllocationProcedure;
-  }
+	static _OU_ALWAYSINLINE_PRE CMemoryAllocationProcedure _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+	/*CMemoryAllocationProcedure */GetMemoryAllocationCustomProcedure()
+	{
+		return g_fnMemoryAllocationProcedure;
+	}
 
-  static _OU_ALWAYSINLINE_PRE CMemoryReallocationProcedure _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
-  /*CMemoryReallocationProcedure */GetMemoryReallocationCustomProcedure()
-  {
-  	return g_fnMemoryReallocationProcedure;
-  }
+	static _OU_ALWAYSINLINE_PRE CMemoryReallocationProcedure _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+	/*CMemoryReallocationProcedure */GetMemoryReallocationCustomProcedure()
+	{
+		return g_fnMemoryReallocationProcedure;
+	}
 
-  static _OU_ALWAYSINLINE_PRE CMemoryDeallocationProcedure _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
-  /*CMemoryDeallocationProcedure */GetMemoryDeallocationCustomProcedure()
-  {
-  	return g_fnMemoryDeallocationProcedure;
-  }
+	static _OU_ALWAYSINLINE_PRE CMemoryDeallocationProcedure _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
+	/*CMemoryDeallocationProcedure */GetMemoryDeallocationCustomProcedure()
+	{
+		return g_fnMemoryDeallocationProcedure;
+	}
 
-  static _OU_INLINE void _OU_CONVENTION_API CustomizeMemoryManager(CMemoryAllocationProcedure fnAllocationProcedure,
-  	CMemoryReallocationProcedure fnReallocationProcedure, CMemoryDeallocationProcedure fnDeallocationProcedure)
-  {
-  	g_fnMemoryAllocationProcedure = fnAllocationProcedure;
-  	g_fnMemoryReallocationProcedure = fnReallocationProcedure;
-  	g_fnMemoryDeallocationProcedure = fnDeallocationProcedure;
-  }
+	static _OU_INLINE void _OU_CONVENTION_API CustomizeMemoryManager(CMemoryAllocationProcedure fnAllocationProcedure,
+		CMemoryReallocationProcedure fnReallocationProcedure, CMemoryDeallocationProcedure fnDeallocationProcedure)
+	{
+		g_fnMemoryAllocationProcedure = fnAllocationProcedure;
+		g_fnMemoryReallocationProcedure = fnReallocationProcedure;
+		g_fnMemoryDeallocationProcedure = fnDeallocationProcedure;
+	}
 
 private:
-  static CMemoryAllocationProcedure g_fnMemoryAllocationProcedure;
-  static CMemoryReallocationProcedure g_fnMemoryReallocationProcedure;
-  static CMemoryDeallocationProcedure g_fnMemoryDeallocationProcedure;
+	static CMemoryAllocationProcedure g_fnMemoryAllocationProcedure;
+	static CMemoryReallocationProcedure g_fnMemoryReallocationProcedure;
+	static CMemoryDeallocationProcedure g_fnMemoryDeallocationProcedure;
 };
 
 
