@@ -1,6 +1,6 @@
 ## Gazebo 4.0
 
-### Gazebo 4.1.1 (2015-03-20)
+### Gazebo 4.1.2 (2015-03-20)
 
 1. Fix quaternion documentation: target Gazebo_4.1
     * [Pull request #1525](https://bitbucket.org/osrf/gazebo/pull-request/1525)
@@ -33,7 +33,24 @@
 1. Prevent out of bounds array access in SkidSteerDrivePlugin (found by cppcheck 1.68)
     * [Pull request #1379](https://bitbucket.org/osrf/gazebo/pull-request/1379)
 
-### Gazebo 4.1.0 (2015-01-15)
+### Gazebo 4.1.1 (2015-01-15)
+
+1. Fix BulletPlaneShape bounding box (#1265)
+    * [Pull request #1367](https://bitbucket.org/osrf/gazebo/pull-request/1367)
+1. Fix dart linking errors on osx
+    * [Pull request #1372](https://bitbucket.org/osrf/gazebo/pull-request/1372)
+1. Update to player interfaces
+    * [Pull request #1324](https://bitbucket.org/osrf/gazebo/pull-request/1324)
+1. Handle GpuLaser name collisions (#1403)
+    * [Pull request #1360](https://bitbucket.org/osrf/gazebo/pull-request/1360)
+1. Add checks for handling array's with counts of zero, and read specular values
+    * [Pull request #1339](https://bitbucket.org/osrf/gazebo/pull-request/1339)
+1. Fix model list widget test
+    * [Pull request #1327](https://bitbucket.org/osrf/gazebo/pull-request/1327)
+1. Fix ogre includes
+    * [Pull request #1323](https://bitbucket.org/osrf/gazebo/pull-request/1323)
+
+### Gazebo 4.1.0 (2014-11-20)
 
 1. Modified GUI rendering to improve the rendering update rate.
     * [Pull request #1487](https://bitbucket.org/osrf/gazebo/pull-request/1487)
