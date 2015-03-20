@@ -4,6 +4,7 @@ include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
 
 link_directories(
   ${CCD_LIBRARY_DIRS}
+  ${Boost_LIBRARY_DIRS}
 )
 
 if (WIN32)

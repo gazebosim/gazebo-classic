@@ -187,10 +187,6 @@ set_property(
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
 )
 
-link_directories(
-  ${tinyxml_LIBRARY_DIRS}
-)
-
 target_link_libraries(gazebo_common
   gazebo_math
   ${libdl_library}
@@ -213,7 +209,7 @@ if (UNIX)
 endif()
 
 if (UNIX)
-  # rt is used for clock_gettime, which is not available on apple
+  # rt is used for clock_gettime, which is not available on apple or windows
   target_link_libraries(gazebo_common rt)
 endif()
 

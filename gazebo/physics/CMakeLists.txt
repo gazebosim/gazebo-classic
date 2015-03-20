@@ -128,17 +128,6 @@ target_link_libraries(gazebo_physics
   gazebo_util
 )
 
-# if (HAVE_BULLET)
-#   target_link_libraries(gazebo_physics gazebo_physics_bullet)
-# endif()
-# if (HAVE_DART)
-#   target_link_libraries(gazebo_physics gazebo_physics_dart)
-# endif()
-# 
-# if (HAVE_SIMBODY)
-#   target_link_libraries(gazebo_physics gazebo_physics_simbody)
-# endif()
-
 if (HAVE_GDAL)
   target_link_libraries(gazebo_physics ${GDAL_LIBRARY})
 endif()
