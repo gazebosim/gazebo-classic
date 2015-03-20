@@ -10,8 +10,8 @@ include_directories(SYSTEM
   ${CMAKE_SOURCE_DIR}/deps/opende/OPCODE
   ${CMAKE_SOURCE_DIR}/deps/opende/GIMPACT/include
   ${CMAKE_SOURCE_DIR}/deps/threadpool
-  ${CCD_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
+  ${CCD_INCLUDE_DIRS}
 )
 
 link_directories(  
