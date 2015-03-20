@@ -1,5 +1,11 @@
 ## Gazebo 4.0
 
+### Gazebo 4.x.x
+
+1. Disable failing pr2 test for dart
+    * [Pull request #1540](https://bitbucket.org/osrf/gazebo/pull-request/1540)
+    * [Issue #1435](https://bitbucket.org/osrf/gazebo/issue/1435)
+
 ### Gazebo 4.1.2 (2015-03-20)
 
 1. Fix quaternion documentation: target Gazebo_4.1
