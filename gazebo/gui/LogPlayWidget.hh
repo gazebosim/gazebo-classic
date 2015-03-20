@@ -78,6 +78,18 @@ namespace gazebo
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void HidePause();
 
+      /// \brief Qt signal when the joint creation process has ended.
+      Q_SIGNALS: void CurrentTime(const QString &);
+
+      /// \brief Qt signal when the joint creation process has ended.
+      Q_SIGNALS: void TotalTime(const QString &);
+
+      /// \brief Qt signal when the joint creation process has ended.
+      Q_SIGNALS: void CurrentTime(int _sec);
+
+      /// \brief Qt signal when the joint creation process has ended.
+      Q_SIGNALS: void TotalTime(int _sec);
+
       /// \brief Play simulation.
       private: void SetPaused(bool _paused);
 
@@ -102,21 +114,11 @@ namespace gazebo
       /// \brief Constructor;
       public: LogPlayView(LogPlayWidget *_parent = 0);
 
-      /// \brief Qt mouse release event.
-      /// \param[in] _event Qt mouse event.
-      public: void SetTime(QString _time);
+      /// \brief Play simulation.
+      public slots: void SetCurrentTime(int _sec);
 
-      /// \brief Qt mouse release event.
-      /// \param[in] _event Qt mouse event.
-      public: void SetTotalTime(QString _time);
-
-      /// \brief Qt mouse release event.
-      /// \param[in] _event Qt mouse event.
-      public: void SetIterations(QString _time);
-
-      /// \brief Qt mouse release event.
-      /// \param[in] _event Qt mouse event.
-      public: void SetPaused(bool _paused);
+      /// \brief Play simulation.
+      public slots: void SetTotalTime(int _sec);
 
       /// \brief Qt mouse release event.
       /// \param[in] _event Qt mouse event.

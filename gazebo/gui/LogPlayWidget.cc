@@ -42,7 +42,6 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   playButton->setCheckable(false);
   playButton->setIcon(QPixmap(":/images/log_play.png"));
   playButton->setIconSize(bigIconSize);
-  playButton->setToolTip("Play");
   playButton->setStyleSheet(
       QString("border-radius: %1px").arg(bigSize.width()/2-2));
   connect(playButton, SIGNAL(clicked()), this, SLOT(OnPlay()));
@@ -55,7 +54,6 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   pauseButton->setCheckable(false);
   pauseButton->setIcon(QPixmap(":/images/log_pause.png"));
   pauseButton->setIconSize(bigIconSize);
-  pauseButton->setToolTip("Play");
   pauseButton->setStyleSheet(
       QString("border-radius: %1px").arg(bigSize.width()/2-2));
   connect(pauseButton, SIGNAL(clicked()), this, SLOT(OnPause()));
@@ -68,7 +66,6 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   stepForwardButton->setCheckable(false);
   stepForwardButton->setIcon(QPixmap(":/images/log_step_forward.png"));
   stepForwardButton->setIconSize(smallIconSize);
-  stepForwardButton->setToolTip("Play");
   stepForwardButton->setStyleSheet(
       QString("border-radius: %1px").arg(smallSize.width()/2-2));
   connect(stepForwardButton, SIGNAL(clicked()), this, SLOT(OnStepForward()));
@@ -79,7 +76,6 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   stepBackButton->setCheckable(false);
   stepBackButton->setIcon(QPixmap(":/images/log_step_back.png"));
   stepBackButton->setIconSize(smallIconSize);
-  stepBackButton->setToolTip("Play");
   stepBackButton->setStyleSheet(
       QString("border-radius: %1px").arg(smallSize.width()/2-2));
 
@@ -89,7 +85,6 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   jumpStartButton->setCheckable(false);
   jumpStartButton->setIcon(QPixmap(":/images/log_jump_start.png"));
   jumpStartButton->setIconSize(smallIconSize);
-  jumpStartButton->setToolTip("Play");
   jumpStartButton->setStyleSheet(
       QString("border-radius: %1px").arg(smallSize.width()/2-2));
 
@@ -99,10 +94,8 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   jumpEndButton->setCheckable(false);
   jumpEndButton->setIcon(QPixmap(":/images/log_jump_end.png"));
   jumpEndButton->setIconSize(smallIconSize);
-  jumpEndButton->setToolTip("Play");
   jumpEndButton->setStyleSheet(
       QString("border-radius: %1px").arg(smallSize.width()/2-2));
-
 
   // Play layout
   QHBoxLayout *playLayout = new QHBoxLayout();
@@ -113,15 +106,33 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   playLayout->addWidget(stepForwardButton);
   playLayout->addWidget(jumpEndButton);
 
-
-
   // View
   this->dataPtr->view = new LogPlayView(this);
+  connect(this, SIGNAL(CurrentTime(int)), this->dataPtr->view,
+      SLOT(SetCurrentTime(int)));
+  connect(this, SIGNAL(TotalTime(int)), this->dataPtr->view,
+      SLOT(SetTotalTime(int)));
+
+  // Time
+  QLineEdit *currentTime = new QLineEdit();
+  currentTime->setMaximumWidth(150);
+  connect(this, SIGNAL(CurrentTime(const QString &)), currentTime,
+      SLOT(setText(const QString &)));
+
+  QLabel *totalTime = new QLabel();
+  connect(this, SIGNAL(TotalTime(const QString &)), totalTime,
+      SLOT(setText(const QString &)));
+
+  QHBoxLayout *timeLayout = new QHBoxLayout();
+  timeLayout->addWidget(currentTime);
+  timeLayout->addWidget(totalTime);
+
 
   // Main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addLayout(playLayout);
   mainLayout->addWidget(this->dataPtr->view);
+  mainLayout->addLayout(timeLayout);
   this->setLayout(mainLayout);
 
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -136,6 +147,10 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
     this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
 
   this->show();
+
+  // Set the total time
+  emit TotalTime(" / 00 00:00:22:123");
+  emit TotalTime(22123);
 }
 
 /////////////////////////////////////////////////
@@ -153,18 +168,11 @@ void LogPlayWidget::OnStats(ConstWorldStatisticsPtr &_msg)
 
   // Set paused state
   this->SetPaused(_msg->paused());
-  this->dataPtr->view->SetPaused(_msg->paused());
 
   // Set simulation time
-  this->dataPtr->view->SetTime(
-      QString::fromStdString(FormatTime(_msg->sim_time())));
-
-  // Set the iterations
-  this->dataPtr->view->SetIterations(QString::fromStdString(
-      boost::lexical_cast<std::string>(_msg->iterations())));
-
-  // Set the total time
-  this->dataPtr->view->SetTotalTime("00 00:00:22:123");
+  emit CurrentTime(QString::fromStdString(FormatTime(_msg->sim_time())));
+  emit CurrentTime(_msg->sim_time().sec() * 1e3 +
+                   _msg->sim_time().nsec() * 1e-6);
 }
 
 /////////////////////////////////////////////////
@@ -258,36 +266,46 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
   this->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Expanding);
 
+  this->dataPtr->sceneWidth = 1000;
+  this->dataPtr->sceneHeight = 120;
+  this->dataPtr->margin = 50;
+
   QGraphicsScene *graphicsScene = new QGraphicsScene();
-  graphicsScene->setBackgroundBrush(Qt::white);
+  graphicsScene->setBackgroundBrush(QColor(128, 128, 128));
   this->setScene(graphicsScene);
-  this->setMinimumWidth(200);
+  this->setMinimumWidth(this->dataPtr->sceneHeight);
   this->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+  this->setStyleSheet("QGraphicsView{border-style: none;}");
+  this->setSceneRect(0, 0,
+      this->dataPtr->sceneWidth, this->dataPtr->sceneHeight);
 
-  int sceneWidth = 1000;
-  int sceneHeight = 150;
-  this->setSceneRect(0, 0, sceneWidth, sceneHeight);
+  // Debug rect
+  graphicsScene->addItem(new QGraphicsRectItem(0, 0,
+      this->dataPtr->sceneWidth, this->dataPtr->sceneHeight));
 
-  graphicsScene->addItem(new QGraphicsRectItem(0, 0, sceneWidth, sceneHeight));
+  // Time line
+  QGraphicsLineItem *line = new QGraphicsLineItem(this->dataPtr->margin,
+      this->dataPtr->sceneHeight/2,
+      this->dataPtr->sceneWidth - this->dataPtr->margin,
+      this->dataPtr->sceneHeight/2);
+  line->setPen(QPen(Qt::black, 2));
+  graphicsScene->addItem(line);
 
-  // Time
-  this->dataPtr->timeText = graphicsScene->addSimpleText("00 00:00:00.000");
-  this->dataPtr->timeText->setPos(700, sceneHeight/2);
-
-  this->dataPtr->totalTimeText =
-      graphicsScene->addSimpleText("00 00:00:00.000");
-  this->dataPtr->totalTimeText->setPos(810, sceneHeight/2);
-
-  // Iterations
-  this->dataPtr->itText = graphicsScene->addSimpleText("0");
-  this->dataPtr->itText->setPos(-100, 0);
+  // Current time line
+  int currentTimeLineHeight = 50;
+  this->dataPtr->currentTimeItem = new QGraphicsLineItem(
+      0, -currentTimeLineHeight/2, 0, currentTimeLineHeight/2);
+  this->dataPtr->currentTimeItem->setPos(this->dataPtr->margin,
+      this->dataPtr->sceneHeight/2);
+  this->dataPtr->currentTimeItem->setPen(QPen(Qt::black, 3));
+  graphicsScene->addItem(this->dataPtr->currentTimeItem);
 
   // Publisher
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
 
   this->dataPtr->worldControlPub =
-    this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
+      this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
 }
 
 /////////////////////////////////////////////////
@@ -325,27 +343,62 @@ void LogPlayView::mouseReleaseEvent(QMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void LogPlayView::SetTime(QString _time)
+void LogPlayView::SetCurrentTime(int _msec)
 {
-  this->dataPtr->timeText->setText(_time);
+  double relPos = double(_msec) / this->dataPtr->totalTime;
+
+  this->dataPtr->currentTimeItem->setPos(
+      this->dataPtr->margin +
+      (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
+      this->dataPtr->sceneHeight/2);
 }
 
 /////////////////////////////////////////////////
-void LogPlayView::SetIterations(QString _it)
+void LogPlayView::SetTotalTime(int _msec)
 {
-  this->dataPtr->itText->setText(_it);
-}
+  this->dataPtr->totalTime = _msec;
 
-/////////////////////////////////////////////////
-void LogPlayView::SetTotalTime(QString _time)
-{
-  this->dataPtr->totalTimeText->setText(" / " + _time);
-}
+  // Current time line
+  int tickHeight = 15;
+  for (int i = 0; i <= 10; ++i)
+  {
+    double interval = double(this->dataPtr->totalTime) * i / 10;
+    double relPos = interval/this->dataPtr->totalTime;
 
-/////////////////////////////////////////////////
-void LogPlayView::SetPaused(bool _paused)
-{
-//  this->dataPtr->playItem->setVisible(_paused);
-//  this->dataPtr->pauseItem->setVisible(!_paused);
-}
+    QGraphicsLineItem *tick = new QGraphicsLineItem(
+        0, -tickHeight, 0, 0);
+    tick->setPos(
+      this->dataPtr->margin +
+      (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
+      this->dataPtr->sceneHeight/2);
+    tick->setPen(QPen(Qt::black, 2));
+    this->scene()->addItem(tick);
 
+  std::ostringstream stream;
+  unsigned int min, sec, msec;
+
+  stream.str("");
+
+  msec = interval;
+
+  min = msec / 60000;
+  msec -= min * 60000;
+
+  sec = msec / 1000;
+  msec -= sec * 60000;
+
+  stream << std::setw(2) << std::setfill('0') << min << ":";
+  stream << std::setw(2) << std::setfill('0') << sec;// << ".";
+  //stream << std::setw(3) << std::setfill('0') << msec;
+
+  QGraphicsSimpleTextItem *tickText = new QGraphicsSimpleTextItem(
+      QString::fromStdString(stream.str()));
+  tickText->setPos(
+      this->dataPtr->margin +
+      (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
+      this->dataPtr->sceneHeight/2 - 3 * tickHeight);
+    this->scene()->addItem(tickText);
+
+
+  }
+}

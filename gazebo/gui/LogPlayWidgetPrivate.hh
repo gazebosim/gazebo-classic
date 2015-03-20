@@ -59,16 +59,22 @@ namespace gazebo
       public: transport::NodePtr node;
 
       /// \brief TODO
-      public: QGraphicsSimpleTextItem *timeText;
-
-      /// \brief TODO
-      public: QGraphicsSimpleTextItem *totalTimeText;
-
-      /// \brief TODO
-      public: QGraphicsSimpleTextItem *itText;
+      public: QGraphicsLineItem *currentTimeItem;
 
       /// \brief Used to start, stop, and step simulation.
       public: transport::PublisherPtr worldControlPub;
+
+      /// \brief Used to start, stop, and step simulation.
+      public: int totalTime;
+
+      /// \brief Used to start, stop, and step simulation.
+      public: int sceneWidth;
+
+      /// \brief Used to start, stop, and step simulation.
+      public: int sceneHeight;
+
+      /// \brief Used to start, stop, and step simulation.
+      public: int margin;
     };
   }
 }
