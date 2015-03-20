@@ -49,6 +49,11 @@ enum {
   dxBodyGyroscopic =                256// use gyroscopic term
 };
 
+enum{
+    cone_friction,             // use cone model
+    pyramid_friction,          // use pyramid friction
+    box_friction               // use box friction
+};
 
 // base class that does correct object allocation / deallocation
 
@@ -121,6 +126,7 @@ struct dxQuickStepParameters {
   bool row_reorder1;  // control quickstep row reordering
   dReal warm_start;  // warm start factor, 0: no warm start, 1: full warm start
   int friction_iterations;  // extra quickstep iterations friction.
+  int friction_model;       // friction model
 };
 
 // robust-step parameters

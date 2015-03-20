@@ -42,6 +42,7 @@ void PGS_LCP (dxWorldProcessContext *context,
 #endif
   const dReal stepsize); 
 
+void dxConeFrictionModel(dReal& hi_act, dReal& lo_act, dReal& hi_act_erp, dReal& lo_act_erp, int *jb, const dRealMutablePtr J_orig, int index, int constraint_index, int startRow, int nRows, const int nb, dxBody * const *body, int i, const IndexError *order, const int *findex, dRealPtr lo, dRealPtr hi, dRealMutablePtr lambda, dRealMutablePtr lambda_erp);
 size_t EstimatePGS_LCPMemoryRequirements(int m,int /*nb*/);
 
     } // namespace quickstep

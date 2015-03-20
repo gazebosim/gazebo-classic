@@ -572,6 +572,12 @@ ODE_API dReal dWorldGetQuickStepWarmStartFactor (dWorldID);
 ODE_API int dWorldGetQuickStepExtraFrictionIterations (dWorldID);
 
 /**
+ * @brief Get which friction model to choose: cone, pyramid, box.
+ * @ingroup world
+ */
+ODE_API int dWorldGetQuickStepFrictionModel(dWorldID);
+
+/**
  * @brief Option to turn on inertia ratio reduction.
  * @ingroup world
  * @param irr set to true to turn on inertia ratio reduction.
@@ -616,6 +622,14 @@ ODE_API void dWorldSetQuickStepWarmStartFactor (dWorldID, dReal warm);
  * default sweep.
  */
 ODE_API void dWorldSetQuickStepExtraFrictionIterations (dWorldID, int iters);
+
+/**
+ * @brief choose one of the friction models: cone friction, pyramid friction 
+ * and box friction
+ * @ingroup world
+ * @param enum for friction model
+ */
+ODE_API void dWorldSetQuickStepFrictionModel(dWorldID, int fricmodel);
 
 /* PGS experimental parameters */
 
