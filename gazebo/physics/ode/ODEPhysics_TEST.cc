@@ -206,12 +206,12 @@ void ODEPhysics_TEST::PhysicsMsgParam()
   physicsPubMsg.set_max_step_size(0.001);
   physicsPubMsg.set_real_time_update_rate(800);
   physicsPubMsg.set_real_time_factor(1.1);
-  physicsPubMsg.set_iters(60);
-  physicsPubMsg.set_sor(1.5);
-  physicsPubMsg.set_cfm(0.1);
-  physicsPubMsg.set_erp(0.25);
-  physicsPubMsg.set_contact_max_correcting_vel(10);
-  physicsPubMsg.set_contact_surface_layer(0.01);
+
+  msgs::AddToPhysicsMsg("iters", 60, physicsPubMsg);
+  msgs::AddToPhysicsMsg("sor", 1.5, physicsPubMsg);
+  msgs::AddToPhysicsMsg("erp", 0.1, physicsPubMsg);
+  msgs::AddToPhysicsMsg("contact_max_correcting_vel", 10.0, physicsPubMsg);
+  msgs::AddToPhysicsMsg("contact_surface_layer", 0.01, physicsPubMsg);
 
   physicsPubMsg.set_type(msgs::Physics::ODE);
   physicsPubMsg.set_solver_type("quick");

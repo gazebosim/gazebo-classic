@@ -194,71 +194,74 @@ void PhysicsEngine::OnRequest(ConstRequestPtr &/*_msg*/)
 //////////////////////////////////////////////////
 void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  if (_msg->has_gravity())
+    this->SetGravity(msgs::Convert(_msg->gravity()));
+
+  if (_msg->has_real_time_factor())
+    this->SetTargetRealTimeFactor(_msg->real_time_factor());
+
+  if (_msg->has_real_time_update_rate())
+  {
+    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+  }
+
+  if (_msg->has_max_step_size())
+  {
+    this->SetMaxStepSize(_msg->max_step_size());
+  }
+
   boost::any value;
   for (int i = 0; i < _msg->parameters_size(); i++)
   {
-    // optimization to skip over iterating through all fields
-    if (_msg->parameters(i).has_type())
+    const google::protobuf::Reflection *reflection =
+        _msg->parameters(i).GetReflection();
+    std::vector<const google::protobuf::FieldDescriptor*> fields;
+    reflection->ListFields(_msg->parameters(i), &fields);
+    if ((_msg->parameters(i).children_size() > 0 && fields.size() > 3) ||
+        (_msg->parameters(i).children_size() == 0 && fields.size() > 2))
     {
-      switch (_msg->parameters(i).type())
+      gzerr << "Too many fields in NamedParam protobuf msg" << std::endl;
+      continue;
+    }
+
+    for (auto field : fields)
+    {
+      if (field->name() == "name" || field->name() ==  "children")
       {
-        case msgs::NamedParam_Type::NamedParam_Type_DOUBLE_TYPE:
-          value = _msg->parameters(i).double_value();
+        continue;
+      }
+      // optimization to skip over iterating through all fields
+      switch (field->cpp_type())
+      {
+        case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
+          value = reflection->GetDouble(_msg->parameters(i), field);
           break;
-        case gazebo::msgs::NamedParam_Type::NamedParam_Type_INT_TYPE:
-          value = _msg->parameters(i).int_value();
+        case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
+          value = reflection->GetInt32(_msg->parameters(i), field);
           break;
-        case msgs::NamedParam_Type::NamedParam_Type_STRING_TYPE:
-          value = _msg->parameters(i).string_value();
+        case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
+          value = reflection->GetString(_msg->parameters(i), field);
           break;
-        case msgs::NamedParam_Type::NamedParam_Type_VECTOR3D_TYPE:
-          value = _msg->parameters(i).vector3d();
+        case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
+          value = reflection->GetBool(_msg->parameters(i), field);
           break;
-        case msgs::NamedParam_Type::NamedParam_Type_BOOL_TYPE:
-          value = _msg->parameters(i).bool_value();
+        case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
+          value = reflection->GetFloat(_msg->parameters(i), field);
           break;
-        case msgs::NamedParam_Type::NamedParam_Type_FLOAT_TYPE:
-          value = _msg->parameters(i).float_value();
-          break;
+        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+          if (field->name() == "vector3d")
+          {
+            value = _msg->parameters(i).vector3d();
+            break;
+          }
+          // Else, go to default case
         default:
           gzwarn << "Empty parameter msg in PhysicsEngine::OnPhysicsMsg"
                  << std::endl;
           continue;
       }
     }
-    else
-    {
-      if (_msg->parameters(i).has_double_value())
-      {
-        value = _msg->parameters(i).double_value();
-      }
-      else if (_msg->parameters(i).has_int_value())
-      {
-        value = _msg->parameters(i).int_value();
-      }
-      else if (_msg->parameters(i).has_string_value())
-      {
-        value = _msg->parameters(i).string_value();
-      }
-      else if (_msg->parameters(i).has_vector3d())
-      {
-        value = _msg->parameters(i).vector3d();
-      }
-      else if (_msg->parameters(i).has_bool_value())
-      {
-        value = _msg->parameters(i).bool_value();
-      }
-      else if (_msg->parameters(i).has_float_value())
-      {
-        value = _msg->parameters(i).float_value();
-      }
-      else
-      {
-        gzwarn << "Empty parameter msg in PhysicsEngine::OnPhysicsMsg"
-               << std::endl;
-        continue;
-      }
-    }
+
     this->SetParam(_msg->parameters(i).name(), value);
   }
 }

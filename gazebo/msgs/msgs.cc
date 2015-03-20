@@ -83,7 +83,7 @@ namespace gazebo
     {
       msgs::NamedParam param;
       param.set_name(_key);
-      param.set_type(NamedParam_Type::NamedParam_Type_DOUBLE_TYPE);
+      //param.set_type(NamedParam_Type::NamedParam_Type_DOUBLE_TYPE);
       param.set_double_value(_value);
       return param;
     }
@@ -93,7 +93,7 @@ namespace gazebo
     {
       msgs::NamedParam param;
       param.set_name(_key);
-      param.set_type(NamedParam_Type::NamedParam_Type_INT_TYPE);
+      //param.set_type(NamedParam_Type::NamedParam_Type_INT_TYPE);
       param.set_int_value(_value);
       return param;
     }
@@ -103,7 +103,7 @@ namespace gazebo
     {
       msgs::NamedParam param;
       param.set_name(_key);
-      param.set_type(NamedParam_Type::NamedParam_Type_STRING_TYPE);
+      //param.set_type(NamedParam_Type::NamedParam_Type_STRING_TYPE);
       param.set_string_value(_value);
       return param;
     }
@@ -113,8 +113,9 @@ namespace gazebo
     {
       msgs::NamedParam param;
       param.set_name(_key);
-      param.set_type(NamedParam_Type::NamedParam_Type_STRING_TYPE);
+      //param.set_type(NamedParam_Type::NamedParam_Type_STRING_TYPE);
       msgs::Vector3d *vec = param.mutable_vector3d();
+      // TODO: better copy
       *vec = Convert(_value);
       return param;
     }
@@ -124,7 +125,7 @@ namespace gazebo
     {
       msgs::NamedParam param;
       param.set_name(_key);
-      param.set_type(NamedParam_Type::NamedParam_Type_BOOL_TYPE);
+      //param.set_type(NamedParam_Type::NamedParam_Type_BOOL_TYPE);
       param.set_bool_value(_value);
       return param;
     }
@@ -134,7 +135,7 @@ namespace gazebo
     {
       msgs::NamedParam param;
       param.set_name(_key);
-      param.set_type(NamedParam_Type::NamedParam_Type_FLOAT_TYPE);
+      //param.set_type(NamedParam_Type::NamedParam_Type_FLOAT_TYPE);
       param.set_float_value(_value);
       return param;
     }
