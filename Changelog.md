@@ -1,6 +1,39 @@
 ## Gazebo 4.0
 
-### Gazebo 4.x.x (yyyy-mm-dd)
+### Gazebo 4.1.1 (2015-03-20)
+
+1. Fix quaternion documentation: target Gazebo_4.1
+    * [Pull request #1525](https://bitbucket.org/osrf/gazebo/pull-request/1525)
+1. Speed up World::Step in loops
+    * [Pull request #1492](https://bitbucket.org/osrf/gazebo/pull-request/1492)
+1. Reduce selection buffer updates -> 4.1
+    * [Pull request #1494](https://bitbucket.org/osrf/gazebo/pull-request/1494)
+1. Fix QT rendering, and rendering update rate
+    * [Pull request #1487](https://bitbucket.org/osrf/gazebo/pull-request/1487)
+1. Fix loading of SimbodyPhysics parameters
+    * [Pull request #1474](https://bitbucket.org/osrf/gazebo/pull-request/1474)
+1. Fix heightmap on OSX -> 4.1
+    * [Pull request #1455](https://bitbucket.org/osrf/gazebo/pull-request/1455)
+1. Remove extra pose tag in a world file that should not be there
+    * [Pull request #1458](https://bitbucket.org/osrf/gazebo/pull-request/1458)
+1. Better fix for #236 for IMU that doesn't require ABI changes
+    * [Pull request #1448](https://bitbucket.org/osrf/gazebo/pull-request/1448)
+1. Fix regression of #236 for ImuSensor in 4.1
+    * [Pull request #1446](https://bitbucket.org/osrf/gazebo/pull-request/1446)
+1. Preserve previous GAZEBO_MODEL_PATH values when sourcing setup.sh
+    * [Pull request #1430](https://bitbucket.org/osrf/gazebo/pull-request/1430)
+1. issue #857: fix segfault for simbody screw joint when setting limits due to uninitialized limitForce.
+    * [Pull request #1423](https://bitbucket.org/osrf/gazebo/pull-request/1423)
+1. Allow multiple contact sensors per link (#960)
+    * [Pull request #1413](https://bitbucket.org/osrf/gazebo/pull-request/1413)
+1. Fix for issue #351, ODE World Step
+    * [Pull request #1406](https://bitbucket.org/osrf/gazebo/pull-request/1406)
+1. Disable failing InelasticCollision/0 test (#1394)
+    * [Pull request #1405](https://bitbucket.org/osrf/gazebo/pull-request/1405)
+1. Prevent out of bounds array access in SkidSteerDrivePlugin (found by cppcheck 1.68)
+    * [Pull request #1379](https://bitbucket.org/osrf/gazebo/pull-request/1379)
+
+### Gazebo 4.1.0 (2015-01-15)
 
 1. Modified GUI rendering to improve the rendering update rate.
     * [Pull request #1487](https://bitbucket.org/osrf/gazebo/pull-request/1487)
