@@ -49,7 +49,7 @@ SchematicViewWidget::SchematicViewWidget(QWidget *_parent)
   this->view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   this->view->setScene(this->scene);
   this->view->centerOn(QPointF(0, 0));
-  this->view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+//  this->view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
   this->view->setDragMode(QGraphicsView::ScrollHandDrag);
   this->view->show();
 
@@ -178,11 +178,11 @@ void SchematicViewWidget::RenameEdge(const std::string &_id,
 /////////////////////////////////////////////////
 void SchematicViewWidget::resizeEvent(QResizeEvent *_event)
 {
-  qreal boundingWidth = std::max(this->minimumWidth, _event->size().width());
+/*  qreal boundingWidth = std::max(this->minimumWidth, _event->size().width());
   boundingWidth = std::max(boundingWidth, this->scene->sceneRect().width());
   qreal boundingHeight = std::max(this->minimumHeight,
       _event->size().height());
   boundingHeight = std::max(boundingHeight, this->scene->sceneRect().height());
   this->scene->setSceneRect(-boundingWidth/2, -boundingHeight/2,
-      boundingWidth, boundingHeight);
+      boundingWidth, boundingHeight);*/
 }
