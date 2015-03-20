@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,9 +53,9 @@ void RestUiWidget::Login()
   if (dialog.exec() != QDialog::Rejected)
   {
     gazebo::msgs::RestLogin msg;
-    msg.set_url(dialog.getUrl());
-    msg.set_username(dialog.getUsername());
-    msg.set_password(dialog.getPassword());
+    msg.set_url(dialog.GetUrl());
+    msg.set_username(dialog.GetUsername());
+    msg.set_password(dialog.GetPassword());
     pub->Publish(msg);
   }
 }

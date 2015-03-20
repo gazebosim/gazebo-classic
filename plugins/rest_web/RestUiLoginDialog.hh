@@ -1,5 +1,5 @@
 /*
- * copyright (C) 2014 Open Source Robotics Foundation
+ * copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,18 +48,18 @@ namespace gazebo
       /// \param[in] _url The web server url
       /// \param[in] _username The user name
       /// \param[in] _password The user password
-      signals: void acceptLogin(QString &_url,
+      signals: void AcceptLogin(QString &_url,
                                 QString& _username,
                                 QString& _password);
 
       /// \brief Getter for User name (of the basic auth REST service)
-      public: std::string getUsername();
+      public: std::string GetUsername() const;
 
       /// \brief Getter for the password
-      public: std::string getPassword();
+      public: std::string GetPassword() const;
 
       /// \brief Getter for the Url (https)
-      public: std::string getUrl();
+      public: std::string GetUrl() const;
 
       /// slot for the AcceptLogin event
       public slots: void slotAcceptLogin();

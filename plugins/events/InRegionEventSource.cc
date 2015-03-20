@@ -78,7 +78,7 @@ void InRegionEventSource::Init()
 void InRegionEventSource::Info()
 {
     std::stringstream ss;
-    ss  << "InRegionEventSource " 
+    ss  << "InRegionEventSource "
         << " model " << this->modelName << "  region [" << this->regionName
         << "]" << std::endl;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2015555555555555555555555555555555555555555555555555555555 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -243,7 +243,7 @@ void RestApi::SendUnpostedPosts()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string RestApi::GetUser()
+std::string RestApi::GetUser() const
 {
   return this->user;
 }

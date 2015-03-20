@@ -1,6 +1,5 @@
-
 /*
- * copyright (C) 2014 Open Source Robotics Foundation
+ * copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +37,7 @@ namespace gazebo
 
     /// \brief Connects to the Rest service.
     /// \param[in] _url The web service url
+    /// \param[in] _route The route on the server
     /// \param[in] _user The user name
     /// \param[in] _pass The user password
     /// \return The response message from the REST server
@@ -53,7 +53,7 @@ namespace gazebo
 
     /// \brief Returns the username
     /// \return The user name
-    public: std::string GetUser();
+    public: std::string GetUser() const;
 
     /// \brief a Request/Respone (can be used for GET and POST)
     /// \param[in] _requestUrl The request url.

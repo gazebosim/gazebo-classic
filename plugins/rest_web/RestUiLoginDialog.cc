@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,19 +91,19 @@ RestUiLoginDialog::RestUiLoginDialog(QWidget *_parent,
 }
 
 /////////////////////////////////////////////////
-std::string RestUiLoginDialog::getUsername()
+std::string RestUiLoginDialog::GetUsername() const
 {
   return this->username;
 }
 
 /////////////////////////////////////////////////
-std::string RestUiLoginDialog::getPassword()
+std::string RestUiLoginDialog::GetPassword() const
 {
   return this->password;
 }
 
 /////////////////////////////////////////////////
-std::string RestUiLoginDialog::getUrl()
+std::string RestUiLoginDialog::GetUrl() const
 {
   return this->url;
 }
@@ -118,7 +118,7 @@ void RestUiLoginDialog::slotAcceptLogin()
   password = pass.toStdString();
   url = u.toStdString();
   qApp->processEvents();
-  emit acceptLogin(u, user, pass);
+  emit AcceptLogin(u, user, pass);
   // close the dialog with success exit code
   accept();
 }
