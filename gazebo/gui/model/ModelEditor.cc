@@ -312,6 +312,15 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     if (!this->mainWindowPaused)
       this->mainWindow->Play();
   }
+
+#ifdef HAVE_GRAPHVIZ
+  if (this->svWidget && this->schematicViewAct)
+  {
+    this->svWidget->setVisible(
+        !this->active && this->schematicViewAct->isChecked());
+  }
+#endif
+
   this->active = !this->active;
   this->ToggleToolbar();
   // g_editModelAct->setChecked(this->active);
