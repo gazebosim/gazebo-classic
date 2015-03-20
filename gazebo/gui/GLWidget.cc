@@ -52,6 +52,8 @@ using namespace gui;
 extern bool g_fullscreen;
 extern ModelRightMenu *g_modelRightMenu;
 
+std::vector<boost::shared_ptr<msgs::Selection const> > selectionMsgs;
+
 /////////////////////////////////////////////////
 GLWidget::GLWidget(QWidget *_parent)
   : QWidget(_parent)
@@ -127,7 +129,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
 
   // Subscribes to selection messages.
-  this->selectionSub = this->node->Subscribe("~/selection/server",
+  this->selectionSub = this->node->Subscribe("~/selection",
       &GLWidget::OnSelectionMsg, this);
 
   // Publishes information about user selections.
@@ -233,6 +235,10 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   // here to make sure it's handled.
   if (!this->sceneCreated && rendering::get_scene())
     this->OnCreateScene(rendering::get_scene()->GetName());
+
+  for (auto msg : selectionMsgs)
+    this->OnSetSelectedEntity(msg->name(), "normal");
+  selectionMsgs.clear();
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (cam && cam->GetInitialized())
@@ -937,7 +943,7 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
   if (_msg->has_selected() && _msg->selected())
   {
-    this->OnSetSelectedEntity(_msg->name(), "normal");
+    selectionMsgs.push_back(_msg);
   }
 }
 
