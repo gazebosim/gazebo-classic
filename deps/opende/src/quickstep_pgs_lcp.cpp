@@ -30,12 +30,16 @@
 #include "objects.h"
 #include "joints/joint.h"
 #include "util.h"
-#include <sys/time.h>
+
+#ifndef _WIN32
+  #include <sys/time.h>
+#endif
+
 #include "quickstep_util.h"
 #include "quickstep_pgs_lcp.h"
 
 using namespace ode;
- 
+
 static void ComputeRows(
 #ifdef SHOW_CONVERGENCE
                 int thread_id,
@@ -179,7 +183,7 @@ static void ComputeRows(
   dRealMutablePtr caccel_erp_ptr2;
   dRealMutablePtr cforce_ptr1;
   dRealMutablePtr cforce_ptr2;
-  int total_iterations = precon_iterations + num_iterations + 
+  int total_iterations = precon_iterations + num_iterations +
     friction_iterations;
   for (int iteration = 0; iteration < total_iterations; ++iteration)
   {
