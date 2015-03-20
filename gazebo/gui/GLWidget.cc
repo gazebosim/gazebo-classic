@@ -52,8 +52,6 @@ using namespace gui;
 extern bool g_fullscreen;
 extern ModelRightMenu *g_modelRightMenu;
 
-std::vector<boost::shared_ptr<msgs::Selection const> > selectionMsgs;
-
 /////////////////////////////////////////////////
 GLWidget::GLWidget(QWidget *_parent)
   : QWidget(_parent)
@@ -159,6 +157,9 @@ GLWidget::GLWidget(QWidget *_parent)
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this,
       SLOT(OnModelEditor(bool)));
+
+  connect(this, SIGNAL(selectionMsgReceived(const QString &)), this,
+                SLOT(OnSelectionMsgEvent(const QString &)));
 }
 
 /////////////////////////////////////////////////
@@ -235,10 +236,6 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   // here to make sure it's handled.
   if (!this->sceneCreated && rendering::get_scene())
     this->OnCreateScene(rendering::get_scene()->GetName());
-
-  for (auto msg : selectionMsgs)
-    this->OnSetSelectedEntity(msg->name(), "normal");
-  selectionMsgs.clear();
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (cam && cam->GetInitialized())
@@ -943,8 +940,14 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
   if (_msg->has_selected() && _msg->selected())
   {
-    selectionMsgs.push_back(_msg);
+    this->selectionMsgReceived(QString(_msg->name().c_str()));
   }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnSelectionMsgEvent(const QString &_name)
+{
+  this->OnSetSelectedEntity(_name.toStdString(), "normal");
 }
 
 /////////////////////////////////////////////////
