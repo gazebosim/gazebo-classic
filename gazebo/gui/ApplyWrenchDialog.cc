@@ -1028,7 +1028,7 @@ bool ApplyWrenchDialog::eventFilter(QObject *_object, QEvent *_event)
   // Activate when changing spinboxes with mousewheel
   else if (_event->type() == QEvent::Wheel)
   {
-    this->SetActive(true);
+    this->ActivateWindow();
   }
 
   return false;
