@@ -3,7 +3,7 @@
 ### Modifications
 
 1. ignition-math is now a dependency. 
-    + [http://ignitionrobotics.org/libraries/math](Igntion math)
+    + [http://ignitionrobotics.org/libraries/math](http://ignitionrobotics.org/libraries/math)
     + [Gazebo migration](https://bitbucket.org/osrf/gazebo/src/583edbeb90759d43d994cc57c0797119dd6d2794/ign-math-migration.md)
 
 1. **gazebo/common/MeshManager.hh**
