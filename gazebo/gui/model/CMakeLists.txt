@@ -3,23 +3,34 @@ include (${QT_USE_FILE})
 
 
 set (sources
+  CollisionConfig.cc
+  ExtrudeDialog.cc
   ImportDialog.cc
   JointInspector.cc
   JointMaker.cc
+  LinkConfig.cc
+  LinkInspector.cc
   ModelCreator.cc
+  ModelData.cc
   ModelEditor.cc
   ModelEditorEvents.cc
   ModelEditorPalette.cc
+  VisualConfig.cc
 )
 
 set (qt_headers
+  CollisionConfig.hh
+  ExtrudeDialog.hh
   ImportDialog.hh
   JointInspector.hh
   JointMaker.hh
+  LinkConfig.hh
+  LinkInspector.hh
   ModelCreator.hh
   ModelData.hh
   ModelEditor.hh
   ModelEditorPalette.hh
+  VisualConfig.hh
 )
 
 set (headers
@@ -28,7 +39,11 @@ set (headers
 
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
-  set (qt_tests ${qt_tests} JointMaker_TEST.cc)
+  set (qt_tests ${qt_tests} 
+    JointMaker_TEST.cc
+    ExtrudeDialog_TEST.cc
+    ModelCreator_TEST.cc
+  )
 endif()
 
 # Generate executables for each of the QT unit tests

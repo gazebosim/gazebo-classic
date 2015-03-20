@@ -27,6 +27,7 @@
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/gui/qt.h"
@@ -121,9 +122,16 @@ namespace gazebo
       /// \param[in] _jointName Name of joint to be removed.
       public: void RemoveJoint(const std::string &_jointName);
 
-      /// \brief Remove all joints connected to part
-      /// \param[in] _partName Name of joint to be removed.
-      public: void RemoveJointsByPart(const std::string &_partName);
+      /// \brief Remove all joints connected to link.
+      /// \param[in] _linkName Name of the link.
+      public: void RemoveJointsByLink(const std::string &_linkName);
+
+      /// \brief Get a vector containing data for all joints connected to
+      /// the given link.
+      /// \param[in] _linkName Name of the link.
+      /// \return Vector with joint data.
+      public: std::vector<JointData *> GetJointDataByLink(
+          const std::string &_linkName) const;
 
       /// \brief Generate SDF for all joints.
       public: void GenerateSDF();
@@ -152,6 +160,20 @@ namespace gazebo
       /// return Number of joints.
       public: unsigned int GetJointCount();
 
+      /// \brief Create a joint from SDF. This is mainly used when editing
+      /// existing models.
+      /// \param[in] _jointElement SDF element to load.
+      /// \param[in] _modelName Name of the model that contains this joint.
+      public: void CreateJointFromSDF(sdf::ElementPtr _jointElem,
+          const std::string &_modelName = "");
+
+      /// \brief Add a scoped link name. Nested model's link names are scoped
+      /// but the parent and child field in the joint SDF element may not be.
+      /// So keep track of scoped link names in order to generate the correct
+      /// SDF before spawning the model.
+      /// \param[in] _name Scoped link name.
+      public: void AddScopedLinkName(const std::string &_name);
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -177,15 +199,25 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
 
-      /// \brief Get the centroid of the part visual in world coordinates.
-      /// \param[in] _visual Visual of the part.
+      /// \brief Get the centroid of the link visual in world coordinates.
+      /// \param[in] _visual Visual of the link.
       /// \return Centroid in world coordinates;
-      private: math::Vector3 GetPartWorldCentroid(
+      private: math::Vector3 GetLinkWorldCentroid(
           const rendering::VisualPtr _visual);
 
       /// \brief Open joint inspector.
       /// \param[in] _name Name of joint.
       private: void OpenInspector(const std::string &_name);
+
+      /// \brief Convert a joint type string to enum.
+      /// \param[in] _type Joint type in string.
+      /// \return Joint type enum.
+      private: JointType ConvertJointType(const std::string &_type);
+
+      /// \brief Get the scoped name of a link.
+      /// \param[in] _name Unscoped link name.
+      /// \return Scoped link name.
+      private: std::string GetScopedLinkName(const std::string &_name);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
@@ -241,6 +273,9 @@ namespace gazebo
 
       /// \brief Selected joint.
       private: rendering::VisualPtr selectedJoint;
+
+      /// \brief A list of scoped link names.
+      private: std::vector<std::string> scopedLinkedNames;
     };
     /// \}
 
@@ -257,6 +292,9 @@ namespace gazebo
       /// \brief Visual of the dynamic line
       public: rendering::VisualPtr visual;
 
+      /// \brief Joint visual.
+      public: rendering::JointVisualPtr jointVisual;
+
       /// \brieft Visual of the hotspot
       public: rendering::VisualPtr hotspot;
 
@@ -265,6 +303,18 @@ namespace gazebo
 
       /// \brief Child visual the joint is connected to.
       public: rendering::VisualPtr child;
+
+      /// \internal
+      /// \brief Parent visual pose used to determine if updates are needed.
+      public: math::Pose parentPose;
+
+      /// \internal
+      /// \brief Child visual pose used to determine if updates are needed.
+      public: math::Pose childPose;
+
+      /// \internal
+      /// \brief Child visual scale used to determine if updates are needed.
+      public: math::Vector3 childScale;
 
       /// \brief Visual line used to represent joint connecting parent and child
       public: rendering::DynamicLines *line;
@@ -284,14 +334,35 @@ namespace gazebo
       /// \brief Joint upper limit.
       public: double upperLimit[2];
 
+      /// \brief Joint effort limit.
+      public: double effortLimit[2];
+
+      /// \brief Joint velocity limit.
+      public: double velocityLimit[2];
+
+      /// \brief Use parent model frame flag.
+      public: bool useParentModelFrame[2];
+
+      /// \brief Joint damping.
+      public: double damping[2];
+
       /// \brief Joint pose.
       public: math::Pose pose;
 
       /// \brief True if the joint visual needs update.
       public: bool dirty;
 
+      /// \brief Msg containing joint data.
+      public: msgs::JointPtr jointMsg;
+
       /// \brief Inspector for configuring joint properties.
       public: JointInspector *inspector;
+
+      /// \brief Open the joint inspector.
+      public: void OpenInspector();
+
+      /// \brief Qt Callback when joint inspector is to be opened.
+      private slots: void OnOpenInspector();
 
       /// \brief Qt Callback when joint inspector configurations are to be
       /// applied.

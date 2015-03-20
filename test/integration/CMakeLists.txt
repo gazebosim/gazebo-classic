@@ -68,7 +68,6 @@ set(tests
   physics_thread_safe.cc
   pioneer2dx.cc
   plugin.cc
-  polyline.cc
   road.cc
   sensor.cc
   server_fixture.cc
@@ -85,6 +84,13 @@ set(tests
   world_population.cc
   worlds_installed.cc
   )
+
+if (HAVE_GTS)
+  set(tests
+    ${tests}
+    polyline.cc
+  )
+endif()
 
 if (MANPAGES_SUPPORT)
   set (tests ${tests}
@@ -137,4 +143,3 @@ if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pioneer2dx PROPERTIES TIMEOUT 500)
 endif()
-

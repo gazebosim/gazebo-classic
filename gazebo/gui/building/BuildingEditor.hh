@@ -26,6 +26,7 @@ namespace gazebo
   namespace gui
   {
     class BuildingEditorPalette;
+    class BuildingEditorWidget;
 
     /// \class TerrainEditor TerrainEditor.hh gui/gui.hh
     /// \brief Interface to the terrain editor.
@@ -67,16 +68,38 @@ namespace gazebo
       /// \brief Contains all the building editor tools.
       private: BuildingEditorPalette *buildingPalette;
 
+      /// \brief Building editor widget for creating a building model
+      private: BuildingEditorWidget *buildingEditorWidget;
+
       /// \brief Create menus
       private: void CreateMenus();
+
+      /// \brief Qt event filter currently used to filter tips label events.
+      /// \param[in] _obj Object that is watched by the event filter.
+      /// \param[in] _event Qt event.
+      /// \return True if the event is handled.
+      private: bool eventFilter(QObject *_obj, QEvent *_event);
 
       /// \brief Our custom menubar
       private: QMenuBar *menuBar;
 
+      /// \brief Action to save model.
       private: QAction *saveAct;
+
+      /// \brief Action to save model as.
       private: QAction *saveAsAct;
+
+      /// \brief Action to start a new model.
       private: QAction *newAct;
+
+      /// \brief Action to exit the editor.
       private: QAction *exitAct;
+
+      /// \brief Save the main window paused state to use when returning.
+      private: bool mainWindowPaused;
+
+      /// \brief Label which shows tips when clicked or hovered.
+      private: QLabel *tipsLabel;
     };
   }
 }

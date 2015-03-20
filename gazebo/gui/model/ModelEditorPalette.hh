@@ -19,6 +19,7 @@
 #define _MODEL_EDITOR_PALETTE_HH_
 
 #include <string>
+#include <vector>
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/Event.hh"
@@ -83,8 +84,8 @@ namespace gazebo
       /// \brief Qt callback when custom button is clicked.
       private slots: void OnCustom();
 
-      /// \brief Qt callback when a part has been added.
-      private slots: void OnPartAdded();
+      /// \brief Qt callback when a link has been added.
+      private slots: void OnLinkAdded();
 
       /// \brief Qt callback when the model is to be made static.
       private slots: void OnStatic();
@@ -92,44 +93,34 @@ namespace gazebo
       /// \brief Qt callback when the model is allowed to auto disable at rest.
       private slots: void OnAutoDisable();
 
-      /// \brief Qt callback when the model is to be saved.
-      private slots: void OnSave();
+      /// \brief Qt callback when the Model Name field is changed.
+      /// \param[in] _name New name.
+      private slots: void OnNameChanged(const QString &_name);
 
-      /// \brief Qt callback when the model is to be discarded.
-      private slots: void OnDiscard();
+      /// \brief Callback when user has provided information on where to save
+      /// the model to.
+      /// \param[in] _saveName Name of model being saved.
+      private: void OnSaveModel(const std::string &_saveName);
 
-      /// \brief Qt callback when model editing is complete.
-      private slots: void OnDone();
+      /// \brief Event received when the user starts a new model.
+      private: void OnNewModel();
 
-      /// \brief Widget that display model properties.
-      private: QTreeWidget *modelTreeWidget;
+      /// \brief Event received when the model properties changed.
+      /// \param[in] _static New static property of the model.
+      /// \param[in] _autoDisable New allow_auto_disable property of the model.
+      /// \param[in] _pose New model pose.
+      /// \param[in] _name New name.
+      private: void OnModelPropertiesChanged(bool _static, bool _autoDisable,
+          const math::Pose &_pose, const std::string &_name);
 
-      /// \brief Model settings item in the tree widget.
-      private: QTreeWidgetItem *modelSettingsItem;
+      /// \brief A list of gui editor events connected to this palette.
+      private: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief Model parts item in the tree widget.
-      private: QTreeWidgetItem *modelItem;
-
-      /// \brief Plugin item in the tree widget.
-      private: QTreeWidgetItem *pluginItem;
-
-      /// \brief Parts button group.
-      private: QButtonGroup *partButtonGroup;
+      /// \brief Links button group.
+      private: QButtonGroup *linkButtonGroup;
 
       /// \brief Model creator.
       private: ModelCreator *modelCreator;
-
-      /// \brief Save button.
-      private: QPushButton *saveButton;
-
-      /// \brief Indicate whether the model has been saved before or not.
-      private: bool saved;
-
-      /// \brief Path to where the model is saved.
-      private: std::string saveLocation;
-
-      /// \brief Name of model being edited.
-      private: std::string modelName;
 
       /// \brief Static checkbox, true to create a static model.
       private: QCheckBox *staticCheck;
@@ -137,6 +128,12 @@ namespace gazebo
       /// \brief Auto disable checkbox, true to allow model to auto-disable at
       /// rest.
       private: QCheckBox *autoDisableCheck;
+
+      /// \brief Default name of the model.
+      private: std::string modelDefaultName;
+
+      /// \brief Edit the name of the model.
+      private: QLineEdit *modelNameEdit;
     };
   }
 }

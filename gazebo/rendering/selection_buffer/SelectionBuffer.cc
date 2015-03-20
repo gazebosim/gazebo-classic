@@ -197,8 +197,10 @@ void SelectionBuffer::CreateRTTOverlays()
     panel->setPosition(10, 10);
     panel->setDimensions(400, 280);
     panel->setMaterialName("SelectionDebugMaterial");
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR  <= 9
     this->selectionDebugOverlay->add2D(panel);
     this->selectionDebugOverlay->hide();
+#endif
   }
   else
   {
@@ -209,6 +211,7 @@ void SelectionBuffer::CreateRTTOverlays()
 }
 
 /////////////////////////////////////////////////
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR  <= 9
 void SelectionBuffer::ShowOverlay(bool _show)
 {
   if (_show)
@@ -216,3 +219,9 @@ void SelectionBuffer::ShowOverlay(bool _show)
   else
     this->selectionDebugOverlay->hide();
 }
+#else
+void SelectionBuffer::ShowOverlay(bool /*_show*/)
+{
+  gzerr << "Selection debug overlay disabled for Ogre > 1.9\n";
+}
+#endif

@@ -267,6 +267,43 @@ TEST_F(MsgsTest, ConvertMsgsJointTypeToString)
   CompareMsgsJointTypeToString(msgs::Joint::GEARBOX);
 }
 
+//////////////////////////////////////////////////
+void CompareMsgsGeometryTypeToString(const msgs::Geometry::Type _type)
+{
+  EXPECT_EQ(_type, msgs::ConvertGeometryType(msgs::ConvertGeometryType(_type)));
+}
+
+//////////////////////////////////////////////////
+TEST_F(MsgsTest, ConvertMsgsGeometryTypeToString)
+{
+  CompareMsgsGeometryTypeToString(msgs::Geometry::BOX);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::SPHERE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::CYLINDER);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::PLANE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::IMAGE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::HEIGHTMAP);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::MESH);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::POLYLINE);
+
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::BOX), "box");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::SPHERE), "sphere");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::CYLINDER), "cylinder");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::PLANE), "plane");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::IMAGE), "image");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::HEIGHTMAP), "heightmap");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::MESH), "mesh");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::POLYLINE), "polyline");
+
+  EXPECT_EQ(msgs::ConvertGeometryType("box"), msgs::Geometry::BOX);
+  EXPECT_EQ(msgs::ConvertGeometryType("sphere"), msgs::Geometry::SPHERE);
+  EXPECT_EQ(msgs::ConvertGeometryType("cylinder"), msgs::Geometry::CYLINDER);
+  EXPECT_EQ(msgs::ConvertGeometryType("plane"), msgs::Geometry::PLANE);
+  EXPECT_EQ(msgs::ConvertGeometryType("image"), msgs::Geometry::IMAGE);
+  EXPECT_EQ(msgs::ConvertGeometryType("heightmap"), msgs::Geometry::HEIGHTMAP);
+  EXPECT_EQ(msgs::ConvertGeometryType("mesh"), msgs::Geometry::MESH);
+  EXPECT_EQ(msgs::ConvertGeometryType("polyline"), msgs::Geometry::POLYLINE);
+}
+
 TEST_F(MsgsTest, SetVector3)
 {
   msgs::Vector3d msg;
@@ -1184,7 +1221,7 @@ TEST_F(MsgsTest, GeometryToSDF)
   // polyline
   msgs::Geometry polylineMsg;
   polylineMsg.set_type(msgs::Geometry::POLYLINE);
-  msgs::Polyline *polylineGeom = polylineMsg.mutable_polyline();
+  msgs::Polyline *polylineGeom = polylineMsg.add_polyline();
   polylineGeom->set_height(2.33);
   msgs::Set(polylineGeom->add_point(), math::Vector2d(0.5, 0.7));
   msgs::Set(polylineGeom->add_point(), math::Vector2d(3.5, 4.7));
@@ -1368,6 +1405,7 @@ TEST_F(MsgsTest, SurfaceToSDF)
   msg.set_min_depth(0.0001);
   msg.set_collide_without_contact(true);
   msg.set_collide_without_contact_bitmask(0x0004);
+  msg.set_collide_bitmask(0x01);
 
   sdf::ElementPtr surfaceSDF = msgs::SurfaceToSDF(msg);
   sdf::ElementPtr frictionElem = surfaceSDF->GetElement("friction");
@@ -1394,6 +1432,8 @@ TEST_F(MsgsTest, SurfaceToSDF)
   EXPECT_TRUE(contactElem->Get<bool>("collide_without_contact"));
   EXPECT_EQ(contactElem->Get<unsigned int>("collide_without_contact_bitmask"),
       static_cast<unsigned int>(0x0004));
+  EXPECT_EQ(contactElem->Get<unsigned int>("collide_bitmask"),
+      static_cast<unsigned int>(0x01));
 }
 
 /////////////////////////////////////////////////

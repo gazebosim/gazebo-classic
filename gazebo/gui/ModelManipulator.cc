@@ -26,6 +26,7 @@
 #include "gazebo/rendering/SelectionObj.hh"
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiIface.hh"
 
@@ -136,7 +137,9 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
   if (signTest < 0 )
     angle *= -1;
 
-  if (this->dataPtr->mouseEvent.control)
+  // Using Qt control modifier instead of Gazebo's for now.
+  // See GLWidget::keyPressEvent
+  if (QApplication::keyboardModifiers() & Qt::ControlModifier)
     angle = rint(angle / (M_PI * 0.25)) * (M_PI * 0.25);
 
   math::Quaternion rot(_axis, angle);
@@ -319,10 +322,127 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
   math::Vector3 scale = (bboxSize + pose.rot.RotateVectorReverse(distance))
       / bboxSize;
 
-  // a bit hacky to check for unit sphere and cylinder simple shapes in order
-  // to restrict the scaling dimensions.
-  if (this->dataPtr->keyEvent.key == Qt::Key_Shift ||
-      _vis->GetName().find("unit_sphere") != std::string::npos)
+  // extended scaling to work in model editor mode by checking geometry
+  // type of first visual child.
+  std::string geomType;
+  if (_vis == _vis->GetRootVisual())
+  {
+    // link-level visuals
+    for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+    {
+      rendering::VisualPtr childVis = _vis->GetChild(i);
+
+      if (childVis->GetPose().pos != math::Vector3::Zero)
+      {
+        gzwarn << "Scaling is currently limited to simple shapes with their "
+            << "origin in the centroid." << std::endl;
+        return;
+      }
+      // visual/collision level visuals
+      for (unsigned int j = 0; j < childVis->GetChildCount(); ++j)
+      {
+        rendering::VisualPtr grandChildVis = childVis->GetChild(j);
+        std::string thisGeomType = grandChildVis->GetGeometryType();
+
+        if (grandChildVis->GetPose().pos != math::Vector3::Zero)
+        {
+          gzwarn << "Scaling is currently limited to simple shapes with their "
+              << "origin in the centroid." << std::endl;
+          return;
+        }
+
+        if (thisGeomType == "")
+          continue;
+
+        if (geomType == "")
+        {
+          geomType = thisGeomType;
+        }
+        else if (thisGeomType != geomType)
+        {
+          gzwarn << "Scaling is currently limited to models consisting of a " <<
+              "single simple geometry type." << std::endl;
+          return;
+        }
+      }
+    }
+
+    if (this->dataPtr->keyEvent.key == Qt::Key_Shift || geomType == "sphere")
+    {
+      scale = this->UpdateScale(_axis, scale, "sphere");
+    }
+    else if (geomType == "cylinder")
+    {
+      scale = this->UpdateScale(_axis, scale, "cylinder");
+    }
+    else if (geomType == "box")
+    {
+      // keep new scale as it is
+    }
+    else
+    {
+      // TODO scaling for complex models are not yet functional.
+      // Limit scaling to simple shapes for now.
+      gzwarn << " Scaling is currently limited to simple shapes." << std::endl;
+      return;
+    }
+
+    math::Vector3 newScale = this->dataPtr->mouseVisualScale * scale.GetAbs();
+
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier)
+    {
+      newScale = SnapPoint(newScale);
+      // prevent setting zero scale
+      newScale.x = std::max(1e-4, newScale.x);
+      newScale.y = std::max(1e-4, newScale.y);
+      newScale.z = std::max(1e-4, newScale.z);
+    }
+    _vis->SetScale(newScale);
+    Events::scaleEntity(_vis->GetName(), newScale);
+  }
+  else
+  {
+    // model editor mode -> apply scaling to individual visuals
+    if (this->dataPtr->mouseChildVisualScale.size() != _vis->GetChildCount())
+    {
+      gzerr << "Incorrect number of child visuals to be scaled. " <<
+          "This should not happen" << std::endl;
+      return;
+    }
+
+    for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+    {
+      rendering::VisualPtr childVis = _vis->GetChild(i);
+      geomType = childVis->GetGeometryType();
+      if (childVis != this->dataPtr->selectionObj &&
+          geomType != "" && geomType != "mesh")
+      {
+        math::Vector3 geomScale = this->UpdateScale(_axis, scale,
+            childVis->GetGeometryType());
+        math::Vector3 newScale = this->dataPtr->mouseChildVisualScale[i]
+            * geomScale.GetAbs();
+
+        if (QApplication::keyboardModifiers() & Qt::ControlModifier)
+        {
+          newScale = SnapPoint(newScale);
+          // prevent setting zero scale
+          newScale.x = std::max(1e-4, newScale.x);
+          newScale.y = std::max(1e-4, newScale.y);
+          newScale.z = std::max(1e-4, newScale.z);
+        }
+        childVis->SetScale(newScale);
+        Events::scaleEntity(childVis->GetName(), newScale);
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+math::Vector3 ModelManipulator::UpdateScale(const math::Vector3 &_axis,
+    const math::Vector3 &_scale, const std::string &_geom)
+{
+  math::Vector3 scale = _scale;
+  if (_geom == "sphere")
   {
     if (_axis.x > 0)
     {
@@ -340,7 +460,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       scale.y = scale.z;
     }
   }
-  else if (_vis->GetName().find("unit_cylinder") != std::string::npos)
+  else if (_geom == "cylinder")
   {
     if (_axis.x > 0)
     {
@@ -351,29 +471,8 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       scale.x = scale.y;
     }
   }
-  else if (_vis->GetName().find("unit_box") != std::string::npos)
-  {
-  }
-  else
-  {
-    // TODO scaling for complex models are not yet functional.
-    // Limit scaling to simple shapes for now.
-    gzwarn << " Scaling is currently limited to simple shapes." << std::endl;
-    return;
-  }
 
-  math::Vector3 newScale = this->dataPtr->mouseVisualScale * scale.GetAbs();
-
-  if (this->dataPtr->mouseEvent.control)
-  {
-    newScale = SnapPoint(newScale);
-    // prevent setting zero scale
-    newScale.x = std::max(1e-4, newScale.x);
-    newScale.y = std::max(1e-4, newScale.y);
-    newScale.z = std::max(1e-4, newScale.z);
-  }
-
-  _vis->SetScale(newScale);
+  return scale;
 }
 
 /////////////////////////////////////////////////
@@ -385,7 +484,7 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
 
   pose.pos = this->dataPtr->mouseMoveVisStartPose.pos + distance;
 
-  if (this->dataPtr->mouseEvent.control)
+  if (QApplication::keyboardModifiers() & Qt::ControlModifier)
   {
     pose.pos = SnapPoint(pose.pos);
   }
@@ -718,6 +817,14 @@ void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
   if (_vis)
   {
     this->dataPtr->mouseVisualScale = _vis->GetScale();
+    this->dataPtr->mouseChildVisualScale.clear();
+    // keep track of all child visual scale for scaling to work in
+    // model editor mode.
+    for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+    {
+      rendering::VisualPtr childVis = _vis->GetChild(i);
+      this->dataPtr->mouseChildVisualScale.push_back(childVis->GetScale());
+    }
     this->dataPtr->mouseVisualBbox = _vis->GetBoundingBox();
   }
   else

@@ -552,7 +552,7 @@ unsigned int LogRecord::Log::Update()
     std::string data = stream.str();
     if (!data.empty())
     {
-      const std::string encodingLocal = this->parent->GetEncoding();
+      const std::string &encodingLocal = this->parent->GetEncoding();
 
       this->buffer.append("<chunk encoding='");
       this->buffer.append(encodingLocal);

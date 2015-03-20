@@ -49,6 +49,7 @@
 #include "gazebo/gui/ToolsWidget.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/AlignWidget.hh"
+#include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/SpaceNav.hh"
@@ -244,7 +245,7 @@ void MainWindow::Init()
   this->renderWidget->show();
 
   // Default window size is entire desktop.
-  QSize winSize = QApplication::desktop()->size();
+  QSize winSize = QApplication::desktop()->screenGeometry().size();
 
   // Get the size properties from the INI file.
   int winWidth = getINIProperty<int>("geometry.width", winSize.width());
@@ -270,9 +271,6 @@ void MainWindow::Init()
       &MainWindow::OnModel, this, true);
 
   this->lightSub = this->node->Subscribe("~/light", &MainWindow::OnLight, this);
-
-  this->statsSub =
-    this->node->Subscribe("~/world_stats", &MainWindow::OnStats, this);
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response",
@@ -309,6 +307,8 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
     this->oculusWindow = NULL;
   }
 #endif
+
+  emit Close();
 
   gazebo::shutdown();
 }
@@ -562,8 +562,13 @@ void MainWindow::Play()
   msgs::WorldControl msg;
   msg.set_pause(false);
 
-  g_pauseAct->setVisible(true);
-  g_playAct->setVisible(false);
+  if (this->renderWidget)
+  {
+    TimePanel *timePanel = this->renderWidget->GetTimePanel();
+    if (timePanel)
+      timePanel->SetPaused(false);
+  }
+
   this->worldControlPub->Publish(msg);
 }
 
@@ -573,8 +578,13 @@ void MainWindow::Pause()
   msgs::WorldControl msg;
   msg.set_pause(true);
 
-  g_pauseAct->setVisible(false);
-  g_playAct->setVisible(true);
+  if (this->renderWidget)
+  {
+    TimePanel *timePanel = this->renderWidget->GetTimePanel();
+    if (timePanel)
+      timePanel->SetPaused(true);
+  }
+
   this->worldControlPub->Publish(msg);
 }
 
@@ -829,6 +839,17 @@ void MainWindow::ShowCOM()
   else
     transport::requestNoReply(this->node->GetTopicNamespace(),
         "hide_com", "all");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ShowInertia()
+{
+  if (g_showInertiaAct->isChecked())
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_inertia", "all");
+  else
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_inertia", "all");
 }
 
 /////////////////////////////////////////////////
@@ -1133,12 +1154,19 @@ void MainWindow::CreateActions()
   connect(g_viewWireframeAct, SIGNAL(triggered()), this,
           SLOT(SetWireframe()));
 
-  g_showCOMAct = new QAction(tr("Center of Mass / Inertia"), this);
-  g_showCOMAct->setStatusTip(tr("Show COM/MOI"));
+  g_showCOMAct = new QAction(tr("Center of Mass"), this);
+  g_showCOMAct->setStatusTip(tr("Show center of mass"));
   g_showCOMAct->setCheckable(true);
   g_showCOMAct->setChecked(false);
   connect(g_showCOMAct, SIGNAL(triggered()), this,
           SLOT(ShowCOM()));
+
+  g_showInertiaAct = new QAction(tr("Inertias"), this);
+  g_showInertiaAct->setStatusTip(tr("Show moments of inertia"));
+  g_showInertiaAct->setCheckable(true);
+  g_showInertiaAct->setChecked(false);
+  connect(g_showInertiaAct, SIGNAL(triggered()), this,
+      SLOT(ShowInertia()));
 
   g_showContactsAct = new QAction(tr("Contacts"), this);
   g_showContactsAct->setStatusTip(tr("Show Contacts"));
@@ -1360,7 +1388,6 @@ void MainWindow::CreateMenuBar()
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
 
-  // \TODO: Add this back in when implementing the full Model Editor spec.
   editMenu->addAction(g_editModelAct);
 
   QMenu *viewMenu = bar->addMenu(tr("&View"));
@@ -1373,6 +1400,7 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_showCollisionsAct);
   viewMenu->addAction(g_showJointsAct);
   viewMenu->addAction(g_showCOMAct);
+  viewMenu->addAction(g_showInertiaAct);
   viewMenu->addAction(g_showContactsAct);
   viewMenu->addSeparator();
 
@@ -1410,15 +1438,6 @@ void MainWindow::CreateMenus()
   frame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
   this->setMenuWidget(frame);
-}
-
-/////////////////////////////////////////////////
-void MainWindow::CreateToolbars()
-{
-  this->playToolbar = this->addToolBar(tr("Play"));
-  this->playToolbar->addAction(g_playAct);
-  this->playToolbar->addAction(g_pauseAct);
-  this->playToolbar->addAction(g_stepAct);
 }
 
 /////////////////////////////////////////////////
@@ -1675,32 +1694,24 @@ void MainWindow::OnSetSelectedEntity(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
-{
-  if (_msg->paused() && g_pauseAct->isVisible())
-  {
-    g_pauseAct->setVisible(false);
-    g_playAct->setVisible(true);
-  }
-  else if (!_msg->paused() && !g_playAct->isVisible())
-  {
-    g_pauseAct->setVisible(true);
-    g_playAct->setVisible(false);
-  }
-}
-
-/////////////////////////////////////////////////
 void MainWindow::OnPlayActionChanged()
 {
-  if (g_playAct->isVisible())
+  if (this->renderWidget)
   {
-    g_stepAct->setToolTip("Step the world");
-    g_stepAct->setEnabled(true);
-  }
-  else
-  {
-    g_stepAct->setToolTip("Pause the world before stepping");
-    g_stepAct->setEnabled(false);
+    TimePanel *timePanel = this->renderWidget->GetTimePanel();
+    if (timePanel)
+    {
+      if (timePanel->IsPaused())
+      {
+        g_stepAct->setToolTip("Step the world");
+        g_stepAct->setEnabled(true);
+      }
+      else
+      {
+        g_stepAct->setToolTip("Pause the world before stepping");
+        g_stepAct->setEnabled(false);
+      }
+    }
   }
 }
 
@@ -1733,6 +1744,18 @@ void MainWindow::ShowLeftColumnWidget(const std::string &_name)
 RenderWidget *MainWindow::GetRenderWidget() const
 {
   return this->renderWidget;
+}
+
+/////////////////////////////////////////////////
+bool MainWindow::IsPaused() const
+{
+  if (this->renderWidget)
+  {
+    TimePanel *timePanel = this->renderWidget->GetTimePanel();
+    if (timePanel)
+      return timePanel->IsPaused();
+  }
+  return false;
 }
 
 /////////////////////////////////////////////////

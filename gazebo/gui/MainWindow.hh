@@ -72,6 +72,10 @@ namespace gazebo
       /// \return A pointer to the render widget.
       public: RenderWidget *GetRenderWidget() const;
 
+      /// \brief Returns the state of the simulation, true if paused.
+      /// \return True if paused, false otherwise.
+      public: bool IsPaused() const;
+
       /// \brief Play simulation.
       public slots: void Play();
 
@@ -84,6 +88,9 @@ namespace gazebo
 
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();
+
+      /// \brief A signal to indicate the main window is about to close.
+      signals: void Close();
 
       protected: void closeEvent(QCloseEvent *_event);
 
@@ -134,11 +141,25 @@ namespace gazebo
       private slots: void CaptureScreenshot();
 
       private slots: void InsertModel();
+
+      /// \brief Qt callback when the show grid action is triggered.
       private slots: void ShowGrid();
+
+      /// \brief Qt callback when the show collisions action is triggered.
       private slots: void ShowCollisions();
+
+      /// \brief Qt callback when the show joints action is triggered.
       private slots: void ShowJoints();
+
+      /// \brief Qt callback when the show contacts action is triggered.
       private slots: void ShowContacts();
+
+      /// \brief Qt callback when the show center of mass action is triggered.
       private slots: void ShowCOM();
+
+      /// \brief Qt callback when the show inertia action is triggered.
+      private slots: void ShowInertia();
+
       private slots: void Reset();
       private slots: void FullScreen();
       private slots: void FPS();
@@ -179,9 +200,6 @@ namespace gazebo
       /// \brief Create menus.
       private: void CreateMenus();
 
-      /// \brief Create the toolbars.
-      private: void CreateToolbars();
-
       /// \brief Create the main menu bar.
       private: void CreateMenuBar();
 
@@ -205,7 +223,6 @@ namespace gazebo
       private: void OnManipMode(const std::string &_mode);
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
-      private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
       /// \brief Handle event for changing the manual step size.
       /// \param[in] _value New input step size.
