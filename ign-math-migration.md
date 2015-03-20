@@ -10,13 +10,16 @@
     ***Replacement*** public: void Translation(const ignition::math::Vector3d &_trans);
 
 1. ***Deprecated*** public: math::Vector3 GetTranslation() const
-  + ***Replacement*** public: ignition::math::Vector3d Translation() const
+
+    ***Replacement*** public: ignition::math::Vector3d Translation() const
 
 1. ***Deprecated*** public: void SetRotation(const math::Quaternion &_rot)
-  + ***Replacement*** public: void Rotation(const ignition::math::Quaterniond &_rot)
+
+    ***Replacement*** public: void Rotation(const ignition::math::Quaterniond &_rot)
 
 1. ***Deprecated*** public: math::Quaternion GetRotation() const
-  + ***Replacement*** public: ignition::math::Quaterniond Rotation() const
+
+    ***Replacement*** public: ignition::math::Quaterniond Rotation() const
 
 ## gazebo/math
 
