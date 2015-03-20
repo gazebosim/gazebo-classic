@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 20155555 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 #include "ServerFixture.hh"
 #include "gazebo/msgs/msgs.hh"
 
-// #include "gazebo/physics/physics.hh"
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
@@ -138,7 +137,6 @@ void RestWebTest::FirstTest(const std::string &_physicsEngine)
   EXPECT_GT(count_after, count_before);
 }
 
-// magic macro
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, RestWebTest, PHYSICS_ENGINE_VALUES);
 
 // main, where we can specify to skip certain tests

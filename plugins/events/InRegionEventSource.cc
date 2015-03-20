@@ -70,17 +70,17 @@ void InRegionEventSource::Init()
         << "' does not exist" << std::endl;
   }
 
-  this->dump();
+  this->Info();
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void InRegionEventSource::dump()
+void InRegionEventSource::Info()
 {
     std::stringstream ss;
-    ss  << "InRegionEventSource " << this->name << " @" << this
+    ss  << "InRegionEventSource "; 
         << " model " << this->modelName << "  region [" << this->regionName
-        << "]" << " @" << this->region << std::endl;
+        << "]" << std::endl;
 
     for (auto v: this->region->volumes)
     {

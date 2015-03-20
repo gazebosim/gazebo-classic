@@ -84,8 +84,8 @@ namespace gazebo
     /// \param[in] _worldFilename Name of the world to load.
     /// \param[in] _paused True to start the world paused.
     /// \param[in] _physics Name of the physics engine.
-    /// \param[in] _argc nb of arguments (for example to load system plugins)
-    /// \param[in] _argv array of arguments
+    /// \param[in] _argc Argument count (for example to load system plugins)
+    /// \param[in] _argv Array of arguments
     protected: virtual void Load(const std::string &_worldFilename,
                                  bool _paused, const std::string &_physics,
                                  int _argc = 0, char **_argv = NULL);

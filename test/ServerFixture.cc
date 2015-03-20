@@ -182,7 +182,6 @@ void ServerFixture::Load(const std::string &_worldFilename,
   this->requestPub->WaitForConnection();
 }
 
-
 /////////////////////////////////////////////////
 void ServerFixture::RunServer(const std::string &_worldFilename)
 {
@@ -221,37 +220,6 @@ void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
   ASSERT_NO_THROW(delete this->server);
   this->server = NULL;
 }
-
-/*
-/////////////////////////////////////////////////
-void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
-               const std::string &_physics)
-{
-  ASSERT_NO_THROW(this->server = new Server());
-  this->server->PreLoad();
-  if (_physics.length())
-    ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
-                                           _physics));
-  else
-    ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
-
-  if (!rendering::get_scene(
-        gazebo::physics::get_world()->GetName()))
-  {
-    ASSERT_NO_THROW(rendering::create_scene(
-        gazebo::physics::get_world()->GetName(), false, true));
-  }
-
-  ASSERT_NO_THROW(this->SetPause(_paused));
-
-  ASSERT_NO_THROW(this->server->Run());
-
-  ASSERT_NO_THROW(this->server->Fini());
-
-  ASSERT_NO_THROW(delete this->server);
-  this->server = NULL;
-}
-*/
 
 /////////////////////////////////////////////////
 rendering::ScenePtr ServerFixture::GetScene(
