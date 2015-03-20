@@ -45,39 +45,40 @@ endif()
 
 
 gz_add_executable(gzserver server_main.cc Server.cc Master.cc gazebo.cc)
-gz_add_executable(gazebo gazebo_main.cc Server.cc Master.cc gazebo.cc)
+# gz_add_executable(gazebo gazebo_main.cc Server.cc Master.cc gazebo.cc)
 
 target_link_libraries(gzserver
   gazebo_common
   gazebo_util
   gazebo_transport
   gazebo_physics
+  gazebo_physics_ode
   gazebo_sensors
   gazebo_rendering
   gazebo_msgs
   pthread
 )
 
-target_link_libraries(gazebo
-  gazebo_common
-  gazebo_util
-  gazebo_transport
-  gazebo_physics
-  gazebo_sensors
-  gazebo_rendering
-  gazebo_msgs
-  gazebo_gui
-  pthread
-)
+# target_link_libraries(gazebo
+#   gazebo_common
+#   gazebo_util
+#   gazebo_transport
+#   gazebo_physics
+#   gazebo_sensors
+#   gazebo_rendering
+#   gazebo_msgs
+#   gazebo_gui
+#   pthread
+# )
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
   target_link_libraries(gzserver gcov)
 endif()
 
 gz_install_executable(gzserver)
-gz_install_executable(gazebo)
+# gz_install_executable(gazebo)
 manpage(gzserver 1)
-manpage(gazebo 1)
+# manpage(gazebo 1)
 
 gz_add_library(libgazebo Server.cc Master.cc gazebo.cc)
 set_target_properties(libgazebo PROPERTIES OUTPUT_NAME "gazebo")
@@ -87,6 +88,7 @@ target_link_libraries(libgazebo
   gazebo_util
   gazebo_transport
   gazebo_physics
+  gazebo_physics_ode
   gazebo_sensors
   gazebo_rendering
   gazebo_msgs
