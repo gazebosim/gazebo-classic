@@ -192,8 +192,75 @@ void PhysicsEngine::OnRequest(ConstRequestPtr &/*_msg*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/)
+void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  boost::any value;
+  for (int i = 0; i < _msg->parameters_size(); i++)
+  {
+    // optimization to skip over iterating through all fields
+    if (_msg->parameters(i).has_type())
+    {
+      switch (_msg->parameters(i).type())
+      {
+        case msgs::NamedParam_Type::NamedParam_Type_DOUBLE_TYPE:
+          value = _msg->parameters(i).double_value();
+          break;
+        case gazebo::msgs::NamedParam_Type::NamedParam_Type_INT_TYPE:
+          value = _msg->parameters(i).int_value();
+          break;
+        case msgs::NamedParam_Type::NamedParam_Type_STRING_TYPE:
+          value = _msg->parameters(i).string_value();
+          break;
+        case msgs::NamedParam_Type::NamedParam_Type_VECTOR3D_TYPE:
+          value = _msg->parameters(i).vector3d();
+          break;
+        case msgs::NamedParam_Type::NamedParam_Type_BOOL_TYPE:
+          value = _msg->parameters(i).bool_value();
+          break;
+        case msgs::NamedParam_Type::NamedParam_Type_FLOAT_TYPE:
+          value = _msg->parameters(i).float_value();
+          break;
+        default:
+          gzwarn << "Empty parameter msg in PhysicsEngine::OnPhysicsMsg"
+                 << std::endl;
+          continue;
+      }
+    }
+    else
+    {
+      if (_msg->parameters(i).has_double_value())
+      {
+        value = _msg->parameters(i).double_value();
+      }
+      else if (_msg->parameters(i).has_int_value())
+      {
+        value = _msg->parameters(i).int_value();
+      }
+      else if (_msg->parameters(i).has_string_value())
+      {
+        value = _msg->parameters(i).string_value();
+      }
+      else if (_msg->parameters(i).has_vector3d())
+      {
+        value = _msg->parameters(i).vector3d();
+      }
+      else if (_msg->parameters(i).has_bool_value())
+      {
+        value = _msg->parameters(i).bool_value();
+      }
+      else if (_msg->parameters(i).has_float_value())
+      {
+        value = _msg->parameters(i).float_value();
+      }
+      else
+      {
+        gzwarn << "Empty parameter msg in PhysicsEngine::OnPhysicsMsg"
+               << std::endl;
+        continue;
+      }
+    }
+    this->SetParam(_msg->parameters(i).name(), value);
+  }
 }
 
 //////////////////////////////////////////////////

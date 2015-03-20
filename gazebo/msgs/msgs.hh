@@ -489,6 +489,21 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Header *GetHeader(google::protobuf::Message &_message);
 
+    template<typename T> GAZEBO_VISIBLE msgs::NamedParam ConvertMessageParam(
+        const std::string &/*_key*/, const T /*_value*/)
+    {
+      msgs::NamedParam param;
+      return param;
+    }
+
+    template<typename T> GAZEBO_VISIBLE void AddToPhysicsMsg(
+        const std::string &_key, const T _value, msgs::Physics &_physics)
+    {
+      msgs::NamedParam *param = _physics.add_parameters();
+      // TODO: better copy?
+      *param = ConvertMessageParam(_key, _value);
+    }
+
     /// \}
   }
 }

@@ -78,6 +78,67 @@ namespace gazebo
       return (msgs::Header*)msg;
     }
 
+    template<> msgs::NamedParam ConvertMessageParam<double>(const std::string &_key,
+        const double _value)
+    {
+      msgs::NamedParam param;
+      param.set_name(_key);
+      param.set_type(NamedParam_Type::NamedParam_Type_DOUBLE_TYPE);
+      param.set_double_value(_value);
+      return param;
+    }
+
+    template<> msgs::NamedParam ConvertMessageParam<int>(const std::string &_key,
+        const int _value)
+    {
+      msgs::NamedParam param;
+      param.set_name(_key);
+      param.set_type(NamedParam_Type::NamedParam_Type_INT_TYPE);
+      param.set_int_value(_value);
+      return param;
+    }
+
+    template<> msgs::NamedParam ConvertMessageParam<std::string>(const std::string &_key,
+        const std::string _value)
+    {
+      msgs::NamedParam param;
+      param.set_name(_key);
+      param.set_type(NamedParam_Type::NamedParam_Type_STRING_TYPE);
+      param.set_string_value(_value);
+      return param;
+    }
+
+    template<> msgs::NamedParam ConvertMessageParam<math::Vector3>(const std::string &_key,
+        const math::Vector3 _value)
+    {
+      msgs::NamedParam param;
+      param.set_name(_key);
+      param.set_type(NamedParam_Type::NamedParam_Type_STRING_TYPE);
+      msgs::Vector3d *vec = param.mutable_vector3d();
+      *vec = Convert(_value);
+      return param;
+    }
+
+    template<> msgs::NamedParam ConvertMessageParam<bool>(const std::string &_key,
+        const bool _value)
+    {
+      msgs::NamedParam param;
+      param.set_name(_key);
+      param.set_type(NamedParam_Type::NamedParam_Type_BOOL_TYPE);
+      param.set_bool_value(_value);
+      return param;
+    }
+
+    template<> msgs::NamedParam ConvertMessageParam<float>(const std::string &_key,
+        const float _value)
+    {
+      msgs::NamedParam param;
+      param.set_name(_key);
+      param.set_type(NamedParam_Type::NamedParam_Type_FLOAT_TYPE);
+      param.set_float_value(_value);
+      return param;
+    }
+
     void Init(google::protobuf::Message &_message, const std::string &_id)
     {
       msgs::Header *header = GetHeader(_message);

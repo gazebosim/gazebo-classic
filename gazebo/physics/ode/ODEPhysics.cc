@@ -260,7 +260,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
   if (_msg->request() == "physics_info")
   {
     msgs::Physics physicsMsg;
-    physicsMsg.set_type(msgs::Physics::ODE);
+    /*physicsMsg.set_type(msgs::Physics::ODE);
     physicsMsg.set_solver_type(this->dataPtr->stepType);
     // min_step_size is defined but not yet used
     boost::any min_step_size;
@@ -286,7 +286,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
-    physicsMsg.set_max_step_size(this->maxStepSize);
+    physicsMsg.set_max_step_size(this->maxStepSize);*/
 
     response.set_type(physicsMsg.GetTypeName());
     physicsMsg.SerializeToString(serializedData);
@@ -297,7 +297,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  if (_msg->has_solver_type())
+  /*if (_msg->has_solver_type())
     this->SetStepType(_msg->solver_type());
 
   if (_msg->has_min_step_size())
@@ -342,12 +342,13 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   {
     this->SetMaxStepSize(_msg->max_step_size());
   }
+  */
+
+  // Parent class handles all parameters
+  PhysicsEngine::OnPhysicsMsg(_msg);
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
-
-  // Parent class handles many generic parameters
-  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 

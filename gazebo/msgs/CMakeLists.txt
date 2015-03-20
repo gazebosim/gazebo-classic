@@ -51,6 +51,7 @@ set (msgs
   model.proto
   model_configuration.proto
   model_v.proto
+  namedparam.proto
   packet.proto
   physics.proto
   planegeom.proto
