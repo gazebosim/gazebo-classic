@@ -404,13 +404,15 @@ void SimbodyPhysics::InitForThread()
 //////////////////////////////////////////////////
 void SimbodyPhysics::UpdateCollision()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
+
   this->contactManager->ResetCount();
 
   // Get all contacts from Simbody
   const SimTK::State &state = this->integ->getState();
 
   // get contact snapshot
-  const SimTK::ContactSnapshot& contactSnapshot =
+  const SimTK::ContactSnapshot &contactSnapshot =
     this->tracker.getActiveContacts(state);
 
   int numc = contactSnapshot.getNumContacts();
@@ -477,6 +479,7 @@ void SimbodyPhysics::UpdateCollision()
         if (useContactPatch)
         {
           // get contact patch to get detailed contacts
+          // see https://github.com/simbody/simbody/blob/master/examples/ExampleContactPlayground.cpp#L110
           SimTK::ContactPatch patch;
           const bool found =
              this->contact.calcContactPatchDetailsById(
@@ -515,9 +518,11 @@ void SimbodyPhysics::UpdateCollision()
               // per gazebo contact feedback convention, pending more testing.
               SimTK::SpatialVec s2cg = SimTK::shiftForceBy(s2,
                 -detail.getContactPoint());
+              /*gzerr << "numc: " << j << "\n";
+              gzerr << "index: " << i << "\n";
               gzerr << "offset: " << detail.getContactPoint() << "\n";
               gzerr << "s2: " << s2 << "\n";
-              gzerr << "s2cg: " << s2cg << "\n";
+              gzerr << "s2cg: " << s2cg << "\n";*/
               SimTK::Vec3 t2cg = s2cg[0];
               SimTK::Vec3 f2cg = s2cg[1];
 
@@ -1325,6 +1330,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
   //                                 0.5,   // mu_dynamic
   //                                 0.5);  // mu_viscous
 
+  gzerr << "mobod :" << _mobod.getMobilizedBodyIndex() << "\n";
   bool addModelClique = _modelClique.isValid() && !_link->GetSelfCollide();
 
   // COLLISION
@@ -1343,9 +1349,11 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
     {
       case physics::Entity::PLANE_SHAPE:
       {
+        gzerr << "adding ground shape\n";
         boost::shared_ptr<physics::PlaneShape> p =
           boost::dynamic_pointer_cast<physics::PlaneShape>((*ci)->GetShape());
 
+        /*
         // Add a contact surface to represent the ground.
         // Half space normal is -x; must rotate about y to make it +z.
         int surfNum = this->matter.Ground().updBody().addContactSurface(
@@ -1353,9 +1361,10 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
            ContactSurface(ContactGeometry::HalfSpace(), material));
 
         // store ContactGeometry pointer in SimbodyCollision object
-        // SimTK::ContactSurface &groundContactSurf =
-        //   this->matter.Ground().updBody().updContactSurface(surfNum);
-        // sc->SetCollisionShape(&groundContactSurf.updShape());
+        SimTK::ContactSurface &groundContactSurf =
+          this->matter.Ground().updBody().updContactSurface(surfNum);
+        sc->SetCollisionShape(&groundContactSurf.updShape());
+        */
 
         // by default, simbody HalfSpace normal is in the -X direction
         // rotate it based on normal vector specified by user
@@ -1369,7 +1378,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         if (addModelClique)
             surface.joinClique(_modelClique);
 
-        surfNum = _mobod.updBody().addContactSurface(R_XN, surface);
+        int surfNum = _mobod.updBody().addContactSurface(R_XN, surface);
 
         // store ContactGeometry pointer in SimbodyCollision object
         SimTK::ContactSurface &contactSurf =
