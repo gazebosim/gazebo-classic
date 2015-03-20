@@ -2360,6 +2360,7 @@ void dWorldSetQuickStepExtraFrictionIterations (dWorldID w, int iters)
   w->qs.friction_iterations = iters;
 }
 
+
 void dWorldSetQuickStepFrictionModel (dWorldID w, int fricmodel)
 {
 	dAASSERT(w);
