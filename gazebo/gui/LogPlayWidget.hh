@@ -122,7 +122,15 @@ namespace gazebo
 
       /// \brief Qt mouse release event.
       /// \param[in] _event Qt mouse event.
-      private: void mouseReleaseEvent(QMouseEvent *_event);
+      protected: void mousePressEvent(QMouseEvent *_event);
+
+      /// \brief Qt mouse release event.
+      /// \param[in] _event Qt mouse event.
+      protected: void mouseReleaseEvent(QMouseEvent *_event);
+
+      /// \brief Qt mouse release event.
+      /// \param[in] _event Qt mouse event.
+      protected: void mouseMoveEvent(QMouseEvent *_event);
 
       /// \internal
       /// \brief Pointer to private data.
@@ -131,16 +139,19 @@ namespace gazebo
 
     // TODO
     class GAZEBO_VISIBLE CurrentTimeItem: public QObject,
-        public QGraphicsLineItem
+        public QGraphicsRectItem
     {
       Q_OBJECT
 
       /// \brief Constructor;
-      public: CurrentTimeItem() {};
+      public: CurrentTimeItem();
 
       // Documentation inherited
       private: virtual void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+
+      // Documentation inherited
+      protected: virtual QRectF boundingRect() const;
     };
   }
 }

@@ -247,16 +247,19 @@ void LogPlayWidget::OnStepForward()
 /////////////////////////////////////////////////
 void LogPlayWidget::OnStepBack()
 {
+  gzdbg << "send Step Back msg" << std::endl;
 }
 
 /////////////////////////////////////////////////
 void LogPlayWidget::OnJumpStart()
 {
+  gzdbg << "send Jump Start msg" << std::endl;
 }
 
 /////////////////////////////////////////////////
 void LogPlayWidget::OnJumpEnd()
 {
+  gzdbg << "send Jump End msg" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -302,42 +305,65 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-void LogPlayView::mouseReleaseEvent(QMouseEvent *_event)
+void LogPlayView::mousePressEvent(QMouseEvent *_event)
 {
   QGraphicsItem *mouseItem =
       this->scene()->itemAt(this->mapToScene(_event->pos()));
-  if (mouseItem)
+
+  if (mouseItem == this->dataPtr->currentTimeItem)
   {
-//    msgs::WorldControl msg;
-//
-//    if (mouseItem == this->dataPtr->playItem)
-//    {
-//      msg.set_pause(false);
-//    }
-//    else if (mouseItem == this->dataPtr->pauseItem)
-//    {
-//      msg.set_pause(true);
-//    }
-//    else if (mouseItem == this->dataPtr->stepForwardItem)
-//    {
-//      msg.set_multi_step(1);
-//    }
-//    else if (mouseItem == this->dataPtr->stepBackItem)
-//    {
-//      // msg.set_multi_step(-1);
-//    }
-//
-//    if (msg.has_pause() || msg.has_multi_step())
-//    {
-//      this->dataPtr->worldControlPub->Publish(msg);
-//    }
+    QApplication::setOverrideCursor(QCursor(Qt::ClosedHandCursor));
+    mouseItem->setSelected(true);
   }
-  QGraphicsView::mouseReleaseEvent(_event);
+  // QGraphicsView::mousePressEvent(_event);
+}
+
+/////////////////////////////////////////////////
+void LogPlayView::mouseMoveEvent(QMouseEvent *_event)
+{
+  if (this->scene()->selectedItems().isEmpty())
+  {
+    QGraphicsItem *mouseItem =
+        this->scene()->itemAt(this->mapToScene(_event->pos()));
+
+    if (mouseItem == this->dataPtr->currentTimeItem)
+      QApplication::setOverrideCursor(QCursor(Qt::OpenHandCursor));
+    else
+      QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+  }
+
+  if (this->dataPtr->currentTimeItem->isSelected())
+  {
+    QPointF newPos(this->mapToScene(_event->pos()));
+
+    if (newPos.x() < this->dataPtr->margin)
+      newPos.setX(this->dataPtr->margin);
+    else if (newPos.x() > (this->dataPtr->sceneWidth - this->dataPtr->margin))
+      newPos.setX(this->dataPtr->sceneWidth - this->dataPtr->margin);
+
+    newPos.setY(this->dataPtr->sceneHeight/2);
+    this->dataPtr->currentTimeItem->setPos(newPos);
+
+    gzdbg << "send specific time msg" << std::endl;
+  }
+  // QGraphicsView::mouseMoveEvent(_event);
+}
+
+/////////////////////////////////////////////////
+void LogPlayView::mouseReleaseEvent(QMouseEvent *_event)
+{
+  this->scene()->clearSelection();
+  QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+
+  // QGraphicsView::mouseReleaseEvent(_event);
 }
 
 /////////////////////////////////////////////////
 void LogPlayView::SetCurrentTime(int _msec)
 {
+  if (this->dataPtr->currentTimeItem->isSelected())
+    return;
+
   double relPos = double(_msec) / this->dataPtr->totalTime;
 
   this->dataPtr->currentTimeItem->setPos(
@@ -395,6 +421,20 @@ void LogPlayView::SetTotalTime(int _msec)
 }
 
 /////////////////////////////////////////////////
+CurrentTimeItem::CurrentTimeItem()
+{
+  this->setEnabled(true);
+  this->setRect(-8, -25, 16, 50);
+  this->setZValue(10);
+  this->setAcceptHoverEvents(true);
+  this->setAcceptedMouseButtons(Qt::LeftButton);
+  this->setFlag(QGraphicsItem::ItemIsSelectable);
+  this->setFlag(QGraphicsItem::ItemIsMovable);
+  this->setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
+  this->setCursor(Qt::SizeAllCursor);
+}
+
+/////////////////////////////////////////////////
 void CurrentTimeItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
@@ -419,11 +459,27 @@ void CurrentTimeItem::paint(QPainter *_painter,
   trianglePts.push_back(QPointF(0, -lineHeight/2 + 10));
   QPolygonF triangle(trianglePts);
 
-  QPen trianglePen(Qt::red, 0);
-  QBrush triangleBrush(Qt::red);
+  QPen whitePen(Qt::white, 0);
+  QPen redPen(Qt::red, 0);
+  QBrush whiteBrush(Qt::white);
+  QBrush redBrush(Qt::red);
 
-  _painter->setPen(trianglePen);
-  _painter->setBrush(triangleBrush);
+  if (this->isSelected())
+  {
+    _painter->setPen(whitePen);
+    _painter->setBrush(whiteBrush);
+  }
+  else
+  {
+    _painter->setPen(redPen);
+    _painter->setBrush(redBrush);
+  }
+
   _painter->drawPolygon(triangle);
 }
 
+/////////////////////////////////////////////////
+QRectF CurrentTimeItem::boundingRect() const
+{
+  return QRectF(-8, -25, 16, 50);
+}
