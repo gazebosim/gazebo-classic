@@ -30,7 +30,7 @@
 
   const float EPSILON2 = 1.0e-20f;
 
-  class __attribute__((__may_alias__)) ICEMATHS_API  Point
+  class ATTRIBUTE_MAY_ALIAS ICEMATHS_API  Point
   {
     public:
 
