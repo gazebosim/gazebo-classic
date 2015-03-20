@@ -1221,10 +1221,6 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
       double value = boost::any_cast<double>(_value);
       odeElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
     }
-    else if (_key == "max_step_size")
-    {
-      this->SetMaxStepSize(boost::any_cast<double>(_value));
-    }
     else if (_key == "sor_lcp_tolerance")
     {
       dWorldSetQuickStepTolerance(this->dataPtr->worldId,
@@ -1269,8 +1265,7 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
     }
     else
     {
-      gzwarn << _key << " is not supported in ode" << std::endl;
-      return false;
+      return PhysicsEngine::SetParam(_key, _value);
     }
   }
   catch(boost::bad_any_cast &e)

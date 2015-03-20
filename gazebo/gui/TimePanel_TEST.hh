@@ -30,6 +30,9 @@ class TimePanel_TEST : public QTestFixture
 
   /// \brief Test setting the visibility of TimePanel child widgets.
   private slots: void Visibility();
+
+  /// \brief Test setting the play/pause state.
+  private slots: void SetPaused();
 };
 
 #endif
