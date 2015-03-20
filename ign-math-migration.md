@@ -5,18 +5,17 @@
 ## gazebo/common
 
 ### KeyFrame.hh
-    + ***Deprecated*** public: void SetTranslation(const math::Vector3 &_trans)
+1. ***Deprecated*** public: void SetTranslation(const math::Vector3 &_trans)
     + ***Replacement*** public: void Translation(const ignition::math::Vector3d &_trans);
 
-    + ***Deprecated*** public: math::Vector3 GetTranslation() const
+1. ***Deprecated*** public: math::Vector3 GetTranslation() const
     + ***Replacement*** public: ignition::math::Vector3d Translation() const
 
-    + ***Deprecated*** public: void SetRotation(const math::Quaternion &_rot)
+1. ***Deprecated*** public: void SetRotation(const math::Quaternion &_rot)
     + ***Replacement*** public: void Rotation(const ignition::math::Quaterniond &_rot)
 
-    + ***Deprecated*** public: math::Quaternion GetRotation() const
+1. ***Deprecated*** public: math::Quaternion GetRotation() const
     + ***Replacement*** public: ignition::math::Quaterniond Rotation() const
-
 
 ## gazebo/math
 
@@ -25,7 +24,6 @@
 1. ***Added*** public: ignition::math::Angle Ign() const
 1. ***Added*** public: Angle &operator=(const double &_angle)
 1. ***Added*** public: Angle &operator=(const ignition::math::Angle &_angle)
-    
 
 ### Box.hh
 1. ***Added*** public: Box(const ignition::math::Box &_box)
@@ -36,7 +34,6 @@
 1. ***Added*** public: Quaternion(const ignition::math::Quaterniond &_qt)
 1. ***Added*** public: ignition::math::Quaterniond Ign() const
 1. ***Added*** public: Quaternion &operator =(const ignition::math::Quaterniond &_v)
-
 
 ### Vector3.hh
 1. ***Added*** public: Vector3(const ignition::math::Vector3d &_v)
