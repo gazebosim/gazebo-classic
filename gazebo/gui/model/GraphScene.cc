@@ -37,6 +37,7 @@ GraphScene::GraphScene(QWidget *_parent)
   this->setNodeAttribute("fillcolor", "white");
   this->setNodeAttribute("height", "1.2");
   this->setEdgeAttribute("minlen", "3");
+//  this->setEdgeAttribute("arrowhead", "box");
 }
 
 /////////////////////////////////////////////////

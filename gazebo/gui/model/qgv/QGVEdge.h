@@ -58,6 +58,7 @@ private:
 		QGVEdge(QGVEdgePrivate *edge, QGVScene *scene);
 
     QPolygonF toArrow(const QLineF &normal) const;
+    QPolygonF toBox(const QLineF &normal) const;
 
     friend class QGVScene;
     //friend class QGVSubGraph;

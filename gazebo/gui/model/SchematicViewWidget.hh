@@ -63,8 +63,12 @@ namespace gazebo
       /// \brief Remove an edge from the scene in the widget
       /// \param[in] _id Unique id of edge.
       /// \param[in] _name Name of edge.
-      public: void RemoveEdge(const std::string &_id,
-          const std::string &_name);
+      public: void RemoveEdge(const std::string &_id);
+
+      /// \brief Helper function to get the leaf name from a scoped name.
+      /// \param[in] _scopedName Scoped name.
+      /// \return Leaf name.
+      private: std::string GetLeafName(const std::string &_scopedName);
 
       /// \brief Qt event received when the widget is being resized
       /// \param[in] _event Resize event.

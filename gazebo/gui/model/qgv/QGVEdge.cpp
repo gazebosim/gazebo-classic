@@ -25,7 +25,7 @@ License along with this library.
 
 QGVEdge::QGVEdge(QGVEdgePrivate *edge, QGVScene *qgvscene) :  _scene(qgvscene), _edge(edge)
 {
-    setFlag(QGraphicsItem::ItemIsSelectable, true);
+//    setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
 
 QGVEdge::~QGVEdge()
@@ -124,11 +124,15 @@ void QGVEdge::updateLayout()
     {
         if(spl->list->sflag)
         {
-            _tail_arrow = toArrow(QLineF(QGVCore::toPoint(spl->list->list[0], gheight), QGVCore::toPoint(spl->list->sp, gheight)));
+            _tail_arrow = toBox(QLineF(QGVCore::toPoint(spl->list->list[0], gheight), QGVCore::toPoint(spl->list->sp, gheight)));
+            //
+            _head_arrow = toArrow(QLineF(QGVCore::toPoint(spl->list->list[spl->list->size-1], gheight), QGVCore::toPoint(spl->list->ep, gheight)));
         }
 
         if(spl->list->eflag)
-        {
+        {     //
+            _tail_arrow = toBox(QLineF(QGVCore::toPoint(spl->list->list[0], gheight), QGVCore::toPoint(spl->list->sp, gheight)));
+
             _head_arrow = toArrow(QLineF(QGVCore::toPoint(spl->list->list[spl->list->size-1], gheight), QGVCore::toPoint(spl->list->ep, gheight)));
         }
     }
@@ -161,4 +165,16 @@ QPolygonF QGVEdge::toArrow(const QLineF &line) const
     polygon.append(line.p1() - o);
 
     return polygon;
+}
+
+QPolygonF QGVEdge::toBox(const QLineF &line) const
+{
+    QLineF n = line.normalVector();
+    QPointF o(n.dx() * 0.5, n.dy() * 0.5);
+
+    QPolygonF polygon;
+    polygon.append(line.p1() + o);
+    polygon.append(line.p2() + o);
+    polygon.append(line.p2() - o);
+    polygon.append(line.p1() - o);
 }
