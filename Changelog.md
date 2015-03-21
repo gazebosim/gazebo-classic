@@ -1,5 +1,11 @@
 ## Gazebo 5.0
 
+### Gazebo 5.x.x
+
+1. Disable failing pr2 test for dart
+    * [Pull request #1540](https://bitbucket.org/osrf/gazebo/pull-request/1540)
+    * [Issue #1435](https://bitbucket.org/osrf/gazebo/issue/1435)
+
 ### Gazebo 5.1.0
 1. Allow sdformat 2.3.1+ or 3+ and fix tests
   * [Pull request #1484](https://bitbucket.org/osrf/gazebo/pull-request/1484)
@@ -236,12 +242,6 @@
     * [Pull request #1318](https://bitbucket.org/osrf/gazebo/pull-request/1318)
 
 ## Gazebo 4.0
-
-### Gazebo 4.x.x
-
-1. Disable failing pr2 test for dart
-    * [Pull request #1540](https://bitbucket.org/osrf/gazebo/pull-request/1540)
-    * [Issue #1435](https://bitbucket.org/osrf/gazebo/issue/1435)
 
 ### Gazebo 4.1.2 (2015-03-20)
 
