@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/thread/recursive_mutex.hpp>
 #include <string>
 
 #include "gazebo/rendering/DynamicLines.hh"
@@ -150,23 +151,79 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->modelCreator = new ModelCreator();
   connect(modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
 
-  // Horizontal separator
-  QFrame *separator = new QFrame(this);
-  separator->setFrameShape(QFrame::HLine);
-  separator->setFrameShadow(QFrame::Sunken);
-  separator->setLineWidth(1);
+  // Palette layout
+  QVBoxLayout *paletteLayout = new QVBoxLayout();
+  paletteLayout->addWidget(shapesLabel);
+  paletteLayout->addLayout(shapesLayout);
+  paletteLayout->addWidget(customShapesLabel);
+  paletteLayout->addLayout(customLayout);
+  paletteLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
+      QSizePolicy::Minimum));
+  paletteLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+  QWidget *paletteWidget = new QWidget();
+  paletteWidget->setLayout(paletteLayout);
+
+  // Model tree
+  this->modelTreeWidget = new QTreeWidget();
+  this->modelTreeWidget->setObjectName("modelTreeWidget");
+  this->modelTreeWidget->setColumnCount(1);
+  this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  this->modelTreeWidget->header()->hide();
+  this->modelTreeWidget->setFocusPolicy(Qt::NoFocus);
+  this->modelTreeWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  this->modelTreeWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+  this->modelTreeWidget->setVerticalScrollMode(
+      QAbstractItemView::ScrollPerPixel);
+
+  // Links
+  this->linksItem = new QTreeWidgetItem(
+      static_cast<QTreeWidgetItem *>(0),
+      QStringList(QString("%1").arg(tr("Links"))));
+  this->linksItem->setData(0, Qt::UserRole, QVariant(tr("Links")));
+  QFont linksFont = this->linksItem->font(0);
+  linksFont.setBold(true);
+  linksFont.setPointSize(1.1 * linksFont.pointSize());
+  this->linksItem->setFont(0, linksFont);
+  this->modelTreeWidget->addTopLevelItem(this->linksItem);
+
+  // Joints
+  this->jointsItem = new QTreeWidgetItem(
+      static_cast<QTreeWidgetItem*>(0),
+      QStringList(QString("%1").arg(tr("Joints"))));
+  this->jointsItem->setData(0, Qt::UserRole, QVariant(tr("Joints")));
+  this->jointsItem->setFont(0, linksFont);
+  this->modelTreeWidget->addTopLevelItem(this->jointsItem);
+
+  connect(this->modelTreeWidget,
+      SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
+      this, SLOT(OnItemDoubleClick(QTreeWidgetItem *, int)));
+
+  // Model layout
+  QVBoxLayout *modelLayout = new QVBoxLayout();
+  modelLayout->addWidget(settingsLabel);
+  modelLayout->addLayout(settingsLayout);
+  modelLayout->addWidget(this->modelTreeWidget);
+  modelLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+  QWidget *modelWidget = new QWidget();
+  modelWidget->setLayout(modelLayout);
 
   // Main layout
-  mainLayout->addWidget(shapesLabel);
-  mainLayout->addLayout(shapesLayout);
-  mainLayout->addWidget(customShapesLabel);
-  mainLayout->addLayout(customLayout);
-  mainLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
-      QSizePolicy::Minimum));
-  mainLayout->addWidget(separator);
-  mainLayout->addWidget(settingsLabel);
-  mainLayout->addLayout(settingsLayout);
-  mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+  QFrame *frame = new QFrame;
+  QVBoxLayout *frameLayout = new QVBoxLayout;
+
+  QSplitter *splitter = new QSplitter(Qt::Vertical, this);
+  splitter->addWidget(paletteWidget);
+  splitter->addWidget(modelWidget);
+  splitter->setStretchFactor(0, 1);
+  splitter->setStretchFactor(1, 2);
+  splitter->setCollapsible(0, false);
+  splitter->setCollapsible(1, false);
+
+  frameLayout->addWidget(splitter);
+  frameLayout->setContentsMargins(0, 0, 0, 0);
+  frame->setLayout(frameLayout);
+
+  mainLayout->addWidget(frame);
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
@@ -187,19 +244,33 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       gui::model::Events::ConnectModelPropertiesChanged(
       boost::bind(&ModelEditorPalette::OnModelPropertiesChanged, this, _1, _2,
       _3, _4)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectLinkInserted(
+      boost::bind(&ModelEditorPalette::OnLinkInserted, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectJointInserted(
+      boost::bind(&ModelEditorPalette::OnJointInserted, this, _1, _2, _3, _4)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectLinkRemoved(
+      boost::bind(&ModelEditorPalette::OnLinkRemoved, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectJointRemoved(
+      boost::bind(&ModelEditorPalette::OnJointRemoved, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectJointNameChanged(
+      boost::bind(&ModelEditorPalette::OnJointNameChanged, this, _1, _2)));
+
+  this->updateMutex = new boost::recursive_mutex();
 }
 
 /////////////////////////////////////////////////
 ModelEditorPalette::~ModelEditorPalette()
 {
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnItemSelection(QTreeWidgetItem *_item,
-                                         int /*_column*/)
-{
-  if (_item && _item->childCount() > 0)
-    _item->setExpanded(!_item->isExpanded());
 }
 
 /////////////////////////////////////////////////
@@ -344,10 +415,135 @@ void ModelEditorPalette::OnNameChanged(const QString &_name)
 void ModelEditorPalette::OnNewModel()
 {
   this->modelNameEdit->setText(tr(this->modelDefaultName.c_str()));
+
+  this->ClearModelTree();
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnSaveModel(const std::string &_saveName)
 {
   this->modelNameEdit->setText(tr(_saveName.c_str()));
+}
+
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnItemDoubleClick(QTreeWidgetItem *_item,
+    int /*_column*/)
+{
+  if (_item)
+  {
+    std::string name = _item->data(0, Qt::UserRole).toString().toStdString();
+    std::string type = _item->data(1, Qt::UserRole).toString().toStdString();
+
+    if (type == "Link")
+      gui::model::Events::openLinkInspector(name);
+    else if (type == "Joint")
+      gui::model::Events::openJointInspector(name);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnLinkInserted(const std::string &_linkName)
+{
+  std::string leafName = _linkName;
+  size_t idx = _linkName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+1);
+
+  QTreeWidgetItem *newLinkItem = new QTreeWidgetItem(this->linksItem,
+      QStringList(QString("%1").arg(QString::fromStdString(leafName))));
+
+  newLinkItem->setData(0, Qt::UserRole, _linkName.c_str());
+  newLinkItem->setData(1, Qt::UserRole, "Link");
+  this->modelTreeWidget->addTopLevelItem(newLinkItem);
+
+  this->linksItem->setExpanded(true);
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnJointInserted(const std::string &_jointId,
+    const std::string &_jointName, const std::string &/*_parentName*/,
+    const std::string &/*_childName*/)
+{
+  std::string leafName = _jointName;
+  size_t idx = _jointName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _jointName.substr(idx+1);
+
+  QTreeWidgetItem *newJointItem = new QTreeWidgetItem(this->jointsItem,
+      QStringList(QString("%1").arg(QString::fromStdString(leafName))));
+
+  newJointItem->setData(0, Qt::UserRole, _jointId.c_str());
+  newJointItem->setData(1, Qt::UserRole, "Joint");
+  this->modelTreeWidget->addTopLevelItem(newJointItem);
+
+  this->jointsItem->setExpanded(true);
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnLinkRemoved(const std::string &_linkId)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  for (int i = 0; i < this->linksItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->linksItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _linkId)
+    {
+      this->linksItem->takeChild(this->linksItem->indexOfChild(item));
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnJointRemoved(const std::string &_jointId)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  for (int i = 0; i < this->jointsItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->jointsItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _jointId)
+    {
+      this->jointsItem->takeChild(this->jointsItem->indexOfChild(item));
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::ClearModelTree()
+{
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  // Remove all links
+  this->linksItem->takeChildren();
+  // Remove all joints
+  this->jointsItem->takeChildren();
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnJointNameChanged(const std::string &_jointId,
+    const std::string &_newJointName)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  for (int i = 0; i < this->jointsItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->jointsItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _jointId)
+    {
+      item->setText(0, QString::fromStdString(_newJointName));
+      break;
+    }
+  }
 }

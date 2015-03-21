@@ -27,6 +27,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class SchematicViewWidget;
     class ModelEditorPalette;
 
     /// \class ModelEditor ModelEditor.hh gui/gui.hh
@@ -76,6 +77,10 @@ namespace gazebo
       /// \param[in] _action Triggered action.
       private slots: void OnAction(QAction *_action);
 
+      /// \brief Show the schematic view widget
+      /// \param[in] _show True to show the widget, false to hide it.
+      private slots: void OnSchematicView(bool _show);
+
       /// \brief Callback when the model has been completed.
       private: void OnFinish();
 
@@ -124,6 +129,12 @@ namespace gazebo
 
       /// \brief Action to exit the editor.
       private: QAction *exitAct;
+
+      /// \brief Action to show/hide the schematic view.
+      private: QAction *schematicViewAct;
+
+      /// \brief Pointer to the schematic view widget.
+      private: SchematicViewWidget *svWidget;
 
       /// \brief Save the main window paused state to use when returning.
       private: bool mainWindowPaused;

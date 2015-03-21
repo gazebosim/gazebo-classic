@@ -87,6 +87,10 @@
         * [Issue #1497](https://bitbucket.org/osrf/gazebo/issue/1497)
         * [Issue #1509](https://bitbucket.org/osrf/gazebo/issue/1509)
 
+    1. Added list of links and joints.
+        * [Pull request #1515](https://bitbucket.org/osrf/gazebo/pull-request/1515)
+        * [Issue #1418](https://bitbucket.org/osrf/gazebo/issue/1418)
+
 1. Building editor updates
     1. Make palette tips tooltip clickable to open.
         * [Pull request #1519](https://bitbucket.org/osrf/gazebo/pull-request/1519)

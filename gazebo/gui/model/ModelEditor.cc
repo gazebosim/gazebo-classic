@@ -17,6 +17,7 @@
 
 #include <string>
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
 
@@ -31,6 +32,10 @@
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
 
+#ifdef HAVE_GRAPHVIZ
+#include "gazebo/gui/model/SchematicViewWidget.hh"
+#endif
+
 using namespace gazebo;
 using namespace gui;
 
@@ -42,6 +47,25 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   // Create the model editor tab
   this->modelPalette = new ModelEditorPalette(_mainWindow);
   this->Init("modelEditorTab", "Model Editor", this->modelPalette);
+
+  this->schematicViewAct = NULL;
+  this->svWidget = NULL;
+#ifdef HAVE_GRAPHVIZ
+  RenderWidget *renderWidget = _mainWindow->GetRenderWidget();
+  this->svWidget = new gazebo::gui::SchematicViewWidget(renderWidget);
+  this->svWidget->setSizePolicy(QSizePolicy::Expanding,
+      QSizePolicy::Expanding);
+  this->svWidget->Init();
+  renderWidget->InsertWidget(0, this->svWidget);
+  this->svWidget->hide();
+
+  this->schematicViewAct = new QAction(tr("Schematic View"), this->mainWindow);
+  this->schematicViewAct->setStatusTip(tr("Sch&ematic View"));
+  this->schematicViewAct->setShortcut(tr("Ctrl+E"));
+  this->schematicViewAct->setCheckable(true);
+  connect(this->schematicViewAct, SIGNAL(toggled(bool)), this,
+      SLOT(OnSchematicView(bool)));
+#endif
 
   this->newAct = new QAction(tr("&New"), this->mainWindow);
   this->newAct->setStatusTip(tr("New"));
@@ -203,6 +227,24 @@ void ModelEditor::Exit()
 }
 
 /////////////////////////////////////////////////
+void ModelEditor::OnSchematicView(bool _show)
+{
+  if (!this->svWidget)
+    return;
+
+  if (_show)
+  {
+#ifdef HAVE_GRAPHVIZ
+    this->svWidget->show();
+  }
+  else
+  {
+    this->svWidget->hide();
+#endif
+  }
+}
+
+/////////////////////////////////////////////////
 void ModelEditor::CreateMenus()
 {
   if (this->menuBar)
@@ -216,6 +258,12 @@ void ModelEditor::CreateMenus()
   fileMenu->addAction(this->saveAct);
   fileMenu->addAction(this->saveAsAct);
   fileMenu->addAction(this->exitAct);
+
+  if (this->schematicViewAct)
+  {
+    QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
+    windowMenu->addAction(this->schematicViewAct);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -264,6 +312,15 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     if (!this->mainWindowPaused)
       this->mainWindow->Play();
   }
+
+#ifdef HAVE_GRAPHVIZ
+  if (this->svWidget && this->schematicViewAct)
+  {
+    this->svWidget->setVisible(
+        !this->active && this->schematicViewAct->isChecked());
+  }
+#endif
+
   this->active = !this->active;
   this->ToggleToolbar();
   // g_editModelAct->setChecked(this->active);
