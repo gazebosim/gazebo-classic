@@ -36,8 +36,8 @@ Preset::Preset() : dataPtr(new PresetPrivate)
 }
 
 //////////////////////////////////////////////////
-Preset::Preset(const std::string &_name) :
-    dataPtr(new PresetPrivate(_name))
+Preset::Preset(const std::string &_name)
+    : dataPtr(new PresetPrivate(_name))
 {
 }
 
