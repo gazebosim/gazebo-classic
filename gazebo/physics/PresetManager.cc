@@ -25,27 +25,57 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
+PresetPrivate::PresetPrivate(const std::string &_name = "default name")
+    : name(_name)
+{
+}
+
+//////////////////////////////////////////////////
 Preset::Preset() : dataPtr(new PresetPrivate)
 {
-  this->dataPtr->name = "default name";
 }
 
 //////////////////////////////////////////////////
-Preset::Preset(const std::string &_name) : dataPtr(new PresetPrivate)
+Preset::Preset(const std::string &_name) :
+    dataPtr(new PresetPrivate(_name))
 {
-  this->Name(_name);
 }
 
 //////////////////////////////////////////////////
-std::map<std::string, boost::any>::iterator Preset::ParameterMapBegin() const
+bool Preset::SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine) const
 {
-  return this->dataPtr->parameterMap.begin();
+  bool result = true;
+  for (auto param : this->dataPtr->parameterMap)
+  {
+    if (!_physicsEngine->SetParam(param.first, param.second))
+    {
+      result = false;
+    }
+  }
+  return result;
 }
 
 //////////////////////////////////////////////////
-std::map<std::string, boost::any>::iterator Preset::ParameterMapEnd() const
+bool Preset::SetAllSDFParameters(sdf::ElementPtr _sdf) const
 {
-  return this->dataPtr->parameterMap.end();
+  bool result = true;
+  for (auto param : this->dataPtr->parameterMap)
+  {
+    std::string key = param.first;
+    std::string value;
+    try
+    {
+      value = boost::any_cast<std::string>(param.second);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzwarn << "Bad cast of boost::any in GenerateSDFFromPreset" << std::endl;
+      result = false;
+    }
+    sdf::ElementPtr child = _sdf->AddElement(key);
+    child->Set<std::string>(value);
+  }
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -161,17 +191,8 @@ bool PresetManager::CurrentProfile(const std::string &_name)
     return false;
   }
   this->dataPtr->currentPreset = _name;
-  bool result = true;
-  for (auto it = this->CurrentPreset()->ParameterMapBegin();
-     it != this->CurrentPreset()->ParameterMapEnd(); ++it)
-  {
-    if (!this->dataPtr->physicsEngine->SetParam(it->first, it->second))
-    {
-      result = false;
-    }
-  }
-
-  return result;
+  return this->CurrentPreset()->SetAllPhysicsParameters(
+      this->dataPtr->physicsEngine);
 }
 
 //////////////////////////////////////////////////
@@ -406,23 +427,8 @@ sdf::ElementPtr PresetManager::GenerateSDFFromPreset(Preset *_preset) const
 
   nameParam->Set(_preset->Name());
 
-  for (auto param = _preset->ParameterMapBegin();
-     param != _preset->ParameterMapEnd(); ++param)
-  {
-    std::string key = param->first;
-    std::string value;
-    try
-    {
-      value = boost::any_cast<std::string>(param->second);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzwarn << "Bad cast of boost::any in GenerateSDFFromPreset" << std::endl;
-      return elem;
-    }
-    sdf::ElementPtr child = elem->AddElement(key);
-    child->Set<std::string>(value);
-  }
+  _preset->SetAllSDFParameters(elem);
+
   _preset->SDF(elem);
   return elem;
 }

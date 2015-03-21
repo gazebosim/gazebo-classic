@@ -28,6 +28,8 @@ namespace gazebo
     /// \class Private data pointer for Preset class
     class PresetPrivate
     {
+      public: PresetPrivate(const std::string &_name);
+
       /// \brief Name of this preset profile
       public: std::string name;
       /// \brief Map of key, parameter pairs

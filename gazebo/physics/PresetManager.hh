@@ -64,15 +64,18 @@ namespace gazebo
       /// \brief Check if profile parameter is set.
       public: bool HasParam(const std::string &_key) const;
 
-      /// \brief Get an iterator at the beginning of this preset's parameter map
-      /// \return An iterator at the beginning of the parameter map.
-      public: std::map<std::string, boost::any>::iterator
-          ParameterMapBegin() const;
+      /// \brief Set all parameters of this preset in the physics engine.
+      /// \param[in] _physicsEngine The physics engine in which to affect the
+      /// change.
+      /// \return True if setting all parameters was successful.
+      public: bool SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine)
+          const;
 
-      /// \brief Get an iterator at the end of this preset's parameter map
-      /// \return An iterator at the end of the parameter map.
-      public: std::map<std::string, boost::any>::iterator
-          ParameterMapEnd() const;
+      /// \brief Set all parameters of this preset in the given SDF element.
+      /// \param[in] _sdf The sdf element in which to affect the
+      /// change.
+      /// \return True if setting all parameters was successful.
+      public: bool SetAllSDFParameters(sdf::ElementPtr _sdf) const;
 
       /// \brief Get this preset profile's SDF
       /// \return An SDF element pointer representing a <physics> element
