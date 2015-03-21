@@ -71,12 +71,6 @@ namespace gazebo
       public: bool SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine)
           const;
 
-      /// \brief Set all parameters of this preset in the given SDF element.
-      /// \param[in] _sdf The sdf element in which to affect the
-      /// change.
-      /// \return True if setting all parameters was successful.
-      public: bool SetAllSDFParameters(sdf::ElementPtr _sdf) const;
-
       /// \brief Get this preset profile's SDF
       /// \return An SDF element pointer representing a <physics> element
       public: sdf::ElementPtr SDF() const;
@@ -175,10 +169,6 @@ namespace gazebo
       /// \param[in] _sdf The SDF physics element for the profile.
       private: void GeneratePresetFromSDF(Preset *_preset,
           const sdf::ElementPtr _elem) const;
-
-      /// \brief Generate an SDF element from a Preset object
-      /// \param[in] _paramMap Pointer to a Preset object
-      private: sdf::ElementPtr GenerateSDFFromPreset(Preset *_paramMap) const;
 
       /// \brief Get a pointer to the current profile preset.
       /// \return Pointer to the current profile preset object.
