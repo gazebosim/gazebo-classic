@@ -39,7 +39,6 @@
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
-#include "gazebo/physics/PresetManager.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

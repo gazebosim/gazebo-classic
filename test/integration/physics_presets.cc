@@ -18,8 +18,7 @@
 #include <boost/any.hpp>
 #include "test/ServerFixture.hh"
 #include "gazebo/physics/World.hh"
-#include "gazebo/physics/PhysicsEngine.hh"
-#include "gazebo/physics/PresetManager.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "test/integration/helper_physics_generator.hh"
 
 using namespace gazebo;
