@@ -1,0 +1,15 @@
+package gazebo.msgs;
+
+import "world_stats.proto";
+
+/// \ingroup gazebo_msgs
+/// \interface SimEvent
+
+message SimEvent 
+{
+  required string type = 1;
+  required string name = 2;
+  required WorldStatistics world_statistics =3;
+ 
+  optional string data = 4;
+}

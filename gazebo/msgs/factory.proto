@@ -5,7 +5,6 @@ package gazebo.msgs;
 /// \brief Message to create new model in gazebo
 
 
-import "header.proto";
 import "pose.proto";
 
 message Factory

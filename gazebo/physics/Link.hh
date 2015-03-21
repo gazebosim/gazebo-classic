@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -255,6 +255,13 @@ namespace gazebo
       /// \brief Get the angular acceleration of the body.
       /// \return Angular acceleration of the body.
       public: math::Vector3 GetRelativeAngularAccel() const;
+
+      /// \brief Get the angular momentum of the body CoG in the world frame,
+      /// which is computed as (I * w), where
+      /// I: inertia matrix in world frame
+      /// w: angular velocity in world frame
+      /// \return Angular momentum of the body.
+      public: math::Vector3 GetWorldAngularMomentum() const;
 
       /// \brief Get the angular acceleration of the body in the world
       /// frame.
@@ -607,9 +614,6 @@ namespace gazebo
 
       /// \brief Cached list of collisions. This is here for performance.
       private: Collision_V collisions;
-
-      /// \brief scale of the link.
-      private: math::Vector3 scale;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources

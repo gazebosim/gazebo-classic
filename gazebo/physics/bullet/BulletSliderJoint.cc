@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/World.hh"
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
@@ -159,10 +160,19 @@ void BulletSliderJoint::Init()
   // Apply joint translation limits here.
   // TODO: velocity and effort limits.
   GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
-  sdf::ElementPtr limitElem;
-  limitElem = this->sdf->GetElement("axis")->GetElement("limit");
-  this->bulletSlider->setLowerLinLimit(limitElem->Get<double>("lower"));
-  this->bulletSlider->setUpperLinLimit(limitElem->Get<double>("upper"));
+  sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+  GZ_ASSERT(axisElem != NULL, "Joint axis sdf member is NULL");
+  {
+    sdf::ElementPtr limitElem;
+    limitElem = this->sdf->GetElement("axis")->GetElement("limit");
+    this->bulletSlider->setLowerLinLimit(limitElem->Get<double>("lower"));
+    this->bulletSlider->setUpperLinLimit(limitElem->Get<double>("upper"));
+  }
+
+  // Set Joint friction here in Init, since the bullet data structure didn't
+  // exist when the friction was set during Joint::Load
+  this->SetParam("friction", 0,
+    axisElem->GetElement("dynamics")->Get<double>("friction"));
 
   this->constraint = this->bulletSlider;
 
@@ -190,14 +200,9 @@ double BulletSliderJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetVelocity(unsigned int /*_index*/, double _angle)
+void BulletSliderJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  math::Vector3 desiredVel;
-  if (this->parentLink)
-    desiredVel = this->parentLink->GetWorldLinearVel();
-  desiredVel += _angle * this->GetGlobalAxis(0);
-  if (this->childLink)
-    this->childLink->SetLinearVel(desiredVel);
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////
@@ -266,7 +271,7 @@ bool BulletSliderJoint::SetHighStop(unsigned int /*_index*/,
   }
   else
   {
-    gzerr << "bulletSlider not yet created.\n";
+    gzlog << "bulletSlider not yet created.\n";
     return false;
   }
 }
@@ -283,7 +288,7 @@ bool BulletSliderJoint::SetLowStop(unsigned int /*_index*/,
   }
   else
   {
-    gzerr << "bulletSlider not yet created.\n";
+    gzlog << "bulletSlider not yet created.\n";
     return false;
   }
 }
@@ -295,7 +300,7 @@ math::Angle BulletSliderJoint::GetHighStop(unsigned int /*_index*/)
   if (this->bulletSlider)
     result = this->bulletSlider->getUpperLinLimit();
   else
-    gzerr << "Joint must be created before getting high stop\n";
+    gzlog << "Joint must be created before getting high stop\n";
   return result;
 }
 
@@ -306,7 +311,7 @@ math::Angle BulletSliderJoint::GetLowStop(unsigned int /*_index*/)
   if (this->bulletSlider)
     result = this->bulletSlider->getLowerLinLimit();
   else
-    gzerr << "Joint must be created before getting low stop\n";
+    gzlog << "Joint must be created before getting low stop\n";
   return result;
 }
 
@@ -357,7 +362,7 @@ math::Angle BulletSliderJoint::GetAngleImpl(unsigned int _index) const
   // if (this->bulletSlider)
   //   result = this->bulletSlider->getLinearPos();
   // else
-  //   gzwarn << "bulletSlider does not exist, returning default position\n";
+  //   gzlog << "bulletSlider does not exist, returning default position\n";
 
   // Compute slider angle from gazebo's cached poses instead
   math::Vector3 offset = this->GetWorldPose().pos
@@ -365,4 +370,87 @@ math::Angle BulletSliderJoint::GetAngleImpl(unsigned int _index) const
   math::Vector3 axis = this->GetGlobalAxis(_index);
   math::Pose poseParent = this->GetWorldPose();
   return math::Angle(axis.Dot(offset));
+}
+
+//////////////////////////////////////////////////
+bool BulletSliderJoint::SetParam(const std::string &_key,
+    unsigned int _index,
+    const boost::any &_value)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return false;
+  }
+
+  try
+  {
+    if (_key == "friction")
+    {
+      if (this->bulletSlider)
+      {
+        this->bulletSlider->setPoweredLinMotor(true);
+        this->bulletSlider->setTargetLinMotorVelocity(0.0);
+        // there is an upstream bug in bullet 2.82 and earlier
+        // the maxLinMotorForce parameter is inadvertently divided
+        // by timestep when attempting to compute an impulse in
+        // the bullet solver.
+        // https://github.com/bulletphysics/bullet3/pull/328
+        // As a workaround, multiply the desired friction
+        // parameter by dt^2 when setting
+        double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
+        this->bulletSlider->setMaxLinMotorForce(
+          dt*dt * boost::any_cast<double>(_value));
+      }
+      else
+      {
+        gzerr << "Joint must be created before setting " << _key << std::endl;
+        return false;
+      }
+    }
+    else
+    {
+      return BulletJoint::SetParam(_key, _index, _value);
+    }
+  }
+  catch(const boost::bad_any_cast &e)
+  {
+    gzerr << "SetParam(" << _key << ")"
+          << " boost any_cast error:" << e.what()
+          << std::endl;
+    return false;
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+double BulletSliderJoint::GetParam(const std::string &_key, unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return 0;
+  }
+
+  if (_key == "friction")
+  {
+    if (this->bulletSlider)
+    {
+      // there is an upstream bug in bullet 2.82 and earlier
+      // the maxLinMotorForce parameter is inadvertently divided
+      // by timestep when attempting to compute an impulse in
+      // the bullet solver.
+      // https://github.com/bulletphysics/bullet3/pull/328
+      // As a workaround, divide the desired friction
+      // parameter by dt^2 when getting
+      double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
+      return this->bulletSlider->getMaxLinMotorForce() / (dt*dt);
+    }
+    else
+    {
+      gzerr << "Joint must be created before getting " << _key << std::endl;
+      return 0.0;
+    }
+  }
+  return BulletJoint::GetParam(_key, _index);
 }

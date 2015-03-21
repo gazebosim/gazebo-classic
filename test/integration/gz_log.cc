@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,11 +33,11 @@ TEST_F(GzLog, Record)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   world->SetPaused(true);
 
-  ASSERT_TRUE(recorder);
+  ASSERT_TRUE(recorder != NULL);
 
   EXPECT_FALSE(recorder->GetPaused());
   EXPECT_FALSE(recorder->GetRunning());
