@@ -69,19 +69,23 @@ namespace gazebo
       /// \return A pointer to the render widget.
       public: RenderWidget *GetRenderWidget() const;
 
+      /// \brief Returns the state of the simulation, true if paused.
+      /// \return True if paused, false otherwise.
+      public: bool IsPaused() const;
+
       /// \brief Play simulation.
       public slots: void Play();
 
       /// \brief Pause simulation.
       public slots: void Pause();
 
-      /// \brief Add a menu to the main window menu bar.
-      /// \param[in] _menu Menu to be added.
-      public: void AddMenu(QMenu *_menu);
-
       /// \brief Set whether the left pane is visible
       /// \param[in] _on True to show the left pane, false to hide.
       public: void SetLeftPaneVisibility(bool _on);
+
+      /// \brief Add a menu to the main window menu bar.
+      /// \param[in] _menu Menu to be added.
+      public: void AddMenu(QMenu *_menu);
 
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();
@@ -197,9 +201,6 @@ namespace gazebo
       /// \brief Create menus.
       private: void CreateMenus();
 
-      /// \brief Create the toolbars.
-      private: void CreateToolbars();
-
       /// \brief Create the main menu bar.
       private: void CreateMenuBar();
 
@@ -223,7 +224,6 @@ namespace gazebo
       private: void OnManipMode(const std::string &_mode);
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
-      private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
       /// \brief Handle event for changing the manual step size.
       /// \param[in] _value New input step size.

@@ -149,13 +149,15 @@ namespace gazebo
       /// property map
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _cfm Constraint force mixing.
-      public: virtual void SetWorldCFM(double _cfm);
+      public: virtual void SetWorldCFM(double /*_cfm*/)
+                  GAZEBO_DEPRECATED(6.0) {}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _erp Error reduction parameter.
-      public: virtual void SetWorldERP(double _erp);
+      public: virtual void SetWorldERP(double /*_erp*/)
+                  GAZEBO_DEPRECATED(6.0) {}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -167,13 +169,15 @@ namespace gazebo
       /// property map
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _vel Max correcting velocity.
-      public: virtual void SetContactMaxCorrectingVel(double _vel);
+      public: virtual void SetContactMaxCorrectingVel(double /*_vel*/)
+                  GAZEBO_DEPRECATED(6.0) {}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _layerDepth Surface layer depth
-      public: virtual void SetContactSurfaceLayer(double _layerDepth);
+      public: virtual void SetContactSurfaceLayer(double /*_layerDepth*/)
+                  GAZEBO_DEPRECATED(6.0) {}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -185,13 +189,13 @@ namespace gazebo
       /// property map
       /// \brief Get World CFM.
       /// \return World CFM.
-      public: virtual double GetWorldCFM() {return 0;}
+      public: virtual double GetWorldCFM() GAZEBO_DEPRECATED(6.0) {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Get World ERP.
       /// \return World ERP.
-      public: virtual double GetWorldERP() {return 0;}
+      public: virtual double GetWorldERP() GAZEBO_DEPRECATED(6.0) {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -203,13 +207,15 @@ namespace gazebo
       /// property map.
       /// \brief access functions to set ODE parameters.
       /// \return Max correcting velocity.
-      public: virtual double GetContactMaxCorrectingVel() {return 0;}
+      public: virtual double GetContactMaxCorrectingVel()
+              GAZEBO_DEPRECATED(6.0) {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map.
       /// \brief access functions to set ODE parameters.
       /// \return Contact suerface layer depth.
-      public: virtual double GetContactSurfaceLayer() {return 0;}
+      public: virtual double GetContactSurfaceLayer()
+              GAZEBO_DEPRECATED(6.0) {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map.
@@ -225,20 +231,20 @@ namespace gazebo
       ///          "sequential_impulse' for Bullet, "quick" for ODE
       ///          "Featherstone and Lemkes" for DART and
       ///          "Spatial Algebra and Elastic Foundation" for Simbody.
-      ///       -# "cfm" (double) - global CFM
-      ///       -# "erp" (double) - global ERP
+      ///       -# "cfm" (double) - global CFM (ODE/Bullet)
+      ///       -# "erp" (double) - global ERP (ODE/Bullet)
       ///       -# "precon_iters" (bool) - precondition iterations
-      ///          (experimental).
+      ///          (experimental). (ODE)
       ///       -# "iters" (int) - number of LCP PGS iterations. If
       ///          sor_lcp_tolerance is negative, full iteration count is
       ///          executed.  Otherwise, PGS may stop iteration early if
       ///          sor_lcp_tolerance is satisfied by the total RMS residual.
       ///       -# "sor" (double) - relaxation parameter for Projected
-      ///          Gauss-Seidel (PGS) updates.
+      ///          Gauss-Seidel (PGS) updates. (ODE/Bullet)
       ///       -# "contact_max_correcting_vel" (double) - truncates correction
-      ///          impulses from ERP by this value.
+      ///          impulses from ERP by this value. (ODE)
       ///       -# "contact_surface_layer" (double) - ERP is 0 for
-      ///          interpenetration depths below this value.
+      ///          interpenetration depths below this value. (ODE/Bullet)
       ///       -# "max_contacts" (int) - max number of contact constraints
       ///          between any pair of collision bodies.
       ///       -# "min_step_size" (double) - minimum internal step size.

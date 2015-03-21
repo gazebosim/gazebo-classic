@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,22 @@
  *
 */
 
-#ifndef _TIMEPANEL_TEST_HH_
-#define _TIMEPANEL_TEST_HH_
 
-#include "gazebo/gui/QTestFixture.hh"
+#ifndef _REST_EXCEPTION_HH_
+#define _REST_EXCEPTION_HH_
 
-/// \brief A test class for the TimePanel widget.
-class TimePanel_TEST : public QTestFixture
+#include <stdexcept>
+
+
+namespace gazebo
 {
-  Q_OBJECT
-
-  /// \brief Test that the TimePanel gets valid times from the server.
-  private slots: void ValidTimes();
-
-  /// \brief Test setting the visibility of TimePanel child widgets.
-  private slots: void Visibility();
-
-  /// \brief Test setting the play/pause state.
-  private slots: void SetPaused();
-};
+  // basic exception class that inherints from the
+  // standard runtime error
+  class RestException : public std::runtime_error
+  {
+    public: RestException(const char *_m):std::runtime_error(_m) {}
+  };
+}
 
 #endif
+

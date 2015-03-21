@@ -1,0 +1,12 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface RestLogin
+
+message RestLogin
+{
+  required string url      = 1;
+  optional string username = 2;
+  optional string password = 3;
+}
+

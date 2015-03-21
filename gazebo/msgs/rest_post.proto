@@ -1,0 +1,11 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface RestPost
+
+message RestPost
+{
+  required string route = 1;
+  required string json =2;
+}
+
