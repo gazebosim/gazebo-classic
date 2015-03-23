@@ -490,6 +490,7 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Header *GetHeader(google::protobuf::Message &_message);
 
+    // TODO: Implement more conversion functions
     /*GAZEBO_VISIBLE sdf::ElementPtr PhysicsToSDF(const msgs::Physics &_physics,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 

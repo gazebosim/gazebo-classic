@@ -142,64 +142,6 @@ namespace gazebo
       return param;
     }
 
-    /*template<> bool ConvertMessageParam<double>(const msgs::NamedParam &_msg,
-        double &_value)
-    {
-      const google::protobuf::Reflection *reflection =
-          _msg.GetReflection();
-      std::vector<const google::protobuf::FieldDescriptor*> fields;
-      reflection->ListFields(_msg, &fields);
-
-      for (auto field : fields)
-      {
-        if (field->cpp_type() ==
-            google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE)
-        {
-          _value = reflection->GetDouble(_msg, field);
-          return true;
-        }
-      }
-      return false;
-    }
-    template<> bool ConvertMessageParam<int>(const msgs::NamedParam &_msg,
-        int &_value)
-    {
-      const google::protobuf::Reflection *reflection =
-          _msg.GetReflection();
-      std::vector<const google::protobuf::FieldDescriptor*> fields;
-      reflection->ListFields(_msg, &fields);
-
-      for (auto field : fields)
-      {
-        if (field->cpp_type() ==
-            google::protobuf::FieldDescriptor::CPPTYPE_INT32)
-        {
-          _value = reflection->GetInt32(_msg, field);
-          return true;
-        }
-      }
-      return false;
-    }
-    template<> bool ConvertMessageParam<std::string>(const msgs::NamedParam &_msg,
-        std::string &_value)
-    {
-      const google::protobuf::Reflection *reflection =
-          _msg.GetReflection();
-      std::vector<const google::protobuf::FieldDescriptor*> fields;
-      reflection->ListFields(_msg, &fields);
-
-      for (auto field : fields)
-      {
-        if (field->cpp_type() ==
-            google::protobuf::FieldDescriptor::CPPTYPE_INT32)
-        {
-          _value = reflection->GetInt32(_msg, field);
-          return true;
-        }
-      }
-      return false;
-    }*/
-
     bool ConvertMessageParam(const msgs::NamedParam &_msg,
         boost::any &_value)
     {
