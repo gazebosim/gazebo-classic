@@ -6,12 +6,24 @@
     * [Pull request #1540](https://bitbucket.org/osrf/gazebo/pull-request/1540)
     * [Issue #1435](https://bitbucket.org/osrf/gazebo/issue/1435)
 
-### Gazebo 5.1.0
+### Gazebo 5.1.0 (2015-03-20)
+1. Backport pull request #1527 (FindOGRE.cmake for non-Debian systems)
+  * [Pull request #1532](https://bitbucket.org/osrf/gazebo/pull-request/1532)
+
+1. Respect system cflags when not using USE_UPSTREAM_CFLAGS
+  * [Pull request #1531](https://bitbucket.org/osrf/gazebo/pull-request/1531)
+
+1. Allow light manipulation
+  * [Pull request #1529](https://bitbucket.org/osrf/gazebo/pull-request/1529)
+
 1. Allow sdformat 2.3.1+ or 3+ and fix tests
   * [Pull request #1484](https://bitbucket.org/osrf/gazebo/pull-request/1484)
 
 1. Add Link::GetWorldAngularMomentum function and test.
   * [Pull request #1482](https://bitbucket.org/osrf/gazebo/pull-request/1482)
+
+1. Preserve previous GAZEBO_MODEL_PATH values when sourcing setup.sh
+  * [Pull request #1430](https://bitbucket.org/osrf/gazebo/pull-request/1430)
 
 1. Implement Coulomb joint friction for DART
   * [Pull request #1427](https://bitbucket.org/osrf/gazebo/pull-request/1427)
@@ -37,7 +49,7 @@
   * [Pull request #1452](https://bitbucket.org/osrf/gazebo/pull-request/1452)
   * [Issue #1348](https://bitbucket.org/osrf/gazebo/issue/1348)
 
-### Gazebo 5.0.0
+### Gazebo 5.0.0 (2015-01-27)
 1. Support for using [digital elevation maps](http://gazebosim.org/tutorials?tut=dem) has been added to debian packages.
 
 1. C++11 support (C++11 compatible compiler is now required)
