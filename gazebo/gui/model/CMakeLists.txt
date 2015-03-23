@@ -42,6 +42,7 @@ if (ENABLE_SCREEN_TESTS)
   set (qt_tests ${qt_tests} 
     JointMaker_TEST.cc
     ExtrudeDialog_TEST.cc
+    ModelCreator_TEST.cc
   )
 endif()
 
