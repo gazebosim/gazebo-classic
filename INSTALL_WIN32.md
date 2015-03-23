@@ -51,7 +51,6 @@ Windows `cmd` for configuring and building.  You might also need to
 1. Configure and build sdformat:
 
         cd sdformat
-        hg up win_gerkey
         mkdir build
         cd build
         ..\configure
@@ -63,7 +62,6 @@ Windows `cmd` for configuring and building.  You might also need to
 1. Configure and build gazebo:
 
         cd gazebo
-        hg up win_gerkey
         mkdir build
         cd build
         ..\configure
