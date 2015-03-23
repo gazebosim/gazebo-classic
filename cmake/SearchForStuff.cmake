@@ -323,6 +323,7 @@ if (PKG_CONFIG_FOUND)
   if (NOT CCD_FOUND)
     message(STATUS "Using internal copy of libccd")
     set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
+    set(CCD_LIBRARY_DIRS "${CMAKE_BINARY_DIR}/deps/libccd")
     set(CCD_LIBRARIES gazebo_ccd)
   endif()
 
