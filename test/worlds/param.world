@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <physics type="ode">
+      <ode>
+        <param name="contact_residual_smoothing" type="double" value="0.01"/>
+        <param name="warm_start_factor" type="double" value="2.0"/>
+        <param name="extra_friction_iterations" type="int" value="11"/>
+      </ode>
+    </physics>
+
+  </world>
+</sdf>
