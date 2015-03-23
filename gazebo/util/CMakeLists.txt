@@ -14,6 +14,7 @@ set (sources
 
 if (NOT USE_EXTERNAL_TINYXML)
   include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
+  add_definitions(-DTIXML_USE_STL)
   set (sources ${sources}
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
