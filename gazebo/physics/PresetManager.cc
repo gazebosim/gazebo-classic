@@ -25,12 +25,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-PresetPrivate::PresetPrivate(const std::string &_name = "default name")
-    : name(_name)
-{
-}
-
-//////////////////////////////////////////////////
 Preset::Preset() : dataPtr(new PresetPrivate)
 {
 }
@@ -39,6 +33,12 @@ Preset::Preset() : dataPtr(new PresetPrivate)
 Preset::Preset(const std::string &_name)
     : dataPtr(new PresetPrivate(_name))
 {
+}
+
+//////////////////////////////////////////////////
+Preset::~Preset()
+{
+  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////
@@ -255,8 +255,7 @@ bool PresetManager::GetCurrentProfileParam(const std::string &_key,
 {
   if (!this->CurrentPreset())
   {
-    gzwarn << "No current preset, returning 0" << std::endl;
-    return 0;
+    return false;
   }
   return this->CurrentPreset()->GetParam(_key, _value);
 }
@@ -300,7 +299,7 @@ void PresetManager::RemoveProfile(const std::string &_name)
 {
   if (_name == this->CurrentProfile())
   {
-    gzwarn << "deselecting current preset " << _name << std::endl;
+    gzmsg << "deselecting current preset " << _name << std::endl;
     this->dataPtr->currentPreset = "";
   }
 

@@ -29,9 +29,11 @@ namespace gazebo
     class PresetPrivate
     {
       /// \brief Constructor
-      /// \param[in] _name The name of the preset profile. Defaults to
-      /// "default_profile"
-      public: PresetPrivate(const std::string &_name);
+      /// \param[in] _name The name of the preset profile.
+      public: PresetPrivate(const std::string &_name = "default name")
+          : name(_name)
+      {
+      }
 
       /// \brief Name of this preset profile
       public: std::string name;

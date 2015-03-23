@@ -37,6 +37,9 @@ namespace gazebo
       /// \brief Constructor.
       public: Preset();
 
+      /// \brief Destructor.
+      public: ~Preset();
+
       /// \brief Constructor
       /// \param[in] _name The name of the preset profile.
       public: Preset(const std::string & _name);
@@ -57,10 +60,12 @@ namespace gazebo
 
       /// \brief Set a profile parameter.
       /// \param[in] _key The key of the parameter to change.
-      /// \param[out] _value The new value of the parameter.
+      /// \param[in] _value The new value of the parameter.
       public: void SetParam(const std::string &_key, const boost::any &_value);
 
       /// \brief Check if profile parameter is set.
+      /// \param[in] _key The profile key to check.
+      /// \return True if the profile has parameter _key, false otherwise
       public: bool HasParam(const std::string &_key) const;
 
       /// \brief Set all parameters of this preset in the physics engine.
