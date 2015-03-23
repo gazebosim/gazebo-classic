@@ -17,7 +17,10 @@
 #ifndef _GZ_PLUGIN_HH_
 #define _GZ_PLUGIN_HH_
 
-#include <unistd.h>
+#ifndef _WIN32
+  #include <unistd.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -347,8 +350,8 @@ namespace gazebo
 /// to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_MODEL_PLUGIN(classname) \
-  extern "C" GAZEBO_VISIBLE gazebo::ModelPlugin *RegisterPlugin(); \
-  GAZEBO_VISIBLE \
+  extern "C" GZ_COMMON_VISIBLE gazebo::ModelPlugin *RegisterPlugin(); \
+  GZ_COMMON_VISIBLE \
   gazebo::ModelPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -359,8 +362,8 @@ namespace gazebo
 /// to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_WORLD_PLUGIN(classname) \
-  extern "C" GAZEBO_VISIBLE gazebo::WorldPlugin *RegisterPlugin(); \
-  GAZEBO_VISIBLE \
+  extern "C" GZ_COMMON_VISIBLE gazebo::WorldPlugin *RegisterPlugin(); \
+  GZ_COMMON_VISIBLE \
   gazebo::WorldPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -371,8 +374,8 @@ namespace gazebo
 /// the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_SENSOR_PLUGIN(classname) \
-  extern "C" GAZEBO_VISIBLE gazebo::SensorPlugin *RegisterPlugin(); \
-  GAZEBO_VISIBLE \
+  extern "C" GZ_COMMON_VISIBLE gazebo::SensorPlugin *RegisterPlugin(); \
+  GZ_COMMON_VISIBLE \
   gazebo::SensorPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -383,8 +386,8 @@ namespace gazebo
 /// library to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_SYSTEM_PLUGIN(classname) \
-  extern "C" GAZEBO_VISIBLE gazebo::SystemPlugin *RegisterPlugin(); \
-  GAZEBO_VISIBLE \
+  extern "C" GZ_COMMON_VISIBLE gazebo::SystemPlugin *RegisterPlugin(); \
+  GZ_COMMON_VISIBLE \
   gazebo::SystemPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -395,8 +398,8 @@ namespace gazebo
 /// library to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_VISUAL_PLUGIN(classname) \
-  extern "C" GAZEBO_VISIBLE gazebo::VisualPlugin *RegisterPlugin(); \
-  GAZEBO_VISIBLE \
+  extern "C" GZ_COMMON_VISIBLE gazebo::VisualPlugin *RegisterPlugin(); \
+  GZ_COMMON_VISIBLE \
   gazebo::VisualPlugin *RegisterPlugin() \
   {\
     return new classname();\
