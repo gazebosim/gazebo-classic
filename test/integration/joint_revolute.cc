@@ -155,7 +155,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
 {
   math::Rand::SetSeed(0);
   // Load world
-  Load("worlds/revolute_joint_test.world", true, _physicsEngine);
+  Load("worlds/revolute_joint_1437.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -497,7 +497,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
         // Apply positive torque to the lower_joint and step forward.
         force = 1;
 
-        for (int i = 0; i < 11; ++i)
+        for (int i = 0; i < 10; ++i)
         {
           joint->SetForce(0, force);
           world->Step(1);
