@@ -28,6 +28,9 @@ namespace gazebo
     /// \class Private data pointer for Preset class
     class PresetPrivate
     {
+      /// \brief Constructor
+      /// \param[in] _name The name of the preset profile. Defaults to
+      /// "default_profile"
       public: PresetPrivate(const std::string &_name);
 
       /// \brief Name of this preset profile
@@ -50,7 +53,7 @@ namespace gazebo
       /// \brief Physics engine instrumented by this PresetManager
       public: PhysicsEnginePtr physicsEngine;
     };
-  }  // namespace physics
-}  // namespace gazebo
+  }
+}
 
 #endif
