@@ -27,16 +27,16 @@
 #include "gazebo/util/system.hh"
 #include "gazebo/gazebo_config.h"
 
-GAZEBO_VISIBLE
+GZ_PHYSICS_VISIBLE
 void RegisterODEPhysics();
 
 #ifdef HAVE_SIMBODY
-GAZEBO_VISIBLE
+GZ_PHYSICS_VISIBLE
 void RegisterSimbodyPhysics();
 #endif
 
 #ifdef HAVE_BULLET
-GAZEBO_VISIBLE
+GZ_PHYSICS_VISIBLE
 void RegisterBulletPhysics();
 #endif
 

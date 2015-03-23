@@ -40,7 +40,7 @@ namespace gazebo
     class ODEPhysicsPrivate;
 
     /// \brief ODE physics engine.
-    class GAZEBO_VISIBLE ODEPhysics : public PhysicsEngine
+    class GZ_PHYSICS_VISIBLE ODEPhysics : public PhysicsEngine
     {
       /// \enum ODEParam
       /// \brief ODE Physics parameter types.

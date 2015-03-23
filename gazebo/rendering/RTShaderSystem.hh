@@ -48,7 +48,7 @@ namespace gazebo
     ///
     /// This class allows Gazebo to generate per-pixel shaders for every
     /// material at run-time.
-    class GAZEBO_VISIBLE RTShaderSystem : public SingletonT<RTShaderSystem>
+    class GZ_RENDERING_VISIBLE RTShaderSystem : public SingletonT<RTShaderSystem>
     {
       /// \enum LightingModel.
       /// \brief The type of lighting.

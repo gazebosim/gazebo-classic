@@ -65,7 +65,7 @@ namespace gazebo
 
     /// \class GpuLaser GpuLaser.hh rendering/rendering.hh
     /// \brief GPU based laser distance sensor
-    class GAZEBO_VISIBLE GpuLaser
+    class GZ_RENDERING_VISIBLE GpuLaser
       : public Camera, public Ogre::RenderObjectListener
     {
       /// \brief Constructor

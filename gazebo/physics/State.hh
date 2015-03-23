@@ -40,7 +40,7 @@ namespace gazebo
     /// \brief State of an entity.
     ///
     /// This is the base class for all State information.
-    class GAZEBO_VISIBLE State
+    class GZ_PHYSICS_VISIBLE State
     {
       /// \brief Default constructor
       public: State();

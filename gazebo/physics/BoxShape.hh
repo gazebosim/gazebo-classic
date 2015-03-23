@@ -34,7 +34,7 @@ namespace gazebo
 
     /// \class BoxShape BoxShape.hh physics/physcs.hh
     /// \brief Box geometry primitive.
-    class GAZEBO_VISIBLE BoxShape : public Shape
+    class GZ_PHYSICS_VISIBLE BoxShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

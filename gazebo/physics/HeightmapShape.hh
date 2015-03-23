@@ -45,7 +45,7 @@ namespace gazebo
     /// \brief HeightmapShape collision shape builds a heightmap from
     /// an image.  The supplied image must be square with
     /// N*N+1 pixels per side, where N is an integer.
-    class GAZEBO_VISIBLE HeightmapShape : public Shape
+    class GZ_PHYSICS_VISIBLE HeightmapShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision object.

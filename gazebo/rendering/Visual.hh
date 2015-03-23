@@ -59,7 +59,7 @@ namespace gazebo
 
     /// \class Visual Visual.hh rendering/rendering.hh
     /// \brief A renderable object
-    class GAZEBO_VISIBLE Visual : public boost::enable_shared_from_this<Visual>
+    class GZ_RENDERING_VISIBLE Visual : public boost::enable_shared_from_this<Visual>
     {
       /// \brief Constructor
       /// \param[in] _name Name of the visual.

@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class SphereShape SphereShape.hh physics/physics.hh
     /// \brief Sphere collision shape.
-    class GAZEBO_VISIBLE SphereShape : public Shape
+    class GZ_PHYSICS_VISIBLE SphereShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.
