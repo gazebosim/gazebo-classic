@@ -232,20 +232,40 @@ void ODEPhysics_TEST::PhysicsMsgParam()
       physicsPubMsg.real_time_update_rate());
   EXPECT_DOUBLE_EQ(physicsResponseMsg.real_time_factor(),
       physicsPubMsg.real_time_factor());
-  EXPECT_EQ(physicsResponseMsg.solver_type(),
-      physicsPubMsg.solver_type());
   EXPECT_EQ(physicsResponseMsg.enable_physics(),
       physicsPubMsg.enable_physics());
-  EXPECT_EQ(physicsResponseMsg.iters(),
-      physicsPubMsg.iters());
-  EXPECT_DOUBLE_EQ(physicsResponseMsg.sor(),
-      physicsPubMsg.sor());
-  EXPECT_DOUBLE_EQ(physicsResponseMsg.cfm(),
-      physicsPubMsg.cfm());
-  EXPECT_DOUBLE_EQ(physicsResponseMsg.contact_max_correcting_vel(),
-      physicsPubMsg.contact_max_correcting_vel());
-  EXPECT_DOUBLE_EQ(physicsResponseMsg.contact_surface_layer(),
-      physicsPubMsg.contact_surface_layer());
+
+  int int_value_resp, int_value_pub;
+  double double_value_resp, double_value_pub;
+  std::string str_value_resp, str_value_pub;
+  EXPECT_TRUE(PhysicsMsgParam(physicsResponseMsg, "solver_type",
+      str_value_resp));
+  EXPECT_TRUE(PhysicsMsgParam(physicsPubMsg, "solver_type", str_value_pub));
+  EXPECT_EQ(str_value_resp, str_value_pub);
+
+  EXPECT_TRUE(PhysicsMsgParam(physicsResponseMsg, "iters", int_value_resp));
+  EXPECT_TRUE(PhysicsMsgParam(physicsPubMsg, "iters", int_value_pub));
+  EXPECT_EQ(int_value_resp, int_value_pub);
+
+  EXPECT_TRUE(PhysicsMsgParam(physicsResponseMsg, "sor", double_value_resp));
+  EXPECT_TRUE(PhysicsMsgParam(physicsPubMsg, "sor", double_value_pub));
+  EXPECT_EQ(double_value_resp, double_value_pub);
+
+  EXPECT_TRUE(PhysicsMsgParam(physicsResponseMsg, "cfm", double_value_resp));
+  EXPECT_TRUE(PhysicsMsgParam(physicsPubMsg, "cfm", double_value_pub));
+  EXPECT_EQ(double_value_resp, double_value_pub);
+
+  EXPECT_TRUE(PhysicsMsgParam(physicsResponseMsg, "contact_max_correcting_vel",
+      double_value_resp));
+  EXPECT_TRUE(PhysicsMsgParam(physicsPubMsg, "contact_max_correcting_vel",
+      double_value_pub));
+  EXPECT_EQ(double_value_resp, double_value_pub);
+
+  EXPECT_TRUE(PhysicsMsgParam(physicsResponseMsg, "contact_surface_layer",
+      double_value_resp));
+  EXPECT_TRUE(PhysicsMsgParam(physicsPubMsg, "contact_surface_layer",
+      double_value_pub));
+  EXPECT_EQ(double_value_resp, double_value_pub);
 
   phyNode->Fini();
 }

@@ -213,7 +213,7 @@ void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   boost::any value;
   for (int i = 0; i < _msg->parameters_size(); i++)
   {
-    const google::protobuf::Reflection *reflection =
+    /*const google::protobuf::Reflection *reflection =
         _msg->parameters(i).GetReflection();
     std::vector<const google::protobuf::FieldDescriptor*> fields;
     reflection->ListFields(_msg->parameters(i), &fields);
@@ -260,9 +260,16 @@ void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &_msg)
                  << std::endl;
           continue;
       }
+    }*/
+    if (ConvertMessageParam(_msg->parameters(i), value))
+    {
+      this->SetParam(_msg->parameters(i).name(), value);
     }
-
-    this->SetParam(_msg->parameters(i).name(), value);
+    else
+    {
+      gzerr << "Couldn't set parameter from msg: "
+            << _msg->parameters(i).name() << std::endl;
+    }
   }
 }
 

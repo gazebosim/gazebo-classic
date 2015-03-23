@@ -491,17 +491,76 @@ namespace gazebo
 
     template<typename T> GAZEBO_VISIBLE msgs::NamedParam ConvertMessageParam(
         const std::string &/*_key*/, const T /*_value*/);
-    /*{
-      msgs::NamedParam param;
-      return param;
-    }*/
+
+    template<typename T> GAZEBO_VISIBLE bool ConvertMessageParam(
+        const msgs::NamedParam &_msg, T &_value)
+    {
+      const google::protobuf::Reflection *reflection =
+          _msg.GetReflection();
+      std::vector<const google::protobuf::FieldDescriptor*> fields;
+      reflection->ListFields(_msg, &fields);
+      if ((_msg.children_size() > 0 && fields.size() > 3) ||
+          (_msg.children_size() == 0 && fields.size() > 2))
+      {
+        return false;
+      }
+
+      for (auto field : fields)
+      {
+        if (field->name() == "name" || field->name() ==  "children")
+        {
+          continue;
+        }
+        // optimization to skip over iterating through all fields
+        switch (field->cpp_type())
+        {
+          case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
+            _value = reflection->GetDouble(_msg, field);
+            return true;
+          case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
+            _value = reflection->GetInt32(_msg, field);
+            return true;
+          case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
+            _value = reflection->GetString(_msg, field);
+            return true;
+          case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
+            _value = reflection->GetBool(_msg, field);
+            return true;
+          case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
+            _value = reflection->GetFloat(_msg, field);
+            return true;
+          case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+            if (field->name() == "vector3d")
+            {
+              _value = _msg.vector3d();
+              return true;
+            }
+            // Else, go to default case
+          default:
+            break;
+        }
+      }
+      return false;
+    }
 
     template<typename T> GAZEBO_VISIBLE void AddToPhysicsMsg(
         const std::string &_key, const T _value, msgs::Physics &_physics)
     {
       msgs::NamedParam *param = _physics.add_parameters();
-      // TODO: better copy?
       param->CopyFrom(ConvertMessageParam(_key, _value));
+    }
+
+    template<typename T> GAZEBO_VISIBLE bool PhysicsMsgParam(
+         const msgs::Physics &_physics, const std::string &_key, T &_value)
+    {
+      for (auto param : _physics.parameters())
+      {
+        if (param.name() == _key)
+        {
+          return ConvertMessageParam(param, _value);
+        }
+      }
+      return false;
     }
 
     /// \}
