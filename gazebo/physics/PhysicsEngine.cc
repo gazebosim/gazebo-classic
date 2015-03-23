@@ -64,6 +64,52 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
   this->contactManager->Init(this->world);
 }
 
+void PhysicsEngine::ParamsFromSDFElement(sdf::ElementPtr _elem)
+{
+  if (_elem == NULL)
+    return;
+
+  // Call this function on child elements (not just params)
+  for (sdf::ElementPtr temp = _elem->GetFirstElement(); temp != NULL;
+       temp = temp->GetNextElement())
+  {
+    if (temp->GetName() == "param")
+    {
+      std::string name = temp->Get<std::string>("name");
+      std::string type = temp->Get<std::string>("type");
+      std::string value = temp->Get<std::string>("value");
+      if (type == "double")
+      {
+        double v = std::stod(value);
+        this->SetParam(name, v);
+      }
+      else if (type == "int")
+      {
+        int v = std::stoi(value);
+        this->SetParam(name, v);
+      }
+      else if (type == "string" || type == "")
+      {
+        this->SetParam(name, value);
+      }
+      else if (type == "vector3")
+      {
+        /*math::Vector3 v = temp->Get<math::Vector3>();
+        gzdbg << "Setting param: " << name << " to: " << v << std::endl;
+        this->SetParam(name, v);*/
+        // TODO
+      }
+      else if (type == "bool")
+      {
+        // TODO: true/false case
+        bool v = stoi(value);
+        this->SetParam(name, v);
+      }
+    }
+    this->ParamsFromSDFElement(temp);
+  }
+}
+
 //////////////////////////////////////////////////
 void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 {
@@ -75,6 +121,9 @@ void PhysicsEngine::Load(sdf::ElementPtr _sdf)
       this->sdf->GetElement("real_time_factor")->Get<double>();
   this->maxStepSize =
       this->sdf->GetElement("max_step_size")->Get<double>();
+
+  // Generalized parameter reading
+  this->ParamsFromSDFElement(this->sdf);
 }
 
 //////////////////////////////////////////////////
@@ -158,21 +207,21 @@ double PhysicsEngine::GetMaxStepSize() const
 //////////////////////////////////////////////////
 void PhysicsEngine::SetTargetRealTimeFactor(double _factor)
 {
-  this->sdf->GetElement("real_time_factor")->Set(_factor);
+  // this->sdf->GetElement("real_time_factor")->Set(_factor);
   this->targetRealTimeFactor = _factor;
 }
 
 //////////////////////////////////////////////////
 void PhysicsEngine::SetRealTimeUpdateRate(double _rate)
 {
-  this->sdf->GetElement("real_time_update_rate")->Set(_rate);
+  // this->sdf->GetElement("real_time_update_rate")->Set(_rate);
   this->realTimeUpdateRate = _rate;
 }
 
 //////////////////////////////////////////////////
 void PhysicsEngine::SetMaxStepSize(double _stepSize)
 {
-  this->sdf->GetElement("max_step_size")->Set(_stepSize);
+  // this->sdf->GetElement("max_step_size")->Set(_stepSize);
   this->maxStepSize = _stepSize;
 }
 
@@ -211,56 +260,9 @@ void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   }
 
   boost::any value;
+  // TODO: Nested parameters
   for (int i = 0; i < _msg->parameters_size(); i++)
   {
-    /*const google::protobuf::Reflection *reflection =
-        _msg->parameters(i).GetReflection();
-    std::vector<const google::protobuf::FieldDescriptor*> fields;
-    reflection->ListFields(_msg->parameters(i), &fields);
-    if ((_msg->parameters(i).children_size() > 0 && fields.size() > 3) ||
-        (_msg->parameters(i).children_size() == 0 && fields.size() > 2))
-    {
-      gzerr << "Too many fields in NamedParam protobuf msg" << std::endl;
-      continue;
-    }
-
-    for (auto field : fields)
-    {
-      if (field->name() == "name" || field->name() ==  "children")
-      {
-        continue;
-      }
-      // optimization to skip over iterating through all fields
-      switch (field->cpp_type())
-      {
-        case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
-          value = reflection->GetDouble(_msg->parameters(i), field);
-          break;
-        case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
-          value = reflection->GetInt32(_msg->parameters(i), field);
-          break;
-        case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
-          value = reflection->GetString(_msg->parameters(i), field);
-          break;
-        case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
-          value = reflection->GetBool(_msg->parameters(i), field);
-          break;
-        case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
-          value = reflection->GetFloat(_msg->parameters(i), field);
-          break;
-        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-          if (field->name() == "vector3d")
-          {
-            value = _msg->parameters(i).vector3d();
-            break;
-          }
-          // Else, go to default case
-        default:
-          gzwarn << "Empty parameter msg in PhysicsEngine::OnPhysicsMsg"
-                 << std::endl;
-          continue;
-      }
-    }*/
     if (ConvertMessageParam(_msg->parameters(i), value))
     {
       this->SetParam(_msg->parameters(i).name(), value);

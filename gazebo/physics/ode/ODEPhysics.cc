@@ -261,7 +261,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
 
-    msgs::AddToPhysicsMsg("solver_type", this->dataPtr->stepType, physicsMsg);
+    msgs::AddToPhysicsMsg("solver_type", this->GetStepType(), physicsMsg);
     boost::any min_step_size;
     try
     {
@@ -279,6 +279,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     msgs::AddToPhysicsMsg("iters", this->GetSORPGSIters(), physicsMsg);
     msgs::AddToPhysicsMsg("sor", this->GetSORPGSW(), physicsMsg);
     msgs::AddToPhysicsMsg("erp", this->GetWorldERP(), physicsMsg);
+    msgs::AddToPhysicsMsg("cfm", this->GetWorldCFM(), physicsMsg);
     msgs::AddToPhysicsMsg("contact_max_correcting_vel",
         this->GetContactMaxCorrectingVel(), physicsMsg);
     msgs::AddToPhysicsMsg("contact_surface_layer",
@@ -1250,7 +1251,6 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
 
   if (_key == "solver_type")
   {
-    //_value = odeElem->GetElement("solver")->Get<std::string>("type");
     _value = this->GetStepType();
   }
   else if (_key == "cfm")
