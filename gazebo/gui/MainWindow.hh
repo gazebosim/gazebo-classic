@@ -60,10 +60,30 @@ namespace gazebo
 
       /// \brief Show a widget in the left column.
       /// \sa AddToLeftColumn
-      /// \param[in] _name Name of the widge to show. The widget must have
+      /// \param[in] _name Name of the widget to show. The widget must have
       /// been added using AddToLeftColumn. The string "default" will show
       /// the main tab.
       public: void ShowLeftColumnWidget(const std::string &_name = "default");
+
+      /// \brief Add a tab to the left column widget.
+      /// \sa RemoveLeftColumnTab
+      /// \param[in] _name Name of the tab to add.
+      /// \param[in] _name Pointer to the tab to add.
+      /// \param[in] _name Name of the column widget that the tab will be added
+      /// to. If omitted, the tab will be added to the default left column.
+      public: void AddLeftColumnTab(const std::string &_name, QWidget *_widget,
+          const std::string &_columnWidget = "default");
+
+      /// \brief Remove a tab from the left column widget.
+      /// \sa AddLeftColumnTab
+      /// \param[in] _name Name of the tab to remove. The tab must have
+      /// been added using AddLeftColumnTab.
+      /// \param[in] _name Name of the column widget that the tab will be
+      /// removed from. If omitted, the tab will be removed from the default
+      /// left column.
+      /// \return Widget that has been removed.
+      public: QWidget *RemoveLeftColumnTab(const std::string &_name,
+          const std::string &_columnWidget = "default");
 
       /// \brief Get a pointer to the render widget.
       /// \return A pointer to the render widget.

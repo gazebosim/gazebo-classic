@@ -1679,6 +1679,50 @@ void MainWindow::ShowLeftColumnWidget(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
+void MainWindow::AddLeftColumnTab(const std::string &_name,
+    QWidget *_widget, const std::string &_columnWidget)
+{
+  std::map<std::string, int>::iterator it =
+      this->leftColumnStack.find(_columnWidget);
+
+  if (it == this->leftColumnStack.end())
+  {
+    gzerr << "Widget: with name[" << _columnWidget << "] has not been added"
+        << " to the left column stack "<< std::endl;
+    return;
+  }
+
+  this->leftColumn->widget(it->second)->addTab(_widget, tr(_name.c_str()));
+}
+
+/////////////////////////////////////////////////
+QWidget *MainWindow::RemoveLeftColumnTab(const std::string &_name,
+    const std::string &_columnWidget)
+{
+  std::map<std::string, int>::iterator it =
+      this->leftColumnStack.find(_columnWidget);
+
+  if (it == this->leftColumnStack.end())
+  {
+    gzerr << "Widget: with name[" << _columnWidget << "] has not been added"
+        << " to the left column stack "<< std::endl;
+    return NULL;
+  }
+
+  QTabWidget *tab = this->leftColumn->widget(it->second);
+  for (int i = 0; i < tab->count(); ++i)
+  {
+    if (tab->tabText(0).toStdString() == _name)
+    {
+      QWidget *widget = tab->widget(i);
+      tab->removeTab(i);
+      return widget;
+    }
+  }
+  return NULL;
+}
+
+/////////////////////////////////////////////////
 RenderWidget *MainWindow::GetRenderWidget() const
 {
   return this->renderWidget;
