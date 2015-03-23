@@ -79,6 +79,9 @@ namespace gazebo
       /// \brief A label for the length widget.
       public: QWidget *geomLengthLabel;
 
+      /// \brief A label for the unit of the length widget.
+      public: QWidget *geomLengthUnitLabel;
+
       /// \brief A line edit for editing the mesh filename.
       public: QWidget *geomFilenameLineEdit;
 
