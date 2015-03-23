@@ -32,7 +32,6 @@ namespace gazebo
 
     /// \class Preset PresetManager.hh gazebo/physics/PresetManager.hh
     /// \brief Representation of a preset physics profile
-
     class Preset
     {
       /// \brief Constructor.
