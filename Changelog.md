@@ -4,6 +4,7 @@
 
 1. Fix clamping of PID command
     * [Pull request #1543](https://bitbucket.org/osrf/gazebo/pull-request/1543)
+    * [Issue #1534](https://bitbucket.org/osrf/gazebo/issue/1534)
 
 ### Gazebo 4.1.2 (2015-03-20)
 
