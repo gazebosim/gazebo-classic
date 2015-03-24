@@ -155,7 +155,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
 {
   math::Rand::SetSeed(0);
   // Load world
-  Load("worlds/revolute_joint_1437.world", true, _physicsEngine);
+  Load("worlds/revolute_joint_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -437,6 +437,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   // Reset world again, disable gravity, detach upper_joint
   // Then apply torque at lower_joint and verify motion
   world->Reset();
+  physics->SetGravity(math::Vector3::Zero);
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
@@ -444,23 +445,6 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
     if (model)
     {
       gzdbg << "Check SetForce for model " << *modelIter << '\n';
-      std::vector<std::string>::iterator linkIter;
-      for (linkIter  = linkNames.begin();
-           linkIter != linkNames.end(); ++linkIter)
-      {
-        link = model->GetLink(*linkIter);
-        if (link)
-        {
-          // Disable gravity for links.
-          link->SetGravityMode(false);
-        }
-        else
-        {
-          gzerr << "Error loading link " << *linkIter
-                << " of model " << *modelIter << '\n';
-          EXPECT_TRUE(link != NULL);
-        }
-      }
 
       joint = model->GetJoint("upper_joint");
       if (joint)
