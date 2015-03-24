@@ -25,7 +25,8 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \class Private data pointer for Preset class
+    /// \internal
+    /// \brief Private data pointer for Preset class
     class PresetPrivate
     {
       /// \brief Constructor
@@ -45,7 +46,8 @@ namespace gazebo
 
     class Preset;
 
-    /// \class Private data pointer for PresetManager class
+    /// \internal
+    /// \brief Private data pointer for PresetManager class
     class PresetManagerPrivate
     {
       /// \brief Name of the current preset

@@ -18,9 +18,10 @@
 #ifndef _GAZEBO_PHYSICS_PRESETMANAGER_HH_
 #define _GAZEBO_PHYSICS_PRESETMANAGER_HH_
 
+#include <boost/any.hpp>
 #include <string>
-#include <map>
 #include <vector>
+#include <sdf>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 
@@ -37,24 +38,24 @@ namespace gazebo
       /// \brief Constructor.
       public: Preset();
 
-      /// \brief Destructor.
-      public: ~Preset();
-
       /// \brief Constructor
       /// \param[in] _name The name of the preset profile.
       public: Preset(const std::string & _name);
+
+      /// \brief Destructor.
+      public: ~Preset();
 
       /// \brief Get the profile name.
       /// \return The name of the preset profile.
       public: std::string Name() const;
 
       /// \brief Set the profile name.
-      /// \param[in] _name The new of the preset profile.
+      /// \param[in] _name The new name of the preset profile.
       public: void Name(const std::string &_name);
 
       /// \brief Get a profile parameter.
       /// \param[in] _key The key of the parameter to retrieve.
-      /// \param[out] The parameter value at the input key.
+      /// \param[out] _value The parameter value at the input key.
       /// \return True if the parameter exists in the map, false otherwise.
       public: bool GetParam(const std::string &_key, boost::any &_value) const;
 
@@ -121,8 +122,7 @@ namespace gazebo
       /// \param[in] _value The value of the parameter to change.
       /// \return True if setting the parameter was successful.
       public: bool SetProfileParam(const std::string &_profileName,
-                                   const std::string &_key,
-                                   const boost::any &_value);
+          const std::string &_key, const boost::any &_value);
 
       /// \brief Get a parameter for a certain profile.
       /// \param[in] _name The name of the accessed profile.
@@ -137,7 +137,7 @@ namespace gazebo
       /// \param[in] _value The value of the parameter to be set.
       /// \return True if setting the parameter was successful.
       public: bool SetCurrentProfileParam(const std::string &_key,
-                                       const boost::any &_value);
+          const boost::any &_value);
 
       /// \brief Get a parameter for the current profile.
       /// \param[in] _key The key of the accessed parameter.

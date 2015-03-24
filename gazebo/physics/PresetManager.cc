@@ -15,8 +15,6 @@
  *
 */
 
-#include <boost/any.hpp>
-
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/PresetManagerPrivate.hh"
 #include "gazebo/physics/PresetManager.hh"
