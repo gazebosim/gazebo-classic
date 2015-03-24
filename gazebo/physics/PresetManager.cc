@@ -78,8 +78,8 @@ bool Preset::GetParam(const std::string &_key, boost::any &_value) const
 {
   if (!this->HasParam(_key))
   {
-    gzwarn << "Parameter " << _key << " is not a member of Preset"
-           << this->Name() << std::endl;
+    gzwarn << "Parameter [" << _key << "] is not a member of profile ["
+           << this->Name() << "]" << std::endl;
     return false;
   }
   _value = this->dataPtr->parameterMap[_key];
@@ -157,7 +157,7 @@ bool PresetManager::CurrentProfile(const std::string &_name)
   if (this->dataPtr->presetProfiles.find(_name) ==
       this->dataPtr->presetProfiles.end())
   {
-    gzwarn << "Profile " << _name << " not found." << std::endl;
+    gzwarn << "Profile [" << _name << "] not found." << std::endl;
     return false;
   }
 
@@ -270,7 +270,7 @@ void PresetManager::CreateProfile(const std::string &_name)
   if (this->dataPtr->presetProfiles.find(_name) !=
       this->dataPtr->presetProfiles.end())
   {
-    gzwarn << "Warning: profile " << _name << " already exists! Overwriting."
+    gzwarn << "Warning: profile [" << _name << "] already exists! Overwriting."
            << std::endl;
   }
 
