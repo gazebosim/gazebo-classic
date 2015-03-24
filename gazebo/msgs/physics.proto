@@ -6,7 +6,7 @@ package gazebo.msgs;
 
 
 import "vector3d.proto";
-import "namedparam.proto";
+import "param.proto";
 
 message Physics
 {
@@ -34,5 +34,5 @@ message Physics
   optional double real_time_update_rate      = 14;
   optional double max_step_size              = 15;
 
-  repeated NamedParam parameters             = 16;
+  repeated Param parameters             = 16;
 }

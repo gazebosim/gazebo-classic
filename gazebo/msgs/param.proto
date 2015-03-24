@@ -7,7 +7,7 @@ package gazebo.msgs;
 import "int.proto";
 import "vector3d.proto";
 
-message NamedParam
+message Param
 {
   /*enum Type {DOUBLE_TYPE = 1; INT_TYPE = 2; STRING_TYPE = 3; VECTOR3D_TYPE = 4;
              BOOL_TYPE = 5; FLOAT_TYPE = 6;}*/
@@ -25,5 +25,5 @@ message NamedParam
   optional float    float_value  = 8;
 
   /// For nested parameters (e.g. solver)
-  repeated NamedParam children   = 9;
+  repeated Param children   = 9;
 }

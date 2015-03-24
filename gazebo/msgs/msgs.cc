@@ -87,62 +87,62 @@ namespace gazebo
     {
     }*/
 
-    template<> msgs::NamedParam ConvertMessageParam<double>(
+    template<> msgs::Param ConvertMessageParam<double>(
         const std::string &_key, const double &_value)
     {
-      msgs::NamedParam param;
+      msgs::Param param;
       param.set_name(_key);
       param.set_double_value(_value);
       return param;
     }
 
-    template<> msgs::NamedParam ConvertMessageParam<int>(
+    template<> msgs::Param ConvertMessageParam<int>(
         const std::string &_key, const int &_value)
     {
-      msgs::NamedParam param;
+      msgs::Param param;
       param.set_name(_key);
       param.set_int_value(_value);
       return param;
     }
 
-    template<> msgs::NamedParam ConvertMessageParam<std::string>(
+    template<> msgs::Param ConvertMessageParam<std::string>(
         const std::string &_key, const std::string &_value)
     {
-      msgs::NamedParam param;
+      msgs::Param param;
       param.set_name(_key);
       param.set_string_value(_value);
       return param;
     }
 
-    template<> msgs::NamedParam ConvertMessageParam<math::Vector3>(
+    template<> msgs::Param ConvertMessageParam<math::Vector3>(
         const std::string &_key, const math::Vector3 &_value)
     {
-      msgs::NamedParam param;
+      msgs::Param param;
       param.set_name(_key);
       msgs::Vector3d *vec = param.mutable_vector3d();
       *vec = Convert(_value);
       return param;
     }
 
-    template<> msgs::NamedParam ConvertMessageParam<bool>(
+    template<> msgs::Param ConvertMessageParam<bool>(
         const std::string &_key, const bool &_value)
     {
-      msgs::NamedParam param;
+      msgs::Param param;
       param.set_name(_key);
       param.set_bool_value(_value);
       return param;
     }
 
-    template<> msgs::NamedParam ConvertMessageParam<float>(
+    template<> msgs::Param ConvertMessageParam<float>(
         const std::string &_key, const float &_value)
     {
-      msgs::NamedParam param;
+      msgs::Param param;
       param.set_name(_key);
       param.set_float_value(_value);
       return param;
     }
 
-    bool ConvertMessageParam(const msgs::NamedParam &_msg,
+    bool ConvertMessageParam(const msgs::Param &_msg,
         boost::any &_value)
     {
       const google::protobuf::Reflection *reflection =

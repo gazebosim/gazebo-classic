@@ -496,16 +496,16 @@ namespace gazebo
 
     GAZEBO_VISIBLE msgs::Physics PhysicsFromSDF(sdf::ElementPtr);*/
 
-    template<typename T> GAZEBO_VISIBLE msgs::NamedParam ConvertMessageParam(
+    template<typename T> GAZEBO_VISIBLE msgs::Param ConvertMessageParam(
         const std::string &_key, const T &_value);
 
     GAZEBO_VISIBLE bool ConvertMessageParam(
-        const msgs::NamedParam &_msg, boost::any &_value);
+        const msgs::Param &_msg, boost::any &_value);
 
     template<typename T> GAZEBO_VISIBLE void AddToPhysicsMsg(
         const std::string &_key, const T &_value, msgs::Physics &_physics)
     {
-      msgs::NamedParam *param = _physics.add_parameters();
+      msgs::Param *param = _physics.add_parameters();
       param->CopyFrom(ConvertMessageParam(_key, _value));
     }
 
