@@ -318,6 +318,8 @@ void ModelEditor::OnEdit(bool /*_checked*/)
   {
     this->svWidget->setVisible(
         !this->active && this->schematicViewAct->isChecked());
+    if (!this->active)
+      this->svWidget->Reset();
   }
 #endif
 

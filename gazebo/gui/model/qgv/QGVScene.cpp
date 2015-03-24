@@ -274,21 +274,15 @@ void QGVScene::applyLayout()
 void QGVScene::clearLayout()
 {
   gvFreeLayout(_context->context(), _graph->graph());
-/*  if (_graph->graph())
-  {
-    gvFreeLayout(_context->context(), _graph->graph());
-    agclose(_graph->graph());
-  }
-  QGraphicsScene::clear();*/
 }
 
 void QGVScene::clear()
 {
-		gvFreeLayout(_context->context(), _graph->graph());
-    _nodes.clear();
-    _edges.clear();
-    _subGraphs.clear();
-    QGraphicsScene::clear();
+  gvFreeLayout(_context->context(), _graph->graph());
+  _nodes.clear();
+  _edges.clear();
+  _subGraphs.clear();
+  QGraphicsScene::clear();
 }
 
 #include <QGraphicsSceneContextMenuEvent>

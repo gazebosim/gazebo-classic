@@ -125,14 +125,10 @@ void QGVEdge::updateLayout()
         if(spl->list->sflag)
         {
             _tail_arrow = toBox(QLineF(QGVCore::toPoint(spl->list->list[0], gheight), QGVCore::toPoint(spl->list->sp, gheight)));
-            //
-            //_head_arrow = toArrow(QLineF(QGVCore::toPoint(spl->list->list[spl->list->size-1], gheight), QGVCore::toPoint(spl->list->ep, gheight)));
         }
 
         if(spl->list->eflag)
-        {     //
-            _//tail_arrow = toBox(QLineF(QGVCore::toPoint(spl->list->list[0], gheight), QGVCore::toPoint(spl->list->sp, gheight)));
-
+        {
             _head_arrow = toArrow(QLineF(QGVCore::toPoint(spl->list->list[spl->list->size-1], gheight), QGVCore::toPoint(spl->list->ep, gheight)));
         }
     }
@@ -177,4 +173,5 @@ QPolygonF QGVEdge::toBox(const QLineF &line) const
     polygon.append(line.p2() + o);
     polygon.append(line.p2() - o);
     polygon.append(line.p1() - o);
+    return polygon;
 }

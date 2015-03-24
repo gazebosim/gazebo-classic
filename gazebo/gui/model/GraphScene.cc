@@ -27,7 +27,6 @@ GraphScene::GraphScene(QWidget *_parent)
   this->setObjectName("GraphScene");
 
   //Configure scene attributes
-  //this->scene->setGraphAttribute("label", "qgvscene");
   this->setGraphAttribute("splines", "ortho");
   this->setGraphAttribute("rankdir", "LR");
   //_scene->setGraphAttribute("concentrate", "true"); //Error !
@@ -37,7 +36,6 @@ GraphScene::GraphScene(QWidget *_parent)
   this->setNodeAttribute("fillcolor", "white");
   this->setNodeAttribute("height", "1.2");
   this->setEdgeAttribute("minlen", "3");
-//  this->setEdgeAttribute("arrowhead", "box");
 }
 
 /////////////////////////////////////////////////
