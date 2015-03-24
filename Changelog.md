@@ -1,5 +1,10 @@
 ## Gazebo 4.0
 
+### Gazebo 4.x.x
+
+1. Fix clamping of PID command
+    * [Pull request #1543](https://bitbucket.org/osrf/gazebo/pull-request/1543)
+
 ### Gazebo 4.1.2 (2015-03-20)
 
 1. Fix quaternion documentation: target Gazebo_4.1
