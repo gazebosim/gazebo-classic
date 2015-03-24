@@ -23,7 +23,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-Preset::Preset() : dataPtr(new PresetPrivate)
+Preset::Preset()
+    : dataPtr(new PresetPrivate)
 {
 }
 
