@@ -20,6 +20,12 @@
 */
 
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -284,6 +290,8 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
               (imuPose - this->referencePose).rot);
 
     this->lastLinearVel = imuWorldLinearVel;
+
+    this->lastMeasurementTime = timestamp;
 
     if (this->noiseActive)
     {
