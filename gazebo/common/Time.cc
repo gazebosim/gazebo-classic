@@ -21,15 +21,15 @@
 
 #ifdef _WIN32
   #include <Windows.h>
-  #include <Time.h>
+  #include <Winsock2.h>
   struct timespec
   {
     long tv_sec;
     long tv_nsec;
   };
 #else
-  #include <sys/time.h>
   #include <unistd.h>
+  #include <sys/time.h>
 #endif
 #include <time.h>
 #include <math.h>
