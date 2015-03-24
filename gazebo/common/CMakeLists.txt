@@ -173,6 +173,10 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_DIR}/common.hh )
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_COMMON")
+if (WIN32)
+  # 0x601 = Windows 7.  TBB needs to know this.
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32_WINNT=0x601")
+endif ()
 
 gz_add_library(gazebo_common ${sources})
 

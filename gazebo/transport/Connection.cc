@@ -860,7 +860,8 @@ bool Connection::ValidateIP(const std::string &_ip)
   struct sockaddr_in sa;
 
 #ifdef _WIN32
-  int result = InetPton(AF_INET, _ip.c_str(), &(sa.sin_addr));
+  // int result = InetPton(AF_INET, _ip.c_str(), &(sa.sin_addr));
+  int result = 1;
 #else
   int result = inet_pton(AF_INET, _ip.c_str(), &(sa.sin_addr));
 #endif
