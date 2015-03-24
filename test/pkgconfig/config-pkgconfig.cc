@@ -36,6 +36,8 @@ TEST(PkgConfig, CC)
      "cc -fPIC -shared `pkg-config --cflags gazebo`\
      `pkg-config --libs gazebo` -o hello_world.so \
      %s/../../testfiles/hello_world.cc", SOURCE_DIR);
+  std::cerr << "\n\n\n NATE LOOK HERE \n\n\n[" << cmd << "]\n\n\n\n\n\n\n\n\n\n";
+
   ASSERT_EQ(system(cmd), 0);
 }
 #endif
