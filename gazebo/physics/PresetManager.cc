@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/physics/PresetManagerPrivate.hh"
 #include "gazebo/physics/PresetManager.hh"
 
@@ -37,14 +38,19 @@ Preset::Preset(const std::string &_name)
 //////////////////////////////////////////////////
 Preset::~Preset()
 {
+  GZ_ASSERT(this->dataPtr, "Data ptr not NULL for Preset!");
   delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
 bool Preset::SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine) const
 {
   bool result = true;
-  for (auto param : this->dataPtr->parameterMap)
+  if (!_physicsEngine)
+    return false;
+
+  for (const auto &param : this->dataPtr->parameterMap)
   {
     if (!_physicsEngine->SetParam(param.first, param.second))
     {
@@ -104,6 +110,7 @@ sdf::ElementPtr Preset::SDF() const
 void Preset::SDF(sdf::ElementPtr _sdfElement)
 {
   // TODO: check for non-physics element in Preset::SDF (set)
+  GZ_ASSERT(_sdfElement, "Trying to add NULL SDF element to Preset");
   this->dataPtr->elementSDF = _sdfElement;
 }
 
@@ -138,14 +145,27 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
           }
         }
       }
+      else
+      {
+        gzlog << "Empty physics profile name specified in SDF. No profile made "
+              << "in PresetManager." << std::endl;
+      }
     }
+  }
+  else
+  {
+    gzerr << "PresetManager does not support preset profiles for SDF besides "
+          << "physics. No profiles will be made." << std::endl;
   }
 }
 
 //////////////////////////////////////////////////
 PresetManager::~PresetManager()
 {
+  GZ_ASSERT(this->dataPtr, "Data pointer not NULL for PresetManager!");
+  this->dataPtr->presetProfiles.clear();
   delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -169,6 +189,9 @@ bool PresetManager::CurrentProfile(const std::string &_name)
     return false;
   }
   this->dataPtr->currentPreset = _name;
+  if (this->CurrentPreset() == NULL)
+    return false;
+
   return this->CurrentPreset()->SetAllPhysicsParameters(
       this->dataPtr->physicsEngine);
 }
@@ -183,10 +206,9 @@ std::string PresetManager::CurrentProfile() const
 std::vector<std::string> PresetManager::AllProfiles() const
 {
   std::vector<std::string> ret;
-  for (auto it = this->dataPtr->presetProfiles.begin();
-         it != this->dataPtr->presetProfiles.end(); ++it)
+  for (const auto &profile : this->dataPtr->presetProfiles)
   {
-    ret.push_back(it->first);
+    ret.push_back(profile.first);
   }
   return ret;
 }
@@ -230,7 +252,7 @@ bool PresetManager::GetProfileParam(const std::string &_name,
 bool PresetManager::SetCurrentProfileParam(const std::string &_key,
     const boost::any &_value)
 {
-  if (this->CurrentProfile().empty())
+  if (this->CurrentProfile().empty() || this->CurrentPreset() == NULL)
   {
     return false;
   }
@@ -276,8 +298,8 @@ bool PresetManager::CreateProfile(const std::string &_name)
     gzwarn << "Warning: profile [" << _name << "] already exists! Overwriting."
            << std::endl;
   }
-
-  this->dataPtr->presetProfiles[_name] = Preset(_name);
+  Preset *newPreset = new Preset(_name);
+  this->dataPtr->presetProfiles[_name] = *newPreset;
   return true;
 }
 
@@ -295,6 +317,7 @@ std::string PresetManager::CreateProfile(sdf::ElementPtr _elem)
   if (!this->CreateProfile(name))
     return "";
 
+  // Make a copy of this SDF element.
   this->ProfileSDF(name, _elem);
   return name;
 }
