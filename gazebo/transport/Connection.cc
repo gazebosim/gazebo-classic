@@ -781,7 +781,8 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
     }
 
     freeifaddrs(ifaddr);
-#else // _WIN32
+// _WIN32
+#else
   // Establish our default return value, in case everything below fails.
   std::string ret_addr("127.0.0.1");
   // Look up our address.
@@ -857,7 +858,12 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
 bool Connection::ValidateIP(const std::string &_ip)
 {
   struct sockaddr_in sa;
+
+#ifndef _WIN32
+  int result = InetPton(AF_INET, _ip.c_str(), &(sa.sin_addr));
+#else
   int result = inet_pton(AF_INET, _ip.c_str(), &(sa.sin_addr));
+#endif
   return result != 0;
 }
 
