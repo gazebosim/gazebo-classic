@@ -95,7 +95,7 @@ bool Preset::GetParam(const std::string &_key, boost::any &_value) const
 bool Preset::SetParam(const std::string &_key, const boost::any &_value)
 {
   if (_key.empty())
-    return false; 
+    return false;
   this->dataPtr->parameterMap[_key] = _value;
   return true;
 }
