@@ -1,5 +1,11 @@
 ## Gazebo 5.0
 
+### Gazebo 5.x.x
+
+1. Disable failing pr2 test for dart
+    * [Pull request #1540](https://bitbucket.org/osrf/gazebo/pull-request/1540)
+    * [Issue #1435](https://bitbucket.org/osrf/gazebo/issue/1435)
+
 ### Gazebo 5.1.0 (2015-03-20)
 1. Backport pull request #1527 (FindOGRE.cmake for non-Debian systems)
   * [Pull request #1532](https://bitbucket.org/osrf/gazebo/pull-request/1532)
@@ -32,6 +38,8 @@
 
 1. Added Model Msg-to-SDF conversion functions and test.
     * [Pull request #1429](https://bitbucket.org/osrf/gazebo/pull-request/1429)
+
+1. Added Joint Msg-to-SDF conversion functions and test.
     * [Pull request #1419](https://bitbucket.org/osrf/gazebo/pull-request/1419)
 
 1. Added Visual, Material Msg-to-SDF conversion functions and ShaderType to string conversion functions.
