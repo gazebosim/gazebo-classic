@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A diagnostic class
- * Author: Nate Koenig
- * Date: 2 Feb 2011
- */
 
 #ifndef _DIAGNOSTICMANAGER_HH_
 #define _DIAGNOSTICMANAGER_HH_
