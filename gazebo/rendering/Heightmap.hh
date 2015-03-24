@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap geometry
- * Author: Nate Koenig
- * Date: 12 May 2009
- */
 
-#ifndef _HEIGHTMAP_HH_
-#define _HEIGHTMAP_HH_
+#ifndef _GAZEBO_RENDERING_HEIGHTMAP_HH_
+#define _GAZEBO_RENDERING_HEIGHTMAP_HH_
 
 #include <string>
 #include <vector>

@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap geometry
- * Author: Nate Koenig
- * Date: 12 May 2009
- */
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
