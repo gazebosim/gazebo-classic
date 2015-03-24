@@ -66,7 +66,6 @@ if (WIN32)
   target_link_libraries(gazebo_transport ws2_32 Iphlpapi)
 endif()
 
-
 gz_install_library(gazebo_transport)
 gz_install_includes("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport.hh)
 
