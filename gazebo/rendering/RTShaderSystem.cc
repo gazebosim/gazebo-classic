@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sys/stat.h>
 #include <boost/bind.hpp>
 
@@ -94,7 +100,8 @@ void RTShaderSystem::Fini()
   // Finalize RTShader system.
   if (this->shaderGenerator != NULL)
   {
-#if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
+    // On Windows, we're using 1.9RC1, which doesn't have a bunch of changes.
+#if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
     Ogre::RTShader::ShaderGenerator::finalize();
 #else
     Ogre::RTShader::ShaderGenerator::destroy();
@@ -386,7 +393,11 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
           stream << tmpdir << "/gazebo-" << user << "-rtshaderlibcache" << "/";
           cachePath = stream.str();
           // Create the directory
+#ifdef _WIN32
+          if (mkdir(cachePath.c_str()) != 0)
+#else
           if (mkdir(cachePath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) != 0)
+#endif
           {
             if (errno != EEXIST)
             {

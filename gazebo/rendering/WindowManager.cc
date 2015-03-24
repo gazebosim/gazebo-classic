@@ -82,6 +82,8 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
 
 #ifdef Q_OS_MAC
   params["externalWindowHandle"] = _ogreHandle;
+#elif defined(_WIN32)
+  // Something different here?
 #else
   params["parentWindowHandle"] = _ogreHandle;
 #endif

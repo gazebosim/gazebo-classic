@@ -17,6 +17,12 @@
 #ifndef _WINDOWMANAGER_HH_
 #define _WINDOWMANAGER_HH_
 
+#ifdef _WIN32
+  // Oh, yeah, CreateWindow is taken, too.
+  #include <windows.h>
+  #undef CreateWindow
+#endif
+
 #include <string>
 #include <vector>
 
