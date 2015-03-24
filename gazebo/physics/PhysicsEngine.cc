@@ -77,7 +77,7 @@ void PhysicsEngine::ParamsFromSDFElement(sdf::ElementPtr _elem)
     {
       std::string name = temp->Get<std::string>("name");
       std::string type = temp->Get<std::string>("type");
-      std::string value = temp->Get<std::string>("value");
+      std::string value = temp->Get<std::string>();
       if (type == "double")
       {
         double v = std::stod(value);
@@ -94,9 +94,8 @@ void PhysicsEngine::ParamsFromSDFElement(sdf::ElementPtr _elem)
       }
       else if (type == "vector3")
       {
-        /*math::Vector3 v = temp->Get<math::Vector3>();
-        gzdbg << "Setting param: " << name << " to: " << v << std::endl;
-        this->SetParam(name, v);*/
+        math::Vector3 v = temp->Get<math::Vector3>();
+        this->SetParam(name, v);
         // TODO
       }
       else if (type == "bool")
