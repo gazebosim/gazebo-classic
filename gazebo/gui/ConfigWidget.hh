@@ -273,7 +273,7 @@ namespace gazebo
       /// \param[in] _name Name used when creating new widgets.
       /// return Updated widget.
       private: QWidget *Parse(google::protobuf::Message *_msg,
-          bool _update = false, const std::string &_name = "");
+          bool _update = false, const std::string &_name = "", int _level = 0);
 
       /// \brief Parse a vector3 message.
       /// param[in] _msg Input vector3d message.

@@ -43,7 +43,7 @@ void ConfigWidget::Load(const google::protobuf::Message *_msg)
   this->configMsg = _msg->New();
   this->configMsg->CopyFrom(*_msg);
 
-  QWidget *widget = this->Parse(this->configMsg);
+  QWidget *widget = this->Parse(this->configMsg, 0);
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->setAlignment(Qt::AlignTop);
   mainLayout->addWidget(widget);
@@ -397,7 +397,7 @@ std::string ConfigWidget::GetGeometryWidgetValue(const std::string &_name,
 
 /////////////////////////////////////////////////
 QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
-    const std::string &_name)
+    const std::string &_name, int _level)
 {
   std::vector<QWidget *> newWidgets;
 
@@ -731,11 +731,13 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           else
           {
             // parse the message fields recursively
-            QWidget *groupBoxWidget = Parse(valueMsg, _update, scopedName);
+            QWidget *groupBoxWidget =
+                this->Parse(valueMsg, _update, scopedName, _level+1);
             if (groupBoxWidget)
             {
               newFieldWidget = new ConfigChildWidget();
               QVBoxLayout *groupBoxLayout = new QVBoxLayout;
+              groupBoxLayout->setContentsMargins(0, 0, 0, 0);
               groupBoxLayout->addWidget(groupBoxWidget);
               newFieldWidget->setLayout(groupBoxLayout);
               qobject_cast<ConfigChildWidget *>(newFieldWidget)->
@@ -748,7 +750,12 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
             // create a group widget to collapse or expand child widgets
             // (contained in a group box).
             GroupWidget *groupWidget = new GroupWidget;
-            newFieldWidget->setStyleSheet("QGroupBox {border : 0px}");
+            groupWidget->setStyleSheet(
+                "QGroupBox {\
+                    border : 0;\
+                    margin : 0;\
+                    padding : 0;\
+                }");
 
             // Button
             QCheckBox *groupButton = new QCheckBox();
@@ -777,8 +784,18 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
             groupWidget->childWidget = newFieldWidget;
             qobject_cast<ConfigChildWidget *>(newFieldWidget)->groupWidget
                 = groupWidget;
-            newFieldWidget->setContentsMargins(20, 0, 0, 0);
-
+            newFieldWidget->setContentsMargins(0, 0, 0, 0);
+/*
+            if (_level == 0)
+              newFieldWidget->setStyleSheet(
+                  "QWidget{background-color: #777777}");
+            else if (_level == 1)
+              newFieldWidget->setStyleSheet(
+                  "QWidget{background-color: #555555}");
+            else if (_level == 2)
+              newFieldWidget->setStyleSheet(
+                  "QWidget{background-color: #333333}");
+*/
             QVBoxLayout *configGroupLayout = new QVBoxLayout;
             configGroupLayout->setContentsMargins(0, 0, 0, 0);
             configGroupLayout->addWidget(top);
@@ -1045,9 +1062,6 @@ ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key)
   QFrame *top = new QFrame();
   top->setFrameShape(QFrame::HLine);
   top->setLineWidth(2);
-  // QFrame *bottom = new QFrame();
-  // bottom->setFrameShape(QFrame::HLine);
-  // bottom->setLineWidth(2);
 
   // Layout
   QGridLayout *widgetLayout = new QGridLayout;
