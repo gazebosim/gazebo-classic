@@ -62,7 +62,7 @@ namespace gazebo
       /// \brief Set a profile parameter.
       /// \param[in] _key The key of the parameter to change.
       /// \param[in] _value The new value of the parameter.
-      public: void SetParam(const std::string &_key, const boost::any &_value);
+      public: bool SetParam(const std::string &_key, const boost::any &_value);
 
       /// \brief Check if profile parameter is set.
       /// \param[in] _key The profile key to check.

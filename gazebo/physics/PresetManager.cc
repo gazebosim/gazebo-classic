@@ -69,7 +69,7 @@ void Preset::Name(const std::string &_name)
 //////////////////////////////////////////////////
 bool Preset::HasParam(const std::string &_key) const
 {
-  return (this->dataPtr->parameterMap.count(_key) != 0);
+  return (_key.empty() || this->dataPtr->parameterMap.count(_key) != 0);
 }
 
 //////////////////////////////////////////////////
@@ -86,9 +86,12 @@ bool Preset::GetParam(const std::string &_key, boost::any &_value) const
 }
 
 //////////////////////////////////////////////////
-void Preset::SetParam(const std::string &_key, const boost::any &_value)
+bool Preset::SetParam(const std::string &_key, const boost::any &_value)
 {
+  if (_key.empty())
+    return false; 
   this->dataPtr->parameterMap[_key] = _value;
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -197,7 +200,8 @@ bool PresetManager::SetProfileParam(const std::string &_profileName,
     return this->SetCurrentProfileParam(_key, _value);
   }
 
-  if (this->dataPtr->presetProfiles.count(_profileName) == 0)
+  if (_profileName.empty() ||
+      this->dataPtr->presetProfiles.count(_profileName) == 0)
   {
     return false;
   }
@@ -205,7 +209,8 @@ bool PresetManager::SetProfileParam(const std::string &_profileName,
   {
     return false;
   }
-  this->dataPtr->presetProfiles[_profileName].SetParam(_key, _value);
+  if (!this->dataPtr->presetProfiles[_profileName].SetParam(_key, _value))
+    return false;
   return true;
 }
 
@@ -213,7 +218,8 @@ bool PresetManager::SetProfileParam(const std::string &_profileName,
 bool PresetManager::GetProfileParam(const std::string &_name,
     const std::string &_key, boost::any &_value) const
 {
-  if (this->dataPtr->presetProfiles.count(_name) == 0)
+  if (_name.empty() ||
+      this->dataPtr->presetProfiles.count(_name) == 0)
   {
     return false;
   }
@@ -232,7 +238,8 @@ bool PresetManager::SetCurrentProfileParam(const std::string &_key,
   {
     return false;
   }
-  this->CurrentPreset()->SetParam(_key, _value);
+  if (!this->CurrentPreset()->SetParam(_key, _value))
+    return false;
   try
   {
     return this->dataPtr->physicsEngine->SetParam(_key, _value);
@@ -307,7 +314,7 @@ void PresetManager::RemoveProfile(const std::string &_name)
 //////////////////////////////////////////////////
 sdf::ElementPtr PresetManager::ProfileSDF(const std::string &_name) const
 {
-  if (this->dataPtr->presetProfiles.count(_name) == 0)
+  if (_name.empty() || this->dataPtr->presetProfiles.count(_name) == 0)
     return NULL;
 
   this->dataPtr->presetProfiles[_name].SDF(this->ProfileSDF(_name));
@@ -318,7 +325,7 @@ sdf::ElementPtr PresetManager::ProfileSDF(const std::string &_name) const
 void PresetManager::ProfileSDF(const std::string &_name,
     sdf::ElementPtr _sdf)
 {
-  if (this->dataPtr->presetProfiles.count(_name) == 0)
+  if (_name.empty() || this->dataPtr->presetProfiles.count(_name) == 0)
     return;
   this->dataPtr->presetProfiles[_name].SDF(_sdf);
 
