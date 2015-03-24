@@ -447,7 +447,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
             value = 0;
           if (newWidget)
           {
-            configChildWidget = CreateDoubleWidget(name);
+            configChildWidget = CreateDoubleWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateDoubleWidget(configChildWidget, value);
@@ -460,7 +460,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
             value = 0;
           if (newWidget)
           {
-            configChildWidget = CreateDoubleWidget(name);
+            configChildWidget = CreateDoubleWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateDoubleWidget(configChildWidget, value);
@@ -471,7 +471,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           int64_t value = ref->GetInt64(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateIntWidget(name);
+            configChildWidget = CreateIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateIntWidget(configChildWidget, value);
@@ -482,7 +482,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           uint64_t value = ref->GetUInt64(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateUIntWidget(name);
+            configChildWidget = CreateUIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateUIntWidget(configChildWidget, value);
@@ -493,7 +493,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           int32_t value = ref->GetInt32(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateIntWidget(name);
+            configChildWidget = CreateIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateIntWidget(configChildWidget, value);
@@ -504,7 +504,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           uint32_t value = ref->GetUInt32(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateUIntWidget(name);
+            configChildWidget = CreateUIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateUIntWidget(configChildWidget, value);
@@ -515,7 +515,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           bool value = ref->GetBool(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateBoolWidget(name);
+            configChildWidget = CreateBoolWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateBoolWidget(configChildWidget, value);
@@ -526,7 +526,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           std::string value = ref->GetString(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateStringWidget(name);
+            configChildWidget = CreateStringWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateStringWidget(configChildWidget, value);
@@ -542,7 +542,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           {
             if (newWidget)
             {
-              configChildWidget = this->CreateGeometryWidget(name);
+              configChildWidget = this->CreateGeometryWidget(name, _level);
               newFieldWidget = configChildWidget;
             }
 
@@ -636,7 +636,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           {
             if (newWidget)
             {
-              configChildWidget = this->CreatePoseWidget(name);
+              configChildWidget = this->CreatePoseWidget(name, _level);
               newFieldWidget = configChildWidget;
             }
 
@@ -690,7 +690,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           {
             if (newWidget)
             {
-              configChildWidget = this->CreateVector3dWidget(name);
+              configChildWidget = this->CreateVector3dWidget(name, _level);
               newFieldWidget = configChildWidget;
             }
 
@@ -702,7 +702,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           {
             if (newWidget)
             {
-              configChildWidget = this->CreateColorWidget(name);
+              configChildWidget = this->CreateColorWidget(name, _level);
               newFieldWidget = configChildWidget;
             }
 
@@ -758,53 +758,61 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
                 }");
 
             // Button
+            QLabel *buttonLabel = new QLabel(
+                tr(this->GetHumanReadableString(name).c_str()));
+            buttonLabel->setToolTip(tr(name.c_str()));
+
             QCheckBox *groupButton = new QCheckBox();
             groupButton->setChecked(true);
-            groupButton->setText(
-                tr(this->GetHumanReadableString(name).c_str()));
-            groupButton->setToolTip(tr(name.c_str()));
             groupButton->setStyleSheet(
-                "QCheckBox {\
-                   color: #d0d0d0;\
-                   font: bold;\
-                 }\
-                 QCheckBox::indicator::unchecked {\
+                 "QCheckBox::indicator::unchecked {\
                    image: url(:/images/right_arrow.png);\
                  }\
                  QCheckBox::indicator::checked {\
                    image: url(:/images/down_arrow.png);\
                  }");
 
-            // Borders
-            QFrame *top = new QFrame();
-            top->setFrameShape(QFrame::HLine);
-            top->setLineWidth(2);
+            QHBoxLayout *buttonLayout = new QHBoxLayout();
+            buttonLayout->addItem(new QSpacerItem(20*_level, 1,
+                QSizePolicy::Fixed, QSizePolicy::Fixed));
+            buttonLayout->addWidget(buttonLabel);
+            buttonLayout->addWidget(groupButton);
+
+            buttonLayout->setAlignment(groupButton, Qt::AlignRight);
+
+            QFrame *buttonFrame = new QFrame();
+            buttonFrame->setFrameStyle(QFrame::Box);
+            buttonFrame->setLayout(buttonLayout);
 
             // set the child widget so it can be toggled
             groupWidget->childWidget = newFieldWidget;
             qobject_cast<ConfigChildWidget *>(newFieldWidget)->groupWidget
                 = groupWidget;
             newFieldWidget->setContentsMargins(0, 0, 0, 0);
-/*
+
+            // Set color for children
             if (_level == 0)
               newFieldWidget->setStyleSheet(
-                  "QWidget{background-color: #777777}");
+                  "QWidget{background-color: #666666}");
             else if (_level == 1)
               newFieldWidget->setStyleSheet(
-                  "QWidget{background-color: #555555}");
+                  "QWidget{background-color: #444444}");
             else if (_level == 2)
               newFieldWidget->setStyleSheet(
-                  "QWidget{background-color: #333333}");
-*/
-            QVBoxLayout *configGroupLayout = new QVBoxLayout;
+                  "QWidget{background-color: #222222}");
+
+            QGridLayout *configGroupLayout = new QGridLayout;
             configGroupLayout->setContentsMargins(0, 0, 0, 0);
-            configGroupLayout->addWidget(top);
-            configGroupLayout->addWidget(groupButton);
-            configGroupLayout->addWidget(newFieldWidget);
+            configGroupLayout->setSpacing(0);
+            configGroupLayout->addWidget(buttonFrame, 0, 0);
+            configGroupLayout->addWidget(newFieldWidget, 1, 0);
             groupWidget->setLayout(configGroupLayout);
 
             connect(groupButton, SIGNAL(toggled(bool)), groupWidget,
                 SLOT(Toggle(bool)));
+
+            // Start collapsed
+           // groupButton->toggle();
 
             // reset new field widget pointer in order for it to be added
             // to the parent widget
@@ -823,9 +831,6 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
       }
       if (newWidget && newFieldWidget)
       {
-        newFieldWidget->setSizePolicy(QSizePolicy::Preferred,
-            QSizePolicy::Fixed);
-
         newWidgets.push_back(newFieldWidget);
 
         // store the newly created widget in a map with a unique scoped name.
@@ -858,9 +863,10 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
     }
 
     widgetLayout->setContentsMargins(0, 0, 0, 0);
+    widgetLayout->setSpacing(0);
     widgetLayout->setAlignment(Qt::AlignTop);
     widget->setLayout(widgetLayout);
-    widget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+    //widget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
     return widget;
   }
   return NULL;
@@ -886,7 +892,8 @@ math::Vector3 ConfigWidget::ParseVector3(const google::protobuf::Message *_msg)
 }
 
 /////////////////////////////////////////////////
-ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key)
+ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key,
+    int _level)
 {
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableString(_key).c_str()));
@@ -897,21 +904,18 @@ ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key)
   valueSpinBox->setRange(0, 1e8);
   valueSpinBox->setAlignment(Qt::AlignRight);
 
-  // Borders
-  QFrame *top = new QFrame();
-  top->setFrameShape(QFrame::HLine);
-  top->setLineWidth(2);
-
   // Layout
-  QGridLayout *widgetLayout = new QGridLayout;
-  widgetLayout->setContentsMargins(0, 0, 0, 0);
-  widgetLayout->addWidget(top, 0, 0, 1, 2);
-  widgetLayout->addWidget(keyLabel, 1, 0);
-  widgetLayout->addWidget(valueSpinBox, 1, 1);
+  QHBoxLayout *widgetLayout = new QHBoxLayout;
+  if (_level != 0)
+    widgetLayout->addItem(new QSpacerItem(20*_level, 1,
+        QSizePolicy::Fixed, QSizePolicy::Fixed));
+  widgetLayout->addWidget(keyLabel);
+  widgetLayout->addWidget(valueSpinBox);
 
   // ChildWidget
   ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
+  widget->setFrameStyle(QFrame::Box);
 
   widget->widgets.push_back(valueSpinBox);
 
@@ -919,7 +923,8 @@ ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key)
 }
 
 /////////////////////////////////////////////////
-ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key)
+ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key,
+    int _level)
 {
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableString(_key).c_str()));
@@ -930,21 +935,18 @@ ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key)
   valueSpinBox->setRange(-1e8, 1e8);
   valueSpinBox->setAlignment(Qt::AlignRight);
 
-  // Borders
-  QFrame *top = new QFrame();
-  top->setFrameShape(QFrame::HLine);
-  top->setLineWidth(2);
-
   // Layout
-  QGridLayout *widgetLayout = new QGridLayout;
-  widgetLayout->setContentsMargins(0, 0, 0, 0);
-  widgetLayout->addWidget(top, 0, 0, 1, 2);
-  widgetLayout->addWidget(keyLabel, 1, 0);
-  widgetLayout->addWidget(valueSpinBox, 1, 1);
+  QHBoxLayout *widgetLayout = new QHBoxLayout;
+  if (_level != 0)
+    widgetLayout->addItem(new QSpacerItem(20*_level, 1,
+        QSizePolicy::Fixed, QSizePolicy::Fixed));
+  widgetLayout->addWidget(keyLabel);
+  widgetLayout->addWidget(valueSpinBox);
 
   // ChildWidget
   ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
+  widget->setFrameStyle(QFrame::Box);
 
   widget->widgets.push_back(valueSpinBox);
 
@@ -952,7 +954,8 @@ ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key)
 }
 
 /////////////////////////////////////////////////
-ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key)
+ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
+    int _level)
 {
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableString(_key).c_str()));
@@ -980,35 +983,29 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key)
            _key == "iyy" || _key == "iyz" || _key == "izz")
     unit->setText(tr("Kg&middot;m<sup>2</sup>"));
 
-  // Borders
-  QFrame *top = new QFrame();
-  top->setFrameShape(QFrame::HLine);
-  top->setLineWidth(2);
-
   // Layout
-  QGridLayout *widgetLayout = new QGridLayout;
-  widgetLayout->setContentsMargins(0, 0, 0, 0);
-  widgetLayout->addWidget(keyLabel, 1, 0);
-  widgetLayout->addWidget(valueSpinBox, 1, 1);
+  QHBoxLayout *widgetLayout = new QHBoxLayout;
+  if (_level != 0)
+    widgetLayout->addItem(new QSpacerItem(20*_level, 1,
+        QSizePolicy::Fixed, QSizePolicy::Fixed));
+  widgetLayout->addWidget(keyLabel);
+  widgetLayout->addWidget(valueSpinBox);
   if (unit->text() != "")
-  {
-    widgetLayout->addWidget(top, 0, 0, 1, 3);
-    widgetLayout->addWidget(unit, 1, 2);
-  }
-  else
-  {
-    widgetLayout->addWidget(top, 0, 0, 1, 2);
-  }
+    widgetLayout->addWidget(unit);
 
   // ChildWidget
   ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
+  widget->setFrameStyle(QFrame::Box);
+
   widget->widgets.push_back(valueSpinBox);
+
   return widget;
 }
 
 /////////////////////////////////////////////////
-ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key)
+ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
+    int _level)
 {
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableString(_key).c_str()));
@@ -1016,30 +1013,28 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key)
 
   // LineEdit
   QLineEdit *valueLineEdit = new QLineEdit;
-  valueLineEdit->setSizePolicy(QSizePolicy::Minimum,
-      QSizePolicy::Fixed);
-
-  // Borders
-  QFrame *top = new QFrame();
-  top->setFrameShape(QFrame::HLine);
-  top->setLineWidth(2);
 
   // Layout
-  QGridLayout *widgetLayout = new QGridLayout;
-  widgetLayout->setContentsMargins(0, 0, 0, 0);
-  widgetLayout->addWidget(top, 0, 0, 1, 2);
-  widgetLayout->addWidget(keyLabel, 1, 0);
-  widgetLayout->addWidget(valueLineEdit, 1, 1);
+  QHBoxLayout *widgetLayout = new QHBoxLayout;
+  if (_level != 0)
+    widgetLayout->addItem(new QSpacerItem(20*_level, 1,
+        QSizePolicy::Fixed, QSizePolicy::Fixed));
+  widgetLayout->addWidget(keyLabel);
+  widgetLayout->addWidget(valueLineEdit);
 
   // ChildWidget
   ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
+  widget->setFrameStyle(QFrame::Box);
+
   widget->widgets.push_back(valueLineEdit);
+
   return widget;
 }
 
 /////////////////////////////////////////////////
-ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key)
+ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key,
+    int _level)
 {
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableString(_key).c_str()));
@@ -1058,29 +1053,29 @@ ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key)
   buttonLayout->addWidget(valueTrueRadioButton);
   buttonLayout->addWidget(valueFalseRadioButton);
 
-  // Borders
-  QFrame *top = new QFrame();
-  top->setFrameShape(QFrame::HLine);
-  top->setLineWidth(2);
-
   // Layout
-  QGridLayout *widgetLayout = new QGridLayout;
-  widgetLayout->setContentsMargins(0, 0, 0, 0);
-  widgetLayout->addWidget(top, 0, 0, 1, 2);
-  widgetLayout->addWidget(keyLabel, 1, 0);
-  widgetLayout->addLayout(buttonLayout, 1, 1);
+  QHBoxLayout *widgetLayout = new QHBoxLayout;
+  if (_level != 0)
+    widgetLayout->addItem(new QSpacerItem(20*_level, 1,
+        QSizePolicy::Fixed, QSizePolicy::Fixed));
+  widgetLayout->addWidget(keyLabel);
+  widgetLayout->addLayout(buttonLayout);
 
   // ChildWidget
   ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
+  widget->setFrameStyle(QFrame::Box);
+
   widget->widgets.push_back(valueTrueRadioButton);
   widget->widgets.push_back(valueFalseRadioButton);
+
   return widget;
 }
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
-    const std::string &/*_key*/)
+    const std::string &/*_key*/,
+    int _level)
 {
   // Labels
   QLabel *vecXLabel = new QLabel(tr("X"));
@@ -1109,20 +1104,19 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   vecZSpinBox->setAlignment(Qt::AlignRight);
   vecZSpinBox->setMaximumWidth(100);
 
-  // Borders
-  QFrame *top = new QFrame();
-  top->setFrameShape(QFrame::HLine);
-  top->setLineWidth(2);
+  // Why?
+  int level = _level + 1;
 
   // Layout
-  QGridLayout *widgetLayout = new QGridLayout;
-  widgetLayout->addWidget(top, 0, 0, 1, 6);
-  widgetLayout->addWidget(vecXLabel, 1, 0);
-  widgetLayout->addWidget(vecXSpinBox, 1, 1);
-  widgetLayout->addWidget(vecYLabel, 1, 2);
-  widgetLayout->addWidget(vecYSpinBox, 1, 3);
-  widgetLayout->addWidget(vecZLabel, 1, 4);
-  widgetLayout->addWidget(vecZSpinBox, 1, 5);
+  QHBoxLayout *widgetLayout = new QHBoxLayout;
+  widgetLayout->addItem(new QSpacerItem(20*level, 1,
+      QSizePolicy::Fixed, QSizePolicy::Fixed));
+  widgetLayout->addWidget(vecXLabel);
+  widgetLayout->addWidget(vecXSpinBox);
+  widgetLayout->addWidget(vecYLabel);
+  widgetLayout->addWidget(vecYSpinBox);
+  widgetLayout->addWidget(vecZLabel);
+  widgetLayout->addWidget(vecZSpinBox);
 
   widgetLayout->setAlignment(vecXLabel, Qt::AlignRight);
   widgetLayout->setAlignment(vecYLabel, Qt::AlignRight);
@@ -1131,7 +1125,7 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   // ChildWidget
   ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
-  widgetLayout->setContentsMargins(0, 0, 0, 0);
+  widget->setFrameStyle(QFrame::Box);
 
   widget->widgets.push_back(vecXSpinBox);
   widget->widgets.push_back(vecYSpinBox);
@@ -1140,7 +1134,8 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
 }
 
 /////////////////////////////////////////////////
-ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &/*_key*/)
+ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &/*_key*/,
+    int _level)
 {
   // Labels
   QLabel *colorRLabel = new QLabel(tr("R"));
@@ -1177,22 +1172,21 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &/*_key*/)
   colorASpinBox->setAlignment(Qt::AlignRight);
   colorASpinBox->setMaximumWidth(10);
 
-  // Borders
-  QFrame *top = new QFrame();
-  top->setFrameShape(QFrame::HLine);
-  top->setLineWidth(2);
+  // Why?
+  int level = _level + 1;
 
   // Layout
-  QGridLayout *widgetLayout = new QGridLayout;
-  widgetLayout->addWidget(top, 0, 0, 1, 8);
-  widgetLayout->addWidget(colorRLabel, 1, 0);
-  widgetLayout->addWidget(colorRSpinBox, 1, 1);
-  widgetLayout->addWidget(colorGLabel, 1, 2);
-  widgetLayout->addWidget(colorGSpinBox, 1, 3);
-  widgetLayout->addWidget(colorBLabel, 1, 4);
-  widgetLayout->addWidget(colorBSpinBox, 1, 5);
-  widgetLayout->addWidget(colorALabel, 1, 6);
-  widgetLayout->addWidget(colorASpinBox, 1, 7);
+  QHBoxLayout *widgetLayout = new QHBoxLayout;
+  widgetLayout->addItem(new QSpacerItem(20*level, 1,
+      QSizePolicy::Fixed, QSizePolicy::Fixed));
+  widgetLayout->addWidget(colorRLabel);
+  widgetLayout->addWidget(colorRSpinBox);
+  widgetLayout->addWidget(colorGLabel);
+  widgetLayout->addWidget(colorGSpinBox);
+  widgetLayout->addWidget(colorBLabel);
+  widgetLayout->addWidget(colorBSpinBox);
+  widgetLayout->addWidget(colorALabel);
+  widgetLayout->addWidget(colorASpinBox);
 
   widgetLayout->setAlignment(colorRLabel, Qt::AlignRight);
   widgetLayout->setAlignment(colorGLabel, Qt::AlignRight);
@@ -1202,7 +1196,7 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &/*_key*/)
   // ChildWidget
   ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
-  widgetLayout->setContentsMargins(0, 0, 0, 0);
+  widget->setFrameStyle(QFrame::Box);
 
   widget->widgets.push_back(colorRSpinBox);
   widget->widgets.push_back(colorGSpinBox);
@@ -1213,7 +1207,8 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &/*_key*/)
 }
 
 /////////////////////////////////////////////////
-ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/)
+ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
+    int _level)
 {
   // Labels
   std::vector<std::string> elements;
@@ -1224,20 +1219,19 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/)
   elements.push_back("Pitch");
   elements.push_back("Yaw");
 
-  // Borders
-  QFrame *top = new QFrame();
-  top->setFrameShape(QFrame::HLine);
-  top->setLineWidth(2);
+  // Why?
+  int level = _level+1;
 
   // Layout
-  QGridLayout *poseGroupLayout = new QGridLayout;
-  poseGroupLayout->setColumnStretch(3, 1);
-  poseGroupLayout->setContentsMargins(0, 0, 0, 0);
-  poseGroupLayout->addWidget(top, 0, 0, 1, 7);
+  QGridLayout *widgetLayout = new QGridLayout;
+  widgetLayout->setColumnStretch(4, 1);
+  widgetLayout->addItem(new QSpacerItem(20*level, 1, QSizePolicy::Fixed,
+      QSizePolicy::Fixed), 0, 0);
 
   // ChildWidget
   ConfigChildWidget *widget = new ConfigChildWidget();
-  widget->setLayout(poseGroupLayout);
+  widget->setLayout(widgetLayout);
+  widget->setFrameStyle(QFrame::Box);
 
   for (unsigned int i = 0; i < elements.size(); ++i)
   {
@@ -1257,13 +1251,13 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/)
     else
       unitLabel->setText(tr("rad"));
 
-    poseGroupLayout->addWidget(label, i%3+1, std::floor(i/3)*3+1);
-    poseGroupLayout->addWidget(spin, i%3+1, std::floor(i/3)*3+2);
-    poseGroupLayout->addWidget(unitLabel, i%3+1, std::floor(i/3)*3+3);
+    widgetLayout->addWidget(label, i%3, std::floor(i/3)*3+1);
+    widgetLayout->addWidget(spin, i%3, std::floor(i/3)*3+2);
+    widgetLayout->addWidget(unitLabel, i%3, std::floor(i/3)*3+3);
 
-    poseGroupLayout->setAlignment(label, Qt::AlignLeft);
-    poseGroupLayout->setAlignment(spin, Qt::AlignLeft);
-    poseGroupLayout->setAlignment(unitLabel, Qt::AlignLeft);
+    widgetLayout->setAlignment(label, Qt::AlignLeft);
+    widgetLayout->setAlignment(spin, Qt::AlignLeft);
+    widgetLayout->setAlignment(unitLabel, Qt::AlignLeft);
   }
 
   return widget;
@@ -1271,7 +1265,8 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/)
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
-    const std::string &/*_key*/)
+    const std::string &/*_key*/,
+    int _level)
 {
   // Geometry ComboBox
   QLabel *geometryLabel = new QLabel(tr("Geometry"));
@@ -1392,20 +1387,20 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomDimensionWidget->setSizePolicy(
       QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-  // Borders
-  QFrame *top = new QFrame();
-  top->setFrameShape(QFrame::HLine);
-  top->setLineWidth(2);
+  // Why?
+  int level = _level + 1;
 
   // Layout
   QGridLayout *widgetLayout = new QGridLayout;
-  widgetLayout->addWidget(top, 0, 0, 1, 3);
-  widgetLayout->addWidget(geometryLabel, 1, 0);
-  widgetLayout->addWidget(geometryComboBox, 1, 1, 1, 2);
-  widgetLayout->addWidget(geomDimensionWidget, 2, 0, 1, 3);
+  widgetLayout->addItem(new QSpacerItem(20*level, 1,
+      QSizePolicy::Fixed, QSizePolicy::Fixed), 0, 0);
+  widgetLayout->addWidget(geometryLabel, 0, 1);
+  widgetLayout->addWidget(geometryComboBox, 0, 2, 1, 2);
+  widgetLayout->addWidget(geomDimensionWidget, 2, 1, 1, 3);
 
   // ChildWidget
   GeometryConfigWidget *widget = new GeometryConfigWidget;
+  widget->setFrameStyle(QFrame::Box);
   widget->geomDimensionWidget = geomDimensionWidget;
   widget->geomLengthSpinBox = geomLengthSpinBox;
   widget->geomLengthLabel = geomLengthLabel;
@@ -1422,9 +1417,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
       widget, SLOT(GeometryChanged(const QString)));
   connect(geomFilenameButton, SIGNAL(clicked()), widget, SLOT(OnSelectFile()));
 
-  widgetLayout->setContentsMargins(0, 0, 0, 0);
   widget->setLayout(widgetLayout);
-
   widget->widgets.push_back(geometryComboBox);
   widget->widgets.push_back(geomSizeXSpinBox);
   widget->widgets.push_back(geomSizeYSpinBox);

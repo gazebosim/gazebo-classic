@@ -48,7 +48,7 @@ namespace gazebo
     /// \class ConfigChildWidget ConfigWidget.hh
     /// \brief A convenience widget that also holds pointers to a list of its
     /// child widgets
-    class GAZEBO_VISIBLE ConfigChildWidget : public QWidget
+    class GAZEBO_VISIBLE ConfigChildWidget : public QFrame
     {
       Q_OBJECT
 
@@ -296,47 +296,59 @@ namespace gazebo
       /// \brief Create a widget for configuring an unsigned integer value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \return The newly created widget.
-      private: ConfigChildWidget *CreateUIntWidget(const std::string &_key);
+      private: ConfigChildWidget *CreateUIntWidget(const std::string &_key,
+          int _level);
+
+      /// \brief A label for the length widget.
+      public: QWidget *geomLengthLabel;
 
       /// \brief Create a widget for configuring an integer value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \return The newly created widget.
-      private: ConfigChildWidget *CreateIntWidget(const std::string &_key);
+      private: ConfigChildWidget *CreateIntWidget(const std::string &_key,
+          int _level);
 
       /// \brief Create a widget for configuring a double value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \return The newly created widget.
-      private: ConfigChildWidget *CreateDoubleWidget(const std::string &_key);
+      private: ConfigChildWidget *CreateDoubleWidget(const std::string &_key,
+          int _level);
 
       /// \brief Create a widget for configuring a string value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \return The newly created widget.
-      private: ConfigChildWidget *CreateStringWidget(const std::string &_key);
+      private: ConfigChildWidget *CreateStringWidget(const std::string &_key,
+          int _level);
 
       /// \brief Create a widget for configuring a bool value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \return The newly created widget.
-      private: ConfigChildWidget *CreateBoolWidget(const std::string &_key);
+      private: ConfigChildWidget *CreateBoolWidget(const std::string &_key,
+          int _level);
 
       /// \brief Create a widget for configuring a vector3 value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \return The newly created widget.
-      private: ConfigChildWidget *CreateVector3dWidget(const std::string &_key);
+      private: ConfigChildWidget *CreateVector3dWidget(const std::string &_key,
+          int _level);
 
       /// \brief Create a widget for configuring a color value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \return The newly created widget.
-      private: ConfigChildWidget *CreateColorWidget(const std::string &_key);
+      private: ConfigChildWidget *CreateColorWidget(const std::string &_key,
+          int _level);
 
       /// \brief Create a widget for configuring a pose value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \return The newly created widget.
-      private: ConfigChildWidget *CreatePoseWidget(const std::string &_key);
+      private: ConfigChildWidget *CreatePoseWidget(const std::string &_key,
+          int _level);
 
       /// \brief Create a widget for configuring a geometry value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \return The newly created widget.
-      private: ConfigChildWidget *CreateGeometryWidget(const std::string &_key);
+      private: ConfigChildWidget *CreateGeometryWidget(const std::string &_key,
+          int _level);
 
       /// \brief Update a child widget with an unsigned integer value.
       /// \param[in] _widget Pointer to the child widget.
