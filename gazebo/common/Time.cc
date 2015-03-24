@@ -21,6 +21,7 @@
 
 #ifdef _WIN32
   #include <Windows.h>
+  #include <Time.h>
   struct timespec
   {
     long tv_sec;
@@ -177,9 +178,9 @@ const Time &Time::GetWallTime()
       // why did they choose 1601 as the time zero, instead of 1970?
       // there were no outstanding hard rock bands in 1601.
 #ifdef _MSC_VER
-  	start_li.QuadPart -= 116444736000000000Ui64;
+    start_li.QuadPart -= 116444736000000000Ui64;
 #else
-  	start_li.QuadPart -= 116444736000000000ULL;
+    start_li.QuadPart -= 116444736000000000ULL;
 #endif
       start_sec = (uint32_t)(start_li.QuadPart / 10000000); // 100-ns units. odd.
       start_nsec = (start_li.LowPart % 10000000) * 100;
@@ -294,18 +295,18 @@ Time Time::Sleep(const common::Time &_time)
     sleepTime.QuadPart = -
       static_cast<int64_t>(interval.tv_sec)*10000000LL -
       static_cast<int64_t>(interval.tv_nsec) / 100LL;
-  
+
     timer = CreateWaitableTimer(NULL, TRUE, NULL);
     if (timer == NULL)
       {
         //return -1;
       }
-  
+
     if (!SetWaitableTimer (timer, &sleepTime, 0, NULL, NULL, 0))
       {
         //return -1;
       }
-  
+
     if (WaitForSingleObject (timer, INFINITE) != WAIT_OBJECT_0)
       {
         //return -1;
