@@ -21,7 +21,7 @@
 #include <boost/any.hpp>
 #include <string>
 #include <vector>
-#include <sdf>
+#include <sdf/sdf.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 
