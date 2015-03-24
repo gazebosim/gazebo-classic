@@ -148,7 +148,7 @@ namespace gazebo
 
       /// \brief Create a new profile.
       /// \param[in] _name The name of the new profile.
-      public: void CreateProfile(const std::string &_name);
+      public: bool CreateProfile(const std::string &_name);
 
       /// \brief Create a new profile from SDF. SDF determines the profile name
       /// \param[in] _sdf Pointer to a physics SDF element.

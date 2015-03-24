@@ -69,8 +69,7 @@ void Preset::Name(const std::string &_name)
 //////////////////////////////////////////////////
 bool Preset::HasParam(const std::string &_key) const
 {
-  return (this->dataPtr->parameterMap.find(_key) !=
-      this->dataPtr->parameterMap.end());
+  return (this->dataPtr->parameterMap.count(_key) != 0);
 }
 
 //////////////////////////////////////////////////
@@ -152,11 +151,10 @@ bool PresetManager::CurrentProfile(const std::string &_name)
   if (_name == this->CurrentProfile())
     return true;
 
-  if (_name.size() <= 0)
+  if (_name.empty())
     return false;
 
-  if (this->dataPtr->presetProfiles.find(_name) ==
-      this->dataPtr->presetProfiles.end())
+  if (this->dataPtr->presetProfiles.count(_name) == 0)
   {
     gzwarn << "Profile [" << _name << "] not found." << std::endl;
     return false;
@@ -199,8 +197,7 @@ bool PresetManager::SetProfileParam(const std::string &_profileName,
     return this->SetCurrentProfileParam(_key, _value);
   }
 
-  if (this->dataPtr->presetProfiles.find(_profileName) ==
-      this->dataPtr->presetProfiles.end())
+  if (this->dataPtr->presetProfiles.count(_profileName) == 0)
   {
     return false;
   }
@@ -216,8 +213,7 @@ bool PresetManager::SetProfileParam(const std::string &_profileName,
 bool PresetManager::GetProfileParam(const std::string &_name,
     const std::string &_key, boost::any &_value) const
 {
-  if (this->dataPtr->presetProfiles.find(_name) ==
-      this->dataPtr->presetProfiles.end())
+  if (this->dataPtr->presetProfiles.count(_name) == 0)
   {
     return false;
   }
@@ -261,21 +257,21 @@ bool PresetManager::GetCurrentProfileParam(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-void PresetManager::CreateProfile(const std::string &_name)
+bool PresetManager::CreateProfile(const std::string &_name)
 {
   if (_name.empty())
   {
     gzwarn << "Specified profile name was invalid. Aborting." << std::endl;
-    return;
+    return false;
   }
-  if (this->dataPtr->presetProfiles.find(_name) !=
-      this->dataPtr->presetProfiles.end())
+  if (this->dataPtr->presetProfiles.count(_name) != 0)
   {
     gzwarn << "Warning: profile [" << _name << "] already exists! Overwriting."
            << std::endl;
   }
 
   this->dataPtr->presetProfiles[_name] = Preset(_name);
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -289,7 +285,9 @@ std::string PresetManager::CreateProfile(sdf::ElementPtr _elem)
   if (name.empty())
     return "";
 
-  this->CreateProfile(name);
+  if (!this->CreateProfile(name))
+    return "";
+
   this->ProfileSDF(name, _elem);
   return name;
 }
@@ -309,8 +307,7 @@ void PresetManager::RemoveProfile(const std::string &_name)
 //////////////////////////////////////////////////
 sdf::ElementPtr PresetManager::ProfileSDF(const std::string &_name) const
 {
-  if (this->dataPtr->presetProfiles.find(_name) ==
-      this->dataPtr->presetProfiles.end())
+  if (this->dataPtr->presetProfiles.count(_name) == 0)
     return NULL;
 
   this->dataPtr->presetProfiles[_name].SDF(this->ProfileSDF(_name));
@@ -321,8 +318,7 @@ sdf::ElementPtr PresetManager::ProfileSDF(const std::string &_name) const
 void PresetManager::ProfileSDF(const std::string &_name,
     sdf::ElementPtr _sdf)
 {
-  if (this->dataPtr->presetProfiles.find(_name) ==
-      this->dataPtr->presetProfiles.end())
+  if (this->dataPtr->presetProfiles.count(_name) == 0)
     return;
   this->dataPtr->presetProfiles[_name].SDF(_sdf);
 
