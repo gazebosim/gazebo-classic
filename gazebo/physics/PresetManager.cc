@@ -107,7 +107,8 @@ void Preset::SDF(sdf::ElementPtr _sdfElement)
 
 //////////////////////////////////////////////////
 PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
-    sdf::ElementPtr _sdf) : dataPtr(new PresetManagerPrivate)
+    sdf::ElementPtr _sdf)
+    : dataPtr(new PresetManagerPrivate)
 {
   this->dataPtr->physicsEngine = _physicsEngine;
 
