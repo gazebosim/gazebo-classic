@@ -973,7 +973,7 @@ GzTerrainMatGen::~GzTerrainMatGen()
 GzTerrainMatGen::SM2Profile::SM2Profile(
     Ogre::TerrainMaterialGenerator *_parent, const Ogre::String &_name,
     const Ogre::String &_desc)
-: TerrainMaterialGeneratorA::SM2Profile::SM2Profile(_parent, _name, _desc)
+: TerrainMaterialGeneratorA::SM2Profile(_parent, _name, _desc)
 {
   this->mShaderGen = NULL;
 }
