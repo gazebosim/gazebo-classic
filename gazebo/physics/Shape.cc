@@ -14,6 +14,14 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <boost/thread/recursive_mutex.hpp>
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
 

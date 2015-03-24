@@ -31,16 +31,17 @@ GZ_PHYSICS_VISIBLE
 void RegisterODEPhysics();
 
 #ifdef HAVE_SIMBODY
-GZ_PHYSICS_VISIBLE
-void RegisterSimbodyPhysics();
+  GZ_PHYSICS_VISIBLE
+  void RegisterSimbodyPhysics();
 #endif
 
 #ifdef HAVE_BULLET
-GZ_PHYSICS_VISIBLE
-void RegisterBulletPhysics();
+  GZ_PHYSICS_VISIBLE
+  void RegisterBulletPhysics();
 #endif
 
 #ifdef HAVE_DART
+  GZ_PHYSICS_VISIBLE
   void RegisterDARTPhysics();
 #endif
 
