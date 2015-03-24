@@ -533,7 +533,7 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
     this->firstPassViewports[_index]->setShadowsEnabled(false);
     this->firstPassViewports[_index]->setSkiesEnabled(false);
     this->firstPassViewports[_index]->setBackgroundColour(
-        Ogre::ColourValue(this->far, 0.0, 1.0));
+        Ogre::ColourValue(this->farClip, 0.0, 1.0));
     this->firstPassViewports[_index]->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   }
@@ -793,25 +793,25 @@ void GpuLaser::SetCosVertFOV(double _cvfov)
 //////////////////////////////////////////////////
 double GpuLaser::GetNearClip() const
 {
-  return this->near;
+  return this->nearClip;
 }
 
 //////////////////////////////////////////////////
 double GpuLaser::GetFarClip() const
 {
-  return this->far;
+  return this->farClip;
 }
 
 //////////////////////////////////////////////////
 void GpuLaser::SetNearClip(double _near)
 {
-  this->near = _near;
+  this->nearClip = _near;
 }
 
 //////////////////////////////////////////////////
 void GpuLaser::SetFarClip(double _far)
 {
-  this->far = _far;
+  this->farClip = _far;
 }
 
 //////////////////////////////////////////////////
