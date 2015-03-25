@@ -58,6 +58,8 @@ bool Preset::SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine) const
   {
     if (!_physicsEngine->SetParam(param.first, param.second))
     {
+      gzerr << "Couldn't set parameter [" << param.first
+            << " in physics engine" << std::endl;
       result = false;
     }
   }
