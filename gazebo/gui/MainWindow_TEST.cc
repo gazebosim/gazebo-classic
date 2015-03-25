@@ -254,6 +254,14 @@ void MainWindow_TEST::CopyPaste()
     }
     QVERIFY(modelVis->GetHighlighted());
 
+    // Process some events, and draw the screen
+    for (unsigned int i = 0; i < 10; ++i)
+    {
+      gazebo::common::Time::MSleep(30);
+      QCoreApplication::processEvents();
+      mainWindow->repaint();
+    }
+
     // Copy the model
     QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier);
     QTest::qWait(500);
@@ -265,13 +273,11 @@ void MainWindow_TEST::CopyPaste()
 
     // Paste the model
     QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier);
-    QTest::qWait(1000);
+    QTest::qWait(500);
 
     // Release and spawn the model
     QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
     QTest::qWait(500);
-
-    QCoreApplication::processEvents();
 
     // Verify there is a clone of the model
     gazebo::rendering::VisualPtr modelVisClone;

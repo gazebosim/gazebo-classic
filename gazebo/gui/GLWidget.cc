@@ -176,6 +176,9 @@ GLWidget::~GLWidget()
   ModelSnap::Instance()->Clear();
   ModelAlign::Instance()->Clear();
 
+  if (this->userCamera)
+    this->userCamera->Fini();
+
   this->userCamera.reset();
   this->scene.reset();
 }
