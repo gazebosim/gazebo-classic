@@ -109,7 +109,7 @@ namespace gazebo
 
     /// \def  PresetManagerPtr
     /// \brief Shared pointer to a PresetManager object
-    typedef std::shared_ptr<PresetManager> PresetManagerPtr;
+    typedef boost::shared_ptr<PresetManager> PresetManagerPtr;
 
     /// \def ShapePtr
     /// \brief Boost shared pointer to a Shape object
