@@ -1,29 +1,19 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs Messages
-/// \interface NamedParam
-/// \brief A union type message for physics engine parameters
+/// \interface Param
+/// \brief A key/value pair message for physics engine parameters
 
-import "int.proto";
-import "vector3d.proto";
+import "any.proto";
 
 message Param
 {
-  /*enum Type {DOUBLE_TYPE = 1; INT_TYPE = 2; STRING_TYPE = 3; VECTOR3D_TYPE = 4;
-             BOOL_TYPE = 5; FLOAT_TYPE = 6;}*/
 
   required string  name    = 1;
 
   // Contains the field that is filled in
   //optional Type  type   = 2;
-
-  optional double   double_value = 3;
-  optional int32    int_value    = 4;
-  optional string   string_value = 5;
-  optional Vector3d vector3d     = 6;
-  optional bool     bool_value   = 7;
-  optional float    float_value  = 8;
-
+  required Any value = 2;
   /// For nested parameters (e.g. solver)
-  repeated Param children   = 9;
+  repeated Param children   = 3;
 }

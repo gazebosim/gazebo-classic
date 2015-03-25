@@ -1,6 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (msgs
+  any.proto
   axis.proto
   boxgeom.proto
   camerasensor.proto

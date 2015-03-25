@@ -92,7 +92,7 @@ namespace gazebo
     {
       msgs::Param param;
       param.set_name(_key);
-      param.set_double_value(_value);
+      param.mutable_value()->set_double_value(_value);
       return param;
     }
 
@@ -101,7 +101,7 @@ namespace gazebo
     {
       msgs::Param param;
       param.set_name(_key);
-      param.set_int_value(_value);
+      param.mutable_value()->set_int_value(_value);
       return param;
     }
 
@@ -110,7 +110,7 @@ namespace gazebo
     {
       msgs::Param param;
       param.set_name(_key);
-      param.set_string_value(_value);
+      param.mutable_value()->set_string_value(_value);
       return param;
     }
 
@@ -119,7 +119,7 @@ namespace gazebo
     {
       msgs::Param param;
       param.set_name(_key);
-      msgs::Vector3d *vec = param.mutable_vector3d();
+      msgs::Vector3d *vec = param.mutable_value()->mutable_vector3d();
       *vec = Convert(_value);
       return param;
     }
@@ -129,7 +129,7 @@ namespace gazebo
     {
       msgs::Param param;
       param.set_name(_key);
-      param.set_bool_value(_value);
+      param.mutable_value()->set_bool_value(_value);
       return param;
     }
 
@@ -138,7 +138,7 @@ namespace gazebo
     {
       msgs::Param param;
       param.set_name(_key);
-      param.set_float_value(_value);
+      param.mutable_value()->set_float_value(_value);
       return param;
     }
 
@@ -146,9 +146,9 @@ namespace gazebo
         boost::any &_value)
     {
       const google::protobuf::Reflection *reflection =
-          _msg.GetReflection();
+          _msg.value().GetReflection();
       std::vector<const google::protobuf::FieldDescriptor*> fields;
-      reflection->ListFields(_msg, &fields);
+      reflection->ListFields(_msg.value(), &fields);
       if ((_msg.children_size() > 0 && fields.size() > 3) ||
           (_msg.children_size() == 0 && fields.size() > 2))
       {
@@ -165,24 +165,24 @@ namespace gazebo
         switch (field->cpp_type())
         {
           case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
-            _value = reflection->GetDouble(_msg, field);
+            _value = reflection->GetDouble(_msg.value(), field);
             return true;
           case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
-            _value = reflection->GetInt32(_msg, field);
+            _value = reflection->GetInt32(_msg.value(), field);
             return true;
           case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
-            _value = reflection->GetString(_msg, field);
+            _value = reflection->GetString(_msg.value(), field);
             return true;
           case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
-            _value = reflection->GetBool(_msg, field);
+            _value = reflection->GetBool(_msg.value(), field);
             return true;
           case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
-            _value = reflection->GetFloat(_msg, field);
+            _value = reflection->GetFloat(_msg.value(), field);
             return true;
           case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
             if (field->name() == "vector3d")
             {
-              _value = _msg.vector3d();
+              _value = _msg.value().vector3d();
               return true;
             }
             // Else, go to default case
