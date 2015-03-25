@@ -214,18 +214,6 @@ namespace gazebo
     /// \brief Check that a pointer is not NULL. A function is created
     /// for this purpose, since ASSERT's cannot be called from non-void
     /// functions.
-    /// Once boost::shared_ptr is eliminated from Gazebo, this function
-    /// should be deprecated.
-    /// \param[in] _ptr Pointer to verify is not NULL.
-    protected: template<typename T>
-      static void CheckPointer(boost::shared_ptr<T> _ptr)
-      {
-        ASSERT_TRUE(_ptr != NULL);
-      }
-
-    /// \brief Check that a pointer is not NULL. A function is created
-    /// for this purpose, since ASSERT's cannot be called from non-void
-    /// functions.
     /// \param[in] _ptr Pointer to verify is not NULL.
     protected: template<typename T>
       static void CheckPointer(std::shared_ptr<T> _ptr)
