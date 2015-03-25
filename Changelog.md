@@ -44,6 +44,9 @@
 1. Implemented AddLinkForce for ODE.
     * [Pull request #1456](https://bitbucket.org/osrf/gazebo/pull-request/1456)
 
+1. Updated ConfigWidget class to parse enum values.
+    * [Pull request #1518](https://bitbucket.org/osrf/gazebo/pull-request/1518)
+
 1. Added PresetManager to physics libraries and corresponding integration test.
     * [Pull request #1471](https://bitbucket.org/osrf/gazebo/pull-request/1471)
 
