@@ -78,7 +78,7 @@ void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
     if (entity && entity->HasType(physics::Base::LINK))
     {
       physics::LinkPtr link =
-        boost::dynamic_pointer_cast<physics::Link>(entity);
+        std::dynamic_pointer_cast<physics::Link>(entity);
       if (link)
       {
         physics::CollisionPtr collision = link->GetCollision(collisionName);
@@ -88,7 +88,7 @@ void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
           if (shape->HasType(physics::Base::BOX_SHAPE))
           {
             physics::BoxShapePtr box =
-              boost::dynamic_pointer_cast<physics::BoxShape>(shape);
+              std::dynamic_pointer_cast<physics::BoxShape>(shape);
             if (box)
             {
               math::Vector3 size = box->GetSize();

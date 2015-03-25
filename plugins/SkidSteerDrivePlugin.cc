@@ -93,7 +93,7 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
 
   // This assumes that the largest dimension of the wheel is the diameter
   // and that all wheels have the same diameter
-  physics::EntityPtr wheelLink = boost::dynamic_pointer_cast<physics::Entity>(
+  physics::EntityPtr wheelLink = std::dynamic_pointer_cast<physics::Entity>(
                                         this->joints[RIGHT_FRONT]->GetChild() );
   if (wheelLink)
   {

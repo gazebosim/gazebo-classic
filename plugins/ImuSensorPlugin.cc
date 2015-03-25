@@ -39,7 +39,7 @@ void ImuSensorPlugin::Load(sensors::SensorPtr _parent,
     sdf::ElementPtr /*_sdf*/)
 {
   this->parentSensor =
-    std::dynamic_pointer_cast<sensors::ImuSensor>(_parent);
+    boost::dynamic_pointer_cast<sensors::ImuSensor>(_parent);
 
   this->world = physics::get_world(_parent->GetWorldName());
   physics::EntityPtr entity = this->world->GetEntity(_parent->GetParentName());

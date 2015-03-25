@@ -124,7 +124,7 @@ void MudPlugin::Init()
         {
           std::string colName = sensor->GetCollisionName(i);
           physics::CollisionPtr colPtr =
-              boost::dynamic_pointer_cast<physics::Collision>(
+              std::dynamic_pointer_cast<physics::Collision>(
               this->world->GetEntity(colName));
           if (colPtr)
           {
@@ -142,7 +142,7 @@ void MudPlugin::Init()
 
   for (unsigned int i = 0; i < this->allowedLinks.size(); ++i)
   {
-    physics::LinkPtr allowedLink = boost::dynamic_pointer_cast<physics::Link>(
+    physics::LinkPtr allowedLink = std::dynamic_pointer_cast<physics::Link>(
         this->world->GetEntity(this->allowedLinks[i]));
 
     if (!allowedLink)
