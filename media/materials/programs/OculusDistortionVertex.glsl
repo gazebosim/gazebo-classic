@@ -1,4 +1,4 @@
-#version 130
+#version 120
 
 // Values automatically defined by Ogre/OpenGL:
 attribute vec4 vertex;
