@@ -1,5 +1,8 @@
 ## Gazebo 6.0
 
+1. Added support for Oculus DK2
+    * [Pull request #1526](https://bitbucket.org/osrf/gazebo/pull-request/1526)
+
 1. Use collide_bitmask from SDF to perform collision filtering
     * [Pull request #1470](https://bitbucket.org/osrf/gazebo/pull-request/1470)
 
