@@ -420,8 +420,17 @@ boost::any GetAnySDFValue(const sdf::ElementPtr _elem)
 void PresetManager::GeneratePresetFromSDF(Preset *_preset,
     const sdf::ElementPtr _elem) const
 {
-  if (!_preset || !_elem)
+  if (!_preset)
+  {
+    gzerr << "NULL preset given to GeneratePresetFromSDF. No preset will be "
+          << "generated." << std::endl;
     return;
+  }
+  if (!_elem)
+  {
+    return;
+  }
+  
   for (sdf::ElementPtr elem = _elem->GetFirstElement(); elem;
         elem = elem->GetNextElement())
   {
