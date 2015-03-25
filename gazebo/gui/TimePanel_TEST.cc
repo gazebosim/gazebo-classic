@@ -102,6 +102,7 @@ void TimePanel_TEST::ValidTimes()
     cam->Fini();
     mainWindow->close();
     delete mainWindow;
+    delete timePanel;
   }
 }
 
@@ -109,6 +110,13 @@ void TimePanel_TEST::ValidTimes()
 void TimePanel_TEST::Visibility()
 {
   this->Load("empty.world");
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
 
   // Create a new time panel widget
   gazebo::gui::TimePanel *timePanel = new gazebo::gui::TimePanel;
@@ -164,6 +172,11 @@ void TimePanel_TEST::Visibility()
   QVERIFY(realTimeEdit->isVisible());
   QVERIFY(stepButton->isVisible());
   QVERIFY(iterationsEdit->isVisible());
+
+  //cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+  delete timePanel;
 }
 
 // Generate a main function for the test
