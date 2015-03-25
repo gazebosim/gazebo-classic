@@ -129,10 +129,8 @@ void JointMaker::Reset()
 
   this->scopedLinkedNames.clear();
 
-  while (this->joints.size() > 0)
-  {
+  while (!this->joints.empty())
     this->RemoveJoint(this->joints.begin()->first);
-  }
   this->joints.clear();
 }
 
