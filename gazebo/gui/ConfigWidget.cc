@@ -1224,7 +1224,7 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
 
   // Layout
   QGridLayout *widgetLayout = new QGridLayout;
-  widgetLayout->setColumnStretch(4, 1);
+  widgetLayout->setColumnStretch(3, 1);
   widgetLayout->addItem(new QSpacerItem(20*level, 1, QSizePolicy::Fixed,
       QSizePolicy::Fixed), 0, 0);
 

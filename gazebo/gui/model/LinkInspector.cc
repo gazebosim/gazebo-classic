@@ -50,7 +50,8 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
   // Create the main tab widget for all components in a link
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("linkInspectorTab");
-  this->tabWidget->setMinimumHeight(800);
+  this->tabWidget->setMinimumHeight(300);
+  this->tabWidget->setMinimumWidth(550);
 
   this->tabWidget->addTab(this->linkConfig, "Link");
   this->tabWidget->addTab(this->visualConfig, "Visual");

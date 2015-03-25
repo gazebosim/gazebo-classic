@@ -93,34 +93,32 @@ void VisualConfig::Reset()
 void VisualConfig::AddVisual(const std::string &_name,
     const msgs::Visual *_visualMsg)
 {
-  // Create a top-level tree item for the path
-  QTreeWidgetItem *visualItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  this->visualsTreeWidget->addTopLevelItem(visualItem);
-
-  QWidget *visualItemWidget = new QWidget;
-  QHBoxLayout *visualItemLayout = new QHBoxLayout;
+  // Visual name label
   QLabel *visualLabel = new QLabel(QString(_name.c_str()));
 
+  // Remove button
   QPushButton *removeVisualButton = new QPushButton(tr("Remove"));
   connect(removeVisualButton, SIGNAL(clicked()), this->signalMapper,
       SLOT(map()));
   this->signalMapper->setMapping(removeVisualButton, this->counter);
 
+  // Item Layout
+  QHBoxLayout *visualItemLayout = new QHBoxLayout;
   visualItemLayout->addWidget(visualLabel);
   visualItemLayout->addWidget(removeVisualButton);
   visualItemLayout->setContentsMargins(10, 0, 0, 0);
+
+  // Item widget
+  QWidget *visualItemWidget = new QWidget;
   visualItemWidget->setLayout(visualItemLayout);
+
+  // Top-level tree item
+  QTreeWidgetItem *visualItem =
+      new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
+  this->visualsTreeWidget->addTopLevelItem(visualItem);
   this->visualsTreeWidget->setItemWidget(visualItem, 0, visualItemWidget);
 
-  QTreeWidgetItem *visualChildItem =
-    new QTreeWidgetItem(visualItem);
-
-  QWidget *visualWidget = new QWidget;
-  QVBoxLayout *visualLayout = new QVBoxLayout;
-
-  ConfigWidget *configWidget = new ConfigWidget;
-
+  // ConfigWidget
   msgs::Visual msgToLoad;
   if (_visualMsg)
     msgToLoad = *_visualMsg;
@@ -131,6 +129,7 @@ void VisualConfig::AddVisual(const std::string &_name,
   if (!matMsg->has_lighting())
       matMsg->set_lighting(true);
 
+  ConfigWidget *configWidget = new ConfigWidget;
   configWidget->Load(&msgToLoad);
 
   configWidget->SetWidgetVisible("id", false);
@@ -158,18 +157,30 @@ void VisualConfig::AddVisual(const std::string &_name,
   configData->treeItem = visualItem;
   configData->name = _name;
   this->configs[this->counter] = configData;
+
+  // Scroll area
   QScrollArea *scrollArea = new QScrollArea;
   scrollArea->setWidget(configWidget);
-  visualLayout->addWidget(scrollArea);
-  this->counter++;
+  scrollArea->setWidgetResizable(true);
 
+  // Layout
+  QVBoxLayout *visualLayout = new QVBoxLayout;
   visualLayout->setContentsMargins(0, 0, 0, 0);
-  visualWidget->setLayout(visualLayout);
-  visualWidget->setMinimumHeight(650);
+  visualLayout->addWidget(scrollArea);
 
+  // Widget
+  QWidget *visualWidget = new QWidget;
+  visualWidget->setLayout(visualLayout);
+  visualWidget->setMinimumHeight(200);
+
+  // Child item
+  QTreeWidgetItem *visualChildItem = new QTreeWidgetItem(visualItem);
   this->visualsTreeWidget->setItemWidget(visualChildItem, 0, visualWidget);
+
   visualItem->setExpanded(false);
   visualChildItem->setExpanded(false);
+
+  this->counter++;
 }
 
 /////////////////////////////////////////////////
