@@ -25,8 +25,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-JointInspector::JointInspector(/*JointMaker::JointType _jointType,*/
-  QWidget *_parent) : QDialog(_parent)
+JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("JointInspectorDialog");
   this->setWindowTitle(tr("Joint Inspector"));
@@ -50,7 +49,7 @@ JointInspector::JointInspector(/*JointMaker::JointType _jointType,*/
         math::Vector3::UnitZ);
     this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_lower",
         -GZ_DBL_MAX);
-    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_higher",
+    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_upper",
         GZ_DBL_MAX);
     this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_effort", -1);
     this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_velocity", -1);
