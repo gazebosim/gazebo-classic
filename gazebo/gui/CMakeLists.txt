@@ -12,7 +12,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/deps
 )
 
-include_directories(${tinyxml_INCLUDE_DIRS}) 
+include_directories(${tinyxml_INCLUDE_DIRS})
 
 add_definitions(${QT_DEFINITIONS})
 
@@ -22,7 +22,7 @@ add_subdirectory(model)
 add_subdirectory(terrain)
 add_subdirectory(viewers)
 
-include_directories(${TBB_INCLUDEDIR}) 
+include_directories(${TBB_INCLUDEDIR})
 
 set (sources
   Actions.cc
@@ -63,10 +63,10 @@ set (sources
 if (NOT USE_EXTERNAL_TINYXML)
   include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
   set (sources ${sources}
-    ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
-    ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
-    ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
-    ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
 endif()
 
 set (qt_headers
@@ -191,7 +191,6 @@ if (UNIX)
   target_link_libraries(gazebo_gui pthread)
 endif()
 
-
 target_link_libraries(gzclient
   gazebo_common
   gazebo_transport
@@ -203,6 +202,7 @@ target_link_libraries(gzclient
   gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
+  gazebo_skyx
   gzqtpropertybrowser
   libgazebo
   ${QT_LIBRARIES}
