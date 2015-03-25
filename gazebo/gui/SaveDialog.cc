@@ -41,14 +41,16 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
       tr("Pick a location for your model:\n"));
 
   QLabel *modelLabel = new QLabel;
-  modelLabel->setText(tr("Model Name: "));
+  modelLabel->setText(tr("Model Name:"));
   this->dataPtr->modelNameLineEdit = new QLineEdit;
+  connect(this->dataPtr->modelNameLineEdit, SIGNAL(textChanged(QString)), this,
+           SLOT(ModelNameChangedOnDialog(QString)));
 
   QLabel *modelHeader = new QLabel;
   modelHeader->setText(tr("<b>Model</b>"));
 
   QLabel *modelLocation = new QLabel;
-  modelLocation->setText(tr("  Location:"));
+  modelLocation->setText(tr("Location:"));
   this->dataPtr->modelLocationLineEdit = new QLineEdit;
 
   // Try to get path to home folder
@@ -104,8 +106,11 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
   buttonsLayout->addWidget(saveButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
-  QHBoxLayout *locationLayout = new QHBoxLayout;
+  QHBoxLayout *modelNameLayout = new QHBoxLayout;
+  modelNameLayout->addWidget(modelLabel);
+  modelNameLayout->addWidget(this->dataPtr->modelNameLineEdit);
 
+  QHBoxLayout *locationLayout = new QHBoxLayout;
   locationLayout->addWidget(modelLocation);
   locationLayout->addWidget(this->dataPtr->modelLocationLineEdit);
   locationLayout->addWidget(browseButton);
@@ -133,8 +138,6 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
 
   // Advanced options
   QGridLayout *advancedOptionsGrid = new QGridLayout();
-  advancedOptionsGrid->addWidget(modelLabel, 0, 0);
-  advancedOptionsGrid->addWidget(this->dataPtr->modelNameLineEdit, 0, 1);
 
   advancedOptionsGrid->addWidget(modelHeader, 1, 0);
   advancedOptionsGrid->addWidget(modelVersion, 2, 0);
@@ -154,6 +157,7 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(this->dataPtr->messageLabel);
+  mainLayout->addLayout(modelNameLayout);
   mainLayout->addLayout(locationLayout);
 
   mainLayout->addLayout(advancedOptions);
@@ -162,7 +166,7 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
   mainLayout->setAlignment(Qt::AlignTop);
 
   this->setLayout(mainLayout);
-  this->setMinimumSize(400, 150);
+  this->setMinimumSize(400, 170);
   this->setMaximumSize(400, 380);
   this->resize(this->minimumSize());
 }
@@ -514,4 +518,18 @@ std::string SaveDialog::GetFolderNameFromModelName(const std::string
   }
 
   return foldername;
+}
+
+/////////////////////////////////////////////////
+void SaveDialog::ModelNameChangedOnDialog(QString _modelName)
+{
+  std::string folderName = this->GetFolderNameFromModelName(
+      _modelName.toStdString());
+
+  // Use current path and change only last folder name
+  std::string path = this->GetSaveLocation();
+  path = path.substr(0, path.rfind("/")+1);
+  path += folderName;
+
+  this->SetSaveLocation(path);
 }

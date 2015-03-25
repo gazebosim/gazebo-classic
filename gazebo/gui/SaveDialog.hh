@@ -114,6 +114,9 @@ namespace gazebo
       /// \brief Qt callback when the Save button is pressed.
       private slots: void OnAcceptSave();
 
+      /// \brief Qt callback when the model name line edit changes.
+      private slots: void ModelNameChangedOnDialog(QString _modelName);
+
       /// \brief Get a template config file for a simple model.
       private: std::string GetTemplateConfigString();
 
