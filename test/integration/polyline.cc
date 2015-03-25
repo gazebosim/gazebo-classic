@@ -49,7 +49,7 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
   EXPECT_TRUE(shape->HasType(physics::Base::POLYLINE_SHAPE));
 
   physics::PolylineShapePtr polyShape =
-    boost::dynamic_pointer_cast<physics::PolylineShape>(shape);
+    std::dynamic_pointer_cast<physics::PolylineShape>(shape);
   EXPECT_TRUE(polyShape != NULL);
 
   EXPECT_DOUBLE_EQ(polyShape->GetHeight(), 1.0);

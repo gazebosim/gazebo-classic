@@ -64,7 +64,7 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
     model->GetLink("link")->GetCollision("collision");
 
   physics::HeightmapShapePtr shape =
-    boost::dynamic_pointer_cast<physics::HeightmapShape>(
+    std::dynamic_pointer_cast<physics::HeightmapShape>(
         collision->GetShape());
 
   EXPECT_TRUE(shape != NULL);
@@ -117,7 +117,7 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
     model->GetLink("link")->GetCollision("collision");
 
   physics::HeightmapShapePtr shape =
-    boost::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
+    std::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
 
   EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
@@ -149,7 +149,7 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
     model->GetLink("link")->GetCollision("collision");
 
   physics::HeightmapShapePtr shape =
-    boost::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
+    std::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
 
   EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
@@ -233,7 +233,7 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
     model->GetLink("link")->GetCollision("collision");
 
   physics::HeightmapShapePtr shape =
-    boost::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
+    std::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
 
   EXPECT_TRUE(shape);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
