@@ -48,7 +48,11 @@ bool Preset::SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine) const
 {
   bool result = true;
   if (!_physicsEngine)
+  {
+    gzwarn << "Physics engine for PresetManager is NULL. PresetManager will "
+           << "have no effect on simulation!" << std::endl;
     return false;
+  }
 
   for (const auto &param : this->dataPtr->parameterMap)
   {
