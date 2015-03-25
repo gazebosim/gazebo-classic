@@ -260,6 +260,8 @@ void JointMaker_TEST::JointDefaultProperties()
   QCOMPARE(prisAxis1Msg.use_parent_model_frame(), false);
 
   delete jointMaker;
+  mainWindow->close();
+  delete mainWindow;
 }
 
 // Generate a main function for the test
