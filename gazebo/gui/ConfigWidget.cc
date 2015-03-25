@@ -791,17 +791,36 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
         {
           const google::protobuf::EnumValueDescriptor *value =
               ref->GetEnum(*_msg, field);
+          if (!value)
+          {
+            gzerr << "Error retrieving enum value for '" << name << "'"
+                << std::endl;
+            break;
+          }
+
           if (newWidget)
           {
             std::vector<std::string> enumValues;
             const google::protobuf::EnumDescriptor *descriptor = value->type();
+            if (!descriptor)
+              break;
+
             for (int j = 0; j < descriptor->value_count(); ++j)
             {
               const google::protobuf::EnumValueDescriptor *valueDescriptor =
                   descriptor->value(j);
-              enumValues.push_back(valueDescriptor->name());
+              if (valueDescriptor)
+                enumValues.push_back(valueDescriptor->name());
             }
             configChildWidget = this->CreateEnumWidget(name, enumValues);
+
+            if (!configChildWidget)
+            {
+              gzerr << "Error creating an enum widget for '" << name << "'"
+                  << std::endl;
+              break;
+            }
+
             // connect enum config widget event so that we can fire an other
             // event from ConfigWidget that has the name of this field
             connect(qobject_cast<EnumConfigWidget *>(configChildWidget),
@@ -1344,7 +1363,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
     std::string name = field->name();
 
     // Update each field in the message
-    // TODO update repeated fields and enum fields
+    // TODO update repeated fields
     if (!field->is_repeated() /*&& ref->HasField(*_msg, field)*/)
     {
       std::string scopedName = _name.empty() ? name : _name + "::" + name;
@@ -1637,12 +1656,22 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
         {
           QComboBox *valueComboBox =
               qobject_cast<QComboBox *>(childWidget->widgets[0]);
-          std::string valueStr = valueComboBox->currentText().toStdString();
-          const google::protobuf::EnumDescriptor *enumDescriptor =
-              field->enum_type();
-          const google::protobuf::EnumValueDescriptor *enumValue =
-              enumDescriptor->FindValueByName(valueStr);
-          ref->SetEnum(_msg, field, enumValue);
+          if (valueComboBox)
+          {
+            std::string valueStr = valueComboBox->currentText().toStdString();
+            const google::protobuf::EnumDescriptor *enumDescriptor =
+                field->enum_type();
+            if (enumDescriptor)
+            {
+              const google::protobuf::EnumValueDescriptor *enumValue =
+                  enumDescriptor->FindValueByName(valueStr);
+              if (enumValue)
+                ref->SetEnum(_msg, field, enumValue);
+              else
+                gzerr << "Unable to find enum value: '" << valueStr << "'"
+                    << std::endl;
+            }
+          }
           break;
         }
         default:
@@ -1821,7 +1850,7 @@ bool ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
     return false;
   }
 
-  QComboBox * valueComboBox = qobject_cast<QComboBox *>(_widget->widgets[0]);
+  QComboBox *valueComboBox = qobject_cast<QComboBox *>(_widget->widgets[0]);
   int index = valueComboBox->findText(tr(_value.c_str()));
 
   if (index < 0)
@@ -1873,11 +1902,17 @@ bool ConfigWidget::UpdateEnumWidget(ConfigChildWidget *_widget,
 {
   if (_widget->widgets.size() != 1u)
   {
-    gzerr << "Error updating Geometry Config widget " << std::endl;
+    gzerr << "Error updating Enum Config widget" << std::endl;
     return false;
   }
 
-  QComboBox * valueComboBox = qobject_cast<QComboBox *>(_widget->widgets[0]);
+  QComboBox *valueComboBox = qobject_cast<QComboBox *>(_widget->widgets[0]);
+  if (!valueComboBox)
+  {
+    gzerr << "Error updating Enum Config widget" << std::endl;
+    return false;
+  }
+
   int index = valueComboBox->findText(tr(_value.c_str()));
 
   if (index < 0)

@@ -38,11 +38,14 @@
     * [Pull request #1454](https://bitbucket.org/osrf/gazebo/pull-request/1454)
     * [Issue #1455](https://bitbucket.org/osrf/gazebo/issue/1455)
 
-1. Added Matrix3::Inverse() and tests 
+1. Added Matrix3::Inverse() and tests
     * [Pull request #1481](https://bitbucket.org/osrf/gazebo/pull-request/1481)
 
 1. Implemented AddLinkForce for ODE.
     * [Pull request #1456](https://bitbucket.org/osrf/gazebo/pull-request/1456)
+
+1. Updated ConfigWidget class to parse enum values.
+    * [Pull request #1518](https://bitbucket.org/osrf/gazebo/pull-request/1518)
 
 1. Model editor updates
     1. Joint preview using JointVisuals.
@@ -77,6 +80,11 @@
 
     1. Hide time panel inside editor and keep main window's paused state.
         * [Pull request #1500](https://bitbucket.org/osrf/gazebo/pull-request/1500)
+
+    1. Fixed pose issues and added ModelCreator_TEST.
+        * [Pull request #1509](https://bitbucket.org/osrf/gazebo/pull-request/1509)
+        * [Issue #1497](https://bitbucket.org/osrf/gazebo/issue/1497)
+        * [Issue #1509](https://bitbucket.org/osrf/gazebo/issue/1509)
 
 ## Gazebo 5.0
 

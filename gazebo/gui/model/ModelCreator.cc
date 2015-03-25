@@ -1564,6 +1564,14 @@ void ModelCreator::GenerateSDF()
     this->modelPose.pos = mid;
   }
 
+  // Update preview model and link poses in case they changed
+  for (auto &linksIt : this->allLinks)
+  {
+    this->previewVisual->SetWorldPose(this->modelPose);
+    LinkData *link = linksIt.second;
+    link->SetPose(link->linkVisual->GetWorldPose() - this->modelPose);
+    link->linkVisual->SetPose(link->GetPose());
+  }
 
   // generate canonical link sdf first.
   if (!this->canonicalLink.empty())
@@ -1801,4 +1809,9 @@ void ModelCreator::SetModelVisible(rendering::VisualPtr _visual, bool _visible)
       _visual->SetVisible(it->second, false);
     }
   }
+}
+/////////////////////////////////////////////////
+ModelCreator::SaveState ModelCreator::GetCurrentSaveState() const
+{
+  return this->currentSaveState;
 }

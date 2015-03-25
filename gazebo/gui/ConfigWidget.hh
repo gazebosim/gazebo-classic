@@ -210,6 +210,7 @@ namespace gazebo
       /// \brief Set a color value to a child widget.
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
+      /// \return True if the value is set successfully.
       public: bool SetColorWidgetValue(const std::string &_name,
           const common::Color &_value);
 
@@ -232,6 +233,7 @@ namespace gazebo
       /// \brief Set an enum value to a child widget.
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
+      /// \return True if the value is set successfully.
       public: bool SetEnumWidgetValue(const std::string &_name,
           const std::string &_value);
 
@@ -364,6 +366,7 @@ namespace gazebo
 
       /// \brief Create a widget for configuring an enum value.
       /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _values A list of enum values in string.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateEnumWidget(const std::string &_key,
           const std::vector<std::string> &_values);
@@ -371,6 +374,7 @@ namespace gazebo
       /// \brief Update a child widget with an unsigned integer value.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
+      /// \return True if the update completed successfully.
       private: bool UpdateUIntWidget(ConfigChildWidget *_widget,
           unsigned int _value);
 
