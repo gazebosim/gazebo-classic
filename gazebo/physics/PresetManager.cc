@@ -54,7 +54,7 @@ bool Preset::SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine) const
     return false;
   }
 
-  for (const auto &param : this->dataPtr->parameterMap)
+  for (auto const &param : this->dataPtr->parameterMap)
   {
     if (!_physicsEngine->SetParam(param.first, param.second))
     {
@@ -209,7 +209,7 @@ std::string PresetManager::CurrentProfile() const
 std::vector<std::string> PresetManager::AllProfiles() const
 {
   std::vector<std::string> ret;
-  for (const auto &profile : this->dataPtr->presetProfiles)
+  for (auto const &profile : this->dataPtr->presetProfiles)
   {
     ret.push_back(profile.first);
   }
