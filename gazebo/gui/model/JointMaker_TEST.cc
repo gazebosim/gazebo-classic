@@ -59,7 +59,7 @@ void JointMaker_TEST::CreateRemoveJoint()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   gui::JointMaker *jointMaker = new gui::JointMaker();
   QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
@@ -148,7 +148,7 @@ void JointMaker_TEST::JointDefaultProperties()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   gui::JointMaker *jointMaker = new gui::JointMaker();
   QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
