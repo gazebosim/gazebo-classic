@@ -44,6 +44,9 @@
 1. Implemented AddLinkForce for ODE.
     * [Pull request #1456](https://bitbucket.org/osrf/gazebo/pull-request/1456)
 
+1. Updated ConfigWidget class to parse enum values.
+    * [Pull request #1518](https://bitbucket.org/osrf/gazebo/pull-request/1518)
+
 1. Model editor updates
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
