@@ -25,8 +25,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-JointInspector::JointInspector(/*JointMaker::JointType _jointType,*/
-  QWidget *_parent) : QDialog(_parent)
+JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("JointInspectorDialog");
   this->setWindowTitle(tr("Joint Inspector"));

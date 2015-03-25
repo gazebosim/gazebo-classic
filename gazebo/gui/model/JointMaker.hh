@@ -336,30 +336,6 @@ namespace gazebo
       /// \brief Type of joint.
       public: JointMaker::JointType type;
 
-/*      /// \brief Joint axis direction.
-      public: math::Vector3 axis[2];
-
-      /// \brief Joint lower limit.
-      public: double lowerLimit[2];
-
-      /// \brief Joint upper limit.
-      public: double upperLimit[2];
-
-      /// \brief Joint effort limit.
-      public: double effortLimit[2];
-
-      /// \brief Joint velocity limit.
-      public: double velocityLimit[2];
-
-      /// \brief Use parent model frame flag.
-      public: bool useParentModelFrame[2];
-
-      /// \brief Joint damping.
-      public: double damping[2];
-
-      /// \brief Joint pose.
-      public: math::Pose pose;*/
-
       /// \brief True if the joint visual needs update.
       public: bool dirty;
 
