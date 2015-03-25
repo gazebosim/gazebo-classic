@@ -584,14 +584,9 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
       double value = boost::any_cast<double>(_value);
       bulletElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
     }
-    else if (_key == "max_step_size")
-    {
-      this->SetMaxStepSize(boost::any_cast<double>(_value));
-    }
     else
     {
-      gzwarn << _key << " is not supported in Bullet" << std::endl;
-      return false;
+      return PhysicsEngine::SetParam(_key, _value);
     }
   }
   catch(boost::bad_any_cast &e)
