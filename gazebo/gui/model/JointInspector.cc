@@ -49,7 +49,7 @@ JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
         math::Vector3::UnitZ);
     this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_lower",
         -GZ_DBL_MAX);
-    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_higher",
+    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_upper",
         GZ_DBL_MAX);
     this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_effort", -1);
     this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_velocity", -1);
