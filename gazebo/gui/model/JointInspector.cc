@@ -66,7 +66,6 @@ JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
   this->configWidget->SetWidgetVisible("child_id", false);
 
   this->configWidget->SetWidgetReadOnly("id", true);
-  this->configWidget->SetWidgetReadOnly("name", true);
   this->configWidget->SetWidgetReadOnly("parent_id", true);
   this->configWidget->SetWidgetReadOnly("child_id", true);
   this->configWidget->SetWidgetReadOnly("parent", true);
