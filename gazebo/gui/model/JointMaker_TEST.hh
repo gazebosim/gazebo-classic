@@ -33,7 +33,6 @@ class JointMaker_TEST : public QTestFixture
 
   /// \brief Test values of joint default properties.
   private slots: void JointDefaultProperties();
-
 };
 
 #endif

@@ -791,6 +791,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
         {
           const google::protobuf::EnumValueDescriptor *value =
               ref->GetEnum(*_msg, field);
+
           if (!value)
           {
             gzerr << "Error retrieving enum value for '" << name << "'"
@@ -1109,10 +1110,6 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/)
   QLabel *rotRLabel = new QLabel(tr("roll"));
   QLabel *rotPLabel = new QLabel(tr("pitch"));
   QLabel *rotYLabel = new QLabel(tr("yaw"));
-
-  posXLabel->setStyleSheet("QLabel { color : #F44336; }");
-  posYLabel->setStyleSheet("QLabel { color : #4caf50; }");
-  posZLabel->setStyleSheet("QLabel { color : #2196f3; }");
 
   QDoubleSpinBox *posXSpinBox = new QDoubleSpinBox;
   posXSpinBox->setRange(-1e12, 1e12);
