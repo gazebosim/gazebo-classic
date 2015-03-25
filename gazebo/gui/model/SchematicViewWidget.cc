@@ -34,10 +34,6 @@ SchematicViewWidget::SchematicViewWidget(QWidget *_parent)
   this->scene = new GraphScene(this);
   this->view = new GraphView(_parent);
 
-  /*QColor c(220, 220, 220);
-  QBrush brush(c, Qt::SolidPattern);
-  view->setBackgroundBrush(brush);*/
-
   this->minimumWidth = 1240*2;
   this->minimumHeight = 1024*2;
   this->scene->setSceneRect(-this->minimumWidth/2, -this->minimumHeight/2,
@@ -66,8 +62,8 @@ SchematicViewWidget::~SchematicViewWidget()
 /////////////////////////////////////////////////
 void SchematicViewWidget::Reset()
 {
-  this->scene->clearLayout();
   this->edges.clear();
+  this->scene->clear();
 }
 
 /////////////////////////////////////////////////
@@ -84,14 +80,14 @@ void SchematicViewWidget::Init()
 
   this->connections.push_back(gui::model::Events::ConnectJointRemoved(
       boost::bind(&SchematicViewWidget::RemoveEdge, this, _1)));
-
-//  this->connections.push_back(gui::model::Events::ConnectJointNameChanged(
-//      boost::bind(&SchematicViewWidget::RenameEdge, this, _1, _2)));
 }
 
 /////////////////////////////////////////////////
 std::string SchematicViewWidget::GetLeafName(const std::string &_scopedName)
 {
+  if (_scopedName.empty())
+    return "";
+
   std::string leafName = _scopedName;
   size_t idx = _scopedName.find_last_of("::");
   if (idx != std::string::npos)
@@ -104,7 +100,6 @@ void SchematicViewWidget::AddNode(const std::string &_node)
 {
   std::string node = this->GetLeafName(_node);
 
-  std::cerr << "Add node " << node << std::endl;
   if (this->scene->HasNode(node))
     return;
 
@@ -120,7 +115,6 @@ void SchematicViewWidget::RemoveNode(const std::string &_node)
 {
   std::string node = this->GetLeafName(_node);
 
-  std::cerr << "remove node " << node << std::endl;
   if (this->scene->HasNode(node))
     return;
 
@@ -142,7 +136,6 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
 
   this->edges[_id] = std::make_pair(parentNode, childNode);
 
-  std::cerr << "add edge " << parentNode << " " << childNode << std::endl;
   // this must be called before making changes to the graph
   this->scene->clearLayout();
   this->scene->AddEdge(parentNode, childNode);
@@ -165,30 +158,8 @@ void SchematicViewWidget::RemoveEdge(const std::string &_id)
     this->scene->applyLayout();
 
     this->edges.erase(it);
-    std::cerr << "remove edge " << parentNode << " " << childNode << std::endl;
   }
 }
-
-/*/////////////////////////////////////////////////
-void SchematicViewWidget::RenameEdge(const std::string &_id,
-    const std::string &_name)
-{
-  auto it = this->edges.find(_id);
-  if (it != this->edges.end())
-  {
-    std::string parentNode = it->second.first;
-    std::string childNode = it->second.second;
-    // this must be called before making changes to the graph
-    this->scene->clearLayout();
-    this->scene->RemoveEdge(parentNode, childNode);
-    //Layout scene
-    this->scene->applyLayout();
-
-    this->edges.erase(it);
-    std::cerr << "remove edge " << parentNode << " " << childNode << std::endl;
-  }
-}*/
-
 
 /////////////////////////////////////////////////
 void SchematicViewWidget::resizeEvent(QResizeEvent *_event)
