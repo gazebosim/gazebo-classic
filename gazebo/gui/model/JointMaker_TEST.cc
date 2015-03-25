@@ -51,11 +51,6 @@ void JointMaker_TEST::JointState()
 /////////////////////////////////////////////////
 void JointMaker_TEST::CreateRemoveJoint()
 {
-  // FIXME Test passes but segfaults when QTestFixture clean up
-  // Problem: JointMaker's destructor resets visual shared_ptrs
-  // but this later causes a segfault in Visual's destructor when exiting the
-  // program.
-
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
@@ -132,7 +127,7 @@ void JointMaker_TEST::CreateRemoveJoint()
   jointMaker->RemoveJoint(ballJointData->hotspot->GetName());
   QCOMPARE(jointMaker->GetJointCount(), 0u);
 
-  // delete jointMaker;
+  delete jointMaker;
   mainWindow->close();
   delete mainWindow;
 }
@@ -140,11 +135,6 @@ void JointMaker_TEST::CreateRemoveJoint()
 /////////////////////////////////////////////////
 void JointMaker_TEST::JointDefaultProperties()
 {
-  // FIXME Test passes but segfaults when QTestFixture clean up
-  // Problem: JointMaker's destructor resets visual shared_ptrs
-  // but this later causes a segfault in Visual's destructor when exiting the
-  // program.
-
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
@@ -268,6 +258,8 @@ void JointMaker_TEST::JointDefaultProperties()
   qFuzzyCompare(prisAxis1Msg.damping(), 0.0);
   qFuzzyCompare(prisAxis1Msg.friction(), 0.0);
   QCOMPARE(prisAxis1Msg.use_parent_model_frame(), false);
+
+  delete jointMaker;
 }
 
 // Generate a main function for the test

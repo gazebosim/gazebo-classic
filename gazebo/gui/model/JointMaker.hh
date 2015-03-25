@@ -18,9 +18,9 @@
 #ifndef _JOINTMAKER_HH_
 #define _JOINTMAKER_HH_
 
+#include <map>
 #include <string>
 #include <vector>
-#include <boost/unordered/unordered_map.hpp>
 
 #include <sdf/sdf.hh>
 
