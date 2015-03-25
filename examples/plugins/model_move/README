@@ -1,0 +1,42 @@
+Model Movement Plugin
+
+This is a simple plugin example for moving a model to a specified set of goal points.
+
+===================
+Build Instructions
+===================
+
+* From this directory
+
+$ mkdir build
+$ cd build
+$ cmake ../
+$ make
+
+=================
+Run Instructions
+=================
+
+* From this directory
+
+$ gazebo model_move.world
+ 
+* In a seperate session
+
+$ cd build
+$ ./path_publisher
+
+To change the input parameters, you can modify the world file sdf:
+
+    <path> is the sequence of goal point, as a string of space-separated integers, six ints per point as per gazebo Pose.
+    <n_points> is the number of specified goal points.
+
+    Example (in sdf file):
+    
+    <plugin name="model_move" filename="libmodel_move.so"/>
+        <path>5 5 0 0 0 0
+              5 -5 0 0 0 0
+              0 0 0 0 0 0</path>
+	<n_points>3</n_points>
+
+Input parameters can also be sent via gazebo topics. This example uses path_publisher.cc to send path information to the movement plugin via a PoseAnimation message. See file for more details.
