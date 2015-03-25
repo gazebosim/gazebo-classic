@@ -34,11 +34,6 @@ if (WIN32)
  add_definitions(-DBUILDING_DLL)
 endif()
 
-if (WIN32)
-  # 0x601 = Windows 7.  TBB needs to know this.
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32_WINNT=0x601")
-endif ()
-
 add_subdirectory(msgs)
 add_subdirectory(math)
 add_subdirectory(transport)
