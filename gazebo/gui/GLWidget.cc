@@ -172,6 +172,9 @@ GLWidget::~GLWidget()
   this->selectionSub.reset();
   this->selectionPub.reset();
 
+  if (this->userCamera)
+    this->userCamera->Fini();
+
   this->userCamera.reset();
 }
 
