@@ -856,10 +856,10 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
     /// \brief Turn on the joint limit constraints if
     ///   - there is no joint damping/stiffness specified, or
     ///   - a joint is at its limit.
-    bool stiffnessDampingOn = math::equal(this->dissipationCoefficient[i], 0.0)
-                           && math::equal(this->stiffnessCoefficient[i], 0.0);
+    bool stiffnessDampingOff = math::equal(this->dissipationCoefficient[i], 0.0)
+                            && math::equal(this->stiffnessCoefficient[i], 0.0);
     double angle = this->GetAngle(i).Radian();
-    if (!stiffnessDampingOn || angle >= this->upperLimit[i].Radian() ||
+    if (stiffnessDampingOff || angle >= this->upperLimit[i].Radian() ||
         angle <= this->lowerLimit[i].Radian())
     {
       if (this->implicitDampingState[i] != ODEJoint::JOINT_LIMIT)
@@ -899,7 +899,7 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
     ///   - a joint is not at its limit
     /// \brief Below checks that the joint is not at its limit and uses
     /// the joint limit constraint to enforce joint damping.
-    else if (stiffnessDampingOn)
+    else if (!stiffnessDampingOff)
     {
       double kd = fabs(this->dissipationCoefficient[i]);
       double kp = this->stiffnessCoefficient[i];
