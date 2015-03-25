@@ -32,12 +32,11 @@ namespace gazebo
  
   class ModelMove : public ModelPlugin
   {
-    gazebo::common::PoseAnimationPtr anim;
-    transport::NodePtr node;
-    transport::SubscriberPtr pathSubscriber;
-    int num_points;
-    math::Vector3 start_point;
-    math::Vector3 *path;
+    public:
+      ModelMove() : 
+              num_points(0),
+              path(new math::Vector3())
+      { }
 
     private: void move(math::Vector3 *start, math::Vector3 *end, math::Vector3 *translation)
     {
@@ -47,10 +46,9 @@ namespace gazebo
       float y_step = diff.y / duration;
       float z_step = diff.z / duration;
       int curr_frame = anim->GetKeyFrameCount();
-      gazebo::common::PoseKeyFrame *key;
      
       for (int i=1; i <= duration; i++) {
-        key = anim->CreateKeyFrame(i+curr_frame);
+        gazebo::common::PoseKeyFrame * key = anim->CreateKeyFrame(i+curr_frame);
         key->SetTranslation(math::Vector3((*translation).x + x_step*i,
             (*translation).y + y_step*i,
               (*translation).z + z_step*i));
@@ -138,6 +136,14 @@ namespace gazebo
 
     // Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;
+
+    private:
+      gazebo::common::PoseAnimationPtr anim;
+      transport::NodePtr node;
+      transport::SubscriberPtr pathSubscriber;
+      int num_points;
+      math::Vector3 start_point;
+      math::Vector3 *path;
   };
 
   // Register this plugin with the simulator
