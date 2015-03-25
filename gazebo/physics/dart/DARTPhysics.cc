@@ -431,14 +431,13 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
       gzerr << "Setting [" << _key << "] in DART to [" << value
             << "] not yet supported.\n";
     }
-    else if (_key == "max_step_size")
-    {
-      this->dtWorld->setTimeStep(boost::any_cast<double>(_value));
-    }
     else
     {
-      gzwarn << _key << " is not supported in DART" << std::endl;
-      return false;
+      if (_key == "max_step_size")
+      {
+        this->dtWorld->setTimeStep(boost::any_cast<double>(_value));
+      }
+      return PhysicsEngine::SetParam(_key, _value);
     }
   }
   catch(boost::bad_any_cast &e)

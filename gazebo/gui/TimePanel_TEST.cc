@@ -93,10 +93,10 @@ void TimePanel_TEST::ValidTimes()
     value = boost::lexical_cast<double>(txt.substr(0, txt.find(" ")));
     QVERIFY(value > 0.0);
 
-    // Make sure the percent real time is greater than zero
+    // Make sure the fps is somewhere close to 60 fps
     txt = fpsEdit->text().toStdString();
     value = boost::lexical_cast<double>(txt.substr(0, txt.find(" ")));
-    QVERIFY(value > 55.0);
+    QVERIFY(value > 45.0);
     QVERIFY(value < 75.0);
 
     cam->Fini();
@@ -164,6 +164,26 @@ void TimePanel_TEST::Visibility()
   QVERIFY(realTimeEdit->isVisible());
   QVERIFY(stepButton->isVisible());
   QVERIFY(iterationsEdit->isVisible());
+}
+
+/////////////////////////////////////////////////
+void TimePanel_TEST::SetPaused()
+{
+  this->Load("empty.world");
+
+  // Create a new time panel widget
+  gazebo::gui::TimePanel *timePanel = new gazebo::gui::TimePanel;
+  QVERIFY(timePanel != NULL);
+
+  // verify initial state
+  QVERIFY(!timePanel->IsPaused());
+
+  // set paused state and verify
+  timePanel->SetPaused(true);
+  QVERIFY(timePanel->IsPaused());
+
+  timePanel->SetPaused(false);
+  QVERIFY(!timePanel->IsPaused());
 }
 
 // Generate a main function for the test

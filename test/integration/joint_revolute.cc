@@ -39,7 +39,9 @@ class JointTestRevolute : public JointTest
   /// Measure angular velocity of links, and verify proper axis orientation.
   /// Then set joint limits and verify that links remain within limits.
   /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void RevoluteJoint(const std::string &_physicsEngine);
+  /// \param[in] _solverType Type of solver to use.
+  public: void RevoluteJoint(const std::string &_physicsEngine,
+                             const std::string &_solverType="quick");
 
   /// \brief Load a simple pendulum, simulate and compare to numerical
   /// results from SimplePendulumIntegrator.
@@ -148,7 +150,8 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
 
 
 ////////////////////////////////////////////////////////////////////////
-void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
+void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
+                                      const std::string &_solverType)
 {
   math::Rand::SetSeed(0);
   // Load world
@@ -160,6 +163,9 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // Set solver type
+  physics->SetParam("solver_type", _solverType);
 
   // Model names
   std::vector<std::string> modelNames;
@@ -431,6 +437,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
   // Reset world again, disable gravity, detach upper_joint
   // Then apply torque at lower_joint and verify motion
   world->Reset();
+  physics->SetGravity(math::Vector3::Zero);
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
@@ -438,23 +445,6 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
     if (model)
     {
       gzdbg << "Check SetForce for model " << *modelIter << '\n';
-      std::vector<std::string>::iterator linkIter;
-      for (linkIter  = linkNames.begin();
-           linkIter != linkNames.end(); ++linkIter)
-      {
-        link = model->GetLink(*linkIter);
-        if (link)
-        {
-          // Disable gravity for links.
-          link->SetGravityMode(false);
-        }
-        else
-        {
-          gzerr << "Error loading link " << *linkIter
-                << " of model " << *modelIter << '\n';
-          EXPECT_TRUE(link != NULL);
-        }
-      }
 
       joint = model->GetJoint("upper_joint");
       if (joint)
@@ -679,7 +669,8 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
     // test with global contact_max_correcting_vel at 100
     // here we expect much lower energy loss
     world->Reset();
-    physicsEngine->SetContactMaxCorrectingVel(100);
+    if (_physicsEngine == "ode")
+      EXPECT_TRUE(physicsEngine->SetParam("contact_max_correcting_vel", 100.0));
 
     int steps = 10;  // @todo: make this more general
     for (int i = 0; i < steps; i ++)
@@ -732,6 +723,11 @@ TEST_P(JointTestRevolute, PendulumEnergy)
 TEST_P(JointTestRevolute, RevoluteJoint)
 {
   RevoluteJoint(this->physicsEngine);
+}
+
+TEST_F(JointTestRevolute, RevoluteJointWorldStep)
+{
+  RevoluteJoint("ode", "world");
 }
 
 TEST_P(JointTestRevolute, SimplePendulum)

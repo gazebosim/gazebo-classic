@@ -79,6 +79,10 @@ JointMaker::JointMaker()
       event::Events::ConnectPreRender(
         boost::bind(&JointMaker::Update, this)));
 
+  this->connections.push_back(
+      gui::model::Events::ConnectOpenJointInspector(
+      boost::bind(&JointMaker::OpenInspector, this, _1)));
+
   this->inspectAct = new QAction(tr("Open Joint Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this, SLOT(OnOpenInspector()));
 
@@ -159,10 +163,10 @@ void JointMaker::DisableEventHandlers()
 }
 
 /////////////////////////////////////////////////
-void JointMaker::RemoveJoint(const std::string &_jointName)
+void JointMaker::RemoveJoint(const std::string &_jointId)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  auto jointIt = this->joints.find(_jointName);
+  auto jointIt = this->joints.find(_jointId);
   if (jointIt != this->joints.end())
   {
     JointData *joint = jointIt->second;
@@ -195,6 +199,7 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
     delete joint;
     this->joints.erase(jointIt);
     gui::model::Events::modelChanged();
+    gui::model::Events::jointRemoved(_jointId);
   }
 }
 
@@ -567,7 +572,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     if (rootVis->IsPlane())
       this->hoverVis = vis->GetParent();
     else if (!gui::get_entity_id(rootVis->GetName()) &&
-        vis->GetName().find("_HOTSPOT_") == std::string::npos)
+        vis->GetName().find("_UNIQUE_ID_") == std::string::npos)
     {
       this->hoverVis = vis->GetParent();
       if (!this->selectedVis ||
@@ -619,9 +624,14 @@ void JointMaker::OnOpenInspector()
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OpenInspector(const std::string &_name)
+void JointMaker::OpenInspector(const std::string &_jointId)
 {
-  JointData *joint = this->joints[_name];
+  JointData *joint = this->joints[_jointId];
+  if (!joint)
+  {
+    gzerr << "Joint [" << _jointId << "] not found." << std::endl;
+    return;
+  }
   joint->OpenInspector();
 }
 
@@ -665,16 +675,17 @@ void JointMaker::CreateHotSpot(JointData *_joint)
 
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
-  std::string hotSpotName = _joint->visual->GetName() + "_HOTSPOT_";
+  // Joint hotspot visual name is the JointId for easy access when clicking
+  std::string jointId = _joint->visual->GetName() + "_UNIQUE_ID_";
   rendering::VisualPtr hotspotVisual(
-      new rendering::Visual(hotSpotName, _joint->visual, false));
+      new rendering::Visual(jointId, _joint->visual, false));
 
   // create a cylinder to represent the joint
   hotspotVisual->InsertMesh("unit_cylinder");
   Ogre::MovableObject *hotspotObj =
       (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
       _joint->visual->GetName(), "unit_cylinder"));
-  hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(hotSpotName));
+  hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(jointId));
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial(this->jointMaterials[_joint->type]);
   hotspotVisual->SetTransparency(0.75);
@@ -704,10 +715,11 @@ void JointMaker::CreateHotSpot(JointData *_joint)
       GZ_VISIBILITY_SELECTABLE);
   hotspotVisual->GetSceneNode()->setInheritScale(false);
 
-  this->joints[hotSpotName] = _joint;
+  this->joints[jointId] = _joint;
   camera->GetScene()->AddVisual(hotspotVisual);
 
   _joint->hotspot = hotspotVisual;
+  gui::model::Events::jointInserted(jointId, _joint->name);
 }
 
 /////////////////////////////////////////////////
@@ -989,6 +1001,12 @@ void JointData::OnApply()
   this->jointMsg->CopyFrom(*this->inspector->GetData());
   this->type = JointMaker::ConvertJointType(
       msgs::ConvertJointType(this->jointMsg->type()));
+
+  if (this->name != this->jointMsg->name())
+    gui::model::Events::jointNameChanged(this->hotspot->GetName(),
+        this->jointMsg->name());
+  this->name = this->inspector->GetName();
+
   this->dirty = true;
   gui::model::Events::modelChanged();
 }
