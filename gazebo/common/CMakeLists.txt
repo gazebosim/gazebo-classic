@@ -121,6 +121,7 @@ set (gtest_sources
   Material_TEST.cc
   Mesh_TEST.cc
   MovingWindowFilter_TEST.cc
+  PID_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   Time_TEST.cc
