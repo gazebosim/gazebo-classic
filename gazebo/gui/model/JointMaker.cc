@@ -688,7 +688,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(jointId));
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial(this->jointMaterials[_joint->type]);
-  hotspotVisual->SetTransparency(0.75);
+  hotspotVisual->SetTransparency(0.7);
 
   // create a handle at the parent end
   Ogre::BillboardSet *handleSet =
@@ -764,7 +764,7 @@ void JointMaker::Update()
           math::Vector3 dPos = (childOrigin - parentOrigin);
           math::Vector3 center = dPos * 0.5;
           joint->hotspot->SetScale(
-              math::Vector3(0.005, 0.005, dPos.GetLength()));
+              math::Vector3(0.008, 0.008, dPos.GetLength()));
           joint->hotspot->SetWorldPosition(parentOrigin + center);
           math::Vector3 u = dPos.Normalize();
           math::Vector3 v = math::Vector3::UnitZ;
@@ -784,7 +784,7 @@ void JointMaker::Update()
             Ogre::SceneNode *handleNode = joint->handles->getParentSceneNode();
             joint->handles->detachFromParent();
             joint->hotspot->SetMaterial(material);
-            joint->hotspot->SetTransparency(0.75);
+            joint->hotspot->SetTransparency(0.7);
             handleNode->attachObject(joint->handles);
             Ogre::MaterialPtr mat =
                 Ogre::MaterialManager::getSingleton().getByName(material);
