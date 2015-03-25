@@ -34,7 +34,7 @@ void SaveDialogTestHelper::CheckFileDialog()
   // hit enter to close dialog
   QTest::keyClick(fileDialog, Qt::Key_Enter);
 
-  QVERIFY(!this->dialog->isVisible());
+  QVERIFY(!fileDialog->isVisible());
 }
 
 /////////////////////////////////////////////////
