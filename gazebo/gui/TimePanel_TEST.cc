@@ -173,7 +173,6 @@ void TimePanel_TEST::Visibility()
   QVERIFY(stepButton->isVisible());
   QVERIFY(iterationsEdit->isVisible());
 
-  //cam->Fini();
   mainWindow->close();
   delete mainWindow;
   delete timePanel;
