@@ -82,7 +82,7 @@ void WirelessTransmitter::Init()
 
   // This ray will be used in GetSignalStrength() for checking obstacles
   // between the transmitter and a given point.
-  this->testRay = boost::dynamic_pointer_cast<RayShape>(
+  this->testRay = std::dynamic_pointer_cast<RayShape>(
       world->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 }
 

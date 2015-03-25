@@ -55,7 +55,7 @@ SimbodyLink::~SimbodyLink()
 //////////////////////////////////////////////////
 void SimbodyLink::Load(sdf::ElementPtr _sdf)
 {
-  this->simbodyPhysics = boost::dynamic_pointer_cast<SimbodyPhysics>(
+  this->simbodyPhysics = std::dynamic_pointer_cast<SimbodyPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
   if (this->simbodyPhysics == NULL)
@@ -89,7 +89,7 @@ void SimbodyLink::Init()
     if ((*iter)->HasType(Base::COLLISION))
     {
       SimbodyCollisionPtr collision;
-      collision = boost::static_pointer_cast<SimbodyCollision>(*iter);
+      collision = std::static_pointer_cast<SimbodyCollision>(*iter);
 
       math::Pose relativePose = collision->GetRelativePose();
       relativePose.pos -= cogVec;

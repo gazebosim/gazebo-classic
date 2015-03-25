@@ -59,7 +59,7 @@ void ODEGearboxJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetReferenceBody(LinkPtr _body)
 {
-  ODELinkPtr odelink = boost::dynamic_pointer_cast<ODELink>(_body);
+  ODELinkPtr odelink = std::dynamic_pointer_cast<ODELink>(_body);
   dBodyID refId;
   if (odelink == NULL)
   {

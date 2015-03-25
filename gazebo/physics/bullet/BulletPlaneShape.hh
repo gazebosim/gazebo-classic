@@ -56,7 +56,7 @@ namespace gazebo
               {
                 PlaneShape::CreatePlane();
                 BulletCollisionPtr bParent;
-                bParent = boost::dynamic_pointer_cast<BulletCollision>(
+                bParent = std::dynamic_pointer_cast<BulletCollision>(
                     this->collisionParent);
 
                 math::Vector3 n = this->GetNormal();

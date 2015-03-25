@@ -212,10 +212,10 @@ void Joint::Load(sdf::ElementPtr _sdf)
   }
   else
   {
-    this->childLink = boost::dynamic_pointer_cast<Link>(
+    this->childLink = std::dynamic_pointer_cast<Link>(
         this->GetWorld()->GetByName(childName));
 
-    this->parentLink = boost::dynamic_pointer_cast<Link>(
+    this->parentLink = std::dynamic_pointer_cast<Link>(
         this->GetWorld()->GetByName(parentName));
   }
 
@@ -236,10 +236,10 @@ void Joint::LoadImpl(const math::Pose &_pose)
   BasePtr myBase = shared_from_this();
 
   if (this->parentLink)
-    this->parentLink->AddChildJoint(boost::static_pointer_cast<Joint>(myBase));
+    this->parentLink->AddChildJoint(std::static_pointer_cast<Joint>(myBase));
 
   if (this->childLink)
-    this->childLink->AddParentJoint(boost::static_pointer_cast<Joint>(myBase));
+    this->childLink->AddParentJoint(std::static_pointer_cast<Joint>(myBase));
 
   if (!this->parentLink && !this->childLink)
     gzthrow("both parent and child link do no exist");

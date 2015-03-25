@@ -22,8 +22,6 @@
 #include <vector>
 #include <list>
 #include <string>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <sdf/sdf.hh>
 

@@ -505,7 +505,7 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
 {
   ShapePtr shape;
   ODECollisionPtr collision =
-    boost::dynamic_pointer_cast<ODECollision>(_collision);
+    std::dynamic_pointer_cast<ODECollision>(_collision);
 
   if (_type == "sphere")
     shape.reset(new ODESphereShape(collision));

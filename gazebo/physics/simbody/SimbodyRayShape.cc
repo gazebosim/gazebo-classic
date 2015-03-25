@@ -32,7 +32,7 @@ SimbodyRayShape::SimbodyRayShape(PhysicsEnginePtr _physicsEngine)
   this->SetName("Simbody Ray Shape");
 
   this->physicsEngine =
-    boost::static_pointer_cast<SimbodyPhysics>(_physicsEngine);
+    std::static_pointer_cast<SimbodyPhysics>(_physicsEngine);
 }
 
 //////////////////////////////////////////////////
@@ -40,7 +40,7 @@ SimbodyRayShape::SimbodyRayShape(CollisionPtr _parent)
     : RayShape(_parent)
 {
   this->SetName("Simbody Ray Shape");
-  this->physicsEngine = boost::static_pointer_cast<SimbodyPhysics>(
+  this->physicsEngine = std::static_pointer_cast<SimbodyPhysics>(
       this->collisionParent->GetWorld()->GetPhysicsEngine());
 }
 

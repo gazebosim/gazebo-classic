@@ -34,7 +34,7 @@ DARTMultiRayShape::DARTMultiRayShape(CollisionPtr _parent)
   : MultiRayShape(_parent)
 {
   this->SetName("DART_multiray_shape");
-  this->physicsEngine = boost::static_pointer_cast<DARTPhysics>(
+  this->physicsEngine = std::static_pointer_cast<DARTPhysics>(
       this->collisionParent->GetWorld()->GetPhysicsEngine());
 }
 

@@ -19,8 +19,8 @@
 
 #include <vector>
 #include <map>
+#include <memory>
 #include <string>
-#include <boost/shared_ptr.hpp>
 #include "gazebo/util/system.hh"
 
 /// \file
@@ -64,107 +64,107 @@ namespace gazebo
 
     /// \def BasePtr
     /// \brief Boost shared pointer to a Base object
-    typedef boost::shared_ptr<Base> BasePtr;
+    typedef std::shared_ptr<Base> BasePtr;
 
     /// \def ContactPtr
     /// \brief Boost shared pointer to a Contact object
-    typedef boost::shared_ptr<Contact> ContactPtr;
+    typedef std::shared_ptr<Contact> ContactPtr;
 
     /// \def EntityPtr
     /// \brief Boost shared pointer to an Entity object
-    typedef boost::shared_ptr<Entity> EntityPtr;
+    typedef std::shared_ptr<Entity> EntityPtr;
 
     /// \def WorldPtr
     /// \brief Boost shared pointer to a World object
-    typedef boost::shared_ptr<World> WorldPtr;
+    typedef std::shared_ptr<World> WorldPtr;
 
     /// \def ModelPtr
     /// \brief Boost shared pointer to a Model object
-    typedef boost::shared_ptr<Model> ModelPtr;
+    typedef std::shared_ptr<Model> ModelPtr;
 
     /// \def Actor
     /// \brief Boost shared pointer to an Actor object
-    typedef boost::shared_ptr<Actor> ActorPtr;
+    typedef std::shared_ptr<Actor> ActorPtr;
 
     /// \def LinkPtr
     /// \brief Boost shared pointer to a Link object
-    typedef boost::shared_ptr<Link> LinkPtr;
+    typedef std::shared_ptr<Link> LinkPtr;
 
     /// \def CollisionPtr
     /// \brief Boost shared pointer to a Collision object
-    typedef boost::shared_ptr<Collision> CollisionPtr;
+    typedef std::shared_ptr<Collision> CollisionPtr;
 
     /// \def JointPtr
     /// \brief Boost shared pointer to a Joint object
-    typedef boost::shared_ptr<Joint> JointPtr;
+    typedef std::shared_ptr<Joint> JointPtr;
 
     /// \def JointControllerPtr
     /// \brief Boost shared pointer to a JointController object
-    typedef boost::shared_ptr<JointController> JointControllerPtr;
+    typedef std::shared_ptr<JointController> JointControllerPtr;
 
     /// \def  PhysicsEnginePtr
     /// \brief Boost shared pointer to a PhysicsEngine object
-    typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
+    typedef std::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
 
     /// \def ShapePtr
     /// \brief Boost shared pointer to a Shape object
-    typedef boost::shared_ptr<Shape> ShapePtr;
+    typedef std::shared_ptr<Shape> ShapePtr;
 
     /// \def RayShapePtr
     /// \brief Boost shared pointer to a RayShape object
-    typedef boost::shared_ptr<RayShape> RayShapePtr;
+    typedef std::shared_ptr<RayShape> RayShapePtr;
 
     /// \def HeightmapShapePtr
     /// \brief Boost shared pointer to a HeightmapShape object
-    typedef boost::shared_ptr<HeightmapShape> HeightmapShapePtr;
+    typedef std::shared_ptr<HeightmapShape> HeightmapShapePtr;
 
     /// \def MultiRayShapePtr
     /// \brief Boost shared pointer to a MultiRayShape object
-    typedef boost::shared_ptr<MultiRayShape> MultiRayShapePtr;
+    typedef std::shared_ptr<MultiRayShape> MultiRayShapePtr;
 
     /// \def InertialPtr
     /// \brief Boost shared pointer to a Inertial object
-    typedef boost::shared_ptr<Inertial> InertialPtr;
+    typedef std::shared_ptr<Inertial> InertialPtr;
 
     /// \def RoadPtr
     /// \brief Boost shared pointer to a Road object
-    typedef boost::shared_ptr<Road> RoadPtr;
+    typedef std::shared_ptr<Road> RoadPtr;
 
     /// \def FrictionPyramidPtr
     /// \brief Boost shared pointer to a FrictionPyramid object
-    typedef boost::shared_ptr<FrictionPyramid> FrictionPyramidPtr;
+    typedef std::shared_ptr<FrictionPyramid> FrictionPyramidPtr;
 
     /// \def SurfaceParamsPtr
     /// \brief Boost shared pointer to a SurfaceParams object
-    typedef boost::shared_ptr<SurfaceParams> SurfaceParamsPtr;
+    typedef std::shared_ptr<SurfaceParams> SurfaceParamsPtr;
 
     /// \def BoxShapePtr
     /// \brief Boost shared pointer to a BoxShape object
-    typedef boost::shared_ptr<BoxShape> BoxShapePtr;
+    typedef std::shared_ptr<BoxShape> BoxShapePtr;
 
     /// \def CylinderShapePtr
     /// \brief Boost shared pointer to a CylinderShape object
-    typedef boost::shared_ptr<CylinderShape> CylinderShapePtr;
+    typedef std::shared_ptr<CylinderShape> CylinderShapePtr;
 
     /// \def PlaneShapePtr
     /// \brief Boost shared pointer to a PlaneShape object
-    typedef boost::shared_ptr<PlaneShape> PlaneShapePtr;
+    typedef std::shared_ptr<PlaneShape> PlaneShapePtr;
 
     /// \def MeshShapePtr
     /// \brief Boost shared pointer to a MeshShape object
-    typedef boost::shared_ptr<MeshShape> MeshShapePtr;
+    typedef std::shared_ptr<MeshShape> MeshShapePtr;
 
     /// \def PolylineShapePtr
     /// \brief Boost shared pointer to a Polyline shape object
-    typedef boost::shared_ptr<PolylineShape> PolylineShapePtr;
+    typedef std::shared_ptr<PolylineShape> PolylineShapePtr;
 
     /// \def SphereShapePtr
     /// \brief Boost shared pointer to a SphereShape object
-    typedef boost::shared_ptr<SphereShape> SphereShapePtr;
+    typedef std::shared_ptr<SphereShape> SphereShapePtr;
 
     /// \def GripperPtr
     /// \brief Boost shared pointer to a Gripper object
-    typedef boost::shared_ptr<Gripper> GripperPtr;
+    typedef std::shared_ptr<Gripper> GripperPtr;
 
     /// \def Base_V
     /// \brief Vector of BasePtr

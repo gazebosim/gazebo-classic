@@ -74,7 +74,7 @@ namespace gazebo
         CylinderShape::SetSize(_radius, _length);
 
         DARTCollisionPtr dartCollisionParent =
-            boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
+            std::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
 
         if (dartCollisionParent->GetDARTCollisionShape() == NULL)
         {

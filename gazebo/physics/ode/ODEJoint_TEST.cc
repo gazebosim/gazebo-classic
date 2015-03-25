@@ -66,16 +66,16 @@ TEST_F(ODEJoint_TEST, ImplicitDamping)
   physics::JointPtr joint_0 = model_1->GetJoint("joint_0");
   physics::JointPtr joint_1 = model_1->GetJoint("joint_1");
 
-  EXPECT_TRUE(boost::dynamic_pointer_cast<physics::ODEJoint>(joint_0)->
+  EXPECT_TRUE(std::dynamic_pointer_cast<physics::ODEJoint>(joint_0)->
       UsesImplicitSpringDamper());
-  EXPECT_TRUE(boost::dynamic_pointer_cast<physics::ODEJoint>(joint_1)->
+  EXPECT_TRUE(std::dynamic_pointer_cast<physics::ODEJoint>(joint_1)->
       UsesImplicitSpringDamper());
 
   // Test for UseImplicitSpringDamper setting method
   // toggle flag to false then back to true
   {
     physics::ODEJointPtr joint =
-      boost::dynamic_pointer_cast<physics::ODEJoint>(joint_0);
+      std::dynamic_pointer_cast<physics::ODEJoint>(joint_0);
 
     joint->UseImplicitSpringDamper(false);
     EXPECT_FALSE(joint->UsesImplicitSpringDamper());

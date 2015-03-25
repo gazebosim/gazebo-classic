@@ -85,7 +85,7 @@ void RFIDSensor::Load(const std::string &_worldName)
   this->laserCollision->SetName("rfid_sensor_collision");
   this->laserCollision->SetRelativePose(this->pose);
 
-  this->laserShape = boost::dynamic_pointer_cast<physics::RayShape>(
+  this->laserShape = std::dynamic_pointer_cast<physics::RayShape>(
       this->laserCollision->GetShape());
 
   this->laserShape->Load(this->sdf);

@@ -105,7 +105,7 @@ void Model::LoadLinks()
     {
       // Create a new link
       LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink(
-          boost::static_pointer_cast<Model>(shared_from_this()));
+          std::static_pointer_cast<Model>(shared_from_this()));
 
       /// \TODO: canonical link is hardcoded to the first link.
       ///        warn users for now, need  to add parsing of
@@ -172,7 +172,7 @@ void Model::Init()
   {
     if ((*iter)->HasType(Base::LINK))
     {
-      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
+      LinkPtr link = std::static_pointer_cast<Link>(*iter);
       if (link)
         link->Init();
       else
@@ -180,7 +180,7 @@ void Model::Init()
               << "] has type Base::LINK, but cannot be dynamically casted\n";
     }
     else if ((*iter)->HasType(Base::MODEL))
-      boost::static_pointer_cast<Model>(*iter)->Init();
+      std::static_pointer_cast<Model>(*iter)->Init();
   }
 
   // Initialize the joints last.
@@ -345,7 +345,7 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr linkElem = _sdf->GetElement("link");
     while (linkElem)
     {
-      LinkPtr link = boost::dynamic_pointer_cast<Link>(
+      LinkPtr link = std::dynamic_pointer_cast<Link>(
           this->GetChild(linkElem->Get<std::string>("name")));
       link->UpdateParameters(linkElem);
       linkElem = linkElem->GetNextElement("link");
@@ -358,7 +358,7 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr jointElem = _sdf->GetElement("joint");
     while (jointElem)
     {
-      JointPtr joint = boost::dynamic_pointer_cast<Joint>(this->GetChild(jointElem->Get<std::string>("name")));
+      JointPtr joint = std::dynamic_pointer_cast<Joint>(this->GetChild(jointElem->Get<std::string>("name")));
       joint->UpdateParameters(jointElem);
       jointElem = jointElem->GetNextElement("joint");
     }
@@ -589,7 +589,7 @@ JointPtr Model::GetJoint(const std::string &_name)
 //////////////////////////////////////////////////
 LinkPtr Model::GetLinkById(unsigned int _id) const
 {
-  return boost::dynamic_pointer_cast<Link>(this->GetById(_id));
+  return std::dynamic_pointer_cast<Link>(this->GetById(_id));
 }
 
 //////////////////////////////////////////////////
@@ -631,7 +631,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   std::string stype = _sdf->Get<std::string>("type");
 
   joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype,
-     boost::static_pointer_cast<Model>(shared_from_this()));
+     std::static_pointer_cast<Model>(shared_from_this()));
   if (!joint)
   {
     gzerr << "Unable to create joint of type[" << stype << "]\n";
@@ -639,7 +639,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
     return;
   }
 
-  joint->SetModel(boost::static_pointer_cast<Model>(shared_from_this()));
+  joint->SetModel(std::static_pointer_cast<Model>(shared_from_this()));
 
   // Load the joint
   joint->Load(_sdf);
@@ -655,7 +655,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 
   if (!this->jointController)
     this->jointController.reset(new JointController(
-        boost::dynamic_pointer_cast<Model>(shared_from_this())));
+        std::dynamic_pointer_cast<Model>(shared_from_this())));
   this->jointController->AddJoint(joint);
 }
 
@@ -663,7 +663,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 void Model::LoadGripper(sdf::ElementPtr _sdf)
 {
   GripperPtr gripper(new Gripper(
-      boost::static_pointer_cast<Model>(shared_from_this())));
+      std::static_pointer_cast<Model>(shared_from_this())));
   gripper->Load(_sdf);
   this->grippers.push_back(gripper);
 }
@@ -778,7 +778,7 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
       return;
     }
 
-    ModelPtr myself = boost::static_pointer_cast<Model>(shared_from_this());
+    ModelPtr myself = std::static_pointer_cast<Model>(shared_from_this());
 
     try
     {
@@ -1020,7 +1020,7 @@ void Model::SetScale(const math::Vector3 &_scale)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
-      boost::static_pointer_cast<Link>(*iter)->SetScale(_scale);
+      std::static_pointer_cast<Link>(*iter)->SetScale(_scale);
     }
   }
 }

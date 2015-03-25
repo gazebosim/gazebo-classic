@@ -39,7 +39,7 @@ DARTCollision::DARTCollision(LinkPtr _link)
   this->SetName("DART_Collision");
   this->surface.reset(new DARTSurfaceParams());
   this->dtBodyNode
-      = boost::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode();
+      = std::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode();
 }
 
 //////////////////////////////////////////////////
@@ -68,8 +68,8 @@ void DARTCollision::Init()
   if (this->dtCollisionShape)
   {
     // TODO: Don't change offset of shape until dart supports plane shape.
-    boost::shared_ptr<DARTPlaneShape> planeShape =
-        boost::dynamic_pointer_cast<DARTPlaneShape>(this->shape);
+    std::shared_ptr<DARTPlaneShape> planeShape =
+        std::dynamic_pointer_cast<DARTPlaneShape>(this->shape);
 
     if (!planeShape)
     {
@@ -157,5 +157,5 @@ dart::dynamics::Shape *DARTCollision::GetDARTCollisionShape() const
 /////////////////////////////////////////////////
 DARTSurfaceParamsPtr DARTCollision::GetDARTSurface() const
 {
-  return boost::dynamic_pointer_cast<DARTSurfaceParams>(this->surface);
+  return std::dynamic_pointer_cast<DARTSurfaceParams>(this->surface);
 }

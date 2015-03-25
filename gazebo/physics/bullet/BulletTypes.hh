@@ -18,7 +18,7 @@
 #ifndef _BULLETTYPES_HH
 #define _BULLETTYPES_HH
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "gazebo/physics/bullet/bullet_math_inc.h"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector4.hh"
@@ -40,12 +40,12 @@ namespace gazebo
     class BulletRayShape;
     class BulletSurfaceParams;
 
-    typedef boost::shared_ptr<BulletCollision> BulletCollisionPtr;
-    typedef boost::shared_ptr<BulletLink> BulletLinkPtr;
-    typedef boost::shared_ptr<BulletMotionState> BulletMotionStatePtr;
-    typedef boost::shared_ptr<BulletPhysics> BulletPhysicsPtr;
-    typedef boost::shared_ptr<BulletRayShape> BulletRayShapePtr;
-    typedef boost::shared_ptr<BulletSurfaceParams> BulletSurfaceParamsPtr;
+    typedef std::shared_ptr<BulletCollision> BulletCollisionPtr;
+    typedef std::shared_ptr<BulletLink> BulletLinkPtr;
+    typedef std::shared_ptr<BulletMotionState> BulletMotionStatePtr;
+    typedef std::shared_ptr<BulletPhysics> BulletPhysicsPtr;
+    typedef std::shared_ptr<BulletRayShape> BulletRayShapePtr;
+    typedef std::shared_ptr<BulletSurfaceParams> BulletSurfaceParamsPtr;
 
     /// \addtogroup gazebo_physics_bullet
     /// \{

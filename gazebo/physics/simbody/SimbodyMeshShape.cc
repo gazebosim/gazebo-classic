@@ -53,13 +53,13 @@ void SimbodyMeshShape::Init()
   if (this->submesh)
   {
     this->simbodyMesh->Init(this->submesh,
-        boost::static_pointer_cast<SimbodyCollision>(this->collisionParent),
+        std::static_pointer_cast<SimbodyCollision>(this->collisionParent),
         this->sdf->Get<math::Vector3>("scale"));
   }
   else
   {
     this->simbodyMesh->Init(this->mesh,
-        boost::static_pointer_cast<SimbodyCollision>(this->collisionParent),
+        std::static_pointer_cast<SimbodyCollision>(this->collisionParent),
         this->sdf->Get<math::Vector3>("scale"));
   }
 }

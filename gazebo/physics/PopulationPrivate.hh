@@ -18,7 +18,7 @@
 #ifndef _GAZEBO_POPULATION_PRIVATE_HH_
 #define _GAZEBO_POPULATION_PRIVATE_HH_
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <sdf/sdf.hh>
 #include "gazebo/physics/World.hh"
 
@@ -33,7 +33,7 @@ namespace gazebo
       public: sdf::ElementPtr populationElem;
 
       /// \brief Pointer to the world.
-      public: boost::shared_ptr<World> world;
+      public: WorldPtr world;
     };
   }
 }

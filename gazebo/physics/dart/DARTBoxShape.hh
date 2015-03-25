@@ -80,7 +80,7 @@ namespace gazebo
         BoxShape::SetSize(size);
 
         DARTCollisionPtr dartCollisionParent =
-            boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
+            std::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
 
         if (dartCollisionParent->GetDARTCollisionShape() == NULL)
         {

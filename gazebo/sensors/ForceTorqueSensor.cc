@@ -141,7 +141,7 @@ void ForceTorqueSensor::Load(const std::string &_worldName)
   GZ_ASSERT(this->world != NULL,
       "ForceTorqueSensor did not get a valid World pointer");
 
-  this->parentJoint = boost::dynamic_pointer_cast<physics::Joint>(
+  this->parentJoint = std::dynamic_pointer_cast<physics::Joint>(
       this->world->GetByName(this->parentName));
 
   if (!this->parentJoint)

@@ -57,7 +57,7 @@ void GpsSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   physics::EntityPtr parentEntity = this->world->GetEntity(this->parentName);
-  this->parentLink = boost::dynamic_pointer_cast<physics::Link>(parentEntity);
+  this->parentLink = std::dynamic_pointer_cast<physics::Link>(parentEntity);
 
   this->lastGpsMsg.set_link_name(this->parentName);
 

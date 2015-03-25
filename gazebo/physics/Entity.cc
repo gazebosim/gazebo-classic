@@ -65,7 +65,7 @@ Entity::Entity(BasePtr _parent)
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
-    this->parentEntity = boost::dynamic_pointer_cast<Entity>(this->parent);
+    this->parentEntity = std::dynamic_pointer_cast<Entity>(this->parent);
     this->visualMsg->set_parent_name(this->parentEntity->GetScopedName());
     this->SetStatic(this->parentEntity->IsStatic());
   }
@@ -152,7 +152,7 @@ void Entity::SetStatic(const bool &_s)
 
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
-    EntityPtr e = boost::dynamic_pointer_cast<Entity>(*iter);
+    EntityPtr e = std::dynamic_pointer_cast<Entity>(*iter);
     if (e)
       e->SetStatic(_s);
   }
@@ -286,7 +286,7 @@ void Entity::SetWorldTwist(const math::Vector3 &_linear,
       {
         if ((*iter)->HasType(ENTITY))
         {
-          EntityPtr entity = boost::static_pointer_cast<Entity>(*iter);
+          EntityPtr entity = std::static_pointer_cast<Entity>(*iter);
           entity->SetWorldTwist(_linear, _angular, _updateChildren);
         }
       }
@@ -320,7 +320,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
   {
     if ((*iter)->HasType(ENTITY))
     {
-      EntityPtr entity = boost::static_pointer_cast<Entity>(*iter);
+      EntityPtr entity = std::static_pointer_cast<Entity>(*iter);
 
       if (entity->IsCanonicalLink())
         entity->worldPose = (entity->initialRelativePose + _pose);
@@ -342,7 +342,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
       {
         if ((*iterC)->HasType(COLLISION))
         {
-          CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
+          CollisionPtr entityC = std::static_pointer_cast<Collision>(*iterC);
           entityC->SetWorldPoseDirty();
         }
       }
@@ -383,7 +383,7 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
     {
       if ((*iterC)->HasType(COLLISION))
       {
-        CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
+        CollisionPtr entityC = std::static_pointer_cast<Collision>(*iterC);
         entityC->SetWorldPoseDirty();
       }
     }
@@ -459,7 +459,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
       if ((*iter)->HasType(LINK))
       {
         // call child Link::OnPoseChange()
-        boost::static_pointer_cast<Link>(*iter)->OnPoseChange();
+        std::static_pointer_cast<Link>(*iter)->OnPoseChange();
       }
     }
   }
@@ -472,7 +472,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
     for (Base_V::iterator iter = this->children.begin();
          iter != this->children.end(); ++iter)
     {
-      CollisionPtr coll = boost::static_pointer_cast<Collision>(*iter);
+      CollisionPtr coll = std::static_pointer_cast<Collision>(*iter);
       if (coll && (*iter)->HasType(COLLISION))
       {
         // update collision pose
@@ -496,7 +496,7 @@ ModelPtr Entity::GetParentModel()
 {
   BasePtr p;
   if (this->HasType(MODEL))
-    return boost::dynamic_pointer_cast<Model>(shared_from_this());
+    return std::dynamic_pointer_cast<Model>(shared_from_this());
 
   p = this->parent;
   GZ_ASSERT(p, "Parent of an entity is NULL");
@@ -504,7 +504,7 @@ ModelPtr Entity::GetParentModel()
   while (p->GetParent() && p->GetParent()->HasType(MODEL))
     p = p->GetParent();
 
-  return boost::dynamic_pointer_cast<Model>(p);
+  return std::dynamic_pointer_cast<Model>(p);
 }
 
 //////////////////////////////////////////////////
@@ -512,7 +512,7 @@ CollisionPtr Entity::GetChildCollision(const std::string &_name)
 {
   BasePtr base = this->GetByName(_name);
   if (base)
-    return boost::dynamic_pointer_cast<Collision>(base);
+    return std::dynamic_pointer_cast<Collision>(base);
 
   return CollisionPtr();
 }
@@ -522,7 +522,7 @@ LinkPtr Entity::GetChildLink(const std::string &_name)
 {
   BasePtr base = this->GetByName(_name);
   if (base)
-    return boost::dynamic_pointer_cast<Link>(base);
+    return std::dynamic_pointer_cast<Link>(base);
 
   return LinkPtr();
 }
@@ -614,7 +614,7 @@ const math::Pose &Entity::GetDirtyPose() const
 //////////////////////////////////////////////////
 math::Box Entity::GetCollisionBoundingBox() const
 {
-  BasePtr base = boost::const_pointer_cast<Base>(shared_from_this()); return
+  BasePtr base = std::const_pointer_cast<Base>(shared_from_this()); return
   this->GetCollisionBoundingBoxHelper(base);
 }
 
@@ -622,7 +622,7 @@ math::Box Entity::GetCollisionBoundingBox() const
 math::Box Entity::GetCollisionBoundingBoxHelper(BasePtr _base) const
 {
   if (_base->HasType(COLLISION))
-    return boost::dynamic_pointer_cast<Collision>(_base)->GetBoundingBox();
+    return std::dynamic_pointer_cast<Collision>(_base)->GetBoundingBox();
 
   math::Box box;
 
@@ -651,7 +651,7 @@ void Entity::GetNearestEntityBelow(double &_distBelow,
                                    std::string &_entityName)
 {
   this->GetWorld()->GetPhysicsEngine()->InitForThread();
-  RayShapePtr rayShape = boost::dynamic_pointer_cast<RayShape>(
+  RayShapePtr rayShape = std::dynamic_pointer_cast<RayShape>(
     this->GetWorld()->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
   math::Box box = this->GetCollisionBoundingBox();

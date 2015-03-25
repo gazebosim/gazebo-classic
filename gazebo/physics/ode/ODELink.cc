@@ -51,7 +51,7 @@ ODELink::~ODELink()
 //////////////////////////////////////////////////
 void ODELink::Load(sdf::ElementPtr _sdf)
 {
-  this->odePhysics = boost::dynamic_pointer_cast<ODEPhysics>(
+  this->odePhysics = std::dynamic_pointer_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
   if (this->odePhysics == NULL)
@@ -100,7 +100,7 @@ void ODELink::Init()
     {
       if ((*iter)->HasType(Base::COLLISION))
       {
-        ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(*iter);
+        ODECollisionPtr g = std::static_pointer_cast<ODECollision>(*iter);
         if (g->IsPlaceable() && g->GetCollisionId())
         {
           dGeomSetBody(g->GetCollisionId(), this->linkId);
@@ -345,7 +345,7 @@ void ODELink::UpdateSurface()
   {
     if ((*iter)->HasType(Base::COLLISION))
     {
-      ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(*iter);
+      ODECollisionPtr g = std::static_pointer_cast<ODECollision>(*iter);
       if (g->IsPlaceable() && g->GetCollisionId())
       {
         // Set surface properties max_vel and min_depth

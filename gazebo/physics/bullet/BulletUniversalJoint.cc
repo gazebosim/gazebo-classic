@@ -51,9 +51,9 @@ void BulletUniversalJoint::Init()
   UniversalJoint<BulletJoint>::Init();
 
   BulletLinkPtr bulletChildLink =
-    boost::static_pointer_cast<BulletLink>(this->childLink);
+    std::static_pointer_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
-    boost::static_pointer_cast<BulletLink>(this->parentLink);
+    std::static_pointer_cast<BulletLink>(this->parentLink);
 
   math::Vector3 axis1 = this->initialWorldAxis[0];
   math::Vector3 axis2 = this->initialWorldAxis[1];

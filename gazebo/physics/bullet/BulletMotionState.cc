@@ -54,7 +54,7 @@ void BulletMotionState::setWorldTransform(const btTransform &/*_cogWorldTrans*/)
   // _cogWorldTrans seems to be one time-step behind
   // for now get transform from btRigidBody directly
   physics::BulletLinkPtr bulletLink =
-    boost::static_pointer_cast<BulletLink>(this->link);
+    std::static_pointer_cast<BulletLink>(this->link);
   GZ_ASSERT(bulletLink, "parent link must be valid");
   math::Pose pose;
   if (bulletLink->GetBulletLink())

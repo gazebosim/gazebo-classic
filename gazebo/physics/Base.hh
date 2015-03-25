@@ -23,7 +23,6 @@
 #ifndef _GAZEBO_PHYSICS_BASE_HH_
 #define _GAZEBO_PHYSICS_BASE_HH_
 
-#include <boost/enable_shared_from_this.hpp>
 #include <string>
 
 #include <sdf/sdf.hh>
@@ -71,7 +70,7 @@ namespace gazebo
 
     /// \class Base Base.hh physics/physics.hh
     /// \brief Base class for most physics classes
-    class GAZEBO_VISIBLE Base : public boost::enable_shared_from_this<Base>
+    class GAZEBO_VISIBLE Base : public std::enable_shared_from_this<Base>
     {
       /// \enum EntityType
       /// \brief Unique identifiers for all entity types.

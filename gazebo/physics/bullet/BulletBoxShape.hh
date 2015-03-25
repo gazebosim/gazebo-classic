@@ -74,7 +74,7 @@ namespace gazebo
 
                 BoxShape::SetSize(size);
                 BulletCollisionPtr bParent;
-                bParent = boost::dynamic_pointer_cast<BulletCollision>(
+                bParent = std::dynamic_pointer_cast<BulletCollision>(
                     this->collisionParent);
 
                 /// Bullet requires the half-extents of the box
@@ -97,7 +97,7 @@ namespace gazebo
                   // clear bullet cache and re-add the collision shape
                   // otherwise collisions won't work properly after scaling
                   BulletLinkPtr bLink =
-                    boost::dynamic_pointer_cast<BulletLink>(
+                    std::dynamic_pointer_cast<BulletLink>(
                     bParent->GetLink());
                   bLink->ClearCollisionCache();
 

@@ -71,7 +71,7 @@ namespace gazebo
       protected: double gain;
 
       /// \brief Parent entity which the sensor is attached to
-      protected: boost::weak_ptr<physics::Link> parentEntity;
+      protected: std::weak_ptr<physics::Link> parentEntity;
 
       /// \brief Sensor reference pose
       protected: math::Pose referencePose;

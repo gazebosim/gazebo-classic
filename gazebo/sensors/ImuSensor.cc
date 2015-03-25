@@ -148,7 +148,7 @@ void ImuSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  this->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
+  this->parentEntity = std::dynamic_pointer_cast<physics::Link>(
       this->world->GetEntity(this->parentName));
 
   if (!this->parentEntity)

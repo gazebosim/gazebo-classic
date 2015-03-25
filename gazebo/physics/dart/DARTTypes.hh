@@ -18,7 +18,7 @@
 #ifndef _GAZEBO_DARTTYPES_HH_
 #define _GAZEBO_DARTTYPES_HH_
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "gazebo/math/Pose.hh"
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/util/system.hh"
@@ -39,13 +39,13 @@ namespace gazebo
     class DARTRayShape;
     class DARTSurfaceParams;
 
-    typedef boost::shared_ptr<DARTPhysics>   DARTPhysicsPtr;
-    typedef boost::shared_ptr<DARTModel>     DARTModelPtr;
-    typedef boost::shared_ptr<DARTLink>      DARTLinkPtr;
-    typedef boost::shared_ptr<DARTJoint>     DARTJointPtr;
-    typedef boost::shared_ptr<DARTCollision> DARTCollisionPtr;
-    typedef boost::shared_ptr<DARTRayShape>  DARTRayShapePtr;
-    typedef boost::shared_ptr<DARTSurfaceParams> DARTSurfaceParamsPtr;
+    typedef std::shared_ptr<DARTPhysics>   DARTPhysicsPtr;
+    typedef std::shared_ptr<DARTModel>     DARTModelPtr;
+    typedef std::shared_ptr<DARTLink>      DARTLinkPtr;
+    typedef std::shared_ptr<DARTJoint>     DARTJointPtr;
+    typedef std::shared_ptr<DARTCollision> DARTCollisionPtr;
+    typedef std::shared_ptr<DARTRayShape>  DARTRayShapePtr;
+    typedef std::shared_ptr<DARTSurfaceParams> DARTSurfaceParamsPtr;
 
     /// \addtogroup gazebo_physics_dart
     /// \{

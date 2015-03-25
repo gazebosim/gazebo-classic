@@ -34,7 +34,7 @@ DARTRayShape::DARTRayShape(PhysicsEnginePtr _physicsEngine)
 {
   this->SetName("DART_ray_shape");
   this->physicsEngine =
-    boost::static_pointer_cast<DARTPhysics>(_physicsEngine);
+    std::static_pointer_cast<DARTPhysics>(_physicsEngine);
 }
 
 //////////////////////////////////////////////////
@@ -42,7 +42,7 @@ DARTRayShape::DARTRayShape(CollisionPtr _parent)
     : RayShape(_parent)
 {
   this->SetName("DART_ray_shape");
-  this->physicsEngine = boost::static_pointer_cast<DARTPhysics>(
+  this->physicsEngine = std::static_pointer_cast<DARTPhysics>(
       this->collisionParent->GetWorld()->GetPhysicsEngine());
 }
 

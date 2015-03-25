@@ -15,7 +15,7 @@
  *
 */
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "gazebo/util/system.hh"
 
 /// \file
@@ -33,26 +33,26 @@ namespace gazebo
 
     /// \def ODECollisionPtr
     /// \brief Boost shared point to ODECollision
-    typedef boost::shared_ptr<ODECollision> ODECollisionPtr;
+    typedef std::shared_ptr<ODECollision> ODECollisionPtr;
 
     /// \def ODEJointPtr
     /// \brief Boost shared point to ODEJoint
-    typedef boost::shared_ptr<ODEJoint> ODEJointPtr;
+    typedef std::shared_ptr<ODEJoint> ODEJointPtr;
 
     /// \def ODELinkPtr
     /// \brief Boost shared point to ODELink
-    typedef boost::shared_ptr<ODELink> ODELinkPtr;
+    typedef std::shared_ptr<ODELink> ODELinkPtr;
 
     /// \def ODERayShapePtr
     /// \brief Boost shared point to ODERayShape
-    typedef boost::shared_ptr<ODERayShape> ODERayShapePtr;
+    typedef std::shared_ptr<ODERayShape> ODERayShapePtr;
 
     /// \def ODESurfaceParamsPtr
     /// \brief Boost shared pointer to ODESurfaceParams
-    typedef  boost::shared_ptr<ODESurfaceParams> ODESurfaceParamsPtr;
+    typedef  std::shared_ptr<ODESurfaceParams> ODESurfaceParamsPtr;
 
     /// \def ODEPhysicsPtr
     /// \brief Boost shared pointer for ODEPhysics.
-    typedef boost::shared_ptr<ODEPhysics> ODEPhysicsPtr;
+    typedef std::shared_ptr<ODEPhysics> ODEPhysicsPtr;
   }
 }

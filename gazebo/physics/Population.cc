@@ -16,8 +16,8 @@
 */
 
 #include <string>
+#include <memory>
 #include <vector>
-#include <boost/shared_ptr.hpp>
 #include <sdf/sdf.hh>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -34,7 +34,7 @@ using namespace common;
 using namespace physics;
 
 //////////////////////////////////////////////////
-Population::Population(sdf::ElementPtr _sdf, boost::shared_ptr<World> _world)
+Population::Population(sdf::ElementPtr _sdf, WorldPtr _world)
   : dataPtr(new PopulationPrivate)
 {
   this->dataPtr->world = _world;

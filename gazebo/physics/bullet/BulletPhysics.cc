@@ -143,7 +143,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 
     PhysicsEnginePtr engine = collisionPtr1->GetWorld()->GetPhysicsEngine();
     BulletPhysicsPtr bulletPhysics =
-          boost::static_pointer_cast<BulletPhysics>(engine);
+          std::static_pointer_cast<BulletPhysics>(engine);
 
     // Add a new contact to the manager. This will return NULL if no one is
     // listening for contact information.
@@ -676,7 +676,7 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
 {
   ShapePtr shape;
   BulletCollisionPtr collision =
-    boost::dynamic_pointer_cast<BulletCollision>(_collision);
+    std::dynamic_pointer_cast<BulletCollision>(_collision);
 
   if (_type == "plane")
     shape.reset(new BulletPlaneShape(collision));

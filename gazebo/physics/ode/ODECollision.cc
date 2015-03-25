@@ -42,7 +42,7 @@ ODECollision::ODECollision(LinkPtr _link)
   this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
 
   this->SetSpaceId(
-      boost::static_pointer_cast<ODELink>(this->link)->GetSpaceId());
+      std::static_pointer_cast<ODELink>(this->link)->GetSpaceId());
 
   this->surface.reset(new ODESurfaceParams());
 }
@@ -200,7 +200,7 @@ void ODECollision::SetSpaceId(dSpaceID _spaceid)
 /////////////////////////////////////////////////
 ODESurfaceParamsPtr ODECollision::GetODESurface() const
 {
-  return boost::dynamic_pointer_cast<ODESurfaceParams>(this->surface);
+  return std::dynamic_pointer_cast<ODESurfaceParams>(this->surface);
 }
 
 /////////////////////////////////////////////////

@@ -36,7 +36,7 @@ DARTJoint::DARTJoint(BasePtr _parent)
     dtJoint(NULL),
     dtChildBodyNode(NULL)
 {
-  this->dartPhysicsEngine = boost::dynamic_pointer_cast<DARTPhysics>(
+  this->dartPhysicsEngine = std::dynamic_pointer_cast<DARTPhysics>(
                               this->GetWorld()->GetPhysicsEngine());
   this->forceApplied[0] = 0.0;
   this->forceApplied[1] = 0.0;
@@ -70,9 +70,9 @@ void DARTJoint::Init()
 
   // Parent and child link information
   DARTLinkPtr dartParentLink =
-    boost::static_pointer_cast<DARTLink>(this->parentLink);
+    std::static_pointer_cast<DARTLink>(this->parentLink);
   DARTLinkPtr dartChildLink =
-    boost::static_pointer_cast<DARTLink>(this->childLink);
+    std::static_pointer_cast<DARTLink>(this->childLink);
 
   Eigen::Isometry3d dtTransformParentLinkToJoint =
       Eigen::Isometry3d::Identity();
@@ -122,7 +122,7 @@ LinkPtr DARTJoint::GetJointLink(unsigned int _index) const
   if (_index == 0)
   {
     DARTLinkPtr dartLink1
-        = boost::static_pointer_cast<DARTLink>(this->parentLink);
+        = std::static_pointer_cast<DARTLink>(this->parentLink);
 
     if (dartLink1 != NULL)
       return this->parentLink;
@@ -131,7 +131,7 @@ LinkPtr DARTJoint::GetJointLink(unsigned int _index) const
   if (_index == 1)
   {
     DARTLinkPtr dartLink2
-        = boost::static_pointer_cast<DARTLink>(this->childLink);
+        = std::static_pointer_cast<DARTLink>(this->childLink);
 
     if (dartLink2 != NULL)
       return this->childLink;
@@ -343,7 +343,7 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
   // Parent and child link information
   //---------------------------------------------
   DARTLinkPtr theChildLink =
-    boost::static_pointer_cast<DARTLink>(this->childLink);
+    std::static_pointer_cast<DARTLink>(this->childLink);
 
   Eigen::Vector6d F1 = Eigen::Vector6d::Zero();
   Eigen::Vector6d F2 = Eigen::Vector6d::Zero();
@@ -386,7 +386,7 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
 
   // Parent and child link information
   DARTLinkPtr theChildLink =
-    boost::static_pointer_cast<DARTLink>(this->childLink);
+    std::static_pointer_cast<DARTLink>(this->childLink);
 
   Eigen::Vector6d F1 = Eigen::Vector6d::Zero();
   Eigen::Vector6d F2 = Eigen::Vector6d::Zero();
@@ -482,7 +482,7 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   // Parent and child link information
   //---------------------------------------------
   DARTLinkPtr theChildLink =
-    boost::static_pointer_cast<DARTLink>(this->childLink);
+    std::static_pointer_cast<DARTLink>(this->childLink);
 
   Eigen::Vector6d F1 = Eigen::Vector6d::Zero();
   Eigen::Vector6d F2 = Eigen::Vector6d::Zero();
@@ -569,7 +569,7 @@ void DARTJoint::ApplyDamping()
 /////////////////////////////////////////////////
 DARTModelPtr DARTJoint::GetDARTModel() const
 {
-  return boost::dynamic_pointer_cast<DARTModel>(this->model);
+  return std::dynamic_pointer_cast<DARTModel>(this->model);
 }
 
 /////////////////////////////////////////////////

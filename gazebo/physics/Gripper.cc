@@ -186,14 +186,14 @@ void Gripper::HandleAttach()
 
     if (this->collisions.find(name1) == this->collisions.end())
     {
-      cc[name1] = boost::dynamic_pointer_cast<Collision>(
+      cc[name1] = std::dynamic_pointer_cast<Collision>(
           this->world->GetEntity(name1));
       contactCounts[name1] += 1;
     }
 
     if (this->collisions.find(name2) == this->collisions.end())
     {
-      cc[name2] = boost::dynamic_pointer_cast<Collision>(
+      cc[name2] = std::dynamic_pointer_cast<Collision>(
           this->world->GetEntity(name2));
       contactCounts[name2] += 1;
     }
@@ -249,9 +249,9 @@ void Gripper::OnContacts(ConstContactsPtr &_msg)
 {
   for (int i = 0; i < _msg->contact_size(); ++i)
   {
-    CollisionPtr collision1 = boost::dynamic_pointer_cast<Collision>(
+    CollisionPtr collision1 = std::dynamic_pointer_cast<Collision>(
         this->world->GetEntity(_msg->contact(i).collision1()));
-    CollisionPtr collision2 = boost::dynamic_pointer_cast<Collision>(
+    CollisionPtr collision2 = std::dynamic_pointer_cast<Collision>(
         this->world->GetEntity(_msg->contact(i).collision2()));
 
     if ((collision1 && !collision1->IsStatic()) &&

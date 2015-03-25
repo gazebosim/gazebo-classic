@@ -47,9 +47,9 @@ ODEMultiRayShape::ODEMultiRayShape(CollisionPtr _parent)
 
   // These three lines may be unessecary
   ODELinkPtr pLink =
-    boost::static_pointer_cast<ODELink>(this->collisionParent->GetLink());
+    std::static_pointer_cast<ODELink>(this->collisionParent->GetLink());
   pLink->SetSpaceId(this->raySpaceId);
-  boost::static_pointer_cast<ODECollision>(this->collisionParent)->SetSpaceId(
+  std::static_pointer_cast<ODECollision>(this->collisionParent)->SetSpaceId(
       this->raySpaceId);
 }
 
@@ -66,7 +66,7 @@ ODEMultiRayShape::~ODEMultiRayShape()
 //////////////////////////////////////////////////
 void ODEMultiRayShape::UpdateRays()
 {
-  ODEPhysicsPtr ode = boost::dynamic_pointer_cast<ODEPhysics>(
+  ODEPhysicsPtr ode = std::dynamic_pointer_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
   if (ode == NULL)
@@ -158,7 +158,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 
       if (n > 0)
       {
-        RayShapePtr shape = boost::static_pointer_cast<RayShape>(
+        RayShapePtr shape = std::static_pointer_cast<RayShape>(
             rayCollision->GetShape());
         if (contact.depth < shape->GetLength())
         {

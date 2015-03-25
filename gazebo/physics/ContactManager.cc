@@ -103,7 +103,7 @@ Contact *ContactManager::NewContact(Collision *_collision1,
         for (it = iter->second->collisionNames.begin();
             it != iter->second->collisionNames.end();)
         {
-          Collision *col = boost::dynamic_pointer_cast<Collision>(
+          Collision *col = std::dynamic_pointer_cast<Collision>(
               this->world->GetByName(*it)).get();
           if (!col)
           {
@@ -315,7 +315,7 @@ std::string ContactManager::CreateFilter(const std::string &_name,
   std::vector<std::string> collisionNames;
   for (unsigned int i = 0; i < _collisions.size(); ++i)
   {
-    CollisionPtr colPtr = boost::dynamic_pointer_cast<Collision>(
+    CollisionPtr colPtr = std::dynamic_pointer_cast<Collision>(
        this->world->GetByName(_collisions[i]));
     if (colPtr)
     {

@@ -58,6 +58,6 @@ void SimbodyPolylineShape::Init()
 
   // Uncomment these lines when simbody supports mesh shapes.
   // this->simbodyMesh->Init(this->mesh,
-  //     boost::static_pointer_cast<SimbodyCollision>(this->collisionParent),
+  //     std::static_pointer_cast<SimbodyCollision>(this->collisionParent),
   //     math::Vector3(1, 1, 1));
 }

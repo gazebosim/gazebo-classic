@@ -131,7 +131,7 @@ void SonarSensor::Load(const std::string &_worldName)
   this->sonarCollision->AddType(physics::Base::SENSOR_COLLISION);
   this->parentEntity->AddChild(this->sonarCollision);
 
-  this->sonarShape = boost::dynamic_pointer_cast<physics::MeshShape>(
+  this->sonarShape = std::dynamic_pointer_cast<physics::MeshShape>(
       this->sonarCollision->GetShape());
 
   GZ_ASSERT(this->sonarShape != NULL,

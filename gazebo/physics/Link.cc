@@ -242,7 +242,7 @@ void Link::Init()
   {
     if ((*iter)->HasType(Base::COLLISION))
     {
-      CollisionPtr collision = boost::static_pointer_cast<Collision>(*iter);
+      CollisionPtr collision = std::static_pointer_cast<Collision>(*iter);
       this->collisions.push_back(collision);
       collision->Init();
     }
@@ -359,7 +359,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr collisionElem = this->sdf->GetElement("collision");
     while (collisionElem)
     {
-      CollisionPtr collision = boost::dynamic_pointer_cast<Collision>(
+      CollisionPtr collision = std::dynamic_pointer_cast<Collision>(
           this->GetChild(collisionElem->Get<std::string>("name")));
 
       if (collision)
@@ -515,7 +515,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
     this->SetStatic(true);
 
   collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision(geomType,
-      boost::static_pointer_cast<Link>(shared_from_this()));
+      std::static_pointer_cast<Link>(shared_from_this()));
 
   if (!collision)
     gzthrow("Unknown Collisionetry Type[" + geomType + "]");
@@ -526,7 +526,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 CollisionPtr Link::GetCollisionById(unsigned int _id) const
 {
-  return boost::dynamic_pointer_cast<Collision>(this->GetById(_id));
+  return std::dynamic_pointer_cast<Collision>(this->GetById(_id));
 }
 
 //////////////////////////////////////////////////
@@ -538,7 +538,7 @@ CollisionPtr Link::GetCollision(const std::string &_name)
   {
     if ((*biter)->GetName() == _name)
     {
-      result = boost::dynamic_pointer_cast<Collision>(*biter);
+      result = std::dynamic_pointer_cast<Collision>(*biter);
       break;
     }
   }
@@ -557,7 +557,7 @@ CollisionPtr Link::GetCollision(unsigned int _index) const
 {
   CollisionPtr collision;
   if (_index <= this->GetChildCount())
-    collision = boost::static_pointer_cast<Collision>(this->GetChild(_index));
+    collision = std::static_pointer_cast<Collision>(this->GetChild(_index));
   else
     gzerr << "Index is out of range\n";
 
@@ -652,7 +652,7 @@ math::Vector3 Link::GetRelativeTorque() const
 //////////////////////////////////////////////////
 ModelPtr Link::GetModel() const
 {
-  return boost::dynamic_pointer_cast<Model>(this->GetParent());
+  return std::dynamic_pointer_cast<Model>(this->GetParent());
 }
 
 //////////////////////////////////////////////////
@@ -1109,7 +1109,7 @@ void Link::SetScale(const math::Vector3 &_scale)
   {
     if ((*biter)->HasType(Base::COLLISION))
     {
-      boost::static_pointer_cast<Collision>(*biter)->SetScale(_scale);
+      std::static_pointer_cast<Collision>(*biter)->SetScale(_scale);
     }
   }
 

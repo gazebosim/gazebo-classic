@@ -60,13 +60,13 @@ void ODEMeshShape::Init()
   if (this->submesh)
   {
     this->odeMesh->Init(this->submesh,
-        boost::static_pointer_cast<ODECollision>(this->collisionParent),
+        std::static_pointer_cast<ODECollision>(this->collisionParent),
         this->sdf->Get<math::Vector3>("scale"));
   }
   else
   {
     this->odeMesh->Init(this->mesh,
-        boost::static_pointer_cast<ODECollision>(this->collisionParent),
+        std::static_pointer_cast<ODECollision>(this->collisionParent),
         this->sdf->Get<math::Vector3>("scale"));
   }
 }
