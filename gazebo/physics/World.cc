@@ -234,6 +234,9 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->statPub =
     this->dataPtr->node->Advertise<msgs::WorldStatistics>(
         "~/world_stats", 100, 5);
+  this->dataPtr->logStatPub =
+    this->dataPtr->node->Advertise<msgs::LogStatistics>(
+        "~/log_stats", 100, 5);
   this->dataPtr->modelPub = this->dataPtr->node->Advertise<msgs::Model>(
       "~/model/info");
   this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
@@ -539,7 +542,7 @@ void World::LogStep()
       this->dataPtr->stepInc--;
   }
 
-  this->PublishWorldStats();
+  this->PublishLogStats();
 
   this->ProcessMessages();
 }
@@ -1936,6 +1939,19 @@ void World::PublishWorldStats()
   if (this->dataPtr->statPub && this->dataPtr->statPub->HasConnections())
     this->dataPtr->statPub->Publish(this->dataPtr->worldStatsMsg);
   this->dataPtr->prevStatTime = common::Time::GetWallTime();
+}
+
+//////////////////////////////////////////////////
+void World::PublishLogStats()
+{
+  msgs::Set(this->dataPtr->logStatsMsg.mutable_sim_time(),
+      this->GetSimTime());
+
+  this->dataPtr->logStatsMsg.set_iterations(this->dataPtr->iterations);
+  this->dataPtr->logStatsMsg.set_paused(this->IsPaused());
+
+  if (this->dataPtr->logStatPub && this->dataPtr->logStatPub->HasConnections())
+    this->dataPtr->logStatPub->Publish(this->dataPtr->logStatsMsg);
 }
 
 //////////////////////////////////////////////////

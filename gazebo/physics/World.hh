@@ -444,6 +444,9 @@ namespace gazebo
       /// \brief Publish the world stats message.
       private: void PublishWorldStats();
 
+      /// \brief Publish the log stats message.
+      private: void PublishLogStats();
+
       /// \brief Thread function for logging state data.
       private: void LogWorker();
 

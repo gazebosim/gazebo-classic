@@ -87,6 +87,9 @@ namespace gazebo
       /// \brief Publisher for world statistics messages.
       public: transport::PublisherPtr statPub;
 
+      /// \brief Publisher for world statistics messages.
+      public: transport::PublisherPtr logStatPub;
+
       /// \brief Publisher for request response messages.
       public: transport::PublisherPtr responsePub;
 
@@ -125,6 +128,9 @@ namespace gazebo
 
       /// \brief Outgoing world statistics message.
       public: msgs::WorldStatistics worldStatsMsg;
+
+      /// \brief Outgoing world statistics message.
+      public: msgs::WorldStatistics logStatsMsg;
 
       /// \brief Outgoing scene message.
       public: msgs::Scene sceneMsg;
