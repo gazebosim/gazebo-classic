@@ -113,11 +113,19 @@ void SaveDialog::SetTitle(const std::string &_title)
 /////////////////////////////////////////////////
 void SaveDialog::OnBrowse()
 {
-  QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-    QDir::homePath(), QFileDialog::ShowDirsOnly
-    | QFileDialog::DontResolveSymlinks);
-  if (!dir.isEmpty())
-    this->locationLineEdit->setText(dir);
+  QFileDialog fileDialog(this, tr("Open Directory"), QDir::homePath());
+  fileDialog.setFileMode(QFileDialog::Directory);
+  fileDialog.setOptions(QFileDialog::ShowDirsOnly
+      | QFileDialog::DontResolveSymlinks);
+
+  if (fileDialog.exec() == QDialog::Accepted)
+  {
+    QStringList selected = fileDialog.selectedFiles();
+    if (selected.empty())
+      return;
+
+    this->locationLineEdit->setText(selected[0]);
+  }
 }
 
 /////////////////////////////////////////////////
