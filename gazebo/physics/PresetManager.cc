@@ -430,7 +430,7 @@ void PresetManager::GeneratePresetFromSDF(Preset *_preset,
   {
     return;
   }
-  
+
   for (sdf::ElementPtr elem = _elem->GetFirstElement(); elem;
         elem = elem->GetNextElement())
   {
