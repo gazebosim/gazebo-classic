@@ -148,11 +148,14 @@ namespace gazebo
 
       /// \brief Create a new profile.
       /// \param[in] _name The name of the new profile.
+      /// \return True if the profile was successfully created.
       public: bool CreateProfile(const std::string &_name);
 
       /// \brief Create a new profile from SDF. SDF determines the profile name
       /// \param[in] _sdf Pointer to a physics SDF element.
-      /// \return The name of the new profile, read from SDF.
+      /// \return The name of the new profile, read from SDF. If the profile
+      /// was not successfully created, return the empty string, which is an
+      /// invalid profile name.
       public: std::string CreateProfile(sdf::ElementPtr _sdf);
 
       /// \brief Remove a profile.
@@ -161,7 +164,8 @@ namespace gazebo
 
       /// \brief Get the SDF for a profile.
       /// \param[in] _name The name of the profile to be accessed.
-      /// \return Pointer to the SDF physics element representing the profile
+      /// \return Pointer to the SDF physics element representing the profile.
+      /// Can be NULL if no profile was found.
       public: sdf::ElementPtr ProfileSDF(const std::string &_name) const;
 
       /// \brief Set the SDF for a profile.
