@@ -46,7 +46,7 @@ namespace gazebo
       float y_step = diff.y / duration;
       float z_step = diff.z / duration;
       int curr_frame = anim->GetKeyFrameCount();
-    
+
       for (int i=1; i <= duration; i++) {
         gazebo::common::PoseKeyFrame * key = anim->CreateKeyFrame(i+curr_frame);
         key->SetTranslation(math::Vector3((*translation).x + x_step*i,
@@ -54,7 +54,7 @@ namespace gazebo
               (*translation).z + z_step*i));
         key->SetRotation(math::Quaternion(0, 0, 0));
       }
-    
+
       translation->Set((*translation).x + x_step*duration,
            (*translation).y + y_step*duration,
            (*translation).z + z_step*duration);
@@ -66,23 +66,23 @@ namespace gazebo
 
       for (int i=0; i < num_points-1; i++)
         path_length += path[i].Distance(path[i+1].x, path[i+1].y, path[i+1].z);
-    
+
       // create the animation
       this->anim = gazebo::common::PoseAnimationPtr(new gazebo::common::PoseAnimation("test", path_length+1, false));
-    
+
       gazebo::common::PoseKeyFrame *key;
-    
+
       // set starting location of the box
       key = anim->CreateKeyFrame(0);
       key->SetTranslation(math::Vector3(0, 0, 0));
       key->SetRotation(math::Quaternion(0, 0, 0));
-    
+
       math::Vector3 translation = math::Vector3(0, 0, 0);
-    
+
       move(&start_point, path, &translation);
       for (int i=0; i < num_points-1; i++)
         move(path+i, path+i+1, &translation);
-    
+
       // set the animation
       this->model->SetAnimation(anim);
     }
@@ -96,10 +96,10 @@ namespace gazebo
 
       for (int i = 0; i < num_points; i++)
         path[i] = gazebo::msgs::Convert(msg->pose(i)).pos;
-     
+
       initiateMove();
     }
-  
+
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
       std::cout << "In plugin code.\n";
@@ -108,7 +108,7 @@ namespace gazebo
 
       this->node = transport::NodePtr(new transport::Node());
       this->node->Init(this->model->GetWorld()->GetName());
-    
+
       // Either get parameters from sdf
       if (_sdf->HasElement("path") && _sdf->HasElement("n_points"))
       {
@@ -130,7 +130,7 @@ namespace gazebo
         pathSubscriber = node->Subscribe("/gazebo/default/pose_animation", &ModelMove::getPathMsg, this);
       }
     }
-  
+
     // Pointer to the model
     private: physics::ModelPtr model;
 
