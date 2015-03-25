@@ -38,6 +38,7 @@ using namespace gui;
 // spnav_open() when spnav daemon is not running.
 int spnav_test_daemon(void)
 {
+#ifndef _WIN32
   int s;
   struct sockaddr_un addr;
 
@@ -55,6 +56,7 @@ int spnav_test_daemon(void)
   }
 
   close(s);
+#endif
   return 0;
 }
 
