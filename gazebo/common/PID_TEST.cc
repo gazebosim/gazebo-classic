@@ -24,7 +24,7 @@ using namespace gazebo;
 
 class PID : public gazebo::testing::AutoLogFixture { };
 
-TEST_F(PID, ConstructorInit)
+TEST_F(PID, ConstructorInitGetSet)
 {
   // default constructor
   {
@@ -59,6 +59,27 @@ TEST_F(PID, ConstructorInit)
     EXPECT_DOUBLE_EQ(0.0, pid.GetCmdMin());
 
     pid.Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
+    EXPECT_DOUBLE_EQ(p, pid.GetPGain());
+    EXPECT_DOUBLE_EQ(i, pid.GetIGain());
+    EXPECT_DOUBLE_EQ(d, pid.GetDGain());
+    EXPECT_DOUBLE_EQ(iMax, pid.GetIMax());
+    EXPECT_DOUBLE_EQ(iMin, pid.GetIMin());
+    EXPECT_DOUBLE_EQ(cmdMax, pid.GetCmdMax());
+    EXPECT_DOUBLE_EQ(cmdMin, pid.GetCmdMin());
+  }
+
+  // default constructor
+  // followed by Set/Get of parameters
+  {
+    common::PID pid;
+    pid.SetPGain(p);
+    pid.SetIGain(i);
+    pid.SetDGain(d);
+    pid.SetIMax(iMax);
+    pid.SetIMin(iMin);
+    pid.SetCmdMax(cmdMax);
+    pid.SetCmdMin(cmdMin);
+
     EXPECT_DOUBLE_EQ(p, pid.GetPGain());
     EXPECT_DOUBLE_EQ(i, pid.GetIGain());
     EXPECT_DOUBLE_EQ(d, pid.GetDGain());
