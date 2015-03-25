@@ -202,7 +202,7 @@ void LevelInspectorDialog::SetFloorColor(const QColor _color)
     this->floorColorComboBox->addItem(colorIcon, QString(""));
     index = this->floorColorComboBox->count()-1;
   }
-  GZ_ASSERT(index > 0, "Color index is broken < 0");
+  GZ_ASSERT(index >= 0, "Color index is broken < 0");
   this->floorColorComboBox->setCurrentIndex(index);
 }
 

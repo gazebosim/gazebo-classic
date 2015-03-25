@@ -28,6 +28,11 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace gazebo
 {
   namespace rendering
@@ -67,11 +72,6 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
 
-      /// \brief Received item selection user input.
-      /// \param[in] _item Item selected.
-      /// \param[in] _column Column index.
-      private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
-
       /// \brief Qt callback when cylinder button is clicked.
       private slots: void OnCylinder();
 
@@ -84,8 +84,8 @@ namespace gazebo
       /// \brief Qt callback when custom button is clicked.
       private slots: void OnCustom();
 
-      /// \brief Qt callback when a part has been added.
-      private slots: void OnPartAdded();
+      /// \brief Qt callback when a link has been added.
+      private slots: void OnLinkAdded();
 
       /// \brief Qt callback when the model is to be made static.
       private slots: void OnStatic();
@@ -96,6 +96,38 @@ namespace gazebo
       /// \brief Qt callback when the Model Name field is changed.
       /// \param[in] _name New name.
       private slots: void OnNameChanged(const QString &_name);
+
+      /// \brief Qt callback when a tree item has been double clicked.
+      /// \param[in] _item Item clicked.
+      /// \param[in] _column Column index.
+      private slots: void OnItemDoubleClick(QTreeWidgetItem *item, int column);
+
+      /// \brief Add a link to the tree.
+      /// \param[in] _linkName Scoped link name.
+      private: void OnLinkInserted(const std::string &_linkName);
+
+      /// \brief Add a joint to the tree.
+      /// \param[in] _jointId Unique joint identifying name.
+      /// \param[in] _jointName Scoped name which can be changed by the user.
+      private: void OnJointInserted(const std::string &_jointId,
+          const std::string &_jointName);
+
+      /// \brief Remove a link from the tree.
+      /// \param[in] _linkId Unique link identifying name.
+      private: void OnLinkRemoved(const std::string &_linkId);
+
+      /// \brief Remove a joint from the tree.
+      /// \param[in] _jointId Unique joint identifying name.
+      private: void OnJointRemoved(const std::string &_jointId);
+
+      /// \brief Remove all links and joints from the tree.
+      private: void ClearModelTree();
+
+      /// \brief Update a joint item text in the tree.
+      /// \param[in] _jointId Unique joint identifying name.
+      /// \param[in] _newJointName New scoped joint name.
+      private: void OnJointNameChanged(const std::string &_jointId,
+          const std::string &_newJointName);
 
       /// \brief Callback when user has provided information on where to save
       /// the model to.
@@ -109,14 +141,15 @@ namespace gazebo
       /// \param[in] _static New static property of the model.
       /// \param[in] _autoDisable New allow_auto_disable property of the model.
       /// \param[in] _pose New model pose.
+      /// \param[in] _name New name.
       private: void OnModelPropertiesChanged(bool _static, bool _autoDisable,
-          const math::Pose &_pose);
+          const math::Pose &_pose, const std::string &_name);
 
       /// \brief A list of gui editor events connected to this palette.
       private: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief Parts button group.
-      private: QButtonGroup *partButtonGroup;
+      /// \brief Links button group.
+      private: QButtonGroup *linkButtonGroup;
 
       /// \brief Model creator.
       private: ModelCreator *modelCreator;
@@ -133,6 +166,18 @@ namespace gazebo
 
       /// \brief Edit the name of the model.
       private: QLineEdit *modelNameEdit;
+
+      /// \brief The tree holding all links and joints.
+      private: QTreeWidget *modelTreeWidget;
+
+      /// \brief Parent item for all links.
+      private: QTreeWidgetItem *linksItem;
+
+      /// \brief Parent item for all joints.
+      private: QTreeWidgetItem *jointsItem;
+
+      /// \brief Mutex to protect updates.
+      private: boost::recursive_mutex *updateMutex;
     };
   }
 }
