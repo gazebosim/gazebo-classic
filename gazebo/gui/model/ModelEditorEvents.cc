@@ -41,3 +41,4 @@ event::EventT<void (std::string)> model::Events::jointRemoved;
 event::EventT<void (std::string)> model::Events::openLinkInspector;
 event::EventT<void (std::string)> model::Events::openJointInspector;
 event::EventT<void (std::string, std::string)> model::Events::jointNameChanged;
+

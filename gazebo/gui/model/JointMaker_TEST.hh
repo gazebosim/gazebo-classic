@@ -30,6 +30,10 @@ class JointMaker_TEST : public QTestFixture
 
   /// \brief Test creating and removing joints
   private slots: void CreateRemoveJoint();
+
+  /// \brief Test values of joint default properties.
+  private slots: void JointDefaultProperties();
+
 };
 
 #endif

@@ -278,7 +278,7 @@ namespace gazebo
         public: static event::EventT<void (std::string)> modelNameChanged;
 
         /// \brief Notify that model properties have been changed.
-        // The properties are: is_static, auto_disable, pose, name
+        // The properties are: is_static, auto_disable, pose, name.
         public: static event::EventT<void (bool, bool, const math::Pose &,
             const std::string &)> modelPropertiesChanged;
 
@@ -300,7 +300,7 @@ namespace gazebo
         /// \brief Notify that a link has been removed.
         public: static event::EventT<void (std::string)> linkRemoved;
 
-        /// \brief Nitify that a joint has been removed.
+        /// \brief Notify that a joint has been removed.
         public: static event::EventT<void (std::string)> jointRemoved;
 
         /// \brief Request to open the link inspector.
