@@ -1005,7 +1005,7 @@ void JointData::OnApply()
   if (this->name != this->jointMsg->name())
     gui::model::Events::jointNameChanged(this->hotspot->GetName(),
         this->jointMsg->name());
-  this->name = this->inspector->GetName();
+  this->name = this->jointMsg->name();
 
   this->dirty = true;
   gui::model::Events::modelChanged();
