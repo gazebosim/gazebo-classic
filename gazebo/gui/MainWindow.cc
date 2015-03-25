@@ -19,7 +19,6 @@
 
 #include "gazebo/gazebo_config.h"
 
-#include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiPlugin.hh"
 #include "gazebo/gui/CloneWindow.hh"
 #include "gazebo/gui/TopicSelector.hh"
