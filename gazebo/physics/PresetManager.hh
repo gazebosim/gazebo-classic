@@ -183,6 +183,9 @@ namespace gazebo
       private: void GenerateSDFFromPreset(sdf::ElementPtr _elem,
           const Preset &_preset) const;
 
+      private: void GenerateSDFHelper(sdf::ElementPtr _elem,
+          const Preset &_preset) const;
+
       /// \brief Get a pointer to the current profile preset.
       /// \return Pointer to the current profile preset object.
       private: Preset *CurrentPreset() const;

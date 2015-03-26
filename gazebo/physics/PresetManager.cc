@@ -420,6 +420,19 @@ boost::any GetAnySDFValue(const sdf::ElementPtr _elem)
   return ret;
 }
 
+//////////////////////////////////////////////////
+template<typename T> bool CastAnyValue(const boost::any _value, T &_return)
+{
+  try
+  {
+    _return = boost::any_cast<T>(_value);
+  }
+  catch(boost::bad_any_cast &_e)
+  {
+    return false;
+  }
+  return true;
+}
 
 //////////////////////////////////////////////////
 void PresetManager::GeneratePresetFromSDF(Preset *_preset,
@@ -432,6 +445,17 @@ void PresetManager::GeneratePresetFromSDF(Preset *_preset,
     return;
   }
   if (!_elem)
+  {
+    return;
+  }
+
+  // Check for physics engine type. If the type specified in SDF doesn't match
+  // the type of the physics engine, don't add the children to the parameter map.
+  // This will need to be changed in the future when switching the type of the
+  // physics engine is allowed.
+  GZ_ASSERT(this->dataPtr->physicsEngine, "No physics engine in PresetManager");
+  if (_elem->GetParent()->GetName() == "physics" &&
+      this->dataPtr->physicsEngine->GetType() != _elem->GetName())
   {
     return;
   }
@@ -449,8 +473,72 @@ void PresetManager::GeneratePresetFromSDF(Preset *_preset,
 
 //////////////////////////////////////////////////
 void PresetManager::GenerateSDFFromPreset(sdf::ElementPtr _elem,
-    const sdf::ElementPtr _elem) const
+    const Preset &_preset) const
 {
+  _elem.reset();
+
+  // Start with the elementSDF member variable of the preset
+  _elem = _preset.SDF()->Clone();
+
+  // For each element, check that its equivalent in Preset has the same value
+  GenerateSDFHelper(_elem, _preset);
+}
+
+//////////////////////////////////////////////////
+void PresetManager::GenerateSDFHelper(sdf::ElementPtr _elem,
+    const Preset &_preset) const
+{
+  if (!_elem)
+  {
+    return;
+  }
+
+  for (sdf::ElementPtr elem = _elem->GetFirstElement(); elem;
+        elem = elem->GetNextElement())
+  {
+    boost::any value;
+    if (_preset.GetParam(elem->GetName(), value))
+    {
+      // cast based on type in SDF
+      if (typeid(int) == _elem->GetValue()->GetType())
+      {
+        int v;
+        if (CastAnyValue(value, v)) 
+          elem->Set(v);
+      }
+      else if (typeid(double) == _elem->GetValue()->GetType())
+      {
+        double v;
+        if (CastAnyValue(value, v)) 
+          elem->Set(v);
+      }
+      else if (typeid(float) == _elem->GetValue()->GetType())
+      {
+        float v;
+        if (CastAnyValue(value, v)) 
+          elem->Set(v);
+      }
+      else if (typeid(bool) == _elem->GetValue()->GetType())
+      {
+        bool v;
+        if (CastAnyValue(value, v)) 
+          elem->Set(v);
+      }
+      else if (typeid(std::string) == _elem->GetValue()->GetType())
+      {
+        std::string v;
+        if (CastAnyValue(value, v)) 
+          elem->Set(v);
+      }
+      else if (typeid(sdf::Vector3) == _elem->GetValue()->GetType())
+      {
+        math::Vector3 v;
+        if (CastAnyValue(value, v)) 
+          elem->Set(v);
+      }
+    }
+    this->GenerateSDFHelper(elem, _preset);
+  }
 }
 
 //////////////////////////////////////////////////
