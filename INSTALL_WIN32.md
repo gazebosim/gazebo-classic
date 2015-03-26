@@ -39,7 +39,7 @@ Windows `cmd` for configuring and building.  You might also need to
 
     - [Qt 4.8.6](http://packages.osrfoundation.org/win32/deps/qt-4.8.6-x64-msvc2013-rev1.7z)
 
-1. Install cmake
+1. Install cmake, make sure to select the "Add CMake to system path for all users" option in the install dialog box
 
     - [Cmake](http://www.cmake.org/download/)
     
