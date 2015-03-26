@@ -178,6 +178,11 @@ namespace gazebo
       private: void GeneratePresetFromSDF(Preset *_preset,
           const sdf::ElementPtr _elem) const;
 
+      /// \brief Generate an SDF element from an Preset object.
+      /// \param[in] _sdf The SDF physics element for the profile.
+      private: void GenerateSDFFromPreset(sdf::ElementPtr _elem,
+          const Preset &_preset) const;
+
       /// \brief Get a pointer to the current profile preset.
       /// \return Pointer to the current profile preset object.
       private: Preset *CurrentPreset() const;

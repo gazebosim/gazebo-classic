@@ -40,6 +40,7 @@
 
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
 

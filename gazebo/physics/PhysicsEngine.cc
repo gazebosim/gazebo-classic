@@ -31,6 +31,7 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/PresetManager.hh"
 
 using namespace gazebo;
 using namespace physics;

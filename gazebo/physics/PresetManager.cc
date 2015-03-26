@@ -116,7 +116,12 @@ sdf::ElementPtr Preset::SDF() const
 void Preset::SDF(sdf::ElementPtr _sdfElement)
 {
   // TODO: check for non-physics element in Preset::SDF (set)
-  GZ_ASSERT(_sdfElement, "Trying to add NULL SDF element to Preset");
+  GZ_ASSERT(_sdfElement, "Tried to add NULL SDF element to Preset");
+  if (_sdfElement->GetName() != "physics")
+  {
+    gzwarn << "Can't assign non-physics element to preset profile" << std::endl;
+    return;
+  }
   this->dataPtr->elementSDF = _sdfElement;
 }
 
@@ -440,6 +445,12 @@ void PresetManager::GeneratePresetFromSDF(Preset *_preset,
     }
     this->GeneratePresetFromSDF(_preset, elem);
   }
+}
+
+//////////////////////////////////////////////////
+void PresetManager::GenerateSDFFromPreset(sdf::ElementPtr _elem,
+    const sdf::ElementPtr _elem) const
+{
 }
 
 //////////////////////////////////////////////////
