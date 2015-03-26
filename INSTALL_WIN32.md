@@ -39,6 +39,10 @@ Windows `cmd` for configuring and building.  You might also need to
 
     - [Qt 4.8.6](http://packages.osrfoundation.org/win32/deps/qt-4.8.6-x64-msvc2013-rev1.7z)
 
+1. Install cmake
+
+    - [Cmake](http://www.cmake.org/download/)
+    
 1. Clone sdformat and gazebo:
 
         hg clone https://bitbucket.org/osrf/sdformat
