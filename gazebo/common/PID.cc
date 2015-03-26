@@ -148,7 +148,10 @@ double PID::Update(double _error, common::Time _dt)
   this->cmd = -pTerm - iTerm - dTerm;
 
   // Check the command limits
-  this->cmd = math::clamp(this->cmd, this->cmdMin, this->cmdMax);
+  if (!math::equal(this->cmdMax, 0.0) && this->cmd > this->cmdMax)
+    this->cmd = this->cmdMax;
+  if (!math::equal(this->cmdMin, 0.0) && this->cmd < this->cmdMin)
+    this->cmd = this->cmdMin;
 
   return this->cmd;
 }
