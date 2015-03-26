@@ -78,7 +78,7 @@ namespace gazebo
 
       /// \brief QT signal to notify when we received a selection msg.
       /// \param[in] _name Name of the selected entity.
-      private signals: void selectionMsgReceived(const QString &_name);
+      signals: void selectionMsgReceived(const QString &_name);
 
       protected: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);

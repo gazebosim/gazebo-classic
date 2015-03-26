@@ -158,7 +158,7 @@ GLWidget::GLWidget(QWidget *_parent)
       SLOT(OnModelEditor(bool)));
 
   connect(this, SIGNAL(selectionMsgReceived(const QString &)), this,
-                SLOT(OnSelectionMsgEvent(const QString &)));
+      SLOT(OnSelectionMsgEvent(const QString &)), Qt::QueuedConnection);
 }
 
 /////////////////////////////////////////////////
