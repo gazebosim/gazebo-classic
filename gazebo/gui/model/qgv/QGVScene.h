@@ -15,10 +15,11 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public
 License along with this library.
 ***************************************************************/
+
 #ifndef QGVSCENE_H
 #define QGVSCENE_H
 
-#pragma GCC system_header
+
 
 #include <QMap>
 #include <QGraphicsScene>
@@ -39,7 +40,7 @@ class QGVGvcPrivate;
 class QGVCORE_EXPORT QGVScene : public QGraphicsScene
 {
     Q_OBJECT
-public:
+  public:
 
     explicit QGVScene(const QString &name, QObject *parent = 0);
     ~QGVScene();
@@ -49,10 +50,11 @@ public:
     void setEdgeAttribute(const QString &name, const QString &value);
 
     QGVNode* addNode(const QString& label);
-    QGVEdge* addEdge(QGVNode* source, QGVNode* target, const QString& label=QString());
+    QGVEdge* addEdge(QGVNode* source, QGVNode* target, const QString&
+        label = QString());
     QGVEdge *addEdge(const QString &source, const QString &target);
 
-    QGVSubGraph* addSubGraph(const QString& name, bool cluster=true);
+    QGVSubGraph* addSubGraph(const QString& name, bool cluster = true);
     void removeNode(const QString& label);
     void removeEdge(const QString& source, const QString& target);
     void removeEdge(const QPair<QString, QString>& key);
@@ -62,13 +64,16 @@ public:
 
     void setRootNode(QGVNode *node);
 
+    int nodeCount() const;
+    int edgeCount() const;
+
     void loadLayout(const QString &text);
     void applyLayout();
     void clearLayout();
     void clear();
 
 
-signals:
+  signals:
     void nodeContextMenu(QGVNode* node);
     void nodeDoubleClick(QGVNode* node);
 
@@ -80,30 +85,31 @@ signals:
 
     void graphContextMenuEvent();
 
-public slots:
+  public slots:
 
-protected:
-    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent * contextMenuEvent);
+  protected:
+    virtual void contextMenuEvent(
+        QGraphicsSceneContextMenuEvent * contextMenuEvent);
     virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent);
     virtual void drawBackground(QPainter * painter, const QRectF & rect);
-private:
+  private:
     friend class QGVNode;
     friend class QGVEdge;
     friend class QGVSubGraph;
 
-		QGVGvcPrivate *_context;
-		QGVGraphPrivate *_graph;
-    //QFont _font;
+    QGVGvcPrivate *_context;
+    QGVGraphPrivate *_graph;
+    // QFont _font;
 
-//    QList<QGVNode*> _nodes;
-//    QList<QGVEdge*> _edges;
-//    QList<QGVSubGraph*> _subGraphs;
+    // QList<QGVNode*> _nodes;
+    // QList<QGVEdge*> _edges;
+    // QList<QGVSubGraph*> _subGraphs;
 
     QMap<QString, QGVNode*> _nodes;
     QMap<QPair<QString, QString>, QGVEdge*> _edges;
     QMap<QString, QGVSubGraph*> _subGraphs;
 
-		bool init;
+    bool init;
 };
 
-#endif // QGVSCENE_H
+#endif

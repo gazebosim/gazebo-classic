@@ -111,6 +111,12 @@ void SchematicViewWidget::AddNode(const std::string &_node)
 }
 
 /////////////////////////////////////////////////
+int SchematicViewWidget::GetNodeCount() const
+{
+  return this->scene->nodeCount();
+}
+
+/////////////////////////////////////////////////
 void SchematicViewWidget::RemoveNode(const std::string &_node)
 {
   std::string node = this->GetLeafName(_node);
@@ -122,7 +128,6 @@ void SchematicViewWidget::RemoveNode(const std::string &_node)
   this->scene->clearLayout();
   this->scene->RemoveNode(node);
 
-  //Layout scene
   this->scene->applyLayout();
 }
 
@@ -159,6 +164,12 @@ void SchematicViewWidget::RemoveEdge(const std::string &_id)
 
     this->edges.erase(it);
   }
+}
+
+/////////////////////////////////////////////////
+int SchematicViewWidget::GetEdgeCount() const
+{
+  return this->scene->nodeCount();
 }
 
 /////////////////////////////////////////////////

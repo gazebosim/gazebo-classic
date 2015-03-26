@@ -15,6 +15,7 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public
 License along with this library.
 ***************************************************************/
+
 #ifndef QGVSUBGRAPH_H
 #define QGVSUBGRAPH_H
 
@@ -33,16 +34,17 @@ class QGVGraphPrivate;
  */
 class QGVCORE_EXPORT QGVSubGraph : public QGraphicsItem
 {
-public:
+  public:
     ~QGVSubGraph();
 
     QString name() const;
 
     QGVNode* addNode(const QString& label);
-    QGVSubGraph* addSubGraph(const QString& name, bool cluster=true);
+    QGVSubGraph* addSubGraph(const QString& name, bool cluster = true);
 
     QRectF boundingRect() const;
-    void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+        QWidget *widget = 0);
     void setAttribute(const QString &name, const QString &value);
     QString getAttribute(const QString &name) const;
     void updateLayout();
@@ -50,13 +52,12 @@ public:
     enum { Type = UserType + 4 };
     int type() const
     {
-        return Type;
+      return Type;
     }
 
-
-private:
+  private:
     friend class QGVScene;
-		QGVSubGraph(QGVGraphPrivate* subGraph, QGVScene *scene);
+    QGVSubGraph(QGVGraphPrivate* subGraph, QGVScene *scene);
 
     double _height, _width;
     QPen _pen;
@@ -66,8 +67,8 @@ private:
     QRectF _label_rect;
 
     QGVScene *_scene;
-		QGVGraphPrivate *_sgraph;
+    QGVGraphPrivate *_sgraph;
     QList<QGVNode*> _nodes;
 };
 
-#endif // QGVSUBGRAPH_H
+#endif

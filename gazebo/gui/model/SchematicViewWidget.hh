@@ -70,6 +70,14 @@ namespace gazebo
       /// \param[in] _name Name of edge.
       public: void RemoveEdge(const std::string &_id);
 
+      /// \brief Get number of nodes in the scene.
+      /// \return Number of nodes.
+      public: int GetNodeCount() const;
+
+      /// \brief Get number of edges in the scene.
+      /// \return Number of nodes.
+      public: int GetEdgeCount() const;
+
       /// \brief Helper function to get the leaf name from a scoped name.
       /// \param[in] _scopedName Scoped name.
       /// \return Leaf name.

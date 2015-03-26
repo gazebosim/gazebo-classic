@@ -15,6 +15,7 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public
 License along with this library.
 ***************************************************************/
+
 #include <QGVEdge.h>
 #include <QGVCore.h>
 #include <QGVScene.h>
@@ -31,7 +32,7 @@ QGVEdge::QGVEdge(QGVEdgePrivate *edge, QGVScene *qgvscene) :  _scene(qgvscene), 
 QGVEdge::~QGVEdge()
 {
     _scene->removeItem(this);
-		delete _edge;
+    delete _edge;
 }
 
 QString QGVEdge::label() const
@@ -98,12 +99,12 @@ void QGVEdge::paint(QPainter * painter, const QStyleOptionGraphicsItem */*_optio
 
 void QGVEdge::setAttribute(const QString &name, const QString &value)
 {
-		agsafeset(_edge->edge(), name.toLocal8Bit().data(), value.toLocal8Bit().data(), (char *)"");
+    agsafeset(_edge->edge(), name.toLocal8Bit().data(), value.toLocal8Bit().data(), (char *)"");
 }
 
 QString QGVEdge::getAttribute(const QString &name) const
 {
-		char* value = agget(_edge->edge(), name.toLocal8Bit().data());
+    char* value = agget(_edge->edge(), name.toLocal8Bit().data());
     if(value)
         return value;
     return QString();
@@ -113,9 +114,9 @@ void QGVEdge::updateLayout()
 {
     prepareGeometryChange();
 
-		qreal gheight = QGVCore::graphHeight(_scene->_graph->graph());
+    qreal gheight = QGVCore::graphHeight(_scene->_graph->graph());
 
-		const splines* spl = ED_spl(_edge->edge());
+    const splines* spl = ED_spl(_edge->edge());
     _path = QGVCore::toPath(spl, gheight);
 
 
@@ -137,13 +138,13 @@ void QGVEdge::updateLayout()
     _pen.setColor(QGVCore::toColor(getAttribute("color")));
     _pen.setStyle(QGVCore::toPenStyle(getAttribute("style")));
 
-    //Edge label
-		textlabel_t *xlabel = ED_xlabel(_edge->edge());
+    // Edge label
+    textlabel_t *xlabel = ED_xlabel(_edge->edge());
     if(xlabel)
     {
         _label = xlabel->text;
         _label_rect.setSize(QSize(xlabel->dimen.x, xlabel->dimen.y));
-				_label_rect.moveCenter(QGVCore::toPoint(xlabel->pos, QGVCore::graphHeight(_scene->_graph->graph())));
+        _label_rect.moveCenter(QGVCore::toPoint(xlabel->pos, QGVCore::graphHeight(_scene->_graph->graph())));
     }
 
     setToolTip(getAttribute("tooltip"));
@@ -154,7 +155,7 @@ QPolygonF QGVEdge::toArrow(const QLineF &line) const
     QLineF n = line.normalVector();
     QPointF o(n.dx() / 3.0, n.dy() / 3.0);
 
-    //Only support normal arrow type
+    // Only support normal arrow type
     QPolygonF polygon;
     polygon.append(line.p1() + o);
     polygon.append(line.p2());
