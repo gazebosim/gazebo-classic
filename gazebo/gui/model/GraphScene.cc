@@ -26,10 +26,9 @@ GraphScene::GraphScene(QWidget *_parent)
 {
   this->setObjectName("GraphScene");
 
-  //Configure scene attributes
+  // Configure scene attributes
   this->setGraphAttribute("splines", "ortho");
   this->setGraphAttribute("rankdir", "LR");
-  //_scene->setGraphAttribute("concentrate", "true"); //Error !
   this->setGraphAttribute("nodesep", "0.4");
   this->setNodeAttribute("shape", "box");
   this->setNodeAttribute("style", "filled");
@@ -98,8 +97,10 @@ void GraphScene::drawBackground(QPainter * _painter, const QRectF & _rect)
 
   const int gridSize = 25;
 
-  const qreal left = int(_rect.left()) - (int(_rect.left()) % gridSize);
-  const qreal top = int(_rect.top()) - (int(_rect.top()) % gridSize);
+  const qreal left = static_cast<int>(_rect.left()) -
+      (static_cast<int>(_rect.left()) % gridSize);
+  const qreal top = static_cast<int>(_rect.top()) -
+      (static_cast<int>(_rect.top()) % gridSize);
 
   QVarLengthArray<QLineF, 100> lines;
 

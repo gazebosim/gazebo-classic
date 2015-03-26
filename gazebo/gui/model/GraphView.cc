@@ -49,7 +49,6 @@ void GraphView::resizeEvent(QResizeEvent */*_event*/)
 /////////////////////////////////////////////////
 void GraphView::contextMenuEvent(QContextMenuEvent *_event)
 {
-
   QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
   if (item)
   {
@@ -97,12 +96,8 @@ void GraphView::mousePressEvent(QMouseEvent *_event)
         this->scene()->itemAt(this->mapToScene(_event->pos()));
     if (mouseItem && !mouseItem->isSelected())
     {
-//      CMLEditorItem *item = dynamic_cast<CMLEditorItem *>(mouseItem);
-//      if (item)
-//      {
-        this->scene()->clearSelection();
-        mouseItem->setSelected(true);
-//      }
+      this->scene()->clearSelection();
+      mouseItem->setSelected(true);
     }
     QGraphicsView::mousePressEvent(_event);
   }
@@ -123,12 +118,7 @@ void GraphView::mouseMoveEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void GraphView::keyPressEvent(QKeyEvent *_event)
 {
-  if (_event->key() == Qt::Key_Delete || _event->key() == Qt::Key_Backspace)
-  {
-  }
-  else if (_event->key() == Qt::Key_Escape)
-  {
-  }
+  QGraphicsView::keyPressEvent(_event);
 }
 
 /////////////////////////////////////////////////

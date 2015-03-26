@@ -18,6 +18,11 @@
 #ifndef _SCHEMATIC_VIEW_WIDGET_HH_
 #define _SCHEMATIC_VIEW_WIDGET_HH_
 
+#include <utility>
+#include <map>
+#include <string>
+#include <vector>
+
 #include "gazebo/gui/qt.h"
 
 namespace gazebo

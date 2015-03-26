@@ -76,7 +76,6 @@ namespace gazebo
 
       /// \brief Scale (zoom level) of the editor view.
       private: double viewScale;
-
     };
   }
 }

@@ -18,6 +18,8 @@ License along with this library.
 #ifndef QGVSCENE_H
 #define QGVSCENE_H
 
+#pragma GCC system_header
+
 #include <QMap>
 #include <QGraphicsScene>
 
