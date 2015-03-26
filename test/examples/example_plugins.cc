@@ -84,6 +84,7 @@ INSTANTIATE_TEST_CASE_P(ExamplePlugins, ExamplePlugins, ::testing::Values(
   , "factory"
   , "hello_world"
   , "model_push"
+  , "model_move"
   , "parameters"
   , "projector"
   , "system_gui_plugin"
