@@ -43,6 +43,10 @@ Windows `cmd` for configuring and building.  You might also need to
 
     - [Cmake](http://www.cmake.org/download/)
     
+1. Install Ruby 1.9 or greater.
+
+    - [Ruby](http://rubyinstaller.org/downloads/)
+    
 1. Clone sdformat and gazebo:
 
         hg clone https://bitbucket.org/osrf/sdformat
