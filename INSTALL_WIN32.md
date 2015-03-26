@@ -37,7 +37,7 @@ Windows `cmd` for configuring and building.  You might also need to
 
 1. Also download and execute the Qt 4.8 installer.  It should end up somewhere like C:\Qt.  As far as I can tell, this installation is not relocatable, so cannot be put into a .zip and dropped into a local workspace:
 
-    - [Qt 4.8.6](http://packages.osrfoundation.org/win32/deps/qt-opensource-windows-x86-vs2010-4.8.6.exe)
+    - [Qt 4.8.6](http://packages.osrfoundation.org/win32/deps/qt-4.8.6-x64-msvc2013-rev1.7z)
 
 1. Clone sdformat and gazebo:
 
