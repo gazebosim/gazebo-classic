@@ -215,6 +215,11 @@ if (UNIX AND NOT APPLE)
   filter_valid_compiler_flags(-fvisibility=hidden -fvisibility-inlines-hidden)
 endif()
 
+# Visual Studio enables c++11 support by default
+if (NOT MSVC)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}} -std=c++11")
+endif()
+
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS}")
 
 #################################################
