@@ -24,6 +24,7 @@ using namespace gazebo;
 
 class PID : public gazebo::testing::AutoLogFixture { };
 
+//////////////////////////////////////////////////
 TEST_F(PID, ConstructorInitGetSet)
 {
   // default constructor
@@ -90,6 +91,37 @@ TEST_F(PID, ConstructorInitGetSet)
   }
 }
 
+//////////////////////////////////////////////////
+TEST_F(PID, Pcontrol)
+{
+  const double p = 1.0;
+  // Proportional control
+  {
+    common::PID pid(p);
+    const double error = 1.0;
+    const double dt = 0.1;
+    const double expectedCmd = -p * error;
+    EXPECT_DOUBLE_EQ(expectedCmd, pid.Update(error, dt));
+    EXPECT_DOUBLE_EQ(expectedCmd, pid.GetCmd());
+
+    // Check GetErrors
+    double pErr, iErr, dErr;
+    pid.GetErrors(pErr, iErr, dErr);
+    EXPECT_DOUBLE_EQ(error, pErr);
+    EXPECT_DOUBLE_EQ(error*dt, iErr);
+    EXPECT_DOUBLE_EQ(error/dt, dErr);
+
+    // Update again with dt=0
+    // Update should return 0.0
+    // Other accessors should return same command and errors
+    EXPECT_DOUBLE_EQ(0.0, pid.Update(error, 0.0));
+    EXPECT_DOUBLE_EQ(expectedCmd, pid.GetCmd());
+    pid.GetErrors(pErr, iErr, dErr);
+    EXPECT_DOUBLE_EQ(error, pErr);
+    EXPECT_DOUBLE_EQ(error*dt, iErr);
+    EXPECT_DOUBLE_EQ(error/dt, dErr);
+  }
+}
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
