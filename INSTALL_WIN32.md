@@ -6,7 +6,8 @@ Gazebo on Windows.  It does not actually work yet.
 ## Supported compilers
 
 At this moment, compilation has been testewd on Windows 7 and is supported when
-using Visual Studio 2013. Patches for other versions are welcome.
+using [Visual Studio 2013](https://www.visualstudio.com/downloads/).
+Patches for other versions are welcome.
 
 ## Installation
 
