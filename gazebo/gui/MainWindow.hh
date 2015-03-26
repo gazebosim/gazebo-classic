@@ -200,6 +200,8 @@ namespace gazebo
       /// \brief Delete the actions created in CreateActions.
       private: void DeleteActions();
 
+      public: void GetAllActionPointers(std::vector<QAction*> &_out) const;
+
       /// \brief Create menus.
       private: void CreateMenus();
 
@@ -317,6 +319,8 @@ namespace gazebo
 
       /// \brief Splitter for the main window.
       private: QSplitter *splitter;
+
+      private: std::vector<QAction*> actionPointers;
     };
   }
 }

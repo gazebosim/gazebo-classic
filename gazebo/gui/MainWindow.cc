@@ -933,11 +933,13 @@ void MainWindow::CreateActions()
   g_newAct->setStatusTip(tr("Create a new world"));
   connect(g_newAct, SIGNAL(triggered()), this, SLOT(New()));
   */
+  this->actionPointers.reserve(46);
 
   g_topicVisAct = new QAction(tr("Topic Visualization"), this);
   g_topicVisAct->setShortcut(tr("Ctrl+T"));
   g_topicVisAct->setStatusTip(tr("Select a topic to visualize"));
   connect(g_topicVisAct, SIGNAL(triggered()), this, SLOT(SelectTopic()));
+  this->actionPointers.push_back(g_topicVisAct);
 
 #ifdef HAVE_QWT
   /*g_diagnosticsAct = new QAction(tr("Diagnostic Plot"), this);
@@ -951,6 +953,7 @@ void MainWindow::CreateActions()
   g_openAct->setShortcut(tr("Ctrl+O"));
   g_openAct->setStatusTip(tr("Open an world file"));
   connect(g_openAct, SIGNAL(triggered()), this, SLOT(Open()));
+  this->actionPointers.push_back(g_openAct);
 
   /*g_importAct = new QAction(tr("&Import Mesh"), this);
   g_importAct->setShortcut(tr("Ctrl+I"));
@@ -963,38 +966,46 @@ void MainWindow::CreateActions()
   g_saveAct->setStatusTip(tr("Save world"));
   g_saveAct->setEnabled(false);
   connect(g_saveAct, SIGNAL(triggered()), this, SLOT(Save()));
+  this->actionPointers.push_back(g_saveAct);
 
   g_saveAsAct = new QAction(tr("Save World &As"), this);
   g_saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
   g_saveAsAct->setStatusTip(tr("Save world to new file"));
   connect(g_saveAsAct, SIGNAL(triggered()), this, SLOT(SaveAs()));
+  this->actionPointers.push_back(g_saveAsAct);
 
   g_saveCfgAct = new QAction(tr("Save &Configuration"), this);
   g_saveCfgAct->setStatusTip(tr("Save GUI configuration"));
   connect(g_saveCfgAct, SIGNAL(triggered()), this, SLOT(SaveINI()));
+  this->actionPointers.push_back(g_saveCfgAct);
 
   g_cloneAct = new QAction(tr("Clone World"), this);
   g_cloneAct->setStatusTip(tr("Clone the world"));
   connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
+  this->actionPointers.push_back(g_cloneAct);
 
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
   connect(g_aboutAct, SIGNAL(triggered()), this, SLOT(About()));
+  this->actionPointers.push_back(g_aboutAct);
 
   g_quitAct = new QAction(tr("&Quit"), this);
   g_quitAct->setStatusTip(tr("Quit"));
   connect(g_quitAct, SIGNAL(triggered()), this, SLOT(close()));
+  this->actionPointers.push_back(g_quitAct);
 
   g_resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
   g_resetModelsAct->setShortcut(tr("Ctrl+Shift+R"));
   g_resetModelsAct->setStatusTip(tr("Reset model poses"));
   connect(g_resetModelsAct, SIGNAL(triggered()), this,
     SLOT(OnResetModelOnly()));
+  this->actionPointers.push_back(g_resetModelsAct);
 
   g_resetWorldAct = new QAction(tr("&Reset World"), this);
   g_resetWorldAct->setShortcut(tr("Ctrl+R"));
   g_resetWorldAct->setStatusTip(tr("Reset the world"));
   connect(g_resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
+  this->actionPointers.push_back(g_resetWorldAct);
 
   QActionGroup *editorGroup = new QActionGroup(this);
   // Exclusive doesn't allow all actions to be unchecked at the same time
@@ -1007,23 +1018,27 @@ void MainWindow::CreateActions()
   g_editBuildingAct->setStatusTip(tr("Enter Building Editor Mode"));
   g_editBuildingAct->setCheckable(true);
   g_editBuildingAct->setChecked(false);
+  this->actionPointers.push_back(g_editBuildingAct);
 
   g_editTerrainAct = new QAction(tr("&Terrain Editor"), editorGroup);
   g_editTerrainAct->setShortcut(tr("Ctrl+E"));
   g_editTerrainAct->setStatusTip(tr("Enter Terrain Editor Mode"));
   g_editTerrainAct->setCheckable(true);
   g_editTerrainAct->setChecked(false);
+  this->actionPointers.push_back(g_editTerrainAct);
 
   g_editModelAct = new QAction(tr("&Model Editor"), editorGroup);
   g_editModelAct->setShortcut(tr("Ctrl+M"));
   g_editModelAct->setStatusTip(tr("Enter Model Editor Mode"));
   g_editModelAct->setCheckable(true);
   g_editModelAct->setChecked(false);
+  this->actionPointers.push_back(g_editModelAct);
 
   g_stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
   g_stepAct->setStatusTip(tr("Step the world"));
   connect(g_stepAct, SIGNAL(triggered()), this, SLOT(Step()));
   this->CreateDisabledIcon(":/images/end.png", g_stepAct);
+  this->actionPointers.push_back(g_stepAct);
 
   g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   g_playAct->setStatusTip(tr("Run the world"));
@@ -1031,11 +1046,13 @@ void MainWindow::CreateActions()
   connect(g_playAct, SIGNAL(triggered()), this, SLOT(Play()));
   connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
   this->OnPlayActionChanged();
+  this->actionPointers.push_back(g_playAct);
 
   g_pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
   g_pauseAct->setStatusTip(tr("Pause the world"));
   g_pauseAct->setVisible(true);
   connect(g_pauseAct, SIGNAL(triggered()), this, SLOT(Pause()));
+  this->actionPointers.push_back(g_pauseAct);
 
   g_arrowAct = new QAction(QIcon(":/images/arrow.png"),
       tr("Selection Mode"), this);
@@ -1044,6 +1061,7 @@ void MainWindow::CreateActions()
   g_arrowAct->setChecked(true);
   g_arrowAct->setToolTip(tr("Selection Mode (Esc)"));
   connect(g_arrowAct, SIGNAL(triggered()), this, SLOT(Arrow()));
+  this->actionPointers.push_back(g_arrowAct);
 
   g_translateAct = new QAction(QIcon(":/images/translate.png"),
       tr("&Translation Mode"), this);
@@ -1053,6 +1071,7 @@ void MainWindow::CreateActions()
   g_translateAct->setToolTip(tr("Translation Mode (T)"));
   connect(g_translateAct, SIGNAL(triggered()), this, SLOT(Translate()));
   this->CreateDisabledIcon(":/images/translate.png", g_translateAct);
+  this->actionPointers.push_back(g_translateAct);
 
   g_rotateAct = new QAction(QIcon(":/images/rotate.png"),
       tr("Rotation Mode"), this);
@@ -1062,6 +1081,7 @@ void MainWindow::CreateActions()
   g_rotateAct->setToolTip(tr("Rotation Mode (R)"));
   connect(g_rotateAct, SIGNAL(triggered()), this, SLOT(Rotate()));
   this->CreateDisabledIcon(":/images/rotate.png", g_rotateAct);
+  this->actionPointers.push_back(g_rotateAct);
 
   g_scaleAct = new QAction(QIcon(":/images/scale.png"),
       tr("Scale Mode"), this);
@@ -1070,12 +1090,14 @@ void MainWindow::CreateActions()
   g_scaleAct->setChecked(false);
   g_scaleAct->setToolTip(tr("Scale Mode (S)"));
   connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(Scale()));
+  this->actionPointers.push_back(g_scaleAct);
 
   g_boxCreateAct = new QAction(QIcon(":/images/box.png"), tr("Box"), this);
   g_boxCreateAct->setStatusTip(tr("Create a box"));
   g_boxCreateAct->setCheckable(true);
   connect(g_boxCreateAct, SIGNAL(triggered()), this, SLOT(CreateBox()));
   this->CreateDisabledIcon(":/images/box.png", g_boxCreateAct);
+  this->actionPointers.push_back(g_boxCreateAct);
 
   g_sphereCreateAct = new QAction(QIcon(":/images/sphere.png"),
       tr("Sphere"), this);
@@ -1084,6 +1106,7 @@ void MainWindow::CreateActions()
   connect(g_sphereCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateSphere()));
   this->CreateDisabledIcon(":/images/sphere.png", g_sphereCreateAct);
+  this->actionPointers.push_back(g_sphereCreateAct);
 
   g_cylinderCreateAct = new QAction(QIcon(":/images/cylinder.png"),
       tr("Cylinder"), this);
@@ -1092,6 +1115,7 @@ void MainWindow::CreateActions()
   connect(g_cylinderCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateCylinder()));
   this->CreateDisabledIcon(":/images/cylinder.png", g_cylinderCreateAct);
+  this->actionPointers.push_back(g_cylinderCreateAct);
 
   g_meshCreateAct = new QAction(QIcon(":/images/cylinder.png"),
       tr("Mesh"), this);
@@ -1100,7 +1124,7 @@ void MainWindow::CreateActions()
   connect(g_meshCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateMesh()));
   this->CreateDisabledIcon(":/images/cylinder.png", g_meshCreateAct);
-
+  this->actionPointers.push_back(g_meshCreateAct);
 
   g_pointLghtCreateAct = new QAction(QIcon(":/images/pointlight.png"),
       tr("Point Light"), this);
@@ -1109,6 +1133,7 @@ void MainWindow::CreateActions()
   connect(g_pointLghtCreateAct, SIGNAL(triggered()), this,
       SLOT(CreatePointLight()));
   this->CreateDisabledIcon(":/images/pointlight.png", g_pointLghtCreateAct);
+  this->actionPointers.push_back(g_pointLghtCreateAct);
 
   g_spotLghtCreateAct = new QAction(QIcon(":/images/spotlight.png"),
       tr("Spot Light"), this);
@@ -1117,6 +1142,7 @@ void MainWindow::CreateActions()
   connect(g_spotLghtCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateSpotLight()));
   this->CreateDisabledIcon(":/images/spotlight.png", g_spotLghtCreateAct);
+  this->actionPointers.push_back(g_spotLghtCreateAct);
 
   g_dirLghtCreateAct = new QAction(QIcon(":/images/directionallight.png"),
       tr("Directional Light"), this);
@@ -1125,11 +1151,13 @@ void MainWindow::CreateActions()
   connect(g_dirLghtCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateDirectionalLight()));
   this->CreateDisabledIcon(":/images/directionallight.png", g_dirLghtCreateAct);
+  this->actionPointers.push_back(g_dirLghtCreateAct);
 
   g_resetAct = new QAction(tr("Reset Camera"), this);
   g_resetAct->setStatusTip(tr("Move camera to pose"));
   connect(g_resetAct, SIGNAL(triggered()), this,
       SLOT(Reset()));
+  this->actionPointers.push_back(g_resetAct);
 
   g_showCollisionsAct = new QAction(tr("Collisions"), this);
   g_showCollisionsAct->setStatusTip(tr("Show Collisions"));
@@ -1137,6 +1165,7 @@ void MainWindow::CreateActions()
   g_showCollisionsAct->setChecked(false);
   connect(g_showCollisionsAct, SIGNAL(triggered()), this,
           SLOT(ShowCollisions()));
+  this->actionPointers.push_back(g_showCollisionsAct);
 
   g_showGridAct = new QAction(tr("Grid"), this);
   g_showGridAct->setStatusTip(tr("Show Grid"));
@@ -1144,6 +1173,7 @@ void MainWindow::CreateActions()
   g_showGridAct->setChecked(true);
   connect(g_showGridAct, SIGNAL(triggered()), this,
           SLOT(ShowGrid()));
+  this->actionPointers.push_back(g_showGridAct);
 
   g_transparentAct = new QAction(tr("Transparent"), this);
   g_transparentAct->setStatusTip(tr("Transparent"));
@@ -1151,6 +1181,7 @@ void MainWindow::CreateActions()
   g_transparentAct->setChecked(false);
   connect(g_transparentAct, SIGNAL(triggered()), this,
           SLOT(SetTransparent()));
+  this->actionPointers.push_back(g_transparentAct);
 
   g_viewWireframeAct = new QAction(tr("Wireframe"), this);
   g_viewWireframeAct->setStatusTip(tr("Wireframe"));
@@ -1158,6 +1189,7 @@ void MainWindow::CreateActions()
   g_viewWireframeAct->setChecked(false);
   connect(g_viewWireframeAct, SIGNAL(triggered()), this,
           SLOT(SetWireframe()));
+  this->actionPointers.push_back(g_viewWireframeAct);
 
   g_showCOMAct = new QAction(tr("Center of Mass"), this);
   g_showCOMAct->setStatusTip(tr("Show center of mass"));
@@ -1165,6 +1197,7 @@ void MainWindow::CreateActions()
   g_showCOMAct->setChecked(false);
   connect(g_showCOMAct, SIGNAL(triggered()), this,
           SLOT(ShowCOM()));
+  this->actionPointers.push_back(g_showCOMAct);
 
   g_showInertiaAct = new QAction(tr("Inertias"), this);
   g_showInertiaAct->setStatusTip(tr("Show moments of inertia"));
@@ -1172,6 +1205,7 @@ void MainWindow::CreateActions()
   g_showInertiaAct->setChecked(false);
   connect(g_showInertiaAct, SIGNAL(triggered()), this,
       SLOT(ShowInertia()));
+  this->actionPointers.push_back(g_showInertiaAct);
 
   g_showContactsAct = new QAction(tr("Contacts"), this);
   g_showContactsAct->setStatusTip(tr("Show Contacts"));
@@ -1179,6 +1213,7 @@ void MainWindow::CreateActions()
   g_showContactsAct->setChecked(false);
   connect(g_showContactsAct, SIGNAL(triggered()), this,
           SLOT(ShowContacts()));
+  this->actionPointers.push_back(g_showContactsAct);
 
   g_showJointsAct = new QAction(tr("Joints"), this);
   g_showJointsAct->setStatusTip(tr("Show Joints"));
@@ -1186,23 +1221,27 @@ void MainWindow::CreateActions()
   g_showJointsAct->setChecked(false);
   connect(g_showJointsAct, SIGNAL(triggered()), this,
           SLOT(ShowJoints()));
+  this->actionPointers.push_back(g_showJointsAct);
 
   g_fullScreenAct = new QAction(tr("Full Screen"), this);
   g_fullScreenAct->setStatusTip(tr("Full Screen(F-11 to exit)"));
   connect(g_fullScreenAct, SIGNAL(triggered()), this,
       SLOT(FullScreen()));
+  this->actionPointers.push_back(g_fullScreenAct);
 
   g_fpsAct = new QAction(tr("FPS View Control"), this);
   g_fpsAct->setStatusTip(tr("First Person Shooter View Style"));
   g_fpsAct->setCheckable(true);
   g_fpsAct->setChecked(false);
   connect(g_fpsAct, SIGNAL(triggered()), this, SLOT(FPS()));
+  this->actionPointers.push_back(g_fpsAct);
 
   g_orbitAct = new QAction(tr("Orbit View Control"), this);
   g_orbitAct->setStatusTip(tr("Orbit View Style"));
   g_orbitAct->setCheckable(true);
   g_orbitAct->setChecked(true);
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
+  this->actionPointers.push_back(g_orbitAct);
 
   QActionGroup *viewControlActionGroup = new QActionGroup(this);
   viewControlActionGroup->addAction(g_fpsAct);
@@ -1215,17 +1254,20 @@ void MainWindow::CreateActions()
 #ifndef HAVE_OCULUS
   g_viewOculusAct->setEnabled(false);
 #endif
+  this->actionPointers.push_back(g_viewOculusAct);
 
   g_dataLoggerAct = new QAction(tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
   connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
+  this->actionPointers.push_back(g_dataLoggerAct);
 
   g_screenshotAct = new QAction(QIcon(":/images/screenshot.png"),
       tr("Screenshot"), this);
   g_screenshotAct->setStatusTip(tr("Take a screenshot"));
   connect(g_screenshotAct, SIGNAL(triggered()), this,
       SLOT(CaptureScreenshot()));
+  this->actionPointers.push_back(g_screenshotAct);
 
   g_copyAct = new QAction(QIcon(":/images/copy_object.png"),
       tr("Copy (Ctrl + C)"), this);
@@ -1233,6 +1275,7 @@ void MainWindow::CreateActions()
   g_copyAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/copy_object.png", g_copyAct);
   g_copyAct->setEnabled(false);
+  this->actionPointers.push_back(g_copyAct);
 
   g_pasteAct = new QAction(QIcon(":/images/paste_object.png"),
       tr("Paste (Ctrl + V)"), this);
@@ -1240,6 +1283,7 @@ void MainWindow::CreateActions()
   g_pasteAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/paste_object.png", g_pasteAct);
   g_pasteAct->setEnabled(false);
+  this->actionPointers.push_back(g_pasteAct);
 
   g_snapAct = new QAction(QIcon(":/images/magnet.png"),
       tr("Snap Mode (N)"), this);
@@ -1247,6 +1291,7 @@ void MainWindow::CreateActions()
   g_snapAct->setCheckable(true);
   g_snapAct->setToolTip(tr("Snap Mode"));
   connect(g_snapAct, SIGNAL(triggered()), this, SLOT(Snap()));
+  this->actionPointers.push_back(g_snapAct);
 
   // set up align actions and widget
   QAction *xAlignMin = new QAction(QIcon(":/images/x_min.png"),
@@ -1317,6 +1362,7 @@ void MainWindow::CreateActions()
   g_alignAct->setDefaultWidget(alignWidget);
   g_alignAct->setEnabled(false);
   connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
+  this->actionPointers.push_back(g_alignAct);
 }
 
 /////////////////////////////////////////////////
@@ -1368,147 +1414,22 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 }
 
 /////////////////////////////////////////////////
-void MainWindow::DeleteActions()
+void MainWindow::GetAllActionPointers(std::vector<QAction*> &_out) const
 {
-  delete g_topicVisAct;
-  g_topicVisAct = 0;
-
-  delete g_openAct;
-  g_openAct = 0;
-
-  delete g_saveAct;
-  g_saveAct = 0;
-
-  delete g_saveAsAct;
-  g_saveAsAct = 0;
-
-  delete g_saveCfgAct;
-  g_saveCfgAct = 0;
-
-  delete g_cloneAct;
-  g_cloneAct = 0;
-
-  delete g_aboutAct;
-  g_aboutAct = 0;
-
-  delete g_quitAct;
-  g_quitAct = 0;
-
-  delete g_resetModelsAct;
-  g_resetModelsAct = 0;
-
-  delete g_resetWorldAct;
-  g_resetWorldAct = 0;
-
-  delete g_editBuildingAct;
-  g_editBuildingAct = 0;
-
-  delete g_editTerrainAct;
-  g_editTerrainAct = 0;
-
-  delete g_editModelAct;
-  g_editModelAct = 0;
-
-  delete g_stepAct;
-  g_stepAct = 0;
-
-  delete g_playAct;
-  g_playAct = 0;
-
-  delete g_pauseAct;
-  g_pauseAct = 0;
-
-  delete g_arrowAct;
-  g_arrowAct = 0,
-
-  delete g_translateAct;
-  g_translateAct = 0;
-
-  delete g_rotateAct;
-  g_rotateAct = 0;
-
-  delete g_scaleAct;
-  g_scaleAct = 0;
-
-  delete g_boxCreateAct;
-  g_boxCreateAct = 0;
-
-  delete g_sphereCreateAct;
-  g_sphereCreateAct = 0;
-
-  delete g_cylinderCreateAct;
-  g_cylinderCreateAct = 0;
-
-  delete g_meshCreateAct;
-  g_meshCreateAct = 0;
-
-  delete g_pointLghtCreateAct;
-  g_pointLghtCreateAct = 0;
-
-  delete g_spotLghtCreateAct;
-  g_spotLghtCreateAct = 0;
-
-  delete g_dirLghtCreateAct;
-  g_dirLghtCreateAct = 0;
-
-  delete g_resetAct;
-  g_resetAct = 0;
-
-  delete g_showCollisionsAct;
-  g_showCollisionsAct = 0;
-
-  delete g_showGridAct;
-  g_showGridAct = 0;
-
-  delete g_transparentAct;
-  g_transparentAct = 0;
-
-  delete g_viewWireframeAct;
-  g_viewWireframeAct = 0;
-
-  delete g_showCOMAct;
-  g_showCOMAct = 0;
-
-  delete g_showInertiaAct;
-  g_showInertiaAct = 0;
-
-  delete g_showContactsAct;
-  g_showContactsAct = 0;
-
-  delete g_showJointsAct;
-  g_showJointsAct = 0;
-
-  delete g_fullScreenAct;
-  g_fullScreenAct = 0;
-
-  delete g_fpsAct;
-  g_fpsAct = 0;
-
-  delete g_orbitAct;
-  g_orbitAct = 0;
-
-  delete g_viewOculusAct;
-  g_viewOculusAct = 0;
-
-  delete g_dataLoggerAct;
-  g_dataLoggerAct = 0;
-
-  delete g_screenshotAct;
-  g_screenshotAct = 0;
-
-  delete g_copyAct;
-  g_copyAct = 0;
-
-  delete g_pasteAct;
-  g_pasteAct = 0;
-
-  delete g_snapAct;
-  g_snapAct = 0;
-
-  delete g_alignAct;
-  g_alignAct = 0;
+  _out = this->actionPointers;
 }
 
+/////////////////////////////////////////////////
+void MainWindow::DeleteActions()
+{
+  gzdbg << "# action pointers: " << this->actionPointers.size() << std::endl;
+  for (auto &actionPointer : this->actionPointers)
+  {
+    delete actionPointer;
+    actionPointer = NULL;
+  }
+  this->actionPointers.erase(this->actionPointers);
+}
 
 /////////////////////////////////////////////////
 void MainWindow::CreateMenuBar()
