@@ -107,9 +107,11 @@ void ModelCreator_TEST::SaveState()
   QCOMPARE(modelCreator->GetCurrentSaveState(),
       gui::ModelCreator::ALL_SAVED);
 
-  //delete modelCreator;
   mainWindow->close();
   delete mainWindow;
+  mainWindow = NULL;
+  delete modelCreator;
+  modelCreator = NULL;
 }
 
 // Generate a main function for the test
