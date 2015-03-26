@@ -2731,15 +2731,13 @@ void Scene::SetShadowsEnabled(bool _value)
 {
   // If a usercamera is set to stereo mode, then turn off shadows.
   // Our shadow mapping technique disables stereo.
-  bool stereoOverride = true;
+  bool stereoOverride = false;
   for (std::vector<UserCameraPtr>::iterator iter =
-       this->dataPtr->userCameras.begin();
-       iter != this->dataPtr->userCameras.end() && stereoOverride; ++iter)
+      this->dataPtr->userCameras.begin();
+      iter != this->dataPtr->userCameras.end() && !stereoOverride; ++iter)
   {
-    stereoOverride = !(*iter)->StereoEnabled();
+    stereoOverride = (*iter)->StereoEnabled();
   }
-
-  _value = _value && stereoOverride;
 
   this->dataPtr->sdf->GetElement("shadows")->Set(_value);
 
@@ -2763,13 +2761,29 @@ void Scene::SetShadowsEnabled(bool _value)
 #endif
   }
   else if (RenderEngine::Instance()->GetRenderPathType() ==
-           RenderEngine::FORWARD)
+      RenderEngine::FORWARD)
   {
-    // RT Shader shadows
+    // If _value is true, then apply shadows.
     if (_value)
-      RTShaderSystem::Instance()->ApplyShadows(shared_from_this());
+    {
+      // If stereoOverride is true, then use stencil shadows
+      if (stereoOverride)
+      {
+        RTShaderSystem::Instance()->RemoveShadows(shared_from_this());
+        this->dataPtr->manager->setShadowTechnique(
+            Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+      }
+      // Otherwise, use shadow maps (this is the default).
+      else
+      {
+        RTShaderSystem::Instance()->ApplyShadows(shared_from_this());
+      }
+    }
+    // Otherwise, disable shadows.
     else
+    {
       RTShaderSystem::Instance()->RemoveShadows(shared_from_this());
+    }
   }
   else
   {

@@ -20,6 +20,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
 
+#include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/WindowManager.hh"
@@ -562,6 +563,8 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 #endif
 
     this->dataPtr->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+    RTShaderSystem::AttachViewport(this->dataPtr->rightViewport,
+                                   this->GetScene());
   }
 
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
