@@ -453,8 +453,13 @@ bool CTLSStorageArray::FindFreeStorageBlock(CTLSStorageBlock *&psbOutFreeStorage
 }
 
 
+#if _OU_TARGET_OS == _OU_TARGET_OS_WINDOWS
+bool CTLSStorageArray::FindFreeStorageBlockIndex(unsigned int &nOutFreeBlockIndex, 
+	tlsindextype iValueCount, bool bIsManualCleanup)
+#else
 bool CTLSStorageArray::FindFreeStorageBlockIndex(unsigned int &nOutFreeBlockIndex, 
 	tlsindextype /*iValueCount*/, bool bIsManualCleanup)
+#endif
 {
 	bool bResult = false;
 
@@ -490,8 +495,13 @@ bool CTLSStorageArray::FindFreeStorageBlockIndex(unsigned int &nOutFreeBlockInde
 	return bResult;
 }
 
+#if _OU_TARGET_OS == _OU_TARGET_OS_WINDOWS
+bool CTLSStorageArray::FindFreeStorageBlockIndexWithPossibilityVerified(unsigned int &nOutFreeBlockIndex, 
+	bool bIsManualCleanup)
+#else
 bool CTLSStorageArray::FindFreeStorageBlockIndexWithPossibilityVerified(unsigned int &nOutFreeBlockIndex, 
 	bool /*bIsManualCleanup*/)
+#endif
 {
 	unsigned int nBlockIndex = 0;
 

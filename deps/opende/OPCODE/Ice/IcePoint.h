@@ -12,8 +12,16 @@
 #ifndef __ICEPOINT_H__
 #define __ICEPOINT_H__
 
+#ifndef ATTRIBUTE_MAY_ALIAS
+  #if  defined _WIN32
+    #define ATTRIBUTE_MAY_ALIAS
+  #else
+    #define ATTRIBUTE_MAY_ALIAS __attribute__((__may_alias__)) 
+  #endif
+#endif
+
 	// Forward declarations
-	class __attribute__((__may_alias__)) HPoint;
+	class ATTRIBUTE_MAY_ALIAS HPoint;
 	class Plane;
 	class Matrix3x3;
 	class Matrix4x4;
@@ -22,7 +30,7 @@
 
 	const float EPSILON2 = 1.0e-20f;
 
-	class __attribute__((__may_alias__)) ICEMATHS_API  Point
+	class ATTRIBUTE_MAY_ALIAS ICEMATHS_API  Point
 	{
 		public:
 
