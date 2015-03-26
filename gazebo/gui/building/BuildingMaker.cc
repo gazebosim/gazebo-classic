@@ -604,7 +604,6 @@ void BuildingMaker::Reset()
   this->previewVisual->Load();
   this->previewVisual->SetPose(math::Pose::Zero);
   this->previewVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  scene->AddVisual(this->previewVisual);
 
   std::map<std::string, BuildingModelManip *>::iterator it;
   for (it = this->allItems.begin(); it != this->allItems.end(); ++it)
