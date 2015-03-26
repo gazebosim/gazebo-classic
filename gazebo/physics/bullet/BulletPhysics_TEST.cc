@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,7 +122,7 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   double minStepSize = 32.32;
   double maxStepSize = 3232.32;
 
-  bulletPhysics->SetParam("type", type);
+  bulletPhysics->SetParam("solver_type", type);
   bulletPhysics->SetParam("iters", iters);
   bulletPhysics->SetParam("sor", sor);
   bulletPhysics->SetParam("cfm", cfm);
@@ -134,7 +134,7 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   bulletPhysics->SetParam("split_impulse_penetration_threshold",
       splitImpulsePenetrationThreshold);
 
-  value = bulletPhysics->GetParam("type");
+  value = bulletPhysics->GetParam("solver_type");
   typeRet = boost::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
   value = bulletPhysics->GetParam("iters");

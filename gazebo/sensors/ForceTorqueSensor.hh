@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,9 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~ForceTorqueSensor();
+
+      // Documentation inherited.
+      protected: void Load(const std::string &_worldName, sdf::ElementPtr _sdf);
 
       // Documentation inherited.
       public: virtual void Load(const std::string &_worldName);
@@ -99,6 +102,27 @@ namespace gazebo
 
       /// \brief Mutex to protect the wrench message
       private: boost::mutex mutex;
+
+      /// \brief Which orientation we support for returning sensor measure
+      private: enum MeasureFrame
+      {
+        PARENT_LINK,
+        CHILD_LINK,
+        SENSOR
+      };
+
+      /// \brief Frame in which we return the measured force torque info.
+      private: MeasureFrame measureFrame;
+
+      /// \brief Direction of the measure
+      ///        True if the measured force torque is the one applied
+      ///        by the parent on the child, false otherwise
+      private: bool parentToChild;
+
+      /// \brief Rotation matrix than transforms a vector expressed in child
+      ///        orientation in a vector expressed in joint orientation.
+      ///        Necessary is the measure is specified in joint frame.
+      private: math::Matrix3 rotationSensorChild;
     };
     /// \}
   }

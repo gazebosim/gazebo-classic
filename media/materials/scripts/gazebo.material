@@ -606,22 +606,7 @@ material Gazebo/YellowTransparent
       texture_unit
       {
         colour_op_ex source1 src_current src_current 0 1 0
-        alpha_op_ex source1 src_manual src_current 0.4
-      }
-    }
-
-    pass
-    {
-      depth_write on
-
-      ambient 1.0 1.0 0.0 1
-      diffuse 1.0 1.0 0.0 1
-      polygon_mode points
-
-      texture_unit
-      {
-        colour_op_ex source1 src_current src_current 0 1 0
-        alpha_op_ex source1 src_manual src_current 0.4
+        alpha_op_ex source1 src_manual src_current 0.5
       }
     }
   }
@@ -720,6 +705,21 @@ material Gazebo/JointAnchor
   }
 }
 
+material Gazebo/CoM
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.5 0.5 0.5 1.000000
+
+      texture_unit
+      {
+        texture com.png
+      }
+    }
+  }
+}
 
 material Gazebo/WoodFloor
 {
@@ -939,6 +939,25 @@ material Gazebo/Wood
   }
 }
 
+material Gazebo/Bricks
+{
+  technique
+  {
+    pass
+    {
+      ambient 1.0 1.0 1.0 1.0
+      diffuse 1.0 1.0 1.0 1.0
+      specular 0.2 0.2 0.2 1.0 12.5
+
+      texture_unit
+      {
+        texture bricks.png
+        filtering trilinear
+      }
+    }
+  }
+}
+
 material Gazebo/Road
 {
   technique
@@ -952,6 +971,253 @@ material Gazebo/Road
       texture_unit
       {
         texture road1.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Residential
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture residential.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Tertiary
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture residential.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Pedestrian
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture sidewalk.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Footway
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture sidewalk.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Motorway
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture motorway.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Lanes_6
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture motorway.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Trunk
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture trunk.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Lanes_4
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture trunk.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Primary
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture primary.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Lanes_2
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture primary.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Secondary
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture secondary.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Lane_1
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture secondary.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Steps
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture steps.jpeg
         filtering trilinear
       }
     }
@@ -1014,6 +1280,41 @@ material Gazebo/GaussianCameraNoise
   }
 }
 
+vertex_program Gazebo/CameraDistortionMapVS glsl
+{
+  source camera_distortion_map_vs.glsl
+}
+
+fragment_program Gazebo/CameraDistortionMapFS glsl
+{
+  source camera_distortion_map_fs.glsl
+  default_params
+  {
+    param_named RT int 0
+    param_named distortionMap int 1
+    param_named scale float3 1.0 1.0 1.0
+  }
+}
+
+material Gazebo/CameraDistortionMap
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/CameraDistortionMapVS { }
+      fragment_program_ref Gazebo/CameraDistortionMapFS { }
+
+      texture_unit RT
+      {
+        tex_coord_set 0
+        tex_address_mode border
+        filtering linear linear linear
+      }
+    }
+  }
+}
+
 material Gazebo/PointCloud
 {
    technique
@@ -1030,3 +1331,34 @@ material Gazebo/PointCloud
    }
 }
 
+material Gazebo/PointHandle
+{
+   technique
+   {
+      pass
+      {
+        lighting off
+        scene_blend alpha_blend
+        depth_write off
+      }
+   }
+}
+
+material Gazebo/BuildingFrame
+{
+  technique
+  {
+    pass
+    {
+      ambient 1.0 1.0 1.0 1.0
+      diffuse 1.0 1.0 1.0 1.0
+      specular 0.2 0.2 0.2 1.0 12.5
+
+      texture_unit
+      {
+        texture building_frame.png
+        filtering trilinear
+      }
+    }
+  }
+}

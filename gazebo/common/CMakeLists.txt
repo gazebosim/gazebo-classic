@@ -20,6 +20,7 @@ set (sources
   AudioDecoder.cc
   Base64.cc
   BVHLoader.cc
+  ColladaExporter.cc
   ColladaLoader.cc
   Color.cc
   CommonIface.cc
@@ -33,6 +34,7 @@ set (sources
   KeyFrame.cc
   Material.cc
   Mesh.cc
+  MeshExporter.cc
   MeshLoader.cc
   MeshManager.cc
   ModelDatabase.cc
@@ -42,9 +44,11 @@ set (sources
   SphericalCoordinates.cc
   STLLoader.cc
   SystemPaths.cc
+  SVGLoader.cc
   Time.cc
   Timer.cc
   Video.cc
+  ffmpeg_inc.cc
 )
 
 set (headers
@@ -59,7 +63,6 @@ set (headers
   Color.hh
   Console.hh
   Dem.hh
-  DemPrivate.hh
   Event.hh
   Events.hh
   Exception.hh
@@ -81,9 +84,9 @@ set (headers
   Skeleton.hh
   SingletonT.hh
   SphericalCoordinates.hh
-  SphericalCoordinatesPrivate.hh
   STLLoader.hh
   SystemPaths.hh
+  SVGLoader.hh
   Time.hh
   Timer.hh
   UpdateInfo.hh
@@ -91,19 +94,9 @@ set (headers
   ffmpeg_inc.h
  )
 
-if (HAVE_GTS)
-set (sources
-  ${sources}
-  MeshCSG.cc
-)
-set (headers
-  ${headers}
-  MeshCSG.hh
-)
-endif()
-
 set (gtest_sources
   Animation_TEST.cc
+  ColladaExporter_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
   CommonIface_TEST.cc
@@ -115,11 +108,31 @@ set (gtest_sources
   ImageHeightmap_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc
+  MeshManager_TEST.cc
   MovingWindowFilter_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
+  SVGLoader_TEST.cc
   Time_TEST.cc
 )
+
+if (HAVE_GTS)
+set (sources
+  ${sources}
+  GTSMeshUtils.cc
+  MeshCSG.cc
+)
+set (headers
+  ${headers}
+  GTSMeshUtils.hh
+  MeshCSG.hh
+)
+
+set (gtest_sources
+  ${gtest_sources}
+  GTSMeshUtils_TEST.cc
+)
+endif()
 
 if (HAVE_FFMPEG)
   set (gtest_sources ${gtest_sources}
@@ -138,12 +151,18 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_
 gz_add_library(gazebo_common ${sources})
 
 set_property(
-  SOURCE SystemPaths.cc SystemPaths_TEST.cc ModelDatabase.cc
+  SOURCE SystemPaths.cc SystemPaths_TEST.cc ModelDatabase.cc Console.cc
   PROPERTY COMPILE_DEFINITIONS
   GAZEBO_PLUGIN_PATH="${GAZEBO_PLUGIN_PATH}"
+  GAZEBO_MODEL_PATH="${GAZEBO_MODEL_PATH}"
   GAZEBO_RESOURCE_PATH="${GAZEBO_RESOURCE_PATH}"
   GAZEBO_MODEL_DATABASE_URI="${GAZEBO_MODEL_DATABASE_URI}"
+  GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
+)
+
+link_directories(
+  ${tinyxml_LIBRARY_DIRS}
 )
 
 target_link_libraries(gazebo_common
@@ -160,7 +179,7 @@ target_link_libraries(gazebo_common
   ${libswscale_LIBRARIES}
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
-  ${SDF_LIBRARIES}
+  ${SDFormat_LIBRARIES}
   pthread
 )
 

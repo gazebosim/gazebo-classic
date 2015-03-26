@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,12 +34,6 @@ namespace gazebo
     /// \return True if successfully loaded, false if not.
     GAZEBO_VISIBLE
     bool load();
-
-    /// \brief Deprecated.
-    GAZEBO_VISIBLE
-    std::string create_sensor(sdf::ElementPtr _elem,
-        const std::string &_worldName,
-        const std::string &_parentName) GAZEBO_DEPRECATED(2.0);
 
     /// \brief Create a sensor using SDF.
     /// \param[in] _elem The SDF element that describes the sensor.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,10 @@ namespace gazebo
                   const math::Vector3 &_relpos);
 
       // Documentation inherited
+      public: virtual void AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero);
+
+      // Documentation inherited
       public: virtual void AddTorque(const math::Vector3 &_torque);
 
       // Documentation inherited
@@ -174,6 +178,12 @@ namespace gazebo
 
       /// \brief Collision space id.
       private: dSpaceID spaceId;
+
+      /// \brief Cache force applied on body
+      private: math::Vector3 force;
+
+      /// \brief Cache torque applied on body
+      private: math::Vector3 torque;
     };
   }
 }

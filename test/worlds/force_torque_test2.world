@@ -158,7 +158,7 @@
           <inertia>
             <ixx>0.001</ixx>
             <iyy>0.001</iyy>
-            <izz>0.0</izz>
+            <izz>0.001</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>

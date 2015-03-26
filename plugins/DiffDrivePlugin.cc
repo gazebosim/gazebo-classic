@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ enum {RIGHT, LEFT};
 DiffDrivePlugin::DiffDrivePlugin()
 {
   this->wheelSpeed[LEFT] = this->wheelSpeed[RIGHT] = 0;
+  this->wheelSeparation = 1.0;
+  this->wheelRadius = 1.0;
 }
 
 /////////////////////////////////////////////////
@@ -52,14 +54,6 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
       _sdf->GetElement("left_joint")->Get<std::string>());
   this->rightJoint = _model->GetJoint(
       _sdf->GetElement("right_joint")->Get<std::string>());
-
-  if (_sdf->HasElement("torque"))
-    this->torque = _sdf->GetElement("torque")->Get<double>();
-  else
-  {
-    gzwarn << "No torque value set for the DiffDrive plugin.\n";
-    this->torque = 5.0;
-  }
 
   if (!this->leftJoint)
     gzerr << "Unable to find left joint["
@@ -121,7 +115,4 @@ void DiffDrivePlugin::OnUpdate()
 
   this->leftJoint->SetVelocity(0, leftVelDesired);
   this->rightJoint->SetVelocity(0, rightVelDesired);
-
-  this->leftJoint->SetMaxForce(0, this->torque);
-  this->rightJoint->SetMaxForce(0, this->torque);
 }

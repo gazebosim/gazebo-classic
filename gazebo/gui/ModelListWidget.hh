@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,9 +67,12 @@ namespace gazebo
       private: void OnResponse(ConstResponsePtr &_msg);
 
       private: void OnModelUpdate(const msgs::Model &_msg);
-      private: void OnRequest(ConstRequestPtr &_msg);
 
-      private: void OnLightMsg(ConstLightPtr &_msg);
+      /// \brief An event callback to handle light update msgs.
+      /// \param[in] _msg Light message.
+      private: void OnLightUpdate(const msgs::Light &_msg);
+
+      private: void OnRequest(ConstRequestPtr &_msg);
 
       private: void OnRemoveScene(const std::string &_name);
       private: void OnCreateScene(const std::string &_name);
@@ -126,7 +129,7 @@ namespace gazebo
                                             QTreeWidgetItem *_parent);
 
       private: void FillPropertyTree(const msgs::Model &_msg,
-                                     QtProperty *_parentItem);
+                                     QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Link &_msg,
                                      QtProperty *_parent);
@@ -138,13 +141,13 @@ namespace gazebo
                                      QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Surface &_msg,
-                                       QtProperty *_parent);
+                                     QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Visual &_msg,
-                                       QtProperty *_parent);
+                                     QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Geometry &_msg,
-                                       QtProperty *_parent);
+                                     QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Scene &_msg,
                                      QtProperty *_parent);
@@ -153,7 +156,7 @@ namespace gazebo
                                      QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Light &_msg,
-                                       QtProperty * /*_parent*/);
+                                     QtProperty *_parent);
 
       private: void FillVector3dProperty(const msgs::Vector3d &_msg,
                                          QtProperty *_parent);
@@ -167,6 +170,11 @@ namespace gazebo
       /// the message data.
       private: void FillPropertyTree(const msgs::SphericalCoordinates &_msg,
                                      QtProperty *_parent);
+
+      /// \brief Add a property to a parent property or to the property tree.
+      /// \param[in] _item Pointer to the property to be added.
+      /// \param[in] _parent Pointer to the parent property, if applicable.
+      private: void AddProperty(QtProperty *_item, QtProperty *_parent);
 
       private: void ProcessModelMsgs();
       private: void ProcessLightMsgs();
@@ -202,7 +210,6 @@ namespace gazebo
 
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
-      private: transport::SubscriberPtr lightSub;
 
       private: QTreeWidgetItem *sceneItem;
       private: QTreeWidgetItem *physicsItem;

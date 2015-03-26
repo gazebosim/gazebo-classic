@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,3 +21,22 @@ using namespace gazebo;
 using namespace gui;
 
 event::EventT<void ()> model::Events::finishModel;
+event::EventT<bool ()> model::Events::saveAsModelEditor;
+event::EventT<bool ()> model::Events::saveModelEditor;
+event::EventT<void ()> model::Events::newModelEditor;
+event::EventT<void ()> model::Events::exitModelEditor;
+event::EventT<void ()> model::Events::modelChanged;
+event::EventT<void (std::string)> model::Events::modelNameChanged;
+event::EventT<void (bool, bool, const math::Pose &, const std::string &)>
+    model::Events::modelPropertiesChanged;
+
+event::EventT<void (std::string)> model::Events::saveModel;
+event::EventT<void ()> model::Events::newModel;
+
+event::EventT<void (std::string)> model::Events::linkInserted;
+event::EventT<void (std::string, std::string)> model::Events::jointInserted;
+event::EventT<void (std::string)> model::Events::linkRemoved;
+event::EventT<void (std::string)> model::Events::jointRemoved;
+event::EventT<void (std::string)> model::Events::openLinkInspector;
+event::EventT<void (std::string)> model::Events::openJointInspector;
+event::EventT<void (std::string, std::string)> model::Events::jointNameChanged;

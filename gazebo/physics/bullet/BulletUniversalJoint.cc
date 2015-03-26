@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,12 +118,12 @@ void BulletUniversalJoint::Init()
   this->angleOffset[0] = this->bulletUniversal->getAngle2();
   this->angleOffset[1] = this->bulletUniversal->getAngle1();
 
-  this->bulletUniversal->setUpperLimit(
-    this->angleOffset[1] + this->GetUpperLimit(1).Radian(),
-    this->angleOffset[0] + this->GetUpperLimit(0).Radian());
-  this->bulletUniversal->setLowerLimit(
-    this->angleOffset[1] + this->GetLowerLimit(1).Radian(),
-    this->angleOffset[0] + this->GetLowerLimit(0).Radian());
+  // Get{Upp|Low}erLimit gets the original sdf values
+  // Set{High|Low}Stop translates to bullet's axis definitions
+  this->SetHighStop(0, this->GetUpperLimit(0));
+  this->SetHighStop(1, this->GetUpperLimit(1));
+  this->SetLowStop(0, this->GetLowerLimit(0));
+  this->SetLowStop(1, this->GetLowerLimit(1));
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
@@ -186,12 +186,7 @@ double BulletUniversalJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void BulletUniversalJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  math::Vector3 desiredVel;
-  if (this->parentLink)
-    desiredVel = this->parentLink->GetWorldAngularVel();
-  desiredVel += _angle * this->GetGlobalAxis(_index);
-  if (this->childLink)
-    this->childLink->SetAngularVel(desiredVel);
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////
@@ -451,4 +446,31 @@ math::Angle BulletUniversalJoint::GetAngleImpl(unsigned int _index) const
     gzlog << "bulletUniversal does not yet exist" << std::endl;
 
   return result;
+}
+
+//////////////////////////////////////////////////
+bool BulletUniversalJoint::SetParam(const std::string &_key,
+    unsigned int _index,
+    const boost::any &_value)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return false;
+  }
+
+  return BulletJoint::SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+double BulletUniversalJoint::GetParam(const std::string &_key,
+                                      unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return 0;
+  }
+
+  return BulletJoint::GetParam(_key, _index);
 }

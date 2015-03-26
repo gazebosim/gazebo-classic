@@ -4,6 +4,7 @@ set (sources
   Angle.cc
   Box.cc
   Helpers.cc
+  Kmeans.cc
   Matrix3.cc
   Matrix4.cc
   Plane.cc
@@ -11,17 +12,21 @@ set (sources
   Quaternion.cc
   Rand.cc
   RotationSpline.cc
+  SignalStats.cc
   Spline.cc
   Vector2d.cc
   Vector2i.cc
   Vector3.cc
+  Vector3Stats.cc
   Vector4.cc
 )
 
 set (headers
   Angle.hh
   Box.hh
+  Filter.hh
   Helpers.hh
+  Kmeans.hh
   MathTypes.hh
   Matrix3.hh
   Matrix4.hh
@@ -30,10 +35,12 @@ set (headers
   Quaternion.hh
   Rand.hh
   RotationSpline.hh
+  SignalStats.hh
   Spline.hh
   Vector2d.hh
   Vector2i.hh
   Vector3.hh
+  Vector3Stats.hh
   Vector4.hh
 )
 
@@ -41,16 +48,19 @@ set (gtest_sources
   Angle_TEST.cc
   Box_TEST.cc
   Helpers_TEST.cc
+  Kmeans_TEST.cc
   Matrix3_TEST.cc
   Plane_TEST.cc
   Pose_TEST.cc
   Quaternion_TEST.cc
   Rand_TEST.cc
   RotationSpline_TEST.cc
+  SignalStats_TEST.cc
   Spline_TEST.cc
   Vector2d_TEST.cc
   Vector2i_TEST.cc
   Vector3_TEST.cc
+  Vector3Stats_TEST.cc
   Vector4_TEST.cc
 )
 gz_build_tests(${gtest_sources})

@@ -107,7 +107,7 @@
             </box>
           </geometry>
         </visual>
-        <sensor name="multicamera_sensor_translated" type="camera">
+        <sensor name="camera_sensor_translated" type="camera">
           <update_rate>15</update_rate>
           <pose>0 0 0 0 0 0</pose>
           <camera name="single_camera">

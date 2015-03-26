@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,13 @@
  *
  */
 
+#include <OgrePrerequisites.h>
+
 #include <OgreMaterialManager.h>
 #include <OgreGpuProgramManager.h>
 #include <OgreStringConverter.h>
 #include <OgreHighLevelGpuProgramManager.h>
+#include <OgreHighLevelGpuProgram.h>
 #include <OgreTechnique.h>
 
 #include "gazebo/rendering/deferred_shading/GBufferMaterialGenerator.hh"
@@ -155,6 +158,7 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::GenerateVertexShader(
 
   return Ogre::GpuProgramPtr(ptrProgram);
 }
+
 /////////////////////////////////////////////////
 Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::GenerateFragmentShader(
     MaterialGenerator::Perm _permutation)

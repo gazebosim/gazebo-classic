@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,6 +207,87 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   delete [] scan2;
 }
 
+/////////////////////////////////////////////////
+/// \brief Spawn multiple GPU ray sensors with same name.
+/// Verify that it doesn't crash.
+TEST_F(GPURaySensorTest, NameCollision)
+{
+  // Test GPU ray sensors with 3 boxes in the world.
+  // First GPU ray sensor at identity orientation, second at 90 degree roll
+  // First place 2 of 3 boxes within range and verify range values.
+  // then move all 3 boxes out of range and verify range values
+  Load("worlds/empty_test.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run gpu laser test\n";
+    return;
+  }
+
+  std::string modelName = "gpu_ray_model";
+  std::string raySensorName = "gpu_ray_sensor";
+  double hMinAngle = -M_PI/2.0;
+  double hMaxAngle = M_PI/2.0;
+  double minRange = 0.1;
+  double maxRange = 5.0;
+  double rangeResolution = 0.02;
+  unsigned int samples = 320;
+  math::Pose testPose(math::Vector3(0, 0, 0.1),
+      math::Quaternion(0, 0, 0));
+
+  // Spawn another gpu ray sensor at 90 degree roll
+  std::string modelName2 = "gpu_ray_model_roll";
+  std::string raySensorName2 = "gpu_ray_sensor";
+  math::Pose testPose2(math::Vector3(0, 0, 0.1),
+      math::Quaternion(M_PI/2.0, 0, 0));
+
+  SpawnGpuRaySensor(modelName, raySensorName, testPose.pos,
+      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
+      rangeResolution, samples);
+
+  SpawnGpuRaySensor(modelName2, raySensorName2, testPose2.pos,
+      testPose2.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
+      rangeResolution, samples);
+
+  std::string box01 = "box_01";
+  std::string box02 = "box_02";
+  std::string box03 = "box_03";
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  world->GetPhysicsEngine()->SetGravity(math::Vector3(0, 0, 0));
+
+  // box in front of ray sensor 1 and 2
+  math::Pose box01Pose(math::Vector3(1, 0, 0.5), math::Quaternion(0, 0, 0));
+  // box on the right of ray sensor 1
+  math::Pose box02Pose(math::Vector3(0, -1, 0.5), math::Quaternion(0, 0, 0));
+  // box on the left of the ray sensor 1 but out of range
+  math::Pose box03Pose(math::Vector3(0, maxRange + 1, 0.5),
+      math::Quaternion(0, 0, 0));
+
+  SpawnBox(box01, math::Vector3(1, 1, 1), box01Pose.pos,
+      box01Pose.rot.GetAsEuler());
+
+  SpawnBox(box02, math::Vector3(1, 1, 1), box02Pose.pos,
+      box02Pose.rot.GetAsEuler());
+
+  SpawnBox(box03, math::Vector3(1, 1, 1), box03Pose.pos,
+      box03Pose.rot.GetAsEuler());
+
+  sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
+  sensors::GpuRaySensorPtr raySensor =
+    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
+
+  sensors::SensorPtr sensor2 = sensors::get_sensor(raySensorName2);
+  sensors::GpuRaySensorPtr raySensor2 =
+    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor2);
+
+  // Make sure the above dynamic cast worked.
+  EXPECT_TRUE(raySensor != NULL);
+  EXPECT_TRUE(raySensor2 != NULL);
+}
 
 /////////////////////////////////////////////////
 /// \brief Test GPU ray sensor interaction with terrain

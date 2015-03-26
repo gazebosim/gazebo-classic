@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  *
 */
 
-#ifndef _SURFACEPARAMS_HH_
-#define _SURFACEPARAMS_HH_
+#ifndef _GAZEBO_SURFACEPARAMS_HH_
+#define _GAZEBO_SURFACEPARAMS_HH_
 
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -110,12 +111,21 @@ namespace gazebo
       /// \param[in] _msg Message to read values from.
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 
+      /// \brief Get access to FrictionPyramid data, if available.
+      /// \return Pointer to FrictionPyramid data or NULL if class does
+      /// not use FrictionPyramid data.
+      public: virtual FrictionPyramidPtr GetFrictionPyramid() const;
+
       /// \brief Allow collision checking without generating a contact joint.
       public: bool collideWithoutContact;
 
       /// \brief Custom collision filtering used when collideWithoutContact is
       /// true.
       public: unsigned int collideWithoutContactBitmask;
+
+      /// \brief Custom collision filtering. Will override
+      /// collideWithoutContact.
+      public: unsigned int collideBitmask;
     };
     /// \}
   }

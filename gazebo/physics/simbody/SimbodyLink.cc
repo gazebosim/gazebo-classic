@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -330,8 +330,13 @@ void SimbodyLink::SetEnabled(bool /*_enable*/) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetLinearVel(const math::Vector3 & /*_vel*/)
+void SimbodyLink::SetLinearVel(const math::Vector3 & _vel)
 {
+  this->masterMobod.setUToFitLinearVelocity(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    SimbodyPhysics::Vector3ToVec3(_vel));
+  this->simbodyPhysics->system.realize(
+    this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
 }
 
 //////////////////////////////////////////////////
@@ -412,8 +417,13 @@ math::Vector3 SimbodyLink::GetWorldCoGLinearVel() const
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetAngularVel(const math::Vector3 &/*_vel*/)
+void SimbodyLink::SetAngularVel(const math::Vector3 &_vel)
 {
+  this->masterMobod.setUToFitAngularVelocity(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    SimbodyPhysics::Vector3ToVec3(_vel));
+  this->simbodyPhysics->system.realize(
+    this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
 }
 
 //////////////////////////////////////////////////
@@ -515,10 +525,17 @@ void SimbodyLink::AddForceAtRelativePosition(const math::Vector3 &/*_force*/,
   gzerr << "Not implemented.\n";
 }
 
+//////////////////////////////////////////////////
+void SimbodyLink::AddLinkForce(const math::Vector3 &/*_force*/,
+    const math::Vector3 &/*_offset*/)
+{
+  gzlog << "SimbodyLink::AddLinkForce not yet implemented (issue #1478)."
+        << std::endl;
+}
+
 /////////////////////////////////////////////////
 void SimbodyLink::AddTorque(const math::Vector3 &/*_torque*/)
 {
-  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////

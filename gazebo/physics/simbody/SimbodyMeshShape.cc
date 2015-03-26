@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include "gazebo/common/Mesh.hh"
 
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
+#include "gazebo/physics/simbody/SimbodyMesh.hh"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/simbody/SimbodyMeshShape.hh"
@@ -29,12 +30,13 @@ using namespace physics;
 SimbodyMeshShape::SimbodyMeshShape(CollisionPtr _parent)
   : MeshShape(_parent)
 {
+  this->simbodyMesh = new SimbodyMesh();
 }
-
 
 //////////////////////////////////////////////////
 SimbodyMeshShape::~SimbodyMeshShape()
 {
+  delete this->simbodyMesh;
 }
 
 //////////////////////////////////////////////////
@@ -48,6 +50,16 @@ void SimbodyMeshShape::Init()
 {
   MeshShape::Init();
 
-  SimbodyCollisionPtr bParent =
-    boost::static_pointer_cast<SimbodyCollision>(this->collisionParent);
+  if (this->submesh)
+  {
+    this->simbodyMesh->Init(this->submesh,
+        boost::static_pointer_cast<SimbodyCollision>(this->collisionParent),
+        this->sdf->Get<math::Vector3>("scale"));
+  }
+  else
+  {
+    this->simbodyMesh->Init(this->mesh,
+        boost::static_pointer_cast<SimbodyCollision>(this->collisionParent),
+        this->sdf->Get<math::Vector3>("scale"));
+  }
 }

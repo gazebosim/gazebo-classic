@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The ODE base joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 12 Oct 2009
- */
-
 #ifndef _ODEJOINT_HH_
 #define _ODEJOINT_HH_
 
@@ -86,6 +81,9 @@ namespace gazebo
       public: virtual void SetDamping(unsigned int _index, double _damping);
 
       // Documentation inherited.
+      public: virtual bool SetPosition(unsigned int _index, double _position);
+
+      // Documentation inherited.
       public: virtual void SetStiffness(unsigned int _index,
                                         const double _stiffness);
 
@@ -119,13 +117,13 @@ namespace gazebo
       /// \return Pointer to the joint feedback.
       public: dJointFeedback *GetFeedback();
 
-      /// \brief simulating damping with CFM and meddling with Joint limits
-      /// Deprecated by ODEJoint::ApplyImplicitStiffnessDamping()
-      public: void CFMDamping() GAZEBO_DEPRECATED(3.0);
-
       /// \brief Get flag indicating whether implicit spring damper is enabled.
       /// \return True if implicit spring damper is used.
       public: bool UsesImplicitSpringDamper();
+
+      /// \brief Set flag indicating whether implicit spring damper is enabled.
+      /// \param[in] _implicit True if implicit spring damper is used.
+      public: void UseImplicitSpringDamper(const bool _implicit);
 
       /// \brief simulate implicit spring and damper with CFM/ERP
       /// and meddling with Joint limits.
@@ -217,10 +215,6 @@ namespace gazebo
       public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetAttribute(Attribute _attr, unsigned int _index,
-                                        double _value) GAZEBO_DEPRECATED(3.0);
-
-      // Documentation inherited.
       public: virtual void SetAxis(unsigned int _index,
                   const math::Vector3 &_axis);
 
@@ -230,18 +224,8 @@ namespace gazebo
                                         const boost::any &_value);
 
       // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &_key,
-                                        unsigned int _index,
-                                        const boost::any &_value)
-                                        GAZEBO_DEPRECATED(3.0);
-
-      // Documentation inherited.
       public: virtual double GetParam(const std::string &_key,
                                                 unsigned int _index);
-
-      // Documentation inherited.
-      public: virtual double GetAttribute(const std::string &_key,
-                unsigned int _index) GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited.
       public: virtual void SetProvideFeedback(bool _enable);

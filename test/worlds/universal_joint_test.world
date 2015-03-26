@@ -180,8 +180,8 @@
         <axis>
           <xyz>1 0 0</xyz>
           <limit>
-            <lower>-1.7</lower>
-            <upper>1.7</upper>
+            <lower>-1.4</lower>
+            <upper>1.4</upper>
           </limit>
           <dynamics>
             <damping>0.1</damping>
@@ -190,8 +190,8 @@
         <axis2>
           <xyz>0 1 0</xyz>
           <limit>
-            <lower>-1.57</lower>
-            <upper>1.57</upper>
+            <lower>-1.27</lower>
+            <upper>1.27</upper>
           </limit>
           <dynamics>
             <damping>0.1</damping>

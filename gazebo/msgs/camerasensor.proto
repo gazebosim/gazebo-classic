@@ -1,12 +1,11 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface CameraSensor 
+/// \interface CameraSensor
 /// \brief Information about a camera sensor element
 
-
-
 import "vector2d.proto";
+import "distortion.proto";
 
 message CameraSensor
 {
@@ -17,5 +16,5 @@ message CameraSensor
   optional double far_clip       = 5;
   optional bool save_enabled     = 6;
   optional string save_path      = 7;
+  optional Distortion distortion = 8;
 }
-

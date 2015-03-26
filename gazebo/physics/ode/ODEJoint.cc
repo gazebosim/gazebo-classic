@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,13 +74,7 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
   {
     sdf::ElementPtr elem = this->sdf->GetElement("physics")->GetElement("ode");
 
-    if (elem->HasElement("cfm_damping"))
-    {
-      gzwarn << "Deprecating sdf <cfm_damping>, "
-             << "replace with <implicit_spring_damper> in sdf 1.5.\n";
-      this->useImplicitSpringDamper = elem->Get<bool>("cfm_damping");
-    }
-    else if (elem->HasElement("implicit_spring_damper"))
+    if (elem->HasElement("implicit_spring_damper"))
     {
       this->useImplicitSpringDamper = elem->Get<bool>("implicit_spring_damper");
     }
@@ -124,44 +118,6 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
     if (elem->HasElement("velocity"))
       this->SetParam(dParamVel,
           elem->GetElement("velocity")->Get<double>());
-  }
-
-  if (this->sdf->HasElement("axis"))
-  {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    if (axisElem->HasElement("dynamics"))
-    {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(0, dynamicsElem->Get<double>("damping"));
-      }
-      if (dynamicsElem->HasElement("friction"))
-      {
-        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
-        gzlog << "joint friction not implemented\n";
-      }
-    }
-  }
-
-  if (this->sdf->HasElement("axis2"))
-  {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    if (axisElem->HasElement("dynamics"))
-    {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(1, dynamicsElem->Get<double>("damping"));
-      }
-      if (dynamicsElem->HasElement("friction"))
-      {
-        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
-        gzlog << "joint friction not implemented\n";
-      }
-    }
   }
 }
 
@@ -413,285 +369,132 @@ void ODEJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetAttribute(Attribute _attr, unsigned int _index, double _value)
+bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
+                        const boost::any &_value)
 {
-  switch (_attr)
+  // Axis parameters for multi-axis joints use a group bitmask
+  // to identify the variable.
+  unsigned int group;
+  switch (_index)
   {
-    case FUDGE_FACTOR:
-      this->SetParam(dParamFudgeFactor, _value);
+    case 0:
+      group = dParamGroup1;
       break;
-    case SUSPENSION_ERP:
-      this->SetParam(dParamSuspensionERP, _value);
+    case 1:
+      group = dParamGroup2;
       break;
-    case SUSPENSION_CFM:
-      this->SetParam(dParamSuspensionCFM, _value);
-      break;
-    case STOP_ERP:
-      this->SetParam("stop_erp", _index, _value);
-      break;
-    case STOP_CFM:
-      this->SetParam("stop_cfm", _index, _value);
-      break;
-    case ERP:
-      this->SetParam(dParamERP, _value);
-      break;
-    case CFM:
-      this->SetParam(dParamCFM, _value);
-      break;
-    case FMAX:
-      this->SetParam(dParamFMax, _value);
-      break;
-    case VEL:
-      this->SetParam(dParamVel, _value);
-      break;
-    case HI_STOP:
-      this->SetParam("hi_stop", _index, _value);
-      break;
-    case LO_STOP:
-      this->SetParam("lo_stop", _index, _value);
+    case 2:
+      group = dParamGroup3;
       break;
     default:
-      gzerr << "Unable to handle joint attribute[" << _attr << "]\n";
-      break;
+      gzerr << "Invalid index[" << _index << "]\n";
+      return false;
   };
-}
 
-//////////////////////////////////////////////////
-void ODEJoint::SetAttribute(const std::string &_key, unsigned int _index,
-                            const boost::any &_value)
-{
-  this->SetParam(_key, _index, _value);
-}
-
-//////////////////////////////////////////////////
-bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
-                            const boost::any &_value)
-{
-  if (_key == "fudge_factor")
+  // try because boost::any_cast can throw
+  try
   {
-    try
+    if (_key == "fudge_factor")
     {
       this->SetParam(dParamFudgeFactor, boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-  }
-  else if (_key == "suspension_erp")
-  {
-    try
+    else if (_key == "suspension_erp")
     {
       this->SetParam(dParamSuspensionERP, boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-  }
-  else if (_key == "suspension_cfm")
-  {
-    try
+    else if (_key == "suspension_cfm")
     {
       this->SetParam(dParamSuspensionCFM, boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "stop_erp")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      this->SetParam(dParamStopERP | group, boost::any_cast<double>(_value));
     }
-  }
-  else if (_key == "stop_erp")
-  {
-    try
+    else if (_key == "stop_cfm")
     {
-      switch (_index)
-      {
-        case 0:
-          this->SetParam(dParamStopERP, boost::any_cast<double>(_value));
-          break;
-        case 1:
-          this->SetParam(dParamStopERP2, boost::any_cast<double>(_value));
-          break;
-        case 2:
-          this->SetParam(dParamStopERP3, boost::any_cast<double>(_value));
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return false;
-      };
+      this->SetParam(dParamStopCFM | group, boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-  }
-  else if (_key == "stop_cfm")
-  {
-    try
-    {
-      switch (_index)
-      {
-        case 0:
-          this->SetParam(dParamStopCFM, boost::any_cast<double>(_value));
-          break;
-        case 1:
-          this->SetParam(dParamStopCFM2, boost::any_cast<double>(_value));
-          break;
-        case 2:
-          this->SetParam(dParamStopCFM3, boost::any_cast<double>(_value));
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return false;
-      };
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-  }
-  else if (_key == "erp")
-  {
-    try
+    else if (_key == "erp")
     {
       this->SetParam(dParamERP, boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-  }
-  else if (_key == "cfm")
-  {
-    try
+    else if (_key == "cfm")
     {
       this->SetParam(dParamCFM, boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "fmax")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      gzwarn << "The '" << _key << "' parameter is deprecated "
+             << "to enable Coulomb joint friction with the "
+             << "'friction' parameter"
+             << std::endl;
+      this->SetParam(dParamFMax | group, boost::any_cast<double>(_value));
     }
-  }
-  else if (_key == "fmax")
-  {
-    try
+    else if (_key == "friction")
     {
-      this->SetParam(dParamFMax, boost::any_cast<double>(_value));
+      // To represent Coulomb friction,
+      //  set FMax to friction value
+      //  set Vel to 0
+      this->SetParam(group | dParamFMax, boost::any_cast<double>(_value));
+      this->SetParam(group | dParamVel, 0.0);
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "vel")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      gzwarn << "The '" << _key << "' parameter is deprecated "
+             << "to enable Coulomb joint friction with the "
+             << "'friction' parameter"
+             << std::endl;
+      this->SetParam(dParamVel | group, boost::any_cast<double>(_value));
     }
-  }
-  else if (_key == "vel")
-  {
-    try
+    else if (_key == "hi_stop")
     {
-      this->SetParam(dParamVel, boost::any_cast<double>(_value));
+      this->SetParam(dParamHiStop | group, boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "lo_stop")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      this->SetParam(dParamLoStop | group, boost::any_cast<double>(_value));
     }
-  }
-  else if (_key == "hi_stop")
-  {
-    try
+    else if (_key == "thread_pitch")
     {
-      switch (_index)
-      {
-        case 0:
-          this->SetParam(dParamHiStop, boost::any_cast<double>(_value));
-          break;
-        case 1:
-          this->SetParam(dParamHiStop2, boost::any_cast<double>(_value));
-          break;
-        case 2:
-          this->SetParam(dParamHiStop3, boost::any_cast<double>(_value));
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return false;
-      };
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-  }
-  else if (_key == "lo_stop")
-  {
-    try
-    {
-      switch (_index)
-      {
-        case 0:
-          this->SetParam(dParamLoStop, boost::any_cast<double>(_value));
-          break;
-        case 1:
-          this->SetParam(dParamLoStop2, boost::any_cast<double>(_value));
-          break;
-        case 2:
-          this->SetParam(dParamLoStop3, boost::any_cast<double>(_value));
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return false;
-      };
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-  }
-  else if (_key == "thread_pitch")
-  {
-    ScrewJoint<ODEJoint>* screwJoint =
-      dynamic_cast<ScrewJoint<ODEJoint>* >(this);
-    if (screwJoint != NULL)
-    {
-      try
+      ScrewJoint<ODEJoint>* screwJoint =
+        dynamic_cast<ScrewJoint<ODEJoint>* >(this);
+      if (screwJoint != NULL)
       {
         screwJoint->SetThreadPitch(boost::any_cast<double>(_value));
       }
-      catch(const boost::bad_any_cast &e)
+      else
       {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return false;
+        gzerr << "Trying to set " << _key << " for non-screw joints."
+              << std::endl;
+        return 0;
       }
     }
-  }
-  else if (_key == "gearbox_ratio")
-  {
-    GearboxJoint<ODEJoint>* gearboxJoint =
-      dynamic_cast<GearboxJoint<ODEJoint>* >(this);
-    if (gearboxJoint != NULL)
+    else if (_key == "gearbox_ratio")
     {
-      try
+      GearboxJoint<ODEJoint>* gearboxJoint =
+        dynamic_cast<GearboxJoint<ODEJoint>* >(this);
+      if (gearboxJoint != NULL)
       {
         gearboxJoint->SetGearboxRatio(boost::any_cast<double>(_value));
       }
-      catch(const boost::bad_any_cast &e)
+      else
       {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return false;
+        gzerr << "Trying to set " << _key << " for non-gearbox joints."
+              << std::endl;
+        return 0;
       }
     }
+    else
+    {
+      gzerr << "Unable to handle joint attribute[" << _key << "]\n";
+      return false;
+    }
   }
-  else
+  catch(const boost::bad_any_cast &e)
   {
-    gzerr << "Unable to handle joint attribute[" << _key << "]\n";
+    gzerr << "SetParam(" << _key << ")"
+          << " boost any_cast error:" << e.what()
+          << std::endl;
     return false;
   }
   return true;
@@ -700,220 +503,125 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
 //////////////////////////////////////////////////
 double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  if (_key == "fudge_factor")
+  // Axis parameters for multi-axis joints use a group bitmask
+  // to identify the variable.
+  unsigned int group;
+  switch (_index)
   {
-    try
+    case 0:
+      group = dParamGroup1;
+      break;
+    case 1:
+      group = dParamGroup2;
+      break;
+    case 2:
+      group = dParamGroup3;
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
+      return false;
+  }
+
+  try
+  {
+    if (_key == "fudge_factor")
     {
       return this->GetParam(dParamFudgeFactor);
     }
-    catch(common::Exception &e)
-    {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
-    }
-  }
-  else if (_key == "suspension_erp")
-  {
-    try
+    else if (_key == "suspension_erp")
     {
       return this->GetParam(dParamSuspensionERP);
     }
-    catch(common::Exception &e)
-    {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
-    }
-  }
-  else if (_key == "suspension_cfm")
-  {
-    try
+    else if (_key == "suspension_cfm")
     {
       return this->GetParam(dParamSuspensionCFM);
     }
-    catch(common::Exception &e)
+    else if (_key == "stop_erp")
     {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
+      return this->GetParam(dParamStopERP | group);
     }
-  }
-  else if (_key == "stop_erp")
-  {
-    try
+    else if (_key == "stop_cfm")
     {
-      /// \TODO: switch based on index
-      return this->GetParam(dParamStopERP);
+      return this->GetParam(dParamStopCFM | group);
     }
-    catch(common::Exception &e)
-    {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
-    }
-  }
-  else if (_key == "stop_cfm")
-  {
-    try
-    {
-      /// \TODO: switch based on index
-      return this->GetParam(dParamStopCFM);
-    }
-    catch(common::Exception &e)
-    {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
-    }
-  }
-  else if (_key == "erp")
-  {
-    try
+    else if (_key == "erp")
     {
       return this->GetParam(dParamERP);
     }
-    catch(common::Exception &e)
-    {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
-    }
-  }
-  else if (_key == "cfm")
-  {
-    try
+    else if (_key == "cfm")
     {
       return this->GetParam(dParamCFM);
     }
-    catch(common::Exception &e)
+    else if (_key == "fmax")
     {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
+      gzwarn << "The '" << _key << "' parameter is deprecated "
+             << "to enable Coulomb joint friction with the "
+             << "'friction' parameter"
+             << std::endl;
+      return this->GetParam(dParamFMax | group);
     }
-  }
-  else if (_key == "fmax")
-  {
-    try
+    else if (_key == "friction")
     {
-      return this->GetParam(dParamFMax);
+      return this->GetParam(dParamFMax | group);
     }
-    catch(common::Exception &e)
+    else if (_key == "vel")
     {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
+      gzwarn << "The '" << _key << "' parameter is deprecated "
+             << "to enable Coulomb joint friction with the "
+             << "'friction' parameter"
+             << std::endl;
+      return this->GetParam(dParamVel | group);
     }
-  }
-  else if (_key == "vel")
-  {
-    try
+    else if (_key == "hi_stop")
     {
-      return this->GetParam(dParamVel);
+          return this->GetParam(dParamHiStop | group);
     }
-    catch(common::Exception &e)
+    else if (_key == "lo_stop")
     {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
+          return this->GetParam(dParamLoStop | group);
     }
-  }
-  else if (_key == "hi_stop")
-  {
-    try
+    else if (_key == "thread_pitch")
     {
-      switch (_index)
+      ScrewJoint<ODEJoint>* screwJoint =
+        dynamic_cast<ScrewJoint<ODEJoint>* >(this);
+      if (screwJoint != NULL)
       {
-        case 0:
-          return this->GetParam(dParamHiStop);
-        case 1:
-          return this->GetParam(dParamHiStop2);
-        case 2:
-          return this->GetParam(dParamHiStop3);
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          break;
-      };
-    }
-    catch(common::Exception &e)
-    {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
-    }
-  }
-  else if (_key == "lo_stop")
-  {
-    try
-    {
-      switch (_index)
-      {
-        case 0:
-          return this->GetParam(dParamLoStop);
-        case 1:
-          return this->GetParam(dParamLoStop2);
-        case 2:
-          return this->GetParam(dParamLoStop3);
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          break;
-      };
-    }
-    catch(common::Exception &e)
-    {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
-    }
-  }
-  else if (_key == "thread_pitch")
-  {
-    ScrewJoint<ODEJoint>* screwJoint =
-      dynamic_cast<ScrewJoint<ODEJoint>* >(this);
-    if (screwJoint != NULL)
-    {
-      try
-      {
-        return screwJoint->GetThreadPitch();
+          return screwJoint->GetThreadPitch();
       }
-      catch(common::Exception &e)
+      else
       {
-        gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
+        gzerr << "Trying to get " << _key << " for non-screw joints."
+              << std::endl;
         return 0;
       }
     }
-    else
+    else if (_key == "gearbox_ratio")
     {
-      gzerr << "Trying to get thread_pitch for non-screw joints.\n";
-      return 0;
-    }
-  }
-  else if (_key == "gearbox_ratio")
-  {
-    GearboxJoint<ODEJoint>* gearboxJoint =
-      dynamic_cast<GearboxJoint<ODEJoint>* >(this);
-    if (gearboxJoint != NULL)
-    {
-      try
+      GearboxJoint<ODEJoint>* gearboxJoint =
+        dynamic_cast<GearboxJoint<ODEJoint>* >(this);
+      if (gearboxJoint != NULL)
       {
         return gearboxJoint->GetGearboxRatio();
       }
-      catch(common::Exception &e)
+      else
       {
-        gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
+        gzerr << "Trying to get " << _key << " for non-gearbox joints."
+              << std::endl;
         return 0;
       }
     }
-    else
-    {
-      gzerr << "Trying to get thread_pitch for non-gearbox joints.\n";
-      return 0;
-    }
   }
-  else
+  catch(common::Exception &e)
   {
-    gzerr << "Unable to get joint attribute[" << _key << "]\n";
+    gzerr << "GetParam(" << _key << ") error:"
+          << e.GetErrorStr()
+          << std::endl;
     return 0;
   }
 
-  gzerr << "should not be here\n";
+  gzerr << "Unable to get joint attribute[" << _key << "]"
+        << std::endl;
   return 0;
-}
-
-//////////////////////////////////////////////////
-double ODEJoint::GetAttribute(const std::string &_key, unsigned int _index)
-{
-  return this->GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////
@@ -1120,15 +828,15 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::CFMDamping()
-{
-  this->ApplyImplicitStiffnessDamping();
-}
-
-//////////////////////////////////////////////////
 bool ODEJoint::UsesImplicitSpringDamper()
 {
   return this->useImplicitSpringDamper;
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::UseImplicitSpringDamper(const bool _implicit)
+{
+  this->useImplicitSpringDamper = _implicit;
 }
 
 //////////////////////////////////////////////////
@@ -1465,4 +1173,10 @@ void ODEJoint::ApplyExplicitStiffnessDamping()
 
     // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
   }
+}
+
+//////////////////////////////////////////////////
+bool ODEJoint::SetPosition(unsigned int _index, double _position)
+{
+  return Joint::SetPositionMaximal(_index, _position);
 }

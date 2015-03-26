@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,10 @@
 #define _GAZEBO_DARTCOLLISION_HH_
 
 #include "gazebo/common/CommonTypes.hh"
-
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
-
 #include "gazebo/physics/dart/dart_inc.h"
+#include "gazebo/physics/dart/DARTTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -81,6 +80,11 @@ namespace gazebo
 
       /// \brief Get DART collision shape.
       public: dart::dynamics::Shape* GetDARTCollisionShape() const;
+
+      /// \brief Similar to Collision::GetSurface, but provides dynamically
+      ///        casted pointer to DARTSurfaceParams.
+      /// \return Dynamically casted pointer to DARTSurfaceParams.
+      public: DARTSurfaceParamsPtr GetDARTSurface() const;
 
       /// \brief DART body node associated with this collision.
       private: dart::dynamics::BodyNode *dtBodyNode;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,7 @@
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
-#include "gazebo/gui/building/WallItem.hh"
-#include "gazebo/gui/building/LineSegmentItem.hh"
+#include "gazebo/gui/building/WallSegmentItem.hh"
 #include "gazebo/gui/building/FloorItem.hh"
 
 using namespace gazebo;
@@ -53,7 +52,6 @@ FloorItem::~FloorItem()
 {
 }
 
-
 /////////////////////////////////////////////////
 QVector3D FloorItem::GetSize() const
 {
@@ -74,50 +72,39 @@ double FloorItem::GetSceneRotation() const
 }
 
 /////////////////////////////////////////////////
-void FloorItem::AttachWall(WallItem *_wallItem)
+void FloorItem::AttachWallSegment(WallSegmentItem *_wallSegmentItem)
 {
-  if (this->floorBoundingRect.isEmpty())
-  {
-    this->floorBoundingRect = _wallItem->mapToScene(_wallItem->boundingRect());
-  }
-  else
-  {
-    this->floorBoundingRect = this->floorBoundingRect.united(
-      _wallItem->mapToScene(_wallItem->boundingRect()));
-  }
-  this->walls.push_back(_wallItem);
+  this->floorBoundingRect << _wallSegmentItem->boundingRect().topLeft();
+  this->floorBoundingRect << _wallSegmentItem->boundingRect().bottomRight();
+  this->wallSegments.push_back(_wallSegmentItem);
 
-  for (unsigned int i = 0; i < _wallItem->GetSegmentCount(); ++i)
-  {
-    LineSegmentItem *segment = _wallItem->GetSegment(i);
-    connect(segment, SIGNAL(WidthChanged(double)), this,
-        SLOT(NotifyChange()));
-    connect(segment, SIGNAL(DepthChanged(double)), this,
-        SLOT(NotifyChange()));
-    connect(segment, SIGNAL(PosXChanged(double)), this,
-        SLOT(NotifyChange()));
-    connect(segment, SIGNAL(PosYChanged(double)), this,
-        SLOT(NotifyChange()));
-  }
-  connect(_wallItem, SIGNAL(ItemDeleted()), this,
-      SLOT(WallDeleted()));
+  connect(_wallSegmentItem, SIGNAL(WidthChanged(double)), this,
+      SLOT(NotifyChange()));
+  connect(_wallSegmentItem, SIGNAL(DepthChanged(double)), this,
+      SLOT(NotifyChange()));
+  connect(_wallSegmentItem, SIGNAL(PosXChanged(double)), this,
+      SLOT(NotifyChange()));
+  connect(_wallSegmentItem, SIGNAL(PosYChanged(double)), this,
+      SLOT(NotifyChange()));
+  connect(_wallSegmentItem, SIGNAL(ItemDeleted()), this,
+      SLOT(WallSegmentDeleted()));
   this->Update();
 }
 
 /////////////////////////////////////////////////
-void FloorItem:: WallDeleted()
+void FloorItem::WallSegmentDeleted()
 {
-  EditorItem *wallItem = dynamic_cast<EditorItem *>(QObject::sender());
-  if (wallItem)
+  EditorItem *wallSegmentItem = dynamic_cast<EditorItem *>(QObject::sender());
+  if (wallSegmentItem)
   {
-    this->walls.erase(std::remove(this->walls.begin(), this->walls.end(),
-      wallItem), this->walls.end());
+    this->wallSegments.erase(std::remove(this->wallSegments.begin(),
+        this->wallSegments.end(), wallSegmentItem), this->wallSegments.end());
   }
   this->dirty = true;
 }
 
 /////////////////////////////////////////////////
-void FloorItem:: NotifyChange()
+void FloorItem::NotifyChange()
 {
   this->dirty = true;
 }
@@ -125,16 +112,16 @@ void FloorItem:: NotifyChange()
 /////////////////////////////////////////////////
 void FloorItem::RecalculateBoundingBox()
 {
-  if ((this->walls.empty()) || !this->dirty)
+  if ((this->wallSegments.empty()) || !this->dirty)
     return;
 
-  WallItem *wallItem = this->walls[0];
-  this->floorBoundingRect = wallItem->mapToScene(
-      wallItem->boundingRect());
-  for (unsigned int i = 1; i < this->walls.size(); ++i)
+  this->floorBoundingRect.clear();
+  for (unsigned int i = 0; i < this->wallSegments.size(); ++i)
   {
-    this->floorBoundingRect = this->floorBoundingRect.united(
-        this->walls[i]->mapToScene(this->walls[i]->boundingRect()));
+    this->floorBoundingRect <<
+        this->wallSegments[i]->boundingRect().topLeft();
+    this->floorBoundingRect <<
+        this->wallSegments[i]->boundingRect().bottomRight();
   }
   this->Update();
   this->dirty = false;

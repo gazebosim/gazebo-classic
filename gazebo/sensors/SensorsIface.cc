@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,20 +70,6 @@ bool sensors::fini()
   sensors::SensorManager::Instance()->Fini();
   rendering::fini();
   return true;
-}
-
-/////////////////////////////////////////////////
-std::string sensors::create_sensor(sdf::ElementPtr _elem,
-                                   const std::string &_worldName,
-                                   const std::string &_parentName)
-{
-  if (g_disable)
-    return "";
-
-  SensorPtr parentSensor = get_sensor(_parentName);
-  GZ_ASSERT(parentSensor, "Unable to get parent sensor");
-
-  return create_sensor(_elem, _worldName, _parentName, parentSensor->GetId());
 }
 
 /////////////////////////////////////////////////

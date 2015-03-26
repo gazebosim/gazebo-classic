@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <sdf/sdf.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
@@ -31,11 +32,10 @@ class QHBoxLayout;
 
 namespace gazebo
 {
-  class GLWidget;
-
   namespace gui
   {
-    class BuildingEditorWidget;
+    class GLWidget;
+    class TimePanel;
 
     class GAZEBO_VISIBLE RenderWidget : public QWidget
     {
@@ -46,9 +46,18 @@ namespace gazebo
       public: void RemoveScene(const std::string &_name);
       public: void CreateScene(const std::string &_name);
 
-      /// \brief Show editor widget in the main window
-      /// param[in] _show True to show the editor widget, false to hide it.
-      public: void ShowEditor(bool _show);
+      /// \brief Add a widget inside the render widget
+      /// \param[in] _widget Widget to be added.
+      /// \param[in] _index Index in the splitter to add the widget at.
+      public: void InsertWidget(unsigned int _index, QWidget *_widget);
+
+      /// \brief Show the time panel.
+      /// \para[in] _show True to show the panel, false to hide it.
+      public: void ShowTimePanel(bool _show);
+
+      /// \brief Get the time panel widget.
+      /// \return the time panel widget.
+      public: TimePanel *GetTimePanel() const;
 
       /// \brief Display an overlay message
       /// \param[in] _msg Message to be displayed
@@ -60,7 +69,18 @@ namespace gazebo
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
 
-      private slots: virtual void update();
+      /// \brief Add a plugin to the render widget.
+      /// \param[in] _plugin Plugin pointer to add.
+      /// \param[in] _elem Plugin sdf parameters.
+      public: void AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem);
+
+      /// \brief Get the toolbar on top of the render widget
+      /// \return Toolbar
+      public: QToolBar *GetToolbar() const;
+
+      /// \brief Set the visibility of the toolbar.
+      /// \param[in] _show Whether or not to show the toolbar.
+      public: void ShowToolbar(const bool _show);
 
       /// \brief Qt callback to clear overlay message if a duration is
       /// specified
@@ -72,11 +92,11 @@ namespace gazebo
       /// \param[in] _modelName Name of the model that is being followed.
       private: void OnFollow(const std::string &_modelName);
 
+      /// \brief Handle align model user event.
+      private: void OnAlign();
+
       /// \brief Widget used to draw the scene.
       private: GLWidget *glWidget;
-
-      /// \brief Building editor widget for creating a building model
-      private: BuildingEditorWidget *buildingEditorWidget;
 
       /// \brief Frame that holds the contents of this widget.
       private: QFrame *mainFrame;
@@ -98,21 +118,25 @@ namespace gazebo
       private: QLineEdit *fpsEdit;
       private: QLineEdit *trianglesEdit;
 
+      /// \brief Widget for the top toolbar
+      private: QToolBar *toolbar;
       private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 
       /// \brief An overlay label on the 3D render widget
       private: QLabel *msgOverlayLabel;
 
-      private: bool clear;
-      private: std::string clearName;
-
-      private: bool create;
-      private: std::string createName;
-      private: QTimer *timer;
-
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
+
+      /// \brief Vertical splitter between widgets.
+      private: QSplitter *splitter;
+
+      /// \brief All the gui plugins
+      private: std::vector<gazebo::GUIPluginPtr> plugins;
+
+      /// \brief Time panel widget.
+      private: TimePanel *timePanel;
     };
   }
 }

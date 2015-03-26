@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -599,13 +599,6 @@ math::Angle BulletScrewJoint::GetAngleImpl(unsigned int _index) const
   else
     gzerr << "bulletScrew not created yet\n";
   return result;
-}
-
-//////////////////////////////////////////////////
-double BulletScrewJoint::GetAttribute(
-  const std::string &_key, unsigned int _index)
-{
-  return this->GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -217,6 +217,10 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
+
+      // Documentation inherited
+      public: virtual bool GetParam(const std::string &_key,
+                  boost::any &_value) const;
 
       // Documentation inherited
       public: virtual bool SetParam(const std::string &_key,

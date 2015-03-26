@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 #include "gazebo/physics/simbody/SimbodyBoxShape.hh"
 #include "gazebo/physics/simbody/SimbodyCylinderShape.hh"
 #include "gazebo/physics/simbody/SimbodyMeshShape.hh"
+#include "gazebo/physics/simbody/SimbodyPolylineShape.hh"
 #include "gazebo/physics/simbody/SimbodyRayShape.hh"
 
 #include "gazebo/physics/simbody/SimbodyHingeJoint.hh"
@@ -42,6 +43,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/WorldPrivate.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/SurfaceParams.hh"
@@ -160,13 +162,13 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
     simbodyContactElem->Get<double>("viscous_friction");
 
   // below are not used yet, but should work it into the system
-  this->contactMaterialViscousFriction =
-    simbodyContactElem->Get<double>("plastic_coef_restitution");
   this->contactMaterialPlasticCoefRestitution =
-    simbodyContactElem->Get<double>("plastic_impact_velocity");
+    simbodyContactElem->Get<double>("plastic_coef_restitution");
   this->contactMaterialPlasticImpactVelocity =
-    simbodyContactElem->Get<double>("override_impact_capture_velocity");
+    simbodyContactElem->Get<double>("plastic_impact_velocity");
   this->contactImpactCaptureVelocity =
+    simbodyContactElem->Get<double>("override_impact_capture_velocity");
+  this->contactStictionTransitionVelocity =
     simbodyContactElem->Get<double>("override_stiction_transition_velocity");
 }
 
@@ -454,7 +456,7 @@ void SimbodyPhysics::UpdatePhysics()
       math::Pose pose = SimbodyPhysics::Transform2Pose(
         simbodyLink->masterMobod.getBodyTransform(s));
       simbodyLink->SetDirtyPose(pose);
-      this->world->dirtyPoses.push_back(
+      this->world->dataPtr->dirtyPoses.push_back(
         boost::static_pointer_cast<Entity>(*lx).get());
     }
 
@@ -519,6 +521,8 @@ ShapePtr SimbodyPhysics::CreateShape(const std::string &_type,
     shape.reset(new SimbodyCylinderShape(collision));
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new SimbodyMeshShape(collision));
+  else if (_type == "polyline")
+    shape.reset(new SimbodyPolylineShape(collision));
   else if (_type == "heightmap")
     shape.reset(new SimbodyHeightmapShape(collision));
   else if (_type == "multiray")
@@ -802,7 +806,9 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       else if (type == "screw")
       {
         UnitVec3 axis(
-          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
+          SimbodyPhysics::Vector3ToVec3(
+            gzJoint->GetAxisFrameOffset(0).RotateVector(
+            gzJoint->GetLocalAxis(0))));
 
         double pitch =
           dynamic_cast<physics::SimbodyScrewJoint*>(gzJoint)->GetThreadPitch(0);
@@ -855,9 +861,12 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       else if (type == "universal")
       {
         UnitVec3 axis1(SimbodyPhysics::Vector3ToVec3(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_PARENT)));
+          gzJoint->GetAxisFrameOffset(0).RotateVector(
+          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_PARENT))));
+        /// \TODO: check if this is right, or GetAxisFrameOffset(1) is needed.
         UnitVec3 axis2(SimbodyPhysics::Vector3ToVec3(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_CHILD)));
+          gzJoint->GetAxisFrameOffset(0).RotateVector(
+          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_CHILD))));
 
         // Simbody's univeral joint is along axis1=Y and axis2=X
         // note X and Y are reversed because Simbody defines universal joint
@@ -906,8 +915,24 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       }
       else if (type == "revolute")
       {
+        // rotation from axis frame to child link frame
+        // simbody assumes links are in child link frame, but gazebo
+        // sdf 1.4 and earlier assumes joint axis are defined in model frame.
+        // Use function Joint::GetAxisFrame() to remedy this situation.
+        // Joint::GetAxisFrame() returns the frame joint axis is defined:
+        // either model frame or child link frame.
+        // simbody always assumes axis is specified in the child link frame.
+        // \TODO: come up with a test case where we might need to
+        // flip transform based on isReversed flag.
         UnitVec3 axis(
-          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
+          SimbodyPhysics::Vector3ToVec3(
+            gzJoint->GetAxisFrameOffset(0).RotateVector(
+            gzJoint->GetLocalAxis(0))));
+
+        // gzerr << "[" << gzJoint->GetAxisFrameOffset(0).GetAsEuler()
+        //       << "] ["
+        //       << gzJoint->GetAxisFrameOffset(0).RotateVector(
+        //          gzJoint->GetLocalAxis(0)) << "]\n";
 
         // Simbody's pin is along Z
         Rotation R_JZ(axis, ZAxis);
@@ -946,8 +971,9 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       }
       else if (type == "prismatic")
       {
-        UnitVec3 axis(
-          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
+        UnitVec3 axis(SimbodyPhysics::Vector3ToVec3(
+            gzJoint->GetAxisFrameOffset(0).RotateVector(
+            gzJoint->GetLocalAxis(0))));
 
         // Simbody's slider is along X
         Rotation R_JX(axis, XAxis);
@@ -1316,95 +1342,102 @@ std::string SimbodyPhysics::GetTypeString(unsigned int _type)
 //////////////////////////////////////////////////
 boost::any SimbodyPhysics::GetParam(const std::string &_key) const
 {
-  if (_key == "type")
+  boost::any value;
+  this->GetParam(_key, value);
+  return value;
+}
+
+//////////////////////////////////////////////////
+bool SimbodyPhysics::GetParam(const std::string &_key, boost::any &_value) const
+{
+  if (_key == "solver_type")
   {
-    gzwarn << "Please use keyword `solver_typ` in the future.\n";
-    return this->GetParam("solver_type");
-  }
-  else if (_key == "solver_type")
-  {
-    return "Spatial Algebra and Elastic Foundation";
+    _value = std::string("Spatial Algebra and Elastic Foundation");
   }
   else if (_key == "integrator_type")
   {
-    return this->integratorType;
+    _value = this->integratorType;
   }
   else if (_key == "accuracy")
   {
     if (this->integ)
-      return this->integ->getAccuracyInUse();
+      _value = this->integ->getAccuracyInUse();
     else
-      return 0.0f;
+      _value = 0.0f;
   }
   else if (_key == "max_transient_velocity")
   {
-    return this->contact.getTransitionVelocity();
+    _value = this->contact.getTransitionVelocity();
   }
   else
   {
-    gzwarn << "key [" << _key
-           << "] not supported, returning (int)0." << std::endl;
-    return 0;
+    return PhysicsEngine::GetParam(_key, _value);
   }
+  return true;
 }
 
 //////////////////////////////////////////////////
 bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
-  /// \TODO fill this out, see issue #1116
-  if (_key == "accuracy")
+  try
   {
-    int value;
-    try
+    if (_key == "accuracy")
     {
-      value = boost::any_cast<int>(_value);
+      this->integ->setAccuracy(boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "max_transient_velocity")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      this->contact.setTransitionVelocity(boost::any_cast<double>(_value));
     }
-    gzerr << "Setting [" << _key << "] in Simbody to [" << value
-          << "] not yet supported.\n";
+    else if (_key == "stiffness")
+    {
+      this->contactMaterialStiffness = boost::any_cast<double>(_value);
+    }
+    else if (_key == "dissipation")
+    {
+      this->contactMaterialDissipation = boost::any_cast<double>(_value);
+    }
+    else if (_key == "plastic_coef_restitution")
+    {
+      this->contactMaterialPlasticCoefRestitution =
+          boost::any_cast<double>(_value);
+    }
+    else if (_key == "plastic_impact_velocity")
+    {
+      this->contactMaterialPlasticImpactVelocity =
+          boost::any_cast<double>(_value);
+    }
+    else if (_key == "static_friction")
+    {
+      this->contactMaterialStaticFriction = boost::any_cast<double>(_value);
+    }
+    else if (_key == "dynamic_friction")
+    {
+      this->contactMaterialDynamicFriction = boost::any_cast<double>(_value);
+    }
+    else if (_key == "viscous_friction")
+    {
+      this->contactMaterialViscousFriction = boost::any_cast<double>(_value);
+    }
+    else if (_key == "override_impact_capture_velocity")
+    {
+      this->contactMaterialPlasticImpactVelocity =
+          boost::any_cast<double>(_value);
+    }
+    else if (_key == "override_stiction_transition_velocity")
+    {
+      this->contactImpactCaptureVelocity = boost::any_cast<double>(_value);
+    }
+    else
+    {
+      return PhysicsEngine::SetParam(_key, _value);
+    }
+  }
+  catch(boost::bad_any_cast &e)
+  {
+    gzerr << "SimbodyPhysics::SetParam(" << _key << ") boost::any_cast error: "
+          << e.what() << std::endl;
     return false;
   }
-  else if (_key == "max_transient_velocity")
-  {
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    gzerr << "Setting [" << _key << "] in Simbody to [" << value
-          << "] not yet supported.\n";
-    return false;
-  }
-  else if (_key == "max_step_size")
-  {
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    gzerr << "Setting [" << _key << "] in Simbody to [" << value
-          << "] not yet supported.\n";
-    return false;
-  }
-  else
-  {
-    gzwarn << _key << " is not supported in Simbody" << std::endl;
-    return false;
-  }
-  // should never get here
-  return false;
+  return true;
 }

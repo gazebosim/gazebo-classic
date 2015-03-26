@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,28 +82,14 @@ namespace gazebo
       // Documentation inherited.
       public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
 
-      /// \brief Set a parameter for the joint
-      public: virtual void SetAttribute(Attribute, unsigned int _index,
-                                        double _value);
-
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,
                                         unsigned int _index,
                                         const boost::any &_value);
 
       // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &_key,
-                                        unsigned int _index,
-                                        const boost::any &_value)
-                                        GAZEBO_DEPRECATED(3.0);
-
-      // Documentation inherited.
       public: virtual double GetParam(const std::string &_key,
                   unsigned int _index);
-
-      // Documentation inherited.
-      public: virtual double GetAttribute(const std::string &_key,
-                  unsigned int _index) GAZEBO_DEPRECATED(3.0);
 
       // Save current Simbody State
       public: virtual void SaveSimbodyState(const SimTK::State &_state);

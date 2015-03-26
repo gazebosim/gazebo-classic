@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ namespace gazebo
 {
   namespace physics
   {
+    class DARTMesh;
+
     /// \brief Triangle mesh collision.
     class GAZEBO_VISIBLE DARTMeshShape : public MeshShape
     {
@@ -44,20 +46,8 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Update();
 
-      /// \brief Transform matrix.
-      // private: dReal transform[16*2];
-
-      /// \brief Transform matrix index.
-      private: int transformIndex;
-
-      /// \brief Array of vertex values.
-      private: float *vertices;
-
-      /// \brief Array of index values.
-      private: int *indices;
-
-      /// \brief DART trimesh data.
-      // private: dTriMeshDataID odeData;
+      /// \brief DART collision mesh helper class
+      private: DARTMesh *dartMesh;
     };
   }
 }

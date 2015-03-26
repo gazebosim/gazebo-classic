@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -160,14 +160,26 @@ math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
       this->simbodyPhysics->simbodyPhysicsStepped &&
       _index < this->GetAngleCount())
   {
-    const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
-      this->simbodyPhysics->integ->getState());
+    if (!this->mobod.isEmptyHandle())
+    {
+      const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
+        this->simbodyPhysics->integ->getState());
 
-    // express Z-axis of X_OM in world frame
-    SimTK::Vec3 z_W(this->mobod.expressVectorInGroundFrame(
-      this->simbodyPhysics->integ->getState(), X_OM.z()));
+      // express Z-axis of X_OM in world frame
+      SimTK::Vec3 z_W(this->mobod.expressVectorInGroundFrame(
+        this->simbodyPhysics->integ->getState(), X_OM.z()));
 
-    return SimbodyPhysics::Vec3ToVector3(z_W);
+      return SimbodyPhysics::Vec3ToVector3(z_W);
+    }
+    else
+    {
+      gzerr << "Joint mobod not initialized correctly.  Returning"
+            << " initial axis vector in world frame (not valid if"
+            << " joint frame has moved). Please file"
+            << " a report on issue tracker.\n";
+      return this->GetAxisFrame(_index).RotateVector(
+        this->GetLocalAxis(_index));
+    }
   }
   else
   {
@@ -184,22 +196,8 @@ math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
             << "global axis.\n";
       // if local axis specified in model frame (to be changed)
       // switch to code below if issue #494 is to be addressed
-      return this->model->GetWorldPose().rot.RotateVector(
+      return this->GetAxisFrame(_index).RotateVector(
         this->GetLocalAxis(_index));
-
-      // if local axis specified in joint frame (Issue #494)
-      // Remember to remove include of Model.hh when switching.
-      // if (this->childLink)
-      // {
-      //   math::Pose jointPose =
-      //    this->anchorPose + this->childLink->GetWorldPose();
-      //   return jointPose.rot.RotateVector(this->GetLocalAxis(_index));
-      // }
-      // else
-      // {
-      //   gzerr << "Joint [" << this->GetName() << "] missing child link.\n";
-      //   return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
-      // }
     }
   }
 }
@@ -212,8 +210,27 @@ math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int _index) const
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)
     {
-      return math::Angle(this->mobod.getOneQ(
-        this->simbodyPhysics->integ->getState(), _index));
+      if (!this->mobod.isEmptyHandle())
+      {
+        // simbody screw joint only has one dof
+        // _index=0: angular dof
+        // _index=1: linear dof
+        math::Angle angle(this->mobod.getOneQ(
+          this->simbodyPhysics->integ->getState(), 0));
+        if (_index == 1)
+        {
+          // return linear position
+          // thread pitch units rad/m
+          angle /= math::Angle(this->threadPitch);
+        }
+        return angle;
+      }
+      else
+      {
+        gzerr << "Joint mobod not initialized correctly.  Please file"
+              << " a report on issue tracker.\n";
+        return math::Angle(0.0);
+      }
     }
     else
     {
@@ -239,7 +256,7 @@ double SimbodyScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 //////////////////////////////////////////////////
 double SimbodyScrewJoint::GetThreadPitch()
 {
-  if (this->physicsInitialized &&
+  if (!this->mobod.isEmptyHandle() && this->physicsInitialized &&
       this->simbodyPhysics->simbodyPhysicsInitialized)
   {
     // downcast mobod to screw mobod first
@@ -253,14 +270,6 @@ double SimbodyScrewJoint::GetThreadPitch()
            << " to initialize. Returning thread pitch from SDF.\n";
     return this->threadPitch;
   }
-}
-
-//////////////////////////////////////////////////
-void SimbodyScrewJoint::SetAttribute(const std::string &_key,
-  unsigned int _index,
-  const boost::any &_value)
-{
-  this->SetParam(_key, _index, _value);
 }
 
 //////////////////////////////////////////////////
@@ -287,13 +296,6 @@ bool SimbodyScrewJoint::SetParam(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-double SimbodyScrewJoint::GetAttribute(const std::string &_key,
-  unsigned int _index)
-{
-  return this->GetParam(_key, _index);
-}
-
-//////////////////////////////////////////////////
 double SimbodyScrewJoint::GetParam(const std::string &_key,
   unsigned int _index)
 {
@@ -313,6 +315,14 @@ bool SimbodyScrewJoint::SetHighStop(
   {
     if (this->physicsInitialized)
     {
+      // check if limitForce is initialized
+      if (this->limitForce[_index].isEmptyHandle())
+      {
+        gzerr << "child link is NULL, force element not initialized, "
+              << "SetHighStop failed. Please file a report on issue tracker.\n";
+        return false;
+      }
+
       if (_index == 0)
       {
         // angular limit is specified
@@ -382,6 +392,14 @@ bool SimbodyScrewJoint::SetLowStop(
   {
     if (this->physicsInitialized)
     {
+      // check if limitForce is initialized
+      if (this->limitForce[_index].isEmptyHandle())
+      {
+        gzerr << "child link is NULL, force element not initialized, "
+              << "SetHighStop failed. Please file a report on issue tracker.\n";
+        return false;
+      }
+
       if (_index == 0)
       {
         // angular limit is specified
