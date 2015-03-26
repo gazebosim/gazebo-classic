@@ -294,12 +294,6 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 
   this->connections.clear();
 
-  delete this->renderWidget;
-
-  // Cleanup the space navigator
-  delete this->spacenav;
-  this->spacenav = NULL;
-
 #ifdef HAVE_OCULUS
   if (this->oculusWindow)
   {
@@ -307,6 +301,11 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
     this->oculusWindow = NULL;
   }
 #endif
+  delete this->renderWidget;
+
+  // Cleanup the space navigator
+  delete this->spacenav;
+  this->spacenav = NULL;
 
   emit Close();
 
