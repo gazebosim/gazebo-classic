@@ -26,7 +26,7 @@ Windows `cmd` for configuring and building.  You might also need to
     - [boost 1.56.0](http://packages.osrfoundation.org/win32/deps/boost_1_56_0.zip)
     - [bzip2 1.0.6](http://packages.osrfoundation.org/win32/deps/bzip2-1.0.6-vc12-x64-release-debug.zip)
     - [dlfcn-win32](http://packages.osrfoundation.org/win32/deps/dlfcn-win32-vc12-x64-release-debug.zip)
-    - [libcurl HEAD](http://packages.osrfoundation.org/win32/deps/libcurl-vc12-x64-release-static-ipv6-sspi-winssl.zip)
+    - [libcurl HEAD](http://packages.osrfoundation.org/win32/deps/libcurl-vc12-x64-release-debug-static-ipv6-sspi-winssl.zip)
     - [OGRE 1.9.0 rc1](http://packages.osrfoundation.org/win32/deps/ogre_src_v1-8-1-vc12-x64-release-debug.zip)
     - [protobuf 2.6.0](http://packages.osrfoundation.org/win32/deps/protobuf-2.6.0-win64-vc12.zip)
     - [TBB 4.3](http://packages.osrfoundation.org/win32/deps/tbb43_20141023oss_win.zip)
