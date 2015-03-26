@@ -192,7 +192,7 @@ void CollisionConfig::AddCollision(const std::string &_name,
   // Widget
   QWidget *collisionWidget = new QWidget;
   collisionWidget->setLayout(collisionLayout);
-  collisionWidget->setMinimumHeight(200);
+  collisionWidget->setMinimumHeight(800);
 
   // Child item
   QTreeWidgetItem *collisionChildItem =

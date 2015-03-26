@@ -171,7 +171,7 @@ void VisualConfig::AddVisual(const std::string &_name,
   // Widget
   QWidget *visualWidget = new QWidget;
   visualWidget->setLayout(visualLayout);
-  visualWidget->setMinimumHeight(200);
+  visualWidget->setMinimumHeight(800);
 
   // Child item
   QTreeWidgetItem *visualChildItem = new QTreeWidgetItem(visualItem);
