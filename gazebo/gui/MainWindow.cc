@@ -1499,6 +1499,9 @@ void MainWindow::DeleteActions()
   delete g_orbitAct;
   g_orbitAct = 0;
 
+  delete g_overlayAct;
+  g_overlayAct = 0;
+
   delete g_viewOculusAct;
   g_viewOculusAct = 0;
 
