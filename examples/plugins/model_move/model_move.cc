@@ -27,8 +27,8 @@
 
 namespace gazebo
 {
-
-  typedef const boost::shared_ptr<const gazebo::msgs::PoseAnimation> PoseAnimationPtr;
+  typedef const
+    boost::shared_ptr<const gazebo::msgs::PoseAnimation> PoseAnimationPtr;
 
   class ModelMove : public ModelPlugin
   {
@@ -38,7 +38,8 @@ namespace gazebo
               path(new math::Vector3())
       { }
 
-    private: void move(math::Vector3 *start, math::Vector3 *end, math::Vector3 *translation)
+    private: void move(math::Vector3 *start, math::Vector3 *end,
+                       math::Vector3 *translation)
     {
       int duration = floor(start->Distance((*end).x, (*end).y, (*end).z));
       math::Vector3 diff = *end - *start;
@@ -47,11 +48,13 @@ namespace gazebo
       float z_step = diff.z / duration;
       int curr_frame = anim->GetKeyFrameCount();
 
-      for (int i=1; i <= duration; i++) {
+      for (int i = 1; i <= duration; i++)
+      {
         gazebo::common::PoseKeyFrame * key = anim->CreateKeyFrame(i+curr_frame);
-        key->SetTranslation(math::Vector3((*translation).x + x_step*i,
-            (*translation).y + y_step*i,
-              (*translation).z + z_step*i));
+        key->SetTranslation(math::Vector3(
+             (*translation).x + x_step * i,
+             (*translation).y + y_step * i,
+             (*translation).z + z_step * i));
         key->SetRotation(math::Quaternion(0, 0, 0));
       }
 
@@ -64,11 +67,13 @@ namespace gazebo
     {
       float path_length = start_point.Distance(path->x, path->y, path->z);
 
-      for (int i=0; i < num_points-1; i++)
+      for (int i = 0; i < num_points-1; i++)
         path_length += path[i].Distance(path[i+1].x, path[i+1].y, path[i+1].z);
 
       // create the animation
-      this->anim = gazebo::common::PoseAnimationPtr(new gazebo::common::PoseAnimation("test", path_length+1, false));
+      this->anim =
+        gazebo::common::PoseAnimationPtr(
+            new gazebo::common::PoseAnimation("test", path_length+1, false));
 
       gazebo::common::PoseKeyFrame *key;
 
@@ -80,7 +85,7 @@ namespace gazebo
       math::Vector3 translation = math::Vector3(0, 0, 0);
 
       move(&start_point, path, &translation);
-      for (int i=0; i < num_points-1; i++)
+      for (int i = 0; i < num_points-1; i++)
         move(path+i, path+i+1, &translation);
 
       // set the animation
@@ -112,22 +117,29 @@ namespace gazebo
       // Either get parameters from sdf
       if (_sdf->HasElement("path") && _sdf->HasElement("n_points"))
       {
-        sdf::Vector3 sdf_pose = _sdf->GetParent()->GetElement("pose")->Get<sdf::Pose>().pos;
-        this->start_point = math::Vector3(sdf_pose.x, sdf_pose.y, sdf_pose.z);
-        this->num_points = std::stoi(_sdf->GetElement("n_points")->Get<std::string>());
-        this->path = new math::Vector3[num_points];
-        std::stringstream stream(_sdf->GetElement("path")->Get<std::string>());
-        for (int i=0; i<num_points; i++) {
+        sdf::Vector3 sdf_pose =
+          _sdf->GetParent()->GetElement("pose")->Get<sdf::Pose>().pos;
+        this->start_point =
+          math::Vector3(sdf_pose.x, sdf_pose.y, sdf_pose.z);
+        this->num_points =
+          std::stoi(_sdf->GetElement("n_points")->Get<std::string>());
+        this->path =
+          new math::Vector3[num_points];
+
+        std::stringstream stream(sdf->GetElement("path")->Get<std::string>());
+        for (int i = 0; i < num_points; i++)
+        {
           float f1, f2, f3;
           stream >> f1 >> f2 >> f3;
           path[i] = math::Vector3(f1, f2, f3);
         }
         initiateMove();
       }
-      else // Or get parameters from gazebo topics
+      else  // Or get parameters from gazebo topics
       {
         std::cout << "Waiting\n";
-        pathSubscriber = node->Subscribe("/gazebo/default/pose_animation", &ModelMove::getPathMsg, this);
+        pathSubscriber = node->Subscribe("/gazebo/default/pose_animation",
+                                         &ModelMove::getPathMsg, this);
       }
     }
 
