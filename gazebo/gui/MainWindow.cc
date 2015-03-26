@@ -206,6 +206,7 @@ MainWindow::MainWindow()
 /////////////////////////////////////////////////
 MainWindow::~MainWindow()
 {
+  this->DeleteActions();
 }
 
 /////////////////////////////////////////////////
@@ -1377,6 +1378,149 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
   this->menuLayout->addStretch(5);
   this->menuLayout->setContentsMargins(0, 0, 0, 0);
 }
+
+/////////////////////////////////////////////////
+void MainWindow::DeleteActions()
+{
+  delete g_topicVisAct;
+  g_topicVisAct = 0;
+
+  delete g_openAct;
+  g_openAct = 0;
+
+  delete g_saveAct;
+  g_saveAct = 0;
+
+  delete g_saveAsAct;
+  g_saveAsAct = 0;
+
+  delete g_saveCfgAct;
+  g_saveCfgAct = 0;
+
+  delete g_cloneAct;
+  g_cloneAct = 0;
+
+  delete g_aboutAct;
+  g_aboutAct = 0;
+
+  delete g_quitAct;
+  g_quitAct = 0;
+
+  delete g_resetModelsAct;
+  g_resetModelsAct = 0;
+
+  delete g_resetWorldAct;
+  g_resetWorldAct = 0;
+
+  delete g_editBuildingAct;
+  g_editBuildingAct = 0;
+
+  delete g_editTerrainAct;
+  g_editTerrainAct = 0;
+
+  delete g_editModelAct;
+  g_editModelAct = 0;
+
+  delete g_stepAct;
+  g_stepAct = 0;
+
+  delete g_playAct;
+  g_playAct = 0;
+
+  delete g_pauseAct;
+  g_pauseAct = 0;
+
+  delete g_arrowAct;
+  g_arrowAct = 0,
+
+  delete g_translateAct;
+  g_translateAct = 0;
+
+  delete g_rotateAct;
+  g_rotateAct = 0;
+
+  delete g_scaleAct;
+  g_scaleAct = 0;
+
+  delete g_boxCreateAct;
+  g_boxCreateAct = 0;
+
+  delete g_sphereCreateAct;
+  g_sphereCreateAct = 0;
+
+  delete g_cylinderCreateAct;
+  g_cylinderCreateAct = 0;
+
+  delete g_meshCreateAct;
+  g_meshCreateAct = 0;
+
+  delete g_pointLghtCreateAct;
+  g_pointLghtCreateAct = 0;
+
+  delete g_spotLghtCreateAct;
+  g_spotLghtCreateAct = 0;
+
+  delete g_dirLghtCreateAct;
+  g_dirLghtCreateAct = 0;
+
+  delete g_resetAct;
+  g_resetAct = 0;
+
+  delete g_showCollisionsAct;
+  g_showCollisionsAct = 0;
+
+  delete g_showGridAct;
+  g_showGridAct = 0;
+
+  delete g_transparentAct;
+  g_transparentAct = 0;
+
+  delete g_viewWireframeAct;
+  g_viewWireframeAct = 0;
+
+  delete g_showCOMAct;
+  g_showCOMAct = 0;
+
+  delete g_showInertiaAct;
+  g_showInertiaAct = 0;
+
+  delete g_showContactsAct;
+  g_showContactsAct = 0;
+
+  delete g_showJointsAct;
+  g_showJointsAct = 0;
+
+  delete g_fullScreenAct;
+  g_fullScreenAct = 0;
+
+  delete g_fpsAct;
+  g_fpsAct = 0;
+
+  delete g_orbitAct;
+  g_orbitAct = 0;
+
+  delete g_viewOculusAct;
+  g_viewOculusAct = 0;
+
+  delete g_dataLoggerAct;
+  g_dataLoggerAct = 0;
+
+  delete g_screenshotAct;
+  g_screenshotAct = 0;
+
+  delete g_copyAct;
+  g_copyAct = 0;
+
+  delete g_pasteAct;
+  g_pasteAct = 0;
+
+  delete g_snapAct;
+  g_snapAct = 0;
+
+  delete g_alignAct;
+  g_alignAct = 0;
+}
+
 
 /////////////////////////////////////////////////
 void MainWindow::CreateMenuBar()
