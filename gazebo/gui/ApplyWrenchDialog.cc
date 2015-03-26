@@ -249,8 +249,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   forceFrame->setGraphicsEffect(forceEffect);
 
   // Torque
-  QLabel *torqueLabel = new QLabel(tr(
-       "<font size=4>Torque</font>"));
+  QLabel *torqueLabel = new QLabel(tr("<font size=4>Torque</font>"));
   torqueLabel->setObjectName("torqueLabel");
   torqueLabel->setStyleSheet(
     "QLabel#torqueLabel {\
@@ -394,8 +393,10 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 ApplyWrenchDialog::~ApplyWrenchDialog()
 {
   if (this->dataPtr->applyWrenchVisual)
+  {
     MouseEventHandler::Instance()->RemoveReleaseFilter(
         "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+  }
 
   this->dataPtr->node->Fini();
   this->dataPtr->connections.clear();
@@ -468,8 +469,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
       event::Events::ConnectPreRender(
       boost::bind(&ApplyWrenchDialog::OnPreRender, this)));
 
-  this->dataPtr->modelLabel->setText(
-      ("<b>Model:</b> " + _modelName).c_str());
+  this->dataPtr->modelLabel->setText(("<b>Model:</b> " + _modelName).c_str());
 
   // Don't fire signals while inserting items
   this->dataPtr->linksComboBox->blockSignals(true);
@@ -579,8 +579,10 @@ void ApplyWrenchDialog::SetLink(const QString _linkName)
 {
   // Remove previous link's filter
   if (this->dataPtr->applyWrenchVisual)
+  {
     MouseEventHandler::Instance()->RemoveReleaseFilter(
         "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+  }
 
   if (!this->SetLink(this->dataPtr->modelName + "::" + _linkName.toStdString()))
     this->Fini();
@@ -591,7 +593,9 @@ void ApplyWrenchDialog::OnResponse(ConstResponsePtr &_msg)
 {
   if (!this->dataPtr->requestMsg ||
       _msg->id() != this->dataPtr->requestMsg->id())
+  {
     return;
+  }
 
   if (_msg->has_type() && _msg->type() == "gazebo.msgs.Link")
   {
@@ -606,11 +610,9 @@ void ApplyWrenchDialog::OnResponse(ConstResponsePtr &_msg)
     this->SetPublisher();
 
     // CoM
-    if (linkMsg.has_inertial() &&
-        linkMsg.inertial().has_pose())
+    if (linkMsg.has_inertial() && linkMsg.inertial().has_pose())
     {
-      this->SetCoM(msgs::Convert(
-          linkMsg.inertial().pose()).pos);
+      this->SetCoM(msgs::Convert(linkMsg.inertial().pose()).pos);
       // Apply force at com by default
       this->SetForcePos(this->dataPtr->comVector);
     }
@@ -769,8 +771,7 @@ void ApplyWrenchDialog::AttachVisuals()
     while (vis)
     {
       visName = visNameBase + std::to_string(count);
-      vis = gui::get_active_camera()->GetScene()->
-        GetVisual(visName);
+      vis = gui::get_active_camera()->GetScene()->GetVisual(visName);
       ++count;
     }
 
@@ -822,7 +823,7 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent & _event)
   this->dataPtr->draggingTool = false;
 
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos,
-        this->dataPtr->manipState);
+      this->dataPtr->manipState);
 
   if (vis)
     return false;
@@ -913,7 +914,7 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
 
     math::Vector3 pressPoint;
     userCamera->GetWorldPointOnPlane(_event.pressPos.x, _event.pressPos.y,
-          math::Plane(normal, offset), pressPoint);
+        math::Plane(normal, offset), pressPoint);
 
     math::Vector3 newPoint;
     userCamera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
@@ -972,7 +973,7 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
     userCamera->GetVisual(_event.pos, this->dataPtr->manipState);
 
     if (this->dataPtr->manipState == "rot_z" ||
-      this->dataPtr->manipState == "rot_y")
+        this->dataPtr->manipState == "rot_y")
     {
       this->dataPtr->applyWrenchVisual->GetRotTool()->SetState(
           this->dataPtr->manipState);

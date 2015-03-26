@@ -85,8 +85,8 @@ void ApplyWrenchVisual::Load()
   this->InsertMesh("axis_shaft");
 
   Ogre::MovableObject *shaftObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__FORCE_SHAFT__", "axis_shaft"));
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      this->GetName()+"__FORCE_SHAFT__", "axis_shaft"));
   shaftObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->forceVisual->GetName())));
 
@@ -100,8 +100,8 @@ void ApplyWrenchVisual::Load()
   this->InsertMesh("axis_head");
 
   Ogre::MovableObject *headObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__FORCE_HEAD__", "axis_head"));
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      this->GetName()+"__FORCE_HEAD__", "axis_head"));
   headObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->forceVisual->GetName())));
 
@@ -134,7 +134,7 @@ void ApplyWrenchVisual::Load()
 
   // Torque visual
   dPtr->torqueVisual.reset(new rendering::Visual(
-       this->GetName() + "__TORQUE_VISUAL__", shared_from_this()));
+      this->GetName() + "__TORQUE_VISUAL__", shared_from_this()));
   dPtr->torqueVisual->Load();
   dPtr->scene->AddVisual(dPtr->torqueVisual);
 
@@ -144,8 +144,8 @@ void ApplyWrenchVisual::Load()
   this->InsertMesh("torque_tube");
 
   Ogre::MovableObject *tubeObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-        this->GetName()+"__TORQUE_TUBE__", "torque_tube"));
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      this->GetName()+"__TORQUE_TUBE__", "torque_tube"));
   tubeObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->torqueVisual->GetName())));
 
@@ -158,8 +158,8 @@ void ApplyWrenchVisual::Load()
   this->InsertMesh("axis_head");
 
   Ogre::MovableObject *torqueHeadObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__TORQUE_HEAD__", "axis_head"));
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      this->GetName()+"__TORQUE_HEAD__", "axis_head"));
   torqueHeadObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->torqueVisual->GetName())));
 
@@ -214,8 +214,7 @@ void ApplyWrenchVisual::Load()
   dPtr->torqueVector = math::Vector3::Zero;
   dPtr->mode = "force";
 
-  this->SetVisibilityFlags(GZ_VISIBILITY_GUI |
-      GZ_VISIBILITY_SELECTABLE);
+  this->SetVisibilityFlags(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
   this->Resize();
   this->UpdateForceVisual();
   this->UpdateTorqueVisual();
@@ -469,8 +468,7 @@ void ApplyWrenchVisual::UpdateTorqueVisual()
 
   // Position towards comVector
   double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
-  dPtr->torqueVisual->SetPosition(normVec * linkDiagonal*0.75
-      + dPtr->comVector);
+  dPtr->torqueVisual->SetPosition(normVec*linkDiagonal*0.75 + dPtr->comVector);
   dPtr->torqueLine->SetPoint(1,
       math::Vector3(0, 0, -linkDiagonal*0.75)/dPtr->torqueVisual->GetScale());
 
