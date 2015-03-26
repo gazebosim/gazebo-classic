@@ -304,7 +304,7 @@ void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
 /////////////////////////////////////////////////
 void RenderWidget::SetOverlaysVisible(const bool _visible)
 {
-  for (const auto &plugin : this->plugins)
+  for (const gazebo::GUIPluginPtr &plugin : this->plugins)
     plugin->setVisible(_visible);
 }
 
