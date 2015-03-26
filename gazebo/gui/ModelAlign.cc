@@ -46,9 +46,23 @@ ModelAlign::ModelAlign()
 /////////////////////////////////////////////////
 ModelAlign::~ModelAlign()
 {
-  this->dataPtr->modelPub.reset();
+  this->Clear();
   delete this->dataPtr;
   this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelAlign::Clear()
+{
+  this->dataPtr->targetVis.reset();
+  this->dataPtr->userCamera.reset();
+  this->dataPtr->scene.reset();
+  this->dataPtr->node.reset();
+  this->dataPtr->modelPub.reset();
+  this->dataPtr->selectedVisuals.clear();
+  this->dataPtr->connections.clear();
+  this->dataPtr->originalVisualPose.clear();
+  this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////
