@@ -1,8 +1,19 @@
+## Gazebo 6.0
+
+1. Use collide_bitmask from SDF to perform collision filtering
+    * [Pull request #1470](https://bitbucket.org/osrf/gazebo/pull-request/1470)
+
+1. Pass Coulomb surface friction parameters to DART.
+    * [Pull request #1420](https://bitbucket.org/osrf/gazebo/pull-request/1420)
+
 1. Added various Get functions to Visual. Also added a ConvertGeometryType function to msgs.
     * [Pull request #1402](https://bitbucket.org/osrf/gazebo/pull-request/1402)
 
 1. Get and Set visibility of SelectionObj's handles, with unit test.
     * [Pull request #1417](https://bitbucket.org/osrf/gazebo/pull-request/1417)
+
+1. Set material of SelectionObj's handles.
+    * [Pull request #1472](https://bitbucket.org/osrf/gazebo/pull-request/1472)
 
 1. Allow link selection with the mouse if parent model already selected.
     * [Pull request #1409](https://bitbucket.org/osrf/gazebo/pull-request/1409)
@@ -13,7 +24,7 @@
 1. Added Gazebo/CoM material.
     * [Pull request #1439](https://bitbucket.org/osrf/gazebo/pull-request/1439)
 
-1. Added arc parameter to MeshManager::CreateTube 
+1. Added arc parameter to MeshManager::CreateTube
     * [Pull request #1436](https://bitbucket.org/osrf/gazebo/pull-request/1436)
 
 1. Added View Inertia and InertiaVisual, changed COMVisual to sphere proportional to mass.
@@ -23,10 +34,23 @@
     * [Pull request #1442](https://bitbucket.org/osrf/gazebo/pull-request/1442)
     * [Issue #1377](https://bitbucket.org/osrf/gazebo/issue/1377)
 
+1. Fixed Visual material updates
+    * [Pull request #1454](https://bitbucket.org/osrf/gazebo/pull-request/1454)
+    * [Issue #1455](https://bitbucket.org/osrf/gazebo/issue/1455)
+
+1. Added Matrix3::Inverse() and tests
+    * [Pull request #1481](https://bitbucket.org/osrf/gazebo/pull-request/1481)
+
+1. Implemented AddLinkForce for ODE.
+    * [Pull request #1456](https://bitbucket.org/osrf/gazebo/pull-request/1456)
+
+1. Updated ConfigWidget class to parse enum values.
+    * [Pull request #1518](https://bitbucket.org/osrf/gazebo/pull-request/1518)
+
 1. Added PresetManager to physics libraries and corresponding integration test.
     * [Pull request #1471](https://bitbucket.org/osrf/gazebo/pull-request/1471)
 
- 1. Model editor updates
+1. Model editor updates
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
 
@@ -43,23 +67,97 @@
         * [Pull request #1449](https://bitbucket.org/osrf/gazebo/pull-request/1449)
         * [Issue #1443](https://bitbucket.org/osrf/gazebo/issue/1443)
 
+    1. Added button to select mesh file on inspector.
+        * [Pull request #1460](https://bitbucket.org/osrf/gazebo/pull-request/1460)
+        * [Issue #1450](https://bitbucket.org/osrf/gazebo/issue/1450)
+
+    1. Renamed Part to Link.
+        * [Pull request #1478](https://bitbucket.org/osrf/gazebo/pull-request/1478)
+
+    1. Fix snapping inside editor.
+        * [Pull request #1489](https://bitbucket.org/osrf/gazebo/pull-request/1489)
+        * [Issue #1457](https://bitbucket.org/osrf/gazebo/issue/1457)
+
+    1. Keep loaded model's name.
+        * [Pull request #1516](https://bitbucket.org/osrf/gazebo/pull-request/1516)
+        * [Issue #1504](https://bitbucket.org/osrf/gazebo/issue/1504)
+
+    1. Added ExtrudeDialog.
+        * [Pull request #1483](https://bitbucket.org/osrf/gazebo/pull-request/1483)
+
+    1. Hide time panel inside editor and keep main window's paused state.
+        * [Pull request #1500](https://bitbucket.org/osrf/gazebo/pull-request/1500)
+
+    1. Fixed pose issues and added ModelCreator_TEST.
+        * [Pull request #1509](https://bitbucket.org/osrf/gazebo/pull-request/1509)
+        * [Issue #1497](https://bitbucket.org/osrf/gazebo/issue/1497)
+        * [Issue #1509](https://bitbucket.org/osrf/gazebo/issue/1509)
+
+    1. Added list of links and joints.
+        * [Pull request #1515](https://bitbucket.org/osrf/gazebo/pull-request/1515)
+        * [Issue #1418](https://bitbucket.org/osrf/gazebo/issue/1418)
+
+1. Building editor updates
+    1. Make palette tips tooltip clickable to open.
+        * [Pull request #1519](https://bitbucket.org/osrf/gazebo/pull-request/1519)
+        * [Issue #1370](https://bitbucket.org/osrf/gazebo/issue/1370)
+
 ## Gazebo 5.0
 
-### Gazebo 5.1.0
+### Gazebo 5.x.x
+
+1. Disable failing pr2 test for dart
+    * [Pull request #1540](https://bitbucket.org/osrf/gazebo/pull-request/1540)
+    * [Issue #1435](https://bitbucket.org/osrf/gazebo/issue/1435)
+
+### Gazebo 5.1.0 (2015-03-20)
+1. Backport pull request #1527 (FindOGRE.cmake for non-Debian systems)
+  * [Pull request #1532](https://bitbucket.org/osrf/gazebo/pull-request/1532)
+
+1. Respect system cflags when not using USE_UPSTREAM_CFLAGS
+  * [Pull request #1531](https://bitbucket.org/osrf/gazebo/pull-request/1531)
+
+1. Allow light manipulation
+  * [Pull request #1529](https://bitbucket.org/osrf/gazebo/pull-request/1529)
+
+1. Allow sdformat 2.3.1+ or 3+ and fix tests
+  * [Pull request #1484](https://bitbucket.org/osrf/gazebo/pull-request/1484)
+
+1. Add Link::GetWorldAngularMomentum function and test.
+  * [Pull request #1482](https://bitbucket.org/osrf/gazebo/pull-request/1482)
+
+1. Preserve previous GAZEBO_MODEL_PATH values when sourcing setup.sh
+  * [Pull request #1430](https://bitbucket.org/osrf/gazebo/pull-request/1430)
+
+1. Implement Coulomb joint friction for DART
+  * [Pull request #1427](https://bitbucket.org/osrf/gazebo/pull-request/1427)
+  * [Issue #1281](https://bitbucket.org/osrf/gazebo/issue/1281)
+
+1. Fix simple shape normals.
+    * [Pull request #1477](https://bitbucket.org/osrf/gazebo/pull-request/1477)
+    * [Issue #1369](https://bitbucket.org/osrf/gazebo/issue/1369)
+
+1. Use Msg-to-SDF conversion functions in tests, add ServerFixture::SpawnModel(msgs::Model).
+    * [Pull request #1466](https://bitbucket.org/osrf/gazebo/pull-request/1466)
+
+1. Added Model Msg-to-SDF conversion functions and test.
+    * [Pull request #1429](https://bitbucket.org/osrf/gazebo/pull-request/1429)
+
 1. Added Joint Msg-to-SDF conversion functions and test.
     * [Pull request #1419](https://bitbucket.org/osrf/gazebo/pull-request/1419)
 
 1. Added Visual, Material Msg-to-SDF conversion functions and ShaderType to string conversion functions.
     * [Pull request #1415](https://bitbucket.org/osrf/gazebo/pull-request/1415)
 
-### Gazebo 5.0.0
+1. Implement Coulomb joint friction for BulletSliderJoint
+  * [Pull request #1452](https://bitbucket.org/osrf/gazebo/pull-request/1452)
+  * [Issue #1348](https://bitbucket.org/osrf/gazebo/issue/1348)
+
+### Gazebo 5.0.0 (2015-01-27)
 1. Support for using [digital elevation maps](http://gazebosim.org/tutorials?tut=dem) has been added to debian packages.
 
 1. C++11 support (C++11 compatible compiler is now required)
     * [Pull request #1340](https://bitbucket.org/osrf/gazebo/pull-request/1340)
-
-1. Implemented private data pointer for the ODEPhysicsPrivate class.
-    * [Pull request #1383](https://bitbucket.org/osrf/gazebo/pull-request/1383)
 
 1. Implemented private data pointer for the World class.
     * [Pull request #1383](https://bitbucket.org/osrf/gazebo/pull-request/1383)
@@ -105,7 +203,7 @@
   * [Issue #381](https://bitbucket.org/osrf/gazebo/issue/381)
 
 1. Implement Coulomb joint friction for BulletHingeJoint
-  * [Pull request #1221](https://bitbucket.org/osrf/gazebo/pull-request/1317)
+  * [Pull request #1317](https://bitbucket.org/osrf/gazebo/pull-request/1317)
   * [Issue #1348](https://bitbucket.org/osrf/gazebo/issue/1348)
 
 1. Implemented camera lens distortion.
@@ -241,9 +339,6 @@
     1. Pick textures from the palette and assign in 3D view.
         * [Pull request #1368](https://bitbucket.org/osrf/gazebo/pull-request/1368)
 
-    1. Pick custom colors from the palette and assign in 3D view.
-        * [Pull request #1382](https://bitbucket.org/osrf/gazebo/pull-request/1382)
-
 1. Model editor updates
     1. Fix adding/removing event filters .
         * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
@@ -264,7 +359,60 @@
 
 ## Gazebo 4.0
 
-### Gazebo 4.x.x (yyyy-mm-dd)
+### Gazebo 4.1.2 (2015-03-20)
+
+1. Fix quaternion documentation: target Gazebo_4.1
+    * [Pull request #1525](https://bitbucket.org/osrf/gazebo/pull-request/1525)
+1. Speed up World::Step in loops
+    * [Pull request #1492](https://bitbucket.org/osrf/gazebo/pull-request/1492)
+1. Reduce selection buffer updates -> 4.1
+    * [Pull request #1494](https://bitbucket.org/osrf/gazebo/pull-request/1494)
+1. Fix QT rendering, and rendering update rate
+    * [Pull request #1487](https://bitbucket.org/osrf/gazebo/pull-request/1487)
+1. Fix loading of SimbodyPhysics parameters
+    * [Pull request #1474](https://bitbucket.org/osrf/gazebo/pull-request/1474)
+1. Fix heightmap on OSX -> 4.1
+    * [Pull request #1455](https://bitbucket.org/osrf/gazebo/pull-request/1455)
+1. Remove extra pose tag in a world file that should not be there
+    * [Pull request #1458](https://bitbucket.org/osrf/gazebo/pull-request/1458)
+1. Better fix for #236 for IMU that doesn't require ABI changes
+    * [Pull request #1448](https://bitbucket.org/osrf/gazebo/pull-request/1448)
+1. Fix regression of #236 for ImuSensor in 4.1
+    * [Pull request #1446](https://bitbucket.org/osrf/gazebo/pull-request/1446)
+1. Preserve previous GAZEBO_MODEL_PATH values when sourcing setup.sh
+    * [Pull request #1430](https://bitbucket.org/osrf/gazebo/pull-request/1430)
+1. issue #857: fix segfault for simbody screw joint when setting limits due to uninitialized limitForce.
+    * [Pull request #1423](https://bitbucket.org/osrf/gazebo/pull-request/1423)
+1. Allow multiple contact sensors per link (#960)
+    * [Pull request #1413](https://bitbucket.org/osrf/gazebo/pull-request/1413)
+1. Fix for issue #351, ODE World Step
+    * [Pull request #1406](https://bitbucket.org/osrf/gazebo/pull-request/1406)
+1. Disable failing InelasticCollision/0 test (#1394)
+    * [Pull request #1405](https://bitbucket.org/osrf/gazebo/pull-request/1405)
+1. Prevent out of bounds array access in SkidSteerDrivePlugin (found by cppcheck 1.68)
+    * [Pull request #1379](https://bitbucket.org/osrf/gazebo/pull-request/1379)
+
+### Gazebo 4.1.1 (2015-01-15)
+
+1. Fix BulletPlaneShape bounding box (#1265)
+    * [Pull request #1367](https://bitbucket.org/osrf/gazebo/pull-request/1367)
+1. Fix dart linking errors on osx
+    * [Pull request #1372](https://bitbucket.org/osrf/gazebo/pull-request/1372)
+1. Update to player interfaces
+    * [Pull request #1324](https://bitbucket.org/osrf/gazebo/pull-request/1324)
+1. Handle GpuLaser name collisions (#1403)
+    * [Pull request #1360](https://bitbucket.org/osrf/gazebo/pull-request/1360)
+1. Add checks for handling array's with counts of zero, and read specular values
+    * [Pull request #1339](https://bitbucket.org/osrf/gazebo/pull-request/1339)
+1. Fix model list widget test
+    * [Pull request #1327](https://bitbucket.org/osrf/gazebo/pull-request/1327)
+1. Fix ogre includes
+    * [Pull request #1323](https://bitbucket.org/osrf/gazebo/pull-request/1323)
+
+### Gazebo 4.1.0 (2014-11-20)
+
+1. Modified GUI rendering to improve the rendering update rate.
+    * [Pull request #1487](https://bitbucket.org/osrf/gazebo/pull-request/1487)
 
 ### Gazebo 4.1.0 (2014-11-20)
 
@@ -287,12 +435,6 @@
     * [Pull request #1271](https://bitbucket.org/osrf/gazebo/pull-request/1271)
 1. Fix loading collada meshes with unsupported input semantics.
     * [Pull request #1319](https://bitbucket.org/osrf/gazebo/pull-request/1319)
-1. Fix race condition with ImuSensor not publishing after Reset World.
-    * [Pull request #1448](https://bitbucket.org/osrf/gazebo/pull-request/1448)
-    * [Pull request #1446](https://bitbucket.org/osrf/gazebo/pull-request/1446)
-    * [Issue #236](https://bitbucket.org/osrf/gazebo/issue/236)
-1. Fixed heightmap on OSX
-    * [Pull request #1455](https://bitbucket.org/osrf/gazebo/pull-request/1455)
 
 ### Gazebo 4.0.2 (2014-09-23)
 

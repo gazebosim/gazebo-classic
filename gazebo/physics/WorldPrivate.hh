@@ -32,7 +32,6 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 
-#include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
 
@@ -288,7 +287,7 @@ namespace gazebo
       public: std::list<Entity*> dirtyPoses;
 
       /// \brief Class to manage preset simulation parameter profiles.
-      public: PresetManager* presetManager;
+      public: PresetManagerPtr presetManager;
     };
   }
 }

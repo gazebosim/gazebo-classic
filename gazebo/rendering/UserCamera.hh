@@ -114,14 +114,6 @@ namespace gazebo
       public: void SetViewportDimensions(float _x, float _y,
                                          float _w, float _h);
 
-      /// \brief Get the average frames per second
-      /// \return The average rendering frames per second
-      public: float GetAvgFPS() const;
-
-      /// \brief Get the triangle count.
-      /// \return The number of triangles currently being rendered.
-      public: unsigned int GetTriangleCount() const;
-
       /// \brief Move the camera to focus on a visual.
       /// \param[in] _visual Visual to move the camera to.
       public: void MoveToVisual(VisualPtr _visual);

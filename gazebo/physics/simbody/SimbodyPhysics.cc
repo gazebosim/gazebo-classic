@@ -162,13 +162,13 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
     simbodyContactElem->Get<double>("viscous_friction");
 
   // below are not used yet, but should work it into the system
-  this->contactMaterialViscousFriction =
-    simbodyContactElem->Get<double>("plastic_coef_restitution");
   this->contactMaterialPlasticCoefRestitution =
-    simbodyContactElem->Get<double>("plastic_impact_velocity");
+    simbodyContactElem->Get<double>("plastic_coef_restitution");
   this->contactMaterialPlasticImpactVelocity =
-    simbodyContactElem->Get<double>("override_impact_capture_velocity");
+    simbodyContactElem->Get<double>("plastic_impact_velocity");
   this->contactImpactCaptureVelocity =
+    simbodyContactElem->Get<double>("override_impact_capture_velocity");
+  this->contactStictionTransitionVelocity =
     simbodyContactElem->Get<double>("override_stiction_transition_velocity");
 }
 
@@ -1342,99 +1342,102 @@ std::string SimbodyPhysics::GetTypeString(unsigned int _type)
 //////////////////////////////////////////////////
 boost::any SimbodyPhysics::GetParam(const std::string &_key) const
 {
-  if (_key == "type")
+  boost::any value;
+  this->GetParam(_key, value);
+  return value;
+}
+
+//////////////////////////////////////////////////
+bool SimbodyPhysics::GetParam(const std::string &_key, boost::any &_value) const
+{
+  if (_key == "solver_type")
   {
-    gzwarn << "Please use keyword `solver_typ` in the future.\n";
-    return this->GetParam("solver_type");
-  }
-  else if (_key == "solver_type")
-  {
-    return "Spatial Algebra and Elastic Foundation";
+    _value = std::string("Spatial Algebra and Elastic Foundation");
   }
   else if (_key == "integrator_type")
   {
-    return this->integratorType;
+    _value = this->integratorType;
   }
   else if (_key == "accuracy")
   {
     if (this->integ)
-      return this->integ->getAccuracyInUse();
+      _value = this->integ->getAccuracyInUse();
     else
-      return 0.0f;
+      _value = 0.0f;
   }
   else if (_key == "max_transient_velocity")
   {
-    return this->contact.getTransitionVelocity();
-  }
-  else if (_key == "max_step_size")
-  {
-    return this->GetMaxStepSize();
+    _value = this->contact.getTransitionVelocity();
   }
   else
   {
-    gzwarn << "key [" << _key
-           << "] not supported, returning (int)0." << std::endl;
-    return 0;
+    return PhysicsEngine::GetParam(_key, _value);
   }
+  return true;
 }
 
 //////////////////////////////////////////////////
 bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
-  /// \TODO fill this out, see issue #1116
-  if (_key == "accuracy")
+  try
   {
-    double value;
-    try
+    if (_key == "accuracy")
     {
-      value = boost::any_cast<double>(_value);
+      this->integ->setAccuracy(boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "max_transient_velocity")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      this->contact.setTransitionVelocity(boost::any_cast<double>(_value));
     }
-    gzerr << "Setting [" << _key << "] in Simbody to [" << value
-          << "] not yet supported.\n";
+    else if (_key == "stiffness")
+    {
+      this->contactMaterialStiffness = boost::any_cast<double>(_value);
+    }
+    else if (_key == "dissipation")
+    {
+      this->contactMaterialDissipation = boost::any_cast<double>(_value);
+    }
+    else if (_key == "plastic_coef_restitution")
+    {
+      this->contactMaterialPlasticCoefRestitution =
+          boost::any_cast<double>(_value);
+    }
+    else if (_key == "plastic_impact_velocity")
+    {
+      this->contactMaterialPlasticImpactVelocity =
+          boost::any_cast<double>(_value);
+    }
+    else if (_key == "static_friction")
+    {
+      this->contactMaterialStaticFriction = boost::any_cast<double>(_value);
+    }
+    else if (_key == "dynamic_friction")
+    {
+      this->contactMaterialDynamicFriction = boost::any_cast<double>(_value);
+    }
+    else if (_key == "viscous_friction")
+    {
+      this->contactMaterialViscousFriction = boost::any_cast<double>(_value);
+    }
+    else if (_key == "override_impact_capture_velocity")
+    {
+      this->contactMaterialPlasticImpactVelocity =
+          boost::any_cast<double>(_value);
+    }
+    else if (_key == "override_stiction_transition_velocity")
+    {
+      this->contactImpactCaptureVelocity = boost::any_cast<double>(_value);
+    }
+    else
+    {
+      return PhysicsEngine::SetParam(_key, _value);
+    }
+  }
+  catch(boost::bad_any_cast &e)
+  {
+    gzerr << "SimbodyPhysics::SetParam(" << _key << ") boost::any_cast error: "
+          << e.what() << std::endl;
     return false;
   }
-  else if (_key == "max_transient_velocity")
-  {
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    gzerr << "Setting [" << _key << "] in Simbody to [" << value
-          << "] not yet supported.\n";
-    return false;
-  }
-  else if (_key == "max_step_size")
-  {
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    gzerr << "Setting [" << _key << "] in Simbody to [" << value
-          << "] not yet supported.\n";
-    return false;
-  }
-  else
-  {
-    gzwarn << _key << " is not supported in Simbody" << std::endl;
-    return false;
-  }
-  // should never get here
-  return false;
+  return true;
 }

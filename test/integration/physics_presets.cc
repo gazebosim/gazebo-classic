@@ -18,8 +18,7 @@
 #include <boost/any.hpp>
 #include "test/ServerFixture.hh"
 #include "gazebo/physics/World.hh"
-#include "gazebo/physics/PhysicsEngine.hh"
-#include "gazebo/physics/PresetManager.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "test/integration/helper_physics_generator.hh"
 
 using namespace gazebo;
@@ -38,21 +37,19 @@ TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
-  // SimbodyPhysics::SetParam is not implemented, so we can't expect any of the
-  // parameter setting to work.
-
-  if (physicsEngineName == "simbody")
+  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  if (!presetManager)
   {
-    return;
+    FAIL();
   }
   try
   {
     EXPECT_NEAR(boost::any_cast<double>(
         physicsEngine->GetParam("max_step_size")), 0.01, 1e-4);
-    EXPECT_NEAR(boost::any_cast<double>(
-        physicsEngine->GetParam("min_step_size")), 0.001, 1e-4);
     if (physicsEngineName == "ode" || physicsEngineName == "bullet")
     {
+      EXPECT_NEAR(boost::any_cast<double>(
+          physicsEngine->GetParam("min_step_size")), 0.001, 1e-4);
       EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("cfm")),
           0.01, 1e-4);
       EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("erp")),
@@ -75,11 +72,50 @@ TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
       EXPECT_FALSE(boost::any_cast<bool>(
           physicsEngine->GetParam("split_impulse")));
     }
+    if (physicsEngineName == "simbody")
+    {
+      EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam("accuracy")),
+          0.01, 1e-4);
+      EXPECT_NEAR(boost::any_cast<double>(physicsEngine->GetParam(
+          "max_transient_velocity")), 0.001, 1e-4);
+    }
   }
   catch(const boost::bad_any_cast& e)
   {
     FAIL();
   }
+}
+
+/////////////////////////////////////////////////
+TEST_F(PresetManagerTest, MultipleDefaults)
+{
+  Load("test/worlds/presets.world", false, "ode");
+  physics::WorldPtr world = physics::get_world("default");
+
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+
+  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  if (!presetManager)
+  {
+    FAIL();
+  }
+  EXPECT_EQ(presetManager->CurrentProfile(), "preset_1");
+}
+
+/////////////////////////////////////////////////
+TEST_F(PresetManagerTest, NoDefault)
+{
+  Load("test/worlds/presets_nodefault.world", false, "ode");
+  physics::WorldPtr world = physics::get_world("default");
+
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+
+  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  if (!presetManager)
+  {
+    FAIL();
+  }
+  EXPECT_EQ(presetManager->CurrentProfile(), "preset_1");
 }
 
 /////////////////////////////////////////////////
@@ -90,13 +126,13 @@ TEST_F(PresetManagerTest, SetProfileParam)
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
-  physics::PresetManager *presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->GetPresetManager();
   if (!presetManager)
   {
     FAIL();
   }
 
-  EXPECT_TRUE(presetManager->CurrentProfileParam("max_step_size", 10.0));
+  EXPECT_TRUE(presetManager->SetCurrentProfileParam("max_step_size", 10.0));
   try
   {
     EXPECT_NEAR(boost::any_cast<double>(
@@ -104,7 +140,8 @@ TEST_F(PresetManagerTest, SetProfileParam)
 
     // preset_2 is not the current profile, so we do not expect to see a change
     // in the physics engine when we change preset_2.
-    EXPECT_TRUE(presetManager->ProfileParam("preset_2", "max_step_size", 20));
+    EXPECT_TRUE(presetManager->SetProfileParam("preset_2", "max_step_size",
+        20));
     EXPECT_NEAR(boost::any_cast<double>(
         physicsEngine->GetParam("max_step_size")), 10.0, 1e-4);
   }
@@ -114,13 +151,21 @@ TEST_F(PresetManagerTest, SetProfileParam)
   }
 
   // Trying to set a preset profile that does not exist should return false.
-  EXPECT_FALSE(presetManager->ProfileParam("this_preset_does_not_exist",
+  EXPECT_FALSE(presetManager->SetProfileParam("this_preset_does_not_exist",
       "max_step_size", 10));
 
   // Trying to set a parameter for the current preset that does not exist will
   // return false, since the physics engine doesn't know what to do with it.
-  EXPECT_FALSE(presetManager->CurrentProfileParam("this_param_does_not_exist",
-      10.0));
+  EXPECT_FALSE(presetManager->SetCurrentProfileParam(
+      "this_param_does_not_exist", 10.0));
+
+  boost::any value;
+  // Trying to get from a nonexistent preset profile should return false.
+  EXPECT_FALSE(presetManager->GetProfileParam("this_preset_does_not_exist",
+      "max_step_size", value));
+  // Trying to get a nonexistent param should return false.
+  EXPECT_FALSE(presetManager->GetProfileParam("preset_1",
+      "this_param_does_not_exist", value));
 }
 
 /////////////////////////////////////////////////
@@ -131,7 +176,7 @@ TEST_F(PresetManagerTest, SetCurrentProfile)
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
-  physics::PresetManager *presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->GetPresetManager();
 
   if (!presetManager)
   {
@@ -139,7 +184,7 @@ TEST_F(PresetManagerTest, SetCurrentProfile)
   }
 
   std::vector<std::string> profileNames(presetManager->AllProfiles());
-  EXPECT_EQ(profileNames.size(), 2);
+  EXPECT_EQ(profileNames.size(), 3);
 
   presetManager->CurrentProfile("preset_2");
 
@@ -171,7 +216,7 @@ TEST_F(PresetManagerTest, CreateProfileFromSDF)
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
-  physics::PresetManager *presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->GetPresetManager();
   if (!presetManager)
   {
     FAIL();
@@ -181,7 +226,7 @@ TEST_F(PresetManagerTest, CreateProfileFromSDF)
   worldSDF.SetFromString(
       "<sdf version = \"1.5\">\
         <world name = \"default\">\
-          <physics name = \"preset_3\" type=\"ode\">\
+          <physics name = \"preset_3\" type = \"ode\">\
             <max_step_size>0.03</max_step_size>\
             <ode>\
               <solver>\
@@ -226,7 +271,7 @@ TEST_F(PresetManagerTest, BackwardsCompatibilityTest)
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
-  physics::PresetManager *presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->GetPresetManager();
   if (!presetManager)
   {
     FAIL();

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _PRESETMANAGER_PRIVATE_HH_
-#define _PRESETMANAGER_PRIVATE_HH_
+#ifndef _GAZEBO_PHYSICS_PRESETMANAGER_PRIVATE_HH_
+#define _GAZEBO_PHYSICS_PRESETMANAGER_PRIVATE_HH_
 
 #include <map>
 #include <string>
@@ -25,22 +25,39 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \internal
+    /// \brief Private data pointer for Preset class
     class PresetPrivate
     {
+      /// \brief Constructor
+      /// \param[in] _name The name of the preset profile.
+      public: PresetPrivate(const std::string &_name = "default name")
+          : name(_name)
+      {
+      }
+
+      /// \brief Name of this preset profile
       public: std::string name;
+      /// \brief Map of key, parameter pairs
       public: std::map<std::string, boost::any> parameterMap;
+      /// \brief SDF for the physics element represented by this object
       public: sdf::ElementPtr elementSDF;
     };
 
     class Preset;
 
+    /// \internal
+    /// \brief Private data pointer for PresetManager class
     class PresetManagerPrivate
     {
-      public: Preset* currentPreset;
+      /// \brief Name of the current preset
+      public: std::string currentPreset;
+      /// \brief Map of all known preset profile pairs keyed by name
       public: std::map<std::string, Preset> presetProfiles;
+      /// \brief Physics engine instrumented by this PresetManager
       public: PhysicsEnginePtr physicsEngine;
     };
-  }  // namespace physics
-}  // namespace gazebo
+  }
+}
 
 #endif

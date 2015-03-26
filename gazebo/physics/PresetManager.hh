@@ -15,23 +15,24 @@
  *
 */
 
-#ifndef _PRESETMANAGER_HH_
-#define _PRESETMANAGER_HH_
+#ifndef _GAZEBO_PHYSICS_PRESETMANAGER_HH_
+#define _GAZEBO_PHYSICS_PRESETMANAGER_HH_
 
+#include <boost/any.hpp>
 #include <string>
-#include <map>
 #include <vector>
+#include <sdf/sdf.hh>
 
-#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 
-// TODO: check for non-physics element in Preset::SDF (set)
 namespace gazebo
 {
   namespace physics
   {
     class PresetPrivate;
 
-    /// \class A preset profile class.
+    /// \class Preset PresetManager.hh gazebo/physics/PresetManager.hh
+    /// \brief Representation of a preset physics profile
     class Preset
     {
       /// \brief Constructor.
@@ -41,27 +42,39 @@ namespace gazebo
       /// \param[in] _name The name of the preset profile.
       public: Preset(const std::string & _name);
 
+      /// \brief Destructor.
+      public: ~Preset();
+
       /// \brief Get the profile name.
       /// \return The name of the preset profile.
       public: std::string Name() const;
 
       /// \brief Set the profile name.
-      /// \param[in] _name The new of the preset profile.
-      public: void Name(const std::string& _name);
+      /// \param[in] _name The new name of the preset profile.
+      public: void Name(const std::string &_name);
 
       /// \brief Get a profile parameter.
       /// \param[in] _key The key of the parameter to retrieve.
-      /// \return The parameter value at the input key.
-      public: boost::any Param(const std::string& _key) const;
+      /// \param[out] _value The parameter value at the input key.
+      /// \return True if the parameter exists in the map, false otherwise.
+      public: bool GetParam(const std::string &_key, boost::any &_value) const;
 
       /// \brief Set a profile parameter.
       /// \param[in] _key The key of the parameter to change.
       /// \param[in] _value The new value of the parameter.
-      public: void Param(const std::string& _key, const boost::any& _value);
+      public: bool SetParam(const std::string &_key, const boost::any &_value);
 
-      /// \brief Get this preset's parameter map (used for iteration)
-      /// \return A pointer to this preset profile's parameter map.
-      public: std::map<std::string, boost::any>* ParameterMap();
+      /// \brief Check if profile parameter is set.
+      /// \param[in] _key The profile key to check.
+      /// \return True if the profile has parameter _key, false otherwise
+      public: bool HasParam(const std::string &_key) const;
+
+      /// \brief Set all parameters of this preset in the physics engine.
+      /// \param[in] _physicsEngine The physics engine in which to affect the
+      /// change.
+      /// \return True if setting all parameters was successful.
+      public: bool SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine)
+          const;
 
       /// \brief Get this preset profile's SDF
       /// \return An SDF element pointer representing a <physics> element
@@ -77,7 +90,8 @@ namespace gazebo
 
     class PresetManagerPrivate;
 
-    /// \class A class for managing preset profiles.
+    /// \class PresetManager PresetManager.hh gazebo/physics/PresetManager.hh
+    /// \brief Class to manage preset physics profiles.
     class GAZEBO_VISIBLE PresetManager
     {
       /// \brief Constructor
@@ -92,7 +106,7 @@ namespace gazebo
       /// \brief Set the current profile.
       /// \param[in] _name The name of the new current profile.
       /// \return True if the profile switch was successful.
-      public: bool CurrentProfile(const std::string& _name);
+      public: bool CurrentProfile(const std::string &_name);
 
       /// \brief Get the name of the current profile.
       /// \return The name of the current profile.
@@ -107,45 +121,51 @@ namespace gazebo
       /// \param[in] _key The key of the parameter to change.
       /// \param[in] _value The value of the parameter to change.
       /// \return True if setting the parameter was successful.
-      public: bool ProfileParam(const std::string& _profileName,
-                                   const std::string& _key,
-                                   const boost::any &_value);
+      public: bool SetProfileParam(const std::string &_profileName,
+          const std::string &_key, const boost::any &_value);
 
       /// \brief Get a parameter for a certain profile.
       /// \param[in] _name The name of the accessed profile.
       /// \param[in] _key The key of the accessed parameter.
-      /// \return The value of the parameter.
-      public: boost::any ProfileParam(const std::string &_name,
-          const std::string& _key) const;
+      /// \param[out] _value The value of the accessed parameter.
+      /// \return True if the parameter existed in profile "_name".
+      public: bool GetProfileParam(const std::string &_name,
+          const std::string &_key, boost::any &_value) const;
 
       /// \brief Set a parameter for the current profile.
       /// \param[in] _key The key of the parameter to be set.
       /// \param[in] _value The value of the parameter to be set.
       /// \return True if setting the parameter was successful.
-      public: bool CurrentProfileParam(const std::string& _key,
-                                       const boost::any &_value);
+      public: bool SetCurrentProfileParam(const std::string &_key,
+          const boost::any &_value);
 
       /// \brief Get a parameter for the current profile.
       /// \param[in] _key The key of the accessed parameter.
-      /// \return The value of the accessed parameter.
-      public: boost::any CurrentProfileParam(const std::string& _key);
+      /// \param[out] _value The value of the accessed parameter.
+      /// \return True if the parameter existed in profile "_name".
+      public: bool GetCurrentProfileParam(const std::string &_key,
+          boost::any &_value);
 
       /// \brief Create a new profile.
       /// \param[in] _name The name of the new profile.
-      public: void CreateProfile(const std::string& _name);
+      /// \return True if the profile was successfully created.
+      public: bool CreateProfile(const std::string &_name);
 
       /// \brief Create a new profile from SDF. SDF determines the profile name
       /// \param[in] _sdf Pointer to a physics SDF element.
-      /// \return The name of the new profile, read from SDF.
+      /// \return The name of the new profile, read from SDF. If the profile
+      /// was not successfully created, return the empty string, which is an
+      /// invalid profile name.
       public: std::string CreateProfile(sdf::ElementPtr _sdf);
 
       /// \brief Remove a profile.
       /// \param[in] _name The name of the profile to remove.
-      public: void RemoveProfile(const std::string& _name);
+      public: void RemoveProfile(const std::string &_name);
 
       /// \brief Get the SDF for a profile.
       /// \param[in] _name The name of the profile to be accessed.
-      /// \return Pointer to the SDF physics element representing the profile
+      /// \return Pointer to the SDF physics element representing the profile.
+      /// Can be NULL if no profile was found.
       public: sdf::ElementPtr ProfileSDF(const std::string &_name) const;
 
       /// \brief Set the SDF for a profile.
@@ -155,22 +175,17 @@ namespace gazebo
 
       /// \brief Generate a Preset object from an SDF pointer
       /// \param[in] _sdf The SDF physics element for the profile.
-      private: void GeneratePresetFromSDF(Preset* _preset,
+      private: void GeneratePresetFromSDF(Preset *_preset,
           const sdf::ElementPtr _elem) const;
-
-      /// \brief Generate an SDF element from a Preset object
-      /// \param[in] _paramMap Pointer to a Preset object
-      private: sdf::ElementPtr GenerateSDFFromPreset(Preset* _paramMap) const;
 
       /// \brief Get a pointer to the current profile preset.
       /// \return Pointer to the current profile preset object.
-      private: Preset* CurrentPreset() const;
+      private: Preset *CurrentPreset() const;
 
       /// \brief Private data pointer for PIMPL.
       private: PresetManagerPrivate *dataPtr;
     };
-
-  }  // namespace physics
-}  // namespace gazebo
+  }
+}
 
 #endif

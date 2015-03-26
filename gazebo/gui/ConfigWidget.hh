@@ -85,9 +85,30 @@ namespace gazebo
       /// \brief A label for the mesh filename widget.
       public: QWidget *geomFilenameLabel;
 
+      /// \brief A button for selecting the mesh filename.
+      public: QWidget *geomFilenameButton;
+
       /// brief Callback when the geometry type is changed.
       /// \param[in] _text New geometry type in string.
       private slots: void GeometryChanged(const QString _text);
+
+      /// brief Callback when the file button is clicked.
+      private slots: void OnSelectFile();
+    };
+
+    /// \class EnumConfigWidget ConfigWidget.hh
+    /// \brief A widget for configuring enum values.
+    class GAZEBO_VISIBLE EnumConfigWidget : public ConfigChildWidget
+    {
+      Q_OBJECT
+
+      /// brief Signal an enum value change event.
+      /// \param[in] _value New enum value in string.
+      Q_SIGNALS: void EnumValueChanged(const QString &_value);
+
+      /// brief Callback when the enum value is changed.
+      /// \param[in] _value New enum value in string.
+      private slots: void EnumChanged(const QString &_value);
     };
 
     /// \class GroupWidget ConfigWidget.hh
@@ -150,56 +171,71 @@ namespace gazebo
       /// \brief Set an integer value to a child widget.
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
-      public: void SetIntWidgetValue(const std::string &_name, int _value);
+      /// \return True if the value is set successfully.
+      public: bool SetIntWidgetValue(const std::string &_name, int _value);
 
       /// \brief Set an unsigned integer value to a child widget.
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
-      public: void SetUIntWidgetValue(const std::string &_name, unsigned int
+      /// \return True if the value is set successfully.
+      public: bool SetUIntWidgetValue(const std::string &_name, unsigned int
           _value);
 
       /// \brief Set a double value to a child widget.
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
-      public: void SetDoubleWidgetValue(const std::string &_name,
+      /// \return True if the value is set successfully.
+      public: bool SetDoubleWidgetValue(const std::string &_name,
           double _value);
 
       /// \brief Set a bool value to a child widget.
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
-      public: void SetBoolWidgetValue(const std::string &_name, bool _value);
+      /// \return True if the value is set successfully.
+      public: bool SetBoolWidgetValue(const std::string &_name, bool _value);
 
       /// \brief Set a string value to a child widget.
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
-      public: void SetStringWidgetValue(const std::string &_name,
+      public: bool SetStringWidgetValue(const std::string &_name,
           const std::string &_value);
 
       /// \brief Set a vector3 value to a child widget.
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
-      public: void SetVector3WidgetValue(const std::string &_name,
+      /// \return True if the value is set successfully.
+      public: bool SetVector3WidgetValue(const std::string &_name,
           const math::Vector3 &_value);
 
       /// \brief Set a color value to a child widget.
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
-      public: void SetColorWidgetValue(const std::string &_name,
+      /// \return True if the value is set successfully.
+      public: bool SetColorWidgetValue(const std::string &_name,
           const common::Color &_value);
 
       /// \brief Set a pose value to a child widget.
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
-      public: void SetPoseWidgetValue(const std::string &_name,
+      /// \return True if the value is set successfully.
+      public: bool SetPoseWidgetValue(const std::string &_name,
           const math::Pose &_value);
 
       /// \brief Set a geometry value to a child widget.
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Type of geometry.
       /// \param[in] _dimensions Dimensions of geometry.
-      public: void SetGeometryWidgetValue(const std::string &_name,
+      /// \return True if the value is set successfully.
+      public: bool SetGeometryWidgetValue(const std::string &_name,
           const std::string &_value, const math::Vector3 &_dimensions,
           const std::string &_uri = "");
+
+      /// \brief Set an enum value to a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _value Value to set to.
+      /// \return True if the value is set successfully.
+      public: bool SetEnumWidgetValue(const std::string &_name,
+          const std::string &_value);
 
       /// \brief Get an integer value from a child widget.
       /// \param[in] _name Name of the child widget.
@@ -248,6 +284,11 @@ namespace gazebo
       /// \return Type of geometry.
       public: std::string GetGeometryWidgetValue(const std::string &_name,
           math::Vector3 &_dimensions, std::string &_uri) const;
+
+      /// \brief Get an enum value from a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \return Enum value.
+      public: std::string GetEnumWidgetValue(const std::string &_name) const;
 
       /// \brief Parse the input message and either create widgets for
       /// configuring fields of the message, or update the widgets with values
@@ -323,50 +364,65 @@ namespace gazebo
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateGeometryWidget(const std::string &_key);
 
+      /// \brief Create a widget for configuring an enum value.
+      /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _values A list of enum values in string.
+      /// \return The newly created widget.
+      private: ConfigChildWidget *CreateEnumWidget(const std::string &_key,
+          const std::vector<std::string> &_values);
+
       /// \brief Update a child widget with an unsigned integer value.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
-      private: void UpdateUIntWidget(ConfigChildWidget *_widget,
+      /// \return True if the update completed successfully.
+      private: bool UpdateUIntWidget(ConfigChildWidget *_widget,
           unsigned int _value);
 
       /// \brief Update a child widget with an integer value.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
-      private: void UpdateIntWidget(ConfigChildWidget *_widget, int _value);
+      /// \return True if the update completed successfully.
+      private: bool UpdateIntWidget(ConfigChildWidget *_widget, int _value);
 
       /// \brief Update a child widget with a double value.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
-      private: void UpdateDoubleWidget(ConfigChildWidget *_widget,
+      /// \return True if the update completed successfully.
+      private: bool UpdateDoubleWidget(ConfigChildWidget *_widget,
           double _value);
 
       /// \brief Update a child widget with a string value.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
-      private: void UpdateStringWidget(ConfigChildWidget *_widget,
+      /// \return True if the update completed successfully.
+      private: bool UpdateStringWidget(ConfigChildWidget *_widget,
           const std::string &_value);
 
       /// \brief Update a child widget with a bool value.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
-      private: void UpdateBoolWidget(ConfigChildWidget *_widget, bool _value);
+      /// \return True if the update completed successfully.
+      private: bool UpdateBoolWidget(ConfigChildWidget *_widget, bool _value);
 
       /// \brief Update a child widget with a vector3 value.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
-      private: void UpdateVector3Widget(ConfigChildWidget *_widget,
+      /// \return True if the update completed successfully.
+      private: bool UpdateVector3Widget(ConfigChildWidget *_widget,
           const math::Vector3 &_value);
 
       /// \brief Update a child widget with a color value.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
-      private: void UpdateColorWidget(ConfigChildWidget *_widget,
+      /// \return True if the update completed successfully.
+      private: bool UpdateColorWidget(ConfigChildWidget *_widget,
           const common::Color &_value);
 
       /// \brief Update a child widget with a pose value.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
-      private: void UpdatePoseWidget(ConfigChildWidget *_widget,
+      /// \return True if the update completed successfully.
+      private: bool UpdatePoseWidget(ConfigChildWidget *_widget,
           const math::Pose &_value);
 
       /// \brief Update a child widget with a geometry type and dimensions.
@@ -374,9 +430,17 @@ namespace gazebo
       /// \param[in] _value Type of geometry.
       /// \param[in] _dimensions Dimensions of the geometry.
       /// \param[in] _uri URI of the geometry mesh, if any.
-      private: void UpdateGeometryWidget(ConfigChildWidget *_widget,
+      /// \return True if the update completed successfully.
+      private: bool UpdateGeometryWidget(ConfigChildWidget *_widget,
           const std::string &_value, const math::Vector3 &_dimensions,
           const std::string &_uri = "");
+
+      /// \brief Update a child widget with an enum value.
+      /// \param[in] _widget Pointer to the child widget.
+      /// \param[in] _value Value to set to.
+      /// \return True if the update completed successfully.
+      private: bool UpdateEnumWidget(ConfigChildWidget *_widget,
+          const std::string &_value);
 
       /// \brief Get an integer value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
@@ -430,10 +494,25 @@ namespace gazebo
       private: std::string GetGeometryWidgetValue(ConfigChildWidget *_widget,
           math::Vector3 &_dimensions, std::string &_uri) const;
 
+      /// \brief Get an enum value from a child widget.
+      /// \param[in] _widget Pointer to the child widget.
+      /// \return Value of the widget.
+      private: std::string GetEnumWidgetValue(ConfigChildWidget *_widget) const;
+
       /// \brief Received item selection user input.
       /// \param[in] _item Item selected.
       /// \param[in] _column Column index.
       private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
+
+      /// \brief Callback when an enum config widget's enum value has changed.
+      /// \param[in] _value New enum value in string.
+      private slots: void OnEnumValueChanged(const QString &_value);
+
+      /// \brief Signal that an enum config widget's enum value has changed.
+      /// \param[in] _name Scoped name of widget.
+      /// \param[in] _name New enum value string.
+      Q_SIGNALS: void EnumValueChanged(const QString &_name,
+          const QString &_value);
 
       /// \brief Qt event filter currently used to filter mouse wheel events.
       /// \param[in] _obj Object that is watched by the event filter.
