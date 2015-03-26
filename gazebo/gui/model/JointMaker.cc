@@ -1226,5 +1226,5 @@ void JointMaker::ShowJoints(bool _show)
       iter.second->jointVisual->SetVisible(_show);
   }
   if (this->selectedJoint)
-    this->selectedJoint->SetHighlighted(_show && true);
+    this->selectedJoint->SetHighlighted(_show);
 }
