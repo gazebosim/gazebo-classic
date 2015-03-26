@@ -17,7 +17,7 @@ Windows `cmd` for configuring and building.  You might also need to
 
 1. Make a directory to work in, e.g.:
 
-	mkdir gz-ws
+        mkdir gz-ws
         cd gz-ws
 
 1. Download the following things into that directory:
