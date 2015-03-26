@@ -450,6 +450,7 @@ endif ()
 ########################################
 # Find SDFormat
 find_package(SDFormat 3.0.0)
+
 if (NOT SDFormat_FOUND)
   message (STATUS "Looking for SDFormat - not found")
   BUILD_ERROR ("Missing: SDF version >=3.0.0. Required for reading and writing SDF files.")
