@@ -13,7 +13,7 @@ using namespace gazebo;
 int main(int argc, char * argv[])
 {
   msgs::PoseAnimation msg;
-  
+
   msg.set_model_name("box");
   msgs::Pose *p = msg.add_pose();
   msgs::Set(p, math::Pose(5, 5, 0, 0, 0, 0));
@@ -26,15 +26,15 @@ int main(int argc, char * argv[])
   transport::run();
   transport::NodePtr node(new gazebo::transport::Node());
   node->Init("default");
-  
+
   gazebo::transport::PublisherPtr pathPub =
     node->Advertise<msgs::PoseAnimation>("/gazebo/default/pose_animation");
   std::cout << "Waiting for connection...\n";
   pathPub->WaitForConnection();
   pathPub->Publish(msg);
-  
+
   std::cout << "Path published!\n\n";
-  
+
   gazebo::transport::fini();
   return 0;
 }
