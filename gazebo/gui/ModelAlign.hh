@@ -47,6 +47,10 @@ namespace gazebo
       /// \brief Initialize the model alignment tool.
       public: void Init();
 
+      /// \brief Clear the model alignment tool. This explicity cleans up the
+      /// internal state of the singleton and prepares it for exit.
+      public: void Clear();
+
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _visuals Visuals to be aligned.
       /// \param[in] _axis Axis of alignment: x, y, or z.
