@@ -747,8 +747,46 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
 
           if (newWidget)
           {
-            // create a group widget to collapse or expand child widgets
-            // (contained in a group box).
+            // Button label
+            QLabel *buttonLabel = new QLabel(
+                tr(this->GetHumanReadableString(name).c_str()));
+            buttonLabel->setToolTip(tr(name.c_str()));
+
+            // Button icon
+            QCheckBox *buttonIcon = new QCheckBox();
+            buttonIcon->setChecked(true);
+            buttonIcon->setStyleSheet(
+                 "QCheckBox::indicator::unchecked {\
+                   image: url(:/images/right_arrow.png);\
+                 }\
+                 QCheckBox::indicator::checked {\
+                   image: url(:/images/down_arrow.png);\
+                 }");
+
+            // Button layout
+            QHBoxLayout *buttonLayout = new QHBoxLayout();
+            buttonLayout->addItem(new QSpacerItem(20*_level, 1,
+                QSizePolicy::Fixed, QSizePolicy::Fixed));
+            buttonLayout->addWidget(buttonLabel);
+            buttonLayout->addWidget(buttonIcon);
+
+            buttonLayout->setAlignment(buttonIcon, Qt::AlignRight);
+
+            // Button frame
+            QFrame *buttonFrame = new QFrame();
+            buttonFrame->setFrameStyle(QFrame::Box);
+            buttonFrame->setLayout(buttonLayout);
+
+            // Set color for top level button
+            if (_level == 0)
+              buttonFrame->setStyleSheet(
+                  "QWidget\
+                   {\
+                     background-color: #999999\
+                   }");
+
+
+            // Child widgets are contained in a group box which can be collapsed
             GroupWidget *groupWidget = new GroupWidget;
             groupWidget->setStyleSheet(
                 "QGroupBox {\
@@ -757,34 +795,13 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
                     padding : 0;\
                 }");
 
-            // Button
-            QLabel *buttonLabel = new QLabel(
-                tr(this->GetHumanReadableString(name).c_str()));
-            buttonLabel->setToolTip(tr(name.c_str()));
+            connect(buttonIcon, SIGNAL(toggled(bool)), groupWidget,
+                SLOT(Toggle(bool)));
 
-            QCheckBox *groupButton = new QCheckBox();
-            groupButton->setChecked(true);
-            groupButton->setStyleSheet(
-                 "QCheckBox::indicator::unchecked {\
-                   image: url(:/images/right_arrow.png);\
-                 }\
-                 QCheckBox::indicator::checked {\
-                   image: url(:/images/down_arrow.png);\
-                 }");
+            // Start collapsed
+           // buttonIcon->toggle();
 
-            QHBoxLayout *buttonLayout = new QHBoxLayout();
-            buttonLayout->addItem(new QSpacerItem(20*_level, 1,
-                QSizePolicy::Fixed, QSizePolicy::Fixed));
-            buttonLayout->addWidget(buttonLabel);
-            buttonLayout->addWidget(groupButton);
-
-            buttonLayout->setAlignment(groupButton, Qt::AlignRight);
-
-            QFrame *buttonFrame = new QFrame();
-            buttonFrame->setFrameStyle(QFrame::Box);
-            buttonFrame->setLayout(buttonLayout);
-
-            // set the child widget so it can be toggled
+            // Set the child widget
             groupWidget->childWidget = newFieldWidget;
             qobject_cast<ConfigChildWidget *>(newFieldWidget)->groupWidget
                 = groupWidget;
@@ -793,26 +810,42 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
             // Set color for children
             if (_level == 0)
               newFieldWidget->setStyleSheet(
-                  "QWidget{background-color: #666666}");
+                  "QWidget\
+                   {\
+                     background-color: #777777\
+                   }\
+                   QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+                   {\
+                     background-color: #cccccc\
+                   }");
             else if (_level == 1)
               newFieldWidget->setStyleSheet(
-                  "QWidget{background-color: #444444}");
+                  "QWidget\
+                   {\
+                     background-color: #555555\
+                   }\
+                   QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+                   {\
+                     background-color: #aaaaaa\
+                   }");
             else if (_level == 2)
               newFieldWidget->setStyleSheet(
-                  "QWidget{background-color: #222222}");
+                  "QWidget\
+                   {\
+                     background-color: #333333\
+                   }\
+                   QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+                   {\
+                     background-color: #888888\
+                   }");
 
+            // Group Layout
             QGridLayout *configGroupLayout = new QGridLayout;
             configGroupLayout->setContentsMargins(0, 0, 0, 0);
             configGroupLayout->setSpacing(0);
             configGroupLayout->addWidget(buttonFrame, 0, 0);
             configGroupLayout->addWidget(newFieldWidget, 1, 0);
             groupWidget->setLayout(configGroupLayout);
-
-            connect(groupButton, SIGNAL(toggled(bool)), groupWidget,
-                SLOT(Toggle(bool)));
-
-            // Start collapsed
-           // groupButton->toggle();
 
             // reset new field widget pointer in order for it to be added
             // to the parent widget
@@ -829,6 +862,22 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
         default:
           break;
       }
+
+      // Style widgets without parent (level 0)
+      if (newFieldWidget && _level == 0 &&
+          !qobject_cast<GroupWidget *>(newFieldWidget))
+      {
+        newFieldWidget->setStyleSheet(
+            "QWidget\
+             {\
+               background-color: #999999\
+             }\
+             QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+             {\
+               background-color: #eeeeee\
+             }");
+      }
+
       if (newWidget && newFieldWidget)
       {
         newWidgets.push_back(newFieldWidget);
