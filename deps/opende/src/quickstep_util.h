@@ -124,6 +124,7 @@ struct dxPGSLCPParameters {
 #endif
     int* jb;
     const int* findex;
+    bool skip_friction;
     dRealPtr hi;
     dRealPtr lo;
     dRealPtr invMOI;
@@ -142,12 +143,8 @@ struct dxPGSLCPParameters {
     dRealMutablePtr caccel;
     dRealMutablePtr lambda;
 
-    dRealPtr rhs_erp;
-    dRealMutablePtr caccel_erp;
-    dRealMutablePtr lambda_erp;
 #ifdef REORDER_CONSTRAINTS
     dRealMutablePtr last_lambda ;
-    dRealMutablePtr last_lambda_erp ;
 #endif
 };
 // ****************************************************************
