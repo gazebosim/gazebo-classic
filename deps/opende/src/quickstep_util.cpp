@@ -161,6 +161,7 @@ int quickstep::compare_index_error (const void *a, const void *b)
 }
 #endif
 
+//***************************************************************************
 // Modifying inertia along constrained axes without modifying dynamics.
 void quickstep::DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const int b1, const int b2,
                             const dJointWithInfo1 *jicurr,

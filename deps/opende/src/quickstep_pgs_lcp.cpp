@@ -398,9 +398,9 @@ static void ComputeRows(
 
         // record residual (error) (for the non-erp version)
         // given
-        //   dlambda = pgs * (b_i - A_ij * lambda_j)/(A_ii + cfm)
+        //   dlambda = sor * (b_i - A_ij * lambda_j)/(A_ii + cfm)
         // define scalar Ad:
-        //   Ad = pgs / (A_ii + cfm)
+        //   Ad = sor / (A_ii + cfm)
         // then
         //   dlambda = Ad  * (b_i - A_ij * lambda_j)
         // thus, to get residual from dlambda,
@@ -411,16 +411,16 @@ static void ComputeRows(
         dReal Ad2 = 0.0;
         if (!_dequal(Ad[index], 0.0))
         {
-          // Ad[i] = pgs_w / (sum + cfm[i]);
+          // Ad[i] = sor_w / (sum + cfm[i]);
           Ad2 = 1.0 / (Ad[index] * Ad[index]);
         }
         else
         {
-          // TODO: Usually, this means qs->w (PGS param) is zero.
-          // Residual calculation is wrong when PGS (w) is zero
-          // Given PGS is rarely 0, we'll set residual as 0 for now.
-          // To do this properly, we should compute dlambda without pgs
-          // then use the Ad without PGS to back out residual.
+          // TODO: Usually, this means qs->w (SOR param) is zero.
+          // Residual calculation is wrong when SOR (w) is zero
+          // Given SOR is rarely 0, we'll set residual as 0 for now.
+          // To do this properly, we should compute dlambda without sor
+          // then use the Ad without SOR to back out residual.
         }
 
         dReal delta_precon2 = delta_precon*delta_precon;
@@ -466,13 +466,6 @@ static void ComputeRows(
         if (caccel_ptr2)
           delta -= quickstep::dot6(caccel_ptr2, J_ptr + 6);
 
-        // delta_erp: unthrottled version compute for rhs with custom erp
-        // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
-        delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
-        delta_erp -= quickstep::dot6(caccel_erp_ptr1, J_ptr);
-        if (caccel_erp_ptr2)
-          delta_erp -= quickstep::dot6(caccel_erp_ptr2, J_ptr + 6);
-
         // set the limits for this constraint.
         // this is the place where the QuickStep method differs from the
         // direct LCP solving method, since that method only performs this
@@ -481,21 +474,14 @@ static void ComputeRows(
         // the constraints are ordered so that all lambda[] values needed have
         // already been computed.
         dReal hi_act, lo_act;
-        dReal hi_act_erp, lo_act_erp;
         if (constraint_index >= 0) {
           // FOR erp throttled by info.c_v_max or info.c
           hi_act = dFabs (hi[index] * lambda[constraint_index]);
           lo_act = -hi_act;
-          // for the unthrottled _erp version
-          hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
-          lo_act_erp = -hi_act_erp;
         } else {
           // FOR erp throttled by info.c_v_max or info.c
           hi_act = hi[index];
           lo_act = lo[index];
-          // for the unthrottled _erp version
-          hi_act_erp = hi[index];
-          lo_act_erp = lo[index];
         }
 
         // compute lambda and clamp it to [lo,hi].
@@ -511,29 +497,12 @@ static void ComputeRows(
           delta = hi_act-old_lambda;
           lambda[index] = hi_act;
         }
-
-        // for the unthrottled _erp version
-        lambda_erp[index] = old_lambda_erp + delta_erp;
-        if (lambda_erp[index] < lo_act_erp) {
-          delta_erp = lo_act_erp-old_lambda_erp;
-          lambda_erp[index] = lo_act_erp;
-        }
-        else if (lambda_erp[index] > hi_act_erp) {
-          delta_erp = hi_act_erp-old_lambda_erp;
-          lambda_erp[index] = hi_act_erp;
-        }
 #else
         // FOR erp throttled by info.c_v_max or info.c
         dReal nl = old_lambda + delta;
         _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
         lambda[index] = nl;
         delta = nl - old_lambda;
-
-        // for the unthrottled _erp version
-        dReal nl = old_lambda_erp + delta_erp;
-        _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
-        lambda_erp[index] = nl;
-        delta_erp = nl - old_lambda_erp;
 #endif
 
         // option to smooth lambda
@@ -559,9 +528,6 @@ static void ComputeRows(
           {
             lambda[index] = (1.0 - smooth_contacts)*lambda[index]
               + smooth_contacts*old_lambda;
-            // is filtering lambda_erp necessary?
-            // lambda_erp[index] = (1.0 - smooth_contacts)*lambda_erp[index]
-            //   + smooth_contacts*old_lambda_erp;
           }
         }
 #endif
@@ -576,12 +542,12 @@ static void ComputeRows(
           if (caccel_ptr2)
             quickstep::sum6(caccel_ptr2, delta, iMJ_ptr + 6);
 
-          // update caccel_erp.
-          quickstep::sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
-          if (caccel_erp_ptr2)
-            quickstep::sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
+        }
 
 #ifdef PENETRATION_JVERROR_CORRECTION
+        {
+          // FOR erp throttled by info.c_v_max or info.c
+          dRealPtr iMJ_ptr = iMJ + index*12;
           // update vnew incrementally
           //   add stepsize * delta_caccel to the body velocity
           //   vnew = vnew + dt * delta_caccel
@@ -608,14 +574,103 @@ static void ComputeRows(
           //       iteration,
           //       vnew_ptr1[0], vnew_ptr1[1], vnew_ptr1[2],
           //       vnew_ptr1[3], vnew_ptr1[4], vnew_ptr1[5],Jvnew);
+        }
 #endif
+
+
+        //////////////////////////////////////////////////////
+        /// repeat for position projection
+        //////////////////////////////////////////////////////
+        if (constraint_index < 0)
+        {
+          // delta_erp: unthrottled version compute for rhs with custom erp
+          // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
+          delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
+          delta_erp -= quickstep::dot6(caccel_erp_ptr1, J_ptr);
+          if (caccel_erp_ptr2)
+            delta_erp -= quickstep::dot6(caccel_erp_ptr2, J_ptr + 6);
+
+          dReal hi_act_erp, lo_act_erp;
+          if (constraint_index >= 0) {
+            // for the unthrottled _erp version
+            hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
+            lo_act_erp = -hi_act_erp;
+          } else {
+            // for the unthrottled _erp version
+            hi_act_erp = hi[index];
+            lo_act_erp = lo[index];
+          }
+
+          // compute lambda and clamp it to [lo,hi].
+          // @@@ SSE not a win here
+  #if 1
+          // for the unthrottled _erp version
+          lambda_erp[index] = old_lambda_erp + delta_erp;
+          if (lambda_erp[index] < lo_act_erp) {
+            delta_erp = lo_act_erp-old_lambda_erp;
+            lambda_erp[index] = lo_act_erp;
+          }
+          else if (lambda_erp[index] > hi_act_erp) {
+            delta_erp = hi_act_erp-old_lambda_erp;
+            lambda_erp[index] = hi_act_erp;
+          }
+  #else
+          // FOR erp throttled by info.c_v_max or info.c
+          // for the unthrottled _erp version
+          dReal nl = old_lambda_erp + delta_erp;
+          _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
+          lambda_erp[index] = nl;
+          delta_erp = nl - old_lambda_erp;
+  #endif
+
+          // option to smooth lambda
+  #ifdef SMOOTH_LAMBDA
+          {
+            // smooth delta lambda
+            // equivalent to first order artificial dissipation on lambda update.
+
+            // debug smoothing
+            // if (i == 0)
+            //   printf("rhs[%f] adcfm[%f]: ",rhs[index], Adcfm[index]);
+            // if (i == 0)
+            //   printf("dlambda iter[%d]: ",iteration);
+            // printf(" %f ", lambda[index]-old_lambda);
+            // if (i == startRow + nRows - 1)
+            //   printf("\n");
+
+            // extra residual smoothing for contact constraints
+            // was smoothing both contact normal and friction constraints for VRC
+            // if (constraint_index != -1)
+            // smooth only lambda for friction directions fails friction_demo.world
+            if (constraint_index != -1)
+            {
+              // is filtering lambda_erp necessary?
+              // lambda_erp[index] = (1.0 - smooth_contacts)*lambda_erp[index]
+              //   + smooth_contacts*old_lambda_erp;
+            }
+          }
+  #endif
+
+          // update caccel
+          {
+            // FOR erp throttled by info.c_v_max or info.c
+            dRealPtr iMJ_ptr = iMJ + index*12;
+
+            // update caccel_erp.
+            quickstep::sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
+            if (caccel_erp_ptr2)
+              quickstep::sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
+          }
         }
 
+
+        //////////////////////////////////////////////////////
         // record residual (error) (for the non-erp version)
+        //////////////////////////////////////////////////////
         // given
-        //   dlambda = pgs * (b_i - A_ij * lambda_j)/(A_ii + cfm)
+        //   dlambda = sor * (b_i - A_ij * lambda_j)/(A_ii + cfm)
         // define scalar Ad:
-        //   Ad = pgs / (A_ii + cfm)
+        //   Ad = sor / (A_ii + cfm)
         // then
         //   dlambda = Ad  * (b_i - A_ij * lambda_j)
         // thus, to get residual from dlambda,
@@ -626,16 +681,16 @@ static void ComputeRows(
         dReal Ad2 = 0.0;
         if (!_dequal(Ad[index], 0.0))
         {
-          // Ad[i] = pgs_w / (sum + cfm[i]);
+          // Ad[i] = sor_w / (sum + cfm[i]);
           Ad2 = 1.0 / (Ad[index] * Ad[index]);
         }
         else
         {
-          // TODO: Usually, this means qs->w (PGS param) is zero.
-          // Residual calculation is wrong when PGS (w) is zero
-          // Given PGS is rarely 0, we'll set residual as 0 for now.
-          // To do this properly, we should compute dlambda without pgs
-          // then use the Ad without PGS to back out residual.
+          // TODO: Usually, this means qs->w (SOR param) is zero.
+          // Residual calculation is wrong when SOR (w) is zero
+          // Given SOR is rarely 0, we'll set residual as 0 for now.
+          // To do this properly, we should compute dlambda without sor
+          // then use the Ad without SOR to back out residual.
         }
 
         dReal delta2 = delta*delta;
@@ -796,13 +851,14 @@ static void ComputeRows(
 
 //***************************************************************************
 // PGS_LCP method was previously SOR_LCP
+//
 // this returns lambda and cforce (the constraint force).
 // note: cforce is returned as inv(M)*J'*lambda,
 //   the constraint force is actually J'*lambda
 //
 // rhs, lo and hi are modified on exit
 //
-void quickstep::PGS_LCP (dxWorldProcessContext *context,
+static void quickstep::PGS_LCP (dxWorldProcessContext *context,
   const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, dRealMutablePtr vnew, int *jb, dxBody * const *body,
   dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
@@ -843,20 +899,20 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   dReal *Ad = context->AllocateArray<dReal> (m);
 
   {
-    const dReal pgs_w = qs->w;    // PGS over-relaxation parameter
+    const dReal sor_w = qs->w;    // SOR over-relaxation parameter
     // precompute 1 / diagonals of A
     dRealPtr iMJ_ptr = iMJ;
     dRealPtr J_ptr = J;
     for (int i=0; i<m; J_ptr += 12, iMJ_ptr += 12, i++) {
       dReal sum = 0;
-      sum += dot6(iMJ_ptr, J_ptr);
+      sum += quickstep::dot6(iMJ_ptr, J_ptr);
       if (jb[i*2+1] >= 0) {
-        sum += dot6(iMJ_ptr+6, J_ptr+6);
+        sum += quickstep::dot6(iMJ_ptr+6, J_ptr+6);
       }
       if (findex[i] < 0)
-        Ad[i] = pgs_w / (sum + cfm[i]);
+        Ad[i] = sor_w / (sum + cfm[i]);
       else
-        Ad[i] = CONTACT_PGS_SCALE * pgs_w / (sum + cfm[i]);
+        Ad[i] = CONTACT_SOR_SCALE * sor_w / (sum + cfm[i]);
     }
   }
 
@@ -869,20 +925,20 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     dReal *Ad_precon = context->AllocateArray<dReal> (m);
 
     {
-      const dReal pgs_w = qs->w;    // PGS over-relaxation parameter
+      const dReal sor_w = qs->w;    // SOR over-relaxation parameter
       // precompute 1 / diagonals of A
       // preconditioned version uses J instead of iMJ
       dRealPtr J_ptr = J;
       for (int i=0; i<m; J_ptr += 12, i++) {
         dReal sum = 0;
-        sum += dot6(J_ptr, J_ptr);
+        sum += quickstep::dot6(J_ptr, J_ptr);
         if (jb[i*2+1] >= 0) {
-          sum += dot6(J_ptr+6, J_ptr+6);
+          sum += quickstep::dot6(J_ptr+6, J_ptr+6);
         }
         if (findex[i] < 0)
-          Ad_precon[i] = pgs_w / (sum + cfm[i]);
+          Ad_precon[i] = sor_w / (sum + cfm[i]);
         else
-          Ad_precon[i] = CONTACT_PGS_SCALE * pgs_w / (sum + cfm[i]);
+          Ad_precon[i] = CONTACT_SOR_SCALE * sor_w / (sum + cfm[i]);
       }
     }
 
