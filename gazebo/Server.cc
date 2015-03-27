@@ -108,8 +108,8 @@ bool Server::ParseArgs(int _argc, char **_argv)
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.")
-    ("profile,o", po::value<std::string>()->default_value(""),
-     "Specify a physics preset profile name from the options in the world file.");
+    ("profile,o", po::value<std::string>(),
+     "Physics preset profile name from the options in the world file.");
 
   po::options_description hiddenDesc("Hidden options");
   hiddenDesc.add_options()
@@ -267,10 +267,9 @@ bool Server::ParseArgs(int _argc, char **_argv)
     if (!this->LoadFile(configFilename, physics))
       return false;
 
-    std::string profileName = this->vm["profile"].as<std::string>();
-    if (this->vm.count("profile") &&
-        profileName.size() > 0)
+    if (this->vm.count("profile"))
     {
+      std::string profileName = this->vm["profile"].as<std::string>();
       if (physics::get_world()->GetPresetManager()->HasProfile(profileName))
       {
         physics::get_world()->GetPresetManager()->CurrentProfile(profileName);
