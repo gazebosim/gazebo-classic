@@ -34,6 +34,51 @@ void OnRequest(ConstRequestPtr &_msg)
     g_gotSetWireframe = true;
 }
 
+/////////////////////////////////////////////////
+void MainWindow_TEST::StepState()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  QVERIFY(gazebo::gui::g_stepAct != NULL);
+  QVERIFY(!gazebo::gui::g_stepAct->isEnabled());
+  QVERIFY(!mainWindow->IsPaused());
+
+
+  // toggle pause and play step and check if the step action is properly
+  // enabled / disabled.
+  mainWindow->Pause();
+  QVERIFY(mainWindow->IsPaused());
+  QVERIFY(gazebo::gui::g_stepAct->isEnabled());
+
+  mainWindow->Play();
+  QVERIFY(!mainWindow->IsPaused());
+  QVERIFY(!gazebo::gui::g_stepAct->isEnabled());
+
+  mainWindow->Pause();
+  QVERIFY(mainWindow->IsPaused());
+  QVERIFY(gazebo::gui::g_stepAct->isEnabled());
+
+  mainWindow->close();
+  delete mainWindow;
+}
 
 /////////////////////////////////////////////////
 void MainWindow_TEST::Selection()
