@@ -1152,21 +1152,29 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
 
   // this is the main computational loop for PGS
   // here we iterate over each row and make progressive updates
+
+  // to do split impulse / position projection correction,
+  //   - solve lambda     and caccel     using rhs
+  //   - solve lambda_erp and caccel_erp using rhs_erp
+  // these two solves can be performed simultaneously.
+
   IFTIMING (dTimerNow ("start pgs rows"));
   for (int i=0; i<m; i+= chunk,thread_id++)
   {
-    //for (int ijk=0;ijk<m;ijk++) printf("thread_id> id:%d jb[%d]=%d\n",thread_id,ijk,jb[ijk]);
+    // for (int ijk=0;ijk<m;ijk++)
+    //   printf("thread_id> id:%d jb[%d]=%d\n",thread_id,ijk,jb[ijk]);
 
     int nStart = i - qs->num_overlap < 0 ? 0 : i - qs->num_overlap;
     int nEnd   = i + chunk + qs->num_overlap;
     if (nEnd > m) nEnd = m;
-    // if every one reorders constraints, this might just work
-    // comment out below if using defaults (0 and m) so every thread runs through all joints
 #ifdef PENETRATION_JVERROR_CORRECTION
     params[thread_id].stepsize = stepsize;
     params[thread_id].vnew  = vnew ;
 #endif
     params[thread_id].qs  = qs ;
+    // if every one reorders constraints, this might just work
+    // comment out below if using defaults (0 and m) so every
+    // thread runs through all joints
     params[thread_id].nStart = nStart;   // 0
     params[thread_id].nChunkSize = nEnd - nStart; // m
     params[thread_id].m = m; // m
