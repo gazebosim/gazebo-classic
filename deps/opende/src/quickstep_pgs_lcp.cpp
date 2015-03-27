@@ -1067,62 +1067,6 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     if (nEnd > m) nEnd = m;
 
     // setup params for ComputeRows
-#ifdef PENETRATION_JVERROR_CORRECTION
-    params[thread_id].stepsize = stepsize;
-    params[thread_id].vnew  = vnew;
-#endif
-    params[thread_id].qs  = qs;
-    // if every one reorders constraints, this might just work
-    // comment out below if using defaults (0 and m) so every
-    // thread runs through all joints
-    params[thread_id].nStart = nStart;   // 0
-    params[thread_id].nChunkSize = nEnd - nStart; // m
-    params[thread_id].m = m; // m
-    params[thread_id].nb = nb;
-    params[thread_id].jb = jb;
-    params[thread_id].findex = findex;
-    params[thread_id].skip_friction = false;
-    params[thread_id].hi = hi;
-    params[thread_id].lo = lo;
-    params[thread_id].invMOI = invMOI;
-    params[thread_id].MOI= MOI;
-    params[thread_id].Ad = Ad;
-    params[thread_id].Adcfm = Adcfm;
-    params[thread_id].Adcfm_precon = Adcfm_precon;
-    params[thread_id].J = J;
-    params[thread_id].iMJ = iMJ;
-    params[thread_id].rhs_precon  = rhs_precon;
-    params[thread_id].J_precon  = J_precon;
-    params[thread_id].J_orig  = J_orig;
-    params[thread_id].cforce  = cforce;
-
-    params[thread_id].rhs = rhs;
-    params[thread_id].caccel = caccel;
-    params[thread_id].lambda = lambda;
-
-#ifdef REORDER_CONSTRAINTS
-    params[thread_id].last_lambda  = last_lambda;
-#endif
-
-#ifdef DEBUG_CONVERGENCE_TOLERANCE
-    printf("thread summary: id %d i %d m %d chunk %d start %d end %d \n",
-      thread_id,i,m,chunk,nStart,nEnd);
-#endif
-#ifdef USE_TPROW
-    if (row_threadpool && row_threadpool->size() > 0)
-    {
-      // printf("threading out for params\n");
-      row_threadpool->schedule(boost::bind(ComputeRows,thread_id,order,
-      body, params[thread_id], mutex));
-    }
-    else //automatically skip threadpool if only 1 thread allocated
-      ComputeRows(thread_id,order, body, params[thread_id], mutex);
-#else
-    boost::thread params_thread(ComputeRows, thread_id,order, body, params[thread_id], mutex);
-    // ComputeRows(thread_id,order, body, params[thread_id], mutex);
-#endif
-
-
     IFTIMING (dTimerNow ("start pgs_erp rows"));
     //////////////////////////////////////////////////////
     /// repeat for position projection
@@ -1179,12 +1123,70 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     else //automatically skip threadpool if only 1 thread allocated
       ComputeRows(thread_id,order, body, params_erp[thread_id], mutex);
 #else
-    ComputeRows(thread_id,order, body, params_erp[thread_id], mutex);
+    boost::thread params_erp_thread(ComputeRows, thread_id,order, body, params_erp[thread_id], mutex);
+    // ComputeRows(thread_id,order, body, params_erp[thread_id], mutex);
 #endif
 
-    IFTIMING (dTimerNow ("wait for params threads"));
-    params_thread.join();
-    IFTIMING (dTimerNow ("params threads done"));
+
+    // setup params for ComputeRows non_erp
+#ifdef PENETRATION_JVERROR_CORRECTION
+    params[thread_id].stepsize = stepsize;
+    params[thread_id].vnew  = vnew;
+#endif
+    params[thread_id].qs  = qs;
+    // if every one reorders constraints, this might just work
+    // comment out below if using defaults (0 and m) so every
+    // thread runs through all joints
+    params[thread_id].nStart = nStart;   // 0
+    params[thread_id].nChunkSize = nEnd - nStart; // m
+    params[thread_id].m = m; // m
+    params[thread_id].nb = nb;
+    params[thread_id].jb = jb;
+    params[thread_id].findex = findex;
+    params[thread_id].skip_friction = false;
+    params[thread_id].hi = hi;
+    params[thread_id].lo = lo;
+    params[thread_id].invMOI = invMOI;
+    params[thread_id].MOI= MOI;
+    params[thread_id].Ad = Ad;
+    params[thread_id].Adcfm = Adcfm;
+    params[thread_id].Adcfm_precon = Adcfm_precon;
+    params[thread_id].J = J;
+    params[thread_id].iMJ = iMJ;
+    params[thread_id].rhs_precon  = rhs_precon;
+    params[thread_id].J_precon  = J_precon;
+    params[thread_id].J_orig  = J_orig;
+    params[thread_id].cforce  = cforce;
+
+    params[thread_id].rhs = rhs;
+    params[thread_id].caccel = caccel;
+    params[thread_id].lambda = lambda;
+
+#ifdef REORDER_CONSTRAINTS
+    params[thread_id].last_lambda  = last_lambda;
+#endif
+
+#ifdef DEBUG_CONVERGENCE_TOLERANCE
+    printf("thread summary: id %d i %d m %d chunk %d start %d end %d \n",
+      thread_id,i,m,chunk,nStart,nEnd);
+#endif
+#ifdef USE_TPROW
+    if (row_threadpool && row_threadpool->size() > 0)
+    {
+      // printf("threading out for params\n");
+      row_threadpool->schedule(boost::bind(ComputeRows,thread_id,order,
+      body, params[thread_id], mutex));
+    }
+    else //automatically skip threadpool if only 1 thread allocated
+      ComputeRows(thread_id,order, body, params[thread_id], mutex);
+#else
+    // boost::thread params_thread(ComputeRows, thread_id,order, body, params[thread_id], mutex);
+    ComputeRows(thread_id,order, body, params[thread_id], mutex);
+#endif
+
+    IFTIMING (dTimerNow ("wait for params_erp threads"));
+    params_erp_thread.join();
+    IFTIMING (dTimerNow ("params_erp threads done"));
   }
 
 
