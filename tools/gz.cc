@@ -355,7 +355,7 @@ bool PhysicsCommand::RunImpl()
   if (this->vm.count("profile") &&
       this->vm["profile"].as<std::string>().size() > 0)
   {
-    msg.set_name(this->vm["profile"].as<std::string>());
+    msg.set_profile_name(this->vm["profile"].as<std::string>());
     good = true;
   }
 
