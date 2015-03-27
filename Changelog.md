@@ -1,7 +1,7 @@
 ## Gazebo 6.0
 
 1. Show/hide GUI overlays using the menu bar.
-    * [Pull request #1552](https://bitbucket.org/osrf/gazebo/pull-request/1552)
+    * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
 
 1. Added support for Oculus DK2
     * [Pull request #1526](https://bitbucket.org/osrf/gazebo/pull-request/1526)
