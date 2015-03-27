@@ -31,13 +31,15 @@ namespace gazebo
 {
   class GAZEBO_VISIBLE RestUiPlugin : public SystemPlugin
   {
-    /// \brief ctor
+    /// \brief Constructor
     public: RestUiPlugin();
 
-    /// \brief dtor
+    /// \brief Destructor
     public: virtual ~RestUiPlugin();
 
     /// \brief called when plugin is loaded
+    /// \param[in] _argc Arguments count
+    /// \param[in] _argv Argument vector
     public: virtual void Load(int _argc, char **_argv);
 
     /// \brief plugin initialization

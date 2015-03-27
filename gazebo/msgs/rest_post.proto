@@ -6,6 +6,6 @@ package gazebo.msgs;
 message RestPost
 {
   required string route = 1;
-  required string json =2;
+  required string json = 2;
 }
 

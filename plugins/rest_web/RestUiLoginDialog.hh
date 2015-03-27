@@ -38,7 +38,7 @@ namespace gazebo
       /// \param[in] _parent Parent QWidget
       /// \param[in] _title The dialog window title bar text
       /// \param[in] _url Label the title of the url (ex: super webservice url)
-      /// \param[in] _default Url text for the url (ex: https://superweb.com)
+      /// \param[in] _defaultUrl Url text for the url (ex: https://superweb.com)
       public: RestUiLoginDialog(QWidget *_parent,
                               const std::string &_title,
                               const std::string &_urlLabel,
@@ -53,18 +53,22 @@ namespace gazebo
                                 QString& _password);
 
       /// \brief Getter for User name (of the basic auth REST service)
+      /// \return User name
       public: std::string GetUsername() const;
 
       /// \brief Getter for the password
+      /// \return The password
       public: std::string GetPassword() const;
 
-      /// \brief Getter for the Url (https)
+      /// \brief Getter for the Url
+      /// \return The url for the site (ex: https://yoursite.com:4000)
       public: std::string GetUrl() const;
 
-      /// slot for the AcceptLogin event
+      /// \brief slot for the AcceptLogin event
       public slots: void slotAcceptLogin();
 
-      /// \brief A label for the url component
+      /// \brief A label for the url component that appears on the
+      /// login widget above
       private: QLabel *labelUrl;
 
       /// \brief A label for the username component

@@ -32,22 +32,27 @@ namespace gazebo
 {
   class GAZEBO_VISIBLE RestWebPlugin : public SystemPlugin
   {
-    /// \brief ctor
+    /// \brief Constructor
     public: RestWebPlugin();
 
-    /// \brief dtor
+    /// \brief Destructor
     public: virtual ~RestWebPlugin();
 
     /// \brief Plugin Load
+    /// \param[in] _argc Argument count
+    /// \param[in] _argv Argument vector
     public: virtual void Load(int _argc, char **_argv);
 
     /// \brief  called everytime a login message is received.
+    /// \param[in] _msg The login message
     public: void OnRestLoginRequest(ConstRestLoginPtr &_msg);
 
     /// \brief Called everytime a REST POST event message is received
+    /// \param[in] _msg The post message
     public: void OnEventRestPost(ConstRestPostPtr &_msg);
 
     /// \brief Called everytime a SimEvent message is received
+    /// \param[in] The SimEvent message
     public: void OnSimEvent(ConstSimEventPtr &_msg);
 
     /// \brief Plugin initialization
@@ -57,10 +62,8 @@ namespace gazebo
     private: void RunRequestQ();
 
     /// \brief Process a RestRequest message from the requestThread
+    /// \param[in] The message to process
     private: void ProcessLoginRequest(ConstRestLoginPtr _msg);
-
-    /// \brief Process a REST Post messsage from the requestThread
-    private: void ProcessRestPostEvent(ConstRestPostPtr _msg);
 
     /// \brief Gazebo pub/sub node
     private: gazebo::transport::NodePtr node;
@@ -87,8 +90,11 @@ namespace gazebo
     private: bool stopMsgProcessing;
 
     /// \brief a list to accumulate pending request
-    private: std::list< boost::shared_ptr<const gazebo::msgs::RestLogin> >
-              msgLoginQ;
+    private: std::list<
+               boost::shared_ptr<
+                 const gazebo::msgs::RestLogin
+               >
+             > msgLoginQ;
 
     /// \brief a thread to process requests without stopping the simulation
     private: boost::thread *requestQThread;

@@ -32,14 +32,14 @@ namespace gazebo
   {
     Q_OBJECT
 
-    /// \brief ctor
+    /// \brief Constructor
     public: RestUiWidget(QWidget *_parent,
                          const std::string &_menuTitle,
                          const std::string &_title,
                          const std::string &_urlLabel,
                          const std::string &_defautlUrl);
 
-    /// \brief dtor
+    /// \brief Destructor
     public: virtual ~RestUiWidget();
 
     /// \brief QT callback (from the login menu)

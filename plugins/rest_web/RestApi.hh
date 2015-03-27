@@ -29,10 +29,10 @@ namespace gazebo
 {
   class RestApi
   {
-    /// \brief ctor
+    /// \brief Constructor
     public: RestApi();
 
-    /// \brief dtor
+    /// \brief Destructor
     public: virtual ~RestApi();
 
     /// \brief Connects to the Rest service.

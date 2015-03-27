@@ -30,7 +30,7 @@ namespace gazebo
   ///  The default implementation is a simple axis aligned bounding box.
   class Volume
   {
-    /// \brief dtor
+    /// \brief Destructor
     public: virtual ~Volume();
 
     /// \brief Checks if a point lies inside the box

@@ -77,21 +77,21 @@ void InRegionEventSource::Init()
 ////////////////////////////////////////////////////////////////////////////////
 void InRegionEventSource::Info()
 {
-    std::stringstream ss;
-    ss  << "InRegionEventSource "
+  std::stringstream ss;
+  ss  << "InRegionEventSource "
         << " model " << this->modelName << "  region [" << this->regionName
         << "]" << std::endl;
 
-    for (auto v: this->region->volumes)
-    {
-      ss << "  Min ";
-      ss << "[" << v->min.x << ", " << v->min.y << ", " << v->min.z << "]";
-      ss << std::endl;
-      ss << "  Max ";
-      ss << "[" << v->max.x << ", " << v->max.y << ", " << v->max.z << "]\n";
-    }
-    ss << "  inside: " << this->isInside << std::endl;
-    gzmsg << ss.str();
+  for (auto v: this->region->volumes)
+  {
+    ss << "  Min ";
+    ss << "[" << v->min.x << ", " << v->min.y << ", " << v->min.z << "]";
+    ss << std::endl;
+    ss << "  Max ";
+    ss << "[" << v->max.x << ", " << v->max.y << ", " << v->max.z << "]\n";
+  }
+  ss << "  inside: " << this->isInside << std::endl;
+  gzmsg << ss.str();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

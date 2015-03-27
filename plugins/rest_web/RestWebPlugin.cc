@@ -69,7 +69,7 @@ void RestWebPlugin::Init()
 ////////////////////////////////////////////////////////////////////////////////
 void RestWebPlugin::Load(int /*_argc*/, char ** /*_argv*/)
 {
-  // npthing to do for now
+  // nothing to do for now
 }
 
 //  adapted from TimePanel
@@ -275,28 +275,6 @@ void RestWebPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
     msg.set_msg(errorMsg);
     // alert the user via the gui plugin
     gzerr << "ERROR in REST login request. : " << errorMsg << std::endl;
-    this->pub->Publish(msg);
-  }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-void RestWebPlugin::ProcessRestPostEvent(ConstRestPostPtr _msg)
-{
-  // this is executed asynchronously
-  try
-  {
-    restApi.PostJsonData(_msg->route().c_str(), _msg->json().c_str());
-  }
-  catch(RestException &x)
-  {
-    gazebo::msgs::RestError msg;
-    std::string errorMsg;
-    errorMsg = "There was a problem trying to post data to the web server: ";
-    errorMsg += x.what();
-    msg.set_type("Error");
-    msg.set_msg(errorMsg);
-    // alert the user via the gui plugin
-    gzerr << "Error posting to REST server: " << errorMsg << std::endl;
     this->pub->Publish(msg);
   }
 }
