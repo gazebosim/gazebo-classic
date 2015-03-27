@@ -1210,8 +1210,8 @@ void MainWindow::CreateActions()
   g_orbitAct->setChecked(true);
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
 
-  g_overlayAct = new QAction(tr("GUI overlays"), this);
-  g_overlayAct->setStatusTip(tr("Show GUI overlays"));
+  g_overlayAct = new QAction(tr("GUI Overlays"), this);
+  g_overlayAct->setStatusTip(tr("Show GUI Overlays"));
   g_overlayAct->setCheckable(true);
   g_overlayAct->setChecked(true);
   connect(g_overlayAct, SIGNAL(triggered()), this, SLOT(ShowGUIOverlays()));
