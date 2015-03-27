@@ -33,101 +33,103 @@ namespace gazebo
       /// \brief Node for communication.
       public: transport::NodePtr node;
 
-      /// Name of the model this is connected to.
+      /// \brief Name of the model this is connected to.
       public: std::string modelName;
 
-      /// Name of the link currently targeted.
+      /// \brief Name of the link currently targeted.
       public: std::string linkName;
 
-      /// Label holding the model name.
+      /// \brief Label holding the model name.
       public: QLabel *modelLabel;
 
-      /// Dropdown holding all link names.
+      /// \brief Dropdown holding all link names.
       public: QComboBox *linksComboBox;
 
-      /// Radio button for CoM.
+      /// \brief Radio button for CoM.
       public: QRadioButton *comRadio;
 
-      /// Radio button for force position.
+      /// \brief Radio button for force position.
       public: QRadioButton *forcePosRadio;
 
-      /// Spin for force position X.
+      /// \brief Spin for force position X.
       public: QDoubleSpinBox *forcePosXSpin;
 
-      /// Spin for force position Y.
+      /// \brief Spin for force position Y.
       public: QDoubleSpinBox *forcePosYSpin;
 
-      /// Spin for force position Z.
+      /// \brief Spin for force position Z.
       public: QDoubleSpinBox *forcePosZSpin;
 
-      /// Spin for force magnitude.
+      /// \brief Spin for force magnitude.
       public: QDoubleSpinBox *forceMagSpin;
 
-      /// Spin for force X.
+      /// \brief Spin for force X.
       public: QDoubleSpinBox *forceXSpin;
 
-      /// Spin for force Y.
+      /// \brief Spin for force Y.
       public: QDoubleSpinBox *forceYSpin;
 
-      /// Spin for force Z.
+      /// \brief Spin for force Z.
       public: QDoubleSpinBox *forceZSpin;
 
-      /// Spin for torque magnitude.
+      /// \brief Spin for torque magnitude.
       public: QDoubleSpinBox *torqueMagSpin;
 
-      /// Spin for torque X.
+      /// \brief Spin for torque X.
       public: QDoubleSpinBox *torqueXSpin;
 
-      /// Spin for torque Y.
+      /// \brief Spin for torque Y.
       public: QDoubleSpinBox *torqueYSpin;
 
-      /// Spin for torque Z.
+      /// \brief Spin for torque Z.
       public: QDoubleSpinBox *torqueZSpin;
 
-      /// CoM coordinates in link frame.
+      /// \brief CoM coordinates in link frame.
       public: math::Vector3 comVector;
 
-      /// Forse position coordinates in link frame.
+      /// \brief Force position coordinates in link frame.
       public: math::Vector3 forcePosVector;
 
-      /// Force vector.
+      /// \brief Force vector.
       public: math::Vector3 forceVector;
 
-      /// Torque vector.
+      /// \brief Torque vector.
       public: math::Vector3 torqueVector;
 
       /// \brief Publishes the wrench message.
       public: transport::PublisherPtr wrenchPub;
 
-      /// Visual of the targeted link.
+      /// \brief Visual of the targeted link.
       public: rendering::VisualPtr linkVisual;
 
-      /// Interactive visual which represents the wrench applied.
+      /// \brief Interactive visual which represents the wrench applied.
       public: rendering::ApplyWrenchVisualPtr applyWrenchVisual;
 
-      /// Indicate whether mousepress is dragging on top the rotation tool or
-      /// not.
+      /// \brief Indicate whether mousepress is dragging on top the
+      /// rotation tool or not.
       public: bool draggingTool;
 
-      /// World pose of the rotation tool the moment dragging started.
+      /// \brief World pose of the rotation tool the moment dragging
+      /// started.
       public: math::Pose dragStartPose;
 
-      /// State of the manipulation tool, here only using "rot_y" and "tor_z"
+      /// \brief State of the manipulation tool, here only using "rot_y"
+      /// and "rot_z".
       public: std::string manipState;
 
-      /// Current mode, either "force", "torque" or "none".
+      /// \brief Current mode, either "force", "torque" or "none".
       public: std::string mode;
 
-      /// Message to request for entity info.
+      /// \brief Message to request for entity info.
       public: msgs::Request *requestMsg;
 
-      /// Publishes the request message.
+      /// \brief Publishes the request message.
       public: transport::PublisherPtr requestPub;
 
-      /// Subscribes to response messages.
+      /// \brief Subscribes to response messages.
       public: transport::SubscriberPtr responseSub;
 
-      /// Pointer to the main window.
+      /// \brief Pointer to the main window.
       public: MainWindow *mainWindow;
 
       /// \brief A list of events connected to this.
