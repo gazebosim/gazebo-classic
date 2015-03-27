@@ -109,7 +109,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.")
     ("profile,o", po::value<std::string>()->default_value(""),
-     "Specify a preset profile name from the options in the world file.");
+     "Specify a physics preset profile name from the options in the world file.");
 
   po::options_description hiddenDesc("Hidden options");
   hiddenDesc.add_options()
