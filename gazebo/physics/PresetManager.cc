@@ -70,7 +70,7 @@ boost::any GetAnySDFValue(const sdf::ElementPtr _elem)
 }
 
 //////////////////////////////////////////////////
-template<typename T> bool CastAnyValue(const boost::any _value, T &_return)
+template<typename T> bool CastAnyValue(const boost::any &_value, T &_return)
 {
   try
   {
@@ -129,9 +129,7 @@ bool Preset::SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine) const
 //////////////////////////////////////////////////
 bool Preset::SetAllParamsFromSDF(const sdf::ElementPtr _elem)
 {
-  bool result = true;
-
-  return this->SetAllParamsHelper(_elem, result);
+  return this->SetAllParamsHelper(_elem, true);
 }
 
 //////////////////////////////////////////////////
