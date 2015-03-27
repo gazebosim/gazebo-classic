@@ -963,19 +963,22 @@ void ModelCreator::RemoveLink(const std::string &_linkName)
   std::string linkName(_linkName);
 
   rendering::ScenePtr scene = link->linkVisual->GetScene();
-  for (auto &it : link->visuals)
+  if (scene)
   {
-    rendering::VisualPtr vis = it.first;
-    scene->RemoveVisual(vis);
-  }
-  scene->RemoveVisual(link->linkVisual);
-  for (auto &colIt : link->collisions)
-  {
-    rendering::VisualPtr vis = colIt.first;
-    scene->RemoveVisual(vis);
-  }
+    for (auto &it : link->visuals)
+    {
+      rendering::VisualPtr vis = it.first;
+      scene->RemoveVisual(vis);
+    }
+    scene->RemoveVisual(link->linkVisual);
+    for (auto &colIt : link->collisions)
+    {
+      rendering::VisualPtr vis = colIt.first;
+      scene->RemoveVisual(vis);
+    }
 
-  scene->RemoveVisual(link->linkVisual);
+    scene->RemoveVisual(link->linkVisual);
+  }
 
   link->linkVisual.reset();
   {
