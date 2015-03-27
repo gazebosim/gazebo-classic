@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,21 @@
  *
 */
 
-#ifndef _TIMEPANEL_TEST_HH_
-#define _TIMEPANEL_TEST_HH_
+#ifndef _GAZEBO_EXTRUDEDIALOG_TEST_HH_
+#define _GAZEBO_EXTRUDEDIALOG_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the TimePanel widget.
-class TimePanel_TEST : public QTestFixture
+/// \brief A test class for the polyline extrude dialog.
+class ExtrudeDialog_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test that the TimePanel gets valid times from the server.
-  private slots: void ValidTimes();
+  /// \brief Test a bad input.
+  private slots: void BadFilename();
 
-  /// \brief Test setting the visibility of TimePanel child widgets.
-  private slots: void Visibility();
+  /// \brief Test getting spin values.
+  private slots: void GetSpinValues();
 };
 
 #endif
