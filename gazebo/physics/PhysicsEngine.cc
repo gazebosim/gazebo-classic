@@ -275,3 +275,9 @@ ContactManager *PhysicsEngine::GetContactManager() const
 {
   return this->contactManager;
 }
+
+//////////////////////////////////////////////////
+sdf::ElementPtr PhysicsEngine::GetSDF() const
+{
+  return this->sdf;
+}
