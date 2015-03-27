@@ -36,30 +36,57 @@ JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
   this->configWidget = new ConfigWidget;
   msgs::Joint jointMsg;
   configWidget->Load(&jointMsg);
-  generalLayout->addWidget(this->configWidget);
 
-  // set default values
-  // TODO: auto-fill them with SDF defaults
+  QScrollArea *scrollArea = new QScrollArea;
+  scrollArea->setWidget(configWidget);
+
+  generalLayout->setContentsMargins(0, 0, 0, 0);
+  generalLayout->addWidget(scrollArea);
+
+  // fill them with SDF default values
+  sdf::ElementPtr jointElem = msgs::JointToSDF(jointMsg);
+  sdf::ElementPtr axisElem = jointElem->GetElement("axis");
+  sdf::ElementPtr axisLimitElem = axisElem->GetElement("limit");
+  sdf::ElementPtr odeElem = jointElem->GetElement("physics")->GetElement("ode");
   for (unsigned int i = 0; i < 2u; ++i)
   {
     std::stringstream axis;
     axis << "axis" << i+1;
     std::string axisStr = axis.str();
     this->configWidget->SetVector3WidgetValue(axisStr + "::xyz",
-        math::Vector3::UnitZ);
+        axisElem->Get<math::Vector3>("xyz"));
     this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_lower",
-        -GZ_DBL_MAX);
+        axisLimitElem->Get<double>("lower"));
     this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_upper",
-        GZ_DBL_MAX);
-    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_effort", -1);
-    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_velocity", -1);
-    this->configWidget->SetDoubleWidgetValue(axisStr + "::damping", 0.0);
+        axisLimitElem->Get<double>("upper"));
+    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_effort",
+        axisLimitElem->Get<double>("effort"));
+    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_velocity",
+        axisLimitElem->Get<double>("velocity"));
+    this->configWidget->SetDoubleWidgetValue(axisStr + "::damping",
+        axisElem->GetElement("dynamics")->Get<double>("damping"));
+    this->configWidget->SetDoubleWidgetValue(axisStr + "::friction",
+        axisElem->GetElement("dynamics")->Get<double>("friction"));
     this->configWidget->SetBoolWidgetValue(axisStr + "::parent_model_frame",
-        false);
+        axisElem->Get<bool>("use_parent_model_frame"));
   }
 
-  this->configWidget->SetDoubleWidgetValue("limit_erp", 0.2);
-  this->configWidget->SetDoubleWidgetValue("suspension_erp", 0.2);
+  this->configWidget->SetDoubleWidgetValue("cfm",
+      odeElem->Get<double>("cfm"));
+  this->configWidget->SetDoubleWidgetValue("bounce",
+      odeElem->Get<double>("bounce"));
+  this->configWidget->SetDoubleWidgetValue("velocity",
+      odeElem->Get<double>("velocity"));
+  this->configWidget->SetDoubleWidgetValue("fudge_factor",
+      odeElem->Get<double>("fudge_factor"));
+  this->configWidget->SetDoubleWidgetValue("limit_cfm",
+      odeElem->GetElement("limit")->Get<double>("cfm"));
+  this->configWidget->SetDoubleWidgetValue("limit_erp",
+      odeElem->GetElement("limit")->Get<double>("erp"));
+  this->configWidget->SetDoubleWidgetValue("suspension_cfm",
+      odeElem->GetElement("suspension")->Get<double>("cfm"));
+  this->configWidget->SetDoubleWidgetValue("suspension_erp",
+      odeElem->GetElement("suspension")->Get<double>("erp"));
 
   this->configWidget->SetWidgetVisible("id", false);
   this->configWidget->SetWidgetVisible("parent_id", false);
@@ -94,6 +121,10 @@ JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(generalLayout);
   mainLayout->addLayout(buttonsLayout);
+
+  this->setMinimumWidth(685);
+  this->setMinimumHeight(850);
+
   this->setLayout(mainLayout);
 }
 
