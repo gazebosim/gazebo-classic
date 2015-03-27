@@ -1123,7 +1123,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     //////////////////////////////////////////////////////
 #ifdef PENETRATION_JVERROR_CORRECTION
     params_erp[thread_id].stepsize = stepsize;
-    params_erp[thread_id].vnew  = vnew;
+    params_erp[thread_id].vnew  = vnew_erp;  /// \TODO need to allocate vnew_erp
 #endif
     params_erp[thread_id].qs  = qs;
     // if every one reorders constraints, this might just work
