@@ -3,6 +3,11 @@
 This documentation describes how to set up a workspace for trying to compile
 Gazebo on Windows.  It does not actually work yet.
 
+## Important requirement: 30Gb free disk space 
+
+It is recommended to have at least 30 Gigabytes of disk space to host Gazebo 
+sources together with all the dependencies and compilation artifacts.
+
 ## Supported compilers
 
 At this moment, compilation has been testewd on Windows 7 and is supported when
