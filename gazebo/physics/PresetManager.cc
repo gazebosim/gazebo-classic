@@ -289,7 +289,7 @@ bool PresetManager::CurrentProfile(const std::string &_name)
     return false;
 
   // For now, ignore the return value of this function, since not all
-  // paramteres are supported
+  // parameters are supported
   this->CurrentPreset()->SetAllPhysicsParameters(
       this->dataPtr->physicsEngine);
   return true;
