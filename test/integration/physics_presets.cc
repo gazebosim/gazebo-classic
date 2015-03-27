@@ -285,6 +285,12 @@ TEST_F(PresetManagerTest, BackwardsCompatibilityTest)
   }
 }
 
+/////////////////////////////////////////////////
+TEST_F(PresetManagerTest, CommandLineInterface)
+{
+  // Test setting the thing from command line
+}
+
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PresetManagerTest,
                         PHYSICS_ENGINE_VALUES);
 

@@ -136,11 +136,7 @@ TEST_F(PresetManagerTest, CreateRemoveProfile)
   EXPECT_FALSE(presetManager->GetProfileParam("preset_1", "max_step_size",
       value));
 
-  for (auto const &profile : presetManager->AllProfiles())
-  {
-    if (profile == "preset_1")
-      FAIL();
-  }
+  EXPECT_FALSE(presetManager->HasProfile("preset_1"));
 
   // Create a profile using (name)
   EXPECT_FALSE(presetManager->CreateProfile(""));

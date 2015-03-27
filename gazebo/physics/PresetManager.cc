@@ -276,7 +276,7 @@ bool PresetManager::CurrentProfile(const std::string &_name)
   if (_name == this->CurrentProfile())
     return true;
 
-  if (this->dataPtr->presetProfiles.count(_name) == 0)
+  if (!this->HasProfile(_name))
   {
     gzwarn << "Profile [" << _name << "] not found." << std::endl;
     return false;
@@ -321,8 +321,7 @@ bool PresetManager::SetProfileParam(const std::string &_profileName,
     return this->SetCurrentProfileParam(_key, _value);
   }
 
-  if (_profileName.empty() ||
-      this->dataPtr->presetProfiles.count(_profileName) == 0)
+  if (_profileName.empty() || !this->HasProfile(_profileName))
   {
     gzwarn << "Invalid profile name: [" << _profileName << "]" << std::endl;
     return false;
@@ -346,8 +345,7 @@ bool PresetManager::SetProfileParam(const std::string &_profileName,
 bool PresetManager::GetProfileParam(const std::string &_name,
     const std::string &_key, boost::any &_value) const
 {
-  if (_name.empty() ||
-      this->dataPtr->presetProfiles.count(_name) == 0)
+  if (_name.empty() || !this->HasProfile(_name))
   {
     return false;
   }
@@ -399,7 +397,7 @@ bool PresetManager::CreateProfile(const std::string &_name)
     gzwarn << "Specified profile name was invalid. Aborting." << std::endl;
     return false;
   }
-  if (this->dataPtr->presetProfiles.count(_name) != 0)
+  if (this->HasProfile(_name))
   {
     gzwarn << "Warning: profile [" << _name << "] already exists! Overwriting."
            << std::endl;
@@ -434,7 +432,7 @@ std::string PresetManager::CreateProfile(const sdf::ElementPtr _elem)
 //////////////////////////////////////////////////
 void PresetManager::RemoveProfile(const std::string &_name)
 {
-  if (this->dataPtr->presetProfiles.count(_name) == 0)
+  if (!this->HasProfile(_name))
   {
     gzwarn << "Cannot remove non-existent profile [" << _name << "]"
            << std::endl;
@@ -450,9 +448,15 @@ void PresetManager::RemoveProfile(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+bool PresetManager::HasProfile(const std::string &_name) const
+{
+  return this->dataPtr->presetProfiles.count(_name) > 0;
+}
+
+//////////////////////////////////////////////////
 sdf::ElementPtr PresetManager::ProfileSDF(const std::string &_name) const
 {
-  if (_name.empty() || this->dataPtr->presetProfiles.count(_name) == 0)
+  if (_name.empty() || !this->HasProfile(_name))
   {
     gzerr << "Profile [" << _name << "] does not exist. Returning NULL "
           << "SDF pointer." << std::endl;
@@ -466,7 +470,7 @@ sdf::ElementPtr PresetManager::ProfileSDF(const std::string &_name) const
 void PresetManager::ProfileSDF(const std::string &_name,
     const sdf::ElementPtr _sdf)
 {
-  if (_name.empty() || this->dataPtr->presetProfiles.count(_name) == 0)
+  if (_name.empty() || !this->HasProfile(_name))
     return;
   this->dataPtr->presetProfiles[_name].SDF(_sdf);
 
@@ -521,7 +525,7 @@ void PresetManager::GeneratePresetFromSDF(Preset *_preset,
 void PresetManager::GenerateSDFFromPreset(sdf::ElementPtr &_elem,
     const std::string &_name) const
 {
-  if (this->dataPtr->presetProfiles.count(_name) == 0)
+  if (!this->HasProfile(_name))
   {
     gzwarn << "Profile [" << _name << "] does not exist. No SDF will be "
            << "generated." << std::endl;

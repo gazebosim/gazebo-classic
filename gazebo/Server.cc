@@ -267,11 +267,20 @@ bool Server::ParseArgs(int _argc, char **_argv)
     if (!this->LoadFile(configFilename, physics))
       return false;
 
+    std::string profileName = this->vm["profile"].as<std::string>();
     if (this->vm.count("profile") &&
-        this->vm["profile"].as<std::string>().size() > 0)
+        profileName.size() > 0)
     {
-      physics::get_world()->GetPresetManager()->CurrentProfile(
-          this->vm["profile"].as<std::string>());
+      if (physics::get_world()->GetPresetManager()->HasProfile(profileName))
+      {
+        physics::get_world()->GetPresetManager()->CurrentProfile(profileName);
+        gzmsg << "Setting physics profile to [" << profileName << "]." << std::endl;
+      }
+      else
+      {
+        gzerr << "Specified profile [" << profileName << "] was not found."
+              << std::endl;
+      }
     }
   }
 

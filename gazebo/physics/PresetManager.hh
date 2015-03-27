@@ -178,6 +178,11 @@ namespace gazebo
       /// \param[in] _name The name of the profile to remove.
       public: void RemoveProfile(const std::string &_name);
 
+      /// \brief Determine if we have a profile.
+      /// \param[in] _name The name of the profile to find.
+      /// \return True if we have the profile, false otherwise
+      public: bool HasProfile(const std::string &_name) const;
+
       /// \brief Get the SDF for a profile.
       /// \param[in] _name The name of the profile to be accessed.
       /// \return Pointer to the SDF physics element representing the profile.
