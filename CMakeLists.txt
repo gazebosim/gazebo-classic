@@ -199,9 +199,11 @@ if(NOT DEFINED USE_UPSTREAM_CFLAGS OR USE_UPSTREAM_CFLAGS)
 endif()
 
 # Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
+if (NOT MSVC)
 filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
                                -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow
 			       -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
+endif()
 
 # Check and add visibility hidden by default. Only in UNIX
 # Windows and MacosX does not handled properly the hidden compilation
