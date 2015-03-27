@@ -102,6 +102,7 @@ void TimePanel_TEST::ValidTimes()
     cam->Fini();
     mainWindow->close();
     delete mainWindow;
+    delete timePanel;
   }
 }
 
@@ -164,6 +165,7 @@ void TimePanel_TEST::Visibility()
   QVERIFY(realTimeEdit->isVisible());
   QVERIFY(stepButton->isVisible());
   QVERIFY(iterationsEdit->isVisible());
+  delete timePanel;
 }
 
 /////////////////////////////////////////////////
@@ -184,6 +186,7 @@ void TimePanel_TEST::SetPaused()
 
   timePanel->SetPaused(false);
   QVERIFY(!timePanel->IsPaused());
+  delete timePanel;
 }
 
 // Generate a main function for the test

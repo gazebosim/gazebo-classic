@@ -232,6 +232,7 @@ void Visual::Fini()
   }
 
   RTShaderSystem::Instance()->DetachEntity(this);
+  this->dataPtr->scene.reset();
 }
 
 /////////////////////////////////////////////////
@@ -455,7 +456,6 @@ void Visual::Load(sdf::ElementPtr _sdf)
 {
   this->dataPtr->sdf->Copy(_sdf);
   this->Load();
-  this->dataPtr->scene->AddVisual(shared_from_this());
 }
 
 //////////////////////////////////////////////////
@@ -603,6 +603,7 @@ void Visual::Load()
   // Allow the mesh to cast shadows
   this->SetCastShadows(this->dataPtr->sdf->Get<bool>("cast_shadows"));
   this->LoadPlugins();
+  this->dataPtr->scene->AddVisual(shared_from_this());
 }
 
 //////////////////////////////////////////////////
@@ -1901,7 +1902,7 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
 DynamicLines *Visual::CreateDynamicLine(RenderOpType _type)
 {
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
-      boost::bind(&Visual::Update, shared_from_this()));
+      boost::bind(&Visual::Update, this));
 
   DynamicLines *line = new DynamicLines(_type);
   this->dataPtr->lines.push_back(line);
@@ -3001,6 +3002,11 @@ uint32_t Visual::GetId() const
 //////////////////////////////////////////////////
 void Visual::SetId(uint32_t _id)
 {
+  if (this->dataPtr->id == _id)
+    return;
+
+  // set new id and also let the scene know that the id has changed.
+  this->dataPtr->scene->SetVisualId(shared_from_this(), _id);
   this->dataPtr->id = _id;
 }
 
