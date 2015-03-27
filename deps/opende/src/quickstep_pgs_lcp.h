@@ -42,9 +42,9 @@ void PGS_LCP (dxWorldProcessContext *context,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
-  dxQuickStepParameters *qs,
+  dxQuickStepParameters *qs
 #ifdef USE_TPROW
-  boost::threadpool::pool* row_threadpool
+  , boost::threadpool::pool* row_threadpool
 #endif
 #ifdef PENETRATION_JVERROR_CORRECTION
   , const dReal stepsize

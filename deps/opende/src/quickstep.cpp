@@ -493,9 +493,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
                caccel,caccel_erp,cforce,
                rhs,rhs_erp,rhs_precon,
                lo,hi,cfm,findex,
-               &world->qs,
+               &world->qs
 #ifdef USE_TPROW
-               world->row_threadpool
+               , world->row_threadpool
 #endif
 #ifdef PENETRATION_JVERROR_CORRECTION
                , stepsize

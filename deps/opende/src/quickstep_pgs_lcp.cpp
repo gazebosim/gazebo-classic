@@ -769,6 +769,11 @@ static void ComputeRows(
   double end_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
   printf("      quickstep row thread %d start time %f ended time %f duration %f\n",thread_id,cur_time,end_time,end_time - cur_time);
   #endif
+
+  if (skip_friction)
+    IFTIMING (dTimerNow ("ComputeRows_erp ends"));
+  else
+    IFTIMING (dTimerNow ("ComputeRows ends"));
 }
 
 //***************************************************************************
@@ -792,9 +797,9 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
-  dxQuickStepParameters *qs,
+  dxQuickStepParameters *qs
 #ifdef USE_TPROW
-  boost::threadpool::pool* row_threadpool
+  , boost::threadpool::pool* row_threadpool
 #endif
 #ifdef PENETRATION_JVERROR_CORRECTION
   , const dReal stepsize
@@ -1113,10 +1118,12 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     else //automatically skip threadpool if only 1 thread allocated
       ComputeRows(thread_id,order, body, params[thread_id], mutex);
 #else
-    ComputeRows(thread_id,order, body, params[thread_id], mutex);
+    boost::thread params_thread(ComputeRows, thread_id,order, body, params[thread_id], mutex);
+    // ComputeRows(thread_id,order, body, params[thread_id], mutex);
 #endif
 
 
+    IFTIMING (dTimerNow ("start pgs_erp rows"));
     //////////////////////////////////////////////////////
     /// repeat for position projection
     /// setup params_erp for ComputeRows
@@ -1175,7 +1182,9 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     ComputeRows(thread_id,order, body, params_erp[thread_id], mutex);
 #endif
 
-
+    IFTIMING (dTimerNow ("wait for params threads"));
+    params_thread.join();
+    IFTIMING (dTimerNow ("params threads done"));
   }
 
 
@@ -1190,7 +1199,6 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     row_threadpool->wait();
   IFTIMING (dTimerNow ("threads done"));
 #endif
-
 
 
   #ifdef REPORT_THREAD_TIMING
