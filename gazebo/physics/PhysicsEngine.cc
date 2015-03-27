@@ -206,6 +206,7 @@ bool PhysicsEngine::SetParam(const std::string &_key,
   {
     if (_key == "type")
     {
+      // Cannot set physics engine type from SetParam
       return false;
     }
     if (_key == "max_step_size")
