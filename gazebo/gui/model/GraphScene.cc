@@ -15,6 +15,7 @@
  *
 */
 
+#include <iostream>
 #include "gazebo/gui/model/GraphScene.hh"
 
 using namespace gazebo;

@@ -99,11 +99,6 @@ class QGVCORE_EXPORT QGVScene : public QGraphicsScene
 
     QGVGvcPrivate *_context;
     QGVGraphPrivate *_graph;
-    // QFont _font;
-
-    // QList<QGVNode*> _nodes;
-    // QList<QGVEdge*> _edges;
-    // QList<QGVSubGraph*> _subGraphs;
 
     QMap<QString, QGVNode*> _nodes;
     QMap<QPair<QString, QString>, QGVEdge*> _edges;

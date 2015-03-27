@@ -111,9 +111,9 @@ void SchematicViewWidget::AddNode(const std::string &_node)
 }
 
 /////////////////////////////////////////////////
-int SchematicViewWidget::GetNodeCount() const
+unsigned int SchematicViewWidget::GetNodeCount() const
 {
-  return this->scene->nodeCount();
+  return static_cast<unsigned int>(this->scene->nodeCount());
 }
 
 /////////////////////////////////////////////////
@@ -121,7 +121,7 @@ void SchematicViewWidget::RemoveNode(const std::string &_node)
 {
   std::string node = this->GetLeafName(_node);
 
-  if (this->scene->HasNode(node))
+  if (!this->scene->HasNode(node))
     return;
 
   // this must be called before making changes to the graph
@@ -167,9 +167,9 @@ void SchematicViewWidget::RemoveEdge(const std::string &_id)
 }
 
 /////////////////////////////////////////////////
-int SchematicViewWidget::GetEdgeCount() const
+unsigned int SchematicViewWidget::GetEdgeCount() const
 {
-  return this->scene->nodeCount();
+  return static_cast<unsigned int>(this->scene->edgeCount());
 }
 
 /////////////////////////////////////////////////

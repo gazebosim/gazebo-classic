@@ -52,7 +52,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->svWidget = NULL;
 #ifdef HAVE_GRAPHVIZ
   RenderWidget *renderWidget = _mainWindow->GetRenderWidget();
-  this->svWidget = new gazebo::gui::SchematicViewWidget(renderWidget);
+  this->svWidget = new SchematicViewWidget(renderWidget);
   this->svWidget->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Expanding);
   this->svWidget->Init();

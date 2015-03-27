@@ -160,7 +160,6 @@ target_link_libraries(gazebo_gui
   gazebo_msgs
   gazebo_gui_building
   gazebo_gui_model
-#  gazebo_gui_model_sv
   gazebo_gui_terrain
   gazebo_gui_viewers
   gzqtpropertybrowser
@@ -180,7 +179,6 @@ target_link_libraries(gzclient
   gazebo_gui
   gazebo_gui_building
   gazebo_gui_model
-#  gazebo_gui_model_sv
   gazebo_gui_terrain
   gazebo_gui_viewers
   gzqtpropertybrowser

@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -34,7 +35,7 @@ namespace gazebo
 
     /// \class SchematicViewWidget SchematicViewWidget.hh
     /// \brief The parent widget of the CML editor
-    class SchematicViewWidget : public QWidget
+    class GAZEBO_VISIBLE SchematicViewWidget : public QWidget
     {
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
@@ -61,7 +62,7 @@ namespace gazebo
       /// \param[in] _id Unique id of edge.
       /// \param[in] _name Name of edge.
       /// \param[in] _parent Name of parent node.
-      /// \param[in] _cgukd Name of child node.
+      /// \param[in] _child Name of child node.
       public: void AddEdge(const std::string &_id, const std::string &_name,
           const std::string &_parent, const std::string &_child);
 
@@ -72,11 +73,11 @@ namespace gazebo
 
       /// \brief Get number of nodes in the scene.
       /// \return Number of nodes.
-      public: int GetNodeCount() const;
+      public: unsigned int GetNodeCount() const;
 
       /// \brief Get number of edges in the scene.
-      /// \return Number of nodes.
-      public: int GetEdgeCount() const;
+      /// \return Number of edges.
+      public: unsigned int GetEdgeCount() const;
 
       /// \brief Helper function to get the leaf name from a scoped name.
       /// \param[in] _scopedName Scoped name.
