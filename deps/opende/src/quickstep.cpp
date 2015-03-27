@@ -237,7 +237,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
   int *jb = NULL;
   int *findex;
 
+#ifdef PENETRATION_JVERROR_CORRECTION
   dReal *vnew = NULL; // used by PENETRATION_JVERROR_CORRECTION
+#endif
 
   dReal *cforce = context->AllocateArray<dReal> (nb*6);
   dReal *caccel = context->AllocateArray<dReal> (nb*6);
@@ -482,16 +484,23 @@ void dxQuickStepper (dxWorldProcessContext *context,
     BEGIN_STATE_SAVE(context, lcpstate) {
       IFTIMING (dTimerNow ("solving LCP problem"));
       // solve the LCP problem and get lambda and invM*constraint_force
-      PGS_LCP (context,m,nb,J,J_precon,J_orig,vnew,jb,body,
+      PGS_LCP (context,m,nb,J,J_precon,J_orig,
+#ifdef PENETRATION_JVERROR_CORRECTION
+               vnew,
+#endif
+               jb,body,
                invMOI,MOI,lambda,lambda_erp,
                caccel,caccel_erp,cforce,
                rhs,rhs_erp,rhs_precon,
                lo,hi,cfm,findex,
                &world->qs,
 #ifdef USE_TPROW
-               world->row_threadpool,
+               world->row_threadpool
 #endif
-               stepsize);
+#ifdef PENETRATION_JVERROR_CORRECTION
+               , stepsize
+#endif
+      );
 
     } END_STATE_SAVE(context, lcpstate);
 
@@ -875,7 +884,9 @@ size_t dxEstimateQuickStepMemoryRequirements (
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J_precon
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J_orig
+#ifdef PENETRATION_JVERROR_CORRECTION
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for vnew
+#endif
       sub1_res2 += 3 * dEFFICIENT_SIZE(sizeof(dReal) * m); // for cfm, lo, hi
       sub1_res2 += 2 * dEFFICIENT_SIZE(sizeof(dReal) * m); // for rhs, rhs_erp
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for rhs_precon

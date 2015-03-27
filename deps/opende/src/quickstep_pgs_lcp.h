@@ -31,16 +31,25 @@ namespace ode {
 
 // PGS_LCP was previously named SOR_LCP
 void PGS_LCP (dxWorldProcessContext *context,
-  const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, dRealMutablePtr vnew, int *jb, dxBody * const *body,
-  dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
+  const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon,
+  dRealMutablePtr J_orig,
+#ifdef PENETRATION_JVERROR_CORRECTION
+  dRealMutablePtr vnew,
+#endif
+  int *jb, dxBody * const *body,
+  dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda,
+  dRealMutablePtr lambda_erp,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
   dxQuickStepParameters *qs,
 #ifdef USE_TPROW
-  boost::threadpool::pool* row_threadpool,
+  boost::threadpool::pool* row_threadpool
 #endif
-  const dReal stepsize); 
+#ifdef PENETRATION_JVERROR_CORRECTION
+  , const dReal stepsize
+#endif
+  ); 
 
 size_t EstimatePGS_LCPMemoryRequirements(int m,int /*nb*/);
 

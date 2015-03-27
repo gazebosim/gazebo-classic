@@ -75,18 +75,21 @@ static void ComputeRows(
   dRealPtr        Ad           = params.Ad;
   dRealPtr        Adcfm        = params.Adcfm;
   dRealPtr        Adcfm_precon = params.Adcfm_precon;
-  dRealMutablePtr rhs          = params.rhs;
-  dRealMutablePtr rhs_erp      = params.rhs_erp;
-  dRealMutablePtr J            = params.J;
-  dRealMutablePtr caccel       = params.caccel;
-  dRealMutablePtr caccel_erp   = params.caccel_erp;
-  dRealMutablePtr lambda       = params.lambda;
-  dRealMutablePtr lambda_erp   = params.lambda_erp;
-  dRealMutablePtr iMJ          = params.iMJ;
-  dRealMutablePtr rhs_precon   = params.rhs_precon;
-  dRealMutablePtr J_precon     = params.J_precon;
-  dRealMutablePtr J_orig       = params.J_orig;
+  dRealPtr        J            = params.J;
+  dRealPtr        iMJ          = params.iMJ;
+  dRealPtr        rhs_precon   = params.rhs_precon;
+  dRealPtr        J_precon     = params.J_precon;
+  dRealPtr        J_orig       = params.J_orig;
   dRealMutablePtr cforce       = params.cforce;
+
+  dRealPtr        rhs          = params.rhs;
+  dRealMutablePtr caccel       = params.caccel;
+  dRealMutablePtr lambda       = params.lambda;
+
+  dRealPtr        rhs_erp      = params.rhs_erp;
+  dRealMutablePtr caccel_erp   = params.caccel_erp;
+  dRealMutablePtr lambda_erp   = params.lambda_erp;
+
 #ifdef REORDER_CONSTRAINTS
   dRealMutablePtr last_lambda  = params.last_lambda;
   dRealMutablePtr last_lambda_erp  = params.last_lambda_erp;
@@ -887,16 +890,25 @@ static void ComputeRows(
 // rhs, lo and hi are modified on exit
 //
 void quickstep::PGS_LCP (dxWorldProcessContext *context,
-  const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, dRealMutablePtr vnew, int *jb, dxBody * const *body,
-  dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
+  const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon,
+  dRealMutablePtr J_orig,
+#ifdef PENETRATION_JVERROR_CORRECTION
+  dRealMutablePtr vnew,
+#endif
+  int *jb, dxBody * const *body,
+  dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda,
+  dRealMutablePtr lambda_erp,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
   dxQuickStepParameters *qs,
 #ifdef USE_TPROW
-  boost::threadpool::pool* row_threadpool,
+  boost::threadpool::pool* row_threadpool
 #endif
-  const dReal stepsize)
+#ifdef PENETRATION_JVERROR_CORRECTION
+  , const dReal stepsize
+#endif
+  )
 {
 
   // precompute iMJ = inv(M)*J'
@@ -1150,12 +1162,15 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     if (nEnd > m) nEnd = m;
     // if every one reorders constraints, this might just work
     // comment out below if using defaults (0 and m) so every thread runs through all joints
+#ifdef PENETRATION_JVERROR_CORRECTION
+    params[thread_id].stepsize = stepsize;
+    params[thread_id].vnew  = vnew ;
+#endif
     params[thread_id].qs  = qs ;
     params[thread_id].nStart = nStart;   // 0
     params[thread_id].nChunkSize = nEnd - nStart; // m
     params[thread_id].m = m; // m
     params[thread_id].nb = nb;
-    params[thread_id].stepsize = stepsize;
     params[thread_id].jb = jb;
     params[thread_id].findex = findex;
     params[thread_id].hi = hi;
@@ -1171,7 +1186,6 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     params[thread_id].J_precon  = J_precon ;
     params[thread_id].J_orig  = J_orig ;
     params[thread_id].cforce  = cforce ;
-    params[thread_id].vnew  = vnew ;
 
     params[thread_id].rhs = rhs;
     params[thread_id].caccel = caccel;
@@ -1192,7 +1206,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
 #endif
 #ifdef USE_TPROW
     if (row_threadpool && row_threadpool->size() > 0)
-      row_threadpool->schedule(boost::bind(ComputeRows,thread_id,order, body, params[thread_id], mutex));
+      row_threadpool->schedule(boost::bind(ComputeRows,thread_id,order,
+      body, params[thread_id], mutex));
     else //automatically skip threadpool if only 1 thread allocated
       ComputeRows(thread_id,order, body, params[thread_id], mutex);
 #else

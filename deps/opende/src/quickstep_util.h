@@ -118,7 +118,10 @@ struct dxPGSLCPParameters {
     int nChunkSize;
     int m; // m
     int nb;
+#ifdef PENETRATION_JVERROR_CORRECTION
     dReal stepsize;
+    dRealMutablePtr vnew;
+#endif
     int* jb;
     const int* findex;
     dRealPtr hi;
@@ -128,19 +131,20 @@ struct dxPGSLCPParameters {
     dRealPtr Ad;
     dRealPtr Adcfm;
     dRealPtr Adcfm_precon;
-    dRealMutablePtr rhs;
-    dRealMutablePtr rhs_erp;
-    dRealMutablePtr J;
-    dRealMutablePtr caccel;
-    dRealMutablePtr caccel_erp;
-    dRealMutablePtr lambda;
-    dRealMutablePtr lambda_erp;
-    dRealMutablePtr iMJ;
-    dRealMutablePtr rhs_precon ;
-    dRealMutablePtr J_precon ;
-    dRealMutablePtr J_orig ;
+    dRealPtr J;
+    dRealPtr iMJ;
+    dRealPtr rhs_precon ;
+    dRealPtr J_precon ;
+    dRealPtr J_orig ;
     dRealMutablePtr cforce ;
-    dRealMutablePtr vnew ;
+
+    dRealPtr rhs;
+    dRealMutablePtr caccel;
+    dRealMutablePtr lambda;
+
+    dRealPtr rhs_erp;
+    dRealMutablePtr caccel_erp;
+    dRealMutablePtr lambda_erp;
 #ifdef REORDER_CONSTRAINTS
     dRealMutablePtr last_lambda ;
     dRealMutablePtr last_lambda_erp ;
