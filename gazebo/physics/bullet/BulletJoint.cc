@@ -481,6 +481,9 @@ void BulletJoint::ApplyStiffnessDamping()
 {
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
   {
+    bool explicitStiffnessDamping = false;
+    if (explicitStiffnessDamping)
+    {
     // Take absolute value of dissipationCoefficient, since negative values of
     // dissipationCoefficient are used for adaptive damping to
     // enforce stability.
@@ -494,6 +497,19 @@ void BulletJoint::ApplyStiffnessDamping()
     this->SetForceImpl(i, dampingForce + springForce);
 
     // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
+    }
+    else
+    {
+      btGeneric6DofConstraint stiffnessDampingConstraint;
+      stiffnessDampingConstraint = new btGeneric6DofConstraint(
+        *(bulletChildLink->GetBulletLink()),
+        *(bulletParentLink->GetBulletLink()),
+        BulletTypes::ConvertVector3(pivotChild),
+        BulletTypes::ConvertVector3(pivotParent),
+        BulletTypes::ConvertVector3(axisChild),
+        BulletTypes::ConvertVector3(axisParent);
+        );
+    }
   }
 }
 
