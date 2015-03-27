@@ -201,7 +201,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   }
 
   /// \TODO: debugging threadpool
-  dWorldSetQuickStepThreads(this->dataPtr->worldId, 4);
+  dWorldSetQuickStepThreads(this->dataPtr->worldId, 2);
 
   /// \TODO: defaultvelocity decay!? This is BAD if it's true.
   dWorldSetDamping(this->dataPtr->worldId, 0.0001, 0.0001);
