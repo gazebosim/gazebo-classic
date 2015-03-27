@@ -141,10 +141,14 @@ bool Preset::SetAllParamsHelper(const sdf::ElementPtr _elem, bool _result)
   {
     return _result;
   }
+
+  // Avoid setting parameters that do not match the physics engine type set in
+  // SDF
+
   if (_elem->GetParent() && _elem->GetParent()->GetName() == "physics" &&
       _elem->GetParent()->Get<std::string>("type") != _elem->GetName())
   {
-      return _result;
+    return _result;
   }
 
   for (sdf::ElementPtr elem = _elem->GetFirstElement(); elem;
