@@ -1212,8 +1212,9 @@ void MainWindow::CreateActions()
 
   g_overlayAct = new QAction(tr("GUI Overlays"), this);
   g_overlayAct->setStatusTip(tr("Show GUI Overlays"));
+  g_overlayAct->setEnabled(false);
   g_overlayAct->setCheckable(true);
-  g_overlayAct->setChecked(true);
+  g_overlayAct->setChecked(false);
   connect(g_overlayAct, SIGNAL(triggered()), this, SLOT(ShowGUIOverlays()));
 
   QActionGroup *viewControlActionGroup = new QActionGroup(this);
@@ -1720,6 +1721,9 @@ void MainWindow::OnAddPlugins()
     }
   }
   this->pluginMsgs.clear();
+
+  g_overlayAct->setChecked(true);
+  g_overlayAct->setEnabled(true);
 }
 
 /////////////////////////////////////////////////
