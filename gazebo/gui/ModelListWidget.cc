@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,6 +93,8 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   this->variantManager = new QtVariantPropertyManager();
   this->propTreeBrowser = new QtTreePropertyBrowser();
   this->propTreeBrowser->setObjectName("propTreeBrowser");
+  this->propTreeBrowser->setStyleSheet(
+      "QTreeView::branch:selected:active { background-color: transparent; }");
   this->variantFactory = new QtVariantEditorFactory();
   this->propTreeBrowser->setFactoryForManager(this->variantManager,
                                               this->variantFactory);
@@ -434,7 +436,7 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   }
   else if (_msg->has_type() && _msg->type() == "error")
   {
-    if (_msg->response() == "nonexistant")
+    if (_msg->response() == "nonexistent")
     {
       this->removeEntityList.push_back(this->selectedEntityName);
     }
@@ -509,7 +511,8 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
   if (i >= 0)
   {
     g_modelRightMenu->Run(item->text(0).toStdString(),
-                          this->modelTreeWidget->mapToGlobal(_pt));
+                          this->modelTreeWidget->mapToGlobal(_pt),
+                          ModelRightMenu::EntityTypes::MODEL);
     return;
   }
 
@@ -518,7 +521,8 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
   if (i >= 0)
   {
     g_modelRightMenu->Run(item->text(0).toStdString(),
-                          this->modelTreeWidget->mapToGlobal(_pt));
+                          this->modelTreeWidget->mapToGlobal(_pt),
+                          ModelRightMenu::EntityTypes::LIGHT);
   }
 }
 
@@ -1520,6 +1524,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   else
     item->setValue(true);
   this->AddProperty(item, _parent);
+  item->setEnabled(false);
 
   // gravity
   item = this->variantManager->addProperty(QVariant::Bool, tr("gravity"));
@@ -2054,6 +2059,14 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
   else
     item->setValue(false);
   /// \todo Dynamically setting a model static doesn't currently work.
+  item->setEnabled(false);
+  this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Bool, tr("self_collide"));
+  if (_msg.has_self_collide())
+    item->setValue(_msg.self_collide());
+  else
+    item->setValue(false);
   item->setEnabled(false);
   this->propTreeBrowser->addProperty(item);
 

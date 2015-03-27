@@ -5,7 +5,6 @@ package gazebo.msgs;
 /// \brief Message for creating joint in rendering::Scene
 
 
-import "vector3d.proto";
 import "axis.proto";
 import "pose.proto";
 import "sensor.proto";

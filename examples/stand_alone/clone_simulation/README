@@ -1,0 +1,25 @@
+Clone a simulation Example
+
+This is very simple example of how to clone an existing simulation.
+
+===================
+Build Instructions
+===================
+
+ * From this directory:
+
+  $ mkdir build
+  $ cd build
+  $ cmake ..
+  $ make
+
+
+===================
+Execute Instructions
+===================
+
+ * Launch the example from the build directory above:
+
+  $ ./cloner
+
+ * Follow the instructions detailed in the console.

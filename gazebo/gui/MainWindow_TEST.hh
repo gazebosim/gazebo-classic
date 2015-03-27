@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,17 +25,20 @@ class MainWindow_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Test that Actions created in MainWindow get destroyed.
+  private slots: void ActionCreationDestruction();
+
+  /// \brief Test scene destruction on shutdown
+  private slots: void SceneDestruction();
+
   /// \brief Test user camera entity selection
   private slots: void Selection();
 
   /// \brief Test user camera frames per second
   private slots: void UserCameraFPS();
 
-  /// \brief Test copying and pasting a model
-  private slots: void CopyPasteModel();
-
-  /// \brief Test copying and pasting a light
-  private slots: void CopyPasteLight();
+  /// \brief Test copying and pasting a model and a light
+  private slots: void CopyPaste();
 
   /// \brief Test that trigger of the view wireframe action creates an
   /// appropriate request.
@@ -43,6 +46,9 @@ class MainWindow_TEST : public QTestFixture
 
   /// \brief Test creating a main window with non-default world
   private slots: void NonDefaultWorld();
+
+  /// \brief Test moving the user camera via a joystick message.
+  private slots: void UserCameraJoystick();
 };
 
 #endif

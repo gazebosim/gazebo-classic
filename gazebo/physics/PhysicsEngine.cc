@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,22 +177,7 @@ void PhysicsEngine::SetMaxStepSize(double _stepSize)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetWorldCFM(double /*_cfm*/)
-{
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetWorldERP(double /*_erp*/)
-{
-}
-
-//////////////////////////////////////////////////
 void PhysicsEngine::SetAutoDisableFlag(bool /*_autoDisable*/)
-{
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetContactMaxCorrectingVel(double /*_vel*/)
 {
 }
 
@@ -212,14 +197,42 @@ void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
+bool PhysicsEngine::SetParam(const std::string &_key,
+    const boost::any &_value)
 {
-}
-
-//////////////////////////////////////////////////
-bool PhysicsEngine::SetParam(const std::string &/*_key*/,
-    const boost::any &/*_value*/)
-{
+  try
+  {
+    if (_key == "type")
+    {
+      gzwarn << "Cannot set physics engine type from GetParam." << std::endl;
+      return false;
+    }
+    if (_key == "max_step_size")
+      this->SetMaxStepSize(boost::any_cast<double>(_value));
+    else if (_key == "real_time_update_rate")
+      this->SetRealTimeUpdateRate(boost::any_cast<double>(_value));
+    else if (_key == "real_time_factor")
+      this->SetTargetRealTimeFactor(boost::any_cast<double>(_value));
+    else if (_key == "gravity")
+      this->SetGravity(boost::any_cast<math::Vector3>(_value));
+    else if (_key == "magnetic_field")
+    {
+      this->sdf->GetElement("magnetic_field")->
+          Set(boost::any_cast<math::Vector3>(_value));
+    }
+    else
+    {
+      gzwarn << "SetParam failed for [" << _key << "] in physics engine "
+             << this->GetType() << std::endl;
+      return false;
+    }
+  }
+  catch(boost::bad_any_cast &_e)
+  {
+    gzerr << "Caught bad any_cast in PhysicsEngine::SetParam: " << _e.what()
+          << std::endl;
+    return false;
+  }
   return true;
 }
 
@@ -227,6 +240,32 @@ bool PhysicsEngine::SetParam(const std::string &/*_key*/,
 boost::any PhysicsEngine::GetParam(const std::string &/*_key*/) const
 {
   return 0;
+}
+
+//////////////////////////////////////////////////
+bool PhysicsEngine::GetParam(const std::string &_key,
+    boost::any &_value) const
+{
+  if (_key == "type")
+    _value = this->GetType();
+  else if (_key == "max_step_size")
+    _value = this->GetMaxStepSize();
+  else if (_key == "real_time_update_rate")
+    _value = this->GetRealTimeUpdateRate();
+  else if (_key == "real_time_factor")
+    _value = this->GetTargetRealTimeFactor();
+  else if (_key == "gravity")
+    _value = this->GetGravity();
+  else if (_key == "magnetic_field")
+    _value = this->sdf->Get<math::Vector3>("magnetic_field");
+  else
+  {
+    gzwarn << "GetParam failed for [" << _key << "] in physics engine "
+           << this->GetType() << std::endl;
+    return false;
+  }
+
+  return true;
 }
 
 //////////////////////////////////////////////////

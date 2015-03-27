@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,6 +88,10 @@ namespace gazebo
       /// \brief Remove a scene
       /// \param[in] The scene to remove
       public: void RemoveScene(ScenePtr _scene);
+
+      /// \brief Remove a scene
+      /// \param[in] Name of the scene to remove.
+      public: void RemoveScene(const std::string &_scene);
 
       /// \brief Update the shaders. This should not be called frequently.
       public: void UpdateShaders();

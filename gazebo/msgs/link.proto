@@ -5,7 +5,6 @@ package gazebo.msgs;
 /// \brief Information about a link
 
 
-import "header.proto";
 import "inertial.proto";
 import "collision.proto";
 import "visual.proto";

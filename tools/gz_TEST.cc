@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -201,8 +201,6 @@ TEST_F(gzTest, Joint)
 {
   init();
 
-  std::string expectedStr;
-
   std::string helpOutput = custom_exec_str("gz help joint");
   EXPECT_NE(helpOutput.find("gz joint"), std::string::npos);
 
@@ -301,9 +299,6 @@ TEST_F(gzTest, Model)
 
     waitForMsg("gz model -w default -m my_box -f " + filename);
 
-    std::ifstream ifs(filename.c_str());
-    EXPECT_TRUE(ifs);
-
     boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));
 
@@ -325,9 +320,6 @@ TEST_F(gzTest, Model)
     std::string cmd = "cat ";
     cmd += filename + " | gz model -w default -m my_box -s";
     waitForMsg(cmd);
-
-    std::ifstream ifs(filename.c_str());
-    EXPECT_TRUE(ifs);
 
     boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));
@@ -364,20 +356,24 @@ TEST_F(gzTest, Model)
     modelInfo = custom_exec_str("gz model -m my_box -p");
     boost::algorithm::trim(modelInfo);
 
-    // Split the string into parts.
-    std::vector<std::string> parts;
-    boost::split(parts, modelInfo, boost::is_any_of(" "));
+    // Split the string into parts p.
+    std::vector<std::string> p;
+    boost::split(p, modelInfo, boost::is_any_of(" "));
 
     // Make sure we have the right number of parts.
-    ASSERT_EQ(parts.size(), 6u);
+    // Don't ASSERT_EQ, because we need to run fini at end of test
+    EXPECT_EQ(p.size(), 6u);
 
     // Make sure the pose is correct.
-    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[0]), 0.0);
-    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[1]), 0.0);
-    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[2]), 0.5);
-    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[3]), 0.0);
-    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[4]), 0.0);
-    EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[5]), 0.0);
+    if (p.size() == 6u)
+    {
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[0]), 0.0));
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[1]), 0.0));
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[2]), 0.5));
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[3]), 0.0));
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[4]), 0.0));
+      EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(p[5]), 0.0));
+    }
   }
 
   // Test model delete
@@ -623,8 +619,8 @@ TEST_F(gzTest, SDF)
   descSums["1.0"] = "5235eb8464a96505c2a31fe96327d704e45c9cc4";
   descSums["1.2"] = "27973b2542d7a0f7582a615b245d81797718c89a";
   descSums["1.3"] = "30ffce1c662c17185d23f30ef3af5c110d367e10";
-  descSums["1.4"] = "eb1798699f1926e6e75083970528c598bfa6d7f7";
-  descSums["1.5"] = "15fc37c57a9f970fc999cef62c8d2f821a20c7f7";
+  descSums["1.4"] = "ae07ffdd316b529077a601e58891e8623aafb72b";
+  descSums["1.5"] = "dd9dcf3dda3d31e9c7818cc1e44e59ff90e6b905";
 
   // Test each descSum
   for (std::map<std::string, std::string>::iterator iter = descSums.begin();
@@ -642,8 +638,8 @@ TEST_F(gzTest, SDF)
   docSums["1.0"] = "4cf955ada785adf72503744604ffadcdf13ec0d2";
   docSums["1.2"] = "f84c1cf1b1ba04ab4859e96f6aea881134fb5a9b";
   docSums["1.3"] = "f3dd699687c8922710e4492aadedd1c038d678c1";
-  docSums["1.4"] = "31082d3b9fda88b1ac25588323e31c305937a548";
-  docSums["1.5"] = "cb1f5b9cba7d3dbf428934aca99da8bd9b9d9f34";
+  docSums["1.4"] = "d63ad98596fb26daa24e5a7ee54eee3d54ee379b";
+  docSums["1.5"] = "d98ba4139355f260d7d2d3bdd20472a80e46854e";
 
   // Test each docSum
   for (std::map<std::string, std::string>::iterator iter = docSums.begin();
@@ -674,7 +670,7 @@ TEST_F(gzTest, SDF)
     std::string output =
       custom_exec_str(std::string("gz sdf -p ") + path.string());
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "1da2108b86f3b4aa194ab5c22527759e012b6393");
+    EXPECT_EQ(shasum, "8d705cf60cfdb944764bdc0176050168253aa752");
   }
 
   path = PROJECT_BINARY_PATH;

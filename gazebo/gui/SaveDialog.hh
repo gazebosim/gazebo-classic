@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #define _SAVE_DIALOG_HH_
 
 #include <string>
+#include <sdf/sdf.hh>
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -26,6 +27,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class SaveDialogPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -35,43 +38,72 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \enum SaveMode
+      /// \brief Unique identifiers for all dialog modes.
+      public: enum SaveMode {
+                /// \brief Save model
+                MODEL,
+                /// \brief Save building
+                BUILDING
+              };
+
       /// \brief Constructor.
+      /// \param[in] _mode Mode of the dialog.
       /// \param[in] _parent Parent QWidget.
-      public: SaveDialog(QWidget *_parent = 0);
+      public: SaveDialog(int _mode = 0, QWidget *_parent = 0);
 
       /// \brief Destructor.
       public: ~SaveDialog();
 
-      /// \brief Get name of file.
-      /// \return The name of file.
-      public: std::string GetSaveName() const;
+      /// \brief Get the model name.
+      /// \return The model name.
+      public: std::string GetModelName() const;
 
       /// \brief Get the save location.
       /// \return Path of the save location.
       public: std::string GetSaveLocation() const;
 
-      /// \brief Set the name to save as.
-      /// \param[in] _name Name of file.
-      public: void SetSaveName(const std::string &_name);
+      /// \brief Set the model name.
+      /// \param[in] _name Name to set the model to.
+      public: void SetModelName(const std::string &_name);
 
       /// \brief Set the save location.
       /// \param[in] _location Location to save to.
       public: void SetSaveLocation(const std::string &_location);
 
-      /// \brief Set the message to be displayed.
-      /// \param[in] _msg Message to be displayed.
-      public: void SetMessage(const std::string &_msg);
+      /// \brief Get the model's author's name.
+      /// \return The author's name.
+      public: std::string GetAuthorName() const;
 
-      /// \brief Set the tile of the dialog.
-      /// \param[in] _title Title of dialog.
-      public: void SetTitle(const std::string &_title);
+      /// \brief Get the model's author's email.
+      /// \return The author's email.
+      public: std::string GetAuthorEmail() const;
 
-      /// \brief Set the file extension.
-      /// \param[in] _extension File extension.
-      public: void SetFileExtension(const std::string &_extension);
+      /// \brief Get the model's description.
+      /// \return The model's description.
+      public: std::string GetDescription() const;
 
-      /// \brief Qt event emitted showing the dialog
-      protected: virtual void showEvent(QShowEvent *_event);
+      /// \brief Get the model's version.
+      /// \return The model's version.
+      public: std::string GetVersion() const;
+
+      /// \brief Add the parent folder of _path to the model path represented
+      /// by SystemPaths, notify InsertModelWidget to display the model name in
+      /// the "Insert Models" tab, and write the parent folder filename to
+      /// gui.ini
+      /// \param[in] _path Path to be added.
+      public: void AddDirToModelPaths(const std::string &_path);
+
+       /// \brief Helper function to generate a valid folder name from a
+       /// human-readable model name.
+       /// \param[in] _modelName Human-readable model name.
+       /// \return Folder name.
+      public: std::string GetFolderNameFromModelName(const std::string
+          &_modelName);
+
+      /// \brief Call to execute the dialog.
+      /// \return True if the user accepted the dialog.
+      public: bool OnSaveAs();
 
       /// \brief Qt callback when the file directory browse button is pressed.
       private slots: void OnBrowse();
@@ -80,19 +112,28 @@ namespace gazebo
       private slots: void OnCancel();
 
       /// \brief Qt callback when the Save button is pressed.
-      private slots: void OnSave();
+      private slots: void OnAcceptSave();
 
-      /// \brief Editable line that holds the name.
-      private: QLineEdit *nameLineEdit;
+      /// \brief Get a template config file for a simple model.
+      private: std::string GetTemplateConfigString();
 
-      /// \brief Editable line that holds the save location.
-      private: QLineEdit *locationLineEdit;
+      /// \brief Generate the config file.
+      public: void GenerateConfig();
 
-      /// \brief Message displayed in the dialog.
-      private: QLabel *messageLabel;
+      /// \brief Save config file.
+      public: void SaveToConfig();
 
-      /// \brief File extension.
-      private: std::string fileExtension;
+      /// \brief Save model to SDF format.
+      /// \param[in] _modelSDF Pointer to the model SDF.
+      public: void SaveToSDF(sdf::SDFPtr _modelSDF);
+
+      /// \brief Qt callback to show/hide advanced model saving options.
+      /// \param[in] _checked Whether it is checked or not.
+      private slots: void ToggleAdvancedOptions(bool _checked);
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: SaveDialogPrivate *dataPtr;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,10 @@ namespace gazebo
       /// \param[in] _c The colum index (0, 1, 2)
       /// \param[in] _v The value to set in each row of the column
       public: void SetCol(unsigned int _c, const Vector3 &_v);
+
+      /// \brief Return the inverse matrix
+      /// \return Inverse of this matrix.
+      public: Matrix3 Inverse() const;
 
       /// \brief returns the element wise difference of two matrices
       public: Matrix3 operator-(const Matrix3 &_m) const

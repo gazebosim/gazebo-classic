@@ -9,13 +9,12 @@ project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
-set (GAZEBO_VERSION_NAME "lithium")
-set (GAZEBO_MAJOR_VERSION 4)
-set (GAZEBO_MINOR_VERSION 1)
+set (GAZEBO_MAJOR_VERSION 6)
+set (GAZEBO_MINOR_VERSION 0)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
-set (GAZEBO_PATCH_VERSION 1)
+set (GAZEBO_PATCH_VERSION 0)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
@@ -182,8 +181,12 @@ endif()
 
 #####################################
 # Handle CFlags
+# USE_UPSTREAM_CFLAGS (default TRUE)
+if(NOT DEFINED USE_UPSTREAM_CFLAGS)
+    set (USE_UPSTREAM_CFLAGS True)
+endif()
+
 unset (CMAKE_C_FLAGS_ALL CACHE)
-unset (CMAKE_CXX_FLAGS CACHE)
 
 # USE_HOST_CFLAGS (default TRUE)
 # Will check building host machine for proper cflags
@@ -192,9 +195,11 @@ if(NOT DEFINED USE_HOST_CFLAGS OR USE_HOST_CFLAGS)
   include (${gazebo_cmake_dir}/HostCFlags.cmake)
 endif()
 
-# USE_UPSTREAM_CFLAGS (default TRUE)
 # Will use predefined gazebo developers cflags
-if(NOT DEFINED USE_UPSTREAM_CFLAGS OR USE_UPSTREAM_CFLAGS)
+# this needs to be called after HostCFlags 
+if(USE_UPSTREAM_CFLAGS)
+  # use gazebo own set of flags
+  unset (CMAKE_CXX_FLAGS CACHE)
   message(STATUS "Enable upstream CFlags")
   include(${gazebo_cmake_dir}/DefaultCFlags.cmake)
 endif()

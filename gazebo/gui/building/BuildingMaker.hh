@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
@@ -41,7 +42,7 @@ namespace gazebo
     class EntityMaker;
     class EditorItem;
     class BuildingModelManip;
-    class FinishBuildingDialog;
+    class SaveDialog;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -50,11 +51,29 @@ namespace gazebo
     /// \brief Create and manage 3D visuals of a building.
     class GAZEBO_VISIBLE BuildingMaker : public EntityMaker
     {
+      /// \enum SaveState
+      /// \brief Save states for the building editor.
+      private: enum SaveState
+      {
+        // NEVER_SAVED: The building has never been saved.
+        NEVER_SAVED,
+
+        // ALL_SAVED: All changes have been saved.
+        ALL_SAVED,
+
+        // UNSAVED_CHANGES: Has been saved before, but has unsaved changes.
+        UNSAVED_CHANGES
+      };
+
       /// \brief Constructor
       public: BuildingMaker();
 
       /// \brief Destructor
       public: virtual ~BuildingMaker();
+
+      /// \brief QT callback when entering or leaving building edit mode
+      /// \param[in] _checked True if the menu item is checked
+      public: void OnEdit(bool _checked);
 
       /// \brief Set the name of this building model.
       /// \param[in] _modelName Name of the model to set to.
@@ -140,6 +159,10 @@ namespace gazebo
       public: void DetachManip(const std::string &_child,
           const std::string &_parent);
 
+      /// \brief Detach all child building parts from the given manip.
+      /// \param[in] _manip Name of the building part.
+      public: void DetachAllChildren(const std::string &_manip);
+
       /// \brief Helper method to convert size from editor coordinate system
       /// to Gazebo coordinate system.
       /// \param[in] _size Size vector in pixels.
@@ -185,10 +208,6 @@ namespace gazebo
       /// \return Angle in radians.
       public: static double ConvertAngle(double _angle);
 
-      /// \brief Save model to SDF format.
-      /// \param[in] _savePath Path to save the SDF to.
-      public: void SaveToSDF(const std::string &_savePath);
-
       /// \brief Reset the building maker and the SDF.
       public: void Reset();
 
@@ -203,6 +222,9 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual bool IsActive() const;
+
+      /// \brief Set save state upon a change to the building.
+      public: void BuildingChanged();
 
       // Documentation inherited
       private: virtual void CreateTheEntity();
@@ -241,18 +263,68 @@ namespace gazebo
       private: void SubdivideRectSurface(const QRectF &_surface,
         const std::vector<QRectF> &_holes, std::vector<QRectF> &_subdivisions);
 
+      /// \brief Helper function to manage writing files to disk.
+      private: void SaveModelFiles();
+
       /// \brief Callback for saving the model.
-      private: void OnSave();
+      /// \return True if the user chose to save, false if the user cancelled.
+      private: bool OnSave();
 
-      /// \brief Callback for discarding the model.
-      private: void OnDiscard();
+      /// \brief Callback for selecting a folder and saving the model.
+      /// \return True if the user chose to save, false if the user cancelled.
+      private: bool OnSaveAs();
 
-      /// \brief Callback when the model is to be finished and uploaded on to
-      /// the server.
-      private: void OnDone();
+      /// \brief Callback for when the name is changed through the Palette.
+      /// \param[in] _modelName The newly entered building name.
+      private: void OnNameChanged(const std::string &_modelName);
+
+      /// \brief Callback for newing the model.
+      private: void OnNew();
 
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
+
+      /// \brief Callback received when a level on a building model is to
+      /// be changed.
+      /// \param[in] _level The level that is currently being edited.
+      private: void OnChangeLevel(int _level);
+
+      /// \brief Cancel material modes.
+      private: void StopMaterialModes();
+
+      /// \brief Reset currently hovered visual to the properties it had before
+      /// being hovered.
+      private: void ResetHoverVis();
+
+      /// \brief Callback received when a color has been selected on the
+      /// palette.
+      /// \param[in] _color Selected color.
+      private: void OnColorSelected(QColor _color);
+
+      /// \brief Callback received when a texture has been selected on the
+      /// palette.
+      /// \param[in] _texture Selected texture.
+      private: void OnTextureSelected(QString _texture);
+
+      /// \brief Mouse event filter callback when mouse is moved.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool On3dMouseMove(const common::MouseEvent &_event);
+
+      /// \brief Mouse event filter callback when mouse is pressed.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool On3dMousePress(const common::MouseEvent &_event);
+
+      /// \brief Mouse event filter callback when mouse is released.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool On3dMouseRelease(const common::MouseEvent &_event);
+
+      /// \brief Key event filter callback when key is pressed.
+      /// \param[in] _event The key event.
+      /// \return True if the event was handled
+      private: bool On3dKeyPress(const common::KeyEvent &_event);
 
       /// \brief Conversion scale used by the Convert helper functions.
       public: static double conversionScale;
@@ -270,11 +342,14 @@ namespace gazebo
       /// \brief Name of the building model.
       private: std::string modelName;
 
-      /// \brief The root visual of the building model.
-      private: rendering::VisualPtr modelVisual;
+      /// \brief Folder name, which is the model name without spaces.
+      private: std::string folderName;
 
-      /// \brief The pose of the building model.
-      private: math::Pose modelPose;
+      /// \brief Name of the building model preview.
+      private: static const std::string previewName;
+
+      /// \brief The root visual of the building model preview.
+      private: rendering::VisualPtr previewVisual;
 
       /// \brief Counter for the number of walls in the model.
       private: int wallCounter;
@@ -291,24 +366,31 @@ namespace gazebo
       /// \brief Counter for the number of floors in the model.
       private: int floorCounter;
 
-      /// \brief Indicate whether the model has been saved before or not.
-      private: bool saved;
-
-      /// \brief Path to where the model is saved.
-      private: std::string saveLocation;
+      /// \brief Store the current save state of the model.
+      private: enum SaveState currentSaveState;
 
       /// \brief A list of gui editor events connected to the building maker.
       private: std::vector<event::ConnectionPtr> connections;
 
       /// \brief Default name of building model
-      private: std::string buildingDefaultName;
+      private: static const std::string buildingDefaultName;
 
       /// \brief A dialog for setting building model name and save location.
-      private: FinishBuildingDialog *saveDialog;
+      private: SaveDialog *saveDialog;
 
-      /// \brief A dialog that prompts to confirm model completion and uploading
-      /// to the server
-      private: FinishBuildingDialog *finishDialog;
+      /// \brief Visual that is currently hovered over by the mouse.
+      private: rendering::VisualPtr hoverVis;
+
+      /// \brief The color currently selected. If none is selected, it will be
+      /// QColor::Invalid.
+      private: QColor selectedColor;
+
+      /// \brief The texture currently selected. If none is selected, it will be
+      /// an empty string.
+      private: QString selectedTexture;
+
+      /// \brief The current level that is being edited.
+      private: int currentLevel;
     };
     /// \}
   }

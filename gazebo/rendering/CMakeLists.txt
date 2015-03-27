@@ -2,14 +2,14 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
-  ${CEGUI_INCLUDE_DIRS}
   skyx
   skyx/include
 )
 
-if (${OGRE_VERSION} GREATER 1.7.4)
+if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
   add_subdirectory(deferred_shading)
 endif()
+
 add_subdirectory(skyx)
 add_subdirectory(selection_buffer)
 
@@ -22,13 +22,14 @@ set (sources
   ContactVisual.cc
   Conversions.cc
   DepthCamera.cc
+  Distortion.cc
   DynamicLines.cc
   DynamicRenderable.cc
   FPSViewController.cc
   GpuLaser.cc
   Grid.cc
-  GUIOverlay.cc
   Heightmap.cc
+  InertiaVisual.cc
   JointVisual.cc
   LaserVisual.cc
   SonarVisual.cc
@@ -37,6 +38,7 @@ set (sources
   MovableText.cc
   OrbitViewController.cc
   Projector.cc
+  RayQuery.cc
   RenderEngine.cc
   RenderEvents.cc
   RenderingIface.cc
@@ -65,13 +67,14 @@ set (headers
   ContactVisual.hh
   Conversions.hh
   DepthCamera.hh
+  Distortion.hh
   DynamicLines.hh
   DynamicRenderable.hh
   FPSViewController.hh
   GpuLaser.hh
   Grid.hh
-  GUIOverlay.hh
   Heightmap.hh
+  InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
   SonarVisual.hh
@@ -80,6 +83,7 @@ set (headers
   MovableText.hh
   OrbitViewController.hh
   Projector.hh
+  RayQuery.hh
   RenderEngine.hh
   RenderEvents.hh
   RenderingIface.hh
@@ -99,7 +103,6 @@ set (headers
   WindowManager.hh
   WrenchVisual.hh
   ogre_gazebo.h
-  cegui.h
 )
 
 if (HAVE_OCULUS)
@@ -119,6 +122,8 @@ gz_build_tests(${gtest_sources})
 set (gtest_sources_dri
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
+  JointVisual_TEST.cc
+  SelectionObj_TEST.cc
   SonarVisual_TEST.cc
   TransmitterVisual_TEST.cc
   Visual_TEST.cc
@@ -148,20 +153,17 @@ target_link_libraries(gazebo_rendering
   gazebo_transport
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
-  ${CEGUI_LIBRARIES}
 )
 
 if (HAVE_OCULUS)
-  target_link_libraries(gazebo_rendering
-    OculusVR
-  )
+  target_link_libraries(gazebo_rendering ${OculusVR_LIBRARIES})
 endif()
 
 if (NOT APPLE)
   target_link_libraries(gazebo_rendering X11)
 endif()
 
-if (${OGRE_VERSION} GREATER 1.7.4)
+if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
   target_link_libraries(gazebo_rendering gazebo_rendering_deferred)
 endif()
 

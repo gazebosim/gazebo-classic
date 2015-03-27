@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,7 +119,8 @@ namespace gazebo
 
       /// \brief Set whether this body will collide with others in the
       /// model.
-      /// \param[in] _collid True to enable collisions.
+      /// \sa GetSelfCollide
+      /// \param[in] _collide True to enable collisions.
       public: virtual void SetSelfCollide(bool _collide) = 0;
 
       /// \brief Set the collide mode of the body.
@@ -132,8 +133,12 @@ namespace gazebo
       /// ghost: collides with everything else but other ghost
       public: void SetCollideMode(const std::string &_mode);
 
-      /// \brief Get Self-Collision Flag, if this is true, this body will
-      /// collide with other bodies even if they share the same parent.
+      /// \brief Get Self-Collision Flag.
+      /// Two links within the same model will not collide if both have
+      /// self_collide == false. \n
+      /// link 1 and link2 collide = link1.self_collide || link2.self_collide
+      /// Bodies connected by a joint are exempt from this, and will
+      /// never collide.
       /// \return True if self collision is enabled.
       public: bool GetSelfCollide() const;
 
@@ -187,6 +192,15 @@ namespace gazebo
       public: virtual void AddForceAtRelativePosition(
                   const math::Vector3 &_force,
                   const math::Vector3 &_relPos) = 0;
+
+      /// \brief Add a force expressed in the link frame.
+      /// \param[in] _force Direction vector expressed in the link frame. Each
+      /// component corresponds to the force which will be added in that axis
+      /// and the vector's magnitude corresponds to the total force.
+      /// \param[in] _offset Offset position expressed in the link frame. It
+      /// defaults to the link origin.
+      public: virtual void AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero) = 0;
 
       /// \brief Add a torque to the body.
       /// \param[in] _torque Torque value to add to the link.
@@ -256,8 +270,19 @@ namespace gazebo
       /// \return Angular acceleration of the body.
       public: math::Vector3 GetRelativeAngularAccel() const;
 
-      /// \brief Get the angular acceleration of the body in the world
-      /// frame.
+      /// \brief Get the angular momentum of the body CoG in the world frame,
+      /// which is computed as (I * w), where
+      /// I: inertia matrix in world frame
+      /// w: angular velocity in world frame
+      /// \return Angular momentum of the body.
+      public: math::Vector3 GetWorldAngularMomentum() const;
+
+      /// \brief Get the angular acceleration of the body in the world frame,
+      /// which is computed as (I^-1 * (T - w x L)), where
+      /// I: inertia matrix in world frame
+      /// T: sum of external torques in world frame
+      /// L: angular momentum of CoG in world frame
+      /// w: angular velocity in world frame
       /// \return Angular acceleration of the body in the world frame.
       public: math::Vector3 GetWorldAngularAccel() const;
 
@@ -607,9 +632,6 @@ namespace gazebo
 
       /// \brief Cached list of collisions. This is here for performance.
       private: Collision_V collisions;
-
-      /// \brief scale of the link.
-      private: math::Vector3 scale;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources

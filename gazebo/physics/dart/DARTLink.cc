@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,15 @@
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/WorldPrivate.hh"
 
 #include "gazebo/physics/dart/dart_inc.h"
+#include "gazebo/physics/dart/DARTCollision.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
 #include "gazebo/physics/dart/DARTModel.hh"
 #include "gazebo/physics/dart/DARTLink.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
+#include "gazebo/physics/dart/DARTSurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -208,6 +211,46 @@ void DARTLink::Init()
   // Gravity mode
   this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
+  // Friction coefficient
+
+  /// \todo FIXME: Friction Parameters
+  /// Gazebo allows different friction parameters per collision objects,
+  /// while DART stores the friction parameter per link (BodyNode in DART). For
+  /// now, the average friction parameter of all the child collision objects is
+  /// stored in this->dtBodyNode.
+  /// Final friction coefficient is applied in DART's constraint solver by
+  /// taking the lower of the 2 colliding rigidLink's.
+  /// See also:
+  /// - https://github.com/dartsim/dart/issues/141
+  /// - https://github.com/dartsim/dart/issues/266
+
+  double hackAvgMu1 = 0;
+  double hackAvgMu2 = 0;
+  int numCollisions = 0;
+
+  for (auto const &child : this->children)
+  {
+    if (child->HasType(Base::COLLISION))
+    {
+      CollisionPtr collision =
+          boost::static_pointer_cast<Collision>(child);
+
+      SurfaceParamsPtr surface = collision->GetSurface();
+      GZ_ASSERT(surface, "Surface pointer for is invalid");
+      FrictionPyramidPtr friction = surface->GetFrictionPyramid();
+      GZ_ASSERT(friction, "Friction pointer for is invalid");
+
+      numCollisions++;
+      hackAvgMu1 += friction->GetMuPrimary();
+      hackAvgMu2 += friction->GetMuSecondary();
+    }
+  }
+
+  hackAvgMu1 /= static_cast<double>(numCollisions);
+  hackAvgMu2 /= static_cast<double>(numCollisions);
+
+  this->dtBodyNode->setFrictionCoeff(0.5 * (hackAvgMu1 + hackAvgMu2));
+
   // We don't add dart body node to the skeleton here because dart body node
   // should be set its parent joint before being added. This body node will be
   // added to the skeleton in DARTModel::Init().
@@ -246,9 +289,28 @@ void DARTLink::OnPoseChange()
       P = this->dtBodyNode->getParentBodyNode()->getTransform();
 
     Eigen::Isometry3d Q = T1.inverse() * P.inverse() * W * InvT2;
-    // Set generalized coordinate and update the transformations only
-    freeJoint->setPositions(dart::math::logMap(Q));
+
+    // Convert homogeneous transformation matrix to 6-dimensional generalized
+    // coordinates. There are several ways of conversions. Here is the way of
+    // DART. The orientation part is converted by using logarithm map, which
+    // maps SO(3) to so(3), and it takes the first three components of the
+    // generalized coordinates. On the other hand, the position part just takes
+    // the last three components of the generalized coordinates without any
+    // conversion.
+    Eigen::Vector6d q;
+    q.head<3>() = dart::math::logMap(Q.linear());
+    q.tail<3>() = Q.translation();
+    freeJoint->setPositions(q);
+    // TODO: The above 4 lines will be reduced to single line as:
+    // freeJoint->setPositions(FreeJoint::convertToPositions(Q));
+    // after the following PR is merged:
+    // https://github.com/dartsim/dart/pull/322
+
+    // Update all the transformations of the links in the parent model.
     freeJoint->getSkeleton()->computeForwardKinematics(true, false, false);
+    // TODO: This kinematic updating will be done automatically after pull
+    // request (https://github.com/dartsim/dart/pull/319) is merged so that
+    // we don't need this line anymore.
   }
   else
   {
@@ -446,6 +508,14 @@ void DARTLink::AddForceAtRelativePosition(const math::Vector3 &_force,
   this->dtBodyNode->addExtForce(DARTTypes::ConvVec3(_force),
                                 DARTTypes::ConvVec3(_relpos),
                                 true, true);
+}
+
+//////////////////////////////////////////////////
+void DARTLink::AddLinkForce(const math::Vector3 &/*_force*/,
+    const math::Vector3 &/*_offset*/)
+{
+  gzlog << "DARTLink::AddLinkForce not yet implemented (issue #1477)."
+        << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -717,7 +787,7 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
 
   // Set the new pose to the world
   // (Below method can be changed in gazebo code)
-  this->world->dirtyPoses.push_back(this);
+  this->world->dataPtr->dirtyPoses.push_back(this);
 }
 
 //////////////////////////////////////////////////

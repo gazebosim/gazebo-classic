@@ -1,0 +1,145 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- Testing the automatic population of objects -->
+    <population name="can_population1">
+      <model name="can1">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <pose>3 3 0 0 0 0</pose>
+      <box>
+        <size>1 1 0.1</size>
+      </box>
+      <model_count>10</model_count>
+      <distribution>
+        <type>random</type>
+      </distribution>
+    </population>
+
+    <population name="can_population2">
+      <model name="can2">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <pose>0 0 0 0 0 0</pose>
+      <distribution>
+        <type>grid</type>
+        <rows>2</rows>
+        <cols>3</cols>
+        <step>0.25 0.25 0</step>
+      </distribution>
+    </population>
+
+    <population name="can_population3">
+      <model name="can3">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <pose>-3 3 0 0 0 0</pose>
+      <cylinder>
+        <radius>1</radius>
+        <length>0.01</length>
+      </cylinder>
+      <model_count>10</model_count>
+      <distribution>
+        <type>random</type>
+      </distribution>
+    </population>
+
+    <population name="can_population4">
+      <model name="can4">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <pose>1 -4 0 0 0 0</pose>
+      <box>
+        <size>4 2 0.01</size>
+      </box>
+      <model_count>10</model_count>
+      <distribution>
+        <type>uniform</type>
+      </distribution>
+    </population>
+
+    <population name="can_population5">
+      <model name="can5">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <pose>-3 -3 0 0 0 0</pose>
+      <cylinder>
+        <radius>1</radius>
+        <length>0.1</length>
+      </cylinder>
+      <model_count>10</model_count>
+      <distribution>
+        <type>uniform</type>
+      </distribution>
+    </population>
+
+    <population name="can_population6">
+      <model name="can6">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <pose>0 4 0 0 0 0</pose>
+      <box>
+        <size>2 1 0.01</size>
+      </box>
+      <model_count>6</model_count>
+      <distribution>
+        <type>linear-x</type>
+      </distribution>
+    </population>
+
+    <population name="can_population7">
+      <model name="can7">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <pose>-5 -1 0 0 0 0</pose>
+      <box>
+        <size>1 2 0.01</size>
+      </box>
+      <model_count>6</model_count>
+      <distribution>
+        <type>linear-y</type>
+      </distribution>
+    </population>
+
+    <population name="can_population8">
+      <model name="can8">
+        <static>true</static>
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <pose>4 0 0.7 0 0 0</pose>
+      <box>
+        <size>0.2 0.2 1.4</size>
+      </box>
+      <model_count>6</model_count>
+      <distribution>
+        <type>linear-z</type>
+      </distribution>
+    </population>
+
+  </world>
+</sdf>

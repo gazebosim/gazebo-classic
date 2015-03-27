@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,6 +148,22 @@ void RTShaderSystem::RemoveScene(ScenePtr _scene)
     this->shaderGenerator->removeAllShaderBasedTechniques();
     this->shaderGenerator->flushShaderCache();
     // this->UpdateShaders();
+  }
+}
+
+//////////////////////////////////////////////////
+void RTShaderSystem::RemoveScene(const std::string &_scene)
+{
+  if (!this->initialized)
+    return;
+
+  for (auto iter : this->scenes)
+  {
+    if (iter->GetName() == _scene)
+    {
+      this->RemoveScene(iter);
+      return;
+    }
   }
 }
 
@@ -487,7 +503,7 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   }
 
   double shadowFarDistance = 500;
-  double cameraNearClip = 0.1;
+  double cameraNearClip = 0.01;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
   Ogre::PSSMShadowCameraSetup *cameraSetup =

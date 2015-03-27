@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,10 +38,12 @@ namespace gazebo
     class Actor;
     class Link;
     class Collision;
+    class FrictionPyramid;
     class Gripper;
     class Joint;
     class JointController;
     class Contact;
+    class PresetManager;
     class PhysicsEngine;
     class Mass;
     class Road;
@@ -105,6 +107,10 @@ namespace gazebo
     /// \brief Boost shared pointer to a PhysicsEngine object
     typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
 
+    /// \def  PresetManagerPtr
+    /// \brief Shared pointer to a PresetManager object
+    typedef boost::shared_ptr<PresetManager> PresetManagerPtr;
+
     /// \def ShapePtr
     /// \brief Boost shared pointer to a Shape object
     typedef boost::shared_ptr<Shape> ShapePtr;
@@ -128,6 +134,10 @@ namespace gazebo
     /// \def RoadPtr
     /// \brief Boost shared pointer to a Road object
     typedef boost::shared_ptr<Road> RoadPtr;
+
+    /// \def FrictionPyramidPtr
+    /// \brief Boost shared pointer to a FrictionPyramid object
+    typedef boost::shared_ptr<FrictionPyramid> FrictionPyramidPtr;
 
     /// \def SurfaceParamsPtr
     /// \brief Boost shared pointer to a SurfaceParams object

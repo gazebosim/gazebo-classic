@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Distortion.hh"
 #include "gazebo/rendering/CameraPrivate.hh"
 #include "gazebo/rendering/Camera.hh"
 
@@ -112,22 +113,11 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 Camera::~Camera()
 {
   delete [] this->saveFrameBuffer;
+  this->saveFrameBuffer = NULL;
   delete [] this->bayerFrameBuffer;
+  this->bayerFrameBuffer = NULL;
 
-  this->sceneNode = NULL;
-
-  if (this->renderTexture && this->scene->GetInitialized())
-    Ogre::TextureManager::getSingleton().remove(this->renderTexture->getName());
-  this->renderTexture = NULL;
-  this->renderTarget = NULL;
-
-  if (this->camera && this->scene && this->scene->GetManager())
-  {
-    this->scene->GetManager()->destroyCamera(this->scopedUniqueName);
-    this->camera = NULL;
-  }
-
-  this->connections.clear();
+  this->Fini();
 
   this->sdf->Reset();
   this->sdf.reset();
@@ -187,6 +177,12 @@ void Camera::Load()
     this->dataPtr->cmdSub = this->dataPtr->node->Subscribe(
         "~/" + this->GetName() + "/cmd", &Camera::OnCmdMsg, this, true);
   }
+
+  if (this->sdf->HasElement("distortion"))
+  {
+    this->dataPtr->distortion.reset(new Distortion());
+    this->dataPtr->distortion->Load(this->sdf->GetElement("distortion"));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -212,17 +208,29 @@ void Camera::Init()
 void Camera::Fini()
 {
   this->initialized = false;
-  this->connections.clear();
   this->dataPtr->node.reset();
 
-  RTShaderSystem::DetachViewport(this->viewport, this->scene);
+  if (this->viewport && this->scene)
+    RTShaderSystem::DetachViewport(this->viewport, this->scene);
 
-  if (this->renderTarget && this->scene->GetInitialized())
+  if (this->renderTarget)
     this->renderTarget->removeAllViewports();
-
-  this->viewport = NULL;
   this->renderTarget = NULL;
 
+  if (this->renderTexture)
+    Ogre::TextureManager::getSingleton().remove(this->renderTexture->getName());
+  this->renderTexture = NULL;
+
+  if (this->camera)
+  {
+    this->scene->GetManager()->destroyCamera(this->scopedUniqueName);
+    this->camera = NULL;
+  }
+
+  this->sceneNode = NULL;
+  this->viewport = NULL;
+
+  this->scene.reset();
   this->connections.clear();
 }
 
@@ -572,26 +580,44 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
 }
 
 //////////////////////////////////////////////////
-void Camera::Translate(const math::Vector3 &direction)
+void Camera::Translate(const math::Vector3 &_direction)
 {
-  Ogre::Vector3 vec(direction.x, direction.y, direction.z);
-
   this->sceneNode->translate(this->sceneNode->getOrientation() *
-      this->sceneNode->getOrientation() * vec);
+      Conversions::Convert(_direction));
+}
+
+//////////////////////////////////////////////////
+void Camera::Roll(const math::Angle &_angle,
+    Ogre::Node::TransformSpace _relativeTo)
+{
+  this->sceneNode->pitch(Ogre::Radian(_angle.Radian()), _relativeTo);
+}
+
+//////////////////////////////////////////////////
+void Camera::Yaw(const math::Angle &_angle,
+    Ogre::Node::TransformSpace _relativeTo)
+{
+  this->sceneNode->roll(Ogre::Radian(_angle.Radian()), _relativeTo);
+}
+
+//////////////////////////////////////////////////
+void Camera::Pitch(const math::Angle &_angle,
+    Ogre::Node::TransformSpace _relativeTo)
+{
+  this->sceneNode->yaw(Ogre::Radian(_angle.Radian()), _relativeTo);
 }
 
 //////////////////////////////////////////////////
 void Camera::RotateYaw(math::Angle _angle)
 {
-  this->sceneNode->roll(Ogre::Radian(_angle.Radian()), Ogre::Node::TS_WORLD);
+  this->Yaw(_angle);
 }
 
 //////////////////////////////////////////////////
 void Camera::RotatePitch(math::Angle _angle)
 {
-  this->sceneNode->yaw(Ogre::Radian(_angle.Radian()));
+  this->Pitch(_angle);
 }
-
 
 //////////////////////////////////////////////////
 void Camera::SetClipDist()
@@ -625,6 +651,7 @@ void Camera::SetClipDist(float _near, float _far)
 void Camera::SetHFOV(math::Angle _angle)
 {
   this->sdf->GetElement("horizontal_fov")->Set(_angle.Radian());
+  this->UpdateFOV();
 }
 
 //////////////////////////////////////////////////
@@ -1289,6 +1316,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     double hfov = this->GetHFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
+
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
 
@@ -1329,9 +1357,11 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
       // this->dataPtr->this->ssaoInstance->setEnabled(false);
     }
 
+    if (this->dataPtr->distortion)
+      this->dataPtr->distortion->SetCamera(shared_from_this());
 
-    if (this->GetScene()->skyx != NULL)
-      this->renderTarget->addListener(this->GetScene()->skyx);
+    if (this->GetScene()->GetSkyX() != NULL)
+      this->renderTarget->addListener(this->GetScene()->GetSkyX());
   }
 }
 
@@ -1678,4 +1708,43 @@ void Camera::OnCmdMsg(ConstCameraCmdPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->dataPtr->receiveMutex);
   this->dataPtr->commandMsgs.push_back(_msg);
+}
+
+//////////////////////////////////////////////////
+DistortionPtr Camera::GetDistortion() const
+{
+  return this->dataPtr->distortion;
+}
+
+//////////////////////////////////////////////////
+void Camera::UpdateFOV()
+{
+  if (this->viewport)
+  {
+    this->viewport->setDimensions(0, 0, 1, 1);
+    double ratio = static_cast<double>(this->viewport->getActualWidth()) /
+      static_cast<double>(this->viewport->getActualHeight());
+
+    double hfov =
+      this->sdf->Get<double>("horizontal_fov");
+    double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
+
+    this->camera->setAspectRatio(ratio);
+    this->camera->setFOVy(Ogre::Radian(vfov));
+
+    delete [] this->saveFrameBuffer;
+    this->saveFrameBuffer = NULL;
+  }
+}
+
+//////////////////////////////////////////////////
+float Camera::GetAvgFPS() const
+{
+  return this->renderTarget->getAverageFPS();
+}
+
+//////////////////////////////////////////////////
+unsigned int Camera::GetTriangleCount() const
+{
+  return this->renderTarget->getTriangleCount();
 }

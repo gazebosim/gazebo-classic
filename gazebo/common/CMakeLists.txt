@@ -44,9 +44,11 @@ set (sources
   SphericalCoordinates.cc
   STLLoader.cc
   SystemPaths.cc
+  SVGLoader.cc
   Time.cc
   Timer.cc
   Video.cc
+  ffmpeg_inc.cc
 )
 
 set (headers
@@ -61,7 +63,6 @@ set (headers
   Color.hh
   Console.hh
   Dem.hh
-  DemPrivate.hh
   Event.hh
   Events.hh
   Exception.hh
@@ -83,28 +84,15 @@ set (headers
   Skeleton.hh
   SingletonT.hh
   SphericalCoordinates.hh
-  SphericalCoordinatesPrivate.hh
   STLLoader.hh
   SystemPaths.hh
+  SVGLoader.hh
   Time.hh
   Timer.hh
   UpdateInfo.hh
   Video.hh
   ffmpeg_inc.h
  )
-
-if (HAVE_GTS)
-set (sources
-  ${sources}
-  GTSMeshUtils.cc
-  MeshCSG.cc
-)
-set (headers
-  ${headers}
-  GTSMeshUtils.hh
-  MeshCSG.hh
-)
-endif()
 
 set (gtest_sources
   Animation_TEST.cc
@@ -120,11 +108,31 @@ set (gtest_sources
   ImageHeightmap_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc
+  MeshManager_TEST.cc
   MovingWindowFilter_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
+  SVGLoader_TEST.cc
   Time_TEST.cc
 )
+
+if (HAVE_GTS)
+set (sources
+  ${sources}
+  GTSMeshUtils.cc
+  MeshCSG.cc
+)
+set (headers
+  ${headers}
+  GTSMeshUtils.hh
+  MeshCSG.hh
+)
+
+set (gtest_sources
+  ${gtest_sources}
+  GTSMeshUtils_TEST.cc
+)
+endif()
 
 if (HAVE_FFMPEG)
   set (gtest_sources ${gtest_sources}
@@ -143,12 +151,13 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_
 gz_add_library(gazebo_common ${sources})
 
 set_property(
-  SOURCE SystemPaths.cc SystemPaths_TEST.cc ModelDatabase.cc
+  SOURCE SystemPaths.cc SystemPaths_TEST.cc ModelDatabase.cc Console.cc
   PROPERTY COMPILE_DEFINITIONS
   GAZEBO_PLUGIN_PATH="${GAZEBO_PLUGIN_PATH}"
   GAZEBO_MODEL_PATH="${GAZEBO_MODEL_PATH}"
   GAZEBO_RESOURCE_PATH="${GAZEBO_RESOURCE_PATH}"
   GAZEBO_MODEL_DATABASE_URI="${GAZEBO_MODEL_DATABASE_URI}"
+  GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
 )
 

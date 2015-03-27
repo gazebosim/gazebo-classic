@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ OrbitViewController::OrbitViewController(UserCameraPtr _camera)
   this->refVisual.reset(new Visual("OrbitViewController",
                         this->camera->GetScene()));
 
-  this->refVisual->Init();
+  this->refVisual->Load();
   this->refVisual->AttachMesh("unit_sphere");
   this->refVisual->SetScale(math::Vector3(0.2, 0.2, 0.1));
   this->refVisual->SetCastShadows(false);

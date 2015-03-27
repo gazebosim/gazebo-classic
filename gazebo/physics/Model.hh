@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,6 +177,20 @@ namespace gazebo
       /// \param[in] _name Name of the link to get.
       /// \return Pointer to the link, NULL if the name is invalid.
       public: LinkPtr GetLink(const std::string &_name ="canonical") const;
+
+      /// \brief If true, all links within the model will collide by default.
+      /// Two links within the same model will not collide if both have
+      /// link.self_collide == false.
+      /// link 1 and link2 collide = link1.self_collide || link2.self_collide
+      /// Bodies connected by a joint are exempt from this, and will
+      /// never collide.
+      /// \return True if self-collide enabled for this model, false otherwise.
+      public: bool GetSelfCollide() const;
+
+      /// \brief Set this model's self_collide property
+      /// \sa GetSelfCollide
+      /// \param[in] _self_collide True if self-collisions enabled by default.
+      public: void SetSelfCollide(bool _self_collide);
 
       /// \brief Set the gravity mode of the model.
       /// \param[in] _value False to turn gravity on for the model.
