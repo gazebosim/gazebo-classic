@@ -213,6 +213,7 @@ TEST_F(PresetManagerTest, SDF)
       </sdf>");
     physicsSDF = worldSDF.root->GetElement("world")->GetElement("physics");
     EXPECT_EQ(presetManager->CreateProfile(physicsSDF), "preset_3");
+    EXPECT_TRUE(presetManager->HasProfile("preset_3"));
 
     // Compare the SDF as strings
     EXPECT_EQ(presetManager->ProfileSDF("preset_3")->ToString(""),

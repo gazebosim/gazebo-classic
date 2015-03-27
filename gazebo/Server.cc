@@ -274,7 +274,8 @@ bool Server::ParseArgs(int _argc, char **_argv)
       if (physics::get_world()->GetPresetManager()->HasProfile(profileName))
       {
         physics::get_world()->GetPresetManager()->CurrentProfile(profileName);
-        gzmsg << "Setting physics profile to [" << profileName << "]." << std::endl;
+        gzmsg << "Setting physics profile to [" << profileName << "]."
+              << std::endl;
       }
       else
       {

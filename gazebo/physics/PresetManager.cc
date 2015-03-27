@@ -127,7 +127,6 @@ bool Preset::SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine) const
 }
 
 //////////////////////////////////////////////////
-// TODO: Check type
 bool Preset::SetAllParamsFromSDF(const sdf::ElementPtr _elem)
 {
   bool result = true;
@@ -142,6 +141,12 @@ bool Preset::SetAllParamsHelper(const sdf::ElementPtr _elem, bool _result)
   {
     return _result;
   }
+  if (_elem->GetParent() && _elem->GetParent()->GetName() == "physics" &&
+      _elem->GetParent()->Get<std::string>("type") != _elem->GetName())
+  {
+      return _result;
+  }
+
   for (sdf::ElementPtr elem = _elem->GetFirstElement(); elem;
         elem = elem->GetNextElement())
   {
