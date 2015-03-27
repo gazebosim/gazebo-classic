@@ -858,7 +858,7 @@ static void ComputeRows(
 //
 // rhs, lo and hi are modified on exit
 //
-static void quickstep::PGS_LCP (dxWorldProcessContext *context,
+void quickstep::PGS_LCP (dxWorldProcessContext *context,
   const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, dRealMutablePtr vnew, int *jb, dxBody * const *body,
   dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,

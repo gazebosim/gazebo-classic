@@ -83,7 +83,7 @@ typedef dReal *dRealMutablePtr;
 
 /// scale PGS for contact to reduce overshoot in solution for contacts
 /// \TODO: make this a parameter
-#define CONTACT_PGS_SCALE 0.25
+#define CONTACT_SOR_SCALE 0.25
 
 //***************************************************************************
 // testing stuff
