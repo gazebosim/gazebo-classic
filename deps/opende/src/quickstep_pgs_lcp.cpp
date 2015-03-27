@@ -295,35 +295,62 @@ static void ComputeRows(
           constraint_index < 0)
         continue;
 
-      dReal delta,delta_erp;
+
+      dReal delta;
       dReal delta_precon;
 
+      // setup pointers
+      int b1 = jb[index*2];
+      int b2 = jb[index*2+1];
+
+      // 1/4 for precon
       {
-        int b1 = jb[index*2];
-        int b2 = jb[index*2+1];
-        caccel_ptr1 = caccel + 6*b1;
-        caccel_erp_ptr1 = caccel_erp + 6*b1;
         cforce_ptr1 = cforce + 6*b1;
         if (b2 >= 0)
         {
-          caccel_ptr2     = caccel + 6*b2;
-          caccel_erp_ptr2 = caccel_erp + 6*b2;
           cforce_ptr2     = cforce + 6*b2;
         }
         else
         {
-          caccel_ptr2     = NULL;
-          caccel_erp_ptr2 = NULL;
           cforce_ptr2     = NULL;
         }
-#ifdef PENETRATION_JVERROR_CORRECTION
-        vnew_ptr1 = vnew + 6*b1;
-        vnew_ptr2 = (b2 >= 0) ? vnew + 6*b2 : NULL;
-#endif
       }
 
+      // 2/4 for non_erp non-position projection
+      {
+        caccel_ptr1 = caccel + 6*b1;
+        if (b2 >= 0)
+        {
+          caccel_ptr2     = caccel + 6*b2;
+        }
+        else
+        {
+          caccel_ptr2     = NULL;
+        }
+      }
       dReal old_lambda        = lambda[index];
+
+      // 3/4 repeat above for position projection variables
+      dReal delta_erp;
+      {
+        caccel_erp_ptr1 = caccel_erp + 6*b1;
+        if (b2 >= 0)
+        {
+          caccel_erp_ptr2 = caccel_erp + 6*b2;
+        }
+        else
+        {
+          caccel_erp_ptr2 = NULL;
+        }
+      }
       dReal old_lambda_erp    = lambda_erp[index];
+
+#ifdef PENETRATION_JVERROR_CORRECTION
+      // 4/4 optional pointers for jverror correction
+      vnew_ptr1 = vnew + 6*b1;
+      vnew_ptr2 = (b2 >= 0) ? vnew + 6*b2 : NULL;
+#endif
+
 
       //
       // caccel is the constraint accel in the non-precon case
@@ -366,7 +393,8 @@ static void ComputeRows(
 
         // compute lambda and clamp it to [lo,hi].
         // @@@ SSE not a win here
-#if 1
+#undef SSE_CLAMP
+#ifdef SSE_CLAMP
         lambda[index] = old_lambda+ delta_precon;
         if (lambda[index] < lo_act) {
           delta_precon = lo_act-old_lambda;
@@ -712,7 +740,7 @@ static void ComputeRows(
           rms_error[2] += delta2*Ad2;
           m_rms_dlambda[2]++;
         }
-      }
+      } // end of non-precon
 
       //@@@ a trick that may or may not help
       //dReal ramp = (1-((dReal)(iteration+1)/(dReal)iterations));
@@ -1110,7 +1138,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   //printf("    quickstep start threads at time %f\n",cur_time);
   #endif
 
-
+  // this is the main computational loop for PGS
+  // here we iterate over each row and make progressive updates
   IFTIMING (dTimerNow ("start pgs rows"));
   for (int i=0; i<m; i+= chunk,thread_id++)
   {
@@ -1136,19 +1165,22 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     params[thread_id].Ad = Ad;
     params[thread_id].Adcfm = Adcfm;
     params[thread_id].Adcfm_precon = Adcfm_precon;
-    params[thread_id].rhs = rhs;
-    params[thread_id].rhs_erp = rhs_erp;
     params[thread_id].J = J;
-    params[thread_id].caccel = caccel;
-    params[thread_id].caccel_erp = caccel_erp;
-    params[thread_id].lambda = lambda;
-    params[thread_id].lambda_erp = lambda_erp;
     params[thread_id].iMJ = iMJ;
     params[thread_id].rhs_precon  = rhs_precon ;
     params[thread_id].J_precon  = J_precon ;
     params[thread_id].J_orig  = J_orig ;
     params[thread_id].cforce  = cforce ;
     params[thread_id].vnew  = vnew ;
+
+    params[thread_id].rhs = rhs;
+    params[thread_id].caccel = caccel;
+    params[thread_id].lambda = lambda;
+
+    params[thread_id].rhs_erp = rhs_erp;
+    params[thread_id].caccel_erp = caccel_erp;
+    params[thread_id].lambda_erp = lambda_erp;
+
 #ifdef REORDER_CONSTRAINTS
     params[thread_id].last_lambda  = last_lambda ;
     params[thread_id].last_lambda_erp  = last_lambda_erp ;
