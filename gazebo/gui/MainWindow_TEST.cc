@@ -41,7 +41,7 @@ void MainWindow_TEST::Selection()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
@@ -62,11 +62,18 @@ void MainWindow_TEST::Selection()
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
   QVERIFY(cam != NULL);
 
-  // get model at center of window - should get the ground plane
+  gazebo::gui::GLWidget *glWidget =
+    mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+  QVERIFY(glWidget != NULL);
+
+  gazebo::math::Vector2i glWidgetCenter(
+      glWidget->width()*0.5, glWidget->height()*0.5);
+
+  // get model at center of window - should get the box
   gazebo::rendering::VisualPtr vis =
-      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+      cam->GetVisual(glWidgetCenter);
   QVERIFY(vis != NULL);
-  QVERIFY(vis->IsPlane());
+  QVERIFY(vis->GetRootVisual()->GetName() == "box");
 
   // move camera to look at the box
   gazebo::math::Pose cameraPose(gazebo::math::Vector3(-1, 0, 0.5),
@@ -86,8 +93,7 @@ void MainWindow_TEST::Selection()
   QVERIFY(cam->GetWorldRotation() == pitch90);
 
   // verify there is nothing in the middle of the window
-  gazebo::rendering::VisualPtr vis3 =
-      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+  gazebo::rendering::VisualPtr vis3 = cam->GetVisual(glWidgetCenter);
   QVERIFY(vis3 == NULL);
 
   // reset orientation
@@ -103,8 +109,7 @@ void MainWindow_TEST::Selection()
 
   // hide the box
   vis4->SetVisible(false);
-  gazebo::rendering::VisualPtr vis5 =
-      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+  gazebo::rendering::VisualPtr vis5 = cam->GetVisual(glWidgetCenter);
 
   // verify we don't get anything now
   QVERIFY(vis5 == NULL);
@@ -112,6 +117,37 @@ void MainWindow_TEST::Selection()
   cam->Fini();
   mainWindow->close();
   delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::SceneDestruction()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  // Create the main window.
+  mainWindow->Load();
+
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != NULL);
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+
+  // verify that this test case has the only scene shared pointer remaining.
+  QVERIFY(scene.use_count() == 1u);
 }
 
 /////////////////////////////////////////////////
@@ -171,10 +207,6 @@ void MainWindow_TEST::CopyPaste()
 
   // Create the main window.
   mainWindow->Load();
-
-  gazebo::rendering::create_scene(
-      gazebo::physics::get_world()->GetName(), false);
-
   mainWindow->Init();
   mainWindow->show();
 
@@ -222,6 +254,14 @@ void MainWindow_TEST::CopyPaste()
     }
     QVERIFY(modelVis->GetHighlighted());
 
+    // Process some events, and draw the screen
+    for (unsigned int i = 0; i < 10; ++i)
+    {
+      gazebo::common::Time::MSleep(30);
+      QCoreApplication::processEvents();
+      mainWindow->repaint();
+    }
+
     // Copy the model
     QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier);
     QTest::qWait(500);
@@ -239,8 +279,6 @@ void MainWindow_TEST::CopyPaste()
     QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
     QTest::qWait(500);
 
-    QCoreApplication::processEvents();
-
     // Verify there is a clone of the model
     gazebo::rendering::VisualPtr modelVisClone;
     sleep = 0;
@@ -248,7 +286,7 @@ void MainWindow_TEST::CopyPaste()
     while (!modelVisClone && sleep < maxSleep)
     {
       modelVisClone = scene->GetVisual(modelName + "_clone");
-      QTest::qWait(30);
+      QTest::qWait(100);
       sleep++;
     }
     QVERIFY(modelVisClone != NULL);
@@ -598,6 +636,212 @@ void MainWindow_TEST::UserCameraJoystick()
   cam->Fini();
   mainWindow->close();
   delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::ActionCreationDestruction()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+
+  QVERIFY(gazebo::gui::g_topicVisAct);
+
+  QVERIFY(gazebo::gui::g_openAct);
+
+  QVERIFY(gazebo::gui::g_saveAct);
+
+  QVERIFY(gazebo::gui::g_saveAsAct);
+
+  QVERIFY(gazebo::gui::g_saveCfgAct);
+
+  QVERIFY(gazebo::gui::g_cloneAct);
+
+  QVERIFY(gazebo::gui::g_aboutAct);
+
+  QVERIFY(gazebo::gui::g_quitAct);
+
+  QVERIFY(gazebo::gui::g_resetModelsAct);
+
+  QVERIFY(gazebo::gui::g_resetWorldAct);
+
+  QVERIFY(gazebo::gui::g_editBuildingAct);
+
+  QVERIFY(gazebo::gui::g_editTerrainAct);
+
+  QVERIFY(gazebo::gui::g_editModelAct);
+
+  QVERIFY(gazebo::gui::g_stepAct);
+
+  QVERIFY(gazebo::gui::g_playAct);
+
+  QVERIFY(gazebo::gui::g_pauseAct);
+
+  QVERIFY(gazebo::gui::g_arrowAct);
+
+  QVERIFY(gazebo::gui::g_translateAct);
+
+  QVERIFY(gazebo::gui::g_rotateAct);
+
+  QVERIFY(gazebo::gui::g_scaleAct);
+
+  QVERIFY(gazebo::gui::g_boxCreateAct);
+
+  QVERIFY(gazebo::gui::g_sphereCreateAct);
+
+  QVERIFY(gazebo::gui::g_cylinderCreateAct);
+
+  QVERIFY(gazebo::gui::g_meshCreateAct);
+
+  QVERIFY(gazebo::gui::g_pointLghtCreateAct);
+
+  QVERIFY(gazebo::gui::g_spotLghtCreateAct);
+
+  QVERIFY(gazebo::gui::g_dirLghtCreateAct);
+
+  QVERIFY(gazebo::gui::g_resetAct);
+
+  QVERIFY(gazebo::gui::g_showCollisionsAct);
+
+  QVERIFY(gazebo::gui::g_showGridAct);
+
+  QVERIFY(gazebo::gui::g_transparentAct);
+
+  QVERIFY(gazebo::gui::g_viewWireframeAct);
+
+  QVERIFY(gazebo::gui::g_showCOMAct);
+
+  QVERIFY(gazebo::gui::g_showInertiaAct);
+
+  QVERIFY(gazebo::gui::g_showContactsAct);
+
+  QVERIFY(gazebo::gui::g_showJointsAct);
+
+  QVERIFY(gazebo::gui::g_fullScreenAct);
+
+  QVERIFY(gazebo::gui::g_fpsAct);
+
+  QVERIFY(gazebo::gui::g_orbitAct);
+
+  QVERIFY(gazebo::gui::g_overlayAct);
+
+  QVERIFY(gazebo::gui::g_viewOculusAct);
+
+  QVERIFY(gazebo::gui::g_dataLoggerAct);
+
+  QVERIFY(gazebo::gui::g_screenshotAct);
+
+  QVERIFY(gazebo::gui::g_copyAct);
+
+  QVERIFY(gazebo::gui::g_pasteAct);
+
+  QVERIFY(gazebo::gui::g_snapAct);
+
+  QVERIFY(gazebo::gui::g_alignAct);
+
+  mainWindow->close();
+  delete mainWindow;
+
+  QVERIFY(!gazebo::gui::g_topicVisAct);
+
+  QVERIFY(!gazebo::gui::g_openAct);
+
+  QVERIFY(!gazebo::gui::g_saveAct);
+
+  QVERIFY(!gazebo::gui::g_saveAsAct);
+
+  QVERIFY(!gazebo::gui::g_saveCfgAct);
+
+  QVERIFY(!gazebo::gui::g_cloneAct);
+
+  QVERIFY(!gazebo::gui::g_aboutAct);
+
+  QVERIFY(!gazebo::gui::g_quitAct);
+
+  QVERIFY(!gazebo::gui::g_resetModelsAct);
+
+  QVERIFY(!gazebo::gui::g_resetWorldAct);
+
+  QVERIFY(!gazebo::gui::g_editBuildingAct);
+
+  QVERIFY(!gazebo::gui::g_editTerrainAct);
+
+  QVERIFY(!gazebo::gui::g_editModelAct);
+
+  QVERIFY(!gazebo::gui::g_stepAct);
+
+  QVERIFY(!gazebo::gui::g_playAct);
+
+  QVERIFY(!gazebo::gui::g_pauseAct);
+
+  QVERIFY(!gazebo::gui::g_arrowAct);
+
+  QVERIFY(!gazebo::gui::g_translateAct);
+
+  QVERIFY(!gazebo::gui::g_rotateAct);
+
+  QVERIFY(!gazebo::gui::g_scaleAct);
+
+  QVERIFY(!gazebo::gui::g_boxCreateAct);
+
+  QVERIFY(!gazebo::gui::g_sphereCreateAct);
+
+  QVERIFY(!gazebo::gui::g_cylinderCreateAct);
+
+  QVERIFY(!gazebo::gui::g_meshCreateAct);
+
+  QVERIFY(!gazebo::gui::g_pointLghtCreateAct);
+
+  QVERIFY(!gazebo::gui::g_spotLghtCreateAct);
+
+  QVERIFY(!gazebo::gui::g_dirLghtCreateAct);
+
+  QVERIFY(!gazebo::gui::g_resetAct);
+
+  QVERIFY(!gazebo::gui::g_showCollisionsAct);
+
+  QVERIFY(!gazebo::gui::g_showGridAct);
+
+  QVERIFY(!gazebo::gui::g_transparentAct);
+
+  QVERIFY(!gazebo::gui::g_viewWireframeAct);
+
+  QVERIFY(!gazebo::gui::g_showCOMAct);
+
+  QVERIFY(!gazebo::gui::g_showInertiaAct);
+
+  QVERIFY(!gazebo::gui::g_showContactsAct);
+
+  QVERIFY(!gazebo::gui::g_showJointsAct);
+
+  QVERIFY(!gazebo::gui::g_fullScreenAct);
+
+  QVERIFY(!gazebo::gui::g_fpsAct);
+
+  QVERIFY(!gazebo::gui::g_orbitAct);
+
+  QVERIFY(!gazebo::gui::g_overlayAct);
+
+  QVERIFY(!gazebo::gui::g_viewOculusAct);
+
+  QVERIFY(!gazebo::gui::g_dataLoggerAct);
+
+  QVERIFY(!gazebo::gui::g_screenshotAct);
+
+  QVERIFY(!gazebo::gui::g_copyAct);
+
+  QVERIFY(!gazebo::gui::g_pasteAct);
+
+  QVERIFY(!gazebo::gui::g_snapAct);
+
+  QVERIFY(!gazebo::gui::g_alignAct);
 }
 
 // Generate a main function for the test

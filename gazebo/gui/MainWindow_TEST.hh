@@ -25,6 +25,12 @@ class MainWindow_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Test that Actions created in MainWindow get destroyed.
+  private slots: void ActionCreationDestruction();
+
+  /// \brief Test scene destruction on shutdown
+  private slots: void SceneDestruction();
+
   /// \brief Test user camera entity selection
   private slots: void Selection();
 
