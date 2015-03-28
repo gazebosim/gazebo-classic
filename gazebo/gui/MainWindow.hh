@@ -197,6 +197,9 @@ namespace gazebo
       /// \brief Create most of the actions.
       private: void CreateActions();
 
+      /// \brief Delete the actions created in CreateActions.
+      private: void DeleteActions();
+
       /// \brief Create menus.
       private: void CreateMenus();
 
