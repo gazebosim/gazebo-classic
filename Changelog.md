@@ -100,7 +100,6 @@
     1. Add schematic view to model editor
         * [Pull request #1562](https://bitbucket.org/osrf/gazebo/pull-request/1562)
 
-
 1. Building editor updates
     1. Make palette tips tooltip clickable to open.
         * [Pull request #1519](https://bitbucket.org/osrf/gazebo/pull-request/1519)
