@@ -24,7 +24,8 @@ License along with this library.
 #include <QDebug>
 #include <QPainter>
 
-QGVEdge::QGVEdge(QGVEdgePrivate *edge, QGVScene *qgvscene) :  _scene(qgvscene), _edge(edge)
+QGVEdge::QGVEdge(QGVEdgePrivate *edge, QGVScene *qgvscene)
+    :  _scene(qgvscene), _edge(edge)
 {
 //    setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
@@ -60,7 +61,8 @@ void QGVEdge::setLabel(const QString &_xlabel)
     setAttribute("xlabel", _xlabel);
 }
 
-void QGVEdge::paint(QPainter * painter, const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
+void QGVEdge::paint(QPainter * painter,
+    const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
     painter->save();
 
@@ -84,7 +86,8 @@ void QGVEdge::paint(QPainter * painter, const QStyleOptionGraphicsItem */*_optio
         painter->save();
         painter->translate(_label_rect.topLeft());
         painter->rotate(90);
-        painter->drawText(QRectF(QPointF(0, -_label_rect.width()), _label_rect.size()), Qt::AlignCenter, _label);
+        painter->drawText(QRectF(QPointF(0, -_label_rect.width()),
+            _label_rect.size()), Qt::AlignCenter, _label);
         painter->restore();
     }
     else
@@ -99,7 +102,8 @@ void QGVEdge::paint(QPainter * painter, const QStyleOptionGraphicsItem */*_optio
 
 void QGVEdge::setAttribute(const QString &name, const QString &value)
 {
-    agsafeset(_edge->edge(), name.toLocal8Bit().data(), value.toLocal8Bit().data(), (char *)"");
+    agsafeset(_edge->edge(), name.toLocal8Bit().data(),
+        value.toLocal8Bit().data(), (char *)"");
 }
 
 QString QGVEdge::getAttribute(const QString &name) const
@@ -125,12 +129,16 @@ void QGVEdge::updateLayout()
     {
         if(spl->list->sflag)
         {
-            _tail_arrow = toBox(QLineF(QGVCore::toPoint(spl->list->list[0], gheight), QGVCore::toPoint(spl->list->sp, gheight)));
+            _tail_arrow = toArrow(
+                QLineF(QGVCore::toPoint(spl->list->list[0], gheight),
+                QGVCore::toPoint(spl->list->sp, gheight)));
         }
 
         if(spl->list->eflag)
         {
-            _head_arrow = toArrow(QLineF(QGVCore::toPoint(spl->list->list[spl->list->size-1], gheight), QGVCore::toPoint(spl->list->ep, gheight)));
+            _head_arrow = toArrow(
+                QLineF(QGVCore::toPoint(spl->list->list[spl->list->size-1],
+                gheight), QGVCore::toPoint(spl->list->ep, gheight)));
         }
     }
 
@@ -144,7 +152,8 @@ void QGVEdge::updateLayout()
     {
         _label = xlabel->text;
         _label_rect.setSize(QSize(xlabel->dimen.x, xlabel->dimen.y));
-        _label_rect.moveCenter(QGVCore::toPoint(xlabel->pos, QGVCore::graphHeight(_scene->_graph->graph())));
+        _label_rect.moveCenter(QGVCore::toPoint(xlabel->pos,
+            QGVCore::graphHeight(_scene->_graph->graph())));
     }
 
     setToolTip(getAttribute("tooltip"));

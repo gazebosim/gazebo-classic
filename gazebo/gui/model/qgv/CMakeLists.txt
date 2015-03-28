@@ -34,7 +34,6 @@ add_definitions(${QT_DEFINITIONS})
 
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 
-#include_directories(${GRAPHVIZ_GVC_PKG_INCLUDE_DIRS})
 include_directories(${GRAPHVIZ_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/private)

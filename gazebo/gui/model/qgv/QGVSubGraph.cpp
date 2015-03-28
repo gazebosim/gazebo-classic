@@ -25,7 +25,8 @@ License along with this library.
 #include <QDebug>
 #include <QPainter>
 
-QGVSubGraph::QGVSubGraph(QGVGraphPrivate *subGraph, QGVScene *_qgvscene): _scene(_qgvscene), _sgraph(subGraph)
+QGVSubGraph::QGVSubGraph(QGVGraphPrivate *subGraph, QGVScene *_qgvscene)
+    : _scene(_qgvscene), _sgraph(subGraph)
 {
     // setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
@@ -87,7 +88,8 @@ QRectF QGVSubGraph::boundingRect() const
     return QRectF(0,0, _width, _height);
 }
 
-void QGVSubGraph::paint(QPainter * painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+void QGVSubGraph::paint(QPainter * painter,
+    const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
     painter->save();
 
