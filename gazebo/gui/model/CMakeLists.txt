@@ -49,6 +49,12 @@ if (ENABLE_SCREEN_TESTS)
   )
 endif()
 
+set (libraries_to_link
+  gazebo_common
+  gazebo_rendering
+  gazebo_msgs
+)
+
 if (HAVE_GRAPHVIZ)
   set (qt_headers
     ${qt_headers}
@@ -72,6 +78,11 @@ if (HAVE_GRAPHVIZ)
     ${qt_tests}
     SchematicViewWidget_TEST.cc
   )
+
+  set (libraries_to_link
+    ${libraries_to_link}
+    gazebo_gui_model_qgv
+  )
 endif()
 
 # Generate executables for each of the QT unit tests
@@ -86,11 +97,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 gz_add_library(gazebo_gui_model ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 
 target_link_libraries(gazebo_gui_model
-  gazebo_common
-#  gazebo_transport
-#  gazebo_sdf_interface
-  gazebo_rendering
-  gazebo_msgs
-  gazebo_gui_model_qgv)
+  ${libraries_to_link}
+)
 
 gz_install_library(gazebo_gui_model)
