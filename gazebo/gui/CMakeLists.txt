@@ -50,6 +50,7 @@ set (sources
   SpaceNav.cc
   SphereMaker.cc
   TimePanel.cc
+  TimeWidget.cc
   ToolsWidget.cc
   TopicSelector.cc
 )
@@ -71,6 +72,7 @@ set (qt_headers
   RenderWidget.hh
   SaveDialog.hh
   TimePanel.hh
+  TimeWidget.hh
   ToolsWidget.hh
   TopicSelector.hh
 )

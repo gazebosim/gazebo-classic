@@ -22,6 +22,7 @@
 #include <string>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/TimeWidget.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/common/Event.hh"
@@ -35,6 +36,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class TimeWidget;
+
     class GAZEBO_VISIBLE TimePanel : public QWidget
     {
       Q_OBJECT
@@ -78,27 +81,14 @@ namespace gazebo
       /// indicates the simulation is running
       public: void SetPaused(bool _paused);
 
-      /// \brief A signal used to set the sim time line edit.
-      /// \param[in] _string String representation of sim time.
-      signals: void SetSimTime(QString _string);
+      /// \brief Qt call back when the step value in the spinbox changed
+      public slots: void OnStepValueChanged(int _value);
 
-      /// \brief A signal used to set the real time line edit.
-      /// \param[in] _string String representation of real time.
-      signals: void SetRealTime(QString _string);
-
-      /// \brief A signal used to set the iterations line edit.
-      /// \param[in] _string String representation of iterations.
-      signals: void SetIterations(QString _string);
-
-      /// \brief A signal used to set the avg fps line edit.
-      /// \param[in] _string String representation of avg fps.
-      signals: void SetFPS(QString _string);
+      /// \brief QT callback when the reset time button is pressed.
+      public slots: void OnTimeReset();
 
       /// \brief Update the data output.
       private slots: void Update();
-
-      /// \brief Qt call back when the step value in the spinbox changed
-      private slots: void OnStepValueChanged(int _value);
 
       /// \brief Called when the GUI enters/leaves full-screen mode.
       /// \param[in] _value True when entering full screen, false when
@@ -112,24 +102,6 @@ namespace gazebo
       /// \brief Helper function to format time string.
       /// \param[in] _msg Time message.
       private: static std::string FormatTime(const msgs::Time &_msg);
-
-      /// \brief QT callback when the reset time button is pressed.
-      private slots: void OnTimeReset();
-
-      /// \brief Display the real time percentage.
-      private: QLineEdit *percentRealTimeEdit;
-
-      /// \brief Display the simulation time.
-      private: QLineEdit *simTimeEdit;
-
-      /// \brief Display the real time.
-      private: QLineEdit *realTimeEdit;
-
-      /// \brief Display the number of iterations.
-      private: QLineEdit *iterationsEdit;
-
-      /// \brief Display the average frames per second.
-      private: QLineEdit *fpsEdit;
 
       /// \brief Node used for communication.
       private: transport::NodePtr node;
@@ -152,32 +124,11 @@ namespace gazebo
       /// \brief Mutex to protect the memeber variables.
       private: boost::mutex mutex;
 
-      /// \brief Tool button that holds the step widget
-      private: QToolButton *stepButton;
-
-      /// \brief Real time factor label.
-      private: QLabel *realTimeFactorLabel;
-
-      /// \brief Sim time label.
-      private: QLabel *simTimeLabel;
-
-      /// \brief Real time label.
-      private: QLabel *realTimeLabel;
-
-      /// \brief Iterations label.
-      private: QLabel *iterationsLabel;
-
-      /// \brief FPS label.
-      private: QLabel *fpsLabel;
-
-      /// \brief Action associated with the step label in the toolbar.
-      private: QAction *stepToolBarLabelAction;
-
-      /// \brief Action associated with the step button in the toolbar.
-      private: QAction *stepButtonAction;
-
       /// \brief Paused state of the simulation.
       private: bool paused;
+
+      /// \brief Paused state of the simulation.
+      private: TimeWidget *timeWidget;
     };
   }
 }
