@@ -24,12 +24,23 @@
       </plugin>
     </model>
 
+    <!-- A ball -->
+    <include>
+      <pose>0 0 0 0 0 0</pose>
+      <uri>model://robocup_3Dsim_ball</uri>
+      <name>foosball_ball</name>
+    </include>
+
     <!-- Load the plugin for Razer Hydra -->
     <plugin name="hydra" filename="libHydraPlugin.so"></plugin>
 
     <!-- Load a plugin to control the foosball demo -->
     <plugin name='foosball_demo' filename='libFoosballDemoPlugin.so'>
       <!-- Parameters -->
+      <ball>foosball_ball</ball>
+      <table_length>2.0</table_length>
+      <table_height>1.0</table_height>
+      <game_duration>180</game_duration>
     </plugin>
 
     <!-- Set the user camera on top of the foosball table -->

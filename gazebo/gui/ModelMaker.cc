@@ -170,8 +170,6 @@ bool ModelMaker::Init()
   modelName = this->modelVisual->GetName();
   modelElem->GetAttribute("name")->Set(modelName);
 
-  scene->AddVisual(this->modelVisual);
-
   if (modelElem->GetName() == "model")
   {
     sdf::ElementPtr linkElem = modelElem->GetElement("link");
