@@ -156,9 +156,7 @@ target_link_libraries(gazebo_rendering
 )
 
 if (HAVE_OCULUS)
-  target_link_libraries(gazebo_rendering
-    OculusVR
-  )
+  target_link_libraries(gazebo_rendering ${OculusVR_LIBRARIES})
 endif()
 
 if (NOT APPLE)

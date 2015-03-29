@@ -360,6 +360,17 @@ namespace gazebo
       /// \param[in] _vis Visual to remove.
       public: void RemoveVisual(VisualPtr _vis);
 
+      /// \brief Remove a visual from the scene.
+      /// \param[in] _id Id of the visual to remove.
+      public: void RemoveVisual(uint32_t _id);
+
+      /// \internal
+      /// \brief Set the id of a visual. Internally used when visual ids'
+      /// are required to be updated from visual msgs.
+      /// \param[in] _vis Pointer to visual.
+      /// \param[in] _id New id to set to.
+      public: void SetVisualId(VisualPtr _vis, uint32_t _id);
+
       /// \brief Add a light to the scene
       /// \param[in] _light Light to add.
       public: void AddLight(LightPtr _light);
