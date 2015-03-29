@@ -94,10 +94,10 @@ namespace gazebo
       /// \param[in] _path Path to be added.
       public: void AddDirToModelPaths(const std::string &_path);
 
-       /// \brief Helper function to generate a valid folder name from a
-       /// human-readable model name.
-       /// \param[in] _modelName Human-readable model name.
-       /// \return Folder name.
+      /// \brief Helper function to generate a valid folder name from a
+      /// human-readable model name.
+      /// \param[in] _modelName Human-readable model name.
+      /// \return Folder name.
       public: std::string GetFolderNameFromModelName(const std::string
           &_modelName);
 
@@ -115,6 +115,7 @@ namespace gazebo
       private slots: void OnAcceptSave();
 
       /// \brief Qt callback when the model name line edit changes.
+      /// \param[in] _modelName New name.
       private slots: void ModelNameChangedOnDialog(QString _modelName);
 
       /// \brief Get a template config file for a simple model.
