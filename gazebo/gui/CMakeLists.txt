@@ -36,6 +36,7 @@ set (sources
   JointControlWidget.cc
   KeyEventHandler.cc
   LightMaker.cc
+  LogPlayWidget.cc
   MainWindow.cc
   ModelAlign.cc
   ModelManipulator.cc
@@ -65,6 +66,7 @@ set (qt_headers
   GLWidget.hh
   InsertModelWidget.hh
   JointControlWidget.hh
+  LogPlayWidget.hh
   MainWindow.hh
   ModelListWidget.hh
   ModelEditWidget.hh

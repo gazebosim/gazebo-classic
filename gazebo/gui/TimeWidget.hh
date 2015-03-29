@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,8 @@
 #ifndef _GAZEBO_TIME_WIDGET_HH_
 #define _GAZEBO_TIME_WIDGET_HH_
 
-#include <vector>
-#include <list>
-#include <string>
-
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/TimePanel.hh"
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/Time.hh"
 #include "gazebo/util/system.hh"
 
 class QLineEdit;

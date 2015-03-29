@@ -23,6 +23,7 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/TimeWidget.hh"
+#include "gazebo/gui/LogPlayWidget.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/common/Event.hh"
@@ -37,6 +38,7 @@ namespace gazebo
   namespace gui
   {
     class TimeWidget;
+    class LogPlayWidget;
 
     class GAZEBO_VISIBLE TimePanel : public QWidget
     {
@@ -80,6 +82,11 @@ namespace gazebo
       /// \param[in] _p True to display the simulation as paused. False
       /// indicates the simulation is running
       public: void SetPaused(bool _paused);
+
+
+      signals: void SetTimeWidgetVisible(bool _visible);
+      signals: void SetLogPlayWidgetVisible(bool _visible);
+
 
       /// \brief Qt call back when the step value in the spinbox changed
       public slots: void OnStepValueChanged(int _value);
@@ -129,6 +136,9 @@ namespace gazebo
 
       /// \brief Paused state of the simulation.
       private: TimeWidget *timeWidget;
+
+      /// \brief Paused state of the simulation.
+      private: LogPlayWidget *logPlayWidget;
     };
   }
 }
