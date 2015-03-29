@@ -32,14 +32,15 @@ class QGVNodePrivate;
  */
 class QGVCORE_EXPORT QGVNode : public QGraphicsItem
 {
-public:
+  public:
     ~QGVNode();
 
     QString label() const;
     void setLabel(const QString &label);
 
     QRectF boundingRect() const;
-    void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+        QWidget *widget = 0);
     void setAttribute(const QString &label, const QString &value);
     QString getAttribute(const QString &name) const;
 
@@ -51,15 +52,15 @@ public:
         return Type;
     }
 
-private:
+  private:
     friend class QGVScene;
     friend class QGVSubGraph;
     void updateLayout();
-		QGVNode(QGVNodePrivate* node, QGVScene *scene);
+    QGVNode(QGVNodePrivate* node, QGVScene *scene);
 
-		// Not implemented in QGVNode.cpp
-//		QPainterPath makeShape(Agnode_t* node) const;
-//		QPolygonF makeShapeHelper(Agnode_t* node) const;
+    // Not implemented in QGVNode.cpp
+//    QPainterPath makeShape(Agnode_t* node) const;
+//    QPolygonF makeShapeHelper(Agnode_t* node) const;
 
     QPainterPath _path;
     QPen _pen;
@@ -67,8 +68,8 @@ private:
     QImage _icon;
 
     QGVScene *_scene;
-		QGVNodePrivate* _node;
+    QGVNodePrivate* _node;
 };
 
 
-#endif // QGVNODE_H
+#endif

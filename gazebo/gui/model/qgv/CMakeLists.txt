@@ -1,6 +1,10 @@
 add_definitions(-DWITH_CGRAPH)
 add_definitions(-DHAVE_STRING_H)
 
+# Activate Export macro for building the library itself
+# if QGVCORE_LIB is not set or equal 0 (null), import macro is used
+add_definitions(-DQGVCORE_LIB)
+
 include ( ${QT_USE_FILE} )
 
 SET(sources
@@ -30,31 +34,15 @@ add_definitions(${QT_DEFINITIONS})
 
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 
-#include_directories(${GRAPHVIZ_GVC_PKG_INCLUDE_DIRS})
 include_directories(${GRAPHVIZ_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/private)
 
-add_library(gazebo_gui_model_sv STATIC ${sources} ${headers_MOC} ${headers} ${resources_RCC})
-set_target_properties(gazebo_gui_model_sv PROPERTIES POSITION_INDEPENDENT_CODE ON)
-#add_library(qgvcore SHARED ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+add_library(gazebo_gui_model_qgv STATIC ${sources} ${headers_MOC} ${headers})
 
-#link_directories(${GRAPHVIZ_CGRAPH_PKG_LIBRARY_DIRS})
+set_target_properties(gazebo_gui_model_qgv PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-#MESSAGE(" ${GRAPHVIZ_GVC_PKG_LIBRARIES} ")
-#MESSAGE(" ${GRAPHVIZ_INCLUDE_DIR} ")
-
-target_link_libraries(gazebo_gui_model_sv
+target_link_libraries(gazebo_gui_model_qgv
   ${QT_LIBRARIES}
   ${GRAPHVIZ_LIBRARIES}
-#  ${GRAPHVIZ_CGRAPH_PKG_LIBRARIES}
-#  ${GRAPHVIZ_CDT_PKG_LIBRARIES}
-#  ${GRAPHVIZ_GVC_PKG_LIBRARIES}
-#  ${GRAPHVIZ_GVC_PKG_LIBRARIES}
-
-#  ${GRAPHVIZ_GVC_LIBRARY}
-#  ${GRAPHVIZ_CGRAPH_LIBRARY}
-#  ${GRAPHVIZ_CDT_LIBRARY}
 )
-
-#install (TARGETS gazebo_gui_model_sv DESTINATION ${SIMPLEGDK_PLUGIN_INSTALL_DIR})

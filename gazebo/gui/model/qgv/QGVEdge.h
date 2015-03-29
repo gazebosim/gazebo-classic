@@ -15,6 +15,7 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public
 License along with this library.
 ***************************************************************/
+
 #ifndef QGVEDGE_H
 #define QGVEDGE_H
 
@@ -32,7 +33,7 @@ class QGVEdgePrivate;
  */
 class QGVCORE_EXPORT QGVEdge : public QGraphicsItem
 {
-public:
+  public:
     ~QGVEdge();
 
     QString label() const;
@@ -41,7 +42,8 @@ public:
 
     void setLabel(const QString &label);
 
-    void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+    void paint(QPainter * painter, const QStyleOptionGraphicsItem * option,
+        QWidget * widget = 0);
 
     void setAttribute(const QString &name, const QString &value);
     QString getAttribute(const QString &name) const;
@@ -54,17 +56,17 @@ public:
         return Type;
     }
 
-private:
-		QGVEdge(QGVEdgePrivate *edge, QGVScene *scene);
+  private:
+    QGVEdge(QGVEdgePrivate *edge, QGVScene *scene);
 
     QPolygonF toArrow(const QLineF &normal) const;
     QPolygonF toBox(const QLineF &normal) const;
 
     friend class QGVScene;
-    //friend class QGVSubGraph;
+    // friend class QGVSubGraph;
 
     QGVScene *_scene;
-		QGVEdgePrivate* _edge;
+    QGVEdgePrivate* _edge;
 
     QPainterPath _path;
     QPen _pen;
@@ -75,4 +77,4 @@ private:
     QRectF _label_rect;
 };
 
-#endif // QGVEDGE_H
+#endif

@@ -1,8 +1,6 @@
 if (HAVE_GRAPHVIZ)
-#  add_subdirectory(qgv)
+  add_subdirectory(qgv)
 endif()
-
-add_subdirectory(qgv)
 
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include (${QT_USE_FILE})
@@ -43,6 +41,20 @@ set (headers
   ModelEditorEvents.hh
 )
 
+if (ENABLE_SCREEN_TESTS)
+  set (qt_tests ${qt_tests}
+    JointMaker_TEST.cc
+    ExtrudeDialog_TEST.cc
+    ModelCreator_TEST.cc
+  )
+endif()
+
+set (libraries_to_link
+  gazebo_common
+  gazebo_rendering
+  gazebo_msgs
+)
+
 if (HAVE_GRAPHVIZ)
   set (qt_headers
     ${qt_headers}
@@ -61,16 +73,18 @@ if (HAVE_GRAPHVIZ)
     ${headers}
     SchematicViewWidget.hh
   )
-endif()
 
-# MainWindow is using screen rendering
-if (ENABLE_SCREEN_TESTS)
-  set (qt_tests ${qt_tests}
-    JointMaker_TEST.cc
-    ExtrudeDialog_TEST.cc
-    ModelCreator_TEST.cc
+  set (qt_tests
+    ${qt_tests}
+    SchematicViewWidget_TEST.cc
+  )
+
+  set (libraries_to_link
+    ${libraries_to_link}
+    gazebo_gui_model_qgv
   )
 endif()
+
 
 # Generate executables for each of the QT unit tests
 gz_build_qt_tests(${qt_tests})
@@ -84,12 +98,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 gz_add_library(gazebo_gui_model ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 
 target_link_libraries(gazebo_gui_model
-  gazebo_common
-#  gazebo_transport
-#  gazebo_sdf_interface
-  gazebo_rendering
-  gazebo_msgs
-  gazebo_gui_model_sv)
+  gazebo_gui_model_qgv
+)
 
 gz_install_library(gazebo_gui_model)
 gz_install_includes("gui/model" ${headers})

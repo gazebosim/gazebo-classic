@@ -105,9 +105,15 @@ void SchematicViewWidget::AddNode(const std::string &_node)
 
   // this must be called before making changes to the graph
   this->scene->clearLayout();
+
   this->scene->AddNode(node);
-  //Layout scene
   this->scene->applyLayout();
+}
+
+/////////////////////////////////////////////////
+unsigned int SchematicViewWidget::GetNodeCount() const
+{
+  return static_cast<unsigned int>(this->scene->nodeCount());
 }
 
 /////////////////////////////////////////////////
@@ -115,14 +121,13 @@ void SchematicViewWidget::RemoveNode(const std::string &_node)
 {
   std::string node = this->GetLeafName(_node);
 
-  if (this->scene->HasNode(node))
+  if (!this->scene->HasNode(node))
     return;
 
   // this must be called before making changes to the graph
   this->scene->clearLayout();
   this->scene->RemoveNode(node);
 
-  //Layout scene
   this->scene->applyLayout();
 }
 
@@ -138,8 +143,8 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
 
   // this must be called before making changes to the graph
   this->scene->clearLayout();
+
   this->scene->AddEdge(parentNode, childNode);
-  //Layout scene
   this->scene->applyLayout();
 }
 
@@ -153,12 +158,18 @@ void SchematicViewWidget::RemoveEdge(const std::string &_id)
     std::string childNode = it->second.second;
     // this must be called before making changes to the graph
     this->scene->clearLayout();
+
     this->scene->RemoveEdge(parentNode, childNode);
-    //Layout scene
     this->scene->applyLayout();
 
     this->edges.erase(it);
   }
+}
+
+/////////////////////////////////////////////////
+unsigned int SchematicViewWidget::GetEdgeCount() const
+{
+  return static_cast<unsigned int>(this->scene->edgeCount());
 }
 
 /////////////////////////////////////////////////
