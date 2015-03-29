@@ -240,7 +240,11 @@ void SaveDialog::OnBrowse()
     if (selected.empty())
       return;
 
-    this->dataPtr->modelLocationLineEdit->setText(selected[0]);
+    // Substitute everything up to the model folder
+    std::string folder = this->GetSaveLocation();
+    folder = folder.substr(folder.rfind("/")+1);
+
+    this->SetSaveLocation(selected[0].toStdString() + "/" + folder);
   }
 }
 
