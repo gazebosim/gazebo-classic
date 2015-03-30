@@ -87,7 +87,10 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   playToolbar->addWidget(emptyLabel);
 
   if (g_stepAct)
+  {
     playToolbar->addAction(g_stepAct);
+    g_stepAct->setEnabled(this->dataPtr->paused);
+  }
   this->dataPtr->stepToolBarLabelAction = playToolbar->addWidget(stepToolBarLabel);
   this->dataPtr->stepButtonAction = playToolbar->addWidget(this->dataPtr->stepButton);
   this->dataPtr->stepButtonAction->setObjectName("timePanelStepAction");
@@ -153,12 +156,12 @@ bool LogPlayWidget::IsPaused() const
 /////////////////////////////////////////////////
 void LogPlayWidget::SetPaused(bool _paused)
 {
+  this->dataPtr->paused = _paused;
+
   if (g_pauseAct)
     g_pauseAct->setVisible(!_paused);
   if (g_playAct)
     g_playAct->setVisible(_paused);
-
-  this->dataPtr->paused = _paused;
 }
 
 /////////////////////////////////////////////////

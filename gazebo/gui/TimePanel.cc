@@ -148,14 +148,14 @@ bool TimePanel::IsPaused() const
 /////////////////////////////////////////////////
 void TimePanel::SetPaused(bool _paused)
 {
+  this->paused = _paused;
+
   if (this->timeWidget->isVisible())
     this->timeWidget->SetPaused(_paused);
   else if (this->logPlayWidget->isVisible())
     this->logPlayWidget->SetPaused(_paused);
   else
     gzwarn << "No widget visible" << std::endl;
-
-  this->paused = _paused;
 }
 
 /////////////////////////////////////////////////
