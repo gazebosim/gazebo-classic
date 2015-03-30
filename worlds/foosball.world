@@ -21,13 +21,35 @@
       <!-- Load the plugin to control the foosball players -->
       <plugin name="foosball_table" filename='libFoosballPlugin.so'>
         <!-- Parameters -->
+        <player>
+          <name>B</name>
+          <left_controller>
+            <rod>0</rod>
+            <rod>1</rod>
+          </left_controller>
+          <right_controller>
+            <rod>2</rod>
+            <rod>3</rod>
+          </right_controller>
+        </player>
+        <!--<player>
+          <name>B</name>
+          <left_controller>
+            <rod>0</rod>
+            <rod>1</rod>
+          </left_controller>
+          <right_controller>
+            <rod>2</rod>
+            <rod>3</rod>
+          </right_controller>
+        </player> -->
       </plugin>
     </model>
 
     <!-- A ball -->
     <include>
       <pose>0 0 0 0 0 0</pose>
-      <uri>model://robocup_3Dsim_ball</uri>
+      <uri>model://foosball_ball</uri>
       <name>foosball_ball</name>
     </include>
 

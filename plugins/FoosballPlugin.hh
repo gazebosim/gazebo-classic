@@ -19,6 +19,7 @@
 #define _GAZEBO_FOOSBALL_PLUGIN_HH_
 
 #include <list>
+#include <map>
 #include <mutex>
 #include <sdf/sdf.hh>
 #include "gazebo/common/UpdateInfo.hh"
@@ -31,6 +32,11 @@ namespace gazebo
 {
   class GAZEBO_VISIBLE FoosballPlugin : public ModelPlugin
   {
+    /// \def Rod_t
+    /// \brief A rod is composed by two joints (prismatic and revolute).
+    typedef std::array<physics::JointPtr, 2> Rod_t;
+    typedef std::map<std::string, std::vector<Rod_t>> Controller_t;
+
     /// \brief Constructor.
     public: FoosballPlugin();
 
@@ -47,6 +53,8 @@ namespace gazebo
 
     /// \brief Initialize the starting position of the Hydra controllers.
     private: void Restart();
+
+    private: void SwitchRod(std::vector<Rod_t> &_aController);
 
     /// \brief Pointer to model containing this plugin.
     private: physics::ModelPtr model;
@@ -84,6 +92,10 @@ namespace gazebo
     private: math::Pose basePoseLeft;
     private: math::Pose leftStartPose;
     private: math::Pose rightStartPose;
+
+    private: std::vector<Controller_t> controllers;
+    private: bool leftTriggerPressed = false;
+    private: bool rightTriggerPressed = false;
   };
 }
 #endif
