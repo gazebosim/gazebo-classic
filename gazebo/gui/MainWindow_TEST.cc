@@ -735,6 +735,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_orbitAct);
 
+  QVERIFY(gazebo::gui::g_overlayAct);
+
   QVERIFY(gazebo::gui::g_viewOculusAct);
 
   QVERIFY(gazebo::gui::g_dataLoggerAct);
@@ -829,6 +831,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_fpsAct);
 
   QVERIFY(!gazebo::gui::g_orbitAct);
+
+  QVERIFY(!gazebo::gui::g_overlayAct);
 
   QVERIFY(!gazebo::gui::g_viewOculusAct);
 

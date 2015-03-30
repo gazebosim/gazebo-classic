@@ -836,6 +836,12 @@ void MainWindow::SetWireframe()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ShowGUIOverlays()
+{
+  this->GetRenderWidget()->SetOverlaysVisible(g_overlayAct->isChecked());
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ShowCOM()
 {
   if (g_showCOMAct->isChecked())
@@ -1204,6 +1210,13 @@ void MainWindow::CreateActions()
   g_orbitAct->setChecked(true);
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
 
+  g_overlayAct = new QAction(tr("GUI Overlays"), this);
+  g_overlayAct->setStatusTip(tr("Show GUI Overlays"));
+  g_overlayAct->setEnabled(false);
+  g_overlayAct->setCheckable(true);
+  g_overlayAct->setChecked(false);
+  connect(g_overlayAct, SIGNAL(triggered()), this, SLOT(ShowGUIOverlays()));
+
   QActionGroup *viewControlActionGroup = new QActionGroup(this);
   viewControlActionGroup->addAction(g_fpsAct);
   viewControlActionGroup->addAction(g_orbitAct);
@@ -1487,6 +1500,9 @@ void MainWindow::DeleteActions()
   delete g_orbitAct;
   g_orbitAct = 0;
 
+  delete g_overlayAct;
+  g_overlayAct = 0;
+
   delete g_viewOculusAct;
   g_viewOculusAct = 0;
 
@@ -1558,6 +1574,9 @@ void MainWindow::CreateMenuBar()
 
   viewMenu->addAction(g_fpsAct);
   viewMenu->addAction(g_orbitAct);
+  viewMenu->addSeparator();
+
+  viewMenu->addAction(g_overlayAct);
 
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
@@ -1702,6 +1721,9 @@ void MainWindow::OnAddPlugins()
     }
   }
   this->pluginMsgs.clear();
+
+  g_overlayAct->setChecked(true);
+  g_overlayAct->setEnabled(true);
 }
 
 /////////////////////////////////////////////////
