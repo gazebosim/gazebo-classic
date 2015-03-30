@@ -27,33 +27,6 @@ namespace gazebo
     /// \brief Private data for the LogPlayWidget class
     class LogPlayWidgetPrivate
     {
-      /// \brief Display the simulation time.
-      public: QLineEdit *simTimeEdit;
-
-      /// \brief Display the number of iterations.
-      public: QLineEdit *iterationsEdit;
-
-      /// \brief Event based connections.
-      public: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Mutex to protect the memeber variables.
-      public: boost::mutex mutex;
-
-      /// \brief Tool button that holds the step widget
-      public: QToolButton *stepButton;
-
-      /// \brief Sim time label.
-      public: QLabel *simTimeLabel;
-
-      /// \brief Iterations label.
-      public: QLabel *iterationsLabel;
-
-      /// \brief Action associated with the step label in the toolbar.
-      public: QAction *stepToolBarLabelAction;
-
-      /// \brief Action associated with the step button in the toolbar.
-      public: QAction *stepButtonAction;
-
       /// \brief Paused state of the simulation.
       public: bool paused;
 

@@ -37,6 +37,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class TimePanelPrivate;
     class TimeWidget;
     class LogPlayWidget;
 
@@ -49,6 +50,9 @@ namespace gazebo
 
       /// \brief Destructor
       public: virtual ~TimePanel();
+
+      /// \brief Qt call back when the play action state changes
+      private slots: void OnPlayActionChanged();
 
       /// \brief Show real time factor.
       /// \param[in] _show True to display real time factor.
@@ -110,35 +114,9 @@ namespace gazebo
       /// \param[in] _msg Time message.
       private: static std::string FormatTime(const msgs::Time &_msg);
 
-      /// \brief Node used for communication.
-      private: transport::NodePtr node;
-
-      /// \brief Subscriber to the statistics topic.
-      private: transport::SubscriberPtr statsSub;
-
-      /// \brief Used to start, stop, and step simulation.
-      private: transport::PublisherPtr worldControlPub;
-
-      /// \brief Event based connections.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief List of simulation times used to compute averages.
-      private: std::list<common::Time> simTimes;
-
-      /// \brief List of real times used to compute averages.
-      private: std::list<common::Time> realTimes;
-
-      /// \brief Mutex to protect the memeber variables.
-      private: boost::mutex mutex;
-
-      /// \brief Paused state of the simulation.
-      private: bool paused;
-
-      /// \brief Paused state of the simulation.
-      private: TimeWidget *timeWidget;
-
-      /// \brief Paused state of the simulation.
-      private: LogPlayWidget *logPlayWidget;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: TimePanelPrivate *dataPtr;
     };
   }
 }

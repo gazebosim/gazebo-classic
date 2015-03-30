@@ -26,7 +26,7 @@ using namespace gui;
 TimeWidget::TimeWidget(QWidget *_parent)
   : QWidget(_parent), dataPtr(new TimeWidgetPrivate)
 {
-  this->setObjectName("timePanel");
+  this->setObjectName("timeWidget");
 
   this->dataPtr->timePanel = dynamic_cast<TimePanel *>(_parent);
 
@@ -57,7 +57,8 @@ TimeWidget::TimeWidget(QWidget *_parent)
 
   QMenu *stepMenu = new QMenu;
   this->dataPtr->stepButton = new QToolButton;
-  this->dataPtr->stepButton->setMaximumSize(35, this->dataPtr->stepButton->height());
+  this->dataPtr->stepButton->setMaximumSize(35,
+      this->dataPtr->stepButton->height());
   QWidgetAction *stepAction = new QWidgetAction(stepMenu);
   stepAction->setDefaultWidget(stepWidget);
   stepMenu->addAction(stepAction);
@@ -91,44 +92,46 @@ TimeWidget::TimeWidget(QWidget *_parent)
     playToolbar->addAction(g_stepAct);
     g_stepAct->setEnabled(this->dataPtr->paused);
   }
-  this->dataPtr->stepToolBarLabelAction = playToolbar->addWidget(stepToolBarLabel);
-  this->dataPtr->stepButtonAction = playToolbar->addWidget(this->dataPtr->stepButton);
-  this->dataPtr->stepButtonAction->setObjectName("timePanelStepAction");
+  this->dataPtr->stepToolBarLabelAction =
+      playToolbar->addWidget(stepToolBarLabel);
+  this->dataPtr->stepButtonAction =
+      playToolbar->addWidget(this->dataPtr->stepButton);
+  this->dataPtr->stepButtonAction->setObjectName("timeWidgetStepAction");
 
   this->dataPtr->percentRealTimeEdit = new QLineEdit;
-  this->dataPtr->percentRealTimeEdit->setObjectName("timePanelPercentRealTime");
+  this->dataPtr->percentRealTimeEdit->setObjectName(
+      "timeWidgetPercentRealTime");
   this->dataPtr->percentRealTimeEdit->setReadOnly(true);
   this->dataPtr->percentRealTimeEdit->setFixedWidth(90);
 
   this->dataPtr->simTimeEdit = new QLineEdit;
-  this->dataPtr->simTimeEdit->setObjectName("timePanelSimTime");
+  this->dataPtr->simTimeEdit->setObjectName("timeWidgetSimTime");
   this->dataPtr->simTimeEdit->setReadOnly(true);
   this->dataPtr->simTimeEdit->setFixedWidth(110);
 
   this->dataPtr->realTimeEdit = new QLineEdit;
-  this->dataPtr->realTimeEdit->setObjectName("timePanelRealTime");
+  this->dataPtr->realTimeEdit->setObjectName("timeWidgetRealTime");
   this->dataPtr->realTimeEdit->setReadOnly(true);
   this->dataPtr->realTimeEdit->setFixedWidth(110);
 
   this->dataPtr->iterationsEdit = new QLineEdit;
   this->dataPtr->iterationsEdit->setReadOnly(true);
   this->dataPtr->iterationsEdit->setFixedWidth(110);
-  this->dataPtr->iterationsEdit->setObjectName("timePanelIterations");
+  this->dataPtr->iterationsEdit->setObjectName("timeWidgetIterations");
 
   this->dataPtr->fpsEdit = new QLineEdit;
   this->dataPtr->fpsEdit->setReadOnly(true);
   this->dataPtr->fpsEdit->setFixedWidth(90);
-  this->dataPtr->fpsEdit->setObjectName("timePanelFPS");
+  this->dataPtr->fpsEdit->setObjectName("timeWidgetFPS");
 
   QPushButton *timeResetButton = new QPushButton("Reset");
   timeResetButton->setFocusPolicy(Qt::NoFocus);
-  connect(timeResetButton, SIGNAL(clicked()),
-          this, SLOT(OnTimeReset()));
+  connect(timeResetButton, SIGNAL(clicked()), this, SLOT(OnTimeReset()));
 
   QHBoxLayout *frameLayout = new QHBoxLayout;
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frameLayout->addItem(new QSpacerItem(5, -1, QSizePolicy::Expanding,
-                             QSizePolicy::Minimum));
+      QSizePolicy::Minimum));
   frameLayout->addWidget(playToolbar);
 
   this->dataPtr->realTimeFactorLabel = new QLabel(tr("Real Time Factor:"));
@@ -154,7 +157,7 @@ TimeWidget::TimeWidget(QWidget *_parent)
   frameLayout->addWidget(timeResetButton);
 
   frameLayout->addItem(new QSpacerItem(15, -1, QSizePolicy::Expanding,
-                       QSizePolicy::Minimum));
+      QSizePolicy::Minimum));
 
   frame->setLayout(frameLayout);
   frame->layout()->setContentsMargins(0, 0, 0, 0);
@@ -167,23 +170,23 @@ TimeWidget::TimeWidget(QWidget *_parent)
 
   // Create a QueuedConnection to set avg fps.
   // This is used for thread safety.
-  connect(this, SIGNAL(SetFPS(QString)),
-          this->dataPtr->fpsEdit, SLOT(setText(QString)), Qt::QueuedConnection);
+  connect(this, SIGNAL(SetFPS(QString)), this->dataPtr->fpsEdit,
+      SLOT(setText(QString)), Qt::QueuedConnection);
 
   // Create a QueuedConnection to set iterations.
   // This is used for thread safety.
-  connect(this, SIGNAL(SetIterations(QString)),
-          this->dataPtr->iterationsEdit, SLOT(setText(QString)), Qt::QueuedConnection);
+  connect(this, SIGNAL(SetIterations(QString)), this->dataPtr->iterationsEdit,
+      SLOT(setText(QString)), Qt::QueuedConnection);
 
   // Create a QueuedConnection to set sim time.
   // This is used for thread safety.
-  connect(this, SIGNAL(SetSimTime(QString)),
-          this->dataPtr->simTimeEdit, SLOT(setText(QString)), Qt::QueuedConnection);
+  connect(this, SIGNAL(SetSimTime(QString)), this->dataPtr->simTimeEdit,
+      SLOT(setText(QString)), Qt::QueuedConnection);
 
   // Create a QueuedConnection to set real time.
   // This is used for thread safety.
-  connect(this, SIGNAL(SetRealTime(QString)),
-          this->dataPtr->realTimeEdit, SLOT(setText(QString)), Qt::QueuedConnection);
+  connect(this, SIGNAL(SetRealTime(QString)), this->dataPtr->realTimeEdit,
+      SLOT(setText(QString)), Qt::QueuedConnection);
 }
 
 /////////////////////////////////////////////////
@@ -191,16 +194,6 @@ TimeWidget::~TimeWidget()
 {
   delete this->dataPtr;
   this->dataPtr = NULL;
-}
-
-/////////////////////////////////////////////////
-void TimeWidget::OnFullScreen(bool & /*_value*/)
-{
-  /*if (_value)
-    this->hide();
-  else
-    this->show();
-    */
 }
 
 /////////////////////////////////////////////////

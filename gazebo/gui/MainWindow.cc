@@ -566,13 +566,6 @@ void MainWindow::Play()
   msgs::WorldControl msg;
   msg.set_pause(false);
 
-  if (this->renderWidget)
-  {
-    TimePanel *timePanel = this->renderWidget->GetTimePanel();
-    if (timePanel)
-      timePanel->SetPaused(false);
-  }
-
   this->worldControlPub->Publish(msg);
 }
 
@@ -581,13 +574,6 @@ void MainWindow::Pause()
 {
   msgs::WorldControl msg;
   msg.set_pause(true);
-
-  if (this->renderWidget)
-  {
-    TimePanel *timePanel = this->renderWidget->GetTimePanel();
-    if (timePanel)
-      timePanel->SetPaused(true);
-  }
 
   this->worldControlPub->Publish(msg);
 }
@@ -1028,8 +1014,6 @@ void MainWindow::CreateActions()
   g_playAct->setStatusTip(tr("Run the world"));
   g_playAct->setVisible(false);
   connect(g_playAct, SIGNAL(triggered()), this, SLOT(Play()));
-  connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
-  this->OnPlayActionChanged();
 
   g_pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
   g_pauseAct->setStatusTip(tr("Pause the world"));
@@ -1694,28 +1678,6 @@ void MainWindow::OnSetSelectedEntity(const std::string &_name,
   if (!_name.empty())
   {
     this->tabWidget->setCurrentIndex(0);
-  }
-}
-
-/////////////////////////////////////////////////
-void MainWindow::OnPlayActionChanged()
-{
-  if (this->renderWidget)
-  {
-    TimePanel *timePanel = this->renderWidget->GetTimePanel();
-    if (timePanel)
-    {
-      if (timePanel->IsPaused())
-      {
-        g_stepAct->setToolTip("Step the world");
-        g_stepAct->setEnabled(true);
-      }
-      else
-      {
-        g_stepAct->setToolTip("Pause the world before stepping");
-        g_stepAct->setEnabled(false);
-      }
-    }
   }
 }
 

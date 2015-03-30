@@ -170,9 +170,6 @@ namespace gazebo
       private slots: void SetTransparent();
       private slots: void SetWireframe();
 
-      /// \brief Qt call back when the play action state changes
-      private slots: void OnPlayActionChanged();
-
       /// \brief QT slot to open the data logger utility
       private slots: void DataLogger();
 

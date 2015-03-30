@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_TIME_WIDGET_PRIVATE_HH_
 #define _GAZEBO_TIME_WIDGET_PRIVATE_HH_
 
+#include <vector>
+
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -27,53 +29,50 @@ namespace gazebo
     /// \brief Private data for the TimeWidget class
     class TimeWidgetPrivate
     {
-      /// \brief Display the real time percentage.
-      public: QLineEdit *percentRealTimeEdit;
+      /// \brief Sim time label.
+      public: QLabel *simTimeLabel;
 
       /// \brief Display the simulation time.
       public: QLineEdit *simTimeEdit;
 
+      /// \brief Real time label.
+      public: QLabel *realTimeLabel;
+
       /// \brief Display the real time.
       public: QLineEdit *realTimeEdit;
-
-      /// \brief Display the number of iterations.
-      public: QLineEdit *iterationsEdit;
-
-      /// \brief Display the average frames per second.
-      public: QLineEdit *fpsEdit;
-
-      /// \brief Event based connections.
-      public: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Mutex to protect the memeber variables.
-      public: boost::mutex mutex;
-
-      /// \brief Tool button that holds the step widget
-      public: QToolButton *stepButton;
 
       /// \brief Real time factor label.
       public: QLabel *realTimeFactorLabel;
 
-      /// \brief Sim time label.
-      public: QLabel *simTimeLabel;
-
-      /// \brief Real time label.
-      public: QLabel *realTimeLabel;
+      /// \brief Display the real time percentage.
+      public: QLineEdit *percentRealTimeEdit;
 
       /// \brief Iterations label.
       public: QLabel *iterationsLabel;
 
+      /// \brief Display the number of iterations.
+      public: QLineEdit *iterationsEdit;
+
       /// \brief FPS label.
       public: QLabel *fpsLabel;
 
+      /// \brief Display the average frames per second.
+      public: QLineEdit *fpsEdit;
+
       /// \brief Action associated with the step label in the toolbar.
       public: QAction *stepToolBarLabelAction;
+
+      /// \brief Tool button that holds the step widget
+      public: QToolButton *stepButton;
 
       /// \brief Action associated with the step button in the toolbar.
       public: QAction *stepButtonAction;
 
       /// \brief Paused state of the simulation.
       public: bool paused;
+
+      /// \brief Event based connections.
+      public: std::vector<event::ConnectionPtr> connections;
 
       /// \brief Paused state of the simulation.
       public: TimePanel *timePanel;

@@ -47,24 +47,21 @@ namespace gazebo
       /// indicates the simulation is running
       public: void SetPaused(bool _paused);
 
+      /// \brief Emit signal to set sim time line edit.
+      /// \param[in] _string String representation of sim time.
+      public: void EmitSetSimTime(QString _string);
+
+      /// \brief Emit signal to set iterations line edit.
+      /// \param[in] _string String representation of sim time.
+      public: void EmitSetIterations(QString _string);
+
       /// \brief A signal used to set the sim time line edit.
       /// \param[in] _string String representation of sim time.
       signals: void SetSimTime(QString _string);
 
-      /// \brief A signal used to set the sim time line edit.
-      /// \param[in] _string String representation of sim time.
-      public: void EmitSetSimTime(QString _string);
-
       /// \brief A signal used to set the iterations line edit.
       /// \param[in] _string String representation of iterations.
       signals: void SetIterations(QString _string);
-
-      /// \brief A signal used to set the sim time line edit.
-      /// \param[in] _string String representation of sim time.
-      public: void EmitSetIterations(QString _string);
-
-      /// \brief Qt call back when the step value in the spinbox changed
-      public slots: void OnStepValueChanged(int _value);
 
       /// \internal
       /// \brief Pointer to private data.

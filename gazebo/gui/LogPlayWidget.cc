@@ -26,7 +26,7 @@ using namespace gui;
 LogPlayWidget::LogPlayWidget(QWidget *_parent)
   : QWidget(_parent), dataPtr(new LogPlayWidgetPrivate)
 {
-  this->setObjectName("timePanel");
+  this->setObjectName("logPlayWidget");
 
   this->dataPtr->timePanel = dynamic_cast<TimePanel *>(_parent);
 
@@ -41,35 +41,6 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
   // Play control (Play/Step/Pause)
-  QSpinBox *stepSpinBox = new QSpinBox;
-  stepSpinBox->setRange(1, 9999);
-  connect(stepSpinBox, SIGNAL(valueChanged(int)), this,
-      SLOT(OnStepValueChanged(int)));
-
-  QWidget *stepWidget = new QWidget;
-  QLabel *stepLabel = new QLabel(tr("Steps:"));
-  QVBoxLayout *stepLayout = new QVBoxLayout;
-  stepLayout->addWidget(stepLabel);
-  stepLayout->addWidget(stepSpinBox);
-  stepWidget->setLayout(stepLayout);
-
-  QLabel *stepToolBarLabel = new QLabel(tr("Steps:"));
-
-  QMenu *stepMenu = new QMenu;
-  this->dataPtr->stepButton = new QToolButton;
-  this->dataPtr->stepButton->setMaximumSize(35, this->dataPtr->stepButton->height());
-  QWidgetAction *stepAction = new QWidgetAction(stepMenu);
-  stepAction->setDefaultWidget(stepWidget);
-  stepMenu->addAction(stepAction);
-  this->dataPtr->stepButton->setMenu(stepMenu);
-  this->dataPtr->stepButton->setPopupMode(QToolButton::InstantPopup);
-  this->dataPtr->stepButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
-  this->dataPtr->stepButton->setContentsMargins(0, 0, 0, 0);
-  this->OnStepValueChanged(1);
-
-  connect(stepSpinBox, SIGNAL(editingFinished()), stepMenu,
-      SLOT(hide()));
-
   QFrame *frame = new QFrame(scrollArea);
   frame->setFrameShape(QFrame::NoFrame);
   scrollArea->setWidget(frame);
@@ -91,19 +62,16 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
     playToolbar->addAction(g_stepAct);
     g_stepAct->setEnabled(this->dataPtr->paused);
   }
-  this->dataPtr->stepToolBarLabelAction = playToolbar->addWidget(stepToolBarLabel);
-  this->dataPtr->stepButtonAction = playToolbar->addWidget(this->dataPtr->stepButton);
-  this->dataPtr->stepButtonAction->setObjectName("timePanelStepAction");
 
-  this->dataPtr->simTimeEdit = new QLineEdit;
-  this->dataPtr->simTimeEdit->setObjectName("timePanelSimTime");
-  this->dataPtr->simTimeEdit->setReadOnly(true);
-  this->dataPtr->simTimeEdit->setFixedWidth(110);
+  QLineEdit *simTimeEdit = new QLineEdit();
+  simTimeEdit->setObjectName("logPlayWidgetSimTime");
+  simTimeEdit->setReadOnly(true);
+  simTimeEdit->setFixedWidth(110);
 
-  this->dataPtr->iterationsEdit = new QLineEdit;
-  this->dataPtr->iterationsEdit->setReadOnly(true);
-  this->dataPtr->iterationsEdit->setFixedWidth(110);
-  this->dataPtr->iterationsEdit->setObjectName("timePanelIterations");
+  QLineEdit *iterationsEdit = new QLineEdit();
+  iterationsEdit->setReadOnly(true);
+  iterationsEdit->setFixedWidth(110);
+  iterationsEdit->setObjectName("logPlayWidgetIterations");
 
   QHBoxLayout *frameLayout = new QHBoxLayout;
   frameLayout->setContentsMargins(0, 0, 0, 0);
@@ -111,13 +79,11 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
                              QSizePolicy::Minimum));
   frameLayout->addWidget(playToolbar);
 
-  this->dataPtr->simTimeLabel = new QLabel(tr("Sim Time:"));
-  frameLayout->addWidget(this->dataPtr->simTimeLabel);
-  frameLayout->addWidget(this->dataPtr->simTimeEdit);
+  frameLayout->addWidget(new QLabel(tr("Sim Time:")));
+  frameLayout->addWidget(simTimeEdit);
 
-  this->dataPtr->iterationsLabel = new QLabel(tr("Iterations:"));
-  frameLayout->addWidget(this->dataPtr->iterationsLabel);
-  frameLayout->addWidget(this->dataPtr->iterationsEdit);
+  frameLayout->addWidget(new QLabel(tr("Iterations:")));
+  frameLayout->addWidget(iterationsEdit);
 
   frame->setLayout(frameLayout);
   frame->layout()->setContentsMargins(0, 0, 0, 0);
@@ -132,12 +98,13 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   // Create a QueuedConnection to set iterations.
   // This is used for thread safety.
   connect(this, SIGNAL(SetIterations(QString)),
-          this->dataPtr->iterationsEdit, SLOT(setText(QString)), Qt::QueuedConnection);
+      iterationsEdit, SLOT(setText(QString)),
+      Qt::QueuedConnection);
 
   // Create a QueuedConnection to set sim time.
   // This is used for thread safety.
   connect(this, SIGNAL(SetSimTime(QString)),
-          this->dataPtr->simTimeEdit, SLOT(setText(QString)), Qt::QueuedConnection);
+      simTimeEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 }
 
 /////////////////////////////////////////////////
@@ -162,20 +129,6 @@ void LogPlayWidget::SetPaused(bool _paused)
     g_pauseAct->setVisible(!_paused);
   if (g_playAct)
     g_playAct->setVisible(_paused);
-}
-
-/////////////////////////////////////////////////
-void LogPlayWidget::OnStepValueChanged(int _value)
-{
-  // text formating and resizing for better presentation
-  std::string numStr = QString::number(_value).toStdString();
-  QFont stepFont = this->dataPtr->stepButton->font();
-  stepFont.setPointSizeF(11 - numStr.size()/2.0);
-  this->dataPtr->stepButton->setFont(stepFont);
-  numStr.insert(numStr.end(), 4 - numStr.size(), ' ');
-  this->dataPtr->stepButton->setText(tr(numStr.c_str()));
-
-  this->dataPtr->timePanel->OnStepValueChanged(_value);
 }
 
 /////////////////////////////////////////////////

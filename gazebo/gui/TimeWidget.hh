@@ -45,11 +45,11 @@ namespace gazebo
       /// \param[in] _show True to display real time factor.
       public: void ShowRealTimeFactor(bool _show);
 
-      /// \brief Show real time
+      /// \brief Show real time.
       /// \param[in] _show True to display real time.
       public: void ShowRealTime(bool _show);
 
-      /// \brief Show sim time
+      /// \brief Show sim time.
       /// \param[in] _show True to display sim time.
       public: void ShowSimTime(bool _show);
 
@@ -70,56 +70,52 @@ namespace gazebo
       public: bool IsPaused() const;
 
       /// \brief Set whether to display the simulation as paused.
-      /// \param[in] _p True to display the simulation as paused. False
+      /// \param[in] _paused True to display the simulation as paused. False
       /// indicates the simulation is running
       public: void SetPaused(bool _paused);
 
-      /// \brief A signal used to set the sim time line edit.
-      /// \param[in] _string String representation of sim time.
-      signals: void SetSimTime(QString _string);
-
-      /// \brief A signal used to set the sim time line edit.
+      /// \brief Emit a signal used to set the sim time line edit.
       /// \param[in] _string String representation of sim time.
       public: void EmitSetSimTime(QString _string);
 
-      /// \brief A signal used to set the real time line edit.
+      /// \brief Emit a signal used to set the real time line edit.
       /// \param[in] _string String representation of real time.
-      signals: void SetRealTime(QString _string);
-
-      /// \brief A signal used to set the sim time line edit.
-      /// \param[in] _string String representation of sim time.
       public: void EmitSetRealTime(QString _string);
 
-      /// \brief A signal used to set the iterations line edit.
+      /// \brief Emit a signal used to set the iterations line edit.
       /// \param[in] _string String representation of iterations.
-      signals: void SetIterations(QString _string);
-
-      /// \brief A signal used to set the sim time line edit.
-      /// \param[in] _string String representation of sim time.
       public: void EmitSetIterations(QString _string);
 
-      /// \brief A signal used to set the avg fps line edit.
-      /// \param[in] _string String representation of avg fps.
-      signals: void SetFPS(QString _string);
-
-      /// \brief A signal used to set the sim time line edit.
-      /// \param[in] _string String representation of sim time.
+      /// \brief Emit a signal used to set the FPS line edit.
+      /// \param[in] _string String representation of average FPS.
       public: void EmitSetFPS(QString _string);
 
-      /// \brief Qt call back when the step value in the spinbox changed
-      public slots: void OnStepValueChanged(int _value);
+      /// \brief A signal used to set the sim time line edit.
+      /// \param[in] _string String representation of real time factor.
+      public: void SetPercentRealTimeEdit(QString _text);
 
-      /// \brief Called when the GUI enters/leaves full-screen mode.
-      /// \param[in] _value True when entering full screen, false when
-      /// leaving.
-      public: void OnFullScreen(bool &_value);
+      /// \brief Qt call back when the step value in the spinbox changed
+      /// \param[in] _value New step value.
+      public slots: void OnStepValueChanged(int _value);
 
       /// \brief QT callback when the reset time button is pressed.
       public slots: void OnTimeReset();
 
       /// \brief A signal used to set the sim time line edit.
       /// \param[in] _string String representation of sim time.
-      public: void SetPercentRealTimeEdit(QString _text);
+      signals: void SetSimTime(QString _string);
+
+      /// \brief A signal used to set the real time line edit.
+      /// \param[in] _string String representation of real time.
+      signals: void SetRealTime(QString _string);
+
+      /// \brief A signal used to set the iterations line edit.
+      /// \param[in] _string String representation of iterations.
+      signals: void SetIterations(QString _string);
+
+      /// \brief A signal used to set the avg fps line edit.
+      /// \param[in] _string String representation of avg fps.
+      signals: void SetFPS(QString _string);
 
       /// \internal
       /// \brief Pointer to private data.
