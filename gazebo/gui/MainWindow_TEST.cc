@@ -277,7 +277,7 @@ void MainWindow_TEST::CopyPaste()
 
     // Move to center of the screen
     QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
-    QTest::mouseMove(glWidget, moveTo, 100);
+    QTest::mouseMove(glWidget, moveTo, 500);
 
     // Paste the model
     QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier, 500);
