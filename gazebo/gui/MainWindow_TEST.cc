@@ -181,14 +181,6 @@ void MainWindow_TEST::SceneDestruction()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
-
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
   QVERIFY(cam != NULL);
@@ -318,17 +310,17 @@ void MainWindow_TEST::CopyPaste()
     QVERIFY(gazebo::gui::g_pasteAct != NULL);
 
     // Copy the model
-    QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier, 500);
+    QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier, 100);
 
     // Move to center of the screen
     QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
-    QTest::mouseMove(glWidget, moveTo, 500);
+    QTest::mouseMove(glWidget, moveTo, 100);
 
     // Paste the model
-    QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier, 500);
+    QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier, 100);
 
     // Release and spawn the model
-    QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo, 500);
+    QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo, 100);
     QCoreApplication::processEvents();
 
     // Verify there is a clone of the model
