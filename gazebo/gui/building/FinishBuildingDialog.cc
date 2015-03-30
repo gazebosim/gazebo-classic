@@ -225,11 +225,19 @@ void FinishBuildingDialog::SetSaveLocation(const std::string &_location)
 /////////////////////////////////////////////////
 void FinishBuildingDialog::OnBrowse()
 {
-  QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-    QDir::homePath(), QFileDialog::ShowDirsOnly
-    | QFileDialog::DontResolveSymlinks);
-  if (!dir.isEmpty())
-    this->modelLocationLineEdit->setText(dir);
+  QFileDialog fileDialog(this, tr("Open Directory"), QDir::homePath());
+  fileDialog.setFileMode(QFileDialog::Directory);
+  fileDialog.setOptions(QFileDialog::ShowDirsOnly
+      | QFileDialog::DontResolveSymlinks);
+
+  if (fileDialog.exec() == QDialog::Accepted)
+  {
+    QStringList selected = fileDialog.selectedFiles();
+    if (selected.empty())
+      return;
+
+    this->modelLocationLineEdit->setText(selected[0]);
+  }
 }
 
 /////////////////////////////////////////////////
