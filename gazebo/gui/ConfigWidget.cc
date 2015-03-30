@@ -912,7 +912,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
               if (valueDescriptor)
                 enumValues.push_back(valueDescriptor->name());
             }
-            configChildWidget = this->CreateEnumWidget(name, enumValues);
+            configChildWidget = this->CreateEnumWidget(name, enumValues, _level);
 
             if (!configChildWidget)
             {
@@ -1385,8 +1385,7 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
-    const std::string &/*_key*/,
-    int _level)
+    const std::string &/*_key*/, int _level)
 {
   // Geometry ComboBox
   QLabel *geometryLabel = new QLabel(tr("Geometry"));
@@ -1552,26 +1551,35 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateEnumWidget(
-    const std::string &_key, const std::vector<std::string> &_values)
+    const std::string &_key, const std::vector<std::string> &_values,
+    int _level)
 {
-  QLabel *enumLabel = new QLabel(tr(_key.c_str()));
+  // Label
+  QLabel *enumLabel = new QLabel(this->GetHumanReadableString(_key).c_str());
+
+  // ComboBox
   QComboBox *enumComboBox = new QComboBox;
 
   for (unsigned int i = 0; i < _values.size(); ++i)
     enumComboBox->addItem(tr(_values[i].c_str()));
 
-  QHBoxLayout *enumLayout = new QHBoxLayout;
-  enumLayout->addWidget(enumLabel);
-  enumLayout->addWidget(enumComboBox);
+  // Layout
+  QHBoxLayout *widgetLayout = new QHBoxLayout;
+  if (_level != 0)
+    widgetLayout->addItem(new QSpacerItem(20*_level, 1,
+        QSizePolicy::Fixed, QSizePolicy::Fixed));
+  widgetLayout->addWidget(enumLabel);
+  widgetLayout->addWidget(enumComboBox);
 
+  // ChildWidget
   EnumConfigWidget *widget = new EnumConfigWidget();
-
+  widget->setLayout(widgetLayout);
+  widget->setFrameStyle(QFrame::Box);
   connect(enumComboBox, SIGNAL(currentIndexChanged(const QString &)),
       widget, SLOT(EnumChanged(const QString &)));
 
-  enumLayout->setContentsMargins(0, 0, 0, 0);
-  widget->setLayout(enumLayout);
   widget->widgets.push_back(enumComboBox);
+
   return widget;
 }
 

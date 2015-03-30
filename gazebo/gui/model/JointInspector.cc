@@ -39,6 +39,7 @@ JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
 
   QScrollArea *scrollArea = new QScrollArea;
   scrollArea->setWidget(configWidget);
+  scrollArea->setWidgetResizable(true);
 
   generalLayout->setContentsMargins(0, 0, 0, 0);
   generalLayout->addWidget(scrollArea);
@@ -122,8 +123,8 @@ JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
   mainLayout->addLayout(generalLayout);
   mainLayout->addLayout(buttonsLayout);
 
-  this->setMinimumWidth(685);
-  this->setMinimumHeight(850);
+  this->setMinimumWidth(500);
+  this->setMinimumHeight(300);
 
   this->setLayout(mainLayout);
 }

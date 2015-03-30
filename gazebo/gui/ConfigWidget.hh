@@ -390,7 +390,7 @@ namespace gazebo
       /// \param[in] _values A list of enum values in string.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateEnumWidget(const std::string &_key,
-          const std::vector<std::string> &_values);
+          const std::vector<std::string> &_values, int _level);
 
       /// \brief Update a child widget with an unsigned integer value.
       /// \param[in] _widget Pointer to the child widget.
