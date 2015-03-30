@@ -38,7 +38,8 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
 
   this->dataPtr->messageLabel = new QLabel;
   this->dataPtr->messageLabel->setText(
-      tr("Pick a location for your model:\n"));
+      tr("Pick a name and a location for your model.\n"
+         "All the model files will be saved in the model folder.\n"));
 
   QLabel *modelLabel = new QLabel;
   modelLabel->setText(tr("Model Name:"));
@@ -52,6 +53,7 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
   QLabel *modelLocation = new QLabel;
   modelLocation->setText(tr("Location:"));
   this->dataPtr->modelLocationLineEdit = new QLineEdit;
+  this->dataPtr->modelLocationLineEdit->setMinimumWidth(300);
 
   // Try to get path to home folder
   if (_mode == SaveMode::BUILDING)
@@ -159,16 +161,12 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
   mainLayout->addWidget(this->dataPtr->messageLabel);
   mainLayout->addLayout(modelNameLayout);
   mainLayout->addLayout(locationLayout);
-
   mainLayout->addLayout(advancedOptions);
   mainLayout->addWidget(this->dataPtr->advancedOptionsWidget);
   mainLayout->addLayout(buttonsLayout);
-  mainLayout->setAlignment(Qt::AlignTop);
+  mainLayout->setSizeConstraint(QLayout::SetFixedSize);
 
   this->setLayout(mainLayout);
-  this->setMinimumSize(400, 170);
-  this->setMaximumSize(400, 380);
-  this->resize(this->minimumSize());
 }
 
 /////////////////////////////////////////////////
@@ -334,12 +332,10 @@ void SaveDialog::ToggleAdvancedOptions(bool _checked)
   if (_checked)
   {
     this->dataPtr->advancedOptionsWidget->show();
-    this->resize(this->maximumSize());
   }
   else
   {
     this->dataPtr->advancedOptionsWidget->hide();
-    this->resize(this->minimumSize());
   }
 }
 
