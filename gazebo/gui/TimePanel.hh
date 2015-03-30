@@ -51,9 +51,6 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~TimePanel();
 
-      /// \brief Qt call back when the play action state changes
-      private slots: void OnPlayActionChanged();
-
       /// \brief Show real time factor.
       /// \param[in] _show True to display real time factor.
       public: void ShowRealTimeFactor(bool _show);
@@ -87,19 +84,21 @@ namespace gazebo
       /// indicates the simulation is running
       public: void SetPaused(bool _paused);
 
-
-      signals: void SetTimeWidgetVisible(bool _visible);
-      signals: void SetLogPlayWidgetVisible(bool _visible);
-
-
       /// \brief Qt call back when the step value in the spinbox changed
       public slots: void OnStepValueChanged(int _value);
 
       /// \brief QT callback when the reset time button is pressed.
       public slots: void OnTimeReset();
 
+      signals: void SetTimeWidgetVisible(bool _visible);
+
+      signals: void SetLogPlayWidgetVisible(bool _visible);
+
       /// \brief Update the data output.
       private slots: void Update();
+
+      /// \brief Qt call back when the play action state changes
+      private slots: void OnPlayActionChanged();
 
       /// \brief Called when the GUI enters/leaves full-screen mode.
       /// \param[in] _value True when entering full screen, false when

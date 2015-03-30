@@ -127,6 +127,7 @@ set (qt_tests
   RenderWidget_TEST.cc
   SaveDialog_TEST.cc
   TimePanel_TEST.cc
+  TimeWidget_TEST.cc
 )
 
 # MainWindow is using screen rendering

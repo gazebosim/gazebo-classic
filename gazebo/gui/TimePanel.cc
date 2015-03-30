@@ -101,16 +101,20 @@ TimePanel::~TimePanel()
 /////////////////////////////////////////////////
 void TimePanel::OnPlayActionChanged()
 {
-      if (this->IsPaused())
-      {
-        g_stepAct->setToolTip("Step the world");
-        g_stepAct->setEnabled(true);
-      }
-      else
-      {
-        g_stepAct->setToolTip("Pause the world before stepping");
-        g_stepAct->setEnabled(false);
-      }
+  // Tests don't see external actions
+  if (!g_stepAct)
+    return;
+
+  if (this->IsPaused())
+  {
+    g_stepAct->setToolTip("Step the world");
+    g_stepAct->setEnabled(true);
+  }
+  else
+  {
+    g_stepAct->setToolTip("Pause the world before stepping");
+    g_stepAct->setEnabled(false);
+  }
 }
 
 /////////////////////////////////////////////////

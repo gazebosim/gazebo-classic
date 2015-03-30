@@ -33,6 +33,51 @@ void OnRequest(ConstRequestPtr &_msg)
     g_gotSetWireframe = true;
 }
 
+/////////////////////////////////////////////////
+void MainWindow_TEST::StepState()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  QVERIFY(gazebo::gui::g_stepAct != NULL);
+  QVERIFY(!gazebo::gui::g_stepAct->isEnabled());
+  QVERIFY(!mainWindow->IsPaused());
+
+
+  // toggle pause and play step and check if the step action is properly
+  // enabled / disabled.
+  mainWindow->Pause();
+  QVERIFY(mainWindow->IsPaused());
+  QVERIFY(gazebo::gui::g_stepAct->isEnabled());
+
+  mainWindow->Play();
+  QVERIFY(!mainWindow->IsPaused());
+  QVERIFY(!gazebo::gui::g_stepAct->isEnabled());
+
+  mainWindow->Pause();
+  QVERIFY(mainWindow->IsPaused());
+  QVERIFY(gazebo::gui::g_stepAct->isEnabled());
+
+  mainWindow->close();
+  delete mainWindow;
+}
 
 /////////////////////////////////////////////////
 void MainWindow_TEST::Selection()
@@ -635,6 +680,212 @@ void MainWindow_TEST::UserCameraJoystick()
   cam->Fini();
   mainWindow->close();
   delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::ActionCreationDestruction()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+
+  QVERIFY(gazebo::gui::g_topicVisAct);
+
+  QVERIFY(gazebo::gui::g_openAct);
+
+  QVERIFY(gazebo::gui::g_saveAct);
+
+  QVERIFY(gazebo::gui::g_saveAsAct);
+
+  QVERIFY(gazebo::gui::g_saveCfgAct);
+
+  QVERIFY(gazebo::gui::g_cloneAct);
+
+  QVERIFY(gazebo::gui::g_aboutAct);
+
+  QVERIFY(gazebo::gui::g_quitAct);
+
+  QVERIFY(gazebo::gui::g_resetModelsAct);
+
+  QVERIFY(gazebo::gui::g_resetWorldAct);
+
+  QVERIFY(gazebo::gui::g_editBuildingAct);
+
+  QVERIFY(gazebo::gui::g_editTerrainAct);
+
+  QVERIFY(gazebo::gui::g_editModelAct);
+
+  QVERIFY(gazebo::gui::g_stepAct);
+
+  QVERIFY(gazebo::gui::g_playAct);
+
+  QVERIFY(gazebo::gui::g_pauseAct);
+
+  QVERIFY(gazebo::gui::g_arrowAct);
+
+  QVERIFY(gazebo::gui::g_translateAct);
+
+  QVERIFY(gazebo::gui::g_rotateAct);
+
+  QVERIFY(gazebo::gui::g_scaleAct);
+
+  QVERIFY(gazebo::gui::g_boxCreateAct);
+
+  QVERIFY(gazebo::gui::g_sphereCreateAct);
+
+  QVERIFY(gazebo::gui::g_cylinderCreateAct);
+
+  QVERIFY(gazebo::gui::g_meshCreateAct);
+
+  QVERIFY(gazebo::gui::g_pointLghtCreateAct);
+
+  QVERIFY(gazebo::gui::g_spotLghtCreateAct);
+
+  QVERIFY(gazebo::gui::g_dirLghtCreateAct);
+
+  QVERIFY(gazebo::gui::g_resetAct);
+
+  QVERIFY(gazebo::gui::g_showCollisionsAct);
+
+  QVERIFY(gazebo::gui::g_showGridAct);
+
+  QVERIFY(gazebo::gui::g_transparentAct);
+
+  QVERIFY(gazebo::gui::g_viewWireframeAct);
+
+  QVERIFY(gazebo::gui::g_showCOMAct);
+
+  QVERIFY(gazebo::gui::g_showInertiaAct);
+
+  QVERIFY(gazebo::gui::g_showContactsAct);
+
+  QVERIFY(gazebo::gui::g_showJointsAct);
+
+  QVERIFY(gazebo::gui::g_fullScreenAct);
+
+  QVERIFY(gazebo::gui::g_fpsAct);
+
+  QVERIFY(gazebo::gui::g_orbitAct);
+
+  QVERIFY(gazebo::gui::g_overlayAct);
+
+  QVERIFY(gazebo::gui::g_viewOculusAct);
+
+  QVERIFY(gazebo::gui::g_dataLoggerAct);
+
+  QVERIFY(gazebo::gui::g_screenshotAct);
+
+  QVERIFY(gazebo::gui::g_copyAct);
+
+  QVERIFY(gazebo::gui::g_pasteAct);
+
+  QVERIFY(gazebo::gui::g_snapAct);
+
+  QVERIFY(gazebo::gui::g_alignAct);
+
+  mainWindow->close();
+  delete mainWindow;
+
+  QVERIFY(!gazebo::gui::g_topicVisAct);
+
+  QVERIFY(!gazebo::gui::g_openAct);
+
+  QVERIFY(!gazebo::gui::g_saveAct);
+
+  QVERIFY(!gazebo::gui::g_saveAsAct);
+
+  QVERIFY(!gazebo::gui::g_saveCfgAct);
+
+  QVERIFY(!gazebo::gui::g_cloneAct);
+
+  QVERIFY(!gazebo::gui::g_aboutAct);
+
+  QVERIFY(!gazebo::gui::g_quitAct);
+
+  QVERIFY(!gazebo::gui::g_resetModelsAct);
+
+  QVERIFY(!gazebo::gui::g_resetWorldAct);
+
+  QVERIFY(!gazebo::gui::g_editBuildingAct);
+
+  QVERIFY(!gazebo::gui::g_editTerrainAct);
+
+  QVERIFY(!gazebo::gui::g_editModelAct);
+
+  QVERIFY(!gazebo::gui::g_stepAct);
+
+  QVERIFY(!gazebo::gui::g_playAct);
+
+  QVERIFY(!gazebo::gui::g_pauseAct);
+
+  QVERIFY(!gazebo::gui::g_arrowAct);
+
+  QVERIFY(!gazebo::gui::g_translateAct);
+
+  QVERIFY(!gazebo::gui::g_rotateAct);
+
+  QVERIFY(!gazebo::gui::g_scaleAct);
+
+  QVERIFY(!gazebo::gui::g_boxCreateAct);
+
+  QVERIFY(!gazebo::gui::g_sphereCreateAct);
+
+  QVERIFY(!gazebo::gui::g_cylinderCreateAct);
+
+  QVERIFY(!gazebo::gui::g_meshCreateAct);
+
+  QVERIFY(!gazebo::gui::g_pointLghtCreateAct);
+
+  QVERIFY(!gazebo::gui::g_spotLghtCreateAct);
+
+  QVERIFY(!gazebo::gui::g_dirLghtCreateAct);
+
+  QVERIFY(!gazebo::gui::g_resetAct);
+
+  QVERIFY(!gazebo::gui::g_showCollisionsAct);
+
+  QVERIFY(!gazebo::gui::g_showGridAct);
+
+  QVERIFY(!gazebo::gui::g_transparentAct);
+
+  QVERIFY(!gazebo::gui::g_viewWireframeAct);
+
+  QVERIFY(!gazebo::gui::g_showCOMAct);
+
+  QVERIFY(!gazebo::gui::g_showInertiaAct);
+
+  QVERIFY(!gazebo::gui::g_showContactsAct);
+
+  QVERIFY(!gazebo::gui::g_showJointsAct);
+
+  QVERIFY(!gazebo::gui::g_fullScreenAct);
+
+  QVERIFY(!gazebo::gui::g_fpsAct);
+
+  QVERIFY(!gazebo::gui::g_orbitAct);
+
+  QVERIFY(!gazebo::gui::g_overlayAct);
+
+  QVERIFY(!gazebo::gui::g_viewOculusAct);
+
+  QVERIFY(!gazebo::gui::g_dataLoggerAct);
+
+  QVERIFY(!gazebo::gui::g_screenshotAct);
+
+  QVERIFY(!gazebo::gui::g_copyAct);
+
+  QVERIFY(!gazebo::gui::g_pasteAct);
+
+  QVERIFY(!gazebo::gui::g_snapAct);
+
+  QVERIFY(!gazebo::gui::g_alignAct);
 }
 
 // Generate a main function for the test

@@ -169,6 +169,8 @@ namespace gazebo
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
       private slots: void SetWireframe();
+      /// \brief Qt callback when the show GUI overlays action is triggered.
+      private slots: void ShowGUIOverlays();
 
       /// \brief QT slot to open the data logger utility
       private slots: void DataLogger();
@@ -193,6 +195,9 @@ namespace gazebo
 
       /// \brief Create most of the actions.
       private: void CreateActions();
+
+      /// \brief Delete the actions created in CreateActions.
+      private: void DeleteActions();
 
       /// \brief Create menus.
       private: void CreateMenus();
