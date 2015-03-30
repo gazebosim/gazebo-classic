@@ -611,6 +611,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
             // for Update Body velocity and position
             size_t sub4_res1 = dxUpdateBodiesMemoryRequirements(m, nb);
             size_t sub4_res2 = 0;
+
             sub3_res2 += (sub4_res1 >= sub4_res2) ? sub4_res1 : sub4_res2;
           }
 #endif
