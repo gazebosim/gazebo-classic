@@ -528,7 +528,6 @@ void JointMaker::Stop()
       rendering::ScenePtr scene = this->mouseJoint->visual->GetScene();
       scene->RemoveVisual(this->mouseJoint->visual);
       this->mouseJoint->visual.reset();
-//      delete this->mouseJoint->inspector;
       delete this->mouseJoint;
       this->mouseJoint = NULL;
     }
@@ -1069,10 +1068,24 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 
   joint->jointMsg.reset(new msgs::Joint);
   joint->jointMsg->set_name(jointName);
-  joint->jointMsg->set_parent(joint->parent->GetName());
+
+  std::string jointParentName = joint->parent->GetName();
+  std::string jointParentLeafName = jointParentName;
+  size_t pIdx = jointParentName.find_last_of("::");
+  if (pIdx != std::string::npos)
+    jointParentLeafName = jointParentName.substr(pIdx+1);
+  joint->jointMsg->set_parent(jointParentLeafName);
+
+  std::string jointChildName = joint->child->GetName();
+  std::string jointChildLeafName = jointChildName;
+  size_t cIdx = jointChildName.find_last_of("::");
+  if (cIdx != std::string::npos)
+    jointChildLeafName = jointChildName.substr(cIdx+1);
+  joint->jointMsg->set_child(jointChildLeafName);
+
   joint->jointMsg->set_parent_id(joint->parent->GetId());
-  joint->jointMsg->set_child(joint->child->GetName());
   joint->jointMsg->set_child_id(joint->child->GetId());
+
   msgs::Set(joint->jointMsg->mutable_pose(), jointPose);
 
   joint->jointMsg->set_type(
