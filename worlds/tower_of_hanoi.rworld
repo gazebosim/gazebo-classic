@@ -1,0 +1,106 @@
+<?xml version="1.0" ?>
+<%
+  # Tower of Hanoi demo
+  # Make disks with extruded polylines
+
+  # Inertial parameters
+  # Aluminum 2700 kg/m^3
+  density = 2700.0
+
+  # Constant parameters for each disk
+  radius_inner = 0.01
+  points_inner = 10
+  # TODO: make these a function of radius
+  points_outer = 20
+  height = 0.02
+%>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+<%
+  # Disk axis of symmetry: Z
+  outer_radii = [0.2, 0.1, 0.05, 0.03]
+
+  outer_radii.each_index do |j|
+    radius_outer = outer_radii[j]
+
+    volume = Math::PI * (radius_outer**2 - radius_inner**2) * height
+    mass = density * volume
+    ixx = 1.0 / 12 * mass * (3*(radius_inner**2 + radius_outer**2) + height**2)
+    iyy = ixx
+    izz = 0.5 * mass * (radius_inner**2 + radius_outer**2)
+
+    def disk_points_s(radius, points=20)
+      polyline = []
+      points.times do |i|
+        angle = 2*Math::PI * i / points.to_f
+        polyline << [radius*Math.cos(angle), radius*Math.sin(angle)]
+      end
+      points_s = ""
+      polyline.each do |p|
+        points_s += "<point>" \
+                  + p[0].to_s + " " + p[1].to_s \
+                  + "</point>\n"
+      end
+      points_s
+    end
+
+    geometry_s = "<geometry>\n"  \
+               + "<polyline>\n"  \
+               + disk_points_s(radius_outer, points_outer) \
+               + "<height>" + height.to_s + "</height>\n"  \
+               + "</polyline>\n" \
+               + "<polyline>\n"  \
+               + disk_points_s(radius_inner, points_inner) \
+               + "<height>" + height.to_s + "</height>\n"  \
+               + "</polyline>\n" \
+               + "</geometry>\n"
+%>
+    <%= '<model name="disk_' + radius_outer.to_s + '">' %>
+      <pose>0 0 <%= height * (j + 0.5) %>  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass><%= mass %></mass>
+          <inertia>
+            <ixx><%= ixx %></ixx>
+            <iyy><%= iyy %></iyy>
+            <izz><%= izz %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <%= geometry_s %>
+          <surface>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <max_vel>0.1</max_vel>
+                <kp>1e8</kp>
+                <kd>1</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <%= geometry_s %>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+<%
+    end
+%>
+  </world>
+</sdf>
