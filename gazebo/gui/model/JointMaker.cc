@@ -528,7 +528,6 @@ void JointMaker::Stop()
       rendering::ScenePtr scene = this->mouseJoint->visual->GetScene();
       scene->RemoveVisual(this->mouseJoint->visual);
       this->mouseJoint->visual.reset();
-//      delete this->mouseJoint->inspector;
       delete this->mouseJoint;
       this->mouseJoint = NULL;
     }
