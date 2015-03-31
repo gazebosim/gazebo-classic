@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,8 +41,58 @@ namespace gazebo
     // Documentation inherited.
     public: void Load(sdf::ElementPtr _elem);
 
+    /// \brief Callback when receives a time message. Updates the time display.
+    /// \param[in] _time Time message.
+    public: void OnTime(ConstTimePtr &_time);
+
+    /// \brief Callback when receives a score message. Updates the score
+    /// display.
+    /// \param[in] _score Message containing the score string.
+    public: void OnScore(ConstGzStringPtr &_score);
+
+    /// \brief Callback when receives a state message. Updates the state
+    /// display.
+    /// \param[in] _state Message containing the state string.
+    public: void OnState(ConstGzStringPtr &_state);
+
+    /// \brief Publish restart game message on hotkey.
+    public slots: void OnRestartGame();
+
+    /// \brief Publish restart ball message on hotkey.
+    public slots: void OnRestartBall();
+
+    /// \brief Set time display.
+    /// \param[in] _time Time string.
+    signals: void SetTime(QString _time);
+
+    /// \brief Set score display.
+    /// \param[in] _score Score string.
+    signals: void SetScore(QString _score);
+
+    /// \brief Set state display.
+    /// \param[in] _state State string.
+    signals: void SetState(QString _state);
+
     /// \brief SDF for this plugin.
     private: sdf::ElementPtr sdf;
+
+    /// \brief Pointer to a node for communication.
+    private: transport::NodePtr gzNode;
+
+    /// \brief "Restart ball" subscriber.
+    private: transport::SubscriberPtr timeSub;
+
+    /// \brief "Restart ball" subscriber.
+    private: transport::SubscriberPtr scoreSub;
+
+    /// \brief "Restart ball" subscriber.
+    private: transport::SubscriberPtr stateSub;
+
+    /// \brief "Restart ball" subscriber.
+    private: transport::PublisherPtr restartGamePub;
+
+    /// \brief "Restart ball" subscriber.
+    private: transport::PublisherPtr restartBallPub;
   };
 }
 
