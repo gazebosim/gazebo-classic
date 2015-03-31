@@ -193,7 +193,7 @@ void FoosballGUIPlugin::OnState(ConstGzStringPtr &_msg)
   {
     state = "Red GOAL!";
   }
-  else if (_msgs->data() == "finished")
+  else if (_msg->data() == "finished")
   {
     state = "Game Over!";
   }
