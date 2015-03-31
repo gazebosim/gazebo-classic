@@ -37,6 +37,10 @@ set (headers
   ModelEditorEvents.hh
 )
 
+set (install_headers
+  ModelEditor.hh
+)
+
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
   set (qt_tests ${qt_tests}
@@ -67,3 +71,4 @@ target_link_libraries(gazebo_gui_model
   gazebo_msgs)
 
 gz_install_library(gazebo_gui_model)
+gz_install_includes("gui/model" ${install_headers})

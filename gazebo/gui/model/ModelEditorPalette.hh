@@ -18,6 +18,7 @@
 #ifndef _MODEL_EDITOR_PALETTE_HH_
 #define _MODEL_EDITOR_PALETTE_HH_
 
+#include <map>
 #include <string>
 #include <vector>
 
