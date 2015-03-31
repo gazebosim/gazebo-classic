@@ -216,11 +216,25 @@ bool PhysicsEngine::SetParam(const std::string &_key,
     else if (_key == "real_time_factor")
       this->SetTargetRealTimeFactor(boost::any_cast<double>(_value));
     else if (_key == "gravity")
-      this->SetGravity(boost::any_cast<math::Vector3>(_value));
+    {
+      boost::any copy = _value;
+      if (_value.type() == typeid(sdf::Vector3))
+      {
+        copy = boost::lexical_cast<math::Vector3>
+            (boost::any_cast<sdf::Vector3>(_value));
+      }
+      this->SetGravity(boost::any_cast<math::Vector3>(copy));
+    }
     else if (_key == "magnetic_field")
     {
+      boost::any copy = _value;
+      if (_value.type() == typeid(sdf::Vector3))
+      {
+        copy = boost::lexical_cast<math::Vector3>
+            (boost::any_cast<sdf::Vector3>(_value));
+      }
       this->sdf->GetElement("magnetic_field")->
-          Set(boost::any_cast<math::Vector3>(_value));
+          Set(boost::any_cast<math::Vector3>(copy));
     }
     else
     {
