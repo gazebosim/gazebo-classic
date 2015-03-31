@@ -50,6 +50,7 @@ namespace gazebo
     /// \brief Initialize the state. Called once when the state is entered.
     public: virtual void Initialize()
     {
+      this->timer.Reset();
       this->timer.Start();
     }
 
@@ -193,6 +194,9 @@ namespace gazebo
     /// \param[in] _newState New state to transition.
     public: void SetCurrentState(State<FoosballDemoPlugin> &_newState);
 
+    // 2 Hz.
+    public: static const int kUpdateRate = 2;
+
     /// \brief Seconds remaining to finish the game.
     public: common::Time gameTime;
 
@@ -261,6 +265,8 @@ namespace gazebo
 
     /// \brief Game duration.
     private: common::Time gameDuration;
+
+    private: common::Time lastSimTimeForThrottling;
 
     /// \brief Current state.
     private: State<FoosballDemoPlugin> *currentState;

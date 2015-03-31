@@ -46,7 +46,7 @@ void KickoffState::Initialize()
   math::Pose newPose(math::Pose(0, 0, ballHeight, 0, 0, 0));
   math::Vector3 newVel(0, 0, 0);
   this->plugin->ball->SetWorldPose(newPose);
-  this->plugin->ball->SetLinearVel(newVel);
+  this->plugin->ball->ResetPhysicsStates();
 }
 
 /////////////////////////////////////////////////
@@ -207,6 +207,8 @@ void FoosballDemoPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     this->gzNode->Subscribe("~/foosball_demo/restart_game",
     &FoosballDemoPlugin::OnRestartGame, this);
 
+  this->lastSimTimeForThrottling = this->world->GetSimTime();
+
   // Connect to the update event.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&FoosballDemoPlugin::Update, this, _1));
@@ -229,22 +231,32 @@ void FoosballDemoPlugin::Update(const common::UpdateInfo &/*_info*/)
   // Step.
   this->currentState->Update();
 
-  // Update and publish game time.
+  common::Time curTime = this->world->GetSimTime();
+
+  // Update game time.
   common::Time elapsed = this->world->GetSimTime() - this->startTimeSim;
   this->gameTime = std::max(0.0, (this->gameDuration - elapsed).Double());
-  this->timePub->Publish(msgs::Convert(this->gameTime));
 
-  // Publish score.
-  std::string score =
-    std::to_string(this->scoreA) + ":" + std::to_string(this->scoreB);
-  msgs::GzString scoreMsg;
-  scoreMsg.set_data(score);
-  this->scorePub->Publish(scoreMsg);
+  // Update based on updateRate.
+  if (curTime - this->lastSimTimeForThrottling >= 1.0 / this->kUpdateRate)
+  {
+    // Publish score.
+    std::string score =
+      std::to_string(this->scoreA) + ":" + std::to_string(this->scoreB);
+    msgs::GzString scoreMsg;
+    scoreMsg.set_data(score);
+    this->scorePub->Publish(scoreMsg);
 
-  // Publish game state.
-  msgs::GzString stateMsg;
-  stateMsg.set_data(this->currentState->GetName());
-  this->statePub->Publish(stateMsg);
+    // Publish time.
+    this->timePub->Publish(msgs::Convert(this->gameTime));
+
+    // Publish game state.
+    msgs::GzString stateMsg;
+    stateMsg.set_data(this->currentState->GetName());
+    this->statePub->Publish(stateMsg);
+
+    this->lastSimTimeForThrottling = curTime;
+  }
 }
 
 /////////////////////////////////////////////////

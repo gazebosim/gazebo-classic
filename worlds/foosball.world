@@ -67,8 +67,11 @@
 
     <!-- Set the user camera on top of the foosball table -->
     <gui fullscreen='0'>
+      <!-- Load the GUI plugin -->
+      <plugin name="FoosballGUI" filename="libFoosballGUIPlugin.so"></plugin>
+
       <camera name='user_camera'>
-        <pose>0.03112 -0.022242 2.13625 1e-05 1.5658 1.57221</pose>
+        <pose>0.03112 0.05 3 1e-05 1.5658 1.57221</pose>
         <view_controller>orbit</view_controller>
       </camera>
     </gui>
