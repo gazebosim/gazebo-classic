@@ -27,7 +27,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class ModelEditorPalette;
+    class ModelEditorPrivate;
 
     /// \class ModelEditor ModelEditor.hh gui/gui.hh
     /// \brief Interface to the terrain editor.
@@ -41,6 +41,12 @@ namespace gazebo
 
       /// \brief Destuctor.
       public: virtual ~ModelEditor();
+
+      /// \brief Add an item to palette.
+      /// \param[in] _Item item to add.
+      /// \param[in] _category Category to add the item too.
+      public: void AddItemToPalette(QWidget *_item,
+          const std::string &_category = "");
 
       /// \brief Qt callback when the model editor's save action is
       /// triggered.
@@ -85,48 +91,9 @@ namespace gazebo
       /// \brief Create menus
       private: void CreateMenus();
 
-      /// \brief Menubar containing actions related to the editor.
-      private: QMenuBar *menuBar;
-
-      /// \brief Contains all the model editor tools.
-      private: ModelEditorPalette *modelPalette;
-
-      /// \brief True if model editor is active.
-      private: bool active;
-
-      /// \brief Qt action for selecting and adding a joint in the model editor.
-      private: QAction *jointTypeAct;
-
-      /// \brief Qt action for adding a previously selected joint in the
-      /// model editor.
-      private: QAction *jointAct;
-
-      /// \brief A separator for the joint icon.
-      private: QAction *jointSeparatorAct;
-
-      /// \brief Qt tool button associated with the joint action.
-      private: QToolButton *jointButton;
-
-      /// \brief Qt signal mapper for mapping add jointsignals.
-      private: QSignalMapper *signalMapper;
-
-      /// \brief Previously selected joint type.
-      private: std::string selectedJointType;
-
-      /// \brief Action to save model.
-      private: QAction *saveAct;
-
-      /// \brief Action to save model as.
-      private: QAction *saveAsAct;
-
-      /// \brief Action to start a new model.
-      private: QAction *newAct;
-
-      /// \brief Action to exit the editor.
-      private: QAction *exitAct;
-
-      /// \brief Save the main window paused state to use when returning.
-      private: bool mainWindowPaused;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: ModelEditorPrivate *dataPtr;
     };
   }
 }

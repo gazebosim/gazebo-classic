@@ -86,6 +86,11 @@ namespace gazebo
       /// \param[in] _on True to show the left pane, false to hide.
       public: void SetLeftPaneVisibility(bool _on);
 
+      /// \brief Get an editor by name
+      /// \param[in] _name Name of the editor.
+      /// \return Pointer to the editor.
+      public: Editor *GetEditor(const std::string &_name);
+
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();
 
@@ -298,8 +303,8 @@ namespace gazebo
       /// \brief User specified step size for manually stepping the world
       private: int inputStepSize;
 
-      /// \brief List of all the editors.
-      private: std::list<Editor*> editors;
+      /// \brief Map of all the editors to their names.
+      private: std::map<std::string, Editor *> editors;
 
       /// \brief List of all the align action groups.
       private: std::vector<QActionGroup *> alignActionGroups;

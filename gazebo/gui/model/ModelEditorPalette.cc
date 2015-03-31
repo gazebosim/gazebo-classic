@@ -151,12 +151,16 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->modelCreator = new ModelCreator();
   connect(modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
 
+  this->otherItemsLayout = new QVBoxLayout();
+  this->otherItemsLayout->setContentsMargins(0, 0, 0, 0);
+
   // Palette layout
   QVBoxLayout *paletteLayout = new QVBoxLayout();
   paletteLayout->addWidget(shapesLabel);
   paletteLayout->addLayout(shapesLayout);
   paletteLayout->addWidget(customShapesLabel);
   paletteLayout->addLayout(customLayout);
+  paletteLayout->addLayout(this->otherItemsLayout);
   paletteLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
       QSizePolicy::Minimum));
   paletteLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
@@ -271,6 +275,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 /////////////////////////////////////////////////
 ModelEditorPalette::~ModelEditorPalette()
 {
+  delete this->modelCreator;
 }
 
 /////////////////////////////////////////////////
@@ -346,7 +351,37 @@ void ModelEditorPalette::OnCustom()
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::AddJoint(const std::string &_type)
+void ModelEditorPalette::AddItem(QWidget *_item,
+    const std::string &_category)
+{
+  std::string category = _category;
+  if (category.empty())
+    category = "Other";
+
+  auto iter = this->categories.find(category);
+  QGridLayout *catLayout = NULL;
+  if (iter == this->categories.end())
+  {
+    catLayout = new QGridLayout();
+    this->categories[category] = catLayout;
+
+    std::string catStr =
+        "<font size=4 color='white'>" + category + "</font>";
+    QLabel *catLabel = new QLabel(tr(catStr.c_str()));
+    this->otherItemsLayout->addWidget(catLabel);
+    this->otherItemsLayout->addLayout(catLayout);
+  }
+  else
+    catLayout = iter->second;
+
+  int rowWidth = 3;
+  int row = catLayout->count() / rowWidth;
+  int col = catLayout->count() % rowWidth;
+  catLayout->addWidget(_item, row, col);
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::CreateJoint(const std::string &_type)
 {
   event::Events::setSelectedEntity("", "normal");
   this->modelCreator->AddJoint(_type);
@@ -546,4 +581,3 @@ void ModelEditorPalette::OnJointNameChanged(const std::string &_jointId,
     }
   }
 }
-

@@ -39,10 +39,12 @@ set (headers
 
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
-  set (qt_tests ${qt_tests} 
+  set (qt_tests ${qt_tests}
     JointMaker_TEST.cc
     ExtrudeDialog_TEST.cc
     ModelCreator_TEST.cc
+    ModelEditor_TEST.cc
+    ModelEditorPalette_TEST.cc
   )
 endif()
 
