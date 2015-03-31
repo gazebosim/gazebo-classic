@@ -89,7 +89,7 @@ namespace gazebo
       /// \brief Get an editor by name
       /// \param[in] _name Name of the editor.
       /// \return Pointer to the editor.
-      public: Editor *GetEditor(const std::string &_name);
+      public: Editor *GetEditor(const std::string &_name) const;
 
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();

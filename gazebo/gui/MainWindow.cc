@@ -1984,7 +1984,7 @@ void MainWindow::OnEditorGroup(QAction *_action)
 }
 
 /////////////////////////////////////////////////
-Editor *MainWindow::GetEditor(const std::string &_name)
+Editor *MainWindow::GetEditor(const std::string &_name) const
 {
   auto iter = this->editors.find(_name);
   if (iter != this->editors.end())

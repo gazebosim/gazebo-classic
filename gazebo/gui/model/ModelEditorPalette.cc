@@ -276,6 +276,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 ModelEditorPalette::~ModelEditorPalette()
 {
   delete this->modelCreator;
+  this->modelCreator = NULL;
 }
 
 /////////////////////////////////////////////////
