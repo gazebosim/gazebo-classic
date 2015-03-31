@@ -43,7 +43,7 @@ void ModelEditorPalette_TEST::AddItem()
   QToolButton *testButton2 = new QToolButton();
   testButton2->setObjectName("my_tool_button2");
 
-  // test adding without specifying category
+  // test adding with category
   palette->AddItem(testButton2, "category");
 
   // verify that the button is added.
