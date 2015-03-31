@@ -44,9 +44,8 @@ void KickoffState::Initialize()
   // Move the ball to the centre of the table.
   float ballHeight = this->plugin->tableHeight + 0.2;
   math::Pose newPose(math::Pose(0, 0, ballHeight, 0, 0, 0));
-  math::Vector3 newVel(0, 0, 0);
   this->plugin->ball->SetWorldPose(newPose);
-  this->plugin->ball->SetLinearVel(newVel);
+  this->plugin->ball->ResetPhysicsStates();
 }
 
 /////////////////////////////////////////////////
