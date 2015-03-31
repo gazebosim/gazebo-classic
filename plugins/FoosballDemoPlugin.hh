@@ -50,6 +50,7 @@ namespace gazebo
     /// \brief Initialize the state. Called once when the state is entered.
     public: virtual void Initialize()
     {
+      this->timer.Reset();
       this->timer.Start();
     }
 
