@@ -140,12 +140,14 @@ void QGVScene::removeNode(const QString &label)
   if (_nodes.contains(label))
   {
     agdelete(_graph->graph(), _nodes[label]->_node->node());
+    removeItem(_nodes[label]);
     _nodes.remove(label);
 
     QList<QPair<QString, QString> >keys=_edges.keys();
     for(int i=0; i<keys.size(); ++i)
         if (keys.at(i).first==label || keys.at(i).second==label)
             removeEdge(keys.at(i));
+
   }
 }
 
@@ -159,6 +161,7 @@ void QGVScene::removeEdge(const QPair<QString, QString>& key)
   if (_edges.contains(key))
   {
     agdelete(_graph->graph(), _edges[key]->_edge->edge());
+    removeItem(_edges[key]);
     _edges.remove(key);
   }
 }
