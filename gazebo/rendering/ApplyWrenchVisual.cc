@@ -39,8 +39,22 @@ ApplyWrenchVisual::ApplyWrenchVisual(const std::string &_name,
 /////////////////////////////////////////////////
 ApplyWrenchVisual::~ApplyWrenchVisual()
 {
+  this->Fini();
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchVisual::Fini()
+{
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  dPtr->torqueVisual->DeleteDynamicLine(dPtr->torqueLine);
+
+  if (!dPtr->scene)
+  {
+    gzerr << "Scene shouldn't be cleared before destroying nodes." << std::endl;
+    return;
+  }
 
   Ogre::SceneManager *manager = dPtr->scene->GetManager();
 

@@ -41,8 +41,11 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ApplyWrenchVisual();
 
-      /// \brief Load the visual with default parameters.
+      // Documentation inherited.
       public: void Load();
+
+      // Documentation inherited.
+      public: void Fini();
 
       /// \brief Returns the force visual.
       /// \return Pointer to force visual.
