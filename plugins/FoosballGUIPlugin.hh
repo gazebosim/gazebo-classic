@@ -79,19 +79,19 @@ namespace gazebo
     /// \brief Pointer to a node for communication.
     private: transport::NodePtr gzNode;
 
-    /// \brief "Restart ball" subscriber.
+    /// \brief Time subscriber.
     private: transport::SubscriberPtr timeSub;
 
-    /// \brief "Restart ball" subscriber.
+    /// \brief Score subscriber.
     private: transport::SubscriberPtr scoreSub;
 
-    /// \brief "Restart ball" subscriber.
+    /// \brief State subscriber.
     private: transport::SubscriberPtr stateSub;
 
-    /// \brief "Restart ball" subscriber.
+    /// \brief "Restart game" publisher.
     private: transport::PublisherPtr restartGamePub;
 
-    /// \brief "Restart ball" subscriber.
+    /// \brief "Restart ball" publisher.
     private: transport::PublisherPtr restartBallPub;
   };
 }

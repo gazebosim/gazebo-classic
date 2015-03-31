@@ -47,7 +47,7 @@ FoosballGUIPlugin::FoosballGUIPlugin()
       SLOT(setText(QString)), Qt::QueuedConnection);
 
   // Blue team
-  QPixmap bluePixmap(100,100);
+  QPixmap bluePixmap(100, 100);
   bluePixmap.fill(QColor(100, 100, 100));
   QPainter bluePainter(&bluePixmap);
   bluePainter.setRenderHint(QPainter::Antialiasing, true);
@@ -60,7 +60,7 @@ FoosballGUIPlugin::FoosballGUIPlugin()
   blueLabel->setPixmap(bluePixmap);
 
   // Red team
-  QPixmap redPixmap(100,100);
+  QPixmap redPixmap(100, 100);
   redPixmap.fill(QColor(100, 100, 100));
   QPainter redPainter(&redPixmap);
   redPainter.setRenderHint(QPainter::Antialiasing, true);
@@ -128,10 +128,12 @@ FoosballGUIPlugin::FoosballGUIPlugin()
 
   // Connect hotkeys
   QShortcut *restartGame = new QShortcut(QKeySequence("Ctrl+G"), this);
-  QObject::connect(restartGame, SIGNAL(activated()), this, SLOT(OnRestartGame()));
+  QObject::connect(restartGame, SIGNAL(activated()), this,
+      SLOT(OnRestartGame()));
 
   QShortcut *restartBall = new QShortcut(QKeySequence("Ctrl+H"), this);
-  QObject::connect(restartBall, SIGNAL(activated()), this, SLOT(OnRestartBall()));
+  QObject::connect(restartBall, SIGNAL(activated()), this,
+      SLOT(OnRestartBall()));
 }
 
 /////////////////////////////////////////////////
@@ -190,6 +192,10 @@ void FoosballGUIPlugin::OnState(ConstGzStringPtr &_msg)
   else if (_msg->data() == "goalB")
   {
     state = "Red GOAL!";
+  }
+  else if (_msgs->data() == "finished")
+  {
+    state = "Game Over!";
   }
 
   this->SetState(QString::fromStdString(state));
