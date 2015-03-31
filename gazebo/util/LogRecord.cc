@@ -64,7 +64,11 @@ LogRecord::LogRecord()
   // Get the user's home directory
   // \todo getenv is not portable, and there is no generic cross-platform
   // method. Must check OS and choose a method
+#ifndef _WIN32
   char *homePath = getenv("HOME");
+#else
+  const char *homePath = common::getEnvWin("HOMEPATH");
+#endif
   GZ_ASSERT(homePath, "HOME environment variable is missing");
 
   if (!homePath)
