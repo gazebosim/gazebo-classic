@@ -24,52 +24,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-// This sort of duplicates a code block in the constructor of SDF::Param
-// (http://bit.ly/175LWfE)
-boost::any GetAnySDFValue(const sdf::ElementPtr _elem)
-{
-  boost::any ret;
-
-  if (!_elem)
-  {
-    gzerr << "got NULL ElementPtr in GetAnySDFValue" << std::endl;
-    return ret;
-  }
-
-  if (typeid(int) == _elem->GetValue()->GetType())
-  {
-    ret = _elem->Get<int>();
-  }
-  else if (typeid(double) == _elem->GetValue()->GetType())
-  {
-    ret = _elem->Get<double>();
-  }
-  else if (typeid(float) == _elem->GetValue()->GetType())
-  {
-    ret = _elem->Get<float>();
-  }
-  else if (typeid(bool) == _elem->GetValue()->GetType())
-  {
-    ret = _elem->Get<bool>();
-  }
-  else if (typeid(std::string) == _elem->GetValue()->GetType())
-  {
-    ret = _elem->Get<std::string>();
-  }
-  else if (typeid(sdf::Vector3) == _elem->GetValue()->GetType())
-  {
-    ret = _elem->Get<gazebo::math::Vector3>();
-  }
-  else
-  {
-    gzerr << "Type of element [" << _elem->GetName() << "] not known!"
-          << std::endl;
-  }
-
-  return ret;
-}
-
-//////////////////////////////////////////////////
 template<typename T> bool CastAnyValue(const boost::any &_value, T &_return)
 {
   try
@@ -157,7 +111,7 @@ bool Preset::SetAllParamsHelper(const sdf::ElementPtr _elem, bool _result)
   {
     if (elem->GetValue())
     {
-      _result &= this->SetParam(elem->GetName(), GetAnySDFValue(elem));
+      _result &= this->SetParam(elem->GetName(), elem->GetAny());
     }
     _result &= this->SetAllParamsHelper(elem, _result);
   }
@@ -525,7 +479,7 @@ void PresetManager::GeneratePresetFromSDF(Preset *_preset,
   {
     if (elem->GetValue() != NULL)
     {
-      _preset->SetParam(elem->GetName(), GetAnySDFValue(elem));
+      _preset->SetParam(elem->GetName(), elem->GetAny());
     }
     this->GeneratePresetFromSDF(_preset, elem);
   }
