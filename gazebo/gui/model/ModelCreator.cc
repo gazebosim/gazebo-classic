@@ -742,7 +742,6 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
   }
 
   rendering::ScenePtr scene = link->linkVisual->GetScene();
-  scene->AddVisual(link->linkVisual);
 
   this->ModelChanged();
 }
@@ -936,7 +935,6 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
   }
 
   rendering::ScenePtr scene = link->linkVisual->GetScene();
-  scene->AddVisual(link->linkVisual);
 
   this->ModelChanged();
 }
@@ -965,19 +963,22 @@ void ModelCreator::RemoveLink(const std::string &_linkName)
   std::string linkName(_linkName);
 
   rendering::ScenePtr scene = link->linkVisual->GetScene();
-  for (auto &it : link->visuals)
+  if (scene)
   {
-    rendering::VisualPtr vis = it.first;
-    scene->RemoveVisual(vis);
-  }
-  scene->RemoveVisual(link->linkVisual);
-  for (auto &colIt : link->collisions)
-  {
-    rendering::VisualPtr vis = colIt.first;
-    scene->RemoveVisual(vis);
-  }
+    for (auto &it : link->visuals)
+    {
+      rendering::VisualPtr vis = it.first;
+      scene->RemoveVisual(vis);
+    }
+    scene->RemoveVisual(link->linkVisual);
+    for (auto &colIt : link->collisions)
+    {
+      rendering::VisualPtr vis = colIt.first;
+      scene->RemoveVisual(vis);
+    }
 
-  scene->RemoveVisual(link->linkVisual);
+    scene->RemoveVisual(link->linkVisual);
+  }
 
   link->linkVisual.reset();
   {
@@ -1036,7 +1037,6 @@ void ModelCreator::Reset()
   this->previewVisual->Load();
   this->modelPose = math::Pose::Zero;
   this->previewVisual->SetPose(this->modelPose);
-  scene->AddVisual(this->previewVisual);
 }
 
 /////////////////////////////////////////////////

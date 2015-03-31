@@ -1,5 +1,8 @@
 ## Gazebo 6.0
 
+1. Show/hide GUI overlays using the menu bar.
+    * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
+
 1. Added support for Oculus DK2
     * [Pull request #1526](https://bitbucket.org/osrf/gazebo/pull-request/1526)
 
@@ -49,6 +52,9 @@
 
 1. Updated ConfigWidget class to parse enum values.
     * [Pull request #1518](https://bitbucket.org/osrf/gazebo/pull-request/1518)
+
+1. Added PresetManager to physics libraries and corresponding integration test.
+    * [Pull request #1471](https://bitbucket.org/osrf/gazebo/pull-request/1471)
 
 1. Added Apply Force/Torque GUI
     * [Pull request #1506](https://bitbucket.org/osrf/gazebo/pull-request/1506)

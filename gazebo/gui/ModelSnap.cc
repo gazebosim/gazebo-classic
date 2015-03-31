@@ -46,29 +46,54 @@ ModelSnap::ModelSnap()
   this->dataPtr->selectedTriangleDirty = false;
   this->dataPtr->hoverTriangleDirty = false;
   this->dataPtr->snapLines = NULL;
-
-  this->dataPtr->updateMutex = new boost::recursive_mutex();
+  this->dataPtr->updateMutex = NULL;
 }
 
 /////////////////////////////////////////////////
 ModelSnap::~ModelSnap()
 {
+  this->Clear();
+  delete this->dataPtr;
+  this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelSnap::Clear()
+{
+  this->dataPtr->selectedTriangleDirty = false;
+  this->dataPtr->hoverTriangleDirty = false;
+  this->dataPtr->selectedTriangle.clear();
+  this->dataPtr->hoverTriangle.clear();
+  this->dataPtr->selectedVis.reset();
+  this->dataPtr->hoverVis.reset();
+
+  this->dataPtr->node.reset();
   this->dataPtr->modelPub.reset();
 
+  if (this->dataPtr->updateMutex)
   {
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
-    if (this->dataPtr->snapLines)
-      delete this->dataPtr->snapLines;
+    delete this->dataPtr->snapLines;
+    this->dataPtr->snapLines = NULL;
     this->dataPtr->snapVisual.reset();
+
+    delete this->dataPtr->snapHighlight;
+    this->dataPtr->snapHighlight = NULL;
+    this->dataPtr->highlightVisual.reset();
   }
 
-  event::Events::DisconnectRender(this->dataPtr->renderConnection);
+  if (this->dataPtr->renderConnection)
+    event::Events::DisconnectRender(this->dataPtr->renderConnection);
   this->dataPtr->renderConnection.reset();
 
   delete this->dataPtr->updateMutex;
+  this->dataPtr->updateMutex = NULL;
 
-  delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr->scene.reset();
+  this->dataPtr->userCamera.reset();
+  this->dataPtr->rayQuery.reset();
+
+  this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////
@@ -86,6 +111,8 @@ void ModelSnap::Init()
 
   this->dataPtr->userCamera = cam;
   this->dataPtr->scene =  cam->GetScene();
+
+  this->dataPtr->updateMutex = new boost::recursive_mutex();
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
