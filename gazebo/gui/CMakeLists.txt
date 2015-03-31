@@ -124,6 +124,7 @@ set (qt_tests
   GuiIface_TEST.cc
   ModelAlign_TEST.cc
   RenderWidget_TEST.cc
+  SaveDialog_TEST.cc
   TimePanel_TEST.cc
 )
 
