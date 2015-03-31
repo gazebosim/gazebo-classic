@@ -32,6 +32,9 @@
 /// \brief Double min value
 #define GZ_DBL_MIN std::numeric_limits<double>::min()
 
+/// \brief Double positive infinite value
+#define GZ_DBL_INF std::numeric_limits<double>::infinity()
+
 /// \brief Float maximum value
 #define GZ_FLT_MAX std::numeric_limits<float>::max()
 

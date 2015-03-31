@@ -463,7 +463,15 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
         intensity = this->laserShape->GetRetro(j * this->GetRayCount() + i);
       }
 
-      if (!this->noises.empty())
+      if(range >= this->GetRangeMax())
+      {
+        range = GZ_DBL_INF;
+      }
+      else if(range <= this->GetRangeMin())
+      {
+        range = -GZ_DBL_INF;
+      }
+      else if (!this->noises.empty())
       {
         // currently supports only one noise model per laser sensor
         range = this->noises[0]->Apply(range);
