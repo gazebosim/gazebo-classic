@@ -79,7 +79,6 @@ void ApplyWrenchVisual::Load()
   dPtr->forceVisual.reset(new rendering::Visual(
       this->GetName() + "__FORCE_VISUAL__", shared_from_this()));
   dPtr->forceVisual->Load();
-  dPtr->scene->AddVisual(dPtr->forceVisual);
 
   // Force shaft
   this->InsertMesh("axis_shaft");
@@ -136,7 +135,6 @@ void ApplyWrenchVisual::Load()
   dPtr->torqueVisual.reset(new rendering::Visual(
       this->GetName() + "__TORQUE_VISUAL__", shared_from_this()));
   dPtr->torqueVisual->Load();
-  dPtr->scene->AddVisual(dPtr->torqueVisual);
 
   // Torque tube
   common::MeshManager::Instance()->CreateTube("torque_tube",
