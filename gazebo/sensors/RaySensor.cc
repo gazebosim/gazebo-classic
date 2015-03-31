@@ -463,6 +463,7 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
         intensity = this->laserShape->GetRetro(j * this->GetRayCount() + i);
       }
 
+      // Mask ranges outside of min/max to +/- inf, as per REP 117
       if(range >= this->GetRangeMax())
       {
         range = GZ_DBL_INF;
