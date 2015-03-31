@@ -97,7 +97,13 @@ void VisualConfig::AddVisual(const std::string &_name,
   QLabel *visualLabel = new QLabel(QString(_name.c_str()));
 
   // Remove button
-  QPushButton *removeVisualButton = new QPushButton(tr("Remove"));
+  QToolButton *removeVisualButton = new QToolButton(this);
+  removeVisualButton->setFixedSize(QSize(30, 30));
+  removeVisualButton->setToolTip("Remove " + QString(_name.c_str()));
+  removeVisualButton->setIcon(QPixmap(":/images/trashcan.png"));
+  removeVisualButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  removeVisualButton->setIconSize(QSize(16, 16));
+  removeVisualButton->setCheckable(false);
   connect(removeVisualButton, SIGNAL(clicked()), this->signalMapper,
       SLOT(map()));
   this->signalMapper->setMapping(removeVisualButton, this->counter);

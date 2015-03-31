@@ -111,7 +111,13 @@ void CollisionConfig::AddCollision(const std::string &_name,
   QLabel *collisionLabel = new QLabel(QString(_name.c_str()));
 
   // Remove button
-  QPushButton *removeCollisionButton = new QPushButton(tr("Remove"));
+  QToolButton *removeCollisionButton = new QToolButton(this);
+  removeCollisionButton->setFixedSize(QSize(30, 30));
+  removeCollisionButton->setToolTip("Remove " + QString(_name.c_str()));
+  removeCollisionButton->setIcon(QPixmap(":/images/trashcan.png"));
+  removeCollisionButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  removeCollisionButton->setIconSize(QSize(16, 16));
+  removeCollisionButton->setCheckable(false);
   connect(removeCollisionButton, SIGNAL(clicked()), this->signalMapper,
       SLOT(map()));
   this->signalMapper->setMapping(removeCollisionButton, this->counter);
