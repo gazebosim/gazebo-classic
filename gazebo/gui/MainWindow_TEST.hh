@@ -25,6 +25,9 @@ class MainWindow_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Test the step action state when simulation is running and paused.
+  private slots: void StepState();
+
   /// \brief Test that Actions created in MainWindow get destroyed.
   private slots: void ActionCreationDestruction();
 
