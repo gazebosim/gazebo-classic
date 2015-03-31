@@ -35,6 +35,7 @@
 #include <boost/iostreams/copy.hpp>
 #include <iomanip>
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Base64.hh"
 #include "gazebo/common/Console.hh"

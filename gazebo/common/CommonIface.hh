@@ -77,7 +77,6 @@ namespace gazebo
     /// \return Environment variable contents, or NULL on error.
     GZ_COMMON_VISIBLE
     const char *getEnvWin(const char *_name);
-
     /// \}
   }
 
