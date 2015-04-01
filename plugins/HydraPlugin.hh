@@ -18,6 +18,9 @@
 #ifndef _GAZEBO_RAZER_HYDRA_HH_
 #define _GAZEBO_RAZER_HYDRA_HH_
 
+#include <thread>
+#include <memory>
+#include <mutex>
 #include <vector>
 #include <gazebo/math/Filter.hh>
 #include <gazebo/math/Vector3.hh>
@@ -25,28 +28,29 @@
 
 namespace gazebo
 {
-  class RazerHydra : public WorldPlugin
+  class HydraController
   {
     /// \brief Constructor.
-    public: RazerHydra();
+    public: HydraController(const int _fd, const std::string &_worldName,
+      const std::string &_topic);
 
     /// \brief Destructor.
-    public: virtual ~RazerHydra();
-
-    // Documentation Inherited.
-    public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
+    public: virtual ~HydraController();
 
     /// \brief Poll the hydra for input.
     /// \param[in] _lowPassCornerHz Filter frequency.
     /// \return true when there is a new update coming from the controller.
-    private: bool Poll(float _lowPassCornerHz = 5.0);
+    public: bool Poll(float _lowPassCornerHz = 5.0);
 
-    /// \brief Method executed in a separate thread to poll hydra for updates.
-    private: void Run();
+    public: std::array<math::Vector3, 2> GetPos();
 
-    /// \brief Update the hydra.
-    /// \param[in] _info Update information.
-    private: void Update(const common::UpdateInfo &_info);
+    public: std::array<math::Quaternion, 2> GetQuat();
+
+    public: std::array<float, 6> GetAnalog();
+
+    public: std::array<uint8_t, 14> GetButtons();
+
+    public: void Publish();
 
     /// \brief Raw controller positions.
     private: std::array<int16_t, 6> rawPos;
@@ -59,9 +63,6 @@ namespace gazebo
 
     /// \brief Raw values of the analog joysticks.
     private: std::array<double, 6> rawAnalog;
-
-    /// \brief Device file descriptor
-    private: std::vector<int> hidrawFd;
 
     /// \brief Left and right controller positions.
     private: std::array<math::Vector3, 2> pos;
@@ -76,7 +77,7 @@ namespace gazebo
     private: std::array<math::OnePoleQuaternion, 2> filterQuat;
 
     /// \brief Analog joysticks
-    private: std::array<float. 6> analog;
+    private: std::array<float, 6> analog;
 
     /// \brief Buttons that have been pressed.
     private: std::array<uint8_t, 14> buttons;
@@ -87,23 +88,51 @@ namespace gazebo
     /// \brief Time of the last poll cycle.
     private: common::Time lastCycleStart;
 
-    // Pointer to the update event connection
-    private: event::ConnectionPtr updateConnection;
+    private: int fd;
 
     /// \brief Mutex
-    private: boost::mutex mutex;
-
-    /// \brief Additional thread
-    private: boost::thread *pollThread;
-
-    /// \brief Use to stop the additional thread that the plugin uses.
-    private: bool stop;
+    private: std::mutex mutex;
 
     /// \brief Gazebo communication node pointer.
     private: transport::NodePtr node;
 
     /// \brief Publisher pointer used to publish the messages.
     private: transport::PublisherPtr pub;
+
+    private: std::string worldName;
+
+    private: std::string topic;
+  };
+
+  class RazerHydra : public WorldPlugin
+  {
+    /// \brief Constructor.
+    public: RazerHydra();
+
+    /// \brief Destructor.
+    public: virtual ~RazerHydra();
+
+    // Documentation Inherited.
+    public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
+
+    /// \brief Method executed in a separate thread to poll hydra for updates.
+    private: void Run();
+
+    /// \brief Update the hydra.
+    /// \param[in] _info Update information.
+    private: void Update(const common::UpdateInfo &_info);
+
+    /// \brief Device file descriptor
+    private: std::vector<std::unique_ptr<HydraController>> controllers;
+
+    // Pointer to the update event connection
+    private: event::ConnectionPtr updateConnection;
+
+    /// \brief Additional thread
+    private: std::thread *pollThread;
+
+    /// \brief Use to stop the additional thread that the plugin uses.
+    private: bool stop;
   };
 }
 #endif

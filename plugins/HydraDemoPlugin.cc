@@ -36,10 +36,17 @@ HydraDemoPlugin::~HydraDemoPlugin()
 }
 
 /////////////////////////////////////////////////
-void HydraDemoPlugin::OnHydra(ConstHydraPtr &_msg)
+void HydraDemoPlugin::OnHydra0(ConstHydraPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->msgMutex);
-  this->hydraMsgPtr = _msg;
+  this->hydraMsgPtr0 = _msg;
+}
+
+/////////////////////////////////////////////////
+void HydraDemoPlugin::OnHydra1(ConstHydraPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(this->msgMutex);
+  this->hydraMsgPtr1 = _msg;
 }
 
 /////////////////////////////////////////////////
@@ -52,8 +59,11 @@ void HydraDemoPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
   // Subscribe to Hydra updates by registering OnHydra() callback.
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->world->GetName());
-  this->hydraSub = this->node->Subscribe("~/hydra",
-      &HydraDemoPlugin::OnHydra, this);
+  this->hydraSub0 = this->node->Subscribe("~/hydra0",
+      &HydraDemoPlugin::OnHydra0, this);
+
+  this->hydraSub1 = this->node->Subscribe("~/hydra1",
+      &HydraDemoPlugin::OnHydra0, this);
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
@@ -67,16 +77,30 @@ void HydraDemoPlugin::Update(const common::UpdateInfo & /*_info*/)
   boost::mutex::scoped_lock lock(this->msgMutex);
 
   // Return if we don't have messages yet
-  if (!this->hydraMsgPtr)
+  if (!this->hydraMsgPtr0)
     return;
 
   // Read the value of the right joystick.
-  double joyX = this->hydraMsgPtr->right().joy_x();
-  double joyY = this->hydraMsgPtr->right().joy_y();
+  double joyX = this->hydraMsgPtr0->right().joy_x();
+  double joyY = this->hydraMsgPtr0->right().joy_y();
 
   // Move the model.
   this->model->SetLinearVel(math::Vector3(-joyX * 0.2, joyY * 0.2, 0));
 
   // Remove the message that has been processed.
-  this->hydraMsgPtr.reset();
+  this->hydraMsgPtr0.reset();
+
+  // Return if we don't have messages yet
+  if (!this->hydraMsgPtr1)
+    return;
+
+  // Read the value of the right joystick.
+  joyX = this->hydraMsgPtr1->right().joy_x();
+  joyY = this->hydraMsgPtr1->right().joy_y();
+
+  // Move the model.
+  this->model->SetLinearVel(math::Vector3(-joyX * 0.2, joyY * 0.2, 0));
+
+  // Remove the message that has been processed.
+  this->hydraMsgPtr1.reset();
 }

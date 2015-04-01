@@ -49,10 +49,17 @@ namespace gazebo
 
     /// \brief Callback executed every time a new hydra message is received.
     /// \param[in] _msg The hydra message.
-    private: void OnHydra(ConstHydraPtr &_msg);
+    private: void OnHydra0(ConstHydraPtr &_msg);
+
+    /// \brief Callback executed every time a new hydra message is received.
+    /// \param[in] _msg The hydra message.
+    private: void OnHydra1(ConstHydraPtr &_msg);
 
     /// \brief Initialize the starting position of the Hydra controllers.
-    private: void Restart();
+    private: void Restart0();
+
+    /// \brief Initialize the starting position of the Hydra controllers.
+    private: void Restart1();
 
     private: void SwitchRod(std::vector<Rod_t> &_aController);
 
@@ -69,33 +76,37 @@ namespace gazebo
     private: transport::NodePtr node;
 
     /// \brief Subscriber pointer.
-    private: transport::SubscriberPtr hydraSub;
+    private: transport::SubscriberPtr hydraSub0;
+
+    /// \brief Subscriber pointer.
+    private: transport::SubscriberPtr hydraSub1;
 
     /// \brief Reset pose of the left Hydra controller.
-    private: math::Pose resetPoseLeft;
+    private: math::Pose resetPoseLeft0, resetPoseLeft1;
 
     /// \brief Reset pose of the right Hydra controller.
-    private: math::Pose resetPoseRight;
+    private: math::Pose resetPoseRight0, resetPoseRight1;
 
     /// \brief Is Hydra control activated?
-    private: bool activated = false;
+    private: bool activated0 = false, activated1 = false;
 
     /// \brief Mutex to protect the hydra messages.
     private: std::mutex msgMutex;
 
     /// \brief Hydra messages.
-    private: std::list<boost::shared_ptr<msgs::Hydra const>> hydraMsgs;
+    private: std::list<boost::shared_ptr<msgs::Hydra const>> hydraMsgs0;
+    private: std::list<boost::shared_ptr<msgs::Hydra const>> hydraMsgs1;
 
-    private: physics::JointPtr rightModelRot, leftModelRot;
-    private: physics::JointPtr rightModelTrans, leftModelTrans;
-    private: math::Pose basePoseRight;
-    private: math::Pose basePoseLeft;
-    private: math::Pose leftStartPose;
-    private: math::Pose rightStartPose;
+    private: math::Pose basePoseRight0, basePoseRight1;
+    private: math::Pose basePoseLeft0, basePoseLeft1;
+    private: math::Pose leftStartPose0, leftStartPose1;
+    private: math::Pose rightStartPose0, rightStartPose1;
 
     private: std::vector<Controller_t> controllers;
-    private: bool leftTriggerPressed = false;
-    private: bool rightTriggerPressed = false;
+    private: bool leftTriggerPressed0 = false;
+    private: bool rightTriggerPressed0 = false;
+    private: bool leftTriggerPressed1 = false;
+    private: bool rightTriggerPressed1 = false;
   };
 }
 #endif

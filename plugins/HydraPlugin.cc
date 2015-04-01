@@ -21,6 +21,8 @@
 #include <linux/input.h>
 #include <linux/types.h>
 #include <cstring>
+#include <mutex>
+#include <thread>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/HydraPlugin.hh"
@@ -62,11 +64,131 @@ GZ_REGISTER_WORLD_PLUGIN(RazerHydra)
 
 /////////////////////////////////////////////////
 RazerHydra::RazerHydra()
-: lastCycleStart(common::Time::GetWallTime())
+  : pollThread(nullptr),
+    stop(false)
 {
-  this->stop = false;
-  this->pollThread = NULL;
+}
 
+/////////////////////////////////////////////////
+RazerHydra::~RazerHydra()
+{
+  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+
+  this->stop = true;
+  if (this->pollThread->joinable())
+    this->pollThread->join();
+}
+
+/////////////////////////////////////////////////
+void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
+{
+  // Find the Razer device.
+  std::vector<std::string> devices;
+  for (int i = 0; i < 3; ++i)
+  {
+    std::ostringstream stream;
+    stream << "/sys/class/hidraw/hidraw" << i << "/device/uevent";
+    std::ifstream fileIn(stream.str().c_str());
+    if (fileIn.is_open())
+    {
+      std::string line;
+      std::string device;
+      while (std::getline(fileIn, line) && device.empty())
+      {
+        if (line.find("HID_NAME=Razer Razer Hydra") != std::string::npos)
+        {
+          device = "/dev/hidraw" + boost::lexical_cast<std::string>(i);
+          devices.push_back(device);
+          std::cout << "Found in " << i << std::endl;
+        }
+      }
+      if (!device.empty())
+        break;
+    }
+  }
+
+  for (int i = 3; i < 6; ++i)
+  {
+    std::ostringstream stream;
+    stream << "/sys/class/hidraw/hidraw" << i << "/device/uevent";
+    std::ifstream fileIn(stream.str().c_str());
+    if (fileIn.is_open())
+    {
+      std::string line;
+      std::string device;
+      while (std::getline(fileIn, line) && device.empty())
+      {
+        if (line.find("HID_NAME=Razer Razer Hydra") != std::string::npos)
+        {
+          device = "/dev/hidraw" + boost::lexical_cast<std::string>(i);
+          devices.push_back(device);
+          std::cout << "Found in " << i << std::endl;
+        }
+      }
+      if (!device.empty())
+        break;
+    }
+  }
+
+  if (devices.empty())
+  {
+    gzerr << "Unable to find Razer device\n";
+    return;
+  }
+
+  int counter = 0;
+  for (const auto &device : devices)
+  {
+    int fd = open(device.c_str(), O_RDWR | O_NONBLOCK);
+    if (fd < 0)
+    {
+      gzerr << "couldn't open hidraw device[" << device << "]\n";
+      return;
+    }
+
+    this->controllers.push_back(std::unique_ptr<HydraController>(
+      new HydraController(fd, _world->GetName(),
+        "~/hydra" + std::to_string(counter++))));
+  }
+
+  std::cout << "Num Hydra's found: " << this->controllers.size() << std::endl;
+
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&RazerHydra::Update, this, _1));
+
+  this->pollThread = new std::thread(&RazerHydra::Run, this);
+}
+
+/////////////////////////////////////////////////
+void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
+{
+  for (auto &controller : this->controllers)
+    controller->Publish();
+}
+
+/////////////////////////////////////////////////
+void RazerHydra::Run()
+{
+  float cornerHz = 2.5f;
+
+  while (!this->stop)
+  {
+    for (auto &controller : this->controllers)
+    {
+      if (!controller->Poll(cornerHz))
+        common::Time::NSleep(250000);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+HydraController::HydraController(const int _fd, const std::string &_worldName,
+  const std::string &_topic)
+  : lastCycleStart(common::Time::GetWallTime()),
+    fd(_fd),
+    worldName(_worldName),
+    topic(_topic)
+{
   for (auto &v: this->analog)
     v = 0;
 
@@ -89,210 +211,79 @@ RazerHydra::RazerHydra()
   this->periodEstimate.SetFc(0.11, 1.0);
 
   this->periodEstimate.SetValue(0.004);
-}
 
-/////////////////////////////////////////////////
-RazerHydra::~RazerHydra()
-{
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
-
-  this->stop = true;
-  this->pollThread->join();
-}
-
-/////////////////////////////////////////////////
-void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
-{
-  int res;
   uint8_t buf[256];
   struct hidraw_report_descriptor rptDesc;
   struct hidraw_devinfo info;
 
-  // Find the Razer device.
-  std::vector<std::string> devices;
-  for (int i = 0; i < 6; ++i)
+  memset(&rptDesc, 0x0, sizeof(rptDesc));
+  memset(&info, 0x0, sizeof(info));
+  memset(buf, 0x0, sizeof(buf));
+
+  // Get Raw Name
+  int res = ioctl(this->fd, HIDIOCGRAWNAME(256), buf);
+  if (res < 0)
+    gzerr << "Hydro ioctl error HIDIOCGRAWNAME: " << strerror(errno) << "\n";
+
+  // set feature to start it streaming
+  memset(buf, 0x0, sizeof(buf));
+  buf[6] = 1;
+  buf[8] = 4;
+  buf[9] = 3;
+  buf[89] = 6;
+
+  int attempt;
+  for (attempt = 0; attempt < 50; ++attempt)
   {
-    std::ostringstream stream;
-    stream << "/sys/class/hidraw/hidraw" << i << "/device/uevent";
-    std::ifstream fileIn(stream.str().c_str());
-    if (fileIn.is_open())
+    res = ioctl(this->fd, HIDIOCSFEATURE(91), buf);
+    if (res < 0)
     {
-      std::string line;
-      std::string device;
-      while (std::getline(fileIn, line) && device.empty())
-      {
-        if (line.find("HID_NAME=Razer Razer Hydra") != std::string::npos)
-        {
-          device = "/dev/hidraw" + boost::lexical_cast<std::string>(i);
-          devices.push_back(device);
-        }
-      }
+      gzerr << "Unable to start streaming. HIDIOCSFEATURE: "
+            << strerror(errno) << "\n";
+      common::Time::MSleep(500);
+    }
+    else
+    {
+      break;
     }
   }
 
-  if (devices.empty())
+  if (attempt >= 50)
   {
-    gzerr << "Unable to find Razer device\n";
+    gzerr << "Failed to load hydra\n";
     return;
   }
 
-  for (const auto &device : devices)
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(this->worldName);
+  this->pub = this->node->Advertise<msgs::Hydra>(this->topic);
+}
+
+/////////////////////////////////////////////////
+HydraController::~HydraController()
+{
+  if (this->fd >= 0)
   {
-    int fd = open(device.c_str(), O_RDWR | O_NONBLOCK);
-    if (fd < 0)
-    {
-      gzerr << "couldn't open hidraw device[" << device << "]\n";
-      return;
-    }
-
-    this->hidrawFd.push_back(fd);
-
-    memset(&rptDesc, 0x0, sizeof(rptDesc));
-    memset(&info, 0x0, sizeof(info));
-    memset(buf, 0x0, sizeof(buf));
-
-    // Get Raw Name
-    res = ioctl(fd, HIDIOCGRAWNAME(256), buf);
-    if (res < 0)
-      gzerr << "Hydro ioctl error HIDIOCGRAWNAME: " << strerror(errno) << "\n";
-
-    // set feature to start it streaming
-    memset(buf, 0x0, sizeof(buf));
+    uint8_t buf[256];
+    memset(buf, 0, sizeof(buf));
     buf[6] = 1;
     buf[8] = 4;
-    buf[9] = 3;
-    buf[89] = 6;
+    buf[89] = 5;
 
-    int attempt;
-    for (attempt = 0; attempt < 50; ++attempt)
+    if (ioctl(this->fd, HIDIOCSFEATURE(91), buf) < 0)
     {
-      res = ioctl(fd, HIDIOCSFEATURE(91), buf);
-      if (res < 0)
-      {
-        gzerr << "Unable to start streaming. HIDIOCSFEATURE: "
-              << strerror(errno) << "\n";
-        common::Time::MSleep(500);
-      }
-      else
-      {
-        break;
-      }
+      gzerr << "Unable to stop streaming. HIDIOCSFEATURE: "
+            << strerror(errno) << "\n";
     }
 
-    if (attempt >= 50)
-    {
-      gzerr << "Failed to load hydra\n";
-      return;
-    }
+    close(this->fd);
   }
-
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&RazerHydra::Update, this, _1));
-
-  this->pollThread = new boost::thread(boost::bind(&RazerHydra::Run, this));
-
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(_world->GetName());
-  this->pub = this->node->Advertise<msgs::Hydra>("~/hydra");
 }
 
 /////////////////////////////////////////////////
-void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
+bool HydraController::Poll(float _lowPassCornerHz)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
-  math::Pose origRight(this->pos[1], this->quat[1]);
-
-  math::Pose pivotRight = origRight;
-  math::Pose grabRight = origRight;
-
-  pivotRight.pos += origRight.rot * math::Vector3(-0.04, 0, 0);
-  grabRight.pos += origRight.rot * math::Vector3(-0.12, 0, 0);
-
-  math::Pose origLeft(this->pos[0], this->quat[0]);
-
-  math::Pose pivotLeft = origLeft;
-  math::Pose grabLeft = origLeft;
-
-  pivotLeft.pos += origLeft.rot.RotateVector(math::Vector3(-0.04, 0, 0));
-  grabLeft.pos += origLeft.rot.RotateVector(math::Vector3(-0.12, 0, 0));
-
-  msgs::Hydra msg;
-  msgs::Hydra::Paddle *rightPaddle = msg.mutable_right();
-  msgs::Hydra::Paddle *leftPaddle = msg.mutable_left();
-
-  // Analog 0: Left right(+) left(-)
-  // Analog 1: Left forward(+) back(-)
-  // Analog 2: Left trigger(0-1)
-  // Analog 3: Right right(+) left(-)
-  // Analog 4: Right forward(+) back(-)
-  // Analog 5: Right trigger(0-1)
-  rightPaddle->set_joy_y(this->analog[3]);
-  rightPaddle->set_joy_x(this->analog[4]);
-  rightPaddle->set_trigger(this->analog[5]);
-
-  leftPaddle->set_joy_y(this->analog[0]);
-  leftPaddle->set_joy_x(this->analog[1]);
-  leftPaddle->set_trigger(this->analog[2]);
-
-  leftPaddle->set_button_bumper(this->buttons[0]);
-  leftPaddle->set_button_1(this->buttons[1]);
-  leftPaddle->set_button_2(this->buttons[2]);
-  leftPaddle->set_button_3(this->buttons[3]);
-  leftPaddle->set_button_4(this->buttons[4]);
-
-  leftPaddle->set_button_center(this->buttons[5]);
-  leftPaddle->set_button_joy(this->buttons[6]);
-
-  rightPaddle->set_button_bumper(this->buttons[7]);
-  rightPaddle->set_button_1(this->buttons[8]);
-  rightPaddle->set_button_2(this->buttons[9]);
-  rightPaddle->set_button_3(this->buttons[10]);
-  rightPaddle->set_button_4(this->buttons[11]);
-  rightPaddle->set_button_center(this->buttons[12]);
-  rightPaddle->set_button_joy(this->buttons[13]);
-
-  msgs::Set(rightPaddle->mutable_pose(), grabRight);
-  msgs::Set(leftPaddle->mutable_pose(), grabLeft);
-
-  this->pub->Publish(msg);
-}
-
-/////////////////////////////////////////////////
-void RazerHydra::Run()
-{
-  double cornerHz = 2.5;
-
-  while (!this->stop)
-  {
-    if (!this->Poll(cornerHz))
-      common::Time::NSleep(250000);
-  }
-
-  for (const auto &fd : this->hidrawFd)
-  {
-   if (fd >= 0)
-   {
-     uint8_t buf[256];
-     memset(buf, 0, sizeof(buf));
-     buf[6] = 1;
-     buf[8] = 4;
-     buf[89] = 5;
-
-     if (ioctl(fd, HIDIOCSFEATURE(91), buf) < 0)
-     {
-       gzerr << "Unable to stop streaming. HIDIOCSFEATURE: "
-             << strerror(errno) << "\n";
-     }
-
-     close(fd);
-   }
- }
-}
-
-/////////////////////////////////////////////////
-bool RazerHydra::Poll(float _lowPassCornerHz)
-{
-  if (this->hidrawFd < 0)
+  if (this->fd < 0)
   {
     gzerr << "hidraw device is not open, couldn't poll.\n";
     return false;
@@ -307,7 +298,7 @@ bool RazerHydra::Poll(float _lowPassCornerHz)
   }
 
   uint8_t buf[64];
-  ssize_t nread = read(this->hidrawFd, buf, sizeof(buf));
+  ssize_t nread = read(this->fd, buf, sizeof(buf));
 
   // No updates.
   if (nread <= 0)
@@ -363,7 +354,7 @@ bool RazerHydra::Poll(float _lowPassCornerHz)
   this->rawAnalog[4] = *(reinterpret_cast<int16_t *>(buf+47));
   this->rawAnalog[5] = buf[49];
 
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   // Put the raw position and orientation into Gazebo coordinate frame
   for (int i = 0; i < 2; ++i)
   {
@@ -403,4 +394,94 @@ bool RazerHydra::Poll(float _lowPassCornerHz)
   }
 
   return true;
+}
+
+/////////////////////////////////////////////////
+std::array<math::Vector3, 2> HydraController::GetPos()
+{
+  std::lock_guard<std::mutex> lock(this->mutex);
+  return this->pos;
+}
+
+/////////////////////////////////////////////////
+std::array<math::Quaternion, 2> HydraController::GetQuat()
+{
+  std::lock_guard<std::mutex> lock(this->mutex);
+  return this->quat;
+}
+
+/////////////////////////////////////////////////
+std::array<float, 6> HydraController::GetAnalog()
+{
+  std::lock_guard<std::mutex> lock(this->mutex);
+  return this->analog;
+}
+
+/////////////////////////////////////////////////
+std::array<uint8_t, 14> HydraController::GetButtons()
+{
+  std::lock_guard<std::mutex> lock(this->mutex);
+  return this->buttons;
+}
+
+/////////////////////////////////////////////////
+void HydraController::Publish()
+{
+  std::lock_guard<std::mutex> lock(this->mutex);
+
+  math::Pose origRight(this->pos[1], this->quat[1]);
+
+  math::Pose pivotRight = origRight;
+  math::Pose grabRight = origRight;
+
+  pivotRight.pos += origRight.rot * math::Vector3(-0.04, 0, 0);
+  grabRight.pos += origRight.rot * math::Vector3(-0.12, 0, 0);
+
+  math::Pose origLeft(this->pos[0], this->quat[0]);
+
+  math::Pose pivotLeft = origLeft;
+  math::Pose grabLeft = origLeft;
+
+  pivotLeft.pos += origLeft.rot.RotateVector(math::Vector3(-0.04, 0, 0));
+  grabLeft.pos += origLeft.rot.RotateVector(math::Vector3(-0.12, 0, 0));
+
+  msgs::Hydra msg;
+  msgs::Hydra::Paddle *rightPaddle = msg.mutable_right();
+  msgs::Hydra::Paddle *leftPaddle = msg.mutable_left();
+
+  // Analog 0: Left right(+) left(-)
+  // Analog 1: Left forward(+) back(-)
+  // Analog 2: Left trigger(0-1)
+  // Analog 3: Right right(+) left(-)
+  // Analog 4: Right forward(+) back(-)
+  // Analog 5: Right trigger(0-1)
+  rightPaddle->set_joy_y(this->analog[3]);
+  rightPaddle->set_joy_x(this->analog[4]);
+  rightPaddle->set_trigger(this->analog[5]);
+
+  leftPaddle->set_joy_y(this->analog[0]);
+  leftPaddle->set_joy_x(this->analog[1]);
+  leftPaddle->set_trigger(this->analog[2]);
+
+  leftPaddle->set_button_bumper(this->buttons[0]);
+  leftPaddle->set_button_1(this->buttons[1]);
+  leftPaddle->set_button_2(this->buttons[2]);
+  leftPaddle->set_button_3(this->buttons[3]);
+  leftPaddle->set_button_4(this->buttons[4]);
+
+  leftPaddle->set_button_center(this->buttons[5]);
+  leftPaddle->set_button_joy(this->buttons[6]);
+
+  rightPaddle->set_button_bumper(this->buttons[7]);
+  rightPaddle->set_button_1(this->buttons[8]);
+  rightPaddle->set_button_2(this->buttons[9]);
+  rightPaddle->set_button_3(this->buttons[10]);
+  rightPaddle->set_button_4(this->buttons[11]);
+  rightPaddle->set_button_center(this->buttons[12]);
+  rightPaddle->set_button_joy(this->buttons[13]);
+
+  msgs::Set(rightPaddle->mutable_pose(), grabRight);
+  msgs::Set(leftPaddle->mutable_pose(), grabLeft);
+
+  this->pub->Publish(msg);
 }

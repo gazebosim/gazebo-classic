@@ -103,8 +103,11 @@ void FoosballPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Subscribe to Hydra updates by registering OnHydra() callback.
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->model->GetWorld()->GetName());
-  this->hydraSub = this->node->Subscribe("~/hydra",
-    &FoosballPlugin::OnHydra, this);
+  this->hydraSub0 = this->node->Subscribe("~/hydra0",
+    &FoosballPlugin::OnHydra0, this);
+
+  this->hydraSub1 = this->node->Subscribe("~/hydra1",
+    &FoosballPlugin::OnHydra1, this);
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
@@ -117,27 +120,27 @@ void FoosballPlugin::Update(const common::UpdateInfo & /*_info*/)
 {
   std::lock_guard<std::mutex> lock(this->msgMutex);
 
-  if (this->hydraMsgs.empty())
+  if (this->hydraMsgs0.empty())
     return;
 
-  if (!this->activated)
+  if (!this->activated0)
   {
     for (std::list<boost::shared_ptr<msgs::Hydra const> >::iterator iter =
-        this->hydraMsgs.begin(); iter != this->hydraMsgs.end(); ++iter)
+        this->hydraMsgs0.begin(); iter != this->hydraMsgs0.end(); ++iter)
     {
       if ((*iter)->right().button_bumper() && (*iter)->left().button_bumper())
       {
-        this->activated = true;
-        this->resetPoseRight = msgs::Convert((*iter)->right().pose());
-        this->resetPoseLeft = msgs::Convert((*iter)->left().pose());
+        this->activated0 = true;
+        this->resetPoseRight0 = msgs::Convert((*iter)->right().pose());
+        this->resetPoseLeft0 = msgs::Convert((*iter)->left().pose());
         break;
       }
     }
   }
 
-  if (this->activated)
+  if (this->activated0)
   {
-    boost::shared_ptr<msgs::Hydra const> msg = this->hydraMsgs.back();
+    boost::shared_ptr<msgs::Hydra const> msg = this->hydraMsgs0.back();
 
     math::Pose rightPose;
     math::Pose leftPose;
@@ -148,18 +151,21 @@ void FoosballPlugin::Update(const common::UpdateInfo & /*_info*/)
     leftPose = msgs::Convert(msg->left().pose());
 
     adjust["right_controller"] = math::Pose(
-      rightPose.pos - this->resetPoseRight.pos + this->basePoseRight.pos,
-      rightPose.rot * this->resetPoseRight.rot.GetInverse() *
-      this->basePoseRight.rot);
+      rightPose.pos - this->resetPoseRight0.pos + this->basePoseRight0.pos,
+      rightPose.rot * this->resetPoseRight0.rot.GetInverse() *
+      this->basePoseRight0.rot);
 
     adjust["left_controller"] = math::Pose(
-      leftPose.pos - this->resetPoseLeft.pos + this->basePoseLeft.pos,
-      leftPose.rot * this->resetPoseLeft.rot.GetInverse() *
-      this->basePoseLeft.rot);
+      leftPose.pos - this->resetPoseLeft0.pos + this->basePoseLeft0.pos,
+      leftPose.rot * this->resetPoseLeft0.rot.GetInverse() *
+      this->basePoseLeft0.rot);
 
     // Move the rods.
-    for (auto &controller : this->controllers)
+    //for (auto &controller : this->controllers)
+    //{
+    if (!this->controllers.empty())
     {
+      auto controller = this->controllers.at(0);
       for (const auto &side : {"left_controller", "right_controller"})
       {
         if (controller.find(side) != controller.end())
@@ -176,6 +182,70 @@ void FoosballPlugin::Update(const common::UpdateInfo & /*_info*/)
       }
     }
   }
+
+  if (this->hydraMsgs1.empty())
+    return;
+
+  if (!this->activated1)
+  {
+    for (std::list<boost::shared_ptr<msgs::Hydra const> >::iterator iter =
+        this->hydraMsgs1.begin(); iter != this->hydraMsgs1.end(); ++iter)
+    {
+      if ((*iter)->right().button_bumper() && (*iter)->left().button_bumper())
+      {
+        this->activated1 = true;
+        this->resetPoseRight1 = msgs::Convert((*iter)->right().pose());
+        this->resetPoseLeft1 = msgs::Convert((*iter)->left().pose());
+        break;
+      }
+    }
+  }
+
+  if (this->activated1)
+  {
+    boost::shared_ptr<msgs::Hydra const> msg = this->hydraMsgs1.back();
+
+    math::Pose rightPose;
+    math::Pose leftPose;
+
+    std::map<std::string, math::Pose> adjust;
+
+    rightPose = msgs::Convert(msg->right().pose());
+    leftPose = msgs::Convert(msg->left().pose());
+
+    adjust["right_controller"] = math::Pose(
+      rightPose.pos - this->resetPoseRight1.pos + this->basePoseRight1.pos,
+      rightPose.rot * this->resetPoseRight1.rot.GetInverse() *
+      this->basePoseRight1.rot);
+
+    adjust["left_controller"] = math::Pose(
+      leftPose.pos - this->resetPoseLeft1.pos + this->basePoseLeft1.pos,
+      leftPose.rot * this->resetPoseLeft1.rot.GetInverse() *
+      this->basePoseLeft1.rot);
+
+    // Move the rods.
+    //for (auto &controller : this->controllers)
+    //{
+    if (!this->controllers.size() > 1)
+    {
+      auto controller = this->controllers.at(1);
+      for (const auto &side : {"left_controller", "right_controller"})
+      {
+        if (controller.find(side) != controller.end())
+        {
+          if (!controller[side].empty())
+          {
+            // Translation.
+            controller[side].at(0).at(0)->SetPosition(0, -adjust[side].pos.x);
+            // Rotation.
+            controller[side].at(0).at(1)->SetPosition(
+              0, -adjust[side].rot.GetRoll());
+          }
+        }
+      }
+    }
+  }
+
 }
 
 /////////////////////////////////////////////////
@@ -189,39 +259,77 @@ void FoosballPlugin::SwitchRod(std::vector<Rod_t> &_aController)
 }
 
 /////////////////////////////////////////////////
-void FoosballPlugin::OnHydra(ConstHydraPtr &_msg)
+void FoosballPlugin::OnHydra0(ConstHydraPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->msgMutex);
 
   if (_msg->right().button_center() &&_msg->left().button_center())
   {
-    this->Restart();
+    this->Restart0();
     return;
   }
 
   if (_msg->left().trigger() > 0.2)
-    this->leftTriggerPressed = true;
-  else if (this->leftTriggerPressed)
+    this->leftTriggerPressed0 = true;
+  else if (this->leftTriggerPressed0)
   {
-    this->leftTriggerPressed = false;
+    this->leftTriggerPressed0 = false;
     this->SwitchRod(this->controllers.at(0)["left_controller"]);
   }
 
   if (_msg->right().trigger() > 0.2)
-    this->rightTriggerPressed = true;
-  else if (this->rightTriggerPressed)
+    this->rightTriggerPressed0 = true;
+  else if (this->rightTriggerPressed0)
   {
-    this->rightTriggerPressed = false;
+    this->rightTriggerPressed0 = false;
     this->SwitchRod(this->controllers.at(0)["right_controller"]);
   }
 
-  this->hydraMsgs.push_back(_msg);
+  this->hydraMsgs0.push_back(_msg);
 }
 
 /////////////////////////////////////////////////
-void FoosballPlugin::Restart()
+void FoosballPlugin::OnHydra1(ConstHydraPtr &_msg)
 {
-  this->basePoseLeft = this->leftStartPose;
-  this->basePoseRight = this->rightStartPose;
-  this->activated = false;
+  std::lock_guard<std::mutex> lock(this->msgMutex);
+
+  if (_msg->right().button_center() &&_msg->left().button_center())
+  {
+    this->Restart1();
+    return;
+  }
+
+  if (_msg->left().trigger() > 0.2)
+    this->leftTriggerPressed1 = true;
+  else if (this->leftTriggerPressed1)
+  {
+    this->leftTriggerPressed1 = false;
+    this->SwitchRod(this->controllers.at(0)["left_controller"]);
+  }
+
+  if (_msg->right().trigger() > 0.2)
+    this->rightTriggerPressed1 = true;
+  else if (this->rightTriggerPressed1)
+  {
+    this->rightTriggerPressed1 = false;
+    this->SwitchRod(this->controllers.at(0)["right_controller"]);
+  }
+
+  this->hydraMsgs1.push_back(_msg);
+}
+
+/////////////////////////////////////////////////
+void FoosballPlugin::Restart0()
+{
+  this->basePoseLeft0 = this->leftStartPose0;
+  this->basePoseRight0 = this->rightStartPose0;
+  this->activated0 = false;
+}
+
+/////////////////////////////////////////////////
+void FoosballPlugin::Restart1()
+{
+  this->basePoseLeft1 = this->leftStartPose1;
+  this->basePoseRight1 = this->rightStartPose1;
+  this->activated1 = false;
 }
