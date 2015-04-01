@@ -1596,7 +1596,7 @@ void World::ProcessFactoryMsgs()
           if (this->dataPtr->factorySDF->Root()->GetName() == "sdf")
             elem = this->dataPtr->factorySDF->Root()->GetFirstElement();
           else
-            elem = this->dataPtr->factorySDF->root;
+            elem = this->dataPtr->factorySDF->Root();
 
           base->UpdateParameters(elem);
         }
