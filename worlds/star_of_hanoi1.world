@@ -1,0 +1,439 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="star_0.02">
+      <pose>0 0 0.01  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>0.05089380098815466</mass>
+          <inertia>
+            <ixx>8.05818515645782e-06</ixx>
+            <iyy>8.05818515645782e-06</iyy>
+            <izz>1.2723450247038664e-05</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+<polyline>
+<point>0.009659258262890684 0.0025881904510252074</point>
+<point>0.01258640782099675 0.015542919229139416</point>
+<point>0.0005233595624294397 0.009986295347545738</point>
+<point>-0.010892780700300543 0.016773411358908478</point>
+<point>-0.009335804264972018 0.003583679495453002</point>
+<point>-0.019318516525781367 -0.005176380902050416</point>
+<point>-0.006293203910498379 -0.0077714596145697055</point>
+<point>-0.0010467191248588862 -0.019972590695091476</point>
+<point>0.005446390350150266 -0.008386705679454242</point>
+<point>0.018671608529944032 -0.007167358990906016</point>
+<point>0.009659258262890684 0.0025881904510252074</point>
+<height>0.02</height>
+</polyline>
+</geometry>
+
+          <surface>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <max_vel>0.1</max_vel>
+                <kp>1e8</kp>
+                <kd>1</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+<polyline>
+<point>0.009659258262890684 0.0025881904510252074</point>
+<point>0.01258640782099675 0.015542919229139416</point>
+<point>0.0005233595624294397 0.009986295347545738</point>
+<point>-0.010892780700300543 0.016773411358908478</point>
+<point>-0.009335804264972018 0.003583679495453002</point>
+<point>-0.019318516525781367 -0.005176380902050416</point>
+<point>-0.006293203910498379 -0.0077714596145697055</point>
+<point>-0.0010467191248588862 -0.019972590695091476</point>
+<point>0.005446390350150266 -0.008386705679454242</point>
+<point>0.018671608529944032 -0.007167358990906016</point>
+<point>0.009659258262890684 0.0025881904510252074</point>
+<height>0.02</height>
+</polyline>
+</geometry>
+
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="star_0.04">
+      <pose>0 0 0.03  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>0.25446900494077324</mass>
+          <inertia>
+            <ixx>0.00011663162726452107</ixx>
+            <iyy>0.00011663162726452107</iyy>
+            <izz>0.00021629865419965728</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+<polyline>
+<point>0.008660254037844387 0.004999999999999999</point>
+<point>0.016269465723032017 0.036541818305704035</point>
+<point>-0.002079116908177591 0.009781476007338056</point>
+<point>-0.02972579301909576 0.026765224254354333</point>
+<point>-0.009945218953682734 0.0010452846326765373</point>
+<point>-0.03464101615137755 -0.01999999999999999</point>
+<point>-0.004067366430758001 -0.00913545457642601</point>
+<point>0.008316467632710376 -0.039125904029352225</point>
+<point>0.007431448254773943 -0.006691306063588582</point>
+<point>0.039780875814730936 -0.004181138530706137</point>
+<point>0.008660254037844387 0.004999999999999999</point>
+<height>0.02</height>
+</polyline>
+</geometry>
+
+          <surface>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <max_vel>0.1</max_vel>
+                <kp>1e8</kp>
+                <kd>1</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+<polyline>
+<point>0.008660254037844387 0.004999999999999999</point>
+<point>0.016269465723032017 0.036541818305704035</point>
+<point>-0.002079116908177591 0.009781476007338056</point>
+<point>-0.02972579301909576 0.026765224254354333</point>
+<point>-0.009945218953682734 0.0010452846326765373</point>
+<point>-0.03464101615137755 -0.01999999999999999</point>
+<point>-0.004067366430758001 -0.00913545457642601</point>
+<point>0.008316467632710376 -0.039125904029352225</point>
+<point>0.007431448254773943 -0.006691306063588582</point>
+<point>0.039780875814730936 -0.004181138530706137</point>
+<point>0.008660254037844387 0.004999999999999999</point>
+<height>0.02</height>
+</polyline>
+</geometry>
+
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="star_0.06">
+      <pose>0 0 0.05  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>0.5937610115284708</mass>
+          <inertia>
+            <ixx>0.000569020969381451</ixx>
+            <iyy>0.000569020969381451</iyy>
+            <izz>0.001098457871327671</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+<polyline>
+<point>0.007071067811865476 0.0070710678118654745</point>
+<point>0.009386067902413855 0.059261300435708264</point>
+<point>-0.004539904997395467 0.00891006524188368</point>
+<point>-0.05346039145130207 0.02723942998437281</point>
+<point>-0.009876883405951378 -0.0015643446504023074</point>
+<point>-0.04242640687119286 -0.04242640687119285</point>
+<point>-0.0015643446504023104 -0.009876883405951376</point>
+<point>0.027239429984372798 -0.053460391451302075</point>
+<point>0.008910065241883678 -0.00453990499739547</point>
+<point>0.059261300435708264 0.009386067902413836</point>
+<point>0.007071067811865476 0.0070710678118654745</point>
+<height>0.02</height>
+</polyline>
+</geometry>
+
+          <surface>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <max_vel>0.1</max_vel>
+                <kp>1e8</kp>
+                <kd>1</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+<polyline>
+<point>0.007071067811865476 0.0070710678118654745</point>
+<point>0.009386067902413855 0.059261300435708264</point>
+<point>-0.004539904997395467 0.00891006524188368</point>
+<point>-0.05346039145130207 0.02723942998437281</point>
+<point>-0.009876883405951378 -0.0015643446504023074</point>
+<point>-0.04242640687119286 -0.04242640687119285</point>
+<point>-0.0015643446504023104 -0.009876883405951376</point>
+<point>0.027239429984372798 -0.053460391451302075</point>
+<point>0.008910065241883678 -0.00453990499739547</point>
+<point>0.059261300435708264 0.009386067902413836</point>
+<point>0.007071067811865476 0.0070710678118654745</point>
+<height>0.02</height>
+</polyline>
+</geometry>
+
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="star_0.08">
+      <pose>0 0 0.07  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>1.0687698207512477</mass>
+          <inertia>
+            <ixx>0.0017723766194124861</ixx>
+            <iyy>0.0017723766194124861</iyy>
+            <izz>0.0034735019174415554</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+<polyline>
+<point>0.005000000000000001 0.008660254037844387</point>
+<point>-0.008362277061412267 0.07956175162946187</point>
+<point>-0.006691306063588579 0.007431448254773945</point>
+<point>-0.07825180805870445 0.016632935265420777</point>
+<point>-0.00913545457642601 -0.004067366430757998</point>
+<point>-0.040000000000000036 -0.06928203230275508</point>
+<point>0.00104528463267653 -0.009945218953682734</point>
+<point>0.053530448508708625 -0.05945158603819157</point>
+<point>0.009781476007338056 -0.002079116908177599</point>
+<point>0.07308363661140808 0.03253893144606398</point>
+<point>0.005000000000000001 0.008660254037844387</point>
+<height>0.02</height>
+</polyline>
+</geometry>
+
+          <surface>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <max_vel>0.1</max_vel>
+                <kp>1e8</kp>
+                <kd>1</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+<polyline>
+<point>0.005000000000000001 0.008660254037844387</point>
+<point>-0.008362277061412267 0.07956175162946187</point>
+<point>-0.006691306063588579 0.007431448254773945</point>
+<point>-0.07825180805870445 0.016632935265420777</point>
+<point>-0.00913545457642601 -0.004067366430757998</point>
+<point>-0.040000000000000036 -0.06928203230275508</point>
+<point>0.00104528463267653 -0.009945218953682734</point>
+<point>0.053530448508708625 -0.05945158603819157</point>
+<point>0.009781476007338056 -0.002079116908177599</point>
+<point>0.07308363661140808 0.03253893144606398</point>
+<point>0.005000000000000001 0.008660254037844387</point>
+<height>0.02</height>
+</polyline>
+</geometry>
+
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="star_0.1">
+      <pose>0 0 0.09  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>1.6794954326091036</mass>
+          <inertia>
+            <ixx>0.0042967091484249565</ixx>
+            <iyy>0.0042967091484249565</iyy>
+            <izz>0.008481451934675975</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+<polyline>
+<point>0.0025881904510252074 0.009659258262890684</point>
+<point>-0.03583679495453003 0.09335804264972018</point>
+<point>-0.008386705679454242 0.00544639035015027</point>
+<point>-0.09986295347545739 -0.005233595624294401</point>
+<point>-0.007771459614569708 -0.006293203910498376</point>
+<point>-0.025881904510252064 -0.09659258262890684</point>
+<point>0.003583679495453004 -0.009335804264972018</point>
+<point>0.08386705679454241 -0.0544639035015027</point>
+<point>0.009986295347545738 0.0005233595624294389</point>
+<point>0.07771459614569709 0.06293203910498375</point>
+<point>0.0025881904510252074 0.009659258262890684</point>
+<height>0.02</height>
+</polyline>
+</geometry>
+
+          <surface>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <max_vel>0.1</max_vel>
+                <kp>1e8</kp>
+                <kd>1</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+<polyline>
+<point>0.0025881904510252074 0.009659258262890684</point>
+<point>-0.03583679495453003 0.09335804264972018</point>
+<point>-0.008386705679454242 0.00544639035015027</point>
+<point>-0.09986295347545739 -0.005233595624294401</point>
+<point>-0.007771459614569708 -0.006293203910498376</point>
+<point>-0.025881904510252064 -0.09659258262890684</point>
+<point>0.003583679495453004 -0.009335804264972018</point>
+<point>0.08386705679454241 -0.0544639035015027</point>
+<point>0.009986295347545738 0.0005233595624294389</point>
+<point>0.07771459614569709 0.06293203910498375</point>
+<point>0.0025881904510252074 0.009659258262890684</point>
+<height>0.02</height>
+</polyline>
+</geometry>
+
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="star_0.12">
+      <pose>0 0 0.11  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>2.425937847102038</mass>
+          <inertia>
+            <ixx>0.008874889290648287</ixx>
+            <iyy>0.008874889290648287</iyy>
+            <izz>0.017588049391489776</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+<polyline>
+<point>6.123233995736766e-19 0.01</point>
+<point>-0.07053423027509675 0.0970820393249937</point>
+<point>-0.009510565162951536 0.003090169943749475</point>
+<point>-0.11412678195541844 -0.037082039324993675</point>
+<point>-0.005877852522924732 -0.008090169943749474</point>
+<point>-2.2043642384652355e-17 -0.12</point>
+<point>0.005877852522924729 -0.008090169943749476</point>
+<point>0.11412678195541842 -0.03708203932499371</point>
+<point>0.009510565162951536 0.0030901699437494716</point>
+<point>0.0705342302750968 0.09708203932499367</point>
+<point>6.123233995736766e-19 0.01</point>
+<height>0.02</height>
+</polyline>
+</geometry>
+
+          <surface>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <max_vel>0.1</max_vel>
+                <kp>1e8</kp>
+                <kd>1</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+<polyline>
+<point>6.123233995736766e-19 0.01</point>
+<point>-0.07053423027509675 0.0970820393249937</point>
+<point>-0.009510565162951536 0.003090169943749475</point>
+<point>-0.11412678195541844 -0.037082039324993675</point>
+<point>-0.005877852522924732 -0.008090169943749474</point>
+<point>-2.2043642384652355e-17 -0.12</point>
+<point>0.005877852522924729 -0.008090169943749476</point>
+<point>0.11412678195541842 -0.03708203932499371</point>
+<point>0.009510565162951536 0.0030901699437494716</point>
+<point>0.0705342302750968 0.09708203932499367</point>
+<point>6.123233995736766e-19 0.01</point>
+<height>0.02</height>
+</polyline>
+</geometry>
+
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

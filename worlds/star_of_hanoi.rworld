@@ -1,19 +1,22 @@
 <?xml version="1.0" ?>
 <%
-  # Tower of Hanoi demo
-  # Make disks with extruded polylines
+  # Star of Hanoi demo
+  # Make stars with extruded polylines
 
   # Inertial parameters
   # Aluminum 2700 kg/m^3
   density = 2700.0
 
-  # Constant parameters for each disk
-  radius_inner = 0.01
-  points_inner = 10
-  # TODO: make these a function of radius
-  points_outer = 20
+  # Constant parameters for each star 
+  radius_outer0 = 0.05
+  star_ratio = 0.75
   height = 0.02
+  star_number = 6
+  star_point_number = 5
+  radius_hole = 0.02
+  points_hole = 10
   color = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple"]
+  
 %>
 <sdf version="1.5">
   <world name="default">
@@ -24,45 +27,68 @@
       <uri>model://sun</uri>
     </include>
 <%
-  # Disk axis of symmetry: Z
-  outer_radii = [0.2, 0.1, 0.05, 0.03]
+  # Star axis of symmetry: Z
+  star_number.times do |j|
+    radius_outer = radius_outer0*(star_number - j)
+    radius_inner = star_ratio*radius_outer
+    # offset between each star
+    angle0 = (j+1)*Math::PI/12.0;
 
-  outer_radii.each_index do |j|
-    radius_outer = outer_radii[j]
-
+    # approximate the inertia for star 
     volume = Math::PI * (radius_outer**2 - radius_inner**2) * height
     mass = density * volume
     ixx = 1.0 / 12 * mass * (3*(radius_inner**2 + radius_outer**2) + height**2)
     iyy = ixx
     izz = 0.5 * mass * (radius_inner**2 + radius_outer**2)
 
-    def disk_points_s(radius, points=20)
+    def star_points_s(outer_radius, inner_radius, angle0, points=5)
       polyline = []
       points.times do |i|
-        angle = 2*Math::PI * i / points.to_f
-        polyline << [radius*Math.cos(angle), radius*Math.sin(angle)]
+        inner_angle = 2*Math::PI * i / points.to_f + angle0;
+        # outer_angle(i) = (inner_angle(i) + inner_angle(i+1)) / 2.0
+        outer_angle = Math::PI * (2*i+1) / points.to_f + angle0;
+        polyline << [inner_radius*Math.cos(inner_angle), inner_radius*Math.sin(inner_angle)]
+        polyline << [outer_radius*Math.cos(outer_angle), outer_radius*Math.sin(outer_angle)]
       end
+      polyline << [inner_radius*Math.cos(angle0), inner_radius*Math.sin(angle0)]
+      
       points_s = ""
-      polyline.each do |p|
+      polyline.each do |p| 
         points_s += "<point>" \
-                  + p[0].to_s + " " + p[1].to_s \
-                  + "</point>\n"
+                 + p[0].to_s + " " + p[1].to_s \
+                 + "</point>\n"
       end
-      points_s
+      points_s 
+    end
+
+    def hole_points_s(hole_radius, hole_points=10)
+      polyline = []
+      hole_points.times do |i|
+        angle = 2*Math::PI * i / hole_points.to_f;
+        polyline << [hole_radius*Math.cos(angle), hole_radius*Math.sin(angle)]
+      end
+      
+      points_s = ""
+      polyline.each do |p| 
+        points_s += "<point>" \
+                 + p[0].to_s + " " + p[1].to_s \
+                 + "</point>\n"
+      end
+      points_s 
     end
 
     geometry_s = "<geometry>\n"  \
                + "<polyline>\n"  \
-               + disk_points_s(radius_outer, points_outer) \
+               + star_points_s(radius_outer, radius_inner, angle0, star_point_number) \
                + "<height>" + height.to_s + "</height>\n"  \
                + "</polyline>\n" \
                + "<polyline>\n"  \
-               + disk_points_s(radius_inner, points_inner) \
+               + hole_points_s(radius_hole, points_hole) \
                + "<height>" + height.to_s + "</height>\n"  \
                + "</polyline>\n" \
                + "</geometry>\n"
 %>
-    <%= '<model name="disk_' + radius_outer.to_s + '">' %>
+    <%= '<model name="star_' + radius_outer.to_s + '">' %>
       <pose>0 0 <%= height * (j + 0.5) %>  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -94,7 +120,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
-              <%= '<name>Gazebo/' + color[j%(outer_radii.length)].to_s + '</name>'%>
+              <%= '<name>Gazebo/' + color[j%star_number].to_s + '</name>'%>
             </script>
           </material>
         </visual>
