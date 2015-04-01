@@ -674,8 +674,6 @@ void ApplyWrenchDialog::OnForcePosChanged(double /*_value*/)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceMagChanged(double /*_magnitude*/)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
   // Update force vector proportionally
   // Normalize current vector
   math::Vector3 v = this->dataPtr->forceVector;
@@ -691,8 +689,6 @@ void ApplyWrenchDialog::OnForceMagChanged(double /*_magnitude*/)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceChanged(double /*_value*/)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
   // Update force vector with values from XYZ spins
   this->SetForce(math::Vector3(this->dataPtr->forceXSpin->value(),
                                this->dataPtr->forceYSpin->value(),
@@ -702,16 +698,12 @@ void ApplyWrenchDialog::OnForceChanged(double /*_value*/)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceClear()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
   this->SetForce(math::Vector3::Zero);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueMagChanged(double /*_magnitude*/)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
   // Update torque vector proportionally
   // Normalize current vector
   math::Vector3 v = this->dataPtr->torqueVector;
@@ -727,8 +719,6 @@ void ApplyWrenchDialog::OnTorqueMagChanged(double /*_magnitude*/)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueChanged(double /*_value*/)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
   // Update torque vector with values from XYZ spins
   this->SetTorque(math::Vector3(this->dataPtr->torqueXSpin->value(),
                                this->dataPtr->torqueYSpin->value(),
@@ -738,8 +728,6 @@ void ApplyWrenchDialog::OnTorqueChanged(double /*_value*/)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueClear()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
   this->SetTorque(math::Vector3::Zero);
 }
 
@@ -757,8 +745,6 @@ void ApplyWrenchDialog::SetPublisher()
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::AttachVisuals()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
   if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene())
   {
     gzerr << "Camera or scene missing" << std::endl;
@@ -858,8 +844,6 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent & _event)
 /////////////////////////////////////////////////
 bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent & _event)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (!userCamera || !this->dataPtr->applyWrenchVisual)
     return false;
@@ -1015,7 +999,6 @@ bool ApplyWrenchDialog::eventFilter(QObject *_object, QEvent *_event)
         _object == this->dataPtr->forcePosYSpin ||
         _object == this->dataPtr->forcePosZSpin)
     {
-      std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
       this->SetForce(this->dataPtr->forceVector);
     }
     else if (_object == this->dataPtr->torqueMagSpin ||
@@ -1023,7 +1006,6 @@ bool ApplyWrenchDialog::eventFilter(QObject *_object, QEvent *_event)
              _object == this->dataPtr->torqueYSpin ||
              _object == this->dataPtr->torqueZSpin)
     {
-      std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
       this->SetTorque(this->dataPtr->torqueVector);
     }
   }
@@ -1126,6 +1108,9 @@ void ApplyWrenchDialog::SetForcePos(const math::Vector3 &_forcePos)
 void ApplyWrenchDialog::SetForce(const math::Vector3 &_force,
     bool _rotatedByMouse)
 {
+  // This can be called from the dialog or the mouse
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
   this->dataPtr->forceVector = _force;
 
   // Spins
@@ -1157,8 +1142,6 @@ void ApplyWrenchDialog::SetForce(const math::Vector3 &_force,
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::NewForceDirection(const math::Vector3 &_dir)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
   // Normalize direction
   math::Vector3 v = _dir;
   if (v == math::Vector3::Zero)
@@ -1174,6 +1157,9 @@ void ApplyWrenchDialog::NewForceDirection(const math::Vector3 &_dir)
 void ApplyWrenchDialog::SetTorque(const math::Vector3 &_torque,
     bool _rotatedByMouse)
 {
+  // This can be called from the dialog or the mouse
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
   this->dataPtr->torqueVector = _torque;
 
   // Spins
@@ -1205,8 +1191,6 @@ void ApplyWrenchDialog::SetTorque(const math::Vector3 &_torque,
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::NewTorqueDirection(const math::Vector3 &_dir)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
   // Normalize direction
   math::Vector3 v = _dir;
   if (v == math::Vector3::Zero)

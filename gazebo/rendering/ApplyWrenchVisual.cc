@@ -305,6 +305,7 @@ void ApplyWrenchVisual::SetMode(const std::string &_mode)
     return;
   }
 
+  // Protect force/torque visuals
   std::lock_guard<std::mutex> lock(dPtr->mutex);
 
   dPtr->mode = _mode;
@@ -347,7 +348,12 @@ void ApplyWrenchVisual::SetCoM(const math::Vector3 &_comVector)
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
   dPtr->comVector = _comVector;
-  this->UpdateTorqueVisual();
+  {
+    // UpdateTorqueVisual changes torqueVisual
+    std::lock_guard<std::mutex> lock(dPtr->mutex);
+
+    this->UpdateTorqueVisual();
+  }
 }
 
 ///////////////////////////////////////////////////
@@ -357,7 +363,12 @@ void ApplyWrenchVisual::SetForcePos(const math::Vector3 &_forcePosVector)
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
   dPtr->forcePosVector = _forcePosVector;
-  this->UpdateForceVisual();
+  {
+    // UpdateForceVisual changes forceVisual
+    std::lock_guard<std::mutex> lock(dPtr->mutex);
+
+    this->UpdateForceVisual();
+  }
 }
 
 ///////////////////////////////////////////////////
@@ -508,6 +519,7 @@ void ApplyWrenchVisual::SetVisible(bool _visible, bool _cascade)
     return;
   }
 
+  // Protect force/torque visuals
   std::lock_guard<std::mutex> lock(dPtr->mutex);
 
   if (_visible)
@@ -557,6 +569,7 @@ void ApplyWrenchVisual::Resize()
     return;
   }
 
+  // Protect force/torque visuals
   std::lock_guard<std::mutex> lock(dPtr->mutex);
 
   double linkSize = std::max(0.1,
