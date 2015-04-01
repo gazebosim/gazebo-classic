@@ -279,7 +279,7 @@ gazebo::physics::WorldPtr gazebo::loadWorld(const std::string &_worldFile)
   }
 
   world = gazebo::physics::create_world();
-  gazebo::physics::load_world(world, sdf->root->GetElement("world"));
+  gazebo::physics::load_world(world, sdf->Root()->GetElement("world"));
 
   gazebo::physics::init_world(world);
 
