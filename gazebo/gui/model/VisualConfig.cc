@@ -41,6 +41,7 @@ VisualConfig::VisualConfig()
       this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
 
   QPushButton *addVisualButton = new QPushButton(tr("+ &Another Visual"));
+  addVisualButton->setMaximumWidth(200);
   connect(addVisualButton, SIGNAL(clicked()), this, SLOT(OnAddVisual()));
 
   mainLayout->addWidget(this->visualsTreeWidget);

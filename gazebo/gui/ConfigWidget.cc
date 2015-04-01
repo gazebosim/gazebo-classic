@@ -1365,7 +1365,16 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
     spin->setMaximumWidth(100);
 
     QLabel *label = new QLabel(tr(elements[i].c_str()));
+    if (i == 0)
+      label->setStyleSheet("QLabel{color: #d42b2b;}");
+    else if (i == 1)
+      label->setStyleSheet("QLabel{color: #3bc43b;}");
+    else if (i == 2)
+      label->setStyleSheet("QLabel{color: #0d0df2;}");
+
     QLabel *unitLabel = new QLabel();
+    unitLabel->setMaximumWidth(40);
+    unitLabel->setMinimumWidth(40);
     if (i < 3)
       unitLabel->setText(tr("m"));
     else
@@ -1424,6 +1433,10 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   QLabel *geomSizeXLabel = new QLabel(tr("X"));
   QLabel *geomSizeYLabel = new QLabel(tr("Y"));
   QLabel *geomSizeZLabel = new QLabel(tr("Z"));
+  geomSizeXLabel->setStyleSheet("QLabel{color: #d42b2b;}");
+  geomSizeYLabel->setStyleSheet("QLabel{color: #3bc43b;}");
+  geomSizeZLabel->setStyleSheet("QLabel{color: #0d0df2;}");
+
   QLabel *geomSizeXUnitLabel = new QLabel(tr("m"));
   QLabel *geomSizeYUnitLabel = new QLabel(tr("m"));
   QLabel *geomSizeZUnitLabel = new QLabel(tr("m"));

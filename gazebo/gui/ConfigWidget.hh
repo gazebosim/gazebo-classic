@@ -334,9 +334,6 @@ namespace gazebo
       private: ConfigChildWidget *CreateUIntWidget(const std::string &_key,
           int _level);
 
-      /// \brief A label for the length widget.
-      public: QWidget *geomLengthLabel;
-
       /// \brief Create a widget for configuring an integer value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \return The newly created widget.

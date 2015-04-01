@@ -40,6 +40,7 @@ CollisionConfig::CollisionConfig()
       this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
 
   QPushButton *addCollisionButton = new QPushButton(tr("+ &Another Collision"));
+  addCollisionButton->setMaximumWidth(200);
   connect(addCollisionButton, SIGNAL(clicked()), this, SLOT(OnAddCollision()));
 
   mainLayout->addWidget(this->collisionsTreeWidget);
