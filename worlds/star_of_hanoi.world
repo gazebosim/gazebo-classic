@@ -607,7 +607,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>gazebo/Woodpallet</name>
+              <name>Gazebo/Wood</name>
            </script>
           </material>
         </visual>
@@ -649,7 +649,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>gazebo/Woodpallet</name>
+              <name>Gazebo/Wood</name>
            </script>
           </material>
         </visual>
@@ -691,7 +691,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>gazebo/woodpallet</name>
+              <name>Gazebo/Wood</name>
            </script>
           </material>
         </visual>
