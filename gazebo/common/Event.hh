@@ -52,6 +52,8 @@ namespace gazebo
 
       /// \brief True if the event has been signaled.
       public: bool signaled;
+
+      public: int test;
     };
 
     /// \class Event Event.hh common/common.hh
