@@ -670,7 +670,7 @@ void BuildingMaker::GenerateSDF()
   this->modelSDF.reset(new sdf::SDF);
   this->modelSDF->SetFromString(this->GetTemplateSDFString());
 
-  modelElem = this->modelSDF->root->GetElement("model");
+  modelElem = this->modelSDF->Root()->GetElement("model");
 
   linkElem = modelElem->GetElement("link");
   sdf::ElementPtr templateLinkElem = linkElem->Clone();
@@ -991,7 +991,7 @@ void BuildingMaker::GenerateSDFWithCSG()
   this->modelSDF.reset(new sdf::SDF);
   this->modelSDF->SetFromString(this->GetTemplateSDFString());
 
-  modelElem = this->modelSDF->root->GetElement("model");
+  modelElem = this->modelSDF->Root()->GetElement("model");
   linkElem = modelElem->GetElement("link");
 
   sdf::ElementPtr templateLinkElem = linkElem->Clone();
@@ -1160,7 +1160,7 @@ void BuildingMaker::GenerateSDFWithCSG()
 /////////////////////////////////////////////////
 void BuildingMaker::CreateTheEntity()
 {
-  if (!this->modelSDF->root->HasElement("model"))
+  if (!this->modelSDF->Root()->HasElement("model"))
   {
     gzerr << "Generated invalid SDF! Cannot create entity." << std::endl;
     return;
@@ -1168,7 +1168,7 @@ void BuildingMaker::CreateTheEntity()
 
   msgs::Factory msg;
   // Create a new name if the model exists
-  sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
+  sdf::ElementPtr modelElem = this->modelSDF->Root()->GetElement("model");
   std::string modelElemName = modelElem->Get<std::string>("name");
   if (has_entity_name(modelElemName))
   {
