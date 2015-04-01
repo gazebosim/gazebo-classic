@@ -98,33 +98,29 @@ Windows `cmd` for configuring and building.  You might also need to
 
     1. If in Debug: Copy in the following into `plugins.cfg`
     
-        ```
-        # Define plugin folder
-        PluginFolder=C:\Users\MYUSERNAME\code\gz\ogre_src_v1-8-1-vc12-x64-release-debug\build\install\Debug\bin\Debug
+            # Define plugin folder
+            PluginFolder=C:\Users\MYUSERNAME\code\gz\ogre_src_v1-8-1-vc12-x64-release-debug\build\install\Debug\bin\Debug
 
-        # Define plugins
-        Plugin=RenderSystem_GL_d
-        Plugin=Plugin_ParticleFX_d
-        Plugin=Plugin_BSPSceneManager_d
-        Plugin=Plugin_PCZSceneManager_d
-        Plugin=Plugin_OctreeZone_d
-        Plugin=Plugin_OctreeSceneManager_d
-        ```
+            # Define plugins
+            Plugin=RenderSystem_GL_d
+            Plugin=Plugin_ParticleFX_d
+            Plugin=Plugin_BSPSceneManager_d
+            Plugin=Plugin_PCZSceneManager_d
+            Plugin=Plugin_OctreeZone_d
+            Plugin=Plugin_OctreeSceneManager_d
 
     1. If in Release: Copy in the following into `plugins.cfg`
     
-        ```
-        # Define plugin folder
-        PluginFolder=C:\Users\MYUSERNAME\code\gz\ogre_src_v1-8-1-vc12-x64-release-debug\build\install\Release\bin\Release
+            # Define plugin folder
+            PluginFolder=C:\Users\MYUSERNAME\code\gz\ogre_src_v1-8-1-vc12-x64-release-debug\build\install\Release\bin\Release
 
-        # Define plugins
-        Plugin=RenderSystem_GL
-        Plugin=Plugin_ParticleFX
-        Plugin=Plugin_BSPSceneManager
-        Plugin=Plugin_PCZSceneManager
-        Plugin=Plugin_OctreeZone
-        Plugin=Plugin_OctreeSceneManager
-        ```
+            # Define plugins
+            Plugin=RenderSystem_GL
+            Plugin=Plugin_ParticleFX
+            Plugin=Plugin_BSPSceneManager
+            Plugin=Plugin_PCZSceneManager
+            Plugin=Plugin_OctreeZone
+            Plugin=Plugin_OctreeSceneManager
 
 1. Run gzserver
 
