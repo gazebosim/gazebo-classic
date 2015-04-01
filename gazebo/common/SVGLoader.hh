@@ -24,6 +24,7 @@
 
 #include <gazebo/common/Console.hh>
 #include <gazebo/math/Vector2d.hh>
+#include <gazebo/math/Matrix3.hh>
 
 class TiXmlElement;
 class TiXmlNode;
