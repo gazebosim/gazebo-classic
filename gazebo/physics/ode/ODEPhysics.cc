@@ -297,6 +297,11 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  // Parent class handles many generic parameters
+  // This should be done first so that the profile settings
+  // can be over-ridden by other message parameters.
+  PhysicsEngine::OnPhysicsMsg(_msg);
+
   if (_msg->has_solver_type())
     this->SetStepType(_msg->solver_type());
 
@@ -345,9 +350,6 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
-
-  // Parent class handles many generic parameters
-  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 
