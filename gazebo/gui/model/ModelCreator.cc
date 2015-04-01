@@ -582,7 +582,7 @@ std::string ModelCreator::AddShape(LinkType _type,
   visualName << linkName << "::visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
       linkVisual));
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
@@ -908,7 +908,7 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
       collisionPose.Set(0, 0, 0, 0, 0, 0);
 
     // Make a visual element from the collision element
-    sdf::ElementPtr colVisualElem =  this->modelTemplateSDF->root
+    sdf::ElementPtr colVisualElem =  this->modelTemplateSDF->Root()
         ->GetElement("model")->GetElement("link")->GetElement("visual");
 
     sdf::ElementPtr geomElem = colVisualElem->GetElement("geometry");
