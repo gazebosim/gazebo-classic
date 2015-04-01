@@ -587,7 +587,6 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
       foundNoise = true;
   }
   EXPECT_TRUE(foundNoise);
-
 }
 
 TEST_P(LaserTest, LaserNoise)

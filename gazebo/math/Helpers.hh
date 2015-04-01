@@ -178,10 +178,11 @@ namespace gazebo
     /// \param[in] _x the number
     /// \return true if _x is infinite, false otherwise
     template<typename T>
-    inline bool isInfinite(const T &_x){
-
-      return std::numeric_limits<T>::has_infinity && !(_x < std::numeric_limits<T>::max() && _x > std::numeric_limits<T>::min());
-
+    inline bool isInfinite(const T &_x)
+    {
+      return std::numeric_limits<T>::has_infinity &&
+        !(_x < std::numeric_limits<T>::max() &&
+          _x > std::numeric_limits<T>::min());
     }
 
     /// \brief get value at a specified precision
@@ -193,7 +194,8 @@ namespace gazebo
     {
       if (!isInfinite(_a))
       {
-        return boost::math::round(_a * pow(10, _precision)) / pow(10, _precision);
+        return boost::math::round(
+          _a * pow(10, _precision)) / pow(10, _precision);
       }
       else
       {
@@ -205,20 +207,20 @@ namespace gazebo
     /// \param[in] _x the number
     /// \return 1 if _x is positive, -1 if _x is negative, 0 otherwise
     template<typename T>
-    inline int sign(const T &_x){
-
-      if(_x < 0)
+    inline int sign(const T &_x)
+    {
+      if (_x < 0)
       {
         return -1;
       }
-      else if(_x > 0)
+      else if (_x > 0)
       {
         return 1;
       }
-      else{
+      else
+      {
         return 0;
       }
-
     }
 
     /// \brief is this a power of 2?
