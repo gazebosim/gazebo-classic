@@ -62,7 +62,7 @@ GZ_REGISTER_WORLD_PLUGIN(RazerHydra)
 
 /////////////////////////////////////////////////
 RazerHydra::RazerHydra()
-: hidrawFd(0), lastCycleStart(common::Time::GetWallTime())
+: lastCycleStart(common::Time::GetWallTime())
 {
   this->stop = false;
   this->pollThread = NULL;
@@ -109,8 +109,8 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
   struct hidraw_devinfo info;
 
   // Find the Razer device.
-  std::string device;
-  for (int i = 0; i < 6 && device.empty(); ++i)
+  std::vector<std::string> devices;
+  for (int i = 0; i < 6; ++i)
   {
     std::ostringstream stream;
     stream << "/sys/class/hidraw/hidraw" << i << "/device/uevent";
@@ -118,63 +118,72 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
     if (fileIn.is_open())
     {
       std::string line;
+      std::string device;
       while (std::getline(fileIn, line) && device.empty())
       {
         if (line.find("HID_NAME=Razer Razer Hydra") != std::string::npos)
+        {
           device = "/dev/hidraw" + boost::lexical_cast<std::string>(i);
+          devices.push_back(device);
+        }
       }
     }
   }
 
-  if (device.empty())
+  if (devices.empty())
   {
     gzerr << "Unable to find Razer device\n";
     return;
   }
 
-  this->hidrawFd = open(device.c_str(), O_RDWR | O_NONBLOCK);
-  if (this->hidrawFd < 0)
+  for (const auto &device : devices)
   {
-    gzerr << "couldn't open hidraw device[" << device << "]\n";
-    return;
-  }
+    int fd = open(device.c_str(), O_RDWR | O_NONBLOCK);
+    if (fd < 0)
+    {
+      gzerr << "couldn't open hidraw device[" << device << "]\n";
+      return;
+    }
 
-  memset(&rptDesc, 0x0, sizeof(rptDesc));
-  memset(&info, 0x0, sizeof(info));
-  memset(buf, 0x0, sizeof(buf));
+    this->hidrawFd.push_back(fd);
 
-  // Get Raw Name
-  res = ioctl(this->hidrawFd, HIDIOCGRAWNAME(256), buf);
-  if (res < 0)
-    gzerr << "Hydro ioctl error HIDIOCGRAWNAME: " << strerror(errno) << "\n";
+    memset(&rptDesc, 0x0, sizeof(rptDesc));
+    memset(&info, 0x0, sizeof(info));
+    memset(buf, 0x0, sizeof(buf));
 
-  // set feature to start it streaming
-  memset(buf, 0x0, sizeof(buf));
-  buf[6] = 1;
-  buf[8] = 4;
-  buf[9] = 3;
-  buf[89] = 6;
-
-  int attempt = 0;
-  for (attempt = 0; attempt < 50; ++attempt)
-  {
-    res = ioctl(this->hidrawFd, HIDIOCSFEATURE(91), buf);
+    // Get Raw Name
+    res = ioctl(fd, HIDIOCGRAWNAME(256), buf);
     if (res < 0)
-    {
-      gzerr << "Unable to start streaming. HIDIOCSFEATURE: "
-            << strerror(errno) << "\n";
-      common::Time::MSleep(500);
-    }
-    else
-    {
-      break;
-    }
-  }
+      gzerr << "Hydro ioctl error HIDIOCGRAWNAME: " << strerror(errno) << "\n";
 
-  if (attempt >= 60)
-  {
-    gzerr << "Failed to load hydra\n";
-    return;
+    // set feature to start it streaming
+    memset(buf, 0x0, sizeof(buf));
+    buf[6] = 1;
+    buf[8] = 4;
+    buf[9] = 3;
+    buf[89] = 6;
+
+    int attempt;
+    for (attempt = 0; attempt < 50; ++attempt)
+    {
+      res = ioctl(fd, HIDIOCSFEATURE(91), buf);
+      if (res < 0)
+      {
+        gzerr << "Unable to start streaming. HIDIOCSFEATURE: "
+              << strerror(errno) << "\n";
+        common::Time::MSleep(500);
+      }
+      else
+      {
+        break;
+      }
+    }
+
+    if (attempt >= 50)
+    {
+      gzerr << "Failed to load hydra\n";
+      return;
+    }
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
@@ -259,22 +268,25 @@ void RazerHydra::Run()
       common::Time::NSleep(250000);
   }
 
-  if (this->hidrawFd >= 0)
+  for (const auto &fd : this->hidrawFd)
   {
-    uint8_t buf[256];
-    memset(buf, 0, sizeof(buf));
-    buf[6] = 1;
-    buf[8] = 4;
-    buf[89] = 5;
+   if (fd >= 0)
+   {
+     uint8_t buf[256];
+     memset(buf, 0, sizeof(buf));
+     buf[6] = 1;
+     buf[8] = 4;
+     buf[89] = 5;
 
-    if (ioctl(this->hidrawFd, HIDIOCSFEATURE(91), buf) < 0)
-    {
-      gzerr << "Unable to stop streaming. HIDIOCSFEATURE: "
-            << strerror(errno) << "\n";
-    }
+     if (ioctl(fd, HIDIOCSFEATURE(91), buf) < 0)
+     {
+       gzerr << "Unable to stop streaming. HIDIOCSFEATURE: "
+             << strerror(errno) << "\n";
+     }
 
-    close(this->hidrawFd);
-  }
+     close(fd);
+   }
+ }
 }
 
 /////////////////////////////////////////////////

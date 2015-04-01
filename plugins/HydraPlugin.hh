@@ -18,6 +18,7 @@
 #ifndef _GAZEBO_RAZER_HYDRA_HH_
 #define _GAZEBO_RAZER_HYDRA_HH_
 
+#include <vector>
 #include <gazebo/math/Filter.hh>
 #include <gazebo/math/Vector3.hh>
 #include <gazebo/common/Plugin.hh>
@@ -60,7 +61,7 @@ namespace gazebo
     private: double rawAnalog[6];
 
     /// \brief Device file descriptor
-    private: int hidrawFd;
+    private: std::vector<int> hidrawFd;
 
     /// \brief Left and right controller positions.
     private: math::Vector3 pos[2];
