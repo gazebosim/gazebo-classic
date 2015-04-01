@@ -449,11 +449,11 @@ endif ()
 
 ########################################
 # Find SDFormat
-find_package(SDFormat 3.0.0)
+find_package(SDFormat 3.0.2)
 
 if (NOT SDFormat_FOUND)
   message (STATUS "Looking for SDFormat - not found")
-  BUILD_ERROR ("Missing: SDF version >=3.0.0. Required for reading and writing SDF files.")
+  BUILD_ERROR ("Missing: SDF version >=3.0.2. Required for reading and writing SDF files.")
 else()
   message (STATUS "Looking for SDFormat - found")
 endif()
