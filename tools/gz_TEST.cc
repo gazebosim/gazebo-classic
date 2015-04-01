@@ -303,7 +303,7 @@ TEST_F(gzTest, Model)
     EXPECT_TRUE(sdf::init(sdf));
 
     EXPECT_TRUE(sdf::readFile(filename, sdf));
-    sdf::ElementPtr modelElem = sdf->root->GetElement("model");
+    sdf::ElementPtr modelElem = sdf->Root()->GetElement("model");
     modelElem->GetAttribute("name")->SetFromString("my_box");
 
     gazebo::msgs::Factory msg;
@@ -325,7 +325,7 @@ TEST_F(gzTest, Model)
     EXPECT_TRUE(sdf::init(sdf));
 
     EXPECT_TRUE(sdf::readFile(filename, sdf));
-    sdf::ElementPtr modelElem = sdf->root->GetElement("model");
+    sdf::ElementPtr modelElem = sdf->Root()->GetElement("model");
     modelElem->GetAttribute("name")->SetFromString("my_box");
 
     gazebo::msgs::Factory msg;
