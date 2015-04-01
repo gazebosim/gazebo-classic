@@ -49,4 +49,7 @@ message Hydra
 
   // Info for the left paddle
   required Paddle left  = 2;
+
+  // Controller ID.
+  required int32 id     = 3;
 }

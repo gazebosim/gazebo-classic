@@ -49,37 +49,37 @@ namespace gazebo
     private: void Update(const common::UpdateInfo &_info);
 
     /// \brief Raw controller positions.
-    private: int16_t rawPos[6];
+    private: std::array<int16_t, 6> rawPos;
 
     /// \brief Raw controller orientations.
-    private: int16_t rawQuat[8];
+    private: std::array<int16_t, 6> rawQuat;
 
     /// \brief Raw value of the buttons.
-    private: uint8_t rawButtons[2];
+    private: std::array<uint8_t, 2> rawButtons;
 
     /// \brief Raw values of the analog joysticks.
-    private: double rawAnalog[6];
+    private: std::array<double, 6> rawAnalog;
 
     /// \brief Device file descriptor
     private: std::vector<int> hidrawFd;
 
     /// \brief Left and right controller positions.
-    private: math::Vector3 pos[2];
+    private: std::array<math::Vector3, 2> pos;
 
     /// \brief Left and right controller orientations.
-    private: math::Quaternion quat[2];
+    private: std::array<math::Quaternion, 2> quat;
 
     /// \brief Left and right filtered positions.
-    private: math::OnePoleVector3 filterPos[2];
+    private: std::array<math::OnePoleVector3, 2> filterPos;
 
     /// \brief Left and right filtered controller orientations.
-    private: math::OnePoleQuaternion filterQuat[2];
+    private: std::array<math::OnePoleQuaternion, 2> filterQuat;
 
     /// \brief Analog joysticks
-    private: float analog[6];
+    private: std::array<float. 6> analog;
 
     /// \brief Buttons that have been pressed.
-    private: uint8_t buttons[14];
+    private: std::array<uint8_t, 14> buttons;
 
     /// \brief Estimate of the update period.
     private: math::OnePole<float> periodEstimate;
