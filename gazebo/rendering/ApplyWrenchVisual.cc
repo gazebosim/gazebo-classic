@@ -245,6 +245,8 @@ rendering::VisualPtr ApplyWrenchVisual::GetForceVisual() const
     return NULL;
   }
 
+  std::lock_guard<std::mutex> lock(dPtr->mutex);
+
   return dPtr->forceVisual;
 }
 
@@ -259,6 +261,8 @@ rendering::VisualPtr ApplyWrenchVisual::GetTorqueVisual() const
     gzerr << "Torque visual not found, but it should exist." << std::endl;
     return NULL;
   }
+
+  std::lock_guard<std::mutex> lock(dPtr->mutex);
 
   return dPtr->torqueVisual;
 }
@@ -300,6 +304,8 @@ void ApplyWrenchVisual::SetMode(const std::string &_mode)
     gzerr << "Some visual is missing!" << std::endl;
     return;
   }
+
+  std::lock_guard<std::mutex> lock(dPtr->mutex);
 
   dPtr->mode = _mode;
 
@@ -502,6 +508,8 @@ void ApplyWrenchVisual::SetVisible(bool _visible, bool _cascade)
     return;
   }
 
+  std::lock_guard<std::mutex> lock(dPtr->mutex);
+
   if (_visible)
   {
     dPtr->forceVisual->SetVisible(true);
@@ -548,6 +556,8 @@ void ApplyWrenchVisual::Resize()
     gzwarn << "ApplyWrenchVisual is incomplete." << std::endl;
     return;
   }
+
+  std::lock_guard<std::mutex> lock(dPtr->mutex);
 
   double linkSize = std::max(0.1,
       dPtr->parent->GetBoundingBox().GetSize().GetLength());

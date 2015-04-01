@@ -19,6 +19,7 @@
 #define _GAZEBO_APPLYWRENCHVISUAL_PRIVATE_HH_
 
 #include <string>
+#include <mutex>
 
 #include "gazebo/rendering/VisualPrivate.hh"
 
@@ -71,6 +72,9 @@ namespace gazebo
       /// \brief If true, the rotation tool was rotated by the mouse and
       /// shouldn't be oriented again according to the vector.
       public: bool rotatedByMouse;
+
+      /// \brief Mutex to protect variables
+      public: std::mutex mutex;
     };
   }
 }

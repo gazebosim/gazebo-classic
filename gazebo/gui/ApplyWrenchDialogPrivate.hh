@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include "gazebo/gui/qt.h"
 
@@ -134,6 +135,9 @@ namespace gazebo
 
       /// \brief A list of events connected to this.
       public: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Mutex to protect variables.
+      public: std::mutex mutex;
     };
   }
 }
