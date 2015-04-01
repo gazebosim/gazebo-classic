@@ -59,6 +59,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->state = "select";
   this->sceneCreated = false;
   this->copyEntityName = "";
+  this->modelEditorEnabled = false;
 
   this->setFocusPolicy(Qt::StrongFocus);
 
@@ -172,7 +173,15 @@ GLWidget::~GLWidget()
   this->selectionSub.reset();
   this->selectionPub.reset();
 
+  ModelManipulator::Instance()->Clear();
+  ModelSnap::Instance()->Clear();
+  ModelAlign::Instance()->Clear();
+
+  if (this->userCamera)
+    this->userCamera->Fini();
+
   this->userCamera.reset();
+  this->scene.reset();
 }
 
 /////////////////////////////////////////////////
