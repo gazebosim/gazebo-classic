@@ -44,9 +44,7 @@ namespace gazebo
 
     /// \brief Callback executed every time a new hydra message is received.
     /// \param[in] _msg The hydra message.
-    private: void OnHydra0(ConstHydraPtr &_msg);
-
-    private: void OnHydra1(ConstHydraPtr &_msg);
+    private: void OnHydra(ConstHydraPtr &_msg);
 
     /// \brief World pointer
     private: physics::WorldPtr world;
@@ -58,10 +56,7 @@ namespace gazebo
     private: transport::NodePtr node;
 
     /// \brief Subscribe pointer.
-    private: transport::SubscriberPtr hydraSub0;
-
-    /// \brief Subscribe pointer.
-    private: transport::SubscriberPtr hydraSub1;
+    private: transport::SubscriberPtr hydraSub;
 
     /// \brief Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;
@@ -70,9 +65,7 @@ namespace gazebo
     private: boost::mutex msgMutex;
 
     /// \brief Store the last message from hydra.
-    private: boost::shared_ptr<const gazebo::msgs::Hydra> hydraMsgPtr0;
-
-    private: boost::shared_ptr<const gazebo::msgs::Hydra> hydraMsgPtr1;
+    private: boost::shared_ptr<const gazebo::msgs::Hydra> hydraMsgPtr;
   };
 }
 #endif

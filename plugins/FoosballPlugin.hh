@@ -63,6 +63,10 @@ namespace gazebo
 
     private: void SwitchRod(std::vector<Rod_t> &_aController);
 
+    private: void Process0();
+
+    private: void Process1();
+
     /// \brief Pointer to model containing this plugin.
     private: physics::ModelPtr model;
 

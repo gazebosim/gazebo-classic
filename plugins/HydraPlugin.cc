@@ -84,7 +84,7 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
 {
   // Find the Razer device.
   std::vector<std::string> devices;
-  for (int i = 0; i < 3; ++i)
+  for (int i = 4; i < 5; ++i)
   {
     std::ostringstream stream;
     stream << "/sys/class/hidraw/hidraw" << i << "/device/uevent";
@@ -107,7 +107,7 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
     }
   }
 
-  for (int i = 3; i < 6; ++i)
+  for (int i = 6; i < 7; ++i)
   {
     std::ostringstream stream;
     stream << "/sys/class/hidraw/hidraw" << i << "/device/uevent";

@@ -36,34 +36,27 @@ HydraDemoPlugin::~HydraDemoPlugin()
 }
 
 /////////////////////////////////////////////////
-void HydraDemoPlugin::OnHydra0(ConstHydraPtr &_msg)
+void HydraDemoPlugin::OnHydra(ConstHydraPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->msgMutex);
-  this->hydraMsgPtr0 = _msg;
+  this->hydraMsgPtr = _msg;
 }
 
 /////////////////////////////////////////////////
-void HydraDemoPlugin::OnHydra1(ConstHydraPtr &_msg)
-{
-  boost::mutex::scoped_lock lock(this->msgMutex);
-  this->hydraMsgPtr1 = _msg;
-}
-
-/////////////////////////////////////////////////
-void HydraDemoPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
+void HydraDemoPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get the world name.
   this->model = _parent;
   this->world = this->model->GetWorld();
 
+  std::string topic = _sdf->Get<std::string>("topic");
+  std::cout << "Subscribed to [~/" << topic << "]" << std::endl;
+
   // Subscribe to Hydra updates by registering OnHydra() callback.
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->world->GetName());
-  this->hydraSub0 = this->node->Subscribe("~/hydra0",
-      &HydraDemoPlugin::OnHydra0, this);
-
-  this->hydraSub1 = this->node->Subscribe("~/hydra1",
-      &HydraDemoPlugin::OnHydra0, this);
+  this->hydraSub = this->node->Subscribe("~/" + topic,
+      &HydraDemoPlugin::OnHydra, this);
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
@@ -77,30 +70,16 @@ void HydraDemoPlugin::Update(const common::UpdateInfo & /*_info*/)
   boost::mutex::scoped_lock lock(this->msgMutex);
 
   // Return if we don't have messages yet
-  if (!this->hydraMsgPtr0)
+  if (!this->hydraMsgPtr)
     return;
 
   // Read the value of the right joystick.
-  double joyX = this->hydraMsgPtr0->right().joy_x();
-  double joyY = this->hydraMsgPtr0->right().joy_y();
+  double joyX = this->hydraMsgPtr->right().joy_x();
+  double joyY = this->hydraMsgPtr->right().joy_y();
 
   // Move the model.
   this->model->SetLinearVel(math::Vector3(-joyX * 0.2, joyY * 0.2, 0));
 
   // Remove the message that has been processed.
-  this->hydraMsgPtr0.reset();
-
-  // Return if we don't have messages yet
-  if (!this->hydraMsgPtr1)
-    return;
-
-  // Read the value of the right joystick.
-  joyX = this->hydraMsgPtr1->right().joy_x();
-  joyY = this->hydraMsgPtr1->right().joy_y();
-
-  // Move the model.
-  this->model->SetLinearVel(math::Vector3(-joyX * 0.2, joyY * 0.2, 0));
-
-  // Remove the message that has been processed.
-  this->hydraMsgPtr1.reset();
+  this->hydraMsgPtr.reset();
 }

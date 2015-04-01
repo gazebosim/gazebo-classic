@@ -115,11 +115,8 @@ void FoosballPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     boost::bind(&FoosballPlugin::Update, this, _1));
 }
 
-/////////////////////////////////////////////////
-void FoosballPlugin::Update(const common::UpdateInfo & /*_info*/)
+void FoosballPlugin::Process0()
 {
-  std::lock_guard<std::mutex> lock(this->msgMutex);
-
   if (this->hydraMsgs0.empty())
     return;
 
@@ -182,7 +179,10 @@ void FoosballPlugin::Update(const common::UpdateInfo & /*_info*/)
       }
     }
   }
+}
 
+void FoosballPlugin::Process1()
+{
   if (this->hydraMsgs1.empty())
     return;
 
@@ -226,7 +226,7 @@ void FoosballPlugin::Update(const common::UpdateInfo & /*_info*/)
     // Move the rods.
     //for (auto &controller : this->controllers)
     //{
-    if (!this->controllers.size() > 1)
+    if (this->controllers.size() > 1)
     {
       auto controller = this->controllers.at(1);
       for (const auto &side : {"left_controller", "right_controller"})
@@ -245,7 +245,14 @@ void FoosballPlugin::Update(const common::UpdateInfo & /*_info*/)
       }
     }
   }
+}
 
+/////////////////////////////////////////////////
+void FoosballPlugin::Update(const common::UpdateInfo & /*_info*/)
+{
+  std::lock_guard<std::mutex> lock(this->msgMutex);
+  this->Process0();
+  this->Process1();
 }
 
 /////////////////////////////////////////////////
@@ -262,7 +269,6 @@ void FoosballPlugin::SwitchRod(std::vector<Rod_t> &_aController)
 void FoosballPlugin::OnHydra0(ConstHydraPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->msgMutex);
-
   if (_msg->right().button_center() &&_msg->left().button_center())
   {
     this->Restart0();
@@ -304,7 +310,7 @@ void FoosballPlugin::OnHydra1(ConstHydraPtr &_msg)
   else if (this->leftTriggerPressed1)
   {
     this->leftTriggerPressed1 = false;
-    this->SwitchRod(this->controllers.at(0)["left_controller"]);
+    this->SwitchRod(this->controllers.at(1)["left_controller"]);
   }
 
   if (_msg->right().trigger() > 0.2)
@@ -312,7 +318,7 @@ void FoosballPlugin::OnHydra1(ConstHydraPtr &_msg)
   else if (this->rightTriggerPressed1)
   {
     this->rightTriggerPressed1 = false;
-    this->SwitchRod(this->controllers.at(0)["right_controller"]);
+    this->SwitchRod(this->controllers.at(1)["right_controller"]);
   }
 
   this->hydraMsgs1.push_back(_msg);
