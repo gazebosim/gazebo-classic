@@ -92,11 +92,43 @@ Windows `cmd` for configuring and building.  You might also need to
          cd gz-ws/gazebo
          addpath.bat Debug|Release
 
-1. Download the ogre plugins.cfg file         
-         cd gz-ws/gazebo/build/gazebo
-         <download> http://packages.osrfoundation.org/win32/deps/plugins.cfg
-         <edit> plugins.cfg
-         gzserver.exe ..\..\worlds\empty.world
+1. Create an ogre plugins.cfg file
+
+    1. `cd gz-ws/gazebo/build/gazebo`
+
+    1. If in Debug: Copy in the following into `plugins.cfg`
+    
+        ```
+        # Define plugin folder
+        PluginFolder=C:\Users\MYUSERNAME\code\gz\ogre_src_v1-8-1-vc12-x64-release-debug\build\install\Debug\bin\Debug
+
+        # Define plugins
+        Plugin=RenderSystem_GL_d
+        Plugin=Plugin_ParticleFX_d
+        Plugin=Plugin_BSPSceneManager_d
+        Plugin=Plugin_PCZSceneManager_d
+        Plugin=Plugin_OctreeZone_d
+        Plugin=Plugin_OctreeSceneManager_d
+        ```
+
+    1. If in Release: Copy in the following into `plugins.cfg`
+    
+        ```
+        # Define plugin folder
+        PluginFolder=C:\Users\MYUSERNAME\code\gz\ogre_src_v1-8-1-vc12-x64-release-debug\build\install\Release\bin\Release
+
+        # Define plugins
+        Plugin=RenderSystem_GL
+        Plugin=Plugin_ParticleFX
+        Plugin=Plugin_BSPSceneManager
+        Plugin=Plugin_PCZSceneManager
+        Plugin=Plugin_OctreeZone
+        Plugin=Plugin_OctreeSceneManager
+        ```
+
+1. Run gzserver
+
+        gzserver.exe ..\..\worlds\empty.world
 
 ## Debugging
 
