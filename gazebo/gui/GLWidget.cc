@@ -59,6 +59,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->state = "select";
   this->sceneCreated = false;
   this->copyEntityName = "";
+  this->modelEditorEnabled = false;
 
   this->setFocusPolicy(Qt::StrongFocus);
 
