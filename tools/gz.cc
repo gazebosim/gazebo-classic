@@ -539,7 +539,7 @@ bool ModelCommand::RunImpl()
 bool ModelCommand::ProcessSpawn(boost::shared_ptr<sdf::SDF> _sdf,
     const std::string &_name, const math::Pose &_pose, transport::NodePtr _node)
 {
-  sdf::ElementPtr modelElem = _sdf->root->GetElement("model");
+  sdf::ElementPtr modelElem = _sdf->Root()->GetElement("model");
 
   if (!modelElem)
   {

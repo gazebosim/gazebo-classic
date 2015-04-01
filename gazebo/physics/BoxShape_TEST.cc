@@ -43,7 +43,7 @@ TEST_F(BoxShapeTest, Scale)
   boxSDF->SetFromString(boxStr.str());
 
   physics::BoxShapePtr box(new physics::BoxShape(physics::CollisionPtr()));
-  sdf::ElementPtr elem = boxSDF->root;
+  sdf::ElementPtr elem = boxSDF->Root();
   ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("model");
   ASSERT_TRUE(elem != NULL);

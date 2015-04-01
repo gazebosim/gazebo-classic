@@ -211,7 +211,7 @@ TEST_F(PresetManagerTest, SDF)
           </physics>\
         </world>\
       </sdf>");
-    physicsSDF = worldSDF.root->GetElement("world")->GetElement("physics");
+    physicsSDF = worldSDF.Root()->GetElement("world")->GetElement("physics");
     EXPECT_EQ(presetManager->CreateProfile(physicsSDF), "preset_3");
     EXPECT_TRUE(presetManager->HasProfile("preset_3"));
 
