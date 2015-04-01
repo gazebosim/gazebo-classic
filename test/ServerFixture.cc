@@ -372,8 +372,21 @@ void ServerFixture::DoubleCompare(double *_scanA, double *_scanB,
   _diffAvg = 0;
   for (unsigned int i = 0; i < _sampleCount; ++i)
   {
-    double diff = fabs(math::precision(_scanA[i], 10) -
+
+    double diff;
+
+    // set diff = 0 if both values are same-sign infinite, as inf - inf = nan
+    if(math::isInfinite(_scanA[i]) && math::isInfinite(_scanB[i]) &&
+      math::sign(_scanA[i]) == math::sign(_scanB[i]))
+    {
+      diff = 0;
+    }
+    else
+    {
+      diff = fabs(math::precision(_scanA[i], 10) -
                 math::precision(_scanB[i], 10));
+    }
+
     _diffSum += diff;
     if (diff > _diffMax)
     {
