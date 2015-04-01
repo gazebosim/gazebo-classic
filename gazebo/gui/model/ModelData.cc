@@ -696,7 +696,7 @@ void LinkData::OnAddVisual(const std::string &_name)
 
     visVisual.reset(new rendering::Visual(visualName.str(),
         this->linkVisual));
-    sdf::ElementPtr visualElem =  modelTemplateSDF->root
+    sdf::ElementPtr visualElem =  modelTemplateSDF->Root()
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     visVisual->Load(visualElem);
   }
@@ -741,7 +741,7 @@ void LinkData::OnAddCollision(const std::string &_name)
 
     collisionVis.reset(new rendering::Visual(collisionName.str(),
         this->linkVisual));
-    sdf::ElementPtr collisionElem =  modelTemplateSDF->root
+    sdf::ElementPtr collisionElem =  modelTemplateSDF->Root()
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     collisionVis->Load(collisionElem);
     collisionVis->SetMaterial("Gazebo/Orange");
