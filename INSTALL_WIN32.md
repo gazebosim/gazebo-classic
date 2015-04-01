@@ -58,14 +58,14 @@ Windows `cmd` for configuring and building.  You might also need to
         hg clone https://bitbucket.org/osrf/sdformat
         hg clone https://bitbucket.org/osrf/gazebo
 
-1. Load your compiler setup, e.g. (note that we are asking for the 64-bit toolchain here):
+1. Open a regular Windows shell (Start->Run->"cmd"->enter), and load your compiler setup by copying and pasting the following line:
 
         "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86_amd64
 
-1. Configure and build sdformat:
+1. In a Windows shell, configure and build sdformat
 
         cd sdformat
-        mkdir build
+        mkdir build       
         cd build
         ..\configure
         nmake
@@ -73,9 +73,9 @@ Windows `cmd` for configuring and building.  You might also need to
 
     You should now have an installation of sdformat in gz-ws/sdformat/build/install/Release.
 
-1. Configure and build gazebo:
+1. In the same Windows shell, configure and build gazebo:
 
-        cd gazebo
+        cd ..\gazebo
         mkdir build
         cd build
         ..\configure
