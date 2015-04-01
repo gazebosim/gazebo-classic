@@ -224,11 +224,30 @@ void VisualConfig::OnRemoveVisual(int _id)
 
   VisualConfigData *configData = this->configs[_id];
 
+  // Ask for confirmation
+  std::string msg = "Are you sure you want to remove " +
+      configData->name + "?\n";
+
+  QMessageBox msgBox(QMessageBox::Warning, QString("Remove visual?"),
+      QString(msg.c_str()));
+  msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+
+  QPushButton *cancelButton =
+      msgBox.addButton("Cancel", QMessageBox::RejectRole);
+  QPushButton *removeButton = msgBox.addButton("Remove",
+      QMessageBox::AcceptRole);
+  msgBox.setDefaultButton(removeButton);
+  msgBox.setEscapeButton(cancelButton);
+  msgBox.exec();
+  if (msgBox.clickedButton() != removeButton)
+    return;
+
+  // Remove
   int index = this->visualsTreeWidget->indexOfTopLevelItem(
       configData->treeItem);
   this->visualsTreeWidget->takeTopLevelItem(index);
 
-  emit VisualRemoved(this->configs[_id]->name);
+  emit VisualRemoved(configData->name);
   this->configs.erase(it);
 }
 

@@ -233,11 +233,30 @@ void CollisionConfig::OnRemoveCollision(int _id)
 
   CollisionConfigData *configData = this->configs[_id];
 
+  // Ask for confirmation
+  std::string msg = "Are you sure you want to remove " +
+      configData->name + "?\n";
+
+  QMessageBox msgBox(QMessageBox::Warning, QString("Remove collision?"),
+      QString(msg.c_str()));
+  msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+
+  QPushButton *cancelButton =
+      msgBox.addButton("Cancel", QMessageBox::RejectRole);
+  QPushButton *removeButton = msgBox.addButton("Remove",
+      QMessageBox::AcceptRole);
+  msgBox.setDefaultButton(removeButton);
+  msgBox.setEscapeButton(cancelButton);
+  msgBox.exec();
+  if (msgBox.clickedButton() != removeButton)
+    return;
+
+  // Remove
   int index = this->collisionsTreeWidget->indexOfTopLevelItem(
       configData->treeItem);
   this->collisionsTreeWidget->takeTopLevelItem(index);
 
-  emit CollisionRemoved(this->configs[_id]->name);
+  emit CollisionRemoved(configData->name);
   this->configs.erase(it);
 }
 

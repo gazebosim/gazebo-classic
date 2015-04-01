@@ -41,7 +41,8 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
 
   QHBoxLayout *nameLayout = new QHBoxLayout;
   nameLayout->addWidget(linkLabel);
-  nameLayout->addWidget(linkNameLabel);
+  nameLayout->addWidget(this->linkNameLabel, QSizePolicy::Maximum);
+  nameLayout->setAlignment(this->linkNameLabel, Qt::AlignLeft);
 
   this->linkConfig = new LinkConfig;
   this->visualConfig = new VisualConfig;
