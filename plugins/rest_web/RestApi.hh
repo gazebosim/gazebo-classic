@@ -49,18 +49,21 @@ namespace gazebo
     /// \brief Notify the service with a http POST
     /// \param[in] _route on the web server
     /// \param[in] _json the data to send to the server
-    public: void PostJsonData(const char* _route, const char *_json);
+    public: void PostJsonData(const char *_route, const char *_json);
 
     /// \brief Returns the username
     /// \return The user name
     public: std::string GetUser() const;
 
-    /// \brief a Request/Respone (can be used for GET and POST)
+    /// \brief A Request/Respone (can be used for GET and POST)
     /// \param[in] _requestUrl The request url.
     /// \param[in] _postStr The data to post
     /// \return The web server response
     private: std::string Request(const std::string &_requestUrl,
                                  const std::string &_postStr);
+
+    /// \brief Sends unposted posts
+    private: void SendUnpostedPosts();
 
     /// \brief Login information: Rest service host url
     private: std::string url;
@@ -86,9 +89,6 @@ namespace gazebo
 
     /// \brief List of unposted posts. Posts await when isLoggedIn is false
     private: std::list<Post> posts;
-
-    /// \brief Sends unposted posts
-    private: void SendUnpostedPosts();
   };
 }
 

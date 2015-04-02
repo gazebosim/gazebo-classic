@@ -21,9 +21,9 @@
 using namespace gazebo;
 using namespace std;
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 RestWebPlugin::RestWebPlugin()
-  :node(new gazebo::transport::Node()),
+  : node(new gazebo::transport::Node()),
   stopMsgProcessing(false),
   requestQThread(NULL)
 {
@@ -36,7 +36,7 @@ RestWebPlugin::RestWebPlugin()
   gzmsg << "REST web Session : " << this->session << endl;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 RestWebPlugin::~RestWebPlugin()
 {
   node.reset();
@@ -51,7 +51,7 @@ RestWebPlugin::~RestWebPlugin()
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void RestWebPlugin::Init()
 {
   // setup our node for communication
@@ -66,14 +66,14 @@ void RestWebPlugin::Init()
                                                   this));
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void RestWebPlugin::Load(int /*_argc*/, char ** /*_argv*/)
 {
   // nothing to do for now
 }
 
 //  adapted from TimePanel
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 std::string FormatTime(int _sec, int _nsec)
 {
   std::ostringstream stream;
@@ -103,7 +103,7 @@ std::string FormatTime(int _sec, int _nsec)
   return stream.str();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
 {
   // where to post the data on the REST server
@@ -118,7 +118,6 @@ void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
   msgs::Time realT = ws.real_time();
   msgs::Time pauseT = ws.pause_time();
   bool paused = ws.paused();
-  // uint64_t iterations = ws.iterations();
 
   std::string worldName = physics::get_world()->GetName();
   std::string event = "{\n";
@@ -169,7 +168,7 @@ void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
   restApi.PostJsonData(route.c_str(), event.c_str());
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 {
   gzmsg << "RestWebPlugin::OnRestPost";
@@ -247,14 +246,14 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
   }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-void RestWebPlugin::OnRestLoginRequest(ConstRestLoginPtr &_msg )
+//////////////////////////////////////////////////
+void RestWebPlugin::OnRestLoginRequest(ConstRestLoginPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->requestQMutex);
   msgLoginQ.push_back(_msg);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void RestWebPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
 {
   // this is executed asynchronously
@@ -279,7 +278,7 @@ void RestWebPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
   }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void RestWebPlugin::RunRequestQ()
 {
   // be ready to send errors back to the UI
@@ -308,12 +307,11 @@ void RestWebPlugin::RunRequestQ()
     }
     catch(...)
     {
-      gzerr << "Unhandled exception while processing request message";
-      gzerr << std::endl;
+      gzerr << "Unhandled exception while processing request message"
+          << std::endl;
     }
   }
 }
-
 
 // plugin registration
 GZ_REGISTER_SYSTEM_PLUGIN(RestWebPlugin)

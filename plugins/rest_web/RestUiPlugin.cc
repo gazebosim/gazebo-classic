@@ -48,19 +48,19 @@ void RestUiPlugin::Load(int _argc, char ** _argv)
     std::string arg = _argv[i];
     if (arg.find("menu=") == 0)
     {
-        this->menuTitle = arg.substr(5);
+      this->menuTitle = arg.substr(5);
     }
     else if (arg.find("title=") == 0 )
     {
-        this->loginTitle = arg.substr(6);
+      this->loginTitle = arg.substr(6);
     }
     else if (arg.find("label=") == 0 )
     {
-        this->urlLabel = arg.substr(6);
+      this->urlLabel = arg.substr(6);
     }
     else if (arg.find("url=") == 0 )
     {
-        this->defaultUrl = arg.substr(4);
+      this->defaultUrl = arg.substr(4);
     }
   }
   gzmsg << "   menu title: " << this->menuTitle  << std::endl;
@@ -78,8 +78,8 @@ void RestUiPlugin::Init()
       boost::bind(&RestUiPlugin::OnMainWindowReady, this)));
 
   this->connections.push_back(
-        event::Events::ConnectPreRender(
-        boost::bind(&RestUiPlugin::Update, this)));
+      event::Events::ConnectPreRender(
+      boost::bind(&RestUiPlugin::Update, this)));
 }
 
 /////////////////////////////////////////////////
@@ -98,7 +98,7 @@ void RestUiPlugin::OnMainWindowReady()
   std::string menuStr("&");
   menuStr += this->menuTitle;
   QMenu *menu = new QMenu(QString(menuStr.c_str()));
-  QAction* loginAct = new QAction(QString("&Login"), menu);
+  QAction *loginAct = new QAction(QString("&Login"), menu);
   loginAct->setStatusTip(QString("Login to Mentor 2 Learning Companion"));
   gui::MainWindow *mainWindow = gui::get_main_window();
   // create a global widget instance, to act as a global QT object
