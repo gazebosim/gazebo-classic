@@ -375,7 +375,7 @@ void ServerFixture::DoubleCompare(double *_scanA, double *_scanB,
     double diff;
 
     // set diff = 0 if both values are same-sign infinite, as inf - inf = nan
-    if (math::isInfinite(_scanA[i]) && math::isInfinite(_scanB[i]) &&
+    if (std::isinf(_scanA[i]) && std::isinf(_scanB[i]) &&
       math::sign(_scanA[i]) == math::sign(_scanB[i]))
     {
       diff = 0;

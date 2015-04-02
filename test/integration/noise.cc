@@ -105,7 +105,7 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
   for (int i = 0; i < raySensor->GetRayCount(); ++i)
   {
     double range = raySensor->GetRange(i);
-    if (math::isInfinite(range))
+    if (std::isinf(range))
     {
       continue;
     }

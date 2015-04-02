@@ -174,17 +174,6 @@ namespace gazebo
       return std::fabs(_a - _b) <= _epsilon;
     }
 
-    /// \brief check if value is infinite
-    /// \param[in] _x the number
-    /// \return true if _x is infinite, false otherwise
-    template<typename T>
-    inline bool isInfinite(const T &_x)
-    {
-      return std::numeric_limits<T>::has_infinity &&
-        !(_x < std::numeric_limits<T>::max() &&
-          _x > -std::numeric_limits<T>::max());
-    }
-
     /// \brief get value at a specified precision
     /// \param[in] _a the number
     /// \param[in] _precision the precision
@@ -192,7 +181,7 @@ namespace gazebo
     template<typename T>
     inline T precision(const T &_a, const unsigned int &_precision)
     {
-      if (!isInfinite(_a))
+      if (!std::isinf(_a))
       {
         return boost::math::round(
           _a * pow(10, _precision)) / pow(10, _precision);
