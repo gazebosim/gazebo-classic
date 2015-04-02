@@ -58,6 +58,7 @@ namespace gazebo
     class Visual;
     class Grid;
     class Heightmap;
+    class Forest;
 
     /// \def Visual_M
     /// \brief Map of visuals and their names.
@@ -318,6 +319,9 @@ namespace gazebo
 
       /// \brief Keep track of data of joints.
       public: JointMsgs_M joints;
+
+      /// \brief Pointer to the forest.
+      public: Forest *forest;
     };
   }
 }

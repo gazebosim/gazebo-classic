@@ -1,0 +1,37 @@
+material 3D-Diggers/shroom1
+{
+	technique Default
+	{
+		pass Main
+		{
+			ambient 0.5 0.5 0.5 1
+			diffuse 0.6 0.6 0.6 1
+
+			alpha_rejection greater_equal 128
+
+			texture_unit
+			{
+				texture shroom1.png alpha
+			}
+		}
+	}
+}
+
+material 3D-Diggers/shroom2
+{
+	technique Default
+	{
+		pass Main
+		{
+			ambient 0.5 0.5 0.5 1
+			diffuse 0.6 0.6 0.6 1
+
+			alpha_rejection greater_equal 128
+
+			texture_unit
+			{
+				texture shroom2.png alpha
+			}
+		}
+	}
+}

@@ -1,0 +1,37 @@
+
+material 3D-Diggers/fir01
+{
+	technique Default
+	{
+		pass Main
+		{
+			ambient 0.5 0.5 0.5 1
+			diffuse 0.6 0.6 0.6 1
+
+			alpha_rejection greater_equal 128
+
+			texture_unit
+			{
+				texture fir01.png alpha
+			}
+		}
+	}
+}
+
+material 3D-Diggers/fir02
+{
+	technique Default
+	{
+		pass Main
+		{
+			ambient 0.5 0.5 0.5 1
+			diffuse 0.6 0.6 0.6 1
+
+			texture_unit
+			{
+				texture_alias diffuse
+				texture fir02.jpg -1
+			}
+		}
+	}
+}

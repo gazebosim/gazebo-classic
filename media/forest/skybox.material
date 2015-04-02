@@ -1,0 +1,18 @@
+material 3D-Diggers/SkyBox
+{
+	technique
+	{
+		pass
+		{
+			fog_override true none
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				cubic_texture 3ddsky_0001.jpg 3ddsky_0003.jpg 3ddsky_0004.jpg 3ddsky_0002.jpg 3ddsky_0005.jpg 3ddsky_0006.jpg separateUV
+				tex_address_mode clamp
+			}
+		}
+	}
+}

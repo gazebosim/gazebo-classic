@@ -1,0 +1,18 @@
+material 3D-Diggers/plant2
+{
+	technique Default
+	{
+		pass Main
+		{
+			ambient 0.5 0.5 0.5 1
+			diffuse 0.6 0.6 0.6 1
+
+			alpha_rejection greater_equal 128
+
+			texture_unit
+			{
+				texture plant2.png alpha
+			}
+		}
+	}
+}

@@ -575,6 +575,8 @@ void RenderEngine::SetupResources()
       archNames.push_back(
           std::make_pair(prefix + "/skyx", "SkyX"));
       archNames.push_back(
+          std::make_pair(prefix + "/forest", "PagedGeometry"));
+      archNames.push_back(
           std::make_pair(prefix + "/rtshaderlib", "General"));
       archNames.push_back(
           std::make_pair(prefix + "/materials/programs", "General"));
