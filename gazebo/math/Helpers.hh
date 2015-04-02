@@ -192,26 +192,6 @@ namespace gazebo
       }
     }
 
-    /// \brief get sign of value
-    /// \param[in] _x the number
-    /// \return 1 if _x is positive, -1 if _x is negative, 0 otherwise
-    template<typename T>
-    inline int sign(const T &_x)
-    {
-      if (_x < 0)
-      {
-        return -1;
-      }
-      else if (_x > 0)
-      {
-        return 1;
-      }
-      else
-      {
-        return 0;
-      }
-    }
-
     /// \brief is this a power of 2?
     /// \param[in] _x the number
     /// \return true if _x is a power of 2, false otherwise
