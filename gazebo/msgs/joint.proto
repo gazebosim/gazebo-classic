@@ -5,9 +5,9 @@ package gazebo.msgs;
 /// \brief Message for creating joint in rendering::Scene
 
 
-import "vector3d.proto";
 import "axis.proto";
 import "pose.proto";
+import "sensor.proto";
 
 message Joint
 {
@@ -19,24 +19,29 @@ message Joint
     UNIVERSAL = 4;
     BALL      = 5;
     SCREW     = 6;
+    GEARBOX   = 7;
   }
 
   required string name           = 1;
-  repeated double angle          = 2;
-  optional Type type             = 3;
-  optional string parent         = 4;
-  optional string child          = 5;
-  optional Pose pose             = 6;
-  optional Axis axis1            = 7;
-  optional Axis axis2            = 8;
+  optional uint32 id             = 2;
+  repeated double angle          = 3;
+  optional Type type             = 4;
+  optional string parent         = 5;
+  optional uint32 parent_id      = 6;
+  optional string child          = 7;
+  optional uint32 child_id       = 8;
+  optional Pose pose             = 9;
+  optional Axis axis1            = 10;
+  optional Axis axis2            = 11;
 
-  optional double cfm            = 9;
-  optional double bounce         = 10;
-  optional double velocity       = 11;
-  optional double fudge_factor   = 12;
-  optional double limit_cfm      = 13;
-  optional double limit_erp      = 14;
-  optional double suspension_cfm = 15;
-  optional double suspension_erp = 16;
+  optional double cfm            = 12;
+  optional double bounce         = 13;
+  optional double velocity       = 14;
+  optional double fudge_factor   = 15;
+  optional double limit_cfm      = 16;
+  optional double limit_erp      = 17;
+  optional double suspension_cfm = 18;
+  optional double suspension_erp = 19;
+
+  repeated Sensor sensor         = 20;
 }
-

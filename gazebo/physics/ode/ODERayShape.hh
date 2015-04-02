@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,14 @@
 
 #include "gazebo/physics/RayShape.hh"
 #include "gazebo/physics/Shape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief Ray collision
-    class ODERayShape : public RayShape
+    class GAZEBO_VISIBLE ODERayShape : public RayShape
     {
       /// \brief Constructor for a global ray.
       /// \param[in] _physicsEngine Pointer to the physics engine.
@@ -45,10 +46,18 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~ODERayShape();
 
+      /// \brief Update the ray collision
       public: virtual void Update();
 
+      /// \brief Get the nearest intersection
+      /// \param[out] _dist Distance to the intersection.
+      /// \param[out] _entity Name of the entity that was hit.
       public: virtual void GetIntersection(double &_dist, std::string &_entity);
 
+      /// \brief Set the ray based on starting and ending points relative to
+      ///        the body
+      /// \param[in] _posStart Start position, relative the body
+      /// \param[in] _posEnd End position, relative to the body
       public: virtual void SetPoints(const math::Vector3 &_posStart,
                                      const math::Vector3 &_posEnd);
 

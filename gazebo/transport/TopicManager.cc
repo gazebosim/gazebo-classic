@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,38 @@
  *
 */
 
+#include <tbb/parallel_for.h>
+#include <tbb/blocked_range.h>
 
-#include "msgs/msgs.hh"
-#include "transport/Node.hh"
-#include "transport/Publication.hh"
-#include "transport/TopicManager.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publication.hh"
+#include "gazebo/transport/TopicManager.hh"
 
 using namespace gazebo;
 using namespace transport;
+
+/// \brief Class to facilitate parallel processing of nodes.
+class NodeProcess_TBB
+{
+  /// \brief Constructor.
+  /// \param[in] _nodes List of nodes to process.
+  public: NodeProcess_TBB(std::vector<NodePtr> *_nodes) : nodes(_nodes) {}
+
+  /// \brief Used by TBB during parallel execution.
+  /// \param[in] _r Range within this->nodes to process.
+  public: void operator() (const tbb::blocked_range<size_t> &_r) const
+  {
+    for (size_t i = _r.begin(); i != _r.end(); i++)
+    {
+      (*this->nodes)[i]->ProcessPublishers();
+    }
+  }
+
+  /// \brief The list of nodes to process.
+  private: std::vector<NodePtr> *nodes;
+};
+
 
 //////////////////////////////////////////////////
 TopicManager::TopicManager()
@@ -50,7 +74,7 @@ void TopicManager::Fini()
 {
   // These two lines make sure that pending messages get sent out
   this->ProcessNodes(true);
-  ConnectionManager::Instance()->RunUpdate();
+  // ConnectionManager::Instance()->RunUpdate();
 
   PublicationPtr_M::iterator iter;
   for (iter = this->advertisedTopics.begin();
@@ -110,55 +134,77 @@ void TopicManager::RemoveNode(unsigned int _id)
 }
 
 //////////////////////////////////////////////////
+void TopicManager::AddNodeToProcess(NodePtr _ptr)
+{
+  if (_ptr)
+  {
+    boost::mutex::scoped_lock lock(this->processNodesMutex);
+    this->nodesToProcess.insert(_ptr);
+  }
+}
+
+//////////////////////////////////////////////////
 void TopicManager::ProcessNodes(bool _onlyOut)
 {
-  std::vector<NodePtr>::iterator iter;
-  int s;
-
   {
-    boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
-    // store as size might change (spawning)
-    s = this->nodes.size();
+    boost::mutex::scoped_lock lock(this->processNodesMutex);
+    for (boost::unordered_set<NodePtr>::iterator iter =
+        this->nodesToProcess.begin();
+        iter != this->nodesToProcess.end(); ++iter)
+    {
+      (*iter)->ProcessPublishers();
+    }
+    this->nodesToProcess.clear();
   }
 
-  for (int i = 0; i < s; ++i)
-  {
-    this->nodes[i]->ProcessPublishers();
-  }
+  // Note: In general there are very few nodes. So, parallelization is not
+  // needed. Keeping this code for posterity.
+  // int s;
+  // {
+  //   boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
+  //   // store as size might change (spawning)
+  //   s = this->nodes.size();
+  // }
+  // Process nodes in parallel
+  // try
+  // {
+  //   boost::mutex::scoped_lock lock(this->processNodesMutex);
+  //   tbb::parallel_for(tbb::blocked_range<size_t>(0, this->nodes.size(), 10),
+  //       NodeProcess_TBB(&this->nodes));
+  // }
+  // catch(...)
+  // {
+  //   /// Failed to process the nodes this time around. But not to
+  //   /// worry. This function is called again.
+  // }
 
   if (!this->pauseIncoming && !_onlyOut)
   {
     {
+      int s = 0;
       boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
       s = this->nodes.size();
-    }
 
-    for (int i = 0; i < s; ++i)
-    {
-      this->nodes[i]->ProcessIncoming();
-      if (this->pauseIncoming)
-        break;
+      for (int i = 0; i < s; ++i)
+      {
+        this->nodes[i]->ProcessIncoming();
+        if (this->pauseIncoming)
+          break;
+      }
     }
   }
 }
 
 //////////////////////////////////////////////////
-void TopicManager::Publish(const std::string &_topic,
-                           const google::protobuf::Message &_message,
-                           const boost::function<void()> &_cb)
+void TopicManager::Publish(const std::string &_topic, MessagePtr _message,
+    boost::function<void(uint32_t)> _cb, uint32_t _id)
 {
   PublicationPtr pub = this->FindPublication(_topic);
-  PublicationPtr dbgPub = this->FindPublication(_topic+"/__dbg");
 
   if (pub)
-    pub->Publish(_message, _cb);
-
-  if (dbgPub && dbgPub->GetCallbackCount() > 0)
-  {
-    msgs::GzString dbgMsg;
-    dbgMsg.set_data(_message.DebugString());
-    dbgPub->Publish(dbgMsg);
-  }
+    pub->Publish(_message, _cb, _id);
+  else if (!_cb.empty())
+    _cb(_id);
 }
 
 //////////////////////////////////////////////////
@@ -309,30 +355,23 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
   this->ConnectSubscribers(_pub.topic());
 }
 
-
 //////////////////////////////////////////////////
-PublicationPtr TopicManager::UpdatePublications(const std::string &topic,
-                                                const std::string &msgType)
+PublicationPtr TopicManager::UpdatePublications(const std::string &_topic,
+                                                const std::string &_msgType)
 {
   // Find a current publication on this topic
-  PublicationPtr pub = this->FindPublication(topic);
+  PublicationPtr pub = this->FindPublication(_topic);
 
   if (pub)
   {
-    if (msgType != pub->GetMsgType())
+    if (_msgType != pub->GetMsgType())
       gzthrow("Attempting to advertise on an existing topic with"
               " a conflicting message type\n");
   }
   else
   {
-    PublicationPtr dbgPub;
-    msgs::GzString tmp;
-
-    pub = PublicationPtr(new Publication(topic, msgType));
-    dbgPub = PublicationPtr(new Publication(topic+"/__dbg",
-          tmp.GetTypeName()));
-    this->advertisedTopics[topic] =  pub;
-    this->advertisedTopics[topic+"/__dbg"] = dbgPub;
+    pub = PublicationPtr(new Publication(_topic, _msgType));
+    this->advertisedTopics[_topic] =  pub;
     this->advertisedTopicsEnd = this->advertisedTopics.end();
   }
 
@@ -344,20 +383,29 @@ void TopicManager::Unadvertise(const std::string &_topic)
 {
   std::string t;
 
-  for (int i = 0; i < 2; i ++)
-  {
-    if (i == 0)
-      t = _topic;
-    else
-      t = _topic + "/__dbg";
+  t = _topic;
 
-    PublicationPtr publication = this->FindPublication(t);
-    if (publication && publication->GetLocallyAdvertised() &&
-        publication->GetTransportCount() == 0)
-    {
-      publication->SetLocallyAdvertised(false);
-      ConnectionManager::Instance()->Unadvertise(t);
-    }
+  PublicationPtr publication = this->FindPublication(t);
+  if (publication && publication->GetLocallyAdvertised() &&
+      publication->GetTransportCount() == 0)
+  {
+    publication->SetLocallyAdvertised(false);
+    ConnectionManager::Instance()->Unadvertise(t);
+  }
+}
+
+//////////////////////////////////////////////////
+void TopicManager::Unadvertise(PublisherPtr _pub)
+{
+  GZ_ASSERT(_pub, "Unadvertising a NULL Publisher");
+
+  if (_pub)
+  {
+    PublicationPtr publication = this->FindPublication(_pub->GetTopic());
+    if (publication)
+      publication->RemovePublisher(_pub);
+
+    this->Unadvertise(_pub->GetTopic());
   }
 }
 
@@ -371,24 +419,6 @@ void TopicManager::RegisterTopicNamespace(const std::string &_name)
 void TopicManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 {
   ConnectionManager::Instance()->GetTopicNamespaces(_namespaces);
-}
-
-//////////////////////////////////////////////////
-std::map<std::string, std::list<std::string> >
-TopicManager::GetAdvertisedTopics() const
-{
-  std::map<std::string, std::list<std::string> > result;
-  std::list<msgs::Publish> publishers;
-
-  ConnectionManager::Instance()->GetAllPublishers(publishers);
-
-  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
-      iter != publishers.end(); ++iter)
-  {
-    result[(*iter).msg_type()].push_back((*iter).topic());
-  }
-
-  return result;
 }
 
 //////////////////////////////////////////////////

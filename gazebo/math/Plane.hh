@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@
 #ifndef _PLANE_HH_
 #define _PLANE_HH_
 
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2d.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,7 @@ namespace gazebo
 
     /// \class Plane Plane.hh math/gzmath.hh
     /// \brief A plane and related functions.
-    class Plane
+    class GAZEBO_VISIBLE Plane
     {
       /// \brief Constructor
       public: Plane();

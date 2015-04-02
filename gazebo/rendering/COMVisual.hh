@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,14 @@
  * limitations under the License.
  *
 */
-/* Desc: Center of Mass Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _COMVISUAL_HH_
 #define _COMVISUAL_HH_
 
 #include <string>
 
-#include "rendering/Visual.hh"
-#include "msgs/msgs.hh"
-
-namespace ogre
-{
-  class SceneNode;
-}
+#include "gazebo/math/Pose.hh"
+#include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
 {
@@ -38,11 +30,9 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
-    class DynamicLines;
-
     /// \class COMVisual COMVisual.hh rendering/rendering.hh
     /// \brief Basic Center of Mass visualization
-    class COMVisual : public Visual
+    class GAZEBO_VISIBLE COMVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the Visual
@@ -55,20 +45,18 @@ namespace gazebo
       /// \brief Load the Visual from an SDF pointer
       /// \param[in] _elem SDF Element pointer
       public: virtual void Load(sdf::ElementPtr _elem);
+      using Visual::Load;
 
       /// \brief Load from a message
       /// \param[in] _msg Pointer to the message
       public: virtual void Load(ConstLinkPtr &_msg);
 
       /// \brief Load based on a math::Pose
-      /// \param[in] _pose Pose of the COM visual
-      private: void Load(const math::Pose &_pose);
-
-      /// \brief Lines that make the cross marking the center of mass
-      private: DynamicLines *crossLines;
-
-      /// \brief Box that make the cross marking the center of mass
-      private: Ogre::SceneNode *boxNode;
+      /// \param[in] _pose Pose of the COM visual.
+      /// \param[in] _radius Radius for the sphere visual.
+      /// \param[in] _box Link's bounding box.
+      private: void Load(const math::Pose &_pose,
+          double _radius = 0.01, math::Box _box = math::Box());
     };
     /// \}
   }

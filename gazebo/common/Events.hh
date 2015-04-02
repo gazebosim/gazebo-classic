@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class Events Events.hh common/common.hh
     /// \brief An Event class to get notifications for simulator events
-    class Events
+    class GAZEBO_VISIBLE Events
     {
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the pause signal
@@ -128,27 +129,6 @@ namespace gazebo
       public: static void DisconnectAddEntity(ConnectionPtr _subscriber)
               { addEntity.Disconnect(_subscriber); }
 
-
-      //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the world update start signal
-      /// \param[in] _subscriber the subscriber to this event
-      /// \return a connection
-      public: template<typename T>
-              static ConnectionPtr ConnectWorldUpdateStart(T _subscriber)
-              {
-                // Putting in this comment so the deprecation message
-                // will be found easier: GAZEBO_DEPRECATED.
-                gzerr << "Events::ConnectWorldUpdateStart is deprecated "
-                      << "in v 1.5.0. Please use "
-                      << "Events::ConnectWorldUpdateBegin\n";
-                 return worldUpdateStart.Connect(_subscriber);
-              }
-
-      /// \brief Disconnect a boost::slot the the world update start signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectWorldUpdateStart(ConnectionPtr _subscriber)
-              GAZEBO_DEPRECATED;
-
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the world update start signal
       /// \param[in] _subscriber the subscriber to this event
@@ -173,6 +153,19 @@ namespace gazebo
       /// \param[in] _subscriber the subscriber to this event
       public: static void DisconnectWorldUpdateEnd(ConnectionPtr _subscriber)
               { worldUpdateEnd.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect to the the world reset signal
+      /// \param[in] _subscriber the subscriber to this event
+      /// \return a connection
+      public: template<typename T>
+              static ConnectionPtr ConnectWorldReset(T _subscriber)
+              { return worldReset.Connect(_subscriber); }
+
+      /// \brief Disconnect from the world reset signal
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectWorldReset(ConnectionPtr _subscriber)
+              { worldReset.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Render start signal
@@ -230,6 +223,18 @@ namespace gazebo
       public: static void DisconnectDiagTimerStop(ConnectionPtr _subscriber)
               { diagTimerStop.Disconnect(_subscriber); }
 
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot to the sigint event
+      /// \param[in] _subscriber the subscriber to this event
+      /// \return a connection
+      public: template<typename T>
+              static ConnectionPtr ConnectSigInt(T _subscriber)
+              { return sigInt.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot to the sigint event
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectSigInt(ConnectionPtr _subscriber)
+              { sigInt.Disconnect(_subscriber); }
+
       /// \brief Pause signal
       public: static EventT<void (bool)> pause;
 
@@ -238,6 +243,9 @@ namespace gazebo
 
       /// \brief Simulation stop signal
       public: static EventT<void ()> stop;
+
+      /// \brief Simulation stop signal
+      public: static EventT<void ()> sigInt;
 
       /// \brief A world has been created
       public: static EventT<void (std::string)> worldCreated;
@@ -255,13 +263,13 @@ namespace gazebo
       public: static EventT<void (std::string)> deleteEntity;
 
       /// \brief World update has started
-      public: static EventT<void ()> worldUpdateStart;
-
-      /// \brief World update has started
       public: static EventT<void (const common::UpdateInfo &)> worldUpdateBegin;
 
       /// \brief World update has ended
       public: static EventT<void ()> worldUpdateEnd;
+
+      /// \brief World reset signal
+      public: static EventT<void ()> worldReset;
 
       /// \brief Pre-render
       public: static EventT<void ()> preRender;

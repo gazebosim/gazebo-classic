@@ -1,5 +1,4 @@
 
-
 /*************************************************************************
  *                                                                       *
  * Open Dynamics Engine, Copyright (C) 2001,2002 Russell L. Smith.       *
@@ -411,22 +410,34 @@ ODE_API void dWorldSetRobustStepMaxIterations (dWorldID, int num);
 
 
 /**
- * @brief Set the tolerance of when sor lcp stops
- * @param num The default is 1 chunk
+ * @brief Get the tolerance of when sor lcp stops
+ * @param dWorldID world id
  */
-void dWorldSetQuickStepTolerance (dWorldID, dReal tol);
+ODE_API dReal dWorldGetQuickStepTolerance (dWorldID);
+
+/**
+ * @brief Set a tolerance to stop quickstep iterations.
+ * PGS iteration stops when the RMS of total constraint residual in the
+ * quickstep inner iteration (see dWorldGetQuickStepRMSConstraintResidual)
+ * is less than the tolerance specified here.
+ * The units of tolerance is the same as units of \lambda,
+ * which is in units of force.
+ * @param dWorldID world id
+ * @param dReal tolerance
+ */
+ODE_API void dWorldSetQuickStepTolerance (dWorldID, dReal tol);
 
 /**
  * @brief Set the number of chunks quickstep divide up constraint rows
  * @param num The default is 1 chunk
  */
-void dWorldSetQuickStepNumChunks (dWorldID, int num);
+ODE_API void dWorldSetQuickStepNumChunks (dWorldID, int num);
 
 /**
  * @brief Set the number of overlap when quickstep divide up constraint rows
  * @param num The default is 0 overlap
  */
-void dWorldSetQuickStepNumOverlap (dWorldID, int num);
+ODE_API void dWorldSetQuickStepNumOverlap (dWorldID, int num);
 
 /**
  * @brief Get the maximum number of iterations that the RobustStep method 
@@ -492,11 +503,135 @@ ODE_API void dWorldSetQuickStepW (dWorldID, dReal over_relaxation);
 ODE_API dReal dWorldGetQuickStepW (dWorldID);
 
 /**
- * @brief Get the RMS error of the quickstep step
+ * @brief Get the RMS of \Delta \lambda of the quickstep step
+ * Given dLambda is measures by (b_i - a_{ij} lambda_j)/a_{ii}
+ * it's a reasonable convergence measure for the linear system
+ * being solved via PGS.  Note the dLambda used are post-projection.
+ * The unit of errors are the same as the units of forces.
+ * RMS of \Delta \Lambda array is defined as:
+ * rms_dlambda[0]: bilateral constraints (findex = -1)
+ * rms_dlambda[1]: contact normal constraints (findex = -2)
+ * rms_dlambda[2]: friction constraints (findex >= 0)
+ * rms_dlambda[3]: total (sum of previous 3)
  * @ingroup world
- * @returns the rms error
+ * @returns the RMS of delta lambda
  */
-ODE_API dReal dWorldGetQuickStepRMSError (dWorldID);
+ODE_API dReal *dWorldGetQuickStepRMSDeltaLambda (dWorldID);
+
+/**
+ * @brief Get the RMS of constraint residuals for the quickstep step.
+ * The unit of constraint residuals are same as the units of velocities.
+ * RMS of constraint residuals array is defined as:
+ * rms_constraint_residual[0]: bilateral constraints (findex = -1)
+ * rms_constraint_residual[1]: contact normal constraints (findex = -2)
+ * rms_constraint_residual[2]: friction constraints (findex >= 0)
+ * rms_constraint_residual[3]: total (sum of previous 3)
+ * @ingroup world
+ * @returns the RMS of constraint residuals
+ */
+ODE_API dReal *dWorldGetQuickStepRMSConstraintResidual (dWorldID);
+
+/**
+ * @brief Get current count of contact constraints.
+ * @ingroup world
+ * @returns the number of contact constraints in quickstep.
+ */
+ODE_API int dWorldGetQuickStepNumContacts (dWorldID);
+
+/* PGS experimental parameters */
+
+/**
+ * @brief Get option to turn on inertia ratio reduction.
+ * @ingroup world
+ */
+ODE_API bool dWorldGetQuickStepInertiaRatioReduction (dWorldID);
+
+/**
+ * @brief Get friction residual exponential smoothing coefficient.
+ * @ingroup world
+ */
+ODE_API dReal dWorldGetQuickStepContactResidualSmoothing (dWorldID);
+
+/**
+ * @brief Get option to turn on experimental row reordering.
+ * see dWorldGetQuickStepExperimentalRowReordering for details.
+ * @ingroup world
+ */
+ODE_API bool dWorldGetQuickStepExperimentalRowReordering (dWorldID);
+
+/**
+ * @brief Get warm start scaling coefficient
+ * @ingroup world
+ */
+ODE_API dReal dWorldGetQuickStepWarmStartFactor (dWorldID);
+
+/**
+ * @brief Get extra friction constraint iterations within each time step.
+ * @ingroup world
+ */
+ODE_API int dWorldGetQuickStepExtraFrictionIterations (dWorldID);
+
+/**
+ * @brief Option to turn on inertia ratio reduction.
+ * @ingroup world
+ * @param irr set to true to turn on inertia ratio reduction.
+ */
+ODE_API void dWorldSetQuickStepInertiaRatioReduction (dWorldID, bool irr);
+
+/**
+ * @brief Set friction residual exponential smoothing coefficient
+ * @ingroup world
+ * @param smooth smoothing coefficent (0: no smothing ~ 1: full smoothing)
+ */
+ODE_API void dWorldSetQuickStepContactResidualSmoothing (dWorldID, dReal smoo);
+
+/**
+ * @brief Turn on experimental row reordering, so within one sweep,
+ * following ordering of constraints are used:
+ *   1. bilateral constraints
+ *   2. all contact normal constraints
+ *   3. all friction force constraints
+ * otherwise, use standard reordering
+ *   1. bilateral constraints
+ *   2. sweep each contact sequentially.  For each contact,
+ *      solve normal constraint followed by 2 friction constraints.
+ * @ingroup world
+ * @param reorder set to true to turn on experimental row reordering
+ */
+ODE_API void dWorldSetQuickStepExperimentalRowReordering (dWorldID, bool order);
+
+/**
+ * @brief Set warm start scaling coefficient
+ * @ingroup world
+ * @param warm 0: turn off warm starting, anything else is a scaling factor
+ * for lambda from previous time step.
+ */
+ODE_API void dWorldSetQuickStepWarmStartFactor (dWorldID, dReal warm);
+
+/**
+ * @brief Set extra friction constraint iterations within each time step,
+ * to be done after initial sweeps.
+ * @ingroup world
+ * @param iterations extra constraint iterations for friction rows after
+ * default sweep.
+ */
+ODE_API void dWorldSetQuickStepExtraFrictionIterations (dWorldID, int iters);
+
+/* PGS experimental parameters */
+
+/**
+ * @brief Get option to turn on inertia ratio reduction.
+ * @ingroup world
+ */
+ODE_API bool dWorldGetQuickStepInertiaRatioReduction (dWorldID);
+
+
+/**
+ * @brief Option to turn on inertia ratio reduction.
+ * @ingroup world
+ * @param irr set to true to turn on inertia ratio reduction.
+ */
+ODE_API void dWorldSetQuickStepInertiaRatioReduction (dWorldID, bool irr);
 
 /* World contact parameter functions */
 
@@ -1660,6 +1795,14 @@ ODE_API dJointID dJointCreateBall (dWorldID, dJointGroupID);
 ODE_API dJointID dJointCreateHinge (dWorldID, dJointGroupID);
 
 /**
+ * @brief Create a new joint of the gearbox type.
+ * @ingroup joints
+ * @param dJointGroupID set to 0 to allocate the joint normally.
+ * If it is nonzero the joint is allocated in the given joint group.
+ */
+ODE_API dJointID dJointCreateGearbox (dWorldID, dJointGroupID);
+ 
+/**
  * @brief Create a new joint of the slider type.
  * @ingroup joints
  * @param dJointGroupID set to 0 to allocate the joint normally.
@@ -1757,6 +1900,14 @@ ODE_API dJointID dJointCreateLMotor (dWorldID, dJointGroupID);
  * If it is nonzero the joint is allocated in the given joint group.
  */
 ODE_API dJointID dJointCreatePlane2D (dWorldID, dJointGroupID);
+
+/**
+ * @brief Create a new joint of the double ball type.
+ * @ingroup joints
+ * @param dJointGroupID set to 0 to allocate the joint normally.
+ * If it is nonzero the joint is allocated in the given joint group.
+ */
+ODE_API dJointID dJointCreateDBall (dWorldID, dJointGroupID);
 
 /**
  * @brief Destroy a joint.
@@ -2045,6 +2196,28 @@ ODE_API void dJointSetScrewParam (dJointID, int parameter, dReal value);
  */
 ODE_API void dJointAddScrewForce(dJointID joint, dReal force);
 ODE_API void dJointAddScrewTorque(dJointID joint, dReal torque);
+
+/**
+ * @brief set first axis for the gearbox joint
+ * @remarks This is the axis around which the first body is allowed to
+ * revolve and is attached to it.  It is given in global coordinates.
+ * @ingroup joints
+ */
+ODE_API void dJointSetGearboxAxis1(dJointID, dReal x, dReal y, dReal z);
+
+/**
+ * @brief get first axis for the gearbox joint
+ * @ingroup joints
+ */
+ODE_API void dJointGetGearboxAxis1(dJointID, dVector3 result);
+
+/**
+ * @brief set second axis for the gearbox joint
+ * @remarks This is the axis around which the second body is allowed to
+ * revolve and is attached to it.  It is given in global coordinates.
+ * @ingroup joints
+ */
+ODE_API void dJointSetGearboxAxis2(dJointID, dReal x, dReal y, dReal z);
 
 /**
  * @brief set anchor
@@ -2628,6 +2801,16 @@ ODE_API dReal dJointGetScrewPosition (dJointID);
 ODE_API dReal dJointGetScrewAngle (dJointID);
 
 /**
+ * @brief Set the screw anchor
+ */
+ODE_API void dJointSetScrewAnchor( dJointID j, dReal x, dReal y, dReal z );
+
+/**
+ * @brief Get the screw anchor
+ */
+ODE_API void dJointGetScrewAnchor( dJointID j, dVector3 result );
+
+/**
  * @brief Get the screw linear position's time derivative.
  * @ingroup joints
  */
@@ -2645,6 +2828,69 @@ ODE_API void dJointGetScrewAxis (dJointID, dVector3 result);
  * @ingroup joints
  */
 ODE_API dReal dJointGetScrewParam (dJointID, int parameter);
+
+/**
+ * @brief get second axis for the gearbox joint
+ * @ingroup joints
+ */
+ODE_API void dJointGetGearboxAxis2(dJointID, dVector3 result);
+
+/**
+ * @brief set gearbox joint parameter
+ * @ingroup joints
+ */
+ODE_API void dJointSetGearboxParam(dJointID, int parameter, dReal value);
+
+/**
+ * @brief get gearbox joint parameter
+ * @ingroup joints
+ */
+ODE_API dReal dJointGetGearboxParam(dJointID, int parameter);
+
+/**
+ * @brief set gearbox ratio
+ * @remarks
+ * This is the ratio of the angular velocity of the first body to that
+ * of the second body along the joint axis.  If the ratio is N then
+ * the first body is constrained to rotate N times faster than the
+ * second body.  Set it to 1 / N or reverse the bodies for the reverse
+ * effect.
+ * @ingroup joints
+ */
+ODE_API void dJointSetGearboxRatio( dJointID j, dReal value );
+
+/**
+ * @brief set gearbox reference body
+ * @remarks
+ * This is used to get the joint angle of the two bodies, so
+ * one can enforce error correction on gear angles.
+ * @ingroup joints
+ */
+ODE_API void dJointSetGearboxReferenceBody( dJointID j, dBodyID b );
+
+/**
+ * @brief set gearbox reference body
+ * @remarks
+ * This is used to get the joint angle of the first body, so
+ * one can enforce error correction on gear angles.
+ * @ingroup joints
+ */
+ODE_API void dJointSetGearboxReferenceBody1( dJointID j, dBodyID b );
+
+/**
+ * @brief set gearbox reference body
+ * @remarks
+ * This is used to get the joint angle of the second body, so
+ * one can enforce error correction on gear angles.
+ * @ingroup joints
+ */
+ODE_API void dJointSetGearboxReferenceBody2( dJointID j, dBodyID b );
+
+/**
+ * @brief get gearbox ratio
+ * @ingroup joints
+ */
+ODE_API dReal dJointGetGearboxRatio( dJointID j );
 
 /**
  * @brief Get the joint anchor point, in world coordinates.
@@ -3128,6 +3374,103 @@ ODE_API dReal dJointGetLMotorParam (dJointID, int parameter);
  * @ingroup joints
  */
 ODE_API dReal dJointGetFixedParam (dJointID, int parameter);
+
+/**
+ * @brief set anchor1 for double ball joint
+ * @ingroup joints
+ */
+ODE_API void dJointSetDBallAnchor1(dJointID, dReal x, dReal y, dReal z);
+
+/**
+ * @brief set anchor2 for double ball joint
+ * @ingroup joints
+ */
+ODE_API void dJointSetDBallAnchor2(dJointID, dReal x, dReal y, dReal z);
+
+/**
+ * @brief get anchor1 from double ball joint
+ * @ingroup joints
+ */
+ODE_API void dJointGetDBallAnchor1(dJointID, dVector3 result);
+
+/**
+ * @brief get anchor2 from double ball joint
+ * @ingroup joints
+ */
+ODE_API void dJointGetDBallAnchor2(dJointID, dVector3 result);
+
+/**
+ * @brief get the set distance from double ball joint
+ * @ingroup joints
+ */
+ODE_API dReal dJointGetDBallDistance(dJointID);
+
+/**
+ * @brief set double ball joint parameter
+ * @ingroup joints
+ */
+ODE_API void dJointSetDBallParam(dJointID, int parameter, dReal value);
+
+/**
+ * @brief get double ball joint parameter
+ * @ingroup joints
+ */
+ODE_API dReal dJointGetDBallParam(dJointID, int parameter);
+
+
+/**
+ * @brief set axis for double hinge joint
+ * @ingroup joints
+ */
+ODE_API void dJointSetDHingeAxis(dJointID, dReal x, dReal y, dReal z);
+
+/**
+ * @brief get axis for double hinge joint
+ * @ingroup joints
+ */
+ODE_API void dJointGetDHingeAxis(dJointID, dVector3 result);
+
+/**
+ * @brief set anchor1 for double hinge joint
+ * @ingroup joints
+ */
+ODE_API void dJointSetDHingeAnchor1(dJointID, dReal x, dReal y, dReal z);
+
+/**
+ * @brief set anchor2 for double hinge joint
+ * @ingroup joints
+ */
+ODE_API void dJointSetDHingeAnchor2(dJointID, dReal x, dReal y, dReal z);
+
+/**
+ * @brief get anchor1 from double hinge joint
+ * @ingroup joints
+ */
+ODE_API void dJointGetDHingeAnchor1(dJointID, dVector3 result);
+
+/**
+ * @brief get anchor2 from double hinge joint
+ * @ingroup joints
+ */
+ODE_API void dJointGetDHingeAnchor2(dJointID, dVector3 result);
+
+/**
+ * @brief get the set distance from double hinge joint
+ * @ingroup joints
+ */
+ODE_API dReal dJointGetDHingeDistance(dJointID);
+
+/**
+ * @brief set double hinge joint parameter
+ * @ingroup joints
+ */
+ODE_API void dJointSetDHingeParam(dJointID, int parameter, dReal value);
+
+/**
+ * @brief get double hinge joint parameter
+ * @ingroup joints
+ */
+ODE_API dReal dJointGetDHingeParam(dJointID, int parameter);
 
 
 /**

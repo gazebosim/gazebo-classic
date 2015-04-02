@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,19 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: a test for getting force and torques at joints
- * Author: John Hsu
- */
-#ifndef GAZEBO_JOINT_TRAJECTORY_PLUGIN_HH
-#define GAZEBO_JOINT_TRAJECTORY_PLUGIN_HH
 
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
+#ifndef _GAZEBO_FORCE_TORQUE_PLUGIN_HH_
+#define _GAZEBO_FORCE_TORQUE_PLUGIN_HH_
 
-#include "gazebo/physics/physics.hh"
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/common/Time.hh"
+#include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  class ForceTorquePlugin : public ModelPlugin
+  /// \brief An base class plugin for custom force torque sensor processing.
+  class GAZEBO_VISIBLE ForceTorquePlugin : public SensorPlugin
   {
     /// \brief Constructor
     public: ForceTorquePlugin();
@@ -40,21 +34,20 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~ForceTorquePlugin();
 
-    /// \brief Load the controller
-    public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
+    /// \brief Load the plugin.
+    /// \param[in] _parent Pointer to the parent sensor.
+    /// \param[in] _sdf SDF element for the plugin.
+    public: virtual void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
 
-    /// \brief Update the controller
-    /// \param[in] _info Update information provided by the server.
-    private: void UpdateStates(const common::UpdateInfo &_info);
+    /// \brief Update callback. Overload this function in a child class.
+    /// \param[in] _msg The force torque message.
+    protected: virtual void OnUpdate(msgs::WrenchStamped _msg);
 
-    private: physics::WorldPtr world;
-    private: physics::ModelPtr model;
-    private: physics::Joint_V joints;
+    /// \brief The parent sensor
+    protected: sensors::ForceTorqueSensorPtr parentSensor;
 
-    private: boost::mutex update_mutex;
-
-    // Pointer to the update event connection
-    private: event::ConnectionPtr updateConnection;
+    /// \brief Pointer to the update event connection
+    private: event::ConnectionPtr connection;
   };
 }
 #endif

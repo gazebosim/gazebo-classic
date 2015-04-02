@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@
 #include <string>
 
 #include "gazebo/common/Event.hh"
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     /// \class ToolsWidget ToolsWidget.hh gui/ToolsWidget.hh
     /// \brief A widget that manages all the tools on the right side of the
     /// render widget.
-    class ToolsWidget : public QWidget
+    class GAZEBO_VISIBLE ToolsWidget : public QWidget
     {
       Q_OBJECT
 

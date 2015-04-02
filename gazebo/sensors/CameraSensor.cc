@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,12 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/sensors/Noise.hh"
+
 
 using namespace gazebo;
 using namespace sensors;
@@ -45,17 +47,15 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 CameraSensor::CameraSensor()
     : Sensor(sensors::IMAGE)
 {
+  this->rendered = false;
+  this->connections.push_back(
+      event::Events::ConnectRender(
+        boost::bind(&CameraSensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
 CameraSensor::~CameraSensor()
 {
-}
-
-//////////////////////////////////////////////////
-void CameraSensor::SetParent(const std::string &_name)
-{
-  Sensor::SetParent(_name);
 }
 
 //////////////////////////////////////////////////
@@ -78,7 +78,8 @@ std::string CameraSensor::GetTopic() const
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->imagePub = this->node->Advertise<msgs::ImageStamped>(this->GetTopic());
+  this->imagePub = this->node->Advertise<msgs::ImageStamped>(
+      this->GetTopic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -98,7 +99,7 @@ void CameraSensor::Init()
     this->scene = rendering::get_scene(worldName);
     if (!this->scene)
     {
-      this->scene = rendering::create_scene(worldName, false);
+      this->scene = rendering::create_scene(worldName, false, true);
 
       // This usually means rendering is not available
       if (!this->scene)
@@ -109,7 +110,7 @@ void CameraSensor::Init()
     }
 
     this->camera = this->scene->CreateCamera(
-        this->sdf->GetValueString("name"), false);
+        this->sdf->Get<std::string>("name"), false);
 
     if (!this->camera)
     {
@@ -130,11 +131,30 @@ void CameraSensor::Init()
 
     this->camera->Init();
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
-    this->camera->SetWorldPose(this->pose);
-    this->camera->AttachToVisual(this->parentName, true);
+    math::Pose cameraPose = this->pose;
+    if (cameraSdf->HasElement("pose"))
+      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
+
+    this->camera->SetWorldPose(cameraPose);
+    this->camera->AttachToVisual(this->parentId, true);
+
+    if (cameraSdf->HasElement("noise"))
+    {
+      NoisePtr noise =
+          NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
+        this->GetType());
+      this->noises.push_back(noise);
+      noise->SetCamera(this->camera);
+    }
   }
   else
     gzerr << "No world name\n";
+
+  // Disable clouds and moon on server side until fixed and also to improve
+  // performance
+  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+      ~rendering::Scene::GZ_SKYX_CLOUDS &
+      ~rendering::Scene::GZ_SKYX_MOON);
 
   Sensor::Init();
 }
@@ -142,39 +162,59 @@ void CameraSensor::Init()
 //////////////////////////////////////////////////
 void CameraSensor::Fini()
 {
+  this->imagePub.reset();
   Sensor::Fini();
+
   if (this->camera)
-    this->camera->Fini();
+  {
+    this->scene->RemoveCamera(this->camera->GetName());
+  }
+
   this->camera.reset();
   this->scene.reset();
 }
 
 //////////////////////////////////////////////////
-void CameraSensor::UpdateImpl(bool /*_force*/)
+void CameraSensor::Render()
 {
-  if (this->camera)
+  if (!this->camera || !this->IsActive() || !this->NeedsUpdate())
+    return;
+
+  // Update all the cameras
+  this->camera->Render();
+
+  this->rendered = true;
+  this->lastMeasurementTime = this->scene->GetSimTime();
+}
+
+//////////////////////////////////////////////////
+bool CameraSensor::UpdateImpl(bool /*_force*/)
+{
+  if (!this->rendered)
+    return false;
+
+  this->camera->PostRender();
+
+  if (this->imagePub && this->imagePub->HasConnections())
   {
-    this->camera->Render();
-    this->camera->PostRender();
-    this->lastMeasurementTime = this->world->GetSimTime();
+    msgs::ImageStamped msg;
+    msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
+    msg.mutable_image()->set_width(this->camera->GetImageWidth());
+    msg.mutable_image()->set_height(this->camera->GetImageHeight());
+    msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+          this->camera->GetImageFormat()));
 
-    if (this->imagePub->HasConnections())
-    {
-      msgs::ImageStamped msg;
-      msgs::Set(msg.mutable_time(), this->world->GetSimTime());
-      msg.mutable_image()->set_width(this->camera->GetImageWidth());
-      msg.mutable_image()->set_height(this->camera->GetImageHeight());
-      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
-            this->camera->GetImageFormat()));
+    msg.mutable_image()->set_step(this->camera->GetImageWidth() *
+        this->camera->GetImageDepth());
+    msg.mutable_image()->set_data(this->camera->GetImageData(),
+        msg.image().width() * this->camera->GetImageDepth() *
+        msg.image().height());
 
-      msg.mutable_image()->set_step(this->camera->GetImageWidth() *
-          this->camera->GetImageDepth());
-      msg.mutable_image()->set_data(this->camera->GetImageData(),
-          msg.image().width() * this->camera->GetImageDepth() *
-          msg.image().height());
-      this->imagePub->Publish(msg);
-    }
+    this->imagePub->Publish(msg);
   }
+
+  this->rendered = false;
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -209,5 +249,6 @@ bool CameraSensor::SaveFrame(const std::string &_filename)
 //////////////////////////////////////////////////
 bool CameraSensor::IsActive()
 {
-  return Sensor::IsActive() || this->imagePub->HasConnections();
+  return Sensor::IsActive() ||
+    (this->imagePub && this->imagePub->HasConnections());
 }

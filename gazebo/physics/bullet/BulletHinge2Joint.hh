@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,12 @@
 #ifndef _BULLETHINGE2JOINT_HH_
 #define _BULLETHINGE2JOINT_HH_
 
-#include "math/Angle.hh"
-#include "math/Vector3.hh"
-#include "physics/Hinge2Joint.hh"
-#include "physics/bullet/BulletJoint.hh"
-#include "physics/bullet/BulletPhysics.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/physics/Hinge2Joint.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/util/system.hh"
 
 class btHinge2Constraint;
 
@@ -39,7 +40,7 @@ namespace gazebo
     /// \{
 
     /// \brief A two axis hinge joint
-    class BulletHinge2Joint : public Hinge2Joint<BulletJoint>
+    class GAZEBO_VISIBLE BulletHinge2Joint : public Hinge2Joint<BulletJoint>
     {
       /// \brief Constructor
       public: BulletHinge2Joint(btDynamicsWorld *world, BasePtr _parent);
@@ -47,65 +48,70 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletHinge2Joint();
 
-      /// \brief Load the BulletHinge2Joint
+      // Documentation inherited.
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Attach the two bodies with this joint
-      public: virtual void Attach(LinkPtr _one, LinkPtr _two);
+      // Documentation inherited.
+      public: virtual void Init();
 
-      /// \brief Set the anchor point
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
+      // Documentation inherited.
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
 
-      /// \brief Get anchor point
-      public: virtual math::Vector3 GetAnchor(int _index) const;
+      // Documentation inherited.
+      public: virtual void SetAxis(unsigned int _index,
+                  const math::Vector3 &_axis);
 
-      /// \brief Set the first axis of rotation
-      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+      // Documentation inherited.
+      public: virtual math::Vector3 GetAxis(unsigned int _index) const;
 
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int _index, double _damping);
+      // Documentation inherited.
+      public: math::Angle GetAngle(unsigned int _index) const;
 
-      /// \brief Get first axis of rotation
-      public: virtual math::Vector3 GetAxis(int _index) const;
+      // Documentation inherited.
+      public: double GetVelocity(unsigned int _index) const;
 
-      /// \brief Get angle of rotation about first axis
-      public: math::Angle GetAngle(int _index) const;
+      // Documentation inherited.
+      public: virtual void SetVelocity(unsigned int _index, double _angle);
 
-      /// \brief Get rate of rotation about first axis
-      public: double GetVelocity(int _index) const;
+      // Documentation inherited.
+      public: virtual void SetMaxForce(unsigned int _index, double _t);
 
-      /// \brief Set the velocity of an axis(index).
-      public: virtual void SetVelocity(int _index, double _angle);
+      // Documentation inherited.
+      public: virtual double GetMaxForce(unsigned int _index);
 
-      /// \brief Set the torque
-      public: void SetForce(int _index, double _torque);
+      // Documentation inherited.
+      public: virtual bool SetHighStop(unsigned int _index,
+                  const math::Angle &_angle);
 
-      /// \brief Set the max allowed force of an axis(index).
-      public: virtual void SetMaxForce(int _index, double _t);
+      // Documentation inherited.
+      public: virtual bool SetLowStop(unsigned int _index,
+                  const math::Angle &_angle);
 
-      /// \brief Get the max allowed force of an axis(index).
-      public: virtual double GetMaxForce(int _index);
+      // Documentation inherited.
+      public: virtual math::Angle GetHighStop(unsigned int _index);
 
-      /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
+      // Documentation inherited.
+      public: virtual math::Angle GetLowStop(unsigned int _index);
 
-      /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
+      // Documentation inherited.
+      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
-      /// \brief Get the high stop of an axis(index).
-      public: virtual math::Angle GetHighStop(int _index);
+      // Documentation inherited.
+      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
-      /// \brief Get the low stop of an axis(index).
-      public: virtual math::Angle GetLowStop(int _index);
-
-      /// \brief Get the axis of rotation
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
-
-      /// \brief Get the angle of rotation
-      public: virtual math::Angle GetAngleImpl(int _index) const;
+      // Documentation inherited.
+      protected: virtual void SetForceImpl(unsigned int _index, double _torque);
 
       /// \brief Pointer to bullet hinge2 constraint
       private: btHinge2Constraint *bulletHinge2;
+
+      /// \brief Offset angle used in GetAngleImpl, so that angles are reported
+      /// relative to the initial configuration.
+      private: double angleOffset[2];
+
+      /// \brief Initial value of joint axis, expressed as unit vector
+      /// in world frame.
+      private: math::Vector3 initialWorldAxis[2];
     };
 
   /// \}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@
 #include <string>
 #include <map>
 
-#include "physics/PhysicsTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -41,7 +42,7 @@ namespace gazebo
 
     /// \class PhysicsFactory PhysicsFactory.hh physics/physics.hh
     /// \brief The physics factory instantiates different physics engines.
-    class PhysicsFactory
+    class GAZEBO_VISIBLE PhysicsFactory
     {
       /// \brief Register everything.
       public: static void RegisterAll();
@@ -62,7 +63,7 @@ namespace gazebo
       /// \brief Check if a physics engine is registered.
       /// \param[in] _name Name of the physics engine.
       /// \return True if physics engine is registered, false otherwise.
-      public: static bool IsRegistered(const std::string _name);
+      public: static bool IsRegistered(const std::string &_name);
 
       /// \brief A list of registered physics classes.
       private: static std::map<std::string, PhysicsFactoryFn> engines;
@@ -74,10 +75,11 @@ namespace gazebo
     /// \param[in] name Physics type name, as it appears in the world file.
     /// \param[in] classname C++ class name for the physics engine.
     #define GZ_REGISTER_PHYSICS_ENGINE(name, classname) \
-    PhysicsEnginePtr New##classname(WorldPtr _world) \
+    GAZEBO_VISIBLE PhysicsEnginePtr New##classname(WorldPtr _world) \
     { \
       return PhysicsEnginePtr(new gazebo::physics::classname(_world)); \
     } \
+    GAZEBO_VISIBLE \
     void Register##classname() \
     {\
       PhysicsFactory::RegisterPhysicsEngine(name, New##classname);\

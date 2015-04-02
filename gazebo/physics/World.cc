@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The world; all models are collected here
- * Author: Andrew Howard and Nate Koenig
- */
 
 #include <time.h>
 
@@ -27,41 +24,61 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include <sdf/sdf.hh>
+
+#include <deque>
+#include <list>
+#include <set>
+#include <string>
+#include <vector>
+
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Subscriber.hh"
 
-#include "gazebo/common/LogPlay.hh"
-#include "gazebo/common/LogRecord.hh"
+#include "gazebo/util/LogPlay.hh"
+
 #include "gazebo/common/ModelDatabase.hh"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 
+#include "gazebo/math/Vector3.hh"
+
+#include "gazebo/msgs/msgs.hh"
+
+#include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
+#include "gazebo/util/LogRecord.hh"
 
 #include "gazebo/physics/Road.hh"
 #include "gazebo/physics/RayShape.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Actor.hh"
+#include "gazebo/physics/WorldPrivate.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/common/SphericalCoordinates.hh"
 
-#include "physics/Collision.hh"
-#include "physics/ContactManager.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/ContactManager.hh"
+#include "gazebo/physics/Population.hh"
 
 using namespace gazebo;
 using namespace physics;
 
+/// \brief Flag used to say if/when to clear all models.
+/// This will be replaced with a class member variable in Gazebo 3.0
+bool g_clearModels;
 
 class ModelUpdate_TBB
 {
@@ -79,151 +96,198 @@ class ModelUpdate_TBB
 
 //////////////////////////////////////////////////
 World::World(const std::string &_name)
+  : dataPtr(new WorldPrivate)
 {
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("world.sdf", this->sdf);
+  g_clearModels = false;
+  this->dataPtr->sdf.reset(new sdf::Element);
+  sdf::initFile("world.sdf", this->dataPtr->sdf);
 
-  this->factorySDF.reset(new sdf::SDF);
-  sdf::initFile("root.sdf", this->factorySDF);
+  this->dataPtr->factorySDF.reset(new sdf::SDF);
+  sdf::initFile("root.sdf", this->dataPtr->factorySDF);
 
-  this->logPlayStateSDF.reset(new sdf::Element);
-  sdf::initFile("state.sdf", this->logPlayStateSDF);
+  this->dataPtr->logPlayStateSDF.reset(new sdf::Element);
+  sdf::initFile("state.sdf", this->dataPtr->logPlayStateSDF);
 
-  this->receiveMutex = new boost::recursive_mutex();
-  this->loadModelMutex = new boost::mutex();
+  this->dataPtr->receiveMutex = new boost::recursive_mutex();
+  this->dataPtr->loadModelMutex = new boost::mutex();
 
-  this->initialized = false;
-  this->loaded = false;
-  this->stepInc = 0;
-  this->pause = false;
-  this->thread = NULL;
-  this->stop = false;
+  this->dataPtr->initialized = false;
+  this->dataPtr->loaded = false;
+  this->dataPtr->stepInc = 0;
+  this->dataPtr->pause = false;
+  this->dataPtr->thread = NULL;
+  this->dataPtr->logThread = NULL;
+  this->dataPtr->stop = false;
 
-  this->stateToggle = 0;
+  this->dataPtr->currentStateBuffer = 0;
+  this->dataPtr->stateToggle = 0;
 
-  this->pluginsLoaded = false;
+  this->dataPtr->pluginsLoaded = false;
 
-  this->name = _name;
+  this->dataPtr->name = _name;
 
-  this->needsReset = false;
-  this->resetAll = true;
-  this->resetTimeOnly = false;
-  this->resetModelOnly = false;
-  this->enablePhysicsEngine = true;
-  this->setWorldPoseMutex = new boost::mutex();
-  this->worldUpdateMutex = new boost::recursive_mutex();
+  this->dataPtr->needsReset = false;
+  this->dataPtr->resetAll = true;
+  this->dataPtr->resetTimeOnly = false;
+  this->dataPtr->resetModelOnly = false;
+  this->dataPtr->enablePhysicsEngine = true;
+  this->dataPtr->setWorldPoseMutex = new boost::mutex();
+  this->dataPtr->worldUpdateMutex = new boost::recursive_mutex();
 
-  this->sleepOffset = common::Time(0);
+  this->dataPtr->sleepOffset = common::Time(0);
 
-  this->prevStatTime = common::Time::GetWallTime();
-  this->prevProcessMsgsTime = common::Time::GetWallTime();
+  this->dataPtr->prevStatTime = common::Time::GetWallTime();
+  this->dataPtr->prevProcessMsgsTime = common::Time::GetWallTime();
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
      event::Events::ConnectStep(boost::bind(&World::OnStep, this)));
-  this->connections.push_back(
-     event::Events::ConnectSetSelectedEntity(
-       boost::bind(&World::SetSelectedEntityCB, this, _1)));
+  this->dataPtr->connections.push_back(
+     event::Events::ConnectPause(
+       boost::bind(&World::SetPaused, this, _1)));
 }
 
 //////////////////////////////////////////////////
 World::~World()
 {
-  delete this->receiveMutex;
-  this->receiveMutex = NULL;
-  delete this->loadModelMutex;
-  this->loadModelMutex = NULL;
-  delete this->setWorldPoseMutex;
-  this->setWorldPoseMutex = NULL;
-  delete this->worldUpdateMutex;
-  this->worldUpdateMutex = NULL;
+  this->dataPtr->presetManager.reset();
+  delete this->dataPtr->receiveMutex;
+  this->dataPtr->receiveMutex = NULL;
+  delete this->dataPtr->loadModelMutex;
+  this->dataPtr->loadModelMutex = NULL;
+  delete this->dataPtr->setWorldPoseMutex;
+  this->dataPtr->setWorldPoseMutex = NULL;
+  delete this->dataPtr->worldUpdateMutex;
+  this->dataPtr->worldUpdateMutex = NULL;
 
-  this->connections.clear();
+  this->dataPtr->connections.clear();
   this->Fini();
 
-  this->sdf->Reset();
-  this->rootElement.reset();
-  this->node.reset();
+  this->dataPtr->sdf->Reset();
+  this->dataPtr->rootElement.reset();
+  this->dataPtr->node.reset();
 
-  this->testRay.reset();
+  this->dataPtr->testRay.reset();
+
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
 void World::Load(sdf::ElementPtr _sdf)
 {
-  this->loaded = false;
-  this->sdf = _sdf;
+  this->dataPtr->loaded = false;
+  this->dataPtr->sdf = _sdf;
 
-  if (this->sdf->GetValueString("name").empty())
+  if (this->dataPtr->sdf->Get<std::string>("name").empty())
     gzwarn << "create_world(world_name =["
-           << this->name << "]) overwrites sdf world name\n!";
+           << this->dataPtr->name << "]) overwrites sdf world name\n!";
   else
-    this->name = this->sdf->GetValueString("name");
+    this->dataPtr->name = this->dataPtr->sdf->Get<std::string>("name");
 
-  this->sceneMsg.CopyFrom(msgs::SceneFromSDF(this->sdf->GetElement("scene")));
-  this->sceneMsg.set_name(this->GetName());
+#ifdef HAVE_OPENAL
+  util::OpenAL::Instance()->Load(this->dataPtr->sdf->GetElement("audio"));
+#endif
 
-  // The period at which statistics about the world are published
-  this->statPeriod = common::Time(0, 200000000);
+  this->dataPtr->sceneMsg.CopyFrom(
+      msgs::SceneFromSDF(this->dataPtr->sdf->GetElement("scene")));
+  this->dataPtr->sceneMsg.set_name(this->GetName());
 
   // The period at which messages are processed
-  this->processMsgsPeriod = common::Time(0, 200000000);
+  this->dataPtr->processMsgsPeriod = common::Time(0, 200000000);
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->GetName());
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init(this->GetName());
 
-  this->posePub = this->node->Advertise<msgs::Pose_V>("~/pose/info", 10, 60.0);
+  // pose pub for server side, mainly used for updating and timestamping
+  // Scene, which in turn will be used by rendering sensors.
+  // TODO: replace local communication with shared memory for efficiency.
+  this->dataPtr->poseLocalPub =
+    this->dataPtr->node->Advertise<msgs::PosesStamped>("~/pose/local/info", 10);
 
-  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
-  if (this->sdf->HasElement("gui"))
-    this->guiPub->Publish(msgs::GUIFromSDF(this->sdf->GetElement("gui")));
+  // pose pub for client with a cap on publishing rate to reduce traffic
+  // overhead
+  this->dataPtr->posePub = this->dataPtr->node->Advertise<msgs::PosesStamped>(
+    "~/pose/info", 10, 60);
 
-  this->factorySub = this->node->Subscribe("~/factory",
+  this->dataPtr->guiPub = this->dataPtr->node->Advertise<msgs::GUI>("~/gui", 5);
+  if (this->dataPtr->sdf->HasElement("gui"))
+  {
+    this->dataPtr->guiPub->Publish(
+        msgs::GUIFromSDF(this->dataPtr->sdf->GetElement("gui")));
+  }
+
+  this->dataPtr->factorySub = this->dataPtr->node->Subscribe("~/factory",
                                            &World::OnFactoryMsg, this);
-  this->controlSub = this->node->Subscribe("~/world_control",
+  this->dataPtr->controlSub = this->dataPtr->node->Subscribe("~/world_control",
                                            &World::OnControl, this);
 
-  this->logControlSub = this->node->Subscribe("~/log/control",
-                                              &World::OnLogControl, this);
-  this->logStatusPub = this->node->Advertise<msgs::LogStatus>("~/log/status");
-
-  this->requestSub = this->node->Subscribe("~/request",
+  this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
                                            &World::OnRequest, this, true);
-  this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
-  this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
-      &World::OnModelMsg, this);
+  this->dataPtr->jointSub = this->dataPtr->node->Subscribe("~/joint",
+      &World::JointLog, this);
+  this->dataPtr->lightSub = this->dataPtr->node->Subscribe("~/light",
+      &World::OnLightMsg, this);
 
-  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
-  this->statPub =
-    this->node->Advertise<msgs::WorldStatistics>("~/world_stats");
-  this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);
-  this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
-  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+  this->dataPtr->modelSub = this->dataPtr->node->Subscribe<msgs::Model>(
+      "~/model/modify", &World::OnModelMsg, this);
 
-  std::string type = this->sdf->GetElement("physics")->GetValueString("type");
-  this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
-      shared_from_this());
-
-  if (this->physicsEngine == NULL)
-    gzthrow("Unable to create physics engine\n");
+  this->dataPtr->responsePub = this->dataPtr->node->Advertise<msgs::Response>(
+      "~/response");
+  this->dataPtr->statPub =
+    this->dataPtr->node->Advertise<msgs::WorldStatistics>(
+        "~/world_stats", 100, 5);
+  this->dataPtr->modelPub = this->dataPtr->node->Advertise<msgs::Model>(
+      "~/model/info");
+  this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
+      "~/light");
 
   // This should come before loading of entities
-  this->physicsEngine->Load(this->sdf->GetElement("physics"));
+  sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
 
-  this->rootElement.reset(new Base(BasePtr()));
-  this->rootElement->SetName(this->GetName());
-  this->rootElement->SetWorld(shared_from_this());
+  std::string type = physicsElem->Get<std::string>("type");
+  this->dataPtr->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
+      shared_from_this());
+
+  if (this->dataPtr->physicsEngine == NULL)
+    gzthrow("Unable to create physics engine\n");
+
+  this->dataPtr->physicsEngine->Load(physicsElem);
+
+  // This should also come before loading of entities
+  {
+    sdf::ElementPtr spherical = this->dataPtr->sdf->GetElement(
+        "spherical_coordinates");
+    common::SphericalCoordinates::SurfaceType surfaceType =
+      common::SphericalCoordinates::Convert(
+        spherical->Get<std::string>("surface_model"));
+    math::Angle latitude, longitude, heading;
+    double elevation = spherical->Get<double>("elevation");
+    latitude.SetFromDegree(spherical->Get<double>("latitude_deg"));
+    longitude.SetFromDegree(spherical->Get<double>("longitude_deg"));
+    heading.SetFromDegree(spherical->Get<double>("heading_deg"));
+
+    this->dataPtr->sphericalCoordinates.reset(new common::SphericalCoordinates(
+      surfaceType, latitude, longitude, elevation, heading));
+  }
+
+  if (this->dataPtr->sphericalCoordinates == NULL)
+    gzthrow("Unable to create spherical coordinates data structure\n");
+
+  this->dataPtr->rootElement.reset(new Base(BasePtr()));
+  this->dataPtr->rootElement->SetName(this->GetName());
+  this->dataPtr->rootElement->SetWorld(shared_from_this());
 
   // A special order is necessary when loading a world that contains state
   // information. The joints must be created last, otherwise they get
   // initialized improperly.
   {
     // Create all the entities
-    this->LoadEntities(this->sdf, this->rootElement);
+    this->LoadEntities(this->dataPtr->sdf, this->dataPtr->rootElement);
 
     // Set the state of the entities
-    if (this->sdf->HasElement("state"))
+    if (this->dataPtr->sdf->HasElement("state"))
     {
-      sdf::ElementPtr childElem = this->sdf->GetElement("state");
+      sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("state");
 
       while (childElem)
       {
@@ -247,13 +311,13 @@ void World::Load(sdf::ElementPtr _sdf)
   // Choose threaded or unthreaded model updating depending on the number of
   // models in the scene
   // if (this->GetModelCount() < 20)
-  this->modelUpdateFunc = &World::ModelUpdateSingleLoop;
+  this->dataPtr->modelUpdateFunc = &World::ModelUpdateSingleLoop;
   // else
-  // this->modelUpdateFunc = &World::ModelUpdateTBB;
+  // this->dataPtr->modelUpdateFunc = &World::ModelUpdateTBB;
 
   event::Events::worldCreated(this->GetName());
 
-  this->loaded = true;
+  this->dataPtr->loaded = true;
 }
 
 //////////////////////////////////////////////////
@@ -264,7 +328,7 @@ void World::Save(const std::string &_filename)
   data = "<?xml version ='1.0'?>\n";
   data += "<sdf version='" +
           boost::lexical_cast<std::string>(SDF_VERSION) + "'>\n";
-  data += this->sdf->ToString("");
+  data += this->dataPtr->sdf->ToString("");
   data += "</sdf>\n";
 
   std::ofstream out(_filename.c_str(), std::ios::out);
@@ -279,142 +343,206 @@ void World::Save(const std::string &_filename)
 //////////////////////////////////////////////////
 void World::Init()
 {
-  // Initialize all the entities
-  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
-    this->rootElement->GetChild(i)->Init();
+  // Initialize all the entities (i.e. Model)
+  for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); i++)
+    this->dataPtr->rootElement->GetChild(i)->Init();
 
   // Initialize the physics engine
-  this->physicsEngine->Init();
+  this->dataPtr->physicsEngine->Init();
 
-  this->testRay = boost::shared_dynamic_cast<RayShape>(
+  this->dataPtr->presetManager = PresetManagerPtr(
+      new PresetManager(this->dataPtr->physicsEngine, this->dataPtr->sdf));
+
+  this->dataPtr->testRay = boost::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
-  common::LogRecord::Instance()->Add(this->GetName(), "state.log",
-      boost::bind(&World::OnLog, this, _1));
+  this->dataPtr->prevStates[0].SetWorld(shared_from_this());
+  this->dataPtr->prevStates[1].SetWorld(shared_from_this());
 
-  this->prevStates[0].SetWorld(shared_from_this());
-  this->prevStates[1].SetWorld(shared_from_this());
+  this->dataPtr->prevStates[0].SetName(this->GetName());
+  this->dataPtr->prevStates[1].SetName(this->GetName());
 
-  this->prevStates[0].SetName(this->GetName());
-  this->prevStates[1].SetName(this->GetName());
+  this->dataPtr->updateInfo.worldName = this->GetName();
 
-  this->initialized = true;
-
-  this->updateInfo.worldName = this->GetName();
-
-  this->iterations = 0;
-
-  // Mark the world initialization
-  gzlog << "World::Init" << std::endl;
+  this->dataPtr->iterations = 0;
+  this->dataPtr->logPrevIteration = 0;
 
   util::DiagnosticManager::Instance()->Init(this->GetName());
+
+  util::LogRecord::Instance()->Add(this->GetName(), "state.log",
+      boost::bind(&World::OnLog, this, _1));
+
+  // Check if we have to insert an object population.
+  if (this->dataPtr->sdf->HasElement("population"))
+  {
+    Population population(this->dataPtr->sdf, shared_from_this());
+    population.PopulateAll();
+  }
+
+  this->dataPtr->initialized = true;
+
+  // Mark the world initialization
+  gzlog << "Init world[" << this->GetName() << "]" << std::endl;
 }
 
 //////////////////////////////////////////////////
-void World::Run()
+void World::Run(unsigned int _iterations)
 {
-  this->stop = false;
-  this->thread = new boost::thread(
-      boost::bind(&World::RunLoop, this));
+  this->dataPtr->stop = false;
+  this->dataPtr->stopIterations = _iterations;
+
+  this->dataPtr->thread = new boost::thread(boost::bind(&World::RunLoop, this));
+}
+
+//////////////////////////////////////////////////
+void World::RunBlocking(unsigned int _iterations)
+{
+  this->dataPtr->stop = false;
+  this->dataPtr->stopIterations = _iterations;
+  this->RunLoop();
+}
+
+//////////////////////////////////////////////////
+void World::RemoveModel(ModelPtr _model)
+{
+  if (_model)
+    this->RemoveModel(_model->GetName());
+}
+
+//////////////////////////////////////////////////
+bool World::GetRunning() const
+{
+  return !this->dataPtr->stop;
 }
 
 //////////////////////////////////////////////////
 void World::Stop()
 {
-  this->stop = true;
-  if (this->thread)
+  this->dataPtr->stop = true;
+
+  if (this->dataPtr->thread)
   {
-    this->thread->join();
-    delete this->thread;
-    this->thread = NULL;
+    this->dataPtr->thread->join();
+    delete this->dataPtr->thread;
+    this->dataPtr->thread = NULL;
   }
 }
 
 //////////////////////////////////////////////////
 void World::RunLoop()
 {
-  this->physicsEngine->InitForThread();
+  this->dataPtr->physicsEngine->InitForThread();
 
-  this->startTime = common::Time::GetWallTime();
+  this->dataPtr->startTime = common::Time::GetWallTime();
 
   // This fixes a minor issue when the world is paused before it's started
   if (this->IsPaused())
-    this->pauseStartTime = this->startTime;
+    this->dataPtr->pauseStartTime = this->dataPtr->startTime;
 
-  this->prevStepWallTime = common::Time::GetWallTime();
+  this->dataPtr->prevStepWallTime = common::Time::GetWallTime();
 
   // Get the first state
-  this->prevStates[0] = WorldState(shared_from_this());
-  this->stateToggle = 0;
+  this->dataPtr->prevStates[0] = WorldState(shared_from_this());
+  this->dataPtr->prevStates[1] = WorldState(shared_from_this());
+  this->dataPtr->stateToggle = 0;
 
-  if (!common::LogPlay::Instance()->IsOpen())
+  this->dataPtr->logThread =
+    new boost::thread(boost::bind(&World::LogWorker, this));
+
+  if (!util::LogPlay::Instance()->IsOpen())
   {
-    while (!this->stop)
+    for (this->dataPtr->iterations = 0; !this->dataPtr->stop &&
+        (!this->dataPtr->stopIterations ||
+         (this->dataPtr->iterations < this->dataPtr->stopIterations));)
+    {
       this->Step();
+    }
   }
   else
   {
-    this->enablePhysicsEngine = false;
-    while (!this->stop)
+    this->dataPtr->enablePhysicsEngine = false;
+    for (this->dataPtr->iterations = 0; !this->dataPtr->stop &&
+        (!this->dataPtr->stopIterations ||
+         (this->dataPtr->iterations < this->dataPtr->stopIterations));)
+    {
       this->LogStep();
+    }
+  }
+
+  this->dataPtr->stop = true;
+
+  if (this->dataPtr->logThread)
+  {
+    this->dataPtr->logCondition.notify_all();
+    {
+      boost::mutex::scoped_lock lock(this->dataPtr->logMutex);
+      this->dataPtr->logCondition.notify_all();
+    }
+    this->dataPtr->logThread->join();
+    delete this->dataPtr->logThread;
+    this->dataPtr->logThread = NULL;
   }
 }
 
 //////////////////////////////////////////////////
 void World::LogStep()
 {
-  if (!this->IsPaused() || this->stepInc > 0)
+  if (!this->IsPaused() || this->dataPtr->stepInc > 0)
   {
     std::string data;
-    if (!common::LogPlay::Instance()->Step(data))
+    if (!util::LogPlay::Instance()->Step(data))
     {
       this->SetPaused(true);
     }
     else
     {
-      this->logPlayStateSDF->ClearElements();
-      sdf::readString(data, this->logPlayStateSDF);
+      this->dataPtr->logPlayStateSDF->ClearElements();
+      sdf::readString(data, this->dataPtr->logPlayStateSDF);
 
-      this->logPlayState.Load(this->logPlayStateSDF);
+      this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
 
       // Process insertions
-      if (this->logPlayStateSDF->HasElement("insertions"))
+      if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
       {
         sdf::ElementPtr modelElem =
-          this->logPlayStateSDF->GetElement("insertions")->GetElement("model");
+          this->dataPtr->logPlayStateSDF->GetElement(
+              "insertions")->GetElement("model");
 
         while (modelElem)
         {
-          ModelPtr model = this->LoadModel(modelElem, this->rootElement);
+          ModelPtr model = this->LoadModel(modelElem,
+              this->dataPtr->rootElement);
           model->Init();
-          model->LoadPlugins();
+
+          // Disabling plugins on playback
+          // model->LoadPlugins();
 
           modelElem = modelElem->GetNextElement("model");
         }
       }
 
       // Process deletions
-      if (this->logPlayStateSDF->HasElement("deletions"))
+      if (this->dataPtr->logPlayStateSDF->HasElement("deletions"))
       {
         sdf::ElementPtr nameElem =
-          this->logPlayStateSDF->GetElement("deletions")->GetElement("name");
+          this->dataPtr->logPlayStateSDF->GetElement(
+              "deletions")->GetElement("name");
+
         while (nameElem)
         {
           transport::requestNoReply(this->GetName(), "entity_delete",
-                                    nameElem->GetValueString());
+                                    nameElem->Get<std::string>());
           nameElem = nameElem->GetNextElement("name");
         }
       }
 
-      WorldState state = WorldState(shared_from_this()) + this->logPlayState;
-      this->SetState(state);
-
+      this->SetState(this->dataPtr->logPlayState);
       this->Update();
-      this->iterations++;
+      this->dataPtr->iterations++;
     }
 
-    if (this->stepInc > 0)
-      this->stepInc--;
+    if (this->dataPtr->stepInc > 0)
+      this->dataPtr->stepInc--;
   }
 
   this->PublishWorldStats();
@@ -431,28 +559,25 @@ void World::Step()
   /// until dWorld.*Step
   /// Plugins that manipulate joints (and probably other properties) require
   /// one iteration of the physics engine. Do not remove this.
-  if (!this->pluginsLoaded &&
+  if (!this->dataPtr->pluginsLoaded &&
       sensors::SensorManager::Instance()->SensorsInitialized())
   {
     this->LoadPlugins();
-    this->pluginsLoaded = true;
+    this->dataPtr->pluginsLoaded = true;
   }
 
   DIAG_TIMER_LAP("World::Step", "loadPlugins");
 
   // Send statistics about the world simulation
-  if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
-  {
-    this->PublishWorldStats();
-  }
+  this->PublishWorldStats();
 
   DIAG_TIMER_LAP("World::Step", "publishWorldStats");
 
+  double updatePeriod = this->dataPtr->physicsEngine->GetUpdatePeriod();
   // sleep here to get the correct update rate
   common::Time tmpTime = common::Time::GetWallTime();
-  common::Time sleepTime = this->prevStepWallTime +
-    common::Time(this->physicsEngine->GetUpdatePeriod()) -
-    tmpTime - this->sleepOffset;
+  common::Time sleepTime = this->dataPtr->prevStepWallTime +
+    common::Time(updatePeriod) - tmpTime - this->dataPtr->sleepOffset;
 
   common::Time actualSleep = 0;
   if (sleepTime > 0)
@@ -463,66 +588,74 @@ void World::Step()
   else
     sleepTime = 0;
 
-
   // exponentially avg out
-  this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
-                      this->sleepOffset * 0.99;
+  this->dataPtr->sleepOffset = (actualSleep - sleepTime) * 0.01 +
+                      this->dataPtr->sleepOffset * 0.99;
 
   DIAG_TIMER_LAP("World::Step", "sleepOffset");
 
   // throttling update rate, with sleepOffset as tolerance
   // the tolerance is needed as the sleep time is not exact
-  if (common::Time::GetWallTime() - this->prevStepWallTime + this->sleepOffset
-         >= common::Time(this->physicsEngine->GetUpdatePeriod()))
+  if (common::Time::GetWallTime() - this->dataPtr->prevStepWallTime +
+      this->dataPtr->sleepOffset >= common::Time(updatePeriod))
   {
-    boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
 
     DIAG_TIMER_LAP("World::Step", "worldUpdateMutex");
 
-    this->prevStepWallTime = common::Time::GetWallTime();
+    this->dataPtr->prevStepWallTime = common::Time::GetWallTime();
 
-    if (!this->IsPaused() || this->stepInc > 0)
+    double stepTime = this->dataPtr->physicsEngine->GetMaxStepSize();
+    if (!this->IsPaused() || this->dataPtr->stepInc > 0)
     {
       // query timestep to allow dynamic time step size updates
-      this->simTime += this->physicsEngine->GetStepTime();
-      this->iterations++;
+      this->dataPtr->simTime += stepTime;
+      this->dataPtr->iterations++;
       this->Update();
 
       DIAG_TIMER_LAP("World::Step", "update");
 
-      if (this->IsPaused() && this->stepInc > 0)
-        this->stepInc--;
+      if (this->IsPaused() && this->dataPtr->stepInc > 0)
+        this->dataPtr->stepInc--;
     }
     else
-      this->pauseTime += this->physicsEngine->GetStepTime();
+    {
+      // Flush the log record buffer, if there is data in it.
+      if (util::LogRecord::Instance()->GetBufferSize() > 0)
+        util::LogRecord::Instance()->Notify();
+      this->dataPtr->pauseTime += stepTime;
+    }
   }
 
   this->ProcessMessages();
 
   DIAG_TIMER_STOP("World::Step");
+
+  if (g_clearModels)
+    this->ClearModels();
 }
 
 //////////////////////////////////////////////////
-void World::StepWorld(int _steps)
+void World::Step(unsigned int _steps)
 {
   if (!this->IsPaused())
   {
-    gzwarn << "Calling World::StepWorld(steps) while world is not paused\n";
+    gzwarn << "Calling World::Step(steps) while world is not paused\n";
     this->SetPaused(true);
   }
 
   {
-    boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
-    this->stepInc = _steps;
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
+    this->dataPtr->stepInc = _steps;
   }
 
   // block on completion
   bool wait = true;
   while (wait)
   {
-    common::Time::MSleep(1);
-    boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
-    if (this->stepInc == 0 || this->stop)
+    common::Time::NSleep(1);
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
+    if (this->dataPtr->stepInc == 0 || this->dataPtr->stop)
       wait = false;
   }
 }
@@ -532,85 +665,85 @@ void World::Update()
 {
   DIAG_TIMER_START("World::Update");
 
-  if (this->needsReset)
+  if (this->dataPtr->needsReset)
   {
-    if (this->resetAll)
+    if (this->dataPtr->resetAll)
       this->Reset();
-    else if (this->resetTimeOnly)
+    else if (this->dataPtr->resetTimeOnly)
       this->ResetTime();
-    else if (this->resetModelOnly)
+    else if (this->dataPtr->resetModelOnly)
       this->ResetEntities(Base::MODEL);
-    this->needsReset = false;
+    this->dataPtr->needsReset = false;
   }
-
   DIAG_TIMER_LAP("World::Update", "needsReset");
 
-  event::Events::worldUpdateStart();
-  this->updateInfo.simTime = this->GetSimTime();
-  this->updateInfo.realTime = this->GetRealTime();
-  event::Events::worldUpdateBegin(this->updateInfo);
+  this->dataPtr->updateInfo.simTime = this->GetSimTime();
+  this->dataPtr->updateInfo.realTime = this->GetRealTime();
+  event::Events::worldUpdateBegin(this->dataPtr->updateInfo);
 
   DIAG_TIMER_LAP("World::Update", "Events::worldUpdateBegin");
 
   // Update all the models
-  (*this.*modelUpdateFunc)();
+  (*this.*dataPtr->modelUpdateFunc)();
 
   DIAG_TIMER_LAP("World::Update", "Model::Update");
 
   // This must be called before PhysicsEngine::UpdatePhysics.
-  this->physicsEngine->UpdateCollision();
+  this->dataPtr->physicsEngine->UpdateCollision();
 
   DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
 
+  // Wait for logging to finish, if it's running.
+  if (util::LogRecord::Instance()->GetRunning())
+  {
+    boost::mutex::scoped_lock lock(this->dataPtr->logMutex);
+
+    // It's possible the logWorker thread never processed the previous
+    // state. This checks to make sure that we don't continute until the log
+    // worker catchs up.
+    if (this->dataPtr->iterations - this->dataPtr->logPrevIteration > 1)
+    {
+      this->dataPtr->logCondition.notify_one();
+      this->dataPtr->logContinueCondition.wait(lock);
+    }
+  }
+
   // Update the physics engine
-  if (this->enablePhysicsEngine && this->physicsEngine)
+  if (this->dataPtr->enablePhysicsEngine && this->dataPtr->physicsEngine)
   {
     // This must be called directly after PhysicsEngine::UpdateCollision.
-    this->physicsEngine->UpdatePhysics();
+    this->dataPtr->physicsEngine->UpdatePhysics();
 
     DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdatePhysics");
 
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
     //           and we need to propagate it into Entity::worldPose
-    for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
-        iter != this->dirtyPoses.end(); ++iter)
     {
-      (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
-    }
+      // block any other pose updates (e.g. Joint::SetPosition)
+      boost::recursive_mutex::scoped_lock lock(
+        *this->dataPtr->physicsEngine->GetPhysicsUpdateMutex());
 
-    this->dirtyPoses.clear();
+      for (auto &dirtyEntity : this->dataPtr->dirtyPoses)
+      {
+        dirtyEntity->SetWorldPose(dirtyEntity->GetDirtyPose(), false);
+      }
+
+      this->dataPtr->dirtyPoses.clear();
+    }
 
     DIAG_TIMER_LAP("World::Update", "SetWorldPose(dirtyPoses)");
   }
 
+  // Only update state information if logging data.
+  if (util::LogRecord::Instance()->GetRunning())
+    this->dataPtr->logCondition.notify_one();
+  DIAG_TIMER_LAP("World::Update", "LogRecordNotify");
+
   // Output the contact information
-  this->physicsEngine->GetContactManager()->PublishContacts();
+  this->dataPtr->physicsEngine->GetContactManager()->PublishContacts();
 
   DIAG_TIMER_LAP("World::Update", "ContactManager::PublishContacts");
-
-  // Only update state informatin if logging data.
-  if (common::LogRecord::Instance()->GetRunning())
-  {
-    int currState = (this->stateToggle + 1) % 2;
-    this->prevStates[currState] = WorldState(shared_from_this());
-
-    WorldState diffState = this->prevStates[currState] -
-      this->prevStates[this->stateToggle];
-
-    if (!diffState.IsZero())
-    {
-      this->stateToggle = currState;
-      this->states.push_back(diffState);
-      if (this->states.size() > 1000)
-        this->states.pop_front();
-
-      /// Publish a log status message if the logger is running.
-      this->PublishLogStatus();
-    }
-  }
-
-  DIAG_TIMER_LAP("World::Update", "LogRecord");
 
   event::Events::worldUpdateEnd();
 
@@ -621,78 +754,120 @@ void World::Update()
 void World::Fini()
 {
   this->Stop();
-  this->plugins.clear();
+  this->dataPtr->plugins.clear();
 
-  this->node->Fini();
+  this->dataPtr->publishModelPoses.clear();
 
-  if (this->rootElement)
+  this->dataPtr->node->Fini();
+
+  if (this->dataPtr->rootElement)
   {
-    this->rootElement->Fini();
-    this->rootElement.reset();
+    this->dataPtr->rootElement->Fini();
+    this->dataPtr->rootElement.reset();
   }
 
-  if (this->physicsEngine)
+  if (this->dataPtr->physicsEngine)
   {
-    this->physicsEngine->Fini();
-    this->physicsEngine.reset();
+    this->dataPtr->physicsEngine->Fini();
+    this->dataPtr->physicsEngine.reset();
   }
 
-  this->prevStates[0].SetWorld(WorldPtr());
-  this->prevStates[1].SetWorld(WorldPtr());
+  this->dataPtr->models.clear();
+  this->dataPtr->prevStates[0].SetWorld(WorldPtr());
+  this->dataPtr->prevStates[1].SetWorld(WorldPtr());
+
+#ifdef HAVE_OPENAL
+  util::OpenAL::Instance()->Fini();
+#endif
 }
 
 //////////////////////////////////////////////////
 void World::Clear()
 {
-  // TODO: Implement this
+  g_clearModels = true;
+}
+
+//////////////////////////////////////////////////
+void World::ClearModels()
+{
+  g_clearModels = false;
+  bool pauseState = this->IsPaused();
+  this->SetPaused(true);
+
+  this->dataPtr->publishModelPoses.clear();
+
+  // Remove all models
+  for (auto &model : this->dataPtr->models)
+  {
+    this->dataPtr->rootElement->RemoveChild(model->GetId());
+  }
+  this->dataPtr->models.clear();
+
+  this->SetPaused(pauseState);
 }
 
 //////////////////////////////////////////////////
 std::string World::GetName() const
 {
-  return this->name;
+  return this->dataPtr->name;
 }
 
 //////////////////////////////////////////////////
 PhysicsEnginePtr World::GetPhysicsEngine() const
 {
-  return this->physicsEngine;
+  return this->dataPtr->physicsEngine;
+}
+
+//////////////////////////////////////////////////
+PresetManagerPtr World::GetPresetManager() const
+{
+  return this->dataPtr->presetManager;
+}
+
+//////////////////////////////////////////////////
+common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
+{
+  return this->dataPtr->sphericalCoordinates;
 }
 
 //////////////////////////////////////////////////
 BasePtr World::GetByName(const std::string &_name)
 {
-  return this->rootElement->GetByName(_name);
+  if (this->dataPtr->rootElement)
+    return this->dataPtr->rootElement->GetByName(_name);
+  else
+    return BasePtr();
 }
 
 /////////////////////////////////////////////////
 ModelPtr World::GetModelById(unsigned int _id)
 {
-  return boost::shared_dynamic_cast<Model>(this->rootElement->GetById(_id));
+  return boost::dynamic_pointer_cast<Model>(
+      this->dataPtr->rootElement->GetById(_id));
 }
 
 //////////////////////////////////////////////////
 ModelPtr World::GetModel(const std::string &_name)
 {
-  boost::mutex::scoped_lock lock(*this->loadModelMutex);
-  return boost::shared_dynamic_cast<Model>(this->GetByName(_name));
+  boost::mutex::scoped_lock lock(*this->dataPtr->loadModelMutex);
+  return boost::dynamic_pointer_cast<Model>(this->GetByName(_name));
 }
 
 //////////////////////////////////////////////////
 EntityPtr World::GetEntity(const std::string &_name)
 {
-  return boost::shared_dynamic_cast<Entity>(this->GetByName(_name));
+  return boost::dynamic_pointer_cast<Entity>(this->GetByName(_name));
 }
 
 //////////////////////////////////////////////////
 ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 {
-  boost::mutex::scoped_lock lock(*this->loadModelMutex);
+  boost::mutex::scoped_lock lock(*this->dataPtr->loadModelMutex);
   ModelPtr model;
 
   if (_sdf->GetName() == "model")
   {
-    model.reset(new Model(_parent));
+    model = this->dataPtr->physicsEngine->CreateModel(_parent);
     model->SetWorld(shared_from_this());
     model->Load(_sdf);
 
@@ -700,17 +875,17 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 
     msgs::Model msg;
     model->FillMsg(msg);
-    this->modelPub->Publish(msg);
+    this->dataPtr->modelPub->Publish(msg);
 
     this->EnableAllModels();
   }
   else
   {
     gzerr << "SDF is missing the <model> tag:\n";
-    _sdf->PrintValues("  ");
   }
 
-  this->PublishModelPose(model->GetName());
+  this->PublishModelPose(model);
+  this->dataPtr->models.push_back(model);
   return model;
 }
 
@@ -725,7 +900,7 @@ ActorPtr World::LoadActor(sdf::ElementPtr _sdf , BasePtr _parent)
 
   msgs::Model msg;
   actor->FillMsg(msg);
-  this->modelPub->Publish(msg);
+  this->dataPtr->modelPub->Publish(msg);
 
   return actor;
 }
@@ -746,7 +921,7 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
     sdf::ElementPtr childElem = _sdf->GetElement("light");
     while (childElem)
     {
-      msgs::Light *lm = this->sceneMsg.add_light();
+      msgs::Light *lm = this->dataPtr->sceneMsg.add_light();
       lm->CopyFrom(msgs::LightFromSDF(childElem));
 
       childElem = childElem->GetNextElement("light");
@@ -794,206 +969,159 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 //////////////////////////////////////////////////
 unsigned int World::GetModelCount() const
 {
-  // Not all children of the root element are models. We have to iterate
-  // through the children and count only the models.
-  unsigned int result = 0;
-  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
-    result += this->rootElement->GetChild(i)->HasType(Base::MODEL) ? 1 : 0;
-  return result;
+  return this->dataPtr->models.size();
 }
 
 //////////////////////////////////////////////////
 ModelPtr World::GetModel(unsigned int _index) const
 {
-  ModelPtr model;
-
-  if (_index < this->rootElement->GetChildCount())
-  {
-    // Not all children of the root element are models. We have to iterate
-    // through the children and count only the models.
-    for (unsigned int i = 0, count = 0;
-         i < this->rootElement->GetChildCount(); i++)
-    {
-      if (this->rootElement->GetChild(i)->HasType(Base::MODEL))
-      {
-        if (count == _index)
-        {
-          model = boost::shared_static_cast<Model>(
-              this->rootElement->GetChild(i));
-          break;
-        }
-        count++;
-      }
-    }
-
-    if (!model)
-      gzerr << "Unable to get model with index[" << _index << "]\n";
-  }
-  else
+  if (_index >= this->dataPtr->models.size())
   {
     gzerr << "Given model index[" << _index << "] is out of range[0.."
-          << this->rootElement->GetChildCount() << "]\n";
+          << this->dataPtr->models.size() << "]\n";
+    return ModelPtr();
   }
 
-  return model;
+  return this->dataPtr->models[_index];
 }
 
 //////////////////////////////////////////////////
 Model_V World::GetModels() const
 {
-  Model_V models;
-  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
-    models.push_back(this->GetModel(i));
-
-  return models;
+  return this->dataPtr->models;
 }
 
 //////////////////////////////////////////////////
 void World::ResetTime()
 {
-  this->simTime = common::Time(0);
-  this->pauseTime = common::Time(0);
-  this->startTime = common::Time::GetWallTime();
-  this->realTimeOffset = common::Time(0);
-  this->iterations = 0;
+  this->dataPtr->simTime = common::Time(0);
+  this->dataPtr->pauseTime = common::Time(0);
+  this->dataPtr->startTime = common::Time::GetWallTime();
+  this->dataPtr->realTimeOffset = common::Time(0);
+  this->dataPtr->iterations = 0;
+  sensors::SensorManager::Instance()->ResetLastUpdateTimes();
 }
 
 //////////////////////////////////////////////////
 void World::ResetEntities(Base::EntityType _type)
 {
-  this->rootElement->Reset(_type);
+  this->dataPtr->rootElement->Reset(_type);
 }
 
 //////////////////////////////////////////////////
 void World::Reset()
 {
-  bool currently_paused = this->IsPaused();
+  bool currentlyPaused = this->IsPaused();
   this->SetPaused(true);
 
   {
-    boost::recursive_mutex::scoped_lock(*this->worldUpdateMutex);
+    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
+
+    math::Rand::SetSeed(math::Rand::GetSeed());
+    this->dataPtr->physicsEngine->SetSeed(math::Rand::GetSeed());
 
     this->ResetTime();
     this->ResetEntities(Base::BASE);
-    for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
-        iter != this->plugins.end(); ++iter)
-      (*iter)->Reset();
-    this->physicsEngine->Reset();
+    for (auto &plugin : this->dataPtr->plugins)
+    {
+      plugin->Reset();
+    }
+    this->dataPtr->physicsEngine->Reset();
+
+    // Signal a reset has occurred
+    event::Events::worldReset();
   }
 
-  this->SetPaused(currently_paused);
+  this->SetPaused(currentlyPaused);
 }
 
 //////////////////////////////////////////////////
 void World::OnStep()
 {
-  this->stepInc = 1;
-}
-
-//////////////////////////////////////////////////
-void World::SetSelectedEntityCB(const std::string &_name)
-{
-  msgs::Selection msg;
-  BasePtr base = this->GetByName(_name);
-  EntityPtr ent = boost::shared_dynamic_cast<Entity>(base);
-
-  // unselect selectedEntity
-  if (this->selectedEntity)
-  {
-    msg.set_id(this->selectedEntity->GetId());
-    msg.set_name(this->selectedEntity->GetScopedName());
-    msg.set_selected(false);
-    this->selectionPub->Publish(msg);
-
-    this->selectedEntity->SetSelected(false);
-  }
-
-  // if a different entity is selected, show bounding box and SetSelected(true)
-  if (ent && this->selectedEntity != ent)
-  {
-    // set selected entity to ent
-    this->selectedEntity = ent;
-    this->selectedEntity->SetSelected(true);
-
-    msg.set_id(this->selectedEntity->GetId());
-    msg.set_name(this->selectedEntity->GetScopedName());
-    msg.set_selected(true);
-
-    this->selectionPub->Publish(msg);
-  }
-  else
-    this->selectedEntity.reset();
-}
-
-//////////////////////////////////////////////////
-EntityPtr World::GetSelectedEntity() const
-{
-  return this->selectedEntity;
+  this->dataPtr->stepInc = 1;
 }
 
 //////////////////////////////////////////////////
 void World::PrintEntityTree()
 {
   // Initialize all the entities
-  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
-    this->rootElement->GetChild(i)->Print("");
+  for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); i++)
+    this->dataPtr->rootElement->GetChild(i)->Print("");
 }
 
 //////////////////////////////////////////////////
 gazebo::common::Time World::GetSimTime() const
 {
-  return this->simTime;
+  return this->dataPtr->simTime;
 }
 
 //////////////////////////////////////////////////
 void World::SetSimTime(const common::Time &_t)
 {
-  this->simTime = _t;
+  this->dataPtr->simTime = _t;
 }
 
 //////////////////////////////////////////////////
 gazebo::common::Time World::GetPauseTime() const
 {
-  return this->pauseTime;
+  return this->dataPtr->pauseTime;
 }
 
 //////////////////////////////////////////////////
 gazebo::common::Time World::GetStartTime() const
 {
-  return this->startTime;
+  return this->dataPtr->startTime;
 }
 
 //////////////////////////////////////////////////
 common::Time World::GetRealTime() const
 {
-  if (this->pause)
-    return (this->pauseStartTime - this->startTime) - this->realTimeOffset;
+  if (!util::LogPlay::Instance()->IsOpen())
+  {
+    if (this->dataPtr->pause)
+    {
+      return (this->dataPtr->pauseStartTime - this->dataPtr->startTime) -
+        this->dataPtr->realTimeOffset;
+    }
+    else
+    {
+      return (common::Time::GetWallTime() - this->dataPtr->startTime) -
+        this->dataPtr->realTimeOffset;
+    }
+  }
   else
-    return (common::Time::GetWallTime() - this->startTime) -
-             this->realTimeOffset;
+    return this->dataPtr->logRealTime;
 }
 
 //////////////////////////////////////////////////
 bool World::IsPaused() const
 {
-  return this->pause;
+  return this->dataPtr->pause;
 }
 
 //////////////////////////////////////////////////
 void World::SetPaused(bool _p)
 {
-  if (this->pause == _p)
+  if (this->dataPtr->pause == _p)
     return;
 
   {
-    boost::recursive_mutex::scoped_lock(*this->worldUpdateMutex);
-    this->pause = _p;
+    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
+    this->dataPtr->pause = _p;
   }
 
   if (_p)
-    this->pauseStartTime = common::Time::GetWallTime();
+  {
+    // This is also a good time to clear out the logging buffer.
+    util::LogRecord::Instance()->Notify();
+
+    this->dataPtr->pauseStartTime = common::Time::GetWallTime();
+  }
   else
-    this->realTimeOffset += common::Time::GetWallTime() - this->pauseStartTime;
+  {
+    this->dataPtr->realTimeOffset += common::Time::GetWallTime() -
+      this->dataPtr->pauseStartTime;
+  }
 
   event::Events::pause(_p);
 }
@@ -1001,40 +1129,8 @@ void World::SetPaused(bool _p)
 //////////////////////////////////////////////////
 void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
-  this->factoryMsgs.push_back(*_msg);
-}
-
-//////////////////////////////////////////////////
-void World::OnLogControl(ConstLogControlPtr &_data)
-{
-  if (_data->has_base_path() && !_data->base_path().empty())
-    common::LogRecord::Instance()->SetBasePath(_data->base_path());
-
-  if (_data->has_start() && _data->start())
-  {
-    if (common::LogRecord::Instance()->GetPaused())
-    {
-      common::LogRecord::Instance()->Start("bz2");
-    }
-    else
-    {
-      common::LogRecord::Instance()->Start("bz2");
-      common::LogRecord::Instance()->Add(this->GetName(), "state.log",
-          boost::bind(&World::OnLog, this, _1));
-    }
-  }
-  else if (_data->has_stop() && _data->stop())
-  {
-    common::LogRecord::Instance()->Stop();
-  }
-  else if (_data->has_paused())
-  {
-    common::LogRecord::Instance()->SetPaused(_data->paused());
-  }
-
-  // Output the new log status
-  this->PublishLogStatus();
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->factoryMsgs.push_back(*_msg);
 }
 
 //////////////////////////////////////////////////
@@ -1046,29 +1142,38 @@ void World::OnControl(ConstWorldControlPtr &_data)
   if (_data->has_step())
     this->OnStep();
 
+  if (_data->has_multi_step())
+  {
+    // stepWorld is a blocking call so set stepInc directly so that world stats
+    // will still be published
+    this->SetPaused(true);
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
+    this->dataPtr->stepInc = _data->multi_step();
+  }
+
   if (_data->has_seed())
   {
     math::Rand::SetSeed(_data->seed());
-    this->physicsEngine->SetSeed(_data->seed());
+    this->dataPtr->physicsEngine->SetSeed(_data->seed());
   }
 
   if (_data->has_reset())
   {
-    this->needsReset = true;
+    this->dataPtr->needsReset = true;
 
     if (_data->reset().has_all() && _data->reset().all())
     {
-        this->resetAll = true;
+      this->dataPtr->resetAll = true;
     }
     else
     {
-      this->resetAll = false;
+      this->dataPtr->resetAll = false;
 
       if (_data->reset().has_time_only() && _data->reset().time_only())
-        this->resetTimeOnly = true;
+        this->dataPtr->resetTimeOnly = true;
 
       if (_data->reset().has_model_only() && _data->reset().model_only())
-        this->resetModelOnly = true;
+        this->dataPtr->resetModelOnly = true;
     }
   }
 }
@@ -1076,27 +1181,27 @@ void World::OnControl(ConstWorldControlPtr &_data)
 //////////////////////////////////////////////////
 void World::OnRequest(ConstRequestPtr &_msg)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
-  this->requestMsgs.push_back(*_msg);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->requestMsgs.push_back(*_msg);
 }
 
 //////////////////////////////////////////////////
 void World::JointLog(ConstJointPtr &_msg)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   int i = 0;
-  for (; i < this->sceneMsg.joint_size(); i++)
+  for (; i < this->dataPtr->sceneMsg.joint_size(); i++)
   {
-    if (this->sceneMsg.joint(i).name() == _msg->name())
+    if (this->dataPtr->sceneMsg.joint(i).name() == _msg->name())
     {
-      this->sceneMsg.mutable_joint(i)->CopyFrom(*_msg);
+      this->dataPtr->sceneMsg.mutable_joint(i)->CopyFrom(*_msg);
       break;
     }
   }
 
-  if (i >= this->sceneMsg.joint_size())
+  if (i >= this->dataPtr->sceneMsg.joint_size())
   {
-    msgs::Joint *newJoint = this->sceneMsg.add_joint();
+    msgs::Joint *newJoint = this->dataPtr->sceneMsg.add_joint();
     newJoint->CopyFrom(*_msg);
   }
 }
@@ -1104,8 +1209,8 @@ void World::JointLog(ConstJointPtr &_msg)
 //////////////////////////////////////////////////
 void World::OnModelMsg(ConstModelPtr &_msg)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
-  this->modelMsgs.push_back(*_msg);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->modelMsgs.push_back(*_msg);
 }
 
 //////////////////////////////////////////////////
@@ -1116,7 +1221,7 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
     if (_entity->HasType(Entity::MODEL))
     {
       msgs::Model *modelMsg = _scene.add_model();
-      boost::shared_static_cast<Model>(_entity)->FillMsg(*modelMsg);
+      boost::static_pointer_cast<Model>(_entity)->FillMsg(*modelMsg);
     }
 
     for (unsigned int i = 0; i < _entity->GetChildCount(); ++i)
@@ -1128,18 +1233,19 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
 
 
 //////////////////////////////////////////////////
-/*void World::ModelUpdateTBB()
-{
-  tbb::parallel_for(tbb::blocked_range<size_t>(0, this->models.size(), 10),
-      ModelUpdate_TBB(&this->models));
-}*/
+// void World::ModelUpdateTBB()
+// {
+//   tbb::parallel_for (tbb::blocked_range<size_t>(0,
+//   this->dataPtr->models.size(), 10),
+//       ModelUpdate_TBB(&this->dataPtr->models));
+// }
 
 //////////////////////////////////////////////////
 void World::ModelUpdateSingleLoop()
 {
   // Update all the models
-  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
-    this->rootElement->GetChild(i)->Update();
+  for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); i++)
+    this->dataPtr->rootElement->GetChild(i)->Update();
 }
 
 
@@ -1147,9 +1253,9 @@ void World::ModelUpdateSingleLoop()
 void World::LoadPlugins()
 {
   // Load the plugins
-  if (this->sdf->HasElement("plugin"))
+  if (this->dataPtr->sdf->HasElement("plugin"))
   {
-    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    sdf::ElementPtr pluginElem = this->dataPtr->sdf->GetElement("plugin");
     while (pluginElem)
     {
       this->LoadPlugin(pluginElem);
@@ -1158,20 +1264,14 @@ void World::LoadPlugins()
   }
 
   // Load the plugins for all the models
-  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+  for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); i++)
   {
-    if (this->rootElement->GetChild(i)->HasType(Base::MODEL))
+    if (this->dataPtr->rootElement->GetChild(i)->HasType(Base::MODEL))
     {
-      ModelPtr model = boost::shared_static_cast<Model>(
-          this->rootElement->GetChild(i));
+      ModelPtr model = boost::static_pointer_cast<Model>(
+          this->dataPtr->rootElement->GetChild(i));
       model->LoadPlugins();
     }
-  }
-
-  for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
-  {
-    (*iter)->Init();
   }
 }
 
@@ -1193,9 +1293,9 @@ void World::LoadPlugin(const std::string &_filename,
       return;
     }
     plugin->Load(shared_from_this(), _sdf);
-    this->plugins.push_back(plugin);
+    this->dataPtr->plugins.push_back(plugin);
 
-    if (this->initialized)
+    if (this->dataPtr->initialized)
       plugin->Init();
   }
 }
@@ -1203,12 +1303,12 @@ void World::LoadPlugin(const std::string &_filename,
 //////////////////////////////////////////////////
 void World::RemovePlugin(const std::string &_name)
 {
-  std::vector<WorldPluginPtr>::iterator iter;
-  for (iter = this->plugins.begin(); iter != this->plugins.end(); ++iter)
+  for (auto plugin = this->dataPtr->plugins.begin();
+           plugin != this->dataPtr->plugins.end(); ++plugin)
   {
-    if ((*iter)->GetHandle() == _name)
+    if ((*plugin)->GetHandle() == _name)
     {
-      this->plugins.erase(iter);
+      this->dataPtr->plugins.erase(plugin);
       break;
     }
   }
@@ -1217,75 +1317,53 @@ void World::RemovePlugin(const std::string &_name)
 //////////////////////////////////////////////////
 void World::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string pluginName = _sdf->GetValueString("name");
-  std::string filename = _sdf->GetValueString("filename");
+  std::string pluginName = _sdf->Get<std::string>("name");
+  std::string filename = _sdf->Get<std::string>("filename");
   this->LoadPlugin(filename, pluginName, _sdf);
 }
 
 //////////////////////////////////////////////////
 void World::ProcessEntityMsgs()
 {
-  std::list<std::string>::iterator iter;
-  for (iter = this->deleteEntity.begin();
-       iter != this->deleteEntity.end(); ++iter)
+  boost::mutex::scoped_lock lock(this->dataPtr->entityDeleteMutex);
+
+  for (auto &entityName : this->dataPtr->deleteEntity)
   {
-    // Remove all the dirty poses from the delete entity.
-    for (std::list<Entity*>::iterator iter2 = this->dirtyPoses.begin();
-         iter2 != this->dirtyPoses.end();)
-    {
-      if ((*iter2)->GetName() == *iter ||
-          (*iter2)->GetParent()->GetName() == *iter)
-      {
-        this->dirtyPoses.erase(iter2++);
-      }
-      else
-        ++iter2;
-    }
-
-    if (this->sdf->HasElement("model"))
-    {
-      sdf::ElementPtr childElem = this->sdf->GetElement("model");
-      while (childElem && childElem->GetValueString("name") != (*iter))
-        childElem = childElem->GetNextElement("model");
-      if (childElem)
-        this->sdf->RemoveChild(childElem);
-    }
-
-    this->rootElement->RemoveChild((*iter));
+    this->RemoveModel(entityName);
   }
 
-  if (this->deleteEntity.size() > 0)
+  if (!this->dataPtr->deleteEntity.empty())
   {
     this->EnableAllModels();
-    this->deleteEntity.clear();
+    this->dataPtr->deleteEntity.clear();
   }
 }
 
 //////////////////////////////////////////////////
 void World::ProcessRequestMsgs()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   msgs::Response response;
 
-  std::list<msgs::Request>::iterator iter;
-  for (iter = this->requestMsgs.begin();
-       iter != this->requestMsgs.end(); ++iter)
+  for (auto const &requestMsg : this->dataPtr->requestMsgs)
   {
     bool send = true;
-    response.set_id((*iter).id());
-    response.set_request((*iter).request());
+    response.set_id(requestMsg.id());
+    response.set_request(requestMsg.request());
     response.set_response("success");
 
-    if ((*iter).request() == "entity_list")
+    if (requestMsg.request() == "entity_list")
     {
       msgs::Model_V modelVMsg;
 
-      for (unsigned int i = 0; i < this->rootElement->GetChildCount(); ++i)
+      for (unsigned int i = 0;
+          i < this->dataPtr->rootElement->GetChildCount(); ++i)
       {
-        BasePtr entity = this->rootElement->GetChild(i);
+        BasePtr entity = this->dataPtr->rootElement->GetChild(i);
         if (entity->HasType(Base::MODEL))
         {
           msgs::Model *modelMsg = modelVMsg.add_models();
-          ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
+          ModelPtr model = boost::dynamic_pointer_cast<Model>(entity);
           model->FillMsg(*modelMsg);
         }
       }
@@ -1294,19 +1372,20 @@ void World::ProcessRequestMsgs()
       std::string *serializedData = response.mutable_serialized_data();
       modelVMsg.SerializeToString(serializedData);
     }
-    else if ((*iter).request() == "entity_delete")
+    else if (requestMsg.request() == "entity_delete")
     {
-      this->deleteEntity.push_back((*iter).data());
+      boost::mutex::scoped_lock lock2(this->dataPtr->entityDeleteMutex);
+      this->dataPtr->deleteEntity.push_back(requestMsg.data());
     }
-    else if ((*iter).request() == "entity_info")
+    else if (requestMsg.request() == "entity_info")
     {
-      BasePtr entity = this->rootElement->GetByName((*iter).data());
+      BasePtr entity = this->dataPtr->rootElement->GetByName(requestMsg.data());
       if (entity)
       {
         if (entity->HasType(Base::MODEL))
         {
           msgs::Model modelMsg;
-          ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
+          ModelPtr model = boost::dynamic_pointer_cast<Model>(entity);
           model->FillMsg(modelMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
@@ -1316,7 +1395,7 @@ void World::ProcessRequestMsgs()
         else if (entity->HasType(Base::LINK))
         {
           msgs::Link linkMsg;
-          LinkPtr link = boost::shared_dynamic_cast<Link>(entity);
+          LinkPtr link = boost::dynamic_pointer_cast<Link>(entity);
           link->FillMsg(linkMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
@@ -1327,7 +1406,7 @@ void World::ProcessRequestMsgs()
         {
           msgs::Collision collisionMsg;
           CollisionPtr collision =
-            boost::shared_dynamic_cast<Collision>(entity);
+            boost::dynamic_pointer_cast<Collision>(entity);
           collision->FillMsg(collisionMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
@@ -1337,7 +1416,7 @@ void World::ProcessRequestMsgs()
         else if (entity->HasType(Base::JOINT))
         {
           msgs::Joint jointMsg;
-          JointPtr joint = boost::shared_dynamic_cast<Joint>(entity);
+          JointPtr joint = boost::dynamic_pointer_cast<Joint>(entity);
           joint->FillMsg(jointMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
@@ -1348,17 +1427,17 @@ void World::ProcessRequestMsgs()
       else
       {
         response.set_type("error");
-        response.set_response("nonexistant");
+        response.set_response("nonexistent");
       }
     }
-    else if ((*iter).request() == "world_sdf")
+    else if (requestMsg.request() == "world_sdf")
     {
       msgs::GzString msg;
       this->UpdateStateSDF();
       std::ostringstream stream;
       stream << "<?xml version='1.0'?>\n"
              << "<sdf version='" << SDF_VERSION << "'>\n"
-             << this->sdf->ToString("")
+             << this->dataPtr->sdf->ToString("")
              << "</sdf>";
 
       msg.set_data(stream.str());
@@ -1367,203 +1446,249 @@ void World::ProcessRequestMsgs()
       msg.SerializeToString(serializedData);
       response.set_type(msg.GetTypeName());
     }
-    else if ((*iter).request() == "scene_info")
+    else if (requestMsg.request() == "scene_info")
     {
-      this->sceneMsg.clear_model();
-      this->BuildSceneMsg(this->sceneMsg, this->rootElement);
+      this->dataPtr->sceneMsg.clear_model();
+      this->BuildSceneMsg(this->dataPtr->sceneMsg, this->dataPtr->rootElement);
 
       std::string *serializedData = response.mutable_serialized_data();
-      this->sceneMsg.SerializeToString(serializedData);
-      response.set_type(sceneMsg.GetTypeName());
+      this->dataPtr->sceneMsg.SerializeToString(serializedData);
+      response.set_type(this->dataPtr->sceneMsg.GetTypeName());
+    }
+    else if (requestMsg.request() == "spherical_coordinates_info")
+    {
+      msgs::SphericalCoordinates sphereCoordMsg;
+      msgs::Set(&sphereCoordMsg, *(this->dataPtr->sphericalCoordinates));
+
+      std::string *serializedData = response.mutable_serialized_data();
+      sphereCoordMsg.SerializeToString(serializedData);
+      response.set_type(sphereCoordMsg.GetTypeName());
     }
     else
       send = false;
 
     if (send)
     {
-      this->responsePub->Publish(response);
+      this->dataPtr->responsePub->Publish(response);
     }
   }
 
-  this->requestMsgs.clear();
+  this->dataPtr->requestMsgs.clear();
 }
 
 //////////////////////////////////////////////////
 void World::ProcessModelMsgs()
 {
-  std::list<msgs::Model>::iterator iter;
-  for (iter = this->modelMsgs.begin();
-       iter != this->modelMsgs.end(); ++iter)
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  for (auto const &modelMsg : this->dataPtr->modelMsgs)
   {
     ModelPtr model;
-    if ((*iter).has_id())
-      model = this->GetModelById((*iter).id());
+    if (modelMsg.has_id())
+      model = this->GetModelById(modelMsg.id());
     else
-      model = this->GetModel((*iter).name());
+      model = this->GetModel(modelMsg.name());
 
     if (!model)
       gzerr << "Unable to find model["
-            << (*iter).name() << "] Id[" << (*iter).id() << "]\n";
+            << modelMsg.name() << "] Id[" << modelMsg.id() << "]\n";
     else
     {
-      model->ProcessMsg(*iter);
+      model->ProcessMsg(modelMsg);
 
+      // May 30, 2013: The following code was removed because it has a
+      // major performance impact when dragging complex object via the GUI.
+      // This code also does not seem to be necessary, since can just
+      // publish the incoming changes instead of a full model message. We
+      // are leaving it temporarily in case we find a need for it.
+      //
       // Let all other subscribers know about the change
-      msgs::Model msg;
-      model->FillMsg(msg);
-      this->modelPub->Publish(msg);
+      // msgs::Model msg;
+      // model->FillMsg(msg);
+      // // FillMsg fills the visual components from initial sdf
+      // // but problem is that Visuals may have changed e.g. through ~/visual,
+      // // so don't publish them to subscribers.
+      // for (int i = 0; i < msg.link_size(); ++i)
+      // {
+      //   msg.mutable_link(i)->clear_visual();
+      //   for (int j = 0; j < msg.link(i).collision_size(); ++j)
+      //   {
+      //     msg.mutable_link(i)->mutable_collision(j)->clear_visual();
+      //   }
+      // }
+
+      this->dataPtr->modelPub->Publish(modelMsg);
     }
   }
-  if (this->modelMsgs.size())
+
+  if (!this->dataPtr->modelMsgs.empty())
   {
     this->EnableAllModels();
-    this->modelMsgs.clear();
+    this->dataPtr->modelMsgs.clear();
   }
 }
 
 //////////////////////////////////////////////////
 void World::ProcessFactoryMsgs()
 {
-  std::list<msgs::Factory>::iterator iter;
+  std::list<sdf::ElementPtr> modelsToLoad;
 
-  for (iter = this->factoryMsgs.begin();
-       iter != this->factoryMsgs.end(); ++iter)
   {
-    this->factorySDF->root->ClearElements();
-
-    if ((*iter).has_sdf() && !(*iter).sdf().empty())
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+    for (auto const &factoryMsg : this->dataPtr->factoryMsgs)
     {
-      // SDF Parsing happens here
-      if (!sdf::readString((*iter).sdf(), factorySDF))
+      this->dataPtr->factorySDF->root->ClearElements();
+
+      if (factoryMsg.has_sdf() && !factoryMsg.sdf().empty())
       {
-        gzerr << "Unable to read sdf string[" << (*iter).sdf() << "]\n";
-        continue;
+        // SDF Parsing happens here
+        if (!sdf::readString(factoryMsg.sdf(), this->dataPtr->factorySDF))
+        {
+          gzerr << "Unable to read sdf string[" << factoryMsg.sdf() << "]\n";
+          continue;
+        }
       }
-    }
-    else if ((*iter).has_sdf_filename() && !(*iter).sdf_filename().empty())
-    {
-      std::string filename = common::ModelDatabase::Instance()->GetModelFile(
-          (*iter).sdf_filename());
-
-      if (!sdf::readFile(filename, factorySDF))
+      else if (factoryMsg.has_sdf_filename() &&
+              !factoryMsg.sdf_filename().empty())
       {
-        gzerr << "Unable to read sdf file.\n";
-        continue;
+        std::string filename = common::ModelDatabase::Instance()->GetModelFile(
+            factoryMsg.sdf_filename());
+
+        if (!sdf::readFile(filename, this->dataPtr->factorySDF))
+        {
+          gzerr << "Unable to read sdf file.\n";
+          continue;
+        }
       }
-    }
-    else if ((*iter).has_clone_model_name())
-    {
-      ModelPtr model = this->GetModel((*iter).clone_model_name());
-      if (!model)
+      else if (factoryMsg.has_clone_model_name())
       {
-        gzerr << "Unable to clone model[" << (*iter).clone_model_name()
-              << "]. Model not found.\n";
-        continue;
-      }
+        ModelPtr model = this->GetModel(factoryMsg.clone_model_name());
+        if (!model)
+        {
+          gzerr << "Unable to clone model[" << factoryMsg.clone_model_name()
+            << "]. Model not found.\n";
+          continue;
+        }
 
-      factorySDF->root->InsertElement(model->GetSDF()->Clone());
+        this->dataPtr->factorySDF->root->InsertElement(
+            model->GetSDF()->Clone());
 
-      std::string newName = model->GetName() + "_clone";
-      int i = 0;
-      while (this->GetModel(newName))
-      {
-        newName = model->GetName() + "_clone_" +
-                  boost::lexical_cast<std::string>(i);
-        i++;
-      }
+        std::string newName = model->GetName() + "_clone";
+        int i = 0;
+        while (this->GetModel(newName))
+        {
+          newName = model->GetName() + "_clone_" +
+            boost::lexical_cast<std::string>(i);
+          i++;
+        }
 
-      factorySDF->root->GetElement("model")->GetAttribute("name")->Set(newName);
-    }
-    else
-    {
-      gzerr << "Unable to load sdf from factory message."
-            << "No SDF or SDF filename specified.\n";
-      continue;
-    }
-
-    if ((*iter).has_edit_name())
-    {
-      BasePtr base = this->rootElement->GetByName((*iter).edit_name());
-      if (base)
-      {
-        sdf::ElementPtr elem;
-        if (factorySDF->root->GetName() == "sdf")
-          elem = factorySDF->root->GetFirstElement();
-        else
-          elem = factorySDF->root;
-
-        base->UpdateParameters(elem);
-      }
-    }
-    else
-    {
-      bool isActor = false;
-      bool isModel = false;
-      bool isLight = false;
-
-      sdf::ElementPtr elem = factorySDF->root;
-
-      if (elem->HasElement("world"))
-        elem = elem->GetElement("world");
-
-      if (elem->HasElement("model"))
-      {
-        elem = elem->GetElement("model");
-        isModel = true;
-      }
-      else if (elem->HasElement("light"))
-      {
-        elem = elem->GetElement("light");
-        isLight = true;
-      }
-      else if (elem->HasElement("actor"))
-      {
-        elem = elem->GetElement("actor");
-        isActor = true;
+        this->dataPtr->factorySDF->root->GetElement("model")->GetAttribute(
+            "name")->Set(newName);
       }
       else
       {
-        gzerr << "Unable to find a model, light, or actor in:\n";
-        factorySDF->root->PrintValues("");
+        gzerr << "Unable to load sdf from factory message."
+          << "No SDF or SDF filename specified.\n";
         continue;
       }
 
-      if (!elem)
+      if (factoryMsg.has_edit_name())
       {
-        gzerr << "Invalid SDF:";
-        factorySDF->root->PrintValues("");
-        continue;
+        BasePtr base =
+          this->dataPtr->rootElement->GetByName(factoryMsg.edit_name());
+        if (base)
+        {
+          sdf::ElementPtr elem;
+          if (this->dataPtr->factorySDF->root->GetName() == "sdf")
+            elem = this->dataPtr->factorySDF->root->GetFirstElement();
+          else
+            elem = this->dataPtr->factorySDF->root;
+
+          base->UpdateParameters(elem);
+        }
       }
-
-      elem->SetParent(this->sdf);
-      elem->GetParent()->InsertElement(elem);
-      if ((*iter).has_pose())
-        elem->GetElement("pose")->Set(msgs::Convert((*iter).pose()));
-
-      if (isActor)
+      else
       {
-        ActorPtr actor = this->LoadActor(elem, this->rootElement);
-        actor->Init();
-      }
-      else if (isModel)
-      {
-        ModelPtr model = this->LoadModel(elem, this->rootElement);
-        model->Init();
+        bool isActor = false;
+        bool isModel = false;
+        bool isLight = false;
 
-        model->LoadPlugins();
-      }
-      else if (isLight)
-      {
-        /// \TODO: Current broken. See Issue #67.
-        msgs::Light *lm = this->sceneMsg.add_light();
-        lm->CopyFrom(msgs::LightFromSDF(elem));
+        sdf::ElementPtr elem = this->dataPtr->factorySDF->root->Clone();
 
-        this->lightPub->Publish(*lm);
+        if (elem->HasElement("world"))
+          elem = elem->GetElement("world");
+
+        if (elem->HasElement("model"))
+        {
+          elem = elem->GetElement("model");
+          isModel = true;
+        }
+        else if (elem->HasElement("light"))
+        {
+          elem = elem->GetElement("light");
+          isLight = true;
+        }
+        else if (elem->HasElement("actor"))
+        {
+          elem = elem->GetElement("actor");
+          isActor = true;
+        }
+        else
+        {
+          gzerr << "Unable to find a model, light, or actor in:\n";
+          this->dataPtr->factorySDF->root->PrintValues("");
+          continue;
+        }
+
+        if (!elem)
+        {
+          gzerr << "Invalid SDF:";
+          this->dataPtr->factorySDF->root->PrintValues("");
+          continue;
+        }
+
+        elem->SetParent(this->dataPtr->sdf);
+        elem->GetParent()->InsertElement(elem);
+        if (factoryMsg.has_pose())
+          elem->GetElement("pose")->Set(msgs::Convert(factoryMsg.pose()));
+
+        if (isActor)
+        {
+          ActorPtr actor = this->LoadActor(elem, this->dataPtr->rootElement);
+          actor->Init();
+        }
+        else if (isModel)
+        {
+          modelsToLoad.push_back(elem);
+        }
+        else if (isLight)
+        {
+          /// \TODO: Current broken. See Issue #67.
+          msgs::Light *lm = this->dataPtr->sceneMsg.add_light();
+          lm->CopyFrom(msgs::LightFromSDF(elem));
+
+          this->dataPtr->lightPub->Publish(*lm);
+        }
       }
     }
+
+    this->dataPtr->factoryMsgs.clear();
   }
 
-  this->factoryMsgs.clear();
+  for (auto const &elem : modelsToLoad)
+  {
+    try
+    {
+      boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
+
+      ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
+      model->Init();
+      model->LoadPlugins();
+    }
+    catch(...)
+    {
+      gzerr << "Loading model from factory message failed\n";
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1590,9 +1715,9 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
   end = _pt;
   end.z -= 1000;
 
-  this->physicsEngine->InitForThread();
-  this->testRay->SetPoints(_pt, end);
-  this->testRay->GetIntersection(dist, entityName);
+  this->dataPtr->physicsEngine->InitForThread();
+  this->dataPtr->testRay->SetPoints(_pt, end);
+  this->dataPtr->testRay->GetIntersection(dist, entityName);
   return this->GetEntity(entityName);
 }
 
@@ -1600,43 +1725,44 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
 void World::SetState(const WorldState &_state)
 {
   this->SetSimTime(_state.GetSimTime());
+  this->dataPtr->logRealTime = _state.GetRealTime();
 
-  for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
+  const ModelState_M modelStates = _state.GetModelStates();
+  for (auto const &modelState : modelStates)
   {
-    ModelState modelState = _state.GetModelState(i);
-    ModelPtr model = this->GetModel(modelState.GetName());
+    ModelPtr model = this->GetModel(modelState.second.GetName());
     if (model)
-      model->SetState(modelState);
+      model->SetState(modelState.second);
     else
-      gzerr << "Unable to find model[" << modelState.GetName() << "]\n";
+      gzerr << "Unable to find model[" << modelState.second.GetName() << "]\n";
   }
 }
 
 //////////////////////////////////////////////////
 void World::InsertModelFile(const std::string &_sdfFilename)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   msgs::Factory msg;
   msg.set_sdf_filename(_sdfFilename);
-  this->factoryMsgs.push_back(msg);
+  this->dataPtr->factoryMsgs.push_back(msg);
 }
 
 //////////////////////////////////////////////////
 void World::InsertModelSDF(const sdf::SDF &_sdf)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   msgs::Factory msg;
   msg.set_sdf(_sdf.ToString());
-  this->factoryMsgs.push_back(msg);
+  this->dataPtr->factoryMsgs.push_back(msg);
 }
 
 //////////////////////////////////////////////////
 void World::InsertModelString(const std::string &_sdfString)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   msgs::Factory msg;
   msg.set_sdf(_sdfString);
-  this->factoryMsgs.push_back(msg);
+  this->dataPtr->factoryMsgs.push_back(msg);
 }
 
 //////////////////////////////////////////////////
@@ -1651,47 +1777,93 @@ std::string World::StripWorldName(const std::string &_name) const
 //////////////////////////////////////////////////
 void World::EnableAllModels()
 {
-  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
-    this->GetModel(i)->SetEnabled(true);
+  for (auto &model : this->dataPtr->models)
+  {
+    model->SetEnabled(true);
+  }
 }
 
 //////////////////////////////////////////////////
 void World::DisableAllModels()
 {
-  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
-    this->GetModel(i)->SetEnabled(false);
+  for (auto &model : this->dataPtr->models)
+  {
+    model->SetEnabled(false);
+  }
 }
 
 //////////////////////////////////////////////////
 void World::UpdateStateSDF()
 {
-  this->sdf->Update();
-  sdf::ElementPtr stateElem = this->sdf->GetElement("state");
+  this->dataPtr->sdf->Update();
+  sdf::ElementPtr stateElem = this->dataPtr->sdf->GetElement("state");
   stateElem->ClearElements();
 
-  this->prevStates[(this->stateToggle + 1) % 2].FillSDF(stateElem);
+  WorldState currentState(shared_from_this());
+  currentState.FillSDF(stateElem);
 }
 
 //////////////////////////////////////////////////
 bool World::OnLog(std::ostringstream &_stream)
 {
+  int bufferIndex = this->dataPtr->currentStateBuffer;
   // Save the entire state when its the first call to OnLog.
-  if (common::LogRecord::Instance()->GetFirstUpdate())
+  if (util::LogRecord::Instance()->GetFirstUpdate())
   {
     this->UpdateStateSDF();
     _stream << "<sdf version ='";
     _stream << SDF_VERSION;
     _stream << "'>\n";
-    _stream << this->sdf->ToString("");
+    _stream << this->dataPtr->sdf->ToString("");
     _stream << "</sdf>\n";
   }
-  else if (this->states.size() >= 1)
+  else if (this->dataPtr->states[bufferIndex].size() >= 1)
   {
-    // Get the difference from the previous state.
-    _stream << "<sdf version='" << SDF_VERSION << "'>";
-    _stream << this->states[0];
-    _stream << "</sdf>";
-    this->states.pop_front();
+    {
+      boost::mutex::scoped_lock lock(this->dataPtr->logBufferMutex);
+      this->dataPtr->currentStateBuffer ^= 1;
+    }
+    for (auto const &worldState : this->dataPtr->states[bufferIndex])
+    {
+      _stream << "<sdf version='" << SDF_VERSION << "'>"
+              << worldState
+              << "</sdf>";
+    }
+
+    this->dataPtr->states[bufferIndex].clear();
+  }
+
+  // Logging has stopped. Wait for log worker to finish. Output last bit
+  // of data, and reset states.
+  if (!util::LogRecord::Instance()->GetRunning())
+  {
+    boost::mutex::scoped_lock lock(this->dataPtr->logBufferMutex);
+
+    // Output any data that may have been pushed onto the queue
+    for (size_t i = 0;
+        i < this->dataPtr->states[this->dataPtr->currentStateBuffer^1].size();
+        ++i)
+    {
+      _stream << "<sdf version='" << SDF_VERSION << "'>"
+        << this->dataPtr->states[this->dataPtr->currentStateBuffer^1][i]
+        << "</sdf>";
+    }
+
+    for (size_t i = 0;
+        i < this->dataPtr->states[this->dataPtr->currentStateBuffer].size();
+        ++i)
+    {
+      _stream << "<sdf version='" << SDF_VERSION << "'>"
+        << this->dataPtr->states[this->dataPtr->currentStateBuffer][i]
+        << "</sdf>";
+    }
+
+    // Clear everything.
+    this->dataPtr->states[0].clear();
+    this->dataPtr->states[1].clear();
+    this->dataPtr->stateToggle = 0;
+    this->dataPtr->prevStates[0] = WorldState();
+    this->dataPtr->prevStates[1] = WorldState();
   }
 
   return true;
@@ -1700,125 +1872,291 @@ bool World::OnLog(std::ostringstream &_stream)
 //////////////////////////////////////////////////
 void World::ProcessMessages()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
-  msgs::Pose *poseMsg;
-
-  if (this->posePub && this->posePub->HasConnections() &&
-      this->publishModelPoses.size() > 0)
   {
-    msgs::Pose_V msg;
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
 
-    for (std::set<std::string>::iterator iter =
-         this->publishModelPoses.begin();
-         iter != this->publishModelPoses.end(); ++iter)
+    if ((this->dataPtr->posePub && this->dataPtr->posePub->HasConnections()) ||
+        (this->dataPtr->poseLocalPub &&
+         this->dataPtr->poseLocalPub->HasConnections()))
     {
-      ModelPtr model = this->GetModel(*iter);
+      msgs::PosesStamped msg;
 
-      // It's possible that the model was deleted somewhere along the line.
-      // So check to make sure we get a valid model pointer.
-      if (!model)
-        continue;
+      // Time stamp this PosesStamped message
+      msgs::Set(msg.mutable_time(), this->GetSimTime());
 
-      poseMsg = msg.add_pose();
-
-      // Publish the model's relative pose
-      poseMsg->set_name(model->GetScopedName());
-      msgs::Set(poseMsg, model->GetRelativePose());
-
-      // Publish each of the model's children relative poses
-      Link_V links = model->GetLinks();
-      for (Link_V::iterator linkIter = links.begin();
-           linkIter != links.end(); ++linkIter)
+      if (!this->dataPtr->publishModelPoses.empty())
       {
-        poseMsg = msg.add_pose();
-        poseMsg->set_name((*linkIter)->GetScopedName());
-        msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
+        for (auto const &model : this->dataPtr->publishModelPoses)
+        {
+          msgs::Pose *poseMsg = msg.add_pose();
+
+          // Publish the model's relative pose
+          poseMsg->set_name(model->GetScopedName());
+          poseMsg->set_id(model->GetId());
+          msgs::Set(poseMsg, model->GetRelativePose());
+
+          // Publish each of the model's children relative poses
+          Link_V links = model->GetLinks();
+          for (auto const &link : links)
+          {
+            poseMsg = msg.add_pose();
+            poseMsg->set_name(link->GetScopedName());
+            poseMsg->set_id(link->GetId());
+            msgs::Set(poseMsg, link->GetRelativePose());
+          }
+        }
+
+        if (this->dataPtr->posePub && this->dataPtr->posePub->HasConnections())
+          this->dataPtr->posePub->Publish(msg);
+      }
+
+      if (this->dataPtr->poseLocalPub &&
+          this->dataPtr->poseLocalPub->HasConnections())
+      {
+        // rendering::Scene depends on this timestamp, which is used by
+        // rendering sensors to time stamp their data
+        this->dataPtr->poseLocalPub->Publish(msg);
       }
     }
-    this->posePub->Publish(msg);
+    this->dataPtr->publishModelPoses.clear();
   }
-  this->publishModelPoses.clear();
 
-  if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
-      this->processMsgsPeriod)
+  if (common::Time::GetWallTime() - this->dataPtr->prevProcessMsgsTime >
+      this->dataPtr->processMsgsPeriod)
   {
     this->ProcessEntityMsgs();
     this->ProcessRequestMsgs();
     this->ProcessFactoryMsgs();
     this->ProcessModelMsgs();
-    this->prevProcessMsgsTime = common::Time::GetWallTime();
+    this->dataPtr->prevProcessMsgsTime = common::Time::GetWallTime();
   }
 }
 
 //////////////////////////////////////////////////
 void World::PublishWorldStats()
 {
-  msgs::Set(this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
-  msgs::Set(this->worldStatsMsg.mutable_real_time(), this->GetRealTime());
-  msgs::Set(this->worldStatsMsg.mutable_pause_time(), this->GetPauseTime());
-  this->worldStatsMsg.set_iterations(this->iterations);
-  this->worldStatsMsg.set_paused(this->IsPaused());
+  msgs::Set(this->dataPtr->worldStatsMsg.mutable_sim_time(),
+      this->GetSimTime());
+  msgs::Set(this->dataPtr->worldStatsMsg.mutable_real_time(),
+      this->GetRealTime());
+  msgs::Set(this->dataPtr->worldStatsMsg.mutable_pause_time(),
+      this->GetPauseTime());
 
-  this->statPub->Publish(this->worldStatsMsg);
-  this->prevStatTime = common::Time::GetWallTime();
+  this->dataPtr->worldStatsMsg.set_iterations(this->dataPtr->iterations);
+  this->dataPtr->worldStatsMsg.set_paused(this->IsPaused());
+
+  if (this->dataPtr->statPub && this->dataPtr->statPub->HasConnections())
+    this->dataPtr->statPub->Publish(this->dataPtr->worldStatsMsg);
+  this->dataPtr->prevStatTime = common::Time::GetWallTime();
 }
 
 //////////////////////////////////////////////////
 bool World::IsLoaded() const
 {
-  return this->loaded;
+  return this->dataPtr->loaded;
 }
 
 //////////////////////////////////////////////////
-void World::PublishModelPose(const std::string &_modelName)
+void World::PublishModelPose(physics::ModelPtr _model)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
 
   // Only add if the model name is not in the list
-  this->publishModelPoses.insert(_modelName);
+  this->dataPtr->publishModelPoses.insert(_model);
 }
 
 //////////////////////////////////////////////////
-void World::PublishLogStatus()
+void World::LogWorker()
 {
-  msgs::LogStatus msg;
-  unsigned int size = 0;
+  boost::mutex::scoped_lock lock(this->dataPtr->logMutex);
 
-  // Set the time of the status message
-  msgs::Set(msg.mutable_sim_time(),
-            common::LogRecord::Instance()->GetRunTime());
+  WorldPtr self = shared_from_this();
+  this->dataPtr->logPrevIteration = this->dataPtr->iterations;
 
-  // Set the log recording base path name
-  msg.mutable_log_file()->set_base_path(
-      common::LogRecord::Instance()->GetBasePath());
+  GZ_ASSERT(self, "Self pointer to World is invalid");
 
-  // Get the full name of the log file
-  msg.mutable_log_file()->set_full_path(
-    common::LogRecord::Instance()->GetFilename(this->GetName()));
-
-  // Set the URI of th log file
-  msg.mutable_log_file()->set_uri(transport::Connection::GetLocalHostname());
-
-  // Get the size of the log file
-  size = common::LogRecord::Instance()->GetFileSize(this->GetName());
-
-  if (size < 1000)
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::BYTES);
-  else if (size < 1e6)
+  while (!this->dataPtr->stop)
   {
-    msg.mutable_log_file()->set_size(size / 1.0e3);
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::K_BYTES);
-  }
-  else if (size < 1e9)
-  {
-    msg.mutable_log_file()->set_size(size / 1.0e6);
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::M_BYTES);
-  }
-  else
-  {
-    msg.mutable_log_file()->set_size(size / 1.0e9);
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::G_BYTES);
+    int currState = (this->dataPtr->stateToggle + 1) % 2;
+
+    this->dataPtr->prevStates[currState].Load(self);
+    WorldState diffState = this->dataPtr->prevStates[currState] -
+      this->dataPtr->prevStates[this->dataPtr->stateToggle];
+    this->dataPtr->logPrevIteration = this->dataPtr->iterations;
+
+    if (!diffState.IsZero())
+    {
+      this->dataPtr->stateToggle = currState;
+      {
+        // Store the entire current state (instead of the diffState). A slow
+        // moving link may never be captured if only diff state is recorded.
+        boost::mutex::scoped_lock bLock(this->dataPtr->logBufferMutex);
+        this->dataPtr->states[this->dataPtr->currentStateBuffer].push_back(
+            this->dataPtr->prevStates[currState]);
+        // Tell the logger to update, once the number of states exceeds 1000
+        if (this->dataPtr->states[this->dataPtr->currentStateBuffer].size() >
+            1000)
+        {
+          util::LogRecord::Instance()->Notify();
+        }
+      }
+    }
+
+    this->dataPtr->logContinueCondition.notify_all();
+
+    // Wait until there is work to be done.
+    this->dataPtr->logCondition.wait(lock);
   }
 
-  this->logStatusPub->Publish(msg);
+  // Make sure nothing is blocked by this thread.
+  this->dataPtr->logContinueCondition.notify_all();
+}
+
+/////////////////////////////////////////////////
+uint32_t World::GetIterations() const
+{
+  return this->dataPtr->iterations;
+}
+
+//////////////////////////////////////////////////
+void World::RemoveModel(const std::string &_name)
+{
+  boost::mutex::scoped_lock flock(this->dataPtr->factoryDeleteMutex);
+
+  // Remove all the dirty poses from the delete entity.
+  {
+    for (auto entity = this->dataPtr->dirtyPoses.begin();
+             entity != this->dataPtr->dirtyPoses.end(); ++entity)
+    {
+      if ((*entity)->GetName() == _name ||
+         ((*entity)->GetParent() && (*entity)->GetParent()->GetName() == _name))
+      {
+        this->dataPtr->dirtyPoses.erase(entity++);
+      }
+      else
+        ++entity;
+    }
+  }
+
+  if (this->dataPtr->sdf->HasElement("model"))
+  {
+    sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("model");
+    while (childElem && childElem->Get<std::string>("name") != _name)
+      childElem = childElem->GetNextElement("model");
+    if (childElem)
+      this->dataPtr->sdf->RemoveChild(childElem);
+  }
+
+  if (this->dataPtr->sdf->HasElement("light"))
+  {
+    sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("light");
+    while (childElem && childElem->Get<std::string>("name") != _name)
+      childElem = childElem->GetNextElement("light");
+    if (childElem)
+    {
+      this->dataPtr->sdf->RemoveChild(childElem);
+      // Find the light by name in the scene msg, and remove it.
+      for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
+      {
+        if (this->dataPtr->sceneMsg.light(i).name() == _name)
+        {
+          this->dataPtr->sceneMsg.mutable_light()->SwapElements(i,
+              this->dataPtr->sceneMsg.light_size()-1);
+          this->dataPtr->sceneMsg.mutable_light()->RemoveLast();
+          break;
+        }
+      }
+    }
+  }
+
+  {
+    boost::recursive_mutex::scoped_lock lock(
+        *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+
+    this->dataPtr->rootElement->RemoveChild(_name);
+
+    for (auto model = this->dataPtr->models.begin();
+             model != this->dataPtr->models.end(); ++model)
+    {
+      if ((*model)->GetName() == _name || (*model)->GetScopedName() == _name)
+      {
+        this->dataPtr->models.erase(model);
+        break;
+      }
+    }
+  }
+
+  // Cleanup the publishModelPoses list.
+  {
+    boost::recursive_mutex::scoped_lock lock2(*this->dataPtr->receiveMutex);
+    for (auto model = this->dataPtr->publishModelPoses.begin();
+             model != this->dataPtr->publishModelPoses.end(); ++model)
+    {
+      if ((*model)->GetName() == _name || (*model)->GetScopedName() == _name)
+      {
+        this->dataPtr->publishModelPoses.erase(model);
+        break;
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void World::OnLightMsg(ConstLightPtr &_msg)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+
+  bool lightExists = false;
+
+  // Find the light by name, and copy the new parameters.
+  for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
+  {
+    if (this->dataPtr->sceneMsg.light(i).name() == _msg->name())
+    {
+      lightExists = true;
+      this->dataPtr->sceneMsg.mutable_light(i)->MergeFrom(*_msg);
+
+      sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("light");
+      while (childElem && childElem->Get<std::string>("name") != _msg->name())
+        childElem = childElem->GetNextElement("light");
+      if (childElem)
+        msgs::LightToSDF(*_msg, childElem);
+      break;
+    }
+  }
+
+  // Add a new light if the light doesn't exist.
+  if (!lightExists)
+  {
+    this->dataPtr->sceneMsg.add_light()->CopyFrom(*_msg);
+
+    // add to the world sdf
+    sdf::ElementPtr lightSDF = msgs::LightToSDF(*_msg);
+    lightSDF->SetParent(this->dataPtr->sdf);
+    lightSDF->GetParent()->InsertElement(lightSDF);
+  }
+}
+
+/////////////////////////////////////////////////
+msgs::Scene World::GetSceneMsg() const
+{
+  return this->dataPtr->sceneMsg;
+}
+
+/////////////////////////////////////////////////
+boost::mutex *World::GetSetWorldPoseMutex() const
+{
+  return this->dataPtr->setWorldPoseMutex;
+}
+
+/////////////////////////////////////////////////
+bool World::GetEnablePhysicsEngine()
+{
+  return this->dataPtr->enablePhysicsEngine;
+}
+
+/////////////////////////////////////////////////
+void World::EnablePhysicsEngine(bool _enable)
+{
+  this->dataPtr->enablePhysicsEngine = _enable;
 }

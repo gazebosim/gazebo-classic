@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,16 @@
 */
 #include <math.h>
 
-#include "rendering/ogre_gazebo.h"
+#ifdef  __APPLE__
+# include <QtCore/qglobal.h>
+#endif
 
-#include "common/Events.hh"
-#include "common/Color.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderEngine.hh"
@@ -63,7 +67,9 @@ void WindowManager::Fini()
 //////////////////////////////////////////////////
 void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
 {
-  this->windows[_windowId]->removeAllViewports();
+  if (static_cast<unsigned int>(_windowId) < this->windows.size() &&
+      this->windows[_windowId])
+    this->windows[_windowId]->removeAllViewports();
   _camera->SetRenderTarget(this->windows[_windowId]);
 }
 
@@ -76,9 +82,22 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   Ogre::NameValuePairList params;
   Ogre::RenderWindow *window = NULL;
 
+#ifdef Q_OS_MAC
+  params["externalWindowHandle"] = _ogreHandle;
+#else
   params["parentWindowHandle"] = _ogreHandle;
+#endif
   params["externalGLControl"] = true;
   params["FSAA"] = "4";
+  params["stereoMode"] = "Frame Sequential";
+
+  // Set the macAPI for Ogre based on the Qt implementation
+#ifdef QT_MAC_USE_COCOA
+  params["macAPI"] = "cocoa";
+  params["macAPICocoaUseNSView"] = "true";
+#else
+  params["macAPI"] = "carbon";
+#endif
 
   std::ostringstream stream;
   stream << "OgreWindow(" << windowCounter++ << ")";

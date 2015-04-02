@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,11 @@
 #include <string>
 #include <vector>
 
-#include "sdf/sdf.hh"
-#include "physics/State.hh"
-#include "physics/ModelState.hh"
+#include <sdf/sdf.hh>
+
+#include "gazebo/physics/State.hh"
+#include "gazebo/physics/ModelState.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -41,7 +43,7 @@ namespace gazebo
     /// Instances of this class contain the state of a World at a specific
     /// time. World state includes the state of all models, and their
     /// children.
-    class WorldState : public State
+    class GAZEBO_VISIBLE WorldState : public State
     {
       /// \brief Default constructor
       public: WorldState();
@@ -61,6 +63,12 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~WorldState();
 
+      /// \brief Load from a World pointer.
+      ///
+      /// Generate a WorldState from an instance of a World.
+      /// \param[in] _world Pointer to a world
+      public: void Load(const WorldPtr _world);
+
       /// \brief Load state from SDF element.
       ///
       /// Set a WorldState from an SDF element containing WorldState info.
@@ -71,24 +79,21 @@ namespace gazebo
       /// \param[in] _world Pointer to the world.
       public: void SetWorld(const WorldPtr _world);
 
+      /// \brief Get model states based on a regular expression.
+      /// \param[in] _regex The regular expression.
+      /// \return List of model states whose names match the regular
+      /// expression.
+      public: ModelState_M GetModelStates(const boost::regex &_regex) const;
+
       /// \brief Get the model states.
       /// \return A vector of model states.
-      public: const std::vector<ModelState> &GetModelStates() const;
+      public: const ModelState_M &GetModelStates() const;
 
       /// \brief Get the number of model states.
       ///
       /// Returns the number of models in this instance.
       /// \return Number of models.
       public: unsigned int GetModelStateCount() const;
-
-      /// \brief Get a model state.
-      ///
-      /// Get the state of a Model based on an index. The min index is
-      /// and the max is WorldState::GetModelStateCount().
-      ///
-      /// \param[in] _index Index of the model.
-      /// \return State of the requested Model.
-      public: ModelState GetModelState(unsigned int _index) const;
 
       /// \brief Get a model state by model name.
       /// \param[in] _modelName Name of the model state to get.
@@ -112,6 +117,19 @@ namespace gazebo
       /// \param[out] _sdf SDF element to populate.
       public: void FillSDF(sdf::ElementPtr _sdf);
 
+      /// \brief Set the wall time when this state was generated
+      /// \param[in] _time The absolute clock time when the State
+      /// data was recorded.
+      public: virtual void SetWallTime(const common::Time &_time);
+
+      /// \brief Set the real time when this state was generated
+      /// \param[in] _time Clock time since simulation was stated.
+      public: virtual void SetRealTime(const common::Time &_time);
+
+      /// \brief Set the sim time when this state was generated
+      /// \param[in] _time Simulation time when the data was recorded.
+      public: virtual void SetSimTime(const common::Time &_time);
+
       /// \brief Assignment operator
       /// \param[in] _state State value
       /// \return Reference to this
@@ -131,55 +149,54 @@ namespace gazebo
       /// \param[in] _out output stream
       /// \param[in] _state World state to output
       /// \return the stream
-      public: friend std::ostream &operator<<(std::ostream &_out,
-                                 const gazebo::physics::WorldState &_state)
+      public: inline friend std::ostream &operator<<(std::ostream &_out,
+                  const gazebo::physics::WorldState &_state)
       {
-        _out << "<state world_name='" << _state.name << "'>\n";
-        _out << "  <sim_time>" << _state.simTime << "</sim_time>\n";
-        _out << "  <wall_time>" << _state.wallTime << "</wall_time>\n";
-        _out << "  <real_time>" << _state.realTime << "</real_time>\n";
+        _out << "<state world_name='" << _state.name << "'>"
+          << "<sim_time>" << _state.simTime << "</sim_time>"
+          << "<wall_time>" << _state.wallTime << "</wall_time>"
+          << "<real_time>" << _state.realTime << "</real_time>";
 
         // List all of the inserted models
         if (_state.insertions.size() > 0)
         {
-          _out << "  <insertions>\n";
+          _out << "<insertions>";
           for (std::vector<std::string>::const_iterator iter =
                _state.insertions.begin();
                iter != _state.insertions.end(); ++iter)
           {
-            _out << *iter << "\n";
+            _out << *iter;
           }
-          _out << "  </insertions>\n";
+          _out << "</insertions>";
         }
 
         // List all of the deleted models
         if (_state.deletions.size() > 0)
         {
-          _out << "  <deletions>\n";
+          _out << "<deletions>";
           for (std::vector<std::string>::const_iterator iter =
                _state.deletions.begin();
                iter != _state.deletions.end(); ++iter)
           {
-            _out << "    <name>" << (*iter) << "</name>\n";
+            _out << "<name>" << (*iter) << "</name>";
           }
-          _out << "  </deletions>\n";
+          _out << "</deletions>";
         }
 
         // List the model states
-        for (std::vector<ModelState>::const_iterator iter =
-            _state.modelStates.begin(); iter != _state.modelStates.end();
-            ++iter)
+        for (ModelState_M::const_iterator iter = _state.modelStates.begin();
+            iter != _state.modelStates.end(); ++iter)
         {
-          _out << *iter;
+          _out << iter->second;
         }
 
-        _out << "</state>\n";
+        _out << "</state>";
 
         return _out;
       }
 
       /// \brief State of all the models.
-      private: std::vector<ModelState> modelStates;
+      private: ModelState_M modelStates;
 
       /// \brief List of new added models. The
       /// value is the SDF that describes the model.

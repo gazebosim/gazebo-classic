@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ BulletRayShape::BulletRayShape(PhysicsEnginePtr _physicsEngine)
   this->SetName("Bullet Ray Shape");
 
   this->physicsEngine =
-    boost::shared_static_cast<BulletPhysics>(_physicsEngine);
+    boost::static_pointer_cast<BulletPhysics>(_physicsEngine);
 }
 
 //////////////////////////////////////////////////
@@ -46,7 +46,7 @@ BulletRayShape::BulletRayShape(CollisionPtr _parent)
     : RayShape(_parent)
 {
   this->SetName("Bullet Ray Shape");
-  this->physicsEngine = boost::shared_static_cast<BulletPhysics>(
+  this->physicsEngine = boost::static_pointer_cast<BulletPhysics>(
       this->collisionParent->GetWorld()->GetPhysicsEngine());
 }
 
@@ -61,7 +61,7 @@ void BulletRayShape::Update()
   if (this->collisionParent)
   {
     BulletCollisionPtr collision =
-      boost::shared_static_cast<BulletCollision>(this->collisionParent);
+        boost::static_pointer_cast<BulletCollision>(this->collisionParent);
 
     LinkPtr link = this->collisionParent->GetLink();
     GZ_ASSERT(link != NULL, "Bullet link is NULL");
@@ -79,6 +79,8 @@ void BulletRayShape::Update()
       this->globalEndPos.z);
 
   btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
+  rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
+  rayCallback.m_collisionFilterMask = ~GZ_SENSOR_COLLIDE;
 
   boost::recursive_mutex::scoped_lock lock(
       *this->physicsEngine->GetPhysicsUpdateMutex());
@@ -101,7 +103,22 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
   _dist = 0;
   _entity = "";
 
-  if (this->physicsEngine && this->collisionParent)
+  if (this->collisionParent)
+  {
+    BulletCollisionPtr collision =
+        boost::static_pointer_cast<BulletCollision>(this->collisionParent);
+
+    LinkPtr link = this->collisionParent->GetLink();
+    GZ_ASSERT(link != NULL, "Bullet link is NULL");
+
+    this->globalStartPos = link->GetWorldPose().CoordPositionAdd(
+          this->relativeStartPos);
+
+    this->globalEndPos = link->GetWorldPose().CoordPositionAdd(
+          this->relativeEndPos);
+  }
+
+  if (this->physicsEngine)
   {
     btVector3 start(this->globalStartPos.x, this->globalStartPos.y,
         this->globalStartPos.z);
@@ -109,6 +126,8 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
         this->globalEndPos.z);
 
     btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
+    rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
+    rayCallback.m_collisionFilterMask = ~GZ_SENSOR_COLLIDE;
     this->physicsEngine->GetDynamicsWorld()->rayTest(
         start, end, rayCallback);
     if (rayCallback.hasHit())
@@ -121,7 +140,7 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
       BulletLink *link = static_cast<BulletLink *>(
           rayCallback.m_collisionObject->getUserPointer());
       GZ_ASSERT(link != NULL, "Bullet link is NULL");
-      _entity = link->GetName();
+      _entity = link->GetScopedName();
     }
   }
 }

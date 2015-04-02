@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,11 @@
 #define PTZINTERFACE_HH
 
 #include "GazeboInterface.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
-  class recursive_mutex;
+  class GAZEBO_VISIBLE recursive_mutex;
 }
 
 namespace libgazebo
@@ -36,10 +37,10 @@ namespace libgazebo
   /// \defgroup ptz_player PTZ Interface
   /// \brief Interface for controling a ptz
   /// \{
-  class PTZIface;
+  class GAZEBO_VISIBLE PTZIface;
 
   /// \brief PTZ Interface
-  class PTZInterface : public GazeboInterface
+  class GAZEBO_VISIBLE PTZInterface : public GazeboInterface
   {
     /// \brief Constructor
     public: PTZInterface(player_devaddr_t addr, GazeboDriver *driver,

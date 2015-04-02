@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,11 @@
  *
 */
 #include <boost/bind.hpp>
-#include "gazebo/physics/physics.hh"
-#include "gazebo/gazebo.hh"
+#include <gazebo/gazebo.hh>
+#include <gazebo/physics/physics.hh>
+#include <gazebo/common/common.hh>
+#include <stdio.h>
 
-/// \example examples/plugins/model_push.cc
-/// This example creates a ModelPlugin, and applies a force to a box to move
-/// it alone the ground plane.
 namespace gazebo
 {
   class ModelPush : public ModelPlugin
@@ -32,15 +31,15 @@ namespace gazebo
 
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
-      this->updateConnection = event::Events::ConnectWorldUpdateStart(
-          boost::bind(&ModelPush::OnUpdate, this));
+      this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+          boost::bind(&ModelPush::OnUpdate, this, _1));
     }
 
     // Called by the world update start event
-    public: void OnUpdate()
+    public: void OnUpdate(const common::UpdateInfo & /*_info*/)
     {
       // Apply a small linear velocity to the model.
-      this->model->SetLinearVel(math::Vector3(.03, 0, 0));
+      this->model->SetLinearVel(math::Vector3(.3, 0, 0));
     }
 
     // Pointer to the model

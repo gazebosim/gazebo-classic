@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<rule version="1">
+  <pattern>boost :: shared_[a-z]+_cast</pattern>
+  <message>
+    <id>deprecatedBoostFunction</id>
+    <severity>warning</severity>
+    <summary>
+      Calling a deprecated function, boost::shared_dynamic_cast or 
+      boost::shared_static_cast. Use boost::dynamic_pointer_cast or
+      boost::static_pointer_cast instead.
+    </summary>
+  </message>
+</rule>

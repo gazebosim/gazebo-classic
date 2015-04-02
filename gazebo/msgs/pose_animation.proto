@@ -11,8 +11,7 @@ import "time.proto";
 message PoseAnimation
 {
   required string model_name      = 1;
-  repeated Pose pose              = 2;
-  repeated Time time              = 3;
+  optional uint32 model_id        = 2;
+  repeated Pose pose              = 3;
+  repeated Time time              = 4;
 }
-
-

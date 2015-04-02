@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -237,7 +237,7 @@ void DeferredLight::CreateCone(float _radius, float _height,
         Ogre::Vector3(-_radius, 0, -_radius),
         Ogre::Vector3(_radius, _height, _radius)));
 
-  this->radius = radius;
+  this->radius = _radius;
   this->ignoreWorld = false;
 }
 

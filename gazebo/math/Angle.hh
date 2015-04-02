@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Angle class
- * Author: Nate Koenig
- * Date: 18 Aug 2008
- */
 
 #ifndef _ANGLE_HH_
 #define _ANGLE_HH_
 
 #include <math.h>
 #include <iostream>
+#include "gazebo/util/system.hh"
 
 /// \brief Macro that converts radians to degrees
 /// \param[in] radians
@@ -52,8 +49,20 @@ namespace gazebo
 
   /// \class Angle Angle.hh math/gzmath.hh
   /// \brief An angle and related functions.
-  class Angle
+  class GAZEBO_VISIBLE Angle
   {
+    /// \brief math::Angle(0)
+    public: static const Angle Zero;
+
+    /// \brief math::Angle(M_PI)
+    public: static const Angle Pi;
+
+    /// \brief math::Angle(M_PI * 0.5)
+    public: static const Angle HalfPi;
+
+    /// \brief math::Angle(M_PI * 2)
+    public: static const Angle TwoPi;
+
     /// \brief Constructor
     public: Angle();
 

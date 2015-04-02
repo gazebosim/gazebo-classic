@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,16 @@ void RegisterCameraSensor();
 void RegisterContactSensor();
 void RegisterDepthCameraSensor();
 void RegisterMultiCameraSensor();
-// void RegisterGpuRaySensor();
+void RegisterGpsSensor();
+void RegisterGpuRaySensor();
 void RegisterImuSensor();
 void RegisterRaySensor();
 void RegisterRFIDSensor();
 void RegisterRFIDTag();
+void RegisterSonarSensor();
+void RegisterForceTorqueSensor();
+void RegisterWirelessTransmitter();
+void RegisterWirelessReceiver();
 
 using namespace gazebo;
 using namespace sensors;
@@ -46,11 +51,16 @@ void SensorFactory::RegisterAll()
   RegisterContactSensor();
   RegisterDepthCameraSensor();
   RegisterMultiCameraSensor();
-  // RegisterGpuRaySensor();
+  RegisterGpsSensor();
+  RegisterGpuRaySensor();
   RegisterImuSensor();
   RegisterRaySensor();
   RegisterRFIDSensor();
   RegisterRFIDTag();
+  RegisterSonarSensor();
+  RegisterForceTorqueSensor();
+  RegisterWirelessTransmitter();
+  RegisterWirelessReceiver();
 }
 
 /////////////////////////////////////////////////

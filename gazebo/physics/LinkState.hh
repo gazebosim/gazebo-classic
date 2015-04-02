@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,12 @@
 #include <vector>
 #include <string>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/CollisionState.hh"
 #include "gazebo/math/Pose.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -44,10 +46,20 @@ namespace gazebo
     ///
     /// State of a Link includes the state of itself all its child Collision
     /// entities.
-    class LinkState : public State
+    class GAZEBO_VISIBLE LinkState : public State
     {
       /// \brief Default constructor
       public: LinkState();
+
+      /// \brief Constructor
+      ///
+      /// Build a LinkState from an existing Link.
+      /// \param[in] _model Pointer to the Link from which to gather state
+      /// info.
+      /// \param[in] _realTime Real time stamp.
+      /// \param[in] _simTime Sim time stamp
+      public: LinkState(const LinkPtr _link, const common::Time &_realTime,
+                  const common::Time &_simTime);
 
       /// \brief Constructor
       ///
@@ -64,6 +76,16 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~LinkState();
+
+      /// \brief Load a LinkState from a Link pointer.
+      ///
+      /// Build a LinkState from an existing Link.
+      /// \param[in] _model Pointer to the Link from which to gather state
+      /// info.
+      /// \param[in] _realTime Real time stamp.
+      /// \param[in] _simTime Sim time stamp
+      public: void Load(const LinkPtr _link, const common::Time &_realTime,
+                  const common::Time &_simTime);
 
       /// \brief Load state from SDF element.
       ///
@@ -124,6 +146,19 @@ namespace gazebo
       /// \param[out] _sdf SDF element to populate.
       public: void FillSDF(sdf::ElementPtr _sdf);
 
+      /// \brief Set the wall time when this state was generated
+      /// \param[in] _time The absolute clock time when the State
+      /// data was recorded.
+      public: virtual void SetWallTime(const common::Time &_time);
+
+      /// \brief Set the real time when this state was generated
+      /// \param[in] _time Clock time since simulation was stated.
+      public: virtual void SetRealTime(const common::Time &_time);
+
+      /// \brief Set the sim time when this state was generated
+      /// \param[in] _time Simulation time when the data was recorded.
+      public: virtual void SetSimTime(const common::Time &_time);
+
       /// \brief Assignment operator
       /// \param[in] _state State value
       /// \return this
@@ -143,24 +178,44 @@ namespace gazebo
       /// \param[in] _out output stream
       /// \param[in] _state Link state to output
       /// \return the stream
-      public: friend std::ostream &operator<<(std::ostream &_out,
-                                     const gazebo::physics::LinkState &_state)
+      public: inline friend std::ostream &operator<<(std::ostream &_out,
+                  const gazebo::physics::LinkState &_state)
       {
-        _out << "    <link name='" << _state.name << "'>\n";
-        _out << "      <pose>" << _state.pose << "</pose>\n";
-        _out << "      <velocity>" << _state.velocity << "</velocity>\n";
-        _out << "      <acceleration>" << _state.acceleration
-             << "</acceleration>\n";
-        _out << "      <wrench>" << _state.wrench << "</wrench>\n";
+        math::Vector3 q(_state.pose.rot.GetAsEuler());
+        _out << std::fixed <<std::setprecision(5)
+          << "<link name='" << _state.name << "'>"
+          << "<pose>"
+          << _state.pose.pos.x << " "
+          << _state.pose.pos.y << " "
+          << _state.pose.pos.z << " "
+          << q.x << " "
+          << q.y << " "
+          << q.z << " "
+          << "</pose>";
 
-        for (std::vector<CollisionState>::const_iterator iter =
-             _state.collisionStates.begin();
-             iter != _state.collisionStates.end(); ++iter)
-        {
-          _out << *iter;
-        }
+        /// Disabling this for efficiency.
+        q = _state.velocity.rot.GetAsEuler();
+         _out << std::fixed <<std::setprecision(4)
+           << "<velocity>"
+           << _state.velocity.pos.x << " "
+           << _state.velocity.pos.y << " "
+           << _state.velocity.pos.z << " "
+           << q.x << " "
+           << q.y << " "
+           << q.z << " "
+           << "</velocity>";
+        // << "<acceleration>" << _state.acceleration << "</acceleration>"
+        // << "<wrench>" << _state.wrench << "</wrench>";
 
-        _out << "    </link>\n";
+        /// Disabling this for efficiency.
+        // for (std::vector<CollisionState>::const_iterator iter =
+        //      _state.collisionStates.begin();
+        //      iter != _state.collisionStates.end(); ++iter)
+        // {
+        //   _out << *iter;
+        // }
+
+        _out << "</link>";
 
         return _out;
       }

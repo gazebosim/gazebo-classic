@@ -36,6 +36,7 @@ namespace SkyX
       , mMoonHaloIntensity(0.4f)
       , mMoonHaloStrength(0.9f)
       , mMoonMaterial(Ogre::MaterialPtr())
+      , mVisible(true)
   {
   }
 

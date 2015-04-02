@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@
 
 #include <string>
 #include "player.h"
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 /// \addtogroup player
 /// \brief Base class for all the player interfaces
@@ -33,7 +34,7 @@
 class GazeboDriver;
 
 /// \brief Base class for all the player interfaces
-class GazeboInterface
+class GAZEBO_VISIBLE GazeboInterface
 {
   /// \brief Constructor
   public: GazeboInterface(player_devaddr_t _addr, GazeboDriver *_driver,

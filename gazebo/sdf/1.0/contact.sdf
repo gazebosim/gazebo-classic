@@ -1,6 +1,0 @@
-<element name="contact" required="0">
-  <element name="collision" required="1">
-    <attribute name="name" type="string" default="__default__" required="1"/>
-  </element> <!-- End Collision -->
-  <element name="topic" type="string" default="__default_topic__" required="1"/>
-</element> <!-- End Contact -->

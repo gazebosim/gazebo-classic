@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,10 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
 
+#include "gazebo/gui/KeyEventHandler.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 
 using namespace gazebo;
@@ -30,14 +32,20 @@ using namespace gui;
 /////////////////////////////////////////////////
 ModelRightMenu::ModelRightMenu()
 {
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-  this->requestSub = this->node->Subscribe("~/request",
-      &ModelRightMenu::OnRequest, this);
+  KeyEventHandler::Instance()->AddReleaseFilter("ModelRightMenu",
+        boost::bind(&ModelRightMenu::OnKeyRelease, this, _1));
 
   this->moveToAct = new QAction(tr("Move To"), this);
   this->moveToAct->setStatusTip(tr("Move camera to the selection"));
   connect(this->moveToAct, SIGNAL(triggered()), this, SLOT(OnMoveTo()));
+
+  this->followAct = new QAction(tr("Follow"), this);
+  this->followAct->setStatusTip(tr("Follow the selection"));
+  connect(this->followAct, SIGNAL(triggered()), this, SLOT(OnFollow()));
+
+  this->editAct = new QAction(tr("Edit model"), this);
+  this->editAct->setStatusTip(tr("Open on Model Editor"));
+  connect(this->editAct, SIGNAL(triggered()), this, SLOT(OnEdit()));
 
   // \todo Reimplement
   // this->snapBelowAct = new QAction(tr("Snap"), this);
@@ -56,6 +64,13 @@ ModelRightMenu::ModelRightMenu()
   ViewState *state = new ViewState(this, "set_transparent", "set_opaque");
   state->action = new QAction(tr("Transparent"), this);
   state->action->setStatusTip(tr("Make model transparent"));
+  state->action->setCheckable(true);
+  connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
+  this->viewStates.push_back(state);
+
+  state = new ViewState(this, "set_wireframe", "set_solid");
+  state->action = new QAction(tr("Wireframe"), this);
+  state->action->setStatusTip(tr("Wireframe mode"));
   state->action->setCheckable(true);
   connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
   this->viewStates.push_back(state);
@@ -81,16 +96,43 @@ ModelRightMenu::ModelRightMenu()
   connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
   this->viewStates.push_back(state);
 
-  // \todo Reimplement
-  // this->followAction = new QAction(tr("Follow"), this);
-  // this->followAction->setStatusTip(tr("Follow the selection"));
-  // connect(this->followAction, SIGNAL(triggered()), this, SLOT(OnFollow()));
+  state = new ViewState(this, "show_inertia", "hide_inertia");
+  state->action = new QAction(tr("Inertia"), this);
+  state->action->setStatusTip(tr("Show moments of inertia"));
+  state->action->setCheckable(true);
+  connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
+  this->viewStates.push_back(state);
 
+  // \todo Reimplement
   // this->skeletonAction = new QAction(tr("Skeleton"), this);
   // this->skeletonAction->setStatusTip(tr("Show model skeleton"));
   // this->skeletonAction->setCheckable(true);
   // connect(this->skeletonAction, SIGNAL(triggered()), this,
   //         SLOT(OnSkeleton()));
+}
+
+//////////////////////////////////////////////////
+bool ModelRightMenu::Init()
+{
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->requestSub = this->node->Subscribe("~/request",
+      &ModelRightMenu::OnRequest, this);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool ModelRightMenu::OnKeyRelease(const common::KeyEvent &_event)
+{
+  if (_event.key == Qt::Key_Escape)
+  {
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+    cam->TrackVisual("");
+    gui::Events::follow("");
+  }
+
+  return false;
 }
 
 /////////////////////////////////////////////////
@@ -100,35 +142,59 @@ ModelRightMenu::~ModelRightMenu()
 }
 
 /////////////////////////////////////////////////
-void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
+void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
+    EntityTypes _type)
 {
   this->modelName = _modelName.substr(0, _modelName.find("::"));
 
   QMenu menu;
+
   menu.addAction(this->moveToAct);
-  // menu.addAction(this->snapBelowAct);
+  menu.addAction(this->followAct);
 
-  // Create the view menu
-  QMenu *viewMenu = menu.addMenu(tr("View"));
-  for (std::vector<ViewState*>::iterator iter = this->viewStates.begin();
-       iter != this->viewStates.end(); ++iter)
+  if (_type == EntityTypes::MODEL)
   {
-    viewMenu->addAction((*iter)->action);
+    // disable editing planes for now
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+    rendering::ScenePtr scene = cam->GetScene();
+    rendering::VisualPtr vis = scene->GetVisual(this->modelName);
+    if (vis && !vis->IsPlane())
+    {
+      menu.addSeparator();
+      menu.addAction(this->editAct);
+      menu.addSeparator();
+    }
 
-    std::map<std::string, bool>::iterator modelIter =
-      (*iter)->modelStates.find(this->modelName);
+    // menu.addAction(this->snapBelowAct);
 
-    if (modelIter == (*iter)->modelStates.end())
-      (*iter)->action->setChecked((*iter)->globalEnable);
-    else
-      (*iter)->action->setChecked(modelIter->second);
+    // Create the view menu
+    QMenu *viewMenu = menu.addMenu(tr("View"));
+    for (std::vector<ViewState*>::iterator iter = this->viewStates.begin();
+         iter != this->viewStates.end(); ++iter)
+    {
+      viewMenu->addAction((*iter)->action);
+
+      std::map<std::string, bool>::iterator modelIter =
+        (*iter)->modelStates.find(this->modelName);
+
+      if (modelIter == (*iter)->modelStates.end())
+        (*iter)->action->setChecked((*iter)->globalEnable);
+      else
+        (*iter)->action->setChecked(modelIter->second);
+    }
+  }
+
+  if (g_copyAct && g_pasteAct)
+  {
+    menu.addSeparator();
+    menu.addAction(g_copyAct);
+    menu.addAction(g_pasteAct);
   }
 
   menu.addSeparator();
   menu.addAction(g_deleteAct);
 
   // \todo Reimplement these features.
-  // menu.addAction(this->followAction);
   // menu.addAction(this->skeletonAction);
 
   menu.exec(_pt);
@@ -139,6 +205,21 @@ void ModelRightMenu::OnMoveTo()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
   cam->MoveToVisual(this->modelName);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnFollow()
+{
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  cam->TrackVisual(this->modelName);
+  gui::Events::follow(this->modelName);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnEdit()
+{
+  g_editModelAct->trigger();
+  gui::Events::editModel(this->modelName);
 }
 
 /////////////////////////////////////////////////
@@ -257,11 +338,4 @@ void ViewState::Callback()
 //   }
 //
 //   this->requestPub->Publish(*this->requestMsg);
-// }
-
-/////////////////////////////////////////////////
-// void ModelRightMenu::OnFollow()
-// {
-//   rendering::UserCameraPtr cam = gui::get_active_camera();
-//   cam->TrackVisual(this->modelName);
 // }

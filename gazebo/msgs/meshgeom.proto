@@ -9,8 +9,8 @@ import "vector3d.proto";
 
 message MeshGeom
 {
-  required string filename  = 1;
-  optional Vector3d scale    = 2;
+  required string filename = 1;
+  optional Vector3d scale  = 2;
+  optional string submesh  = 3;
+  optional bool center_submesh = 4;
 }
-
-

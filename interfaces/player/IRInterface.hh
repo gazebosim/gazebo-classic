@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #define IRINTERFACE_HH
 
 #include "GazeboInterface.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
@@ -40,7 +41,7 @@ namespace libgazebo
 class IRIface;
 
 /// \brief Plugin Player interface for a Gazebo laser
-class IRInterface : public GazeboInterface
+class GAZEBO_VISIBLE IRInterface : public GazeboInterface
 {
   /// \brief Constructor
   /// \param addr Plaer device address

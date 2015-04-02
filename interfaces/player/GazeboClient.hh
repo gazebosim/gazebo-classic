@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@
 
 #include <string>
 
+#include "gazebo/util/system.hh"
+
 /// \addtogroup player
 /// \brief Gazebo client handler
 /// \{
@@ -33,7 +35,7 @@
 /// This class handles the Gazebo client object, and acts as a shared
 /// data-structure for all Gazebo related drivers.  Note that there
 /// can only be one instance of this class (it is entirely static).
-class GazeboClient
+class GAZEBO_VISIBLE GazeboClient
 {
   /// \brief Initialize
   public: static void Init(int _serverid, const std::string &_worldName);

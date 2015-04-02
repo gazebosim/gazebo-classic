@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,31 @@ ModelState::ModelState()
 }
 
 /////////////////////////////////////////////////
+ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
+    const common::Time &_simTime)
+: State(_model->GetName(), _realTime, _simTime)
+{
+  this->pose = _model->GetWorldPose();
+
+  // Copy all the links
+  const Link_V links = _model->GetLinks();
+  for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
+  {
+    this->linkStates.insert(std::make_pair((*iter)->GetName(),
+          LinkState(*iter, _realTime, _simTime)));
+  }
+
+  // Copy all the joints
+  /*const Joint_V joints = _model->GetJoints();
+  for (Joint_V::const_iterator iter = joints.begin();
+       iter != joints.end(); ++iter)
+  {
+    this->jointStates.insert(std::make_pair((*iter)->GetName(),
+          JointState(*iter, _realTime, _simTime)));
+  }*/
+}
+
+/////////////////////////////////////////////////
 ModelState::ModelState(const ModelPtr _model)
 : State(_model->GetName(), _model->GetWorld()->GetRealTime(),
         _model->GetWorld()->GetSimTime())
@@ -41,16 +66,18 @@ ModelState::ModelState(const ModelPtr _model)
   const Link_V links = _model->GetLinks();
   for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
   {
-    this->linkStates.push_back(LinkState((*iter)));
+    this->linkStates.insert(std::make_pair((*iter)->GetName(),
+          LinkState((*iter))));
   }
 
   // Copy all the joints
-  const Joint_V joints = _model->GetJoints();
+  /*const Joint_V joints = _model->GetJoints();
   for (Joint_V::const_iterator iter = joints.begin();
        iter != joints.end(); ++iter)
   {
-    this->jointStates.push_back(JointState(*iter));
-  }
+    this->jointStates.insert(std::make_pair((*iter)->GetName(),
+          JointState(*iter)));
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -66,14 +93,62 @@ ModelState::~ModelState()
 }
 
 /////////////////////////////////////////////////
+void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
+    const common::Time &_simTime)
+{
+  this->name = _model->GetName();
+  this->wallTime = common::Time::GetWallTime();
+  this->realTime = _realTime;
+  this->simTime = _simTime;
+  this->pose = _model->GetWorldPose();
+
+  // Load all the links
+  const Link_V links = _model->GetLinks();
+  for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
+  {
+    this->linkStates[(*iter)->GetName()].Load(*iter, _realTime, _simTime);
+  }
+
+  // Remove links that no longer exist. We determine this by check the time
+  // stamp on each link.
+  for (LinkState_M::iterator iter = this->linkStates.begin();
+       iter != this->linkStates.end();)
+  {
+    if (iter->second.GetRealTime() != this->realTime)
+      this->linkStates.erase(iter++);
+    else
+      ++iter;
+  }
+
+  // Copy all the joints
+  /*const Joint_V joints = _model->GetJoints();
+  for (Joint_V::const_iterator iter = joints.begin();
+      iter != joints.end(); ++iter)
+  {
+    this->jointStates[(*iter)->GetName()].Load(*iter, _realTime, _simTime);
+  }
+
+  // Remove joints that no longer exist. We determine this by check the time
+  // stamp on each joint.
+  for (JointState_M::iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end();)
+  {
+    if (iter->second.GetRealTime() != this->realTime)
+      this->jointStates.erase(iter++);
+    else
+      ++iter;
+  }*/
+}
+
+/////////////////////////////////////////////////
 void ModelState::Load(const sdf::ElementPtr _elem)
 {
   // Set the name
-  this->name = _elem->GetValueString("name");
+  this->name = _elem->Get<std::string>("name");
 
   // Set the model pose
   if (_elem->HasElement("pose"))
-    this->pose = _elem->GetValuePose("pose");
+    this->pose = _elem->Get<math::Pose>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 
@@ -85,23 +160,25 @@ void ModelState::Load(const sdf::ElementPtr _elem)
 
     while (childElem)
     {
-      this->linkStates.push_back(LinkState(childElem));
+      this->linkStates.insert(std::make_pair(
+            childElem->Get<std::string>("name"), LinkState(childElem)));
       childElem = childElem->GetNextElement("link");
     }
   }
 
   // Set all the joints
-  this->jointStates.clear();
+  /*this->jointStates.clear();
   if (_elem->HasElement("joint"))
   {
     sdf::ElementPtr childElem = _elem->GetElement("joint");
 
     while (childElem)
     {
-      this->jointStates.push_back(JointState(childElem));
+      this->jointStates.insert(std::make_pair(childElem->Get<std::string>("name"),
+            JointState(childElem)));
       childElem = childElem->GetNextElement("joint");
     }
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -115,17 +192,17 @@ bool ModelState::IsZero() const
 {
   bool result = true;
 
-  for (std::vector<LinkState>::const_iterator iter = this->linkStates.begin();
+  for (LinkState_M::const_iterator iter = this->linkStates.begin();
        iter != this->linkStates.end() && result; ++iter)
   {
-    result = result && (*iter).IsZero();
+    result = result && iter->second.IsZero();
   }
 
-  for (std::vector<JointState>::const_iterator iter = this->jointStates.begin();
+  /*for (JointState_M::const_iterator iter = this->jointStates.begin();
        iter != this->jointStates.end() && result; ++iter)
   {
-    result = result && (*iter).IsZero();
-  }
+    result = result && iter->second.IsZero();
+  }*/
 
   return result && this->pose == math::Pose::Zero;
 }
@@ -137,25 +214,44 @@ unsigned int ModelState::GetLinkStateCount() const
 }
 
 /////////////////////////////////////////////////
-LinkState ModelState::GetLinkState(unsigned int _index) const
+LinkState_M ModelState::GetLinkStates(const boost::regex &_regex) const
 {
-  if (_index < this->linkStates.size())
-    return this->linkStates[_index];
+  LinkState_M result;
 
-  gzthrow("Index is out of range");
-  return LinkState();
+  // Search for matching link names
+  for (LinkState_M::const_iterator iter = this->linkStates.begin();
+       iter != this->linkStates.end(); ++iter)
+  {
+    if (boost::regex_match(iter->first, _regex))
+      result.insert(std::make_pair(iter->first, iter->second));
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+JointState_M ModelState::GetJointStates(const boost::regex &_regex) const
+{
+  JointState_M result;
+
+  // Search for matching link names
+  for (JointState_M::const_iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end(); ++iter)
+  {
+    if (boost::regex_match(iter->second.GetName(), _regex))
+      result.insert(std::make_pair(iter->first, iter->second));
+  }
+
+  return result;
 }
 
 /////////////////////////////////////////////////
 LinkState ModelState::GetLinkState(const std::string &_linkName) const
 {
   // Search for the link name
-  for (std::vector<LinkState>::const_iterator iter = this->linkStates.begin();
-       iter != this->linkStates.end(); ++iter)
-  {
-    if ((*iter).GetName() == _linkName)
-      return *iter;
-  }
+  LinkState_M::const_iterator iter = this->linkStates.find(_linkName);
+  if (iter != this->linkStates.end())
+    return iter->second;
 
   gzthrow("Invalid link name[" + _linkName + "]");
   return LinkState();
@@ -165,18 +261,15 @@ LinkState ModelState::GetLinkState(const std::string &_linkName) const
 bool ModelState::HasLinkState(const std::string &_linkName) const
 {
   // Search for the link name
-  for (std::vector<LinkState>::const_iterator iter = this->linkStates.begin();
-       iter != this->linkStates.end(); ++iter)
-  {
-    if ((*iter).GetName() == _linkName)
-      return true;
-  }
+  LinkState_M::const_iterator iter = this->linkStates.find(_linkName);
+  if (iter != this->linkStates.end())
+    return true;
 
   return false;
 }
 
 /////////////////////////////////////////////////
-const std::vector<LinkState> &ModelState::GetLinkStates() const
+const LinkState_M &ModelState::GetLinkStates() const
 {
   return this->linkStates;
 }
@@ -191,7 +284,11 @@ unsigned int ModelState::GetJointStateCount() const
 JointState ModelState::GetJointState(unsigned int _index) const
 {
   if (_index < this->jointStates.size())
-    return this->jointStates[_index];
+  {
+    JointState_M::const_iterator iter = this->jointStates.begin();
+    std::advance(iter, _index);
+    return iter->second;
+  }
 
   gzthrow("Index is out of range");
   return JointState();
@@ -200,12 +297,9 @@ JointState ModelState::GetJointState(unsigned int _index) const
 /////////////////////////////////////////////////
 JointState ModelState::GetJointState(const std::string &_jointName) const
 {
-  for (std::vector<JointState>::const_iterator iter = this->jointStates.begin();
-       iter != this->jointStates.end(); ++iter)
-  {
-    if ((*iter).GetName() == _jointName)
-      return *iter;
-  }
+  JointState_M::const_iterator iter = this->jointStates.find(_jointName);
+  if (iter != this->jointStates.end())
+    return iter->second;
 
   gzthrow("Invalid joint name[" + _jointName + "]");
   return JointState();
@@ -214,18 +308,16 @@ JointState ModelState::GetJointState(const std::string &_jointName) const
 /////////////////////////////////////////////////
 bool ModelState::HasJointState(const std::string &_jointName) const
 {
-  for (std::vector<JointState>::const_iterator iter = this->jointStates.begin();
-       iter != this->jointStates.end(); ++iter)
-  {
-    if ((*iter).GetName() == _jointName)
-      return true;
-  }
+  JointState_M::const_iterator iter = this->jointStates.find(_jointName);
+  if (iter != this->jointStates.end())
+    return true;
+
 
   return false;
 }
 
 /////////////////////////////////////////////////
-const std::vector<JointState> &ModelState::GetJointStates() const
+const JointState_M &ModelState::GetJointStates() const
 {
   return this->jointStates;
 }
@@ -243,18 +335,18 @@ ModelState &ModelState::operator=(const ModelState &_state)
   this->jointStates.clear();
 
   // Copy the link states.
-  for (std::vector<LinkState>::const_iterator iter =
+  for (LinkState_M::const_iterator iter =
        _state.linkStates.begin(); iter != _state.linkStates.end(); ++iter)
   {
-    this->linkStates.push_back(LinkState(*iter));
+    this->linkStates.insert(std::make_pair(iter->first, iter->second));
   }
 
   // Copy the joint states.
-  for (std::vector<JointState>::const_iterator iter =
-       _state.jointStates.begin(); iter != _state.jointStates.end(); ++iter)
-  {
-    this->jointStates.push_back(JointState(*iter));
-  }
+  // for (JointState_M::const_iterator iter =
+  //     _state.jointStates.begin(); iter != _state.jointStates.end(); ++iter)
+  // {
+  //   this->jointStates.insert(std::make_pair(iter->first, iter->second));
+  // }
 
   return *this;
 }
@@ -269,16 +361,17 @@ ModelState ModelState::operator-(const ModelState &_state) const
   result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
 
   // Insert the link state diffs.
-  for (std::vector<LinkState>::const_iterator iter =
+  for (LinkState_M::const_iterator iter =
        this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
   {
     try
     {
-      if (_state.HasLinkState((*iter).GetName()))
+      if (_state.HasLinkState(iter->second.GetName()))
       {
-        LinkState state = (*iter) - _state.GetLinkState((*iter).GetName());
+        LinkState state = iter->second - _state.GetLinkState(
+            iter->second.GetName());
         if (!state.IsZero())
-          result.linkStates.push_back(state);
+          result.linkStates.insert(std::make_pair(state.GetName(), state));
       }
     }
     catch(common::Exception &)
@@ -289,16 +382,17 @@ ModelState ModelState::operator-(const ModelState &_state) const
   }
 
   // Insert the joint state diffs.
-  for (std::vector<JointState>::const_iterator iter =
+  /*for (JointState_M::const_iterator iter =
        this->jointStates.begin(); iter != this->jointStates.end(); ++iter)
   {
     try
     {
-      if (_state.HasJointState((*iter).GetName()))
+      if (_state.HasJointState(iter->second.GetName()))
       {
-        JointState state = (*iter) - _state.GetJointState((*iter).GetName());
+        JointState state = iter->second -
+          _state.GetJointState(iter->second.GetName());
         if (!state.IsZero())
-          result.jointStates.push_back(state);
+          result.jointStates.insert(std::make_pair(state.GetName(), state));
       }
     }
     catch(common::Exception &)
@@ -306,7 +400,7 @@ ModelState ModelState::operator-(const ModelState &_state) const
       // Ignore exception, which is just the fact that a joint state may not
       // have been recorded.
     }
-  }
+  }*/
 
   return result;
 }
@@ -321,15 +415,16 @@ ModelState ModelState::operator+(const ModelState &_state) const
   result.pose.rot = _state.pose.rot * this->pose.rot;
 
   // Insert the link state diffs.
-  for (std::vector<LinkState>::const_iterator iter =
+  for (LinkState_M::const_iterator iter =
        this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
   {
     try
     {
-      if (_state.HasLinkState((*iter).GetName()))
+      if (_state.HasLinkState(iter->second.GetName()))
       {
-        LinkState state = (*iter) + _state.GetLinkState((*iter).GetName());
-        result.linkStates.push_back(state);
+        LinkState state = iter->second + _state.GetLinkState(
+            iter->second.GetName());
+        result.linkStates.insert(std::make_pair(state.GetName(), state));
       }
     }
     catch(common::Exception &)
@@ -340,15 +435,16 @@ ModelState ModelState::operator+(const ModelState &_state) const
   }
 
   // Insert the joint state diffs.
-  for (std::vector<JointState>::const_iterator iter =
+  for (JointState_M::const_iterator iter =
        this->jointStates.begin(); iter != this->jointStates.end(); ++iter)
   {
     try
     {
-      if (_state.HasJointState((*iter).GetName()))
+      if (_state.HasJointState(iter->second.GetName()))
       {
-        JointState state = (*iter) + _state.GetJointState((*iter).GetName());
-        result.jointStates.push_back(state);
+        JointState state = iter->second +
+          _state.GetJointState(iter->second.GetName());
+        result.jointStates.insert(std::make_pair(state.GetName(), state));
       }
     }
     catch(common::Exception &)
@@ -369,17 +465,71 @@ void ModelState::FillSDF(sdf::ElementPtr _sdf)
   _sdf->GetAttribute("name")->Set(this->name);
   _sdf->GetElement("pose")->Set(this->pose);
 
-  for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
+  for (LinkState_M::iterator iter = this->linkStates.begin();
        iter != this->linkStates.end(); ++iter)
   {
     sdf::ElementPtr elem = _sdf->AddElement("link");
-    (*iter).FillSDF(elem);
+    iter->second.FillSDF(elem);
   }
 
-  for (std::vector<JointState>::iterator iter = this->jointStates.begin();
+  for (JointState_M::iterator iter = this->jointStates.begin();
        iter != this->jointStates.end(); ++iter)
   {
     sdf::ElementPtr elem = _sdf->AddElement("joint");
-    (*iter).FillSDF(elem);
+    iter->second.FillSDF(elem);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelState::SetWallTime(const common::Time &_time)
+{
+  State::SetWallTime(_time);
+
+  for (LinkState_M::iterator iter = this->linkStates.begin();
+       iter != this->linkStates.end(); ++iter)
+  {
+    iter->second.SetWallTime(_time);
+  }
+
+  for (JointState_M::iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end(); ++iter)
+  {
+    iter->second.SetWallTime(_time);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelState::SetRealTime(const common::Time &_time)
+{
+  State::SetRealTime(_time);
+
+  for (LinkState_M::iterator iter = this->linkStates.begin();
+           iter != this->linkStates.end(); ++iter)
+  {
+    iter->second.SetRealTime(_time);
+  }
+
+  for (JointState_M::iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end(); ++iter)
+  {
+    iter->second.SetRealTime(_time);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelState::SetSimTime(const common::Time &_time)
+{
+  State::SetSimTime(_time);
+
+  for (LinkState_M::iterator iter = this->linkStates.begin();
+       iter != this->linkStates.end(); ++iter)
+  {
+    iter->second.SetSimTime(_time);
+  }
+
+  for (JointState_M::iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end(); ++iter)
+  {
+    iter->second.SetSimTime(_time);
   }
 }

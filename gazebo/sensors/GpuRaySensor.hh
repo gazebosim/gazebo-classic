@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,12 @@
 #include <string>
 #include <boost/thread/mutex.hpp>
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
-#include "transport/TransportTypes.hh"
-#include "sensors/Sensor.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -46,7 +47,7 @@ namespace gazebo
     /// This sensor cast rays into the world, tests for intersections, and
     /// reports the range to the nearest object.  It is used by ranging
     /// sensor models (e.g., sonars and scanning laser range finders).
-    class GpuRaySensor: public Sensor
+    class GAZEBO_VISIBLE GpuRaySensor: public Sensor
     {
       /// \brief Constructor
       public: GpuRaySensor();
@@ -58,7 +59,7 @@ namespace gazebo
       /// \param[in] _sdf SDF Sensor parameters
       /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName,
-                                sdf::ElementPtr &_sdf);
+                                sdf::ElementPtr _sdf);
 
       /// \brief Load the sensor with default parameters
       /// \param[in] _worldName Name of world to load from
@@ -67,12 +68,14 @@ namespace gazebo
       /// \brief Initialize the ray
       public: virtual void Init();
 
-      /// \brief Update the sensor information
-      /// \param[in] _force True if update is forced, false if not
-      protected: virtual void UpdateImpl(bool _force);
+      // Documentation inherited
+      protected: virtual bool UpdateImpl(bool _force);
 
       /// \brief Finalize the ray
       protected: virtual void Fini();
+
+      // Documentation inherited
+      public: virtual std::string GetTopic() const;
 
       /// \brief Returns a pointer to the internally kept rendering::GpuLaser
       /// \return Pointer to GpuLaser
@@ -147,6 +150,10 @@ namespace gazebo
       /// \param[in] _angle The Maximum angle of the scan block
       public: void SetVerticalAngleMax(double _angle);
 
+      /// \brief Get the vertical angle in radians between each range
+      /// \return Resolution of the angle
+      public: double GetVerticalAngleResolution() const;
+
       /// \brief Get detected range for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
       ///         it's possible that the Ray will update in the middle of
@@ -160,7 +167,7 @@ namespace gazebo
 
       /// \brief Get all the ranges
       /// \param[out] _range A vector that will contain all the range data
-      public: void GetRanges(std::vector<double> &_ranges) const;
+      public: void GetRanges(std::vector<double> &_ranges);
 
       /// \brief Get detected retro (intensity) value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -241,6 +248,12 @@ namespace gazebo
       /// \param[in,out] _conn Connection pointer to disconnect.
       public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn);
 
+      // Documentation inherited
+      public: virtual bool IsActive();
+
+      /// brief Render the camera.
+      private: void Render();
+
       /// \brief Scan SDF elementz.
       protected: sdf::ElementPtr scanElem;
 
@@ -256,33 +269,6 @@ namespace gazebo
       /// \brief Camera SDF element.
       protected: sdf::ElementPtr cameraElem;
 
-      /// \brief Number of cameras.
-      protected: unsigned int cameraCount;
-
-      /// \brief Horizontal field-of-view.
-      protected: double hfov;
-
-      /// \brief Vertical field-of-view.
-      protected: double vfov;
-
-      /// \brief Cos horizontal field-of-view.
-      protected: double chfov;
-
-      /// \brief Cos vertical field-of-view.
-      protected: double cvfov;
-
-      /// \brief Horizontal half angle.
-      protected: double horzHalfAngle;
-
-      /// \brief Vertical half angle.
-      protected: double vertHalfAngle;
-
-      /// \brief Near clip plane.
-      protected: double near;
-
-      /// \brief Far clip plane.
-      protected: double far;
-
       /// \brief Horizontal ray count.
       protected: unsigned int horzRayCount;
 
@@ -295,26 +281,26 @@ namespace gazebo
       /// \brief Vertical range count.
       protected: unsigned int vertRangeCount;
 
-      /// \brief Ray count ratio.
-      protected: double rayCountRatio;
-
       /// \brief Range count ratio.
       protected: double rangeCountRatio;
 
-      /// \brief True if the sensor is horizontal only.
-      protected: bool isHorizontal;
-
       /// \brief GPU laser rendering.
       private: rendering::GpuLaserPtr laserCam;
-
-      /// \brief Pointer to the scene.
-      private: rendering::ScenePtr scene;
 
       /// \brief Mutex to protect getting ranges.
       private: boost::mutex mutex;
 
       /// \brief Laser message to publish data.
-      private: msgs::LaserScan laserMsg;
+      private: msgs::LaserScanStamped laserMsg;
+
+      /// \brief Parent entity of gpu ray sensor
+      private: physics::EntityPtr parentEntity;
+
+      /// \brief Publisher to publish ray sensor data
+      private: transport::PublisherPtr scanPub;
+
+      /// \brief True if the sensor was rendered.
+      private: bool rendered;
     };
     /// \}
   }

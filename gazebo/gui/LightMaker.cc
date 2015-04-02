@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,15 @@
 #include <iostream>
 #include <sstream>
 
-#include "transport/Node.hh"
-#include "gui/GuiEvents.hh"
-#include "common/MouseEvent.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/Light.hh"
-#include "rendering/Scene.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Light.hh"
+#include "gazebo/rendering/Scene.hh"
 
-#include "gui/LightMaker.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/LightMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -49,12 +50,56 @@ LightMaker::LightMaker() : EntityMaker()
 }
 
 /////////////////////////////////////////////////
-void LightMaker::Start(const rendering::UserCameraPtr _camera)
+bool LightMaker::InitFromLight(const std::string & _lightName)
 {
-  this->camera = _camera;
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
-  this->light = new rendering::Light(this->camera->GetScene());
+  if (this->light)
+  {
+    scene->RemoveLight(this->light);
+    this->light.reset();
+  }
+
+  rendering::LightPtr sceneLight = scene->GetLight(_lightName);
+  if (!sceneLight)
+  {
+    gzerr << "Light: '" << _lightName << "' does not exist." << std::endl;
+    return false;
+  }
+
+  this->light = sceneLight->Clone(_lightName + "_clone_tmp", scene);
+
+  if (!this->light)
+  {
+    gzerr << "Unable to clone\n";
+    return false;
+  }
+
+  this->lightTypename =  this->light->GetType();
+  this->light->FillMsg(this->msg);
+
+  std::string newName = _lightName + "_clone";
+  int i = 0;
+  while (scene->GetLight(newName))
+  {
+    newName = _lightName + "_clone_" +
+      boost::lexical_cast<std::string>(i);
+    i++;
+  }
+
+  this->msg.set_name(newName);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool LightMaker::Init()
+{
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+
+  this->light.reset(new rendering::Light(scene));
   this->light->Load();
+  scene->AddLight(this->light);
 
   this->light->SetLightType(this->lightTypename);
   this->light->SetPosition(math::Vector3(0, 0, 1));
@@ -64,15 +109,29 @@ void LightMaker::Start(const rendering::UserCameraPtr _camera)
   std::ostringstream stream;
   stream << "user_" << this->lightTypename << "_light_" << counter++;
   this->msg.set_name(stream.str());
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+void LightMaker::Start(const rendering::UserCameraPtr _camera)
+{
+  if (!this->light)
+    this->Init();
+
+  this->camera = _camera;
   this->state = 1;
 }
 
 /////////////////////////////////////////////////
 void LightMaker::Stop()
 {
-  delete this->light;
-  this->light = NULL;
-
+  if (this->light)
+  {
+    rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+    scene->RemoveLight(this->light);
+    this->light.reset();
+  }
   this->state = 0;
   gui::Events::moveMode(true);
 }
@@ -114,10 +173,7 @@ void LightMaker::OnMouseRelease(const common::MouseEvent &_event)
 // prevent code duplication.
 void LightMaker::OnMouseMove(const common::MouseEvent &_event)
 {
-  math::Vector3 pos = this->light->GetPosition();
-
   math::Vector3 origin1, dir1, p1;
-  math::Vector3 origin2, dir2, p2;
 
   // Cast two rays from the camera into the world
   this->camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
@@ -131,21 +187,20 @@ void LightMaker::OnMouseMove(const common::MouseEvent &_event)
   // Compute two points on the plane. The first point is the current
   // mouse position, the second is the previous mouse position
   p1 = origin1 + dir1 * dist1;
-  pos = p1;
 
   if (!_event.shift)
   {
-    if (ceil(pos.x) - pos.x <= .4)
-      pos.x = ceil(pos.x);
-    else if (pos.x - floor(pos.x) <= .4)
-      pos.x = floor(pos.x);
+    if (ceil(p1.x) - p1.x <= .4)
+      p1.x = ceil(p1.x);
+    else if (p1.x - floor(p1.x) <= .4)
+      p1.x = floor(p1.x);
 
-    if (ceil(pos.y) - pos.y <= .4)
-      pos.y = ceil(pos.y);
-    else if (pos.y - floor(pos.y) <= .4)
-      pos.y = floor(pos.y);
+    if (ceil(p1.y) - p1.y <= .4)
+      p1.y = ceil(p1.y);
+    else if (p1.y - floor(p1.y) <= .4)
+      p1.y = floor(p1.y);
   }
-  pos.z = this->light->GetPosition().z;
+  p1.z = this->light->GetPosition().z;
 
-  this->light->SetPosition(pos);
+  this->light->SetPosition(p1);
 }

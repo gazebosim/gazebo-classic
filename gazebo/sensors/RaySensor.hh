@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,17 @@
  * limitations under the License.
  *
 */
-/* Desc: RaySensor proximity sensor
- * Author: Nate Koenig
- * Date: 23 february 2004
-*/
-
 #ifndef _RAYSENSOR_HH_
 #define _RAYSENSOR_HH_
 
 #include <vector>
 #include <string>
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
-#include "transport/TransportTypes.hh"
-#include "sensors/Sensor.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -49,7 +45,7 @@ namespace gazebo
     /// This sensor cast rays into the world, tests for intersections, and
     /// reports the range to the nearest object.  It is used by ranging
     /// sensor models (e.g., sonars and scanning laser range finders).
-    class RaySensor: public Sensor
+    class GAZEBO_VISIBLE RaySensor: public Sensor
     {
       /// \brief Constructor
       public: RaySensor();
@@ -64,7 +60,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual void UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();
@@ -120,6 +116,10 @@ namespace gazebo
       /// \return The Maximum angle of the scan block
       public: math::Angle GetVerticalAngleMax() const;
 
+      /// \brief Get the vertical angle in radians between each range
+      /// \return Resolution of the angle
+      public: double GetVerticalAngleResolution() const;
+
       /// \brief Get detected range for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
       ///         it's possible that the Ray will update in the middle of
@@ -129,7 +129,7 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Returns DBL_MAX for no detection.
-      public: double GetRange(int _index);
+      public: double GetRange(unsigned int _index);
 
       /// \brief Get all the ranges
       /// \param _ranges A vector that will contain all the range data
@@ -144,7 +144,7 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Retro (intensity) value for ray
-      public: double GetRetro(int _index);
+      public: double GetRetro(unsigned int _index);
 
       /// \brief Get detected fiducial value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -155,7 +155,7 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index value of specific ray
       /// \return Fiducial value
-      public: int GetFiducial(int _index);
+      public: int GetFiducial(unsigned int _index);
 
       /// \brief Returns a pointer to the internal physics::MultiRayShape
       /// \return Pointer to ray shape

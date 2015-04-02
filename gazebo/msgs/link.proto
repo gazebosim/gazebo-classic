@@ -1,11 +1,10 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Link 
+/// \interface Link
 /// \brief Information about a link
 
 
-import "header.proto";
 import "inertial.proto";
 import "collision.proto";
 import "visual.proto";
@@ -15,7 +14,7 @@ import "pose.proto";
 
 message Link
 {
-  required uint32 id            = 1;
+  optional uint32 id            = 1;
   required string name          = 2;
   optional bool self_collide    = 3;
   optional bool gravity         = 4;
@@ -27,5 +26,5 @@ message Link
   repeated Collision collision  = 10;
   repeated Sensor sensor        = 11;
   repeated Projector projector  = 12;
+  optional bool canonical       = 13;
 }
-

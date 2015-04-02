@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,13 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: a test for getting force and torques at joints
- * Author: John Hsu
- */
 
-#include <plugins/ForceTorquePlugin.hh>
+#include "ForceTorquePlugin.hh"
 
-namespace gazebo
-{
-GZ_REGISTER_MODEL_PLUGIN(ForceTorquePlugin)
+using namespace gazebo;
+
+// Register this plugin with the simulator
+GZ_REGISTER_SENSOR_PLUGIN(ForceTorquePlugin)
 
 /////////////////////////////////////////////////
 ForceTorquePlugin::ForceTorquePlugin()
@@ -33,52 +30,26 @@ ForceTorquePlugin::ForceTorquePlugin()
 /////////////////////////////////////////////////
 ForceTorquePlugin::~ForceTorquePlugin()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+  this->parentSensor->DisconnectUpdate(this->connection);
+  this->parentSensor.reset();
 }
 
 /////////////////////////////////////////////////
-void ForceTorquePlugin::Load(physics::ModelPtr _parent,
-                                 sdf::ElementPtr /*_sdf*/)
+void ForceTorquePlugin::Load(sensors::SensorPtr _parent,
+    sdf::ElementPtr /*_sdf*/)
 {
-  //  the world name.
-  this->world = _parent->GetWorld();
-  this->model = _parent;
-  this->joints = this->model->GetJoints();
+  this->parentSensor =
+    boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(_parent);
 
-  // this->world->PhysicsEngine()->SetGravity(math::Vector3(0,0,0));
+  if (!this->parentSensor)
+    gzthrow("ForceTorquePlugin requires a force_torque sensor as its parent.");
 
-  // New Mechanism for Updating every World Cycle
-  // Listen to the update event. This event is broadcast every
-  // simulation iteration.
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&ForceTorquePlugin::UpdateStates, this, _1));
+  this->connection = this->parentSensor->ConnectUpdate(
+        boost::bind(&ForceTorquePlugin::OnUpdate, this, _1));
 }
 
 /////////////////////////////////////////////////
-void ForceTorquePlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
+void ForceTorquePlugin::OnUpdate(msgs::WrenchStamped /*_msg*/)
 {
-  common::Time cur_time = this->world->GetSimTime();
-
-  // convert to joint frame?
-
-  gzdbg << "-----------------------------------------------------\n";
-  for (unsigned int i = 0; i < this->joints.size(); ++i)
-  {
-    if (i < 2)
-      this->joints[i]->SetForce(0, 1.0);
-
-    physics::JointWrench jw = this->joints[i]->GetForceTorque(0);
-    gzdbg << "model [" << this->model->GetName()
-          << "] joint [" << this->joints[i]->GetName()
-          << "] b1f [" << jw.body1Force
-          << "] b1t [" << jw.body1Torque
-          << "] b2f [" << jw.body2Force
-          << "] b2t [" << jw.body2Torque
-          << "] link1f [" << this->joints[i]->GetLinkForce(0)
-          << "] link1t [" << this->joints[i]->GetLinkTorque(0)
-          << "] link2f [" << this->joints[i]->GetLinkForce(1)
-          << "] link2t [" << this->joints[i]->GetLinkTorque(1)
-          << "]\n";
-  }
-}
+  // overload with useful callback here
 }

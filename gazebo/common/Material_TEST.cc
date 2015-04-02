@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,10 +17,13 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/common/Material.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(MaterialTest, Material)
+class MaterialTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(MaterialTest, Material)
 {
   common::Material mat(common::Color(1.0, 0.5, 0.2, 1.0));
   EXPECT_TRUE(mat.GetAmbient() == common::Color(1.0, 0.5, 0.2, 1.0));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@
 
 #include <string>
 #include <iostream>
-#include "common/Color.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
 
     /// \class Material Material.hh common/common.hh
     /// \brief Encapsulates description of a material
-    class Material
+    class GAZEBO_VISIBLE Material
     {
       public: enum ShadeMode {FLAT, GOURAUD, PHONG, BLINN, SHADE_COUNT};
       public: static std::string ShadeModeStr[SHADE_COUNT];

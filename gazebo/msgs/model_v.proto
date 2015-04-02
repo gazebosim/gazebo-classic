@@ -1,7 +1,7 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Entities 
+/// \interface Model_V 
 /// \brief Information about all entities in a world
 
 

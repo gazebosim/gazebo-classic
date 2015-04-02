@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,13 @@
 
 #include <string>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Matrix3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +36,7 @@ namespace gazebo
 
     /// \class Inertial Inertial.hh physics/physics.hh
     /// \brief A class for inertial information about a link
-    class Inertial
+    class GAZEBO_VISIBLE Inertial
     {
       /// \brief Default Constructor
       public: Inertial();
@@ -67,7 +70,7 @@ namespace gazebo
       public: double GetMass() const;
 
       /// \brief Set the mass matrix.
-      /// \param[in] _ixx X second moment of inertia about x axis.
+      /// \param[in] _ixx X second moment of inertia (MOI) about x axis.
       /// \param[in] _iyy Y second moment of inertia about y axis.
       /// \param[in] _izz Z second moment of inertia about z axis.
       /// \param[in] _ixy XY inertia.
@@ -86,22 +89,41 @@ namespace gazebo
       /// \param[in] _center Center of the gravity.
       public: void SetCoG(const math::Vector3 &_center);
 
+      /// \brief Set the center of gravity and rotation offset of inertial
+      ///        coordinate frame relative to Link frame.
+      /// \param[in] _cx Center offset in x-direction in Link frame
+      /// \param[in] _cy Center offset in y-direction in Link frame
+      /// \param[in] _cz Center offset in z-direction in Link frame
+      /// \param[in] _rx Roll angle offset of inertial coordinate frame.
+      /// \param[in] _ry Pitch angle offset of inertial coordinate frame.
+      /// \param[in] _rz Yaw angle offset of inertial coordinate frame.
+      public: void SetCoG(double _cx, double _cy, double _cz,
+                          double _rx, double _ry, double _rz);
+
+      /// \brief Set the center of gravity.
+      /// \param[in] _c Transform to center of gravity.
+      public: void SetCoG(const math::Pose &_c);
+
       /// \brief Get the center of gravity.
       /// \return The center of gravity.
       public: inline const math::Vector3 &GetCoG() const
-              {return this->cog;}
+              {
+                return this->cog.pos;
+              }
 
       /// \brief Get the pose about which the mass and inertia matrix is
       /// specified in the Link frame.
       /// \return The inertial pose.
       public: inline const math::Pose GetPose() const
-              { return math::Pose(this->cog, math::Quaternion());}
+              {
+                return math::Pose(this->cog);
+              }
 
       /// \brief Get the principal moments of inertia (Ixx, Iyy, Izz).
       /// \return The principal moments.
       public: math::Vector3 GetPrincipalMoments() const;
 
-      /// \brief Get the products of inertia (Ixy, Ixy, Iyz).
+      /// \brief Get the products of inertia (Ixy, Ixz, Iyz).
       /// \return The products of inertia.
       public: math::Vector3 GetProductsofInertia() const;
 
@@ -163,6 +185,10 @@ namespace gazebo
       public: Inertial &operator=(const Inertial &_inertial);
 
       /// \brief Addition operator.
+      /// Assuming both CG and Moment of Inertia (MOI) are defined
+      /// in the same reference Link frame.
+      /// New CG is computed from masses and perspective offsets,
+      /// and both MOI contributions relocated to the new cog.
       /// \param[in] _inertial Inertial to add.
       /// \return The result of the addition.
       public: Inertial operator+(const Inertial &_inertial) const;
@@ -175,6 +201,24 @@ namespace gazebo
       /// \brief Update parameters from a message
       /// \param[in] _msg Message to read
       public: void ProcessMsg(const msgs::Inertial &_msg);
+
+      /// \brief Get the equivalent inertia from a point in local Link frame
+      /// If you specify GetMOI(this->GetPose()), you should get
+      /// back the Moment of Inertia (MOI) exactly as specified in the SDF.
+      /// If _pose is different from pose of the Inertial block, then
+      /// the MOI is rotated accordingly, and contributions from changes
+      /// in MOI location location due to point mass is added to the final MOI.
+      /// \param[in] _pose location in Link local frame
+      /// \return equivalent inertia at _pose
+      public: math::Matrix3 GetMOI(const math::Pose &_pose)
+        const;
+
+      /// \brief Get equivalent Inertia values with the Link frame offset,
+      /// while holding the Pose of CoG constant in the world frame.
+      /// \param[in] _frameOffset amount to offset the Link frame by, this
+      /// is a transform defined in the Link frame.
+      /// \return Inertial parameters with the shifted frame.
+      public: Inertial GetInertial(const math::Pose &_frameOffset) const;
 
       /// \brief Output operator.
       /// \param[in] _out Output stream.
@@ -193,16 +237,28 @@ namespace gazebo
                 return _out;
               }
 
+      /// \brief returns Moments of Inertia as a Matrix3
+      /// \return Moments of Inertia as a Matrix3
+      public: math::Matrix3 GetMOI() const;
+
+      /// \brief Sets Moments of Inertia (MOI) from a Matrix3
+      /// \param[in] Moments of Inertia as a Matrix3
+      public: void SetMOI(const math::Matrix3 &_moi);
+
       /// \brief Mass the object. Default is 1.0.
       private: double mass;
 
-      /// \brief Center of gravity. Default is (0.0 0.0 0.0)
-      private: math::Vector3 cog;
+      /// \brief Center of gravity in the Link frame.
+      ///        Default is (0.0 0.0 0.0  0.0 0.0 0.0)
+      private: math::Pose cog;
 
       /// \brief Principal moments of inertia. Default is (1.0 1.0 1.0)
+      /// These Moments of Inertia are specified in the local Inertial frame.
       private: math::Vector3 principals;
 
       /// \brief Product moments of inertia. Default is (0.0 0.0 0.0)
+      /// These MOI off-diagonals are specified in the local Inertial frame.
+      /// Where products.x is Ixy, products.y is Ixz and products.z is Iyz.
       private: math::Vector3 products;
 
       /// \brief Our SDF values.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,9 @@
 
 #include <vector>
 
-#include "math/Vector3.hh"
-#include "math/Matrix4.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Matrix4.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
 
     /// \class Spline Spline.hh math/gzmath.hh
     /// \brief Splines
-    class Spline
+    class GAZEBO_VISIBLE Spline
     {
       /// \brief constructor
       public: Spline();

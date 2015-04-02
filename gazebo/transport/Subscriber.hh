@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "transport/CallbackHelper.hh"
+#include "gazebo/transport/CallbackHelper.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
 
     /// \class Subscriber Subscriber.hh transport/transport.hh
     /// \brief A subscriber to a topic
-    class Subscriber
+    class GAZEBO_VISIBLE Subscriber
     {
       /// \brief Constructor
       /// \param[in] _topic The topic we're subscribing to

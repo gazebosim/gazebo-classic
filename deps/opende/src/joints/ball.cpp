@@ -33,8 +33,9 @@ dxJointBall::dxJointBall( dxWorld *w ) :
 {
     dSetZero( anchor1, 4 );
     dSetZero( anchor2, 4 );
-    erp = world->global_erp;
-    cfm = world->global_cfm;
+    // These are now set in dxJoint constructor
+    // erp = world->global_erp;
+    // cfm = world->global_cfm;
 }
 
 
@@ -56,10 +57,16 @@ dxJointBall::getInfo1( dxJoint::Info1 *info )
 void
 dxJointBall::getInfo2( dxJoint::Info2 *info )
 {
-    info->erp = erp;
-    info->cfm[0] = cfm;
-    info->cfm[1] = cfm;
-    info->cfm[2] = cfm;
+    // If joint values of erp and cfm are negative, then ignore them.
+    // info->erp, info->cfm already have the global values from quickstep
+    if (this->erp >= 0)
+      info->erp = this->erp;
+    if (this->cfm >= 0)
+    {
+      info->cfm[0] = cfm;
+      info->cfm[1] = cfm;
+      info->cfm[2] = cfm;
+    }
     setBall( this, info, anchor1, anchor2 );
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@
  * Date: 21 May 2003
  */
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletBallJoint.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletBallJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -33,7 +34,8 @@ using namespace physics;
 BulletBallJoint::BulletBallJoint(btDynamicsWorld *_world, BasePtr _parent)
     : BallJoint<BulletJoint>(_parent)
 {
-  this->world = _world;
+  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  this->bulletWorld = _world;
   this->bulletBall = NULL;
 }
 
@@ -43,107 +45,146 @@ BulletBallJoint::~BulletBallJoint()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletBallJoint::GetAnchor(int /*_index*/) const
+void BulletBallJoint::Load(sdf::ElementPtr _sdf)
 {
-  return this->anchorPos;
+  BallJoint<BulletJoint>::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::SetAnchor(int /*_index*/,
-                                const math::Vector3 &/*_anchor*/)
+void BulletBallJoint::Init()
 {
-  gzerr << "Not implemented\n";
-}
+  BallJoint<BulletJoint>::Init();
 
-//////////////////////////////////////////////////
-void BulletBallJoint::SetDamping(int /*_index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
-}
-
-//////////////////////////////////////////////////
-void BulletBallJoint::Attach(LinkPtr _one, LinkPtr _two)
-{
-  BallJoint<BulletJoint>::Attach(_one, _two);
-
+  // Cast to BulletLink
   BulletLinkPtr bulletChildLink =
-    boost::shared_static_cast<BulletLink>(this->childLink);
+    boost::static_pointer_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
-    boost::shared_static_cast<BulletLink>(this->parentLink);
+    boost::static_pointer_cast<BulletLink>(this->parentLink);
 
-  if (!bulletChildLink || !bulletParentLink)
-    gzthrow("Requires bullet bodies");
+  // Local variables used to compute pivots and axes in body-fixed frames
+  // for the parent and child links.
+  math::Vector3 pivotParent, pivotChild;
+  math::Pose pose;
 
-  math::Vector3 pivotA, pivotB;
+  // Initialize pivots to anchorPos, which is expressed in the
+  // world coordinate frame.
+  pivotParent = this->anchorPos;
+  pivotChild = this->anchorPos;
 
-  // Compute the pivot point, based on the anchorPos
-  pivotA = this->anchorPos + this->childLink->GetWorldPose().pos
-                           - this->parentLink->GetWorldPose().pos;
-  pivotB = this->anchorPos;
+  // Check if parentLink exists. If not, the parent will be the world.
+  if (this->parentLink)
+  {
+    // Compute relative pose between joint anchor and CoG of parent link.
+    pose = this->parentLink->GetWorldCoGPose();
+    // Subtract CoG position from anchor position, both in world frame.
+    pivotParent -= pose.pos;
+    // Rotate pivot offset and axis into body-fixed frame of parent.
+    pivotParent = pose.rot.RotateVectorReverse(pivotParent);
+  }
+  // Check if childLink exists. If not, the child will be the world.
+  if (this->childLink)
+  {
+    // Compute relative pose between joint anchor and CoG of child link.
+    pose = this->childLink->GetWorldCoGPose();
+    // Subtract CoG position from anchor position, both in world frame.
+    pivotChild -= pose.pos;
+    // Rotate pivot offset and axis into body-fixed frame of child.
+    pivotChild = pose.rot.RotateVectorReverse(pivotChild);
+  }
 
-  this->bulletBall = new btPoint2PointConstraint(
-      *bulletParentLink->GetBulletLink(),
+  // If both links exist, then create a joint between the two links.
+  if (bulletChildLink && bulletParentLink)
+  {
+    this->bulletBall = new btPoint2PointConstraint(
       *bulletChildLink->GetBulletLink(),
-      btVector3(pivotA.x, pivotA.y, pivotA.z),
-      btVector3(pivotB.x, pivotB.y, pivotB.z));
+      *bulletParentLink->GetBulletLink(),
+      BulletTypes::ConvertVector3(pivotChild),
+      BulletTypes::ConvertVector3(pivotParent));
+  }
+  // If only the child exists, then create a joint between the child
+  // and the world.
+  else if (bulletChildLink)
+  {
+    this->bulletBall = new btPoint2PointConstraint(
+      *bulletChildLink->GetBulletLink(),
+      BulletTypes::ConvertVector3(pivotChild));
+  }
+  // If only the parent exists, then create a joint between the parent
+  // and the world.
+  else if (bulletParentLink)
+  {
+    this->bulletBall = new btPoint2PointConstraint(
+      *bulletParentLink->GetBulletLink(),
+      BulletTypes::ConvertVector3(pivotParent));
+  }
+  // Throw an error if no links are given.
+  else
+  {
+    gzthrow("joint without links\n");
+  }
 
   this->constraint = this->bulletBall;
 
   // Add the joint to the world
-  this->world->addConstraint(this->constraint);
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
+  this->bulletWorld->addConstraint(this->constraint);
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);
+
+  // Setup Joint force and torque feedback
+  this->SetupJointFeedback();
+}
+
+//////////////////////////////////////////////////
+math::Vector3 BulletBallJoint::GetAnchor(unsigned int /*_index*/) const
+{
+  return this->anchorPos;
 }
 
 /////////////////////////////////////////////////
-void BulletBallJoint::SetVelocity(int /*_index*/, double /*_angle*/)
+void BulletBallJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
   gzerr << "Not implemented\n";
 }
 
 /////////////////////////////////////////////////
-double BulletBallJoint::GetVelocity(int /*_index*/) const
+double BulletBallJoint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return 0;
 }
 
 /////////////////////////////////////////////////
-double BulletBallJoint::GetMaxForce(int /*_index*/)
+double BulletBallJoint::GetMaxForce(unsigned int /*_index*/)
 {
   gzerr << "Not implemented\n";
   return 0;
 }
 
 /////////////////////////////////////////////////
-void BulletBallJoint::SetMaxForce(int /*_index*/, double /*_t*/)
+void BulletBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 {
   gzerr << "Not implemented\n";
   return;
 }
 
 /////////////////////////////////////////////////
-math::Angle BulletBallJoint::GetAngle(int /*_index*/) const
+math::Vector3 BulletBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
-  return 0;
-}
-
-/////////////////////////////////////////////////
-math::Vector3 BulletBallJoint::GetGlobalAxis(int /*_index*/) const
-{
   return math::Vector3();
 }
 
 /////////////////////////////////////////////////
-math::Angle BulletBallJoint::GetAngleImpl(int /*_index*/) const
+math::Angle BulletBallJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
+  gzerr << "Not implemented\n";
   return math::Angle();
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::SetHighStop(int /*_index*/,
+bool BulletBallJoint::SetHighStop(unsigned int /*_index*/,
                                    const math::Angle &/*_angle*/)
 {
   if (this->bulletBall)
@@ -153,15 +194,24 @@ void BulletBallJoint::SetHighStop(int /*_index*/,
     // settings
     // this->bulletBall->setLimit(this->btBall->getLowerLimit(),
     //                         _angle.Radian());
+    gzerr << "BulletBallJoint limits not implemented" << std::endl;
+    return false;
   }
   else
   {
-    gzthrow("Joint must be created first");
+    gzerr << "bulletBall does not yet exist" << std::endl;
+    return false;
   }
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::SetLowStop(int /*_index*/,
+void BulletBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
+{
+  gzerr << "Not implemented";
+}
+
+//////////////////////////////////////////////////
+bool BulletBallJoint::SetLowStop(unsigned int /*_index*/,
                                   const math::Angle &/*_angle*/)
 {
   if (this->bulletBall)
@@ -171,8 +221,39 @@ void BulletBallJoint::SetLowStop(int /*_index*/,
     // settings
     // this->bulletBall->setLimit(-_angle.Radian(),
     //                         this->bulletBall->getUpperLimit());
+    gzerr << "BulletBallJoint limits not implemented" << std::endl;
+    return false;
   }
   else
-    gzthrow("Joint must be created first");
+  {
+    gzerr << "bulletBall does not yet exist" << std::endl;
+    return false;
+  }
 }
 
+//////////////////////////////////////////////////
+math::Vector3 BulletBallJoint::GetAxis(unsigned int /*_index*/) const
+{
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+void BulletBallJoint::SetAxis(unsigned int /*_index*/,
+                        const math::Vector3 &/*_axis*/)
+{
+  gzerr << "BulletBallJoint::SetAxis not implemented" << std::endl;
+}
+
+//////////////////////////////////////////////////
+math::Angle BulletBallJoint::GetHighStop(unsigned int /*_index*/)
+{
+  gzerr << "BulletBallJoint::GetHighStop not implemented" << std::endl;
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+math::Angle BulletBallJoint::GetLowStop(unsigned int /*_index*/)
+{
+  gzerr << "BulletBallJoint::GetLowStop not implemented" << std::endl;
+  return math::Angle();
+}

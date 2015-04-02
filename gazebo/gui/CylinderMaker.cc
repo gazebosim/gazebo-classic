@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,18 @@
 */
 #include <sstream>
 
-#include "msgs/msgs.hh"
-#include "gui/GuiEvents.hh"
-#include "common/MouseEvent.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/gui/GuiEvents.hh"
 
-#include "rendering/UserCamera.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/math/Quaternion.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/rendering/UserCamera.hh"
 
-#include "gui/CylinderMaker.hh"
+#include "gazebo/transport/Publisher.hh"
+
+#include "gazebo/gui/CylinderMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -36,6 +38,7 @@ CylinderMaker::CylinderMaker()
   : EntityMaker()
 {
   this->state = 0;
+  this->leftMousePressed = false;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::CYLINDER);
   this->visualMsg->mutable_material()->mutable_script()->add_uri(
@@ -183,41 +186,19 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 std::string CylinderMaker::GetSDFString()
 {
-  std::ostringstream newModelStr;
+  msgs::Model model;
+  {
+    std::ostringstream modelName;
+    modelName << "unit_cylinder_" << counter;
+    model.set_name(modelName.str());
+  }
+  msgs::Set(model.mutable_pose(), math::Pose(0, 0, 0.5, 0, 0, 0));
+  msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
+  model.mutable_link(0)->set_name("link");
 
-  newModelStr
-    << "<sdf version ='1.3'>"
-    << "  <model name ='unit_cylinder_" << counter << "'>"
-    << "    <pose>0 0 0.5 0 0 0</pose>"
-    << "    <link name='link'>"
-    << "      <inertial><mass>1.0</mass></inertial>"
-    << "      <collision name='collision'>"
-    << "        <geometry>"
-    << "          <cylinder>"
-    << "            <radius>0.5</radius>"
-    << "            <length>1.0</length>"
-    << "          </cylinder>"
-    << "        </geometry>"
-    << "      </collision>"
-    << "      <visual name='visual'>"
-    << "        <geometry>"
-    << "          <cylinder>"
-    << "            <radius>0.5</radius>"
-    << "            <length>1.0</length>"
-    << "          </cylinder>"
-    << "        </geometry>"
-    << "      <material>"
-    << "        <script>"
-    << "          <uri>file://media/materials/scripts/gazebo.material</uri>"
-    << "          <name>Gazebo/Grey</name>"
-    << "        </script>"
-    << "      </material>"
-    << "      </visual>"
-    << "    </link>"
-    << "  </model>"
-    << "</sdf>";
-
-  return newModelStr.str();
+  return "<sdf version='" + std::string(SDF_VERSION) + "'>"
+         + msgs::ModelToSDF(model)->ToString("")
+         + "</sdf>";
 }
 
 /////////////////////////////////////////////////
@@ -235,6 +216,3 @@ void CylinderMaker::CreateTheEntity()
   this->makerPub->Publish(msg);
   this->camera.reset();
 }
-
-
-

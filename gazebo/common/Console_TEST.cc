@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,59 +19,259 @@
 #include <boost/filesystem.hpp>
 #include <stdlib.h>
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
+#include "test/util.hh"
+
+const int g_messageRepeat = 4;
+
+class Console_TEST : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 /// \brief Test Console::Init and Console::Log
-TEST(Console_TEST, InitAndLog)
+TEST_F(Console_TEST, InitAndLog)
 {
-  // Initialize Conosol
-  gazebo::common::Console::Instance()->Init("test.log");
+  // Log the string
+  std::string logString = "this is a test";
 
-  EXPECT_TRUE(getenv("HOME") != NULL);
+  gzlog << logString << std::endl;
+  EXPECT_TRUE(this->GetLogContent().find(logString) != std::string::npos);
+}
 
-  // Make sure that the log file has been created
-  std::string logPath = getenv("HOME");
-  boost::filesystem::path testLog(logPath);
-  testLog = testLog / ".gazebo/test.log";
-  EXPECT_TRUE(boost::filesystem::exists(testLog));
+//////////////////////////////////////////////////
+/// \brief Test Console::Log with \n characters
+TEST_F(Console_TEST, LogSlashN)
+{
+  std::string logString = "this is a log test";
 
-  // Test Console::Log
+  for (int i = 0; i < g_messageRepeat; ++i)
   {
-    std::string logString = "this is a test";
-    std::string loggedString;
+    gzlog << logString << " _n__ " << i << '\n';
+  }
 
-    // Log the string
-    gzlog << logString << std::endl;
+  std::string logContent = this->GetLogContent();
 
-    // Open the log file, and read back the string
-    std::ifstream ifs(testLog.string().c_str(), std::ios::in);
-    std::getline(ifs, loggedString);
-    EXPECT_TRUE(loggedString.find(logString) != std::string::npos);
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    std::ostringstream stream;
+    stream << logString << " _n__ " << i;
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
+  }
+}
+
+//////////////////////////////////////////////////
+/// \brief Test Console::Log with std::endl
+TEST_F(Console_TEST, LogStdEndl)
+{
+  std::string logString = "this is a log test";
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    gzlog << logString << " endl " << i << std::endl;
+  }
+
+  std::string logContent = this->GetLogContent();
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    std::ostringstream stream;
+    stream << logString << " endl " << i;
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
+  }
+}
+
+//////////////////////////////////////////////////
+/// \brief Test Console::ColorWarn with \n characters
+TEST_F(Console_TEST, ColorWarnSlashN)
+{
+  std::string logString = "this is a warning test";
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    gzwarn << logString << " _n__ " << i << '\n';
+  }
+
+  std::string logContent = this->GetLogContent();
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    std::ostringstream stream;
+    stream << logString << " _n__ " << i;
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
+  }
+}
+
+//////////////////////////////////////////////////
+/// \brief Test Console::ColorWarn with std::endl
+TEST_F(Console_TEST, ColorWarnStdEndl)
+{
+  std::string logString = "this is a warning test";
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    gzwarn << logString << " endl " << i << std::endl;
+  }
+
+  std::string logContent = this->GetLogContent();
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    std::ostringstream stream;
+    stream << logString << " endl " << i;
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
+  }
+}
+
+//////////////////////////////////////////////////
+/// \brief Test Console::ColorDbg with \n characters
+TEST_F(Console_TEST, ColorDbgSlashN)
+{
+  std::string logString = "this is a dbg test";
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    gzdbg << logString << " _n__ " << i << '\n';
+  }
+
+  std::string logContent = this->GetLogContent();
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    std::ostringstream stream;
+    stream << logString << " _n__ " << i;
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
+  }
+}
+
+//////////////////////////////////////////////////
+/// \brief Test Console::ColorDbg with std::endl
+TEST_F(Console_TEST, ColorDbgStdEndl)
+{
+  std::string logString = "this is a dbg test";
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    gzdbg << logString << " endl " << i << std::endl;
+  }
+
+  std::string logContent = this->GetLogContent();
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    std::ostringstream stream;
+    stream << logString << " endl " << i;
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
+  }
+}
+
+//////////////////////////////////////////////////
+/// \brief Test Console::ColorMsg with \n characters
+TEST_F(Console_TEST, ColorMsgSlashN)
+{
+  std::string logString = "this is a msg test";
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    gzmsg << logString << " _n__ " << i << '\n';
+  }
+
+  std::string logContent = this->GetLogContent();
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    std::ostringstream stream;
+    stream << logString << " _n__ " << i;
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
+  }
+}
+
+//////////////////////////////////////////////////
+/// \brief Test Console::ColorMsg with std::endl
+TEST_F(Console_TEST, ColorMsgStdEndl)
+{
+  std::string logString = "this is a msg test";
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    gzmsg << logString << " endl " << i << std::endl;
+  }
+
+  std::string logContent = this->GetLogContent();
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    std::ostringstream stream;
+    stream << logString << " endl " << i;
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
+  }
+}
+
+//////////////////////////////////////////////////
+/// \brief Test Console::ColorErr with \n characters
+TEST_F(Console_TEST, ColorErrSlashN)
+{
+  std::string logString = "this is an error test";
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    gzerr << logString << " _n__ " << i << '\n';
+  }
+
+  std::string logContent = this->GetLogContent();
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    std::ostringstream stream;
+    stream << logString << " _n__ " << i;
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
+  }
+}
+
+//////////////////////////////////////////////////
+/// \brief Test Console::ColorErr with std::endl
+TEST_F(Console_TEST, ColorErrStdEndl)
+{
+  std::string logString = "this is an error test";
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    gzerr << logString << " endl " << i << std::endl;
+  }
+
+  std::string logContent = this->GetLogContent();
+
+  for (int i = 0; i < g_messageRepeat; ++i)
+  {
+    std::ostringstream stream;
+    stream << logString << " endl " << i;
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
 }
 
 /////////////////////////////////////////////////
 /// \brief Test Console::ColorMsg
-TEST(Console_TEST, ColorMsg)
+TEST_F(Console_TEST, ColorMsg)
 {
-  std::ostream *stream;
-  stream = &(gazebo::common::Console::Instance()->ColorMsg("label", 20));
+  std::string logString = "this is a msg test";
 
-  EXPECT_TRUE(stream != NULL);
-  EXPECT_TRUE(stream->good());
+  gzmsg << logString << std::endl;
+
+  std::string logContent = this->GetLogContent();
+
+  EXPECT_TRUE(logContent.find(logString) != std::string::npos);
 }
 
 /////////////////////////////////////////////////
 /// \brief Test Console::ColorErr
-TEST(Console_TEST, ColorErr)
+TEST_F(Console_TEST, ColorErr)
 {
-  std::ostream *stream;
-  stream = &(gazebo::common::Console::Instance()->ColorErr("label",
-        "myfile", 10, 20));
+  std::string logString = "this is an error test";
 
-  EXPECT_TRUE(stream != NULL);
-  EXPECT_TRUE(stream->good());
+  gzerr << logString << std::endl;
+
+  std::string logContent = this->GetLogContent();
+
+  EXPECT_TRUE(logContent.find(logString) != std::string::npos);
 }
 
 /////////////////////////////////////////////////

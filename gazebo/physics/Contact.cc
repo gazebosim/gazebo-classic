@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
  * Date: 10 Nov 2009
  */
 
+#include "gazebo/physics/physics.hh"
+#include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Contact.hh"
 
 using namespace gazebo;
@@ -45,6 +47,7 @@ Contact::~Contact()
 //////////////////////////////////////////////////
 Contact &Contact::operator =(const Contact &_contact)
 {
+  this->world = _contact.world;
   this->collision1 = _contact.collision1;
   this->collision2 = _contact.collision2;
 
@@ -67,8 +70,20 @@ Contact &Contact::operator =(const msgs::Contact &_contact)
 {
   this->count = 0;
 
-  this->collision1 = _contact.collision1();
-  this->collision2 = _contact.collision2();
+  this->world = physics::get_world(_contact.world());
+
+  if (world)
+  {
+    this->collision1 = boost::dynamic_pointer_cast<Collision>(
+        this->world->GetEntity(_contact.collision1())).get();
+    this->collision2 = boost::dynamic_pointer_cast<Collision>(
+      this->world->GetEntity(_contact.collision2())).get();
+  }
+  else
+  {
+    gzwarn << "World: " << _contact.world() << " not found,"
+           << "contact collision pointers will be NULL";
+  }
 
   for (int j = 0; j < _contact.position_size(); ++j)
   {
@@ -79,16 +94,16 @@ Contact &Contact::operator =(const msgs::Contact &_contact)
     this->depths[j] = _contact.depth(j);
 
     this->wrench[j].body1Force =
-      msgs::Convert(_contact.wrench(j).body_1_force());
+      msgs::Convert(_contact.wrench(j).body_1_wrench().force());
 
     this->wrench[j].body2Force =
-      msgs::Convert(_contact.wrench(j).body_1_force());
+      msgs::Convert(_contact.wrench(j).body_2_wrench().force());
 
     this->wrench[j].body1Torque =
-      msgs::Convert(_contact.wrench(j).body_1_torque());
+      msgs::Convert(_contact.wrench(j).body_1_wrench().torque());
 
     this->wrench[j].body2Torque =
-      msgs::Convert(_contact.wrench(j).body_2_torque());
+      msgs::Convert(_contact.wrench(j).body_2_wrench().torque());
 
     this->count++;
   }
@@ -109,8 +124,9 @@ std::string Contact::DebugString() const
 {
   std::ostringstream stream;
 
-  stream << "Collision 1[" << this->collision1 << "]\n"
-         << "Collision 2[" << this->collision2 << "]\n"
+  stream << "World [" << this->world->GetName() << "]\n"
+         << "Collision 1[" << this->collision1->GetScopedName() << "]\n"
+         << "Collision 2[" << this->collision2->GetScopedName() << "]\n"
          << "Time[" << this->time << "]\n"
          << "Contact Count[" << this->count << "]\n";
 
@@ -132,8 +148,9 @@ std::string Contact::DebugString() const
 //////////////////////////////////////////////////
 void Contact::FillMsg(msgs::Contact &_msg) const
 {
-  _msg.set_collision1(this->collision1);
-  _msg.set_collision2(this->collision2);
+  _msg.set_world(this->world->GetName());
+  _msg.set_collision1(this->collision1->GetScopedName());
+  _msg.set_collision2(this->collision2->GetScopedName());
   msgs::Set(_msg.mutable_time(), this->time);
 
   for (int j = 0; j < this->count; ++j)
@@ -144,11 +161,17 @@ void Contact::FillMsg(msgs::Contact &_msg) const
     msgs::Set(_msg.add_normal(), this->normals[j]);
 
     msgs::JointWrench *jntWrench = _msg.add_wrench();
-    jntWrench->set_body_1_name(this->collision1);
-    jntWrench->set_body_2_name(this->collision2);
-    msgs::Set(jntWrench->mutable_body_1_force(), this->wrench[j].body1Force);
-    msgs::Set(jntWrench->mutable_body_2_force(), this->wrench[j].body2Force);
-    msgs::Set(jntWrench->mutable_body_1_torque(), this->wrench[j].body1Torque);
-    msgs::Set(jntWrench->mutable_body_2_torque(), this->wrench[j].body2Torque);
+    jntWrench->set_body_1_name(this->collision1->GetScopedName());
+    jntWrench->set_body_1_id(this->collision1->GetId());
+    jntWrench->set_body_2_name(this->collision2->GetScopedName());
+    jntWrench->set_body_2_id(this->collision2->GetId());
+
+    msgs::Wrench *wrenchMsg =  jntWrench->mutable_body_1_wrench();
+    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body1Force);
+    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body1Torque);
+
+    wrenchMsg =  jntWrench->mutable_body_2_wrench();
+    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body2Force);
+    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body2Torque);
   }
 }

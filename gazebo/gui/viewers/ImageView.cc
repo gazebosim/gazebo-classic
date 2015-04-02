@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,14 @@
  * limitations under the License.
  *
  */
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
 #include "gazebo/common/Image.hh"
 
 #include "gazebo/gui/viewers/ViewFactory.hh"
+#include "gazebo/gui/viewers/ImageViewPrivate.hh"
 #include "gazebo/gui/viewers/ImageView.hh"
 
 using namespace gazebo;
@@ -30,40 +31,29 @@ GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.ImageStamped", ImageView)
 
 /////////////////////////////////////////////////
 ImageView::ImageView(QWidget *_parent)
-: TopicView(_parent, "gazebo.msgs.ImageStamped", "image", 33)
+: TopicView(_parent, "gazebo.msgs.ImageStamped", "image", 60),
+  dataPtr(new ImageViewPrivate())
 {
   this->setWindowTitle(tr("Gazebo: Image View"));
 
-  // Create the image display
-  // {
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
-  this->pixmap = QPixmap(":/images/no_image.png");
-  QPixmap image = (this->pixmap.scaled(320, 240, Qt::KeepAspectRatio,
-                                 Qt::SmoothTransformation));
-  this->imageLabel = new QLabel();
-  this->imageLabel->setPixmap(image);
-  this->imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-  this->imageLabel->setMinimumSize(320, 240);
-  this->imageLabel->setScaledContents(true);
+  this->dataPtr->imageFrame = new ImageFrame(this);
+  this->dataPtr->imageFrame->setMinimumSize(320, 240);
+  this->dataPtr->imageFrame->show();
+  frameLayout->addWidget(this->dataPtr->imageFrame);
 
-  frameLayout->addWidget(this->imageLabel);
   this->frame->setObjectName("blackBorderFrame");
   this->frame->setLayout(frameLayout);
-  // }
 }
 
 /////////////////////////////////////////////////
 ImageView::~ImageView()
 {
-  this->sub.reset();
-}
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 
-/////////////////////////////////////////////////
-void ImageView::UpdateImpl()
-{
-  // Update the image output
-  this->imageLabel->setPixmap(this->pixmap);
+  this->sub.reset();
 }
 
 /////////////////////////////////////////////////
@@ -79,30 +69,7 @@ void ImageView::SetTopic(const std::string &_topicName)
 void ImageView::OnImage(ConstImageStampedPtr &_msg)
 {
   // Update the Hz and Bandwidth info
-  this->OnMsg(msgs::Convert(_msg->time()),
-      _msg->image().data().size());
+  this->OnMsg(msgs::Convert(_msg->time()), _msg->image().data().size());
 
-  unsigned char *rgbData = NULL;
-  unsigned int rgbDataSize = 0;
-
-  // Convert the image data to RGB
-  common::Image img;
-  img.SetFromData(
-      (unsigned char *)(_msg->image().data().c_str()),
-      _msg->image().width(),
-      _msg->image().height(),
-      (common::Image::PixelFormat)(_msg->image().pixel_format()));
-
-  img.GetRGBData(&rgbData, rgbDataSize);
-
-  // Get the image data in a QT friendly format
-  QImage image(_msg->image().width(), _msg->image().height(),
-               QImage::Format_RGB888);
-  // Store the image data
-  memcpy(image.bits(), rgbData, rgbDataSize);
-
-  // Set the pixmap used by the image label.
-  this->pixmap = QPixmap::fromImage(image);
-
-  delete [] rgbData;
+  this->dataPtr->imageFrame->OnImage(_msg->image());
 }

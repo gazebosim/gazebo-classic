@@ -43,3 +43,13 @@ ELSEIF (PLAYER_OS_SOLARIS)
 ELSE (PLAYER_OS_LINUX)
     MESSAGE (STATUS "Operating system is generic Unix")
 ENDIF (PLAYER_OS_LINUX)
+
+#################################################
+# Check for non-case-sensitive filesystems
+execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/case_sensitive_filesystem
+                RESULT_VARIABLE FILESYSTEM_CASE_SENSITIVE_RETURN)
+if (${FILESYSTEM_CASE_SENSITIVE_RETURN} EQUAL 0)
+  set(FILESYSTEM_CASE_SENSITIVE TRUE)
+else()
+  set(FILESYSTEM_CASE_SENSITIVE FALSE)
+endif()

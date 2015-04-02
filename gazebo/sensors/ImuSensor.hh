@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
 
     /// \class ImuSensor ImuSensor.hh sensors/sensors.hh
     /// \brief An IMU sensor.
-    class ImuSensor: public Sensor
+    class GAZEBO_VISIBLE ImuSensor: public Sensor
     {
       /// \brief Constructor.
       public: ImuSensor();
@@ -48,13 +49,17 @@ namespace gazebo
       protected: virtual void Load(const std::string &_worldName);
 
       /// \brief Initialize the IMU.
-      protected: virtual void Init();
+      public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual void UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();
+
+      /// \brief Returns the imu message
+      /// \return Imu message.
+      public: msgs::IMU GetImuMessage() const;
 
       /// \brief Returns the angular velocity.
       /// \return Angular velocity.
@@ -72,6 +77,13 @@ namespace gazebo
       /// \brief Sets the current pose as the IMU reference pose
       public: void SetReferencePose();
 
+      // Documentation inherited.
+      public: virtual bool IsActive();
+
+      /// \brief Callback when link data is received
+      /// \param[in] _msg Message containing link data
+      private: void OnLinkData(ConstLinkDataPtr &_msg);
+
       /// \brief Imu reference pose
       private: math::Pose referencePose;
 
@@ -84,9 +96,65 @@ namespace gazebo
       /// \brief store gravity vector to be added to the imu output.
       private: math::Vector3 gravity;
 
+      /// \brief Imu data publisher
       private: transport::PublisherPtr pub;
+
+      /// \brief Subscriber to link data published by parent entity
+      private: transport::SubscriberPtr linkDataSub;
+
+      /// \brief Parent entity which the IMU is attached to
       private: physics::LinkPtr parentEntity;
+
+      /// \brief Imu message
       private: msgs::IMU imuMsg;
+
+      /// \brief Mutex to protect reads and writes.
+      private: mutable boost::mutex mutex;
+
+      /// \brief Buffer for storing link data
+      private: boost::shared_ptr<msgs::LinkData const> incomingLinkData[2];
+
+      /// \brief Index for accessing element in the link data array
+      private: unsigned int dataIndex;
+
+      /// \brief True if new link data is received
+      private: bool dataDirty;
+
+      /// \brief Which noise type we support
+      private: enum NoiseModelType
+      {
+        NONE,
+        GAUSSIAN
+      };
+
+      /// \brief If true, apply the noise model specified by other noise
+      /// parameters
+      private: bool noiseActive;
+
+      /// \brief Which type of noise we're applying
+      private: enum NoiseModelType noiseType;
+
+      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
+      /// from which we sample when adding noise to accelerations
+      private: double accelNoiseMean;
+
+      /// \brief If accelNoiseType==GAUSSIAN, the standard devation of the
+      /// distibution from which we sample when adding noise to accelerations
+      private: double accelNoiseStdDev;
+
+      /// \brief If noiseType==GAUSSIAN, the bias we'll add to acceleratations
+      private: double accelBias;
+
+      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
+      /// from which we sample when adding noise to rates
+      private: double rateNoiseMean;
+
+      /// \brief If noiseType==GAUSSIAN, the standard devation of the
+      /// distibution from which we sample when adding noise to rates
+      private: double rateNoiseStdDev;
+
+      /// \brief If noiseType==GAUSSIAN, the bias we'll add to rates
+      private: double rateBias;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _GBUFFER_MATERIAL_GENERATOR_HH_
 
 #include "gazebo/rendering/deferred_shading/MaterialGenerator.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,7 @@ namespace gazebo
     /// there. in order to support more, either expand this class or make sure
     /// that objects that will not get treated correctly will not have
     /// materials generated for them.
-    class GBufferMaterialGenerator : public MaterialGenerator
+    class GAZEBO_VISIBLE GBufferMaterialGenerator : public MaterialGenerator
     {
       /// \brief The types of g buffers
       public: enum GBufferType

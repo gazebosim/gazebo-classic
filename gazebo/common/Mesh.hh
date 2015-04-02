@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef _MESH_HH_
-#define _MESH_HH_
+#ifndef _GAZEBO_MESH_HH_
+#define _GAZEBO_MESH_HH_
 
 #include <vector>
 #include <string>
 
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2d.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
 
     /// \class Mesh Mesh.hh common/common.hh
     /// \brief A 3D mesh
-    class Mesh
+    class GAZEBO_VISIBLE Mesh
     {
       /// \brief Constructor
       public: Mesh();
@@ -107,11 +108,21 @@ namespace gazebo
       /// \return the material or NULL if the index is out of bounds
       public: const Material *GetMaterial(int _index) const;
 
+      /// \brief Get the index of material
+      /// \param[in] _mat the material
+      /// \return the index of the material or -1 if not found.
+      public: int GetMaterialIndex(const Material *_mat) const;
+
       /// \brief Get a child mesh
       /// \param[in] _i the index
       /// \return the submesh. An exception is thrown if the index is out of
       /// bounds
       public: const SubMesh *GetSubMesh(unsigned int _i) const;
+
+      /// \brief Get a child mesh by name.
+      /// \param[in] _name Name of the submesh.
+      /// \return The submesh, NULL if the _name is not found.
+      public: const SubMesh *GetSubMesh(const std::string &_name) const;
 
       /// \brief Put all the data into flat arrays
       /// \param[out] _vertArr the vertex array
@@ -152,6 +163,15 @@ namespace gazebo
       /// \param[in] _factor Scaling vector
       public: void SetScale(const math::Vector3 &_factor);
 
+      /// \brief Move the center of the mesh to the given coordinate. This
+      /// will move all the vertices in all submeshes.
+      /// \param[in] _center Location of the mesh center.
+      public: void Center(const math::Vector3 &_center = math::Vector3::Zero);
+
+      /// \brief Move all vertices in all submeshes by _vec.
+      /// \param[in] _vec Amount to translate vertices.
+      public: void Translate(const math::Vector3 &_vec);
+
       /// \brief The name of the mesh
       private: std::string name;
 
@@ -170,20 +190,23 @@ namespace gazebo
 
     /// \brief Vertex to node weighted assignement for skeleton animation
     /// visualization
-    struct NodeAssignment
+    class GAZEBO_VISIBLE NodeAssignment
     {
-        /// \brief index of the vertex
-        unsigned int vertexIndex;
+      /// \brief Constructor.
+      public: NodeAssignment();
 
-        /// \brieaf node (or bone) index
-        unsigned int nodeIndex;
+      /// \brief index of the vertex
+      public: unsigned int vertexIndex;
 
-        /// \brief the weight (between 0 and 1)
-        float weight;
+      /// \brief node (or bone) index
+      public: unsigned int nodeIndex;
+
+      /// \brief the weight (between 0 and 1)
+      public: float weight;
     };
 
     /// \brief A child mesh
-    class SubMesh
+    class GAZEBO_VISIBLE SubMesh
     {
       /// \brief An enumeration of the geometric mesh primitives
       public: enum PrimitiveType {POINTS, LINES, LINESTRIPS, TRIANGLES,
@@ -192,8 +215,19 @@ namespace gazebo
       /// \brief Constructor
       public: SubMesh();
 
+      /// \brief Copy Constructor
+      public: SubMesh(const SubMesh *_mesh);
+
       /// \brief Destructor
       public: virtual ~SubMesh();
+
+      /// \brief Set the name of this mesh
+      /// \param[in] _n the name to set
+      public: void SetName(const std::string &_n);
+
+      /// \brief Get the name of this mesh
+      /// \return the name
+      public: std::string GetName() const;
 
       /// \brief Set the primitive type
       /// \param[in] _type the type
@@ -364,6 +398,15 @@ namespace gazebo
       /// \param[in] _factor Scaling factor
       public: void Scale(double _factor);
 
+      /// \brief Move the center of the submesh to the given coordinate. This
+      /// will move all the vertices.
+      /// \param[in] _center Location of the mesh center.
+      public: void Center(const math::Vector3 &_center = math::Vector3::Zero);
+
+      /// \brief Move all vertices by _vec.
+      /// \param[in] _vec Amount to translate vertices.
+      public: void Translate(const math::Vector3 &_vec);
+
       /// \brief Scale all vertices by the _factor vector
       /// \param[in] _factor Scaling vector
       public: void SetScale(const math::Vector3 &_factor);
@@ -389,6 +432,9 @@ namespace gazebo
       /// \brief The material index for this mesh. Relates to the parent
       /// mesh material list.
       private: int materialIndex;
+
+      /// \brief The name of the sub-mesh
+      private: std::string name;
     };
     /// \}
   }

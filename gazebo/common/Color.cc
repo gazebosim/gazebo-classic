@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@
 #include <math.h>
 #include <algorithm>
 
-#include "math/Helpers.hh"
-#include "common/Console.hh"
-#include "common/Color.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Color.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -396,12 +396,12 @@ void Color::SetFromABGR(const Color::ABGR _v)
 }
 
 //////////////////////////////////////////////////
-Color &Color::operator =(const Color &_pt)
+Color &Color::operator =(const Color &_clr)
 {
-  this->r = _pt.r;
-  this->g = _pt.g;
-  this->b = _pt.b;
-  this->a = _pt.a;
+  this->r = _clr.r;
+  this->g = _clr.g;
+  this->b = _clr.b;
+  this->a = _clr.a;
 
   return *this;
 }
@@ -510,18 +510,18 @@ const Color &Color::operator*=(const Color &pt)
 
 
 //////////////////////////////////////////////////
-bool Color::operator ==(const Color &pt) const
+bool Color::operator ==(const Color &_pt) const
 {
-  return math::equal(this->r, pt.r) &&
-         math::equal(this->g, pt.g) &&
-         math::equal(this->b, pt.b) &&
-         math::equal(this->a, pt.a);
+  return math::equal(this->r, _pt.r) &&
+         math::equal(this->g, _pt.g) &&
+         math::equal(this->b, _pt.b) &&
+         math::equal(this->a, _pt.a);
 }
 
 //////////////////////////////////////////////////
-bool Color::operator!=(const Color &pt) const
+bool Color::operator!=(const Color &_pt) const
 {
-  return !(*this == pt);
+  return !(*this == _pt);
 }
 
 //////////////////////////////////////////////////

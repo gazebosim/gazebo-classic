@@ -1,0 +1,73 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- a static object -->
+    <model name="cylinder_model">
+      <static>true</static>
+      <link name="cylinder_link">
+        <visual name="cylinder_visual">
+          <pose>0 0 0.5 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+        </visual>
+        <collision name="cylinder_collision">
+          <pose>0 0 0.5 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- a non-static object -->
+    <model name="box_model">
+      <static>false</static>
+      <pose>0 0.8 0 0 0 0</pose>
+      <link name="box_link">
+        <visual name="box_visual">
+          <pose>0 0 0.5 0 0 0</pose>
+          <geometry>
+            <box>
+            <size>1.0 1.0 1.0</size>
+            </box>
+          </geometry>
+        </visual>
+        <collision name="box_collision">
+          <pose>0 0 0.5 0 0 0</pose>
+          <geometry>
+            <box>
+            <size>1.0 1.0 1.0</size>
+            </box>
+          </geometry>
+        </collision>
+        <sensor name="box_imu_sensor" type="imu">
+          <always_on>1</always_on>
+        </sensor>
+      </link>
+    </model>
+
+    <!-- a ray sensor -->
+    <include>
+      <uri>model://hokuyo</uri>
+      <pose>-1.0 0 0.5 0 0 0</pose>
+    </include>
+  </world>
+</sdf>

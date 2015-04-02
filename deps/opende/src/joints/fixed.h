@@ -32,8 +32,9 @@ struct dxJointFixed : public dxJoint
 {
     dQuaternion qrel;   // initial relative rotation body1 -> body2
     dVector3 offset;    // relative offset between the bodies
-    dReal erp;          // error reduction parameter
-    dReal cfm;          // constraint force mix-in
+    // erp and cfm moved to joint.h by OSRF
+    // dReal erp;          // error reduction parameter
+    // dReal cfm;          // constraint force mix-in
     void  set ( int num, dReal value );
     dReal get ( int num );
 

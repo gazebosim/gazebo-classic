@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,20 @@
 */
 
 #include <gtest/gtest.h>
+#include <boost/filesystem.hpp>
 
-#include "gazebo/math/Vector3.hh"
+#include "test_config.h"
+#include "gazebo/common/ColladaLoader.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Mesh.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/math/Vector3.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
+
+class MeshTest : public gazebo::testing::AutoLogFixture { };
 
 std::string asciiSTLBox =
 "solid MYSOLID\n\
@@ -113,8 +120,14 @@ std::string asciiSTLBox =
 endsolid MYSOLID";
 
 
-TEST(MeshTest, Mesh)
+/////////////////////////////////////////////////
+TEST_F(MeshTest, Mesh)
 {
+  // Cleanup test directory.
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  boost::filesystem::remove_all(paths->GetDefaultTestPath());
+  boost::filesystem::create_directories(paths->GetDefaultTestPath());
+
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.mesh"));
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.3ds"));
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.xml"));
@@ -216,20 +229,75 @@ TEST(MeshTest, Mesh)
   newMesh->GenSphericalTexCoord(math::Vector3(0, 0, 0));
   delete newMesh;
 
-  std::ofstream stlFile("/tmp/gazebo_stl_test.stl", std::ios::out);
+  std::ofstream stlFile((paths->GetDefaultTestPath() +
+      "/gazebo_stl_test.stl").c_str(), std::ios::out);
   stlFile << asciiSTLBox;
   stlFile.close();
 
-  mesh = common::MeshManager::Instance()->Load("/tmp/gazebo_stl_test-bad.stl");
+  mesh = common::MeshManager::Instance()->Load(
+      paths->GetDefaultTestPath() + "/gazebo_stl_test-bad.stl");
   EXPECT_EQ(NULL, mesh);
 
-  mesh = common::MeshManager::Instance()->Load("/tmp/gazebo_stl_test.stl");
+  mesh = common::MeshManager::Instance()->Load(
+      paths->GetDefaultTestPath() + "/gazebo_stl_test.stl");
   mesh->GetAABB(center, min, max);
   EXPECT_TRUE(center == math::Vector3(0.5, 0.5, 0.5));
   EXPECT_TRUE(min == math::Vector3(0, 0, 0));
   EXPECT_TRUE(max == math::Vector3(1, 1, 1));
+
+  // Cleanup test directory.
+  boost::filesystem::remove_all(paths->GetDefaultTestPath());
 }
 
+/////////////////////////////////////////////////
+// Test centering a submesh.
+TEST_F(MeshTest, MeshMove)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) + "/test/data/box_offset.dae");
+
+  // The default location of the box_offest is not centered
+  EXPECT_EQ(math::Vector3(5.46554, 2.18039, 4.8431), mesh->GetMax());
+  EXPECT_EQ(math::Vector3(3.46555, 0.180391, 2.8431), mesh->GetMin());
+
+  mesh->Center();
+
+  EXPECT_EQ(math::Vector3(1.0, 1.0, 1.0), mesh->GetMax());
+  EXPECT_EQ(math::Vector3(-1.0, -1.0, -1.0), mesh->GetMin());
+
+  mesh->Translate(math::Vector3(1, 2, 3));
+  EXPECT_EQ(math::Vector3(2.0, 3.0, 4.0), mesh->GetMax());
+  EXPECT_EQ(math::Vector3(0.0, 1.0, 2.0), mesh->GetMin());
+}
+
+/////////////////////////////////////////////////
+// Test centering a submesh.
+TEST_F(MeshTest, SubMeshCenter)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) + "/test/data/box_offset.dae");
+
+  // The default location of the box_offest is not centered
+  EXPECT_EQ(math::Vector3(5.46554, 2.18039, 4.8431), mesh->GetMax());
+  EXPECT_EQ(math::Vector3(3.46555, 0.180391, 2.8431), mesh->GetMin());
+
+  // Get the Cube submesh
+  common::SubMesh submesh(mesh->GetSubMesh("Cube"));
+
+  submesh.Center(math::Vector3(1, 2, 3));
+  EXPECT_EQ(math::Vector3(0, 1, 2), submesh.GetMin());
+  EXPECT_EQ(math::Vector3(2, 3, 4), submesh.GetMax());
+
+  submesh.Translate(math::Vector3(1, 2, 3));
+  EXPECT_EQ(math::Vector3(1, 3, 5), submesh.GetMin());
+  EXPECT_EQ(math::Vector3(3, 5, 7), submesh.GetMax());
+
+  // The original mesh should not change
+  EXPECT_EQ(math::Vector3(5.46554, 2.18039, 4.8431), mesh->GetMax());
+  EXPECT_EQ(math::Vector3(3.46555, 0.180391, 2.8431), mesh->GetMin());
+}
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

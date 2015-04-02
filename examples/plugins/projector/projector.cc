@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace gazebo
       this->node->Init(_parent->GetWorld()->GetName());
 
       std::string name = std::string("~/") + _parent->GetName() + "/" +
-                          _sdf->GetValueString("projector");
+                          _sdf->Get<std::string>("projector");
 
       // Create a publisher on the ~/physics topic
       this->projectorPub = node->Advertise<msgs::Projector>(name);
@@ -43,7 +43,7 @@ namespace gazebo
 
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
-      this->updateConnection = event::Events::ConnectWorldUpdateStart(
+      this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&ProjectorPlugin::OnUpdate, this));
     }
 

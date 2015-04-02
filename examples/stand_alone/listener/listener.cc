@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
+#include <gazebo/gazebo.hh>
 
 #include <iostream>
 
@@ -29,10 +30,10 @@ void cb(ConstWorldStatisticsPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-int main()
+int main(int _argc, char **_argv)
 {
-  // Initialize transport
-  gazebo::transport::init();
+  // Load gazebo
+  gazebo::setupClient(_argc, _argv);
 
   // Create our node for communication
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
@@ -41,13 +42,10 @@ int main()
   // Listen to Gazebo world_stats topic
   gazebo::transport::SubscriberPtr sub = node->Subscribe("~/world_stats", cb);
 
-  // Start transport
-  gazebo::transport::run();
-
   // Busy wait loop...replace with your own code as needed.
   while (true)
     gazebo::common::Time::MSleep(10);
 
   // Make sure to shut everything down.
-  gazebo::transport::fini();
+  gazebo::shutdown();
 }

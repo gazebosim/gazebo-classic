@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,16 @@
  * limitations under the License.
  *
 */
-/* Desc: Laser Visualization Class
- * Author: Nate Koenig
- * Date: 14 Dec 2007
- */
 
 #ifndef _LASERVISUAL_HH_
 #define _LASERVISUAL_HH_
 
 #include <string>
 
-#include "rendering/Visual.hh"
-#include "msgs/MessageTypes.hh"
-#include "transport/TransportTypes.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,11 +32,9 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    class DynamicLines;
-
     /// \class LaserVisual LaserVisual.hh rendering/rendering.hh
     /// \brief Visualization for laser data.
-    class LaserVisual : public Visual
+    class GAZEBO_VISIBLE LaserVisual : public Visual
     {
       /// \brief Constructor.
       /// \param[in] _name Name of the visual.
@@ -57,14 +52,8 @@ namespace gazebo
       /// \brief Callback when laser data is received.
       private: void OnScan(ConstLaserScanStampedPtr &_msg);
 
-      /// \brief Pointer to a node that handles communication.
-      private: transport::NodePtr node;
-
-      /// \brief Subscription to the laser data.
-      private: transport::SubscriberPtr laserScanSub;
-
-      /// \brief Renders the laser data.
-      private: DynamicLines *rayFan;
+      /// \brief Update the Visual
+      private: void Update();
     };
     /// \}
   }

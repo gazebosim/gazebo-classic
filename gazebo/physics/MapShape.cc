@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,15 @@
 #include <string.h>
 #include <math.h>
 
-#include "common/Image.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/BoxShape.hh"
-#include "physics/Collision.hh"
-#include "physics/MapShape.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/BoxShape.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/MapShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -63,14 +64,14 @@ void MapShape::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
-  std::string imageFilename = _sdf->GetValueString("uri");
+  std::string imageFilename = _sdf->Get<std::string>("uri");
 
   // Make sure they are ok
-  if (_sdf->GetValueDouble("scale") <= 0)
+  if (_sdf->Get<double>("scale") <= 0)
     _sdf->GetElement("scale")->Set(0.1);
-  if (this->sdf->GetValueInt("threshold") <= 0)
+  if (this->sdf->Get<int>("threshold") <= 0)
     _sdf->GetElement("threshold")->Set(200);
-  if (this->sdf->GetValueDouble("height") <= 0)
+  if (this->sdf->Get<double>("height") <= 0)
     _sdf->GetElement("height")->Set(1.0);
 
   // Load the image
@@ -107,7 +108,7 @@ void MapShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::IMAGE);
   _msg.mutable_image()->set_uri(this->GetURI());
-  _msg.mutable_image()->set_scale(this->GetScale());
+  _msg.mutable_image()->set_scale(this->GetScale().x);
   _msg.mutable_image()->set_threshold(this->GetThreshold());
   _msg.mutable_image()->set_height(this->GetHeight());
   _msg.mutable_image()->set_granularity(this->GetGranularity());
@@ -117,31 +118,45 @@ void MapShape::FillMsg(msgs::Geometry &_msg)
 //////////////////////////////////////////////////
 std::string MapShape::GetURI() const
 {
-  return this->sdf->GetValueString("uri");
+  return this->sdf->Get<std::string>("uri");
 }
 
 //////////////////////////////////////////////////
-double MapShape::GetScale() const
+void MapShape::SetScale(const math::Vector3 &_scale)
 {
-  return this->sdf->GetValueDouble("scale");
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
+  this->sdf->GetElement("scale")->Set(_scale);
+
+  /// TODO MapShape::SetScale not yet implemented.
+}
+
+//////////////////////////////////////////////////
+math::Vector3 MapShape::GetScale() const
+{
+  double mapScale = this->sdf->Get<double>("scale");
+  return math::Vector3(mapScale, mapScale, mapScale);
 }
 
 //////////////////////////////////////////////////
 int MapShape::GetThreshold() const
 {
-  return this->sdf->GetValueInt("threshold");
+  return this->sdf->Get<int>("threshold");
 }
 
 //////////////////////////////////////////////////
 double MapShape::GetHeight() const
 {
-  return this->sdf->GetValueDouble("height");
+  return this->sdf->Get<double>("height");
 }
 
 //////////////////////////////////////////////////
 int MapShape::GetGranularity() const
 {
-  return this->sdf->GetValueInt("granularity");
+  return this->sdf->Get<int>("granularity");
 }
 
 //////////////////////////////////////////////////
@@ -161,12 +176,12 @@ void MapShape::CreateBoxes(QuadNode * /*_node*/)
 
     stream << "<gazebo:world xmlns:gazebo =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:collision =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#collision\">";
 
-    float x = (node->x + node->width / 2.0) * this->sdf->GetValueDouble("scale");
-    float y = (node->y + node->height / 2.0) * this->sdf->GetValueDouble("scale");
-    float z = this->sdf->GetValueDouble("height") / 2.0;
-    float xSize = (node->width) * this->sdf->GetValueDouble("scale");
-    float ySize = (node->height) * this->sdf->GetValueDouble("scale");
-    float zSize = this->sdf->GetValueDouble("height");
+    float x = (node->x + node->width / 2.0) * this->sdf->Get<double>("scale");
+    float y = (node->y + node->height / 2.0) * this->sdf->Get<double>("scale");
+    float z = this->sdf->Get<double>("height") / 2.0;
+    float xSize = (node->width) * this->sdf->Get<double>("scale");
+    float ySize = (node->height) * this->sdf->Get<double>("scale");
+    float zSize = this->sdf->Get<double>("height");
 
     char collisionName[256];
     sprintf(collisionName, "map_collision_%d", collisionCounter++);
@@ -312,7 +327,6 @@ void MapShape::Merge(QuadNode *_nodeA, QuadNode *_nodeB)
 //////////////////////////////////////////////////
 void MapShape::BuildTree(QuadNode *_node)
 {
-  QuadNode *newNode = NULL;
   unsigned int freePixels, occPixels;
 
   this->GetPixelCount(_node->x, _node->y, _node->width, _node->height,
@@ -321,11 +335,12 @@ void MapShape::BuildTree(QuadNode *_node)
   // int diff = labs(freePixels - occPixels);
 
   if (static_cast<int>(_node->width*_node->height) >
-      this->sdf->GetValueInt("granularity"))
+      this->sdf->Get<int>("granularity"))
   {
     float newX, newY;
     float newW, newH;
 
+    newX = _node->x;
     newY = _node->y;
     newW = _node->width / 2.0;
     newH = _node->height / 2.0;
@@ -337,7 +352,7 @@ void MapShape::BuildTree(QuadNode *_node)
 
       for (int j = 0; j < 2; j++)
       {
-        newNode = new QuadNode(_node);
+        QuadNode *newNode = new QuadNode(_node);
         newNode->x = (unsigned int)newX;
         newNode->y = (unsigned int)newY;
 
@@ -403,10 +418,10 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
 
       v = (unsigned char)(255 *
           ((pixColor.r + pixColor.g + pixColor.b) / 3.0));
-      // if (this->sdf->GetValueBool("negative"))
+      // if (this->sdf->Get<bool>("negative"))
         // v = 255 - v;
 
-      if (v > this->sdf->GetValueInt("threshold"))
+      if (v > this->sdf->Get<int>("threshold"))
         freePixels++;
       else
         occPixels++;
@@ -419,4 +434,3 @@ void MapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 {
   gzerr << "TODO: not implement yet.";
 }
-

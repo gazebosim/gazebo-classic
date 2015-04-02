@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,17 @@
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/viewers/ImageFrame.hh"
 #include "gazebo/gui/viewers/TopicView.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class ImageView : public TopicView
+    class ImageViewPrivate;
+
+    class GAZEBO_VISIBLE ImageView : public TopicView
     {
       Q_OBJECT
 
@@ -45,18 +49,12 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetTopic(const std::string &_topicName);
 
-      // Documentation inherited
-      private: virtual void UpdateImpl();
-
       /// \brief Receives incoming image messages.
       /// \param[in] _msg New image message.
-      private: void OnImage(ConstImageStampedPtr &_msg);
+      public: void OnImage(ConstImageStampedPtr &_msg);
 
-      /// \brief A label is used to display the image data.
-      private: QLabel *imageLabel;
-
-      /// \brief Storage mechansim for image data.
-      private: QPixmap pixmap;
+      /// \brief Private data.
+      private: ImageViewPrivate *dataPtr;
     };
   }
 }

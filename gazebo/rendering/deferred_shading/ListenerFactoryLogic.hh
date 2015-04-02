@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <OgreCompositorInstance.h>
 #include <OgreCompositorLogic.h>
 #include <map>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -27,7 +28,7 @@ namespace gazebo
   {
     /// The simple types of compositor logics will all do the same thing -
     /// Attach a listener to the created compositor
-    class ListenerFactoryLogic : public Ogre::CompositorLogic
+    class GAZEBO_VISIBLE ListenerFactoryLogic : public Ogre::CompositorLogic
     {
       //// @copydoc CompositorLogic::compositorInstanceCreated
       public: virtual void compositorInstanceCreated(

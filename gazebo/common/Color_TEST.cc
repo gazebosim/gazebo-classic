@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,13 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/common/Color.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(Color, Color)
+class Color : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(Color, Color)
 {
   common::Color clr(.1, .2, .3, 1.0);
   EXPECT_FLOAT_EQ(0.1f, clr.r);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,13 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(Exception, Exception)
+class Exception : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(Exception, Exception)
 {
   try
   {
@@ -35,21 +38,21 @@ TEST(Exception, Exception)
   }
 }
 
-TEST(Exception, InternalError_DefaultConstructor_Throw)
+TEST_F(Exception, InternalError_DefaultConstructor_Throw)
 {
   ASSERT_THROW(
     throw common::InternalError(),
     common::InternalError);
 }
 
-TEST(Exception, InternalError_FileLineMsgConstructor_Throw)
+TEST_F(Exception, InternalError_FileLineMsgConstructor_Throw)
 {
   ASSERT_THROW(
       throw common::InternalError(__FILE__, __LINE__, "test"),
       common::InternalError);
 }
 
-TEST(Exception, InternalAssertionError_AssertionConstructor_Throw)
+TEST_F(Exception, InternalAssertionError_AssertionConstructor_Throw)
 {
   ASSERT_THROW(
       throw common::AssertionInternalError(__FILE__, __LINE__, "expression",
@@ -58,20 +61,20 @@ TEST(Exception, InternalAssertionError_AssertionConstructor_Throw)
 }
 
 #if defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-TEST(Exception, GZASSERT_Disabled_NoThrow)
+TEST_F(Exception, GZASSERT_Disabled_NoThrow)
 {
   ASSERT_NO_THROW(
      GZ_ASSERT(true == false, "Assert thrown"));
 }
 #elif defined(BOOST_ENABLE_ASSERT_HANDLER)
-TEST(Exception, GZASSERT_WithHandler_ThrowException)
+TEST_F(Exception, GZASSERT_WithHandler_ThrowException)
 {
   ASSERT_THROW(
     GZ_ASSERT(true == false, "Assert thrown"),
                common::AssertionInternalError);
 }
 #else
-TEST(Exception, GZASSERT_Enabled_ThrowAssertion)
+TEST_F(Exception, GZASSERT_Enabled_ThrowAssertion)
 {
     ASSERT_DEATH(
       GZ_ASSERT(true == false, "Assert thrown"),

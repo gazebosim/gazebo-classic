@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@
 #ifndef _KEYFRAME_HH_
 #define _KEYFRAME_HH_
 
-#include "math/Vector3.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,7 @@ namespace gazebo
 
     /// \class KeyFrame KeyFrame.hh common/common.hh
     /// \brief A key frame in an animation
-    class KeyFrame
+    class GAZEBO_VISIBLE KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe in seconds
@@ -47,7 +48,7 @@ namespace gazebo
     };
 
     /// \brief A keyframe for a PoseAnimation
-    class PoseKeyFrame : public KeyFrame
+    class GAZEBO_VISIBLE PoseKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time of the keyframe
@@ -80,7 +81,7 @@ namespace gazebo
     };
 
     /// \brief A keyframe for a NumericAnimation
-    class NumericKeyFrame : public KeyFrame
+    class GAZEBO_VISIBLE NumericKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe

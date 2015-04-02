@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,14 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Rand.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(RandTest, Rand)
+class RandTest : public gazebo::testing::AutoLogFixture { };
+
+//////////////////////////////////////////////////
+TEST_F(RandTest, Rand)
 {
   double d;
   int i;
@@ -38,6 +42,8 @@ TEST(RandTest, Rand)
   EXPECT_GE(i, 1);
 
   i = math::Rand::GetIntNormal(2, 3);
+  EXPECT_LE(i, GZ_INT32_MAX);
+  EXPECT_GE(i, -GZ_INT32_MAX);
 
   // Test setting the random number seed
   {
@@ -45,5 +51,27 @@ TEST(RandTest, Rand)
 
     d = math::Rand::GetDblNormal(2, 3);
     EXPECT_TRUE(math::equal(d, 0.985827));
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(RandTest, SetSeed)
+{
+  int N = 10;
+  std::vector<int> first;
+  std::vector<int> second;
+
+  for (int i = 0; i < N; ++i)
+  {
+    math::Rand::SetSeed(i);
+    first.push_back(math::Rand::GetIntUniform(-10, 10));
+    second.push_back(math::Rand::GetIntUniform(-10, 10));
+  }
+
+  for (int i = 0; i < N; ++i)
+  {
+    math::Rand::SetSeed(i);
+    EXPECT_EQ(first[i], math::Rand::GetIntUniform(-10, 10));
+    EXPECT_EQ(second[i], math::Rand::GetIntUniform(-10, 10));
   }
 }

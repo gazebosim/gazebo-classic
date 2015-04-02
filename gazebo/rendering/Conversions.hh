@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,12 @@
 #ifndef _CONVERSIONS_HH_
 #define _CONVERSIONS_HH_
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "common/Color.hh"
-#include "math/Vector3.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
     /// \brief Conversions Conversions.hh rendering/Conversions.hh
     /// \brief A set of utility function to convert between Gazebo and Ogre
     /// data types
-    class Conversions
+    class GAZEBO_VISIBLE Conversions
     {
       /// \brief Return the equivalent ogre color
       /// \param[in] _clr Gazebo color to convert

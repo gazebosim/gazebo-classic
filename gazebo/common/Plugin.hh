@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,25 +21,23 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <gazebo_config.h>
-#ifdef HAVE_DL
+#include <gazebo/gazebo_config.h>
 #include <dlfcn.h>
-#elif HAVE_LTDL
-#include <ltdl.h>
-#endif
 
 #include <list>
 #include <string>
 
-#include "common/CommonTypes.hh"
-#include "common/SystemPaths.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include <sdf/sdf.hh>
 
-#include "physics/PhysicsTypes.hh"
-#include "sensors/SensorTypes.hh"
-#include "sdf/sdf.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -61,51 +59,81 @@ namespace gazebo
     /// \brief A System plugin
     SYSTEM_PLUGIN,
     /// \brief A Visual plugin
-    VISUAL_PLUGIN
+    VISUAL_PLUGIN,
+    /// \brief A GUI plugin
+    GUI_PLUGIN
   };
 
 
   /// \class PluginT Plugin.hh common/common.hh
   /// \brief A class which all plugins must inherit from
   template<class T>
-  class PluginT
+  class GAZEBO_VISIBLE PluginT
   {
     /// \brief plugin pointer type definition
     public: typedef boost::shared_ptr<T> TPtr;
 
-            /// \brief Get the name of the handler
+    /// \brief Constructor
+    public: PluginT()
+            {
+              this->dlHandle = NULL;
+            }
+
+    /// \brief Destructor
+    public: virtual ~PluginT()
+            {
+              // dlclose has been disabled due to segfaults in the test suite
+              // This workaround is detailed in #1026 and #1066. After the test
+              // or gazebo execution the plugin is not loaded in memory anymore
+              // \todo Figure out the right thing to do.
+
+              // dlclose(this->dlHandle);
+            }
+
+    /// \brief Get the name of the handler
     public: std::string GetFilename() const
             {
               return this->filename;
             }
 
-            /// \brief Get the short name of the handler
+    /// \brief Get the short name of the handler
     public: std::string GetHandle() const
             {
-              return this->handle;
+              return this->handleName;
             }
 
     /// \brief a class method that creates a plugin from a file name.
     /// It locates the shared library and loads it dynamically.
     /// \param[in] _filename the path to the shared library.
-    /// \param[in] _handle short name of the handler
+    /// \param[in] _name short name of the plugin
     /// \return Shared Pointer to this class type
     public: static TPtr Create(const std::string &_filename,
-                const std::string &_handle)
+                const std::string &_name)
             {
               TPtr result;
               // PluginPtr result;
               struct stat st;
               bool found = false;
-              std::string fullname;
+              std::string fullname, filename(_filename);
               std::list<std::string>::iterator iter;
               std::list<std::string> pluginPaths =
                 common::SystemPaths::Instance()->GetPluginPaths();
 
+#ifdef __APPLE__
+              // This is a hack to work around issue #800,
+              // error loading plugin libraries with different extensions
+              {
+                size_t soSuffix = filename.rfind(".so");
+                const std::string macSuffix(".dylib");
+                if (soSuffix != std::string::npos)
+                  filename.replace(soSuffix, macSuffix.length(), macSuffix);
+              }
+#endif  // ifdef __APPLE__
+
               for (iter = pluginPaths.begin();
                    iter!= pluginPaths.end(); ++iter)
               {
-                fullname = (*iter)+std::string("/")+_filename;
+                fullname = (*iter)+std::string("/")+filename;
                 if (stat(fullname.c_str(), &st) == 0)
                 {
                   found = true;
@@ -114,21 +142,20 @@ namespace gazebo
               }
 
               if (!found)
-                fullname = _filename;
+                fullname = filename;
 
               fptr_union_t registerFunc;
               std::string registerName = "RegisterPlugin";
 
-#ifdef HAVE_DL
-              void* handle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
-              if (!handle)
+              void *dlHandle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+              if (!dlHandle)
               {
                 gzerr << "Failed to load plugin " << fullname << ": "
                   << dlerror() << "\n";
                 return result;
               }
 
-              registerFunc.ptr = dlsym(handle, registerName.c_str());
+              registerFunc.ptr = dlsym(dlHandle, registerName.c_str());
 
               if (!registerFunc.ptr)
               {
@@ -139,54 +166,10 @@ namespace gazebo
 
               // Register the new controller.
               result.reset(registerFunc.func());
+              result->dlHandle = dlHandle;
 
-#elif HAVE_LTDL
-
-              static bool init_done = false;
-
-              if (!init_done)
-              {
-                int errors = lt_dlinit();
-                if (errors)
-                {
-                  gzerr << "Error(s) initializing dynamic loader ("
-                    << errors << ", " << lt_dlerror() << ")";
-                  return NULL;
-                }
-                else
-                  init_done = true;
-              }
-
-              lt_dlhandle handle = lt_dlopenext(fullname.c_str());
-
-              if (!handle)
-              {
-                gzerr << "Failed to load " << fullname
-                      << ": " << lt_dlerror();
-                return NULL;
-              }
-
-              T *(*registerFunc)() =
-                (T *(*)())lt_dlsym(handle, registerName.c_str());
-              resigsterFunc.ptr = lt_dlsym(handle, registerName.c_str());
-              if (!registerFunc.ptr)
-              {
-                gzerr << "Failed to resolve " << registerName << ": "
-                      << lt_dlerror();
-                return NULL;
-              }
-
-              // Register the new controller.
-              result.result(registerFunc.func());
-
-#else  // HAVE_LTDL
-
-              gzthrow("Cannot load plugins as libtool is not installed.");
-
-#endif  // HAVE_LTDL
-
-              result->handle = _handle;
-              result->filename = _filename;
+              result->handleName = _name;
+              result->filename = filename;
 
               return result;
             }
@@ -205,7 +188,7 @@ namespace gazebo
     protected: std::string filename;
 
     /// \brief Short name
-    protected: std::string handle;
+    protected: std::string handleName;
 
     /// \brief Pointer to shared library registration function definition
     private: typedef union
@@ -213,13 +196,16 @@ namespace gazebo
                T *(*func)();
                void *ptr;
              } fptr_union_t;
+
+    /// \brief Handle used for closing the dynamic library.
+    private: void *dlHandle;
   };
 
   /// \class WorldPlugin Plugin.hh common/common.hh
   /// \brief A plugin with access to physics::World.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
-  class WorldPlugin : public PluginT<WorldPlugin>
+  /// <a href="http://gazebosim.org/tutorials/?tut=plugins_world
+  /// &cat=write_plugin">reference</a>.
+  class GAZEBO_VISIBLE WorldPlugin : public PluginT<WorldPlugin>
   {
     /// \brief Constructor
     public: WorldPlugin()
@@ -242,9 +228,9 @@ namespace gazebo
   };
 
   /// \brief A plugin with access to physics::Model.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
-  class ModelPlugin : public PluginT<ModelPlugin>
+  /// <a href="http://gazebosim.org/tutorials?tut=plugins_model
+  /// &cat=write_plugin">reference</a>.
+  class GAZEBO_VISIBLE ModelPlugin : public PluginT<ModelPlugin>
   {
     /// \brief Constructor
     public: ModelPlugin()
@@ -271,9 +257,9 @@ namespace gazebo
 
   /// \class SensorPlugin Plugin.hh common/common.hh
   /// \brief A plugin with access to physics::Sensor.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
-  class SensorPlugin : public PluginT<SensorPlugin>
+  /// <a href="http://gazebosim.org/tutorials?tut=plugins_hello_world
+  /// &cat=write_plugin">reference</a>.
+  class GAZEBO_VISIBLE SensorPlugin : public PluginT<SensorPlugin>
   {
     /// \brief Constructor
     public: SensorPlugin()
@@ -299,10 +285,10 @@ namespace gazebo
   };
 
   /// \brief A plugin loaded within the gzserver on startup.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
+  /// <a href="http://gazebosim.org/tutorials?tut=system_plugin
+  /// &cat=write_plugin">reference</a>
   /// @todo how to make doxygen reference to the file gazebo.cc#g_plugins?
-  class SystemPlugin : public PluginT<SystemPlugin>
+  class GAZEBO_VISIBLE SystemPlugin : public PluginT<SystemPlugin>
   {
     /// \brief Constructor
     public: SystemPlugin()
@@ -328,9 +314,9 @@ namespace gazebo
   };
 
   /// \brief A plugin loaded within the gzserver on startup.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
-  class VisualPlugin : public PluginT<VisualPlugin>
+  /// <a href="http://gazebosim.org/tutorials?tut=plugins_hello_world
+  /// &cat=write_plugin">reference</a>.
+  class GAZEBO_VISIBLE VisualPlugin : public PluginT<VisualPlugin>
   {
     public: VisualPlugin()
              {this->type = VISUAL_PLUGIN;}
@@ -353,6 +339,7 @@ namespace gazebo
     public: virtual void Reset() {}
   };
 
+
   /// \}
 
 /// \brief Plugin registration function for model plugin. Part of the shared
@@ -360,7 +347,8 @@ namespace gazebo
 /// to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_MODEL_PLUGIN(classname) \
-  extern "C" gazebo::ModelPlugin *RegisterPlugin(); \
+  extern "C" GAZEBO_VISIBLE gazebo::ModelPlugin *RegisterPlugin(); \
+  GAZEBO_VISIBLE \
   gazebo::ModelPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -371,7 +359,8 @@ namespace gazebo
 /// to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_WORLD_PLUGIN(classname) \
-  extern "C" gazebo::WorldPlugin *RegisterPlugin(); \
+  extern "C" GAZEBO_VISIBLE gazebo::WorldPlugin *RegisterPlugin(); \
+  GAZEBO_VISIBLE \
   gazebo::WorldPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -382,7 +371,8 @@ namespace gazebo
 /// the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_SENSOR_PLUGIN(classname) \
-  extern "C" gazebo::SensorPlugin *RegisterPlugin(); \
+  extern "C" GAZEBO_VISIBLE gazebo::SensorPlugin *RegisterPlugin(); \
+  GAZEBO_VISIBLE \
   gazebo::SensorPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -393,7 +383,8 @@ namespace gazebo
 /// library to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_SYSTEM_PLUGIN(classname) \
-  extern "C" gazebo::SystemPlugin *RegisterPlugin(); \
+  extern "C" GAZEBO_VISIBLE gazebo::SystemPlugin *RegisterPlugin(); \
+  GAZEBO_VISIBLE \
   gazebo::SystemPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -404,7 +395,8 @@ namespace gazebo
 /// library to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_VISUAL_PLUGIN(classname) \
-  extern "C" gazebo::VisualPlugin *RegisterPlugin(); \
+  extern "C" GAZEBO_VISIBLE gazebo::VisualPlugin *RegisterPlugin(); \
+  GAZEBO_VISIBLE \
   gazebo::VisualPlugin *RegisterPlugin() \
   {\
     return new classname();\

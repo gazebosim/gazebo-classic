@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,11 @@
 #define FIDUCIALINTERFACE_HH
 
 #include "GazeboInterface.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
-  class recursive_mutex;
+  class GAZEBO_VISIBLE recursive_mutex;
 }
 
 namespace libgazebo
@@ -37,10 +38,10 @@ namespace libgazebo
 /// \brief Plugin Player interface for Gazebo fiducials
 /// \{
   // Forward declarations
-  class FiducialIface;
+  class GAZEBO_VISIBLE FiducialIface;
 
   /// \brief Plugin Player interface for Gazebo fiducials
-  class FiducialInterface : public GazeboInterface
+  class GAZEBO_VISIBLE FiducialInterface : public GazeboInterface
   {
     /// \brief Constructor
     /// \param addr Plaer device address

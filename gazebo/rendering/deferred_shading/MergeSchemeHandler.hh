@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "gazebo/rendering/deferred_shading/MergeMaterialGenerator.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,8 @@ namespace gazebo
   {
     /// Class for handling materials who did not specify techniques for the
     /// merging step of deferred/inferred lighting.
-    class MergeSchemeHandler : public Ogre::MaterialManager::Listener
+    class GAZEBO_VISIBLE MergeSchemeHandler :
+      public Ogre::MaterialManager::Listener
     {
       public: MergeSchemeHandler(bool _useDSF) : useDSF(_useDSF)
       {

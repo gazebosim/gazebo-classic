@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,4 +98,22 @@ State State::operator-(const State &_state) const
 
   return State(this->name, this->realTime - _state.realTime,
                this->simTime - _state.simTime);
+}
+
+/////////////////////////////////////////////////
+void State::SetWallTime(const common::Time &_time)
+{
+  this->wallTime = _time;
+}
+
+/////////////////////////////////////////////////
+void State::SetRealTime(const common::Time &_time)
+{
+  this->realTime = _time;
+}
+
+/////////////////////////////////////////////////
+void State::SetSimTime(const common::Time &_time)
+{
+  this->simTime = _time;
 }

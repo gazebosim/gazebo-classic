@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,15 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/math/Helpers.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(HelpersTest, Helpers)
+class HelpersTest : public gazebo::testing::AutoLogFixture { };
+
+/////////////////////////////////////////////////
+// Test a few function in Helpers
+TEST_F(HelpersTest, Helpers)
 {
   EXPECT_EQ(12345, math::parseInt("12345"));
   EXPECT_EQ(-12345, math::parseInt("-12345"));
@@ -29,4 +34,28 @@ TEST(HelpersTest, Helpers)
   EXPECT_FLOAT_EQ(12.345, math::parseFloat("12.345"));
   EXPECT_FLOAT_EQ(-12.345, math::parseFloat("-12.345"));
   EXPECT_TRUE(math::equal(123.45, math::parseFloat("1.2345e2"), 1e-2));
+
+  EXPECT_EQ(1u, math::roundUpPowerOfTwo(0));
+  EXPECT_EQ(1u, math::roundUpPowerOfTwo(1));
+  EXPECT_EQ(2u, math::roundUpPowerOfTwo(2));
+  EXPECT_EQ(2048u, math::roundUpPowerOfTwo(1025));
+}
+
+/////////////////////////////////////////////////
+// Test Helpers::fixnan functions
+TEST_F(HelpersTest, FixNaN)
+{
+  EXPECT_DOUBLE_EQ(math::fixnan(1.0 / 0.0), 0.0);
+  EXPECT_DOUBLE_EQ(math::fixnan(-1.0 / 0.0), 0.0);
+  EXPECT_DOUBLE_EQ(math::fixnan(0.0 / 0.0), 0.0);
+
+  EXPECT_DOUBLE_EQ(math::fixnan(42.0), 42.0);
+  EXPECT_DOUBLE_EQ(math::fixnan(-42.0), -42.0);
+
+  EXPECT_FLOAT_EQ(math::fixnan(1.0f / 0.0f), 0.0f);
+  EXPECT_FLOAT_EQ(math::fixnan(-1.0f / 0.0f), 0.0f);
+  EXPECT_FLOAT_EQ(math::fixnan(0.0f / 0.0f), 0.0f);
+
+  EXPECT_FLOAT_EQ(math::fixnan(42.0f), 42.0f);
+  EXPECT_FLOAT_EQ(math::fixnan(-42.0f), -42.0f);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@
 #ifndef _GAZEBO_PID_HH_
 #define _GAZEBO_PID_HH_
 
-#include "common/Time.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,15 +33,17 @@ namespace gazebo
     /// Generic proportiolnal-integral-derivative controller class that
     /// keeps track of PID-error states and control inputs given
     /// the state of a system and a user specified target state.
-    class PID
+    class GAZEBO_VISIBLE PID
     {
-      ///  \brief Constructor, zeros out Pid values when created and
-      ///  initialize Pid-gains and integral term limits:[iMax:iMin]-[I1:I2].
-      ///  \param[in] _p  The proportional gain.
-      ///  \param[in] _i  The integral gain.
-      ///  \param[in] _d  The derivative gain.
-      ///  \param[in] _imax The integral upper limit.
-      ///  \param[in] _imin The integral lower limit.
+      /// \brief Constructor, zeros out Pid values when created and
+      /// initialize Pid-gains and integral term limits:[iMax:iMin]-[I1:I2].
+      /// \param[in] _p  The proportional gain.
+      /// \param[in] _i  The integral gain.
+      /// \param[in] _d  The derivative gain.
+      /// \param[in] _imax The integral upper limit.
+      /// \param[in] _imin The integral lower limit.
+      /// \param[in] _cmdMax Output max value.
+      /// \param[in] _cmdMin Output min value.
       public: PID(double _p = 0.0, double _i = 0.0, double _d = 0.0,
                   double _imax = 0.0, double _imin = 0.0,
                   double _cmdMax = 0.0, double _cmdMin = 0.0);
@@ -48,13 +51,15 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~PID();
 
-      ///  \brief Initialize PID-gains and integral term
-      ///         limits:[iMax:iMin]-[I1:I2]
-      ///  \param[in] _p  The proportional gain.
-      ///  \param[in] _i  The integral gain.
-      ///  \param[in] _d  The derivative gain.
-      ///  \param[in] _imax The integral upper limit.
-      ///  \param[in] _imin The integral lower limit.
+      /// \brief Initialize PID-gains and integral term
+      ///        limits:[iMax:iMin]-[I1:I2]
+      /// \param[in] _p  The proportional gain.
+      /// \param[in] _i  The integral gain.
+      /// \param[in] _d  The derivative gain.
+      /// \param[in] _imax The integral upper limit.
+      /// \param[in] _imin The integral lower limit.
+      /// \param[in] _cmdMax Output max value.
+      /// \param[in] _cmdMin Output min value.
       public: void Init(double _p = 0.0, double _i = 0.0, double _d = 0.0,
                         double _imax = 0.0, double _imin = 0.0,
                         double _cmdMax = 0.0, double _cmdMin = 0.0);
@@ -86,6 +91,34 @@ namespace gazebo
       /// \brief Set the maximum value for the command.
       /// \param[in] _c The maximum value
       public: void SetCmdMin(double _c);
+
+      /// \brief Get the proportional Gain.
+      /// \return The proportional gain value
+      public: double GetPGain() const;
+
+      /// \brief Get the integral Gain.
+      /// \return The integral gain value
+      public: double GetIGain() const;
+
+      /// \brief Get the derivative Gain.
+      /// \return The derivative gain value
+      public: double GetDGain() const;
+
+      /// \brief Get the integral upper limit.
+      /// \return The integral upper limit value
+      public: double GetIMax() const;
+
+      /// \brief Get the integral lower limit.
+      /// \return The integral lower limit value
+      public: double GetIMin() const;
+
+      /// \brief Get the maximum value for the command.
+      /// \return The maximum value
+      public: double GetCmdMax() const;
+
+      /// \brief Get the maximum value for the command.
+      /// \return The maximum value
+      public: double GetCmdMin() const;
 
       /// \brief Update the Pid loop with nonuniform time step size.
       /// \param[_in] _error  Error since last call (p_state - p_target).
@@ -124,6 +157,12 @@ namespace gazebo
                 this->iMax = _p.iMax;
                 this->iMin = _p.iMin;
                 this->cmdMax = _p.cmdMax;
+                this->cmdMin = _p.cmdMin;
+                this->pErrLast = _p.pErrLast;
+                this->pErr = _p.pErr;
+                this->iErr = _p.iErr;
+                this->dErr = _p.dErr;
+                this->cmd = _p.cmd;
 
                 this->Reset();
                 return *this;

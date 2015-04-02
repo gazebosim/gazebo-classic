@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,13 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/math/Vector4.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(Vector4Test, Vector4)
+class Vector4Test : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(Vector4Test, Vector4)
 {
   {
     math::Vector4 v;

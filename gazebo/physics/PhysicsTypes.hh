@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,10 @@
 #define _PHYSICSTYPES_HH_
 
 #include <vector>
+#include <map>
+#include <string>
 #include <boost/shared_ptr.hpp>
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_physics
@@ -35,9 +38,12 @@ namespace gazebo
     class Actor;
     class Link;
     class Collision;
+    class FrictionPyramid;
+    class Gripper;
     class Joint;
     class JointController;
     class Contact;
+    class PresetManager;
     class PhysicsEngine;
     class Mass;
     class Road;
@@ -48,9 +54,14 @@ namespace gazebo
     class SurfaceParams;
     class BoxShape;
     class CylinderShape;
-    class SphereShape;
     class MeshShape;
+    class SphereShape;
+    class PlaneShape;
     class HeightmapShape;
+    class PolylineShape;
+    class ModelState;
+    class LinkState;
+    class JointState;
 
     /// \def BasePtr
     /// \brief Boost shared pointer to a Base object
@@ -96,6 +107,10 @@ namespace gazebo
     /// \brief Boost shared pointer to a PhysicsEngine object
     typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
 
+    /// \def  PresetManagerPtr
+    /// \brief Shared pointer to a PresetManager object
+    typedef boost::shared_ptr<PresetManager> PresetManagerPtr;
+
     /// \def ShapePtr
     /// \brief Boost shared pointer to a Shape object
     typedef boost::shared_ptr<Shape> ShapePtr;
@@ -120,6 +135,10 @@ namespace gazebo
     /// \brief Boost shared pointer to a Road object
     typedef boost::shared_ptr<Road> RoadPtr;
 
+    /// \def FrictionPyramidPtr
+    /// \brief Boost shared pointer to a FrictionPyramid object
+    typedef boost::shared_ptr<FrictionPyramid> FrictionPyramidPtr;
+
     /// \def SurfaceParamsPtr
     /// \brief Boost shared pointer to a SurfaceParams object
     typedef boost::shared_ptr<SurfaceParams> SurfaceParamsPtr;
@@ -132,13 +151,25 @@ namespace gazebo
     /// \brief Boost shared pointer to a CylinderShape object
     typedef boost::shared_ptr<CylinderShape> CylinderShapePtr;
 
-    /// \def SphereShapePtr
-    /// \brief Boost shared pointer to a SphereShape object
-    typedef boost::shared_ptr<SphereShape> SphereShapePtr;
+    /// \def PlaneShapePtr
+    /// \brief Boost shared pointer to a PlaneShape object
+    typedef boost::shared_ptr<PlaneShape> PlaneShapePtr;
 
     /// \def MeshShapePtr
     /// \brief Boost shared pointer to a MeshShape object
     typedef boost::shared_ptr<MeshShape> MeshShapePtr;
+
+    /// \def PolylineShapePtr
+    /// \brief Boost shared pointer to a Polyline shape object
+    typedef boost::shared_ptr<PolylineShape> PolylineShapePtr;
+
+    /// \def SphereShapePtr
+    /// \brief Boost shared pointer to a SphereShape object
+    typedef boost::shared_ptr<SphereShape> SphereShapePtr;
+
+    /// \def GripperPtr
+    /// \brief Boost shared pointer to a Gripper object
+    typedef boost::shared_ptr<Gripper> GripperPtr;
 
     /// \def Base_V
     /// \brief Vector of BasePtr
@@ -168,6 +199,18 @@ namespace gazebo
     /// \brief Vector of CollisionPtr
     typedef std::vector<CollisionPtr>  Collision_V;
 
+    /// \def ModelState_M
+    /// \brief Map of model state
+    typedef std::map<std::string, ModelState> ModelState_M;
+
+    /// \def LinkState_M
+    /// \brief Map of link state
+    typedef std::map<std::string, LinkState> LinkState_M;
+
+    /// \def JointState_M
+    /// \brief Map of joint state
+    typedef std::map<std::string, JointState> JointState_M;
+
     #ifndef GZ_COLLIDE_BITS
 
     /// \def GZ_ALL_COLLIDE
@@ -185,7 +228,7 @@ namespace gazebo
 
     /// \def GZ_SENSOR_COLLIDE
     /// \brief Collision object will collide only with sensors
-    #define GZ_SENSOR_COLLIDE 0x00000003
+    #define GZ_SENSOR_COLLIDE 0x00000002
 
     /// \def GZ_GHOST_COLLIDE
     /// \brief Collides with everything else but other ghost.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,18 @@
 #define _QTESTFIXTURE_HH_
 
 #include <string>
-#include <boost/thread.hpp>
 
-#include "gazebo/physics/physics.hh"
-#include "gazebo/rendering/rendering.hh"
-#include "gazebo/Server.hh"
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include <boost/thread.hpp>
+# include "gazebo/Server.hh"
+# include "gazebo/physics/physics.hh"
+# include "gazebo/rendering/rendering.hh"
+#endif
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/qt_test.h"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 #include "test_config.h"
 
 /// \brief Base class for all Gazebo GUI unit tests.
@@ -35,10 +38,15 @@ class QTestFixture : public QObject
 {
   Q_OBJECT
 
+  public: QTestFixture();
+
   /// \brief Load a world.
   /// \param[in] _worldFilename Name of the world to load.
   /// \param[in] _paused True to start the world paused.
-  protected: void Load(const std::string &_worldFilename, bool _paused = false);
+  /// \param[in] _serverScene True to create a scene on the server
+  /// \param[in] _clientScene True to create a scene on the client
+  protected: void Load(const std::string &_worldFilename, bool _paused = false,
+                 bool _serverScene = true, bool _clientScene = false);
 
   /// \brief Pause or unpause the world.
   /// \param[in] _pause True to pause the world
@@ -63,7 +71,11 @@ class QTestFixture : public QObject
   private slots: void cleanupTestCase();
 
   /// \brief Run the Gazebo server in a thread.
-  private: void RunServer(const std::string &_worldFilename, bool _paused);
+  /// \param[in] _worldFilename World file to load.
+  /// \param[in] _paused True to start the world paused.
+  /// \param[in] _createScene True to create a scene.
+  private: void RunServer(const std::string &_worldFilename, bool _paused,
+                bool _createScene);
 
   /// \brief The Gazebo server, which is run in a thread.
   protected: gazebo::Server *server;
@@ -71,8 +83,16 @@ class QTestFixture : public QObject
   /// \brief Thread to run the Gazebo server.
   protected: boost::thread *serverThread;
 
+  /// \brief Maximum allowed percent change in resident memory usage.
+  protected: double resMaxPercentChange;
+
+  /// \brief Maximum allowed percent change in shared memory usage.
+  protected: double shareMaxPercentChange;
+
+  /// \brief Amount of resident memory at start.
   private: double residentStart;
+
+  /// \brief Amount of shared memory at start.
   private: double shareStart;
 };
-
 #endif

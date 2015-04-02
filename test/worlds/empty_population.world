@@ -1,0 +1,80 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- Testing a population with 0 models -->
+    <population name="can_population1">
+      <model name="can1">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <pose>3 3 0 0 0 0</pose>
+      <box>
+        <size>1 1 0.1</size>
+      </box>
+      <model_count>0</model_count>
+      <distribution>
+        <type>random</type>
+      </distribution>
+    </population>
+
+    <!-- Testing a population with a negative number of models -->
+    <population name="can_population1">
+      <model name="can1">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <pose>3 3 0 0 0 0</pose>
+      <box>
+        <size>1 1 0.1</size>
+      </box>
+      <model_count>-5</model_count>
+      <distribution>
+        <type>uniform</type>
+      </distribution>
+    </population>
+
+    <!-- Testing a 2D grid population with 0 rows -->
+    <population name="can_population2">
+      <model name="can2">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <pose>-0.25 -0.5 0 0 0 0</pose>
+      <distribution>
+        <type>grid</type>
+        <rows>0</rows>
+        <cols>3</cols>
+        <step>0.25 0.25 0</step>
+      </distribution>
+    </population>
+
+    <!-- Testing a 2D grid population with a negative number of columns -->
+    <population name="can_population2">
+      <model name="can2">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <pose>-0.25 -0.5 0 0 0 0</pose>
+      <distribution>
+        <type>grid</type>
+        <rows>2</rows>
+        <cols>-3</cols>
+        <step>0.25 0.25 0</step>
+      </distribution>
+    </population>
+
+  </world>
+</sdf>

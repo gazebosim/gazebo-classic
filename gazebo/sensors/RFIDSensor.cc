@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ void RFIDSensor::Load(const std::string &_worldName)
   if (this->sdf->GetElement("topic"))
   {
     this->scanPub = this->node->Advertise<msgs::Pose>(
-        this->sdf->GetElement("topic")->GetValueString());
+        this->sdf->GetElement("topic")->Get<std::string>());
   }
 
   this->entity = this->world->GetEntity(this->parentName);
@@ -123,7 +123,7 @@ void RFIDSensor::Init()
 }
 
 //////////////////////////////////////////////////
-void RFIDSensor::UpdateImpl(bool /*_force*/)
+bool RFIDSensor::UpdateImpl(bool /*_force*/)
 {
   this->EvaluateTags();
   this->lastMeasurementTime = this->world->GetSimTime();
@@ -134,6 +134,8 @@ void RFIDSensor::UpdateImpl(bool /*_force*/)
     msgs::Set(&msg, this->entity->GetWorldPose());
     this->scanPub->Publish(msg);
   }
+
+  return true;
 }
 
 //////////////////////////////////////////////////

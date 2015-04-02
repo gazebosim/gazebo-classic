@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,13 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/math/Vector3.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(Vector3Test, Vector3)
+class Vector3Test : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(Vector3Test, Vector3)
 {
   math::Vector3 v;
 
@@ -83,4 +86,11 @@ TEST(Vector3Test, Vector3)
   v.Set(1, 2, 4);
   v *= math::Vector3(2, .5, .1);
   EXPECT_TRUE(v.Equal(math::Vector3(2, 1, .4)));
+
+  // Test the static defines.
+  EXPECT_TRUE(math::Vector3::Zero == math::Vector3(0, 0, 0));
+  EXPECT_TRUE(math::Vector3::One == math::Vector3(1, 1, 1));
+  EXPECT_TRUE(math::Vector3::UnitX == math::Vector3(1, 0, 0));
+  EXPECT_TRUE(math::Vector3::UnitY == math::Vector3(0, 1, 0));
+  EXPECT_TRUE(math::Vector3::UnitZ == math::Vector3(0, 0, 1));
 }

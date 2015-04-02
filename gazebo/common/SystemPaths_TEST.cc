@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,21 @@
 */
 #include <gtest/gtest.h>
 
+#include <string>
+#include <vector>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+
 #include "gazebo/common/SystemPaths.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(SystemPathsTest, SystemPaths)
+class SystemPathsTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(SystemPathsTest, SystemPaths)
 {
+  std::vector<std::string> tmpstrings;
   std::string gazeboResourcePathBackup = "GAZEBO_RESOURCE_PATH=";
   std::string ogreResourcePathBackup = "OGRE_RESOURCE_PATH=";
   std::string pluginPathBackup = "GAZEBO_PLUGIN_PATH=";
@@ -42,22 +51,31 @@ TEST(SystemPathsTest, SystemPaths)
   paths->ClearOgrePaths();
   paths->ClearPluginPaths();
 
-  putenv(const_cast<char*>("GAZEBO_RESOURCE_PATH=/tmp/resource:/test/me/now"));
-  const std::list<std::string> pathList1 = paths->GetGazeboPaths();
+  std::string gzResourcePath = "GAZEBO_RESOURCE_PATH=" + paths->GetTmpPath() +
+      "/resource:/test/me/now";
+  putenv(const_cast<char*>(gzResourcePath.c_str()));
+  const std::list<std::string> &pathList1 = paths->GetGazeboPaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList1.size());
-  EXPECT_STREQ("/tmp/resource", pathList1.front().c_str());
+  EXPECT_STREQ((paths->GetTmpPath() + "/resource").c_str(),
+      pathList1.front().c_str());
   EXPECT_STREQ("/test/me/now", pathList1.back().c_str());
 
-  putenv(const_cast<char*>("OGRE_RESOURCE_PATH=/tmp/ogre:/test/ogre/now"));
-  const std::list<std::string> pathList2 = paths->GetOgrePaths();
+  std::string ogreResourcePath = "OGRE_RESOURCE_PATH=" + paths->GetTmpPath() +
+      "/ogre:/test/ogre/now";
+  putenv(const_cast<char*>(ogreResourcePath.c_str()));
+  const std::list<std::string> &pathList2 = paths->GetOgrePaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList2.size());
-  EXPECT_STREQ("/tmp/ogre", pathList2.front().c_str());
+  EXPECT_STREQ((paths->GetTmpPath() + "/ogre").c_str(),
+      pathList2.front().c_str());
   EXPECT_STREQ("/test/ogre/now", pathList2.back().c_str());
 
-  putenv(const_cast<char*>("GAZEBO_PLUGIN_PATH=/tmp/plugin:/test/plugin/now"));
-  const std::list<std::string> pathList3 = paths->GetPluginPaths();
+  std::string gzPluginPath = "GAZEBO_PLUGIN_PATH=" + paths->GetTmpPath() +
+      "/plugin:/test/plugin/now";
+  putenv(const_cast<char*>(gzPluginPath.c_str()));
+  const std::list<std::string> &pathList3 = paths->GetPluginPaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList3.size());
-  EXPECT_STREQ("/tmp/plugin", pathList3.front().c_str());
+  EXPECT_STREQ((paths->GetTmpPath() + "/plugin").c_str(),
+      pathList3.front().c_str());
   EXPECT_STREQ("/test/plugin/now", pathList3.back().c_str());
 
   EXPECT_STREQ("/worlds", paths->GetWorldPathExtension().c_str());
@@ -67,7 +85,7 @@ TEST(SystemPathsTest, SystemPaths)
   EXPECT_STREQ("/other/gazebo", paths->GetGazeboPaths().back().c_str());
 
   paths->AddPluginPaths("/plugin/path:/other/plugin");
-  EXPECT_EQ(static_cast<unsigned int>(4), paths->GetGazeboPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(4), paths->GetPluginPaths().size());
   EXPECT_STREQ("/other/plugin", paths->GetPluginPaths().back().c_str());
 
   paths->AddOgrePaths("/ogre/path:/other/ogre");
@@ -84,15 +102,21 @@ TEST(SystemPathsTest, SystemPaths)
 
   putenv(const_cast<char*>("GAZEBO_RESOURCE_PATH="));
   paths->ClearGazeboPaths();
-  EXPECT_EQ(static_cast<unsigned int>(0), paths->GetGazeboPaths().size());
+  // In this case, we expect to get the compiled-in default
+  boost::split(tmpstrings, GAZEBO_RESOURCE_PATH, boost::is_any_of(":"));
+  EXPECT_EQ(tmpstrings.size(), paths->GetGazeboPaths().size());
 
   putenv(const_cast<char*>("OGRE_RESOURCE_PATH="));
   paths->ClearOgrePaths();
-  EXPECT_EQ(static_cast<unsigned int>(0), paths->GetOgrePaths().size());
+  // In this case, we expect to get the compiled-in default
+  boost::split(tmpstrings, OGRE_RESOURCE_PATH, boost::is_any_of(":"));
+  EXPECT_EQ(tmpstrings.size(), paths->GetOgrePaths().size());
 
   putenv(const_cast<char*>("GAZEBO_PLUGIN_PATH="));
   paths->ClearPluginPaths();
-  EXPECT_EQ(static_cast<unsigned int>(0), paths->GetPluginPaths().size());
+  // In this case, we expect to get the compiled-in default
+  boost::split(tmpstrings, GAZEBO_PLUGIN_PATH, boost::is_any_of(":"));
+  EXPECT_EQ(tmpstrings.size(), paths->GetPluginPaths().size());
 
   std::cout << "GAZEBO_RESOURCE_BACKUP[" << gazeboResourcePathBackup << "]\n";
   std::cout << "OGRE_RESOURCE_BACKUP[" << ogreResourcePathBackup << "]\n";

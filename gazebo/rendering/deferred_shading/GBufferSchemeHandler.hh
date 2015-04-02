@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <string>
 
 #include "gazebo/rendering/deferred_shading/GBufferMaterialGenerator.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,8 @@ namespace gazebo
     /// @note This does not support all the possible rendering techniques
     /// out there. in order to support more, either expand this class or
     /// specify the techniques in the materials.
-    class GBufferSchemeHandler : public Ogre::MaterialManager::Listener
+    class GAZEBO_VISIBLE GBufferSchemeHandler :
+      public Ogre::MaterialManager::Listener
     {
       public: GBufferSchemeHandler(GBufferMaterialGenerator::GBufferType _type)
               : type(_type), materialGenerator(_type) {}

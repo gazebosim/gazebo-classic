@@ -352,7 +352,48 @@ namespace SkyX
       return mTimeOffset;
     }
 
+    void setEnabled(bool _enabled)
+    {
+      this->mEnabled = _enabled;
+      this->setMoonEnabled(_enabled);
+      this->setCloudsEnabled(_enabled);
+    }
+
+    inline bool getEnabled()
+    {
+      return this->mEnabled;
+    }
+
+    void setMoonEnabled(bool _enabled)
+    {
+      this->mMoonEnabled = _enabled;
+      this->mMoonManager->setEnabled(_enabled);
+    }
+
+    inline bool getMoonEnabled()
+    {
+      return this->mMoonEnabled;
+    }
+
+    void setCloudsEnabled(bool _enabled)
+    {
+      this->mCloudsEnabled = _enabled;
+      this->mVCloudsManager->getVClouds()->setEnabled(_enabled);
+    }
+
+    inline bool getCloudsEnabled()
+    {
+      return this->mCloudsEnabled;
+    }
+
   private:
+
+    /// Enable starfield?
+    bool mStarfield;
+
+    /// Lighting mode
+    LightingMode mLightingMode;
+
     /// Scene manager
     Ogre::SceneManager *mSceneManager;
 
@@ -390,11 +431,6 @@ namespace SkyX
     /// Is SkyX visible?
     bool mVisible;
 
-    /// Lighting mode
-    LightingMode mLightingMode;
-    /// Enable starfield?
-    bool mStarfield;
-
     /// Time multiplier
     Ogre::Real mTimeMultiplier;
     /// Time offset
@@ -402,6 +438,15 @@ namespace SkyX
 
     /// Volumetric clouds manager
     VCloudsManager* mVCloudsManager;
+
+    /// True if moon is enabled
+    bool mMoonEnabled;
+
+    /// True if clouds are enabled
+    bool mCloudsEnabled;
+
+    /// True if skyx is enabled
+    bool mEnabled;
   };
 }
 

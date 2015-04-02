@@ -1,0 +1,14 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface PropagationGrid
+/// \brief Wireless propagation grid
+
+
+import "propagation_particle.proto";
+
+message PropagationGrid
+{
+  repeated PropagationParticle particle = 1;
+}
+

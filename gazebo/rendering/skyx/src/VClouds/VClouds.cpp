@@ -53,8 +53,6 @@ VClouds::VClouds(Ogre::SceneManager *sm)
     , mGeometryManager(new GeometryManager(this))
     , mLightningManager(new LightningManager(this))
     , mCamerasData(std::vector<CameraData>())
-    , mVolCloudsMaterial(Ogre::MeshPtr())
-    , mVolCloudsLightningMaterial(Ogre::MeshPtr())
 {
 }
 
@@ -250,6 +248,18 @@ void VClouds::setVisible(const bool& visible)
 
   mGeometryManager->getSceneNode()->setVisible(mVisible);
   mLightningManager->_setVisible(mVisible);
+}
+
+void VClouds::setEnabled(bool _enabled)
+{
+  if (!mCreated)
+  {
+    return;
+  }
+
+  bool visible = _enabled ? mVisible : false;
+  mGeometryManager->getSceneNode()->setVisible(visible);
+  mLightningManager->_setVisible(visible);
 }
 
 void VClouds::setRenderQueueGroups(const RenderQueueGroups& rqg)

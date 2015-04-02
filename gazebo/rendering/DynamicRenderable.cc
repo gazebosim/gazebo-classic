@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#include "common/Console.hh"
-#include "rendering/DynamicRenderable.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/rendering/DynamicRenderable.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -165,10 +165,18 @@ void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount,
         this->vertexBufferCapacity,
         Ogre::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
 
+    Ogre::HardwareVertexBufferSharedPtr cbuf =
+      Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
+        Ogre::VertexElement::getTypeSize(Ogre::VET_COLOUR),
+        this->vertexBufferCapacity,
+        Ogre::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
+
     // TODO: Custom HBU_?
 
     // Bind buffer
     this->mRenderOp.vertexData->vertexBufferBinding->setBinding(0, vbuf);
+
+    this->mRenderOp.vertexData->vertexBufferBinding->setBinding(1, cbuf);
   }
 
   // Update vertex count in the render operation
@@ -238,5 +246,8 @@ Ogre::Real DynamicRenderable::getSquaredViewDepth(const Ogre::Camera* cam) const
   return vDist.squaredLength();
 }
 
-
-
+/////////////////////////////////////////////////
+std::string DynamicRenderable::GetMovableType() const
+{
+  return "gazebo::DynamicRenderable";
+}

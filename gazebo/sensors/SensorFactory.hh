@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <vector>
 
 #include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -43,7 +44,7 @@ namespace gazebo
   /// \{
   /// \class SensorFactor SensorFactory.hh sensors/sensors.hh
   /// \brief The sensor factory; the class is just for namespacing purposes.
-  class SensorFactory
+  class GAZEBO_VISIBLE SensorFactory
   {
     /// \brief Register all known sensors
     ///  \li sensors::CameraSensor
@@ -53,6 +54,8 @@ namespace gazebo
     ///  \li sensors::ContactSensor
     ///  \li sensors::RFIDSensor
     ///  \li sensors::RFIDTag
+    ///  \li sensors::WirelessTransmitter
+    ///  \li sensors::WirelessReceiver
     public: static void RegisterAll();
 
     /// \brief Register a sensor class (called by sensor registration function).
@@ -83,10 +86,11 @@ namespace gazebo
   /// @param name Sensor type name, as it appears in the world file.
   /// @param classname C++ class name for the sensor.
   #define GZ_REGISTER_STATIC_SENSOR(name, classname) \
-  Sensor *New##classname() \
+  GAZEBO_VISIBLE Sensor *New##classname() \
   { \
     return new gazebo::sensors::classname(); \
   } \
+  GAZEBO_VISIBLE \
   void Register##classname() \
   {\
     SensorFactory::RegisterSensor(name, New##classname);\

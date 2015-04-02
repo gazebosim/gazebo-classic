@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,20 @@
  * Author: Nate Koenig
  */
 
-#ifndef __GAZEBO_VEHICLE_PLUGIN_HH__
-#define __GAZEBO_VEHICLE_PLUGIN_HH__
+#ifndef _GAZEBO_VEHICLE_PLUGIN_HH_
+#define _GAZEBO_VEHICLE_PLUGIN_HH_
 
 #include <string>
 #include <vector>
 
-#include "common/common.hh"
-#include "physics/physics.hh"
-#include "transport/transport.hh"
-#include "gazebo.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  class VehiclePlugin : public ModelPlugin
+  class GAZEBO_VISIBLE VehiclePlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: VehiclePlugin();

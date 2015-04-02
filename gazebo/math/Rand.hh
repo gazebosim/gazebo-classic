@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #define _RAND_HH_
 
 #include <boost/random.hpp>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -56,7 +57,7 @@ namespace gazebo
 
     /// \class Rand Rand.hh gzmath/gzmath.hh
     /// \brief Random number generator class
-    class Rand
+    class GAZEBO_VISIBLE Rand
     {
       /// \brief Set the seed value.
       /// \param[in] _seed The seed used to initialize the randon number

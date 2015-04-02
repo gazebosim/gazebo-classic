@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,16 @@ JointState::JointState()
 }
 
 /////////////////////////////////////////////////
+JointState::JointState(JointPtr _joint, const common::Time &_realTime,
+    const common::Time &_simTime)
+: State(_joint->GetName(), _realTime, _simTime)
+{
+  // Set the joint angles.
+  for (unsigned int i = 0; i < _joint->GetAngleCount(); ++i)
+    this->angles.push_back(_joint->GetAngle(i));
+}
+
+/////////////////////////////////////////////////
 JointState::JointState(JointPtr _joint)
 : State(_joint->GetName(), _joint->GetWorld()->GetRealTime(),
         _joint->GetWorld()->GetSimTime())
@@ -54,10 +64,24 @@ JointState::~JointState()
 }
 
 /////////////////////////////////////////////////
+void JointState::Load(JointPtr _joint, const common::Time &_realTime,
+    const common::Time &_simTime)
+{
+  this->name = _joint->GetName();
+  this->realTime = _realTime;
+  this->simTime = _simTime;
+  this->wallTime = common::Time::GetWallTime();
+
+  // Set the joint angles.
+  for (unsigned int i = 0; i < _joint->GetAngleCount(); ++i)
+    this->angles.push_back(_joint->GetAngle(i));
+}
+
+/////////////////////////////////////////////////
 void JointState::Load(const sdf::ElementPtr _elem)
 {
   // Set the name
-  this->name = _elem->GetValueString("name");
+  this->name = _elem->Get<std::string>("name");
 
   // Set the angles
   this->angles.clear();
@@ -66,10 +90,10 @@ void JointState::Load(const sdf::ElementPtr _elem)
     sdf::ElementPtr childElem = _elem->GetElement("angle");
     while (childElem)
     {
-      unsigned int axis = childElem->GetValueUInt("axis");
+      unsigned int axis = childElem->Get<unsigned int>("axis");
       if (axis+1 > this->angles.size())
         this->angles.resize(axis+1, math::Angle(0.0));
-      this->angles[axis] = childElem->GetValueDouble();
+      this->angles[axis] = childElem->Get<double>();
       childElem = childElem->GetNextElement("angle");
     }
   }
@@ -105,7 +129,7 @@ bool JointState::IsZero() const
   for (std::vector<math::Angle>::const_iterator iter = this->angles.begin();
        iter != this->angles.end() && result; ++iter)
   {
-    result = result && (*iter) == math::Angle(0.0);
+    result = result && (*iter) == math::Angle::Zero;
   }
 
   return result;

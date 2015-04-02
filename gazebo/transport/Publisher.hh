@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,11 @@
 #include <boost/thread.hpp>
 #include <string>
 #include <list>
+#include <map>
 
-#include "transport/TransportTypes.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,12 +40,8 @@ namespace gazebo
 
     /// \class Publisher Publisher.hh transport/transport.hh
     /// \brief A publisher of messages on a topic
-    class Publisher
+    class GAZEBO_VISIBLE Publisher
     {
-      /// Deprecated
-      public: Publisher(const std::string &_topic, const std::string &_msgType,
-                        unsigned int _limit, bool _latch) GAZEBO_DEPRECATED;
-
       /// \brief Constructor
       /// \param[in] _topic Name of topic to be published
       /// \param[in] _msgType Type of the message to be published
@@ -63,10 +62,16 @@ namespace gazebo
       ///        publisher
       public: void WaitForConnection() const;
 
+      /// \brief Block until a connection has been established with this
+      ///        publisher
+      /// \param[in] _timeout Maxiumum time to wait. Use a negative time
+      /// value to wait forever.
+      /// \return True if a connection was established.
+      public: bool WaitForConnection(const common::Time &_timeout) const;
+
       /// \brief Set the publication object for a particular publication
       /// \param[in] _publication Pointer to the publication object to be set
-      /// \param[in] _i Index into publications vector that will be set
-      public: void SetPublication(PublicationPtr &_publication, int _i);
+      public: void SetPublication(PublicationPtr _publication);
 
       /// \brief Publish a protobuf message on the topic
       /// \param[in] _message Message to be published
@@ -88,9 +93,6 @@ namespace gazebo
       /// \return The number of outgoing messages
       public: unsigned int GetOutgoingCount() const;
 
-      private: void PublishImpl(const google::protobuf::Message &_message,
-                                bool _block);
-
       /// \brief Get the topic name
       /// \return The topic name
       public: std::string GetTopic() const;
@@ -102,15 +104,32 @@ namespace gazebo
       /// \brief Send latest message over the wire. For internal use only
       public: void SendMessage();
 
-      /// Deprecated
-      public: bool GetLatching() const GAZEBO_DEPRECATED;
+      /// \brief Set our containing node.
+      /// \param[in] _node Pointer to a node. Should be the node that create
+      /// this publisher.
+      public: void SetNode(NodePtr _node);
 
       /// \brief Get the previously published message
       /// \return The previously published message, if any
       public: std::string GetPrevMsg() const;
 
+      /// \brief Get the previously published message
+      /// \return The previously published message, if any
+      public: MessagePtr GetPrevMsgPtr() const;
+
+      /// \brief Finalize the publisher.
+      public: void Fini();
+
+      /// \brief Implementation of Publish.
+      /// \param[in] _message Message to be published.
+      /// \param[in] _block Whether to block until the message is actually
+      /// written out.
+      private: void PublishImpl(const google::protobuf::Message &_message,
+                                bool _block);
+
       /// \brief Callback when a publish is completed
-      private: void OnPublishComplete();
+      /// \param[in] _id ID associated with the publication.
+      private: void OnPublishComplete(uint32_t _id);
 
       /// \brief Topic on which messages are published.
       private: std::string topic;
@@ -131,20 +150,32 @@ namespace gazebo
       private: bool queueLimitWarned;
 
       /// \brief List of messages to publish.
-      private: std::list<google::protobuf::Message *> messages;
+      private: std::list<MessagePtr> messages;
 
       /// \brief For mutual exclusion.
-      private: mutable boost::recursive_mutex mutex;
+      private: mutable boost::mutex mutex;
 
       /// \brief The publication pointers. One for normal publication, and
       /// one for debug.
-      private: PublicationPtr publications[2];
+      private: PublicationPtr publication;
 
-      /// \brief The previous message published. Used for latching topics.
-      private: google::protobuf::Message *prevMsg;
+      /// \brief Pointer to our containing node.
+      private: NodePtr node;
 
       private: common::Time currentTime;
       private: common::Time prevPublishTime;
+
+      /// \brief Current id of the sent message.
+      private: uint32_t pubId;
+
+      /// \brief Current publication ids.
+      private: std::map<uint32_t, int> pubIds;
+
+      /// \brief Unique ID for this publisher.
+      private: uint32_t id;
+
+      /// \brief Counter to create unique ID for publishers.
+      private: static uint32_t idCounter;
     };
     /// \}
   }

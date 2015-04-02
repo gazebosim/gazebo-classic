@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #ifndef POWERINTERFACE_HH
 #define POWERINTERFACE_HH
 
+#include "gazebo/util/system.hh"
 #include "GazeboInterface.hh"
 
 // Forward declarations
@@ -29,7 +30,7 @@ typedef struct gz_power gz_power_t;
 
 
 /// \brief Power interface
-class PowerInterface : public GazeboInterface
+class GAZEBO_VISIBLE PowerInterface : public GazeboInterface
 {
   /// \brief Constructor
   public: PowerInterface(player_devaddr_t addr, GazeboDriver *driver,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@
 
 #include <cmath>
 #include <sstream>
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "common/Exception.hh"
-#include "rendering/DynamicLines.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/rendering/DynamicLines.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -60,16 +60,19 @@ const Ogre::String &DynamicLines::getMovableType() const
 }
 
 /////////////////////////////////////////////////
-void DynamicLines::AddPoint(const math::Vector3 &pt)
+void DynamicLines::AddPoint(const math::Vector3 &_pt,
+                            const common::Color &_color)
 {
-  this->points.push_back(pt);
+  this->points.push_back(_pt);
+  this->colors.push_back(_color);
   this->dirty = true;
 }
 
 /////////////////////////////////////////////////
-void DynamicLines::AddPoint(double _x, double _y, double _z)
+void DynamicLines::AddPoint(double _x, double _y, double _z,
+                            const common::Color &_color)
 {
-  this->AddPoint(math::Vector3(_x, _y, _z));
+  this->AddPoint(math::Vector3(_x, _y, _z), _color);
 }
 
 /////////////////////////////////////////////////
@@ -85,6 +88,13 @@ void DynamicLines::SetPoint(unsigned int index, const math::Vector3 &value)
 
   this->points[index] = value;
 
+  this->dirty = true;
+}
+
+/////////////////////////////////////////////////
+void DynamicLines::SetColor(unsigned int _index, const common::Color &_color)
+{
+  this->colors[_index] = _color;
   this->dirty = true;
 }
 
@@ -126,6 +136,7 @@ void DynamicLines::CreateVertexDeclaration()
     this->mRenderOp.vertexData->vertexDeclaration;
 
   decl->addElement(POSITION_BINDING, 0, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
+  decl->addElement(1, 0, Ogre::VET_COLOUR, Ogre::VES_DIFFUSE);
 }
 
 /////////////////////////////////////////////////
@@ -157,6 +168,21 @@ void DynamicLines::FillHardwareBuffers()
     }
   }
   vbuf->unlock();
+
+  // Update the colors
+  Ogre::HardwareVertexBufferSharedPtr cbuf =
+    this->mRenderOp.vertexData->vertexBufferBinding->getBuffer(1);
+
+  Ogre::RGBA *colorArrayBuffer =
+        static_cast<Ogre::RGBA*>(cbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
+  Ogre::RenderSystem *renderSystemForVertex =
+        Ogre::Root::getSingleton().getRenderSystem();
+  for (int i = 0; i < size; ++i)
+  {
+    Ogre::ColourValue color = Conversions::Convert(this->colors[i]);
+    renderSystemForVertex->convertColourValue(color, &colorArrayBuffer[i]);
+  }
+  cbuf->unlock();
 
   // need to update after mBox change, otherwise the lines goes in and out
   // of scope based on old mBox

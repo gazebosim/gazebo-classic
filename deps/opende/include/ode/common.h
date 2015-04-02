@@ -261,7 +261,10 @@ typedef enum {
   dJointTypePlane2D,
   dJointTypePR,
   dJointTypePU,
-  dJointTypePiston
+  dJointTypePiston,
+  dJointTypeDBall,
+  dJointTypeDHinge,
+  dJointTypeGearbox
 } dJointType;
 
 

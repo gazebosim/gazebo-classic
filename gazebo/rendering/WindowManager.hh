@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "common/SingletonT.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
@@ -37,13 +37,13 @@ namespace gazebo
 
     /// \class WindowManager WindowManager.hh rendering/rendering.hh
     /// \brief Class to mangage render windows.
-    class WindowManager : public SingletonT<WindowManager>
+    class GAZEBO_VISIBLE WindowManager
     {
       /// \brief Constructor
-      private: WindowManager();
+      public: WindowManager();
 
       /// \brief Destructor
-      private: virtual ~WindowManager();
+      public: virtual ~WindowManager();
 
       /// \brief Shutdown all the windows
       public: void Fini();
@@ -91,9 +91,6 @@ namespace gazebo
 
       /// \brief Used to create unique names for the windows.
       private: static uint32_t windowCounter;
-
-      /// \brief This is a singleton class.
-      private: friend class SingletonT<WindowManager>;
     };
     /// \}
   }

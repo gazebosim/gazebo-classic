@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,22 @@
  *
 */
 /*
- * Desc: Contact Plugin
+ * Desc: Ray Plugin
  * Author: Nate Koenig mod by John Hsu
  */
 
-#ifndef GAZEBO_RAY_PLUGIN_HH
-#define GAZEBO_RAY_PLUGIN_HH
+#ifndef _GAZEBO_RAY_PLUGIN_HH_
+#define _GAZEBO_RAY_PLUGIN_HH_
 
-#include "common/Plugin.hh"
-#include "sensors/SensorTypes.hh"
-#include "sensors/RaySensor.hh"
-#include "gazebo.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/sensors/RaySensor.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  /// \brief A Bumper controller
-  class RayPlugin : public SensorPlugin
+  /// \brief A Ray Sensor Plugin
+  class GAZEBO_VISIBLE RayPlugin : public SensorPlugin
   {
     /// \brief Constructor
     public: RayPlugin();
@@ -38,9 +38,8 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~RayPlugin();
 
-    // update callback
+    /// \brief Update callback
     public: virtual void OnNewLaserScans();
-    private: event::ConnectionPtr newLaserScansConnection;
 
     /// \brief Load the plugin
     /// \param take in SDF root element
@@ -51,8 +50,9 @@ namespace gazebo
 
     /// \brief The parent sensor
     private: sensors::RaySensorPtr parentSensor;
+
+    /// \brief The connection tied to RayPlugin::OnNewLaserScans()
+    private: event::ConnectionPtr newLaserScansConnection;
   };
 }
-
 #endif
-

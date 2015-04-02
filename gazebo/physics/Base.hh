@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,11 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -63,12 +65,13 @@ namespace gazebo
       "ray",
       "plane",
       "sphere",
-      "trimesh"
+      "trimesh",
+      "polyline"
     };
 
     /// \class Base Base.hh physics/physics.hh
     /// \brief Base class for most physics classes
-    class Base : public boost::enable_shared_from_this<Base>
+    class GAZEBO_VISIBLE Base : public boost::enable_shared_from_this<Base>
     {
       /// \enum EntityType
       /// \brief Unique identifiers for all entity types.
@@ -104,27 +107,34 @@ namespace gazebo
                 SCREW_JOINT     = 0x00000800,
                 /// \brief UniversalJoint type
                 UNIVERSAL_JOINT = 0x00001000,
+                /// \brief GearboxJoint type
+                GEARBOX_JOINT   = 0x00002000,
 
                 /// \brief Shape type
-                SHAPE           = 0x00002000,
+                SHAPE           = 0x00010000,
                 /// \brief BoxShape type
-                BOX_SHAPE       = 0x00004000,
+                BOX_SHAPE       = 0x00020000,
                 /// \brief CylinderShape type
-                CYLINDER_SHAPE  = 0x00008000,
+                CYLINDER_SHAPE  = 0x00040000,
                 /// \brief HeightmapShape type
-                HEIGHTMAP_SHAPE = 0x00010000,
+                HEIGHTMAP_SHAPE = 0x00080000,
                 /// \brief MapShape type
-                MAP_SHAPE       = 0x00020000,
+                MAP_SHAPE       = 0x00100000,
                 /// \brief MultiRayShape type
-                MULTIRAY_SHAPE  = 0x00040000,
+                MULTIRAY_SHAPE  = 0x00200000,
                 /// \brief RayShape type
-                RAY_SHAPE       = 0x00080000,
+                RAY_SHAPE       = 0x00400000,
                 /// \brief PlaneShape type
-                PLANE_SHAPE     = 0x00100000,
+                PLANE_SHAPE     = 0x00800000,
                 /// \brief SphereShape type
-                SPHERE_SHAPE    = 0x00200000,
-                /// \brief TrimeshShape type
-                TRIMESH_SHAPE   = 0x00400000
+                SPHERE_SHAPE    = 0x01000000,
+                /// \brief MeshShape type
+                MESH_SHAPE      = 0x02000000,
+                /// \brief PolylineShape type
+                POLYLINE_SHAPE  = 0x04000000,
+
+                /// \brief Indicates a collision shape used for sensing
+                SENSOR_COLLISION = 0x10000000
               };
 
       /// \brief Constructor
@@ -169,7 +179,7 @@ namespace gazebo
 
       /// \brief Return the ID of this entity. This id is unique.
       /// \return Integer ID.
-      public: unsigned int GetId() const;
+      public: uint32_t GetId() const;
 
       /// \brief Set whether the object should be "saved", when the user
       /// selects to save the world to xml
@@ -251,9 +261,12 @@ namespace gazebo
       public: unsigned int GetType() const;
 
       /// \brief Return the name of this entity with the model scope
-      /// world::model1::...::modelN::entityName
+      /// model1::...::modelN::entityName
+      /// \param[in] _prependWorldName True to prended the returned string
+      /// with the world name. The result will be
+      /// world::model1::...::modelN::entityName.
       /// \return The scoped name.
-      public: std::string GetScopedName() const;
+      public: std::string GetScopedName(bool _prependWorldName = false) const;
 
       /// \brief Print this object to screen via gzmsg.
       /// \param[in] _prefix Usually a set of spaces.
@@ -287,6 +300,11 @@ namespace gazebo
       /// \return The SDF values for the object.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \brief Compute the scoped name of this object based on its
+      /// parents.
+      /// \sa Base::GetScopedName
+      protected: void ComputeScopedName();
+
       /// \brief The SDF values for this object.
       protected: sdf::ElementPtr sdf;
 
@@ -296,9 +314,6 @@ namespace gazebo
       /// \brief Children of this entity.
       protected: Base_V children;
 
-      /// \brief End of the children vector.
-      protected: Base_V::iterator childrenEnd;
-
       /// \brief Pointer to the world.
       protected: WorldPtr world;
 
@@ -306,16 +321,19 @@ namespace gazebo
       private: bool saveable;
 
       /// \brief This entities ID.
-      private: unsigned int id;
-
-      /// \brief Used to automaticaly chose a unique ID on creation.
-      private: static unsigned int idCounter;
+      private: uint32_t id;
 
       /// \brief The type of this object.
       private: unsigned int type;
 
       /// \brief True if selected.
       private: bool selected;
+
+      /// \brief Local copy of the sdf name.
+      private: std::string name;
+
+      /// \brief Local copy of the scoped name.
+      private: std::string scopedName;
 
       protected: friend class Entity;
     };

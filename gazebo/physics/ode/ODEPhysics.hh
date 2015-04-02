@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: The ODE physics engine wrapper
- * Author: Nate Koenig
- * Date: 11 June 2007
- */
-
 #ifndef _ODEPHYSICS_HH_
 #define _ODEPHYSICS_HH_
 
 #include <tbb/spin_mutex.h>
 #include <tbb/concurrent_vector.h>
-#include <map>
 #include <string>
-#include <vector>
 #include <utility>
 
 #include <boost/thread/thread.hpp>
@@ -37,29 +30,57 @@
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/gazebo_config.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \brief Data structure for contact feedbacks
-    class ODEJointFeedback
-    {
-      public: ODEJointFeedback() : contact(NULL), count(0) {}
-
-      /// \brief Contact information.
-      public: Contact *contact;
-
-      /// \brief Number of elements in feedbacks array.
-      public: int count;
-
-      /// \brief Contact joint feedback information.
-      public: dJointFeedback feedbacks[MAX_CONTACT_JOINTS];
-    };
+    class ODEJointFeedback;
+    class ODEPhysicsPrivate;
 
     /// \brief ODE physics engine.
-    class ODEPhysics : public PhysicsEngine
+    class GAZEBO_VISIBLE ODEPhysics : public PhysicsEngine
     {
+      /// \enum ODEParam
+      /// \brief ODE Physics parameter types.
+      public: enum ODEParam
+      {
+        /// \brief Solve type
+        SOLVER_TYPE,
+
+        /// \brief Constraint force mixing
+        GLOBAL_CFM,
+
+        /// \brief Error reduction parameter
+        GLOBAL_ERP,
+
+        /// \brief Number of iterations
+        SOR_PRECON_ITERS,
+
+        /// \brief Number of iterations
+        PGS_ITERS,
+
+        /// \brief SOR over-relaxation parameter
+        SOR,
+
+        /// \brief Max correcting velocity
+        CONTACT_MAX_CORRECTING_VEL,
+
+        /// \brief Surface layer depth
+        CONTACT_SURFACE_LAYER,
+
+        /// \brief Maximum number of contacts
+        MAX_CONTACTS,
+
+        /// \brief Minimum step size
+        MIN_STEP_SIZE,
+
+        /// \brief Limit ratios of inertias of adjacent links (note that the
+        /// corresponding SDF tag is "use_dynamic_moi_rescaling")
+        INERTIA_RATIO_REDUCTION
+      };
+
       /// \brief Constructor.
       /// \param[in] _world The World that uses this physics engine.
       public: ODEPhysics(WorldPtr _world);
@@ -91,12 +112,6 @@ namespace gazebo
       // Documentation inherited
       public: virtual std::string GetType() const
                       { return "ode"; }
-
-      // Documentation inherited
-      public: virtual void SetStepTime(double _value);
-
-      // Documentation inherited
-      public: virtual double GetStepTime();
 
       // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
@@ -162,13 +177,24 @@ namespace gazebo
       public: virtual double GetContactSurfaceLayer();
 
       // Documentation inherited
-      public: virtual int GetMaxContacts();
+      public: virtual unsigned int GetMaxContacts();
 
       // Documentation inherited
       public: virtual void DebugPrint() const;
 
       // Documentation inherited
       public: virtual void SetSeed(uint32_t _seed);
+
+      /// Documentation inherited
+      public: virtual bool SetParam(const std::string &_key,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual boost::any GetParam(const std::string &_key) const;
+
+      /// Documentation inherited
+      public: virtual bool GetParam(const std::string &_key,
+                  boost::any &_value) const;
 
       /// \brief Return the world space id.
       /// \return The space id for the world.
@@ -233,51 +259,9 @@ namespace gazebo
       private: void AddCollider(ODECollision *_collision1,
                                 ODECollision *_collision2);
 
-      /// \brief Top-level world for all bodies
-      private: dWorldID worldId;
-
-      /// \brief Top-level space for all sub-spaces/collisions
-      private: dSpaceID spaceId;
-
-      /// \brief Collision attributes
-      private: dJointGroupID contactGroup;
-
-      /// \brief Store the value of the stepTime parameter to improve efficiency
-      private: double stepTimeDouble;
-
-      /// \brief The type of the solver.
-      private: std::string stepType;
-
-      /// \brief Buffer of contact feedback information.
-      private: std::vector<ODEJointFeedback*> jointFeedbacks;
-
-      /// \brief Current index into the contactFeedbacks buffer
-      private: unsigned int jointFeedbackIndex;
-
-      /// \brief All the collsiion spaces.
-      private: std::map<std::string, dSpaceID> spaces;
-
-      /// \brief All the normal colliders.
-      private: std::vector< std::pair<ODECollision*, ODECollision*> > colliders;
-
-      /// \brief All the triangle mesh colliders.
-      private: std::vector< std::pair<ODECollision*, ODECollision*> >
-               trimeshColliders;
-
-      /// \brief Number of normal colliders.
-      private: unsigned int collidersCount;
-
-      /// \brief Number of triangle mesh colliders.
-      private: unsigned int trimeshCollidersCount;
-
-      /// \brief Array of contact collisions.
-      private: dContactGeom contactCollisions[MAX_COLLIDE_RETURNS];
-
-      /// \brief Physics step function.
-      private: int (*physicsStepFunc)(dxWorld*, dReal);
-
-      /// \brief Indices used during creation of contact joints.
-      private: int indices[MAX_CONTACT_JOINTS];
+      /// \internal
+      /// \brief Private data pointer.
+      private: ODEPhysicsPrivate *dataPtr;
     };
   }
 }

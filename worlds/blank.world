@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <scene>
+      <ambient>0.2 0.2 0.2 1</ambient>
+      <background>1 1 1 1</background>
+      <shadows>false</shadows>
+      <grid>false</grid>
+    </scene>
+  </world>
+</sdf>

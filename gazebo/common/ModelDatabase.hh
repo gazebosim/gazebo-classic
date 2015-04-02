@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,12 @@
 
 #include <string>
 #include <map>
-#include <list>
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
+#include <utility>
+
+#include "gazebo/common/Event.hh"
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/util/system.hh"
 
 /// \brief The file name of model XML configuration.
 #define GZ_MODEL_MANIFEST_FILENAME "model.config"
@@ -34,19 +36,30 @@ namespace gazebo
 {
   namespace common
   {
+    /// \brief Forward declare private data class.
+    class ModelDatabasePrivate;
+
     /// \addtogroup gazebo_common Common
     /// \{
 
     /// \class ModelDatabase ModelDatabase.hh common/common.hh
     /// \brief Connects to model database, and has utility functions to find
     /// models.
-    class ModelDatabase : public SingletonT<ModelDatabase>
+    class GAZEBO_VISIBLE ModelDatabase : public SingletonT<ModelDatabase>
     {
       /// \brief Constructor. This will update the model cache
       private: ModelDatabase();
 
       /// \brief Destructor
       private: virtual ~ModelDatabase();
+
+      /// \brief Start the model database.
+      /// \param[in] _fetchImmediately True to fetch the models without
+      /// waiting.
+      public: void Start(bool _fetchImmediately = false);
+
+      /// \brief Finalize the model database.
+      public: void Fini();
 
       /// \brief Returns the the global model database URI.
       /// \return the URI.
@@ -64,7 +77,9 @@ namespace gazebo
       /// This is the non-blocking version of ModelDatabase::GetModels
       /// \param[in] _func Callback function that receives the list of
       /// models.
-      public: void GetModels(boost::function<
+      /// \return A boost shared pointer. This pointer must remain valid in
+      /// order to receive the callback.
+      public: event::ConnectionPtr  GetModels(boost::function<
                   void (const std::map<std::string, std::string> &)> _func);
 
       /// \brief Get the name of a model based on a URI.
@@ -83,12 +98,6 @@ namespace gazebo
       /// \brief Return the database.config file as a string.
       /// \return The database config file from the model database.
       public: std::string GetDBConfig(const std::string &_uri);
-
-      /// \brief Deprecated.
-      /// \sa ModelDatabase::GetModelConfig
-      /// \sa ModelDatabase::GetDBConfig
-      public: std::string GetManifest(const std::string &_uri)
-              GAZEBO_DEPRECATED;
 
       /// \brief Get the local path to a model.
       ///
@@ -129,42 +138,23 @@ namespace gazebo
       private: std::string GetManifestImpl(const std::string &_uri);
 
       /// \brief Used by a thread to update the model cache.
-      private: void UpdateModelCache();
+      /// \param[in] _fetchImmediately True to fetch the models without
+      /// waiting.
+      private: void UpdateModelCache(bool _fetchImmediately);
 
       /// \brief Used by ModelDatabase::UpdateModelCache,
       /// no one else should use this function.
       private: bool UpdateModelCacheImpl();
 
-      /// \brief A dictionary of all model names indexed by their uri.
-      private: std::map<std::string, std::string> modelCache;
+      /// \brief Private data.
+      private: ModelDatabasePrivate *dataPtr;
 
-      /// \brief True to stop the background thread
-      private: bool stop;
-
-      /// \brief Cache update mutex
-      private: boost::mutex updateMutex;
-
-      /// \brief Thread to update the model cache.
-      private: boost::thread *updateCacheThread;
-
-      /// \brief Condition variable for the updateCacheThread.
-      private: boost::condition_variable updateCacheCondition;
-
-      /// \def CallbackFunc
-      /// \brief Boost function that is used to passback the model cache.
-      private: typedef boost::function<
-               void (const std::map<std::string, std::string> &)> CallbackFunc;
-
-      /// \brief List of all callbacks set from the
-      /// ModelDatabase::GetModels function.
-      private: std::list<CallbackFunc> callbacks;
+      /// \brief Singleton implementation
+      private: friend class SingletonT<ModelDatabase>;
 
       /// \brief Handy trick to automatically call a singleton's
       /// constructor.
       private: static ModelDatabase *myself;
-
-      /// \brief Singleton implementation
-      private: friend class SingletonT<ModelDatabase>;
     };
   }
 }

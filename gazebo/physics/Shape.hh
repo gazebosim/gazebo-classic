@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Inertial.hh"
 #include "gazebo/physics/Base.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
 
     /// \class Shape Shape.hh physics/physics.hh
     /// \brief Base class for all shapes.
-    class Shape : public Base
+    class GAZEBO_VISIBLE Shape : public Base
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the shape.
@@ -48,6 +49,14 @@ namespace gazebo
       /// \brief Initialize the shape.
       public: virtual void Init() = 0;
 
+      /// \brief Set the scale of the shape.
+      /// \param[in] _scale Scale to set the shape to.
+      public: virtual void SetScale(const math::Vector3 &_scale) = 0;
+
+      /// \brief Get the scale of the shape.
+      /// \return Scale of the shape.
+      public: virtual math::Vector3 GetScale() const;
+
       /// \brief Fill in the values for a geometry message.
       /// \param[out] _msg The geometry message to fill.
       public: virtual void FillMsg(msgs::Geometry &_msg) = 0;
@@ -58,6 +67,9 @@ namespace gazebo
 
       /// \brief This shape's collision parent.
       protected: CollisionPtr collisionParent;
+
+      /// \brief This shape's scale;
+      protected: math::Vector3 scale;
     };
     /// \}
   }

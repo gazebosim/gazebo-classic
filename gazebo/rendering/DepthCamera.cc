@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +23,18 @@
 #include <dirent.h>
 #include <sstream>
 
-#include "sdf/sdf.hh"
-#include "rendering/ogre_gazebo.h"
-#include "rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RTShaderSystem.hh"
 
-#include "common/Events.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "math/Pose.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/math/Pose.hh"
 
-#include "rendering/Visual.hh"
-#include "rendering/Conversions.hh"
-#include "rendering/Scene.hh"
-#include "rendering/DepthCamera.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/DepthCamera.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -61,11 +60,11 @@ DepthCamera::~DepthCamera()
 }
 
 //////////////////////////////////////////////////
-void DepthCamera::Load(sdf::ElementPtr &_sdf)
+void DepthCamera::Load(sdf::ElementPtr _sdf)
 {
   Camera::Load(_sdf);
   this->outputPoints =
-    (_sdf->GetElement("depth_camera")->GetValueString("output")
+    (_sdf->GetElement("depth_camera")->Get<std::string>("output")
     == "points");
 }
 
@@ -146,7 +145,7 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
         Conversions::Convert(this->scene->GetBackgroundColor()));
     this->pcdViewport->setOverlaysEnabled(false);
     this->pcdViewport->setVisibilityMask(
-        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
     this->pcdMaterial = (Ogre::Material*)(
     Ogre::MaterialManager::getSingleton().getByName("Gazebo/XYZPoints").get());

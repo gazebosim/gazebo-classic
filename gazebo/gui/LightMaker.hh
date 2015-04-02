@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,9 @@
 
 #include <string>
 
-#include "msgs/msgs.hh"
-#include "gui/EntityMaker.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/gui/EntityMaker.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -31,7 +32,7 @@ namespace gazebo
 
   namespace gui
   {
-    class LightMaker : public EntityMaker
+    class GAZEBO_VISIBLE LightMaker : public EntityMaker
     {
       public: LightMaker();
 
@@ -44,6 +45,16 @@ namespace gazebo
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
       public: virtual void OnMouseDrag(const common::MouseEvent &) {}
+
+      /// \brief Initialize the light maker from an existing light in the scene.
+      /// \param[in] _lightName Name of existing light in the scene.
+      /// \return True if initialization is successful.
+      public: bool InitFromLight(const std::string & _lightName);
+
+      /// \brief Initialize the light maker.
+      /// \return True if the light maker is initialized successfully.
+      protected: virtual bool Init();
+
       protected: virtual void CreateTheEntity();
 
       protected: int state;
@@ -51,10 +62,12 @@ namespace gazebo
       protected: transport::PublisherPtr lightPub;
       private: static unsigned int counter;
       protected: std::string lightTypename;
-      private: rendering::Light *light;
+
+      /// \brief Pointer to the light being spawned.
+      private: rendering::LightPtr light;
     };
 
-    class PointLightMaker : public LightMaker
+    class GAZEBO_VISIBLE PointLightMaker : public LightMaker
     {
       public: PointLightMaker() : LightMaker()
               {
@@ -64,7 +77,7 @@ namespace gazebo
               }
     };
 
-    class SpotLightMaker : public LightMaker
+    class GAZEBO_VISIBLE SpotLightMaker : public LightMaker
     {
       public: SpotLightMaker() : LightMaker()
               {
@@ -80,7 +93,7 @@ namespace gazebo
               }
     };
 
-    class DirectionalLightMaker : public LightMaker
+    class GAZEBO_VISIBLE DirectionalLightMaker : public LightMaker
     {
       public: DirectionalLightMaker() : LightMaker()
               {
@@ -95,6 +108,3 @@ namespace gazebo
   }
 }
 #endif
-
-
-

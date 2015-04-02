@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <iostream>
 
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +40,7 @@ namespace gazebo
     /// \class Time Time.hh common/common.hh
     /// \brief A Time class, can be used to hold wall- or sim-time.
     ///        stored as sec and nano-sec.
-    class Time
+    class GAZEBO_VISIBLE Time
     {
       /// \brief A static zero time variable set to common::Time(0, 0).
       public: static const Time Zero;
@@ -113,11 +114,6 @@ namespace gazebo
       /// \param[in] _ns nanoseconds
       /// \return Time actually slept
       public: static Time NSleep(unsigned int _ns);
-
-      /// \brief Nano sleep
-      /// \param[in] _time is a Time
-      /// \return Time actually slept
-      public: static Time NSleep(Time _time) GAZEBO_DEPRECATED;
 
       /// \brief Assignment operator
       /// \param[in] _tv the new time
@@ -378,19 +374,19 @@ namespace gazebo
       /// \param[in] _sec duration in seconds
       /// \return nanoseconds
       public: static inline double SecToNano(double _sec)
-              { return _sec * 1e-9;}
+              { return _sec * 1e9;}
 
       /// \brief Convert milliseconds to nanoseconds
       /// \param[in] _ms milliseconds
       /// \return nanoseconds
       public: static inline double MilToNano(double _ms)
-              { return _ms * 1e-6;}
+              { return _ms * 1e6;}
 
       /// \brief Convert microseconds to nanoseconds
       /// \param _ms microseconds
       /// \return nanoseconds
       public: static inline double MicToNano(double _ms)
-              { return _ms * 1e-3;}
+              { return _ms * 1e3;}
 
       /// \brief Stream insertion operator
       /// \param[in] _out the output stream
@@ -419,7 +415,7 @@ namespace gazebo
       /// \brief Seconds
       public: int32_t sec;
 
-      /// \brief Microseconds
+      /// \brief Nanoseconds
       public: int32_t nsec;
 
       /// \brief a singleton value of the last GetWallTime() value

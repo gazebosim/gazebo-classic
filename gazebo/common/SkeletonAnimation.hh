@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,13 @@
 #ifndef _SKELETONANIMATION_HH_
 #define _SKELETONANIMATION_HH_
 
-#include <math/Matrix4.hh>
-#include <math/Pose.hh>
-
 #include <map>
 #include <utility>
 #include <string>
+
+#include "gazebo/math/Matrix4.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
 
     /// \class NodeAnimation SkeletonAnimation.hh common/common.hh
     /// \brief Node animation
-    class NodeAnimation
+    class GAZEBO_VISIBLE NodeAnimation
     {
       /// \brief constructor
       /// \param[in] _name the name of the node
@@ -53,12 +54,12 @@ namespace gazebo
       /// \brief Adds a key frame at a specific time
       /// \param[in] _time the time of the key frame
       /// \param[in] _trans the transformation
-      public: void AddKeyFrame(const double _time, const math::Matrix4 _trans);
+      public: void AddKeyFrame(const double _time, const math::Matrix4 &_trans);
 
       /// \brief Adds a key fram at a specific time
       /// \param[in] _time the tiem of the key frame
       /// \param[in] _pose the pose
-      public: void AddKeyFrame(const double _time, const math::Pose _pose);
+      public: void AddKeyFrame(const double _time, const math::Pose &_pose);
 
       /// \brief Returns the number of key frames.
       /// \return the count
@@ -117,7 +118,7 @@ namespace gazebo
     };
 
     /// \brief Skeleton animation
-    class SkeletonAnimation
+    class GAZEBO_VISIBLE SkeletonAnimation
     {
       /// \brief The Constructor
       /// \param[in] _name the name of the animation
@@ -149,14 +150,14 @@ namespace gazebo
       /// \param[in] _time the time
       /// \param[in] _mat the key frame transformation
       public: void AddKeyFrame(const std::string& _node, const double _time,
-                      const math::Matrix4 _mat);
+                      const math::Matrix4 &_mat);
 
       /// \brief Adds or replaces a named key frame at a specific time
       /// \param[in] _node the name of the new or existing node
       /// \param[in] _time the time
       /// \param[in] _pose the key frame transformation as a math::Pose
       public: void AddKeyFrame(const std::string& _node, const double _time,
-                      const math::Pose _pose);
+                      const math::Pose &_pose);
 
       /// \brief Returns the key frame transformation for a named animation at
       /// a specific time

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,11 @@
 #include <vector>
 #include <string>
 
-#include "math/Vector3.hh"
-#include "rendering/DynamicRenderable.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/DynamicRenderable.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,7 +40,7 @@ namespace gazebo
 
     /// \class DynamicLines DynamicLines.hh rendering/rendering.hh
     /// \brief Class for drawing lines that can change
-    class DynamicLines : public DynamicRenderable
+    class GAZEBO_VISIBLE DynamicLines : public DynamicRenderable
     {
       /// \brief Constructor
       /// \param[in] _opType The type of Line
@@ -55,19 +58,28 @@ namespace gazebo
       public: virtual const Ogre::String &getMovableType() const;
 
       /// \brief Add a point to the point list
-      /// \param[in] pt math::Vector3 point
-      public: void AddPoint(const math::Vector3 &_pt);
+      /// \param[in] _pt math::Vector3 point
+      /// \param[in] _color common::Color Point color
+      public: void AddPoint(const math::Vector3 &_pt,
+            const common::Color &_color = common::Color::White);
 
       /// \brief Add a point to the point list.
-      /// \param[in] _x X position.
-      /// \param[in] _y Y position.
-      /// \param[in] _z Z position.
-      public: void AddPoint(double _x, double _y, double _z);
+      /// \param[in] _x X position
+      /// \param[in] _y Y position
+      /// \param[in] _z Z position
+      /// \param[in] _color common::Color Point color
+      public: void AddPoint(double _x, double _y, double _z,
+            const common::Color &_color = common::Color::White);
 
       /// \brief Change the location of an existing point in the point list
       /// \param[in] _index Index of the point to set
       /// \param[in] _value math::Vector3 value to set the point to
       public: void SetPoint(unsigned int _index, const math::Vector3 &_value);
+
+      /// \brief Change the color of an existing point in the point list
+      /// \param[in] _index Index of the point to set
+      /// \param[in] _color common::Color Pixelcolor color to set the point to
+      public: void SetColor(unsigned int _index, const common::Color &_color);
 
       /// \brief Return the location of an existing point in the point list
       /// \param[in] _index Number of the point to return
@@ -86,17 +98,20 @@ namespace gazebo
 
       /// \brief Implementation DynamicRenderable,
       /// creates a simple vertex-only decl
-      protected: virtual void  CreateVertexDeclaration();
+      private: virtual void  CreateVertexDeclaration();
 
       /// \brief Implementation DynamicRenderable, pushes point
       /// list out to hardware memory
-      protected: virtual void FillHardwareBuffers();
+      private: virtual void FillHardwareBuffers();
 
       /// \brief List of points for the line
       private: std::vector<math::Vector3> points;
 
       /// \brief Used to indicate if the lines require an update
       private: bool dirty;
+
+      /// \brief List of colors
+      private: std::vector<common::Color> colors;
     };
     /// \}
   }

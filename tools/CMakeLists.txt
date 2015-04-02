@@ -1,40 +1,40 @@
-link_directories(${urdfdom_LIBRARY_DIRS} ${urdfdom_headers_LIBRARY_DIRS} ${console_bridge_LIBRARY_DIRS})
-
 include ( ${QT_USE_FILE} )
 add_definitions(${QT_DEFINITIONS})
 
-
-include_directories( 
-  ${PROJECT_BINARY_DIR}/gazebo 
-  ${PROJECT_SOURCE_DIR}/gazebo 
-  ${tinyxml_include_dirs}
+include_directories(
+  ${tinyxml_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
+  ${SDFormat_INCLUDE_DIRS}
 )
 
-add_subdirectory(test)
+link_directories(
+  ${CCD_LIBRARY_DIRS}
+  ${SDFormat_LIBRARY_DIRS}
+  ${tinyxml_LIBRARY_DIRS}
+)
 
-add_executable(gzsdf gzsdf.cc)
-target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_sdf_interface)
-gz_install_executable(gzsdf)
+if (HAVE_BULLET)
+  link_directories(${BULLET_LIBRARY_DIRS})
+endif()
 
-add_executable(gztopic gztopic.cc)
-target_link_libraries(gztopic gazebo_msgs gazebo_common gazebo_transport pthread gazebo_gui ${QT_LIBRARIES})
-gz_install_executable(gztopic)
+if (HAVE_DART)
+  link_directories(${DARTCore_LIBRARY_DIRS})
+endif()
 
-add_executable(gzlog gzlog.cc)
-target_link_libraries(gzlog gazebo_common gazebo_physics gazebo_transport gazebo_sensors gazebo_msgs gazebo_sdf_interface pthread)
-gz_install_executable(gzlog)
+set (test_sources
+  gz_log_TEST.cc
+  gz_TEST.cc
+)
 
-add_executable(gzstats gzstats.cc)
-target_link_libraries(gzstats gazebo_msgs gazebo_common gazebo_transport pthread)
-gz_install_executable(gzstats)
+gz_build_tests(${test_sources})
 
-#add_executable(sdf2pov sdf2pov.cc)
-#target_link_libraries(sdf2pov gazebo_common gazebo_sdf_interface)
-#gz_install_executable(sdf2pov)
+add_executable(gz gz.cc gz_topic.cc gz_log.cc)
+target_link_libraries(gz
+ gazebo_msgs gazebo_common gazebo_transport gazebo_gui gazebo_physics
+ gazebo_sensors ${QT_LIBRARIES} ${Boost_LIBRARIES} pthread)
+gz_install_executable(gz)
 
-add_executable(gzfactory gzfactory.cc)
-target_link_libraries(gzfactory gazebo_common gazebo_transport ${Boost_LIBRARIES} pthread)
-gz_install_executable(gzfactory)
+roffman(gz 1)
 
-install (FILES gzmodel_create.sh DESTINATION ${BIN_INSTALL_DIR})
+install (PROGRAMS gzprop DESTINATION ${BIN_INSTALL_DIR})
+manpage(gzprop 1)

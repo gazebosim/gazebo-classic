@@ -52,6 +52,7 @@ dxJoint::dxJoint( dxWorld *w ) :
     node[1].body = 0;
     node[1].next = 0;
     dSetZero( lambda, 6 );
+    dSetZero( lambda_erp, 6 );
 
     addObjectToList( this, ( dObject ** ) &w->firstjoint );
 
@@ -61,6 +62,13 @@ dxJoint::dxJoint( dxWorld *w ) :
     // joint damping
     use_damping = false;
     damping_coefficient = 0.0;
+
+    // Moved here by OSRF
+    // Default to negative value, which means the current global value
+    // will be used. If set non-negative, then this joint-specific 
+    // value will be used.
+    erp = -1;  // world->global_erp;
+    cfm = -1;  // world->global_cfm;
 }
 
 dxJoint::~dxJoint()
@@ -440,16 +448,21 @@ dReal getHingeAngle( dxBody *body1, dxBody *body2, dVector3 axis,
 {
     // get qrel = relative rotation between the two bodies
     dQuaternion qrel;
-    if ( body2 )
+    if ( body1 && body2 )
     {
         dQuaternion qq;
         dQMultiply1( qq, body1->q, body2->q );
         dQMultiply2( qrel, qq, q_initial );
     }
-    else
+    else if (body1)
     {
         // pretend body2->q is the identity
         dQMultiply3( qrel, body1->q, q_initial );
+    }
+    else if (body2)
+    {
+        // pretend body1->q is the identity
+        dQMultiply3( qrel, body2->q, q_initial );
     }
 
     return getHingeAngleFromRelativeQuat( qrel, axis );

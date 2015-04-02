@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include "sdf/sdf.hh"
 #include "Inertial.hh"
 
 using namespace gazebo;
@@ -32,7 +31,7 @@ Inertial::Inertial()
   if (!this->sdfInertial)
   {
     this->sdfInertial.reset(new sdf::Element);
-    sdf::initFile("inertial.sdf", this->sdfInertial);
+    initFile("inertial.sdf", this->sdfInertial);
   }
 
   // This is the only time this->sdfInertial should be used.
@@ -43,10 +42,10 @@ Inertial::Inertial()
 Inertial::Inertial(double _m)
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("inertial.sdf", this->sdf);
+  initFile("inertial.sdf", this->sdf);
 
   this->mass = _m;
-  this->cog.Set(0, 0, 0);
+  this->cog.Set(0, 0, 0, 0, 0, 0);
   this->principals.Set(1, 1, 1);
   this->products.Set(0, 0, 0);
 }
@@ -55,7 +54,7 @@ Inertial::Inertial(double _m)
 Inertial::Inertial(const Inertial &_inertial)
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("inertial.sdf", this->sdf);
+  initFile("inertial.sdf", this->sdf);
 
   (*this) = _inertial;
 }
@@ -77,12 +76,9 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
 
-  math::Vector3 center(0, 0, 0);
-  if (this->sdf->HasElement("pose"))
-  {
-    center = this->sdf->GetValuePose("pose").pos;
-  }
-  this->SetCoG(center.x, center.y, center.z);
+  // use default pose (identity) if not specified in sdf
+  math::Pose pose = this->sdf->Get<math::Pose>("pose");
+  this->SetCoG(pose);
 
   // if (this->sdf->HasElement("inertia"))
   // Do the following whether an inertia element was specified or not.
@@ -90,12 +86,12 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   {
     sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia");
     this->SetInertiaMatrix(
-        inertiaElem->GetValueDouble("ixx"),
-        inertiaElem->GetValueDouble("iyy"),
-        inertiaElem->GetValueDouble("izz"),
-        inertiaElem->GetValueDouble("ixy"),
-        inertiaElem->GetValueDouble("ixz"),
-        inertiaElem->GetValueDouble("iyz"));
+        inertiaElem->Get<double>("ixx"),
+        inertiaElem->Get<double>("iyy"),
+        inertiaElem->Get<double>("izz"),
+        inertiaElem->Get<double>("ixy"),
+        inertiaElem->Get<double>("ixz"),
+        inertiaElem->Get<double>("iyz"));
 
     inertiaElem->GetElement("ixx")->GetValue()->SetUpdateFunc(
         boost::bind(&Inertial::GetIXX, this));
@@ -111,9 +107,24 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
         boost::bind(&Inertial::GetIYZ, this));
   }
 
-  this->SetMass(this->sdf->GetValueDouble("mass"));
+  this->SetMass(this->sdf->Get<double>("mass"));
   this->sdf->GetElement("mass")->GetValue()->SetUpdateFunc(
       boost::bind(&Inertial::GetMass, this));
+}
+
+//////////////////////////////////////////////////
+Inertial Inertial::GetInertial(const math::Pose &_frameOffset) const
+{
+  // make a copy of the current Inertial
+  Inertial result(*this);
+
+  // new CoG location after link frame offset
+  result.cog = result.cog - _frameOffset;
+
+  // new MOI after link frame offset
+  result.SetMOI(this->GetMOI(result.cog));
+
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -121,16 +132,16 @@ void Inertial::Reset()
 {
   sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia");
 
-  this->mass = this->sdf->GetValueDouble("mass");
-  this->cog.Set(0, 0, 0);
+  this->mass = this->sdf->Get<double>("mass");
+  this->cog.Set(0, 0, 0, 0, 0, 0);
   this->SetInertiaMatrix(
-        inertiaElem->GetValueDouble("ixx"),
-        inertiaElem->GetValueDouble("iyy"),
-        inertiaElem->GetValueDouble("izz"),
+        inertiaElem->Get<double>("ixx"),
+        inertiaElem->Get<double>("iyy"),
+        inertiaElem->Get<double>("izz"),
 
-        inertiaElem->GetValueDouble("ixy"),
-        inertiaElem->GetValueDouble("ixz"),
-        inertiaElem->GetValueDouble("iyz"));
+        inertiaElem->Get<double>("ixy"),
+        inertiaElem->Get<double>("ixz"),
+        inertiaElem->Get<double>("iyz"));
 }
 
 //////////////////////////////////////////////////
@@ -148,11 +159,24 @@ double Inertial::GetMass() const
 //////////////////////////////////////////////////
 void Inertial::SetCoG(double _cx, double _cy, double _cz)
 {
-  this->cog.Set(_cx, _cy, _cz);
+  this->cog.pos.Set(_cx, _cy, _cz);
 }
 
 //////////////////////////////////////////////////
 void Inertial::SetCoG(const math::Vector3 &_c)
+{
+  this->cog.pos = _c;
+}
+
+//////////////////////////////////////////////////
+void Inertial::SetCoG(double _cx, double _cy, double _cz,
+                      double _rx, double _ry, double _rz)
+{
+  this->cog.Set(_cx, _cy, _cz, _rx, _ry, _rz);
+}
+
+//////////////////////////////////////////////////
+void Inertial::SetCoG(const math::Pose &_c)
 {
   this->cog = _c;
 }
@@ -179,9 +203,28 @@ math::Vector3 Inertial::GetProductsofInertia() const
 }
 
 //////////////////////////////////////////////////
+void Inertial::SetMOI(const math::Matrix3 &_moi)
+{
+  /// \TODO: check symmetry of incoming _moi matrix
+  this->principals.Set(_moi[0][0], _moi[1][1], _moi[2][2]);
+  this->products.Set(_moi[0][1], _moi[0][2], _moi[1][2]);
+}
+
+//////////////////////////////////////////////////
+math::Matrix3 Inertial::GetMOI() const
+{
+  return math::Matrix3(
+    this->principals.x, this->products.x,   this->products.y,
+    this->products.x,   this->principals.y, this->products.z,
+    this->products.y,   this->products.z,   this->principals.z);
+}
+
+//////////////////////////////////////////////////
 void Inertial::Rotate(const math::Quaternion &_rot)
 {
-  this->cog = _rot.RotateVector(this->cog);
+  /// \TODO: double check what this does, if needed
+  this->cog.pos = _rot.RotateVector(this->cog.pos);
+  this->cog.rot = _rot * this->cog.rot;
 }
 
 //////////////////////////////////////////////////
@@ -198,15 +241,58 @@ Inertial &Inertial::operator=(const Inertial &_inertial)
 //////////////////////////////////////////////////
 Inertial Inertial::operator+(const Inertial &_inertial) const
 {
-  Inertial result;
+  Inertial result(*this);
+
+  // update mass with sum
   result.mass = this->mass + _inertial.mass;
 
-  result.cog = (this->cog*this->mass + _inertial.cog * _inertial.mass) /
-                result.mass;
+  // compute new center of mass
+  result.cog.pos =
+    (this->cog.pos*this->mass + _inertial.cog.pos * _inertial.mass) /
+    result.mass;
 
-  result.principals = this->principals + _inertial.principals;
-  result.products = this->products + _inertial.products;
+  // make a decision on the new orientation, set it to identity
+  result.cog.rot = math::Quaternion(1, 0, 0, 0);
+
+  // compute equivalent I for (*this) at the new CoG
+  math::Matrix3 Ithis = this->GetMOI(result.cog);
+
+  // compute equivalent I for _inertial at the new CoG
+  math::Matrix3 Iparam = _inertial.GetMOI(result.cog);
+
+  // sum up principals and products now they are at the same location
+  result.SetMOI(Ithis + Iparam);
+
   return result;
+}
+
+//////////////////////////////////////////////////
+math::Matrix3 Inertial::GetMOI(const math::Pose &_pose) const
+{
+  // get MOI as a Matrix3
+  math::Matrix3 moi = this->GetMOI();
+
+  // transform from new _pose to old this->cog, specified in new _pose frame
+  math::Pose new2Old = this->cog - _pose;
+
+  // rotate moi into new cog frame
+  moi = new2Old.rot.GetAsMatrix3() * moi *
+        new2Old.rot.GetInverse().GetAsMatrix3();
+
+  // parallel axis theorem to get MOI at the new cog location
+  // integrating point mass at some offset
+  math::Vector3 offset = new2Old.pos;
+  moi[0][0] += (offset.y * offset.y + offset.z * offset.z) * this->mass;
+  moi[0][1] -= (offset.x * offset.y) * this->mass;
+  moi[0][2] -= (offset.x * offset.z) * this->mass;
+  moi[1][0] -= (offset.y * offset.x) * this->mass;
+  moi[1][1] += (offset.x * offset.x + offset.z * offset.z) * this->mass;
+  moi[1][2] -= (offset.y * offset.z) * this->mass;
+  moi[2][0] -= (offset.z * offset.x) * this->mass;
+  moi[2][1] -= (offset.z * offset.y) * this->mass;
+  moi[2][2] += (offset.x * offset.x + offset.y * offset.y) * this->mass;
+
+  return moi;
 }
 
 //////////////////////////////////////////////////

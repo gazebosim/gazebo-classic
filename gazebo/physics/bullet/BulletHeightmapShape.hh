@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,10 @@
 #define _BULLETHEIGHTMAPGEOM_HH_
 #include <string>
 
-#include "physics/HeightmapShape.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/Collision.hh"
+#include "gazebo/physics/HeightmapShape.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/util/system.hh"
 
 class btHeightfieldTerrainShape;
 
@@ -38,7 +39,7 @@ namespace gazebo
     /// \{
 
     /// \brief Height map collision
-    class BulletHeightmapShape : public HeightmapShape
+    class GAZEBO_VISIBLE BulletHeightmapShape : public HeightmapShape
     {
       /// \brief Constructor
       public: BulletHeightmapShape(CollisionPtr _parent);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,11 @@
 #include <map>
 #include <vector>
 
-#include "physics/Model.hh"
-#include "common/Time.hh"
-#include "common/Skeleton.hh"
-#include "common/Animation.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/common/Animation.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,14 +37,29 @@ namespace gazebo
 
   namespace physics
   {
-    struct TrajectoryInfo
+    /// \brief Information about a trajectory for an Actor.
+    class GAZEBO_VISIBLE TrajectoryInfo
     {
-      unsigned int id;
-      std::string type;
-      double duration;
-      double startTime;
-      double endTime;
-      bool translated;
+      /// \brief Constructor.
+      public: TrajectoryInfo();
+
+      /// \brief ID of the trajectory.
+      public: unsigned int id;
+
+      /// \brief Type of trajectory.
+      public: std::string type;
+
+      /// \brief Duration of the trajectory.
+      public: double duration;
+
+      /// \brief Start time of the trajectory.
+      public: double startTime;
+
+      /// \brief End time of the trajectory.
+      public: double endTime;
+
+      /// \brief True if the trajectory is tranlated.
+      public: bool translated;
     };
 
     /// \addtogroup gazebo_physics
@@ -52,7 +68,7 @@ namespace gazebo
     /// \class Actor Actor.hh physics/physics.hh
     /// \brief Actor class enables GPU based mesh model / skeleton
     /// scriptable animation.
-    class Actor : public Model
+    class GAZEBO_VISIBLE Actor : public Model
     {
       /// \brief Constructor
       /// \param[in] _parent Parent object
@@ -228,6 +244,9 @@ namespace gazebo
 
       /// \brief Name of the visual
       protected: std::string visualName;
+
+      /// \brief ID for this visual
+      protected: uint32_t visualId;
 
       /// \brief Where to send bone info.
       protected: transport::PublisherPtr bonePosePub;

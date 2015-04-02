@@ -6,7 +6,6 @@ package gazebo.msgs;
 
 
 import "vector3d.proto";
-import "header.proto";
 
 message Physics
 {
@@ -14,19 +13,23 @@ message Physics
   {
     ODE = 1;
     BULLET = 2;
+    SIMBODY = 3;
+    DART = 4;
   }
-  required Type type = 2[default=ODE];
+  optional Type type                         = 1[default=ODE];
 
-  optional string solver_type = 3;
-  optional double dt = 4;
-  optional int32 iters = 5;
-  optional double sor = 6;
-  optional double cfm = 7;
-  optional double erp = 8;
+  optional string solver_type                = 2;
+  optional double min_step_size              = 3;
+  optional int32 precon_iters                = 4;
+  optional int32 iters                       = 5;
+  optional double sor                        = 6;
+  optional double cfm                        = 7;
+  optional double erp                        = 8;
   optional double contact_max_correcting_vel = 9;
-  optional double contact_surface_layer = 10;
-  optional Vector3d gravity = 11;
-  optional double update_rate = 12;
-  optional bool enable_physics = 13;
+  optional double contact_surface_layer      = 10;
+  optional Vector3d gravity                  = 11;
+  optional bool enable_physics               = 12;
+  optional double real_time_factor           = 13;
+  optional double real_time_update_rate      = 14;
+  optional double max_step_size              = 15;
 }
-

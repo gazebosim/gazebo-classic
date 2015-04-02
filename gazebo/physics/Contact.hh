@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,11 @@
 
 #include "gazebo/msgs/msgs.hh"
 
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/JointWrench.hh"
+#include "gazebo/util/system.hh"
 
 // For the sake of efficiency, use fixed size arrays for collision
 // MAX_COLLIDE_RETURNS limits contact detection, needs to be large
@@ -42,13 +44,14 @@ namespace gazebo
 {
   namespace physics
   {
+    class Collision;
     /// \addtogroup gazebo_physics
     /// \{
 
     /// \class Contact Contact.hh physics/physics.hh
     /// \brief A contact between two collisions. Each contact can consist of
     /// a number of contact points
-    class Contact
+    class GAZEBO_VISIBLE Contact
     {
       /// \brief Constructor.
       public: Contact();
@@ -81,11 +84,11 @@ namespace gazebo
       /// \brief Reset to default values.
       public: void Reset();
 
-      /// \brief Name of the first collision object
-      public: std::string collision1;
+      /// \brief Pointer to the first collision object
+      public: Collision *collision1;
 
-      /// \brief Name of the second collision object
-      public: std::string collision2;
+      /// \brief Pointer to the second collision object
+      public: Collision *collision2;
 
       /// \brief Array of forces for the contact.
       /// All forces and torques are relative to the center of mass of the
@@ -104,8 +107,11 @@ namespace gazebo
       /// \brief Length of all the arrays.
       public: int count;
 
-      /// \brief Time at which the contact occured.
+      /// \brief Time at which the contact occurred.
       public: common::Time time;
+
+      /// \brief World in which the contact occurred
+      public: WorldPtr world;
     };
     /// \}
   }

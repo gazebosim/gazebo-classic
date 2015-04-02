@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,36 +22,52 @@
 #include <utility>
 #include <list>
 
-#include "gui/qt.h"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/rendering/RenderTypes.hh"
 
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
-#include "common/MouseEvent.hh"
-#include "common/Event.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/KeyEvent.hh"
+#include "gazebo/common/Event.hh"
 
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "gui/BoxMaker.hh"
-#include "gui/SphereMaker.hh"
-#include "gui/CylinderMaker.hh"
-#include "gui/MeshMaker.hh"
-#include "gui/ModelMaker.hh"
-#include "gui/LightMaker.hh"
+#include "gazebo/gui/BoxMaker.hh"
+#include "gazebo/gui/SphereMaker.hh"
+#include "gazebo/gui/CylinderMaker.hh"
+#include "gazebo/gui/MeshMaker.hh"
+#include "gazebo/gui/ModelMaker.hh"
+#include "gazebo/gui/LightMaker.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class GLWidget : public QWidget
+    class GAZEBO_VISIBLE GLWidget : public QWidget
     {
       Q_OBJECT
+
+      /// \enum SelectionLevels
+      /// \brief Unique identifiers for all selection levels supported.
+      public: enum SelectionLevels {
+                  /// \brief Model level
+                  MODEL,
+                  /// \brief Link level
+                  LINK
+                };
 
       public: GLWidget(QWidget *_parent = 0);
       public: virtual ~GLWidget();
 
+      /// \brief View a scene in this widget.
+      /// This will use the scene's UserCamera to visualize the scene.
+      /// If a UserCamera does not exist, one is created with the
+      /// name "gzclient_camera".
+      /// \param[in] _scene Pointer to the scene to visualize.
       public: void ViewScene(rendering::ScenePtr _scene);
       public: rendering::UserCameraPtr GetCamera() const;
       public: rendering::ScenePtr GetScene() const;
@@ -78,27 +94,51 @@ namespace gazebo
 
       private: std::string GetOgreHandle() const;
 
+      /// \brief Callback for a mouse move event.
+      /// \param[in] _event The mouse move event
+      /// \return True if handled by this function.
+      private: bool OnMouseMove(const common::MouseEvent &_event);
+
+      /// \brief Process a normal mouse move event.
       private: void OnMouseMoveNormal();
-      private: void OnMouseMoveTranslate();
+
+      /// \brief Process a make object mouse move event.
       private: void OnMouseMoveMakeEntity();
 
+      /// \brief Callback for a mouse release event.
+      /// \param[in] _event The mouse release event
+      /// \return True if handled by this function.
+      private: bool OnMouseRelease(const common::MouseEvent &_event);
+
+      /// \brief Process a normal mouse release event.
       private: void OnMouseReleaseNormal();
-      private: void OnMouseReleaseTranslate();
+
+      /// \brief Process a make object mouse release event.
       private: void OnMouseReleaseMakeEntity();
 
+      /// \brief Callback for a mouse press event.
+      /// \param[in] _event The mouse press event
+      /// \return True if handled by this function.
+      private: bool OnMousePress(const common::MouseEvent &_event);
+
+      /// \brief Process a normal mouse press event.
       private: void OnMousePressNormal();
-      private: void OnMousePressTranslate();
+
+      /// \brief Process a make object mouse presse event.
       private: void OnMousePressMakeEntity();
 
+      /// \brief Callback for a mouse double click event.
+      /// \param[in] _event The mouse double click event
+      /// \return True if handled by this function.
+      private: bool OnMouseDoubleClick(const common::MouseEvent &_event);
+
       private: void OnRequest(ConstRequestPtr &_msg);
-
-      private: void SmartMoveVisual(rendering::VisualPtr _vis);
-
       private: void OnCreateScene(const std::string &_name);
       private: void OnRemoveScene(const std::string &_name);
       private: void OnMoveMode(bool _mode);
       private: void OnCreateEntity(const std::string &_type,
                                    const std::string &_data);
+
       private: void OnFPS();
       private: void OnOrbit();
       private: void OnManipMode(const std::string &_mode);
@@ -106,18 +146,11 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
 
-      private: void RotateEntity(rendering::VisualPtr &_vis);
-      private: void TranslateEntity(rendering::VisualPtr &_vis);
-
-      private: void OnMouseMoveVisual(const std::string &_visualName);
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       private: bool eventFilter(QObject *_obj, QEvent *_event);
-      private: void PublishVisualPose(rendering::VisualPtr _vis);
-      private: void ClearSelection();
 
-      /// \brief Copy an object by name
-      private: void Paste(const std::string &_object);
+      private: void ClearSelection();
 
       private: void PushHistory(const std::string &_visName,
                                 const math::Pose &_pose);
@@ -127,9 +160,36 @@ namespace gazebo
       /// visual
       private: void SetSelectedVisual(rendering::VisualPtr _vis);
 
-      /// \brief Set the visual being moved, which will highlight the
-      /// visual
-      private: void SetMouseMoveVisual(rendering::VisualPtr _vis);
+      /// \brief Deselect all visuals, removing highlight and publishing message
+      private: void DeselectAllVisuals();
+
+      /// \brief Callback when a specific alignment configuration is set.
+      /// \param[in] _axis Axis of alignment: x, y, or z.
+      /// \param[in] _config Configuration: min, center, or max.
+      /// \param[in] _target Target of alignment: first or last.
+      /// \param[in] _bool True to preview alignment without publishing
+      /// to server.
+      private: void OnAlignMode(const std::string &_axis,
+          const std::string &_config, const std::string &_target,
+          bool _preview);
+
+      /// \brief Copy an entity by name
+      /// \param[in] _name Name of entity to be copied.
+      private: void Copy(const std::string &_name);
+
+      /// \brief Paste an entity by name
+      /// \param[in] _name Name of entity to be pasted.
+      private: void Paste(const std::string &_name);
+
+      /// \brief Qt callback when the copy action is triggered.
+      private slots: void OnCopy();
+
+      /// \brief Qt callback when the paste action is triggered.
+      private slots: void OnPaste();
+
+      /// \brief Qt callback when the model editor action is toggled.
+      /// \param[in] _checked True if the model editor was checked.
+      private slots: void OnModelEditor(bool _checked);
 
       private: int windowId;
 
@@ -137,6 +197,9 @@ namespace gazebo
       private: rendering::ScenePtr scene;
       private: QFrame *renderFrame;
       private: common::MouseEvent mouseEvent;
+
+      /// \brief The most recent keyboard event.
+      private: common::KeyEvent keyEvent;
 
       private: std::vector<event::ConnectionPtr> connections;
 
@@ -150,23 +213,47 @@ namespace gazebo
       private: SpotLightMaker spotLightMaker;
       private: DirectionalLightMaker directionalLightMaker;
 
-      private: rendering::VisualPtr hoverVis, selectedVis, mouseMoveVis;
+      /// \brief Light maker
+      private: LightMaker lightMaker;
+
+      private: rendering::VisualPtr hoverVis;
+
+      /// \brief A list of selected visuals.
+      private: std::vector<rendering::VisualPtr> selectedVisuals;
+
+      /// \brief Indicates how deep into the model to select.
+      private: SelectionLevels selectionLevel;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;
-      private: transport::PublisherPtr lightPub;
+
+      /// \brief Publishes information about user selections.
+      private: transport::PublisherPtr selectionPub;
+
       private: transport::SubscriberPtr selectionSub, requestSub;
 
       private: std::string keyText;
       private: Qt::KeyboardModifiers keyModifiers;
       private: QPoint onShiftMousePos;
-      private: math::Pose mouseMoveVisStartPose;
 
       private: std::string copiedObject;
 
       private: std::string state;
 
       private: std::list<std::pair<std::string, math::Pose> > moveHistory;
+
+      /// \brief Name of entity that is being copied.
+      private: std::string copyEntityName;
+
+      /// \brief Flag that is set to true when GLWidget has responded to
+      ///  OnCreateScene
+      private: bool sceneCreated;
+
+      /// \brief True if the model editor is up, false otherwise
+      private: bool modelEditorEnabled;
+
+      /// \brief Mutext to protect selectedVisuals array.
+      private: boost::mutex selectedVisMutex;
     };
   }
 }

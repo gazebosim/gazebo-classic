@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,12 @@
  * limitations under the License.
  *
 */
-#include "gazebo.hh"
+#include <sdf/sdf.hh>
+#include "gazebo/gazebo.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
 
 /// \example examples/plugins/world_edit.cc
 /// This example creates a WorldPlugin, initializes the Transport system by
@@ -23,13 +28,13 @@ namespace gazebo
 {
   class WorldEdit : public WorldPlugin
   {
-    public: void Load(physics::WorldPtr /*_parent*/, sdf::ElementPtr _sdf)
+    public: void Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     {
       // Create a new transport node
       transport::NodePtr node(new transport::Node());
 
       // Initialize the node with the world name
-      node->Init(_sdf->GetWorldName());
+      node->Init(_parent->GetName());
 
       // Create a publisher on the ~/physics topic
       transport::PublisherPtr physicsPub =
@@ -39,10 +44,10 @@ namespace gazebo
       physicsMsg.set_type(msgs::Physics::ODE);
 
       // Set the step time
-      physicsMsg.set_dt(0.01);
+      physicsMsg.set_max_step_size(0.01);
 
       // Change gravity
-      msgs::Set(physicsMsg.mutable_gravity(), math::Vector3(0.01, 0, 0.01));
+      msgs::Set(physicsMsg.mutable_gravity(), math::Vector3(0.01, 0, 0.1));
       physicsPub->Publish(physicsMsg);
     }
   };

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
  * Date: 12 Nov 2009
  */
 
-#include "common/Exception.hh"
-#include "physics/ode/ODECollision.hh"
-#include "physics/ode/ODEHeightmapShape.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODEHeightmapShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -30,6 +30,7 @@ using namespace physics;
 ODEHeightmapShape::ODEHeightmapShape(CollisionPtr _parent)
     : HeightmapShape(_parent)
 {
+  this->flipY = false;
 }
 
 //////////////////////////////////////////////////
@@ -50,16 +51,16 @@ void ODEHeightmapShape::Init()
   HeightmapShape::Init();
 
   ODECollisionPtr oParent =
-    boost::shared_static_cast<ODECollision>(this->collisionParent);
+    boost::static_pointer_cast<ODECollision>(this->collisionParent);
 
   // Step 2: Create the ODE heightfield collision
   this->odeData = dGeomHeightfieldDataCreate();
 
   // Step 3: Setup a callback method for ODE
-  dGeomHeightfieldDataBuildCallback(
+  dGeomHeightfieldDataBuildSingle(
       this->odeData,
-      this,
-      ODEHeightmapShape::GetHeightCallback,
+      &this->heights[0],
+      0,
       this->GetSize().x,  // in meters
       this->GetSize().y,  // in meters
       this->vertSize,  // width sampling size

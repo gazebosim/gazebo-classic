@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,13 @@
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(AnimationTest, PoseAnimation)
+class AnimationTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(AnimationTest, PoseAnimation)
 {
   {
     common::PoseAnimation anim("test", 1.0, true);
@@ -76,7 +79,7 @@ TEST(AnimationTest, PoseAnimation)
       math::Quaternion(0.0302776, 0.0785971, 0.109824));
 }
 
-TEST(AnimationTest, NumericAnimation)
+TEST_F(AnimationTest, NumericAnimation)
 {
   common::NumericAnimation anim("numeric_test", 10, false);
   common::NumericKeyFrame *key = anim.CreateKeyFrame(0.0);

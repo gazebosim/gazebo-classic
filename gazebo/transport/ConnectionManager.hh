@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 
 #include <boost/shared_ptr.hpp>
+#include <boost/interprocess/sync/interprocess_semaphore.hpp>
 #include <string>
 #include <list>
 #include <vector>
@@ -28,6 +29,7 @@
 
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Connection.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -38,7 +40,8 @@ namespace gazebo
 
     /// \class ConnectionManager ConnectionManager.hh transport/transport.hh
     /// \brief Manager of connections
-    class ConnectionManager : public SingletonT<ConnectionManager>
+    class GAZEBO_VISIBLE ConnectionManager :
+      public SingletonT<ConnectionManager>
     {
       /// \brief Constructor
       private: ConnectionManager();
@@ -46,12 +49,15 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~ConnectionManager();
 
-      /// \brief Initialize the connection manager
-      /// \param[in] _masterHost Host where the master is running
-      /// \param[in] _masterPort Port where the master is running
+      /// \brief Initialize the connection manager.
+      /// \param[in] _masterHost Host where the master is running.
+      /// \param[in] _masterPort Port where the master is running.
+      /// \param[in] _timeoutIterations Number of times to wait for
+      /// a connection to master.
       /// \return true if initialization succeeded, false otherwise
       public: bool Init(const std::string &_masterHost,
-                        unsigned int _masterPort);
+                        unsigned int _masterPort,
+                        uint32_t _timeoutIterations = 30);
 
       /// \brief Run the connection manager loop.  Does not return until
       /// stopped.
@@ -67,11 +73,11 @@ namespace gazebo
       /// \brief Stop the conneciton manager
       public: void Stop();
 
-      /// \brief Subscribe to a topic
-      /// \param[in] _topic The topic to subscribe to
-      /// \param[in] _msgType The type of the topic
+      /// \brief Subscribe to a topic.
+      /// \param[in] _topic The topic to subscribe to.
+      /// \param[in] _msgType The type of the topic.
       /// \param[in] _latching If true, latch the latest incoming message;
-      /// otherwise don't
+      /// otherwise don't.
       public: void Subscribe(const std::string &_topic,
                               const std::string &_msgType,
                               bool _latching);
@@ -126,6 +132,9 @@ namespace gazebo
       public: ConnectionPtr ConnectToRemoteHost(const std::string &_host,
                                                   unsigned int _port);
 
+      /// \brief Inform the connection manager that it needs an update.
+      public: void TriggerUpdate();
+
       /// \brief Callback function called when we have read data from the
       /// master
       /// \param[in] _data String of incoming data
@@ -133,20 +142,26 @@ namespace gazebo
 
       /// \brief Callback function called when a connection is accepted
       /// \param[in] _newConnection Pointer to the new connection
-      private: void OnAccept(const ConnectionPtr &_newConnection);
+      private: void OnAccept(ConnectionPtr _newConnection);
 
       /// \brief Callback function called when a connection is read
       /// \param[in] _newConnection Pointer to new connection
       /// \param[in] _data Data that has been read.
-      private: void OnRead(const ConnectionPtr &_newConnection,
-                            const std::string &_data);
+      private: void OnRead(ConnectionPtr _newConnection,
+                           const std::string &_data);
 
       /// \brief Process a raw message.
       /// \param[in] _packet The raw message data.
       private: void ProcessMessage(const std::string &_packet);
 
       /// \brief Run the manager update loop once
-      public: void RunUpdate();
+      private: void RunUpdate();
+
+      /// \brief Condition used to trigger an update.
+      private: boost::condition_variable updateCondition;
+
+      /// \brief Mutex for updateCondition
+      private: boost::mutex updateMutex;
 
       private: ConnectionPtr masterConn;
       private: Connection *serverConn;
@@ -156,16 +171,21 @@ namespace gazebo
 
       private: bool initialized;
       private: bool stop, stopped;
-      private: boost::thread *thread;
 
       private: unsigned int tmpIndex;
-      private: boost::recursive_mutex *listMutex;
-      private: boost::recursive_mutex *masterMessagesMutex;
-      private: boost::recursive_mutex *connectionMutex;
+      private: boost::recursive_mutex listMutex;
+
+      /// \brief A namespace to protect the namespace list.
+      private: boost::mutex namespaceMutex;
+      private: boost::recursive_mutex masterMessagesMutex;
+      private: boost::recursive_mutex connectionMutex;
 
       private: std::list<msgs::Publish> publishers;
       private: std::list<std::string> namespaces;
       private: std::list<std::string> masterMessages;
+
+      /// \brief Condition used for synchronization
+      private: boost::condition_variable namespaceCondition;
 
       // Singleton implementation
       private: friend class SingletonT<ConnectionManager>;

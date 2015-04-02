@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,9 @@
 #ifndef _BULLETCYLINDERSHAPE_HH_
 #define _BULLETCYLINDERSHAPE_HH_
 
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/CylinderShape.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/CylinderShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
     /// \{
 
     /// \brief Cylinder collision
-    class BulletCylinderShape : public CylinderShape
+    class GAZEBO_VISIBLE BulletCylinderShape : public CylinderShape
     {
       /// \brief Constructor
       public: BulletCylinderShape(CollisionPtr _parent)
@@ -44,16 +45,81 @@ namespace gazebo
       public: virtual ~BulletCylinderShape() {}
 
       /// \brief Set the size of the cylinder
+      /// \param[in] _radius Cylinder radius
+      /// \param[in] _length Cylinder length
       public: void SetSize(double _radius, double _length)
               {
+                if (_radius < 0)
+                {
+                  gzerr << "Cylinder shape does not support negative radius\n";
+                  return;
+                }
+                if (_length < 0)
+                {
+                  gzerr << "Cylinder shape does not support negative length\n";
+                  return;
+                }
+                if (math::equal(_radius, 0.0))
+                {
+                  // Warn user, but still create shape with very small value
+                  // otherwise later resize operations using setLocalScaling
+                  // will not be possible
+                  gzwarn << "Setting cylinder shape's radius to zero \n";
+                  _radius = 1e-4;
+                }
+                if (math::equal(_length, 0.0))
+                {
+                  gzwarn << "Setting cylinder shape's length to zero \n";
+                  _length = 1e-4;
+                }
+
                 CylinderShape::SetSize(_radius, _length);
                 BulletCollisionPtr bParent;
-                bParent = boost::shared_dynamic_cast<BulletCollision>(
+                bParent = boost::dynamic_pointer_cast<BulletCollision>(
                     this->collisionParent);
 
-                bParent->SetCollisionShape(new btCylinderShapeZ(
-                    btVector3(_radius, _radius, _length * 0.5)));
+                btCollisionShape *shape = bParent->GetCollisionShape();
+                if (!shape)
+                {
+                  this->initialSize = math::Vector3(_radius, _radius, _length);
+                  bParent->SetCollisionShape(new btCylinderShapeZ(
+                      btVector3(_radius, _radius, _length * 0.5)));
+                }
+                else
+                {
+                  btVector3 cylinderScale;
+                  cylinderScale.setX(_radius / this->initialSize.x);
+                  cylinderScale.setY(_radius / this->initialSize.y);
+                  cylinderScale.setZ(_length / this->initialSize.z);
+
+                  shape->setLocalScaling(cylinderScale);
+
+                  // clear bullet cache and re-add the collision shape
+                  // otherwise collisions won't work properly after scaling
+                  BulletLinkPtr bLink =
+                      boost::dynamic_pointer_cast<BulletLink>(
+                      bParent->GetLink());
+                  bLink->ClearCollisionCache();
+
+                  // remove and add the shape again
+                  if (bLink->GetBulletLink()->getCollisionShape()->isCompound())
+                  {
+                    btCompoundShape *compoundShape =
+                        dynamic_cast<btCompoundShape *>(
+                        bLink->GetBulletLink()->getCollisionShape());
+
+                    compoundShape->removeChildShape(shape);
+                    math::Pose relativePose =
+                        this->collisionParent->GetRelativePose();
+                    relativePose.pos -= bLink->GetInertial()->GetCoG();
+                    compoundShape->addChildShape(
+                        BulletTypes::ConvertPose(relativePose), shape);
+                  }
+                }
               }
+
+      /// \brief Initial size of cylinder.
+      private: math::Vector3 initialSize;
     };
     /// \}
   }

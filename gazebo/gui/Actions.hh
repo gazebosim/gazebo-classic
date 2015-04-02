@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 #define _GUI_ACTIONS_HH_
 
 #include <string>
-
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -31,15 +31,18 @@ namespace gazebo
     extern QAction *g_importAct;
     extern QAction *g_saveAct;
     extern QAction *g_saveAsAct;
+    extern QAction *g_saveCfgAct;
+    extern QAction *g_cloneAct;
     extern QAction *g_aboutAct;
     extern QAction *g_quitAct;
 
     extern QAction *g_dataLoggerAct;
 
-    extern QAction *g_newModelAct;
     extern QAction *g_resetModelsAct;
     extern QAction *g_resetWorldAct;
     extern QAction *g_editBuildingAct;
+    extern QAction *g_editTerrainAct;
+    extern QAction *g_editModelAct;
 
     extern QAction *g_playAct;
     extern QAction *g_pauseAct;
@@ -53,34 +56,45 @@ namespace gazebo
     extern QAction *g_spotLghtCreateAct;
     extern QAction *g_dirLghtCreateAct;
 
+    extern QAction *g_screenshotAct;
+
     extern QAction *g_showCollisionsAct;
     extern QAction *g_showGridAct;
     extern QAction *g_showContactsAct;
     extern QAction *g_showJointsAct;
     extern QAction *g_showCOMAct;
+    extern QAction *g_showInertiaAct;
     extern QAction *g_transparentAct;
 
     extern QAction *g_resetAct;
     extern QAction *g_fullScreenAct;
     extern QAction *g_fpsAct;
     extern QAction *g_orbitAct;
+    extern QAction *g_overlayAct;
 
     extern QAction *g_arrowAct;
     extern QAction *g_translateAct;
     extern QAction *g_rotateAct;
+    extern QAction *g_scaleAct;
 
     extern QAction *g_topicVisAct;
 
     extern QAction *g_diagnosticsAct;
 
-    extern QAction *g_buildingEditorSaveAct;
-    extern QAction *g_buildingEditorDiscardAct;
-    extern QAction *g_buildingEditorDoneAct;
-    extern QAction *g_buildingEditorExitAct;
+    extern QAction *g_viewWireframeAct;
+
+    extern QAction *g_viewOculusAct;
+
+    extern QAction *g_copyAct;
+    extern QAction *g_pasteAct;
+
+    extern QWidgetAction *g_alignAct;
+    extern QAction *g_alignButtonAct;
+    extern QAction *g_snapAct;
 
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.
-    class DeleteAction : public QAction
+    class GAZEBO_VISIBLE DeleteAction : public QAction
     {
       Q_OBJECT
       /// \brief Constructor

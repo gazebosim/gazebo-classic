@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #define _BOXSHAPE_HH_
 
 #include "gazebo/physics/Shape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
 
     /// \class BoxShape BoxShape.hh physics/physcs.hh
     /// \brief Box geometry primitive.
-    class BoxShape : public Shape
+    class GAZEBO_VISIBLE BoxShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
@@ -48,6 +49,10 @@ namespace gazebo
       /// \brief Set the size of the box.
       /// \param[in] _size Size of each side of the box.
       public: virtual void SetSize(const math::Vector3 &_size);
+
+      /// \brief Set the scale of the box.
+      /// \param[in] _scale Scale of the box.
+      public: virtual void SetScale(const math::Vector3 &_scale);
 
       /// \brief Get the size of the box.
       /// \return The size of each side of the box.

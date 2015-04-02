@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,7 @@
  * limitations under the License.
  *
  */
-/* Desc: Local Gazebo configuration
- * Author: Nate Koenig, Jordi Polo
- * Date: 3 May 2008
- */
 
-#include <assert.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -29,15 +24,15 @@
 #include <fstream>
 #include <sstream>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
 
 using namespace gazebo;
 using namespace common;
-
 
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
@@ -47,12 +42,31 @@ SystemPaths::SystemPaths()
   this->pluginPaths.clear();
   this->modelPaths.clear();
 
+  try
+  {
+    // Get a path suitable for temporary files
+    this->tmpPath = boost::filesystem::temp_directory_path();
+
+    // Get a unique path suitable for temporary files. If there are multiple
+    // gazebo instances on the same machine, each one will have its own
+    // temporary directory
+    this->tmpInstancePath = boost::filesystem::unique_path("gazebo-%%%%%%");
+  }
+  catch(const boost::system::error_code &_ex)
+  {
+    gzerr << "Failed creating temp directory. Reason: "
+          << _ex.message() << "\n";
+    return;
+  }
+
   char *homePath = getenv("HOME");
   std::string home;
   if (!homePath)
-    home = "/tmp/gazebo";
+    home = this->GetTmpPath() + "/gazebo";
   else
     home = homePath;
+
+  sdf::addURIPath("model://", home + "/.gazebo/models");
 
   this->modelPaths.push_back(home + "/.gazebo/models");
 
@@ -60,7 +74,7 @@ SystemPaths::SystemPaths()
   std::string fullPath;
   if (!path)
   {
-    if (home != "/tmp/gazebo")
+    if (home != this->GetTmpPath() + "/gazebo")
       fullPath = home + "/.gazebo";
     else
       fullPath = home;
@@ -134,6 +148,24 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
 }
 
 /////////////////////////////////////////////////
+std::string SystemPaths::GetTmpPath()
+{
+  return this->tmpPath.string();
+}
+
+/////////////////////////////////////////////////
+std::string SystemPaths::GetTmpInstancePath()
+{
+  return this->tmpInstancePath.string();
+}
+
+/////////////////////////////////////////////////
+std::string SystemPaths::GetDefaultTestPath()
+{
+  return this->GetTmpInstancePath() + "/gazebo_test";
+}
+
+/////////////////////////////////////////////////
 void SystemPaths::UpdateModelPaths()
 {
   std::string delim(":");
@@ -142,18 +174,18 @@ void SystemPaths::UpdateModelPaths()
   char *pathCStr = getenv("GAZEBO_MODEL_PATH");
   if (!pathCStr || *pathCStr == '\0')
   {
-    // gzdbg << "gazeboPaths is empty and GAZEBO_RESOURCE_PATH doesn't exist. "
-    //  << "Set GAZEBO_RESOURCE_PATH to gazebo's installation path. "
-    //  << "...or are you using SystemPlugins?\n";
-    return;
+    // No env var; take the compile-time default.
+    path = GAZEBO_MODEL_PATH;
   }
-  path = pathCStr;
+  else
+    path = pathCStr;
 
   /// \TODO: Use boost to split string.
   size_t pos1 = 0;
   size_t pos2 = path.find(delim);
   while (pos2 != std::string::npos)
   {
+    sdf::addURIPath("model://", path.substr(pos1, pos2-pos1));
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->modelPaths);
     pos1 = pos2+1;
     pos2 = path.find(delim, pos2+1);
@@ -170,12 +202,11 @@ void SystemPaths::UpdateGazeboPaths()
   char *pathCStr = getenv("GAZEBO_RESOURCE_PATH");
   if (!pathCStr || *pathCStr == '\0')
   {
-    // gzdbg << "gazeboPaths is empty and GAZEBO_RESOURCE_PATH doesn't exist. "
-    //  << "Set GAZEBO_RESOURCE_PATH to gazebo's installation path. "
-    //  << "...or are you using SystemPlugins?\n";
-    return;
+    // No env var; take the compile-time default.
+    path = GAZEBO_RESOURCE_PATH;
   }
-  path = pathCStr;
+  else
+    path = pathCStr;
 
   size_t pos1 = 0;
   size_t pos2 = path.find(delim);
@@ -197,12 +228,11 @@ void SystemPaths::UpdatePluginPaths()
   char *pathCStr = getenv("GAZEBO_PLUGIN_PATH");
   if (!pathCStr || *pathCStr == '\0')
   {
-    // gzdbg << "pluginPaths and GAZEBO_PLUGIN_PATH doesn't exist."
-    //  << "Set GAZEBO_PLUGIN_PATH to Ogre's installation path."
-    //  << " ...or are you loading via SystemPlugins?\n";
-    return;
+    // No env var; take the compile-time default.
+    path = GAZEBO_PLUGIN_PATH;
   }
-  path = pathCStr;
+  else
+    path = pathCStr;
 
   size_t pos1 = 0;
   size_t pos2 = path.find(delim);
@@ -224,12 +254,11 @@ void SystemPaths::UpdateOgrePaths()
   char *pathCStr = getenv("OGRE_RESOURCE_PATH");
   if (!pathCStr || *pathCStr == '\0')
   {
-    // gzdbg << "ogrePaths is empty and OGRE_RESOURCE_PATH doesn't exist. "
-    //  << "Set OGRE_RESOURCE_PATH to Ogre's installation path. "
-    //  << "...or are you using SystemPlugins?\n";
-    return;
+    // No env var; take the compile-time default.
+    path = OGRE_RESOURCE_PATH;
   }
-  path = pathCStr;
+  else
+    path = pathCStr;
 
   size_t pos1 = 0;
   size_t pos2 = path.find(delim);
@@ -309,8 +338,16 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     bool found = false;
 
-    path = boost::filesystem::operator/(boost::filesystem::current_path(),
-                                        _filename);
+    try
+    {
+      path = boost::filesystem::operator/(boost::filesystem::current_path(),
+          _filename);
+    }
+    catch(boost::filesystem::filesystem_error &_e)
+    {
+      gzerr << "Filesystem error[" << _e.what() << "]\n";
+      return std::string();
+    }
 
     if (_searchLocalPath && boost::filesystem::exists(path))
     {
@@ -449,6 +486,13 @@ void SystemPaths::AddModelPaths(const std::string &_path)
     pos2 = _path.find(delim, pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->modelPaths);
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::AddModelPathsUpdate(const std::string &_path)
+{
+  this->AddModelPaths(_path);
+  updateModelRequest(_path);
 }
 
 /////////////////////////////////////////////////

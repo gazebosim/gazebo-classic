@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +28,15 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/ode/ODETypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief Base class for all ODE collisions.
-    class ODECollision : public Collision
+    class GAZEBO_VISIBLE ODECollision : public Collision
     {
       /// \brief Constructor.
       /// \param[in] _link Parent Link
@@ -51,7 +53,7 @@ namespace gazebo
 
       /// \brief Set the encapsulated collsion object.
       /// \param[in] _collisionId ODE id of the collision object.
-      /// \param[in] _placeable True to make the object m.
+      /// \param[in] _placeable True to make the object movable.
       public: void SetCollision(dGeomID _collisionId, bool _placeable);
 
       /// \brief Return the collision id.
@@ -81,6 +83,11 @@ namespace gazebo
       /// \brief Set the collision's space ID
       /// \param[in] _spaceid ID of an ODE collision space.
       public: void SetSpaceId(dSpaceID _spaceid);
+
+      /// \brief Similar to Collision::GetSurface, but provides dynamically
+      ///        casted pointer to ODESurfaceParams.
+      /// \return Dynamically casted pointer to ODESurfaceParams.
+      public: ODESurfaceParamsPtr GetODESurface() const;
 
       /// \brief Used when this is static to set the posse.
       private: void OnPoseChangeGlobal();

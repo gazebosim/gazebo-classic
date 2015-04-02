@@ -21,68 +21,11 @@
  *************************************************************************/
 
 
+#include <ode/misc.h>
 #include "config.h"
 #include "screw.h"
 #include "joint_internal.h"
 
-//****************************************************************************
-// helper function: shortest_angular_distance implementation
-
-  /*!
-   * \brief normalize_angle_positive
-   *
-   *        Normalizes the angle to be 0 to 2*M_PI
-   *        It takes and returns radians.
-   */
-  static inline double normalize_angle_positive(double angle)
-  {
-    return fmod(fmod(angle, 2.0*M_PI) + 2.0*M_PI, 2.0*M_PI);
-  }
-
-
-  /*!
-   * \brief normalize
-   *
-   * Normalizes the angle to be -M_PI circle to +M_PI circle
-   * It takes and returns radians.
-   *
-   */
-  static inline double normalize_angle(double angle)
-  {
-    double a = normalize_angle_positive(angle);
-    if (a > M_PI)
-      a -= 2.0 *M_PI;
-    return a;
-  }
-
-
-  /*!
-   * \function
-   * \brief shortest_angular_distance
-   *
-   * Given 2 angles, this returns the shortest angular
-   * difference.  The inputs and ouputs are of course radians.
-   *
-   * The result
-   * would always be -pi <= result <= pi.  Adding the result
-   * to "from" will always get you an equivelent angle to "to".
-   */
-
-  static inline double shortest_angular_distance(double from, double to)
-  {
-    double result = normalize_angle_positive(normalize_angle_positive(to) - normalize_angle_positive(from));
-
-    if (result > M_PI)
-      // If the result > 180,
-      // It's shorter the other way.
-      result = -(2.0*M_PI - result);
-
-    return normalize_angle(result);
-  }
-
-
-
-//****************************************************************************
 // screw
 
 dxJointScrew::dxJointScrew( dxWorld *w ) :
@@ -124,12 +67,19 @@ dxJointScrew::getInfo1( dxJoint::Info1 *info )
                                      node[1].body,
                                      axis1, qrel );
         // from angle, update cumulative_angle, which does not wrap
-        cumulative_angle = cumulative_angle + shortest_angular_distance(cumulative_angle,angle);
+        cumulative_angle =
+          dShortestAngularDistanceUpdate(cumulative_angle,angle);
 
-        // printf("angle: %f lo[%f] hi[%f]\n", cumulative_angle, limot.lostop, limot.histop);
+        // printf("angle: %f lo[%f] hi[%f]\n", cumulative_angle,
+        //   limot.lostop, limot.histop);
 
         if ( limot.testRotationalLimit( cumulative_angle ) )
             info->m = 6;
+
+        // FIXME: reset does not reset joint angle if more than 2pi
+        // printf("cumulative angle: %f  lo: %f  hi:  %f test: %f\n",
+        //   cumulative_angle, limot.lostop, limot.histop,
+        //   limot.testRotationalLimit( cumulative_angle ));
     }
 
     /* uncommnet to enforce slider joint limit
@@ -163,24 +113,50 @@ dxJointScrew::getInfo1( dxJoint::Info1 *info )
 void
 dxJointScrew::getInfo2( dxJoint::Info2 *info )
 {
-    // constrain the slider like DOFs
+    // Added by OSRF
+    //
+    // Screw Constraint Overview 
+    //
+    // make 5 constraint rows.
+    // given screw axis, first create two orthogonal axis p and q.
+    // row 1: linear constraint along p
+    // row 2: linear constraint along q
+    // row 3: screw constraint about user specified axis
+    // row 4: rotational constraint about p
+    // row 5: rotational constraint about q
+
+    // Added by OSRF
+    // If joint values of erp and cfm are negative, then ignore them.
+    // info->erp, info->cfm already have the global values from quickstep
+    if (this->erp >= 0)
+      info->erp = erp;
+    if (this->cfm >= 0)
+    {
+      info->cfm[0] = cfm;
+      info->cfm[1] = cfm;
+      info->cfm[2] = cfm;
+      info->cfm[3] = cfm;
+      info->cfm[4] = cfm;
+      info->cfm[5] = cfm;
+    }
+
+    // constraint rows 1 to 3
     {
       // pull out pos and R for both bodies. also get the `connection'
       // vector pos2-pos1.
-
-      int i;
       dReal *pos1, *pos2, *R1, *R2;
-      dVector3 c;
-      c[0] = c[1] = c[2] = 0;
+      dVector3 cgdiff;
+      cgdiff[0] = cgdiff[1] = cgdiff[2] = 0;
       pos1 = node[0].body->posr.pos;
       R1 = node[0].body->posr.R;
       if ( node[1].body )
       {
           pos2 = node[1].body->posr.pos;
           R2 = node[1].body->posr.R;
-          for ( i = 0; i < 3; i++ )
+          for (int i = 0; i < 3; ++i )
           {
-              c[i] = pos2[i] - pos1[i];
+              // store distance between cg's in cgdiff
+              cgdiff[i] = pos2[i] - pos1[i];
           }
       }
       else
@@ -195,11 +171,6 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       dReal lin_disp; // linear displacement
       dReal lin_err; // linear displacement
       {
-        dReal ang; // angular displacement
-        // get angular disp for screw
-        ang = getHingeAngle(node[0].body,node[1].body,axis1,qrel);
-        cumulative_angle = cumulative_angle
-                         + shortest_angular_distance(cumulative_angle,ang);
         // get linear disp for screw
         // get axis1 in global coordinates
         dVector3 ax1, q;
@@ -208,11 +179,15 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
         {
             // get body2 + offset point in global coordinates
             dMultiply0_331 ( q, node[1].body->posr.R, offset );
-            //printf("debug offset q[%f %f %f] p0[%f %f %f] p1[%f %f %f] \t",q[0],q[1],q[2],
-            //    node[0].body->posr.pos[0], node[0].body->posr.pos[1], node[0].body->posr.pos[2],
-            //    node[1].body->posr.pos[0], node[1].body->posr.pos[1], node[1].body->posr.pos[2]);
+            //printf("debug offset q[%f %f %f] p0[%f %f %f] p1[%f %f %f] \t",
+            //  q[0],q[1],q[2],
+            //  node[0].body->posr.pos[0], node[0].body->posr.pos[1],
+            //  node[0].body->posr.pos[2],
+            //  node[1].body->posr.pos[0], node[1].body->posr.pos[1],
+            //  node[1].body->posr.pos[2]);
             for ( int ii = 0; ii < 3; ++ii )
-              q[ii] = node[0].body->posr.pos[ii] - q[ii] - node[1].body->posr.pos[ii];
+              q[ii] = node[0].body->posr.pos[ii] - q[ii] -
+                node[1].body->posr.pos[ii];
         }
         else
         {
@@ -221,7 +196,22 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
             q[2] = node[0].body->posr.pos[2] - offset[2];
         }
         lin_disp = dCalcVectorDot3 ( ax1, q );
-        lin_err = -(lin_disp+cumulative_angle/thread_pitch);
+
+        // linear error should be length scaled, BUT
+        if (dFabs(thread_pitch) > 1.0)
+        {
+          // constraint is written in length scale, so
+          // linear error is length scaled.
+          lin_err = -(lin_disp-cumulative_angle/thread_pitch);
+        }
+        else
+        {
+          // here the entire constraint equation, including lin_err
+          // is multiplied by thread_pitch for |thread_pitch| less than 1.0
+          // for added numerical stability,
+          lin_err = -(thread_pitch*lin_disp-cumulative_angle);
+        }
+        // printf("lin disp: %f lin err: %f\n", lin_disp, lin_err);
       }
 
 
@@ -229,73 +219,170 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       int s0 = 0 * info->rowskip;
       int s1 = 1 * info->rowskip;
       int s2 = 2 * info->rowskip;
-      // remaining two rows. we want: vel2 = vel1 + w1 x c ... but this would
+
+      // remaining two rows. we want: vel2 = vel1 + w1 x cgdiff ... but this would
       // result in three equations, so we project along the planespace vectors
       // so that sliding along the slider axis is disregarded. for symmetry we
       // also substitute (w1+w2)/2 for w1, as w1 is supposed to equal w2.
 
-      dVector3 ax1; // joint axis in global coordinates (unit length)
-      dVector3 p, q; // plane space of ax1
+      // ax1 is axis1 converted to body1 frame
+      dVector3 ax1;
       dMultiply0_331 ( ax1, R1, axis1 );
+
+      // p and q are vectors perpendicular to ax1 in body1 frame
+      dVector3 p, q;
       dPlaneSpace ( ax1, p, q );
+
+      // linear constraints for the hinge joint
+      // perpendicular to the sliding axis direction.
+      for (int i = 0; i < 3; ++i ) info->J1l[s0+i] = p[i];
+      for (int i = 0; i < 3; ++i ) info->J1l[s1+i] = q[i];
+
+      // if p and q do not pass through body CG's,
+      // we need to add angular constraints to balance out the forces
+      // from these linear constraints.  See below:
+
+      // a1 and a2 are axis vectors in the body frame
+      // (whereas anchor1 and anchor2 are in world frame).
+      // anchor1 is the vector from CG to joint anchor in world frame.
+      dVector3 a1, a2;
+      dMultiply0_331( a1, R1, anchor1 );
+
+      // tmpp is a vector perpendicular to a1 and p in body frame,
+      // it is the direction of the angular constraint that will
+      // cancel out moment generated by linear constraint p
+      // if p does not pass through CG.
+      {
+        dVector3 tmpp;
+        dCalcVectorCross3(tmpp, p, a1);
+        for (int i = 0; i < 3; ++i ) info->J1a[s0+i] = -tmpp[i];
+      }
+
+      // tmpq is similar to tmpp, but for q.
+      {
+        dVector3 tmpq;
+        dCalcVectorCross3(tmpq, q, a1);
+        for (int i = 0; i < 3; ++i ) info->J1a[s1+i] = -tmpq[i];
+      }
+
+      // screw constraint:
+      // now constrain the sliding axis by rotation of the other body
+      if (dFabs(thread_pitch) > 1.0)
+      {
+        for (int i = 0; i < 3; ++i ) info->J1l[s2+i] = ax1[i];
+        for (int i = 0; i < 3; ++i ) info->J1a[s2+i] = -ax1[i]/thread_pitch;
+      }
+      else
+      {
+        // here the entire constraint equation, including lin_err
+        // is multiplied by thread_pitch for |thread_pitch| less than 1.0
+        // for added numerical stability,
+        for (int i = 0; i < 3; ++i ) info->J1l[s2+i] = ax1[i]*thread_pitch;
+        for (int i = 0; i < 3; ++i ) info->J1a[s2+i] = -ax1[i];
+      }
+
+      // repeat above for child body if one exists
       if ( node[1].body )
       {
-          // angular constraints if axis are not aligned with cg's
-          dVector3 tmp;
-          dCalcVectorCross3( tmp, c, p );
-          dScaleVector3( tmp, REAL( 0.5 ));
-          for ( i = 0; i < 3; i++ ) info->J1a[s0+i] = tmp[i];
-          for ( i = 0; i < 3; i++ ) info->J2a[s0+i] = tmp[i];
-          dCalcVectorCross3( tmp, c, q );
-          dScaleVector3( tmp, REAL( 0.5 ));
-          for ( i = 0; i < 3; i++ ) info->J1a[s1+i] = tmp[i];
-          for ( i = 0; i < 3; i++ ) info->J2a[s1+i] = tmp[i];
-          // linear constraints
-          for ( i = 0; i < 3; i++ ) info->J2l[s0+i] = -p[i];
-          for ( i = 0; i < 3; i++ ) info->J2l[s1+i] = -q[i];
+        // linear constraints for s0 and s1
+        for (int i = 0; i < 3; ++i ) info->J2l[s0+i] = -p[i];
+        for (int i = 0; i < 3; ++i ) info->J2l[s1+i] = -q[i];
 
-          // screw constraint: compensate for linear axial force induced torque
-          //   not sure how to mix this with screw constraint
-          //   for now, MAKE SURE THE AXIS IS ALIGNED WITH c!!!
-          // dCalcVectorCross3( tmp, c, ax1 );
-          // dScaleVector3( tmp, REAL( 0.5 ));
-          // for ( i = 0; i < 3; i++ ) info->J1a[s2+i] = tmp[i];
-          // for ( i = 0; i < 3; i++ ) info->J2a[s2+i] = tmp[i];
-          // screw constraint: now constrain the sliding axis by rotation of the other body
-          for ( i = 0; i < 3; i++ ) info->J2a[s2+i] = -ax1[i]/thread_pitch;
-          for ( i = 0; i < 3; i++ ) info->J2l[s2+i] = -ax1[i];
+        // angular compensation if p and q do not pass through CG
+        dMultiply0_331( a2, R2, anchor2 );
+        dVector3 tmpp;
+        dCalcVectorCross3(tmpp, p, a2);
+        for (int i = 0; i < 3; ++i ) info->J2a[s0+i] = tmpp[i];
+        dVector3 tmpq;
+        dCalcVectorCross3(tmpq, q, a2);
+        for (int i = 0; i < 3; ++i ) info->J2a[s1+i] = tmpq[i];
+
+        // screw constraint:
+        // constrain the sliding axis by rotation of the other body
+        if (dFabs(thread_pitch) > 1.0)
+        {
+          for (int i = 0; i < 3; ++i ) info->J2a[s2+i] =  ax1[i]/thread_pitch;
+          for (int i = 0; i < 3; ++i ) info->J2l[s2+i] = -ax1[i];
+        }
+        else
+        {
+          // here the entire constraint equation, including lin_err
+          // is multiplied by thread_pitch for |thread_pitch| less than 1.0
+          // for added numerical stability,
+          for (int i = 0; i < 3; ++i ) info->J2a[s2+i] =  ax1[i];
+          for (int i = 0; i < 3; ++i ) info->J2l[s2+i] = -ax1[i]*thread_pitch;
+        }
       }
-      for ( i = 0; i < 3; i++ ) info->J1l[s0+i] = p[i];
-      for ( i = 0; i < 3; i++ ) info->J1l[s1+i] = q[i];
-      // screw constraint: now constrain the sliding axis by rotation of the other body
-      for ( i = 0; i < 3; i++ ) info->J1l[s2+i] = ax1[i];
-      for ( i = 0; i < 3; i++ ) info->J1a[s2+i] = ax1[i]/thread_pitch;
-      //printf("screw err lin[%f], ang[%f], diff[%f] [%d] tp[%f]\n",thread_pitch*lin_disp, cumulative_angle, lin_err, (int)this->use_damping, thread_pitch);
+
+      // debug
+      // printf ("anchor1 %f %f %f\n", anchor1[0], anchor1[1], anchor1[2]);
+      // printf ("a1 %f %f %f\n", a1[0], a1[1], a1[2]);
+      // printf ("ax1 %f %f %f\n", ax1[0], ax1[1], ax1[2]);
+      // printf ("tmpp %f %f %f\n", tmpp[0], tmpp[1], tmpp[2]);
+      // printf ("p %f %f %f\n", p[0], p[1], p[2]);
+      // printf ("q %f %f %f\n", q[0], q[1], q[2]);
+      // printf ("J1a[s0] %f %f %f\n", info->J1a[s0+0], info->J1a[s0+1],
+      //   info->J1a[s0+2]);
+      // printf ("J1a[s1] %f %f %f\n", info->J1a[s1+0], info->J1a[s1+1],
+      //   info->J1a[s1+2]);
+      // info->J1a[s0+0] = 1;
+      // info->J1a[s0+1] = 0;
+      // info->J1a[s0+2] = 0;
+      // info->J1a[s1+0] = -1;
+      // info->J1a[s1+1] = 0;
+      // info->J1a[s1+2] = 0;
+      // printf("screw err lin[%f], ang[%f], diff[%f] [%d] tp[%f]\n",
+      //   thread_pitch*lin_disp, cumulative_angle, lin_err,
+      //   (int)this->use_damping, thread_pitch);
 
       // compute last two elements of right hand side. we want to align the offset
       // point (in body 2's frame) with the center of body 1.
       dReal k = info->fps * info->erp;
       if ( node[1].body )
       {
-          dVector3 ofs;  // offset point in global coordinates
-          dMultiply0_331 ( ofs, R2, offset );
-          for ( i = 0; i < 3; i++ ) c[i] += ofs[i];
-          info->c[0] = k * dCalcVectorDot3 ( p, c );
-          info->c[1] = k * dCalcVectorDot3 ( q, c );
+          // dVector3 ofs;  // offset point in global coordinates
+          // dMultiply0_331 ( ofs, R2, offset );
+          // for (int i = 0; i < 3; ++i ) cgdiff[i] += ofs[i];
+
+          // error between body anchors
+          dVector3 error12;
+          for (int i = 0; i < 3; ++i)
+            error12[i] = a2[i] + node[1].body->posr.pos[i] - a1[i] -
+              node[0].body->posr.pos[i];
+
+          // error in the p direction is error12 dot p
+          info->c[0] = k * (dCalcVectorDot3(error12, p));
+          // error in the q direction is error12 dot p
+          info->c[1] = k * (dCalcVectorDot3(error12, q));
           // interpenetration error for screw constraint
           info->c[2] = k * lin_err;
       }
       else
       {
-          dVector3 ofs;  // offset point in global coordinates
-          for ( i = 0; i < 3; i++ ) ofs[i] = offset[i] - pos1[i];
-          info->c[0] = k * dCalcVectorDot3 ( p, ofs );
-          info->c[1] = k * dCalcVectorDot3 ( q, ofs );
+          // debug
+          // printf ("anchor1 %f %f %f\n", anchor1[0], anchor1[1], anchor1[2]);
+          // printf ("anchor2 %f %f %f\n", anchor2[0], anchor2[1], anchor2[2]);
+          // printf ("a1 %f %f %f\n", a1[0], a1[1], a1[2]);
+          // printf ("p1 %f %f %f\n",
+          //   node[0].body->posr.pos[0],
+          //   node[0].body->posr.pos[1],
+          //   node[0].body->posr.pos[2]);
+
+          // error of body's anchor
+          dVector3 error1;
+          for (int i = 0; i < 3; ++i) error1[i] = anchor2[i] - a1[i] -
+            node[0].body->posr.pos[i];
+          // printf ("error1 %f %f %f\n", error1[0], error1[1], error1[2]);
+
+          // error in the p direction is error1 dot p
+          info->c[0] = k * (dCalcVectorDot3(error1, p));
+          // error in the q direction
+          info->c[1] = k * (dCalcVectorDot3(error1, q));
           // interpenetration error for screw constraint
           info->c[2] = k * lin_err;
 
           if ( flags & dJOINT_REVERSE )
-              for ( i = 0; i < 3; ++i ) ax1[i] = -ax1[i];
+              for (int i = 0; i < 3; ++i ) ax1[i] = -ax1[i];
       }
 
       // uncommnet to enforce slider joint limit
@@ -315,14 +402,15 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
           info->J2ld[1] = -ax1[1];
           info->J2ld[2] = -ax1[2];
         }
-        // there's no rhs for damping setup, all we want to use is the jacobian information above
+        // there's no rhs for damping setup, all we want to use is the
+        // jacobian information above
       }
       */
     }
 
-    // constrain the hinge like DOFs
+    // constraint rows 4 and 5
     {
-      // set the two hinge rows. the hinge axis should be the only unconstrained
+      // set the two hinge rows. the screw axis should be the only unconstrained
       // rotational axis, the angular velocity of the two bodies perpendicular to
       // the hinge axis should be equal. thus the constraint equations are
       //    p*w1 - p*w2 = 0
@@ -403,7 +491,8 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
           info->J2ad[1] = -ax1[1];
           info->J2ad[2] = -ax1[2];
         }
-        // there's no rhs for damping setup, all we want to use is the jacobian information above
+        // there's no rhs for damping setup, all we want to use is
+        // the jacobian information above
       }
     }
 }
@@ -420,7 +509,8 @@ void dJointSetScrewAnchor( dJointID j, dReal x, dReal y, dReal z )
 }
 
 
-void dJointSetScrewAnchorDelta( dJointID j, dReal x, dReal y, dReal z, dReal dx, dReal dy, dReal dz )
+void dJointSetScrewAnchorDelta( dJointID j, dReal x, dReal y, dReal z,
+  dReal dx, dReal dy, dReal dz )
 {
     dxJointScrew* joint = ( dxJointScrew* )j;
     dUASSERT( joint, "bad joint argument" );
@@ -532,7 +622,20 @@ void dJointSetScrewParam( dJointID j, int parameter, dReal value )
     dxJointScrew* joint = ( dxJointScrew* )j;
     dUASSERT( joint, "bad joint argument" );
     checktype( joint, Screw );
-    joint->limot.set( parameter, value );
+    switch (parameter)
+    {
+      case dParamERP:
+        joint->erp = value;
+        break;
+      case dParamCFM:
+        joint->cfm = value;
+        // dParamCFM label is also used for normal_cfm
+        joint->limot.set( parameter, value );
+        break;
+      default:
+        joint->limot.set( parameter, value );
+        break;
+    }
 }
 
 
@@ -541,7 +644,15 @@ dReal dJointGetScrewParam( dJointID j, int parameter )
     dxJointScrew* joint = ( dxJointScrew* )j;
     dUASSERT( joint, "bad joint argument" );
     checktype( joint, Screw );
-    return joint->limot.get( parameter );
+    switch (parameter)
+    {
+      case dParamERP:
+        return joint->erp;
+      case dParamCFM:
+        return joint->cfm;
+      default:
+        return joint->limot.get( parameter );
+    }
 }
 
 
@@ -557,11 +668,12 @@ dReal dJointGetScrewAngle( dJointID j )
                                    joint->axis1,
                                    joint->qrel );
         // from angle, update cumulative_angle, which does not wrap
-        joint->cumulative_angle = joint->cumulative_angle + shortest_angular_distance(joint->cumulative_angle,ang);
+        dReal joint_angle =
+          dShortestAngularDistanceUpdate(joint->cumulative_angle,ang);
         if ( joint->flags & dJOINT_REVERSE )
-            return -joint->cumulative_angle;
+            return -joint_angle;
         else
-            return joint->cumulative_angle;
+            return joint_angle;
     }
     else return 0;
 }
@@ -577,8 +689,10 @@ dReal dJointGetScrewAngleRate( dJointID j )
         dVector3 axis;
         dMultiply0_331( axis, joint->node[0].body->posr.R, joint->axis1 );
         dReal rate = dCalcVectorDot3( axis, joint->node[0].body->avel );
-        if ( joint->node[1].body ) rate -= dCalcVectorDot3( axis, joint->node[1].body->avel );
-        if ( joint->flags & dJOINT_REVERSE ) rate = - rate;
+        if (joint->node[1].body)
+          rate -= dCalcVectorDot3( axis, joint->node[1].body->avel );
+        if (joint->flags & dJOINT_REVERSE)
+          rate = - rate;
         return rate;
     }
     else return 0;
@@ -598,11 +712,11 @@ dReal dJointGetScrewPosition ( dJointID j )
 
     dMultiply0_331 ( ax1, joint->node[0].body->posr.R, joint->axis1 );
 
-    if ( joint->node[1].body )
+    if (joint->node[1].body)
     {
         // get body2 + offset point in global coordinates
         dMultiply0_331 ( q, joint->node[1].body->posr.R, joint->offset );
-        for ( int i = 0; i < 3; i++ )
+        for (int i = 0; i < 3; ++i )
             q[i] = joint->node[0].body->posr.pos[i]
                    - q[i]
                    - joint->node[1].body->posr.pos[i];
@@ -616,8 +730,8 @@ dReal dJointGetScrewPosition ( dJointID j )
         if ( joint->flags & dJOINT_REVERSE )
         {
             // N.B. it could have been simplier to only inverse the sign of
-            //      the dCalcVectorDot3 result but this case is exceptional and doing
-            //      the check for all case can decrease the performance.
+            //      the dCalcVectorDot3 result but this case is exceptional and
+            //      doing the check for all case can decrease the performance.
             ax1[0] = -ax1[0];
             ax1[1] = -ax1[1];
             ax1[2] = -ax1[2];
@@ -700,11 +814,14 @@ void dJointAddScrewForce ( dJointID j, dReal force )
 
         dVector3 ltd; // Linear Torque Decoupling vector (a torque)
 
-        dVector3 c;
-        c[0] = REAL ( 0.5 ) * ( joint->node[1].body->posr.pos[0] - joint->node[0].body->posr.pos[0] );
-        c[1] = REAL ( 0.5 ) * ( joint->node[1].body->posr.pos[1] - joint->node[0].body->posr.pos[1] );
-        c[2] = REAL ( 0.5 ) * ( joint->node[1].body->posr.pos[2] - joint->node[0].body->posr.pos[2] );
-        dCalcVectorCross3( ltd, c, axis );
+        dVector3 cgdiff;
+        cgdiff[0] = REAL ( 0.5 ) * ( joint->node[1].body->posr.pos[0] -
+          joint->node[0].body->posr.pos[0] );
+        cgdiff[1] = REAL ( 0.5 ) * ( joint->node[1].body->posr.pos[1] -
+          joint->node[0].body->posr.pos[1] );
+        cgdiff[2] = REAL ( 0.5 ) * ( joint->node[1].body->posr.pos[2] -
+          joint->node[0].body->posr.pos[2] );
+        dCalcVectorCross3( ltd, cgdiff, axis );
 
         dBodyAddTorque ( joint->node[0].body, ltd[0], ltd[1], ltd[2] );
         dBodyAddTorque ( joint->node[1].body, ltd[0], ltd[1], ltd[2] );
@@ -768,12 +885,12 @@ dxJointScrew::computeOffset()
 {
     if ( node[1].body )
     {
-        dVector3 c;
-        c[0] = node[0].body->posr.pos[0] - node[1].body->posr.pos[0];
-        c[1] = node[0].body->posr.pos[1] - node[1].body->posr.pos[1];
-        c[2] = node[0].body->posr.pos[2] - node[1].body->posr.pos[2];
+        dVector3 cgdiff;
+        cgdiff[0] = node[0].body->posr.pos[0] - node[1].body->posr.pos[0];
+        cgdiff[1] = node[0].body->posr.pos[1] - node[1].body->posr.pos[1];
+        cgdiff[2] = node[0].body->posr.pos[2] - node[1].body->posr.pos[2];
 
-        dMultiply1_331 ( offset, node[1].body->posr.R, c );
+        dMultiply1_331 ( offset, node[1].body->posr.R, cgdiff );
     }
     else if ( node[0].body )
     {

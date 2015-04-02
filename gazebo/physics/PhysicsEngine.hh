@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The base class for all physics engines
- * Author: Nate Koenig
- */
-
 #ifndef _PHYSICSENGINE_HH_
 #define _PHYSICSENGINE_HH_
 
@@ -28,6 +24,7 @@
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -40,7 +37,7 @@ namespace gazebo
 
     /// \class PhysicsEngine PhysicsEngine.hh physics/physics.hh
     /// \brief Base class for a physics engine.
-    class PhysicsEngine
+    class GAZEBO_VISIBLE PhysicsEngine
     {
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.
@@ -68,7 +65,7 @@ namespace gazebo
       /// \brief Update the physics engine collision.
       public: virtual void UpdateCollision() = 0;
 
-      /// \brief Return the type of the physics engine (ode|bullet).
+      /// \brief Return the physics engine type (ode|bullet|dart|simbody).
       /// \return Type of the physics engine.
       public: virtual std::string GetType() const = 0;
 
@@ -76,28 +73,40 @@ namespace gazebo
       /// \param[in] _seed The random number seed.
       public: virtual void SetSeed(uint32_t _seed) = 0;
 
-      /// \brief Set the simulation update rate.
-      /// \param[in] _value Value of the update rate.
-      public: void SetUpdateRate(double _value);
-
-      /// \brief Get the simulation update rate.
-      /// \return Update rate.
-      public: double GetUpdateRate();
-
       /// \brief Get the simulation update period.
       /// \return Simulation update period.
       public: double GetUpdatePeriod();
 
-      /// \brief Set the simulation step time.
-      /// \param[in] _value Value of the step time.
-      public: virtual void SetStepTime(double _value) = 0;
+      /// \brief Get target real time factor
+      /// \return Target real time factor
+      public: double GetTargetRealTimeFactor() const;
 
-      /// \brief Get the simulation step time.
-      /// \return Simulation step time.
-      public: virtual double GetStepTime() = 0;
+      /// \brief Get real time update rate
+      /// \return Update rate
+      public: double GetRealTimeUpdateRate() const;
+
+      /// \brief Get max step size.
+      /// \return Max step size.
+      public: double GetMaxStepSize() const;
+
+      /// \brief Set target real time factor
+      /// \param[in] _factor Target real time factor
+      public: void SetTargetRealTimeFactor(double _factor);
+
+      /// \brief Set real time update rate
+      /// \param[in] _rate Update rate
+      public: void SetRealTimeUpdateRate(double _rate);
+
+      /// \brief Set max step size.
+      /// \param[in] _stepSize Max step size.
+      public: void SetMaxStepSize(double _stepSize);
 
       /// \brief Update the physics engine.
       public: virtual void UpdatePhysics() {}
+
+      /// \brief Create a new model.
+      /// \param[in] _base Boost shared pointer to a new model.
+      public: virtual ModelPtr CreateModel(BasePtr _base);
 
       /// \brief Create a new body.
       /// \param[in] _parent Parent model for the link.
@@ -125,7 +134,7 @@ namespace gazebo
       /// \param[in] _type Type of joint to create.
       /// \param[in] _parent Model parent.
       public: virtual JointPtr CreateJoint(const std::string &_type,
-                                           ModelPtr _parent) = 0;
+                                           ModelPtr _parent = ModelPtr()) = 0;
 
       /// \brief Return the gavity vector.
       /// \return The gavity vector.
@@ -140,13 +149,15 @@ namespace gazebo
       /// property map
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _cfm Constraint force mixing.
-      public: virtual void SetWorldCFM(double _cfm);
+      public: virtual void SetWorldCFM(double /*_cfm*/)
+                  GAZEBO_DEPRECATED(6.0) {}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _erp Error reduction parameter.
-      public: virtual void SetWorldERP(double _erp);
+      public: virtual void SetWorldERP(double /*_erp*/)
+                  GAZEBO_DEPRECATED(6.0) {}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -157,50 +168,34 @@ namespace gazebo
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Access functions to set ODE parameters.
-      /// \param[in] _iter Number of iterations.
-      public: virtual void SetSORPGSPreconIters(unsigned int _iters);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _iter Number of iterations.
-      public: virtual void SetSORPGSIters(unsigned int _iters);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _w SORPGSW value.
-      public: virtual void SetSORPGSW(double _w);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
       /// \param[in] _vel Max correcting velocity.
-      public: virtual void SetContactMaxCorrectingVel(double _vel);
+      public: virtual void SetContactMaxCorrectingVel(double /*_vel*/)
+                  GAZEBO_DEPRECATED(6.0) {}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _layerDepth Surface layer depth
-      public: virtual void SetContactSurfaceLayer(double _layerDepth);
+      public: virtual void SetContactSurfaceLayer(double /*_layerDepth*/)
+                  GAZEBO_DEPRECATED(6.0) {}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief access functions to set ODE parameters
       /// \param[in] _maxContacts Maximum number of contacts.
-      public: virtual void SetMaxContacts(double _maxContacts);
+      public: virtual void SetMaxContacts(unsigned int _maxContacts);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Get World CFM.
       /// \return World CFM.
-      public: virtual double GetWorldCFM() {return 0;}
+      public: virtual double GetWorldCFM() GAZEBO_DEPRECATED(6.0) {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Get World ERP.
       /// \return World ERP.
-      public: virtual double GetWorldERP() {return 0;}
+      public: virtual double GetWorldERP() GAZEBO_DEPRECATED(6.0) {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -209,40 +204,72 @@ namespace gazebo
       public: virtual bool GetAutoDisableFlag() {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief access functions to set ODE parameters.
-      /// \return SORPGS precondition iterations.
-      public: virtual int GetSORPGSPreconIters() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief access functions to set ODE parameters.
-      /// \return SORPGS iterations.
-      public: virtual int GetSORPGSIters() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map.
-      /// \brief access functions to set ODE parameters
-      /// \return SORPGSW value.
-      public: virtual double GetSORPGSW() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
       /// property map.
       /// \brief access functions to set ODE parameters.
       /// \return Max correcting velocity.
-      public: virtual double GetContactMaxCorrectingVel() {return 0;}
+      public: virtual double GetContactMaxCorrectingVel()
+              GAZEBO_DEPRECATED(6.0) {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map.
       /// \brief access functions to set ODE parameters.
       /// \return Contact suerface layer depth.
-      public: virtual double GetContactSurfaceLayer() {return 0;}
+      public: virtual double GetContactSurfaceLayer()
+              GAZEBO_DEPRECATED(6.0) {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map.
       /// \brief access functions to set ODE parameters.
       /// \return Maximum number of allows contacts.
-      public: virtual int GetMaxContacts() {return 0;}
+      public: virtual unsigned int GetMaxContacts() {return 0;}
+
+      /// \brief Set a parameter of the physics engine.
+      /// See SetParam documentation for descriptions of duplicate parameters.
+      /// \param[in] _key String key
+      /// Below is a list of _key parameter definitions:
+      ///       -# "solver_type" (string) - returns solver used by engine, e.g.
+      ///          "sequential_impulse' for Bullet, "quick" for ODE
+      ///          "Featherstone and Lemkes" for DART and
+      ///          "Spatial Algebra and Elastic Foundation" for Simbody.
+      ///       -# "cfm" (double) - global CFM (ODE/Bullet)
+      ///       -# "erp" (double) - global ERP (ODE/Bullet)
+      ///       -# "precon_iters" (bool) - precondition iterations
+      ///          (experimental). (ODE)
+      ///       -# "iters" (int) - number of LCP PGS iterations. If
+      ///          sor_lcp_tolerance is negative, full iteration count is
+      ///          executed.  Otherwise, PGS may stop iteration early if
+      ///          sor_lcp_tolerance is satisfied by the total RMS residual.
+      ///       -# "sor" (double) - relaxation parameter for Projected
+      ///          Gauss-Seidel (PGS) updates. (ODE/Bullet)
+      ///       -# "contact_max_correcting_vel" (double) - truncates correction
+      ///          impulses from ERP by this value. (ODE)
+      ///       -# "contact_surface_layer" (double) - ERP is 0 for
+      ///          interpenetration depths below this value. (ODE/Bullet)
+      ///       -# "max_contacts" (int) - max number of contact constraints
+      ///          between any pair of collision bodies.
+      ///       -# "min_step_size" (double) - minimum internal step size.
+      ///          (defined but not used in ode).
+      ///       -# "max_step_size" (double) - maximum physics step size when
+      ///          physics update step must return.
+      ///
+      /// \param[in] _value The value to set to
+      /// \return true if SetParam is successful, false if operation fails.
+      public: virtual bool SetParam(const std::string &_key,
+                  const boost::any &_value);
+
+      /// \brief Get an parameter of the physics engine
+      /// \param[in] _attr String key
+      /// \sa SetParam
+      /// \return The value of the parameter
+      public: virtual boost::any GetParam(const std::string &_key) const;
+
+      /// \brief Get a parameter from the physics engine with a boolean to
+      /// indicate success or failure
+      /// \param[in] _key Key of the accessed param
+      /// \param[out] _value Value of the accessed param
+      /// \return True if the parameter was successfully retrieved
+      public: virtual bool GetParam(const std::string &_key,
+                  boost::any &_value) const;
 
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;
@@ -289,9 +316,14 @@ namespace gazebo
       /// engine.
       protected: ContactManager *contactManager;
 
-      /// \brief Store the value of the updateRate parameter in double form.
-      /// To improve efficiency.
-      private: double updateRateDouble;
+      /// \brief Real time update rate.
+      protected: double realTimeUpdateRate;
+
+      /// \brief Target real time factor.
+      protected: double targetRealTimeFactor;
+
+      /// \brief Real time update rate.
+      protected: double maxStepSize;
     };
     /// \}
   }

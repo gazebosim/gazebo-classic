@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/common/Time.hh"
 #include "test/ServerFixture.hh"
 
@@ -52,6 +52,19 @@ TEST_F(SensorManager_TEST, Data)
   // Make sure we have the right number of sensors
   size_t sensorCount = 4;
   sensors::Sensor_V sensors = mgr->GetSensors();
+
+  int i = 0;
+  while (sensors.size() != sensorCount && i < 100)
+  {
+    gazebo::common::Time::MSleep(100);
+    sensors.clear();
+    sensors = mgr->GetSensors();
+    gzdbg << "Sensor Count. Actual[" << sensors.size() << "] Expected["
+          << sensorCount << "]\n";
+    ++i;
+  }
+
+  EXPECT_LT(i, 100);
   EXPECT_EQ(sensors.size(), sensorCount);
 
   // Get the current simulation time
@@ -66,19 +79,19 @@ TEST_F(SensorManager_TEST, Data)
   // Get each sensor, and make sure that it has been updated
   {
     sensor = mgr->GetSensor("default::camera_1::link::camera");
-    EXPECT_TRUE(sensor != NULL);
+    ASSERT_TRUE(sensor != NULL);
     EXPECT_TRUE(sensor->GetLastMeasurementTime() > time);
 
     sensor = mgr->GetSensor("default::camera_2::link::camera");
-    EXPECT_TRUE(sensor != NULL);
+    ASSERT_TRUE(sensor != NULL);
     EXPECT_TRUE(sensor->GetLastMeasurementTime() > time);
 
     sensor = mgr->GetSensor("default::laser_1::link::laser");
-    EXPECT_TRUE(sensor != NULL);
+    ASSERT_TRUE(sensor != NULL);
     EXPECT_TRUE(sensor->GetLastMeasurementTime() > time);
 
     sensor = mgr->GetSensor("default::laser_2::link::laser");
-    EXPECT_TRUE(sensor != NULL);
+    ASSERT_TRUE(sensor != NULL);
     EXPECT_TRUE(sensor->GetLastMeasurementTime() > time);
   }
 }
@@ -98,12 +111,31 @@ TEST_F(SensorManager_TEST, InitRemove)
   sensors::Sensor_V sensors = mgr->GetSensors();
   EXPECT_EQ(sensors.size(), sensorCount);
 
-  // Try removing a few senors.
+  std::vector<std::string> sensorNames;
   for (sensors::Sensor_V::iterator iter = sensors.begin();
-       iter != sensors.end() && sensorCount > 10; ++iter)
+       iter != sensors.end(); ++iter)
   {
-    mgr->RemoveSensor((*iter)->GetName());
-    EXPECT_EQ(mgr->GetSensors().size(), --sensorCount);
+    sensorNames.push_back((*iter)->GetName());
+  }
+
+  // Try removing a few senors.
+  for (std::vector<std::string>::iterator iter = sensorNames.begin();
+       iter != sensorNames.end() && sensorCount > 10; ++iter)
+  {
+    mgr->RemoveSensor(*iter);
+
+    --sensorCount;
+
+    int i = 0;
+
+    // Wait for a sensor manager update.
+    while (mgr->GetSensors().size() > sensorCount)
+    {
+      gazebo::common::Time::MSleep(100);
+      ++i;
+    }
+
+    EXPECT_LT(i, 100);
   }
 
   // Make sure the proper number of sensors have been removed
@@ -112,8 +144,19 @@ TEST_F(SensorManager_TEST, InitRemove)
   // Remove the rest of the sensors
   mgr->RemoveSensors();
 
+  int i = 0;
+  // Wait for a sensor manager update.
+  while (mgr->GetSensors().size() > 0 && i < 100)
+  {
+    gazebo::common::Time::MSleep(100);
+    ++i;
+  }
+  EXPECT_LT(i, 100);
+
   // Make sure all the sensors have been removed
   EXPECT_EQ(mgr->GetSensors().size(), size_t(0));
+
+  printf("Done done\n");
 }
 
 /////////////////////////////////////////////////

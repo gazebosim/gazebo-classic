@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
  */
 #include <list>
 
-#include "common/Skeleton.hh"
-#include "common/SkeletonAnimation.hh"
-#include "math/Angle.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/common/SkeletonAnimation.hh"
+#include "gazebo/math/Angle.hh"
 
 using namespace gazebo;
 using namespace common;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,8 @@
  *
  */
 #include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/JointControlWidget.hh"
 
 using namespace gazebo;
@@ -27,7 +28,7 @@ JointForceControl::JointForceControl(const std::string &_name,
   : QWidget(_parent), name(_name)
 {
   this->forceSpin = new QDoubleSpinBox;
-  this->forceSpin->setRange(-1000.0, 1000.0);
+  this->forceSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->forceSpin->setSingleStep(0.001);
   this->forceSpin->setDecimals(3);
   this->forceSpin->setValue(0.000);
@@ -62,25 +63,25 @@ JointPIDPosControl::JointPIDPosControl(const std::string &_name,
   : QWidget(_parent), name(_name)
 {
   this->posSpin = new QDoubleSpinBox;
-  this->posSpin->setRange(-1000, 1000);
+  this->posSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->posSpin->setSingleStep(0.001);
   this->posSpin->setDecimals(3);
   this->posSpin->setValue(0.000);
 
   this->pGainSpin = new QDoubleSpinBox;
-  this->pGainSpin->setMinimum(0.0);
+  this->pGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->pGainSpin->setSingleStep(0.01);
   this->pGainSpin->setDecimals(3);
   this->pGainSpin->setValue(1.000);
 
   this->iGainSpin = new QDoubleSpinBox;
-  this->iGainSpin->setMinimum(0.0);
+  this->iGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->iGainSpin->setSingleStep(0.01);
   this->iGainSpin->setDecimals(3);
   this->iGainSpin->setValue(0.100);
 
   this->dGainSpin = new QDoubleSpinBox;
-  this->dGainSpin->setMinimum(0.0);
+  this->dGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->dGainSpin->setSingleStep(0.01);
   this->dGainSpin->setDecimals(3);
   this->dGainSpin->setValue(0.010);
@@ -164,28 +165,28 @@ JointPIDVelControl::JointPIDVelControl(const std::string &_name,
   : QWidget(_parent), name(_name)
 {
   this->posSpin = new QDoubleSpinBox;
-  posSpin->setRange(-1000, 1000);
-  posSpin->setSingleStep(0.001);
-  posSpin->setDecimals(3);
-  posSpin->setValue(0.000);
+  this->posSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->posSpin->setSingleStep(0.001);
+  this->posSpin->setDecimals(3);
+  this->posSpin->setValue(0.000);
 
   this->pGainSpin = new QDoubleSpinBox;
-  pGainSpin->setMinimum(0.0);
-  pGainSpin->setSingleStep(0.01);
-  pGainSpin->setDecimals(3);
-  pGainSpin->setValue(1.000);
+  this->pGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->pGainSpin->setSingleStep(0.01);
+  this->pGainSpin->setDecimals(3);
+  this->pGainSpin->setValue(1.000);
 
   this->iGainSpin = new QDoubleSpinBox;
-  iGainSpin->setMinimum(0.0);
-  iGainSpin->setSingleStep(0.01);
-  iGainSpin->setDecimals(3);
-  iGainSpin->setValue(0.100);
+  this->iGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->iGainSpin->setSingleStep(0.01);
+  this->iGainSpin->setDecimals(3);
+  this->iGainSpin->setValue(0.100);
 
   this->dGainSpin = new QDoubleSpinBox;
-  dGainSpin->setMinimum(0.0);
-  dGainSpin->setSingleStep(0.01);
-  dGainSpin->setDecimals(3);
-  dGainSpin->setValue(0.010);
+  this->dGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dGainSpin->setSingleStep(0.01);
+  this->dGainSpin->setDecimals(3);
+  this->dGainSpin->setValue(0.010);
 
   _layout->addWidget(posSpin, _index, 2);
   _layout->addWidget(pGainSpin, _index, 3);
@@ -251,8 +252,8 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
     this->jointPub = this->node->Advertise<msgs::JointCmd>(
         std::string("~/") + _modelName + "/joint_cmd");
 
-    boost::shared_ptr<msgs::Response> response = transport::request("default",
-        "entity_info", _modelName);
+    boost::shared_ptr<msgs::Response> response = transport::request(
+        gui::get_world(), "entity_info", _modelName);
 
     if (response->response() != "error" &&
         response->type() == modelMsg.GetTypeName())

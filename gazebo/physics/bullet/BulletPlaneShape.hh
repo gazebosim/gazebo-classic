@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,9 @@
 
 #include <iostream>
 
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/PlaneShape.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/PlaneShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet collision for an infinite plane.
-    class BulletPlaneShape : public PlaneShape
+    class GAZEBO_VISIBLE BulletPlaneShape : public PlaneShape
     {
       /// \brief Constructor
       public: BulletPlaneShape(CollisionPtr _parent) : PlaneShape(_parent) {}
@@ -55,13 +56,14 @@ namespace gazebo
               {
                 PlaneShape::CreatePlane();
                 BulletCollisionPtr bParent;
-                bParent = boost::shared_dynamic_cast<BulletCollision>(
+                bParent = boost::dynamic_pointer_cast<BulletCollision>(
                     this->collisionParent);
 
                 math::Vector3 n = this->GetNormal();
                 btVector3 vec(n.x, n.y, n.z);
 
-                bParent->SetCollisionShape(new btStaticPlaneShape(vec, 0.0));
+                bParent->SetCollisionShape(new btStaticPlaneShape(vec, 0.0),
+                    false);
               }
     };
     /// \}

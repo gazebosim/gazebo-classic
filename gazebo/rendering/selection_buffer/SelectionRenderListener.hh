@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _SELECTIONRENDERLISTENER_HH_
 
 #include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -28,7 +29,8 @@ namespace gazebo
     // the compositor MaterialManager.Listener should NOT be running all the
     // time - rather only when we're specifically rendering the target that
     // needs it
-    class SelectionRenderListener : public Ogre::RenderTargetListener
+    class GAZEBO_VISIBLE SelectionRenderListener :
+      public Ogre::RenderTargetListener
     {
       /// \brief Constructor
       public: SelectionRenderListener(MaterialSwitcher *_switcher);

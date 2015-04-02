@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,16 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap collisionetry
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
 
-#include "common/Exception.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Assert.hh"
 
-#include "physics/bullet/bullet_inc.h"
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletCollision.hh"
-#include "physics/bullet/BulletHeightmapShape.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletMotionState.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletHeightmapShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -33,6 +32,8 @@ using namespace physics;
 BulletHeightmapShape::BulletHeightmapShape(CollisionPtr _parent)
     : HeightmapShape(_parent)
 {
+  // Bullet need the height values flipped in the y direction
+  this->flipY = true;
 }
 
 //////////////////////////////////////////////////
@@ -63,17 +64,35 @@ void BulletHeightmapShape::Init()
       PHY_FLOAT,
       false);             // Flip quad edges
 
-  this->heightFieldShape->setUseDiamondSubdivision(true);
   this->heightFieldShape->setLocalScaling(localScaling);
 
+  // This is suppose to match up with Ogre rendering a bit better.
+  this->heightFieldShape->setUseZigzagSubdivision(true);
+
+  // Get a pointer to the parent collision
   BulletCollisionPtr bParent;
-  bParent = boost::shared_dynamic_cast<BulletCollision>(this->collisionParent);
+  bParent = boost::dynamic_pointer_cast<BulletCollision>(this->collisionParent);
 
-  bParent->SetCollisionShape(this->heightFieldShape);
+  GZ_ASSERT(bParent != NULL, "Bullet collision parent of a heightmap is NULL");
 
-  math::Pose pose;
-  pose.pos.x = 0;
-  pose.pos.y = 0;
-  pose.pos.z = (maxHeight - minHeight) * 0.5;
-  bParent->SetRelativePose(pose, false);
+  bParent->SetCollisionShape(this->heightFieldShape, false);
+
+  btVector3 min, max;
+  this->heightFieldShape->getAabb(btTransform::getIdentity(), min, max);
+
+  BulletLinkPtr bLink = boost::dynamic_pointer_cast<BulletLink>(
+      bParent->GetParent());
+
+  GZ_ASSERT(bLink != NULL, "Bullet heightmap does not have a link.");
+
+  BulletMotionStatePtr motionState = bLink->motionState;
+
+  GZ_ASSERT(motionState != NULL, "Invalid motion state for heightmap.");
+
+  btTransform tr;
+  tr.setIdentity();
+  tr.setOrigin(btVector3(0, 0, (maxHeight - minHeight) * 0.5));
+
+  // Set the transform for the heightmap.
+  motionState->setWorldTransform(tr);
 }

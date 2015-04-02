@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
     /// \cond
     /// \brief A custom combobox that pull in a list of topics for user
     /// selection.
-    class TopicCombo : public QComboBox
+    class GAZEBO_VISIBLE TopicCombo : public QComboBox
     {
       /// \brief Constructor
       /// \param[in] _w Parent widget.
@@ -72,7 +73,7 @@ namespace gazebo
     /// \endcond
 
     /// \brief Base class for widgets that display topic data.
-    class TopicView : public QDialog
+    class GAZEBO_VISIBLE TopicView : public QDialog
     {
       Q_OBJECT
 

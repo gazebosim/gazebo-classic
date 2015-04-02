@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@
  * Author: Jared Duke, John Hsu, Nate Koenig
  */
 
-#include "rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
 
-#include "rendering/Conversions.hh"
-#include "rendering/Visual.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Projector.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Projector.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -76,9 +76,6 @@ void Projector::Load(const std::string &_name,
     // set the projector pose relative to body
     this->projector.SetPose(_pose);
 
-    // Add the projector as an Ogre frame listener
-    Ogre::Root::getSingletonPtr()->addFrameListener(&this->projector);
-
     if (!this->projector.initialized)
     {
       gzwarn << "starting projector failed, retrying in 1 sec.\n";
@@ -86,6 +83,9 @@ void Projector::Load(const std::string &_name,
       ++retryCount;
     }
   }
+
+  // Add the projector as an Ogre frame listener
+  Ogre::Root::getSingletonPtr()->addFrameListener(&this->projector);
 
   this->projector.SetEnabled(true);
 
@@ -105,21 +105,21 @@ void Projector::Load(sdf::ElementPtr _sdf)
   double fov = M_PI * 0.25;
 
   if (_sdf->HasElement("pose"))
-    pose = _sdf->GetValuePose("pose");
+    pose = _sdf->Get<math::Pose>("pose");
 
   if (_sdf->HasElement("texture_name"))
-    textureName = _sdf->GetValueString("texture_name");
+    textureName = _sdf->Get<std::string>("texture_name");
 
   if (_sdf->HasElement("near_clip"))
-    nearClip = _sdf->GetValueDouble("near_clip");
+    nearClip = _sdf->Get<double>("near_clip");
 
   if (_sdf->HasElement("far_clip"))
-    farClip = _sdf->GetValueDouble("far_clip");
+    farClip = _sdf->Get<double>("far_clip");
 
   if (_sdf->HasElement("fov"))
-    fov = _sdf->GetValueDouble("fov");
+    fov = _sdf->Get<double>("fov");
 
-  this->Load(_sdf->GetValueString("name"), pose, textureName,
+  this->Load(_sdf->Get<std::string>("name"), pose, textureName,
              nearClip, farClip, fov);
 }
 
@@ -219,6 +219,8 @@ Projector::ProjectorFrameListener::~ProjectorFrameListener()
 
   delete this->frustum;
   delete this->filterFrustum;
+  this->frustum = NULL;
+  this->filterFrustum = NULL;
 
   if (this->projectorQuery)
     this->sceneMgr->destroyQuery(this->projectorQuery);
@@ -400,7 +402,7 @@ void Projector::ProjectorFrameListener::AddPassToVisibleMaterials()
   Ogre::SceneQueryResultMovableList::iterator it;
   for (it = result.movables.begin(); it != result.movables.end(); ++it)
   {
-    Ogre::Entity* entity = dynamic_cast<Ogre::Entity*>(*it);
+    Ogre::Entity *entity = dynamic_cast<Ogre::Entity*>(*it);
     if (entity && entity->getName().find("visual") != std::string::npos)
     {
       for (unsigned int i = 0; i < entity->getNumSubEntities(); i++)

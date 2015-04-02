@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  * Date: 03 Apr 2007
  */
 
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -64,6 +64,13 @@ void Pose::Set(const Vector3 &_pos, const Quaternion &_rot)
 }
 
 //////////////////////////////////////////////////
+void Pose::Set(const Vector3 &_pos, const Vector3 &_rpy)
+{
+  this->pos = _pos;
+  this->rot.SetFromEuler(_rpy);
+}
+
+//////////////////////////////////////////////////
 void Pose::Set(double _x, double _y, double _z,
                double _roll, double _pitch, double _yaw)
 {
@@ -85,12 +92,12 @@ Pose Pose::GetInverse() const
 }
 
 //////////////////////////////////////////////////
-Pose Pose::operator+(const Pose &obj) const
+Pose Pose::operator+(const Pose &_obj) const
 {
   Pose result;
 
-  result.pos = this->CoordPositionAdd(obj);
-  result.rot = this->CoordRotationAdd(obj.rot);
+  result.pos = this->CoordPositionAdd(_obj);
+  result.rot = this->CoordRotationAdd(_obj.rot);
 
   return result;
 }
@@ -129,6 +136,14 @@ bool Pose::operator!=(const Pose &_pose) const
 Pose Pose::operator*(const Pose &pose)
 {
   return Pose(this->CoordPositionAdd(pose),  pose.rot * this->rot);
+}
+
+//////////////////////////////////////////////////
+Pose &Pose::operator=(const Pose &_pose)
+{
+  this->pos = _pose.pos;
+  this->rot = _pose.rot;
+  return *this;
 }
 
 //////////////////////////////////////////////////

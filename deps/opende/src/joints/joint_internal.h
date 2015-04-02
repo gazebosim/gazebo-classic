@@ -21,7 +21,7 @@
  *************************************************************************/
 
 
-#ifndef _ODE_JOINT_NTERNAL_H_
+#ifndef _ODE_JOINT_INTERNAL_H_
 #define _ODE_JOINT_INTERNAL_H_
 
 

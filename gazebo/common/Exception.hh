@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -41,7 +42,7 @@ namespace gazebo
 
     /// \class Exception Exception.hh common/common.hh
     /// \brief Class for generating exceptions
-    class Exception
+    class GAZEBO_VISIBLE Exception
     {
       /// \brief Constructor
       public: Exception();
@@ -80,7 +81,7 @@ namespace gazebo
       /// \brief stream insertion operator for Gazebo Error
       /// \param[in] _out the output stream
       /// \param[in] _err the exception
-      public: friend std::ostream &operator<<(std::ostream& _out,
+      public: friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::common::Exception &_err)
               {
                 return _out << _err.GetErrorStr();
@@ -91,7 +92,7 @@ namespace gazebo
     /// \brief Class for generating Internal Gazebo Errors:
     ///        those errors which should never happend and
     ///        represent programming bugs.
-    class InternalError : public Exception
+    class GAZEBO_VISIBLE InternalError : public Exception
     {
       /// \brief Constructor
       public: InternalError();
@@ -101,7 +102,7 @@ namespace gazebo
       /// \param[in] _line Line number where the error occurred
       /// \param[in] _msg Error message
       public: InternalError(const char *_file, int _line,
-                            const std::string _msg);
+                            const std::string &_msg);
 
       /// \brief Destructor
       public: virtual ~InternalError();
@@ -112,7 +113,7 @@ namespace gazebo
     ///        gazebo assertions. They include information about the
     ///        assertion expression violated, function where problem
     ///        appeared and assertion debug message.
-    class AssertionInternalError : public InternalError
+    class GAZEBO_VISIBLE AssertionInternalError : public InternalError
     {
       /// \brief Constructor for assertions
       /// \param[in] _file File name
@@ -123,9 +124,9 @@ namespace gazebo
       /// \param[in] _msg Function where assertion failed
       public: AssertionInternalError(const char *_file,
                                      int _line,
-                                     const std::string _expr,
-                                     const std::string _function,
-                                     const std::string _msg = "");
+                                     const std::string &_expr,
+                                     const std::string &_function,
+                                     const std::string &_msg = "");
       /// \brief Destructor
       public: virtual ~AssertionInternalError();
     };

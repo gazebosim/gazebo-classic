@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,5 +41,4 @@ class ImagesView_TEST : public QTestFixture
   private: void SetTopic(gazebo::gui::ImagesView *_view,
                          const std::string &_topicName, int _count);
 };
-
 #endif

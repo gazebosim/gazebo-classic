@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ BulletMultiRayShape::BulletMultiRayShape(CollisionPtr _parent)
 : MultiRayShape(_parent)
 {
   this->SetName("Bullet Multiray Shape");
-  this->physicsEngine = boost::shared_static_cast<BulletPhysics>(
+  this->physicsEngine = boost::static_pointer_cast<BulletPhysics>(
       this->collisionParent->GetWorld()->GetPhysicsEngine());
 }
 

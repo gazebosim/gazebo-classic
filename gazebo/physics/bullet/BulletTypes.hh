@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector4.hh"
 #include "gazebo/math/Pose.hh"
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_physics
@@ -34,15 +35,17 @@ namespace gazebo
   {
     class BulletCollision;
     class BulletLink;
+    class BulletMotionState;
     class BulletPhysics;
     class BulletRayShape;
-    class BulletMotionState;
+    class BulletSurfaceParams;
 
-    typedef boost::shared_ptr<BulletPhysics> BulletPhysicsPtr;
     typedef boost::shared_ptr<BulletCollision> BulletCollisionPtr;
     typedef boost::shared_ptr<BulletLink> BulletLinkPtr;
-    typedef boost::shared_ptr<BulletRayShape> BulletRayShapePtr;
     typedef boost::shared_ptr<BulletMotionState> BulletMotionStatePtr;
+    typedef boost::shared_ptr<BulletPhysics> BulletPhysicsPtr;
+    typedef boost::shared_ptr<BulletRayShape> BulletRayShapePtr;
+    typedef boost::shared_ptr<BulletSurfaceParams> BulletSurfaceParamsPtr;
 
     /// \addtogroup gazebo_physics_bullet
     /// \{
@@ -50,7 +53,7 @@ namespace gazebo
     /// \class BulletTypes BulletTypes.hh
     /// \brief A set of functions for converting between the math types used
     ///        by gazebo and bullet.
-    class BulletTypes {
+    class GAZEBO_VISIBLE BulletTypes {
       /// \brief Convert a bullet btVector3 to a gazebo Vector3.
       /// \param[in] _bt Bullet Vector3.
       /// \return Gazebo Vector3.

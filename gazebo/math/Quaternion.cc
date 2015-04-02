@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 03 Apr 2007
  */
 #include <math.h>
-#include "math/Helpers.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Quaternion.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -158,7 +158,7 @@ Quaternion Quaternion::GetExp() const
 void Quaternion::Invert()
 {
   this->Normalize();
-  this->w = this->w;
+  // this->w = this->w;
   this->x = -this->x;
   this->y = -this->y;
   this->z = -this->z;
@@ -428,8 +428,8 @@ Vector3 Quaternion::RotateVectorReverse(Vector3 _vec) const
 //////////////////////////////////////////////////
 bool Quaternion::IsFinite() const
 {
-  return finite(this->w) && finite(this->x) && finite(this->y) &&
-         finite(this->z);
+  return std::isfinite(this->w) && std::isfinite(this->x) &&
+         std::isfinite(this->y) && std::isfinite(this->z);
 }
 
 //////////////////////////////////////////////////
@@ -598,3 +598,31 @@ Quaternion Quaternion::Slerp(double _fT, const Quaternion &_rkP,
     return t;
   }
 }
+
+//////////////////////////////////////////////////
+// Implementation based on:
+// http://physicsforgames.blogspot.com/2010/02/quaternions.html
+Quaternion Quaternion::Integrate(const Vector3 &_angularVelocity,
+                                 const double _deltaT) const
+{
+  Quaternion deltaQ;
+  Vector3 theta = _angularVelocity * _deltaT * 0.5;
+  double thetaMagSq = theta.GetSquaredLength();
+  double s;
+  if (thetaMagSq * thetaMagSq / 24.0 < GZ_DBL_MIN)
+  {
+    deltaQ.w = 1.0 - thetaMagSq / 2.0;
+    s = 1.0 - thetaMagSq / 6.0;
+  }
+  else
+  {
+    double thetaMag = sqrt(thetaMagSq);
+    deltaQ.w = cos(thetaMag);
+    s = sin(thetaMag) / thetaMag;
+  }
+  deltaQ.x = theta.x * s;
+  deltaQ.y = theta.y * s;
+  deltaQ.z = theta.z * s;
+  return deltaQ * (*this);
+}
+

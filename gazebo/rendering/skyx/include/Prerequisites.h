@@ -23,6 +23,9 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 #ifndef _SkyX_Prerequisites_H_
 #define _SkyX_Prerequisites_H_
+#ifdef __clang__
+#pragma clang diagnostic ignored "-W#warnings"
+#endif  // ifdef __clang__
 
 #ifdef _MSC_VER
   // conversion from 'xxx' to 'yyy', possible loss of data
@@ -33,6 +36,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 /// Include external headers
 #include <OGRE/Ogre.h>
+#include <OGRE/OgreFrameListener.h>
+#include <OGRE/OgreBillboard.h>
 
 /// Define the dll export qualifier if compiling for Windows
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -42,7 +47,11 @@ http://www.gnu.org/copyleft/lesser.txt.
     #define DllExport __declspec (dllimport)
   #endif
 #else
-  #define DllExport
+  #if __GNUC__ >= 4
+    #define DllExport __attribute__ ((visibility ("default")))
+  #else
+    #define DllExport
+  #endif
 #endif
 
 /// Log macro

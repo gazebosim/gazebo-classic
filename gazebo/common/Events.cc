@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "common/Events.hh"
+#include "gazebo/common/Events.hh"
 
 using namespace gazebo;
 using namespace event;
@@ -22,6 +22,7 @@ using namespace event;
 EventT<void (bool)> Events::pause;
 EventT<void ()> Events::step;
 EventT<void ()> Events::stop;
+EventT<void ()> Events::sigInt;
 
 EventT<void (std::string)> Events::worldCreated;
 EventT<void (std::string)> Events::entityCreated;
@@ -29,10 +30,10 @@ EventT<void (std::string, std::string)> Events::setSelectedEntity;
 EventT<void (std::string)> Events::addEntity;
 EventT<void (std::string)> Events::deleteEntity;
 
-EventT<void ()> Events::worldUpdateStart;
 EventT<void (const common::UpdateInfo &)> Events::worldUpdateBegin;
 
 EventT<void ()> Events::worldUpdateEnd;
+EventT<void ()> Events::worldReset;
 
 EventT<void ()> Events::preRender;
 EventT<void ()> Events::render;
@@ -40,12 +41,6 @@ EventT<void ()> Events::postRender;
 
 EventT<void (std::string)> Events::diagTimerStart;
 EventT<void (std::string)> Events::diagTimerStop;
-
-/////////////////////////////////////////////////
-void Events::DisconnectWorldUpdateStart(ConnectionPtr _subscriber)
-{
-  worldUpdateStart.Disconnect(_subscriber);
-}
 
 /////////////////////////////////////////////////
 void Events::DisconnectWorldUpdateBegin(ConnectionPtr _subscriber)

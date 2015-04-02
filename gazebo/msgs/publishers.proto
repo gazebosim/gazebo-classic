@@ -11,5 +11,3 @@ message Publishers
 {
   repeated Publish publisher = 1;
 }
-
-

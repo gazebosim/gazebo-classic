@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +23,20 @@
 #define GRAPHICS3DINTERFACE_HH
 
 #include "GazeboInterface.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
-  class recursive_mutex;
+  class GAZEBO_VISIBLE recursive_mutex;
 }
 
 namespace libgazebo
 {
   // Forward declarations
-  class Graphics3dIface;
+  class GAZEBO_VISIBLE Graphics3dIface;
 
   /// \brief Graphics3d interface
-  class Graphics3dInterface : public GazeboInterface
+  class GAZEBO_VISIBLE Graphics3dInterface : public GazeboInterface
   {
     /// \brief Constructor
     public: Graphics3dInterface(player_devaddr_t addr, GazeboDriver *driver,

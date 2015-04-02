@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 */
 #include <algorithm>
 
-#include "math/Spline.hh"
-#include "math/RotationSpline.hh"
-#include "common/Console.hh"
-#include "common/KeyFrame.hh"
-#include "common/Animation.hh"
+#include "gazebo/math/Spline.hh"
+#include "gazebo/math/RotationSpline.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/KeyFrame.hh"
+#include "gazebo/common/Animation.hh"
 
 using namespace gazebo;
 using namespace common;

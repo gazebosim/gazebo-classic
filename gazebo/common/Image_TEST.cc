@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,13 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/common/Image.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(ImageTest, Image)
+class ImageTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(ImageTest, Image)
 {
   common::Image img;
   EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));

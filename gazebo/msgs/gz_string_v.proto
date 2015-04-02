@@ -9,5 +9,3 @@ message GzString_V
 {
   repeated string data = 1;
 }
-
-

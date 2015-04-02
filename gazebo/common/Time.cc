@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,13 @@
 #include <sys/time.h>
 #include <time.h>
 #include <math.h>
+#include <unistd.h>
 #include <boost/date_time.hpp>
+
+#ifdef __MACH__
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/common/Time.hh"
@@ -44,9 +50,13 @@ Time::Time()
   this->sec = 0;
   this->nsec = 0;
 
+#ifdef __MACH__
+  clockResolution.tv_sec = 1 / sysconf(_SC_CLK_TCK);
+#else
   // get clock resolution, skip sleep if resolution is larger then
   // requested sleep time
   clock_getres(CLOCK_REALTIME, &clockResolution);
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -91,7 +101,18 @@ Time::~Time()
 const Time &Time::GetWallTime()
 {
   struct timespec tv;
+  // OS X does not have clock_gettime, use clock_get_time
+#ifdef __MACH__
+  clock_serv_t cclock;
+  mach_timespec_t mts;
+  host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+  clock_get_time(cclock, &mts);
+  mach_port_deallocate(mach_task_self(), cclock);
+  tv.tv_sec = mts.tv_sec;
+  tv.tv_nsec = mts.tv_nsec;
+#else
   clock_gettime(0, &tv);
+#endif
   wallTime = tv;
   return wallTime;
 }
@@ -168,7 +189,11 @@ Time Time::Sleep(const common::Time &_time)
       return result;
     }
 
+#ifdef __MACH__
     if (nanosleep(&interval, &remainder) == -1)
+#else
+    if (clock_nanosleep(CLOCK_REALTIME, 0, &interval, &remainder) == -1)
+#endif
     {
       result.sec = remainder.tv_sec;
       result.nsec = remainder.tv_nsec;
@@ -193,12 +218,6 @@ Time Time::MSleep(unsigned int _ms)
 Time Time::NSleep(unsigned int _ns)
 {
   return Time::Sleep(Time(0, _ns));
-}
-
-/////////////////////////////////////////////////
-Time Time::NSleep(Time _time)
-{
-  return Time::Sleep(_time);
 }
 
 /////////////////////////////////////////////////
@@ -416,7 +435,7 @@ Time Time::operator /(const Time &_time) const
 {
   Time result(*this);
 
-  if (math::equal(_time.Double(), 0.0))
+  if (_time.sec == 0 && _time.nsec == 0)
     gzerr << "Time divide by zero\n";
   else
     result.Set(this->Double() / _time.Double());

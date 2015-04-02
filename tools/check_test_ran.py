@@ -43,7 +43,10 @@ from __future__ import print_function
 NAME="check_test_ran.py"
 
 import os
+import re
+import string
 import sys
+import subprocess
 
 def usage():
     print("""Usage:
@@ -52,11 +55,50 @@ def usage():
     print(sys.argv)
     sys.exit(getattr(os, 'EX_USAGE', 1))
 
+def run_grep(filename, arg):
+    process = subprocess.Popen(['grep', arg, filename], stdout=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    return stdout, stderr
+
+def run_xsltproc(stylesheet, document):
+    try:
+        process = subprocess.Popen(['xsltproc', stylesheet, document], stdout=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        # Overwrite same document
+        open(document, 'w').write(stdout)
+    except OSError as err:
+        test_name = os.path.basename(document)
+        f = open(document, 'w')
+        d = {'test': test_name, 'test_file': document, 'test_no_xml': test_name.replace('.xml', '')}
+        f.write("""<?xml version="1.0" encoding="UTF-8"?>
+<testsuite tests="1" failures="1" time="1" errors="0" name="%(test)s">
+  <testcase name="test_ran" status="run" time="1" classname="%(test_no_xml)s">
+    <failure message="Unable to find xsltproc. Can not parse output test for QTest suite." type=""/>
+  </testcase>
+</testsuite>"""%d)
+        sys.exit(getattr(os, 'EX_USAGE', 1))
+
 def check_main():
     if len(sys.argv) < 2:
         usage()
     test_file = sys.argv[1]
         
+    # kill rogue gzservers from INTEGRATION_world_clone test
+    # https://bitbucket.org/osrf/gazebo/issue/1299
+    if 'INTEGRATION_world_clone' in test_file:
+        process = subprocess.Popen(['ps', 'ax'], stdout=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        for line in string.split(stdout, '\n'):
+            if line.find('gzserver /tmp/clone.11347.world') >= 0:
+                print(line)
+                m = re.search('^ *([0-9]+) .*', line)
+                if m == None:
+                    print("Error identifying process id, not killing any gzserver's")
+                else:
+                    pid = m.group(1)
+                    print("killing gzserver with pid %s" % (pid))
+                    subprocess.call(["kill", "-9", "%s" % (pid)])
+
     print("Checking for test results in %s"%test_file)
     
     if not os.path.exists(test_file):
@@ -67,15 +109,21 @@ def check_main():
         
         with open(test_file, 'w') as f:
             test_name = os.path.basename(test_file)
-            d = {'test': test_name, 'test_file': test_file }
+            d = {'test': test_name, 'test_file': test_file , 'test_no_xml': test_name.replace('.xml', '')}
             f.write("""<?xml version="1.0" encoding="UTF-8"?>
 <testsuite tests="1" failures="1" time="1" errors="0" name="%(test)s">
-  <testcase name="test_ran" status="run" time="1" classname="Results">
+  <testcase name="test_ran" status="run" time="1" classname="%(test_no_xml)s">
     <failure message="Unable to find test results for %(test)s, test did not run.\nExpected results in %(test_file)s" type=""/>
   </testcase>
 </testsuite>"""%d)
+        sys.exit(getattr(os, 'EX_USAGE', 1))
+
+    # Checking if test is a QTest file
+    stdout, stderr = run_grep(test_file, "QtVersion")
+    if (stdout):
+        print("Detect QTest xml file. Converting to JUNIT ...")
+        stylesheet = os.path.dirname(os.path.abspath(__file__)) + "/qtest_to_junit.xslt"
+        run_xsltproc(stylesheet, test_file)
 
 if __name__ == '__main__':
     check_main()
-
-

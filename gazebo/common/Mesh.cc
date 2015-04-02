@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@
 #include <string.h>
 #include <algorithm>
 
-#include "math/Helpers.hh"
+#include "gazebo/math/Helpers.hh"
 
-#include "common/Material.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/Mesh.hh"
-#include "common/Skeleton.hh"
-#include "gazebo_config.h"
+#include "gazebo/common/Material.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 using namespace common;
@@ -217,6 +217,20 @@ const SubMesh *Mesh::GetSubMesh(unsigned int i) const
 }
 
 //////////////////////////////////////////////////
+const SubMesh *Mesh::GetSubMesh(const std::string &_name) const
+{
+  // Find the submesh with the provided name.
+  for (std::vector<SubMesh *>::const_iterator iter = this->submeshes.begin();
+       iter != this->submeshes.end(); ++iter)
+  {
+    if ((*iter)->GetName() == _name)
+      return *iter;
+  }
+
+  return NULL;
+}
+
+//////////////////////////////////////////////////
 int Mesh::AddMaterial(Material *_mat)
 {
   int result = -1;
@@ -243,6 +257,18 @@ const Material *Mesh::GetMaterial(int index) const
     return this->materials[index];
 
   return NULL;
+}
+
+//////////////////////////////////////////////////
+int Mesh::GetMaterialIndex(const Material *_mat) const
+{
+  for (unsigned int i = 0; i < this->materials.size(); ++i)
+  {
+    if (this->materials[i] == _mat)
+      return i;
+  }
+
+  return -1;
 }
 
 //////////////////////////////////////////////////
@@ -353,6 +379,31 @@ void Mesh::GenSphericalTexCoord(const math::Vector3 &_center)
 }
 
 //////////////////////////////////////////////////
+void Mesh::Center(const math::Vector3 &_center)
+{
+  math::Vector3 min, max, half;
+  min = this->GetMin();
+  max = this->GetMax();
+  half = (max - min) * 0.5;
+
+  this->Translate(_center - (min + half));
+}
+
+//////////////////////////////////////////////////
+void Mesh::Translate(const math::Vector3 &_vec)
+{
+  std::vector<SubMesh*>::iterator iter;
+
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
+  {
+    if ((*iter)->GetVertexCount() <= 2)
+      continue;
+
+    (*iter)->Translate(_vec);
+  }
+}
+
+//////////////////////////////////////////////////
 //////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
@@ -360,6 +411,32 @@ SubMesh::SubMesh()
 {
   this->materialIndex = -1;
   this->primitiveType = TRIANGLES;
+}
+
+//////////////////////////////////////////////////
+SubMesh::SubMesh(const SubMesh *_mesh)
+{
+  if (!_mesh)
+  {
+    gzerr << "Submesh is NULL." << std::endl;
+    return;
+  }
+
+  this->name = _mesh->name;
+  this->materialIndex = _mesh->materialIndex;
+  this->primitiveType = _mesh->primitiveType;
+
+  std::copy(_mesh->nodeAssignments.begin(), _mesh->nodeAssignments.end(),
+      std::back_inserter(this->nodeAssignments));
+
+  std::copy(_mesh->indices.begin(), _mesh->indices.end(),
+      std::back_inserter(this->indices));
+  std::copy(_mesh->normals.begin(), _mesh->normals.end(),
+      std::back_inserter(this->normals));
+  std::copy(_mesh->texCoords.begin(), _mesh->texCoords.end(),
+      std::back_inserter(this->texCoords));
+  std::copy(_mesh->vertices.begin(), _mesh->vertices.end(),
+      std::back_inserter(this->vertices));
 }
 
 //////////////////////////////////////////////////
@@ -671,7 +748,7 @@ unsigned int SubMesh::GetVertexIndex(const math::Vector3 &_v) const
 //////////////////////////////////////////////////
 void SubMesh::FillArrays(float **_vertArr, int **_indArr) const
 {
-  if (this->vertices.size() == 0 || this->indices.size() == 0)
+  if (this->vertices.empty() || this->indices.empty())
     gzerr << "No vertices or indices\n";
 
   std::vector< math::Vector3 >::const_iterator viter;
@@ -814,4 +891,43 @@ void SubMesh::SetScale(const math::Vector3 &_factor)
     (*iter).y *= _factor.y;
     (*iter).z *= _factor.z;
   }
+}
+
+//////////////////////////////////////////////////
+void SubMesh::Center(const math::Vector3 &_center)
+{
+  math::Vector3 min, max, half;
+  min = this->GetMin();
+  max = this->GetMax();
+  half = (max - min) * 0.5;
+
+  this->Translate(_center - (min + half));
+}
+
+//////////////////////////////////////////////////
+void SubMesh::Translate(const math::Vector3 &_vec)
+{
+  for (std::vector<math::Vector3>::iterator iter = this->vertices.begin();
+       iter != this->vertices.end(); ++iter)
+  {
+    (*iter) += _vec;
+  }
+}
+
+//////////////////////////////////////////////////
+void SubMesh::SetName(const std::string &_n)
+{
+  this->name = _n;
+}
+
+//////////////////////////////////////////////////
+std::string SubMesh::GetName() const
+{
+  return this->name;
+}
+
+//////////////////////////////////////////////////
+NodeAssignment::NodeAssignment()
+  : vertexIndex(0), nodeIndex(0), weight(0.0)
+{
 }
