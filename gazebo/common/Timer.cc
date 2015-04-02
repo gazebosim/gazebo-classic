@@ -14,10 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: A timer class
- * Author: Nate Koenig
- * Date: 22 Nov 2009
- */
 
 #include "gazebo/common/Timer.hh"
 
@@ -78,6 +74,7 @@ Time Timer::GetElapsed() const
 
     return currentTime - this->start;
   }
-  else
-    return this->stop - this->start;
+
+  // else
+  return this->stop - this->start;
 }
