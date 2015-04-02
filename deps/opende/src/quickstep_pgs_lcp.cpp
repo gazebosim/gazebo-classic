@@ -1113,6 +1113,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     printf("thread summary: id %d i %d m %d chunk %d start %d end %d \n",
       thread_id,i,m,chunk,nStart,nEnd);
 #endif
+
+    boost::thread *params_erp_thread;
 #ifdef USE_TPROW
     if (row_threadpool && row_threadpool->size() > 0)
     {
@@ -1121,9 +1123,9 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       body, params_erp[thread_id], mutex));
     }
     else //automatically skip threadpool if only 1 thread allocated
-      ComputeRows(thread_id,order, body, params_erp[thread_id], mutex);
+      params_erp_thread = new boost::thread(ComputeRows, thread_id,order, body, params_erp[thread_id], mutex);
 #else
-    boost::thread params_erp_thread(ComputeRows, thread_id,order, body, params_erp[thread_id], mutex);
+    params_erp_thread = new boost::thread(ComputeRows, thread_id,order, body, params_erp[thread_id], mutex);
     // ComputeRows(thread_id,order, body, params_erp[thread_id], mutex);
 #endif
 
@@ -1180,12 +1182,12 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     else //automatically skip threadpool if only 1 thread allocated
       ComputeRows(thread_id,order, body, params[thread_id], mutex);
 #else
-    // boost::thread params_thread(ComputeRows, thread_id,order, body, params[thread_id], mutex);
     ComputeRows(thread_id,order, body, params[thread_id], mutex);
 #endif
 
     IFTIMING (dTimerNow ("wait for params_erp threads"));
-    params_erp_thread.join();
+    params_erp_thread->join();
+    delete params_erp_thread;
     IFTIMING (dTimerNow ("params_erp threads done"));
   }
 
