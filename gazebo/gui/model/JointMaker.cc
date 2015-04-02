@@ -71,6 +71,10 @@ JointMaker::JointMaker()
       gui::model::Events::ConnectOpenJointInspector(
       boost::bind(&JointMaker::OpenInspector, this, _1)));
 
+  this->connections.push_back(
+      gui::model::Events::ConnectShowJointContextMenu(
+      boost::bind(&JointMaker::ShowContextMenu, this, _1)));
+
   this->inspectAct = new QAction(tr("Open Joint Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this, SLOT(OnOpenInspector()));
 
@@ -278,9 +282,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
         if (_event.button == common::MouseEvent::RIGHT)
         {
           this->inspectVis = vis;
-          QMenu menu;
-          menu.addAction(this->inspectAct);
-          menu.exec(QCursor::pos());
+          this->ShowContextMenu(this->inspectVis->GetName());
         }
         else if (_event.button == common::MouseEvent::LEFT)
         {
@@ -610,11 +612,22 @@ bool JointMaker::OnKeyPress(const common::KeyEvent &_event)
   {
     if (this->selectedJoint)
     {
-      this->RemoveJoint(this->selectedJoint->GetName());
-      this->selectedJoint.reset();
+      this->OnDelete();
+      return true;
     }
   }
+
   return false;
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OnDelete()
+{
+  if (this->selectedJoint)
+  {
+    this->RemoveJoint(this->selectedJoint->GetName());
+    this->selectedJoint.reset();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1102,6 +1115,24 @@ void JointData::OpenInspector()
   }
   this->inspector->move(QCursor::pos());
   this->inspector->show();
+}
+
+/////////////////////////////////////////////////
+void JointMaker::ShowContextMenu(const std::string &_name)
+{
+  auto it = this->joints.find(_name);
+  if (it == this->joints.end())
+    return;
+
+  QMenu menu;
+  if (this->inspectAct)
+    menu.addAction(this->inspectAct);
+
+  QAction *deleteAct = new QAction(tr("Delete"), this);
+  connect(deleteAct, SIGNAL(triggered()), this, SLOT(OnDelete()));
+  menu.addAction(deleteAct);
+
+  menu.exec(QCursor::pos());
 }
 
 /////////////////////////////////////////////////

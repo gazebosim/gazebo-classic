@@ -219,11 +219,19 @@ namespace gazebo
       /// \return Scoped link name.
       private: std::string GetScopedLinkName(const std::string &_name);
 
+      /// \brief Show a joint's context menu
+      /// \param[in] _joint Name of joint the context menu is associated with.
+      private: void ShowContextMenu(const std::string &_joint);
+
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
 
       /// \brief Qt Callback to open joint inspector
       private slots: void OnOpenInspector();
+
+      /// \brief Qt callback when a delete signal has been emitted. This is
+      /// currently triggered by the context menu via right click.
+      private slots: void OnDelete();
 
       /// \brief Constant vector containing [UnitX, UnitY, UnitZ].
       private: std::vector<math::Vector3> UnitVectors;

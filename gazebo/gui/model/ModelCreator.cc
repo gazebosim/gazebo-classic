@@ -130,8 +130,16 @@ ModelCreator::ModelCreator()
        boost::bind(&ModelCreator::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
+     gui::model::Events::ConnectSetSelectedLink(
+       boost::bind(&ModelCreator::OnSetSelectedLink, this, _1, _2)));
+
+  this->connections.push_back(
       gui::Events::ConnectScaleEntity(
       boost::bind(&ModelCreator::OnEntityScaleChanged, this, _1, _2)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectShowLinkContextMenu(
+      boost::bind(&ModelCreator::ShowContextMenu, this, _1)));
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
@@ -1164,6 +1172,16 @@ void ModelCreator::Stop()
 }
 
 /////////////////////////////////////////////////
+void ModelCreator::OnDelete()
+{
+  if (this->inspectName.empty())
+    return;
+
+  this->OnDelete(this->inspectName);
+  this->inspectName = "";
+}
+
+/////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
@@ -1210,13 +1228,11 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
   {
     if (!this->selectedVisuals.empty())
     {
-      for (auto it = this->selectedVisuals.begin();
-          it != this->selectedVisuals.end();)
+      for (auto linkVis : this->selectedVisuals)
       {
-        (*it)->SetHighlighted(false);
-        this->OnDelete((*it)->GetName());
-        it = this->selectedVisuals.erase(it);
+        this->OnDelete(linkVis->GetName());
       }
+      this->DeselectAll();
     }
   }
   else if (_event.control)
@@ -1311,28 +1327,9 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       // trigger link inspector on right click
       if (_event.button == common::MouseEvent::RIGHT)
       {
-        this->inspectVis = vis->GetParent();
+        this->inspectName = vis->GetParent()->GetName();
 
-        QMenu menu;
-        menu.addAction(this->inspectAct);
-
-        std::vector<JointData *> joints = this->jointMaker->GetJointDataByLink(
-            this->inspectVis->GetName());
-
-        if (!joints.empty())
-        {
-          QMenu *jointsMenu = menu.addMenu(tr("Open Joint Inspector"));
-
-          for (auto joint : joints)
-          {
-            QAction *jointAct = new QAction(tr(joint->name.c_str()), this);
-            connect(jointAct, SIGNAL(triggered()), joint,
-                SLOT(OnOpenInspector()));
-            jointsMenu->addAction(jointAct);
-          }
-        }
-
-        menu.exec(QCursor::pos());
+        this->ShowContextMenu(this->inspectName);
         return true;
       }
 
@@ -1340,10 +1337,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
       {
         this->DeselectAll();
-
-        // Highlight and selected clicked link
-        linkVis->SetHighlighted(true);
-        this->selectedVisuals.push_back(linkVis);
+        this->SetSelected(linkVis, true);
       }
       // Multi-selection mode
       else
@@ -1353,14 +1347,12 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         // Highlight and select clicked link if not already selected
         if (it == this->selectedVisuals.end())
         {
-          linkVis->SetHighlighted(true);
-          this->selectedVisuals.push_back(linkVis);
+          this->SetSelected(linkVis, true);
         }
         // Deselect if already selected
         else
         {
-          linkVis->SetHighlighted(false);
-          this->selectedVisuals.erase(it);
+          this->SetSelected(linkVis, false);
         }
       }
       g_copyAct->setEnabled(!this->selectedVisuals.empty());
@@ -1387,6 +1379,45 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     }
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::ShowContextMenu(const std::string &_link)
+{
+  auto it = this->allLinks.find(_link);
+  if (it == this->allLinks.end())
+    return;
+
+  this->inspectName = _link;
+  QMenu menu;
+  if (this->inspectAct)
+  {
+    menu.addAction(this->inspectAct);
+
+    if (this->jointMaker)
+    {
+      std::vector<JointData *> joints = this->jointMaker->GetJointDataByLink(
+          _link);
+
+      if (!joints.empty())
+      {
+        QMenu *jointsMenu = menu.addMenu(tr("Open Joint Inspector"));
+
+        for (auto joint : joints)
+        {
+          QAction *jointAct = new QAction(tr(joint->name.c_str()), this);
+          connect(jointAct, SIGNAL(triggered()), joint,
+              SLOT(OnOpenInspector()));
+          jointsMenu->addAction(jointAct);
+        }
+      }
+    }
+  }
+  QAction *deleteAct = new QAction(tr("Delete"), this);
+  connect(deleteAct, SIGNAL(triggered()), this, SLOT(OnDelete()));
+  menu.addAction(deleteAct);
+
+  menu.exec(QCursor::pos());
 }
 
 /////////////////////////////////////////////////
@@ -1463,8 +1494,11 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 void ModelCreator::OnOpenInspector()
 {
-  this->OpenInspector(this->inspectVis->GetName());
-  this->inspectVis.reset();
+  if (this->inspectName.empty())
+    return;
+
+  this->OpenInspector(this->inspectName);
+  this->inspectName = "";
 }
 
 /////////////////////////////////////////////////
@@ -1696,12 +1730,62 @@ void ModelCreator::DeselectAll()
 {
   if (!this->selectedVisuals.empty())
   {
+    std::cerr << " DeselectAll " << selectedVisuals.size() << std::endl;
     for (auto &vis : this->selectedVisuals)
     {
-      vis->SetHighlighted(false);
+      if (vis)
+      {
+        vis->SetHighlighted(false);
+        model::Events::setSelectedLink(vis->GetName(), false);
+      }
+      else
+      {
+        std::cerr << "empty vis " << std::endl;
+      }
     }
     this->selectedVisuals.clear();
   }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::SetSelected(const std::string &_name, bool _selected)
+{
+  auto it = this->allLinks.find(_name);
+  if (it == this->allLinks.end())
+    return;
+
+  this->SetSelected((*it).second->linkVisual, _selected);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::SetSelected(rendering::VisualPtr _linkVis, bool _selected)
+{
+  if (!_linkVis)
+    return;
+
+  _linkVis->SetHighlighted(_selected);
+  auto it = std::find(this->selectedVisuals.begin(),
+      this->selectedVisuals.end(), _linkVis);
+  if (_selected)
+  {
+    if (it == this->selectedVisuals.end())
+    {
+      this->selectedVisuals.push_back(_linkVis);
+      model::Events::setSelectedLink(_linkVis->GetName(), _selected);
+    }
+  }
+  else
+  {
+    if (it != this->selectedVisuals.end())
+    {
+      std::cerr << " erasing "  << _linkVis->GetName() << " " << std::endl;
+      this->selectedVisuals.erase(it);
+      model::Events::setSelectedLink(_linkVis->GetName(), _selected);
+    }
+  }
+
+  std::cerr << " set selected _linkVis "  << _linkVis->GetName() << " " <<
+      _selected << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -1724,12 +1808,10 @@ void ModelCreator::OnManipMode(const std::string &_mode)
   // deselect 0 to n-1 models.
   if (this->selectedVisuals.size() > 1)
   {
-    for (auto it = this->selectedVisuals.begin();
-        it != --this->selectedVisuals.end();)
-    {
-       (*it)->SetHighlighted(false);
-       it = this->selectedVisuals.erase(it);
-    }
+    rendering::VisualPtr link =
+        this->selectedVisuals[this->selectedVisuals.size()-1];
+    this->DeselectAll();
+    this->SetSelected(link, true);
   }
 }
 
@@ -1739,6 +1821,14 @@ void ModelCreator::OnSetSelectedEntity(const std::string &/*_name*/,
 {
   this->DeselectAll();
 }
+
+/////////////////////////////////////////////////
+void ModelCreator::OnSetSelectedLink(const std::string &_name,
+    bool _selected)
+{
+  this->SetSelected(_name, _selected);
+}
+
 
 /////////////////////////////////////////////////
 void ModelCreator::ModelChanged()
