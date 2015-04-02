@@ -147,9 +147,7 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   EXPECT_NEAR(raySensor->GetRange(mid), expectedRangeAtMidPoint, LASER_TOL);
   EXPECT_NEAR(raySensor->GetRange(0), expectedRangeAtMidPoint, LASER_TOL);
 
-  // WARNING: for readings of no return, gazebo returns max range rather
-  // than +inf. issue #124
-    EXPECT_DOUBLE_EQ(raySensor->GetRange(samples-1), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(samples-1), GZ_DBL_INF);
 
   // Verify ray sensor 2 range readings
   // listen to new laser frames
