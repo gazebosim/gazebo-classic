@@ -90,7 +90,10 @@ TimePanel::TimePanel(QWidget *_parent)
   playToolbar->addWidget(emptyLabel);
 
   if (g_stepAct)
+  {
     playToolbar->addAction(g_stepAct);
+    g_stepAct->setEnabled(this->paused);
+  }
   this->stepToolBarLabelAction = playToolbar->addWidget(stepToolBarLabel);
   this->stepButtonAction = playToolbar->addWidget(this->stepButton);
   this->stepButtonAction->setObjectName("timePanelStepAction");
@@ -264,12 +267,12 @@ bool TimePanel::IsPaused() const
 /////////////////////////////////////////////////
 void TimePanel::SetPaused(bool _paused)
 {
+  this->paused = _paused;
+
   if (g_pauseAct)
     g_pauseAct->setVisible(!_paused);
   if (g_playAct)
     g_playAct->setVisible(_paused);
-
-  this->paused = _paused;
 }
 
 /////////////////////////////////////////////////

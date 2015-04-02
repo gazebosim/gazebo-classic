@@ -28,235 +28,183 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(FoosballPlugin)
 
 /////////////////////////////////////////////////
-FoosballPlugin::FoosballPlugin()
+FoosballPlayer::FoosballPlayer(const std::string &_hydraTopic)
+  : hydraTopic(_hydraTopic)
 {
 }
 
 /////////////////////////////////////////////////
-void FoosballPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
+bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_model, "FoosballPlugin _model pointer is NULL");
-  this->model = _model;
   GZ_ASSERT(_sdf, "FoosballPlugin _sdf pointer is NULL");
-  this->sdf = _sdf;
 
-  for (auto playerElem = _sdf->GetElement("player"); playerElem;
-    playerElem = playerElem->GetNextElement("player"))
+  if (!_sdf->HasElement("team"))
   {
-    if (!playerElem->HasElement("name"))
-    {
-      std::cerr << "FoosballPlugin::Load() Missing <name> element in player "
-                << "section" << std::endl;
-      continue;
-    }
-    std::string name = playerElem->Get<std::string>("name");
-    if (name != "A" && name != "B")
-    {
-      std::cerr << "FoosballPlugin::Load() Invalid <name> value in player "
-                << "section. Allowed values ar A or B" << std::endl;
-    }
+    std::cerr << "FoosballPlayer::Load() Missing <team> element in player "
+              << "section" << std::endl;
+    return false;
+  }
 
-    Controller_t controller;
+  std::string team = _sdf->Get<std::string>("team");
+  if (team != "blue" && team != "red")
+  {
+    std::cerr << "FoosballPlayer::Load() Invalid <team> value in player "
+              << "section. Allowed values are 'blue' or 'red'" << std::endl;
+    return false;
+  }
 
-    for (const auto &side : {"left_controller", "right_controller"})
+  for (const auto &side : {"left_controller", "right_controller"})
+  {
+    if (_sdf->HasElement(side))
     {
-      if (playerElem->HasElement(side))
+      sdf::ElementPtr controllerElem = _sdf->GetElement(side);
+      if (!controllerElem->HasElement("rod"))
       {
-        sdf::ElementPtr controllerElem = playerElem->GetElement(side);
-        if (!controllerElem->HasElement("rod"))
+        std::cerr << "FoosballPlayer::Load() Missing <rod> element in <"
+                  << side << "_controller> section" << std::endl;
+        return false;
+      }
+
+      this->controller[side] = {};
+
+      for (auto rodElem = controllerElem->GetElement("rod"); rodElem;
+        rodElem = rodElem->GetNextElement("rod"))
+      {
+        std::string transName;
+        std::string rotName;
+        std::string rodNumber = rodElem->GetValue()->GetAsString();
+
+        if (team == "red")
         {
-          std::cerr << "FoosballPlugin::Load() Missing <rod> element in <"
-                    << side << "_controller> section" << std::endl;
-          continue;
+          transName = "Foosball::transA" + rodNumber;
+          rotName = "Foosball::rotA" + rodNumber;
+        }
+        else
+        {
+          transName = "Foosball::transB" + rodNumber;
+          rotName = "Foosball::rotB" + rodNumber;
         }
 
-        controller[side] = {};
-
-        for (auto rodElem = controllerElem->GetElement("rod"); rodElem;
-          rodElem = rodElem->GetNextElement("rod"))
-        {
-          std::string rodNumber = rodElem->GetValue()->GetAsString();
-          std::string transName = "Foosball::trans" + name + rodNumber;
-          std::string rotName = "Foosball::rot" + name + rodNumber;
-          Rod_t rod =
-           {this->model->GetJoint(transName), this->model->GetJoint(rotName)};
-
-           controller[side].push_back(rod);
-        }
+        Rod_t rod = {_model->GetJoint(transName), _model->GetJoint(rotName)};
+        this->controller[side].push_back(rod);
       }
     }
-
-    std::cout << "Player " << name << " detected" << std::endl;
-    for (const auto &side : controller)
-    {
-      std::cout << "\t" << side.first << ":" << std::endl;
-      for (const auto &rod : side.second)
-      {
-        std::cout << "\t\tTranslation: " << rod.at(0)->GetName() << std::endl;
-        std::cout << "\t\tRotation: " << rod.at(1)->GetName() << std::endl;
-      }
-    }
-
-    this->controllers.push_back(controller);
   }
 
   // Subscribe to Hydra updates by registering OnHydra() callback.
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->model->GetWorld()->GetName());
-  this->hydraSub0 = this->node->Subscribe("~/hydra0",
-    &FoosballPlugin::OnHydra0, this);
+  this->node->Init(_model->GetWorld()->GetName());
+  this->hydraSub = this->node->Subscribe(this->hydraTopic,
+    &FoosballPlayer::OnHydra, this);
 
-  this->hydraSub1 = this->node->Subscribe("~/hydra1",
-    &FoosballPlugin::OnHydra1, this);
-
-  // Listen to the update event. This event is broadcast every
-  // simulation iteration.
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-    boost::bind(&FoosballPlugin::Update, this, _1));
-}
-
-void FoosballPlugin::Process0()
-{
-  if (this->hydraMsgs0.empty())
-    return;
-
-  if (!this->activated0)
-  {
-    for (std::list<boost::shared_ptr<msgs::Hydra const> >::iterator iter =
-        this->hydraMsgs0.begin(); iter != this->hydraMsgs0.end(); ++iter)
-    {
-      if ((*iter)->right().button_bumper() && (*iter)->left().button_bumper())
-      {
-        this->activated0 = true;
-        this->resetPoseRight0 = msgs::Convert((*iter)->right().pose());
-        this->resetPoseLeft0 = msgs::Convert((*iter)->left().pose());
-        break;
-      }
-    }
-  }
-
-  if (this->activated0)
-  {
-    boost::shared_ptr<msgs::Hydra const> msg = this->hydraMsgs0.back();
-
-    math::Pose rightPose;
-    math::Pose leftPose;
-
-    std::map<std::string, math::Pose> adjust;
-
-    rightPose = msgs::Convert(msg->right().pose());
-    leftPose = msgs::Convert(msg->left().pose());
-
-    adjust["right_controller"] = math::Pose(
-      rightPose.pos - this->resetPoseRight0.pos + this->basePoseRight0.pos,
-      rightPose.rot * this->resetPoseRight0.rot.GetInverse() *
-      this->basePoseRight0.rot);
-
-    adjust["left_controller"] = math::Pose(
-      leftPose.pos - this->resetPoseLeft0.pos + this->basePoseLeft0.pos,
-      leftPose.rot * this->resetPoseLeft0.rot.GetInverse() *
-      this->basePoseLeft0.rot);
-
-    // Move the rods.
-    //for (auto &controller : this->controllers)
-    //{
-    if (!this->controllers.empty())
-    {
-      auto controller = this->controllers.at(0);
-      for (const auto &side : {"left_controller", "right_controller"})
-      {
-        if (controller.find(side) != controller.end())
-        {
-          if (!controller[side].empty())
-          {
-            // Translation.
-            controller[side].at(0).at(0)->SetPosition(0, -adjust[side].pos.x);
-            // Rotation.
-            controller[side].at(0).at(1)->SetPosition(
-              0, -adjust[side].rot.GetRoll());
-          }
-        }
-      }
-    }
-  }
-}
-
-void FoosballPlugin::Process1()
-{
-  if (this->hydraMsgs1.empty())
-    return;
-
-  if (!this->activated1)
-  {
-    for (std::list<boost::shared_ptr<msgs::Hydra const> >::iterator iter =
-        this->hydraMsgs1.begin(); iter != this->hydraMsgs1.end(); ++iter)
-    {
-      if ((*iter)->right().button_bumper() && (*iter)->left().button_bumper())
-      {
-        this->activated1 = true;
-        this->resetPoseRight1 = msgs::Convert((*iter)->right().pose());
-        this->resetPoseLeft1 = msgs::Convert((*iter)->left().pose());
-        break;
-      }
-    }
-  }
-
-  if (this->activated1)
-  {
-    boost::shared_ptr<msgs::Hydra const> msg = this->hydraMsgs1.back();
-
-    math::Pose rightPose;
-    math::Pose leftPose;
-
-    std::map<std::string, math::Pose> adjust;
-
-    rightPose = msgs::Convert(msg->right().pose());
-    leftPose = msgs::Convert(msg->left().pose());
-
-    adjust["right_controller"] = math::Pose(
-      rightPose.pos - this->resetPoseRight1.pos + this->basePoseRight1.pos,
-      rightPose.rot * this->resetPoseRight1.rot.GetInverse() *
-      this->basePoseRight1.rot);
-
-    adjust["left_controller"] = math::Pose(
-      leftPose.pos - this->resetPoseLeft1.pos + this->basePoseLeft1.pos,
-      leftPose.rot * this->resetPoseLeft1.rot.GetInverse() *
-      this->basePoseLeft1.rot);
-
-    // Move the rods.
-    //for (auto &controller : this->controllers)
-    //{
-    if (this->controllers.size() > 1)
-    {
-      auto controller = this->controllers.at(1);
-      for (const auto &side : {"left_controller", "right_controller"})
-      {
-        if (controller.find(side) != controller.end())
-        {
-          if (!controller[side].empty())
-          {
-            // Translation.
-            controller[side].at(0).at(0)->SetPosition(0, -adjust[side].pos.x);
-            // Rotation.
-            controller[side].at(0).at(1)->SetPosition(
-              0, -adjust[side].rot.GetRoll());
-          }
-        }
-      }
-    }
-  }
+  return true;
 }
 
 /////////////////////////////////////////////////
-void FoosballPlugin::Update(const common::UpdateInfo & /*_info*/)
+void FoosballPlayer::Update()
 {
   std::lock_guard<std::mutex> lock(this->msgMutex);
-  this->Process0();
-  this->Process1();
+
+  if (this->hydraMsgs.empty())
+    return;
+
+  if (!this->activated)
+  {
+    for (std::list<boost::shared_ptr<msgs::Hydra const> >::iterator iter =
+        this->hydraMsgs.begin(); iter != this->hydraMsgs.end(); ++iter)
+    {
+      if ((*iter)->right().button_bumper() && (*iter)->left().button_bumper())
+      {
+        this->activated = true;
+        this->resetPoseRight = msgs::Convert((*iter)->right().pose());
+        this->resetPoseLeft = msgs::Convert((*iter)->left().pose());
+        break;
+      }
+    }
+  }
+
+  if (this->activated)
+  {
+    boost::shared_ptr<msgs::Hydra const> msg = this->hydraMsgs.back();
+
+    math::Pose rightPose;
+    math::Pose leftPose;
+
+    std::map<std::string, math::Pose> adjust;
+
+    rightPose = msgs::Convert(msg->right().pose());
+    leftPose = msgs::Convert(msg->left().pose());
+
+    adjust["right_controller"] = math::Pose(
+      rightPose.pos - this->resetPoseRight.pos + this->basePoseRight.pos,
+      rightPose.rot * this->resetPoseRight.rot.GetInverse() *
+      this->basePoseRight.rot);
+
+    adjust["left_controller"] = math::Pose(
+      leftPose.pos - this->resetPoseLeft.pos + this->basePoseLeft.pos,
+      leftPose.rot * this->resetPoseLeft.rot.GetInverse() *
+      this->basePoseLeft.rot);
+
+    // Move the rods.
+    for (const auto &side : {"left_controller", "right_controller"})
+    {
+      if (this->controller.find(side) != this->controller.end())
+      {
+        if (!this->controller[side].empty())
+        {
+          // Translation.
+          this->controller[side].at(0).at(0)->SetPosition(0, -adjust[side].pos.x);
+          // Rotation.
+          this->controller[side].at(0).at(1)->SetPosition(
+            0, -adjust[side].rot.GetRoll());
+        }
+      }
+    }
+  }
+}
+
+
+/////////////////////////////////////////////////
+void FoosballPlayer::OnHydra(ConstHydraPtr &_msg)
+{
+  std::lock_guard<std::mutex> lock(this->msgMutex);
+
+  if (_msg->right().button_center() &&_msg->left().button_center())
+  {
+    this->Restart();
+    return;
+  }
+
+  if (_msg->left().trigger() > 0.2)
+    this->leftTriggerPressed = true;
+  else if (this->leftTriggerPressed)
+  {
+    this->leftTriggerPressed = false;
+    this->SwitchRod(this->controller["left_controller"]);
+  }
+
+  if (_msg->right().trigger() > 0.2)
+    this->rightTriggerPressed = true;
+  else if (this->rightTriggerPressed)
+  {
+    this->rightTriggerPressed = false;
+    this->SwitchRod(this->controller["right_controller"]);
+  }
+
+  this->hydraMsgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////
-void FoosballPlugin::SwitchRod(std::vector<Rod_t> &_aController)
+void FoosballPlayer::Restart()
+{
+  this->basePoseLeft = this->leftStartPose;
+  this->basePoseRight = this->rightStartPose;
+  this->activated = false;
+}
+
+/////////////////////////////////////////////////
+void FoosballPlayer::SwitchRod(std::vector<Rod_t> &_aController)
 {
   if (_aController.size() > 1)
   {
@@ -266,76 +214,36 @@ void FoosballPlugin::SwitchRod(std::vector<Rod_t> &_aController)
 }
 
 /////////////////////////////////////////////////
-void FoosballPlugin::OnHydra0(ConstHydraPtr &_msg)
+FoosballPlugin::FoosballPlugin()
 {
-  std::lock_guard<std::mutex> lock(this->msgMutex);
-  if (_msg->right().button_center() &&_msg->left().button_center())
-  {
-    this->Restart0();
-    return;
-  }
-
-  if (_msg->left().trigger() > 0.2)
-    this->leftTriggerPressed0 = true;
-  else if (this->leftTriggerPressed0)
-  {
-    this->leftTriggerPressed0 = false;
-    this->SwitchRod(this->controllers.at(0)["left_controller"]);
-  }
-
-  if (_msg->right().trigger() > 0.2)
-    this->rightTriggerPressed0 = true;
-  else if (this->rightTriggerPressed0)
-  {
-    this->rightTriggerPressed0 = false;
-    this->SwitchRod(this->controllers.at(0)["right_controller"]);
-  }
-
-  this->hydraMsgs0.push_back(_msg);
 }
 
 /////////////////////////////////////////////////
-void FoosballPlugin::OnHydra1(ConstHydraPtr &_msg)
+void FoosballPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
-  std::lock_guard<std::mutex> lock(this->msgMutex);
+  GZ_ASSERT(_model, "FoosballPlugin _model pointer is NULL");
+  GZ_ASSERT(_sdf, "FoosballPlugin _sdf pointer is NULL");
 
-  if (_msg->right().button_center() &&_msg->left().button_center())
+  int counter = 0;
+  for (auto playerElem = _sdf->GetElement("player"); playerElem;
+    playerElem = playerElem->GetNextElement("player"))
   {
-    this->Restart1();
-    return;
+    std::string topic = "~/hydra" + std::to_string(counter);
+    this->players.push_back(std::unique_ptr<FoosballPlayer>(
+      new FoosballPlayer(topic)));
+    this->players.at(counter)->Load(_model, playerElem);
+    ++counter;
   }
 
-  if (_msg->left().trigger() > 0.2)
-    this->leftTriggerPressed1 = true;
-  else if (this->leftTriggerPressed1)
-  {
-    this->leftTriggerPressed1 = false;
-    this->SwitchRod(this->controllers.at(1)["left_controller"]);
-  }
-
-  if (_msg->right().trigger() > 0.2)
-    this->rightTriggerPressed1 = true;
-  else if (this->rightTriggerPressed1)
-  {
-    this->rightTriggerPressed1 = false;
-    this->SwitchRod(this->controllers.at(1)["right_controller"]);
-  }
-
-  this->hydraMsgs1.push_back(_msg);
+  // Listen to the update event. This event is broadcast every
+  // simulation iteration.
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+    boost::bind(&FoosballPlugin::Update, this, _1));
 }
 
 /////////////////////////////////////////////////
-void FoosballPlugin::Restart0()
+void FoosballPlugin::Update(const common::UpdateInfo & /*_info*/)
 {
-  this->basePoseLeft0 = this->leftStartPose0;
-  this->basePoseRight0 = this->rightStartPose0;
-  this->activated0 = false;
-}
-
-/////////////////////////////////////////////////
-void FoosballPlugin::Restart1()
-{
-  this->basePoseLeft1 = this->leftStartPose1;
-  this->basePoseRight1 = this->rightStartPose1;
-  this->activated1 = false;
+  for (auto &player : this->players)
+    player->Update();
 }

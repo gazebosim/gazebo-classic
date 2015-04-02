@@ -50,6 +50,7 @@ namespace gazebo
     /// \brief Initialize the state. Called once when the state is entered.
     public: virtual void Initialize()
     {
+      this->timer.Reset();
       this->timer.Start();
     }
 
@@ -224,7 +225,7 @@ namespace gazebo
     public: PlayState playState = {"play", this};
 
     ///  \brief State to represent the end of the game.
-    public: PlayState finishedState = {"finished", this};
+    public: FinishedState finishedState = {"finished", this};
 
     /// \brief Default game time in seconds.
     private: int kDefaultGameTime = 180;

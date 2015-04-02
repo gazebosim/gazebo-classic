@@ -30,13 +30,69 @@
 
 namespace gazebo
 {
+  /// \def Rod_t
+  /// \brief A rod is composed by two joints (prismatic and revolute).
+  typedef std::array<physics::JointPtr, 2> Rod_t;
+  typedef std::map<std::string, std::vector<Rod_t>> Controller_t;
+
+  class GAZEBO_VISIBLE FoosballPlayer
+  {
+    /// \brief Constructor.
+    public: FoosballPlayer(const std::string &_hydraTopic);
+
+    /// \brief Load.
+    public: bool Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+
+    /// \brief Update the rods controlled by this player.
+    public: void Update();
+
+    /// \brief Callback executed every time a new hydra message is received.
+    /// \param[in] _msg The hydra message.
+    private: void OnHydra(ConstHydraPtr &_msg);
+
+    /// \brief Initialize the starting position of the Hydra controllers.
+    private: void Restart();
+
+    private: void SwitchRod(std::vector<Rod_t> &_aController);
+
+    /// \brief Pointer to the update event connection.
+    private: event::ConnectionPtr updateConnection;
+
+    /// \brief Node used for using Gazebo communications.
+    private: transport::NodePtr node;
+
+    /// \brief Subscriber pointer.
+    private: transport::SubscriberPtr hydraSub;
+
+    /// \brief Reset pose of the left Hydra controller.
+    private: math::Pose resetPoseLeft;
+
+    /// \brief Reset pose of the right Hydra controller.
+    private: math::Pose resetPoseRight;
+
+    /// \brief Is Hydra control activated?
+    private: bool activated = false;
+
+    /// \brief Mutex to protect the hydra messages.
+    private: std::mutex msgMutex;
+
+    private: std::string hydraTopic;
+
+    /// \brief Hydra messages.
+    private: std::list<boost::shared_ptr<msgs::Hydra const>> hydraMsgs;
+    private: Controller_t controller;
+
+    private: math::Pose basePoseRight;
+    private: math::Pose basePoseLeft;
+    private: math::Pose leftStartPose;
+    private: math::Pose rightStartPose;
+
+    private: bool leftTriggerPressed = false;
+    private: bool rightTriggerPressed = false;
+  };
+
   class GAZEBO_VISIBLE FoosballPlugin : public ModelPlugin
   {
-    /// \def Rod_t
-    /// \brief A rod is composed by two joints (prismatic and revolute).
-    typedef std::array<physics::JointPtr, 2> Rod_t;
-    typedef std::map<std::string, std::vector<Rod_t>> Controller_t;
-
     /// \brief Constructor.
     public: FoosballPlugin();
 
@@ -47,70 +103,10 @@ namespace gazebo
     /// \param[in] _info Update information provided by the server.
     private: void Update(const common::UpdateInfo &_info);
 
-    /// \brief Callback executed every time a new hydra message is received.
-    /// \param[in] _msg The hydra message.
-    private: void OnHydra0(ConstHydraPtr &_msg);
-
-    /// \brief Callback executed every time a new hydra message is received.
-    /// \param[in] _msg The hydra message.
-    private: void OnHydra1(ConstHydraPtr &_msg);
-
-    /// \brief Initialize the starting position of the Hydra controllers.
-    private: void Restart0();
-
-    /// \brief Initialize the starting position of the Hydra controllers.
-    private: void Restart1();
-
-    private: void SwitchRod(std::vector<Rod_t> &_aController);
-
-    private: void Process0();
-
-    private: void Process1();
-
-    /// \brief Pointer to model containing this plugin.
-    private: physics::ModelPtr model;
-
-    /// \brief SDF for this plugin.
-    private: sdf::ElementPtr sdf;
-
     /// \brief Pointer to the update event connection.
     private: event::ConnectionPtr updateConnection;
 
-    /// \brief Node used for using Gazebo communications.
-    private: transport::NodePtr node;
-
-    /// \brief Subscriber pointer.
-    private: transport::SubscriberPtr hydraSub0;
-
-    /// \brief Subscriber pointer.
-    private: transport::SubscriberPtr hydraSub1;
-
-    /// \brief Reset pose of the left Hydra controller.
-    private: math::Pose resetPoseLeft0, resetPoseLeft1;
-
-    /// \brief Reset pose of the right Hydra controller.
-    private: math::Pose resetPoseRight0, resetPoseRight1;
-
-    /// \brief Is Hydra control activated?
-    private: bool activated0 = false, activated1 = false;
-
-    /// \brief Mutex to protect the hydra messages.
-    private: std::mutex msgMutex;
-
-    /// \brief Hydra messages.
-    private: std::list<boost::shared_ptr<msgs::Hydra const>> hydraMsgs0;
-    private: std::list<boost::shared_ptr<msgs::Hydra const>> hydraMsgs1;
-
-    private: math::Pose basePoseRight0, basePoseRight1;
-    private: math::Pose basePoseLeft0, basePoseLeft1;
-    private: math::Pose leftStartPose0, leftStartPose1;
-    private: math::Pose rightStartPose0, rightStartPose1;
-
-    private: std::vector<Controller_t> controllers;
-    private: bool leftTriggerPressed0 = false;
-    private: bool rightTriggerPressed0 = false;
-    private: bool leftTriggerPressed1 = false;
-    private: bool rightTriggerPressed1 = false;
+    private: std::vector<std::unique_ptr<FoosballPlayer>> players;
   };
 }
 #endif
