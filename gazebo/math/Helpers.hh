@@ -182,7 +182,7 @@ namespace gazebo
     {
       return std::numeric_limits<T>::has_infinity &&
         !(_x < std::numeric_limits<T>::max() &&
-          _x > std::numeric_limits<T>::min());
+          _x > -std::numeric_limits<T>::max());
     }
 
     /// \brief get value at a specified precision
