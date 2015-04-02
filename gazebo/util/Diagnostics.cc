@@ -246,18 +246,18 @@ void DiagnosticTimer::Start()
   // Only start if not running.
   if (!this->GetRunning())
   {
+    // Make sure the previous lap is reset
+    this->prevLap = this->GetElapsed();
+
     // Start the timer
     Timer::Start();
-
-    // Make sure the prev lap is reset
-    this->prevLap.Set(0, 0);
   }
 }
 
 //////////////////////////////////////////////////
 void DiagnosticTimer::Stop()
 {
-  // Only stop is currently running
+  // Only stop if currently running
   if (this->GetRunning())
   {
     // Stop the timer
@@ -265,16 +265,19 @@ void DiagnosticTimer::Stop()
 
     common::Time elapsed = this->GetElapsed();
     common::Time currTime = common::Time::GetWallTime();
+    this->cumulativeTime += elapsed;
 
     // Write out the total elapsed time.
     this->log << this->name << " " << currTime << " "
-      << elapsed.Double() << std::endl;
+        << elapsed.Double() << " " << this->cumulativeTime.Double()
+        << std::endl;
     this->log.flush();
 
     DiagnosticManager::Instance()->AddTime(this->name, currTime, elapsed);
 
-    // Reset the lap time
+    // Reset the lap time and timer
     this->prevLap.Set(0, 0);
+    this->Reset();
   }
 }
 
@@ -293,6 +296,6 @@ void DiagnosticTimer::Lap(const std::string &_prefix)
   DiagnosticManager::Instance()->AddTime(this->name + ":" + _prefix,
       currTime, delta);
 
-  // Store the prev lap time.
+  // Store the previous lap time.
   this->prevLap = elapsed;
 }

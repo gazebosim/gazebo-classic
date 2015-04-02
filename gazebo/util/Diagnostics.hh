@@ -200,6 +200,9 @@ namespace gazebo
 
       /// \brief Time of the previous lap.
       private: common::Time prevLap;
+
+      /// \brief Cumulative time throughout simulation.
+      private: common::Time cumulativeTime;
     };
     /// \}
   }
