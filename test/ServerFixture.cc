@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <cmath>
 
 #include "ServerFixture.hh"
 
