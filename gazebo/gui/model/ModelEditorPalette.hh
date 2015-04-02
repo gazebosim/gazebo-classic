@@ -122,11 +122,6 @@ namespace gazebo
       private slots: void OnItemDoubleClicked(QTreeWidgetItem *_item,
           int _column);
 
-      /// \brief Qt callback when a tree item has been clicked.
-      /// \param[in] _item Item clicked.
-      /// \param[in] _column Column index.
-      private slots: void OnItemClicked(QTreeWidgetItem *_item, int _column);
-
       /// \brief Qt callback when selected items have changed.
       private slots: void OnItemSelectionChanged();
 

@@ -206,6 +206,16 @@ namespace gazebo
       /// \return Joint maker
       public: JointMaker *GetJointMaker() const;
 
+      /// \brief Set the select state of a link.
+      /// \param[in] _name Name of the link.
+      /// \param[in] _selected True to select the link.
+      public: void SetSelected(const std::string &_name, bool selected);
+
+      /// \brief Set the select state of a link visual.
+      /// \param[in] _linkVis Pointer to the link visual.
+      /// \param[in] _selected True to select the link.
+      public: void SetSelected(rendering::VisualPtr _linkVis, bool selected);
+
       /// \brief Get current save state.
       /// \return Current save state.
       public: enum SaveState GetCurrentSaveState() const;
@@ -221,6 +231,11 @@ namespace gazebo
       /// \param[in] _link Link data used to generate the sdf.
       /// \return SDF element describing the link.
       private: sdf::ElementPtr GenerateLinkSDF(LinkData *_link);
+
+      /// \brief Internal helper function to remove a link without removing
+      /// the joints.
+      /// \param[in] _linkName Name of the link to remove
+      private: void RemoveLinkImpl(const std::string &_linkName);
 
       /// \brief QT callback when entering model edit mode
       /// \param[in] _checked True if the menu item is checked
@@ -329,18 +344,8 @@ namespace gazebo
       private: void OnEntityScaleChanged(const std::string &_name,
           const math::Vector3 &_scale);
 
-      /// \brief Deselect all currently selected link visuals.
+      /// \brief Deselect all currently selected joint visuals.
       private: void DeselectAll();
-
-      /// \brief Set the select state of a link.
-      /// \param[in] _name Name of the link.
-      /// \param[in] _selected True to select the link.
-      private: void SetSelected(const std::string &_name, bool selected);
-
-      /// \brief Set the select state of a link visual.
-      /// \param[in] _linkVis Pointer to the link visual.
-      /// \param[in] _selected True to select the link.
-      private: void SetSelected(rendering::VisualPtr _linkVis, bool selected);
 
       /// \brief Set visibilty of a visual recursively while storing their
       /// original values
@@ -435,8 +440,8 @@ namespace gazebo
       /// \brief origin of the model.
       private: math::Pose origin;
 
-      /// \brief A list of selected visuals.
-      private: std::vector<rendering::VisualPtr> selectedVisuals;
+      /// \brief A list of selected link visuals.
+      private: std::vector<rendering::VisualPtr> selectedLinks;
 
       /// \brief Names of links copied through g_copyAct
       private: std::vector<std::string> copiedLinkNames;

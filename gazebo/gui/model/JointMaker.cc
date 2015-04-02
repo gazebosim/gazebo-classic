@@ -75,6 +75,14 @@ JointMaker::JointMaker()
       gui::model::Events::ConnectShowJointContextMenu(
       boost::bind(&JointMaker::ShowContextMenu, this, _1)));
 
+  this->connections.push_back(
+     gui::model::Events::ConnectSetSelectedJoint(
+       boost::bind(&JointMaker::OnSetSelectedJoint, this, _1, _2)));
+
+  this->connections.push_back(
+     event::Events::ConnectSetSelectedEntity(
+       boost::bind(&JointMaker::OnSetSelectedEntity, this, _1, _2)));
+
   this->inspectAct = new QAction(tr("Open Joint Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this, SLOT(OnOpenInspector()));
 
@@ -117,7 +125,7 @@ void JointMaker::Reset()
   this->hoverVis.reset();
   this->prevHoverVis.reset();
   this->inspectVis.reset();
-  this->selectedJoint.reset();
+  this->selectedJoints.clear();
 
   this->scopedLinkedNames.clear();
 
@@ -273,9 +281,6 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
     rendering::VisualPtr vis = camera->GetVisual(_event.pos);
     if (vis)
     {
-      if (this->selectedJoint)
-        this->selectedJoint->SetHighlighted(false);
-      this->selectedJoint.reset();
       if (this->joints.find(vis->GetName()) != this->joints.end())
       {
         // trigger joint inspector on right click
@@ -286,10 +291,32 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
         }
         else if (_event.button == common::MouseEvent::LEFT)
         {
-          this->selectedJoint = vis;
-          this->selectedJoint->SetHighlighted(true);
+          // Not in multi-selection mode.
+          if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
+          {
+            this->DeselectAll();
+            this->SetSelected(vis, true);
+          }
+          // Multi-selection mode
+          else
+          {
+            auto it = std::find(this->selectedJoints.begin(),
+                this->selectedJoints.end(), vis);
+            // Highlight and select clicked link if not already selected
+            if (it == this->selectedJoints.end())
+            {
+              this->SetSelected(vis, true);
+            }
+            // Deselect if already selected
+            else
+            {
+              this->SetSelected(vis, false);
+            }
+          }
         }
       }
+      else
+        this->DeselectAll();
       return false;
     }
   }
@@ -610,9 +637,13 @@ bool JointMaker::OnKeyPress(const common::KeyEvent &_event)
 {
   if (_event.key == Qt::Key_Delete)
   {
-    if (this->selectedJoint)
+    if (!this->selectedJoints.empty())
     {
-      this->OnDelete();
+      for (auto jointVis : this->selectedJoints)
+      {
+        this->RemoveJoint(jointVis->GetName());
+      }
+      this->DeselectAll();
       return true;
     }
   }
@@ -623,10 +654,9 @@ bool JointMaker::OnKeyPress(const common::KeyEvent &_event)
 /////////////////////////////////////////////////
 void JointMaker::OnDelete()
 {
-  if (this->selectedJoint)
+  if (this->inspectVis)
   {
-    this->RemoveJoint(this->selectedJoint->GetName());
-    this->selectedJoint.reset();
+    this->RemoveJoint(this->inspectVis->GetName());
   }
 }
 
@@ -1133,6 +1163,75 @@ void JointMaker::ShowContextMenu(const std::string &_name)
   menu.addAction(deleteAct);
 
   menu.exec(QCursor::pos());
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OnSetSelectedEntity(const std::string &/*_name*/,
+    const std::string &/*_mode*/)
+{
+  this->DeselectAll();
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OnSetSelectedJoint(const std::string &_name,
+    bool _selected)
+{
+  this->SetSelected(_name, _selected);
+}
+
+/////////////////////////////////////////////////
+void JointMaker::SetSelected(const std::string &_name,
+    bool _selected)
+{
+  auto it = this->joints.find(_name);
+  if (it == this->joints.end())
+    return;
+
+  this->SetSelected((*it).second->hotspot, _selected);
+}
+
+/////////////////////////////////////////////////
+void JointMaker::SetSelected(rendering::VisualPtr _jointVis,
+    bool _selected)
+{
+  if (!_jointVis)
+    return;
+
+  _jointVis->SetHighlighted(_selected);
+  auto it = std::find(this->selectedJoints.begin(),
+      this->selectedJoints.end(), _jointVis);
+  if (_selected)
+  {
+    if (it == this->selectedJoints.end())
+    {
+      this->selectedJoints.push_back(_jointVis);
+      model::Events::setSelectedJoint(_jointVis->GetName(), _selected);
+    }
+  }
+  else
+  {
+    if (it != this->selectedJoints.end())
+    {
+      this->selectedJoints.erase(it);
+      model::Events::setSelectedJoint(_jointVis->GetName(), _selected);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void JointMaker::DeselectAll()
+{
+  if (!this->selectedJoints.empty())
+  {
+    while (!this->selectedJoints.empty())
+    {
+      rendering::VisualPtr vis = this->selectedJoints[0];
+      vis->SetHighlighted(false);
+      this->selectedJoints.erase(this->selectedJoints.begin());
+      model::Events::setSelectedJoint(vis->GetName(), false);
+    }
+    this->selectedJoints.clear();
+  }
 }
 
 /////////////////////////////////////////////////

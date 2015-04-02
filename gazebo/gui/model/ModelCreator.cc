@@ -160,7 +160,7 @@ ModelCreator::ModelCreator()
 ModelCreator::~ModelCreator()
 {
   while (!this->allLinks.empty())
-    this->RemoveLink(this->allLinks.begin()->first);
+    this->RemoveLinkImpl(this->allLinks.begin()->first);
 
   this->allLinks.clear();
   this->node->Fini();
@@ -948,7 +948,7 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::RemoveLink(const std::string &_linkName)
+void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
 {
   if (!this->previewVisual)
   {
@@ -1006,7 +1006,7 @@ void ModelCreator::Reset()
   this->saveDialog = new SaveDialog(SaveDialog::MODEL);
 
   this->jointMaker->Reset();
-  this->selectedVisuals.clear();
+  this->selectedLinks.clear();
   g_copyAct->setEnabled(false);
   g_pasteAct->setEnabled(false);
 
@@ -1028,7 +1028,7 @@ void ModelCreator::Reset()
       this->modelPose, this->GetModelName());
 
   while (!this->allLinks.empty())
-    this->RemoveLink(this->allLinks.begin()->first);
+    this->RemoveLinkImpl(this->allLinks.begin()->first);
   this->allLinks.clear();
 
   if (!gui::get_active_camera() ||
@@ -1163,7 +1163,7 @@ void ModelCreator::Stop()
 {
   if (this->addLinkType != LINK_NONE && this->mouseVisual)
   {
-    this->RemoveLink(this->mouseVisual->GetName());
+    this->RemoveLinkImpl(this->mouseVisual->GetName());
     this->mouseVisual.reset();
     emit LinkAdded();
   }
@@ -1184,6 +1184,12 @@ void ModelCreator::OnDelete()
 /////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
 {
+  this->RemoveLink(_entity);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::RemoveLink(const std::string &_entity)
+{
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
   // if it's a link
@@ -1191,7 +1197,7 @@ void ModelCreator::OnDelete(const std::string &_entity)
   {
     if (this->jointMaker)
       this->jointMaker->RemoveJointsByLink(_entity);
-    this->RemoveLink(_entity);
+    this->RemoveLinkImpl(_entity);
     return;
   }
 
@@ -1210,7 +1216,7 @@ void ModelCreator::OnDelete(const std::string &_entity)
       {
         if (this->jointMaker)
           this->jointMaker->RemoveJointsByLink(parentLink->GetName());
-        this->RemoveLink(parentLink->GetName());
+        this->RemoveLinkImpl(parentLink->GetName());
         return;
       }
     }
@@ -1226,9 +1232,9 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
   }
   else if (_event.key == Qt::Key_Delete)
   {
-    if (!this->selectedVisuals.empty())
+    if (!this->selectedLinks.empty())
     {
-      for (auto linkVis : this->selectedVisuals)
+      for (auto linkVis : this->selectedLinks)
       {
         this->OnDelete(linkVis->GetName());
       }
@@ -1342,10 +1348,10 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       // Multi-selection mode
       else
       {
-        auto it = std::find(this->selectedVisuals.begin(),
-            this->selectedVisuals.end(), linkVis);
+        auto it = std::find(this->selectedLinks.begin(),
+            this->selectedLinks.end(), linkVis);
         // Highlight and select clicked link if not already selected
-        if (it == this->selectedVisuals.end())
+        if (it == this->selectedLinks.end())
         {
           this->SetSelected(linkVis, true);
         }
@@ -1355,8 +1361,8 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
           this->SetSelected(linkVis, false);
         }
       }
-      g_copyAct->setEnabled(!this->selectedVisuals.empty());
-      g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
+      g_copyAct->setEnabled(!this->selectedLinks.empty());
+      g_alignAct->setEnabled(this->selectedLinks.size() > 1);
 
       if (this->manipMode == "translate" || this->manipMode == "rotate" ||
           this->manipMode == "scale")
@@ -1372,7 +1378,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       this->DeselectAll();
 
       g_alignAct->setEnabled(false);
-      g_copyAct->setEnabled(!this->selectedVisuals.empty());
+      g_copyAct->setEnabled(!this->selectedLinks.empty());
 
       if (!vis->IsPlane())
         return true;
@@ -1523,10 +1529,10 @@ void ModelCreator::OnCopy()
   if (!g_editModelAct->isChecked())
     return;
 
-  if (!this->selectedVisuals.empty())
+  if (!this->selectedLinks.empty())
   {
     this->copiedLinkNames.clear();
-    for (auto vis : this->selectedVisuals)
+    for (auto vis : this->selectedLinks)
     {
       this->copiedLinkNames.push_back(vis->GetName());
     }
@@ -1721,29 +1727,23 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
 void ModelCreator::OnAlignMode(const std::string &_axis,
     const std::string &_config, const std::string &_target, bool _preview)
 {
-  ModelAlign::Instance()->AlignVisuals(this->selectedVisuals, _axis, _config,
+  ModelAlign::Instance()->AlignVisuals(this->selectedLinks, _axis, _config,
       _target, !_preview);
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::DeselectAll()
 {
-  if (!this->selectedVisuals.empty())
+  if (!this->selectedLinks.empty())
   {
-    std::cerr << " DeselectAll " << selectedVisuals.size() << std::endl;
-    for (auto &vis : this->selectedVisuals)
+    while (!this->selectedLinks.empty())
     {
-      if (vis)
-      {
-        vis->SetHighlighted(false);
-        model::Events::setSelectedLink(vis->GetName(), false);
-      }
-      else
-      {
-        std::cerr << "empty vis " << std::endl;
-      }
+      rendering::VisualPtr vis = this->selectedLinks[0];
+      vis->SetHighlighted(false);
+      this->selectedLinks.erase(this->selectedLinks.begin());
+      model::Events::setSelectedLink(vis->GetName(), false);
     }
-    this->selectedVisuals.clear();
+    this->selectedLinks.clear();
   }
 }
 
@@ -1764,28 +1764,24 @@ void ModelCreator::SetSelected(rendering::VisualPtr _linkVis, bool _selected)
     return;
 
   _linkVis->SetHighlighted(_selected);
-  auto it = std::find(this->selectedVisuals.begin(),
-      this->selectedVisuals.end(), _linkVis);
+  auto it = std::find(this->selectedLinks.begin(),
+      this->selectedLinks.end(), _linkVis);
   if (_selected)
   {
-    if (it == this->selectedVisuals.end())
+    if (it == this->selectedLinks.end())
     {
-      this->selectedVisuals.push_back(_linkVis);
+      this->selectedLinks.push_back(_linkVis);
       model::Events::setSelectedLink(_linkVis->GetName(), _selected);
     }
   }
   else
   {
-    if (it != this->selectedVisuals.end())
+    if (it != this->selectedLinks.end())
     {
-      std::cerr << " erasing "  << _linkVis->GetName() << " " << std::endl;
-      this->selectedVisuals.erase(it);
+      this->selectedLinks.erase(it);
       model::Events::setSelectedLink(_linkVis->GetName(), _selected);
     }
   }
-
-  std::cerr << " set selected _linkVis "  << _linkVis->GetName() << " " <<
-      _selected << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -1796,20 +1792,20 @@ void ModelCreator::OnManipMode(const std::string &_mode)
 
   this->manipMode = _mode;
 
-  if (!this->selectedVisuals.empty())
+  if (!this->selectedLinks.empty())
   {
     ModelManipulator::Instance()->SetAttachedVisual(
-        this->selectedVisuals.back());
+        this->selectedLinks.back());
   }
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
   ModelSnap::Instance()->Reset();
 
   // deselect 0 to n-1 models.
-  if (this->selectedVisuals.size() > 1)
+  if (this->selectedLinks.size() > 1)
   {
     rendering::VisualPtr link =
-        this->selectedVisuals[this->selectedVisuals.size()-1];
+        this->selectedLinks[this->selectedLinks.size()-1];
     this->DeselectAll();
     this->SetSelected(link, true);
   }

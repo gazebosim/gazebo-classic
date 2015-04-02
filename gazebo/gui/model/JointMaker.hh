@@ -174,6 +174,16 @@ namespace gazebo
       /// \param[in] _name Scoped link name.
       public: void AddScopedLinkName(const std::string &_name);
 
+      /// \brief Set the select state of a joint.
+      /// \param[in] _name Name of the joint.
+      /// \param[in] _selected True to select the joint.
+      public: void SetSelected(const std::string &_name, bool selected);
+
+      /// \brief Set the select state of a joint visual.
+      /// \param[in] _jointVis Pointer to the joint visual.
+      /// \param[in] _selected True to select the joint.
+      public: void SetSelected(rendering::VisualPtr _jointVis, bool selected);
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -222,6 +232,22 @@ namespace gazebo
       /// \brief Show a joint's context menu
       /// \param[in] _joint Name of joint the context menu is associated with.
       private: void ShowContextMenu(const std::string &_joint);
+
+      /// \brief Deselect all currently selected joint visuals.
+      private: void DeselectAll();
+
+      /// \brief Callback when an entity is selected.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _mode Select mode
+      private: void OnSetSelectedEntity(const std::string &_name,
+          const std::string &_mode);
+
+      /// \brief Callback when a joint is selected.
+      /// \param[in] _name Name of joint.
+      /// \param[in] _selected True if the joint is selected, false if
+      /// deselected.
+      private: void OnSetSelectedJoint(const std::string &_name,
+          bool _selected);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
@@ -279,8 +305,8 @@ namespace gazebo
       /// \brief Mutex to protect the list of joints
       private: boost::recursive_mutex *updateMutex;
 
-      /// \brief Selected joint.
-      private: rendering::VisualPtr selectedJoint;
+      /// \brief A list of selected link visuals.
+      private: std::vector<rendering::VisualPtr> selectedJoints;
 
       /// \brief A list of scoped link names.
       private: std::vector<std::string> scopedLinkedNames;

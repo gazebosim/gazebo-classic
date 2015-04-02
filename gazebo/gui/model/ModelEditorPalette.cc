@@ -198,9 +198,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
       this, SLOT(OnItemDoubleClicked(QTreeWidgetItem *, int)));
 
-  connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-          this, SLOT(OnItemClicked(QTreeWidgetItem *, int)));
-
   connect(this->modelTreeWidget, SIGNAL(itemSelectionChanged()),
       this, SLOT(OnItemSelectionChanged()));
 
@@ -284,7 +281,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
        boost::bind(&ModelEditorPalette::OnSetSelectedLink, this, _1, _2)));
 
   this->connections.push_back(
-     gui::model::Events::ConnectSetSelectedLink(
+     gui::model::Events::ConnectSetSelectedJoint(
        boost::bind(&ModelEditorPalette::OnSetSelectedJoint, this, _1, _2)));
 
   this->updateMutex = new boost::recursive_mutex();
@@ -422,21 +419,6 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnItemClicked(QTreeWidgetItem *_item, int /*_column*/)
-{
-/*  if (_item)
-  {
-    std::string name = _item->data(0, Qt::UserRole).toString().toStdString();
-    std::string type = _item->data(1, Qt::UserRole).toString().toStdString();
-
-    if (type == "Link")
-      gui::model::Events::setSelectedLink(name, true);
-    else if (type == "Joint")
-      gui::model::Events::setSelectedJoint(name, true);
-  }*/
-}
-
-/////////////////////////////////////////////////
 void ModelEditorPalette::OnItemSelectionChanged()
 {
   QList<QTreeWidgetItem *> items = this->modelTreeWidget->selectedItems();
@@ -455,9 +437,13 @@ void ModelEditorPalette::OnItemSelectionChanged()
     std::string type = item->data(1, Qt::UserRole).toString().toStdString();
 
     if (type == "Link")
+    {
       gui::model::Events::setSelectedLink(name, true);
+    }
     else if (type == "Joint")
+    {
       gui::model::Events::setSelectedJoint(name, true);
+    }
   }
 
   // deselect
@@ -687,7 +673,7 @@ void ModelEditorPalette::OnSetSelectedJoint(const std::string &_name,
     QTreeWidgetItem *item = this->jointsItem->child(i);
     if (!item)
       continue;
-    std::string listData = item->data(2, Qt::UserRole).toString().toStdString();
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
 
     if (listData == _name)
     {
