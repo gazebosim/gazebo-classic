@@ -79,6 +79,9 @@ namespace gazebo
       /// \return Number of edges.
       public: unsigned int GetEdgeCount() const;
 
+      /// \brief Scales the view to ensure the items of the scene are visible.
+      public: void FitInView();
+
       /// \brief Helper function to get the leaf name from a scoped name.
       /// \param[in] _scopedName Scoped name.
       /// \return Leaf name.

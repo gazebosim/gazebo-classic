@@ -119,7 +119,8 @@ void JointMaker::Reset()
 
   while (this->joints.size() > 0)
   {
-    this->RemoveJoint(this->joints.begin()->first);
+    std::string jointId = this->joints.begin()->first;
+    this->RemoveJoint(jointId);
   }
   this->joints.clear();
 }
