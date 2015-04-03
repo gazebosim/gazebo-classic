@@ -46,6 +46,7 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor
+      /// \param[in] _parent Parent widget.
       public: TimePanel(QWidget *_parent = 0);
 
       /// \brief Destructor
@@ -80,18 +81,23 @@ namespace gazebo
       public: bool IsPaused() const;
 
       /// \brief Set whether to display the simulation as paused.
-      /// \param[in] _p True to display the simulation as paused. False
+      /// \param[in] _paused True to display the simulation as paused. False
       /// indicates the simulation is running
       public: void SetPaused(bool _paused);
 
       /// \brief Qt call back when the step value in the spinbox changed
+      /// \param[in] _value New step value.
       public slots: void OnStepValueChanged(int _value);
 
       /// \brief QT callback when the reset time button is pressed.
       public slots: void OnTimeReset();
 
+      /// \brief QT signal to set visibility of time widget.
+      /// \param[in] _visible True to make visible.
       signals: void SetTimeWidgetVisible(bool _visible);
 
+      /// \brief QT signal to set visibility of log play widget.
+      /// \param[in] _visible True to make visible.
       signals: void SetLogPlayWidgetVisible(bool _visible);
 
       /// \brief Update the data output.

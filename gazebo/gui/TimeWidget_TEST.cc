@@ -27,7 +27,7 @@ void TimeWidget_TEST::ValidTimes()
 {
   QBENCHMARK
   {
-    this->Load("empty.world", false, false, true);
+    this->Load("empty.world", false, false, false);
 
     // Create the main window.
     gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();

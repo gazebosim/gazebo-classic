@@ -33,6 +33,7 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor
+      /// \param[in] _parent Parent widget, commonly a TimePanel.
       public: LogPlayWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
