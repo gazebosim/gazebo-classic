@@ -19,10 +19,10 @@
       </include>
 
       <!-- Load the plugin to control the foosball players -->
-      <plugin name="foosball_table" filename='libFoosballPlugin.so'>
+      <plugin name="foosball_table" filename='libFoosballTablePlugin.so'>
         <!-- Parameters -->
         <player>
-          <name>A</name>
+          <name>blue</name>
           <left_controller>
             <rod>0</rod>
             <rod>1</rod>
@@ -33,7 +33,7 @@
           </right_controller>
         </player>
         <!--<player>
-          <name>A</name>
+          <name>red</name>
           <left_controller>
           </left_controller>
           <right_controller>
