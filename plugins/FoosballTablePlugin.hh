@@ -24,8 +24,9 @@
 #include <mutex>
 #include <vector>
 #include <sdf/sdf.hh>
-#include "gazebo/common/UpdateInfo.hh"
+#include "gazebo/common/PID.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -78,6 +79,9 @@ namespace gazebo
     /// pressed.
     private: void SwitchRod(Rod_V &_rods);
 
+    /// \brief Pointer to the world;
+    private: physics::ModelPtr model;
+
     /// \brief Pointer to the update event connection.
     private: event::ConnectionPtr updateConnection;
 
@@ -107,6 +111,12 @@ namespace gazebo
 
     /// \brief
     private: Hydra_t hydra;
+
+    /// \brief For each left/side controller we need two PIDs.
+    /// One PID is for the position of the rod and the other for its angle.
+    private: std::map<std::string, std::array<common::PID, 2>> hydraPID;
+
+    private: common::Time lastUpdateTime;
 
     private: math::Pose basePoseRight;
     private: math::Pose basePoseLeft;

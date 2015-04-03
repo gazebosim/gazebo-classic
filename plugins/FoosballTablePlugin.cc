@@ -34,12 +34,19 @@ FoosballPlayer::FoosballPlayer(const std::string &_hydraTopic)
   : hydraTopic(_hydraTopic),
     hydra({{"left_controller", {}}, {"right_controller", {}}})
 {
+  for (const auto &side : {"left_controller", "right_controller"})
+  {
+    this->hydraPID[side] = {common::PID(), common::PID()};
+    for (auto i = 0; i < 2; ++i)
+      this->hydraPID[side].at(i).Init(1.0, 0.0, 0.5, 0.0, 0.0, 60.0, -60.0);
+  }
 }
 
 /////////////////////////////////////////////////
 bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_model, "FoosballPlugin _model pointer is NULL");
+  this->model = _model;
   GZ_ASSERT(_sdf, "FoosballPlugin _sdf pointer is NULL");
 
   if (!_sdf->HasElement("team"))
@@ -100,6 +107,8 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->hydraSub = this->node->Subscribe(this->hydraTopic,
     &FoosballPlayer::OnHydra, this);
 
+  this->lastUpdateTime = this->model->GetWorld()->GetSimTime();
+
   return true;
 }
 
@@ -148,21 +157,56 @@ void FoosballPlayer::Update()
       leftPose.rot * this->resetPoseLeft.rot.GetInverse() *
       this->basePoseLeft.rot);
 
-    // Move the rods.
-    for (const auto &side : {"left_controller", "right_controller"})
+    common::Time curTime = this->model->GetWorld()->GetSimTime();
+
+    if (curTime > this->lastUpdateTime)
     {
-      if (this->hydra.find(side) != this->hydra.end())
+      common::Time dt = (curTime - this->lastUpdateTime).Double();
+
+      // Move the rods.
+      for (const auto &side : {"left_controller", "right_controller"})
       {
-        if (!this->hydra[side].empty())
+        if (this->hydra.find(side) != this->hydra.end())
         {
-          // Translation.
-          this->hydra[side].at(0).at(0)->SetPosition(0, -adjust[side].pos.x);
-          // Rotation.
-          this->hydra[side].at(0).at(1)->SetPosition(
-            0, -adjust[side].rot.GetRoll());
+          if (!this->hydra[side].empty())
+          {
+            // Get the current rod. The first element of the vector of rods is
+            // always the active rod.
+            auto &currentRod = this->hydra[side].at(0);
+
+            // Translation.
+            //   Get the target x position based on the Hydra controller.
+            double target = -adjust[side].pos.x;
+
+            //   Get the current x rod position.
+            double current =  currentRod.at(0)->GetWorldPose().pos.x;
+
+            //   Position error between the rod and the Hydra controller.
+            double error = current - target;
+
+            //   Update the PID.
+            double torque = this->hydraPID[side].at(0).Update(error, dt);
+            currentRod.at(0)->SetForce(0, torque);
+
+            // Rotation.
+            //   Get the target angle based on the Hydra controller.
+            target = -adjust[side].rot.GetRoll();
+
+            //   Get the current rod angle.
+            current = currentRod.at(1)->GetAngle(0).Radian();
+
+            //   Angle error between the rod and Hydra controller.
+            error = current - target;
+
+            //   Update the PID.
+            torque = this->hydraPID[side].at(1).Update(error, dt);
+            currentRod.at(1)->SetForce(0, torque);
+          }
         }
       }
     }
+
+    this->lastUpdateTime = this->model->GetWorld()->GetSimTime();
   }
 }
 
