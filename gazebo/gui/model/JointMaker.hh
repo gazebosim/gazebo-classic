@@ -274,8 +274,8 @@ namespace gazebo
       /// \brief Currently selected visual
       private: rendering::VisualPtr selectedVis;
 
-      /// \brief Joint visual that is currently being inspected.
-      private: rendering::VisualPtr inspectVis;
+      /// \brief Name of joint that is currently being inspected.
+      private: std::string inspectName;
 
       /// \brief All joints created by joint maker.
       private: boost::unordered_map<std::string, JointData *> joints;

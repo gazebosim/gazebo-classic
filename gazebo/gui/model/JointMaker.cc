@@ -124,7 +124,7 @@ void JointMaker::Reset()
   this->selectedVis.reset();
   this->hoverVis.reset();
   this->prevHoverVis.reset();
-  this->inspectVis.reset();
+  this->inspectName = "";
   this->selectedJoints.clear();
 
   this->scopedLinkedNames.clear();
@@ -286,8 +286,9 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
         // trigger joint inspector on right click
         if (_event.button == common::MouseEvent::RIGHT)
         {
-          this->inspectVis = vis;
-          this->ShowContextMenu(this->inspectVis->GetName());
+          this->inspectName = vis->GetName();
+          this->ShowContextMenu(this->inspectName);
+          return true;
         }
         else if (_event.button == common::MouseEvent::LEFT)
         {
@@ -598,8 +599,11 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 void JointMaker::OnOpenInspector()
 {
-  this->OpenInspector(this->inspectVis->GetName());
-  this->inspectVis.reset();
+  if (this->inspectName.empty())
+    return;
+
+  this->OpenInspector(this->inspectName);
+  this->inspectName = "";
 }
 
 /////////////////////////////////////////////////
@@ -654,10 +658,11 @@ bool JointMaker::OnKeyPress(const common::KeyEvent &_event)
 /////////////////////////////////////////////////
 void JointMaker::OnDelete()
 {
-  if (this->inspectVis)
-  {
-    this->RemoveJoint(this->inspectVis->GetName());
-  }
+  if (this->inspectName.empty())
+    return;
+
+  this->RemoveJoint(this->inspectName);
+  this->inspectName = "";
 }
 
 /////////////////////////////////////////////////
@@ -1158,6 +1163,7 @@ void JointMaker::ShowContextMenu(const std::string &_name)
   if (this->inspectAct)
     menu.addAction(this->inspectAct);
 
+  this->inspectName = _name;
   QAction *deleteAct = new QAction(tr("Delete"), this);
   connect(deleteAct, SIGNAL(triggered()), this, SLOT(OnDelete()));
   menu.addAction(deleteAct);
