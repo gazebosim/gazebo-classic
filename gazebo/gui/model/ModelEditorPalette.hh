@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _MODEL_EDITOR_PALETTE_HH_
-#define _MODEL_EDITOR_PALETTE_HH_
+#ifndef _GAZEBO_MODEL_EDITOR_PALETTE_HH_
+#define _GAZEBO_MODEL_EDITOR_PALETTE_HH_
 
 #include <map>
 #include <string>
