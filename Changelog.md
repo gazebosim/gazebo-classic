@@ -56,6 +56,8 @@
 1. Added PresetManager to physics libraries and corresponding integration test.
     * [Pull request #1471](https://bitbucket.org/osrf/gazebo/pull-request/1471)
 
+1. Sync name and location on SaveDialog.
+    * [Pull request #1563](https://bitbucket.org/osrf/gazebo/pull-request/1563)
 1. Added Apply Force/Torque GUI
     * [Pull request #1506](https://bitbucket.org/osrf/gazebo/pull-request/1506)
 
