@@ -30,10 +30,10 @@ namespace gazebo
   class HydraDemoPlugin : public ModelPlugin
   {
     /// \brief Constructor
-    public: HydraDemoPlugin();
+    public: HydraDemoPlugin() = default;
 
     /// \brief Destructor
-    public: virtual ~HydraDemoPlugin();
+    public: virtual ~HydraDemoPlugin() = default;
 
     // Documentation Inherited.
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
