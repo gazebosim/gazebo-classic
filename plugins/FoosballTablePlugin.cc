@@ -35,11 +35,7 @@ FoosballPlayer::FoosballPlayer(const std::string &_hydraTopic)
     hydra({{"left_controller", {}}, {"right_controller", {}}})
 {
   for (const auto &side : {"left_controller", "right_controller"})
-  {
-    this->hydraPID[side] = {common::PID(), common::PID()};
-    for (auto i = 0; i < 2; ++i)
-      this->hydraPID[side].at(i).Init(1.0, 0.0, 0.5, 0.0, 0.0, 60.0, -60.0);
-  }
+    this->lastHydraPose[side] = {0.0, 0.0};
 }
 
 /////////////////////////////////////////////////
@@ -108,6 +104,7 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     &FoosballPlayer::OnHydra, this);
 
   this->lastUpdateTime = this->model->GetWorld()->GetSimTime();
+  this->lastPos = 0;
 
   return true;
 }
@@ -117,28 +114,22 @@ void FoosballPlayer::Update()
 {
   std::lock_guard<std::mutex> lock(this->msgMutex);
 
-  if (this->hydraMsgs.empty())
+  if (!this->hydraMsgPtr)
     return;
 
+  boost::shared_ptr<msgs::Hydra const> msg = this->hydraMsgPtr;
   if (!this->activated)
   {
-    for (std::list<boost::shared_ptr<msgs::Hydra const> >::iterator iter =
-        this->hydraMsgs.begin(); iter != this->hydraMsgs.end(); ++iter)
+    if (msg->right().button_bumper() && msg->left().button_bumper())
     {
-      if ((*iter)->right().button_bumper() && (*iter)->left().button_bumper())
-      {
-        this->activated = true;
-        this->resetPoseRight = msgs::Convert((*iter)->right().pose());
-        this->resetPoseLeft = msgs::Convert((*iter)->left().pose());
-        break;
-      }
+      this->activated = true;
+      this->resetPoseRight = msgs::Convert(msg->right().pose());
+      this->resetPoseLeft = msgs::Convert(msg->left().pose());
     }
   }
 
   if (this->activated)
   {
-    boost::shared_ptr<msgs::Hydra const> msg = this->hydraMsgs.back();
-
     math::Pose rightPose;
     math::Pose leftPose;
 
@@ -170,37 +161,21 @@ void FoosballPlayer::Update()
         {
           if (!this->hydra[side].empty())
           {
-            // Get the current rod. The first element of the vector of rods is
-            // always the active rod.
-            auto &currentRod = this->hydra[side].at(0);
+            // Get the active rod.
+            auto &activeRod = this->hydra[side].front();
 
             // Translation.
-            //   Get the target x position based on the Hydra controller.
-            double target = -adjust[side].pos.x;
-
-            //   Get the current x rod position.
-            double current =  currentRod.at(0)->GetWorldPose().pos.x;
-
-            //   Position error between the rod and the Hydra controller.
-            double error = current - target;
-
-            //   Update the PID.
-            double torque = this->hydraPID[side].at(0).Update(error, dt);
-            currentRod.at(0)->SetForce(0, torque);
+            double vel = (-adjust[side].pos.x - this->lastHydraPose[side].at(0))
+             / dt.Double();
+            activeRod.at(0)->SetVelocity(0, vel);
 
             // Rotation.
-            //   Get the target angle based on the Hydra controller.
-            target = -adjust[side].rot.GetRoll();
+            vel = (-adjust[side].rot.GetRoll() -
+              this->lastHydraPose[side].at(1)) / dt.Double();
+            activeRod.at(1)->SetVelocity(0, vel);
 
-            //   Get the current rod angle.
-            current = currentRod.at(1)->GetAngle(0).Radian();
-
-            //   Angle error between the rod and Hydra controller.
-            error = current - target;
-
-            //   Update the PID.
-            torque = this->hydraPID[side].at(1).Update(error, dt);
-            currentRod.at(1)->SetForce(0, torque);
+            this->lastHydraPose[side].at(0) = -adjust[side].pos.x;
+            this->lastHydraPose[side].at(1) = -adjust[side].rot.GetRoll();
           }
         }
       }
@@ -227,7 +202,7 @@ void FoosballPlayer::OnHydra(ConstHydraPtr &_msg)
   else if (this->leftTriggerPressed)
   {
     this->leftTriggerPressed = false;
-    this->SwitchRod(this->hydra["left_controller"]);
+    this->SwitchRod("left_controller");
   }
 
   if (_msg->right().trigger() > 0.2)
@@ -235,10 +210,10 @@ void FoosballPlayer::OnHydra(ConstHydraPtr &_msg)
   else if (this->rightTriggerPressed)
   {
     this->rightTriggerPressed = false;
-    this->SwitchRod(this->hydra["right_controller"]);
+    this->SwitchRod("right_controller");
   }
 
-  this->hydraMsgs.push_back(_msg);
+  this->hydraMsgPtr = _msg;
 }
 
 /////////////////////////////////////////////////
@@ -250,11 +225,17 @@ void FoosballPlayer::Restart()
 }
 
 /////////////////////////////////////////////////
-void FoosballPlayer::SwitchRod(Rod_V &_rods)
+void FoosballPlayer::SwitchRod(const std::string &_side)
 {
-  if (_rods.size() > 1)
+  if (this->hydra[_side].size() > 1)
   {
-    std::rotate(_rods.begin(), _rods.begin() + 1, _rods.end());
+    std::rotate(this->hydra[_side].begin(), this->hydra[_side].begin() + 1,
+      this->hydra[_side].end());
+
+    // Restore the position to the last known Hydra position.
+    auto &activeRod = this->hydra[_side].front();
+    activeRod.at(0)->SetPosition(0, this->lastHydraPose[_side].at(0));
+    activeRod.at(1)->SetPosition(0, this->lastHydraPose[_side].at(1));
   }
 }
 

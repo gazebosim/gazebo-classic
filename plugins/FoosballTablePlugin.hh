@@ -77,7 +77,7 @@ namespace gazebo
     /// only one rod at a time. This method switches the rod to control.
     /// The rods change in a circular way every time the trigger button is
     /// pressed.
-    private: void SwitchRod(Rod_V &_rods);
+    private: void SwitchRod(const std::string &_side);
 
     /// \brief Pointer to the world;
     private: physics::ModelPtr model;
@@ -106,15 +106,13 @@ namespace gazebo
     /// \brief Topic in which the Hydra updates for this player are published.
     private: std::string hydraTopic;
 
-    /// \brief Hydra messages.
-    private: std::list<boost::shared_ptr<msgs::Hydra const>> hydraMsgs;
+    /// \brief Last Hydra message received.
+    private: boost::shared_ptr<const gazebo::msgs::Hydra> hydraMsgPtr;
 
     /// \brief
     private: Hydra_t hydra;
 
-    /// \brief For each left/side controller we need two PIDs.
-    /// One PID is for the position of the rod and the other for its angle.
-    private: std::map<std::string, std::array<common::PID, 2>> hydraPID;
+    private: std::map<std::string, std::array<double, 2>> lastHydraPose;
 
     private: common::Time lastUpdateTime;
 
@@ -125,6 +123,7 @@ namespace gazebo
 
     private: bool leftTriggerPressed = false;
     private: bool rightTriggerPressed = false;
+    private: double lastPos = 0.0;
   };
 
   /// \class FoosballTablePlugin FoosballTablePlugin.hh
