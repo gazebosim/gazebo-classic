@@ -38,7 +38,7 @@ void OnWorldModify(ConstWorldModifyPtr &_msg)
 void RunServer()
 {
   // Initialize gazebo server.
-  boost::scoped_ptr<gazebo::Server> server(new gazebo::Server());
+  std::scoped_ptr<gazebo::Server> server(new gazebo::Server());
   try
   {
     if (!server->ParseArgs(0, NULL))

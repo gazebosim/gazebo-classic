@@ -24,8 +24,8 @@ int main(int _argc, char **_argv)
 {
   // Populate a std::vector with the command line arguments
   std::vector<std::string> v;
-  for (size_t i = 0; i < _argc; ++i)
-    v.push_back(std::string(_argv[i]));
+  for (auto arg : _argv)
+    v.push_back(std::string(_arg));
 
   // Initialize gazebo.
   gazebo::setupServer(v);

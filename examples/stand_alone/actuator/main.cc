@@ -84,16 +84,16 @@ int main(int _argc, char **_argv)
 
   std::vector<gazebo::physics::JointPtr> joints;
 
-  for (unsigned int i = 0; i < modelNames.size(); i++)
+  for (auto modelName : modelNames)
   {
-    gazebo::physics::ModelPtr model = world->GetModel(modelNames[i]);
+    gazebo::physics::ModelPtr model = world->GetModel(modelName);
     if (!model)
     {
-      std::cout << "Couldn't find model: " << modelNames[i] << std::endl;
+      std::cout << "Couldn't find model: " << modelName << std::endl;
       return -1;
     }
 
-    if (modelNames[i].compare("actuator_example") == 0)
+    if (modelName.compare("actuator_example") == 0)
     {
       const sdf::ElementPtr modelSDF = model->GetSDF();
       // Find the ActuatorPlugin SDF block
@@ -142,7 +142,7 @@ int main(int _argc, char **_argv)
     if (!joint)
     {
       std::cout << "Couldn't find joint " << jointName << " for model "
-                << modelNames[i] << std::endl;
+                << modelName << std::endl;
     }
     else
     {
