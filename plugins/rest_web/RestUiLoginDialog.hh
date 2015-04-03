@@ -49,8 +49,8 @@ namespace gazebo
       /// \param[in] _username The user name
       /// \param[in] _password The user password
       signals: void AcceptLogin(QString &_url,
-                                QString& _username,
-                                QString& _password);
+                                QString &_username,
+                                QString &_password);
 
       /// \brief Getter for User name (of the basic auth REST service)
       /// \return User name
@@ -64,8 +64,8 @@ namespace gazebo
       /// \return The url for the site (ex: https://yoursite.com:4000)
       public: std::string GetUrl() const;
 
-      /// \brief slot for the AcceptLogin event
-      public slots: void slotAcceptLogin();
+      /// \brief Slot for the AcceptLogin event
+      public slots: void SlotAcceptLogin();
 
       /// \brief A label for the url component that appears on the
       /// login widget above
@@ -78,15 +78,15 @@ namespace gazebo
       private: QLabel *labelPassword;
 
       /// \brief A text field for the default url
-      private: QLineEdit* editUrl;
+      private: QLineEdit *editUrl;
 
       /// \brief A text field to enter the user name
-      private: QLineEdit* editUsername;
+      private: QLineEdit *editUsername;
 
       /// \brief A text field to enter the password
-      private: QLineEdit* editPassword;
+      private: QLineEdit *editPassword;
 
-      /// \brief A label to displau errors and information
+      /// \brief A label to display errors and information
       private: QLabel *labelInfo;
 
       /// \brief The standard dialog buttons

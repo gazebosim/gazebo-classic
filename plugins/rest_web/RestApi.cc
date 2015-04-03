@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015555555555555555555555555555555555555555555555555555555 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +43,7 @@ struct data {
   char trace_ascii;  // 1 or 0
 };
 
-
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 static void DumpRequest(const char *text,
           FILE *stream,
           unsigned char *ptr,
@@ -69,10 +68,12 @@ static void DumpRequest(const char *text,
     {
       // hex not disabled, show it
       for (c = 0; c < width; ++c)
+      {
         if (i+c < size)
           fprintf(stream, "%02x ", ptr[i+c]);
         else
           fputs("   ", stream);
+      }
     }
 
     for (c = 0; (c < width) && (i+c < size); ++c)
@@ -97,9 +98,8 @@ static void DumpRequest(const char *text,
   fflush(stream);
 }
 
-
-// Callback given to curl that outputs data about the reuest
-////////////////////////////////////////////////////////////////////////////////
+// Callback given to curl that outputs data about the request
+/////////////////////////////////////////////////
 static int TraceRequest(CURL *handle,
                         curl_infotype type,
                         char *data,
@@ -144,7 +144,6 @@ static int TraceRequest(CURL *handle,
   return 0;
 }
 
-
 // private data structure used to
 // read libcurl response
 struct MemoryStruct {
@@ -153,7 +152,7 @@ struct MemoryStruct {
 };
 
 // callback for libcurl when data is read from http response
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 static size_t WriteMemoryCallback(void *contents,
                                   size_t size,
                                   size_t nmemb,
@@ -162,11 +161,11 @@ static size_t WriteMemoryCallback(void *contents,
   size_t realsize = size * nmemb;
   struct MemoryStruct *mem = (struct MemoryStruct *)userp;
   size_t newsize = mem->size + realsize + 1;
-  mem->memory = static_cast<char*> (realloc(mem->memory, newsize));
+  mem->memory = static_cast<char *> (realloc(mem->memory, newsize));
   if (mem->memory == NULL)
   {
     // out of memory!
-    printf("not enough memory (realloc returned NULL)\n");
+    gzerr << "not enough memory (realloc returned NULL)" << std::endl;
     return 0;
   }
   memcpy(&(mem->memory[mem->size]), contents, realsize);
@@ -175,20 +174,20 @@ static size_t WriteMemoryCallback(void *contents,
   return realsize;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 RestApi::RestApi()
   :isLoggedIn(false)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 RestApi::~RestApi()
 {
   curl_global_cleanup();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-void RestApi::PostJsonData(const char* _route, const char *_json)
+/////////////////////////////////////////////////
+void RestApi::PostJsonData(const char *_route, const char *_json)
 {
   Post post;
   post.route = _route;
@@ -198,7 +197,7 @@ void RestApi::PostJsonData(const char* _route, const char *_json)
   SendUnpostedPosts();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 std::string RestApi::Login(const std::string &_urlStr,
                            const std::string &_route,
                            const std::string &_userStr,
@@ -212,16 +211,16 @@ std::string RestApi::Login(const std::string &_urlStr,
   // at this point we want to test the (user supplied) login data
   // so we're hitting the server on the login route ('/login')
   this->loginRoute = _route;
-  gzmsg << "login route: " << this->loginRoute << "\n";
+  gzmsg << "login route: " << this->loginRoute << std::endl;
   std::string resp = this->Request(loginRoute, "");
-  gzmsg << "login response: " << resp << "\n";
+  gzmsg << "login response: " << resp << std::endl;
 
   this->isLoggedIn = true;
   this->SendUnpostedPosts();
   return resp;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 void RestApi::SendUnpostedPosts()
 {
   if (this->isLoggedIn)
@@ -242,13 +241,13 @@ void RestApi::SendUnpostedPosts()
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 std::string RestApi::GetUser() const
 {
   return this->user;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 std::string RestApi::Request(const std::string &_reqUrl,
                              const std::string &_postJsonStr)
 {

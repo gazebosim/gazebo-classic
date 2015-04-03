@@ -61,7 +61,7 @@ void RestUiWidget::Login()
 }
 
 /////////////////////////////////////////////////
-void RestUiWidget::OnResponse(ConstRestErrorPtr &_msg )
+void RestUiWidget::OnResponse(ConstRestErrorPtr &_msg)
 {
   gzerr << "Error received:" << std::endl;
   gzerr << " type: " << _msg->type() << std::endl;
@@ -74,7 +74,7 @@ void RestUiWidget::OnResponse(ConstRestErrorPtr &_msg )
 }
 
 /////////////////////////////////////////////////
-void  RestUiWidget::Update()
+void RestUiWidget::Update()
 {
   // Login problem?
   while (!msgRespQ.empty())

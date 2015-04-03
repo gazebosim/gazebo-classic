@@ -78,9 +78,9 @@ void InRegionEventSource::Init()
 void InRegionEventSource::Info()
 {
   std::stringstream ss;
-  ss  << "InRegionEventSource "
-        << " model " << this->modelName << "  region [" << this->regionName
-        << "]" << std::endl;
+  ss << "InRegionEventSource "
+      << " model " << this->modelName << "  region [" << this->regionName
+      << "]" << std::endl;
 
   for (auto v: this->region->volumes)
   {

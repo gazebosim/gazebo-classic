@@ -87,7 +87,7 @@ RestUiLoginDialog::RestUiLoginDialog(QWidget *_parent,
   connect(buttons->button(QDialogButtonBox::Ok),
           SIGNAL(clicked()),
           this,
-          SLOT(slotAcceptLogin()));
+          SLOT(SlotAcceptLogin()));
 }
 
 /////////////////////////////////////////////////
@@ -109,11 +109,11 @@ std::string RestUiLoginDialog::GetUrl() const
 }
 
 /////////////////////////////////////////////////
-void RestUiLoginDialog::slotAcceptLogin()
+void RestUiLoginDialog::SlotAcceptLogin()
 {
   QString user = editUsername->text();
   QString pass = editPassword->text();
-  QString u    = editUrl->text();
+  QString u = editUrl->text();
   username = user.toStdString();
   password = pass.toStdString();
   url = u.toStdString();

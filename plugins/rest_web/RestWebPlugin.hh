@@ -43,7 +43,7 @@ namespace gazebo
     /// \param[in] _argv Argument vector
     public: virtual void Load(int _argc, char **_argv);
 
-    /// \brief  called everytime a login message is received.
+    /// \brief Called everytime a login message is received.
     /// \param[in] _msg The login message
     public: void OnRestLoginRequest(ConstRestLoginPtr &_msg);
 
@@ -86,23 +86,20 @@ namespace gazebo
     /// \brief REST calls
     private: RestApi restApi;
 
-    /// \brief a flag to interrupt message processing
+    /// \brief A flag to interrupt message processing
     private: bool stopMsgProcessing;
 
-    /// \brief a list to accumulate pending request
-    private: std::list<
-               boost::shared_ptr<
-                 const gazebo::msgs::RestLogin
-               >
-             > msgLoginQ;
+    /// \brief A list to accumulate pending request
+    private: std::list<boost::shared_ptr<const gazebo::msgs::RestLogin>>
+        msgLoginQ;
 
-    /// \brief a thread to process requests without stopping the simulation
+    /// \brief A thread to process requests without stopping the simulation
     private: boost::thread *requestQThread;
 
-    /// \brief a mutex to ensure integrity of the request list
+    /// \brief A mutex to ensure integrity of the request list
     private: boost::mutex requestQMutex;
 
-    /// \brief a session string to keep track of exercises
+    /// \brief A session string to keep track of exercises
     private: std::string session;
   };
 }
