@@ -38,6 +38,7 @@ void ModelEditorPalette_TEST::AddItem()
   QToolButton *retButton =
       palette->findChild<QToolButton *>("my_tool_button");
   QVERIFY(retButton);
+  QVERIFY(retButton == testButton);
 
   // add another custom tool button to the palette
   QToolButton *testButton2 = new QToolButton();
@@ -50,6 +51,31 @@ void ModelEditorPalette_TEST::AddItem()
   QToolButton *retButton2 =
       palette->findChild<QToolButton *>("my_tool_button2");
   QVERIFY(retButton2);
+  QVERIFY(retButton2 == testButton2);
+
+  // add a button to an existing category
+  QToolButton *testButton3 = new QToolButton();
+  testButton3->setObjectName("my_tool_button3");
+
+  palette->AddItem(testButton3, "category");
+
+  // verify that the button is added.
+  QToolButton *retButton3 =
+      palette->findChild<QToolButton *>("my_tool_button3");
+  QVERIFY(retButton3);
+  QVERIFY(retButton3 == testButton3);
+
+  // add a button with an empty category
+  QToolButton *testButton4 = new QToolButton();
+  testButton4->setObjectName("my_tool_button4");
+
+  palette->AddItem(testButton4, "");
+
+  // verify that the button is added.
+  QToolButton *retButton4 =
+      palette->findChild<QToolButton *>("my_tool_button4");
+  QVERIFY(retButton4);
+  QVERIFY(retButton4 == testButton4);
 
   delete palette;
   palette = NULL;
