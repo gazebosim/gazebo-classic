@@ -54,12 +54,7 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
       _sdf->GetElement("right_joint")->Get<std::string>());
 
   if (_sdf->HasElement("torque"))
-  {
     this->torque = _sdf->GetElement("torque")->Get<double>();
-    gzwarn << "The MaxForce API is deprecated in Gazebo, "
-           << "and the torque tag is no longer used in this plugin."
-           << std::endl;
-  }
 
   if (!this->leftJoint)
     gzerr << "Unable to find left joint["
@@ -119,6 +114,9 @@ void DiffDrivePlugin::OnUpdate()
   double leftVelDesired = (this->wheelSpeed[LEFT] / this->wheelRadius);
   double rightVelDesired = (this->wheelSpeed[RIGHT] / this->wheelRadius);
 
-  this->leftJoint->SetVelocity(0, leftVelDesired);
-  this->rightJoint->SetVelocity(0, rightVelDesired);
+  this->leftJoint->SetParam("vel", 0, leftVelDesired);
+  this->rightJoint->SetParam("vel", 0, rightVelDesired);
+
+  this->leftJoint->SetParam("max_force", 0, this->torque);
+  this->rightJoint->SetParam("max_force", 0, this->torque);
 }

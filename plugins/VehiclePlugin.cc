@@ -199,17 +199,17 @@ void VehiclePlugin::OnUpdate()
                     this->wheelRadius;
 
   // Set velocity and max force for each wheel
-  this->joints[0]->SetVelocityLimit(1, -jointVel);
-  this->joints[0]->SetForce(1, (gas + brake) * this->frontPower);
+  this->joints[0]->SetParam("vel", 1, -jointVel);
+  this->joints[0]->SetParam("max_force", 1, (gas + brake) * this->frontPower);
 
-  this->joints[1]->SetVelocityLimit(1, -jointVel);
-  this->joints[1]->SetForce(1, (gas + brake) * this->frontPower);
+  this->joints[1]->SetParam("vel", 1, -jointVel);
+  this->joints[1]->SetParam("max_force", 1, (gas + brake) * this->frontPower);
 
-  this->joints[2]->SetVelocityLimit(1, -jointVel);
-  this->joints[2]->SetForce(1, (gas + brake) * this->rearPower);
+  this->joints[2]->SetParam("vel", 1, -jointVel);
+  this->joints[2]->SetParam("max_force", 1, (gas + brake) * this->rearPower);
 
-  this->joints[3]->SetVelocityLimit(1, -jointVel);
-  this->joints[3]->SetForce(1, (gas + brake) * this->rearPower);
+  this->joints[3]->SetParam("vel", 1, -jointVel);
+  this->joints[3]->SetParam("max_force", 1, (gas + brake) * this->rearPower);
 
   // Set the front-left wheel angle
   this->joints[0]->SetLowStop(0, wheelAngle);

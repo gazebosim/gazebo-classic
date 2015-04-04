@@ -80,12 +80,14 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
   if (_sdf->HasElement("max_force"))
   {
     this->maxForce = _sdf->GetElement("max_force")->Get<double>();
-    gzwarn << "The MaxForce API is deprecated in Gazebo, "
-           << "and the max_force tag is no longer used in this plugin."
-           << std::endl;
   }
   else
-    gzwarn << "No MaxForce value set in the model sdf, default value is 5.0.\n";
+  {
+    gzwarn << "No MaxForce value set in the model sdf, default value is "
+           << this->maxForce
+           << std::endl;
+  }
+
 
   // This assumes that front and rear wheel spacing is identical
   this->wheelSeparation = this->joints[RIGHT_FRONT]->GetAnchor(0).Distance(
@@ -129,12 +131,15 @@ void SkidSteerDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
   // gzmsg << "cmd_vel: " << msg->position().x() << ", "
   //       << msgs::Convert(msg->orientation()).GetAsEuler().z << std::endl;
 
+  for (int i = 0; i < NUMBER_OF_WHEELS; i++)
+    this->joints[i]->SetParam("fmax", 0, this->maxForce);
+
   double vel_lin = _msg->position().x() / this->wheelRadius;
   double vel_rot = -1 * msgs::Convert(_msg->orientation()).GetAsEuler().z
                    * (this->wheelSeparation / this->wheelRadius);
 
-  this->joints[RIGHT_FRONT]->SetVelocity(0, vel_lin - vel_rot);
-  this->joints[RIGHT_REAR ]->SetVelocity(0, vel_lin - vel_rot);
-  this->joints[LEFT_FRONT ]->SetVelocity(0, vel_lin + vel_rot);
-  this->joints[LEFT_REAR  ]->SetVelocity(0, vel_lin + vel_rot);
+  this->joints[RIGHT_FRONT]->SetParam("vel", 0, vel_lin - vel_rot);
+  this->joints[RIGHT_REAR ]->SetParam("vel", 0, vel_lin - vel_rot);
+  this->joints[LEFT_FRONT ]->SetParam("vel", 0, vel_lin + vel_rot);
+  this->joints[LEFT_REAR  ]->SetParam("vel", 0, vel_lin + vel_rot);
 }
