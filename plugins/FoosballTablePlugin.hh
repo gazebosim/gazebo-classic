@@ -77,7 +77,7 @@ namespace gazebo
     /// only one rod at a time. This method switches the rod to control.
     /// The rods change in a circular way every time the trigger button is
     /// pressed.
-    /// \param[in] _side "left_controller" or "right_controoler".
+    /// \param[in] _side "left_controller" or "right_controller".
     private: void SwitchRod(const std::string &_side);
 
     /// \brief Pointer to the world;
