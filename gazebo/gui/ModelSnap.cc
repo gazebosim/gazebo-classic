@@ -77,8 +77,12 @@ void ModelSnap::Clear()
     this->dataPtr->snapLines = NULL;
     this->dataPtr->snapVisual.reset();
 
-    delete this->dataPtr->snapHighlight;
-    this->dataPtr->snapHighlight = NULL;
+    if (this->dataPtr->snapHighlight != NULL &&
+        this->dataPtr->highlightVisual != NULL)
+    {
+      this->dataPtr->highlightVisual->
+          DeleteDynamicLine(this->dataPtr->snapHighlight);
+    }
     this->dataPtr->highlightVisual.reset();
   }
 

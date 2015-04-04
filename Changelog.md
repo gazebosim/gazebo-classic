@@ -1,5 +1,8 @@
 ## Gazebo 6.0
 
+1. Show/hide GUI overlays using the menu bar.
+    * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
+
 1. Added support for Oculus DK2
     * [Pull request #1526](https://bitbucket.org/osrf/gazebo/pull-request/1526)
 
@@ -52,6 +55,9 @@
 
 1. Added PresetManager to physics libraries and corresponding integration test.
     * [Pull request #1471](https://bitbucket.org/osrf/gazebo/pull-request/1471)
+
+1. Sync name and location on SaveDialog.
+    * [Pull request #1563](https://bitbucket.org/osrf/gazebo/pull-request/1563)
 
 1. Model editor updates
     1. Joint preview using JointVisuals.
