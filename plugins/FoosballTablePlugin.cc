@@ -44,13 +44,13 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->model = _model;
   GZ_ASSERT(_sdf, "FoosballPlugin _sdf pointer is NULL");
 
+  // Read the <team> element.
   if (!_sdf->HasElement("team"))
   {
     std::cerr << "FoosballPlayer::Load() Missing <team> element in player "
               << "section" << std::endl;
     return false;
   }
-
   std::string team = _sdf->Get<std::string>("team");
   if (team != "Blue" && team != "Red")
   {
@@ -59,6 +59,15 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     return false;
   }
 
+  if (team == "Red" && _sdf->HasElement("oculus"))
+  {
+    int oculus = _sdf->Get<int>("oculus");
+    if (oculus == 1)
+      this->invert = -1.0;
+  }
+
+
+  // Read the <left_controller> and <right_controller> elements.
   for (auto const &side : {"left_controller", "right_controller"})
   {
     if (_sdf->HasElement(side))
@@ -141,12 +150,12 @@ void FoosballPlayer::Update()
             // Translation.
             double vel = (-adjust[side].pos.x - this->lastHydraPose[side].at(0))
               / dt.Double();
-            activeRod.at(0)->SetVelocity(0, vel);
+            activeRod.at(0)->SetVelocity(0, this->invert * vel);
 
             // Rotation.
             vel = (-adjust[side].rot.GetRoll() -
               this->lastHydraPose[side].at(1)) / dt.Double();
-            activeRod.at(1)->SetVelocity(0, vel);
+            activeRod.at(1)->SetVelocity(0, this->invert * vel);
 
             this->lastHydraPose[side].at(0) = -adjust[side].pos.x;
             this->lastHydraPose[side].at(1) = -adjust[side].rot.GetRoll();

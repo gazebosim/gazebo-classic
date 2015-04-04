@@ -126,6 +126,10 @@ namespace gazebo
 
     /// \brief Is the right trigger button pressed?
     private: bool rightTriggerPressed = false;
+
+    /// \brief This multiplier will be used to invert the velocity applied to
+    /// a rod in case the player is using Oculus and belongs to the Red team.
+    private: double invert = 1.0;
   };
 
   /// \class FoosballTablePlugin FoosballTablePlugin.hh

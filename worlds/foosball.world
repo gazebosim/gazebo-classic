@@ -34,6 +34,7 @@
         </player>
         <player>
           <team>Red</team>
+          <!--<oculus>1</oculus>-->
           <left_controller>
             <rod>0</rod>
             <rod>1</rod>
