@@ -589,9 +589,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       }
     }
   }
-
 }
-
 
 /////////////////////////////////////////////////
 TEST_P(PhysicsMsgsTest, SetGravity)

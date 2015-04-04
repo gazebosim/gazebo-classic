@@ -374,7 +374,7 @@ void Visual::Load()
   {
     sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
 
-    bool hasGeom = true;;
+    bool hasGeom = true;
     if (geomElem->HasElement("box"))
     {
       this->dataPtr->scale =
