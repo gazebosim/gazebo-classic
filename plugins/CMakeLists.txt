@@ -27,6 +27,7 @@ endif()
 
 set (plugins
   ArrangePlugin
+  BoxThrusterPlugin
   BreakableJointPlugin
   CameraPlugin
   CartDemoPlugin
