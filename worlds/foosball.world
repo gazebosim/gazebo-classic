@@ -22,7 +22,7 @@
       <plugin name="foosball_table" filename='libFoosballTablePlugin.so'>
         <!-- Parameters -->
         <player>
-          <team>blue</team>
+          <team>Blue</team>
           <left_controller>
             <rod>0</rod>
             <rod>1</rod>
@@ -33,7 +33,7 @@
           </right_controller>
         </player>
         <player>
-          <team>red</team>
+          <team>Red</team>
           <left_controller>
             <rod>0</rod>
             <rod>1</rod>
@@ -42,7 +42,7 @@
             <rod>2</rod>
             <rod>3</rod>
           </right_controller>
-        </player>-
+        </player>
       </plugin>
     </model>
 

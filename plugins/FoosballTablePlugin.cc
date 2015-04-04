@@ -32,10 +32,9 @@ GZ_REGISTER_MODEL_PLUGIN(FoosballTablePlugin)
 /////////////////////////////////////////////////
 FoosballPlayer::FoosballPlayer(const std::string &_hydraTopic)
   : hydraTopic(_hydraTopic),
-    hydra({{"left_controller", {}}, {"right_controller", {}}})
+    hydra({{"left_controller", {}}, {"right_controller", {}}}),
+    lastHydraPose({{"left_controller", {0, 0}}, {"right_controller", {0, 0}}})
 {
-  for (const auto &side : {"left_controller", "right_controller"})
-    this->lastHydraPose[side] = {0.0, 0.0};
 }
 
 /////////////////////////////////////////////////
@@ -53,14 +52,14 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   std::string team = _sdf->Get<std::string>("team");
-  if (team != "blue" && team != "red")
+  if (team != "Blue" && team != "Red")
   {
     std::cerr << "FoosballPlayer::Load() Invalid <team> value in player "
-              << "section. Allowed values are 'blue' or 'red'" << std::endl;
+              << "section. Allowed values are 'Blue' or 'Red'" << std::endl;
     return false;
   }
 
-  for (const auto &side : {"left_controller", "right_controller"})
+  for (auto const &side : {"left_controller", "right_controller"})
   {
     if (_sdf->HasElement(side))
     {
@@ -75,20 +74,9 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       for (auto rodElem = controllerElem->GetElement("rod"); rodElem;
         rodElem = rodElem->GetNextElement("rod"))
       {
-        std::string transName;
-        std::string rotName;
         std::string rodNumber = rodElem->GetValue()->GetAsString();
-
-        if (team == "red")
-        {
-          transName = "Foosball::transA" + rodNumber;
-          rotName = "Foosball::rotA" + rodNumber;
-        }
-        else
-        {
-          transName = "Foosball::transB" + rodNumber;
-          rotName = "Foosball::rotB" + rodNumber;
-        }
+        std::string transName = "Foosball::trans" + team + rodNumber;
+        std::string rotName = "Foosball::rot" + team + rodNumber;
 
         // Create a new rod and make it controllable by this controller.
         Rod_t rod = {_model->GetJoint(transName), _model->GetJoint(rotName)};
@@ -104,7 +92,6 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     &FoosballPlayer::OnHydra, this);
 
   this->lastUpdateTime = this->model->GetWorld()->GetSimTime();
-  this->lastPos = 0;
 
   return true;
 }
@@ -117,45 +104,32 @@ void FoosballPlayer::Update()
   if (!this->hydraMsgPtr)
     return;
 
+  // Read the last known Hydra message.
   boost::shared_ptr<msgs::Hydra const> msg = this->hydraMsgPtr;
-  if (!this->activated)
-  {
-    if (msg->right().button_bumper() && msg->left().button_bumper())
-    {
-      this->activated = true;
-      this->resetPoseRight = msgs::Convert(msg->right().pose());
-      this->resetPoseLeft = msgs::Convert(msg->left().pose());
-    }
-  }
 
   if (this->activated)
   {
-    math::Pose rightPose;
-    math::Pose leftPose;
+    // If the user pressed the trigger we have to change the active rod.
+    this->UpdateActiveRod();
+
+    math::Pose rightPose = msgs::Convert(msg->right().pose());
+    math::Pose leftPose = msgs::Convert(msg->left().pose());
 
     std::map<std::string, math::Pose> adjust;
-
-    rightPose = msgs::Convert(msg->right().pose());
-    leftPose = msgs::Convert(msg->left().pose());
-
     adjust["right_controller"] = math::Pose(
-      rightPose.pos - this->resetPoseRight.pos + this->basePoseRight.pos,
-      rightPose.rot * this->resetPoseRight.rot.GetInverse() *
-      this->basePoseRight.rot);
-
+      rightPose.pos - this->resetPoseRight.pos,
+      rightPose.rot * this->resetPoseRight.rot.GetInverse());
     adjust["left_controller"] = math::Pose(
-      leftPose.pos - this->resetPoseLeft.pos + this->basePoseLeft.pos,
-      leftPose.rot * this->resetPoseLeft.rot.GetInverse() *
-      this->basePoseLeft.rot);
+      leftPose.pos - this->resetPoseLeft.pos,
+      leftPose.rot * this->resetPoseLeft.rot.GetInverse());
 
     common::Time curTime = this->model->GetWorld()->GetSimTime();
-
     if (curTime > this->lastUpdateTime)
     {
       common::Time dt = (curTime - this->lastUpdateTime).Double();
 
       // Move the rods.
-      for (const auto &side : {"left_controller", "right_controller"})
+      for (auto const &side : {"left_controller", "right_controller"})
       {
         if (this->hydra.find(side) != this->hydra.end())
         {
@@ -166,7 +140,7 @@ void FoosballPlayer::Update()
 
             // Translation.
             double vel = (-adjust[side].pos.x - this->lastHydraPose[side].at(0))
-             / dt.Double();
+              / dt.Double();
             activeRod.at(0)->SetVelocity(0, vel);
 
             // Rotation.
@@ -183,21 +157,35 @@ void FoosballPlayer::Update()
 
     this->lastUpdateTime = this->model->GetWorld()->GetSimTime();
   }
+  else
+  {
+    // Reset the Hydra position.
+    if (msg->right().button_center() && msg->left().button_center())
+    {
+      this->activated = true;
+      this->resetPoseRight = msgs::Convert(msg->right().pose());
+      this->resetPoseLeft = msgs::Convert(msg->left().pose());
+    }
+  }
 }
-
 
 /////////////////////////////////////////////////
 void FoosballPlayer::OnHydra(ConstHydraPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->msgMutex);
+  this->hydraMsgPtr = _msg;
+}
 
-  if (_msg->right().button_center() &&_msg->left().button_center())
-  {
-    this->Restart();
+/////////////////////////////////////////////////
+void FoosballPlayer::UpdateActiveRod()
+{
+  if (!this->hydraMsgPtr)
     return;
-  }
 
-  if (_msg->left().trigger() > 0.2)
+  // Read the last known Hydra message.
+  boost::shared_ptr<msgs::Hydra const> msg = this->hydraMsgPtr;
+
+  if (msg->left().trigger() > 0.2)
     this->leftTriggerPressed = true;
   else if (this->leftTriggerPressed)
   {
@@ -205,23 +193,13 @@ void FoosballPlayer::OnHydra(ConstHydraPtr &_msg)
     this->SwitchRod("left_controller");
   }
 
-  if (_msg->right().trigger() > 0.2)
+  if (msg->right().trigger() > 0.2)
     this->rightTriggerPressed = true;
   else if (this->rightTriggerPressed)
   {
     this->rightTriggerPressed = false;
     this->SwitchRod("right_controller");
   }
-
-  this->hydraMsgPtr = _msg;
-}
-
-/////////////////////////////////////////////////
-void FoosballPlayer::Restart()
-{
-  this->basePoseLeft = this->leftStartPose;
-  this->basePoseRight = this->rightStartPose;
-  this->activated = false;
 }
 
 /////////////////////////////////////////////////

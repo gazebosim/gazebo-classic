@@ -15,13 +15,13 @@
  *
 */
 
-#ifndef _GAZEBO_FOOSBALL_PLUGIN_HH_
-#define _GAZEBO_FOOSBALL_PLUGIN_HH_
+#ifndef _GAZEBO_FOOSBALLTABLE_PLUGIN_HH_
+#define _GAZEBO_FOOSBALLTABLE_PLUGIN_HH_
 
 #include <array>
-#include <list>
 #include <map>
 #include <mutex>
+#include <string>
 #include <vector>
 #include <sdf/sdf.hh>
 #include "gazebo/common/PID.hh"
@@ -33,25 +33,25 @@
 
 namespace gazebo
 {
-  /// \def Rod_t
-  /// \brief A rod is composed by two joints (prismatic and revolute).
-  typedef std::array<physics::JointPtr, 2> Rod_t;
+    /// \class FoosballPlayer FoosballTablePlugin.hh
+    /// \brief A class that moves a set of rods of the table based on a Hydra
+    /// device controlled by a player.
+    class GAZEBO_VISIBLE FoosballPlayer
+    {
+      /// \def Rod_t
+    /// \brief A rod is composed by two joints (prismatic and revolute).
+    typedef std::array<physics::JointPtr, 2> Rod_t;
 
-  /// \def Rod_V
-  /// \brief A vector of rods.
-  typedef std::vector<Rod_t> Rod_V;
+    /// \def Rod_V
+    /// \brief A vector of rods.
+    typedef std::vector<Rod_t> Rod_V;
 
-  /// \def Hydra_t
-  /// \brief A Hydra is composed by two controllers (left and right).
-  /// Each controller is able to move a vector of rods (one at a time).
-  /// The rod that is currenly active is the rod at the front of the vector.
-  typedef std::map<std::string, Rod_V> Hydra_t;
+    /// \def Hydra_t
+    /// \brief A Hydra is composed by two controllers (left and right).
+    /// Each controller is able to move a vector of rods (one at a time).
+    /// The rod that is currenly active is the rod at the front of the vector.
+    typedef std::map<std::string, Rod_V> Hydra_t;
 
-  /// \class FoosballPlayer FoosballTablePlugin.hh
-  /// \brief A class that moves a set of rods of the table based on a Hydra
-  /// device controlled by a player.
-  class GAZEBO_VISIBLE FoosballPlayer
-  {
     /// \brief Constructor.
     /// \brief \param[in] _hydraTopic Topic name in which the Hydra associated
     /// to this player will publish updates. E.g.: ~/hydra0
@@ -70,13 +70,14 @@ namespace gazebo
     /// \param[in] _msg The hydra message.
     private: void OnHydra(ConstHydraPtr &_msg);
 
-    /// \brief Initialize the starting position of the Hydra.
-    private: void Restart();
+    /// \brief Check if we have to change the active rods for this player.
+    private: void UpdateActiveRod();
 
     /// \brief Each left/right Hydra controller controls a set of rods but
     /// only one rod at a time. This method switches the rod to control.
     /// The rods change in a circular way every time the trigger button is
     /// pressed.
+    /// \param[in] _side "left_controller" or "right_controoler".
     private: void SwitchRod(const std::string &_side);
 
     /// \brief Pointer to the world;
@@ -109,21 +110,22 @@ namespace gazebo
     /// \brief Last Hydra message received.
     private: boost::shared_ptr<const gazebo::msgs::Hydra> hydraMsgPtr;
 
-    /// \brief
+    /// \brief Hydra controller used by this player.
     private: Hydra_t hydra;
 
+    /// \brief Stores the last known X position and roll angle
+    /// of the left/right controller. Those parameters are the ones we use in
+    /// the plugin to compute the controller velocity.
     private: std::map<std::string, std::array<double, 2>> lastHydraPose;
 
+    /// \brief Last time that the plugin was updated.
     private: common::Time lastUpdateTime;
 
-    private: math::Pose basePoseRight;
-    private: math::Pose basePoseLeft;
-    private: math::Pose leftStartPose;
-    private: math::Pose rightStartPose;
-
+    /// \brief Is the left trigger button pressed?
     private: bool leftTriggerPressed = false;
+
+    /// \brief Is the right trigger button pressed?
     private: bool rightTriggerPressed = false;
-    private: double lastPos = 0.0;
   };
 
   /// \class FoosballTablePlugin FoosballTablePlugin.hh
