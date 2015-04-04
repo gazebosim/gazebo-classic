@@ -45,6 +45,8 @@ namespace gazebo
   ///   <topic>~/my_timer_control</topic>
   ///   <pos>pixel_x_pos pixel_y_pos</pos>
   ///   <size>pixel_width pixel_height</size>
+  ///   <start_stop_button>visible</start_stop_button>
+  ///   <reset_button>visible</reset_button>
   /// </plugin>
   class GAZEBO_VISIBLE TimerGUIPlugin : public GUIPlugin
   {
