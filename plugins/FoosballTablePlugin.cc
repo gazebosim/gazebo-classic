@@ -47,10 +47,10 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   std::string team = _sdf->Get<std::string>("team");
-  if (team != "blue" && team != "red")
+  if (team != "Blue" && team != "Red")
   {
     std::cerr << "FoosballPlayer::Load() Invalid <team> value in player "
-              << "section. Allowed values are 'blue' or 'red'" << std::endl;
+              << "section. Allowed values are 'Blue' or 'Red'" << std::endl;
     return false;
   }
 
@@ -71,20 +71,9 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       for (auto rodElem = controllerElem->GetElement("rod"); rodElem;
         rodElem = rodElem->GetNextElement("rod"))
       {
-        std::string transName;
-        std::string rotName;
         std::string rodNumber = rodElem->GetValue()->GetAsString();
-
-        if (team == "red")
-        {
-          transName = "Foosball::transA" + rodNumber;
-          rotName = "Foosball::rotA" + rodNumber;
-        }
-        else
-        {
-          transName = "Foosball::transB" + rodNumber;
-          rotName = "Foosball::rotB" + rodNumber;
-        }
+        std::string transName = "Foosball::trans" + team + rodNumber;
+        std::string rotName = "Foosball::rot" + team + rodNumber;
 
         Rod_t rod = {_model->GetJoint(transName), _model->GetJoint(rotName)};
         this->controller[side].push_back(rod);
