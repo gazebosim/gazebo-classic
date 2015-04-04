@@ -227,7 +227,7 @@ void FoosballTablePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-    boost::bind(&FoosballPlugin::Update, this, _1));
+    boost::bind(&FoosballTablePlugin::Update, this, _1));
 }
 
 /////////////////////////////////////////////////
