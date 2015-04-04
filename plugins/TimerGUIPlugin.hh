@@ -68,6 +68,21 @@ namespace gazebo
     /// = reset timer.
     private: void OnTimerCtrl(ConstGzStringPtr &_msg);
 
+    /// \brief Start the timer.
+    private: void Start();
+
+    /// \brief Stop the timer.
+    private: void Stop();
+
+    /// \brief Reset the timer.
+    private: void Reset();
+
+    /// \brief Callback when the start/stop button is pressed.
+    private slots: void OnStartStopButton();
+
+    /// \brief Callback when the reset button is pressed.
+    private slots: void OnResetButton();
+
     /// \brief Handles the prerender callback
     private: void PreRender();
 
@@ -90,6 +105,18 @@ namespace gazebo
 
     /// \brief Mutex to protect timer updates.
     private: boost::mutex timerMutex;
+
+    /// \brief Start/stop button.
+    private: QPushButton *startStopButton;
+
+    /// \brief QT style for the start setting of the start/stop button
+    private: std::string startStyle;
+
+    /// \brief QT style for the stop setting of the start/stop button
+    private: std::string stopStyle;
+
+    /// \brief Reset button.
+    private: QPushButton *resetButton;
   };
 }
 
