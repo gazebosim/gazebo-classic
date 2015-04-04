@@ -1,8 +1,5 @@
 <sdf version="1.4">
   <world name="default">
-    <physics type="ode">
-      <real_time_update_rate>0.0</real_time_update_rate>
-    </physics>
     <include>
       <uri>model://sun</uri>
     </include>
