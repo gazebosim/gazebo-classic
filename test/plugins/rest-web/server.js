@@ -43,7 +43,7 @@ passport.use(new BasicStrategy({
   function(username, password, done) {
     // asynchronous verification, for effect...
     process.nextTick(function () {
-      
+
       // Find the user by username.  If there is no user with the given
       // username, or the password is not correct, set the user to `false` to
       // indicate failure.  Otherwise, return the authenticated `user`.
@@ -61,11 +61,11 @@ all_events = [];
 
 // curl -v -I http://127.0.0.1:3000/
 // curl -v -I --user bob:secret http://127.0.0.1:3000/
-app.get('/login', 
+app.get('/login',
    passport.authenticate('basic', { session: false }),
    function(req, res){
      console.log("-----\nLogin:" + util.inspect(req.user));
-     all_events.push(req.user);    
+     all_events.push(req.user);
      res.jsonp( req.user );
      console.log('LOGIN DONE');
   });
@@ -77,36 +77,36 @@ app.get('/',
   function(req, res){
     //res.jsonp({ username: req.user.username, email: req.user.email });
     console.log('serving all events');
-      
+
     res.write('<html>');
     // refresh the page every sec
     res.write("<meta http-equiv=\"refresh\" content=\"2\" >");
     res.write('<script>\n');
     res.write('events = ' + JSON.stringify(all_events) + ';\n' );
     res.write('</script>\n');
- 
+
     res.write('<script src="script.js"></script>\n');
 
     res.write('<body onload="fillEventList()">');
     res.write(' <h1>' + all_events.length + ' events</h1>');
     colors = ['LightGrey', 'LightGreen'];
-    for (var i=0; i < all_events.length; i++)
+    for (var i = all_events.length-1; i >=0;  i--)
     {
       // get a nice formatted string for display
       var s = JSON.stringify(all_events[i], null, "  ");
       res.write('<div>' + i + '</div><pre style="background:' + colors[i%2] + '">' + s + '</pre>');
     }
-    res.write(' <div id="list"/>'); 
+    res.write(' <div id="list"/>');
     res.write('</body>');
     res.end('</html>');
   });
 
-app.post('/events/new', 
+app.post('/events/new',
   passport.authenticate('basic', { session: false }),
   function(req, res){
    console.log("-----\nNEW EVENT:\n\n" + util.inspect(req.body));
    var r = { username: req.user.username, Event: req.body };
-   all_events.push(r);    
+   all_events.push(r);
    res.jsonp(r);
   });
 
