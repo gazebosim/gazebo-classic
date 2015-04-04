@@ -65,6 +65,10 @@ namespace gazebo
     /// \param[in] _string String representation of sim time.
     signals: void SetTime(QString _string);
 
+    /// \brief A signal used to set the style of the start/stop button.
+    /// \param[in] _string State ("Start"/"Stop").
+    signals: void SetStartStopButton(QString _state);
+
     /// \brief Callback that receives timer control message.
     /// \param[in] _msg "start" = start timer, "stop" = stop timer, "reset"
     /// = reset timer.
@@ -81,6 +85,10 @@ namespace gazebo
 
     /// \brief Callback when the start/stop button is pressed.
     private slots: void OnStartStopButton();
+
+    /// \brief Callback to set the start/stop button style.
+    /// \param[in] _string State ("Start"/"Stop").
+    private slots: void OnSetStartStopButton(QString _state);
 
     /// \brief Callback when the reset button is pressed.
     private slots: void OnResetButton();

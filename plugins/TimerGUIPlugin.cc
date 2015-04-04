@@ -97,6 +97,8 @@ TimerGUIPlugin::TimerGUIPlugin()
   frameLayout->addWidget(this->startStopButton);
   connect(this->startStopButton, SIGNAL(clicked()), this,
       SLOT(OnStartStopButton()));
+  connect(this, SIGNAL(SetStartStopButton(QString)),
+      this, SLOT(OnSetStartStopButton(QString)), Qt::QueuedConnection);
 
   // Create a reset button
   this->resetButton = new QPushButton();
@@ -267,11 +269,7 @@ void TimerGUIPlugin::Start()
   boost::mutex::scoped_lock lock(this->timerMutex);
   this->timer.Start();
 
-  if (this->startStopButton->isVisible())
-  {
-    this->startStopButton->setText(tr("Stop"));
-    this->startStopButton->setStyleSheet(this->stopStyle.c_str());
-  }
+  this->SetStartStopButton("Stop");
 }
 
 /////////////////////////////////////////////////
@@ -280,11 +278,21 @@ void TimerGUIPlugin::Stop()
   boost::mutex::scoped_lock lock(this->timerMutex);
   this->timer.Stop();
 
-  if (this->startStopButton->isVisible())
-  {
-    this->startStopButton->setText(tr("Start"));
+  this->SetStartStopButton("Start");
+}
+
+/////////////////////////////////////////////////
+void TimerGUIPlugin::OnSetStartStopButton(QString _state)
+{
+  if (!this->startStopButton->isVisible())
+    return;
+
+  this->startStopButton->setText(_state);
+
+  if (_state == "Start")
     this->startStopButton->setStyleSheet(this->startStyle.c_str());
-  }
+  else if ("Stop")
+    this->startStopButton->setStyleSheet(this->stopStyle.c_str());
 }
 
 /////////////////////////////////////////////////
