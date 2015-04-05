@@ -644,8 +644,8 @@ void LogRecord::Log::Stop()
            << "<log_version>" << GZ_LOG_VERSION << "</log_version>\n"
            << "<gazebo_version>" << GAZEBO_VERSION_FULL << "</gazebo_version>\n"
            << "<rand_seed>" << math::Rand::GetSeed() << "</rand_seed>\n"
-           << "<log_start>" << logStartTime << "</log_start>\n"
-           << "<log_end>" << logEndTime << "</log_end>\n"
+           << "<log_start>" << this->logStartTime << "</log_start>\n"
+           << "<log_end>" << this->logEndTime << "</log_end>\n"
            << "</header>\n";
     this->logFile.write(stream.str().c_str(), stream.str().size());
 
