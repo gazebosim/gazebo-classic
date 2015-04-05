@@ -718,7 +718,7 @@ void LogRecord::Log::UpdateLogTime(const std::string &_logStream)
   const std::string kStartDelim = "<sim_time>";
   const std::string kEndDelim = "</sim_time>";
 
-  // Find the start of the log.
+  // Find the first <sim_time> of the log.
   if (!this->isFirstUpdate)
   {
     auto from = _logStream.find(kStartDelim);
@@ -730,10 +730,13 @@ void LogRecord::Log::UpdateLogTime(const std::string &_logStream)
       this->isFirstUpdate = true;
     }
     else
+    {
       gzwarn << "Unable to find a <sim_time>...</sim_time> tags." << std::endl;
+      return;
+    }
   }
 
-  // Find the end of the log.
+  // Update the last <sim_time> of the log.
   auto from = _logStream.rfind(kStartDelim);
   auto to = _logStream.rfind(kEndDelim);
   if (from != std::string::npos && to != std::string::npos)
