@@ -1,5 +1,8 @@
 ## Gazebo 6.0
 
+1. Added start/stop simulation times to the header of the log files.
+    * [Pull request #1577](https://bitbucket.org/osrf/gazebo/pull-request/1577)
+
 1. Show/hide GUI overlays using the menu bar.
     * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
 

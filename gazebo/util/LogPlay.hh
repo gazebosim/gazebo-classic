@@ -80,9 +80,11 @@ namespace gazebo
       public: uint32_t GetRandSeed() const;
 
       /// \brief Get the log start time of the open log file.
+      /// \return Start time of the log.
       public: common::Time GetLogStartTime() const;
 
       /// \brief Get the log end time of the open log file.
+      /// \return End time of the log.
       public: common::Time GetLogEndTime() const;
 
       /// \brief Step through the open log file.

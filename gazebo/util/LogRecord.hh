@@ -258,6 +258,7 @@ namespace gazebo
 
         /// \brief Update the internal variables that keep track of the times
         /// where the log started and finished (simulation time).
+        /// \param[in] _logStream String containing a chunk of the log file.
         private: void UpdateLogTime(const std::string &_logStream);
 
         /// \brief Pointer to the log record parent.
