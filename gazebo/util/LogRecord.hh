@@ -284,7 +284,7 @@ namespace gazebo
         /// \brief Log end time (simulation time).
         private: std::string logEndTime;
 
-        /// \brief True when we have read the first
+        /// \brief True when we have not updated the log yet.
         private: bool isFirstUpdate;
       };
       /// \endcond
