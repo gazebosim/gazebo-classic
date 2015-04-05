@@ -533,6 +533,7 @@ LogRecord::Log::Log(LogRecord *_parent, const std::string &_relativeFilename,
   this->logCB = _logCB;
 
   this->relativeFilename = _relativeFilename;
+  this->isFirstUpdate = false;
 }
 
 //////////////////////////////////////////////////
@@ -552,6 +553,9 @@ unsigned int LogRecord::Log::Update()
     std::string data = stream.str();
     if (!data.empty())
     {
+      // Keep track of the times where the log started and finished.
+      this->UpdateLogTime(data);
+
       const std::string &encodingLocal = this->parent->GetEncoding();
 
       this->buffer.append("<chunk encoding='");
@@ -635,6 +639,16 @@ void LogRecord::Log::Stop()
     this->Update();
     this->Write();
 
+    std::ostringstream stream;
+    stream << "<header>\n"
+           << "<log_version>" << GZ_LOG_VERSION << "</log_version>\n"
+           << "<gazebo_version>" << GAZEBO_VERSION_FULL << "</gazebo_version>\n"
+           << "<rand_seed>" << math::Rand::GetSeed() << "</rand_seed>\n"
+           << "<log_start>" << logStartTime << "</log_start>\n"
+           << "<log_end>" << logEndTime << "</log_end>\n"
+           << "</header>\n";
+    this->logFile.write(stream.str().c_str(), stream.str().size());
+
     std::string xmlEnd = "</gazebo_log>";
     this->logFile.write(xmlEnd.c_str(), xmlEnd.size());
 
@@ -652,17 +666,12 @@ void LogRecord::Log::Start(const boost::filesystem::path &_path)
 
   // Make sure the file does not exist
   if (boost::filesystem::exists(this->completePath))
-    gzlog << "Filename[" + this->completePath.string() + "], already exists."
-      << " The log file will be overwritten.\n";
+    gzlog << "Filename [" + this->completePath.string() + "], already exists."
+          << " The log file will be overwritten.\n";
 
   std::ostringstream stream;
   stream << "<?xml version='1.0'?>\n"
-         << "<gazebo_log>\n"
-         << "<header>\n"
-         << "<log_version>" << GZ_LOG_VERSION << "</log_version>\n"
-         << "<gazebo_version>" << GAZEBO_VERSION_FULL << "</gazebo_version>\n"
-         << "<rand_seed>" << math::Rand::GetSeed() << "</rand_seed>\n"
-         << "</header>\n";
+         << "<gazebo_log>\n";
 
   this->buffer.append(stream.str());
 }
@@ -701,6 +710,39 @@ void LogRecord::Log::Write()
 
   // Clear the buffer.
   this->buffer.clear();
+}
+
+//////////////////////////////////////////////////
+void LogRecord::Log::UpdateLogTime(const std::string &_logStream)
+{
+  const std::string kStartDelim = "<sim_time>";
+  const std::string kEndDelim = "</sim_time>";
+
+  // Find the start of the log.
+  if (!this->isFirstUpdate)
+  {
+    auto from = _logStream.find(kStartDelim);
+    auto to = _logStream.find(kEndDelim);
+    if (from != std::string::npos && to != std::string::npos)
+    {
+      auto length = to - from - kStartDelim.size();
+      this->logStartTime = _logStream.substr(from + kStartDelim.size(), length);
+      this->isFirstUpdate = true;
+    }
+    else
+      gzwarn << "Unable to find a <sim_time>...</sim_time> tags." << std::endl;
+  }
+
+  // Find the end of the log.
+  auto from = _logStream.rfind(kStartDelim);
+  auto to = _logStream.rfind(kEndDelim);
+  if (from != std::string::npos && to != std::string::npos)
+  {
+    auto length = to - from - kStartDelim.size();
+    this->logEndTime = _logStream.substr(from + kStartDelim.size(), length);
+  }
+  else
+    gzwarn << "Unable to find a <sim_time>...</sim_time> tags." << std::endl;
 }
 
 //////////////////////////////////////////////////

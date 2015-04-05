@@ -86,6 +86,8 @@ std::string LogPlay::GetHeader() const
          << "<log_version>" << this->logVersion << "</log_version>\n"
          << "<gazebo_version>" << this->gazeboVersion << "</gazebo_version>\n"
          << "<rand_seed>" << this->randSeed << "</rand_seed>\n"
+         << "<log_start>" << this->logStartTime << "</log_start>\n"
+         << "<log_end>" << this->logEndTime << "</log_end>\n"
          << "</header>\n";
 
   return stream.str();
@@ -126,6 +128,26 @@ void LogPlay::ReadHeader()
   else
     this->randSeed = boost::lexical_cast<uint32_t>(childXml->GetText());
 
+  // Get the log start time.
+  childXml = headerXml->FirstChildElement("log_start");
+  if (!childXml)
+    gzerr << "Log file header is missing the log start time.\n";
+  else
+  {
+    std::stringstream ss(childXml->GetText());
+    ss >> this->logStartTime;
+  }
+
+  // Get the log end time.
+  childXml = headerXml->FirstChildElement("log_end");
+  if (!childXml)
+    gzerr << "Log file header is missing the log end time.\n";
+  else
+  {
+    std::stringstream ss(childXml->GetText());
+    ss >> this->logEndTime;
+  }
+
   if (this->logVersion != GZ_LOG_VERSION)
     gzwarn << "Log version[" << this->logVersion << "] in file["
            << this->filename
@@ -158,6 +180,18 @@ std::string LogPlay::GetGazeboVersion() const
 uint32_t LogPlay::GetRandSeed() const
 {
   return this->randSeed;
+}
+
+/////////////////////////////////////////////////
+common::Time LogPlay::GetLogStartTime() const
+{
+  return this->logStartTime;
+}
+
+/////////////////////////////////////////////////
+common::Time LogPlay::GetLogEndTime() const
+{
+  return this->logEndTime;
 }
 
 /////////////////////////////////////////////////
