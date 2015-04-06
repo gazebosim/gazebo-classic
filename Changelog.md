@@ -112,6 +112,10 @@
     1. Add schematic view to model editor
         * [Pull request #1562](https://bitbucket.org/osrf/gazebo/pull-request/1562)
 
+    1. Added menu for toggling joint visualization
+        * [Pull request #1551](https://bitbucket.org/osrf/gazebo/pull-request/1551)
+        * [Issue #1483](https://bitbucket.org/osrf/gazebo/issue/1483)
+
 1. Building editor updates
     1. Make palette tips tooltip clickable to open.
         * [Pull request #1519](https://bitbucket.org/osrf/gazebo/pull-request/1519)
