@@ -139,6 +139,7 @@ namespace gazebo
   /// The plugin accepts 'n' blocks of <player> elements as follows:
   /// <player>
   ///   <team>blue</team>
+  ///   <oculus>0</oculus>
   ///   <left_controller>
   ///     <rod>0</rod>
   ///     <rod>1</rod>
@@ -150,6 +151,10 @@ namespace gazebo
   /// </player>
   ///
   /// <team> is a required tag and should contain 'red' or 'blue'.
+  /// <oculus> is an optional tag. By default, the plugin assumes that the
+  /// players' viewpoint are the same and both are looking from the blue side of
+  /// the table. When <oculus> is 1, the plugin will assume that each player's
+  /// viewpoint is different and is located in each own side of the table.
   /// <left_controller> and <right_controller> are optional. If present,
   /// each tag associates a set of rods to the left or right controller.
   /// The control of a rod will change by pressing the 'trigger' button.
