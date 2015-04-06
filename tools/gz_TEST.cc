@@ -617,10 +617,10 @@ TEST_F(gzTest, SDF)
   // gz sdf -d -v <major.minor> | sha1sum'
   std::map<std::string, std::string> descSums;
   descSums["1.0"] = "5235eb8464a96505c2a31fe96327d704e45c9cc4";
-  descSums["1.2"] = "27973b2542d7a0f7582a615b245d81797718c89a";
-  descSums["1.3"] = "30ffce1c662c17185d23f30ef3af5c110d367e10";
-  descSums["1.4"] = "ae07ffdd316b529077a601e58891e8623aafb72b";
-  descSums["1.5"] = "dd9dcf3dda3d31e9c7818cc1e44e59ff90e6b905";
+  descSums["1.2"] = "870d8c02800c3ac75e85c58657ee8cc2c1079a92";
+  descSums["1.3"] = "549f8f2e9231820897616dac4da42220aafe5aa8";
+  descSums["1.4"] = "3d6e8cbd0410a6e65060f2f5c32f546d25af5873";
+  descSums["1.5"] = "273a4f016654ffc237bbf3638e9e2c013171d9da";
 
   // Test each descSum
   for (std::map<std::string, std::string>::iterator iter = descSums.begin();
@@ -636,10 +636,10 @@ TEST_F(gzTest, SDF)
   // gz sdf -o -v <major.minor> | sha1sum'
   std::map<std::string, std::string> docSums;
   docSums["1.0"] = "4cf955ada785adf72503744604ffadcdf13ec0d2";
-  docSums["1.2"] = "f84c1cf1b1ba04ab4859e96f6aea881134fb5a9b";
-  docSums["1.3"] = "f3dd699687c8922710e4492aadedd1c038d678c1";
-  docSums["1.4"] = "d63ad98596fb26daa24e5a7ee54eee3d54ee379b";
-  docSums["1.5"] = "d98ba4139355f260d7d2d3bdd20472a80e46854e";
+  docSums["1.2"] = "27f9d91080ce8aa18eac27c9d899fde2d4b78785";
+  docSums["1.3"] = "ad80986d42eae97baf277118f52d7e8b951d8ea1";
+  docSums["1.4"] = "153ddd6ba6797c37c7fcddb2be5362c9969d97a1";
+  docSums["1.5"] = "ffbead7b207372d25db5419629365ff6fc27b12c";
 
   // Test each docSum
   for (std::map<std::string, std::string>::iterator iter = docSums.begin();
