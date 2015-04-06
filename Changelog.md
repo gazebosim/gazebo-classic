@@ -1,5 +1,11 @@
 ## Gazebo 6.0
 
+1. Use GAZEBO_CFLAGS or GAZEBO_CXX_FLAGS in CMakeLists.txt for example plugins
+    * [Pull request #1573](https://bitbucket.org/osrf/gazebo/pull-request/1573)
+
+1. Show/hide GUI overlays using the menu bar.
+    * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
+
 1. Added support for Oculus DK2
     * [Pull request #1526](https://bitbucket.org/osrf/gazebo/pull-request/1526)
 
@@ -49,6 +55,12 @@
 
 1. Updated ConfigWidget class to parse enum values.
     * [Pull request #1518](https://bitbucket.org/osrf/gazebo/pull-request/1518)
+
+1. Added PresetManager to physics libraries and corresponding integration test.
+    * [Pull request #1471](https://bitbucket.org/osrf/gazebo/pull-request/1471)
+
+1. Sync name and location on SaveDialog.
+    * [Pull request #1563](https://bitbucket.org/osrf/gazebo/pull-request/1563)
 
 1. Model editor updates
     1. Joint preview using JointVisuals.

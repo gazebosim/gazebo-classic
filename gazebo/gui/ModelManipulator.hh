@@ -47,6 +47,10 @@ namespace gazebo
       /// \brief Initialize the model manipulator.
       public: void Init();
 
+      /// \brief Clear the model manipulator. This explicity cleans up the
+      /// internal state of the singleton and prepares it for exit.
+      public: void Clear();
+
       /// \brief Detach the manipulator from an entity
       public: void Detach();
 

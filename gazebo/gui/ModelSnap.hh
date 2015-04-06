@@ -48,6 +48,10 @@ namespace gazebo
       /// \brief Initialize the model snapping tool.
       public: void Init();
 
+      /// \brief Clear the model snapping tool. This explicity cleans up the
+      /// internal state of the singleton and prepares it for exit.
+      public: void Clear();
+
       /// \brief Reset the model snapping tool.
       public: void Reset();
 

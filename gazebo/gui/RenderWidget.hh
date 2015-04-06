@@ -69,6 +69,10 @@ namespace gazebo
       public: void DisplayOverlayMsg(const std::string &_msg,
           int _duration = -1);
 
+      /// \brief Show or hide all the GUI overlays.
+      /// \param[in] _visible True to show the GUI overlays, false to hide them.
+      public: void SetOverlaysVisible(const bool _visible);
+
       /// \brief Add a widget to the bottom row stack of widgets.
       /// \param[in] _name Name of the widget
       /// \param[in] _widget Pointer to the widget to add.

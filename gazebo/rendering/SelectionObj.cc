@@ -68,7 +68,7 @@ void SelectionObj::Load()
   this->CreateTranslateVisual();
   this->CreateScaleVisual();
 
-  this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->SetVisibilityFlags(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
 
   this->SetHandleVisible(TRANS, false);
   this->SetHandleVisible(ROT, false);
@@ -309,6 +309,7 @@ void SelectionObj::CreateTranslateVisual()
   dPtr->transVisual.reset(new rendering::Visual(
       this->GetName() + "__SELECTION_OBJ_TRANS__",
       shared_from_this()));
+  dPtr->transVisual->Load();
 
   dPtr->transXVisual.reset(
       new rendering::Visual(
@@ -419,11 +420,6 @@ void SelectionObj::CreateTranslateVisual()
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
   dPtr->transZVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
-
-  // Add to scene so they are selectable by the mouse
-  dPtr->scene->AddVisual(dPtr->transXVisual);
-  dPtr->scene->AddVisual(dPtr->transYVisual);
-  dPtr->scene->AddVisual(dPtr->transZVisual);
 }
 
 /////////////////////////////////////////////////
@@ -436,6 +432,7 @@ void SelectionObj::CreateRotateVisual()
   dPtr->rotVisual.reset(new rendering::Visual(
       this->GetName() + "__SELECTION_OBJ_ROT__",
       shared_from_this()));
+  dPtr->rotVisual->Load();
 
   dPtr->rotXVisual.reset(
       new rendering::Visual(
@@ -506,11 +503,6 @@ void SelectionObj::CreateRotateVisual()
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
   dPtr->rotZVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
-
-  // Add to scene so they are selectable by the mouse
-  dPtr->scene->AddVisual(dPtr->rotXVisual);
-  dPtr->scene->AddVisual(dPtr->rotYVisual);
-  dPtr->scene->AddVisual(dPtr->rotZVisual);
 }
 
 /////////////////////////////////////////////////
@@ -523,6 +515,7 @@ void SelectionObj::CreateScaleVisual()
   dPtr->scaleVisual.reset(new rendering::Visual(
       this->GetName() + "__SELECTION_OBJ_SCALE__",
       shared_from_this()));
+  dPtr->scaleVisual->Load();
 
   dPtr->scaleXVisual.reset(
       new rendering::Visual(
@@ -632,11 +625,6 @@ void SelectionObj::CreateScaleVisual()
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
   dPtr->scaleZVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
-
-  // Add to scene so they are selectable by the mouse
-  dPtr->scene->AddVisual(dPtr->scaleXVisual);
-  dPtr->scene->AddVisual(dPtr->scaleYVisual);
-  dPtr->scene->AddVisual(dPtr->scaleZVisual);
 }
 
 /////////////////////////////////////////////////
