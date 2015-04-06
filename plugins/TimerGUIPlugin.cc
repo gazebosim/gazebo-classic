@@ -49,6 +49,7 @@ TimerGUIPlugin::TimerGUIPlugin()
 
   // Add the label to the frame's layout
   frameLayout->addWidget(timeLabel);
+  frameLayout->setAlignment(timeLabel, Qt::AlignCenter);
   connect(this, SIGNAL(SetTime(QString)),
       timeLabel, SLOT(setText(QString)), Qt::QueuedConnection);
 
@@ -151,16 +152,44 @@ TimerGUIPlugin::~TimerGUIPlugin()
 /////////////////////////////////////////////////
 void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
 {
+  bool hasStartButton = false;
+  bool hasResetButton = false;
+
+  // Check if there is a start button
+  if (_elem->HasElement("start_stop_button"))
+  {
+    hasStartButton = _elem->Get<bool>("start_stop_button");
+    if (hasStartButton)
+      this->startStopButton->show();
+  }
+
+  // Check if there is a reset button
+  if (_elem->HasElement("reset_button"))
+  {
+    hasResetButton = _elem->Get<bool>("reset_button");
+    if (hasResetButton)
+      this->resetButton->show();
+  }
+
   // Size this widget
+  math::Vector2d s;
   if (_elem->HasElement("size"))
   {
-    math::Vector2d s = _elem->Get<math::Vector2d>("size");
-    this->resize(s.x, s.y);
+    s = _elem->Get<math::Vector2d>("size");
   }
+
+  // Minumum horizontal size
+  s.x = std::max(s.x, 150.0);
+
+  // Minimum vertical size according to the elements present
+  if (hasStartButton && hasResetButton)
+    s.y = std::max(s.y, 120.0);
+  else if (hasStartButton || hasResetButton)
+    s.y = std::max(s.y, 80.0);
   else
-  {
-    this->resize(200, 30);
-  }
+    s.y = std::max(s.y, 30.0);
+
+  this->resize(s.x, s.y);
 
   // Position this widget
   if (_elem->HasElement("pos"))
@@ -209,20 +238,6 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
 
     yPos = 10;
     this->move(xPos, yPos);
-  }
-
-  // Check if there is a start button
-  if (_elem->HasElement("start_stop_button"))
-  {
-    if (_elem->Get<bool>("start_stop_button"))
-      this->startStopButton->show();
-  }
-
-  // Check if there is a reset button
-  if (_elem->HasElement("reset_button"))
-  {
-    if (_elem->Get<bool>("reset_button"))
-      this->resetButton->show();
   }
 
   // Create a node for transportation
