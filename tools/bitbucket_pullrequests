@@ -160,7 +160,13 @@ class BitbucketPullRequests
     diff.lines.map(&:chomp).each do |line|
       if line.start_with? '+++ b/'
         line["+++ b/"] = ""
-        line[/\t.*$/] = ""
+        # try to remove anything after a tab character
+        # this is needed by --check 0
+        begin
+          line[/\t.*$/] = ""
+        # IndexError is raised if no tab characters are found
+        rescue IndexError
+        end
         files << line
       end
     end
