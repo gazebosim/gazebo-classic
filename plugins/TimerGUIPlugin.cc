@@ -291,7 +291,7 @@ void TimerGUIPlugin::OnSetStartStopButton(QString _state)
 
   if (_state == "Start")
     this->startStopButton->setStyleSheet(this->startStyle.c_str());
-  else if ("Stop")
+  else if (_state == "Stop")
     this->startStopButton->setStyleSheet(this->stopStyle.c_str());
 }
 
