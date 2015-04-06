@@ -17,7 +17,7 @@
         <reset_button>1</reset_button>
       </plugin>
 
-      <plugin name="timer_start__button" filename="libTimerGUIPlugin.so">
+      <plugin name="timer_start_button" filename="libTimerGUIPlugin.so">
         <topic>~/timer_control_3</topic>
         <pos>460 10</pos>
         <start_stop_button>1</start_stop_button>
