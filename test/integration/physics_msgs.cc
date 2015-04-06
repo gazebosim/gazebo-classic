@@ -448,10 +448,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   world->Step(100);
 
   // Verify the initial model pose is where we set it to be.
-  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (auto const &iter : modelPos)
   {
-    std::string name = iter->first;
+    std::string name = iter.first;
     // Make sure the model is loaded
     model = world->GetModel(name);
     EXPECT_TRUE(model != NULL);
@@ -467,10 +466,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 
   // resize model to half of it's size
   double scaleFactor = 0.5;
-  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (auto const &iter : modelPos)
   {
-    std::string name = iter->first;
+    std::string name = iter.first;
     model = world->GetModel(name);
     if (*(name.rbegin()) == '2')
     {
@@ -508,10 +506,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   // This loop checks the velocity and pose of each model 0.5 seconds
   // after the time of predicted ground contact. The pose is expected to be
   // underneath the initial pose.
-  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (auto const &iter : modelPos)
   {
-    std::string name = iter->first;
+    std::string name = iter.first;
     // Make sure the model is loaded
     model = world->GetModel(name);
     if (model != NULL)
@@ -533,10 +530,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   }
 
   // verify geom msgs contain resized values.
-  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (auto const &iter : modelPos)
   {
-    std::string name = iter->first;
+    std::string name = iter.first;
     model = world->GetModel(name);
     msgs::Model modelMsg;
     model->FillMsg(modelMsg);

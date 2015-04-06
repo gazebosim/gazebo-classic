@@ -1049,7 +1049,7 @@ void Link::ParseVisuals()
 {
   this->UpdateVisualMsg();
 
-  for (auto it : this->visuals)
+  for (auto const it : this->visuals)
     this->visPub->Publish(it.second);
 }
 
@@ -1171,7 +1171,7 @@ void Link::UpdateVisualMsg()
         msg.set_parent_id(this->GetId());
         msg.set_is_static(this->IsStatic());
 
-        Visuals_M::iterator iter = this->visuals.find(msg.id());
+        auto iter = this->visuals.find(msg.id());
         if (iter != this->visuals.end())
           gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
         this->visuals[msg.id()] = msg;
