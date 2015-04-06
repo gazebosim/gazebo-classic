@@ -1,5 +1,8 @@
 ## Gazebo 6.0
 
+1. Use GAZEBO_CFLAGS or GAZEBO_CXX_FLAGS in CMakeLists.txt for example plugins
+    * [Pull request #1573](https://bitbucket.org/osrf/gazebo/pull-request/1573)
+
 1. Show/hide GUI overlays using the menu bar.
     * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
 
