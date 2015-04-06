@@ -160,7 +160,6 @@ class BitbucketPullRequests
     diff.lines.map(&:chomp).each do |line|
       if line.start_with? '+++ b/'
         line["+++ b/"] = ""
-        line[/\t.*$/] = ""
         files << line
       end
     end
