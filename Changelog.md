@@ -1,5 +1,8 @@
 ## Gazebo 6.0
 
+1. Use GAZEBO_CFLAGS or GAZEBO_CXX_FLAGS in CMakeLists.txt for example plugins
+    * [Pull request #1573](https://bitbucket.org/osrf/gazebo/pull-request/1573)
+
 1. Show/hide GUI overlays using the menu bar.
     * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
 
@@ -105,6 +108,10 @@
     1. Added list of links and joints.
         * [Pull request #1515](https://bitbucket.org/osrf/gazebo/pull-request/1515)
         * [Issue #1418](https://bitbucket.org/osrf/gazebo/issue/1418)
+
+    1. Added menu for toggling joint visualization
+        * [Pull request #1551](https://bitbucket.org/osrf/gazebo/pull-request/1551)
+        * [Issue #1483](https://bitbucket.org/osrf/gazebo/issue/1483)
 
 1. Building editor updates
     1. Make palette tips tooltip clickable to open.
