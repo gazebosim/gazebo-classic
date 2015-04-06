@@ -67,6 +67,14 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->exitAct->setCheckable(false);
   connect(this->exitAct, SIGNAL(triggered()), this, SLOT(Exit()));
 
+  this->showJointsAct = new QAction(tr("Joints"), this);
+  this->showJointsAct->setStatusTip(tr("Show Joints"));
+  this->showJointsAct->setCheckable(true);
+  this->showJointsAct->setChecked(true);
+  connect(this->showJointsAct, SIGNAL(toggled(bool)),
+      this->modelPalette->GetModelCreator()->GetJointMaker(),
+      SLOT(ShowJoints(bool)));
+
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
   this->connections.push_back(
@@ -216,6 +224,9 @@ void ModelEditor::CreateMenus()
   fileMenu->addAction(this->saveAct);
   fileMenu->addAction(this->saveAsAct);
   fileMenu->addAction(this->exitAct);
+
+  QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
+  viewMenu->addAction(this->showJointsAct);
 }
 
 /////////////////////////////////////////////////
