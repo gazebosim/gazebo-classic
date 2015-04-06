@@ -60,7 +60,7 @@ TimerGUIPlugin::TimerGUIPlugin()
 
   this->startStyle =
       "QPushButton {\
-         background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4,\
+         background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4, \
          radius: 1.35, stop: 0 #ddd, stop: 1 #59b353);\
          border: 2px solid #8bca88;\
          border-radius: 4px;\
@@ -70,13 +70,13 @@ TimerGUIPlugin::TimerGUIPlugin()
          margin-left: 10px;\
       }\
       QPushButton:hover {\
-         background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4,\
+         background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4, \
          radius: 1.35, stop: 0 #ddd, stop: 1 #70c464);\
       }";
 
   this->stopStyle =
       "QPushButton {\
-         background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4,\
+         background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4, \
          radius: 1.35, stop: 0 #ddd, stop: 1 #D85C48);\
          border: 2px solid #e18071;\
          border-radius: 4px;\
@@ -86,7 +86,7 @@ TimerGUIPlugin::TimerGUIPlugin()
          margin-left: 10px;\
       }\
       QPushButton:hover {\
-         background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4,\
+         background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4, \
          radius: 1.35, stop: 0 #ddd, stop: 1 #bf5140);\
       }";
 
@@ -107,7 +107,7 @@ TimerGUIPlugin::TimerGUIPlugin()
   this->resetButton->setText(QString("Reset"));
   this->resetButton->setStyleSheet(
       "QPushButton {\
-         background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4,\
+         background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4, \
          radius: 1.35, stop: 0 #ddd, stop: 1 #666);\
          border: 2px solid #ccc;\
          border-radius: 4px;\
@@ -117,7 +117,7 @@ TimerGUIPlugin::TimerGUIPlugin()
          margin-left: 10px;\
       }\
       QPushButton:hover {\
-         background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4,\
+         background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4, \
          radius: 1.35, stop: 0 #ddd, stop: 1 #777);\
       }");
   this->resetButton->hide();
