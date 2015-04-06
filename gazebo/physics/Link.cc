@@ -1148,14 +1148,13 @@ void Link::UpdateVisualMsg()
       std::string linkName = this->GetScopedName();
 
       // update visual msg if it exists
-      for (auto iter : this->visuals)
+      for (auto &iter : this->visuals)
       {
         msgs::Visual visMsg = iter.second;
         std::string visName = linkName + "::" + visualElem->GetName();
         if (visMsg.name() == visName)
         {
-          visMsg.mutable_geometry()->CopyFrom(msg.geometry());
-          this->visuals[visMsg.id()] = visMsg;
+          iter.second.mutable_geometry()->CopyFrom(msg.geometry());
           newVis = false;
           break;
         }
