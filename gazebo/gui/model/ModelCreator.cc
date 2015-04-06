@@ -114,6 +114,10 @@ ModelCreator::ModelCreator()
       boost::bind(&ModelCreator::ModelChanged, this)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectOpenLinkInspector(
+      boost::bind(&ModelCreator::OpenInspector, this, _1)));
+
+  this->connections.push_back(
       gui::Events::ConnectAlignMode(
         boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
 
@@ -738,7 +742,6 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
   }
 
   rendering::ScenePtr scene = link->linkVisual->GetScene();
-  scene->AddVisual(link->linkVisual);
 
   this->ModelChanged();
 }
@@ -928,10 +931,10 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allLinks[linkName] = link;
+    gui::model::Events::linkInserted(linkName);
   }
 
   rendering::ScenePtr scene = link->linkVisual->GetScene();
-  scene->AddVisual(link->linkVisual);
 
   this->ModelChanged();
 }
@@ -956,20 +959,26 @@ void ModelCreator::RemoveLink(const std::string &_linkName)
   if (!link)
     return;
 
-  rendering::ScenePtr scene = link->linkVisual->GetScene();
-  for (auto &it : link->visuals)
-  {
-    rendering::VisualPtr vis = it.first;
-    scene->RemoveVisual(vis);
-  }
-  scene->RemoveVisual(link->linkVisual);
-  for (auto &colIt : link->collisions)
-  {
-    rendering::VisualPtr vis = colIt.first;
-    scene->RemoveVisual(vis);
-  }
+  // Copy before reference is deleted.
+  std::string linkName(_linkName);
 
-  scene->RemoveVisual(link->linkVisual);
+  rendering::ScenePtr scene = link->linkVisual->GetScene();
+  if (scene)
+  {
+    for (auto &it : link->visuals)
+    {
+      rendering::VisualPtr vis = it.first;
+      scene->RemoveVisual(vis);
+    }
+    scene->RemoveVisual(link->linkVisual);
+    for (auto &colIt : link->collisions)
+    {
+      rendering::VisualPtr vis = colIt.first;
+      scene->RemoveVisual(vis);
+    }
+
+    scene->RemoveVisual(link->linkVisual);
+  }
 
   link->linkVisual.reset();
   {
@@ -977,6 +986,7 @@ void ModelCreator::RemoveLink(const std::string &_linkName)
     this->allLinks.erase(_linkName);
     delete link;
   }
+  gui::model::Events::linkRemoved(linkName);
 
   this->ModelChanged();
 }
@@ -1027,7 +1037,6 @@ void ModelCreator::Reset()
   this->previewVisual->Load();
   this->modelPose = math::Pose::Zero;
   this->previewVisual->SetPose(this->modelPose);
-  scene->AddVisual(this->previewVisual);
 }
 
 /////////////////////////////////////////////////
@@ -1146,8 +1155,7 @@ void ModelCreator::Stop()
 {
   if (this->addLinkType != LINK_NONE && this->mouseVisual)
   {
-    for (unsigned int i = 0; i < this->mouseVisual->GetChildCount(); ++i)
-        this->RemoveLink(this->mouseVisual->GetName());
+    this->RemoveLink(this->mouseVisual->GetName());
     this->mouseVisual.reset();
     emit LinkAdded();
   }
@@ -1278,6 +1286,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     {
       LinkData *link = this->allLinks[this->mouseVisual->GetName()];
       link->SetPose(this->mouseVisual->GetWorldPose()-this->modelPose);
+      gui::model::Events::linkInserted(this->mouseVisual->GetName());
     }
 
     // reset and return
@@ -1463,6 +1472,11 @@ void ModelCreator::OpenInspector(const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   LinkData *link = this->allLinks[_name];
+  if (!link)
+  {
+    gzerr << "Link [" << _name << "] not found." << std::endl;
+    return;
+  }
   link->SetPose(link->linkVisual->GetWorldPose()-this->modelPose);
   link->UpdateConfig();
   link->inspector->move(QCursor::pos());
