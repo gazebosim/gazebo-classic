@@ -1,5 +1,8 @@
 ## Gazebo 6.0
 
+1. Fix deprecation warnings when using SDFormat 3.0.2, 3.0.3 prereleases
+    * [Pull request #1568](https://bitbucket.org/osrf/gazebo/pull-request/1568)
+
 1. Show/hide GUI overlays using the menu bar.
     * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
 
