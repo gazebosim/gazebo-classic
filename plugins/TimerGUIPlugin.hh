@@ -48,6 +48,8 @@ namespace gazebo
   ///   <start_stop_button>visible</start_stop_button>
   ///   <reset_button>visible</reset_button>
   /// </plugin>
+  ///
+  /// Note that the size has to be large enough to fit all widgets.
   class GAZEBO_VISIBLE TimerGUIPlugin : public GUIPlugin
   {
     Q_OBJECT
