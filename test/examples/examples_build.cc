@@ -34,32 +34,41 @@ boost::filesystem::path createTempBuildFolder(const std::string &_prefix)
 
 ///////////////////////////////////////////////////////////////////
 // Get path to source folder with specified suffix
-boost::filesystem::path getSourcePath(const std::string &_suffix)
+boost::filesystem::path getSourcePath(const std::string &_folder,
+                                      const std::string &_suffix)
 {
   boost::filesystem::path path = CMAKE_SOURCE_DIR;
   path /= std::string("examples");
-  path /= std::string("plugins");
+  path /= _folder;
   path /= _suffix;
   gzdbg << "source " << path.string() << std::endl;
   return path;
 }
 
-class ExamplePlugins : public ::testing::TestWithParam<const char*>
+///////////////////////////////////////////////////////////////////
+class ExamplesBuild : public ::testing::TestWithParam<const char*>
 {
-  /// \brief Build plugin in subfolder _name in a temporary build folder
+  /// \brief Build code in subfolder _type/_name in a temporary build folder
+  /// \param[in] _type Type of example to build (plugins, stand_alone).
   /// \param[in] _name Subfolder to build.
-  public: void Build(const std::string &_name);
+  public: void Build(const std::string &_type, const std::string &_name);
 };
 
+// Fixture for building example plugins
+class ExamplesBuild_Plugins: public ExamplesBuild {};
+
+// Fixture for building example stand_alone applications
+class ExamplesBuild_Standalone: public ExamplesBuild {};
+
 ///////////////////////////////////////////////////////////////////
-// Build plugin in subfolder _name in a temporary build folder
-void ExamplePlugins::Build(const std::string &_name)
+// Build code in subfolder _type/_name in a temporary build folder
+void ExamplesBuild::Build(const std::string &_type, const std::string &_name)
 {
   // get a unique temporary build folder name
   boost::filesystem::path build = createTempBuildFolder(_name);
 
   // construct path of source folder
-  boost::filesystem::path source = getSourcePath(_name);
+  boost::filesystem::path source = getSourcePath(_type, _name);
 
   char cmd[1024];
 
@@ -73,23 +82,42 @@ void ExamplePlugins::Build(const std::string &_name)
   boost::filesystem::remove_all(build);
 }
 
-TEST_P(ExamplePlugins, Build)
+///////////////////////////////////////////////////////////////////
+TEST_P(ExamplesBuild_Plugins, Plugins)
 {
-  Build(GetParam());
+  Build("plugins", GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(ExamplePlugins, ExamplePlugins, ::testing::Values(
+///////////////////////////////////////////////////////////////////
+INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
   "animate_joints"
   , "animate_pose"
   , "factory"
+  , "gui_overlay_plugin_spawn"
+  , "gui_overlay_plugin_time"
   , "hello_world"
   , "model_push"
   , "parameters"
   , "projector"
   , "system_gui_plugin"
   , "world_edit"
-  , "gui_overlay_plugin_spawn"
-  , "gui_overlay_plugin_time"
+));
+
+///////////////////////////////////////////////////////////////////
+TEST_P(ExamplesBuild_Standalone, Standalone)
+{
+  Build("stand_alone", GetParam());
+}
+
+///////////////////////////////////////////////////////////////////
+INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, ::testing::Values(
+  "actuator"
+  , "animated_box"
+  , "arrange"
+  , "clone_simulation"
+  , "custom_main"
+  , "listener"
+  , "publisher"
 ));
 
 int main(int argc, char **argv)
