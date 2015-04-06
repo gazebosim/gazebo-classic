@@ -49,6 +49,9 @@ namespace gazebo
       public: virtual ~LogPlayWidget();
 
       /// \brief Play simulation.
+      public: void SetPaused(bool _paused);
+
+      /// \brief Play simulation.
       public slots: void OnPlay();
 
       /// \brief Pause simulation.
@@ -89,9 +92,6 @@ namespace gazebo
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void TotalTime(int _sec);
-
-      /// \brief Play simulation.
-      private: void SetPaused(bool _paused);
 
       /// \brief Called when a world stats message is received.
       /// \param[in] _msg World statistics message.

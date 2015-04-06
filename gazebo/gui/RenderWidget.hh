@@ -36,7 +36,6 @@ namespace gazebo
   {
     class GLWidget;
     class TimePanel;
-    class LogPlayWidget;
 
     class GAZEBO_VISIBLE RenderWidget : public QWidget
     {
@@ -142,9 +141,6 @@ namespace gazebo
 
       /// \brief Time panel widget.
       private: TimePanel *timePanel;
-
-      /// \brief TODO
-      private: LogPlayWidget *logPlayWidget;
     };
   }
 }

@@ -1944,6 +1944,8 @@ void World::PublishWorldStats()
 
   this->dataPtr->worldStatsMsg.set_iterations(this->dataPtr->iterations);
   this->dataPtr->worldStatsMsg.set_paused(this->IsPaused());
+  this->dataPtr->worldStatsMsg.set_log_playback(
+      util::LogPlay::Instance()->IsOpen());
 
   if (this->dataPtr->statPub && this->dataPtr->statPub->HasConnections())
     this->dataPtr->statPub->Publish(this->dataPtr->worldStatsMsg);
