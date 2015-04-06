@@ -1150,9 +1150,8 @@ void Link::UpdateVisualMsg()
       // update visual msg if it exists
       for (auto &iter : this->visuals)
       {
-        msgs::Visual visMsg = iter.second;
         std::string visName = linkName + "::" + visualElem->GetName();
-        if (visMsg.name() == visName)
+        if (iter.second.name() == visName)
         {
           iter.second.mutable_geometry()->CopyFrom(msg.geometry());
           newVis = false;
