@@ -34,10 +34,9 @@ SchematicViewWidget::SchematicViewWidget(QWidget *_parent)
   this->scene = new GraphScene(this);
   this->view = new GraphView(_parent);
 
-  this->minimumWidth = 1240*2;
-  this->minimumHeight = 1024*2;
-  this->scene->setSceneRect(-this->minimumWidth/2, -this->minimumHeight/2,
-      this->minimumWidth, this->minimumHeight);
+  this->minimumWidth = 500;
+  this->minimumHeight = 500;
+
   QHBoxLayout *canvasLayout = new QHBoxLayout(this);
   canvasLayout->addWidget(view);
   canvasLayout->setAlignment(Qt::AlignHCenter);
@@ -108,6 +107,8 @@ void SchematicViewWidget::AddNode(const std::string &_node)
 
   this->scene->AddNode(node);
   this->scene->applyLayout();
+
+  this->FitInView();
 }
 
 /////////////////////////////////////////////////
@@ -129,6 +130,7 @@ void SchematicViewWidget::RemoveNode(const std::string &_node)
   this->scene->RemoveNode(node);
 
   this->scene->applyLayout();
+  this->FitInView();
 }
 
 /////////////////////////////////////////////////
@@ -146,6 +148,8 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
 
   this->scene->AddEdge(parentNode, childNode);
   this->scene->applyLayout();
+
+  this->FitInView();
 }
 
 /////////////////////////////////////////////////
@@ -162,6 +166,8 @@ void SchematicViewWidget::RemoveEdge(const std::string &_id)
     this->scene->RemoveEdge(parentNode, childNode);
     this->scene->applyLayout();
 
+    this->FitInView();
+
     this->edges.erase(it);
   }
 }
@@ -173,13 +179,24 @@ unsigned int SchematicViewWidget::GetEdgeCount() const
 }
 
 /////////////////////////////////////////////////
-void SchematicViewWidget::resizeEvent(QResizeEvent *_event)
+void SchematicViewWidget::resizeEvent(QResizeEvent */*_event*/)
 {
-  qreal boundingWidth = std::max(this->minimumWidth, _event->size().width());
-  boundingWidth = std::max(boundingWidth, this->scene->sceneRect().width());
-  qreal boundingHeight = std::max(this->minimumHeight,
-      _event->size().height());
-  boundingHeight = std::max(boundingHeight, this->scene->sceneRect().height());
-  this->scene->setSceneRect(-boundingWidth/2, -boundingHeight/2,
-      boundingWidth, boundingHeight);
+  this->FitInView();
+}
+
+/////////////////////////////////////////////////
+void SchematicViewWidget::FitInView()
+{
+  QRectF newRect;
+  QRectF sceneRect = this->scene->itemsBoundingRect();
+  newRect.setWidth(std::max(static_cast<int>(sceneRect.width()),
+      this->minimumWidth));
+  newRect.setHeight(std::max(static_cast<int>(sceneRect.height()),
+      this->minimumHeight));
+  newRect.setX(sceneRect.x());
+  newRect.setY(sceneRect.y());
+
+  this->view->fitInView(newRect, Qt::KeepAspectRatio);
+  this->view->centerOn(newRect.x() + newRect.width()*0.5,
+      newRect.y() + newRect.height()*0.5);
 }

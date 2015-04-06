@@ -27,7 +27,7 @@ License along with this library.
 QGVNode::QGVNode(QGVNodePrivate *node, QGVScene *qgvscene): _scene(qgvscene),
     _node(node)
 {
-  this->setFlag(QGraphicsItem::ItemIsSelectable, true);
+//  this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 //  this->setFlag(QGraphicsItem::ItemIsMovable, true);
 }
 
@@ -72,7 +72,7 @@ void QGVNode::paint(QPainter * painter,
 
     painter->setPen(QGVCore::toColor(getAttribute("labelfontcolor")));
 
-    const QRectF rect = boundingRect().adjusted(2,2,-2,-2); //Margin
+    const QRectF rect = boundingRect();
     if (_icon.isNull())
     {
         painter->drawText(rect, Qt::AlignCenter , QGVNode::label());

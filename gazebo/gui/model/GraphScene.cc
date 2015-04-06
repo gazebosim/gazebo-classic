@@ -31,10 +31,11 @@ GraphScene::GraphScene(QWidget *_parent)
   this->setGraphAttribute("splines", "ortho");
   this->setGraphAttribute("rankdir", "LR");
   this->setGraphAttribute("nodesep", "0.4");
+  this->setNodeAttribute("margin", "0.3");
   this->setNodeAttribute("shape", "box");
   this->setNodeAttribute("style", "filled");
   this->setNodeAttribute("fillcolor", "white");
-  this->setNodeAttribute("height", "1.2");
+  this->setNodeAttribute("height", "1.0");
   this->setEdgeAttribute("minlen", "3");
 }
 
