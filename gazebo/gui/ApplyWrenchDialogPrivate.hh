@@ -138,6 +138,9 @@ namespace gazebo
 
       /// \brief Mutex to protect variables.
       public: std::mutex mutex;
+
+      /// \brief Mutex to protect response callback.
+      public: std::mutex responseMutex;
     };
   }
 }

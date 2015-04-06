@@ -376,12 +376,16 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   this->setLayout(mainLayout);
 
+  // Transport
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
 
+  // Request/response to get link's CoM
+  this->dataPtr->requestPub = this->dataPtr->node->Advertise<msgs::Request>(
+      "~/request");
+  this->dataPtr->responseSub = this->dataPtr->node->Subscribe(
+      "~/response", &ApplyWrenchDialog::OnResponse, this);
   this->dataPtr->requestMsg = NULL;
-  this->dataPtr->requestPub.reset();
-  this->dataPtr->responseSub.reset();
 
   this->dataPtr->mode = "none";
   this->dataPtr->comVector = math::Vector3::Zero;
@@ -512,7 +516,8 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
 /////////////////////////////////////////////////
 bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
 {
-  if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene())
+  if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene() ||
+      !this->dataPtr->requestPub)
     return false;
 
   // Select on combo box
@@ -536,13 +541,6 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   this->dataPtr->linksComboBox->setCurrentIndex(index);
 
   // Request link message to get CoM
-  this->dataPtr->requestPub.reset();
-  this->dataPtr->responseSub.reset();
-  this->dataPtr->requestPub = this->dataPtr->node->Advertise<msgs::Request>(
-      "~/request");
-  this->dataPtr->responseSub = this->dataPtr->node->Subscribe(
-      "~/response", &ApplyWrenchDialog::OnResponse, this);
-
   this->dataPtr->requestMsg = msgs::CreateRequest("entity_info", _linkName);
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
 
@@ -560,7 +558,7 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   this->dataPtr->linkVisual = vis;
   this->AttachVisuals();
 
-  // Main window
+  // Filter main window activate events
   this->dataPtr->mainWindow->installEventFilter(this);
 
   // MouseRelease even when it's inactive, to regain focus
@@ -591,6 +589,8 @@ void ApplyWrenchDialog::SetLink(const QString _linkName)
 ///////////////////////////////////////////////////
 void ApplyWrenchDialog::OnResponse(ConstResponsePtr &_msg)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->responseMutex);
+
   if (!this->dataPtr->requestMsg ||
       _msg->id() != this->dataPtr->requestMsg->id())
   {
