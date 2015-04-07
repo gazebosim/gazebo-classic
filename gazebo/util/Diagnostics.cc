@@ -14,14 +14,12 @@
  * limitations under the License.
  *
  */
-/* Desc: A diagnostic class
- * Author: Nate Koenig
- * Date: 2 Feb 2011
- */
 
+#include <iomanip>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/SystemPaths.hh"
+#include "gazebo/math/SignalStats.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/util/Diagnostics.hh"
 
@@ -237,6 +235,22 @@ DiagnosticTimer::DiagnosticTimer(const std::string &_name) : Timer()
 DiagnosticTimer::~DiagnosticTimer()
 {
   this->Stop();
+  for (auto const &measurement: this->stats)
+  {
+    std::ostringstream scopedName;
+    if (measurement.first != this->name)
+      scopedName << this->name << "::";
+    scopedName << measurement.first;
+
+    this->log << std::setw(50) << std::left << scopedName.str();
+    for (auto const &stat: measurement.second.Map())
+    {
+      this->log << std::setw(7) << stat.first
+                << std::setw(15) << std::scientific << stat.second;
+    }
+    this->log << std::endl;
+  }
+  this->log.flush();
   this->log.close();
 }
 
@@ -267,11 +281,8 @@ void DiagnosticTimer::Stop()
     common::Time currTime = common::Time::GetWallTime();
     this->cumulativeTime += elapsed;
 
-    // Write out the total elapsed time.
-    this->log << this->name << " " << currTime << " "
-        << elapsed.Double() << " " << this->cumulativeTime.Double()
-        << std::endl;
-    this->log.flush();
+    // Record the total elapsed time.
+    this->InsertData(this->name, elapsed.Double());
 
     DiagnosticManager::Instance()->AddTime(this->name, currTime, elapsed);
 
@@ -289,9 +300,8 @@ void DiagnosticTimer::Lap(const std::string &_prefix)
   common::Time delta = elapsed - this->prevLap;
   common::Time currTime = common::Time::GetWallTime();
 
-  // Write out the delta time.
-  this->log << this->name << ":" << _prefix << " " <<
-    currTime << " " << delta.Double() << std::endl;
+  // Record the delta time.
+  this->InsertData(_prefix, elapsed.Double());
 
   DiagnosticManager::Instance()->AddTime(this->name + ":" + _prefix,
       currTime, delta);
@@ -299,3 +309,18 @@ void DiagnosticTimer::Lap(const std::string &_prefix)
   // Store the previous lap time.
   this->prevLap = elapsed;
 }
+
+//////////////////////////////////////////////////
+void DiagnosticTimer::InsertData(const std::string &_name,
+                                 const common::Time &_time)
+{
+  auto iter = this->stats.find(_name);
+  if (iter == this->stats.end())
+  {
+    this->stats[_name] = math::SignalStats();
+    iter = this->stats.find(_name);
+    iter->second.InsertStatistics("mean,maxAbs");
+  }
+  iter->second.InsertData(_time.Double());
+}
+
