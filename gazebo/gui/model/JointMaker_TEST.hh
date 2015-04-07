@@ -34,6 +34,9 @@ class JointMaker_TEST : public QTestFixture
   /// \brief Test values of joint default properties.
   private slots: void JointDefaultProperties();
   
+  /// \brief Tests selecting joints in the model editor
+  private slots: void Selection();
+  
   /// \brief Test toggling joint visualization.
   private slots: void ShowJoints();
 

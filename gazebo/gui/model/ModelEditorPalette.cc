@@ -200,7 +200,14 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   connect(this->modelTreeWidget,
       SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
-      this, SLOT(OnItemDoubleClick(QTreeWidgetItem *, int)));
+      this, SLOT(OnItemDoubleClicked(QTreeWidgetItem *, int)));
+
+  connect(this->modelTreeWidget, SIGNAL(itemSelectionChanged()),
+      this, SLOT(OnItemSelectionChanged()));
+
+  connect(this->modelTreeWidget,
+      SIGNAL(customContextMenuRequested(const QPoint &)),
+      this, SLOT(OnCustomContextMenu(const QPoint &)));
 
   // Model layout
   QVBoxLayout *modelLayout = new QVBoxLayout();
@@ -268,6 +275,18 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->connections.push_back(
       gui::model::Events::ConnectJointNameChanged(
       boost::bind(&ModelEditorPalette::OnJointNameChanged, this, _1, _2)));
+
+  this->connections.push_back(
+     event::Events::ConnectSetSelectedEntity(
+       boost::bind(&ModelEditorPalette::OnSetSelectedEntity, this, _1, _2)));
+
+  this->connections.push_back(
+     gui::model::Events::ConnectSetSelectedLink(
+       boost::bind(&ModelEditorPalette::OnSetSelectedLink, this, _1, _2)));
+
+  this->connections.push_back(
+     gui::model::Events::ConnectSetSelectedJoint(
+       boost::bind(&ModelEditorPalette::OnSetSelectedJoint, this, _1, _2)));
 
   this->updateMutex = new boost::recursive_mutex();
 }
@@ -436,6 +455,66 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
+void ModelEditorPalette::OnItemSelectionChanged()
+{
+  QList<QTreeWidgetItem *> items = this->modelTreeWidget->selectedItems();
+
+  // update and signal new selection
+  for (int i = 0; i < items.size(); ++i)
+  {
+    QTreeWidgetItem *item = items[i];
+    int idx = this->selected.indexOf(item);
+    if (idx >= 0)
+    {
+      this->selected.removeAt(idx);
+      continue;
+    }
+    std::string name = item->data(0, Qt::UserRole).toString().toStdString();
+    std::string type = item->data(1, Qt::UserRole).toString().toStdString();
+
+    if (type == "Link")
+    {
+      gui::model::Events::setSelectedLink(name, true);
+    }
+    else if (type == "Joint")
+    {
+      gui::model::Events::setSelectedJoint(name, true);
+    }
+  }
+
+  // deselect
+  for (int i = 0; i < this->selected.size(); ++i)
+  {
+    QTreeWidgetItem *item = this->selected[i];
+    if (item)
+    {
+      std::string name = item->data(0, Qt::UserRole).toString().toStdString();
+      std::string type = item->data(1, Qt::UserRole).toString().toStdString();
+
+      if (type == "Link")
+        gui::model::Events::setSelectedLink(name, false);
+      else if (type == "Joint")
+        gui::model::Events::setSelectedJoint(name, false);
+    }
+  }
+
+  this->selected = items;
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnSetSelectedEntity(const std::string &/*_name*/,
+    const std::string &/*_mode*/)
+{
+  // deselect all
+  for (int i = 0; i < this->selected.size(); ++i)
+  {
+    QTreeWidgetItem *item = this->selected[i];
+    if (item)
+      item->setSelected(false);
+  }
+}
+
+/////////////////////////////////////////////////
 ModelCreator *ModelEditorPalette::GetModelCreator()
 {
   return this->modelCreator;
@@ -461,9 +540,8 @@ void ModelEditorPalette::OnSaveModel(const std::string &_saveName)
   this->modelNameEdit->setText(tr(_saveName.c_str()));
 }
 
-
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnItemDoubleClick(QTreeWidgetItem *_item,
+void ModelEditorPalette::OnItemDoubleClicked(QTreeWidgetItem *_item,
     int /*_column*/)
 {
   if (_item)
@@ -475,6 +553,23 @@ void ModelEditorPalette::OnItemDoubleClick(QTreeWidgetItem *_item,
       gui::model::Events::openLinkInspector(name);
     else if (type == "Joint")
       gui::model::Events::openJointInspector(name);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnCustomContextMenu(const QPoint &_pt)
+{
+  QTreeWidgetItem *item = this->modelTreeWidget->itemAt(_pt);
+
+  if (item)
+  {
+    std::string name = item->data(0, Qt::UserRole).toString().toStdString();
+    std::string type = item->data(1, Qt::UserRole).toString().toStdString();
+
+    if (type == "Link")
+      gui::model::Events::showLinkContextMenu(name);
+    else if (type == "Joint")
+      gui::model::Events::showJointContextMenu(name);
   }
 }
 
@@ -511,6 +606,7 @@ void ModelEditorPalette::OnJointInserted(const std::string &_jointId,
 
   newJointItem->setData(0, Qt::UserRole, _jointId.c_str());
   newJointItem->setData(1, Qt::UserRole, "Joint");
+  newJointItem->setData(2, Qt::UserRole, _jointName.c_str());
   this->modelTreeWidget->addTopLevelItem(newJointItem);
 
   this->jointsItem->setExpanded(true);
@@ -579,6 +675,46 @@ void ModelEditorPalette::OnJointNameChanged(const std::string &_jointId,
     if (listData == _jointId)
     {
       item->setText(0, QString::fromStdString(_newJointName));
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnSetSelectedLink(const std::string &_name,
+    bool _selected)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  for (int i = 0; i < this->linksItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->linksItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _name)
+    {
+      item->setSelected(_selected);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnSetSelectedJoint(const std::string &_name,
+    bool _selected)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  for (int i = 0; i < this->jointsItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->jointsItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _name)
+    {
+      item->setSelected(_selected);
       break;
     }
   }
