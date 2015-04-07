@@ -196,14 +196,14 @@ namespace gazebo
           const sdf::ElementPtr _sdf);
 
       /// \brief Generate an SDF element from an Preset object.
-      /// \param[out] _sdf The SDF physics element for the profile.
-      /// \param[in] _preset The preset profile element.
+      /// \param[out] _elem The SDF physics element for the profile.
+      /// \param[in] _name The name of the profile to copy.
       public: void GenerateSDFFromPreset(sdf::ElementPtr &_elem,
           const std::string &_name) const;
 
       /// \brief Recursive helper for traversing SDF elements.
       /// \param[out] _sdf The SDF physics element for the profile.
-      /// \param[in] _name The name of the profile to copy.
+      /// \param[in] _preset The preset profile element.
       private: void GenerateSDFHelper(sdf::ElementPtr &_elem,
           const Preset &_preset) const;
 

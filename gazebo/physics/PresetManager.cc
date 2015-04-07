@@ -439,6 +439,12 @@ void PresetManager::ProfileSDF(const std::string &_name,
 {
   if (_name.empty() || !this->HasProfile(_name))
     return;
+  if (!_sdf)
+  {
+    gzwarn << "Received NULL SDF element pointer in ProfileSDF" << std::endl;
+    return;
+  }
+
   this->dataPtr->presetProfiles[_name].SDF(_sdf);
 
   this->GeneratePresetFromSDF(&this->dataPtr->presetProfiles[_name], _sdf);
@@ -463,6 +469,7 @@ void PresetManager::GeneratePresetFromSDF(Preset *_preset,
   }
   if (!_elem)
   {
+    // End condition of recursion
     return;
   }
 
@@ -505,7 +512,7 @@ void PresetManager::GenerateSDFFromPreset(sdf::ElementPtr &_elem,
   GZ_ASSERT(_elem, "Null SDF pointer in preset");
 
   GenerateSDFHelper(_elem, this->dataPtr->presetProfiles[_name]);
-  GZ_ASSERT(_elem, "Null SDF pointer in preset");
+  GZ_ASSERT(_elem, "Generated NULL SDF pointer");
 }
 
 //////////////////////////////////////////////////
@@ -514,6 +521,7 @@ void PresetManager::GenerateSDFHelper(sdf::ElementPtr &_elem,
 {
   if (!_elem)
   {
+    // End condition of recursion
     return;
   }
 
