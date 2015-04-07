@@ -125,6 +125,9 @@ namespace gazebo
       /// \brief Action to exit the editor.
       private: QAction *exitAct;
 
+      /// \brief Action to show joints.
+      private: QAction *showJointsAct;
+
       /// \brief Save the main window paused state to use when returning.
       private: bool mainWindowPaused;
     };
