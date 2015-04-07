@@ -344,7 +344,7 @@ namespace gazebo
       private: void OnEntityScaleChanged(const std::string &_name,
           const math::Vector3 &_scale);
 
-      /// \brief Deselect all currently selected joint visuals.
+      /// \brief Deselect all currently selected link visuals.
       private: void DeselectAll();
 
       /// \brief Set visibilty of a visual recursively while storing their
