@@ -98,7 +98,7 @@ void ModelPropShop::Load(int _argc, char **_argv)
     return;
   }
 
-  sdf::ElementPtr modelElem = this->sdf->root->GetElement("model");
+  sdf::ElementPtr modelElem = this->sdf->Root()->GetElement("model");
   this->modelName = modelElem->Get<std::string>("name");
 }
 
