@@ -1,5 +1,8 @@
 ## Gazebo 6.0
 
+1. Added start/stop simulation times to the header of the log files.
+    * [Pull request #1577](https://bitbucket.org/osrf/gazebo/pull-request/1577)
+
 1. Use GAZEBO_CFLAGS or GAZEBO_CXX_FLAGS in CMakeLists.txt for example plugins
     * [Pull request #1573](https://bitbucket.org/osrf/gazebo/pull-request/1573)
 
