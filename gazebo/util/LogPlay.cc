@@ -26,6 +26,7 @@
 #include <boost/archive/iterators/remove_whitespace.hpp>
 #include <boost/archive/iterators/istream_iterator.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/math/Rand.hh"
 
@@ -54,7 +55,10 @@ void LogPlay::Open(const std::string &_logFile)
 {
   boost::filesystem::path path(_logFile);
   if (!boost::filesystem::exists(path))
-    gzthrow("Invalid logfile[" + _logFile + "]. Does not exist.");
+    gzthrow("Invalid logfile [" + _logFile + "]. Does not exist.");
+
+  if (boost::filesystem::is_directory(path))
+    gzthrow("Invalid logfile [" + _logFile + "]. This is a directory.");
 
   // Parse the log file
   if (!this->xmlDoc.LoadFile(_logFile))
@@ -232,6 +236,19 @@ common::Time LogPlay::GetLogStartTime() const
 common::Time LogPlay::GetLogEndTime() const
 {
   return this->logEndTime;
+}
+
+/////////////////////////////////////////////////
+std::string LogPlay::GetFilename() const
+{
+  return boost::filesystem::basename(this->filename) +
+    boost::filesystem::extension(this->filename);
+}
+
+/////////////////////////////////////////////////
+uintmax_t LogPlay::GetFileSize() const
+{
+  return boost::filesystem::file_size(this->filename);
 }
 
 /////////////////////////////////////////////////
