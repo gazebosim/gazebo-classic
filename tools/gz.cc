@@ -531,7 +531,7 @@ bool ModelCommand::RunImpl()
 bool ModelCommand::ProcessSpawn(boost::shared_ptr<sdf::SDF> _sdf,
     const std::string &_name, const math::Pose &_pose, transport::NodePtr _node)
 {
-  sdf::ElementPtr modelElem = _sdf->root->GetElement("model");
+  sdf::ElementPtr modelElem = _sdf->Root()->GetElement("model");
 
   if (!modelElem)
   {
@@ -929,7 +929,7 @@ bool SDFCommand::TransportRequired()
 /////////////////////////////////////////////////
 bool SDFCommand::RunImpl()
 {
-  sdf::SDF::version = SDF_VERSION;
+  sdf::SDF::Version(SDF_VERSION);
 
   try
   {
@@ -948,8 +948,8 @@ bool SDFCommand::RunImpl()
   {
     try
     {
-      sdf::SDF::version = boost::lexical_cast<std::string>(
-          this->vm["version"].as<std::string>());
+      sdf::SDF::Version(boost::lexical_cast<std::string>(
+          this->vm["version"].as<std::string>()));
     }
     catch(...)
     {
@@ -998,7 +998,7 @@ bool SDFCommand::RunImpl()
     TiXmlDocument xmlDoc;
     if (xmlDoc.LoadFile(path.string()))
     {
-      if (sdf::Converter::Convert(&xmlDoc, sdf::SDF::version, true))
+      if (sdf::Converter::Convert(&xmlDoc, sdf::SDF::Version(), true))
       {
         // Create an XML printer to control formatting
         TiXmlPrinter printer;
