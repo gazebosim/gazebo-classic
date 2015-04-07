@@ -26,16 +26,6 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(HydraDemoPlugin)
 
 /////////////////////////////////////////////////
-HydraDemoPlugin::HydraDemoPlugin()
-{
-}
-
-/////////////////////////////////////////////////
-HydraDemoPlugin::~HydraDemoPlugin()
-{
-}
-
-/////////////////////////////////////////////////
 void HydraDemoPlugin::OnHydra(ConstHydraPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->msgMutex);
@@ -43,16 +33,24 @@ void HydraDemoPlugin::OnHydra(ConstHydraPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void HydraDemoPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
+void HydraDemoPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get the world name.
   this->model = _parent;
   this->world = this->model->GetWorld();
 
+  if (!_sdf->HasElement("topic"))
+  {
+    gzerr << "HydraDemoPlugin missing <topic> element\n";
+    return;
+  }
+
+  std::string topic = _sdf->Get<std::string>("topic");
+
   // Subscribe to Hydra updates by registering OnHydra() callback.
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->world->GetName());
-  this->hydraSub = this->node->Subscribe("~/hydra",
+  this->hydraSub = this->node->Subscribe("~/" + topic,
       &HydraDemoPlugin::OnHydra, this);
 
   // Listen to the update event. This event is broadcast every

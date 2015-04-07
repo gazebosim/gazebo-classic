@@ -21,6 +21,9 @@
 #include <linux/input.h>
 #include <linux/types.h>
 #include <cstring>
+#include <mutex>
+#include <string>
+#include <thread>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/HydraPlugin.hh"
@@ -61,12 +64,13 @@ GZ_REGISTER_WORLD_PLUGIN(RazerHydra)
 #define HYDRA_LEFT_JOY 6
 
 /////////////////////////////////////////////////
-RazerHydra::RazerHydra()
-: hidrawFd(0), lastCycleStart(common::Time::GetWallTime())
+HydraController::HydraController(const int _fd, const std::string &_worldName,
+  const std::string &_topic)
+  : lastCycleStart(common::Time::GetWallTime()),
+    fd(_fd),
+    worldName(_worldName),
+    topic(_topic)
 {
-  this->stop = false;
-  this->pollThread = NULL;
-
   for (auto &v: this->analog)
     v = 0;
 
@@ -89,62 +93,17 @@ RazerHydra::RazerHydra()
   this->periodEstimate.SetFc(0.11, 1.0);
 
   this->periodEstimate.SetValue(0.004);
-}
 
-/////////////////////////////////////////////////
-RazerHydra::~RazerHydra()
-{
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
-
-  this->stop = true;
-  this->pollThread->join();
-}
-
-/////////////////////////////////////////////////
-void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
-{
-  int res;
   uint8_t buf[256];
   struct hidraw_report_descriptor rptDesc;
   struct hidraw_devinfo info;
-
-  // Find the Razer device.
-  std::string device;
-  for (int i = 0; i < 6 && device.empty(); ++i)
-  {
-    std::ostringstream stream;
-    stream << "/sys/class/hidraw/hidraw" << i << "/device/uevent";
-    std::ifstream fileIn(stream.str().c_str());
-    if (fileIn.is_open())
-    {
-      std::string line;
-      while (std::getline(fileIn, line) && device.empty())
-      {
-        if (line.find("HID_NAME=Razer Razer Hydra") != std::string::npos)
-          device = "/dev/hidraw" + boost::lexical_cast<std::string>(i);
-      }
-    }
-  }
-
-  if (device.empty())
-  {
-    gzerr << "Unable to find Razer device\n";
-    return;
-  }
-
-  this->hidrawFd = open(device.c_str(), O_RDWR | O_NONBLOCK);
-  if (this->hidrawFd < 0)
-  {
-    gzerr << "couldn't open hidraw device[" << device << "]\n";
-    return;
-  }
 
   memset(&rptDesc, 0x0, sizeof(rptDesc));
   memset(&info, 0x0, sizeof(info));
   memset(buf, 0x0, sizeof(buf));
 
   // Get Raw Name
-  res = ioctl(this->hidrawFd, HIDIOCGRAWNAME(256), buf);
+  int res = ioctl(this->fd, HIDIOCGRAWNAME(256), buf);
   if (res < 0)
     gzerr << "Hydro ioctl error HIDIOCGRAWNAME: " << strerror(errno) << "\n";
 
@@ -155,10 +114,10 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
   buf[9] = 3;
   buf[89] = 6;
 
-  int attempt = 0;
+  int attempt;
   for (attempt = 0; attempt < 50; ++attempt)
   {
-    res = ioctl(this->hidrawFd, HIDIOCSFEATURE(91), buf);
+    res = ioctl(this->fd, HIDIOCSFEATURE(91), buf);
     if (res < 0)
     {
       gzerr << "Unable to start streaming. HIDIOCSFEATURE: "
@@ -171,26 +130,159 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
     }
   }
 
-  if (attempt >= 60)
+  if (attempt >= 50)
   {
     gzerr << "Failed to load hydra\n";
     return;
   }
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&RazerHydra::Update, this, _1));
-
-  this->pollThread = new boost::thread(boost::bind(&RazerHydra::Run, this));
-
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(_world->GetName());
-  this->pub = this->node->Advertise<msgs::Hydra>("~/hydra");
+  this->node->Init(this->worldName);
+  this->pub = this->node->Advertise<msgs::Hydra>(this->topic);
 }
 
 /////////////////////////////////////////////////
-void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
+HydraController::~HydraController()
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  if (this->fd >= 0)
+  {
+    uint8_t buf[256];
+    memset(buf, 0, sizeof(buf));
+    buf[6] = 1;
+    buf[8] = 4;
+    buf[89] = 5;
+
+    if (ioctl(this->fd, HIDIOCSFEATURE(91), buf) < 0)
+    {
+      gzerr << "Unable to stop streaming. HIDIOCSFEATURE: "
+            << strerror(errno) << "\n";
+    }
+
+    close(this->fd);
+  }
+}
+
+/////////////////////////////////////////////////
+bool HydraController::Poll(float _lowPassCornerHz)
+{
+  if (this->fd < 0)
+  {
+    gzerr << "hidraw device is not open, couldn't poll.\n";
+    return false;
+  }
+
+  if (_lowPassCornerHz <= std::numeric_limits<float>::epsilon())
+  {
+    gzerr << "Corner frequency for low-pass filter must be greater than 0."
+      << "Using a default value of 2.5Hz.\n";
+    // Set a default value if the value is incorrect.
+    _lowPassCornerHz = 2.5;
+  }
+
+  uint8_t buf[64];
+  ssize_t nread = read(this->fd, buf, sizeof(buf));
+
+  // No updates.
+  if (nread <= 0)
+    return false;
+
+
+  static bool firstTime = true;
+
+  // Update average read period
+  if (!firstTime)
+  {
+    this->periodEstimate.Process(
+      (common::Time::GetWallTime() - this->lastCycleStart).Double());
+  }
+
+  this->lastCycleStart = common::Time::GetWallTime();
+
+  if (firstTime)
+    firstTime = false;
+
+  // Update filter frequencies
+  float fs = 1.0 / this->periodEstimate.GetValue();
+  float fc = _lowPassCornerHz;
+
+  for (int i = 0; i < 2; ++i)
+  {
+    this->filterPos[i].SetFc(fc, fs);
+    this->filterQuat[i].SetFc(fc, fs);
+  }
+
+  // Read data
+  this->rawPos[0] = *(reinterpret_cast<int16_t *>(buf+8));
+  this->rawPos[1] = *(reinterpret_cast<int16_t *>(buf+10));
+  this->rawPos[2] = *(reinterpret_cast<int16_t *>(buf+12));
+  this->rawQuat[0] = *(reinterpret_cast<int16_t *>(buf+14));
+  this->rawQuat[1] = *(reinterpret_cast<int16_t *>(buf+16));
+  this->rawQuat[2] = *(reinterpret_cast<int16_t *>(buf+18));
+  this->rawQuat[3] = *(reinterpret_cast<int16_t *>(buf+20));
+  this->rawButtons[0] = buf[22] & 0x7f;
+  this->rawAnalog[0] = *(reinterpret_cast<int16_t *>(buf+23));
+  this->rawAnalog[1] = *(reinterpret_cast<int16_t *>(buf+25));
+  this->rawAnalog[2] = buf[27];
+
+  this->rawPos[3] = *(reinterpret_cast<int16_t *>(buf+30));
+  this->rawPos[4] = *(reinterpret_cast<int16_t *>(buf+32));
+  this->rawPos[5] = *(reinterpret_cast<int16_t *>(buf+34));
+  this->rawQuat[4] = *(reinterpret_cast<int16_t *>(buf+36));
+  this->rawQuat[5] = *(reinterpret_cast<int16_t *>(buf+38));
+  this->rawQuat[6] = *(reinterpret_cast<int16_t *>(buf+40));
+  this->rawQuat[7] = *(reinterpret_cast<int16_t *>(buf+42));
+  this->rawButtons[1] = buf[44] & 0x7f;
+  this->rawAnalog[3] = *(reinterpret_cast<int16_t *>(buf+45));
+  this->rawAnalog[4] = *(reinterpret_cast<int16_t *>(buf+47));
+  this->rawAnalog[5] = buf[49];
+
+  std::lock_guard<std::mutex> lock(this->mutex);
+  // Put the raw position and orientation into Gazebo coordinate frame
+  for (int i = 0; i < 2; ++i)
+  {
+    this->pos[i].x = -this->rawPos[3*i+1] * 0.001;
+    this->pos[i].y = -this->rawPos[3*i+0] * 0.001;
+    this->pos[i].z = -this->rawPos[3*i+2] * 0.001;
+
+    this->quat[i].w = this->rawQuat[i*4+0] / 32768.0;
+    this->quat[i].x = -this->rawQuat[i*4+2] / 32768.0;
+    this->quat[i].y = -this->rawQuat[i*4+1] / 32768.0;
+    this->quat[i].z = -this->rawQuat[i*4+3] / 32768.0;
+  }
+
+  // Apply filters
+  for (int i = 0; i < 2; ++i)
+  {
+    this->quat[i] = this->filterQuat[i].Process(this->quat[i]);
+    this->pos[i] = this->filterPos[i].Process(this->pos[i]);
+  }
+
+  this->analog[0] = this->rawAnalog[0] / 32768.0;
+  this->analog[1] = this->rawAnalog[1] / 32768.0;
+  this->analog[2] = this->rawAnalog[2] / 255.0;
+  this->analog[3] = this->rawAnalog[3] / 32768.0;
+  this->analog[4] = this->rawAnalog[4] / 32768.0;
+  this->analog[5] = this->rawAnalog[5] / 255.0;
+
+  for (int i = 0; i < 2; ++i)
+  {
+    this->buttons[i*7  ] = (this->rawButtons[i] & 0x01) ? 1 : 0;
+    this->buttons[i*7+1] = (this->rawButtons[i] & 0x04) ? 1 : 0;
+    this->buttons[i*7+2] = (this->rawButtons[i] & 0x08) ? 1 : 0;
+    this->buttons[i*7+3] = (this->rawButtons[i] & 0x02) ? 1 : 0;
+    this->buttons[i*7+4] = (this->rawButtons[i] & 0x10) ? 1 : 0;
+    this->buttons[i*7+5] = (this->rawButtons[i] & 0x20) ? 1 : 0;
+    this->buttons[i*7+6] = (this->rawButtons[i] & 0x40) ? 1 : 0;
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+void HydraController::Publish()
+{
+  std::lock_guard<std::mutex> lock(this->mutex);
+
   math::Pose origRight(this->pos[1], this->quat[1]);
 
   math::Pose pivotRight = origRight;
@@ -249,146 +341,96 @@ void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
 }
 
 /////////////////////////////////////////////////
-void RazerHydra::Run()
+RazerHydra::RazerHydra()
+  : pollThread(nullptr),
+    stop(false)
 {
-  double cornerHz = 2.5;
-
-  while (!this->stop)
-  {
-    if (!this->Poll(cornerHz))
-      common::Time::NSleep(250000);
-  }
-
-  if (this->hidrawFd >= 0)
-  {
-    uint8_t buf[256];
-    memset(buf, 0, sizeof(buf));
-    buf[6] = 1;
-    buf[8] = 4;
-    buf[89] = 5;
-
-    if (ioctl(this->hidrawFd, HIDIOCSFEATURE(91), buf) < 0)
-    {
-      gzerr << "Unable to stop streaming. HIDIOCSFEATURE: "
-            << strerror(errno) << "\n";
-    }
-
-    close(this->hidrawFd);
-  }
 }
 
 /////////////////////////////////////////////////
-bool RazerHydra::Poll(float _lowPassCornerHz)
+RazerHydra::~RazerHydra()
 {
-  if (this->hidrawFd < 0)
+  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+
   {
-    gzerr << "hidraw device is not open, couldn't poll.\n";
-    return false;
+    std::lock_guard<std::mutex> lock(this->exitMutex);
+    this->stop = true;
   }
 
-  if (_lowPassCornerHz <= std::numeric_limits<float>::epsilon())
+  if (this->pollThread->joinable())
+    this->pollThread->join();
+}
+
+/////////////////////////////////////////////////
+void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
+{
+  // Find the Razer devices.
+  int counter = 0;
+  for (int i = 0; i < 8; ++i)
   {
-    gzerr << "Corner frequency for low-pass filter must be greater than 0."
-      << "Using a default value of 2.5Hz.\n";
-    // Set a default value if the value is incorrect.
-    _lowPassCornerHz = 2.5;
+    std::ostringstream stream;
+    stream << "/sys/class/hidraw/hidraw" << i << "/device/uevent";
+    std::ifstream fileIn(stream.str().c_str());
+    if (fileIn.is_open())
+    {
+      std::string data = std::string((std::istreambuf_iterator<char>(fileIn)),
+        std::istreambuf_iterator<char>());
+      if ((data.find("HID_NAME=Razer Razer Hydra") != std::string::npos) &&
+          (data.find("/input0") != std::string::npos))
+      {
+        std::string device = "/dev/hidraw" + std::to_string(i);
+
+        int fd = open(device.c_str(), O_RDWR | O_NONBLOCK);
+        if (fd < 0)
+        {
+          gzerr << "couldn't open hidraw device [" << device << "]\n";
+          continue;
+        }
+
+        this->controllers.push_back(std::unique_ptr<HydraController>(
+          new HydraController(fd, _world->GetName(),
+            "~/hydra" + std::to_string(counter++))));
+      }
+    }
   }
 
-  uint8_t buf[64];
-  ssize_t nread = read(this->hidrawFd, buf, sizeof(buf));
-
-  // No updates.
-  if (nread <= 0)
-    return false;
-
-
-  static bool firstTime = true;
-
-  // Update average read period
-  if (!firstTime)
+  if (this->controllers.empty())
   {
-    this->periodEstimate.Process(
-      (common::Time::GetWallTime() - this->lastCycleStart).Double());
+    gzerr << "Unable to find Razer devices\n";
+    return;
   }
 
-  this->lastCycleStart = common::Time::GetWallTime();
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&RazerHydra::Update, this, _1));
 
-  if (firstTime)
-    firstTime = false;
+  this->pollThread = new std::thread(&RazerHydra::Run, this);
+}
 
-  // Update filter frequencies
-  float fs = 1.0 / this->periodEstimate.GetValue();
-  float fc = _lowPassCornerHz;
+/////////////////////////////////////////////////
+void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
+{
+  for (auto &controller : this->controllers)
+    controller->Publish();
+}
 
-  for (int i = 0; i < 2; ++i)
+/////////////////////////////////////////////////
+void RazerHydra::Run()
+{
+  float cornerHz = 2.5f;
+
+  while (true)
   {
-    this->filterPos[i].SetFc(fc, fs);
-    this->filterQuat[i].SetFc(fc, fs);
+    for (auto &controller : this->controllers)
+    {
+      if (!controller->Poll(cornerHz))
+        common::Time::NSleep(250000);
+    }
+
+    // Check if it's time to exit.
+    {
+      std::lock_guard<std::mutex> lock(this->exitMutex);
+      if (this->stop)
+        break;
+    }
   }
-
-  // Read data
-  this->rawPos[0] = *(reinterpret_cast<int16_t *>(buf+8));
-  this->rawPos[1] = *(reinterpret_cast<int16_t *>(buf+10));
-  this->rawPos[2] = *(reinterpret_cast<int16_t *>(buf+12));
-  this->rawQuat[0] = *(reinterpret_cast<int16_t *>(buf+14));
-  this->rawQuat[1] = *(reinterpret_cast<int16_t *>(buf+16));
-  this->rawQuat[2] = *(reinterpret_cast<int16_t *>(buf+18));
-  this->rawQuat[3] = *(reinterpret_cast<int16_t *>(buf+20));
-  this->rawButtons[0] = buf[22] & 0x7f;
-  this->rawAnalog[0] = *(reinterpret_cast<int16_t *>(buf+23));
-  this->rawAnalog[1] = *(reinterpret_cast<int16_t *>(buf+25));
-  this->rawAnalog[2] = buf[27];
-
-  this->rawPos[3] = *(reinterpret_cast<int16_t *>(buf+30));
-  this->rawPos[4] = *(reinterpret_cast<int16_t *>(buf+32));
-  this->rawPos[5] = *(reinterpret_cast<int16_t *>(buf+34));
-  this->rawQuat[4] = *(reinterpret_cast<int16_t *>(buf+36));
-  this->rawQuat[5] = *(reinterpret_cast<int16_t *>(buf+38));
-  this->rawQuat[6] = *(reinterpret_cast<int16_t *>(buf+40));
-  this->rawQuat[7] = *(reinterpret_cast<int16_t *>(buf+42));
-  this->rawButtons[1] = buf[44] & 0x7f;
-  this->rawAnalog[3] = *(reinterpret_cast<int16_t *>(buf+45));
-  this->rawAnalog[4] = *(reinterpret_cast<int16_t *>(buf+47));
-  this->rawAnalog[5] = buf[49];
-
-  boost::mutex::scoped_lock lock(this->mutex);
-  // Put the raw position and orientation into Gazebo coordinate frame
-  for (int i = 0; i < 2; ++i)
-  {
-    this->pos[i].x = -this->rawPos[3*i+1] * 0.001;
-    this->pos[i].y = -this->rawPos[3*i+0] * 0.001;
-    this->pos[i].z = -this->rawPos[3*i+2] * 0.001;
-
-    this->quat[i].w = this->rawQuat[i*4+0] / 32768.0;
-    this->quat[i].x = -this->rawQuat[i*4+2] / 32768.0;
-    this->quat[i].y = -this->rawQuat[i*4+1] / 32768.0;
-    this->quat[i].z = -this->rawQuat[i*4+3] / 32768.0;
-  }
-
-  // Apply filters
-  for (int i = 0; i < 2; ++i)
-  {
-    this->quat[i] = this->filterQuat[i].Process(this->quat[i]);
-    this->pos[i] = this->filterPos[i].Process(this->pos[i]);
-  }
-
-  this->analog[0] = this->rawAnalog[0] / 32768.0;
-  this->analog[1] = this->rawAnalog[1] / 32768.0;
-  this->analog[2] = this->rawAnalog[2] / 255.0;
-  this->analog[3] = this->rawAnalog[3] / 32768.0;
-  this->analog[4] = this->rawAnalog[4] / 32768.0;
-  this->analog[5] = this->rawAnalog[5] / 255.0;
-
-  for (int i = 0; i < 2; ++i)
-  {
-    this->buttons[i*7  ] = (this->rawButtons[i] & 0x01) ? 1 : 0;
-    this->buttons[i*7+1] = (this->rawButtons[i] & 0x04) ? 1 : 0;
-    this->buttons[i*7+2] = (this->rawButtons[i] & 0x08) ? 1 : 0;
-    this->buttons[i*7+3] = (this->rawButtons[i] & 0x02) ? 1 : 0;
-    this->buttons[i*7+4] = (this->rawButtons[i] & 0x10) ? 1 : 0;
-    this->buttons[i*7+5] = (this->rawButtons[i] & 0x20) ? 1 : 0;
-    this->buttons[i*7+6] = (this->rawButtons[i] & 0x40) ? 1 : 0;
-  }
-
-  return true;
 }
