@@ -84,8 +84,6 @@ QGVEdge *GraphScene::AddEdge(const std::string &_id,
 }
 
 /////////////////////////////////////////////////
-//void GraphScene::RemoveEdge(const std::string &_node1,
-//    const std::string &_node2)
 void GraphScene::RemoveEdge(const std::string &_id)
 {
   this->removeEdge(tr(_id.c_str()));

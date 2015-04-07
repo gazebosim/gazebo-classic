@@ -159,8 +159,6 @@ void SchematicViewWidget::RemoveEdge(const std::string &_id)
   auto it = this->edges.find(_id);
   if (it != this->edges.end())
   {
-    std::string parentNode = it->second.first;
-    std::string childNode = it->second.second;
     // this must be called before making changes to the graph
     this->scene->clearLayout();
 

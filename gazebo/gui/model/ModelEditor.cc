@@ -269,7 +269,7 @@ void ModelEditor::CreateMenus()
 
   QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
   viewMenu->addAction(this->showJointsAct);
-  
+
   if (this->schematicViewAct)
   {
     QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
