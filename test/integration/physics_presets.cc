@@ -167,7 +167,7 @@ TEST_F(PresetManagerTest, SetCurrentProfile)
   }
 
   std::vector<std::string> profileNames(presetManager->AllProfiles());
-  EXPECT_EQ(profileNames.size(), 3);
+  EXPECT_EQ(profileNames.size(), 3u);
 
   presetManager->CurrentProfile("preset_2");
 
