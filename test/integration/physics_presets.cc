@@ -225,7 +225,7 @@ TEST_F(PresetManagerTest, CreateProfileFromSDF)
           </physics>\
         </world>\
       </sdf>");
-  sdf::ElementPtr physicsSDF = worldSDF.root->GetElement("world")
+  sdf::ElementPtr physicsSDF = worldSDF.Root()->GetElement("world")
       ->GetElement("physics");
   presetManager->CreateProfile(physicsSDF);
   presetManager->CurrentProfile("preset_3");
