@@ -26,7 +26,6 @@
 #include <boost/archive/iterators/remove_whitespace.hpp>
 #include <boost/archive/iterators/istream_iterator.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
-#include <boost/filesystem.hpp>
 
 #include "gazebo/math/Rand.hh"
 
