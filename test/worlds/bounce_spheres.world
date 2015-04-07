@@ -1,0 +1,2615 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.5">
+  <world name="default">
+    <!--
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+               <collide_bitmask>0xffff</collide_bitmask>
+            </contact>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name='ball_2.0_0'>
+      <pose>0 0 2.0  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.0_1'>
+      <pose>0 1 2.0  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.0_2'>
+      <pose>0 2 2.0  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.0_3'>
+      <pose>0 3 2.0  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.0_4'>
+      <pose>0 4 2.0  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.001_0'>
+      <pose>1 0 2.001  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.001_1'>
+      <pose>1 1 2.001  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.001_2'>
+      <pose>1 2 2.001  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.001_3'>
+      <pose>1 3 2.001  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.001_4'>
+      <pose>1 4 2.001  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.002_0'>
+      <pose>2 0 2.002  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.002_1'>
+      <pose>2 1 2.002  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.002_2'>
+      <pose>2 2 2.002  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.002_3'>
+      <pose>2 3 2.002  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.002_4'>
+      <pose>2 4 2.002  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.003_0'>
+      <pose>3 0 2.003  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.003_1'>
+      <pose>3 1 2.003  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.003_2'>
+      <pose>3 2 2.003  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.003_3'>
+      <pose>3 3 2.003  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.003_4'>
+      <pose>3 4 2.003  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.004_0'>
+      <pose>4 0 2.004  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.004_1'>
+      <pose>4 1 2.004  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.004_2'>
+      <pose>4 2 2.004  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.004_3'>
+      <pose>4 3 2.004  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.004_4'>
+      <pose>4 4 2.004  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.005_0'>
+      <pose>5 0 2.005  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.005_1'>
+      <pose>5 1 2.005  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.005_2'>
+      <pose>5 2 2.005  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.005_3'>
+      <pose>5 3 2.005  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.005_4'>
+      <pose>5 4 2.005  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.006_0'>
+      <pose>6 0 2.006  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.006_1'>
+      <pose>6 1 2.006  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.006_2'>
+      <pose>6 2 2.006  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.006_3'>
+      <pose>6 3 2.006  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.006_4'>
+      <pose>6 4 2.006  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.007_0'>
+      <pose>7 0 2.007  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.007_1'>
+      <pose>7 1 2.007  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.007_2'>
+      <pose>7 2 2.007  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.007_3'>
+      <pose>7 3 2.007  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.007_4'>
+      <pose>7 4 2.007  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.008_0'>
+      <pose>8 0 2.008  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.008_1'>
+      <pose>8 1 2.008  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.008_2'>
+      <pose>8 2 2.008  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.008_3'>
+      <pose>8 3 2.008  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.008_4'>
+      <pose>8 4 2.008  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.009_0'>
+      <pose>9 0 2.009  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.009_1'>
+      <pose>9 1 2.009  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.009_2'>
+      <pose>9 2 2.009  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.009_3'>
+      <pose>9 3 2.009  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='ball_2.009_4'>
+      <pose>9 4 2.009  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923257</mass>
+          <inertia>
+            <ixx>0.04523893421169304</ixx>
+            <iyy>0.04523893421169304</iyy>
+            <izz>0.04523893421169304</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

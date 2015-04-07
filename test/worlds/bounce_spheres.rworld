@@ -1,0 +1,150 @@
+<?xml version="1.0" ?>
+<%
+  # Testing bounce parameters
+  # Make array of spheres with different bounce parameters and heights
+
+  # Inertial parameters
+  # Aluminum 2700 kg/m^3
+  density = 2700.0
+
+  # Geometric parameters
+  radius = 0.1
+  volume = 4.0 / 3.0 * Math::PI * radius**3
+
+  # Inertial parameters
+  mass = density * volume
+  ixx = 2.0 / 5.0 * mass * radius**2
+  iyy = ixx
+  izz = ixx
+%>
+<sdf version="1.5">
+  <world name="default">
+    <!--
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+               <collide_bitmask>0xffff</collide_bitmask>
+            </contact>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+<%
+  # Disk axis of symmetry: Z
+  height_initial = 2.0
+  height_increment = 0.001
+  heights = 10
+  repeat = 5
+
+  heights.times do |height_index|
+    height = height_initial + height_increment * height_index
+    repeat.times do |repeat_index|
+      name = "ball_" + height.to_s + "_" + repeat_index.to_s
+      x0 = height_index
+      y0 = repeat_index
+      z0 = height
+%>
+    <%= "<model name='#{name}'>" %>
+      <pose><%= x0 %> <%= y0 %> <%= z0 %>  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass><%= mass %></mass>
+          <inertia>
+            <ixx><%= ixx %></ixx>
+            <iyy><%= iyy %></iyy>
+            <izz><%= izz %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius><%= radius %></radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <bounce>
+              <restitution_coefficient>1.0</restitution_coefficient>
+              <threshold>0</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <kd>1</kd>
+                <kp>1e8</kp>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius><%= radius %></radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+<%
+    end
+  end
+%>
+  </world>
+</sdf>
