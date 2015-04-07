@@ -155,17 +155,17 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->otherItemsLayout->setContentsMargins(0, 0, 0, 0);
 
   // Palette layout
-  this->paletteLayout = new QVBoxLayout();
-  this->paletteLayout->addWidget(shapesLabel);
-  this->paletteLayout->addLayout(shapesLayout);
-  this->paletteLayout->addWidget(customShapesLabel);
-  this->paletteLayout->addLayout(customLayout);
-  this->paletteLayout->addLayout(this->otherItemsLayout);
-  this->paletteLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
+  QVBoxLayout *paletteLayout = new QVBoxLayout();
+  paletteLayout->addWidget(shapesLabel);
+  paletteLayout->addLayout(shapesLayout);
+  paletteLayout->addWidget(customShapesLabel);
+  paletteLayout->addLayout(customLayout);
+  paletteLayout->addLayout(this->otherItemsLayout);
+  paletteLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
       QSizePolicy::Minimum));
-  this->paletteLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+  paletteLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
   QWidget *paletteWidget = new QWidget();
-  paletteWidget->setLayout(this->paletteLayout);
+  paletteWidget->setLayout(paletteLayout);
 
   // Model tree
   this->modelTreeWidget = new QTreeWidget();
@@ -275,6 +275,8 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 /////////////////////////////////////////////////
 ModelEditorPalette::~ModelEditorPalette()
 {
+  delete this->modelCreator;
+  this->modelCreator = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -353,33 +355,34 @@ void ModelEditorPalette::OnCustom()
 void ModelEditorPalette::AddItem(QWidget *_item,
     const std::string &_category)
 {
-  if (!_category.empty())
+  std::string category = _category;
+  if (category.empty())
+    category = "Other";
+
+  auto iter = this->categories.find(category);
+  QGridLayout *catLayout = NULL;
+  if (iter == this->categories.end())
   {
-    auto iter = this->categories.find(_category);
-    QGridLayout *catLayout = NULL;
-    if (iter == this->categories.end())
-    {
-      catLayout = new QGridLayout();
-      this->categories[_category] = catLayout;
+    catLayout = new QGridLayout();
+    this->categories[category] = catLayout;
 
-      std::string catStr =
-          "<font size=4 color='white'>" + _category + "</font>";
-      QLabel *catLabel = new QLabel(tr(catStr.c_str()));
-      this->otherItemsLayout->addWidget(catLabel);
-      this->otherItemsLayout->addLayout(catLayout);
-    }
-    else
-      catLayout = iter->second;
-
-    int rowWidth = 3;
-    int row = catLayout->count() / rowWidth;
-    int col = catLayout->count() % rowWidth;
-    catLayout->addWidget(_item, row, col);
+    std::string catStr =
+        "<font size=4 color='white'>" + category + "</font>";
+    QLabel *catLabel = new QLabel(tr(catStr.c_str()));
+    this->otherItemsLayout->addWidget(catLabel);
+    this->otherItemsLayout->addLayout(catLayout);
   }
+  else
+    catLayout = iter->second;
+
+  int rowWidth = 3;
+  int row = catLayout->count() / rowWidth;
+  int col = catLayout->count() % rowWidth;
+  catLayout->addWidget(_item, row, col);
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::AddJoint(const std::string &_type)
+void ModelEditorPalette::CreateJoint(const std::string &_type)
 {
   event::Events::setSelectedEntity("", "normal");
   this->modelCreator->AddJoint(_type);

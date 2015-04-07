@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _MODEL_EDITOR_PALETTE_HH_
-#define _MODEL_EDITOR_PALETTE_HH_
+#ifndef _GAZEBO_MODEL_EDITOR_PALETTE_HH_
+#define _GAZEBO_MODEL_EDITOR_PALETTE_HH_
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -59,15 +60,15 @@ namespace gazebo
       /// \brief Destructor
       public: ~ModelEditorPalette();
 
-      /// \brief Add a joint to the model.
-      /// \param[in] _type Type of joint to add.
-      public: void AddJoint(const std::string &_type);
-
-      /// \brief Add an item to palette.
+      /// \brief Add an item to the model editor palette.
       /// \param[in] _Item item to add.
       /// \param[in] _category Category to add the item too.
       public: void AddItem(QWidget *_item,
           const std::string &_category = "Other");
+
+      /// \brief Add a joint to the model.
+      /// \param[in] _type Type of joint to add.
+      public: void CreateJoint(const std::string &_type);
 
       /// \brief Get the model creator.
       /// \return a pointer to the model creator.
@@ -187,9 +188,6 @@ namespace gazebo
 
       /// \brief Mutex to protect updates.
       private: boost::recursive_mutex *updateMutex;
-
-      /// \brief Layout for this palette.
-      private: QVBoxLayout *paletteLayout;
 
       /// \brief Layout for other items in the palette.
       private: QVBoxLayout *otherItemsLayout;
