@@ -1,6 +1,6 @@
 ## Gazebo 6.0
 
-1. Added start/stop simulation times to the header of the log files.
+1. Read start/stop simulation times from log files in LogPlay::Open().
     * [Pull request #1577](https://bitbucket.org/osrf/gazebo/pull-request/1577)
 
 1. Fix deprecation warnings when using SDFormat 3.0.2, 3.0.3 prereleases
