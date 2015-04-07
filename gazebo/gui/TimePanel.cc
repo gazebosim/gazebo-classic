@@ -227,13 +227,10 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   }
   else if (this->dataPtr->logPlayWidget->isVisible())
   {
-    // Set simulation time
-    //this->dataPtr->logPlayWidget->EmitSetSimTime(
-     //   QString::fromStdString(FormatTime(_msg->sim_time())));
-
-    // Set the iterations
-    //this->dataPtr->logPlayWidget->EmitSetIterations(QString::fromStdString(
-     //   boost::lexical_cast<std::string>(_msg->iterations())));
+    // Set current time (simulation time) in text and in ms
+    this->dataPtr->logPlayWidget->EmitSetCurrentTime(
+        QString::fromStdString(FormatTime(_msg->sim_time())),
+        _msg->sim_time().sec() * 1e3 + _msg->sim_time().nsec() * 1e-6);
   }
 }
 

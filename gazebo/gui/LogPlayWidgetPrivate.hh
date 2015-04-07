@@ -20,6 +20,7 @@
 #include <string>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/TimePanel.hh"
 
 namespace gazebo
 {
@@ -29,12 +30,6 @@ namespace gazebo
     /// \brief Private data for the LogPlayWidget class
     class LogPlayWidgetPrivate
     {
-      /// \brief Node used for communication.
-      public: transport::NodePtr node;
-
-      /// \brief Subscriber to the statistics topic.
-      public: transport::SubscriberPtr statsSub;
-
       /// \brief Event based connections.
       public: std::vector<event::ConnectionPtr> connections;
 
@@ -47,22 +42,16 @@ namespace gazebo
       /// TODO
       public: LogPlayView *view;
 
-      /// \brief Used to start, stop, and step simulation.
-      public: transport::PublisherPtr worldControlPub;
+      /// \brief Paused state of the simulation.
+      public: TimePanel *timePanel;
     };
 
     /// \class LogPlayViewPrivate LogPlayViewPrivate.hh
     /// \brief Private data for the LogPlayView class
     class LogPlayViewPrivate
     {
-      /// \brief Node used for communication.
-      public: transport::NodePtr node;
-
       /// \brief TODO
       public: CurrentTimeItem *currentTimeItem;
-
-      /// \brief Used to start, stop, and step simulation.
-      public: transport::PublisherPtr worldControlPub;
 
       /// \brief Used to start, stop, and step simulation.
       public: int totalTime;

@@ -51,6 +51,10 @@ namespace gazebo
       /// \brief Play simulation.
       public: void SetPaused(bool _paused);
 
+      /// \brief Emit a signal used to set the sim time line edit.
+      /// \param[in] _string String representation of sim time.
+      public: void EmitSetCurrentTime(QString _timeString, int _timeInt);
+
       /// \brief Play simulation.
       public slots: void OnPlay();
 
@@ -82,24 +86,16 @@ namespace gazebo
       Q_SIGNALS: void HidePause();
 
       /// \brief Qt signal when the joint creation process has ended.
-      Q_SIGNALS: void CurrentTime(const QString &);
+      Q_SIGNALS: void SetCurrentTime(const QString &);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void TotalTime(const QString &);
 
       /// \brief Qt signal when the joint creation process has ended.
-      Q_SIGNALS: void CurrentTime(int _sec);
+      Q_SIGNALS: void SetCurrentTime(int _time);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void TotalTime(int _sec);
-
-      /// \brief Called when a world stats message is received.
-      /// \param[in] _msg World statistics message.
-      private: void OnStats(ConstWorldStatisticsPtr &_msg);
-
-      /// \brief Helper function to format time string.
-      /// \param[in] _msg Time message.
-      private: static std::string FormatTime(const msgs::Time &_msg);
 
       /// \internal
       /// \brief Pointer to private data.

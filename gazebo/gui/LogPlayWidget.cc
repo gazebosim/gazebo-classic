@@ -15,8 +15,7 @@
  *
  */
 
-#include "gazebo/transport/Node.hh"
-
+#include "gazebo/common/Console.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/LogPlayWidget.hh"
 #include "gazebo/gui/LogPlayWidgetPrivate.hh"
@@ -30,6 +29,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 {
   this->setObjectName("logPlayWidget");
 
+  this->dataPtr->timePanel = dynamic_cast<TimePanel *>(_parent);
 
   QSize bigSize(70, 70);
   QSize bigIconSize(40, 40);
@@ -108,7 +108,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 
   // View
   this->dataPtr->view = new LogPlayView(this);
-  connect(this, SIGNAL(CurrentTime(int)), this->dataPtr->view,
+  connect(this, SIGNAL(SetCurrentTime(int)), this->dataPtr->view,
       SLOT(SetCurrentTime(int)));
   connect(this, SIGNAL(TotalTime(int)), this->dataPtr->view,
       SLOT(SetTotalTime(int)));
@@ -116,7 +116,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   // Time
   QLineEdit *currentTime = new QLineEdit();
   currentTime->setMaximumWidth(110);
-  connect(this, SIGNAL(CurrentTime(const QString &)), currentTime,
+  connect(this, SIGNAL(SetCurrentTime(const QString &)), currentTime,
       SLOT(setText(const QString &)));
 
   QLabel *totalTime = new QLabel();
@@ -126,7 +126,6 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   QHBoxLayout *timeLayout = new QHBoxLayout();
   timeLayout->addWidget(currentTime);
   timeLayout->addWidget(totalTime);
-
 
   // Main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
@@ -138,16 +137,6 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
-
-  this->dataPtr->statsSub =
-    this->dataPtr->node->Subscribe("~/world_stats", &LogPlayWidget::OnStats, this);
-  this->dataPtr->worldControlPub =
-    this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
-
-  this->show();
-
   // Set the total time
   emit TotalTime(" / 00 00:00:22:123");
   emit TotalTime(22123);
@@ -156,53 +145,8 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 /////////////////////////////////////////////////
 LogPlayWidget::~LogPlayWidget()
 {
-  this->dataPtr->node.reset();
   delete this->dataPtr;
   this->dataPtr = NULL;
-}
-
-/////////////////////////////////////////////////
-void LogPlayWidget::OnStats(ConstWorldStatisticsPtr &_msg)
-{
-  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
-
-  // Set paused state
-  this->SetPaused(_msg->paused());
-
-  // Set simulation time
-  emit CurrentTime(QString::fromStdString(FormatTime(_msg->sim_time())));
-  emit CurrentTime(_msg->sim_time().sec() * 1e3 +
-                   _msg->sim_time().nsec() * 1e-6);
-}
-
-/////////////////////////////////////////////////
-std::string LogPlayWidget::FormatTime(const msgs::Time &_msg)
-{
-  std::ostringstream stream;
-  unsigned int day, hour, min, sec, msec;
-
-  stream.str("");
-
-  sec = _msg.sec();
-
-  day = sec / 86400;
-  sec -= day * 86400;
-
-  hour = sec / 3600;
-  sec -= hour * 3600;
-
-  min = sec / 60;
-  sec -= min * 60;
-
-  msec = rint(_msg.nsec() * 1e-6);
-
-  stream << std::setw(2) << std::setfill('0') << day << " ";
-  stream << std::setw(2) << std::setfill('0') << hour << ":";
-  stream << std::setw(2) << std::setfill('0') << min << ":";
-  stream << std::setw(2) << std::setfill('0') << sec << ".";
-  stream << std::setw(3) << std::setfill('0') << msec;
-
-  return stream.str();
 }
 
 /////////////////////////////////////////////////
@@ -223,25 +167,20 @@ void LogPlayWidget::SetPaused(bool _paused)
 /////////////////////////////////////////////////
 void LogPlayWidget::OnPlay()
 {
-  msgs::WorldControl msg;
-  msg.set_pause(false);
-  this->dataPtr->worldControlPub->Publish(msg);
+  g_playAct->trigger();
 }
 
 /////////////////////////////////////////////////
 void LogPlayWidget::OnPause()
 {
-  msgs::WorldControl msg;
-  msg.set_pause(true);
-  this->dataPtr->worldControlPub->Publish(msg);
+  g_pauseAct->trigger();
 }
 
 /////////////////////////////////////////////////
 void LogPlayWidget::OnStepForward()
 {
-  msgs::WorldControl msg;
-  msg.set_multi_step(1);
-  this->dataPtr->worldControlPub->Publish(msg);
+  // TODO: Add possibility to change number of steps
+  g_stepAct->trigger();
 }
 
 /////////////////////////////////////////////////
@@ -260,6 +199,15 @@ void LogPlayWidget::OnJumpStart()
 void LogPlayWidget::OnJumpEnd()
 {
   gzdbg << "send Jump End msg" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::EmitSetCurrentTime(QString _timeString, int _timeInt)
+{
+  // current time line edit
+  this->SetCurrentTime(_timeString);
+  // current time item in view
+  this->SetCurrentTime(_timeInt);
 }
 
 /////////////////////////////////////////////////
@@ -295,13 +243,6 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
   this->dataPtr->currentTimeItem->setPos(this->dataPtr->margin,
       this->dataPtr->sceneHeight/2);
   graphicsScene->addItem(this->dataPtr->currentTimeItem);
-
-  // Publisher
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
-
-  this->dataPtr->worldControlPub =
-      this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
 }
 
 /////////////////////////////////////////////////
@@ -350,7 +291,7 @@ void LogPlayView::mouseMoveEvent(QMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void LogPlayView::mouseReleaseEvent(QMouseEvent *_event)
+void LogPlayView::mouseReleaseEvent(QMouseEvent */*_event*/)
 {
   this->scene()->clearSelection();
   QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
