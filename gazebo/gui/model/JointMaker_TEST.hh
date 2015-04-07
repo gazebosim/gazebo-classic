@@ -31,6 +31,9 @@ class JointMaker_TEST : public QTestFixture
   /// \brief Test creating and removing joints
   private slots: void CreateRemoveJoint();
 
+  /// \brief Test toggling joint visualization.
+  private slots: void ShowJoints();
+  
   /// \brief Tests selecting joints in the model editor
   private slots: void Selection();
 };

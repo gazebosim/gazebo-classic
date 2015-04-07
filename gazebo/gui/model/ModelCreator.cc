@@ -251,10 +251,10 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
     sdfParsed.SetFromString(msg.data());
 
     // Check that sdf contains world
-    if (sdfParsed.root->HasElement("world") &&
-        sdfParsed.root->GetElement("world")->HasElement("model"))
+    if (sdfParsed.Root()->HasElement("world") &&
+        sdfParsed.Root()->GetElement("world")->HasElement("model"))
     {
-      sdf::ElementPtr world = sdfParsed.root->GetElement("world");
+      sdf::ElementPtr world = sdfParsed.Root()->GetElement("world");
       sdf::ElementPtr model = world->GetElement("model");
       while (model)
       {
@@ -588,7 +588,7 @@ std::string ModelCreator::AddShape(LinkType _type,
   visualName << linkName << "::visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
       linkVisual));
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
@@ -913,7 +913,7 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
       collisionPose.Set(0, 0, 0, 0, 0, 0);
 
     // Make a visual element from the collision element
-    sdf::ElementPtr colVisualElem =  this->modelTemplateSDF->root
+    sdf::ElementPtr colVisualElem =  this->modelTemplateSDF->Root()
         ->GetElement("model")->GetElement("link")->GetElement("visual");
 
     sdf::ElementPtr geomElem = colVisualElem->GetElement("geometry");
@@ -1117,7 +1117,7 @@ void ModelCreator::FinishModel()
 /////////////////////////////////////////////////
 void ModelCreator::CreateTheEntity()
 {
-  if (!this->modelSDF->root->HasElement("model"))
+  if (!this->modelSDF->Root()->HasElement("model"))
   {
     gzerr << "Generated invalid SDF! Cannot create entity." << std::endl;
     return;
@@ -1125,7 +1125,7 @@ void ModelCreator::CreateTheEntity()
 
   msgs::Factory msg;
   // Create a new name if the model exists
-  sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
+  sdf::ElementPtr modelElem = this->modelSDF->Root()->GetElement("model");
   std::string modelElemName = modelElem->Get<std::string>("name");
   if (has_entity_name(modelElemName))
   {
@@ -1599,7 +1599,7 @@ void ModelCreator::GenerateSDF()
   this->modelSDF.reset(new sdf::SDF);
   this->modelSDF->SetFromString(ModelData::GetTemplateSDFString());
 
-  modelElem = this->modelSDF->root->GetElement("model");
+  modelElem = this->modelSDF->Root()->GetElement("model");
 
   modelElem->ClearElements();
   modelElem->GetAttribute("name")->Set(this->folderName);

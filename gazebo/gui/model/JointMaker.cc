@@ -1346,3 +1346,20 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 
   this->CreateHotSpot(joint);
 }
+
+/////////////////////////////////////////////////
+void JointMaker::ShowJoints(bool _show)
+{
+  for (auto iter : this->joints)
+  {
+    rendering::VisualPtr vis = iter.second->hotspot;
+    if (vis)
+    {
+      vis->SetVisible(_show);
+      vis->SetHighlighted(false);
+    }
+    if (iter.second->jointVisual)
+      iter.second->jointVisual->SetVisible(_show);
+  }
+  this->DeselectAll();
+}

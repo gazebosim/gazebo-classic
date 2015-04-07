@@ -138,6 +138,94 @@ void JointMaker_TEST::CreateRemoveJoint()
 
 
 /////////////////////////////////////////////////
+void JointMaker_TEST::ShowJoints()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  gui::JointMaker *jointMaker = new gui::JointMaker();
+
+  gui::MainWindow *mainWindow = new gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  Q_ASSERT(cam);
+  rendering::ScenePtr scene = cam->GetScene();
+  Q_ASSERT(scene);
+
+  rendering::VisualPtr boxLink = scene->GetVisual("box::link");
+  rendering::VisualPtr sphereLink = scene->GetVisual("sphere::link");
+  rendering::VisualPtr cylinderLink = scene->GetVisual("cylinder::link");
+
+  Q_ASSERT(boxLink.get());
+  Q_ASSERT(sphereLink.get());
+  Q_ASSERT(cylinderLink.get());
+
+  // Add a revolute joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_HINGE);
+  gui::JointData *revoluteJointData =
+      jointMaker->CreateJoint(boxLink, sphereLink);
+  jointMaker->CreateHotSpot(revoluteJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 1u);
+
+  // Add a prismatic joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_SLIDER);
+  gui::JointData *prismaticJointData =
+      jointMaker->CreateJoint(sphereLink, cylinderLink);
+  jointMaker->CreateHotSpot(prismaticJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 2u);
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  QVERIFY(revoluteJointData->hotspot != NULL);
+  QVERIFY(prismaticJointData->hotspot != NULL);
+  QVERIFY(revoluteJointData->jointVisual != NULL);
+  QVERIFY(prismaticJointData->jointVisual != NULL);
+
+  // toggle joint visualization and verify
+  jointMaker->ShowJoints(false);
+  QVERIFY(!revoluteJointData->hotspot->GetVisible());
+  QVERIFY(!prismaticJointData->hotspot->GetVisible());
+  QVERIFY(!revoluteJointData->jointVisual->GetVisible());
+  QVERIFY(!prismaticJointData->jointVisual->GetVisible());
+
+  jointMaker->ShowJoints(true);
+  QVERIFY(revoluteJointData->hotspot->GetVisible());
+  QVERIFY(prismaticJointData->hotspot->GetVisible());
+  QVERIFY(revoluteJointData->jointVisual->GetVisible());
+  QVERIFY(prismaticJointData->jointVisual->GetVisible());
+
+  jointMaker->ShowJoints(false);
+  QVERIFY(!revoluteJointData->hotspot->GetVisible());
+  QVERIFY(!prismaticJointData->hotspot->GetVisible());
+  QVERIFY(!revoluteJointData->jointVisual->GetVisible());
+  QVERIFY(!prismaticJointData->jointVisual->GetVisible());
+
+  delete jointMaker;
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
 void JointMaker_TEST::Selection()
 {
   this->resMaxPercentChange = 5.0;
@@ -146,6 +234,7 @@ void JointMaker_TEST::Selection()
   this->Load("worlds/shapes.world", false, false, false);
 
   gui::JointMaker *jointMaker = new gui::JointMaker();
+
   QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
   QCOMPARE(jointMaker->GetJointCount(), 0u);
 
