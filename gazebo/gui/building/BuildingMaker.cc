@@ -298,7 +298,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   visualName << this->previewName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
-  sdf::ElementPtr visualElem = this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem = this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
@@ -344,7 +344,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")->GetElement("name")
       ->Set("Gazebo/BuildingFrame");
@@ -390,7 +390,7 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")->GetElement("name")
       ->Set("Gazebo/BuildingFrame");
@@ -435,7 +435,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visVisual->Load(visualElem);
   visVisual->DetachObjects();
@@ -511,7 +511,7 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
@@ -663,7 +663,7 @@ void BuildingMaker::GenerateSDF()
   this->modelSDF.reset(new sdf::SDF);
   this->modelSDF->SetFromString(this->GetTemplateSDFString());
 
-  modelElem = this->modelSDF->root->GetElement("model");
+  modelElem = this->modelSDF->Root()->GetElement("model");
 
   linkElem = modelElem->GetElement("link");
   sdf::ElementPtr templateLinkElem = linkElem->Clone();
@@ -984,7 +984,7 @@ void BuildingMaker::GenerateSDFWithCSG()
   this->modelSDF.reset(new sdf::SDF);
   this->modelSDF->SetFromString(this->GetTemplateSDFString());
 
-  modelElem = this->modelSDF->root->GetElement("model");
+  modelElem = this->modelSDF->Root()->GetElement("model");
   linkElem = modelElem->GetElement("link");
 
   sdf::ElementPtr templateLinkElem = linkElem->Clone();
@@ -1153,7 +1153,7 @@ void BuildingMaker::GenerateSDFWithCSG()
 /////////////////////////////////////////////////
 void BuildingMaker::CreateTheEntity()
 {
-  if (!this->modelSDF->root->HasElement("model"))
+  if (!this->modelSDF->Root()->HasElement("model"))
   {
     gzerr << "Generated invalid SDF! Cannot create entity." << std::endl;
     return;
@@ -1161,7 +1161,7 @@ void BuildingMaker::CreateTheEntity()
 
   msgs::Factory msg;
   // Create a new name if the model exists
-  sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
+  sdf::ElementPtr modelElem = this->modelSDF->Root()->GetElement("model");
   std::string modelElemName = modelElem->Get<std::string>("name");
   if (has_entity_name(modelElemName))
   {
