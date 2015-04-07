@@ -136,6 +136,9 @@ namespace gazebo
       /// \brief Pointer to the schematic view widget.
       private: SchematicViewWidget *svWidget;
 
+      /// \brief Action to show joints.
+      private: QAction *showJointsAct;
+
       /// \brief Save the main window paused state to use when returning.
       private: bool mainWindowPaused;
     };

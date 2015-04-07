@@ -95,19 +95,21 @@ QGVEdge *QGVScene::addEdge(QGVNode *source, QGVNode *target,
   }
 
   QGVEdge *item = new QGVEdge(new QGVEdgePrivate(edge), this);
-  item->setLabel(label);
+
+  item->setSource(source->label());
+  item->setSource(target->label());
   addItem(item);
 
-  QPair<QString, QString> key(source->label(), target->label());
-  _edges.insert(key, item);
+  _edges.insert(label, item);
   return item;
 }
 
 
-QGVEdge *QGVScene::addEdge(const QString &source, const QString &target)
+QGVEdge *QGVScene::addEdge(const QString &source, const QString &target,
+    const QString &label)
 {
   if (_nodes.contains(source) && _nodes.contains(target))
-    return this->addEdge(_nodes[source], _nodes[target], tr(""));
+    return this->addEdge(_nodes[source], _nodes[target], label);
   return NULL;
 }
 
@@ -139,30 +141,40 @@ void QGVScene::removeNode(const QString &label)
 {
   if (_nodes.contains(label))
   {
+
+    for (Agedge_t* edge = agfstout(_graph->graph(),
+        _nodes[label]->_node->node()); edge != NULL;
+        edge = agnxtout(_graph->graph(), edge))
+    {
+      QGVEdge *iedge = new QGVEdge(new QGVEdgePrivate(edge), this);
+      iedge->updateLayout();
+      addItem(iedge);
+    }
+
     agdelete(_graph->graph(), _nodes[label]->_node->node());
     removeItem(_nodes[label]);
     _nodes.remove(label);
 
-    QList<QPair<QString, QString> >keys=_edges.keys();
-    for(int i=0; i<keys.size(); ++i)
-        if (keys.at(i).first==label || keys.at(i).second==label)
-            removeEdge(keys.at(i));
+    QList<QString> toRemove;
 
+    for (auto key : _edges.toStdMap())
+    {
+      QGVEdge *e = key.second;
+      if (e->source() == label || e->target() == label)
+      toRemove.append(e->label());
+    }
+    for (auto e : toRemove)
+      this->removeEdge(e);
   }
 }
 
-void QGVScene::removeEdge(const QString &source, const QString &target)
+void QGVScene::removeEdge(const QString &_label)
 {
-    removeEdge(QPair<QString, QString>(source, target));
-}
-
-void QGVScene::removeEdge(const QPair<QString, QString>& key)
-{
-  if (_edges.contains(key))
+  if (_edges.contains(_label))
   {
-    agdelete(_graph->graph(), _edges[key]->_edge->edge());
-    removeItem(_edges[key]);
-    _edges.remove(key);
+    agdelete(_graph->graph(), _edges[_label]->_edge->edge());
+    removeItem(_edges[_label]);
+    _edges.remove(_label);
   }
 }
 

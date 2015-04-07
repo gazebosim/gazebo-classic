@@ -40,7 +40,13 @@ class QGVCORE_EXPORT QGVEdge : public QGraphicsItem
     QRectF boundingRect() const;
     QPainterPath shape() const;
 
+    QString source() const;
+    QString target() const;
+
     void setLabel(const QString &label);
+
+    void setSource(const QString &_source);
+    void setTarget(const QString &_target);
 
     void paint(QPainter * painter, const QStyleOptionGraphicsItem * option,
         QWidget * widget = 0);
@@ -75,6 +81,9 @@ class QGVCORE_EXPORT QGVEdge : public QGraphicsItem
 
     QString _label;
     QRectF _label_rect;
+
+    QString sourceNode;
+    QString targetNode;
 };
 
 #endif

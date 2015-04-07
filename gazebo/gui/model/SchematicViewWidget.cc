@@ -146,7 +146,7 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
   // this must be called before making changes to the graph
   this->scene->clearLayout();
 
-  this->scene->AddEdge(parentNode, childNode);
+  this->scene->AddEdge(_id, parentNode, childNode);
   this->scene->applyLayout();
 
   this->FitInView();
@@ -163,7 +163,7 @@ void SchematicViewWidget::RemoveEdge(const std::string &_id)
     // this must be called before making changes to the graph
     this->scene->clearLayout();
 
-    this->scene->RemoveEdge(parentNode, childNode);
+    this->scene->RemoveEdge(_id);
     this->scene->applyLayout();
 
     this->FitInView();

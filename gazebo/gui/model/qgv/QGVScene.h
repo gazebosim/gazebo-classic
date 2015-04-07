@@ -50,14 +50,15 @@ class QGVCORE_EXPORT QGVScene : public QGraphicsScene
     void setEdgeAttribute(const QString &name, const QString &value);
 
     QGVNode* addNode(const QString& label);
-    QGVEdge* addEdge(QGVNode* source, QGVNode* target, const QString&
-        label = QString());
-    QGVEdge *addEdge(const QString &source, const QString &target);
+    QGVEdge* addEdge(QGVNode* source, QGVNode* target, const QString& label);
+    QGVEdge *addEdge(const QString &source, const QString &target,
+        const QString &label);
 
     QGVSubGraph* addSubGraph(const QString& name, bool cluster = true);
-    void removeNode(const QString& label);
-    void removeEdge(const QString& source, const QString& target);
-    void removeEdge(const QPair<QString, QString>& key);
+    void removeNode(const QString &label);
+//    void removeEdge(const QString& source, const QString& target);
+//    void removeEdge(const QPair<QString, QString>& key);
+    void removeEdge(const QString &label);
 
     bool hasNode(const QString &name);
     QGVNode *getNode(const QString &name);
@@ -100,9 +101,10 @@ class QGVCORE_EXPORT QGVScene : public QGraphicsScene
     QGVGvcPrivate *_context;
     QGVGraphPrivate *_graph;
 
-    QMap<QString, QGVNode*> _nodes;
-    QMap<QPair<QString, QString>, QGVEdge*> _edges;
-    QMap<QString, QGVSubGraph*> _subGraphs;
+    QMap<QString, QGVNode *> _nodes;
+//    QMap<QPair<QString, QString>, QGVEdge*> _edges;
+    QMap<QString, QGVEdge *> _edges;
+    QMap<QString, QGVSubGraph *> _subGraphs;
 
     bool init;
 };

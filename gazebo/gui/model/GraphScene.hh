@@ -60,17 +60,16 @@ namespace gazebo
       public: QGVNode *GetNode(const std::string &_name);
 
       /// \brief Add an edge to connect two nodes.
+      /// \param[in] _id Edge ID.
       /// \param[in] _node1 Name of the first node.
       /// \param[in] _node2 Name of the second node.
       /// \return the Edge created.
-      public: QGVEdge *AddEdge(const std::string &_node1,
-          const std::string &_node2);
+      public: QGVEdge *AddEdge(const std::string &_id,
+          const std::string &_node1, const std::string &_node2);
 
       /// \brief Remove an edge between two nodes.
-      /// \param[in] _node1 Name of the first node.
-      /// \param[in] _node2 Name of the second node.
-      public: void RemoveEdge(const std::string &_node1,
-          const std::string &_node2);
+      /// \param[in] _id Edge ID.
+      public: void RemoveEdge(const std::string &_id);
 
       /// \brief Overrides the default background with grid lines.
       /// \param[in] _painter Qt painter object.

@@ -75,18 +75,22 @@ QGVNode *GraphScene::GetNode(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-QGVEdge *GraphScene::AddEdge(const std::string &_node1,
-    const std::string &_node2)
+QGVEdge *GraphScene::AddEdge(const std::string &_id,
+    const std::string &_node1, const std::string &_node2)
 {
-  QGVEdge *edge = this->addEdge(tr(_node1.c_str()), tr(_node2.c_str()));
+  QGVEdge *edge = this->addEdge(tr(_node1.c_str()), tr(_node2.c_str()),
+      tr(_id.c_str()));
+//  QGVEdge *edge = this->addEdge(tr(_node1.c_str()), tr(_node2.c_str()));
   return edge;
 }
 
 /////////////////////////////////////////////////
-void GraphScene::RemoveEdge(const std::string &_node1,
-    const std::string &_node2)
+//void GraphScene::RemoveEdge(const std::string &_node1,
+//    const std::string &_node2)
+void GraphScene::RemoveEdge(const std::string &_id)
 {
-  this->removeEdge(tr(_node1.c_str()), tr(_node2.c_str()));
+//  this->removeEdge(tr(_node1.c_str()), tr(_node2.c_str()));
+  this->removeEdge(tr(_id.c_str()));
 }
 
 /////////////////////////////////////////////////

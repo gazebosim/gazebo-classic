@@ -115,6 +115,10 @@ namespace gazebo
       /// \return Pointer to the physics engine.
       public: PhysicsEnginePtr GetPhysicsEngine() const;
 
+      /// \brief Return the preset manager.
+      /// \return Pointer to the preset manager.
+      public: PresetManagerPtr GetPresetManager() const;
+
       /// \brief Return the spherical coordinates converter.
       /// \return Pointer to the spherical coordinates converter.
       public: common::SphericalCoordinatesPtr GetSphericalCoordinates() const;
