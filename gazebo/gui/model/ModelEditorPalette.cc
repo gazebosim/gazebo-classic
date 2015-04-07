@@ -533,7 +533,6 @@ void ModelEditorPalette::OnItemClicked(QTreeWidgetItem *_item,
     std::string selectedType =
         item->data(1, Qt::UserRole).toString().toStdString();
 
-    std::string name = _item->data(0, Qt::UserRole).toString().toStdString();
     std::string type = _item->data(1, Qt::UserRole).toString().toStdString();
 
     if (type != selectedType)

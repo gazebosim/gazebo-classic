@@ -1734,16 +1734,12 @@ void ModelCreator::OnAlignMode(const std::string &_axis,
 /////////////////////////////////////////////////
 void ModelCreator::DeselectAll()
 {
-  if (!this->selectedLinks.empty())
+  while (!this->selectedLinks.empty())
   {
-    while (!this->selectedLinks.empty())
-    {
-      rendering::VisualPtr vis = this->selectedLinks[0];
-      vis->SetHighlighted(false);
-      this->selectedLinks.erase(this->selectedLinks.begin());
-      model::Events::setSelectedLink(vis->GetName(), false);
-    }
-    this->selectedLinks.clear();
+    rendering::VisualPtr vis = this->selectedLinks[0];
+    vis->SetHighlighted(false);
+    this->selectedLinks.erase(this->selectedLinks.begin());
+    model::Events::setSelectedLink(vis->GetName(), false);
   }
 }
 

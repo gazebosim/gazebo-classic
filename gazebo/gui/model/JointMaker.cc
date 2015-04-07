@@ -303,7 +303,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           {
             auto it = std::find(this->selectedJoints.begin(),
                 this->selectedJoints.end(), vis);
-            // Highlight and select clicked link if not already selected
+            // Highlight and select clicked joint if not already selected
             if (it == this->selectedJoints.end())
             {
               this->SetSelected(vis, true);
@@ -1227,16 +1227,12 @@ void JointMaker::SetSelected(rendering::VisualPtr _jointVis,
 /////////////////////////////////////////////////
 void JointMaker::DeselectAll()
 {
-  if (!this->selectedJoints.empty())
+  while (!this->selectedJoints.empty())
   {
-    while (!this->selectedJoints.empty())
-    {
-      rendering::VisualPtr vis = this->selectedJoints[0];
-      vis->SetHighlighted(false);
-      this->selectedJoints.erase(this->selectedJoints.begin());
-      model::Events::setSelectedJoint(vis->GetName(), false);
-    }
-    this->selectedJoints.clear();
+    rendering::VisualPtr vis = this->selectedJoints[0];
+    vis->SetHighlighted(false);
+    this->selectedJoints.erase(this->selectedJoints.begin());
+    model::Events::setSelectedJoint(vis->GetName(), false);
   }
 }
 
