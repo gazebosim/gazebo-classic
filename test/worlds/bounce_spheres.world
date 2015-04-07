@@ -29,7 +29,6 @@
                 <max_vel>1e5</max_vel>
                 <min_depth>0.001</min_depth>
               </ode>
-               <collide_bitmask>0xffff</collide_bitmask>
             </contact>
             <friction>
               <ode>
