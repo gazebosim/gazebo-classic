@@ -198,6 +198,10 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
       this, SLOT(OnItemDoubleClicked(QTreeWidgetItem *, int)));
 
+  connect(this->modelTreeWidget,
+      SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+      this, SLOT(OnItemClicked(QTreeWidgetItem *, int)));
+
   connect(this->modelTreeWidget, SIGNAL(itemSelectionChanged()),
       this, SLOT(OnItemSelectionChanged()));
 
@@ -438,13 +442,9 @@ void ModelEditorPalette::OnItemSelectionChanged()
     std::string type = item->data(1, Qt::UserRole).toString().toStdString();
 
     if (type == "Link")
-    {
       gui::model::Events::setSelectedLink(name, true);
-    }
     else if (type == "Joint")
-    {
       gui::model::Events::setSelectedJoint(name, true);
-    }
   }
 
   // deselect
@@ -518,6 +518,56 @@ void ModelEditorPalette::OnItemDoubleClicked(QTreeWidgetItem *_item,
     else if (type == "Joint")
       gui::model::Events::openJointInspector(name);
   }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnItemClicked(QTreeWidgetItem *_item,
+    int /*_column*/)
+{
+  if (_item)
+  {
+    if (this->selected.empty())
+      return;
+
+    QTreeWidgetItem *item = this->selected[0];
+    std::string selectedType =
+        item->data(1, Qt::UserRole).toString().toStdString();
+
+    std::string name = _item->data(0, Qt::UserRole).toString().toStdString();
+    std::string type = _item->data(1, Qt::UserRole).toString().toStdString();
+
+    if (type != selectedType)
+      this->DeselectType(selectedType);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::DeselectType(const std::string &_type)
+{
+  QObject::disconnect(this->modelTreeWidget, SIGNAL(itemSelectionChanged()),
+      this, SLOT(OnItemSelectionChanged()));
+
+  for (auto it = this->selected.begin(); it != this->selected.end();)
+  {
+    std::string name = (*it)->data(0, Qt::UserRole).toString().toStdString();
+    std::string type = (*it)->data(1, Qt::UserRole).toString().toStdString();
+    if (type == _type)
+    {
+      (*it)->setSelected(false);
+      it = this->selected.erase(it);
+      if (type == "Link")
+        gui::model::Events::setSelectedLink(name, false);
+      else if (type == "Joint")
+        gui::model::Events::setSelectedJoint(name, false);
+    }
+    else
+      ++it;
+  }
+
+  this->selected = this->modelTreeWidget->selectedItems();
+
+  QObject::connect(this->modelTreeWidget, SIGNAL(itemSelectionChanged()),
+      this, SLOT(OnItemSelectionChanged()));
 }
 
 /////////////////////////////////////////////////

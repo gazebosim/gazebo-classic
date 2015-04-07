@@ -92,6 +92,10 @@ namespace gazebo
       private: void OnSetSelectedJoint(const std::string &_name,
           bool _selected);
 
+      /// \brief Helper function to deselect a link or a joint.
+      /// \param[in] _type Type: Link or Joint.
+      private: void DeselectType(const std::string &_type);
+
       /// \brief Qt callback when cylinder button is clicked.
       private slots: void OnCylinder();
 
@@ -122,6 +126,11 @@ namespace gazebo
       /// \param[in] _column Column index.
       private slots: void OnItemDoubleClicked(QTreeWidgetItem *_item,
           int _column);
+
+      /// \brief Qt callback when a tree item has been clicked.
+      /// \param[in] _item Item clicked.
+      /// \param[in] _column Column index.
+      private slots: void OnItemClicked(QTreeWidgetItem *_item, int _column);
 
       /// \brief Qt callback when selected items have changed.
       private slots: void OnItemSelectionChanged();
