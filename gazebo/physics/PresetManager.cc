@@ -447,7 +447,7 @@ void PresetManager::ProfileSDF(const std::string &_name,
 
   this->dataPtr->presetProfiles[_name].SDF(_sdf);
 
-  this->GeneratePresetFromSDF(&this->dataPtr->presetProfiles[_name], _sdf);
+  this->GeneratePresetFromSDF(_sdf, &this->dataPtr->presetProfiles[_name]);
 
   if (_name == this->CurrentProfile())
   {
@@ -458,8 +458,8 @@ void PresetManager::ProfileSDF(const std::string &_name,
 }
 
 //////////////////////////////////////////////////
-void PresetManager::GeneratePresetFromSDF(Preset *_preset,
-    const sdf::ElementPtr _elem) const
+void PresetManager::GeneratePresetFromSDF(const sdf::ElementPtr _elem,
+    Preset *_preset) const
 {
   if (!_preset)
   {
@@ -491,13 +491,13 @@ void PresetManager::GeneratePresetFromSDF(Preset *_preset,
     {
       _preset->SetParam(elem->GetName(), elem->GetAny());
     }
-    this->GeneratePresetFromSDF(_preset, elem);
+    this->GeneratePresetFromSDF(elem, _preset);
   }
 }
 
 //////////////////////////////////////////////////
-void PresetManager::GenerateSDFFromPreset(sdf::ElementPtr &_elem,
-    const std::string &_name) const
+void PresetManager::GenerateSDFFromPreset(const std::string &_name,
+    sdf::ElementPtr &_elem) const
 {
   if (!this->HasProfile(_name))
   {
@@ -511,13 +511,13 @@ void PresetManager::GenerateSDFFromPreset(sdf::ElementPtr &_elem,
   _elem = this->dataPtr->presetProfiles[_name].SDF()->Clone();
   GZ_ASSERT(_elem, "Null SDF pointer in preset");
 
-  GenerateSDFHelper(_elem, this->dataPtr->presetProfiles[_name]);
+  GenerateSDFHelper(this->dataPtr->presetProfiles[_name], _elem);
   GZ_ASSERT(_elem, "Generated NULL SDF pointer");
 }
 
 //////////////////////////////////////////////////
-void PresetManager::GenerateSDFHelper(sdf::ElementPtr &_elem,
-    const Preset &_preset) const
+void PresetManager::GenerateSDFHelper(const Preset &_preset,
+    sdf::ElementPtr &_elem) const
 {
   if (!_elem)
   {
@@ -585,7 +585,7 @@ void PresetManager::GenerateSDFHelper(sdf::ElementPtr &_elem,
           gzerr << "SDF type did not give successful cast" << std::endl;
       }
     }
-    this->GenerateSDFHelper(elem, _preset);
+    this->GenerateSDFHelper(_preset, elem);
   }
 }
 

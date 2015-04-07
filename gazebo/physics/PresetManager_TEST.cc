@@ -237,7 +237,7 @@ TEST_F(PresetManagerTest, SDF)
 
     // GenerateSDFFromPreset
     sdf::ElementPtr generatedPhysicsSDF;
-    presetManager->GenerateSDFFromPreset(generatedPhysicsSDF, "preset_3");
+    presetManager->GenerateSDFFromPreset("preset_3", generatedPhysicsSDF);
     // Compare the SDF as strings
     if (generatedPhysicsSDF == NULL)
     {
