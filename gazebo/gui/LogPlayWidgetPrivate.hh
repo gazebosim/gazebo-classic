@@ -17,10 +17,7 @@
 #ifndef _GAZEBO_LOG_PLAY_WIDGET_PRIVATE_HH_
 #define _GAZEBO_LOG_PLAY_WIDGET_PRIVATE_HH_
 
-#include <string>
-
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/TimePanel.hh"
 
 namespace gazebo
 {
@@ -38,6 +35,9 @@ namespace gazebo
 
       /// \brief Mutex to protect the memeber variables.
       public: boost::mutex mutex;
+
+      /// \brief Paused state of the simulation.
+      public: bool paused;
 
       /// TODO
       public: LogPlayView *view;

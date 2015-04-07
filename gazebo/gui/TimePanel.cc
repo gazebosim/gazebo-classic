@@ -46,6 +46,7 @@ TimePanel::TimePanel(QWidget *_parent)
   connect(this, SIGNAL(SetLogPlayWidgetVisible(bool)),
       this->dataPtr->logPlayWidget, SLOT(setVisible(bool)));
 
+  // Layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addWidget(this->dataPtr->timeWidget);
   mainLayout->addWidget(this->dataPtr->logPlayWidget);
@@ -58,11 +59,11 @@ TimePanel::TimePanel(QWidget *_parent)
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
 
-  this->dataPtr->statsSub =
-    this->dataPtr->node->Subscribe("~/world_stats", &TimePanel::OnStats, this);
+  this->dataPtr->statsSub = this->dataPtr->node->Subscribe(
+      "~/world_stats", &TimePanel::OnStats, this);
 
-  this->dataPtr->worldControlPub =
-    this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
+  this->dataPtr->worldControlPub = this->dataPtr->node->
+      Advertise<msgs::WorldControl>("~/world_control");
 
   // Timer
   QTimer *timer = new QTimer(this);
@@ -72,7 +73,7 @@ TimePanel::TimePanel(QWidget *_parent)
   // Connections
   this->dataPtr->connections.push_back(
       gui::Events::ConnectFullScreen(
-        boost::bind(&TimePanel::OnFullScreen, this, _1)));
+      boost::bind(&TimePanel::OnFullScreen, this, _1)));
 
   connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
   this->OnPlayActionChanged();
@@ -92,6 +93,9 @@ void TimePanel::OnFullScreen(bool & /*_value*/)
 TimePanel::~TimePanel()
 {
   this->dataPtr->node.reset();
+
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -277,7 +281,8 @@ void TimePanel::Update()
 
   simIter = ++(this->dataPtr->simTimes.begin());
   realIter = ++(this->dataPtr->realTimes.begin());
-  while (simIter != this->dataPtr->simTimes.end() && realIter != this->dataPtr->realTimes.end())
+  while (simIter != this->dataPtr->simTimes.end() &&
+      realIter != this->dataPtr->realTimes.end())
   {
     simAvg += ((*simIter) - this->dataPtr->simTimes.front());
     realAvg += ((*realIter) - this->dataPtr->realTimes.front());

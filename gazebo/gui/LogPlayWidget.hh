@@ -17,19 +17,9 @@
 #ifndef _GAZEBO_LOG_PLAY_WIDGET_HH_
 #define _GAZEBO_LOG_PLAY_WIDGET_HH_
 
-#include <vector>
-#include <list>
-#include <string>
-
 #include "gazebo/gui/qt.h"
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/Time.hh"
+#include "gazebo/gui/TimePanel.hh"
 #include "gazebo/util/system.hh"
-
-class QLineEdit;
-class QLabel;
 
 namespace gazebo
 {
@@ -37,22 +27,31 @@ namespace gazebo
   {
     class LogPlayWidgetPrivate;
     class LogPlayViewPrivate;
+    class TimePanel;
 
     class GAZEBO_VISIBLE LogPlayWidget : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor
+      /// \param[in] _parent Parent widget, commonly a TimePanel.
       public: LogPlayWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~LogPlayWidget();
 
-      /// \brief Play simulation.
+      /// \brief Returns if the simulation is displayed as paused.
+      /// \return True if paused, false otherwise.
+      public: bool IsPaused() const;
+
+      /// \brief Set whether to display the simulation as paused.
+      /// \param[in] _p True to display the simulation as paused. False
+      /// indicates the simulation is running
       public: void SetPaused(bool _paused);
 
-      /// \brief Emit a signal used to set the sim time line edit.
-      /// \param[in] _string String representation of sim time.
+      /// \brief Emit signal to set current time line edit and item.
+      /// \param[in] _timeString String representation of sim time.
+      /// \param[in] _timeInt Integer representation of sim time.
       public: void EmitSetCurrentTime(QString _timeString, int _timeInt);
 
       /// \brief Play simulation.

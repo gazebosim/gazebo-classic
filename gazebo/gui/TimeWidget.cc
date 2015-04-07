@@ -306,4 +306,3 @@ void TimeWidget::SetPercentRealTimeEdit(QString _text)
 {
   this->dataPtr->percentRealTimeEdit->setText(_text);
 }
-

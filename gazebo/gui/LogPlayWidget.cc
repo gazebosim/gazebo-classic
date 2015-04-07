@@ -150,8 +150,16 @@ LogPlayWidget::~LogPlayWidget()
 }
 
 /////////////////////////////////////////////////
+bool LogPlayWidget::IsPaused() const
+{
+  return this->dataPtr->paused;
+}
+
+/////////////////////////////////////////////////
 void LogPlayWidget::SetPaused(bool _paused)
 {
+  this->dataPtr->paused = _paused;
+
   if (_paused)
   {
     emit ShowPlay();
