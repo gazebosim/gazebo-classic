@@ -63,6 +63,7 @@ void SchematicViewWidget::Reset()
 {
   this->edges.clear();
   this->scene->clear();
+  this->FitInView();
 }
 
 /////////////////////////////////////////////////
@@ -199,4 +200,5 @@ void SchematicViewWidget::FitInView()
   this->view->fitInView(newRect, Qt::KeepAspectRatio);
   this->view->centerOn(newRect.x() + newRect.width()*0.5,
       newRect.y() + newRect.height()*0.5);
+  this->scene->setSceneRect(newRect);
 }
