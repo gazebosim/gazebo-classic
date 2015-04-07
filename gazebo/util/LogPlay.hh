@@ -121,6 +121,10 @@ namespace gazebo
       /// \brief Read the header from the log file.
       private: void ReadHeader();
 
+      /// \brief Update the internal variables that keep track of the times
+      /// where the log started and finished (simulation time).
+      private: void ReadLogTimes();
+
       /// \brief The XML document of the log file.
       private: TiXmlDocument xmlDoc;
 
