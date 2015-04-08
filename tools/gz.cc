@@ -290,7 +290,7 @@ PhysicsCommand::PhysicsCommand()
     ("step-size,s", po::value<double>(), "Maximum step size (seconds).")
     ("iters,i", po::value<double>(), "Number of iterations.")
     ("update-rate,u", po::value<double>(), "Target real-time update rate.")
-    ("profile,p", po::value<std::string>(), "Preset physics profile.");
+    ("profile,o", po::value<std::string>(), "Preset physics profile.");
 }
 
 /////////////////////////////////////////////////
