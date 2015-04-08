@@ -921,6 +921,114 @@ TEST_F(MsgsTest, MeshFromSDF)
 }
 
 /////////////////////////////////////////////////
+TEST_F(MsgsTest, AxisFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("joint.sdf", sdf);
+  sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <joint name='arm' type='revolute'>\
+           <parent>arm_base</parent>\
+           <child>arm_shoulder</child>\
+           <axis>\
+             <xyz>0 0 1</xyz>\
+             <limit>\
+               <lower>0.01</lower>\
+               <upper>9</upper>\
+               <effort>2.2</effort>\
+               <velocity>0.1</velocity>\
+             </limit>\
+             <use_parent_model_frame>false</use_parent_model_frame>\
+             <dynamics>\
+               <damping>0.1</damping>\
+               <friction>0.2</friction>\
+             </dynamics>\
+           </axis>\
+         </joint>\
+      </sdf>", sdf);
+  msgs::Axis msg = msgs::AxisFromSDF(sdf->GetElement("axis"));
+
+  EXPECT_EQ(msgs::Convert(msg.xyz()), math::Vector3(0, 0, 1));
+  EXPECT_NEAR(msg.limit_lower(), 0.01, 1e-6);
+  EXPECT_NEAR(msg.limit_upper(), 9, 1e-6);
+  EXPECT_NEAR(msg.limit_effort(), 2.2, 1e-6);
+  EXPECT_NEAR(msg.limit_velocity(), 0.1, 1e-6);
+  EXPECT_EQ(msg.use_parent_model_frame(), false);
+  EXPECT_NEAR(msg.damping(), 0.1, 1e-6);
+  EXPECT_NEAR(msg.friction(), 0.2, 1e-6);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, JointFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("joint.sdf", sdf);
+  sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <joint name='arm' type='revolute'>\
+           <pose>1 2 3 0 1.57 0</pose>\
+           <parent>arm_base</parent>\
+           <child>arm_shoulder</child>\
+           <axis>\
+             <xyz>1 0 0</xyz>\
+             <limit>\
+               <lower>0.1</lower>\
+               <upper>3.14</upper>\
+               <effort>2.4</effort>\
+               <velocity>0.4</velocity>\
+             </limit>\
+             <use_parent_model_frame>true</use_parent_model_frame>\
+             <dynamics>\
+               <damping>1.0</damping>\
+               <friction>0.1</friction>\
+             </dynamics>\
+           </axis>\
+           <physics>\
+             <ode>\
+               <cfm>0.2</cfm>\
+               <bounce>0.1</bounce>\
+               <velocity>1.1</velocity>\
+               <fudge_factor>0.4</fudge_factor>\
+               <limit>\
+                 <cfm>0.0</cfm>\
+                 <erp>0.9</erp>\
+               </limit>\
+               <suspension>\
+                 <cfm>0.1</cfm>\
+                 <erp>0.3</erp>\
+               </suspension>\
+             </ode>\
+           </physics>\
+         </joint>\
+      </gazebo>", sdf);
+  msgs::Joint msg = msgs::JointFromSDF(sdf);
+
+  EXPECT_EQ(msg.name(), "arm");
+  EXPECT_EQ(msgs::ConvertJointType(msg.type()), "revolute");
+  EXPECT_EQ(msgs::Convert(msg.pose()), math::Pose(1, 2, 3, 0, 1.57, 0));
+  EXPECT_EQ(msg.parent(), "arm_base");
+  EXPECT_EQ(msg.child(), "arm_shoulder");
+  EXPECT_NEAR(msg.cfm(), 0.2, 1e-6);
+  EXPECT_NEAR(msg.bounce(), 0.1, 1e-6);
+  EXPECT_NEAR(msg.velocity(), 1.1, 1e-6);
+  EXPECT_NEAR(msg.fudge_factor(), 0.4, 1e-6);
+  EXPECT_NEAR(msg.limit_cfm(), 0.0, 1e-6);
+  EXPECT_NEAR(msg.limit_erp(), 0.9, 1e-6);
+  EXPECT_NEAR(msg.suspension_cfm(), 0.1, 1e-6);
+  EXPECT_NEAR(msg.suspension_erp(), 0.3, 1e-6);
+
+  const msgs::Axis axisMsg = msg.axis1();
+  EXPECT_EQ(msgs::Convert(axisMsg.xyz()), math::Vector3(1, 0, 0));
+  EXPECT_NEAR(axisMsg.limit_lower(), 0.1, 1e-6);
+  EXPECT_NEAR(axisMsg.limit_upper(), 3.14, 1e-6);
+  EXPECT_NEAR(axisMsg.limit_effort(), 2.4, 1e-6);
+  EXPECT_NEAR(axisMsg.limit_velocity(), 0.4, 1e-6);
+  EXPECT_EQ(axisMsg.use_parent_model_frame(), true);
+  EXPECT_NEAR(axisMsg.damping(), 1.0, 1e-6);
+  EXPECT_NEAR(axisMsg.friction(), 0.1, 1e-6);
+}
+
+/////////////////////////////////////////////////
 TEST_F(MsgsTest, LinkToSDF)
 {
   const std::string name("test_link");
@@ -1911,4 +2019,3 @@ TEST_F(MsgsTest, ModelToSDF)
   EXPECT_EQ(jointElem2->Get<std::string>("type"), "revolute");
   EXPECT_EQ(jointElem2->Get<math::Pose>("pose"), math::Pose());
 }
-
