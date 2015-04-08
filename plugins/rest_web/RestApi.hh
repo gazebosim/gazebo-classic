@@ -16,8 +16,8 @@
 */
 
 
-#ifndef _REST_API_HH_
-#define _REST_API_HH_
+#ifndef _GAZEBO_REST_API_HH_
+#define _GAZEBO_REST_API_HH_
 
 #include <string>
 #include <list>
