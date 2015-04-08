@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 */
 
 #include <gtest/gtest.h>
-#include <memory>
+#include <boost/filesystem.hpp>
 #include <string>
 #include "gazebo/common/Time.hh"
 #include "gazebo/util/LogPlay.hh"
+#include "test_config.h"
 #include "test/util.hh"
 
 class LogPlay_TEST : public gazebo::testing::AutoLogFixture { };
@@ -35,16 +36,24 @@ TEST_F(LogPlay_TEST, Open)
   EXPECT_ANY_THROW(player->Open("non-existing-file"));
   EXPECT_FALSE(player->IsOpen());
 
+  boost::filesystem::path logFilePath(TEST_PATH);
+
   // Open a file that is a directory.
-  EXPECT_ANY_THROW(player->Open("gazebo/utils/logs/"));
+  EXPECT_ANY_THROW(player->Open(logFilePath.string()));
   EXPECT_FALSE(player->IsOpen());
 
-  // Open a malformed log file.
-  EXPECT_ANY_THROW(player->Open("gazebo/utils/logs/incorrectLog.state"));
+  logFilePath = TEST_PATH;
+  logFilePath /= "logs/invalidHeader.log";
+
+  // Open a malformed log file (incorrect header).
+  EXPECT_ANY_THROW(player->Open(logFilePath.string()));
   EXPECT_FALSE(player->IsOpen());
+
+  logFilePath = TEST_PATH;
+  logFilePath /= "logs/state.log";
 
   // Open a correct log file.
-  EXPECT_NO_THROW(player->Open("../test/logs/state.log"));
+  EXPECT_NO_THROW(player->Open(logFilePath.string()));
   EXPECT_TRUE(player->IsOpen());
 }
 
@@ -67,7 +76,10 @@ TEST_F(LogPlay_TEST, Accessors)
   gazebo::util::LogPlay *player = gazebo::util::LogPlay::Instance();
 
   // Open a correct log file.
-  EXPECT_NO_THROW(player->Open("../test/logs/state.log"));
+  boost::filesystem::path logFilePath(TEST_PATH);
+  logFilePath /= "logs/state.log";
+
+  EXPECT_NO_THROW(player->Open(logFilePath.string()));
 
   // Test the accessors.
   EXPECT_EQ(player->GetLogVersion(), "1.0");
@@ -94,7 +106,10 @@ TEST_F(LogPlay_TEST, Chunks)
   gazebo::util::LogPlay *player = gazebo::util::LogPlay::Instance();
 
   // Open a correct log file.
-  EXPECT_NO_THROW(player->Open("../test/logs/state.log"));
+  boost::filesystem::path logFilePath(TEST_PATH);
+  logFilePath /= "logs/state.log";
+
+  EXPECT_NO_THROW(player->Open(logFilePath.string()));
 
   // Make sure that the chunk returned is not empty.
   for (unsigned int i = 0; i < player->GetChunkCount(); ++i)
