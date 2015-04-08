@@ -49,10 +49,6 @@ namespace gazebo
       /// \return The name of the preset profile.
       public: std::string Name() const;
 
-      /// \brief Set the profile name.
-      /// \param[in] _name The new name of the preset profile.
-      public: void Name(const std::string &_name);
-
       /// \brief Get a profile parameter.
       /// \param[in] _key The key of the parameter to retrieve.
       /// \param[out] _value The parameter value at the input key.

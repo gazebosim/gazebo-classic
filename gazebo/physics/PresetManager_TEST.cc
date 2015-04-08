@@ -76,13 +76,15 @@ TEST_F(PresetManagerTest, GetSetProfileParam)
       max_step_size));
   EXPECT_TRUE(presetManager->SetCurrentProfileParam("max_step_size",
       0.8));
-  EXPECT_TRUE(presetManager->SetProfileParam("preset_1", "max_step_size", max_step_size));
+  EXPECT_TRUE(presetManager->SetProfileParam("preset_1", "max_step_size",
+      max_step_size));
 
   boost::any value2;
   EXPECT_FALSE(presetManager->GetCurrentProfileParam("param_does_not_exist",
       value2));
   EXPECT_TRUE(presetManager->GetCurrentProfileParam("max_step_size", value2));
-  EXPECT_TRUE(presetManager->GetProfileParam("preset_1", "max_step_size", value2));
+  EXPECT_TRUE(presetManager->GetProfileParam("preset_1", "max_step_size",
+      value2));
 
   try
   {

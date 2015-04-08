@@ -125,12 +125,6 @@ std::string Preset::Name() const
 }
 
 //////////////////////////////////////////////////
-void Preset::Name(const std::string &_name)
-{
-  this->dataPtr->name = _name;
-}
-
-//////////////////////////////////////////////////
 bool Preset::HasParam(const std::string &_key) const
 {
   return (!_key.empty()) && this->dataPtr->parameterMap.count(_key) != 0;
