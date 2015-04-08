@@ -5,8 +5,8 @@ package gazebo.msgs;
 
 message RestError
 {
-  required string type  = 1;
-  optional string msg   = 2;
+  required string type = 1;
+  optional string msg  = 2;
 }
 
 
