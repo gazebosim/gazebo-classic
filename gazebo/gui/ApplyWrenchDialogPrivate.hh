@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 #include <mutex>
+#include <map>
 
 #include "gazebo/gui/qt.h"
 
@@ -121,15 +122,6 @@ namespace gazebo
       /// \brief Current mode, either "force", "torque" or "none".
       public: std::string mode;
 
-      /// \brief Message to request for entity info.
-      public: msgs::Request *requestMsg;
-
-      /// \brief Publishes the request message.
-      public: transport::PublisherPtr requestPub;
-
-      /// \brief Subscribes to response messages.
-      public: transport::SubscriberPtr responseSub;
-
       /// \brief Pointer to the main window.
       public: MainWindow *mainWindow;
 
@@ -139,8 +131,8 @@ namespace gazebo
       /// \brief Mutex to protect variables.
       public: std::mutex mutex;
 
-      /// \brief Mutex to protect response callback.
-      public: std::mutex responseMutex;
+      /// \brief Map link name to link CoM vector.
+      public: std::map<std::string, math::Vector3> linkToCOMMap;
     };
   }
 }

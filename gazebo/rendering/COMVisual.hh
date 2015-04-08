@@ -57,6 +57,10 @@ namespace gazebo
       /// \param[in] _box Link's bounding box.
       private: void Load(const math::Pose &_pose,
           double _radius = 0.01, math::Box _box = math::Box());
+
+      /// \brief Get inertia pose.
+      /// \return Inertia pose in link frame.
+      public: math::Pose GetInertiaPose() const;
     };
     /// \}
   }

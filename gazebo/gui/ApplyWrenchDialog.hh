@@ -192,11 +192,6 @@ namespace gazebo
       /// \param[in] _dir New direction.
       private: void NewTorqueDirection(const math::Vector3 &_dir);
 
-      /// \brief Callback when receiving a response message. Used to get the
-      /// CoM from the server.
-      /// \param[in] _msg Response message.
-      private: void OnResponse(ConstResponsePtr &_msg);
-
       /// \brief Set this dialog to be active, visuals visible and mouse
       /// filters on.
       /// \param[in] _active True to make it active.

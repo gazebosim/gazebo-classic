@@ -20,6 +20,7 @@
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/ApplyWrenchVisual.hh"
@@ -380,13 +381,6 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
 
-  // Request/response to get link's CoM
-  this->dataPtr->requestPub = this->dataPtr->node->Advertise<msgs::Request>(
-      "~/request");
-  this->dataPtr->responseSub = this->dataPtr->node->Subscribe(
-      "~/response", &ApplyWrenchDialog::OnResponse, this);
-  this->dataPtr->requestMsg = NULL;
-
   this->dataPtr->mode = "none";
   this->dataPtr->comVector = math::Vector3::Zero;
   this->dataPtr->forceVector = math::Vector3::Zero;
@@ -484,7 +478,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
     rendering::VisualPtr childVis = vis->GetChild(i);
     std::string linkName = childVis->GetName();
 
-    // FIXME: This is failing to get real links sometimes:
+    // Issue #1553: This is failing to get real links sometimes:
     // uint32_t flags = childVis->GetVisibilityFlags();
     // if (!((flags != GZ_VISIBILITY_ALL) && (flags & GZ_VISIBILITY_GUI)))
     if (linkName.find("_GL_MANIP_") == std::string::npos)
@@ -492,6 +486,20 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
       std::string unscopedLinkName = linkName.substr(linkName.find("::") + 2);
       this->dataPtr->linksComboBox->addItem(
           QString::fromStdString(unscopedLinkName));
+
+      // Get CoM from link's COMVisual
+      for (unsigned int j = 0; j < childVis->GetChildCount(); ++j)
+      {
+        rendering::COMVisualPtr comVis =
+            boost::dynamic_pointer_cast<rendering::COMVisual>(
+            childVis->GetChild(j));
+
+        if (comVis)
+        {
+          this->dataPtr->linkToCOMMap[linkName] = comVis->GetInertiaPose().pos;
+          break;
+        }
+      }
     }
   }
   // Sort alphabetically
@@ -516,8 +524,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
 /////////////////////////////////////////////////
 bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
 {
-  if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene() ||
-      !this->dataPtr->requestPub)
+  if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene())
     return false;
 
   // Select on combo box
@@ -540,10 +547,6 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   }
   this->dataPtr->linksComboBox->setCurrentIndex(index);
 
-  // Request link message to get CoM
-  this->dataPtr->requestMsg = msgs::CreateRequest("entity_info", _linkName);
-  this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
-
   // Visual
   this->dataPtr->linkName = _linkName;
   rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
@@ -557,6 +560,9 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   }
   this->dataPtr->linkVisual = vis;
   this->AttachVisuals();
+
+  // Set publisher
+  this->SetPublisher();
 
   // Filter main window activate events
   this->dataPtr->mainWindow->installEventFilter(this);
@@ -584,41 +590,6 @@ void ApplyWrenchDialog::SetLink(const QString _linkName)
 
   if (!this->SetLink(this->dataPtr->modelName + "::" + _linkName.toStdString()))
     this->Fini();
-}
-
-///////////////////////////////////////////////////
-void ApplyWrenchDialog::OnResponse(ConstResponsePtr &_msg)
-{
-  std::lock_guard<std::mutex> lock(this->dataPtr->responseMutex);
-
-  if (!this->dataPtr->requestMsg ||
-      _msg->id() != this->dataPtr->requestMsg->id())
-  {
-    return;
-  }
-
-  if (_msg->has_type() && _msg->type() == "gazebo.msgs.Link")
-  {
-    msgs::Link linkMsg;
-    linkMsg.ParseFromString(_msg->serialized_data());
-
-    // Name
-    if (!linkMsg.has_name())
-      return;
-
-    this->dataPtr->linkName = linkMsg.name();
-    this->SetPublisher();
-
-    // CoM
-    if (linkMsg.has_inertial() && linkMsg.inertial().has_pose())
-    {
-      this->SetCoM(msgs::Convert(linkMsg.inertial().pose()).pos);
-      // Apply force at com by default
-      this->SetForcePos(this->dataPtr->comVector);
-    }
-  }
-  delete this->dataPtr->requestMsg;
-  this->dataPtr->requestMsg = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -798,6 +769,10 @@ void ApplyWrenchDialog::AttachVisuals()
     this->Fini();
   }
 
+  // Set COM
+  this->SetCoM(this->dataPtr->linkToCOMMap[this->dataPtr->linkName]);
+  // Apply force at com by default
+  this->SetForcePos(this->dataPtr->comVector);
   this->SetTorque(this->dataPtr->torqueVector, true);
   this->SetForce(this->dataPtr->forceVector, true);
 }

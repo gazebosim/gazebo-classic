@@ -39,6 +39,9 @@ namespace gazebo
 
       /// \brief Sphere with density of lead and equivalent mass.
       public: Ogre::SceneNode *sphereNode;
+
+      /// \brief Inertia pose in link frame.
+      public: math::Pose inertiaPose;
     };
   }
 }

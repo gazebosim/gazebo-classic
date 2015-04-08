@@ -54,6 +54,9 @@ void COMVisual::Load(ConstLinkPtr &_msg)
 {
   Visual::Load();
 
+  COMVisualPrivate *dPtr =
+      reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
+
   math::Vector3 xyz(_msg->inertial().pose().position().x(),
                     _msg->inertial().pose().position().y(),
                     _msg->inertial().pose().position().z());
@@ -62,13 +65,15 @@ void COMVisual::Load(ConstLinkPtr &_msg)
                      _msg->inertial().pose().orientation().y(),
                      _msg->inertial().pose().orientation().z());
 
+  dPtr->inertiaPose = math::Pose(xyz, q);
+
   double mass = _msg->inertial().mass();
   if (mass < 0)
   {
     // Unrealistic mass, load with default mass
     gzlog << "The link " << _msg->name() << " has unrealistic mass, "
           << "unable to visualize sphere of equivalent mass." << std::endl;
-    this->Load(math::Pose(xyz, q));
+    this->Load(dPtr->inertiaPose);
   }
   else
   {
@@ -85,7 +90,7 @@ void COMVisual::Load(ConstLinkPtr &_msg)
     if (vis)
       box = vis->GetBoundingBox();
 
-    this->Load(math::Pose(xyz, q), sphereRadius, box);
+    this->Load(dPtr->inertiaPose, sphereRadius, box);
   }
 }
 
@@ -140,3 +145,13 @@ void COMVisual::Load(const math::Pose &_pose, double _radius, math::Box _box)
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
+
+/////////////////////////////////////////////////
+math::Pose COMVisual::GetInertiaPose() const
+{
+  COMVisualPrivate *dPtr =
+      reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
+
+  return dPtr->inertiaPose;
+}
+
