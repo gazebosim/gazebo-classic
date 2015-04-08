@@ -246,7 +246,7 @@ TEST_F(PresetManagerTest, SDF)
         generatedPhysicsSDF);
     // Call doesn't do anything
     ASSERT_TRUE(generatedPhysicsSDF == NULL);
-    
+
     presetManager->GenerateSDFFromPreset("preset_3", generatedPhysicsSDF);
     // Compare the SDF as strings
     ASSERT_TRUE(generatedPhysicsSDF != NULL);
