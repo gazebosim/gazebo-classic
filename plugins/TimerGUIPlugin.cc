@@ -257,6 +257,11 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
   }
 }
 
+common::Time TimerGUIPlugin::GetCurrentTime() const
+{
+  return this->timer.GetElapsed();
+}
+
 /////////////////////////////////////////////////
 void TimerGUIPlugin::PreRender()
 {
