@@ -241,15 +241,16 @@ TEST_F(PresetManagerTest, SDF)
     }
 
     // GenerateSDFFromPreset
-    sdf::ElementPtr generatedPhysicsSDF;
+    sdf::ElementPtr generatedPhysicsSDF = NULL;
+    presetManager->GenerateSDFFromPreset("this_preset_does_not_exist",
+        generatedPhysicsSDF);
+    // Call doesn't do anything
+    ASSERT_TRUE(generatedPhysicsSDF == NULL);
+    
     presetManager->GenerateSDFFromPreset("preset_3", generatedPhysicsSDF);
     // Compare the SDF as strings
-    if (generatedPhysicsSDF == NULL)
-    {
-      gzerr << "Generated SDF pointer was NULL" << std::endl;
-      FAIL();
-      return;
-    }
+    ASSERT_TRUE(generatedPhysicsSDF != NULL);
+
     EXPECT_EQ(generatedPhysicsSDF->ToString(""), physicsSDF->ToString(""));
   }
 
@@ -279,7 +280,7 @@ TEST_F(PresetManagerTest, SDF)
       </sdf>");
     sceneSDF = worldSDF.Root()->GetElement("world")->GetElement("scene");
     EXPECT_EQ(presetManager->CreateProfile(sceneSDF), "");
-    presetManager->ProfileSDF("default_physics", sceneSDF);
+    EXPECT_FALSE(presetManager->ProfileSDF("default_physics", sceneSDF));
   }
 }
 
