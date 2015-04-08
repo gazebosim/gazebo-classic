@@ -84,8 +84,7 @@ namespace gazebo
       /// this function.
       /// \return True if setting all parameters in one level of SDF was
       /// successful.
-      private: bool SetAllParamsHelper(const sdf::ElementPtr _elem,
-          bool _result);
+      private: bool SetAllParamsHelper(const sdf::ElementPtr _elem);
 
       /// \brief Get this preset profile's SDF
       /// \return An SDF element pointer representing a <physics> element
@@ -209,7 +208,7 @@ namespace gazebo
       /// \param[in] _sdf The SDF physics element for the profile.
       /// \param[out] _param The preset profile element.
       private: void GeneratePresetFromSDF(const sdf::ElementPtr _elem,
-          Preset *_preset) const;
+          Preset &_preset) const;
 
       /// \brief Get a pointer to the current profile preset.
       /// \return Pointer to the current profile preset object.

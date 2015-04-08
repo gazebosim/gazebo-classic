@@ -41,18 +41,19 @@ template<typename T> bool CastAnyValue(const boost::any &_value, T &_return)
 Preset::Preset()
     : dataPtr(new PresetPrivate)
 {
+  GZ_ASSERT(this->dataPtr != NULL, "Data ptr NULL for Preset!");
 }
 
 //////////////////////////////////////////////////
 Preset::Preset(const std::string &_name)
     : dataPtr(new PresetPrivate(_name))
 {
+  GZ_ASSERT(this->dataPtr != NULL, "Data ptr NULL for Preset!");
 }
 
 //////////////////////////////////////////////////
 Preset::~Preset()
 {
-  GZ_ASSERT(this->dataPtr, "Data ptr not NULL for Preset!");
   delete this->dataPtr;
   this->dataPtr = NULL;
 }
@@ -61,49 +62,54 @@ Preset::~Preset()
 bool Preset::SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine) const
 {
   bool result = true;
+
   if (!_physicsEngine)
   {
     gzwarn << "Physics engine for PresetManager is NULL. PresetManager will "
            << "have no effect on simulation!" << std::endl;
-    return false;
+    result = false;
   }
-
-  for (auto const &param : this->dataPtr->parameterMap)
+  else
   {
-    // disable params we know can't be set
-    if (param.first == "type")
-      continue;
-    if (!_physicsEngine->SetParam(param.first, param.second))
+    for (auto const &param : this->dataPtr->parameterMap)
     {
-      gzwarn << "Couldn't set parameter [" << param.first
-             << "] in physics engine" << std::endl;
-      result = false;
+      // disable params we know can't be set
+      if (param.first != "type" &&
+          !_physicsEngine->SetParam(param.first, param.second))
+      {
+        gzwarn << "Couldn't set parameter [" << param.first
+          << "] in physics engine" << std::endl;
+        result = false;
+        break;
+      }
     }
   }
+
   return result;
 }
 
 //////////////////////////////////////////////////
 bool Preset::SetAllParamsFromSDF(const sdf::ElementPtr _elem)
 {
-  return this->SetAllParamsHelper(_elem, true);
+  return this->SetAllParamsHelper(_elem);
 }
 
 //////////////////////////////////////////////////
-bool Preset::SetAllParamsHelper(const sdf::ElementPtr _elem, bool _result)
+bool Preset::SetAllParamsHelper(const sdf::ElementPtr _elem)
 {
+  bool result = true;
+
   if (!_elem)
   {
-    return _result;
+    return result;
   }
 
   // Avoid setting parameters that do not match the physics engine type set in
   // SDF
-
   if (_elem->GetParent() && _elem->GetParent()->GetName() == "physics" &&
       _elem->GetParent()->Get<std::string>("type") != _elem->GetName())
   {
-    return _result;
+    return result;
   }
 
   for (sdf::ElementPtr elem = _elem->GetFirstElement(); elem;
@@ -111,11 +117,12 @@ bool Preset::SetAllParamsHelper(const sdf::ElementPtr _elem, bool _result)
   {
     if (elem->GetValue())
     {
-      _result &= this->SetParam(elem->GetName(), elem->GetAny());
+      result &= this->SetParam(elem->GetName(), elem->GetAny());
     }
-    _result &= this->SetAllParamsHelper(elem, _result);
+    result &= this->SetAllParamsHelper(elem);
   }
-  return _result;
+
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -127,29 +134,40 @@ std::string Preset::Name() const
 //////////////////////////////////////////////////
 bool Preset::HasParam(const std::string &_key) const
 {
-  return (!_key.empty()) && this->dataPtr->parameterMap.count(_key) != 0;
+  return this->dataPtr->parameterMap.find(_key) !=
+         this->dataPtr->parameterMap.end();
 }
 
 //////////////////////////////////////////////////
 bool Preset::GetParam(const std::string &_key, boost::any &_value) const
 {
+  bool result = true;
+
   if (!this->HasParam(_key))
   {
     gzwarn << "Parameter [" << _key << "] is not a member of profile ["
            << this->Name() << "]" << std::endl;
-    return false;
+    result = false;
   }
-  _value = this->dataPtr->parameterMap[_key];
-  return true;
+  else
+  {
+    _value = this->dataPtr->parameterMap[_key];
+  }
+
+  return result;
 }
 
 //////////////////////////////////////////////////
 bool Preset::SetParam(const std::string &_key, const boost::any &_value)
 {
+  bool result = true;
+
   if (_key.empty())
-    return false;
-  this->dataPtr->parameterMap[_key] = _value;
-  return true;
+    result = false;
+  else
+    this->dataPtr->parameterMap[_key] = _value;
+
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -180,6 +198,8 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
     const sdf::ElementPtr _sdf)
     : dataPtr(new PresetManagerPrivate)
 {
+  GZ_ASSERT(this->dataPtr != NULL, "Data pointer NULL for PresetManager!");
+
   this->dataPtr->physicsEngine = _physicsEngine;
   if (!_physicsEngine || !_sdf)
   {
@@ -193,6 +213,7 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
     gzerr << "PresetManager does not support preset profiles for SDF besides "
           << "physics. No profiles will be made." << std::endl;
   }
+
   bool defaultSet = false;
   for (sdf::ElementPtr physicsElem = _sdf->GetElement("physics"); physicsElem;
         physicsElem = physicsElem->GetNextElement("physics"))
@@ -203,18 +224,20 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
     {
       gzlog << "Empty physics profile name specified in SDF. No profile made "
             << "in PresetManager." << std::endl;
-      continue;
     }
-    if (this->CurrentProfile().empty())
+    else
     {
-      this->CurrentProfile(name);
-    }
-    if (physicsElem->HasAttribute("default"))
-    {
-      if (physicsElem->Get<bool>("default") && !defaultSet)
+      if (this->CurrentProfile().empty())
       {
         this->CurrentProfile(name);
-        defaultSet = true;
+      }
+      if (physicsElem->HasAttribute("default"))
+      {
+        if (physicsElem->Get<bool>("default") && !defaultSet)
+        {
+          this->CurrentProfile(name);
+          defaultSet = true;
+        }
       }
     }
   }
@@ -223,7 +246,6 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
 //////////////////////////////////////////////////
 PresetManager::~PresetManager()
 {
-  GZ_ASSERT(this->dataPtr, "Data pointer not NULL for PresetManager!");
   this->dataPtr->presetProfiles.clear();
   delete this->dataPtr;
   this->dataPtr = NULL;
@@ -232,11 +254,10 @@ PresetManager::~PresetManager()
 //////////////////////////////////////////////////
 bool PresetManager::CurrentProfile(const std::string &_name)
 {
+  GZ_ASSERT(this->dataPtr->physicsEngine, "Physics engine was NULL");
+
   if (_name.empty())
     return false;
-
-  if (_name == this->CurrentProfile())
-    return true;
 
   if (!this->HasProfile(_name))
   {
@@ -244,16 +265,16 @@ bool PresetManager::CurrentProfile(const std::string &_name)
     return false;
   }
 
-  GZ_ASSERT(this->dataPtr->physicsEngine, "Physics engine was NULL");
+  if (_name == this->CurrentProfile())
+    return true;
 
   this->dataPtr->currentPreset = _name;
-  if (this->CurrentPreset() == NULL)
-    return false;
 
   // For now, ignore the return value of this function, since not all
   // parameters are supported
   this->CurrentPreset()->SetAllPhysicsParameters(
       this->dataPtr->physicsEngine);
+
   return true;
 }
 
@@ -283,18 +304,22 @@ bool PresetManager::SetProfileParam(const std::string &_profileName,
     return this->SetCurrentProfileParam(_key, _value);
   }
 
-  if (_profileName.empty() || !this->HasProfile(_profileName))
+  auto iter = this->dataPtr->presetProfiles.find(_profileName);
+
+  if (iter == this->dataPtr->presetProfiles.end())
   {
     gzwarn << "Invalid profile name: [" << _profileName << "]" << std::endl;
     return false;
   }
-  if (!this->dataPtr->presetProfiles[_profileName].HasParam(_key))
+
+  if (!iter->second.HasParam(_key))
   {
     gzwarn << "Profile [" << _profileName << "] does not have key [" << _key
            << "], so it was not set." << std::endl;
     return false;
   }
-  if (!this->dataPtr->presetProfiles[_profileName].SetParam(_key, _value))
+
+  if (!iter->second.SetParam(_key, _value))
   {
     gzwarn << "Could not set key [" << _key
            << "] for profile [" << _profileName << "]." << std::endl;
@@ -307,7 +332,7 @@ bool PresetManager::SetProfileParam(const std::string &_profileName,
 bool PresetManager::GetProfileParam(const std::string &_name,
     const std::string &_key, boost::any &_value) const
 {
-  if (_name.empty() || !this->HasProfile(_name))
+  if (!this->HasProfile(_name))
   {
     return false;
   }
@@ -334,7 +359,8 @@ bool PresetManager::SetCurrentProfileParam(const std::string &_key,
   }
   catch(const boost::bad_any_cast &e)
   {
-    gzerr << "Couldn't set physics engine parameter! " << e.what() << std::endl;
+    gzerr << "Couldn't set physics engine parameter[" << e.what()
+          << "]" << std::endl;
     return false;
   }
   return true;
@@ -344,7 +370,7 @@ bool PresetManager::SetCurrentProfileParam(const std::string &_key,
 bool PresetManager::GetCurrentProfileParam(const std::string &_key,
     boost::any &_value)
 {
-  if (this->CurrentProfile().empty() )
+  if (this->CurrentProfile().empty())
   {
     return false;
   }
@@ -356,7 +382,7 @@ bool PresetManager::CreateProfile(const std::string &_name)
 {
   if (_name.empty())
   {
-    gzwarn << "Specified profile name was invalid. Aborting." << std::endl;
+    gzwarn << "Specified profile name was empty. Aborting." << std::endl;
     return false;
   }
   if (this->HasProfile(_name))
@@ -364,8 +390,7 @@ bool PresetManager::CreateProfile(const std::string &_name)
     gzwarn << "Warning: profile [" << _name << "] already exists! Overwriting."
            << std::endl;
   }
-  Preset *newPreset = new Preset(_name);
-  this->dataPtr->presetProfiles[_name] = *newPreset;
+  this->dataPtr->presetProfiles.emplace(_name, _name);
 
   if (!this->ProfileSDF(_name, this->dataPtr->physicsEngine->GetSDF()))
     return false;
@@ -413,7 +438,8 @@ void PresetManager::RemoveProfile(const std::string &_name)
 //////////////////////////////////////////////////
 bool PresetManager::HasProfile(const std::string &_name) const
 {
-  return this->dataPtr->presetProfiles.count(_name) > 0;
+  return this->dataPtr->presetProfiles.find(_name) !=
+         this->dataPtr->presetProfiles.end();
 }
 
 //////////////////////////////////////////////////
@@ -433,41 +459,34 @@ sdf::ElementPtr PresetManager::ProfileSDF(const std::string &_name) const
 bool PresetManager::ProfileSDF(const std::string &_name,
     const sdf::ElementPtr _sdf)
 {
-  if (_name.empty() || !this->HasProfile(_name))
-    return false;
   if (!_sdf)
   {
     gzwarn << "Received NULL SDF element pointer in ProfileSDF" << std::endl;
     return false;
   }
 
-  if (!this->dataPtr->presetProfiles[_name].SDF(_sdf))
-  {
-    return false;
-  }
+  auto iter = this->dataPtr->presetProfiles.find(_name);
 
-  this->GeneratePresetFromSDF(_sdf, &this->dataPtr->presetProfiles[_name]);
+  if (iter == this->dataPtr->presetProfiles.end() ||
+      !iter->second.SDF(_sdf))
+    return false;
+
+  this->GeneratePresetFromSDF(_sdf, iter->second);
 
   if (_name == this->CurrentProfile())
   {
     this->CurrentPreset()->SetAllPhysicsParameters(
         this->dataPtr->physicsEngine);
   }
-  this->dataPtr->presetProfiles[_name].SetAllParamsFromSDF(_sdf);
+
+  iter->second.SetAllParamsFromSDF(_sdf);
   return true;
 }
 
 //////////////////////////////////////////////////
 void PresetManager::GeneratePresetFromSDF(const sdf::ElementPtr _elem,
-    Preset *_preset) const
+    Preset &_preset) const
 {
-  if (!_preset)
-  {
-    gzerr << "NULL preset given to GeneratePresetFromSDF. No preset will be "
-          << "generated." << std::endl;
-    return;
-  }
-
   GZ_ASSERT(_elem, "NULL elem in GeneratePresetFromSDF, should never happen");
 
   // Check for physics engine type. If the type specified in SDF doesn't match
@@ -486,7 +505,7 @@ void PresetManager::GeneratePresetFromSDF(const sdf::ElementPtr _elem,
   {
     if (elem->GetValue() != NULL)
     {
-      _preset->SetParam(elem->GetName(), elem->GetAny());
+      _preset.SetParam(elem->GetName(), elem->GetAny());
     }
     this->GeneratePresetFromSDF(elem, _preset);
   }
@@ -496,7 +515,9 @@ void PresetManager::GeneratePresetFromSDF(const sdf::ElementPtr _elem,
 void PresetManager::GenerateSDFFromPreset(const std::string &_name,
     sdf::ElementPtr &_elem) const
 {
-  if (!this->HasProfile(_name))
+  auto iter = this->dataPtr->presetProfiles.find(_name);
+
+  if (iter == this->dataPtr->presetProfiles.end())
   {
     gzwarn << "Profile [" << _name << "] does not exist. No SDF will be "
            << "generated." << std::endl;
@@ -505,10 +526,10 @@ void PresetManager::GenerateSDFFromPreset(const std::string &_name,
   _elem.reset();
 
   // Start with the elementSDF member variable of the preset
-  _elem = this->dataPtr->presetProfiles[_name].SDF()->Clone();
+  _elem = iter->second.SDF()->Clone();
   GZ_ASSERT(_elem, "Null SDF pointer in preset");
 
-  GenerateSDFHelper(this->dataPtr->presetProfiles[_name], _elem);
+  this->GenerateSDFHelper(iter->second, _elem);
   GZ_ASSERT(_elem, "Generated NULL SDF pointer");
 }
 
