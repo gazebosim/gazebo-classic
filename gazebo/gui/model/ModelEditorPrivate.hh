@@ -28,6 +28,7 @@ namespace gazebo
   {
     class ModelEditorPalette;
 
+    /// \internal
     /// \class ModelEditor ModelEditor.hh
     /// \brief Private data for the ModelEditor class.
     class ModelEditorPrivate
