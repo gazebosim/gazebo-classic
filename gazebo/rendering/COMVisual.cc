@@ -100,6 +100,27 @@ void COMVisual::Load(const math::Pose &_pose, double _radius, math::Box _box)
   COMVisualPrivate *dPtr =
       reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
 
+  // Mass indicator: equivalent sphere with density of lead
+  this->InsertMesh("unit_sphere");
+
+  Ogre::MovableObject *sphereObj =
+    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+          this->GetName()+"__SPHERE__", "unit_sphere"));
+  sphereObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
+  sphereObj->setCastShadows(false);
+
+  dPtr->sphereNode =
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SPHERE");
+
+  dPtr->sphereNode->attachObject(sphereObj);
+  dPtr->sphereNode->setScale(_radius*2, _radius*2, _radius*2);
+  dPtr->sphereNode->setPosition(_pose.pos.x, _pose.pos.y, _pose.pos.z);
+  dPtr->sphereNode->setOrientation(Ogre::Quaternion(_pose.rot.w, _pose.rot.x,
+                                                    _pose.rot.y, _pose.rot.z));
+  dPtr->sphereNode->setInheritScale(false);
+
+  this->SetMaterial("Gazebo/CoM");
+
   // CoM position indicator
   math::Vector3 p1(0, 0, _box.min.z - _pose.pos.z);
   math::Vector3 p2(0, 0, _box.max.z - _pose.pos.z);
@@ -122,26 +143,6 @@ void COMVisual::Load(const math::Pose &_pose, double _radius, math::Box _box)
   dPtr->crossLines->AddPoint(p4);
   dPtr->crossLines->AddPoint(p5);
   dPtr->crossLines->AddPoint(p6);
-
-  // Mass indicator: equivalent sphere with density of lead
-  this->InsertMesh("unit_sphere");
-
-  Ogre::MovableObject *sphereObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__SPHERE__", "unit_sphere"));
-  sphereObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
-  ((Ogre::Entity*)sphereObj)->setMaterialName("Gazebo/CoM");
-  sphereObj->setCastShadows(false);
-
-  dPtr->sphereNode =
-      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SPHERE");
-
-  dPtr->sphereNode->attachObject(sphereObj);
-  dPtr->sphereNode->setScale(_radius*2, _radius*2, _radius*2);
-  dPtr->sphereNode->setPosition(_pose.pos.x, _pose.pos.y, _pose.pos.z);
-  dPtr->sphereNode->setOrientation(Ogre::Quaternion(_pose.rot.w, _pose.rot.x,
-                                                    _pose.rot.y, _pose.rot.z));
-  dPtr->sphereNode->setInheritScale(false);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }

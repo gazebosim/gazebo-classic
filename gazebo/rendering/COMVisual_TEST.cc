@@ -16,7 +16,6 @@
 */
 
 #include <gtest/gtest.h>
-//#include "gazebo/math/Rand.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/COMVisual.hh"
@@ -40,19 +39,46 @@ TEST_F(COMVisual_TEST, COMVisualTest)
   EXPECT_TRUE(scene != NULL);
 
   // create a default link message
+  gazebo::msgs::LinkPtr linkDefaultMsg;
+  linkDefaultMsg.reset(new gazebo::msgs::Link);
+
+  // create a link visual
+  gazebo::rendering::VisualPtr linkDefaultVis;
+  linkDefaultVis.reset(
+      new gazebo::rendering::Visual("link", scene->GetWorldVisual()));
+
+  // create CoMVisual for the link
+  gazebo::rendering::COMVisualPtr comDefaultVis(
+      new gazebo::rendering::COMVisual("_COM_VISUAL_", linkDefaultVis));
+  comDefaultVis->Load(linkDefaultMsg);
+
+  EXPECT_EQ(comDefaultVis->GetInertiaPose().pos, math::Vector3::Zero);
+  EXPECT_EQ(comDefaultVis->GetInertiaPose().rot.GetAsEuler(),
+      math::Vector3::Zero);
+
+  // Create a message and set inertia pose
+  math::Vector3 pos(1, 0, -3);
+  math::Quaternion quat(M_PI/2, 0, -M_PI/5);
+
   gazebo::msgs::LinkPtr linkMsg;
   linkMsg.reset(new gazebo::msgs::Link);
+  msgs::Set(linkMsg->mutable_inertial()->mutable_pose()->mutable_position(),
+      pos);
+  msgs::Set(linkMsg->mutable_inertial()->mutable_pose()->mutable_orientation(),
+      quat);
 
   // create a link visual
   gazebo::rendering::VisualPtr linkVis;
-  linkVis.reset(new gazebo::rendering::Visual("link", scene->GetWorldVisual()));
-  linkVis.Load(linkMsg);
+  linkVis.reset(
+      new gazebo::rendering::Visual("link", scene->GetWorldVisual()));
 
   // create CoMVisual for the link
-  COMVisualPtr comVis(new COMVisual("_COM_VISUAL_", linkVis));
+  gazebo::rendering::COMVisualPtr comVis(
+      new gazebo::rendering::COMVisual("_COM_VISUAL_", linkVis));
   comVis->Load(linkMsg);
 
-  EXPECT_EQ(comVis->GetInertiaPose(), math::Pose::Zero);
+  EXPECT_EQ(comVis->GetInertiaPose().pos, pos);
+  EXPECT_EQ(comVis->GetInertiaPose().rot, quat);
 }
 
 /////////////////////////////////////////////////
