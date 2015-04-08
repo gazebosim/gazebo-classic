@@ -1,7 +1,16 @@
 ## Gazebo 6.0
 
+1. Fix deprecation warnings when using SDFormat 3.0.2, 3.0.3 prereleases
+    * [Pull request #1568](https://bitbucket.org/osrf/gazebo/pull-request/1568)
+
+1. Use GAZEBO_CFLAGS or GAZEBO_CXX_FLAGS in CMakeLists.txt for example plugins
+    * [Pull request #1573](https://bitbucket.org/osrf/gazebo/pull-request/1573)
+
 1. Show/hide GUI overlays using the menu bar.
     * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
+
+1. Added optional start/stop/reset buttons to timer GUI plugin.
+    * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
 
 1. Separate TimePanel's display into TimeWidget and LogPlayWidget.
     * [Pull request #1564](https://bitbucket.org/osrf/gazebo/pull-request/1564)
@@ -59,6 +68,9 @@
 1. Added PresetManager to physics libraries and corresponding integration test.
     * [Pull request #1471](https://bitbucket.org/osrf/gazebo/pull-request/1471)
 
+1. Sync name and location on SaveDialog.
+    * [Pull request #1563](https://bitbucket.org/osrf/gazebo/pull-request/1563)
+
 1. Model editor updates
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
@@ -105,6 +117,13 @@
     1. Added list of links and joints.
         * [Pull request #1515](https://bitbucket.org/osrf/gazebo/pull-request/1515)
         * [Issue #1418](https://bitbucket.org/osrf/gazebo/issue/1418)
+
+    1. Expose API to support adding items to the palette.
+        * [Pull request #1565](https://bitbucket.org/osrf/gazebo/pull-request/1565)
+
+    1. Added menu for toggling joint visualization
+        * [Pull request #1551](https://bitbucket.org/osrf/gazebo/pull-request/1551)
+        * [Issue #1483](https://bitbucket.org/osrf/gazebo/issue/1483)
 
 1. Building editor updates
     1. Make palette tips tooltip clickable to open.

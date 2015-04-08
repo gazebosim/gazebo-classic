@@ -448,9 +448,9 @@ void MainWindow::Save()
     sdf::SDF sdf_parsed;
     sdf_parsed.SetFromString(msg.data());
     // Check that sdf contains world
-    if (sdf_parsed.root->HasElement("world"))
+    if (sdf_parsed.Root()->HasElement("world"))
     {
-      sdf::ElementPtr world = sdf_parsed.root->GetElement("world");
+      sdf::ElementPtr world = sdf_parsed.Root()->GetElement("world");
       sdf::ElementPtr guiElem = world->GetElement("gui");
 
       if (guiElem->HasAttribute("fullscreen"))
@@ -463,7 +463,7 @@ void MainWindow::Save()
       cameraElem->GetElement("view_controller")->Set(
           cam->GetViewControllerTypeString());
       // TODO: export track_visual properties as well.
-      msgData = sdf_parsed.root->ToString("");
+      msgData = sdf_parsed.Root()->ToString("");
     }
     else
     {
@@ -1894,13 +1894,13 @@ bool MainWindow::IsPaused() const
 void MainWindow::CreateEditors()
 {
   // Create a Terrain Editor
-  this->editors.push_back(new TerrainEditor(this));
+  this->editors["terrain"] = new TerrainEditor(this);
 
   // Create a Building Editor
-  this->editors.push_back(new BuildingEditor(this));
+  this->editors["building"] = new BuildingEditor(this);
 
   // Create a Model Editor
-  this->editors.push_back(new ModelEditor(this));
+  this->editors["model"] = new ModelEditor(this);
 }
 
 /////////////////////////////////////////////////
@@ -1943,4 +1943,14 @@ void MainWindow::OnEditorGroup(QAction *_action)
       editorGroup->actions()[i]->setChecked(false);
     }
   }
+}
+
+/////////////////////////////////////////////////
+Editor *MainWindow::GetEditor(const std::string &_name) const
+{
+  auto iter = this->editors.find(_name);
+  if (iter != this->editors.end())
+    return iter->second;
+
+  return NULL;
 }

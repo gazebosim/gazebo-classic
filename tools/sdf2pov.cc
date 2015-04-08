@@ -378,7 +378,7 @@ int main(int argc, char **argv)
   printf("  right <0, 1, 0>\n");
   printf("}\n");
 
-  sdf::ElementPtr root = sdf->root;
+  sdf::ElementPtr root = sdf->Root();
 
   gazebo::math::Pose modelPose, linkPose, visualPose;
 
