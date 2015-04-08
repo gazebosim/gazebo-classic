@@ -97,7 +97,8 @@ namespace gazebo
 
       /// \brief Set this preset profile's SDF
       /// \param[in] _sdfElement Pointer to an SDF physics element.
-      public: void SDF(const sdf::ElementPtr _sdfElement);
+      /// \return True if setting the profile SDF was successful.
+      public: bool SDF(const sdf::ElementPtr _sdfElement);
 
       /// \brief Private data pointer for PIMPL
       private: PresetPrivate *dataPtr;
@@ -192,7 +193,8 @@ namespace gazebo
       /// \brief Set the SDF for a profile.
       /// \param[in] _name The name of the profile to set.
       /// \param[in] _sdf The new SDF physics element for the profile.
-      public: void ProfileSDF(const std::string &_name,
+      /// \return True if setting the new SDF element was successful.
+      public: bool ProfileSDF(const std::string &_name,
           const sdf::ElementPtr _sdf);
 
       /// \brief Generate an SDF element from an Preset object.

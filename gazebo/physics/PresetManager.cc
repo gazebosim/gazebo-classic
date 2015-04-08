@@ -165,19 +165,20 @@ sdf::ElementPtr Preset::SDF() const
 }
 
 //////////////////////////////////////////////////
-void Preset::SDF(const sdf::ElementPtr _sdfElement)
+bool Preset::SDF(const sdf::ElementPtr _sdfElement)
 {
   if (!_sdfElement)
   {
     gzwarn << "Can't add NULL SDF element to Preset" << std::endl;
-    return;
+    return false;
   }
   if (_sdfElement->GetName() != "physics")
   {
     gzwarn << "Can't assign non-physics element to preset profile" << std::endl;
-    return;
+    return false;
   }
   this->dataPtr->elementSDF = _sdfElement;
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -349,7 +350,7 @@ bool PresetManager::SetCurrentProfileParam(const std::string &_key,
 bool PresetManager::GetCurrentProfileParam(const std::string &_key,
     boost::any &_value)
 {
-  if (!this->CurrentPreset())
+  if (this->CurrentProfile().empty() )
   {
     return false;
   }
@@ -372,7 +373,8 @@ bool PresetManager::CreateProfile(const std::string &_name)
   Preset *newPreset = new Preset(_name);
   this->dataPtr->presetProfiles[_name] = *newPreset;
 
-  this->ProfileSDF(_name, this->dataPtr->physicsEngine->GetSDF());
+  if (!this->ProfileSDF(_name, this->dataPtr->physicsEngine->GetSDF()))
+    return false;
 
   return true;
 }
@@ -434,18 +436,21 @@ sdf::ElementPtr PresetManager::ProfileSDF(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-void PresetManager::ProfileSDF(const std::string &_name,
+bool PresetManager::ProfileSDF(const std::string &_name,
     const sdf::ElementPtr _sdf)
 {
   if (_name.empty() || !this->HasProfile(_name))
-    return;
+    return false;
   if (!_sdf)
   {
     gzwarn << "Received NULL SDF element pointer in ProfileSDF" << std::endl;
-    return;
+    return false;
   }
 
-  this->dataPtr->presetProfiles[_name].SDF(_sdf);
+  if (!this->dataPtr->presetProfiles[_name].SDF(_sdf))
+  {
+    return false;
+  }
 
   this->GeneratePresetFromSDF(_sdf, &this->dataPtr->presetProfiles[_name]);
 
@@ -455,6 +460,7 @@ void PresetManager::ProfileSDF(const std::string &_name,
         this->dataPtr->physicsEngine);
   }
   this->dataPtr->presetProfiles[_name].SetAllParamsFromSDF(_sdf);
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -467,11 +473,8 @@ void PresetManager::GeneratePresetFromSDF(const sdf::ElementPtr _elem,
           << "generated." << std::endl;
     return;
   }
-  if (!_elem)
-  {
-    // End condition of recursion
-    return;
-  }
+
+  GZ_ASSERT(_elem, "NULL elem in GeneratePresetFromSDF, should never happen");
 
   // Check for physics engine type. If the type specified in SDF doesn't match
   // the type of the physics engine, don't add the children to the parameter
@@ -519,11 +522,7 @@ void PresetManager::GenerateSDFFromPreset(const std::string &_name,
 void PresetManager::GenerateSDFHelper(const Preset &_preset,
     sdf::ElementPtr &_elem) const
 {
-  if (!_elem)
-  {
-    // End condition of recursion
-    return;
-  }
+  GZ_ASSERT(_elem, "NULL elem in GenerateSDFHelper, should never happen");
 
   // For each element, enforce that its equivalent in Preset has the same value
   for (sdf::ElementPtr elem = _elem->GetFirstElement(); elem;
