@@ -114,17 +114,17 @@ TEST_P(GzPhysics, Profile)
 
   // Check initial profile and step size
   EXPECT_EQ(world->GetPresetManager()->CurrentProfile(), "preset_1");
-  EXPECT_NEAR(world->GetPhysicsEngine()->GetMaxStepSize(), 0.01, 1e-5);
+  EXPECT_FLOAT_EQ(world->GetPhysicsEngine()->GetMaxStepSize(), 0.01);
 
   // Change profile
   custom_exec("gz physics -o preset_2");
   EXPECT_EQ(world->GetPresetManager()->CurrentProfile(), "preset_2");
-  EXPECT_NEAR(world->GetPhysicsEngine()->GetMaxStepSize(), 0.02, 1e-5);
+  EXPECT_FLOAT_EQ(world->GetPhysicsEngine()->GetMaxStepSize(), 0.02);
 
   // Change profile and override step size
   custom_exec("gz physics -o preset_1 -s 0.001");
   EXPECT_EQ(world->GetPresetManager()->CurrentProfile(), "preset_1");
-  EXPECT_NEAR(world->GetPhysicsEngine()->GetMaxStepSize(), 0.001, 1e-5);
+  EXPECT_FLOAT_EQ(world->GetPhysicsEngine()->GetMaxStepSize(), 0.001);
 }
 
 /////////////////////////////////////////////////

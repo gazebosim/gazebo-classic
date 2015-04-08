@@ -88,7 +88,7 @@ TEST_F(PresetManagerTest, GetSetProfileParam)
 
   try
   {
-    EXPECT_EQ(max_step_size, boost::any_cast<double>(value2));
+    EXPECT_DOUBLE_EQ(max_step_size, boost::any_cast<double>(value2));
   }
   catch(boost::bad_any_cast &_e)
   {
@@ -153,7 +153,7 @@ TEST_F(PresetManagerTest, CreateRemoveProfile)
 
   try
   {
-    EXPECT_EQ(1.0, boost::any_cast<double>(value));
+    EXPECT_DOUBLE_EQ(1.0, boost::any_cast<double>(value));
   }
   catch(boost::bad_any_cast &_e)
   {
@@ -229,10 +229,10 @@ TEST_F(PresetManagerTest, SDF)
     {
       EXPECT_TRUE(presetManager->GetCurrentProfileParam("max_step_size",
           value));
-      EXPECT_EQ(boost::any_cast<double>(value), 0.03);
+      EXPECT_DOUBLE_EQ(boost::any_cast<double>(value), 0.03);
       EXPECT_TRUE(presetManager->GetCurrentProfileParam("min_step_size",
           value));
-      EXPECT_EQ(boost::any_cast<double>(value), 0.003);
+      EXPECT_DOUBLE_EQ(boost::any_cast<double>(value), 0.003);
     }
     catch(boost::bad_any_cast &_e)
     {
