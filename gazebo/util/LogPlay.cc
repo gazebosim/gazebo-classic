@@ -150,7 +150,7 @@ void LogPlay::ReadHeader()
 /////////////////////////////////////////////////
 void LogPlay::ReadLogTimes()
 {
-  if (this->GetChunkCount() <= 0)
+  if (this->GetChunkCount() == 0u)
   {
     gzwarn << "Unable to extract log timing information. No chunks available."
            << std::endl;
@@ -166,7 +166,7 @@ void LogPlay::ReadLogTimes()
 
   // Find the first <sim_time> of the log.
   auto from = chunk.find(kStartDelim);
-  auto to = chunk.find(kEndDelim);
+  auto to = chunk.find(kEndDelim, from + kStartDelim.size());
   if (from != std::string::npos && to != std::string::npos)
   {
     auto length = to - from - kStartDelim.size();
@@ -184,8 +184,9 @@ void LogPlay::ReadLogTimes()
   this->GetChunk(this->GetChunkCount() - 1, chunk);
 
   // Update the last <sim_time> of the log.
-  from = chunk.rfind(kStartDelim);
   to = chunk.rfind(kEndDelim);
+  from = chunk.rfind(kStartDelim, to - 1);
+
   if (from != std::string::npos && to != std::string::npos)
   {
     auto length = to - from - kStartDelim.size();
