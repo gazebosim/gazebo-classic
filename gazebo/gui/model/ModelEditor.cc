@@ -54,25 +54,25 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->newAct->setShortcut(tr("Ctrl+N"));
   this->dataPtr->newAct->setCheckable(false);
   connect(this->dataPtr->newAct, SIGNAL(triggered()), this, SLOT(New()));
-  this->schematicViewAct = NULL;
-  this->svWidget = NULL;
+
+  this->dataPtr->schematicViewAct = NULL;
+  this->dataPtr->svWidget = NULL;
 #ifdef HAVE_GRAPHVIZ
   RenderWidget *renderWidget = _mainWindow->GetRenderWidget();
-  this->svWidget = new SchematicViewWidget(renderWidget);
-  this->svWidget->setSizePolicy(QSizePolicy::Expanding,
+  this->dataPtr->svWidget = new SchematicViewWidget(renderWidget);
+  this->dataPtr->svWidget->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Expanding);
-  this->svWidget->Init();
-  renderWidget->InsertWidget(0, this->svWidget);
-  this->svWidget->hide();
+  this->dataPtr->svWidget->Init();
+  renderWidget->InsertWidget(0, this->dataPtr->svWidget);
+  this->dataPtr->svWidget->hide();
 
-  this->schematicViewAct = new QAction(tr("Schematic View"), this->mainWindow);
-  this->schematicViewAct->setStatusTip(tr("Sch&ematic View"));
-  this->schematicViewAct->setShortcut(tr("Ctrl+E"));
-  this->schematicViewAct->setCheckable(true);
-  connect(this->schematicViewAct, SIGNAL(toggled(bool)), this,
+  this->dataPtr->schematicViewAct = new QAction(tr("Schematic View"), this->mainWindow);
+  this->dataPtr->schematicViewAct->setStatusTip(tr("Sch&ematic View"));
+  this->dataPtr->schematicViewAct->setShortcut(tr("Ctrl+E"));
+  this->dataPtr->schematicViewAct->setCheckable(true);
+  connect(this->dataPtr->schematicViewAct, SIGNAL(toggled(bool)), this,
       SLOT(OnSchematicView(bool)));
 #endif
-
 
   this->dataPtr->saveAct = new QAction(tr("&Save"), this->mainWindow);
   this->dataPtr->saveAct->setStatusTip(tr("Save"));
@@ -93,11 +93,11 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->exitAct->setCheckable(false);
   connect(this->dataPtr->exitAct, SIGNAL(triggered()), this, SLOT(Exit()));
 
-  this->showJointsAct = new QAction(tr("Joints"), this);
-  this->showJointsAct->setStatusTip(tr("Show Joints"));
-  this->showJointsAct->setCheckable(true);
-  this->showJointsAct->setChecked(true);
-  connect(this->showJointsAct, SIGNAL(toggled(bool)),
+  this->dataPtr->showJointsAct = new QAction(tr("Joints"), this);
+  this->dataPtr->showJointsAct->setStatusTip(tr("Show Joints"));
+  this->dataPtr->showJointsAct->setCheckable(true);
+  this->dataPtr->showJointsAct->setChecked(true);
+  connect(this->dataPtr->showJointsAct, SIGNAL(toggled(bool)),
       this->dataPtr->modelPalette->GetModelCreator()->GetJointMaker(),
       SLOT(ShowJoints(bool)));
 
@@ -255,17 +255,17 @@ void ModelEditor::Exit()
 /////////////////////////////////////////////////
 void ModelEditor::OnSchematicView(bool _show)
 {
-  if (!this->svWidget)
+  if (!this->dataPtr->svWidget)
     return;
 
   if (_show)
   {
 #ifdef HAVE_GRAPHVIZ
-    this->svWidget->show();
+    this->dataPtr->svWidget->show();
   }
   else
   {
-    this->svWidget->hide();
+    this->dataPtr->svWidget->hide();
 #endif
   }
 }
@@ -286,12 +286,12 @@ void ModelEditor::CreateMenus()
   fileMenu->addAction(this->dataPtr->exitAct);
 
   QMenu *viewMenu = this->dataPtr->menuBar->addMenu(tr("&View"));
-  viewMenu->addAction(this->showJointsAct);
+  viewMenu->addAction(this->dataPtr->showJointsAct);
 
-  if (this->schematicViewAct)
+  if (this->dataPtr->schematicViewAct)
   {
     QMenu *windowMenu = this->dataPtr->menuBar->addMenu(tr("&Window"));
-    windowMenu->addAction(this->schematicViewAct);
+    windowMenu->addAction(this->dataPtr->schematicViewAct);
   }
 }
 
@@ -343,12 +343,12 @@ void ModelEditor::OnEdit(bool /*_checked*/)
   }
 
 #ifdef HAVE_GRAPHVIZ
-  if (this->svWidget && this->schematicViewAct)
+  if (this->dataPtr->svWidget && this->dataPtr->schematicViewAct)
   {
-    this->svWidget->setVisible(
-        !this->dataPtr->active && this->schematicViewAct->isChecked());
+    this->dataPtr->svWidget->setVisible(
+        !this->dataPtr->active && this->dataPtr->schematicViewAct->isChecked());
     if (!this->dataPtr->active)
-      this->svWidget->Reset();
+      this->dataPtr->svWidget->Reset();
   }
 #endif
 

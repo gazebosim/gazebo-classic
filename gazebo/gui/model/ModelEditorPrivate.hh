@@ -26,8 +26,10 @@ namespace gazebo
 {
   namespace gui
   {
+    class SchematicViewWidget;
     class ModelEditorPalette;
 
+    /// \internal
     /// \class ModelEditor ModelEditor.hh
     /// \brief Private data for the ModelEditor class.
     class ModelEditorPrivate
@@ -71,6 +73,15 @@ namespace gazebo
 
       /// \brief Action to exit the editor.
       public: QAction *exitAct;
+
+      /// \brief Action to show joints.
+      public: QAction *showJointsAct;
+
+      /// \brief Action to show/hide the schematic view.
+      public: QAction *schematicViewAct;
+
+      /// \brief Pointer to the schematic view widget.
+      public: SchematicViewWidget *svWidget;
 
       /// \brief Save the main window paused state to use when returning.
       public: bool mainWindowPaused;

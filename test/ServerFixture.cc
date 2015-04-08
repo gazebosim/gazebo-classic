@@ -1288,11 +1288,11 @@ void ServerFixture::SpawnSDF(const std::string &_sdf)
   sdf::SDF sdfParsed;
   sdfParsed.SetFromString(_sdf);
   // Check that sdf contains a model
-  if (sdfParsed.root->HasElement("model"))
+  if (sdfParsed.Root()->HasElement("model"))
   {
     // Timeout of 30 seconds (3000 * 10 ms)
     int waitCount = 0, maxWaitCount = 3000;
-    sdf::ElementPtr model = sdfParsed.root->GetElement("model");
+    sdf::ElementPtr model = sdfParsed.Root()->GetElement("model");
     std::string name = model->Get<std::string>("name");
     while (!this->HasEntity(name) && ++waitCount < maxWaitCount)
       common::Time::MSleep(100);

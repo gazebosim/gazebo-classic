@@ -100,14 +100,6 @@ namespace gazebo
       /// \brief Pointer to private data.
       private: ModelEditorPrivate *dataPtr;
 
-      /// \brief Action to show/hide the schematic view.
-      private: QAction *schematicViewAct;
-
-      /// \brief Pointer to the schematic view widget.
-      private: SchematicViewWidget *svWidget;
-
-      /// \brief Action to show joints.
-      private: QAction *showJointsAct;
     };
   }
 }
