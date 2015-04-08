@@ -570,7 +570,6 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
     this->node->Advertise<msgs::Wrench>(topicName);
 
   msgs::Wrench msg;
-  int count = 0;
 
   std::vector<math::Vector3> forces;
   std::vector<math::Vector3> torques;
@@ -580,27 +579,23 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
   forces.push_back(math::Vector3(1, 0, 0));
   torques.push_back(math::Vector3::Zero);
   forceOffsets.push_back(math::Vector3::Zero);
-  count++;
 
   // Only force, with an offset
   forces.push_back(math::Vector3(5.2, 0.1, 10));
   torques.push_back(math::Vector3::Zero);
   forceOffsets.push_back(math::Vector3(2.1, 1, -0.6));
-  count++;
 
   // Only torque
   forces.push_back(math::Vector3::Zero);
   torques.push_back(math::Vector3(-0.2, 5, 0));
   forceOffsets.push_back(math::Vector3::Zero);
-  count++;
 
   // All fields set
   forces.push_back(math::Vector3(5, 6, -0.9));
   torques.push_back(math::Vector3(-0.2, 5, 0));
   forceOffsets.push_back(math::Vector3(-1, -4, -0.8));
-  count++;
 
-  for (int i = 0; i < count; ++i)
+  for (unsigned int i = 0; i < forces.size(); ++i)
   {
     gzdbg << "Testing force: " << forces[i].x << ", "
                                << forces[i].y << ", "
@@ -612,22 +607,30 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
                                << forceOffsets[i].y << ", "
                                << forceOffsets[i].z << std::endl;
 
+    // Publish message
     msgs::Set(msg.mutable_force(), forces[i]);
     msgs::Set(msg.mutable_torque(), torques[i]);
-    msgs::Set(msg.mutable_force_offset(), forceOffsets[i]);
+    // Leave optional field unset if it's zero
+    if (forceOffsets[i] != math::Vector3::Zero)
+      msgs::Set(msg.mutable_force_offset(), forceOffsets[i]);
+
     wrenchPub->Publish(msg);
 
-    // while (link->GetWorldForce() != forces[i]);
+    // Calculate expected values
+    math::Vector3 forceWorld = forces[i];
+    math::Vector3 worldOffset = forceOffsets[i] - link->GetInertial()->GetCoG();
+    math::Vector3 torqueWorld = worldOffset.Cross(forces[i]) + torques[i];
+
+    // Wait for message to be received
+    while (link->GetWorldForce() != forceWorld ||
+           link->GetWorldTorque() != torqueWorld)
     {
       world->Step(1);
       common::Time::MSleep(1);
     }
 
     // Check force and torque (at CoG?) in world frame
-    EXPECT_EQ(link->GetWorldForce(), forces[i]);
-
-    math::Vector3 worldOffset = forceOffsets[i] - link->GetInertial()->GetCoG();
-    math::Vector3 torqueWorld = worldOffset.Cross(forces[i]) + torques[i];
+    EXPECT_EQ(link->GetWorldForce(), forceWorld);
     EXPECT_EQ(link->GetWorldTorque(), torqueWorld);
 
     // Reset link's physics states
