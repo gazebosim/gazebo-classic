@@ -51,6 +51,10 @@ namespace gazebo
       /// \param[in] _msg Pointer to the message
       public: virtual void Load(ConstLinkPtr &_msg);
 
+      /// \brief Get inertia pose.
+      /// \return Inertia pose in link frame.
+      public: math::Pose GetInertiaPose() const;
+
       /// \brief Load based on a math::Pose
       /// \param[in] _pose Pose of the COM visual.
       /// \param[in] _radius Radius for the sphere visual.
