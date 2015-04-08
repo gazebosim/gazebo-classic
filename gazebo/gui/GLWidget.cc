@@ -59,6 +59,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->state = "select";
   this->sceneCreated = false;
   this->copyEntityName = "";
+  this->modelEditorEnabled = false;
 
   this->setFocusPolicy(Qt::StrongFocus);
 
@@ -156,6 +157,9 @@ GLWidget::GLWidget(QWidget *_parent)
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this,
       SLOT(OnModelEditor(bool)));
+
+  connect(this, SIGNAL(selectionMsgReceived(const QString &)), this,
+      SLOT(OnSelectionMsgEvent(const QString &)), Qt::QueuedConnection);
 }
 
 /////////////////////////////////////////////////
@@ -1009,8 +1013,14 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
   if (_msg->has_selected() && _msg->selected())
   {
-    this->OnSetSelectedEntity(_msg->name(), "normal");
+    this->selectionMsgReceived(QString(_msg->name().c_str()));
   }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnSelectionMsgEvent(const QString &_name)
+{
+  this->OnSetSelectedEntity(_name.toStdString(), "normal");
 }
 
 /////////////////////////////////////////////////

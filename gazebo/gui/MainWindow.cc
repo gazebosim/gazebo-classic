@@ -448,9 +448,9 @@ void MainWindow::Save()
     sdf::SDF sdf_parsed;
     sdf_parsed.SetFromString(msg.data());
     // Check that sdf contains world
-    if (sdf_parsed.root->HasElement("world"))
+    if (sdf_parsed.Root()->HasElement("world"))
     {
-      sdf::ElementPtr world = sdf_parsed.root->GetElement("world");
+      sdf::ElementPtr world = sdf_parsed.Root()->GetElement("world");
       sdf::ElementPtr guiElem = world->GetElement("gui");
 
       if (guiElem->HasAttribute("fullscreen"))
@@ -463,7 +463,7 @@ void MainWindow::Save()
       cameraElem->GetElement("view_controller")->Set(
           cam->GetViewControllerTypeString());
       // TODO: export track_visual properties as well.
-      msgData = sdf_parsed.root->ToString("");
+      msgData = sdf_parsed.Root()->ToString("");
     }
     else
     {
