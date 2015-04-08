@@ -64,6 +64,7 @@ namespace gazebo
     public: void Load(sdf::ElementPtr _elem);
 
     /// \brief Get the current time listed in the timer.
+    /// \return Gazebo time object representing the time.
     public: common::Time GetCurrentTime() const;
 
     /// \brief A signal used to set the sim time line edit.
