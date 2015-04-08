@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _JOINTMAKER_HH_
-#define _JOINTMAKER_HH_
+#ifndef _GAZEBO_JOINTMAKER_HH_
+#define _GAZEBO_JOINTMAKER_HH_
 
 #include <map>
 #include <string>
