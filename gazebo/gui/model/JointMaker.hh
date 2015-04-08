@@ -174,6 +174,10 @@ namespace gazebo
       /// \param[in] _name Scoped link name.
       public: void AddScopedLinkName(const std::string &_name);
 
+      /// \brief Qt Callback to show / hide joint visuals.
+      /// \param[in] _show True to show joints, false to hide them.
+      public slots: void ShowJoints(bool _show);
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled

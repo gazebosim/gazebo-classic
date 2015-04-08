@@ -448,10 +448,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   world->Step(100);
 
   // Verify the initial model pose is where we set it to be.
-  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (auto const &iter : modelPos)
   {
-    std::string name = iter->first;
+    std::string name = iter.first;
     // Make sure the model is loaded
     model = world->GetModel(name);
     EXPECT_TRUE(model != NULL);
@@ -467,10 +466,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 
   // resize model to half of it's size
   double scaleFactor = 0.5;
-  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (auto const &iter : modelPos)
   {
-    std::string name = iter->first;
+    std::string name = iter.first;
     model = world->GetModel(name);
     if (*(name.rbegin()) == '2')
     {
@@ -508,10 +506,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   // This loop checks the velocity and pose of each model 0.5 seconds
   // after the time of predicted ground contact. The pose is expected to be
   // underneath the initial pose.
-  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (auto const &iter : modelPos)
   {
-    std::string name = iter->first;
+    std::string name = iter.first;
     // Make sure the model is loaded
     model = world->GetModel(name);
     if (model != NULL)
@@ -531,8 +528,64 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       EXPECT_TRUE(model != NULL);
     }
   }
-}
 
+  // verify geom msgs contain resized values.
+  for (auto const &iter : modelPos)
+  {
+    std::string name = iter.first;
+    model = world->GetModel(name);
+    msgs::Model modelMsg;
+    model->FillMsg(modelMsg);
+
+    EXPECT_EQ(msgs::Convert(modelMsg.scale()), scaleFactor*math::Vector3::One);
+    for (int i = 0; i < modelMsg.link_size(); ++i)
+    {
+      msgs::Link linkMsg = modelMsg.link(i);
+
+      // verify visual geom msgs
+      for (int j = 0; j < linkMsg.visual_size(); ++j)
+      {
+        msgs::Visual visualMsg = linkMsg.visual(j);
+        msgs::Geometry geomMsg = visualMsg.geometry();
+        if (geomMsg.has_box())
+        {
+          EXPECT_EQ(msgs::Convert(geomMsg.box().size()),
+              math::Vector3(0.5, 0.5, 0.5));
+        }
+        else if (geomMsg.has_sphere())
+        {
+          EXPECT_DOUBLE_EQ(geomMsg.sphere().radius(), 0.25);
+        }
+        else if (geomMsg.has_cylinder())
+        {
+          EXPECT_DOUBLE_EQ(geomMsg.cylinder().radius(), 0.25);
+          EXPECT_DOUBLE_EQ(geomMsg.cylinder().length(), 0.5);
+        }
+      }
+
+      // verify collision geom msgs
+      for (int j = 0; j < linkMsg.collision_size(); ++j)
+      {
+        msgs::Collision collisionMsg = linkMsg.collision(j);
+        msgs::Geometry geomMsg = collisionMsg.geometry();
+        if (geomMsg.has_box())
+        {
+          EXPECT_EQ(msgs::Convert(geomMsg.box().size()),
+              math::Vector3(0.5, 0.5, 0.5));
+        }
+        else if (geomMsg.has_sphere())
+        {
+          EXPECT_DOUBLE_EQ(geomMsg.sphere().radius(), 0.25);
+        }
+        else if (geomMsg.has_cylinder())
+        {
+          EXPECT_DOUBLE_EQ(geomMsg.cylinder().radius(), 0.25);
+          EXPECT_DOUBLE_EQ(geomMsg.cylinder().length(), 0.5);
+        }
+      }
+    }
+  }
+}
 
 /////////////////////////////////////////////////
 TEST_P(PhysicsMsgsTest, SetGravity)
