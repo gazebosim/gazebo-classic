@@ -575,6 +575,9 @@ namespace gazebo
       /// \brief Update visual SDFs.
       private: void UpdateVisualSDF();
 
+      /// \brief Update visual msgs.
+      private: void UpdateVisualMsg();
+
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
 
