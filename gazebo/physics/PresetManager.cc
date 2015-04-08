@@ -80,7 +80,6 @@ bool Preset::SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine) const
         gzwarn << "Couldn't set parameter [" << param.first
           << "] in physics engine" << std::endl;
         result = false;
-        break;
       }
     }
   }
