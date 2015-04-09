@@ -110,7 +110,65 @@ void Matrix3::SetCol(unsigned int _i, const Vector3 &_v)
 //////////////////////////////////////////////////
 bool Matrix3::GetAsQuaternion(Quaternion &_q) const
 {
-  return false;
+  // Check to see if this matrix is a rotation matrix
+  if (fabs(this->Determinant() - 1.0) > std::numeric_limits<double>::epsilon())
+  {
+    return false;
+  }
+
+  double trace = this->m[0][0] + this->m[1][1] + this->m[2][2];
+  double root, s, qw, qx, qy, qz;
+
+  if (trace > 0)
+  {
+    root = sqrt(1+trace);
+    s = 0.5/root;
+    qw = 0.5*root;
+    qx = (this->m[2][1] - this->m[1][2])*s;
+    qy = (this->m[0][2] - this->m[2][0])*s;
+    qz = (this->m[1][0] - this->m[0][1])*s;
+  }
+  else if (this->m[0][0] > this->m[1][1] && this->m[0][0] > this->m[2][2])
+  {
+    root = sqrt(1+this->m[0][0] - this->m[1][1] - this->m[2][2]);
+    s = 0.5/root;
+    qw = (this->m[2][1] - this->m[1][2])*s;
+    qx = 0.5*root;
+    qy = (this->m[0][1] - this->m[1][0])*s;
+    qz = (this->m[2][0] - this->m[0][2])*s;
+  }
+  else if (this->m[1][1] > this->m[0][0] && this->m[1][1] > this->m[2][2])
+  {
+    root = sqrt(1+this->m[1][1] - this->m[0][0] - this->m[2][2]);
+    s = 0.5/root;
+    qw = (this->m[0][2] - this->m[2][0])*s;
+    qx = (this->m[0][1] - this->m[1][0])*s;
+    qy = 0.5*root;
+    qz = (this->m[1][2] - this->m[2][1])*s;
+  }
+  else if (this->m[2][2] > this->m[0][0] && this->m[2][2] > this->m[1][1])
+  {
+    root = sqrt(1+this->m[2][2] - this->m[0][0] - this->m[1][1]);
+    s = 0.5/root;
+    qw = (this->m[1][0] - this->m[0][1])*s;
+    qx = (this->m[2][0] - this->m[0][2])*s;
+    qy = (this->m[1][2] - this->m[2][1])*s;
+    qz = 0.5*root;
+  }
+
+  _q = Quaternion(qw, qx, qy, qz);
+  return true;
+}
+
+//////////////////////////////////////////////////
+double Matrix3::Determinant() const
+{
+  return this->m[0][0]*this->m[1][1]*this->m[2][2] +
+      this->m[1][0]*this->m[2][1]*this->m[0][2] +
+      this->m[2][0]*this->m[0][1]*this->m[1][2]
+      - (this->m[2][0]*this->m[1][1]*this->m[0][2] +
+         this->m[1][0]*this->m[0][1]*this->m[2][2] +
+         this->m[0][0]*this->m[2][1]*this->m[1][2]);
 }
 
 //////////////////////////////////////////////////

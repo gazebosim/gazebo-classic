@@ -20,6 +20,7 @@
 #include <assert.h>
 
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Quaternion.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -82,6 +83,10 @@ namespace gazebo
       /// \return True if the matrix was a valid rotation matrix.
       /// false otherwise.
       public: bool GetAsQuaternion(Quaternion &_q) const;
+
+      /// \brief Get the determinant of this matrix.
+      /// \return The determinant of the matrix.
+      public: double Determinant() const;
 
       /// \brief Return the inverse matrix
       /// \return Inverse of this matrix.

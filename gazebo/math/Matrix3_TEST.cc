@@ -122,3 +122,13 @@ TEST_F(Matrix3Test, Inverse)
   double scalar = 2.5;
   EXPECT_EQ((matrix1 * scalar).Inverse(), matrix1.Inverse() * (1.0/scalar));
 }
+
+TEST_F(Matrix3Test, Determinant)
+{
+
+}
+
+TEST_F(Matrix3Test, GetAsQuaternion)
+{
+
+}
