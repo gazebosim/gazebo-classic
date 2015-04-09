@@ -466,8 +466,7 @@ bool PresetManager::ProfileSDF(const std::string &_name,
 
   auto iter = this->dataPtr->presetProfiles.find(_name);
 
-  if (iter == this->dataPtr->presetProfiles.end() ||
-      !iter->second.SDF(_sdf))
+  if (iter == this->dataPtr->presetProfiles.end() || !iter->second.SDF(_sdf))
     return false;
 
   this->GeneratePresetFromSDF(_sdf, iter->second);
