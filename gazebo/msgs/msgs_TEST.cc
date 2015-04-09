@@ -1038,6 +1038,8 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_TRUE(msg.has_suspension_erp());
   EXPECT_NEAR(msg.suspension_erp(), 0.3, 1e-6);
 
+  EXPECT_TRUE(msg.has_axis1());
+  EXPECT_TRUE(!msg.has_axis2());
   const msgs::Axis axisMsg = msg.axis1();
   EXPECT_TRUE(axisMsg.has_xyz());
   EXPECT_EQ(msgs::Convert(axisMsg.xyz()), math::Vector3(1, 0, 0));
