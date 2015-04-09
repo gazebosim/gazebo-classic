@@ -26,6 +26,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class SchematicViewWidget;
     class ModelEditorPalette;
 
     /// \internal
@@ -77,10 +78,10 @@ namespace gazebo
       public: QAction *showJointsAct;
 
       /// \brief Action to show/hide the schematic view.
-      private: QAction *schematicViewAct;
+      public: QAction *schematicViewAct;
 
       /// \brief Pointer to the schematic view widget.
-      private: SchematicViewWidget *svWidget;
+      public: SchematicViewWidget *svWidget;
 
       /// \brief Save the main window paused state to use when returning.
       public: bool mainWindowPaused;

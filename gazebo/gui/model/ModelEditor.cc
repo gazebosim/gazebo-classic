@@ -291,7 +291,7 @@ void ModelEditor::CreateMenus()
 
   if (this->dataPtr->schematicViewAct)
   {
-    QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
+    QMenu *windowMenu = this->dataPtr->menuBar->addMenu(tr("&Window"));
     windowMenu->addAction(this->dataPtr->schematicViewAct);
   }
 }
@@ -347,8 +347,8 @@ void ModelEditor::OnEdit(bool /*_checked*/)
   if (this->dataPtr->svWidget && this->dataPtr->schematicViewAct)
   {
     this->dataPtr->svWidget->setVisible(
-        !this->active && this->dataPtr->schematicViewAct->isChecked());
-    if (!this->active)
+        !this->dataPtr->active && this->dataPtr->schematicViewAct->isChecked());
+    if (!this->dataPtr->active)
       this->dataPtr->svWidget->Reset();
   }
 #endif

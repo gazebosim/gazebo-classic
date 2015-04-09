@@ -27,7 +27,6 @@ namespace gazebo
 {
   namespace gui
   {
-    class SchematicViewWidget;
     class ModelEditorPrivate;
 
     /// \class ModelEditor ModelEditor.hh gui/gui.hh
