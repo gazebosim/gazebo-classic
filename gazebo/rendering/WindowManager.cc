@@ -80,10 +80,12 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   Ogre::NameValuePairList params;
   Ogre::RenderWindow *window = NULL;
 
+  std::cout << "\n\n\n WINDOW HANDLE[" << _ogreHandle << "]\n";
+
 #ifdef Q_OS_MAC
   params["externalWindowHandle"] = _ogreHandle;
 #elif defined(_WIN32)
-  // Something different here?
+  params["parentWindowHandle"] = _ogreHandle;
 #else
   params["parentWindowHandle"] = _ogreHandle;
 #endif
