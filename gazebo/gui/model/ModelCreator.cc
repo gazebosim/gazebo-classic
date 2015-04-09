@@ -1723,8 +1723,8 @@ void ModelCreator::OnManipMode(const std::string &_mode)
 
   if (!this->selectedVisuals.empty())
   {
-    ModelManipulator::Instance()->SetAttachedVisual(
-        this->selectedVisuals.back());
+    ModelManipulator::Instance()->SetAttachedVisuals(
+        this->selectedVisuals);
   }
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);

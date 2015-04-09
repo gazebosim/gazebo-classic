@@ -61,6 +61,10 @@ namespace gazebo
       /// \brief Set the visual to be manipulated by the model manipulator.
       public: void SetAttachedVisual(rendering::VisualPtr _vis);
 
+      /// \brief Set the visual to be manipulated by the model manipulator.
+      public: void SetAttachedVisuals(
+          std::vector<rendering::VisualPtr> _visuals);
+
       /// \brief Process an object translate mouse press event.
       /// \param[in] _event Mouse event.
       public: void OnMousePressEvent(const common::MouseEvent &_event);

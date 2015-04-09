@@ -85,6 +85,12 @@ namespace gazebo
 
       /// \brief True to manipulate model in global frame.
       public: bool globalManip;
+
+      /// \brief True to manipulate model in global frame.
+      public: rendering::VisualPtr groupVis;
+
+      /// \brief True to manipulate model in global frame.
+      public: rendering::VisualPtr groupOriginalParent;
     };
   }
 }

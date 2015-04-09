@@ -105,6 +105,49 @@ void ModelManipulator::Detach()
   this->dataPtr->selectionObj->SetMode(
       rendering::SelectionObj::SELECTION_NONE);
   this->dataPtr->selectionObj->Detach();
+
+  if (!this->dataPtr->groupVis)
+    return;
+
+  math::Pose groupPose = this->dataPtr->groupVis->GetWorldPose();
+
+  // Ungroup
+  while (this->dataPtr->groupVis->GetChildCount() > 0)
+  {
+    rendering::VisualPtr child = this->dataPtr->groupVis->GetChild(0);
+    this->dataPtr->groupVis->DetachVisual(child);
+    this->dataPtr->groupOriginalParent->AttachVisual(child);
+    child->SetWorldPose(child->GetWorldPose() + groupPose);
+  }
+
+
+/*
+  // Get average pose and keep individual poses
+  std::map<rendering::VisualPtr, math::Pose> preGroupingPoses;
+  math::Vector3 totalPos = _visuals[0]->GetWorldPose().pos;
+  preGroupingPoses[_visuals[0]] = _visuals[0]->GetWorldPose();
+  for (unsigned int i = 1; i < _visuals.size(); ++i)
+  {
+    totalPos += _visuals[i]->GetWorldPose().pos;
+    preGroupingPoses[_visuals[i]] = _visuals[i]->GetWorldPose();
+  }
+  totalPos /= _visuals.size();
+  math::Pose totalPose(totalPos, math::Vector3::Zero);
+
+  // Create a temp visual containing all selected visuals
+  this->dataPtr->groupVis.reset(new rendering::Visual("_TEMP_MANIP_VIS_GROUP",
+      this->dataPtr->scene->GetWorldVisual()));
+  this->dataPtr->groupVis->Load();
+  this->dataPtr->groupVis->SetWorldPose(totalPose);
+  this->dataPtr->mouseMoveVisStartPose = totalPose;
+
+  // Attach visuals and set their original poses
+  for (auto it : _visuals)
+  {
+    this->dataPtr->groupVis->AttachVisual(it);
+    it->SetPose(preGroupingPoses[it] - totalPose);
+  }
+  */
 }
 
 /////////////////////////////////////////////////
@@ -610,9 +653,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     }
     else
     {
-      this->dataPtr->selectionObj->SetMode(
-          rendering::SelectionObj::SELECTION_NONE);
-      this->dataPtr->selectionObj->Detach();
+      this->Detach();
     }
   }
   else
@@ -782,9 +823,7 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
         this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.pos);
       if (vis && vis->IsPlane())
       {
-        this->dataPtr->selectionObj->SetMode(
-            rendering::SelectionObj::SELECTION_NONE);
-        this->dataPtr->selectionObj->Detach();
+        this->Detach();
       }
     }
   }
@@ -817,6 +856,58 @@ void ModelManipulator::SetAttachedVisual(rendering::VisualPtr _vis)
   this->dataPtr->mouseMoveVisStartPose = vis->GetWorldPose();
 
   this->SetMouseMoveVisual(vis);
+
+  if (this->dataPtr->mouseMoveVis && !this->dataPtr->mouseMoveVis->IsPlane())
+    this->dataPtr->selectionObj->Attach(this->dataPtr->mouseMoveVis);
+}
+
+/////////////////////////////////////////////////
+void ModelManipulator::SetAttachedVisuals(
+    std::vector<rendering::VisualPtr> _visuals)
+{
+  if (_visuals.empty())
+  {
+    gzwarn << "No visuals given, not attaching manipulator." << std::endl;
+    return;
+  }
+
+  // Get average pose and keep individual poses
+  std::map<rendering::VisualPtr, math::Pose> preGroupingPoses;
+  math::Vector3 totalPos = _visuals[0]->GetWorldPose().pos;
+  preGroupingPoses[_visuals[0]] = _visuals[0]->GetWorldPose();
+  for (unsigned int i = 1; i < _visuals.size(); ++i)
+  {
+    totalPos += _visuals[i]->GetWorldPose().pos;
+    preGroupingPoses[_visuals[i]] = _visuals[i]->GetWorldPose();
+  }
+  totalPos /= _visuals.size();
+  math::Pose totalPose(totalPos, math::Vector3::Zero);
+
+  // Create a temp visual containing all selected visuals
+  this->dataPtr->groupVis.reset(new rendering::Visual("_TEMP_MANIP_VIS_GROUP",
+      this->dataPtr->scene->GetWorldVisual()));
+  this->dataPtr->groupVis->Load();
+  this->dataPtr->groupVis->SetWorldPose(totalPose);
+  this->dataPtr->mouseMoveVisStartPose = totalPose;
+
+  // Attach visuals and set their original poses
+  this->dataPtr->groupOriginalParent = _visuals[0]->GetParent();
+  for (auto it : _visuals)
+  {
+   std::cout << it->GetParent()->GetName() << " " <<
+                this->dataPtr->groupOriginalParent->GetName() << std::endl;
+    if (it->GetParent() != this->dataPtr->groupOriginalParent)
+    {
+      this->dataPtr->groupVis.reset();
+      gzerr << "Can't move visuals with different parents" << std::endl;
+      return;
+    }
+
+    this->dataPtr->groupVis->AttachVisual(it);
+    it->SetPose(preGroupingPoses[it] - totalPose);
+  }
+
+  this->SetMouseMoveVisual(this->dataPtr->groupVis);
 
   if (this->dataPtr->mouseMoveVis && !this->dataPtr->mouseMoveVis->IsPlane())
     this->dataPtr->selectionObj->Attach(this->dataPtr->mouseMoveVis);
