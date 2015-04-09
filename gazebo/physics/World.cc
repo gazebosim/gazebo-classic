@@ -368,17 +368,19 @@ void World::Init()
   this->dataPtr->iterations = 0;
   this->dataPtr->logPrevIteration = 0;
 
-  util::DiagnosticManager::Instance()->Init(this->GetName());
+  //util::DiagnosticManager::Instance()->Init(this->GetName());
 
-  util::LogRecord::Instance()->Add(this->GetName(), "state.log",
+  /*util::LogRecord::Instance()->Add(this->GetName(), "state.log",
       boost::bind(&World::OnLog, this, _1));
+      */
 
   // Check if we have to insert an object population.
-  if (this->dataPtr->sdf->HasElement("population"))
+  /*if (this->dataPtr->sdf->HasElement("population"))
   {
     Population population(this->dataPtr->sdf, shared_from_this());
     population.PopulateAll();
   }
+  */
 
   this->dataPtr->initialized = true;
 
