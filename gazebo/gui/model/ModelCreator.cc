@@ -137,11 +137,16 @@ ModelCreator::ModelCreator()
       event::Events::ConnectPreRender(
         boost::bind(&ModelCreator::Update, this)));
 
-  g_copyAct->setEnabled(false);
-  g_pasteAct->setEnabled(false);
-
-  connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
-  connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+  if (g_copyAct)
+  {
+    g_copyAct->setEnabled(false);
+    connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
+  }
+  if (g_pasteAct)
+  {
+    g_pasteAct->setEnabled(false);
+    connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+  }
 
   this->saveDialog = new SaveDialog(SaveDialog::MODEL);
 
@@ -999,8 +1004,12 @@ void ModelCreator::Reset()
 
   this->jointMaker->Reset();
   this->selectedVisuals.clear();
-  g_copyAct->setEnabled(false);
-  g_pasteAct->setEnabled(false);
+
+  if (g_copyAct)
+    g_copyAct->setEnabled(false);
+
+  if (g_pasteAct)
+    g_pasteAct->setEnabled(false);
 
   this->currentSaveState = NEVER_SAVED;
   this->SetModelName(this->modelDefaultName);
