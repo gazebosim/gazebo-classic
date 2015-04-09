@@ -150,7 +150,6 @@ void Node::ProcessPublishers()
 
   int start, end;
   boost::mutex::scoped_lock lock(this->publisherDeleteMutex);
-  boost::mutex::scoped_lock lock2(this->publisherMutex);
 
   {
     boost::mutex::scoped_lock lock2(this->publisherMutex);
