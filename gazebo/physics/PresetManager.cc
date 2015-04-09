@@ -350,6 +350,8 @@ bool PresetManager::SetCurrentProfileParam(const std::string &_key,
   {
     return false;
   }
+
+  std::lock_guard<std::mutex> lock(this->dataPtr->currentProfileMutex);
   if (!this->CurrentPreset()->HasParam(_key))
   {
     return false;
@@ -377,6 +379,7 @@ bool PresetManager::GetCurrentProfileParam(const std::string &_key,
   {
     return false;
   }
+  std::lock_guard<std::mutex> lock(this->dataPtr->currentProfileMutex);
   return this->CurrentPreset()->GetParam(_key, _value);
 }
 
@@ -478,6 +481,7 @@ bool PresetManager::ProfileSDF(const std::string &_name,
 
   if (_name == this->CurrentProfile())
   {
+    std::lock_guard<std::mutex> lock(this->dataPtr->currentProfileMutex);
     this->CurrentPreset()->SetAllPhysicsParameters(
         this->dataPtr->physicsEngine);
   }
