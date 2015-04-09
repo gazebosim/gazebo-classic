@@ -307,7 +307,7 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
-  return this->LoadImpl(sdf->root, _physics);
+  return this->LoadImpl(sdf->Root(), _physics);
 }
 
 /////////////////////////////////////////////////
@@ -327,7 +327,7 @@ bool Server::LoadString(const std::string &_sdfString)
     return false;
   }
 
-  return this->LoadImpl(sdf->root);
+  return this->LoadImpl(sdf->Root());
 }
 
 /////////////////////////////////////////////////
@@ -679,7 +679,7 @@ bool Server::OpenWorld(const std::string & /*_filename*/)
 
   gazebo::transport::clear_buffers();
 
-  sdf::ElementPtr worldElem = sdf->root->GetElement("world");
+  sdf::ElementPtr worldElem = sdf->Root()->GetElement("world");
 
   physics::WorldPtr world = physics::create_world();
 
