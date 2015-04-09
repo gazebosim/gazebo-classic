@@ -1385,14 +1385,10 @@ void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
   {
     pos = msgs::Convert(_msg->force_offset());
   }
-  if (_msg->has_force())
-  {
-    math::Vector3 force = msgs::Convert(_msg->force());
-    this->AddLinkForce(force, pos);
-  }
-  if (_msg->has_torque())
-  {
-    const math::Vector3 torque = msgs::Convert(_msg->torque());
-    this->AddRelativeTorque(torque);
-  }
+
+  const math::Vector3 force = msgs::Convert(_msg->force());
+  this->AddLinkForce(force, pos);
+
+  const math::Vector3 torque = msgs::Convert(_msg->torque());
+  this->AddRelativeTorque(torque);
 }
