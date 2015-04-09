@@ -379,7 +379,6 @@ bool PresetManager::GetCurrentProfileParam(const std::string &_key,
   {
     return false;
   }
-  std::lock_guard<std::mutex> lock(this->dataPtr->currentProfileMutex);
   return this->CurrentPreset()->GetParam(_key, _value);
 }
 
