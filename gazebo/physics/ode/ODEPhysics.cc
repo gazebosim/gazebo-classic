@@ -1310,7 +1310,7 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;
     }
-    dWorldSetIslandThreads(this->worldId, value);
+    dWorldSetIslandThreads(this->dataPtr->worldId, value);
   }
   else if (_key == "cfm")
   {
