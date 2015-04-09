@@ -1298,6 +1298,20 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
   {
     _value = odeElem->GetElement("solver")->Get<std::string>("type");
   }
+  else if (_key == "island_threads")
+  {
+    int value;
+    try
+    {
+      value = boost::any_cast<int>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    dWorldSetIslandThreads(this->worldId, value);
+  }
   else if (_key == "cfm")
   {
     _value = odeElem->GetElement("constraints")->Get<double>("cfm");
