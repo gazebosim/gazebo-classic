@@ -108,6 +108,12 @@ void Matrix3::SetCol(unsigned int _i, const Vector3 &_v)
 }
 
 //////////////////////////////////////////////////
+bool Matrix3::GetAsQuaternion(Quaternion &_q) const
+{
+  return false;
+}
+
+//////////////////////////////////////////////////
 Matrix3 Matrix3::Inverse() const
 {
   double t0 = + (this->m[2][2]*this->m[1][1] - this->m[2][1]*this->m[1][2]);
