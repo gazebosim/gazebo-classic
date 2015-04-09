@@ -179,6 +179,8 @@ target_link_libraries(gazebo_gui
   gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
+  gazebo_physics
+  gazebo_physics_ode
   gzqtpropertybrowser
   libgazebo
   ${QT_LIBRARIES}
@@ -202,6 +204,8 @@ target_link_libraries(gzclient
   gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
+  gazebo_physics
+  gazebo_physics_ode
   gazebo_skyx
   gzqtpropertybrowser
   libgazebo
