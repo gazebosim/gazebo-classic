@@ -575,6 +575,9 @@ namespace gazebo
       /// \brief Update visual SDFs.
       private: void UpdateVisualSDF();
 
+      /// \brief Update visual msgs.
+      private: void UpdateVisualMsg();
+
       /// \brief Called when a new wrench message arrives. The wrench's force,
       /// torque and force offset are described in the link frame,
       /// \param[in] _msg The message to set the wrench from.

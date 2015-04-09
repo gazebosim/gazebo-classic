@@ -304,150 +304,7 @@ void Visual::Init()
 //////////////////////////////////////////////////
 void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 {
-  sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
-  geomElem->ClearElements();
-
-  if (_msg->has_geometry())
-  {
-    if (_msg->geometry().type() == msgs::Geometry::BOX)
-    {
-      sdf::ElementPtr elem = geomElem->AddElement("box");
-      elem->GetElement("size")->Set(
-          msgs::Convert(_msg->geometry().box().size()));
-    }
-    else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
-    {
-      sdf::ElementPtr elem = geomElem->AddElement("sphere");
-      elem->GetElement("radius")->Set(_msg->geometry().sphere().radius());
-    }
-    else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
-    {
-      sdf::ElementPtr elem = geomElem->AddElement("cylinder");
-      elem->GetElement("radius")->Set(_msg->geometry().cylinder().radius());
-      elem->GetElement("length")->Set(_msg->geometry().cylinder().length());
-    }
-    else if (_msg->geometry().type() == msgs::Geometry::PLANE)
-    {
-      math::Plane plane = msgs::Convert(_msg->geometry().plane());
-      sdf::ElementPtr elem = geomElem->AddElement("plane");
-      elem->GetElement("normal")->Set(plane.normal);
-      elem->GetElement("size")->Set(plane.size);
-    }
-    else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
-    {
-      while (geomElem->HasElement("polyline"))
-        geomElem->GetElement("polyline")->RemoveFromParent();
-
-      for (int j = 0; j < _msg->geometry().polyline_size(); ++j)
-      {
-        sdf::ElementPtr polylineElem = geomElem->AddElement("polyline");
-        for (int i = 0; i < _msg->geometry().polyline(j).point_size(); ++i)
-        {
-          sdf::ElementPtr pointElem = polylineElem->AddElement("point");
-          pointElem->Set(msgs::Convert(_msg->geometry().polyline(j).point(i)));
-        }
-        polylineElem->GetElement("height")->Set(
-            _msg->geometry().polyline(j).height());
-      }
-    }
-    else if (_msg->geometry().type() == msgs::Geometry::MESH)
-    {
-      sdf::ElementPtr elem = geomElem->AddElement("mesh");
-      elem->GetElement("uri")->Set(_msg->geometry().mesh().filename());
-
-      if (_msg->geometry().mesh().has_submesh())
-      {
-        elem->GetElement("submesh")->GetElement("name")->Set(
-            _msg->geometry().mesh().submesh());
-      }
-
-      if (_msg->geometry().mesh().has_center_submesh())
-      {
-        elem->GetElement("submesh")->GetElement("center")->Set(
-            _msg->geometry().mesh().center_submesh());
-      }
-    }
-  }
-
-  if (_msg->has_pose())
-  {
-    sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("pose");
-    math::Pose p(msgs::Convert(_msg->pose().position()),
-                  msgs::Convert(_msg->pose().orientation()));
-
-    elem->Set(p);
-  }
-
-  if (_msg->has_material())
-  {
-    if (_msg->material().has_script())
-    {
-      sdf::ElementPtr elem =
-        this->dataPtr->sdf->GetElement("material")->GetElement("script");
-      elem->GetElement("name")->Set(_msg->material().script().name());
-      for (int i = 0; i < _msg->material().script().uri_size(); ++i)
-      {
-        sdf::ElementPtr uriElem = elem->AddElement("uri");
-        uriElem->Set(_msg->material().script().uri(i));
-      }
-    }
-
-    if (_msg->material().has_ambient())
-    {
-      sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("material");
-      elem->GetElement("ambient")->Set(
-          msgs::Convert(_msg->material().ambient()));
-    }
-
-    if (_msg->material().has_diffuse())
-    {
-      sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("material");
-      elem->GetElement("diffuse")->Set(
-          msgs::Convert(_msg->material().diffuse()));
-    }
-
-    if (_msg->material().has_specular())
-    {
-      sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("material");
-      elem->GetElement("specular")->Set(
-          msgs::Convert(_msg->material().specular()));
-    }
-
-    if (_msg->material().has_emissive())
-    {
-      sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("material");
-      elem->GetElement("emissive")->Set(
-          msgs::Convert(_msg->material().emissive()));
-    }
-
-    if (_msg->material().has_lighting())
-    {
-      sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("material");
-      elem->GetElement("lighting")->Set(_msg->material().lighting());
-    }
-  }
-
-  if (_msg->has_cast_shadows())
-    this->dataPtr->sdf->GetElement("cast_shadows")->Set(_msg->cast_shadows());
-
-  if (_msg->has_laser_retro())
-    this->dataPtr->sdf->GetElement("laser_retro")->Set(_msg->laser_retro());
-
-  if (_msg->has_plugin())
-  {
-    sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("plugin");
-    if (_msg->plugin().has_name())
-      elem->GetAttribute("name")->Set(_msg->plugin().name());
-    if (_msg->plugin().has_filename())
-      elem->GetAttribute("filename")->Set(_msg->plugin().filename());
-    if (_msg->plugin().has_innerxml())
-    {
-      TiXmlDocument innerXML;
-      innerXML.Parse(_msg->plugin().innerxml().c_str());
-      sdf::copyChildren(elem, innerXML.RootElement());
-    }
-  }
-
+  this->dataPtr->sdf = msgs::VisualToSDF(*_msg.get());
   this->Load();
   this->UpdateFromMsg(_msg);
 }
@@ -518,6 +375,7 @@ void Visual::Load()
   {
     sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
 
+    bool hasGeom = true;
     if (geomElem->HasElement("box"))
     {
       this->dataPtr->scale =
@@ -545,10 +403,21 @@ void Visual::Load()
       this->dataPtr->scale =
           geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
     }
-  }
+    else
+    {
+      hasGeom = false;
+    }
 
-  this->dataPtr->sceneNode->setScale(this->dataPtr->scale.x,
-      this->dataPtr->scale.y, this->dataPtr->scale.z);
+    if (hasGeom)
+    {
+      // geom values give the absolute size so compute a scale that will
+      // be mulitiply by the current scale to get to the geom size.
+      math::Vector3 derivedScale = Conversions::Convert(
+          this->dataPtr->sceneNode->_getDerivedScale());
+      math::Vector3 toScale = this->dataPtr->scale / derivedScale;
+      this->dataPtr->sceneNode->scale(toScale.x, toScale.y, toScale.z);
+    }
+  }
 
   // Set the material of the mesh
   if (this->dataPtr->sdf->HasElement("material"))
@@ -2331,7 +2200,6 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_scale())
     this->SetScale(msgs::Convert(_msg->scale()));
-
 
   if (_msg->has_geometry() && _msg->geometry().has_type())
   {

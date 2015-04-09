@@ -799,9 +799,10 @@ void Link::FillMsg(msgs::Link &_msg)
       sensor->FillMsg(*_msg.add_sensor());
   }
 
-  // Parse visuals from SDF
   if (this->visuals.empty())
     this->ParseVisuals();
+  else
+    this->UpdateVisualMsg();
 
   for (Visuals_M::iterator iter = this->visuals.begin();
       iter != this->visuals.end(); ++iter)
@@ -1051,32 +1052,10 @@ void Link::OnCollision(ConstContactsPtr &_msg)
 /////////////////////////////////////////////////
 void Link::ParseVisuals()
 {
-  // TODO: this shouldn't be in the physics sim
-  if (this->sdf->HasElement("visual"))
-  {
-    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
-    while (visualElem)
-    {
-      msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+  this->UpdateVisualMsg();
 
-      std::string visName = this->GetScopedName() + "::" + msg.name();
-      msg.set_name(visName);
-      msg.set_id(physics::getUniqueId());
-      msg.set_parent_name(this->GetScopedName());
-      msg.set_parent_id(this->GetId());
-      msg.set_is_static(this->IsStatic());
-
-      this->visPub->Publish(msg);
-
-      Visuals_M::iterator iter = this->visuals.find(msg.id());
-      if (iter != this->visuals.end())
-        gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
-
-      this->visuals[msg.id()] = msg;
-
-      visualElem = visualElem->GetNextElement("visual");
-    }
-  }
+  for (auto const it : this->visuals)
+    this->visPub->Publish(it.second);
 }
 
 /////////////////////////////////////////////////
@@ -1153,6 +1132,53 @@ void Link::UpdateVisualSDF()
       }
       else if (geomElem->HasElement("mesh"))
         geomElem->GetElement("mesh")->GetElement("scale")->Set(this->scale);
+
+      visualElem = visualElem->GetNextElement("visual");
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Link::UpdateVisualMsg()
+{
+  // TODO: this shouldn't be in the physics sim
+  if (this->sdf->HasElement("visual"))
+  {
+    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    while (visualElem)
+    {
+      msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+
+      bool newVis = true;
+      std::string linkName = this->GetScopedName();
+
+      // update visual msg if it exists
+      for (auto &iter : this->visuals)
+      {
+        std::string visName = linkName + "::" + visualElem->GetName();
+        if (iter.second.name() == visName)
+        {
+          iter.second.mutable_geometry()->CopyFrom(msg.geometry());
+          newVis = false;
+          break;
+        }
+      }
+
+      // add to visual msgs if not found.
+      if (newVis)
+      {
+        std::string visName = this->GetScopedName() + "::" + msg.name();
+        msg.set_name(visName);
+        msg.set_id(physics::getUniqueId());
+        msg.set_parent_name(this->GetScopedName());
+        msg.set_parent_id(this->GetId());
+        msg.set_is_static(this->IsStatic());
+
+        auto iter = this->visuals.find(msg.id());
+        if (iter != this->visuals.end())
+          gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
+        this->visuals[msg.id()] = msg;
+      }
 
       visualElem = visualElem->GetNextElement("visual");
     }
