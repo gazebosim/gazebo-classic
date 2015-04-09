@@ -948,13 +948,21 @@ TEST_F(MsgsTest, AxisFromSDF)
       </sdf>", sdf);
   msgs::Axis msg = msgs::AxisFromSDF(sdf->GetElement("axis"));
 
+  EXPECT_TRUE(msg.has_xyz());
   EXPECT_EQ(msgs::Convert(msg.xyz()), math::Vector3(0, 0, 1));
+  EXPECT_TRUE(msg.has_limit_lower());
   EXPECT_NEAR(msg.limit_lower(), 0.01, 1e-6);
+  EXPECT_TRUE(msg.has_limit_upper());
   EXPECT_NEAR(msg.limit_upper(), 9, 1e-6);
+  EXPECT_TRUE(msg.has_limit_effort());
   EXPECT_NEAR(msg.limit_effort(), 2.2, 1e-6);
+  EXPECT_TRUE(msg.has_limit_velocity());
   EXPECT_NEAR(msg.limit_velocity(), 0.1, 1e-6);
+  EXPECT_TRUE(msg.has_use_parent_model_frame());
   EXPECT_EQ(msg.use_parent_model_frame(), false);
+  EXPECT_TRUE(msg.has_damping());
   EXPECT_NEAR(msg.damping(), 0.1, 1e-6);
+  EXPECT_TRUE(msg.has_friction());
   EXPECT_NEAR(msg.friction(), 0.2, 1e-6);
 }
 
@@ -1003,28 +1011,49 @@ TEST_F(MsgsTest, JointFromSDF)
       </gazebo>", sdf);
   msgs::Joint msg = msgs::JointFromSDF(sdf);
 
+  EXPECT_TRUE(msg.has_name());
   EXPECT_EQ(msg.name(), "arm");
+  EXPECT_TRUE(msg.has_type());
   EXPECT_EQ(msgs::ConvertJointType(msg.type()), "revolute");
+  EXPECT_TRUE(msg.has_pose());
   EXPECT_EQ(msgs::Convert(msg.pose()), math::Pose(1, 2, 3, 0, 1.57, 0));
+  EXPECT_TRUE(msg.has_parent());
   EXPECT_EQ(msg.parent(), "arm_base");
+  EXPECT_TRUE(msg.has_child());
   EXPECT_EQ(msg.child(), "arm_shoulder");
+  EXPECT_TRUE(msg.has_cfm());
   EXPECT_NEAR(msg.cfm(), 0.2, 1e-6);
+  EXPECT_TRUE(msg.has_bounce());
   EXPECT_NEAR(msg.bounce(), 0.1, 1e-6);
+  EXPECT_TRUE(msg.has_velocity());
   EXPECT_NEAR(msg.velocity(), 1.1, 1e-6);
+  EXPECT_TRUE(msg.has_fudge_factor());
   EXPECT_NEAR(msg.fudge_factor(), 0.4, 1e-6);
+  EXPECT_TRUE(msg.has_limit_cfm());
   EXPECT_NEAR(msg.limit_cfm(), 0.0, 1e-6);
+  EXPECT_TRUE(msg.has_limit_erp());
   EXPECT_NEAR(msg.limit_erp(), 0.9, 1e-6);
+  EXPECT_TRUE(msg.has_suspension_cfm());
   EXPECT_NEAR(msg.suspension_cfm(), 0.1, 1e-6);
+  EXPECT_TRUE(msg.has_suspension_erp());
   EXPECT_NEAR(msg.suspension_erp(), 0.3, 1e-6);
 
   const msgs::Axis axisMsg = msg.axis1();
+  EXPECT_TRUE(axisMsg.has_xyz());
   EXPECT_EQ(msgs::Convert(axisMsg.xyz()), math::Vector3(1, 0, 0));
+  EXPECT_TRUE(axisMsg.has_limit_lower());
   EXPECT_NEAR(axisMsg.limit_lower(), 0.1, 1e-6);
+  EXPECT_TRUE(axisMsg.has_limit_upper());
   EXPECT_NEAR(axisMsg.limit_upper(), 3.14, 1e-6);
+  EXPECT_TRUE(axisMsg.has_limit_effort());
   EXPECT_NEAR(axisMsg.limit_effort(), 2.4, 1e-6);
+  EXPECT_TRUE(axisMsg.has_limit_velocity());
   EXPECT_NEAR(axisMsg.limit_velocity(), 0.4, 1e-6);
+  EXPECT_TRUE(axisMsg.has_use_parent_model_frame());
   EXPECT_EQ(axisMsg.use_parent_model_frame(), true);
+  EXPECT_TRUE(axisMsg.has_damping());
   EXPECT_NEAR(axisMsg.damping(), 1.0, 1e-6);
+  EXPECT_TRUE(axisMsg.has_friction());
   EXPECT_NEAR(axisMsg.friction(), 0.1, 1e-6);
 }
 
