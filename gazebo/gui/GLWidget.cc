@@ -201,8 +201,11 @@ void GLWidget::showEvent(QShowEvent *_event)
 
   if (this->windowId < 0)
   {
-    this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
+    this->windowId =rendering::RenderEngine::Instance()->GetWindowManager()->
         CreateWindow(this->GetOgreHandle(), this->width(), this->height());
+    QWidget::showEvent(_event);
+
+    this->scene = rendering::create_scene(gui::get_world(), true);
     if (this->userCamera)
     {
       rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
@@ -210,7 +213,6 @@ void GLWidget::showEvent(QShowEvent *_event)
     }
   }
 
-  QWidget::showEvent(_event);
 
   this->setFocus();
 }

@@ -317,7 +317,10 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 
   emit Close();
 
-  gazebo::shutdown();
+  // Stop transport
+  gazebo::transport::stop();
+
+  gazebo::transport::fini();
 }
 
 /////////////////////////////////////////////////

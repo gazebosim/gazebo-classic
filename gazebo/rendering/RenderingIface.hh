@@ -30,7 +30,7 @@ namespace gazebo
 
     /// \brief load rendering engine.
     GZ_RENDERING_VISIBLE
-    bool load();
+    bool load(bool _server = true);
 
     /// \brief init rendering engine.
     GZ_RENDERING_VISIBLE

@@ -142,7 +142,7 @@ set (qt_tests
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
   set (qt_tests
-      ${qt_tests}
+    ${qt_tests}
       BuildingEditor_TEST.cc
       ConfigWidget_TEST.cc
       GLWidget_TEST.cc
@@ -153,7 +153,7 @@ if (ENABLE_SCREEN_TESTS)
 endif()
 
 # Generate executables for each of the QT unit tests
-gz_build_qt_tests(${qt_tests})
+# gz_build_qt_tests(${qt_tests})
 
 set (resources resources.qrc)
 
@@ -166,21 +166,19 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
 
 gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 
-add_dependencies(gazebo_gui gazebo_msgs)
-add_dependencies(gzclient gazebo_gui)
+# add_dependencies(gazebo_gui gazebo_msgs)
+# add_dependencies(gzclient gazebo_gui)
 
 target_link_libraries(gazebo_gui
   gazebo_common
   gazebo_transport
   gazebo_rendering
-  gazebo_sensors
   gazebo_msgs
   gazebo_gui_building
   gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
   gzqtpropertybrowser
-  libgazebo
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
@@ -191,24 +189,26 @@ if (UNIX)
   target_link_libraries(gazebo_gui pthread)
 endif()
 
-target_link_libraries(gzclient
-  gazebo_common
-  gazebo_transport
-  gazebo_rendering
-  gazebo_sensors
-  gazebo_msgs
-  gazebo_gui
-  gazebo_gui_building
-  gazebo_gui_model
-  gazebo_gui_terrain
-  gazebo_gui_viewers
-  gazebo_skyx
-  gzqtpropertybrowser
-  libgazebo
-  ${QT_LIBRARIES}
-  ${ogre_libraries}
-  ${Boost_LIBRARIES}
-)
+target_link_libraries(gzclient gazebo_gui)
+#   gazebo_common
+#   gazebo_transport
+#   gazebo_rendering
+#   gazebo_physics
+#   gazebo_physics_ode
+#   gazebo_sensors
+#   gazebo_msgs
+#   gazebo_gui
+#   gazebo_gui_building
+#   gazebo_gui_model
+#   gazebo_gui_terrain
+#   gazebo_gui_viewers
+#   gazebo_skyx
+#   gzqtpropertybrowser
+#   libgazebo
+#   ${QT_LIBRARIES}
+#   ${ogre_libraries}
+#   ${Boost_LIBRARIES}
+# )
 
 if (UNIX)
   target_link_libraries(gzclient pthread)

@@ -27,6 +27,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
@@ -121,6 +122,9 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   {
     gzthrow("Unable to create the rendering window\n");
   }
+
+  if (this->windows.empty())
+    rendering::init();
 
   if (window)
   {
