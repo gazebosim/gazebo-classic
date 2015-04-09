@@ -115,6 +115,9 @@
         * [Pull request #1515](https://bitbucket.org/osrf/gazebo/pull-request/1515)
         * [Issue #1418](https://bitbucket.org/osrf/gazebo/issue/1418)
 
+    1. Expose API to support adding items to the palette.
+        * [Pull request #1565](https://bitbucket.org/osrf/gazebo/pull-request/1565)
+
     1. Added menu for toggling joint visualization
         * [Pull request #1551](https://bitbucket.org/osrf/gazebo/pull-request/1551)
         * [Issue #1483](https://bitbucket.org/osrf/gazebo/issue/1483)
