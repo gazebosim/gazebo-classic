@@ -55,12 +55,8 @@ namespace gazebo
       /// \return Inertia pose in link frame.
       public: math::Pose GetInertiaPose() const;
 
-      /// \brief Load based on a math::Pose
-      /// \param[in] _pose Pose of the COM visual.
-      /// \param[in] _radius Radius for the sphere visual.
-      /// \param[in] _box Link's bounding box.
-      private: void Load(const math::Pose &_pose,
-          double _radius = 0.01, math::Box _box = math::Box());
+      /// \brief Load using previously set member variables.
+      private: void Load();
     };
     /// \}
   }

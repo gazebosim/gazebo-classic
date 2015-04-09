@@ -45,8 +45,28 @@ COMVisual::~COMVisual()
 void COMVisual::Load(sdf::ElementPtr _elem)
 {
   Visual::Load();
-  math::Pose pose = _elem->Get<math::Pose>("origin");
-  this->Load(pose);
+
+  COMVisualPrivate *dPtr =
+      reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
+
+  if (_elem->HasAttribute("name"))
+    dPtr->name = _elem->Get<std::string>("name");
+
+  if (_elem->HasElement("inertial"))
+  {
+    if (_elem->GetElement("inertial")->HasElement("pose"))
+    {
+      dPtr->inertiaPose =
+          _elem->GetElement("inertial")->Get<math::Pose>("pose");
+    }
+    else if (_elem->GetElement("inertial")->HasElement("mass"))
+    {
+      dPtr->mass =
+          _elem->GetElement("inertial")->Get<double>("mass");
+    }
+  }
+
+  this->Load();
 }
 
 /////////////////////////////////////////////////
@@ -67,38 +87,37 @@ void COMVisual::Load(ConstLinkPtr &_msg)
 
   dPtr->inertiaPose = math::Pose(xyz, q);
 
-  double mass = _msg->inertial().mass();
-  if (mass < 0)
-  {
-    // Unrealistic mass, load with default mass
-    gzlog << "The link " << _msg->name() << " has unrealistic mass, "
-          << "unable to visualize sphere of equivalent mass." << std::endl;
-    this->Load(dPtr->inertiaPose);
-  }
-  else
-  {
-    // Compute radius of sphere with density of lead and equivalent mass.
-    double sphereRadius;
-    double dLead = 11340;
-    sphereRadius = cbrt((0.75 * mass) / (M_PI * dLead));
+  dPtr->mass = _msg->inertial().mass();
+  dPtr->name = _msg->name();
 
-    // Get the link's bounding box
-    std::string name = _msg->name();
-    VisualPtr vis = this->GetScene()->GetVisual(name);
-    math::Box box;
-
-    if (vis)
-      box = vis->GetBoundingBox();
-
-    this->Load(dPtr->inertiaPose, sphereRadius, box);
-  }
+  this->Load();
 }
 
 /////////////////////////////////////////////////
-void COMVisual::Load(const math::Pose &_pose, double _radius, math::Box _box)
+void COMVisual::Load()
 {
   COMVisualPrivate *dPtr =
       reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
+
+  if (dPtr->mass < 0)
+  {
+    // Unrealistic mass, load with default mass
+    gzlog << "The link " << dPtr->name << " has unrealistic mass, "
+          << "unable to visualize sphere of equivalent mass." << std::endl;
+    dPtr->mass = 1;
+  }
+
+  // Compute radius of sphere with density of lead and equivalent mass.
+  double sphereRadius;
+  double dLead = 11340;
+  sphereRadius = cbrt((0.75 * dPtr->mass) / (M_PI * dLead));
+
+  // Get the link's bounding box
+  VisualPtr vis = this->GetScene()->GetVisual(dPtr->name);
+  math::Box box;
+
+  if (vis)
+    box = vis->GetBoundingBox();
 
   // Mass indicator: equivalent sphere with density of lead
   this->InsertMesh("unit_sphere");
@@ -113,27 +132,29 @@ void COMVisual::Load(const math::Pose &_pose, double _radius, math::Box _box)
       dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SPHERE");
 
   dPtr->sphereNode->attachObject(sphereObj);
-  dPtr->sphereNode->setScale(_radius*2, _radius*2, _radius*2);
-  dPtr->sphereNode->setPosition(_pose.pos.x, _pose.pos.y, _pose.pos.z);
-  dPtr->sphereNode->setOrientation(Ogre::Quaternion(_pose.rot.w, _pose.rot.x,
-                                                    _pose.rot.y, _pose.rot.z));
+  dPtr->sphereNode->setScale(sphereRadius*2, sphereRadius*2, sphereRadius*2);
+  dPtr->sphereNode->setPosition(dPtr->inertiaPose.pos.x,
+      dPtr->inertiaPose.pos.y, dPtr->inertiaPose.pos.z);
+  dPtr->sphereNode->setOrientation(Ogre::Quaternion(
+      dPtr->inertiaPose.rot.w, dPtr->inertiaPose.rot.x,
+      dPtr->inertiaPose.rot.y, dPtr->inertiaPose.rot.z));
   dPtr->sphereNode->setInheritScale(false);
 
   this->SetMaterial("Gazebo/CoM");
 
   // CoM position indicator
-  math::Vector3 p1(0, 0, _box.min.z - _pose.pos.z);
-  math::Vector3 p2(0, 0, _box.max.z - _pose.pos.z);
-  math::Vector3 p3(0, _box.min.y - _pose.pos.y, 0);
-  math::Vector3 p4(0, _box.max.y - _pose.pos.y, 0);
-  math::Vector3 p5(_box.min.x - _pose.pos.x, 0, 0);
-  math::Vector3 p6(_box.max.x - _pose.pos.x, 0, 0);
-  p1 += _pose.pos;
-  p2 += _pose.pos;
-  p3 += _pose.pos;
-  p4 += _pose.pos;
-  p5 += _pose.pos;
-  p6 += _pose.pos;
+  math::Vector3 p1(0, 0, box.min.z - dPtr->inertiaPose.pos.z);
+  math::Vector3 p2(0, 0, box.max.z - dPtr->inertiaPose.pos.z);
+  math::Vector3 p3(0, box.min.y - dPtr->inertiaPose.pos.y, 0);
+  math::Vector3 p4(0, box.max.y - dPtr->inertiaPose.pos.y, 0);
+  math::Vector3 p5(box.min.x - dPtr->inertiaPose.pos.x, 0, 0);
+  math::Vector3 p6(box.max.x - dPtr->inertiaPose.pos.x, 0, 0);
+  p1 += dPtr->inertiaPose.pos;
+  p2 += dPtr->inertiaPose.pos;
+  p3 += dPtr->inertiaPose.pos;
+  p4 += dPtr->inertiaPose.pos;
+  p5 += dPtr->inertiaPose.pos;
+  p6 += dPtr->inertiaPose.pos;
 
   dPtr->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
   dPtr->crossLines->setMaterial("Gazebo/Green");

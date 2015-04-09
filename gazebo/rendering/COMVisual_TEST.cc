@@ -47,7 +47,7 @@ TEST_F(COMVisual_TEST, COMVisualTest)
   linkDefaultVis.reset(
       new gazebo::rendering::Visual("link", scene->GetWorldVisual()));
 
-  // create CoMVisual for the link
+  // create CoMVisual for the link using msg Load
   gazebo::rendering::COMVisualPtr comDefaultVis(
       new gazebo::rendering::COMVisual("_COM_VISUAL_", linkDefaultVis));
   comDefaultVis->Load(linkDefaultMsg);
@@ -60,11 +60,11 @@ TEST_F(COMVisual_TEST, COMVisualTest)
   math::Vector3 pos(1, 0, -3);
   math::Quaternion quat(M_PI/2, 0, -M_PI/5);
 
-  gazebo::msgs::LinkPtr linkMsg;
-  linkMsg.reset(new gazebo::msgs::Link);
-  msgs::Set(linkMsg->mutable_inertial()->mutable_pose()->mutable_position(),
+  gazebo::msgs::Link linkMsg;
+  linkMsg.set_name("link");
+  msgs::Set(linkMsg.mutable_inertial()->mutable_pose()->mutable_position(),
       pos);
-  msgs::Set(linkMsg->mutable_inertial()->mutable_pose()->mutable_orientation(),
+  msgs::Set(linkMsg.mutable_inertial()->mutable_pose()->mutable_orientation(),
       quat);
 
   // create a link visual
@@ -72,10 +72,10 @@ TEST_F(COMVisual_TEST, COMVisualTest)
   linkVis.reset(
       new gazebo::rendering::Visual("link", scene->GetWorldVisual()));
 
-  // create CoMVisual for the link
+  // create CoMVisual for the link using SDF Load
   gazebo::rendering::COMVisualPtr comVis(
       new gazebo::rendering::COMVisual("_COM_VISUAL_", linkVis));
-  comVis->Load(linkMsg);
+  comVis->Load(msgs::LinkToSDF(linkMsg));
 
   EXPECT_EQ(comVis->GetInertiaPose().pos, pos);
   EXPECT_EQ(comVis->GetInertiaPose().rot, quat);
