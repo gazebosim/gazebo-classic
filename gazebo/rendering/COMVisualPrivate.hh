@@ -46,7 +46,7 @@ namespace gazebo
       public: math::Pose inertiaPose;
 
       /// \brief Parent link name.
-      public: std::string name;
+      public: std::string linkName;
 
       /// \brief Link mass.
       public: double mass;

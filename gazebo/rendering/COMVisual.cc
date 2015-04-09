@@ -50,7 +50,7 @@ void COMVisual::Load(sdf::ElementPtr _elem)
       reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
 
   if (_elem->HasAttribute("name"))
-    dPtr->name = _elem->Get<std::string>("name");
+    dPtr->linkName = _elem->Get<std::string>("name");
 
   if (_elem->HasElement("inertial"))
   {
@@ -88,7 +88,7 @@ void COMVisual::Load(ConstLinkPtr &_msg)
   dPtr->inertiaPose = math::Pose(xyz, q);
 
   dPtr->mass = _msg->inertial().mass();
-  dPtr->name = _msg->name();
+  dPtr->linkName = _msg->name();
 
   this->Load();
 }
@@ -102,7 +102,7 @@ void COMVisual::Load()
   if (dPtr->mass < 0)
   {
     // Unrealistic mass, load with default mass
-    gzlog << "The link " << dPtr->name << " has unrealistic mass, "
+    gzlog << "The link " << dPtr->linkName << " has unrealistic mass, "
           << "unable to visualize sphere of equivalent mass." << std::endl;
     dPtr->mass = 1;
   }
@@ -113,7 +113,7 @@ void COMVisual::Load()
   sphereRadius = cbrt((0.75 * dPtr->mass) / (M_PI * dLead));
 
   // Get the link's bounding box
-  VisualPtr vis = this->GetScene()->GetVisual(dPtr->name);
+  VisualPtr vis = this->GetScene()->GetVisual(dPtr->linkName);
   math::Box box;
 
   if (vis)
