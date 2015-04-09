@@ -62,6 +62,7 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/WorldPrivate.hh"
@@ -148,6 +149,7 @@ World::World(const std::string &_name)
 //////////////////////////////////////////////////
 World::~World()
 {
+  this->dataPtr->presetManager.reset();
   delete this->dataPtr->receiveMutex;
   this->dataPtr->receiveMutex = NULL;
   delete this->dataPtr->loadModelMutex;
@@ -239,16 +241,17 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
       "~/light");
 
-  std::string type = this->dataPtr->sdf->GetElement(
-      "physics")->Get<std::string>("type");
+  // This should come before loading of entities
+  sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
+
+  std::string type = physicsElem->Get<std::string>("type");
   this->dataPtr->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
       shared_from_this());
 
   if (this->dataPtr->physicsEngine == NULL)
     gzthrow("Unable to create physics engine\n");
 
-  // This should come before loading of entities
-  this->dataPtr->physicsEngine->Load(this->dataPtr->sdf->GetElement("physics"));
+  this->dataPtr->physicsEngine->Load(physicsElem);
 
   // This should also come before loading of entities
   {
@@ -346,6 +349,9 @@ void World::Init()
 
   // Initialize the physics engine
   this->dataPtr->physicsEngine->Init();
+
+  this->dataPtr->presetManager = PresetManagerPtr(
+      new PresetManager(this->dataPtr->physicsEngine, this->dataPtr->sdf));
 
   this->dataPtr->testRay = boost::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
@@ -810,6 +816,12 @@ std::string World::GetName() const
 PhysicsEnginePtr World::GetPhysicsEngine() const
 {
   return this->dataPtr->physicsEngine;
+}
+
+//////////////////////////////////////////////////
+PresetManagerPtr World::GetPresetManager() const
+{
+  return this->dataPtr->presetManager;
 }
 
 //////////////////////////////////////////////////
@@ -1524,7 +1536,7 @@ void World::ProcessFactoryMsgs()
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
     for (auto const &factoryMsg : this->dataPtr->factoryMsgs)
     {
-      this->dataPtr->factorySDF->root->ClearElements();
+      this->dataPtr->factorySDF->Root()->ClearElements();
 
       if (factoryMsg.has_sdf() && !factoryMsg.sdf().empty())
       {
@@ -1557,7 +1569,7 @@ void World::ProcessFactoryMsgs()
           continue;
         }
 
-        this->dataPtr->factorySDF->root->InsertElement(
+        this->dataPtr->factorySDF->Root()->InsertElement(
             model->GetSDF()->Clone());
 
         std::string newName = model->GetName() + "_clone";
@@ -1569,7 +1581,7 @@ void World::ProcessFactoryMsgs()
           i++;
         }
 
-        this->dataPtr->factorySDF->root->GetElement("model")->GetAttribute(
+        this->dataPtr->factorySDF->Root()->GetElement("model")->GetAttribute(
             "name")->Set(newName);
       }
       else
@@ -1586,10 +1598,10 @@ void World::ProcessFactoryMsgs()
         if (base)
         {
           sdf::ElementPtr elem;
-          if (this->dataPtr->factorySDF->root->GetName() == "sdf")
-            elem = this->dataPtr->factorySDF->root->GetFirstElement();
+          if (this->dataPtr->factorySDF->Root()->GetName() == "sdf")
+            elem = this->dataPtr->factorySDF->Root()->GetFirstElement();
           else
-            elem = this->dataPtr->factorySDF->root;
+            elem = this->dataPtr->factorySDF->Root();
 
           base->UpdateParameters(elem);
         }
@@ -1600,7 +1612,7 @@ void World::ProcessFactoryMsgs()
         bool isModel = false;
         bool isLight = false;
 
-        sdf::ElementPtr elem = this->dataPtr->factorySDF->root->Clone();
+        sdf::ElementPtr elem = this->dataPtr->factorySDF->Root()->Clone();
 
         if (elem->HasElement("world"))
           elem = elem->GetElement("world");
@@ -1623,14 +1635,14 @@ void World::ProcessFactoryMsgs()
         else
         {
           gzerr << "Unable to find a model, light, or actor in:\n";
-          this->dataPtr->factorySDF->root->PrintValues("");
+          this->dataPtr->factorySDF->Root()->PrintValues("");
           continue;
         }
 
         if (!elem)
         {
           gzerr << "Invalid SDF:";
-          this->dataPtr->factorySDF->root->PrintValues("");
+          this->dataPtr->factorySDF->Root()->PrintValues("");
           continue;
         }
 

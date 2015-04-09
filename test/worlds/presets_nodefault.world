@@ -1,0 +1,75 @@
+<sdf version="1.5">
+  <world name="default">
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <physics name="preset_1" type="ode">
+      <max_step_size>0.01</max_step_size>
+      <ode>
+        <solver>
+          <min_step_size>0.001</min_step_size>
+          <iters>50</iters>
+          <sor>1.4</sor>
+          <use_dynamic_moi_rescaling>1</use_dynamic_moi_rescaling>
+        </solver>
+        <constraints>
+          <cfm>0.01</cfm>
+          <erp>0.3</erp>
+          <contact_max_correcting_vel>200</contact_max_correcting_vel>
+          <contact_surface_layer>0.002</contact_surface_layer>
+        </constraints>
+      </ode>
+      <simbody>
+        <min_step_size>0.001</min_step_size>
+        <accuracy>0.01</accuracy>
+        <max_transient_velocity>0.001</max_transient_velocity>
+      </simbody>
+      <bullet>
+        <solver>
+          <min_step_size>0.001</min_step_size>
+          <iters>50</iters>
+          <sor>1.4</sor>
+        </solver>
+        <constraints>
+          <cfm>0.01</cfm>
+          <erp>0.3</erp>
+          <split_impulse>false</split_impulse>
+          <contact_surface_layer>0.002</contact_surface_layer>
+        </constraints>
+      </bullet>
+    </physics>
+
+    <physics name="preset_2" type="ode">
+      <max_step_size>0.02</max_step_size>
+      <ode>
+        <solver>
+          <min_step_size>0.002</min_step_size>
+          <iters>100</iters>
+          <sor>1.5</sor>
+        </solver>
+        <constraints>
+          <cfm>0.02</cfm>
+          <erp>0.6</erp>
+        </constraints>
+      </ode>
+    </physics>
+
+    <physics name="unused" type="ode">
+      <max_step_size>0.04</max_step_size>
+      <ode>
+        <solver>
+          <min_step_size>0.004</min_step_size>
+          <iters>200</iters>
+          <sor>1.3</sor>
+        </solver>
+        <constraints>
+          <cfm>0.05</cfm>
+          <erp>0.7</erp>
+        </constraints>
+      </ode>
+    </physics>
+
+  </world>
+</sdf>
