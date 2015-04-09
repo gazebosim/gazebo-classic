@@ -18,7 +18,9 @@
 #include <gtest/gtest.h>
 
 #include "test_config.h"
+
 #include "gazebo/common/SVGLoader.hh"
+
 #include "test/util.hh"
 
 using namespace gazebo;
@@ -87,7 +89,6 @@ TEST_F(SVGLoader, LoadPaths)
   EXPECT_EQ(67u, p2.polylines[0].size());
 }
 
-
 /////////////////////////////////////////////////
 std::vector<std::string> &split(const std::string &_s,
                                 char _delim,
@@ -101,7 +102,6 @@ std::vector<std::string> &split(const std::string &_s,
   }
   return _elems;
 }
-
 
 void strv(const std::vector<std::string> &strs)
 {
@@ -175,6 +175,20 @@ math::Matrix3 GetTransformationMatrix(const std::string &_transform, const std::
   return m;
 }
 
+
+/////////////////////////////////////////////////
+TEST_F(SVGLoader, ChainedTransforms)
+{
+
+//  std::string str = "matrix(0,0.55669897,-0.55669897,0,194.55441,-149.50402) translate(0,0) scale(1,3) skewX(22)";
+//  common::SVGTransform tx(str);
+  EXPECT_EQ(42, 41);
+  
+}
+
+
+
+/*
 /////////////////////////////////////////////////
 TEST_F(SVGLoader, ChainedTransforms)
 {
@@ -201,6 +215,7 @@ TEST_F(SVGLoader, Transforms)
 {
 
   std::string str = "matrix(0,0.55669897,-0.55669897,0,194.55441,-149.50402)";
+
   size_t found1, found2;
   std::string mtrx("matrix(");
   found1 = str.find(mtrx) + mtrx.length();
@@ -224,7 +239,7 @@ TEST_F(SVGLoader, Transforms)
   EXPECT_DOUBLE_EQ(matrix[4], 194.55441);
   EXPECT_DOUBLE_EQ(matrix[5], -149.50402);
 }
-
+*/
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {

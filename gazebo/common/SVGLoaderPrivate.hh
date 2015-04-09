@@ -19,6 +19,7 @@
 #define _GAZEBO_SVGLOADER_PRIVATE_HH_
 
 #include <gazebo/math/Vector2d.hh>
+#include <gazebo/math/Matrix3.hh>
 
 class TiXmlElement;
 class TiXmlNode;
@@ -27,6 +28,26 @@ namespace gazebo
 {
   namespace common
   {
+    class SVGTransform
+    {
+      /// \brief Constructor
+      /// \param[in] _trans The transform attribute
+      public: SVGTransform(const std::string &_trans);
+
+      /// \brief Tranforms a point into its transform
+      /// \param[in] _p Point to transform
+      /// \return The transformed coordinates
+      public: math::Vector2d Transform(const math::Vector2d &_p);
+
+      /// \brief Parses a transform string and gets a matrix
+      /// \param[in] _transform The transformation string (ex "rotation(45)" )
+      private: static math::Matrix3 GetTransformationMatrix(
+                                                const std::string &_transform);
+
+      /// \brief Current transformation matrix
+      private: math::Matrix3 ctm;
+    };
+
     class SVGLoaderPrivate
     {
       /// \brief The step distance between 2 sampled points in a bezier curve
