@@ -264,15 +264,19 @@ bool PresetManager::CurrentProfile(const std::string &_name)
     return false;
   }
 
-  if (_name == this->CurrentProfile())
-    return true;
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->currentProfileMutex);
 
-  this->dataPtr->currentPreset = _name;
+    if (_name == this->CurrentProfile())
+      return true;
 
-  // For now, ignore the return value of this function, since not all
-  // parameters are supported
-  this->CurrentPreset()->SetAllPhysicsParameters(
-      this->dataPtr->physicsEngine);
+    this->dataPtr->currentPreset = _name;
+
+    // For now, ignore the return value of this function, since not all
+    // parameters are supported
+    this->CurrentPreset()->SetAllPhysicsParameters(
+        this->dataPtr->physicsEngine);
+  }
 
   return true;
 }
@@ -346,6 +350,8 @@ bool PresetManager::SetCurrentProfileParam(const std::string &_key,
   {
     return false;
   }
+
+  std::lock_guard<std::mutex> lock(this->dataPtr->currentProfileMutex);
   if (!this->CurrentPreset()->HasParam(_key))
   {
     return false;
@@ -373,6 +379,7 @@ bool PresetManager::GetCurrentProfileParam(const std::string &_key,
   {
     return false;
   }
+  std::lock_guard<std::mutex> lock(this->dataPtr->currentProfileMutex);
   return this->CurrentPreset()->GetParam(_key, _value);
 }
 
@@ -425,6 +432,7 @@ void PresetManager::RemoveProfile(const std::string &_name)
            << std::endl;
     return;
   }
+
   if (_name == this->CurrentProfile())
   {
     gzmsg << "deselecting current preset " << _name << std::endl;
@@ -473,6 +481,7 @@ bool PresetManager::ProfileSDF(const std::string &_name,
 
   if (_name == this->CurrentProfile())
   {
+    std::lock_guard<std::mutex> lock(this->dataPtr->currentProfileMutex);
     this->CurrentPreset()->SetAllPhysicsParameters(
         this->dataPtr->physicsEngine);
   }
