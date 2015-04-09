@@ -4,14 +4,14 @@ if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
-set (sources 
+set (sources
   Diagnostics.cc
   LogPlay.cc
   LogRecord.cc
   OpenAL.cc
 )
 
-set (headers 
+set (headers
   Diagnostics.hh
   LogPlay.hh
   LogRecord.hh

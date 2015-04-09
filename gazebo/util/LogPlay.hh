@@ -87,6 +87,14 @@ namespace gazebo
       /// \return End time of the log.
       public: common::Time GetLogEndTime() const;
 
+      /// \brief Get the name of the log file.
+      /// \return The filename.
+      public: std::string GetFilename() const;
+
+      /// \brief Get the size of the log file.
+      /// \return The size of the file in bytes.
+      public: uintmax_t GetFileSize() const;
+
       /// \brief Step through the open log file.
       /// \param[out] _data Data from next entry in the log file.
       public: bool Step(std::string &_data);
@@ -120,6 +128,10 @@ namespace gazebo
 
       /// \brief Read the header from the log file.
       private: void ReadHeader();
+
+      /// \brief Update the internal variables that keep track of the times
+      /// where the log started and finished (simulation time).
+      private: void ReadLogTimes();
 
       /// \brief The XML document of the log file.
       private: TiXmlDocument xmlDoc;

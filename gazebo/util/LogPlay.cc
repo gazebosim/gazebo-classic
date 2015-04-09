@@ -54,7 +54,10 @@ void LogPlay::Open(const std::string &_logFile)
 {
   boost::filesystem::path path(_logFile);
   if (!boost::filesystem::exists(path))
-    gzthrow("Invalid logfile[" + _logFile + "]. Does not exist.");
+    gzthrow("Invalid logfile [" + _logFile + "]. Does not exist.");
+
+  if (boost::filesystem::is_directory(path))
+    gzthrow("Invalid logfile [" + _logFile + "]. This is a directory.");
 
   // Parse the log file
   if (!this->xmlDoc.LoadFile(_logFile))
@@ -74,6 +77,9 @@ void LogPlay::Open(const std::string &_logFile)
 
   this->logCurrXml = this->logStartXml;
   this->encoding.clear();
+
+  // Extract the start/end log times from the log.
+  this->ReadLogTimes();
 }
 
 /////////////////////////////////////////////////
@@ -114,6 +120,15 @@ void LogPlay::ReadHeader()
   else
     this->logVersion = childXml->GetText();
 
+  if (this->logVersion != GZ_LOG_VERSION)
+  {
+    gzwarn << "Log version[" << this->logVersion << "] in file["
+           << this->filename
+           << "] does not match Gazebo's log version["
+           << GZ_LOG_VERSION << "]\n";
+    return;
+  }
+
   // Get the gazebo version
   childXml = headerXml->FirstChildElement("gazebo_version");
   if (!childXml)
@@ -128,34 +143,63 @@ void LogPlay::ReadHeader()
   else
     this->randSeed = boost::lexical_cast<uint32_t>(childXml->GetText());
 
-  // Get the log start time.
-  childXml = headerXml->FirstChildElement("log_start");
-  if (!childXml)
-    gzerr << "Log file header is missing the log start time.\n";
-  else
-  {
-    std::stringstream ss(childXml->GetText());
-    ss >> this->logStartTime;
-  }
-
-  // Get the log end time.
-  childXml = headerXml->FirstChildElement("log_end");
-  if (!childXml)
-    gzerr << "Log file header is missing the log end time.\n";
-  else
-  {
-    std::stringstream ss(childXml->GetText());
-    ss >> this->logEndTime;
-  }
-
-  if (this->logVersion != GZ_LOG_VERSION)
-    gzwarn << "Log version[" << this->logVersion << "] in file["
-           << this->filename
-           << "] does not match Gazebo's log version["
-           << GZ_LOG_VERSION << "]\n";
-
   /// Set the random number seed for simulation
   math::Rand::SetSeed(this->randSeed);
+}
+
+/////////////////////////////////////////////////
+void LogPlay::ReadLogTimes()
+{
+  if (this->GetChunkCount() == 0u)
+  {
+    gzwarn << "Unable to extract log timing information. No chunks available."
+           << std::endl;
+    return;
+  }
+
+  const std::string kStartDelim = "<sim_time>";
+  const std::string kEndDelim = "</sim_time>";
+  std::string chunk;
+
+  // Read the start time of the log from the first chunk.
+  this->GetChunk(0, chunk);
+
+  // Find the first <sim_time> of the log.
+  auto from = chunk.find(kStartDelim);
+  auto to = chunk.find(kEndDelim, from + kStartDelim.size());
+  if (from != std::string::npos && to != std::string::npos)
+  {
+    auto length = to - from - kStartDelim.size();
+    std::string startTime = chunk.substr(from + kStartDelim.size(), length);
+    std::stringstream ss(startTime);
+    ss >> this->logStartTime;
+  }
+  else
+  {
+    gzwarn << "Unable to find <sim_time>...</sim_time> tags in the first chunk."
+           << std::endl;
+    return;
+  }
+
+  this->GetChunk(this->GetChunkCount() - 1, chunk);
+
+  // Update the last <sim_time> of the log.
+  to = chunk.rfind(kEndDelim);
+  from = chunk.rfind(kStartDelim, to - 1);
+
+  if (from != std::string::npos && to != std::string::npos)
+  {
+    auto length = to - from - kStartDelim.size();
+    std::string endTime = chunk.substr(from + kStartDelim.size(), length);
+    std::stringstream ss(endTime);
+    ss >> this->logEndTime;
+  }
+  else
+  {
+    gzwarn << "Unable to find <sim_time>...</sim_time> tags in the last chunk."
+           << std::endl;
+    return;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -192,6 +236,19 @@ common::Time LogPlay::GetLogStartTime() const
 common::Time LogPlay::GetLogEndTime() const
 {
   return this->logEndTime;
+}
+
+/////////////////////////////////////////////////
+std::string LogPlay::GetFilename() const
+{
+  return boost::filesystem::basename(this->filename) +
+    boost::filesystem::extension(this->filename);
+}
+
+/////////////////////////////////////////////////
+uintmax_t LogPlay::GetFileSize() const
+{
+  return boost::filesystem::file_size(this->filename);
 }
 
 /////////////////////////////////////////////////
