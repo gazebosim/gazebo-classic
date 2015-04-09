@@ -232,12 +232,8 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   else if (this->dataPtr->logPlayWidget->isVisible())
   {
     // Set simulation time
-    this->dataPtr->logPlayWidget->EmitSetSimTime(
+    this->dataPtr->logPlayWidget->EmitSetCurrentTime(
         QString::fromStdString(FormatTime(_msg->sim_time())));
-
-    // Set the iterations
-    this->dataPtr->logPlayWidget->EmitSetIterations(QString::fromStdString(
-        boost::lexical_cast<std::string>(_msg->iterations())));
   }
 }
 

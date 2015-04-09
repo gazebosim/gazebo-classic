@@ -30,81 +30,70 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 
   this->dataPtr->timePanel = dynamic_cast<TimePanel *>(_parent);
 
+  QSize bigSize(70, 70);
+  QSize bigIconSize(40, 40);
+  QSize smallSize(50, 50);
+  QSize smallIconSize(30, 30);
+
+  // Play
+  QToolButton *playButton = new QToolButton(this);
+  playButton->setFixedSize(bigSize);
+  playButton->setCheckable(false);
+  playButton->setIcon(QPixmap(":/images/log_play.png"));
+  playButton->setIconSize(bigIconSize);
+  playButton->setStyleSheet(
+      QString("border-radius: %1px").arg(bigSize.width()/2-2));
+  connect(playButton, SIGNAL(clicked()), this, SLOT(OnPlay()));
+  connect(this, SIGNAL(ShowPlay()), playButton, SLOT(show()));
+  connect(this, SIGNAL(HidePlay()), playButton, SLOT(hide()));
+
+  // Pause
+  QToolButton *pauseButton = new QToolButton(this);
+  pauseButton->setFixedSize(bigSize);
+  pauseButton->setCheckable(false);
+  pauseButton->setIcon(QPixmap(":/images/log_pause.png"));
+  pauseButton->setIconSize(bigIconSize);
+  pauseButton->setStyleSheet(
+      QString("border-radius: %1px").arg(bigSize.width()/2-2));
+  connect(pauseButton, SIGNAL(clicked()), this, SLOT(OnPause()));
+  connect(this, SIGNAL(ShowPause()), pauseButton, SLOT(show()));
+  connect(this, SIGNAL(HidePause()), pauseButton, SLOT(hide()));
+
+  // Step forward
+  QToolButton *stepForwardButton = new QToolButton(this);
+  stepForwardButton->setFixedSize(smallSize);
+  stepForwardButton->setCheckable(false);
+  stepForwardButton->setIcon(QPixmap(":/images/log_step_forward.png"));
+  stepForwardButton->setIconSize(smallIconSize);
+  stepForwardButton->setStyleSheet(
+      QString("border-radius: %1px").arg(smallSize.width()/2-2));
+  connect(stepForwardButton, SIGNAL(clicked()), this, SLOT(OnStepForward()));
+
+  // Play layout
+  QHBoxLayout *playLayout = new QHBoxLayout();
+  playLayout->addWidget(playButton);
+  playLayout->addWidget(pauseButton);
+  playLayout->addWidget(stepForwardButton);
+
+  // Time
+  QLineEdit *currentTime = new QLineEdit();
+  currentTime->setMaximumWidth(110);
+  connect(this, SIGNAL(SetCurrentTime(const QString &)), currentTime,
+      SLOT(setText(const QString &)));
+
+  QHBoxLayout *timeLayout = new QHBoxLayout();
+  timeLayout->addWidget(currentTime);
+
+  // Main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
-
-  QScrollArea *scrollArea = new QScrollArea(this);
-  scrollArea->setLineWidth(1);
-  scrollArea->setFrameShape(QFrame::NoFrame);
-  scrollArea->setFrameShadow(QFrame::Plain);
-  scrollArea->setWidgetResizable(true);
-  scrollArea->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-  scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-  // Play control (Play/Step/Pause)
-  QFrame *frame = new QFrame(scrollArea);
-  frame->setFrameShape(QFrame::NoFrame);
-  scrollArea->setWidget(frame);
-
-  QToolBar *playToolbar = new QToolBar;
-  playToolbar->setObjectName("playToolBar");
-  playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  if (g_playAct)
-    playToolbar->addAction(g_playAct);
-  if (g_pauseAct)
-    playToolbar->addAction(g_pauseAct);
-  this->dataPtr->paused = false;
-
-  QLabel *emptyLabel = new QLabel(tr("  "));
-  playToolbar->addWidget(emptyLabel);
-
-  if (g_stepAct)
-  {
-    playToolbar->addAction(g_stepAct);
-    g_stepAct->setEnabled(this->dataPtr->paused);
-  }
-
-  QLineEdit *simTimeEdit = new QLineEdit();
-  simTimeEdit->setObjectName("logPlayWidgetSimTime");
-  simTimeEdit->setReadOnly(true);
-  simTimeEdit->setFixedWidth(110);
-
-  QLineEdit *iterationsEdit = new QLineEdit();
-  iterationsEdit->setReadOnly(true);
-  iterationsEdit->setFixedWidth(110);
-  iterationsEdit->setObjectName("logPlayWidgetIterations");
-
-  QHBoxLayout *frameLayout = new QHBoxLayout;
-  frameLayout->setContentsMargins(0, 0, 0, 0);
-  frameLayout->addItem(new QSpacerItem(5, -1, QSizePolicy::Expanding,
-                             QSizePolicy::Minimum));
-  frameLayout->addWidget(playToolbar);
-
-  frameLayout->addWidget(new QLabel(tr("Sim Time:")));
-  frameLayout->addWidget(simTimeEdit);
-
-  frameLayout->addWidget(new QLabel(tr("Iterations:")));
-  frameLayout->addWidget(iterationsEdit);
-
-  frame->setLayout(frameLayout);
-  frame->layout()->setContentsMargins(0, 0, 0, 0);
-
-  mainLayout->addWidget(scrollArea);
-  mainLayout->setAlignment(Qt::AlignCenter);
+  mainLayout->addLayout(playLayout);
+  mainLayout->addLayout(timeLayout);
   this->setLayout(mainLayout);
+  mainLayout->setAlignment(playLayout, Qt::AlignRight);
+  mainLayout->setAlignment(timeLayout, Qt::AlignLeft);
 
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   this->layout()->setContentsMargins(0, 0, 0, 0);
-
-  // Create a QueuedConnection to set iterations.
-  // This is used for thread safety.
-  connect(this, SIGNAL(SetIterations(QString)),
-      iterationsEdit, SLOT(setText(QString)),
-      Qt::QueuedConnection);
-
-  // Create a QueuedConnection to set sim time.
-  // This is used for thread safety.
-  connect(this, SIGNAL(SetSimTime(QString)),
-      simTimeEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 }
 
 /////////////////////////////////////////////////
@@ -125,20 +114,38 @@ void LogPlayWidget::SetPaused(bool _paused)
 {
   this->dataPtr->paused = _paused;
 
-  if (g_pauseAct)
-    g_pauseAct->setVisible(!_paused);
-  if (g_playAct)
-    g_playAct->setVisible(_paused);
+  if (_paused)
+  {
+    emit ShowPlay();
+    emit HidePause();
+  }
+  else
+  {
+    emit HidePlay();
+    emit ShowPause();
+  }
 }
 
 /////////////////////////////////////////////////
-void LogPlayWidget::EmitSetSimTime(QString _time)
+void LogPlayWidget::OnPlay()
 {
-  this->SetSimTime(_time);
+  g_playAct->trigger();
 }
 
 /////////////////////////////////////////////////
-void LogPlayWidget::EmitSetIterations(QString _time)
+void LogPlayWidget::OnPause()
 {
-  this->SetIterations(_time);
+  g_pauseAct->trigger();
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnStepForward()
+{
+  g_stepAct->trigger();
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::EmitSetCurrentTime(QString _time)
+{
+  this->SetCurrentTime(_time);
 }

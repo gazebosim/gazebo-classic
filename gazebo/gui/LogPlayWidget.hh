@@ -49,20 +49,33 @@ namespace gazebo
       public: void SetPaused(bool _paused);
 
       /// \brief Emit signal to set sim time line edit.
-      /// \param[in] _string String representation of sim time.
-      public: void EmitSetSimTime(QString _string);
+      /// \param[in] _string String representation of current time.
+      public: void EmitSetCurrentTime(QString _string);
 
-      /// \brief Emit signal to set iterations line edit.
-      /// \param[in] _string String representation of sim time.
-      public: void EmitSetIterations(QString _string);
+      /// \brief Play simulation.
+      public slots: void OnPlay();
 
-      /// \brief A signal used to set the sim time line edit.
-      /// \param[in] _string String representation of sim time.
-      signals: void SetSimTime(QString _string);
+      /// \brief Pause simulation.
+      public slots: void OnPause();
 
-      /// \brief A signal used to set the iterations line edit.
-      /// \param[in] _string String representation of iterations.
-      signals: void SetIterations(QString _string);
+      /// \brief Play simulation.
+      public slots: void OnStepForward();
+
+      /// \brief Qt signal to show the play button.
+      signals: void ShowPlay();
+
+      /// \brief Qt signal to hide the play button.
+      signals: void HidePlay();
+
+      /// \brief Qt signal to show the pause button.
+      signals: void ShowPause();
+
+      /// \brief Qt signal to hide the pause button.
+      signals: void HidePause();
+
+      /// \brief Qt signal used to set the current time line edit.
+      /// \param[in] _string String representation of current time.
+      signals: void SetCurrentTime(const QString &);
 
       /// \internal
       /// \brief Pointer to private data.
