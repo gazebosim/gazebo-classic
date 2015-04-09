@@ -72,20 +72,21 @@ namespace gazebo
       /// \brief Play simulation.
       public slots: void OnJumpEnd();
 
-      /// \brief Qt signal when the joint creation process has ended.
-      Q_SIGNALS: void ShowPlay();
+      /// \brief Qt signal to show the play button.
+      signals: void ShowPlay();
 
-      /// \brief Qt signal when the joint creation process has ended.
-      Q_SIGNALS: void HidePlay();
+      /// \brief Qt signal to hide the play button.
+      signals: void HidePlay();
 
-      /// \brief Qt signal when the joint creation process has ended.
-      Q_SIGNALS: void ShowPause();
+      /// \brief Qt signal to show the pause button.
+      signals: void ShowPause();
 
-      /// \brief Qt signal when the joint creation process has ended.
-      Q_SIGNALS: void HidePause();
+      /// \brief Qt signal to hide the pause button.
+      signals: void HidePause();
 
-      /// \brief Qt signal when the joint creation process has ended.
-      Q_SIGNALS: void SetCurrentTime(const QString &);
+      /// \brief Qt signal used to set the current time line edit.
+      /// \param[in] _string String representation of current time.
+      signals: void SetCurrentTime(const QString &);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void TotalTime(const QString &);

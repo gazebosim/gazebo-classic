@@ -18,6 +18,9 @@
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
 
+1. Separate TimePanel's display into TimeWidget and LogPlayWidget.
+    * [Pull request #1564](https://bitbucket.org/osrf/gazebo/pull-request/1564)
+
 1. Added support for Oculus DK2
     * [Pull request #1526](https://bitbucket.org/osrf/gazebo/pull-request/1526)
 
