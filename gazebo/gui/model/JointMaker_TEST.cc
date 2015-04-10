@@ -19,6 +19,7 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/model/JointInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/JointMaker_TEST.hh"
 
@@ -50,15 +51,10 @@ void JointMaker_TEST::JointState()
 /////////////////////////////////////////////////
 void JointMaker_TEST::CreateRemoveJoint()
 {
-  // FIXME Test passes but segfaults when QTestFixture clean up
-  // Problem: JointMaker's destructor resets visual shared_ptrs
-  // but this later causes a segfault in Visual's destructor when exiting the
-  // program.
-
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   gui::JointMaker *jointMaker = new gui::JointMaker();
   QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
@@ -131,7 +127,139 @@ void JointMaker_TEST::CreateRemoveJoint()
   jointMaker->RemoveJoint(ballJointData->hotspot->GetName());
   QCOMPARE(jointMaker->GetJointCount(), 0u);
 
-  // delete jointMaker;
+  delete jointMaker;
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void JointMaker_TEST::JointDefaultProperties()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  gui::JointMaker *jointMaker = new gui::JointMaker();
+  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
+  QCOMPARE(jointMaker->GetJointCount(), 0u);
+
+  gui::MainWindow *mainWindow = new gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  Q_ASSERT(cam);
+  rendering::ScenePtr scene = cam->GetScene();
+  Q_ASSERT(scene);
+
+  rendering::VisualPtr boxLink = scene->GetVisual("box::link");
+  rendering::VisualPtr sphereLink = scene->GetVisual("sphere::link");
+  rendering::VisualPtr cylinderLink = scene->GetVisual("cylinder::link");
+
+  Q_ASSERT(boxLink.get());
+  Q_ASSERT(sphereLink.get());
+  Q_ASSERT(cylinderLink.get());
+
+  // Add a revolute2 joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_HINGE2);
+  gui::JointData *revoluteJointData =
+      jointMaker->CreateJoint(boxLink, sphereLink);
+  jointMaker->CreateHotSpot(revoluteJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 1u);
+
+  // verify connected joints
+  std::vector<gui::JointData *> boxJointData =
+      jointMaker->GetJointDataByLink("box::link");
+  QCOMPARE(static_cast<unsigned int>(boxJointData.size()), 1u);
+
+  gui::JointData *rev2joint = boxJointData[0];
+  QVERIFY(rev2joint != NULL);
+  QVERIFY(rev2joint->inspector != NULL);
+
+  // verify default values
+  QVERIFY(msgs::ConvertJointType(rev2joint->jointMsg->type()) == "revolute2");
+  QCOMPARE(msgs::Convert(rev2joint->jointMsg->pose()), math::Pose::Zero);
+  qFuzzyCompare(rev2joint->jointMsg->cfm(), 0.0);
+  qFuzzyCompare(rev2joint->jointMsg->bounce(), 0.0);
+  qFuzzyCompare(rev2joint->jointMsg->fudge_factor(), 0.0);
+  qFuzzyCompare(rev2joint->jointMsg->limit_cfm(), 0.0);
+  qFuzzyCompare(rev2joint->jointMsg->limit_erp(), 0.2);
+  qFuzzyCompare(rev2joint->jointMsg->suspension_cfm(), 0.0);
+  qFuzzyCompare(rev2joint->jointMsg->suspension_erp(), 0.2);
+
+  msgs::Axis rev2Axis1Msg = rev2joint->jointMsg->axis1();
+  QCOMPARE(msgs::Convert(rev2Axis1Msg.xyz()), math::Vector3(1, 0, 0));
+  qFuzzyCompare(rev2Axis1Msg.limit_lower(), -GZ_DBL_MAX);
+  qFuzzyCompare(rev2Axis1Msg.limit_upper(), GZ_DBL_MAX);
+  qFuzzyCompare(rev2Axis1Msg.limit_effort(), -1);
+  qFuzzyCompare(rev2Axis1Msg.limit_velocity(), -1);
+  qFuzzyCompare(rev2Axis1Msg.damping(), 0.0);
+  qFuzzyCompare(rev2Axis1Msg.friction(), 0.0);
+  QCOMPARE(rev2Axis1Msg.use_parent_model_frame(), false);
+
+  msgs::Axis rev2Axis2Msg = rev2joint->jointMsg->axis2();
+  QCOMPARE(msgs::Convert(rev2Axis2Msg.xyz()), math::Vector3(0, 1, 0));
+  qFuzzyCompare(rev2Axis2Msg.limit_lower(), -GZ_DBL_MAX);
+  qFuzzyCompare(rev2Axis2Msg.limit_upper(), GZ_DBL_MAX);
+  qFuzzyCompare(rev2Axis2Msg.limit_effort(), -1);
+  qFuzzyCompare(rev2Axis2Msg.limit_velocity(), -1);
+  qFuzzyCompare(rev2Axis2Msg.damping(), 0.0);
+  qFuzzyCompare(rev2Axis2Msg.friction(), 0.0);
+  QCOMPARE(rev2Axis2Msg.use_parent_model_frame(), false);
+
+  // Add a prismatic joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_SLIDER);
+  gui::JointData *prismaticJointData =
+      jointMaker->CreateJoint(sphereLink, cylinderLink);
+  jointMaker->CreateHotSpot(prismaticJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 2u);
+
+  // verify connected joints
+  std::vector<gui::JointData *> sphereJointData =
+      jointMaker->GetJointDataByLink("sphere::link");
+  QCOMPARE(static_cast<unsigned int>(sphereJointData.size()), 2u);
+
+  std::vector<gui::JointData *> cylinderJointData =
+      jointMaker->GetJointDataByLink("cylinder::link");
+  QCOMPARE(static_cast<unsigned int>(cylinderJointData.size()), 1u);
+
+  gui::JointData *prisJoint = cylinderJointData[0];
+  QVERIFY(prisJoint != NULL);
+  QVERIFY(prisJoint->inspector != NULL);
+
+  // verify default values
+  QVERIFY(msgs::ConvertJointType(prisJoint->jointMsg->type()) == "prismatic");
+  QCOMPARE(msgs::Convert(prisJoint->jointMsg->pose()), math::Pose::Zero);
+  qFuzzyCompare(prisJoint->jointMsg->cfm(), 0.0);
+  qFuzzyCompare(prisJoint->jointMsg->bounce(), 0.0);
+  qFuzzyCompare(prisJoint->jointMsg->fudge_factor(), 0.0);
+  qFuzzyCompare(prisJoint->jointMsg->limit_cfm(), 0.0);
+  qFuzzyCompare(prisJoint->jointMsg->limit_erp(), 0.2);
+  qFuzzyCompare(prisJoint->jointMsg->suspension_cfm(), 0.0);
+  qFuzzyCompare(prisJoint->jointMsg->suspension_erp(), 0.2);
+
+  msgs::Axis prisAxis1Msg = prisJoint->jointMsg->axis1();
+  QCOMPARE(msgs::Convert(prisAxis1Msg.xyz()), math::Vector3(1, 0, 0));
+  qFuzzyCompare(prisAxis1Msg.limit_lower(), -GZ_DBL_MAX);
+  qFuzzyCompare(prisAxis1Msg.limit_upper(), GZ_DBL_MAX);
+  qFuzzyCompare(prisAxis1Msg.limit_effort(), -1);
+  qFuzzyCompare(prisAxis1Msg.limit_velocity(), -1);
+  qFuzzyCompare(prisAxis1Msg.damping(), 0.0);
+  qFuzzyCompare(prisAxis1Msg.friction(), 0.0);
+  QCOMPARE(prisAxis1Msg.use_parent_model_frame(), false);
+
+  delete jointMaker;
   mainWindow->close();
   delete mainWindow;
 }
