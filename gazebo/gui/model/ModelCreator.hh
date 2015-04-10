@@ -76,7 +76,9 @@ namespace gazebo
         /// \brief Imported 3D mesh
         LINK_MESH,
         /// \brief Extruded polyline
-        LINK_POLYLINE
+        LINK_POLYLINE,
+        /// \brief Nest model.
+        NESTED_MODEL
       };
 
       /// \enum SaveState
@@ -220,6 +222,10 @@ namespace gazebo
       /// \return Current save state.
       public: enum SaveState GetCurrentSaveState() const;
 
+      /// \brief Add an entity to the model
+      /// \param[in] _sdf SDF describing the entity.
+      public: void AddEntity(sdf::ElementPtr _sdf);
+
       /// \brief Add a link to the model
       /// \param[in] _type Type of link to be added
       public: void AddLink(LinkType _type);
@@ -308,6 +314,13 @@ namespace gazebo
       /// \param[in] _link SDF element of the link that will be used to
       /// recreate its visual representation in the model editor.
       private: void CreateLinkFromSDF(sdf::ElementPtr _linkElem);
+
+      /// \brief Create a link from an SDF with the specified parent visual.
+      /// \param[in] _linkElem SDF element of the link that will be used to
+      /// recreate its visual representation in the model editor.
+      /// \param[in] _parentVis Parent visual that the link will be attached to.
+      private: void CreateLinkFromSDF(sdf::ElementPtr _linkElem,
+          rendering::VisualPtr _parentVis);
 
       /// \brief Open the link inspector.
       /// \param[in] _name Name of link.

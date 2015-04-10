@@ -797,7 +797,8 @@ LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
+void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem,
+    rendering::VisualPtr _parentVis)
 {
   LinkData *link = new LinkData();
   MainWindow *mainWindow = gui::get_main_window();
@@ -828,8 +829,7 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
   if (leafName.find("::") != std::string::npos)
     this->jointMaker->AddScopedLinkName(leafName);
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
-      this->previewVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(linkName, _parentVis));
   linkVisual->Load();
   linkVisual->SetPose(link->GetPose());
   link->linkVisual = linkVisual;
@@ -949,6 +949,12 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
 
   rendering::ScenePtr scene = link->linkVisual->GetScene();
   this->ModelChanged();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
+{
+  this->CreateLinkFromSDF(_linkElem, this->previewVisual);
 }
 
 /////////////////////////////////////////////////
@@ -1154,6 +1160,64 @@ void ModelCreator::CreateTheEntity()
   msg.set_sdf(this->modelSDF->ToString());
   msgs::Set(msg.mutable_pose(), this->modelPose);
   this->makerPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::AddEntity(sdf::ElementPtr _sdf)
+{
+  if (!this->previewVisual)
+  {
+    this->Reset();
+  }
+
+  this->Stop();
+
+  // parse _sdf
+  if (_sdf->GetName() == "model")
+  {
+    std::stringstream entityNameStream;
+    entityNameStream << this->previewName << "_" << this->modelCounter
+        << "::" << _sdf->Get<std::string>("name");
+
+
+    std::string entityName = entityNameStream.str();
+
+    rendering::VisualPtr entityVisual(new rendering::Visual(entityName,
+        this->previewVisual));
+    entityVisual->Load();
+    entityVisual->SetTransparency(ModelData::GetEditTransparency());
+
+    if (_sdf->HasElement("pose"))
+      entityVisual->SetPose(_sdf->Get<math::Pose>("pose"));
+
+    // Links
+    if (!_sdf->HasElement("link"))
+    {
+      gzerr << "Can't load a model without links." << std::endl;
+      return;
+    }
+    sdf::ElementPtr linkElem = _sdf->GetElement("link");
+    while (linkElem)
+    {
+      this->CreateLinkFromSDF(linkElem, entityVisual);
+      linkElem = linkElem->GetNextElement("link");
+    }
+
+    // Joints
+    sdf::ElementPtr jointElem;
+    if (_sdf->HasElement("joint"))
+       jointElem = _sdf->GetElement("joint");
+
+    while (jointElem)
+    {
+      this->jointMaker->CreateJointFromSDF(jointElem, entityName);
+      jointElem = jointElem->GetNextElement("joint");
+    }
+
+    this->addLinkType = NESTED_MODEL;
+
+    this->mouseVisual = entityVisual;
+  }
 }
 
 /////////////////////////////////////////////////

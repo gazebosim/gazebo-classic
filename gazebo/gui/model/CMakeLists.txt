@@ -43,6 +43,7 @@ set (headers
 
 set (install_headers
   ModelEditor.hh
+  ModelEditorEvents.hh
 )
 
 if (ENABLE_SCREEN_TESTS)

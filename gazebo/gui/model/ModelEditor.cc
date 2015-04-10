@@ -229,6 +229,14 @@ void ModelEditor::AddItemToPalette(QWidget *_item,
 }
 
 ////////////////////////////////////////////////
+void ModelEditor::SpawnEntity(sdf::ElementPtr _sdf)
+{
+  event::Events::setSelectedEntity("", "normal");
+  g_arrowAct->trigger();
+  this->dataPtr->modelPalette->GetModelCreator()->AddEntity(_sdf);
+}
+
+////////////////////////////////////////////////
 void ModelEditor::Save()
 {
   gui::model::Events::saveModelEditor();
