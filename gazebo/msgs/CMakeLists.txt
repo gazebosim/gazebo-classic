@@ -45,6 +45,7 @@ set (msgs
   link.proto
   link_data.proto
   log_control.proto
+  log_play_control.proto
   log_status.proto
   material.proto
   meshgeom.proto
