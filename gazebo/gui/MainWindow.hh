@@ -170,7 +170,7 @@ namespace gazebo
       /// \brief Qt callback when the full screen action is triggered.
       private slots: void FullScreen();
 
-      /// \brief Qt callback when the show toolbarss action is triggered.
+      /// \brief Qt callback when the show toolbars action is triggered.
       private slots: void ShowToolbars();
 
       private slots: void FPS();
