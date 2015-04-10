@@ -166,7 +166,13 @@ namespace gazebo
       private slots: void ShowInertia();
 
       private slots: void Reset();
+
+      /// \brief Qt callback when the full screen action is triggered.
       private slots: void FullScreen();
+
+      /// \brief Qt callback when the show toolbarss action is triggered.
+      private slots: void ShowToolbars();
+
       private slots: void FPS();
       private slots: void Orbit();
       private slots: void ViewOculus();
@@ -174,6 +180,7 @@ namespace gazebo
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
       private slots: void SetWireframe();
+
       /// \brief Qt callback when the show GUI overlays action is triggered.
       private slots: void ShowGUIOverlays();
 
