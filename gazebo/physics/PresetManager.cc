@@ -114,9 +114,15 @@ bool Preset::SetAllParamsHelper(const sdf::ElementPtr _elem)
   for (sdf::ElementPtr elem = _elem->GetFirstElement(); elem;
         elem = elem->GetNextElement())
   {
+    std::string name = elem->GetName();
+    if (elem->GetParent() && elem->GetParent()->GetName() == "solver" &&
+        elem->GetName() == "type")
+    {
+      name = "solver_type";
+    }
     if (elem->GetValue())
     {
-      result &= this->SetParam(elem->GetName(), elem->GetAny());
+      result &= this->SetParam(name, elem->GetAny());
     }
     result &= this->SetAllParamsHelper(elem);
   }
@@ -511,7 +517,14 @@ void PresetManager::GeneratePresetFromSDF(const sdf::ElementPtr _elem,
   {
     if (elem->GetValue() != NULL)
     {
-      _preset.SetParam(elem->GetName(), elem->GetAny());
+      std::string key = elem->GetName();
+
+      if (elem->GetParent() && elem->GetParent()->GetName() == "solver" &&
+          elem->GetName() == "type")
+      {
+        key = "solver_type";
+      }
+      _preset.SetParam(key, elem->GetAny());
     }
     this->GeneratePresetFromSDF(elem, _preset);
   }
@@ -550,7 +563,12 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
         elem = elem->GetNextElement())
   {
     boost::any value;
-    if (_preset.GetParam(elem->GetName(), value) && elem->GetValue())
+    std::string key = elem->GetName();
+    if (key == "type")
+    {
+      key = "solver_type";
+    }
+    if (_preset.GetParam(key, value) && elem->GetValue())
     {
       // cast based on type in SDF
       if (typeid(int) == elem->GetValue()->GetType())

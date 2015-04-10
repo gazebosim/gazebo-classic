@@ -113,6 +113,18 @@ TEST_F(PresetManagerTest, GetSetProfileParam)
 
   EXPECT_TRUE(presetManager->GetProfileParam("preset_2", "max_step_size",
       value2));
+
+  boost::any type;
+  EXPECT_TRUE(presetManager->GetProfileParam("preset_1", "solver_type", type));
+  try
+  {
+    EXPECT_EQ(boost::any_cast<std::string>(type), "quick");
+  }
+  catch(boost::bad_any_cast &_e)
+  {
+    gzerr << "Bad any cast in PresetManager_TEST" << std::endl;
+    FAIL();
+  }
 }
 
 /////////////////////////////////////////////////

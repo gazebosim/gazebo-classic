@@ -745,18 +745,20 @@ std::string ODEPhysics::GetStepType() const
 //////////////////////////////////////////////////
 void ODEPhysics::SetStepType(const std::string &_type)
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("ode")->GetElement("solver");
-  elem->GetElement("type")->Set(_type);
-  this->dataPtr->stepType = _type;
-
   // Set the physics update function
   if (this->dataPtr->stepType == "quick")
     this->dataPtr->physicsStepFunc = &dWorldQuickStep;
   else if (this->dataPtr->stepType == "world")
     this->dataPtr->physicsStepFunc = &dWorldStep;
   else
+  {
     gzerr << "Invalid step type[" << this->dataPtr->stepType
           << "]" << std::endl;
+    return;
+  }
+  sdf::ElementPtr elem = this->sdf->GetElement("ode")->GetElement("solver");
+  elem->GetElement("type")->Set(_type);
+  this->dataPtr->stepType = _type;
 }
 
 //////////////////////////////////////////////////
