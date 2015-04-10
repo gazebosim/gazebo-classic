@@ -45,7 +45,7 @@ TEST_F(CylinderShapeTest, Scale)
 
   physics::CylinderShapePtr cylinder(
       new physics::CylinderShape(physics::CollisionPtr()));
-  sdf::ElementPtr elem = cylinderSDF->root;
+  sdf::ElementPtr elem = cylinderSDF->Root();
   ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("model");
   ASSERT_TRUE(elem != NULL);

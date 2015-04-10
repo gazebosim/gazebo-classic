@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _JOINTMAKER_HH_
-#define _JOINTMAKER_HH_
+#ifndef _GAZEBO_JOINTMAKER_HH_
+#define _GAZEBO_JOINTMAKER_HH_
 
 #include <map>
 #include <string>
@@ -179,6 +179,10 @@ namespace gazebo
       /// SDF before spawning the model.
       /// \param[in] _name Scoped link name.
       public: void AddScopedLinkName(const std::string &_name);
+
+      /// \brief Qt Callback to show / hide joint visuals.
+      /// \param[in] _show True to show joints, false to hide them.
+      public slots: void ShowJoints(bool _show);
 
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
