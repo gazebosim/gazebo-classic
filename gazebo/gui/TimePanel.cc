@@ -201,7 +201,7 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   if (this->dataPtr->realTimes.size() > 20)
     this->dataPtr->realTimes.pop_front();
 
-  if (_msg->has_log_playback() && _msg->log_playback())
+  if (_msg->has_log_stats())
   {
     this->SetTimeWidgetVisible(false);
     this->SetLogPlayWidgetVisible(true);
@@ -235,6 +235,18 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
     this->dataPtr->logPlayWidget->EmitSetCurrentTime(
         QString::fromStdString(FormatTime(_msg->sim_time())),
         _msg->sim_time().sec() * 1e3 + _msg->sim_time().nsec() * 1e-6);
+
+    // Set start time in text and in ms
+    this->dataPtr->logPlayWidget->EmitSetStartTime(
+        QString::fromStdString(FormatTime(_msg->log_stats().start_time())),
+        _msg->log_stats().start_time().sec() * 1e3 +
+        _msg->log_stats().start_time().nsec() * 1e-6);
+
+    // Set end time in text and in ms
+    this->dataPtr->logPlayWidget->EmitSetEndTime(
+        QString::fromStdString(FormatTime(_msg->log_stats().end_time())),
+        _msg->log_stats().end_time().sec() * 1e3 +
+        _msg->log_stats().end_time().nsec() * 1e-6);
   }
 }
 

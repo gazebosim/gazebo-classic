@@ -54,6 +54,16 @@ namespace gazebo
       /// \param[in] _timeInt Integer representation of sim time.
       public: void EmitSetCurrentTime(QString _timeString, int _timeInt);
 
+      /// \brief Emit signal to set current time line edit and item.
+      /// \param[in] _timeString String representation of sim time.
+      /// \param[in] _timeInt Integer representation of sim time.
+      public: void EmitSetStartTime(QString _timeString, int _timeInt);
+
+      /// \brief Emit signal to set current time line edit and item.
+      /// \param[in] _timeString String representation of sim time.
+      /// \param[in] _timeInt Integer representation of sim time.
+      public: void EmitSetEndTime(QString _timeString, int _timeInt);
+
       /// \brief Play simulation.
       public slots: void OnPlay();
 
@@ -88,14 +98,18 @@ namespace gazebo
       /// \param[in] _string String representation of current time.
       signals: void SetCurrentTime(const QString &);
 
-      /// \brief Qt signal when the joint creation process has ended.
-      Q_SIGNALS: void TotalTime(const QString &);
+      /// \brief Qt signal used to set the current time line edit.
+      /// \param[in] _string String representation of current time.
+      signals: void SetEndTime(const QString &);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void SetCurrentTime(int _time);
 
       /// \brief Qt signal when the joint creation process has ended.
-      Q_SIGNALS: void TotalTime(int _sec);
+      Q_SIGNALS: void SetStartTime(int _time);
+
+      /// \brief Qt signal when the joint creation process has ended.
+      Q_SIGNALS: void SetEndTime(int _time);
 
       /// \internal
       /// \brief Pointer to private data.
@@ -114,7 +128,10 @@ namespace gazebo
       public slots: void SetCurrentTime(int _sec);
 
       /// \brief Play simulation.
-      public slots: void SetTotalTime(int _sec);
+      public slots: void SetStartTime(int _sec);
+
+      /// \brief Play simulation.
+      public slots: void SetEndTime(int _sec);
 
       /// \brief Qt mouse release event.
       /// \param[in] _event Qt mouse event.

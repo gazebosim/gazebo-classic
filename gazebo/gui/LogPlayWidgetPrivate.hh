@@ -54,7 +54,10 @@ namespace gazebo
       public: CurrentTimeItem *currentTimeItem;
 
       /// \brief Used to start, stop, and step simulation.
-      public: int totalTime;
+      public: int startTime;
+
+      /// \brief Used to start, stop, and step simulation.
+      public: int endTime;
 
       /// \brief Used to start, stop, and step simulation.
       public: int sceneWidth;

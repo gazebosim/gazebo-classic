@@ -1,0 +1,14 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface LogStatistics
+/// \brief A message statiscs about a log during playback.
+
+
+import "time.proto";
+
+message LogStatistics
+{
+  required Time start_time = 1;
+  required Time end_time   = 2;
+}

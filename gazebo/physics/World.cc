@@ -1935,6 +1935,8 @@ void World::ProcessMessages()
 //////////////////////////////////////////////////
 void World::PublishWorldStats()
 {
+  this->dataPtr->worldStatsMsg.Clear();
+
   msgs::Set(this->dataPtr->worldStatsMsg.mutable_sim_time(),
       this->GetSimTime());
   msgs::Set(this->dataPtr->worldStatsMsg.mutable_real_time(),
@@ -1944,9 +1946,34 @@ void World::PublishWorldStats()
 
   this->dataPtr->worldStatsMsg.set_iterations(this->dataPtr->iterations);
   this->dataPtr->worldStatsMsg.set_paused(this->IsPaused());
-  this->dataPtr->worldStatsMsg.set_log_playback(
-      util::LogPlay::Instance()->IsOpen());
 
+  if (util::LogPlay::Instance()->IsOpen())
+  {
+    msgs::LogStatistics logStats;
+    msgs::Set(logStats.mutable_start_time(),
+        util::LogPlay::Instance()->GetLogStartTime());
+    msgs::Set(logStats.mutable_end_time(),
+        util::LogPlay::Instance()->GetLogEndTime());
+
+/*
+    if (this->GetSimTime().Double() <
+        util::LogPlay::Instance()->GetLogStartTime().Double())
+    {
+std::cout << "sim time: " << this->GetSimTime().Double() <<
+" start: " << util::LogPlay::Instance()->GetLogStartTime().Double() << std::endl;
+    }
+
+
+    if (this->GetSimTime().Double() >=
+        util::LogPlay::Instance()->GetLogEndTime().Double())
+    {
+std::cout << "sim time: " << this->GetSimTime().Double() <<
+" end: " << util::LogPlay::Instance()->GetLogEndTime().Double() << std::endl;
+    }
+
+    this->dataPtr->worldStatsMsg.mutable_log_stats()->CopyFrom(logStats);
+  }
+*/
   if (this->dataPtr->statPub && this->dataPtr->statPub->HasConnections())
     this->dataPtr->statPub->Publish(this->dataPtr->worldStatsMsg);
   this->dataPtr->prevStatTime = common::Time::GetWallTime();

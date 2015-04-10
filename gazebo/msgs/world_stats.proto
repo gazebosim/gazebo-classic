@@ -5,6 +5,7 @@ package gazebo.msgs;
 /// \brief A message statiscs about a world
 
 
+import "log_stats.proto";
 import "time.proto";
 
 message WorldStatistics
@@ -15,5 +16,5 @@ message WorldStatistics
   required bool  paused      = 5;
   required uint64 iterations = 6;
   optional int32 model_count = 7;
-  optional bool log_playback = 8;
+  optional LogStatistics log_stats = 8;
 }

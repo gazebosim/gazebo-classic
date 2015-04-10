@@ -110,8 +110,10 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   this->dataPtr->view = new LogPlayView(this);
   connect(this, SIGNAL(SetCurrentTime(int)), this->dataPtr->view,
       SLOT(SetCurrentTime(int)));
-  connect(this, SIGNAL(TotalTime(int)), this->dataPtr->view,
-      SLOT(SetTotalTime(int)));
+  connect(this, SIGNAL(SetStartTime(int)), this->dataPtr->view,
+      SLOT(SetStartTime(int)));
+  connect(this, SIGNAL(SetEndTime(int)), this->dataPtr->view,
+      SLOT(SetEndTime(int)));
 
   // Time
   QLineEdit *currentTime = new QLineEdit();
@@ -119,13 +121,13 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   connect(this, SIGNAL(SetCurrentTime(const QString &)), currentTime,
       SLOT(setText(const QString &)));
 
-  QLabel *totalTime = new QLabel();
-  connect(this, SIGNAL(TotalTime(const QString &)), totalTime,
+  QLabel *endTime = new QLabel();
+  connect(this, SIGNAL(SetEndTime(const QString &)), endTime,
       SLOT(setText(const QString &)));
 
   QHBoxLayout *timeLayout = new QHBoxLayout();
   timeLayout->addWidget(currentTime);
-  timeLayout->addWidget(totalTime);
+  timeLayout->addWidget(endTime);
 
   // Main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
@@ -136,10 +138,6 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   this->layout()->setContentsMargins(0, 0, 0, 0);
-
-  // Set the total time
-  emit TotalTime(" / 00 00:00:22:123");
-  emit TotalTime(22123);
 }
 
 /////////////////////////////////////////////////
@@ -216,6 +214,22 @@ void LogPlayWidget::EmitSetCurrentTime(QString _timeString, int _timeInt)
   this->SetCurrentTime(_timeString);
   // current time item in view
   this->SetCurrentTime(_timeInt);
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::EmitSetStartTime(QString /*_timeString*/, int _timeInt)
+{
+  // start time in view
+  this->SetStartTime(_timeInt);
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::EmitSetEndTime(QString _timeString, int _timeInt)
+{
+  // end time line edit
+  this->SetEndTime(_timeString);
+  // start time in view
+  this->SetEndTime(_timeInt);
 }
 
 /////////////////////////////////////////////////
@@ -313,7 +327,11 @@ void LogPlayView::SetCurrentTime(int _msec)
   if (this->dataPtr->currentTimeItem->isSelected())
     return;
 
-  double relPos = double(_msec) / this->dataPtr->totalTime;
+  double relPos = double(_msec - this->dataPtr->startTime) /
+      (this->dataPtr->endTime - this->dataPtr->startTime);
+
+  if (relPos < 0 || relPos > 1)
+    return;
 
   this->dataPtr->currentTimeItem->setPos(
       this->dataPtr->margin +
@@ -322,49 +340,59 @@ void LogPlayView::SetCurrentTime(int _msec)
 }
 
 /////////////////////////////////////////////////
-void LogPlayView::SetTotalTime(int _msec)
+void LogPlayView::SetStartTime(int _msec)
 {
-  this->dataPtr->totalTime = _msec;
+  this->dataPtr->startTime = _msec;
+}
+
+/////////////////////////////////////////////////
+void LogPlayView::SetEndTime(int _msec)
+{
+  this->dataPtr->endTime = _msec;
+
+  int totalTime = this->dataPtr->endTime - this->dataPtr->startTime;
 
   // Current time line
   int tickHeight = 15;
+  double interval = double(totalTime) / 10;
   for (int i = 0; i <= 10; ++i)
   {
-    double interval = double(this->dataPtr->totalTime) * i / 10;
-    double relPos = interval/this->dataPtr->totalTime;
+    double relPos = (interval*i)/totalTime;
 
+    // Tick
     QGraphicsLineItem *tick = new QGraphicsLineItem(
         0, -tickHeight, 0, 0);
     tick->setPos(
-      this->dataPtr->margin +
-      (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
-      this->dataPtr->sceneHeight/2);
+        this->dataPtr->margin +
+        (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
+        this->dataPtr->sceneHeight/2);
     tick->setPen(QPen(Qt::black, 2));
     this->scene()->addItem(tick);
 
-  std::ostringstream stream;
-  unsigned int min, sec, msec;
+    // Text
+    std::ostringstream stream;
+    unsigned int min, sec, msec;
 
-  stream.str("");
+    stream.str("");
 
-  msec = interval;
+    msec = this->dataPtr->startTime + interval * i;
 
-  min = msec / 60000;
-  msec -= min * 60000;
+    min = msec / 60000;
+    msec -= min * 60000;
 
-  sec = msec / 1000;
-  msec -= sec * 60000;
+    sec = msec / 1000;
+    msec -= sec * 60000;
 
-  stream << std::setw(2) << std::setfill('0') << min << ":";
-  stream << std::setw(2) << std::setfill('0') << sec;// << ".";
-  //stream << std::setw(3) << std::setfill('0') << msec;
+    stream << std::setw(2) << std::setfill('0') << min << ":";
+    stream << std::setw(2) << std::setfill('0') << sec;// << ".";
+    //stream << std::setw(3) << std::setfill('0') << msec;
 
-  QGraphicsSimpleTextItem *tickText = new QGraphicsSimpleTextItem(
-      QString::fromStdString(stream.str()));
-  tickText->setPos(
-      this->dataPtr->margin +
-      (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
-      this->dataPtr->sceneHeight/2 - 3 * tickHeight);
+    QGraphicsSimpleTextItem *tickText = new QGraphicsSimpleTextItem(
+        QString::fromStdString(stream.str()));
+    tickText->setPos(
+        this->dataPtr->margin +
+        (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
+        this->dataPtr->sceneHeight/2 - 3 * tickHeight);
     this->scene()->addItem(tickText);
   }
 }
