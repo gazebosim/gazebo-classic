@@ -507,7 +507,7 @@ void Visual::Load()
   if (this->dataPtr->sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
-
+    bool hasGeom = true;
     if (geomElem->HasElement("box"))
     {
       this->dataPtr->scale =
@@ -535,10 +535,21 @@ void Visual::Load()
       this->dataPtr->scale =
           geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
     }
-  }
+    else
+    {
+      hasGeom = false;
+    }
 
-  this->dataPtr->sceneNode->setScale(this->dataPtr->scale.x,
-      this->dataPtr->scale.y, this->dataPtr->scale.z);
+    if (hasGeom)
+    {
+      // geom values give the absolute size so compute a scale that will
+      // be mulitiply by the current scale to get to the geom size.
+      math::Vector3 derivedScale = Conversions::Convert(
+          this->dataPtr->sceneNode->_getDerivedScale());
+      math::Vector3 toScale = this->dataPtr->scale / derivedScale;
+      this->dataPtr->sceneNode->scale(toScale.x, toScale.y, toScale.z);
+    }
+  }
 
   // Set the material of the mesh
   if (this->dataPtr->sdf->HasElement("material"))
