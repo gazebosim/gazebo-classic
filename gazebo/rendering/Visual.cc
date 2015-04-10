@@ -304,6 +304,7 @@ void Visual::Init()
 void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 {
   this->dataPtr->sdf = msgs::VisualToSDF(*_msg.get());
+
   this->Load();
   this->UpdateFromMsg(_msg);
 }

@@ -33,6 +33,7 @@ class PhysicsMsgsTest : public ServerFixture,
   public: void LinkProperties(const std::string &_physicsEngine);
   public: void LinkPose(const std::string &_physicsEngine);
   public: void SimpleShapeResize(const std::string &_physicsEngine);
+  public: void LinkVisualMsg(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
@@ -586,6 +587,86 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     }
   }
 }
+////////////////////////////////////////////////////////////////////////
+void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
+{
+  // load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the gravity vector
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  std::ostringstream sdfStream;
+  math::Pose pose(0, 0, 0, 0, 0, 0);
+  math::Vector3 boxSize(1, 1, 1);
+  sdfStream << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='box_test'>"
+    << "<allow_auto_disable>false</allow_auto_disable>"
+    << "<link name ='body'>"
+    << "  <pose>" << pose << "</pose>"
+    << "  <inertial>"
+    << "    <mass>4.0</mass>"
+    << "    <inertia>"
+    << "      <ixx>0.1667</ixx> <ixy>0.0</ixy> <ixz>0.0</ixz>"
+    << "      <iyy>0.1667</iyy> <iyz>0.0</iyz>"
+    << "      <izz>0.1667</izz>"
+    << "    </inertia>"
+    << "  </inertial>"
+    << "  <collision name ='geom'>"
+    << "    <geometry>"
+    << "      <box><size>" << boxSize << "</size></box>"
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << "      <box><size>" << boxSize << "</size></box>"
+    << "    </geometry>"
+    << "  </visual>"
+    << "  <visual name ='visual2'>"
+    << "    <geometry>"
+    << "      <box><size>" << boxSize << "</size></box>"
+    << "    </geometry>"
+    << "  </visual>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+  SpawnSDF(sdfStream.str());
+
+  physics::ModelPtr model;
+  model = world->GetModel("box_test");
+  EXPECT_TRUE(model != NULL);
+  msgs::Model msg;
+  model->FillMsg(msg);
+
+  EXPECT_EQ(msg.link_size(), 1);
+  msgs::Link linkMsg = msg.link(0);
+
+  // 3 visuals to be created: 1 link body + 2 visuals
+  EXPECT_EQ(linkMsg.visual_size(), 3);
+
+  // verify link body visual
+  msgs::Visual visualMsg = linkMsg.visual(0);
+  EXPECT_EQ(visualMsg.name(), "box_test::body");
+  EXPECT_FALSE(visualMsg.has_geometry());
+
+  // verify remaining visual msgs
+  for (int i = 1; i < linkMsg.visual_size(); ++i)
+  {
+    msgs::Visual visualMsg = linkMsg.visual(i);
+    std::stringstream visName;
+    visName << "box_test::body::visual";
+    if (i > 1)
+      visName << i;
+    EXPECT_EQ(visualMsg.name(), visName.str());
+    msgs::Geometry geomMsg = visualMsg.geometry();
+    EXPECT_TRUE(geomMsg.has_box());
+    EXPECT_EQ(msgs::Convert(geomMsg.box().size()), boxSize);
+  }
+}
 
 /////////////////////////////////////////////////
 TEST_P(PhysicsMsgsTest, SetGravity)
@@ -615,6 +696,12 @@ TEST_P(PhysicsMsgsTest, LinkPose)
 TEST_P(PhysicsMsgsTest, SimpleShapeResize)
 {
   SimpleShapeResize(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsMsgsTest, LinkVisualMsg)
+{
+  LinkVisualMsg(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsMsgsTest,
