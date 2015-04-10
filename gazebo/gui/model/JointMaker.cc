@@ -808,8 +808,9 @@ void JointMaker::Update()
           // set orientation of joint hotspot
           math::Vector3 dPos = (childOrigin - parentOrigin);
           math::Vector3 center = dPos * 0.5;
+          double length = std::max(dPos.GetLength(), 0.001);
           joint->hotspot->SetScale(
-              math::Vector3(0.008, 0.008, dPos.GetLength()));
+              math::Vector3(0.008, 0.008, length));
           joint->hotspot->SetWorldPosition(parentOrigin + center);
           math::Vector3 u = dPos.Normalize();
           math::Vector3 v = math::Vector3::UnitZ;
