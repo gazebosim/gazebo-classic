@@ -8,13 +8,17 @@
   density = 2700.0
 
   # Constant parameters for each star 
-  radius_outer0 = 0.05
-  star_ratio = 0.75
+  radius_outer0 = 0.06
+  star_ratio = 0.55
   height = 0.02
   star_number = 6
   star_point_number = 5
+  # the radius of the hole, shared by the disk and lowr separation part
   radius_hole = 0.02
+  # the outer radius of lower separation part
+  # radius_lower = 0.04
   points_hole = 10
+  height_hole = 0.025
   color = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple"]
   
 %>
@@ -29,8 +33,12 @@
 <%
   # Star axis of symmetry: Z
   star_number.times do |j|
-    radius_outer = radius_outer0*(star_number - j)
+    #radius_outer = radius_outer0*(star_number - j)
+    radius_outer = radius_outer0*(1.2**(star_number-j))
     radius_inner = star_ratio*radius_outer
+    # the outer radius of the lower sepeartion part
+    radius_lower = 0.85*(star_ratio * radius_outer0 * (1.2**(star_number-j+1)))
+
     # offset between each star
     angle0 = (j+1)*Math::PI/12.0;
 
@@ -40,6 +48,13 @@
     ixx = 1.0 / 12 * mass * (3*(radius_inner**2 + radius_outer**2) + height**2)
     iyy = ixx
     izz = 0.5 * mass * (radius_inner**2 + radius_outer**2)
+
+    # the inertia for the separation lower part
+    volume_low = Math::PI * (radius_lower**2 - radius_hole**2) * height_hole
+    mass_low = density * volume_low
+    ixx_low = 1.0 / 12 * mass_low * (3*(radius_hole**2 + radius_lower**2) + height_hole**2)
+    iyy_low = ixx_low
+    izz_low = 0.5 * mass_low * (radius_hole**2 + radius_lower**2)
 
     def star_points_s(outer_radius, inner_radius, angle0, points=5)
       polyline = []
@@ -87,10 +102,22 @@
                + "<height>" + height.to_s + "</height>\n"  \
                + "</polyline>\n" \
                + "</geometry>\n"
+
+    geometry_s_l = "<geometry>\n"  \
+                 + "<polyline>\n"  \
+                 + hole_points_s(radius_lower, 20) \
+                 + "<height>" + height_hole.to_s + "</height>\n"  \
+                 + "</polyline>\n" \
+                 + "<polyline>\n"  \
+                 + hole_points_s(radius_hole, 10) \
+                 + "<height>" + height_hole.to_s + "</height>\n"  \
+                 + "</polyline>\n" \
+                 + "</geometry>\n"
 %>
     <%= '<model name="star_' + radius_outer.to_s + '">' %>
-      <pose>0 0 <%= height * (j + 0.5) %>  0 0 0</pose>
-      <link name="link">
+      <pose>0 0 <%= 0.1 + (height+height_hole + 0.02)*j + height_hole %>  0 0 0</pose>
+      <link name="upper_disk">
+          <pose>0 0 <%= height/2.0 %>  0 0 0</pose>
         <inertial>
           <mass><%= mass %></mass>
           <inertia>
@@ -125,6 +152,55 @@
           </material>
         </visual>
       </link>
+
+      <link name="lower_gap">
+          <pose>0 0 <%= -height_hole/2.0 %> </pose>
+        <inertial>
+          <mass><%= mass_low %></mass>
+          <inertia>
+            <ixx><%= ixx_low %></ixx>
+            <iyy><%= iyy_low %></iyy>
+            <izz><%= izz_low %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <%= geometry_s_l %>
+          <surface>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <max_vel>0.1</max_vel>
+                <kp>1e8</kp>
+                <kd>1</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <%= geometry_s_l %>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <%= '<name>Gazebo/' + color[j%star_number].to_s + '</name>'%>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <joint name="hanoi_joint" type="revolute">
+          <pose> 0 0 0 </pose>
+          <child>lower_gap</child>
+          <parent>upper_disk</parent>
+          <axis>
+            <xyz>0 0 1</xyz>
+            <limit>
+              <upper>0</upper>
+              <lower>0</lower>
+            </limit>
+          </axis>
+      </joint>
     </model>
 <%
     end
