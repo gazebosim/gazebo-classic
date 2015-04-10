@@ -15,7 +15,6 @@
  *
 */
 
-
 #ifndef _GAZEBO_REST_API_HH_
 #define _GAZEBO_REST_API_HH_
 
@@ -27,6 +26,8 @@
 
 namespace gazebo
 {
+  /// \class RestApi RestApi.hh RestApi.hh
+  /// \brief REST interface
   class RestApi
   {
     /// \brief Constructor
@@ -35,7 +36,7 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~RestApi();
 
-    /// \brief Connects to the Rest service.
+    /// \brief Connects to the REST service.
     /// \param[in] _url The web service url
     /// \param[in] _route The route on the server
     /// \param[in] _user The user name
@@ -58,6 +59,8 @@ namespace gazebo
     /// \brief A Request/Respone (can be used for GET and POST)
     /// \param[in] _requestUrl The request url.
     /// \param[in] _postStr The data to post
+    /// \throws RestException When this->url or this->user are empty, and
+    /// when the request failed.
     /// \return The web server response
     private: std::string Request(const std::string &_requestUrl,
                                  const std::string &_postStr);
@@ -65,13 +68,13 @@ namespace gazebo
     /// \brief Sends unposted posts
     private: void SendUnpostedPosts();
 
-    /// \brief Login information: Rest service host url
+    /// \brief Login information: REST service host url
     private: std::string url;
 
-    /// \brief Login information: Rest service username
+    /// \brief Login information: REST service username
     private: std::string user;
 
-    /// \brief Login information: Rest service password
+    /// \brief Login information: REST service password
     private: std::string pass;
 
     /// \brief Login information: login route

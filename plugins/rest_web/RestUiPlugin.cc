@@ -25,25 +25,19 @@ using namespace gazebo;
 
 /////////////////////////////////////////////////
 RestUiPlugin::RestUiPlugin()
-  :widget(NULL)
+: widget(NULL)
 {
-  menuTitle = "Web service";
-  loginTitle = "Web service login";
-  urlLabel = "url";
-  defaultUrl = "https://";
-}
-
-/////////////////////////////////////////////////
-RestUiPlugin::~RestUiPlugin()
-{
-  // nothing to do
+  this->menuTitle = "Web service";
+  this->loginTitle = "Web service login";
+  this->urlLabel = "url";
+  this->defaultUrl = "https://";
 }
 
 /////////////////////////////////////////////////
 void RestUiPlugin::Load(int _argc, char ** _argv)
 {
   gzmsg << "RestUiPlugin: cmd line arguments (menu=, title=, label=, url=)\n";
-  for (int i = 0; i < _argc; i++)
+  for (int i = 0; i < _argc; ++i)
   {
     std::string arg = _argv[i];
     if (arg.find("menu=") == 0)
@@ -85,9 +79,9 @@ void RestUiPlugin::Init()
 /////////////////////////////////////////////////
 void RestUiPlugin::Update()
 {
-  if (widget)
+  if (this->widget)
   {
-    widget->Update();
+    this->widget->Update();
   }
 }
 
@@ -103,12 +97,14 @@ void RestUiPlugin::OnMainWindowReady()
   gui::MainWindow *mainWindow = gui::get_main_window();
   // create a global widget instance, to act as a global QT object
   // the RestUiPlugin class is not a QT object
-  widget = new RestUiWidget(mainWindow,
+  this->widget = new RestUiWidget(mainWindow,
                             this->menuTitle.c_str(),
                             this->loginTitle.c_str(),
                             this->urlLabel.c_str(),
                             this->defaultUrl.c_str());
-  QObject::connect(loginAct, SIGNAL(triggered()), widget, SLOT(Login()));
+
+  QObject::connect(loginAct, SIGNAL(triggered()),
+                   this->widget, SLOT(this->Login()));
   menu->addAction(loginAct);
   mainWindow->AddMenu(menu);
 }

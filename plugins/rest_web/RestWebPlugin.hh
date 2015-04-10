@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _REST_SERVICE_PLUGIN_HH_
-#define _REST_SERVICE_PLUGIN_HH_
+#ifndef _GAZEBO_REST_WEB_PLUGIN_HH_
+#define _GAZEBO_REST_WEB_PLUGIN_HH_
 
 #include <list>
 #include <vector>
@@ -27,9 +27,10 @@
 
 #include "RestApi.hh"
 
-
 namespace gazebo
 {
+  /// \class RestWebPlugin RestWebPlugin.hh RestWebPlugin.hh
+  /// \brief REST web plugin
   class GAZEBO_VISIBLE RestWebPlugin : public SystemPlugin
   {
     /// \brief Constructor
@@ -89,7 +90,7 @@ namespace gazebo
     /// \brief A flag to interrupt message processing
     private: bool stopMsgProcessing;
 
-    /// \brief A list to accumulate pending request
+    /// \brief A list to accumulate pending requests
     private: std::list<boost::shared_ptr<const gazebo::msgs::RestLogin>>
         msgLoginQ;
 

@@ -29,13 +29,15 @@
 
 namespace gazebo
 {
+  /// \class RestUiPlugin RestUiPlugin.hh RestUiPlugin.hh
+  /// \brief REST user interface plugin
   class GAZEBO_VISIBLE RestUiPlugin : public SystemPlugin
   {
     /// \brief Constructor
     public: RestUiPlugin();
 
     /// \brief Destructor
-    public: virtual ~RestUiPlugin();
+    public: virtual ~RestUiPlugin() = default;
 
     /// \brief Called when plugin is loaded.
     /// \param[in] _argc Arguments count

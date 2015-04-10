@@ -44,28 +44,23 @@ void SimStateEventSource::Load(const sdf::ElementPtr &_sdf)
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&SimStateEventSource::OnUpdate, this));
+      boost::bind(&SimStateEventSource::OnUpdate, this, _1));
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
-void SimStateEventSource::OnUpdate()
+void SimStateEventSource::OnUpdate(const common::UpdateInfo &_info)
 {
-  // check for change in simtime
-  common::Time t = this->world->GetSimTime();
-
-  if (t < this->simTime)
+  if (_info.simTime < this->simTime)
   {
     std::string json;
     json = "{\"state\": \"reset\" }";
     this->Emit(json);
   }
-  this->simTime = t;
+  this->simTime = _info.simTime;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimStateEventSource::OnPause(bool _pause)
+void SimStateEventSource::OnPause(const bool _pause)
 {
   std::string json;
   if (_pause)

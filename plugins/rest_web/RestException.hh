@@ -15,16 +15,14 @@
  *
 */
 
-
 #ifndef _REST_EXCEPTION_HH_
 #define _REST_EXCEPTION_HH_
 
 #include <stdexcept>
 
-
 namespace gazebo
 {
-  // Basic exception class that inherints from the standard runtime error.
+  // Basic exception class that inherits from the standard runtime error.
   class RestException : public std::runtime_error
   {
     public: RestException(const char *_m):std::runtime_error(_m) {}

@@ -14,108 +14,112 @@
  * limitations under the License.
  *
 */
-
-
-#include <curl/curl.h>
+#include <iostream>
 #include <cstring>
 #include <stdlib.h>
+#include <curl/curl.h>
 
-#include <iostream>
 #include "RestApi.hh"
 
 using namespace gazebo;
 
-
-// This code is adapted from the curl C examples (http://curl.haxx.se/libcurl/c/)
+// This code is adapted from the curl C examples
+// (http://curl.haxx.se/libcurl/c/)
 // mostly modified to adhere to the Gazebo code check tool.
 // It implements the following features:
 //  - HTML POST, sending and receiving data
 //  - Authentication (Basic Auth)
 //  - https (SSL, but accepting non signed certificates)
 
-
 // You can enable this flag to get more curl details
 // about each request (will provide  SSL negociation and TCP dumps of the
 // requests and responses)
 bool trace_requests = false;
 
-struct data {
-  char trace_ascii;  // 1 or 0
+struct data
+{
+  // 1 or 0
+  char trace_ascii;
 };
 
 /////////////////////////////////////////////////
-static void DumpRequest(const char *text,
-          FILE *stream,
-          unsigned char *ptr,
-          size_t size,
-          char nohex)
+static void DumpRequest(const char *_text,
+          FILE *_stream,
+          unsigned char *_ptr,
+          size_t _size,
+          char _nohex)
 {
   size_t i;
   size_t c;
   unsigned int width = 0x10;
 
-  if (nohex)
+  if (_nohex)
+  {
     // without the hex output, we can fit more on screen
     width = 0x40;
-  int64_t s = size;
-  fprintf(stream, "%s, %10.10ld bytes (0x%8.8lx)\n",
-          text, s, s);
+  }
+  int64_t s = _size;
+  fprintf(_stream, "%s, %10.10ld bytes (0x%8.8lx)\n", _text, s, s);
 
-  for (i = 0; i < size; i += width)
+  for (i = 0; i < _size; i += width)
   {
-    fprintf(stream, "%4.4lx: ", i);
-    if (!nohex)
+    fprintf(_stream, "%4.4lx: ", i);
+    if (!_nohex)
     {
       // hex not disabled, show it
       for (c = 0; c < width; ++c)
       {
-        if (i+c < size)
-          fprintf(stream, "%02x ", ptr[i+c]);
+        if (i+c < _size)
+          fprintf(_stream, "%02x ", _ptr[i+c]);
         else
-          fputs("   ", stream);
+          fputs("   ", _stream);
       }
     }
 
-    for (c = 0; (c < width) && (i+c < size); ++c)
+    for (c = 0; (c < width) && (i+c < _size); ++c)
     {
       // check for 0D0A; if found, skip past and start a new line of output
-      if (nohex && (i+c+1 < size) && ptr[i+c] == 0x0D && ptr[i+c+1] == 0x0A)
+      if (_nohex && (i+c+1 < _size) && _ptr[i+c] == 0x0D && _ptr[i+c+1] == 0x0A)
       {
         i+=(c+2-width);
         break;
       }
-      fprintf(stream, "%c",
-              (ptr[i+c] >= 0x20) && (ptr[i+c] < 0x80)?ptr[i+c]:'.');
+      fprintf(_stream, "%c",
+              (_ptr[i+c] >= 0x20) && (_ptr[i+c] < 0x80)?_ptr[i+c]:'.');
       // check again for 0D0A, to avoid an extra \n if it's at width
-      if (nohex && (i+c+2 < size) && ptr[i+c+1] == 0x0D && ptr[i+c+2] == 0x0A)
+      if (_nohex && (i+c+2 < _size) && _ptr[i+c+1] == 0x0D &&
+          _ptr[i+c+2] == 0x0A)
       {
         i+=(c+3-width);
         break;
       }
     }
-    fputc('\n', stream);
+    fputc('\n', _stream);
   }
-  fflush(stream);
+  fflush(_stream);
 }
 
-// Callback given to curl that outputs data about the request
 /////////////////////////////////////////////////
-static int TraceRequest(CURL *handle,
-                        curl_infotype type,
-                        char *data,
-                        size_t size,
-                        void *userp)
+// Callback given to curl that outputs data about the request
+static int TraceRequest(CURL *_handle,
+                        curl_infotype _type,
+                        char *_data,
+                        size_t _size,
+                        void *_userp)
 {
-  struct data *config = (struct data *)userp;
+  struct data *config = (struct data *)_userp;
   const char *text;
-  (void)handle;  // prevent compiler warning
 
-  switch (type)
+  // prevent compiler warning
+  (void)_handle;
+
+  switch (_type)
   {
     case CURLINFO_TEXT:
       if (trace_requests)
-        fprintf(stderr, "== Info: %s", data);
-    default:  // in case a new one is introduced to shock us
+        fprintf(stderr, "== Info: %s", _data);
+    // in case a new one is introduced to shock us
+    default:
       return 0;
     case CURLINFO_HEADER_OUT:
       text = "=> Send header";
@@ -139,7 +143,8 @@ static int TraceRequest(CURL *handle,
 
   if (trace_requests)
   {
-    DumpRequest(text, stderr, (unsigned char *)data, size, config->trace_ascii);
+    DumpRequest(text, stderr,
+        (unsigned char *)(_data), _size, config->trace_ascii);
   }
   return 0;
 }
@@ -151,15 +156,15 @@ struct MemoryStruct {
   size_t size;
 };
 
-// callback for libcurl when data is read from http response
 /////////////////////////////////////////////////
-static size_t WriteMemoryCallback(void *contents,
-                                  size_t size,
-                                  size_t nmemb,
-                                  void *userp)
+// callback for libcurl when data is read from http response
+static size_t WriteMemoryCallback(void *_contents,
+                                  size_t _size,
+                                  size_t _nmemb,
+                                  void *_userp)
 {
-  size_t realsize = size * nmemb;
-  struct MemoryStruct *mem = (struct MemoryStruct *)userp;
+  size_t realsize = _size * _nmemb;
+  struct MemoryStruct *mem = (struct MemoryStruct *)_userp;
   size_t newsize = mem->size + realsize + 1;
   mem->memory = static_cast<char *> (realloc(mem->memory, newsize));
   if (mem->memory == NULL)
@@ -168,7 +173,7 @@ static size_t WriteMemoryCallback(void *contents,
     gzerr << "not enough memory (realloc returned NULL)" << std::endl;
     return 0;
   }
-  memcpy(&(mem->memory[mem->size]), contents, realsize);
+  memcpy(&(mem->memory[mem->size]), _contents, realsize);
   mem->size += realsize;
   mem->memory[mem->size] = 0;
   return realsize;
@@ -211,8 +216,18 @@ std::string RestApi::Login(const std::string &_urlStr,
   // at this point we want to test the (user supplied) login data
   // so we're hitting the server on the login route ('/login')
   this->loginRoute = _route;
+  std::string resp;
+
   gzmsg << "login route: " << this->loginRoute << std::endl;
-  std::string resp = this->Request(loginRoute, "");
+  try
+  {
+    resp = this->Request(loginRoute, "");
+  }
+  catch(RestException &e)
+  {
+    gzerr << "Failed to login in with error[" << e.what() << "]\n";
+    return resp;
+  }
   gzmsg << "login response: " << resp << std::endl;
 
   this->isLoggedIn = true;

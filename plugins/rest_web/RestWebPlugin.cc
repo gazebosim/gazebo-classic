@@ -23,7 +23,7 @@ using namespace std;
 
 //////////////////////////////////////////////////
 RestWebPlugin::RestWebPlugin()
-  : node(new gazebo::transport::Node()),
+: node(new gazebo::transport::Node()),
   stopMsgProcessing(false),
   requestQThread(NULL)
 {
@@ -39,11 +39,8 @@ RestWebPlugin::RestWebPlugin()
 //////////////////////////////////////////////////
 RestWebPlugin::~RestWebPlugin()
 {
-  node.reset();
-  subEvent.reset();
-  subRequest.reset();
   // tell the requestQ to stop precessing
-  stopMsgProcessing = true;
+  this->stopMsgProcessing = true;
   if (this->requestQThread->joinable())
   {
     this->requestQThread->join();
@@ -55,15 +52,15 @@ RestWebPlugin::~RestWebPlugin()
 void RestWebPlugin::Init()
 {
   // setup our node for communication
-  node->Init();
-  subRequest = node->Subscribe("/gazebo/rest/rest_login",
+  this->node->Init();
+  this->subRequest = node->Subscribe("/gazebo/rest/rest_login",
                                &RestWebPlugin::OnRestLoginRequest, this);
-  subEvent = node->Subscribe("/gazebo/rest/rest_post",
+  this->subEvent = node->Subscribe("/gazebo/rest/rest_post",
                              &RestWebPlugin::OnEventRestPost, this);
-  subSimEvent = node->Subscribe("/gazebo/sim_events",
+  this->subSimEvent = node->Subscribe("/gazebo/sim_events",
                                 &RestWebPlugin::OnSimEvent, this);
-  requestQThread = new boost::thread(boost::bind(&RestWebPlugin::RunRequestQ,
-                                                  this));
+  this->requestQThread = new boost::thread(
+      boost::bind(&RestWebPlugin::RunRequestQ, this));
 }
 
 //////////////////////////////////////////////////
@@ -72,7 +69,6 @@ void RestWebPlugin::Load(int /*_argc*/, char ** /*_argv*/)
   // nothing to do for now
 }
 
-//  adapted from TimePanel
 //////////////////////////////////////////////////
 std::string FormatTime(int _sec, int _nsec)
 {
@@ -165,7 +161,7 @@ void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
   event += "}";    // root element
 
   // post it with curl
-  restApi.PostJsonData(route.c_str(), event.c_str());
+  this->restApi.PostJsonData(route.c_str(), event.c_str());
 }
 
 //////////////////////////////////////////////////
@@ -230,7 +226,7 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
       event += "}";
     }
     event += "}";
-    restApi.PostJsonData(_msg->route().c_str(), event.c_str());
+    this->restApi.PostJsonData(_msg->route().c_str(), event.c_str());
   }
   catch(RestException &x)
   {
@@ -250,7 +246,7 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 void RestWebPlugin::OnRestLoginRequest(ConstRestLoginPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->requestQMutex);
-  msgLoginQ.push_back(_msg);
+  this->msgLoginQ.push_back(_msg);
 }
 
 //////////////////////////////////////////////////
@@ -259,7 +255,7 @@ void RestWebPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
   // this is executed asynchronously
   try
   {
-    restApi.Login(_msg->url().c_str(),
+    this->restApi.Login(_msg->url().c_str(),
         "/login",
         _msg->username().c_str(),
         _msg->password().c_str());
@@ -285,7 +281,7 @@ void RestWebPlugin::RunRequestQ()
   std::string path("/gazebo/rest/rest_error");
   this->pub = node->Advertise<gazebo::msgs::RestError>(path);
   // process any login or post data that ha been received
-  while (!stopMsgProcessing)
+  while (!this->stopMsgProcessing)
   {
     gazebo::common::Time::MSleep(50);
     try
@@ -294,10 +290,10 @@ void RestWebPlugin::RunRequestQ()
       // Grab the mutex and remove first message the queue
       {
         boost::mutex::scoped_lock lock(this->requestQMutex);
-        if (!msgLoginQ.empty())
+        if (!this->msgLoginQ.empty())
         {
-          login = msgLoginQ.front();
-          msgLoginQ.pop_front();
+          login = this->msgLoginQ.front();
+          this->msgLoginQ.pop_front();
         }
       }
       if (login)
@@ -315,4 +311,3 @@ void RestWebPlugin::RunRequestQ()
 
 // plugin registration
 GZ_REGISTER_SYSTEM_PLUGIN(RestWebPlugin)
-

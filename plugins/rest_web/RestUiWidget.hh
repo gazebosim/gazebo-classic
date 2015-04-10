@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _RestUi_WIDGET_HH_
-#define _RestUi_WIDGET_HH_
+#ifndef _GAZEBO_RESTUI_WIDGET_HH_
+#define _GAZEBO_RESTUI_WIDGET_HH_
 
 #include <string>
 #include <list>
@@ -25,10 +25,11 @@
 #include <gazebo/util/system.hh>
 #include "RestUiLoginDialog.hh"
 
-
 namespace gazebo
 {
-  class GAZEBO_VISIBLE  RestUiWidget : public QWidget
+  /// \class RestUiWidget RestUiWidget.hh RestUiWidget.hh
+  /// \brief REST user interface widget
+  class GAZEBO_VISIBLE RestUiWidget : public QWidget
   {
     Q_OBJECT
 
@@ -37,7 +38,7 @@ namespace gazebo
     /// \param[in] _menuTitle Menu title.
     /// \param[in] _loginTitle Login title.
     /// \param[in] _urlLabel Url label.
-    /// \param[in] _defaultIrl Default url.
+    /// \param[in] _defaultUrl Default url.
     public: RestUiWidget(QWidget *_parent,
                          const std::string &_menuTitle,
                          const std::string &_loginTitle,
@@ -45,7 +46,7 @@ namespace gazebo
                          const std::string &_defautlUrl);
 
     /// \brief Destructor
-    public: virtual ~RestUiWidget();
+    public: virtual ~RestUiWidget() = default;
 
     /// \brief QT callback (from the login menu)
     public slots: void Login();

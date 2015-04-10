@@ -15,9 +15,8 @@
  *
 */
 
-
-#ifndef  _REST_LOGIN_DIALOG_HH_
-#define  _REST_LOGIN_DIALOG_HH_
+#ifndef _REST_LOGIN_DIALOG_HH_
+#define _REST_LOGIN_DIALOG_HH_
 
 #include <string>
 
@@ -30,6 +29,8 @@ namespace gazebo
   {
     class RestUiWidget;
 
+    /// \class RestUiLoginDialog RestUiLoginDialog.hh RestUiLoginDialog.hh
+    /// \brief Provides a means to login to a webservice
     class GAZEBO_VISIBLE RestUiLoginDialog : public QDialog
     {
       Q_OBJECT

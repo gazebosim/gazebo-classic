@@ -40,7 +40,8 @@ namespace gazebo
     public: virtual void Load(const sdf::ElementPtr &_sdf);
 
     /// \brief Update for every time step
-    public: virtual void OnUpdate();
+    /// \param[in] _info Update information provided by the server.
+    public: virtual void OnUpdate(const common::UpdateInfo &_info);
 
     /// \brief Callback for the pause event
     /// \param[in] _p true if the sim has been paused
