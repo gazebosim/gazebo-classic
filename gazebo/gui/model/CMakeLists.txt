@@ -39,6 +39,7 @@ set (headers
 
 set (install_headers
   ModelEditor.hh
+  ModelEditorEvents.hh
 )
 
 # MainWindow is using screen rendering

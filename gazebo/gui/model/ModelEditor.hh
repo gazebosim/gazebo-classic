@@ -19,6 +19,8 @@
 
 #include <string>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Editor.hh"
 #include "gazebo/util/system.hh"
@@ -47,6 +49,10 @@ namespace gazebo
       /// \param[in] _category Category to add the item too.
       public: void AddItemToPalette(QWidget *_item,
           const std::string &_category = "");
+
+      /// \brief Spawn an entity in the editor
+      /// \param[in] _sdf SDF describing the entity.
+      public: void SpawnEntity(sdf::ElementPtr _sdf);
 
       /// \brief Qt callback when the model editor's save action is
       /// triggered.
