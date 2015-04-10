@@ -300,7 +300,7 @@ ModelEditorPalette::~ModelEditorPalette()
 {
   delete this->updateMutex;
   this->updateMutex = NULL;
-  
+
   delete this->modelCreator;
   this->modelCreator = NULL;
 }

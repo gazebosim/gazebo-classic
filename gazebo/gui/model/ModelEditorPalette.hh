@@ -225,7 +225,7 @@ namespace gazebo
 
       /// \brief Keeps tracks of selected items.
       private: QList<QTreeWidgetItem *> selected;
-      
+
       /// \brief Layout for other items in the palette.
       private: QVBoxLayout *otherItemsLayout;
 
