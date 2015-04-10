@@ -260,7 +260,7 @@ namespace gazebo
       /// \return joint data.
       private: JointData *CreateJointLine(const std::string &_name,
           rendering::VisualPtr _parent);
-          
+
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
 
