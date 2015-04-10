@@ -47,10 +47,6 @@ GraphScene::~GraphScene()
 /////////////////////////////////////////////////
 QGVNode *GraphScene::AddNode(const std::string &_name)
 {
-  // Note don't show the ground plane
-  if (_name.find("plane") != std::string::npos)
-    return NULL;
-
   QGVNode *node = this->addNode(tr(_name.c_str()));
 
   return node;
