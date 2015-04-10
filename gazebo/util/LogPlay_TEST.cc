@@ -84,14 +84,14 @@ TEST_F(LogPlay_TEST, Accessors)
   // Test the accessors.
   EXPECT_EQ(player->GetLogVersion(), "1.0");
   EXPECT_EQ(player->GetGazeboVersion(), "6.0.0");
-  EXPECT_EQ(player->GetRandSeed(), 22889);
+  EXPECT_EQ(player->GetRandSeed(), 22889u);
   EXPECT_TRUE(player->GetLogStartTime() == expectedStartTime);
   EXPECT_TRUE(player->GetLogEndTime() == expectedEndTime);
   EXPECT_EQ(player->GetFilename(), "state.log");
-  EXPECT_EQ(player->GetFileSize(), 357580);
+  EXPECT_EQ(player->GetFileSize(), 357580u);
   EXPECT_EQ(player->GetEncoding(), "zlib");
   EXPECT_EQ(player->GetHeader(), expectedHeader);
-  EXPECT_EQ(player->GetChunkCount(), 5);
+  EXPECT_EQ(player->GetChunkCount(), 5u);
 
   std::string chunk;
   player->GetChunk(0, chunk);
