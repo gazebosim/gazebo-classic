@@ -99,6 +99,105 @@ std::string ConfigWidget::GetHumanReadableKey(std::string _key)
 }
 
 /////////////////////////////////////////////////
+std::string ConfigWidget::GetUnitFromKey(const std::string &_key,
+    const std::string &_jointType)
+{
+  if (_key == "pos" || _key == "length" || _key == "min_depth")
+  {
+    return "m";
+  }
+
+  if (_key == "rot")
+    return "rad";
+
+  if (_key == "kp" || _key == "kd")
+    return "N/m";
+
+  if (_key == "max_vel")
+    return "m/s";
+
+  if (_key == "mass")
+    return "Kg";
+
+  if (_key == "ixx" || _key == "ixy" || _key == "ixz" ||
+      _key == "iyy" || _key == "iyz" || _key == "izz")
+  {
+    return "Kg&middot;m<sup>2</sup>";
+  }
+
+  if (_key == "limit_lower" || _key == "limit_upper")
+  {
+    if (_jointType == "PRISMATIC")
+      return "m";
+    else if (_jointType != "")
+      return "rad";
+  }
+
+  if (_key == "limit_effort")
+  {
+    if (_jointType == "PRISMATIC")
+      return "N";
+    else if (_jointType != "")
+      return "Nm";
+  }
+
+  if (_key == "limit_velocity" || _key == "velocity")
+  {
+    if (_jointType == "PRISMATIC")
+      return "m/s";
+    else if (_jointType != "")
+      return "rad/s";
+  }
+
+  if (_key == "damping")
+  {
+    if (_jointType == "PRISMATIC")
+      return "Ns/m";
+    else if (_jointType != "")
+      return "Ns";
+  }
+
+  if (_key == "friction")
+  {
+    if (_jointType == "PRISMATIC")
+      return "N";
+    else if (_jointType != "")
+      return "Nm";
+  }
+
+  return "";
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::GetRangeFromKey(const std::string &_key, double *_min,
+    double *_max)
+{
+  // Maximum range by default
+  *_min = -1e12;
+  *_max = 1e12;
+
+  if (_key == "mass" || _key == "ixx" || _key == "ixy" || _key == "ixz" ||
+      _key == "iyy" || _key == "iyz" || _key == "izz" || _key == "length" ||
+      _key == "min_depth")
+  {
+    *_min = 0;
+  }
+  else if (_key == "bounce" || _key == "transparency" ||
+      _key == "laser_retro" || _key == "ambient" || _key == "diffuse" ||
+      _key == "specular" || _key == "emissive" ||
+      _key == "restitution_coefficient")
+  {
+    *_min = 0;
+    *_max = 1;
+  }
+  else if (_key == "fdir1" || _key == "xyz")
+  {
+    *_min = -1;
+    *_max = +1;
+  }
+}
+
+/////////////////////////////////////////////////
 bool ConfigWidget::GetWidgetVisible(const std::string &_name) const
 {
   std::map <std::string, ConfigChildWidget *>::const_iterator iter =
@@ -788,12 +887,12 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
             QCheckBox *buttonIcon = new QCheckBox();
             buttonIcon->setChecked(true);
             buttonIcon->setStyleSheet(
-                 "QCheckBox::indicator::unchecked {\
-                   image: url(:/images/right_arrow.png);\
-                 }\
-                 QCheckBox::indicator::checked {\
-                   image: url(:/images/down_arrow.png);\
-                 }");
+                "QCheckBox::indicator::unchecked {\
+                  image: url(:/images/right_arrow.png);\
+                }\
+                QCheckBox::indicator::checked {\
+                  image: url(:/images/down_arrow.png);\
+                }");
 
             // Button layout
             QHBoxLayout *buttonLayout = new QHBoxLayout();
@@ -801,7 +900,6 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
                 QSizePolicy::Fixed, QSizePolicy::Fixed));
             buttonLayout->addWidget(buttonLabel);
             buttonLayout->addWidget(buttonIcon);
-
             buttonLayout->setAlignment(buttonIcon, Qt::AlignRight);
 
             // Button frame
@@ -811,27 +909,25 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
 
             // Set color for top level button
             if (_level == 0)
+            {
               buttonFrame->setStyleSheet(
                   "QWidget\
-                   {\
-                     background-color: #999999\
-                   }");
-
+                  {\
+                    background-color: #999999\
+                  }");
+            }
 
             // Child widgets are contained in a group box which can be collapsed
             GroupWidget *groupWidget = new GroupWidget;
             groupWidget->setStyleSheet(
                 "QGroupBox {\
-                    border : 0;\
-                    margin : 0;\
-                    padding : 0;\
+                  border : 0;\
+                  margin : 0;\
+                  padding : 0;\
                 }");
 
             connect(buttonIcon, SIGNAL(toggled(bool)), groupWidget,
                 SLOT(Toggle(bool)));
-
-            // Start collapsed
-           // buttonIcon->toggle();
 
             // Set the child widget
             groupWidget->childWidget = newFieldWidget;
@@ -841,35 +937,41 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
 
             // Set color for children
             if (_level == 0)
+            {
               newFieldWidget->setStyleSheet(
                   "QWidget\
-                   {\
-                     background-color: #777777\
-                   }\
-                   QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-                   {\
-                     background-color: #cccccc\
-                   }");
+                  {\
+                    background-color: #777777\
+                  }\
+                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+                  {\
+                    background-color: #cccccc\
+                  }");
+            }
             else if (_level == 1)
+            {
               newFieldWidget->setStyleSheet(
                   "QWidget\
-                   {\
-                     background-color: #555555\
-                   }\
-                   QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-                   {\
-                     background-color: #aaaaaa\
-                   }");
+                  {\
+                    background-color: #555555\
+                  }\
+                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+                  {\
+                    background-color: #aaaaaa\
+                  }");
+            }
             else if (_level == 2)
+            {
               newFieldWidget->setStyleSheet(
                   "QWidget\
-                   {\
-                     background-color: #333333\
-                   }\
-                   QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-                   {\
-                     background-color: #888888\
-                   }");
+                  {\
+                    background-color: #333333\
+                  }\
+                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+                  {\
+                    background-color: #888888\
+                  }");
+            }
 
             // Group Layout
             QGridLayout *configGroupLayout = new QGridLayout;
@@ -912,7 +1014,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
               if (valueDescriptor)
                 enumValues.push_back(valueDescriptor->name());
             }
-            configChildWidget = this->CreateEnumWidget(name, enumValues, _level);
+            configChildWidget =
+                this->CreateEnumWidget(name, enumValues, _level);
 
             if (!configChildWidget)
             {
@@ -941,13 +1044,13 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
       {
         newFieldWidget->setStyleSheet(
             "QWidget\
-             {\
-               background-color: #999999\
-             }\
-             QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-             {\
-               background-color: #eeeeee\
-             }");
+            {\
+              background-color: #999999\
+            }\
+            QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+            {\
+              background-color: #eeeeee\
+            }");
       }
 
       if (newWidget && newFieldWidget)
@@ -1027,8 +1130,10 @@ ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key,
   // Layout
   QHBoxLayout *widgetLayout = new QHBoxLayout;
   if (_level != 0)
+  {
     widgetLayout->addItem(new QSpacerItem(20*_level, 1,
         QSizePolicy::Fixed, QSizePolicy::Fixed));
+  }
   widgetLayout->addWidget(keyLabel);
   widgetLayout->addWidget(valueSpinBox);
 
@@ -1058,8 +1163,10 @@ ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key,
   // Layout
   QHBoxLayout *widgetLayout = new QHBoxLayout;
   if (_level != 0)
+  {
     widgetLayout->addItem(new QSpacerItem(20*_level, 1,
         QSizePolicy::Fixed, QSizePolicy::Fixed));
+  }
   widgetLayout->addWidget(keyLabel);
   widgetLayout->addWidget(valueSpinBox);
 
@@ -1082,8 +1189,12 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
   keyLabel->setToolTip(tr(_key.c_str()));
 
   // SpinBox
+  double *min = new double(0);
+  double *max = new double(0);
+  this->GetRangeFromKey(_key, min, max);
+
   QDoubleSpinBox *valueSpinBox = new QDoubleSpinBox;
-  valueSpinBox->setRange(-1e12, 1e12);
+  valueSpinBox->setRange(*min, *max);
   valueSpinBox->setSingleStep(0.01);
   valueSpinBox->setDecimals(6);
   valueSpinBox->setAlignment(Qt::AlignRight);
@@ -1099,8 +1210,10 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
   // Layout
   QHBoxLayout *widgetLayout = new QHBoxLayout;
   if (_level != 0)
+  {
     widgetLayout->addItem(new QSpacerItem(20*_level, 1,
         QSizePolicy::Fixed, QSizePolicy::Fixed));
+  }
   widgetLayout->addWidget(keyLabel);
   widgetLayout->addWidget(valueSpinBox);
   if (unitLabel->text() != "")
@@ -1132,8 +1245,10 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
   // Layout
   QHBoxLayout *widgetLayout = new QHBoxLayout;
   if (_level != 0)
+  {
     widgetLayout->addItem(new QSpacerItem(20*_level, 1,
         QSizePolicy::Fixed, QSizePolicy::Fixed));
+  }
   widgetLayout->addWidget(keyLabel);
   widgetLayout->addWidget(valueLineEdit);
 
@@ -1171,8 +1286,10 @@ ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key,
   // Layout
   QHBoxLayout *widgetLayout = new QHBoxLayout;
   if (_level != 0)
+  {
     widgetLayout->addItem(new QSpacerItem(20*_level, 1,
         QSizePolicy::Fixed, QSizePolicy::Fixed));
+  }
   widgetLayout->addWidget(keyLabel);
   widgetLayout->addLayout(buttonLayout);
 
@@ -1189,8 +1306,7 @@ ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key,
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
-    const std::string &/*_key*/,
-    int _level)
+    const std::string &_key, int _level)
 {
   // Labels
   QLabel *vecXLabel = new QLabel(tr("X"));
@@ -1198,28 +1314,32 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   QLabel *vecZLabel = new QLabel(tr("Z"));
 
   // SpinBoxes
+  double *min = new double(0);
+  double *max = new double(0);
+  this->GetRangeFromKey(_key, min, max);
+
   QDoubleSpinBox *vecXSpinBox = new QDoubleSpinBox;
-  vecXSpinBox->setRange(-1e12, 1e12);
+  vecXSpinBox->setRange(*min, *max);
   vecXSpinBox->setSingleStep(0.01);
   vecXSpinBox->setDecimals(6);
   vecXSpinBox->setAlignment(Qt::AlignRight);
   vecXSpinBox->setMaximumWidth(100);
 
   QDoubleSpinBox *vecYSpinBox = new QDoubleSpinBox;
-  vecYSpinBox->setRange(-1e12, 1e12);
+  vecYSpinBox->setRange(*min, *max);
   vecYSpinBox->setSingleStep(0.01);
   vecYSpinBox->setDecimals(6);
   vecYSpinBox->setAlignment(Qt::AlignRight);
   vecYSpinBox->setMaximumWidth(100);
 
   QDoubleSpinBox *vecZSpinBox = new QDoubleSpinBox;
-  vecZSpinBox->setRange(-1e12, 1e12);
+  vecZSpinBox->setRange(*min, *max);
   vecZSpinBox->setSingleStep(0.01);
   vecZSpinBox->setDecimals(6);
   vecZSpinBox->setAlignment(Qt::AlignRight);
   vecZSpinBox->setMaximumWidth(100);
 
-  // Why?
+  // This is inside a group
   int level = _level + 1;
 
   // Layout
@@ -1245,11 +1365,12 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   widget->widgets.push_back(vecXSpinBox);
   widget->widgets.push_back(vecYSpinBox);
   widget->widgets.push_back(vecZSpinBox);
+
   return widget;
 }
 
 /////////////////////////////////////////////////
-ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &/*_key*/,
+ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
     int _level)
 {
   // Labels
@@ -1259,6 +1380,10 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &/*_key*/,
   QLabel *colorALabel = new QLabel(tr("A"));
 
   // SpinBoxes
+  double *min = new double(0);
+  double *max = new double(0);
+  this->GetRangeFromKey(_key, min, max);
+
   QDoubleSpinBox *colorRSpinBox = new QDoubleSpinBox;
   colorRSpinBox->setRange(0, 1.0);
   colorRSpinBox->setSingleStep(0.1);
@@ -1287,7 +1412,7 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &/*_key*/,
   colorASpinBox->setAlignment(Qt::AlignRight);
   colorASpinBox->setMaximumWidth(10);
 
-  // Why?
+  // This is inside a group
   int level = _level + 1;
 
   // Layout
@@ -1334,7 +1459,7 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
   elements.push_back("Pitch");
   elements.push_back("Yaw");
 
-  // Why?
+  // This is inside a group
   int level = _level+1;
 
   // Layout
@@ -1344,6 +1469,10 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
       QSizePolicy::Fixed), 0, 0);
 
   // ChildWidget
+  double *min = new double(0);
+  double *max = new double(0);
+  this->GetRangeFromKey("", min, max);
+
   ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
@@ -1353,7 +1482,7 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
     QDoubleSpinBox *spin = new QDoubleSpinBox();
     widget->widgets.push_back(spin);
 
-    spin->setRange(-1e12, 1e12);
+    spin->setRange(*min, *max);
     spin->setSingleStep(0.01);
     spin->setDecimals(6);
     spin->setAlignment(Qt::AlignRight);
@@ -1401,8 +1530,12 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geometryComboBox->addItem(tr("polyline"));
 
   // Size XYZ
+  double *min = new double(0);
+  double *max = new double(0);
+  this->GetRangeFromKey("length", min, max);
+
   QDoubleSpinBox *geomSizeXSpinBox = new QDoubleSpinBox;
-  geomSizeXSpinBox->setRange(-1000, 1000);
+  geomSizeXSpinBox->setRange(*min, *max);
   geomSizeXSpinBox->setSingleStep(0.01);
   geomSizeXSpinBox->setDecimals(6);
   geomSizeXSpinBox->setValue(1.000);
@@ -1410,7 +1543,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomSizeXSpinBox->setMaximumWidth(100);
 
   QDoubleSpinBox *geomSizeYSpinBox = new QDoubleSpinBox;
-  geomSizeYSpinBox->setRange(-1000, 1000);
+  geomSizeYSpinBox->setRange(*min, *max);
   geomSizeYSpinBox->setSingleStep(0.01);
   geomSizeYSpinBox->setDecimals(6);
   geomSizeYSpinBox->setValue(1.000);
@@ -1418,7 +1551,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomSizeYSpinBox->setMaximumWidth(100);
 
   QDoubleSpinBox *geomSizeZSpinBox = new QDoubleSpinBox;
-  geomSizeZSpinBox->setRange(-1000, 1000);
+  geomSizeZSpinBox->setRange(*min, *max);
   geomSizeZSpinBox->setSingleStep(0.01);
   geomSizeZSpinBox->setDecimals(6);
   geomSizeZSpinBox->setValue(1.000);
@@ -1473,13 +1606,11 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   // Radius / Length
   QLabel *geomRadiusLabel = new QLabel(tr("Radius"));
   QLabel *geomLengthLabel = new QLabel(tr("Length"));
-  QLabel *geomRadiusUnitLabel =
-      new QLabel(QString::fromStdString(this->GetUnitFromKey("radius")));
-  QLabel *geomLengthUnitLabel =
-      new QLabel(QString::fromStdString(this->GetUnitFromKey("length")));
+  QLabel *geomRadiusUnitLabel = new QLabel(QString::fromStdString(unit));
+  QLabel *geomLengthUnitLabel = new QLabel(QString::fromStdString(unit));
 
   QDoubleSpinBox *geomRadiusSpinBox = new QDoubleSpinBox;
-  geomRadiusSpinBox->setRange(-1000, 1000);
+  geomRadiusSpinBox->setRange(*min, *max);
   geomRadiusSpinBox->setSingleStep(0.01);
   geomRadiusSpinBox->setDecimals(6);
   geomRadiusSpinBox->setValue(0.500);
@@ -1487,7 +1618,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomRadiusSpinBox->setMaximumWidth(100);
 
   QDoubleSpinBox *geomLengthSpinBox = new QDoubleSpinBox;
-  geomLengthSpinBox->setRange(-1000, 1000);
+  geomLengthSpinBox->setRange(*min, *max);
   geomLengthSpinBox->setSingleStep(0.01);
   geomLengthSpinBox->setDecimals(6);
   geomLengthSpinBox->setValue(1.000);
@@ -1517,7 +1648,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomDimensionWidget->setSizePolicy(
       QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-  // Why?
+  // This is inside a group
   int level = _level + 1;
 
   // Layout
@@ -1577,8 +1708,10 @@ ConfigChildWidget *ConfigWidget::CreateEnumWidget(
   // Layout
   QHBoxLayout *widgetLayout = new QHBoxLayout;
   if (_level != 0)
+  {
     widgetLayout->addItem(new QSpacerItem(20*_level, 1,
         QSizePolicy::Fixed, QSizePolicy::Fixed));
+  }
   widgetLayout->addWidget(enumLabel);
   widgetLayout->addWidget(enumComboBox);
 
@@ -2422,77 +2555,6 @@ void ConfigWidget::OnEnumValueChanged(const QString &_value)
       return;
     }
   }
-}
-
-/////////////////////////////////////////////////
-std::string ConfigWidget::GetUnitFromKey(const std::string &_key,
-    const std::string &_jointType)
-{
-  if (_key == "pos" || _key == "radius" || _key == "length" ||
-      _key == "min_depth")
-  {
-    return "m";
-  }
-
-  if (_key == "rot")
-    return "rad";
-
-  if (_key == "kp" || _key == "kd")
-    return "N/m";
-
-  if (_key == "max_vel")
-    return "m/s";
-
-  if (_key == "mass")
-    return "Kg";
-
-  if (_key == "ixx" || _key == "ixy" || _key == "ixz" ||
-      _key == "iyy" || _key == "iyz" || _key == "izz")
-  {
-    return "Kg&middot;m<sup>2</sup>";
-  }
-
-  if (_key == "limit_lower" || _key == "limit_upper")
-  {
-    if (_jointType == "PRISMATIC")
-      return "m";
-    else if (_jointType != "")
-      return "rad";
-  }
-
-  if (_key == "limit_effort")
-  {
-    if (_jointType == "PRISMATIC")
-      return "N";
-    else if (_jointType != "")
-      return "Nm";
-  }
-
-  if (_key == "limit_velocity" || _key == "velocity")
-  {
-    if (_jointType == "PRISMATIC")
-      return "m/s";
-    else if (_jointType != "")
-      return "rad/s";
-  }
-
-  if (_key == "damping")
-  {
-    if (_jointType == "PRISMATIC")
-      return "Ns/m";
-    else if (_jointType != "")
-      return "Ns";
-  }
-
-  if (_key == "friction")
-  {
-    if (_jointType == "PRISMATIC")
-      return "N";
-    else if (_jointType != "")
-      return "Nm";
-  }
-
-  return "";
 }
 
 /////////////////////////////////////////////////

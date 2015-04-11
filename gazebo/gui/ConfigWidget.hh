@@ -130,6 +130,7 @@ namespace gazebo
       public: QWidget *childWidget;
 
       /// \brief Callback that collapses or expands the child widget.
+      /// _param[in] _checked Whether it is checked or not.
       private slots: void Toggle(bool _checked);
     };
 
@@ -166,7 +167,15 @@ namespace gazebo
       /// joint's type.
       /// \return The unit.
       public: std::string GetUnitFromKey(const std::string &_key,
-          const std::string &_jointTypei = "");
+          const std::string &_jointType = "");
+
+      /// \brief Returns the range for a given key. For example, the key
+      // "transparency" returns min == 0, max == 1.
+      /// \param[in] _key The key.
+      /// \param[out] _min Pointer to the minimum value.
+      /// \param[out] _max Pointer to the maximum value.
+      public: void GetRangeFromKey(const std::string &_key,
+          double *_min, double *_max);
 
       /// \brief Set whether a child widget should be visible.
       /// \param[in] _name Name of the child widget.
@@ -345,54 +354,63 @@ namespace gazebo
 
       /// \brief Create a widget for configuring an unsigned integer value.
       /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateUIntWidget(const std::string &_key,
           int _level);
 
       /// \brief Create a widget for configuring an integer value.
       /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateIntWidget(const std::string &_key,
           int _level);
 
       /// \brief Create a widget for configuring a double value.
       /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateDoubleWidget(const std::string &_key,
           int _level);
 
       /// \brief Create a widget for configuring a string value.
       /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateStringWidget(const std::string &_key,
           int _level);
 
       /// \brief Create a widget for configuring a bool value.
       /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateBoolWidget(const std::string &_key,
           int _level);
 
       /// \brief Create a widget for configuring a vector3 value.
       /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateVector3dWidget(const std::string &_key,
           int _level);
 
       /// \brief Create a widget for configuring a color value.
       /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateColorWidget(const std::string &_key,
           int _level);
 
       /// \brief Create a widget for configuring a pose value.
       /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreatePoseWidget(const std::string &_key,
           int _level);
 
       /// \brief Create a widget for configuring a geometry value.
       /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateGeometryWidget(const std::string &_key,
           int _level);
@@ -400,6 +418,7 @@ namespace gazebo
       /// \brief Create a widget for configuring an enum value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _values A list of enum values in string.
+      /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateEnumWidget(const std::string &_key,
           const std::vector<std::string> &_values, int _level);
