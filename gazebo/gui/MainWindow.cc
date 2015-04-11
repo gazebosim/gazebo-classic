@@ -1519,6 +1519,9 @@ void MainWindow::DeleteActions()
   delete g_showJointsAct;
   g_showJointsAct = 0;
 
+  delete g_showToolbarsAct;
+  g_showToolbarsAct = 0;
+
   delete g_fullScreenAct;
   g_fullScreenAct = 0;
 
