@@ -1,0 +1,273 @@
+<?xml version="1.0" ?>
+<%
+  # Joint tree model
+  # Follow the demo here: 
+  # http://www.interactive-graphics.de/index.php/research/
+  # /72-impulse-based-dynamic-simulation-in-linear-time-all
+
+  # Inertial parameters
+  # Aluminum 2700 kg/m^3
+  density = 2700.0
+
+  # Constant parameters for each fixed peg
+  Radius = 0.03
+  Height = 0.6
+
+  # Constant parameters for each link 
+  radius = 0.005
+  layer_dist = 0.05 
+  length0     = 0.5
+  length_ratio = 0.6
+  layers = 2
+
+  #color = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple"]
+  color = ["Red", "Green", "Blue"]
+%>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+<%
+  
+# top layer
+pose0 = [0, 0, 0.5]
+orit0 = [0, 0, Math::PI/2.0]
+
+# r = 2, a1 = 1
+total_number = 2**(layers) - 1 
+
+positions << pose0
+orientations << orit0 
+
+# not strictly accurate, just approximate
+# TODO: need to debug and test
+volume = Math::PI * (radius**2)*length0 
+mass = density * volume
+ixx = 1.0 / 12 * mass * (length0/2.0) **2
+iyy = ixx
+izz = ixx
+
+# layer 1 --- 2 
+# layer 2 --- 4 
+# layer 3 --- 8
+# layer 4 --- 16 
+
+def nextLevel(parent_pose, parent_layer, parent_length)
+   layer = parent_layer + 1
+   # hard-coded the position, but it does not matter because this is the 
+   # set up for valid starting scene 
+   if(layer%2==1) # x axis
+     # body 1 
+     p1 = [parent_pose[0]+parent_length/2.0, parent_pose[1], parent_pose[2]]
+     pos << [p1[0], p1[1], p1[2]-layer_dist]
+     orit << [0, 0, Math::PI/2.0]
+     # body 2
+     p2 = [parent_pose[0]-parent_length/2.0, parent_pose[1], parent_pose[2]]
+     pos << [p2[0], p2[1], p2[2]-layer_dist]
+     orit << [0, 0, Math::PI/2.0]
+   else          # y axis
+     # body 1 
+     p1 = [parent_pose[0], parent_pose[1]+parent_length/2.0, parent_pose[2]]
+     pos << [p1[0], p1[1], p1[2]-layer_dist]
+     orit << [0, 0, Math::PI]
+     # body 2
+     p2 = [parent_pose[0], parent_pose[1]-parent_length/2.0, parent_pose[2]]
+     pos << [p2[0], p2[1], p2[2]-layer_dist]
+     orit << [0, 0, Math::PI/2.0]
+
+     orit << [0, 0, Math::PI]
+   end
+   return pos, orit
+end
+
+for layer in 1..layers
+  tmp_positions = []
+  tmp_orientations = []
+  # there are 2**(level-1) parents, each parent has 2 kids 
+  # the parent min_index and max_index
+  # layer 0    body 1   parent_index [0, 0]
+  # layer 1    body 2   parent_index [0, 0]
+  # layer 2    body 4   parent_index [1, 2] 1, 2 as parent to formulate 4 kids/bodies
+  # [3, 6] 3, 4, 5, 6 as parent to formulate 8 kids/bodies for level 3
+  # layer 3    body 8   parent_index [3, 6] 
+  # layer 4    body 16  parent_index [7, 14]
+  # layer 5    body 32  parent_index [15, 30]
+
+  parent_min_index = 2**(layer-1)-1
+  parent_max_index = 2*(2**(layer-1)-1)
+  for parent in parent_min_index..parent_max_index
+      parent_pose = positions[parent]
+      parent_length = length * (ratio** (layer-1))
+      # parent_layer = layer-1 
+      pos, orit = nextLevel(parent_pose, layer-1, parent_length)
+      tmp_positions << pos
+      tmp_orientations << orit
+  end
+  positions << tmp_positions 
+  orientations << tmp_orientations 
+end
+%>
+<% 
+  for layer in 0..layers
+%>
+<%= '<model name="barlayer_' + layer.to_s + '">' %>
+    <static>true</static>
+    <pose>0 0 <% =0.5-layer*layer_dist%> 0 0 0</pose>
+
+     <% 
+        layer     body     body_num
+          0        0:0        1
+          1        1:2        2 
+          2        3:6        4
+          3        7:14       8
+          4        15:30      16
+        body_min_index = 2**layer - 1
+        body_max_index = 2*(2**layer -1)
+        for body in body_min_index..body_max_index
+     %>
+
+     <%= '<link name="body_' + body.to_s + '">' %>
+          <pose><%= positions[0][0], positions[0][1], positions[0][2], 
+                    orientations[0][0], orientations[0][1], orientations[0][2] %> </pose>
+          <pose>0 0 <%= height/2.0 %>  0 0 0</pose>
+        <inertial>
+          <mass><%= mass * (ratio**layer)%></mass>
+          <inertia>
+            <ixx><%= ixx * (ratio**layer) %></ixx>
+            <iyy><%= iyy * (ratio**layer) %></iyy>
+            <izz><%= izz * (ratio**layer) %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose><%= positions[0][0], positions[0][1], positions[0][2], 
+                    orientations[0][0], orientations[0][1], orientations[0][2] %> </pose>
+          <geometry>
+            <cylinder>
+              <radius><%= radius %></radius>
+              <length><%= length0*(ratio**layer) %></length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <max_vel>0.1</max_vel>
+                <kp>1e8</kp>
+                <kd>1</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius><%= radius %></radius>
+              <length><%= length0*(ratio**layer) %></length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <%= '<name>Gazebo/' + color[j%layers].to_s + '</name>'%>
+            </script>
+          </material>
+        </visual>
+      </link>
+    <%
+     end
+    %>
+    </model>
+<%
+  end
+%>
+    <model name="peg1">
+      <static>true</static>
+      <link name="link">
+        <pose> 0.6 0 0.3 0 0 0</pose>
+        <self_collide>0</self_collide>
+        <visual name="vis_peg">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.03</radius>
+              <length>0.6</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Wood</name>
+           </script>
+          </material>
+        </visual>
+        <collision name="col_peg">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.03</radius>
+              <length>0.6</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <max_vel>0.1</max_vel>
+                <kp>1e8</kp>
+                <kd>1</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+      </link>
+    </model>
+    <model name="peg2">
+      <static>true</static>
+      <link name="link">
+          <pose>0.3 0 0.6 0 0 <%= Math::PI/2.0 %></pose>
+        <self_collide>0</self_collide>
+        <visual name="vis_peg2">
+          <pose>0.0 0.0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.03</radius>
+              <length>0.6</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Wood</name>
+           </script>
+          </material>
+        </visual>
+        <collision name="col_peg2">
+          <pose>0.0 0.0 0.0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.03</radius>
+              <length>0.6</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <max_vel>0.1</max_vel>
+                <kp>1e8</kp>
+                <kd>1</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+      </link>
+    </model>
+  </world>
+</sdf>
