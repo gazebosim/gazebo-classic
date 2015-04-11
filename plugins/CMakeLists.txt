@@ -28,6 +28,7 @@ endif()
 set (plugins
   ActuatorPlugin
   ArrangePlugin
+  BirdsnestPlugin
   BreakableJointPlugin
   CameraPlugin
   CartDemoPlugin
