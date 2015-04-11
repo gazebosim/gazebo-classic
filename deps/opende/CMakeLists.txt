@@ -260,5 +260,8 @@ target_link_libraries(gazebo_ode
 add_dependencies(gazebo_ode gazebo_opcode gazebo_gimpact)
 add_dependencies(gazebo_ode gazebo_opende_ou)
 
+add_executable(rimless_wheel src/rimless-wheel.cpp ${sources})
+target_link_libraries(rimless_wheel gazebo_ode)
+
 gz_install_library(gazebo_ode)
 gz_install_includes("ode" ${headers})
