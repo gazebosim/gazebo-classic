@@ -32,6 +32,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Base64.hh"
+#include "gazebo/transport/transport.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
 
@@ -42,6 +43,12 @@ using namespace util;
 LogPlay::LogPlay()
 {
   this->logStartXml = NULL;
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init("/gazebo");
+
+  this->logControlSub = this->node->Subscribe("/gazebo/log/play/control",
+      &LogPlay::OnLogControl, this);
 }
 
 /////////////////////////////////////////////////
@@ -254,6 +261,29 @@ uintmax_t LogPlay::GetFileSize() const
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
+  if (this->mode == "play")
+    this->target++;
+
+  if (this->current == this->target && this->stepMsgs.empty())
+    return false;
+
+  // There is work to do!
+  if (this->current == this->target)
+  {
+    this->target += this->stepMsgs.front();
+    this->stepMsgs.pop_front();
+  }
+
+  if (this->current < this->target)
+  {
+    this->current++;
+    this->GetChunk(this->current, _data);
+  }
+  else
+    this->current = -1;
+
+  return true;
+
   std::string startMarker = "<sdf ";
   std::string endMarker = "</sdf>";
   size_t start = this->currentChunk.find(startMarker);
@@ -395,4 +425,18 @@ unsigned int LogPlay::GetChunkCount() const
   }
 
   return count;
+}
+
+/////////////////////////////////////////////////
+void LogPlay::OnLogControl(ConstLogPlayControlPtr &_data)
+{
+  if (_data->has_start() && _data->start())
+    this->mode = "start";
+  else if (_data->has_pause() && _data->pause())
+    this->mode = "pause";
+  else if (_data->has_multi_step())
+  {
+    this->mode = "step";
+    this->stepMsgs.push_back(_data->multi_step());
+  }
 }

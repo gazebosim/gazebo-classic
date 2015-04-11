@@ -21,11 +21,13 @@
 #include <tinyxml.h>
 
 #include <list>
+#include <mutex>
 #include <string>
 #include <fstream>
 
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/transport/transport.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -133,6 +135,10 @@ namespace gazebo
       /// where the log started and finished (simulation time).
       private: void ReadLogTimes();
 
+      /// \brief Called when a log control message is received.
+      /// \param[in] _data The log control message.
+      private: void OnLogControl(ConstLogPlayControlPtr &_data);
+
       /// \brief The XML document of the log file.
       private: TiXmlDocument xmlDoc;
 
@@ -168,6 +174,17 @@ namespace gazebo
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogPlay>;
+
+      // -- caguero --
+      private: std::deque<int> stepMsgs;
+      /// \brief Transportation node.
+      private: transport::NodePtr node;
+      /// \brief Subscriber to log control messages.
+      private: transport::SubscriberPtr logControlSub;
+      private: std::string mode = "play";
+      private: std::mutex mutex;
+      private: int current = -1;
+      private: int target = -1;
     };
     /// \}
   }
