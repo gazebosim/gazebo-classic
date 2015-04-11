@@ -301,6 +301,11 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  // Parent class handles many generic parameters
+  // This should be done first so that the profile settings
+  // can be over-ridden by other message parameters.
+  PhysicsEngine::OnPhysicsMsg(_msg);
+
   if (_msg->has_solver_type())
     this->SetStepType(_msg->solver_type());
 
@@ -349,9 +354,6 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
-
-  // Parent class handles many generic parameters
-  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 
@@ -1236,7 +1238,8 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
       dWorldSetQuickStepTolerance(this->dataPtr->worldId,
           boost::any_cast<double>(_value));
     }
-    else if (_key == "inertia_ratio_reduction")
+    else if (_key == "inertia_ratio_reduction" ||
+             _key == "use_dynamic_moi_rescaling")
     {
       bool value = boost::any_cast<bool>(_value);
       dWorldSetQuickStepInertiaRatioReduction(this->dataPtr->worldId, value);
@@ -1334,7 +1337,8 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = dWorldGetQuickStepRMSConstraintResidual(this->dataPtr->worldId);
   else if (_key == "num_contacts")
     _value = dWorldGetQuickStepNumContacts(this->dataPtr->worldId);
-  else if (_key == "inertia_ratio_reduction")
+  else if (_key == "inertia_ratio_reduction" ||
+           _key == "use_dynamic_moi_rescaling")
     _value = dWorldGetQuickStepInertiaRatioReduction(this->dataPtr->worldId);
   else if (_key == "contact_residual_smoothing")
     _value = dWorldGetQuickStepContactResidualSmoothing(this->dataPtr->worldId);
