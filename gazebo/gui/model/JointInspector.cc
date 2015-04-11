@@ -167,6 +167,7 @@ void JointInspector::OnJointTypeChanged(const QString &/*_name*/,
     std::string axisStr = axis.str();
     this->configWidget->SetWidgetVisible(axisStr, true);
     this->configWidget->SetWidgetReadOnly(axisStr, false);
+    this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());
   }
 
   for (unsigned int i = axisCount; i < 2u; ++i)
@@ -176,6 +177,7 @@ void JointInspector::OnJointTypeChanged(const QString &/*_name*/,
     std::string axisStr = axis.str();
     this->configWidget->SetWidgetVisible(axisStr, false);
     this->configWidget->SetWidgetReadOnly(axisStr, true);
+    this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());
   }
 }
 

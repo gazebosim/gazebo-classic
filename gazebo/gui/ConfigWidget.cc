@@ -83,19 +83,19 @@ google::protobuf::Message *ConfigWidget::GetMsg()
 }
 
 /////////////////////////////////////////////////
-std::string ConfigWidget::GetHumanReadableString(std::string _name)
+std::string ConfigWidget::GetHumanReadableKey(std::string _key)
 {
-  std::string humanName = _name;
-  humanName[0] = std::toupper(humanName[0]);
+  std::string humanKey = _key;
+  humanKey[0] = std::toupper(humanKey[0]);
   std::string forbiddenChar = "_";
   std::string replaceChar = " ";
-  size_t index = humanName.find(forbiddenChar);
+  size_t index = humanKey.find(forbiddenChar);
   while (index != std::string::npos)
   {
-    humanName.replace(index, forbiddenChar.size(), replaceChar);
-    index = humanName.find(forbiddenChar);
+    humanKey.replace(index, forbiddenChar.size(), replaceChar);
+    index = humanKey.find(forbiddenChar);
   }
-  return humanName;
+  return humanKey;
 }
 
 /////////////////////////////////////////////////
@@ -781,7 +781,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           {
             // Button label
             QLabel *buttonLabel = new QLabel(
-                tr(this->GetHumanReadableString(name).c_str()));
+                tr(this->GetHumanReadableKey(name).c_str()));
             buttonLabel->setToolTip(tr(name.c_str()));
 
             // Button icon
@@ -1016,7 +1016,7 @@ ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key,
     int _level)
 {
   // Label
-  QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableString(_key).c_str()));
+  QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
 
   // SpinBox
@@ -1047,7 +1047,7 @@ ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key,
     int _level)
 {
   // Label
-  QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableString(_key).c_str()));
+  QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
 
   // SpinBox
@@ -1078,7 +1078,7 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
     int _level)
 {
   // Label
-  QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableString(_key).c_str()));
+  QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
 
   // SpinBox
@@ -1089,19 +1089,12 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
   valueSpinBox->setAlignment(Qt::AlignRight);
 
   // Unit
-  QLabel *unit = new QLabel();
-  unit->setMaximumWidth(40);
-  if (_key == "kp" || _key == "kd")
-    unit->setText(tr("N/m"));
-  else if (_key == "max_vel")
-    unit->setText(tr("m/s"));
-  else if (_key == "min_depth")
-    unit->setText(tr("m"));
-  else if (_key == "mass")
-    unit->setText(tr("Kg"));
-  else if (_key == "ixx" || _key == "ixy" || _key == "ixz" ||
-           _key == "iyy" || _key == "iyz" || _key == "izz")
-    unit->setText(tr("Kg&middot;m<sup>2</sup>"));
+  std::string jointType = this->GetEnumWidgetValue("type");
+  std::string unit = this->GetUnitFromKey(_key, jointType);
+
+  QLabel *unitLabel = new QLabel();
+  unitLabel->setMaximumWidth(40);
+  unitLabel->setText(QString::fromStdString(unit));
 
   // Layout
   QHBoxLayout *widgetLayout = new QHBoxLayout;
@@ -1110,15 +1103,17 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
         QSizePolicy::Fixed, QSizePolicy::Fixed));
   widgetLayout->addWidget(keyLabel);
   widgetLayout->addWidget(valueSpinBox);
-  if (unit->text() != "")
-    widgetLayout->addWidget(unit);
+  if (unitLabel->text() != "")
+    widgetLayout->addWidget(unitLabel);
 
   // ChildWidget
   ConfigChildWidget *widget = new ConfigChildWidget();
+  widget->key = _key;
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
 
   widget->widgets.push_back(valueSpinBox);
+  widget->mapWidgetToUnit[valueSpinBox] = unitLabel;
 
   return widget;
 }
@@ -1128,7 +1123,7 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
     int _level)
 {
   // Label
-  QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableString(_key).c_str()));
+  QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
 
   // LineEdit
@@ -1157,7 +1152,7 @@ ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key,
     int _level)
 {
   // Label
-  QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableString(_key).c_str()));
+  QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
 
   // Buttons
@@ -1376,9 +1371,9 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
     unitLabel->setMaximumWidth(40);
     unitLabel->setMinimumWidth(40);
     if (i < 3)
-      unitLabel->setText(tr("m"));
+      unitLabel->setText(QString::fromStdString(this->GetUnitFromKey("pos")));
     else
-      unitLabel->setText(tr("rad"));
+      unitLabel->setText(QString::fromStdString(this->GetUnitFromKey("rot")));
 
     widgetLayout->addWidget(label, i%3, std::floor(i/3)*3+1);
     widgetLayout->addWidget(spin, i%3, std::floor(i/3)*3+2);
@@ -1437,9 +1432,10 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomSizeYLabel->setStyleSheet("QLabel{color: #3bc43b;}");
   geomSizeZLabel->setStyleSheet("QLabel{color: #0d0df2;}");
 
-  QLabel *geomSizeXUnitLabel = new QLabel(tr("m"));
-  QLabel *geomSizeYUnitLabel = new QLabel(tr("m"));
-  QLabel *geomSizeZUnitLabel = new QLabel(tr("m"));
+  std::string unit = this->GetUnitFromKey("length");
+  QLabel *geomSizeXUnitLabel = new QLabel(QString::fromStdString(unit));
+  QLabel *geomSizeYUnitLabel = new QLabel(QString::fromStdString(unit));
+  QLabel *geomSizeZUnitLabel = new QLabel(QString::fromStdString(unit));
 
   QHBoxLayout *geomSizeLayout = new QHBoxLayout;
   geomSizeLayout->addWidget(geomSizeXLabel);
@@ -1477,8 +1473,10 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   // Radius / Length
   QLabel *geomRadiusLabel = new QLabel(tr("Radius"));
   QLabel *geomLengthLabel = new QLabel(tr("Length"));
-  QLabel *geomRadiusUnitLabel = new QLabel(tr("m"));
-  QLabel *geomLengthUnitLabel = new QLabel(tr("m"));
+  QLabel *geomRadiusUnitLabel =
+      new QLabel(QString::fromStdString(this->GetUnitFromKey("radius")));
+  QLabel *geomLengthUnitLabel =
+      new QLabel(QString::fromStdString(this->GetUnitFromKey("length")));
 
   QDoubleSpinBox *geomRadiusSpinBox = new QDoubleSpinBox;
   geomRadiusSpinBox->setRange(-1000, 1000);
@@ -1568,7 +1566,7 @@ ConfigChildWidget *ConfigWidget::CreateEnumWidget(
     int _level)
 {
   // Label
-  QLabel *enumLabel = new QLabel(this->GetHumanReadableString(_key).c_str());
+  QLabel *enumLabel = new QLabel(this->GetHumanReadableKey(_key).c_str());
 
   // ComboBox
   QComboBox *enumComboBox = new QComboBox;
@@ -1994,7 +1992,17 @@ bool ConfigWidget::UpdateDoubleWidget(ConfigChildWidget *_widget, double _value)
 {
   if (_widget->widgets.size() == 1u)
   {
-    qobject_cast<QDoubleSpinBox *>(_widget->widgets[0])->setValue(_value);
+    // Spin value
+    QDoubleSpinBox *spin =
+        qobject_cast<QDoubleSpinBox *>(_widget->widgets[0]);
+    spin->setValue(_value);
+
+    // Unit label
+    std::string jointType = this->GetEnumWidgetValue("type");
+    std::string unit = this->GetUnitFromKey(_widget->key, jointType);
+    qobject_cast<QLabel *>(
+        _widget->mapWidgetToUnit[spin])->setText(QString::fromStdString(unit));
+
     return true;
   }
   else
@@ -2414,6 +2422,77 @@ void ConfigWidget::OnEnumValueChanged(const QString &_value)
       return;
     }
   }
+}
+
+/////////////////////////////////////////////////
+std::string ConfigWidget::GetUnitFromKey(const std::string &_key,
+    const std::string &_jointType)
+{
+  if (_key == "pos" || _key == "radius" || _key == "length" ||
+      _key == "min_depth")
+  {
+    return "m";
+  }
+
+  if (_key == "rot")
+    return "rad";
+
+  if (_key == "kp" || _key == "kd")
+    return "N/m";
+
+  if (_key == "max_vel")
+    return "m/s";
+
+  if (_key == "mass")
+    return "Kg";
+
+  if (_key == "ixx" || _key == "ixy" || _key == "ixz" ||
+      _key == "iyy" || _key == "iyz" || _key == "izz")
+  {
+    return "Kg&middot;m<sup>2</sup>";
+  }
+
+  if (_key == "limit_lower" || _key == "limit_upper")
+  {
+    if (_jointType == "PRISMATIC")
+      return "m";
+    else if (_jointType != "")
+      return "rad";
+  }
+
+  if (_key == "limit_effort")
+  {
+    if (_jointType == "PRISMATIC")
+      return "N";
+    else if (_jointType != "")
+      return "Nm";
+  }
+
+  if (_key == "limit_velocity" || _key == "velocity")
+  {
+    if (_jointType == "PRISMATIC")
+      return "m/s";
+    else if (_jointType != "")
+      return "rad/s";
+  }
+
+  if (_key == "damping")
+  {
+    if (_jointType == "PRISMATIC")
+      return "Ns/m";
+    else if (_jointType != "")
+      return "Ns";
+  }
+
+  if (_key == "friction")
+  {
+    if (_jointType == "PRISMATIC")
+      return "N";
+    else if (_jointType != "")
+      return "Nm";
+  }
+
+  return "";
 }
 
 /////////////////////////////////////////////////

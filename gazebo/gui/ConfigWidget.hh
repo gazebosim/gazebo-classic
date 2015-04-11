@@ -55,8 +55,14 @@ namespace gazebo
       /// \brief Constructor;
       public: ConfigChildWidget() : groupWidget(NULL) {}
 
-      /// \brief List of child widgets.
+      /// \brief Widget's key value.
+      public: std::string key;
+
+      /// \brief List of widgets holding values, such as Spins and LineEdits.
       public: std::vector<QWidget *> widgets;
+
+      /// \brief Map a widget to the label holding its unit value.
+      public: std::map<QWidget *, QLabel *> mapWidgetToUnit;
 
       /// \brief Pointer to group widget.
       /// NULL if this widget is not contained inside a group widget.
@@ -147,11 +153,20 @@ namespace gazebo
       /// \return Updated message.
       public: google::protobuf::Message *GetMsg();
 
-      /// \brief Create a human readable name, capitalizing the first letter
+      /// \brief Create a human readable key, capitalizing the first letter
       /// and removing characters like "_".
-      /// \param[in] _name Non-human-readable name.
-      /// \return Human-redadable name.
-      public: std::string GetHumanReadableString(std::string _name);
+      /// \param[in] _key Non-human-readable key.
+      /// \return Human-redadable key.
+      public: std::string GetHumanReadableKey(std::string _key);
+
+      /// \brief Returns the unit for a given key. For example, the key "mass"
+      /// returns "Kg".
+      /// \param[in] _key The key.
+      /// \param[in] _jointType In case the field belongs to a joint, the
+      /// joint's type.
+      /// \return The unit.
+      public: std::string GetUnitFromKey(const std::string &_key,
+          const std::string &_jointTypei = "");
 
       /// \brief Set whether a child widget should be visible.
       /// \param[in] _name Name of the child widget.
