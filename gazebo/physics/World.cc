@@ -1955,7 +1955,6 @@ void World::PublishWorldStats()
     msgs::Set(logStats.mutable_end_time(),
         util::LogPlay::Instance()->GetLogEndTime());
 
-/*
     if (this->GetSimTime().Double() <
         util::LogPlay::Instance()->GetLogStartTime().Double())
     {
@@ -1973,7 +1972,7 @@ std::cout << "sim time: " << this->GetSimTime().Double() <<
 
     this->dataPtr->worldStatsMsg.mutable_log_stats()->CopyFrom(logStats);
   }
-*/
+
   if (this->dataPtr->statPub && this->dataPtr->statPub->HasConnections())
     this->dataPtr->statPub->Publish(this->dataPtr->worldStatsMsg);
   this->dataPtr->prevStatTime = common::Time::GetWallTime();
