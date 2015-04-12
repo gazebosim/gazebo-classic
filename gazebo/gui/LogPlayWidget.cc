@@ -327,6 +327,8 @@ void LogPlayView::SetCurrentTime(int _msec)
   if (this->dataPtr->currentTimeItem->isSelected())
     return;
 
+std::cout << "Start: " << this->dataPtr->startTime << " Current: " << _msec << std::endl;
+
   double relPos = double(_msec - this->dataPtr->startTime) /
       (this->dataPtr->endTime - this->dataPtr->startTime);
 

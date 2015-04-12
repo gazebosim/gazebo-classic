@@ -150,10 +150,10 @@ void LogPlay::ReadHeader()
 /////////////////////////////////////////////////
 void LogPlay::ReadLogTimes()
 {
-  if (this->GetChunkCount() == 0u)
+  if (this->GetChunkCount() < 2u)
   {
-    gzwarn << "Unable to extract log timing information. No chunks available."
-           << std::endl;
+    gzwarn << "Unable to extract log timing information. No chunks available "
+           << "with <sim_time> information." << std::endl;
     return;
   }
 
@@ -162,7 +162,7 @@ void LogPlay::ReadLogTimes()
   std::string chunk;
 
   // Read the start time of the log from the first chunk.
-  this->GetChunk(0, chunk);
+  this->GetChunk(1, chunk);
 
   // Find the first <sim_time> of the log.
   auto from = chunk.find(kStartDelim);
