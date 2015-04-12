@@ -43,4 +43,7 @@ message Physics
   optional PhysicsDART dart                  = 40;
   optional PhysicsODE ode                    = 41;
   optional PhysicsSimbody simbody            = 42;
+
+  // The name of this physics profile (not to be confused with type)
+  optional string profile_name               = 16;
 }
