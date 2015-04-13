@@ -186,7 +186,7 @@ class BitbucketPullRequests
   end
 
   # check files changed by the parent commit
-  def checkCurrent(fork=true)
+  def checkCurrent()
     files = getFilesFromDiff(`hg log -r . --patch`)
     changeset = `hg id`[0..11]
     checkFiles(files, changeset)
