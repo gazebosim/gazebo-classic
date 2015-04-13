@@ -77,7 +77,7 @@ JointMaker::JointMaker()
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
-        boost::bind(&JointMaker::Update, this)));
+      boost::bind(&JointMaker::Update, this)));
 
   this->connections.push_back(
       gui::model::Events::ConnectOpenJointInspector(
@@ -88,12 +88,12 @@ JointMaker::JointMaker()
       boost::bind(&JointMaker::ShowContextMenu, this, _1)));
 
   this->connections.push_back(
-     gui::model::Events::ConnectSetSelectedJoint(
-       boost::bind(&JointMaker::OnSetSelectedJoint, this, _1, _2)));
+      gui::model::Events::ConnectSetSelectedJoint(
+      boost::bind(&JointMaker::OnSetSelectedJoint, this, _1, _2)));
 
   this->connections.push_back(
-     event::Events::ConnectSetSelectedEntity(
-       boost::bind(&JointMaker::OnSetSelectedEntity, this, _1, _2)));
+      event::Events::ConnectSetSelectedEntity(
+      boost::bind(&JointMaker::OnSetSelectedEntity, this, _1, _2)));
 
   this->inspectAct = new QAction(tr("Open Joint Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this, SLOT(OnOpenInspector()));
