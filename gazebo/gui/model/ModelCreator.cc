@@ -1370,8 +1370,6 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
           this->SetSelected(linkVis, false);
         }
       }
-      g_copyAct->setEnabled(!this->selectedLinks.empty());
-      g_alignAct->setEnabled(this->selectedLinks.size() > 1);
 
       if (this->manipMode == "translate" || this->manipMode == "rotate" ||
           this->manipMode == "scale")
@@ -1787,6 +1785,8 @@ void ModelCreator::SetSelected(rendering::VisualPtr _linkVis, bool _selected)
       model::Events::setSelectedLink(_linkVis->GetName(), _selected);
     }
   }
+  g_copyAct->setEnabled(!this->selectedLinks.empty());
+  g_alignAct->setEnabled(this->selectedLinks.size() > 1);
 }
 
 /////////////////////////////////////////////////
