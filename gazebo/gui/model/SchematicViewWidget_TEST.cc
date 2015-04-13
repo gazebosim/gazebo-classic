@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,18 +29,27 @@ void SchematicViewWidget_TEST::AddRemove()
   // add nodes
   QCOMPARE(svWidget->GetNodeCount(), 0u);
   svWidget->AddNode("node_a");
+  Q_ASSERT(svWidget->HasNode("node_a"));
   QCOMPARE(svWidget->GetNodeCount(), 1u);
   svWidget->AddNode("node_b");
+  Q_ASSERT(svWidget->HasNode("node_b"));
   QCOMPARE(svWidget->GetNodeCount(), 2u);
   svWidget->AddNode("node_c");
+  Q_ASSERT(svWidget->HasNode("node_c"));
   QCOMPARE(svWidget->GetNodeCount(), 3u);
   svWidget->AddNode("node_d");
+  Q_ASSERT(svWidget->HasNode("node_d"));
   QCOMPARE(svWidget->GetNodeCount(), 4u);
   // remove node
+  svWidget->RemoveNode("node_d");
+  Q_ASSERT(!svWidget->HasNode("node_d"));
+  QCOMPARE(svWidget->GetNodeCount(), 3u);
+  // removing a node that doesn't exist doesn't break anything
   svWidget->RemoveNode("node_d");
   QCOMPARE(svWidget->GetNodeCount(), 3u);
   // add it back
   svWidget->AddNode("node_d");
+  Q_ASSERT(svWidget->HasNode("node_d"));
   QCOMPARE(svWidget->GetNodeCount(), 4u);
 
   // add edges
@@ -54,9 +63,17 @@ void SchematicViewWidget_TEST::AddRemove()
   // remove edge
   svWidget->RemoveEdge("id_2");
   QCOMPARE(svWidget->GetEdgeCount(), 2u);
+  // removing an edge that doesn't exist doesn't break anything
+  svWidget->RemoveEdge("id_2");
+  QCOMPARE(svWidget->GetEdgeCount(), 2u);
   // add it back
   svWidget->AddEdge("id_2", "edge_2", "node_a", "node_c");
   QCOMPARE(svWidget->GetEdgeCount(), 3u);
+
+  // must remove all edges connected to a node before removing the node
+  svWidget->RemoveEdge("id_0");
+  svWidget->RemoveEdge("id_1");
+  svWidget->RemoveNode("node_b");
 
   delete svWidget;
 }

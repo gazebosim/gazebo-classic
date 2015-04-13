@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GRAPH_VIEW_HH_
-#define _GRAPH_VIEW_HH_
+#ifndef _GAZEBO_GRAPH_VIEW_HH_
+#define _GAZEBO_GRAPH_VIEW_HH_
 
 #include "gazebo/gui/qt.h"
 
@@ -35,7 +35,7 @@ namespace gazebo
       public: GraphView(QWidget *_parent = 0);
 
       /// \brief Destructor
-      public: virtual ~GraphView();
+      public: virtual ~GraphView() = default;
 
       /// \brief Qt resize event received when the parent widget changes size.
       /// \param[in] _event Qt resize event

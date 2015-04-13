@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GRAPH_SCENE_HH_
-#define _GRAPH_SCENE_HH_
+#ifndef _GAZEBO_GRAPH_SCENE_HH_
+#define _GAZEBO_GRAPH_SCENE_HH_
 
 #include <string>
 
@@ -38,7 +38,7 @@ namespace gazebo
       public: GraphScene(QWidget *_parent = 0);
 
       /// \brief Destructor
-      public: virtual ~GraphScene();
+      public: virtual ~GraphScene() = default;
 
       /// \brief Add a node to the scene.
       /// \param[in] _name Name of the node.
@@ -50,7 +50,7 @@ namespace gazebo
       public: void RemoveNode(const std::string &_name);
 
       /// \brief Check if a node exists in the scene.
-      /// \param[in] _name Name of the name.
+      /// \param[in] _name Name of the node.
       /// \return True if the node exists.
       public: bool HasNode(const std::string &_name);
 
@@ -74,7 +74,7 @@ namespace gazebo
       /// \brief Overrides the default background with grid lines.
       /// \param[in] _painter Qt painter object.
       /// \param[in] _rect Qt scene background rectangle
-      private: void drawBackground(QPainter * _painter, const QRectF & _rect);
+      private: void drawBackground(QPainter *_painter, const QRectF &_rect);
     };
   }
 }
