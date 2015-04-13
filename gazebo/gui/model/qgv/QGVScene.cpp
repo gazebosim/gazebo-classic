@@ -97,7 +97,7 @@ QGVEdge *QGVScene::addEdge(QGVNode *source, QGVNode *target,
   QGVEdge *item = new QGVEdge(new QGVEdgePrivate(edge), this);
 
   item->setSource(source->label());
-  item->setSource(target->label());
+  item->setTarget(target->label());
   addItem(item);
 
   _edges.insert(label, item);
@@ -141,31 +141,21 @@ void QGVScene::removeNode(const QString &label)
 {
   if (_nodes.contains(label))
   {
-
-    for (Agedge_t* edge = agfstout(_graph->graph(),
-        _nodes[label]->_node->node()); edge != NULL;
-        edge = agnxtout(_graph->graph(), edge))
-    {
-      QGVEdge *iedge = new QGVEdge(new QGVEdgePrivate(edge), this);
-      iedge->updateLayout();
-      addItem(iedge);
-    }
-
     agdelete(_graph->graph(), _nodes[label]->_node->node());
     removeItem(_nodes[label]);
     _nodes.remove(label);
-
-    QList<QString> toRemove;
-
-    for (auto key : _edges.toStdMap())
-    {
-      QGVEdge *e = key.second;
-      if (e->source() == label || e->target() == label)
-      toRemove.append(e->label());
-    }
-    for (auto e : toRemove)
-      this->removeEdge(e);
   }
+
+  QList<QString> toRemove;
+
+  for (auto key : _edges.toStdMap())
+  {
+    QGVEdge *e = key.second;
+    if (e->source() == label || e->target() == label)
+      toRemove.append(key.first);
+  }
+  for (auto e : toRemove)
+    this->removeEdge(e);
 }
 
 void QGVScene::removeEdge(const QString &_label)

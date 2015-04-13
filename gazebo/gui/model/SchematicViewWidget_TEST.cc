@@ -70,10 +70,10 @@ void SchematicViewWidget_TEST::AddRemove()
   svWidget->AddEdge("id_2", "edge_2", "node_a", "node_c");
   QCOMPARE(svWidget->GetEdgeCount(), 3u);
 
-  // must remove all edges connected to a node before removing the node
-  svWidget->RemoveEdge("id_0");
-  svWidget->RemoveEdge("id_1");
+  // remove node and its edges
   svWidget->RemoveNode("node_b");
+  QCOMPARE(svWidget->GetNodeCount(), 3u);
+  QCOMPARE(svWidget->GetEdgeCount(), 1u);
 
   delete svWidget;
 }
