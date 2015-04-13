@@ -16,7 +16,5 @@ QT4_WRAP_CPP(headers_MOC GUIExampleTimeWidget.hh)
 add_library(gui_example_time_widget SHARED ${headers_MOC}
   GUIExampleTimeWidget.cc)
 target_link_libraries(gui_example_time_widget ${GAZEBO_LIBRARIES} 
-    ${OGRE_LIBRARIES} 
-    ${OGRE-Terrain_LIBRARIES}
     ${QT_LIBRARIES}
     ${PROTOBUF_LIBRARIES})

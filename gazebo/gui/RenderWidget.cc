@@ -302,6 +302,13 @@ void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
 }
 
 /////////////////////////////////////////////////
+void RenderWidget::SetOverlaysVisible(const bool _visible)
+{
+  for (auto const &plugin : this->plugins)
+    plugin->setVisible(_visible);
+}
+
+/////////////////////////////////////////////////
 std::string RenderWidget::GetOverlayMsg() const
 {
   return this->msgOverlayLabel->text().toStdString();
