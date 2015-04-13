@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,12 +33,12 @@
 
 namespace gazebo
 {
-    /// \class FoosballPlayer FoosballTablePlugin.hh
-    /// \brief A class that moves a set of rods of the table based on a Hydra
-    /// device controlled by a player.
-    class GAZEBO_VISIBLE FoosballPlayer
-    {
-      /// \def Rod_t
+  /// \class FoosballPlayer FoosballTablePlugin.hh
+  /// \brief A class that moves a set of rods of the table based on a Hydra
+  /// device controlled by a player.
+  class GAZEBO_VISIBLE FoosballPlayer
+  {
+    /// \def Rod_t
     /// \brief A rod is composed by two joints (prismatic and revolute).
     typedef std::array<physics::JointPtr, 2> Rod_t;
 
@@ -60,6 +60,7 @@ namespace gazebo
     /// \brief Load a <player> section of the plugin SDF.
     /// \param [in] _model Pointer to the world.
     /// \param [in] _sdf Pointer to the <player> section of the plugin SDF.
+    /// \return true on success or false otherwise.
     public: bool Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
     /// \brief Update the rods controlled by this player.
