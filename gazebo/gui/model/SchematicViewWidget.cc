@@ -44,18 +44,12 @@ SchematicViewWidget::SchematicViewWidget(QWidget *_parent)
   this->view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   this->view->setScene(this->scene);
   this->view->centerOn(QPointF(0, 0));
-//  this->view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
   this->view->setDragMode(QGraphicsView::ScrollHandDrag);
   this->view->show();
 
   canvasLayout->setContentsMargins(0, 0, 0, 0);
   canvasLayout->setSpacing(0);
   this->setLayout(canvasLayout);
-}
-
-/////////////////////////////////////////////////
-SchematicViewWidget::~SchematicViewWidget()
-{
 }
 
 /////////////////////////////////////////////////
@@ -135,6 +129,12 @@ void SchematicViewWidget::RemoveNode(const std::string &_node)
 }
 
 /////////////////////////////////////////////////
+bool SchematicViewWidget::HasNode(const std::string &_name) const
+{
+  return this->scene->HasNode(_name);
+}
+
+/////////////////////////////////////////////////
 void SchematicViewWidget::AddEdge(const std::string &_id,
     const std::string &/*_name*/, const std::string &_parent,
     const std::string &_child)
@@ -188,15 +188,21 @@ void SchematicViewWidget::FitInView()
 {
   QRectF newRect;
   QRectF sceneRect = this->scene->itemsBoundingRect();
-  newRect.setWidth(std::max(static_cast<int>(sceneRect.width()),
-      this->minimumWidth));
-  newRect.setHeight(std::max(static_cast<int>(sceneRect.height()),
-      this->minimumHeight));
-  newRect.setX(sceneRect.x());
-  newRect.setY(sceneRect.y());
+
+  int sceneCenterX = sceneRect.x() + sceneRect.width()*0.5;
+  int sceneCenterY = sceneRect.y() + sceneRect.height()*0.5;
+
+  int sceneWidth = std::max(static_cast<int>(sceneRect.width()),
+      this->minimumWidth);
+  int sceneHeight = std::max(static_cast<int>(sceneRect.height()),
+      this->minimumHeight);
+
+  newRect.setX(sceneCenterX - sceneWidth*0.5);
+  newRect.setY(sceneCenterY - sceneHeight*0.5);
+  newRect.setWidth(sceneWidth);
+  newRect.setHeight(sceneHeight);
 
   this->view->fitInView(newRect, Qt::KeepAspectRatio);
-  this->view->centerOn(newRect.x() + newRect.width()*0.5,
-      newRect.y() + newRect.height()*0.5);
+  this->view->centerOn(sceneCenterX, sceneCenterY);
   this->scene->setSceneRect(newRect);
 }

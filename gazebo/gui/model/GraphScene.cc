@@ -40,11 +40,6 @@ GraphScene::GraphScene(QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-GraphScene::~GraphScene()
-{
-}
-
-/////////////////////////////////////////////////
 QGVNode *GraphScene::AddNode(const std::string &_name)
 {
   QGVNode *node = this->addNode(tr(_name.c_str()));
@@ -86,7 +81,7 @@ void GraphScene::RemoveEdge(const std::string &_id)
 }
 
 /////////////////////////////////////////////////
-void GraphScene::drawBackground(QPainter * _painter, const QRectF & _rect)
+void GraphScene::drawBackground(QPainter *_painter, const QRectF & _rect)
 {
   QColor c(250, 250, 250);
   QBrush brush(c, Qt::SolidPattern);

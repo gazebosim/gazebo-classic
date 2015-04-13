@@ -31,11 +31,6 @@ GraphView::GraphView(QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-GraphView::~GraphView()
-{
-}
-
-/////////////////////////////////////////////////
 void GraphView::scrollContentsBy(int _dx, int _dy)
 {
   QGraphicsView::scrollContentsBy(_dx, _dy);

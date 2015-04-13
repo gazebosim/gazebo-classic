@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _SCHEMATIC_VIEW_WIDGET_TEST_HH_
-#define _SCHEMATIC_VIEW_WIDGET_TEST_HH_
+#ifndef _GAZEBO_SCHEMATIC_VIEW_WIDGET_TEST_HH_
+#define _GAZEBO_SCHEMATIC_VIEW_WIDGET_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
@@ -25,7 +25,7 @@ class SchematicViewWidget_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test joint states
+  /// \brief Test adding and removing nodes.
   private slots: void AddRemove();
 };
 
