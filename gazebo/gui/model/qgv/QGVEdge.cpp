@@ -61,6 +61,26 @@ void QGVEdge::setLabel(const QString &_xlabel)
     setAttribute("xlabel", _xlabel);
 }
 
+void QGVEdge::setSource(const QString &_source)
+{
+  this->sourceNode = _source;
+}
+
+void QGVEdge::setTarget(const QString &_target)
+{
+  this->targetNode = _target;
+}
+
+QString QGVEdge::source() const
+{
+  return sourceNode;
+}
+
+QString QGVEdge::target() const
+{
+  return targetNode;
+}
+
 void QGVEdge::paint(QPainter * painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {

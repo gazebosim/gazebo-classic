@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _SCHEMATIC_VIEW_WIDGET_HH_
-#define _SCHEMATIC_VIEW_WIDGET_HH_
+#ifndef _GAZEBO_SCHEMATIC_VIEW_WIDGET_HH_
+#define _GAZEBO_SCHEMATIC_VIEW_WIDGET_HH_
 
 #include <utility>
 #include <map>
@@ -42,7 +42,7 @@ namespace gazebo
       public: SchematicViewWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
-      public: ~SchematicViewWidget();
+      public: ~SchematicViewWidget() = default;
 
       /// \brief Initialize the widget to listen to events/topics
       public: void Init();
@@ -58,6 +58,11 @@ namespace gazebo
       /// \param[in] _node Name of node.
       public: void RemoveNode(const std::string &_node);
 
+      /// \brief Check if a node exists in the scene in the widget.
+      /// \param[in] _name Name of the name.
+      /// \return True if the node exists.
+      public: bool HasNode(const std::string &_name) const;
+
       /// \brief Add an edge to the scene in the widget
       /// \param[in] _id Unique id of edge.
       /// \param[in] _name Name of edge.
@@ -68,7 +73,6 @@ namespace gazebo
 
       /// \brief Remove an edge from the scene in the widget
       /// \param[in] _id Unique id of edge.
-      /// \param[in] _name Name of edge.
       public: void RemoveEdge(const std::string &_id);
 
       /// \brief Get number of nodes in the scene.
@@ -104,10 +108,10 @@ namespace gazebo
       private: int minimumHeight;
 
       /// \brief A map of joint id to parent-child link pair.
-      private: std::map<std::string, std::pair<std::string, std::string> >
+      private: std::map<std::string, std::pair<std::string, std::string>>
           edges;
 
-      /// \brief A list of gazebo event connects.
+      /// \brief A list of gazebo event connections.
       private: std::vector<event::ConnectionPtr> connections;
     };
   }
