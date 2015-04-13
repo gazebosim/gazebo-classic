@@ -5,12 +5,14 @@ include_directories(
   ${tinyxml_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
+  ${SDL2_INCLUDE_DIRS}
 )
 
 link_directories(
   ${CCD_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
+  ${SDL2_LIBRARY_DIRS}
 )
 
 if (HAVE_BULLET)
@@ -28,10 +30,10 @@ set (test_sources
 
 gz_build_tests(${test_sources})
 
-add_executable(gz gz.cc gz_topic.cc gz_log.cc)
+add_executable(gz gz.cc gz_topic.cc gz_log.cc gz_joy.cc)
 target_link_libraries(gz
  gazebo_msgs gazebo_common gazebo_transport gazebo_gui gazebo_physics
- gazebo_sensors ${QT_LIBRARIES} ${Boost_LIBRARIES} pthread)
+ gazebo_sensors ${QT_LIBRARIES} ${Boost_LIBRARIES} ${SDL2_LIBRARIES} pthread)
 gz_install_executable(gz)
 
 roffman(gz 1)

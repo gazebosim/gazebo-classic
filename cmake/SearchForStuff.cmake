@@ -86,6 +86,16 @@ if (MSVC)
 endif()
 
 if (PKG_CONFIG_FOUND)
+
+  ########################################
+  # Find SDL
+  pkg_check_modules(SDL2 sdl2)
+  if (NOT SDL2_FOUND)
+    message(STATUS "\n\n\nSDL2 not found\n\n\n\n")
+  else()
+    message (STATUS "\n\nSDL2_LIBRARIES=|${SDL2_LIBRARIES}|\n\n")
+  endif()
+
   pkg_check_modules(CURL libcurl)
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
