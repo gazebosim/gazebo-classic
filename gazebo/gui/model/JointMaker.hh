@@ -15,12 +15,12 @@
  *
 */
 
-#ifndef _JOINTMAKER_HH_
-#define _JOINTMAKER_HH_
+#ifndef _GAZEBO_JOINTMAKER_HH_
+#define _GAZEBO_JOINTMAKER_HH_
 
+#include <map>
 #include <string>
 #include <vector>
-#include <boost/unordered/unordered_map.hpp>
 
 #include <sdf/sdf.hh>
 
@@ -240,7 +240,7 @@ namespace gazebo
       /// \return joint data.
       private: JointData *CreateJointLine(const std::string &_name,
           rendering::VisualPtr _parent);
-          
+
       /// \brief Show a joint's context menu
       /// \param[in] _joint Name of joint the context menu is associated with.
       private: void ShowContextMenu(const std::string &_joint);
