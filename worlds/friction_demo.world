@@ -14,6 +14,7 @@
           <iters>50</iters>
           <precon_iters>0</precon_iters>
           <sor>1.300000</sor>
+          <friction_model>1</friction_model>
         </solver>
         <constraints>
           <cfm>0.000000</cfm>

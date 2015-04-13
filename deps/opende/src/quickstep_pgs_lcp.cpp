@@ -487,7 +487,7 @@ static void ComputeRows(
         if (constraint_index >= 0) {
             if(friction_model == cone_friction) {
                 dxConeFrictionModel(hi_act, lo_act, hi_act_erp, lo_act_erp, jb, J_orig,
-                        index, constraint_index, startRow, nRows, nb, body, i, order, findex, lo, hi, lambda, lambda_erp);
+                        index, constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
             }
             else if(friction_model == pyramid_friction) {
                 // FOR erp throttled by info.c_v_max or info.c
@@ -504,7 +504,7 @@ static void ComputeRows(
                 lo_act_erp = -hi_act_erp;
             }
             else
-                printf("Undefined friction model\n");
+                dMessage (d_ERR_UASSERT, "internal error, undefined friction model");
         } else {
           // FOR erp throttled by info.c_v_max or info.c
           hi_act = hi[index];
@@ -1153,7 +1153,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   delete mutex;
 }
 
-void quickstep::dxConeFrictionModel(dReal& hi_act, dReal& lo_act, dReal& hi_act_erp, dReal& lo_act_erp, int *jb, const dRealMutablePtr J_orig, int index, int constraint_index, int startRow, int nRows, const int nb, dxBody * const *body, int i, const IndexError *order, const int *findex, dRealPtr lo, dRealPtr hi, dRealMutablePtr lambda, dRealMutablePtr lambda_erp)
+void quickstep::dxConeFrictionModel(dReal& hi_act, dReal& lo_act, dReal& hi_act_erp, dReal& lo_act_erp, int *jb, const dRealMutablePtr J_orig, int index, int constraint_index, int startRow, int nRows, const int nb, dxBody * const *body, int i, const IndexError *order, const int *findex, dRealPtr /*lo*/, dRealPtr hi, dRealMutablePtr lambda, dRealMutablePtr lambda_erp)
 {
 // This computes the corresponding hi_act and lo_act for friction constraints.
 // For each contact, we have lambda_n, lambda_f1, and lambda_f2.

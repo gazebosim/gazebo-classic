@@ -277,6 +277,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(this->GetSORPGSW());
+    physicsMsg.set_friction_model(this->GetFrictionModel());
     physicsMsg.set_cfm(this->GetWorldCFM());
     physicsMsg.set_erp(this->GetWorldERP());
     physicsMsg.set_contact_max_correcting_vel(
@@ -316,6 +317,9 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   if (_msg->has_sor())
     this->SetSORPGSW(_msg->sor());
+
+  if (_msg->has_friction_model())
+    this->SetFrictionModel(_msg->friction_model());
 
   if (_msg->has_cfm())
     this->SetWorldCFM(_msg->cfm());
@@ -582,6 +586,15 @@ void ODEPhysics::SetSORPGSW(double _w)
 }
 
 //////////////////////////////////////////////////
+void ODEPhysics::SetFrictionModel(unsigned int _fricModel)
+{
+  this->sdf->GetElement("ode")->GetElement(
+      "solver")->GetElement("friction_model")->Set(_fricModel);
+
+  dWorldSetQuickStepFrictionModel(this->dataPtr->worldId, _fricModel);
+}
+
+//////////////////////////////////////////////////
 void ODEPhysics::SetWorldCFM(double _cfm)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode");
@@ -642,6 +655,13 @@ double ODEPhysics::GetSORPGSW()
 {
   return this->sdf->GetElement("ode")->GetElement(
       "solver")->Get<double>("sor");
+}
+
+//////////////////////////////////////////////////
+int ODEPhysics::GetFrictionModel()
+{
+  return this->sdf->GetElement("ode")->GetElement(
+      "solver")->Get<double>("friction_model");
 }
 
 //////////////////////////////////////////////////
@@ -1198,6 +1218,12 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
       odeElem->GetElement("solver")->GetElement("sor")->Set(value);
       dWorldSetQuickStepW(this->dataPtr->worldId, value);
     }
+    else if (_key == "friction_model")
+    {
+      int value = boost::any_cast<int>(_value);
+      odeElem->GetElement("solver")->GetElement("friction_model")->Set(value);
+      dWorldSetQuickStepFrictionModel(this->dataPtr->worldId, value);
+    }
     else if (_key == "contact_max_correcting_vel")
     {
       double value = boost::any_cast<double>(_value);
@@ -1266,11 +1292,6 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
       dWorldSetQuickStepExtraFrictionIterations(this->dataPtr->worldId,
         boost::any_cast<int>(_value));
     }
-    else if (_key == "friction_model")
-    {
-      dWorldSetQuickStepFrictionModel(this->dataPtr->worldId,
-        boost::any_cast<int>(_value));
-    }
     else
     {
       return PhysicsEngine::SetParam(_key, _value);
@@ -1315,6 +1336,8 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = odeElem->GetElement("solver")->Get<int>("iters");
   else if (_key == "sor")
     _value = odeElem->GetElement("solver")->Get<double>("sor");
+  else if (_key == "friction_model")
+    _value = odeElem->GetElement("solver")->Get<int>("friction_model");
   else if (_key == "contact_max_correcting_vel")
     _value = odeElem->GetElement("constraints")->Get<double>(
         "contact_max_correcting_vel");

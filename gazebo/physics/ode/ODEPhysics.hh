@@ -64,6 +64,9 @@ namespace gazebo
         /// \brief SOR over-relaxation parameter
         SOR,
 
+        /// \brief friction model
+        FRICTION_MODEL,
+
         /// \brief Max correcting velocity
         CONTACT_MAX_CORRECTING_VEL,
 
@@ -147,6 +150,9 @@ namespace gazebo
       public: virtual void SetSORPGSW(double w);
 
       // Documentation inherited
+      public: virtual void SetFrictionModel(unsigned int fricModel);
+
+      // Documentation inherited
       public: virtual void SetContactMaxCorrectingVel(double vel);
 
       // Documentation inherited
@@ -169,6 +175,9 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual double GetSORPGSW();
+
+      // Documentation inherited
+      public: virtual int GetFrictionModel();
 
       // Documentation inherited
       public: virtual double GetContactMaxCorrectingVel();
