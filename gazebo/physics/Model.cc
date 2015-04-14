@@ -57,7 +57,6 @@ Model::Model(BasePtr _parent)
 //////////////////////////////////////////////////
 Model::~Model()
 {
-  this->plugins.clear();
 }
 
 //////////////////////////////////////////////////
@@ -329,6 +328,7 @@ void Model::Fini()
 {
   Entity::Fini();
 
+  this->plugins.clear();
   this->attachedModels.clear();
   this->joints.clear();
   this->links.clear();
