@@ -119,6 +119,7 @@ endif ()
 #endif()
 
 set (qt_tests
+  ApplyWrenchDialog_TEST.cc
   DataLogger_TEST.cc
   GuiIface_TEST.cc
   ModelAlign_TEST.cc

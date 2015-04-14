@@ -424,9 +424,9 @@ void ApplyWrenchDialog::Init(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::Fini()
 {
-  this->close();
   this->dataPtr->connections.clear();
-  this->dataPtr->mainWindow->removeEventFilter(this);
+  if (this->dataPtr->mainWindow)
+    this->dataPtr->mainWindow->removeEventFilter(this);
 
   if (this->dataPtr->applyWrenchVisual)
   {
@@ -565,7 +565,8 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   this->SetPublisher();
 
   // Filter main window activate events
-  this->dataPtr->mainWindow->installEventFilter(this);
+  if (this->dataPtr->mainWindow)
+    this->dataPtr->mainWindow->installEventFilter(this);
 
   // MouseRelease even when it's inactive, to regain focus
   if (this->dataPtr->applyWrenchVisual)
