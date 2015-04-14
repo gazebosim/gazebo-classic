@@ -54,5 +54,10 @@
     <include>
       <uri>model://pr2</uri>
     </include>
+    <include>
+      <pose>2 0 0  0 0 0</pose>
+      <name>pr2_copy</name>
+      <uri>model://pr2</uri>
+    </include>
   </world>
 </sdf>
