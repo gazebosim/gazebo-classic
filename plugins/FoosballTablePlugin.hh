@@ -58,7 +58,7 @@ namespace gazebo
     public: FoosballPlayer(const std::string &_hydraTopic);
 
     /// \brief Load a <player> section of the plugin SDF.
-    /// \param [in] _model Pointer to the world.
+    /// \param [in] _model Pointer to the model.
     /// \param [in] _sdf Pointer to the <player> section of the plugin SDF.
     /// \return true on success or false otherwise.
     public: bool Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
@@ -81,7 +81,7 @@ namespace gazebo
     /// \param[in] _side "left_controller" or "right_controller".
     private: void SwitchRod(const std::string &_side);
 
-    /// \brief Pointer to the world;
+    /// \brief Pointer to the model;
     private: physics::ModelPtr model;
 
     /// \brief Pointer to the update event connection.
