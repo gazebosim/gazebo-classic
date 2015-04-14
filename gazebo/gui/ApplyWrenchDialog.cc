@@ -58,6 +58,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   QHBoxLayout *linkLayout = new QHBoxLayout();
   QLabel *linkLabel = new QLabel(tr("<b>Apply to link:<b> "));
   this->dataPtr->linksComboBox = new QComboBox();
+  this->dataPtr->linksComboBox->installEventFilter(this);
   this->dataPtr->linksComboBox->setMinimumWidth(200);
   connect(this->dataPtr->linksComboBox, SIGNAL(currentIndexChanged(QString)),
       this, SLOT(SetLink(QString)));
@@ -973,14 +974,18 @@ bool ApplyWrenchDialog::eventFilter(QObject *_object, QEvent *_event)
         _object == this->dataPtr->forceZSpin ||
         _object == this->dataPtr->forcePosXSpin ||
         _object == this->dataPtr->forcePosYSpin ||
-        _object == this->dataPtr->forcePosZSpin)
+        _object == this->dataPtr->forcePosZSpin ||
+       (_object == this->dataPtr->linksComboBox &&
+        this->dataPtr->mode != "torque"))
     {
       this->SetForce(this->dataPtr->forceVector);
     }
     else if (_object == this->dataPtr->torqueMagSpin ||
              _object == this->dataPtr->torqueXSpin ||
              _object == this->dataPtr->torqueYSpin ||
-             _object == this->dataPtr->torqueZSpin)
+             _object == this->dataPtr->torqueZSpin ||
+            (_object == this->dataPtr->linksComboBox &&
+             this->dataPtr->mode == "torque"))
     {
       this->SetTorque(this->dataPtr->torqueVector);
     }
