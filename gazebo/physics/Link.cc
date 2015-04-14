@@ -103,6 +103,7 @@ Link::~Link()
 
   this->requestPub.reset();
   this->dataPub.reset();
+  this->wrenchSub.reset();
   this->connections.clear();
 
   delete this->publishDataMutex;
@@ -114,8 +115,6 @@ Link::~Link()
 //////////////////////////////////////////////////
 void Link::Load(sdf::ElementPtr _sdf)
 {
-  bool needUpdate = false;
-
   Entity::Load(_sdf);
 
   // before loading child collision, we have to figure out if selfCollide is
@@ -207,21 +206,21 @@ void Link::Load(sdf::ElementPtr _sdf)
       this->audioContactsSub = this->node->Subscribe(topic,
           &Link::OnCollision, this);
     }
-
-    needUpdate = true;
   }
 
   if (_sdf->HasElement("audio_sink"))
   {
-    needUpdate = true;
     this->audioSink = util::OpenAL::Instance()->CreateSink(
         _sdf->GetElement("audio_sink"));
   }
 #endif
 
-  if (needUpdate)
-    this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&Link::Update, this, _1)));
+  this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&Link::Update, this, _1)));
+
+  std::string topicName = "~/" + this->GetScopedName() + "/wrench";
+  boost::replace_all(topicName, "::", "/");
+  this->wrenchSub = this->node->Subscribe(topicName, &Link::OnWrenchMsg, this);
 }
 
 //////////////////////////////////////////////////
@@ -462,6 +461,21 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
      this->enabled = this->GetEnabled();
      this->enabledSignal(this->enabled);
    }*/
+
+  if (!this->wrenchMsgs.empty())
+  {
+    std::vector<msgs::Wrench> messages;
+    {
+      boost::mutex::scoped_lock lock(this->wrenchMsgMutex);
+      messages = this->wrenchMsgs;
+      this->wrenchMsgs.clear();
+    }
+
+    for (auto it : messages)
+    {
+      this->ProcessWrenchMsg(it);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1371,4 +1385,27 @@ msgs::Visual Link::GetVisualMessage(const std::string &_name) const
     result = iter->second;
 
   return result;
+}
+
+//////////////////////////////////////////////////
+void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(this->wrenchMsgMutex);
+  this->wrenchMsgs.push_back(*_msg);
+}
+
+//////////////////////////////////////////////////
+void Link::ProcessWrenchMsg(const msgs::Wrench &_msg)
+{
+  math::Vector3 pos = math::Vector3::Zero;
+  if (_msg.has_force_offset())
+  {
+    pos = msgs::Convert(_msg.force_offset());
+  }
+
+  const math::Vector3 force = msgs::Convert(_msg.force());
+  this->AddLinkForce(force, pos);
+
+  const math::Vector3 torque = msgs::Convert(_msg.torque());
+  this->AddRelativeTorque(torque);
 }
