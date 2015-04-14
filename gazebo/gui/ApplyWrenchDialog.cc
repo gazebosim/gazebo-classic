@@ -170,7 +170,6 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   connect(this->dataPtr->comRadio, SIGNAL(toggled(bool)), this,
       SLOT(ToggleComRadio(bool)));
 
-
   // Force Position layout
   QGridLayout *forcePosLayout = new QGridLayout();
   forcePosLayout->setContentsMargins(0, 0, 0, 0);
@@ -502,6 +501,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
       }
     }
   }
+
   // Sort alphabetically
   QSortFilterProxyModel *proxy = new QSortFilterProxyModel(
       this->dataPtr->linksComboBox);

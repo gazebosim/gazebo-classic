@@ -254,7 +254,7 @@ void ModelRightMenu::OnApplyWrench()
 
   if (!vis)
   {
-    gzerr << "Can't find entity " << this->entityName  << std::endl;
+    gzerr << "Can't find entity " << this->entityName << std::endl;
     return;
   }
 
