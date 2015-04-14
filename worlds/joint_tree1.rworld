@@ -2,7 +2,8 @@
 <%
   # Joint tree model
   # Follow the demo here: 
-  # http://www.interactive-graphics.de/index.php/research/72-impulse-based-dynamic-simulation-in-linear-time-all
+  # http://www.interactive-graphics.de/index.php/research/
+  # /72-impulse-based-dynamic-simulation-in-linear-time-all
 
   # Inertial parameters
   # Aluminum 2700 kg/m^3
@@ -17,9 +18,9 @@
   layer_dist = 0.05 
   length0     = 0.5
   ratio = 0.6
-  layers = 1
+  layers = 2
 
-  # color = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple"]
+  #color = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple"]
   color = ["Red", "Green", "Blue"]
 %>
 <sdf version="1.5">
@@ -44,9 +45,6 @@ orientations = []
 
 positions << pose0
 orientations << orit0 
-print(positions)
-print(orientations)
-print("\n")
 
 # not strictly accurate, just approximate
 # TODO: need to debug and test
@@ -64,44 +62,39 @@ izz = ixx
 def nextLevel(parent_pose, parent_layer, parent_length, layer_dist)
    pos = []
    orit = []
-    if (parent_pose.length > 0)
-        print("inside nextLevel function\n")
-        print(parent_pose)
-        a = parent_pose.at(2) 
-        print("\n This is a: ")
-        print(a)
-        print("\n")
-        layer = parent_layer + 1
-        # hard-coded the position, but it does not matter because this is the 
-        # set up for valid starting scene 
-        if(layer%2==1) # x axis
-             # body 1 
-             p1 = [parent_pose[0]+parent_length/2.0, parent_pose[1], parent_pose[2]]
-             pos << [p1[0], p1[1], p1[2]-layer_dist]
-             orit << [0, 0, Math::PI/2.0]
-             # body 2
-             p2 = [parent_pose[0]-parent_length/2.0, parent_pose[1], parent_pose[2]]
-             pos << [p2[0], p2[1], p2[2]-layer_dist]
-             orit << [0, 0, Math::PI/2.0]
-        else          # y axis
-             # body 1 
-             p1 = [parent_pose[0], parent_pose[1] + parent_length/2.0, parent_pose[2]]
-             pos << [p1[0], p1[1], p1[2]-layer_dist]
-             orit << [0, 0, Math::PI]
-             # body 2
-             p2 = [parent_pose[0], parent_pose[1] - parent_length/2.0, parent_pose[2]]
-             pos << [p2[0], p2[1], p2[2]-layer_dist]
-             orit << [0, 0, Math::PI]
-        end
-    end
-    print("after function, pos \n")
-    print(pos)
-    print("\n orint \n")
-    print(orit)
-       return pos, orit
+=begin
+   have multiple line comments
+   layer = parent_layer + 1
+   # hard-coded the position, but it does not matter because this is the 
+   # set up for valid starting scene 
+   if(layer%2==1) # x axis
+     # body 1 
+     p1 = [parent_pose[0]+parent_length/2.0, parent_pose[1], parent_pose[2]]
+     pos << [p1[0], p1[1], p1[2]-layer_dist]
+     orit << [0, 0, Math::PI/2.0]
+     # body 2
+     p2 = [parent_pose[0]-parent_length/2.0, parent_pose[1], parent_pose[2]]
+     pos << [p2[0], p2[1], p2[2]-layer_dist]
+     orit << [0, 0, Math::PI/2.0]
+   else          # y axis
+     # body 1 
+     p1 = [parent_pose[0], parent_pose[1] + parent_length/2.0, parent_pose[2]]
+     pos << [p1[0], p1[1], p1[2]-layer_dist]
+     orit << [0, 0, Math::PI]
+     # body 2
+     p2 = [parent_pose[0], parent_pose[1] - parent_length/2.0, parent_pose[2]]
+     pos << [p2[0], p2[1], p2[2]-layer_dist]
+     orit << [0, 0, Math::PI/2.0]
+
+     orit << [0, 0, Math::PI]
+   end
+=end
+   return pos, orit
 end
 
 for layer in 1..layers
+  tmp_positions = []
+  tmp_orientations = []
   # there are 2**(level-1) parents, each parent has 2 kids 
   # the parent min_index and max_index
   # layer 0    body 1   parent_index [0, 0]
@@ -114,31 +107,18 @@ for layer in 1..layers
 
   parent_min_index = 2**(layer-1)-1
   parent_max_index = 2*(2**(layer-1)-1)
-   print("before calling nextLevel function layer is: \n")
-   print(layer)
-   print("\n before calling nextLevel function \n")
-   print(positions[parent_min_index])
-   print("\n orientations: ")
-   print(orientations[parent_min_index])
-   print("\n")
+  print(parent_min_index)
   for parent in parent_min_index..parent_max_index
       parent_pose = positions[parent]
+      parent_pose 
       parent_length = length0 * (ratio** (layer-1))
       # parent_layer = layer-1 
       pos, orit = nextLevel(parent_pose, layer-1, parent_length, layer_dist)
-      print("after call function, pos\n")
-      print(pos)
-      print("\n orit: \n")
-      print(orit)
-      positions << pos
-      orientations << orit
+      tmp_positions << pos
+      tmp_orientations << orit
   end
-      print("before end of for loop, pos\n")
-      print(positions)
-      print("\n orit: \n")
-      print(orientations)
-  
-
+  positions << tmp_positions 
+  orientations << tmp_orientations 
 end
 %>
 <% 
@@ -158,6 +138,7 @@ end
         body_min_index = 2**layer - 1
         body_max_index = 2*(2**layer -1)
         for body in body_min_index..body_max_index
+
         #pos_x = positions[body][0] - 0.0
         #pos_y = positions[body][1] - 0.0
         #pos_z = positions[body][2] - pos_z 
@@ -167,6 +148,9 @@ end
      %>
 
      <%= '<link name="body_' + body.to_s + '">' %>
+        <!--
+        <pose><%= pos_x%>, <%= pos_y%>, <%= pos_z%>, <%= orit_x%>, <%= orit_y%>, <%= orit_z%> </pose>  
+        -->
         <pose>-1 0 0 0 0 0 </pose>  
         <inertial>
           <mass><%= mass * (ratio**layer)%></mass>
