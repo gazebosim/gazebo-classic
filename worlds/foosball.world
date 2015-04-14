@@ -31,6 +31,13 @@
       <name>foosball_ball</name>
     </include>
 
+    <!-- Blue player view point using Oculus -->
+    <model name='camera'>
+      <static>true</static>
+      <pose>0 -1.2 3 0 0 1.57</pose>
+      <link name='link'></link>
+    </model>
+
     <!-- Load the plugin for Razer Hydra -->
     <plugin name="hydra" filename="libHydraPlugin.so"></plugin>
 
