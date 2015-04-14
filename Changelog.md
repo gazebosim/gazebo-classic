@@ -15,6 +15,9 @@
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
 
+1. Added a context menu for links
+    * [Pull request #1589](https://bitbucket.org/osrf/gazebo/pull-request/1589)
+
 1. Added support for Oculus DK2
     * [Pull request #1526](https://bitbucket.org/osrf/gazebo/pull-request/1526)
 

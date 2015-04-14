@@ -338,12 +338,14 @@ void ViewState::Callback()
 //
 //   if (this->skeletonAction->isChecked())
 //   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->entityName);
+//     this->requestMsg = msgs::CreateRequest("show_skeleton",
+//         this->entityName);
 //     this->requestMsg->set_dbl_data(1.0);
 //   }
 //   else
 //   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->entityName);
+//     this->requestMsg = msgs::CreateRequest("show_skeleton",
+//         this->entityName);
 //     this->requestMsg->set_dbl_data(0.0);
 //   }
 //
