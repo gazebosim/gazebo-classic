@@ -118,6 +118,16 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   // Time
   QLineEdit *currentTime = new QLineEdit();
   currentTime->setMaximumWidth(110);
+  currentTime->setAlignment(Qt::AlignRight);
+  currentTime->setStyleSheet("\
+      QLineEdit{\
+        background-color: #808080;\
+        color: #cfcfcf;\
+        font-size: 15px;\
+      }\
+      QLineEdit:focus{\
+        background-color: #707070;\
+      }");
   connect(this, SIGNAL(SetCurrentTime(const QString &)), currentTime,
       SLOT(setText(const QString &)));
 
@@ -210,8 +220,14 @@ void LogPlayWidget::OnJumpEnd()
 /////////////////////////////////////////////////
 void LogPlayWidget::EmitSetCurrentTime(QString _timeString, int _timeInt)
 {
+  std::string timeString = _timeString.toStdString();
+
+  // Remove zeroes if unnecessary
+  if (this->dataPtr->lessThan1h)
+    timeString = timeString.substr(6);
+
   // current time line edit
-  this->SetCurrentTime(_timeString);
+  this->SetCurrentTime(QString::fromStdString(timeString));
   // current time item in view
   this->SetCurrentTime(_timeInt);
 }
@@ -226,8 +242,19 @@ void LogPlayWidget::EmitSetStartTime(QString /*_timeString*/, int _timeInt)
 /////////////////////////////////////////////////
 void LogPlayWidget::EmitSetEndTime(QString _timeString, int _timeInt)
 {
+  std::string timeString = _timeString.toStdString();
+
+  // Remove zeroes if unnecessary
+  if (timeString.find("00 00") != std::string::npos)
+  {
+    this->dataPtr->lessThan1h = true;
+    timeString = timeString.substr(6);
+  }
+
+  timeString = "/   " + timeString;
+
   // end time line edit
-  this->SetEndTime(_timeString);
+  this->SetEndTime(QString::fromStdString(timeString));
   // start time in view
   this->SetEndTime(_timeInt);
 }
@@ -257,7 +284,7 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
       this->dataPtr->sceneHeight/2,
       this->dataPtr->sceneWidth - this->dataPtr->margin,
       this->dataPtr->sceneHeight/2);
-  line->setPen(QPen(Qt::black, 2));
+  line->setPen(QPen(QColor(50, 50, 50, 255), 2));
   graphicsScene->addItem(line);
 
   // Current time line
@@ -368,7 +395,7 @@ void LogPlayView::SetEndTime(int _msec)
         this->dataPtr->margin +
         (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
         this->dataPtr->sceneHeight/2);
-    tick->setPen(QPen(Qt::black, 2));
+    tick->setPen(QPen(QColor(50, 50, 50, 255), 2));
     this->scene()->addItem(tick);
 
     // Text
@@ -391,6 +418,7 @@ void LogPlayView::SetEndTime(int _msec)
 
     QGraphicsSimpleTextItem *tickText = new QGraphicsSimpleTextItem(
         QString::fromStdString(stream.str()));
+    tickText->setBrush(QBrush(QColor(50, 50, 50, 255)));
     tickText->setPos(
         this->dataPtr->margin +
         (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
@@ -420,13 +448,15 @@ void CurrentTimeItem::paint(QPainter *_painter,
 //  if (this->isSelected())
 
   int lineHeight = 50;
+  int lineWidth = 3;
 
   // Line
-  QLineF vLine(0, -lineHeight/2, 0, lineHeight/2);
+  QLineF vLine(-lineWidth/10.0, -lineHeight/2.0,
+               -lineWidth/10.0, +lineHeight/2.0);
 
   QPen linePen;
-  linePen.setColor(Qt::black);
-  linePen.setWidth(3);
+  linePen.setColor(QColor(50, 50, 50, 255));
+  linePen.setWidth(lineWidth);
 
   _painter->setPen(linePen);
   _painter->drawLine(vLine);
@@ -439,9 +469,9 @@ void CurrentTimeItem::paint(QPainter *_painter,
   QPolygonF triangle(trianglePts);
 
   QPen whitePen(Qt::white, 0);
-  QPen redPen(Qt::red, 0);
+  QPen orangePen(QColor(245, 129, 19, 255), 0);
   QBrush whiteBrush(Qt::white);
-  QBrush redBrush(Qt::red);
+  QBrush orangeBrush(QColor(245, 129, 19, 255));
 
   if (this->isSelected())
   {
@@ -450,8 +480,8 @@ void CurrentTimeItem::paint(QPainter *_painter,
   }
   else
   {
-    _painter->setPen(redPen);
-    _painter->setBrush(redBrush);
+    _painter->setPen(orangePen);
+    _painter->setBrush(orangeBrush);
   }
 
   _painter->drawPolygon(triangle);

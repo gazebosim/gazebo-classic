@@ -39,6 +39,9 @@ namespace gazebo
       /// \brief Paused state of the simulation.
       public: bool paused;
 
+      /// \brief Paused state of the simulation.
+      public: bool lessThan1h;
+
       /// TODO
       public: LogPlayView *view;
 
