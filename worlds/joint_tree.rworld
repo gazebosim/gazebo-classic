@@ -36,7 +36,7 @@
     </include>
 <%
 # top most layer
-pose0 = [0, 0, 0.52]
+pose0 = [0, 0, 0.53]
 orit0 = [Math::PI/2.0, 0, 0]
 # keep track of the positions of links
 positions = []
@@ -105,11 +105,94 @@ for layer in 1..layers
    end
 end
 %>
+
+    <model name="peg1">
+      <static>true</static>
+      <link name="link">
+        <pose> 0 0.6 0.3 0 0 0</pose>
+        <self_collide>0</self_collide>
+        <visual name="vis_peg">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.03</radius>
+              <length>0.6</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Wood</name>
+           </script>
+          </material>
+        </visual>
+        <collision name="col_peg">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.03</radius>
+              <length>0.6</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <max_vel>0.1</max_vel>
+                <kp>1e8</kp>
+                <kd>1</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+      </link>
+    </model>
+
+    <model name="peg2">
+      <static>true</static>
+      <link name="link">
+        <pose>0 0.3 0.6 <%= Math::PI/2.0 %> 0 0</pose>
+        <self_collide>0</self_collide>
+        <visual name="vis_peg2">
+          <pose>0.0 0.0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.03</radius>
+              <length>0.6</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Wood</name>
+           </script>
+          </material>
+        </visual>
+        <collision name="col_peg2">
+          <pose>0.0 0.0 0.0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.03</radius>
+              <length>0.6</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <max_vel>0.1</max_vel>
+                <kp>1e8</kp>
+                <kd>1</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+      </link>
+    </model>
 <% 
   for layer in 0..layers
 %>
 <%= '<model name="barlayer_' + layer.to_s + '">' %>
-    <static>true</static>
      <% 
         #layer     body    number of body 
         #  0        0:0        1
@@ -229,6 +312,63 @@ end
           </material>
         </visual>
       </link>
+
+      <%= '<joint name="vertChild_' + body.to_s + '" type="ball">' %>
+          <pose><%= pos_x %> <%= pos_y %> <%= pos_z %> </pose>  
+          <parent><%='linkvert_' + body.to_s%></parent>
+          <child><%='link_' + body.to_s %></child>
+          <thread_pitch>-0.1</thread_pitch>
+          <axis>
+            <xyz>0 0 1</xyz>
+            <limit>
+              <upper>1.7</upper>
+              <lower>-1.7</lower>
+              <stiffness>1e6</stiffness>
+              <dissipation>1.0</dissipation>
+            </limit>
+            <dynamics>
+              <damping>0.1</damping>
+           </dynamics>
+          </axis>
+          <physics>
+            <ode>
+                <cfm_damping>1</cfm_damping>
+           </ode>
+         </physics>
+       </joint>
+      <%
+        if(layer == 0) 
+      %>
+        <%= '<joint name="vertParent_' + body.to_s + '" type="revolute">' %>
+          <pose><%= pos_x %> <%= pos_y %> <%= pos_z + layer_dist%> </pose>  
+          <parent>peg2</parent>
+          <child><%='linkvert_' + body.to_s %></child>
+          <axis>
+            <xyz>0 0 1</xyz>
+            <limit>
+              <upper>0</upper>
+              <lower>0</lower>
+            </limit>
+          </axis>
+        </joint>
+      <%
+       else
+      %>
+        <%= '<joint name="vertParent_' + body.to_s + '" type="revolute">' %>
+          <pose><%= pos_x %> <%= pos_y %> <%= pos_z + layer_dist%> </pose>  
+          <parent><%='link_' + ((body-1)/2).to_s %></parent>
+          <child><%='linkvert_' + body.to_s %></child>
+          <axis>
+            <xyz>1 0 0</xyz>
+            <limit>
+              <upper>0</upper>
+              <lower>0</lower>
+            </limit>
+          </axis>
+        </joint>
+      <%
+        end
+      %>
     <%
      end
     %>
@@ -236,87 +376,6 @@ end
 <%
  end
 %>
-    <model name="peg1">
-      <static>true</static>
-      <link name="link">
-        <pose> 0 0.6 0.3 0 0 0</pose>
-        <self_collide>0</self_collide>
-        <visual name="vis_peg">
-          <pose>0 0 0 0 0 0</pose>
-          <geometry>
-            <cylinder>
-              <radius>0.03</radius>
-              <length>0.6</length>
-            </cylinder>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Wood</name>
-           </script>
-          </material>
-        </visual>
-        <collision name="col_peg">
-          <pose>0 0 0 0 0 0</pose>
-          <geometry>
-            <cylinder>
-              <radius>0.03</radius>
-              <length>0.6</length>
-            </cylinder>
-          </geometry>
-          <surface>
-            <contact>
-              <ode>
-                <min_depth>0.001</min_depth>
-                <max_vel>0.1</max_vel>
-                <kp>1e8</kp>
-                <kd>1</kd>
-              </ode>
-            </contact>
-          </surface>
-        </collision>
-      </link>
-    </model>
-    <model name="peg2">
-      <static>true</static>
-      <link name="link">
-        <pose>0 0.3 0.6 <%= Math::PI/2.0 %> 0 0</pose>
-        <self_collide>0</self_collide>
-        <visual name="vis_peg2">
-          <pose>0.0 0.0 0 0 0 0</pose>
-          <geometry>
-            <cylinder>
-              <radius>0.03</radius>
-              <length>0.6</length>
-            </cylinder>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Wood</name>
-           </script>
-          </material>
-        </visual>
-        <collision name="col_peg2">
-          <pose>0.0 0.0 0.0 0 0 0</pose>
-          <geometry>
-            <cylinder>
-              <radius>0.03</radius>
-              <length>0.6</length>
-            </cylinder>
-          </geometry>
-          <surface>
-            <contact>
-              <ode>
-                <min_depth>0.001</min_depth>
-                <max_vel>0.1</max_vel>
-                <kp>1e8</kp>
-                <kd>1</kd>
-              </ode>
-            </contact>
-          </surface>
-        </collision>
-      </link>
-    </model>
+
   </world>
 </sdf>
