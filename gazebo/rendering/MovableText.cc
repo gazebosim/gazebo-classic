@@ -96,7 +96,9 @@ void MovableText::Load(const std::string &name_,
 
   this->SetFontName(this->fontName);
 
+  std::cout << "TEXT2" << std::endl;
   this->_setupGeometry();
+  std::cout << "TEXT3" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -134,7 +136,16 @@ void MovableText::SetFontName(const std::string &newFontName)
                             "MovableText::setFontName");
     }
 
-    this->font->load();
+    try
+    {
+      this->font->load();
+    }
+    catch(Ogre::Exception &e)
+    {
+      gzerr << "Ogre Error:" << e.getFullDescription() << std::endl;
+      gzerr << "Unable to set font name." << std::endl;;
+      return;
+    }
 
     if (!this->material.isNull())
     {

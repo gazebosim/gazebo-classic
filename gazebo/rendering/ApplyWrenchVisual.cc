@@ -48,7 +48,8 @@ void ApplyWrenchVisual::Fini()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  dPtr->torqueVisual->DeleteDynamicLine(dPtr->torqueLine);
+  if (dPtr->torqueVisual && dPtr->torqueLine)
+    dPtr->torqueVisual->DeleteDynamicLine(dPtr->torqueLine);
 
   if (!dPtr->scene)
   {
@@ -57,27 +58,48 @@ void ApplyWrenchVisual::Fini()
   }
 
   Ogre::SceneManager *manager = dPtr->scene->GetManager();
+  if (!manager)
+    return;
 
-  manager->destroyMovableObject(
-      manager->getEntity(this->GetName()+"__FORCE_SHAFT__"));
-  manager->destroySceneNode(
-      manager->getSceneNode(this->GetName()+"__FORCE_SHAFT_NODE__"));
-  manager->destroyMovableObject(
-      manager->getEntity(this->GetName()+"__FORCE_HEAD__"));
-  manager->destroySceneNode(
-      manager->getSceneNode(this->GetName()+"__FORCE_HEAD_NODE__"));
-  manager->destroyMovableObject(
-      manager->getEntity(this->GetName()+"__TORQUE_TUBE__"));
-  manager->destroySceneNode(
-      manager->getSceneNode(this->GetName()+"__TORQUE_TUBE_NODE__"));
-  manager->destroyMovableObject(
-      manager->getEntity(this->GetName()+"__TORQUE_HEAD__"));
-  manager->destroySceneNode(
-      manager->getSceneNode(this->GetName()+"__TORQUE_HEAD_NODE__"));
-  manager->destroySceneNode(
-      manager->getSceneNode(this->GetName()+"__FORCE_TEXT_NODE__"));
-  manager->destroySceneNode(
-      manager->getSceneNode(this->GetName()+"__TORQUE_TEXT_NODE__"));
+  std::string name = this->GetName()+"__FORCE_SHAFT__";
+  if (manager->hasEntity(name))
+    manager->destroyMovableObject(manager->getEntity(name));
+
+  name = this->GetName()+"__FORCE_SHAFT_NODE__";
+  if (manager->hasSceneNode(name))
+    manager->destroySceneNode(manager->getSceneNode(name));
+
+  name = this->GetName()+"__FORCE_HEAD__";
+  if (manager->hasEntity(name))
+    manager->destroyMovableObject(manager->getEntity(name));
+
+  name = this->GetName()+"__FORCE_HEAD_NODE__";
+  if (manager->hasSceneNode(name))
+    manager->destroySceneNode(manager->getSceneNode(name));
+
+  name = this->GetName()+"__TORQUE_TUBE__";
+  if (manager->hasEntity(name))
+    manager->destroyMovableObject(manager->getEntity(name));
+
+  name = this->GetName()+"__TORQUE_TUBE_NODE__";
+  if (manager->hasSceneNode(name))
+    manager->destroySceneNode(manager->getSceneNode(name));
+
+  name = this->GetName()+"__TORQUE_HEAD__";
+  if (manager->hasEntity(name))
+    manager->destroyMovableObject(manager->getEntity(name));
+
+  name = this->GetName()+"__TORQUE_HEAD_NODE__";
+  if (manager->hasSceneNode(name))
+    manager->destroySceneNode(manager->getSceneNode(name));
+
+  name = this->GetName()+"__FORCE_TEXT_NODE__";
+  if (manager->hasSceneNode(name))
+    manager->destroySceneNode(manager->getSceneNode(name));
+
+  name = this->GetName()+"__TORQUE_TEXT_NODE__";
+  if (manager->hasSceneNode(name))
+    manager->destroySceneNode(manager->getSceneNode(name));
 }
 
 ///////////////////////////////////////////////////
@@ -132,8 +154,10 @@ void ApplyWrenchVisual::Load()
   rendering::Material::GetMaterialAsColor(dPtr->selectedMaterial,
       matAmbient, matDiffuse, matSpecular, matEmissive);
   dPtr->forceText = new MovableText();
+std::cout << "Load1.4.2" << std::endl;
   dPtr->forceText->Load(this->GetName()+"__FORCE_TEXT__",
       "0N", "Arial", 0.03, matAmbient);
+std::cout << "Load1.4.3" << std::endl;
   dPtr->forceText->SetShowOnTop(true);
 
   dPtr->forceText->MovableObject::getUserObjectBindings().setUserAny(
