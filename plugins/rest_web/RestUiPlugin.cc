@@ -104,7 +104,7 @@ void RestUiPlugin::OnMainWindowReady()
                             this->defaultUrl.c_str());
 
   QObject::connect(loginAct, SIGNAL(triggered()),
-                   this->widget, SLOT(this->Login()));
+                   this->widget, SLOT(Login()));
   menu->addAction(loginAct);
   mainWindow->AddMenu(menu);
 }

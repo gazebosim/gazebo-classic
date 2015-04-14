@@ -197,8 +197,10 @@ void RestApi::PostJsonData(const char *_route, const char *_json)
   Post post;
   post.route = _route;
   post.json = _json;
-
-  this->posts.push_back(post);
+  {
+    boost::mutex::scoped_lock lock(this->postsMutex);
+    this->posts.push_back(post);
+  }
   SendUnpostedPosts();
 }
 
@@ -242,12 +244,16 @@ void RestApi::SendUnpostedPosts()
   {
     while (!this->posts.empty())
     {
-      Post post = this->posts.front();
+      Post post;
+      {
+        boost::mutex::scoped_lock lock(this->postsMutex);
+        post = this->posts.front();
+        this->posts.pop_front();
+      }
       //  You can generate a similar request on the cmd line like so:
       //  curl --verbose --connect-timeout 5 -X POST
       //    -H \"Content-Type: application/json \" -k --user"
       this->Request(post.route.c_str(), post.json.c_str());
-      this->posts.pop_front();
     }
   }
   else

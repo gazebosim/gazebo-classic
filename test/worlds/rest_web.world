@@ -9,6 +9,46 @@
       <uri>model://sun</uri>
     </include>
 
+
+    <!-- bowls around start region-->
+    <include>
+      <pose>-3 -3 0 0 0 0</pose>
+      <uri>model://bowl</uri>
+    </include>
+    <include>
+      <pose>3 3 0 0 0 0</pose>
+      <uri>model://bowl</uri>
+    </include>
+   <include>
+      <pose>-3 3 0 0 0 0</pose>
+      <uri>model://bowl</uri>
+    </include>
+    <include>
+      <pose>3 -3 0 0 0 0</pose>
+      <uri>model://bowl</uri>
+    </include>
+
+    <!-- bowls around end region -->
+    <include>
+      <pose>7 7 0 0 0 0</pose>
+      <uri>model://bowl</uri>
+    </include>
+    <include>
+      <pose>13 13 0 0 0 0</pose>
+      <uri>model://bowl</uri>
+    </include>
+   <include>
+      <pose>7 13 0 0 0 0</pose>
+      <uri>model://bowl</uri>
+    </include>
+    <include>
+      <pose>13 7 0 0 0 0</pose>
+      <uri>model://bowl</uri>
+    </include>
+
+
+
+
     <plugin name="SimEvents" filename="libSimEventsPlugin.so">
 
       <session></session>

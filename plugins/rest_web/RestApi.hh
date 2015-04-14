@@ -92,6 +92,9 @@ namespace gazebo
 
     /// \brief List of unposted posts. Posts await when isLoggedIn is false
     private: std::list<Post> posts;
+
+    /// \brief A mutex to ensure integrity of the post list
+    private: boost::mutex postsMutex;
   };
 }
 

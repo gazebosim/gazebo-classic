@@ -15,8 +15,15 @@
  *
 */
 
-#include <uuid/uuid.h>
+#ifdef _WIN32
+  #include <Rpc.h>
+  #pragma comment(lib, "Rpcrt4.lib")
+#else /* UNIX */
+  #include <uuid/uuid.h>
+#endif
+
 #include "RestWebPlugin.hh"
+
 
 using namespace gazebo;
 using namespace std;
@@ -28,11 +35,29 @@ RestWebPlugin::RestWebPlugin()
   requestQThread(NULL)
 {
   // generate a unique session ID
+#ifdef _WIN32
+  UUID uuid;
+  C_STATUS Result = ::UuidCreate(uuid);
+  if (Result != RPC_S_OK)
+  {
+    std::cerr << "Call to UuidCreate return a non success RPC call. " <<
+                 "Return code: " << Result << std::endl;
+  }
+  char* szUuid = NULL;
+  if (::UuidToStringA(&this->data, reinterpret_cast<RPC_CSTR*>(&szUuid)) ==
+    RPC_S_OK)
+  {
+    this->session = szUuid;
+    ::RpcStringFreeA(reinterpret_cast<RPC_CSTR*>(&szUuid));
+  }
+#else /* UNIX */
   uuid_t uuid;
   uuid_generate_random(uuid);
   char s[37];
   uuid_unparse(uuid, s);
   this->session = s;
+#endif
+
   gzmsg << "REST web Session : " << this->session << endl;
 }
 
