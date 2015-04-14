@@ -142,10 +142,17 @@ ModelRightMenu::~ModelRightMenu()
 }
 
 /////////////////////////////////////////////////
-void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
+void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     EntityTypes _type)
 {
-  this->modelName = _modelName.substr(0, _modelName.find("::"));
+  if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
+  {
+    this->entityName = _entityName.substr(0, _entityName.find("::"));
+  }
+  else if (_type == EntityTypes::LINK)
+  {
+    this->entityName = _entityName;
+  }
 
   QMenu menu;
 
@@ -157,7 +164,7 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
     // disable editing planes for now
     rendering::UserCameraPtr cam = gui::get_active_camera();
     rendering::ScenePtr scene = cam->GetScene();
-    rendering::VisualPtr vis = scene->GetVisual(this->modelName);
+    rendering::VisualPtr vis = scene->GetVisual(this->entityName);
     if (vis && !vis->IsPlane())
     {
       menu.addSeparator();
@@ -175,7 +182,7 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
       viewMenu->addAction((*iter)->action);
 
       std::map<std::string, bool>::iterator modelIter =
-        (*iter)->modelStates.find(this->modelName);
+        (*iter)->modelStates.find(this->entityName);
 
       if (modelIter == (*iter)->modelStates.end())
         (*iter)->action->setChecked((*iter)->globalEnable);
@@ -184,15 +191,18 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
     }
   }
 
-  if (g_copyAct && g_pasteAct)
+  if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
   {
-    menu.addSeparator();
-    menu.addAction(g_copyAct);
-    menu.addAction(g_pasteAct);
-  }
+    if (g_copyAct && g_pasteAct)
+    {
+      menu.addSeparator();
+      menu.addAction(g_copyAct);
+      menu.addAction(g_pasteAct);
+    }
 
-  menu.addSeparator();
-  menu.addAction(g_deleteAct);
+    menu.addSeparator();
+    menu.addAction(g_deleteAct);
+  }
 
   // \todo Reimplement these features.
   // menu.addAction(this->skeletonAction);
@@ -204,22 +214,22 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
 void ModelRightMenu::OnMoveTo()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->MoveToVisual(this->modelName);
+  cam->MoveToVisual(this->entityName);
 }
 
 /////////////////////////////////////////////////
 void ModelRightMenu::OnFollow()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->TrackVisual(this->modelName);
-  gui::Events::follow(this->modelName);
+  cam->TrackVisual(this->entityName);
+  gui::Events::follow(this->entityName);
 }
 
 /////////////////////////////////////////////////
 void ModelRightMenu::OnEdit()
 {
   g_editModelAct->trigger();
-  gui::Events::editModel(this->modelName);
+  gui::Events::editModel(this->entityName);
 }
 
 /////////////////////////////////////////////////
@@ -232,7 +242,7 @@ void ModelRightMenu::OnEdit()
 //   if (!cam->GetScene())
 //     gzerr << "Invalid user camera scene\n";
 //
-//   // cam->GetScene()->SnapVisualToNearestBelow(this->modelName);
+//   // cam->GetScene()->SnapVisualToNearestBelow(this->entityName);
 // }
 
 /////////////////////////////////////////////////
@@ -240,7 +250,7 @@ void ModelRightMenu::OnDelete(const std::string &_name)
 {
   std::string name = _name;
   if (name.empty())
-    name = this->modelName;
+    name = this->entityName;
 
   // Delete the entity
   if (!name.empty())
@@ -303,19 +313,19 @@ ViewState::ViewState(ModelRightMenu *_parent,
 void ViewState::Callback()
 {
   // Store the check state for the model
-  this->modelStates[this->parent->modelName] = this->action->isChecked();
+  this->modelStates[this->parent->entityName] = this->action->isChecked();
 
   // Send a message with the new check state. The Scene listens to these
   // messages and updates the visualizations accordingly.
   if (this->action->isChecked())
   {
     transport::requestNoReply(this->parent->node, this->checkRequest,
-                              this->parent->modelName);
+                              this->parent->entityName);
   }
   else
   {
     transport::requestNoReply(this->parent->node, this->uncheckRequest,
-                              this->parent->modelName);
+                              this->parent->entityName);
   }
 }
 
@@ -323,17 +333,17 @@ void ViewState::Callback()
 /////////////////////////////////////////////////
 // void ModelRightMenu::OnSkeleton()
 // {
-//   this->skeletonActionState[this->modelName] =
+//   this->skeletonActionState[this->entityName] =
 //     this->skeletonAction->isChecked();
 //
 //   if (this->skeletonAction->isChecked())
 //   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->modelName);
+//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->entityName);
 //     this->requestMsg->set_dbl_data(1.0);
 //   }
 //   else
 //   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->modelName);
+//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->entityName);
 //     this->requestMsg->set_dbl_data(0.0);
 //   }
 //
