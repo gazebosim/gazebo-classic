@@ -142,7 +142,6 @@ void Model::LoadModels()
           boost::static_pointer_cast<Model>(shared_from_this()));
       model->SetWorld(this->GetWorld());
       model->Load(modelElem);
-      // std::cerr << " modelElem " << modelElem->ToString("") << std::endl;
       this->models.push_back(model);
       modelElem = modelElem->GetNextElement("model");
     }
@@ -915,8 +914,6 @@ void Model::FillMsg(msgs::Model &_msg)
   {
     model->FillMsg(*_msg.add_model());
   }
-
-//  std::cerr << " model fill msg " << _msg.DebugString() << std::endl;
 }
 
 //////////////////////////////////////////////////
