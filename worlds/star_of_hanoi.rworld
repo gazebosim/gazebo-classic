@@ -7,7 +7,7 @@
   # Aluminum 2700 kg/m^3
   density = 2700.0
 
-  # Constant parameters for each star 
+  # Constant parameters for each star
   radius_outer0 = 0.06
   star_ratio = 0.55
   height = 0.02
@@ -20,7 +20,7 @@
   points_hole = 10
   height_hole = 0.025
   color = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple"]
-  
+
 %>
 <sdf version="1.5">
   <world name="default">
@@ -42,7 +42,7 @@
     # offset between each star
     angle0 = (j+1)*Math::PI/12.0;
 
-    # approximate the inertia for star 
+    # approximate the inertia for star
     volume = Math::PI * (radius_outer**2 - radius_inner**2) * height
     mass = density * volume
     ixx = 1.0 / 12 * mass * (3*(radius_inner**2 + radius_outer**2) + height**2)
@@ -66,14 +66,14 @@
         polyline << [outer_radius*Math.cos(outer_angle), outer_radius*Math.sin(outer_angle)]
       end
       polyline << [inner_radius*Math.cos(angle0), inner_radius*Math.sin(angle0)]
-      
+
       points_s = ""
-      polyline.each do |p| 
+      polyline.each do |p|
         points_s += "<point>" \
                  + p[0].to_s + " " + p[1].to_s \
                  + "</point>\n"
       end
-      points_s 
+      points_s
     end
 
     def hole_points_s(hole_radius, hole_points=10)
@@ -82,14 +82,14 @@
         angle = 2*Math::PI * i / hole_points.to_f;
         polyline << [hole_radius*Math.cos(angle), hole_radius*Math.sin(angle)]
       end
-      
+
       points_s = ""
-      polyline.each do |p| 
+      polyline.each do |p|
         points_s += "<point>" \
                  + p[0].to_s + " " + p[1].to_s \
                  + "</point>\n"
       end
-      points_s 
+      points_s
     end
 
     geometry_s = "<geometry>\n"  \
@@ -154,7 +154,7 @@
       </link>
 
       <link name="lower_gap">
-          <pose>0 0 <%= -height_hole/2.0 %> </pose>
+          <pose>0 0 <%= -height_hole/2.0 %> 0 0 0</pose>
         <inertial>
           <mass><%= mass_low %></mass>
           <inertia>
@@ -190,7 +190,7 @@
         </visual>
       </link>
       <joint name="hanoi_joint" type="revolute">
-          <pose> 0 0 0 </pose>
+          <pose> 0 0 0 0 0 0 </pose>
           <child>lower_gap</child>
           <parent>upper_disk</parent>
           <axis>

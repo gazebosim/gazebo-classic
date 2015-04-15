@@ -107,7 +107,7 @@
       </link>
 
       <link name="lower_gap">
-          <pose>0 0 -0.0125 </pose>
+          <pose>0 0 -0.0125 0 0 0</pose>
         <inertial>
           <mass>2.0573612456747297</mass>
           <inertia>
@@ -219,7 +219,7 @@
         </visual>
       </link>
       <joint name="hanoi_joint" type="revolute">
-          <pose> 0 0 0 </pose>
+          <pose> 0 0 0 0 0 0 </pose>
           <child>lower_gap</child>
           <parent>upper_disk</parent>
           <axis>
@@ -330,7 +330,7 @@
       </link>
 
       <link name="lower_gap">
-          <pose>0 0 -0.0125 </pose>
+          <pose>0 0 -0.0125 0 0 0</pose>
         <inertial>
           <mass>1.4028049478820017</mass>
           <inertia>
@@ -442,7 +442,7 @@
         </visual>
       </link>
       <joint name="hanoi_joint" type="revolute">
-          <pose> 0 0 0 </pose>
+          <pose> 0 0 0 0 0 0 </pose>
           <child>lower_gap</child>
           <parent>upper_disk</parent>
           <axis>
@@ -553,7 +553,7 @@
       </link>
 
       <link name="lower_gap">
-          <pose>0 0 -0.0125 </pose>
+          <pose>0 0 -0.0125 0 0 0</pose>
         <inertial>
           <mass>0.948251963303719</mass>
           <inertia>
@@ -665,7 +665,7 @@
         </visual>
       </link>
       <joint name="hanoi_joint" type="revolute">
-          <pose> 0 0 0 </pose>
+          <pose> 0 0 0 0 0 0 </pose>
           <child>lower_gap</child>
           <parent>upper_disk</parent>
           <axis>
@@ -776,7 +776,7 @@
       </link>
 
       <link name="lower_gap">
-          <pose>0 0 -0.0125 </pose>
+          <pose>0 0 -0.0125 0 0 0</pose>
         <inertial>
           <mass>0.6325901684576891</mass>
           <inertia>
@@ -888,7 +888,7 @@
         </visual>
       </link>
       <joint name="hanoi_joint" type="revolute">
-          <pose> 0 0 0 </pose>
+          <pose> 0 0 0 0 0 0 </pose>
           <child>lower_gap</child>
           <parent>upper_disk</parent>
           <axis>
@@ -999,7 +999,7 @@
       </link>
 
       <link name="lower_gap">
-          <pose>0 0 -0.0125 </pose>
+          <pose>0 0 -0.0125 0 0 0</pose>
         <inertial>
           <mass>0.41338058870350153</mass>
           <inertia>
@@ -1111,7 +1111,7 @@
         </visual>
       </link>
       <joint name="hanoi_joint" type="revolute">
-          <pose> 0 0 0 </pose>
+          <pose> 0 0 0 0 0 0 </pose>
           <child>lower_gap</child>
           <parent>upper_disk</parent>
           <axis>
@@ -1222,7 +1222,7 @@
       </link>
 
       <link name="lower_gap">
-          <pose>0 0 -0.0125 </pose>
+          <pose>0 0 -0.0125 0 0 0</pose>
         <inertial>
           <mass>0.26115171387420477</mass>
           <inertia>
@@ -1334,7 +1334,7 @@
         </visual>
       </link>
       <joint name="hanoi_joint" type="revolute">
-          <pose> 0 0 0 </pose>
+          <pose> 0 0 0 0 0 0 </pose>
           <child>lower_gap</child>
           <parent>upper_disk</parent>
           <axis>
