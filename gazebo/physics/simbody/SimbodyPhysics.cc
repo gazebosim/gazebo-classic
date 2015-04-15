@@ -203,6 +203,11 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  // Parent class handles many generic parameters
+  // This should be done first so that the profile settings
+  // can be over-ridden by other message parameters.
+  PhysicsEngine::OnPhysicsMsg(_msg);
+
   if (_msg->has_enable_physics())
     this->world->EnablePhysicsEngine(_msg->enable_physics());
 
@@ -235,9 +240,6 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
-
-  // Parent class handles many generic parameters
-  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 //////////////////////////////////////////////////
@@ -1389,10 +1391,6 @@ bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
     {
       this->contact.setTransitionVelocity(boost::any_cast<double>(_value));
     }
-    else if (_key == "max_step_size")
-    {
-      this->SetMaxStepSize(boost::any_cast<double>(_value));
-    }
     else if (_key == "stiffness")
     {
       this->contactMaterialStiffness = boost::any_cast<double>(_value);
@@ -1434,8 +1432,7 @@ bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
     }
     else
     {
-      gzwarn << _key << " is not supported in Simbody" << std::endl;
-      return false;
+      return PhysicsEngine::SetParam(_key, _value);
     }
   }
   catch(boost::bad_any_cast &e)

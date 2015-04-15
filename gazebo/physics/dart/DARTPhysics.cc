@@ -431,14 +431,13 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
       gzerr << "Setting [" << _key << "] in DART to [" << value
             << "] not yet supported.\n";
     }
-    else if (_key == "max_step_size")
-    {
-      this->dtWorld->setTimeStep(boost::any_cast<double>(_value));
-    }
     else
     {
-      gzwarn << _key << " is not supported in DART" << std::endl;
-      return false;
+      if (_key == "max_step_size")
+      {
+        this->dtWorld->setTimeStep(boost::any_cast<double>(_value));
+      }
+      return PhysicsEngine::SetParam(_key, _value);
     }
   }
   catch(boost::bad_any_cast &e)
@@ -484,6 +483,11 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
 //////////////////////////////////////////////////
 void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
 {
+  // Parent class handles many generic parameters
+  // This should be done first so that the profile settings
+  // can be over-ridden by other message parameters.
+  PhysicsEngine::OnPhysicsMsg(_msg);
+
   if (_msg->has_enable_physics())
     this->world->EnablePhysicsEngine(_msg->enable_physics());
 
@@ -505,9 +509,6 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
-
-  // Parent class handles many generic parameters
-  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 //////////////////////////////////////////////////

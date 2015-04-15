@@ -72,6 +72,10 @@ namespace gazebo
       /// \return A pointer to the render widget.
       public: RenderWidget *GetRenderWidget() const;
 
+      /// \brief Returns the state of the simulation, true if paused.
+      /// \return True if paused, false otherwise.
+      public: bool IsPaused() const;
+
       /// \brief Play simulation.
       public slots: void Play();
 
@@ -81,6 +85,11 @@ namespace gazebo
       /// \brief Set whether the left pane is visible
       /// \param[in] _on True to show the left pane, false to hide.
       public: void SetLeftPaneVisibility(bool _on);
+
+      /// \brief Get an editor by name
+      /// \param[in] _name Name of the editor.
+      /// \return Pointer to the editor.
+      public: Editor *GetEditor(const std::string &_name) const;
 
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();
@@ -165,6 +174,8 @@ namespace gazebo
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
       private slots: void SetWireframe();
+      /// \brief Qt callback when the show GUI overlays action is triggered.
+      private slots: void ShowGUIOverlays();
 
       /// \brief Qt call back when the play action state changes
       private slots: void OnPlayActionChanged();
@@ -193,11 +204,11 @@ namespace gazebo
       /// \brief Create most of the actions.
       private: void CreateActions();
 
+      /// \brief Delete the actions created in CreateActions.
+      private: void DeleteActions();
+
       /// \brief Create menus.
       private: void CreateMenus();
-
-      /// \brief Create the toolbars.
-      private: void CreateToolbars();
 
       /// \brief Create the main menu bar.
       private: void CreateMenuBar();
@@ -222,7 +233,6 @@ namespace gazebo
       private: void OnManipMode(const std::string &_mode);
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
-      private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
       /// \brief Handle event for changing the manual step size.
       /// \param[in] _value New input step size.
@@ -293,8 +303,8 @@ namespace gazebo
       /// \brief User specified step size for manually stepping the world
       private: int inputStepSize;
 
-      /// \brief List of all the editors.
-      private: std::list<Editor*> editors;
+      /// \brief Map of all the editors to their names.
+      private: std::map<std::string, Editor *> editors;
 
       /// \brief List of all the align action groups.
       private: std::vector<QActionGroup *> alignActionGroups;

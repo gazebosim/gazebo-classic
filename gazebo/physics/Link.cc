@@ -103,6 +103,7 @@ Link::~Link()
 
   this->requestPub.reset();
   this->dataPub.reset();
+  this->wrenchSub.reset();
   this->connections.clear();
 
   delete this->publishDataMutex;
@@ -114,8 +115,6 @@ Link::~Link()
 //////////////////////////////////////////////////
 void Link::Load(sdf::ElementPtr _sdf)
 {
-  bool needUpdate = false;
-
   Entity::Load(_sdf);
 
   // before loading child collision, we have to figure out if selfCollide is
@@ -207,21 +206,21 @@ void Link::Load(sdf::ElementPtr _sdf)
       this->audioContactsSub = this->node->Subscribe(topic,
           &Link::OnCollision, this);
     }
-
-    needUpdate = true;
   }
 
   if (_sdf->HasElement("audio_sink"))
   {
-    needUpdate = true;
     this->audioSink = util::OpenAL::Instance()->CreateSink(
         _sdf->GetElement("audio_sink"));
   }
 #endif
 
-  if (needUpdate)
-    this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&Link::Update, this, _1)));
+  this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&Link::Update, this, _1)));
+
+  std::string topicName = "~/" + this->GetScopedName() + "/wrench";
+  boost::replace_all(topicName, "::", "/");
+  this->wrenchSub = this->node->Subscribe(topicName, &Link::OnWrenchMsg, this);
 }
 
 //////////////////////////////////////////////////
@@ -462,6 +461,21 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
      this->enabled = this->GetEnabled();
      this->enabledSignal(this->enabled);
    }*/
+
+  if (!this->wrenchMsgs.empty())
+  {
+    std::vector<msgs::Wrench> messages;
+    {
+      boost::mutex::scoped_lock lock(this->wrenchMsgMutex);
+      messages = this->wrenchMsgs;
+      this->wrenchMsgs.clear();
+    }
+
+    for (auto it : messages)
+    {
+      this->ProcessWrenchMsg(it);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -794,9 +808,10 @@ void Link::FillMsg(msgs::Link &_msg)
       sensor->FillMsg(*_msg.add_sensor());
   }
 
-  // Parse visuals from SDF
   if (this->visuals.empty())
     this->ParseVisuals();
+  else
+    this->UpdateVisualMsg();
 
   for (Visuals_M::iterator iter = this->visuals.begin();
       iter != this->visuals.end(); ++iter)
@@ -1046,32 +1061,10 @@ void Link::OnCollision(ConstContactsPtr &_msg)
 /////////////////////////////////////////////////
 void Link::ParseVisuals()
 {
-  // TODO: this shouldn't be in the physics sim
-  if (this->sdf->HasElement("visual"))
-  {
-    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
-    while (visualElem)
-    {
-      msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+  this->UpdateVisualMsg();
 
-      std::string visName = this->GetScopedName() + "::" + msg.name();
-      msg.set_name(visName);
-      msg.set_id(physics::getUniqueId());
-      msg.set_parent_name(this->GetScopedName());
-      msg.set_parent_id(this->GetId());
-      msg.set_is_static(this->IsStatic());
-
-      this->visPub->Publish(msg);
-
-      Visuals_M::iterator iter = this->visuals.find(msg.id());
-      if (iter != this->visuals.end())
-        gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
-
-      this->visuals[msg.id()] = msg;
-
-      visualElem = visualElem->GetNextElement("visual");
-    }
-  }
+  for (auto const it : this->visuals)
+    this->visPub->Publish(it.second);
 }
 
 /////////////////////////////////////////////////
@@ -1148,6 +1141,54 @@ void Link::UpdateVisualSDF()
       }
       else if (geomElem->HasElement("mesh"))
         geomElem->GetElement("mesh")->GetElement("scale")->Set(this->scale);
+
+      visualElem = visualElem->GetNextElement("visual");
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Link::UpdateVisualMsg()
+{
+  // TODO: this shouldn't be in the physics sim
+  if (this->sdf->HasElement("visual"))
+  {
+    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    while (visualElem)
+    {
+      msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+
+      bool newVis = true;
+      std::string linkName = this->GetScopedName();
+
+      // update visual msg if it exists
+      for (auto &iter : this->visuals)
+      {
+        std::string visName = linkName + "::" +
+            visualElem->Get<std::string>("name");
+        if (iter.second.name() == visName)
+        {
+          iter.second.mutable_geometry()->CopyFrom(msg.geometry());
+          newVis = false;
+          break;
+        }
+      }
+
+      // add to visual msgs if not found.
+      if (newVis)
+      {
+        std::string visName = this->GetScopedName() + "::" + msg.name();
+        msg.set_name(visName);
+        msg.set_id(physics::getUniqueId());
+        msg.set_parent_name(this->GetScopedName());
+        msg.set_parent_id(this->GetId());
+        msg.set_is_static(this->IsStatic());
+
+        auto iter = this->visuals.find(msg.id());
+        if (iter != this->visuals.end())
+          gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
+        this->visuals[msg.id()] = msg;
+      }
 
       visualElem = visualElem->GetNextElement("visual");
     }
@@ -1344,4 +1385,27 @@ msgs::Visual Link::GetVisualMessage(const std::string &_name) const
     result = iter->second;
 
   return result;
+}
+
+//////////////////////////////////////////////////
+void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(this->wrenchMsgMutex);
+  this->wrenchMsgs.push_back(*_msg);
+}
+
+//////////////////////////////////////////////////
+void Link::ProcessWrenchMsg(const msgs::Wrench &_msg)
+{
+  math::Vector3 pos = math::Vector3::Zero;
+  if (_msg.has_force_offset())
+  {
+    pos = msgs::Convert(_msg.force_offset());
+  }
+
+  const math::Vector3 force = msgs::Convert(_msg.force());
+  this->AddLinkForce(force, pos);
+
+  const math::Vector3 torque = msgs::Convert(_msg.torque());
+  this->AddRelativeTorque(torque);
 }

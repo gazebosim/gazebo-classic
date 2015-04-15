@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <cmath>
 
 #include "ServerFixture.hh"
 
@@ -372,8 +373,20 @@ void ServerFixture::DoubleCompare(double *_scanA, double *_scanB,
   _diffAvg = 0;
   for (unsigned int i = 0; i < _sampleCount; ++i)
   {
-    double diff = fabs(math::precision(_scanA[i], 10) -
+    double diff;
+
+    // set diff = 0 if both values are same-sign infinite, as inf - inf = nan
+    if (std::isinf(_scanA[i]) && std::isinf(_scanB[i]) &&
+      _scanA[i] * _scanB[i] > 0)
+    {
+      diff = 0;
+    }
+    else
+    {
+      diff = fabs(math::precision(_scanA[i], 10) -
                 math::precision(_scanB[i], 10));
+    }
+
     _diffSum += diff;
     if (diff > _diffMax)
     {
@@ -1281,11 +1294,11 @@ void ServerFixture::SpawnSDF(const std::string &_sdf)
   sdf::SDF sdfParsed;
   sdfParsed.SetFromString(_sdf);
   // Check that sdf contains a model
-  if (sdfParsed.root->HasElement("model"))
+  if (sdfParsed.Root()->HasElement("model"))
   {
     // Timeout of 30 seconds (3000 * 10 ms)
     int waitCount = 0, maxWaitCount = 3000;
-    sdf::ElementPtr model = sdfParsed.root->GetElement("model");
+    sdf::ElementPtr model = sdfParsed.Root()->GetElement("model");
     std::string name = model->Get<std::string>("name");
     while (!this->HasEntity(name) && ++waitCount < maxWaitCount)
       common::Time::MSleep(100);

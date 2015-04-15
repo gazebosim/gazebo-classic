@@ -504,6 +504,16 @@ void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
   physics::ModelPtr model = world->GetModel("pr2");
   physics::LinkPtr link_00 = model->GetLink("torso_lift_link");
 
+  if (_physicsEngine == "dart")
+  {
+    gzerr << _physicsEngine
+          << " is broken for this test,"
+          << " because of the pr2 gripper's closed kinematic chain,"
+          << " see issue #1435."
+          << std::endl;
+    return;
+  }
+
   // drop from some height
   model->SetWorldPose(math::Pose(0, 0, 0.5, 0, 0, 0));
   // +1sec: should have hit the ground
