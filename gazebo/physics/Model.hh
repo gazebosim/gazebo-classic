@@ -348,6 +348,9 @@ namespace gazebo
       /// \brief Load all the links.
       private: void LoadLinks();
 
+      /// \brief Load all the nested models.
+      private: void LoadModels();
+
       /// \brief Load a joint helper function.
       /// \param[in] _sdf SDF parameter.
       private: void LoadJoint(sdf::ElementPtr _sdf);
@@ -382,6 +385,9 @@ namespace gazebo
 
       /// \brief Cached list of links. This is here for performance.
       private: Link_V links;
+
+      /// \brief Cached list of nested models.
+      private: Model_V models;
 
       /// \brief All the grippers in the model.
       private: std::vector<GripperPtr> grippers;
