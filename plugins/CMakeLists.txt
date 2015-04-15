@@ -54,7 +54,7 @@ set (plugins
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins ${plugins}
-    FoosballPlugin
+    FoosballTablePlugin
     HydraPlugin
     HydraDemoPlugin
   )
