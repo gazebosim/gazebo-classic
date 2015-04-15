@@ -75,25 +75,6 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->newAct->setCheckable(false);
   connect(this->dataPtr->newAct, SIGNAL(triggered()), this, SLOT(New()));
 
-  this->dataPtr->schematicViewAct = NULL;
-  this->dataPtr->svWidget = NULL;
-#ifdef HAVE_GRAPHVIZ
-  RenderWidget *renderWidget = _mainWindow->GetRenderWidget();
-  this->dataPtr->svWidget = new SchematicViewWidget(renderWidget);
-  this->dataPtr->svWidget->setSizePolicy(QSizePolicy::Expanding,
-      QSizePolicy::Expanding);
-  this->dataPtr->svWidget->Init();
-  renderWidget->InsertWidget(0, this->dataPtr->svWidget);
-  this->dataPtr->svWidget->hide();
-
-  this->dataPtr->schematicViewAct = new QAction(tr("Schematic View"), this->mainWindow);
-  this->dataPtr->schematicViewAct->setStatusTip(tr("Sch&ematic View"));
-  this->dataPtr->schematicViewAct->setShortcut(tr("Ctrl+E"));
-  this->dataPtr->schematicViewAct->setCheckable(true);
-  connect(this->dataPtr->schematicViewAct, SIGNAL(toggled(bool)), this,
-      SLOT(OnSchematicView(bool)));
-#endif
-
   this->dataPtr->saveAct = new QAction(tr("&Save"), this->mainWindow);
   this->dataPtr->saveAct->setStatusTip(tr("Save"));
   this->dataPtr->saveAct->setShortcut(tr("Ctrl+S"));
