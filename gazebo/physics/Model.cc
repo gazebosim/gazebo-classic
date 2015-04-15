@@ -83,6 +83,8 @@ void Model::Load(sdf::ElementPtr _sdf)
 
   this->LoadLinks();
 
+  this->LoadModels();
+
   // Load the joints if the world is already loaded. Otherwise, the World
   // has some special logic to load models that takes into account state
   // information.
@@ -122,6 +124,27 @@ void Model::LoadLinks()
       link->Load(linkElem);
       linkElem = linkElem->GetNextElement("link");
       this->links.push_back(link);
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Model::LoadModels()
+{
+  // Load the bodies
+  if (this->sdf->HasElement("model"))
+  {
+    sdf::ElementPtr modelElem = this->sdf->GetElement("model");
+    while (modelElem)
+    {
+      // Create a new model
+      ModelPtr model = this->GetWorld()->GetPhysicsEngine()->CreateModel(
+          boost::static_pointer_cast<Model>(shared_from_this()));
+      model->SetWorld(this->GetWorld());
+      model->Load(modelElem);
+      // std::cerr << " modelElem " << modelElem->ToString("") << std::endl;
+      this->models.push_back(model);
+      modelElem = modelElem->GetNextElement("model");
     }
   }
 }
@@ -333,6 +356,7 @@ void Model::Fini()
   this->plugins.clear();
   this->links.clear();
   this->canonicalLink.reset();
+  this->models.clear();
 }
 
 //////////////////////////////////////////////////
@@ -705,6 +729,9 @@ void Model::LoadPlugins()
         << "Plugins for the model will not be loaded.\n";
     }
   }
+
+  for (auto model : models)
+    model->LoadPlugins();
 }
 
 //////////////////////////////////////////////////
@@ -883,6 +910,13 @@ void Model::FillMsg(msgs::Model &_msg)
   {
     (*iter)->FillMsg(*_msg.add_joint());
   }
+
+  for (auto &model : this->models)
+  {
+    model->FillMsg(*_msg.add_model());
+  }
+
+//  std::cerr << " model fill msg " << _msg.DebugString() << std::endl;
 }
 
 //////////////////////////////////////////////////
