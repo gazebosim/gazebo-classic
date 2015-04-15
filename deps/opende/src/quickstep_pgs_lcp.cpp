@@ -35,7 +35,6 @@
 #include "quickstep_pgs_lcp.h"
 #ifndef TIMING
 #ifdef INSTRUMENT
-#undef TIMING
 #define DUMP
 std::vector<dReal> errors;
 #endif   //instrument

@@ -45,10 +45,6 @@
 
 #undef CHECK_VELOCITY_OBEYS_CONSTRAINT
 
-//hdf5
-//#undef TIMING
-//#define INSTRUMENT
-
 #ifndef TIMING
 #ifdef INSTRUMENT
 #define DUMP
