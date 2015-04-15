@@ -35,6 +35,7 @@ RestWebPlugin::RestWebPlugin()
   requestQThread(NULL)
 {
   // generate a unique session ID
+  // On Windows
 #ifdef _WIN32
   UUID uuid;
   C_STATUS Result = ::UuidCreate(uuid);
@@ -50,7 +51,8 @@ RestWebPlugin::RestWebPlugin()
     this->session = szUuid;
     ::RpcStringFreeA(reinterpret_cast<RPC_CSTR*>(&szUuid));
   }
-#else /* UNIX */
+  // or on UNIX
+#else
   uuid_t uuid;
   uuid_generate_random(uuid);
   char s[37];
