@@ -145,7 +145,7 @@ void FoosballPlayer::Update()
       common::Time dt = (curTime - this->lastUpdateTime).Double();
 
       // Move the rods.
-      for (std::string const &side : {"left_controller", "right_controller"})
+      for (auto const &side : {"left_controller", "right_controller"})
       {
         if (this->hydra.find(side) != this->hydra.end())
         {
