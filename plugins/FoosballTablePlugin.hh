@@ -114,10 +114,15 @@ namespace gazebo
     /// \brief Hydra controller used by this player.
     private: Hydra_t hydra;
 
-    /// \brief Stores the last known X position and roll angle
+    /// \brief Stores the last known X position and roll angle.
     /// of the left/right controller. Those parameters are the ones we use in
     /// the plugin to compute the controller velocity.
     private: std::map<std::string, std::array<double, 2>> lastHydraPose;
+
+    /// \brief Stores the last positions of the active rods.
+    /// If we switch rods we have to modify the position of the new active rod
+    /// to match the position of the previous one.
+    private: std::map<std::string, std::array<math::Angle, 2>> lastRodPose;
 
     /// \brief Last time that the plugin was updated.
     private: common::Time lastUpdateTime;
@@ -129,7 +134,7 @@ namespace gazebo
     private: bool rightTriggerPressed = false;
 
     /// \brief This multiplier will be used to invert the velocity applied to
-    /// a rod in case the player is using Oculus and belongs to the Red team.
+    /// a rod depending on the player's viewpoint.
     private: double invert = 1.0;
   };
 
@@ -140,7 +145,7 @@ namespace gazebo
   /// The plugin accepts 'n' blocks of <player> elements as follows:
   /// <player>
   ///   <team>blue</team>
-  ///   <oculus>0</oculus>
+  ///   <invert_control>0</invert_control>
   ///   <left_controller>
   ///     <rod>0</rod>
   ///     <rod>1</rod>
@@ -152,10 +157,10 @@ namespace gazebo
   /// </player>
   ///
   /// <team> is a required tag and should contain 'red' or 'blue'.
-  /// <oculus> is an optional tag. By default, the plugin assumes that the
-  /// players' viewpoint are the same and both are looking from the blue side of
-  /// the table. When <oculus> is 1, the plugin will assume that each player's
-  /// viewpoint is different and is located in each own side of the table.
+  /// <invert_control> is an optional tag. By default, the plugin assumes
+  /// that the players' viewpoint matches his/her side of the table.
+  /// When <invert_control> is 1, the plugin will assume that the player is
+  /// playing from the other side of the table and the controllers are inverted.
   /// <left_controller> and <right_controller> are optional. If present,
   /// each tag associates a set of rods to the left or right controller.
   /// The control of a rod will change by pressing the 'trigger' button.
