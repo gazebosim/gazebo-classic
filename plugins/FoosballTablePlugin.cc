@@ -123,6 +123,14 @@ void FoosballPlayer::Update()
   // Read the last known Hydra message.
   boost::shared_ptr<msgs::Hydra const> msg = this->hydraMsgPtr;
 
+  // Reset the Hydra position.
+  if (msg->right().button_center() && msg->left().button_center())
+  {
+    this->activated = true;
+    this->resetPoseRight = msgs::Convert(msg->right().pose());
+    this->resetPoseLeft = msgs::Convert(msg->left().pose());
+  }
+
   if (this->activated)
   {
     // If the user pressed the trigger we have to change the active rod.
@@ -181,16 +189,6 @@ void FoosballPlayer::Update()
     }
 
     this->lastUpdateTime = this->model->GetWorld()->GetSimTime();
-  }
-  else
-  {
-    // Reset the Hydra position.
-    if (msg->right().button_center() && msg->left().button_center())
-    {
-      this->activated = true;
-      this->resetPoseRight = msgs::Convert(msg->right().pose());
-      this->resetPoseLeft = msgs::Convert(msg->left().pose());
-    }
   }
 }
 
