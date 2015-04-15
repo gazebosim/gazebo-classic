@@ -1092,14 +1092,14 @@ void Link::SetScale(const math::Vector3 &_scale)
     }
   }
 
-  this->scale = _scale;
+  // update the visual sdf to ensure cloning and saving has the correct values.
+  this->UpdateVisualGeomSDF(_scale);
 
-  // update the visual sdf to ensure cloning gets the correct values.
-  this->UpdateVisualSDF();
+  this->scale = _scale;
 }
 
 //////////////////////////////////////////////////
-void Link::UpdateVisualSDF()
+void Link::UpdateVisualGeomSDF(const math::Vector3 &_scale)
 {
   // TODO: this shouldn't be in the physics sim
   if (this->sdf->HasElement("visual"))
@@ -1111,22 +1111,36 @@ void Link::UpdateVisualSDF()
 
       if (geomElem->HasElement("box"))
       {
-        geomElem->GetElement("box")->GetElement("size")->Set(this->scale);
+        math::Vector3 size =
+            geomElem->GetElement("box")->Get<math::Vector3>("size");
+        geomElem->GetElement("box")->GetElement("size")->Set(
+            _scale/this->scale*size);
       }
       else if (geomElem->HasElement("sphere"))
       {
+        // update radius the same way as collision shapes
+        double radius = geomElem->GetElement("sphere")->Get<double>("radius");
+        double newRadius = std::max(_scale.z, std::max(_scale.x, _scale.y));
+        double oldRadius = std::max(this->scale.z,
+            std::max(this->scale.x, this->scale.y));
         geomElem->GetElement("sphere")->GetElement("radius")->Set(
-            this->scale.x/2.0);
+            newRadius/oldRadius*radius);
       }
       else if (geomElem->HasElement("cylinder"))
       {
-        geomElem->GetElement("cylinder")->GetElement("radius")
-            ->Set(this->scale.x/2.0);
+        // update radius the same way as collision shapes
+        double radius = geomElem->GetElement("cylinder")->Get<double>("radius");
+        double newRadius = std::max(_scale.x, _scale.y);
+        double oldRadius = std::max(this->scale.x, this->scale.y);
+
+        double length = geomElem->GetElement("cylinder")->Get<double>("length");
+        geomElem->GetElement("cylinder")->GetElement("radius")->Set(
+            newRadius/oldRadius*radius);
         geomElem->GetElement("cylinder")->GetElement("length")->Set(
-            this->scale.z);
+            _scale.z/this->scale.z*length);
       }
       else if (geomElem->HasElement("mesh"))
-        geomElem->GetElement("mesh")->GetElement("scale")->Set(this->scale);
+        geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
 
       visualElem = visualElem->GetNextElement("visual");
     }

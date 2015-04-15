@@ -417,17 +417,30 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   modelPos["test_box"] = math::Vector3(0, 0, z0);
   modelPos["test_sphere"] = math::Vector3(4, 0, z0);
   modelPos["test_cylinder"] = math::Vector3(8, 0, z0);
+  modelPos["test_non_unit_box"] = math::Vector3(16, 0, z0);
+
+  std::map<std::string, math::Vector3> modelSize;
+  modelSize["test_box"] = math::Vector3::One;
+  modelSize["test_sphere"] = math::Vector3::One;
+  modelSize["test_cylinder"] = math::Vector3::One;
+  modelSize["test_non_unit_box"] = math::Vector3(3, 8, 1.0);
 
   SpawnBox("test_box", math::Vector3(1, 1, 1), modelPos["test_box"],
       math::Vector3::Zero);
   SpawnSphere("test_sphere", modelPos["test_sphere"], math::Vector3::Zero);
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
       math::Vector3::Zero);
+  SpawnBox("test_non_unit_box", modelSize["test_non_unit_box"],
+      modelPos["test_non_unit_box"], math::Vector3::Zero);
 
   // spawn another set of shapes and use messages to resize these
   modelPos["test_box2"] = math::Vector3(0, 9, z0);
   modelPos["test_sphere2"] = math::Vector3(4, 9, z0);
   modelPos["test_cylinder2"] = math::Vector3(8, 9, z0);
+
+  modelSize["test_box2"] = math::Vector3::One;
+  modelSize["test_sphere2"] = math::Vector3::One;
+  modelSize["test_cylinder2"] = math::Vector3::One;
 
   SpawnBox("test_box2", math::Vector3(1, 1, 1), modelPos["test_box2"],
       math::Vector3::Zero);
@@ -550,17 +563,19 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
         msgs::Geometry geomMsg = visualMsg.geometry();
         if (geomMsg.has_box())
         {
-          EXPECT_EQ(msgs::Convert(geomMsg.box().size()),
-              math::Vector3(0.5, 0.5, 0.5));
+          EXPECT_EQ(msgs::Convert(geomMsg.box().size()), modelSize[name]*0.5);
         }
         else if (geomMsg.has_sphere())
         {
-          EXPECT_DOUBLE_EQ(geomMsg.sphere().radius(), 0.25);
+          EXPECT_DOUBLE_EQ(geomMsg.sphere().radius(),
+              modelSize[name].x * 0.5 * 0.5);
         }
         else if (geomMsg.has_cylinder())
         {
-          EXPECT_DOUBLE_EQ(geomMsg.cylinder().radius(), 0.25);
-          EXPECT_DOUBLE_EQ(geomMsg.cylinder().length(), 0.5);
+          EXPECT_DOUBLE_EQ(geomMsg.cylinder().radius(),
+              modelSize[name].x * 0.5 * 0.5);
+          EXPECT_DOUBLE_EQ(geomMsg.cylinder().length(),
+              modelSize[name].z * 0.5);
         }
       }
 
@@ -571,19 +586,90 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
         msgs::Geometry geomMsg = collisionMsg.geometry();
         if (geomMsg.has_box())
         {
-          EXPECT_EQ(msgs::Convert(geomMsg.box().size()),
-              math::Vector3(0.5, 0.5, 0.5));
+          EXPECT_EQ(msgs::Convert(geomMsg.box().size()), modelSize[name]*0.5);
         }
         else if (geomMsg.has_sphere())
         {
-          EXPECT_DOUBLE_EQ(geomMsg.sphere().radius(), 0.25);
+          EXPECT_DOUBLE_EQ(geomMsg.sphere().radius(),
+              modelSize[name].x * 0.5 * 0.5);
         }
         else if (geomMsg.has_cylinder())
         {
-          EXPECT_DOUBLE_EQ(geomMsg.cylinder().radius(), 0.25);
-          EXPECT_DOUBLE_EQ(geomMsg.cylinder().length(), 0.5);
+          EXPECT_DOUBLE_EQ(geomMsg.cylinder().radius(),
+              modelSize[name].x * 0.5 * 0.5);
+          EXPECT_DOUBLE_EQ(geomMsg.cylinder().length(),
+              modelSize[name].z * 0.5);
         }
       }
+    }
+  }
+
+  // verify geom sdfs contain resized values.
+  for (auto const &iter : modelPos)
+  {
+    std::string name = iter.first;
+    model = world->GetModel(name);
+    sdf::ElementPtr modelElem = model->GetSDF();
+
+    EXPECT_TRUE(modelElem->HasElement("link"));
+    sdf::ElementPtr linkElem = modelElem->GetElement("link");
+    while (linkElem)
+    {
+      // verify visual geom sdf
+      EXPECT_TRUE(linkElem->HasElement("visual"));
+      sdf::ElementPtr visualElem = linkElem->GetElement("visual");
+
+      EXPECT_TRUE(visualElem->HasElement("geometry"));
+      sdf::ElementPtr visualGeomElem = visualElem->GetElement("geometry");
+      if (visualGeomElem->HasElement("box"))
+      {
+        sdf::ElementPtr boxElem = visualGeomElem->GetElement("box");
+        math::Vector3 size = boxElem->Get<math::Vector3>("size");
+        EXPECT_EQ(size, modelSize[name] * 0.5);
+      }
+      else if (visualGeomElem->HasElement("sphere"))
+      {
+        sdf::ElementPtr sphereElem = visualGeomElem->GetElement("sphere");
+        double radius = sphereElem->Get<double>("radius");
+        EXPECT_EQ(radius, modelSize[name].x * 0.5 * 0.5);
+      }
+      else if (visualGeomElem->HasElement("cylinder"))
+      {
+        sdf::ElementPtr cylinderElem = visualGeomElem->GetElement("cylinder");
+        double radius = cylinderElem->Get<double>("radius");
+        EXPECT_EQ(radius, modelSize[name].x * 0.5 * 0.5);
+        double length = cylinderElem->Get<double>("length");
+        EXPECT_EQ(length, modelSize[name].z * 0.5);
+      }
+
+      // verify collision geom sdf
+      EXPECT_TRUE(linkElem->HasElement("collision"));
+      sdf::ElementPtr collisionElem = linkElem->GetElement("collision");
+
+      EXPECT_TRUE(collisionElem->HasElement("geometry"));
+      sdf::ElementPtr collisionGeomElem = collisionElem->GetElement("geometry");
+      if (collisionGeomElem->HasElement("box"))
+      {
+        sdf::ElementPtr boxElem = collisionGeomElem->GetElement("box");
+        math::Vector3 size = boxElem->Get<math::Vector3>("size");
+        EXPECT_EQ(size, modelSize[name] * 0.5);
+      }
+      else if (collisionGeomElem->HasElement("sphere"))
+      {
+        sdf::ElementPtr sphereElem = collisionGeomElem->GetElement("sphere");
+        double radius = sphereElem->Get<double>("radius");
+        EXPECT_EQ(radius, modelSize[name].x * 0.5 * 0.5);
+      }
+      else if (collisionGeomElem->HasElement("cylinder"))
+      {
+        sdf::ElementPtr cylinderElem =
+            collisionGeomElem->GetElement("cylinder");
+        double radius = cylinderElem->Get<double>("radius");
+        EXPECT_EQ(radius, modelSize[name].x * 0.5 * 0.5);
+        double length = cylinderElem->Get<double>("length");
+        EXPECT_EQ(length, modelSize[name].z * 0.5);
+      }
+      linkElem = linkElem->GetNextElement("link");
     }
   }
 }
