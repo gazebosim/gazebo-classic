@@ -10,13 +10,12 @@
     </include>
 
 
-    <model name="peg1">
+    <model name="joint_tree_base">
       <static>true</static>
-      <link name="link">
+      <link name="peg1">
         <pose> 0 0.6 0.3 0 0 0</pose>
         <self_collide>0</self_collide>
         <visual name="vis_peg">
-          <pose>0 0 0 0 0 0</pose>
           <geometry>
             <cylinder>
               <radius>0.03</radius>
@@ -31,7 +30,6 @@
           </material>
         </visual>
         <collision name="col_peg">
-          <pose>0 0 0 0 0 0</pose>
           <geometry>
             <cylinder>
               <radius>0.03</radius>
@@ -50,19 +48,14 @@
           </surface>
         </collision>
       </link>
-    </model>
-
-    <model name="peg2">
-      <static>true</static>
-      <link name="link">
+      <link name="peg2">
         <pose>0 0.3 0.6 1.5707963267948966 0 0</pose>
         <self_collide>0</self_collide>
         <visual name="vis_peg2">
-          <pose>0 0 0 0 0 0</pose>
           <geometry>
             <cylinder>
               <radius>0.03</radius>
-              <length>0.6</length>
+              <length>0.585</length>
             </cylinder>
           </geometry>
           <material>
@@ -73,11 +66,10 @@
           </material>
         </visual>
         <collision name="col_peg2">
-          <pose>0.0 0.0 0.0 0 0 0</pose>
           <geometry>
             <cylinder>
               <radius>0.03</radius>
-              <length>0.6</length>
+              <length>0.585</length>
             </cylinder>
           </geometry>
           <surface>
@@ -93,8 +85,8 @@
         </collision>
       </link>
     </model>
-
-    <model name="barlayer_0">
+    <model name="joint_tree_layers">
+      <self_collide>true</self_collide>
 
       <link name="link_0">
         <pose>0 0 0.53 1.5707963267948966 0 0</pose>
@@ -159,7 +151,7 @@
           <geometry>
             <cylinder>
               <radius>0.005</radius>
-              <length>0.05</length>
+              <length>0.03</length>
             </cylinder>
           </geometry>
           <surface>
@@ -190,9 +182,9 @@
       </link>
 
         <joint name="vertChild_0" type="ball">
-          <pose>0 0 0.53 0 0 0</pose>
-          <parent>linkvert_0</parent>
-          <child>link_0</child>
+          <pose>0 0 -0.02173913043478261 0 0 0</pose>
+          <parent>link_0</parent>
+          <child>linkvert_0</child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
             <xyz>0 0 1</xyz>
@@ -213,8 +205,8 @@
           </physics>
         </joint>
         <joint name="vertParent_0" type="revolute">
-          <pose>0 0 0.5800000000000001 0 0 0 </pose>
-          <parent>peg2</parent>
+          <pose>0 0 0.025 0 0 0</pose>
+          <parent>joint_tree_base::peg2</parent>
           <child>linkvert_0</child>
           <axis>
             <xyz>0 0 1</xyz>
@@ -224,10 +216,6 @@
             </limit>
           </axis>
         </joint>
-
-    </model>
-
-    <model name="barlayer_1">
 
       <link name="link_1">
         <pose>0 0.25 0.48000000000000004 0 1.5707963267948966 0</pose>
@@ -292,7 +280,7 @@
           <geometry>
             <cylinder>
               <radius>0.005</radius>
-              <length>0.05</length>
+              <length>0.03</length>
             </cylinder>
           </geometry>
           <surface>
@@ -323,9 +311,9 @@
       </link>
 
         <joint name="vertChild_1" type="ball">
-          <pose>0 0.25 0.48000000000000004 0 0 0</pose>
-          <parent>linkvert_1</parent>
-          <child>link_1</child>
+          <pose>0 0 -0.02173913043478261 0 0 0</pose>
+          <parent>link_1</parent>
+          <child>linkvert_1</child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
             <xyz>0 0 1</xyz>
@@ -346,7 +334,7 @@
           </physics>
         </joint>
         <joint name="vertParent_1" type="revolute">
-          <pose>0 0.25 0.53 0 0 0 </pose>
+          <pose>0 0 0.025 0 0 0</pose>
           <parent>link_0</parent>
           <child>linkvert_1</child>
           <axis>
@@ -421,7 +409,7 @@
           <geometry>
             <cylinder>
               <radius>0.005</radius>
-              <length>0.05</length>
+              <length>0.03</length>
             </cylinder>
           </geometry>
           <surface>
@@ -452,9 +440,9 @@
       </link>
 
         <joint name="vertChild_2" type="ball">
-          <pose>0 -0.25 0.48000000000000004 0 0 0</pose>
-          <parent>linkvert_2</parent>
-          <child>link_2</child>
+          <pose>0 0 -0.02173913043478261 0 0 0</pose>
+          <parent>link_2</parent>
+          <child>linkvert_2</child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
             <xyz>0 0 1</xyz>
@@ -475,7 +463,7 @@
           </physics>
         </joint>
         <joint name="vertParent_2" type="revolute">
-          <pose>0 -0.25 0.53 0 0 0 </pose>
+          <pose>0 0 0.025 0 0 0</pose>
           <parent>link_0</parent>
           <child>linkvert_2</child>
           <axis>
@@ -486,10 +474,6 @@
             </limit>
           </axis>
         </joint>
-
-    </model>
-
-    <model name="barlayer_2">
 
       <link name="link_3">
         <pose>0.15 0.25 0.43000000000000005 1.5707963267948966 0 0</pose>
@@ -554,7 +538,7 @@
           <geometry>
             <cylinder>
               <radius>0.005</radius>
-              <length>0.05</length>
+              <length>0.03</length>
             </cylinder>
           </geometry>
           <surface>
@@ -585,9 +569,9 @@
       </link>
 
         <joint name="vertChild_3" type="ball">
-          <pose>0.15 0.25 0.43000000000000005 0 0 0</pose>
-          <parent>linkvert_3</parent>
-          <child>link_3</child>
+          <pose>0 0 -0.02173913043478261 0 0 0</pose>
+          <parent>link_3</parent>
+          <child>linkvert_3</child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
             <xyz>0 0 1</xyz>
@@ -608,7 +592,7 @@
           </physics>
         </joint>
         <joint name="vertParent_3" type="revolute">
-          <pose>0.15 0.25 0.48000000000000004 0 0 0 </pose>
+          <pose>0 0 0.025 0 0 0</pose>
           <parent>link_1</parent>
           <child>linkvert_3</child>
           <axis>
@@ -683,7 +667,7 @@
           <geometry>
             <cylinder>
               <radius>0.005</radius>
-              <length>0.05</length>
+              <length>0.03</length>
             </cylinder>
           </geometry>
           <surface>
@@ -714,9 +698,9 @@
       </link>
 
         <joint name="vertChild_4" type="ball">
-          <pose>-0.15 0.25 0.43000000000000005 0 0 0</pose>
-          <parent>linkvert_4</parent>
-          <child>link_4</child>
+          <pose>0 0 -0.02173913043478261 0 0 0</pose>
+          <parent>link_4</parent>
+          <child>linkvert_4</child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
             <xyz>0 0 1</xyz>
@@ -737,7 +721,7 @@
           </physics>
         </joint>
         <joint name="vertParent_4" type="revolute">
-          <pose>-0.15 0.25 0.48000000000000004 0 0 0 </pose>
+          <pose>0 0 0.025 0 0 0</pose>
           <parent>link_1</parent>
           <child>linkvert_4</child>
           <axis>
@@ -812,7 +796,7 @@
           <geometry>
             <cylinder>
               <radius>0.005</radius>
-              <length>0.05</length>
+              <length>0.03</length>
             </cylinder>
           </geometry>
           <surface>
@@ -843,9 +827,9 @@
       </link>
 
         <joint name="vertChild_5" type="ball">
-          <pose>0.15 -0.25 0.43000000000000005 0 0 0</pose>
-          <parent>linkvert_5</parent>
-          <child>link_5</child>
+          <pose>0 0 -0.02173913043478261 0 0 0</pose>
+          <parent>link_5</parent>
+          <child>linkvert_5</child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
             <xyz>0 0 1</xyz>
@@ -866,7 +850,7 @@
           </physics>
         </joint>
         <joint name="vertParent_5" type="revolute">
-          <pose>0.15 -0.25 0.48000000000000004 0 0 0 </pose>
+          <pose>0 0 0.025 0 0 0</pose>
           <parent>link_2</parent>
           <child>linkvert_5</child>
           <axis>
@@ -941,7 +925,7 @@
           <geometry>
             <cylinder>
               <radius>0.005</radius>
-              <length>0.05</length>
+              <length>0.03</length>
             </cylinder>
           </geometry>
           <surface>
@@ -972,9 +956,9 @@
       </link>
 
         <joint name="vertChild_6" type="ball">
-          <pose>-0.15 -0.25 0.43000000000000005 0 0 0</pose>
-          <parent>linkvert_6</parent>
-          <child>link_6</child>
+          <pose>0 0 -0.02173913043478261 0 0 0</pose>
+          <parent>link_6</parent>
+          <child>linkvert_6</child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
             <xyz>0 0 1</xyz>
@@ -995,7 +979,7 @@
           </physics>
         </joint>
         <joint name="vertParent_6" type="revolute">
-          <pose>-0.15 -0.25 0.48000000000000004 0 0 0 </pose>
+          <pose>0 0 0.025 0 0 0</pose>
           <parent>link_2</parent>
           <child>linkvert_6</child>
           <axis>
@@ -1008,6 +992,5 @@
         </joint>
 
     </model>
-
   </world>
 </sdf>

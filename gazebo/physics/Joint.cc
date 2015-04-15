@@ -210,11 +210,15 @@ void Joint::Load(sdf::ElementPtr _sdf)
     this->childLink = this->model->GetLink(childName);
     this->parentLink = this->model->GetLink(parentName);
   }
-  else
+
+  if (!this->childLink)
   {
     this->childLink = boost::dynamic_pointer_cast<Link>(
         this->GetWorld()->GetByName(childName));
+  }
 
+  if (!this->parentLink)
+  {
     this->parentLink = boost::dynamic_pointer_cast<Link>(
         this->GetWorld()->GetByName(parentName));
   }
