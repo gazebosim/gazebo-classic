@@ -54,7 +54,6 @@ DiagnosticManager::DiagnosticManager()
 //////////////////////////////////////////////////
 DiagnosticManager::~DiagnosticManager()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
 }
 
 //////////////////////////////////////////////////
@@ -68,6 +67,14 @@ void DiagnosticManager::Init(const std::string &_worldName)
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&DiagnosticManager::Update, this, _1));
+}
+
+//////////////////////////////////////////////////
+void DiagnosticManager::Fini()
+{
+  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+
+  this->timers.clear();
 }
 
 //////////////////////////////////////////////////

@@ -88,6 +88,10 @@ namespace gazebo
       /// \param[in] _worldName Name of the world.
       public: void Init(const std::string &_worldName);
 
+      /// \brief Finalize to prepare for shutdown.
+      /// Write all remaining log data to disk.
+      public: void Fini();
+
       /// \brief Start a new timer instance
       /// \param[in] _name Name of the timer.
       /// \return A pointer to the new diagnostic timer
