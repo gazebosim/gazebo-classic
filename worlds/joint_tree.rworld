@@ -7,7 +7,7 @@
   # Aluminum 2700 kg/m^3
   density = 2700.0
   # Constants
-  layers = 6
+  layers = 3
   # Constant parameters for the two fixed peg
   Radius = 0.03
   Height = 0.6
@@ -25,6 +25,10 @@
   ixx_vert = 1/12.0 * mass_vert * ( 3 * radius**2 + layer_dist**2)
   iyy_vert = ixx_vert
   izz_vert = 0.5*mass_vert*radius**2
+
+  def a_to_s(array=[])
+    array.map(&:to_s).join(" ")
+  end
 %>
 <sdf version="1.5">
   <world name="default">
@@ -190,34 +194,48 @@ end
       </link>
     </model>
 <%
-  for layer in 0..layers
+  layers.times do |layer|
+    modelName = "barlayer_" + layer.to_s
 %>
-<%= '<model name="barlayer_' + layer.to_s + '">' %>
-     <%
-        #layer     body    number of body
-        #  0        0:0        1
-        #  1        1:2        2
-        #  2        3:6        4
-        #  3        7:14       8
-        #  4        15:30      16
-        body_min_index = 2**layer - 1
-        body_max_index = 2*(2**layer -1)
-        for body in body_min_index..body_max_index
-           length_curr = length0 * (ratio**layer)
-           mass_curr = density * (Math::PI * (radius**2) * length_curr)
-           ixx_curr = 1.0/12 * mass_curr*(3*(radius**2) + length_curr**2)
-           iyy_curr = ixx_curr
-           izz_curr = 0.5*mass_curr*(radius**2)
+    <%= "<model name=\"#{modelName}\">" %>
+<%
+    #layer     body    number of body
+    #  0        0:0        1
+    #  1        1:2        2
+    #  2        3:6        4
+    #  3        7:14       8
+    #  4        15:30      16
+    body_min_index = 2**layer - 1
+    body_max_index = 2*(2**layer -1)
+    for body in body_min_index..body_max_index
+      linkName = "link_" + body.to_s
+      linkVertName = "linkvert_" + body.to_s
 
-           pos_x = positions[body][0]
-           pos_y = positions[body][1]
-           pos_z = positions[body][2]
-           orit_x = orientations[body][0]
-           orit_y = orientations[body][1]
-           orit_z = orientations[body][2]
-     %>
-     <%= '<link name="link_' + body.to_s + '">' %>
-         <pose><%= pos_x %> <%= pos_y %> <%= pos_z %> <%= orit_x %> <%= orit_y %> <%= orit_z %> </pose>
+      length_curr = length0 * (ratio**layer)
+      mass_curr = density * (Math::PI * (radius**2) * length_curr)
+      ixx_curr = 1.0/12 * mass_curr*(3*(radius**2) + length_curr**2)
+      iyy_curr = ixx_curr
+      izz_curr = 0.5*mass_curr*(radius**2)
+
+      pos_xyz = positions[body].clone
+      ori_xyz = orientations[body].clone
+
+      pos_link_vert_xyz = pos_xyz.clone
+      pos_link_vert_xyz[2] += layer_dist/2.0
+
+      pos_joint_vert_xyz = pos_xyz.clone
+      pos_joint_vert_xyz[2] += layer_dist
+
+      if(layer == 0)
+        axisRevolute = [0, 0, 1]
+        parentRevolute = "peg2"
+      else
+        axisRevolute = [1, 0, 0]
+        parentRevolute = "link_" + ((body-1)/2).to_s
+      end
+%>
+      <%= "<link name=\"#{linkName}\">" %>
+        <pose><%= a_to_s(pos_xyz) %> <%= a_to_s(ori_xyz) %></pose>
         <inertial>
           <mass><%= mass_curr %></mass>
           <inertia>
@@ -230,7 +248,6 @@ end
           </inertia>
         </inertial>
         <collision name="collision">
-         <pose>0 0 0 0 0 0</pose>
           <geometry>
             <cylinder>
               <radius><%= radius %></radius>
@@ -249,7 +266,6 @@ end
           </surface>
         </collision>
         <visual name="visual">
-          <pose> 0 0 0 0 0 0</pose>
           <geometry>
             <cylinder>
               <radius><%= radius %></radius>
@@ -264,10 +280,10 @@ end
           </material>
         </visual>
       </link>
-      <%= '<link name="linkvert_' + body.to_s + '">' %>
-          <pose><%= pos_x %> <%= pos_y %> <%= pos_z + layer_dist/2.0 %>  0 0 0 </pose>
-         <inertial>
-           <mass><%= mass_vert %></mass>
+      <%= "<link name=\"#{linkVertName}\">" %>
+        <pose><%= a_to_s(pos_link_vert_xyz) %>  0 0 0 </pose>
+        <inertial>
+          <mass><%= mass_vert %></mass>
           <inertia>
             <ixx><%= ixx_vert %></ixx>
             <iyy><%= iyy_vert %></iyy>
@@ -278,7 +294,6 @@ end
           </inertia>
         </inertial>
         <collision name="collision">
-         <pose>0 0 0 0 0 0</pose>
           <geometry>
             <cylinder>
               <radius><%= radius %></radius>
@@ -297,7 +312,6 @@ end
           </surface>
         </collision>
         <visual name="visual">
-          <pose> 0 0 0 0 0 0</pose>
           <geometry>
             <cylinder>
               <radius><%= radius %></radius>
@@ -313,10 +327,10 @@ end
         </visual>
       </link>
 
-      <%= '<joint name="vertChild_' + body.to_s + '" type="ball">' %>
-          <pose><%= pos_x %> <%= pos_y %> <%= pos_z %> 0 0 0</pose>
-          <parent><%='linkvert_' + body.to_s%></parent>
-          <child><%='link_' + body.to_s %></child>
+        <%= '<joint name="vertChild_' + body.to_s + '" type="ball">' %>
+          <pose><%= a_to_s(pos_xyz) %> 0 0 0</pose>
+          <parent><%= linkVertName %></parent>
+          <child><%= linkName %></child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
             <xyz>0 0 1</xyz>
@@ -332,50 +346,28 @@ end
           </axis>
           <physics>
             <ode>
-                <cfm_damping>1</cfm_damping>
-           </ode>
-         </physics>
-       </joint>
-      <%
-        if(layer == 0)
-      %>
+              <cfm_damping>1</cfm_damping>
+            </ode>
+          </physics>
+        </joint>
         <%= '<joint name="vertParent_' + body.to_s + '" type="revolute">' %>
-          <pose><%= pos_x %> <%= pos_y %> <%= pos_z + layer_dist%> 0 0 0 </pose>
-          <parent>peg2</parent>
-          <child><%='linkvert_' + body.to_s %></child>
+          <pose><%= a_to_s(pos_joint_vert_xyz) %> 0 0 0 </pose>
+          <parent><%= parentRevolute %></parent>
+          <child><%= linkVertName %></child>
           <axis>
-            <xyz>0 0 1</xyz>
+            <xyz><%= a_to_s(axisRevolute) %></xyz>
             <limit>
               <upper>0</upper>
               <lower>0</lower>
             </limit>
           </axis>
         </joint>
-      <%
-       else
-      %>
-        <%= '<joint name="vertParent_' + body.to_s + '" type="revolute">' %>
-          <pose><%= pos_x %> <%= pos_y %> <%= pos_z + layer_dist%>  0 0 0 </pose>
-          <parent><%='link_' + ((body-1)/2).to_s %></parent>
-          <child><%='linkvert_' + body.to_s %></child>
-          <axis>
-            <xyz>1 0 0</xyz>
-            <limit>
-              <upper>0</upper>
-              <lower>0</lower>
-            </limit>
-          </axis>
-        </joint>
-      <%
-        end
-      %>
-    <%
-     end
-    %>
+<%
+    end
+%>
     </model>
 <%
- end
+  end
 %>
-
   </world>
 </sdf>
