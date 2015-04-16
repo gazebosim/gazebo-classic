@@ -84,11 +84,10 @@ namespace gazebo
     /// \param[in] _worldFilename Name of the world to load.
     /// \param[in] _paused True to start the world paused.
     /// \param[in] _physics Name of the physics engine.
-    /// \param[in] _argc Argument count (for example to load system plugins)
-    /// \param[in] _argv Array of arguments
+    /// \param[in] _plugins Array of system plugins to load.
     protected: virtual void Load(const std::string &_worldFilename,
                                  bool _paused, const std::string &_physics,
-                                 int _argc = 0, char **_argv = NULL);
+                                 std::vector<std::string> _plugins = {});
 
     /// \brief Run the server.
     /// \param[in] _worldFilename Name of the world to run in simulation.
@@ -99,11 +98,10 @@ namespace gazebo
     /// \param[in] _worldFilename Name of the world to load.
     /// \param[in] _paused True to start the world paused.
     /// \param[in] _physics Name of the physics engine.
-    /// \param[in] _argc Argument count
-    /// \param[in] _argv Argument array
+    /// \param[in] _plugins Array of system plugins to load.
     protected: void RunServer(const std::string &_worldFilename, bool _paused,
                               const std::string &_physics,
-                              int _argc = 0, char **_argv = NULL);
+                              std::vector<std::string> _plugins = {});
 
 
     /// \brief Get a pointer to the rendering scene.
