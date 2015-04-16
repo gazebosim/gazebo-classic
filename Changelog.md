@@ -1,16 +1,26 @@
 ## Gazebo 6.0
 
+1. Added a plugin to send messages to an existing website.
+   Added gui::MainWindow::AddMenu and msgs/rest_error, msgs/rest_login, msgs rest/post
+    * [Pull request #1524](https://bitbucket.org/osrf/gazebo/pull-request/1524)
+
 1. Fix deprecation warnings when using SDFormat 3.0.2, 3.0.3 prereleases
     * [Pull request #1568](https://bitbucket.org/osrf/gazebo/pull-request/1568)
 
 1. Use GAZEBO_CFLAGS or GAZEBO_CXX_FLAGS in CMakeLists.txt for example plugins
     * [Pull request #1573](https://bitbucket.org/osrf/gazebo/pull-request/1573)
 
+1. Added Link::OnWrenchMsg subscriber with test
+    * [Pull request #1582](https://bitbucket.org/osrf/gazebo/pull-request/1582)
+
 1. Show/hide GUI overlays using the menu bar.
     * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
 
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
+
+1. Separate TimePanel's display into TimeWidget and LogPlayWidget.
+    * [Pull request #1564](https://bitbucket.org/osrf/gazebo/pull-request/1564)
 
 1. Added support for Oculus DK2
     * [Pull request #1526](https://bitbucket.org/osrf/gazebo/pull-request/1526)
@@ -67,6 +77,9 @@
 
 1. Sync name and location on SaveDialog.
     * [Pull request #1563](https://bitbucket.org/osrf/gazebo/pull-request/1563)
+
+1. Added inertia pose getter for COMVisual and COMVisual_TEST
+    * [Pull request #1581](https://bitbucket.org/osrf/gazebo/pull-request/1581)
 
 1. Model editor updates
     1. Joint preview using JointVisuals.
