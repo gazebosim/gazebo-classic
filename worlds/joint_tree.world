@@ -10,6 +10,7 @@
     </include>
 
 
+<!--
     <model name="joint_tree_base">
       <static>true</static>
       <link name="peg1">
@@ -85,6 +86,7 @@
         </collision>
       </link>
     </model>
+-->
     <model name="joint_tree_layers">
       <self_collide>true</self_collide>
 
@@ -181,19 +183,13 @@
         </visual>
       </link>
 
+      
         <joint name="vertChild_0" type="ball">
-          <pose>0 0 -0.02173913043478261 0 0 0</pose>
-          <parent>link_0</parent>
-          <child>linkvert_0</child>
+          <parent>linkvert_0</parent>
+          <child>link_0</child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
-            <xyz>0 0 1</xyz>
-            <limit>
-              <upper>1.7</upper>
-              <lower>-1.7</lower>
-              <stiffness>1e6</stiffness>
-              <dissipation>1.0</dissipation>
-            </limit>
+            <xyz>1 0 0</xyz>
             <dynamics>
               <damping>0.1</damping>
            </dynamics>
@@ -204,16 +200,16 @@
             </ode>
           </physics>
         </joint>
+      
         <joint name="vertParent_0" type="revolute">
           <pose>0 0 0.025 0 0 0</pose>
-          <parent>joint_tree_base::peg2</parent>
+          <parent>world</parent>
           <child>linkvert_0</child>
           <axis>
             <xyz>0 0 1</xyz>
-            <limit>
-              <upper>0</upper>
-              <lower>0</lower>
-            </limit>
+            <dynamics>
+              <friction>0.01</friction>
+            </dynamics>
           </axis>
         </joint>
 
@@ -310,19 +306,13 @@
         </visual>
       </link>
 
+      
         <joint name="vertChild_1" type="ball">
-          <pose>0 0 -0.02173913043478261 0 0 0</pose>
-          <parent>link_1</parent>
-          <child>linkvert_1</child>
+          <parent>linkvert_1</parent>
+          <child>link_1</child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
-            <xyz>0 0 1</xyz>
-            <limit>
-              <upper>1.7</upper>
-              <lower>-1.7</lower>
-              <stiffness>1e6</stiffness>
-              <dissipation>1.0</dissipation>
-            </limit>
+            <xyz>0 1 0</xyz>
             <dynamics>
               <damping>0.1</damping>
            </dynamics>
@@ -333,16 +323,16 @@
             </ode>
           </physics>
         </joint>
+      
         <joint name="vertParent_1" type="revolute">
           <pose>0 0 0.025 0 0 0</pose>
           <parent>link_0</parent>
           <child>linkvert_1</child>
           <axis>
-            <xyz>1 0 0</xyz>
-            <limit>
-              <upper>0</upper>
-              <lower>0</lower>
-            </limit>
+            <xyz>0 1 0</xyz>
+            <dynamics>
+              <friction>0.01</friction>
+            </dynamics>
           </axis>
         </joint>
 
@@ -439,19 +429,13 @@
         </visual>
       </link>
 
+      
         <joint name="vertChild_2" type="ball">
-          <pose>0 0 -0.02173913043478261 0 0 0</pose>
-          <parent>link_2</parent>
-          <child>linkvert_2</child>
+          <parent>linkvert_2</parent>
+          <child>link_2</child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
-            <xyz>0 0 1</xyz>
-            <limit>
-              <upper>1.7</upper>
-              <lower>-1.7</lower>
-              <stiffness>1e6</stiffness>
-              <dissipation>1.0</dissipation>
-            </limit>
+            <xyz>0 1 0</xyz>
             <dynamics>
               <damping>0.1</damping>
            </dynamics>
@@ -462,16 +446,16 @@
             </ode>
           </physics>
         </joint>
+      
         <joint name="vertParent_2" type="revolute">
           <pose>0 0 0.025 0 0 0</pose>
           <parent>link_0</parent>
           <child>linkvert_2</child>
           <axis>
-            <xyz>1 0 0</xyz>
-            <limit>
-              <upper>0</upper>
-              <lower>0</lower>
-            </limit>
+            <xyz>0 1 0</xyz>
+            <dynamics>
+              <friction>0.01</friction>
+            </dynamics>
           </axis>
         </joint>
 
@@ -568,19 +552,13 @@
         </visual>
       </link>
 
+      <!--
         <joint name="vertChild_3" type="ball">
-          <pose>0 0 -0.02173913043478261 0 0 0</pose>
-          <parent>link_3</parent>
-          <child>linkvert_3</child>
+          <parent>linkvert_3</parent>
+          <child>link_3</child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
-            <xyz>0 0 1</xyz>
-            <limit>
-              <upper>1.7</upper>
-              <lower>-1.7</lower>
-              <stiffness>1e6</stiffness>
-              <dissipation>1.0</dissipation>
-            </limit>
+            <xyz>1 0 0</xyz>
             <dynamics>
               <damping>0.1</damping>
            </dynamics>
@@ -591,16 +569,16 @@
             </ode>
           </physics>
         </joint>
+      -->
         <joint name="vertParent_3" type="revolute">
           <pose>0 0 0.025 0 0 0</pose>
           <parent>link_1</parent>
           <child>linkvert_3</child>
           <axis>
             <xyz>1 0 0</xyz>
-            <limit>
-              <upper>0</upper>
-              <lower>0</lower>
-            </limit>
+            <dynamics>
+              <friction>0.01</friction>
+            </dynamics>
           </axis>
         </joint>
 
@@ -697,19 +675,13 @@
         </visual>
       </link>
 
+      <!--
         <joint name="vertChild_4" type="ball">
-          <pose>0 0 -0.02173913043478261 0 0 0</pose>
-          <parent>link_4</parent>
-          <child>linkvert_4</child>
+          <parent>linkvert_4</parent>
+          <child>link_4</child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
-            <xyz>0 0 1</xyz>
-            <limit>
-              <upper>1.7</upper>
-              <lower>-1.7</lower>
-              <stiffness>1e6</stiffness>
-              <dissipation>1.0</dissipation>
-            </limit>
+            <xyz>1 0 0</xyz>
             <dynamics>
               <damping>0.1</damping>
            </dynamics>
@@ -720,16 +692,16 @@
             </ode>
           </physics>
         </joint>
+      -->
         <joint name="vertParent_4" type="revolute">
           <pose>0 0 0.025 0 0 0</pose>
           <parent>link_1</parent>
           <child>linkvert_4</child>
           <axis>
             <xyz>1 0 0</xyz>
-            <limit>
-              <upper>0</upper>
-              <lower>0</lower>
-            </limit>
+            <dynamics>
+              <friction>0.01</friction>
+            </dynamics>
           </axis>
         </joint>
 
@@ -826,19 +798,13 @@
         </visual>
       </link>
 
+      <!--
         <joint name="vertChild_5" type="ball">
-          <pose>0 0 -0.02173913043478261 0 0 0</pose>
-          <parent>link_5</parent>
-          <child>linkvert_5</child>
+          <parent>linkvert_5</parent>
+          <child>link_5</child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
-            <xyz>0 0 1</xyz>
-            <limit>
-              <upper>1.7</upper>
-              <lower>-1.7</lower>
-              <stiffness>1e6</stiffness>
-              <dissipation>1.0</dissipation>
-            </limit>
+            <xyz>1 0 0</xyz>
             <dynamics>
               <damping>0.1</damping>
            </dynamics>
@@ -849,16 +815,16 @@
             </ode>
           </physics>
         </joint>
+      -->
         <joint name="vertParent_5" type="revolute">
           <pose>0 0 0.025 0 0 0</pose>
           <parent>link_2</parent>
           <child>linkvert_5</child>
           <axis>
             <xyz>1 0 0</xyz>
-            <limit>
-              <upper>0</upper>
-              <lower>0</lower>
-            </limit>
+            <dynamics>
+              <friction>0.01</friction>
+            </dynamics>
           </axis>
         </joint>
 
@@ -955,19 +921,13 @@
         </visual>
       </link>
 
+      <!--
         <joint name="vertChild_6" type="ball">
-          <pose>0 0 -0.02173913043478261 0 0 0</pose>
-          <parent>link_6</parent>
-          <child>linkvert_6</child>
+          <parent>linkvert_6</parent>
+          <child>link_6</child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
-            <xyz>0 0 1</xyz>
-            <limit>
-              <upper>1.7</upper>
-              <lower>-1.7</lower>
-              <stiffness>1e6</stiffness>
-              <dissipation>1.0</dissipation>
-            </limit>
+            <xyz>1 0 0</xyz>
             <dynamics>
               <damping>0.1</damping>
            </dynamics>
@@ -978,16 +938,16 @@
             </ode>
           </physics>
         </joint>
+      -->
         <joint name="vertParent_6" type="revolute">
           <pose>0 0 0.025 0 0 0</pose>
           <parent>link_2</parent>
           <child>linkvert_6</child>
           <axis>
             <xyz>1 0 0</xyz>
-            <limit>
-              <upper>0</upper>
-              <lower>0</lower>
-            </limit>
+            <dynamics>
+              <friction>0.01</friction>
+            </dynamics>
           </axis>
         </joint>
 

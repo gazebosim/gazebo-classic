@@ -110,6 +110,7 @@ for layer in 1..layers
 end
 %>
 
+<!--
     <model name="joint_tree_base">
       <static>true</static>
       <link name="peg1">
@@ -185,6 +186,7 @@ end
         </collision>
       </link>
     </model>
+-->
     <model name="joint_tree_layers">
       <self_collide>true</self_collide>
 <%
@@ -214,11 +216,18 @@ end
       pos_link_vert_xyz[2] += layer_dist/2.0
 
       if(layer == 0)
-        axisRevolute = [0, 0, 1]
-        parentRevolute = "joint_tree_base::peg2"
+        axisVertParent = [0, 0, 1]
+        vertParent = "world"
       else
-        axisRevolute = [1, 0, 0]
-        parentRevolute = "link_" + ((body-1)/2).to_s
+        axisVertParent = [1, 0, 0]
+        vertParent = "link_" + ((body-1)/2).to_s
+      end
+
+      if layer.even?
+        axisVertChild = [1, 0, 0]
+      else
+        axisVertChild = [0, 1, 0]
+        axisVertParent = [0, 1, 0]
       end
 %>
       <%= "<link name=\"#{linkName}\">" %>
@@ -314,19 +323,19 @@ end
         </visual>
       </link>
 
+      <%=
+        if layer == layers-1
+          "<!--"
+        else
+          ""
+        end
+      %>
         <%= '<joint name="vertChild_' + body.to_s + '" type="ball">' %>
-          <pose>0 0 <%= -layer_dist/2.3 %> 0 0 0</pose>
-          <parent><%= linkName %></parent>
-          <child><%= linkVertName %></child>
+          <parent><%= linkVertName %></parent>
+          <child><%= linkName %></child>
           <thread_pitch>-0.1</thread_pitch>
           <axis>
-            <xyz>0 0 1</xyz>
-            <limit>
-              <upper>1.7</upper>
-              <lower>-1.7</lower>
-              <stiffness>1e6</stiffness>
-              <dissipation>1.0</dissipation>
-            </limit>
+            <xyz><%= a_to_s(axisVertChild) %></xyz>
             <dynamics>
               <damping>0.1</damping>
            </dynamics>
@@ -337,16 +346,22 @@ end
             </ode>
           </physics>
         </joint>
+      <%=
+        if layer == layers-1
+          "-->"
+        else
+          ""
+        end
+      %>
         <%= '<joint name="vertParent_' + body.to_s + '" type="revolute">' %>
           <pose>0 0 <%= layer_dist/2.0 %> 0 0 0</pose>
-          <parent><%= parentRevolute %></parent>
+          <parent><%= vertParent %></parent>
           <child><%= linkVertName %></child>
           <axis>
-            <xyz><%= a_to_s(axisRevolute) %></xyz>
-            <limit>
-              <upper>0</upper>
-              <lower>0</lower>
-            </limit>
+            <xyz><%= a_to_s(axisVertParent) %></xyz>
+            <dynamics>
+              <friction>0.01</friction>
+            </dynamics>
           </axis>
         </joint>
 <%
