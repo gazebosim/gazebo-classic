@@ -30,7 +30,7 @@ namespace gazebo
   ///  The default implementation is a simple axis aligned bounding box.
   class Volume
   {
-    /// \brief dtor
+    /// \brief Destructor
     public: virtual ~Volume();
 
     /// \brief Checks if a point lies inside the box
@@ -85,6 +85,9 @@ namespace gazebo
 
     /// \brief Called every simulation step
     public: void Update();
+
+    /// \brief Prints data about the event source to the log (useful for debug)
+    public: void Info() const;
 
     /// \brief Prints data about the event source to the log (useful for debug)
     public: void Info();

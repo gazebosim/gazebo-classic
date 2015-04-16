@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _REST_SERVICE_PLUGIN_HH_
-#define _REST_SERVICE_PLUGIN_HH_
+#ifndef _GAZEBO_REST_WEB_PLUGIN_HH_
+#define _GAZEBO_REST_WEB_PLUGIN_HH_
 
 #include <list>
 #include <vector>
@@ -27,27 +27,33 @@
 
 #include "RestApi.hh"
 
-
 namespace gazebo
 {
+  /// \class RestWebPlugin RestWebPlugin.hh RestWebPlugin.hh
+  /// \brief REST web plugin
   class GAZEBO_VISIBLE RestWebPlugin : public SystemPlugin
   {
-    /// \brief ctor
+    /// \brief Constructor
     public: RestWebPlugin();
 
-    /// \brief dtor
+    /// \brief Destructor
     public: virtual ~RestWebPlugin();
 
     /// \brief Plugin Load
+    /// \param[in] _argc Argument count
+    /// \param[in] _argv Argument vector
     public: virtual void Load(int _argc, char **_argv);
 
-    /// \brief  called everytime a login message is received.
+    /// \brief Called everytime a login message is received.
+    /// \param[in] _msg The login message
     public: void OnRestLoginRequest(ConstRestLoginPtr &_msg);
 
     /// \brief Called everytime a REST POST event message is received
+    /// \param[in] _msg The post message
     public: void OnEventRestPost(ConstRestPostPtr &_msg);
 
     /// \brief Called everytime a SimEvent message is received
+    /// \param[in] The SimEvent message
     public: void OnSimEvent(ConstSimEventPtr &_msg);
 
     /// \brief Plugin initialization
@@ -57,10 +63,8 @@ namespace gazebo
     private: void RunRequestQ();
 
     /// \brief Process a RestRequest message from the requestThread
+    /// \param[in] The message to process
     private: void ProcessLoginRequest(ConstRestLoginPtr _msg);
-
-    /// \brief Process a REST Post messsage from the requestThread
-    private: void ProcessRestPostEvent(ConstRestPostPtr _msg);
 
     /// \brief Gazebo pub/sub node
     private: gazebo::transport::NodePtr node;
@@ -83,20 +87,20 @@ namespace gazebo
     /// \brief REST calls
     private: RestApi restApi;
 
-    /// \brief a flag to interrupt message processing
+    /// \brief A flag to interrupt message processing
     private: bool stopMsgProcessing;
 
-    /// \brief a list to accumulate pending request
-    private: std::list< boost::shared_ptr<const gazebo::msgs::RestLogin> >
-              msgLoginQ;
+    /// \brief A list to accumulate pending requests
+    private: std::list<boost::shared_ptr<const gazebo::msgs::RestLogin>>
+        msgLoginQ;
 
-    /// \brief a thread to process requests without stopping the simulation
+    /// \brief A thread to process requests without stopping the simulation
     private: boost::thread *requestQThread;
 
-    /// \brief a mutex to ensure integrity of the request list
+    /// \brief A mutex to ensure integrity of the request list
     private: boost::mutex requestQMutex;
 
-    /// \brief a session string to keep track of exercises
+    /// \brief A session string to keep track of exercises
     private: std::string session;
   };
 }

@@ -1,5 +1,9 @@
 ## Gazebo 6.0
 
+1. Added a plugin to send messages to an existing website.
+   Added gui::MainWindow::AddMenu and msgs/rest_error, msgs/rest_login, msgs rest/post
+    * [Pull request #1524](https://bitbucket.org/osrf/gazebo/pull-request/1524)
+
 1. Fix deprecation warnings when using SDFormat 3.0.2, 3.0.3 prereleases
     * [Pull request #1568](https://bitbucket.org/osrf/gazebo/pull-request/1568)
 

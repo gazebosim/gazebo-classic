@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _RestUi_WIDGET_HH_
-#define _RestUi_WIDGET_HH_
+#ifndef _GAZEBO_RESTUI_WIDGET_HH_
+#define _GAZEBO_RESTUI_WIDGET_HH_
 
 #include <string>
 #include <list>
@@ -25,52 +25,59 @@
 #include <gazebo/util/system.hh>
 #include "RestUiLoginDialog.hh"
 
-
 namespace gazebo
 {
-  class GAZEBO_VISIBLE  RestUiWidget : public QWidget
+  /// \class RestUiWidget RestUiWidget.hh RestUiWidget.hh
+  /// \brief REST user interface widget
+  class GAZEBO_VISIBLE RestUiWidget : public QWidget
   {
     Q_OBJECT
 
-    /// \brief ctor
+    /// \brief Constructor
+    /// \param[in] _parent Parent widget.
+    /// \param[in] _menuTitle Menu title.
+    /// \param[in] _loginTitle Login title.
+    /// \param[in] _urlLabel Url label.
+    /// \param[in] _defaultUrl Default url.
     public: RestUiWidget(QWidget *_parent,
                          const std::string &_menuTitle,
-                         const std::string &_title,
+                         const std::string &_loginTitle,
                          const std::string &_urlLabel,
                          const std::string &_defautlUrl);
 
-    /// \brief dtor
-    public: virtual ~RestUiWidget();
+    /// \brief Destructor
+    public: virtual ~RestUiWidget() = default;
 
     /// \brief QT callback (from the login menu)
     public slots: void Login();
 
-    /// \brief called before rendering, from the GUI thread
-    /// this is called from the plugin's update
+    /// \brief Called before rendering, from the GUI thread this is called from
+    /// the plugin's update.
     public: void Update();
 
-    /// \brief the title to use when displaying dialog/message windows
+    /// \brief Called everytime a response  message is received.
+    /// \param[in] _msg Rest error message.
+    private: void OnResponse(ConstRestErrorPtr &_msg);
+
+    /// \brief The title to use when displaying dialog/message windows
     private: std::string title;
 
-    /// \brief pub/sub node to communicate with gzserver
+    /// \brief Pub/sub node to communicate with gzserver.
     private: gazebo::transport::NodePtr node;
 
-    /// \brief login dialog
+    /// \brief Login dialog.
     private: gui::RestUiLoginDialog dialog;
 
     /// \brief Gazebo topics publisher
     private: gazebo::transport::PublisherPtr pub;
 
-    // \brief Gazebo topics subscriber
+    /// \brief Gazebo topics subscriber.
     private: gazebo::transport::SubscriberPtr sub;
 
-    /// \brief called everytime a response  message is received.
-    private: void OnResponse(ConstRestErrorPtr &_msg);
-
-    /// \brief List of unprocessed error messages to be displayed from
-    /// the gui thread
-    private: std::list< boost::shared_ptr<const gazebo::msgs::RestError> >
-      msgRespQ;
+    /// \brief List of unprocessed error messages to be displayed from the gui
+    /// thread.
+    private: std::list<boost::shared_ptr<const gazebo::msgs::RestError>>
+        msgRespQ;
   };
 }
 
