@@ -44,7 +44,7 @@ Send messages from Gazebo to the web server:
 
     gzclient --verbose -g libRestUiPlugin.so menu="REST-web" title="test server" label="Login" url="https://localhost:3000"
 
-
+  You should run gzserver.bash and gzclient.bash from their directory, otherwise you will get an error (Could not open file[../../worlds/rest_web.world]).
   In gzclient, there should be a new menu titled: "REST-web". Log in with user 'myuser' and password 'mypass'. Then, start and stop the simulation, you should see events published to the web site.
 
 

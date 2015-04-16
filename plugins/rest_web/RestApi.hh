@@ -15,9 +15,8 @@
  *
 */
 
-
-#ifndef _REST_API_HH_
-#define _REST_API_HH_
+#ifndef _GAZEBO_REST_API_HH_
+#define _GAZEBO_REST_API_HH_
 
 #include <string>
 #include <list>
@@ -27,15 +26,17 @@
 
 namespace gazebo
 {
+  /// \class RestApi RestApi.hh RestApi.hh
+  /// \brief REST interface
   class RestApi
   {
-    /// \brief ctor
+    /// \brief Constructor
     public: RestApi();
 
-    /// \brief dtor
+    /// \brief Destructor
     public: virtual ~RestApi();
 
-    /// \brief Connects to the Rest service.
+    /// \brief Connects to the REST service.
     /// \param[in] _url The web service url
     /// \param[in] _route The route on the server
     /// \param[in] _user The user name
@@ -49,26 +50,31 @@ namespace gazebo
     /// \brief Notify the service with a http POST
     /// \param[in] _route on the web server
     /// \param[in] _json the data to send to the server
-    public: void PostJsonData(const char* _route, const char *_json);
+    public: void PostJsonData(const char *_route, const char *_json);
 
     /// \brief Returns the username
     /// \return The user name
     public: std::string GetUser() const;
 
-    /// \brief a Request/Respone (can be used for GET and POST)
+    /// \brief A Request/Respone (can be used for GET and POST)
     /// \param[in] _requestUrl The request url.
     /// \param[in] _postStr The data to post
+    /// \throws RestException When this->url or this->user are empty, and
+    /// when the request failed.
     /// \return The web server response
     private: std::string Request(const std::string &_requestUrl,
                                  const std::string &_postStr);
 
-    /// \brief Login information: Rest service host url
+    /// \brief Sends unposted posts
+    private: void SendUnpostedPosts();
+
+    /// \brief Login information: REST service host url
     private: std::string url;
 
-    /// \brief Login information: Rest service username
+    /// \brief Login information: REST service username
     private: std::string user;
 
-    /// \brief Login information: Rest service password
+    /// \brief Login information: REST service password
     private: std::string pass;
 
     /// \brief Login information: login route
@@ -87,8 +93,8 @@ namespace gazebo
     /// \brief List of unposted posts. Posts await when isLoggedIn is false
     private: std::list<Post> posts;
 
-    /// \brief Sends unposted posts
-    private: void SendUnpostedPosts();
+    /// \brief A mutex to ensure integrity of the post list
+    private: boost::mutex postsMutex;
   };
 }
 

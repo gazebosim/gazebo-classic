@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,42 +25,36 @@ using namespace gazebo;
 
 /////////////////////////////////////////////////
 RestUiPlugin::RestUiPlugin()
-  :widget(NULL)
+: widget(NULL)
 {
-  menuTitle = "Web service";
-  loginTitle = "Web service login";
-  urlLabel = "url";
-  defaultUrl = "https://";
-}
-
-/////////////////////////////////////////////////
-RestUiPlugin::~RestUiPlugin()
-{
-  // nothing to do
+  this->menuTitle = "Web service";
+  this->loginTitle = "Web service login";
+  this->urlLabel = "url";
+  this->defaultUrl = "https://";
 }
 
 /////////////////////////////////////////////////
 void RestUiPlugin::Load(int _argc, char ** _argv)
 {
   gzmsg << "RestUiPlugin: cmd line arguments (menu=, title=, label=, url=)\n";
-  for (int i = 0; i < _argc; i++)
+  for (int i = 0; i < _argc; ++i)
   {
     std::string arg = _argv[i];
     if (arg.find("menu=") == 0)
     {
-        this->menuTitle = arg.substr(5);
+      this->menuTitle = arg.substr(5);
     }
     else if (arg.find("title=") == 0 )
     {
-        this->loginTitle = arg.substr(6);
+      this->loginTitle = arg.substr(6);
     }
     else if (arg.find("label=") == 0 )
     {
-        this->urlLabel = arg.substr(6);
+      this->urlLabel = arg.substr(6);
     }
     else if (arg.find("url=") == 0 )
     {
-        this->defaultUrl = arg.substr(4);
+      this->defaultUrl = arg.substr(4);
     }
   }
   gzmsg << "   menu title: " << this->menuTitle  << std::endl;
@@ -78,16 +72,16 @@ void RestUiPlugin::Init()
       boost::bind(&RestUiPlugin::OnMainWindowReady, this)));
 
   this->connections.push_back(
-        event::Events::ConnectPreRender(
-        boost::bind(&RestUiPlugin::Update, this)));
+      event::Events::ConnectPreRender(
+      boost::bind(&RestUiPlugin::Update, this)));
 }
 
 /////////////////////////////////////////////////
 void RestUiPlugin::Update()
 {
-  if (widget)
+  if (this->widget)
   {
-    widget->Update();
+    this->widget->Update();
   }
 }
 
@@ -98,17 +92,19 @@ void RestUiPlugin::OnMainWindowReady()
   std::string menuStr("&");
   menuStr += this->menuTitle;
   QMenu *menu = new QMenu(QString(menuStr.c_str()));
-  QAction* loginAct = new QAction(QString("&Login"), menu);
+  QAction *loginAct = new QAction(QString("&Login"), menu);
   loginAct->setStatusTip(QString("Login to Mentor 2 Learning Companion"));
   gui::MainWindow *mainWindow = gui::get_main_window();
   // create a global widget instance, to act as a global QT object
   // the RestUiPlugin class is not a QT object
-  widget = new RestUiWidget(mainWindow,
+  this->widget = new RestUiWidget(mainWindow,
                             this->menuTitle.c_str(),
                             this->loginTitle.c_str(),
                             this->urlLabel.c_str(),
                             this->defaultUrl.c_str());
-  QObject::connect(loginAct, SIGNAL(triggered()), widget, SLOT(Login()));
+
+  QObject::connect(loginAct, SIGNAL(triggered()),
+                   this->widget, SLOT(Login()));
   menu->addAction(loginAct);
   mainWindow->AddMenu(menu);
 }

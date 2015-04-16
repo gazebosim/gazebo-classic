@@ -68,7 +68,6 @@ std::string LastRestError()
   return "";
 }
 
-
 // waits for one or multiple events. if the expected number is
 // specified, then the function can return early
 unsigned int WaitForNewError(unsigned int current,

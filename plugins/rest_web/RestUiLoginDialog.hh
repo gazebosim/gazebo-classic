@@ -15,9 +15,8 @@
  *
 */
 
-
-#ifndef  _REST_LOGIN_DIALOG_HH_
-#define  _REST_LOGIN_DIALOG_HH_
+#ifndef _REST_LOGIN_DIALOG_HH_
+#define _REST_LOGIN_DIALOG_HH_
 
 #include <string>
 
@@ -30,6 +29,8 @@ namespace gazebo
   {
     class RestUiWidget;
 
+    /// \class RestUiLoginDialog RestUiLoginDialog.hh RestUiLoginDialog.hh
+    /// \brief Provides a means to login to a webservice
     class GAZEBO_VISIBLE RestUiLoginDialog : public QDialog
     {
       Q_OBJECT
@@ -38,7 +39,7 @@ namespace gazebo
       /// \param[in] _parent Parent QWidget
       /// \param[in] _title The dialog window title bar text
       /// \param[in] _url Label the title of the url (ex: super webservice url)
-      /// \param[in] _default Url text for the url (ex: https://superweb.com)
+      /// \param[in] _defaultUrl Url text for the url (ex: https://superweb.com)
       public: RestUiLoginDialog(QWidget *_parent,
                               const std::string &_title,
                               const std::string &_urlLabel,
@@ -49,22 +50,26 @@ namespace gazebo
       /// \param[in] _username The user name
       /// \param[in] _password The user password
       signals: void AcceptLogin(QString &_url,
-                                QString& _username,
-                                QString& _password);
+                                QString &_username,
+                                QString &_password);
 
       /// \brief Getter for User name (of the basic auth REST service)
+      /// \return User name
       public: std::string GetUsername() const;
 
       /// \brief Getter for the password
+      /// \return The password
       public: std::string GetPassword() const;
 
-      /// \brief Getter for the Url (https)
+      /// \brief Getter for the Url
+      /// \return The url for the site (ex: https://yoursite.com:4000)
       public: std::string GetUrl() const;
 
-      /// slot for the AcceptLogin event
-      public slots: void slotAcceptLogin();
+      /// \brief Slot for the AcceptLogin event
+      public slots: void SlotAcceptLogin();
 
-      /// \brief A label for the url component
+      /// \brief A label for the url component that appears on the
+      /// login widget above
       private: QLabel *labelUrl;
 
       /// \brief A label for the username component
@@ -74,15 +79,15 @@ namespace gazebo
       private: QLabel *labelPassword;
 
       /// \brief A text field for the default url
-      private: QLineEdit* editUrl;
+      private: QLineEdit *editUrl;
 
       /// \brief A text field to enter the user name
-      private: QLineEdit* editUsername;
+      private: QLineEdit *editUsername;
 
       /// \brief A text field to enter the password
-      private: QLineEdit* editPassword;
+      private: QLineEdit *editPassword;
 
-      /// \brief A label to displau errors and information
+      /// \brief A label to display errors and information
       private: QLabel *labelInfo;
 
       /// \brief The standard dialog buttons

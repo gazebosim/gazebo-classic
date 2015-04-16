@@ -9,4 +9,3 @@ message RestLogin
   optional string username = 2;
   optional string password = 3;
 }
-

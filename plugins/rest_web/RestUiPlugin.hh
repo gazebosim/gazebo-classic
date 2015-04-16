@@ -29,42 +29,46 @@
 
 namespace gazebo
 {
+  /// \class RestUiPlugin RestUiPlugin.hh RestUiPlugin.hh
+  /// \brief REST user interface plugin
   class GAZEBO_VISIBLE RestUiPlugin : public SystemPlugin
   {
-    /// \brief ctor
+    /// \brief Constructor
     public: RestUiPlugin();
 
-    /// \brief dtor
-    public: virtual ~RestUiPlugin();
+    /// \brief Destructor
+    public: virtual ~RestUiPlugin() = default;
 
-    /// \brief called when plugin is loaded
+    /// \brief Called when plugin is loaded.
+    /// \param[in] _argc Arguments count
+    /// \param[in] _argv Argument vector
     public: virtual void Load(int _argc, char **_argv);
 
-    /// \brief plugin initialization
+    /// \brief Plugin initialization.
     private: virtual void Init();
 
-    /// \brief called by Gazebo after the main window has been setup
+    /// \brief Called by Gazebo after the main window has been setup.
     private: void OnMainWindowReady();
 
-    /// \brief called from the GUI thread before rendering
+    /// \brief Called from the GUI thread before rendering.
     private: void Update();
 
-    /// \brief callbacks (to connect to the main window ready event)
+    /// \brief Callbacks (to connect to the main window ready event).
     private: std::vector<event::ConnectionPtr> connections;
 
-    /// \brief The Title, used for the menu item
+    /// \brief The Title, used for the menu item.
     private: std::string menuTitle;
 
-    /// \brief The login title
+    /// \brief The login title.
     private: std::string loginTitle;
 
-    /// \brief The url description
+    /// \brief The url description.
     private: std::string urlLabel;
 
-    /// \brief The default url (if fixed)
+    /// \brief The default url (if fixed).
     private: std::string defaultUrl;
 
-    /// \brief the widget
+    /// \brief The widget.
     private: RestUiWidget *widget;
   };
 }
