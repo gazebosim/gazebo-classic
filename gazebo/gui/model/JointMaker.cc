@@ -697,7 +697,12 @@ void JointMaker::CreateHotSpot(JointData *_joint)
       this->jointMaterials[_joint->type]);
   Ogre::ColourValue color = mat->getTechnique(0)->getPass(0)->getDiffuse();
   color.a = 0.5;
-  double dimension = 0.1;
+
+  double linkSize = std::min(0.1,
+      _joint->parent->GetBoundingBox().GetSize().GetLength()*0.05);
+  linkSize = std::max(linkSize, 0.01);
+
+  double dimension = linkSize;
   handleSet->setDefaultDimensions(dimension, dimension);
   Ogre::Billboard *parentHandle = handleSet->createBillboard(0, 0, 0);
   parentHandle->setColour(color);

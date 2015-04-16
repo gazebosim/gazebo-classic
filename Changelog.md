@@ -39,6 +39,10 @@
 1. Added ModelRightMenu::EntityTypes.
     * [Pull request #1414](https://bitbucket.org/osrf/gazebo/pull-request/1414)
 
+1. Scale joint visuals according to link size.
+    * [Pull request #1591](https://bitbucket.org/osrf/gazebo/pull-request/1591)
+    * [Issue #1563](https://bitbucket.org/osrf/gazebo/issue/1563)
+
 1. Added Gazebo/CoM material.
     * [Pull request #1439](https://bitbucket.org/osrf/gazebo/pull-request/1439)
 
