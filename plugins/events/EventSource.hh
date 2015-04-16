@@ -46,7 +46,7 @@ namespace gazebo
     /// \brief emit an event with data to the internal publisher
     /// (and using the internal type)
     /// \param[in] _data the JSON data related to this event.
-    public: void Emit(const std::string& _data);
+    public: void Emit(const std::string& _data) const;
 
     /// \brief Load from an sdf element (with possible configuration data)
     /// \param[in] _sdf the sdf element for the event in the world file
@@ -58,7 +58,7 @@ namespace gazebo
     /// \brief An event source can be used to enable other events. Inactive
     /// events do not generate an message when Emit is called.
     /// \return true if the event is active
-    public: virtual bool IsActive();
+    public: virtual bool IsActive() const;
 
     /// \brief Name of the event.
     protected: std::string name;
@@ -80,7 +80,7 @@ namespace gazebo
   typedef boost::shared_ptr<EventSource> EventSourcePtr;
 
   /// \brief Gazebo events to detect model creation/deletion
-  class  SimEventConnector
+  class SimEventConnector
   {
     /// \brief Connect a boost::slot to the spawn model event
     /// \param[in] _subscriber the subscriber to this event
