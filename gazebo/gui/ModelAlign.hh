@@ -79,6 +79,13 @@ namespace gazebo
       private: void Transform(math::Box _bbox, math::Pose _worldPose,
           std::vector<math::Vector3> &_vertices);
 
+      /// \brief Change the transparency of the visual's children recursively
+      /// to indicate a highlighted state or not. Must do it for each visual 
+      /// independently as they might have different transparencies.
+      /// \param[in] _vis Visual to be highlighted.
+      /// \param[in] _highlight Whether to highlight or not.
+      private: void SetHighlighted(rendering::VisualPtr _vis, bool _highlight);
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelAlign>;
 

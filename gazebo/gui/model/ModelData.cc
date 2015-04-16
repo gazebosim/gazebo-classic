@@ -70,6 +70,12 @@ double ModelData::GetEditTransparency()
 }
 
 /////////////////////////////////////////////////
+void ModelData::SetPose(const math::Pose &_pose)
+{
+  this->pose = _pose;
+}
+
+/////////////////////////////////////////////////
 LinkData::LinkData()
 {
   this->linkSDF.reset(new sdf::Element);

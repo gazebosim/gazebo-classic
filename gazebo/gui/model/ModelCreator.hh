@@ -49,6 +49,7 @@ namespace gazebo
   namespace gui
   {
     class LinkData;
+    class ModelData;
     class SaveDialog;
     class JointMaker;
 
@@ -186,6 +187,10 @@ namespace gazebo
       /// \param[in] _type Type of joint to add.
       public: void AddJoint(const std::string &_type);
 
+      /// \brief Remove a nestedModel from the model.
+      /// \param[in] _nestedModelName Name of the nestedModel to remove
+      public: void RemoveNestedModel(const std::string &_nestedModelName);
+
       /// \brief Remove a link from the model.
       /// \param[in] _linkName Name of the link to remove
       public: void RemoveLink(const std::string &_linkName);
@@ -237,6 +242,12 @@ namespace gazebo
       /// \param[in] _link Link data used to generate the sdf.
       /// \return SDF element describing the link.
       private: sdf::ElementPtr GenerateLinkSDF(LinkData *_link);
+
+      /// \brief Internal helper function to remove a nestedModel without
+      /// removing
+      /// the joints.
+      /// \param[in] _nestedModelName Name of the nestedModel to remove
+      private: void RemoveNestedModelImpl(const std::string &_nestedModelName);
 
       /// \brief Internal helper function to remove a link without removing
       /// the joints.
@@ -292,6 +303,13 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
 
+      /// \brief Callback when a nestedModel is selected.
+      /// \param[in] _name Name of nestedModel.
+      /// \param[in] _selected True if the nestedModel is selected, false if
+      /// deselected.
+      private: void OnSetSelectedNestedModel(const std::string &_name,
+          bool _selected);
+
       /// \brief Callback when a link is selected.
       /// \param[in] _name Name of link.
       /// \param[in] _selected True if the link is selected, false if
@@ -339,7 +357,8 @@ namespace gazebo
       /// \brief Load a model SDF file and create visuals in the model editor.
       /// This is used mainly when editing existing models.
       /// \param[in] _sdf SDF of a model to be loaded
-      private: void LoadSDF(sdf::ElementPtr _sdf);
+      private: rendering::VisualPtr CreateModelFromSDF(sdf::ElementPtr _sdf,
+          rendering::VisualPtr _parentVis = NULL);
 
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _axis Axis of alignment: x, y, or z.
@@ -380,6 +399,10 @@ namespace gazebo
       /// \brief Qt callback when a delete signal has been emitted. This is
       /// currently triggered by the context menu via right click.
       private slots: void OnDelete();
+
+      /// \brief Qt callback when a delete signal has been emitted.
+      /// \param[in] _name Name of the entity to delete.
+      private slots: void OnDeleteNestedModel(const std::string &_name);
 
       /// \brief Qt callback when a delete signal has been emitted.
       /// \param[in] _name Name of the entity to delete.
@@ -436,6 +459,9 @@ namespace gazebo
       /// \brief A map of model link names to and their visuals.
       private: std::map<std::string, LinkData *> allLinks;
 
+      /// \brief A map of nested model names to and their visuals.
+      private: std::map<std::string, ModelData *> allNestedModels;
+
       /// \brief Transport node
       private: transport::NodePtr node;
 
@@ -452,6 +478,9 @@ namespace gazebo
 
       /// \brief origin of the model.
       private: math::Pose origin;
+
+      /// \brief A list of selected nestedModel visuals.
+      private: std::vector<rendering::VisualPtr> selectedNestedModels;
 
       /// \brief A list of selected link visuals.
       private: std::vector<rendering::VisualPtr> selectedLinks;

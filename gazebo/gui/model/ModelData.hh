@@ -49,6 +49,19 @@ namespace gazebo
       /// \brief Get the default transparency setting for entities in model
       /// editor.
       public: static double GetEditTransparency();
+
+      /// \brief Set the pose of the model.
+      /// \param[in] _pose Pose of model.
+      public: void SetPose(const math::Pose &_pose);
+
+      /// \brief SDF representing the model data.
+      public: sdf::ElementPtr modelSDF;
+
+      /// \brief Model pose.
+      public: math::Pose pose;
+
+      /// \brief Visual representing this model.
+      public: rendering::VisualPtr modelVisual;
     };
 
     /// \class LinkData LinkData.hh

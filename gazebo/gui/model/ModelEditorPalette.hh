@@ -85,6 +85,13 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
 
+      /// \brief Callback when a nestedModel is selected.
+      /// \param[in] _name Name of nestedModel.
+      /// \param[in] _selected True if the nestedModel is selected, false if
+      /// deselected.
+      private: void OnSetSelectedNestedModel(const std::string &_name,
+          bool _selected);
+
       /// \brief Callback when a link is selected.
       /// \param[in] _name Name of link.
       /// \param[in] _selected True if the link is selected, false if
@@ -137,6 +144,10 @@ namespace gazebo
       ///  receives.
       private slots: void OnCustomContextMenu(const QPoint &_pt);
 
+      /// \brief Add a nestedModel to the tree.
+      /// \param[in] _nestedModelName Scoped nestedModel name.
+      private: void OnNestedModelInserted(const std::string &_nestedModelName);
+
       /// \brief Add a link to the tree.
       /// \param[in] _linkName Scoped link name.
       private: void OnLinkInserted(const std::string &_linkName);
@@ -149,6 +160,10 @@ namespace gazebo
       private: void OnJointInserted(const std::string &_jointId,
           const std::string &_jointName, const std::string &_parentName,
           const std::string &_childName);
+
+      /// \brief Remove a nested model from the tree.
+      /// \param[in] _linkId Unique nested model identifying name.
+      private: void OnNestedModelRemoved(const std::string &_nestedModelId);
 
       /// \brief Remove a link from the tree.
       /// \param[in] _linkId Unique link identifying name.
@@ -209,6 +224,9 @@ namespace gazebo
       private: QTreeWidget *modelTreeWidget;
 
       /// \brief Parent item for all links.
+      private: QTreeWidgetItem *nestedModelsItem;
+
+      /// \brief Parent item for all links.
       private: QTreeWidgetItem *linksItem;
 
       /// \brief Parent item for all joints.
@@ -219,7 +237,7 @@ namespace gazebo
 
       /// \brief Keeps tracks of selected items.
       private: QList<QTreeWidgetItem *> selected;
-      
+
       /// \brief Layout for other items in the palette.
       private: QVBoxLayout *otherItemsLayout;
 
