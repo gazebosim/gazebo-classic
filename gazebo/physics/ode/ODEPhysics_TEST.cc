@@ -168,6 +168,33 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   EXPECT_DOUBLE_EQ(contactMaxCorrectingVel,
       odePhysics->GetContactMaxCorrectingVel());
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, odePhysics->GetContactSurfaceLayer());
+
+  // Test dynamic MOI modification flag
+  {
+    std::vector<std::string> keys;
+    const std::string key1 = "inertia_ratio_reduction";
+    const std::string key2 = "use_dynamic_moi_rescaling";
+    keys.push_back(key1);
+    keys.push_back(key2);
+
+    std::vector<bool> bools;
+    bools.push_back(true);
+    bools.push_back(false);
+
+    // Set each keys with each flag value
+    for (auto const &key : keys)
+    {
+      for (const bool &flag : bools)
+      {
+        gzdbg << "SetParam(" << key << ", " << flag << ")" << std::endl;
+        EXPECT_TRUE(odePhysics->SetParam(key, flag));
+
+        // Check both keys
+        EXPECT_EQ(flag, boost::any_cast<bool>(odePhysics->GetParam(key1)));
+        EXPECT_EQ(flag, boost::any_cast<bool>(odePhysics->GetParam(key2)));
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
