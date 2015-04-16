@@ -40,17 +40,8 @@ GraphScene::GraphScene(QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-GraphScene::~GraphScene()
-{
-}
-
-/////////////////////////////////////////////////
 QGVNode *GraphScene::AddNode(const std::string &_name)
 {
-  // Note don't show the ground plane
-  if (_name.find("plane") != std::string::npos)
-    return NULL;
-
   QGVNode *node = this->addNode(tr(_name.c_str()));
 
   return node;
@@ -75,22 +66,22 @@ QGVNode *GraphScene::GetNode(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-QGVEdge *GraphScene::AddEdge(const std::string &_node1,
-    const std::string &_node2)
+QGVEdge *GraphScene::AddEdge(const std::string &_id,
+    const std::string &_node1, const std::string &_node2)
 {
-  QGVEdge *edge = this->addEdge(tr(_node1.c_str()), tr(_node2.c_str()));
+  QGVEdge *edge = this->addEdge(tr(_node1.c_str()), tr(_node2.c_str()),
+      tr(_id.c_str()));
   return edge;
 }
 
 /////////////////////////////////////////////////
-void GraphScene::RemoveEdge(const std::string &_node1,
-    const std::string &_node2)
+void GraphScene::RemoveEdge(const std::string &_id)
 {
-  this->removeEdge(tr(_node1.c_str()), tr(_node2.c_str()));
+  this->removeEdge(tr(_id.c_str()));
 }
 
 /////////////////////////////////////////////////
-void GraphScene::drawBackground(QPainter * _painter, const QRectF & _rect)
+void GraphScene::drawBackground(QPainter *_painter, const QRectF & _rect)
 {
   QColor c(250, 250, 250);
   QBrush brush(c, Qt::SolidPattern);

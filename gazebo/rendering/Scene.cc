@@ -1612,6 +1612,15 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     }
   }
 
+  {
+    boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+    for (int i = 0; i < _msg.model_size(); ++i)
+    {
+      boost::shared_ptr<msgs::Model> mm(new msgs::Model(_msg.model(i)));
+      this->dataPtr->modelMsgs.push_back(mm);
+    }
+  }
+
   return true;
 }
 

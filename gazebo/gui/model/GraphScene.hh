@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GRAPH_SCENE_HH_
-#define _GRAPH_SCENE_HH_
+#ifndef _GAZEBO_GRAPH_SCENE_HH_
+#define _GAZEBO_GRAPH_SCENE_HH_
 
 #include <string>
 
@@ -38,7 +38,7 @@ namespace gazebo
       public: GraphScene(QWidget *_parent = 0);
 
       /// \brief Destructor
-      public: virtual ~GraphScene();
+      public: virtual ~GraphScene() = default;
 
       /// \brief Add a node to the scene.
       /// \param[in] _name Name of the node.
@@ -50,7 +50,7 @@ namespace gazebo
       public: void RemoveNode(const std::string &_name);
 
       /// \brief Check if a node exists in the scene.
-      /// \param[in] _name Name of the name.
+      /// \param[in] _name Name of the node.
       /// \return True if the node exists.
       public: bool HasNode(const std::string &_name);
 
@@ -60,22 +60,21 @@ namespace gazebo
       public: QGVNode *GetNode(const std::string &_name);
 
       /// \brief Add an edge to connect two nodes.
+      /// \param[in] _id Edge ID.
       /// \param[in] _node1 Name of the first node.
       /// \param[in] _node2 Name of the second node.
       /// \return the Edge created.
-      public: QGVEdge *AddEdge(const std::string &_node1,
-          const std::string &_node2);
+      public: QGVEdge *AddEdge(const std::string &_id,
+          const std::string &_node1, const std::string &_node2);
 
       /// \brief Remove an edge between two nodes.
-      /// \param[in] _node1 Name of the first node.
-      /// \param[in] _node2 Name of the second node.
-      public: void RemoveEdge(const std::string &_node1,
-          const std::string &_node2);
+      /// \param[in] _id Edge ID.
+      public: void RemoveEdge(const std::string &_id);
 
       /// \brief Overrides the default background with grid lines.
       /// \param[in] _painter Qt painter object.
       /// \param[in] _rect Qt scene background rectangle
-      private: void drawBackground(QPainter * _painter, const QRectF & _rect);
+      private: void drawBackground(QPainter *_painter, const QRectF &_rect);
     };
   }
 }

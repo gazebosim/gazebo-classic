@@ -141,7 +141,7 @@ void JointMaker::Reset()
 
   this->scopedLinkedNames.clear();
 
-  while (this->joints.size() > 0)
+  while (!this->joints.empty())
   {
     std::string jointId = this->joints.begin()->first;
     this->RemoveJoint(jointId);
@@ -580,7 +580,6 @@ void JointMaker::Stop()
       rendering::ScenePtr scene = this->mouseJoint->visual->GetScene();
       scene->RemoveVisual(this->mouseJoint->visual);
       this->mouseJoint->visual.reset();
-//      delete this->mouseJoint->inspector;
       delete this->mouseJoint;
       this->mouseJoint = NULL;
     }
@@ -899,6 +898,7 @@ void JointMaker::Update()
                 new gazebo::rendering::JointVisual(jointVisName, joint->child));
 
             jointVis->Load(jointUpdateMsg);
+
             joint->jointVisual = jointVis;
           }
 
@@ -1100,11 +1100,9 @@ void JointMaker::ShowContextMenu(const std::string &_name)
   auto it = this->joints.find(_name);
   if (it == this->joints.end())
     return;
-
   QMenu menu;
   if (this->inspectAct)
     menu.addAction(this->inspectAct);
-
   this->inspectName = _name;
   QAction *deleteAct = new QAction(tr("Delete"), this);
   connect(deleteAct, SIGNAL(triggered()), this, SLOT(OnDelete()));
@@ -1169,16 +1167,12 @@ void JointMaker::SetSelected(rendering::VisualPtr _jointVis,
 /////////////////////////////////////////////////
 void JointMaker::DeselectAll()
 {
-  if (!this->selectedJoints.empty())
+  while (!this->selectedJoints.empty())
   {
-    while (!this->selectedJoints.empty())
-    {
-      rendering::VisualPtr vis = this->selectedJoints[0];
-      vis->SetHighlighted(false);
-      this->selectedJoints.erase(this->selectedJoints.begin());
-      model::Events::setSelectedJoint(vis->GetName(), false);
-    }
-    this->selectedJoints.clear();
+    rendering::VisualPtr vis = this->selectedJoints[0];
+    vis->SetHighlighted(false);
+    this->selectedJoints.erase(this->selectedJoints.begin());
+    model::Events::setSelectedJoint(vis->GetName(), false);
   }
 }
 
@@ -1186,26 +1180,15 @@ void JointMaker::DeselectAll()
 void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
     const std::string &_modelName)
 {
-  // Name
-  std::string jointName = _jointElem->Get<std::string>("name");
-
-  // Pose
-  math::Pose jointPose;
-  if (_jointElem->HasElement("pose"))
-    jointPose = _jointElem->Get<math::Pose>("pose");
-  else
-    jointPose.Set(0, 0, 0, 0, 0, 0);
+  msgs::Joint jointMsg = msgs::JointFromSDF(_jointElem);
 
   // Parent
-  std::string parentName = _modelName + "::" +
-      _jointElem->GetElement("parent")->GetValue()->GetAsString();
-
+  std::string parentName = _modelName + "::" + jointMsg.parent();
   rendering::VisualPtr parentVis =
       gui::get_active_camera()->GetScene()->GetVisual(parentName);
 
   // Child
-  std::string childName = _modelName + "::" +
-      _jointElem->GetElement("child")->GetValue()->GetAsString();
+  std::string childName = _modelName + "::" + jointMsg.child();
   rendering::VisualPtr childVis =
       gui::get_active_camera()->GetScene()->GetVisual(childName);
 
@@ -1216,123 +1199,24 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
     return;
   }
 
-  // Type
-  std::string type = _jointElem->Get<std::string>("type");
-
   JointData *joint = new JointData();
-  joint->name = jointName;
+  joint->name = jointMsg.name();
   joint->parent = parentVis;
   joint->child = childVis;
-  joint->type = this->ConvertJointType(type);
-  std::string jointVisName = _modelName + "::" + jointName;
+  joint->type = this->ConvertJointType(msgs::ConvertJointType(jointMsg.type()));
+  std::string jointVisName = _modelName + "::" + joint->name;
 
   joint->jointMsg.reset(new msgs::Joint);
-  joint->jointMsg->set_name(jointName);
-  joint->jointMsg->set_parent(joint->parent->GetName());
+  joint->jointMsg->CopyFrom(jointMsg);
   joint->jointMsg->set_parent_id(joint->parent->GetId());
-  joint->jointMsg->set_child(joint->child->GetName());
   joint->jointMsg->set_child_id(joint->child->GetId());
-  msgs::Set(joint->jointMsg->mutable_pose(), jointPose);
 
-  joint->jointMsg->set_type(
-      msgs::ConvertJointType(this->GetTypeAsString(joint->type)));
-
-  unsigned int axisCount = JointMaker::GetJointAxisCount(joint->type);
-  for (unsigned int i = 0; i < axisCount; ++i)
-  {
-    msgs::Axis *axisMsg;
-    sdf::ElementPtr axisElem;
-    if (i == 0u)
-    {
-      axisMsg = joint->jointMsg->mutable_axis1();
-      axisElem = _jointElem->GetElement("axis");
-    }
-    else if (i == 1u)
-    {
-      axisMsg = joint->jointMsg->mutable_axis2();
-      axisElem = _jointElem->GetElement("axis2");
-    }
-    else
-    {
-      gzerr << "Invalid axis index["
-            << i
-            << "]"
-            << std::endl;
-      continue;
-    }
-    if (axisElem->HasElement("limit"))
-    {
-      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
-      axisMsg->set_limit_lower(limitElem->Get<double>("lower"));
-      axisMsg->set_limit_upper(limitElem->Get<double>("upper"));
-      axisMsg->set_limit_effort(limitElem->Get<double>("effort"));
-      axisMsg->set_limit_velocity(limitElem->Get<double>("velocity"));
-    }
-    // Use parent model frame
-    if (axisElem->HasElement("use_parent_model_frame"))
-    {
-      bool useParent = axisElem->Get<bool>("use_parent_model_frame");
-      axisMsg->set_use_parent_model_frame(useParent);
-    }
-    if (axisElem->HasElement("dynamics"))
-    {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-      axisMsg->set_damping(dynamicsElem->Get<double>("damping"));
-      axisMsg->set_friction(dynamicsElem->Get<double>("friction"));
-    }
-
-    msgs::Set(axisMsg->mutable_xyz(), axisElem->Get<math::Vector3>("xyz"));
-
-    // Add angle field after we've checked that index i is valid
-    joint->jointMsg->add_angle(0);
-  }
-
-  if (_jointElem->HasElement("physics"))
-  {
-    sdf::ElementPtr physicsElem = _jointElem->GetElement("physics");
-    if (physicsElem->HasElement("ode"))
-    {
-      sdf::ElementPtr odeElem = physicsElem->GetElement("ode");
-      if (odeElem->HasElement("cfm"))
-        joint->jointMsg->set_cfm(odeElem->Get<double>("cfm"));
-      if (odeElem->HasElement("bounce"))
-        joint->jointMsg->set_bounce(odeElem->Get<double>("bounce"));
-      if (odeElem->HasElement("velocity"))
-        joint->jointMsg->set_velocity(odeElem->Get<double>("velocity"));
-      if (odeElem->HasElement("fudge_factor"))
-        joint->jointMsg->set_fudge_factor(odeElem->Get<double>("fudge_factor"));
-
-      if (odeElem->HasElement("limit"))
-      {
-        sdf::ElementPtr odeLimitElem = odeElem->GetElement("limit");
-        if (odeLimitElem->HasElement("cfm"))
-          joint->jointMsg->set_limit_cfm(odeLimitElem->Get<double>("cfm"));
-        if (odeLimitElem->HasElement("erp"))
-          joint->jointMsg->set_limit_erp(odeLimitElem->Get<double>("erp"));
-      }
-      if (odeElem->HasElement("suspension"))
-      {
-        sdf::ElementPtr odeSuspensionElem = odeElem->GetElement("suspension");
-        if (odeSuspensionElem->HasElement("cfm"))
-        {
-          joint->jointMsg->set_suspension_cfm(
-              odeSuspensionElem->Get<double>("cfm"));
-        }
-        if (odeSuspensionElem->HasElement("erp"))
-        {
-          joint->jointMsg->set_suspension_erp(
-              odeSuspensionElem->Get<double>("erp"));
-        }
-      }
-    }
-  }
 
   // Inspector
   joint->inspector = new JointInspector();
   joint->inspector->Update(joint->jointMsg);
   joint->inspector->setModal(false);
-  connect(joint->inspector, SIGNAL(Applied()),
-      joint, SLOT(OnApply()));
+  connect(joint->inspector, SIGNAL(Applied()), joint, SLOT(OnApply()));
 
   // Visuals
   rendering::VisualPtr jointVis(
