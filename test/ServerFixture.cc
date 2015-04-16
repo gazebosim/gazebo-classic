@@ -130,7 +130,7 @@ void ServerFixture::Load(const std::string &_worldFilename, bool _paused)
 /////////////////////////////////////////////////
 void ServerFixture::Load(const std::string &_worldFilename,
                   bool _paused, const std::string &_physics,
-                  std::vector<std::string> _plugins)
+                  const std::vector<std::string> &_systemPlugins)
 {
   delete this->server;
   this->server = NULL;
@@ -138,7 +138,7 @@ void ServerFixture::Load(const std::string &_worldFilename,
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
      boost::bind(&ServerFixture::RunServer, this, _worldFilename,
-                 _paused, _physics, _plugins));
+                 _paused, _physics, _systemPlugins));
 
   // Wait for the server to come up
   // Use a 60 second timeout.
@@ -193,11 +193,11 @@ void ServerFixture::RunServer(const std::string &_worldFilename)
 /////////////////////////////////////////////////
 void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
                const std::string &_physics,
-               std::vector<std::string> _plugins)
+               const std::vector<std::string> &_systemPlugins)
 {
   ASSERT_NO_THROW(this->server = new Server());
 
-  for (auto iter : _plugins)
+  for (auto iter : _systemPlugins)
   {
     gazebo::addPlugin(iter);
   }
