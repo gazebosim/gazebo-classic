@@ -563,19 +563,20 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
         msgs::Geometry geomMsg = visualMsg.geometry();
         if (geomMsg.has_box())
         {
-          EXPECT_EQ(msgs::Convert(geomMsg.box().size()), modelSize[name]*0.5);
+          EXPECT_EQ(msgs::Convert(geomMsg.box().size()),
+              modelSize[name] * scaleFactor);
         }
         else if (geomMsg.has_sphere())
         {
           EXPECT_DOUBLE_EQ(geomMsg.sphere().radius(),
-              modelSize[name].x * 0.5 * 0.5);
+              modelSize[name].x * 0.5 * scaleFactor);
         }
         else if (geomMsg.has_cylinder())
         {
           EXPECT_DOUBLE_EQ(geomMsg.cylinder().radius(),
-              modelSize[name].x * 0.5 * 0.5);
+              modelSize[name].x * 0.5 * scaleFactor);
           EXPECT_DOUBLE_EQ(geomMsg.cylinder().length(),
-              modelSize[name].z * 0.5);
+              modelSize[name].z * scaleFactor);
         }
       }
 
@@ -586,19 +587,20 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
         msgs::Geometry geomMsg = collisionMsg.geometry();
         if (geomMsg.has_box())
         {
-          EXPECT_EQ(msgs::Convert(geomMsg.box().size()), modelSize[name]*0.5);
+          EXPECT_EQ(msgs::Convert(geomMsg.box().size()),
+              modelSize[name] * scaleFactor);
         }
         else if (geomMsg.has_sphere())
         {
           EXPECT_DOUBLE_EQ(geomMsg.sphere().radius(),
-              modelSize[name].x * 0.5 * 0.5);
+              modelSize[name].x * 0.5 * scaleFactor);
         }
         else if (geomMsg.has_cylinder())
         {
           EXPECT_DOUBLE_EQ(geomMsg.cylinder().radius(),
-              modelSize[name].x * 0.5 * 0.5);
+              modelSize[name].x * 0.5 * scaleFactor);
           EXPECT_DOUBLE_EQ(geomMsg.cylinder().length(),
-              modelSize[name].z * 0.5);
+              modelSize[name].z * scaleFactor);
         }
       }
     }
@@ -625,21 +627,21 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       {
         sdf::ElementPtr boxElem = visualGeomElem->GetElement("box");
         math::Vector3 size = boxElem->Get<math::Vector3>("size");
-        EXPECT_EQ(size, modelSize[name] * 0.5);
+        EXPECT_EQ(size, modelSize[name] * scaleFactor);
       }
       else if (visualGeomElem->HasElement("sphere"))
       {
         sdf::ElementPtr sphereElem = visualGeomElem->GetElement("sphere");
         double radius = sphereElem->Get<double>("radius");
-        EXPECT_EQ(radius, modelSize[name].x * 0.5 * 0.5);
+        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
       }
       else if (visualGeomElem->HasElement("cylinder"))
       {
         sdf::ElementPtr cylinderElem = visualGeomElem->GetElement("cylinder");
         double radius = cylinderElem->Get<double>("radius");
-        EXPECT_EQ(radius, modelSize[name].x * 0.5 * 0.5);
+        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
         double length = cylinderElem->Get<double>("length");
-        EXPECT_EQ(length, modelSize[name].z * 0.5);
+        EXPECT_EQ(length, modelSize[name].z * scaleFactor);
       }
 
       // verify collision geom sdf
@@ -652,22 +654,22 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       {
         sdf::ElementPtr boxElem = collisionGeomElem->GetElement("box");
         math::Vector3 size = boxElem->Get<math::Vector3>("size");
-        EXPECT_EQ(size, modelSize[name] * 0.5);
+        EXPECT_EQ(size, modelSize[name] * scaleFactor);
       }
       else if (collisionGeomElem->HasElement("sphere"))
       {
         sdf::ElementPtr sphereElem = collisionGeomElem->GetElement("sphere");
         double radius = sphereElem->Get<double>("radius");
-        EXPECT_EQ(radius, modelSize[name].x * 0.5 * 0.5);
+        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
       }
       else if (collisionGeomElem->HasElement("cylinder"))
       {
         sdf::ElementPtr cylinderElem =
             collisionGeomElem->GetElement("cylinder");
         double radius = cylinderElem->Get<double>("radius");
-        EXPECT_EQ(radius, modelSize[name].x * 0.5 * 0.5);
+        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
         double length = cylinderElem->Get<double>("length");
-        EXPECT_EQ(length, modelSize[name].z * 0.5);
+        EXPECT_EQ(length, modelSize[name].z * scaleFactor);
       }
       linkElem = linkElem->GetNextElement("link");
     }
