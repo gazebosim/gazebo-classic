@@ -40,13 +40,13 @@
     </include>
 <%
 # top most layer
-pose0 = [0, 0, 0.53]
-orit0 = [Math::PI/2.0, 0, 0]
+pos0 = [0, 0, 0.53]
+ori0 = [Math::PI/2.0, 0, 0]
 # keep track of the positions of links
 positions = []
 orientations = []
-positions << pose0
-orientations << orit0
+positions << pos0
+orientations << ori0
 
 # layer 0 --- 1
 # layer 1 --- 2
@@ -54,31 +54,31 @@ orientations << orit0
 # layer 3 --- 8
 # layer 4 --- 16
 
-def nextLevel(parent_pose, parent_layer, parent_length, layer_dist)
+def nextLevel(parentPosition, parent_layer, parent_length, layer_dist)
    pos = []
-   orit = []
+   ori = []
    current_layer = parent_layer + 1
    # 0 layer has 1 link
    if(current_layer%2==1) # y axis
       # body 1
-      p1 = [parent_pose[0], parent_pose[1] + parent_length/2.0, parent_pose[2]]
+      p1 = [parentPosition[0], parentPosition[1] + parent_length/2.0, parentPosition[2]]
       pos << [p1[0], p1[1], p1[2]-layer_dist]
-      orit << [0, Math::PI/2.0, 0]
+      ori << [0, Math::PI/2.0, 0]
       # body 2
-      p2 = [parent_pose[0], parent_pose[1] - parent_length/2.0, parent_pose[2]]
+      p2 = [parentPosition[0], parentPosition[1] - parent_length/2.0, parentPosition[2]]
       pos << [p2[0], p2[1], p2[2]-layer_dist]
-      orit << [0, Math::PI/2.0, 0]
+      ori << [0, Math::PI/2.0, 0]
    else  # x axis
       # body 1
-      p1 = [parent_pose[0]+parent_length/2.0, parent_pose[1], parent_pose[2]]
+      p1 = [parentPosition[0]+parent_length/2.0, parentPosition[1], parentPosition[2]]
       pos << [p1[0], p1[1], p1[2]-layer_dist]
-      orit << [Math::PI/2.0, 0, 0]
+      ori << [Math::PI/2.0, 0, 0]
       # body 2
-      p2 = [parent_pose[0]-parent_length/2.0, parent_pose[1], parent_pose[2]]
+      p2 = [parentPosition[0]-parent_length/2.0, parentPosition[1], parentPosition[2]]
       pos << [p2[0], p2[1], p2[2]-layer_dist]
-      orit << [Math::PI/2.0, 0, 0]
+      ori << [Math::PI/2.0, 0, 0]
    end
-   return pos, orit
+   return pos, ori
 end
 
 for layer in 1..layers
@@ -96,16 +96,16 @@ for layer in 1..layers
    parent_max_index = 2*(2**(layer-1)-1)
 
    for parent in parent_min_index..parent_max_index
-      parent_pose = positions[parent]
+      parentPosition = positions[parent]
       parent_length = length0 * (ratio** (layer-1))
       # parent_layer = layer-1
-      pos, orit = nextLevel(parent_pose, layer-1, parent_length, layer_dist)
+      pos, ori = nextLevel(parentPosition, layer-1, parent_length, layer_dist)
       # TODO: better way to append matrix in Ruby???
       # each parent has 2 child, so add each child to the positions and orientations for each parent
       positions << pos[0]
       positions << pos[1]
-      orientations << orit[0]
-      orientations << orit[1]
+      orientations << ori[0]
+      orientations << ori[1]
    end
 end
 %>
