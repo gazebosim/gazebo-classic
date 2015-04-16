@@ -110,7 +110,7 @@ bool LogPlayWidget::IsPaused() const
 }
 
 /////////////////////////////////////////////////
-void LogPlayWidget::SetPaused(bool _paused)
+void LogPlayWidget::SetPaused(const bool _paused)
 {
   this->dataPtr->paused = _paused;
 
@@ -145,7 +145,7 @@ void LogPlayWidget::OnStepForward()
 }
 
 /////////////////////////////////////////////////
-void LogPlayWidget::EmitSetCurrentTime(QString _time)
+void LogPlayWidget::EmitSetCurrentTime(const QString &_time)
 {
   this->SetCurrentTime(_time);
 }

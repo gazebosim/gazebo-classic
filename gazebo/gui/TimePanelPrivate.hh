@@ -26,7 +26,7 @@ namespace gazebo
 {
   namespace gui
   {
-    /// \class TimePanelPrivate TimePanelPrivate.hh
+    /// \internal
     /// \brief Private data for the TimePanel class
     class TimePanelPrivate
     {

@@ -46,11 +46,11 @@ namespace gazebo
       /// \brief Set whether to display the simulation as paused.
       /// \param[in] _p True to display the simulation as paused. False
       /// indicates the simulation is running
-      public: void SetPaused(bool _paused);
+      public: void SetPaused(const bool _paused);
 
       /// \brief Emit signal to set sim time line edit.
       /// \param[in] _string String representation of current time.
-      public: void EmitSetCurrentTime(QString _string);
+      public: void EmitSetCurrentTime(const QString &_string);
 
       /// \brief Play simulation.
       public slots: void OnPlay();
@@ -58,7 +58,7 @@ namespace gazebo
       /// \brief Pause simulation.
       public slots: void OnPause();
 
-      /// \brief Play simulation.
+      /// \brief Step simulation forward.
       public slots: void OnStepForward();
 
       /// \brief Qt signal to show the play button.
