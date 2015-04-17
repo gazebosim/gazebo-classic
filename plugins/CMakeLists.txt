@@ -88,4 +88,4 @@ foreach (src ${GUIplugins})
 endforeach (src ${GUIplugins})
 
 add_subdirectory(events)
-
+add_subdirectory(rest_web)
