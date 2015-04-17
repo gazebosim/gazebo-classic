@@ -197,7 +197,7 @@ void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
 {
   ASSERT_NO_THROW(this->server = new Server());
 
-  for (auto iter : _systemPlugins)
+  for (auto const &plugin : _systemPlugins)
   {
     gazebo::addPlugin(iter);
   }
