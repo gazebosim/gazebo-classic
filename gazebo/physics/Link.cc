@@ -56,8 +56,8 @@ Link::Link(EntityPtr _parent)
   this->publishDataMutex = new boost::recursive_mutex();
 
   // Do not merge this forward, this->scale variable has been removed from
-  // the Link class in favor of using the one from Entity class.
-  // Entity already sets scale to one in its destructor.
+  // the Link class in favor of using the one from the Entity class.
+  // Entity already sets scale to one in its constructor.
   this->scale = math::Vector3::One;
 }
 
