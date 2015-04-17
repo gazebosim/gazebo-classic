@@ -221,15 +221,7 @@ std::string RestApi::Login(const std::string &_urlStr,
   std::string resp;
 
   gzmsg << "login route: " << this->loginRoute << std::endl;
-  try
-  {
-    resp = this->Request(loginRoute, "");
-  }
-  catch(RestException &e)
-  {
-    gzerr << "Failed to login in with error[" << e.what() << "]\n";
-    return resp;
-  }
+  resp = this->Request(loginRoute, "");
   gzmsg << "login response: " << resp << std::endl;
 
   this->isLoggedIn = true;
