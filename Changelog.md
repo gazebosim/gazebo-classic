@@ -1,5 +1,10 @@
 ## Gazebo 2.0
 
+### Gazebo 2.2.1 (xxxx-xx-xx)
+
+1. Fix heightmap model texture loading.
+    * [Pull request #X](https://bitbucket.org/osrf/gazebo/pull-request/X)
+
 ### Gazebo 2.2.0 (2014-01-10)
 1. Fix compilation when using OGRE-1.9 (full support is being worked on)
     * [Issue #994](https://bitbucket.org/osrf/gazebo/issue/994)
