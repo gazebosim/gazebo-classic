@@ -45,6 +45,7 @@ namespace gazebo
       public: Box(const Vector3 &_vec1, const Vector3 &_vec2);
 
       /// \brief Ignition math copy constructor
+      /// \param[in] _box Ignition box to convert
       public: Box(const ignition::math::Box &_box);
 
       /// \brief Copy Constructor
