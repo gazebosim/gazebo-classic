@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/msgs/msgs.hh"
 #include "gz_joy.hh"
 
 using namespace gazebo;
@@ -79,40 +80,81 @@ bool JoyCommand::RunImpl()
   this->node.reset(new transport::Node());
   this->node->Init(worldName);
 
+  this->joyPub = this->node->Advertise<msgs::Joystick>("~/joystick");
+
   while (this->running)
   {
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
+      msgs::Joystick msg;
       switch(event.type)
       {
         case SDL_JOYAXISMOTION:
-          std::cout << "Joy axis motion\n";
-          std::cout << "Axis[" << event.jaxis.axis << "] Value[" << event.jaxis.value << "] " << std::endl;
-          break;
+          {
+            int index = static_cast<int>(event.jaxis.axis);
+            int value = static_cast<int>(event.jaxis.value);
+
+            msgs::Joystick::Axis *axis = msg.add_analog_axis();
+            axis->set_index(index);
+            axis->set_value(value);
+
+            // Debug
+            // std::cout << "Joy axis motion\n"
+            //   << "\tType[" << event.jaxis.type << "]\n"
+            //   << "\tWhich[" << event.jaxis.which << "]\n"
+            //   << "\tAxis[" << static_cast<int>(event.jaxis.axis) << "]\n"
+            //   << "\tValue[" << static_cast<int>(event.jaxis.value) << "]\n";
+            break;
+          }
 
         case SDL_JOYHATMOTION:
-          std::cout << "Joy hat motion\n";
-          break;
+          {
+            // So far, only event.jhat.value seems useful
+            int value = static_cast<int>(event.jhat.value);
 
-        case SDL_JOYBALLMOTION:
-          std::cout << "Joy ball motion\n";
-          break;
+            msgs::Joystick::Axis *axis = msg.add_digital_axis();
+            axis->set_value(value);
 
-        case SDL_JOYBUTTONDOWN:
-          std::cout << "joy button down\n";
-          break;
+            // Debug
+            // std::cout << "Joy hat motion\n"
+            //   << "\tType[" << event.jhat.type << "]\n"
+            //   << "\tWhich[" << static_cast<int>(event.jhat.which) << "]\n"
+            //   << "\tHat[" << static_cast<int>(event.jhat.hat) << "]\n"
+            //   << "\tValue[" << static_cast<int>(event.jhat.value) << "]\n";
+            break;
+          }
 
         case SDL_JOYBUTTONUP:
-          std::cout << "joy button up\n";
-          break;
+        case SDL_JOYBUTTONDOWN:
+          {
+            int index = static_cast<int>(event.jbutton.button);
+            int state = static_cast<int>(event.jbutton.state);
 
-        case SDL_QUIT:
+            msgs::Joystick::Button *button = msg.add_button();
+            button->set_index(index);
+            button->set_state(state);
+
+            // Debug
+            // std::cout << "Joy button down\n"
+            //   << "\tType[" << event.jbutton.type << "]\n"
+            //   << "\tWhich[" << static_cast<int>(event.jbutton.which)
+            //   << "]\n"
+            //   << "\tButton[" << static_cast<int>event.jbutton.button)
+            //   << "]\n"
+            //   << "\tState[" << static_cast<int>(event.jbutton.state)
+            //   << "]\n";
+            break;
+          }
+
+        default:
           break;
       }
+
+      std::cout << msg.DebugString() << "\n";
+      this->joyPub->Publish(msg);
     }
   }
-
 
   return true;
 }

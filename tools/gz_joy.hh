@@ -39,6 +39,7 @@ namespace gazebo
 
     /// \brief Node pointer.
     private: transport::NodePtr node;
+    private: transport::PublisherPtr joyPub;
 
     private: SDL_Joystick *joy;
 
