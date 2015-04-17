@@ -2395,6 +2395,17 @@ VisualPtr Visual::GetRootVisual()
 }
 
 //////////////////////////////////////////////////
+VisualPtr Visual::GetFirstAncestorFromRootVisual()
+{
+  VisualPtr p = shared_from_this();
+  VisualPtr root = this->GetRootVisual();
+  while (p->GetParent() && p->GetParent() != root)
+    p = p->GetParent();
+
+  return p;
+}
+
+//////////////////////////////////////////////////
 bool Visual::IsPlane() const
 {
   if (this->dataPtr->sdf->HasElement("geometry"))

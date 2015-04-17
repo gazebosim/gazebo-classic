@@ -727,6 +727,8 @@ void ModelEditorPalette::OnJointRemoved(const std::string &_jointId)
 void ModelEditorPalette::ClearModelTree()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  // Remove all nested models
+  this->nestedModelsItem->takeChildren();
   // Remove all links
   this->linksItem->takeChildren();
   // Remove all joints

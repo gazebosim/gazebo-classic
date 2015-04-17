@@ -130,6 +130,10 @@ ModelCreator::ModelCreator()
        boost::bind(&ModelCreator::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
+     gui::model::Events::ConnectSetSelectedNestedModel(
+       boost::bind(&ModelCreator::OnSetSelectedNestedModel, this, _1, _2)));
+
+  this->connections.push_back(
      gui::model::Events::ConnectSetSelectedLink(
        boost::bind(&ModelCreator::OnSetSelectedLink, this, _1, _2)));
 
@@ -305,9 +309,8 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
 
 /////////////////////////////////////////////////
 rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
-    _modelElem, rendering::VisualPtr _parentVis)
+    _modelElem, rendering::VisualPtr _parentVis, bool _attachedToMouse)
 {
-
   rendering::VisualPtr modelVisual;
   std::stringstream modelNameStream;
   std::string nestedModelName;
@@ -319,11 +322,11 @@ rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
     // Reset preview visual in case there was something already loaded
     this->Reset();
 
+    // Keep previewModel with previewName to avoid conflicts
     modelVisual = this->previewVisual;
     modelNameStream << this->previewName << "_" << this->modelCounter;
 
     // Model general info
-    // Keep previewModel with previewName to avoid conflicts
     if (_modelElem->HasAttribute("name"))
       this->SetModelName(_modelElem->Get<std::string>("name"));
 
@@ -344,8 +347,13 @@ rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
   else
   {
     // Internal name
-    modelNameStream << _parentVis->GetName() << "::" <<
-        _modelElem->Get<std::string>("name");;
+    std::stringstream parentNameStream;
+    parentNameStream << _parentVis->GetName();
+    if (_parentVis->GetName() == this->previewName)
+      parentNameStream << "_" << this->modelCounter;
+
+    modelNameStream << parentNameStream.str() << "::" <<
+        _modelElem->Get<std::string>("name");
     nestedModelName = modelNameStream.str();
 
     // Model Visual
@@ -366,7 +374,6 @@ rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
   sdf::ElementPtr nestedModelElem;
   if (_modelElem->HasElement("model"))
      nestedModelElem = _modelElem->GetElement("model");
-
   while (nestedModelElem)
   {
     this->CreateModelFromSDF(nestedModelElem, modelVisual);
@@ -383,15 +390,18 @@ rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
     linkElem = linkElem->GetNextElement("link");
   }
 
-  // Joints
-  sdf::ElementPtr jointElem;
-  if (_modelElem->HasElement("joint"))
-     jointElem = _modelElem->GetElement("joint");
-
-  while (jointElem)
+  // Don't load joints for nested models
+  if (!_parentVis)
   {
-    this->jointMaker->CreateJointFromSDF(jointElem, modelNameStream.str());
-    jointElem = jointElem->GetNextElement("joint");
+    sdf::ElementPtr jointElem;
+    if (_modelElem->HasElement("joint"))
+       jointElem = _modelElem->GetElement("joint");
+
+    while (jointElem)
+    {
+      this->jointMaker->CreateJointFromSDF(jointElem, modelNameStream.str());
+      jointElem = jointElem->GetNextElement("joint");
+    }
   }
 
   // Nested models only
@@ -399,7 +409,8 @@ rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allNestedModels[nestedModelName] = modelData;
-    // gui::model::Events::nestedModelInserted(nestedModelName);
+    if (!_attachedToMouse)
+      gui::model::Events::nestedModelInserted(nestedModelName);
   }
 
   return modelVisual;
@@ -907,7 +918,11 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem,
   std::stringstream linkNameStream;
   std::string leafName = link->GetName();
 
-  linkNameStream << this->previewName << "_" << this->modelCounter << "::";
+  if (_parentVis->GetName() == this->previewName)
+    linkNameStream << this->previewName << "_" << this->modelCounter << "::";
+  else
+    linkNameStream << _parentVis->GetName() << "::";
+
   linkNameStream << leafName;
   std::string linkName = linkNameStream.str();
 
@@ -1333,7 +1348,7 @@ void ModelCreator::AddEntity(sdf::ElementPtr _sdf)
   {
     // Create a top-level nested model
     rendering::VisualPtr entityVisual =
-        this->CreateModelFromSDF(_sdf, this->previewVisual);
+        this->CreateModelFromSDF(_sdf, this->previewVisual, true);
 
     this->addLinkType = NESTED_MODEL;
     this->mouseVisual = entityVisual;
@@ -1548,9 +1563,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
   if (vis)
   {
-    rendering::VisualPtr topLevelVis = vis->GetParent();
-    while (topLevelVis->GetParent() != vis->GetRootVisual())
-      topLevelVis = topLevelVis->GetParent();
+    rendering::VisualPtr topLevelVis = vis->GetFirstAncestorFromRootVisual();
 
     // Is link / nested model
     if (this->allLinks.find(topLevelVis->GetName()) !=
@@ -1672,9 +1685,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
     rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
     if (vis && !vis->IsPlane())
     {
-      rendering::VisualPtr topLevelVis = vis->GetParent();
-      while (topLevelVis->GetParent() != vis->GetRootVisual())
-        topLevelVis = topLevelVis->GetParent();
+      rendering::VisualPtr topLevelVis = vis->GetFirstAncestorFromRootVisual();
 
       // Main window models always handled here
       if (this->allLinks.find(topLevelVis->GetName()) ==
@@ -2107,12 +2118,18 @@ void ModelCreator::OnSetSelectedEntity(const std::string &/*_name*/,
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::OnSetSelectedLink(const std::string &_name,
+void ModelCreator::OnSetSelectedNestedModel(const std::string &_name,
     bool _selected)
 {
   this->SetSelected(_name, _selected);
 }
 
+/////////////////////////////////////////////////
+void ModelCreator::OnSetSelectedLink(const std::string &_name,
+    bool _selected)
+{
+  this->SetSelected(_name, _selected);
+}
 
 /////////////////////////////////////////////////
 void ModelCreator::ModelChanged()

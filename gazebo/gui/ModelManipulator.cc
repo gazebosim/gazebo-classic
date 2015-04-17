@@ -582,9 +582,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     rendering::VisualPtr rootVis = vis->GetRootVisual();
 
     // Root visual's imediate child
-    rendering::VisualPtr topLevelVis = vis->GetParent();
-    while (topLevelVis && topLevelVis->GetParent() != vis->GetRootVisual())
-      topLevelVis = topLevelVis->GetParent();
+    rendering::VisualPtr topLevelVis = vis->GetFirstAncestorFromRootVisual();
 
     if (gui::get_entity_id(rootVis->GetName()))
     {
@@ -595,7 +593,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
         vis->GetParent() != this->dataPtr->scene->GetWorldVisual())
     {
       // select link
-      vis = vis->GetParent();
+      vis = topLevelVis;
     }
     else
     {

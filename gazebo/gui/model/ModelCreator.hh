@@ -358,7 +358,8 @@ namespace gazebo
       /// This is used mainly when editing existing models.
       /// \param[in] _sdf SDF of a model to be loaded
       private: rendering::VisualPtr CreateModelFromSDF(sdf::ElementPtr _sdf,
-          rendering::VisualPtr _parentVis = NULL);
+          rendering::VisualPtr _parentVis = NULL,
+          bool _attachedToMouse = false);
 
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _axis Axis of alignment: x, y, or z.
