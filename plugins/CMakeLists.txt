@@ -80,4 +80,4 @@ install (TARGETS TimerGUIPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
 gz_install_includes("plugins" TimerGUIPlugin.hh)
 
 add_subdirectory(events)
-
+add_subdirectory(rest_web)

@@ -86,6 +86,10 @@ namespace gazebo
       /// \param[in] _on True to show the left pane, false to hide.
       public: void SetLeftPaneVisibility(bool _on);
 
+      /// \brief Add a menu to the main window menu bar.
+      /// \param[in] _menu Menu to be added.
+      public: void AddMenu(QMenu *_menu);
+
       /// \brief Get an editor by name
       /// \param[in] _name Name of the editor.
       /// \return Pointer to the editor.
@@ -183,9 +187,6 @@ namespace gazebo
 
       /// \brief Qt callback when the show GUI overlays action is triggered.
       private slots: void ShowGUIOverlays();
-
-      /// \brief Qt call back when the play action state changes
-      private slots: void OnPlayActionChanged();
 
       /// \brief QT slot to open the data logger utility
       private slots: void DataLogger();
