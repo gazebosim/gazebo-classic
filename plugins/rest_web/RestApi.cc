@@ -18,6 +18,7 @@
 #include <cstring>
 #include <stdlib.h>
 #include <curl/curl.h>
+#include <inttypes.h>
 
 #include "RestApi.hh"
 
@@ -59,7 +60,8 @@ static void DumpRequest(const char *_text,
     width = 0x40;
   }
   int64_t s = _size;
-  fprintf(_stream, "%s, %10.10ld bytes (0x%8.8lx)\n", _text, s, s);
+  fprintf(_stream,
+    "%s, %10.10" PRId64 " bytes (0x%8.8" PRIx64 ")\n", _text, s, s);
 
   for (i = 0; i < _size; i += width)
   {
@@ -221,15 +223,7 @@ std::string RestApi::Login(const std::string &_urlStr,
   std::string resp;
 
   gzmsg << "login route: " << this->loginRoute << std::endl;
-  try
-  {
-    resp = this->Request(loginRoute, "");
-  }
-  catch(RestException &e)
-  {
-    gzerr << "Failed to login in with error[" << e.what() << "]\n";
-    return resp;
-  }
+  resp = this->Request(loginRoute, "");
   gzmsg << "login response: " << resp << std::endl;
 
   this->isLoggedIn = true;

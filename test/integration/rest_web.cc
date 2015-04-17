@@ -48,8 +48,8 @@ unsigned int g_count;
 // increment a counter and keep the data around
 void ReceiveRestError(ConstRestErrorPtr &_msg)
 {
-  gzerr << "ReceiveRestError" << std::endl;
-  gzmsg << _msg->msg() << std::endl;
+  gzmsg << "ReceiveRestError:" << std::endl;
+  gzmsg << "    \""  << _msg->msg() << "\"" << std::endl;
   boost::mutex::scoped_lock lock(g_mutex);
   g_count += 1;
 }
@@ -74,6 +74,7 @@ unsigned int WaitForNewError(unsigned int current,
                              unsigned int max_tries = 10,
                              unsigned int ms = 100)
 {
+  gzmsg << "WaitForNewError " << current << std::endl;
   for (unsigned int i = 0; i < max_tries; i++)
   {
     unsigned int count = GetErrorCount();
@@ -83,6 +84,7 @@ unsigned int WaitForNewError(unsigned int current,
     }
     common::Time::MSleep(ms);
   }
+  gzmsg << "WaitForNewError (timeout)" << std::endl;
   return GetErrorCount();
 }
 
@@ -113,7 +115,7 @@ void RestWebTest::FirstTest(const std::string &_physicsEngine)
       &ReceiveRestError);
 
   // check that after pause, we have received a new event
-  // unsigned int count_before = GetErrorCount();
+  unsigned int count_before = GetErrorCount();
 
   // publish to the login topic
   gazebo::transport::PublisherPtr pub;
@@ -130,8 +132,8 @@ void RestWebTest::FirstTest(const std::string &_physicsEngine)
   // receive a Rest_error via our sub
 
   // wait for it ...
-  // unsigned int count_after = WaitForNewError(count_before);
-  // EXPECT_GT(count_after, count_before);
+  unsigned int count_after = WaitForNewError(count_before);
+  EXPECT_GT(count_after, count_before);
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, RestWebTest, PHYSICS_ENGINE_VALUES);
