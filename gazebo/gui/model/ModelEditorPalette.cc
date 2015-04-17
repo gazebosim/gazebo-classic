@@ -15,7 +15,6 @@
  *
 */
 
-#include <mutex>
 #include <string>
 
 #include "gazebo/rendering/DynamicLines.hh"
@@ -291,16 +290,11 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedJoint(
        boost::bind(&ModelEditorPalette::OnSetSelectedJoint, this, _1, _2)));
-
-  this->updateMutex = new std::recursive_mutex();
 }
 
 /////////////////////////////////////////////////
 ModelEditorPalette::~ModelEditorPalette()
 {
-  delete this->updateMutex;
-  this->updateMutex = NULL;
-
   delete this->modelCreator;
   this->modelCreator = NULL;
 }
@@ -507,9 +501,8 @@ void ModelEditorPalette::OnSetSelectedEntity(const std::string &/*_name*/,
     const std::string &/*_mode*/)
 {
   // deselect all
-  for (int i = 0; i < this->selected.size(); ++i)
+  for (auto &item : this->selected)
   {
-    QTreeWidgetItem *item = this->selected[i];
     if (item)
       item->setSelected(false);
   }
@@ -663,7 +656,7 @@ void ModelEditorPalette::OnJointInserted(const std::string &_jointId,
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnLinkRemoved(const std::string &_linkId)
 {
-  std::unique_lock<std::recursive_mutex> lock(*this->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   for (int i = 0; i < this->linksItem->childCount(); ++i)
   {
     QTreeWidgetItem *item = this->linksItem->child(i);
@@ -682,7 +675,7 @@ void ModelEditorPalette::OnLinkRemoved(const std::string &_linkId)
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnJointRemoved(const std::string &_jointId)
 {
-  std::unique_lock<std::recursive_mutex> lock(*this->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   for (int i = 0; i < this->jointsItem->childCount(); ++i)
   {
     QTreeWidgetItem *item = this->jointsItem->child(i);
@@ -701,7 +694,7 @@ void ModelEditorPalette::OnJointRemoved(const std::string &_jointId)
 /////////////////////////////////////////////////
 void ModelEditorPalette::ClearModelTree()
 {
-  std::unique_lock<std::recursive_mutex> lock(*this->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   // Remove all links
   this->linksItem->takeChildren();
   // Remove all joints
@@ -712,7 +705,7 @@ void ModelEditorPalette::ClearModelTree()
 void ModelEditorPalette::OnJointNameChanged(const std::string &_jointId,
     const std::string &_newJointName)
 {
-  std::unique_lock<std::recursive_mutex> lock(*this->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   for (int i = 0; i < this->jointsItem->childCount(); ++i)
   {
     QTreeWidgetItem *item = this->jointsItem->child(i);
@@ -732,7 +725,7 @@ void ModelEditorPalette::OnJointNameChanged(const std::string &_jointId,
 void ModelEditorPalette::OnSetSelectedLink(const std::string &_name,
     bool _selected)
 {
-  std::unique_lock<std::recursive_mutex> lock(*this->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   for (int i = 0; i < this->linksItem->childCount(); ++i)
   {
     QTreeWidgetItem *item = this->linksItem->child(i);
@@ -752,7 +745,7 @@ void ModelEditorPalette::OnSetSelectedLink(const std::string &_name,
 void ModelEditorPalette::OnSetSelectedJoint(const std::string &_name,
     bool _selected)
 {
-  std::unique_lock<std::recursive_mutex> lock(*this->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   for (int i = 0; i < this->jointsItem->childCount(); ++i)
   {
     QTreeWidgetItem *item = this->jointsItem->child(i);

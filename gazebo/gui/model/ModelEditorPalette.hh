@@ -18,6 +18,7 @@
 #ifndef _GAZEBO_MODEL_EDITOR_PALETTE_HH_
 #define _GAZEBO_MODEL_EDITOR_PALETTE_HH_
 
+#include <mutex>
 #include <map>
 #include <string>
 #include <vector>
@@ -28,11 +29,6 @@
 #include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
-
-namespace std
-{
-  class recursive_mutex;
-}
 
 namespace gazebo
 {
@@ -221,9 +217,9 @@ namespace gazebo
       private: QTreeWidgetItem *jointsItem;
 
       /// \brief Mutex to protect updates.
-      private: std::recursive_mutex *updateMutex;
+      private: std::recursive_mutex updateMutex;
 
-      /// \brief Keeps tracks of selected items.
+      /// \brief Keeps track of selected items.
       private: QList<QTreeWidgetItem *> selected;
 
       /// \brief Layout for other items in the palette.
