@@ -34,6 +34,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include "gazebo/transport/transport.hh"
 
@@ -84,10 +85,10 @@ namespace gazebo
     /// \param[in] _worldFilename Name of the world to load.
     /// \param[in] _paused True to start the world paused.
     /// \param[in] _physics Name of the physics engine.
-    /// \param[in] _plugins Array of system plugins to load.
+    /// \param[in] _systemPlugins Array of system plugins to load.
     protected: virtual void Load(const std::string &_worldFilename,
                                  bool _paused, const std::string &_physics,
-                                 std::vector<std::string> _plugins = {});
+                          const std::vector<std::string> &_systemPlugins = {});
 
     /// \brief Run the server.
     /// \param[in] _worldFilename Name of the world to run in simulation.
@@ -98,10 +99,10 @@ namespace gazebo
     /// \param[in] _worldFilename Name of the world to load.
     /// \param[in] _paused True to start the world paused.
     /// \param[in] _physics Name of the physics engine.
-    /// \param[in] _plugins Array of system plugins to load.
+    /// \param[in] _systemPlugins Array of system plugins to load.
     protected: void RunServer(const std::string &_worldFilename, bool _paused,
                               const std::string &_physics,
-                              std::vector<std::string> _plugins = {});
+                          const std::vector<std::string> &_systemPlugins = {});
 
 
     /// \brief Get a pointer to the rendering scene.
