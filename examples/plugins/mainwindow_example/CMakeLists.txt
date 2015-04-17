@@ -9,7 +9,7 @@ add_definitions(${QT_DEFINITIONS})
 
 include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 QT4_WRAP_CPP(headers_MOC MainWindowExampleWidget.hh)
 

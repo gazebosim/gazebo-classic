@@ -114,6 +114,10 @@ ModelCreator::ModelCreator()
       boost::bind(&ModelCreator::ModelChanged, this)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectOpenLinkInspector(
+      boost::bind(&ModelCreator::OpenInspector, this, _1)));
+
+  this->connections.push_back(
       gui::Events::ConnectAlignMode(
         boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
 
@@ -133,11 +137,16 @@ ModelCreator::ModelCreator()
       event::Events::ConnectPreRender(
         boost::bind(&ModelCreator::Update, this)));
 
-  g_copyAct->setEnabled(false);
-  g_pasteAct->setEnabled(false);
-
-  connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
-  connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+  if (g_copyAct)
+  {
+    g_copyAct->setEnabled(false);
+    connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
+  }
+  if (g_pasteAct)
+  {
+    g_pasteAct->setEnabled(false);
+    connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+  }
 
   this->saveDialog = new SaveDialog(SaveDialog::MODEL);
 
@@ -239,10 +248,10 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
     sdfParsed.SetFromString(msg.data());
 
     // Check that sdf contains world
-    if (sdfParsed.root->HasElement("world") &&
-        sdfParsed.root->GetElement("world")->HasElement("model"))
+    if (sdfParsed.Root()->HasElement("world") &&
+        sdfParsed.Root()->GetElement("world")->HasElement("model"))
     {
-      sdf::ElementPtr world = sdfParsed.root->GetElement("world");
+      sdf::ElementPtr world = sdfParsed.Root()->GetElement("world");
       sdf::ElementPtr model = world->GetElement("model");
       while (model)
       {
@@ -576,7 +585,7 @@ std::string ModelCreator::AddShape(LinkType _type,
   visualName << linkName << "::visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
       linkVisual));
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
@@ -738,7 +747,6 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
   }
 
   rendering::ScenePtr scene = link->linkVisual->GetScene();
-  scene->AddVisual(link->linkVisual);
 
   this->ModelChanged();
 }
@@ -902,7 +910,7 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
       collisionPose.Set(0, 0, 0, 0, 0, 0);
 
     // Make a visual element from the collision element
-    sdf::ElementPtr colVisualElem =  this->modelTemplateSDF->root
+    sdf::ElementPtr colVisualElem =  this->modelTemplateSDF->Root()
         ->GetElement("model")->GetElement("link")->GetElement("visual");
 
     sdf::ElementPtr geomElem = colVisualElem->GetElement("geometry");
@@ -928,10 +936,10 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allLinks[linkName] = link;
+    gui::model::Events::linkInserted(linkName);
   }
 
   rendering::ScenePtr scene = link->linkVisual->GetScene();
-  scene->AddVisual(link->linkVisual);
 
   this->ModelChanged();
 }
@@ -956,20 +964,26 @@ void ModelCreator::RemoveLink(const std::string &_linkName)
   if (!link)
     return;
 
-  rendering::ScenePtr scene = link->linkVisual->GetScene();
-  for (auto &it : link->visuals)
-  {
-    rendering::VisualPtr vis = it.first;
-    scene->RemoveVisual(vis);
-  }
-  scene->RemoveVisual(link->linkVisual);
-  for (auto &colIt : link->collisions)
-  {
-    rendering::VisualPtr vis = colIt.first;
-    scene->RemoveVisual(vis);
-  }
+  // Copy before reference is deleted.
+  std::string linkName(_linkName);
 
-  scene->RemoveVisual(link->linkVisual);
+  rendering::ScenePtr scene = link->linkVisual->GetScene();
+  if (scene)
+  {
+    for (auto &it : link->visuals)
+    {
+      rendering::VisualPtr vis = it.first;
+      scene->RemoveVisual(vis);
+    }
+    scene->RemoveVisual(link->linkVisual);
+    for (auto &colIt : link->collisions)
+    {
+      rendering::VisualPtr vis = colIt.first;
+      scene->RemoveVisual(vis);
+    }
+
+    scene->RemoveVisual(link->linkVisual);
+  }
 
   link->linkVisual.reset();
   {
@@ -977,6 +991,7 @@ void ModelCreator::RemoveLink(const std::string &_linkName)
     this->allLinks.erase(_linkName);
     delete link;
   }
+  gui::model::Events::linkRemoved(linkName);
 
   this->ModelChanged();
 }
@@ -989,8 +1004,12 @@ void ModelCreator::Reset()
 
   this->jointMaker->Reset();
   this->selectedVisuals.clear();
-  g_copyAct->setEnabled(false);
-  g_pasteAct->setEnabled(false);
+
+  if (g_copyAct)
+    g_copyAct->setEnabled(false);
+
+  if (g_pasteAct)
+    g_pasteAct->setEnabled(false);
 
   this->currentSaveState = NEVER_SAVED;
   this->SetModelName(this->modelDefaultName);
@@ -1027,7 +1046,6 @@ void ModelCreator::Reset()
   this->previewVisual->Load();
   this->modelPose = math::Pose::Zero;
   this->previewVisual->SetPose(this->modelPose);
-  scene->AddVisual(this->previewVisual);
 }
 
 /////////////////////////////////////////////////
@@ -1100,7 +1118,7 @@ void ModelCreator::FinishModel()
 /////////////////////////////////////////////////
 void ModelCreator::CreateTheEntity()
 {
-  if (!this->modelSDF->root->HasElement("model"))
+  if (!this->modelSDF->Root()->HasElement("model"))
   {
     gzerr << "Generated invalid SDF! Cannot create entity." << std::endl;
     return;
@@ -1108,7 +1126,7 @@ void ModelCreator::CreateTheEntity()
 
   msgs::Factory msg;
   // Create a new name if the model exists
-  sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
+  sdf::ElementPtr modelElem = this->modelSDF->Root()->GetElement("model");
   std::string modelElemName = modelElem->Get<std::string>("name");
   if (has_entity_name(modelElemName))
   {
@@ -1146,8 +1164,7 @@ void ModelCreator::Stop()
 {
   if (this->addLinkType != LINK_NONE && this->mouseVisual)
   {
-    for (unsigned int i = 0; i < this->mouseVisual->GetChildCount(); ++i)
-        this->RemoveLink(this->mouseVisual->GetName());
+    this->RemoveLink(this->mouseVisual->GetName());
     this->mouseVisual.reset();
     emit LinkAdded();
   }
@@ -1278,6 +1295,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     {
       LinkData *link = this->allLinks[this->mouseVisual->GetName()];
       link->SetPose(this->mouseVisual->GetWorldPose()-this->modelPose);
+      gui::model::Events::linkInserted(this->mouseVisual->GetName());
     }
 
     // reset and return
@@ -1463,6 +1481,11 @@ void ModelCreator::OpenInspector(const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   LinkData *link = this->allLinks[_name];
+  if (!link)
+  {
+    gzerr << "Link [" << _name << "] not found." << std::endl;
+    return;
+  }
   link->SetPose(link->linkVisual->GetWorldPose()-this->modelPose);
   link->UpdateConfig();
   link->inspector->move(QCursor::pos());
@@ -1545,7 +1568,7 @@ void ModelCreator::GenerateSDF()
   this->modelSDF.reset(new sdf::SDF);
   this->modelSDF->SetFromString(ModelData::GetTemplateSDFString());
 
-  modelElem = this->modelSDF->root->GetElement("model");
+  modelElem = this->modelSDF->Root()->GetElement("model");
 
   modelElem->ClearElements();
   modelElem->GetAttribute("name")->Set(this->folderName);
