@@ -34,7 +34,7 @@
         </player>
         <player>
           <team>Red</team>
-          <invert_control>1</invert_control>
+          <invert_control>0</invert_control>
           <left_controller>
             <rod>0</rod>
             <rod>1</rod>
@@ -57,7 +57,7 @@
     <!-- Blue player view point using Oculus -->
     <model name='camera'>
       <static>true</static>
-      <pose>0 -1.2 3 0 0 1.57</pose>
+      <pose>0 1.2 3 0 0 -1.57</pose>
       <link name='link'></link>
     </model>
 
