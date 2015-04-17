@@ -21,7 +21,9 @@
 #include <string>
 #include <list>
 
-#include <gazebo/gazebo.hh>
+#include <gazebo/gui/qt.h>
+#include <gazebo/transport/TransportTypes.hh>
+#include <gazebo/msgs/MessageTypes.hh>
 #include <gazebo/util/system.hh>
 #include "RestUiLoginDialog.hh"
 

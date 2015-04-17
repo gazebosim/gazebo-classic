@@ -21,12 +21,12 @@
 #include <vector>
 #include <string>
 
-#include <gazebo/gazebo.hh>
+#include <gazebo/common/Plugin.hh>
+#include <gazebo/common/CommonTypes.hh>
 #include <gazebo/gui/qt.h>
 #include <gazebo/util/system.hh>
 
 #include "RestUiWidget.hh"
-
 namespace gazebo
 {
   /// \class RestUiPlugin RestUiPlugin.hh RestUiPlugin.hh

@@ -15,10 +15,12 @@
  *
 */
 
+#include "gazebo/common/Events.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
+#include "RestUiWidget.hh"
 #include "RestUiPlugin.hh"
 
 using namespace gazebo;
@@ -104,7 +106,7 @@ void RestUiPlugin::OnMainWindowReady()
                             this->defaultUrl.c_str());
 
   QObject::connect(loginAct, SIGNAL(triggered()),
-                   this->widget, SLOT(this->Login()));
+                   this->widget, SLOT(Login()));
   menu->addAction(loginAct);
   mainWindow->AddMenu(menu);
 }

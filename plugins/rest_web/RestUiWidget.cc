@@ -16,7 +16,9 @@
 */
 
 #include <curl/curl.h>
-#include <QMessageBox>
+
+#include <gazebo/transport/transport.hh>
+#include <gazebo/msgs/msgs.hh>
 #include "RestUiWidget.hh"
 
 using namespace gazebo;
