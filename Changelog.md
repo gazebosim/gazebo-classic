@@ -3,7 +3,7 @@
 ### Gazebo 4.1.3 (xxxx-xx-xx)
 
 1. Fix heightmap model texture loading.
-    * [Pull request #X](https://bitbucket.org/osrf/gazebo/pull-request/X)
+    * [Pull request #1595](https://bitbucket.org/osrf/gazebo/pull-request/1595)
 
 ### Gazebo 4.1.2 (2015-03-20)
 
