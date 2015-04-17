@@ -1108,7 +1108,6 @@ void MainWindow::CreateActions()
       SLOT(CreateMesh()));
   this->CreateDisabledIcon(":/images/cylinder.png", g_meshCreateAct);
 
-
   g_pointLghtCreateAct = new QAction(QIcon(":/images/pointlight.png"),
       tr("Point Light"), this);
   g_pointLghtCreateAct->setStatusTip(tr("Create a point light"));
@@ -1989,4 +1988,30 @@ Editor *MainWindow::GetEditor(const std::string &_name) const
     return iter->second;
 
   return NULL;
+}
+
+/////////////////////////////////////////////////
+QAction *MainWindow::CloneAction(QAction *_action, QObject *_parent)
+{
+  if (!_action || !_parent)
+  {
+    gzwarn << "Missing action or parent. Not cloning action." << std::endl;
+    return NULL;
+  }
+
+  QAction *actionClone = new QAction(_action->text(), _parent);
+
+  // Copy basic information from original action.
+  actionClone->setStatusTip(_action->statusTip());
+  actionClone->setCheckable(_action->isCheckable());
+  actionClone->setChecked(_action->isChecked());
+
+  // Do not copy shortcut to avoid overlaps. Instead, connect actions.
+  // Cloned action will trigger original action, which does the desired effect.
+  connect(actionClone, SIGNAL(triggered()), _action, SLOT(trigger()));
+  // Then the original action reports its checked state to the cloned action
+  // without triggering it circularly.
+  connect(_action, SIGNAL(toggled(bool)), actionClone, SLOT(setChecked(bool)));
+
+  return actionClone;
 }

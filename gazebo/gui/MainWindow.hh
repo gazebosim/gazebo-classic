@@ -90,6 +90,22 @@ namespace gazebo
       /// \param[in] _menu Menu to be added.
       public: void AddMenu(QMenu *_menu);
 
+      /// \brief Show a custom menubar. If NULL is used, the default menubar
+      /// is shown.
+      /// \param[in] _bar The menubar to show. NULL will show the default
+      /// menubar.
+      public: void ShowMenuBar(QMenuBar *_bar = NULL);
+
+      /// \brief Create a new action with information from the given action,
+      /// such as text and tooltip. The new action triggers the original action
+      /// and follows its checked state. This is used for example to have the
+      /// "same" action on the main window menu and the model editor menu,
+      /// since an action can't be added to 2 different menus.
+      /// \param[in] _action Action to be cloned.
+      /// \param[in] _parent Parent for the new action.
+      /// \return The new action.
+      public: QAction *CloneAction(QAction *_action, QObject *_parent);
+
       /// \brief Get an editor by name
       /// \param[in] _name Name of the editor.
       /// \return Pointer to the editor.
@@ -207,6 +223,7 @@ namespace gazebo
       /// \brief Toggle full screen display.
       /// \param[in] _value True to display in full screen mode.
       private: void OnFullScreen(bool _value);
+
       private: void OnMoveMode(bool _mode);
 
       /// \brief Create most of the actions.
@@ -223,12 +240,6 @@ namespace gazebo
 
       /// \brief Create all the editors.
       private: void CreateEditors();
-
-      /// \brief Show a custom menubar. If NULL is used, the default menubar
-      /// is shown.
-      /// \param[in] _bar The menubar to show. NULL will show the default
-      /// menubar.
-      public: void ShowMenuBar(QMenuBar *_bar = NULL);
 
       private: void OnModel(ConstModelPtr &_msg);
 

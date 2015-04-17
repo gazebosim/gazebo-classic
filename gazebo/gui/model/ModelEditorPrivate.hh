@@ -76,6 +76,12 @@ namespace gazebo
       /// \brief Action to show joints.
       public: QAction *showJointsAct;
 
+      /// \brief Show toolbars action cloned from main window.
+      public: QAction *showToolbarsAct;
+
+      /// \brief Fullscreen action cloned from main window.
+      public: QAction *fullScreenAct;
+
       /// \brief Save the main window paused state to use when returning.
       public: bool mainWindowPaused;
     };

@@ -16,7 +16,9 @@
 1. Show/hide GUI overlays using the menu bar.
     * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
 
-1. Show/hide toolbars using the menu bars and shortcut. Moved fullscreen to Window menu.
+1. Show/hide toolbars using the menu bars and shortcut.
+   Added MainWindow::CloneAction.
+   Added Window menu to Model Editor.
     * [Pull request #1584](https://bitbucket.org/osrf/gazebo/pull-request/1584)
 
 1. Added optional start/stop/reset buttons to timer GUI plugin.
