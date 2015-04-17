@@ -186,19 +186,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
       if (it->first)
       {
         it->first->SetWorldPose(it->second);
-        if (it->first->GetChildCount() != 0)
-        {
-          for (unsigned int j = 0; j < it->first->GetChildCount(); ++j)
-          {
-            it->first->GetChild(j)->SetTransparency(std::abs(
-                it->first->GetChild(j)->GetTransparency()*2.0-1.0));
-          }
-        }
-        else
-        {
-          it->first->SetTransparency(std::abs(
-                it->first->GetTransparency()*2.0-1.0));
-        }
+        this->SetHighlighted(it->first, false);
       }
     }
     this->dataPtr->originalVisualPose.clear();
@@ -270,19 +258,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
           this->dataPtr->originalVisualPose.end())
       {
         this->dataPtr->originalVisualPose[vis] = vis->GetWorldPose();
-        // Children might have different transparencies
-        if (vis->GetChildCount() != 0)
-        {
-          for (unsigned int j = 0; j < vis->GetChildCount(); ++j)
-          {
-            vis->GetChild(j)->SetTransparency((1.0 -
-                vis->GetChild(j)->GetTransparency()) * 0.5);
-          }
-        }
-        else
-        {
-          vis->SetTransparency((1.0 - vis->GetTransparency()) * 0.5);
-        }
+        this->SetHighlighted(vis, true);
       }
       // prevent the visual pose from being updated by the server
       if (this->dataPtr->scene)
@@ -325,5 +301,28 @@ void ModelAlign::PublishVisualPose(rendering::VisualPtr _vis)
 
     msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
     this->dataPtr->modelPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelAlign::SetHighlighted(rendering::VisualPtr _vis, bool _highlight)
+{
+  if (_vis->GetChildCount() != 0)
+  {
+    for (unsigned int j = 0; j < _vis->GetChildCount(); ++j)
+    {
+      this->SetHighlighted(_vis->GetChild(j), _highlight);
+    }
+  }
+  else
+  {
+    if (_highlight)
+    {
+      _vis->SetTransparency((1.0 - _vis->GetTransparency()) * 0.5);
+    }
+    else
+    {
+      _vis->SetTransparency(std::abs(_vis->GetTransparency()*2.0-1.0));
+    }
   }
 }
