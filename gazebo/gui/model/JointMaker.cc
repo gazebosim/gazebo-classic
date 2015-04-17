@@ -315,7 +315,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
                 this->selectedJoints.end(), vis);
             // Highlight and select clicked joint if not already selected
             // Otherwise deselect if already selected
-              this->SetSelected(vis, it == this->selectedJoints.end());
+            this->SetSelected(vis, it == this->selectedJoints.end());
           }
         }
       }
