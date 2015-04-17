@@ -148,6 +148,9 @@
 
 ### Gazebo 5.x.x
 
+1. Fix heightmap model texture loading.
+    * [Pull request #1592](https://bitbucket.org/osrf/gazebo/pull-request/1592)
+
 1. Disable failing pr2 test for dart
     * [Pull request #1540](https://bitbucket.org/osrf/gazebo/pull-request/1540)
     * [Issue #1435](https://bitbucket.org/osrf/gazebo/issue/1435)
