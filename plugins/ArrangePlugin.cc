@@ -148,6 +148,8 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
   sub = this->node->Subscribe(this->eventTopicName,
                               &ArrangePlugin::ArrangementCallback, this);
+
+  pub = this->node->Advertise<msgs::Model>("~/model/modify");
 }
 
 /////////////////////////////////////////////////
@@ -204,6 +206,15 @@ bool ArrangePlugin::SetArrangement(const std::string &_arrangement)
     }
     model->SetWorldPose(pose);
     model->ResetPhysicsStates();
+
+    if (model->IsStatic())
+    {
+      msgs::Model msg;
+      msg.set_name(model->GetName());
+      msg.set_id(model->GetId());
+      msgs::Set(msg.mutable_pose(), pose);
+      pub->Publish(msg);
+    }
   }
   return true;
 }

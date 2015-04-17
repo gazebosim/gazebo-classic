@@ -107,6 +107,8 @@ namespace gazebo
 
     /// \brief Subscriber for listening to changing arrangements.
     protected: transport::SubscriberPtr sub;
+
+    protected: transport::PublisherPtr pub;
   };
 }
 #endif
