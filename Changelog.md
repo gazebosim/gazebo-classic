@@ -1,7 +1,26 @@
 ## Gazebo 6.0
 
+1. Added a plugin to send messages to an existing website.
+   Added gui::MainWindow::AddMenu and msgs/rest_error, msgs/rest_login, msgs rest/post
+    * [Pull request #1524](https://bitbucket.org/osrf/gazebo/pull-request/1524)
+
+1. Fix deprecation warnings when using SDFormat 3.0.2, 3.0.3 prereleases
+    * [Pull request #1568](https://bitbucket.org/osrf/gazebo/pull-request/1568)
+
+1. Use GAZEBO_CFLAGS or GAZEBO_CXX_FLAGS in CMakeLists.txt for example plugins
+    * [Pull request #1573](https://bitbucket.org/osrf/gazebo/pull-request/1573)
+
+1. Added Link::OnWrenchMsg subscriber with test
+    * [Pull request #1582](https://bitbucket.org/osrf/gazebo/pull-request/1582)
+
 1. Show/hide GUI overlays using the menu bar.
     * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
+
+1. Added optional start/stop/reset buttons to timer GUI plugin.
+    * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
+
+1. Separate TimePanel's display into TimeWidget and LogPlayWidget.
+    * [Pull request #1564](https://bitbucket.org/osrf/gazebo/pull-request/1564)
 
 1. Added support for Oculus DK2
     * [Pull request #1526](https://bitbucket.org/osrf/gazebo/pull-request/1526)
@@ -56,6 +75,12 @@
 1. Added PresetManager to physics libraries and corresponding integration test.
     * [Pull request #1471](https://bitbucket.org/osrf/gazebo/pull-request/1471)
 
+1. Sync name and location on SaveDialog.
+    * [Pull request #1563](https://bitbucket.org/osrf/gazebo/pull-request/1563)
+
+1. Added inertia pose getter for COMVisual and COMVisual_TEST
+    * [Pull request #1581](https://bitbucket.org/osrf/gazebo/pull-request/1581)
+
 1. Model editor updates
     1. Joint preview using JointVisuals.
         * [Pull request #1369](https://bitbucket.org/osrf/gazebo/pull-request/1369)
@@ -103,6 +128,17 @@
         * [Pull request #1515](https://bitbucket.org/osrf/gazebo/pull-request/1515)
         * [Issue #1418](https://bitbucket.org/osrf/gazebo/issue/1418)
 
+    1. Expose API to support adding items to the palette.
+        * [Pull request #1565](https://bitbucket.org/osrf/gazebo/pull-request/1565)
+
+    1. Added menu for toggling joint visualization
+        * [Pull request #1551](https://bitbucket.org/osrf/gazebo/pull-request/1551)
+        * [Issue #1483](https://bitbucket.org/osrf/gazebo/issue/1483)
+
+    1. Added list of links and joints.
+        * [Pull request #1515](https://bitbucket.org/osrf/gazebo/pull-request/1515)
+        * [Issue #1418](https://bitbucket.org/osrf/gazebo/issue/1418)
+
 1. Building editor updates
     1. Make palette tips tooltip clickable to open.
         * [Pull request #1519](https://bitbucket.org/osrf/gazebo/pull-request/1519)
@@ -111,6 +147,9 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.x.x
+
+1. Fix heightmap model texture loading.
+    * [Pull request #1592](https://bitbucket.org/osrf/gazebo/pull-request/1592)
 
 1. Disable failing pr2 test for dart
     * [Pull request #1540](https://bitbucket.org/osrf/gazebo/pull-request/1540)

@@ -292,7 +292,8 @@ PhysicsCommand::PhysicsCommand()
      "eg: -g 0,0,-9.8")
     ("step-size,s", po::value<double>(), "Maximum step size (seconds).")
     ("iters,i", po::value<double>(), "Number of iterations.")
-    ("update-rate,u", po::value<double>(), "Target real-time update rate.");
+    ("update-rate,u", po::value<double>(), "Target real-time update rate.")
+    ("profile,o", po::value<std::string>(), "Preset physics profile.");
 }
 
 /////////////////////////////////////////////////
@@ -351,6 +352,13 @@ bool PhysicsCommand::RunImpl()
     msg.mutable_gravity()->set_x(boost::lexical_cast<double>(values[0]));
     msg.mutable_gravity()->set_y(boost::lexical_cast<double>(values[1]));
     msg.mutable_gravity()->set_z(boost::lexical_cast<double>(values[2]));
+    good = true;
+  }
+
+  if (this->vm.count("profile") &&
+      this->vm["profile"].as<std::string>().size() > 0)
+  {
+    msg.set_profile_name(this->vm["profile"].as<std::string>());
     good = true;
   }
 
@@ -534,7 +542,7 @@ bool ModelCommand::RunImpl()
 bool ModelCommand::ProcessSpawn(boost::shared_ptr<sdf::SDF> _sdf,
     const std::string &_name, const math::Pose &_pose, transport::NodePtr _node)
 {
-  sdf::ElementPtr modelElem = _sdf->root->GetElement("model");
+  sdf::ElementPtr modelElem = _sdf->Root()->GetElement("model");
 
   if (!modelElem)
   {
@@ -932,7 +940,7 @@ bool SDFCommand::TransportRequired()
 /////////////////////////////////////////////////
 bool SDFCommand::RunImpl()
 {
-  sdf::SDF::version = SDF_VERSION;
+  sdf::SDF::Version(SDF_VERSION);
 
   try
   {
@@ -951,8 +959,8 @@ bool SDFCommand::RunImpl()
   {
     try
     {
-      sdf::SDF::version = boost::lexical_cast<std::string>(
-          this->vm["version"].as<std::string>());
+      sdf::SDF::Version(boost::lexical_cast<std::string>(
+          this->vm["version"].as<std::string>()));
     }
     catch(...)
     {
@@ -1001,7 +1009,7 @@ bool SDFCommand::RunImpl()
     TiXmlDocument xmlDoc;
     if (xmlDoc.LoadFile(path.string()))
     {
-      if (sdf::Converter::Convert(&xmlDoc, sdf::SDF::version, true))
+      if (sdf::Converter::Convert(&xmlDoc, sdf::SDF::Version(), true))
       {
         // Create an XML printer to control formatting
         TiXmlPrinter printer;
