@@ -1,5 +1,10 @@
 ## Gazebo 4.0
 
+### Gazebo 4.1.3 (xxxx-xx-xx)
+
+1. Fix heightmap model texture loading.
+    * [Pull request #X](https://bitbucket.org/osrf/gazebo/pull-request/X)
+
 ### Gazebo 4.1.2 (2015-03-20)
 
 1. Fix quaternion documentation: target Gazebo_4.1
