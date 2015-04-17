@@ -1100,14 +1100,14 @@ void JointMaker::OnSetSelectedEntity(const std::string &/*_name*/,
 
 /////////////////////////////////////////////////
 void JointMaker::OnSetSelectedJoint(const std::string &_name,
-    bool _selected)
+    const bool _selected)
 {
   this->SetSelected(_name, _selected);
 }
 
 /////////////////////////////////////////////////
 void JointMaker::SetSelected(const std::string &_name,
-    bool _selected)
+    const bool _selected)
 {
   auto it = this->joints.find(_name);
   if (it == this->joints.end())
@@ -1118,7 +1118,7 @@ void JointMaker::SetSelected(const std::string &_name,
 
 /////////////////////////////////////////////////
 void JointMaker::SetSelected(rendering::VisualPtr _jointVis,
-    bool _selected)
+    const bool _selected)
 {
   if (!_jointVis)
     return;

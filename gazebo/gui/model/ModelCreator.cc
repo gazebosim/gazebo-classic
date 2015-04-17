@@ -1751,7 +1751,7 @@ void ModelCreator::DeselectAll()
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::SetSelected(const std::string &_name, bool _selected)
+void ModelCreator::SetSelected(const std::string &_name, const bool _selected)
 {
   auto it = this->allLinks.find(_name);
   if (it == this->allLinks.end())
@@ -1761,7 +1761,8 @@ void ModelCreator::SetSelected(const std::string &_name, bool _selected)
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::SetSelected(rendering::VisualPtr _linkVis, bool _selected)
+void ModelCreator::SetSelected(rendering::VisualPtr _linkVis,
+    const bool _selected)
 {
   if (!_linkVis)
     return;
@@ -1825,7 +1826,7 @@ void ModelCreator::OnSetSelectedEntity(const std::string &/*_name*/,
 
 /////////////////////////////////////////////////
 void ModelCreator::OnSetSelectedLink(const std::string &_name,
-    bool _selected)
+    const bool _selected)
 {
   this->SetSelected(_name, _selected);
 }
