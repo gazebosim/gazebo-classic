@@ -1,4 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 
 set (msgs
   axis.proto

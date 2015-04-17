@@ -543,12 +543,12 @@ endif()
 
 ########################################
 # Find ignition math
-find_package(ignition-math QUIET)
-if (NOT ignition-math_FOUND)
-  message(STATUS "Looking for ignition-math-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition math library.")
+find_package(ignition-math2 QUIET)
+if (NOT ignition-math2_FOUND)
+  message(STATUS "Looking for ignition-math2-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition math2 library.")
 else()
-  message(STATUS "Looking for ignition-math-config.cmake - found")
+  message(STATUS "Looking for ignition-math2-config.cmake - found")
 endif()
 
 ########################################

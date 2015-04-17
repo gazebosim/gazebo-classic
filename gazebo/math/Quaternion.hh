@@ -73,7 +73,7 @@ namespace gazebo
     public: Quaternion(const Quaternion &_qt);
 
     /// \brief Copy constructor for ignition::math::Quaterniond
-    /// \param qt Ignition math duaterniond to copy
+    /// \param [in] qt Ignition math duaterniond to copy
     public: Quaternion(const ignition::math::Quaterniond &_qt);
 
     /// \brief Destructor
@@ -89,7 +89,7 @@ namespace gazebo
 
     /// \brief Assignment operator for ignition math
     /// \param[in] _v a new value
-    /// \return this
+    /// \return The new quaternion.
     public: Quaternion &operator =(const ignition::math::Quaterniond &_v);
 
     /// \brief Invert the quaternion

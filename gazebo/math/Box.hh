@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _BOX_HH_
-#define _BOX_HH_
+#ifndef _GAZEBO_BOX_HH_
+#define _GAZEBO_BOX_HH_
 
 #include <iostream>
 #include <ignition/math/Box.hh>
@@ -84,7 +84,7 @@ namespace gazebo
 
       /// \brief Assignment operator for ignition math
       /// \param[in] _b a new value
-      /// \return this
+      /// \return The new box
       public: Box &operator=(const ignition::math::Box &_b);
 
       /// \brief Assignment operator. Set this box to the parameter

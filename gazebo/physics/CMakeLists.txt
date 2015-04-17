@@ -16,6 +16,7 @@ if (HAVE_GDAL)
   include_directories(${GDAL_INCLUDE_DIR})
 endif()
 
+
 set (sources
   Actor.cc
   Base.cc

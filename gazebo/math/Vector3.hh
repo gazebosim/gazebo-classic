@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: The world; all models are collected here
- * Author: Nate Koenig
- * Date: 3 Apr 2007
- */
-
-#ifndef _VECTOR3_HH_
-#define _VECTOR3_HH_
+#ifndef _GAZEBO_VECTOR3_HH_
+#define _GAZEBO_VECTOR3_HH_
 
 #include <math.h>
 #include <iostream>
@@ -184,7 +179,7 @@ namespace gazebo
 
       /// \brief Assignment operator
       /// \param[in] _v a new value
-      /// \return this
+      /// \return The new vector
       public: Vector3 &operator =(const Vector3 &_v);
 
       /// \brief Assignment operator
