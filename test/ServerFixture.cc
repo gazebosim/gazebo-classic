@@ -199,7 +199,7 @@ void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
 
   for (auto const &plugin : _systemPlugins)
   {
-    gazebo::addPlugin(iter);
+    gazebo::addPlugin(plugin);
   }
 
   this->server->PreLoad();
