@@ -283,6 +283,8 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("modelEditorTab");
     this->mainWindow->ShowMenuBar(this->dataPtr->menuBar);
+    if (!g_showToolbarsAct->isChecked())
+      g_showToolbarsAct->trigger();
     this->mainWindow->GetRenderWidget()->ShowTimePanel(false);
   }
   else
