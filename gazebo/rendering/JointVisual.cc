@@ -53,8 +53,12 @@ void JointVisual::Load(ConstJointPtr &_msg)
       new AxisVisual(this->GetName() + "_AXIS", shared_from_this()));
   dPtr->axisVisual->Load();
 
-  this->SetPosition(msgs::Convert(_msg->pose().position()));
-  this->SetRotation(msgs::Convert(_msg->pose().orientation()));
+  math::Pose pose;
+  if (_msg->has_pose())
+    pose = msgs::Convert(_msg->pose());
+
+  this->SetPosition(pose.pos);
+  this->SetRotation(pose.rot);
 
   if (_msg->has_axis2())
   {
@@ -70,8 +74,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
 
     JointVisualPtr jointVis;
     jointVis.reset(new JointVisual(this->GetName() + "_parent_", parentVis));
-    jointVis->Load(_msg,
-        msgs::Convert(_msg->pose()) + this->GetParent()->GetWorldPose());
+    jointVis->Load(_msg, pose + this->GetParent()->GetWorldPose());
 
     // attach axis2 to this visual
     msgs::Axis axis2Msg = _msg->axis2();

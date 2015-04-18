@@ -567,13 +567,6 @@ void MainWindow::Play()
   msgs::WorldControl msg;
   msg.set_pause(false);
 
-  if (this->renderWidget)
-  {
-    TimePanel *timePanel = this->renderWidget->GetTimePanel();
-    if (timePanel)
-      timePanel->SetPaused(false);
-  }
-
   this->worldControlPub->Publish(msg);
 }
 
@@ -582,13 +575,6 @@ void MainWindow::Pause()
 {
   msgs::WorldControl msg;
   msg.set_pause(true);
-
-  if (this->renderWidget)
-  {
-    TimePanel *timePanel = this->renderWidget->GetTimePanel();
-    if (timePanel)
-      timePanel->SetPaused(true);
-  }
 
   this->worldControlPub->Publish(msg);
 }
@@ -1035,8 +1021,6 @@ void MainWindow::CreateActions()
   g_playAct->setStatusTip(tr("Run the world"));
   g_playAct->setVisible(false);
   connect(g_playAct, SIGNAL(triggered()), this, SLOT(Play()));
-  connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
-  this->OnPlayActionChanged();
 
   g_pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
   g_pauseAct->setStatusTip(tr("Pause the world"));
@@ -1596,6 +1580,12 @@ void MainWindow::CreateMenuBar()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::AddMenu(QMenu *_menu)
+{
+  this->menuBar->addMenu(_menu);
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreateMenus()
 {
   this->ShowMenuBar();
@@ -1864,28 +1854,6 @@ void MainWindow::OnSetSelectedEntity(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void MainWindow::OnPlayActionChanged()
-{
-  if (this->renderWidget)
-  {
-    TimePanel *timePanel = this->renderWidget->GetTimePanel();
-    if (timePanel)
-    {
-      if (timePanel->IsPaused())
-      {
-        g_stepAct->setToolTip("Step the world");
-        g_stepAct->setEnabled(true);
-      }
-      else
-      {
-        g_stepAct->setToolTip("Pause the world before stepping");
-        g_stepAct->setEnabled(false);
-      }
-    }
-  }
-}
-
-/////////////////////////////////////////////////
 void MainWindow::ItemSelected(QTreeWidgetItem *_item, int)
 {
   _item->setExpanded(!_item->isExpanded());
@@ -1932,13 +1900,13 @@ bool MainWindow::IsPaused() const
 void MainWindow::CreateEditors()
 {
   // Create a Terrain Editor
-  this->editors.push_back(new TerrainEditor(this));
+  this->editors["terrain"] = new TerrainEditor(this);
 
   // Create a Building Editor
-  this->editors.push_back(new BuildingEditor(this));
+  this->editors["building"] = new BuildingEditor(this);
 
   // Create a Model Editor
-  this->editors.push_back(new ModelEditor(this));
+  this->editors["model"] = new ModelEditor(this);
 }
 
 /////////////////////////////////////////////////
@@ -1981,4 +1949,14 @@ void MainWindow::OnEditorGroup(QAction *_action)
       editorGroup->actions()[i]->setChecked(false);
     }
   }
+}
+
+/////////////////////////////////////////////////
+Editor *MainWindow::GetEditor(const std::string &_name) const
+{
+  auto iter = this->editors.find(_name);
+  if (iter != this->editors.end())
+    return iter->second;
+
+  return NULL;
 }
