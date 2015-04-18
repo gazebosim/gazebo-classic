@@ -2,6 +2,14 @@
 <sdf version="1.4">
   <world name="default">
 
+    <scene>
+      <sky>
+        <clouds>
+          <speed>12</speed>
+        </clouds>
+      </sky>
+    </scene>
+
     <!-- A ground plane -->
     <include>
       <uri>model://ground_plane</uri>
@@ -10,6 +18,11 @@
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://starting_pen</uri>
+      <pose>-5.688061 -0.096423 0 0 0 -1.570796</pose>
     </include>
 
     <!-- A foosball table -->
