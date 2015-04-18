@@ -187,13 +187,9 @@ namespace gazebo
       /// \param[in] _type Type of joint to add.
       public: void AddJoint(const std::string &_type);
 
-      /// \brief Remove a nestedModel from the model.
-      /// \param[in] _nestedModelName Name of the nestedModel to remove
-      public: void RemoveNestedModel(const std::string &_nestedModelName);
-
       /// \brief Remove a link from the model.
       /// \param[in] _linkName Name of the link to remove
-      public: void RemoveLink(const std::string &_linkName);
+      public: void RemoveEntity(const std::string &_entityName);
 
       /// \brief Set the model to be static
       /// \param[in] _static True to make the model static.
@@ -400,10 +396,6 @@ namespace gazebo
       /// \brief Qt callback when a delete signal has been emitted. This is
       /// currently triggered by the context menu via right click.
       private slots: void OnDelete();
-
-      /// \brief Qt callback when a delete signal has been emitted.
-      /// \param[in] _name Name of the entity to delete.
-      private slots: void OnDeleteNestedModel(const std::string &_name);
 
       /// \brief Qt callback when a delete signal has been emitted.
       /// \param[in] _name Name of the entity to delete.

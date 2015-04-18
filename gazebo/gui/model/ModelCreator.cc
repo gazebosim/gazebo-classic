@@ -170,10 +170,10 @@ ModelCreator::~ModelCreator()
 {
   while (!this->allLinks.empty())
     this->RemoveLinkImpl(this->allLinks.begin()->first);
-/*
+
   while (!this->allNestedModels.empty())
     this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
-*/
+
   this->allLinks.clear();
   this->allNestedModels.clear();
   this->node->Fini();
@@ -1095,18 +1095,6 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
   rendering::ScenePtr scene = modelData->modelVisual->GetScene();
   if (scene)
   {
-   /* for (auto &it : modelData->visuals)
-    {
-      rendering::VisualPtr vis = it.first;
-      scene->RemoveVisual(vis);
-    }
-    scene->RemoveVisual(nestedModel->nestedModelVisual);
-    for (auto &colIt : nestedModel->collisions)
-    {
-      rendering::VisualPtr vis = colIt.first;
-      scene->RemoveVisual(vis);
-    }
-*/
     scene->RemoveVisual(modelData->modelVisual);
   }
 
@@ -1396,34 +1384,20 @@ void ModelCreator::OnDelete()
 /////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
 {
-  this->RemoveLink(_entity);
+  this->RemoveEntity(_entity);
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::OnDeleteNestedModel(const std::string &_nestedModelName)
-{
-  this->RemoveNestedModel(_nestedModelName);
-}
-
-/////////////////////////////////////////////////
-void ModelCreator::RemoveNestedModel(const std::string &_entity)
+void ModelCreator::RemoveEntity(const std::string &_entity)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
   // if it's a nestedModel
   if (this->allNestedModels.find(_entity) != this->allNestedModels.end())
   {
-//    if (this->jointMaker)
-//      this->jointMaker->RemoveJointsByNestedModel(_entity);
     this->RemoveNestedModelImpl(_entity);
     return;
   }
-}
-
-/////////////////////////////////////////////////
-void ModelCreator::RemoveLink(const std::string &_entity)
-{
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
   // if it's a link
   if (this->allLinks.find(_entity) != this->allLinks.end())
@@ -1467,7 +1441,7 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
   {
     for (auto nestedModelVis : this->selectedNestedModels)
     {
-      this->OnDeleteNestedModel(nestedModelVis->GetName());
+      this->OnDelete(nestedModelVis->GetName());
     }
     for (auto linkVis : this->selectedLinks)
     {
