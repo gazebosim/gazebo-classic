@@ -135,7 +135,7 @@ void CollisionConfig::AddCollision(const std::string &_name,
 
   // Top-level tree item
   QTreeWidgetItem *collisionItem =
-      new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
+      new QTreeWidgetItem(static_cast<QTreeWidgetItem *>(0));
   this->collisionsTreeWidget->addTopLevelItem(collisionItem);
 
   this->collisionsTreeWidget->setItemWidget(collisionItem, 0,

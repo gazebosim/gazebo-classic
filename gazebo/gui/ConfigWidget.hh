@@ -158,7 +158,7 @@ namespace gazebo
       /// and removing characters like "_".
       /// \param[in] _key Non-human-readable key.
       /// \return Human-redadable key.
-      public: std::string GetHumanReadableKey(std::string _key);
+      public: std::string GetHumanReadableKey(const std::string &_key);
 
       /// \brief Returns the unit for a given key. For example, the key "mass"
       /// returns "Kg".
@@ -357,63 +357,63 @@ namespace gazebo
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateUIntWidget(const std::string &_key,
-          int _level);
+          int _level = 0);
 
       /// \brief Create a widget for configuring an integer value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateIntWidget(const std::string &_key,
-          int _level);
+          int _level = 0);
 
       /// \brief Create a widget for configuring a double value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateDoubleWidget(const std::string &_key,
-          int _level);
+          int _level = 0);
 
       /// \brief Create a widget for configuring a string value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateStringWidget(const std::string &_key,
-          int _level);
+          int _level = 0);
 
       /// \brief Create a widget for configuring a bool value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateBoolWidget(const std::string &_key,
-          int _level);
+          int _level = 0);
 
       /// \brief Create a widget for configuring a vector3 value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateVector3dWidget(const std::string &_key,
-          int _level);
+          int _level = 0);
 
       /// \brief Create a widget for configuring a color value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateColorWidget(const std::string &_key,
-          int _level);
+          int _level = 0);
 
       /// \brief Create a widget for configuring a pose value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreatePoseWidget(const std::string &_key,
-          int _level);
+          int _level = 0);
 
       /// \brief Create a widget for configuring a geometry value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateGeometryWidget(const std::string &_key,
-          int _level);
+          int _level = 0);
 
       /// \brief Create a widget for configuring an enum value.
       /// \param[in] _key A key that is used as a label for the widget.
@@ -421,7 +421,7 @@ namespace gazebo
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateEnumWidget(const std::string &_key,
-          const std::vector<std::string> &_values, int _level);
+          const std::vector<std::string> &_values, int _level = 0);
 
       /// \brief Update a child widget with an unsigned integer value.
       /// \param[in] _widget Pointer to the child widget.

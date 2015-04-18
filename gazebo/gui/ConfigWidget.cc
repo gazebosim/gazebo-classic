@@ -83,18 +83,11 @@ google::protobuf::Message *ConfigWidget::GetMsg()
 }
 
 /////////////////////////////////////////////////
-std::string ConfigWidget::GetHumanReadableKey(std::string _key)
+std::string ConfigWidget::GetHumanReadableKey(const std::string &_key)
 {
   std::string humanKey = _key;
   humanKey[0] = std::toupper(humanKey[0]);
-  std::string forbiddenChar = "_";
-  std::string replaceChar = " ";
-  size_t index = humanKey.find(forbiddenChar);
-  while (index != std::string::npos)
-  {
-    humanKey.replace(index, forbiddenChar.size(), replaceChar);
-    index = humanKey.find(forbiddenChar);
-  }
+  std::replace(humanKey.begin(), humanKey.end(), '_', ' ');
   return humanKey;
 }
 
@@ -173,8 +166,8 @@ void ConfigWidget::GetRangeFromKey(const std::string &_key, double *_min,
     double *_max)
 {
   // Maximum range by default
-  *_min = -1e12;
-  *_max = 1e12;
+  *_min = -GZ_DBL_MAX;
+  *_max = GZ_DBL_MAX;
 
   if (_key == "mass" || _key == "ixx" || _key == "ixy" || _key == "ixz" ||
       _key == "iyy" || _key == "iyz" || _key == "izz" || _key == "length" ||
@@ -552,7 +545,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
     std::string name = field->name();
 
     // Parse each field in the message
-    // TODO parse repeated fields and enum fields.
+    // TODO parse repeated fields
     if (!field->is_repeated())
     {
       if (_update && !ref->HasField(*_msg, field))
@@ -1189,12 +1182,12 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
   keyLabel->setToolTip(tr(_key.c_str()));
 
   // SpinBox
-  double *min = new double(0);
-  double *max = new double(0);
-  this->GetRangeFromKey(_key, min, max);
+  double min = 0;
+  double max = 0;
+  this->GetRangeFromKey(_key, &min, &max);
 
   QDoubleSpinBox *valueSpinBox = new QDoubleSpinBox;
-  valueSpinBox->setRange(*min, *max);
+  valueSpinBox->setRange(min, max);
   valueSpinBox->setSingleStep(0.01);
   valueSpinBox->setDecimals(6);
   valueSpinBox->setAlignment(Qt::AlignRight);
@@ -1312,28 +1305,31 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   QLabel *vecXLabel = new QLabel(tr("X"));
   QLabel *vecYLabel = new QLabel(tr("Y"));
   QLabel *vecZLabel = new QLabel(tr("Z"));
+  vecXLabel->setToolTip(tr("x"));
+  vecYLabel->setToolTip(tr("y"));
+  vecZLabel->setToolTip(tr("z"));
 
   // SpinBoxes
-  double *min = new double(0);
-  double *max = new double(0);
-  this->GetRangeFromKey(_key, min, max);
+  double min = 0;
+  double max = 0;
+  this->GetRangeFromKey(_key, &min, &max);
 
   QDoubleSpinBox *vecXSpinBox = new QDoubleSpinBox;
-  vecXSpinBox->setRange(*min, *max);
+  vecXSpinBox->setRange(min, max);
   vecXSpinBox->setSingleStep(0.01);
   vecXSpinBox->setDecimals(6);
   vecXSpinBox->setAlignment(Qt::AlignRight);
   vecXSpinBox->setMaximumWidth(100);
 
   QDoubleSpinBox *vecYSpinBox = new QDoubleSpinBox;
-  vecYSpinBox->setRange(*min, *max);
+  vecYSpinBox->setRange(min, max);
   vecYSpinBox->setSingleStep(0.01);
   vecYSpinBox->setDecimals(6);
   vecYSpinBox->setAlignment(Qt::AlignRight);
   vecYSpinBox->setMaximumWidth(100);
 
   QDoubleSpinBox *vecZSpinBox = new QDoubleSpinBox;
-  vecZSpinBox->setRange(*min, *max);
+  vecZSpinBox->setRange(min, max);
   vecZSpinBox->setSingleStep(0.01);
   vecZSpinBox->setDecimals(6);
   vecZSpinBox->setAlignment(Qt::AlignRight);
@@ -1378,11 +1374,15 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   QLabel *colorGLabel = new QLabel(tr("G"));
   QLabel *colorBLabel = new QLabel(tr("B"));
   QLabel *colorALabel = new QLabel(tr("A"));
+  colorRLabel->setToolTip(tr("r"));
+  colorGLabel->setToolTip(tr("g"));
+  colorBLabel->setToolTip(tr("b"));
+  colorALabel->setToolTip(tr("a"));
 
   // SpinBoxes
-  double *min = new double(0);
-  double *max = new double(0);
-  this->GetRangeFromKey(_key, min, max);
+  double min = 0;
+  double max = 0;
+  this->GetRangeFromKey(_key, &min, &max);
 
   QDoubleSpinBox *colorRSpinBox = new QDoubleSpinBox;
   colorRSpinBox->setRange(0, 1.0);
@@ -1452,12 +1452,12 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
 {
   // Labels
   std::vector<std::string> elements;
-  elements.push_back("X");
-  elements.push_back("Y");
-  elements.push_back("Z");
-  elements.push_back("Roll");
-  elements.push_back("Pitch");
-  elements.push_back("Yaw");
+  elements.push_back("x");
+  elements.push_back("y");
+  elements.push_back("z");
+  elements.push_back("roll");
+  elements.push_back("pitch");
+  elements.push_back("yaw");
 
   // This is inside a group
   int level = _level+1;
@@ -1469,9 +1469,9 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
       QSizePolicy::Fixed), 0, 0);
 
   // ChildWidget
-  double *min = new double(0);
-  double *max = new double(0);
-  this->GetRangeFromKey("", min, max);
+  double min = 0;
+  double max = 0;
+  this->GetRangeFromKey("", &min, &max);
 
   ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
@@ -1482,13 +1482,14 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
     QDoubleSpinBox *spin = new QDoubleSpinBox();
     widget->widgets.push_back(spin);
 
-    spin->setRange(*min, *max);
+    spin->setRange(min, max);
     spin->setSingleStep(0.01);
     spin->setDecimals(6);
     spin->setAlignment(Qt::AlignRight);
     spin->setMaximumWidth(100);
 
-    QLabel *label = new QLabel(tr(elements[i].c_str()));
+    QLabel *label = new QLabel(this->GetHumanReadableKey(elements[i]).c_str());
+    label->setToolTip(tr(elements[i].c_str()));
     if (i == 0)
       label->setStyleSheet("QLabel{color: #d42b2b;}");
     else if (i == 1)
@@ -1522,6 +1523,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
 {
   // Geometry ComboBox
   QLabel *geometryLabel = new QLabel(tr("Geometry"));
+  geometryLabel->setToolTip(tr("geometry"));
   QComboBox *geometryComboBox = new QComboBox;
   geometryComboBox->addItem(tr("box"));
   geometryComboBox->addItem(tr("cylinder"));
@@ -1530,12 +1532,12 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geometryComboBox->addItem(tr("polyline"));
 
   // Size XYZ
-  double *min = new double(0);
-  double *max = new double(0);
-  this->GetRangeFromKey("length", min, max);
+  double min = 0;
+  double max = 0;
+  this->GetRangeFromKey("length", &min, &max);
 
   QDoubleSpinBox *geomSizeXSpinBox = new QDoubleSpinBox;
-  geomSizeXSpinBox->setRange(*min, *max);
+  geomSizeXSpinBox->setRange(min, max);
   geomSizeXSpinBox->setSingleStep(0.01);
   geomSizeXSpinBox->setDecimals(6);
   geomSizeXSpinBox->setValue(1.000);
@@ -1543,7 +1545,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomSizeXSpinBox->setMaximumWidth(100);
 
   QDoubleSpinBox *geomSizeYSpinBox = new QDoubleSpinBox;
-  geomSizeYSpinBox->setRange(*min, *max);
+  geomSizeYSpinBox->setRange(min, max);
   geomSizeYSpinBox->setSingleStep(0.01);
   geomSizeYSpinBox->setDecimals(6);
   geomSizeYSpinBox->setValue(1.000);
@@ -1551,7 +1553,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomSizeYSpinBox->setMaximumWidth(100);
 
   QDoubleSpinBox *geomSizeZSpinBox = new QDoubleSpinBox;
-  geomSizeZSpinBox->setRange(*min, *max);
+  geomSizeZSpinBox->setRange(min, max);
   geomSizeZSpinBox->setSingleStep(0.01);
   geomSizeZSpinBox->setDecimals(6);
   geomSizeZSpinBox->setValue(1.000);
@@ -1564,6 +1566,9 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomSizeXLabel->setStyleSheet("QLabel{color: #d42b2b;}");
   geomSizeYLabel->setStyleSheet("QLabel{color: #3bc43b;}");
   geomSizeZLabel->setStyleSheet("QLabel{color: #0d0df2;}");
+  geomSizeXLabel->setToolTip(tr("x"));
+  geomSizeYLabel->setToolTip(tr("y"));
+  geomSizeZLabel->setToolTip(tr("z"));
 
   std::string unit = this->GetUnitFromKey("length");
   QLabel *geomSizeXUnitLabel = new QLabel(QString::fromStdString(unit));
@@ -1587,6 +1592,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
 
   // Uri
   QLabel *geomFilenameLabel = new QLabel(tr("Uri"));
+  geomFilenameLabel->setToolTip(tr("uri"));
   QLineEdit *geomFilenameLineEdit = new QLineEdit;
   QPushButton *geomFilenameButton = new QPushButton(tr("..."));
   geomFilenameButton->setMaximumWidth(30);
@@ -1608,9 +1614,11 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   QLabel *geomLengthLabel = new QLabel(tr("Length"));
   QLabel *geomRadiusUnitLabel = new QLabel(QString::fromStdString(unit));
   QLabel *geomLengthUnitLabel = new QLabel(QString::fromStdString(unit));
+  geomRadiusLabel->setToolTip(tr("radius"));
+  geomLengthLabel->setToolTip(tr("length"));
 
   QDoubleSpinBox *geomRadiusSpinBox = new QDoubleSpinBox;
-  geomRadiusSpinBox->setRange(*min, *max);
+  geomRadiusSpinBox->setRange(min, max);
   geomRadiusSpinBox->setSingleStep(0.01);
   geomRadiusSpinBox->setDecimals(6);
   geomRadiusSpinBox->setValue(0.500);
@@ -1618,7 +1626,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomRadiusSpinBox->setMaximumWidth(100);
 
   QDoubleSpinBox *geomLengthSpinBox = new QDoubleSpinBox;
-  geomLengthSpinBox->setRange(*min, *max);
+  geomLengthSpinBox->setRange(min, max);
   geomLengthSpinBox->setSingleStep(0.01);
   geomLengthSpinBox->setDecimals(6);
   geomLengthSpinBox->setValue(1.000);
@@ -1698,6 +1706,7 @@ ConfigChildWidget *ConfigWidget::CreateEnumWidget(
 {
   // Label
   QLabel *enumLabel = new QLabel(this->GetHumanReadableKey(_key).c_str());
+  enumLabel->setToolTip(tr(_key.c_str()));
 
   // ComboBox
   QComboBox *enumComboBox = new QComboBox;

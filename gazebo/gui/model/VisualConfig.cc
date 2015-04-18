@@ -121,7 +121,7 @@ void VisualConfig::AddVisual(const std::string &_name,
 
   // Top-level tree item
   QTreeWidgetItem *visualItem =
-      new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
+      new QTreeWidgetItem(static_cast<QTreeWidgetItem *>(0));
   this->visualsTreeWidget->addTopLevelItem(visualItem);
   this->visualsTreeWidget->setItemWidget(visualItem, 0, visualItemWidget);
 
