@@ -48,7 +48,7 @@ void GLWidget_TEST::SelectObject()
   gazebo::transport::SubscriberPtr sub;
   node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init();
-  sub = node->Subscribe("~/selection", &OnSelection, this);
+  sub = node->Subscribe("~/selection", &OnSelection, true);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
