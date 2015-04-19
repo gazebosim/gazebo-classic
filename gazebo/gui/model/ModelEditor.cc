@@ -77,6 +77,12 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       this->dataPtr->modelPalette->GetModelCreator()->GetJointMaker(),
       SLOT(ShowJoints(bool)));
 
+  // Clone actions from main window
+  this->dataPtr->showToolbarsAct =
+      this->mainWindow->CloneAction(g_showToolbarsAct, this);
+  this->dataPtr->fullScreenAct =
+      this->mainWindow->CloneAction(g_fullScreenAct, this);
+
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
   this->connections.push_back(
@@ -245,6 +251,10 @@ void ModelEditor::CreateMenus()
 
   QMenu *viewMenu = this->dataPtr->menuBar->addMenu(tr("&View"));
   viewMenu->addAction(this->dataPtr->showJointsAct);
+
+  QMenu *windowMenu = this->dataPtr->menuBar->addMenu(tr("&Window"));
+  windowMenu->addAction(this->dataPtr->showToolbarsAct);
+  windowMenu->addAction(this->dataPtr->fullScreenAct);
 }
 
 /////////////////////////////////////////////////
@@ -283,6 +293,8 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("modelEditorTab");
     this->mainWindow->ShowMenuBar(this->dataPtr->menuBar);
+    if (!g_showToolbarsAct->isChecked())
+      g_showToolbarsAct->trigger();
     this->mainWindow->GetRenderWidget()->ShowTimePanel(false);
   }
   else
