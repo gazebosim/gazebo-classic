@@ -73,6 +73,12 @@ namespace gazebo
     /// \param[in] _state State string.
     signals: void SetState(QString _state);
 
+    /// \brief Qt event filter currently used to filter resize events.
+    /// \param[in] _obj Object that is watched by the event filter.
+    /// \param[in] _event Qt event.
+    /// \return True if the event is handled.
+    private: bool eventFilter(QObject *_obj, QEvent *_event);
+
     /// \brief SDF for this plugin.
     private: sdf::ElementPtr sdf;
 
@@ -93,6 +99,9 @@ namespace gazebo
 
     /// \brief "Restart ball" publisher.
     private: transport::PublisherPtr restartBallPub;
+
+    /// \brief Pointer to the render widget used to get width.
+    private: QWidget *renderWidget;
   };
 }
 
