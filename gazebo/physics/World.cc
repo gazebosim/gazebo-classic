@@ -1995,7 +1995,6 @@ void World::LogWorker()
         boost::mutex::scoped_lock bLock(this->dataPtr->logBufferMutex);
         this->dataPtr->states[this->dataPtr->currentStateBuffer].push_back(
             this->dataPtr->prevStates[currState]);
-
         // Tell the logger to update, once the number of states exceeds 1000
         if (this->dataPtr->states[this->dataPtr->currentStateBuffer].size() >
             1000)
