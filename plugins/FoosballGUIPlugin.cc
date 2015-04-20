@@ -137,7 +137,7 @@ FoosballGUIPlugin::FoosballGUIPlugin()
   QObject::connect(restartGame, SIGNAL(activated()), this,
       SLOT(OnRestartGame()));
 
-  QShortcut *restartBall = new QShortcut(QKeySequence("Ctrl+H"), this);
+  QShortcut *restartBall = new QShortcut(QKeySequence("Ctrl+T"), this);
   QObject::connect(restartBall, SIGNAL(activated()), this,
       SLOT(OnRestartBall()));
 }
