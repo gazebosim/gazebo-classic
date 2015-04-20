@@ -19,12 +19,14 @@
 #define _GAZEBO_ARRANGE_PLUGIN_HH_
 
 #include <map>
+#include <mutex>
 #include <string>
 
 #include <boost/shared_ptr.hpp>
 
 #include <sdf/sdf.hh>
 
+#include <gazebo/common/Event.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/math/Pose.hh>
@@ -107,8 +109,15 @@ namespace gazebo
 
     /// \brief Subscriber for listening to changing arrangements.
     protected: transport::SubscriberPtr sub;
-
     protected: transport::PublisherPtr pub;
+
+    protected: std::mutex updateMutex;
+    /// \brief Connection to WorldUpdate
+    /*protected: event::ConnectionPtr worldUpdateConnection;
+
+    protected: void OnWorldUpdateBegin();
+
+    protected: Object_M staticObjectsUpdate;*/
   };
 }
 #endif

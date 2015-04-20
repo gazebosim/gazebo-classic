@@ -17,6 +17,7 @@
 
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Console.hh>
+#include <gazebo/common/Events.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/World.hh>
 #include "plugins/ArrangePlugin.hh"
@@ -149,6 +150,8 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   sub = this->node->Subscribe(this->eventTopicName,
                               &ArrangePlugin::ArrangementCallback, this);
 
+  /*this->worldUpdateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&ArrangePlugin::OnWorldUpdateBegin, this));*/
   pub = this->node->Advertise<msgs::Model>("~/model/modify");
 }
 
@@ -167,6 +170,7 @@ void ArrangePlugin::Reset()
 
 void ArrangePlugin::ArrangementCallback(ConstGzStringPtr &_msg)
 {
+  std::lock_guard<std::mutex> lock(this->updateMutex);
   // Set arrangement to the requested id
   this->SetArrangement(_msg->data());
 }
@@ -209,13 +213,28 @@ bool ArrangePlugin::SetArrangement(const std::string &_arrangement)
 
     if (model->IsStatic())
     {
+      /*std::lock_guard<std::mutex> lock(this->staticObjectsMutex);
+      ObjectPtr o(new Object());
+      o->model = model;
+      o->pose = pose;
+      this->staticObjectsUpdate[model->GetName()] = o;
       msgs::Model msg;
-      msg.set_name(model->GetName());
       msg.set_id(model->GetId());
+      msg.set_name(model->GetName());
       msgs::Set(msg.mutable_pose(), pose);
-      pub->Publish(msg);
+      this->pub->Publish(msg);*/
     }
   }
   return true;
 }
 
+
+/*void ArrangePlugin::OnWorldUpdateBegin()
+{
+  std::lock_guard<std::mutex> lock(this->staticObjectsMutex);
+  for (auto iter : this->staticObjectsUpdate)
+  {
+    iter.second->model->SetWorldPose(iter.second->pose);
+  }
+  this->staticObjectsUpdate.clear();
+}*/

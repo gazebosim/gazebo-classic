@@ -481,6 +481,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
           this->worldPose.rot.RotateVector(coll->initialRelativePose.pos);
         coll->worldPose.rot = this->worldPose.rot *
           coll->initialRelativePose.rot;
+
         coll->OnPoseChange();
       }
       else
