@@ -15,6 +15,8 @@
  *
 */
 
+#include <mutex>
+
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
 #include <gazebo/rendering/UserCamera.hh>
@@ -201,6 +203,8 @@ void FoosballGUIPlugin::OnScore(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void FoosballGUIPlugin::OnState(ConstGzStringPtr &_msg)
 {
+  std::lock_guard<std::mutex> lock(this->mutex);
+
   std::string state = _msg->data();
   std::string timeStr = _msg->data().substr(_msg->data().find(":")+1);
   int time = 3 - std::stoi(timeStr);
@@ -221,21 +225,21 @@ void FoosballGUIPlugin::OnState(ConstGzStringPtr &_msg)
   {
     state = "Blue GOAL!";
     this->floatingText->SetColor(common::Color(0, 0, 255));
-    this->floatingText->SetText("Blue GOAL!");
+    this->floatingText->SetText(state);
     this->floatingVisual->SetVisible(true);
   }
   else if (_msg->data().find("goalB") != std::string::npos)
   {
     state = "Red GOAL!";
     this->floatingText->SetColor(common::Color(255, 0, 0));
-    this->floatingText->SetText("Red GOAL!");
+    this->floatingText->SetText(state);
     this->floatingVisual->SetVisible(true);
   }
   else if (_msg->data().find("finished") != std::string::npos)
   {
     state = "Game Over!";
     this->floatingText->SetColor(common::Color(255, 255, 255));
-    this->floatingText->SetText("Game Over!");
+    this->floatingText->SetText(state);
     this->floatingVisual->SetVisible(true);
   }
 

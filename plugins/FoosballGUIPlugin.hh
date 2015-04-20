@@ -17,6 +17,7 @@
 #ifndef _GUI_FOOSBALL_PLUGIN_HH_
 #define _GUI_FOOSBALL_PLUGIN_HH_
 
+#include <mutex>
 #include <sdf/sdf.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
@@ -110,6 +111,9 @@ namespace gazebo
 
     /// \brief Visual containing the floating text.
     private: rendering::VisualPtr floatingVisual;
+
+    /// \brief Mutex to avoid race conditions.
+    private: std::mutex mutex;
   };
 }
 
