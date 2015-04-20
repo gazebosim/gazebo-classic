@@ -17,6 +17,7 @@
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
+#include <gazebo/rendering/UserCamera.hh>
 #include "FoosballGUIPlugin.hh"
 
 using namespace gazebo;
@@ -110,6 +111,23 @@ FoosballGUIPlugin::FoosballGUIPlugin()
     this->resize(this->renderWidget->width(), 100);
   }
 
+  // Floating text
+  rendering::UserCameraPtr camera = gui::get_active_camera();
+
+  this->floatingText = new rendering::MovableText();
+  this->floatingText->Load("floating_text",
+      "0", "Arial", 0.2, common::Color(255, 255, 255));
+  this->floatingText->SetShowOnTop(true);
+  this->floatingText->SetTextAlignment(rendering::MovableText::H_CENTER,
+      rendering::MovableText::V_ABOVE);
+
+  this->floatingVisual.reset(new rendering::Visual("floating_text_visual",
+      camera->GetScene()));
+  this->floatingVisual->Load();
+  this->floatingVisual->GetSceneNode()->attachObject(this->floatingText);
+  this->floatingVisual->SetVisible(true);
+  this->floatingVisual->SetPosition(math::Vector3(0, 0, 1.2));
+
   // Initialize transport.
   this->gzNode = transport::NodePtr(new transport::Node());
   this->gzNode->Init();
@@ -137,7 +155,7 @@ FoosballGUIPlugin::FoosballGUIPlugin()
   QObject::connect(restartGame, SIGNAL(activated()), this,
       SLOT(OnRestartGame()));
 
-  QShortcut *restartBall = new QShortcut(QKeySequence("Ctrl+T"), this);
+  QShortcut *restartBall = new QShortcut(QKeySequence("Ctrl+Y"), this);
   QObject::connect(restartBall, SIGNAL(activated()), this,
       SLOT(OnRestartBall()));
 }
@@ -182,26 +200,41 @@ void FoosballGUIPlugin::OnScore(ConstGzStringPtr &_msg)
 void FoosballGUIPlugin::OnState(ConstGzStringPtr &_msg)
 {
   std::string state = _msg->data();
+  std::string timeStr = _msg->data().substr(_msg->data().find(":")+1);
+  int time = 3 - std::stoi(timeStr);
 
-  if (_msg->data() == "play")
+  if (_msg->data().find("play") != std::string::npos)
   {
     state = "Play!";
+    this->floatingVisual->SetVisible(false);
   }
-  else if (_msg->data() == "kickoff")
+  else if (_msg->data().find("kickoff") != std::string::npos)
   {
     state = "Kickoff!";
+    this->floatingText->SetColor(common::Color(255, 255, 255));
+    this->floatingText->SetText(std::to_string(time));
+    this->floatingVisual->SetVisible(true);
   }
-  else if (_msg->data() == "goalA")
+  else if (_msg->data().find("goalA") != std::string::npos)
   {
     state = "Blue GOAL!";
+    this->floatingText->SetColor(common::Color(0, 0, 255));
+    this->floatingText->SetText("Blue GOAL!!!");
+    this->floatingVisual->SetVisible(true);
   }
-  else if (_msg->data() == "goalB")
+  else if (_msg->data().find("goalB") != std::string::npos)
   {
     state = "Red GOAL!";
+    this->floatingText->SetColor(common::Color(255, 0, 0));
+    this->floatingText->SetText("Red GOAL!!!");
+    this->floatingVisual->SetVisible(true);
   }
-  else if (_msg->data() == "finished")
+  else if (_msg->data().find("finished") != std::string::npos)
   {
     state = "Game Over!";
+    this->floatingText->SetColor(common::Color(255, 255, 255));
+    this->floatingText->SetText("Game Over!");
+    this->floatingVisual->SetVisible(true);
   }
 
   this->SetState(QString::fromStdString(state));

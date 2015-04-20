@@ -20,6 +20,8 @@
 #include <sdf/sdf.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
+#include <gazebo/rendering/Visual.hh>
+#include <gazebo/rendering/MovableText.hh>
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
 # include <gazebo/transport/transport.hh>
 # include <gazebo/gui/gui.hh>
@@ -102,6 +104,13 @@ namespace gazebo
 
     /// \brief Pointer to the render widget used to get width.
     private: QWidget *renderWidget;
+
+    /// \brief Text floating above the table to display countdown and goals.
+    private: rendering::MovableText *floatingText;
+
+    /// \brief Visual containing the floating text.
+    private: rendering::VisualPtr floatingVisual;
+
   };
 }
 

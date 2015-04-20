@@ -64,14 +64,14 @@ namespace gazebo
       return this->name;
     }
 
+    /// \brief Timer to measure the time elapsed in this state.
+    public: common::Timer timer;
+
     /// \brief Name of the state.
     protected: std::string name;
 
     /// \brief Pointer to be able to access to the plugin inside the state.
     protected: T *plugin;
-
-    /// \brief Timer to measure the time elapsed in this state.
-    protected: common::Timer timer;
   };
 
   // Forward declaration.
