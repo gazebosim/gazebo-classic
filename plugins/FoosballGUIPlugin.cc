@@ -113,6 +113,8 @@ FoosballGUIPlugin::FoosballGUIPlugin()
 
   // Floating text
   rendering::UserCameraPtr camera = gui::get_active_camera();
+  if (!camera)
+    return;
 
   this->floatingText = new rendering::MovableText();
   this->floatingText->Load("floating_text",
@@ -219,14 +221,14 @@ void FoosballGUIPlugin::OnState(ConstGzStringPtr &_msg)
   {
     state = "Blue GOAL!";
     this->floatingText->SetColor(common::Color(0, 0, 255));
-    this->floatingText->SetText("Blue GOAL!!!");
+    this->floatingText->SetText("Blue GOAL!");
     this->floatingVisual->SetVisible(true);
   }
   else if (_msg->data().find("goalB") != std::string::npos)
   {
     state = "Red GOAL!";
     this->floatingText->SetColor(common::Color(255, 0, 0));
-    this->floatingText->SetText("Red GOAL!!!");
+    this->floatingText->SetText("Red GOAL!");
     this->floatingVisual->SetVisible(true);
   }
   else if (_msg->data().find("finished") != std::string::npos)
@@ -260,7 +262,8 @@ void FoosballGUIPlugin::OnRestartBall()
 bool FoosballGUIPlugin::eventFilter(QObject *_obj, QEvent *_event)
 {
   QWidget *widget = qobject_cast<QWidget *>(_obj);
-  if (widget == this->renderWidget && _event->type() == QEvent::Resize)
+  if (widget && widget == this->renderWidget &&
+      _event->type() == QEvent::Resize)
   {
     this->resize(this->renderWidget->width(), 100);
   }

@@ -102,7 +102,7 @@ namespace gazebo
     /// \brief "Restart ball" publisher.
     private: transport::PublisherPtr restartBallPub;
 
-    /// \brief Pointer to the render widget used to get width.
+    /// \brief Pointer to the render widget.
     private: QWidget *renderWidget;
 
     /// \brief Text floating above the table to display countdown and goals.
@@ -110,7 +110,6 @@ namespace gazebo
 
     /// \brief Visual containing the floating text.
     private: rendering::VisualPtr floatingVisual;
-
   };
 }
 
