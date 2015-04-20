@@ -113,6 +113,10 @@ struct IndexError {
 
 // structure for passing variable pointers in PGS_LCP
 struct dxPGSLCPParameters {
+    int thread_id;
+    IndexError* order;
+    dxBody* const* body;
+    boost::recursive_mutex* mutex;
     dxQuickStepParameters *qs;
     int nStart;   // 0
     int nChunkSize;

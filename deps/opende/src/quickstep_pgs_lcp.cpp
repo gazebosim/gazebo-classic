@@ -19,6 +19,8 @@
 * LICENSE.TXT and LICENSE-BSD.TXT for more details.                     *
 *                                                                       *
 *************************************************************************/
+#include <pthread.h>
+
 #include <ode/common.h>
 #include <ode/odemath.h>
 #include <ode/rotation.h>
@@ -36,17 +38,9 @@
 
 using namespace ode;
  
-static void ComputeRows(
-#ifdef SHOW_CONVERGENCE
-                int thread_id,
-#else
-                int /*thread_id*/,
-#endif
-                IndexError* order,
-                dxBody* const * /*body*/,
-                dxPGSLCPParameters params,
-                boost::recursive_mutex* /*mutex*/)
+static void* ComputeRows(void *p)
 {
+  dxPGSLCPParameters *params = (dxPGSLCPParameters *)p;
 
   #ifdef REPORT_THREAD_TIMING
   struct timeval tv;
@@ -56,39 +50,44 @@ static void ComputeRows(
   //printf("thread %d started at time %f\n",thread_id,cur_time);
   #endif
 
-  //boost::recursive_mutex::scoped_lock lock(*mutex); // put in caccel read/writes?
-  dxQuickStepParameters *qs    = params.qs;
-  int startRow                 = params.nStart;   // 0
-  int nRows                    = params.nChunkSize; // m
-#ifdef USE_1NORM
-  int m                        = params.m; // m used for rms error computation
-#endif
-  // int nb                       = params.nb;
-#ifdef PENETRATION_JVERROR_CORRECTION
-  dReal stepsize               = params.stepsize;
-  dRealMutablePtr vnew         = params.vnew;
-#endif
-  int* jb                      = params.jb;
-  const int* findex            = params.findex;
-  bool skip_friction           = params.skip_friction;
-  dRealPtr        hi           = params.hi;
-  dRealPtr        lo           = params.lo;
-  dRealPtr        Ad           = params.Ad;
-  dRealPtr        Adcfm        = params.Adcfm;
-  dRealPtr        Adcfm_precon = params.Adcfm_precon;
-  dRealPtr        J            = params.J;
-  dRealPtr        iMJ          = params.iMJ;
-  dRealPtr        rhs_precon   = params.rhs_precon;
-  dRealPtr        J_precon     = params.J_precon;
-  dRealPtr        J_orig       = params.J_orig;
-  dRealMutablePtr cforce       = params.cforce;
+  int thread_id                 = params->thread_id;
+  IndexError* order             = params->order;
+  dxBody* const* body           = params->body;
+  boost::recursive_mutex* mutex = params->mutex;
 
-  dRealPtr        rhs          = params.rhs;
-  dRealMutablePtr caccel       = params.caccel;
-  dRealMutablePtr lambda       = params.lambda;
+  //boost::recursive_mutex::scoped_lock lock(*mutex); // put in caccel read/writes?
+  dxQuickStepParameters *qs    = params->qs;
+  int startRow                 = params->nStart;   // 0
+  int nRows                    = params->nChunkSize; // m
+#ifdef USE_1NORM
+  int m                        = params->m; // m used for rms error computation
+#endif
+  // int nb                       = params->nb;
+#ifdef PENETRATION_JVERROR_CORRECTION
+  dReal stepsize               = params->stepsize;
+  dRealMutablePtr vnew         = params->vnew;
+#endif
+  int* jb                      = params->jb;
+  const int* findex            = params->findex;
+  bool skip_friction           = params->skip_friction;
+  dRealPtr        hi           = params->hi;
+  dRealPtr        lo           = params->lo;
+  dRealPtr        Ad           = params->Ad;
+  dRealPtr        Adcfm        = params->Adcfm;
+  dRealPtr        Adcfm_precon = params->Adcfm_precon;
+  dRealPtr        J            = params->J;
+  dRealPtr        iMJ          = params->iMJ;
+  dRealPtr        rhs_precon   = params->rhs_precon;
+  dRealPtr        J_precon     = params->J_precon;
+  dRealPtr        J_orig       = params->J_orig;
+  dRealMutablePtr cforce       = params->cforce;
+
+  dRealPtr        rhs          = params->rhs;
+  dRealMutablePtr caccel       = params->caccel;
+  dRealMutablePtr lambda       = params->lambda;
 
 #ifdef REORDER_CONSTRAINTS
-  dRealMutablePtr last_lambda  = params.last_lambda;
+  dRealMutablePtr last_lambda  = params->last_lambda;
 #endif
 
   //printf("iiiiiiiii %d %d %d\n",thread_id,jb[0],jb[1]);
@@ -1072,6 +1071,10 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     /// repeat for position projection
     /// setup params_erp for ComputeRows
     //////////////////////////////////////////////////////
+    params_erp[thread_id].thread_id = thread_id;
+    params_erp[thread_id].order     = order;
+    params_erp[thread_id].body      = body;
+    params_erp[thread_id].mutex     = mutex;
 #ifdef PENETRATION_JVERROR_CORRECTION
     params_erp[thread_id].stepsize = stepsize;
     params_erp[thread_id].vnew  = vnew_erp;  /// \TODO need to allocate vnew_erp
@@ -1114,23 +1117,29 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       thread_id,i,m,chunk,nStart,nEnd);
 #endif
 
-    boost::thread *params_erp_thread;
+    pthread_t params_erp_thread;
+    int pthread_err;
 #ifdef USE_TPROW
-    if (row_threadpool && row_threadpool->size() > 0)
+    if (row_threadpool && row_threadpool->size() > 1)
     {
+      // skip threadpool if less than 2 threads allocated
       // printf("threading out for params_erp\n");
-      row_threadpool->schedule(boost::bind(ComputeRows,thread_id,order,
-      body, params_erp[thread_id], mutex));
+      row_threadpool->schedule(boost::bind(*ComputeRows, (void*)(&params_erp[thread_id])));
     }
-    else //automatically skip threadpool if only 1 thread allocated
-      params_erp_thread = new boost::thread(ComputeRows, thread_id,order, body, params_erp[thread_id], mutex);
+    else
+      pthread_err = pthread_create(&params_erp_thread, NULL, ComputeRows,
+                                   (void*)(&(params_erp[thread_id])));
 #else
-    params_erp_thread = new boost::thread(ComputeRows, thread_id,order, body, params_erp[thread_id], mutex);
-    // ComputeRows(thread_id,order, body, params_erp[thread_id], mutex);
+    pthread_err = pthread_create(&params_erp_thread, NULL, ComputeRows,
+                                 (void*)(&(params_erp[thread_id])));
 #endif
 
 
     // setup params for ComputeRows non_erp
+    params[thread_id].thread_id = thread_id;
+    params[thread_id].order     = order;
+    params[thread_id].body      = body;
+    params[thread_id].mutex     = mutex;
 #ifdef PENETRATION_JVERROR_CORRECTION
     params[thread_id].stepsize = stepsize;
     params[thread_id].vnew  = vnew;
@@ -1175,19 +1184,18 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
 #ifdef USE_TPROW
     if (row_threadpool && row_threadpool->size() > 0)
     {
+      // skip threadpool if less than 2 threads allocated
       // printf("threading out for params\n");
-      row_threadpool->schedule(boost::bind(ComputeRows,thread_id,order,
-      body, params[thread_id], mutex));
+      row_threadpool->schedule(boost::bind(*ComputeRows, (void*)(&(params[thread_id]))));
     }
-    else //automatically skip threadpool if only 1 thread allocated
-      ComputeRows(thread_id,order, body, params[thread_id], mutex);
+    else
+      ComputeRows((void*)(&(params[thread_id])));
 #else
-    ComputeRows(thread_id,order, body, params[thread_id], mutex);
+    ComputeRows((void*)(&(params[thread_id])));
 #endif
 
     IFTIMING (dTimerNow ("wait for params_erp threads"));
-    params_erp_thread->join();
-    delete params_erp_thread;
+    pthread_join(params_erp_thread, NULL);
     IFTIMING (dTimerNow ("params_erp threads done"));
   }
 
@@ -1195,7 +1203,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   // check time for scheduling, this is usually very quick
   //gettimeofday(&tv,NULL);
   //double wait_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
-  //printf("      quickstep done scheduling start time %f stopped time %f duration %f\n",cur_time,wait_time,wait_time - cur_time);
+  //printf("      quickstep done scheduling start time %f stopped time %f duration %f\n",
+  //       cur_time,wait_time,wait_time - cur_time);
 
 #ifdef USE_TPROW
   IFTIMING (dTimerNow ("wait for threads"));
@@ -1208,7 +1217,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   #ifdef REPORT_THREAD_TIMING
   gettimeofday(&tv,NULL);
   double end_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
-  printf("    quickstep threads start time %f stopped time %f duration %f\n",cur_time,end_time,end_time - cur_time);
+  printf("    quickstep threads start time %f stopped time %f duration %f\n",
+         cur_time,end_time,end_time - cur_time);
   #endif
 
   delete [] params;
