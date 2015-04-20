@@ -23,7 +23,7 @@ namespace gazebo
 {
   namespace gui
   {
-    /// \class LogPlayWidgetPrivate LogPlayWidgetPrivate.hh
+    /// \internal
     /// \brief Private data for the LogPlayWidget class
     class LogPlayWidgetPrivate
     {

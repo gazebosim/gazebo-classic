@@ -47,7 +47,7 @@ namespace gazebo
       /// \brief Set whether to display the simulation as paused.
       /// \param[in] _p True to display the simulation as paused. False
       /// indicates the simulation is running
-      public: void SetPaused(bool _paused);
+      public: void SetPaused(const bool _paused);
 
       /// \brief Emit signal to set current time line edit and item.
       /// \param[in] _timeString String representation of sim time.
@@ -70,7 +70,7 @@ namespace gazebo
       /// \brief Pause simulation.
       public slots: void OnPause();
 
-      /// \brief Play simulation.
+      /// \brief Step simulation forward.
       public slots: void OnStepForward();
 
       /// \brief Play simulation.

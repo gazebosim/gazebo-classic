@@ -98,8 +98,8 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
   // Check that all the range values
   for (unsigned int i = 0; i < ranges.size(); ++i)
   {
-    EXPECT_NEAR(ranges[i], sensor->GetRangeMax(), 1e-6);
-    EXPECT_NEAR(sensor->GetRange(i), ranges[i], 1e-6);
+    EXPECT_DOUBLE_EQ(ranges[i], GZ_DBL_INF);
+    EXPECT_DOUBLE_EQ(sensor->GetRange(i), ranges[i]);
     EXPECT_NEAR(sensor->GetRetro(i), 0, 1e-6);
     EXPECT_EQ(sensor->GetFiducial(i), -1);
   }
