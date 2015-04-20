@@ -316,10 +316,14 @@ void ModelAlign::SetHighlighted(rendering::VisualPtr _vis, bool _highlight)
   }
   else
   {
+    // Highlighting increases transparency for opaque visuals (0 < t < 0.3) and
+    // decreases transparency for semi-transparent visuals (0.3 < t < 1).
+    // A visual will never become fully transparent (t = 1) when highlighted.
     if (_highlight)
     {
       _vis->SetTransparency((1.0 - _vis->GetTransparency()) * 0.5);
     }
+    // The inverse operation restores the original transparency value.
     else
     {
       _vis->SetTransparency(std::abs(_vis->GetTransparency()*2.0-1.0));
