@@ -27,11 +27,10 @@
 #include <boost/archive/iterators/istream_iterator.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
 
-#include "gazebo/math/Rand.hh"
-
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Base64.hh"
+#include "gazebo/math/Rand.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
 
