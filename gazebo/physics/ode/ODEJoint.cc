@@ -345,6 +345,11 @@ math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
   }
 
   dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);
+  if (!jointFeedback)
+  {
+    gzerr << "Joint feedback uninitialized" << std::endl;
+    return result;
+  }
 
   if (_index == 0)
     result.Set(jointFeedback->t1[0], jointFeedback->t1[1],
