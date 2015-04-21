@@ -372,10 +372,10 @@ void Forest::LoadScene()
       scale = Ogre::Math::RangeRandom(0.1f, 0.2f);
       bushLoader->addTree(fern, position, yaw, scale);
     } else if (rnd < 0.7) {
-      scale = Ogre::Math::RangeRandom(0.05f, 0.1f);
+      scale = Ogre::Math::RangeRandom(0.1f, 0.2f);
       bushLoader->addTree(mushroom, position, yaw, scale);
     } else {
-      scale = Ogre::Math::RangeRandom(0.05f, 0.1f);
+      scale = Ogre::Math::RangeRandom(0.1f, 0.2f);
       bushLoader->addTree(plant, position, yaw, scale);
     }
   }
