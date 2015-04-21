@@ -1438,8 +1438,6 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
           this->SetSelected(linkVis, false);
         }
       }
-      g_copyAct->setEnabled(!this->selectedLinks.empty());
-      g_alignAct->setEnabled(this->selectedLinks.size() > 1);
 
       if (this->manipMode == "translate" || this->manipMode == "rotate" ||
           this->manipMode == "scale")
@@ -1811,21 +1809,18 @@ void ModelCreator::OnAlignMode(const std::string &_axis,
 /////////////////////////////////////////////////
 void ModelCreator::DeselectAll()
 {
-  if (!this->selectedLinks.empty())
+  while (!this->selectedLinks.empty())
   {
-    while (!this->selectedLinks.empty())
-    {
-      rendering::VisualPtr vis = this->selectedLinks[0];
-      vis->SetHighlighted(false);
-      this->selectedLinks.erase(this->selectedLinks.begin());
-      model::Events::setSelectedLink(vis->GetName(), false);
-    }
-    this->selectedLinks.clear();
+    rendering::VisualPtr vis = this->selectedLinks[0];
+
+    vis->SetHighlighted(false);
+    this->selectedLinks.erase(this->selectedLinks.begin());
+    model::Events::setSelectedLink(vis->GetName(), false);
   }
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::SetSelected(const std::string &_name, bool _selected)
+void ModelCreator::SetSelected(const std::string &_name, const bool _selected)
 {
   auto it = this->allLinks.find(_name);
   if (it == this->allLinks.end())
@@ -1835,7 +1830,8 @@ void ModelCreator::SetSelected(const std::string &_name, bool _selected)
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::SetSelected(rendering::VisualPtr _linkVis, bool _selected)
+void ModelCreator::SetSelected(rendering::VisualPtr _linkVis,
+    const bool _selected)
 {
   if (!_linkVis)
     return;
@@ -1859,6 +1855,8 @@ void ModelCreator::SetSelected(rendering::VisualPtr _linkVis, bool _selected)
       model::Events::setSelectedLink(_linkVis->GetName(), _selected);
     }
   }
+  g_copyAct->setEnabled(!this->selectedLinks.empty());
+  g_alignAct->setEnabled(this->selectedLinks.size() > 1);
 }
 
 /////////////////////////////////////////////////
@@ -1897,7 +1895,7 @@ void ModelCreator::OnSetSelectedEntity(const std::string &/*_name*/,
 
 /////////////////////////////////////////////////
 void ModelCreator::OnSetSelectedLink(const std::string &_name,
-    bool _selected)
+    const bool _selected)
 {
   this->SetSelected(_name, _selected);
 }

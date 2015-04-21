@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,53 +14,40 @@
  * limitations under the License.
  *
  */
-#ifndef _TIME_PANEL_HH_
-#define _TIME_PANEL_HH_
-
-#include <vector>
-#include <list>
-#include <string>
+#ifndef _GAZEBO_TIME_WIDGET_HH_
+#define _GAZEBO_TIME_WIDGET_HH_
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/TimeWidget.hh"
-#include "gazebo/gui/LogPlayWidget.hh"
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/Time.hh"
+#include "gazebo/gui/TimePanel.hh"
 #include "gazebo/util/system.hh"
-
-class QLineEdit;
-class QLabel;
 
 namespace gazebo
 {
   namespace gui
   {
-    class TimePanelPrivate;
-    class TimeWidget;
-    class LogPlayWidget;
+    class TimeWidgetPrivate;
+    class TimePanel;
 
-    class GAZEBO_VISIBLE TimePanel : public QWidget
+    class GAZEBO_VISIBLE TimeWidget : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor
-      /// \param[in] _parent Parent widget.
-      public: TimePanel(QWidget *_parent = 0);
+      /// \param[in] _parent Parent widget, commonly a TimePanel.
+      public: TimeWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
-      public: virtual ~TimePanel();
+      public: virtual ~TimeWidget();
 
       /// \brief Show real time factor.
       /// \param[in] _show True to display real time factor.
       public: void ShowRealTimeFactor(bool _show);
 
-      /// \brief Show real time
+      /// \brief Show real time.
       /// \param[in] _show True to display real time.
       public: void ShowRealTime(bool _show);
 
-      /// \brief Show sim time
+      /// \brief Show sim time.
       /// \param[in] _show True to display sim time.
       public: void ShowSimTime(bool _show);
 
@@ -85,6 +72,26 @@ namespace gazebo
       /// indicates the simulation is running
       public: void SetPaused(bool _paused);
 
+      /// \brief Emit a signal used to set the sim time line edit.
+      /// \param[in] _string String representation of sim time.
+      public: void EmitSetSimTime(QString _string);
+
+      /// \brief Emit a signal used to set the real time line edit.
+      /// \param[in] _string String representation of real time.
+      public: void EmitSetRealTime(QString _string);
+
+      /// \brief Emit a signal used to set the iterations line edit.
+      /// \param[in] _string String representation of iterations.
+      public: void EmitSetIterations(QString _string);
+
+      /// \brief Emit a signal used to set the FPS line edit.
+      /// \param[in] _string String representation of average FPS.
+      public: void EmitSetFPS(QString _string);
+
+      /// \brief A signal used to set the sim time line edit.
+      /// \param[in] _string String representation of real time factor.
+      public: void SetPercentRealTimeEdit(QString _text);
+
       /// \brief Qt call back when the step value in the spinbox changed
       /// \param[in] _value New step value.
       public slots: void OnStepValueChanged(int _value);
@@ -92,36 +99,25 @@ namespace gazebo
       /// \brief QT callback when the reset time button is pressed.
       public slots: void OnTimeReset();
 
-      /// \brief QT signal to set visibility of time widget.
-      /// \param[in] _visible True to make visible.
-      signals: void SetTimeWidgetVisible(bool _visible);
+      /// \brief A signal used to set the sim time line edit.
+      /// \param[in] _string String representation of sim time.
+      signals: void SetSimTime(QString _string);
 
-      /// \brief QT signal to set visibility of log play widget.
-      /// \param[in] _visible True to make visible.
-      signals: void SetLogPlayWidgetVisible(bool _visible);
+      /// \brief A signal used to set the real time line edit.
+      /// \param[in] _string String representation of real time.
+      signals: void SetRealTime(QString _string);
 
-      /// \brief Update the data output.
-      private slots: void Update();
+      /// \brief A signal used to set the iterations line edit.
+      /// \param[in] _string String representation of iterations.
+      signals: void SetIterations(QString _string);
 
-      /// \brief Qt call back when the play action state changes
-      private slots: void OnPlayActionChanged();
-
-      /// \brief Called when the GUI enters/leaves full-screen mode.
-      /// \param[in] _value True when entering full screen, false when
-      /// leaving.
-      private: void OnFullScreen(bool &_value);
-
-      /// \brief Called when a world stats message is received.
-      /// \param[in] _msg World statistics message.
-      private: void OnStats(ConstWorldStatisticsPtr &_msg);
-
-      /// \brief Helper function to format time string.
-      /// \param[in] _msg Time message.
-      private: static std::string FormatTime(const msgs::Time &_msg);
+      /// \brief A signal used to set the avg fps line edit.
+      /// \param[in] _string String representation of avg fps.
+      signals: void SetFPS(QString _string);
 
       /// \internal
       /// \brief Pointer to private data.
-      private: TimePanelPrivate *dataPtr;
+      private: TimeWidgetPrivate *dataPtr;
     };
   }
 }

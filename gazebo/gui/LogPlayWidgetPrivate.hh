@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,25 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_LOG_PLAY_WIDGET_PRIVATE_HH_
+#define _GAZEBO_LOG_PLAY_WIDGET_PRIVATE_HH_
 
-#ifndef _TIMEPANEL_TEST_HH_
-#define _TIMEPANEL_TEST_HH_
+#include "gazebo/gui/qt.h"
 
-#include "gazebo/gui/QTestFixture.hh"
-
-/// \brief A test class for the TimePanel widget.
-class TimePanel_TEST : public QTestFixture
+namespace gazebo
 {
-  Q_OBJECT
+  namespace gui
+  {
+    /// \internal
+    /// \brief Private data for the LogPlayWidget class
+    class LogPlayWidgetPrivate
+    {
+      /// \brief Paused state of the simulation.
+      public: bool paused;
 
-  /// \brief Test setting the play/pause state.
-  private slots: void SetPaused();
-};
-
+      /// \brief Paused state of the simulation.
+      public: TimePanel *timePanel;
+    };
+  }
+}
 #endif

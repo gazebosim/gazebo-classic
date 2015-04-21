@@ -15,7 +15,6 @@
  *
 */
 
-#include <boost/thread/recursive_mutex.hpp>
 #include <string>
 
 #include "gazebo/rendering/DynamicLines.hh"
@@ -202,6 +201,10 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
       this, SLOT(OnItemDoubleClicked(QTreeWidgetItem *, int)));
 
+  connect(this->modelTreeWidget,
+      SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+      this, SLOT(OnItemClicked(QTreeWidgetItem *, int)));
+
   connect(this->modelTreeWidget, SIGNAL(itemSelectionChanged()),
       this, SLOT(OnItemSelectionChanged()));
 
@@ -288,7 +291,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
      gui::model::Events::ConnectSetSelectedJoint(
        boost::bind(&ModelEditorPalette::OnSetSelectedJoint, this, _1, _2)));
 
-  this->updateMutex = new boost::recursive_mutex();
 }
 
 /////////////////////////////////////////////////
@@ -460,9 +462,8 @@ void ModelEditorPalette::OnItemSelectionChanged()
   QList<QTreeWidgetItem *> items = this->modelTreeWidget->selectedItems();
 
   // update and signal new selection
-  for (int i = 0; i < items.size(); ++i)
+  for (auto const item : items)
   {
-    QTreeWidgetItem *item = items[i];
     int idx = this->selected.indexOf(item);
     if (idx >= 0)
     {
@@ -473,19 +474,14 @@ void ModelEditorPalette::OnItemSelectionChanged()
     std::string type = item->data(1, Qt::UserRole).toString().toStdString();
 
     if (type == "Link")
-    {
       gui::model::Events::setSelectedLink(name, true);
-    }
     else if (type == "Joint")
-    {
       gui::model::Events::setSelectedJoint(name, true);
-    }
   }
 
   // deselect
-  for (int i = 0; i < this->selected.size(); ++i)
+  for (auto const item : this->selected)
   {
-    QTreeWidgetItem *item = this->selected[i];
     if (item)
     {
       std::string name = item->data(0, Qt::UserRole).toString().toStdString();
@@ -506,9 +502,8 @@ void ModelEditorPalette::OnSetSelectedEntity(const std::string &/*_name*/,
     const std::string &/*_mode*/)
 {
   // deselect all
-  for (int i = 0; i < this->selected.size(); ++i)
+  for (auto &item : this->selected)
   {
-    QTreeWidgetItem *item = this->selected[i];
     if (item)
       item->setSelected(false);
   }
@@ -554,6 +549,55 @@ void ModelEditorPalette::OnItemDoubleClicked(QTreeWidgetItem *_item,
     else if (type == "Joint")
       gui::model::Events::openJointInspector(name);
   }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnItemClicked(QTreeWidgetItem *_item,
+    int /*_column*/)
+{
+  if (_item)
+  {
+    if (this->selected.empty())
+      return;
+
+    QTreeWidgetItem *item = this->selected[0];
+    std::string selectedType =
+        item->data(1, Qt::UserRole).toString().toStdString();
+
+    std::string type = _item->data(1, Qt::UserRole).toString().toStdString();
+
+    if (type != selectedType)
+      this->DeselectType(selectedType);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::DeselectType(const std::string &_type)
+{
+  QObject::disconnect(this->modelTreeWidget, SIGNAL(itemSelectionChanged()),
+      this, SLOT(OnItemSelectionChanged()));
+
+  for (auto it = this->selected.begin(); it != this->selected.end();)
+  {
+    std::string name = (*it)->data(0, Qt::UserRole).toString().toStdString();
+    std::string type = (*it)->data(1, Qt::UserRole).toString().toStdString();
+    if (type == _type)
+    {
+      (*it)->setSelected(false);
+      it = this->selected.erase(it);
+      if (type == "Link")
+        gui::model::Events::setSelectedLink(name, false);
+      else if (type == "Joint")
+        gui::model::Events::setSelectedJoint(name, false);
+    }
+    else
+      ++it;
+  }
+
+  this->selected = this->modelTreeWidget->selectedItems();
+
+  QObject::connect(this->modelTreeWidget, SIGNAL(itemSelectionChanged()),
+      this, SLOT(OnItemSelectionChanged()));
 }
 
 /////////////////////////////////////////////////
@@ -615,7 +659,7 @@ void ModelEditorPalette::OnJointInserted(const std::string &_jointId,
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnLinkRemoved(const std::string &_linkId)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   for (int i = 0; i < this->linksItem->childCount(); ++i)
   {
     QTreeWidgetItem *item = this->linksItem->child(i);
@@ -634,7 +678,7 @@ void ModelEditorPalette::OnLinkRemoved(const std::string &_linkId)
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnJointRemoved(const std::string &_jointId)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   for (int i = 0; i < this->jointsItem->childCount(); ++i)
   {
     QTreeWidgetItem *item = this->jointsItem->child(i);
@@ -653,7 +697,7 @@ void ModelEditorPalette::OnJointRemoved(const std::string &_jointId)
 /////////////////////////////////////////////////
 void ModelEditorPalette::ClearModelTree()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   // Remove all links
   this->linksItem->takeChildren();
   // Remove all joints
@@ -664,7 +708,7 @@ void ModelEditorPalette::ClearModelTree()
 void ModelEditorPalette::OnJointNameChanged(const std::string &_jointId,
     const std::string &_newJointName)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   for (int i = 0; i < this->jointsItem->childCount(); ++i)
   {
     QTreeWidgetItem *item = this->jointsItem->child(i);
@@ -684,7 +728,7 @@ void ModelEditorPalette::OnJointNameChanged(const std::string &_jointId,
 void ModelEditorPalette::OnSetSelectedLink(const std::string &_name,
     bool _selected)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   for (int i = 0; i < this->linksItem->childCount(); ++i)
   {
     QTreeWidgetItem *item = this->linksItem->child(i);
@@ -704,7 +748,7 @@ void ModelEditorPalette::OnSetSelectedLink(const std::string &_name,
 void ModelEditorPalette::OnSetSelectedJoint(const std::string &_name,
     bool _selected)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   for (int i = 0; i < this->jointsItem->childCount(); ++i)
   {
     QTreeWidgetItem *item = this->jointsItem->child(i);

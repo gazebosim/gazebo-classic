@@ -89,9 +89,6 @@ namespace gazebo
     /// \brief Prints data about the event source to the log (useful for debug)
     public: void Info() const;
 
-    /// \brief Prints data about the event source to the log (useful for debug)
-    public: void Info();
-
     /// \brief Loads the full name of the model and the region from the world
     /// file.
     /// \param[in] _sdf

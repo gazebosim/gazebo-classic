@@ -187,12 +187,13 @@ namespace gazebo
       /// \brief Set the select state of a joint.
       /// \param[in] _name Name of the joint.
       /// \param[in] _selected True to select the joint.
-      public: void SetSelected(const std::string &_name, bool selected);
+      public: void SetSelected(const std::string &_name, const bool selected);
 
       /// \brief Set the select state of a joint visual.
       /// \param[in] _jointVis Pointer to the joint visual.
       /// \param[in] _selected True to select the joint.
-      public: void SetSelected(rendering::VisualPtr _jointVis, bool selected);
+      public: void SetSelected(rendering::VisualPtr _jointVis,
+          const bool selected);
 
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
@@ -234,13 +235,6 @@ namespace gazebo
       /// \return Scoped link name.
       private: std::string GetScopedLinkName(const std::string &_name);
 
-      /// \brief Create a joint line.
-      /// \param[in] _name Name to give the visual that contains the joint line.
-      /// \param[in] _parent Parent of the joint.
-      /// \return joint data.
-      private: JointData *CreateJointLine(const std::string &_name,
-          rendering::VisualPtr _parent);
-
       /// \brief Show a joint's context menu
       /// \param[in] _joint Name of joint the context menu is associated with.
       private: void ShowContextMenu(const std::string &_joint);
@@ -259,7 +253,14 @@ namespace gazebo
       /// \param[in] _selected True if the joint is selected, false if
       /// deselected.
       private: void OnSetSelectedJoint(const std::string &_name,
-          bool _selected);
+          const bool _selected);
+
+      /// \brief Create a joint line.
+      /// \param[in] _name Name to give the visual that contains the joint line.
+      /// \param[in] _parent Parent of the joint.
+      /// \return joint data.
+      private: JointData *CreateJointLine(const std::string &_name,
+          rendering::VisualPtr _parent);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();

@@ -20,13 +20,16 @@
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the TimePanel widget.
-class TimePanel_TEST : public QTestFixture
+/// \brief A test class for the TimeWidget widget.
+class TimeWidget_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test setting the play/pause state.
-  private slots: void SetPaused();
+  /// \brief Test that the TimeWidget gets valid times from the server.
+  private slots: void ValidTimes();
+
+  /// \brief Test setting the visibility of TimeWidget child widgets.
+  private slots: void Visibility();
 };
 
 #endif
