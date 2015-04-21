@@ -623,12 +623,12 @@ UserCameraPtr Scene::CreateUserCamera(const std::string &_name,
   camera->Init();
   this->dataPtr->userCameras.push_back(camera);
 
-  if (!this->dataPtr->forest)
+  /*if (!this->dataPtr->forest)
   {
     // create Forest
     this->dataPtr->forest = new Forest(shared_from_this());
     this->dataPtr->forest->Load();
-  }
+  }*/
 
   return camera;
 }
@@ -1922,6 +1922,14 @@ void Scene::PreRender()
       this->dataPtr->selectionMsg.reset();
     }
   }
+
+  // TODO create forest here for now
+  if (!this->dataPtr->forest)
+  {
+    this->dataPtr->forest = new Forest(shared_from_this());
+    this->dataPtr->forest->Load();
+  }
+
 }
 
 /////////////////////////////////////////////////
@@ -2436,6 +2444,14 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
         {
           return false;
         }
+
+        // TODO create forest here for now
+        if (!this->dataPtr->forest)
+        {
+          this->dataPtr->forest = new Forest(shared_from_this());
+          this->dataPtr->forest->Load();
+        }
+
       }
       return true;
     }

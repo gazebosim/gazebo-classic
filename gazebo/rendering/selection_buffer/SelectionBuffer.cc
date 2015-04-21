@@ -49,6 +49,9 @@ SelectionBuffer::~SelectionBuffer()
 /////////////////////////////////////////////////
 void SelectionBuffer::Update()
 {
+  /// TODO paged geometry changes.
+  return;
+
   if (!this->renderTexture)
     return;
 

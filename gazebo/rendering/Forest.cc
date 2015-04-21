@@ -22,30 +22,26 @@
 #include "gazebo/rendering/paged_geometry/BatchPage.h"
 #include "gazebo/rendering/paged_geometry/WindBatchPage.h"
 #include "gazebo/rendering/paged_geometry/ImpostorPage.h"
+#include "gazebo/rendering/paged_geometry/TreeLoader3D.h"
 #include "gazebo/rendering/paged_geometry/TreeLoader2D.h"
 
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Forest.hh"
 
-namespace HeightFunction
-{
-  inline float getTerrainHeight(const float _x, const float _z,
-      void *_userData = NULL)
-  {
-    return 0;
-  }
-}
-
 using namespace gazebo;
 using namespace rendering;
 
+#define WIND
 
 //////////////////////////////////////////////////
 Forest::Forest(ScenePtr _scene)
 {
   this->scene = _scene;
+  this->heightmap = NULL;
   this->initialized = false;
 }
 
@@ -113,6 +109,32 @@ void Forest::Load()
 }
 
 //////////////////////////////////////////////////
+float Forest::GetTerrainHeight(const float _x, const float _y, void *_userdata)
+{
+  Heightmap *hm = RenderEngine::Instance()->GetScene()->GetHeightmap();
+  if (hm)
+  {
+    return hm->GetHeight(_x, _y);
+  }
+
+  return 0;
+}
+
+//////////////////////////////////////////////////
+float Forest::GetGrassTerrainHeight(const float _x, const float _y, void *_userdata)
+{
+  // TODO HACK! fix coordinate system transform in paged geometry then
+  // remove this function
+  Heightmap *hm = RenderEngine::Instance()->GetScene()->GetHeightmap();
+  if (hm)
+  {
+    return hm->GetHeight(_y, _x);
+  }
+
+  return 0;
+}
+
+//////////////////////////////////////////////////
 void Forest::LoadScene()
 {
   if (!this->camera)
@@ -123,7 +145,7 @@ void Forest::LoadScene()
 
 
   Ogre::Vector3 upAxis = Ogre::Vector3(0, 0, 1);
-  Ogre::Vector3 rightAxis = Ogre::Vector3(1, 0, 0);
+  Ogre::Vector3 rightAxis = Ogre::Vector3(0, 1, 0);
   uint32_t visibilityFlags = GZ_VISIBILITY_GUI;
 
   // Setup a skybox
@@ -131,9 +153,9 @@ void Forest::LoadScene()
 
   // -------------------------------------- LOAD GRASS -----------------------
   // Create and configure a new PagedGeometry instance for this->grass
-  this->grass = new Forests::PagedGeometry(this->camera->GetOgreCamera(), 30);
+  this->grass = new Forests::PagedGeometry(this->camera->GetOgreCamera(), 100);
   this->grass->setCoordinateSystem(upAxis, rightAxis);
-  this->grass->addDetailLevel<Forests::GrassPage>(60);
+  this->grass->addDetailLevel<Forests::GrassPage>(300);
 
   // Create a GrassLoader object
   Forests::GrassLoader *grassLoader = new Forests::GrassLoader(this->grass);
@@ -143,7 +165,7 @@ void Forest::LoadScene()
 
   // Supply a height function to GrassLoader so it can calculate this->grass Y values
   // HeightFunction::initialize(this->scene->GetManager());
-  grassLoader->setHeightFunction(&HeightFunction::getTerrainHeight);
+  grassLoader->setHeightFunction(&Forest::GetGrassTerrainHeight);
 
   //Add some this->grass to the scene with GrassLoader::addLayer()
   Forests::GrassLayer *l = grassLoader->addLayer("3D-Diggers/plant1sprite");
@@ -161,7 +183,7 @@ void Forest::LoadScene()
   //Sway 1/2 a cycle every second
   l->setSwaySpeed(0.4f);
   //Relatively dense this->grass
-  l->setDensity(3.0f);
+  l->setDensity(4.0f);
   l->setRenderTechnique(Forests::GRASSTECH_SPRITE);
   //Distant this->grass should slowly raise out of the ground when coming in range
   l->setFadeTechnique(Forests::FADETECH_GROW);
@@ -174,12 +196,42 @@ void Forest::LoadScene()
   //This sets the density map that will be used to determine the density levels of this->grass all over the
   //terrain. This can be used to make this->grass grow anywhere you want to; in this case it's used to make
   //this->grass grow only on fairly level ground (see densitymap.png to see how this works).
-  l->setDensityMap("densitymap.png");
+//  l->setDensityMap("densitymap.png");
 
   //setMapBounds() must be called for the density and color maps to work (otherwise GrassLoader wouldn't
   //have any knowledge of where you want the maps to be applied). In this case, the maps are applied
   //to the same boundaries as the terrain.
-  l->setMapBounds(Forests::TBounds(-1000, -1000, 1000, 1000));	//(0,0)-(1500,1500) is the full boundaries of the terrain
+  //(0,0)-(500,500) is the full boundaries of the terrain
+  l->setMapBounds(Forests::TBounds(-500, -500, 500, 500));
+
+
+  // -------------------------------------- LOAD GRASS TYPE 2 -----------------------
+
+  Forests::GrassLayer *l2 = grassLoader->addLayer("grass");
+  //Configure the this->grass layer properties (size, density, animation properties,
+  // fade settings, etc.)
+  l2->setMinimumSize(0.7f, 0.7f);
+  l2->setMaximumSize(0.9f, 0.9f);
+  //Enable animations
+  l2->setAnimationEnabled(true);
+  //Sway fairly unsynchronized
+  l2->setSwayDistribution(7.0f);
+  //Sway back and forth 0.5 units in length
+  l2->setSwayLength(0.1f);
+  //Sway 1/2 a cycle every second
+  l2->setSwaySpeed(0.4f);
+  //Relatively dense this->grass
+  l2->setDensity(4.0f);
+//  l->setRenderTechnique(Forests::GRASSTECH_SPRITE);
+  //Distant this->grass should slowly raise out of the ground when coming in range
+  l2->setFadeTechnique(Forests::FADETECH_GROW);
+  l2->setColorMap("terrain_texture3.jpg");
+
+  //setMapBounds() must be called for the density and color maps to work (otherwise GrassLoader wouldn't
+  //have any knowledge of where you want the maps to be applied). In this case, the maps are applied
+  //to the same boundaries as the terrain.
+  //(0,0)-(500,500) is the full boundaries of the terrain
+  l2->setMapBounds(Forests::TBounds(-500, -500, 500, 500));
 
   //-------------------------------------- LOAD TREES --------------------------------------
   //Create and configure a new PagedGeometry instance
@@ -189,25 +241,25 @@ void Forest::LoadScene()
   //Set the camera so PagedGeometry knows how to calculate LODs
   this->trees->setCamera(this->camera->GetOgreCamera());
   //Set the size of each page of geometry
-  this->trees->setPageSize(50);
+  this->trees->setPageSize(100);
   //Use infinite paging mode
   this->trees->setInfinite();
 
   #ifdef WIND
   //WindBatchPage is a variation of BatchPage which includes a wind animation shader
-  this->trees->addDetailLevel<Forests::WindBatchPage>(90, 30);		//Use batches up to 150 units away, and fade for 30 more units
+  this->trees->addDetailLevel<Forests::WindBatchPage>(150, 30);		//Use batches up to 150 units away, and fade for 30 more units
   #else
-  this->trees->addDetailLevel<Forests::BatchPage>(90, 30);		//Use batches up to 150 units away, and fade for 30 more units
+  this->trees->addDetailLevel<Forests::BatchPage>(150, 30);		//Use batches up to 150 units away, and fade for 30 more units
   #endif
   this->trees->addDetailLevel<Forests::ImpostorPage>(700, 50);	//Use impostors up to 400 units, and for for 50 more units
 
   // Create a new TreeLoader2D object
-  Forests::TreeLoader2D *treeLoader = new Forests::TreeLoader2D(this->trees, Forests::TBounds(-1000, -1000, 1000, 1000));
+  Forests::TreeLoader3D *treeLoader = new Forests::TreeLoader3D(this->trees, Forests::TBounds(-500, -500, 500, 500));
   this->trees->setPageLoader(treeLoader);	//Assign the "treeLoader" to be used to load geometry for the PagedGeometry instance
 
   // Supply a height function to TreeLoader2D so it can calculate tree Y values
   // HeightFunction::initialize(this->scene->GetManager());
-  treeLoader->setHeightFunction(&HeightFunction::getTerrainHeight);
+//  treeLoader->setHeightFunction(&Forest::GetTerrainHeight);
 
   // [NOTE] This sets the color map, or lightmap to be used for this->trees. All this->trees will be colored according
   // to this texture. In this case, the shading of the terrain is used so this->trees will be shadowed
@@ -235,24 +287,32 @@ void Forest::LoadScene()
   Ogre::Vector3 position = Ogre::Vector3::ZERO;
   Ogre::Radian yaw;
   Ogre::Real scale;
-  for (int i = 0; i < 10000; i++)
+  for (int i = 0; i < 8000; i++)
   {
     yaw = Ogre::Degree(Ogre::Math::RangeRandom(0, 360));
 
-    position.x = Ogre::Math::RangeRandom(-1000, 1000);
-    position.y = Ogre::Math::RangeRandom(-1000, 1000);
+    position.x = Ogre::Math::RangeRandom(-500, 500);
+    position.y = Ogre::Math::RangeRandom(-500, 500);
+    position.z = Forest::GetTerrainHeight(position.x, position.y);
+
+    // hardcode to remove trees at specific places on heightmap
+    {
+      if (this->heightmap) {
+        if (position.z < 1.0)
+        {
+          i--;
+          continue;
+        }
+
+      }
+    }
 
     scale = Ogre::Math::RangeRandom(0.07f, 0.12f);
 
     float rnd = Ogre::Math::UnitRandom();
     if (rnd < 0.5f)
     {
-    //[NOTE] Unlike TreeLoader3D, TreeLoader2D's addTree() function accepts a Vector2D position (x/z)
-    //The Y value is calculated during runtime (to save memory) from the height function supplied (above)
-    if (Ogre::Math::UnitRandom() < 0.5f)
       treeLoader->addTree(tree1, position, yaw, scale);
-    //else
-    //	treeLoader->addTree(tree2, position, yaw, scale);
     }
     else
       treeLoader->addTree(tree2, position, yaw, scale);
@@ -261,23 +321,24 @@ void Forest::LoadScene()
   // -------------------------------------- LOAD BUSHES ------------------------
 
   // Create and configure a new PagedGeometry instance for this->bushes
-  this->bushes = new Forests::PagedGeometry(this->camera->GetOgreCamera(), 50);
+  this->bushes = new Forests::PagedGeometry(this->camera->GetOgreCamera(), 250);
   this->bushes->setCoordinateSystem(upAxis, rightAxis);
 
   #ifdef WIND
-  this->bushes->addDetailLevel<Forests::WindBatchPage>(80, 50);
+  this->bushes->addDetailLevel<Forests::WindBatchPage>(50, 50);
   #else
-  this->bushes->addDetailLevel<Forests::BatchPage>(80, 50);
+  this->bushes->addDetailLevel<Forests::BatchPage>(400, 50);
   #endif
+//  this->bushes->addDetailLevel<Forests::ImpostorPage>(400, 50);
 
-  // Create a new TreeLoader2D object for the this->bushes
-  Forests::TreeLoader2D *bushLoader =
-      new Forests::TreeLoader2D(this->bushes, Forests::TBounds(-1000, -1000, 1000, 1000));
+  // Create a new TreeLoader3D object for the this->bushes
+  Forests::TreeLoader3D *bushLoader =
+      new Forests::TreeLoader3D(this->bushes, Forests::TBounds(-500, -500, 500, 500));
   this->bushes->setPageLoader(bushLoader);
 
   // Supply the height function to TreeLoader2D so it can calculate tree Y values
-  //HeightFunction::initialize(this->scene->GetManager());
-  bushLoader->setHeightFunction(&HeightFunction::getTerrainHeight);
+  // HeightFunction::initialize(this->scene->GetManager());
+  // bushLoader->setHeightFunction(&Forest::GetTerrainHeight);
 
   bushLoader->setColorMap("terrain_lightmap.jpg");
 
@@ -300,20 +361,21 @@ void Forest::LoadScene()
   #endif
 
   // Randomly place 20,000 this->bushes on the terrain
-  for (int i = 0; i < 20000; i++){
+  for (int i = 0; i < 10000; i++){
     yaw = Ogre::Degree(Ogre::Math::RangeRandom(0, 360));
-    position.x = Ogre::Math::RangeRandom(-1000, 1000);
-    position.y = Ogre::Math::RangeRandom(-1000, 1000);
+    position.x = Ogre::Math::RangeRandom(-500, 500);
+    position.y = Ogre::Math::RangeRandom(-500, 500);
+    position.z = Forest::GetTerrainHeight(position.x, position.y);
 
     float rnd = Ogre::Math::UnitRandom();
-    if (rnd < 0.8f) {
-      scale = Ogre::Math::RangeRandom(0.3f, 0.4f);
+    if (rnd < 0.3f) {
+      scale = Ogre::Math::RangeRandom(0.1f, 0.2f);
       bushLoader->addTree(fern, position, yaw, scale);
-    } else if (rnd < 0.9) {
-      scale = Ogre::Math::RangeRandom(0.2f, 0.6f);
+    } else if (rnd < 0.7) {
+      scale = Ogre::Math::RangeRandom(0.05f, 0.1f);
       bushLoader->addTree(mushroom, position, yaw, scale);
     } else {
-      scale = Ogre::Math::RangeRandom(0.3f, 0.5f);
+      scale = Ogre::Math::RangeRandom(0.05f, 0.1f);
       bushLoader->addTree(plant, position, yaw, scale);
     }
   }
@@ -324,9 +386,10 @@ void Forest::LoadScene()
 void Forest::Update(bool _force)
 {
   if (!this->initialized)
+  {
+    this->heightmap = this->scene->GetHeightmap();
     this->LoadScene();
-
-  std::cerr << " update " << std::endl;
+  }
 
   // [NOTE] PagedGeometry::update() is called every frame to keep LODs, etc.
   // up-to-date

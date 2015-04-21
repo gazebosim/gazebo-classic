@@ -31,6 +31,9 @@ namespace gazebo
 {
   namespace rendering
   {
+
+    class Heightmap;
+
     /// \addtogroup gazebo_rendering
     /// \{
 
@@ -56,6 +59,23 @@ namespace gazebo
       /// \brief Update the scene and camera.
       public: void Update(bool _force);
 
+      /// \brief Get the height of terrain at specific location
+      /// \param[in] _x Position x
+      /// \param[in] _y Position y
+      /// \param[in] _userdata User data.
+      /// \return height in meterx
+      private: static float GetTerrainHeight(const float _x, const float _y,
+          void *_userdata = NULL);
+
+      /// \brief Get the height of terrain at specific location
+      /// TODO merge with GetTerrainHeight later
+      /// \param[in] _x Position x
+      /// \param[in] _y Position y
+      /// \param[in] _userdata User data.
+      /// \return height in meterx
+      private: static float GetGrassTerrainHeight(const float _x,
+          const float _y, void *_userdata = NULL);
+
       /// \brief True if the forest is initialized.
       private: bool initialized;
 
@@ -67,15 +87,21 @@ namespace gazebo
 
       /// \brief Pointer to the scene
       private: ScenePtr scene;
-           
+
       /// \brief PagedGeometry tree instances.
       private: Forests::PagedGeometry *trees;
 
       /// \brief PagedGeometry grass instances.
       private: Forests::PagedGeometry *grass;
 
+      /// \brief PagedGeometry another type of grass instances.
+      private: Forests::PagedGeometry *grass2;
+
       /// \brief PagedGeometry bush instances.
       private: Forests::PagedGeometry *bushes;
+
+      /// \brief heightmap in the scene.
+      private: Heightmap *heightmap;
 
     };
     /// \}

@@ -384,6 +384,9 @@ void Heightmap::Load()
     prefix = terrainDirPath / "gazebo_terrain_nocache";
   }
 
+  if (!boost::filesystem::exists(prefix))
+    boost::filesystem::create_directories(prefix);
+
   double sqrtN = sqrt(nTerrains);
 
   // Create terrain group, which holds all the individual terrain instances.

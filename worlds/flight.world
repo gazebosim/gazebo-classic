@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <scene>
+      <grid>false</grid>
+      <ambient>0.3 0.3 0.3 1.0</ambient>
+      <sky>
+        <time>10</time>
+        <sunrise>06</sunrise>
+        <sunset>18</sunset>
+<!--        <clouds>
+          <speed>1</speed>
+        </coulds>-->
+      </sky>
+    </scene>
+
+    <gui>
+      <camera name="user_camera">
+        <pose>145 266 0.0 0 0.1 0</pose>
+      </camera>
+    </gui>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+<!--    <include>
+      <uri>model://ground_plane</uri>
+    </include>-->
+
+    <include>
+      <uri>model://flight_heightmap</uri>
+    </include>
+
+<!--    <include>
+      <pose>-295 -210 -3.0 0 0 1.57</pose>
+      <uri>model://powerplant</uri>
+    </include>-->
+
+  </world>
+</sdf>
