@@ -801,21 +801,16 @@ void ModelAlign_TEST::SetHighlighted()
   scene = gazebo::rendering::get_scene("default");
   QVERIFY(scene != NULL);
 
-  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
-
   // Create a deeply nested visual where each level has a different transparency
   gazebo::rendering::VisualPtr vis1;
-  vis1.reset(
-      new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
   vis1->Load();
   double vis1Transp = 0.0;
   QVERIFY(gazebo::math::equal(
       static_cast<double>(vis1->GetTransparency()), vis1Transp, 1e-5));
 
   gazebo::rendering::VisualPtr vis2;
-  vis2.reset(
-      new gazebo::rendering::Visual("vis2", vis1));
+  vis2.reset(new gazebo::rendering::Visual("vis2", vis1));
   vis2->Load();
   double vis2Transp = 0.6;
   vis2->SetTransparency(vis2Transp);
@@ -823,8 +818,7 @@ void ModelAlign_TEST::SetHighlighted()
       static_cast<double>(vis2->GetTransparency()), vis2Transp, 1e-5));
 
   gazebo::rendering::VisualPtr vis3_1;
-  vis3_1.reset(
-      new gazebo::rendering::Visual("vis3_1", vis2));
+  vis3_1.reset(new gazebo::rendering::Visual("vis3_1", vis2));
   vis3_1->Load();
   double vis3_1Transp = 0.25;
   vis3_1->SetTransparency(vis3_1Transp);
@@ -832,8 +826,7 @@ void ModelAlign_TEST::SetHighlighted()
       static_cast<double>(vis3_1->GetTransparency()), vis3_1Transp, 1e-5));
 
   gazebo::rendering::VisualPtr vis3_2;
-  vis3_2.reset(
-      new gazebo::rendering::Visual("vis3_2_LEAF", vis2));
+  vis3_2.reset(new gazebo::rendering::Visual("vis3_2_LEAF", vis2));
   vis3_2->Load();
   double vis3_2Transp = 1.0;
   vis3_2->SetTransparency(vis3_2Transp);
@@ -841,8 +834,7 @@ void ModelAlign_TEST::SetHighlighted()
       static_cast<double>(vis3_2->GetTransparency()), vis3_2Transp, 1e-5));
 
   gazebo::rendering::VisualPtr vis4;
-  vis4.reset(
-      new gazebo::rendering::Visual("vis4_LEAF", vis3_1));
+  vis4.reset(new gazebo::rendering::Visual("vis4_LEAF", vis3_1));
   vis4->Load();
   double vis4Transp = 0.9;
   vis4->SetTransparency(vis4Transp);
@@ -869,7 +861,6 @@ void ModelAlign_TEST::SetHighlighted()
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
-    mainWindow->repaint();
   }
 
   // Check that the transparency of the leaves have changed
@@ -887,7 +878,6 @@ void ModelAlign_TEST::SetHighlighted()
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
-    mainWindow->repaint();
   }
 
   // Check that the transparency of the leaves have the original value
@@ -905,7 +895,6 @@ void ModelAlign_TEST::SetHighlighted()
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
-    mainWindow->repaint();
   }
 
   // Check that the transparency of the leaves have changed
@@ -923,7 +912,6 @@ void ModelAlign_TEST::SetHighlighted()
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
-    mainWindow->repaint();
   }
 
   // Check that the transparency of the leaves have the original value
