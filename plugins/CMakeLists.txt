@@ -34,6 +34,7 @@ set (plugins
   ContactPlugin
   DepthCameraPlugin
   DiffDrivePlugin
+  DronePlugin
   ForceTorquePlugin
   GpuRayPlugin
   ImuSensorPlugin
