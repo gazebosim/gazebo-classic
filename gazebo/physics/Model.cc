@@ -102,7 +102,7 @@ void Model::LoadLinks()
   if (this->sdf->HasElement("link"))
   {
     sdf::ElementPtr linkElem = this->sdf->GetElement("link");
-    bool canonicalLinkInitialized = false;
+//    bool canonicalLinkInitialized = false;
     while (linkElem)
     {
       // Create a new link
@@ -112,12 +112,38 @@ void Model::LoadLinks()
       /// \TODO: canonical link is hardcoded to the first link.
       ///        warn users for now, need  to add parsing of
       ///        the canonical tag in sdf
-      if (!canonicalLinkInitialized)
+      if (!this->canonicalLink)
+      {
+        // Get the canonical link from parent, if not found then set the
+        // current link as the canonoical link.
+        LinkPtr cLink;
+        BasePtr entity = this->GetParent();
+        while (entity && entity->HasType(MODEL))
+        {
+          ModelPtr model = boost::static_pointer_cast<Model>(entity);
+          LinkPtr tmpLink = model->GetLink();
+          if (tmpLink)
+            cLink = tmpLink;
+          entity = entity->GetParent();
+        }
+
+        if (cLink)
+        {
+          this->canonicalLink = cLink;
+        }
+        else
+        {
+          link->SetCanonicalLink(true);
+          this->canonicalLink = link;
+        }
+      }
+
+/*      if (!canonicalLinkInitialized)
       {
         link->SetCanonicalLink(true);
         this->canonicalLink = link;
         canonicalLinkInitialized = true;
-      }
+      }*/
 
       // Load the link using the config node. This also loads all of the
       // bodies collisionetries
@@ -145,7 +171,41 @@ void Model::LoadModels()
       this->models.push_back(model);
       modelElem = modelElem->GetNextElement("model");
     }
+
+    for (auto &model : this->models)
+      model->SetEnabled(true);
   }
+}
+
+//////////////////////////////////////////////////
+void Model::SetCanonicalLink()
+{
+  // Set the canonical link in all nested models
+  if (!this->canonicalLink)
+    this->canonicalLink = this->FindCanonicalLink();
+
+  if (this->canonicalLink)
+  {
+    for (auto model : this->models)
+      model->canonicalLink = this->canonicalLink;
+  }
+}
+
+//////////////////////////////////////////////////
+LinkPtr Model::FindCanonicalLink()
+{
+  // Do a depth first search to find the canonical link in nested models
+  if (this->canonicalLink)
+    return this->canonicalLink;
+
+  LinkPtr cLink;
+  for (auto model : this->models)
+  {
+    cLink = model->FindCanonicalLink();
+    if (cLink)
+      return cLink;
+  }
+  return cLink;
 }
 
 //////////////////////////////////////////////////
@@ -183,10 +243,13 @@ void Model::LoadJoints()
 //////////////////////////////////////////////////
 void Model::Init()
 {
-  // Record the model's initial pose (for reseting)
-  this->SetInitialRelativePose(this->GetWorldPose());
+  this->SetCanonicalLink();
 
-  this->SetRelativePose(this->GetWorldPose());
+  // Record the model's initial pose (for reseting)
+  this->SetInitialRelativePose(this->sdf->Get<math::Pose>("pose"));
+  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
+//  this->SetInitialRelativePose(this->GetWorldPose());
+//  this->SetRelativePose(this->GetWorldPose());
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();
@@ -729,7 +792,7 @@ void Model::LoadPlugins()
     }
   }
 
-  for (auto model : models)
+  for (auto model : this->models)
     model->LoadPlugins();
 }
 
@@ -888,14 +951,18 @@ void Model::SetLaserRetro(const float _retro)
 //////////////////////////////////////////////////
 void Model::FillMsg(msgs::Model &_msg)
 {
+  math::Pose relPose = this->GetRelativePose();
+
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
   _msg.set_self_collide(this->GetSelfCollide());
-  msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
+//  msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
+  msgs::Set(_msg.mutable_pose(), relPose);
   _msg.set_id(this->GetId());
   msgs::Set(_msg.mutable_scale(), this->scale);
 
-  msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
+//  msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
+  msgs::Set(this->visualMsg->mutable_pose(), relPose);
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   for (Link_V::iterator iter = this->links.begin(); iter != this->links.end();
