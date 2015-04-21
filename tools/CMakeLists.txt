@@ -32,8 +32,8 @@ gz_build_tests(${test_sources})
 
 add_executable(gz gz.cc gz_topic.cc gz_log.cc gz_joy.cc)
 target_link_libraries(gz
- gazebo_msgs gazebo_common gazebo_transport gazebo_gui gazebo_physics
- gazebo_sensors ${QT_LIBRARIES} ${Boost_LIBRARIES} ${SDL2_LIBRARIES} pthread)
+ gazebo_gui gazebo_physics gazebo_util
+ gazebo_sensors ${QT_LIBRARIES} ${Boost_LIBRARIES} pthread)
 gz_install_executable(gz)
 
 roffman(gz 1)
