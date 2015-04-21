@@ -124,6 +124,7 @@ set (gtest_sources_dri
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
   JointVisual_TEST.cc
+  Scene_TEST.cc
   SelectionObj_TEST.cc
   SonarVisual_TEST.cc
   TransmitterVisual_TEST.cc
