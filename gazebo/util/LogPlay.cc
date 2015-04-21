@@ -245,6 +245,13 @@ std::string LogPlay::GetFilename() const
 }
 
 /////////////////////////////////////////////////
+std::string LogPlay::GetFullPathFilename() const
+{
+  const boost::filesystem::path logFilename(this->filename);
+  return boost::filesystem::canonical(logFilename).string();
+}
+
+/////////////////////////////////////////////////
 uintmax_t LogPlay::GetFileSize() const
 {
   return boost::filesystem::file_size(this->filename);
