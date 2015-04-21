@@ -19,6 +19,9 @@
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
 
+1. Added a context menu for links
+    * [Pull request #1589](https://bitbucket.org/osrf/gazebo/pull-request/1589)
+
 1. Separate TimePanel's display into TimeWidget and LogPlayWidget.
     * [Pull request #1564](https://bitbucket.org/osrf/gazebo/pull-request/1564)
 
