@@ -184,6 +184,17 @@ namespace gazebo
       /// \param[in] _show True to show joints, false to hide them.
       public slots: void ShowJoints(bool _show);
 
+      /// \brief Set the select state of a joint.
+      /// \param[in] _name Name of the joint.
+      /// \param[in] _selected True to select the joint.
+      public: void SetSelected(const std::string &_name, const bool selected);
+
+      /// \brief Set the select state of a joint visual.
+      /// \param[in] _jointVis Pointer to the joint visual.
+      /// \param[in] _selected True to select the joint.
+      public: void SetSelected(rendering::VisualPtr _jointVis,
+          const bool selected);
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -224,6 +235,26 @@ namespace gazebo
       /// \return Scoped link name.
       private: std::string GetScopedLinkName(const std::string &_name);
 
+      /// \brief Show a joint's context menu
+      /// \param[in] _joint Name of joint the context menu is associated with.
+      private: void ShowContextMenu(const std::string &_joint);
+
+      /// \brief Deselect all currently selected joint visuals.
+      private: void DeselectAll();
+
+      /// \brief Callback when an entity is selected.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _mode Select mode
+      private: void OnSetSelectedEntity(const std::string &_name,
+          const std::string &_mode);
+
+      /// \brief Callback when a joint is selected.
+      /// \param[in] _name Name of joint.
+      /// \param[in] _selected True if the joint is selected, false if
+      /// deselected.
+      private: void OnSetSelectedJoint(const std::string &_name,
+          const bool _selected);
+
       /// \brief Create a joint line.
       /// \param[in] _name Name to give the visual that contains the joint line.
       /// \param[in] _parent Parent of the joint.
@@ -236,6 +267,10 @@ namespace gazebo
 
       /// \brief Qt Callback to open joint inspector
       private slots: void OnOpenInspector();
+
+      /// \brief Qt callback when a delete signal has been emitted. This is
+      /// currently triggered by the context menu via right click.
+      private slots: void OnDelete();
 
       /// \brief Constant vector containing [UnitX, UnitY, UnitZ].
       private: std::vector<math::Vector3> UnitVectors;
@@ -252,8 +287,8 @@ namespace gazebo
       /// \brief Currently selected visual
       private: rendering::VisualPtr selectedVis;
 
-      /// \brief Joint visual that is currently being inspected.
-      private: rendering::VisualPtr inspectVis;
+      /// \brief Name of joint that is currently being inspected.
+      private: std::string inspectName;
 
       /// \brief All joints created by joint maker.
       private: std::map<std::string, JointData *> joints;
@@ -283,8 +318,8 @@ namespace gazebo
       /// \brief Mutex to protect the list of joints
       private: boost::recursive_mutex *updateMutex;
 
-      /// \brief Selected joint.
-      private: rendering::VisualPtr selectedJoint;
+      /// \brief A list of selected link visuals.
+      private: std::vector<rendering::VisualPtr> selectedJoints;
 
       /// \brief A list of scoped link names.
       private: std::vector<std::string> scopedLinkedNames;

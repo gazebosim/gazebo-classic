@@ -162,11 +162,8 @@ void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
 
   QMenu menu;
 
-  if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
-  {
-    menu.addAction(this->moveToAct);
-    menu.addAction(this->followAct);
-  }
+  menu.addAction(this->moveToAct);
+  menu.addAction(this->followAct);
 
   if (_type == EntityTypes::MODEL || _type == EntityTypes::LINK)
     menu.addAction(this->applyWrenchAct);

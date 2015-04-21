@@ -37,6 +37,7 @@ set (sources
   JointControlWidget.cc
   KeyEventHandler.cc
   LightMaker.cc
+  LogPlayWidget.cc
   MainWindow.cc
   ModelAlign.cc
   ModelManipulator.cc
@@ -51,6 +52,7 @@ set (sources
   SpaceNav.cc
   SphereMaker.cc
   TimePanel.cc
+  TimeWidget.cc
   ToolsWidget.cc
   TopicSelector.cc
 )
@@ -66,6 +68,7 @@ set (qt_headers
   GLWidget.hh
   InsertModelWidget.hh
   JointControlWidget.hh
+  LogPlayWidget.hh
   MainWindow.hh
   ModelListWidget.hh
   ModelEditWidget.hh
@@ -73,6 +76,7 @@ set (qt_headers
   RenderWidget.hh
   SaveDialog.hh
   TimePanel.hh
+  TimeWidget.hh
   ToolsWidget.hh
   TopicSelector.hh
 )
@@ -126,6 +130,7 @@ set (qt_tests
   RenderWidget_TEST.cc
   SaveDialog_TEST.cc
   TimePanel_TEST.cc
+  TimeWidget_TEST.cc
 )
 
 # MainWindow is using screen rendering

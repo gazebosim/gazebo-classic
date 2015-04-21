@@ -79,7 +79,7 @@ namespace gazebo
       private slots: void OnApplyWrench();
 
       /// \brief QT callback when delete has been selected.
-      /// \param[in] _name Name of the model to delete.
+      /// \param[in] _name Name of the entity to delete.
       private slots: void OnDelete(const std::string &_name="");
 
       /// \brief QT callback when snap below has been selected.
@@ -108,10 +108,10 @@ namespace gazebo
       /// \brief Action for moving the camera to an object.
       private: QAction *moveToAct;
 
-      /// \brief Action for attaching the camera to a model.
+      /// \brief Action for attaching the camera to an entity.
       private: QAction *followAct;
 
-      /// \brief Action for opening model on Model Editor.
+      /// \brief Action for opening entity on Model Editor.
       private: QAction *editAct;
 
       /// \brief Action for applying force and torque to a model.
