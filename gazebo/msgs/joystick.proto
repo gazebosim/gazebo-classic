@@ -8,6 +8,18 @@ import "vector3d.proto";
 
 message Joystick
 {
+  message Button
+  {
+    required int32 index = 1;
+    required int32 state = 2;
+  }
+
+  message Axis
+  {
+    required int32 index = 1;
+    required int32 value = 2;
+  }
+
   // Translation measurements along the x,y,z
   // axes. These values should be normalized to
   // the range -1...1
@@ -19,5 +31,13 @@ message Joystick
   optional Vector3d rotation    = 2;
 
   // Button measurements
+  /// \deprecated Use button instead
   repeated int32 buttons        = 3;
+
+  // Button measurements
+  repeated Button button        = 4;
+
+  repeated Axis analog_axis     = 5;
+
+  repeated Axis digital_axis    = 6;
 }

@@ -93,8 +93,12 @@ namespace gazebo
     /// \brief Signal mutex.
     protected: static boost::mutex sigMutex;
 
-    /// \breif Signal condition.
+    /// \brief Signal condition.
     protected: static boost::condition_variable sigCondition;
+
+    /// \brief True when the command is running. This is set to false
+    /// when a signal occurs.
+    protected: static bool running;
 
     /// \brief Save argc for use by child commands.
     protected: int argc;

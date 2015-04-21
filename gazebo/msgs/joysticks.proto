@@ -1,0 +1,12 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Joysticks 
+/// \brief Message for multiple joystick events
+
+import "joystick.proto";
+
+message Joysticks
+{
+  repeated Joystick joy = 1;
+}

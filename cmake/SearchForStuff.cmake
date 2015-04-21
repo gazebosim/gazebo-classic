@@ -86,6 +86,19 @@ if (MSVC)
 endif()
 
 if (PKG_CONFIG_FOUND)
+
+  ########################################
+  # Find SDL
+  pkg_check_modules(SDL2 sdl2)
+  if (NOT SDL2_FOUND)
+    set(HAVE_SDL FALSE)
+    message (STATUS "Looking for SDL2 - not found")
+    BUILD_ERROR ("Missing: SDL2. Required for Joysticks and gamepads.")
+  else()
+    set(HAVE_SDL TRUE)
+    message (STATUS "Looking for SDL2 - found")
+  endif()
+
   pkg_check_modules(CURL libcurl)
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
