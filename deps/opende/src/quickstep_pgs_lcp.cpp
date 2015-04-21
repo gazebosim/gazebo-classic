@@ -86,6 +86,11 @@ static void* ComputeRows(void *p)
   dRealMutablePtr caccel       = params->caccel;
   dRealMutablePtr lambda       = params->lambda;
 
+  /// THREAD_POSITION_CORRECTION
+  dRealPtr rhs_erp             = params->rhs_erp;
+  dRealMutablePtr caccel_erp   = params->caccel_erp;
+  dRealMutablePtr lambda_erp   = params->lambda_erp;
+
 #ifdef REORDER_CONSTRAINTS
   dRealMutablePtr last_lambda  = params->last_lambda;
 #endif
@@ -157,6 +162,7 @@ static void* ComputeRows(void *p)
   dReal pgs_lcp_tolerance = qs->pgs_lcp_tolerance;
   int friction_iterations = qs->friction_iterations;
   dReal smooth_contacts = qs->smooth_contacts;
+  bool thread_position_correction = qs->thread_position_correction;
 
 #ifdef SHOW_CONVERGENCE
     // show starting lambda
@@ -171,6 +177,11 @@ static void* ComputeRows(void *p)
 #endif
   dRealMutablePtr caccel_ptr1;
   dRealMutablePtr caccel_ptr2;
+
+  /// THREAD_POSITION_CORRECTION
+  dRealMutablePtr caccel_erp_ptr1;
+  dRealMutablePtr caccel_erp_ptr2;
+
   dRealMutablePtr cforce_ptr1;
   dRealMutablePtr cforce_ptr2;
   int total_iterations = precon_iterations + num_iterations + 
@@ -293,6 +304,10 @@ static void* ComputeRows(void *p)
       dReal delta = 0;
       dReal delta_precon = 0;
 
+      // THREAD_POSITION_CORRECTION
+      dReal delta_erp = 0;
+      dReal delta_precon_erp = 0;
+
       // setup pointers
       int b1 = jb[index*2];
       int b2 = jb[index*2+1];
@@ -321,8 +336,26 @@ static void* ComputeRows(void *p)
         {
           caccel_ptr2     = NULL;
         }
+
+        if (thread_position_correction)
+        {
+          caccel_erp_ptr1 = caccel_erp + 6*b1;
+          if (b2 >= 0)
+          {
+            caccel_erp_ptr2     = caccel_erp + 6*b2;
+          }
+          else
+          {
+            caccel_erp_ptr2     = NULL;
+          }
+        }
       }
       dReal old_lambda        = lambda[index];
+
+      /// THREAD_POSITION_CORRECTION
+      dReal old_lambda_erp;
+      if (thread_position_correction)
+        old_lambda_erp    = lambda_erp[index];
 
 #ifdef PENETRATION_JVERROR_CORRECTION
       // 4/4 optional pointers for jverror correction
@@ -448,6 +481,13 @@ static void* ComputeRows(void *p)
           rms_error[2] += delta_precon2*Ad2;
           m_rms_dlambda[2]++;
         }
+
+        // initialize position correction terms (_erp) with precon results
+        if (qs->thread_position_correction)
+        {
+          old_lambda_erp = old_lambda;
+          lambda_erp[index] = lambda[index];
+        }
       }
       else
       {
@@ -471,6 +511,14 @@ static void* ComputeRows(void *p)
           if (caccel_ptr2)
             delta -= quickstep::dot6(caccel_ptr2, J_ptr + 6);
 
+          if (qs->thread_position_correction)
+          {
+            delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
+            delta_erp -= quickstep::dot6(caccel_erp_ptr1, J_ptr);
+            if (caccel_ptr2)
+              delta_erp -= quickstep::dot6(caccel_erp_ptr2, J_ptr + 6);
+          }
+
           // set the limits for this constraint.
           // this is the place where the QuickStep method differs from the
           // direct LCP solving method, since that method only performs this
@@ -479,14 +527,26 @@ static void* ComputeRows(void *p)
           // the constraints are ordered so that all lambda[] values needed have
           // already been computed.
           dReal hi_act, lo_act;
+          /// THREAD_POSITION_CORRECTION
+          dReal hi_act_erp, lo_act_erp;
           if (constraint_index >= 0) {
             // FOR erp throttled by info.c_v_max or info.c
             hi_act = dFabs (hi[index] * lambda[constraint_index]);
             lo_act = -hi_act;
+            if (qs->thread_position_correction)
+            {
+              hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
+              lo_act_erp = -hi_act_erp;
+            }
           } else {
             // FOR erp throttled by info.c_v_max or info.c
             hi_act = hi[index];
             lo_act = lo[index];
+            if (qs->thread_position_correction)
+            {
+              hi_act_erp = hi[index];
+              lo_act_erp = lo[index];
+            }
           }
 
           // compute lambda and clamp it to [lo,hi].
@@ -503,12 +563,39 @@ static void* ComputeRows(void *p)
             delta = hi_act-old_lambda;
             lambda[index] = hi_act;
           }
+
+          if (qs->thread_position_correction)
+          {
+            lambda_erp[index] = old_lambda_erp + delta_erp;
+            if (lambda_erp[index] < lo_act_erp) {
+              delta_erp = lo_act_erp-old_lambda_erp;
+              lambda_erp[index] = lo_act_erp;
+            }
+            else if (lambda_erp[index] > hi_act_erp) {
+              delta_erp = hi_act_erp-old_lambda_erp;
+              lambda_erp[index] = hi_act_erp;
+            }
+          }
 #else
           // FOR erp throttled by info.c_v_max or info.c
           dReal nl = old_lambda + delta;
-          _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
+          _mm_store_sd(&nl,
+                       _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl),
+                       _mm_load_sd(&hi_act)),
+                       _mm_load_sd(&lo_act)));
           lambda[index] = nl;
           delta = nl - old_lambda;
+
+          if (qs->thread_position_correction)
+          {
+            dReal nl_erp = old_lambda_erp + delta_erp;
+            _mm_store_sd(&nl_erp,
+                         _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl_erp),
+                         _mm_load_sd(&hi_act_erp)),
+                         _mm_load_sd(&lo_act_erp)));
+            lambda_erp[index] = nl_erp;
+            delta_erp = nl_erp - old_lambda_erp;
+          }
 #endif
 
           // option to smooth lambda
@@ -535,6 +622,11 @@ static void* ComputeRows(void *p)
               lambda[index] = (1.0 - smooth_contacts)*lambda[index]
                 + smooth_contacts*old_lambda;
             }
+
+            // if (qs->thread_position_correction)
+            // {
+            //   /// not smoothing lambda_erp
+            // }
           }
 #endif
 
@@ -548,6 +640,12 @@ static void* ComputeRows(void *p)
             if (caccel_ptr2)
               quickstep::sum6(caccel_ptr2, delta, iMJ_ptr + 6);
 
+            if (qs->thread_position_correction)
+            {
+              quickstep::sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
+              if (caccel_erp_ptr2)
+                quickstep::sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
+            }
           }
         }  // end of skip friction check
 
@@ -773,6 +871,9 @@ static void* ComputeRows(void *p)
     IFTIMING (dTimerNow ("ComputeRows_erp ends"));
   else
     IFTIMING (dTimerNow ("ComputeRows ends"));
+
+  if (qs->thread_position_correction)
+    pthread_exit(NULL);
 }
 
 //***************************************************************************
@@ -1021,7 +1122,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   dReal *last_lambda_erp = context->AllocateArray<dReal> (m);
 #endif
 
-  boost::recursive_mutex* mutex = new boost::recursive_mutex();
+  boost::recursive_mutex* mutex =
+    context->AllocateArray<boost::recursive_mutex>(1);
 
   // number of chunks must be at least 1
   // (single iteration, through all the constraints)
@@ -1033,10 +1135,14 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   int thread_id = 0;
 
   // prepare pointers for threads
-  dxPGSLCPParameters *params     = new dxPGSLCPParameters [num_chunks];
+  // params for solution with correction (_erp) term
+  dxPGSLCPParameters *params_erp;
+  if (qs->thread_position_correction)
+    params_erp = context->AllocateArray<dxPGSLCPParameters>(num_chunks);
 
-  // params for solution with _erp
-  dxPGSLCPParameters *params_erp = new dxPGSLCPParameters [num_chunks];
+  // params for solution without correction (_erp) term
+  dxPGSLCPParameters *params =
+    context->AllocateArray<dxPGSLCPParameters>(num_chunks);
 
 #ifdef REPORT_THREAD_TIMING
   // timing
@@ -1065,74 +1171,77 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     int nEnd   = i + chunk + qs->num_overlap;
     if (nEnd > m) nEnd = m;
 
-    // setup params for ComputeRows
-    IFTIMING (dTimerNow ("start pgs_erp rows"));
-    //////////////////////////////////////////////////////
-    /// repeat for position projection
-    /// setup params_erp for ComputeRows
-    //////////////////////////////////////////////////////
-    params_erp[thread_id].thread_id = thread_id;
-    params_erp[thread_id].order     = order;
-    params_erp[thread_id].body      = body;
-    params_erp[thread_id].mutex     = mutex;
+    pthread_t params_erp_thread;
+    if (qs->thread_position_correction)
+    {
+      // setup params for ComputeRows
+      IFTIMING (dTimerNow ("start pgs_erp rows"));
+      //////////////////////////////////////////////////////
+      /// repeat for position projection
+      /// setup params_erp for ComputeRows
+      //////////////////////////////////////////////////////
+      params_erp[thread_id].thread_id = thread_id;
+      params_erp[thread_id].order     = order;
+      params_erp[thread_id].body      = body;
+      params_erp[thread_id].mutex     = mutex;
 #ifdef PENETRATION_JVERROR_CORRECTION
-    params_erp[thread_id].stepsize = stepsize;
-    params_erp[thread_id].vnew  = vnew_erp;  /// \TODO need to allocate vnew_erp
+      params_erp[thread_id].stepsize = stepsize;
+      params_erp[thread_id].vnew  = vnew_erp;  /// \TODO need to allocate vnew_erp
 #endif
-    params_erp[thread_id].qs  = qs;
-    // if every one reorders constraints, this might just work
-    // comment out below if using defaults (0 and m) so every
-    // thread runs through all joints
-    params_erp[thread_id].nStart = nStart;   // 0
-    params_erp[thread_id].nChunkSize = nEnd - nStart; // m
-    params_erp[thread_id].m = m; // m
-    params_erp[thread_id].nb = nb;
-    params_erp[thread_id].jb = jb;
-    params_erp[thread_id].findex = findex;
-    params_erp[thread_id].skip_friction = true;
-    params_erp[thread_id].hi = hi;
-    params_erp[thread_id].lo = lo;
-    params_erp[thread_id].invMOI = invMOI;
-    params_erp[thread_id].MOI= MOI;
-    params_erp[thread_id].Ad = Ad;
-    params_erp[thread_id].Adcfm = Adcfm;
-    params_erp[thread_id].Adcfm_precon = Adcfm_precon;
-    params_erp[thread_id].J = J;
-    params_erp[thread_id].iMJ = iMJ;
-    params_erp[thread_id].rhs_precon  = rhs_precon;
-    params_erp[thread_id].J_precon  = J_precon;
-    params_erp[thread_id].J_orig  = J_orig;
-    params_erp[thread_id].cforce  = cforce;
+      params_erp[thread_id].qs  = qs;
+      // if every one reorders constraints, this might just work
+      // comment out below if using defaults (0 and m) so every
+      // thread runs through all joints
+      params_erp[thread_id].nStart = nStart;   // 0
+      params_erp[thread_id].nChunkSize = nEnd - nStart; // m
+      params_erp[thread_id].m = m; // m
+      params_erp[thread_id].nb = nb;
+      params_erp[thread_id].jb = jb;
+      params_erp[thread_id].findex = findex;
+      params_erp[thread_id].skip_friction = true;
+      params_erp[thread_id].hi = hi;
+      params_erp[thread_id].lo = lo;
+      params_erp[thread_id].invMOI = invMOI;
+      params_erp[thread_id].MOI= MOI;
+      params_erp[thread_id].Ad = Ad;
+      params_erp[thread_id].Adcfm = Adcfm;
+      params_erp[thread_id].Adcfm_precon = Adcfm_precon;
+      params_erp[thread_id].J = J;
+      params_erp[thread_id].iMJ = iMJ;
+      params_erp[thread_id].rhs_precon  = rhs_precon;
+      params_erp[thread_id].J_precon  = J_precon;
+      params_erp[thread_id].J_orig  = J_orig;
+      params_erp[thread_id].cforce  = cforce;
 
-    params_erp[thread_id].rhs = rhs_erp;
-    params_erp[thread_id].caccel = caccel_erp;
-    params_erp[thread_id].lambda = lambda_erp;
+      params_erp[thread_id].rhs = rhs_erp;
+      params_erp[thread_id].caccel = caccel_erp;
+      params_erp[thread_id].lambda = lambda_erp;
 
 #ifdef REORDER_CONSTRAINTS
-    params_erp[thread_id].last_lambda  = last_lambda_erp;
+      params_erp[thread_id].last_lambda  = last_lambda_erp;
 #endif
 
 #ifdef DEBUG_CONVERGENCE_TOLERANCE
-    printf("thread summary: id %d i %d m %d chunk %d start %d end %d \n",
-      thread_id,i,m,chunk,nStart,nEnd);
+      printf("thread summary: id %d i %d m %d chunk %d start %d end %d \n",
+        thread_id,i,m,chunk,nStart,nEnd);
 #endif
 
-    pthread_t params_erp_thread;
-    int pthread_err;
+      int pthread_err;
 #ifdef USE_TPROW
-    if (row_threadpool && row_threadpool->size() > 1)
-    {
-      // skip threadpool if less than 2 threads allocated
-      // printf("threading out for params_erp\n");
-      row_threadpool->schedule(boost::bind(*ComputeRows, (void*)(&params_erp[thread_id])));
-    }
-    else
+      if (row_threadpool && row_threadpool->size() > 1)
+      {
+        // skip threadpool if less than 2 threads allocated
+        // printf("threading out for params_erp\n");
+        row_threadpool->schedule(boost::bind(*ComputeRows, (void*)(&params_erp[thread_id])));
+      }
+      else
+        pthread_err = pthread_create(&params_erp_thread, NULL, ComputeRows,
+                                     (void*)(&(params_erp[thread_id])));
+#else
       pthread_err = pthread_create(&params_erp_thread, NULL, ComputeRows,
                                    (void*)(&(params_erp[thread_id])));
-#else
-    pthread_err = pthread_create(&params_erp_thread, NULL, ComputeRows,
-                                 (void*)(&(params_erp[thread_id])));
 #endif
+    }
 
 
     // setup params for ComputeRows non_erp
@@ -1173,6 +1282,15 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     params[thread_id].caccel = caccel;
     params[thread_id].lambda = lambda;
 
+    if (!qs->thread_position_correction)
+    {
+      /// if running without thread_position_correction, compute both in
+      /// the same loop
+      params[thread_id].rhs_erp = rhs_erp;
+      params[thread_id].caccel_erp = caccel_erp;
+      params[thread_id].lambda_erp = lambda_erp;
+    }
+
 #ifdef REORDER_CONSTRAINTS
     params[thread_id].last_lambda  = last_lambda;
 #endif
@@ -1194,9 +1312,12 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     ComputeRows((void*)(&(params[thread_id])));
 #endif
 
-    IFTIMING (dTimerNow ("wait for params_erp threads"));
-    pthread_join(params_erp_thread, NULL);
-    IFTIMING (dTimerNow ("params_erp threads done"));
+    if (qs->thread_position_correction)
+    {
+      IFTIMING (dTimerNow ("wait for params_erp threads"));
+      pthread_join(params_erp_thread, NULL);
+      IFTIMING (dTimerNow ("params_erp threads done"));
+    }
   }
 
 
@@ -1220,10 +1341,6 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   printf("    quickstep threads start time %f stopped time %f duration %f\n",
          cur_time,end_time,end_time - cur_time);
   #endif
-
-  delete [] params;
-  delete [] params_erp;
-  delete mutex;
 }
 
 size_t quickstep::EstimatePGS_LCPMemoryRequirements(int m,int /*nb*/)
@@ -1239,6 +1356,9 @@ size_t quickstep::EstimatePGS_LCPMemoryRequirements(int m,int /*nb*/)
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for last_lambda
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for last_lambda_erp
 #endif
+  res += dEFFICIENT_SIZE(sizeof(dxPGSLCPParameters) * m); // for params_erp
+  res += dEFFICIENT_SIZE(sizeof(dxPGSLCPParameters) * m); // for params
+  res += dEFFICIENT_SIZE(sizeof(boost::recursive_mutex)); // for mutex
   return res;
 }
 

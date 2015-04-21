@@ -147,6 +147,13 @@ struct dxPGSLCPParameters {
     dRealMutablePtr caccel;
     dRealMutablePtr lambda;
 
+    /// Only used if THREAD_POSITION_CORRECTION is not active,
+    /// in that case, compute both updates in the same
+    /// ComputeRows update.
+    dRealPtr rhs_erp;
+    dRealMutablePtr caccel_erp;
+    dRealMutablePtr lambda_erp;
+
 #ifdef REORDER_CONSTRAINTS
     dRealMutablePtr last_lambda ;
 #endif
