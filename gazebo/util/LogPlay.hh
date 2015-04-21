@@ -91,6 +91,10 @@ namespace gazebo
       /// \return The filename.
       public: std::string GetFilename() const;
 
+      /// \brief Get the full path of the log file.
+      /// \return The full path of the log file.
+      public: std::string GetFullPathFilename() const;
+
       /// \brief Get the size of the log file.
       /// \return The size of the file in bytes.
       public: uintmax_t GetFileSize() const;
