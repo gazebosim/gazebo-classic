@@ -299,18 +299,11 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
 
-      /// \brief Callback when a nestedModel is selected.
-      /// \param[in] _name Name of nestedModel.
-      /// \param[in] _selected True if the nestedModel is selected, false if
+      /// \brief Callback when a model editor entity is selected.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _selected True if the entity is selected, false if
       /// deselected.
-      private: void OnSetSelectedNestedModel(const std::string &_name,
-          bool _selected);
-
-      /// \brief Callback when a link is selected.
-      /// \param[in] _name Name of link.
-      /// \param[in] _selected True if the link is selected, false if
-      /// deselected.
-      private: void OnSetSelectedLink(const std::string &_name, bool _selected);
+      private: void OnSetSelected(const std::string &_name, bool _selected);
 
       /// \brief Create link with default properties from a visual. This
       /// function creates a link that will become the parent of the

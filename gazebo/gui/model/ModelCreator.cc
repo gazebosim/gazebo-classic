@@ -130,12 +130,8 @@ ModelCreator::ModelCreator()
        boost::bind(&ModelCreator::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
-     gui::model::Events::ConnectSetSelectedNestedModel(
-       boost::bind(&ModelCreator::OnSetSelectedNestedModel, this, _1, _2)));
-
-  this->connections.push_back(
-     gui::model::Events::ConnectSetSelectedLink(
-       boost::bind(&ModelCreator::OnSetSelectedLink, this, _1, _2)));
+     gui::model::Events::ConnectSetSelected(
+       boost::bind(&ModelCreator::OnSetSelected, this, _1, _2)));
 
   this->connections.push_back(
       gui::Events::ConnectScaleEntity(
@@ -1978,7 +1974,7 @@ void ModelCreator::DeselectAll()
     rendering::VisualPtr vis = this->selectedLinks[0];
     vis->SetHighlighted(false);
     this->selectedLinks.erase(this->selectedLinks.begin());
-    model::Events::setSelectedLink(vis->GetName(), false);
+    model::Events::setSelected(vis->GetName(), false);
   }
   this->selectedLinks.clear();
 
@@ -1987,7 +1983,7 @@ void ModelCreator::DeselectAll()
     rendering::VisualPtr vis = this->selectedNestedModels[0];
     vis->SetHighlighted(false);
     this->selectedNestedModels.erase(this->selectedNestedModels.begin());
-    model::Events::setSelectedNestedModel(vis->GetName(), false);
+    model::Events::setSelected(vis->GetName(), false);
   }
   this->selectedNestedModels.clear();
 }
@@ -2027,13 +2023,13 @@ void ModelCreator::SetSelected(rendering::VisualPtr _topLevelVis,
         itLinkSelected == this->selectedLinks.end())
     {
       this->selectedLinks.push_back(_topLevelVis);
-      model::Events::setSelectedLink(_topLevelVis->GetName(), _selected);
+      model::Events::setSelected(_topLevelVis->GetName(), _selected);
     }
     else if (itNestedModel != this->allNestedModels.end() &&
              itNestedModelSelected == this->selectedNestedModels.end())
     {
       this->selectedNestedModels.push_back(_topLevelVis);
-      model::Events::setSelectedNestedModel(_topLevelVis->GetName(), _selected);
+      model::Events::setSelected(_topLevelVis->GetName(), _selected);
     }
   }
   else
@@ -2042,13 +2038,13 @@ void ModelCreator::SetSelected(rendering::VisualPtr _topLevelVis,
         itLinkSelected != this->selectedLinks.end())
     {
       this->selectedLinks.erase(itLinkSelected);
-      model::Events::setSelectedLink(_topLevelVis->GetName(), _selected);
+      model::Events::setSelected(_topLevelVis->GetName(), _selected);
     }
     else if (itNestedModel != this->allNestedModels.end() &&
              itNestedModelSelected != this->selectedNestedModels.end())
     {
       this->selectedNestedModels.erase(itNestedModelSelected);
-      model::Events::setSelectedNestedModel(_topLevelVis->GetName(), _selected);
+      model::Events::setSelected(_topLevelVis->GetName(), _selected);
     }
   }
   g_copyAct->setEnabled(this->selectedLinks.size() +
@@ -2092,14 +2088,7 @@ void ModelCreator::OnSetSelectedEntity(const std::string &/*_name*/,
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::OnSetSelectedNestedModel(const std::string &_name,
-    bool _selected)
-{
-  this->SetSelected(_name, _selected);
-}
-
-/////////////////////////////////////////////////
-void ModelCreator::OnSetSelectedLink(const std::string &_name,
+void ModelCreator::OnSetSelected(const std::string &_name,
     bool _selected)
 {
   this->SetSelected(_name, _selected);

@@ -344,31 +344,18 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { showJointContextMenu.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the set selected nestedModel signal.
+        /// \brief Connect a Gazebo event to the set selected signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T> static event::ConnectionPtr
-            ConnectSetSelectedNestedModel(T _subscriber)
-          { return setSelectedNestedModel.Connect(_subscriber); }
+            ConnectSetSelected(T _subscriber)
+          { return setSelected.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the set selected nestedModel signal.
+        /// \brief Disconnect a Gazebo event from the set selected signal.
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectSetSelectedNestedModel(
+        public: static void DisconnectSetSelected(
             event::ConnectionPtr _subscriber)
-          { setSelectedNestedModel.Disconnect(_subscriber); }
-
-        /// \brief Connect a Gazebo event to the set selected link signal.
-        /// \param[in] _subscriber the subscriber to this event
-        /// \return a connection
-        public: template<typename T> static event::ConnectionPtr
-            ConnectSetSelectedLink(T _subscriber)
-          { return setSelectedLink.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the set selected link signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectSetSelectedLink(
-            event::ConnectionPtr _subscriber)
-          { setSelectedLink.Disconnect(_subscriber); }
+          { setSelected.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the set selected joint signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -463,12 +450,8 @@ namespace gazebo
         /// \brief Request to show the joint context menu.
         public: static event::EventT<void (std::string)> showJointContextMenu;
 
-        /// \brief Request to select or deselect a nestedModel.
-        public: static event::EventT<void (std::string, bool)>
-            setSelectedNestedModel;
-
-        /// \brief Request to select or deselect a link.
-        public: static event::EventT<void (std::string, bool)> setSelectedLink;
+        /// \brief Request to select or deselect an entity.
+        public: static event::EventT<void (std::string, bool)> setSelected;
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void (std::string, bool)> setSelectedJoint;
