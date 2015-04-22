@@ -54,6 +54,7 @@ static void* ComputeRows(void *p)
   IndexError* order             = params->order;
   dxBody* const* body           = params->body;
   boost::recursive_mutex* mutex = params->mutex;
+  bool inline_position_correction = params->inline_position_correction;
 
   //boost::recursive_mutex::scoped_lock lock(*mutex); // put in caccel read/writes?
   dxQuickStepParameters *qs    = params->qs;
@@ -162,7 +163,6 @@ static void* ComputeRows(void *p)
   dReal pgs_lcp_tolerance = qs->pgs_lcp_tolerance;
   int friction_iterations = qs->friction_iterations;
   dReal smooth_contacts = qs->smooth_contacts;
-  bool thread_position_correction = qs->thread_position_correction;
 
 #ifdef SHOW_CONVERGENCE
     // show starting lambda
@@ -337,7 +337,7 @@ static void* ComputeRows(void *p)
           caccel_ptr2     = NULL;
         }
 
-        if (thread_position_correction)
+        if (inline_position_correction)
         {
           caccel_erp_ptr1 = caccel_erp + 6*b1;
           if (b2 >= 0)
@@ -354,7 +354,7 @@ static void* ComputeRows(void *p)
 
       /// THREAD_POSITION_CORRECTION
       dReal old_lambda_erp;
-      if (thread_position_correction)
+      if (inline_position_correction)
         old_lambda_erp    = lambda_erp[index];
 
 #ifdef PENETRATION_JVERROR_CORRECTION
@@ -483,7 +483,7 @@ static void* ComputeRows(void *p)
         }
 
         // initialize position correction terms (_erp) with precon results
-        if (qs->thread_position_correction)
+        if (inline_position_correction)
         {
           old_lambda_erp = old_lambda;
           lambda_erp[index] = lambda[index];
@@ -511,7 +511,7 @@ static void* ComputeRows(void *p)
           if (caccel_ptr2)
             delta -= quickstep::dot6(caccel_ptr2, J_ptr + 6);
 
-          if (qs->thread_position_correction)
+          if (inline_position_correction)
           {
             delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
             delta_erp -= quickstep::dot6(caccel_erp_ptr1, J_ptr);
@@ -533,7 +533,7 @@ static void* ComputeRows(void *p)
             // FOR erp throttled by info.c_v_max or info.c
             hi_act = dFabs (hi[index] * lambda[constraint_index]);
             lo_act = -hi_act;
-            if (qs->thread_position_correction)
+            if (inline_position_correction)
             {
               hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
               lo_act_erp = -hi_act_erp;
@@ -542,7 +542,7 @@ static void* ComputeRows(void *p)
             // FOR erp throttled by info.c_v_max or info.c
             hi_act = hi[index];
             lo_act = lo[index];
-            if (qs->thread_position_correction)
+            if (inline_position_correction)
             {
               hi_act_erp = hi[index];
               lo_act_erp = lo[index];
@@ -564,7 +564,7 @@ static void* ComputeRows(void *p)
             lambda[index] = hi_act;
           }
 
-          if (qs->thread_position_correction)
+          if (inline_position_correction)
           {
             lambda_erp[index] = old_lambda_erp + delta_erp;
             if (lambda_erp[index] < lo_act_erp) {
@@ -586,7 +586,7 @@ static void* ComputeRows(void *p)
           lambda[index] = nl;
           delta = nl - old_lambda;
 
-          if (qs->thread_position_correction)
+          if (inline_position_correction)
           {
             dReal nl_erp = old_lambda_erp + delta_erp;
             _mm_store_sd(&nl_erp,
@@ -623,7 +623,7 @@ static void* ComputeRows(void *p)
                 + smooth_contacts*old_lambda;
             }
 
-            // if (qs->thread_position_correction)
+            // if (inline_position_correction)
             // {
             //   /// not smoothing lambda_erp
             // }
@@ -640,7 +640,7 @@ static void* ComputeRows(void *p)
             if (caccel_ptr2)
               quickstep::sum6(caccel_ptr2, delta, iMJ_ptr + 6);
 
-            if (qs->thread_position_correction)
+            if (inline_position_correction)
             {
               quickstep::sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
               if (caccel_erp_ptr2)
@@ -872,7 +872,7 @@ static void* ComputeRows(void *p)
   else
     IFTIMING (dTimerNow ("ComputeRows ends"));
 
-  if (qs->thread_position_correction)
+  if (!inline_position_correction)
     pthread_exit(NULL);
 }
 
@@ -1184,6 +1184,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       params_erp[thread_id].order     = order;
       params_erp[thread_id].body      = body;
       params_erp[thread_id].mutex     = mutex;
+      params_erp[thread_id].inline_position_correction = false;
 #ifdef PENETRATION_JVERROR_CORRECTION
       params_erp[thread_id].stepsize = stepsize;
       params_erp[thread_id].vnew  = vnew_erp;  /// \TODO need to allocate vnew_erp
@@ -1249,6 +1250,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     params[thread_id].order     = order;
     params[thread_id].body      = body;
     params[thread_id].mutex     = mutex;
+    params[thread_id].inline_position_correction = !qs->thread_position_correction;
 #ifdef PENETRATION_JVERROR_CORRECTION
     params[thread_id].stepsize = stepsize;
     params[thread_id].vnew  = vnew;

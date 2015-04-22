@@ -117,6 +117,7 @@ struct dxPGSLCPParameters {
     IndexError* order;
     dxBody* const* body;
     boost::recursive_mutex* mutex;
+    bool inline_position_correction;
     dxQuickStepParameters *qs;
     int nStart;   // 0
     int nChunkSize;
