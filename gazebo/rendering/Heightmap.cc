@@ -34,6 +34,7 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -102,12 +103,17 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 
   for (int i = 0; i < _msg->geometry().heightmap().texture_size(); ++i)
   {
-    this->diffuseTextures.push_back(common::find_file(
-        _msg->geometry().heightmap().texture(i).diffuse()));
-    this->normalTextures.push_back(common::find_file(
-        _msg->geometry().heightmap().texture(i).normal()));
-    this->worldSizes.push_back(
-        _msg->geometry().heightmap().texture(i).size());
+    std::string diffusePath = common::find_file(
+        _msg->geometry().heightmap().texture(i).diffuse());
+    std::string normalPath = common::find_file(
+        _msg->geometry().heightmap().texture(i).normal());
+
+    RenderEngine::Instance()->AddResourcePath(diffusePath);
+    RenderEngine::Instance()->AddResourcePath(normalPath);
+
+    this->diffuseTextures.push_back(diffusePath);
+    this->normalTextures.push_back(normalPath);
+    this->worldSizes.push_back(_msg->geometry().heightmap().texture(i).size());
   }
 
   for (int i = 0; i < _msg->geometry().heightmap().blend_size(); ++i)

@@ -15,20 +15,18 @@
  *
 */
 
-#include <stdio.h>
 #include <string>
 
 #include "gazebo/math/SignalStats.hh"
+#include "gazebo/math/Vector3Stats.hh"
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;
 
 /////////////////////////////////////////////////
-void ServerFixture::Record(const std::string &_name, double _data)
+void ServerFixture::Record(const std::string &_name, const double _data)
 {
-    std::ostringstream stream;
-    stream << _data;
-    RecordProperty(_name, stream.str());
+  RecordProperty(_name, std::to_string(_data));
 }
 
 /////////////////////////////////////////////////
@@ -36,9 +34,9 @@ void ServerFixture::Record(const std::string &_prefix,
                            const math::SignalStats &_stats)
 {
   auto map = _stats.Map();
-  for (auto const &iter : map)
+  for (auto const &stat : map)
   {
-    Record(_prefix + iter.first, iter.second);
+    this->Record(_prefix + stat.first, stat.second);
   }
 }
 
@@ -46,9 +44,8 @@ void ServerFixture::Record(const std::string &_prefix,
 void ServerFixture::Record(const std::string &_prefix,
                            const math::Vector3Stats &_stats)
 {
-  Record(_prefix + "_x_", _stats.X());
-  Record(_prefix + "_y_", _stats.Y());
-  Record(_prefix + "_z_", _stats.Z());
-  Record(_prefix + "_mag_", _stats.Mag());
+  this->Record(_prefix + "_x_", _stats.X());
+  this->Record(_prefix + "_y_", _stats.Y());
+  this->Record(_prefix + "_z_", _stats.Z());
+  this->Record(_prefix + "_mag_", _stats.Mag());
 }
-
