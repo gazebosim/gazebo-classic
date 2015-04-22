@@ -55,6 +55,7 @@ static void* ComputeRows(void *p)
   dxBody* const* body           = params->body;
   boost::recursive_mutex* mutex = params->mutex;
   bool inline_position_correction = params->inline_position_correction;
+  bool position_correction_thread = params->position_correction_thread;
 
   //boost::recursive_mutex::scoped_lock lock(*mutex); // put in caccel read/writes?
   dxQuickStepParameters *qs    = params->qs;
@@ -872,7 +873,7 @@ static void* ComputeRows(void *p)
   else
     IFTIMING (dTimerNow ("ComputeRows ends"));
 
-  if (!inline_position_correction)
+  if (position_correction_thread)
     pthread_exit(NULL);
 }
 
@@ -1185,6 +1186,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       params_erp[thread_id].body      = body;
       params_erp[thread_id].mutex     = mutex;
       params_erp[thread_id].inline_position_correction = false;
+      params_erp[thread_id].position_correction_thread = true;
 #ifdef PENETRATION_JVERROR_CORRECTION
       params_erp[thread_id].stepsize = stepsize;
       params_erp[thread_id].vnew  = vnew_erp;  /// \TODO need to allocate vnew_erp
@@ -1251,6 +1253,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     params[thread_id].body      = body;
     params[thread_id].mutex     = mutex;
     params[thread_id].inline_position_correction = !qs->thread_position_correction;
+    params[thread_id].position_correction_thread = false;
 #ifdef PENETRATION_JVERROR_CORRECTION
     params[thread_id].stepsize = stepsize;
     params[thread_id].vnew  = vnew;
