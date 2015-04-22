@@ -35,6 +35,8 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
   WrenchVisualPrivate *dPtr =
       reinterpret_cast<WrenchVisualPrivate *>(this->dataPtr);
 
+  dPtr->type = VISUAL_PHYSICS;
+
   dPtr->enabled = true;
   dPtr->receivedMsg = false;
 

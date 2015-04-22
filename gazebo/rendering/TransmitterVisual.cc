@@ -32,6 +32,8 @@ TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
   TransmitterVisualPrivate *dPtr =
       reinterpret_cast<TransmitterVisualPrivate *>(this->dataPtr);
 
+  dPtr->type = VISUAL_SENSOR;
+
   dPtr->isFirst = true;
   dPtr->receivedMsg = false;
 

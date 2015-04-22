@@ -2211,16 +2211,9 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
         visPtr = this->GetVisual(_msg->data());
       }
 
-      std::cerr << "entity_delete " << _msg->data() << std::endl;
       if (visPtr)
       {
-        VisualPtr viss = this->GetVisual("unit_box_1::link_COM_VISUAL__");
-/*        if (viss || true)
-        {
-          std::cerr << " got com vis  !!! " << std::endl;
-          this->RemoveChildGUIVisuals(viss);
-        }*/
-        this->RemoveChildGUIVisuals(visPtr);
+        this->RemoveVisualizations(visPtr);
         this->RemoveVisual(visPtr);
       }
     }
@@ -2481,6 +2474,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
           visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
       {
+        visual->SetType(Visual::VISUAL_PHYSICS);
         visual->SetVisible(false);
         visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
       }
@@ -2823,7 +2817,6 @@ void Scene::RemoveVisual(uint32_t _id)
   if (iter != this->dataPtr->visuals.end())
   {
     VisualPtr vis = iter->second;
-  std::cerr << " scene remove vis " << _id << " " << vis->GetName() << std::endl;
     // Remove all projectors attached to the visual
     auto piter = this->dataPtr->projectors.begin();
     while (piter != this->dataPtr->projectors.end())
@@ -2846,11 +2839,6 @@ void Scene::RemoveVisual(uint32_t _id)
         vis->GetId())
       this->dataPtr->selectedVis.reset();
   }
-
-/*  std::cerr << "==============" << std::endl;
-  for (auto v : this->dataPtr->visuals)
-    std::cerr << v.second->GetName() << std::endl;
-  std::cerr << "==============" << std::endl;*/
 }
 
 /////////////////////////////////////////////////
@@ -2968,25 +2956,27 @@ void Scene::CreateInertiaVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 {
   InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->GetName() +
-      "_Inertia_VISUAL__", _linkVisual));
+      "_INERTIA_VISUAL__", _linkVisual));
   inertiaVis->Load(_elem);
   inertiaVis->SetVisible(false);
   this->dataPtr->visuals[inertiaVis->GetId()] = inertiaVis;
 }
 
 /////////////////////////////////////////////////
-void Scene::RemoveChildGUIVisuals(rendering::VisualPtr _vis)
+void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
 {
+  std::vector<VisualPtr> toRemove;
   for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
   {
     rendering::VisualPtr childVis = _vis->GetChild(i);
-    uint32_t flags = childVis->GetVisibilityFlags();
-    if (flags != GZ_VISIBILITY_ALL && flags & GZ_VISIBILITY_GUI)
+    Visual::VisualType visType = childVis->GetType();
+    if (visType == Visual::VISUAL_PHYSICS || visType == Visual::VISUAL_SENSOR)
     {
-      std::cerr << " remove child vis " << childVis->GetName()  << std::endl;
-      this->RemoveVisual(childVis);
+      toRemove.push_back(childVis);
     }
   }
+  for (auto vis : toRemove)
+    this->RemoveVisual(vis);
 }
 
 /////////////////////////////////////////////////

@@ -30,6 +30,9 @@ using namespace rendering;
 JointVisual::JointVisual(const std::string &_name, VisualPtr _vis)
   : Visual(*new JointVisualPrivate, _name, _vis, false)
 {
+  JointVisualPrivate *dPtr =
+      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
+  dPtr->type = VISUAL_PHYSICS;
 }
 
 /////////////////////////////////////////////////

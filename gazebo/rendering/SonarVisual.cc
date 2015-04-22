@@ -35,6 +35,8 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
   SonarVisualPrivate *dPtr =
       reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
 
+  dPtr->type = VISUAL_SENSOR;
+
   dPtr->receivedMsg = false;
 
   dPtr->node = transport::NodePtr(new transport::Node());

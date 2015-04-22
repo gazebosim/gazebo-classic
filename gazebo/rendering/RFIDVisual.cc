@@ -38,6 +38,8 @@ RFIDVisual::RFIDVisual(const std::string &_name, VisualPtr _vis,
   RFIDVisualPrivate *dPtr =
       reinterpret_cast<RFIDVisualPrivate *>(this->dataPtr);
 
+  dPtr->type = VISUAL_SENSOR;
+
   dPtr->node = transport::NodePtr(new transport::Node());
   dPtr->node->Init(dPtr->scene->GetName());
 
