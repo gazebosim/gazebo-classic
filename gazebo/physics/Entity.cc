@@ -322,29 +322,38 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
     {
       EntityPtr entity = boost::static_pointer_cast<Entity>(*iter);
 
-      if (entity->IsCanonicalLink())
-        entity->worldPose = (entity->initialRelativePose + _pose);
-      else
+      if (entity->HasType(LINK))
       {
-        entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
-        if (_publish)
-          entity->PublishPose();
-      }
-
-      if (_notify)
-        entity->UpdatePhysicsPose(false);
-
-      // Tell collisions that their current world pose is dirty (needs
-      // updating). We set a dirty flag instead of directly updating the
-      // value to improve performance.
-      for (Base_V::iterator iterC = (*iter)->children.begin();
-           iterC != (*iter)->children.end(); ++iterC)
-      {
-        if ((*iterC)->HasType(COLLISION))
+        if (entity->IsCanonicalLink())
+          entity->worldPose = (entity->initialRelativePose + _pose);
+        else
         {
-          CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
-          entityC->SetWorldPoseDirty();
+          entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
+          if (_publish)
+            entity->PublishPose();
         }
+
+        if (_notify)
+          entity->UpdatePhysicsPose(false);
+
+        // Tell collisions that their current world pose is dirty (needs
+        // updating). We set a dirty flag instead of directly updating the
+        // value to improve performance.
+        for (Base_V::iterator iterC = (*iter)->children.begin();
+             iterC != (*iter)->children.end(); ++iterC)
+        {
+          if ((*iterC)->HasType(COLLISION))
+          {
+            CollisionPtr entityC =
+                boost::static_pointer_cast<Collision>(*iterC);
+            entityC->SetWorldPoseDirty();
+          }
+        }
+      }
+      else if (entity->HasType(MODEL))
+      {
+        entity->SetWorldPoseModel(
+            (entity->worldPose - oldModelWorldPose) + _pose, _notify, _publish);
       }
     }
   }
@@ -360,7 +369,45 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
   if (_notify)
     this->UpdatePhysicsPose(true);
 
-  // also update parent model's pose
+  EntityPtr parentEnt = this->parentEntity;
+  math::Pose relativePose = this->initialRelativePose;
+  math::Pose updatePose = _pose;
+
+  while (parentEnt && parentEnt->HasType(MODEL))
+  {
+    // setting parent Model world pose from canonical link world pose
+    // where _pose is the canonical link's world pose
+    parentEnt->worldPose = (-relativePose) + updatePose;
+
+    parentEnt->worldPose.Correct();
+
+    if (_notify)
+      parentEnt->UpdatePhysicsPose(false);
+
+    if (_publish)
+      parentEnt->PublishPose();
+
+    updatePose = parentEnt->worldPose;
+    relativePose = parentEnt->GetInitialRelativePose();
+    parentEnt = boost::dynamic_pointer_cast<Entity>(parentEnt->GetParent());
+  }
+
+  // Tell collisions that their current world pose is dirty (needs
+  // updating). We set a dirty flag instead of directly updating the
+  // value to improve performance.
+  for (Base_V::iterator iterC = this->children.begin();
+      iterC != this->children.end(); ++iterC)
+  {
+    if ((*iterC)->HasType(COLLISION))
+    {
+      CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
+      entityC->SetWorldPoseDirty();
+    }
+  }
+
+
+
+/*  // also update parent model's pose
   if (this->parentEntity->HasType(MODEL))
   {
     // setting parent Model world pose from canonical link world pose
@@ -390,13 +437,14 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
   }
   else
     gzerr << "SWP for CB[" << this->GetName() << "] but parent["
-      << this->parentEntity->GetName() << "] is not a MODEL!\n";
+      << this->parentEntity->GetName() << "] is not a MODEL!\n";*/
 }
 
 //////////////////////////////////////////////////
 void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
         bool /*_publish*/)
 {
+//  std::cerr << "set world pose default " << this->GetName() << " " << _pose << std::endl;
   this->worldPose = _pose;
   this->worldPose.Correct();
 
