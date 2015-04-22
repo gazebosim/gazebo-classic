@@ -1241,6 +1241,7 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
   fsaa = 0;
 #endif
 
+
   // Create the render texture
   this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
       _textureName,
@@ -1317,6 +1318,9 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
         Conversions::Convert(this->scene->GetBackgroundColor()));
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
+
+std::cerr << "Camera::SetRenderTarget WxH[" <<this->viewport->getActualWidth() << "x" << this->viewport->getActualHeight() << "]\n";
+std::cerr << "Camera::SetRenderTarget Target WxH[" <<this->renderTarget->getWidth() << "x" << this->renderTarget->getHeight() << "]\n";
 
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
                    static_cast<double>(this->viewport->getActualHeight());
@@ -1732,8 +1736,7 @@ void Camera::UpdateFOV()
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
       static_cast<double>(this->viewport->getActualHeight());
 
-    double hfov =
-      this->sdf->Get<double>("horizontal_fov");
+    double hfov = this->sdf->Get<double>("horizontal_fov");
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->camera->setAspectRatio(ratio);

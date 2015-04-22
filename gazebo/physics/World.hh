@@ -327,6 +327,12 @@ namespace gazebo
       /// \param[in] _name Name of the model to remove.
       public: void RemoveModel(const std::string &_name);
 
+      /// \brief Add a dirty pose to the list for processing at the next
+      /// physics time step. This function should only be used by physics
+      /// engines.
+      /// \param[in] _entity Pointer to an entity that has a dirty pose.
+      public: void AddDirtyPose(Entity *_entity);
+
       /// \cond
       /// This is an internal function.
       /// \brief Get a model by id.
@@ -460,9 +466,6 @@ namespace gazebo
       /// \internal
       /// \brief Private data pointer.
       private: WorldPrivate *dataPtr;
-
-      /// Friend ODELink so that it has access to dataPtr->dirtyPoses
-      private: friend class ODELink;
 
       /// Friend DARTLink so that it has access to dataPtr->dirtyPoses
       private: friend class DARTLink;

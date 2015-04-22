@@ -831,8 +831,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
   else
     gzerr << "GetAdaptersAddresses() failed: " << ret << std::endl;
   delete [] addrs;
-  gzdbg << "Determined my IP address to be: " <<
-    ret_addr << std::endl;
+
   if (ret_addr == "127.0.0.1")
   {
     gzwarn <<

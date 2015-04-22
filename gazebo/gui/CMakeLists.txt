@@ -142,7 +142,7 @@ set (qt_tests
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
   set (qt_tests
-      ${qt_tests}
+    ${qt_tests}
       BuildingEditor_TEST.cc
       ConfigWidget_TEST.cc
       GLWidget_TEST.cc
@@ -153,7 +153,7 @@ if (ENABLE_SCREEN_TESTS)
 endif()
 
 # Generate executables for each of the QT unit tests
-gz_build_qt_tests(${qt_tests})
+# gz_build_qt_tests(${qt_tests})
 
 set (resources resources.qrc)
 
@@ -166,23 +166,16 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
 
 gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 
-add_dependencies(gazebo_gui gazebo_msgs)
-add_dependencies(gzclient gazebo_gui)
-
 target_link_libraries(gazebo_gui
   gazebo_common
   gazebo_transport
   gazebo_rendering
-  gazebo_sensors
   gazebo_msgs
   gazebo_gui_building
   gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
-  gazebo_physics
-  gazebo_physics_ode
   gzqtpropertybrowser
-  libgazebo
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
@@ -193,26 +186,7 @@ if (UNIX)
   target_link_libraries(gazebo_gui pthread)
 endif()
 
-target_link_libraries(gzclient
-  gazebo_common
-  gazebo_transport
-  gazebo_rendering
-  gazebo_sensors
-  gazebo_msgs
-  gazebo_gui
-  gazebo_gui_building
-  gazebo_gui_model
-  gazebo_gui_terrain
-  gazebo_gui_viewers
-  gazebo_physics
-  gazebo_physics_ode
-  gazebo_skyx
-  gzqtpropertybrowser
-  libgazebo
-  ${QT_LIBRARIES}
-  ${ogre_libraries}
-  ${Boost_LIBRARIES}
-)
+target_link_libraries(gzclient gazebo_gui)
 
 if (UNIX)
   target_link_libraries(gzclient pthread)
@@ -222,7 +196,6 @@ if (SPNAV_LIBRARY)
   target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})
   target_link_libraries(gzclient ${SPNAV_LIBRARY})
 endif()
-
 
 add_definitions(${QT_DEFINITIONS})
 
@@ -237,3 +210,7 @@ gz_install_library(gazebo_gui)
 gz_install_includes("gui" ${headers} ${qt_headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)
 manpage(gzclient 1)
+
+QT4_WRAP_CPP(test_MOC test.hh)
+gz_add_executable(gztest test.cc ${test_MOC})
+target_link_libraries(gztest ${QT_LIBRARIES} ${ogre_libraries})

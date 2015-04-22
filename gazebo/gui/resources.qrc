@@ -1,5 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
-<qresource prefix="">
+<qresource>
   <file>style.qss</file>
   <file>images/mainwindow_bg.png</file>
   <file>images/play.png</file>

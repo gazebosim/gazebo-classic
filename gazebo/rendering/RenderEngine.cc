@@ -92,7 +92,7 @@ RenderEngine::~RenderEngine()
 }
 
 //////////////////////////////////////////////////
-void RenderEngine::Load()
+void RenderEngine::Load(bool _server)
 {
   if (!this->CreateContext())
   {
@@ -148,11 +148,23 @@ void RenderEngine::Load()
     this->SetupResources();
   }
 
-  std::stringstream stream;
-  stream << (int32_t)this->dummyWindowId;
+  /*if (_server)
+  {
+  */
+    std::stringstream stream;
+    stream << (int32_t)this->dummyWindowId;
 
-  this->windowManager->CreateWindow(stream.str(), 1, 1);
-  this->CheckSystemCapabilities();
+    this->windowManager->CreateWindow(stream.str(), 1, 1);
+    
+    // this->CheckSystemCapabilities();
+    //this->Init();
+  //}
+  //else
+  //{
+    //this->renderPathType = FORWARD;
+  //}
+    // Setup the available resources
+
 }
 
 //////////////////////////////////////////////////
@@ -161,7 +173,10 @@ ScenePtr RenderEngine::CreateScene(const std::string &_name,
                                    bool _isServer)
 {
   if (this->renderPathType == NONE)
+  {
+    gzerr << "NO RENDER PATH TYPE\n";
     return ScenePtr();
+  }
 
   if (!this->initialized)
   {
@@ -291,8 +306,15 @@ void RenderEngine::PostRender()
 //////////////////////////////////////////////////
 void RenderEngine::Init()
 {
+  this->CheckSystemCapabilities();
+
   if (this->renderPathType == NONE)
+  {
+    gzwarn << "Cannot initialize render engine since "
+           << "render path type is NONE. Ignore this warning if"
+	   << "rendering has been turned off on purpose.\n";
     return;
+  }
 
   this->initialized = false;
 

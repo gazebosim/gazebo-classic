@@ -25,12 +25,12 @@ set (qt_headers
   TopicView.hh
 )
 
-set (qt_tests
-  ImagesView_TEST.cc
-)
-
-# Generate executables for each of the QT unit tests
-gz_build_qt_tests(${qt_tests})
+# set (qt_tests
+#   ImagesView_TEST.cc
+# )
+# 
+# # Generate executables for each of the QT unit tests
+# gz_build_qt_tests(${qt_tests})
 
 set (resources ../resources.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers})

@@ -63,6 +63,8 @@ namespace gazebo
       public: GLWidget(QWidget *_parent = 0);
       public: virtual ~GLWidget();
 
+      public: void Init();
+
       /// \brief View a scene in this widget.
       /// This will use the scene's UserCamera to visualize the scene.
       /// If a UserCamera does not exist, one is created with the
@@ -77,20 +79,20 @@ namespace gazebo
       signals: void clicked();
 
 
-      protected: virtual void moveEvent(QMoveEvent *_e);
+      public: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
       protected: virtual void resizeEvent(QResizeEvent *_e);
-      protected: virtual void showEvent(QShowEvent *_e);
+      //protected: virtual void showEvent(QShowEvent *_e);
       protected: virtual void enterEvent(QEvent * event);
 
 
-      protected: void keyPressEvent(QKeyEvent *_event);
-      protected: void keyReleaseEvent(QKeyEvent *_event);
-      protected: void wheelEvent(QWheelEvent *_event);
-      protected: void mousePressEvent(QMouseEvent *_event);
-      protected: void mouseDoubleClickEvent(QMouseEvent *_event);
-      protected: void mouseMoveEvent(QMouseEvent *_event);
-      protected: void mouseReleaseEvent(QMouseEvent *_event);
+      public: void keyPressEvent(QKeyEvent *_event);
+      public: void keyReleaseEvent(QKeyEvent *_event);
+      public: void wheelEvent(QWheelEvent *_event);
+      public: void mousePressEvent(QMouseEvent *_event);
+      public: void mouseDoubleClickEvent(QMouseEvent *_event);
+      public: void mouseMoveEvent(QMouseEvent *_event);
+      public: void mouseReleaseEvent(QMouseEvent *_event);
 
       private: std::string GetOgreHandle() const;
 
@@ -148,7 +150,7 @@ namespace gazebo
 
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
-      private: bool eventFilter(QObject *_obj, QEvent *_event);
+      // private: bool eventFilter(QObject *_obj, QEvent *_event);
 
       private: void ClearSelection();
 
@@ -254,6 +256,8 @@ namespace gazebo
 
       /// \brief Mutext to protect selectedVisuals array.
       private: boost::mutex selectedVisMutex;
+
+      private: void MyCreateWindow();
     };
   }
 }

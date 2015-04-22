@@ -569,7 +569,7 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   this->initialized = true;
 
   this->dataPtr->selectionBuffer = new SelectionBuffer(this->scopedUniqueName,
-      this->scene->GetManager(), this->renderTarget);
+    this->scene->GetManager(), this->renderTarget);
 }
 
 //////////////////////////////////////////////////
