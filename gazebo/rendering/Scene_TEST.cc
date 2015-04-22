@@ -124,6 +124,7 @@ TEST_F(Scene_TEST, RemoveModelVisual)
 
   // Send request to delete the box model
   transport::NodePtr node = transport::NodePtr(new transport::Node());
+  node->Init();
   transport::requestNoReply(node, "entity_delete", "box");
 
   sleep = 0;

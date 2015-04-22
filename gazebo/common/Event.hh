@@ -615,6 +615,10 @@ namespace gazebo
     {
       boost::mutex::scoped_lock lock(this->myDataPtr->connectionsEraseMutex);
       this->myDataPtr->connectionsToErase.push_back(_id);
+
+      std::cerr << "disconnection _id "<< _id << " empty " <<
+          this->myDataPtr->connectionsToErase.empty() << std::endl;
+
     }
 
     /// \brief Cleanup disconnected connections.
@@ -625,6 +629,7 @@ namespace gazebo
         return;
       boost::mutex::scoped_lock lock(this->myDataPtr->connectionsEraseMutex);
 
+      std::cerr << "event cleanup  size !" << this->myDataPtr->connectionsToErase.size() << std::endl;
       for (std::vector<int>::iterator iter =
           this->myDataPtr->connectionsToErase.begin();
           iter != this->myDataPtr->connectionsToErase.end(); ++iter)
@@ -633,10 +638,12 @@ namespace gazebo
           this->myDataPtr->connections.find(*iter);
         if (iter2 != this->myDataPtr->connections.end())
         {
+          std::cerr << "event cleanup !" << iter2->first << std::endl;
           delete iter2->second;
           this->myDataPtr->connections.erase(iter2);
         }
       }
+      std::cerr << "event cleanup done!  size !" << this->myDataPtr->connectionsToErase.size() << std::endl;
       this->myDataPtr->connectionsToErase.clear();
     }
     /// \}

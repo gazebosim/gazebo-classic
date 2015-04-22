@@ -227,6 +227,7 @@ void Visual::Fini()
 
   if (this->dataPtr->preRenderConnection)
   {
+    std::cerr << " disconnect prerender " << this->dataPtr->preRenderConnection->GetId() << std::endl;
     event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
     this->dataPtr->preRenderConnection.reset();
   }

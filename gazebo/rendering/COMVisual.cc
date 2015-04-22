@@ -176,4 +176,3 @@ math::Pose COMVisual::GetInertiaPose() const
 
   return dPtr->inertiaPose;
 }
-

@@ -613,6 +613,10 @@ namespace gazebo
       private: void CreateInertiaVisual(sdf::ElementPtr _elem,
           VisualPtr _linkVisual);
 
+      /// \brief Helper function to remove all attached GUI visuals.
+      /// \param[in] _vis Visual whose child GUI visuals will be removed.
+      private: void RemoveChildGUIVisuals(VisualPtr _vis);
+
       /// \internal
       /// \brief Pointer to private data.
       private: ScenePrivate *dataPtr;
