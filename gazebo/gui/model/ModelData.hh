@@ -49,10 +49,17 @@ namespace gazebo
       /// \brief Get the default transparency setting for entities in model
       /// editor.
       public: static double GetEditTransparency();
+    };
 
+    class NestedModelData
+    {
       /// \brief Set the pose of the model.
       /// \param[in] _pose Pose of model.
       public: void SetPose(const math::Pose &_pose);
+
+      /// \brief Get the pose of the nested model.
+      /// \return Pose of nested model.
+      public: math::Pose GetPose() const;
 
       /// \brief SDF representing the model data.
       public: sdf::ElementPtr modelSDF;

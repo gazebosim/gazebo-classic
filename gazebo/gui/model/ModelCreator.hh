@@ -49,6 +49,7 @@ namespace gazebo
   namespace gui
   {
     class LinkData;
+    class NestedModelData;
     class ModelData;
     class SaveDialog;
     class JointMaker;
@@ -446,7 +447,7 @@ namespace gazebo
       private: std::map<std::string, LinkData *> allLinks;
 
       /// \brief A map of nested model names to and their visuals.
-      private: std::map<std::string, ModelData *> allNestedModels;
+      private: std::map<std::string, NestedModelData *> allNestedModels;
 
       /// \brief Transport node
       private: transport::NodePtr node;

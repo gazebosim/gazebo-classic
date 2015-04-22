@@ -310,7 +310,7 @@ rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
   rendering::VisualPtr modelVisual;
   std::stringstream modelNameStream;
   std::string nestedModelName;
-  ModelData *modelData = new ModelData();
+  NestedModelData *modelData = new NestedModelData();
 
   // If no parent vis, this is the root model
   if (!_parentVis)
@@ -1071,7 +1071,7 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
     return;
   }
 
-  ModelData *modelData = NULL;
+  NestedModelData *modelData = NULL;
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     if (this->allNestedModels.find(_nestedModelName) ==
@@ -1517,7 +1517,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     else if (this->allNestedModels.find(this->mouseVisual->GetName()) !=
         this->allNestedModels.end())
     {
-      ModelData *modelData = this->allNestedModels[
+      NestedModelData *modelData = this->allNestedModels[
           this->mouseVisual->GetName()];
       modelData->SetPose(this->mouseVisual->GetWorldPose()-this->modelPose);
       gui::model::Events::nestedModelInserted(this->mouseVisual->GetName());
@@ -1828,7 +1828,7 @@ void ModelCreator::GenerateSDF()
 
   if (this->serverModelName.empty())
   {
-    // set center of all links to be origin
+    // set center of all links and nested models to be origin
     // TODO set a better origin other than the centroid
     math::Vector3 mid;
     for (auto &linksIt : this->allLinks)
@@ -1836,21 +1836,33 @@ void ModelCreator::GenerateSDF()
       LinkData *link = linksIt.second;
       mid += link->GetPose().pos;
     }
-    if (!this->allLinks.empty())
-      mid /= this->allLinks.size();
+    for (auto &nestedModelsIt : this->allNestedModels)
+    {
+      NestedModelData *modelData = nestedModelsIt.second;
+      mid += modelData->GetPose().pos;
+    }
+    if (!(this->allLinks.empty() && this-allNestedModels.empty()))
+      mid /= (this->allLinks.size() + this->allNestedModels.size());
     this->modelPose.pos = mid;
   }
 
   // Update preview model and link poses in case they changed
+  this->previewVisual->SetWorldPose(this->modelPose);
   for (auto &linksIt : this->allLinks)
   {
-    this->previewVisual->SetWorldPose(this->modelPose);
     LinkData *link = linksIt.second;
     link->SetPose(link->linkVisual->GetWorldPose() - this->modelPose);
     link->linkVisual->SetPose(link->GetPose());
   }
+  for (auto &nestedModelsIt : this->allNestedModels)
+  {
+    NestedModelData *modelData = nestedModelsIt.second;
+    modelData->SetPose(modelData->modelVisual->GetWorldPose()-this->modelPose);
+    modelData->modelVisual->SetPose(modelData->GetPose());
+  }
 
   // generate canonical link sdf first.
+  // TODO: Model with no links and only nested models
   if (!this->canonicalLink.empty())
   {
     auto canonical = this->allLinks.find(this->canonicalLink);
@@ -1875,6 +1887,13 @@ void ModelCreator::GenerateSDF()
 
     sdf::ElementPtr newLinkElem = this->GenerateLinkSDF(link);
     modelElem->InsertElement(newLinkElem);
+  }
+
+  // loop through all nested models and add sdf
+  for (auto &nestedModelsIt : this->allNestedModels)
+  {
+    NestedModelData *nestedModelData = nestedModelsIt.second;
+    modelElem->InsertElement(nestedModelData->modelSDF);
   }
 
   // Add joint sdf elements

@@ -70,9 +70,15 @@ double ModelData::GetEditTransparency()
 }
 
 /////////////////////////////////////////////////
-void ModelData::SetPose(const math::Pose &_pose)
+void NestedModelData::SetPose(const math::Pose &_pose)
 {
   this->pose = _pose;
+}
+
+/////////////////////////////////////////////////
+math::Pose NestedModelData::GetPose() const
+{
+  return this->pose;
 }
 
 /////////////////////////////////////////////////
