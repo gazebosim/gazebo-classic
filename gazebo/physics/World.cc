@@ -1955,21 +1955,6 @@ void World::PublishWorldStats()
     msgs::Set(logStats.mutable_end_time(),
         util::LogPlay::Instance()->GetLogEndTime());
 
-    if (this->GetSimTime().Double() <
-        util::LogPlay::Instance()->GetLogStartTime().Double())
-    {
-std::cout << "sim time: " << this->GetSimTime().Double() <<
-" start: " << util::LogPlay::Instance()->GetLogStartTime().Double() << std::endl;
-    }
-
-
-    if (this->GetSimTime().Double() >=
-        util::LogPlay::Instance()->GetLogEndTime().Double())
-    {
-std::cout << "sim time: " << this->GetSimTime().Double() <<
-" end: " << util::LogPlay::Instance()->GetLogEndTime().Double() << std::endl;
-    }
-
     this->dataPtr->worldStatsMsg.mutable_log_stats()->CopyFrom(logStats);
   }
 
