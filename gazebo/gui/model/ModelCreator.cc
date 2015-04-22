@@ -1991,6 +1991,7 @@ void ModelCreator::DeselectAll()
   while (!this->selectedLinks.empty())
   {
     rendering::VisualPtr vis = this->selectedLinks[0];
+
     vis->SetHighlighted(false);
     this->selectedLinks.erase(this->selectedLinks.begin());
     model::Events::setSelected(vis->GetName(), false);
@@ -2008,7 +2009,7 @@ void ModelCreator::DeselectAll()
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::SetSelected(const std::string &_name, bool _selected)
+void ModelCreator::SetSelected(const std::string &_name, const bool _selected)
 {
   auto itLink = this->allLinks.find(_name);
   if (itLink != this->allLinks.end())
@@ -2108,7 +2109,7 @@ void ModelCreator::OnSetSelectedEntity(const std::string &/*_name*/,
 
 /////////////////////////////////////////////////
 void ModelCreator::OnSetSelected(const std::string &_name,
-    bool _selected)
+    const bool _selected)
 {
   this->SetSelected(_name, _selected);
 }

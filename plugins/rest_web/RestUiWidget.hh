@@ -21,7 +21,10 @@
 #include <string>
 #include <list>
 
-#include <gazebo/gazebo.hh>
+// See: https://bugreports.qt-project.org/browse/QTBUG-22829
+#ifndef Q_MOC_RUN
+# include <gazebo/gazebo.hh>
+#endif
 #include <gazebo/util/system.hh>
 #include "RestUiLoginDialog.hh"
 

@@ -77,7 +77,7 @@ JointMaker::JointMaker()
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
-        boost::bind(&JointMaker::Update, this)));
+      boost::bind(&JointMaker::Update, this)));
 
   this->connections.push_back(
       gui::model::Events::ConnectOpenJointInspector(
@@ -88,12 +88,12 @@ JointMaker::JointMaker()
       boost::bind(&JointMaker::ShowContextMenu, this, _1)));
 
   this->connections.push_back(
-     gui::model::Events::ConnectSetSelectedJoint(
-       boost::bind(&JointMaker::OnSetSelectedJoint, this, _1, _2)));
+      gui::model::Events::ConnectSetSelectedJoint(
+      boost::bind(&JointMaker::OnSetSelectedJoint, this, _1, _2)));
 
   this->connections.push_back(
-     event::Events::ConnectSetSelectedEntity(
-       boost::bind(&JointMaker::OnSetSelectedEntity, this, _1, _2)));
+      event::Events::ConnectSetSelectedEntity(
+      boost::bind(&JointMaker::OnSetSelectedEntity, this, _1, _2)));
 
   this->inspectAct = new QAction(tr("Open Joint Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this, SLOT(OnOpenInspector()));
@@ -327,16 +327,9 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           {
             auto it = std::find(this->selectedJoints.begin(),
                 this->selectedJoints.end(), vis);
-            // Highlight and select clicked link if not already selected
-            if (it == this->selectedJoints.end())
-            {
-              this->SetSelected(vis, true);
-            }
-            // Deselect if already selected
-            else
-            {
-              this->SetSelected(vis, false);
-            }
+            // Highlight and select clicked joint if not already selected
+            // Otherwise deselect if already selected
+            this->SetSelected(vis, it == this->selectedJoints.end());
           }
         }
       }
@@ -767,7 +760,12 @@ void JointMaker::CreateHotSpot(JointData *_joint)
       this->jointMaterials[_joint->type]);
   Ogre::ColourValue color = mat->getTechnique(0)->getPass(0)->getDiffuse();
   color.a = 0.5;
-  double dimension = 0.1;
+
+  double linkSize = std::min(0.1,
+      _joint->parent->GetBoundingBox().GetSize().GetLength()*0.05);
+  linkSize = std::max(linkSize, 0.01);
+
+  double dimension = linkSize;
   handleSet->setDefaultDimensions(dimension, dimension);
   Ogre::Billboard *parentHandle = handleSet->createBillboard(0, 0, 0);
   parentHandle->setColour(color);
@@ -831,8 +829,9 @@ void JointMaker::Update()
           // set orientation of joint hotspot
           math::Vector3 dPos = (childOrigin - parentOrigin);
           math::Vector3 center = dPos * 0.5;
+          double length = std::max(dPos.GetLength(), 0.001);
           joint->hotspot->SetScale(
-              math::Vector3(0.008, 0.008, dPos.GetLength()));
+              math::Vector3(0.008, 0.008, length));
           joint->hotspot->SetWorldPosition(parentOrigin + center);
           math::Vector3 u = dPos.Normalize();
           math::Vector3 v = math::Vector3::UnitZ;
@@ -1100,9 +1099,11 @@ void JointMaker::ShowContextMenu(const std::string &_name)
   auto it = this->joints.find(_name);
   if (it == this->joints.end())
     return;
+
   QMenu menu;
   if (this->inspectAct)
     menu.addAction(this->inspectAct);
+
   this->inspectName = _name;
   QAction *deleteAct = new QAction(tr("Delete"), this);
   connect(deleteAct, SIGNAL(triggered()), this, SLOT(OnDelete()));
@@ -1120,14 +1121,14 @@ void JointMaker::OnSetSelectedEntity(const std::string &/*_name*/,
 
 /////////////////////////////////////////////////
 void JointMaker::OnSetSelectedJoint(const std::string &_name,
-    bool _selected)
+    const bool _selected)
 {
   this->SetSelected(_name, _selected);
 }
 
 /////////////////////////////////////////////////
 void JointMaker::SetSelected(const std::string &_name,
-    bool _selected)
+    const bool _selected)
 {
   auto it = this->joints.find(_name);
   if (it == this->joints.end())
@@ -1138,7 +1139,7 @@ void JointMaker::SetSelected(const std::string &_name,
 
 /////////////////////////////////////////////////
 void JointMaker::SetSelected(rendering::VisualPtr _jointVis,
-    bool _selected)
+    const bool _selected)
 {
   if (!_jointVis)
     return;
@@ -1262,7 +1263,5 @@ void JointMaker::ShowJoints(bool _show)
     if (iter.second->jointVisual)
       iter.second->jointVisual->SetVisible(_show);
   }
-//  if (this->selectedJoint)
-//    this->selectedJoint->SetHighlighted(_show);
   this->DeselectAll();
 }

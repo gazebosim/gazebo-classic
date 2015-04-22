@@ -213,12 +213,13 @@ namespace gazebo
       /// \brief Set the select state of a link.
       /// \param[in] _name Name of the link.
       /// \param[in] _selected True to select the link.
-      public: void SetSelected(const std::string &_name, bool selected);
+      public: void SetSelected(const std::string &_name, const bool selected);
 
       /// \brief Set the select state of a link visual.
       /// \param[in] _linkVis Pointer to the link visual.
       /// \param[in] _selected True to select the link.
-      public: void SetSelected(rendering::VisualPtr _linkVis, bool selected);
+      public: void SetSelected(rendering::VisualPtr _linkVis,
+          const bool selected);
 
       /// \brief Get current save state.
       /// \return Current save state.
@@ -304,7 +305,7 @@ namespace gazebo
       /// \param[in] _name Name of entity.
       /// \param[in] _selected True if the entity is selected, false if
       /// deselected.
-      private: void OnSetSelected(const std::string &_name, bool _selected);
+      private: void OnSetSelected(const std::string &_name, const bool _selected);
 
       /// \brief Create link with default properties from a visual. This
       /// function creates a link that will become the parent of the
@@ -367,7 +368,7 @@ namespace gazebo
       private: void OnEntityScaleChanged(const std::string &_name,
           const math::Vector3 &_scale);
 
-      /// \brief Deselect all currently selected joint visuals.
+      /// \brief Deselect all currently selected link visuals.
       private: void DeselectAll();
 
       /// \brief Set visibilty of a visual recursively while storing their

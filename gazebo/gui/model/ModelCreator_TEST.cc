@@ -147,7 +147,7 @@ void ModelCreator_TEST::Selection()
   gui::ModelCreator *modelCreator = new gui::ModelCreator();
   QVERIFY(modelCreator);
 
-  // Inserting a few link s
+  // Inserting a few links
   modelCreator->AddShape(gui::ModelCreator::LINK_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
       scene->GetVisual("ModelPreview_0::link_0");

@@ -48,8 +48,8 @@ unsigned int g_count;
 // increment a counter and keep the data around
 void ReceiveRestError(ConstRestErrorPtr &_msg)
 {
-  gzerr << "ReceiveRestError" << std::endl;
-  gzmsg << _msg->msg() << std::endl;
+  gzmsg << "ReceiveRestError:" << std::endl;
+  gzmsg << "    \""  << _msg->msg() << "\"" << std::endl;
   boost::mutex::scoped_lock lock(g_mutex);
   g_count += 1;
 }
@@ -74,6 +74,7 @@ unsigned int WaitForNewError(unsigned int current,
                              unsigned int max_tries = 10,
                              unsigned int ms = 100)
 {
+  gzmsg << "WaitForNewError " << current << std::endl;
   for (unsigned int i = 0; i < max_tries; i++)
   {
     unsigned int count = GetErrorCount();
@@ -83,6 +84,7 @@ unsigned int WaitForNewError(unsigned int current,
     }
     common::Time::MSleep(ms);
   }
+  gzmsg << "WaitForNewError (timeout)" << std::endl;
   return GetErrorCount();
 }
 
@@ -98,12 +100,10 @@ TEST_P(RestWebTest, FirstTest)
 ////////////////////////////////////////////////////////////////////////
 void RestWebTest::FirstTest(const std::string &_physicsEngine)
 {
-  char const *argv[] = {"program name", "-s", "libRestWebPlugin.so"};
-  Load(static_cast<const char*>("test/worlds/rest_web.world"),
+  Load("test/worlds/rest_web.world",
        false,
        _physicsEngine,
-       3,
-       const_cast<char **>(argv));
+       {"libRestWebPlugin.so"});
   physics::WorldPtr world = physics::get_world("default");
 
   // setup the callback that increments a counter each time a
