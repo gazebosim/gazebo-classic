@@ -15,12 +15,12 @@
  *
 */
 
-#ifndef _JOINTMAKER_HH_
-#define _JOINTMAKER_HH_
+#ifndef _GAZEBO_JOINTMAKER_HH_
+#define _GAZEBO_JOINTMAKER_HH_
 
+#include <map>
 #include <string>
 #include <vector>
-#include <boost/unordered/unordered_map.hpp>
 
 #include <sdf/sdf.hh>
 
@@ -141,12 +141,18 @@ namespace gazebo
 
       /// \brief Get the axis count for joint type.
       /// \param[in] _type Type of joint.
-      public: static int GetJointAxisCount(JointMaker::JointType _type);
+      public: static unsigned int GetJointAxisCount(
+          JointMaker::JointType _type);
 
       /// \brief Get the joint type in string.
       /// \param[in] _type Type of joint.
       /// \return Joint type in string.
       public: static std::string GetTypeAsString(JointMaker::JointType _type);
+
+      /// \brief Convert a joint type string to enum.
+      /// \param[in] _type Joint type in string.
+      /// \return Joint type enum.
+      public: static JointType ConvertJointType(const std::string &_type);
 
       /// \brief Get state
       /// \return State of JointType if joint creation is in process, otherwise
@@ -177,6 +183,17 @@ namespace gazebo
       /// \brief Qt Callback to show / hide joint visuals.
       /// \param[in] _show True to show joints, false to hide them.
       public slots: void ShowJoints(bool _show);
+
+      /// \brief Set the select state of a joint.
+      /// \param[in] _name Name of the joint.
+      /// \param[in] _selected True to select the joint.
+      public: void SetSelected(const std::string &_name, const bool selected);
+
+      /// \brief Set the select state of a joint visual.
+      /// \param[in] _jointVis Pointer to the joint visual.
+      /// \param[in] _selected True to select the joint.
+      public: void SetSelected(rendering::VisualPtr _jointVis,
+          const bool selected);
 
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
@@ -213,21 +230,47 @@ namespace gazebo
       /// \param[in] _name Name of joint.
       private: void OpenInspector(const std::string &_name);
 
-      /// \brief Convert a joint type string to enum.
-      /// \param[in] _type Joint type in string.
-      /// \return Joint type enum.
-      private: JointType ConvertJointType(const std::string &_type);
-
       /// \brief Get the scoped name of a link.
       /// \param[in] _name Unscoped link name.
       /// \return Scoped link name.
       private: std::string GetScopedLinkName(const std::string &_name);
+
+      /// \brief Show a joint's context menu
+      /// \param[in] _joint Name of joint the context menu is associated with.
+      private: void ShowContextMenu(const std::string &_joint);
+
+      /// \brief Deselect all currently selected joint visuals.
+      private: void DeselectAll();
+
+      /// \brief Callback when an entity is selected.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _mode Select mode
+      private: void OnSetSelectedEntity(const std::string &_name,
+          const std::string &_mode);
+
+      /// \brief Callback when a joint is selected.
+      /// \param[in] _name Name of joint.
+      /// \param[in] _selected True if the joint is selected, false if
+      /// deselected.
+      private: void OnSetSelectedJoint(const std::string &_name,
+          const bool _selected);
+
+      /// \brief Create a joint line.
+      /// \param[in] _name Name to give the visual that contains the joint line.
+      /// \param[in] _parent Parent of the joint.
+      /// \return joint data.
+      private: JointData *CreateJointLine(const std::string &_name,
+          rendering::VisualPtr _parent);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
 
       /// \brief Qt Callback to open joint inspector
       private slots: void OnOpenInspector();
+
+      /// \brief Qt callback when a delete signal has been emitted. This is
+      /// currently triggered by the context menu via right click.
+      private slots: void OnDelete();
 
       /// \brief Constant vector containing [UnitX, UnitY, UnitZ].
       private: std::vector<math::Vector3> UnitVectors;
@@ -244,11 +287,11 @@ namespace gazebo
       /// \brief Currently selected visual
       private: rendering::VisualPtr selectedVis;
 
-      /// \brief Joint visual that is currently being inspected.
-      private: rendering::VisualPtr inspectVis;
+      /// \brief Name of joint that is currently being inspected.
+      private: std::string inspectName;
 
       /// \brief All joints created by joint maker.
-      private: boost::unordered_map<std::string, JointData *> joints;
+      private: std::map<std::string, JointData *> joints;
 
       /// \brief Joint currently being created.
       private: JointData *mouseJoint;
@@ -260,7 +303,7 @@ namespace gazebo
       private: bool newJointCreated;
 
       /// \brief A map of joint type to its corresponding material.
-      private: boost::unordered_map<JointMaker::JointType, std::string>
+      private: std::map<JointMaker::JointType, std::string>
           jointMaterials;
 
       /// \brief The SDF element pointer to the model that contains the joints.
@@ -275,11 +318,14 @@ namespace gazebo
       /// \brief Mutex to protect the list of joints
       private: boost::recursive_mutex *updateMutex;
 
-      /// \brief Selected joint.
-      private: rendering::VisualPtr selectedJoint;
+      /// \brief A list of selected link visuals.
+      private: std::vector<rendering::VisualPtr> selectedJoints;
 
       /// \brief A list of scoped link names.
       private: std::vector<std::string> scopedLinkedNames;
+
+      /// \brief A map of joint type to its string value.
+      private: static std::map<JointMaker::JointType, std::string> jointTypes;
     };
     /// \}
 
@@ -328,30 +374,6 @@ namespace gazebo
 
       /// \brief Type of joint.
       public: JointMaker::JointType type;
-
-      /// \brief Joint axis direction.
-      public: math::Vector3 axis[2];
-
-      /// \brief Joint lower limit.
-      public: double lowerLimit[2];
-
-      /// \brief Joint upper limit.
-      public: double upperLimit[2];
-
-      /// \brief Joint effort limit.
-      public: double effortLimit[2];
-
-      /// \brief Joint velocity limit.
-      public: double velocityLimit[2];
-
-      /// \brief Use parent model frame flag.
-      public: bool useParentModelFrame[2];
-
-      /// \brief Joint damping.
-      public: double damping[2];
-
-      /// \brief Joint pose.
-      public: math::Pose pose;
 
       /// \brief True if the joint visual needs update.
       public: bool dirty;

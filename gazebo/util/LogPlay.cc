@@ -27,11 +27,10 @@
 #include <boost/archive/iterators/istream_iterator.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
 
-#include "gazebo/math/Rand.hh"
-
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Base64.hh"
+#include "gazebo/math/Rand.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
@@ -253,6 +252,13 @@ std::string LogPlay::GetFilename() const
 }
 
 /////////////////////////////////////////////////
+std::string LogPlay::GetFullPathFilename() const
+{
+  const boost::filesystem::path logFilename(this->filename);
+  return boost::filesystem::canonical(logFilename).string();
+}
+
+/////////////////////////////////////////////////
 uintmax_t LogPlay::GetFileSize() const
 {
   return boost::filesystem::file_size(this->filename);
@@ -261,7 +267,7 @@ uintmax_t LogPlay::GetFileSize() const
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
-  if (this->mode == "play")
+  /*if (this->mode == "play")
     this->target++;
 
   if (this->current == this->target && this->stepMsgs.empty())
@@ -282,7 +288,7 @@ bool LogPlay::Step(std::string &_data)
   else
     this->current = -1;
 
-  return true;
+  return true;*/
 
   std::string startMarker = "<sdf ";
   std::string endMarker = "</sdf>";

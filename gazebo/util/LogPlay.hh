@@ -59,7 +59,8 @@ namespace gazebo
       ///
       /// Open a log file that was previously recorded.
       /// \param[in] _logFile The file to load
-      /// \throws Exception
+      /// \throws Exception When the log file does not exist, is a directory
+      /// instead of a regular file, or Gazebo was unable to parse it.
       public: void Open(const std::string &_logFile);
 
       /// \brief Return true if a file is open.
@@ -92,6 +93,10 @@ namespace gazebo
       /// \brief Get the name of the log file.
       /// \return The filename.
       public: std::string GetFilename() const;
+
+      /// \brief Get the full path of the log file.
+      /// \return The full path of the log file.
+      public: std::string GetFullPathFilename() const;
 
       /// \brief Get the size of the log file.
       /// \return The size of the file in bytes.
