@@ -16,9 +16,9 @@
 */
 #include <iostream>
 #include <cstring>
-#include <stdlib.h>
+#include <cstdlib>
 #include <curl/curl.h>
-#include <inttypes.h>
+#include <cinttypes>
 
 #include "RestApi.hh"
 
