@@ -351,43 +351,12 @@ double OrbitViewController::NormalizePitch(double _v)
 //////////////////////////////////////////////////
 void OrbitViewController::Zoom(float _amount)
 {
-  Ogre::Camera *cam = this->camera->GetOgreCamera();
+  this->distance -= _amount;
 
-/*  if (cam->getProjectionType() == Ogre::PT_ORTHOGRAPHIC)
-  {
-    this->orthoZoom = math::clamp(this->orthoZoom + _amount, 0.01, 10.0);
-
-    std::cout << "Zoom[" << _amount << "]\n";
-    std::cout << "OrthoZoom[" << this->orthoZoom << "]\n";
-
-    Ogre::Viewport *vp = this->camera->GetViewport();
-    Ogre::Matrix4 p = this->BuildScaledOrthoMatrix(
-        cam->getOrthoWindowWidth() /  this->orthoZoom / -2.0f,
-        cam->getOrthoWindowWidth() /  this->orthoZoom / 2.0f,
-        cam->getOrthoWindowHeight() / this->orthoZoom / -2.0f,
-        cam->getOrthoWindowHeight() / this->orthoZoom / 2.0f,
-
-        // (vp->getWidth()*0.5) /  this->orthoZoom / -2.0f,
-        // (vp->getWidth()*0.5) /  this->orthoZoom / 2.0f,
-        // (vp->getHeight()*0.5) / this->orthoZoom / -2.0f,
-        // (vp->getHeight()*0.5) / this->orthoZoom / 2.0f,
-
-        -1000, 1000
-        );
-
-    this->camera->GetOgreCamera()->setCustomProjectionMatrix(
-        true, p);
-  }
-  else
-  {
-  */
-    this->distance -= _amount;
-
-    math::Vector3 delta = this->camera->GetWorldPosition() - this->focalPoint;
-    delta.Normalize();
-    delta *= this->distance;
-    this->camera->SetWorldPosition(this->focalPoint + delta);
-  //}
+  math::Vector3 delta = this->camera->GetWorldPosition() - this->focalPoint;
+  delta.Normalize();
+  delta *= this->distance;
+  this->camera->SetWorldPosition(this->focalPoint + delta);
 
   this->UpdateRefVisual();
 }

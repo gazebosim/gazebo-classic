@@ -51,6 +51,11 @@ namespace gazebo
       /// of the Camera.
       public: virtual void Update() = 0;
 
+      /// \brief Called by the UserCamear when a resize event occurs.
+      /// \param[in] _width New width
+      /// \param[in] _height New height
+      public: virtual void Resize(int _width, int _height);
+
       /// \brief Set whether the controller is enabled.
       /// \param[in] _value True if the controller is enabled.
       public: void SetEnabled(bool _value);

@@ -345,6 +345,8 @@ void UserCamera::SetViewController(const std::string &_type)
   if (this->dataPtr->viewController->GetTypeString() == _type)
     return;
 
+  std::string vc = this->dataPtr->viewController->GetTypeString();
+
   if (_type == OrbitViewController::GetTypeString())
     this->dataPtr->viewController = this->dataPtr->orbitViewController;
   else if (_type == OrthoViewController::GetTypeString())
@@ -353,6 +355,8 @@ void UserCamera::SetViewController(const std::string &_type)
     this->dataPtr->viewController = this->dataPtr->fpsViewController;
   else
     gzthrow("Invalid view controller type: " + _type);
+
+  this->dataPtr->prevViewControllerName = vc;
 
   this->dataPtr->viewController->Init();
 }
@@ -364,6 +368,8 @@ void UserCamera::SetViewController(const std::string &_type,
   if (this->dataPtr->viewController->GetTypeString() == _type)
     return;
 
+  std::string vc = this->dataPtr->viewController->GetTypeString();
+
   if (_type == OrbitViewController::GetTypeString())
     this->dataPtr->viewController = this->dataPtr->orbitViewController;
   else if (_type == OrthoViewController::GetTypeString())
@@ -372,6 +378,8 @@ void UserCamera::SetViewController(const std::string &_type,
     this->dataPtr->viewController = this->dataPtr->fpsViewController;
   else
     gzthrow("Invalid view controller type: " + _type);
+
+  this->dataPtr->prevViewControllerName = vc;
 
   this->dataPtr->viewController->Init(_pos);
 }
@@ -389,9 +397,10 @@ unsigned int UserCamera::GetImageHeight() const
 }
 
 //////////////////////////////////////////////////
-void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
+void UserCamera::Resize(unsigned int _w, unsigned int _h)
 {
   this->UpdateFOV();
+  this->dataPtr->viewController->Resize(_w, _h);
 }
 
 //////////////////////////////////////////////////
@@ -794,8 +803,10 @@ void UserCamera::EnableStereo(bool _enable)
 /////////////////////////////////////////////////
 void UserCamera::SetOrtho(const bool _ortho)
 {
+  Camera::SetOrtho(_ortho);
+
   if (_ortho)
     this->SetViewController("ortho");
   else
-    this->SetViewController("orbit");
+    this->SetViewController(this->dataPtr->prevViewControllerName);
 }

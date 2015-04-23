@@ -37,6 +37,9 @@ namespace gazebo
       /// \brief The currently active view controller.
       public: ViewController *viewController;
 
+      /// \brief The previously used view controller.
+      public: std::string prevViewControllerName;
+
       /// \brief An orbit view controller.
       public: OrbitViewController *orbitViewController;
 

@@ -49,5 +49,7 @@ void ViewController::SetEnabled(bool _value)
   this->enabled = _value;
 }
 
-
-
+//////////////////////////////////////////////////
+void ViewController::Resize(int /*_width*/, int /*_height*/)
+{
+}

@@ -80,15 +80,15 @@ namespace gazebo
 
       /// \brief Translate the focal point in the local coordinate frame.
       /// \param[in] _vec Direction and amount to translate the camera.
-      private: void TranslateLocal(const math::Vector3 &_vec);
+      protected: void TranslateLocal(const math::Vector3 &_vec);
 
       /// \brief Translate the focal point in the global coordinate frame.
       /// \param[in] _vec Direction and amount to translate the camera.
-      private: void TranslateGlobal(const math::Vector3 &_vec);
+      protected: void TranslateGlobal(const math::Vector3 &_vec);
 
       /// \brief Zoom the camera.
       /// \paramp[in] _amount Zoom quatity.
-      private: void Zoom(float _amount);
+      protected: void Zoom(float _amount);
 
       /// \brief Normalize yaw value.
       /// \paramp[in] _v Normalize a yaw value.
