@@ -119,10 +119,6 @@ namespace gazebo
       /// \param[in] _value New value.
       private: void SetSpinValue(QDoubleSpinBox *_spin, double _value);
 
-      /// \brief Set CoM vector and send it to visuals.
-      /// \param[in] _com CoM position in link frame.
-      private: void SetCoM(const math::Vector3 &_com);
-
       /// \brief Set force position vector and update spins.
       /// \param[in] _forcePos New force position.
       private: void SetForcePos(const math::Vector3 &_forcePos);

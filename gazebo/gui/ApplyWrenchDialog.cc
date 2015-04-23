@@ -675,12 +675,6 @@ void ApplyWrenchDialog::SetSpinValue(QDoubleSpinBox *_spin, double _value)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetCoM(const math::Vector3 &_com)
-{
-  this->dataPtr->comVector = _com;
-}
-
-/////////////////////////////////////////////////
 void ApplyWrenchDialog::SetForcePos(const math::Vector3 &_forcePos)
 {
   this->dataPtr->forcePosVector = _forcePos;
