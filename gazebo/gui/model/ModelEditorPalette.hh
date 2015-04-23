@@ -15,9 +15,11 @@
  *
 */
 
-#ifndef _MODEL_EDITOR_PALETTE_HH_
-#define _MODEL_EDITOR_PALETTE_HH_
+#ifndef _GAZEBO_MODEL_EDITOR_PALETTE_HH_
+#define _GAZEBO_MODEL_EDITOR_PALETTE_HH_
 
+#include <mutex>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -27,11 +29,6 @@
 #include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
-
-namespace boost
-{
-  class recursive_mutex;
-}
 
 namespace gazebo
 {
@@ -59,9 +56,15 @@ namespace gazebo
       /// \brief Destructor
       public: ~ModelEditorPalette();
 
+      /// \brief Add an item to the model editor palette.
+      /// \param[in] _Item item to add.
+      /// \param[in] _category Category to add the item too.
+      public: void AddItem(QWidget *_item,
+          const std::string &_category = "Other");
+
       /// \brief Add a joint to the model.
       /// \param[in] _type Type of joint to add.
-      public: void AddJoint(const std::string &_type);
+      public: void CreateJoint(const std::string &_type);
 
       /// \brief Get the model creator.
       /// \return a pointer to the model creator.
@@ -71,6 +74,29 @@ namespace gazebo
       /// \param[in] _event The key event.
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
+
+      /// \brief Callback when an entity is selected.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _mode Select mode
+      private: void OnSetSelectedEntity(const std::string &_name,
+          const std::string &_mode);
+
+      /// \brief Callback when a link is selected.
+      /// \param[in] _name Name of link.
+      /// \param[in] _selected True if the link is selected, false if
+      /// deselected.
+      private: void OnSetSelectedLink(const std::string &_name, bool _selected);
+
+      /// \brief Callback when a joint is selected.
+      /// \param[in] _name Name of joint.
+      /// \param[in] _selected True if the joint is selected, false if
+      /// deselected.
+      private: void OnSetSelectedJoint(const std::string &_name,
+          bool _selected);
+
+      /// \brief Helper function to deselect a link or a joint.
+      /// \param[in] _type Type: Link or Joint.
+      private: void DeselectType(const std::string &_type);
 
       /// \brief Qt callback when cylinder button is clicked.
       private slots: void OnCylinder();
@@ -100,7 +126,21 @@ namespace gazebo
       /// \brief Qt callback when a tree item has been double clicked.
       /// \param[in] _item Item clicked.
       /// \param[in] _column Column index.
-      private slots: void OnItemDoubleClick(QTreeWidgetItem *item, int column);
+      private slots: void OnItemDoubleClicked(QTreeWidgetItem *_item,
+          int _column);
+
+      /// \brief Qt callback when a tree item has been clicked.
+      /// \param[in] _item Item clicked.
+      /// \param[in] _column Column index.
+      private slots: void OnItemClicked(QTreeWidgetItem *_item, int _column);
+
+      /// \brief Qt callback when selected items have changed.
+      private slots: void OnItemSelectionChanged();
+
+      /// \brief Qt callback when the context menu signal is triggered.
+      /// \param[in] _pt Position of the context menu event that the widget
+      ///  receives.
+      private slots: void OnCustomContextMenu(const QPoint &_pt);
 
       /// \brief Add a link to the tree.
       /// \param[in] _linkName Scoped link name.
@@ -177,7 +217,16 @@ namespace gazebo
       private: QTreeWidgetItem *jointsItem;
 
       /// \brief Mutex to protect updates.
-      private: boost::recursive_mutex *updateMutex;
+      private: std::recursive_mutex updateMutex;
+
+      /// \brief Keeps track of selected items.
+      private: QList<QTreeWidgetItem *> selected;
+
+      /// \brief Layout for other items in the palette.
+      private: QVBoxLayout *otherItemsLayout;
+
+      /// \brief Map of categories to their layout
+      private: std::map<std::string, QGridLayout *> categories;
     };
   }
 }

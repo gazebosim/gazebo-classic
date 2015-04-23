@@ -27,11 +27,10 @@
 #include <boost/archive/iterators/istream_iterator.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
 
-#include "gazebo/math/Rand.hh"
-
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Base64.hh"
+#include "gazebo/math/Rand.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
 
@@ -150,10 +149,10 @@ void LogPlay::ReadHeader()
 /////////////////////////////////////////////////
 void LogPlay::ReadLogTimes()
 {
-  if (this->GetChunkCount() == 0u)
+  if (this->GetChunkCount() < 2u)
   {
-    gzwarn << "Unable to extract log timing information. No chunks available."
-           << std::endl;
+    gzwarn << "Unable to extract log timing information. No chunks available "
+           << "with <sim_time> information." << std::endl;
     return;
   }
 
@@ -162,7 +161,7 @@ void LogPlay::ReadLogTimes()
   std::string chunk;
 
   // Read the start time of the log from the first chunk.
-  this->GetChunk(0, chunk);
+  this->GetChunk(1, chunk);
 
   // Find the first <sim_time> of the log.
   auto from = chunk.find(kStartDelim);
@@ -243,6 +242,13 @@ std::string LogPlay::GetFilename() const
 {
   return boost::filesystem::basename(this->filename) +
     boost::filesystem::extension(this->filename);
+}
+
+/////////////////////////////////////////////////
+std::string LogPlay::GetFullPathFilename() const
+{
+  const boost::filesystem::path logFilename(this->filename);
+  return boost::filesystem::canonical(logFilename).string();
 }
 
 /////////////////////////////////////////////////

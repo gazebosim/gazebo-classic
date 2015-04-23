@@ -61,17 +61,19 @@ TEST_F(LogPlay_TEST, Open)
 /// \brief Test LogPlay accessors.
 TEST_F(LogPlay_TEST, Accessors)
 {
-  gazebo::common::Time expectedStartTime(16, 146000000);
-  gazebo::common::Time expectedEndTime(18, 569000000);
-  std::string expectedHeader = "<?xml version='1.0'?>\n"
-                                 "<gazebo_log>\n"
-                                   "<header>\n"
-                                     "<log_version>1.0</log_version>\n"
-                                     "<gazebo_version>6.0.0</gazebo_version>\n"
-                                     "<rand_seed>22889</rand_seed>\n"
-                                     "<log_start>16 146000000</log_start>\n"
-                                     "<log_end>18 569000000</log_end>\n"
-                                     "</header>\n";
+  gazebo::common::Time expectedStartTime(28, 457000000);
+  gazebo::common::Time expectedEndTime(31, 745000000);
+  std::ostringstream expectedHeader;
+
+  expectedHeader << "<?xml version='1.0'?>\n"
+                 <<   "<gazebo_log>\n"
+                 <<     "<header>\n"
+                 <<       "<log_version>1.0</log_version>\n"
+                 <<       "<gazebo_version>6.0.0</gazebo_version>\n"
+                 <<       "<rand_seed>27838</rand_seed>\n"
+                 <<       "<log_start>" << expectedStartTime << "</log_start>\n"
+                 <<       "<log_end>" << expectedEndTime << "</log_end>\n"
+                 <<     "</header>\n";
 
   gazebo::util::LogPlay *player = gazebo::util::LogPlay::Instance();
 
@@ -84,13 +86,14 @@ TEST_F(LogPlay_TEST, Accessors)
   // Test the accessors.
   EXPECT_EQ(player->GetLogVersion(), "1.0");
   EXPECT_EQ(player->GetGazeboVersion(), "6.0.0");
-  EXPECT_EQ(player->GetRandSeed(), 22889u);
-  EXPECT_TRUE(player->GetLogStartTime() == expectedStartTime);
-  EXPECT_TRUE(player->GetLogEndTime() == expectedEndTime);
+  EXPECT_EQ(player->GetRandSeed(), 27838u);
+  EXPECT_EQ(player->GetLogStartTime(), expectedStartTime);
+  EXPECT_EQ(player->GetLogEndTime(), expectedEndTime);
   EXPECT_EQ(player->GetFilename(), "state.log");
-  EXPECT_EQ(player->GetFileSize(), 357580u);
+  EXPECT_EQ(player->GetFullPathFilename(), logFilePath.string());
+  EXPECT_EQ(player->GetFileSize(), 341608u);
   EXPECT_EQ(player->GetEncoding(), "zlib");
-  EXPECT_EQ(player->GetHeader(), expectedHeader);
+  EXPECT_EQ(player->GetHeader(), expectedHeader.str());
   EXPECT_EQ(player->GetChunkCount(), 5u);
 
   std::string chunk;

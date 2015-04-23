@@ -53,8 +53,12 @@ void JointVisual::Load(ConstJointPtr &_msg)
       new AxisVisual(this->GetName() + "_AXIS", shared_from_this()));
   dPtr->axisVisual->Load();
 
-  this->SetPosition(msgs::Convert(_msg->pose().position()));
-  this->SetRotation(msgs::Convert(_msg->pose().orientation()));
+  math::Pose pose;
+  if (_msg->has_pose())
+    pose = msgs::Convert(_msg->pose());
+
+  this->SetPosition(pose.pos);
+  this->SetRotation(pose.rot);
 
   if (_msg->has_axis2())
   {
@@ -70,8 +74,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
 
     JointVisualPtr jointVis;
     jointVis.reset(new JointVisual(this->GetName() + "_parent_", parentVis));
-    jointVis->Load(_msg,
-        msgs::Convert(_msg->pose()) + this->GetParent()->GetWorldPose());
+    jointVis->Load(_msg, pose + this->GetParent()->GetWorldPose());
 
     // attach axis2 to this visual
     msgs::Axis axis2Msg = _msg->axis2();
@@ -88,6 +91,16 @@ void JointVisual::Load(ConstJointPtr &_msg)
     dPtr->arrowVisual = this->CreateAxis(msgs::Convert(axis1Msg.xyz()),
         axis1Msg.use_parent_model_frame(), _msg->type());
   }
+
+  // Scale according to the link it is attached to
+  double linkSize = std::max(0.1,
+      dPtr->parent->GetBoundingBox().GetSize().GetLength());
+  dPtr->scaleToLink = math::Vector3(linkSize * 0.7,
+                                    linkSize * 0.7,
+                                    linkSize * 0.7);
+  this->SetScale(dPtr->scaleToLink);
+  if (dPtr->parentAxisVis)
+    dPtr->parentAxisVis->SetScale(dPtr->scaleToLink);
 
   this->GetSceneNode()->setInheritScale(false);
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -262,6 +275,7 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
           msgs::Convert(_msg->pose()) + this->GetParent()->GetWorldPose());
 
       dPtr->parentAxisVis = jointVis;
+      dPtr->parentAxisVis->SetScale(dPtr->scaleToLink);
 
       // Previously had 1 axis, which becomes axis 2 now
       if (dPtr->arrowVisual)
