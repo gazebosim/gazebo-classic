@@ -314,6 +314,11 @@ namespace gazebo
       /// \param[in] _visual Visual used to create the link.
       private: void CreateLink(const rendering::VisualPtr &_visual);
 
+      /// \brief Clone an existing nested model.
+      /// \param[in] _linkName Name of link to be cloned.
+      /// \return Cloned link.
+      private: NestedModelData *CloneNestedModel(const std::string &_modelName);
+
       /// \brief Clone an existing link.
       /// \param[in] _linkName Name of link to be cloned.
       /// \return Cloned link.
@@ -474,7 +479,7 @@ namespace gazebo
       private: std::vector<rendering::VisualPtr> selectedLinks;
 
       /// \brief Names of links copied through g_copyAct
-      private: std::vector<std::string> copiedLinkNames;
+      private: std::vector<std::string> copiedNames;
 
       /// \brief The last mouse event
       private: common::MouseEvent lastMouseEvent;

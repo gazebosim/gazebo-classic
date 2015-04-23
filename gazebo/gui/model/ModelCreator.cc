@@ -360,10 +360,11 @@ rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
     if (_modelElem->HasElement("pose"))
       modelVisual->SetPose(_modelElem->Get<math::Pose>("pose"));
 
-    // For now, only the pose of nested models can be edited
+    // Only keep SDF and preview visual
     modelData->modelSDF = _modelElem;
-    modelData->pose = _modelElem->Get<math::Pose>("pose");
     modelData->modelVisual = modelVisual;
+    modelData->SetName(_modelElem->Get<std::string>("name"));
+    modelData->SetPose(_modelElem->Get<math::Pose>("pose"));
   }
 
   // Nested models
@@ -857,9 +858,10 @@ LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 
   return link;
 }
-/*
+
 /////////////////////////////////////////////////
-ModelData *ModelCreator::CloneNestedModel(const std::string &_nestedModelName)
+NestedModelData *ModelCreator::CloneNestedModel(
+    const std::string &_nestedModelName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
@@ -878,7 +880,7 @@ ModelData *ModelCreator::CloneNestedModel(const std::string &_nestedModelName)
   while (itName != this->allNestedModels.end())
   {
     std::stringstream newNestedModelName;
-    newLinkName << _nestedModelName << "_clone_" << nameCounter++;
+    newNestedModelName << _nestedModelName << "_clone_" << nameCounter++;
     newName = newNestedModelName.str();
     itName = this->allNestedModels.find(newName);
   }
@@ -887,7 +889,7 @@ ModelData *ModelCreator::CloneNestedModel(const std::string &_nestedModelName)
   size_t idx = newName.find_last_of("::");
   if (idx != std::string::npos)
     leafName = newName.substr(idx+1);
-  ModelData *modelData;// = it->second->Clone(leafName);
+  NestedModelData *modelData = it->second->Clone(leafName);
 
   this->allNestedModels[newName] = modelData;
 
@@ -895,7 +897,7 @@ ModelData *ModelCreator::CloneNestedModel(const std::string &_nestedModelName)
 
   return modelData;
 }
-*/
+
 /////////////////////////////////////////////////
 void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem,
     rendering::VisualPtr _parentVis)
@@ -1749,29 +1751,45 @@ void ModelCreator::OnCopy()
   if (!g_editModelAct->isChecked())
     return;
 
-  if (!this->selectedLinks.empty())
+  if (this->selectedLinks.empty() && this->selectedNestedModels.empty())
+    return;
+
+  this->copiedNames.clear();
+
+  for (auto vis : this->selectedLinks)
   {
-    this->copiedLinkNames.clear();
-    for (auto vis : this->selectedLinks)
-    {
-      this->copiedLinkNames.push_back(vis->GetName());
-    }
-    g_pasteAct->setEnabled(true);
+    this->copiedNames.push_back(vis->GetName());
   }
+  for (auto vis : this->selectedNestedModels)
+  {
+    this->copiedNames.push_back(vis->GetName());
+  }
+  g_pasteAct->setEnabled(true);
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::OnPaste()
 {
-  if (this->copiedLinkNames.empty() || !g_editModelAct->isChecked())
+  if (this->copiedNames.empty() || !g_editModelAct->isChecked())
   {
     return;
   }
 
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-  // For now, only copy the last selected model
-  auto it = this->allLinks.find(this->copiedLinkNames.back());
+  math::Pose clonePose;
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (userCamera)
+  {
+    math::Vector3 mousePosition = ModelManipulator::GetMousePositionOnPlane(
+        userCamera, this->lastMouseEvent);
+    clonePose.pos.x = mousePosition.x;
+    clonePose.pos.y = mousePosition.y;
+  }
+
+  // For now, only copy the last selected (nested models come after)
+  auto it = this->allLinks.find(this->copiedNames.back());
+  // Copy a link
   if (it != this->allLinks.end())
   {
     LinkData *copiedLink = it->second;
@@ -1786,22 +1804,33 @@ void ModelCreator::OnPaste()
       this->Reset();
     }
 
-    LinkData* clonedLink = this->CloneLink(it->first);
-
-    math::Pose clonePose = copiedLink->linkVisual->GetWorldPose();
-    rendering::UserCameraPtr userCamera = gui::get_active_camera();
-    if (userCamera)
-    {
-      math::Vector3 mousePosition =
-        ModelManipulator::GetMousePositionOnPlane(userCamera,
-                                                  this->lastMouseEvent);
-      clonePose.pos.x = mousePosition.x;
-      clonePose.pos.y = mousePosition.y;
-    }
-
+    LinkData *clonedLink = this->CloneLink(it->first);
     clonedLink->linkVisual->SetWorldPose(clonePose);
     this->addLinkType = LINK_MESH;
     this->mouseVisual = clonedLink->linkVisual;
+  }
+  else
+  {
+    auto it2 = this->allNestedModels.find(this->copiedNames.back());
+    if (it2 != this->allNestedModels.end())
+    {
+      NestedModelData *copiedNestedModel = it2->second;
+      if (!copiedNestedModel)
+        return;
+
+      this->Stop();
+      this->DeselectAll();
+
+      if (!this->previewVisual)
+      {
+        this->Reset();
+      }
+
+      NestedModelData *clonedNestedModel = this->CloneNestedModel(it2->first);
+      clonedNestedModel->modelVisual->SetWorldPose(clonePose);
+      this->addLinkType = NESTED_MODEL;
+      this->mouseVisual = clonedNestedModel->modelVisual;
+    }
   }
 }
 
