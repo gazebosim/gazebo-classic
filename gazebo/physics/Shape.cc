@@ -58,5 +58,7 @@ double Shape::ComputeVolume() const
   gzwarn << "ComputeVolume not fully implemented for shape type "
          << this->collisionParent << ", returning bounding box approximation"
          << std::endl;
-  return this->collisionParent->GetBoundingBox().GetSize().GetLength();
+
+  math::Vector3 size = this->collisionParent->GetBoundingBox().this->GetSize();
+  return size.x * size.y * size.z;
 }
