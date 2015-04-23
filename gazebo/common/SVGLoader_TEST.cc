@@ -18,7 +18,9 @@
 #include <gtest/gtest.h>
 
 #include "test_config.h"
+
 #include "gazebo/common/SVGLoader.hh"
+
 #include "test/util.hh"
 
 using namespace gazebo;
@@ -87,8 +89,6 @@ TEST_F(SVGLoader, LoadPaths)
   EXPECT_EQ(68u, p2.polylines[0].size());
 }
 
-
-
 /////////////////////////////////////////////////
 TEST_F(SVGLoader, LoadArcs)
 {
@@ -127,7 +127,6 @@ TEST_F(SVGLoader, LoadArcs)
   std::ofstream out("arc_test.html" );
   loader.DumpPaths(paths, out);
   out.close();
-
 }
 
 TEST_F(SVGLoader, Capsule)
@@ -151,12 +150,6 @@ TEST_F(SVGLoader, Capsule)
   loader.DumpPaths(paths, out);
   out.close();
 
-}
-
-
-/////////////////////////////////////////////////
-TEST_F(SVGLoader, LoadTransform)
-{
 }
 
 /////////////////////////////////////////////////
