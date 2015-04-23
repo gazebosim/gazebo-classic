@@ -77,9 +77,6 @@ class RenderWidget : public QWidget
   protected: virtual void leaveEvent(QEvent *_event);
 
   protected: void resizeEvent(QResizeEvent *_e);
-  protected: void showEvent(QShowEvent *_e);
-
-  protected: bool eventFilter(QObject *_obj, QEvent *_event);
 
   private: std::string GetOgreHandle() const;
 
@@ -100,9 +97,6 @@ class MainWindow : public QMainWindow
 
   public: void Load();
 
-  protected: virtual void mousePressEvent(QMouseEvent *_event);
-  protected: bool eventFilter(QObject *_obj, QEvent *_event);
- 
   private: RenderWidget *renderWidget;
  
   private: QFrame *mouseFrame;

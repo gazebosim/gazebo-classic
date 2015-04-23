@@ -1,7 +1,7 @@
 #include "test.hh"
 
-bool createOneByOne = true;
-bool externalHandle = true;
+bool createOneByOne = false;
+bool externalHandle = false;
 bool renderFrameId = true;
 
 uint32_t RenderEngine::windowCounter = 1;
@@ -146,9 +146,6 @@ Ogre::RenderWindow *RenderEngine::CreateOgreWindow(
   else
     handle = "parentWindowHandle";
 
-  if (_width == 1)
-    handle = "parentWindowHandle";
-
   std::cout << "CreateOgreWindow. Handle[" << _ogreHandle
             << "] WxH[" << _width << " " << _height << "] Type["
             << handle << "]\n";
@@ -189,8 +186,7 @@ Ogre::RenderWindow *RenderEngine::CreateOgreWindow(
     window->setVisible(true);
   }
 
-  if (externalHandle)
-    this->window = window;
+  this->window = window;
   return window;
 }
 
@@ -344,12 +340,11 @@ void RenderEngine::SetupResources()
 }
 
 RenderWidget::RenderWidget(QWidget *parent)
-: QWidget(parent)
+: QWidget(parent), renderEngine(new RenderEngine)
 {
+  // Give this widget a name for debugging purposes
   this->setObjectName("RenderWidget");
-  this->renderEngine = new RenderEngine();
 
-  this->setAttribute(Qt::WA_NoSystemBackground, true);
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
   this->setAttribute(Qt::WA_PaintOnScreen, true);
 
@@ -363,15 +358,10 @@ RenderWidget::RenderWidget(QWidget *parent)
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->addWidget(this->renderFrame);
-  //mainLayout->addWidget(this->mouseFrame);
   this->setLayout(mainLayout);
 
-  /*this->setMouseTracking(true);
+  this->setMouseTracking(true);
   this->setFocus(Qt::OtherFocusReason);
-
-  this->renderFrame->setMouseTracking(true);
-  this->renderFrame->setFocus(Qt::OtherFocusReason);
-  */
 
   this->renderEngine->Load();
 
@@ -382,36 +372,20 @@ RenderWidget::RenderWidget(QWidget *parent)
   Ogre::RenderWindow *win = 
     this->renderEngine->CreateOgreWindow(handle,
       this->width(), this->height());
+  this->renderEngine->CreateScene();
 
-  // this->renderEngine->CreateScene(win);
-
-  //this->create(this->winId(), true, false);
-  //this->raise();
-  // this->renderFrame->raise();
-
-  // this->installEventFilter(this);
-  // this->renderFrame->setAttribute(Qt::WA_TransparentForMouseEvents);
-  // this->renderFrame->setAttribute(Qt::WA_NoMousePropagation);
-  // this->renderFrame->setAttribute(Qt::WA_TransparentForMouseEvents);
-  // this->setAttribute(Qt::WA_TransparentForMouseEvents);
-
+  this->renderEngine->Init();
 }
 
 ///////////////////////////////////////////////
 void RenderWidget::Load()
 {
-  this->show();
-  this->renderEngine->Init();
-
-  this->fake = new QTimer();
-  connect(this->fake, SIGNAL(timeout()), this, SLOT(SendMouseMoveEvent()));
-  // this->fake->start(33);
 }
 
 ///////////////////////////////////////////////
 void RenderWidget::paintEvent(QPaintEvent *_e)
 {
-    this->renderEngine->Render();
+  this->renderEngine->Render();
 
   this->update();
 
@@ -453,16 +427,6 @@ void RenderWidget::resizeEvent(QResizeEvent *_e)
 {
   if (this->renderEngine)
     this->renderEngine->Resize(_e->size().width(), _e->size().height());
-}
-
-void RenderWidget::showEvent(QShowEvent *_e)
-{
-  QWidget::showEvent(_e);
-  this->setFocus();
-
-  this->renderEngine->CreateScene();//win);
-
-  std::cout << "Show Event\n";
 }
 
 /////////////////////////////////////////////////
@@ -542,27 +506,6 @@ MainWindow::MainWindow()
   this->installEventFilter(this);
 }
 
-/////////////////////////////////////////////////
-bool MainWindow::eventFilter(QObject *_obj, QEvent *_event)
-{
-
-  if (_event->type() == QEvent::MouseMove)
-  {
-    std::cout << "MainWindow::eventFilter render frame\n";
-    this->mouseMoveEvent((QMouseEvent *)_event);
-    return true;
-  }
-
-  if (_event->type() == QEvent::Enter)
-  {
-    std::cout << "MainWindow::eventFilter enter\n";
-    this->setFocus(Qt::OtherFocusReason);
-    return true;
-  }
-
-  return false;
-}
-
 ///////////////////////////////////////////////
 void MainWindow::Load()
 {
@@ -579,64 +522,41 @@ void MainWindow::Load()
   this->setCentralWidget(central);
 
   this->renderWidget->Load();
-
-
-  //this->mouseFrame = new QFrame(this);
-  //this->mouseFrame->setLineWidth(1);
-  //this->mouseFrame->setFrameShadow(QFrame::Sunken);
-  //this->mouseFrame->setFrameShape(QFrame::Box);
-  //this->mouseFrame->show();
-  //this->mouseFrame->raise();
-  //this->mouseFrame->resize(1024,768);
-  //this->mouseFrame->setStyleSheet("QFrame {background-color: transparent;}");
-  //this->mouseFrame->setVisible(true);
-
-  //this->mouseFrame->setAutoFillBackground(true);
-  //QPalette p = this->mouseFrame->palette();
-  //p.setColor(QPalette::Window, Qt::transparent);
-  //this->mouseFrame->setPalette(p);
-
 }
 
-void MainWindow::mousePressEvent(QMouseEvent *_event)
-{
-  std::cout << "MainWindow::Mouse Press Event\n";
-}
-
-
+/////////////////////////////////////////////////
 MyApplication::MyApplication(int &argc,char **argv)
 : QApplication(argc, argv)
 {
-  
 }
 
+/////////////////////////////////////////////////
 bool MyApplication::notify(QObject *_receiver, QEvent *_event)
 {
-if (_event->type() != 12 && _event->type() != 78 && _event->type() != 77)
-{
-  std::cout << "Notify[" << _receiver->objectName().toStdString() << "] Event[" << _event->type() << "]\n";
-  }
-  QApplication::notify(_receiver, _event);
-  return true;
+  // Uncomment to see all events received by the QT application
+  // std::cout << "Receiver[" << _receiver->objectName().toStdString()
+  //           << "] Event[" << _event->type() << "]\n";
+
+  // Send the event onto QT.
+  return QApplication::notify(_receiver, _event);
 }
 
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  //QApplication *app = new QApplication(argc, argv);
+  // Create the application
   MyApplication *app = new MyApplication(argc, argv);
 
+  // Create the main window
   MainWindow *main = new MainWindow();
-  // main->show();
 
-  // These two lines cause the window handle to be stable.
-  // QApplication::flush();
-  // QApplication::syncX();
-
+  // Load the main window
   main->Load();
 
+  // Run the application
   app->exec();
 
+  // Cleanup
   delete main;
-
   return 0;
 }
