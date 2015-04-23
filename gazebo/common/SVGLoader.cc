@@ -68,6 +68,7 @@ math::Vector2d bezierInterpolate(double _t,
   double t_1_3 = t_1_2 * t_1;
   double t2 = _t * _t;
   double t3 = t2 * _t;
+
   math::Vector2d p;
   p.x = t_1_3 * _p0.x + 3 * _t *  t_1_2 * _p1.x + 3 * t2 * t_1 * _p2.x +
         t3 * _p3.x;
@@ -84,6 +85,8 @@ void cubicBezier(const math::Vector2d &_p0,
                  double _step,
                  std::vector<math::Vector2d> &_points)
 {
+  // we don't start at t = 0, but t = step...
+  // so we assume that the first point is there (from the last move)
   double t = _step;
   while (t < 1.0)
   {
@@ -91,8 +94,193 @@ void cubicBezier(const math::Vector2d &_p0,
     _points.push_back(p);
     t += _step;
   }
-  // close the loop
+  // however we close the loop with the last point (t = 1)
   _points.push_back(_p3);
+}
+
+static double sqr(float x) { return x*x; }
+
+static float vecang(float _ux, float _uy, float _vx, float _vy)
+{
+/*
+  double ux = ceil(_ux *1000.0)/1000.0;
+  double uy = ceil(_uy *1000.0)/1000.0;
+  double vx = ceil(_vx *1000.0)/1000.0;
+  double vy = ceil(_vy *1000.0)/1000.0;
+*/
+  double ux = _ux;
+  double uy = _uy;
+  double vx = _vx;
+  double vy = _vy;
+
+  double uMag = sqrt(ux * ux + uy * uy);
+  double vMag = sqrt(vx * vx + vy * vy);
+  double r = (ux * vx + uy * vy) / ( uMag * vMag);
+
+  if (r < -1.0)
+  {
+    r = -1.0;
+  }
+  else if (r > 1.0)
+  {
+    r = 1.0;
+  }
+
+  double a = acos(r);
+  if (ux * vy < uy * vx)
+  {
+    return -a;
+  }
+  else
+  {
+    return a;
+  }
+}
+
+/////////////////////////////////////////////////
+void arcPath(const math::Vector2d &_p0,
+             const double _rx,
+             const double _ry,
+             const double _rotxDeg,
+             const size_t _largeArc,
+             const size_t _sweepDirection,
+             const math::Vector2d &_pEnd,
+             const double _step,
+             std::vector<math::Vector2d> &_points)
+{
+  // Ported from canvg (https://code.google.com/p/canvg/)
+  double rx = _rx;
+  double ry = _ry;
+  double rotx = _rotxDeg / 180.0 * M_PI;
+
+  double x1, y1, x2, y2, cx, cy, dx, dy, d;
+  double x1p, y1p, cxp, cyp, s, sa, sb;
+  double ux, uy, vx, vy, a1, da;
+  double x, y, tanx, tany, a, px = 0, py = 0, ptanx = 0, ptany = 0, t[6];
+  double sinrx, cosrx;
+  double hda, kappa;
+
+  x1 = _p0.x;
+  y1 = _p0.y;
+  x2 = _pEnd.x;
+  y2 = _pEnd.y;
+
+  dx = x1 - x2;
+  dy = y1 - y2;
+  d = sqrt(dx*dx + dy*dy);
+  if (d < 1e-6 || rx < 1e-6 || ry < 1e-6) {
+    // The arc degenerates to a line
+    _points.push_back(_pEnd);
+    return;
+  }
+
+  sinrx = sin(rotx);
+  cosrx = cos(rotx);
+
+  // Convert to center point parameterization.
+  // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
+  // 1) Compute x1', y1'
+  x1p = cosrx * dx / 2.0 + sinrx * dy / 2.0;
+  y1p = -sinrx * dx / 2.0 + cosrx * dy / 2.0;
+  d = sqr(x1p) / sqr(rx) + sqr(y1p) / sqr(ry);
+  if (d > 1) {
+    d = sqrt(d);
+    rx *= d;
+    ry *= d;
+  }
+  // 2) Compute cx', cy'
+  s = 0.0;
+  sa = sqr(rx) * sqr(ry ) - sqr(rx) * sqr(y1p) - sqr(ry) * sqr(x1p);
+  sb = sqr(rx) * sqr(y1p) + sqr(ry) * sqr(x1p);
+  if (sa < 0.0)
+    sa = 0.0;
+  if (sb > 0.0)
+    s = sqrt(sa / sb);
+
+  if (_largeArc == _sweepDirection)
+  {
+    s = -s;
+  }
+
+  cxp = s * rx * y1p / ry;
+  cyp = s * -ry * x1p / rx;
+
+  // 3) Compute cx,cy from cx',cy'
+  cx = (x1 + x2) / 2.0 + cosrx * cxp - sinrx * cyp;
+  cy = (y1 + y2) / 2.0 + sinrx * cxp + cosrx * cyp;
+
+  // 4) Calculate theta1, and delta theta.
+  ux = (x1p - cxp) / rx;
+  uy = (y1p - cyp) / ry;
+  vx = (-x1p - cxp) / rx;
+  vy = (-y1p - cyp) / ry;
+  // initial angle
+  a1 = vecang(1.0, 0.0, ux,uy);
+  // delta angle
+  da = vecang(ux,uy, vx,vy);
+
+  if (_largeArc) {
+    // Choose large arc
+    if (da > 0.0)
+      da = da - 2 * M_PI;
+    else
+      da = 2 * M_PI + da;
+  }
+
+  // rounding errors for half circles
+  if(M_PI - fabs(da) < 0.001)
+  {
+    if(_sweepDirection)
+      da = M_PI;
+    else
+      da = -M_PI;
+  }
+
+  // Approximate the arc using cubic spline segments.
+  t[0] = cosrx;
+  t[1] = sinrx;
+  t[2] = -sinrx;
+  t[3] = cosrx;
+  t[4] = cx;
+  t[5] = cy;
+
+  // Split arc into max 90 degree segments.
+  // The loop assumes an iteration per end point
+  // (including start and end), this +1.
+  size_t ndivs = (int)(fabs(da) / (M_PI * 0.5) + 1.0);
+  hda = (da / (float)ndivs) / 2.0;
+  kappa = fabs(4.0 / 3.0 * (1.0 - cos(hda)) / sin(hda));
+  if (da < 0.0)
+    kappa = -kappa;
+
+  for (size_t i = 0; i <= ndivs; i++) {
+    a = a1 + da * (i/(float)ndivs);
+    dx = cos(a);
+    dy = sin(a);
+    // position  xform point
+    double pox = dx * rx;
+    double poy = dy * ry;
+    x = pox * t[0] + poy * t[2] + t[4];
+    y = pox * t[1] + poy * t[3] + t[5];
+    // tangent  xform vec
+    double tx = -dy * rx * kappa;
+    double ty = dx * ry * kappa;
+    tanx = tx * t[0] + ty * t[2];
+    tany = tx * t[1] + ty * t[3];
+
+    if (i > 0)
+    {
+      math::Vector2d p0(px, py);
+      math::Vector2d p1(px + ptanx, py + ptany);
+      math::Vector2d p2(x - tanx, y - tany);
+      math::Vector2d p3(x, y);
+      cubicBezier(p0, p1, p2, p3, _step, _points);
+    }
+    px = x;
+    py = y;
+    ptanx = tanx;
+    ptany = tany;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -107,6 +295,7 @@ math::Vector2d SVGLoader::SubpathToPolyline(
                             math::Vector2d _last,
                             std::vector<math::Vector2d> &_polyline)
 {
+  GZ_ASSERT(_polyline.size() == 0, "polyline not empty");
   for (SVGCommand cmd: _subpath)
   {
     size_t i = 0;
@@ -173,11 +362,55 @@ math::Vector2d SVGLoader::SubpathToPolyline(
           i += 6;
         }
         break;
+      case 'A':
+        while (i < count)
+        {
+          math::Vector2d p0 = _last;
+          double rx = cmd.numbers[i+0];
+          double ry = cmd.numbers[i+1];
+          double xRot = cmd.numbers[i+2];
+          unsigned int arc(cmd.numbers[i+3]);
+          unsigned int sweep(cmd.numbers[i+4]);
+          math::Vector2d pEnd;
+          pEnd.x = cmd.numbers[i+5];
+          pEnd.y = cmd.numbers[i+6];
+          arcPath(p0, rx, ry, xRot, arc, sweep, pEnd,
+                  this->dataPtr->resolution, _polyline);
+          _last = pEnd;
+          i += 7;
+        }
+        break;
+      case 'a':
+        while (i < count)
+        {
+          math::Vector2d p0 = _last;
+          double rx = cmd.numbers[i+0];
+          double ry = cmd.numbers[i+1];
+          double xRot = cmd.numbers[i+2];
+          unsigned int arc(cmd.numbers[i+3]);
+          unsigned int sweep(cmd.numbers[i+4]);
+          math::Vector2d pEnd;
+          pEnd.x = cmd.numbers[i+5] + _last.x;
+          pEnd.y = cmd.numbers[i+6] + _last.y;
+          arcPath(p0, rx, ry, xRot, arc, sweep, pEnd,
+                  this->dataPtr->resolution, _polyline);
+          _last = pEnd;
+          i += 7;
+        }
+      // Z and z indicate closed path.
+      // just add the first point to the list
+      case 'Z':
+      case 'z':
+        {
+          math::Vector2d pEnd;
+          pEnd = _polyline[0];
+          _polyline.push_back(pEnd);
+          break;
+        }
       default:
         gzerr << "Unexpected SVGCommand value: " << cmd.cmd << std::endl;
     }
   }
-
   return _last;
 }
 
@@ -242,6 +475,8 @@ void SVGLoader::ExpandCommands(
     for (SVGCommand xCmd : compressedSubpath)
     {
       unsigned int numberCount = 0;
+      if (tolower(xCmd.cmd) == 'a')
+        numberCount = 7;
       if (tolower(xCmd.cmd) == 'c')
         numberCount = 6;
       if (tolower(xCmd.cmd) == 'm')
@@ -278,7 +513,7 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
                                   SVGPath &_path)
 {
   std::vector <SVGCommand> cmds;
-  std::string lookup = "cCmMlLvVhHzZ";
+  std::string lookup = "aAcCmMqQlLvVhHzZ";
   char lastCmd = 'x';
   std::vector<double> numbers;
 
@@ -391,6 +626,12 @@ void SVGLoader::GetSvgPaths(TiXmlNode *_pParent, std::vector<SVGPath> &_paths)
       SVGPath p;
       this->GetPathAttribs(element, p);
       _paths.push_back(p);
+    }
+    // skip defs node that can contain path
+    // elements that are not actual paths.
+    if( name == "defs")
+    {
+      return;
     }
   }
 
@@ -611,3 +852,73 @@ function draw(showCtrlPoints)
   }
   _out << footer << std::endl;
 }
+
+/////////////////////////////////////////////////
+math::Matrix3 GetTransformationMatrix(const std::string &_transformStr)
+{
+  // _transfromStr should not have a closing paren and look like this:
+  // matrix(0,0.55669897,-0.55669897,0,194.55441,-149.50402
+  // we're going to extract the transform type and numbers
+  std::vector<std::string> tx;
+  split(_transformStr, '(', tx);
+
+  std::string transform = tx[0];
+  std::vector<std::string> numbers;
+  split(tx[1], ',', numbers);
+
+  // how to unpack the values into 3x3 matrices
+  // http://www.w3.org/TR/SVG/coords.html#TransformAttribute
+  if(transform.find("matrix") != std::string::npos)
+  {
+    gzmsg << "matrix" << std::endl;
+    double v00 = stod(numbers[0]);
+    double v10 = stod(numbers[1]);
+    double v01 = stod(numbers[2]);
+    double v11 = stod(numbers[3]);
+    double v02 = stod(numbers[4]);
+    double v12 = stod(numbers[5]);
+    math::Matrix3 m(v00, v01, v02, v10, v11, v12, 0, 0, 1);
+    return m;
+  }
+
+  if(transform.find("skewX") != std::string::npos)
+  {
+    gzmsg << "skewX" << std::endl;
+
+    math::Matrix3 m;
+    return m;
+  }
+
+  if(transform.find("skewY") != std::string::npos)
+  {
+    gzmsg << "skewY" << std::endl;
+    math::Matrix3 m;
+    return m;
+  }
+
+  if(transform.find("scale") != std::string::npos)
+  {
+    gzmsg << "scale" << std::endl;
+    math::Matrix3 m;
+    return m;
+  }
+
+  if(transform.find("translate") != std::string::npos)
+  {
+    gzmsg << "translate" << std::endl;
+    math::Matrix3 m;
+    return m;
+  }
+
+  if(transform.find("rotate") != std::string::npos)
+  {
+    gzmsg << "rotate" << std::endl;
+    math::Matrix3 m;
+    return m;
+  }
+
+  gzwarn << "Unsupported transformation: " << transform << std::endl;
+  math::Matrix3 m;
+  return m;
+}
+
