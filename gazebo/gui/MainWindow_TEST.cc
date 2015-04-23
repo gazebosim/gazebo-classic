@@ -363,7 +363,7 @@ void MainWindow_TEST::Wireframe()
 
   node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init();
-  sub = node->Subscribe("~/request", &OnRequest, this);
+  sub = node->Subscribe("~/request", &OnRequest, true);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
