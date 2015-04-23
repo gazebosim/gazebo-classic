@@ -21,13 +21,11 @@
 #include <tinyxml.h>
 
 #include <list>
-#include <mutex>
 #include <string>
 #include <fstream>
 
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/transport/transport.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -144,10 +142,6 @@ namespace gazebo
       /// \brief Update the internal variables that keep track of the times
       /// where the log started and finished (simulation time).
       private: void ReadLogTimes();
-
-      /// \brief Called when a log control message is received.
-      /// \param[in] _data The log control message.
-      private: void OnLogControl(ConstLogPlayControlPtr &_data);
 
       /// \brief The XML document of the log file.
       private: TiXmlDocument xmlDoc;

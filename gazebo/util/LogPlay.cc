@@ -417,17 +417,3 @@ unsigned int LogPlay::GetChunkCount() const
 
   return count;
 }
-
-/////////////////////////////////////////////////
-void LogPlay::OnLogControl(ConstLogPlayControlPtr &_data)
-{
-  if (_data->has_start() && _data->start())
-    this->mode = "start";
-  else if (_data->has_pause() && _data->pause())
-    this->mode = "pause";
-  else if (_data->has_multi_step())
-  {
-    this->mode = "step";
-    this->stepMsgs.push_back(_data->multi_step());
-  }
-}
