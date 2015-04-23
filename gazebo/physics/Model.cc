@@ -328,9 +328,9 @@ void Model::Fini()
 {
   Entity::Fini();
 
+  this->plugins.clear();
   this->attachedModels.clear();
   this->joints.clear();
-  this->plugins.clear();
   this->links.clear();
   this->canonicalLink.reset();
 }

@@ -282,6 +282,18 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create a msgs::Axis from an axis SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Axis object
+    GAZEBO_VISIBLE
+    msgs::Axis AxisFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::Joint from a joint SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Joint object
+    GAZEBO_VISIBLE
+    msgs::Joint JointFromSDF(sdf::ElementPtr _sdf);
+
     /// \brief Create or update an SDF element from a msgs::Visual
     /// \param[in] _msg Visual messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of

@@ -229,6 +229,9 @@ RenderWidget::~RenderWidget()
 
   delete this->toolbar;
   this->toolbar = NULL;
+
+  // we created the scene here we are responsible for removing it.
+  rendering::remove_scene(gui::get_world());
 }
 
 /////////////////////////////////////////////////
@@ -296,6 +299,13 @@ void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
 
   if (_duration > 0)
     QTimer::singleShot(_duration, this, SLOT(OnClearOverlayMsg()));
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::SetOverlaysVisible(const bool _visible)
+{
+  for (auto const &plugin : this->plugins)
+    plugin->setVisible(_visible);
 }
 
 /////////////////////////////////////////////////
