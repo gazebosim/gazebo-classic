@@ -1747,3 +1747,19 @@ unsigned int Camera::GetTriangleCount() const
 {
   return this->renderTarget->getTriangleCount();
 }
+
+//////////////////////////////////////////////////
+void Camera::SetOrtho(const bool _ortho)
+{
+  if (_ortho)
+  {
+    this->scene->SetShadowsEnabled(false);
+    this->camera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
+  }
+  else
+  {
+    this->camera->setProjectionType(Ogre::PT_PERSPECTIVE);
+    this->camera->setCustomProjectionMatrix(false);
+    this->scene->SetShadowsEnabled(true);
+  }
+}

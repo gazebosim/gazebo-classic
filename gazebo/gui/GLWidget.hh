@@ -191,6 +191,10 @@ namespace gazebo
       /// \param[in] _checked True if the model editor was checked.
       private slots: void OnModelEditor(bool _checked);
 
+      /// \brief QT Callback that toggles orthogonal view
+      /// \param[in] _checked True if the Ortho menu option was checked.
+      private slots: void OnOrtho(bool _checked);
+
       private: int windowId;
 
       private: rendering::UserCameraPtr userCamera;

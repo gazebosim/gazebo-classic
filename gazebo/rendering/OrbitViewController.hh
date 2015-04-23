@@ -93,42 +93,44 @@ namespace gazebo
       /// \brief Normalize yaw value.
       /// \paramp[in] _v Normalize a yaw value.
       /// \return The normalized value.
-      private: double NormalizeYaw(double _v);
+      protected: double NormalizeYaw(double _v);
 
       /// \brief Normalize pitch value.
       /// \paramp[in] _v Normalize a pitch value.
       /// \return The normalized value.
-      private: double NormalizePitch(double _v);
+      protected: double NormalizePitch(double _v);
 
       /// \brief Update the reference visual.
-      private: void UpdateRefVisual();
+      protected: void UpdateRefVisual();
 
       /// \brief Update the camera's pose based on a rotation update.
       /// \param[in] _dy Delta yaw movement.
       /// \param[in] _dp Delta pitch movement.
-      private: void Orbit(double _dy, double _dp);
+      protected: void Orbit(double _dy, double _dp);
 
       /// \brief Yaw value.
-      private: float yaw;
+      protected: float yaw;
 
       /// \brief Pitch value.
-      private: float pitch;
+      protected: float pitch;
 
       /// \brief Distance to the focal point.
-      private: float distance;
+      protected: float distance;
 
       /// \brief The focal point.
-      private: math::Vector3 focalPoint;
+      protected: math::Vector3 focalPoint;
 
       /// \brief A reference visual.
-      private: VisualPtr refVisual;
+      protected: VisualPtr refVisual;
 
       /// \brief Key that is currently pressed.
-      private: std::string key;
+      protected: std::string key;
 
       /// \brief A flag used to inidicate that the view controller has just
       /// been initialized.
-      private: bool init;
+      protected: bool init;
+
+      protected: double orthoZoom;
     };
     /// \}
   }

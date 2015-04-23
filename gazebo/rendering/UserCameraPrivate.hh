@@ -40,6 +40,9 @@ namespace gazebo
       /// \brief An orbit view controller.
       public: OrbitViewController *orbitViewController;
 
+      /// \brief An orthographic view controller.
+      public: OrthoViewController *orthoViewController;
+
       /// \brief A FPS view controller.
       public: FPSViewController *fpsViewController;
 

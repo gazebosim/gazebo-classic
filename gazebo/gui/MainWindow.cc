@@ -1211,6 +1211,11 @@ void MainWindow::CreateActions()
   g_viewOculusAct->setEnabled(false);
 #endif
 
+  g_cameraOrthoAct = new QAction(tr("Ortho"), this);
+  g_cameraOrthoAct->setStatusTip(tr("Orthogonal Projection"));
+  g_cameraOrthoAct->setCheckable(true);
+  g_cameraOrthoAct->setChecked(false);
+
   g_dataLoggerAct = new QAction(tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
@@ -1389,6 +1394,9 @@ void MainWindow::CreateMenuBar()
   // editMenu->addAction(g_editTerrainAct);
 
   editMenu->addAction(g_editModelAct);
+
+  QMenu *cameraMenu = bar->addMenu(tr("&Camera"));
+  cameraMenu->addAction(g_cameraOrthoAct);
 
   QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);

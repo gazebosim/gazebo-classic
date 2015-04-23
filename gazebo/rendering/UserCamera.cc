@@ -25,6 +25,7 @@
 #include "gazebo/rendering/WindowManager.hh"
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/OrbitViewController.hh"
+#include "gazebo/rendering/OrthoViewController.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCameraPrivate.hh"
@@ -41,6 +42,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene,
     dataPtr(new UserCameraPrivate)
 {
   this->dataPtr->orbitViewController = NULL;
+  this->dataPtr->orthoViewController = NULL;
   this->dataPtr->fpsViewController = NULL;
   this->dataPtr->viewController = NULL;
   this->dataPtr->selectionBuffer = NULL;
@@ -63,6 +65,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene,
 UserCamera::~UserCamera()
 {
   delete this->dataPtr->orbitViewController;
+  delete this->dataPtr->orthoViewController;
   delete this->dataPtr->fpsViewController;
 
   this->connections.clear();
@@ -100,6 +103,8 @@ void UserCamera::Load()
 void UserCamera::Init()
 {
   this->dataPtr->orbitViewController = new OrbitViewController(
+      boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
+  this->dataPtr->orthoViewController = new OrthoViewController(
       boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
   this->dataPtr->fpsViewController = new FPSViewController(
       boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
@@ -335,34 +340,38 @@ bool UserCamera::TrackVisualImpl(VisualPtr _visual)
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetViewController(const std::string &type)
+void UserCamera::SetViewController(const std::string &_type)
 {
-  if (this->dataPtr->viewController->GetTypeString() == type)
+  if (this->dataPtr->viewController->GetTypeString() == _type)
     return;
 
-  if (type == OrbitViewController::GetTypeString())
+  if (_type == OrbitViewController::GetTypeString())
     this->dataPtr->viewController = this->dataPtr->orbitViewController;
-  else if (type == FPSViewController::GetTypeString())
+  else if (_type == OrthoViewController::GetTypeString())
+    this->dataPtr->viewController = this->dataPtr->orthoViewController;
+  else if (_type == FPSViewController::GetTypeString())
     this->dataPtr->viewController = this->dataPtr->fpsViewController;
   else
-    gzthrow("Invalid view controller type: " + type);
+    gzthrow("Invalid view controller type: " + _type);
 
   this->dataPtr->viewController->Init();
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetViewController(const std::string &type,
-                                    const math::Vector3 &_pos)
+void UserCamera::SetViewController(const std::string &_type,
+                                   const math::Vector3 &_pos)
 {
-  if (this->dataPtr->viewController->GetTypeString() == type)
+  if (this->dataPtr->viewController->GetTypeString() == _type)
     return;
 
-  if (type == OrbitViewController::GetTypeString())
+  if (_type == OrbitViewController::GetTypeString())
     this->dataPtr->viewController = this->dataPtr->orbitViewController;
-  else if (type == FPSViewController::GetTypeString())
+  else if (_type == OrthoViewController::GetTypeString())
+    this->dataPtr->viewController = this->dataPtr->orthoViewController;
+  else if (_type == FPSViewController::GetTypeString())
     this->dataPtr->viewController = this->dataPtr->fpsViewController;
   else
-    gzthrow("Invalid view controller type: " + type);
+    gzthrow("Invalid view controller type: " + _type);
 
   this->dataPtr->viewController->Init(_pos);
 }
@@ -780,4 +789,13 @@ void UserCamera::EnableStereo(bool _enable)
          << _enable
          << "). However, Ogre version >= 1.10.0 is required.\n";
 #endif
+}
+
+/////////////////////////////////////////////////
+void UserCamera::SetOrtho(const bool _ortho)
+{
+  if (_ortho)
+    this->SetViewController("ortho");
+  else
+    this->SetViewController("orbit");
 }

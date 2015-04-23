@@ -102,6 +102,8 @@ QAction *gazebo::gui::g_viewWireframeAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_viewOculusAct = 0;
 GAZEBO_VISIBLE
+QAction *gazebo::gui::g_cameraOrthoAct = 0;
+GAZEBO_VISIBLE
 QAction *gazebo::gui::g_resetAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_fullScreenAct = 0;

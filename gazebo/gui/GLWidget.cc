@@ -156,6 +156,9 @@ GLWidget::GLWidget(QWidget *_parent)
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this,
       SLOT(OnModelEditor(bool)));
+
+  connect(g_cameraOrthoAct, SIGNAL(toggled(bool)), this,
+          SLOT(OnOrtho(bool)));
 }
 
 /////////////////////////////////////////////////
@@ -1290,4 +1293,10 @@ void GLWidget::OnModelEditor(bool _checked)
 
   // Manually deselect, in case the editor was opened with Ctrl
   this->DeselectAllVisuals();
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnOrtho(bool _checked)
+{
+  this->userCamera->SetOrtho(_checked);
 }

@@ -49,6 +49,8 @@ OrbitViewController::OrbitViewController(UserCameraPtr _camera)
   this->refVisual->SetMaterial("Gazebo/YellowTransparent");
   this->refVisual->SetVisible(false);
   this->refVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  this->orthoZoom = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -277,8 +279,11 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
       factor *= 2;
 
     // This assumes that _event.scroll.y is -1 or +1
-    this->Zoom(-(_event.scroll.y * factor) * _event.moveScale *
+    /*this->Zoom(-(_event.scroll.y * factor) * _event.moveScale *
                (this->distance / 5.0));
+               */
+    this->Zoom(-_event.scroll.y * 0.02);
+
   }
   else
     this->refVisual->SetVisible(false);
@@ -346,12 +351,43 @@ double OrbitViewController::NormalizePitch(double _v)
 //////////////////////////////////////////////////
 void OrbitViewController::Zoom(float _amount)
 {
-  this->distance -= _amount;
+  Ogre::Camera *cam = this->camera->GetOgreCamera();
 
-  math::Vector3 delta = this->camera->GetWorldPosition() - this->focalPoint;
-  delta.Normalize();
-  delta *= this->distance;
-  this->camera->SetWorldPosition(this->focalPoint + delta);
+/*  if (cam->getProjectionType() == Ogre::PT_ORTHOGRAPHIC)
+  {
+    this->orthoZoom = math::clamp(this->orthoZoom + _amount, 0.01, 10.0);
+
+    std::cout << "Zoom[" << _amount << "]\n";
+    std::cout << "OrthoZoom[" << this->orthoZoom << "]\n";
+
+    Ogre::Viewport *vp = this->camera->GetViewport();
+    Ogre::Matrix4 p = this->BuildScaledOrthoMatrix(
+        cam->getOrthoWindowWidth() /  this->orthoZoom / -2.0f,
+        cam->getOrthoWindowWidth() /  this->orthoZoom / 2.0f,
+        cam->getOrthoWindowHeight() / this->orthoZoom / -2.0f,
+        cam->getOrthoWindowHeight() / this->orthoZoom / 2.0f,
+
+        // (vp->getWidth()*0.5) /  this->orthoZoom / -2.0f,
+        // (vp->getWidth()*0.5) /  this->orthoZoom / 2.0f,
+        // (vp->getHeight()*0.5) / this->orthoZoom / -2.0f,
+        // (vp->getHeight()*0.5) / this->orthoZoom / 2.0f,
+
+        -1000, 1000
+        );
+
+    this->camera->GetOgreCamera()->setCustomProjectionMatrix(
+        true, p);
+  }
+  else
+  {
+  */
+    this->distance -= _amount;
+
+    math::Vector3 delta = this->camera->GetWorldPosition() - this->focalPoint;
+    delta.Normalize();
+    delta *= this->distance;
+    this->camera->SetWorldPosition(this->focalPoint + delta);
+  //}
 
   this->UpdateRefVisual();
 }

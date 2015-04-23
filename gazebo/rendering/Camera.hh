@@ -529,6 +529,12 @@ namespace gazebo
       /// \return Distortion model.
       public: DistortionPtr GetDistortion() const;
 
+      /// \brief Set whether the camera should be orthographic or perspective.
+      /// Perspective is the default.
+      /// \param[in] _ortho True to turn on orthographic projection.
+      /// False to turn on perspective projection.
+      public: virtual void SetOrtho(const bool _ortho);
+
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 
