@@ -42,12 +42,6 @@ using namespace util;
 LogPlay::LogPlay()
 {
   this->logStartXml = NULL;
-
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("/gazebo");
-
-  this->logControlSub = this->node->Subscribe("/gazebo/log/play/control",
-      &LogPlay::OnLogControl, this);
 }
 
 /////////////////////////////////////////////////
@@ -267,29 +261,6 @@ uintmax_t LogPlay::GetFileSize() const
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
-  /*if (this->mode == "play")
-    this->target++;
-
-  if (this->current == this->target && this->stepMsgs.empty())
-    return false;
-
-  // There is work to do!
-  if (this->current == this->target)
-  {
-    this->target += this->stepMsgs.front();
-    this->stepMsgs.pop_front();
-  }
-
-  if (this->current < this->target)
-  {
-    this->current++;
-    this->GetChunk(this->current, _data);
-  }
-  else
-    this->current = -1;
-
-  return true;*/
-
   std::string startMarker = "<sdf ";
   std::string endMarker = "</sdf>";
   size_t start = this->currentChunk.find(startMarker);
@@ -325,6 +296,20 @@ bool LogPlay::Step(std::string &_data)
   _data = this->currentChunk.substr(start, end+endMarker.size()-start);
 
   this->currentChunk.erase(0, end + endMarker.size());
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::Rewind()
+{
+  this->currentChunk.clear();
+  this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+  if (!logCurrXml)
+  {
+    gzerr << "Unable to jump to the beginning of the log file\n";
+    return false;
+  }
 
   return true;
 }

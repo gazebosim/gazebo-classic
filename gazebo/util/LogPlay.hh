@@ -106,6 +106,11 @@ namespace gazebo
       /// \param[out] _data Data from next entry in the log file.
       public: bool Step(std::string &_data);
 
+      /// \brief Jump to the beginning of the log file. The next step() call
+      /// will return the first data "chunk".
+      /// \return True If the function succeed or false otherwise.
+      public: bool Rewind();
+
       /// \brief Get the number of chunks (steps) in the open log file.
       /// \return The number of recorded states in the log file.
       public: unsigned int GetChunkCount() const;
@@ -179,17 +184,6 @@ namespace gazebo
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogPlay>;
-
-      // -- caguero --
-      private: std::deque<int> stepMsgs;
-      /// \brief Transportation node.
-      private: transport::NodePtr node;
-      /// \brief Subscriber to log control messages.
-      private: transport::SubscriberPtr logControlSub;
-      private: std::string mode = "play";
-      private: std::mutex mutex;
-      private: int current = -1;
-      private: int target = -1;
     };
     /// \}
   }

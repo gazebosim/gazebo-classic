@@ -487,63 +487,78 @@ void World::RunLoop()
 //////////////////////////////////////////////////
 void World::LogStep()
 {
-  if (!this->IsPaused() || this->dataPtr->stepInc > 0)
+  if (this->dataPtr->stepInc < 0)
   {
-    std::string data;
-    if (!util::LogPlay::Instance()->Step(data))
-    {
-      this->SetPaused(true);
-    }
-    else
-    {
-      this->dataPtr->logPlayStateSDF->ClearElements();
-      sdf::readString(data, this->dataPtr->logPlayStateSDF);
-
-      this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
-
-      // Process insertions
-      if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
-      {
-        sdf::ElementPtr modelElem =
-          this->dataPtr->logPlayStateSDF->GetElement(
-              "insertions")->GetElement("model");
-
-        while (modelElem)
-        {
-          ModelPtr model = this->LoadModel(modelElem,
-              this->dataPtr->rootElement);
-          model->Init();
-
-          // Disabling plugins on playback
-          // model->LoadPlugins();
-
-          modelElem = modelElem->GetNextElement("model");
-        }
-      }
-
-      // Process deletions
-      if (this->dataPtr->logPlayStateSDF->HasElement("deletions"))
-      {
-        sdf::ElementPtr nameElem =
-          this->dataPtr->logPlayStateSDF->GetElement(
-              "deletions")->GetElement("name");
-
-        while (nameElem)
-        {
-          transport::requestNoReply(this->GetName(), "entity_delete",
-                                    nameElem->Get<std::string>());
-          nameElem = nameElem->GetNextElement("name");
-        }
-      }
-
-      this->SetState(this->dataPtr->logPlayState);
-      this->Update();
-      this->dataPtr->iterations++;
-    }
-
-    if (this->dataPtr->stepInc > 0)
-      this->dataPtr->stepInc--;
+    // Step back: This is implemented by going to the beginning of the log file,
+    // and then, step forward up to the target frame.
+    // ToDo: Use keyframes in the log file to speed up this process.
+    util::LogPlay::Instance()->Rewind();
+    this->dataPtr->stepInc = this->dataPtr->iterations + this->dataPtr->stepInc;
+    if (this->dataPtr->stepInc < 1)
+      this->dataPtr->stepInc = 1;
+    this->dataPtr->iterations = 0;
   }
+
+  do
+  {
+    if (!this->IsPaused() || this->dataPtr->stepInc > 0)
+    {
+      std::string data;
+      if (!util::LogPlay::Instance()->Step(data))
+      {
+        this->SetPaused(true);
+      }
+      else
+      {
+        this->dataPtr->logPlayStateSDF->ClearElements();
+        sdf::readString(data, this->dataPtr->logPlayStateSDF);
+
+        this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
+
+        // Process insertions
+        if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
+        {
+          sdf::ElementPtr modelElem =
+            this->dataPtr->logPlayStateSDF->GetElement(
+                "insertions")->GetElement("model");
+
+          while (modelElem)
+          {
+            ModelPtr model = this->LoadModel(modelElem,
+                this->dataPtr->rootElement);
+            model->Init();
+
+            // Disabling plugins on playback
+            // model->LoadPlugins();
+
+            modelElem = modelElem->GetNextElement("model");
+          }
+        }
+
+        // Process deletions
+        if (this->dataPtr->logPlayStateSDF->HasElement("deletions"))
+        {
+          sdf::ElementPtr nameElem =
+            this->dataPtr->logPlayStateSDF->GetElement(
+                "deletions")->GetElement("name");
+
+          while (nameElem)
+          {
+            transport::requestNoReply(this->GetName(), "entity_delete",
+                                      nameElem->Get<std::string>());
+            nameElem = nameElem->GetNextElement("name");
+          }
+        }
+
+        this->SetState(this->dataPtr->logPlayState);
+        this->Update();
+        this->dataPtr->iterations++;
+      }
+
+      if (this->dataPtr->stepInc > 0)
+        this->dataPtr->stepInc--;
+    }
+  } while (this->dataPtr->stepInc > 0);
 
   this->PublishWorldStats();
 
