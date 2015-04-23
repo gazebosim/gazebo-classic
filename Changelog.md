@@ -1,4 +1,5 @@
 ## Gazebo 6.0
+1. Added ComputeVolume function for simple shape subclasses of Shape.hh.
 
 1. Added a plugin to send messages to an existing website.
    Added gui::MainWindow::AddMenu and msgs/rest_error, msgs/rest_login, msgs rest/post
