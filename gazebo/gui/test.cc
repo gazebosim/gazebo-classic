@@ -1,6 +1,6 @@
 #include "test.hh"
 
-bool createOneByOne = false;
+bool g_createOneByOne = false;
 bool externalHandle = false;
 bool renderFrameId = true;
 
@@ -10,8 +10,6 @@ uint32_t RenderEngine::windowCounter = 1;
 RenderEngine::RenderEngine()
 : root(0), window(0), camera(0), sceneCreated(false)
 {
-  std::cout << "RenderEngine::RenderEngine\n";
-
   // Create a new log manager and prevent output from going to stdout
   this->logManager = new Ogre::LogManager();
   std::string logPath = "C:/Users/nkoenig/";
@@ -25,8 +23,6 @@ RenderEngine::RenderEngine()
 /////////////////////////////////////////////////
 void RenderEngine::Load()
 {
-  std::cout << "RenderEngine::Load\n";
-
   // Load all the plugins
   this->LoadPlugins();
 
@@ -38,16 +34,15 @@ void RenderEngine::Load()
   // Initialize the root node, and don't create a window
   this->root->initialise(false);
 
-  if (createOneByOne)
+  if (g_createOneByOne)
   {
-    this->CreateOgreWindow("0",1,1);
+    this->CreateOgreWindow("0", 1, 1);
   }
 }
 
 /////////////////////////////////////////////////
 void RenderEngine::Init()
 {
-  std::cout << "RenderEngine::Init\n";
   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
 
@@ -62,7 +57,7 @@ if (this->sceneCreated)
   this->root->_fireFrameEnded();
   }
 }
-  
+
 /////////////////////////////////////////////////
 void RenderEngine::CreateScene()//Ogre::RenderWindow *window)
 {
@@ -107,18 +102,14 @@ void RenderEngine::CreateScene()//Ogre::RenderWindow *window)
 /////////////////////////////////////////////////
 void RenderEngine::Resize(int _width, int _height)
 {
-  std::cout << "RenderEngine::Resize(" << _width << " " << _height << ")\n";
-
   if (this->window)
   {
-    // this->window->reposition(-100,-100);
     this->window->resize(_width, _height);
     this->window->windowMovedOrResized();
   }
 
-  /*if (this->camera)
+  if (this->camera)
   {
-  //  this->viewport->setDimensions(0, 0, 1, 1);
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
       static_cast<double>(this->viewport->getActualHeight());
 
@@ -128,7 +119,6 @@ void RenderEngine::Resize(int _width, int _height)
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
   }
-  */
 }
 
 /////////////////////////////////////////////////
@@ -237,7 +227,7 @@ void RenderEngine::LoadPlugins()
           {
             std::cerr << "Unable to load Ogre Plugin[" << *piter
                   << "]. Rendering will not be possible."
-      	    << "Make sure you have installed OGRE and Gazebo properly.\n";
+            << "Make sure you have installed OGRE and Gazebo properly.\n";
           }
         }
       }
@@ -348,7 +338,7 @@ RenderWidget::RenderWidget(QWidget *parent)
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
   this->setAttribute(Qt::WA_PaintOnScreen, true);
 
-  this->renderFrame = new RenderFrame;
+  this->renderFrame = new QFrame;
   this->renderFrame->setObjectName("RenderFrame");
   this->renderFrame->setLineWidth(1);
   this->renderFrame->setFrameShadow(QFrame::Sunken);
@@ -369,7 +359,7 @@ RenderWidget::RenderWidget(QWidget *parent)
   QApplication::syncX();
   std::string handle = this->GetOgreHandle();
 
-  Ogre::RenderWindow *win = 
+  Ogre::RenderWindow *win =
     this->renderEngine->CreateOgreWindow(handle,
       this->width(), this->height());
   this->renderEngine->CreateScene();
@@ -477,18 +467,6 @@ std::string RenderWidget::GetOgreHandle() const
     stream << (unsigned long)this->winId();
 
   return stream.str();
-}
-
-///////////////////////////////////////////////
-RenderFrame::RenderFrame(QWidget *parent)
-: QFrame(parent)
-{
-}
-
-///////////////////////////////////////////////
-void RenderFrame::mousePressEvent(QMouseEvent *_event)
-{
-  std::cout << "MOUSE PRESS EVENT!!!!!\n";
 }
 
 ///////////////////////////////////////////////
