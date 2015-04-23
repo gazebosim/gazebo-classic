@@ -1,28 +1,29 @@
 #include "test.hh"
 
+// Set to true to Create a 1x1 render window
 bool g_createOneByOne = false;
-bool externalHandle = false;
-bool renderFrameId = true;
 
+// Set to true to use "externalWindowHandle", otherwise use "parentWindowHandle"
+bool g_externalHandle = false;
+
+// Set to true to use the windowId from RenderWidget::renderFrame.
+// Otherwise use the renderWidget's windowId.
+bool g_renderFrameId = true;
+
+// Used to create unique ogre window names.
 uint32_t RenderEngine::windowCounter = 1;
 
 /////////////////////////////////////////////////
 RenderEngine::RenderEngine()
-: root(0), window(0), camera(0), sceneCreated(false)
+: window(0), camera(0), sceneCreated(false)
 {
   // Create a new log manager and prevent output from going to stdout
   this->logManager = new Ogre::LogManager();
-  std::string logPath = "C:/Users/nkoenig/";
-  logPath += "/ogre.log";
-  this->logManager->createLog(logPath, true, false, false);
+  this->logManager->createLog("ogre.log", true, false, false);
 
-  // Make the root
+  // Create the OGRE root object.
   this->root = new Ogre::Root();
-}
 
-/////////////////////////////////////////////////
-void RenderEngine::Load()
-{
   // Load all the plugins
   this->LoadPlugins();
 
@@ -34,38 +35,44 @@ void RenderEngine::Load()
   // Initialize the root node, and don't create a window
   this->root->initialise(false);
 
+  // Create a 1x1 render window if the g_createOneByOne is true
   if (g_createOneByOne)
   {
+    std::cout << "RenderEngine::RenderEngine Creating a 1x1 window\n";
     this->CreateOgreWindow("0", 1, 1);
   }
 }
 
 /////////////////////////////////////////////////
-void RenderEngine::Init()
-{
-  Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-}
-
-/////////////////////////////////////////////////
 void RenderEngine::Render()
 {
-if (this->sceneCreated)
-{
-  this->root->_fireFrameStarted();
-  this->window->update();
-  this->root->_fireFrameRenderingQueued();
-  this->root->_fireFrameEnded();
+  // Only draw if the scene has been created.
+  if (this->sceneCreated)
+  {
+    this->root->_fireFrameStarted();
+    this->window->update();
+    this->root->_fireFrameRenderingQueued();
+    this->root->_fireFrameEnded();
+  }
+  else
+  {
+    std::cerr << "RenderEngine::Render  No Scene\n";
   }
 }
 
 /////////////////////////////////////////////////
-void RenderEngine::CreateScene()//Ogre::RenderWindow *window)
+void RenderEngine::CreateScene()
 {
-  //this->window = window;
+  if (!this->window)
+  {
+    std::cerr << "RenderEngine::CreateScene"
+              << "Create a normal render window before creating the scene.\n";
+    return;
+  }
 
-  std::cout << "RenderEngine::CreateScene\n";
   this->manager = this->root->createSceneManager(Ogre::ST_GENERIC);
   this->manager->setAmbientLight(Ogre::ColourValue(0.0, 0.5, 0.0));
+
   Ogre::Entity *entity = this->manager->createEntity("ogrehead.mesh");
   Ogre::SceneNode *node =
   this->manager->getRootSceneNode()->createChildSceneNode();
@@ -85,16 +92,9 @@ void RenderEngine::CreateScene()//Ogre::RenderWindow *window)
   this->viewport = this->window->addViewport(camera);
   this->viewport->setBackgroundColour(Ogre::ColourValue(0.5, 0.0, 0.0));
 
-  std::cout << "Viewport WxH[" << this->viewport->getActualWidth() << " "
-            << this->viewport->getActualHeight() << "]\n";
-
-  std::cout << "Window WxH[" << this->window->getWidth() << " "
-            << this->window->getHeight() << "]\n";
-
-  /*this->camera->setAspectRatio(
+  this->camera->setAspectRatio(
     Ogre::Real(this->viewport->getActualWidth()) /
     Ogre::Real(this->viewport->getActualHeight()));
-    */
 
   this->sceneCreated = true;
 }
@@ -102,12 +102,14 @@ void RenderEngine::CreateScene()//Ogre::RenderWindow *window)
 /////////////////////////////////////////////////
 void RenderEngine::Resize(int _width, int _height)
 {
+  // Resize the window
   if (this->window)
   {
     this->window->resize(_width, _height);
     this->window->windowMovedOrResized();
   }
 
+  // Adjust the camera
   if (this->camera)
   {
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
@@ -123,7 +125,6 @@ void RenderEngine::Resize(int _width, int _height)
 
 /////////////////////////////////////////////////
 Ogre::RenderWindow *RenderEngine::CreateOgreWindow(
-  //unsigned long _ogreHandle, uint32_t _width, uint32_t _height)
   const std::string &_ogreHandle, uint32_t _width, uint32_t _height)
 {
   Ogre::StringVector paramsVector;
@@ -131,12 +132,14 @@ Ogre::RenderWindow *RenderEngine::CreateOgreWindow(
   Ogre::RenderWindow *window = NULL;
 
   std::string handle;
-  if (externalHandle)
+
+  // Use "externalWindowHandle" or "parentWindowHandle" depending on flag.
+  if (g_externalHandle)
     handle = "externalWindowHandle";
   else
     handle = "parentWindowHandle";
 
-  std::cout << "CreateOgreWindow. Handle[" << _ogreHandle
+  std::cout << "RenderEngine::CreateOgreWindow. Handle[" << _ogreHandle
             << "] WxH[" << _width << " " << _height << "] Type["
             << handle << "]\n";
 
@@ -169,14 +172,15 @@ Ogre::RenderWindow *RenderEngine::CreateOgreWindow(
 
   if (window)
   {
-    //window->setActive(false);
-    //window->resize(_width, _height);
     window->reposition(0, 0);
     window->setAutoUpdated(true);
     window->setVisible(true);
+   
+    // Store the normal render window.
+    if (_width > 1 && _height > 1)
+      this->window = window;
   }
 
-  this->window = window;
   return window;
 }
 
@@ -185,7 +189,6 @@ void RenderEngine::LoadPlugins()
 {
   std::list<std::string>::iterator iter;
   std::list<std::string> ogrePaths;
-  ogrePaths.push_back("C");
   ogrePaths.push_back("C:/Users/nkoenig/code/gz/ogre_src_v1-8-1-vc12-x64-release-debug/build/install/Debug/bin/Debug/");
 
   for (iter = ogrePaths.begin(); iter != ogrePaths.end(); ++iter)
@@ -329,6 +332,7 @@ void RenderEngine::SetupResources()
   }
 }
 
+/////////////////////////////////////////////////
 RenderWidget::RenderWidget(QWidget *parent)
 : QWidget(parent), renderEngine(new RenderEngine)
 {
@@ -338,78 +342,67 @@ RenderWidget::RenderWidget(QWidget *parent)
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
   this->setAttribute(Qt::WA_PaintOnScreen, true);
 
+  // Create a render frame. This gets covered by the OGRE render window.
   this->renderFrame = new QFrame;
   this->renderFrame->setObjectName("RenderFrame");
-  this->renderFrame->setLineWidth(1);
-  this->renderFrame->setFrameShadow(QFrame::Sunken);
-  this->renderFrame->setFrameShape(QFrame::Box);
   this->renderFrame->show();
 
+  // Add render frame to the layout
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->addWidget(this->renderFrame);
   this->setLayout(mainLayout);
 
+  // We want to catpture mouse movements.
   this->setMouseTracking(true);
   this->setFocus(Qt::OtherFocusReason);
 
-  this->renderEngine->Load();
-
-  QApplication::flush();
-  QApplication::syncX();
-  std::string handle = this->GetOgreHandle();
+  // These two lines do not seem to matter in Windows.
+  // QApplication::flush();
+  // QApplication::syncX();
 
   Ogre::RenderWindow *win =
-    this->renderEngine->CreateOgreWindow(handle,
+    this->renderEngine->CreateOgreWindow(this->GetOgreHandle(),
       this->width(), this->height());
+
   this->renderEngine->CreateScene();
-
-  this->renderEngine->Init();
-}
-
-///////////////////////////////////////////////
-void RenderWidget::Load()
-{
 }
 
 ///////////////////////////////////////////////
 void RenderWidget::paintEvent(QPaintEvent *_e)
 {
+  // Tell OGRE to render
   this->renderEngine->Render();
 
+  // Tell QT to update
   this->update();
 
+  // We processed this event.
   _e->accept();
 }
 
 ///////////////////////////////////////////////
-void RenderWidget::SendMouseMoveEvent()
-{
-  QPoint pos = QCursor::pos();
-  QPoint posRel = this->mapFromGlobal(pos);
-  if (this->rect().contains(posRel))
-  {
-    //std::cout << "SendMouseMOveEvent Pos[" << pos.x() << " " << pos.y() << "]\n";
-    bool mouse_over_this = false;
-
-    QMouseEvent fakeEvent(QEvent::MouseMove, posRel, Qt::NoButton, QApplication::mouseButtons(), QApplication::keyboardModifiers());
-    this->event(&fakeEvent);
-  }
-}
-
 void RenderWidget::mouseMoveEvent(QMouseEvent *_e)
 {
-  std::cout << "Mouse Move Event\n";
+  std::cout << "RenderWidget::mouseMoveEvent\n";
 }
 
+///////////////////////////////////////////////
 void RenderWidget::wheelEvent(QWheelEvent *_event)
 {
-  std::cout << "Wheel Event\n";
+  std::cout << "RenderWidget::wheelEvent\n";
 }
 
+///////////////////////////////////////////////
 void RenderWidget::mousePressEvent(QMouseEvent *_event)
 {
-  std::cout << "Mouse Press Event\n";
+  std::cout << "RenderWidget::mousePressEvent\n";
+}
+
+///////////////////////////////////////////////
+void RenderWidget::leaveEvent(QEvent *_event)
+{
+  std::cout << "RenderWidget::leaveEvent\n";
 }
 
 ///////////////////////////////////////////////
@@ -419,49 +412,13 @@ void RenderWidget::resizeEvent(QResizeEvent *_e)
     this->renderEngine->Resize(_e->size().width(), _e->size().height());
 }
 
-/////////////////////////////////////////////////
-bool RenderWidget::eventFilter(QObject *_obj, QEvent *_event)
-{
-  if (_event->type() == QEvent::MouseMove)
-  {
-    std::cout << "RenderWidget::eventFilter mouse move\n";
-    this->mouseMoveEvent((QMouseEvent *)_event);
-  }
-
-
-/*  if (_obj == this->renderFrame)
-  {
-    if (_event->type() == QEvent::MouseMove)
-    {
-      std::cerr << "\t render frame\n";
-      this->mouseMoveEvent((QMouseEvent *)_event);
-    }
-  }
-
-  if (_event->type() == QEvent::Enter)
-  {
-    std::cout << "\t QEvent::Enter\n";
-    this->setFocus(Qt::OtherFocusReason);
-    return true;
-  }
-  */
-
-  // std::cout << "\tOther\n";
-  return false;
-}
-
-///////////////////////////////////////////////
-void RenderWidget::leaveEvent(QEvent *_event)
-{
-  std::cout << "Leave Event\n";
-}
-
 ///////////////////////////////////////////////
 std::string RenderWidget::GetOgreHandle() const
 {
   std::ostringstream stream;
 
-  if (renderFrameId)
+  // Use the renderFrame widget if the flag is set.
+  if (g_renderFrameId)
     stream << (unsigned long)this->renderFrame->winId();
   else
     stream << (unsigned long)this->winId();
@@ -474,32 +431,17 @@ MainWindow::MainWindow()
  : QMainWindow()
 {
   this->setWindowTitle("Main WIndow");
-  this->show();
-  std::cout << "MainWindow Constructor\n";
+  this->setObjectName("mainWindow");
+
+  // Create the render widget
+  this->renderWidget = new RenderWidget(this);
+
+  this->setCentralWidget(this->renderWidget);
+
   this->setGeometry(20, 20, 1024, 768);
 
-  this->setMouseTracking(true);
-  this->setFocus(Qt::OtherFocusReason);
-
-  this->installEventFilter(this);
-}
-
-///////////////////////////////////////////////
-void MainWindow::Load()
-{
-  QWidget *central = new QWidget(this);
-  QHBoxLayout *centralLayout = new QHBoxLayout;
-  centralLayout->setSpacing(0);
-  centralLayout->setMargin(0);
-
-  this->renderWidget = new RenderWidget(central);
-
-  centralLayout->addWidget(this->renderWidget);
-  central->setLayout(centralLayout);
-
-  this->setCentralWidget(central);
-
-  this->renderWidget->Load();
+  // Show the application.
+  this->show();
 }
 
 /////////////////////////////////////////////////
@@ -512,6 +454,7 @@ MyApplication::MyApplication(int &argc,char **argv)
 bool MyApplication::notify(QObject *_receiver, QEvent *_event)
 {
   // Uncomment to see all events received by the QT application
+  // See: http://doc.qt.io/qt-4.8/qevent.html#Type-enum
   // std::cout << "Receiver[" << _receiver->objectName().toStdString()
   //           << "] Event[" << _event->type() << "]\n";
 
@@ -527,9 +470,6 @@ int main(int argc, char **argv)
 
   // Create the main window
   MainWindow *main = new MainWindow();
-
-  // Load the main window
-  main->Load();
 
   // Run the application
   app->exec();

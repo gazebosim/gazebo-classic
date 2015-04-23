@@ -18,12 +18,6 @@ class RenderEngine
   /// \brief Constructor
   public: RenderEngine();
 
-  /// \brief Load OGRE resources.
-  public: void Load();
-
-  /// \brief Initialize
-  public: void Init();
-
   /// \brief Draw the scene.
   public: void Render();
 
@@ -54,9 +48,6 @@ class RenderEngine
   /// \brief Manages OGRE log file
   private: Ogre::LogManager *logManager;
 
-  /// \brief Used to create unique window names
-  private: static uint32_t windowCounter;
-
   /// \brief Manages the scene
   private: Ogre::SceneManager *manager;
 
@@ -71,6 +62,9 @@ class RenderEngine
 
   /// \brief True is a scene has been created.
   private: bool sceneCreated;
+
+  /// \brief Used to create unique window names.
+  private: static uint32_t windowCounter;
 };
 
 /// \brief Widget that displays the scene, and received mouse events
@@ -80,9 +74,6 @@ class RenderWidget : public QWidget
 
   /// \brief Constructor
   public: RenderWidget(QWidget *parent);
-
-  /// \brief Load
-  public: void Load();
 
   /// \brief QT paint event. Use this to draw the scene
   public: void paintEvent(QPaintEvent *_e);
@@ -119,9 +110,6 @@ class MainWindow : public QMainWindow
 
   /// \brief Constructor
   public: MainWindow();
-
-  /// \brief Load
-  public: void Load();
 
   /// \brief Pointer to the render widget
   private: RenderWidget *renderWidget;
