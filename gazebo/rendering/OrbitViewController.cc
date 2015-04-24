@@ -279,11 +279,8 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
       factor *= 2;
 
     // This assumes that _event.scroll.y is -1 or +1
-    /*this->Zoom(-(_event.scroll.y * factor) * _event.moveScale *
+    this->Zoom(-(_event.scroll.y * factor) * _event.moveScale *
                (this->distance / 5.0));
-               */
-    this->Zoom(-_event.scroll.y * 0.02);
-
   }
   else
     this->refVisual->SetVisible(false);

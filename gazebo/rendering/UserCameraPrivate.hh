@@ -15,8 +15,10 @@
  *
 */
 
-#ifndef _USERCAMERA_PRIVATE_HH_
-#define _USERCAMERA_PRIVATE_HH_
+#ifndef _GAZEBO_USERCAMERA_PRIVATE_HH_
+#define _GAZEBO_USERCAMERA_PRIVATE_HH_
+
+#include <string>
 
 namespace gazebo
 {

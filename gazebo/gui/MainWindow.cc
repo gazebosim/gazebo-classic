@@ -1213,10 +1213,20 @@ void MainWindow::CreateActions()
   g_viewOculusAct->setEnabled(false);
 #endif
 
-  g_cameraOrthoAct = new QAction(tr("Ortho"), this);
+  g_cameraOrthoAct = new QAction(tr("Orthographic"), this);
   g_cameraOrthoAct->setStatusTip(tr("Orthogonal Projection"));
   g_cameraOrthoAct->setCheckable(true);
   g_cameraOrthoAct->setChecked(false);
+
+  g_cameraPerspectiveAct = new QAction(tr("Perspective"), this);
+  g_cameraPerspectiveAct->setStatusTip(tr("Perspective Projection"));
+  g_cameraPerspectiveAct->setCheckable(true);
+  g_cameraPerspectiveAct->setChecked(true);
+
+  QActionGroup *projectionActionGroup = new QActionGroup(this);
+  projectionActionGroup->addAction(g_cameraOrthoAct);
+  projectionActionGroup->addAction(g_cameraPerspectiveAct);
+  projectionActionGroup->setExclusive(true);
 
   g_dataLoggerAct = new QAction(tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
@@ -1545,6 +1555,10 @@ void MainWindow::CreateMenuBar()
 
   QMenu *cameraMenu = bar->addMenu(tr("&Camera"));
   cameraMenu->addAction(g_cameraOrthoAct);
+  cameraMenu->addAction(g_cameraPerspectiveAct);
+  cameraMenu->addSeparator();
+  cameraMenu->addAction(g_fpsAct);
+  cameraMenu->addAction(g_orbitAct);
 
   QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
@@ -1564,8 +1578,6 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_fullScreenAct);
   viewMenu->addSeparator();
 
-  viewMenu->addAction(g_fpsAct);
-  viewMenu->addAction(g_orbitAct);
   viewMenu->addSeparator();
 
   viewMenu->addAction(g_overlayAct);

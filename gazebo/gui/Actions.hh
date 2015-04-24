@@ -86,6 +86,7 @@ namespace gazebo
     extern QAction *g_viewOculusAct;
 
     extern QAction *g_cameraOrthoAct;
+    extern QAction *g_cameraPerspectiveAct;
 
     extern QAction *g_copyAct;
     extern QAction *g_pasteAct;

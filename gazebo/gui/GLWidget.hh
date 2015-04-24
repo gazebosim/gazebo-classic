@@ -198,9 +198,11 @@ namespace gazebo
       /// \param[in] The name of the selected entity.
       private slots: void OnSelectionMsgEvent(const QString &_name);
 
-      /// \brief QT Callback that toggles orthogonal view
-      /// \param[in] _checked True if the Ortho menu option was checked.
-      private slots: void OnOrtho(bool _checked);
+      /// \brief QT Callback that turns on orthographic projection
+      private slots: void OnOrtho();
+
+      /// \brief QT Callback that turns on perspective projection
+      private slots: void OnPerspective();
 
       private: int windowId;
 

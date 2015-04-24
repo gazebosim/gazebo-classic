@@ -51,7 +51,6 @@ OrthoViewController::~OrthoViewController()
 void OrthoViewController::Init()
 {
   this->dataPtr->scale = 100;
-  //this->pseudoDistanceFactor = 1000;
   this->distance = 1000.0/this->dataPtr->scale;
 
   int width = this->camera->GetViewportWidth();
@@ -133,7 +132,6 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
   {
     math::Vector3 translation;
 
-    //double factor = 2.0;
     double factor = 1.0;
 
     // The control key increases zoom speed by a factor of two.

@@ -161,8 +161,10 @@ GLWidget::GLWidget(QWidget *_parent)
   connect(this, SIGNAL(selectionMsgReceived(const QString &)), this,
       SLOT(OnSelectionMsgEvent(const QString &)), Qt::QueuedConnection);
 
-  connect(g_cameraOrthoAct, SIGNAL(toggled(bool)), this,
-          SLOT(OnOrtho(bool)));
+  connect(g_cameraOrthoAct, SIGNAL(triggered()), this,
+          SLOT(OnOrtho()));
+  connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
+          SLOT(OnPerspective()));
 }
 
 /////////////////////////////////////////////////
@@ -1317,7 +1319,17 @@ void GLWidget::OnModelEditor(bool _checked)
 }
 
 /////////////////////////////////////////////////
-void GLWidget::OnOrtho(bool _checked)
+void GLWidget::OnOrtho()
 {
-  this->userCamera->SetOrtho(_checked);
+  g_fpsAct->setEnabled(false);
+  g_orbitAct->setEnabled(false);
+  this->userCamera->SetOrtho(true);
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnPerspective()
+{
+  g_fpsAct->setEnabled(true);
+  g_orbitAct->setEnabled(true);
+  this->userCamera->SetOrtho(false);
 }
