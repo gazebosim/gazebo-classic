@@ -578,7 +578,12 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   if (vis && !vis->IsPlane() &&
       this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
   {
+    // Root visual
     rendering::VisualPtr rootVis = vis->GetRootVisual();
+
+    // Root visual's imediate child
+    rendering::VisualPtr topLevelVis = vis->GetFirstAncestorFromRootVisual();
+
     if (gui::get_entity_id(rootVis->GetName()))
     {
       // select model
@@ -588,7 +593,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
         vis->GetParent() != this->dataPtr->scene->GetWorldVisual())
     {
       // select link
-      vis = vis->GetParent();
+      vis = topLevelVis;
     }
     else
     {

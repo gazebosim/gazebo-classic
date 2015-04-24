@@ -368,6 +368,15 @@ namespace gazebo
       /// \param[in] _name Name of the link to remove.
       private: void RemoveLink(const std::string &_name);
 
+      /// \brief A helper function to recursively find the canonical link for
+      /// this model.
+      private: LinkPtr FindCanonicalLink();
+
+      /// \brief Set the canonical link for this model and all nested models.
+      /// This only needs to be called once after all models and links have been
+      /// loaded.
+      private: void SetCanonicalLink();
+
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;
 

@@ -49,6 +49,8 @@ namespace gazebo
   namespace gui
   {
     class LinkData;
+    class NestedModelData;
+    class ModelData;
     class SaveDialog;
     class JointMaker;
 
@@ -188,7 +190,7 @@ namespace gazebo
 
       /// \brief Remove a link from the model.
       /// \param[in] _linkName Name of the link to remove
-      public: void RemoveLink(const std::string &_linkName);
+      public: void RemoveEntity(const std::string &_entityName);
 
       /// \brief Set the model to be static
       /// \param[in] _static True to make the model static.
@@ -238,6 +240,12 @@ namespace gazebo
       /// \param[in] _link Link data used to generate the sdf.
       /// \return SDF element describing the link.
       private: sdf::ElementPtr GenerateLinkSDF(LinkData *_link);
+
+      /// \brief Internal helper function to remove a nestedModel without
+      /// removing
+      /// the joints.
+      /// \param[in] _nestedModelName Name of the nestedModel to remove
+      private: void RemoveNestedModelImpl(const std::string &_nestedModelName);
 
       /// \brief Internal helper function to remove a link without removing
       /// the joints.
@@ -293,12 +301,11 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
 
-      /// \brief Callback when a link is selected.
-      /// \param[in] _name Name of link.
-      /// \param[in] _selected True if the link is selected, false if
+      /// \brief Callback when a model editor entity is selected.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _selected True if the entity is selected, false if
       /// deselected.
-      private: void OnSetSelectedLink(const std::string &_name,
-          const bool _selected);
+      private: void OnSetSelected(const std::string &_name, const bool _selected);
 
       /// \brief Create link with default properties from a visual. This
       /// function creates a link that will become the parent of the
@@ -306,6 +313,11 @@ namespace gazebo
       /// visual will also be added to the link.
       /// \param[in] _visual Visual used to create the link.
       private: void CreateLink(const rendering::VisualPtr &_visual);
+
+      /// \brief Clone an existing nested model.
+      /// \param[in] _linkName Name of link to be cloned.
+      /// \return Cloned link.
+      private: NestedModelData *CloneNestedModel(const std::string &_modelName);
 
       /// \brief Clone an existing link.
       /// \param[in] _linkName Name of link to be cloned.
@@ -341,7 +353,9 @@ namespace gazebo
       /// \brief Load a model SDF file and create visuals in the model editor.
       /// This is used mainly when editing existing models.
       /// \param[in] _sdf SDF of a model to be loaded
-      private: void LoadSDF(sdf::ElementPtr _sdf);
+      private: rendering::VisualPtr CreateModelFromSDF(sdf::ElementPtr _sdf,
+          rendering::VisualPtr _parentVis = NULL,
+          bool _attachedToMouse = false);
 
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _axis Axis of alignment: x, y, or z.
@@ -438,6 +452,9 @@ namespace gazebo
       /// \brief A map of model link names to and their visuals.
       private: std::map<std::string, LinkData *> allLinks;
 
+      /// \brief A map of nested model names to and their visuals.
+      private: std::map<std::string, NestedModelData *> allNestedModels;
+
       /// \brief Transport node
       private: transport::NodePtr node;
 
@@ -455,11 +472,14 @@ namespace gazebo
       /// \brief origin of the model.
       private: math::Pose origin;
 
+      /// \brief A list of selected nestedModel visuals.
+      private: std::vector<rendering::VisualPtr> selectedNestedModels;
+
       /// \brief A list of selected link visuals.
       private: std::vector<rendering::VisualPtr> selectedLinks;
 
       /// \brief Names of links copied through g_copyAct
-      private: std::vector<std::string> copiedLinkNames;
+      private: std::vector<std::string> copiedNames;
 
       /// \brief The last mouse event
       private: common::MouseEvent lastMouseEvent;

@@ -98,7 +98,7 @@ void ModelCreator_TEST::SaveState()
       gui::ModelCreator::ALL_SAVED);
 
   // Remove a link to have unsaved changes
-  modelCreator->RemoveLink(cylinder->GetName());
+  modelCreator->RemoveEntity(cylinder->GetName());
   QCOMPARE(modelCreator->GetCurrentSaveState(),
       gui::ModelCreator::UNSAVED_CHANGES);
 

@@ -1195,8 +1195,8 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 
   if (!parentVis || !childVis)
   {
-    gzerr << "Unable to load joint. Joint child / parent not found"
-        << std::endl;
+    gzerr << "Unable to load joint. Joint child [" << childName <<
+        "] or parent [" << parentName << "] not found" << std::endl;
     return;
   }
 
@@ -1211,7 +1211,6 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   joint->jointMsg->CopyFrom(jointMsg);
   joint->jointMsg->set_parent_id(joint->parent->GetId());
   joint->jointMsg->set_child_id(joint->child->GetId());
-
 
   // Inspector
   joint->inspector = new JointInspector();

@@ -408,6 +408,11 @@ namespace gazebo
       /// visual.
       public: VisualPtr GetRootVisual();
 
+      /// \brief Get the root visual
+      /// \return The root visual, which is one level below the world
+      /// visual.
+      public: VisualPtr GetFirstAncestorFromRootVisual();
+
       /// \brief Get the shader type.
       /// \return String of the shader type: "vertex", "pixel",
       /// "normal_map_object_space", "normal_map_tangent_space".

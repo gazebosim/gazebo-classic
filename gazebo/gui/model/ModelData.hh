@@ -51,6 +51,33 @@ namespace gazebo
       public: static double GetEditTransparency();
     };
 
+    class NestedModelData
+    {
+      public: void SetName(const std::string &_name);
+
+      /// \brief Set the pose of the model.
+      /// \param[in] _pose Pose of model.
+      public: void SetPose(const math::Pose &_pose);
+
+      /// \brief Get the pose of the nested model.
+      /// \return Pose of nested model.
+      public: math::Pose GetPose() const;
+
+      /// \brief Clone the link data.
+      /// \param[in] _newName Name to give to the cloned link.
+      /// \return A clone of this link data.
+      public: NestedModelData *Clone(const std::string &_newName);
+
+      public: void CloneChildren(rendering::VisualPtr _from,
+          rendering::VisualPtr _to);
+
+      /// \brief SDF representing the model data.
+      public: sdf::ElementPtr modelSDF;
+
+      /// \brief Visual representing this model.
+      public: rendering::VisualPtr modelVisual;
+    };
+
     /// \class LinkData LinkData.hh
     /// \brief Helper class to store link data
     class LinkData : public QObject

@@ -240,11 +240,9 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
 {
   VisualPtr result(new Visual(_name, _newParent));
   result->Load(this->dataPtr->sdf);
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  for (auto iter: this->dataPtr->children)
   {
-    (*iter)->Clone((*iter)->GetName(), result);
+    iter->Clone(iter->GetName(), result);
   }
 
   if (_newParent == this->dataPtr->scene->GetWorldVisual())
@@ -2389,6 +2387,17 @@ VisualPtr Visual::GetRootVisual()
 {
   VisualPtr p = shared_from_this();
   while (p->GetParent() && p->GetParent()->GetName() != "__world_node__")
+    p = p->GetParent();
+
+  return p;
+}
+
+//////////////////////////////////////////////////
+VisualPtr Visual::GetFirstAncestorFromRootVisual()
+{
+  VisualPtr p = shared_from_this();
+  VisualPtr root = this->GetRootVisual();
+  while (p->GetParent() && p->GetParent() != root)
     p = p->GetParent();
 
   return p;
