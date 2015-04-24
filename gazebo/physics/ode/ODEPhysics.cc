@@ -1336,8 +1336,6 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = odeElem->GetElement("solver")->Get<int>("iters");
   else if (_key == "sor")
     _value = odeElem->GetElement("solver")->Get<double>("sor");
-  else if (_key == "friction_model")
-    _value = odeElem->GetElement("solver")->Get<int>("friction_model");
   else if (_key == "contact_max_correcting_vel")
     _value = odeElem->GetElement("constraints")->Get<double>(
         "contact_max_correcting_vel");

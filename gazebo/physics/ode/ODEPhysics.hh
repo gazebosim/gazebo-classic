@@ -150,10 +150,10 @@ namespace gazebo
       public: virtual void SetSORPGSW(double w);
 
       // Documentation inherited
-      public: virtual void SetFrictionModel(unsigned int fricModel);
+      public: virtual void SetContactMaxCorrectingVel(double vel);
 
       // Documentation inherited
-      public: virtual void SetContactMaxCorrectingVel(double vel);
+      public: virtual void SetFrictionModel(unsigned int fricModel);
 
       // Documentation inherited
       public: virtual void SetContactSurfaceLayer(double layer_depth);
@@ -177,10 +177,10 @@ namespace gazebo
       public: virtual double GetSORPGSW();
 
       // Documentation inherited
-      public: virtual int GetFrictionModel();
+      public: virtual double GetContactMaxCorrectingVel();
 
       // Documentation inherited
-      public: virtual double GetContactMaxCorrectingVel();
+      public: virtual int GetFrictionModel();
 
       // Documentation inherited
       public: virtual double GetContactSurfaceLayer();
