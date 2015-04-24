@@ -57,12 +57,6 @@ namespace gazebo
     /// \brief Connection to World Update events.
     protected: event::ConnectionPtr updateConnection;
 
-    /// \brief Pointer to world.
-    //protected: physics::WorldPtr world;
-
-    /// \brief Pointer to physics engine.
-    //protected: physics::PhysicsEnginePtr physics;
-
     /// \brief Pointer to model containing the plugin.
     protected: physics::ModelPtr model;
 

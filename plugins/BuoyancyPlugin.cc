@@ -80,10 +80,7 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       double density = 0;
       for (auto collision : link->GetCollisions)
       {
-        // density += collision->GetBoundingBox()
-        switch (collision->GetShapeType())
-        {
-        }
+        double volume = collision->GetShape()->ComputeVolume();
       }
       this->volPropsMap[id].cov = ;
       this->volPropsMap[id].density = density;
