@@ -69,6 +69,12 @@ void SchematicViewWidget::Init()
   this->connections.push_back(gui::model::Events::ConnectLinkRemoved(
       boost::bind(&SchematicViewWidget::RemoveNode, this, _1)));
 
+  this->connections.push_back(gui::model::Events::ConnectNestedModelInserted(
+      boost::bind(&SchematicViewWidget::AddNode, this, _1)));
+
+  this->connections.push_back(gui::model::Events::ConnectNestedModelRemoved(
+      boost::bind(&SchematicViewWidget::RemoveNode, this, _1)));
+
   this->connections.push_back(gui::model::Events::ConnectJointInserted(
       boost::bind(&SchematicViewWidget::AddEdge, this, _1, _2, _3, _4)));
 
