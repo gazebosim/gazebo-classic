@@ -1888,7 +1888,35 @@ void World::ProcessMessages()
       {
         for (auto const &model : this->dataPtr->publishModelPoses)
         {
-          msgs::Pose *poseMsg = msg.add_pose();
+          std::list<ModelPtr> modelList;
+          modelList.push_back(model);
+          while (!modelList.empty())
+          {
+            ModelPtr m = modelList.front();
+            modelList.pop_front();
+            msgs::Pose *poseMsg = msg.add_pose();
+
+            // Publish the model's relative pose
+            poseMsg->set_name(m->GetScopedName());
+            poseMsg->set_id(m->GetId());
+            msgs::Set(poseMsg, m->GetRelativePose());
+
+            // Publish each of the model's child links relative poses
+            Link_V links = m->GetLinks();
+            for (auto const &link : links)
+            {
+              poseMsg = msg.add_pose();
+              poseMsg->set_name(link->GetScopedName());
+              poseMsg->set_id(link->GetId());
+              msgs::Set(poseMsg, link->GetRelativePose());
+            }
+
+            // add all nested models to the queue
+            Model_V models = m->GetModels();
+            for (auto const &n : models)
+              modelList.push_back(n);
+          }
+          /*msgs::Pose *poseMsg = msg.add_pose();
 
           // Publish the model's relative pose
           poseMsg->set_name(model->GetScopedName());
@@ -1903,7 +1931,7 @@ void World::ProcessMessages()
             poseMsg->set_name(link->GetScopedName());
             poseMsg->set_id(link->GetId());
             msgs::Set(poseMsg, link->GetRelativePose());
-          }
+          }*/
         }
 
         if (this->dataPtr->posePub && this->dataPtr->posePub->HasConnections())

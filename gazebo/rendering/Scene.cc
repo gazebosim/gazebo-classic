@@ -1860,6 +1860,7 @@ void Scene::PreRender()
         {
           math::Pose pose = msgs::Convert(pIter->second);
           GZ_ASSERT(iter->second, "Visual pointer is NULL");
+          std::cerr << " setting vis pose " << iter->second->GetName() << " " << pose << std::endl;
           iter->second->SetPose(pose);
           PoseMsgs_M::iterator prev = pIter++;
           this->dataPtr->poseMsgs.erase(prev);

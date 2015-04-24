@@ -298,6 +298,7 @@ void Entity::SetWorldTwist(const math::Vector3 &_linear,
 void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
         bool _publish)
 {
+  std::cerr << "set world model " << _pose << std::endl;
   math::Pose oldModelWorldPose = this->worldPose;
 
   // initialization: (no children?) set own worldPose
@@ -363,6 +364,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
 void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
         bool _publish)
 {
+  std::cerr << "set world can " << this->GetName() << " " << _pose << std::endl;
   this->worldPose = _pose;
   this->worldPose.Correct();
 
@@ -444,7 +446,7 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
 void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
         bool /*_publish*/)
 {
-//  std::cerr << "set world pose default " << this->GetName() << " " << _pose << std::endl;
+  std::cerr << "set world pose default " << this->GetName() << " " << _pose << std::endl;
   this->worldPose = _pose;
   this->worldPose.Correct();
 

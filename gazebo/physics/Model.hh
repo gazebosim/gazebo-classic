@@ -152,6 +152,10 @@ namespace gazebo
       /// \return Get the number of joints.
       public: unsigned int GetJointCount() const;
 
+      /// \brief Get all the nested models.
+      /// \return a vector of Model's in this model
+      public: const Model_V &GetModels() const;
+
       /// \brief Construct and return a vector of Link's in this model
       /// Note this constructs the vector of Link's on the fly, could be costly
       /// \return a vector of Link's in this model

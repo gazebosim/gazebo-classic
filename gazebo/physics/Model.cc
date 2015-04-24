@@ -123,18 +123,34 @@ void Model::LoadLinks()
           ModelPtr model = boost::static_pointer_cast<Model>(entity);
           LinkPtr tmpLink = model->GetLink();
           if (tmpLink)
+          {
             cLink = tmpLink;
+            break;
+          }
           entity = entity->GetParent();
         }
 
         if (cLink)
         {
           this->canonicalLink = cLink;
+          std::cerr << this->GetName() << " can link = " << this->canonicalLink->GetName() << std::endl;
         }
         else
         {
+          // first link found, set as canonical link
           link->SetCanonicalLink(true);
           this->canonicalLink = link;
+
+          // notify parent models of this canonical link
+          entity = this->GetParent();
+          while (entity && entity->HasType(MODEL))
+          {
+            ModelPtr model = boost::static_pointer_cast<Model>(entity);
+            model->canonicalLink = this->canonicalLink;
+            entity = entity->GetParent();
+          }
+
+          std::cerr << this->GetName() << " can first link = " << this->canonicalLink->GetName() << std::endl;
         }
       }
 
@@ -182,12 +198,18 @@ void Model::SetCanonicalLink()
 {
   // Set the canonical link in all nested models
   if (!this->canonicalLink)
+  {
     this->canonicalLink = this->FindCanonicalLink();
+  //  std::cerr << this->GetName() << " set can link = " << this->canonicalLink->GetName() << std::endl;
+  }
 
   if (this->canonicalLink)
   {
     for (auto model : this->models)
+    {
       model->canonicalLink = this->canonicalLink;
+      std::cerr << model->GetName() << " set n can link = " << this->canonicalLink->GetName() << std::endl;
+    }
   }
 }
 
@@ -243,7 +265,7 @@ void Model::LoadJoints()
 //////////////////////////////////////////////////
 void Model::Init()
 {
-  this->SetCanonicalLink();
+//  this->SetCanonicalLink();
 
   // Record the model's initial pose (for reseting)
   this->SetInitialRelativePose(this->sdf->Get<math::Pose>("pose"));
@@ -670,6 +692,12 @@ JointPtr Model::GetJoint(const std::string &_name)
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+const Model_V &Model::GetModels() const
+{
+  return this->models;
 }
 
 //////////////////////////////////////////////////
