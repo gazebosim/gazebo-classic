@@ -571,7 +571,7 @@ ODE_API dReal dWorldGetQuickStepWarmStartFactor (dWorldID);
 ODE_API int dWorldGetQuickStepExtraFrictionIterations (dWorldID);
 
 /**
- * @brief Get which friction model to choose: cone, pyramid, box.
+ * @brief Get the friction model.
  * @ingroup world
  */
 ODE_API int dWorldGetQuickStepFrictionModel(dWorldID);
@@ -623,8 +623,8 @@ ODE_API void dWorldSetQuickStepWarmStartFactor (dWorldID, dReal warm);
 ODE_API void dWorldSetQuickStepExtraFrictionIterations (dWorldID, int iters);
 
 /**
- * @brief choose one of the friction models: cone friction, pyramid friction
- * and box friction
+ * @brief Set the friction model from: cone friction, pyramid friction
+ * and box friction. 
  * @ingroup world
  * @param enum for friction model
  */
