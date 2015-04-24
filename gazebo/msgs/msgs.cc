@@ -93,6 +93,7 @@ namespace gazebo
         {
           gzerr << "ParsePartialFromString failed"
                 << std::endl;
+          gzthrow("ParseFromString failed");
           return false;
         }
       }
