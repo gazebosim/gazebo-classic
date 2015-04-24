@@ -59,6 +59,6 @@ double Shape::ComputeVolume() const
          << this->collisionParent << ", returning bounding box approximation"
          << std::endl;
 
-  math::Vector3 size = this->collisionParent->GetBoundingBox().this->GetSize();
+  math::Vector3 size = this->collisionParent->GetBoundingBox().GetSize();
   return size.x * size.y * size.z;
 }
