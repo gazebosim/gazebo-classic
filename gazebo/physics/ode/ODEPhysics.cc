@@ -277,7 +277,6 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(this->GetSORPGSW());
-    physicsMsg.set_friction_model(this->GetFrictionModel());
     physicsMsg.set_cfm(this->GetWorldCFM());
     physicsMsg.set_erp(this->GetWorldERP());
     physicsMsg.set_contact_max_correcting_vel(
@@ -317,9 +316,6 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   if (_msg->has_sor())
     this->SetSORPGSW(_msg->sor());
-
-  if (_msg->has_friction_model())
-    this->SetFrictionModel(_msg->friction_model());
 
   if (_msg->has_cfm())
     this->SetWorldCFM(_msg->cfm());
@@ -586,12 +582,19 @@ void ODEPhysics::SetSORPGSW(double _w)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetFrictionModel(unsigned int _fricModel)
+void ODEPhysics::SetFrictionModel(const std::string &_fricModel)
 {
+  unsigned int fricModel;
+  if(_fricModel.compare("cone_model"))
+      fricModel = 0;
+  else if(_fricModel.compare("pyramid_model"))
+      fricModel = 1;
+  else if(_fricModel.compare("box_model"))
+      fricModel = 2;
+      
   this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetElement("friction_model")->Set(_fricModel);
-
-  dWorldSetQuickStepFrictionModel(this->dataPtr->worldId, _fricModel);
+      "solver")->GetElement("friction_model")->Set(fricModel); 
+  dWorldSetQuickStepFrictionModel(this->dataPtr->worldId, fricModel);
 }
 
 //////////////////////////////////////////////////
@@ -661,7 +664,7 @@ double ODEPhysics::GetSORPGSW()
 int ODEPhysics::GetFrictionModel()
 {
   return this->sdf->GetElement("ode")->GetElement(
-      "solver")->Get<double>("friction_model");
+      "solver")->Get<int>("friction_model");
 }
 
 //////////////////////////////////////////////////

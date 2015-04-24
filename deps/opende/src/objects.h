@@ -50,9 +50,9 @@ enum {
 };
 
 enum{
-    cone_friction,             // use cone model
-    pyramid_friction,          // use pyramid friction
-    box_friction               // use box friction
+    cone_friction,             // use cone friction model
+    pyramid_friction,          // use pyramid friction model
+    box_friction               // use box friction model
 };
 
 // base class that does correct object allocation / deallocation
