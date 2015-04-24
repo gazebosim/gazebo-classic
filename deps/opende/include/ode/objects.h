@@ -624,7 +624,7 @@ ODE_API void dWorldSetQuickStepExtraFrictionIterations (dWorldID, int iters);
 
 /**
  * @brief Set the friction model from: cone friction, pyramid friction
- * and box friction. 
+ * and box friction.
  * @ingroup world
  * @param enum for friction model
  */
