@@ -1613,7 +1613,6 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   }
 
   {
-    boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
     for (int i = 0; i < _msg.model_size(); ++i)
     {
       boost::shared_ptr<msgs::Model> mm(new msgs::Model(_msg.model(i)));
@@ -1856,7 +1855,7 @@ void Scene::PreRender()
         // If an object is selected, don't let the physics engine move it.
         if (!this->dataPtr->selectedVis
             || this->dataPtr->selectionMode != "move" ||
-            iter->first != this->dataPtr->selectedVis->GetId())
+            !this->dataPtr->selectedVis->IsAncestorOf(iter->second))
         {
           math::Pose pose = msgs::Convert(pIter->second);
           GZ_ASSERT(iter->second, "Visual pointer is NULL");

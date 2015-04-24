@@ -2883,3 +2883,19 @@ sdf::ElementPtr Visual::GetSDF() const
 {
   return this->dataPtr->sdf;
 }
+
+/////////////////////////////////////////////////
+bool Visual::IsAncestorOf(rendering::VisualPtr _visual)
+{
+  if (!_visual)
+    return false;
+
+  rendering::VisualPtr vis = _visual->GetParent();
+  while (vis)
+  {
+    if (vis->GetName() == this->GetName())
+      return true;
+    vis = vis->GetParent();
+  }
+  return false;
+}

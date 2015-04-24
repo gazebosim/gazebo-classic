@@ -515,6 +515,11 @@ namespace gazebo
       /// \brief Clear parents.
       public: void ClearParent();
 
+      /// \brief Check if this visual is an ancestor of another visual.
+      /// \param[in] _visual Visual.
+      /// \return True if this visual is an ancestor.
+      bool IsAncestorOf(rendering::VisualPtr _visual);
+
       /// \internal
       /// \brief Constructor used by inherited classes
       /// \param[in] _dataPtr Pointer to private data.
