@@ -4,6 +4,9 @@
     + [http://ignitionrobotics.org/libraries/math](http://ignitionrobotics.org/libraries/math)
     + [Gazebo migration](https://bitbucket.org/osrf/gazebo/src/583edbeb90759d43d994cc57c0797119dd6d2794/ign-math-migration.md)
 
+1. New accessors in LogPlay class.
+    * [Pull request #1577](https://bitbucket.org/osrf/gazebo/pull-request/1577)
+
 1. Added a plugin to send messages to an existing website.
    Added gui::MainWindow::AddMenu and msgs/rest_error, msgs/rest_login, msgs rest/post
     * [Pull request #1524](https://bitbucket.org/osrf/gazebo/pull-request/1524)
@@ -37,6 +40,9 @@
 
 1. Pass Coulomb surface friction parameters to DART.
     * [Pull request #1420](https://bitbucket.org/osrf/gazebo/pull-request/1420)
+
+1. Added ModelAlign::SetHighlighted
+    * [Pull request #1598](https://bitbucket.org/osrf/gazebo/pull-request/1598)
 
 1. Added various Get functions to Visual. Also added a ConvertGeometryType function to msgs.
     * [Pull request #1402](https://bitbucket.org/osrf/gazebo/pull-request/1402)
