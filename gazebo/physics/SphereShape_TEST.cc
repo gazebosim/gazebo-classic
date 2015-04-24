@@ -152,6 +152,10 @@ TEST_F(SphereShapeTest, Volume)
   sphere->SetRadius(2);
 
   EXPECT_DOUBLE_EQ(sphere->ComputeVolume(), 4*M_PI*8/3);
+
+  // The bounding box approximation should be 0 because the Shape has no
+  // Collision parent
+  EXPECT_DOUBLE_EQ(box->Shape::ComputeVolume(), 0);
 }
 
 int main(int argc, char **argv)

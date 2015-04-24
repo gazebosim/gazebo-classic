@@ -177,6 +177,10 @@ TEST_F(CylinderShapeTest, Volume)
   cylinder->SetLength(3);
   cylinder->SetRadius(2);
   EXPECT_FLOAT_EQ(cylinder->ComputeVolume(), M_PI*4*3);
+
+  // The bounding box approximation should be 0 because the Shape has no
+  // Collision parent
+  EXPECT_DOUBLE_EQ(box->Shape::ComputeVolume(), 0);
 }
 
 int main(int argc, char **argv)

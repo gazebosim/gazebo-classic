@@ -172,6 +172,10 @@ TEST_F(BoxShapeTest, Volume)
   box->SetSize(math::Vector3(2.0, 3.0, 4.0));
 
   EXPECT_DOUBLE_EQ(box->ComputeVolume(), 24.0);
+
+  // The bounding box approximation should be 0 because the Shape has no
+  // Collision parent
+  EXPECT_DOUBLE_EQ(box->Shape::ComputeVolume(), 0);
 }
 
 int main(int argc, char **argv)
