@@ -65,6 +65,10 @@ namespace gazebo
       /// \param[in] _msg The message to set values from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg) = 0;
 
+      /// \brief Get the volume of this shape.
+      /// \return The shape volume, which varies depending on the subtype.
+      public: virtual double ComputeVolume() const;
+
       /// \brief This shape's collision parent.
       protected: CollisionPtr collisionParent;
 

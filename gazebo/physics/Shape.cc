@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
 
@@ -44,4 +45,20 @@ Shape::~Shape()
 math::Vector3 Shape::GetScale() const
 {
   return this->scale;
+}
+
+//////////////////////////////////////////////////
+double Shape::ComputeVolume() const
+{
+  if (!this->collisionParent)
+  {
+    gzerr << "Cannot discern shape type, returning 0 volume" << std::endl;
+    return 0;
+  }
+  gzwarn << "ComputeVolume not fully implemented for shape type "
+         << this->collisionParent << ", returning bounding box approximation"
+         << std::endl;
+
+  math::Vector3 size = this->collisionParent->GetBoundingBox().this->GetSize();
+  return size.x * size.y * size.z;
 }
