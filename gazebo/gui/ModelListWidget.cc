@@ -52,8 +52,6 @@
 #include "gazebo/gui/qtpropertybrowser/qtvariantproperty.h"
 #include "gazebo/gui/ModelListWidget.hh"
 
-#include "gazebo/msgs/msgs.hh"
-
 // avoid collision from Mac OS X's ConditionalMacros.h
 #ifdef __MACH__
 #undef TYPE_BOOL
@@ -389,42 +387,42 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   if (_msg->has_type() && _msg->type() == this->modelMsg.GetTypeName())
   {
     this->propMutex->lock();
-    this->msgs::ParseFromString(modelMsg, _msg->serialized_data());
+    msgs::ParseFromString(this->modelMsg, _msg->serialized_data());
     this->fillTypes.push_back("Model");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->linkMsg.GetTypeName())
   {
     this->propMutex->lock();
-    this->msgs::ParseFromString(linkMsg, _msg->serialized_data());
+    msgs::ParseFromString(this->linkMsg, _msg->serialized_data());
     this->fillTypes.push_back("Link");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->jointMsg.GetTypeName())
   {
     this->propMutex->lock();
-    this->msgs::ParseFromString(jointMsg, _msg->serialized_data());
+    msgs::ParseFromString(this->jointMsg, _msg->serialized_data());
     this->fillTypes.push_back("Joint");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->sceneMsg.GetTypeName())
   {
     this->propMutex->lock();
-    this->msgs::ParseFromString(sceneMsg, _msg->serialized_data());
+    msgs::ParseFromString(this->sceneMsg, _msg->serialized_data());
     this->fillTypes.push_back("Scene");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->physicsMsg.GetTypeName())
   {
     this->propMutex->lock();
-    this->msgs::ParseFromString(physicsMsg, _msg->serialized_data());
+    msgs::ParseFromString(this->physicsMsg, _msg->serialized_data());
     this->fillTypes.push_back("Physics");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->lightMsg.GetTypeName())
   {
     this->propMutex->lock();
-    this->msgs::ParseFromString(lightMsg, _msg->serialized_data());
+    msgs::ParseFromString(this->lightMsg, _msg->serialized_data());
     this->fillTypes.push_back("Light");
     this->propMutex->unlock();
   }
@@ -432,7 +430,7 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
            _msg->type() == this->sphericalCoordMsg.GetTypeName())
   {
     this->propMutex->lock();
-    this->msgs::ParseFromString(sphericalCoordMsg, _msg->serialized_data());
+    msgs::ParseFromString(this->sphericalCoordMsg, _msg->serialized_data());
     this->fillTypes.push_back("Spherical Coordinates");
     this->propMutex->unlock();
   }
