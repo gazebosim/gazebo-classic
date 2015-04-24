@@ -1855,11 +1855,15 @@ void Scene::PreRender()
         // If an object is selected, don't let the physics engine move it.
         if (!this->dataPtr->selectedVis
             || this->dataPtr->selectionMode != "move" ||
-            !this->dataPtr->selectedVis->IsAncestorOf(iter->second))
+            (iter->first != this->dataPtr->selectedVis->GetId() &&
+            !this->dataPtr->selectedVis->IsAncestorOf(iter->second)))
         {
           math::Pose pose = msgs::Convert(pIter->second);
           GZ_ASSERT(iter->second, "Visual pointer is NULL");
-          std::cerr << " setting vis pose " << iter->second->GetName() << " " << pose << std::endl;
+          std::cerr << " setting vis pose " << iter->second->GetName() << " " << pose << ", mode: " <<
+              this->dataPtr->selectionMode << std::endl;
+          if (this->dataPtr->selectedVis)
+            std::cerr << " sel vis " << this->dataPtr->selectedVis->GetName() << std::endl;
           iter->second->SetPose(pose);
           PoseMsgs_M::iterator prev = pIter++;
           this->dataPtr->poseMsgs.erase(prev);
