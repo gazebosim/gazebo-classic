@@ -314,7 +314,11 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
   // get the gravity vector
   // small positive y component
   math::Vector3 g = physics->GetGravity();
-  physics->SetFrictionModel("cone_model");
+
+  // Set friction model
+  // "cone_model", "pyramid_model", "box_model"
+  const std::string frictionModel = "cone_model";
+  physics->SetParam("friction_model", frictionModel);
 
   // Spawn concentric semi-circles of boxes
   int boxes = 32;

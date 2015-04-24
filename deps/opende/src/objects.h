@@ -50,8 +50,8 @@ enum {
 };
 
 enum{
-    cone_friction,             // use cone friction model
     pyramid_friction,          // use pyramid friction model
+    cone_friction,             // use cone friction model
     box_friction               // use box friction model
 };
 

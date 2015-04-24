@@ -584,16 +584,17 @@ void ODEPhysics::SetSORPGSW(double _w)
 //////////////////////////////////////////////////
 void ODEPhysics::SetFrictionModel(const std::string &_fricModel)
 {
-  unsigned int fricModel;
-  if(_fricModel.compare("cone_model"))
+  unsigned int fricModel = 0;
+  if(_fricModel.compare("pyramid_model") == 0)
       fricModel = 0;
-  else if(_fricModel.compare("pyramid_model"))
+  else if(_fricModel.compare("cone_model") == 0)
       fricModel = 1;
-  else if(_fricModel.compare("box_model"))
+  else if(_fricModel.compare("box_model") == 0)
       fricModel = 2;
-      
-  this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetElement("friction_model")->Set(fricModel); 
+
+  // Comment this until sdformat changes
+  // this->sdf->GetElement("ode")->GetElement(
+  //    "solver")->GetElement("friction_model")->Set(fricModel);
   dWorldSetQuickStepFrictionModel(this->dataPtr->worldId, fricModel);
 }
 
@@ -661,11 +662,14 @@ double ODEPhysics::GetSORPGSW()
 }
 
 //////////////////////////////////////////////////
+// Comment this out until sdformat changes
+/*
 int ODEPhysics::GetFrictionModel()
 {
   return this->sdf->GetElement("ode")->GetElement(
       "solver")->Get<int>("friction_model");
 }
+*/
 
 //////////////////////////////////////////////////
 double ODEPhysics::GetWorldCFM()
@@ -1222,11 +1226,7 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
       dWorldSetQuickStepW(this->dataPtr->worldId, value);
     }
     else if (_key == "friction_model")
-    {
-      int value = boost::any_cast<int>(_value);
-      odeElem->GetElement("solver")->GetElement("friction_model")->Set(value);
-      dWorldSetQuickStepFrictionModel(this->dataPtr->worldId, value);
-    }
+      this->SetFrictionModel(boost::any_cast<std::string>(_value));
     else if (_key == "contact_max_correcting_vel")
     {
       double value = boost::any_cast<double>(_value);

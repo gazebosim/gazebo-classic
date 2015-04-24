@@ -180,7 +180,8 @@ namespace gazebo
       public: virtual double GetContactMaxCorrectingVel();
 
       // Documentation inherited
-      public: virtual int GetFrictionModel();
+      // Comment this until sdformat changes
+      // public: virtual int GetFrictionModel();
 
       // Documentation inherited
       public: virtual double GetContactSurfaceLayer();

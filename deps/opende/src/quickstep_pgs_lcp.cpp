@@ -35,7 +35,7 @@
 #include "quickstep_pgs_lcp.h"
 
 using namespace ode;
- 
+
 using namespace quickstep;
 static void ComputeRows(
 #ifdef SHOW_CONVERGENCE
@@ -181,7 +181,7 @@ static void ComputeRows(
   dRealMutablePtr caccel_erp_ptr2;
   dRealMutablePtr cforce_ptr1;
   dRealMutablePtr cforce_ptr2;
-  int total_iterations = precon_iterations + num_iterations + 
+  int total_iterations = precon_iterations + num_iterations +
     friction_iterations;
   for (int iteration = 0; iteration < total_iterations; ++iteration)
   {
@@ -485,17 +485,17 @@ static void ComputeRows(
         dReal hi_act, lo_act;
         dReal hi_act_erp, lo_act_erp;
         if (constraint_index >= 0) {
-            if(friction_model == cone_friction) {
-                dxConeFrictionModel(hi_act, lo_act, hi_act_erp, lo_act_erp, jb, J_orig,
-                        index, constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
-            }
-            else if(friction_model == pyramid_friction) {
+            if(friction_model == pyramid_friction) {
                 // FOR erp throttled by info.c_v_max or info.c
                 hi_act = dFabs (hi[index] * lambda[constraint_index]);
                 lo_act = -hi_act;
                 // for the unthrottled _erp version
                 hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
                 lo_act_erp = -hi_act_erp;
+            }
+            else if(friction_model == cone_friction) {
+                dxConeFrictionModel(hi_act, lo_act, hi_act_erp, lo_act_erp, jb, J_orig, index,
+                        constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
             }
             else if(friction_model == box_friction) {
                 hi_act = hi[index];
