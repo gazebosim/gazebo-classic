@@ -55,9 +55,8 @@ double Shape::ComputeVolume() const
     gzerr << "Cannot discern shape type, returning 0 volume" << std::endl;
     return 0;
   }
-  gzwarn << "ComputeVolume not fully implemented for shape type "
-         << this->collisionParent << ", returning bounding box approximation"
-         << std::endl;
+  gzwarn << "ComputeVolume not fully implemented for this shape type, returning"
+         << " bounding box approximation" << std::endl;
 
   math::Vector3 size = this->collisionParent->GetBoundingBox().GetSize();
   return size.x * size.y * size.z;

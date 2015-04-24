@@ -23,8 +23,8 @@ using namespace gazebo;
 class PolylineTest : public ServerFixture,
                      public testing::WithParamInterface<const char*>
 {
-  public: void PolylineWorld(const std::string &_physicsEngine);
   public: void ComputeVolume(const std::string &_physicsEngine);
+  public: void PolylineWorld(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
