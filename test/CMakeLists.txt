@@ -31,7 +31,7 @@ set(GTEST_LIBRARY "${PROJECT_BINARY_DIR}/test/libgtest.a")
 set(GTEST_MAIN_LIBRARY "${PROJECT_BINARY_DIR}/test/libgtest_main.a")
 
 # Build ServerFixture library
-add_library(gazebo_test_fixture STATIC ServerFixture.cc)
+add_library(gazebo_test_fixture STATIC ServerFixture.cc ServerFixtureRecord.cc)
 target_link_libraries(gazebo_test_fixture libgazebo)
 gz_install_library(gazebo_test_fixture)
 
