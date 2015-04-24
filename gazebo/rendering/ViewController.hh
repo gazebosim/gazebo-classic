@@ -51,7 +51,7 @@ namespace gazebo
       /// of the Camera.
       public: virtual void Update() = 0;
 
-      /// \brief Called by the UserCamear when a resize event occurs.
+      /// \brief Called by the UserCamera when a resize event occurs.
       /// \param[in] _width New width
       /// \param[in] _height New height
       public: virtual void Resize(int _width, int _height);

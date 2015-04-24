@@ -1722,12 +1722,11 @@ void Camera::UpdateFOV()
   if (this->viewport)
   {
     this->viewport->setDimensions(0, 0, 1, 1);
+    double ratio = static_cast<double>(this->viewport->getActualWidth()) /
+      static_cast<double>(this->viewport->getActualHeight());
 
-    double width = static_cast<double>(this->viewport->getActualWidth());
-    double height = static_cast<double>(this->viewport->getActualHeight());
-
-    double ratio = width / height;
-    double hfov = this->sdf->Get<double>("horizontal_fov");
+    double hfov =
+      this->sdf->Get<double>("horizontal_fov");
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->camera->setAspectRatio(ratio);
@@ -1755,6 +1754,7 @@ void Camera::SetOrtho(const bool _ortho)
 {
   if (_ortho)
   {
+    // Shadows do not work properly with orthographic projection
     this->scene->SetShadowsEnabled(false);
     this->camera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
   }

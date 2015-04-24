@@ -129,8 +129,6 @@ namespace gazebo
       /// \brief A flag used to inidicate that the view controller has just
       /// been initialized.
       protected: bool init;
-
-      protected: double orthoZoom;
     };
     /// \}
   }

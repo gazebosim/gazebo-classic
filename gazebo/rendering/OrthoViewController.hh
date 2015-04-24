@@ -48,7 +48,7 @@ namespace gazebo
       public: virtual void Init();
 
       /// \brief Get the type name of this view controller.
-      /// \return The view controller name: "orbit".
+      /// \return The view controller name: "ortho".
       public: static std::string GetTypeString();
 
       /// \brief Handle a mouse event.
@@ -79,9 +79,6 @@ namespace gazebo
 
       /// \brief Private data pointer
       private: OrthoViewControllerPrivate *dataPtr;
-
-      /// \brief Pseudo distance factor used for updating the visual reference
-      // private: double pseudoDistanceFactor;
     };
     /// \}
   }

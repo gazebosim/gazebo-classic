@@ -535,11 +535,6 @@ namespace gazebo
       /// False to turn on perspective projection.
       public: virtual void SetOrtho(const bool _ortho);
 
-      protected: Ogre::Matrix4 BuildScaledOrthoMatrix(
-                     double _left, double _right,
-                     double _bottom, double _top,
-                     double _near, double _far);
-
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 

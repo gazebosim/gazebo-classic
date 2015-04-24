@@ -1214,7 +1214,7 @@ void MainWindow::CreateActions()
 #endif
 
   g_cameraOrthoAct = new QAction(tr("Orthographic"), this);
-  g_cameraOrthoAct->setStatusTip(tr("Orthogonal Projection"));
+  g_cameraOrthoAct->setStatusTip(tr("Orthographic Projection"));
   g_cameraOrthoAct->setCheckable(true);
   g_cameraOrthoAct->setChecked(false);
 

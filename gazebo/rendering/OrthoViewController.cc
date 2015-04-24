@@ -188,7 +188,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
     }
 
     // pseudo distance
-    this->distance = 1000/this->dataPtr->scale;
+    this->distance = 1000.0/this->dataPtr->scale;
 
     double factor = 1.0;
 
@@ -235,25 +235,6 @@ void OrthoViewController::Zoom(const float _amount,
   // build custom projection matrix from custom near and far clipping planes,
   // had to set a negative near clippping plane to workaround a camera
   // culling issue in orthographic view.
-  /*double left = width / this->dataPtr->scale / -2.0f;
-  double right = width / this->dataPtr->scale / 2.0f;
-  double bottom = height / this->dataPtr->scale / -2.0f;
-  double top = height / this->dataPtr->scale / 2.0f;
-  double near = -500;
-  double far = 500;
-  double invw = 1 / (right - left);
-  double invh = 1 / (top - bottom);
-  double invd = 1 / (far - near);
-  Ogre::Matrix4 proj = Ogre::Matrix4::ZERO;
-  proj[0][0] = 2 * invw;
-  proj[0][3] = -(right + left) * invw;
-  proj[1][1] = 2 * invh;
-  proj[1][3] = -(top + bottom) * invh;
-  proj[2][2] = -2 * invd;
-  proj[2][3] = -(far + near) * invd;
-  proj[3][3] = 1;
-  */
-
   Ogre::Matrix4 proj;
   proj = this->BuildScaledOrthoMatrix(
       -width / this->dataPtr->scale / 2.0,
