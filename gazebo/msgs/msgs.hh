@@ -501,6 +501,16 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Header *GetHeader(google::protobuf::Message &_message);
 
+    /// \brief Try to parse a protobuf message from a string.
+    /// First use ParseFromString. If it fails, try
+    /// ParseFromPartialString.
+    /// \param[out] _message Google protobuf message to parse to
+    /// \param[in] _data Message serialized as string.
+    /// \return True for success, false for failure.
+    GAZEBO_VISIBLE
+    bool ParseFromString(google::protobuf::Message &_message,
+                         const std::string &_data);
+
     /// \}
   }
 }

@@ -41,6 +41,7 @@ namespace gazebo
     /// \param[in] _sdf sdf::ElementPtr to fill with data.
     void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf);
 
+    /////////////////////////////////////////////////
     /// Create a request message
     msgs::Request *CreateRequest(const std::string &_request,
         const std::string &_data)
@@ -54,12 +55,14 @@ namespace gazebo
       return request;
     }
 
+    /////////////////////////////////////////////////
     const google::protobuf::FieldDescriptor *GetFD(
         google::protobuf::Message &message, const std::string &name)
     {
       return message.GetDescriptor()->FindFieldByName(name);
     }
 
+    /////////////////////////////////////////////////
     msgs::Header *GetHeader(google::protobuf::Message &message)
     {
       google::protobuf::Message *msg = NULL;
@@ -78,6 +81,25 @@ namespace gazebo
       return (msgs::Header*)msg;
     }
 
+    /////////////////////////////////////////////////
+    bool ParseFromString(google::protobuf::Message &_message,
+                         const std::string &_data)
+    {
+      if (!_message.ParseFromString(_data))
+      {
+        gzerr << "ParseFromString failed, trying ParsePartialFromString"
+              << std::endl;
+        if (!_message.ParsePartialFromString(_data))
+        {
+          gzerr << "ParsePartialFromString failed"
+                << std::endl;
+          return false;
+        }
+      }
+      return true;
+    }
+
+    /////////////////////////////////////////////////
     void Init(google::protobuf::Message &_message, const std::string &_id)
     {
       msgs::Header *header = GetHeader(_message);
@@ -90,11 +112,13 @@ namespace gazebo
       }
     }
 
+    /////////////////////////////////////////////////
     void Stamp(msgs::Header *_hdr)
     {
       Stamp(_hdr->mutable_stamp());
     }
 
+    /////////////////////////////////////////////////
     void Stamp(msgs::Time *_time)
     {
       common::Time tm = common::Time::GetWallTime();
@@ -103,6 +127,7 @@ namespace gazebo
       _time->set_nsec(tm.nsec);
     }
 
+    /////////////////////////////////////////////////
     std::string Package(const std::string &type,
         const google::protobuf::Message &message)
     {
