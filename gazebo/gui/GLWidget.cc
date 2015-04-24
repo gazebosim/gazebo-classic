@@ -1327,7 +1327,7 @@ void GLWidget::OnOrtho()
   // Disable view control options when in ortho projection
   g_fpsAct->setEnabled(false);
   g_orbitAct->setEnabled(false);
-  this->userCamera->SetOrtho(true);
+  this->userCamera->SetProjectionType("orthographic");
 }
 
 /////////////////////////////////////////////////
@@ -1336,5 +1336,5 @@ void GLWidget::OnPerspective()
   // Enable view control options when in perspective projection
   g_fpsAct->setEnabled(true);
   g_orbitAct->setEnabled(true);
-  this->userCamera->SetOrtho(false);
+  this->userCamera->SetProjectionType("perspective");
 }

@@ -567,6 +567,12 @@ namespace gazebo
               camSDF->Get<std::string>("view_controller"));
         }
 
+        if (camSDF->HasElement("projection_type"))
+        {
+          guiCam->set_projection_type(
+              camSDF->Get<std::string>("projection_type"));
+        }
+
         if (camSDF->HasElement("track_visual"))
         {
           guiCam->mutable_track()->CopyFrom(
@@ -1403,8 +1409,7 @@ namespace gazebo
 
       if (_msg.has_horizontal_fov())
       {
-        cameraSDF->GetElement("horizontal_fov")->Set(
-            _msg.horizontal_fov());
+        cameraSDF->GetElement("horizontal_fov")->Set(_msg.horizontal_fov());
       }
       if (_msg.has_image_size())
       {

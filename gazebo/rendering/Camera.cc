@@ -1265,6 +1265,9 @@ void Camera::CreateCamera()
   this->camera = this->scene->GetManager()->createCamera(
       this->scopedUniqueName);
 
+  if (this->sdf->HasElement("projection_type"))
+    this->SetProjectionType(this->sdf->Get<std::string>("projection_type"));
+
   this->camera->setFixedYawAxis(false);
   this->camera->yaw(Ogre::Degree(-90.0));
   this->camera->roll(Ogre::Degree(-90.0));
@@ -1304,7 +1307,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->viewport->setShadowsEnabled(true);
     this->viewport->setOverlaysEnabled(false);
 
-    RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
+    if (this->camera->getProjectionType() != Ogre::PT_ORTHOGRAPHIC)
+      RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
     this->viewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
@@ -1750,18 +1754,42 @@ unsigned int Camera::GetTriangleCount() const
 }
 
 //////////////////////////////////////////////////
-void Camera::SetOrtho(const bool _ortho)
+bool Camera::SetProjectionType(const std::string &_type)
 {
-  if (_ortho)
+  bool result = true;
+
+  if (_type == "orthographic")
   {
     // Shadows do not work properly with orthographic projection
-    this->scene->SetShadowsEnabled(false);
+    RTShaderSystem::DetachViewport(this->viewport, this->GetScene());
     this->camera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
   }
-  else
+  else if (_type == "perspective")
   {
     this->camera->setProjectionType(Ogre::PT_PERSPECTIVE);
     this->camera->setCustomProjectionMatrix(false);
-    this->scene->SetShadowsEnabled(true);
+    RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
+  }
+  else
+  {
+    gzerr << "Invalid projection type[" << _type << "]. "
+      << "Valid values are 'perspective' and 'orthographic'.\n";
+    result = false;
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+std::string Camera::GetProjectionType() const
+{
+  if (this->camera->getProjectionType() == Ogre::PT_ORTHOGRAPHIC)
+  {
+    return "orthographic";
+  }
+  // There are only two types of projection in OGRE.
+  else
+  {
+    return "perspective";
   }
 }

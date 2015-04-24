@@ -195,7 +195,7 @@ namespace gazebo
       public: void EnableStereo(bool _enable);
 
       // Documentation inherited.
-      public: virtual void SetOrtho(const bool _ortho);
+      public: virtual bool SetProjectionType(const std::string &_type);
 
       /// \brief Set the camera to be attached to a visual.
       ///

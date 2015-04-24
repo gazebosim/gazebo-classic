@@ -801,12 +801,12 @@ void UserCamera::EnableStereo(bool _enable)
 }
 
 /////////////////////////////////////////////////
-void UserCamera::SetOrtho(const bool _ortho)
+bool UserCamera::SetProjectionType(const std::string &_type)
 {
-  Camera::SetOrtho(_ortho);
-
-  if (_ortho)
+  if (_type == "orthographic")
     this->SetViewController("ortho");
   else
     this->SetViewController(this->dataPtr->prevViewControllerName);
+
+  return Camera::SetProjectionType(_type);
 }

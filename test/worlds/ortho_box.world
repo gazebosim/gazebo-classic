@@ -3,199 +3,30 @@
   <world name="default">
     <scene>
       <ambient>1 1 1 1</ambient>
-      <background>1 1 1 1</background>
+      <background>0 0 0 1</background>
       <grid>false</grid>
     </scene>
 
-    <model name="white">
+    <gui>
+      <camera name="user">
+        <pose>10 0 10 0 0.7 0</pose>
+        <projection_type>orthographic</projection_type>
+      </camera>
+    </gui>
+
+    <model name="wall1">
       <static>true</static>
-      <pose>0 0 0 0 0 0</pose>
-      <link name="link">
-
-        <visual name="visual1">
-          <pose>0 0 0.5 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>2 2 .05</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient> 1 1 1 1</ambient>
-            <diffuse> 1 1 1 1</diffuse>
-          </material>
-        </visual>
-
-        <visual name="visual2">
-          <pose>0 0 -0.5 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>2 2 .05</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient> 1 1 1 1</ambient>
-            <diffuse> 1 1 1 1</diffuse>
-          </material>
-        </visual>
-
-        <visual name="visual3">
-          <pose>0.5 0 0 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>.05 2 2</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient> 1 1 1 1</ambient>
-            <diffuse> 1 1 1 1</diffuse>
-          </material>
-        </visual>
-
-        <visual name="visual4">
-          <pose>-0.5 0 0 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>.05 2 2</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient> 1 1 1 1</ambient>
-            <diffuse> 1 1 1 1</diffuse>
-          </material>
-        </visual>
-
-        <visual name="visual5">
-          <pose>0 -0.5 0 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>2 .05 2</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient> 1 1 1 1</ambient>
-            <diffuse> 1 1 1 1</diffuse>
-          </material>
-        </visual>
-
-        <visual name="visual6">
-          <pose>0 0.5 0 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>2 .05 2</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient> 1 1 1 1</ambient>
-            <diffuse> 1 1 1 1</diffuse>
-          </material>
-        </visual>
-
-      </link>
-    </model>
-
-    <model name="cube">
-      <static>true</static>
-      <pose>0 0 0.5 0 0 0</pose>
+      <pose>500 0 0 0 0 0</pose>
       <link name="link">
         <visual name="visual">
           <geometry>
             <box>
-              <size>.5 .5 .1</size>
+              <size>1000 1 .2</size>
             </box>
           </geometry>
           <material>
-            <ambient>1 0 0 1</ambient>
-            <diffuse>1 0 0 1</diffuse>
-          </material>
-        </visual>
-      </link>
-    </model>
-
-    <model name="blue">
-      <static>true</static>
-      <pose>0 0 -0.5 0 0 0</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>.5 .5 .1</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient>0 1 0 1</ambient>
-            <diffuse>0 1 0 1</diffuse>
-          </material>
-        </visual>
-      </link>
-    </model>
-
-    <model name="green">
-      <static>true</static>
-      <pose>-0.5 0 0 0 0 0</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>.1 .5 .5</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient>0 0 1 1</ambient>
-            <diffuse>0 0 1 1</diffuse>
-          </material>
-        </visual>
-      </link>
-    </model>
-
-    <model name="yellow">
-      <static>true</static>
-      <pose>0.5 0 0 0 0 0</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>.1 .5 .5</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient>1 1 0 1</ambient>
-            <diffuse>1 1 0 1</diffuse>
-          </material>
-        </visual>
-      </link>
-    </model>
-
-    <model name="purple">
-      <static>true</static>
-      <pose>0 0.5 0 0 0 0</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>.5 .1 .5</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient>1 0 1 1</ambient>
-            <diffuse>1 0 1 1</diffuse>
-          </material>
-        </visual>
-      </link>
-    </model>
-
-    <model name="teal">
-      <static>true</static>
-      <pose>0 -0.5 0 0 0 0</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>.5 .1 .5</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient>0 1 1 1</ambient>
-            <diffuse>0 1 1 1</diffuse>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
           </material>
         </visual>
       </link>
