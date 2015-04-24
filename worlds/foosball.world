@@ -70,8 +70,16 @@
     <!-- Blue player view point using Oculus -->
     <model name='camera'>
       <static>true</static>
-      <pose>0 1.2 3 0 0 -1.57</pose>
-      <link name='link'></link>
+      <pose>0 1.2 3 0 0.4 -1.57</pose>
+      <link name='link'>
+         <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
     </model>
 
     <!-- Load the plugin for Razer Hydra -->

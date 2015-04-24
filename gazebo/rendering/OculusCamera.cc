@@ -257,6 +257,10 @@ void OculusCamera::Update()
         -ovrpose.Orientation.z,
         -ovrpose.Orientation.x,
         ovrpose.Orientation.y));
+
+    // caguero: For the foosball demo we prefer to move the camera.
+    this->sceneNode->setPosition(
+      -ovrpose.Position.z, -ovrpose.Position.x, ovrpose.Position.y);
   }
   else if (!this->dataPtr->oculusTrackingWarned)
   {
