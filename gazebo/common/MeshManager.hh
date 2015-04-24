@@ -18,6 +18,7 @@
 #define _MESHMANAGER_HH_
 
 #include <map>
+#include <utility>
 #include <string>
 #include <vector>
 #include <boost/thread/mutex.hpp>

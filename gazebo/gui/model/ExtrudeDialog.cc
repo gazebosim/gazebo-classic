@@ -257,7 +257,6 @@ void ExtrudeDialog::UpdateView()
   // Draw polygons
   for (common::SVGPath path : paths)
   {
-
     for (std::vector<math::Vector2d> poly : path.polylines)
     {
       QPainterPath painterPath;
@@ -279,7 +278,7 @@ void ExtrudeDialog::UpdateView()
         ptItem->setBrush(Qt::red);
         ptItem->setZValue(5);
         scene->addItem(ptItem);
-        if(firstPoint)
+        if (firstPoint)
         {
           firstPoint = false;
           painterPath.moveTo(pt.x, pt.y);

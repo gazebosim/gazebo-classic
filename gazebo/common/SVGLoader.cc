@@ -28,7 +28,7 @@ using namespace gazebo;
 using namespace common;
 
 
-
+/*
 /////////////////////////////////////////////////
 math::Vector2d SVGTransform::Transform(const math::Vector2d &_p)
 {
@@ -36,7 +36,7 @@ math::Vector2d SVGTransform::Transform(const math::Vector2d &_p)
 
   return r;
 }
-
+*/
 
 /////////////////////////////////////////////////
 std::string lowercase(const std::string &_in)
@@ -67,6 +67,7 @@ std::vector<std::string> &split(const std::string &_s,
   return _elems;
 }
 
+/*
 /////////////////////////////////////////////////
 SVGTransform::SVGTransform(const std::string &_trans)
 {
@@ -78,7 +79,7 @@ SVGTransform::SVGTransform(const std::string &_trans)
   std::vector<std::string> transformsStr;
   split(_trans, ')', transformsStr);
 
-  for(size_t i=0; i < transformsStr.size(); ++i)
+  for (size_t i = 0; i < transformsStr.size(); ++i)
   {
     std::string &t = transformsStr[i];
     math::Matrix3 m = this->GetTransformationMatrix(t);
@@ -99,7 +100,7 @@ math::Matrix3 SVGTransform::GetTransformationMatrix(const std::string &_t)
 
   // how to unpack the values into 3x3 matrices
   // http://www.w3.org/TR/SVG/coords.html#TransformAttribute
-  if(transform.find("matrix") != std::string::npos)
+  if (transform.find("matrix") != std::string::npos)
   {
     gzmsg << "matrix" << std::endl;
     double v00 = stod(numbers[0]);
@@ -112,7 +113,7 @@ math::Matrix3 SVGTransform::GetTransformationMatrix(const std::string &_t)
     return m;
   }
 
-  if(transform.find("skewX") != std::string::npos)
+  if (transform.find("skewX") != std::string::npos)
   {
     gzmsg << "skewX" << std::endl;
 
@@ -120,40 +121,39 @@ math::Matrix3 SVGTransform::GetTransformationMatrix(const std::string &_t)
     return m;
   }
 
-  if(transform.find("skewY") != std::string::npos)
+  if (transform.find("skewY") != std::string::npos)
   {
     gzmsg << "skewY" << std::endl;
     math::Matrix3 m;
     return m;
   }
 
-  if(transform.find("scale") != std::string::npos)
+  if (transform.find("scale") != std::string::npos)
   {
     gzmsg << "scale" << std::endl;
     math::Matrix3 m;
     return m;
   }
 
-  if(transform.find("translate") != std::string::npos)
+  if (transform.find("translate") != std::string::npos)
   {
     gzmsg << "translate" << std::endl;
     math::Matrix3 m;
     return m;
   }
 
-  if(transform.find("rotate") != std::string::npos)
+  if (transform.find("rotate") != std::string::npos)
   {
     gzmsg << "rotate" << std::endl;
     math::Matrix3 m;
     return m;
   }
 
-
   gzwarn << "Unsupported transformation: " << &transform << std::endl;
   math::Matrix3 m;
   return m;
-
 }
+*/
 
 /////////////////////////////////////////////////
 math::Vector2d bezierInterpolate(double _t,
@@ -201,12 +201,6 @@ static double sqr(float x) { return x*x; }
 
 static float vecang(float _ux, float _uy, float _vx, float _vy)
 {
-/*
-  double ux = ceil(_ux *1000.0)/1000.0;
-  double uy = ceil(_uy *1000.0)/1000.0;
-  double vx = ceil(_vx *1000.0)/1000.0;
-  double vy = ceil(_vy *1000.0)/1000.0;
-*/
   double ux = _ux;
   double uy = _uy;
   double vx = _vx;
@@ -214,7 +208,7 @@ static float vecang(float _ux, float _uy, float _vx, float _vy)
 
   double uMag = sqrt(ux * ux + uy * uy);
   double vMag = sqrt(vx * vx + vy * vy);
-  double r = (ux * vx + uy * vy) / ( uMag * vMag);
+  double r = (ux * vx + uy * vy) / (uMag * vMag);
 
   if (r < -1.0)
   {
@@ -267,7 +261,8 @@ void arcPath(const math::Vector2d &_p0,
   dx = x1 - x2;
   dy = y1 - y2;
   d = sqrt(dx*dx + dy*dy);
-  if (d < 1e-6 || rx < 1e-6 || ry < 1e-6) {
+  if (d < 1e-6 || rx < 1e-6 || ry < 1e-6)
+  {
     // The arc degenerates to a line
     _points.push_back(_pEnd);
     return;
@@ -282,14 +277,15 @@ void arcPath(const math::Vector2d &_p0,
   x1p = cosrx * dx / 2.0 + sinrx * dy / 2.0;
   y1p = -sinrx * dx / 2.0 + cosrx * dy / 2.0;
   d = sqr(x1p) / sqr(rx) + sqr(y1p) / sqr(ry);
-  if (d > 1) {
+  if (d > 1)
+  {
     d = sqrt(d);
     rx *= d;
     ry *= d;
   }
   // 2) Compute cx', cy'
   s = 0.0;
-  sa = sqr(rx) * sqr(ry ) - sqr(rx) * sqr(y1p) - sqr(ry) * sqr(x1p);
+  sa = sqr(rx) * sqr(ry) - sqr(rx) * sqr(y1p) - sqr(ry) * sqr(x1p);
   sb = sqr(rx) * sqr(y1p) + sqr(ry) * sqr(x1p);
   if (sa < 0.0)
     sa = 0.0;
@@ -314,11 +310,12 @@ void arcPath(const math::Vector2d &_p0,
   vx = (-x1p - cxp) / rx;
   vy = (-y1p - cyp) / ry;
   // initial angle
-  a1 = vecang(1.0, 0.0, ux,uy);
+  a1 = vecang(1.0, 0.0, ux, uy);
   // delta angle
-  da = vecang(ux,uy, vx,vy);
+  da = vecang(ux, uy, vx, vy);
 
-  if (_largeArc) {
+  if (_largeArc)
+  {
     // Choose large arc
     if (da > 0.0)
       da = da - 2 * M_PI;
@@ -327,9 +324,9 @@ void arcPath(const math::Vector2d &_p0,
   }
 
   // rounding errors for half circles
-  if(M_PI - fabs(da) < 0.001)
+  if (M_PI - fabs(da) < 0.001)
   {
-    if(_sweepDirection)
+    if (_sweepDirection)
       da = M_PI;
     else
       da = -M_PI;
@@ -346,14 +343,15 @@ void arcPath(const math::Vector2d &_p0,
   // Split arc into max 90 degree segments.
   // The loop assumes an iteration per end point
   // (including start and end), this +1.
-  size_t ndivs = (int)(fabs(da) / (M_PI * 0.5) + 1.0);
-  hda = (da / (float)ndivs) / 2.0;
+  size_t ndivs = static_cast<int>(fabs(da) / (M_PI * 0.5) + 1.0);
+  hda = (da / ndivs) / 2.0;
   kappa = fabs(4.0 / 3.0 * (1.0 - cos(hda)) / sin(hda));
   if (da < 0.0)
     kappa = -kappa;
 
-  for (size_t i = 0; i <= ndivs; i++) {
-    a = a1 + da * (i/(float)ndivs);
+  for (size_t i = 0; i <= ndivs; i++)
+  {
+    a = a1 + da * (1.0 * i /ndivs);
     dx = cos(a);
     dy = sin(a);
     // position  xform point
@@ -728,7 +726,7 @@ void SVGLoader::GetSvgPaths(TiXmlNode *_pParent, std::vector<SVGPath> &_paths)
     }
     // skip defs node that can contain path
     // elements that are not actual paths.
-    if( name == "defs")
+    if (name == "defs")
     {
       return;
     }

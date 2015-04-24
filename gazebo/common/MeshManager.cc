@@ -1257,7 +1257,7 @@ size_t AddPointToVerticesTable(std::vector<math::Vector2d> &_vertices,
                      double _tol)
 {
   double sqrTol = _tol * _tol;
-  for(auto i = 0u; i != _vertices.size(); ++i)
+  for (auto i = 0u; i != _vertices.size(); ++i)
   {
     auto v = _vertices[i] - _p;
     double d = (v.x * v.x + v.y * v.y);
@@ -1278,13 +1278,13 @@ void AddEdge(std::vector<math::Vector2i> &_edges,
 {
   // store the smaller index first, in case we have
   // to seach for duplicate edges
-  if(a < b)
+  if (a < b)
   {
     size_t tmp = a;
     a = b;
     b = tmp;
   }
-  math::Vector2i e(a,b);
+  math::Vector2i e(a, b);
   _edges.push_back(e);
 }
 

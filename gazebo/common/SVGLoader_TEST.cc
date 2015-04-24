@@ -114,7 +114,7 @@ TEST_F(SVGLoader, LoadArcs)
   auto &polyline1 = paths[0].polylines[0];
   auto &polyline2 = paths[1].polylines[0];
 
-  for(auto i=0u; i != polyline1.size(); ++i )
+  for (auto i = 0u; i != polyline1.size(); ++i)
   {
     // extract points
     auto p1 = polyline1[i];
@@ -124,7 +124,7 @@ TEST_F(SVGLoader, LoadArcs)
     EXPECT_NEAR(p1.y, p2.y, 0.25);
   }
 
-  std::ofstream out("arc_test.html" );
+  std::ofstream out("arc_test.html");
   loader.DumpPaths(paths, out);
   out.close();
 }
@@ -146,10 +146,9 @@ TEST_F(SVGLoader, Capsule)
   EXPECT_EQ(true, success);
 
   // the test file has 2 paths inside
-  std::ofstream out("capsule.html" );
+  std::ofstream out("capsule.html");
   loader.DumpPaths(paths, out);
   out.close();
-
 }
 
 /////////////////////////////////////////////////

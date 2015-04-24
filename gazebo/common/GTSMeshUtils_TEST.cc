@@ -45,23 +45,24 @@ TEST_F(GTSMeshUtils, DelaunayTriangulation)
   vertices.push_back(math::Vector2d(0.75, 0.25));
 
   std::vector<math::Vector2i> edges;
-  edges.push_back(math::Vector2i(0,1));
-  edges.push_back(math::Vector2i(1,2));
-  edges.push_back(math::Vector2i(2,3));
-  edges.push_back(math::Vector2i(3,0));
+  edges.push_back(math::Vector2i(0, 1));
+  edges.push_back(math::Vector2i(1, 2));
+  edges.push_back(math::Vector2i(2, 3));
+  edges.push_back(math::Vector2i(3, 0));
 
-  edges.push_back(math::Vector2i(4,5));
-  edges.push_back(math::Vector2i(5,6));
-  edges.push_back(math::Vector2i(6,7));
-  edges.push_back(math::Vector2i(7,4));
+  edges.push_back(math::Vector2i(4, 5));
+  edges.push_back(math::Vector2i(5, 6));
+  edges.push_back(math::Vector2i(6, 7));
+  edges.push_back(math::Vector2i(7, 4));
 
   common::Mesh *mesh = new common::Mesh();
   mesh->SetName("extruded");
   common::SubMesh *subMesh = new common::SubMesh();
   mesh->AddSubMesh(subMesh);
 
-  bool result = common::GTSMeshUtils::DelaunayTriangulation(vertices, edges, subMesh);
-
+  bool result = common::GTSMeshUtils::DelaunayTriangulation(vertices,
+                                                            edges,
+                                                            subMesh);
   EXPECT_TRUE(result);
 
   // same as number of vertices in the path
