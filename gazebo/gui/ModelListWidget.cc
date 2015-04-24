@@ -52,6 +52,8 @@
 #include "gazebo/gui/qtpropertybrowser/qtvariantproperty.h"
 #include "gazebo/gui/ModelListWidget.hh"
 
+#include "gazebo/msgs/msgs.hh"
+
 // avoid collision from Mac OS X's ConditionalMacros.h
 #ifdef __MACH__
 #undef TYPE_BOOL
