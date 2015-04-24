@@ -533,12 +533,12 @@ namespace gazebo
       /// \param[in] _type The type of projection: "perspective" or
       /// "orthographic".
       /// \return True if successful.
-      /// \sa Projection()
+      /// \sa GetProjectionType()
       public: virtual bool SetProjectionType(const std::string &_type);
 
-      /// \brief Return the project type as a string.
+      /// \brief Return the projection type as a string.
       /// \return "perspective" or "orthographic"
-      /// \sa Projection(const std::string &_type)
+      /// \sa SetProjectionType(const std::string &_type)
       public: std::string GetProjectionType() const;
 
       /// \brief Implementation of the render call

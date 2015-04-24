@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-#include <boost/filesystem.hpp>
-#include "gazebo/math/Helpers.hh"
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/Projection_TEST.hh"
@@ -24,7 +21,7 @@
 #include "test_config.h"
 
 /////////////////////////////////////////////////
-void Projection_TEST::Ortho()
+void Projection_TEST::Projection()
 {
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;

@@ -20,13 +20,12 @@
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the DataLogger widget.
+/// \brief A test class for orthographic and perspective projections
 class Projection_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test orthographic projection.
-  private slots: void Ortho();
+  /// \brief Test orthographic and perspective projections.
+  private slots: void Projection();
 };
-
 #endif
