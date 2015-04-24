@@ -34,6 +34,11 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   GZ_ASSERT(_model != NULL, "Received NULL model pointer" << std::endl;
   GZ_ASSERT(_sdf != NULL, "Received NULL SDF pointer" << std::endl;
   this->model = _model;
+  physics::WorldPtr world = _model->GetWorld();
+  GZ_ASSERT(world != NULL, "Model is in a NULL world" << std::endl;
+  this->physicsEngine = world->GetPhysicsEngine();
+  GZ_ASSERT(this->physicsEngine != NULL, "Physics engine was NULL" << std::endl;
+
   this->sdf = _sdf;
   if (this->sdf->HasElement("fluid_density"))
   {
@@ -69,21 +74,24 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   // For links the user didn't input, precompute the center of volume and
-  // density of each link by approximating the collision volumes with
-  // bounding boxes.
+  // density.
 
   for (auto link : this->model->GetLinks())
   {
     int id = link->GetId();
     if (this->volPropsMap.find(id) == this->volPropsMap.end())
     {
-      double density = 0;
+      double volumeSum = 0;
+      double weightedPosSum = math::Vector3::Zero;
       for (auto collision : link->GetCollisions)
       {
         double volume = collision->GetShape()->ComputeVolume();
+        volumeSum += volume;
+        weightedPosSum += volume*collision->GetWorldPose();
       }
-      this->volPropsMap[id].cov = ;
-      this->volPropsMap[id].density = density;
+      // Subtract the center of volume into the link frame.
+      this->volPropsMap[id].cov = weightedPosSum/volumeSum - link->GetWorldPose();
+      this->volPropsMap[id].volume =volumeSum;
     }
   }
 
@@ -99,4 +107,13 @@ virtual void BuoyancyPlugin::Init()
 /////////////////////////////////////////////////
 virtual void BuoyancyPlugin::OnUpdate()
 {
+  for (auto link : this->model->GetLinks())
+  {
+    VolumeProperties volumeProperties = this->volPropsMap[link->GetId()];
+    double volume = volumeProperties.volume;
+    math::Vector3 cov = volumeProperties.cov;
+
+    math::Vector3 buoyancy =
+        this->fluidDensity*volume*this->physicsEngine->GetGravity();
+  }
 }
