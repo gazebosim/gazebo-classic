@@ -560,7 +560,7 @@ TEST_P(PhysicsFrictionTest, FrictionDemo)
 /////////////////////////////////////////////////
 TEST_P(PhysicsFrictionTest, MaximumDissipation)
 {
-  MaximumDissipation(GetParam());
+  MaximumDissipation("ode");
 }
 
 /////////////////////////////////////////////////
