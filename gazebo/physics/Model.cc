@@ -123,7 +123,10 @@ void Model::LoadLinks()
           ModelPtr model = boost::static_pointer_cast<Model>(entity);
           LinkPtr tmpLink = model->GetLink();
           if (tmpLink)
+          {
             cLink = tmpLink;
+            break;
+          }
           entity = entity->GetParent();
         }
 
@@ -133,8 +136,18 @@ void Model::LoadLinks()
         }
         else
         {
+          // first link found, set as canonical link
           link->SetCanonicalLink(true);
           this->canonicalLink = link;
+
+          // notify parent models of this canonical link
+          entity = this->GetParent();
+          while (entity && entity->HasType(MODEL))
+          {
+            ModelPtr model = boost::static_pointer_cast<Model>(entity);
+            model->canonicalLink = this->canonicalLink;
+            entity = entity->GetParent();
+          }
         }
       }
 
@@ -178,37 +191,6 @@ void Model::LoadModels()
 }
 
 //////////////////////////////////////////////////
-void Model::SetCanonicalLink()
-{
-  // Set the canonical link in all nested models
-  if (!this->canonicalLink)
-    this->canonicalLink = this->FindCanonicalLink();
-
-  if (this->canonicalLink)
-  {
-    for (auto model : this->models)
-      model->canonicalLink = this->canonicalLink;
-  }
-}
-
-//////////////////////////////////////////////////
-LinkPtr Model::FindCanonicalLink()
-{
-  // Do a depth first search to find the canonical link in nested models
-  if (this->canonicalLink)
-    return this->canonicalLink;
-
-  LinkPtr cLink;
-  for (auto model : this->models)
-  {
-    cLink = model->FindCanonicalLink();
-    if (cLink)
-      return cLink;
-  }
-  return cLink;
-}
-
-//////////////////////////////////////////////////
 void Model::LoadJoints()
 {
   // Load the joints
@@ -243,13 +225,9 @@ void Model::LoadJoints()
 //////////////////////////////////////////////////
 void Model::Init()
 {
-  this->SetCanonicalLink();
-
   // Record the model's initial pose (for reseting)
   this->SetInitialRelativePose(this->sdf->Get<math::Pose>("pose"));
   this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
-//  this->SetInitialRelativePose(this->GetWorldPose());
-//  this->SetRelativePose(this->GetWorldPose());
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();
@@ -670,6 +648,12 @@ JointPtr Model::GetJoint(const std::string &_name)
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+const Model_V &Model::GetModels() const
+{
+  return this->models;
 }
 
 //////////////////////////////////////////////////

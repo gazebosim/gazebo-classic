@@ -83,8 +83,8 @@ void ODELink::Init()
   }
 
   // TODO HACK!! Nested model does not move unless auto-disable is false;
-//  if (this->linkId)
-//    dBodySetAutoDisableFlag(this->linkId, 0);
+  if (this->linkId)
+    dBodySetAutoDisableFlag(this->linkId, 0);
 
   GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
   this->SetKinematic(this->sdf->Get<bool>("kinematic"));
