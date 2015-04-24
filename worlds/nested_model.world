@@ -41,7 +41,7 @@
         </link>
       </model>
       <model name="model2">
-        <pose>-1 0 0 0 0 0</pose>
+        <pose>-1 0 0.5 0 0 0</pose>
         <link name="link2">
           <collision name="collision2">
             <geometry>

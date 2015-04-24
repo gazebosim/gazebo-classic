@@ -133,7 +133,6 @@ void Model::LoadLinks()
         if (cLink)
         {
           this->canonicalLink = cLink;
-          std::cerr << this->GetName() << " can link = " << this->canonicalLink->GetName() << std::endl;
         }
         else
         {
@@ -149,8 +148,6 @@ void Model::LoadLinks()
             model->canonicalLink = this->canonicalLink;
             entity = entity->GetParent();
           }
-
-          std::cerr << this->GetName() << " can first link = " << this->canonicalLink->GetName() << std::endl;
         }
       }
 
@@ -194,43 +191,6 @@ void Model::LoadModels()
 }
 
 //////////////////////////////////////////////////
-void Model::SetCanonicalLink()
-{
-  // Set the canonical link in all nested models
-  if (!this->canonicalLink)
-  {
-    this->canonicalLink = this->FindCanonicalLink();
-  //  std::cerr << this->GetName() << " set can link = " << this->canonicalLink->GetName() << std::endl;
-  }
-
-  if (this->canonicalLink)
-  {
-    for (auto model : this->models)
-    {
-      model->canonicalLink = this->canonicalLink;
-      std::cerr << model->GetName() << " set n can link = " << this->canonicalLink->GetName() << std::endl;
-    }
-  }
-}
-
-//////////////////////////////////////////////////
-LinkPtr Model::FindCanonicalLink()
-{
-  // Do a depth first search to find the canonical link in nested models
-  if (this->canonicalLink)
-    return this->canonicalLink;
-
-  LinkPtr cLink;
-  for (auto model : this->models)
-  {
-    cLink = model->FindCanonicalLink();
-    if (cLink)
-      return cLink;
-  }
-  return cLink;
-}
-
-//////////////////////////////////////////////////
 void Model::LoadJoints()
 {
   // Load the joints
@@ -265,13 +225,9 @@ void Model::LoadJoints()
 //////////////////////////////////////////////////
 void Model::Init()
 {
-//  this->SetCanonicalLink();
-
   // Record the model's initial pose (for reseting)
   this->SetInitialRelativePose(this->sdf->Get<math::Pose>("pose"));
   this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
-//  this->SetInitialRelativePose(this->GetWorldPose());
-//  this->SetRelativePose(this->GetWorldPose());
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();
