@@ -256,6 +256,60 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { jointNameChanged.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the show link context menu signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T> static event::ConnectionPtr
+            ConnectShowLinkContextMenu(T _subscriber)
+          { return showLinkContextMenu.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the show link context menu
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectShowLinkContextMenu(
+            event::ConnectionPtr _subscriber)
+          { showLinkContextMenu.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the show joint context menu signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T> static event::ConnectionPtr
+            ConnectShowJointContextMenu(T _subscriber)
+          { return showJointContextMenu.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the show joint context menu
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectShowJointContextMenu(
+            event::ConnectionPtr _subscriber)
+          { showJointContextMenu.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the set selected link signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T> static event::ConnectionPtr
+            ConnectSetSelectedLink(T _subscriber)
+          { return setSelectedLink.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the set selected link signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectSetSelectedLink(
+            event::ConnectionPtr _subscriber)
+          { setSelectedLink.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the set selected joint signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T> static event::ConnectionPtr
+            ConnectSetSelectedJoint(T _subscriber)
+          { return setSelectedJoint.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the set selected joint signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectSetSelectedJoint(
+            event::ConnectionPtr _subscriber)
+          { setSelectedJoint.Disconnect(_subscriber); }
+
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishModel;
 
@@ -315,6 +369,18 @@ namespace gazebo
         /// new joint name.
         public: static event::EventT<void (std::string, std::string)>
             jointNameChanged;
+
+        /// \brief Request to show the link context menu.
+        public: static event::EventT<void (std::string)> showLinkContextMenu;
+
+        /// \brief Request to show the joint context menu.
+        public: static event::EventT<void (std::string)> showJointContextMenu;
+
+        /// \brief Request to select or deselect a link.
+        public: static event::EventT<void (std::string, bool)> setSelectedLink;
+
+        /// \brief Request to select or deselect a joint.
+        public: static event::EventT<void (std::string, bool)> setSelectedJoint;
       };
     }
   }

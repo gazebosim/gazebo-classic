@@ -174,7 +174,6 @@ if (PKG_CONFIG_FOUND)
   else()
     # Needed in WIN32 since in UNIX the flag is added in the code installed
     message (STATUS "Skipping search for tinyxml")
-    add_definitions(-DTIXML_USE_STL)
     set (tinyxml_INCLUDE_DIRS "")
     set (tinyxml_LIBRARIES "")
     set (tinyxml_LIBRARY_DIRS "")
