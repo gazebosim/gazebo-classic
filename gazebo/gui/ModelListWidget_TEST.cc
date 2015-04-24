@@ -73,7 +73,7 @@ void ModelListWidget_TEST::OnResponse(ConstResponsePtr &_msg)
   gazebo::msgs::Model_V modelVMsg;
   if (_msg->has_type() && _msg->type() == modelVMsg.GetTypeName())
   {
-    msgs::ParseFromString(modelVMsg, _msg->serialized_data());
+    gazebo::msgs::ParseFromString(modelVMsg, _msg->serialized_data());
     for (int i = 0; i < modelVMsg.models_size(); i++)
     {
       gazebo::gui::Events::modelUpdate(modelVMsg.models(i));
