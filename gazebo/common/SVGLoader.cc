@@ -27,17 +27,6 @@
 using namespace gazebo;
 using namespace common;
 
-
-/*
-/////////////////////////////////////////////////
-math::Vector2d SVGTransform::Transform(const math::Vector2d &_p)
-{
-  math::Vector2d r = _p;
-
-  return r;
-}
-*/
-
 /////////////////////////////////////////////////
 std::string lowercase(const std::string &_in)
 {
@@ -66,94 +55,6 @@ std::vector<std::string> &split(const std::string &_s,
   }
   return _elems;
 }
-
-/*
-/////////////////////////////////////////////////
-SVGTransform::SVGTransform(const std::string &_trans)
-{
-  gzerr << "SVGTransform::SVGTransform " << _trans << std::endl;
-  std::vector <math::Matrix3> transforms;
-
-  // splits "rotate(45) translate(0,0)" into
-  // "rotate(45" and " translate(0,0"
-  std::vector<std::string> transformsStr;
-  split(_trans, ')', transformsStr);
-
-  for (size_t i = 0; i < transformsStr.size(); ++i)
-  {
-    std::string &t = transformsStr[i];
-    math::Matrix3 m = this->GetTransformationMatrix(t);
-    transforms.push_back(m);
-  }
-}
-
-/////////////////////////////////////////////////
-math::Matrix3 SVGTransform::GetTransformationMatrix(const std::string &_t)
-{
-  // splits "matrix(0,0,0,0"  into "matrix" and "0,0,0,0"
-  std::vector<std::string> tx;
-  split(_t, '(', tx);
-
-  std::string &transform = tx[0];
-  std::vector<std::string> numbers;
-  split(tx[1], ',', numbers);
-
-  // how to unpack the values into 3x3 matrices
-  // http://www.w3.org/TR/SVG/coords.html#TransformAttribute
-  if (transform.find("matrix") != std::string::npos)
-  {
-    gzmsg << "matrix" << std::endl;
-    double v00 = stod(numbers[0]);
-    double v10 = stod(numbers[1]);
-    double v01 = stod(numbers[2]);
-    double v11 = stod(numbers[3]);
-    double v02 = stod(numbers[4]);
-    double v12 = stod(numbers[5]);
-    math::Matrix3 m(v00, v01, v02, v10, v11, v12, 0, 0, 1);
-    return m;
-  }
-
-  if (transform.find("skewX") != std::string::npos)
-  {
-    gzmsg << "skewX" << std::endl;
-
-    math::Matrix3 m;
-    return m;
-  }
-
-  if (transform.find("skewY") != std::string::npos)
-  {
-    gzmsg << "skewY" << std::endl;
-    math::Matrix3 m;
-    return m;
-  }
-
-  if (transform.find("scale") != std::string::npos)
-  {
-    gzmsg << "scale" << std::endl;
-    math::Matrix3 m;
-    return m;
-  }
-
-  if (transform.find("translate") != std::string::npos)
-  {
-    gzmsg << "translate" << std::endl;
-    math::Matrix3 m;
-    return m;
-  }
-
-  if (transform.find("rotate") != std::string::npos)
-  {
-    gzmsg << "rotate" << std::endl;
-    math::Matrix3 m;
-    return m;
-  }
-
-  gzwarn << "Unsupported transformation: " << &transform << std::endl;
-  math::Matrix3 m;
-  return m;
-}
-*/
 
 /////////////////////////////////////////////////
 math::Vector2d bezierInterpolate(double _t,
@@ -249,7 +150,7 @@ void arcPath(const math::Vector2d &_p0,
   double x1, y1, x2, y2, cx, cy, dx, dy, d;
   double x1p, y1p, cxp, cyp, s, sa, sb;
   double ux, uy, vx, vy, a1, da;
-  double x, y, tanx, tany, a, px = 0, py = 0, ptanx = 0, ptany = 0, t[6];
+  double px = 0, py = 0, ptanx = 0, ptany = 0, t[6];
   double sinrx, cosrx;
   double hda, kappa;
 
@@ -351,6 +252,7 @@ void arcPath(const math::Vector2d &_p0,
 
   for (size_t i = 0; i <= ndivs; i++)
   {
+    double x, y, tanx, tany, a;
     a = a1 + da * (1.0 * i /ndivs);
     dx = cos(a);
     dy = sin(a);
@@ -499,9 +401,8 @@ math::Vector2d SVGLoader::SubpathToPolyline(
       case 'Z':
       case 'z':
         {
-          math::Vector2d pEnd;
-          pEnd = _polyline[0];
-          _polyline.push_back(pEnd);
+          if (!(_polyline.front() == _polyline.back()))
+            _polyline.push_back(_polyline.front());
           break;
         }
       default:

@@ -486,6 +486,9 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
 void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     const std::vector<std::vector<math::Vector2d> > &_polys, double _height)
 {
+  // distance tolerence between 2 points. This is used when creating a list
+  // of distinct points in the polylines.
+  double tol = 1e-4;
   #if !HAVE_GTS
     gzerr << "GTS library not found. Can not extrude polyline" << std::endl;
     return;
@@ -506,7 +509,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   std::vector<math::Vector2d> vertices;
   std::vector<math::Vector2i> edges;
   MeshManager::ConvertPolylinesToVerticesAndEdges(_polys,
-                                                  1e-4,
+                                                  tol,
                                                   vertices,
                                                   edges);
   #if HAVE_GTS
@@ -520,10 +523,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   }
   #endif
 
-  gzerr << "WHAT IS GOING ON?" << std::endl;
-
   std::vector<math::Vector3> normals;
-
   for (unsigned int i  = 0; i < edges.size(); ++i)
   {
     // we retreive each edge's coordinates
@@ -1308,7 +1308,7 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
       previous = p;
       if (startPointIndex == endPointIndex)
       {
-        gzerr << "Ignoring edge without 2 distinct vertices" << std::endl;
+        gzwarn << "Ignoring edge without 2 distinct vertices" << std::endl;
         continue;
       }
       AddEdge(edges, startPointIndex, endPointIndex);

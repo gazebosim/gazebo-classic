@@ -151,6 +151,32 @@ TEST_F(SVGLoader, Capsule)
   out.close();
 }
 
+TEST_F(SVGLoader, ghost_edges)
+{
+  // check for invalid edges in svg
+  // this test loads a file with a circle made of 2 arcs:
+  //
+  // The resulting polyline should not have duplicate points
+
+  common::SVGLoader loader(3);
+  std::vector<common::SVGPath> paths;
+
+  bool success = loader.Parse("test/data/svg/arc_circle.svg", paths);
+
+  // save for inspection
+  std::ofstream out("ghost_edges.html");
+  loader.DumpPaths(paths, out);
+  out.close();
+
+  EXPECT_EQ(true, success);
+  // the test file has 2 paths inside
+  EXPECT_EQ(1u, paths.size());
+  // each path has the same number of points
+  EXPECT_EQ(1u, paths[0].polylines.size());
+  auto &polyline1 = paths[0].polylines[0];
+}
+
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
