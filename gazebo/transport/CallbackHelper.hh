@@ -140,7 +140,7 @@ namespace gazebo
                   boost::function<void(uint32_t)> _cb, uint32_t _id)
               {
                 boost::shared_ptr<M> m(new M);
-                m->ParseFromString(_newdata);
+                msgs::ParseFromString(*m, _newdata);
                 this->callback(m);
                 if (!_cb.empty())
                   _cb(_id);

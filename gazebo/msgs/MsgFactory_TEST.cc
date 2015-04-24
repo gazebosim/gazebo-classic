@@ -72,7 +72,7 @@ TEST_F(MsgFactory, NewMsg)
     boost::dynamic_pointer_cast<gazebo::msgs::Vector3d>(
         gazebo::msgs::MsgFactory::NewMsg("gazebo.msgs.Vector3d"));
 
-  msg->ParseFromString(serializedData);
+  msgs::ParseFromString(*msg, serializedData);
   EXPECT_NEAR(msg->x(), 1.1, 1e-6);
   EXPECT_NEAR(msg->y(), 2.2, 1e-6);
   EXPECT_NEAR(msg->z(), 3.3, 1e-6);

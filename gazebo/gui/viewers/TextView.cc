@@ -116,7 +116,7 @@ void TextView::OnText(const std::string &_msg)
   this->OnMsg(common::Time::GetWallTime(), _msg.size());
 
   // Convert the raw data to a message.
-  this->msg->ParseFromString(_msg);
+  msgs::ParseFromString(*(this->msg), _msg);
 
   // Signal to add message to the gui list.
   this->AddMsg(QString::fromStdString(this->msg->DebugString()));

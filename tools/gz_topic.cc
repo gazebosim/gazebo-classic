@@ -165,7 +165,7 @@ void TopicCommand::Info(const std::string &_topic)
 /////////////////////////////////////////////////
 void TopicCommand::EchoCB(const std::string &_data)
 {
-  this->echoMsg->ParseFromString(_data);
+  msgs::ParseFromString(*(this->echoMsg), _data);
   if (this->vm.count("unformatted") > 0)
     std::cout << this->echoMsg->ShortDebugString() << "\n";
   else
