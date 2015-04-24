@@ -113,6 +113,12 @@ struct IndexError {
 
 // structure for passing variable pointers in PGS_LCP
 struct dxPGSLCPParameters {
+    int thread_id;
+    IndexError* order;
+    dxBody* const* body;
+    boost::recursive_mutex* mutex;
+    bool inline_position_correction;
+    bool position_correction_thread;
     dxQuickStepParameters *qs;
     int nStart;   // 0
     int nChunkSize;
@@ -142,6 +148,13 @@ struct dxPGSLCPParameters {
     dRealPtr rhs;
     dRealMutablePtr caccel;
     dRealMutablePtr lambda;
+
+    /// Only used if THREAD_POSITION_CORRECTION is not active,
+    /// in that case, compute both updates in the same
+    /// ComputeRows update.
+    dRealPtr rhs_erp;
+    dRealMutablePtr caccel_erp;
+    dRealMutablePtr lambda_erp;
 
 #ifdef REORDER_CONSTRAINTS
     dRealMutablePtr last_lambda ;

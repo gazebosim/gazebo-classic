@@ -40,10 +40,27 @@ void SimStateEventSource::Load(const sdf::ElementPtr &_sdf)
   // simulation iteration.
   this->pauseConnection = event::Events::ConnectPause(
       boost::bind(&SimStateEventSource::OnPause, this, _1));
+
+  // Listen to the update event. This event is broadcast every
+  // simulation iteration.
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&SimStateEventSource::OnUpdate, this, _1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimStateEventSource::OnPause(bool _pause)
+void SimStateEventSource::OnUpdate(const common::UpdateInfo &_info)
+{
+  if (_info.simTime < this->simTime)
+  {
+    std::string json;
+    json = "{\"state\": \"reset\" }";
+    this->Emit(json);
+  }
+  this->simTime = _info.simTime;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void SimStateEventSource::OnPause(const bool _pause)
 {
   std::string json;
   if (_pause)
