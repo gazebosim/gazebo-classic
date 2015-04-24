@@ -487,6 +487,10 @@ void World::RunLoop()
 //////////////////////////////////////////////////
 void World::LogStep()
 {
+  bool genuine = false;
+  common::Timer timer;
+  timer.Start();
+
   if (this->dataPtr->stepInc < 0)
   {
     // Step back: This is implemented by going to the beginning of the log file,
@@ -501,6 +505,7 @@ void World::LogStep()
 
   while (!this->IsPaused() || this->dataPtr->stepInc > 0)
   {
+    genuine = true;
     std::string data;
     if (!util::LogPlay::Instance()->Step(data))
     {
@@ -559,6 +564,12 @@ void World::LogStep()
     // We only run one step if we are in play mode.
     if (!this->IsPaused())
       break;
+  }
+
+  if (genuine)
+  {
+    timer.Stop();
+    std::cout << "Elapsed: " << timer.GetElapsed() << std::endl;
   }
 
   this->PublishWorldStats();

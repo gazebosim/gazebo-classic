@@ -20,9 +20,12 @@
 
 #include <tinyxml.h>
 
-#include <list>
-#include <string>
+#include <condition_variable>
 #include <fstream>
+#include <list>
+#include <mutex>
+#include <string>
+#include <thread>
 
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/Time.hh"
@@ -143,6 +146,12 @@ namespace gazebo
       /// where the log started and finished (simulation time).
       private: void ReadLogTimes();
 
+      /// \brief Step through the open log file.
+      /// \param[out] _data Data from next entry in the log file.
+      private: bool Next(std::string &_data);
+
+      private: void PrefetchTask();
+
       /// \brief The XML document of the log file.
       private: TiXmlDocument xmlDoc;
 
@@ -175,6 +184,18 @@ namespace gazebo
       private: std::string encoding;
 
       private: std::string currentChunk;
+
+      private: std::thread prefetcherThread;
+
+      private: std::string chunkInCache;
+
+      private: bool cacheReady;
+
+      private: bool exit;
+
+      private: std::mutex mutex;
+
+      private: std::condition_variable condition;
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogPlay>;

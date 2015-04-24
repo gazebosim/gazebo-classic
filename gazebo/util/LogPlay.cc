@@ -27,9 +27,10 @@
 #include <boost/archive/iterators/istream_iterator.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
 
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
 #include "gazebo/common/Base64.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Timer.hh"
 #include "gazebo/math/Rand.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/util/LogRecord.hh"
@@ -42,11 +43,19 @@ using namespace util;
 LogPlay::LogPlay()
 {
   this->logStartXml = NULL;
+  this->cacheReady = false;
+  this->exit = false;
 }
 
 /////////////////////////////////////////////////
 LogPlay::~LogPlay()
 {
+  this->mutex.lock();
+  this->exit = true;
+  this->mutex.unlock();
+
+  if (this->prefetcherThread.joinable())
+    this->prefetcherThread.join();
 }
 
 /////////////////////////////////////////////////
@@ -80,6 +89,9 @@ void LogPlay::Open(const std::string &_logFile)
 
   // Extract the start/end log times from the log.
   this->ReadLogTimes();
+
+  // Start the prefetcher thread.
+  //prefetcherThread = std::thread(&LogPlay::PrefetchTask, this);
 }
 
 /////////////////////////////////////////////////
@@ -261,6 +273,30 @@ uintmax_t LogPlay::GetFileSize() const
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
+  common::Timer timer;
+  timer.Start();
+  std::unique_lock<std::mutex> lock(this->mutex);
+  if (this->cacheReady)
+  {
+    //std::cout << "Reading from cache" << std::endl;
+    _data = this->chunkInCache;
+    this->cacheReady = false;
+    this->condition.notify_one();
+    timer.Stop();
+    //std::cout << "Elapsed: " << timer.GetElapsed() << std::endl;
+    return true;
+  }
+
+  //std::cout << "Cache not available" << std::endl;
+  bool result = this->Next(_data);
+  timer.Stop();
+  //std::cout << "Elapsed: " << timer.GetElapsed() << std::endl;
+  return result;
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::Next(std::string &_data)
+{
   std::string startMarker = "<sdf ";
   std::string endMarker = "</sdf>";
   size_t start = this->currentChunk.find(startMarker);
@@ -298,6 +334,25 @@ bool LogPlay::Step(std::string &_data)
   this->currentChunk.erase(0, end + endMarker.size());
 
   return true;
+}
+
+/////////////////////////////////////////////////
+void LogPlay::PrefetchTask()
+{
+  while (!this->exit)
+  {
+    {
+      std::unique_lock<std::mutex> lock(this->mutex);
+      // Wait until there is some work to do.
+      while (this->cacheReady)
+      {
+        //std::cout << "Waiting for work to do" << std::endl;
+        this->condition.wait(lock);
+      }
+      //std::cout << "Prefetching" << std::endl;
+      this->cacheReady = this->Next(this->chunkInCache);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
