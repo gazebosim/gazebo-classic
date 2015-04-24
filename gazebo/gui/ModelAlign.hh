@@ -54,7 +54,8 @@ namespace gazebo
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _visuals Visuals to be aligned.
       /// \param[in] _axis Axis of alignment: x, y, or z.
-      /// \param[in] _config Configuration: min, center, or max.
+      /// \param[in] _config Either a configuration (min, center, max),
+      /// or "reset" to restore the original pose.
       /// \param[in] _publish True to publish new alignment pose
       public: void AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
           const std::string &_axis, const std::string &_config,
@@ -78,6 +79,13 @@ namespace gazebo
       /// world coordinates.
       private: void Transform(math::Box _bbox, math::Pose _worldPose,
           std::vector<math::Vector3> &_vertices);
+
+      /// \brief Change the transparency of the visual's leaf children to
+      /// indicate a highlighted state or not. Must do it for each leaf as
+      /// they might have different transparencies.
+      /// \param[in] _vis Visual to be highlighted.
+      /// \param[in] _highlight Whether to highlight or not.
+      private: void SetHighlighted(rendering::VisualPtr _vis, bool _highlight);
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelAlign>;
