@@ -2,24 +2,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.4">
   <world name="default">
-    <!--<physics type="ode">
-      <gravity>0.0 0.0 -10.0</gravity>
-      <ode>
-        <solver>
-          <type>quick</type>
-          <iters>50</iters>
-          <sor>0.8</sor>
-        </solver>
-        <constraints>
-          <cfm>0.0</cfm>
-          <erp>0.2</erp>
-          <contact_max_correcting_vel>0.1</contact_max_correcting_vel>
-          <contact_surface_layer>0.0</contact_surface_layer>
-        </constraints>
-      </ode>
-      <real_time_update_rate>0</real_time_update_rate>
-      <max_step_size>0.001</max_step_size>
-    </physics>-->
     <include>
       <uri>model://sun</uri>
     </include>
@@ -29,9 +11,47 @@
     </include>
 
     <include>
-      <uri>model://submarine</uri>
+      <uri>model://sinking_submarine</uri>
+      <pose>5 0 10 1.57 0 0</pose>
     </include>
 
+    <include>
+      <uri>model://submarine</uri>
+      <pose>0 0 10 1.57 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://buoyant_submarine</uri>
+      <pose>-5 0 10 1.57 0 0</pose>
+    </include>
+
+    <model name="ceiling_plane">
+      <static>true</static>
+      <pose>0 0 20 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>100 100 .1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <box>
+              <size>100 100 .1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/BlueTransparent</name>
+            </script>
+          </material>
+        </visual>
+      </link>
     </model>
+
   </world>
 </sdf>

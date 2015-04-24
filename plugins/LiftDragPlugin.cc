@@ -149,13 +149,11 @@ void LiftDragPlugin::OnUpdate()
   math::Vector3 ldNormal = forwardI.Cross(upwardI).Normalize();
 
   // check sweep (angle between vel and lift-drag-plane)
-  double sinSweepAngle = math::clamp(ldNormal.Dot(vel) / vel.GetLength(), -1.0, 1.0);
+  double sinSweepAngle =
+      math::clamp(ldNormal.Dot(vel) / vel.GetLength(), -1.0, 1.0);
 
   // get cos from trig identity
   double cosSweepAngle2 = 1.0 - sinSweepAngle * sinSweepAngle;
-  /*GZ_ASSERT(sinSweepAngle <= 1.0,
-      "sinSweepAngle greater than domain for arcsin!");
-  GZ_ASSERT(sinSweepAngle >= -1.0, "sinSweepAngle less than domain for arcsin!");*/
   this->sweep = asin(sinSweepAngle);
 
   // truncate sweep to within +/-90 deg
@@ -186,7 +184,6 @@ void LiftDragPlugin::OnUpdate()
   math::Vector3 momentDirection = ldNormal;
 
   double vectorMagnitude = forwardI.GetLength() * velInLDPlane.GetLength();
-  GZ_ASSERT(vectorMagnitude > 1e-12, "Forward magnitude was 0, cannot divide!");
   double cosAlpha = math::clamp(
     forwardI.Dot(velInLDPlane) / vectorMagnitude, -1.0, 1.0);
 
@@ -200,7 +197,6 @@ void LiftDragPlugin::OnUpdate()
   // take upwards component of velocity in lift-drag plane.
   // if sign == upward, then alpha is negative
   vectorMagnitude = upwardI.GetLength() + velInLDPlane.GetLength();
-  GZ_ASSERT(vectorMagnitude > 1e-12, "Upward magnitude was 0, cannot divide!");
   double alphaSign = -upwardI.Dot(velInLDPlane)/vectorMagnitude;
 
   if (alphaSign > 0.0)
