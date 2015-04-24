@@ -1253,17 +1253,6 @@ void quickstep::dxConeFrictionModel(dReal& hi_act, dReal& lo_act, dReal& hi_act_
       dRealPtr J_next_ptr =  J_orig + index*12 + 12;
       v_f1 = dot6(J_orig_ptr, body1_vel) + dot6(J_orig_ptr+6, body2_vel);
       v_f2 = dot6(J_next_ptr, body1_vel) + dot6(J_next_ptr+6, body2_vel);
-      /*
-         printf("Jacobian1 is: \n");
-         for(int iii=0; iii<6; iii++)
-         printf("%f, ", J_orig_ptr[iii]);
-         printf("\nJacobian2 is: \n");
-         for(int iii=0; iii<6; iii++)
-         printf("%f, ", J_next_ptr[iii]);
-         printf("\n");
-         printf("v_f1 is %f, v_f2 is %f\n", v_f1, v_f2);
-         printf("\n");
-         */
   }
   else if(constraint_index == prev_constraint_index){
       dRealPtr J_prev_ptr =  J_orig + index*12 - 12;
