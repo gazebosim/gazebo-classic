@@ -15,9 +15,11 @@
  *
 */
 
-#ifndef _MODEL_EDITOR_PALETTE_HH_
-#define _MODEL_EDITOR_PALETTE_HH_
+#ifndef _GAZEBO_MODEL_EDITOR_PALETTE_HH_
+#define _GAZEBO_MODEL_EDITOR_PALETTE_HH_
 
+#include <mutex>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -54,9 +56,15 @@ namespace gazebo
       /// \brief Destructor
       public: ~ModelEditorPalette();
 
+      /// \brief Add an item to the model editor palette.
+      /// \param[in] _Item item to add.
+      /// \param[in] _category Category to add the item too.
+      public: void AddItem(QWidget *_item,
+          const std::string &_category = "Other");
+
       /// \brief Add a joint to the model.
       /// \param[in] _type Type of joint to add.
-      public: void AddJoint(const std::string &_type);
+      public: void CreateJoint(const std::string &_type);
 
       /// \brief Get the model creator.
       /// \return a pointer to the model creator.
@@ -67,10 +75,28 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
 
-      /// \brief Received item selection user input.
-      /// \param[in] _item Item selected.
-      /// \param[in] _column Column index.
-      private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
+      /// \brief Callback when an entity is selected.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _mode Select mode
+      private: void OnSetSelectedEntity(const std::string &_name,
+          const std::string &_mode);
+
+      /// \brief Callback when a link is selected.
+      /// \param[in] _name Name of link.
+      /// \param[in] _selected True if the link is selected, false if
+      /// deselected.
+      private: void OnSetSelectedLink(const std::string &_name, bool _selected);
+
+      /// \brief Callback when a joint is selected.
+      /// \param[in] _name Name of joint.
+      /// \param[in] _selected True if the joint is selected, false if
+      /// deselected.
+      private: void OnSetSelectedJoint(const std::string &_name,
+          bool _selected);
+
+      /// \brief Helper function to deselect a link or a joint.
+      /// \param[in] _type Type: Link or Joint.
+      private: void DeselectType(const std::string &_type);
 
       /// \brief Qt callback when cylinder button is clicked.
       private slots: void OnCylinder();
@@ -84,8 +110,8 @@ namespace gazebo
       /// \brief Qt callback when custom button is clicked.
       private slots: void OnCustom();
 
-      /// \brief Qt callback when a part has been added.
-      private slots: void OnPartAdded();
+      /// \brief Qt callback when a link has been added.
+      private slots: void OnLinkAdded();
 
       /// \brief Qt callback when the model is to be made static.
       private slots: void OnStatic();
@@ -97,6 +123,52 @@ namespace gazebo
       /// \param[in] _name New name.
       private slots: void OnNameChanged(const QString &_name);
 
+      /// \brief Qt callback when a tree item has been double clicked.
+      /// \param[in] _item Item clicked.
+      /// \param[in] _column Column index.
+      private slots: void OnItemDoubleClicked(QTreeWidgetItem *_item,
+          int _column);
+
+      /// \brief Qt callback when a tree item has been clicked.
+      /// \param[in] _item Item clicked.
+      /// \param[in] _column Column index.
+      private slots: void OnItemClicked(QTreeWidgetItem *_item, int _column);
+
+      /// \brief Qt callback when selected items have changed.
+      private slots: void OnItemSelectionChanged();
+
+      /// \brief Qt callback when the context menu signal is triggered.
+      /// \param[in] _pt Position of the context menu event that the widget
+      ///  receives.
+      private slots: void OnCustomContextMenu(const QPoint &_pt);
+
+      /// \brief Add a link to the tree.
+      /// \param[in] _linkName Scoped link name.
+      private: void OnLinkInserted(const std::string &_linkName);
+
+      /// \brief Add a joint to the tree.
+      /// \param[in] _jointId Unique joint identifying name.
+      /// \param[in] _jointName Scoped name which can be changed by the user.
+      private: void OnJointInserted(const std::string &_jointId,
+          const std::string &_jointName);
+
+      /// \brief Remove a link from the tree.
+      /// \param[in] _linkId Unique link identifying name.
+      private: void OnLinkRemoved(const std::string &_linkId);
+
+      /// \brief Remove a joint from the tree.
+      /// \param[in] _jointId Unique joint identifying name.
+      private: void OnJointRemoved(const std::string &_jointId);
+
+      /// \brief Remove all links and joints from the tree.
+      private: void ClearModelTree();
+
+      /// \brief Update a joint item text in the tree.
+      /// \param[in] _jointId Unique joint identifying name.
+      /// \param[in] _newJointName New scoped joint name.
+      private: void OnJointNameChanged(const std::string &_jointId,
+          const std::string &_newJointName);
+
       /// \brief Callback when user has provided information on where to save
       /// the model to.
       /// \param[in] _saveName Name of model being saved.
@@ -105,11 +177,19 @@ namespace gazebo
       /// \brief Event received when the user starts a new model.
       private: void OnNewModel();
 
+      /// \brief Event received when the model properties changed.
+      /// \param[in] _static New static property of the model.
+      /// \param[in] _autoDisable New allow_auto_disable property of the model.
+      /// \param[in] _pose New model pose.
+      /// \param[in] _name New name.
+      private: void OnModelPropertiesChanged(bool _static, bool _autoDisable,
+          const math::Pose &_pose, const std::string &_name);
+
       /// \brief A list of gui editor events connected to this palette.
       private: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief Parts button group.
-      private: QButtonGroup *partButtonGroup;
+      /// \brief Links button group.
+      private: QButtonGroup *linkButtonGroup;
 
       /// \brief Model creator.
       private: ModelCreator *modelCreator;
@@ -126,6 +206,27 @@ namespace gazebo
 
       /// \brief Edit the name of the model.
       private: QLineEdit *modelNameEdit;
+
+      /// \brief The tree holding all links and joints.
+      private: QTreeWidget *modelTreeWidget;
+
+      /// \brief Parent item for all links.
+      private: QTreeWidgetItem *linksItem;
+
+      /// \brief Parent item for all joints.
+      private: QTreeWidgetItem *jointsItem;
+
+      /// \brief Mutex to protect updates.
+      private: std::recursive_mutex updateMutex;
+
+      /// \brief Keeps track of selected items.
+      private: QList<QTreeWidgetItem *> selected;
+
+      /// \brief Layout for other items in the palette.
+      private: QVBoxLayout *otherItemsLayout;
+
+      /// \brief Map of categories to their layout
+      private: std::map<std::string, QGridLayout *> categories;
     };
   }
 }

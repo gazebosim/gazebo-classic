@@ -360,6 +360,17 @@ namespace gazebo
       /// \param[in] _vis Visual to remove.
       public: void RemoveVisual(VisualPtr _vis);
 
+      /// \brief Remove a visual from the scene.
+      /// \param[in] _id Id of the visual to remove.
+      public: void RemoveVisual(uint32_t _id);
+
+      /// \internal
+      /// \brief Set the id of a visual. Internally used when visual ids'
+      /// are required to be updated from visual msgs.
+      /// \param[in] _vis Pointer to visual.
+      /// \param[in] _id New id to set to.
+      public: void SetVisualId(VisualPtr _vis, uint32_t _id);
+
       /// \brief Add a light to the scene
       /// \param[in] _light Light to add.
       public: void AddLight(LightPtr _light);
@@ -404,6 +415,10 @@ namespace gazebo
       /// \brief Enable or disable center of mass visualization.
       /// \param[in] _show True to enable center of mass visualization.
       public: void ShowCOMs(bool _show);
+
+      /// \brief Enable or disable inertia visualization.
+      /// \param[in] _show True to enable inertia visualization.
+      public: void ShowInertias(bool _show);
 
       /// \brief Enable or disable joint visualization.
       /// \param[in] _show True to enable joint visualization.
@@ -585,6 +600,18 @@ namespace gazebo
       /// \param[in] _linkVisual Pointer to the link's visual.
       private: void CreateCOMVisual(sdf::ElementPtr _elem,
                                     VisualPtr _linkVisual);
+
+      /// \brief Create a new inertia visual.
+      /// \param[in] _msg Message containing the link data.
+      /// \param[in] _linkVisual Pointer to the link's visual.
+      private: void CreateInertiaVisual(ConstLinkPtr &_msg,
+          VisualPtr _linkVisual);
+
+      /// \brief Create an inertia visual using SDF data.
+      /// \param[in] _elem SDF element data.
+      /// \param[in] _linkVisual Pointer to the link's visual.
+      private: void CreateInertiaVisual(sdf::ElementPtr _elem,
+          VisualPtr _linkVisual);
 
       /// \internal
       /// \brief Pointer to private data.

@@ -71,15 +71,6 @@ class JointSpawningTest_RotationalWorld : public JointSpawningTest {};
 void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
                                         const std::string &_jointType)
 {
-  /// \TODO: simbody not complete for this test
-  if (_physicsEngine == "simbody" && (
-      _jointType == "gearbox" ||
-      _jointType == "revolute2"))
-  {
-    gzerr << "Aborting test for Simbody, see issues #859, #861.\n";
-    return;
-  }
-
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -147,14 +138,6 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
           << "since DART does not allow joint with world as child. "
           << "Please see issue #914. "
           << "(https://bitbucket.org/osrf/gazebo/issue/914)"
-          << std::endl;
-  }
-  else if (_physicsEngine == "simbody" && _jointType == "screw")
-  {
-    // SimbodyScrewJoint doesn't support joints with world child.
-    gzerr << "Skip SimbodyScrewJoint tests for child world link cases."
-          << "Please see issue #857. "
-          << "(https://bitbucket.org/osrf/gazebo/issue/857)"
           << std::endl;
   }
   else
@@ -228,13 +211,6 @@ void JointSpawningTest::SpawnJointRotationalWorld(
   const std::string &_physicsEngine,
   const std::string &_jointType)
 {
-  /// \TODO: simbody not complete for this test
-  if (_physicsEngine == "simbody")  // && _jointType != "revolute")
-  {
-    gzerr << "Aborting test for Simbody, see issues #859, #861.\n";
-    return;
-  }
-
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -248,17 +224,6 @@ void JointSpawningTest::SpawnJointRotationalWorld(
   physics::JointPtr joint;
   for (unsigned int i = 0; i < 2; ++i)
   {
-    if (_physicsEngine == "dart" && i == 0)
-    {
-      // DART assumes that: (i) every link has its parent joint (ii) root link
-      // is the only link that doesn't have parent link.
-      // Child world link breaks dart for now. Do we need to support it?
-      gzerr << "Skip tests for child world link cases "
-            << "since DART does not allow joint with world as child. "
-            << "Please see issue #914. "
-            << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
-      continue;
-    }
     bool worldChild = (i == 0);
     bool worldParent = (i == 1);
     std::string child = worldChild ? "world" : "child";
@@ -266,15 +231,30 @@ void JointSpawningTest::SpawnJointRotationalWorld(
     gzdbg << "SpawnJoint " << _jointType << " "
           << child << " "
           << parent << std::endl;
+
+    if ((_physicsEngine == "dart" || _physicsEngine == "simbody")
+        && worldChild)
+    {
+      // These physics engines don't support world as a child link.
+      // simbody https://bitbucket.org/osrf/gazebo/issue/861
+      // dart https://bitbucket.org/osrf/gazebo/issue/914
+      gzerr << "Skip tests for child world link cases since "
+            << _physicsEngine
+            << " does not allow joint with world as child. "
+            << "Please see bitbucket issues #861, #914."
+            << std::endl;
+      continue;
+    }
+
     joint = SpawnJoint(_jointType, worldChild, worldParent);
-    EXPECT_TRUE(joint != NULL);
+    ASSERT_TRUE(joint != NULL);
 
     physics::LinkPtr link;
     if (!worldChild)
       link = joint->GetChild();
     else if (!worldParent)
       link = joint->GetParent();
-    EXPECT_TRUE(link != NULL);
+    ASSERT_TRUE(link != NULL);
 
     math::Pose initialPose = link->GetWorldPose();
     world->Step(100);
@@ -293,8 +273,9 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   ASSERT_TRUE(world != NULL);
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
-  bool isOde = physics->GetType().compare("ode") == 0;
   bool isBullet = physics->GetType().compare("bullet") == 0;
+  bool isDart = physics->GetType().compare("dart") == 0;
+  bool isSimbody = physics->GetType().compare("simbody") == 0;
   double dt = physics->GetMaxStepSize();
 
   if (_joint->HasType(physics::Base::HINGE2_JOINT) ||
@@ -366,7 +347,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   }
 
   // Test Coloumb friction
-  if (isBullet && !_joint->HasType(physics::Base::HINGE_JOINT))
+  if (isBullet && _joint->HasType(physics::Base::UNIVERSAL_JOINT))
   {
     gzerr << "Skipping friction test for "
           << physics->GetType()
@@ -375,7 +356,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
           << " joint"
           << std::endl;
   }
-  else if (!isOde && !isBullet)
+  else if (isSimbody)
   {
     gzerr << "Skipping friction test for "
           << physics->GetType()
@@ -414,6 +395,16 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     // Expect motion
     EXPECT_GT(_joint->GetVelocity(_index), 0.2 * friction);
     EXPECT_GT(_joint->GetAngle(_index).Radian(), 0.05 * friction);
+
+    // DART has problem with joint friction and joint limits
+    // https://github.com/dartsim/dart/issues/317
+    // Set friction back to zero to not interfere with other tests
+    // until this issue is resolved.
+    if (isDart)
+    {
+      EXPECT_TRUE(_joint->SetParam("friction", _index, 0.0));
+      EXPECT_NEAR(_joint->GetParam("friction", _index), 0.0, g_tolerance);
+    }
   }
 
   // SetHighStop
@@ -464,6 +455,12 @@ TEST_P(JointSpawningTest_All, SpawnJointTypes)
   if (this->jointType == "gearbox" && this->physicsEngine != "ode")
   {
     gzerr << "Skip test, gearbox is only supported in ODE."
+          << std::endl;
+    return;
+  }
+  if (physicsEngine == "simbody" && jointType == "revolute2")
+  {
+    gzerr << "Skip test, revolute2 not supported in simbody, see issue #859."
           << std::endl;
     return;
   }

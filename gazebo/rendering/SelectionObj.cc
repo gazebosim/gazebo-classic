@@ -68,7 +68,7 @@ void SelectionObj::Load()
   this->CreateTranslateVisual();
   this->CreateScaleVisual();
 
-  this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->SetVisibilityFlags(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
 
   this->SetHandleVisible(TRANS, false);
   this->SetHandleVisible(ROT, false);
@@ -120,15 +120,15 @@ void SelectionObj::UpdateSize()
   // overlays for big objects.
   if (math::equal(max, dPtr->maxScale))
   {
-    dPtr->rotXVisual->SetMaterial(dPtr->xAxisMatOverlay, false);
-    dPtr->rotYVisual->SetMaterial(dPtr->yAxisMatOverlay, false);
-    dPtr->rotZVisual->SetMaterial(dPtr->zAxisMatOverlay, false);
+    this->SetHandleMaterial(ROT_X, dPtr->xAxisMatOverlay, false);
+    this->SetHandleMaterial(ROT_Y, dPtr->yAxisMatOverlay, false);
+    this->SetHandleMaterial(ROT_Z, dPtr->zAxisMatOverlay, false);
   }
   else
   {
-    dPtr->rotXVisual->SetMaterial(dPtr->xAxisMat, false);
-    dPtr->rotYVisual->SetMaterial(dPtr->yAxisMat, false);
-    dPtr->rotZVisual->SetMaterial(dPtr->zAxisMat, false);
+    this->SetHandleMaterial(ROT_X, dPtr->xAxisMat, false);
+    this->SetHandleMaterial(ROT_Y, dPtr->yAxisMat, false);
+    this->SetHandleMaterial(ROT_Z, dPtr->zAxisMat, false);
   }
   this->SetScale(math::Vector3(max, max, max));
 }
@@ -309,6 +309,7 @@ void SelectionObj::CreateTranslateVisual()
   dPtr->transVisual.reset(new rendering::Visual(
       this->GetName() + "__SELECTION_OBJ_TRANS__",
       shared_from_this()));
+  dPtr->transVisual->Load();
 
   dPtr->transXVisual.reset(
       new rendering::Visual(
@@ -407,9 +408,9 @@ void SelectionObj::CreateTranslateVisual()
   dPtr->transYVisual->SetRotation(
       math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
 
-  dPtr->transXVisual->SetMaterial(dPtr->xAxisMatOverlay);
-  dPtr->transYVisual->SetMaterial(dPtr->yAxisMatOverlay);
-  dPtr->transZVisual->SetMaterial(dPtr->zAxisMatOverlay);
+  this->SetHandleMaterial(TRANS_X, dPtr->xAxisMatOverlay);
+  this->SetHandleMaterial(TRANS_Y, dPtr->yAxisMatOverlay);
+  this->SetHandleMaterial(TRANS_Z, dPtr->zAxisMatOverlay);
 
   dPtr->transVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
 
@@ -419,11 +420,6 @@ void SelectionObj::CreateTranslateVisual()
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
   dPtr->transZVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
-
-  // Add to scene so they are selectable by the mouse
-  dPtr->scene->AddVisual(dPtr->transXVisual);
-  dPtr->scene->AddVisual(dPtr->transYVisual);
-  dPtr->scene->AddVisual(dPtr->transZVisual);
 }
 
 /////////////////////////////////////////////////
@@ -436,6 +432,7 @@ void SelectionObj::CreateRotateVisual()
   dPtr->rotVisual.reset(new rendering::Visual(
       this->GetName() + "__SELECTION_OBJ_ROT__",
       shared_from_this()));
+  dPtr->rotVisual->Load();
 
   dPtr->rotXVisual.reset(
       new rendering::Visual(
@@ -494,9 +491,9 @@ void SelectionObj::CreateRotateVisual()
   // By default the visuals are not overlays like translation or scale visuals.
   // This is so that the rings does not block the object it's attached too,
   // and also gives with better depth perception.
-  dPtr->rotXVisual->SetMaterial(dPtr->xAxisMat);
-  dPtr->rotYVisual->SetMaterial(dPtr->yAxisMat);
-  dPtr->rotZVisual->SetMaterial(dPtr->zAxisMat);
+  this->SetHandleMaterial(ROT_X, dPtr->xAxisMat);
+  this->SetHandleMaterial(ROT_Y, dPtr->yAxisMat);
+  this->SetHandleMaterial(ROT_Z, dPtr->zAxisMat);
 
   dPtr->rotVisual->SetScale(math::Vector3(1.0, 1.0, 1.0));
 
@@ -506,11 +503,6 @@ void SelectionObj::CreateRotateVisual()
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
   dPtr->rotZVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
-
-  // Add to scene so they are selectable by the mouse
-  dPtr->scene->AddVisual(dPtr->rotXVisual);
-  dPtr->scene->AddVisual(dPtr->rotYVisual);
-  dPtr->scene->AddVisual(dPtr->rotZVisual);
 }
 
 /////////////////////////////////////////////////
@@ -523,6 +515,7 @@ void SelectionObj::CreateScaleVisual()
   dPtr->scaleVisual.reset(new rendering::Visual(
       this->GetName() + "__SELECTION_OBJ_SCALE__",
       shared_from_this()));
+  dPtr->scaleVisual->Load();
 
   dPtr->scaleXVisual.reset(
       new rendering::Visual(
@@ -620,9 +613,9 @@ void SelectionObj::CreateScaleVisual()
   dPtr->scaleYVisual->SetRotation(
       math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
 
-  dPtr->scaleXVisual->SetMaterial(dPtr->xAxisMatOverlay);
-  dPtr->scaleYVisual->SetMaterial(dPtr->yAxisMatOverlay);
-  dPtr->scaleZVisual->SetMaterial(dPtr->zAxisMatOverlay);
+  this->SetHandleMaterial(SCALE_X, dPtr->xAxisMatOverlay);
+  this->SetHandleMaterial(SCALE_Y, dPtr->yAxisMatOverlay);
+  this->SetHandleMaterial(SCALE_Z, dPtr->zAxisMatOverlay);
 
   dPtr->scaleVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
 
@@ -632,11 +625,6 @@ void SelectionObj::CreateScaleVisual()
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
   dPtr->scaleZVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
-
-  // Add to scene so they are selectable by the mouse
-  dPtr->scene->AddVisual(dPtr->scaleXVisual);
-  dPtr->scene->AddVisual(dPtr->scaleYVisual);
-  dPtr->scene->AddVisual(dPtr->scaleZVisual);
 }
 
 /////////////////////////////////////////////////
@@ -645,29 +633,23 @@ void SelectionObj::SetHandleVisible(SelectionMode _mode, bool _visible)
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
-  if (_mode == TRANS)
-    dPtr->transVisual->SetVisible(_visible);
-  else if (_mode == ROT)
-    dPtr->rotVisual->SetVisible(_visible);
-  else if (_mode == SCALE)
-    dPtr->scaleVisual->SetVisible(_visible);
-  else if (_mode == TRANS_X)
+  if (_mode == TRANS || _mode == TRANS_X)
     dPtr->transXVisual->SetVisible(_visible);
-  else if (_mode == TRANS_Y)
+  if (_mode == TRANS || _mode == TRANS_Y)
     dPtr->transYVisual->SetVisible(_visible);
-  else if (_mode == TRANS_Z)
+  if (_mode == TRANS || _mode == TRANS_Z)
     dPtr->transZVisual->SetVisible(_visible);
-  else if (_mode == ROT_X)
+  if (_mode == ROT || _mode == ROT_X)
     dPtr->rotXVisual->SetVisible(_visible);
-  else if (_mode == ROT_Y)
+  if (_mode == ROT || _mode == ROT_Y)
     dPtr->rotYVisual->SetVisible(_visible);
-  else if (_mode == ROT_Z)
+  if (_mode == ROT || _mode == ROT_Z)
     dPtr->rotZVisual->SetVisible(_visible);
-  else if (_mode == SCALE_X)
+  if (_mode == SCALE || _mode == SCALE_X)
     dPtr->scaleXVisual->SetVisible(_visible);
-  else if (_mode == SCALE_Y)
+  if (_mode == SCALE || _mode == SCALE_Y)
     dPtr->scaleYVisual->SetVisible(_visible);
-  else if (_mode == SCALE_Z)
+  if (_mode == SCALE || _mode == SCALE_Z)
     dPtr->scaleZVisual->SetVisible(_visible);
 }
 
@@ -677,30 +659,51 @@ bool SelectionObj::GetHandleVisible(SelectionMode _mode) const
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
-  if (_mode == TRANS)
-    return dPtr->transVisual->GetVisible();
-  else if (_mode == ROT)
-    return dPtr->rotVisual->GetVisible();
-  else if (_mode == SCALE)
-    return dPtr->scaleVisual->GetVisible();
-  else if (_mode == TRANS_X)
+  if (_mode == TRANS || _mode == TRANS_X)
     return dPtr->transXVisual->GetVisible();
-  else if (_mode == TRANS_Y)
+  if (_mode == TRANS_Y)
     return dPtr->transYVisual->GetVisible();
-  else if (_mode == TRANS_Z)
+  if (_mode == TRANS_Z)
     return dPtr->transZVisual->GetVisible();
-  else if (_mode == ROT_X)
+  if (_mode == ROT || _mode == ROT_X)
     return dPtr->rotXVisual->GetVisible();
-  else if (_mode == ROT_Y)
+  if (_mode == ROT_Y)
     return dPtr->rotYVisual->GetVisible();
-  else if (_mode == ROT_Z)
+  if (_mode == ROT_Z)
     return dPtr->rotZVisual->GetVisible();
-  else if (_mode == SCALE_X)
+  if (_mode == SCALE || _mode == SCALE_X)
     return dPtr->scaleXVisual->GetVisible();
-  else if (_mode == SCALE_Y)
+  if (_mode == SCALE_Y)
     return dPtr->scaleYVisual->GetVisible();
-  else if (_mode == SCALE_Z)
+  if (_mode == SCALE_Z)
     return dPtr->scaleZVisual->GetVisible();
-  else
-    return false;
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+void SelectionObj::SetHandleMaterial(SelectionMode _mode, const std::string
+    &_material, bool _unique)
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  if (_mode == TRANS || _mode == TRANS_X)
+    dPtr->transXVisual->SetMaterial(_material, _unique);
+  if (_mode == TRANS || _mode == TRANS_Y)
+    dPtr->transYVisual->SetMaterial(_material, _unique);
+  if (_mode == TRANS || _mode == TRANS_Z)
+    dPtr->transZVisual->SetMaterial(_material, _unique);
+  if (_mode == ROT || _mode == ROT_X)
+    dPtr->rotXVisual->SetMaterial(_material, _unique);
+  if (_mode == ROT || _mode == ROT_Y)
+    dPtr->rotYVisual->SetMaterial(_material, _unique);
+  if (_mode == ROT || _mode == ROT_Z)
+    dPtr->rotZVisual->SetMaterial(_material, _unique);
+  if (_mode == SCALE || _mode == SCALE_X)
+    dPtr->scaleXVisual->SetMaterial(_material, _unique);
+  if (_mode == SCALE || _mode == SCALE_Y)
+    dPtr->scaleYVisual->SetMaterial(_material, _unique);
+  if (_mode == SCALE || _mode == SCALE_Z)
+    dPtr->scaleZVisual->SetMaterial(_material, _unique);
 }

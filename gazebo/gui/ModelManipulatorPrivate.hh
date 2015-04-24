@@ -47,9 +47,6 @@ namespace gazebo
       /// \brief Keep track of the mouse start screen position.
       public: math::Vector2i mouseStart;
 
-      /// \brief The current selected visual.
-      public: rendering::VisualPtr selectedVis;
-
       /// \brief The current visual attached to the mouse.
       public: rendering::VisualPtr mouseMoveVis;
 

@@ -20,7 +20,8 @@ using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(DepthCameraPlugin)
 
 /////////////////////////////////////////////////
-DepthCameraPlugin::DepthCameraPlugin() : SensorPlugin()
+DepthCameraPlugin::DepthCameraPlugin()
+: SensorPlugin(), width(0), height(0), depth(0)
 {
 }
 

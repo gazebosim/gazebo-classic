@@ -94,6 +94,8 @@ QAction *gazebo::gui::g_showJointsAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_showCOMAct = 0;
 GAZEBO_VISIBLE
+QAction *gazebo::gui::g_showInertiaAct = 0;
+GAZEBO_VISIBLE
 QAction *gazebo::gui::g_transparentAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_viewWireframeAct = 0;
@@ -107,6 +109,8 @@ GAZEBO_VISIBLE
 QAction *gazebo::gui::g_fpsAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_orbitAct = 0;
+GAZEBO_VISIBLE
+QAction *gazebo::gui::g_overlayAct = 0;
 
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_topicVisAct = 0;

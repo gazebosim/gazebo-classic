@@ -298,7 +298,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   visualName << this->previewName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
-  sdf::ElementPtr visualElem = this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem = this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
@@ -344,7 +344,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")->GetElement("name")
       ->Set("Gazebo/BuildingFrame");
@@ -390,7 +390,7 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")->GetElement("name")
       ->Set("Gazebo/BuildingFrame");
@@ -435,7 +435,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visVisual->Load(visualElem);
   visVisual->DetachObjects();
@@ -511,7 +511,7 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
@@ -604,7 +604,6 @@ void BuildingMaker::Reset()
   this->previewVisual->Load();
   this->previewVisual->SetPose(math::Pose::Zero);
   this->previewVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  scene->AddVisual(this->previewVisual);
 
   std::map<std::string, BuildingModelManip *>::iterator it;
   for (it = this->allItems.begin(); it != this->allItems.end(); ++it)
@@ -664,7 +663,7 @@ void BuildingMaker::GenerateSDF()
   this->modelSDF.reset(new sdf::SDF);
   this->modelSDF->SetFromString(this->GetTemplateSDFString());
 
-  modelElem = this->modelSDF->root->GetElement("model");
+  modelElem = this->modelSDF->Root()->GetElement("model");
 
   linkElem = modelElem->GetElement("link");
   sdf::ElementPtr templateLinkElem = linkElem->Clone();
@@ -985,7 +984,7 @@ void BuildingMaker::GenerateSDFWithCSG()
   this->modelSDF.reset(new sdf::SDF);
   this->modelSDF->SetFromString(this->GetTemplateSDFString());
 
-  modelElem = this->modelSDF->root->GetElement("model");
+  modelElem = this->modelSDF->Root()->GetElement("model");
   linkElem = modelElem->GetElement("link");
 
   sdf::ElementPtr templateLinkElem = linkElem->Clone();
@@ -1154,7 +1153,7 @@ void BuildingMaker::GenerateSDFWithCSG()
 /////////////////////////////////////////////////
 void BuildingMaker::CreateTheEntity()
 {
-  if (!this->modelSDF->root->HasElement("model"))
+  if (!this->modelSDF->Root()->HasElement("model"))
   {
     gzerr << "Generated invalid SDF! Cannot create entity." << std::endl;
     return;
@@ -1162,7 +1161,7 @@ void BuildingMaker::CreateTheEntity()
 
   msgs::Factory msg;
   // Create a new name if the model exists
-  sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
+  sdf::ElementPtr modelElem = this->modelSDF->Root()->GetElement("model");
   std::string modelElemName = modelElem->Get<std::string>("name");
   if (has_entity_name(modelElemName))
   {
@@ -1480,8 +1479,10 @@ void BuildingMaker::OnNew()
   }
   QString msg;
   QMessageBox msgBox(QMessageBox::Warning, QString("New"), msg);
-  QPushButton *cancelButton = msgBox.addButton("Cancel", QMessageBox::YesRole);
-  QPushButton *saveButton = msgBox.addButton("Save", QMessageBox::YesRole);
+  QPushButton *cancelButton = msgBox.addButton("Cancel",
+      QMessageBox::RejectRole);
+  msgBox.setEscapeButton(cancelButton);
+  QPushButton *saveButton = new QPushButton("Save");
 
   switch (this->currentSaveState)
   {
@@ -1489,8 +1490,9 @@ void BuildingMaker::OnNew()
     {
       msg.append("Are you sure you want to close this model and open a new "
                  "canvas?\n\n");
-      msgBox.addButton("New Canvas", QMessageBox::ApplyRole);
-      saveButton->hide();
+      QPushButton *newButton =
+          msgBox.addButton("New Canvas", QMessageBox::AcceptRole);
+      msgBox.setDefaultButton(newButton);
       break;
     }
     case UNSAVED_CHANGES:
@@ -1498,7 +1500,9 @@ void BuildingMaker::OnNew()
     {
       msg.append("You have unsaved changes. Do you want to save this model "
                  "and open a new canvas?\n\n");
-      msgBox.addButton("Don't Save", QMessageBox::ApplyRole);
+      msgBox.addButton("Don't Save", QMessageBox::DestructiveRole);
+      msgBox.addButton(saveButton, QMessageBox::AcceptRole);
+      msgBox.setDefaultButton(saveButton);
       break;
     }
     default:
@@ -1603,8 +1607,14 @@ void BuildingMaker::OnExit()
       "your building will no longer be editable.\n\n"
       "Are you ready to exit?\n\n");
       QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
-      msgBox.addButton("Exit", QMessageBox::ApplyRole);
-      QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
+
+      QPushButton *cancelButton = msgBox.addButton("Cancel",
+          QMessageBox::RejectRole);
+      QPushButton *exitButton =
+          msgBox.addButton("Exit", QMessageBox::AcceptRole);
+      msgBox.setDefaultButton(exitButton);
+      msgBox.setEscapeButton(cancelButton);
+
       msgBox.exec();
       if (msgBox.clickedButton() == cancelButton)
       {
@@ -1622,10 +1632,13 @@ void BuildingMaker::OnExit()
 
       QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
       QPushButton *cancelButton = msgBox.addButton("Cancel",
-          QMessageBox::ApplyRole);
+          QMessageBox::RejectRole);
+      msgBox.addButton("Don't Save, Exit", QMessageBox::DestructiveRole);
       QPushButton *saveButton = msgBox.addButton("Save and Exit",
-          QMessageBox::ApplyRole);
-      msgBox.addButton("Don't Save, Exit", QMessageBox::ApplyRole);
+          QMessageBox::AcceptRole);
+      msgBox.setDefaultButton(cancelButton);
+      msgBox.setDefaultButton(saveButton);
+
       msgBox.exec();
       if (msgBox.clickedButton() == cancelButton)
         return;
@@ -1735,6 +1748,7 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
         else if (this->selectedTexture == ":bricks.png")
           material = "Gazebo/Bricks";
 
+        // Must set material before color, otherwise color is overwritten
         this->hoverVis->SetMaterial(material);
         this->hoverVis->SetAmbient((*it).second->GetColor());
       }
@@ -1853,8 +1867,9 @@ void BuildingMaker::ResetHoverVis()
     else
     {
       BuildingModelManip *manip = this->allItems[hoverName];
-      this->hoverVis->SetAmbient(manip->GetColor());
+      // Must set material before color, otherwise color is overwritten
       this->hoverVis->SetMaterial(manip->GetTexture());
+      this->hoverVis->SetAmbient(manip->GetColor());
       this->hoverVis->SetTransparency(manip->GetTransparency());
     }
     this->hoverVis.reset();

@@ -93,6 +93,8 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   this->variantManager = new QtVariantPropertyManager();
   this->propTreeBrowser = new QtTreePropertyBrowser();
   this->propTreeBrowser->setObjectName("propTreeBrowser");
+  this->propTreeBrowser->setStyleSheet(
+      "QTreeView::branch:selected:active { background-color: transparent; }");
   this->variantFactory = new QtVariantEditorFactory();
   this->propTreeBrowser->setFactoryForManager(this->variantManager,
                                               this->variantFactory);
@@ -434,7 +436,7 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   }
   else if (_msg->has_type() && _msg->type() == "error")
   {
-    if (_msg->response() == "nonexistant")
+    if (_msg->response() == "nonexistent")
     {
       this->removeEntityList.push_back(this->selectedEntityName);
     }
@@ -521,6 +523,14 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
     g_modelRightMenu->Run(item->text(0).toStdString(),
                           this->modelTreeWidget->mapToGlobal(_pt),
                           ModelRightMenu::EntityTypes::LIGHT);
+  }
+
+  // Check to see if the selected item is a link
+  if (item->data(3, Qt::UserRole).toString().toStdString() == "Link")
+  {
+    g_modelRightMenu->Run(item->data(0, Qt::UserRole).toString().toStdString(),
+                          this->modelTreeWidget->mapToGlobal(_pt),
+                          ModelRightMenu::EntityTypes::LINK);
   }
 }
 
@@ -1522,6 +1532,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   else
     item->setValue(true);
   this->AddProperty(item, _parent);
+  item->setEnabled(false);
 
   // gravity
   item = this->variantManager->addProperty(QVariant::Bool, tr("gravity"));
@@ -2056,6 +2067,14 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
   else
     item->setValue(false);
   /// \todo Dynamically setting a model static doesn't currently work.
+  item->setEnabled(false);
+  this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Bool, tr("self_collide"));
+  if (_msg.has_self_collide())
+    item->setValue(_msg.self_collide());
+  else
+    item->setValue(false);
   item->setEnabled(false);
   this->propTreeBrowser->addProperty(item);
 

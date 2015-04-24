@@ -40,6 +40,7 @@
 
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
 
@@ -55,6 +56,8 @@ bool Server::stop = true;
 Server::Server()
 {
   this->initialized = false;
+  this->systemPluginsArgc = 0;
+  this->systemPluginsArgv = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -104,7 +107,9 @@ bool Server::ParseArgs(int _argc, char **_argv)
     ("iters",  po::value<unsigned int>(), "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
-     "Load a plugin.");
+     "Load a plugin.")
+    ("profile,o", po::value<std::string>(),
+     "Physics preset profile name from the options in the world file.");
 
   po::options_description hiddenDesc("Hidden options");
   hiddenDesc.add_options()
@@ -234,7 +239,11 @@ bool Server::ParseArgs(int _argc, char **_argv)
       << "  Gazebo Version: "
       << util::LogPlay::Instance()->GetGazeboVersion() << "\n"
       << "  Random Seed: "
-      << util::LogPlay::Instance()->GetRandSeed() << "\n";
+      << util::LogPlay::Instance()->GetRandSeed() << "\n"
+      << "  Log Start Time: "
+      << util::LogPlay::Instance()->GetLogStartTime() << "\n"
+      << "  Log End Time: "
+      << util::LogPlay::Instance()->GetLogEndTime() << "\n";
 
     // Get the SDF world description from the log file
     std::string sdfString;
@@ -261,6 +270,22 @@ bool Server::ParseArgs(int _argc, char **_argv)
     // Load the server
     if (!this->LoadFile(configFilename, physics))
       return false;
+
+    if (this->vm.count("profile"))
+    {
+      std::string profileName = this->vm["profile"].as<std::string>();
+      if (physics::get_world()->GetPresetManager()->HasProfile(profileName))
+      {
+        physics::get_world()->GetPresetManager()->CurrentProfile(profileName);
+        gzmsg << "Setting physics profile to [" << profileName << "]."
+              << std::endl;
+      }
+      else
+      {
+        gzerr << "Specified profile [" << profileName << "] was not found."
+              << std::endl;
+      }
+    }
   }
 
   this->ProcessParams();
@@ -301,7 +326,7 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
-  return this->LoadImpl(sdf->root, _physics);
+  return this->LoadImpl(sdf->Root(), _physics);
 }
 
 /////////////////////////////////////////////////
@@ -321,7 +346,7 @@ bool Server::LoadString(const std::string &_sdfString)
     return false;
   }
 
-  return this->LoadImpl(sdf->root);
+  return this->LoadImpl(sdf->Root());
 }
 
 /////////////////////////////////////////////////
@@ -673,7 +698,7 @@ bool Server::OpenWorld(const std::string & /*_filename*/)
 
   gazebo::transport::clear_buffers();
 
-  sdf::ElementPtr worldElem = sdf->root->GetElement("world");
+  sdf::ElementPtr worldElem = sdf->Root()->GetElement("world");
 
   physics::WorldPtr world = physics::create_world();
 

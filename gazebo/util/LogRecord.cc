@@ -552,7 +552,7 @@ unsigned int LogRecord::Log::Update()
     std::string data = stream.str();
     if (!data.empty())
     {
-      const std::string encodingLocal = this->parent->GetEncoding();
+      const std::string &encodingLocal = this->parent->GetEncoding();
 
       this->buffer.append("<chunk encoding='");
       this->buffer.append(encodingLocal);
@@ -652,8 +652,8 @@ void LogRecord::Log::Start(const boost::filesystem::path &_path)
 
   // Make sure the file does not exist
   if (boost::filesystem::exists(this->completePath))
-    gzlog << "Filename[" + this->completePath.string() + "], already exists."
-      << " The log file will be overwritten.\n";
+    gzlog << "Filename [" + this->completePath.string() + "], already exists."
+          << " The log file will be overwritten.\n";
 
   std::ostringstream stream;
   stream << "<?xml version='1.0'?>\n"

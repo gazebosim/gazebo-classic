@@ -63,12 +63,14 @@ namespace gazebo
     extern QAction *g_showContactsAct;
     extern QAction *g_showJointsAct;
     extern QAction *g_showCOMAct;
+    extern QAction *g_showInertiaAct;
     extern QAction *g_transparentAct;
 
     extern QAction *g_resetAct;
     extern QAction *g_fullScreenAct;
     extern QAction *g_fpsAct;
     extern QAction *g_orbitAct;
+    extern QAction *g_overlayAct;
 
     extern QAction *g_arrowAct;
     extern QAction *g_translateAct;

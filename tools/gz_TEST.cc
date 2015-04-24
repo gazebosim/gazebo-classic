@@ -201,8 +201,6 @@ TEST_F(gzTest, Joint)
 {
   init();
 
-  std::string expectedStr;
-
   std::string helpOutput = custom_exec_str("gz help joint");
   EXPECT_NE(helpOutput.find("gz joint"), std::string::npos);
 
@@ -305,7 +303,7 @@ TEST_F(gzTest, Model)
     EXPECT_TRUE(sdf::init(sdf));
 
     EXPECT_TRUE(sdf::readFile(filename, sdf));
-    sdf::ElementPtr modelElem = sdf->root->GetElement("model");
+    sdf::ElementPtr modelElem = sdf->Root()->GetElement("model");
     modelElem->GetAttribute("name")->SetFromString("my_box");
 
     gazebo::msgs::Factory msg;
@@ -327,7 +325,7 @@ TEST_F(gzTest, Model)
     EXPECT_TRUE(sdf::init(sdf));
 
     EXPECT_TRUE(sdf::readFile(filename, sdf));
-    sdf::ElementPtr modelElem = sdf->root->GetElement("model");
+    sdf::ElementPtr modelElem = sdf->Root()->GetElement("model");
     modelElem->GetAttribute("name")->SetFromString("my_box");
 
     gazebo::msgs::Factory msg;
@@ -619,10 +617,10 @@ TEST_F(gzTest, SDF)
   // gz sdf -d -v <major.minor> | sha1sum'
   std::map<std::string, std::string> descSums;
   descSums["1.0"] = "5235eb8464a96505c2a31fe96327d704e45c9cc4";
-  descSums["1.2"] = "27973b2542d7a0f7582a615b245d81797718c89a";
-  descSums["1.3"] = "30ffce1c662c17185d23f30ef3af5c110d367e10";
-  descSums["1.4"] = "eb1798699f1926e6e75083970528c598bfa6d7f7";
-  descSums["1.5"] = "15fc37c57a9f970fc999cef62c8d2f821a20c7f7";
+  descSums["1.2"] = "870d8c02800c3ac75e85c58657ee8cc2c1079a92";
+  descSums["1.3"] = "549f8f2e9231820897616dac4da42220aafe5aa8";
+  descSums["1.4"] = "3d6e8cbd0410a6e65060f2f5c32f546d25af5873";
+  descSums["1.5"] = "273a4f016654ffc237bbf3638e9e2c013171d9da";
 
   // Test each descSum
   for (std::map<std::string, std::string>::iterator iter = descSums.begin();
@@ -638,10 +636,10 @@ TEST_F(gzTest, SDF)
   // gz sdf -o -v <major.minor> | sha1sum'
   std::map<std::string, std::string> docSums;
   docSums["1.0"] = "4cf955ada785adf72503744604ffadcdf13ec0d2";
-  docSums["1.2"] = "f84c1cf1b1ba04ab4859e96f6aea881134fb5a9b";
-  docSums["1.3"] = "f3dd699687c8922710e4492aadedd1c038d678c1";
-  docSums["1.4"] = "31082d3b9fda88b1ac25588323e31c305937a548";
-  docSums["1.5"] = "dcf9b27cc6ab1117f941c5d19683c60a7bd42e36";
+  docSums["1.2"] = "27f9d91080ce8aa18eac27c9d899fde2d4b78785";
+  docSums["1.3"] = "ad80986d42eae97baf277118f52d7e8b951d8ea1";
+  docSums["1.4"] = "153ddd6ba6797c37c7fcddb2be5362c9969d97a1";
+  docSums["1.5"] = "ffbead7b207372d25db5419629365ff6fc27b12c";
 
   // Test each docSum
   for (std::map<std::string, std::string>::iterator iter = docSums.begin();
@@ -672,7 +670,7 @@ TEST_F(gzTest, SDF)
     std::string output =
       custom_exec_str(std::string("gz sdf -p ") + path.string());
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "1da2108b86f3b4aa194ab5c22527759e012b6393");
+    EXPECT_EQ(shasum, "8d705cf60cfdb944764bdc0176050168253aa752");
   }
 
   path = PROJECT_BINARY_PATH;

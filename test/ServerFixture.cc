@@ -17,13 +17,15 @@
 
 #include <stdio.h>
 #include <string>
+#include <cmath>
 
+#include "gazebo/gazebo.hh"
 #include "ServerFixture.hh"
 
 using namespace gazebo;
 
 /////////////////////////////////////////////////
-std::string custom_exec(std::string _cmd)
+std::string gazebo::custom_exec(std::string _cmd)
 {
   _cmd += " 2>/dev/null";
   FILE* pipe = popen(_cmd.c_str(), "r");
@@ -54,6 +56,7 @@ ServerFixture::ServerFixture()
   this->gotImage = 0;
   this->imgData = NULL;
   this->serverThread = NULL;
+  this->uniqueCounter = 0;
 
   gzLogInit("test-", "test.log");
   gazebo::common::Console::SetQuiet(false);
@@ -120,12 +123,14 @@ void ServerFixture::Load(const std::string &_worldFilename)
 /////////////////////////////////////////////////
 void ServerFixture::Load(const std::string &_worldFilename, bool _paused)
 {
-  this->Load(_worldFilename, _paused, "");
+  std::string s("");
+  this->Load(_worldFilename, _paused, s);
 }
 
 /////////////////////////////////////////////////
 void ServerFixture::Load(const std::string &_worldFilename,
-                  bool _paused, const std::string &_physics)
+                  bool _paused, const std::string &_physics,
+                  const std::vector<std::string> &_systemPlugins)
 {
   delete this->server;
   this->server = NULL;
@@ -133,7 +138,7 @@ void ServerFixture::Load(const std::string &_worldFilename,
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
      boost::bind(&ServerFixture::RunServer, this, _worldFilename,
-                 _paused, _physics));
+                 _paused, _physics, _systemPlugins));
 
   // Wait for the server to come up
   // Use a 60 second timeout.
@@ -186,6 +191,43 @@ void ServerFixture::RunServer(const std::string &_worldFilename)
 }
 
 /////////////////////////////////////////////////
+void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
+               const std::string &_physics,
+               const std::vector<std::string> &_systemPlugins)
+{
+  ASSERT_NO_THROW(this->server = new Server());
+
+  for (auto const &plugin : _systemPlugins)
+  {
+    gazebo::addPlugin(plugin);
+  }
+
+  this->server->PreLoad();
+
+  if (_physics.length())
+    ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
+                                           _physics));
+  else
+    ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
+
+  if (!rendering::get_scene(
+        gazebo::physics::get_world()->GetName()))
+  {
+    ASSERT_NO_THROW(rendering::create_scene(
+        gazebo::physics::get_world()->GetName(), false, true));
+  }
+
+  ASSERT_NO_THROW(this->SetPause(_paused));
+
+  ASSERT_NO_THROW(this->server->Run());
+
+  ASSERT_NO_THROW(this->server->Fini());
+
+  ASSERT_NO_THROW(delete this->server);
+  this->server = NULL;
+}
+
+/////////////////////////////////////////////////
 rendering::ScenePtr ServerFixture::GetScene(
     const std::string &_sceneName)
 {
@@ -209,34 +251,6 @@ rendering::ScenePtr ServerFixture::GetScene(
   return rendering::get_scene(_sceneName);
 }
 
-/////////////////////////////////////////////////
-void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
-               const std::string &_physics)
-{
-  ASSERT_NO_THROW(this->server = new Server());
-  this->server->PreLoad();
-  if (_physics.length())
-    ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
-                                           _physics));
-  else
-    ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
-
-  if (!rendering::get_scene(
-        gazebo::physics::get_world()->GetName()))
-  {
-    ASSERT_NO_THROW(rendering::create_scene(
-        gazebo::physics::get_world()->GetName(), false, true));
-  }
-
-  ASSERT_NO_THROW(this->SetPause(_paused));
-
-  ASSERT_NO_THROW(this->server->Run());
-
-  ASSERT_NO_THROW(this->server->Fini());
-
-  ASSERT_NO_THROW(delete this->server);
-  this->server = NULL;
-}
 
 /////////////////////////////////////////////////
 void ServerFixture::OnStats(ConstWorldStatisticsPtr &_msg)
@@ -371,8 +385,20 @@ void ServerFixture::DoubleCompare(double *_scanA, double *_scanB,
   _diffAvg = 0;
   for (unsigned int i = 0; i < _sampleCount; ++i)
   {
-    double diff = fabs(math::precision(_scanA[i], 10) -
+    double diff;
+
+    // set diff = 0 if both values are same-sign infinite, as inf - inf = nan
+    if (std::isinf(_scanA[i]) && std::isinf(_scanB[i]) &&
+      _scanA[i] * _scanB[i] > 0)
+    {
+      diff = 0;
+    }
+    else
+    {
+      diff = fabs(math::precision(_scanA[i], 10) -
                 math::precision(_scanB[i], 10));
+    }
+
     _diffSum += diff;
     if (diff > _diffMax)
     {
@@ -451,6 +477,33 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
     common::Time::MSleep(100);
 
   camSensor->GetCamera()->DisconnectNewImageFrame(c);
+}
+
+/////////////////////////////////////////////////
+physics::ModelPtr ServerFixture::SpawnModel(const msgs::Model &_msg)
+{
+  physics::WorldPtr world = physics::get_world();
+  ServerFixture::CheckPointer(world);
+  world->InsertModelString(
+    "<sdf version='" + std::string(SDF_VERSION) + "'>"
+    + msgs::ModelToSDF(_msg)->ToString("")
+    + "</sdf>");
+
+  common::Time wait(10, 0);
+  common::Time wallStart = common::Time::GetWallTime();
+  unsigned int waitCount = 0;
+  while (wait > (common::Time::GetWallTime() - wallStart) &&
+         !this->HasEntity(_msg.name()))
+  {
+    common::Time::MSleep(10);
+    if (++waitCount % 100 == 0)
+    {
+      gzwarn << "Waiting " << waitCount / 100 << " seconds for "
+             << "box to spawn." << std::endl;
+    }
+  }
+
+  return world->GetModel(_msg.name());
 }
 
 /////////////////////////////////////////////////
@@ -1049,28 +1102,17 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
+  msgs::Model model;
+  model.set_name(_name);
+  model.set_is_static(_static);
+  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
+  msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
+  auto link = model.mutable_link(0);
+  link->set_name("body");
+  link->mutable_collision(0)->set_name("geom");
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << "<model name ='" << _name << "'>"
-    << "<static>" << _static << "</static>"
-    << "<pose>" << _pos << " " << _rpy << "</pose>"
-    << "<link name ='body'>"
-    << "  <collision name ='geom'>"
-    << "    <geometry>"
-    << "      <cylinder>"
-    << "        <radius>.5</radius><length>1.0</length>"
-    << "      </cylinder>"
-    << "    </geometry>"
-    << "  </collision>"
-    << "  <visual name ='visual'>"
-    << "    <geometry>"
-    << "      <cylinder>"
-    << "        <radius>.5</radius><length>1.0</length>"
-    << "      </cylinder>"
-    << "    </geometry>"
-    << "  </visual>"
-    << "</link>"
-    << "</model>"
+    << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
   msg.set_sdf(newModelStr.str());
@@ -1124,27 +1166,19 @@ void ServerFixture::SpawnSphere(const std::string &_name,
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
+  msgs::Model model;
+  model.set_name(_name);
+  model.set_is_static(_static);
+  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
+  msgs::AddSphereLink(model, 1.0, _radius);
+  auto link = model.mutable_link(0);
+  link->set_name("body");
+  link->mutable_collision(0)->set_name("geom");
+  msgs::Set(link->mutable_inertial()->mutable_pose(),
+            math::Pose(_cog, math::Quaternion()));
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << "<model name ='" << _name << "'>"
-    << "<static>" << _static << "</static>"
-    << "<pose>" << _pos << " " << _rpy << "</pose>"
-    << "<link name ='body'>"
-    << "  <inertial>"
-    << "    <pose>" << _cog << " 0 0 0</pose>"
-    << "  </inertial>"
-    << "  <collision name ='geom'>"
-    << "    <geometry>"
-    << "      <sphere><radius>" << _radius << "</radius></sphere>"
-    << "    </geometry>"
-    << "  </collision>"
-    << "  <visual name ='visual'>"
-    << "    <geometry>"
-    << "      <sphere><radius>" << _radius << "</radius></sphere>"
-    << "    </geometry>"
-    << "  </visual>"
-    << "</link>"
-    << "</model>"
+    << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
   msg.set_sdf(newModelStr.str());
@@ -1162,24 +1196,17 @@ void ServerFixture::SpawnBox(const std::string &_name,
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
+  msgs::Model model;
+  model.set_name(_name);
+  model.set_is_static(_static);
+  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
+  msgs::AddBoxLink(model, 1.0, _size);
+  auto link = model.mutable_link(0);
+  link->set_name("body");
+  link->mutable_collision(0)->set_name("geom");
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << "<model name ='" << _name << "'>"
-    << "<static>" << _static << "</static>"
-    << "<pose>" << _pos << " " << _rpy << "</pose>"
-    << "<link name ='body'>"
-    << "  <collision name ='geom'>"
-    << "    <geometry>"
-    << "      <box><size>" << _size << "</size></box>"
-    << "    </geometry>"
-    << "  </collision>"
-    << "  <visual name ='visual'>"
-    << "    <geometry>"
-    << "      <box><size>" << _size << "</size></box>"
-    << "    </geometry>"
-    << "  </visual>"
-    << "</link>"
-    << "</model>"
+    << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
   msg.set_sdf(newModelStr.str());
@@ -1236,14 +1263,15 @@ void ServerFixture::SpawnEmptyLink(const std::string &_name,
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
+  msgs::Model model;
+  model.set_name(_name);
+  model.set_is_static(_static);
+  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
+  model.add_link();
+  model.mutable_link(0)->set_name("body");
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << "<model name ='" << _name << "'>"
-    << "<static>" << _static << "</static>"
-    << "<pose>" << _pos << " " << _rpy << "</pose>"
-    << "<link name ='body'>"
-    << "</link>"
-    << "</model>"
+    << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
   msg.set_sdf(newModelStr.str());
@@ -1278,11 +1306,11 @@ void ServerFixture::SpawnSDF(const std::string &_sdf)
   sdf::SDF sdfParsed;
   sdfParsed.SetFromString(_sdf);
   // Check that sdf contains a model
-  if (sdfParsed.root->HasElement("model"))
+  if (sdfParsed.Root()->HasElement("model"))
   {
     // Timeout of 30 seconds (3000 * 10 ms)
     int waitCount = 0, maxWaitCount = 3000;
-    sdf::ElementPtr model = sdfParsed.root->GetElement("model");
+    sdf::ElementPtr model = sdfParsed.Root()->GetElement("model");
     std::string name = model->Get<std::string>("name");
     while (!this->HasEntity(name) && ++waitCount < maxWaitCount)
       common::Time::MSleep(100);
@@ -1358,4 +1386,12 @@ void ServerFixture::GetMemInfo(double &_resident, double &_share)
   gzerr << "Unsupported architecture\n";
   return;
 #endif
+}
+
+/////////////////////////////////////////////////
+std::string ServerFixture::GetUniqueString(const std::string &_prefix)
+{
+  std::ostringstream stream;
+  stream << _prefix << this->uniqueCounter++;
+  return stream.str();
 }
