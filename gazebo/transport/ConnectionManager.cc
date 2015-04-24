@@ -136,12 +136,12 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   }
 
   msgs::Packet packet;
-  packet.ParseFromString(initData);
+  msgs::ParseFromString(packet, initData);
 
   if (packet.type() == "version_init")
   {
     msgs::GzString msg;
-    msg.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(msg, packet.serialized_data());
     if (msg.data() == std::string("gazebo ") + GAZEBO_VERSION)
     {
       // TODO: set some flag.. maybe start "serverConn" when initialized
@@ -157,11 +157,11 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   else
     gzerr << "Didn't receive an init from the master" << std::endl;
 
-  packet.ParseFromString(namespacesData);
+  msgs::ParseFromString(packet, namespacesData);
   if (packet.type() == "topic_namepaces_init")
   {
     msgs::GzString_V result;
-    result.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(result, packet.serialized_data());
     boost::mutex::scoped_lock lock(this->namespaceMutex);
 
     for (int i = 0; i < result.data_size(); i++)
@@ -173,11 +173,11 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   else
     gzerr << "Did not get topic_namespaces_init msg from master" << std::endl;
 
-  packet.ParseFromString(publishersData);
+  msgs::ParseFromString(packet, publishersData);
   if (packet.type() == "publishers_init")
   {
     msgs::Publishers pubs;
-    pubs.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(pubs, packet.serialized_data());
 
     boost::recursive_mutex::scoped_lock lock(this->listMutex);
     for (int i = 0; i < pubs.publisher_size(); i++)
@@ -344,18 +344,18 @@ void ConnectionManager::OnMasterRead(const std::string &_data)
 void ConnectionManager::ProcessMessage(const std::string &_data)
 {
   msgs::Packet packet;
-  packet.ParseFromString(_data);
+  msgs::ParseFromString(packet, _data);
 
   if (packet.type() == "publisher_add")
   {
     msgs::Publish result;
-    result.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(result, packet.serialized_data());
     this->publishers.push_back(result);
   }
   else if (packet.type() == "publisher_del")
   {
     msgs::Publish result;
-    result.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(result, packet.serialized_data());
 
     std::list<msgs::Publish>::iterator iter = this->publishers.begin();
     while (iter != this->publishers.end())
@@ -371,7 +371,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   else if (packet.type() == "topic_namespace_add")
   {
     msgs::GzString result;
-    result.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(result, packet.serialized_data());
 
     boost::mutex::scoped_lock lock(this->namespaceMutex);
     this->namespaces.push_back(std::string(result.data()));
@@ -385,7 +385,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   else if (packet.type() == "publisher_update")
   {
     msgs::Publish pub;
-    pub.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(pub, packet.serialized_data());
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
@@ -395,7 +395,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   else if (packet.type() == "publisher_advertise")
   {
     msgs::Publish pub;
-    pub.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(pub, packet.serialized_data());
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
@@ -410,7 +410,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   else if (packet.type() == "publisher_subscribe")
   {
     msgs::Publish pub;
-    pub.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(pub, packet.serialized_data());
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
@@ -420,7 +420,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   else if (packet.type() == "unsubscribe")
   {
     msgs::Subscribe sub;
-    sub.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(sub, packet.serialized_data());
 
     // Disconnect a local publisher from a remote subscriber
     TopicManager::Instance()->DisconnectPubFromSub(sub.topic(),
@@ -429,7 +429,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   else if (packet.type() == "unadvertise")
   {
     msgs::Publish pub;
-    pub.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(pub, packet.serialized_data());
 
     // Disconnection all local subscribers from a remote publisher
     TopicManager::Instance()->DisconnectSubFromPub(pub.topic(),
@@ -467,13 +467,13 @@ void ConnectionManager::OnRead(ConnectionPtr _connection,
   }
 
   msgs::Packet packet;
-  packet.ParseFromString(_data);
+  msgs::ParseFromString(packet, _data);
 
   // If we have an incoming (remote) subscription
   if (packet.type() == "sub")
   {
     msgs::Subscribe sub;
-    sub.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(sub, packet.serialized_data());
 
     // Create a transport link for the publisher to the remote subscriber
     // via the connection

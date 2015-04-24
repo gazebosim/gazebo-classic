@@ -442,7 +442,7 @@ void MainWindow::Save()
   if (response->response() != "error" && response->type() == msg.GetTypeName())
   {
     // Parse the response message
-    msg.ParseFromString(response->serialized_data());
+    msgs::ParseFromString(msg, response->serialized_data());
 
     // Parse the string into sdf, so that we can insert user camera settings.
     sdf::SDF sdf_parsed;
@@ -1750,7 +1750,7 @@ void MainWindow::OnResponse(ConstResponsePtr &_msg)
 
   if (_msg->has_type() && _msg->type() == sceneMsg.GetTypeName())
   {
-    sceneMsg.ParseFromString(_msg->serialized_data());
+    msgs::ParseFromString(sceneMsg, _msg->serialized_data());
 
     for (int i = 0; i < sceneMsg.model_size(); ++i)
     {

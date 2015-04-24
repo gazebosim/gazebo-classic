@@ -387,42 +387,42 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   if (_msg->has_type() && _msg->type() == this->modelMsg.GetTypeName())
   {
     this->propMutex->lock();
-    this->modelMsg.ParseFromString(_msg->serialized_data());
+    this->msgs::ParseFromString(modelMsg, _msg->serialized_data());
     this->fillTypes.push_back("Model");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->linkMsg.GetTypeName())
   {
     this->propMutex->lock();
-    this->linkMsg.ParseFromString(_msg->serialized_data());
+    this->msgs::ParseFromString(linkMsg, _msg->serialized_data());
     this->fillTypes.push_back("Link");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->jointMsg.GetTypeName())
   {
     this->propMutex->lock();
-    this->jointMsg.ParseFromString(_msg->serialized_data());
+    this->msgs::ParseFromString(jointMsg, _msg->serialized_data());
     this->fillTypes.push_back("Joint");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->sceneMsg.GetTypeName())
   {
     this->propMutex->lock();
-    this->sceneMsg.ParseFromString(_msg->serialized_data());
+    this->msgs::ParseFromString(sceneMsg, _msg->serialized_data());
     this->fillTypes.push_back("Scene");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->physicsMsg.GetTypeName())
   {
     this->propMutex->lock();
-    this->physicsMsg.ParseFromString(_msg->serialized_data());
+    this->msgs::ParseFromString(physicsMsg, _msg->serialized_data());
     this->fillTypes.push_back("Physics");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->lightMsg.GetTypeName())
   {
     this->propMutex->lock();
-    this->lightMsg.ParseFromString(_msg->serialized_data());
+    this->msgs::ParseFromString(lightMsg, _msg->serialized_data());
     this->fillTypes.push_back("Light");
     this->propMutex->unlock();
   }
@@ -430,7 +430,7 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
            _msg->type() == this->sphericalCoordMsg.GetTypeName())
   {
     this->propMutex->lock();
-    this->sphericalCoordMsg.ParseFromString(_msg->serialized_data());
+    this->msgs::ParseFromString(sphericalCoordMsg, _msg->serialized_data());
     this->fillTypes.push_back("Spherical Coordinates");
     this->propMutex->unlock();
   }

@@ -369,11 +369,11 @@ transport::ConnectionPtr transport::connectToMaster()
       return transport::ConnectionPtr();
     }
 
-    packet.ParseFromString(data);
+    msgs::ParseFromString(packet, data);
     if (packet.type() == "version_init")
     {
       msgs::GzString msg;
-      msg.ParseFromString(packet.serialized_data());
+      msgs::ParseFromString(msg, packet.serialized_data());
       if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION)
         std::cerr << "Conflicting gazebo versions\n";
     }

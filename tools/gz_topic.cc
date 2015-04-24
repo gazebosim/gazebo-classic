@@ -100,8 +100,8 @@ void TopicCommand::List()
     connection->EnqueueMsg(msgs::Package("request", request), true);
     connection->Read(data);
 
-    packet.ParseFromString(data);
-    topics.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(packet, data);
+    msgs::ParseFromString(topics, packet.serialized_data());
 
     for (int i = 0; i < topics.data_size(); ++i)
     {
@@ -128,11 +128,11 @@ msgs::TopicInfo TopicCommand::GetInfo(const std::string &_topic)
   do
   {
     connection->Read(data);
-    packet.ParseFromString(data);
+    msgs::ParseFromString(packet, data);
   } while (packet.type() != "topic_info_response" && ++i < 10);
 
   if (i <10)
-    topicInfo.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(topicInfo, packet.serialized_data());
   else
     std::cerr << "Unable to get topic info.\n";
 

@@ -279,7 +279,7 @@ void Camera::Update()
     else if ((*iter).request() == "attach_visual")
     {
       msgs::TrackVisual msg;
-      msg.ParseFromString((*iter).data());
+      msgs::ParseFromString(msg, (*iter).data());
       bool result = false;
 
       if (msg.id() < GZ_UINT32_MAX)

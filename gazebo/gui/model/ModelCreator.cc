@@ -249,7 +249,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
   if (response->type() == msg.GetTypeName())
   {
     // Parse the response message
-    msg.ParseFromString(response->serialized_data());
+    msgs::ParseFromString(msg, response->serialized_data());
 
     // Parse the string into sdf
     sdf::SDF sdfParsed;

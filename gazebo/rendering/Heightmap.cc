@@ -346,7 +346,7 @@ void Heightmap::Load()
   if (response->response() != "error" &&
       response->type() == geomMsg.GetTypeName())
   {
-    geomMsg.ParseFromString(response->serialized_data());
+    msgs::ParseFromString(geomMsg, response->serialized_data());
 
     // Copy the height data.
     this->terrainSize = msgs::Convert(geomMsg.heightmap().size());

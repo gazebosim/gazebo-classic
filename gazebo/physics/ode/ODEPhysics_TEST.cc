@@ -201,7 +201,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
 void ODEPhysics_TEST::OnPhysicsMsgResponse(ConstResponsePtr &_msg)
 {
   if (_msg->type() == physicsPubMsg.GetTypeName())
-    physicsResponseMsg.ParseFromString(_msg->serialized_data());
+    msgs::ParseFromString(physicsResponseMsg, _msg->serialized_data());
 }
 
 /////////////////////////////////////////////////

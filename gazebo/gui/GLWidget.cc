@@ -815,8 +815,8 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
     connection->EnqueueMsg(msgs::Package("request", request), true);
     connection->Read(topicData);
 
-    packet.ParseFromString(topicData);
-    topics.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(packet, topicData);
+    msgs::ParseFromString(topics, packet.serialized_data());
 
     std::string searchable;
     for (int i = 0; i < topics.data_size(); ++i)

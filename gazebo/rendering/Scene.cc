@@ -2147,7 +2147,7 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
     return;
 
   msgs::Scene sceneMsg;
-  sceneMsg.ParseFromString(_msg->serialized_data());
+  msgs::ParseFromString(sceneMsg, _msg->serialized_data());
   boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
   this->dataPtr->sceneMsgs.push_back(sm);
   this->dataPtr->requestMsg = NULL;

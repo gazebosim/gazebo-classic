@@ -506,7 +506,7 @@ bool ModelCommand::RunImpl()
 
     if (response->has_serialized_data() &&
         !response->serialized_data().empty() &&
-        modelMsg.ParseFromString(response->serialized_data()))
+        msgs::ParseFromString(modelMsg, response->serialized_data()))
     {
       if (this->vm.count("info"))
         std::cout << modelMsg.DebugString() << std::endl;
@@ -719,8 +719,8 @@ bool CameraCommand::RunImpl()
       connection->EnqueueMsg(msgs::Package("request", *request), true);
       connection->Read(data);
 
-      packet.ParseFromString(data);
-      topics.ParseFromString(packet.serialized_data());
+      msgs::ParseFromString(packet, data);
+      msgs::ParseFromString(topics, packet.serialized_data());
 
       for (int i = 0; i < topics.data_size(); ++i)
       {
@@ -731,13 +731,13 @@ bool CameraCommand::RunImpl()
         do
         {
           connection->Read(data);
-          packet.ParseFromString(data);
+          msgs::ParseFromString(packet, data);
         } while (packet.type() != "topic_info_response" && ++j < 10);
 
         msgs::TopicInfo topicInfo;
 
         if (j <10)
-          topicInfo.ParseFromString(packet.serialized_data());
+          msgs::ParseFromString(topicInfo, packet.serialized_data());
         else
         {
           std::cerr << "Unable to get info for topic["

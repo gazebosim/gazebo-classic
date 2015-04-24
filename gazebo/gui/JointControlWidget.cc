@@ -258,7 +258,7 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
     if (response->response() != "error" &&
         response->type() == modelMsg.GetTypeName())
     {
-      modelMsg.ParseFromString(response->serialized_data());
+      msgs::ParseFromString(modelMsg, response->serialized_data());
     }
   }
 

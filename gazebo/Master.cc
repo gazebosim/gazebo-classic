@@ -139,12 +139,12 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
   transport::ConnectionPtr conn = this->connections[_connectionIndex];
 
   msgs::Packet packet;
-  packet.ParseFromString(_data);
+  msgs::ParseFromString(packet, _data);
 
   if (packet.type() == "register_topic_namespace")
   {
     msgs::GzString worldNameMsg;
-    worldNameMsg.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(worldNameMsg, packet.serialized_data());
 
     std::list<std::string>::iterator iter;
     iter = std::find(this->worldNames.begin(), this->worldNames.end(),
@@ -167,7 +167,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
   {
     boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
     msgs::Publish pub;
-    pub.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(pub, packet.serialized_data());
 
     Connection_M::iterator iter2;
     for (iter2 = this->connections.begin();
@@ -193,19 +193,19 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
   else if (packet.type() == "unadvertise")
   {
     msgs::Publish pub;
-    pub.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(pub, packet.serialized_data());
     this->RemovePublisher(pub);
   }
   else if (packet.type() == "unsubscribe")
   {
     msgs::Subscribe sub;
-    sub.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(sub, packet.serialized_data());
     this->RemoveSubscriber(sub);
   }
   else if (packet.type() == "subscribe")
   {
     msgs::Subscribe sub;
-    sub.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(sub, packet.serialized_data());
 
     this->subscribers.push_back(std::make_pair(sub, conn));
 
@@ -224,7 +224,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
   else if (packet.type() == "request")
   {
     msgs::Request req;
-    req.ParseFromString(packet.serialized_data());
+    msgs::ParseFromString(req, packet.serialized_data());
 
     if (req.request() == "get_publishers")
     {
