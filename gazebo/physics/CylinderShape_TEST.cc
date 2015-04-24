@@ -180,7 +180,7 @@ TEST_F(CylinderShapeTest, Volume)
 
   // The bounding box approximation should be 0 because the Shape has no
   // Collision parent
-  EXPECT_DOUBLE_EQ(box->Shape::ComputeVolume(), 0);
+  EXPECT_DOUBLE_EQ(cylinder->Shape::ComputeVolume(), 0);
 }
 
 int main(int argc, char **argv)
