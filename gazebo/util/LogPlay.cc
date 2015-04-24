@@ -31,7 +31,6 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Base64.hh"
 #include "gazebo/math/Rand.hh"
-#include "gazebo/transport/transport.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
 
