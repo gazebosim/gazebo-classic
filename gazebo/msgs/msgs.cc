@@ -85,7 +85,7 @@ namespace gazebo
     bool ParseFromString(google::protobuf::Message &_message,
                          const std::string &_data)
     {
-      if (!msgs::ParseFromString(_message, _data))
+      if (!_message.ParseFromString(_data))
       {
         gzerr << "ParseFromString failed, trying ParsePartialFromString"
               << std::endl;
