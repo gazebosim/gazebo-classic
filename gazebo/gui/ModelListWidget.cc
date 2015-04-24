@@ -2508,6 +2508,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     item->setValue(_msg.sor());
   solverItem->addSubProperty(item);
 
+
   QtProperty *constraintsItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("constraints"));
   this->propTreeBrowser->addProperty(constraintsItem);
