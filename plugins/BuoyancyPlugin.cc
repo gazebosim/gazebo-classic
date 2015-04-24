@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 #include "plugins/BuoyancyPlugin.hh"
 
@@ -31,13 +32,13 @@ BuoyancyPlugin::BuoyancyPlugin() : fluidDensity(1000.0)
 /////////////////////////////////////////////////
 void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
-  GZ_ASSERT(_model != NULL, "Received NULL model pointer" << std::endl;
-  GZ_ASSERT(_sdf != NULL, "Received NULL SDF pointer" << std::endl;
+  GZ_ASSERT(_model != NULL, "Received NULL model pointer");
+  GZ_ASSERT(_sdf != NULL, "Received NULL SDF pointer");
   this->model = _model;
   physics::WorldPtr world = _model->GetWorld();
-  GZ_ASSERT(world != NULL, "Model is in a NULL world" << std::endl;
+  GZ_ASSERT(world != NULL, "Model is in a NULL world");
   this->physicsEngine = world->GetPhysicsEngine();
-  GZ_ASSERT(this->physicsEngine != NULL, "Physics engine was NULL" << std::endl;
+  GZ_ASSERT(this->physicsEngine != NULL, "Physics engine was NULL");
 
   this->sdf = _sdf;
   if (this->sdf->HasElement("fluid_density"))
@@ -46,13 +47,13 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   // Get center of volume and density that were inputted in SDF
-  for (ElementPtr linkElem = this->sdf->GetElement("link"); linkElem;
+  for (sdf::ElementPtr linkElem = this->sdf->GetElement("link"); linkElem;
        linkElem = this->sdf->GetNextElement("link"))
   {
     int id = -1;
-    if (linkElem->HasAttribute("name")
+    if (linkElem->HasAttribute("name"))
     {
-      physics::LinkPtr link = this->model->GetLink(linkElem->GetAttribute("name"));
+      physics::LinkPtr link = this->model->GetLink(linkElem->Get<std::string>("name"));
       if (!link)
       {
         continue;
@@ -65,11 +66,11 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
           linkElem->GetElement("center_of_volume")->Get<math::Vector3>();
       this->volPropsMap[id].cov = cov;
     }
-    if (linkElem->HasElement("density"))
+    if (linkElem->HasElement("volume"))
     {
-      math::Vector3 density =
-          linkElem->GetElement("density")->Get<math::Vector3>();
-      this->volPropsMap[id].density = density;
+      double volume =
+          linkElem->GetElement("volume")->Get<double>();
+      this->volPropsMap[id].volume = volume;
     }
   }
 
@@ -82,38 +83,46 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     if (this->volPropsMap.find(id) == this->volPropsMap.end())
     {
       double volumeSum = 0;
-      double weightedPosSum = math::Vector3::Zero;
-      for (auto collision : link->GetCollisions)
+      math::Vector3 weightedPosSum = math::Vector3::Zero;
+      for (auto collision : link->GetCollisions())
       {
         double volume = collision->GetShape()->ComputeVolume();
         volumeSum += volume;
-        weightedPosSum += volume*collision->GetWorldPose();
+        weightedPosSum += volume*collision->GetWorldPose().pos;
       }
       // Subtract the center of volume into the link frame.
-      this->volPropsMap[id].cov = weightedPosSum/volumeSum - link->GetWorldPose();
-      this->volPropsMap[id].volume =volumeSum;
+      this->volPropsMap[id].cov = weightedPosSum/volumeSum - link->GetWorldPose().pos;
+      this->volPropsMap[id].volume = volumeSum;
     }
   }
 
-  this->updateConnection = event::ConnectWorldUpdateBegin(
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       std::bind(&BuoyancyPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
-virtual void BuoyancyPlugin::Init()
+void BuoyancyPlugin::Init()
 {
 }
 
 /////////////////////////////////////////////////
-virtual void BuoyancyPlugin::OnUpdate()
+
+/////////////////////////////////////////////////
+void BuoyancyPlugin::OnUpdate()
 {
   for (auto link : this->model->GetLinks())
   {
     VolumeProperties volumeProperties = this->volPropsMap[link->GetId()];
     double volume = volumeProperties.volume;
-    math::Vector3 cov = volumeProperties.cov;
 
     math::Vector3 buoyancy =
-        this->fluidDensity*volume*this->physicsEngine->GetGravity();
+        -this->fluidDensity * volume * this->physicsEngine->GetGravity();
+
+    math::Pose linkFrame = link->GetWorldPose();
+    // Transform buoyancy into the link frame before applying the force.
+    math::Vector3 buoyancyLinkFrame =
+        linkFrame.rot.GetInverse().RotateVector(buoyancy) - linkFrame.pos;
+
+    link->AddLinkForce(buoyancyLinkFrame, volumeProperties.cov);
   }
 }

@@ -18,7 +18,6 @@
 #ifndef _GAZEBO_BUOYANCY_PLUGIN_HH_
 #define _GAZEBO_BUOYANCY_PLUGIN_HH_
 
-#include "sdf/Element.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/math/Vector3.hh"
@@ -30,14 +29,14 @@ namespace gazebo
 
   class VolumeProperties
   {
-    public: VolumeProperties();
-    public: VolumeProperties(const math::Vector3 _cov, const double _density)
-              : cov(_cov), density(_density);
+    public: VolumeProperties() {}
+    public: VolumeProperties(const math::Vector3 _cov, const double _volume)
+              : cov(_cov), volume(_volume) {}
     /// \brief Center of volume in the link frame.
     public: math::Vector3 cov;
-    /// \brief Density of this object.
-    public: double density;
-  }
+    /// \brief Volume of this object.
+    public: double volume;
+  };
 
   /// \class A plugin that simulates buoyancy of an object immersed in fluid.
   class BuoyancyPlugin : public ModelPlugin
