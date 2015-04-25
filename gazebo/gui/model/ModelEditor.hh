@@ -55,6 +55,10 @@ namespace gazebo
       /// \param[in] _sdf SDF describing the entity.
       public: void SpawnEntity(sdf::ElementPtr _sdf);
 
+      /// \brief Remove an entity from the editor
+      /// \param[in] _name Name of the entity.
+      public: void RemoveEntity(const std::string &_name);
+
       /// \brief Qt callback when the model editor's save action is
       /// triggered.
       private slots: void Save();
