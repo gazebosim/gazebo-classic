@@ -1810,7 +1810,7 @@ bool World::OnLog(std::ostringstream &_stream)
   // Save the entire state when its the first call to OnLog.
   if (util::LogRecord::Instance()->GetFirstUpdate())
   {
-    this->UpdateStateSDF();
+    this->dataPtr->sdf->Update();
     _stream << "<sdf version ='";
     _stream << SDF_VERSION;
     _stream << "'>\n";
@@ -1944,6 +1944,8 @@ void World::PublishWorldStats()
 
   this->dataPtr->worldStatsMsg.set_iterations(this->dataPtr->iterations);
   this->dataPtr->worldStatsMsg.set_paused(this->IsPaused());
+  this->dataPtr->worldStatsMsg.set_log_playback(
+      util::LogPlay::Instance()->IsOpen());
 
   if (this->dataPtr->statPub && this->dataPtr->statPub->HasConnections())
     this->dataPtr->statPub->Publish(this->dataPtr->worldStatsMsg);
