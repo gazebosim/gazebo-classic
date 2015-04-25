@@ -151,6 +151,11 @@ macro (gz_setup_apple)
     add_definitions(-DMAC_OS_X_VERSION=0)
   endif ()
 
+  # libstdc++ used on 10.8 and earlier
+  if (${CMAKE_SYSTEM_VERSION} LESS 13)
+    set (APPLE_PKGCONFIG_LIBS "${APPLE_PKGCONFIG_LIBS} -lstdc++")
+  endif()
+
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
 endmacro()
 
