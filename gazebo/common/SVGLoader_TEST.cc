@@ -171,9 +171,7 @@ TEST_F(SVGLoader, ghost_edges)
   EXPECT_EQ(true, success);
   // the test file has 2 paths inside
   EXPECT_EQ(1u, paths.size());
-  // each path has the same number of points
   EXPECT_EQ(1u, paths[0].polylines.size());
-  auto &polyline1 = paths[0].polylines[0];
 }
 
 
