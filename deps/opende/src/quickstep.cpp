@@ -384,7 +384,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
           dIASSERT (jb_ptr == jb+2*m);
         }
       }
-#ifdef INSTRUMENT
+#ifdef HDF5_INSTRUMENT
       IFTIMING (dTimerNow ("Dump data"));
       IFDUMP(h5dump_world(DATA_FILE, world, stepsize));
 #endif

@@ -24,6 +24,7 @@
 #define _ODE_QUICK_STEP_UTIL_H_
 
 #include <ode/common.h>
+#include "gazebo/gazebo_config.h"
 
 #ifdef SSE
 #include <xmmintrin.h>
@@ -46,7 +47,7 @@
 #undef CHECK_VELOCITY_OBEYS_CONSTRAINT
 
 #ifndef TIMING
-#ifdef INSTRUMENT
+#ifdef HDF5_INSTRUMENT
 #define DUMP
 #include <ode/h5dump.h>
 #define DATA_FILE  "ode_frames.hdf5"

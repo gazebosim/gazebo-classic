@@ -271,7 +271,7 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
       }
     }
   }
-#ifdef INSTRUMENT
+#ifdef HDF5_INSTRUMENT
   h5dump_world("ode_frames.hdf5", world, stepsize);
 #endif
   // get m = total constraint dimension, nub = number of unbounded variables.
