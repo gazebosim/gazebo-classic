@@ -3,11 +3,17 @@
     <physics type="ode" name="default" default="true" />
     <physics type="ode" name="unthrottled">
       <real_time_update_rate>0.0</real_time_update_rate>
+      <ode>
+        <solver>
+          <thread_position_correction>0</thread_position_correction>
+        </solver>
+      </ode>
     </physics>
     <physics type="ode" name="unthrottled0">
       <real_time_update_rate>0.0</real_time_update_rate>
       <ode>
         <solver>
+          <thread_position_correction>0</thread_position_correction>
           <island_threads>0</island_threads>
         </solver>
       </ode>
@@ -16,6 +22,7 @@
       <real_time_update_rate>0.0</real_time_update_rate>
       <ode>
         <solver>
+          <thread_position_correction>0</thread_position_correction>
           <island_threads>1</island_threads>
         </solver>
       </ode>
@@ -24,6 +31,7 @@
       <real_time_update_rate>0.0</real_time_update_rate>
       <ode>
         <solver>
+          <thread_position_correction>0</thread_position_correction>
           <island_threads>2</island_threads>
         </solver>
       </ode>
@@ -32,6 +40,7 @@
       <real_time_update_rate>0.0</real_time_update_rate>
       <ode>
         <solver>
+          <thread_position_correction>0</thread_position_correction>
           <island_threads>3</island_threads>
         </solver>
       </ode>
@@ -40,6 +49,52 @@
       <real_time_update_rate>0.0</real_time_update_rate>
       <ode>
         <solver>
+          <thread_position_correction>0</thread_position_correction>
+          <island_threads>4</island_threads>
+        </solver>
+      </ode>
+    </physics>
+    <physics type="ode" name="split_unthrottled0">
+      <real_time_update_rate>0.0</real_time_update_rate>
+      <ode>
+        <solver>
+          <thread_position_correction>1</thread_position_correction>
+          <island_threads>0</island_threads>
+        </solver>
+      </ode>
+    </physics>
+    <physics type="ode" name="split_unthrottled1">
+      <real_time_update_rate>0.0</real_time_update_rate>
+      <ode>
+        <solver>
+          <thread_position_correction>1</thread_position_correction>
+          <island_threads>1</island_threads>
+        </solver>
+      </ode>
+    </physics>
+    <physics type="ode" name="split_unthrottled2">
+      <real_time_update_rate>0.0</real_time_update_rate>
+      <ode>
+        <solver>
+          <thread_position_correction>1</thread_position_correction>
+          <island_threads>2</island_threads>
+        </solver>
+      </ode>
+    </physics>
+    <physics type="ode" name="split_unthrottled3">
+      <real_time_update_rate>0.0</real_time_update_rate>
+      <ode>
+        <solver>
+          <thread_position_correction>1</thread_position_correction>
+          <island_threads>3</island_threads>
+        </solver>
+      </ode>
+    </physics>
+    <physics type="ode" name="split_unthrottled4">
+      <real_time_update_rate>0.0</real_time_update_rate>
+      <ode>
+        <solver>
+          <thread_position_correction>1</thread_position_correction>
           <island_threads>4</island_threads>
         </solver>
       </ode>
