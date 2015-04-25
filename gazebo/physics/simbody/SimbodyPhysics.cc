@@ -492,6 +492,14 @@ void SimbodyPhysics::UpdateCollision()
           {
             for (int i=0; i < patch.getNumDetails(); ++i)
             {
+              if (count >= MAX_CONTACT_JOINTS)
+              {
+                gzerr << "max contact count [" << MAX_CONTACT_JOINTS
+                      << "] exceeded. truncating info.\n";
+                continue;
+              }
+              // gzerr << "count: " << count << "\n";
+
               // get detail
               const SimTK::ContactDetail &detail = patch.getContactDetail(i);
               // get contact information from simbody and
@@ -1332,7 +1340,6 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
   //                                 0.5,   // mu_dynamic
   //                                 0.5);  // mu_viscous
 
-  gzerr << "mobod :" << _mobod.getMobilizedBodyIndex() << "\n";
   bool addModelClique = _modelClique.isValid() && !_link->GetSelfCollide();
 
   // COLLISION
@@ -1351,7 +1358,6 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
     {
       case physics::Entity::PLANE_SHAPE:
       {
-        gzerr << "adding ground shape\n";
         boost::shared_ptr<physics::PlaneShape> p =
           boost::dynamic_pointer_cast<physics::PlaneShape>((*ci)->GetShape());
 

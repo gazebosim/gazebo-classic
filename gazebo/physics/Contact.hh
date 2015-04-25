@@ -38,7 +38,7 @@
 //                      for proper contact dynamics.
 // MAX_CONTACT_JOINTS truncates <max_contacts> specified in SDF
 #define MAX_COLLIDE_RETURNS 250
-#define MAX_CONTACT_JOINTS 32
+#define MAX_CONTACT_JOINTS 250
 
 namespace gazebo
 {
