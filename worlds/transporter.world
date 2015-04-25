@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <plugin filename="libTransporterPlugin.so" name="transporter">
+      <pad name="pad1">
+        <destination>pad2</destination>
+        <outgoing>
+          <pose>0 0 0 0 0 0</pose>
+          <box>1 1 1</box>
+        </outgoing>
+
+        <incoming>
+          <pose>1 0 0 0 0 0</pose>
+          <box>1 1 1</box>
+        </incoming>
+      </pad>
+
+      <pad name="pad2">
+        <destination>pad1</destination>
+        <outgoing>
+          <pose>10 0 0 0 0</pose>
+          <box>1 1 1</box>
+        </outgoing>
+
+        <incoming>
+          <pose>11 0 0 0 0 0</pose>
+          <box>1 1 1</box>
+        </incoming>
+      </pad>
+    </plugin>
+  </world>
+</sdf>
