@@ -1,6 +1,10 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
+    <physics type="ode">
+      <gravity>0 -3.0 -9.8</gravity>
+    </physics>
+
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
@@ -15,7 +19,7 @@
       <pad name="pad1">
         <destination>pad2</destination>
         <outgoing>
-          <pose>0 0 0 0 0 0</pose>
+          <pose>0 0 0.5 0 0 0</pose>
           <box>1 1 1</box>
         </outgoing>
 
@@ -28,15 +32,41 @@
       <pad name="pad2">
         <destination>pad1</destination>
         <outgoing>
-          <pose>10 0 0 0 0</pose>
+          <pose>10 0 0 0 0 0</pose>
           <box>1 1 1</box>
         </outgoing>
 
         <incoming>
-          <pose>11 0 0 0 0 0</pose>
+          <pose>2 0 0.5 0 0 0</pose>
           <box>1 1 1</box>
         </incoming>
       </pad>
     </plugin>
+
+
+
+    <model name="sphere">
+      <pose>0 3 0.2 0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>10</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>.2</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>.2</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
   </world>
 </sdf>

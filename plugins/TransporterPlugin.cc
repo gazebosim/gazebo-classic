@@ -15,8 +15,13 @@
  *
 */
 
+#include <gazebo/common/Events.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Console.hh>
+
+#include <gazebo/physics/World.hh>
+#include <gazebo/physics/Model.hh>
+
 #include "plugins/TransporterPlugin.hh"
 
 using namespace gazebo;
@@ -51,16 +56,65 @@ void TransporterPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
     sdf::ElementPtr outElem = padElem->GetElement("outgoing");
     pad->outgoingPose = outElem->Get<math::Pose>("pose");
-    std::cout << pad->outgoingPose << std::endl;
-    /*outElem->Get<math::Vector3>("box") >> pad->outgoingBox;
+    pad->outgoingBox = outElem->Get<math::Vector3>("box");
 
     sdf::ElementPtr inElem = padElem->GetElement("incoming");
-    inElem->Get<std::string>("pose") >> pad->incomingPose;
-    inElem->Get<math::Vector3>("box") >> pad->incomingBox;
-    */
+    pad->incomingPose = inElem->Get<math::Pose>("pose");
+    pad->incomingBox = inElem->Get<math::Vector3>("box");
 
     this->pads[pad->name] = pad;
 
     padElem = padElem->GetNextElement("pad");
+  }
+
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&TransporterPlugin::Update, this));
+}
+
+/////////////////////////////////////////////////
+void TransporterPlugin::Update()
+{
+  physics::Model_V models = this->world->GetModels();
+
+  for (physics::Model_V::iterator iter = models.begin();
+       iter != models.end(); ++iter)
+  {
+    if ((*iter)->IsStatic())
+      continue;
+
+    math::Pose modelPose = (*iter)->GetWorldPose();
+    for (std::map<std::string, Pad*>::iterator padIter = this->pads.begin();
+         padIter != this->pads.end(); ++padIter)
+    {
+      math::Vector3 min = padIter->second->outgoingPose.pos -
+                          padIter->second->outgoingBox / 2.0;
+
+       math::Vector3 max = padIter->second->outgoingPose.pos +
+                           padIter->second->outgoingBox / 2.0;
+
+      if (modelPose.pos.x > min.x && modelPose.pos.x < max.x &&
+          modelPose.pos.y > min.y && modelPose.pos.y < max.y &&
+          modelPose.pos.z > min.z && modelPose.pos.z < max.z)
+      {
+        std::map<std::string, Pad*>::iterator destIter =
+          this->pads.find(padIter->second->dest);
+
+        std::cout << "Inside Pad[" << padIter->first << "] Pose["
+                  << modelPose.pos << "] Dest[" << padIter->second->dest << "]\n";
+        if (destIter != this->pads.end())
+        {
+          physics::ModelPtr destModel = this->world->GetModelBelowPoint(
+              destIter->second->incomingPose.pos);
+
+          math::Pose destPose = destIter->second->incomingPose;
+          (*iter)->SetWorldPose(destPose);
+
+          double dz = (*iter)->GetBoundingBox().min.z -
+                      destModel->GetBoundingBox().max.z;
+          destPose.pos.z -= dz;
+          (*iter)->SetWorldPose(destPose);
+        }
+      }
+    }
   }
 }

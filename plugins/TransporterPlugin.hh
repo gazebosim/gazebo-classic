@@ -38,11 +38,13 @@ namespace gazebo
     /// \param[in] _sdf Pointer to the SDF configuration.
     public: virtual void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
 
+    private: void Update();
+
     /// \brief World pointer.
-    protected: physics::WorldPtr world;
+    private: physics::WorldPtr world;
 
     /// \brief SDF pointer.
-    protected: sdf::ElementPtr sdf;
+    private: sdf::ElementPtr sdf;
 
     private: class Pad
              {
@@ -56,7 +58,11 @@ namespace gazebo
                public: math::Vector3 outgoingBox;
              };
 
+
     private: std::map<std::string, Pad*> pads;
+
+    /// \brief Pointer to the update event connection
+    private: event::ConnectionPtr updateConnection;
   };
 }
 #endif
