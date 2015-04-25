@@ -352,6 +352,20 @@ rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
         _modelElem->Get<std::string>("name");
     nestedModelName = modelNameStream.str();
 
+    // Generate unique name
+    auto itName = this->allNestedModels.find(nestedModelName);
+    int nameCounter = 0;
+    std::string uniqueName;
+    while (itName != this->allNestedModels.end())
+    {
+      std::stringstream uniqueNameStr;
+      uniqueNameStr << nestedModelName << "_" << nameCounter++;
+      uniqueName = uniqueNameStr.str();
+      itName = this->allNestedModels.find(uniqueName);
+    }
+    if (!uniqueName.empty())
+      nestedModelName = uniqueName;
+
     // Model Visual
     modelVisual.reset(new rendering::Visual(nestedModelName, _parentVis));
     modelVisual->Load();
@@ -361,9 +375,12 @@ rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
       modelVisual->SetPose(_modelElem->Get<math::Pose>("pose"));
 
     // Only keep SDF and preview visual
-    modelData->modelSDF = _modelElem;
+    std::string leafName = nestedModelName;
+    leafName = leafName.substr(leafName.rfind("::")+2);
+
+    modelData->modelSDF = _modelElem->Clone();
     modelData->modelVisual = modelVisual;
-    modelData->SetName(_modelElem->Get<std::string>("name"));
+    modelData->SetName(leafName);
     modelData->SetPose(_modelElem->Get<math::Pose>("pose"));
   }
 
@@ -1104,11 +1121,6 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
   }
   gui::model::Events::nestedModelRemoved(nestedModelName);
 
-  std::string leafName = _nestedModelName;
-  size_t idx = _nestedModelName.find_last_of("::");
-  if (idx != std::string::npos)
-    leafName = _nestedModelName.substr(idx+1);
-  gui::model::Events::nestedModelRemoved(leafName);
   this->ModelChanged();
 }
 
@@ -1156,15 +1168,15 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
   link->linkVisual.reset();
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->allLinks.erase(_linkName);
+    this->allLinks.erase(linkName);
     delete link;
   }
   gui::model::Events::linkRemoved(linkName);
 
-  std::string leafName = _linkName;
-  size_t idx = _linkName.find_last_of("::");
+  std::string leafName = linkName;
+  size_t idx = linkName.find_last_of("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+1);
+    leafName = linkName.substr(idx+1);
   gui::model::Events::linkRemoved(leafName);
   this->ModelChanged();
 }
@@ -1206,7 +1218,9 @@ void ModelCreator::Reset()
     this->RemoveLinkImpl(this->allLinks.begin()->first);
   this->allLinks.clear();
 
-  // remove all nested models
+  while (!this->allNestedModels.empty())
+    this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
+  this->allNestedModels.clear();
 
   if (!gui::get_active_camera() ||
     !gui::get_active_camera()->GetScene())
