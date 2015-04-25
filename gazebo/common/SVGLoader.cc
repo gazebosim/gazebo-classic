@@ -98,10 +98,16 @@ void cubicBezier(const math::Vector2d &_p0,
   _points.push_back(_p3);
 }
 
-static double sqr(float x) { return x*x; }
-
-static float vecang(float _ux, float _uy, float _vx, float _vy)
+/////////////////////////////////////////////////
+static double Sqr(float x)
 {
+  return x*x;
+}
+
+/////////////////////////////////////////////////
+static float VecAng(float _ux, float _uy, float _vx, float _vy)
+{
+  // computes the angle between 2 vectors, using acos
   double ux = _ux;
   double uy = _uy;
   double vx = _vx;
@@ -177,7 +183,7 @@ void arcPath(const math::Vector2d &_p0,
   // 1) Compute x1', y1'
   x1p = cosrx * dx / 2.0 + sinrx * dy / 2.0;
   y1p = -sinrx * dx / 2.0 + cosrx * dy / 2.0;
-  d = sqr(x1p) / sqr(rx) + sqr(y1p) / sqr(ry);
+  d = Sqr(x1p) / Sqr(rx) + Sqr(y1p) / Sqr(ry);
   if (d > 1)
   {
     d = sqrt(d);
@@ -186,8 +192,8 @@ void arcPath(const math::Vector2d &_p0,
   }
   // 2) Compute cx', cy'
   s = 0.0;
-  sa = sqr(rx) * sqr(ry) - sqr(rx) * sqr(y1p) - sqr(ry) * sqr(x1p);
-  sb = sqr(rx) * sqr(y1p) + sqr(ry) * sqr(x1p);
+  sa = Sqr(rx) * Sqr(ry) - Sqr(rx) * Sqr(y1p) - Sqr(ry) * Sqr(x1p);
+  sb = Sqr(rx) * Sqr(y1p) + Sqr(ry) * Sqr(x1p);
   if (sa < 0.0)
     sa = 0.0;
   if (sb > 0.0)
@@ -211,9 +217,9 @@ void arcPath(const math::Vector2d &_p0,
   vx = (-x1p - cxp) / rx;
   vy = (-y1p - cyp) / ry;
   // initial angle
-  a1 = vecang(1.0, 0.0, ux, uy);
+  a1 = VecAng(1.0, 0.0, ux, uy);
   // delta angle
-  da = vecang(ux, uy, vx, vy);
+  da = VecAng(ux, uy, vx, vy);
 
   if (_largeArc)
   {

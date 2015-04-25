@@ -121,19 +121,6 @@ namespace gazebo
                              const math::Vector3 &_sides,
                              const math::Vector2d &_uvCoords);
 
-      /// \brief Converts a vector of polylines into a table of vertices and
-      /// a list of edges (each made of 2 points from the table of vertices.
-      /// \param[in] _polys the polylines
-      /// \param[in] _tol tolerence for 2 vertices to be considered the same
-      /// \param[out] _vertices a table of unique vertices
-      /// \param[out] _edges a list of edges (made of start/end point indices
-      /// from the vertex table)
-      public: void ConvertToVerticesAndEdges(
-                      const std::vector<std::vector<math::Vector2d> > &_polys,
-                      double _tol,
-                      std::vector<math::Vector2d> &_vertices,
-                      std::vector< std::pair<size_t, size_t>  > &edges) const;
-
       /// \brief Create an extruded mesh from polylines. The polylines are
       /// assumed to be closed and non-intersecting. Delaunay triangulation is
       /// applied to create the resulting mesh. If there is more than one

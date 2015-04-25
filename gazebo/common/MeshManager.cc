@@ -526,7 +526,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   std::vector<math::Vector3> normals;
   for (unsigned int i  = 0; i < edges.size(); ++i)
   {
-    // we retreive each edge's coordinates
+    // we retrieve each edge's coordinates
     int i0 = edges[i][0];
     int i1 = edges[i][1];
     math::Vector2d edgeV0 = vertices[i0];
@@ -637,7 +637,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   // create the side faces
   for (unsigned int i = 0; i < edges.size(); ++i)
   {
-    // we retreive each edge's coordinates
+    // we retrieve each edge's coordinates
     int i0 = edges[i][0];
     int i1 = edges[i][1];
     math::Vector2d v0 = vertices[i0];

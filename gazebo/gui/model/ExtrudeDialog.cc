@@ -289,8 +289,6 @@ void ExtrudeDialog::UpdateView()
 
       QGraphicsPathItem *pathItem = new QGraphicsPathItem(painterPath);
       // Draw polygon
-/*      QGraphicsPolygonItem *polyItem = new QGraphicsPolygonItem(
-          QPolygonF(polygonPts)); */
       pathItem->setPen(QPen(Qt::black, 3, Qt::SolidLine));
       scene->addItem(pathItem);
     }
