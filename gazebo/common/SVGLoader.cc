@@ -99,9 +99,9 @@ void cubicBezier(const math::Vector2d &_p0,
 }
 
 /////////////////////////////////////////////////
-static double Sqr(float x)
+static double Sqr(float _x)
 {
-  return x*x;
+  return _x * _x;
 }
 
 /////////////////////////////////////////////////
