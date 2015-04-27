@@ -23,6 +23,7 @@
 
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/ApplyWrenchDialog.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
@@ -46,7 +47,9 @@ namespace gazebo
                   /// \brief Model
                   MODEL,
                   /// \brief Light
-                  LIGHT
+                  LIGHT,
+                  /// \brief Link
+                  LINK
                 };
 
       /// \brief Constructor
@@ -56,11 +59,11 @@ namespace gazebo
       public: virtual ~ModelRightMenu();
 
       /// \brief Show the right menu.
-      /// \param[in] _modelName Name of the model that is active.
+      /// \param[in] _entityName Name of the entity that is active.
       /// \param[in] _pt Point on the GUI that has received the right-click
       /// request.
       /// \param[in] _type Type of the entity clicked.
-      public: void Run(const std::string &_modelName, const QPoint &_pt,
+      public: void Run(const std::string &_entityName, const QPoint &_pt,
           EntityTypes _type = MODEL);
 
       /// \brief QT callback when move to has been selected.
@@ -72,8 +75,11 @@ namespace gazebo
       /// \brief QT callback when edit has been selected.
       private slots: void OnEdit();
 
+      /// \brief QT callback when apply force/torque has been selected.
+      private slots: void OnApplyWrench();
+
       /// \brief QT callback when delete has been selected.
-      /// \param[in] _name Name of the model to delete.
+      /// \param[in] _name Name of the entity to delete.
       private slots: void OnDelete(const std::string &_name="");
 
       /// \brief QT callback when snap below has been selected.
@@ -96,17 +102,20 @@ namespace gazebo
       /// \brief Subscriber to request messages.
       private: transport::SubscriberPtr requestSub;
 
-      /// \brief Name of the active model.
-      private: std::string modelName;
+      /// \brief Name of the active entity.
+      private: std::string entityName;
 
       /// \brief Action for moving the camera to an object.
       private: QAction *moveToAct;
 
-      /// \brief Action for attaching the camera to a model.
+      /// \brief Action for attaching the camera to an entity.
       private: QAction *followAct;
 
-      /// \brief Action for opening model on Model Editor.
+      /// \brief Action for opening entity on Model Editor.
       private: QAction *editAct;
+
+      /// \brief Action for applying force and torque to a model.
+      private: QAction *applyWrenchAct;
 
       /// \brief Action for snapping an object to another object below the
       /// first.

@@ -2466,6 +2466,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     {
       result = true;
       visual->LoadFromMsg(_msg);
+
       this->dataPtr->visuals[visual->GetId()] = visual;
       if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
           visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
@@ -2480,8 +2481,6 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       visual->ShowJoints(this->dataPtr->showJoints);
       visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
       visual->SetWireframe(this->dataPtr->wireframe);
-
-      visual->UpdateFromMsg(_msg);
     }
   }
 
