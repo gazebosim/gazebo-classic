@@ -33,6 +33,7 @@
               <point>0.5 0.5</point>
               <point>0 0</point>
               <point>0.5 -0.5</point>
+              <point>-0.5 -0.5</point>
               <height>1</height>
             </polyline>
           </geometry>
@@ -46,6 +47,7 @@
               <point>0.5 0.5</point>
               <point>0 0</point>
               <point>0.5 -0.5</point>
+              <point>-0.5 -0.5</point>
               <height>1</height>
             </polyline>
           </geometry>
@@ -72,6 +74,7 @@
               <point>3 -3</point>
               <point>-3 -5</point>
               <point>-5 0</point>
+              <point>-3 5</point>
               <height>4</height>
             </polyline>
           </geometry>
@@ -85,6 +88,7 @@
               <point>3 -3</point>
               <point>-3 -5</point>
               <point>-5 0</point>
+              <point>-3 5</point>
               <height>4</height>
             </polyline>
           </geometry>
@@ -109,6 +113,7 @@
               <point>0 1</point>
               <point>1 1</point>
               <point>1 0 </point>
+              <point>0 0</point>
               <height>1.5</height>
             </polyline>
           </geometry>
@@ -121,6 +126,7 @@
               <point>0 1</point>
               <point>1 1</point>
               <point>1 0 </point>
+              <point>0 0</point>
               <height>1.5</height>
             </polyline>
           </geometry>
@@ -144,6 +150,7 @@
               <point>2.27467 1.0967</point>
               <point>1.81094 2.35418</point>
               <point>2.74009 2.35418</point>
+              <point>2.27467 1.0967</point>
               <height>1.0</height>
             </polyline>
             <polyline>
@@ -155,6 +162,7 @@
               <point>1.7077 2.63851</point>
               <point>1.47753 3.28672</point>
               <point>1.11704 3.28672</point>
+              <point>2.08173 0.7599</point>
               <height>1.0</height>
             </polyline>
           </geometry>
@@ -166,6 +174,7 @@
               <point>2.27467 1.0967</point>
               <point>1.81094 2.35418</point>
               <point>2.74009 2.35418</point>
+              <point>2.27467 1.0967</point>
               <height>1.0</height>
             </polyline>
             <polyline>
@@ -177,6 +186,7 @@
               <point>1.7077 2.63851</point>
               <point>1.47753 3.28672</point>
               <point>1.11704 3.28672</point>
+              <point>2.08173 0.7599</point>
               <height>1.0</height>
             </polyline>
           </geometry>
