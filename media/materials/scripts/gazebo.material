@@ -509,6 +509,27 @@ material Gazebo/GreenTransparentOverlay
   }
 }
 
+material Gazebo/DarkOrangeTransparentOverlay
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+      depth_check off
+      ambient 0.6 0.305 0.028
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0.6 0.305 0.028
+        alpha_op_ex source1 src_manual src_current 0.8
+      }
+    }
+  }
+}
+
 material Gazebo/RedTransparent
 {
   technique

@@ -71,9 +71,21 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   gazebo::math::Pose sphereLinkPose = sphereLinkVis->GetWorldPose();
   QVERIFY(sphereLinkPose == sphereLinkVis->GetWorldPose());
 
+  // Try to initialize dialog with an inexistent model
+  gazebo::gui::ApplyWrenchDialog *applyWrenchDialogFakeModel =
+      new gazebo::gui::ApplyWrenchDialog();
+  applyWrenchDialogFakeModel->Init("fake_model", "fake_link");
+  QVERIFY(applyWrenchDialogFakeModel == NULL);
+
+  // Try to initialize dialog with an inexistent link
+  gazebo::gui::ApplyWrenchDialog *applyWrenchDialogFakeLink =
+      new gazebo::gui::ApplyWrenchDialog();
+  applyWrenchDialogFakeLink->Init("multilink", "fake_link");
+  QVERIFY(applyWrenchDialogFakeLink == NULL);
+
   // Initialize dialog with the box link
   gazebo::gui::ApplyWrenchDialog *applyWrenchDialog =
-      new gazebo::gui::ApplyWrenchDialog;
+      new gazebo::gui::ApplyWrenchDialog();
   applyWrenchDialog->Init("multilink", "multilink::box_link");
 
   // Get combo box
