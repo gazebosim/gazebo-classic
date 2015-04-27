@@ -1525,6 +1525,12 @@ void MainWindow::DeleteActions()
 
   delete g_alignAct;
   g_alignAct = 0;
+
+  delete g_cameraOrthoAct;
+  g_cameraOrthoAct = 0;
+
+  delete g_cameraPerspectiveAct;
+  g_cameraPerspectiveAct = 0;
 }
 
 
