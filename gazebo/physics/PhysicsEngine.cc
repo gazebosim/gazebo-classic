@@ -31,6 +31,7 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/PresetManager.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -192,8 +193,9 @@ void PhysicsEngine::OnRequest(ConstRequestPtr &/*_msg*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/)
+void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  this->world->GetPresetManager()->CurrentProfile(_msg->profile_name());
 }
 
 //////////////////////////////////////////////////
@@ -204,7 +206,7 @@ bool PhysicsEngine::SetParam(const std::string &_key,
   {
     if (_key == "type")
     {
-      gzwarn << "Cannot set physics engine type from GetParam." << std::endl;
+      // Cannot set physics engine type from SetParam
       return false;
     }
     if (_key == "max_step_size")
@@ -214,11 +216,25 @@ bool PhysicsEngine::SetParam(const std::string &_key,
     else if (_key == "real_time_factor")
       this->SetTargetRealTimeFactor(boost::any_cast<double>(_value));
     else if (_key == "gravity")
-      this->SetGravity(boost::any_cast<math::Vector3>(_value));
+    {
+      boost::any copy = _value;
+      if (_value.type() == typeid(sdf::Vector3))
+      {
+        copy = boost::lexical_cast<math::Vector3>
+            (boost::any_cast<sdf::Vector3>(_value));
+      }
+      this->SetGravity(boost::any_cast<math::Vector3>(copy));
+    }
     else if (_key == "magnetic_field")
     {
+      boost::any copy = _value;
+      if (_value.type() == typeid(sdf::Vector3))
+      {
+        copy = boost::lexical_cast<math::Vector3>
+            (boost::any_cast<sdf::Vector3>(_value));
+      }
       this->sdf->GetElement("magnetic_field")->
-          Set(boost::any_cast<math::Vector3>(_value));
+          Set(boost::any_cast<math::Vector3>(copy));
     }
     else
     {
@@ -230,6 +246,12 @@ bool PhysicsEngine::SetParam(const std::string &_key,
   catch(boost::bad_any_cast &_e)
   {
     gzerr << "Caught bad any_cast in PhysicsEngine::SetParam: " << _e.what()
+          << std::endl;
+    return false;
+  }
+  catch(boost::bad_lexical_cast &_e)
+  {
+    gzerr << "Caught bad lexical_cast in PhysicsEngine::SetParam: " << _e.what()
           << std::endl;
     return false;
   }
@@ -272,4 +294,10 @@ bool PhysicsEngine::GetParam(const std::string &_key,
 ContactManager *PhysicsEngine::GetContactManager() const
 {
   return this->contactManager;
+}
+
+//////////////////////////////////////////////////
+sdf::ElementPtr PhysicsEngine::GetSDF() const
+{
+  return this->sdf;
 }

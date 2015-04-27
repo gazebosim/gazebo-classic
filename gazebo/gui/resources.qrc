@@ -55,9 +55,13 @@
   <file>images/up_spin_arrow_disabled.png</file>
   <file>images/down_spin_arrow.png</file>
   <file>images/down_spin_arrow_disabled.png</file>
+  <file>images/log_play.png</file>
+  <file>images/log_pause.png</file>
+  <file>images/log_step_forward.png</file>
 
   <file alias='wood.jpg'>../../media/materials/textures/wood.jpg</file>
   <file alias='tiles.jpg'>../../media/materials/textures/ceiling_tiled.jpg</file>
   <file alias='bricks.png'>../../media/materials/textures/bricks.png</file>
+  <file>images/com.png</file>
 </qresource>
 </RCC>

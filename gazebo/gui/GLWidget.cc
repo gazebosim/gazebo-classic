@@ -59,6 +59,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->state = "select";
   this->sceneCreated = false;
   this->copyEntityName = "";
+  this->modelEditorEnabled = false;
 
   this->setFocusPolicy(Qt::StrongFocus);
 
@@ -156,6 +157,9 @@ GLWidget::GLWidget(QWidget *_parent)
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this,
       SLOT(OnModelEditor(bool)));
+
+  connect(this, SIGNAL(selectionMsgReceived(const QString &)), this,
+      SLOT(OnSelectionMsgEvent(const QString &)), Qt::QueuedConnection);
 }
 
 /////////////////////////////////////////////////
@@ -172,7 +176,15 @@ GLWidget::~GLWidget()
   this->selectionSub.reset();
   this->selectionPub.reset();
 
+  ModelManipulator::Instance()->Clear();
+  ModelSnap::Instance()->Clear();
+  ModelAlign::Instance()->Clear();
+
+  if (this->userCamera)
+    this->userCamera->Fini();
+
   this->userCamera.reset();
+  this->scene.reset();
 }
 
 /////////////////////////////////////////////////
@@ -746,6 +758,7 @@ void GLWidget::OnMouseReleaseNormal()
           ((modelHighlighted && !rightButton) || linkHighlighted))
       {
         selectVis = linkVis;
+        this->selectionLevel = SelectionLevels::LINK;
       }
       // Select model
       else
@@ -755,6 +768,7 @@ void GLWidget::OnMouseReleaseNormal()
           this->DeselectAllVisuals();
 
         selectVis = modelVis;
+        this->selectionLevel = SelectionLevels::MODEL;
       }
       this->SetSelectedVisual(selectVis);
       event::Events::setSelectedEntity(selectVis->GetName(), "normal");
@@ -769,7 +783,8 @@ void GLWidget::OnMouseReleaseNormal()
         }
         else if (selectVis == linkVis)
         {
-          // TODO: Open link right menu
+          g_modelRightMenu->Run(selectVis->GetName(), QCursor::pos(),
+              ModelRightMenu::EntityTypes::LINK);
         }
       }
     }
@@ -1001,8 +1016,14 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
   if (_msg->has_selected() && _msg->selected())
   {
-    this->OnSetSelectedEntity(_msg->name(), "normal");
+    this->selectionMsgReceived(QString(_msg->name().c_str()));
   }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnSelectionMsgEvent(const QString &_name)
+{
+  this->OnSetSelectedEntity(_name.toStdString(), "normal");
 }
 
 /////////////////////////////////////////////////
