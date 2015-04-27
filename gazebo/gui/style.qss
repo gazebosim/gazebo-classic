@@ -594,19 +594,6 @@ QWidget#renderBottomFrame
   border-bottom-right-radius: 10px;
 }
 
-QWidget#timePanel
-{
-  max-height: 40px;
-  background-color: #808080;
-  border-bottom-right-radius: 10px;
-}
-
-QWidget#timePanel > QFrame
-{
-  background-color: #808080;
-  border-bottom-right-radius: 10px;
-}
-
 QScrollArea
 {
   background-color: #808080;
