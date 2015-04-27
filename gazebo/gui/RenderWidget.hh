@@ -65,6 +65,10 @@ namespace gazebo
       public: void DisplayOverlayMsg(const std::string &_msg,
           int _duration = -1);
 
+      /// \brief Show or hide all the GUI overlays.
+      /// \param[in] _visible True to show the GUI overlays, false to hide them.
+      public: void SetOverlaysVisible(const bool _visible);
+
       /// \brief Get the overlay message being displayed
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
