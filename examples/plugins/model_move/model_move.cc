@@ -126,7 +126,7 @@ namespace gazebo
         this->path =
           new math::Vector3[num_points];
 
-        std::stringstream stream(sdf->GetElement("path")->Get<std::string>());
+        std::stringstream stream(_sdf->GetElement("path")->Get<std::string>());
         for (int i = 0; i < num_points; i++)
         {
           float f1, f2, f3;
