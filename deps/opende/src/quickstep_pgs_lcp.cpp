@@ -180,7 +180,6 @@ static void ComputeRows(
   dReal Jvnew_final = 0;
 #endif
 #ifdef HDF5_INSTRUMENT
-  printf("instrument defined\n");
   errors.resize(num_iterations + precon_iterations + friction_iterations);
 #endif
   dRealMutablePtr caccel_ptr1;
