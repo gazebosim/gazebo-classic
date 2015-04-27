@@ -25,6 +25,7 @@ set (files
   mud.world
   multilink_shape.world
   openal.world
+  ortho.world
   pioneer2dx.world
   pioneer2dx_camera.world
   pioneer2dx_laser.world
