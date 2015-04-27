@@ -588,6 +588,109 @@ TEST_F(Visual_TEST, UpdateMeshFromMsg)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Visual_TEST, GetAncestors)
+{
+  Load("worlds/blank.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // Get world visual
+  gazebo::rendering::VisualPtr world = scene->GetWorldVisual();
+  ASSERT_TRUE(world != NULL);
+
+  // Create a visual as child of the world visual
+  gazebo::rendering::VisualPtr vis1;
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1->Load();
+
+  // Create a visual as child of vis1
+  gazebo::rendering::VisualPtr vis2;
+  vis2.reset(new gazebo::rendering::Visual("vis2", vis1));
+  vis2->Load();
+
+  // Create a visual as child of vis2
+  gazebo::rendering::VisualPtr vis3_1;
+  vis3_1.reset(new gazebo::rendering::Visual("vis3_1", vis2));
+  vis3_1->Load();
+
+  // Create one more visual as child of vis2
+  gazebo::rendering::VisualPtr vis3_2;
+  vis3_2.reset(new gazebo::rendering::Visual("vis3_2", vis2));
+  vis3_2->Load();
+
+  // Create a visual as child of vis3_1
+  gazebo::rendering::VisualPtr vis4;
+  vis4.reset(new gazebo::rendering::Visual("vis4", vis3_1));
+  vis4->Load();
+
+  // Check depths
+  EXPECT_EQ(world->GetDepth(), 0);
+  EXPECT_EQ(vis1->GetDepth(), 1);
+  EXPECT_EQ(vis2->GetDepth(), 2);
+  EXPECT_EQ(vis3_1->GetDepth(), 3);
+  EXPECT_EQ(vis3_2->GetDepth(), 3);
+  EXPECT_EQ(vis4->GetDepth(), 4);
+
+  // Check parents
+  EXPECT_TRUE(world->GetParent() == NULL);
+  EXPECT_EQ(vis1->GetParent(), world);
+  EXPECT_EQ(vis2->GetParent(), vis1);
+  EXPECT_EQ(vis3_1->GetParent(), vis2);
+  EXPECT_EQ(vis3_2->GetParent(), vis2);
+  EXPECT_EQ(vis4->GetParent(), vis3_1);
+
+  // Check that world is its own root
+  EXPECT_EQ(world->GetRootVisual(), world);
+  // Check that vis1 is the root for all others
+  EXPECT_EQ(vis1->GetRootVisual(), vis1);
+  EXPECT_EQ(vis2->GetRootVisual(), vis1);
+  EXPECT_EQ(vis3_1->GetRootVisual(), vis1);
+  EXPECT_EQ(vis3_2->GetRootVisual(), vis1);
+  EXPECT_EQ(vis4->GetRootVisual(), vis1);
+
+  // Check that world is 0th ancestor for all of them
+  EXPECT_EQ(world->GetNthAncestor(0), world);
+  EXPECT_EQ(vis1->GetNthAncestor(0), world);
+  EXPECT_EQ(vis2->GetNthAncestor(0), world);
+  EXPECT_EQ(vis3_1->GetNthAncestor(0), world);
+  EXPECT_EQ(vis3_2->GetNthAncestor(0), world);
+  EXPECT_EQ(vis4->GetNthAncestor(0), world);
+
+  // Check that the 1st ancestor is the root visual
+  EXPECT_TRUE(world->GetNthAncestor(1) == NULL);
+  EXPECT_EQ(vis1->GetNthAncestor(1), vis1->GetRootVisual());
+  EXPECT_EQ(vis2->GetNthAncestor(1), vis2->GetRootVisual());
+  EXPECT_EQ(vis3_1->GetNthAncestor(1), vis3_1->GetRootVisual());
+  EXPECT_EQ(vis3_2->GetNthAncestor(1), vis3_2->GetRootVisual());
+  EXPECT_EQ(vis4->GetNthAncestor(1), vis4->GetRootVisual());
+
+  // Check 2nd ancestor
+  EXPECT_TRUE(world->GetNthAncestor(2) == NULL);
+  EXPECT_TRUE(vis1->GetNthAncestor(2) == NULL);
+  EXPECT_EQ(vis2->GetNthAncestor(2), vis2);
+  EXPECT_EQ(vis3_1->GetNthAncestor(2), vis2);
+  EXPECT_EQ(vis3_2->GetNthAncestor(2), vis2);
+  EXPECT_EQ(vis4->GetNthAncestor(2), vis2);
+
+  // Check 3rd ancestor
+  EXPECT_TRUE(world->GetNthAncestor(3) == NULL);
+  EXPECT_TRUE(vis1->GetNthAncestor(3) == NULL);
+  EXPECT_TRUE(vis2->GetNthAncestor(3) == NULL);
+  EXPECT_EQ(vis3_1->GetNthAncestor(3), vis3_1);
+  EXPECT_EQ(vis3_2->GetNthAncestor(3), vis3_2);
+  EXPECT_EQ(vis4->GetNthAncestor(3), vis3_1);
+
+  // Check 4th ancestor
+  EXPECT_TRUE(world->GetNthAncestor(4) == NULL);
+  EXPECT_TRUE(vis1->GetNthAncestor(4) == NULL);
+  EXPECT_TRUE(vis2->GetNthAncestor(4) == NULL);
+  EXPECT_TRUE(vis3_1->GetNthAncestor(4) == NULL);
+  EXPECT_TRUE(vis3_2->GetNthAncestor(4) == NULL);
+  EXPECT_EQ(vis4->GetNthAncestor(4), vis4);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
