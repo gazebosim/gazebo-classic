@@ -19,6 +19,9 @@
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
 
+1. Added Visual::GetDepth() and Visual::GetNthAncestor()
+    * [Pull request #1613](https://bitbucket.org/osrf/gazebo/pull-request/1613)
+
 1. Added a context menu for links
     * [Pull request #1589](https://bitbucket.org/osrf/gazebo/pull-request/1589)
 
