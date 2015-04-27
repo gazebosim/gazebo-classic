@@ -308,6 +308,12 @@ math::Vector2i HeightmapShape::GetVertexCount() const
 }
 
 /////////////////////////////////////////////////
+math::Vector3 HeightmapShape::GetScale() const
+{
+  return this->scale;
+}
+
+/////////////////////////////////////////////////
 float HeightmapShape::GetHeight(int _x, int _y) const
 {
   if (_x < 0 || _y < 0)

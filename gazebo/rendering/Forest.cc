@@ -28,6 +28,7 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/OculusCamera.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Forest.hh"
@@ -102,7 +103,7 @@ void Forest::Load()
     return;
 
   this->camera = boost::dynamic_pointer_cast<Camera>(
-      this->scene->GetUserCamera(0));
+      this->scene->GetOculusCamera(0));
 
   this->connections.push_back(event::Events::ConnectRender(
         boost::bind(&Forest::Update, this, false)));
@@ -114,7 +115,7 @@ float Forest::GetTerrainHeight(const float _x, const float _y, void *_userdata)
   Heightmap *hm = RenderEngine::Instance()->GetScene()->GetHeightmap();
   if (hm)
   {
-    return hm->GetHeight(_x, _y);
+    return hm->GetHeight(_x, _y)-0.1;
   }
 
   return 0;
@@ -128,7 +129,7 @@ float Forest::GetGrassTerrainHeight(const float _x, const float _y, void *_userd
   Heightmap *hm = RenderEngine::Instance()->GetScene()->GetHeightmap();
   if (hm)
   {
-    return hm->GetHeight(_y, _x);
+    return hm->GetHeight(_y, _x)-0.1;
   }
 
   return 0;
@@ -247,15 +248,15 @@ void Forest::LoadScene()
 
   #ifdef WIND
   //WindBatchPage is a variation of BatchPage which includes a wind animation shader
-  this->trees->addDetailLevel<Forests::WindBatchPage>(150, 30);		//Use batches up to 150 units away, and fade for 30 more units
+  this->trees->addDetailLevel<Forests::WindBatchPage>(150, 30);    //Use batches up to 150 units away, and fade for 30 more units
   #else
-  this->trees->addDetailLevel<Forests::BatchPage>(150, 30);		//Use batches up to 150 units away, and fade for 30 more units
+  this->trees->addDetailLevel<Forests::BatchPage>(150, 30);    //Use batches up to 150 units away, and fade for 30 more units
   #endif
-  this->trees->addDetailLevel<Forests::ImpostorPage>(700, 50);	//Use impostors up to 400 units, and for for 50 more units
+  this->trees->addDetailLevel<Forests::ImpostorPage>(700, 50);  //Use impostors up to 400 units, and for for 50 more units
 
   // Create a new TreeLoader2D object
   Forests::TreeLoader3D *treeLoader = new Forests::TreeLoader3D(this->trees, Forests::TBounds(-500, -500, 500, 500));
-  this->trees->setPageLoader(treeLoader);	//Assign the "treeLoader" to be used to load geometry for the PagedGeometry instance
+  this->trees->setPageLoader(treeLoader);  //Assign the "treeLoader" to be used to load geometry for the PagedGeometry instance
 
   // Supply a height function to TreeLoader2D so it can calculate tree Y values
   // HeightFunction::initialize(this->scene->GetManager());

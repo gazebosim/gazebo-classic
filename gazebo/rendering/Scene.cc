@@ -590,6 +590,21 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
 
 #ifdef HAVE_OCULUS
 //////////////////////////////////////////////////
+OculusCameraPtr Scene::GetOculusCamera(const unsigned int _index) const
+{
+  if (_index < this->dataPtr->oculusCameras.size())
+  {
+    return this->dataPtr->oculusCameras[_index];
+  }
+  else
+  {
+    gzerr << "Invalid oculus camera index of[" << _index
+          << "]. Max allowed value is["
+          << this->dataPtr->oculusCameras.size()-1 << "]\n";
+  }
+}
+
+//////////////////////////////////////////////////
 OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
 {
   OculusCameraPtr camera(new OculusCamera(_name, shared_from_this()));

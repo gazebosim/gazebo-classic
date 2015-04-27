@@ -65,6 +65,8 @@ namespace gazebo
       /// \param[in] _scale Scale to set the heightmap shape to.
       public: virtual void SetScale(const math::Vector3 &_scale);
 
+      public: math::Vector3 GetScale() const;
+
       /// \brief Get the URI of the heightmap image.
       /// \return The heightmap image URI.
       public: std::string GetURI() const;

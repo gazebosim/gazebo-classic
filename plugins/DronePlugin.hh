@@ -22,10 +22,16 @@
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
+  namespace util
+  {
+    class Joystick;
+  }
+
   /// \brief A plugin that simulates lift and drag.
   class DronePlugin : public ModelPlugin
   {
@@ -41,11 +47,19 @@ namespace gazebo
     /// \brief Connection to World Update events.
     private: event::ConnectionPtr updateConnection;
 
-    /// \brief Pointer to world.
-    private: physics::WorldPtr world;
-
     /// \brief Pointer to model containing plugin.
     private: physics::ModelPtr model;
+    private: physics::HeightmapShapePtr heightmap;
+
+    /// \brief Pointer to the joystick interface.
+    private: util::Joystick *joy;
+
+    private: double yawSpeed;
+    private: double pitchSpeed;
+
+    private: math::Vector3 velocity;
+
+    public: physics::RayShapePtr testRay;
   };
 }
 #endif
