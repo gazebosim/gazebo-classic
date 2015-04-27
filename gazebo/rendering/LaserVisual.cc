@@ -61,8 +61,12 @@ LaserVisual::~LaserVisual()
   {
     this->DeleteDynamicLine(dPtr->rayFans[i]);
     dPtr->rayFans[i] = NULL;
+
+    this->DeleteDynamicLine(dPtr->noHitRayFans[i]);
+    dPtr->noHitRayFans[i] = NULL;
   }
   dPtr->rayFans.clear();
+  dPtr->noHitRayFans.clear();
 }
 
 /////////////////////////////////////////////////
