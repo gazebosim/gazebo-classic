@@ -3,7 +3,7 @@ project(test_fixture_example)
 
 find_package(gazebo REQUIRED)
 include(FindBoost)
-find_package(Boost ${MIN_BOOST_VERSION} REQUIRED filesystem)
+find_package(Boost ${MIN_BOOST_VERSION} REQUIRED filesystem thread system)
 
 include_directories(${GAZEBO_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/gtest/include
@@ -12,16 +12,22 @@ include_directories(${GAZEBO_INCLUDE_DIRS}
 )
 
 link_directories(${GAZEBO_LIBRARY_DIRS})
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 # Build gtest
 add_library(gtest STATIC gtest/src/gtest-all.cc)
 add_library(gtest_main STATIC gtest/src/gtest_main.cc)
 target_link_libraries(gtest_main gtest)
-set(GTEST_LIBRARY "${PROJECT_BINARY_DIR}/test/libgtest.a")
-set(GTEST_MAIN_LIBRARY "${PROJECT_BINARY_DIR}/test/libgtest_main.a")
+set(GTEST_LIBRARY "${PROJECT_BINARY_DIR}/libgtest.a")
+set(GTEST_MAIN_LIBRARY "${PROJECT_BINARY_DIR}/libgtest_main.a")
 include_directories(${GTEST_INCLUDE_DIRS})
 
 add_executable(test test.cc)
-target_link_libraries(test libgtest.a libgtest_main.a gazebo_test_fixture
-  ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(test gtest gtest_main gazebo_test_fixture
+      gazebo_transport
+      ${GAZEBO_LIBRARIES}
+      ${Boost_FILESYSTEM_LIBRARIES}
+      ${Boost_SYSTEM_LIBRARIES}
+      ${Boost_THREAD_LIBRARIES}
+)
