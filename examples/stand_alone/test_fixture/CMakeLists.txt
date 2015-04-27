@@ -25,7 +25,5 @@ target_link_libraries(test
   gtest_main
   gazebo_test_fixture
   ${GAZEBO_LIBRARIES}
-  ${Boost_FILESYSTEM_LIBRARIES}
-  ${Boost_SYSTEM_LIBRARIES}
-  ${Boost_THREAD_LIBRARIES}
+  ${Boost_LIBRARIES}
 )
