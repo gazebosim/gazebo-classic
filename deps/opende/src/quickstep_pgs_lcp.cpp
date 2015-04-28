@@ -606,6 +606,8 @@ static void* ComputeRows(void *p)
 
           // option to smooth lambda
 #ifdef SMOOTH_LAMBDA
+          // skip smoothing for the position correction thread
+          if (!position_correction_thread)
           {
             // smooth delta lambda
             // equivalent to first order artificial dissipation on lambda update.
