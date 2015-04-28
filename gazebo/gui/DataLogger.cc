@@ -67,7 +67,7 @@ DataLogger::DataLogger(QWidget *_parent)
   this->timeLabel->setFixedWidth(90);
 
   // Size of log file
-  this->sizeLabel = new QLabel("0.00 B");
+  this->sizeLabel = new QLabel("(0.00 B)");
   this->sizeLabel->setObjectName("dataLoggerSizeLabel");
 
   QHBoxLayout *timeLayout = new QHBoxLayout;
@@ -224,6 +224,12 @@ DataLogger::DataLogger(QWidget *_parent)
   connect(this, SIGNAL(SetDestinationURI(QString)),
           this, SLOT(OnSetDestinationURI(QString)), Qt::QueuedConnection);
 
+  // Timer used to hide the confirmation dialog
+  this->confirmationTimer = new QTimer();
+  //this->confirmationTimer->setSingleShot(true);
+  connect(this->confirmationTimer, SIGNAL(timeout()), this,
+      SLOT(OnConfirmationTimeout()));
+
   // Create a node from communication.
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -266,6 +272,22 @@ void DataLogger::OnRecord(bool _toggle)
     // Switch the icon
     this->recordButton->setIcon(QPixmap(":/images/record.png"));
 
+    // Display confirmation
+    this->confirmationTimer->start(2000);
+    QLabel *confirmationLabel = new QLabel("Saved to \n" +
+        this->destPath->text());
+    QHBoxLayout *confirmationLayout = new QHBoxLayout();
+    confirmationLayout->addWidget(confirmationLabel);
+
+    this->confirmationDialog = new QDialog(this, Qt::FramelessWindowHint);
+    this->confirmationDialog->setLayout(confirmationLayout);
+    this->confirmationDialog->setStyleSheet(
+        "QDialog{background-color: #eee;}\
+         QLabel{color: #111;}");
+    this->confirmationDialog->setModal(false);
+    this->confirmationDialog->show();
+
+    // Change the status
     this->statusLabel->setText("Ready");
     this->statusLabel->setStyleSheet("QLabel{color: #aeaeae}");
     this->statusTimer->stop();
@@ -332,30 +354,30 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
     if (_msg->log_file().has_size() && _msg->log_file().has_size_units())
     {
       // Get the size of the log file.
-      stream << std::fixed << std::setprecision(2) << _msg->log_file().size();
-
+      stream << std::fixed << std::setprecision(2) << "(" <<
+          _msg->log_file().size();
 
       // Get the size units.
       switch (_msg->log_file().size_units())
       {
         case msgs::LogStatus::LogFile::BYTES:
-          stream << "B";
+          stream << "B)";
           break;
         case msgs::LogStatus::LogFile::K_BYTES:
-          stream << "KB";
+          stream << "KB)";
           break;
         case msgs::LogStatus::LogFile::M_BYTES:
-          stream << "MB";
+          stream << "MB)";
           break;
         default:
-          stream << "GB";
+          stream << "GB)";
           break;
       }
 
       this->SetSize(QString::fromStdString(stream.str()));
     }
     else
-      this->SetSize("0.00 B");
+      this->SetSize("(0.00 B)");
   }
 }
 
@@ -451,5 +473,12 @@ void DataLogger::OnBlinkStatus()
           std::to_string(255+(128*(this->statusTime-1)))+", "+
           std::to_string(255+(128*(this->statusTime-1)))+
       ")}"));
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnConfirmationTimeout()
+{
+  this->confirmationDialog->close();
+  this->confirmationTimer->stop();
 }
 
