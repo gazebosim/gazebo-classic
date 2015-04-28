@@ -88,6 +88,12 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
+  if (_physicsEngine == "simbody")
+  {
+    // default accuracy flunks this test, increase accuracy setting
+    physics->SetParam("accuracy", 0.0001);
+  }
+
   double z = 3;
   double gravityZ = physics->GetGravity().z;
   double stepSize = physics->GetMaxStepSize();
