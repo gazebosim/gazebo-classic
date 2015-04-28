@@ -625,12 +625,12 @@ TEST_F(Visual_TEST, GetAncestors)
   vis4->Load();
 
   // Check depths
-  EXPECT_EQ(world->GetDepth(), 0);
-  EXPECT_EQ(vis1->GetDepth(), 1);
-  EXPECT_EQ(vis2->GetDepth(), 2);
-  EXPECT_EQ(vis3_1->GetDepth(), 3);
-  EXPECT_EQ(vis3_2->GetDepth(), 3);
-  EXPECT_EQ(vis4->GetDepth(), 4);
+  EXPECT_EQ(world->GetDepth(), 0u);
+  EXPECT_EQ(vis1->GetDepth(), 1u);
+  EXPECT_EQ(vis2->GetDepth(), 2u);
+  EXPECT_EQ(vis3_1->GetDepth(), 3u);
+  EXPECT_EQ(vis3_2->GetDepth(), 3u);
+  EXPECT_EQ(vis4->GetDepth(), 4u);
 
   // Check parents
   EXPECT_TRUE(world->GetParent() == NULL);
