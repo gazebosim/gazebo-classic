@@ -259,8 +259,10 @@
     #define GZ_RENDERING_DEFERRED_HIDDEN
   #else
     #if __GNUC__ >= 4
-      #define GZ_RENDERING_DEFERRED_VISIBLE __attribute__ ((visibility ("default")))
-      #define GZ_RENDERING_DEFERRED_HIDDEN __attribute__ ((visibility ("hidden")))
+      #define GZ_RENDERING_DEFERRED_VISIBLE __attribute__ ((visibility (\
+              "default")))
+      #define GZ_RENDERING_DEFERRED_HIDDEN __attribute__ ((visibility (\
+              "hidden")))
     #else
       #define GZ_RENDERING_DEFERRED_VISIBLE
       #define GZ_RENDERING_DEFERRED_HIDDEN

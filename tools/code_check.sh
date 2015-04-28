@@ -66,8 +66,6 @@ echo "*:gazebo/common/STLLoader.cc:126" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:149" >> $SUPPRESS
 echo "*:gazebo/common/SVGLoader.hh:49" >> $SUPPRESS
 echo "*:gazebo/common/SVGLoader.cc:439" >> $SUPPRESS
-echo "*:gazebo/util/system.hh:263" >> $SUPPRESS
-echo "*:gazebo/util/system.hh:265" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 echo "*:examples/stand_alone/test_fixture/gtest/*" >> $SUPPRESS
 
