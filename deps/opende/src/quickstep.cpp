@@ -490,6 +490,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
       PGS_LCP (context,m,nb,J,J_precon,J_orig,
 #ifdef PENETRATION_JVERROR_CORRECTION
                vnew,
+               stepsize,
 #endif
                jb,body,
                invMOI,MOI,lambda,lambda_erp,
@@ -499,9 +500,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
                &world->qs
 #ifdef USE_TPROW
                , world->row_threadpool
-#endif
-#ifdef PENETRATION_JVERROR_CORRECTION
-               , stepsize
 #endif
       );
 

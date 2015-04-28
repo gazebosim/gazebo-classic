@@ -898,6 +898,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   dRealMutablePtr J_orig,
 #ifdef PENETRATION_JVERROR_CORRECTION
   dRealMutablePtr vnew,
+  const dReal stepsize,
 #endif
   int *jb, dxBody * const *body,
   dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda,
@@ -908,9 +909,6 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   dxQuickStepParameters *qs
 #ifdef USE_TPROW
   , boost::threadpool::pool* row_threadpool
-#endif
-#ifdef PENETRATION_JVERROR_CORRECTION
-  , const dReal stepsize
 #endif
   )
 {
