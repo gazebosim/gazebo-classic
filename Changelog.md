@@ -2,6 +2,12 @@
 1. Added ComputeVolume function for simple shape subclasses of Shape.hh.
     * [Pull request #1605](https://bitbucket.org/osrf/gazebo/pull-request/1605)
 
+1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
+    * [Pull request #1606](https://bitbucket.org/osrf/gazebo/pull-request/1606)
+
+1. New accessors in LogPlay class.
+    * [Pull request #1577](https://bitbucket.org/osrf/gazebo/pull-request/1577)
+
 1. Added a plugin to send messages to an existing website.
    Added gui::MainWindow::AddMenu and msgs/rest_error, msgs/rest_login, msgs rest/post
     * [Pull request #1524](https://bitbucket.org/osrf/gazebo/pull-request/1524)
@@ -35,6 +41,9 @@
 
 1. Pass Coulomb surface friction parameters to DART.
     * [Pull request #1420](https://bitbucket.org/osrf/gazebo/pull-request/1420)
+
+1. Added ModelAlign::SetHighlighted
+    * [Pull request #1598](https://bitbucket.org/osrf/gazebo/pull-request/1598)
 
 1. Added various Get functions to Visual. Also added a ConvertGeometryType function to msgs.
     * [Pull request #1402](https://bitbucket.org/osrf/gazebo/pull-request/1402)
@@ -86,6 +95,9 @@
 
 1. Sync name and location on SaveDialog.
     * [Pull request #1563](https://bitbucket.org/osrf/gazebo/pull-request/1563)
+
+1. Added Apply Force/Torque dialog
+    * [Pull request #1600](https://bitbucket.org/osrf/gazebo/pull-request/1600)
 
 1. Added inertia pose getter for COMVisual and COMVisual_TEST
     * [Pull request #1581](https://bitbucket.org/osrf/gazebo/pull-request/1581)
@@ -144,9 +156,8 @@
         * [Pull request #1551](https://bitbucket.org/osrf/gazebo/pull-request/1551)
         * [Issue #1483](https://bitbucket.org/osrf/gazebo/issue/1483)
 
-    1. Added list of links and joints.
-        * [Pull request #1515](https://bitbucket.org/osrf/gazebo/pull-request/1515)
-        * [Issue #1418](https://bitbucket.org/osrf/gazebo/issue/1418)
+    1. Add schematic view to model editor
+        * [Pull request #1562](https://bitbucket.org/osrf/gazebo/pull-request/1562)
 
 1. Building editor updates
     1. Make palette tips tooltip clickable to open.
