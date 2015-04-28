@@ -504,7 +504,10 @@ void World::LogStep()
     std::string data;
     if (!util::LogPlay::Instance()->Step(data))
     {
+      // There are no more chunks, time to exit.
       this->SetPaused(true);
+      this->dataPtr->stepInc = 0;
+      break;
     }
     else
     {
