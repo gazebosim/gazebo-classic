@@ -1,5 +1,6 @@
 ## Gazebo 6.0
 1. Added BuoyancyPlugin for simulating the buoyancy of an object in a column of fluid.
+    * [Pull request #1622](https://bitbucket.org/osrf/gazebo/pull-request/1622)
 
 1. Added ComputeVolume function for simple shape subclasses of Shape.hh.
     * [Pull request #1605](https://bitbucket.org/osrf/gazebo/pull-request/1605)
