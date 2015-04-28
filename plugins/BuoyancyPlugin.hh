@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,8 +64,8 @@ namespace gazebo
     /// \brief Pointer to the plugin SDF.
     protected: sdf::ElementPtr sdf;
 
-    /// \brief The density of the fluid the object is submerged in in kg/m^3.
-    /// Defaults to 1000, the fluid density of water.
+    /// \brief The density of the fluid in which the object is submerged in
+    /// kg/m^3. Defaults to 1000, the fluid density of water.
     protected: double fluidDensity;
 
     /// \brief Map of <link ID, point> pairs mapping link IDs to the CoV (center
