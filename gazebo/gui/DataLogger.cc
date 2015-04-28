@@ -15,6 +15,15 @@
  *
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+  // For _access()
+  #include <io.h>
+  #define access _access
+#endif
+
 #include <boost/filesystem.hpp>
 #include <stdio.h>
 
@@ -412,7 +421,13 @@ void DataLogger::OnBrowse()
 
   // Make sure the path is writable.
   // Note: This is not cross-platform compatible.
+#ifdef _WIN32
+  // Check for write-only (2) and read-write (6)
+  if ((access(path.string().c_str(), 2) != 0) &&
+      (access(path.string().c_str(), 6) != 0))
+#else
   if (access(path.string().c_str(), W_OK) != 0)
+#endif
   {
     QMessageBox msgBox(this);
     std::ostringstream stream;
