@@ -27,7 +27,7 @@
 #include "gazebo/gui/viewers/TopicView.hh"
 #include "gazebo/gui/viewers/ImageView.hh"
 
-#include "gazebo/gazebo.hh"
+#include "gazebo/gazebo_client.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
@@ -310,7 +310,7 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 
   emit Close();
 
-  gazebo::shutdown();
+  gazebo::client::shutdown();
 }
 
 /////////////////////////////////////////////////

@@ -325,7 +325,7 @@ void TopicCommand::Bw(const std::string &_topic)
 /////////////////////////////////////////////////
 void TopicCommand::View(const std::string &_topic)
 {
-  if (!gazebo::setupClient())
+  if (!gazebo::client::setup())
   {
     printf("load error\n");
     return;
@@ -372,5 +372,5 @@ void TopicCommand::View(const std::string &_topic)
   delete app;
   app = NULL;
 
-  gazebo::shutdown();
+  gazebo::client::shutdown();
 }

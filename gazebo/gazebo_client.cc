@@ -40,19 +40,19 @@ struct g_vectorStringDup
 };
 
 /////////////////////////////////////////////////
-void gazebo::printVersion()
+void gazebo::client::printVersion()
 {
   gazebo_shared::printVersion();
 }
 
 /////////////////////////////////////////////////
-void gazebo::addPlugin(const std::string &_filename)
+void gazebo::client::addPlugin(const std::string &_filename)
 {
   gazebo_shared::addPlugin(_filename, g_plugins);
 }
 
 /////////////////////////////////////////////////
-bool gazebo::setupClient(int _argc, char **_argv)
+bool gazebo::client::setup(int _argc, char **_argv)
 {
   if (!gazebo_shared::setup("client-", _argc, _argv, g_plugins))
   {
@@ -81,13 +81,13 @@ bool gazebo::setupClient(int _argc, char **_argv)
 }
 
 /////////////////////////////////////////////////
-bool gazebo::setupClient(const std::vector<std::string> &_args)
+bool gazebo::client::setup(const std::vector<std::string> &_args)
 {
   std::vector<char *> pointers(_args.size());
   std::transform(_args.begin(), _args.end(), pointers.begin(),
                  g_vectorStringDup());
   pointers.push_back(0);
-  bool result = gazebo::setupClient(_args.size(), &pointers[0]);
+  bool result = gazebo::client::setup(_args.size(), &pointers[0]);
 
   // Deallocate memory for the command line arguments alloocated with strdup.
   for (size_t i = 0; i < pointers.size(); ++i)
@@ -97,7 +97,7 @@ bool gazebo::setupClient(const std::vector<std::string> &_args)
 }
 
 /////////////////////////////////////////////////
-bool gazebo::shutdown()
+bool gazebo::client::shutdown()
 {
   // Stop log recording
   util::LogRecord::Instance()->Stop();
