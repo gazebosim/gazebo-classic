@@ -17,8 +17,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 add_library(gtest STATIC gtest/src/gtest-all.cc)
 add_library(gtest_main STATIC gtest/src/gtest_main.cc)
 target_link_libraries(gtest_main gtest)
-set(GTEST_LIBRARY "${PROJECT_BINARY_DIR}/test/libgtest.a")
-set(GTEST_MAIN_LIBRARY "${PROJECT_BINARY_DIR}/test/libgtest_main.a")
 
 add_executable(test test.cc)
 target_link_libraries(test gtest gtest_main gazebo_test_fixture

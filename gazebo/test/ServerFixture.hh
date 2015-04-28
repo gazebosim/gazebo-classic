@@ -63,6 +63,7 @@ namespace gazebo
     /// \brief Constructor
     protected: ServerFixture();
 
+    /// \brief Destructor
     protected: virtual ~ServerFixture();
 
     /// \brief Tear down the test fixture. This gets called by gtest.
