@@ -21,6 +21,7 @@ add_subdirectory(viewers)
 set (sources
   Actions.cc
   AlignWidget.cc
+  ApplyWrenchDialog.cc
   BoxMaker.cc
   CloneWindow.cc
   ConfigWidget.cc
@@ -59,6 +60,7 @@ set (sources
 set (qt_headers
   Actions.hh
   AlignWidget.hh
+  ApplyWrenchDialog.hh
   CloneWindow.hh
   ConfigWidget.hh
   DataLogger.hh
@@ -121,6 +123,7 @@ endif ()
 #endif()
 
 set (qt_tests
+  ApplyWrenchDialog_TEST.cc
   DataLogger_TEST.cc
   GuiIface_TEST.cc
   ModelAlign_TEST.cc

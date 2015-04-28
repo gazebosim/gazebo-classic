@@ -23,6 +23,7 @@
 
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/ApplyWrenchDialog.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
@@ -74,6 +75,9 @@ namespace gazebo
       /// \brief QT callback when edit has been selected.
       private slots: void OnEdit();
 
+      /// \brief QT callback when apply force/torque has been selected.
+      private slots: void OnApplyWrench();
+
       /// \brief QT callback when delete has been selected.
       /// \param[in] _name Name of the entity to delete.
       private slots: void OnDelete(const std::string &_name="");
@@ -109,6 +113,9 @@ namespace gazebo
 
       /// \brief Action for opening entity on Model Editor.
       private: QAction *editAct;
+
+      /// \brief Action for applying force and torque to a model.
+      private: QAction *applyWrenchAct;
 
       /// \brief Action for snapping an object to another object below the
       /// first.
