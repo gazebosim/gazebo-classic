@@ -5,7 +5,7 @@ if (HAVE_OPENAL)
 endif()
 
 include_directories(${tinyxml_INCLUDE_DIRS})
-set (sources 
+set (sources
   Diagnostics.cc
   LogPlay.cc
   LogRecord.cc
