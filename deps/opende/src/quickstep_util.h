@@ -25,7 +25,7 @@
 
 #include <ode/common.h>
 
-#ifdef SSE
+#ifdef ODE_SSE
 #include <xmmintrin.h>
 #define Kf(x) _mm_set_pd((x),(x))
 #endif
@@ -208,7 +208,7 @@ inline void scaled_add (int n, dRealMutablePtr x, dRealPtr y, dRealPtr z, dReal 
 // dot product of two vector a and b with length 6
 inline dReal dot6(dRealPtr a, dRealPtr b)
 {
-#ifdef SSE
+#ifdef ODE_SSE
   __m128d d = _mm_load_pd(a+0) * _mm_load_pd(b+0) + _mm_load_pd(a+2) * _mm_load_pd(b+2) + _mm_load_pd(a+4) * _mm_load_pd(b+4);
   double r[2];
   _mm_store_pd(r, d);
@@ -226,7 +226,7 @@ inline dReal dot6(dRealPtr a, dRealPtr b)
 // a = a + delta * b, vector a and b with length 6
 inline void sum6(dRealMutablePtr a, dReal delta, dRealPtr b)
 {
-#ifdef SSE
+#ifdef ODE_SSE
   __m128d __delta = Kf(delta);
   _mm_store_pd(a + 0, _mm_load_pd(a + 0) + __delta * _mm_load_pd(b + 0));
   _mm_store_pd(a + 2, _mm_load_pd(a + 2) + __delta * _mm_load_pd(b + 2));

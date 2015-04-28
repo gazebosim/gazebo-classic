@@ -19,8 +19,7 @@
 * LICENSE.TXT and LICENSE-BSD.TXT for more details.                     *
 *                                                                       *
 *************************************************************************/
-#define USE_PTHREAD  // if not, use boost thread
-#ifdef USE_PTHREAD
+#ifdef USE_PTHREAD  // option set in deps/opende/CMakeLists.txt -DUSE_PTHREAD
 #include <pthread.h>
 #else
 #include <boost/thread.hpp>
@@ -606,6 +605,8 @@ static void* ComputeRows(void *p)
 
           // option to smooth lambda
 #ifdef SMOOTH_LAMBDA
+          // skip smoothing for the position correction thread
+          if (!position_correction_thread)
           {
             // smooth delta lambda
             // equivalent to first order artificial dissipation on lambda update.
@@ -873,7 +874,7 @@ static void* ComputeRows(void *p)
   printf("      quickstep row thread %d start time %f ended time %f duration %f\n",thread_id,cur_time,end_time,end_time - cur_time);
   #endif
 
-  if (skip_friction)
+  if (position_correction_thread)
     IFTIMING (dTimerNow ("ComputeRows_erp ends"));
   else
     IFTIMING (dTimerNow ("ComputeRows ends"));
@@ -897,6 +898,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   dRealMutablePtr J_orig,
 #ifdef PENETRATION_JVERROR_CORRECTION
   dRealMutablePtr vnew,
+  const dReal stepsize,
 #endif
   int *jb, dxBody * const *body,
   dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda,
@@ -907,9 +909,6 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   dxQuickStepParameters *qs
 #ifdef USE_TPROW
   , boost::threadpool::pool* row_threadpool
-#endif
-#ifdef PENETRATION_JVERROR_CORRECTION
-  , const dReal stepsize
 #endif
   )
 {
@@ -1211,7 +1210,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       params_erp[thread_id].nb = nb;
       params_erp[thread_id].jb = jb;
       params_erp[thread_id].findex = findex;
-      params_erp[thread_id].skip_friction = true;
+      params_erp[thread_id].skip_friction = false;  // might be a save, but need to test more
       params_erp[thread_id].hi = hi;
       params_erp[thread_id].lo = lo;
       params_erp[thread_id].invMOI = invMOI;
