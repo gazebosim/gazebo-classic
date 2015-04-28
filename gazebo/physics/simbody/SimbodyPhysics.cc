@@ -490,7 +490,7 @@ void SimbodyPhysics::UpdateCollision()
           // loop through detials of patch
           if (found)
           {
-            for (int i=0; i < patch.getNumDetails(); ++i)
+            for (int i = 0; i < patch.getNumDetails(); ++i)
             {
               if (count >= MAX_CONTACT_JOINTS)
               {
@@ -545,7 +545,7 @@ void SimbodyPhysics::UpdateCollision()
                 -t2cg[0], -t2cg[1], -t2cg[2]);
               contactFeedback->wrench[j].body2Torque.Set(
                 t2cg[0], t2cg[1], t2cg[2]);
-                  
+
               // Increase the counters
               ++count;
               contactFeedback->count = count;
@@ -1409,7 +1409,6 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         SimTK::ContactSurface &contactSurf =
           _mobod.updBody().updContactSurface(surfNum);
         sc->SetCollisionShape(&contactSurf.updShape());
-
       }
       break;
 
