@@ -243,8 +243,12 @@ include/ode/timer.h
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -DdNODEBUG -DdDOUBLE -DHAVE_CONFIG_H -DPIC")
 
+# using pthread for parallel position correction,
+# comment below to use boost thread instead
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_PTHREAD")
+
 if (SSE2_FOUND OR SSE3_FOUND OR SSSE3_FOUND OR SSE4_1_FOUND OR SSE4_2_FOUND)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSSE")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DODE_SSE")
 endif()
 
 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")

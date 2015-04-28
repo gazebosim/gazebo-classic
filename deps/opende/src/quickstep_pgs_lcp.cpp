@@ -19,8 +19,7 @@
 * LICENSE.TXT and LICENSE-BSD.TXT for more details.                     *
 *                                                                       *
 *************************************************************************/
-#define USE_PTHREAD  // if not, use boost thread
-#ifdef USE_PTHREAD
+#ifdef USE_PTHREAD  // option set in deps/opende/CMakeLists.txt -DUSE_PTHREAD
 #include <pthread.h>
 #else
 #include <boost/thread.hpp>
