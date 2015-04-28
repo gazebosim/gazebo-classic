@@ -537,11 +537,11 @@ namespace gazebo
       public: void ClearParent();
 
       /// \brief Get type of visual.
-      /// return Visual type.
+      /// \return Visual type.
       public: VisualType GetType() const;
 
       /// \brief Set type of visual.
-      /// param[in] _type Visual type.
+      /// \param[in] _type Visual type.
       public: void SetType(VisualType _type);
 
       /// \internal

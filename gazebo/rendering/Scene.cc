@@ -1523,7 +1523,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   std::string modelName, linkName;
 
   modelName = _msg.name() + "::";
-  for (int j = 0; j < _msg.visual_size(); j++)
+  for (int j = 0; j < _msg.visual_size(); ++j)
   {
     boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
           _msg.visual(j)));
@@ -1545,13 +1545,13 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     this->dataPtr->modelVisualMsgs.push_back(vm);
   }
 
-  for (int j = 0; j < _msg.joint_size(); j++)
+  for (int j = 0; j < _msg.joint_size(); ++j)
   {
     boost::shared_ptr<msgs::Joint> jm(new msgs::Joint(
           _msg.joint(j)));
     this->dataPtr->jointMsgs.push_back(jm);
 
-    for (int k = 0; k < _msg.joint(j).sensor_size(); k++)
+    for (int k = 0; k < _msg.joint(j).sensor_size(); ++k)
     {
       boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
             _msg.joint(j).sensor(k)));
@@ -1559,7 +1559,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     }
   }
 
-  for (int j = 0; j < _msg.link_size(); j++)
+  for (int j = 0; j < _msg.link_size(); ++j)
   {
     linkName = modelName + _msg.link(j).name();
 
@@ -1594,14 +1594,14 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
       this->dataPtr->linkVisualMsgs.push_back(vm);
     }
 
-    for (int k = 1; k < _msg.link(j).visual_size(); k++)
+    for (int k = 1; k < _msg.link(j).visual_size(); ++k)
     {
       boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
             _msg.link(j).visual(k)));
       this->dataPtr->visualMsgs.push_back(vm);
     }
 
-    for (int k = 0; k < _msg.link(j).collision_size(); k++)
+    for (int k = 0; k < _msg.link(j).collision_size(); ++k)
     {
       for (int l = 0;
           l < _msg.link(j).collision(k).visual_size(); l++)
@@ -1612,7 +1612,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
       }
     }
 
-    for (int k = 0; k < _msg.link(j).sensor_size(); k++)
+    for (int k = 0; k < _msg.link(j).sensor_size(); ++k)
     {
       boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
             _msg.link(j).sensor(k)));

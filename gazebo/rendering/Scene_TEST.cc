@@ -131,19 +131,19 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   }
   ASSERT_TRUE(box == NULL);
 
-  // Check that the link visuals were properly added
+  // Check that the link visuals were properly removed
   EXPECT_TRUE(scene->GetVisual("box::link") == NULL);
 
-  // Check that the "visual visuals" were properly added
+  // Check that the "visual visuals" were properly removed
   EXPECT_TRUE(scene->GetVisual("box::link::visual") == NULL);
 
-  // Check that the collision visuals were properly added
+  // Check that the collision visuals were properly removed
   EXPECT_TRUE(scene->GetVisual("box::link::collision") == NULL);
 
-  // Check that the inertia visuals were properly added
+  // Check that the inertia visuals were properly removed
   EXPECT_TRUE(scene->GetVisual("box::link_INERTIA_VISUAL__") == NULL);
 
-  // Check that the COM visuals were properly added
+  // Check that the COM visuals were properly removed
   EXPECT_TRUE(scene->GetVisual("box::link_COM_VISUAL__") == NULL);
 }
 
