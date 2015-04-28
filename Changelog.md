@@ -8,6 +8,10 @@
 1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
     * [Pull request #1606](https://bitbucket.org/osrf/gazebo/pull-request/1606)
 
+1. Laser visualization renders light blue for rays that do not hit obstacles, and dark blue for other rays.
+    * [Pull request #1607](https://bitbucket.org/osrf/gazebo/pull-request/1607)
+    * [Issue #1576](https://bitbucket.org/osrf/gazebo/issue/1576)
+
 1. New accessors in LogPlay class.
     * [Pull request #1577](https://bitbucket.org/osrf/gazebo/pull-request/1577)
 
