@@ -634,7 +634,6 @@ namespace gazebo
         it->second = NULL;
         this->myDataPtr->connectionsToErase.push_back(_id);
       }
-
     }
 
     /// \brief Cleanup disconnected connections.

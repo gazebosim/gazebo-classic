@@ -61,7 +61,6 @@ namespace gazebo
     /// \brief A renderable object
     class GAZEBO_VISIBLE Visual : public boost::enable_shared_from_this<Visual>
     {
-
       /// \brief Type of visual
       public: enum VisualType
               {

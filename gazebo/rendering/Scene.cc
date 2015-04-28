@@ -1878,8 +1878,17 @@ void Scene::PreRender()
     std::copy(lightMsgsCopy.begin(), lightMsgsCopy.end(),
         std::front_inserter(this->dataPtr->lightMsgs));
 
+    std::copy(modelVisualMsgsCopy.begin(), modelVisualMsgsCopy.end(),
+        std::front_inserter(this->dataPtr->modelVisualMsgs));
+
+    std::copy(linkVisualMsgsCopy.begin(), linkVisualMsgsCopy.end(),
+        std::front_inserter(this->dataPtr->linkVisualMsgs));
+
     std::copy(visualMsgsCopy.begin(), visualMsgsCopy.end(),
         std::front_inserter(this->dataPtr->visualMsgs));
+
+    std::copy(collisionVisualMsgsCopy.begin(), collisionVisualMsgsCopy.end(),
+        std::front_inserter(this->dataPtr->collisionVisualMsgs));
 
     std::copy(jointMsgsCopy.begin(), jointMsgsCopy.end(),
         std::front_inserter(this->dataPtr->jointMsgs));
@@ -2268,10 +2277,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
       }
 
       if (visPtr)
-      {
-//        this->RemoveVisualizations(visPtr);
         this->RemoveVisual(visPtr);
-      }
     }
   }
   else if (_msg->request() == "show_contact")
@@ -2531,7 +2537,6 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
           visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
       {
-        //visual->SetType(Visual::VT_COLLISION);
         visual->SetVisible(false);
         visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
       }
