@@ -56,7 +56,7 @@ else
     CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc" -o -name "*.hh"`
   fi
   CPPLINT_FILES=`\
-    find $CHECK_DIRS -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h"`
+    find $CHECK_DIRS -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h" | grep -v test_fixture/gtest`
 fi
 
 SUPPRESS=/tmp/gazebo_cpp_check.suppress
@@ -67,6 +67,7 @@ echo "*:gazebo/common/STLLoader.cc:149" >> $SUPPRESS
 echo "*:gazebo/common/SVGLoader.hh:49" >> $SUPPRESS
 echo "*:gazebo/common/SVGLoader.cc:439" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
+echo "*:examples/stand_alone/test_fixture/gtest/*" >> $SUPPRESS
 
 # Not defined FREEIMAGE_COLORORDER
 echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS

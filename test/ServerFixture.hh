@@ -34,6 +34,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include "gazebo/transport/transport.hh"
 
@@ -49,6 +50,7 @@
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/Server.hh"
+#include "gazebo/util/system.hh"
 
 #include "test_config.h"
 
@@ -56,10 +58,13 @@ namespace gazebo
 {
   std::string custom_exec(std::string _cmd);
 
-  class ServerFixture : public testing::Test
+  class GAZEBO_VISIBLE ServerFixture : public testing::Test
   {
     /// \brief Constructor
     protected: ServerFixture();
+
+    /// \brief Destructor
+    protected: virtual ~ServerFixture();
 
     /// \brief Tear down the test fixture. This gets called by gtest.
     protected: virtual void TearDown();
@@ -84,11 +89,10 @@ namespace gazebo
     /// \param[in] _worldFilename Name of the world to load.
     /// \param[in] _paused True to start the world paused.
     /// \param[in] _physics Name of the physics engine.
-    /// \param[in] _argc Argument count (for example to load system plugins)
-    /// \param[in] _argv Array of arguments
+    /// \param[in] _systemPlugins Array of system plugins to load.
     protected: virtual void Load(const std::string &_worldFilename,
                                  bool _paused, const std::string &_physics,
-                                 int _argc = 0, char **_argv = NULL);
+                          const std::vector<std::string> &_systemPlugins = {});
 
     /// \brief Run the server.
     /// \param[in] _worldFilename Name of the world to run in simulation.
@@ -99,11 +103,10 @@ namespace gazebo
     /// \param[in] _worldFilename Name of the world to load.
     /// \param[in] _paused True to start the world paused.
     /// \param[in] _physics Name of the physics engine.
-    /// \param[in] _argc Argument count
-    /// \param[in] _argv Argument array
+    /// \param[in] _systemPlugins Array of system plugins to load.
     protected: void RunServer(const std::string &_worldFilename, bool _paused,
                               const std::string &_physics,
-                              int _argc = 0, char **_argv = NULL);
+                          const std::vector<std::string> &_systemPlugins = {});
 
 
     /// \brief Get a pointer to the rendering scene.
@@ -556,6 +559,23 @@ namespace gazebo
     /// \param[in] _prefix Prefix for unique string.
     /// \return String with prefix and unique number as suffix.
     protected: std::string GetUniqueString(const std::string &_prefix);
+
+    /// \brief Helper to record data to gtest xml output.
+    /// \param[in] _name Name of data.
+    /// \param[in] _data Floating point number to store.
+    protected: void Record(const std::string &_name, const double _data);
+
+    /// \brief Helper to record signal statistics to gtest xml output.
+    /// \param[in] _prefix Prefix string for data names.
+    /// \param[in] _stats Signal statistics to store.
+    protected: void Record(const std::string &_prefix,
+                           const math::SignalStats &_stats);
+
+    /// \brief Helper to record Vector3 signal statistics to gtest xml output.
+    /// \param[in] _prefix Prefix string for data names.
+    /// \param[in] _stats Vector3 signal statistics to store.
+    protected: void Record(const std::string &_prefix,
+                           const math::Vector3Stats &_stats);
 
     /// \brief Pointer the Gazebo server.
     protected: Server *server;

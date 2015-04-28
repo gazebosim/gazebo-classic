@@ -1,5 +1,11 @@
 ## Gazebo 6.0
 
+1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
+    * [Pull request #1606](https://bitbucket.org/osrf/gazebo/pull-request/1606)
+
+1. New accessors in LogPlay class.
+    * [Pull request #1577](https://bitbucket.org/osrf/gazebo/pull-request/1577)
+
 1. Added a plugin to send messages to an existing website.
    Added gui::MainWindow::AddMenu and msgs/rest_error, msgs/rest_login, msgs rest/post
     * [Pull request #1524](https://bitbucket.org/osrf/gazebo/pull-request/1524)
@@ -24,6 +30,9 @@
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
 
+1. Added a context menu for links
+    * [Pull request #1589](https://bitbucket.org/osrf/gazebo/pull-request/1589)
+
 1. Separate TimePanel's display into TimeWidget and LogPlayWidget.
     * [Pull request #1564](https://bitbucket.org/osrf/gazebo/pull-request/1564)
 
@@ -35,6 +44,9 @@
 
 1. Pass Coulomb surface friction parameters to DART.
     * [Pull request #1420](https://bitbucket.org/osrf/gazebo/pull-request/1420)
+
+1. Added ModelAlign::SetHighlighted
+    * [Pull request #1598](https://bitbucket.org/osrf/gazebo/pull-request/1598)
 
 1. Added various Get functions to Visual. Also added a ConvertGeometryType function to msgs.
     * [Pull request #1402](https://bitbucket.org/osrf/gazebo/pull-request/1402)
@@ -50,6 +62,10 @@
 
 1. Added ModelRightMenu::EntityTypes.
     * [Pull request #1414](https://bitbucket.org/osrf/gazebo/pull-request/1414)
+
+1. Scale joint visuals according to link size.
+    * [Pull request #1591](https://bitbucket.org/osrf/gazebo/pull-request/1591)
+    * [Issue #1563](https://bitbucket.org/osrf/gazebo/issue/1563)
 
 1. Added Gazebo/CoM material.
     * [Pull request #1439](https://bitbucket.org/osrf/gazebo/pull-request/1439)
@@ -82,6 +98,9 @@
 
 1. Sync name and location on SaveDialog.
     * [Pull request #1563](https://bitbucket.org/osrf/gazebo/pull-request/1563)
+
+1. Added Apply Force/Torque dialog
+    * [Pull request #1600](https://bitbucket.org/osrf/gazebo/pull-request/1600)
 
 1. Added inertia pose getter for COMVisual and COMVisual_TEST
     * [Pull request #1581](https://bitbucket.org/osrf/gazebo/pull-request/1581)
@@ -152,6 +171,9 @@
 ## Gazebo 5.0
 
 ### Gazebo 5.x.x
+
+1. Fix heightmap model texture loading.
+    * [Pull request #1592](https://bitbucket.org/osrf/gazebo/pull-request/1592)
 
 1. Disable failing pr2 test for dart
     * [Pull request #1540](https://bitbucket.org/osrf/gazebo/pull-request/1540)

@@ -19,6 +19,7 @@
 #include <string>
 #include <cmath>
 
+#include "gazebo/gazebo.hh"
 #include "ServerFixture.hh"
 
 using namespace gazebo;
@@ -86,6 +87,11 @@ ServerFixture::ServerFixture()
 }
 
 /////////////////////////////////////////////////
+ServerFixture::~ServerFixture()
+{
+}
+
+/////////////////////////////////////////////////
 void ServerFixture::TearDown()
 {
   this->Unload();
@@ -129,7 +135,7 @@ void ServerFixture::Load(const std::string &_worldFilename, bool _paused)
 /////////////////////////////////////////////////
 void ServerFixture::Load(const std::string &_worldFilename,
                   bool _paused, const std::string &_physics,
-                  int _argc, char **_argv)
+                  const std::vector<std::string> &_systemPlugins)
 {
   delete this->server;
   this->server = NULL;
@@ -137,7 +143,7 @@ void ServerFixture::Load(const std::string &_worldFilename,
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
      boost::bind(&ServerFixture::RunServer, this, _worldFilename,
-                 _paused, _physics, _argc, _argv));
+                 _paused, _physics, _systemPlugins));
 
   // Wait for the server to come up
   // Use a 60 second timeout.
@@ -191,13 +197,17 @@ void ServerFixture::RunServer(const std::string &_worldFilename)
 
 /////////////////////////////////////////////////
 void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
-               const std::string &_physics, int _argc, char ** _argv)
+               const std::string &_physics,
+               const std::vector<std::string> &_systemPlugins)
 {
   ASSERT_NO_THROW(this->server = new Server());
-  // parse arguments. For example, to load system plugins:
-  //    char *argv[] = {"program name", "-s", "libRestWebPlugin.so"};
-  //    int argc = 3;
-  this->server->ParseArgs(_argc, _argv);
+
+  for (auto const &plugin : _systemPlugins)
+  {
+    gazebo::addPlugin(plugin);
+  }
+
+  this->server->PreLoad();
 
   if (_physics.length())
     ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
