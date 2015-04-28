@@ -875,7 +875,7 @@ static void* ComputeRows(void *p)
   printf("      quickstep row thread %d start time %f ended time %f duration %f\n",thread_id,cur_time,end_time,end_time - cur_time);
   #endif
 
-  if (skip_friction)
+  if (position_correction_thread)
     IFTIMING (dTimerNow ("ComputeRows_erp ends"));
   else
     IFTIMING (dTimerNow ("ComputeRows ends"));
@@ -1213,7 +1213,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       params_erp[thread_id].nb = nb;
       params_erp[thread_id].jb = jb;
       params_erp[thread_id].findex = findex;
-      params_erp[thread_id].skip_friction = true;
+      params_erp[thread_id].skip_friction = false;  // might be a save, but need to test more
       params_erp[thread_id].hi = hi;
       params_erp[thread_id].lo = lo;
       params_erp[thread_id].invMOI = invMOI;
