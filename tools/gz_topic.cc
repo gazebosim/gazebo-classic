@@ -19,7 +19,7 @@
 #include <gazebo/gui/TopicSelector.hh>
 #include <gazebo/gui/viewers/TopicView.hh>
 #include <gazebo/gui/viewers/ViewFactory.hh>
-#include <gazebo/gazebo.hh>
+#include <gazebo/gazebo_client.hh>
 
 #include "gz_topic.hh"
 
