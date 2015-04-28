@@ -20,7 +20,7 @@
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/JointVisual.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class JointVisual_TEST : public ServerFixture

@@ -23,7 +23,7 @@
 #include "heights_cmp.h"
 #include "helper_physics_generator.hh"
 #include "images_cmp.h"
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 
