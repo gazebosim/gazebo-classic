@@ -29,7 +29,6 @@ class SVGLoader : public gazebo::testing::AutoLogFixture { };
 
 
 unsigned int samples = 10;
-std::string foutput = "";
 
 /////////////////////////////////////////////////
 TEST_F(SVGLoader, LoadPaths)
@@ -51,6 +50,7 @@ TEST_F(SVGLoader, LoadPaths)
   // loader.DumpPaths(paths, std::cout);
 
   // or in a file
+  std::string foutput = "";
   if (!foutput.empty())
   {
     std::ofstream out(foutput.c_str() );
@@ -103,7 +103,9 @@ TEST_F(SVGLoader, LoadArcs)
   common::SVGLoader loader(3);
   std::vector<common::SVGPath> paths;
 
-  bool success = loader.Parse("test/data/svg/arc_test.svg", paths);
+  std::string filePath = std::string(PROJECT_SOURCE_PATH);
+  filePath += "/test/data/svg/arc_test.svg";
+  bool success = loader.Parse(filePath, paths);
   EXPECT_EQ(true, success);
 
   // the test file has 2 paths inside
@@ -129,6 +131,7 @@ TEST_F(SVGLoader, LoadArcs)
   out.close();
 }
 
+/////////////////////////////////////////////////
 TEST_F(SVGLoader, Capsule)
 {
   // check for arc command support
@@ -142,7 +145,10 @@ TEST_F(SVGLoader, Capsule)
   common::SVGLoader loader(3);
   std::vector<common::SVGPath> paths;
 
-  bool success = loader.Parse("test/data/svg/capsule.svg", paths);
+  std::string filePath = std::string(PROJECT_SOURCE_PATH);
+  filePath += "/test/data/svg/capsule.svg";
+
+  bool success = loader.Parse(filePath, paths);
   EXPECT_EQ(true, success);
 
   // the test file has 2 paths inside
@@ -151,6 +157,7 @@ TEST_F(SVGLoader, Capsule)
   out.close();
 }
 
+/////////////////////////////////////////////////
 TEST_F(SVGLoader, ghost_edges)
 {
   // check for invalid edges in svg
@@ -161,10 +168,12 @@ TEST_F(SVGLoader, ghost_edges)
   common::SVGLoader loader(3);
   std::vector<common::SVGPath> paths;
 
-  bool success = loader.Parse("test/data/svg/arc_circle.svg", paths);
+  std::string filePath = std::string(PROJECT_SOURCE_PATH);
+  filePath += "/test/data/svg/arc_circle.svg";
+  bool success = loader.Parse(filePath, paths);
 
   // save for inspection
-  std::ofstream out("ghost_edges.html");
+  std::ofstream out("arc_circle.html");
   loader.DumpPaths(paths, out);
   out.close();
 
@@ -173,7 +182,6 @@ TEST_F(SVGLoader, ghost_edges)
   EXPECT_EQ(1u, paths.size());
   EXPECT_EQ(1u, paths[0].polylines.size());
 }
-
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
