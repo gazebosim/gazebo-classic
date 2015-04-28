@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: External interfaces for Gazebo
- * Author: Nate Koenig
- * Date: 03 Apr 2007
- */
 
-#ifndef _TIME_HH_
-#define _TIME_HH_
+#ifndef _GAZEBO_COMMON_TIME_HH_
+#define _GAZEBO_COMMON_TIME_HH_
 
 #include <string>
 #include <stdlib.h>
@@ -40,7 +36,7 @@ namespace gazebo
     /// \class Time Time.hh common/common.hh
     /// \brief A Time class, can be used to hold wall- or sim-time.
     ///        stored as sec and nano-sec.
-    class GAZEBO_VISIBLE Time
+    class GZ_COMMON_VISIBLE Time
     {
       /// \brief A static zero time variable set to common::Time(0, 0).
       public: static const Time Zero;
@@ -428,26 +424,24 @@ namespace gazebo
       /// preserve the internal seconds and nanoseconds separation
       private: inline void Correct()
                {
-                 const int32_t nsInSec = 1000000000;
                  // In the case sec and nsec have different signs, normalize
                  if (this->sec > 0 && this->nsec < 0)
                  {
-                   int32_t n = abs(this->nsec / nsInSec) + 1;
+                   int32_t n = abs(this->nsec / 1e9) + 1;
                    this->sec -= n;
-                   this->nsec += n * nsInSec;
+                   this->nsec += n * 1e9;
                  }
                  if (this->sec < 0 && this->nsec > 0)
                  {
-                   int32_t n = abs(this->nsec / nsInSec) + 1;
+                   int32_t n = abs(this->nsec / 1e9) + 1;
                    this->sec += n;
-                   this->nsec -= n * nsInSec;
+                   this->nsec -= n * 1e9;
                  }
 
                  // Make any corrections
-                 this->sec += this->nsec / nsInSec;
-                 this->nsec = this->nsec % nsInSec;
+                 this->sec += this->nsec / static_cast<int32_t>(1e9);
+                 this->nsec = this->nsec % static_cast<int32_t>(1e9);
                }
-
       private: static struct timespec clockResolution;
     };
     /// \}

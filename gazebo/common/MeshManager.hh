@@ -45,7 +45,7 @@ namespace gazebo
 
     /// \class MeshManager MeshManager.hh common/common.hh
     /// \brief Maintains and manages all meshes
-    class GAZEBO_VISIBLE MeshManager : public SingletonT<MeshManager>
+    class GZ_COMMON_VISIBLE MeshManager : public SingletonT<MeshManager>
     {
       /// \brief Constructor
       private: MeshManager();

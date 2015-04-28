@@ -14,6 +14,10 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  #include <Windows.h>
+#endif
+
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 
@@ -74,3 +78,21 @@ std::string common::find_file_path(const std::string &_file)
     return filepath.substr(0, index);
   }
 }
+
+/////////////////////////////////////////////////
+#ifdef _WIN32
+const char *common::getEnvWin(const char *_name)
+{
+  const DWORD buffSize = 65535;
+  static char buffer[buffSize];
+  if (GetEnvironmentVariable(_name, buffer, buffSize))
+    return buffer;
+  else
+    return NULL;
+}
+#else
+const char *common::getEnvWin(const char * /*_name*/)
+{
+  return NULL;
+}
+#endif
