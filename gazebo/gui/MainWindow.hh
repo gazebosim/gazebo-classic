@@ -315,6 +315,7 @@ namespace gazebo
 
 #ifdef HAVE_OCULUS
       private: gui::OculusWindow *oculusWindow;
+      private: gui::OculusWindow *oculusWindow2;
 #endif
 
       /// \brief Buffer of plugin messages to process.

@@ -87,6 +87,8 @@ namespace gazebo
       /// \brief Flag used to prevent multiple messages from being
       /// displayed.
       public: bool oculusTrackingWarned;
+
+      public: int id;
     };
   }
 }

@@ -16,7 +16,7 @@ fragment_program OculusDistortionFragment glsl
 }
 
 
-material Oculus/LeftEye
+material Oculus/LeftEye0
 {
   receive_shadows off
 
@@ -41,7 +41,7 @@ material Oculus/LeftEye
   }
 }
 
-material Oculus/RightEye
+material Oculus/RightEye0
 {
   receive_shadows off
 
@@ -60,7 +60,58 @@ material Oculus/RightEye
 
       lighting off
 
-      texture_unit 
+      texture_unit
+      {
+      }
+    }
+  }
+}
+
+material Oculus/LeftEye1
+{
+  receive_shadows off
+
+  technique
+  {
+    pass Oculus/LeftEye
+    {
+      vertex_program_ref OculusDistortionVertex
+      {
+      }
+
+      fragment_program_ref OculusDistortionFragment
+      {
+        param_named diffuseMap int 0
+      }
+
+      lighting off
+      texture_unit
+      {
+      }
+    }
+  }
+}
+
+material Oculus/RightEye1
+{
+  receive_shadows off
+
+  technique
+  {
+    pass Oculus/RightEye
+    {
+      vertex_program_ref OculusDistortionVertex
+      {
+      }
+
+      fragment_program_ref OculusDistortionFragment
+      {
+        param_named diffuseMap int 0
+      }
+
+      lighting off
+
+      texture_unit
       {
       }
     }

@@ -157,6 +157,7 @@ MainWindow::MainWindow()
 
 #ifdef HAVE_OCULUS
   this->oculusWindow = NULL;
+  this->oculusWindow2 = NULL;
 #endif
 
   this->connections.push_back(
@@ -225,6 +226,7 @@ void MainWindow::Load()
     {
       this->oculusWindow = new gui::OculusWindow(
         oculusX, oculusY, visual);
+      std::cout << "Oculus #1 attached to " << visual << std::endl;
 
       if (this->oculusWindow->CreateCamera())
         this->oculusWindow->show();
@@ -233,6 +235,29 @@ void MainWindow::Load()
       gzlog << "Oculus: No visual link specified in for attaching the camera. "
             << "Did you forget to set ~/.gazebo/gui.ini?\n";
   }
+
+  // 2nd Oculus.
+  int oculusAutoLaunch2 = getINIProperty<int>("oculus2.autolaunch2", 0);
+  int oculusX2 = getINIProperty<int>("oculus2.x2", 0);
+  int oculusY2 = getINIProperty<int>("oculus2.y2", 0);
+  std::string visual2 = getINIProperty<std::string>("oculus2.visual2", "");
+  std::cout << "Oculus #2 attached to " << visual2 << std::endl;
+
+  if (oculusAutoLaunch2 == 1)
+  {
+    if (!visual2.empty())
+    {
+      this->oculusWindow2 = new gui::OculusWindow(
+        oculusX2, oculusY2, visual2);
+
+      if (this->oculusWindow2->CreateCamera())
+        this->oculusWindow2->show();
+    }
+    else
+      gzlog << "Oculus2: No visual link specified in for attaching the camera. "
+            << "Did you forget to set ~/.gazebo/gui.ini?\n";
+  }
+
 #endif
 
   // Load the space navigator
@@ -300,6 +325,12 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   {
     delete this->oculusWindow;
     this->oculusWindow = NULL;
+  }
+
+  if (this->oculusWindow2)
+  {
+    delete this->oculusWindow2;
+    this->oculusWindow2 = NULL;
   }
 #endif
   delete this->renderWidget;

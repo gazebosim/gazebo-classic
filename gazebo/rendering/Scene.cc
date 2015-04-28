@@ -590,6 +590,7 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
 //////////////////////////////////////////////////
 OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
 {
+  std::cout << "Scene::CreateOculusCamera() Name: " << _name << std::endl;
   OculusCameraPtr camera(new OculusCamera(_name, shared_from_this()));
 
   if (camera->Ready())

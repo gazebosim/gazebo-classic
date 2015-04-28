@@ -139,7 +139,11 @@ bool OculusWindow::CreateCamera()
   if (!this->scene)
     gzerr << "Unable to create an oculus camera, scene is NULL" << std::endl;
 
-  this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
+  static int counter = 0;
+  ++counter;
+
+  this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera" +
+    std::to_string(this->scene->GetOculusCameraCount()));
   return this->oculusCamera->Ready();
 }
 
@@ -166,12 +170,12 @@ void OculusWindow::showEvent(QShowEvent *_event)
   this->setFocus();
 
   QSize winSize;
-  winSize.setWidth(1280);
-  winSize.setHeight(800);
+  winSize.setWidth(1920);
+  winSize.setHeight(1080);
   this->resize(winSize);
 
   // Put the window on the oculus screen
-  this->setGeometry(this->xPos, this->yPos, 1280, 800);
+  this->setGeometry(this->xPos, this->yPos, 1920, 1080);
 
   // Make the window full screen
   this->isFullScreen = true;

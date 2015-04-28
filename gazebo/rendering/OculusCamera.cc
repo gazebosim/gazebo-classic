@@ -46,8 +46,21 @@ const float g_defaultFarClip = 500.0f;
 OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   : Camera(_name, _scene), dataPtr(new OculusCameraPrivate)
 {
-  ovr_Initialize();
-  this->dataPtr->hmd = ovrHmd_Create(0);
+  if (_name == "gzoculus_camera0")
+  {
+    ovr_Initialize();
+    std::cout << "Number of devices: " << ovrHmd_Detect() << std::endl;
+    this->dataPtr->hmd = ovrHmd_Create(0);
+    std::cout << "Creating first Oculus camera" << std::endl;
+    this->dataPtr->id = 0;
+  }
+  else
+  {
+    std::cout << "Creating 2nd Oculus camera" << std::endl;
+    this->dataPtr->hmd = ovrHmd_Create(1);
+    this->dataPtr->id = 1;
+  }
+
   if (!this->dataPtr->hmd)
   {
     gzerr << "Oculus Rift not detected. "
@@ -175,7 +188,7 @@ void OculusCamera::Init()
   // Oculus
   {
     this->dataPtr->rightCamera = this->scene->GetManager()->createCamera(
-      "OculusUserRight");
+      this->name);
     this->dataPtr->rightCamera->pitch(Ogre::Degree(90));
 
     // Don't yaw along variable axis, causes leaning
@@ -384,9 +397,9 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
   if (!_visual)
     return;
 
-  if (this->scene->GetManager()->hasAnimation("cameratrack"))
+  if (this->scene->GetManager()->hasAnimation("cameratrack" + std::to_string(this->dataPtr->id)))
   {
-    this->scene->GetManager()->destroyAnimation("cameratrack");
+    this->scene->GetManager()->destroyAnimation("cameratrack" + std::to_string(this->dataPtr->id));
   }
 
   math::Box box = _visual->GetBoundingBox();
@@ -427,7 +440,7 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
   double time = 0.5;  // dist / vel;
 
   Ogre::Animation *anim =
-    this->scene->GetManager()->createAnimation("cameratrack", time);
+    this->scene->GetManager()->createAnimation("cameratrack" + std::to_string(this->dataPtr->id), time);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
@@ -443,7 +456,7 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
   key->setRotation(yawFinal);
 
   this->animState =
-    this->scene->GetManager()->createAnimationState("cameratrack");
+    this->scene->GetManager()->createAnimationState("cameratrack" + std::to_string(this->dataPtr->id));
 
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
@@ -556,7 +569,7 @@ void OculusCamera::Oculus()
   // Create the left and right render textures.
   this->dataPtr->renderTextureLeft =
     Ogre::TextureManager::getSingleton().createManual(
-      "OculusRiftRenderTextureLeft",
+      "OculusRiftRenderTextureLeft" + std::to_string(this->dataPtr->id),
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
       Ogre::TEX_TYPE_2D,
       textureSizeLeft.w,
@@ -567,7 +580,7 @@ void OculusCamera::Oculus()
 
   this->dataPtr->renderTextureRight =
     Ogre::TextureManager::getSingleton().createManual(
-      "OculusRiftRenderTextureRight",
+      "OculusRiftRenderTextureRight" + std::to_string(this->dataPtr->id),
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
       Ogre::TEX_TYPE_2D,
       textureSizeRight.w,
@@ -578,9 +591,9 @@ void OculusCamera::Oculus()
 
   // Create the left and right materials.
   Ogre::MaterialPtr matLeft =
-    Ogre::MaterialManager::getSingleton().getByName("Oculus/LeftEye");
+    Ogre::MaterialManager::getSingleton().getByName("Oculus/LeftEye" + std::to_string(this->dataPtr->id));
   Ogre::MaterialPtr matRight =
-    Ogre::MaterialManager::getSingleton().getByName("Oculus/RightEye");
+    Ogre::MaterialManager::getSingleton().getByName("Oculus/RightEye" + std::to_string(this->dataPtr->id));
 
   // Attach materials to the render textures.
   matLeft->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTexture(
@@ -678,16 +691,16 @@ void OculusCamera::Oculus()
     {
       externalObj =
         this->dataPtr->externalSceneManager->createManualObject(
-            "OculusRiftRenderObjectLeft");
-      externalObj->begin("Oculus/LeftEye",
+            "OculusRiftRenderObjectLeft" + std::to_string(this->dataPtr->id));
+      externalObj->begin("Oculus/LeftEye" + std::to_string(this->dataPtr->id),
           Ogre::RenderOperation::OT_TRIANGLE_LIST);
     }
     else
     {
       externalObj =
         this->dataPtr->externalSceneManager->createManualObject(
-            "OculusRiftRenderObjectRight");
-      externalObj->begin("Oculus/RightEye",
+            "OculusRiftRenderObjectRight" + std::to_string(this->dataPtr->id));
+      externalObj->begin("Oculus/RightEye" + std::to_string(this->dataPtr->id),
           Ogre::RenderOperation::OT_TRIANGLE_LIST);
     }
 
@@ -725,7 +738,7 @@ void OculusCamera::Oculus()
   // Create the external camera
   this->dataPtr->externalCamera =
     this->dataPtr->externalSceneManager->createCamera(
-        "_OculusRiftExternalCamera_INTERNAL_");
+        "_OculusRiftExternalCamera_INTERNAL_" + std::to_string(this->dataPtr->id));
   this->dataPtr->externalCamera->setFarClipDistance(50);
   this->dataPtr->externalCamera->setNearClipDistance(0.001);
   this->dataPtr->externalCamera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
