@@ -1,3 +1,7 @@
+if (HAVE_GRAPHVIZ)
+  add_subdirectory(qgv)
+endif()
+
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include (${QT_USE_FILE})
 
@@ -41,7 +45,6 @@ set (install_headers
   ModelEditor.hh
 )
 
-# MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
   set (qt_tests ${qt_tests}
     JointMaker_TEST.cc
@@ -49,6 +52,42 @@ if (ENABLE_SCREEN_TESTS)
     ModelCreator_TEST.cc
     ModelEditor_TEST.cc
     ModelEditorPalette_TEST.cc
+  )
+endif()
+
+set (libraries_to_link
+  gazebo_common
+  gazebo_rendering
+  gazebo_msgs
+)
+
+if (HAVE_GRAPHVIZ)
+  set (qt_headers
+    ${qt_headers}
+    GraphScene.hh
+    GraphView.hh
+  )
+
+  set (sources
+    ${sources}
+    GraphScene.cc
+    GraphView.cc
+    SchematicViewWidget.cc
+  )
+
+  set (headers
+    ${headers}
+    SchematicViewWidget.hh
+  )
+
+  set (qt_tests
+    ${qt_tests}
+    SchematicViewWidget_TEST.cc
+  )
+
+  set (libraries_to_link
+    ${libraries_to_link}
+    gazebo_gui_model_qgv
   )
 endif()
 
@@ -64,11 +103,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 gz_add_library(gazebo_gui_model ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 
 target_link_libraries(gazebo_gui_model
-  gazebo_common
-#  gazebo_transport
-#  gazebo_sdf_interface
-  gazebo_rendering
-  gazebo_msgs)
+  ${libraries_to_link}
+)
 
 gz_install_library(gazebo_gui_model)
 gz_install_includes("gui/model" ${install_headers})
