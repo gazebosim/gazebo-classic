@@ -532,7 +532,7 @@ void SimbodyPhysics::UpdateCollision()
               /// detail.getContactPoint() returns in body frame
               /// per gazebo contact feedback convention.
               const SimTK::Vec3 offset2 = -detail.getContactPoint();
-              SimTK::SpatialVec s2cg = SimTK::shiftForceBy(-s2, offset2);
+              SimTK::SpatialVec s2cg = SimTK::shiftForceBy(s2, offset2);
               SimTK::Vec3 t2cg = s2cg[0];
               SimTK::Vec3 f2cg = s2cg[1];
 
@@ -546,7 +546,7 @@ void SimbodyPhysics::UpdateCollision()
               math::Pose pose2 = link2->GetWorldPose();
               const SimTK::Vec3 offset1 = -detail.getContactPoint()
                 + SimbodyPhysics::Vector3ToVec3(pose1.pos - pose2.pos);
-              SimTK::SpatialVec s1cg = SimTK::shiftForceBy(s2, offset1);
+              SimTK::SpatialVec s1cg = SimTK::shiftForceBy(-s2, offset1);
  
               /// get torque and force components 
               SimTK::Vec3 t1cg = s1cg[0];
