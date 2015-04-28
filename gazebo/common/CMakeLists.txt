@@ -212,7 +212,7 @@ if (UNIX)
   target_link_libraries(gazebo_common pthread)
 endif()
 
-if (UNIX)
+if (UNIX AND NOT APPLE)
   # rt is used for clock_gettime, which is not available on apple or windows
   target_link_libraries(gazebo_common rt)
 endif()
