@@ -39,17 +39,21 @@ namespace gazebo
 
   /// \brief A plugin that simulates buoyancy of an object immersed in fluid.
   /// All SDF parameters are optional.
-  /// <fluid_density> sets the density of the fluid that surrounds the buoyant object.
-  /// <link> elements describe the volume properties of individual links in the model. For example:
+  /// <fluid_density> sets the density of the fluid that surrounds the buoyant
+  /// object.
+  /// <link> elements describe the volume properties of individual links in the
+  /// model. For example:
   /// <link name="body">
   ///   <center_of_volume>1 2 3</center_of_volume>
   ///   <volume>50</volume>
   /// </link>
-  /// <center_of_volume> A point representing the volumetric center of the link in the link frame.
+  /// <center_of_volume> A point representing the volumetric center of the
+  /// link in the link frame. This is where the buoyancy force will be applied.
   /// <volume> The volume of the link in kg/m^3.
-  /// If center of volume and volume are not specified, the plugin will attempt to compute these
-  /// properties from the link collision shapes. This computation will not be accurate if the object
-  /// is not composed of simple shapes.
+  /// If center of volume and volume are not specified, the plugin will attempt
+  /// to compute these properties from the link collision shapes. This
+  /// computation will not be accurate if the object is not composed of simple
+  /// collision shapes.
   class BuoyancyPlugin : public ModelPlugin
   {
     /// \brief Constructor.
