@@ -23,7 +23,7 @@
 #include "player.h"
 
 #include "gazebo/transport/transport.hh"
-#include "gazebo/gazebo.hh"
+#include "gazebo/gazebo_client.hh"
 
 #include "GazeboTime.hh"
 #include "GazeboDriver.hh"
