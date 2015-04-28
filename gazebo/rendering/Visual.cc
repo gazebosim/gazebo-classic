@@ -35,7 +35,6 @@
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Material.hh"
-#include "gazebo/rendering/MovableText.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
 #include "gazebo/rendering/Visual.hh"
 
@@ -966,21 +965,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
       {
         Ogre::MovableObject *obj = sn->getAttachedObject(j);
 
-        MovableText *text = dynamic_cast<MovableText *>(obj);
-        if (text)
-        {
-          common::Color ambient, diffuse, specular, emissive;
-          bool matFound = rendering::Material::GetMaterialAsColor(
-              this->dataPtr->myMaterialName, ambient, diffuse, specular,
-              emissive);
-
-          if (matFound)
-          {
-            text->SetColor(ambient);
-          }
-          continue;
-        }
-        else if (dynamic_cast<Ogre::Entity*>(obj))
+        if (dynamic_cast<Ogre::Entity*>(obj))
           ((Ogre::Entity*)obj)->setMaterialName(this->dataPtr->myMaterialName);
         else
         {
@@ -1855,8 +1840,7 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       {
         std::string str = Ogre::any_cast<std::string>(any);
         if (str.substr(0, 3) == "rot" || str.substr(0, 5) == "trans"
-            || str.substr(0, 5) == "scale" ||
-            str.find("_APPLY_WRENCH_") != std::string::npos)
+            || str.substr(0, 5) == "scale")
           continue;
       }
 

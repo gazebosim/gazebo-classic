@@ -19,7 +19,6 @@
 
 #include <string>
 #include <vector>
-#include <mutex>
 #include <map>
 
 #include "gazebo/gui/qt.h"
@@ -104,32 +103,8 @@ namespace gazebo
       /// \brief Visual of the targeted link.
       public: rendering::VisualPtr linkVisual;
 
-      /// \brief Interactive visual which represents the wrench applied.
-      public: rendering::ApplyWrenchVisualPtr applyWrenchVisual;
-
-      /// \brief Indicate whether mousepress is dragging on top the
-      /// rotation tool or not.
-      public: bool draggingTool;
-
-      /// \brief World pose of the rotation tool the moment dragging
-      /// started.
-      public: math::Pose dragStartPose;
-
-      /// \brief State of the manipulation tool, here only using "rot_y"
-      /// and "rot_z".
-      public: std::string manipState;
-
-      /// \brief Current mode, either "force", "torque" or "none".
-      public: std::string mode;
-
-      /// \brief Pointer to the main window.
-      public: MainWindow *mainWindow;
-
       /// \brief A list of events connected to this.
       public: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Mutex to protect variables.
-      public: std::mutex mutex;
 
       /// \brief Map link name to link CoM vector.
       public: std::map<std::string, math::Vector3> linkToCOMMap;

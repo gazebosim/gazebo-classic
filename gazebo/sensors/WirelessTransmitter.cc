@@ -177,7 +177,7 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
 
   double distance = std::max(1.0,
       this->referencePose.pos.Distance(_receiver.pos));
-  double x = abs(math::Rand::GetDblNormal(0.0, ModelStdDesv));
+  double x = std::abs(math::Rand::GetDblNormal(0.0, ModelStdDesv));
   double wavelength = common::SpeedOfLight / (this->GetFreq() * 1000000);
 
   // Hata-Okumara propagation model
