@@ -82,6 +82,10 @@ namespace gazebo
       /// \param[in] _action Triggered action.
       private slots: void OnAction(QAction *_action);
 
+      /// \brief Show the schematic view widget
+      /// \param[in] _show True to show the widget, false to hide it.
+      private slots: void OnSchematicView(bool _show);
+
       /// \brief Callback when the model has been completed.
       private: void OnFinish();
 
