@@ -24,6 +24,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/ApplyWrenchDialog.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 
 using namespace gazebo;
@@ -46,6 +47,11 @@ ModelRightMenu::ModelRightMenu()
   this->editAct = new QAction(tr("Edit model"), this);
   this->editAct->setStatusTip(tr("Open on Model Editor"));
   connect(this->editAct, SIGNAL(triggered()), this, SLOT(OnEdit()));
+
+  this->applyWrenchAct = new QAction(tr("Apply Force/Torque"), this);
+  this->applyWrenchAct->setStatusTip(tr("Apply force and torque to a link"));
+  connect(this->applyWrenchAct, SIGNAL(triggered()), this,
+      SLOT(OnApplyWrench()));
 
   // \todo Reimplement
   // this->snapBelowAct = new QAction(tr("Snap"), this);
@@ -159,6 +165,9 @@ void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
   menu.addAction(this->moveToAct);
   menu.addAction(this->followAct);
 
+  if (_type == EntityTypes::MODEL || _type == EntityTypes::LINK)
+    menu.addAction(this->applyWrenchAct);
+
   if (_type == EntityTypes::MODEL)
   {
     // disable editing planes for now
@@ -230,6 +239,36 @@ void ModelRightMenu::OnEdit()
 {
   g_editModelAct->trigger();
   gui::Events::editModel(this->entityName);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnApplyWrench()
+{
+  ApplyWrenchDialog *applyWrenchDialog = new ApplyWrenchDialog();
+
+  rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
+      GetVisual(this->entityName);
+
+  if (!vis)
+  {
+    gzerr << "Can't find entity " << this->entityName << std::endl;
+    return;
+  }
+
+  std::string modelName, linkName;
+  if (vis == vis->GetRootVisual())
+  {
+    modelName = this->entityName;
+    // If model selected just take the first link
+    linkName = vis->GetChild(0)->GetName();
+  }
+  else
+  {
+    modelName = vis->GetRootVisual()->GetName();
+    linkName = this->entityName;
+  }
+
+  applyWrenchDialog->Init(modelName, linkName);
 }
 
 /////////////////////////////////////////////////
