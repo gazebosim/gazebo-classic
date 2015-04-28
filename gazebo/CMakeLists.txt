@@ -56,7 +56,6 @@ target_link_libraries(gzserver
   gazebo_sensors
   gazebo_rendering
   gazebo_msgs
-  pthread
 )
 
 target_link_libraries(gazebo
@@ -70,7 +69,6 @@ target_link_libraries(gazebo
   gazebo_rendering
   gazebo_msgs
   gazebo_gui
-  pthread
 )
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
@@ -94,8 +92,10 @@ target_link_libraries(libgazebo
   gazebo_rendering
   gazebo_msgs
   gazebo_math
-  pthread
 )
+if (UNIX)
+  target_link_libraries(libgazebo pthread)
+endif()
 
 add_dependencies(libgazebo gazebo_msgs)
 gz_install_library(libgazebo)
@@ -106,7 +106,6 @@ target_link_libraries(libgazebo_client
   gazebo_transport
   gazebo_util
 )
-
 if (UNIX)
   target_link_libraries(libgazebo_client pthread)
 endif()
