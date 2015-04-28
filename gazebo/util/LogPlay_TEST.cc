@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 #include <string>
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/util/LogPlay.hh"
 #include "test_config.h"
@@ -42,15 +43,15 @@ TEST_F(LogPlay_TEST, Open)
   EXPECT_ANY_THROW(player->Open(logFilePath.string()));
   EXPECT_FALSE(player->IsOpen());
 
-  logFilePath = TEST_PATH;
-  logFilePath /= "logs/invalidHeader.log";
+  logFilePath = TEST_PATH / boost::filesystem::path("logs");
+  logFilePath /= boost::filesystem::path("invalidHeader.log");
 
   // Open a malformed log file (incorrect header).
   EXPECT_ANY_THROW(player->Open(logFilePath.string()));
   EXPECT_FALSE(player->IsOpen());
 
-  logFilePath = TEST_PATH;
-  logFilePath /= "logs/state.log";
+  logFilePath = TEST_PATH / boost::filesystem::path("logs");
+  logFilePath /= boost::filesystem::path("state.log");
 
   // Open a correct log file.
   EXPECT_NO_THROW(player->Open(logFilePath.string()));
@@ -79,7 +80,8 @@ TEST_F(LogPlay_TEST, Accessors)
 
   // Open a correct log file.
   boost::filesystem::path logFilePath(TEST_PATH);
-  logFilePath /= "logs/state.log";
+  logFilePath /= boost::filesystem::path("logs");
+  logFilePath /= boost::filesystem::path("state.log");
 
   EXPECT_NO_THROW(player->Open(logFilePath.string()));
 
@@ -97,7 +99,7 @@ TEST_F(LogPlay_TEST, Accessors)
   EXPECT_EQ(player->GetChunkCount(), 5u);
 
   std::string chunk;
-  player->GetChunk(0, chunk);
+  EXPECT_TRUE(player->GetChunk(0, chunk));
 }
 
 /////////////////////////////////////////////////
@@ -110,11 +112,17 @@ TEST_F(LogPlay_TEST, Chunks)
 
   // Open a correct log file.
   boost::filesystem::path logFilePath(TEST_PATH);
-  logFilePath /= "logs/state.log";
+  logFilePath /= boost::filesystem::path("logs");
+  logFilePath /= boost::filesystem::path("state.log");
 
   EXPECT_NO_THROW(player->Open(logFilePath.string()));
 
-  // Make sure that the chunk returned is not empty.
+  // Verify the content of chunk #0.
+  player->GetChunk(0, chunk);
+  std::string shasum = gazebo::common::get_sha1<std::string>(chunk);
+  EXPECT_EQ(shasum, "aa227eee0554b8ace3a033e90b4f0c247909db33");
+
+  // Make sure that the chunks returned are not empty.
   for (unsigned int i = 0; i < player->GetChunkCount(); ++i)
   {
     EXPECT_TRUE(player->GetChunk(i, chunk));
