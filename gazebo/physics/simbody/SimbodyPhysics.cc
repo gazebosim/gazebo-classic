@@ -514,7 +514,7 @@ void SimbodyPhysics::UpdateCollision()
                 detail.getContactPoint()[2]);
 
               // Store the contact normal
-              contactFeedback->normals[j].Set(
+              contactFeedback->normals[count].Set(
                 detail.getContactNormal()[0],
                 detail.getContactNormal()[1],
                 detail.getContactNormal()[2]);
@@ -523,27 +523,42 @@ void SimbodyPhysics::UpdateCollision()
               const SimTK::Vec3 f2 = detail.getForceOnSurface2();
               const SimTK::SpatialVec s2 =
                 SimTK::SpatialVec(SimTK::Vec3(0, 0, 0), f2);
-              /// \TODO: get transform from point to CG, for now, assume
+              /// Get transform from point to CG.
               /// detail.getContactPoint() returns in body frame
-              // per gazebo contact feedback convention, pending more testing.
-              SimTK::SpatialVec s2cg = SimTK::shiftForceBy(s2,
-                -detail.getContactPoint());
-              /*gzerr << "numc: " << j << "\n";
-              gzerr << "index: " << i << "\n";
-              gzerr << "offset: " << detail.getContactPoint() << "\n";
-              gzerr << "s2: " << s2 << "\n";
-              gzerr << "s2cg: " << s2cg << "\n";*/
+              /// per gazebo contact feedback convention.
+              const SimTK::Vec3 offset2 = -detail.getContactPoint();
+              SimTK::SpatialVec s2cg = SimTK::shiftForceBy(s2, offset2);
               SimTK::Vec3 t2cg = s2cg[0];
               SimTK::Vec3 f2cg = s2cg[1];
 
+              /// shift for body 1
+              /// This is wrong
+              const SimTK::Vec3 offset1 = -detail.getContactPoint();
+              SimTK::SpatialVec s1cg = SimTK::shiftForceBy(s2, offset1);
+              SimTK::Vec3 t1cg = -s1cg[0];
+              SimTK::Vec3 f1cg = -s1cg[1];
+
+              gzerr << "numc: " << j << "\n";
+              gzerr << "count: " << count << "\n";
+              gzerr << "index: " << i << "\n";
+              gzerr << "offset 2: " << detail.getContactPoint() << "\n";
+              gzerr << "s2: " << s2 << "\n";
+              gzerr << "s2cg: " << s2cg << "\n";
+              gzerr << "f2cg: " << f2cg << "\n";
+              gzerr << "t2cg: " << t2cg << "\n";
+              gzerr << "offset 1: " << detail.getContactPoint() << "\n";
+              gzerr << "s1cg: " << s1cg << "\n";
+              gzerr << "f1cg: " << f1cg << "\n";
+              gzerr << "t1cg: " << t1cg << "\n";
+
               // copy.
-              contactFeedback->wrench[j].body1Force.Set(
-                -f2cg[0], -f2cg[1], -f2cg[2]);
-              contactFeedback->wrench[j].body2Force.Set(
+              contactFeedback->wrench[count].body1Force.Set(
+                f1cg[0], f1cg[1], f1cg[2]);
+              contactFeedback->wrench[count].body2Force.Set(
                 f2cg[0], f2cg[1], f2cg[2]);
-              contactFeedback->wrench[j].body1Torque.Set(
-                -t2cg[0], -t2cg[1], -t2cg[2]);
-              contactFeedback->wrench[j].body2Torque.Set(
+              contactFeedback->wrench[count].body1Torque.Set(
+                t1cg[0], t1cg[1], t1cg[2]);
+              contactFeedback->wrench[count].body2Torque.Set(
                 t2cg[0], t2cg[1], t2cg[2]);
 
               // Increase the counters
