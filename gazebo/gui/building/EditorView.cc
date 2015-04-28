@@ -203,7 +203,10 @@ void EditorView::contextMenuEvent(QContextMenuEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::wheelEvent(QWheelEvent *_event)
 {
-  int numSteps = (_event->delta()/8) / 15;
+  int wheelIncr = 120;
+  int sign = (_event->delta() > 0) ? 1 : -1;
+  int delta = std::max(std::abs(_event->delta()), wheelIncr) * sign;
+  int numSteps = delta / wheelIncr;
 
   QMatrix mat = matrix();
   QPointF mousePosition = _event->pos();

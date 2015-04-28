@@ -241,6 +241,9 @@ RenderWidget::~RenderWidget()
 
   delete this->toolbar;
   this->toolbar = NULL;
+
+  // we created the scene here we are responsible for removing it.
+  rendering::remove_scene(gui::get_world());
 }
 
 /////////////////////////////////////////////////
@@ -257,13 +260,18 @@ return;
   {
     // set equal size for now. There should always be at least one widget
     // (render3DFrame) in the splitter.
-    QList<int> sizes = this->splitter->sizes();
-    GZ_ASSERT(sizes.size() > 0, "RenderWidget splitter has no child widget");
+    int childCount = this->splitter->count();
+    GZ_ASSERT(childCount > 0,
+        "RenderWidget splitter has no child widget");
 
-    sizes.insert(_index, sizes[0]);
+    QSize widgetSize = this->size();
+    int newSize = widgetSize.height() / (this->splitter->count()+1);
+    QList<int> newSizes;
+    for (int i = 0; i < childCount+1; ++i)
+      newSizes.append(newSize);
 
     this->splitter->insertWidget(_index, _widget);
-    this->splitter->setSizes(sizes);
+    this->splitter->setSizes(newSizes);
     this->splitter->setStretchFactor(_index, 1);
   }
   else
@@ -315,6 +323,13 @@ void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
 
   if (_duration > 0)
     QTimer::singleShot(_duration, this, SLOT(OnClearOverlayMsg()));
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::SetOverlaysVisible(const bool _visible)
+{
+  for (auto const &plugin : this->plugins)
+    plugin->setVisible(_visible);
 }
 
 /////////////////////////////////////////////////

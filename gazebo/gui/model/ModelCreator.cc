@@ -120,6 +120,10 @@ ModelCreator::ModelCreator()
       boost::bind(&ModelCreator::ModelChanged, this)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectOpenLinkInspector(
+      boost::bind(&ModelCreator::OpenInspector, this, _1)));
+
+  this->connections.push_back(
       gui::Events::ConnectAlignMode(
         boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
 
@@ -132,18 +136,31 @@ ModelCreator::ModelCreator()
        boost::bind(&ModelCreator::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
+     gui::model::Events::ConnectSetSelectedLink(
+       boost::bind(&ModelCreator::OnSetSelectedLink, this, _1, _2)));
+
+  this->connections.push_back(
       gui::Events::ConnectScaleEntity(
       boost::bind(&ModelCreator::OnEntityScaleChanged, this, _1, _2)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectShowLinkContextMenu(
+      boost::bind(&ModelCreator::ShowContextMenu, this, _1)));
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&ModelCreator::Update, this)));
 
-  g_copyAct->setEnabled(false);
-  g_pasteAct->setEnabled(false);
-
-  connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
-  connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+  if (g_copyAct)
+  {
+    g_copyAct->setEnabled(false);
+    connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
+  }
+  if (g_pasteAct)
+  {
+    g_pasteAct->setEnabled(false);
+    connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+  }
 
   this->saveDialog = new SaveDialog(SaveDialog::MODEL);
 
@@ -154,7 +171,7 @@ ModelCreator::ModelCreator()
 ModelCreator::~ModelCreator()
 {
   while (!this->allLinks.empty())
-    this->RemoveLink(this->allLinks.begin()->first);
+    this->RemoveLinkImpl(this->allLinks.begin()->first);
 
   this->allLinks.clear();
   this->node->Fini();
@@ -744,7 +761,6 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
   }
 
   rendering::ScenePtr scene = link->linkVisual->GetScene();
-  scene->AddVisual(link->linkVisual);
 
   this->ModelChanged();
 }
@@ -934,16 +950,16 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allLinks[linkName] = link;
+    gui::model::Events::linkInserted(linkName);
   }
 
   rendering::ScenePtr scene = link->linkVisual->GetScene();
-  scene->AddVisual(link->linkVisual);
 
   this->ModelChanged();
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::RemoveLink(const std::string &_linkName)
+void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
 {
   if (!this->previewVisual)
   {
@@ -962,20 +978,26 @@ void ModelCreator::RemoveLink(const std::string &_linkName)
   if (!link)
     return;
 
-  rendering::ScenePtr scene = link->linkVisual->GetScene();
-  for (auto &it : link->visuals)
-  {
-    rendering::VisualPtr vis = it.first;
-    scene->RemoveVisual(vis);
-  }
-  scene->RemoveVisual(link->linkVisual);
-  for (auto &colIt : link->collisions)
-  {
-    rendering::VisualPtr vis = colIt.first;
-    scene->RemoveVisual(vis);
-  }
+  // Copy before reference is deleted.
+  std::string linkName(_linkName);
 
-  scene->RemoveVisual(link->linkVisual);
+  rendering::ScenePtr scene = link->linkVisual->GetScene();
+  if (scene)
+  {
+    for (auto &it : link->visuals)
+    {
+      rendering::VisualPtr vis = it.first;
+      scene->RemoveVisual(vis);
+    }
+    scene->RemoveVisual(link->linkVisual);
+    for (auto &colIt : link->collisions)
+    {
+      rendering::VisualPtr vis = colIt.first;
+      scene->RemoveVisual(vis);
+    }
+
+    scene->RemoveVisual(link->linkVisual);
+  }
 
   link->linkVisual.reset();
   {
@@ -983,6 +1005,7 @@ void ModelCreator::RemoveLink(const std::string &_linkName)
     this->allLinks.erase(_linkName);
     delete link;
   }
+  gui::model::Events::linkRemoved(linkName);
 
   this->ModelChanged();
 }
@@ -994,9 +1017,13 @@ void ModelCreator::Reset()
   this->saveDialog = new SaveDialog(SaveDialog::MODEL);
 
   this->jointMaker->Reset();
-  this->selectedVisuals.clear();
-  g_copyAct->setEnabled(false);
-  g_pasteAct->setEnabled(false);
+  this->selectedLinks.clear();
+
+  if (g_copyAct)
+    g_copyAct->setEnabled(false);
+
+  if (g_pasteAct)
+    g_pasteAct->setEnabled(false);
 
   this->currentSaveState = NEVER_SAVED;
   this->SetModelName(this->modelDefaultName);
@@ -1016,7 +1043,7 @@ void ModelCreator::Reset()
       this->modelPose, this->GetModelName());
 
   while (!this->allLinks.empty())
-    this->RemoveLink(this->allLinks.begin()->first);
+    this->RemoveLinkImpl(this->allLinks.begin()->first);
   this->allLinks.clear();
 
   if (!gui::get_active_camera() ||
@@ -1033,7 +1060,6 @@ void ModelCreator::Reset()
   this->previewVisual->Load();
   this->modelPose = math::Pose::Zero;
   this->previewVisual->SetPose(this->modelPose);
-  scene->AddVisual(this->previewVisual);
 }
 
 /////////////////////////////////////////////////
@@ -1152,8 +1178,7 @@ void ModelCreator::Stop()
 {
   if (this->addLinkType != LINK_NONE && this->mouseVisual)
   {
-    for (unsigned int i = 0; i < this->mouseVisual->GetChildCount(); ++i)
-        this->RemoveLink(this->mouseVisual->GetName());
+    this->RemoveLinkImpl(this->mouseVisual->GetName());
     this->mouseVisual.reset();
     emit LinkAdded();
   }
@@ -1162,7 +1187,23 @@ void ModelCreator::Stop()
 }
 
 /////////////////////////////////////////////////
+void ModelCreator::OnDelete()
+{
+  if (this->inspectName.empty())
+    return;
+
+  this->OnDelete(this->inspectName);
+  this->inspectName = "";
+}
+
+/////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
+{
+  this->RemoveLink(_entity);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::RemoveLink(const std::string &_entity)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
@@ -1171,7 +1212,7 @@ void ModelCreator::OnDelete(const std::string &_entity)
   {
     if (this->jointMaker)
       this->jointMaker->RemoveJointsByLink(_entity);
-    this->RemoveLink(_entity);
+    this->RemoveLinkImpl(_entity);
     return;
   }
 
@@ -1190,7 +1231,7 @@ void ModelCreator::OnDelete(const std::string &_entity)
       {
         if (this->jointMaker)
           this->jointMaker->RemoveJointsByLink(parentLink->GetName());
-        this->RemoveLink(parentLink->GetName());
+        this->RemoveLinkImpl(parentLink->GetName());
         return;
       }
     }
@@ -1206,15 +1247,13 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
   }
   else if (_event.key == Qt::Key_Delete)
   {
-    if (!this->selectedVisuals.empty())
+    if (!this->selectedLinks.empty())
     {
-      for (auto it = this->selectedVisuals.begin();
-          it != this->selectedVisuals.end();)
+      for (auto linkVis : this->selectedLinks)
       {
-        (*it)->SetHighlighted(false);
-        this->OnDelete((*it)->GetName());
-        it = this->selectedVisuals.erase(it);
+        this->OnDelete(linkVis->GetName());
       }
+      this->DeselectAll();
     }
   }
   else if (_event.control)
@@ -1284,6 +1323,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     {
       LinkData *link = this->allLinks[this->mouseVisual->GetName()];
       link->SetPose(this->mouseVisual->GetWorldPose()-this->modelPose);
+      gui::model::Events::linkInserted(this->mouseVisual->GetName());
     }
 
     // reset and return
@@ -1308,28 +1348,9 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       // trigger link inspector on right click
       if (_event.button == common::MouseEvent::RIGHT)
       {
-        this->inspectVis = vis->GetParent();
+        this->inspectName = vis->GetParent()->GetName();
 
-        QMenu menu;
-        menu.addAction(this->inspectAct);
-
-        std::vector<JointData *> joints = this->jointMaker->GetJointDataByLink(
-            this->inspectVis->GetName());
-
-        if (!joints.empty())
-        {
-          QMenu *jointsMenu = menu.addMenu(tr("Open Joint Inspector"));
-
-          for (auto joint : joints)
-          {
-            QAction *jointAct = new QAction(tr(joint->name.c_str()), this);
-            connect(jointAct, SIGNAL(triggered()), joint,
-                SLOT(OnOpenInspector()));
-            jointsMenu->addAction(jointAct);
-          }
-        }
-
-        menu.exec(QCursor::pos());
+        this->ShowContextMenu(this->inspectName);
         return true;
       }
 
@@ -1337,31 +1358,24 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
       {
         this->DeselectAll();
-
-        // Highlight and selected clicked link
-        linkVis->SetHighlighted(true);
-        this->selectedVisuals.push_back(linkVis);
+        this->SetSelected(linkVis, true);
       }
       // Multi-selection mode
       else
       {
-        auto it = std::find(this->selectedVisuals.begin(),
-            this->selectedVisuals.end(), linkVis);
+        auto it = std::find(this->selectedLinks.begin(),
+            this->selectedLinks.end(), linkVis);
         // Highlight and select clicked link if not already selected
-        if (it == this->selectedVisuals.end())
+        if (it == this->selectedLinks.end())
         {
-          linkVis->SetHighlighted(true);
-          this->selectedVisuals.push_back(linkVis);
+          this->SetSelected(linkVis, true);
         }
         // Deselect if already selected
         else
         {
-          linkVis->SetHighlighted(false);
-          this->selectedVisuals.erase(it);
+          this->SetSelected(linkVis, false);
         }
       }
-      g_copyAct->setEnabled(!this->selectedVisuals.empty());
-      g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
 
       if (this->manipMode == "translate" || this->manipMode == "rotate" ||
           this->manipMode == "scale")
@@ -1377,13 +1391,52 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       this->DeselectAll();
 
       g_alignAct->setEnabled(false);
-      g_copyAct->setEnabled(!this->selectedVisuals.empty());
+      g_copyAct->setEnabled(!this->selectedLinks.empty());
 
       if (!vis->IsPlane())
         return true;
     }
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::ShowContextMenu(const std::string &_link)
+{
+  auto it = this->allLinks.find(_link);
+  if (it == this->allLinks.end())
+    return;
+
+  this->inspectName = _link;
+  QMenu menu;
+  if (this->inspectAct)
+  {
+    menu.addAction(this->inspectAct);
+
+    if (this->jointMaker)
+    {
+      std::vector<JointData *> joints = this->jointMaker->GetJointDataByLink(
+          _link);
+
+      if (!joints.empty())
+      {
+        QMenu *jointsMenu = menu.addMenu(tr("Open Joint Inspector"));
+
+        for (auto joint : joints)
+        {
+          QAction *jointAct = new QAction(tr(joint->name.c_str()), this);
+          connect(jointAct, SIGNAL(triggered()), joint,
+              SLOT(OnOpenInspector()));
+          jointsMenu->addAction(jointAct);
+        }
+      }
+    }
+  }
+  QAction *deleteAct = new QAction(tr("Delete"), this);
+  connect(deleteAct, SIGNAL(triggered()), this, SLOT(OnDelete()));
+  menu.addAction(deleteAct);
+
+  menu.exec(QCursor::pos());
 }
 
 /////////////////////////////////////////////////
@@ -1460,8 +1513,11 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 void ModelCreator::OnOpenInspector()
 {
-  this->OpenInspector(this->inspectVis->GetName());
-  this->inspectVis.reset();
+  if (this->inspectName.empty())
+    return;
+
+  this->OpenInspector(this->inspectName);
+  this->inspectName = "";
 }
 
 /////////////////////////////////////////////////
@@ -1469,6 +1525,11 @@ void ModelCreator::OpenInspector(const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   LinkData *link = this->allLinks[_name];
+  if (!link)
+  {
+    gzerr << "Link [" << _name << "] not found." << std::endl;
+    return;
+  }
   link->SetPose(link->linkVisual->GetWorldPose()-this->modelPose);
   link->UpdateConfig();
   link->inspector->move(QCursor::pos());
@@ -1481,10 +1542,10 @@ void ModelCreator::OnCopy()
   if (!g_editModelAct->isChecked())
     return;
 
-  if (!this->selectedVisuals.empty())
+  if (!this->selectedLinks.empty())
   {
     this->copiedLinkNames.clear();
-    for (auto vis : this->selectedVisuals)
+    for (auto vis : this->selectedLinks)
     {
       this->copiedLinkNames.push_back(vis->GetName());
     }
@@ -1679,21 +1740,60 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
 void ModelCreator::OnAlignMode(const std::string &_axis,
     const std::string &_config, const std::string &_target, bool _preview)
 {
-  ModelAlign::Instance()->AlignVisuals(this->selectedVisuals, _axis, _config,
+  ModelAlign::Instance()->AlignVisuals(this->selectedLinks, _axis, _config,
       _target, !_preview);
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::DeselectAll()
 {
-  if (!this->selectedVisuals.empty())
+  while (!this->selectedLinks.empty())
   {
-    for (auto &vis : this->selectedVisuals)
-    {
-      vis->SetHighlighted(false);
-    }
-    this->selectedVisuals.clear();
+    rendering::VisualPtr vis = this->selectedLinks[0];
+    vis->SetHighlighted(false);
+    this->selectedLinks.erase(this->selectedLinks.begin());
+    model::Events::setSelectedLink(vis->GetName(), false);
   }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::SetSelected(const std::string &_name, const bool _selected)
+{
+  auto it = this->allLinks.find(_name);
+  if (it == this->allLinks.end())
+    return;
+
+  this->SetSelected((*it).second->linkVisual, _selected);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::SetSelected(rendering::VisualPtr _linkVis,
+    const bool _selected)
+{
+  if (!_linkVis)
+    return;
+
+  _linkVis->SetHighlighted(_selected);
+  auto it = std::find(this->selectedLinks.begin(),
+      this->selectedLinks.end(), _linkVis);
+  if (_selected)
+  {
+    if (it == this->selectedLinks.end())
+    {
+      this->selectedLinks.push_back(_linkVis);
+      model::Events::setSelectedLink(_linkVis->GetName(), _selected);
+    }
+  }
+  else
+  {
+    if (it != this->selectedLinks.end())
+    {
+      this->selectedLinks.erase(it);
+      model::Events::setSelectedLink(_linkVis->GetName(), _selected);
+    }
+  }
+  g_copyAct->setEnabled(!this->selectedLinks.empty());
+  g_alignAct->setEnabled(this->selectedLinks.size() > 1);
 }
 
 /////////////////////////////////////////////////
@@ -1704,24 +1804,22 @@ void ModelCreator::OnManipMode(const std::string &_mode)
 
   this->manipMode = _mode;
 
-  if (!this->selectedVisuals.empty())
+  if (!this->selectedLinks.empty())
   {
     ModelManipulator::Instance()->SetAttachedVisual(
-        this->selectedVisuals.back());
+        this->selectedLinks.back());
   }
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
   ModelSnap::Instance()->Reset();
 
   // deselect 0 to n-1 models.
-  if (this->selectedVisuals.size() > 1)
+  if (this->selectedLinks.size() > 1)
   {
-    for (auto it = this->selectedVisuals.begin();
-        it != --this->selectedVisuals.end();)
-    {
-       (*it)->SetHighlighted(false);
-       it = this->selectedVisuals.erase(it);
-    }
+    rendering::VisualPtr link =
+        this->selectedLinks[this->selectedLinks.size()-1];
+    this->DeselectAll();
+    this->SetSelected(link, true);
   }
 }
 
@@ -1731,6 +1829,14 @@ void ModelCreator::OnSetSelectedEntity(const std::string &/*_name*/,
 {
   this->DeselectAll();
 }
+
+/////////////////////////////////////////////////
+void ModelCreator::OnSetSelectedLink(const std::string &_name,
+    const bool _selected)
+{
+  this->SetSelected(_name, _selected);
+}
+
 
 /////////////////////////////////////////////////
 void ModelCreator::ModelChanged()

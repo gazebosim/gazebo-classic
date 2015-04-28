@@ -216,6 +216,7 @@ MainWindow::MainWindow()
 /////////////////////////////////////////////////
 MainWindow::~MainWindow()
 {
+  this->DeleteActions();
 }
 
 /////////////////////////////////////////////////
@@ -306,12 +307,6 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 
   this->connections.clear();
 
-  delete this->renderWidget;
-
-  // Cleanup the space navigator
-  delete this->spacenav;
-  this->spacenav = NULL;
-
 #ifdef HAVE_OCULUS
   if (this->oculusWindow)
   {
@@ -319,6 +314,11 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
     this->oculusWindow = NULL;
   }
 #endif
+  delete this->renderWidget;
+
+  // Cleanup the space navigator
+  delete this->spacenav;
+  this->spacenav = NULL;
 
   emit Close();
 
@@ -425,17 +425,22 @@ void MainWindow::SaveINI()
 /////////////////////////////////////////////////
 void MainWindow::SaveAs()
 {
-  std::string filename = QFileDialog::getSaveFileName(this,
-      tr("Save World"), QString(),
-      tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
+  QFileDialog fileDialog(this, tr("Save World"), QDir::homePath(),
+      tr("SDF Files (*.xml *.sdf *.world)"));
+  fileDialog.setAcceptMode(QFileDialog::AcceptSave);
 
-  // Return if the user has canceled.
-  if (filename.empty())
-    return;
+  if (fileDialog.exec() == QDialog::Accepted)
+  {
+    QStringList selected = fileDialog.selectedFiles();
+    if (selected.empty())
+      return;
 
-  g_saveAct->setEnabled(true);
-  this->saveFilename = filename;
-  this->Save();
+    std::string filename = selected[0].toStdString();
+
+    g_saveAct->setEnabled(true);
+    this->saveFilename = filename;
+    this->Save();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -577,13 +582,6 @@ void MainWindow::Play()
   msgs::WorldControl msg;
   msg.set_pause(false);
 
-  if (this->renderWidget)
-  {
-    TimePanel *timePanel = this->renderWidget->GetTimePanel();
-    if (timePanel)
-      timePanel->SetPaused(false);
-  }
-
   this->worldControlPub->Publish(msg);
 }
 
@@ -592,13 +590,6 @@ void MainWindow::Pause()
 {
   msgs::WorldControl msg;
   msg.set_pause(true);
-
-  if (this->renderWidget)
-  {
-    TimePanel *timePanel = this->renderWidget->GetTimePanel();
-    if (timePanel)
-      timePanel->SetPaused(true);
-  }
 
   this->worldControlPub->Publish(msg);
 }
@@ -846,6 +837,12 @@ void MainWindow::SetWireframe()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ShowGUIOverlays()
+{
+  this->GetRenderWidget()->SetOverlaysVisible(g_overlayAct->isChecked());
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ShowCOM()
 {
   if (g_showCOMAct->isChecked())
@@ -1039,8 +1036,6 @@ void MainWindow::CreateActions()
   g_playAct->setStatusTip(tr("Run the world"));
   g_playAct->setVisible(false);
   connect(g_playAct, SIGNAL(triggered()), this, SLOT(Play()));
-  connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
-  this->OnPlayActionChanged();
 
   g_pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
   g_pauseAct->setStatusTip(tr("Pause the world"));
@@ -1214,6 +1209,13 @@ void MainWindow::CreateActions()
   g_orbitAct->setChecked(true);
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
 
+  g_overlayAct = new QAction(tr("GUI Overlays"), this);
+  g_overlayAct->setStatusTip(tr("Show GUI Overlays"));
+  g_overlayAct->setEnabled(false);
+  g_overlayAct->setCheckable(true);
+  g_overlayAct->setChecked(false);
+  connect(g_overlayAct, SIGNAL(triggered()), this, SLOT(ShowGUIOverlays()));
+
   QActionGroup *viewControlActionGroup = new QActionGroup(this);
   viewControlActionGroup->addAction(g_fpsAct);
   viewControlActionGroup->addAction(g_orbitAct);
@@ -1378,6 +1380,152 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 }
 
 /////////////////////////////////////////////////
+void MainWindow::DeleteActions()
+{
+  delete g_topicVisAct;
+  g_topicVisAct = 0;
+
+  delete g_openAct;
+  g_openAct = 0;
+
+  delete g_saveAct;
+  g_saveAct = 0;
+
+  delete g_saveAsAct;
+  g_saveAsAct = 0;
+
+  delete g_saveCfgAct;
+  g_saveCfgAct = 0;
+
+  delete g_cloneAct;
+  g_cloneAct = 0;
+
+  delete g_aboutAct;
+  g_aboutAct = 0;
+
+  delete g_quitAct;
+  g_quitAct = 0;
+
+  delete g_resetModelsAct;
+  g_resetModelsAct = 0;
+
+  delete g_resetWorldAct;
+  g_resetWorldAct = 0;
+
+  delete g_editBuildingAct;
+  g_editBuildingAct = 0;
+
+  delete g_editTerrainAct;
+  g_editTerrainAct = 0;
+
+  delete g_editModelAct;
+  g_editModelAct = 0;
+
+  delete g_stepAct;
+  g_stepAct = 0;
+
+  delete g_playAct;
+  g_playAct = 0;
+
+  delete g_pauseAct;
+  g_pauseAct = 0;
+
+  delete g_arrowAct;
+  g_arrowAct = 0,
+
+  delete g_translateAct;
+  g_translateAct = 0;
+
+  delete g_rotateAct;
+  g_rotateAct = 0;
+
+  delete g_scaleAct;
+  g_scaleAct = 0;
+
+  delete g_boxCreateAct;
+  g_boxCreateAct = 0;
+
+  delete g_sphereCreateAct;
+  g_sphereCreateAct = 0;
+
+  delete g_cylinderCreateAct;
+  g_cylinderCreateAct = 0;
+
+  delete g_meshCreateAct;
+  g_meshCreateAct = 0;
+
+  delete g_pointLghtCreateAct;
+  g_pointLghtCreateAct = 0;
+
+  delete g_spotLghtCreateAct;
+  g_spotLghtCreateAct = 0;
+
+  delete g_dirLghtCreateAct;
+  g_dirLghtCreateAct = 0;
+
+  delete g_resetAct;
+  g_resetAct = 0;
+
+  delete g_showCollisionsAct;
+  g_showCollisionsAct = 0;
+
+  delete g_showGridAct;
+  g_showGridAct = 0;
+
+  delete g_transparentAct;
+  g_transparentAct = 0;
+
+  delete g_viewWireframeAct;
+  g_viewWireframeAct = 0;
+
+  delete g_showCOMAct;
+  g_showCOMAct = 0;
+
+  delete g_showInertiaAct;
+  g_showInertiaAct = 0;
+
+  delete g_showContactsAct;
+  g_showContactsAct = 0;
+
+  delete g_showJointsAct;
+  g_showJointsAct = 0;
+
+  delete g_fullScreenAct;
+  g_fullScreenAct = 0;
+
+  delete g_fpsAct;
+  g_fpsAct = 0;
+
+  delete g_orbitAct;
+  g_orbitAct = 0;
+
+  delete g_overlayAct;
+  g_overlayAct = 0;
+
+  delete g_viewOculusAct;
+  g_viewOculusAct = 0;
+
+  delete g_dataLoggerAct;
+  g_dataLoggerAct = 0;
+
+  delete g_screenshotAct;
+  g_screenshotAct = 0;
+
+  delete g_copyAct;
+  g_copyAct = 0;
+
+  delete g_pasteAct;
+  g_pasteAct = 0;
+
+  delete g_snapAct;
+  g_snapAct = 0;
+
+  delete g_alignAct;
+  g_alignAct = 0;
+}
+
+
+/////////////////////////////////////////////////
 void MainWindow::CreateMenuBar()
 {
   // main window's menu bar
@@ -1425,6 +1573,9 @@ void MainWindow::CreateMenuBar()
 
   viewMenu->addAction(g_fpsAct);
   viewMenu->addAction(g_orbitAct);
+  viewMenu->addSeparator();
+
+  viewMenu->addAction(g_overlayAct);
 
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
@@ -1441,6 +1592,12 @@ void MainWindow::CreateMenuBar()
 
   QMenu *helpMenu = bar->addMenu(tr("&Help"));
   helpMenu->addAction(g_aboutAct);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::AddMenu(QMenu *_menu)
+{
+  this->menuBar->addMenu(_menu);
 }
 
 /////////////////////////////////////////////////
@@ -1569,6 +1726,9 @@ void MainWindow::OnAddPlugins()
     }
   }
   this->pluginMsgs.clear();
+
+  g_overlayAct->setChecked(true);
+  g_overlayAct->setEnabled(true);
 }
 
 /////////////////////////////////////////////////
@@ -1709,28 +1869,6 @@ void MainWindow::OnSetSelectedEntity(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void MainWindow::OnPlayActionChanged()
-{
-  if (this->renderWidget)
-  {
-    TimePanel *timePanel = this->renderWidget->GetTimePanel();
-    if (timePanel)
-    {
-      if (timePanel->IsPaused())
-      {
-        g_stepAct->setToolTip("Step the world");
-        g_stepAct->setEnabled(true);
-      }
-      else
-      {
-        g_stepAct->setToolTip("Pause the world before stepping");
-        g_stepAct->setEnabled(false);
-      }
-    }
-  }
-}
-
-/////////////////////////////////////////////////
 void MainWindow::ItemSelected(QTreeWidgetItem *_item, int)
 {
   _item->setExpanded(!_item->isExpanded());
@@ -1777,13 +1915,13 @@ bool MainWindow::IsPaused() const
 void MainWindow::CreateEditors()
 {
   // Create a Terrain Editor
-  this->editors.push_back(new TerrainEditor(this));
+  this->editors["terrain"] = new TerrainEditor(this);
 
   // Create a Building Editor
-  this->editors.push_back(new BuildingEditor(this));
+  this->editors["building"] = new BuildingEditor(this);
 
   // Create a Model Editor
-  this->editors.push_back(new ModelEditor(this));
+  this->editors["model"] = new ModelEditor(this);
 }
 
 /////////////////////////////////////////////////
@@ -1826,4 +1964,14 @@ void MainWindow::OnEditorGroup(QAction *_action)
       editorGroup->actions()[i]->setChecked(false);
     }
   }
+}
+
+/////////////////////////////////////////////////
+Editor *MainWindow::GetEditor(const std::string &_name) const
+{
+  auto iter = this->editors.find(_name);
+  if (iter != this->editors.end())
+    return iter->second;
+
+  return NULL;
 }
