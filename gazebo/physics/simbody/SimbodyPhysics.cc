@@ -430,9 +430,12 @@ void SimbodyPhysics::UpdateCollision()
       const SimTK::ContactSurface &cs1 = this->tracker.getContactSurface(csi1);
       const SimTK::ContactSurface &cs2 = this->tracker.getContactSurface(csi2);
 
+      /// \TODO: See issue #1584
       /// \TODO: below, get collision data from simbody contacts
       Collision *collision1 = NULL;
       Collision *collision2 = NULL;
+      physics::LinkPtr link1 = NULL;
+      physics::LinkPtr link2 = NULL;
 
       /// \TODO: get SimTK::ContactGeometry* from ContactForce somehow
       const SimTK::ContactGeometry &cg1 = cs1.getShape();
@@ -461,10 +464,12 @@ void SimbodyPhysics::UpdateCollision()
             if (sc->GetCollisionShape() == &cg1)
             {
               collision1 = (*ci).get();
+              link1 = (*li);
             }
             else if (sc->GetCollisionShape() == &cg2)
             {
               collision2 = (*ci).get();
+              link2 = (*li);
             }
           }
         }
@@ -527,16 +532,38 @@ void SimbodyPhysics::UpdateCollision()
               /// detail.getContactPoint() returns in body frame
               /// per gazebo contact feedback convention.
               const SimTK::Vec3 offset2 = -detail.getContactPoint();
-              SimTK::SpatialVec s2cg = SimTK::shiftForceBy(s2, offset2);
+              SimTK::SpatialVec s2cg = SimTK::shiftForceBy(-s2, offset2);
               SimTK::Vec3 t2cg = s2cg[0];
               SimTK::Vec3 f2cg = s2cg[1];
 
               /// shift for body 1
-              /// This is wrong
-              const SimTK::Vec3 offset1 = -detail.getContactPoint();
+              /// \TODO: generalize wrench shifting below later and add
+              /// it to JointWrench class for shifting wrenches around
+              /// arbitrarily based on frames.
+              ///
+              /// shift forces to link1 frame without rotating it first
+              math::Pose pose1 = link1->GetWorldPose();
+              math::Pose pose2 = link2->GetWorldPose();
+              const SimTK::Vec3 offset1 = -detail.getContactPoint()
+                + SimbodyPhysics::Vector3ToVec3(pose1.pos - pose2.pos);
               SimTK::SpatialVec s1cg = SimTK::shiftForceBy(s2, offset1);
-              SimTK::Vec3 t1cg = -s1cg[0];
-              SimTK::Vec3 f1cg = -s1cg[1];
+ 
+              /// get torque and force components 
+              SimTK::Vec3 t1cg = s1cg[0];
+              SimTK::Vec3 f1cg = s1cg[1];
+
+              /* actually don't need to do this? confirm that
+                 everything is in the world frame!
+              /// \TODO: rotate it into link 1 frame, there must be
+              /// a clean way to do this in simbody...
+              /// my gazebo way of rotating frames for now, to replace with
+              /// clean simbody function calls.
+              /// rotation from link2 to link1 frame specified in link2 frame
+              math::Quaternion rot21 = (pose1 - pose2).rot;
+              t1cg = SimbodyPhysics::Vector3ToVec3(
+                rot21.RotateVectorReverse(SimbodyPhysics::Vec3ToVector3(t1cg)));
+              f1cg = SimbodyPhysics::Vector3ToVec3(
+                rot21.RotateVectorReverse(SimbodyPhysics::Vec3ToVector3(f1cg)));
 
               gzerr << "numc: " << j << "\n";
               gzerr << "count: " << count << "\n";
@@ -550,6 +577,7 @@ void SimbodyPhysics::UpdateCollision()
               gzerr << "s1cg: " << s1cg << "\n";
               gzerr << "f1cg: " << f1cg << "\n";
               gzerr << "t1cg: " << t1cg << "\n";
+              */
 
               // copy.
               contactFeedback->wrench[count].body1Force.Set(
