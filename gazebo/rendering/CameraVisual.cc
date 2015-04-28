@@ -34,7 +34,7 @@ CameraVisual::CameraVisual(const std::string &_name, VisualPtr _vis)
 {
   CameraVisualPrivate *dPtr =
       reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
-  dPtr->type = VISUAL_SENSOR;
+  dPtr->type = VT_SENSOR;
 }
 
 /////////////////////////////////////////////////

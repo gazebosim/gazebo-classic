@@ -32,7 +32,7 @@ JointVisual::JointVisual(const std::string &_name, VisualPtr _vis)
 {
   JointVisualPrivate *dPtr =
       reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
-  dPtr->type = VISUAL_PHYSICS;
+  dPtr->type = VT_PHYSICS;
 }
 
 /////////////////////////////////////////////////

@@ -39,7 +39,7 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   LaserVisualPrivate *dPtr =
       reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
 
-  dPtr->type = VISUAL_SENSOR;
+  dPtr->type = VT_SENSOR;
 
   dPtr->receivedMsg = false;
 

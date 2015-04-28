@@ -66,13 +66,21 @@ namespace gazebo
       public: enum VisualType
               {
                 /// \brief Entity visual
-                VISUAL_ENTITY,
+                VT_ENTITY,
+                /// \brief Model visual
+                VT_MODEL,
+                /// \brief Link visual
+                VT_LINK,
+                /// \brief Visual visual
+                VT_VISUAL,
+                /// \brief Collision visual
+                VT_COLLISION,
                 /// \brief Sensor visual
-                VISUAL_SENSOR,
+                VT_SENSOR,
                 /// \brief GUI visual
-                VISUAL_GUI,
+                VT_GUI,
                 /// \brief Physics data visual
-                VISUAL_PHYSICS
+                VT_PHYSICS
               };
 
       /// \brief Constructor

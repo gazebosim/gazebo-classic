@@ -33,7 +33,7 @@ InertiaVisual::InertiaVisual(const std::string &_name, VisualPtr _vis)
 {
   InertiaVisualPrivate *dPtr =
       reinterpret_cast<InertiaVisualPrivate *>(this->dataPtr);
-  dPtr->type = VISUAL_PHYSICS;
+  dPtr->type = VT_PHYSICS;
 }
 
 /////////////////////////////////////////////////

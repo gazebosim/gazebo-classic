@@ -31,6 +31,7 @@
 #include "gazebo/math/Vector2i.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/rendering/Visual.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -556,7 +557,8 @@ namespace gazebo
 
       /// \brief Process a visual message.
       /// \param[in] _msg The message data.
-      private: bool ProcessVisualMsg(ConstVisualPtr &_msg);
+      private: bool ProcessVisualMsg(ConstVisualPtr &_msg,
+          Visual::VisualType _type = Visual::VT_ENTITY);
 
       /// \brief Light message callback.
       /// \param[in] _msg The message data.

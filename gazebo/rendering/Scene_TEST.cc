@@ -120,8 +120,6 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   EXPECT_TRUE(scene->GetVisual("cylinder::link_COM_VISUAL__") != NULL);
   EXPECT_TRUE(scene->GetVisual("sphere::link_COM_VISUAL__") != NULL);
 
-// Check the default::box* as well?
-
   // Send request to delete the box model
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
@@ -150,10 +148,119 @@ TEST_F(Scene_TEST, RemoveModelVisual)
 
   // Check that the COM visuals were properly added
   EXPECT_TRUE(scene->GetVisual("box::link_COM_VISUAL__") == NULL);
+}
 
+/////////////////////////////////////////////////
+TEST_F(Scene_TEST, VisualType)
+{
+  // Load a world containing 3 simple shapes
+  Load("worlds/shapes.world");
 
+  // FIXME need a camera otherwise test produces a gl vertex buffer error
+  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  std::string cameraName = "test_camera";
+  SpawnCamera("test_camera_model", cameraName,
+      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
 
-  scene->PrintSceneGraph();
+  // Get the scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // Wait until all models are inserted
+  int sleep = 0;
+  int maxSleep = 10;
+  rendering::VisualPtr box, sphere, cylinder;
+  while ((!box || !sphere || !cylinder) && sleep < maxSleep)
+  {
+    box = scene->GetVisual("box");
+    cylinder = scene->GetVisual("cylinder");
+    sphere = scene->GetVisual("sphere");
+    common::Time::MSleep(1000);
+    sleep++;
+  }
+
+  // Check that the model visuals were properly added
+  ASSERT_TRUE(box != NULL);
+  ASSERT_TRUE(sphere != NULL);
+  ASSERT_TRUE(cylinder != NULL);
+
+  // Verify type is VT_MODEL
+  EXPECT_TRUE(box->GetType() == rendering::Visual::VT_MODEL);
+  EXPECT_TRUE(sphere->GetType() == rendering::Visual::VT_MODEL);
+  EXPECT_TRUE(cylinder->GetType() == rendering::Visual::VT_MODEL);
+
+  // Check that the link visuals were properly added
+  rendering::VisualPtr boxLink = scene->GetVisual("box::link");
+  rendering::VisualPtr sphereLink = scene->GetVisual("sphere::link");
+  rendering::VisualPtr cylinderLink = scene->GetVisual("cylinder::link");
+  EXPECT_TRUE(boxLink != NULL);
+  EXPECT_TRUE(sphereLink != NULL);
+  EXPECT_TRUE(cylinderLink != NULL);
+
+  // Verify type is VT_LINK
+  EXPECT_TRUE(boxLink->GetType() == rendering::Visual::VT_LINK);
+  EXPECT_TRUE(sphereLink->GetType() == rendering::Visual::VT_LINK);
+  EXPECT_TRUE(cylinderLink->GetType() == rendering::Visual::VT_LINK);
+
+  // Check that the visual visuals were properly added
+  rendering::VisualPtr boxVisual = scene->GetVisual("box::link::visual");
+  rendering::VisualPtr sphereVisual = scene->GetVisual("sphere::link::visual");
+  rendering::VisualPtr cylinderVisual =
+      scene->GetVisual("cylinder::link::visual");
+  EXPECT_TRUE(boxVisual != NULL);
+  EXPECT_TRUE(sphereVisual != NULL);
+  EXPECT_TRUE(cylinderVisual != NULL);
+
+  // Verify type is VT_VISUAL
+  EXPECT_TRUE(boxVisual->GetType() == rendering::Visual::VT_VISUAL);
+  EXPECT_TRUE(sphereVisual->GetType() == rendering::Visual::VT_VISUAL);
+  EXPECT_TRUE(cylinderVisual->GetType() == rendering::Visual::VT_VISUAL);
+
+  // Check that the collision visuals were properly added
+  rendering::VisualPtr boxCollision = scene->GetVisual("box::link::collision");
+  rendering::VisualPtr sphereCollision =
+      scene->GetVisual("sphere::link::collision");
+  rendering::VisualPtr cylinderCollision =
+      scene->GetVisual("cylinder::link::collision");
+  EXPECT_TRUE(boxCollision != NULL);
+  EXPECT_TRUE(sphereCollision != NULL);
+  EXPECT_TRUE(cylinderCollision != NULL);
+
+  // Verify type is VT_COLLISION
+  EXPECT_TRUE(boxCollision->GetType() == rendering::Visual::VT_COLLISION);
+  EXPECT_TRUE(sphereCollision->GetType() ==rendering::Visual::VT_COLLISION);
+  EXPECT_TRUE(cylinderCollision->GetType() == rendering::Visual::VT_COLLISION);
+
+  // Check that the inertia visuals were properly added
+  rendering::VisualPtr boxInertia =
+      scene->GetVisual("box::link_INERTIA_VISUAL__");
+  rendering::VisualPtr sphereInertia =
+      scene->GetVisual("sphere::link_INERTIA_VISUAL__");
+  rendering::VisualPtr cylinderInertia =
+      scene->GetVisual("cylinder::link_INERTIA_VISUAL__");
+  EXPECT_TRUE(boxInertia != NULL);
+  EXPECT_TRUE(sphereInertia != NULL);
+  EXPECT_TRUE(cylinderInertia != NULL);
+
+  // Verify type is VT_PHYSICS
+  EXPECT_TRUE(boxInertia->GetType() == rendering::Visual::VT_PHYSICS);
+  EXPECT_TRUE(sphereInertia->GetType() ==rendering::Visual::VT_PHYSICS);
+  EXPECT_TRUE(cylinderInertia->GetType() == rendering::Visual::VT_PHYSICS);
+
+  // Check that the COM visuals were properly added
+  rendering::VisualPtr boxCOM = scene->GetVisual("box::link_COM_VISUAL__");
+  rendering::VisualPtr sphereCOM =
+      scene->GetVisual("sphere::link_COM_VISUAL__");
+  rendering::VisualPtr cylinderCOM =
+      scene->GetVisual("cylinder::link_COM_VISUAL__");
+  EXPECT_TRUE(boxCOM != NULL);
+  EXPECT_TRUE(sphereCOM != NULL);
+  EXPECT_TRUE(cylinderCOM != NULL);
+
+  // Verify type is VT_PHYSICS
+  EXPECT_TRUE(boxCOM->GetType() == rendering::Visual::VT_PHYSICS);
+  EXPECT_TRUE(cylinderCOM->GetType() ==rendering::Visual::VT_PHYSICS);
+  EXPECT_TRUE(cylinderCOM->GetType() == rendering::Visual::VT_PHYSICS);
 }
 
 /////////////////////////////////////////////////

@@ -36,7 +36,7 @@ COMVisual::COMVisual(const std::string &_name, VisualPtr _vis)
 {
   COMVisualPrivate *dPtr =
       reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
-  dPtr->type = VISUAL_PHYSICS;
+  dPtr->type = VT_PHYSICS;
 }
 
 /////////////////////////////////////////////////

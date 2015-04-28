@@ -41,7 +41,7 @@ ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
   ContactVisualPrivate *dPtr =
       reinterpret_cast<ContactVisualPrivate *>(this->dataPtr);
 
-  dPtr->type = VISUAL_PHYSICS;
+  dPtr->type = VT_PHYSICS;
 
   dPtr->receivedMsg = false;
 

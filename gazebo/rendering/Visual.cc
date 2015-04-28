@@ -291,7 +291,7 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
 //////////////////////////////////////////////////
 void Visual::Init()
 {
-  this->dataPtr->type = VISUAL_ENTITY;
+  this->dataPtr->type = VT_ENTITY;
   this->dataPtr->transparency = 0.0;
   this->dataPtr->isStatic = false;
   this->dataPtr->visible = true;

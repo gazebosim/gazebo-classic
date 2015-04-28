@@ -1527,7 +1527,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   {
     boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
           _msg.visual(j)));
-    this->dataPtr->visualMsgs.push_back(vm);
+    this->dataPtr->modelVisualMsgs.push_back(vm);
   }
 
   // Set the scale of the model visual
@@ -1542,7 +1542,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     vm->mutable_scale()->set_x(_msg.scale().x());
     vm->mutable_scale()->set_y(_msg.scale().y());
     vm->mutable_scale()->set_z(_msg.scale().z());
-    this->dataPtr->visualMsgs.push_back(vm);
+    this->dataPtr->modelVisualMsgs.push_back(vm);
   }
 
   for (int j = 0; j < _msg.joint_size(); j++)
@@ -1586,7 +1586,15 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
       this->dataPtr->linkMsgs.push_back(lm);
     }
 
-    for (int k = 0; k < _msg.link(j).visual_size(); k++)
+    if (_msg.link(j).visual_size() > 0)
+    {
+      // note: the first visual in the link is the link visual
+      boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
+            _msg.link(j).visual(0)));
+      this->dataPtr->linkVisualMsgs.push_back(vm);
+    }
+
+    for (int k = 1; k < _msg.link(j).visual_size(); k++)
     {
       boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
             _msg.link(j).visual(k)));
@@ -1600,7 +1608,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
       {
         boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
               _msg.link(j).collision(k).visual(l)));
-        this->dataPtr->visualMsgs.push_back(vm);
+        this->dataPtr->collisionVisualMsgs.push_back(vm);
       }
     }
 
@@ -1692,7 +1700,10 @@ void Scene::PreRender()
   ModelMsgs_L modelMsgsCopy;
   SensorMsgs_L sensorMsgsCopy;
   LightMsgs_L lightMsgsCopy;
+  VisualMsgs_L modelVisualMsgsCopy;
+  VisualMsgs_L linkVisualMsgsCopy;
   VisualMsgs_L visualMsgsCopy;
+  VisualMsgs_L collisionVisualMsgsCopy;
   JointMsgs_L jointMsgsCopy;
   LinkMsgs_L linkMsgsCopy;
 
@@ -1716,11 +1727,26 @@ void Scene::PreRender()
               std::back_inserter(lightMsgsCopy));
     this->dataPtr->lightMsgs.clear();
 
+    std::copy(this->dataPtr->modelVisualMsgs.begin(),
+              this->dataPtr->modelVisualMsgs.end(),
+              std::back_inserter(modelVisualMsgsCopy));
+    this->dataPtr->modelVisualMsgs.clear();
+
+    std::copy(this->dataPtr->linkVisualMsgs.begin(),
+              this->dataPtr->linkVisualMsgs.end(),
+              std::back_inserter(linkVisualMsgsCopy));
+    this->dataPtr->linkVisualMsgs.clear();
+
     this->dataPtr->visualMsgs.sort(VisualMessageLessOp);
     std::copy(this->dataPtr->visualMsgs.begin(),
               this->dataPtr->visualMsgs.end(),
               std::back_inserter(visualMsgsCopy));
     this->dataPtr->visualMsgs.clear();
+
+    std::copy(this->dataPtr->collisionVisualMsgs.begin(),
+              this->dataPtr->collisionVisualMsgs.end(),
+              std::back_inserter(collisionVisualMsgsCopy));
+    this->dataPtr->collisionVisualMsgs.clear();
 
     std::copy(this->dataPtr->jointMsgs.begin(), this->dataPtr->jointMsgs.end(),
               std::back_inserter(jointMsgsCopy));
@@ -1772,11 +1798,41 @@ void Scene::PreRender()
       ++lightIter;
   }
 
+  // Process the model visual messages.
+  for (visualIter = modelVisualMsgsCopy.begin();
+      visualIter != modelVisualMsgsCopy.end();)
+  {
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_MODEL))
+      modelVisualMsgsCopy.erase(visualIter++);
+    else
+      ++visualIter;
+  }
+
+  // Process the link visual messages.
+  for (visualIter = linkVisualMsgsCopy.begin();
+      visualIter != linkVisualMsgsCopy.end();)
+  {
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_LINK))
+      linkVisualMsgsCopy.erase(visualIter++);
+    else
+      ++visualIter;
+  }
+
   // Process the visual messages.
   for (visualIter = visualMsgsCopy.begin(); visualIter != visualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter))
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_VISUAL))
       visualMsgsCopy.erase(visualIter++);
+    else
+      ++visualIter;
+  }
+
+  // Process the collision visual messages.
+  for (visualIter = collisionVisualMsgsCopy.begin();
+      visualIter != collisionVisualMsgsCopy.end();)
+  {
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_COLLISION))
+      collisionVisualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
   }
@@ -2213,7 +2269,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 
       if (visPtr)
       {
-        this->RemoveVisualizations(visPtr);
+//        this->RemoveVisualizations(visPtr);
         this->RemoveVisual(visPtr);
       }
     }
@@ -2376,7 +2432,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
+bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
 {
   bool result = false;
   Visual_M::iterator iter = this->dataPtr->visuals.end();
@@ -2469,12 +2525,13 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     {
       result = true;
       visual->LoadFromMsg(_msg);
+      visual->SetType(_type);
 
       this->dataPtr->visuals[visual->GetId()] = visual;
       if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
           visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
       {
-        visual->SetType(Visual::VISUAL_PHYSICS);
+        //visual->SetType(Visual::VT_COLLISION);
         visual->SetVisible(false);
         visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
       }
@@ -2833,6 +2890,8 @@ void Scene::RemoveVisual(uint32_t _id)
         ++piter;
     }
 
+    this->RemoveVisualizations(vis);
+
     vis->Fini();
     this->dataPtr->visuals.erase(iter);
     if (this->dataPtr->selectedVis && this->dataPtr->selectedVis->GetId() ==
@@ -2970,7 +3029,7 @@ void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
   {
     rendering::VisualPtr childVis = _vis->GetChild(i);
     Visual::VisualType visType = childVis->GetType();
-    if (visType == Visual::VISUAL_PHYSICS || visType == Visual::VISUAL_SENSOR)
+    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR)
     {
       toRemove.push_back(childVis);
     }
