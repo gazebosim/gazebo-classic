@@ -19,7 +19,11 @@
   #include <Rpc.h>
   #pragma comment(lib, "Rpcrt4.lib")
 #else /* UNIX */
+
+#ifdef HAVE_UUID
   #include <uuid/uuid.h>
+#endif
+
 #endif
 
 #include "RestWebPlugin.hh"
@@ -53,11 +57,15 @@ RestWebPlugin::RestWebPlugin()
   }
   // or on UNIX
 #else
+
+#ifdef HAVE_UUID
   uuid_t uuid;
   uuid_generate_random(uuid);
   char s[37];
   uuid_unparse(uuid, s);
   this->session = s;
+#endif
+
 #endif
 
   gzmsg << "REST web Session : " << this->session << endl;
