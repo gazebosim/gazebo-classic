@@ -35,26 +35,26 @@ TEST_F(Scene_TEST, AddRemoveVisuals)
   ASSERT_TRUE(scene != NULL);
 
   // Check that it only has one visual, the world visual
-  EXPECT_EQ(scene->GetVisualCount(), 1);
+  EXPECT_EQ(scene->GetVisualCount(), 1u);
   EXPECT_TRUE(scene->GetVisual("__world_node__") != NULL);
 
   // Add a visual and check that it has been added
   rendering::VisualPtr visual1;
   visual1.reset(new rendering::Visual("visual1", scene));
   scene->AddVisual(visual1);
-  EXPECT_EQ(scene->GetVisualCount(), 2);
+  EXPECT_EQ(scene->GetVisualCount(), 2u);
   EXPECT_TRUE(scene->GetVisual("visual1") != NULL);
 
   // Add a visual and check that it has been added
   rendering::VisualPtr visual2;
   visual2.reset(new rendering::Visual("visual2", scene));
   scene->AddVisual(visual2);
-  EXPECT_EQ(scene->GetVisualCount(), 3);
+  EXPECT_EQ(scene->GetVisualCount(), 3u);
   EXPECT_TRUE(scene->GetVisual("visual2") != NULL);
 
   // Remove a visual and check that it has been removed
   scene->RemoveVisual(visual1);
-  EXPECT_EQ(scene->GetVisualCount(), 2);
+  EXPECT_EQ(scene->GetVisualCount(), 2u);
   EXPECT_FALSE(scene->GetVisual("visual1"));
 }
 
