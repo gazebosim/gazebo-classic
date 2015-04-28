@@ -135,7 +135,6 @@ void JointMaker::Reset()
   this->jointType = JointMaker::JOINT_NONE;
   this->selectedVis.reset();
   this->hoverVis.reset();
-  this->prevHoverVis.reset();
   this->inspectName = "";
   this->selectedJoints.clear();
 
