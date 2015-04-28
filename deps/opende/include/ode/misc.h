@@ -98,7 +98,7 @@ ODE_API static inline dReal dNormalizeAnglePositive(dReal angle)
  * Normalizes the angle from [0, 2*M_PI] to [-M_PI, +M_PI] circle
  * It takes and returns radians.
  *
- */    
+ */
 ODE_API static inline dReal dNormalizeAngle(dReal angle)
 {
   dReal a = dNormalizeAnglePositive(angle);
@@ -107,7 +107,7 @@ ODE_API static inline dReal dNormalizeAngle(dReal angle)
   return a;
 }
 
-  
+
 /*!
  * \function
  * \brief dShortestAngularDistance

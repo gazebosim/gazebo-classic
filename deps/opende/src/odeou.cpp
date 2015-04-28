@@ -52,11 +52,11 @@ static const CEnumUnsortedElementArray<EASSERTIONFAILURESEVERITY, AFS__MAX, cons
 END_NAMESPACE_OU()
 
 
-static void _OU_CONVENTION_CALLBACK ForwardOUAssertionFailure(EASSERTIONFAILURESEVERITY fsFailureSeverity, 
+static void _OU_CONVENTION_CALLBACK ForwardOUAssertionFailure(EASSERTIONFAILURESEVERITY fsFailureSeverity,
   const char *szAssertionExpression, const char *szAssertionFileName, unsigned int uiAssertionSourceLine)
 {
   dDebug(d_ERR_IASSERT, "Assertion failure in OU Library. Kind: %s, expression: \"%s\", file: \"%s\", line: %u",
-    g_aszAssertionFailureSeverityNames.Encode(fsFailureSeverity), 
+    g_aszAssertionFailureSeverityNames.Encode(fsFailureSeverity),
     szAssertionExpression, szAssertionFileName, uiAssertionSourceLine);
 }
 
@@ -79,7 +79,7 @@ static void _OU_CONVENTION_CALLBACK ForwardOUMemoryFree(void *pv_ExistingBlock)
 
 bool COdeOu::DoOUCustomizations()
 {
-  CMemoryManagerCustomization::CustomizeMemoryManager(&ForwardOUMemoryAlloc, 
+  CMemoryManagerCustomization::CustomizeMemoryManager(&ForwardOUMemoryAlloc,
     &ForwardOUMemoryRealloc, &ForwardOUMemoryFree);
 
   CAssertionCheckCustomization::CustomizeAssertionChecks(&ForwardOUAssertionFailure);
