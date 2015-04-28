@@ -33,7 +33,9 @@
 #include "lcp.h"
 #include "util.h"
 
+#ifndef _WIN32
 #include <sys/time.h>
+#endif
 #include <sys/types.h>
 #include <unistd.h>
 #include "quickstep_util.h"
