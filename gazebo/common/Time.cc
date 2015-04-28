@@ -20,20 +20,21 @@
   #include <Winsock2.h>
   struct timespec
   {
-    long tv_sec;
-    long tv_nsec;
+    int64_t tv_sec;
+    int64_t tv_nsec;
   };
 #else
   #include <unistd.h>
   #include <sys/time.h>
 #endif
+
 #include <time.h>
 #include <math.h>
 #include <boost/date_time.hpp>
 
 #ifdef __MACH__
-#include <mach/clock.h>
-#include <mach/mach.h>
+  #include <mach/clock.h>
+  #include <mach/mach.h>
 #endif
 
 #include "gazebo/math/Helpers.hh"
@@ -42,7 +43,6 @@
 
 using namespace gazebo;
 using namespace common;
-
 
 Time Time::wallTime;
 std::string Time::wallTimeISO;
@@ -63,9 +63,9 @@ Time::Time()
   LARGE_INTEGER freq;
   QueryPerformanceFrequency(&freq);
   double period = 1.0/freq.QuadPart;
-  clockResolution.tv_sec = long(floor(period));
+  clockResolution.tv_sec = static_cast<int64_t>(floor(period));
   clockResolution.tv_nsec =
-    long((period - floor(period)) * this->nsInSec);
+    static_cast<int64_t>((period - floor(period)) * this->nsInSec);
 #else
   // get clock resolution, skip sleep if resolution is larger then
   // requested sleep time
