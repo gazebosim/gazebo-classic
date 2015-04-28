@@ -161,7 +161,7 @@ add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_gui)
 
 target_link_libraries(gazebo_gui
-  gazebo_client
+  libgazebo_client
   gazebo_common
   gazebo_transport
   gazebo_rendering

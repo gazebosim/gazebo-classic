@@ -60,7 +60,7 @@ target_link_libraries(gzserver
 
 target_link_libraries(gazebo
   libgazebo
-  gazebo_client
+  libgazebo_client
   gazebo_common
   gazebo_util
   gazebo_transport
@@ -100,16 +100,17 @@ endif()
 add_dependencies(libgazebo gazebo_msgs)
 gz_install_library(libgazebo)
 
-gz_add_library(gazebo_client gazebo_client.cc gazebo_shared.cc)
-target_link_libraries(gazebo_client
+gz_add_library(libgazebo_client gazebo_client.cc gazebo_shared.cc)
+set_target_properties(libgazebo_client PROPERTIES OUTPUT_NAME "gazebo_client")
+target_link_libraries(libgazebo_client
   gazebo_common
   gazebo_transport
   gazebo_util
 )
 if (UNIX)
-  target_link_libraries(gazebo_client pthread)
+  target_link_libraries(libgazebo_client pthread)
 endif()
-gz_install_library(gazebo_client)
+gz_install_library(libgazebo_client)
 
 set(headers Server.hh Master.hh gazebo.hh gazebo_core.hh)
 gz_install_includes("" ${headers})
