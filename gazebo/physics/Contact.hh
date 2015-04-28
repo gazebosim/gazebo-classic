@@ -91,6 +91,7 @@ namespace gazebo
       public: Collision *collision2;
 
       /// \brief Array of forces for the contact.
+      /// All forces and torques are in the world frame.
       /// All forces and torques are relative to the center of mass of the
       /// respective links that the collision elments are attached to.
       public: JointWrench wrench[MAX_CONTACT_JOINTS];
