@@ -75,6 +75,9 @@ set (msgs
   raysensor.proto
   request.proto
   response.proto
+  rest_error.proto
+  rest_login.proto
+  rest_post.proto
   road.proto
   scene.proto
   selection.proto
@@ -164,6 +167,7 @@ foreach(FIL ${msgs})
 endforeach()
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_MSGS")
+
 # Force inclusion of gazebo/util/system.hh, which defines the symbol visibilty
 # macros.  This is needed for the GZ_MSGS_VISIBLE macro to be defined in
 # the protobuf-generated code (there's no way to force protobuf to add
@@ -186,13 +190,6 @@ if (UNIX)
     set_target_properties(gazebo_msgs PROPERTIES COMPILE_FLAGS "${current_property} -fvisibility=default")
   endif()
 endif()
-
-# CURL is used on linking msgs, probably via
-# gazebo_common. MSVC needs to know about the
-# linking path.
-# TODO: this should be in gazebo/msgs but did not
-# work for me.
-#link_directories(${CURL_LIBDIR})
 
 target_link_libraries(gazebo_msgs
   gazebo_common
