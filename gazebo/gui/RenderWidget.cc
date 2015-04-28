@@ -14,6 +14,13 @@
  * limitations under the License.
  *
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <iomanip>
 
 #include "gazebo/rendering/UserCamera.hh"
@@ -36,7 +43,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   : QWidget(_parent)
 {
   this->setObjectName("renderWidget");
-  this->show();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->mainFrame = new QFrame;
@@ -131,12 +137,12 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
-  rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
-  this->msgOverlayLabel = new QLabel(this->glWidget);
+  /*this->msgOverlayLabel = new QLabel(this->glWidget);
   this->msgOverlayLabel->setStyleSheet(
       "QLabel { background-color : white; color : gray; }");
   this->msgOverlayLabel->setVisible(false);
+  */
 
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
 
@@ -173,6 +179,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   frameLayout->addWidget(this->bottomFrame);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frameLayout->setSpacing(0);
+  
 
   this->mainFrame->setLayout(frameLayout);
   this->mainFrame->layout()->setContentsMargins(0, 0, 0, 0);
@@ -219,6 +226,11 @@ RenderWidget::RenderWidget(QWidget *_parent)
       }
     }
   }
+
+  this->installEventFilter(this);
+  this->setFocusPolicy(Qt::StrongFocus);
+  this->setMouseTracking(true);
+  this->setFocus(Qt::OtherFocusReason);
 }
 
 /////////////////////////////////////////////////
@@ -229,30 +241,29 @@ RenderWidget::~RenderWidget()
 
   delete this->toolbar;
   this->toolbar = NULL;
+}
 
-  // we created the scene here we are responsible for removing it.
-  rendering::remove_scene(gui::get_world());
+/////////////////////////////////////////////////
+void RenderWidget::Init()
+{
+  this->glWidget->Init();
 }
 
 /////////////////////////////////////////////////
 void RenderWidget::InsertWidget(unsigned int _index, QWidget *_widget)
 {
+return;
   if (static_cast<int>(_index) <= this->splitter->count())
   {
     // set equal size for now. There should always be at least one widget
     // (render3DFrame) in the splitter.
-    int childCount = this->splitter->count();
-    GZ_ASSERT(childCount > 0,
-        "RenderWidget splitter has no child widget");
+    QList<int> sizes = this->splitter->sizes();
+    GZ_ASSERT(sizes.size() > 0, "RenderWidget splitter has no child widget");
 
-    QSize widgetSize = this->size();
-    int newSize = widgetSize.height() / (this->splitter->count()+1);
-    QList<int> newSizes;
-    for (int i = 0; i < childCount+1; ++i)
-      newSizes.append(newSize);
+    sizes.insert(_index, sizes[0]);
 
     this->splitter->insertWidget(_index, _widget);
-    this->splitter->setSizes(newSizes);
+    this->splitter->setSizes(sizes);
     this->splitter->setStretchFactor(_index, 1);
   }
   else
@@ -304,13 +315,6 @@ void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
 
   if (_duration > 0)
     QTimer::singleShot(_duration, this, SLOT(OnClearOverlayMsg()));
-}
-
-/////////////////////////////////////////////////
-void RenderWidget::SetOverlaysVisible(const bool _visible)
-{
-  for (auto const &plugin : this->plugins)
-    plugin->setVisible(_visible);
 }
 
 /////////////////////////////////////////////////
@@ -373,4 +377,54 @@ void RenderWidget::AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem)
   _plugin->Load(_elem);
 
   _plugin->show();
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::keyPressEvent(QKeyEvent *_event)
+{
+  this->glWidget->keyPressEvent(_event);
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::keyReleaseEvent(QKeyEvent *_event)
+{
+  this->glWidget->keyReleaseEvent(_event);
+}
+
+void RenderWidget::moveEvent(QMoveEvent *_e)
+{
+  this->glWidget->moveEvent(_e);
+}
+
+void RenderWidget::wheelEvent(QWheelEvent *_event)
+{
+  this->glWidget->wheelEvent(_event);
+}
+void RenderWidget::mousePressEvent(QMouseEvent *_event)
+{
+  this->glWidget->mousePressEvent(_event);
+}
+void RenderWidget::mouseDoubleClickEvent(QMouseEvent *_event)
+{
+  this->glWidget->mouseDoubleClickEvent(_event);
+}
+void RenderWidget::mouseMoveEvent(QMouseEvent *_event)
+{
+  this->glWidget->mouseMoveEvent(_event);
+}
+void RenderWidget::mouseReleaseEvent(QMouseEvent *_event)
+{
+  this->glWidget->mouseReleaseEvent(_event);
+}
+
+/////////////////////////////////////////////////
+bool RenderWidget::eventFilter(QObject *_obj, QEvent *_event)
+{
+  if (_event->type() == QEvent::Enter)
+  {
+    this->setFocus(Qt::OtherFocusReason);
+    return true;
+  }
+
+  return false;
 }

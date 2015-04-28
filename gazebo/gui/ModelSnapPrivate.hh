@@ -53,6 +53,9 @@ namespace gazebo
       /// \brief Current mouse event.
       public: common::MouseEvent mouseEvent;
 
+      /// \brief Current key event.
+      public: common::KeyEvent keyEvent;
+
       /// \brief True if the model align tool is initialized.
       public: bool initialized;
 

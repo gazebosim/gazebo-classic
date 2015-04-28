@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/RenderEvents.hh"
@@ -40,33 +46,21 @@ using namespace gui;
 ModelManipulator::ModelManipulator()
   : dataPtr(new ModelManipulatorPrivate)
 {
+  this->dataPtr->initialized = false;
+  this->dataPtr->selectionObj.reset();
+  this->dataPtr->mouseMoveVis.reset();
+
   this->dataPtr->manipMode = "";
   this->dataPtr->globalManip = false;
-  this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////
 ModelManipulator::~ModelManipulator()
 {
-  this->Clear();
+  this->dataPtr->modelPub.reset();
+  this->dataPtr->selectionObj.reset();
   delete this->dataPtr;
   this->dataPtr = NULL;
-}
-
-/////////////////////////////////////////////////
-void ModelManipulator::Clear()
-{
-  this->dataPtr->modelPub.reset();
-  this->dataPtr->lightPub.reset();
-  this->dataPtr->selectionObj.reset();
-  this->dataPtr->userCamera.reset();
-  this->dataPtr->scene.reset();
-  this->dataPtr->node.reset();
-  this->dataPtr->mouseMoveVis.reset();
-  this->dataPtr->mouseChildVisualScale.clear();
-  this->dataPtr->manipMode = "";
-  this->dataPtr->globalManip = false;
-  this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////

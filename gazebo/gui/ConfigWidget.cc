@@ -171,123 +171,102 @@ void ConfigWidget::SetWidgetReadOnly(const std::string &_name, bool _readOnly)
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::SetIntWidgetValue(const std::string &_name, int _value)
+void ConfigWidget::SetIntWidgetValue(const std::string &_name, int _value)
 {
-  auto iter = this->configWidgets.find(_name);
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
   if (iter != this->configWidgets.end())
-    return this->UpdateIntWidget(iter->second, _value);
-
-  return false;
+    this->UpdateIntWidget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::SetUIntWidgetValue(const std::string &_name,
+void ConfigWidget::SetUIntWidgetValue(const std::string &_name,
     unsigned int _value)
 {
-  auto iter = this->configWidgets.find(_name);
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
   if (iter != this->configWidgets.end())
-    return this->UpdateUIntWidget(iter->second, _value);
-
-  return false;
+    this->UpdateUIntWidget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::SetDoubleWidgetValue(const std::string &_name,
+void ConfigWidget::SetDoubleWidgetValue(const std::string &_name,
     double _value)
 {
-  auto iter = this->configWidgets.find(_name);
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
   if (iter != this->configWidgets.end())
-    return this->UpdateDoubleWidget(iter->second, _value);
-
-  return false;
+    this->UpdateDoubleWidget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::SetBoolWidgetValue(const std::string &_name,
+void ConfigWidget::SetBoolWidgetValue(const std::string &_name,
     bool _value)
 {
-  auto iter = this->configWidgets.find(_name);
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
   if (iter != this->configWidgets.end())
-    return this->UpdateBoolWidget(iter->second, _value);
-
-  return false;
+    this->UpdateBoolWidget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::SetStringWidgetValue(const std::string &_name,
+void ConfigWidget::SetStringWidgetValue(const std::string &_name,
     const std::string &_value)
 {
-  auto iter = this->configWidgets.find(_name);
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
   if (iter != this->configWidgets.end())
-    return this->UpdateStringWidget(iter->second, _value);
-
-  return false;
+    this->UpdateStringWidget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::SetVector3WidgetValue(const std::string &_name,
+void ConfigWidget::SetVector3WidgetValue(const std::string &_name,
     const math::Vector3 &_value)
 {
-  auto iter = this->configWidgets.find(_name);
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
   if (iter != this->configWidgets.end())
-    return this->UpdateVector3Widget(iter->second, _value);
-
-  return false;
+    this->UpdateVector3Widget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::SetColorWidgetValue(const std::string &_name,
+void ConfigWidget::SetColorWidgetValue(const std::string &_name,
     const common::Color &_value)
 {
-  auto iter = this->configWidgets.find(_name);
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
   if (iter != this->configWidgets.end())
-    return this->UpdateColorWidget(iter->second, _value);
-
-  return false;
+    this->UpdateColorWidget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::SetPoseWidgetValue(const std::string &_name,
+void ConfigWidget::SetPoseWidgetValue(const std::string &_name,
     const math::Pose &_value)
 {
-  auto iter = this->configWidgets.find(_name);
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
   if (iter != this->configWidgets.end())
-    return this->UpdatePoseWidget(iter->second, _value);
-
-  return false;
+    this->UpdatePoseWidget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::SetGeometryWidgetValue(const std::string &_name,
+void ConfigWidget::SetGeometryWidgetValue(const std::string &_name,
     const std::string &_value, const math::Vector3 &_dimensions,
     const std::string &_uri)
 {
-  auto iter = this->configWidgets.find(_name);
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
   if (iter != this->configWidgets.end())
-    return this->UpdateGeometryWidget(iter->second, _value, _dimensions, _uri);
-
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool ConfigWidget::SetEnumWidgetValue(const std::string &_name,
-    const std::string &_value)
-{
-  auto iter = this->configWidgets.find(_name);
-
-  if (iter != this->configWidgets.end())
-    return this->UpdateEnumWidget(iter->second, _value);
-
-  return false;
+    this->UpdateGeometryWidget(iter->second, _value, _dimensions, _uri);
 }
 
 /////////////////////////////////////////////////
@@ -398,17 +377,6 @@ std::string ConfigWidget::GetGeometryWidgetValue(const std::string &_name,
   if (iter != this->configWidgets.end())
     type = this->GetGeometryWidgetValue(iter->second, _dimensions, _uri);
   return type;
-}
-
-/////////////////////////////////////////////////
-std::string ConfigWidget::GetEnumWidgetValue(const std::string &_name) const
-{
-  std::string value;
-  auto iter = this->configWidgets.find(_name);
-
-  if (iter != this->configWidgets.end())
-    value = this->GetEnumWidgetValue(iter->second);
-  return value;
 }
 
 /////////////////////////////////////////////////
@@ -788,50 +756,10 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           break;
         }
         case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
-        {
-          const google::protobuf::EnumValueDescriptor *value =
-              ref->GetEnum(*_msg, field);
-
-          if (!value)
-          {
-            gzerr << "Error retrieving enum value for '" << name << "'"
-                << std::endl;
-            break;
-          }
-
-          if (newWidget)
-          {
-            std::vector<std::string> enumValues;
-            const google::protobuf::EnumDescriptor *descriptor = value->type();
-            if (!descriptor)
-              break;
-
-            for (int j = 0; j < descriptor->value_count(); ++j)
-            {
-              const google::protobuf::EnumValueDescriptor *valueDescriptor =
-                  descriptor->value(j);
-              if (valueDescriptor)
-                enumValues.push_back(valueDescriptor->name());
-            }
-            configChildWidget = this->CreateEnumWidget(name, enumValues);
-
-            if (!configChildWidget)
-            {
-              gzerr << "Error creating an enum widget for '" << name << "'"
-                  << std::endl;
-              break;
-            }
-
-            // connect enum config widget event so that we can fire an other
-            // event from ConfigWidget that has the name of this field
-            connect(qobject_cast<EnumConfigWidget *>(configChildWidget),
-                SIGNAL(EnumValueChanged(const QString &)), this,
-                SLOT(OnEnumValueChanged(const QString &)));
-            newFieldWidget = configChildWidget;
-          }
-          this->UpdateEnumWidget(configChildWidget, value->name());
+          // const google::protobuf::EnumValueDescriptor *value =
+          //    ref->GetEnum(*_msg, field);
+          // TODO Implement enum parsing
           break;
-        }
         default:
           break;
       }
@@ -1312,31 +1240,6 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
 }
 
 /////////////////////////////////////////////////
-ConfigChildWidget *ConfigWidget::CreateEnumWidget(
-    const std::string &_key, const std::vector<std::string> &_values)
-{
-  QLabel *enumLabel = new QLabel(tr(_key.c_str()));
-  QComboBox *enumComboBox = new QComboBox;
-
-  for (unsigned int i = 0; i < _values.size(); ++i)
-    enumComboBox->addItem(tr(_values[i].c_str()));
-
-  QHBoxLayout *enumLayout = new QHBoxLayout;
-  enumLayout->addWidget(enumLabel);
-  enumLayout->addWidget(enumComboBox);
-
-  EnumConfigWidget *widget = new EnumConfigWidget();
-
-  connect(enumComboBox, SIGNAL(currentIndexChanged(const QString &)),
-      widget, SLOT(EnumChanged(const QString &)));
-
-  enumLayout->setContentsMargins(0, 0, 0, 0);
-  widget->setLayout(enumLayout);
-  widget->widgets.push_back(enumComboBox);
-  return widget;
-}
-
-/////////////////////////////////////////////////
 void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
     const std::string &_name)
 {
@@ -1360,7 +1263,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
     std::string name = field->name();
 
     // Update each field in the message
-    // TODO update repeated fields
+    // TODO update repeated fields and enum fields
     if (!field->is_repeated() /*&& ref->HasField(*_msg, field)*/)
     {
       std::string scopedName = _name.empty() ? name : _name + "::" + name;
@@ -1650,27 +1553,8 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
           break;
         }
         case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
-        {
-          QComboBox *valueComboBox =
-              qobject_cast<QComboBox *>(childWidget->widgets[0]);
-          if (valueComboBox)
-          {
-            std::string valueStr = valueComboBox->currentText().toStdString();
-            const google::protobuf::EnumDescriptor *enumDescriptor =
-                field->enum_type();
-            if (enumDescriptor)
-            {
-              const google::protobuf::EnumValueDescriptor *enumValue =
-                  enumDescriptor->FindValueByName(valueStr);
-              if (enumValue)
-                ref->SetEnum(_msg, field, enumValue);
-              else
-                gzerr << "Unable to find enum value: '" << valueStr << "'"
-                    << std::endl;
-            }
-          }
+          // todo update enum fields.
           break;
-        }
         default:
           break;
       }
@@ -1699,85 +1583,75 @@ void ConfigWidget::UpdateVector3Msg(google::protobuf::Message *_msg,
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::UpdateIntWidget(ConfigChildWidget *_widget,  int _value)
+void ConfigWidget::UpdateIntWidget(ConfigChildWidget *_widget,  int _value)
 {
   if (_widget->widgets.size() == 1u)
   {
     qobject_cast<QSpinBox *>(_widget->widgets[0])->setValue(_value);
-    return true;
   }
   else
   {
     gzerr << "Error updating Int Config widget" << std::endl;
   }
-  return false;
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::UpdateUIntWidget(ConfigChildWidget *_widget,
+void ConfigWidget::UpdateUIntWidget(ConfigChildWidget *_widget,
     unsigned int _value)
 {
   if (_widget->widgets.size() == 1u)
   {
     qobject_cast<QSpinBox *>(_widget->widgets[0])->setValue(_value);
-    return true;
   }
   else
   {
     gzerr << "Error updating UInt Config widget" << std::endl;
   }
-  return false;
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::UpdateDoubleWidget(ConfigChildWidget *_widget, double _value)
+void ConfigWidget::UpdateDoubleWidget(ConfigChildWidget *_widget, double _value)
 {
   if (_widget->widgets.size() == 1u)
   {
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[0])->setValue(_value);
-    return true;
   }
   else
   {
     gzerr << "Error updating Double Config widget" << std::endl;
   }
-  return false;
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::UpdateStringWidget(ConfigChildWidget *_widget,
+void ConfigWidget::UpdateStringWidget(ConfigChildWidget *_widget,
     const std::string &_value)
 {
   if (_widget->widgets.size() == 1u)
   {
     qobject_cast<QLineEdit *>(_widget->widgets[0])->setText(tr(_value.c_str()));
-    return true;
   }
   else
   {
     gzerr << "Error updating String Config Widget" << std::endl;
   }
-  return false;
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::UpdateBoolWidget(ConfigChildWidget *_widget, bool _value)
+void ConfigWidget::UpdateBoolWidget(ConfigChildWidget *_widget, bool _value)
 {
   if (_widget->widgets.size() == 2u)
   {
     qobject_cast<QRadioButton *>(_widget->widgets[0])->setChecked(_value);
     qobject_cast<QRadioButton *>(_widget->widgets[1])->setChecked(!_value);
-    return true;
   }
   else
   {
     gzerr << "Error updating Bool Config widget" << std::endl;
   }
-  return false;
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::UpdateVector3Widget(ConfigChildWidget *_widget,
+void ConfigWidget::UpdateVector3Widget(ConfigChildWidget *_widget,
     const math::Vector3 &_vec)
 {
   if (_widget->widgets.size() == 3u)
@@ -1785,17 +1659,15 @@ bool ConfigWidget::UpdateVector3Widget(ConfigChildWidget *_widget,
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[0])->setValue(_vec.x);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->setValue(_vec.y);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->setValue(_vec.z);
-    return true;
   }
   else
   {
     gzerr << "Error updating Vector3 Config widget" << std::endl;
   }
-  return false;
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::UpdateColorWidget(ConfigChildWidget *_widget,
+void ConfigWidget::UpdateColorWidget(ConfigChildWidget *_widget,
     const common::Color &_color)
 {
   if (_widget->widgets.size() == 4u)
@@ -1804,17 +1676,15 @@ bool ConfigWidget::UpdateColorWidget(ConfigChildWidget *_widget,
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->setValue(_color.g);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->setValue(_color.b);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[3])->setValue(_color.a);
-    return true;
   }
   else
   {
     gzerr << "Error updating Color Config widget" << std::endl;
   }
-  return false;
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::UpdatePoseWidget(ConfigChildWidget *_widget,
+void ConfigWidget::UpdatePoseWidget(ConfigChildWidget *_widget,
     const math::Pose &_pose)
 {
   if (_widget->widgets.size() == 6u)
@@ -1827,34 +1697,32 @@ bool ConfigWidget::UpdatePoseWidget(ConfigChildWidget *_widget,
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[3])->setValue(rot.x);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->setValue(rot.y);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[5])->setValue(rot.z);
-    return true;
   }
   else
   {
     gzerr << "Error updating Pose Config widget" << std::endl;
   }
-  return false;
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
+void ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
     const std::string &_value, const math::Vector3 &_dimensions,
     const std::string &_uri)
 {
   if (_widget->widgets.size() != 8u)
   {
     gzerr << "Error updating Geometry Config widget " << std::endl;
-    return false;
+    return;
   }
 
-  QComboBox *valueComboBox = qobject_cast<QComboBox *>(_widget->widgets[0]);
+  QComboBox * valueComboBox = qobject_cast<QComboBox *>(_widget->widgets[0]);
   int index = valueComboBox->findText(tr(_value.c_str()));
 
   if (index < 0)
   {
     gzerr << "Error updating Geometry Config widget: '" << _value <<
       "' not found" << std::endl;
-    return false;
+    return;
   }
 
   qobject_cast<QComboBox *>(_widget->widgets[0])->setCurrentIndex(index);
@@ -1888,40 +1756,6 @@ bool ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
 
   if (isMesh)
     qobject_cast<QLineEdit *>(_widget->widgets[6])->setText(tr(_uri.c_str()));
-
-  return true;
-}
-
-
-/////////////////////////////////////////////////
-bool ConfigWidget::UpdateEnumWidget(ConfigChildWidget *_widget,
-    const std::string &_value)
-{
-  if (_widget->widgets.size() != 1u)
-  {
-    gzerr << "Error updating Enum Config widget" << std::endl;
-    return false;
-  }
-
-  QComboBox *valueComboBox = qobject_cast<QComboBox *>(_widget->widgets[0]);
-  if (!valueComboBox)
-  {
-    gzerr << "Error updating Enum Config widget" << std::endl;
-    return false;
-  }
-
-  int index = valueComboBox->findText(tr(_value.c_str()));
-
-  if (index < 0)
-  {
-    gzerr << "Error updating Enum Config widget: '" << _value <<
-      "' not found" << std::endl;
-    return false;
-  }
-
-  qobject_cast<QComboBox *>(_widget->widgets[0])->setCurrentIndex(index);
-
-  return true;
 }
 
 /////////////////////////////////////////////////
@@ -2116,44 +1950,11 @@ std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
 }
 
 /////////////////////////////////////////////////
-std::string ConfigWidget::GetEnumWidgetValue(ConfigChildWidget *_widget) const
-{
-  std::string value;
-  if (_widget->widgets.size() != 1u)
-  {
-    gzerr << "Error getting value from Enum Config widget " << std::endl;
-    return value;
-  }
-
-  QComboBox *valueComboBox = qobject_cast<QComboBox *>(_widget->widgets[0]);
-  value = valueComboBox->currentText().toStdString();
-
-  return value;
-}
-
-/////////////////////////////////////////////////
 void ConfigWidget::OnItemSelection(QTreeWidgetItem *_item,
                                          int /*_column*/)
 {
   if (_item && _item->childCount() > 0)
     _item->setExpanded(!_item->isExpanded());
-}
-
-/////////////////////////////////////////////////
-void ConfigWidget::OnEnumValueChanged(const QString &_value)
-{
-  ConfigChildWidget *widget =
-      qobject_cast<ConfigChildWidget *>(QObject::sender());
-
-  for (auto iter : this->configWidgets)
-  {
-    if (iter.second == widget)
-    {
-      std::string scopedName = iter.first;
-      emit EnumValueChanged(tr(scopedName.c_str()), _value);
-      return;
-    }
-  }
 }
 
 /////////////////////////////////////////////////
@@ -2260,10 +2061,4 @@ void GeometryConfigWidget::OnSelectFile()
       }
     }
   }
-}
-
-/////////////////////////////////////////////////
-void EnumConfigWidget::EnumChanged(const QString &_value)
-{
-  emit EnumValueChanged(_value);
 }

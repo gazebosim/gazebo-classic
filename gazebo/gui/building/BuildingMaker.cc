@@ -15,6 +15,12 @@
  *
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sstream>
 #include <set>
 
@@ -604,6 +610,7 @@ void BuildingMaker::Reset()
   this->previewVisual->Load();
   this->previewVisual->SetPose(math::Pose::Zero);
   this->previewVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  scene->AddVisual(this->previewVisual);
 
   std::map<std::string, BuildingModelManip *>::iterator it;
   for (it = this->allItems.begin(); it != this->allItems.end(); ++it)

@@ -47,8 +47,14 @@ void GLWidget_TEST2::KeyPresses()
   gazebo::gui::MainWindow mainWindow;
 
   mainWindow.Load();
+
+  gazebo::rendering::create_scene(
+      gazebo::physics::get_world()->GetName(), false);
+
   mainWindow.Init();
   mainWindow.show();
+
+  gazebo::rendering::Events::createScene("default");
 
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)

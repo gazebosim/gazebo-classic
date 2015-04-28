@@ -1,3 +1,15 @@
+QSplitter
+{
+  color: #ffffff;
+  background-color: transparent;
+}
+
+QSplitter::handle
+{
+  color: #ffffff;
+  background-color: transparent;
+}
+
 QGroupBox::title
 {
   color: #f0f0f0;
@@ -591,6 +603,19 @@ QWidget#renderBottomFrame
   border-bottom-right-radius: 10px;
   background-color: #808080;
   border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+QWidget#timePanel
+{
+  max-height: 40px;
+  background-color: #808080;
+  border-bottom-right-radius: 10px;
+}
+
+QWidget#timePanel > QFrame
+{
+  background-color: #808080;
   border-bottom-right-radius: 10px;
 }
 

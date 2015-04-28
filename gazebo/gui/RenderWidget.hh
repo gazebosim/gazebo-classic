@@ -43,6 +43,8 @@ namespace gazebo
       public: RenderWidget(QWidget *_parent = 0);
       public: virtual ~RenderWidget();
 
+
+      public: void Init();
       public: void RemoveScene(const std::string &_name);
       public: void CreateScene(const std::string &_name);
 
@@ -65,10 +67,6 @@ namespace gazebo
       public: void DisplayOverlayMsg(const std::string &_msg,
           int _duration = -1);
 
-      /// \brief Show or hide all the GUI overlays.
-      /// \param[in] _visible True to show the GUI overlays, false to hide them.
-      public: void SetOverlaysVisible(const bool _visible);
-
       /// \brief Get the overlay message being displayed
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
@@ -86,9 +84,20 @@ namespace gazebo
       /// \param[in] _show Whether or not to show the toolbar.
       public: void ShowToolbar(const bool _show);
 
+      protected: virtual void moveEvent(QMoveEvent *_e);
+      protected: void keyPressEvent(QKeyEvent *_event);
+      protected: void keyReleaseEvent(QKeyEvent *_event);
+      protected: void wheelEvent(QWheelEvent *_event);
+      protected: void mousePressEvent(QMouseEvent *_event);
+      protected: void mouseDoubleClickEvent(QMouseEvent *_event);
+      protected: void mouseMoveEvent(QMouseEvent *_event);
+      protected: void mouseReleaseEvent(QMouseEvent *_event);
+
+
       /// \brief Qt callback to clear overlay message if a duration is
       /// specified
       private slots: void OnClearOverlayMsg();
+      private: bool eventFilter(QObject *_obj, QEvent *_event);
 
       private: void OnFullScreen(bool &_value);
 

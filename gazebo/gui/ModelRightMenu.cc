@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -24,7 +30,6 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/ApplyWrenchDialog.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 
 using namespace gazebo;
@@ -47,11 +52,6 @@ ModelRightMenu::ModelRightMenu()
   this->editAct = new QAction(tr("Edit model"), this);
   this->editAct->setStatusTip(tr("Open on Model Editor"));
   connect(this->editAct, SIGNAL(triggered()), this, SLOT(OnEdit()));
-
-  this->applyWrenchAct = new QAction(tr("Apply Force/Torque"), this);
-  this->applyWrenchAct->setStatusTip(tr("Apply force and torque to a link"));
-  connect(this->applyWrenchAct, SIGNAL(triggered()), this,
-      SLOT(OnApplyWrench()));
 
   // \todo Reimplement
   // this->snapBelowAct = new QAction(tr("Snap"), this);
@@ -148,32 +148,22 @@ ModelRightMenu::~ModelRightMenu()
 }
 
 /////////////////////////////////////////////////
-void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
+void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt,
     EntityTypes _type)
 {
-  if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
-  {
-    this->entityName = _entityName.substr(0, _entityName.find("::"));
-  }
-  else if (_type == EntityTypes::LINK)
-  {
-    this->entityName = _entityName;
-  }
+  this->modelName = _modelName.substr(0, _modelName.find("::"));
 
   QMenu menu;
 
   menu.addAction(this->moveToAct);
   menu.addAction(this->followAct);
 
-  if (_type == EntityTypes::MODEL || _type == EntityTypes::LINK)
-    menu.addAction(this->applyWrenchAct);
-
   if (_type == EntityTypes::MODEL)
   {
     // disable editing planes for now
     rendering::UserCameraPtr cam = gui::get_active_camera();
     rendering::ScenePtr scene = cam->GetScene();
-    rendering::VisualPtr vis = scene->GetVisual(this->entityName);
+    rendering::VisualPtr vis = scene->GetVisual(this->modelName);
     if (vis && !vis->IsPlane())
     {
       menu.addSeparator();
@@ -191,7 +181,7 @@ void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
       viewMenu->addAction((*iter)->action);
 
       std::map<std::string, bool>::iterator modelIter =
-        (*iter)->modelStates.find(this->entityName);
+        (*iter)->modelStates.find(this->modelName);
 
       if (modelIter == (*iter)->modelStates.end())
         (*iter)->action->setChecked((*iter)->globalEnable);
@@ -200,18 +190,15 @@ void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     }
   }
 
-  if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
+  if (g_copyAct && g_pasteAct)
   {
-    if (g_copyAct && g_pasteAct)
-    {
-      menu.addSeparator();
-      menu.addAction(g_copyAct);
-      menu.addAction(g_pasteAct);
-    }
-
     menu.addSeparator();
-    menu.addAction(g_deleteAct);
+    menu.addAction(g_copyAct);
+    menu.addAction(g_pasteAct);
   }
+
+  menu.addSeparator();
+  menu.addAction(g_deleteAct);
 
   // \todo Reimplement these features.
   // menu.addAction(this->skeletonAction);
@@ -223,52 +210,22 @@ void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
 void ModelRightMenu::OnMoveTo()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->MoveToVisual(this->entityName);
+  cam->MoveToVisual(this->modelName);
 }
 
 /////////////////////////////////////////////////
 void ModelRightMenu::OnFollow()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->TrackVisual(this->entityName);
-  gui::Events::follow(this->entityName);
+  cam->TrackVisual(this->modelName);
+  gui::Events::follow(this->modelName);
 }
 
 /////////////////////////////////////////////////
 void ModelRightMenu::OnEdit()
 {
   g_editModelAct->trigger();
-  gui::Events::editModel(this->entityName);
-}
-
-/////////////////////////////////////////////////
-void ModelRightMenu::OnApplyWrench()
-{
-  ApplyWrenchDialog *applyWrenchDialog = new ApplyWrenchDialog();
-
-  rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
-      GetVisual(this->entityName);
-
-  if (!vis)
-  {
-    gzerr << "Can't find entity " << this->entityName << std::endl;
-    return;
-  }
-
-  std::string modelName, linkName;
-  if (vis == vis->GetRootVisual())
-  {
-    modelName = this->entityName;
-    // If model selected just take the first link
-    linkName = vis->GetChild(0)->GetName();
-  }
-  else
-  {
-    modelName = vis->GetRootVisual()->GetName();
-    linkName = this->entityName;
-  }
-
-  applyWrenchDialog->Init(modelName, linkName);
+  gui::Events::editModel(this->modelName);
 }
 
 /////////////////////////////////////////////////
@@ -281,7 +238,7 @@ void ModelRightMenu::OnApplyWrench()
 //   if (!cam->GetScene())
 //     gzerr << "Invalid user camera scene\n";
 //
-//   // cam->GetScene()->SnapVisualToNearestBelow(this->entityName);
+//   // cam->GetScene()->SnapVisualToNearestBelow(this->modelName);
 // }
 
 /////////////////////////////////////////////////
@@ -289,7 +246,7 @@ void ModelRightMenu::OnDelete(const std::string &_name)
 {
   std::string name = _name;
   if (name.empty())
-    name = this->entityName;
+    name = this->modelName;
 
   // Delete the entity
   if (!name.empty())
@@ -352,19 +309,19 @@ ViewState::ViewState(ModelRightMenu *_parent,
 void ViewState::Callback()
 {
   // Store the check state for the model
-  this->modelStates[this->parent->entityName] = this->action->isChecked();
+  this->modelStates[this->parent->modelName] = this->action->isChecked();
 
   // Send a message with the new check state. The Scene listens to these
   // messages and updates the visualizations accordingly.
   if (this->action->isChecked())
   {
     transport::requestNoReply(this->parent->node, this->checkRequest,
-                              this->parent->entityName);
+                              this->parent->modelName);
   }
   else
   {
     transport::requestNoReply(this->parent->node, this->uncheckRequest,
-                              this->parent->entityName);
+                              this->parent->modelName);
   }
 }
 
@@ -372,19 +329,17 @@ void ViewState::Callback()
 /////////////////////////////////////////////////
 // void ModelRightMenu::OnSkeleton()
 // {
-//   this->skeletonActionState[this->entityName] =
+//   this->skeletonActionState[this->modelName] =
 //     this->skeletonAction->isChecked();
 //
 //   if (this->skeletonAction->isChecked())
 //   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton",
-//         this->entityName);
+//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->modelName);
 //     this->requestMsg->set_dbl_data(1.0);
 //   }
 //   else
 //   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton",
-//         this->entityName);
+//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->modelName);
 //     this->requestMsg->set_dbl_data(0.0);
 //   }
 //
