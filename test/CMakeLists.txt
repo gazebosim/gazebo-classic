@@ -32,13 +32,15 @@ set(GTEST_MAIN_LIBRARY "${PROJECT_BINARY_DIR}/test/libgtest_main.a")
 
 # Build static ServerFixture library
 set(ServerFixtureSources
-  ${PROJECT_SOURCE_DIR}/gazebo/Server.cc
-  ${PROJECT_SOURCE_DIR}/gazebo/Master.cc
-  ${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc
   ${PROJECT_SOURCE_DIR}/test/ServerFixture.cc
   ${PROJECT_SOURCE_DIR}/test/ServerFixtureRecord.cc
 )
 add_library(server_fixture STATIC ${ServerFixtureSources})
+target_link_libraries(server_fixture
+  libgazebo
+  libgazebo_client
+)
+
 add_dependencies(server_fixture gazebo_msgs)
 set(SERVER_FIXTURE_LIBRARY "${PROJECT_BINARY_DIR}/test/libserver_fixture.a")
 

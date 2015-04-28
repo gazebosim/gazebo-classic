@@ -20,7 +20,7 @@
 #include <boost/property_tree/ini_parser.hpp>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gazebo.hh"
+#include "gazebo/gazebo_client.hh"
 
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Console.hh"
