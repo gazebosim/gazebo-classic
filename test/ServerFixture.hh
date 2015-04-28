@@ -34,6 +34,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include "gazebo/transport/transport.hh"
 
@@ -79,29 +80,36 @@ namespace gazebo
                                  bool _paused);
 
     /// \brief Load a world based on a filename and set simulation
-    /// paused/un-paused, and specify physics engine.
+    /// paused/un-paused, and specify physics engine. This versions allows
+    /// plugins to be loaded (via the cmd line args)
     /// \param[in] _worldFilename Name of the world to load.
     /// \param[in] _paused True to start the world paused.
     /// \param[in] _physics Name of the physics engine.
+    /// \param[in] _systemPlugins Array of system plugins to load.
     protected: virtual void Load(const std::string &_worldFilename,
-                                 bool _paused, const std::string &_physics);
+                                 bool _paused, const std::string &_physics,
+                          const std::vector<std::string> &_systemPlugins = {});
 
     /// \brief Run the server.
     /// \param[in] _worldFilename Name of the world to run in simulation.
     protected: void RunServer(const std::string &_worldFilename);
-
-    /// \brief Get a pointer to the rendering scene.
-    /// \param[in] _sceneName Name of the scene to get.
-    protected: rendering::ScenePtr GetScene(
-                   const std::string &_sceneName = "default");
 
     /// \brief Run the server, start paused/unpaused, and specify the physics
     /// engine.
     /// \param[in] _worldFilename Name of the world to load.
     /// \param[in] _paused True to start the world paused.
     /// \param[in] _physics Name of the physics engine.
+    /// \param[in] _systemPlugins Array of system plugins to load.
     protected: void RunServer(const std::string &_worldFilename, bool _paused,
-                              const std::string &_physics);
+                              const std::string &_physics,
+                          const std::vector<std::string> &_systemPlugins = {});
+
+
+    /// \brief Get a pointer to the rendering scene.
+    /// \param[in] _sceneName Name of the scene to get.
+    protected: rendering::ScenePtr GetScene(
+                   const std::string &_sceneName = "default");
+
 
     /// \brief Function that received world stastics messages.
     /// \param[in] _msg World statistics message.
@@ -547,6 +555,23 @@ namespace gazebo
     /// \param[in] _prefix Prefix for unique string.
     /// \return String with prefix and unique number as suffix.
     protected: std::string GetUniqueString(const std::string &_prefix);
+
+    /// \brief Helper to record data to gtest xml output.
+    /// \param[in] _name Name of data.
+    /// \param[in] _data Floating point number to store.
+    protected: void Record(const std::string &_name, const double _data);
+
+    /// \brief Helper to record signal statistics to gtest xml output.
+    /// \param[in] _prefix Prefix string for data names.
+    /// \param[in] _stats Signal statistics to store.
+    protected: void Record(const std::string &_prefix,
+                           const math::SignalStats &_stats);
+
+    /// \brief Helper to record Vector3 signal statistics to gtest xml output.
+    /// \param[in] _prefix Prefix string for data names.
+    /// \param[in] _stats Vector3 signal statistics to store.
+    protected: void Record(const std::string &_prefix,
+                           const math::Vector3Stats &_stats);
 
     /// \brief Pointer the Gazebo server.
     protected: Server *server;

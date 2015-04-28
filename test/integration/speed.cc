@@ -142,6 +142,9 @@ void SpeedTest::UnthrottledStep(const std::string &_physicsEngine)
   double realTimeFactor = dt * steps / runTime.Double();
   gzdbg << "realTimeFactor " << realTimeFactor << std::endl;
   EXPECT_GT(realTimeFactor, 2.0);
+
+  RecordProperty("engine", _physicsEngine);
+  this->Record("realTimeFactor", realTimeFactor);
 }
 
 TEST_P(SpeedTest, UnthrottledStep)
