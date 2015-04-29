@@ -162,31 +162,31 @@ std::string ConfigWidget::GetUnitFromKey(const std::string &_key,
 }
 
 /////////////////////////////////////////////////
-void ConfigWidget::GetRangeFromKey(const std::string &_key, double *_min,
-    double *_max)
+void ConfigWidget::GetRangeFromKey(const std::string &_key, double &_min,
+    double &_max)
 {
   // Maximum range by default
-  *_min = -GZ_DBL_MAX;
-  *_max = GZ_DBL_MAX;
+  _min = -GZ_DBL_MAX;
+  _max = GZ_DBL_MAX;
 
   if (_key == "mass" || _key == "ixx" || _key == "ixy" || _key == "ixz" ||
       _key == "iyy" || _key == "iyz" || _key == "izz" || _key == "length" ||
       _key == "min_depth")
   {
-    *_min = 0;
+    _min = 0;
   }
   else if (_key == "bounce" || _key == "transparency" ||
       _key == "laser_retro" || _key == "ambient" || _key == "diffuse" ||
       _key == "specular" || _key == "emissive" ||
       _key == "restitution_coefficient")
   {
-    *_min = 0;
-    *_max = 1;
+    _min = 0;
+    _max = 1;
   }
   else if (_key == "fdir1" || _key == "xyz")
   {
-    *_min = -1;
-    *_max = +1;
+    _min = -1;
+    _max = +1;
   }
 }
 
@@ -521,7 +521,7 @@ std::string ConfigWidget::GetEnumWidgetValue(const std::string &_name) const
 
 /////////////////////////////////////////////////
 QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
-    const std::string &_name, int _level)
+    const std::string &_name, const int _level)
 {
   std::vector<QWidget *> newWidgets;
 
@@ -1109,7 +1109,7 @@ math::Vector3 ConfigWidget::ParseVector3(const google::protobuf::Message *_msg)
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key,
-    int _level)
+    const int _level)
 {
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
@@ -1142,7 +1142,7 @@ ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key,
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key,
-    int _level)
+    const int _level)
 {
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
@@ -1175,7 +1175,7 @@ ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key,
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
-    int _level)
+    const int _level)
 {
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
@@ -1184,7 +1184,7 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
   // SpinBox
   double min = 0;
   double max = 0;
-  this->GetRangeFromKey(_key, &min, &max);
+  this->GetRangeFromKey(_key, min, max);
 
   QDoubleSpinBox *valueSpinBox = new QDoubleSpinBox;
   valueSpinBox->setRange(min, max);
@@ -1226,7 +1226,7 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
-    int _level)
+    const int _level)
 {
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
@@ -1257,7 +1257,7 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key,
-    int _level)
+    const int _level)
 {
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
@@ -1299,7 +1299,7 @@ ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key,
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
-    const std::string &_key, int _level)
+    const std::string &_key, const int _level)
 {
   // Labels
   QLabel *vecXLabel = new QLabel(tr("X"));
@@ -1312,7 +1312,7 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   // SpinBoxes
   double min = 0;
   double max = 0;
-  this->GetRangeFromKey(_key, &min, &max);
+  this->GetRangeFromKey(_key, min, max);
 
   QDoubleSpinBox *vecXSpinBox = new QDoubleSpinBox;
   vecXSpinBox->setRange(min, max);
@@ -1367,7 +1367,7 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
-    int _level)
+    const int _level)
 {
   // Labels
   QLabel *colorRLabel = new QLabel(tr("R"));
@@ -1382,7 +1382,7 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   // SpinBoxes
   double min = 0;
   double max = 0;
-  this->GetRangeFromKey(_key, &min, &max);
+  this->GetRangeFromKey(_key, min, max);
 
   QDoubleSpinBox *colorRSpinBox = new QDoubleSpinBox;
   colorRSpinBox->setRange(0, 1.0);
@@ -1448,7 +1448,7 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
-    int _level)
+    const int _level)
 {
   // Labels
   std::vector<std::string> elements;
@@ -1471,7 +1471,7 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
   // ChildWidget
   double min = 0;
   double max = 0;
-  this->GetRangeFromKey("", &min, &max);
+  this->GetRangeFromKey("", min, max);
 
   ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
@@ -1519,7 +1519,7 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
-    const std::string &/*_key*/, int _level)
+    const std::string &/*_key*/, const int _level)
 {
   // Geometry ComboBox
   QLabel *geometryLabel = new QLabel(tr("Geometry"));
@@ -1534,7 +1534,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   // Size XYZ
   double min = 0;
   double max = 0;
-  this->GetRangeFromKey("length", &min, &max);
+  this->GetRangeFromKey("length", min, max);
 
   QDoubleSpinBox *geomSizeXSpinBox = new QDoubleSpinBox;
   geomSizeXSpinBox->setRange(min, max);
@@ -1702,7 +1702,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateEnumWidget(
     const std::string &_key, const std::vector<std::string> &_values,
-    int _level)
+    const int _level)
 {
   // Label
   QLabel *enumLabel = new QLabel(this->GetHumanReadableKey(_key).c_str());
