@@ -28,6 +28,10 @@ using namespace gazebo;
 class ContactSensor : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
+  /// \brief Test moving a model while in contact.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void MoveTool(const std::string &_physicsEngine);
+
   /// \brief Test multiple contact sensors on a single link.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void MultipleSensors(const std::string &_physicsEngine);
@@ -44,6 +48,60 @@ unsigned int g_messageCount = 0;
 void ContactSensor::Callback(const ConstContactsPtr &/*_msg*/)
 {
   g_messageCount++;
+}
+
+////////////////////////////////////////////////////////////////////////
+// Test moving a model while in contact
+// addresses a failure in pull request #1610 for simbody
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::MoveTool(const std::string &_physicsEngine)
+{
+  Load("worlds/contact_sensors_multiple.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != NULL);
+
+  const std::string modelName("sphere");
+  const math::Vector3 pos(0, 0, 1.8);
+  const math::Vector3 v30;
+  const double radius = 0.5;
+  SpawnSphere(modelName, pos, v30, v30, radius);
+
+  // advertise on "~/model/modify"
+  // so that we can move the sphere
+  transport::PublisherPtr modelPub =
+    this->node->Advertise<msgs::Model>("~/model/modify");
+
+  // Step forward to allow the sphere to fall
+  world->Step(200);
+
+  // Try moving the model
+  auto model = world->GetModel(modelName);
+  ASSERT_TRUE(model != NULL);
+
+  auto pose = model->GetWorldPose();
+  pose.pos.x += 0.2;
+  pose.pos.y += 0.2;
+
+  msgs::Model msg;
+  msg.set_name(modelName);
+  msg.set_id(model->GetId());
+  msgs::Set(msg.mutable_pose(), pose);
+  modelPub->Publish(msg);
+
+  while (pose != model->GetWorldPose())
+  {
+    world->Step(1);
+    common::Time::MSleep(1);
+  }
+
+  world->Step(10);
+
+  // it just needs to exit successfully in order to pass.
+}
+
+TEST_P(ContactSensor, MoveTool)
+{
+  MoveTool(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
