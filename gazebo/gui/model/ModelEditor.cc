@@ -421,3 +421,11 @@ void ModelEditor::ToggleToolbar()
   this->dataPtr->jointTypeAct->setVisible(this->dataPtr->active);
   this->dataPtr->jointSeparatorAct->setVisible(this->dataPtr->active);
 }
+
+/////////////////////////////////////////////////
+void ModelEditor::AppendPluginElement(const std::string &_name,
+    const std::string &_filename, sdf::ElementPtr _element)
+{
+  this->dataPtr->modelPalette->GetModelCreator()->
+      AppendPluginElement(_name, _filename, _element);
+}

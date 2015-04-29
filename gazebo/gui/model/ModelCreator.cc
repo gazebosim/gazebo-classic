@@ -77,6 +77,9 @@ ModelCreator::ModelCreator()
 
   this->jointMaker = new JointMaker();
 
+  this->sdfToAppend.reset(new sdf::Element);
+  this->sdfToAppend->SetName("sdf_to_append");
+
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
   this->inspectAct = new QAction(tr("Open Link Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this,
@@ -1970,6 +1973,16 @@ void ModelCreator::GenerateSDF()
       }
     }
   }
+
+  // Append custom SDF - only plugins for now
+  sdf::ElementPtr pluginElem;
+  if (this->sdfToAppend->HasElement("plugin"))
+     pluginElem = this->sdfToAppend->GetElement("plugin");
+  while (pluginElem)
+  {
+    modelElem->InsertElement(pluginElem->Clone());
+    pluginElem = pluginElem->GetNextElement("plugin");
+  }
 }
 
 /////////////////////////////////////////////////
@@ -2244,8 +2257,38 @@ void ModelCreator::SetModelVisible(rendering::VisualPtr _visual, bool _visible)
     }
   }
 }
+
 /////////////////////////////////////////////////
 ModelCreator::SaveState ModelCreator::GetCurrentSaveState() const
 {
   return this->currentSaveState;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::AppendPluginElement(const std::string &_name,
+    const std::string &_filename, sdf::ElementPtr _sdfElement)
+{
+  // Insert into existing plugin element
+  sdf::ElementPtr pluginElem;
+  if (this->sdfToAppend->HasElement("plugin"))
+     pluginElem = this->sdfToAppend->GetElement("plugin");
+  while (pluginElem)
+  {
+    if (pluginElem->Get<std::string>("name") == _name)
+    {
+      pluginElem->InsertElement(_sdfElement);
+      return;
+    }
+    pluginElem = pluginElem->GetNextElement("plugin");
+  }
+
+  // Create new plugin element
+  pluginElem.reset(new sdf::Element);
+  pluginElem->SetName("plugin");
+  pluginElem->AddAttribute("name", "string", _name, "0", "name");
+  pluginElem->AddAttribute("filename", "string", _filename, "0", "filename");
+
+  pluginElem->InsertElement(_sdfElement);
+
+  this->sdfToAppend->InsertElement(pluginElem);
 }

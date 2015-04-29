@@ -225,6 +225,13 @@ namespace gazebo
       /// \return Current save state.
       public: enum SaveState GetCurrentSaveState() const;
 
+      /// \brief Append plugin element.
+      /// \param[in[ _name
+      /// \param[in[ _filename
+      /// \param[in[ _element
+      public: void AppendPluginElement(const std::string &_name,
+          const std::string &_filename, sdf::ElementPtr _element);
+
       /// \brief Add an entity to the model
       /// \param[in] _sdf SDF describing the entity.
       public: void AddEntity(sdf::ElementPtr _sdf);
@@ -517,6 +524,9 @@ namespace gazebo
 
       /// \brief SDF element of the model on the server.
       private: sdf::ElementPtr serverModelSDF;
+
+      /// \brief SDF element to append in the end.
+      private: sdf::ElementPtr sdfToAppend;
 
       /// \brief A map of all visuals of the model to be edited to their
       /// visibility.

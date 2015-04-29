@@ -59,6 +59,9 @@ namespace gazebo
       /// \param[in] _name Name of the entity.
       public: void RemoveEntity(const std::string &_name);
 
+      public: void AppendPluginElement(const std::string &_name,
+          const std::string &_filename, sdf::ElementPtr _element);
+
       /// \brief Qt callback when the model editor's save action is
       /// triggered.
       private slots: void Save();
