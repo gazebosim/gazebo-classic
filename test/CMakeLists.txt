@@ -32,7 +32,7 @@ set(GTEST_MAIN_LIBRARY "${PROJECT_BINARY_DIR}/test/libgtest_main.a")
 
 # Build ServerFixture library
 add_library(gazebo_test_fixture STATIC ServerFixture.cc ServerFixtureRecord.cc)
-target_link_libraries(gazebo_test_fixture libgazebo)
+target_link_libraries(gazebo_test_fixture libgazebo libgazebo_client)
 gz_install_library(gazebo_test_fixture)
 
 execute_process(COMMAND cmake -E remove_directory ${CMAKE_BINARY_DIR}/test_results)
