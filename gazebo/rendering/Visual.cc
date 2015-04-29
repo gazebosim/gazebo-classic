@@ -2419,9 +2419,9 @@ VisualPtr Visual::GetNthAncestor(unsigned int _n)
 }
 
 //////////////////////////////////////////////////
-unsigned int Visual::GetDepth()
+unsigned int Visual::GetDepth() const
 {
-  VisualPtr p = shared_from_this();
+  boost::shared_ptr<Visual const> p = shared_from_this();
   unsigned int depth = 0;
   while (p->GetParent())
   {

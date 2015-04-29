@@ -419,7 +419,7 @@ namespace gazebo
       /// \brief Get the depth of this visual, where 0 is the depth of the
       /// world visual.
       /// \return This visual's depth.
-      public: unsigned int GetDepth();
+      public: unsigned int GetDepth() const;
 
       /// \brief Get the shader type.
       /// \return String of the shader type: "vertex", "pixel",
