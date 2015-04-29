@@ -1552,7 +1552,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
   if (vis)
   {
-    rendering::VisualPtr topLevelVis = vis->GetFirstAncestorFromRootVisual();
+    rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
 
     // Is link / nested model
     if (this->allLinks.find(topLevelVis->GetName()) !=
@@ -1674,7 +1674,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
     rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
     if (vis && !vis->IsPlane())
     {
-      rendering::VisualPtr topLevelVis = vis->GetFirstAncestorFromRootVisual();
+      rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
 
       // Main window models always handled here
       if (this->allLinks.find(topLevelVis->GetName()) ==

@@ -581,23 +581,28 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     // Root visual
     rendering::VisualPtr rootVis = vis->GetRootVisual();
 
-    // Root visual's imediate child
-    rendering::VisualPtr topLevelVis = vis->GetFirstAncestorFromRootVisual();
+    // Root visual's immediate child
+    rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
 
+    // If the root visual's ID can be found, it is a model in the main window
     if (gui::get_entity_id(rootVis->GetName()))
     {
       // select model
       vis = rootVis;
     }
-    else if (vis->GetParent() != rootVis &&
-        vis->GetParent() != this->dataPtr->scene->GetWorldVisual())
-    {
-      // select link
-      vis = topLevelVis;
-    }
-    else
+    // If it is not a model and its parent is either a direct child or
+    // grandchild of the world, this is a light, so just keep vis = vis
+    else if (vis->GetParent() == rootVis ||
+        vis->GetParent() == this->dataPtr->scene->GetWorldVisual())
     {
       // select light
+    }
+    // Otherwise, this is a visual in the model editor, so we want to get its
+    // top level visual below the root.
+    else
+    {
+      // select link / nested model
+      vis = topLevelVis;
     }
 
     this->dataPtr->mouseMoveVisStartPose = vis->GetWorldPose();
