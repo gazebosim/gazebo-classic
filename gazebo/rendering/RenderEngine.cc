@@ -19,14 +19,21 @@
 # include <QtCore/qglobal.h>
 #endif
 
-#ifndef Q_OS_MAC  // Not Apple
+#if not defined( Q_OS_MAC) && not defined(_WIN32)  // Not Apple or Windows
 # include <X11/Xlib.h>
 # include <X11/Xutil.h>
 # include <GL/glx.h>
 #endif
 
 #include <sys/types.h>
-#include <dirent.h>
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+  #include "gazebo/common/win_dirent.h"
+#else
+  #include <dirent.h>
+#endif
 #include <string>
 #include <iostream>
 
@@ -85,7 +92,7 @@ RenderEngine::~RenderEngine()
 }
 
 //////////////////////////////////////////////////
-void RenderEngine::Load()
+void RenderEngine::Load(bool _server)
 {
   if (!this->CreateContext())
   {
@@ -141,11 +148,23 @@ void RenderEngine::Load()
     this->SetupResources();
   }
 
-  std::stringstream stream;
-  stream << (int32_t)this->dummyWindowId;
+  /*if (_server)
+  {
+  */
+    std::stringstream stream;
+    stream << (int32_t)this->dummyWindowId;
 
-  this->windowManager->CreateWindow(stream.str(), 1, 1);
-  this->CheckSystemCapabilities();
+    this->windowManager->CreateWindow(stream.str(), 1, 1);
+    
+    // this->CheckSystemCapabilities();
+    //this->Init();
+  //}
+  //else
+  //{
+    //this->renderPathType = FORWARD;
+  //}
+    // Setup the available resources
+
 }
 
 //////////////////////////////////////////////////
@@ -154,7 +173,10 @@ ScenePtr RenderEngine::CreateScene(const std::string &_name,
                                    bool _isServer)
 {
   if (this->renderPathType == NONE)
+  {
+    gzerr << "NO RENDER PATH TYPE\n";
     return ScenePtr();
+  }
 
   if (!this->initialized)
   {
@@ -284,8 +306,15 @@ void RenderEngine::PostRender()
 //////////////////////////////////////////////////
 void RenderEngine::Init()
 {
+  this->CheckSystemCapabilities();
+
   if (this->renderPathType == NONE)
+  {
+    gzwarn << "Cannot initialize render engine since "
+           << "render path type is NONE. Ignore this warning if"
+	   << "rendering has been turned off on purpose.\n";
     return;
+  }
 
   this->initialized = false;
 
@@ -371,7 +400,8 @@ void RenderEngine::Fini()
     this->scenes[i].reset();
   this->scenes.clear();
 
-#ifndef Q_OS_MAC
+  // Not Apple or Windows
+#if not defined( Q_OS_MAC) && not defined(_WIN32)
   if (this->dummyDisplay)
   {
     glXDestroyContext(static_cast<Display*>(this->dummyDisplay),
@@ -671,7 +701,7 @@ bool RenderEngine::CreateContext()
 {
   bool result = true;
 
-#ifdef Q_OS_MAC
+#if defined Q_OS_MAC || _WIN32
   this->dummyDisplay = 0;
 #else
   try

@@ -52,7 +52,7 @@ namespace gazebo
     /// \brief Adaptor to Ogre3d
     ///
     /// Provides the interface to load, initialize the rendering engine.
-    class GAZEBO_VISIBLE RenderEngine : public SingletonT<RenderEngine>
+    class GZ_RENDERING_VISIBLE RenderEngine : public SingletonT<RenderEngine>
     {
       /// \enum RenderPathType
       /// \brief The type of rendering path used by the rendering engine.
@@ -78,7 +78,7 @@ namespace gazebo
       private: virtual ~RenderEngine();
 
       /// \brief Load the parameters for Ogre. Load must happen before Init.
-      public: void Load();
+      public: void Load(bool _server = true);
 
       /// \brief Initialize Ogre. Load must happen before Init.
       public: void Init();
