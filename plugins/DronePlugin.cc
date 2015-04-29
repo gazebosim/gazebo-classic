@@ -192,8 +192,8 @@ void DronePlugin::OnUpdate()
   this->targetBaseLinkPose.pos += dt.Double() *
     baseLinkPose.rot.RotateVector(maxVelocity * this->velocity);
 
-  math::Vector3 fakeRpyBodyFrame(20.0 * this->velocity.y,
-   -20.0 * this->velocity.x, 0.0);
+  math::Vector3 fakeRpyBodyFrame(-20.0 * this->velocity.y,
+   20.0 * this->velocity.x, 0.0);
 
   math::Vector3 fakeRpyWorldFrame =
     baseLinkPose.rot.RotateVector(fakeRpyBodyFrame);
