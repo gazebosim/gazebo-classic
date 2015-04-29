@@ -104,6 +104,8 @@ QAction *gazebo::gui::g_viewOculusAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_resetAct = 0;
 GAZEBO_VISIBLE
+QAction *gazebo::gui::g_showToolbarsAct = 0;
+GAZEBO_VISIBLE
 QAction *gazebo::gui::g_fullScreenAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_fpsAct = 0;
