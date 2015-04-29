@@ -488,6 +488,7 @@ void SimbodyPhysics::UpdateCollision()
           // get contact patch to get detailed contacts
           // see https://github.com/simbody/simbody/blob/master/examples/ExampleContactPlayground.cpp#L110
           SimTK::ContactPatch patch;
+          this->system.realize(state, SimTK::Stage::Velocity);
           const bool found =
              this->contact.calcContactPatchDetailsById(
                state, simbodyContact.getContactId(), patch);
@@ -547,8 +548,8 @@ void SimbodyPhysics::UpdateCollision()
               const SimTK::Vec3 offset1 = -detail.getContactPoint()
                 + SimbodyPhysics::Vector3ToVec3(pose1.pos - pose2.pos);
               SimTK::SpatialVec s1cg = SimTK::shiftForceBy(-s2, offset1);
- 
-              /// get torque and force components 
+
+              /// get torque and force components
               SimTK::Vec3 t1cg = s1cg[0];
               SimTK::Vec3 f1cg = s1cg[1];
 
