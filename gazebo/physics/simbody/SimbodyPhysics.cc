@@ -209,6 +209,11 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  // Parent class handles many generic parameters
+  // This should be done first so that the profile settings
+  // can be over-ridden by other message parameters.
+  PhysicsEngine::OnPhysicsMsg(_msg);
+
   if (_msg->has_simbody())
   {
     const msgs::PhysicsSimbody *msgSimbody = &_msg->simbody();
@@ -229,9 +234,6 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
-
-  // Parent class handles many generic parameters
-  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 //////////////////////////////////////////////////

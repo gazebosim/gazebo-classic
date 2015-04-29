@@ -21,7 +21,6 @@
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
-#include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow_TEST.hh"
 
@@ -306,23 +305,22 @@ void MainWindow_TEST::CopyPaste()
       QCoreApplication::processEvents();
       mainWindow->repaint();
     }
+    QVERIFY(gazebo::gui::g_copyAct != NULL);
+    QVERIFY(gazebo::gui::g_pasteAct != NULL);
 
     // Copy the model
-    QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier);
-    QTest::qWait(500);
+    QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier, 100);
 
     // Move to center of the screen
     QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
-    QTest::mouseMove(glWidget, moveTo);
-    QTest::qWait(500);
+    QTest::mouseMove(glWidget, moveTo, 100);
 
     // Paste the model
-    QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier);
-    QTest::qWait(500);
+    QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier, 100);
 
     // Release and spawn the model
-    QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
-    QTest::qWait(500);
+    QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo, 100);
+    QCoreApplication::processEvents();
 
     // Verify there is a clone of the model
     gazebo::rendering::VisualPtr modelVisClone;
@@ -357,22 +355,20 @@ void MainWindow_TEST::CopyPaste()
     QVERIFY(lightVis->GetHighlighted());
 
     // Copy the light
-    QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier);
-    QTest::qWait(500);
+    QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier, 500);
+    QCoreApplication::processEvents();
 
     // Move to center of the screen
     QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
-    QTest::mouseMove(glWidget, moveTo);
-    QTest::qWait(500);
+    QTest::mouseMove(glWidget, moveTo, 500);
+    QCoreApplication::processEvents();
 
     // Paste the light
-    QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier);
-    QTest::qWait(500);
+    QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier, 500);
+    QCoreApplication::processEvents();
 
     // Release and spawn the model
-    QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
-    QTest::qWait(500);
-
+    QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo, 500);
     QCoreApplication::processEvents();
 
     // Verify there is a clone of the light
@@ -409,7 +405,7 @@ void MainWindow_TEST::Wireframe()
 
   node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init();
-  sub = node->Subscribe("~/request", &OnRequest, this);
+  sub = node->Subscribe("~/request", &OnRequest, true);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();

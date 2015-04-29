@@ -1552,7 +1552,7 @@ void World::ProcessFactoryMsgs()
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
     for (auto const &factoryMsg : this->dataPtr->factoryMsgs)
     {
-      this->dataPtr->factorySDF->root->ClearElements();
+      this->dataPtr->factorySDF->Root()->ClearElements();
 
       if (factoryMsg.has_sdf() && !factoryMsg.sdf().empty())
       {
@@ -1585,7 +1585,7 @@ void World::ProcessFactoryMsgs()
           continue;
         }
 
-        this->dataPtr->factorySDF->root->InsertElement(
+        this->dataPtr->factorySDF->Root()->InsertElement(
             model->GetSDF()->Clone());
 
         std::string newName = model->GetName() + "_clone";
@@ -1597,7 +1597,7 @@ void World::ProcessFactoryMsgs()
           i++;
         }
 
-        this->dataPtr->factorySDF->root->GetElement("model")->GetAttribute(
+        this->dataPtr->factorySDF->Root()->GetElement("model")->GetAttribute(
             "name")->Set(newName);
       }
       else
@@ -1614,10 +1614,10 @@ void World::ProcessFactoryMsgs()
         if (base)
         {
           sdf::ElementPtr elem;
-          if (this->dataPtr->factorySDF->root->GetName() == "sdf")
-            elem = this->dataPtr->factorySDF->root->GetFirstElement();
+          if (this->dataPtr->factorySDF->Root()->GetName() == "sdf")
+            elem = this->dataPtr->factorySDF->Root()->GetFirstElement();
           else
-            elem = this->dataPtr->factorySDF->root;
+            elem = this->dataPtr->factorySDF->Root();
 
           base->UpdateParameters(elem);
         }
@@ -1628,7 +1628,7 @@ void World::ProcessFactoryMsgs()
         bool isModel = false;
         bool isLight = false;
 
-        sdf::ElementPtr elem = this->dataPtr->factorySDF->root->Clone();
+        sdf::ElementPtr elem = this->dataPtr->factorySDF->Root()->Clone();
 
         if (elem->HasElement("world"))
           elem = elem->GetElement("world");
@@ -1651,14 +1651,14 @@ void World::ProcessFactoryMsgs()
         else
         {
           gzerr << "Unable to find a model, light, or actor in:\n";
-          this->dataPtr->factorySDF->root->PrintValues("");
+          this->dataPtr->factorySDF->Root()->PrintValues("");
           continue;
         }
 
         if (!elem)
         {
           gzerr << "Invalid SDF:";
-          this->dataPtr->factorySDF->root->PrintValues("");
+          this->dataPtr->factorySDF->Root()->PrintValues("");
           continue;
         }
 
@@ -1826,7 +1826,7 @@ bool World::OnLog(std::ostringstream &_stream)
   // Save the entire state when its the first call to OnLog.
   if (util::LogRecord::Instance()->GetFirstUpdate())
   {
-    this->UpdateStateSDF();
+    this->dataPtr->sdf->Update();
     _stream << "<sdf version ='";
     _stream << SDF_VERSION;
     _stream << "'>\n";
@@ -1968,6 +1968,8 @@ void World::PublishWorldStats()
 
   this->dataPtr->worldStatsMsg.set_iterations(this->dataPtr->iterations);
   this->dataPtr->worldStatsMsg.set_paused(this->IsPaused());
+  this->dataPtr->worldStatsMsg.set_log_playback(
+      util::LogPlay::Instance()->IsOpen());
 
   if (this->dataPtr->statPub && this->dataPtr->statPub->HasConnections())
     this->dataPtr->statPub->Publish(this->dataPtr->worldStatsMsg);
