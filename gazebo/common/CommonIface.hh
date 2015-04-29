@@ -72,9 +72,10 @@ namespace gazebo
     std::string get_sha1(const T &_buffer);
 
     /// \brief Windows equivalent of getEnv.
-    /// Should only be called when using windows.
+    /// Should only be called when using Windows.
     /// \param[in] _name Name of the environment variable to get.
-    /// \return Environment variable contents, or NULL on error.
+    /// \return Environment variable contents, or NULL on error or
+    /// if used from Linux or Mac.
     GZ_COMMON_VISIBLE
     const char *getEnvWin(const char *_name);
     /// \}
