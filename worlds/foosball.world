@@ -3,6 +3,7 @@
   <world name="default">
 
     <scene>
+      <!-- The sky -->
       <sky>
         <clouds>
           <speed>12</speed>
@@ -21,6 +22,7 @@
       <uri>model://sun</uri>
     </include>
 
+    <!-- The environment -->
     <include>
       <uri>model://starting_pen</uri>
       <pose>-5.688061 -0.096423 0 0 0 -1.570796</pose>
@@ -68,20 +70,19 @@
       <name>foosball_ball</name>
     </include>
 
-    <!-- Blue player view point using Oculus -->
-    <model name='camera'>
-      <static>true</static>
+    <!-- Red player view point using Oculus -->
+    <include>
       <pose>0 1.2 3 0 0.4 -1.57</pose>
-      <link name='link'>
-         <visual name='visual'>
-          <geometry>
-            <box>
-              <size>0.1 0.1 0.1</size>
-            </box>
-          </geometry>
-        </visual>
-      </link>
-    </model>
+      <uri>model://foosball_red_head</uri>
+      <name>camera2</name>
+    </include>
+
+    <!-- Blue player view point using Oculus -->
+    <include>
+      <pose>0 -1.2 3 0 0.4 1.57</pose>
+      <uri>model://foosball_blue_head</uri>
+      <name>camera</name>
+    </include>
 
     <!-- Load the plugin for Razer Hydra -->
     <plugin name="hydra" filename="libHydraPlugin.so"></plugin>
