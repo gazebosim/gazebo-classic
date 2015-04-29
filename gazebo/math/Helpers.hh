@@ -184,7 +184,7 @@ namespace gazebo
       if (!std::isinf(_a))
       {
         return boost::math::round(
-            _a * pow(10, _precision)) / pow(10, _precision);
+          _a * pow(10, _precision)) / pow(10, _precision);
       }
       else
       {
