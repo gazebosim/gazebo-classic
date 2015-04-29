@@ -823,7 +823,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
         // Make it a dotted quad
         char ipv4Str[3*4+3+1];
 
-        sprintf(ipv4Str, "%d.%d.%d.%d",
+        snprintf(ipv4Str, sizeof(ipv4Str), "%d.%d.%d.%d",
           sockaddress->sin_addr.S_un.S_un_b.s_b1,
           sockaddress->sin_addr.S_un.S_un_b.s_b2,
           sockaddress->sin_addr.S_un.S_un_b.s_b3,
