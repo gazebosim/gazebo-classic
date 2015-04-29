@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class MeshCSG MeshCSG.hh common/common.hh
     /// \brief Creates CSG meshes
-    class GAZEBO_VISIBLE MeshCSG
+    class GZ_COMMON_VISIBLE MeshCSG
     {
       /// \brief An enumeration of the boolean operations
       public: enum BooleanOperation {UNION, INTERSECTION, DIFFERENCE};
