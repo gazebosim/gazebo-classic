@@ -56,11 +56,11 @@ bool sensors::init()
     return true;
 
   // The rendering engine will run headless
-  /*if (!gazebo::rendering::init())
+  if (!gazebo::rendering::init())
   {
     gzthrow("Unable to intialize the rendering engine");
     return false;
-  }*/
+  }
 
   sensors::SensorManager::Instance()->Init();
 
