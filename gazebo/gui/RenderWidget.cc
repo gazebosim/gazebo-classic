@@ -45,15 +45,15 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
-  QFrame *toolFrame = new QFrame;
-  toolFrame->setObjectName("toolFrame");
-  toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+  this->toolFrame = new QFrame;
+  this->toolFrame->setObjectName("toolFrame");
+  this->toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
   this->toolbar = new QToolBar;
   QHBoxLayout *toolLayout = new QHBoxLayout;
   toolLayout->setContentsMargins(0, 0, 0, 0);
 
-  QActionGroup *actionGroup = new QActionGroup(toolFrame);
+  QActionGroup *actionGroup = new QActionGroup(this->toolFrame);
   if (g_arrowAct)
   {
     actionGroup->addAction(g_arrowAct);
@@ -128,7 +128,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   toolLayout->addSpacing(10);
   toolLayout->addWidget(this->toolbar);
-  toolFrame->setLayout(toolLayout);
+  this->toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
@@ -155,7 +155,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   QFrame *render3DFrame = new QFrame;
   render3DFrame->setObjectName("render3DFrame");
   QVBoxLayout *render3DLayout = new QVBoxLayout;
-  render3DLayout->addWidget(toolFrame);
+  render3DLayout->addWidget(this->toolFrame);
   render3DLayout->addWidget(this->glWidget);
   render3DLayout->setContentsMargins(0, 0, 0, 0);
   render3DLayout->setSpacing(0);
@@ -326,11 +326,11 @@ void RenderWidget::ShowToolbar(const bool _show)
   {
     if (_show)
     {
-      this->toolbar->show();
+      this->toolFrame->show();
     }
     else
     {
-      this->toolbar->hide();
+      this->toolFrame->hide();
     }
   }
 }

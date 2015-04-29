@@ -65,7 +65,7 @@ namespace gazebo
 
     /// \class Image Image.hh common/common.hh
     /// \brief Encapsulates an image
-    class GAZEBO_VISIBLE Image
+    class GZ_COMMON_VISIBLE Image
     {
       /// \brief Pixel formats enumeration
       public: enum PixelFormat
