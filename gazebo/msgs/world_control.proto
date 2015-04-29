@@ -4,6 +4,7 @@ package gazebo.msgs;
 /// \interface WorldControl
 /// \brief A message that allows for control of world functions
 
+import "time.proto";
 import "world_reset.proto";
 
 message WorldControl
@@ -13,4 +14,5 @@ message WorldControl
   optional sint32 multi_step    = 3;
   optional WorldReset reset     = 4;
   optional uint32 seed          = 5;
+  optional Time go_to           = 6;
 }

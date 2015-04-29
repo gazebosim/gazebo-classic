@@ -260,6 +260,8 @@ uintmax_t LogPlay::GetFileSize() const
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
+  std::lock_guard<std::mutex> lock(this->mutex);
+
   std::string startMarker = "<sdf ";
   std::string endMarker = "</sdf>";
   size_t start = this->currentChunk.find(startMarker);
@@ -302,6 +304,8 @@ bool LogPlay::Step(std::string &_data)
 /////////////////////////////////////////////////
 bool LogPlay::Rewind()
 {
+  std::lock_guard<std::mutex> lock(this->mutex);
+
   this->currentChunk.clear();
   this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
   if (!logCurrXml)

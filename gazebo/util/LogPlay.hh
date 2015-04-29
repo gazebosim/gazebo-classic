@@ -20,9 +20,10 @@
 
 #include <tinyxml.h>
 
-#include <list>
-#include <string>
 #include <fstream>
+#include <list>
+#include <mutex>
+#include <string>
 
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/Time.hh"
@@ -175,6 +176,9 @@ namespace gazebo
       private: std::string encoding;
 
       private: std::string currentChunk;
+
+      /// \brief A mutex to avoid race conditions.
+      private: std::mutex mutex;
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogPlay>;

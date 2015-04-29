@@ -583,7 +583,19 @@ void MainWindow::Pause()
 void MainWindow::Step()
 {
   msgs::WorldControl msg;
-  msg.set_multi_step(this->inputStepSize);
+
+  int secs;
+  int nsecs;
+  std::cout << "Secs: ";
+  std::cin >> secs;
+  std::cout << std::endl;
+  std::cout << "NSecs: ";
+  std::cin >> nsecs;
+  std::cout << std::endl;
+
+  msg.mutable_go_to()->set_sec(secs);
+  msg.mutable_go_to()->set_nsec(nsecs);
+  //msg.set_multi_step(this->inputStepSize);
 
   this->worldControlPub->Publish(msg);
 }
