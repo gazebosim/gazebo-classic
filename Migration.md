@@ -2,6 +2,11 @@
 
 ### Modifications
 
+1. **gazebo/msgs/world_control.proto**
+    + The multi_step field now uses a sint32 type instead of uint32 to allow
+    negative values. A negative multi_step value will step back a simulation
+    while playing back a log file.
+
 1. **gazebo/common/MeshManager.hh**
     + ***Removed:*** void CreateExtrudedPolyline(const std::string &_name, const std::vector<math::Vector2d> &_vertices, const double &_height, const math::Vector2d &_uvCoords)
     + ***Replacement:*** void CreateExtrudedPolyline(const std::string &_name, const const std::vector<std::vector<math::Vector2d> > &_vertices, const double &_height, const math::Vector2d &_uvCoords)
