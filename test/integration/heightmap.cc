@@ -202,6 +202,16 @@ void HeightmapTest::Volume(const std::string &_physicsEngine)
   {
     // SimbodyHeightmapShape unimplemented. ComputeVolume actually returns 0 as
     // an error code, which is the correct answer, but we'll skip it for now.
+    gzerr << "Aborting test for "
+          << _physicsEngine
+          << std::endl;
+    return;
+  }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for "
+          << _physicsEngine
+          ", see issue #909" << std::endl;
     return;
   }
 
