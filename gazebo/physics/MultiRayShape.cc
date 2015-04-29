@@ -284,3 +284,9 @@ void MultiRayShape::FillMsg(msgs::Geometry &/*_msg*/)
 void MultiRayShape::ProcessMsg(const msgs::Geometry &/*_msg*/)
 {
 }
+
+//////////////////////////////////////////////////
+double MultiRayShape::ComputeVolume() const
+{
+  return 0;
+}
