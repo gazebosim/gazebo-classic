@@ -3,6 +3,9 @@
 1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
     * [Pull request #1606](https://bitbucket.org/osrf/gazebo/pull-request/1606)
 
+1. Add VisualType enum to Visual and clean up visuals when entity is deleted.
+    * [Pull request #1614](https://bitbucket.org/osrf/gazebo/pull-request/1614)
+
 1. New accessors in LogPlay class.
     * [Pull request #1577](https://bitbucket.org/osrf/gazebo/pull-request/1577)
 
