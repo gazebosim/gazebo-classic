@@ -58,37 +58,22 @@ void ApplyWrenchVisual::Fini()
   if (!manager)
     return;
 
-  std::string name = this->GetName()+"__FORCE_SHAFT__";
-  if (manager->hasEntity(name))
-    manager->destroyMovableObject(manager->getEntity(name));
+  std::vector<std::string> suffixes = {
+      "_FORCE_SHAFT_",
+      "_FORCE_HEAD_",
+      "_TORQUE_TUBE_",
+      "_TORQUE_HEAD_"};
 
-  name = this->GetName()+"__FORCE_SHAFT_NODE__";
-  if (manager->hasSceneNode(name))
-    manager->destroySceneNode(manager->getSceneNode(name));
+  for (auto suffix : suffixes)
+  {
+    std::string name = this->GetName() + suffix;
+    if (manager->hasEntity(name))
+      manager->destroyMovableObject(manager->getEntity(name));
 
-  name = this->GetName()+"__FORCE_HEAD__";
-  if (manager->hasEntity(name))
-    manager->destroyMovableObject(manager->getEntity(name));
-
-  name = this->GetName()+"__FORCE_HEAD_NODE__";
-  if (manager->hasSceneNode(name))
-    manager->destroySceneNode(manager->getSceneNode(name));
-
-  name = this->GetName()+"__TORQUE_TUBE__";
-  if (manager->hasEntity(name))
-    manager->destroyMovableObject(manager->getEntity(name));
-
-  name = this->GetName()+"__TORQUE_TUBE_NODE__";
-  if (manager->hasSceneNode(name))
-    manager->destroySceneNode(manager->getSceneNode(name));
-
-  name = this->GetName()+"__TORQUE_HEAD__";
-  if (manager->hasEntity(name))
-    manager->destroyMovableObject(manager->getEntity(name));
-
-  name = this->GetName()+"__TORQUE_HEAD_NODE__";
-  if (manager->hasSceneNode(name))
-    manager->destroySceneNode(manager->getSceneNode(name));
+    name += "NODE_";
+    if (manager->hasSceneNode(name))
+      manager->destroySceneNode(manager->getSceneNode(name));
+  }
 }
 
 ///////////////////////////////////////////////////
@@ -107,7 +92,7 @@ void ApplyWrenchVisual::Load()
 
   // Force visual
   dPtr->forceVisual.reset(new rendering::Visual(
-      this->GetName() + "__FORCE_VISUAL__", shared_from_this()));
+      this->GetName() + "_FORCE_VISUAL_", shared_from_this()));
   dPtr->forceVisual->Load();
 
   // Force shaft
@@ -115,13 +100,13 @@ void ApplyWrenchVisual::Load()
 
   Ogre::MovableObject *shaftObj =
       (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      this->GetName()+"__FORCE_SHAFT__", "axis_shaft"));
+      this->GetName()+"_FORCE_SHAFT_", "axis_shaft"));
   shaftObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->forceVisual->GetName())));
 
   Ogre::SceneNode *shaftNode =
       dPtr->forceVisual->GetSceneNode()->createChildSceneNode(
-      this->GetName() + "__FORCE_SHAFT_NODE__");
+      this->GetName() + "_FORCE_SHAFT_NODE_");
   shaftNode->attachObject(shaftObj);
   shaftNode->setPosition(0, 0, 0.1);
 
@@ -130,13 +115,13 @@ void ApplyWrenchVisual::Load()
 
   Ogre::MovableObject *headObj =
       (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      this->GetName()+"__FORCE_HEAD__", "axis_head"));
+      this->GetName()+"_FORCE_HEAD_", "axis_head"));
   headObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->forceVisual->GetName())));
 
   Ogre::SceneNode *headNode =
       dPtr->forceVisual->GetSceneNode()->createChildSceneNode(
-      this->GetName() + "__FORCE_HEAD_NODE__");
+      this->GetName() + "_FORCE_HEAD_NODE_");
   headNode->attachObject(headObj);
   headNode->setPosition(0, 0, 0.24);
 
@@ -145,7 +130,7 @@ void ApplyWrenchVisual::Load()
 
   // Torque visual
   dPtr->torqueVisual.reset(new rendering::Visual(
-      this->GetName() + "__TORQUE_VISUAL__", shared_from_this()));
+      this->GetName() + "_TORQUE_VISUAL_", shared_from_this()));
   dPtr->torqueVisual->Load();
 
   // Torque tube
@@ -155,13 +140,13 @@ void ApplyWrenchVisual::Load()
 
   Ogre::MovableObject *tubeObj =
       (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      this->GetName()+"__TORQUE_TUBE__", "torque_tube"));
+      this->GetName()+"_TORQUE_TUBE_", "torque_tube"));
   tubeObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->torqueVisual->GetName())));
 
   Ogre::SceneNode *tubeNode =
       dPtr->torqueVisual->GetSceneNode()->createChildSceneNode(
-      this->GetName() + "__TORQUE_TUBE_NODE__");
+      this->GetName() + "_TORQUE_TUBE_NODE_");
   tubeNode->attachObject(tubeObj);
 
   // Torque arrow
@@ -169,13 +154,13 @@ void ApplyWrenchVisual::Load()
 
   Ogre::MovableObject *torqueHeadObj =
       (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      this->GetName()+"__TORQUE_HEAD__", "axis_head"));
+      this->GetName()+"_TORQUE_HEAD_", "axis_head"));
   torqueHeadObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->torqueVisual->GetName())));
 
   Ogre::SceneNode *torqueHeadNode =
       dPtr->torqueVisual->GetSceneNode()->createChildSceneNode(
-      this->GetName() + "__TORQUE_HEAD_NODE__");
+      this->GetName() + "_TORQUE_HEAD_NODE_");
   torqueHeadNode->attachObject(torqueHeadObj);
   torqueHeadNode->setScale(3, 3, 1);
   torqueHeadNode->setPosition(-0.04, 0.125, 0);

@@ -710,7 +710,10 @@ void ApplyWrenchDialog::SetForcePos(const math::Vector3 &_forcePos)
 
   // Visuals
   if (!this->dataPtr->applyWrenchVisual)
+  {
+    gzwarn << "No wrench visual found, so it won't be updated" << std::endl;
     return;
+  }
 
   this->dataPtr->applyWrenchVisual->SetForcePos(this->dataPtr->forcePosVector);
 }
@@ -728,7 +731,10 @@ void ApplyWrenchDialog::SetForce(const math::Vector3 &_force)
 
   // Visuals
   if (!this->dataPtr->applyWrenchVisual)
+  {
+    gzwarn << "No wrench visual found, so it won't be updated" << std::endl;
     return;
+  }
 
   this->dataPtr->applyWrenchVisual->SetForce(_force);
 }
@@ -746,7 +752,10 @@ void ApplyWrenchDialog::SetTorque(const math::Vector3 &_torque)
 
   // Visuals
   if (!this->dataPtr->applyWrenchVisual)
+  {
+    gzwarn << "No wrench visual found, so it won't be updated" << std::endl;
     return;
+  }
 
   this->dataPtr->applyWrenchVisual->SetTorque(_torque);
 }
@@ -758,7 +767,10 @@ void ApplyWrenchDialog::SetCoM(const math::Vector3 &_com)
 
   // Visuals
   if (!this->dataPtr->applyWrenchVisual)
+  {
+    gzwarn << "No wrench visual found, so it won't be updated" << std::endl;
     return;
+  }
 
   this->dataPtr->applyWrenchVisual->SetCoM(this->dataPtr->comVector);
 }
@@ -824,8 +836,8 @@ void ApplyWrenchDialog::AttachVisuals()
 
   if (!this->dataPtr->applyWrenchVisual)
   {
-    gzerr << "Failed to attach visual. Closing dialog." << std::endl;
-    this->Fini();
+    gzwarn << "Failed to attach wrench visual. " <<
+        "Dialog will work without it." << std::endl;
   }
 
   // Set COM
