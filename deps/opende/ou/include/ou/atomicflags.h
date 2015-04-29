@@ -32,7 +32,7 @@
 #include <ou/atomic.h>
 #include <ou/assert.h>
 #include <ou/namespace.h>
-#include <ou/ou_dll.h>
+#include <gazebo/util/system.hh>
 
 
 BEGIN_NAMESPACE_OU()
@@ -47,7 +47,7 @@ BEGIN_NAMESPACE_OU()
  *	knowledge in field, of course).
  */
 
-class OU_VISIBLE CAtomicFlags
+class GAZEBO_VISIBLE CAtomicFlags
 {
 public:
 	_OU_INLINE _OU_CONVENTION_METHOD CAtomicFlags():

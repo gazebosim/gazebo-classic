@@ -33,10 +33,7 @@
 #include "lcp.h"
 #include "util.h"
 
-#ifndef _WIN32
-  #include <sys/time.h>
-#endif
-
+#include <sys/time.h>
 #include "quickstep_util.h"
 #include "quickstep_cg_lcp.h"
 #include "quickstep_pgs_lcp.h"

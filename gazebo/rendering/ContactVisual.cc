@@ -41,8 +41,6 @@ ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
   ContactVisualPrivate *dPtr =
       reinterpret_cast<ContactVisualPrivate *>(this->dataPtr);
 
-  dPtr->type = VT_PHYSICS;
-
   dPtr->receivedMsg = false;
 
   dPtr->node = transport::NodePtr(new transport::Node());

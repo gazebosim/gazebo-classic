@@ -31,9 +31,6 @@ using namespace rendering;
 InertiaVisual::InertiaVisual(const std::string &_name, VisualPtr _vis)
   : Visual(*new InertiaVisualPrivate, _name, _vis, false)
 {
-  InertiaVisualPrivate *dPtr =
-      reinterpret_cast<InertiaVisualPrivate *>(this->dataPtr);
-  dPtr->type = VT_PHYSICS;
 }
 
 /////////////////////////////////////////////////

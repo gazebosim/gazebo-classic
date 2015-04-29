@@ -196,8 +196,7 @@ namespace gazebo
                     this->myDataPtr->connections.begin();
                     iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  if (iter->second)
-                    (*iter->second)();
+                  (*iter->second)();
                 }
               }
 
@@ -339,8 +338,7 @@ namespace gazebo
                     this->myDataPtr->connections.begin();
                     iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  if (iter->second)
-                    (*iter->second)(_p);
+                  (*iter->second)(_p);
                 }
               }
 
@@ -356,8 +354,7 @@ namespace gazebo
                     this->myDataPtr->connections.begin();
                     iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  if (iter->second)
-                    (*iter->second)(_p1, _p2);
+                  (*iter->second)(_p1, _p2);
                 }
               }
 
@@ -374,8 +371,7 @@ namespace gazebo
                     this->myDataPtr->connections.begin();
                       iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  if (iter->second)
-                    (*iter->second)(_p1, _p2, _p3);
+                  (*iter->second)(_p1, _p2, _p3);
                 }
               }
 
@@ -394,8 +390,7 @@ namespace gazebo
                     this->myDataPtr->connections.begin();
                         iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  if (iter->second)
-                    (*iter->second)(_p1, _p2, _p3, _p4);
+                  (*iter->second)(_p1, _p2, _p3, _p4);
                 }
               }
 
@@ -416,8 +411,7 @@ namespace gazebo
                     this->myDataPtr->connections.begin();
                           iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  if (iter->second)
-                    (*iter->second)(_p1, _p2, _p3, _p4, _p5);
+                  (*iter->second)(_p1, _p2, _p3, _p4, _p5);
                 }
               }
 
@@ -440,8 +434,7 @@ namespace gazebo
                     this->myDataPtr->connections.begin();
                     iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  if (iter->second)
-                    (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6);
+                  (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6);
                 }
               }
 
@@ -464,8 +457,7 @@ namespace gazebo
                     this->myDataPtr->connections.begin();
                     iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  if (iter->second)
-                    (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
+                  (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
                 }
               }
 
@@ -490,8 +482,7 @@ namespace gazebo
                     this->myDataPtr->connections.begin();
                     iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  if (iter->second)
-                    (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
+                  (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
                 }
               }
 
@@ -518,8 +509,7 @@ namespace gazebo
                 this->myDataPtr->connections.begin();
                 iter != this->myDataPtr->connections.end(); ++iter)
             {
-              if (iter->second)
-                (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
+              (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
             }
           }
 
@@ -547,11 +537,8 @@ namespace gazebo
                     this->myDataPtr->connections.begin();
                     iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  if (iter->second)
-                  {
-                    (*iter->second)(_p1, _p2, _p3, _p4, _p5,
+                  (*iter->second)(_p1, _p2, _p3, _p4, _p5,
                       _p6, _p7, _p8, _p9, _p10);
-                  }
                 }
               }
 
@@ -627,13 +614,7 @@ namespace gazebo
     void EventT<T>::Disconnect(int _id)
     {
       boost::mutex::scoped_lock lock(this->myDataPtr->connectionsEraseMutex);
-      auto it = this->myDataPtr->connections.find(_id);
-      if (it != this->myDataPtr->connections.end())
-      {
-        delete it->second;
-        it->second = NULL;
-        this->myDataPtr->connectionsToErase.push_back(_id);
-      }
+      this->myDataPtr->connectionsToErase.push_back(_id);
     }
 
     /// \brief Cleanup disconnected connections.
@@ -652,6 +633,7 @@ namespace gazebo
           this->myDataPtr->connections.find(*iter);
         if (iter2 != this->myDataPtr->connections.end())
         {
+          delete iter2->second;
           this->myDataPtr->connections.erase(iter2);
         }
       }

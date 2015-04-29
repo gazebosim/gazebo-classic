@@ -35,7 +35,6 @@ ArrowVisual::ArrowVisual(const std::string &_name, VisualPtr _vis)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
-  dPtr->type = VT_GUI;
   dPtr->headNode = NULL;
   dPtr->shaftNode = NULL;
   dPtr->rotationNode = NULL;

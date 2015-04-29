@@ -32,8 +32,14 @@ void InsertModelTest::ReadPermissions()
 
   this->Load("worlds/empty.world", false, false, true);
 
+  gazebo::gui::MainWindow mainWindow;
+
+  mainWindow.Load();
+  mainWindow.Init();
+
+  // wait a bit for the event to fire (?)
   gazebo::gui::InsertModelWidget *insertModelWidget =
-      new gazebo::gui::InsertModelWidget();
+      mainWindow.findChild<gazebo::gui::InsertModelWidget *>("insertModel");
 
   // Create files in a temporary directory and set permissions accordingly
   boost::filesystem::path testDir = boost::filesystem::temp_directory_path() /
@@ -125,6 +131,8 @@ void InsertModelTest::ReadPermissions()
 
     boost::filesystem::permissions(modelConfig, boost::filesystem::all_all);
   }
+
+  mainWindow.close();
 
   // Delete all test files
   boost::filesystem::remove_all(testDir);

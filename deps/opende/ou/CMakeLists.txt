@@ -12,13 +12,8 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/deps/opende/ou/include
 )
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -DdNODEBUG -DdDOUBLE -DHAVE_CONFIG_H -DPIC -D_OU_NAMESPACE=gazebo_odeou -DBUILDING_DLL_OU")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -DdNODEBUG -DdDOUBLE -DHAVE_CONFIG_H -DPIC -D_OU_NAMESPACE=gazebo_odeou")
 
-if (WIN32)
-  add_library(gazebo_opende_ou SHARED ${sources})
-else()
-  gz_add_library(gazebo_opende_ou ${sources})
-endif()
-
+gz_add_library(gazebo_opende_ou ${sources})
 #target_link_libraries(gazebo_fcl gazebo_ccd gazebo_ann)
 gz_install_library(gazebo_opende_ou)

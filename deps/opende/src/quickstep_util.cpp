@@ -30,11 +30,7 @@
 #include "objects.h"
 #include "joints/joint.h"
 #include "util.h"
-
-#ifndef _WIN32
-  #include <sys/time.h>
-#endif
-
+#include <sys/time.h>
 #include "quickstep_util.h"
 
 using namespace ode;

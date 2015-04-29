@@ -30,9 +30,6 @@ using namespace rendering;
 JointVisual::JointVisual(const std::string &_name, VisualPtr _vis)
   : Visual(*new JointVisualPrivate, _name, _vis, false)
 {
-  JointVisualPrivate *dPtr =
-      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
-  dPtr->type = VT_PHYSICS;
 }
 
 /////////////////////////////////////////////////
@@ -94,16 +91,6 @@ void JointVisual::Load(ConstJointPtr &_msg)
     dPtr->arrowVisual = this->CreateAxis(msgs::Convert(axis1Msg.xyz()),
         axis1Msg.use_parent_model_frame(), _msg->type());
   }
-
-  // Scale according to the link it is attached to
-  double linkSize = std::max(0.1,
-      dPtr->parent->GetBoundingBox().GetSize().GetLength());
-  dPtr->scaleToLink = math::Vector3(linkSize * 0.7,
-                                    linkSize * 0.7,
-                                    linkSize * 0.7);
-  this->SetScale(dPtr->scaleToLink);
-  if (dPtr->parentAxisVis)
-    dPtr->parentAxisVis->SetScale(dPtr->scaleToLink);
 
   this->GetSceneNode()->setInheritScale(false);
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -278,7 +265,6 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
           msgs::Convert(_msg->pose()) + this->GetParent()->GetWorldPose());
 
       dPtr->parentAxisVis = jointVis;
-      dPtr->parentAxisVis->SetScale(dPtr->scaleToLink);
 
       // Previously had 1 axis, which becomes axis 2 now
       if (dPtr->arrowVisual)

@@ -33,7 +33,6 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 
-#include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -164,9 +163,6 @@ namespace gazebo
 
       /// \brief Visibility flags of the visual.
       public: uint32_t visibilityFlags;
-
-      /// \brief type
-      public: Visual::VisualType type;
     };
     /// \}
   }

@@ -14,6 +14,7 @@ add_subdirectory(skyx)
 add_subdirectory(selection_buffer)
 
 set (sources
+  ApplyWrenchVisual.cc
   ArrowVisual.cc
   AxisVisual.cc
   Camera.cc
@@ -59,6 +60,7 @@ set (sources
 )
 
 set (headers
+  ApplyWrenchVisual.hh
   ArrowVisual.hh
   AxisVisual.hh
   Camera.hh
@@ -114,7 +116,8 @@ if (HAVE_OCULUS)
   )
 endif ()
 
-set (gtest_sources)
+set (gtest_sources
+)
 
 gz_build_tests(${gtest_sources})
 
@@ -123,7 +126,6 @@ set (gtest_sources_dri
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
   JointVisual_TEST.cc
-  Scene_TEST.cc
   SelectionObj_TEST.cc
   SonarVisual_TEST.cc
   TransmitterVisual_TEST.cc

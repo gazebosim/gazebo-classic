@@ -93,15 +93,7 @@ Logger::Buffer::Buffer(LogType _type, int _color)
 /////////////////////////////////////////////////
 Logger::Buffer::~Buffer()
 {
-  // Can't throw from a destructor
-  try
-  {
-    this->pubsync();
-  }
-  catch(...)
-  {
-    std::cerr << "Exception thrown while pubsync'ing Buffer" << std::endl;
-  }
+  this->pubsync();
 }
 
 /////////////////////////////////////////////////
@@ -259,15 +251,8 @@ FileLogger::Buffer::Buffer(const std::string &_filename)
 /////////////////////////////////////////////////
 FileLogger::Buffer::~Buffer()
 {
-  try
-  {
-    if (this->stream)
-      static_cast<std::ofstream*>(this->stream)->close();
-  }
-  catch(...)
-  {
-    std::cerr << "Exception thrown while closing Buffer" << std::endl;
-  }
+  if (this->stream)
+    static_cast<std::ofstream*>(this->stream)->close();
 }
 
 /////////////////////////////////////////////////

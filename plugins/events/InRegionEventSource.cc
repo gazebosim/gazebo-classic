@@ -69,29 +69,6 @@ void InRegionEventSource::Init()
     gzerr << this->name << ": Region '" << this->regionName
         << "' does not exist" << std::endl;
   }
-
-  this->Info();
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-void InRegionEventSource::Info() const
-{
-  std::stringstream ss;
-  ss << "InRegionEventSource "
-      << " model " << this->modelName << "  region [" << this->regionName
-      << "]" << std::endl;
-
-  for (auto v: this->region->volumes)
-  {
-    ss << "  Min ";
-    ss << "[" << v->min.x << ", " << v->min.y << ", " << v->min.z << "]";
-    ss << std::endl;
-    ss << "  Max ";
-    ss << "[" << v->max.x << ", " << v->max.y << ", " << v->max.z << "]\n";
-  }
-  ss << "  inside: " << this->isInside << std::endl;
-  gzmsg << ss.str();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,11 +83,9 @@ void InRegionEventSource::Update()
 
   math::Vector3 point = this->model->GetWorldPose().pos;
   bool oldState = this->isInside;
-  bool currentState = this->region->PointInRegion(point);
-
-  if (oldState != currentState)
+  this->isInside = this->region->PointInRegion(point);
+  if (oldState != this->isInside)
   {
-    this->isInside = currentState;
     std::string json = "{";
     if (this->isInside)
     {
@@ -135,10 +110,9 @@ Volume::~Volume()
 ////////////////////////////////////////////////////////////////////////////////
 bool Volume::PointInVolume(const math::Vector3 &_p) const
 {
-  bool r = _p.x >= this->min.x && _p.x <= this->max.x &&
-           _p.y >= this->min.y && _p.y <= this->max.y &&
-           _p.z >= this->min.z && _p.z <= this->max.z;
-  return r;
+  return _p.x >= this->min.x && _p.x <= this->max.x &&
+         _p.y >= this->min.y && _p.y <= this->max.y &&
+         _p.z >= this->min.z && _p.z <= this->max.z;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

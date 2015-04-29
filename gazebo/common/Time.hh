@@ -428,26 +428,24 @@ namespace gazebo
       /// preserve the internal seconds and nanoseconds separation
       private: inline void Correct()
                {
-                 const int32_t nsInSec = 1000000000;
                  // In the case sec and nsec have different signs, normalize
                  if (this->sec > 0 && this->nsec < 0)
                  {
-                   int32_t n = abs(this->nsec / nsInSec) + 1;
+                   int32_t n = abs(this->nsec / 1e9) + 1;
                    this->sec -= n;
-                   this->nsec += n * nsInSec;
+                   this->nsec += n * 1e9;
                  }
                  if (this->sec < 0 && this->nsec > 0)
                  {
-                   int32_t n = abs(this->nsec / nsInSec) + 1;
+                   int32_t n = abs(this->nsec / 1e9) + 1;
                    this->sec += n;
-                   this->nsec -= n * nsInSec;
+                   this->nsec -= n * 1e9;
                  }
 
                  // Make any corrections
-                 this->sec += this->nsec / nsInSec;
-                 this->nsec = this->nsec % nsInSec;
+                 this->sec += this->nsec / static_cast<int32_t>(1e9);
+                 this->nsec = this->nsec % static_cast<int32_t>(1e9);
                }
-
       private: static struct timespec clockResolution;
     };
     /// \}

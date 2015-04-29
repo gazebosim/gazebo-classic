@@ -318,9 +318,6 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   {
     EXPECT_LT(angularMomentumError.Mag().Map()[stat], g_tolerance * 10);
   }
-
-  RecordProperty("engine", _physicsEngine);
-  this->Record("angularMomentumError", angularMomentumError);
 }
 
 /////////////////////////////////////////////////
