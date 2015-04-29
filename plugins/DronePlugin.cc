@@ -69,7 +69,6 @@ void DronePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     return;
   }
 
-  double baseJointImplicitDamping = 100.0;
   if (this->sdf->HasElement("base_pid_pos"))
   {
     sdf::ElementPtr basePidPos = this->sdf->GetElement("base_pid_pos");
@@ -79,8 +78,7 @@ void DronePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     basePidPos->GetAttribute("d")->Get(dVal);
     basePidPos->GetAttribute("cmd_max")->Get(cmdMaxVal);
     basePidPos->GetAttribute("cmd_min")->Get(cmdMinVal);
-    this->posPid.Init(pVal, iVal, 0, 0, 0, cmdMaxVal, cmdMinVal);
-    baseJointImplicitDamping = dVal;
+    this->posPid.Init(pVal, iVal, dVal, 0, 0, cmdMaxVal, cmdMinVal);
   }
   else
   {
@@ -97,8 +95,7 @@ void DronePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     basePidRot->GetAttribute("d")->Get(dVal);
     basePidRot->GetAttribute("cmd_max")->Get(cmdMaxVal);
     basePidRot->GetAttribute("cmd_min")->Get(cmdMinVal);
-    this->rotPid.Init(pVal, iVal, 0, 0, 0, cmdMaxVal, cmdMinVal);
-    baseJointImplicitDamping = std::max(dVal, baseJointImplicitDamping);
+    this->rotPid.Init(pVal, iVal, dVal, 0, 0, cmdMaxVal, cmdMinVal);
   }
   else
   {
@@ -106,13 +103,19 @@ void DronePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     this->rotPid.Init(10000, 0, 0, 0, 0, 10000, -10000);
   }
 
-  this->baseJoint->SetParam("erp", 0, 0.0);
+  double baseJointImplicitDamping = 1.0;
+  if (this->sdf->HasElement("damping"))
+  {
+    baseJointImplicitDamping = this->sdf->Get<double>("damping");
+  }
   const double dampTol = 1.0e-6;
   if (baseJointImplicitDamping < dampTol)
   {
     gzwarn << "truncating arm base joint damping at " << dampTol << ".\n";
     baseJointImplicitDamping = dampTol;
   }
+  // set damping
+  this->baseJoint->SetParam("erp", 0, 0.0);
   this->baseJoint->SetParam("cfm", 0, 1.0/baseJointImplicitDamping);
   // same implicit damping for revolute joint stops
   this->baseJoint->SetParam("stop_erp", 0, 0.0);
@@ -178,18 +181,38 @@ void DronePlugin::OnUpdate()
       // std::cout << msg.DebugString();
     }
 
-    // std::cout << "Velocity[" << this->velocity << "]\n";
+    // std::cout << "velocity[" << this->velocity << "]\n";
+    // std::cout << "yawSpeed[" << this->yawSpeed << "]\n";
   }
 
   math::Pose baseLinkPose = this->baseLink->GetWorldPose();
 
   // rotate velocity to world frame
+  const math::Vector3 maxVelocity(10.0, 10.0, 2.0);
   this->targetBaseLinkPose.pos += dt.Double() *
-    baseLinkPose.rot.RotateVector(2.0 * this->velocity);
-  math::Vector3 rpy = this->targetBaseLinkPose.rot.GetAsEuler();
-  rpy.z += 2.0 * dt.Double() * this->yawSpeed;
-  this->targetBaseLinkPose.rot.SetFromEuler(rpy);
+    baseLinkPose.rot.RotateVector(maxVelocity * this->velocity);
 
+  math::Vector3 fakeRpyBodyFrame(20.0 * this->velocity.y,
+   -20.0 * this->velocity.x, 0.0);
+
+  math::Vector3 fakeRpyWorldFrame =
+    baseLinkPose.rot.RotateVector(fakeRpyBodyFrame);
+
+  const math::Vector3 d(5.0, 5.0, 2.0);
+  this->targetBaseLinkPose.pos.x = math::clamp(targetBaseLinkPose.pos.x,
+    baseLinkPose.pos.x-d.x, baseLinkPose.pos.x+d.x);
+  this->targetBaseLinkPose.pos.y = math::clamp(targetBaseLinkPose.pos.y,
+    baseLinkPose.pos.y-d.y, baseLinkPose.pos.y+d.y);
+  this->targetBaseLinkPose.pos.z = math::clamp(targetBaseLinkPose.pos.z,
+    baseLinkPose.pos.z-d.z, baseLinkPose.pos.z+d.z);
+
+  // zero out pitch and roll
+  // math::Vector3 rpy = this->targetBaseLinkPose.rot.GetAsEuler();
+  // this->targetBaseLinkPose.rot.SetFromEuler(rpy);
+
+  math::Quaternion drpy;
+  drpy.SetFromEuler(math::Vector3(0.0, 0.0, dt.Double() * yawSpeed));
+  this->targetBaseLinkPose.rot = this->targetBaseLinkPose.rot * drpy;
 
   math::Vector3 errorPos = baseLinkPose.pos - this->targetBaseLinkPose.pos;
 
@@ -201,11 +224,20 @@ void DronePlugin::OnUpdate()
   this->wrench.force.x = this->posPid.Update(errorPos.x, dt);
   this->wrench.force.y = this->posPid.Update(errorPos.y, dt);
   this->wrench.force.z = this->posPid.Update(errorPos.z, dt);
-  this->wrench.torque.x = this->rotPid.Update(errorRot.x, dt);
-  this->wrench.torque.y = this->rotPid.Update(errorRot.y, dt);
-  this->wrench.torque.z = this->rotPid.Update(errorRot.z, dt);
   this->baseLink->AddForceAtRelativePosition(this->wrench.force,
     math::Vector3(0, 0, 0.2));
+
+  this->wrench.torque.x = this->rotPid.Update(errorRot.x, dt) + fakeRpyWorldFrame.x;
+  this->wrench.torque.y = this->rotPid.Update(errorRot.y, dt) + fakeRpyWorldFrame.y;
+  this->wrench.torque.z = this->rotPid.Update(errorRot.z, dt);
+
+  // math::Vector3 curRpy = baseLinkPose.rot.GetAsEuler();
+  // this->wrench.torque.x = this->rotPid.Update(curRpy.x, dt);
+  // this->wrench.torque.y = this->rotPid.Update(curRpy.y, dt);
+
+  // double izzDt = 20.0 * 0.004/0.001;
+  // this->wrench.torque.z = izzDt * this->yawSpeed;
+
   this->baseLink->AddTorque(this->wrench.torque);
 
 /*

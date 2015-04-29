@@ -1,6 +1,11 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>-128 -334 30 0 1.57071 0</pose>
+      </camera>
+    </gui>
     <scene>
       <sky>
         <clouds>
@@ -72,7 +77,7 @@
 
 
     <model name="box">
-      <pose>-128 -334 0.78 0 0 3.1415</pose>
+      <pose>-128 -334 0.78 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>
@@ -93,6 +98,14 @@
               <size>.4 .4 .4</size>
             </box>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0</mu>
+                <mu2>0</mu2>
+              </ode>
+            </friction>
+          </surface>
         </collision>
 
         <visual name="visual">
@@ -171,10 +184,11 @@
       <plugin name="drone" filename="libDronePlugin.so">
         <base_link>link</base_link>
         <base_joint>base_world</base_joint>
+        <damping>10.0</damping>
         <base_pid_pos cmd_max="10000.0" cmd_min="-10000.0"
-                      d="10.0" i="0" p="100.0"/>
+                      d="0.01" i="0" p="200.0"/>
         <base_pid_rot cmd_max="10000.0" cmd_min="-10000.0"
-                      d="10.0" i="0" p="10.0"/>
+                      d="0.01" i="0" p="100.0"/>
       </plugin>
     </model>
 
