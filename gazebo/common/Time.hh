@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: External interfaces for Gazebo
- * Author: Nate Koenig
- * Date: 03 Apr 2007
- */
 
-#ifndef _TIME_HH_
-#define _TIME_HH_
+#ifndef _GAZEBO_COMMON_TIME_HH_
+#define _GAZEBO_COMMON_TIME_HH_
 
 #include <string>
 #include <stdlib.h>
@@ -428,7 +424,6 @@ namespace gazebo
       /// preserve the internal seconds and nanoseconds separation
       private: inline void Correct()
                {
-                 const int32_t nsInSec = 1000000000;
                  // In the case sec and nsec have different signs, normalize
                  if (this->sec > 0 && this->nsec < 0)
                  {
@@ -449,6 +444,7 @@ namespace gazebo
                }
 
       private: static struct timespec clockResolution;
+      private: static const int32_t nsInSec;
     };
     /// \}
   }
