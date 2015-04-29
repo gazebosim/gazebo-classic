@@ -7,6 +7,8 @@ compilation on Windows.
     * [Pull request #1616](https://bitbucket.org/osrf/gazebo/pull-request/1616)
     * [Pull request #1618](https://bitbucket.org/osrf/gazebo/pull-request/1618)
     * [Pull request #1620](https://bitbucket.org/osrf/gazebo/pull-request/1620)
+    * [Pull request #1626](https://bitbucket.org/osrf/gazebo/pull-request/1626)
+    * [Pull request #1629](https://bitbucket.org/osrf/gazebo/pull-request/1629)
 
 1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
     * [Pull request #1606](https://bitbucket.org/osrf/gazebo/pull-request/1606)
@@ -33,6 +35,11 @@ compilation on Windows.
 
 1. Show/hide GUI overlays using the menu bar.
     * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
+
+1. Show/hide toolbars using the menu bars and shortcut.
+   Added MainWindow::CloneAction.
+   Added Window menu to Model Editor.
+    * [Pull request #1584](https://bitbucket.org/osrf/gazebo/pull-request/1584)
 
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
