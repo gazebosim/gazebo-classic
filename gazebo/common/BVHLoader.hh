@@ -42,7 +42,7 @@ namespace gazebo
 
     /// \class BVHLoader BVHLoader.hh common/common.hh
     /// \brief Handles loading BVH animation files
-    class GAZEBO_VISIBLE BVHLoader
+    class GZ_COMMON_VISIBLE BVHLoader
     {
       /// \brief Constructor
       public: BVHLoader();
