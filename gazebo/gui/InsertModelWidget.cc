@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <fstream>
+
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <sdf/sdf.hh>
