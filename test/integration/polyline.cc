@@ -23,8 +23,55 @@ using namespace gazebo;
 class PolylineTest : public ServerFixture,
                      public testing::WithParamInterface<const char*>
 {
+  public: void ComputeVolume(const std::string &_physicsEngine);
   public: void PolylineWorld(const std::string &_physicsEngine);
 };
+
+/////////////////////////////////////////////////
+// Test polyline shape bounding box volume computation
+void PolylineTest::ComputeVolume(const std::string &_physicsEngine)
+{
+  // Load the sample world
+  Load("worlds/polyline.world", false, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::ModelPtr cubeModel = world->GetModel("cube");
+  EXPECT_TRUE(cubeModel != NULL);
+
+  physics::LinkPtr cubeLink = cubeModel->GetLink("polyLine2");
+  EXPECT_TRUE(cubeLink != NULL);
+
+  physics::CollisionPtr cubeColl = cubeLink->GetCollision("collision");
+  EXPECT_TRUE(cubeColl != NULL);
+
+  physics::ShapePtr shape = cubeColl->GetShape();
+  EXPECT_TRUE(shape != NULL);
+
+  // The actual volume of the cube shape is 1*1*1.5 = 1.5
+  // We expect ComputeVolume to be accurate because it's also a box
+
+  // see issue #1506 (https://bitbucket.org/osrf/gazebo/issue/1506)
+  if (_physicsEngine == "bullet")
+  {
+    EXPECT_NEAR(shape->ComputeVolume(), 1.5, 0.09);
+  }
+  else
+  {
+    EXPECT_DOUBLE_EQ(shape->ComputeVolume(), 1.5);
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_P(PolylineTest, ComputeVolume)
+{
+  if (GetParam() == std::string("simbody"))
+    gzwarn << "Polyline not supported in simbody" << std::endl;
+  else if (GetParam() == std::string("dart"))
+    gzwarn << "Bounding box not supported in DART" << std::endl;
+  else
+    ComputeVolume(GetParam());
+}
 
 /////////////////////////////////////////////////
 // Test polyline instantiation and polyline collision

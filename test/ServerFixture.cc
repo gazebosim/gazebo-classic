@@ -87,6 +87,11 @@ ServerFixture::ServerFixture()
 }
 
 /////////////////////////////////////////////////
+ServerFixture::~ServerFixture()
+{
+}
+
+/////////////////////////////////////////////////
 void ServerFixture::TearDown()
 {
   this->Unload();
