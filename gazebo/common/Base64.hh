@@ -24,7 +24,7 @@
 /// \param[in] _bytesToEncode String of bytes to encode.
 /// \param[in] _len Length of _bytesToEncode.
 /// \param[out] _result Based64 string is appended to this string.
-GAZEBO_VISIBLE
+GZ_COMMON_VISIBLE
 void Base64Encode(const char *_bytesToEncode, unsigned int _len,
     std::string &_result);
 
@@ -32,6 +32,6 @@ void Base64Encode(const char *_bytesToEncode, unsigned int _len,
 /// \brief Decode a base64 string.
 /// \param[in] _encodedString A base 64 encoded string.
 /// \return The decoded string.
-GAZEBO_VISIBLE
+GZ_COMMON_VISIBLE
 std::string Base64Decode(const std::string &_encodedString);
 #endif
