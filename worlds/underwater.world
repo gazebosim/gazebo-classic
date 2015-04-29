@@ -10,7 +10,7 @@
     </include>
 
     <include>
-      <uri>model://sinking_submarine</uri>
+      <uri>model://submarine_sinking</uri>
       <pose>5 0 10 1.57 0 0</pose>
     </include>
 
@@ -20,7 +20,7 @@
     </include>
 
     <include>
-      <uri>model://buoyant_submarine</uri>
+      <uri>model://submarine_buoyant</uri>
       <pose>-5 0 10 1.57 0 0</pose>
     </include>
 
