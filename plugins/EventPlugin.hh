@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_TRANSPORTER_PLUGIN_HH_
-#define _GAZEBO_TRANSPORTER_PLUGIN_HH_
+#ifndef _GAZEBO_EVENT_PLUGIN_HH_
+#define _GAZEBO_EVENT_PLUGIN_HH_
 
 #include <sdf/sdf.hh>
 
@@ -29,13 +29,13 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE TransporterPlugin : public WorldPlugin
+  class GAZEBO_VISIBLE EventPlugin : public WorldPlugin
   {
     /// \brief Constructor.
-    public: TransporterPlugin();
+    public: EventPlugin();
 
     /// \brief Destructor.
-    public: ~TransporterPlugin();
+    public: ~EventPlugin();
 
     /// \brief Load the plugin.
     /// \param[in] _world Pointer to world
@@ -44,46 +44,31 @@ namespace gazebo
 
     private: void Update();
 
-    private: void OnActivation(ConstGzStringPtr &_msg);
-
     /// \brief World pointer.
     private: physics::WorldPtr world;
 
     /// \brief SDF pointer.
     private: sdf::ElementPtr sdf;
 
-    private: class Pad
+    private: class Region
              {
                public: std::string name;
-               public: std::string dest;
 
-               public: math::Pose incomingPose;
-               public: math::Pose outgoingPose;
+               public: math::Pose pose;
+               public: math::Vector3 box;
 
-               public: math::Vector3 incomingBox;
-               public: math::Vector3 outgoingBox;
+               public: std::string msg;
 
-               /// \brief True if the pad should automatically teleport.
-               /// False will cause the pad to wait for an activation
-               /// signal. See this plugin's <activation_topic> xml element.
-               public: bool autoActivation;
-
-               /// \brief This flag is used for manual activation of a pad.
-               /// It is set to true when a string message that contains
-               /// the name of the pad is sent over the activation topic.
-               public: bool activated;
+               public: transport::PublisherPtr pub;
              };
 
 
-    private: std::map<std::string, Pad*> pads;
+    private: std::map<std::string, Region*> regions;
 
     /// \brief Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;
 
     private: transport::NodePtr node;
-    private: transport::SubscriberPtr activationSub;
-
-    private: boost::mutex padMutex;
   };
 }
 #endif

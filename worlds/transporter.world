@@ -2,7 +2,7 @@
 <sdf version="1.5">
   <world name="default">
     <physics type="ode">
-      <gravity>0 -3.0 -9.8</gravity>
+      <gravity>-3 0 -9.8</gravity>
     </physics>
 
     <!-- A global light source -->
@@ -16,37 +16,42 @@
     </include>
 
     <plugin filename="libTransporterPlugin.so" name="transporter">
+      <activation_topic>~/transporter</activation_topic>
+
       <pad name="pad1">
         <destination>pad2</destination>
+        <activation>auto</activation>
+
         <outgoing>
-          <pose>0 0 0.5 0 0 0</pose>
-          <box>1 1 1</box>
+          <pose>0 1.5 0.7 0 0 0</pose>
+          <box>2.5 2.5 1</box>
         </outgoing>
 
         <incoming>
-          <pose>1 0 0 0 0 0</pose>
-          <box>1 1 1</box>
+          <pose>0 -1.5 0.7 0 0 0</pose>
+          <box>2.5 2.5 1</box>
         </incoming>
       </pad>
 
       <pad name="pad2">
         <destination>pad1</destination>
+        <activation>manual</activation>
+
         <outgoing>
           <pose>10 0 0 0 0 0</pose>
           <box>1 1 1</box>
         </outgoing>
 
         <incoming>
-          <pose>2 0 0.5 0 0 0</pose>
-          <box>1 1 1</box>
+          <pose>0 1.5 3.2 0 0 0</pose>
+          <box>2.5 2.5 1</box>
         </incoming>
       </pad>
     </plugin>
 
 
-
     <model name="sphere">
-      <pose>0 3 0.2 0 0 0</pose>
+      <pose>4 1.5 0.4 0 0 0</pose>
       <link name="link">
         <inertial>
           <mass>10</mass>
@@ -65,6 +70,93 @@
             </sphere>
           </geometry>
         </visual>
+      </link>
+    </model>
+
+    <include>
+      <uri>model://elevator</uri>
+      <name>elevator1</name>
+      <pose>0 -1.5 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://elevator</uri>
+      <name>elevator2</name>
+      <pose>0 1.5 0 0 0 0</pose>
+    </include>
+
+    <model name="floors">
+      <static>true</static>
+      <pose>-10 0 0 0 0 0</pose>
+      <link name="link">
+        <collision name="floor0_collision">
+          <pose>0 0 0.1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>30 15 0.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="floor0_visual">
+          <pose>0 0 0.1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>30 15 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+
+        <collision name="floor1_collision">
+          <pose>0 0 3.1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>30 15 0.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="floor1_visual">
+          <pose>0 0 3.1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>30 15 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+
+        <collision name="floor2_collision">
+          <pose>0 0 6.1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>30 15 0.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="floor2_visual">
+          <pose>0 0 6.1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>30 15 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+
+        <collision name="floor3_collision">
+          <pose>0 0 9.1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>30 15 0.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="floor3_visual">
+          <pose>0 0 9.1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>30 15 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+
       </link>
     </model>
 
