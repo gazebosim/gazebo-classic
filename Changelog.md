@@ -5,6 +5,7 @@
 1. Windows support. This consists mostly of numerous small changes to support
 compilation on Windows.
     * [Pull request #1616](https://bitbucket.org/osrf/gazebo/pull-request/1616)
+    * [Pull request #1629](https://bitbucket.org/osrf/gazebo/pull-request/1629)
     * [Pull request #1632](https://bitbucket.org/osrf/gazebo/pull-request/1632)
 
 1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
