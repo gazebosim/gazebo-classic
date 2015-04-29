@@ -23,8 +23,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-#ifndef DIRENT_H
-#define DIRENT_H
+#ifndef _GAZEBO_WIN_DIRENT_H_
+#define _GAZEBO_WIN_DIRENT_H_
 
 // Define architecture flags so we don't need to include windows.h.
 // Avoiding windows.h makes it simpler to use windows sockets in conjunction
@@ -778,6 +778,5 @@ extern "C"
 }
 #endif
 
-// DIRENT_H
+// _GAZEBO_WIN_DIRENT_H_
 #endif
-
