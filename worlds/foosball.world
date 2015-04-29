@@ -8,6 +8,7 @@
           <speed>12</speed>
         </clouds>
       </sky>
+      <grid>false</grid>
     </scene>
 
     <!-- A ground plane -->

@@ -183,24 +183,28 @@ void FoosballGUIPlugin::OnScore(ConstGzStringPtr &_msg)
 void FoosballGUIPlugin::OnState(ConstGzStringPtr &_msg)
 {
   std::string state = _msg->data();
+  std::string timeStr = _msg->data().substr(_msg->data().find(":")+1);
+  int time = 3;
+  if (!timeStr.empty())
+    time = time - std::stoi(timeStr);
 
-  if (_msg->data() == "play")
+  if (_msg->data().find("play") != std::string::npos)
   {
     state = "Play!";
   }
-  else if (_msg->data() == "kickoff")
+  else if (_msg->data().find("kickoff") != std::string::npos)
   {
-    state = "Kickoff!";
+    state = "Kickoff: " + std::to_string(time);
   }
-  else if (_msg->data() == "goalA")
+  else if (_msg->data().find("goalA") != std::string::npos)
   {
     state = "Blue GOAL!";
   }
-  else if (_msg->data() == "goalB")
+  else if (_msg->data().find("goalB") != std::string::npos)
   {
     state = "Red GOAL!";
   }
-  else if (_msg->data() == "finished")
+  else if (_msg->data().find("finished") != std::string::npos)
   {
     state = "Game Over!";
   }
