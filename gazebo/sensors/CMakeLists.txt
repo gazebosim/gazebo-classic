@@ -1,5 +1,11 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+include_directories(${TBB_INCLUDEDIR})
+
+if (WIN32)
+  include_directories(${libdl_include_dir})
+endif()
+
 set (sources
   CameraSensor.cc
   ContactSensor.cc
@@ -61,14 +67,14 @@ set (gtest_sources
   WirelessTransmitter_TEST.cc
 )
 
-gz_build_tests(${gtest_sources})
+# gz_build_tests(${gtest_sources})
 
 set (gtest_sources_dri
   GpuRaySensor_TEST.cc
   SensorManager_TEST.cc
 )
 
-gz_build_dri_tests(${gtest_sources_dri})
+#gz_build_dri_tests(${gtest_sources_dri})
 
 set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)
 foreach (hdr ${headers})
@@ -78,7 +84,7 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sensors.hh.in ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
 
 
-add_library(gazebo_sensors SHARED ${sources})
+gz_add_library(gazebo_sensors ${sources})
 
 target_link_libraries(gazebo_sensors
   gazebo_common

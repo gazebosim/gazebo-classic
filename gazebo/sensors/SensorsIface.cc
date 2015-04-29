@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/transport/TransportIface.hh"
@@ -50,11 +56,11 @@ bool sensors::init()
     return true;
 
   // The rendering engine will run headless
-  if (!gazebo::rendering::init())
+  /*if (!gazebo::rendering::init())
   {
     gzthrow("Unable to intialize the rendering engine");
     return false;
-  }
+  }*/
 
   sensors::SensorManager::Instance()->Init();
 
