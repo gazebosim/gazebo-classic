@@ -73,10 +73,15 @@ void DronePlugin::OnUpdate()
     {
       for (int i = 0; i < msg.joy(0).analog_axis_size(); ++i)
       {
-        if (msg.joy(0).analog_axis(i).index() == 4)
+        if (msg.joy(0).analog_axis(i).index() == 3)
         {
-          // Forward motion
+          // Forward motion (pitch)
           this->velocity.x = msg.joy(0).analog_axis(i).value()/(-32768.0);
+        }
+        else if (msg.joy(0).analog_axis(i).index() == 2)
+        {
+          // Lateral motion (roll)
+          this->velocity.y = msg.joy(0).analog_axis(i).value()/(-32768.0);
         }
         else if (msg.joy(0).analog_axis(i).index() == 1)
         {
