@@ -73,8 +73,20 @@
 
     <model name="box">
       <pose>-128 -334 0.78 0 0 3.1415</pose>
-      <static>true</static>
+      <static>false</static>
       <link name="link">
+        <inertial>
+          <pose>0 0 -0.2 0 0 0</pose>
+          <mass>2.0</mass>
+          <inertia>
+          <ixx>0.004</ixx>
+          <ixy>0.000</ixy>
+          <ixz>0.000</ixz>
+          <iyy>0.004</iyy>
+          <iyz>0.000</iyz>
+          <izz>0.004</izz>
+          </inertia>
+        </inertial>
         <collision name="collision">
           <geometry>
             <box>
@@ -86,7 +98,7 @@
         <visual name="visual">
           <geometry>
             <box>
-              <size>.1 .1 .1</size>
+              <size>.4 .4 .4</size>
             </box>
           </geometry>
         </visual>
@@ -105,8 +117,65 @@
           </material>
         </visual>
 
+        <sensor name="camera" type="camera">
+          <pose>0 0 0 0 0 0</pose>
+          <camera>
+            <horizontal_fov>2.0</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+            </image>
+            <clip>
+              <near>0.05</near>
+              <far>15000</far>
+            </clip>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>25</update_rate>
+          <visualize>true</visualize>
+        </sensor>
+
       </link>
-      <plugin name="drone" filename="libDronePlugin.so"/>
+      <joint name='base_world' type='revolute'>
+        <child>link</child>
+        <parent>world</parent>
+        <axis>
+          <xyz>0 0 1.0</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+            <effort>10000</effort>
+            <velocity>-1</velocity>
+          </limit>
+          <dynamics>
+            <damping>2</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+          <use_parent_model_frame>1</use_parent_model_frame>
+        </axis>
+        <physics>
+          <provide_feedback>1</provide_feedback>
+          <ode>
+            <provide_feedback>1</provide_feedback>
+            <implicit_spring_damper>1</implicit_spring_damper>
+            <cfm_damping>1</cfm_damping>
+            <limit>
+              <cfm>0.01</cfm>
+              <erp>0</erp>
+            </limit>
+          </ode>
+        </physics>
+      </joint>
+      <plugin name="drone" filename="libDronePlugin.so">
+        <base_link>link</base_link>
+        <base_joint>base_world</base_joint>
+        <base_pid_pos cmd_max="10000.0" cmd_min="-10000.0"
+                      d="10.0" i="0" p="100.0"/>
+        <base_pid_rot cmd_max="10000.0" cmd_min="-10000.0"
+                      d="10.0" i="0" p="10.0"/>
+      </plugin>
     </model>
 
   </world>
