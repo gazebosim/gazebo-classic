@@ -9,8 +9,10 @@ compilation on Windows.
     * [Pull request #1620](https://bitbucket.org/osrf/gazebo/pull-request/1620)
     * [Pull request #1626](https://bitbucket.org/osrf/gazebo/pull-request/1626)
     * [Pull request #1627](https://bitbucket.org/osrf/gazebo/pull-request/1627)
+    * [Pull request #1628](https://bitbucket.org/osrf/gazebo/pull-request/1628)
     * [Pull request #1629](https://bitbucket.org/osrf/gazebo/pull-request/1629)
     * [Pull request #1631](https://bitbucket.org/osrf/gazebo/pull-request/1631)
+    * [Pull request #1632](https://bitbucket.org/osrf/gazebo/pull-request/1632)
     * [Pull request #1637](https://bitbucket.org/osrf/gazebo/pull-request/1637)
 
 1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
