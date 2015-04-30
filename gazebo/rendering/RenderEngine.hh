@@ -78,7 +78,7 @@ namespace gazebo
       private: virtual ~RenderEngine();
 
       /// \brief Load the parameters for Ogre. Load must happen before Init.
-      public: void Load(bool _server = true);
+      public: void Load();
 
       /// \brief Initialize Ogre. Load must happen before Init.
       public: void Init();
