@@ -211,7 +211,7 @@ void HeightmapTest::Volume(const std::string &_physicsEngine)
   {
     gzerr << "Aborting test for "
           << _physicsEngine
-          ", see issue #909" << std::endl;
+          << ", see issue #909" << std::endl;
     return;
   }
 
