@@ -21,7 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/thread/recursive_mutex.hpp>
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/PlaneShape.hh"
 
@@ -107,4 +106,10 @@ void PlaneShape::FillMsg(msgs::Geometry &_msg)
 void PlaneShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetNormal(msgs::Convert(_msg.plane().normal()));
+}
+
+//////////////////////////////////////////////////
+double PlaneShape::ComputeVolume() const
+{
+  return 0;
 }

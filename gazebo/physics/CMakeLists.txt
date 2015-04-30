@@ -149,4 +149,4 @@ set (gtest_sources
   Road_TEST.cc
   SphereShape_TEST.cc
 )
-# gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources})

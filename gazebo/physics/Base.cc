@@ -15,8 +15,8 @@
  *
 */
 
-// TODO: we also include this winsock2 trick in Base.hh but it is used at last, so
-// we need it again here.
+// TODO: we also include this winsock2 trick in Base.hh but it is used last,
+// so // we need it again here.
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -394,4 +394,9 @@ const sdf::ElementPtr Base::GetSDF()
   return this->sdf;
 }
 
-
+//////////////////////////////////////////////////
+double BoxShape::ComputeVolume() const
+{
+  math::Vector3 size = this->GetSize();
+  return size.x * size.y * size.z;
+}

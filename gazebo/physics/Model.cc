@@ -21,7 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/thread/recursive_mutex.hpp>
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 #include <float.h>

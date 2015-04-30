@@ -25,7 +25,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/thread/recursive_mutex.hpp>
 #include <vector>
 #include <list>
 #include <string>
@@ -188,4 +187,10 @@ void RayShape::FillMsg(msgs::Geometry &/*_msg*/)
 //////////////////////////////////////////////////
 void RayShape::ProcessMsg(const msgs::Geometry &/*_msg*/)
 {
+}
+
+//////////////////////////////////////////////////
+double RayShape::ComputeVolume() const
+{
+  return 0;
 }
