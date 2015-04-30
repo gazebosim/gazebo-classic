@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <gazebo/gazebo_config.h>
 #ifdef HAVE_SPNAV
 #include <spnav.h>
@@ -32,6 +38,7 @@ using namespace gui;
 // spnav_open() when spnav daemon is not running.
 int spnav_test_daemon(void)
 {
+#ifndef _WIN32
   int s;
   struct sockaddr_un addr;
 
@@ -49,6 +56,7 @@ int spnav_test_daemon(void)
   }
 
   close(s);
+#endif
   return 0;
 }
 
