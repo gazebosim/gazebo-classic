@@ -19,6 +19,12 @@
  * Date: 09 Sept. 2008
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sstream>
 
 #include "gazebo/common/Exception.hh"
