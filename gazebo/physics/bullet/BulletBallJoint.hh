@@ -38,7 +38,7 @@ namespace gazebo
     /// \{
 
     /// \brief BulletBallJoint class models a ball joint in Bullet.
-    class GAZEBO_VISIBLE BulletBallJoint : public BallJoint<BulletJoint>
+    class GZ_PHYSICS_VISIBLE BulletBallJoint : public BallJoint<BulletJoint>
     {
       /// \brief Bullet Ball Joint Constructor
       public: BulletBallJoint(btDynamicsWorld *_world, BasePtr _parent);

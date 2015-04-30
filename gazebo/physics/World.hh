@@ -17,6 +17,12 @@
 #ifndef _GAZEBO_WORLD_HH_
 #define _GAZEBO_WORLD_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <vector>
 #include <list>
 #include <set>
@@ -59,7 +65,7 @@ namespace gazebo
     /// (links, joints, sensors, plugins, etc), and WorldPlugin instances.
     /// Many core function are also handled in the World, including physics
     /// update, model updates, and message processing.
-    class GAZEBO_VISIBLE World : public boost::enable_shared_from_this<World>
+    class GZ_PHYSICS_VISIBLE World : public boost::enable_shared_from_this<World>
     {
       /// \brief Constructor.
       /// Constructor for the World. Must specify a unique name.
@@ -325,6 +331,12 @@ namespace gazebo
       /// \param[in] _name Name of the model to remove.
       public: void RemoveModel(const std::string &_name);
 
+      /// \brief Add a dirty pose to the list for processing at the next
+      /// physics time step. This function should only be used by physics
+      /// engines.
+      /// \param[in] _entity Pointer to an entity that has a dirty pose.
+      public: void AddDirtyPose(Entity *_entity);
+
       /// \cond
       /// This is an internal function.
       /// \brief Get a model by id.
@@ -458,9 +470,6 @@ namespace gazebo
       /// \internal
       /// \brief Private data pointer.
       private: WorldPrivate *dataPtr;
-
-      /// Friend ODELink so that it has access to dataPtr->dirtyPoses
-      private: friend class ODELink;
 
       /// Friend DARTLink so that it has access to dataPtr->dirtyPoses
       private: friend class DARTLink;

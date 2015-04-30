@@ -21,6 +21,13 @@
 #ifndef _STATE_HH_
 #define _STATE_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <boost/thread/recursive_mutex.hpp>
 #include <string>
 
 #include <sdf/sdf.hh>
@@ -40,7 +47,7 @@ namespace gazebo
     /// \brief State of an entity.
     ///
     /// This is the base class for all State information.
-    class GAZEBO_VISIBLE State
+    class GZ_PHYSICS_VISIBLE State
     {
       /// \brief Default constructor
       public: State();
