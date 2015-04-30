@@ -17,6 +17,12 @@
 #ifndef _WINDOWMANAGER_HH_
 #define _WINDOWMANAGER_HH_
 
+#ifdef _WIN32
+  // Oh, yeah, CreateWindow is taken, too.
+  #include <windows.h>
+  #undef CreateWindow
+#endif
+
 #include <string>
 #include <vector>
 
@@ -37,7 +43,7 @@ namespace gazebo
 
     /// \class WindowManager WindowManager.hh rendering/rendering.hh
     /// \brief Class to mangage render windows.
-    class GAZEBO_VISIBLE WindowManager
+    class GZ_RENDERING_VISIBLE WindowManager
     {
       /// \brief Constructor
       public: WindowManager();
@@ -59,7 +65,7 @@ namespace gazebo
       /// \brief Attach a camera to a window.
       /// \param[in] _windowId Id of the window to add the camera to.
       /// \param[in] _camera Pointer to the camera to attach.
-      public: void SetCamera(int _windowId, CameraPtr _camera);
+      public: bool SetCamera(int _windowId, CameraPtr _camera);
 
       /// \brief Resize a window.
       /// \param[in] _id Id of the window to resize.
