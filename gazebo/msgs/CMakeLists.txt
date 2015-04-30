@@ -183,7 +183,6 @@ endif()
 target_link_libraries(gazebo_msgs
   gazebo_common
   gazebo_math
-  ${CURL_LIBRARIES}
   ${GZ_PROTOBUF_LIBRARY}
 )
 
