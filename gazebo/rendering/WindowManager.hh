@@ -65,7 +65,7 @@ namespace gazebo
       /// \brief Attach a camera to a window.
       /// \param[in] _windowId Id of the window to add the camera to.
       /// \param[in] _camera Pointer to the camera to attach.
-      public: bool SetCamera(int _windowId, CameraPtr _camera);
+      public: void SetCamera(int _windowId, CameraPtr _camera);
 
       /// \brief Resize a window.
       /// \param[in] _id Id of the window to resize.
