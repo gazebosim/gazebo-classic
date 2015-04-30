@@ -118,6 +118,7 @@ INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, ::testing::Values(
   , "custom_main"
   , "listener"
   , "publisher"
+  , "test_fixture"
 ));
 
 int main(int argc, char **argv)
