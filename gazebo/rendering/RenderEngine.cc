@@ -19,21 +19,14 @@
 # include <QtCore/qglobal.h>
 #endif
 
-#if not defined( Q_OS_MAC) && not defined(_WIN32)  // Not Apple or Windows
+#ifndef Q_OS_MAC  // Not Apple
 # include <X11/Xlib.h>
 # include <X11/Xutil.h>
 # include <GL/glx.h>
 #endif
 
 #include <sys/types.h>
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-  #include "gazebo/common/win_dirent.h"
-#else
-  #include <dirent.h>
-#endif
+#include <dirent.h>
 #include <string>
 #include <iostream>
 
@@ -292,12 +285,7 @@ void RenderEngine::PostRender()
 void RenderEngine::Init()
 {
   if (this->renderPathType == NONE)
-  {
-    gzwarn << "Cannot initialize render engine since "
-           << "render path type is NONE. Ignore this warning if"
-           << "rendering has been turned off on purpose.\n";
     return;
-  }
 
   this->initialized = false;
 
@@ -383,8 +371,7 @@ void RenderEngine::Fini()
     this->scenes[i].reset();
   this->scenes.clear();
 
-  // Not Apple or Windows
-#if not defined( Q_OS_MAC) && not defined(_WIN32)
+#ifndef Q_OS_MAC
   if (this->dummyDisplay)
   {
     glXDestroyContext(static_cast<Display*>(this->dummyDisplay),
@@ -684,7 +671,7 @@ bool RenderEngine::CreateContext()
 {
   bool result = true;
 
-#if defined Q_OS_MAC || _WIN32
+#ifdef Q_OS_MAC
   this->dummyDisplay = 0;
 #else
   try

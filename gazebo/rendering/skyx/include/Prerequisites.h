@@ -40,21 +40,17 @@ http://www.gnu.org/copyleft/lesser.txt.
 #include <OGRE/OgreBillboard.h>
 
 /// Define the dll export qualifier if compiling for Windows
-#if defined BUILDING_STATIC_LIBS
-  #define DllExport
-#else
-  #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    #ifdef SKYX_LIB
-      #define DllExport __declspec (dllexport)
-    #else
-      #define DllExport __declspec (dllimport)
-    #endif
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+  #ifdef SKYX_LIB
+    #define DllExport __declspec (dllexport)
   #else
-    #if __GNUC__ >= 4
-      #define DllExport __attribute__ ((visibility ("default")))
-    #else
-      #define DllExport
-    #endif
+    #define DllExport __declspec (dllimport)
+  #endif
+#else
+  #if __GNUC__ >= 4
+    #define DllExport __attribute__ ((visibility ("default")))
+  #else
+    #define DllExport
   #endif
 #endif
 
