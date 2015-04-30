@@ -535,13 +535,13 @@ void dLCP::transfer_i_to_C (int i)
       }
       const int nC = m_nC;
       dReal Aii_dDot = AROW(i)[i] - dDot(m_ell, m_Dell, nC);
-      if(abs(Aii_dDot) < 1e-16) {
+      if(dFabs(Aii_dDot) < 1e-16) {
           Aii_dDot += 1e-6;
       }
       m_d[nC] = dRecip (Aii_dDot);
     }
     else {
-        if(abs(AROW(i)[i]) < 1e-16) {
+        if(dFabs(AROW(i)[i]) < 1e-16) {
             AROW(i)[i] += 1e-6;
         }
         m_d[0] = dRecip (AROW(i)[i]);
@@ -590,13 +590,13 @@ void dLCP::transfer_i_from_N_to_C (int i)
       }
       const int nC = m_nC;
       dReal Aii_dDot = AROW(i)[i] - dDot(m_ell, m_Dell, nC);
-      if(abs(Aii_dDot) < 1e-16) {
+      if(dFabs(Aii_dDot) < 1e-16) {
           Aii_dDot += 1e-6;
       }
       m_d[nC] = dRecip (Aii_dDot);
     }
     else {
-        if(abs(AROW(i)[i]) < 1e-16) {
+        if(dFabs(AROW(i)[i]) < 1e-16) {
             AROW(i)[i] += 1e-6;
         }
         m_d[0] = dRecip (AROW(i)[i]);
