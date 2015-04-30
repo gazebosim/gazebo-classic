@@ -42,6 +42,8 @@
 using namespace gazebo;
 using namespace gui;
 
+std::map<JointMaker::JointType, std::string> JointMaker::jointTypes;
+
 /////////////////////////////////////////////////
 JointMaker::JointMaker()
 {
@@ -63,13 +65,35 @@ JointMaker::JointMaker()
   this->jointMaterials[JOINT_UNIVERSAL] = "Gazebo/Blue";
   this->jointMaterials[JOINT_BALL]      = "Gazebo/Purple";
 
+
+  jointTypes[JOINT_FIXED]     = "fixed";
+  jointTypes[JOINT_HINGE]     = "revolute";
+  jointTypes[JOINT_HINGE2]    = "revolute2";
+  jointTypes[JOINT_SLIDER]    = "prismatic";
+  jointTypes[JOINT_SCREW]     = "screw";
+  jointTypes[JOINT_UNIVERSAL] = "universal";
+  jointTypes[JOINT_BALL]      = "ball";
+  jointTypes[JOINT_NONE]      = "none";
+
   this->connections.push_back(
       event::Events::ConnectPreRender(
-        boost::bind(&JointMaker::Update, this)));
+      boost::bind(&JointMaker::Update, this)));
 
   this->connections.push_back(
       gui::model::Events::ConnectOpenJointInspector(
       boost::bind(&JointMaker::OpenInspector, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectShowJointContextMenu(
+      boost::bind(&JointMaker::ShowContextMenu, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectSetSelectedJoint(
+      boost::bind(&JointMaker::OnSetSelectedJoint, this, _1, _2)));
+
+  this->connections.push_back(
+      event::Events::ConnectSetSelectedEntity(
+      boost::bind(&JointMaker::OnSetSelectedEntity, this, _1, _2)));
 
   this->inspectAct = new QAction(tr("Open Joint Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this, SLOT(OnOpenInspector()));
@@ -112,14 +136,15 @@ void JointMaker::Reset()
   this->selectedVis.reset();
   this->hoverVis.reset();
   this->prevHoverVis.reset();
-  this->inspectVis.reset();
-  this->selectedJoint.reset();
+  this->inspectName = "";
+  this->selectedJoints.clear();
 
   this->scopedLinkedNames.clear();
 
-  while (this->joints.size() > 0)
+  while (!this->joints.empty())
   {
-    this->RemoveJoint(this->joints.begin()->first);
+    std::string jointId = this->joints.begin()->first;
+    this->RemoveJoint(jointId);
   }
   this->joints.clear();
 }
@@ -269,25 +294,36 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
     rendering::VisualPtr vis = camera->GetVisual(_event.pos);
     if (vis)
     {
-      if (this->selectedJoint)
-        this->selectedJoint->SetHighlighted(false);
-      this->selectedJoint.reset();
       if (this->joints.find(vis->GetName()) != this->joints.end())
       {
         // trigger joint inspector on right click
         if (_event.button == common::MouseEvent::RIGHT)
         {
-          this->inspectVis = vis;
-          QMenu menu;
-          menu.addAction(this->inspectAct);
-          menu.exec(QCursor::pos());
+          this->inspectName = vis->GetName();
+          this->ShowContextMenu(this->inspectName);
+          return true;
         }
         else if (_event.button == common::MouseEvent::LEFT)
         {
-          this->selectedJoint = vis;
-          this->selectedJoint->SetHighlighted(true);
+          // Not in multi-selection mode.
+          if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
+          {
+            this->DeselectAll();
+            this->SetSelected(vis, true);
+          }
+          // Multi-selection mode
+          else
+          {
+            auto it = std::find(this->selectedJoints.begin(),
+                this->selectedJoints.end(), vis);
+            // Highlight and select clicked joint if not already selected
+            // Otherwise deselect if already selected
+            this->SetSelected(vis, it == this->selectedJoints.end());
+          }
         }
       }
+      else
+        this->DeselectAll();
       return false;
     }
   }
@@ -313,10 +349,11 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           this->hoverVis->SetEmissive(common::Color(0, 0, 0));
           this->selectedVis = this->hoverVis;
           this->hoverVis.reset();
+
           // Create joint data with selected visual as parent
           // the child will be set on the second mouse release.
-          this->mouseJoint = this->CreateJoint(this->selectedVis,
-              rendering::VisualPtr());
+          this->mouseJoint = this->CreateJointLine("JOINT_LINE",
+              this->selectedVis);
         }
         // Pressed child link
         else if (this->selectedVis != this->hoverVis)
@@ -325,13 +362,12 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
             this->hoverVis->SetEmissive(common::Color(0, 0, 0));
           if (this->selectedVis)
             this->selectedVis->SetEmissive(common::Color(0, 0, 0));
+
           this->mouseJoint->child = this->hoverVis;
-
-          // reset variables.
-          this->selectedVis.reset();
-          this->hoverVis.reset();
-          this->AddJoint(JointMaker::JOINT_NONE);
-
+          JointData *newJoint = this->CreateJoint(this->mouseJoint->parent,
+              this->mouseJoint->child);
+          this->Stop();
+          this->mouseJoint = newJoint;
           this->newJointCreated = true;
           gui::model::Events::modelChanged();
         }
@@ -346,13 +382,11 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
-    rendering::VisualPtr _child)
+JointData *JointMaker::CreateJointLine(const std::string &_name,
+    rendering::VisualPtr _parent)
 {
-  std::stringstream ss;
-  ss << _parent->GetName() << "_JOINT_" << this->jointCounter++;
   rendering::VisualPtr jointVis(
-      new rendering::Visual(ss.str(), _parent->GetParent()));
+      new rendering::Visual(_name, _parent->GetParent()));
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
@@ -363,20 +397,35 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   jointVis->GetSceneNode()->setInheritScale(false);
   jointVis->GetSceneNode()->setInheritOrientation(false);
 
-  JointData *jointData = new JointData();
   std::string jointVisName = jointVis->GetName();
   std::string leafName = jointVisName;
   size_t pIdx = jointVisName.find_last_of("::");
   if (pIdx != std::string::npos)
     leafName = jointVisName.substr(pIdx+1);
-  jointData->name = leafName;
+
+  JointData *jointData = new JointData();
   jointData->dirty = false;
+  jointData->name = leafName;
   jointData->visual = jointVis;
   jointData->parent = _parent;
-  jointData->child = _child;
   jointData->line = jointLine;
   jointData->type = this->jointType;
-  jointData->inspector = new JointInspector(JointMaker::JOINT_NONE);
+  jointData->line->setMaterial(this->jointMaterials[jointData->type]);
+
+  return jointData;
+}
+
+/////////////////////////////////////////////////
+JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
+    rendering::VisualPtr _child)
+{
+  std::stringstream ss;
+  ss << _parent->GetName() << "_JOINT_" << this->jointCounter++;
+
+  JointData *jointData = this->CreateJointLine(ss.str(), _parent);
+  jointData->child = _child;
+
+  jointData->inspector = new JointInspector();
   jointData->inspector->setModal(false);
   connect(jointData->inspector, SIGNAL(Applied()),
       jointData, SLOT(OnApply()));
@@ -388,58 +437,83 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
         SLOT(close()));
   }
 
-  int axisCount = JointMaker::GetJointAxisCount(jointData->type);
-  for (int i = 0; i < axisCount; ++i)
+  // setup the joint msg
+  jointData->jointMsg.reset(new msgs::Joint);
+  jointData->jointMsg->set_name(jointData->name);
+  if (jointData->parent)
   {
-    if (i < static_cast<int>(this->UnitVectors.size()))
-      jointData->axis[i] = this->UnitVectors[i];
-    else
-      jointData->axis[i] = this->UnitVectors[0];
+    std::string jointParentName = jointData->parent->GetName();
+    std::string leafName = jointParentName;
+    size_t pIdx = jointParentName.find_last_of("::");
+    if (pIdx != std::string::npos)
+      leafName = jointParentName.substr(pIdx+1);
 
-    jointData->lowerLimit[i] = -3.14;
-    jointData->upperLimit[i] = 3.14;
-    jointData->effortLimit[i] = -1;
-    jointData->velocityLimit[i] = -1;
-    jointData->useParentModelFrame[i] = false;
-    jointData->damping[i] = 0;
+    jointData->jointMsg->set_parent(leafName);
+    jointData->jointMsg->set_parent_id(jointData->parent->GetId());
   }
-  jointData->pose = math::Pose::Zero;
-  jointData->line->setMaterial(this->jointMaterials[jointData->type]);
+  if (jointData->child)
+  {
+    std::string jointChildName = jointData->child->GetName();
+    std::string leafName = jointChildName;
+    size_t pIdx = jointChildName.find_last_of("::");
+    if (pIdx != std::string::npos)
+      leafName = jointChildName.substr(pIdx+1);
 
+    jointData->jointMsg->set_child(leafName);
+    jointData->jointMsg->set_child_id(jointData->child->GetId());
+  }
+  msgs::Set(jointData->jointMsg->mutable_pose(), math::Pose::Zero);
+
+  jointData->jointMsg->set_type(
+      msgs::ConvertJointType(this->GetTypeAsString(jointData->type)));
+
+  unsigned int axisCount = JointMaker::GetJointAxisCount(jointData->type);
+  for (unsigned int i = 0; i < axisCount; ++i)
+  {
+    msgs::Axis *axisMsg;
+    if (i == 0u)
+    {
+      axisMsg = jointData->jointMsg->mutable_axis1();
+    }
+    else if (i == 1u)
+    {
+      axisMsg = jointData->jointMsg->mutable_axis2();
+    }
+    else
+    {
+      gzerr << "Invalid axis index["
+            << i
+            << "]"
+            << std::endl;
+      continue;
+    }
+    msgs::Set(axisMsg->mutable_xyz(),
+        this->UnitVectors[i%this->UnitVectors.size()]);
+    axisMsg->set_use_parent_model_frame(false);
+    axisMsg->set_limit_lower(-GZ_DBL_MAX);
+    axisMsg->set_limit_upper(GZ_DBL_MAX);
+    axisMsg->set_limit_effort(-1);
+    axisMsg->set_limit_velocity(-1);
+    axisMsg->set_damping(0);
+
+    // Add angle field after we've checked that index i is valid
+    jointData->jointMsg->add_angle(0);
+  }
+  jointData->jointMsg->set_limit_erp(0.2);
+  jointData->jointMsg->set_suspension_erp(0.2);
+
+  jointData->inspector->Update(jointData->jointMsg);
   return jointData;
 }
 
 /////////////////////////////////////////////////
 JointMaker::JointType JointMaker::ConvertJointType(const std::string &_type)
 {
-  if (_type == "revolute")
-  {
-    return JointMaker::JOINT_HINGE;
-  }
-  else if (_type == "revolute2")
-  {
-    return JointMaker::JOINT_HINGE2;
-  }
-  else if (_type == "prismatic")
-  {
-    return JointMaker::JOINT_SLIDER;
-  }
-  else if (_type == "ball")
-  {
-    return JointMaker::JOINT_BALL;
-  }
-  else if (_type == "universal")
-  {
-    return JointMaker::JOINT_UNIVERSAL;
-  }
-  else if (_type == "screw")
-  {
-    return JointMaker::JOINT_SCREW;
-  }
-  else
-  {
-    return JointMaker::JOINT_NONE;
-  }
+  for (auto iter : jointTypes)
+    if (iter.second == _type)
+      return iter.first;
+
+  return JOINT_NONE;
 }
 
 /////////////////////////////////////////////////
@@ -480,7 +554,6 @@ void JointMaker::Stop()
       rendering::ScenePtr scene = this->mouseJoint->visual->GetScene();
       scene->RemoveVisual(this->mouseJoint->visual);
       this->mouseJoint->visual.reset();
-      delete this->mouseJoint->inspector;
       delete this->mouseJoint;
       this->mouseJoint = NULL;
     }
@@ -569,8 +642,11 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 void JointMaker::OnOpenInspector()
 {
-  this->OpenInspector(this->inspectVis->GetName());
-  this->inspectVis.reset();
+  if (this->inspectName.empty())
+    return;
+
+  this->OpenInspector(this->inspectName);
+  this->inspectName = "";
 }
 
 /////////////////////////////////////////////////
@@ -608,13 +684,28 @@ bool JointMaker::OnKeyPress(const common::KeyEvent &_event)
 {
   if (_event.key == Qt::Key_Delete)
   {
-    if (this->selectedJoint)
+    if (!this->selectedJoints.empty())
     {
-      this->RemoveJoint(this->selectedJoint->GetName());
-      this->selectedJoint.reset();
+      for (auto jointVis : this->selectedJoints)
+      {
+        this->RemoveJoint(jointVis->GetName());
+      }
+      this->DeselectAll();
+      return true;
     }
   }
+
   return false;
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OnDelete()
+{
+  if (this->inspectName.empty())
+    return;
+
+  this->RemoveJoint(this->inspectName);
+  this->inspectName = "";
 }
 
 /////////////////////////////////////////////////
@@ -638,7 +729,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(jointId));
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial(this->jointMaterials[_joint->type]);
-  hotspotVisual->SetTransparency(0.5);
+  hotspotVisual->SetTransparency(0.7);
 
   // create a handle at the parent end
   Ogre::BillboardSet *handleSet =
@@ -650,7 +741,12 @@ void JointMaker::CreateHotSpot(JointData *_joint)
       this->jointMaterials[_joint->type]);
   Ogre::ColourValue color = mat->getTechnique(0)->getPass(0)->getDiffuse();
   color.a = 0.5;
-  double dimension = 0.1;
+
+  double linkSize = std::min(0.1,
+      _joint->parent->GetBoundingBox().GetSize().GetLength()*0.05);
+  linkSize = std::max(linkSize, 0.01);
+
+  double dimension = linkSize;
   handleSet->setDefaultDimensions(dimension, dimension);
   Ogre::Billboard *parentHandle = handleSet->createBillboard(0, 0, 0);
   parentHandle->setColour(color);
@@ -669,7 +765,8 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   camera->GetScene()->AddVisual(hotspotVisual);
 
   _joint->hotspot = hotspotVisual;
-  gui::model::Events::jointInserted(jointId, _joint->name);
+  gui::model::Events::jointInserted(jointId, _joint->name,
+      _joint->parent->GetName(), _joint->child->GetName());
 }
 
 /////////////////////////////////////////////////
@@ -684,10 +781,9 @@ void JointMaker::Update()
   }
 
   // update joint line and hotspot position.
-  boost::unordered_map<std::string, JointData *>::iterator it;
-  for (it = this->joints.begin(); it != this->joints.end(); ++it)
+  for (auto it : this->joints)
   {
-    JointData *joint = it->second;
+    JointData *joint = it.second;
     if (joint->hotspot)
     {
       if (joint->child && joint->parent)
@@ -713,8 +809,10 @@ void JointMaker::Update()
 
           // set orientation of joint hotspot
           math::Vector3 dPos = (childOrigin - parentOrigin);
-          math::Vector3 center = dPos/2.0;
-          joint->hotspot->SetScale(math::Vector3(0.02, 0.02, dPos.GetLength()));
+          math::Vector3 center = dPos * 0.5;
+          double length = std::max(dPos.GetLength(), 0.001);
+          joint->hotspot->SetScale(
+              math::Vector3(0.008, 0.008, length));
           joint->hotspot->SetWorldPosition(parentOrigin + center);
           math::Vector3 u = dPos.Normalize();
           math::Vector3 v = math::Vector3::UnitZ;
@@ -734,7 +832,7 @@ void JointMaker::Update()
             Ogre::SceneNode *handleNode = joint->handles->getParentSceneNode();
             joint->handles->detachFromParent();
             joint->hotspot->SetMaterial(material);
-            joint->hotspot->SetTransparency(0.5);
+            joint->hotspot->SetTransparency(0.7);
             handleNode->attachObject(joint->handles);
             Ogre::MaterialPtr mat =
                 Ogre::MaterialManager::getSingleton().getByName(material);
@@ -752,71 +850,21 @@ void JointMaker::Update()
         }
 
         // Create / update joint visual
-        if (!joint->jointMsg || joint->dirty || poseUpdate)
+        if (joint->dirty || poseUpdate)
         {
-          joint->jointMsg.reset(new gazebo::msgs::Joint);
-          joint->jointMsg->set_parent(joint->parent->GetName());
-          joint->jointMsg->set_parent_id(joint->parent->GetId());
-          joint->jointMsg->set_child(joint->child->GetName());
-          joint->jointMsg->set_child_id(joint->child->GetId());
-          joint->jointMsg->set_name(joint->name);
-
-          msgs::Set(joint->jointMsg->mutable_pose(), joint->pose);
-          if (joint->type == JointMaker::JOINT_SLIDER)
+          msgs::JointPtr jointUpdateMsg = joint->jointMsg;
+          unsigned int axisCount = JointMaker::GetJointAxisCount(joint->type);
+          for (unsigned int i = axisCount; i < 2u; ++i)
           {
-            joint->jointMsg->set_type(msgs::Joint::PRISMATIC);
-          }
-          else if (joint->type == JointMaker::JOINT_HINGE)
-          {
-            joint->jointMsg->set_type(msgs::Joint::REVOLUTE);
-          }
-          else if (joint->type == JointMaker::JOINT_HINGE2)
-          {
-            joint->jointMsg->set_type(msgs::Joint::REVOLUTE2);
-          }
-          else if (joint->type == JointMaker::JOINT_SCREW)
-          {
-            joint->jointMsg->set_type(msgs::Joint::SCREW);
-          }
-          else if (joint->type == JointMaker::JOINT_UNIVERSAL)
-          {
-            joint->jointMsg->set_type(msgs::Joint::UNIVERSAL);
-          }
-          else if (joint->type == JointMaker::JOINT_BALL)
-          {
-            joint->jointMsg->set_type(msgs::Joint::BALL);
-          }
-
-          int axisCount = JointMaker::GetJointAxisCount(joint->type);
-          for (int i = 0; i < axisCount; ++i)
-          {
-            msgs::Axis *axisMsg;
-            if (i == 0)
-            {
-              axisMsg = joint->jointMsg->mutable_axis1();
-            }
-            else if (i == 1)
-            {
-              axisMsg = joint->jointMsg->mutable_axis2();
-            }
-            else
-            {
-              gzerr << "Invalid axis index["
-                    << i
-                    << "]"
-                    << std::endl;
-              continue;
-            }
-            msgs::Set(axisMsg->mutable_xyz(), joint->axis[i]);
-            axisMsg->set_use_parent_model_frame(joint->useParentModelFrame[i]);
-
-            // Add angle field after we've checked that index i is valid
-            joint->jointMsg->add_angle(0);
+            if (i == 0u)
+              jointUpdateMsg->clear_axis1();
+            else if (i == 1u)
+              jointUpdateMsg->clear_axis2();
           }
 
           if (joint->jointVisual)
           {
-            joint->jointVisual->UpdateFromMsg(joint->jointMsg);
+            joint->jointVisual->UpdateFromMsg(jointUpdateMsg);
           }
           else
           {
@@ -829,7 +877,8 @@ void JointMaker::Update()
             gazebo::rendering::JointVisualPtr jointVis(
                 new gazebo::rendering::JointVisual(jointVisName, joint->child));
 
-            jointVis->Load(joint->jointMsg);
+            jointVis->Load(jointUpdateMsg);
+
             joint->jointVisual = jointVis;
           }
 
@@ -873,18 +922,24 @@ void JointMaker::GenerateSDF()
   sdf::initFile("model.sdf", this->modelSDF);
   this->modelSDF->ClearElements();
 
-  boost::unordered_map<std::string, JointData *>::iterator jointsIt;
   // loop through all joints
-  for (jointsIt = this->joints.begin(); jointsIt != this->joints.end();
-      ++jointsIt)
+  for (auto jointsIt : this->joints)
   {
-    JointData *joint = jointsIt->second;
+    JointData *joint = jointsIt.second;
     sdf::ElementPtr jointElem = this->modelSDF->AddElement("joint");
 
-    jointElem->GetAttribute("name")->Set(joint->name);
-    jointElem->GetAttribute("type")->Set(GetTypeAsString(joint->type));
-    sdf::ElementPtr parentElem = jointElem->GetElement("parent");
+    msgs::JointPtr jointMsg = joint->jointMsg;
+    unsigned int axisCount = GetJointAxisCount(joint->type);
+    for (unsigned int i = axisCount; i < 2u; ++i)
+    {
+      if (i == 0u)
+        jointMsg->clear_axis1();
+      else if (i == 1u)
+        jointMsg->clear_axis2();
+    }
+    jointElem = msgs::JointToSDF(*jointMsg.get(), jointElem);
 
+    sdf::ElementPtr parentElem = jointElem->GetElement("parent");
     std::string parentName = joint->parent->GetName();
     std::string parentLeafName = parentName;
     size_t pIdx = parentName.find_last_of("::");
@@ -902,29 +957,6 @@ void JointMaker::GenerateSDF()
       childLeafName = childName.substr(cIdx+1);
     childLeafName = this->GetScopedLinkName(childLeafName);
     childElem->Set(childLeafName);
-
-    sdf::ElementPtr poseElem = jointElem->GetElement("pose");
-    poseElem->Set(joint->pose);
-    int axisCount = GetJointAxisCount(joint->type);
-    for (int i = 0; i < axisCount; ++i)
-    {
-      std::stringstream ss;
-      ss << "axis";
-      if (i > 0)
-        ss << (i+1);
-      sdf::ElementPtr axisElem = jointElem->GetElement(ss.str());
-      axisElem->GetElement("xyz")->Set(joint->axis[i]);
-
-      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
-      limitElem->GetElement("lower")->Set(joint->lowerLimit[i]);
-      limitElem->GetElement("upper")->Set(joint->upperLimit[i]);
-      limitElem->GetElement("effort")->Set(joint->effortLimit[i]);
-      limitElem->GetElement("velocity")->Set(joint->velocityLimit[i]);
-      axisElem->GetElement("use_parent_model_frame")->Set(
-          joint->useParentModelFrame[i]);
-      axisElem->GetElement("dynamics")->GetElement("damping")->Set(
-          joint->damping[i]);
-    }
   }
 }
 
@@ -939,44 +971,15 @@ std::string JointMaker::GetTypeAsString(JointMaker::JointType _type)
 {
   std::string jointTypeStr = "";
 
-  if (_type == JointMaker::JOINT_FIXED)
-  {
-    jointTypeStr = "fixed";
-  }
-  else if (_type == JointMaker::JOINT_SLIDER)
-  {
-    jointTypeStr = "prismatic";
-  }
-  else if (_type == JointMaker::JOINT_HINGE)
-  {
-    jointTypeStr = "revolute";
-  }
-  else if (_type == JointMaker::JOINT_HINGE2)
-  {
-    jointTypeStr = "revolute2";
-  }
-  else if (_type == JointMaker::JOINT_SCREW)
-  {
-    jointTypeStr = "screw";
-  }
-  else if (_type == JointMaker::JOINT_UNIVERSAL)
-  {
-    jointTypeStr = "universal";
-  }
-  else if (_type == JointMaker::JOINT_BALL)
-  {
-    jointTypeStr = "ball";
-  }
-  else if (_type == JointMaker::JOINT_NONE)
-  {
-    jointTypeStr = "none";
-  }
+  auto iter = jointTypes.find(_type);
+  if (iter != jointTypes.end())
+    jointTypeStr = iter->second;
 
   return jointTypeStr;
 }
 
 /////////////////////////////////////////////////
-int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
+unsigned int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
 {
   if (_type == JOINT_FIXED)
   {
@@ -1044,22 +1047,15 @@ unsigned int JointMaker::GetJointCount()
 /////////////////////////////////////////////////
 void JointData::OnApply()
 {
-  this->pose = this->inspector->GetPose();
-  this->type = this->inspector->GetType();
+  this->jointMsg->CopyFrom(*this->inspector->GetData());
+  this->type = JointMaker::ConvertJointType(
+      msgs::ConvertJointType(this->jointMsg->type()));
 
-  if (this->name != this->inspector->GetName())
+  if (this->name != this->jointMsg->name())
     gui::model::Events::jointNameChanged(this->hotspot->GetName(),
-        this->inspector->GetName());
-  this->name = this->inspector->GetName();
+        this->jointMsg->name());
+  this->name = this->jointMsg->name();
 
-  int axisCount = JointMaker::GetJointAxisCount(this->type);
-  for (int i = 0; i < axisCount; ++i)
-  {
-    this->axis[i] = this->inspector->GetAxis(i);
-    this->lowerLimit[i] = this->inspector->GetLowerLimit(i);
-    this->upperLimit[i] = this->inspector->GetUpperLimit(i);
-    this->useParentModelFrame[i] = this->inspector->GetUseParentModelFrame(i);
-  }
   this->dirty = true;
   gui::model::Events::modelChanged();
 }
@@ -1073,61 +1069,108 @@ void JointData::OnOpenInspector()
 /////////////////////////////////////////////////
 void JointData::OpenInspector()
 {
-  this->inspector->SetType(this->type);
-  this->inspector->SetName(this->name);
-
-  std::string parentName = this->parent->GetName();
-  std::string parentLeafName = parentName;
-  size_t pIdx = parentName.find_last_of("::");
-  if (pIdx != std::string::npos)
-    parentLeafName = parentName.substr(pIdx+1);
-  this->inspector->SetParent(parentLeafName);
-
-  std::string childName = this->child->GetName();
-  std::string childLeafName = childName;
-  size_t cIdx = childName.find_last_of("::");
-  if (cIdx != std::string::npos)
-    childLeafName = childName.substr(cIdx+1);
-  this->inspector->SetChild(childLeafName);
-
-  this->inspector->SetPose(this->pose);
-  int axisCount = JointMaker::GetJointAxisCount(this->type);
-  for (int i = 0; i < axisCount; ++i)
-  {
-    this->inspector->SetAxis(i, this->axis[i]);
-    this->inspector->SetAxis(i, this->axis[i]);
-    this->inspector->SetLowerLimit(i, this->lowerLimit[i]);
-    this->inspector->SetUpperLimit(i, this->upperLimit[i]);
-    this->inspector->SetUseParentModelFrame(i, this->useParentModelFrame[i]);
-  }
+  this->inspector->Update(this->jointMsg);
   this->inspector->move(QCursor::pos());
   this->inspector->show();
+}
+
+/////////////////////////////////////////////////
+void JointMaker::ShowContextMenu(const std::string &_name)
+{
+  auto it = this->joints.find(_name);
+  if (it == this->joints.end())
+    return;
+
+  QMenu menu;
+  if (this->inspectAct)
+    menu.addAction(this->inspectAct);
+
+  this->inspectName = _name;
+  QAction *deleteAct = new QAction(tr("Delete"), this);
+  connect(deleteAct, SIGNAL(triggered()), this, SLOT(OnDelete()));
+  menu.addAction(deleteAct);
+
+  menu.exec(QCursor::pos());
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OnSetSelectedEntity(const std::string &/*_name*/,
+    const std::string &/*_mode*/)
+{
+  this->DeselectAll();
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OnSetSelectedJoint(const std::string &_name,
+    const bool _selected)
+{
+  this->SetSelected(_name, _selected);
+}
+
+/////////////////////////////////////////////////
+void JointMaker::SetSelected(const std::string &_name,
+    const bool _selected)
+{
+  auto it = this->joints.find(_name);
+  if (it == this->joints.end())
+    return;
+
+  this->SetSelected((*it).second->hotspot, _selected);
+}
+
+/////////////////////////////////////////////////
+void JointMaker::SetSelected(rendering::VisualPtr _jointVis,
+    const bool _selected)
+{
+  if (!_jointVis)
+    return;
+
+  _jointVis->SetHighlighted(_selected);
+  auto it = std::find(this->selectedJoints.begin(),
+      this->selectedJoints.end(), _jointVis);
+  if (_selected)
+  {
+    if (it == this->selectedJoints.end())
+    {
+      this->selectedJoints.push_back(_jointVis);
+      model::Events::setSelectedJoint(_jointVis->GetName(), _selected);
+    }
+  }
+  else
+  {
+    if (it != this->selectedJoints.end())
+    {
+      this->selectedJoints.erase(it);
+      model::Events::setSelectedJoint(_jointVis->GetName(), _selected);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void JointMaker::DeselectAll()
+{
+  while (!this->selectedJoints.empty())
+  {
+    rendering::VisualPtr vis = this->selectedJoints[0];
+    vis->SetHighlighted(false);
+    this->selectedJoints.erase(this->selectedJoints.begin());
+    model::Events::setSelectedJoint(vis->GetName(), false);
+  }
 }
 
 /////////////////////////////////////////////////
 void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
     const std::string &_modelName)
 {
-  // Name
-  std::string jointName = _jointElem->Get<std::string>("name");
-
-  // Pose
-  math::Pose jointPose;
-  if (_jointElem->HasElement("pose"))
-    jointPose = _jointElem->Get<math::Pose>("pose");
-  else
-    jointPose.Set(0, 0, 0, 0, 0, 0);
+  msgs::Joint jointMsg = msgs::JointFromSDF(_jointElem);
 
   // Parent
-  std::string parentName = _modelName + "::" +
-      _jointElem->GetElement("parent")->GetValue()->GetAsString();
-
+  std::string parentName = _modelName + "::" + jointMsg.parent();
   rendering::VisualPtr parentVis =
       gui::get_active_camera()->GetScene()->GetVisual(parentName);
 
   // Child
-  std::string childName = _modelName + "::" +
-      _jointElem->GetElement("child")->GetValue()->GetAsString();
+  std::string childName = _modelName + "::" + jointMsg.child();
   rendering::VisualPtr childVis =
       gui::get_active_camera()->GetScene()->GetVisual(childName);
 
@@ -1138,57 +1181,23 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
     return;
   }
 
-  // Type
-  std::string type = _jointElem->Get<std::string>("type");
-
   JointData *joint = new JointData();
-  joint->name = jointName;
-  joint->pose = jointPose;
+  joint->name = jointMsg.name();
   joint->parent = parentVis;
   joint->child = childVis;
-  joint->type = this->ConvertJointType(type);
+  joint->type = this->ConvertJointType(msgs::ConvertJointType(jointMsg.type()));
   std::string jointVisName = _modelName + "::" + joint->name;
 
-  // Axes
-  int axisCount = JointMaker::GetJointAxisCount(joint->type);
-  for (int i = 0; i < axisCount; ++i)
-  {
-    sdf::ElementPtr axisElem;
-    if (i == 0)
-      axisElem = _jointElem->GetElement("axis");
-    else
-      axisElem = _jointElem->GetElement("axis2");
-
-    joint->axis[i] = axisElem->Get<math::Vector3>("xyz");
-
-    if (axisElem->HasElement("limit"))
-    {
-      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
-      joint->lowerLimit[i] = limitElem->Get<double>("lower");
-      joint->upperLimit[i] = limitElem->Get<double>("upper");
-      joint->effortLimit[i] = limitElem->Get<double>("effort");
-      joint->velocityLimit[i] = limitElem->Get<double>("velocity");
-    }
-
-    // Use parent model frame
-    if (axisElem->HasElement("use_parent_model_frame"))
-    {
-      bool useParent = axisElem->Get<bool>("use_parent_model_frame");
-      joint->useParentModelFrame[i] = useParent;
-    }
-
-    if (axisElem->HasElement("dynamics"))
-    {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-      joint->damping[i] = dynamicsElem->Get<double>("damping");
-    }
-  }
+  joint->jointMsg.reset(new msgs::Joint);
+  joint->jointMsg->CopyFrom(jointMsg);
+  joint->jointMsg->set_parent_id(joint->parent->GetId());
+  joint->jointMsg->set_child_id(joint->child->GetId());
 
   // Inspector
-  joint->inspector = new JointInspector(joint->type);
+  joint->inspector = new JointInspector();
+  joint->inspector->Update(joint->jointMsg);
   joint->inspector->setModal(false);
-  connect(joint->inspector, SIGNAL(Applied()),
-      joint, SLOT(OnApply()));
+  connect(joint->inspector, SIGNAL(Applied()), joint, SLOT(OnApply()));
 
   // Visuals
   rendering::VisualPtr jointVis(
@@ -1225,6 +1234,5 @@ void JointMaker::ShowJoints(bool _show)
     if (iter.second->jointVisual)
       iter.second->jointVisual->SetVisible(_show);
   }
-  if (this->selectedJoint)
-    this->selectedJoint->SetHighlighted(_show);
+  this->DeselectAll();
 }

@@ -182,3 +182,9 @@ void RayShape::FillMsg(msgs::Geometry &/*_msg*/)
 void RayShape::ProcessMsg(const msgs::Geometry &/*_msg*/)
 {
 }
+
+//////////////////////////////////////////////////
+double RayShape::ComputeVolume() const
+{
+  return 0;
+}

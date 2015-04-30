@@ -51,7 +51,7 @@ class Factory : public WorldPlugin
           </model>\
         </sdf>");
     // Demonstrate using a custom model name.
-    sdf::ElementPtr model = sphereSDF.root->GetElement("model");
+    sdf::ElementPtr model = sphereSDF.Root()->GetElement("model");
     model->GetAttribute("name")->SetFromString("unique_sphere");
     _parent->InsertModelSDF(sphereSDF);
 

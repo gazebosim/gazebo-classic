@@ -15,6 +15,12 @@
  *
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/rendering/Material.hh"
@@ -690,7 +696,7 @@ void LinkData::OnAddVisual(const std::string &_name)
 
     visVisual.reset(new rendering::Visual(visualName.str(),
         this->linkVisual));
-    sdf::ElementPtr visualElem =  modelTemplateSDF->root
+    sdf::ElementPtr visualElem =  modelTemplateSDF->Root()
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     visVisual->Load(visualElem);
   }
@@ -735,7 +741,7 @@ void LinkData::OnAddCollision(const std::string &_name)
 
     collisionVis.reset(new rendering::Visual(collisionName.str(),
         this->linkVisual));
-    sdf::ElementPtr collisionElem =  modelTemplateSDF->root
+    sdf::ElementPtr collisionElem =  modelTemplateSDF->Root()
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     collisionVis->Load(collisionElem);
     collisionVis->SetMaterial("Gazebo/Orange");

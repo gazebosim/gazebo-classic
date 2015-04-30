@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/math/Rand.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
@@ -177,7 +183,7 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
 
   double distance = std::max(1.0,
       this->referencePose.pos.Distance(_receiver.pos));
-  double x = abs(math::Rand::GetDblNormal(0.0, ModelStdDesv));
+  double x = std::abs(math::Rand::GetDblNormal(0.0, ModelStdDesv));
   double wavelength = common::SpeedOfLight / (this->GetFreq() * 1000000);
 
   // Hata-Okumara propagation model

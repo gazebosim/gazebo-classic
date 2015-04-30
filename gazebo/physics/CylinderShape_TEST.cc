@@ -45,7 +45,7 @@ TEST_F(CylinderShapeTest, Scale)
 
   physics::CylinderShapePtr cylinder(
       new physics::CylinderShape(physics::CollisionPtr()));
-  sdf::ElementPtr elem = cylinderSDF->root;
+  sdf::ElementPtr elem = cylinderSDF->Root();
   ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("model");
   ASSERT_TRUE(elem != NULL);
@@ -134,6 +134,53 @@ TEST_F(CylinderShapeTest, Scale)
   length = cylinder->GetLength();
   EXPECT_DOUBLE_EQ(radius, 0.5);
   EXPECT_DOUBLE_EQ(length, 2.5);
+}
+
+TEST_F(CylinderShapeTest, Volume)
+{
+  std::ostringstream cylinderStr;
+  cylinderStr << "<sdf version ='" << SDF_VERSION << "'>"
+    << "<model name='model'>"
+    << "<link name ='link'>"
+    <<   "<collision name ='collision'>"
+    <<     "<geometry>"
+    <<       "<cylinder>"
+    <<         "<radius>1.0</radius>"
+    <<         "<length>1.0</length>"
+    <<       "</cylinder>"
+    <<     "</geometry>"
+    <<   "</collision>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  sdf::SDFPtr cylinderSDF(new sdf::SDF);
+  cylinderSDF->SetFromString(cylinderStr.str());
+
+  physics::CylinderShapePtr cylinder(
+      new physics::CylinderShape(physics::CollisionPtr()));
+  sdf::ElementPtr elem = cylinderSDF->Root();
+  ASSERT_TRUE(elem != NULL);
+  elem = elem->GetElement("model");
+  ASSERT_TRUE(elem != NULL);
+  elem = elem->GetElement("link");
+  ASSERT_TRUE(elem != NULL);
+  elem = elem->GetElement("collision");
+  ASSERT_TRUE(elem != NULL);
+  elem = elem->GetElement("geometry");
+  ASSERT_TRUE(elem != NULL);
+  elem = elem->GetElement("cylinder");
+  ASSERT_TRUE(elem != NULL);
+  cylinder->Load(elem);
+
+  EXPECT_FLOAT_EQ(cylinder->ComputeVolume(), M_PI);
+  cylinder->SetLength(3);
+  cylinder->SetRadius(2);
+  EXPECT_FLOAT_EQ(cylinder->ComputeVolume(), M_PI*4*3);
+
+  // The bounding box approximation should be 0 because the Shape has no
+  // Collision parent
+  EXPECT_DOUBLE_EQ(cylinder->Shape::ComputeVolume(), 0);
 }
 
 int main(int argc, char **argv)

@@ -54,7 +54,7 @@ void EventSource::Load(const sdf::ElementPtr &_sdf)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void EventSource::Emit(const std::string& _data)
+void EventSource::Emit(const std::string& _data) const
 {
   if (this->IsActive())
   {
@@ -72,12 +72,12 @@ void EventSource::Emit(const std::string& _data)
     msgs::Set(worldStatsMsg->mutable_real_time(), this->world->GetRealTime());
     msgs::Set(worldStatsMsg->mutable_pause_time(), this->world->GetPauseTime());
     // send it on the publisher we got in the ctor
-    pub->Publish(msg);
+    this->pub->Publish(msg);
   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool EventSource::IsActive()
+bool EventSource::IsActive() const
 {
   // inactive events do not fire.
   return this->active;
