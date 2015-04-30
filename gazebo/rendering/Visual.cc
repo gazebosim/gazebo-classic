@@ -2392,10 +2392,47 @@ VisualPtr Visual::GetParent() const
 VisualPtr Visual::GetRootVisual()
 {
   VisualPtr p = shared_from_this();
-  while (p->GetParent() && p->GetParent()->GetName() != "__world_node__")
+  while (p->GetParent() &&
+      p->GetParent() != this->dataPtr->scene->GetWorldVisual())
+  {
     p = p->GetParent();
+  }
 
   return p;
+}
+
+//////////////////////////////////////////////////
+VisualPtr Visual::GetNthAncestor(unsigned int _n)
+{
+  // Get visual's depth
+  unsigned int depth = this->GetDepth();
+
+  // Must be deeper than ancestor
+  if (depth < _n)
+    return NULL;
+
+  // Get ancestor
+  VisualPtr p = shared_from_this();
+  while (p->GetParent() && depth != _n)
+  {
+    p = p->GetParent();
+    --depth;
+  }
+
+  return p;
+}
+
+//////////////////////////////////////////////////
+unsigned int Visual::GetDepth() const
+{
+  boost::shared_ptr<Visual const> p = shared_from_this();
+  unsigned int depth = 0;
+  while (p->GetParent())
+  {
+    p = p->GetParent();
+    ++depth;
+  }
+  return depth;
 }
 
 //////////////////////////////////////////////////
