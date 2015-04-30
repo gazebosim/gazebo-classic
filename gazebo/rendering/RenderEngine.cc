@@ -19,7 +19,8 @@
 # include <QtCore/qglobal.h>
 #endif
 
-#if not defined( Q_OS_MAC) && not defined(_WIN32)  // Not Apple or Windows
+// Not Apple or Windows
+#if not defined( Q_OS_MAC) && not defined(_WIN32)
 # include <X11/Xlib.h>
 # include <X11/Xutil.h>
 # include <GL/glx.h>

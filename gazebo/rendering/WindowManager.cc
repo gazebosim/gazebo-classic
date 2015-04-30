@@ -27,7 +27,6 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
-#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
