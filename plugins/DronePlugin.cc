@@ -41,6 +41,7 @@ GZ_REGISTER_MODEL_PLUGIN(DronePlugin)
 DronePlugin::DronePlugin()
 {
   this->joy = new util::Joystick();
+  this->yawSpeed = 0;
 }
 
 /////////////////////////////////////////////////
@@ -136,6 +137,10 @@ void DronePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       this->model->GetWorld()->GetPhysicsEngine()->CreateShape(
         "ray", physics::CollisionPtr()));
 
+  this->rotorJoints.push_back(this->model->GetJoint("iris::rotor_0_joint"));
+  this->rotorJoints.push_back(this->model->GetJoint("iris::rotor_3_joint"));
+  this->rotorJoints.push_back(this->model->GetJoint("iris::rotor_2_joint"));
+  this->rotorJoints.push_back(this->model->GetJoint("iris::rotor_1_joint"));
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&DronePlugin::OnUpdate, this));
@@ -185,26 +190,39 @@ void DronePlugin::OnUpdate()
     // std::cout << "yawSpeed[" << this->yawSpeed << "]\n";
   }
 
+  double direction = -1.0;
+  for (physics::Joint_V::iterator j = this->rotorJoints.begin();
+       j != this->rotorJoints.end(); ++j)
+  {
+    direction *= -1.0;
+    if (*j)
+      (*j)->SetVelocity(0, direction * (100 * this->velocity.z + 60));
+    else
+      gzerr << "joint not found\n";
+  }
+
   math::Pose baseLinkPose = this->baseLink->GetWorldPose();
 
   // rotate velocity to world frame
-  const math::Vector3 maxVelocity(10.0, 10.0, 2.0);
+  const math::Vector3 maxVelocity(10.0, 10.0, 4.0);
   this->targetBaseLinkPose.pos += dt.Double() *
     baseLinkPose.rot.RotateVector(maxVelocity * this->velocity);
 
-  math::Vector3 fakeRpyBodyFrame(-20.0 * this->velocity.y,
-   20.0 * this->velocity.x, 0.0);
+  double fakeTorqueScale = 5.0;
+  math::Vector3 fakeRpyBodyFrame(-fakeTorqueScale * this->velocity.y,
+   fakeTorqueScale * this->velocity.x, 0.0);
 
   math::Vector3 fakeRpyWorldFrame =
     baseLinkPose.rot.RotateVector(fakeRpyBodyFrame);
 
-  const math::Vector3 d(5.0, 5.0, 2.0);
+  // bounding box for target pose from body frame
+  const math::Vector3 targetBB(5.0, 5.0, 2.0);
   this->targetBaseLinkPose.pos.x = math::clamp(targetBaseLinkPose.pos.x,
-    baseLinkPose.pos.x-d.x, baseLinkPose.pos.x+d.x);
+    baseLinkPose.pos.x-targetBB.x, baseLinkPose.pos.x+targetBB.x);
   this->targetBaseLinkPose.pos.y = math::clamp(targetBaseLinkPose.pos.y,
-    baseLinkPose.pos.y-d.y, baseLinkPose.pos.y+d.y);
+    baseLinkPose.pos.y-targetBB.y, baseLinkPose.pos.y+targetBB.y);
   this->targetBaseLinkPose.pos.z = math::clamp(targetBaseLinkPose.pos.z,
-    baseLinkPose.pos.z-d.z, baseLinkPose.pos.z+d.z);
+    baseLinkPose.pos.z-targetBB.z, baseLinkPose.pos.z+targetBB.z);
 
   // zero out pitch and roll
   // math::Vector3 rpy = this->targetBaseLinkPose.rot.GetAsEuler();

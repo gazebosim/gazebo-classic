@@ -103,6 +103,8 @@ namespace gazebo
     /// of the base link motion.
     private: physics::JointPtr baseJoint;
 
+    private: physics::Joint_V rotorJoints;
+
     /// \brief: target link control pose
     private: math::Pose targetBaseLinkPose;
 
