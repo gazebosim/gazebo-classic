@@ -21,6 +21,7 @@
   #include <Winsock2.h>
 #endif
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
 
@@ -62,7 +63,7 @@ double Shape::ComputeVolume() const
     return 0;
   }
   gzwarn << "ComputeVolume not fully implemented for this shape type, returning"
-    << " bounding box approximation" << std::endl;
+         << " bounding box approximation" << std::endl;
 
   math::Vector3 size = this->collisionParent->GetBoundingBox().GetSize();
   return size.x * size.y * size.z;

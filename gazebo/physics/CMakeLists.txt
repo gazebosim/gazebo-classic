@@ -22,7 +22,6 @@ include_directories(${TBB_INCLUDEDIR})
 # in order to get the proper visibility when building libs
 if (WIN32)
   add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
-
   include_directories(${libdl_include_dir})
 endif()
 
@@ -129,6 +128,18 @@ target_link_libraries(gazebo_physics
   gazebo_common
   gazebo_util
 )
+
+if (HAVE_BULLET)
+  target_link_libraries(gazebo_physics gazebo_physics_bullet)
+endif()
+
+if (HAVE_DART)
+  target_link_libraries(gazebo_physics gazebo_physics_dart)
+endif()
+
+if (HAVE_SIMBODY)
+  target_link_libraries(gazebo_physics gazebo_physics_simbody)
+endif()
 
 if (HAVE_GDAL)
   target_link_libraries(gazebo_physics ${GDAL_LIBRARY})
