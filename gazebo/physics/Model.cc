@@ -83,13 +83,13 @@ void Model::Load(sdf::ElementPtr _sdf)
 
   this->LoadLinks();
 
-  this->LoadModels();
-
   // Load the joints if the world is already loaded. Otherwise, the World
   // has some special logic to load models that takes into account state
   // information.
   if (this->world->IsLoaded())
     this->LoadJoints();
+
+  this->LoadModels();
 }
 
 //////////////////////////////////////////////////
@@ -220,6 +220,14 @@ void Model::LoadJoints()
       gripperElem = gripperElem->GetNextElement("gripper");
     }
   }
+
+  // Load the nested model joints if the world is not already loaded. Otherwise,
+  // LoadJoints will called from in Model::Load.
+  if (!this->world->IsLoaded())
+  {
+    for (auto model : this->models)
+      model->LoadJoints();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -324,6 +332,9 @@ void Model::Update()
     }
     this->prevAnimationTime = this->world->GetSimTime();
   }
+
+  for (auto model : this->models)
+    model->Update();
 }
 
 //////////////////////////////////////////////////
