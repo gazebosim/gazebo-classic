@@ -5,6 +5,9 @@
 1. Windows support. This consists mostly of numerous small changes to support
 compilation on Windows.
     * [Pull request #1616](https://bitbucket.org/osrf/gazebo/pull-request/1616)
+    * [Pull request #1618](https://bitbucket.org/osrf/gazebo/pull-request/1618)
+    * [Pull request #1620](https://bitbucket.org/osrf/gazebo/pull-request/1620)
+    * [Pull request #1626](https://bitbucket.org/osrf/gazebo/pull-request/1626)
     * [Pull request #1629](https://bitbucket.org/osrf/gazebo/pull-request/1629)
     * [Pull request #1631](https://bitbucket.org/osrf/gazebo/pull-request/1631)
 
