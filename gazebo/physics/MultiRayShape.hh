@@ -126,6 +126,9 @@ namespace gazebo
       /// \param[in] _msg Message to update from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
+      /// Documentation inherited
+      public: virtual double ComputeVolume() const;
+
       /// \brief Connect a to the new laser scan signal.
       /// \param[in] _subscriber Callback function.
       /// \return The connection, which must be kept in scope.

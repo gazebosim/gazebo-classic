@@ -119,6 +119,9 @@ namespace gazebo
       /// \TODO Implement this function.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
+      /// Documentation inherited
+      public: virtual double ComputeVolume() const;
+
       // Contact information; this is filled out during collision
       // detection.
       /// \brief Length of the ray.
