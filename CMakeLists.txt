@@ -155,7 +155,7 @@ endif (NOT CMAKE_BUILD_TYPE)
 # uppercase old supported and deprecated modes
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPERCASE)
 
-if (NOT_DEFINED_HDF5_INSTRUMENT)
+if (NOT_DEFINED HDF5_INSTRUMENT)
   set (HDF5_INSTRUMENT FALSE)
 endif()
 
@@ -180,8 +180,7 @@ elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "COVERAGE")
   include (${gazebo_cmake_dir}/CodeCoverage.cmake)
   setup_target_for_coverage(coverage coverage)
 else()
-  build_error("CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} unknown. Valid options are: Debug Release RelWithDebInfo Profile Check")
-endif()
+  build_error("CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} unknown. Valid options are: Debug Release RelWithDebInfo Profile Check") endif()
 
 #####################################
 # Handle CFlags
