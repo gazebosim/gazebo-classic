@@ -15,6 +15,13 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <boost/thread/recursive_mutex.hpp>
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/PlaneShape.hh"
 
@@ -100,10 +107,4 @@ void PlaneShape::FillMsg(msgs::Geometry &_msg)
 void PlaneShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetNormal(msgs::Convert(_msg.plane().normal()));
-}
-
-//////////////////////////////////////////////////
-double PlaneShape::ComputeVolume() const
-{
-  return 0;
 }
