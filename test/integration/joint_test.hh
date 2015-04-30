@@ -21,7 +21,7 @@
 #include <string>
 #include <sstream>
 
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
