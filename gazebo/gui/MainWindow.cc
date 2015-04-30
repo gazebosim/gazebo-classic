@@ -1213,7 +1213,8 @@ void MainWindow::CreateActions()
   g_viewOculusAct->setEnabled(false);
 #endif
 
-  g_dataLoggerAct = new QAction(tr("&Log Data"), this);
+  g_dataLoggerAct = new QAction(QIcon(":images/log_record.png"),
+      tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
   connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
@@ -1565,7 +1566,6 @@ void MainWindow::CreateMenuBar()
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
-  windowMenu->addAction(g_dataLoggerAct);
 
   windowMenu->addAction(g_viewOculusAct);
 

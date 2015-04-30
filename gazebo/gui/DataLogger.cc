@@ -286,6 +286,9 @@ void DataLogger::OnRecord(bool _toggle)
          QLabel{color: #111;}");
     this->confirmationDialog->setModal(false);
     this->confirmationDialog->show();
+    this->confirmationDialog->move(this->mapToGlobal(
+        QPoint((this->width()-this->confirmationDialog->width())*0.5,
+        this->height() + 10)));
 
     // Change the status
     this->statusLabel->setText("Ready");
