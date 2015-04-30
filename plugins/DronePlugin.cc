@@ -196,7 +196,7 @@ void DronePlugin::OnUpdate()
   {
     direction *= -1.0;
     if (*j)
-      (*j)->SetVelocity(0, direction * (100 * this->velocity.z + 60));
+      (*j)->SetVelocity(0, direction * (-100 * this->velocity.z + 60));
     else
       gzerr << "joint not found\n";
   }
