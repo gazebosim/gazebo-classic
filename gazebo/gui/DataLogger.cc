@@ -21,7 +21,6 @@
   #include <Winsock2.h>
   // For _access()
   #include <io.h>
-  #define access _access
 #endif
 
 #include <boost/filesystem.hpp>
@@ -423,8 +422,8 @@ void DataLogger::OnBrowse()
   // Note: This is not cross-platform compatible.
 #ifdef _WIN32
   // Check for write-only (2) and read-write (6)
-  if ((access(path.string().c_str(), 2) != 0) &&
-      (access(path.string().c_str(), 6) != 0))
+  if ((_access(path.string().c_str(), 2) != 0) &&
+      (_access(path.string().c_str(), 6) != 0))
 #else
   if (access(path.string().c_str(), W_OK) != 0)
 #endif
