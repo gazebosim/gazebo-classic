@@ -272,7 +272,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
       {
         if (model->GetAttribute("name")->GetAsString() == _modelName)
         {
-          this->CreateModelFromSDF(model);
+          rendering::VisualPtr modelVis = this->CreateModelFromSDF(model);
 
           // Hide the model from the scene to substitute with the preview visual
           this->SetModelVisible(_modelName, false);
@@ -291,6 +291,13 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
           this->serverModelSDF = model;
           this->modelPose = pose;
 
+          std::stringstream ss;
+          ss << "<sdf version='" << SDF_VERSION << "'>"
+             << model->ToString("")
+             << "</sdf>";
+
+          gui::model::Events::editModel(_modelName, modelVis->GetName(),
+              ss.str());
           return;
         }
         model = model->GetNextElement("model");
@@ -426,6 +433,10 @@ rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allNestedModels[nestedModelName] = modelData;
+
+    if (this->canonicalModel.empty())
+      this->canonicalModel = nestedModelName;
+
     if (!_attachedToMouse)
       gui::model::Events::nestedModelInserted(nestedModelName);
   }
@@ -1206,6 +1217,7 @@ void ModelCreator::Reset()
   this->serverModelSDF.reset();
   this->serverModelVisible.clear();
   this->canonicalLink = "";
+  this->canonicalModel = "";
 
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
@@ -1233,7 +1245,9 @@ void ModelCreator::Reset()
   if (this->previewVisual)
     scene->RemoveVisual(this->previewVisual);
 
-  this->previewVisual.reset(new rendering::Visual(this->previewName,
+  std::stringstream visName;
+  visName << this->previewName << "_" << this->modelCounter;
+  this->previewVisual.reset(new rendering::Visual(visName.str(),
       scene->GetWorldVisual()));
 
   this->previewVisual->Load();
@@ -1553,6 +1567,8 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   if (vis)
   {
     rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
+    if (!topLevelVis)
+      return false;
 
     // Is link / nested model
     if (this->allLinks.find(topLevelVis->GetName()) !=
@@ -1675,6 +1691,9 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
     if (vis && !vis->IsPlane())
     {
       rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
+
+      if (!topLevelVis)
+        return false;
 
       // Main window models always handled here
       if (this->allLinks.find(topLevelVis->GetName()) ==
@@ -1858,6 +1877,52 @@ JointMaker *ModelCreator::GetJointMaker() const
 }
 
 /////////////////////////////////////////////////
+void ModelCreator::UpdateNestedModelSDF(sdf::ElementPtr _modelElem)
+{
+  if (this->modelName == this->serverModelName)
+    return;
+
+  if (_modelElem->HasElement("joint"))
+  {
+    sdf::ElementPtr jointElem = _modelElem->GetElement("joint");
+    while (jointElem)
+    {
+      sdf::ElementPtr parentElem = jointElem->GetElement("parent");
+      std::string parentName = parentElem->Get<std::string>();
+      size_t pos = parentName.find("::");
+      if (pos != std::string::npos &&
+          parentName.substr(0, pos) == this->serverModelName)
+      {
+        parentName = this->modelName + parentName.substr(pos);
+        parentElem->Set(parentName);
+      }
+
+      sdf::ElementPtr childElem = jointElem->GetElement("child");
+      std::string childName = childElem->Get<std::string>();
+      pos = childName.find("::");
+      if (pos != std::string::npos &&
+          childName.substr(0, pos) == this->serverModelName)
+      {
+        childName = this->modelName + childName.substr(pos);
+        childElem->Set(childName);
+      }
+
+      jointElem = jointElem->GetNextElement("joint");
+    }
+  }
+
+  if (_modelElem->HasElement("model"))
+  {
+    sdf::ElementPtr modelElem = _modelElem->GetElement("model");
+    while (modelElem)
+    {
+      this->UpdateNestedModelSDF(modelElem);
+      modelElem = modelElem->GetNextElement("model");
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void ModelCreator::GenerateSDF()
 {
   sdf::ElementPtr modelElem;
@@ -1935,14 +2000,31 @@ void ModelCreator::GenerateSDF()
     modelElem->InsertElement(newLinkElem);
   }
 
-  // loop through all nested models and add sdf
+  // generate canonical model sdf first.
+  if (!this->canonicalModel.empty())
+  {
+    auto canonical = this->allNestedModels.find(this->canonicalModel);
+    if (canonical != this->allNestedModels.end())
+    {
+      NestedModelData *nestedModelData = canonical->second;
+      this->UpdateNestedModelSDF(nestedModelData->modelSDF);
+      modelElem->InsertElement(nestedModelData->modelSDF);
+    }
+  }
+
+  // loop through rest of all nested models and add sdf
   for (auto &nestedModelsIt : this->allNestedModels)
   {
+    if (nestedModelsIt.first == this->canonicalModel)
+      continue;
+
     NestedModelData *nestedModelData = nestedModelsIt.second;
+    this->UpdateNestedModelSDF(nestedModelData->modelSDF);
     modelElem->InsertElement(nestedModelData->modelSDF);
   }
 
   // Add joint sdf elements
+  this->jointMaker->SetModelName(this->modelName);
   this->jointMaker->GenerateSDF();
   sdf::ElementPtr jointsElem = this->jointMaker->GetSDF();
 

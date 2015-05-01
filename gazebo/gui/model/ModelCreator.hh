@@ -243,6 +243,10 @@ namespace gazebo
       /// \brief Generate the SDF from model link and joint visuals.
       public: void GenerateSDF();
 
+      /// \brief Update nested model SDF with new model name.
+      /// \param[in] _modelElem Model SDF.
+      public: void UpdateNestedModelSDF(sdf::ElementPtr _modelElem);
+
       /// \brief Helper function to generate link sdf from link data.
       /// \param[in] _link Link data used to generate the sdf.
       /// \return SDF element describing the link.
@@ -534,6 +538,9 @@ namespace gazebo
 
       /// \brief Name of the canonical link in the model
       private: std::string canonicalLink;
+
+      /// \brief Name of the canonical model
+      private: std::string canonicalModel;
     };
     /// \}
   }

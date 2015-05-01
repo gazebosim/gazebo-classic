@@ -83,13 +83,13 @@ void Model::Load(sdf::ElementPtr _sdf)
 
   this->LoadLinks();
 
+  this->LoadModels();
+
   // Load the joints if the world is already loaded. Otherwise, the World
   // has some special logic to load models that takes into account state
   // information.
   if (this->world->IsLoaded())
     this->LoadJoints();
-
-  this->LoadModels();
 }
 
 //////////////////////////////////////////////////

@@ -49,3 +49,5 @@ event::EventT<void (std::string)> model::Events::showLinkContextMenu;
 event::EventT<void (std::string)> model::Events::showJointContextMenu;
 event::EventT<void (std::string, bool)> model::Events::setSelected;
 event::EventT<void (std::string, bool)> model::Events::setSelectedJoint;
+event::EventT<void (std::string, std::string, std::string)>
+    model::Events::editModel;
