@@ -585,11 +585,11 @@ void ODEPhysics::SetSORPGSW(double _w)
 void ODEPhysics::SetFrictionModel(const std::string &_fricModel)
 {
   unsigned int fricModel = 0;
-  if(_fricModel.compare("pyramid_model") == 0)
+  if (_fricModel.compare("pyramid_model") == 0)
       fricModel = 0;
-  else if(_fricModel.compare("cone_model") == 0)
+  else if (_fricModel.compare("cone_model") == 0)
       fricModel = 1;
-  else if(_fricModel.compare("box_model") == 0)
+  else if (_fricModel.compare("box_model") == 0)
       fricModel = 2;
 
   // Comment this until sdformat changes
