@@ -1373,6 +1373,18 @@ void ModelCreator::AddEntity(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
+sdf::ElementPtr ModelCreator::GetEntitySDF(const std::string &_name)
+{
+  auto it = this->allNestedModels.find(_name);
+  if (it != this->allNestedModels.end())
+  {
+    if (it->second)
+      return it->second->modelSDF;
+  }
+  return NULL;
+}
+
+/////////////////////////////////////////////////
 void ModelCreator::AddLink(LinkType _type)
 {
   if (!this->previewVisual)

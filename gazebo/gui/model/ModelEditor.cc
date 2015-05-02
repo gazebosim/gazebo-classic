@@ -244,6 +244,12 @@ void ModelEditor::RemoveEntity(const std::string &_name)
 }
 
 ////////////////////////////////////////////////
+sdf::ElementPtr ModelEditor::GetEntitySDF(const std::string &_name)
+{
+  return this->dataPtr->modelPalette->GetModelCreator()->GetEntitySDF(_name);
+}
+
+////////////////////////////////////////////////
 void ModelEditor::Save()
 {
   gui::model::Events::saveModelEditor();

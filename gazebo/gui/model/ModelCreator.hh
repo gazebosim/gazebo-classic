@@ -236,6 +236,11 @@ namespace gazebo
       /// \param[in] _sdf SDF describing the entity.
       public: void AddEntity(sdf::ElementPtr _sdf);
 
+      /// \brief Get an entity in the model
+      /// \param[in] _name Name of entity.
+      /// \return _sdf SDF describing the entity.
+      public: sdf::ElementPtr GetEntitySDF(const std::string &_name);
+
       /// \brief Add a link to the model
       /// \param[in] _type Type of link to be added
       public: void AddLink(LinkType _type);

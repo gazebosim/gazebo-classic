@@ -59,6 +59,11 @@ namespace gazebo
       /// \param[in] _name Name of the entity.
       public: void RemoveEntity(const std::string &_name);
 
+      /// \brief Get an entity in the model
+      /// \param[in] _name Name of entity.
+      /// \return _sdf SDF describing the entity.
+      public: sdf::ElementPtr GetEntitySDF(const std::string &_name);
+
       public: void AppendPluginElement(const std::string &_name,
           const std::string &_filename, sdf::ElementPtr _element);
 
