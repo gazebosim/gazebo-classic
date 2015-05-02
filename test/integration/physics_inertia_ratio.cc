@@ -24,7 +24,7 @@
 #include "gazebo/math/Vector3Stats.hh"
 #include "gazebo/physics/physics.hh"
 #include "test/integration/helper_physics_generator.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 
@@ -81,6 +81,10 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   EXPECT_NEAR((upperAngles.Z().Map())["maxAbs"], 0.0, g_angle_z_tol);
   EXPECT_NEAR((lowerAngles.Y().Map())["maxAbs"], 0.0, g_angle_y_tol);
   EXPECT_NEAR((lowerAngles.Z().Map())["maxAbs"], 0.0, g_angle_z_tol);
+
+  RecordProperty("engine", _physicsEngine);
+  this->Record("lowerAngles", lowerAngles);
+  this->Record("upperAngles", upperAngles);
 }
 
 TEST_P(PhysicsTest, InertiaRatioPendulum)

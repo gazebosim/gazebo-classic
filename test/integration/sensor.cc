@@ -15,7 +15,7 @@
  *
 */
 #include <string.h>
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class SensorTest : public ServerFixture

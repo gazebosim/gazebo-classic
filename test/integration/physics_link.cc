@@ -19,7 +19,7 @@
 #include "gazebo/math/Vector3Stats.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
@@ -318,6 +318,9 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   {
     EXPECT_LT(angularMomentumError.Mag().Map()[stat], g_tolerance * 10);
   }
+
+  RecordProperty("engine", _physicsEngine);
+  this->Record("angularMomentumError", angularMomentumError);
 }
 
 /////////////////////////////////////////////////
