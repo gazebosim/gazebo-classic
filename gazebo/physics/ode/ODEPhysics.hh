@@ -64,9 +64,6 @@ namespace gazebo
         /// \brief SOR over-relaxation parameter
         SOR,
 
-        /// \brief friction model
-        FRICTION_MODEL,
-
         /// \brief Max correcting velocity
         CONTACT_MAX_CORRECTING_VEL,
 
@@ -81,7 +78,10 @@ namespace gazebo
 
         /// \brief Limit ratios of inertias of adjacent links (note that the
         /// corresponding SDF tag is "use_dynamic_moi_rescaling")
-        INERTIA_RATIO_REDUCTION
+        INERTIA_RATIO_REDUCTION,
+
+        /// \brief friction model
+        FRICTION_MODEL
       };
 
       /// \brief Constructor.
