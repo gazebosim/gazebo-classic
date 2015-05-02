@@ -26,13 +26,16 @@
 #include <ode/timer.h>
 #include <ode/error.h>
 #include <ode/matrix.h>
-#include <ode/h5dump.h>
 #include "config.h"
 #include "objects.h"
 #include "joints/joint.h"
 #include "lcp.h"
 #include "util.h"
 #include "joints/hinge.h"
+
+#ifdef HDF5_INSTRUMENT
+#include <ode/h5dump.h>
+#endif
 
 //****************************************************************************
 // misc defines
