@@ -155,7 +155,7 @@ endif (NOT CMAKE_BUILD_TYPE)
 # uppercase old supported and deprecated modes
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPERCASE)
 
-if (NOT_DEFINED HDF5_INSTRUMENT)
+if (NOT DEFINED HDF5_INSTRUMENT)
   set (HDF5_INSTRUMENT FALSE)
 endif()
 
