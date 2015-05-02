@@ -560,7 +560,16 @@ TEST_P(PhysicsFrictionTest, FrictionDemo)
 /////////////////////////////////////////////////
 TEST_P(PhysicsFrictionTest, MaximumDissipation)
 {
-  MaximumDissipation("ode");
+  if (GetParam() == "ode")
+  {
+    MaximumDissipation(GetParam());
+  }
+  else
+  {
+    gzerr << "Skipping test for physics engine "
+          << GetParam()
+          << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
