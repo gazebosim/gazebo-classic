@@ -560,7 +560,7 @@ TEST_P(PhysicsFrictionTest, FrictionDemo)
 /////////////////////////////////////////////////
 TEST_P(PhysicsFrictionTest, MaximumDissipation)
 {
-  if (GetParam() == "ode")
+  if (std::string("ode").compare(GetParam()) == 0)
   {
     MaximumDissipation(GetParam());
   }
