@@ -25,7 +25,7 @@ reference:
 */
 
 
-
+#include "gazebo/gazebo_config.h"
 #ifdef HDF5_INSTRUMENT
 
 #ifndef IO_H5

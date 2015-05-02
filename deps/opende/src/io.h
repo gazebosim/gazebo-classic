@@ -24,7 +24,7 @@ reference:
    hdf5-based BPMD database: https://grasp.robotics.cs.rpi.edu/bpmd/
 */
 
-
+#include "gazebo/gazebo_config.h"
 #ifdef HDF5_INSTRUMENT
 
 

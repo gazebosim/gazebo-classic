@@ -32,6 +32,7 @@
 #include "lcp.h"
 #include "util.h"
 #include "joints/hinge.h"
+#include "gazebo/gazebo_config.h"
 
 #ifdef HDF5_INSTRUMENT
 #include <ode/h5dump.h>

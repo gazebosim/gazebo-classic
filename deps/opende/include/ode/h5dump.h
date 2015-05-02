@@ -22,6 +22,7 @@ freely, subject to the following restrictions:
 
 */
 
+#include "gazebo/gazebo_config.h"
 #ifdef HDF5_INSTRUMENT
 
 
