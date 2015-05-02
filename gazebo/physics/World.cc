@@ -113,7 +113,7 @@ World::World(const std::string &_name)
 
   this->dataPtr->initialized = false;
   this->dataPtr->loaded = false;
-  this->dataPtr->stepInc = 1;
+  this->dataPtr->stepInc = 0;
   this->dataPtr->pause = false;
   this->dataPtr->thread = NULL;
   this->dataPtr->logThread = NULL;
