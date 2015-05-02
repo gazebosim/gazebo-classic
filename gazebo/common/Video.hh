@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class Video Video.hh common/common.hh
     /// \brief Handle video encoding and decoding using libavcodec
-    class GAZEBO_VISIBLE Video
+    class GZ_COMMON_VISIBLE Video
     {
       /// \brief Constructor
       public: Video();

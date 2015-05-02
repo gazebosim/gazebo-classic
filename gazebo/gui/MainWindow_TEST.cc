@@ -64,14 +64,41 @@ void MainWindow_TEST::StepState()
   // toggle pause and play step and check if the step action is properly
   // enabled / disabled.
   mainWindow->Pause();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
   QVERIFY(mainWindow->IsPaused());
   QVERIFY(gazebo::gui::g_stepAct->isEnabled());
 
   mainWindow->Play();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
   QVERIFY(!mainWindow->IsPaused());
   QVERIFY(!gazebo::gui::g_stepAct->isEnabled());
 
   mainWindow->Pause();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
   QVERIFY(mainWindow->IsPaused());
   QVERIFY(gazebo::gui::g_stepAct->isEnabled());
 
@@ -765,6 +792,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_showJointsAct);
 
+  QVERIFY(gazebo::gui::g_showToolbarsAct);
+
   QVERIFY(gazebo::gui::g_fullScreenAct);
 
   QVERIFY(gazebo::gui::g_fpsAct);
@@ -861,6 +890,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_showContactsAct);
 
   QVERIFY(!gazebo::gui::g_showJointsAct);
+
+  QVERIFY(!gazebo::gui::g_showToolbarsAct);
 
   QVERIFY(!gazebo::gui::g_fullScreenAct);
 

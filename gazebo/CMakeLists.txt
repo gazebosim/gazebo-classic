@@ -26,6 +26,7 @@ add_subdirectory(gui)
 add_subdirectory(physics)
 add_subdirectory(sensors)
 add_subdirectory(util)
+add_subdirectory(test)
 
 add_dependencies(gazebo_physics gazebo_msgs)
 add_dependencies(gazebo_physics_ode gazebo_msgs)
