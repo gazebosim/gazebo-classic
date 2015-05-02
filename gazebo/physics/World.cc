@@ -220,7 +220,7 @@ void World::Load(sdf::ElementPtr _sdf)
                                            &World::OnFactoryMsg, this);
   this->dataPtr->controlSub = this->dataPtr->node->Subscribe("~/world_control",
                                            &World::OnControl, this);
-  this->dataPtr->controlSub = this->dataPtr->node->Subscribe(
+  this->dataPtr->playbackControlSub = this->dataPtr->node->Subscribe(
       "~/playback_control", &World::OnPlaybackControl, this);
 
   this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
@@ -1213,13 +1213,6 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
     this->dataPtr->stepInc = _data->multi_step();
   }
-
-  /*if (_data->has_rewind())
-    this->SetPaused(_data->pause());
-
-  if (_data->has_forward())
-    this->SetPaused(_data->pause());*/
-
 }
 
 //////////////////////////////////////////////////
