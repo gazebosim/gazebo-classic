@@ -20,7 +20,6 @@
 
 #include <tinyxml.h>
 
-#include <fstream>
 #include <list>
 #include <mutex>
 #include <string>

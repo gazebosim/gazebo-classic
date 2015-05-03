@@ -4,7 +4,6 @@ package gazebo.msgs;
 /// \interface WorldControl
 /// \brief A message that allows for control of world functions
 
-import "time.proto";
 import "world_reset.proto";
 
 message WorldControl

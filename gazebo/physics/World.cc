@@ -119,7 +119,7 @@ World::World(const std::string &_name)
   this->dataPtr->thread = NULL;
   this->dataPtr->logThread = NULL;
   this->dataPtr->stop = false;
-  this->dataPtr->goToPending = false;
+  this->dataPtr->seekPending = false;
 
   this->dataPtr->currentStateBuffer = 0;
   this->dataPtr->stateToggle = 0;
@@ -508,7 +508,7 @@ void World::LogStep()
   {
     boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
     stay = !this->IsPaused() || this->dataPtr->stepInc > 0 ||
-           this->dataPtr->goToPending;
+           this->dataPtr->seekPending;
   }
   while (stay)
   {
@@ -574,14 +574,14 @@ void World::LogStep()
       if (this->dataPtr->stepInc > 0)
         this->dataPtr->stepInc--;
 
-      if (this->dataPtr->goToPending)
+      if (this->dataPtr->seekPending)
       {
-        this->dataPtr->goToPending =
+        this->dataPtr->seekPending =
           this->GetSimTime() < this->dataPtr->targetSimTime;
       }
 
       stay = !this->IsPaused() || this->dataPtr->stepInc > 0 ||
-             this->dataPtr->goToPending;
+             this->dataPtr->seekPending;
     }
 
     // We only run one step if we are in play mode.
@@ -1243,7 +1243,7 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
     this->dataPtr->targetSimTime = msgs::Convert(_data->seek());
     if (this->GetSimTime() > this->dataPtr->targetSimTime)
       util::LogPlay::Instance()->Rewind();
-    this->dataPtr->goToPending = true;
+    this->dataPtr->seekPending = true;
   }
 
   if (_data->has_rewind())

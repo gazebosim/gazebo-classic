@@ -78,13 +78,12 @@ namespace gazebo
       /// \brief Number of steps in increment by.
       public: int stepInc;
 
-      /// \brief While playing a log file it is possible to jump to a specific
-      /// simulation time (goTo). This member variable stores the goTo target.
+      /// \brief Stores the simulation time target during a 'seek' operation.
       public: common::Time targetSimTime;
 
-      /// \brief When there is a 'goTo' command pending during a log file
+      /// \brief When there is a 'seek' command pending during a log file
       /// playback this member variable should be true.
-      public: bool goToPending;
+      public: bool seekPending;
 
       /// \brief All the event connections.
       public: event::Connection_V connections;
