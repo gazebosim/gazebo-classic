@@ -385,7 +385,7 @@ void RenderEngine::Fini()
   this->scenes.clear();
 
   // Not Apple or Windows
-#if not defined( Q_OS_MAC) && not defined(_WIN32)
+# if not defined( Q_OS_MAC) && not defined(_WIN32)
   if (this->dummyDisplay)
   {
     glXDestroyContext(static_cast<Display*>(this->dummyDisplay),
@@ -395,7 +395,7 @@ void RenderEngine::Fini()
     XCloseDisplay(static_cast<Display*>(this->dummyDisplay));
     this->dummyDisplay = NULL;
   }
-#endif
+# endif
 
   this->initialized = false;
 }
