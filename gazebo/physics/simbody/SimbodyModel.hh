@@ -30,7 +30,7 @@ namespace gazebo
 
     /// \class SimbodyModel SimbodyModel.hh physics/physics.hh
     /// \brief A model is a collection of links, joints, and plugins.
-    class GAZEBO_VISIBLE SimbodyModel : public Model
+    class GZ_PHYSICS_VISIBLE SimbodyModel : public Model
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent object.

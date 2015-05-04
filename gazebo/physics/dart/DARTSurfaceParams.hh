@@ -33,7 +33,7 @@ namespace gazebo
     /// \{
 
     /// \brief DART surface parameters.
-    class GAZEBO_VISIBLE DARTSurfaceParams : public SurfaceParams
+    class GZ_PHYSICS_VISIBLE DARTSurfaceParams : public SurfaceParams
     {
       /// \brief Constructor.
       public: DARTSurfaceParams();
