@@ -268,11 +268,15 @@ target_link_libraries(gazebo_ode
   gazebo_opcode
   gazebo_gimpact
   gazebo_opende_ou
-  hdf5_cpp
-  hdf5
   ${CCD_LIBRARIES}
   ${Boost_LIBRARIES})
 
+if (HDF5_INSTRUMENT)
+  message(STATUS "HDF5 Instrument tool enabled \n")
+  target_link_libraries(gazebo_ode
+    hdf5_cpp
+    hdf5)
+endif(HDF5_INSTRUMENT)
 add_dependencies(gazebo_ode gazebo_opcode gazebo_gimpact)
 add_dependencies(gazebo_ode gazebo_opende_ou)
 
