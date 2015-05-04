@@ -36,7 +36,7 @@ namespace gazebo
     /// \class Distortion Distortion.hh rendering/rendering.hh
     /// \brief Camera distortion based on Brown's model. Note that the current
     /// implementation only supports barrel distortion.
-    class GAZEBO_VISIBLE Distortion
+    class GZ_RENDERING_VISIBLE Distortion
     {
       /// \brief Constructor
       public: Distortion();
