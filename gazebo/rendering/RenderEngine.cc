@@ -15,6 +15,11 @@
  *
 */
 
+#include <string>
+#include <iostream>
+#include <boost/filesystem.hpp>
+#include <sys/types.h>
+
 #ifdef __APPLE__
 # include <QtCore/qglobal.h>
 #endif
@@ -26,7 +31,6 @@
 # include <GL/glx.h>
 #endif
 
-#include <sys/types.h>
 #ifndef _WIN32
   #include <dirent.h>
 #else
@@ -35,10 +39,6 @@
   #include <Winsock2.h>
   #include "gazebo/common/win_dirent.h"
 #endif
-#include <string>
-#include <iostream>
-
-#include <boost/filesystem.hpp>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
