@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 #include <sdf/sdf.hh>
 #include "gazebo/math/Angle.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class RaySensor_TEST : public ServerFixture

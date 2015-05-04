@@ -26,6 +26,7 @@
 #include <ode/timer.h>
 #include <ode/error.h>
 #include <ode/matrix.h>
+#include <ode/h5dump.h>
 #include "config.h"
 #include "objects.h"
 #include "joints/joint.h"
@@ -270,7 +271,9 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
       }
     }
   }
-
+#ifdef HDF5_INSTRUMENT
+  h5dump_world("ode_frames.hdf5", world, stepsize);
+#endif
   // get m = total constraint dimension, nub = number of unbounded variables.
   // create constraint offset array and number-of-rows array for all joints.
   // the constraints are re-ordered as follows: the purely unbounded

@@ -23,7 +23,7 @@
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/CameraSensor.hh"
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "images_cmp.h"
 #include "helper_physics_generator.hh"
 

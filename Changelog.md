@@ -5,8 +5,15 @@
 1. Windows support. This consists mostly of numerous small changes to support
 compilation on Windows.
     * [Pull request #1616](https://bitbucket.org/osrf/gazebo/pull-request/1616)
-    * [Pull request #1629](https://bitbucket.org/osrf/gazebo/pull-request/1629)
+    * [Pull request #1618](https://bitbucket.org/osrf/gazebo/pull-request/1618)
+    * [Pull request #1620](https://bitbucket.org/osrf/gazebo/pull-request/1620)
     * [Pull request #1625](https://bitbucket.org/osrf/gazebo/pull-request/1625)
+    * [Pull request #1626](https://bitbucket.org/osrf/gazebo/pull-request/1626)
+    * [Pull request #1627](https://bitbucket.org/osrf/gazebo/pull-request/1627)
+    * [Pull request #1628](https://bitbucket.org/osrf/gazebo/pull-request/1628)
+    * [Pull request #1629](https://bitbucket.org/osrf/gazebo/pull-request/1629)
+    * [Pull request #1631](https://bitbucket.org/osrf/gazebo/pull-request/1631)
+    * [Pull request #1632](https://bitbucket.org/osrf/gazebo/pull-request/1632)
 
 1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
     * [Pull request #1606](https://bitbucket.org/osrf/gazebo/pull-request/1606)
@@ -41,6 +48,9 @@ compilation on Windows.
 
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
+
+1. Added Visual::GetDepth() and Visual::GetNthAncestor()
+    * [Pull request #1613](https://bitbucket.org/osrf/gazebo/pull-request/1613)
 
 1. Added a context menu for links
     * [Pull request #1589](https://bitbucket.org/osrf/gazebo/pull-request/1589)
