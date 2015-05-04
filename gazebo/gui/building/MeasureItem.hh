@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class MeasureItem MeasureItem.hh
     /// \brief Measurement lines and values.
-    class GAZEBO_VISIBLE MeasureItem : public SegmentItem
+    class GZ_GUI_BUILDING_VISIBLE MeasureItem : public SegmentItem
     {
       Q_OBJECT
 
