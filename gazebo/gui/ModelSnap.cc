@@ -235,6 +235,8 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     // Parent model or parent link
     rendering::VisualPtr currentParent = vis->GetRootVisual();
     rendering::VisualPtr previousParent;
+    rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
+
     if (gui::get_entity_id(currentParent->GetName()))
     {
       if (this->dataPtr->selectedVis)
@@ -242,9 +244,11 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     }
     else
     {
-      currentParent = vis->GetParent();
+      currentParent = topLevelVis;
       if (this->dataPtr->selectedVis)
-        previousParent = this->dataPtr->selectedVis->GetParent();
+      {
+        previousParent = this->dataPtr->selectedVis->GetNthAncestor(2);
+      }
     }
 
     // Select first triangle on any mesh
