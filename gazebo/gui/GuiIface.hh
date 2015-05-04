@@ -49,12 +49,6 @@ namespace gazebo
     std::string get_world();
 
     GAZEBO_VISIBLE
-    void addPlugin(const std::string &_filename);
-
-    GAZEBO_VISIBLE
-    bool setupClient(int _argc, char **_argv);
-
-    GAZEBO_VISIBLE
     void set_active_camera(rendering::UserCameraPtr _cam);
     GAZEBO_VISIBLE
     rendering::UserCameraPtr get_active_camera();

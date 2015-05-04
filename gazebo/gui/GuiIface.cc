@@ -15,21 +15,13 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-  #define snprintf _snprintf
-#endif
-
 #include <signal.h>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gazebo.hh"
 
-#include "gazebo/transport/transport.hh"
-#include "gazebo/common/common.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
@@ -49,7 +41,6 @@
 // character string
 int g_argc = 1;
 char **g_argv;
-std::vector<gazebo::SystemPluginPtr> g_plugins;
 
 namespace po = boost::program_options;
 po::variables_map vm;
@@ -80,6 +71,7 @@ void print_usage()
 void signal_handler(int)
 {
   gazebo::gui::stop();
+  gazebo::shutdown();
 }
 
 //////////////////////////////////////////////////
@@ -121,7 +113,7 @@ bool parse_args(int _argc, char **_argv)
 
   if (vm.count("verbose"))
   {
-    fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
+    gazebo::printVersion();
     gazebo::common::Console::SetQuiet(false);
   }
 
@@ -134,7 +126,7 @@ bool parse_args(int _argc, char **_argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      gazebo::gui::addPlugin(*iter);
+      gazebo::addPlugin(*iter);
     }
   }
 
@@ -170,6 +162,7 @@ namespace gazebo
 void gui::init()
 {
   g_modelRightMenu->Init();
+  g_main_win->show();
   g_main_win->Init();
 }
 
@@ -236,8 +229,8 @@ bool gui::load()
 
   g_modelRightMenu = new gui::ModelRightMenu();
 
-//  rendering::load(false);
-//  rendering::init();
+  rendering::load();
+  rendering::init();
 
   g_argv = new char*[g_argc];
   for (int i = 0; i < g_argc; i++)
@@ -250,7 +243,9 @@ bool gui::load()
   set_style();
 
   g_main_win = new gui::MainWindow();
+
   g_main_win->Load();
+  g_main_win->resize(1024, 768);
 
   return true;
 }
@@ -265,77 +260,6 @@ unsigned int gui::get_entity_id(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-// This function is used by both setupClient and setupServer
-bool setup(const std::string &_prefix, int _argc, char **_argv)
-{
-  gazebo::common::load();
-
-  // The SDF find file callback.
-  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
-
-  // Initialize the informational logger. This will log warnings, and
-  // errors.
-  gzLogInit(_prefix, "default.log");
-
-  // Load all the system plugins
-  for (std::vector<gazebo::SystemPluginPtr>::iterator iter =
-       g_plugins.begin(); iter != g_plugins.end(); ++iter)
-  {
-    (*iter)->Load(_argc, _argv);
-  }
-
-  if (!gazebo::transport::init())
-  {
-    gzerr << "Unable to initialize transport.\n";
-    return false;
-  }
-
-  // Make sure the model database has started.
-  gazebo::common::ModelDatabase::Instance()->Start();
-
-  // Run transport loop. Starts a thread
-  gazebo::transport::run();
-
-  // Init all system plugins
-  for (std::vector<gazebo::SystemPluginPtr>::iterator iter = g_plugins.begin();
-       iter != g_plugins.end(); ++iter)
-  {
-    (*iter)->Init();
-  }
-
-  return true;
-}
-
-/////////////////////////////////////////////////
-bool gui::setupClient(int _argc, char **_argv)
-{
-  if (!setup("client-", _argc, _argv))
-  {
-    gzerr << "Unable to setup Gazebo\n";
-    return false;
-  }
-
-  common::Time waitTime(1, 0);
-  int waitCount = 0;
-  int maxWaitCount = 10;
-
-  // Wait for namespaces.
-  while (!gazebo::transport::waitForNamespaces(waitTime) &&
-      (waitCount++) < maxWaitCount)
-  {
-    gzwarn << "Waited " << waitTime.Double() << "seconds for namespaces.\n";
-  }
-
-  if (waitCount >= maxWaitCount)
-  {
-    gzerr << "Waited " << (waitTime * waitCount).Double()
-      << " seconds for namespaces. Giving up.\n";
-  }
-
-  return true;
-}
-
-/////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
 {
   // Initialize the informational logger. This will log warnings, and errors.
@@ -347,7 +271,7 @@ bool gui::run(int _argc, char **_argv)
   if (!parse_args(_argc, _argv))
     return false;
 
-  if (!gazebo::gui::setupClient(_argc, _argv))
+  if (!gazebo::setupClient(_argc, _argv))
     return false;
 
   if (!gazebo::gui::load())
@@ -355,7 +279,6 @@ bool gui::run(int _argc, char **_argv)
 
   gazebo::gui::init();
 
-#ifndef _WIN32
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
   struct sigaction sigact;
@@ -365,12 +288,11 @@ bool gui::run(int _argc, char **_argv)
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
     return false;
   }
-#endif
 
   g_app->exec();
 
   gazebo::gui::fini();
-  // gazebo::shutdown();
+  gazebo::shutdown();
 
   delete g_main_win;
   return true;
@@ -379,35 +301,9 @@ bool gui::run(int _argc, char **_argv)
 /////////////////////////////////////////////////
 void gui::stop()
 {
-  // Stop transport
-  gazebo::transport::stop();
-
-  // Cleanup model database.
-  common::ModelDatabase::Instance()->Fini();
-
+  gazebo::shutdown();
   g_active_camera.reset();
   g_app->quit();
-}
-
-/////////////////////////////////////////////////
-void gui::addPlugin(const std::string &_filename)
-{
-  if (_filename.empty())
-    return;
-  gazebo::SystemPluginPtr plugin =
-    gazebo::SystemPlugin::Create(_filename, _filename);
-
-  if (plugin)
-  {
-    if (plugin->GetType() != SYSTEM_PLUGIN)
-    {
-      gzerr << "System is attempting to load "
-        << "a plugin, but detected an incorrect plugin type. "
-        << "Plugin filename[" << _filename << "].\n";
-      return;
-    }
-    g_plugins.push_back(plugin);
-  }
 }
 
 /////////////////////////////////////////////////
