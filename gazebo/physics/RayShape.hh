@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class RayShape RayShape.hh physics/physics.hh
     /// \brief Base class for Ray collision geometry
-    class GAZEBO_VISIBLE RayShape : public Shape
+    class GZ_PHYSICS_VISIBLE RayShape : public Shape
     {
       /// \brief Constructor for a global ray.
       /// \param[in] _physicsEngine Pointer to the physics engine.
