@@ -99,17 +99,20 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
   ExpectForceTorqueMeasure("force_torque_01_sensor_and_child_to_parent",
     Vector3(0, 0, g*mAll), Vector3(g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_12_parent_and_parent_to_child",
-    Vector3(0, 0, -g*m1), Vector3(-g*m1*cog_y_1, -g*m1*delta_x_joint_12, 0), mgr);
+    Vector3(0, 0, -g*m1),
+    Vector3(-g*m1*cog_y_1, -g*m1*delta_x_joint_12, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_12_parent_and_child_to_parent",
     Vector3(0, 0, g*m1), Vector3(g*m1*cog_y_1, g*m1*delta_x_joint_12, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_12_child_and_parent_to_child",
-    Vector3(0, -g*m1, 0), Vector3(-g*m1*cog_y_1, 0, g*m1*delta_x_joint_12), mgr);
+    Vector3(0, -g*m1, 0),
+    Vector3(-g*m1*cog_y_1, 0, g*m1*delta_x_joint_12), mgr);
   ExpectForceTorqueMeasure("force_torque_12_child_and_child_to_parent",
     Vector3(0, g*m1, 0), Vector3(g*m1*cog_y_1, 0, -g*m1*delta_x_joint_12), mgr);
   ExpectForceTorqueMeasure("force_torque_12_sensor_and_parent_to_child",
     Vector3(0, -g*m1, 0), Vector3(g*m1*delta_x_joint_12, 0, g*m1*cog_y_1), mgr);
   ExpectForceTorqueMeasure("force_torque_12_sensor_and_child_to_parent",
-    Vector3(0, g*m1, 0), Vector3(-g*m1*delta_x_joint_12, 0, -g*m1*cog_y_1), mgr);
+    Vector3(0, g*m1, 0),
+    Vector3(-g*m1*delta_x_joint_12, 0, -g*m1*cog_y_1), mgr);
 }
 
 ////////////////////////////////////////////////////////////////////
