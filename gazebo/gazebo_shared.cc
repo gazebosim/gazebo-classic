@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include <sdf/sdf.hh>
 
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/common/Plugin.hh"
