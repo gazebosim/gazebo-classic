@@ -401,6 +401,7 @@ if (NOT SDFormat_FOUND)
   BUILD_ERROR ("Missing: SDF version >=2.0.1. Required for reading and writing SDF files.")
 else()
   message (STATUS "Looking for SDFormat - found")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SDFormat_CXX_FLAGS}")
 endif()
 
 ########################################
