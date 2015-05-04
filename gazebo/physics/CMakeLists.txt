@@ -127,6 +127,7 @@ gz_add_library(gazebo_physics ${sources})
 target_link_libraries(gazebo_physics
   gazebo_common
   gazebo_util
+  gazebo_physics_ode
 )
 
 if (HAVE_BULLET)
