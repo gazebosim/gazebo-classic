@@ -42,7 +42,7 @@ namespace gazebo
 
     /// \class Level EditorView.hh
     /// \brief A convenient structure for storing level information
-    class GAZEBO_VISIBLE Level
+    class GZ_GUI_BUILDING_VISIBLE Level
     {
       /// \brief Constructor
       public: Level() : level(0), name("level"), baseHeight(0),
@@ -75,7 +75,7 @@ namespace gazebo
 
     /// \class EditorView EditorView.hh
     /// \brief Control the editor view and manage contents in the editor scene.
-    class GAZEBO_VISIBLE EditorView : public QGraphicsView
+    class GZ_GUI_BUILDING_VISIBLE EditorView : public QGraphicsView
     {
       Q_OBJECT
 
