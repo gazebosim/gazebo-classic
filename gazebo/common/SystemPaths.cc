@@ -15,6 +15,12 @@
  *
  */
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+#include <boost/filesystem.hpp>
+#include <sdf/sdf.hh>
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -23,17 +29,7 @@
 // header order if "win_dirent.h" is in the wrong location.
 #ifndef _WIN32
   #include <dirent.h>
-#endif
-
-#include <iostream>
-#include <fstream>
-#include <sstream>
-
-#include <boost/filesystem.hpp>
-#include <sdf/sdf.hh>
-
-// Include custom dirent for Windows.
-#ifdef _WIN32
+#else
   #include "win_dirent.h"
 #endif
 
