@@ -665,10 +665,11 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::ScenePropertyChanged(QtProperty * /*_item*/)
+void ModelListWidget::ScenePropertyChanged(QtProperty * _item)
 {
   msgs::Scene msg;
 
+  QtProperty *cameraPoseProperty = NULL;
   QList<QtProperty*> properties = this->propTreeBrowser->properties();
   for (QList<QtProperty*>::iterator iter = properties.begin();
        iter != properties.end(); ++iter)
@@ -679,10 +680,30 @@ void ModelListWidget::ScenePropertyChanged(QtProperty * /*_item*/)
       this->FillColorMsg((*iter), msg.mutable_background());
     else if ((*iter)->propertyName().toStdString() == "shadows")
       msg.set_shadows(this->variantManager->value((*iter)).toBool());
+    else if ((*iter)->propertyName().toStdString() == "camera_pose")
+      cameraPoseProperty = *iter;
   }
 
   msg.set_name(gui::get_world());
   this->scenePub->Publish(msg);
+
+  if (cameraPoseProperty)
+  {
+    std::string changedProperty = _item->propertyName().toStdString();
+    if (changedProperty == "x"
+      || changedProperty == "y"
+      || changedProperty == "z"
+      || changedProperty == "roll"
+      || changedProperty == "pitch"
+      || changedProperty == "yaw")
+    {
+      msgs::Pose poseMsg;
+      this->FillPoseMsg(cameraPoseProperty, &poseMsg, poseMsg.GetDescriptor());
+      rendering::UserCameraPtr cam = gui::get_active_camera();
+      if (cam)
+        cam->SetWorldPose(msgs::Convert(poseMsg));
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -2388,6 +2409,20 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
     item->setValue(clr);
   }
   this->propTreeBrowser->addProperty(item);
+
+  // Create and set the gui camera pose
+  item = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("camera_pose"));
+  {
+    auto browserItem = this->propTreeBrowser->addProperty(item);
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+    math::Pose cameraPose;
+    if (cam)
+      cameraPose = cam->GetWorldPose();
+
+    this->FillPoseProperty(msgs::Convert(cameraPose), item);
+    this->propTreeBrowser->setExpanded(browserItem, true);
+  }
 
   // Create and set the shadows property
   item = this->variantManager->addProperty(QVariant::Bool, tr("shadows"));
