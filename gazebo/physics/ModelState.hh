@@ -171,6 +171,36 @@ namespace gazebo
       /// \return True if the joint exists in the model.
       public: bool HasJointState(const std::string &_jointName) const;
 
+      /// \brief Get the number of model states.
+      ///
+      /// This returns the number of Models recorded.
+      /// \return Number of ModelState recorded.
+      public: unsigned int GetModelStateCount() const;
+
+      /// \brief Get model states based on a regular expression.
+      /// \param[in] _regex The regular expression.
+      /// \return List of model states whose names match the regular
+      /// expression.
+      public: ModelState_M GetModelStates(const boost::regex &_regex) const;
+
+      /// \brief Get a model state by Model name
+      ///
+      /// Searches through all ModelStates. Returns the ModelState with the
+      /// matching name, if any.
+      /// \param[in] _modelName Name of the ModelState
+      /// \return State of the Model.
+      /// \throws common::Exception When _modelName is invalid.
+      public: ModelState GetModelState(const std::string &_modelName) const;
+
+      /// \brief Return true if there is a model with the specified name.
+      /// \param[in] _modelName Name of the ModelState.
+      /// \return True if the model exists in the model.
+      public: bool HasModelState(const std::string &_modelName) const;
+
+      /// \brief Get the model states.
+      /// \return A map of model states.
+      public: const ModelState_M &GetModelStates() const;
+
       /// \brief Populate a state SDF element with data from the object.
       /// \param[out] _sdf SDF element to populate.
       public: void FillSDF(sdf::ElementPtr _sdf);
@@ -229,6 +259,13 @@ namespace gazebo
           _out << iter->second;
         }
 
+        for (ModelState_M::const_iterator iter =
+            _state.modelStates.begin(); iter != _state.modelStates.end();
+            ++iter)
+        {
+          _out << iter->second;
+        }
+
         // Output the joint information
         // for (JointState_M::const_iterator iter =
         //     _state.jointStates.begin(); iter != _state.jointStates.end();
@@ -250,6 +287,9 @@ namespace gazebo
 
       /// \brief All the joint states.
       private: JointState_M jointStates;
+
+      /// \brief All the model states.
+      private: ModelState_M modelStates;
     };
     /// \}
   }

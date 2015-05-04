@@ -668,6 +668,24 @@ const Model_V &Model::GetModels() const
 }
 
 //////////////////////////////////////////////////
+ModelPtr Model::GetModel(const std::string &_name) const
+{
+  Model_V::const_iterator iter;
+  ModelPtr result;
+
+  for (iter = this->models.begin(); iter != this->models.end(); ++iter)
+  {
+    if (((*iter)->GetScopedName() == _name) || ((*iter)->GetName() == _name))
+    {
+      result = *iter;
+      break;
+    }
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 LinkPtr Model::GetLinkById(unsigned int _id) const
 {
   return boost::dynamic_pointer_cast<Link>(this->GetById(_id));
@@ -1088,6 +1106,17 @@ void Model::SetState(const ModelState &_state)
       link->SetState(iter->second);
     else
       gzerr << "Unable to find link[" << iter->first << "]\n";
+  }
+
+  ModelState_M modelStates = _state.GetModelStates();
+  for (ModelState_M::iterator iter = modelStates.begin();
+       iter != modelStates.end(); ++iter)
+  {
+    ModelPtr model = this->GetModel(iter->first);
+    if (model)
+      model->SetState(iter->second);
+    else
+      gzerr << "Unable to find model[" << iter->first << "]\n";
   }
 
   // For now we don't use the joint state values to set the state of
