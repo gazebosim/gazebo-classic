@@ -2181,7 +2181,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
         item))->setAttribute(item, "decimals", 6);
     static_cast<QtVariantPropertyManager *>(
         this->variantFactory->propertyManager(
-        item))->setAttribute(item, "singleStep", 0.1);
+        item))->setAttribute(item, "singleStep", 0.05);
   }
   item->setValue(rpy.x);
 
@@ -2196,7 +2196,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
         item))->setAttribute(item, "decimals", 6);
     static_cast<QtVariantPropertyManager *>(
         this->variantFactory->propertyManager(
-        item))->setAttribute(item, "singleStep", 0.1);
+        item))->setAttribute(item, "singleStep", 0.05);
   }
   item->setValue(rpy.y);
 
@@ -2211,7 +2211,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
         item))->setAttribute(item, "decimals", 6);
     static_cast<QtVariantPropertyManager *>(
         this->variantFactory->propertyManager(
-        item))->setAttribute(item, "singleStep", 0.1);
+        item))->setAttribute(item, "singleStep", 0.05);
   }
   item->setValue(rpy.z);
 }
