@@ -2,6 +2,10 @@
 
 ### Gazebo 5.x.x
 
+1. Get/Set user camera pose in GUI.
+    * [Pull request #1649](https://bitbucket.org/osrf/gazebo/pull-request/1649)
+    * [Issue #1595](https://bitbucket.org/osrf/gazebo/issue/1595)
+
 1. Fix heightmap model texture loading.
     * [Pull request #1592](https://bitbucket.org/osrf/gazebo/pull-request/1592)
 
