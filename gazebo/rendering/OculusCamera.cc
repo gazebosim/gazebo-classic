@@ -261,6 +261,16 @@ void OculusCamera::Update()
     // caguero: For the foosball demo we prefer to move the camera.
     this->sceneNode->setPosition(
       -ovrpose.Position.z, -ovrpose.Position.x, ovrpose.Position.y);
+
+    // Move camera visual - note that it might break the model's kinematics
+    this->dataPtr->cameraVisual->SetPose(math::Pose(math::Vector3(
+        -ovrpose.Position.z, 
+        -ovrpose.Position.x, 
+         ovrpose.Position.y), math::Quaternion(
+         ovrpose.Orientation.w,
+        -ovrpose.Orientation.z,
+        -ovrpose.Orientation.x,
+         ovrpose.Orientation.y)));
   }
   else if (!this->dataPtr->oculusTrackingWarned)
   {
@@ -305,6 +315,8 @@ bool OculusCamera::AttachToVisualImpl(VisualPtr _visual,
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
   {
+    this->dataPtr->cameraVisual = _visual;
+
     math::Pose origPose = this->GetWorldPose();
     double yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
 
