@@ -15,7 +15,7 @@
  *
 */
 
-#ifdef  __APPLE__
+#ifdef __APPLE__
 # include <QtCore/qglobal.h>
 #endif
 
@@ -27,13 +27,13 @@
 #endif
 
 #include <sys/types.h>
-#ifdef _WIN32
+#ifndef _WIN32
+  #include <dirent.h>
+#else
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
   #include "gazebo/common/win_dirent.h"
-#else
-  #include <dirent.h>
 #endif
 #include <string>
 #include <iostream>
