@@ -2448,8 +2448,6 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       visual->ShowJoints(this->dataPtr->showJoints);
       visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
       visual->SetWireframe(this->dataPtr->wireframe);
-
-      visual->UpdateFromMsg(_msg);
     }
   }
 

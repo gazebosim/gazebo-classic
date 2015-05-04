@@ -417,6 +417,10 @@ bool BulletHingeJoint::SetParam(const std::string &_key,
         return false;
       }
     }
+    else
+    {
+      return BulletJoint::SetParam(_key, _index, _value);
+    }
   }
   catch(const boost::bad_any_cast &e)
   {
@@ -425,7 +429,7 @@ bool BulletHingeJoint::SetParam(const std::string &_key,
           << std::endl;
     return false;
   }
-  return BulletJoint::SetParam(_key, _index, _value);
+  return true;
 }
 
 //////////////////////////////////////////////////
