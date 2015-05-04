@@ -490,18 +490,20 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
 
   // JointWrench.body1Force contains the
   // force applied by the parent Link on the Joint specified in
-  // the parent Link frame.
+  // the parent Link orientation frame and with respect to the joint origin
   if (theChildLink != NULL)
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
     GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
-    F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),
+    Eigen::Isometry3d TJ2 = Eigen::Isometry3d::Identity();
+    TJ2.translation() = dtJoint->getTransformFromChildBodyNode().translation();
+    F2 = -dart::math::dAdT(TJ2,
                            dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains
   // the force applied by the child Link on the Joint specified
-  // in the child Link frame.
+  // in the child Link orientation frame and with respect to the joint origin
   F1 = -dart::math::dAdInvR(T12, F2);
 
   // kind of backwards here, body1 (parent) corresponds go f2, t2
