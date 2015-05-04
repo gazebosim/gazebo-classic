@@ -2176,9 +2176,13 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   {
     item = this->variantManager->addProperty(QVariant::Double, "roll");
     _parent->addSubProperty(item);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "decimals", 6);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "singleStep", 0.1);
   }
-  static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
-    item))->setAttribute(item, "decimals", 6);
   item->setValue(rpy.x);
 
   // Add Pitch value
@@ -2187,9 +2191,13 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   {
     item = this->variantManager->addProperty(QVariant::Double, "pitch");
     _parent->addSubProperty(item);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "decimals", 6);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "singleStep", 0.1);
   }
-  static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
-    item))->setAttribute(item, "decimals", 6);
   item->setValue(rpy.y);
 
   // Add Yaw value
@@ -2198,9 +2206,13 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   {
     item = this->variantManager->addProperty(QVariant::Double, "yaw");
     _parent->addSubProperty(item);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "decimals", 6);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "singleStep", 0.1);
   }
-  static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
-    item))->setAttribute(item, "decimals", 6);
   item->setValue(rpy.z);
 }
 
