@@ -21,10 +21,6 @@
 #include <vector>
 
 #include <gazebo/common/common.hh>
-#include <gazebo/msgs/msgs.hh>
-#include <gazebo/transport/transport.hh>
-
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

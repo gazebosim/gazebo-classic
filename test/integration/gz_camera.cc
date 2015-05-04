@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/sensors/SensorsIface.hh"
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class GzCamera : public ServerFixture

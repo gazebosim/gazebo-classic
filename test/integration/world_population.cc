@@ -17,7 +17,7 @@
 
 #include <string>
 #include <vector>
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "helper_physics_generator.hh"
 #include "gazebo/math/Vector3.hh"
 

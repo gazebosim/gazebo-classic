@@ -17,12 +17,9 @@
 #include <boost/thread/mutex.hpp>
 #include <sdf/sdf.hh>
 
-#include "gazebo/Master.hh"
-#include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/sensors.hh"
 #include "gazebo/transport/transport.hh"
-#include "gazebo/common/common.hh"
 #include "gazebo/util/LogRecord.hh"
+#include "gazebo/util/system.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gazebo_shared.hh"
 #include "gazebo/gazebo_client.hh"

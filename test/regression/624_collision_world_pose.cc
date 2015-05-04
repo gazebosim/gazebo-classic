@@ -15,7 +15,7 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "test/integration/helper_physics_generator.hh"
 

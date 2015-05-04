@@ -15,6 +15,7 @@
  *
 */
 
+#include <cstdlib>
 #include "gazebo/gui/model/GraphView.hh"
 
 using namespace gazebo;
