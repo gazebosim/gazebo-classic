@@ -7,6 +7,7 @@ compilation on Windows.
     * [Pull request #1616](https://bitbucket.org/osrf/gazebo/pull-request/1616)
     * [Pull request #1618](https://bitbucket.org/osrf/gazebo/pull-request/1618)
     * [Pull request #1620](https://bitbucket.org/osrf/gazebo/pull-request/1620)
+    * [Pull request #1625](https://bitbucket.org/osrf/gazebo/pull-request/1625)
     * [Pull request #1626](https://bitbucket.org/osrf/gazebo/pull-request/1626)
     * [Pull request #1627](https://bitbucket.org/osrf/gazebo/pull-request/1627)
     * [Pull request #1628](https://bitbucket.org/osrf/gazebo/pull-request/1628)
