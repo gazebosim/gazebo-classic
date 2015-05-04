@@ -134,11 +134,11 @@ FoosballGUIPlugin::FoosballGUIPlugin()
     this->gzNode->Advertise<msgs::Int>("~/foosball_demo/restart_game");
 
   // Connect hotkeys
-  QShortcut *restartGame = new QShortcut(QKeySequence("Ctrl+G"), this);
+  QShortcut *restartGame = new QShortcut(QKeySequence("F2"), this);
   QObject::connect(restartGame, SIGNAL(activated()), this,
       SLOT(OnRestartGame()));
 
-  QShortcut *restartBall = new QShortcut(QKeySequence("Ctrl+Y"), this);
+  QShortcut *restartBall = new QShortcut(QKeySequence("F1"), this);
   QObject::connect(restartBall, SIGNAL(activated()), this,
       SLOT(OnRestartBall()));
 }
