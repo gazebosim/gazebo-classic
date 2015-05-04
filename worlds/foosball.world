@@ -74,14 +74,14 @@
     <include>
       <pose>0 1.2 3 0 0.4 -1.57</pose>
       <uri>model://foosball_red_head</uri>
-      <name>camera2</name>
+      <name>camera</name>
     </include>
 
     <!-- Blue player view point using Oculus -->
     <include>
       <pose>0 -1.2 3 0 0.4 1.57</pose>
       <uri>model://foosball_blue_head</uri>
-      <name>camera</name>
+      <name>camera2</name>
     </include>
 
     <!-- Load the plugin for Razer Hydra -->
