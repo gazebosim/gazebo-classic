@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/math/Angle.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class GPURaySensor_TEST : public ServerFixture

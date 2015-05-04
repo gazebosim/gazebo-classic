@@ -29,7 +29,7 @@ namespace gazebo
 
     /// \class KeyEvent KeyEvent.hh common/common.hh
     /// \brief Generic description of a keyboard event.
-    class GAZEBO_VISIBLE KeyEvent
+    class GZ_COMMON_VISIBLE KeyEvent
     {
       /// \brief Constructor.
       public: KeyEvent() : type(NO_EVENT), key(0), text(""), control(false),
