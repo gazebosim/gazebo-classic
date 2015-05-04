@@ -32,7 +32,7 @@ namespace gazebo
     /// \{
 
     /// \brief A simbody universal joint class
-    class GAZEBO_VISIBLE SimbodyUniversalJoint
+    class GZ_PHYSICS_VISIBLE SimbodyUniversalJoint
       : public UniversalJoint<SimbodyJoint>
     {
       /// \brief Constructor
