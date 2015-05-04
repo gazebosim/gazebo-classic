@@ -23,7 +23,8 @@
 reference:
    hdf5-based BPMD database: https://grasp.robotics.cs.rpi.edu/bpmd/
 */
-
+#include "gazebo/gazebo_config.h"
+#ifdef HDF5_INSTRUMENT
 #include "ioh5.h"
 #include <iostream>
 #include <sstream>              // for string manipulations.
@@ -32,7 +33,6 @@ reference:
 #include <typeinfo>
 #include <stdint.h>
 
-#ifdef HDF5_INSTRUMENT
 
 using namespace H5;
 namespace h5 {

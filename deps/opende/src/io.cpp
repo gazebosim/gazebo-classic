@@ -25,7 +25,8 @@ reference:
 */
 
 
-
+#include "gazebo/gazebo_config.h"
+#ifdef HDF5_INSTRUMENT
 #include <iostream>
 #include <string>
 #include <string.h>
@@ -37,7 +38,6 @@ reference:
 #include "joints/contact.h"
 #include <ode/h5dump.h>
 
-#ifdef HDF5_INSTRUMENT
 using namespace H5;
 using namespace h5;
 
