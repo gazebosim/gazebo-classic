@@ -77,6 +77,24 @@ else ()
 endif ()
 
 ########################################
+include (FindHDF5)
+find_package(HDF5)
+
+if (NOT HDF5_FOUND)
+  BUILD_WARNING("Missing: HDF5")
+else ()
+ if (HDF5_INCLUDE_DIR)
+   APPEND_TO_CACHED_LIST(gazeboserver_include_dirs
+                         ${gazeboserver_include_dirs_desc}
+                         ${HDF5_INCLUDE_DIR})
+ endif()
+ if (HDF5_LIBRARIES)
+   APPEND_TO_CACHED_LIST(gazeboserver_link_libs
+                         ${gazeboserver_link_libs_desc}
+                         ${HDF5_LIBRARIES})
+ endif()
+endif ()
+########################################
 # Find packages
 
 # In Visual Studio we use configure.bat to trick all path cmake 
