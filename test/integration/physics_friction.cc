@@ -420,7 +420,6 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // set the gravity vector
-  // small positive y component
   math::Vector3 g(0.0, 1.0, -9.81);
   physics->SetGravity(g);
 
