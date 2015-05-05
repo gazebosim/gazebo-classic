@@ -34,7 +34,7 @@ namespace gazebo
 
     /// \class Vector3Stats Vector3Stats.hh math/gzmath.hh
     /// \brief Collection of statistics for a Vector3 signal.
-    class GAZEBO_VISIBLE Vector3Stats
+    class GZ_MATH_VISIBLE Vector3Stats
     {
       /// \brief Constructor
       public: Vector3Stats();

@@ -50,6 +50,7 @@
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/Server.hh"
+#include "gazebo/util/system.hh"
 
 #include "test_config.h"
 
@@ -57,10 +58,13 @@ namespace gazebo
 {
   std::string custom_exec(std::string _cmd);
 
-  class ServerFixture : public testing::Test
+  class GAZEBO_VISIBLE ServerFixture : public testing::Test
   {
     /// \brief Constructor
     protected: ServerFixture();
+
+    /// \brief Destructor
+    protected: virtual ~ServerFixture();
 
     /// \brief Tear down the test fixture. This gets called by gtest.
     protected: virtual void TearDown();

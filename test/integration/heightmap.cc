@@ -23,7 +23,7 @@
 #include "heights_cmp.h"
 #include "helper_physics_generator.hh"
 #include "images_cmp.h"
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 
@@ -33,6 +33,7 @@ class HeightmapTest : public ServerFixture,
   public: void PhysicsLoad(const std::string &_physicsEngine);
   public: void WhiteAlpha(const std::string &_physicsEngine);
   public: void WhiteNoAlpha(const std::string &_physicsEngine);
+  public: void Volume(const std::string &_physicsEngine);
   public: void NotSquareImage();
   public: void InvalidSizeImage();
   // public: void Heights(const std::string &_physicsEngine);
@@ -194,6 +195,31 @@ void HeightmapTest::InvalidSizeImage()
   delete this->server;
 }
 
+/////////////////////////////////////////////////
+void HeightmapTest::Volume(const std::string &_physicsEngine)
+{
+  if (_physicsEngine == "simbody")
+  {
+    // SimbodyHeightmapShape unimplemented. ComputeVolume actually returns 0 as
+    // an error code, which is the correct answer, but we'll skip it for now.
+    return;
+  }
+
+  Load("worlds/heightmap_test.world", true, _physicsEngine);
+
+  physics::ModelPtr model = GetModel("heightmap");
+  EXPECT_TRUE(model != NULL);
+
+  physics::CollisionPtr collision =
+    model->GetLink("link")->GetCollision("collision");
+
+  physics::HeightmapShapePtr shape =
+    boost::dynamic_pointer_cast<physics::HeightmapShape>(
+        collision->GetShape());
+
+  EXPECT_DOUBLE_EQ(shape->ComputeVolume(), 0);
+}
+
 /*
 void HeightmapTest::Heights(const std::string &_physicsEngine)
 {
@@ -347,6 +373,12 @@ TEST_P(HeightmapTest, WhiteAlpha)
 TEST_P(HeightmapTest, WhiteNoAlpha)
 {
   WhiteNoAlpha(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, Volume)
+{
+  Volume(GetParam());
 }
 
 /////////////////////////////////////////////////
