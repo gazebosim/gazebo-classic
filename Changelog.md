@@ -142,6 +142,9 @@ compilation on Windows.
     1. Saving, exiting, generalizing SaveDialog.
         * [Pull request #1401](https://bitbucket.org/osrf/gazebo/pull-request/1401)
 
+    1. Inspectors redesign
+        * [Pull request #1586](https://bitbucket.org/osrf/gazebo/pull-request/1586)
+
     1. Edit existing model.
         * [Pull request #1425](https://bitbucket.org/osrf/gazebo/pull-request/1425)
 
