@@ -87,7 +87,7 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
 #else
   params["parentWindowHandle"] = _ogreHandle;
 #endif
-  params["externalGLControl"] = true;
+  params["externalGLControl"] = "true";
   params["FSAA"] = "4";
   params["stereoMode"] = "Frame Sequential";
 
@@ -98,6 +98,10 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
 #else
   params["macAPI"] = "carbon";
 #endif
+
+  // Hide window if dimensions are less than or equal to one.
+  if (_width <= 1 && _height <=1)
+    params["border"] = "none";
 
   std::ostringstream stream;
   stream << "OgreWindow(" << windowCounter++ << ")";
@@ -125,8 +129,9 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   if (window)
   {
     window->setActive(true);
-    // window->setVisible(true);
+    window->setVisible(true);
     window->setAutoUpdated(false);
+    window->reposition(0, 0);
 
     this->windows.push_back(window);
   }
