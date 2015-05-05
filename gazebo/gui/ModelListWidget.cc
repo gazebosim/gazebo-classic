@@ -189,7 +189,37 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
                                              this->selectedEntityName);
       this->requestPub->Publish(*this->requestMsg);
     }
+    else if (name == "GUI")
+    {
+      QtVariantProperty *item = NULL;
 
+      rendering::UserCameraPtr cam = gui::get_active_camera();
+      if (!cam)
+        return;
+
+      // Create a camera item
+      QtProperty *topItem = this->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), tr("camera"));
+      this->propTreeBrowser->addProperty(topItem);
+
+      // Create and set the gui camera name
+      std::string cameraName = cam->GetName();
+      item = this->variantManager->addProperty(QVariant::String, tr("name"));
+      item->setValue(cameraName.c_str());
+      topItem->addSubProperty(item);
+      item->setEnabled(false);
+
+      // Create and set the gui camera pose
+      item = this->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), tr("pose"));
+      {
+        topItem->addSubProperty(item);
+        math::Pose cameraPose = cam->GetWorldPose();
+
+        this->FillPoseProperty(msgs::Convert(cameraPose), item);
+       // topItem->setExpanded(browserItem, true);
+      }
+    }
     else
     {
       this->propTreeBrowser->clear();
@@ -555,6 +585,8 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     this->ScenePropertyChanged(_item);
   else if (currentItem == this->physicsItem)
     this->PhysicsPropertyChanged(_item);
+  else if (currentItem == this->guiItem)
+    this->GUIPropertyChanged(_item);
 }
 
 /////////////////////////////////////////////////
@@ -619,6 +651,37 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
 }
 
 /////////////////////////////////////////////////
+void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
+{
+  // Only camera pose editable for now
+  QtProperty *cameraProperty = this->GetChildItem("camera");
+  if (!cameraProperty)
+    return;
+
+  QtProperty *cameraPoseProperty = this->GetChildItem(cameraProperty, "pose");
+  if (!cameraPoseProperty)
+    return;
+
+  if (cameraPoseProperty)
+  {
+    std::string changedProperty = _item->propertyName().toStdString();
+    if (changedProperty == "x"
+      || changedProperty == "y"
+      || changedProperty == "z"
+      || changedProperty == "roll"
+      || changedProperty == "pitch"
+      || changedProperty == "yaw")
+    {
+      msgs::Pose poseMsg;
+      this->FillPoseMsg(cameraPoseProperty, &poseMsg, poseMsg.GetDescriptor());
+      rendering::UserCameraPtr cam = gui::get_active_camera();
+      if (cam)
+        cam->SetWorldPose(msgs::Convert(poseMsg));
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
 {
   msgs::Physics msg;
@@ -665,11 +728,10 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::ScenePropertyChanged(QtProperty * _item)
+void ModelListWidget::ScenePropertyChanged(QtProperty */*_item*/)
 {
   msgs::Scene msg;
 
-  QtProperty *cameraPoseProperty = NULL;
   QList<QtProperty*> properties = this->propTreeBrowser->properties();
   for (QList<QtProperty*>::iterator iter = properties.begin();
        iter != properties.end(); ++iter)
@@ -680,30 +742,10 @@ void ModelListWidget::ScenePropertyChanged(QtProperty * _item)
       this->FillColorMsg((*iter), msg.mutable_background());
     else if ((*iter)->propertyName().toStdString() == "shadows")
       msg.set_shadows(this->variantManager->value((*iter)).toBool());
-    else if ((*iter)->propertyName().toStdString() == "camera_pose")
-      cameraPoseProperty = *iter;
   }
 
   msg.set_name(gui::get_world());
   this->scenePub->Publish(msg);
-
-  if (cameraPoseProperty)
-  {
-    std::string changedProperty = _item->propertyName().toStdString();
-    if (changedProperty == "x"
-      || changedProperty == "y"
-      || changedProperty == "z"
-      || changedProperty == "roll"
-      || changedProperty == "pitch"
-      || changedProperty == "yaw")
-    {
-      msgs::Pose poseMsg;
-      this->FillPoseMsg(cameraPoseProperty, &poseMsg, poseMsg.GetDescriptor());
-      rendering::UserCameraPtr cam = gui::get_active_camera();
-      if (cam)
-        cam->SetWorldPose(msgs::Convert(poseMsg));
-    }
-  }
 }
 
 /////////////////////////////////////////////////
@@ -2306,8 +2348,17 @@ void ModelListWidget::ResetTree()
 
   // Create the top level of items in the tree widget
   {
+    // GUI item
+    this->guiItem = new QTreeWidgetItem(
+        static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("%1").arg(tr("GUI"))));
+    this->guiItem->setData(0, Qt::UserRole, QVariant(tr("GUI")));
+    this->modelTreeWidget->addTopLevelItem(this->guiItem);
+
+    // Scene item
     this->ResetScene();
 
+    // Spherical coordinates item
     this->sphericalCoordItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("%1").arg(tr("Spherical Coordinates"))));
@@ -2315,18 +2366,21 @@ void ModelListWidget::ResetTree()
         Qt::UserRole, QVariant(tr("Spherical Coordinates")));
     this->modelTreeWidget->addTopLevelItem(this->sphericalCoordItem);
 
+    // Physics item
     this->physicsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("%1").arg(tr("Physics"))));
     this->physicsItem->setData(0, Qt::UserRole, QVariant(tr("Physics")));
     this->modelTreeWidget->addTopLevelItem(this->physicsItem);
 
+    // Models item
     this->modelsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("%1").arg(tr("Models"))));
     this->modelsItem->setData(0, Qt::UserRole, QVariant(tr("Models")));
     this->modelTreeWidget->addTopLevelItem(this->modelsItem);
 
+    // Lights item
     this->lightsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("%1").arg(tr("Lights"))));
@@ -2421,20 +2475,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
     item->setValue(clr);
   }
   this->propTreeBrowser->addProperty(item);
-
-  // Create and set the gui camera pose
-  item = this->variantManager->addProperty(
-      QtVariantPropertyManager::groupTypeId(), tr("camera_pose"));
-  {
-    auto browserItem = this->propTreeBrowser->addProperty(item);
-    rendering::UserCameraPtr cam = gui::get_active_camera();
-    math::Pose cameraPose;
-    if (cam)
-      cameraPose = cam->GetWorldPose();
-
-    this->FillPoseProperty(msgs::Convert(cameraPose), item);
-    this->propTreeBrowser->setExpanded(browserItem, true);
-  }
 
   // Create and set the shadows property
   item = this->variantManager->addProperty(QVariant::Bool, tr("shadows"));
