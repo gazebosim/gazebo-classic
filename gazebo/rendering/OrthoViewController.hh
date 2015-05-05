@@ -62,7 +62,8 @@ namespace gazebo
                          const math::Vector2i &_point = math::Vector2i(0, 0));
 
       // Documentation inherited
-      public: virtual void Resize(int _width, int _height);
+      public: virtual void Resize(const unsigned int _width,
+                                  const unsigned int _height);
 
       /// \brief Build a custom scaled orthographic projection matrix.
       /// \param[in] _left Left position

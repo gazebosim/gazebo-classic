@@ -260,7 +260,8 @@ void OrthoViewController::Zoom(const float _amount,
 }
 
 //////////////////////////////////////////////////
-void OrthoViewController::Resize(int _width, int _height)
+void OrthoViewController::Resize(
+    const unsigned int _width, const unsigned int _height)
 {
   Ogre::Matrix4 proj = this->BuildScaledOrthoMatrix(
       -_width / this->dataPtr->scale / 2.0,
