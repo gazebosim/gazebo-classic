@@ -592,9 +592,10 @@ void ODEPhysics::SetFrictionModel(const std::string &_fricModel)
   else if (_fricModel.compare("box_model") == 0)
       fricModel = 2;
 
-  // Comment this until sdformat changes
-  // this->sdf->GetElement("ode")->GetElement(
-  //    "solver")->GetElement("friction_model")->Set(fricModel);
+  /// Uncomment this until sdformat changes (sdformat repo issue #96)
+  ///
+  /// this->sdf->GetElement("ode")->GetElement(
+  ///   "solver")->GetElement("friction_model")->Set(fricModel);
   dWorldSetQuickStepFrictionModel(this->dataPtr->worldId, fricModel);
 }
 
@@ -662,14 +663,12 @@ double ODEPhysics::GetSORPGSW()
 }
 
 //////////////////////////////////////////////////
-// Comment this out until sdformat changes
-/*
-int ODEPhysics::GetFrictionModel()
-{
-  return this->sdf->GetElement("ode")->GetElement(
-      "solver")->Get<int>("friction_model");
-}
-*/
+/// Uncomment this until sdformat changes (sdformat repo issue #96)
+/// int ODEPhysics::GetFrictionModel()
+/// {
+///   return this->sdf->GetElement("ode")->GetElement(
+///     "solver")->Get<int>("friction_model");
+/// }
 
 //////////////////////////////////////////////////
 double ODEPhysics::GetWorldCFM()

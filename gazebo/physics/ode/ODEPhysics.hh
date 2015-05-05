@@ -156,7 +156,7 @@ namespace gazebo
       public: virtual void SetContactSurfaceLayer(double layer_depth);
 
       // Documentation inherited
-      public: virtual void SetFrictionModel(const std::string &fricModel);
+      public: virtual void SetFrictionModel(const std::string &_fricModel);
 
       // Documentation inherited
       public: virtual void SetMaxContacts(unsigned int max_contacts);
@@ -180,8 +180,8 @@ namespace gazebo
       public: virtual double GetContactMaxCorrectingVel();
 
       // Documentation inherited
-      // Comment this until sdformat changes
-      // public: virtual int GetFrictionModel();
+      /// Uncomment this until sdformat changes (sdformat repo issue #96)
+      /// public: virtual int GetFrictionModel();
 
       // Documentation inherited
       public: virtual double GetContactSurfaceLayer();
