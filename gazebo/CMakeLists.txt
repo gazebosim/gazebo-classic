@@ -5,6 +5,7 @@ include_directories(SYSTEM
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
   ${TBB_INCLUDEDIR}
+  ${tinyxml_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -13,18 +14,12 @@ link_directories(
   ${SDFormat_LIBRARY_DIRS}
   ${PROJECT_BINARY_DIR}/test
   ${TBB_LIBRARY_DIR}
+  ${CURL_LIBDIR}
 )
 
 if (WIN32)
   include_directories(${libdl_include_dir})
 endif()
-
-include_directories(${tinyxml_INCLUDE_DIRS})
-# TODO: this should work here but it did not for me
-# the workaround was to move this line to ..\CMakeLists.txt
-# review why this is not working here and remove the
-# workaround.
-link_directories(${CURL_LIBDIR})
 
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
