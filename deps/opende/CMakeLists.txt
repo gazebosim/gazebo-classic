@@ -164,6 +164,8 @@ src/cylinder.cpp
 src/error.cpp
 src/export-dif.cpp
 src/heightfield.cpp
+src/io.cpp
+src/ioh5.cpp
 src/lcp.cpp
 src/mass.cpp
 src/mat.cpp
@@ -227,6 +229,7 @@ include/ode/compatibility.h
 include/ode/contact.h
 include/ode/error.h
 include/ode/export-dif.h
+include/ode/h5dump.h
 include/ode/mass.h
 include/ode/matrix.h
 include/ode/memory.h
@@ -267,6 +270,11 @@ target_link_libraries(gazebo_ode
   gazebo_opende_ou
   ${CCD_LIBRARIES}
   ${Boost_LIBRARIES})
+
+if (HDF5_FOUND AND HDF5_INSTRUMENT)
+  message(STATUS "HDF5 Found and Instrument enabled")
+  target_link_libraries(gazebo_ode ${HDF5_LIBRARIES})
+endif()
 
 add_dependencies(gazebo_ode gazebo_opcode gazebo_gimpact)
 add_dependencies(gazebo_ode gazebo_opende_ou)

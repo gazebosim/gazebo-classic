@@ -29,7 +29,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A screw joint.
-    class GAZEBO_VISIBLE DARTScrewJoint : public ScrewJoint<DARTJoint>
+    class GZ_PHYSICS_VISIBLE DARTScrewJoint : public ScrewJoint<DARTJoint>
     {
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the Link that is the joint' parent

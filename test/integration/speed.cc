@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
