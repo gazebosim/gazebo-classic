@@ -161,7 +161,7 @@ namespace gazebo
       public: std::string GetHumanReadableKey(const std::string &_key);
 
       /// \brief Returns the unit for a given key. For example, the key "mass"
-      /// returns "Kg".
+      /// returns "kg".
       /// \param[in] _key The key.
       /// \param[in] _jointType In case the field belongs to a joint, the
       /// joint's type.
@@ -579,6 +579,39 @@ namespace gazebo
 
       /// \brief A copy of the message with fields to be configured by widgets.
       private: google::protobuf::Message *configMsg;
+
+      /// \brief Color used for the background of level 0 widgets.
+      private: static const QString level0BgColor;
+
+      /// \brief Color used for the background of level 0 widgets.
+      private: static const QString level1BgColor;
+
+      /// \brief Color used for the background of level 0 widgets.
+      private: static const QString level2BgColor;
+
+      /// \brief Color used for the background of level 0 widgets.
+      private: static const QString level3BgColor;
+
+      /// \brief Color used for the widget areas of of level 0 widgets.
+      private: static const QString level0WidgetColor;
+
+      /// \brief Color used for the widget areas of of level 0 widgets.
+      private: static const QString level1WidgetColor;
+
+      /// \brief Color used for the widget areas of of level 0 widgets.
+      private: static const QString level2WidgetColor;
+
+      /// \brief Color used for the widget areas of of level 0 widgets.
+      private: static const QString level3WidgetColor;
+
+      /// \brief Red color used for "red" or "x" fields.
+      private: static const QString redColor;
+
+      /// \brief Red color used for "green" or "y" fields.
+      private: static const QString greenColor;
+
+      /// \brief Red color used for "blue" or "z" fields.
+      private: static const QString blueColor;
     };
   }
 }

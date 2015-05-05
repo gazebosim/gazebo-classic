@@ -24,6 +24,18 @@
 using namespace gazebo;
 using namespace gui;
 
+const QString ConfigWidget::level0BgColor = "#999999";
+const QString ConfigWidget::level1BgColor = "#777777";
+const QString ConfigWidget::level2BgColor = "#555555";
+const QString ConfigWidget::level3BgColor = "#333333";
+const QString ConfigWidget::level0WidgetColor = "#eeeeee";
+const QString ConfigWidget::level1WidgetColor = "#cccccc";
+const QString ConfigWidget::level2WidgetColor = "#aaaaaa";
+const QString ConfigWidget::level3WidgetColor = "#888888";
+const QString ConfigWidget::redColor = "#d42b2b";
+const QString ConfigWidget::greenColor = "#3bc43b";
+const QString ConfigWidget::blueColor = "#0d0df2";
+
 /////////////////////////////////////////////////
 ConfigWidget::ConfigWidget()
 {
@@ -110,12 +122,12 @@ std::string ConfigWidget::GetUnitFromKey(const std::string &_key,
     return "m/s";
 
   if (_key == "mass")
-    return "Kg";
+    return "kg";
 
   if (_key == "ixx" || _key == "ixy" || _key == "ixz" ||
       _key == "iyy" || _key == "iyz" || _key == "izz")
   {
-    return "Kg&middot;m<sup>2</sup>";
+    return "kg&middot;m<sup>2</sup>";
   }
 
   if (_key == "limit_lower" || _key == "limit_upper")
@@ -906,8 +918,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
               buttonFrame->setStyleSheet(
                   "QWidget\
                   {\
-                    background-color: #999999\
-                  }");
+                    background-color: " + this->level0BgColor +
+                  "}");
             }
 
             // Child widgets are contained in a group box which can be collapsed
@@ -934,36 +946,36 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
               newFieldWidget->setStyleSheet(
                   "QWidget\
                   {\
-                    background-color: #777777\
-                  }\
+                    background-color: " + this->level1BgColor +
+                  "}\
                   QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
                   {\
-                    background-color: #cccccc\
-                  }");
+                    background-color: " + this->level1WidgetColor +
+                  "}");
             }
             else if (_level == 1)
             {
               newFieldWidget->setStyleSheet(
                   "QWidget\
                   {\
-                    background-color: #555555\
-                  }\
+                    background-color: " + this->level2BgColor +
+                  "}\
                   QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
                   {\
-                    background-color: #aaaaaa\
-                  }");
+                    background-color: " + this->level2WidgetColor +
+                  "}");
             }
             else if (_level == 2)
             {
               newFieldWidget->setStyleSheet(
                   "QWidget\
                   {\
-                    background-color: #333333\
-                  }\
+                    background-color: " + this->level2BgColor +
+                  "}\
                   QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
                   {\
-                    background-color: #888888\
-                  }");
+                    background-color: " + this->level2WidgetColor +
+                  "}");
             }
 
             // Group Layout
@@ -1038,12 +1050,12 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
         newFieldWidget->setStyleSheet(
             "QWidget\
             {\
-              background-color: #999999\
-            }\
+              background-color: " + this->level0BgColor +
+            "}\
             QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
             {\
-              background-color: #eeeeee\
-            }");
+              background-color: " + this->level0WidgetColor +
+            "}");
       }
 
       if (newWidget && newFieldWidget)
@@ -1491,11 +1503,11 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
     QLabel *label = new QLabel(this->GetHumanReadableKey(elements[i]).c_str());
     label->setToolTip(tr(elements[i].c_str()));
     if (i == 0)
-      label->setStyleSheet("QLabel{color: #d42b2b;}");
+      label->setStyleSheet("QLabel{color: " + this->redColor + ";}");
     else if (i == 1)
-      label->setStyleSheet("QLabel{color: #3bc43b;}");
+      label->setStyleSheet("QLabel{color: " + this->greenColor + ";}");
     else if (i == 2)
-      label->setStyleSheet("QLabel{color: #0d0df2;}");
+      label->setStyleSheet("QLabel{color:" + this->blueColor + ";}");
 
     QLabel *unitLabel = new QLabel();
     unitLabel->setMaximumWidth(40);
@@ -1563,9 +1575,9 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   QLabel *geomSizeXLabel = new QLabel(tr("X"));
   QLabel *geomSizeYLabel = new QLabel(tr("Y"));
   QLabel *geomSizeZLabel = new QLabel(tr("Z"));
-  geomSizeXLabel->setStyleSheet("QLabel{color: #d42b2b;}");
-  geomSizeYLabel->setStyleSheet("QLabel{color: #3bc43b;}");
-  geomSizeZLabel->setStyleSheet("QLabel{color: #0d0df2;}");
+  geomSizeXLabel->setStyleSheet("QLabel{color: " + this->redColor + ";}");
+  geomSizeYLabel->setStyleSheet("QLabel{color: " + this->greenColor + ";}");
+  geomSizeZLabel->setStyleSheet("QLabel{color: " + this->blueColor + ";}");
   geomSizeXLabel->setToolTip(tr("x"));
   geomSizeYLabel->setToolTip(tr("y"));
   geomSizeZLabel->setToolTip(tr("z"));
