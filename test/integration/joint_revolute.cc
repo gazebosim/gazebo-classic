@@ -16,6 +16,7 @@
 */
 
 #include "ServerFixture.hh"
+#include "gazebo/gazebo_config.h"
 #include "gazebo/math/SignalStats.hh"
 #include "gazebo/physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"

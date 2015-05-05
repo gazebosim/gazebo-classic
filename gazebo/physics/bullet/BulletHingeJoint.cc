@@ -161,7 +161,7 @@ void BulletHingeJoint::Init()
 
   // Set angleOffset based on hinge angle at joint creation.
   // GetAngleImpl will report angles relative to this offset.
-  this->angleOffset = this->bulletHinge->getHingeAngle();
+  this->angleOffset = this->GetAngleImpl(0).Radian();
 
   // Apply joint angle limits here.
   // TODO: velocity and effort limits.
@@ -236,11 +236,14 @@ math::Angle BulletHingeJoint::GetAngleImpl(unsigned int /*_index*/) const
     btHingeAccumulatedAngleConstraint* hinge =
       static_cast<btHingeAccumulatedAngleConstraint*>(this->bulletHinge);
     if (hinge)
+    {
       result = hinge->getAccumulatedHingeAngle();
+    }
     else
-#else
-      result = this->bulletHinge->getHingeAngle();
 #endif
+    {
+      result = this->bulletHinge->getHingeAngle();
+    }
     result -= this->angleOffset;
   }
   return result;
