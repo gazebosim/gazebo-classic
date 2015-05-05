@@ -155,6 +155,10 @@ endif (NOT CMAKE_BUILD_TYPE)
 # uppercase old supported and deprecated modes
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPERCASE)
 
+if (NOT DEFINED HDF5_INSTRUMENT)
+  set (HDF5_INSTRUMENT FALSE)
+endif()
+
 set (BUILD_TYPE_PROFILE FALSE)
 set (BUILD_TYPE_RELEASE FALSE)
 set (BUILD_TYPE_RELWITHDEBINFO FALSE)
@@ -215,12 +219,18 @@ if (UNIX AND NOT APPLE)
   filter_valid_compiler_flags(-fvisibility=hidden -fvisibility-inlines-hidden)
 endif()
 
-# Visual Studio enables c++11 support by default
-if (NOT MSVC)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}} -std=c++11")
+if (MSVC)
+  # Unable to be filtered flags (failing due to limitations in filter_valid_compiler_warnings)
+  # Handling exceptions rightly
+  set(UNFILTERED_FLAGS "/EHsc")
 endif()
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS}")
+# Visual Studio enables c++11 support by default
+if (NOT MSVC)
+  set(UNFILTERED_FLAGS "-std=c++11")
+endif()
+
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS} ${UNFILTERED_FLAGS}")
 
 #################################################
 # OS Specific initialization
