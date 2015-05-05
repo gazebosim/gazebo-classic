@@ -56,8 +56,8 @@ namespace gazebo
       public: virtual void HandleMouseEvent(const common::MouseEvent &_event);
 
       /// \brief Zoom the camera.
-      /// \param[in] _amount Zoom quatity.
-      /// \param[in] _screenPos Position on screen to zoom to
+      /// \param[in] _amount Zoom quantity.
+      /// \param[in] _point Position on screen to zoom to
       private: void Zoom(const float _amount,
                          const math::Vector2i &_point = math::Vector2i(0, 0));
 
