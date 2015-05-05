@@ -21,8 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/thread/recursive_mutex.hpp>
-
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>

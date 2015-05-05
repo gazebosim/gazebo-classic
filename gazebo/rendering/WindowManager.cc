@@ -27,7 +27,6 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
-#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
@@ -66,14 +65,12 @@ void WindowManager::Fini()
 }
 
 //////////////////////////////////////////////////
-bool WindowManager::SetCamera(int _windowId, CameraPtr _camera)
+void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
 {
   if (static_cast<unsigned int>(_windowId) < this->windows.size() &&
       this->windows[_windowId])
     this->windows[_windowId]->removeAllViewports();
   _camera->SetRenderTarget(this->windows[_windowId]);
-
-  return true;
 }
 
 //////////////////////////////////////////////////
@@ -105,7 +102,7 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   // Hide window if dimensions are less than or equal to one.
   if (_width <= 1 && _height <=1)
     params["border"] = "none";
- 
+
   std::ostringstream stream;
   stream << "OgreWindow(" << windowCounter++ << ")";
 
@@ -129,13 +126,12 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
     gzthrow("Unable to create the rendering window\n");
   }
 
-
   if (window)
   {
     window->setActive(true);
+    window->setVisible(true);
     window->setAutoUpdated(false);
     window->reposition(0, 0);
-    window->setVisible(true);
 
     this->windows.push_back(window);
   }

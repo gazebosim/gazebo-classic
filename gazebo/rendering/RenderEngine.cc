@@ -15,29 +15,30 @@
  *
 */
 
-#ifdef  __APPLE__
+#include <string>
+#include <iostream>
+#include <boost/filesystem.hpp>
+#include <sys/types.h>
+
+#ifdef __APPLE__
 # include <QtCore/qglobal.h>
 #endif
 
-#if not defined( Q_OS_MAC) && not defined(_WIN32)  // Not Apple or Windows
+// Not Apple or Windows
+#if not defined( Q_OS_MAC) && not defined(_WIN32)
 # include <X11/Xlib.h>
 # include <X11/Xutil.h>
 # include <GL/glx.h>
 #endif
 
-#include <sys/types.h>
-#ifdef _WIN32
+#ifndef _WIN32
+  #include <dirent.h>
+#else
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
   #include "gazebo/common/win_dirent.h"
-#else
-  #include <dirent.h>
 #endif
-#include <string>
-#include <iostream>
-
-#include <boost/filesystem.hpp>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -161,10 +162,7 @@ ScenePtr RenderEngine::CreateScene(const std::string &_name,
                                    bool _isServer)
 {
   if (this->renderPathType == NONE)
-  {
-    gzerr << "NO RENDER PATH TYPE\n";
     return ScenePtr();
-  }
 
   if (!this->initialized)
   {
@@ -294,8 +292,6 @@ void RenderEngine::PostRender()
 //////////////////////////////////////////////////
 void RenderEngine::Init()
 {
-  this->CheckSystemCapabilities();
-
   if (this->renderPathType == NONE)
   {
     gzwarn << "Cannot initialize render engine since "
@@ -389,7 +385,7 @@ void RenderEngine::Fini()
   this->scenes.clear();
 
   // Not Apple or Windows
-#if not defined( Q_OS_MAC) && not defined(_WIN32)
+# if not defined( Q_OS_MAC) && not defined(_WIN32)
   if (this->dummyDisplay)
   {
     glXDestroyContext(static_cast<Display*>(this->dummyDisplay),
@@ -399,7 +395,7 @@ void RenderEngine::Fini()
     XCloseDisplay(static_cast<Display*>(this->dummyDisplay));
     this->dummyDisplay = NULL;
   }
-#endif
+# endif
 
   this->initialized = false;
 }

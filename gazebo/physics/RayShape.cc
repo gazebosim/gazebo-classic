@@ -25,7 +25,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/thread/recursive_mutex.hpp>
 #include <vector>
 #include <list>
 #include <string>

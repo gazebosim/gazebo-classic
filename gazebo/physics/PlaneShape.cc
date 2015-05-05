@@ -21,7 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/thread/recursive_mutex.hpp>
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/PlaneShape.hh"
 

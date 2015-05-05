@@ -15,8 +15,8 @@
  *
 */
 
-// TODO: we also include this winsock2 trick in Base.hh but it is used at last, so
-// we need it again here.
+// We also include this winsock2 trick in Base.hh but it is used last,
+// so we need it again here.
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -393,5 +393,3 @@ const sdf::ElementPtr Base::GetSDF()
   this->sdf->Update();
   return this->sdf;
 }
-
-

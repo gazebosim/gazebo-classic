@@ -12,7 +12,7 @@ set (headers
   SelectionRenderListener.hh
 )
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_SELECTION_BUFFER")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_SELECTION_BUFF")
 
 gz_add_library(gazebo_selection_buffer ${sources})
 
