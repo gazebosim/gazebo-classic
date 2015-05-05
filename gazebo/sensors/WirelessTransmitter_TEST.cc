@@ -16,7 +16,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class WirelessTransmitter_TEST : public ServerFixture

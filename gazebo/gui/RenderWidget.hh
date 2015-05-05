@@ -65,6 +65,10 @@ namespace gazebo
       public: void DisplayOverlayMsg(const std::string &_msg,
           int _duration = -1);
 
+      /// \brief Show or hide all the GUI overlays.
+      /// \param[in] _visible True to show the GUI overlays, false to hide them.
+      public: void SetOverlaysVisible(const bool _visible);
+
       /// \brief Get the overlay message being displayed
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
@@ -106,6 +110,10 @@ namespace gazebo
 
       /// \brief Bottom frame that holds the play/pause widgets
       private: QFrame *bottomFrame;
+
+      /// \brief Frame which holds the top toolbar.
+      private: QFrame *toolFrame;
+
       private: QLabel *xyzLabel;
       private: QLineEdit *xPosEdit;
       private: QLineEdit *yPosEdit;
@@ -120,6 +128,7 @@ namespace gazebo
 
       /// \brief Widget for the top toolbar
       private: QToolBar *toolbar;
+
       private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 

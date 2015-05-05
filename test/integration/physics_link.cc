@@ -19,7 +19,7 @@
 #include "gazebo/math/Vector3Stats.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
@@ -55,6 +55,10 @@ class PhysicsLinkTest : public ServerFixture,
   /// \brief Test Link::GetWorldInertia* functions.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void GetWorldInertia(const std::string &_physicsEngine);
+
+  /// \brief Test wrench subscriber.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void OnWrenchMsg(const std::string &_physicsEngine);
 
   /// \brief Test velocity setting functions.
   /// \param[in] _physicsEngine Type of physics engine to use.
@@ -314,6 +318,9 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   {
     EXPECT_LT(angularMomentumError.Mag().Map()[stat], g_tolerance * 10);
   }
+
+  RecordProperty("engine", _physicsEngine);
+  this->Record("angularMomentumError", angularMomentumError);
 }
 
 /////////////////////////////////////////////////
@@ -518,6 +525,132 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
+void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
+{
+  // TODO bullet, dart and simbody currently fail this test
+  if (_physicsEngine != "ode")
+  {
+    gzerr << "Aborting OnWrenchMsg test for Bullet, DART and Simbody. "
+          << "Because of issues #1476, #1477, and #1478."
+          << std::endl;
+    return;
+  }
+
+  Load("worlds/blank.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the physics engine
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  double dt = physics->GetMaxStepSize();
+  EXPECT_GT(dt, 0);
+
+  // disable gravity
+  physics->SetGravity(math::Vector3::Zero);
+
+  // Spawn a box
+  math::Vector3 size(1, 1, 1);
+  SpawnBox("box", size, math::Vector3::Zero, math::Vector3::Zero, false);
+  physics::ModelPtr model = world->GetModel("box");
+  ASSERT_TRUE(model != NULL);
+  physics::LinkPtr link = model->GetLink();
+  ASSERT_TRUE(link != NULL);
+
+  // Check that link is at rest
+  EXPECT_EQ(math::Vector3::Zero, link->GetWorldLinearVel());
+  EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
+  EXPECT_EQ(math::Vector3::Zero, link->GetWorldLinearAccel());
+  EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularAccel());
+  EXPECT_EQ(math::Vector3::Zero, link->GetWorldForce());
+  EXPECT_EQ(math::Vector3::Zero, link->GetWorldTorque());
+
+  // Publish wrench message
+  std::string topicName = "~/" + link->GetScopedName() + "/wrench";
+  boost::replace_all(topicName, "::", "/");
+  transport::PublisherPtr wrenchPub =
+    this->node->Advertise<msgs::Wrench>(topicName);
+
+  msgs::Wrench msg;
+
+  std::vector<math::Vector3> forces;
+  std::vector<math::Vector3> torques;
+  std::vector<math::Vector3> forceOffsets;
+
+  // Only force
+  forces.push_back(math::Vector3(1, 0, 0));
+  torques.push_back(math::Vector3::Zero);
+  forceOffsets.push_back(math::Vector3::Zero);
+
+  // Only force, with an offset
+  forces.push_back(math::Vector3(5.2, 0.1, 10));
+  torques.push_back(math::Vector3::Zero);
+  forceOffsets.push_back(math::Vector3(2.1, 1, -0.6));
+
+  // Only torque
+  forces.push_back(math::Vector3::Zero);
+  torques.push_back(math::Vector3(-0.2, 5, 0));
+  forceOffsets.push_back(math::Vector3::Zero);
+
+  // All fields set
+  forces.push_back(math::Vector3(5, 6, -0.9));
+  torques.push_back(math::Vector3(-0.2, 5, 0));
+  forceOffsets.push_back(math::Vector3(-1, -4, -0.8));
+
+  for (unsigned int i = 0; i < forces.size(); ++i)
+  {
+    gzdbg << "Testing force: " << forces[i].x << ", "
+                               << forces[i].y << ", "
+                               << forces[i].z <<
+                   " torque: " << torques[i].x << ", "
+                               << torques[i].y << ", "
+                               << torques[i].z <<
+             " force offset: " << forceOffsets[i].x << ", "
+                               << forceOffsets[i].y << ", "
+                               << forceOffsets[i].z << std::endl;
+
+    // Publish message
+    msgs::Set(msg.mutable_force(), forces[i]);
+    msgs::Set(msg.mutable_torque(), torques[i]);
+    // Leave optional field unset if it's zero
+    if (forceOffsets[i] != math::Vector3::Zero)
+      msgs::Set(msg.mutable_force_offset(), forceOffsets[i]);
+
+    wrenchPub->Publish(msg);
+
+    // Calculate expected values
+    math::Vector3 forceWorld = forces[i];
+    math::Vector3 worldOffset = forceOffsets[i] - link->GetInertial()->GetCoG();
+    math::Vector3 torqueWorld = worldOffset.Cross(forces[i]) + torques[i];
+
+    // Wait for message to be received
+    while (link->GetWorldForce() != forceWorld ||
+           link->GetWorldTorque() != torqueWorld)
+    {
+      world->Step(1);
+      common::Time::MSleep(1);
+    }
+
+    // Check force and torque (at CoG?) in world frame
+    EXPECT_EQ(link->GetWorldForce(), forceWorld);
+    EXPECT_EQ(link->GetWorldTorque(), torqueWorld);
+
+    // Reset link's physics states
+    link->ResetPhysicsStates();
+    link->SetWorldPose(math::Pose());
+    world->Step(1);
+
+    EXPECT_EQ(math::Vector3::Zero, link->GetWorldLinearVel());
+    EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
+    EXPECT_EQ(math::Vector3::Zero, link->GetWorldLinearAccel());
+    EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularAccel());
+    EXPECT_EQ(math::Vector3::Zero, link->GetWorldForce());
+    EXPECT_EQ(math::Vector3::Zero, link->GetWorldTorque());
+  }
+}
+
+/////////////////////////////////////////////////
 void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
 {
   Load("worlds/blank.world", true, _physicsEngine);
@@ -614,6 +747,12 @@ TEST_P(PhysicsLinkTest, GetWorldEnergy)
 TEST_P(PhysicsLinkTest, GetWorldInertia)
 {
   GetWorldInertia(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsLinkTest, OnWrenchMsg)
+{
+  OnWrenchMsg(GetParam());
 }
 
 /////////////////////////////////////////////////

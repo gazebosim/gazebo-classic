@@ -24,6 +24,7 @@
 #define _ODE_QUICK_STEP_UTIL_H_
 
 #include <ode/common.h>
+#include "gazebo/gazebo_config.h"
 
 #ifdef SSE
 #include <xmmintrin.h>
@@ -45,6 +46,13 @@
 
 #undef CHECK_VELOCITY_OBEYS_CONSTRAINT
 
+#ifndef TIMING
+#ifdef HDF5_INSTRUMENT
+#define DUMP
+#include <ode/h5dump.h>
+#define DATA_FILE  "ode_frames.hdf5"
+#endif  // instrument
+#endif  // timing
 
 #ifdef USE_TPROW
 // added for threading per constraint rows
@@ -81,9 +89,9 @@ typedef dReal *dRealMutablePtr;
 // #define RANDOMLY_REORDER_CONSTRAINTS 1
 #undef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
 
-/// scale PGS for contact to reduce overshoot in solution for contacts
+/// scale SOR for contact to reduce overshoot in solution for contacts
 /// \TODO: make this a parameter
-#define CONTACT_PGS_SCALE 0.25
+#define CONTACT_SOR_SCALE 0.25
 
 //***************************************************************************
 // testing stuff
@@ -94,6 +102,11 @@ typedef dReal *dRealMutablePtr;
 #define IFTIMING(x) ((void)0)
 #endif
 
+#ifdef DUMP
+#define IFDUMP(x) x
+#else
+#define IFDUMP(x) ((void)0)
+#endif
 // ****************************************************************
 // ******************* Struct Definition **************************
 // ****************************************************************

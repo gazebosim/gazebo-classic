@@ -30,12 +30,22 @@
 #include "objects.h"
 #include "joints/joint.h"
 #include "util.h"
-#include <sys/time.h>
+
+#ifndef _WIN32
+  #include <sys/time.h>
+#endif
+
 #include "quickstep_util.h"
 #include "quickstep_pgs_lcp.h"
+#ifndef TIMING
+#ifdef HDF5_INSTRUMENT
+#define DUMP
+std::vector<dReal> errors;
+#endif   //HDF5_INSTRUMENT
+#endif   //timing
 
 using namespace ode;
- 
+
 static void ComputeRows(
 #ifdef SHOW_CONVERGENCE
                 int thread_id,
@@ -173,13 +183,16 @@ static void ComputeRows(
 #ifdef PENETRATION_JVERROR_CORRECTION
   dReal Jvnew_final = 0;
 #endif
+#ifdef HDF5_INSTRUMENT
+  errors.resize(num_iterations + precon_iterations + friction_iterations);
+#endif
   dRealMutablePtr caccel_ptr1;
   dRealMutablePtr caccel_ptr2;
   dRealMutablePtr caccel_erp_ptr1;
   dRealMutablePtr caccel_erp_ptr2;
   dRealMutablePtr cforce_ptr1;
   dRealMutablePtr cforce_ptr2;
-  int total_iterations = precon_iterations + num_iterations + 
+  int total_iterations = precon_iterations + num_iterations +
     friction_iterations;
   for (int iteration = 0; iteration < total_iterations; ++iteration)
   {
@@ -398,9 +411,9 @@ static void ComputeRows(
 
         // record residual (error) (for the non-erp version)
         // given
-        //   dlambda = pgs * (b_i - A_ij * lambda_j)/(A_ii + cfm)
+        //   dlambda = sor * (b_i - A_ij * lambda_j)/(A_ii + cfm)
         // define scalar Ad:
-        //   Ad = pgs / (A_ii + cfm)
+        //   Ad = sor / (A_ii + cfm)
         // then
         //   dlambda = Ad  * (b_i - A_ij * lambda_j)
         // thus, to get residual from dlambda,
@@ -411,16 +424,16 @@ static void ComputeRows(
         dReal Ad2 = 0.0;
         if (!_dequal(Ad[index], 0.0))
         {
-          // Ad[i] = pgs_w / (sum + cfm[i]);
+          // Ad[i] = sor_w / (sum + cfm[i]);
           Ad2 = 1.0 / (Ad[index] * Ad[index]);
         }
         else
         {
-          // TODO: Usually, this means qs->w (PGS param) is zero.
-          // Residual calculation is wrong when PGS (w) is zero
-          // Given PGS is rarely 0, we'll set residual as 0 for now.
-          // To do this properly, we should compute dlambda without pgs
-          // then use the Ad without PGS to back out residual.
+          // TODO: Usually, this means qs->w (SOR param) is zero.
+          // Residual calculation is wrong when SOR (w) is zero
+          // Given SOR is rarely 0, we'll set residual as 0 for now.
+          // To do this properly, we should compute dlambda without sor
+          // then use the Ad without SOR to back out residual.
         }
 
         dReal delta_precon2 = delta_precon*delta_precon;
@@ -613,9 +626,9 @@ static void ComputeRows(
 
         // record residual (error) (for the non-erp version)
         // given
-        //   dlambda = pgs * (b_i - A_ij * lambda_j)/(A_ii + cfm)
+        //   dlambda = sor * (b_i - A_ij * lambda_j)/(A_ii + cfm)
         // define scalar Ad:
-        //   Ad = pgs / (A_ii + cfm)
+        //   Ad = sor / (A_ii + cfm)
         // then
         //   dlambda = Ad  * (b_i - A_ij * lambda_j)
         // thus, to get residual from dlambda,
@@ -626,16 +639,16 @@ static void ComputeRows(
         dReal Ad2 = 0.0;
         if (!_dequal(Ad[index], 0.0))
         {
-          // Ad[i] = pgs_w / (sum + cfm[i]);
+          // Ad[i] = sor_w / (sum + cfm[i]);
           Ad2 = 1.0 / (Ad[index] * Ad[index]);
         }
         else
         {
-          // TODO: Usually, this means qs->w (PGS param) is zero.
-          // Residual calculation is wrong when PGS (w) is zero
-          // Given PGS is rarely 0, we'll set residual as 0 for now.
-          // To do this properly, we should compute dlambda without pgs
-          // then use the Ad without PGS to back out residual.
+          // TODO: Usually, this means qs->w (SOR param) is zero.
+          // Residual calculation is wrong when SOR (w) is zero
+          // Given SOR is rarely 0, we'll set residual as 0 for now.
+          // To do this properly, we should compute dlambda without sor
+          // then use the Ad without SOR to back out residual.
         }
 
         dReal delta2 = delta*delta;
@@ -713,6 +726,9 @@ static void ComputeRows(
     qs->rms_constraint_residual[3] = sqrt(residual_total_mean);
     qs->num_contacts = m_rms_dlambda[1];
 
+#ifdef HDF5_INSTRUMENT
+    errors[iteration] = residual_total_mean;
+#endif
     // debugging mutex locking
     //{
     //  // verify
@@ -792,10 +808,14 @@ static void ComputeRows(
   double end_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
   printf("      quickstep row thread %d start time %f ended time %f duration %f\n",thread_id,cur_time,end_time,end_time - cur_time);
   #endif
+#ifdef HDF5_INSTRUMENT
+  IFDUMP(h5_write_errors(DATA_FILE, errors.data(), errors.size()));
+#endif
 }
 
 //***************************************************************************
 // PGS_LCP method was previously SOR_LCP
+//
 // this returns lambda and cforce (the constraint force).
 // note: cforce is returned as inv(M)*J'*lambda,
 //   the constraint force is actually J'*lambda
@@ -843,20 +863,20 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   dReal *Ad = context->AllocateArray<dReal> (m);
 
   {
-    const dReal pgs_w = qs->w;    // PGS over-relaxation parameter
+    const dReal sor_w = qs->w;    // SOR over-relaxation parameter
     // precompute 1 / diagonals of A
     dRealPtr iMJ_ptr = iMJ;
     dRealPtr J_ptr = J;
     for (int i=0; i<m; J_ptr += 12, iMJ_ptr += 12, i++) {
       dReal sum = 0;
-      sum += dot6(iMJ_ptr, J_ptr);
+      sum += quickstep::dot6(iMJ_ptr, J_ptr);
       if (jb[i*2+1] >= 0) {
-        sum += dot6(iMJ_ptr+6, J_ptr+6);
+        sum += quickstep::dot6(iMJ_ptr+6, J_ptr+6);
       }
       if (findex[i] < 0)
-        Ad[i] = pgs_w / (sum + cfm[i]);
+        Ad[i] = sor_w / (sum + cfm[i]);
       else
-        Ad[i] = CONTACT_PGS_SCALE * pgs_w / (sum + cfm[i]);
+        Ad[i] = CONTACT_SOR_SCALE * sor_w / (sum + cfm[i]);
     }
   }
 
@@ -869,20 +889,20 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     dReal *Ad_precon = context->AllocateArray<dReal> (m);
 
     {
-      const dReal pgs_w = qs->w;    // PGS over-relaxation parameter
+      const dReal sor_w = qs->w;    // SOR over-relaxation parameter
       // precompute 1 / diagonals of A
       // preconditioned version uses J instead of iMJ
       dRealPtr J_ptr = J;
       for (int i=0; i<m; J_ptr += 12, i++) {
         dReal sum = 0;
-        sum += dot6(J_ptr, J_ptr);
+        sum += quickstep::dot6(J_ptr, J_ptr);
         if (jb[i*2+1] >= 0) {
-          sum += dot6(J_ptr+6, J_ptr+6);
+          sum += quickstep::dot6(J_ptr+6, J_ptr+6);
         }
         if (findex[i] < 0)
-          Ad_precon[i] = pgs_w / (sum + cfm[i]);
+          Ad_precon[i] = sor_w / (sum + cfm[i]);
         else
-          Ad_precon[i] = CONTACT_PGS_SCALE * pgs_w / (sum + cfm[i]);
+          Ad_precon[i] = CONTACT_SOR_SCALE * sor_w / (sum + cfm[i]);
       }
     }
 

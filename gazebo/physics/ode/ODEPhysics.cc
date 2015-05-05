@@ -302,8 +302,56 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  // Parent class handles all parameters
+  // Parent class handles many generic parameters
+  // This should be done first so that the profile settings
+  // can be over-ridden by other message parameters.
   PhysicsEngine::OnPhysicsMsg(_msg);
+
+  if (_msg->has_solver_type())
+    this->SetStepType(_msg->solver_type());
+
+  if (_msg->has_min_step_size())
+    this->SetParam("min_step_size", _msg->min_step_size());
+
+  if (_msg->has_precon_iters())
+    this->SetSORPGSPreconIters(_msg->precon_iters());
+
+  if (_msg->has_iters())
+    this->SetSORPGSIters(_msg->iters());
+
+  if (_msg->has_sor())
+    this->SetSORPGSW(_msg->sor());
+
+  if (_msg->has_cfm())
+    this->SetWorldCFM(_msg->cfm());
+
+  if (_msg->has_erp())
+    this->SetWorldERP(_msg->erp());
+
+  if (_msg->has_enable_physics())
+    this->world->EnablePhysicsEngine(_msg->enable_physics());
+
+  if (_msg->has_contact_max_correcting_vel())
+    this->SetContactMaxCorrectingVel(_msg->contact_max_correcting_vel());
+
+  if (_msg->has_contact_surface_layer())
+    this->SetContactSurfaceLayer(_msg->contact_surface_layer());
+
+  if (_msg->has_gravity())
+    this->SetGravity(msgs::Convert(_msg->gravity()));
+
+  if (_msg->has_real_time_factor())
+    this->SetTargetRealTimeFactor(_msg->real_time_factor());
+
+  if (_msg->has_real_time_update_rate())
+  {
+    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+  }
+
+  if (_msg->has_max_step_size())
+  {
+    this->SetMaxStepSize(_msg->max_step_size());
+  }
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
@@ -1190,7 +1238,8 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
       dWorldSetQuickStepTolerance(this->dataPtr->worldId,
           boost::any_cast<double>(_value));
     }
-    else if (_key == "inertia_ratio_reduction")
+    else if (_key == "inertia_ratio_reduction" ||
+             _key == "use_dynamic_moi_rescaling")
     {
       bool value = boost::any_cast<bool>(_value);
       dWorldSetQuickStepInertiaRatioReduction(this->dataPtr->worldId, value);
@@ -1288,7 +1337,8 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = dWorldGetQuickStepRMSConstraintResidual(this->dataPtr->worldId);
   else if (_key == "num_contacts")
     _value = dWorldGetQuickStepNumContacts(this->dataPtr->worldId);
-  else if (_key == "inertia_ratio_reduction")
+  else if (_key == "inertia_ratio_reduction" ||
+           _key == "use_dynamic_moi_rescaling")
     _value = dWorldGetQuickStepInertiaRatioReduction(this->dataPtr->worldId);
   else if (_key == "contact_residual_smoothing")
     _value = dWorldGetQuickStepContactResidualSmoothing(this->dataPtr->worldId);

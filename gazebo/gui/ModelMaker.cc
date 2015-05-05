@@ -14,6 +14,13 @@
  * limitations under the License.
  *
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sstream>
 
 #include "gazebo/msgs/msgs.hh"
@@ -146,10 +153,10 @@ bool ModelMaker::Init()
   math::Pose modelPose, linkPose, visualPose;
   sdf::ElementPtr modelElem;
 
-  if (this->modelSDF->root->HasElement("model"))
-    modelElem = this->modelSDF->root->GetElement("model");
-  else if (this->modelSDF->root->HasElement("light"))
-    modelElem = this->modelSDF->root->GetElement("light");
+  if (this->modelSDF->Root()->HasElement("model"))
+    modelElem = this->modelSDF->Root()->GetElement("model");
+  else if (this->modelSDF->Root()->HasElement("light"))
+    modelElem = this->modelSDF->Root()->GetElement("light");
   else
   {
     gzerr << "No model or light in SDF\n";
@@ -169,8 +176,6 @@ bool ModelMaker::Init()
 
   modelName = this->modelVisual->GetName();
   modelElem->GetAttribute("name")->Set(modelName);
-
-  scene->AddVisual(this->modelVisual);
 
   if (modelElem->GetName() == "model")
   {
@@ -317,14 +322,14 @@ void ModelMaker::CreateTheEntity()
     sdf::ElementPtr modelElem;
     bool isModel = false;
     bool isLight = false;
-    if (this->modelSDF->root->HasElement("model"))
+    if (this->modelSDF->Root()->HasElement("model"))
     {
-      modelElem = this->modelSDF->root->GetElement("model");
+      modelElem = this->modelSDF->Root()->GetElement("model");
       isModel = true;
     }
-    else if (this->modelSDF->root->HasElement("light"))
+    else if (this->modelSDF->Root()->HasElement("light"))
     {
-      modelElem = this->modelSDF->root->GetElement("light");
+      modelElem = this->modelSDF->Root()->GetElement("light");
       isLight = true;
     }
 

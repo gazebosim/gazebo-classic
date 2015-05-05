@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/RenderEvents.hh"
@@ -40,21 +46,33 @@ using namespace gui;
 ModelManipulator::ModelManipulator()
   : dataPtr(new ModelManipulatorPrivate)
 {
-  this->dataPtr->initialized = false;
-  this->dataPtr->selectionObj.reset();
-  this->dataPtr->mouseMoveVis.reset();
-
   this->dataPtr->manipMode = "";
   this->dataPtr->globalManip = false;
+  this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////
 ModelManipulator::~ModelManipulator()
 {
-  this->dataPtr->modelPub.reset();
-  this->dataPtr->selectionObj.reset();
+  this->Clear();
   delete this->dataPtr;
   this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelManipulator::Clear()
+{
+  this->dataPtr->modelPub.reset();
+  this->dataPtr->lightPub.reset();
+  this->dataPtr->selectionObj.reset();
+  this->dataPtr->userCamera.reset();
+  this->dataPtr->scene.reset();
+  this->dataPtr->node.reset();
+  this->dataPtr->mouseMoveVis.reset();
+  this->dataPtr->mouseChildVisualScale.clear();
+  this->dataPtr->manipMode = "";
+  this->dataPtr->globalManip = false;
+  this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////
@@ -566,21 +584,31 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   if (vis && !vis->IsPlane() &&
       this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
   {
+    // Root visual
     rendering::VisualPtr rootVis = vis->GetRootVisual();
+
+    // Root visual's immediate child
+    rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
+
+    // If the root visual's ID can be found, it is a model in the main window
     if (gui::get_entity_id(rootVis->GetName()))
     {
       // select model
       vis = rootVis;
     }
-    else if (vis->GetParent() != rootVis &&
-        vis->GetParent() != this->dataPtr->scene->GetWorldVisual())
-    {
-      // select link
-      vis = vis->GetParent();
-    }
-    else
+    // If it is not a model and its parent is either a direct child or
+    // grandchild of the world, this is a light, so just keep vis = vis
+    else if (vis->GetParent() == rootVis ||
+        vis->GetParent() == this->dataPtr->scene->GetWorldVisual())
     {
       // select light
+    }
+    // Otherwise, this is a visual in the model editor, so we want to get its
+    // top level visual below the root.
+    else
+    {
+      // select link / nested model
+      vis = topLevelVis;
     }
 
     this->dataPtr->mouseMoveVisStartPose = vis->GetWorldPose();
