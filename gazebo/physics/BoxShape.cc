@@ -82,3 +82,10 @@ void BoxShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetSize(msgs::Convert(_msg.box().size()));
 }
+
+//////////////////////////////////////////////////
+double BoxShape::ComputeVolume() const
+{
+  math::Vector3 size = this->GetSize();
+  return size.x * size.y * size.z;
+}

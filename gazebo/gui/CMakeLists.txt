@@ -151,7 +151,7 @@ set (qt_tests
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
   set (qt_tests
-    ${qt_tests}
+      ${qt_tests}
       BuildingEditor_TEST.cc
       ConfigWidget_TEST.cc
       GLWidget_TEST.cc
@@ -162,7 +162,7 @@ if (ENABLE_SCREEN_TESTS)
 endif()
 
 # Generate executables for each of the QT unit tests
-# gz_build_qt_tests(${qt_tests})
+gz_build_qt_tests(${qt_tests})
 
 set (resources resources.qrc)
 
@@ -176,6 +176,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
 gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 
 target_link_libraries(gazebo_gui
+  libgazebo_client
   gazebo_common
   gazebo_transport
   gazebo_rendering

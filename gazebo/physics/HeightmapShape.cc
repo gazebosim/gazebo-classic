@@ -393,3 +393,9 @@ common::Image HeightmapShape::GetImage() const
   delete [] imageData;
   return result;
 }
+
+//////////////////////////////////////////////////
+double HeightmapShape::ComputeVolume() const
+{
+  return 0;
+}

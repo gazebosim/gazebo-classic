@@ -71,12 +71,11 @@ namespace gazebo
     GZ_COMMON_VISIBLE
     std::string get_sha1(const T &_buffer);
 
-    /// \brief Windows equivalent of getEnv.
-    /// Should only be called when using windows.
+    /// \brief Cross platform retrieval of an environment variable.
     /// \param[in] _name Name of the environment variable to get.
     /// \return Environment variable contents, or NULL on error.
     GZ_COMMON_VISIBLE
-    const char *getEnvWin(const char *_name);
+    const char *getEnv(const char *_name);
     /// \}
   }
 

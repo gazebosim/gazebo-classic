@@ -14,30 +14,27 @@
  * limitations under the License.
  *
  */
-/* Desc: Time class
- * Author: Nate Koenig
- * Date: 3 Apr 2007
- */
 
 #ifdef _WIN32
   #include <Windows.h>
   #include <Winsock2.h>
   struct timespec
   {
-    long tv_sec;
-    long tv_nsec;
+    int64_t tv_sec;
+    int64_t tv_nsec;
   };
 #else
   #include <unistd.h>
   #include <sys/time.h>
 #endif
+
 #include <time.h>
 #include <math.h>
 #include <boost/date_time.hpp>
 
 #ifdef __MACH__
-#include <mach/clock.h>
-#include <mach/mach.h>
+  #include <mach/clock.h>
+  #include <mach/mach.h>
 #endif
 
 #include "gazebo/math/Helpers.hh"
@@ -47,32 +44,12 @@
 using namespace gazebo;
 using namespace common;
 
-#ifdef _WIN32
-  // Borrowed from roscpp_core/rostime/src/time.cpp
-  void normalizeSecNSecUnsigned(int64_t& sec, int64_t& nsec)
-  {
-    int64_t nsec_part = nsec % 1000000000L;
-    int64_t sec_part = sec + nsec / 1000000000L;
-    if (nsec_part < 0)
-      {
-        nsec_part += 1000000000L;
-        --sec_part;
-      }
-
-    if (sec_part < 0 || sec_part > UINT_MAX)
-      throw std::runtime_error("Time is out of dual 32-bit range");
-
-    sec = sec_part;
-    nsec = nsec_part;
-  }
-#endif
-
 Time Time::wallTime;
 std::string Time::wallTimeISO;
 
 struct timespec Time::clockResolution;
-
 const Time Time::Zero = common::Time(0, 0);
+const int32_t Time::nsInSec = 1000000000L;
 
 /////////////////////////////////////////////////
 Time::Time()
@@ -86,9 +63,9 @@ Time::Time()
   LARGE_INTEGER freq;
   QueryPerformanceFrequency(&freq);
   double period = 1.0/freq.QuadPart;
-  clockResolution.tv_sec = long(floor(period));
+  clockResolution.tv_sec = static_cast<int64_t>(floor(period));
   clockResolution.tv_nsec =
-    long((period - floor(period))*1e9);
+    static_cast<int64_t>((period - floor(period)) * this->nsInSec);
 #else
   // get clock resolution, skip sleep if resolution is larger then
   // requested sleep time
@@ -159,50 +136,71 @@ const Time &Time::GetWallTime()
   // not installed the latest CPU drivers (an oxymoron). They fixed all these
   // problems in Windows Vista, and this API is by far the most accurate that
   // I know of in Windows, so I'll use it here despite all these caveats
-  static LARGE_INTEGER cpu_freq, init_cpu_time;
-  static uint32_t start_sec = 0;
-  static uint32_t start_nsec = 0;
-  if ( ( start_sec == 0 ) && ( start_nsec == 0 ) )
-   {
-      QueryPerformanceFrequency(&cpu_freq);
-      //if (cpu_freq.QuadPart == 0) {
-        //throw NoHighPerformanceTimersException();
-      //}
-      QueryPerformanceCounter(&init_cpu_time);
-      // compute an offset from the Epoch using the lower-performance timer API
-      FILETIME ft;
-      GetSystemTimeAsFileTime(&ft);
-      LARGE_INTEGER start_li;
-      start_li.LowPart = ft.dwLowDateTime;
-      start_li.HighPart = ft.dwHighDateTime;
-      // why did they choose 1601 as the time zero, instead of 1970?
-      // there were no outstanding hard rock bands in 1601.
+  static LARGE_INTEGER cpuFreq, initCpuTime;
+  static uint32_t startSec = 0;
+  static uint32_t startNSec = 0;
+  if ((startSec == 0)  && (startNSec == 0))
+  {
+    QueryPerformanceFrequency(&cpuFreq);
+    QueryPerformanceCounter(&initCpuTime);
+
+    // compute an offset from the Epoch using the lower-performance timer API
+    FILETIME ft;
+    GetSystemTimeAsFileTime(&ft);
+    LARGE_INTEGER startLi;
+    startLi.LowPart = ft.dwLowDateTime;
+    startLi.HighPart = ft.dwHighDateTime;
+
+    // why did they choose 1601 as the time zero, instead of 1970?
+    // there were no outstanding hard rock bands in 1601.
 #ifdef _MSC_VER
-    start_li.QuadPart -= 116444736000000000Ui64;
+    startLi.QuadPart -= 116444736000000000Ui64;
 #else
-    start_li.QuadPart -= 116444736000000000ULL;
+    startLi.QuadPart -= 116444736000000000ULL;
 #endif
-      start_sec = (uint32_t)(start_li.QuadPart / 10000000); // 100-ns units. odd.
-      start_nsec = (start_li.LowPart % 10000000) * 100;
-    }
-  LARGE_INTEGER cur_time;
-  QueryPerformanceCounter(&cur_time);
-  LARGE_INTEGER delta_cpu_time;
-  delta_cpu_time.QuadPart = cur_time.QuadPart - init_cpu_time.QuadPart;
+
+    // 100-ns units. odd.
+    startSec = static_cast<uint32_t>(startLi.QuadPart / 10000000);
+    startNSec = (startLi.LowPart % 10000000) * 100;
+  }
+
+  LARGE_INTEGER curTime;
+  QueryPerformanceCounter(&curTime);
+  LARGE_INTEGER deltaCpuTime;
+  deltaCpuTime.QuadPart = curTime.QuadPart - initCpuTime.QuadPart;
+
   // todo: how to handle cpu clock drift. not sure it's a big deal for us.
   // also, think about clock wraparound. seems extremely unlikey, but possible
-  double d_delta_cpu_time = delta_cpu_time.QuadPart / (double) cpu_freq.QuadPart;
-  uint32_t delta_sec = (uint32_t) floor(d_delta_cpu_time);
-  uint32_t delta_nsec = (uint32_t) boost::math::round((d_delta_cpu_time-delta_sec) * 1e9);
+  double dDeltaCpuTime = deltaCpuTime.QuadPart /
+    static_cast<double>(cpuFreq.QuadPart);
+  uint32_t deltaSec = static_cast<uint32_t>(floor(dDeltaCpuTime));
+  uint32_t deltaNSec = static_cast<uint32_t>(
+      math::round((dDeltaCpuTime-deltaSec) * this->nsInSec));
 
-  int64_t sec_sum  = (int64_t)start_sec  + (int64_t)delta_sec;
-  int64_t nsec_sum = (int64_t)start_nsec + (int64_t)delta_nsec;
+  int64_t secSum  = static_cast<int64_t>(startSec) +
+    static_cast<int64_t>(deltaSec);
+  int64_t nsecSum = static_cast<int64_t>(startNSec) +
+    static_cast<int64_t>(deltaNSec);
 
-  // Throws an exception if we go out of 32-bit range
-  normalizeSecNSecUnsigned(sec_sum, nsec_sum);
+  // Normalize
+  {
+    int64_t nsecPart = nsecSum % this->nsInSec;
+    int64_t secPart = secSum + nsecSum / this->nsInSec;
+    if (nsecPart < 0)
+    {
+      nsecPart += this->nsInSec;
+      --secPart;
+    }
 
-  tv.tv_sec = sec_sum;
-  tv.tv_nsec = nsec_sum;
+    if (secPart < 0 || secPart > UINT_MAX)
+      gzerr << "Time is out of dual 32-bit range\n";
+
+    secSum = secPart;
+    nsecSum = nsecPart;
+  }
+
+  tv.tv_sec = secSum;
+  tv.tv_nsec = nsecSum;
 #else
   clock_gettime(0, &tv);
 #endif
@@ -238,7 +236,7 @@ void Time::Set(int32_t _sec, int32_t _nsec)
 void Time::Set(double _seconds)
 {
   this->sec = (int32_t)(floor(_seconds));
-  this->nsec = (int32_t)(round((_seconds - this->sec) * 1e9));
+  this->nsec = (int32_t)(round((_seconds - this->sec) * this->nsInSec));
   this->Correct();
 }
 
@@ -298,19 +296,23 @@ Time Time::Sleep(const common::Time &_time)
 
     timer = CreateWaitableTimer(NULL, TRUE, NULL);
     if (timer == NULL)
-      {
-        //return -1;
-      }
+    {
+      gzerr << "Unable to create waitable timer. Sleep will be incorrect.\n";
+      return result;
+    }
 
     if (!SetWaitableTimer (timer, &sleepTime, 0, NULL, NULL, 0))
-      {
-        //return -1;
-      }
+    {
+      gzerr << "Unable to use waitable timer. Sleep will be incorrect.\n";
+      return result;
+    }
 
     if (WaitForSingleObject (timer, INFINITE) != WAIT_OBJECT_0)
-      {
-        //return -1;
-      }
+    {
+      gzerr << "Unable to wait for a single object. Sleep will be incorrect.\n";
+      return result;
+    }
+
     result.sec = 0;
     result.nsec = 0;
 #else

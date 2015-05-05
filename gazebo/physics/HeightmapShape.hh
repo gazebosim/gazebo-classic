@@ -97,6 +97,9 @@ namespace gazebo
       /// \param[in] _msg Message to update from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
+      /// Documentation inherited
+      public: virtual double ComputeVolume() const;
+
       /// \brief Get the maximum height.
       /// \return The maximum height.
       public: float GetMaxHeight() const;

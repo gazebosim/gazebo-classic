@@ -167,16 +167,6 @@ foreach(FIL ${msgs})
 endforeach()
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_MSGS")
-# Force inclusion of gazebo/util/system.hh, which defines the symbol visibilty
-# macros.  This is needed for the GZ_MSGS_VISIBLE macro to be defined in
-# the protobuf-generated code (there's no way to force protobuf to add
-# the #include line).
-if (WIN32)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIgazebo/util/system.hh")
-else()
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include gazebo/util/system.hh")
-endif()
-
 
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
@@ -190,17 +180,9 @@ if (UNIX)
   endif()
 endif()
 
-# CURL is used on linking msgs, probably via
-# gazebo_common. MSVC needs to know about the
-# linking path.
-# TODO: this should be in gazebo/msgs but did not
-# work for me.
-#link_directories(${CURL_LIBDIR})
-
 target_link_libraries(gazebo_msgs
   gazebo_common
   gazebo_math
-  ${CURL_LIBRARIES}
   ${GZ_PROTOBUF_LIBRARY}
 )
 

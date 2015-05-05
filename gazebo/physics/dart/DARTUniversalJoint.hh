@@ -27,7 +27,8 @@ namespace gazebo
   namespace physics
   {
     /// \brief A universal joint.
-    class GZ_PHYSICS_VISIBLE DARTUniversalJoint : public UniversalJoint<DARTJoint>
+    class GZ_PHYSICS_VISIBLE DARTUniversalJoint :
+      public UniversalJoint<DARTJoint>
     {
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the Link that is the joint' parent

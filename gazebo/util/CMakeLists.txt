@@ -37,6 +37,7 @@ set (headers
 
 set (gtest_sources
   Diagnostics_TEST.cc
+  LogPlay_TEST.cc
   LogRecord_TEST.cc
   OpenAL_TEST.cc
 )
