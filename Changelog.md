@@ -1,4 +1,7 @@
 ## Gazebo 6.0
+1. Improved SVG support: arcs in paths, and contours made of multiple paths.
+    * [Pull request #1608](https://bitbucket.org/osrf/gazebo/pull-request/1608)
+
 1. Added ComputeVolume function for simple shape subclasses of Shape.hh.
     * [Pull request #1605](https://bitbucket.org/osrf/gazebo/pull-request/1605)
 
