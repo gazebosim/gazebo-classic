@@ -35,7 +35,7 @@ namespace gazebo
     class SVGLoaderPrivate;
 
     /// \brief Handles errors during SVG parsing
-    class GAZEBO_VISIBLE SvgError: public std::runtime_error
+    class GZ_COMMON_VISIBLE SvgError: public std::runtime_error
     {
       /// \brief constructor
       /// \param[in] _what The error description
@@ -43,7 +43,7 @@ namespace gazebo
     };
 
     /// \brief SVG command data structure
-    struct GAZEBO_VISIBLE SVGCommand
+    struct GZ_COMMON_VISIBLE SVGCommand
     {
       /// \brief A letter that describe the segment
       char cmd;  // cppcheck style error is a false positive
@@ -53,7 +53,7 @@ namespace gazebo
     };
 
     /// \brief An SVG path element data structure
-    struct GAZEBO_VISIBLE SVGPath
+    struct GZ_COMMON_VISIBLE SVGPath
     {
       /// \brief An id or name
       std::string id;
@@ -72,7 +72,7 @@ namespace gazebo
     };
 
     /// \brief A loader for SVG files
-    class GAZEBO_VISIBLE SVGLoader
+    class GZ_COMMON_VISIBLE SVGLoader
     {
       /// \brief Constructor
       /// \param[in] _samples The number of points for cubic spline segments

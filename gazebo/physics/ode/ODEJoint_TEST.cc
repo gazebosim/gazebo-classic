@@ -19,7 +19,7 @@
 #include "gazebo/physics/ode/ODETypes.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
 #include "gazebo/physics/physics.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 #define TOL 1e-6
 using namespace gazebo;

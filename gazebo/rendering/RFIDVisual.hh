@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class RFIDVisual RFIDVisual.hh rendering/rendering.hh
     /// \brief Visualization for RFID sensor.
-    class GAZEBO_VISIBLE RFIDVisual : public Visual
+    class GZ_RENDERING_VISIBLE RFIDVisual : public Visual
     {
       /// \brief Constructor.
       /// \param[in] _name Name of the Visual.

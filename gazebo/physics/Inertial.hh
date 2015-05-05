@@ -17,6 +17,12 @@
 #ifndef _INERTIAL_HH_
 #define _INERTIAL_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <string>
 
 #include <sdf/sdf.hh>
@@ -36,7 +42,7 @@ namespace gazebo
 
     /// \class Inertial Inertial.hh physics/physics.hh
     /// \brief A class for inertial information about a link
-    class GAZEBO_VISIBLE Inertial
+    class GZ_PHYSICS_VISIBLE Inertial
     {
       /// \brief Default Constructor
       public: Inertial();
