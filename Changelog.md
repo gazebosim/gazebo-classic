@@ -1,5 +1,13 @@
 ## Gazebo 6.0
 
+1. Alert user of connection problems when using the REST service plugin
+    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+    * [Issue #1574](https://bitbucket.org/osrf/gazebo/issue/1572)
+
+1. Detect uuid library during compilation.
+    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+    * [Issue #1572](https://bitbucket.org/osrf/gazebo/issue/1572)
+
 1. New accessors in LogPlay class.
     * [Pull request #1577](https://bitbucket.org/osrf/gazebo/pull-request/1577)
 

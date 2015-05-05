@@ -88,12 +88,18 @@ void RestWebPlugin::Init()
 {
   // setup our node for communication
   this->node->Init();
-  this->subRequest = node->Subscribe("/gazebo/rest/rest_login",
+  this->subLogin = node->Subscribe("/gazebo/rest/rest_login",
                                &RestWebPlugin::OnRestLoginRequest, this);
+
+  this->subLogout = node->Subscribe("/gazebo/rest/rest_logout",
+                               &RestWebPlugin::OnRestLogoutRequest, this);
+
   this->subEvent = node->Subscribe("/gazebo/rest/rest_post",
                              &RestWebPlugin::OnEventRestPost, this);
+
   this->subSimEvent = node->Subscribe("/gazebo/sim_events",
                                 &RestWebPlugin::OnSimEvent, this);
+
   this->requestQThread = new boost::thread(
       boost::bind(&RestWebPlugin::RunRequestQ, this));
 }
@@ -137,66 +143,79 @@ std::string FormatTime(int _sec, int _nsec)
 //////////////////////////////////////////////////
 void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
 {
-  // where to post the data on the REST server
-  std::string route = "/events/new";
+  try
+  {
+    // where to post the data on the REST server
+    std::string route = "/events/new";
+    std::string eType = _msg->type();
+    std::string name = _msg->name();
+    std::string data = _msg->data();
 
-  std::string eType = _msg->type();
-  std::string name = _msg->name();
-  std::string data = _msg->data();
+    msgs::WorldStatistics ws = _msg->world_statistics();
+    msgs::Time simT = ws.sim_time();
+    msgs::Time realT = ws.real_time();
+    msgs::Time pauseT = ws.pause_time();
+    bool paused = ws.paused();
 
-  msgs::WorldStatistics ws = _msg->world_statistics();
-  msgs::Time simT = ws.sim_time();
-  msgs::Time realT = ws.real_time();
-  msgs::Time pauseT = ws.pause_time();
-  bool paused = ws.paused();
+    std::string worldName = physics::get_world()->GetName();
+    std::string event = "{\n";
 
-  std::string worldName = physics::get_world()->GetName();
-  std::string event = "{\n";
+    event += "\"session\": \"" + this->session + "\", ";
+    event += "\"name\": \"" + name + "\", ";
+    event += "\"type\": \"" + eType + "\",\n";
+    event += "\"data\": " + data + ", ";
 
-  event += "\"session\": \"" + this->session + "\", ";
-  event += "\"name\": \"" + name + "\", ";
-  event += "\"type\": \"" + eType + "\",\n";
-  event += "\"data\": " + data + ", ";
+    event += "\"world\": {";
+    event += "\"name\": ";
+    event += "\"";
+    event += worldName;
+    event += "\", ";
 
-  event += "\"world\": {";
-  event += "\"name\": ";
-  event += "\"";
-  event += worldName;
-  event += "\", ";
+    event += "\"paused\": ";
+    event += "\"";
+    if (paused)
+      event += "true";
+    else
+      event += "false";
+    event += "\", ";
 
-  event += "\"paused\": ";
-  event += "\"";
-  if (paused)
-    event += "true";
-  else
-    event += "false";
-  event += "\", ";
+    event += "\"clock_time\": ";
+    event += "\"";
+    event += common::Time::GetWallTimeAsISOString();
+    event += "\", ";
 
-  event += "\"clock_time\": ";
-  event += "\"";
-  event += common::Time::GetWallTimeAsISOString();
-  event += "\", ";
+    event += "\"real_time\": ";
+    event += "\"";
+    event += FormatTime(realT.sec(), realT.nsec());
+    event += "\", ";
 
-  event += "\"real_time\": ";
-  event += "\"";
-  event += FormatTime(realT.sec(), realT.nsec());
-  event += "\", ";
+    event += "\"sim_time\": ";
+    event += "\"";
+    event += FormatTime(simT.sec(), simT.nsec());
+    event += "\", ";
 
-  event += "\"sim_time\": ";
-  event += "\"";
-  event += FormatTime(simT.sec(), simT.nsec());
-  event += "\", ";
+    event += "\"pause_time\": ";
+    event += "\"";
+    event += FormatTime(pauseT.sec(), pauseT.nsec());
+    event += "\"";
 
-  event += "\"pause_time\": ";
-  event += "\"";
-  event += FormatTime(pauseT.sec(), pauseT.nsec());
-  event += "\"";
-
-  event += "}\n";  // world element
-  event += "}";    // root element
-
-  // post it with curl
-  this->restApi.PostJsonData(route.c_str(), event.c_str());
+    event += "}\n";  // world element
+    event += "}";    // root element
+    // post it with curl
+    this->restApi.PostJsonData(route.c_str(), event.c_str());
+  }
+  catch(RestException &x)
+  {
+    gazebo::msgs::RestError msg;
+    std::string errorMsg;
+    errorMsg = "There was a problem trying to send data to the server: ";
+    errorMsg += x.what();
+    msg.set_type("Error");
+    msg.set_msg(errorMsg);
+    // alert the user via the gui plugin
+    gzerr << "ERROR in REST service POST request: " << errorMsg << std::endl;
+    this->pub->Publish(msg);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -280,8 +299,17 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 //////////////////////////////////////////////////
 void RestWebPlugin::OnRestLoginRequest(ConstRestLoginPtr &_msg)
 {
+  gzerr << "RestWebPlugin::OnRestLoginRequest" << std::endl;
   boost::mutex::scoped_lock lock(this->requestQMutex);
   this->msgLoginQ.push_back(_msg);
+}
+
+//////////////////////////////////////////////////
+void RestWebPlugin::OnRestLogoutRequest(ConstRestLogoutPtr &/*_msg*/)
+{
+  gzerr << "RestWebPlugin::OnRestLogoutRequest" << std::endl;
+  boost::mutex::scoped_lock lock(this->requestQMutex);
+  this->restApi.Logout();
 }
 
 //////////////////////////////////////////////////

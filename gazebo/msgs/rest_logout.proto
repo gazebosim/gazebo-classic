@@ -1,0 +1,9 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface RestLogout
+
+message RestLogout
+{
+  optional string url      = 1;
+}
