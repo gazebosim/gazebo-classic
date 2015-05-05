@@ -4,19 +4,25 @@ package gazebo.msgs;
 /// \interface Any
 /// \brief A union type message
 
+import "color.proto";
 import "int.proto";
+import "pose.proto";
+import "quaternion.proto";
+import "time.proto";
+import "vector2d.proto";
 import "vector3d.proto";
 
 message Any
 {
-
-  /*enum Type {DOUBLE_TYPE = 1; INT_TYPE = 2; STRING_TYPE = 3; VECTOR3D_TYPE = 4;
-             BOOL_TYPE = 5; FLOAT_TYPE = 6;}*/
-
-  optional double   double_value = 1;
-  optional int32    int_value    = 2;
-  optional string   string_value = 3;
-  optional Vector3d vector3d     = 4;
-  optional bool     bool_value   = 5;
-  optional float    float_value  = 6;
+  optional double     double_value     = 1;
+  optional int32      int_value        = 2;
+  optional string     string_value     = 3;
+  optional float      float_value      = 4;
+  optional Vector3d   vector3d_value   = 5;
+  optional Vector2d   vector2d_value   = 6;
+  optional Pose       pose_value       = 7;
+  optional Quaternion quaternion_value = 8;
+  optional Color      color_value      = 9;
+  optional Time       time_value       = 10;
+  optional bool       bool_value       = 11;
 }

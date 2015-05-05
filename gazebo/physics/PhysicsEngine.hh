@@ -287,7 +287,10 @@ namespace gazebo
       /// \return Pointer to the physics SDF element.
       public: sdf::ElementPtr GetSDF() const;
 
-      private: void ParamsFromSDFElement(sdf::ElementPtr _elem);
+      /// \brief For generic parameters in the SDF element, call SetParam using
+      /// the key-value pairs.
+      /// \brief _elem The SDF element with generic parameters to set.
+      protected: void ParamsFromSDFElement(sdf::ElementPtr _elem);
 
       /// \brief virtual callback for gztopic "~/request".
       /// \param[in] _msg Request message.
@@ -296,6 +299,8 @@ namespace gazebo
       /// \brief virtual callback for gztopic "~/physics".
       /// \param[in] _msg Physics message.
       protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);
+
+      protected: void SetFromGenericMsgParams(const gazebo::msgs::Param &_msg);
 
       /// \brief Pointer to the world.
       protected: WorldPtr world;

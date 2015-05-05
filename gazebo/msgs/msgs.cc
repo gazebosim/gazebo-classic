@@ -78,6 +78,7 @@ namespace gazebo
       return (msgs::Header*)msg;
     }
 
+    // TODO Conversions for Color, Quaternion, Pose, Time, Vector2d
     /*sdf::ElementPtr PhysicsToSDF(const msgs::Physics &_physics,
         sdf::ElementPtr _sdf = sdf::ElementPtr())
     {
@@ -119,7 +120,7 @@ namespace gazebo
     {
       msgs::Param param;
       param.set_name(_key);
-      msgs::Vector3d *vec = param.mutable_value()->mutable_vector3d();
+      msgs::Vector3d *vec = param.mutable_value()->mutable_vector3d_value();
       *vec = Convert(_value);
       return param;
     }
@@ -182,7 +183,7 @@ namespace gazebo
           case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
             if (field->name() == "vector3d")
             {
-              _value = _msg.value().vector3d();
+              _value = _msg.value().vector3d_value();
               return true;
             }
             // Else, go to default case

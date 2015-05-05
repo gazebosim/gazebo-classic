@@ -101,8 +101,8 @@ void PhysicsEngine::ParamsFromSDFElement(sdf::ElementPtr _elem)
       }
       else if (type == "bool")
       {
-        // TODO: true/false case
-        bool v = stoi(value);
+        // TODO: except
+        bool v = boost::lexical_cast<bool>(value);
         this->SetParam(name, v);
       }
     }
@@ -260,7 +260,6 @@ void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   }
 
   boost::any value;
-  // TODO: Nested parameters
   for (int i = 0; i < _msg->parameters_size(); i++)
   {
     if (ConvertMessageParam(_msg->parameters(i), value))
@@ -272,8 +271,32 @@ void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &_msg)
       gzerr << "Couldn't set parameter from msg: "
             << _msg->parameters(i).name() << std::endl;
     }
+    if (_msg->parameters(i).children_size() > 0)
+    {
+       this->SetFromGenericMsgParams(_msg->parameters(i));
+    }
   }
+
   this->world->GetPresetManager()->CurrentProfile(_msg->profile_name());
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetFromGenericMsgParams(const gazebo::msgs::Param &_msg)
+{
+  for (int i = 0; i < _msg.children_size(); i++)
+  {
+    boost::any value;
+    if (ConvertMessageParam(_msg.children(i), value))
+    {
+      this->SetParam(_msg.children(i).name(), value);
+    }
+    else
+    {
+      gzerr << "Couldn't set parameter from msg: "
+            << _msg.children(i).name() << std::endl;
+    }
+    SetFromGenericMsgParams(_msg.children(i));
+  }
 }
 
 //////////////////////////////////////////////////
