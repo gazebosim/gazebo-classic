@@ -83,6 +83,12 @@ namespace gazebo
       /// \brief Pointer to the schematic view widget.
       public: SchematicViewWidget *svWidget;
 
+      /// \brief Show toolbars action cloned from main window.
+      public: QAction *showToolbarsAct;
+
+      /// \brief Fullscreen action cloned from main window.
+      public: QAction *fullScreenAct;
+
       /// \brief Save the main window paused state to use when returning.
       public: bool mainWindowPaused;
     };
