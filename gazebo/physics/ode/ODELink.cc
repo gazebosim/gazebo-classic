@@ -16,7 +16,6 @@
 */
 #include <math.h>
 #include <sstream>
-#include <mutex>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -169,8 +168,6 @@ void ODELink::Init()
 void ODELink::DisabledCallback(dBodyID /*_id*/)
 {
 }
-
-std::mutex g_poseMutex;
 
 //////////////////////////////////////////////////
 void ODELink::MoveCallback(dBodyID _id)

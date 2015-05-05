@@ -291,8 +291,6 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
 
     this->lastLinearVel = imuWorldLinearVel;
 
-    this->lastMeasurementTime = timestamp;
-
     if (this->noiseActive)
     {
       switch (this->noiseType)
