@@ -32,7 +32,7 @@ namespace gazebo
     /// \{
 
     /// \brief Triangle mesh collision
-    class GAZEBO_VISIBLE SimbodyMeshShape : public MeshShape
+    class GZ_PHYSICS_VISIBLE SimbodyMeshShape : public MeshShape
     {
       /// \brief Constructor
       public: SimbodyMeshShape(CollisionPtr _parent);

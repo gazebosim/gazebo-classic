@@ -39,7 +39,7 @@ namespace gazebo
     /// \{
 
     /// \brief Simbody physics engine
-    class GAZEBO_VISIBLE SimbodyPhysics : public PhysicsEngine
+    class GZ_PHYSICS_VISIBLE SimbodyPhysics : public PhysicsEngine
     {
       /// \brief Constructor
       public: SimbodyPhysics(WorldPtr _world);
