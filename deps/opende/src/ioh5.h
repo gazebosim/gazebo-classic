@@ -1,4 +1,4 @@
-/* 
+/*
    Copyright (c) 2013 Claude Lacoursiere
 
    This software is provided 'as-is', without any express or implied
@@ -22,11 +22,11 @@
 
 reference:
    hdf5-based BPMD database: https://grasp.robotics.cs.rpi.edu/bpmd/
-*/ 
+*/
 
 
-
-#ifdef MBSFCLIB_HDF
+#include "gazebo/gazebo_config.h"
+#ifdef HDF5_INSTRUMENT
 
 #ifndef IO_H5
 #define IO_H5
@@ -49,11 +49,11 @@ reference:
 /** TODO:
 
     Missing in this implementation is a way to handle bitfields, and
-    some better way to handle enumerations.  
+    some better way to handle enumerations.
 
     The "stride" argument used in the journal should be used to set the
     column size of the array being dumped since this is in fact valuable
-    information when time comes to read back.  
+    information when time comes to read back.
 */
 
 
@@ -62,19 +62,19 @@ reference:
 */
 namespace h5 {
 
-  struct IteratorData { 
+  struct IteratorData {
     IteratorData() : m_name() {}
     std::string m_name;
-  }; 
+  };
 
   /** A simple wrapper class for the annoying hsize_t dims[2] arrays which are used all the time. */
-  class  h2s  { 
-    public: 
-    hsize_t m[2]; 
+  class  h2s  {
+    public:
+    hsize_t m[2];
     h2s(hsize_t a, hsize_t b) { m[0] =a; m[1]=b;}
     h2s(hsize_t a) { m[0] =a; m[1]=1;}
     h2s() { m[1] =1; m[1]=1;}
-#if !defined(__APPLE__) 
+#if !defined(__APPLE__)
 #ifndef WIN32
     //\TODO Fix mac & windows compiling
     hsize_t & operator[](size_t i) { return m[i] ; }
@@ -83,8 +83,8 @@ namespace h5 {
       std::vector<hsize_t> d( space.getSimpleExtentNdims() );
       space.getSimpleExtentDims(&(d[0]));
       size_t size  = d[0];
-      for (size_t i = 1; i < d.size(); ++i ) size *= d[i] ; 
-      return size; 
+      for (size_t i = 1; i < d.size(); ++i ) size *= d[i] ;
+      return size;
     }
 #endif
 #endif
@@ -93,14 +93,14 @@ namespace h5 {
   };
 
   // Type information needed by HDF5 functions collected here to allow
-  // extensive polymorphism. 
-  struct h5_type { 
-    const std::type_info & info; 
+  // extensive polymorphism.
+  struct h5_type {
+    const std::type_info & info;
     const H5::PredType   & predicate;
     const H5::DataType   type;
     const std::string    name;
   };
-   
+
   const h5_type& h5_type_find(const std::type_info & type);
 
   const h5_type& h5_type_find(const H5::DataType& t );
@@ -116,20 +116,20 @@ namespace h5 {
 
   /// Dump an array with knowledge of the datatype. This is the only
   /// function containing details of the datalayout and controls the
-  /// possible compression of the data on disk. 
-  H5::DataSet dump_array_raw(  H5::CommonFG & g,  const h5_type &t, 
-                               const std::string& name, 
+  /// possible compression of the data on disk.
+  H5::DataSet dump_array_raw(  H5::CommonFG & g,  const h5_type &t,
+                               const std::string& name,
                                const void *a, size_t m=1, size_t n=1);
 
   //// This function takes care of the type identification and is therefore
-  /// templated.   It resolves to the raw write function. 
+  /// templated.   It resolves to the raw write function.
   template <typename R>
   H5::DataSet dump_array( H5::CommonFG & g,  const std::string& name, const R *a, const size_t m=1, const size_t n=1){
     try {
       const h5_type & t = h5_type_find(typeid(a[0]));
-      if  ( typeid(a[0]) == t.info ) { 
+      if  ( typeid(a[0]) == t.info ) {
         return dump_array_raw(g,   t, name, a, m, n);
-      } 
+      }
     }catch ( const H5::DataSetIException& exception ) {
       exception.printError();
     }
@@ -143,21 +143,21 @@ namespace h5 {
     return dump_array(g, name,  &(v[0]), v.size()/n, n);
   }
 
-  template <typename R> 
+  template <typename R>
   void dump_scalar(H5::CommonFG & g, const std::string &name, const R a){
     dump_array<R>(g,  name, &a);
   }
- 
-  template <typename R> 
+
+  template <typename R>
   void set_scalar_attribute (H5::H5Object &g, const std::string &name, const R& val){
     try {
       const h5_type &  t = h5_type_find(typeid(val));
-      if  ( typeid(val) == t.info ) { 
+      if  ( typeid(val) == t.info ) {
         H5::Attribute attr = g.createAttribute(name, t.type, H5::DataSpace(H5S_SCALAR));
         attr.write(t.type, &val);
       } else {
       }
-    } 
+    }
     catch ( const H5::AttributeIException& exception ) {
       exception.printError();
       return;
@@ -170,8 +170,8 @@ namespace h5 {
 
   template<>
   void set_scalar_attribute(H5::H5Object& g, const std::string &name, const std::string& val);
-    
-  void print_attributes( H5::H5Object& loc, const H5std_string attr_name, void *operator_data); 
+
+  void print_attributes( H5::H5Object& loc, const H5std_string attr_name, void *operator_data);
 
   /**
      Read the value of the attribute with the given name from the given group.
@@ -181,8 +181,8 @@ namespace h5 {
   bool get_scalar_attribute(H5::H5Object & g, const std::string& name, T& result){
     try {
       const h5_type & t = h5_type_find(typeid(result));
-      H5::Attribute attribute; 
-      try{ 
+      H5::Attribute attribute;
+      try{
         attribute = g.openAttribute(name);
       } catch ( const H5::AttributeIException &	 exception ) {
         return false;
@@ -191,7 +191,7 @@ namespace h5 {
         if ( attribute.getDataType() == t.predicate ) {
           attribute.read( attribute.getDataType(), &result );
           return true;
-        } 
+        }
       } catch ( const H5::DataTypeIException& exception ) {
         return false;
       }
@@ -223,29 +223,29 @@ namespace h5 {
             return true;
           } catch ( const H5::DataSetIException& exception ) {
             return false;
-          } 
-        } else { 
+          }
+        } else {
         }
       } else {
         return false;
       }
     } catch ( const H5::DataSetIException& exception ) {
       return false;
-    } 
+    }
     return false;
   }
-    
-  /** 
-      Open and existing file to append a problem set, or create a 
-      new one.  This does not overwrite existing data. 
-        
+
+  /**
+      Open and existing file to append a problem set, or create a
+      new one.  This does not overwrite existing data.
+
   */
 
   H5::H5File * append_or_create(const std::string & filename);
 
-  /** 
+  /**
    * Create a new group to write a dataset.  No utility is provided here
-   * to delete problems.  
+   * to delete problems.
    */
   H5::Group  append_problem(H5::H5File *file, const std::string & name = "Problem");
 
@@ -254,7 +254,7 @@ namespace h5 {
   */
   hsize_t getIndexOf( const H5::CommonFG& parent, const H5std_string& childName );
 
-  /** 
+  /**
       Find a child with given name.
   */
   bool hasChildNamed( const H5::CommonFG& parent, const H5std_string& childName );
@@ -264,7 +264,7 @@ namespace h5 {
      Return the child group with the given name. Will be created if it doesn't exist.
 
      This is the same principle as append_or_create.  This library is
-     intended only for writing datasets, not to manipulate them. 
+     intended only for writing datasets, not to manipulate them.
   */
   H5::Group getOrCreateGroup( H5::CommonFG& parent, const H5std_string& childName );
 
@@ -278,41 +278,41 @@ namespace h5 {
   int get_string(const H5::CommonFG& g, const std::string &name, std::string & buff );
 
 
-  /** 
-      Read an array and put content in object v which must be a class with a method 
-      resize(size_t n) and operator *  which returns the data buffer. 
-  */ 
+  /**
+      Read an array and put content in object v which must be a class with a method
+      resize(size_t n) and operator *  which returns the data buffer.
+  */
   template<typename R>
   H5::DataType get_array(const H5::CommonFG& g, const std::string &name, R& v )
   {
-    try { 
+    try {
       H5::Exception::dontPrint();
       H5::DataSet t  = g.openDataSet(name);
-      try { 
+      try {
         H5::Exception::dontPrint();
-        H5::DataSpace ds = t.getSpace(); 
+        H5::DataSpace ds = t.getSpace();
         // this is to make sure that we have enough room
         const h5_type & type = h5::h5_type_find(typeid(v[0]));
         size_t  N = h2s().get_size(ds);
         // make sure we have enough space
-        size_t s1 = sizeof(v[0]); 
-        size_t s2 = t.getDataType().getSize(); 
-        size_t alloc = N; 
-        if ( s2 > s1 ) alloc *= s2/s1; 
-        R  w(alloc); 
+        size_t s1 = sizeof(v[0]);
+        size_t s2 = t.getDataType().getSize();
+        size_t alloc = N;
+        if ( s2 > s1 ) alloc *= s2/s1;
+        R  w(alloc);
         t.read(&(w[0]), t.getDataType() );
         // at this point, we can't be certain that we have the correct
         // datatype for the array that was given so we use the conversion
-        // if necessary. 
+        // if necessary.
         t.getDataType().convert(type.type, N , &(w[0]), NULL, H5::PropList());
-        t.close(); 
-        v.resize(N); 
+        t.close();
+        v.resize(N);
         memcpy(&(v[0]), &(w[0]), N * sizeof(v[0]));
         return  type.type;
-      } catch ( H5::DataSetIException& error ) { 
-      } 
+      } catch ( H5::DataSetIException& error ) {
+      }
     }
-    catch (H5::GroupIException& error ) { 
+    catch (H5::GroupIException& error ) {
     }
     return H5::DataType();
   }
@@ -325,33 +325,33 @@ namespace h5 {
 // cannot use the resize operator using the information from the
 // dataspace.   The purpose is to be able to apply filters without first
 // making a determination of the datatype and then instantiation of arrays
-// with the correct version. 
-// 
-// "Raw"  here means that we have just bytes to manipulate. 
-// 
+// with the correct version.
+//
+// "Raw"  here means that we have just bytes to manipulate.
+//
 template<typename R>
 H5::DataType   get_array_raw(const H5::CommonFG& g, const std::string &name, R& v)
 {
   H5::DataType ret;
-  try { 
+  try {
     H5::Exception::dontPrint();
-    if ( g.getNumObjs()) { 
+    if ( g.getNumObjs()) {
       H5::DataSet t  = g.openDataSet(name);
-      H5::DataSpace ds = t.getSpace(); 
-      h5::h2s dims; 
+      H5::DataSpace ds = t.getSpace();
+      h5::h2s dims;
       ds.getSimpleExtentDims(dims);
       v.resize( t.getStorageSize()  );
       if ( v.size() ) {
         t.read(&(v[0]), t.getDataType());
       }
-      ret = t.getDataType(); 
-      t.close(); 
+      ret = t.getDataType();
+      t.close();
       return ret;
     }
   }
-  catch ( H5::DataSetIException& error ) { 
-  } 
-  catch (H5::GroupIException& error ) { 
+  catch ( H5::DataSetIException& error ) {
+  }
+  catch (H5::GroupIException& error ) {
   }
   return H5::DataType();
 }
@@ -360,22 +360,22 @@ H5::DataType   get_array_raw(const H5::CommonFG& g, const std::string &name, R& 
 ///////////////////////////////////////////////////////
 ///
 /// Utilities to locate datasets which have nown names but unknown location
-/// in the file. 
+/// in the file.
 ///
 ///////////////////////////////////////////////////////
 
 
-/// 
-/// This allows operating on the idx' child of g with an iterator 
-/// 
-struct TraverserFn { 
+///
+/// This allows operating on the idx' child of g with an iterator
+///
+struct TraverserFn {
   virtual bool operator()(H5::Group& parent, hsize_t idx) = 0;
 };
 
 ///  A traverser function which matches a name during a depth first
-///  traversal from a given group. 
+///  traversal from a given group.
 struct MatchName : public TraverserFn {
-  H5std_string target_name; 
+  H5std_string target_name;
   H5::Group parent;
   hsize_t child_index;
   bool operator()(H5::Group& g, hsize_t idx){
@@ -384,14 +384,14 @@ struct MatchName : public TraverserFn {
       parent = g;
       child_index = idx;
       return true;
-    } 
+    }
     return false;
   }
-  
+
   MatchName(const std::string& s) : target_name(s), parent(), child_index(-1) {};
 
-  void set_name(const std::string& s) { 
-    target_name = s;  
+  void set_name(const std::string& s) {
+    target_name = s;
     parent = H5::Group();
     return;
   }
@@ -400,15 +400,15 @@ struct MatchName : public TraverserFn {
 };
 
 ////
-/// This is a depth first search operation which starts from a group.  
-/// 
-/// This could be designed to start from a file but this causes problems to
-/// return the correct object type in the MatchName struct for instance. 
-/// One can always open the "/" group in a file and start from there. 
+/// This is a depth first search operation which starts from a group.
 ///
-bool  find_first(H5::Group g, TraverserFn& fn); 
+/// This could be designed to start from a file but this causes problems to
+/// return the correct object type in the MatchName struct for instance.
+/// One can always open the "/" group in a file and start from there.
+///
+bool  find_first(H5::Group g, TraverserFn& fn);
 }
 
 #endif
 
-#endif // MBSFCLIB_HDF 
+#endif // HDF5_INSTRUMENT
