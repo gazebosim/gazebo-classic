@@ -135,7 +135,7 @@ void CollisionConfig::AddCollision(const std::string &_name,
 
   // Top-level tree item
   QTreeWidgetItem *collisionItem =
-      new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
+      new QTreeWidgetItem(static_cast<QTreeWidgetItem *>(0));
   this->collisionsTreeWidget->addTopLevelItem(collisionItem);
 
   this->collisionsTreeWidget->setItemWidget(collisionItem, 0,
@@ -235,8 +235,20 @@ void CollisionConfig::OnRemoveCollision(int _id)
   CollisionConfigData *configData = this->configs[_id];
 
   // Ask for confirmation
-  std::string msg = "Are you sure you want to remove " +
-      configData->name + "?\n";
+  std::string msg;
+
+  if (this->configs.size() == 1)
+  {
+    msg = "Are you sure you want to remove " +
+        configData->name + "?\n\n" +
+        "This is the only collision. \n" +
+        "Without collisions, this link won't collide with anything.\n";
+  }
+  else
+  {
+    msg = "Are you sure you want to remove " +
+        configData->name + "?\n";
+  }
 
   QMessageBox msgBox(QMessageBox::Warning, QString("Remove collision?"),
       QString(msg.c_str()));

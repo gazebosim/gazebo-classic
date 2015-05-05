@@ -323,6 +323,7 @@ namespace gazebo
       /// deselected.
       private: void OnSetSelected(const std::string &_name, const bool _selected);
 
+
       /// \brief Create link with default properties from a visual. This
       /// function creates a link that will become the parent of the
       /// input visual. A collision visual with the same geometry as the input

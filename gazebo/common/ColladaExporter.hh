@@ -40,7 +40,7 @@ namespace gazebo
 
     /// \class ColladaExporter ColladaExporter.hh common/common.hh
     /// \brief Class used to export Collada mesh files
-    class GAZEBO_VISIBLE ColladaExporter : public MeshExporter
+    class GZ_COMMON_VISIBLE ColladaExporter : public MeshExporter
     {
       /// \brief Geometry types
       public: enum GeometryType {POSITION, NORMAL, UVMAP};

@@ -59,7 +59,8 @@ namespace gazebo
 
     /// \class Visual Visual.hh rendering/rendering.hh
     /// \brief A renderable object
-    class GAZEBO_VISIBLE Visual : public boost::enable_shared_from_this<Visual>
+    class GZ_RENDERING_VISIBLE Visual :
+      public boost::enable_shared_from_this<Visual>
     {
       /// \brief Constructor
       /// \param[in] _name Name of the visual.
@@ -419,7 +420,7 @@ namespace gazebo
       /// \brief Get the depth of this visual, where 0 is the depth of the
       /// world visual.
       /// \return This visual's depth.
-      public: unsigned int GetDepth();
+      public: unsigned int GetDepth() const;
 
       /// \brief Get the shader type.
       /// \return String of the shader type: "vertex", "pixel",

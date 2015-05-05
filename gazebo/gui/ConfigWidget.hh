@@ -158,10 +158,10 @@ namespace gazebo
       /// and removing characters like "_".
       /// \param[in] _key Non-human-readable key.
       /// \return Human-redadable key.
-      public: std::string GetHumanReadableKey(std::string _key);
+      public: std::string GetHumanReadableKey(const std::string &_key);
 
       /// \brief Returns the unit for a given key. For example, the key "mass"
-      /// returns "Kg".
+      /// returns "kg".
       /// \param[in] _key The key.
       /// \param[in] _jointType In case the field belongs to a joint, the
       /// joint's type.
@@ -172,10 +172,10 @@ namespace gazebo
       /// \brief Returns the range for a given key. For example, the key
       // "transparency" returns min == 0, max == 1.
       /// \param[in] _key The key.
-      /// \param[out] _min Pointer to the minimum value.
-      /// \param[out] _max Pointer to the maximum value.
+      /// \param[out] _min The minimum value.
+      /// \param[out] _max The maximum value.
       public: void GetRangeFromKey(const std::string &_key,
-          double *_min, double *_max);
+          double &_min, double &_max);
 
       /// \brief Set whether a child widget should be visible.
       /// \param[in] _name Name of the child widget.
@@ -330,9 +330,11 @@ namespace gazebo
       /// \param[in] _update True to parse only fields that are specified in
       /// the message rather than all the available fields in the message
       /// \param[in] _name Name used when creating new widgets.
+      /// \param[in] _level Level of the widget in the tree.
       /// return Updated widget.
       private: QWidget *Parse(google::protobuf::Message *_msg,
-          bool _update = false, const std::string &_name = "", int _level = 0);
+          bool _update = false, const std::string &_name = "",
+          const int _level = 0);
 
       /// \brief Parse a vector3 message.
       /// param[in] _msg Input vector3d message.
@@ -357,63 +359,63 @@ namespace gazebo
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateUIntWidget(const std::string &_key,
-          int _level);
+          const int _level = 0);
 
       /// \brief Create a widget for configuring an integer value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateIntWidget(const std::string &_key,
-          int _level);
+          const int _level = 0);
 
       /// \brief Create a widget for configuring a double value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateDoubleWidget(const std::string &_key,
-          int _level);
+          const int _level = 0);
 
       /// \brief Create a widget for configuring a string value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateStringWidget(const std::string &_key,
-          int _level);
+          const int _level = 0);
 
       /// \brief Create a widget for configuring a bool value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateBoolWidget(const std::string &_key,
-          int _level);
+          const int _level = 0);
 
       /// \brief Create a widget for configuring a vector3 value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateVector3dWidget(const std::string &_key,
-          int _level);
+          const int _level = 0);
 
       /// \brief Create a widget for configuring a color value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateColorWidget(const std::string &_key,
-          int _level);
+          const int _level = 0);
 
       /// \brief Create a widget for configuring a pose value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreatePoseWidget(const std::string &_key,
-          int _level);
+          const int _level = 0);
 
       /// \brief Create a widget for configuring a geometry value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateGeometryWidget(const std::string &_key,
-          int _level);
+          const int _level = 0);
 
       /// \brief Create a widget for configuring an enum value.
       /// \param[in] _key A key that is used as a label for the widget.
@@ -421,7 +423,7 @@ namespace gazebo
       /// \param[in] _level Level of the widget in the tree.
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateEnumWidget(const std::string &_key,
-          const std::vector<std::string> &_values, int _level);
+          const std::vector<std::string> &_values, const int _level = 0);
 
       /// \brief Update a child widget with an unsigned integer value.
       /// \param[in] _widget Pointer to the child widget.
@@ -577,6 +579,39 @@ namespace gazebo
 
       /// \brief A copy of the message with fields to be configured by widgets.
       private: google::protobuf::Message *configMsg;
+
+      /// \brief Color used for the background of level 0 widgets.
+      private: static const QString level0BgColor;
+
+      /// \brief Color used for the background of level 0 widgets.
+      private: static const QString level1BgColor;
+
+      /// \brief Color used for the background of level 0 widgets.
+      private: static const QString level2BgColor;
+
+      /// \brief Color used for the background of level 0 widgets.
+      private: static const QString level3BgColor;
+
+      /// \brief Color used for the widget areas of of level 0 widgets.
+      private: static const QString level0WidgetColor;
+
+      /// \brief Color used for the widget areas of of level 0 widgets.
+      private: static const QString level1WidgetColor;
+
+      /// \brief Color used for the widget areas of of level 0 widgets.
+      private: static const QString level2WidgetColor;
+
+      /// \brief Color used for the widget areas of of level 0 widgets.
+      private: static const QString level3WidgetColor;
+
+      /// \brief Red color used for "red" or "x" fields.
+      private: static const QString redColor;
+
+      /// \brief Red color used for "green" or "y" fields.
+      private: static const QString greenColor;
+
+      /// \brief Red color used for "blue" or "z" fields.
+      private: static const QString blueColor;
     };
   }
 }

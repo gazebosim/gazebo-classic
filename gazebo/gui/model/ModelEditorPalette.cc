@@ -15,7 +15,6 @@
  *
 */
 
-#include <boost/thread/recursive_mutex.hpp>
 #include <string>
 
 #include "gazebo/rendering/DynamicLines.hh"
