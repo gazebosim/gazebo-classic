@@ -162,11 +162,13 @@ bool ModelMaker::Init()
   if (modelElem->HasElement("pose"))
     modelPose = modelElem->Get<math::Pose>("pose");
 
-  modelName = this->node->GetTopicNamespace() + "::" +
-    modelElem->Get<std::string>("name");
+//  modelName = this->node->GetTopicNamespace() + "::" +
+//    modelElem->Get<std::string>("name");
+  modelName = modelElem->Get<std::string>("name");
 
-  this->modelVisual.reset(new rendering::Visual(modelName,
-                          scene->GetWorldVisual()));
+  this->modelVisual.reset(new rendering::Visual(
+      this->node->GetTopicNamespace() + "::" + modelName,
+      scene->GetWorldVisual()));
   this->modelVisual->Load();
   this->modelVisual->SetPose(modelPose);
 
@@ -260,7 +262,10 @@ void ModelMaker::CreateModelFromSDF(sdf::ElementPtr _modelElem)
     std::string modelName = modelVis->GetName();
 
     // create model
-    sdf::ElementPtr linkElem = modelElem->GetElement("link");
+    sdf::ElementPtr linkElem;
+    if (modelElem->HasElement("link"))
+      linkElem = modelElem->GetElement("link");
+
     try
     {
       while (linkElem)
@@ -327,9 +332,10 @@ void ModelMaker::CreateModelFromSDF(sdf::ElementPtr _modelElem)
           childPose = childElem->Get<math::Pose>("pose");
         childVis->SetPose(childPose);
 
-        std::string childName = modelVis->GetName() + "::" +
-            childElem->Get<std::string>("name");
-        childElem->GetAttribute("name")->Set(childName);
+//        std::string childName = modelVis->GetName() + "::" +
+//            childElem->Get<std::string>("name");
+
+//        childElem->GetAttribute("name")->Set(childName);
         std::pair<sdf::ElementPtr, rendering::VisualPtr> childPair(
             childElem, childVis);
         modelElemList.push_back(childPair);
