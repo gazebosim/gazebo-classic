@@ -77,6 +77,15 @@ else ()
 endif ()
 
 ########################################
+include (FindHDF5)
+find_package(HDF5)
+
+if (NOT HDF5_FOUND)
+  BUILD_WARNING("HDF5 not found")
+else ()
+  message(STATUS "HDF5 Found")
+endif ()
+########################################
 # Find packages
 
 # In Visual Studio we use configure.bat to trick all path cmake
@@ -552,6 +561,17 @@ else ()
   BUILD_WARNING ("uuid-dev library not found - Gazebo will not have uuid support.")
 endif ()
 
+########################################
+# Find graphviz
+include (${gazebo_cmake_dir}/FindGraphviz.cmake)
+if (NOT GRAPHVIZ_FOUND)
+  message (STATUS "Looking for libgraphviz-dev - not found")
+  BUILD_WARNING ("Graphviz not found, Model editor's schematic view will be disabled.")
+  set (HAVE_GRAPHVIZ OFF CACHE BOOL "HAVE GRAPHVIZ" FORCE)
+else ()
+  message (STATUS "Looking for libgraphviz-dev - found")
+  set (HAVE_GRAPHVIZ ON CACHE BOOL "HAVE GRAPHVIZ" FORCE)
+endif ()
 
 ########################################
 # Find QWT (QT graphing library)

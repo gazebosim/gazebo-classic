@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/ViewController.hh"
 

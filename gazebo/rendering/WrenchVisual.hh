@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class WrenchVisual WrenchVisual.hh rendering/rendering.hh
     /// \brief Visualization for sonar data.
-    class GAZEBO_VISIBLE WrenchVisual : public Visual
+    class GZ_RENDERING_VISIBLE WrenchVisual : public Visual
     {
       /// \brief Constructor.
       /// \param[in] _name Name of the visual.
