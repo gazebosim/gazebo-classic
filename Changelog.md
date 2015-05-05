@@ -16,10 +16,11 @@ compilation on Windows.
     * [Pull request #1631](https://bitbucket.org/osrf/gazebo/pull-request/1631)
     * [Pull request #1632](https://bitbucket.org/osrf/gazebo/pull-request/1632)
     * [Pull request #1633](https://bitbucket.org/osrf/gazebo/pull-request/1633)
-    * [Pull request #1651](https://bitbucket.org/osrf/gazebo/pull-request/1651)
     * [Pull request #1635](https://bitbucket.org/osrf/gazebo/pull-request/1635)
     * [Pull request #1637](https://bitbucket.org/osrf/gazebo/pull-request/1637)
     * [Pull request #1639](https://bitbucket.org/osrf/gazebo/pull-request/1639)
+    * [Pull request #1647](https://bitbucket.org/osrf/gazebo/pull-request/1647)
+    * [Pull request #1651](https://bitbucket.org/osrf/gazebo/pull-request/1651)
 
 1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
     * [Pull request #1606](https://bitbucket.org/osrf/gazebo/pull-request/1606)
@@ -142,6 +143,9 @@ compilation on Windows.
 
     1. Saving, exiting, generalizing SaveDialog.
         * [Pull request #1401](https://bitbucket.org/osrf/gazebo/pull-request/1401)
+
+    1. Inspectors redesign
+        * [Pull request #1586](https://bitbucket.org/osrf/gazebo/pull-request/1586)
 
     1. Edit existing model.
         * [Pull request #1425](https://bitbucket.org/osrf/gazebo/pull-request/1425)
