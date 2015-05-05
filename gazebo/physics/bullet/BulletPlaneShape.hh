@@ -37,7 +37,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet collision for an infinite plane.
-    class GAZEBO_VISIBLE BulletPlaneShape : public PlaneShape
+    class GZ_PHYSICS_VISIBLE BulletPlaneShape : public PlaneShape
     {
       /// \brief Constructor
       public: BulletPlaneShape(CollisionPtr _parent) : PlaneShape(_parent) {}
