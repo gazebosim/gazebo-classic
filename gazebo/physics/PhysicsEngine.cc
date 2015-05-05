@@ -21,7 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/thread/recursive_mutex.hpp>
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"

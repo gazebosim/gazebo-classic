@@ -21,7 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/thread/recursive_mutex.hpp>
 #include <time.h>
 
 #include <tbb/parallel_for.h>
@@ -374,19 +373,17 @@ void World::Init()
   this->dataPtr->iterations = 0;
   this->dataPtr->logPrevIteration = 0;
 
-  //util::DiagnosticManager::Instance()->Init(this->GetName());
+  util::DiagnosticManager::Instance()->Init(this->GetName());
 
-  /*util::LogRecord::Instance()->Add(this->GetName(), "state.log",
+  util::LogRecord::Instance()->Add(this->GetName(), "state.log",
       boost::bind(&World::OnLog, this, _1));
-      */
 
   // Check if we have to insert an object population.
-  /*if (this->dataPtr->sdf->HasElement("population"))
+  if (this->dataPtr->sdf->HasElement("population"))
   {
     Population population(this->dataPtr->sdf, shared_from_this());
     population.PopulateAll();
   }
-  */
 
   this->dataPtr->initialized = true;
 
@@ -723,7 +720,6 @@ void World::Update()
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->dataPtr->physicsEngine->UpdatePhysics();
 
-    
     DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdatePhysics");
 
     // do this after physics update as
@@ -2171,10 +2167,4 @@ bool World::GetEnablePhysicsEngine()
 void World::EnablePhysicsEngine(bool _enable)
 {
   this->dataPtr->enablePhysicsEngine = _enable;
-}
-
-/////////////////////////////////////////////////
-void World::AddDirtyPose(Entity *_entity)
-{
-  this->dataPtr->dirtyPoses.push_back(_entity);
 }

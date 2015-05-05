@@ -45,10 +45,11 @@ if(HAVE_DART)
 endif()
 
 
-gz_add_executable(gzserver server_main.cc Server.cc Master.cc gazebo.cc)
-gz_add_executable(gazebo gazebo_main.cc Server.cc Master.cc gazebo.cc)
+gz_add_executable(gzserver server_main.cc)
+gz_add_executable(gazebo gazebo_main.cc)
 
 target_link_libraries(gzserver
+  libgazebo
   gazebo_common
   gazebo_util
   gazebo_transport
@@ -56,10 +57,11 @@ target_link_libraries(gzserver
   gazebo_sensors
   gazebo_rendering
   gazebo_msgs
-  pthread
 )
 
 target_link_libraries(gazebo
+  libgazebo
+  libgazebo_client
   gazebo_common
   gazebo_util
   gazebo_transport
@@ -68,7 +70,6 @@ target_link_libraries(gazebo
   gazebo_rendering
   gazebo_msgs
   gazebo_gui
-  pthread
 )
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
@@ -80,7 +81,7 @@ gz_install_executable(gazebo)
 manpage(gzserver 1)
 manpage(gazebo 1)
 
-gz_add_library(libgazebo Server.cc Master.cc gazebo.cc)
+gz_add_library(libgazebo Server.cc Master.cc gazebo.cc gazebo_shared.cc)
 set_target_properties(libgazebo PROPERTIES OUTPUT_NAME "gazebo")
 
 target_link_libraries(libgazebo
@@ -92,11 +93,25 @@ target_link_libraries(libgazebo
   gazebo_rendering
   gazebo_msgs
   gazebo_math
-  pthread
 )
+if (UNIX)
+  target_link_libraries(libgazebo pthread)
+endif()
 
 add_dependencies(libgazebo gazebo_msgs)
 gz_install_library(libgazebo)
+
+gz_add_library(libgazebo_client gazebo_client.cc gazebo_shared.cc)
+set_target_properties(libgazebo_client PROPERTIES OUTPUT_NAME "gazebo_client")
+target_link_libraries(libgazebo_client
+  gazebo_common
+  gazebo_transport
+  gazebo_util
+)
+if (UNIX)
+  target_link_libraries(libgazebo_client pthread)
+endif()
+gz_install_library(libgazebo_client)
 
 set(headers Server.hh Master.hh gazebo.hh gazebo_core.hh)
 gz_install_includes("" ${headers})
