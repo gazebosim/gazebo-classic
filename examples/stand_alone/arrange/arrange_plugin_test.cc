@@ -15,7 +15,7 @@
  *
 */
 
-#include <gazebo/gazebo.hh>
+#include <gazebo/gazebo_client.hh>
 #include <vector>
 #include <iostream>
 
@@ -24,7 +24,7 @@
 
 int main(int _argc, char** _argv)
 {
-  gazebo::setupClient(_argc, _argv);
+  gazebo::client::setup(_argc, _argv);
 
   std::vector<std::string> arrangementNames;
 
@@ -52,5 +52,5 @@ int main(int _argc, char** _argv)
     gazebo::common::Time::MSleep(1000);
   }
 
-  gazebo::shutdown();
+  gazebo::client::shutdown();
 }

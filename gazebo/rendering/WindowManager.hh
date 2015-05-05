@@ -17,6 +17,12 @@
 #ifndef _WINDOWMANAGER_HH_
 #define _WINDOWMANAGER_HH_
 
+#ifdef _WIN32
+  // Oh, yeah, CreateWindow is taken, too.
+  #include <windows.h>
+  #undef CreateWindow
+#endif
+
 #include <string>
 #include <vector>
 
@@ -37,7 +43,7 @@ namespace gazebo
 
     /// \class WindowManager WindowManager.hh rendering/rendering.hh
     /// \brief Class to mangage render windows.
-    class GAZEBO_VISIBLE WindowManager
+    class GZ_RENDERING_VISIBLE WindowManager
     {
       /// \brief Constructor
       public: WindowManager();

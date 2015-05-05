@@ -28,7 +28,7 @@ namespace gazebo
     class ODEMesh;
 
     /// \brief Triangle mesh collision.
-    class GAZEBO_VISIBLE ODEMeshShape : public MeshShape
+    class GZ_PHYSICS_ODE_VISIBLE ODEMeshShape : public MeshShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.
