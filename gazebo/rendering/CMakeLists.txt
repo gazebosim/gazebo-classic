@@ -116,8 +116,7 @@ if (HAVE_OCULUS)
   )
 endif ()
 
-set (gtest_sources
-)
+set (gtest_sources)
 
 gz_build_tests(${gtest_sources})
 

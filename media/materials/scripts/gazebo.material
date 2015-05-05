@@ -659,6 +659,31 @@ material Gazebo/LightOff
   }
 }
 
+material Gazebo/LightBlueLaser
+{
+  receive_shadows off
+
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      cull_hardware none
+
+      ambient 0.5 0.5 1.0 1
+      diffuse 0.5 0.5 1.0 1
+
+      texture_unit
+      {
+        colour_op_ex source1 src_current src_current 0 1 0
+        alpha_op_ex source1 src_manual src_current 0.4
+      }
+
+    }
+  }
+}
+
 material Gazebo/BlueLaser
 {
   receive_shadows off
