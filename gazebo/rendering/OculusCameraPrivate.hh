@@ -31,7 +31,7 @@ namespace gazebo
   namespace rendering
   {
     /// \brief Private data for the Oculus Camera class
-    class GAZEBO_VISIBLE OculusCameraPrivate
+    class GZ_RENDERING_VISIBLE OculusCameraPrivate
     {
       /// \brief Constructor
       public: OculusCameraPrivate()
