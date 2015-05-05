@@ -85,6 +85,12 @@ namespace gazebo
 
     extern QAction *g_viewOculusAct;
 
+    /// \brief Enable orthographic projection action
+    extern QAction *g_cameraOrthoAct;
+
+    /// \brief Enable perspective projection action
+    extern QAction *g_cameraPerspectiveAct;
+
     extern QAction *g_copyAct;
     extern QAction *g_pasteAct;
 
