@@ -67,9 +67,9 @@ LogRecord::LogRecord()
 
   // Get the user's home directory
 #ifndef _WIN32
-  const char *homePath = common::getenv("HOME");
+  const char *homePath = common::getEnv("HOME");
 #else
-  const char *homePath = common::getenv("HOMEPATH");
+  const char *homePath = common::getEnv("HOMEPATH");
 #endif
 
   GZ_ASSERT(homePath, "HOME environment variable is missing");

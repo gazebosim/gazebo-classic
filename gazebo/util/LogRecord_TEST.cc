@@ -33,7 +33,12 @@ TEST_F(LogRecord_TEST, Constructor)
 {
   gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 
-  char *homePath = getenv("HOME");
+#ifndef _WIN32
+  const char *homePath = common::getEnv("HOME");
+#else
+  const char *homePath = common::getEnv("HOMEPATH");
+#endif
+
   EXPECT_TRUE(homePath != NULL);
 
   common::SystemPaths *paths = common::SystemPaths::Instance();

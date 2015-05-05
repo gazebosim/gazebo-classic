@@ -33,8 +33,15 @@ using namespace util;
 //////////////////////////////////////////////////
 DiagnosticManager::DiagnosticManager()
 {
+#ifndef _WIN32
+  const char *homePath = common::getEnv("HOME");
+#else
+  const char *homePath = common::getEnv("HOMEPATH");
+#endif
+  this->logPath = homePath;
+
   // Get the base of the time logging path
-  if (!getenv("HOME"))
+  if (homePath)
   {
     common::SystemPaths *paths = common::SystemPaths::Instance();
     gzwarn << "HOME environment variable missing. Diagnostic timing " <<
@@ -43,7 +50,6 @@ DiagnosticManager::DiagnosticManager()
   }
   else
   {
-    this->logPath = getenv("HOME");
     this->logPath /= ".gazebo";
   }
 
