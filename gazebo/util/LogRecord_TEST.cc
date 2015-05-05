@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"

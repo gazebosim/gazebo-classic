@@ -22,6 +22,7 @@
 #endif
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/transport/transport.hh"
