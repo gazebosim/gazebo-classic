@@ -48,7 +48,8 @@ namespace gazebo
                               const std::string &_pass);
 
     /// \brief Stops sending messages to the REST service.
-    /// Does not do anything if not logged in.
+    /// Does not do anything if not logged in. Once logged out,
+    /// a new call to Login has to be made to resume sending messages.
     public: void Logout();
 
     /// \brief Notify the service with a http POST
