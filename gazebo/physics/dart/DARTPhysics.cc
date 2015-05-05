@@ -483,6 +483,11 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
 //////////////////////////////////////////////////
 void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
 {
+  // Parent class handles many generic parameters
+  // This should be done first so that the profile settings
+  // can be over-ridden by other message parameters.
+  PhysicsEngine::OnPhysicsMsg(_msg);
+
   if (_msg->has_enable_physics())
     this->world->EnablePhysicsEngine(_msg->enable_physics());
 
@@ -504,9 +509,6 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
-
-  // Parent class handles many generic parameters
-  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 //////////////////////////////////////////////////

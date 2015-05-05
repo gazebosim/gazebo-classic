@@ -56,6 +56,7 @@ set (sources
   PlaneShape.cc
   PolylineShape.cc
   Population.cc
+  PresetManager.cc
   RayShape.cc
   Road.cc
   Shape.cc
@@ -101,6 +102,7 @@ set (headers
   PlaneShape.hh
   PolylineShape.hh
   Population.hh
+  PresetManager.hh
   RayShape.hh
   Road.hh
   Shape.hh
@@ -143,6 +145,7 @@ set (gtest_sources
   Inertial_TEST.cc
   JointController_TEST.cc
   PhysicsEngine_TEST.cc
+  PresetManager_TEST.cc
   Road_TEST.cc
   SphereShape_TEST.cc
 )

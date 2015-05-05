@@ -600,7 +600,16 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
       int index = j * this->GetRayCount() + i;
       double range = this->laserCam->GetLaserData()[index * 3];
 
-      if (!this->noises.empty())
+      // Mask ranges outside of min/max to +/- inf, as per REP 117
+      if (range >= this->GetRangeMax())
+      {
+        range = GZ_DBL_INF;
+      }
+      else if (range <= this->GetRangeMin())
+      {
+        range = -GZ_DBL_INF;
+      }
+      else if (!this->noises.empty())
       {
         range = this->noises[0]->Apply(range);
         range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());

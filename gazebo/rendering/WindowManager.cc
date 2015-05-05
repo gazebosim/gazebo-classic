@@ -68,7 +68,9 @@ void WindowManager::Fini()
 //////////////////////////////////////////////////
 bool WindowManager::SetCamera(int _windowId, CameraPtr _camera)
 {
-  this->windows[_windowId]->removeAllViewports();
+  if (static_cast<unsigned int>(_windowId) < this->windows.size() &&
+      this->windows[_windowId])
+    this->windows[_windowId]->removeAllViewports();
   _camera->SetRenderTarget(this->windows[_windowId]);
 
   return true;

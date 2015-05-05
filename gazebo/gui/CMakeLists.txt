@@ -27,6 +27,7 @@ include_directories(${TBB_INCLUDEDIR})
 set (sources
   Actions.cc
   AlignWidget.cc
+  ApplyWrenchDialog.cc
   BoxMaker.cc
   CloneWindow.cc
   ConfigWidget.cc
@@ -42,6 +43,7 @@ set (sources
   JointControlWidget.cc
   KeyEventHandler.cc
   LightMaker.cc
+  LogPlayWidget.cc
   MainWindow.cc
   ModelAlign.cc
   ModelManipulator.cc
@@ -56,6 +58,7 @@ set (sources
   SpaceNav.cc
   SphereMaker.cc
   TimePanel.cc
+  TimeWidget.cc
   ToolsWidget.cc
   TopicSelector.cc
 )
@@ -72,6 +75,7 @@ endif()
 set (qt_headers
   Actions.hh
   AlignWidget.hh
+  ApplyWrenchDialog.hh
   CloneWindow.hh
   ConfigWidget.hh
   DataLogger.hh
@@ -79,6 +83,7 @@ set (qt_headers
   GLWidget.hh
   InsertModelWidget.hh
   JointControlWidget.hh
+  LogPlayWidget.hh
   MainWindow.hh
   ModelListWidget.hh
   ModelEditWidget.hh
@@ -86,6 +91,7 @@ set (qt_headers
   RenderWidget.hh
   SaveDialog.hh
   TimePanel.hh
+  TimeWidget.hh
   ToolsWidget.hh
   TopicSelector.hh
 )
@@ -132,11 +138,14 @@ endif ()
 #endif()
 
 set (qt_tests
+  ApplyWrenchDialog_TEST.cc
   DataLogger_TEST.cc
   GuiIface_TEST.cc
   ModelAlign_TEST.cc
   RenderWidget_TEST.cc
+  SaveDialog_TEST.cc
   TimePanel_TEST.cc
+  TimeWidget_TEST.cc
 )
 
 # MainWindow is using screen rendering

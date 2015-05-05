@@ -283,6 +283,10 @@ namespace gazebo
       public: boost::recursive_mutex *GetPhysicsUpdateMutex() const
               {return this->physicsUpdateMutex;}
 
+      /// \brief Get a pointer to the SDF element for this physics engine.
+      /// \return Pointer to the physics SDF element.
+      public: sdf::ElementPtr GetSDF() const;
+
       /// \brief virtual callback for gztopic "~/request".
       /// \param[in] _msg Request message.
       protected: virtual void OnRequest(ConstRequestPtr &_msg);

@@ -70,6 +70,7 @@ namespace gazebo
     extern GZ_GUI_VISIBLE QAction *g_fullScreenAct;
     extern GZ_GUI_VISIBLE QAction *g_fpsAct;
     extern GZ_GUI_VISIBLE QAction *g_orbitAct;
+    extern GZ_GUI_VISIBLE QAction *g_overlayAct;
 
     extern GZ_GUI_VISIBLE QAction *g_arrowAct;
     extern GZ_GUI_VISIBLE QAction *g_translateAct;

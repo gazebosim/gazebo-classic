@@ -131,12 +131,12 @@ if (HAVE_OCULUS)
   )
 endif ()
 
-set (gtest_sources
-)
+set (gtest_sources)
 
 gz_build_tests(${gtest_sources})
 
 set (gtest_sources_dri
+  COMVisual_TEST.cc
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
   JointVisual_TEST.cc
@@ -179,9 +179,7 @@ target_link_libraries(gazebo_rendering
 )
 
 if (HAVE_OCULUS)
-  target_link_libraries(gazebo_rendering
-    OculusVR
-  )
+  target_link_libraries(gazebo_rendering ${OculusVR_LIBRARIES})
 endif()
 
 if (NOT APPLE AND NOT WIN32)

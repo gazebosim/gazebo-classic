@@ -89,6 +89,10 @@ namespace gazebo
       /// \param[in] The scene to remove
       public: void RemoveScene(ScenePtr _scene);
 
+      /// \brief Remove a scene
+      /// \param[in] Name of the scene to remove.
+      public: void RemoveScene(const std::string &_scene);
+
       /// \brief Update the shaders. This should not be called frequently.
       public: void UpdateShaders();
 

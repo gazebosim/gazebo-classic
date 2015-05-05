@@ -1,4 +1,18 @@
-@set build_type=Debug
+:: This file is a helper for gazebo configuration (cmake) on Windows
+:: 
+:: It is designed to work with a workspace detailed in the INSTALL_WIN32.md
+:: file. Please follow the instructions there. The workspace layout should be:
+:: 
+:: gz-ws/
+::   sdformat/
+::   ...     # all dependencies detailed in the INSTALL file
+::   #dep1/
+::   #dep2/
+::   ...
+::   gazebo/
+::
+:: Usage: cd gz-ws/gazebo/build && ../configure <Release|Debug>
+@set build_type=Release
 @if not "%1"=="" set build_type=%1
 @echo Configuring for build type %build_type%
 
@@ -44,4 +58,28 @@ set OGRE_LIB_SUFFIX=.lib
 @set LIB=%FREEIMAGE_LIBRARY_DIR%;%BOOST_LIBRARY_DIR%;%TBB_LIBRARY_DIR%;%DLFCN_WIN32_LIBRARY_DIR%;%LIB%
 @set PATH=%QT4_BIN_DIR%;%PATH%
 
-cmake -G "NMake Makefiles" -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%" -DFREEIMAGE_RUNS=1 -DPROTOBUF_SRC_ROOT_FOLDER="%PROTOBUF_PATH%" -DBOOST_ROOT:STRING="%BOOST_PATH%" -DBOOST_LIBRARYDIR:STRING="%BOOST_LIBRARY_DIR%" -DOGRE_FOUND=1 -DOGRE-RTShaderSystem_FOUND=1 -DOGRE-Terrain_FOUND=1 -DOGRE_VERSION=%OGRE_VERSION% -DOGRE_PLUGINDIR="%OGRE_PLUGIN_DIR%" -DOGRE_INCLUDE_DIRS="%OGRE_INCLUDE_DIR%" -DOGRE_LIBRARIES="%OGRE_LIBS%" -DCURL_FOUND=1 -DCURL_INCLUDEDIR="%CURL_INCLUDE_DIR%" -DCURL_LIBDIR="%CURL_LIBRARY_DIR%" -DCURL_LIBRARIES="%CURL_LIBRARY_NAME%" -DTBB_FOUND=1 -DTBB_INCLUDEDIR="%TBB_INCLUDEDIR%" -DTBB_LIBRARY_DIR="%TBB_LIBRARY_DIR%" -DCMAKE_INSTALL_PREFIX="install\%build_type%" -DCMAKE_BUILD_TYPE="%build_type%" -DENABLE_TESTS_COMPILATION:BOOL=False ..
+cmake -G "NMake Makefiles"^
+    -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%"^
+    -DUSE_EXTERNAL_TINYXML:BOOL=False^
+    -DFREEIMAGE_RUNS=1^
+    -DPROTOBUF_SRC_ROOT_FOLDER="%PROTOBUF_PATH%"^
+    -DBOOST_ROOT:STRING="%BOOST_PATH%"^
+    -DBOOST_LIBRARYDIR:STRING="%BOOST_LIBRARY_DIR%"^
+    -DOGRE_FOUND=1^
+    -DOGRE-RTShaderSystem_FOUND=1^
+    -DOGRE-Terrain_FOUND=1^
+    -DOGRE_VERSION=%OGRE_VERSION%^
+    -DOGRE_PLUGINDIR="%OGRE_PLUGIN_DIR%"^
+    -DOGRE_INCLUDE_DIRS="%OGRE_INCLUDE_DIR%"^
+    -DOGRE_LIBRARIES="%OGRE_LIBS%"^
+    -DCURL_FOUND=1^
+    -DCURL_INCLUDEDIR="%CURL_INCLUDE_DIR%"^
+    -DCURL_LIBDIR="%CURL_LIBRARY_DIR%"^
+    -DCURL_LIBRARIES="%CURL_LIBRARY_NAME%"^
+    -DTBB_FOUND=1^
+    -DTBB_INCLUDEDIR="%TBB_INCLUDEDIR%"^
+    -DTBB_LIBRARY_DIR="%TBB_LIBRARY_DIR%"^
+    -DCMAKE_INSTALL_PREFIX="install\%build_type%"^
+    -DCMAKE_BUILD_TYPE="%build_type%"^
+    -DENABLE_TESTS_COMPILATION:BOOL=False^
+    ..

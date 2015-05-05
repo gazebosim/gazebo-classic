@@ -78,6 +78,9 @@ namespace gazebo
 
       signals: void clicked();
 
+      /// \brief QT signal to notify when we received a selection msg.
+      /// \param[in] _name Name of the selected entity.
+      signals: void selectionMsgReceived(const QString &_name);
 
       public: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
@@ -192,6 +195,10 @@ namespace gazebo
       /// \brief Qt callback when the model editor action is toggled.
       /// \param[in] _checked True if the model editor was checked.
       private slots: void OnModelEditor(bool _checked);
+
+      /// \brief Qt callback when a selection msg is received.
+      /// \param[in] The name of the selected entity.
+      private slots: void OnSelectionMsgEvent(const QString &_name);
 
       private: int windowId;
 
