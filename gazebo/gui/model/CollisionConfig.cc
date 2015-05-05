@@ -240,14 +240,14 @@ void CollisionConfig::OnRemoveCollision(int _id)
   if (this->configs.size() == 1)
   {
     msg = "Are you sure you want to remove " +
-        configData->name + "?\n";
+        configData->name + "?\n\n" +
+        "This is the only collision. \n" +
+        "Without collisions, this link won't collide with anything.\n";
   }
   else
   {
     msg = "Are you sure you want to remove " +
-        configData->name + "?\n\n" +
-        "This is the only collision. \n" +
-        "Without collisions, this link won't collide with anything.";
+        configData->name + "?\n";
   }
 
   QMessageBox msgBox(QMessageBox::Warning, QString("Remove collision?"),

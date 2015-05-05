@@ -226,8 +226,20 @@ void VisualConfig::OnRemoveVisual(int _id)
   VisualConfigData *configData = this->configs[_id];
 
   // Ask for confirmation
-  std::string msg = "Are you sure you want to remove " +
-      configData->name + "?\n";
+  std::string msg;
+
+  if (this->configs.size() == 1)
+  {
+    msg = "Are you sure you want to remove " +
+        configData->name + "?\n\n" +
+        "This is the only visual. \n" +
+        "Without visuals, this link won't be visible.\n";
+  }
+  else
+  {
+    msg = "Are you sure you want to remove " +
+        configData->name + "?\n";
+  }
 
   QMessageBox msgBox(QMessageBox::Warning, QString("Remove visual?"),
       QString(msg.c_str()));
