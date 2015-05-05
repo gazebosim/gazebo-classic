@@ -1,0 +1,22 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs Messages
+/// \interface Any
+/// \brief A union type message
+
+import "int.proto";
+import "vector3d.proto";
+
+message Any
+{
+
+  /*enum Type {DOUBLE_TYPE = 1; INT_TYPE = 2; STRING_TYPE = 3; VECTOR3D_TYPE = 4;
+             BOOL_TYPE = 5; FLOAT_TYPE = 6;}*/
+
+  optional double   double_value = 1;
+  optional int32    int_value    = 2;
+  optional string   string_value = 3;
+  optional Vector3d vector3d     = 4;
+  optional bool     bool_value   = 5;
+  optional float    float_value  = 6;
+}
