@@ -40,7 +40,6 @@
 
 using namespace ode;
 
-using namespace quickstep;
 static void ComputeRows(
 #ifdef SHOW_CONVERGENCE
                 int thread_id,
@@ -350,9 +349,9 @@ static void ComputeRows(
 
         // for preconditioned case, update delta using cforce, not caccel
 
-        delta_precon -= dot6(cforce_ptr1, J_ptr);
+        delta_precon -= quickstep::dot6(cforce_ptr1, J_ptr);
         if (cforce_ptr2)
-          delta_precon -= dot6(cforce_ptr2, J_ptr + 6);
+          delta_precon -= quickstep::dot6(cforce_ptr2, J_ptr + 6);
 
         // set the limits for this constraint.
         // this is the place where the QuickStep method differs from the
@@ -397,9 +396,9 @@ static void ComputeRows(
           J_ptr = J_orig + index*12;
 
           // update cforce.
-          sum6(cforce_ptr1, delta_precon, J_ptr);
+          quickstep::sum6(cforce_ptr1, delta_precon, J_ptr);
           if (cforce_ptr2)
-            sum6(cforce_ptr2, delta_precon, J_ptr + 6);
+            quickstep::sum6(cforce_ptr2, delta_precon, J_ptr + 6);
         }
 
         // record residual (error) (for the non-erp version)
@@ -468,16 +467,16 @@ static void ComputeRows(
 #endif
               rhs[index] - old_lambda*Adcfm[index];
         dRealPtr J_ptr = J + index*12;
-        delta -= dot6(caccel_ptr1, J_ptr);
+        delta -= quickstep::dot6(caccel_ptr1, J_ptr);
         if (caccel_ptr2)
-          delta -= dot6(caccel_ptr2, J_ptr + 6);
+          delta -= quickstep::dot6(caccel_ptr2, J_ptr + 6);
 
         // delta_erp: unthrottled version compute for rhs with custom erp
         // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
         delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
-        delta_erp -= dot6(caccel_erp_ptr1, J_ptr);
+        delta_erp -= quickstep::dot6(caccel_erp_ptr1, J_ptr);
         if (caccel_erp_ptr2)
-          delta_erp -= dot6(caccel_erp_ptr2, J_ptr + 6);
+          delta_erp -= quickstep::dot6(caccel_erp_ptr2, J_ptr + 6);
 
         // set the limits for this constraint.
         // this is the place where the QuickStep method differs from the
@@ -498,8 +497,8 @@ static void ComputeRows(
                 lo_act_erp = -hi_act_erp;
             }
             else if(friction_model == cone_friction) {
-                dxConeFrictionModel(hi_act, lo_act, hi_act_erp, lo_act_erp, jb, J_orig, index,
-                        constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
+              quickstep::dxConeFrictionModel(lo_act, hi_act, lo_act_erp, hi_act_erp, jb, J_orig, index,
+                constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
             }
             else if(friction_model == box_friction) {
                 hi_act = hi[index];
@@ -591,22 +590,22 @@ static void ComputeRows(
           dRealPtr iMJ_ptr = iMJ + index*12;
 
           // update caccel.
-          sum6(caccel_ptr1, delta, iMJ_ptr);
+          quickstep::sum6(caccel_ptr1, delta, iMJ_ptr);
           if (caccel_ptr2)
-            sum6(caccel_ptr2, delta, iMJ_ptr + 6);
+            quickstep::sum6(caccel_ptr2, delta, iMJ_ptr + 6);
 
           // update caccel_erp.
-          sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
+          quickstep::sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
           if (caccel_erp_ptr2)
-            sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
+            quickstep::sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
 
 #ifdef PENETRATION_JVERROR_CORRECTION
           // update vnew incrementally
           //   add stepsize * delta_caccel to the body velocity
           //   vnew = vnew + dt * delta_caccel
-          sum6(vnew_ptr1, stepsize*delta, iMJ_ptr);
+          quickstep::sum6(vnew_ptr1, stepsize*delta, iMJ_ptr);
           if (caccel_ptr2)
-            sum6(vnew_ptr2, stepsize*delta, iMJ_ptr + 6);
+            quickstep::sum6(vnew_ptr2, stepsize*delta, iMJ_ptr + 6);
 
           // COMPUTE Jvnew = J*vnew/h*Ad
           //   but J is already scaled by Ad, and we multiply by h later
@@ -616,9 +615,9 @@ static void ComputeRows(
             // I've set findex to -2 for contact normal constraint
             if (constraint_index == -1) {
               dRealPtr J_ptr = J + index*12;
-              Jvnew = dot6(vnew_ptr1,J_ptr);
+              Jvnew = quickstep::dot6(vnew_ptr1,J_ptr);
               if (caccel_ptr2)
-                Jvnew += dot6(vnew_ptr2,J_ptr+6);
+                Jvnew += quickstep::dot6(vnew_ptr2,J_ptr+6);
               // printf("iter [%d] findex [%d] Jvnew [%f] lo [%f] hi [%f]\n",
               //   iteration, constraint_index, Jvnew, lo[index], hi[index]);
             }
@@ -1157,7 +1156,10 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   delete mutex;
 }
 
-void quickstep::dxConeFrictionModel(dReal& hi_act, dReal& lo_act, dReal& hi_act_erp, dReal& lo_act_erp, int *jb, const dRealMutablePtr J_orig, int index, int constraint_index, int startRow, int nRows, const int nb, dxBody * const *body, int i, const IndexError *order, const int *findex, dRealPtr /*lo*/, dRealPtr hi, dRealMutablePtr lambda, dRealMutablePtr lambda_erp)
+void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_erp, dReal& hi_act_erp,
+    int *jb, const dRealMutablePtr J_orig, int index, int constraint_index, int startRow, int nRows,
+    const int nb, dxBody * const *body, int i, const IndexError *order, const int *findex,
+    dRealPtr /*lo*/, dRealPtr hi, dRealMutablePtr lambda, dRealMutablePtr lambda_erp)
 {
   // This computes the corresponding hi_act and lo_act for friction constraints.
   // For each contact, we have lambda_n, lambda_f1, and lambda_f2.
@@ -1222,15 +1224,6 @@ void quickstep::dxConeFrictionModel(dReal& hi_act, dReal& lo_act, dReal& hi_act_
       }
     }
   }
-  /*
-     printf("body1 vel: \n");
-     for(ivel=0; ivel<6; ivel++)
-     printf("%f, ", body1_vel[ivel]);
-     printf("\n body2 vel: \n");
-     for(ivel=0; ivel<6; ivel++)
-     printf("%f, ", body2_vel[ivel]);
-     printf("\n");
-     */
   //startRow, nRows;
   int previndex, nextindex, prev_constraint_index, next_constraint_index;
   if (i == startRow)
@@ -1255,14 +1248,14 @@ void quickstep::dxConeFrictionModel(dReal& hi_act, dReal& lo_act, dReal& hi_act_
   {
     // body1 was always the 1st body in the body pair
     dRealPtr J_next_ptr =  J_orig + index*12 + 12;
-    v_f1 = dot6(J_orig_ptr, body1_vel) + dot6(J_orig_ptr+6, body2_vel);
-    v_f2 = dot6(J_next_ptr, body1_vel) + dot6(J_next_ptr+6, body2_vel);
+    v_f1 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr+6, body2_vel);
+    v_f2 = quickstep::dot6(J_next_ptr, body1_vel) + quickstep::dot6(J_next_ptr+6, body2_vel);
   }
   else if (constraint_index == prev_constraint_index)
   {
     dRealPtr J_prev_ptr =  J_orig + index*12 - 12;
-    v_f1 = dot6(J_prev_ptr, body1_vel) + dot6(J_prev_ptr, body2_vel);
-    v_f2 = dot6(J_orig_ptr, body1_vel) + dot6(J_orig_ptr, body2_vel);
+    v_f1 = quickstep::dot6(J_prev_ptr, body1_vel) + quickstep::dot6(J_prev_ptr, body2_vel);
+    v_f2 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr, body2_vel);
   }
   else
   {
