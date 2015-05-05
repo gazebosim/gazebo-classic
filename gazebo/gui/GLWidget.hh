@@ -153,7 +153,7 @@ namespace gazebo
 
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
-      // private: bool eventFilter(QObject *_obj, QEvent *_event);
+      private: bool eventFilter(QObject *_obj, QEvent *_event);
 
       private: void ClearSelection();
 

@@ -62,7 +62,7 @@ extern ModelRightMenu *g_modelRightMenu;
 GLWidget::GLWidget(QWidget *_parent)
   : QWidget(_parent)
 {
-  rendering::load(false);
+  rendering::load();
 
   this->setObjectName("GLWidget");
   this->state = "select";
@@ -91,7 +91,7 @@ GLWidget::GLWidget(QWidget *_parent)
   /*this->connections.push_back(
       rendering::Events::ConnectCreateScene(
         boost::bind(&GLWidget::OnCreateScene, this, _1)));
-	*/
+  */
 
   this->connections.push_back(
       rendering::Events::ConnectRemoveScene(
@@ -187,7 +187,7 @@ void GLWidget::Init()
     CreateWindow(winHandle, this->width(), this->height());
 
   std::cout << "My Window Id=" << this->windowId << "\n";
- 
+
   rendering::init();
   this->scene = rendering::create_scene(gui::get_world(), true);
   if (!this->scene)
@@ -199,7 +199,7 @@ void GLWidget::Init()
   {
     this->sceneCreated =
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-		  this->windowId, this->userCamera);
+      this->windowId, this->userCamera);
   }
 
   this->renderFrame->lower();
@@ -861,7 +861,7 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   {
     this->userCamera = _scene->GetUserCamera(0);
   }
-   
+
   gui::set_active_camera(this->userCamera);
   this->scene = _scene;
 

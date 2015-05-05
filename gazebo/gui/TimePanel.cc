@@ -281,7 +281,7 @@ void TimePanel::Update()
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
 
   // Avoid apparent race condition on start, seen on Windows.
-  if (!this->simTimes.size() || !this->realTimes.size())
+  if (!this->dataPtr->simTimes.size() || !this->dataPtr->realTimes.size())
     return;
 
   std::ostringstream percent;

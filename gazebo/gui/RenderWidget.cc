@@ -179,7 +179,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   frameLayout->addWidget(this->bottomFrame);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frameLayout->setSpacing(0);
-  
+
 
   this->mainFrame->setLayout(frameLayout);
   this->mainFrame->layout()->setContentsMargins(0, 0, 0, 0);
@@ -433,7 +433,7 @@ void RenderWidget::mouseReleaseEvent(QMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
-bool RenderWidget::eventFilter(QObject *_obj, QEvent *_event)
+bool RenderWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
 {
   if (_event->type() == QEvent::Enter)
   {

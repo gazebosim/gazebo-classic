@@ -191,7 +191,7 @@ void ODELink::MoveCallback(dBodyID _id)
       self->inertial->GetCoG());
 
   self->dirtyPose.pos -= cog;
-  self->world->AddDirtyPose(self);
+  self->world->dataPtr->dirtyPoses.push_back(self);
 
   // get force and applied to this body
   if (_id)

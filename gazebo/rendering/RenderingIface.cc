@@ -24,13 +24,13 @@
 using namespace gazebo;
 
 //////////////////////////////////////////////////
-bool rendering::load(bool _server)
+bool rendering::load()
 {
   bool result = true;
 
   try
   {
-    rendering::RenderEngine::Instance()->Load(_server);
+    rendering::RenderEngine::Instance()->Load();
   }
   catch(common::Exception &e)
   {

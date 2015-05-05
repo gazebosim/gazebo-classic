@@ -221,6 +221,6 @@ gz_install_includes("gui" ${headers} ${qt_headers} ${CMAKE_CURRENT_BINARY_DIR}/g
 gz_install_executable(gzclient)
 manpage(gzclient 1)
 
-QT4_WRAP_CPP(test_MOC test.hh)
-gz_add_executable(gztest test.cc ${test_MOC})
-target_link_libraries(gztest ${QT_LIBRARIES} ${ogre_libraries})
+# QT4_WRAP_CPP(test_MOC test.hh)
+# gz_add_executable(gztest test.cc ${test_MOC})
+# target_link_libraries(gztest ${QT_LIBRARIES} ${ogre_libraries})

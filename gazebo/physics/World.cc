@@ -723,7 +723,6 @@ void World::Update()
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->dataPtr->physicsEngine->UpdatePhysics();
 
-    
     DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdatePhysics");
 
     // do this after physics update as
@@ -2171,10 +2170,4 @@ bool World::GetEnablePhysicsEngine()
 void World::EnablePhysicsEngine(bool _enable)
 {
   this->dataPtr->enablePhysicsEngine = _enable;
-}
-
-/////////////////////////////////////////////////
-void World::AddDirtyPose(Entity *_entity)
-{
-  this->dataPtr->dirtyPoses.push_back(_entity);
 }
