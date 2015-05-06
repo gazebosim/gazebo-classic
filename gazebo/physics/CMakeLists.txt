@@ -16,6 +16,15 @@ if (HAVE_GDAL)
   include_directories(${GDAL_INCLUDE_DIR})
 endif()
 
+include_directories(${TBB_INCLUDEDIR})
+
+# Be sure to locate this definition *after* add_subdirectories
+# in order to get the proper visibility when building libs
+if (WIN32)
+  add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
+  include_directories(${libdl_include_dir})
+endif()
+
 
 set (sources
   Actor.cc
@@ -124,6 +133,7 @@ target_link_libraries(gazebo_physics
 if (HAVE_BULLET)
   target_link_libraries(gazebo_physics gazebo_physics_bullet)
 endif()
+
 if (HAVE_DART)
   target_link_libraries(gazebo_physics gazebo_physics_dart)
 endif()

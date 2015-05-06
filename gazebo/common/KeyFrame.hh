@@ -34,7 +34,7 @@ namespace gazebo
 
     /// \class KeyFrame KeyFrame.hh common/common.hh
     /// \brief A key frame in an animation
-    class GAZEBO_VISIBLE KeyFrame
+    class GZ_COMMON_VISIBLE KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe in seconds
@@ -52,7 +52,7 @@ namespace gazebo
     };
 
     /// \brief A keyframe for a PoseAnimation
-    class GAZEBO_VISIBLE PoseKeyFrame : public KeyFrame
+    class GZ_COMMON_VISIBLE PoseKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time of the keyframe
@@ -109,7 +109,7 @@ namespace gazebo
     };
 
     /// \brief A keyframe for a NumericAnimation
-    class GAZEBO_VISIBLE NumericKeyFrame : public KeyFrame
+    class GZ_COMMON_VISIBLE NumericKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe
