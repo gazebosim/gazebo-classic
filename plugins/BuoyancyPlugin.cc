@@ -46,7 +46,7 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     this->fluidDensity = this->sdf->Get<double>("fluid_density");
   }
 
-  // Get center of volume and volume that were inputted in SDF
+  // Get "center of volume" and "volume" that were inputted in SDF
   // SDF input is recommended for mesh or polylines collision shapes
   if (this->sdf->HasElement("link"))
   {
