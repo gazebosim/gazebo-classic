@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,6 +104,14 @@ namespace gazebo
 
       /// \brief Pointer to bullet hinge2 constraint
       private: btHinge2Constraint *bulletHinge2;
+
+      /// \brief Offset angle used in GetAngleImpl, so that angles are reported
+      /// relative to the initial configuration.
+      private: double angleOffset[2];
+
+      /// \brief Initial value of joint axis, expressed as unit vector
+      /// in world frame.
+      private: math::Vector3 initialWorldAxis[2];
     };
 
   /// \}

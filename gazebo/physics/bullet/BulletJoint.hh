@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,10 +90,6 @@ namespace gazebo
       /// \brief Get the torque the joint applies to the first body
       /// \param index The index of the body(0 or 1)
       public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
-
-      /// \brief Set a parameter for the joint
-      public: virtual void SetAttribute(Attribute, unsigned int _index,
-                                        double _value);
 
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,

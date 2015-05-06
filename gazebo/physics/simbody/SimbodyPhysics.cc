@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/WorldPrivate.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/SurfaceParams.hh"
@@ -455,7 +456,7 @@ void SimbodyPhysics::UpdatePhysics()
       math::Pose pose = SimbodyPhysics::Transform2Pose(
         simbodyLink->masterMobod.getBodyTransform(s));
       simbodyLink->SetDirtyPose(pose);
-      this->world->dirtyPoses.push_back(
+      this->world->dataPtr->dirtyPoses.push_back(
         boost::static_pointer_cast<Entity>(*lx).get());
     }
 
@@ -1172,9 +1173,6 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
     Transform X_LC =
       SimbodyPhysics::Pose2Transform((*ci)->GetRelativePose());
 
-// Remove these pragmas when non-const GetShapeType is removed
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     switch ((*ci)->GetShapeType() & (~physics::Entity::SHAPE))
     {
       case physics::Entity::PLANE_SHAPE:
@@ -1270,7 +1268,6 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
               << "] unimplemented\n";
         break;
     }
-#pragma GCC diagnostic pop
   }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,6 +88,8 @@ INSTANTIATE_TEST_CASE_P(ExamplePlugins, ExamplePlugins, ::testing::Values(
   , "projector"
   , "system_gui_plugin"
   , "world_edit"
+  , "gui_overlay_plugin_spawn"
+  , "gui_overlay_plugin_time"
 ));
 
 int main(int argc, char **argv)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,9 @@
 using namespace gazebo;
 using namespace common;
 
-
 //////////////////////////////////////////////////
 Timer::Timer()
-  : running(false)
+  : reset(true), running(false)
 {
 }
 
@@ -39,7 +38,12 @@ Timer::~Timer()
 //////////////////////////////////////////////////
 void Timer::Start()
 {
-  this->start = Time::GetWallTime();
+  if (this->reset)
+  {
+    this->start = Time::GetWallTime();
+    this->reset = false;
+  }
+
   this->running = true;
 }
 
@@ -48,6 +52,14 @@ void Timer::Stop()
 {
   this->stop = Time::GetWallTime();
   this->running = false;
+}
+
+//////////////////////////////////////////////////
+void Timer::Reset()
+{
+  this->running = false;
+  this->reset = true;
+  this->start = this->stop = Time::GetWallTime();
 }
 
 //////////////////////////////////////////////////

@@ -24,6 +24,7 @@ endif()
 set(tests
   351_world_step.cc
   494_joint_axis_frame.cc
+  602_unsubscribe_segfault.cc
   624_collision_world_pose.cc
   876_random_number_generator.cc
   940_force_torque_sensor_frame.cc
@@ -33,6 +34,7 @@ set(tests
   1124_collision_pose.cc
   1146_collision_bounding_box.cc
   1208_world_plugin_init.cc
+  1375_world_reset.cc
 )
 
 gz_build_tests(${tests})
