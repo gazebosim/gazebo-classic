@@ -99,7 +99,7 @@ if (MANPAGES_SUPPORT)
 	      manpages.cc)
 endif()
 
-# gz_build_tests(${tests})
+gz_build_tests(${tests})
 
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout, to account for model download time.
@@ -113,7 +113,7 @@ set(display_tests
 )
 
 # Build the display tests (need extra sources to compile)
-# gz_build_display_tests(${display_tests})
+gz_build_display_tests(${display_tests})
 
 set(dri_tests
   camera.cc
@@ -131,13 +131,13 @@ set(dri_tests
   world_reset.cc
 )
 
-# gz_build_dri_tests(${dri_tests})
+gz_build_dri_tests(${dri_tests})
 
 set(qt_tests
   insert_model.cc
 )
 
-# gz_build_qt_tests(${qt_tests})
+gz_build_qt_tests(${qt_tests})
 
 if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   # Increase timeout, to account for model download time.
