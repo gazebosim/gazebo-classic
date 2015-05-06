@@ -28,6 +28,7 @@ SignalStatistic::SignalStatistic()
   : dataPtr(new SignalStatisticPrivate)
 {
   this->dataPtr->data = 0.0;
+  this->dataPtr->extraData = 0.0;
   this->dataPtr->count = 0;
 }
 
@@ -121,6 +122,42 @@ void SignalMaxAbsoluteValue::InsertData(const double _data)
 }
 
 //////////////////////////////////////////////////
+// wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm
+// based on Knuth's algorithm
+double SignalVariance::Value() const
+{
+  if (this->dataPtr->count < 2)
+    return 0.0;
+
+  // variance = M2 / (n - 1)
+  return this->dataPtr->data / (this->dataPtr->count - 1);
+}
+
+//////////////////////////////////////////////////
+std::string SignalVariance::ShortName() const
+{
+  return "var";
+}
+
+//////////////////////////////////////////////////
+// wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm
+// based on Knuth's algorithm
+void SignalVariance::InsertData(const double _data)
+{
+  // n++
+  this->dataPtr->count++;
+
+  // delta = x - mean
+  double delta = _data - this->dataPtr->extraData;
+
+  // mean += delta / n
+  this->dataPtr->extraData += delta / this->dataPtr->count;
+
+  // M2 += delta*(x - mean)
+  this->dataPtr->data += delta * (_data - this->dataPtr->extraData);
+}
+
+//////////////////////////////////////////////////
 SignalStats::SignalStats()
   : dataPtr(new SignalStatsPrivate)
 {
@@ -192,6 +229,11 @@ bool SignalStats::InsertStatistic(const std::string &_name)
   else if (_name == "rms")
   {
     stat.reset(new SignalRootMeanSquare());
+    this->dataPtr->stats.push_back(stat);
+  }
+  else if (_name == "var")
+  {
+    stat.reset(new SignalVariance());
     this->dataPtr->stats.push_back(stat);
   }
   else

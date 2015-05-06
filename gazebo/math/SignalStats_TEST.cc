@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 
+#include "gazebo/math/Rand.hh"
 #include "gazebo/math/SignalStats.hh"
 #include "test/util.hh"
 
@@ -163,6 +164,7 @@ TEST_F(SignalStatsTest, SignalRootMeanSquare)
   }
 }
 
+//////////////////////////////////////////////////
 TEST_F(SignalStatsTest, SignalMaxAbsoluteValue)
 {
   {
@@ -234,6 +236,105 @@ TEST_F(SignalStatsTest, SignalMaxAbsoluteValue)
   }
 }
 
+//////////////////////////////////////////////////
+TEST_F(SignalStatsTest, SignalVarianceConstructor)
+{
+  // Constructor
+  math::SignalVariance var;
+  EXPECT_DOUBLE_EQ(var.Value(), 0.0);
+  EXPECT_EQ(var.Count(), 0u);
+  EXPECT_EQ(var.ShortName(), std::string("var"));
+
+  // Reset
+  var.Reset();
+  EXPECT_DOUBLE_EQ(var.Value(), 0.0);
+  EXPECT_EQ(var.Count(), 0u);
+}
+
+//////////////////////////////////////////////////
+TEST_F(SignalStatsTest, SignalVarianceOneValue)
+{
+  // Add one value, expect 0.0 variance
+  // Use the following when merging to gazebo5
+  // std::vector<double> values = {0, 1.0, 10.0, -100.0};
+  // for (auto value : values)
+  std::vector<double> values;
+  values.push_back(0.0);
+  values.push_back(1.0);
+  values.push_back(10.0);
+  values.push_back(-100.0);
+  // Use the following when merging to gazebo5
+  // for (auto value : values)
+  for (unsigned int i = 0; i < values.size(); ++i)
+  {
+    double value = values[i];
+    math::SignalVariance var;
+    var.InsertData(value);
+    EXPECT_EQ(var.Count(), 1u);
+    EXPECT_DOUBLE_EQ(0.0, var.Value());
+
+    // Reset
+    var.Reset();
+    EXPECT_DOUBLE_EQ(0.0, var.Value());
+    EXPECT_EQ(var.Count(), 0u);
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(SignalStatsTest, SignalVarianceConstantValues)
+{
+  // Constant values, expect 0.0 variance
+  math::SignalVariance var;
+  const double value = 3.14159;
+
+  // Loop two times to verify Reset
+  for (int j = 0; j < 2; ++j)
+  {
+    for (unsigned int i = 1; i <= 10; ++i)
+    {
+      var.InsertData(value);
+      EXPECT_DOUBLE_EQ(0.0, var.Value());
+      EXPECT_EQ(var.Count(), i);
+    }
+
+    // Reset
+    var.Reset();
+    EXPECT_DOUBLE_EQ(var.Value(), 0.0);
+    EXPECT_EQ(var.Count(), 0u);
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(SignalStatsTest, SignalVarianceRandomValues)
+{
+  // Random normally distributed values
+  // The sample variance has the following variance:
+  // 2 variance^2 / (count - 1)
+  // en.wikipedia.org/wiki/Variance#Distribution_of_the_sample_variance
+  // We will use 5 sigma (4e-5 chance of failure)
+  math::SignalVariance var;
+  const double stdDev = 3.14159;
+  const int count = 10000;
+  const double sigma = 5.0;
+  for (int i = 0; i < count; ++i)
+  {
+    var.InsertData(math::Rand::GetDblNormal(0.0, stdDev));
+  }
+  const double variance = stdDev*stdDev;
+  double sampleVariance2 = 2 * variance*variance / (count - 1);
+  EXPECT_NEAR(var.Value(), variance, sigma*sqrt(sampleVariance2));
+  std::cout << "True variance " << variance
+            << ", measured variance " << var.Value()
+            << ", sigma " << sqrt(sampleVariance2)
+            << std::endl;
+
+  // Reset
+  var.Reset();
+  EXPECT_DOUBLE_EQ(var.Value(), 0.0);
+  EXPECT_EQ(var.Count(), 0u);
+}
+
+//////////////////////////////////////////////////
 TEST_F(SignalStatsTest, SignalStats)
 {
   {
@@ -265,15 +366,20 @@ TEST_F(SignalStatsTest, SignalStats)
     EXPECT_FALSE(stats.InsertStatistic("rms"));
     EXPECT_FALSE(stats.Map().empty());
 
+    EXPECT_TRUE(stats.InsertStatistic("var"));
+    EXPECT_FALSE(stats.InsertStatistic("var"));
+    EXPECT_FALSE(stats.Map().empty());
+
     EXPECT_FALSE(stats.InsertStatistic("FakeStatistic"));
 
     // Map with no data
     std::map<std::string, double> map = stats.Map();
     EXPECT_FALSE(map.empty());
-    EXPECT_EQ(map.size(), 3u);
+    EXPECT_EQ(map.size(), 4u);
     EXPECT_EQ(map.count("maxAbs"), 1u);
     EXPECT_EQ(map.count("mean"), 1u);
     EXPECT_EQ(map.count("rms"), 1u);
+    EXPECT_EQ(map.count("var"), 1u);
     EXPECT_EQ(map.count("FakeStatistic"), 0u);
   }
 
@@ -284,23 +390,29 @@ TEST_F(SignalStatsTest, SignalStats)
     EXPECT_TRUE(stats.Map().empty());
 
     EXPECT_TRUE(stats.InsertStatistics("maxAbs,rms"));
+    EXPECT_EQ(stats.Map().size(), 2u);
     EXPECT_FALSE(stats.InsertStatistics("maxAbs,rms"));
     EXPECT_FALSE(stats.InsertStatistics("maxAbs"));
     EXPECT_FALSE(stats.InsertStatistics("rms"));
-    EXPECT_FALSE(stats.Map().empty());
+    EXPECT_EQ(stats.Map().size(), 2u);
 
     EXPECT_FALSE(stats.InsertStatistics("mean,FakeStatistic"));
-    EXPECT_FALSE(stats.Map().empty());
+    EXPECT_EQ(stats.Map().size(), 3u);
+
+    EXPECT_FALSE(stats.InsertStatistics("var,FakeStatistic"));
+    EXPECT_EQ(stats.Map().size(), 4u);
 
     EXPECT_FALSE(stats.InsertStatistics("FakeStatistic"));
+    EXPECT_EQ(stats.Map().size(), 4u);
 
     // Map with no data
     std::map<std::string, double> map = stats.Map();
     EXPECT_FALSE(map.empty());
-    EXPECT_EQ(map.size(), 3u);
+    EXPECT_EQ(map.size(), 4u);
     EXPECT_EQ(map.count("maxAbs"), 1u);
     EXPECT_EQ(map.count("mean"), 1u);
     EXPECT_EQ(map.count("rms"), 1u);
+    EXPECT_EQ(map.count("var"), 1u);
     EXPECT_EQ(map.count("FakeStatistic"), 0u);
   }
 
