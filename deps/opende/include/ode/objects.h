@@ -582,7 +582,7 @@ ODE_API int dWorldGetQuickStepExtraFrictionIterations (dWorldID);
  * @brief Get the friction model.
  * @ingroup world
  */
-ODE_API int dWorldGetQuickStepFrictionModel(dWorldID);
+ODE_API Friction_Model dWorldGetQuickStepFrictionModel(dWorldID);
 
 /**
  * @brief Option to turn on inertia ratio reduction.

@@ -701,12 +701,11 @@ double ODEPhysics::GetSORPGSW()
 }
 
 //////////////////////////////////////////////////
-/// Uncomment this until sdformat changes (sdformat repo issue #96)
-/// std::string ODEPhysics::GetFrictionModel()
-/// {
-///   return this->sdf->GetElement("ode")->GetElement(
-///     "solver")->Get<std::string>("friction_model");
-/// }
+std::string ODEPhysics::GetFrictionModel()
+{
+  return ConvertFrictionModel(
+    dWorldGetQuickStepFrictionModel(this->dataPtr->worldId));
+}
 
 //////////////////////////////////////////////////
 double ODEPhysics::GetWorldCFM()

@@ -2324,7 +2324,7 @@ int  dWorldGetQuickStepExtraFrictionIterations (dWorldID w)
   return w->qs.friction_iterations;
 }
 
-int  dWorldGetQuickStepFrictionModel (dWorldID w)
+Friction_Model dWorldGetQuickStepFrictionModel (dWorldID w)
 {
   dAASSERT(w);
   return w->qs.friction_model;

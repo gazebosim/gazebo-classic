@@ -30,6 +30,7 @@
 #include <ode/common.h>
 #include <ode/memory.h>
 #include <ode/mass.h>
+#include <ode/objects.h>
 #include "array.h"
 #include <boost/threadpool.hpp>
 
@@ -120,7 +121,7 @@ struct dxQuickStepParameters {
   bool row_reorder1;  // control quickstep row reordering
   dReal warm_start;  // warm start factor, 0: no warm start, 1: full warm start
   int friction_iterations;  // extra quickstep iterations friction.
-  int friction_model;       // friction model
+  Friction_Model friction_model;  // friction model, enum type Friction_Model
 };
 
 // robust-step parameters

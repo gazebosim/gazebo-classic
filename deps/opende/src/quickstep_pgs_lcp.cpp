@@ -165,7 +165,7 @@ static void ComputeRows(
   int precon_iterations = qs->precon_iterations;
   dReal pgs_lcp_tolerance = qs->pgs_lcp_tolerance;
   int friction_iterations = qs->friction_iterations;
-  int friction_model = qs->friction_model;
+  Friction_Model friction_model = qs->friction_model;
   dReal smooth_contacts = qs->smooth_contacts;
 
 #ifdef SHOW_CONVERGENCE
