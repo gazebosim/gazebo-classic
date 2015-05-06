@@ -230,13 +230,15 @@ namespace gazebo
       /// \param[in] _fricModel Friction model string.
       /// \return A Friction_Model enum. Defaults to pyramid_friction
       /// if _fricModel is unrecognized.
-      public: static Friction_Model ConvertFrictionModel(const std::string &_fricModel);
+      public: static Friction_Model
+              ConvertFrictionModel(const std::string &_fricModel);
 
       /// \brief Convert a Friction_Model enum to a string.
       /// \param[in] _fricModel Friction_Model enum.
       /// \return Friction model string. Returns "unknown" if
       /// _fricModel is unrecognized.
-      public: static std::string ConvertFrictionModel(const Friction_Model _fricModel);
+      public: static std::string
+              ConvertFrictionModel(const Friction_Model _fricModel);
 
       /// \brief Get the step type (quick, world).
       /// \return The step type.

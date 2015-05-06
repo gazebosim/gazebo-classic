@@ -634,7 +634,8 @@ void ODEPhysics::SetFrictionModel(const std::string &_fricModel)
   ///
   /// this->sdf->GetElement("ode")->GetElement(
   ///   "solver")->GetElement("friction_model")->Set(_fricModel);
-  dWorldSetQuickStepFrictionModel(this->dataPtr->worldId, ConvertFrictionModel(_fricModel));
+  dWorldSetQuickStepFrictionModel(this->dataPtr->worldId,
+    ConvertFrictionModel(_fricModel));
 }
 
 //////////////////////////////////////////////////
