@@ -34,6 +34,7 @@
 #include "gazebo/rendering/CameraVisual.hh"
 #include "gazebo/rendering/JointVisual.hh"
 #include "gazebo/rendering/COMVisual.hh"
+#include "gazebo/rendering/InertiaVisual.hh"
 #include "gazebo/rendering/ContactVisual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Light.hh"
@@ -94,6 +95,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
 
   this->dataPtr->initialized = false;
   this->dataPtr->showCOMs = false;
+  this->dataPtr->showInertias = false;
   this->dataPtr->showCollisions = false;
   this->dataPtr->showJoints = false;
   this->dataPtr->transparent = false;
@@ -185,29 +187,66 @@ void Scene::Clear()
   this->dataPtr->poseMsgs.clear();
   this->dataPtr->sceneMsgs.clear();
   this->dataPtr->jointMsgs.clear();
-  this->dataPtr->joints.clear();
   this->dataPtr->linkMsgs.clear();
-  this->dataPtr->cameras.clear();
-  this->dataPtr->userCameras.clear();
-  this->dataPtr->lights.clear();
+  this->dataPtr->sensorMsgs.clear();
+
+  this->dataPtr->poseSub.reset();
+  this->dataPtr->jointSub.reset();
+  this->dataPtr->sensorSub.reset();
+  this->dataPtr->sceneSub.reset();
+  this->dataPtr->skeletonPoseSub.reset();
+  this->dataPtr->selectionSub.reset();
+  this->dataPtr->visSub.reset();
+  this->dataPtr->skySub.reset();
+  this->dataPtr->lightSub.reset();
+  this->dataPtr->requestSub.reset();
+  this->dataPtr->responseSub.reset();
+  this->dataPtr->modelInfoSub.reset();
+  this->dataPtr->lightPub.reset();
+  this->dataPtr->responsePub.reset();
+  this->dataPtr->requestPub.reset();
+  this->dataPtr->selectionMsg.reset();
+
+  this->dataPtr->joints.clear();
 
   delete this->dataPtr->terrain;
   this->dataPtr->terrain = NULL;
 
-  // Erase the world visual
-  this->dataPtr->visuals.erase(this->dataPtr->visuals.begin());
+  delete this->dataPtr->skyx;
+  this->dataPtr->skyx = NULL;
 
   while (!this->dataPtr->visuals.empty())
-    if (this->dataPtr->visuals.begin()->second)
-      this->RemoveVisual(this->dataPtr->visuals.begin()->second);
+    this->RemoveVisual(this->dataPtr->visuals.begin()->first);
+
   this->dataPtr->visuals.clear();
+
+  if (this->dataPtr->worldVisual)
+  {
+    this->dataPtr->worldVisual->Fini();
+    this->dataPtr->worldVisual.reset();
+  }
+
+  while (!this->dataPtr->lights.empty())
+    if (this->dataPtr->lights.begin()->second)
+      this->RemoveLight(this->dataPtr->lights.begin()->second);
+  this->dataPtr->lights.clear();
 
   for (uint32_t i = 0; i < this->dataPtr->grids.size(); ++i)
     delete this->dataPtr->grids[i];
   this->dataPtr->grids.clear();
 
-  this->dataPtr->sensorMsgs.clear();
+  for (unsigned int i = 0; i < this->dataPtr->cameras.size(); ++i)
+    this->dataPtr->cameras[i]->Fini();
+  this->dataPtr->cameras.clear();
+
+  for (unsigned int i = 0; i < this->dataPtr->userCameras.size(); ++i)
+    this->dataPtr->userCameras[i]->Fini();
+  this->dataPtr->userCameras.clear();
+
+  RTShaderSystem::Instance()->RemoveScene(this->GetName());
   RTShaderSystem::Instance()->Clear();
+
+  this->dataPtr->connections.clear();
 
   this->dataPtr->initialized = false;
 }
@@ -216,53 +255,14 @@ void Scene::Clear()
 Scene::~Scene()
 {
   delete this->dataPtr->requestMsg;
+  this->dataPtr->requestMsg = NULL;
   delete this->dataPtr->receiveMutex;
-  delete this->dataPtr->raySceneQuery;
+  this->dataPtr->receiveMutex = NULL;
 
-  this->dataPtr->node->Fini();
-  this->dataPtr->node.reset();
-  this->dataPtr->visSub.reset();
-  this->dataPtr->lightSub.reset();
-  this->dataPtr->poseSub.reset();
-  this->dataPtr->jointSub.reset();
-  this->dataPtr->skeletonPoseSub.reset();
-  this->dataPtr->selectionSub.reset();
+  // raySceneQuery deletion handled by ogre
+  this->dataPtr->raySceneQuery= NULL;
 
-  Visual_M::iterator iter;
-  this->dataPtr->visuals.clear();
-  this->dataPtr->jointMsgs.clear();
-  this->dataPtr->joints.clear();
-  this->dataPtr->linkMsgs.clear();
-  this->dataPtr->sceneMsgs.clear();
-  this->dataPtr->poseMsgs.clear();
-  this->dataPtr->lightMsgs.clear();
-  this->dataPtr->visualMsgs.clear();
-
-  this->dataPtr->worldVisual.reset();
-  this->dataPtr->selectionMsg.reset();
-  this->dataPtr->lights.clear();
-
-  // Remove a scene
-  RTShaderSystem::Instance()->RemoveScene(shared_from_this());
-
-  for (uint32_t i = 0; i < this->dataPtr->grids.size(); ++i)
-    delete this->dataPtr->grids[i];
-  this->dataPtr->grids.clear();
-
-  for (unsigned int i = 0; i < this->dataPtr->cameras.size(); ++i)
-    this->dataPtr->cameras[i].reset();
-  this->dataPtr->cameras.clear();
-
-  for (unsigned int i = 0; i < this->dataPtr->userCameras.size(); ++i)
-    this->dataPtr->userCameras[i].reset();
-  this->dataPtr->userCameras.clear();
-
-  if (this->dataPtr->manager)
-  {
-    RenderEngine::Instance()->root->destroySceneManager(this->dataPtr->manager);
-    this->dataPtr->manager = NULL;
-  }
-  this->dataPtr->connections.clear();
+  this->Clear();
 
   this->dataPtr->sdf->Reset();
   this->dataPtr->sdf.reset();
@@ -610,9 +610,11 @@ uint32_t Scene::GetOculusCameraCount() const
 #endif
 
 //////////////////////////////////////////////////
-UserCameraPtr Scene::CreateUserCamera(const std::string &_name)
+UserCameraPtr Scene::CreateUserCamera(const std::string &_name,
+                                      bool _stereoEnabled)
 {
-  UserCameraPtr camera(new UserCamera(_name, shared_from_this()));
+  UserCameraPtr camera(new UserCamera(_name, shared_from_this(),
+        _stereoEnabled));
   camera->Load();
   camera->Init();
   this->dataPtr->userCameras.push_back(camera);
@@ -2083,6 +2085,11 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     this->CreateCOMVisual(_msg, linkVis);
   }
 
+  if (!this->GetVisual(_msg->name() + "_INERTIA_VISUAL__"))
+  {
+    this->CreateInertiaVisual(_msg, linkVis);
+  }
+
   for (int i = 0; i < _msg->projector_size(); ++i)
   {
     std::string pname = _msg->name() + "::" + _msg->projector(i).name();
@@ -2274,7 +2281,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
       if (vis)
         vis->ShowCOM(true);
       else
-        gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+        gzerr << "Unable to find COM visual[" << _msg->data() << "]\n";
     }
   }
   else if (_msg->request() == "hide_com")
@@ -2286,6 +2293,30 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
       VisualPtr vis = this->GetVisual(_msg->data());
       if (vis)
         vis->ShowCOM(false);
+    }
+  }
+  else if (_msg->request() == "show_inertia")
+  {
+    if (_msg->data() == "all")
+      this->ShowInertias(true);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowInertia(true);
+      else
+        gzerr << "Unable to find inertia visual[" << _msg->data() << "]\n";
+    }
+  }
+  else if (_msg->request() == "hide_inertia")
+  {
+    if (_msg->data() == "all")
+      this->ShowInertias(false);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowInertia(false);
     }
   }
   else if (_msg->request() == "set_transparent")
@@ -2435,6 +2466,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     {
       result = true;
       visual->LoadFromMsg(_msg);
+
       this->dataPtr->visuals[visual->GetId()] = visual;
       if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
           visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
@@ -2444,12 +2476,11 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       }
 
       visual->ShowCOM(this->dataPtr->showCOMs);
+      visual->ShowInertia(this->dataPtr->showInertias);
       visual->ShowCollision(this->dataPtr->showCollisions);
       visual->ShowJoints(this->dataPtr->showJoints);
       visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
       visual->SetWireframe(this->dataPtr->wireframe);
-
-      visual->UpdateFromMsg(_msg);
     }
   }
 
@@ -2697,6 +2728,18 @@ void Scene::SetSky()
 /////////////////////////////////////////////////
 void Scene::SetShadowsEnabled(bool _value)
 {
+  // If a usercamera is set to stereo mode, then turn off shadows.
+  // Our shadow mapping technique disables stereo.
+  bool stereoOverride = true;
+  for (std::vector<UserCameraPtr>::iterator iter =
+       this->dataPtr->userCameras.begin();
+       iter != this->dataPtr->userCameras.end() && stereoOverride; ++iter)
+  {
+    stereoOverride = !(*iter)->StereoEnabled();
+  }
+
+  _value = _value && stereoOverride;
+
   this->dataPtr->sdf->GetElement("shadows")->Set(_value);
 
   if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
@@ -2756,26 +2799,28 @@ void Scene::AddVisual(VisualPtr _vis)
   if (this->dataPtr->visuals.find(_vis->GetId()) !=
       this->dataPtr->visuals.end())
   {
-    gzerr << "Duplicate visuals detected[" << _vis->GetName() << "]\n";
+    gzwarn << "Duplicate visuals detected[" << _vis->GetName() << "]\n";
   }
 
   this->dataPtr->visuals[_vis->GetId()] = _vis;
 }
 
 /////////////////////////////////////////////////
-void Scene::RemoveVisual(VisualPtr _vis)
+void Scene::RemoveVisual(uint32_t _id)
 {
-  if (_vis)
+  // Delete the visual
+  auto iter = this->dataPtr->visuals.find(_id);
+  if (iter != this->dataPtr->visuals.end())
   {
+    VisualPtr vis = iter->second;
     // Remove all projectors attached to the visual
-    std::map<std::string, Projector *>::iterator piter =
-      this->dataPtr->projectors.begin();
+    auto piter = this->dataPtr->projectors.begin();
     while (piter != this->dataPtr->projectors.end())
     {
       // Check to see if the projector is a child of the visual that is
       // being removed.
       if (piter->second->GetParent()->GetRootVisual()->GetName() ==
-          _vis->GetRootVisual()->GetName())
+          vis->GetRootVisual()->GetName())
       {
         delete piter->second;
         this->dataPtr->projectors.erase(piter++);
@@ -2784,17 +2829,32 @@ void Scene::RemoveVisual(VisualPtr _vis)
         ++piter;
     }
 
-    // Delete the visual
-    Visual_M::iterator iter = this->dataPtr->visuals.find(_vis->GetId());
-    if (iter != this->dataPtr->visuals.end())
-    {
-      iter->second->Fini();
-      this->dataPtr->visuals.erase(iter);
-    }
-
+    vis->Fini();
+    this->dataPtr->visuals.erase(iter);
     if (this->dataPtr->selectedVis && this->dataPtr->selectedVis->GetId() ==
-        _vis->GetId())
+        vis->GetId())
       this->dataPtr->selectedVis.reset();
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::RemoveVisual(VisualPtr _vis)
+{
+  this->RemoveVisual(_vis->GetId());
+}
+
+/////////////////////////////////////////////////
+void Scene::SetVisualId(VisualPtr _vis, uint32_t _id)
+{
+  if (!_vis)
+    return;
+
+  auto iter = this->dataPtr->visuals.find(_vis->GetId());
+  if (iter != this->dataPtr->visuals.end())
+  {
+    this->dataPtr->visuals.erase(_vis->GetId());
+    this->dataPtr->visuals[_id] = _vis;
+    _vis->SetId(_id);
   }
 }
 
@@ -2845,7 +2905,7 @@ void Scene::SetGrid(bool _enabled)
 //////////////////////////////////////////////////
 std::string Scene::StripSceneName(const std::string &_name) const
 {
-  if (_name.find(this->GetName() + "::") == 0)
+  if (_name.find(this->GetName() + "::") != std::string::npos)
     return _name.substr(this->GetName().size() + 2);
   else
     return _name;
@@ -2879,13 +2939,32 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 }
 
 /////////////////////////////////////////////////
+void Scene::CreateInertiaVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
+{
+  InertiaVisualPtr inertiaVis(new InertiaVisual(_msg->name() +
+      "_INERTIA_VISUAL__", _linkVisual));
+  inertiaVis->Load(_msg);
+  inertiaVis->SetVisible(this->dataPtr->showInertias);
+  this->dataPtr->visuals[inertiaVis->GetId()] = inertiaVis;
+}
+
+/////////////////////////////////////////////////
+void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
+{
+  InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->GetName() +
+      "_Inertia_VISUAL__", _linkVisual));
+  inertiaVis->Load(_elem);
+  inertiaVis->SetVisible(false);
+  this->dataPtr->visuals[inertiaVis->GetId()] = inertiaVis;
+}
+
+/////////////////////////////////////////////////
 void Scene::SetWireframe(bool _show)
 {
   this->dataPtr->wireframe = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->SetWireframe(_show);
+    visual.second->SetWireframe(_show);
   }
 
   if (this->dataPtr->terrain)
@@ -2896,10 +2975,9 @@ void Scene::SetWireframe(bool _show)
 void Scene::SetTransparent(bool _show)
 {
   this->dataPtr->transparent = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->SetTransparency(_show ? 0.5 : 0.0);
+    visual.second->SetTransparency(_show ? 0.5 : 0.0);
   }
 }
 
@@ -2907,10 +2985,19 @@ void Scene::SetTransparent(bool _show)
 void Scene::ShowCOMs(bool _show)
 {
   this->dataPtr->showCOMs = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->ShowCOM(_show);
+    visual.second->ShowCOM(_show);
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowInertias(bool _show)
+{
+  this->dataPtr->showInertias = _show;
+  for (auto visual : this->dataPtr->visuals)
+  {
+    visual.second->ShowInertia(_show);
   }
 }
 
@@ -2918,10 +3005,9 @@ void Scene::ShowCOMs(bool _show)
 void Scene::ShowCollisions(bool _show)
 {
   this->dataPtr->showCollisions = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->ShowCollision(_show);
+    visual.second->ShowCollision(_show);
   }
 }
 
@@ -2929,10 +3015,9 @@ void Scene::ShowCollisions(bool _show)
 void Scene::ShowJoints(bool _show)
 {
   this->dataPtr->showJoints = _show;
-  for (Visual_M::iterator iter = this->dataPtr->visuals.begin();
-       iter != this->dataPtr->visuals.end(); ++iter)
+  for (auto visual : this->dataPtr->visuals)
   {
-    iter->second->ShowJoints(_show);
+    visual.second->ShowJoints(_show);
   }
 }
 

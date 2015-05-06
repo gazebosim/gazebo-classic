@@ -59,7 +59,8 @@ namespace gazebo
 
     /// \class Visual Visual.hh rendering/rendering.hh
     /// \brief A renderable object
-    class GAZEBO_VISIBLE Visual : public boost::enable_shared_from_this<Visual>
+    class GZ_RENDERING_VISIBLE Visual :
+      public boost::enable_shared_from_this<Visual>
     {
       /// \brief Constructor
       /// \param[in] _name Name of the visual.
@@ -105,6 +106,14 @@ namespace gazebo
 
       /// \brief Update the visual.
       public: void Update();
+
+      /// \brief Get the visual SDF. Note that visuals are abstract. This SDF
+      /// could be associated with a visual that represents a model, a link,
+      /// a visual (inside a link), or a visualization object
+      /// (e.g. LaserVisual). Therefore this SDF may store more fields than
+      /// actually used.
+      /// \return SDF of the visual.
+      public: sdf::ElementPtr GetSDF() const;
 
       /// \brief Set the name of the visual
       /// \param[in] _name Name of the visual
@@ -171,6 +180,10 @@ namespace gazebo
       /// \return The scaling factor.
       public: math::Vector3 GetScale();
 
+      /// \brief Get whether or not lighting is enabled.
+      /// \return True if lighting is enabled.
+      public: bool GetLighting() const;
+
       /// \brief Set whether or not to enable or disable lighting.
       /// \param[in] _lighting True to enable lighting.
       public: void SetLighting(bool _lighting);
@@ -194,6 +207,22 @@ namespace gazebo
       /// \brief Set the specular color of the visual.
       /// \param[in] _color Specular color.
       public: void SetSpecular(const common::Color &_color);
+
+      /// \brief Get the ambient color of the visual.
+      /// \return Ambient color.
+      public: common::Color GetAmbient() const;
+
+      /// \brief Get the diffuse color of the visual.
+      /// \return Diffuse color.
+      public: common::Color GetDiffuse() const;
+
+      /// \brief Get the specular color of the visual.
+      /// \return Specular color.
+      public: common::Color GetSpecular() const;
+
+      /// \brief Get the emissive color of the visual.
+      /// \return Emissive color.
+      public: common::Color GetEmissive() const;
 
       /// \brief Attach visualization axes
       public: void AttachAxes();
@@ -228,6 +257,10 @@ namespace gazebo
       /// \brief Set the emissive value.
       /// \param[in] _color The emissive color.
       public: virtual void SetEmissive(const common::Color &_color);
+
+      /// \brief Get whether the visual casts shadows.
+      /// \return True if the visual casts shadows.
+      public: bool GetCastShadows() const;
 
       /// \brief Set whether the visual should cast shadows.
       /// \param[in] _shadows True to enable shadows.
@@ -376,6 +409,19 @@ namespace gazebo
       /// visual.
       public: VisualPtr GetRootVisual();
 
+      /// \brief Get the nth ancestor counting from the world visual.
+      /// GetNthAncestor(0) returns the world visual. GetNthAncestor(1) returns
+      /// the RootVisual. GetNthAncestor(2) returns the ancestor which is a
+      /// child of the root visual and so on.
+      /// \param[in] _n Depth of the ancestor.
+      /// \return The nth ancestor counting from the world.
+      public: VisualPtr GetNthAncestor(unsigned int _n);
+
+      /// \brief Get the depth of this visual, where 0 is the depth of the
+      /// world visual.
+      /// \return This visual's depth.
+      public: unsigned int GetDepth() const;
+
       /// \brief Get the shader type.
       /// \return String of the shader type: "vertex", "pixel",
       /// "normal_map_object_space", "normal_map_tangent_space".
@@ -441,6 +487,10 @@ namespace gazebo
       /// \param[in] _show True to show center of mass visualizations.
       public: void ShowCOM(bool _show);
 
+      /// \brief Display inertia visuals.
+      /// \param[in] _show True to show inertia visualizations.
+      public: void ShowInertia(bool _show);
+
       /// \brief Set animation skeleton pose.
       /// \param[in] _pose Skelton message
       public: void SetSkeletonPose(const msgs::PoseAnimation &_pose);
@@ -462,6 +512,10 @@ namespace gazebo
 
       /// \brief Set the id associated with this visual
       public: void SetId(uint32_t _id);
+
+      /// \brief Get the geometry type.
+      /// \return Type of geometry in string.
+      public: std::string GetGeometryType() const;
 
       /// \brief The name of the mesh set in the visual's SDF.
       /// \return Name of the mesh.

@@ -15,7 +15,7 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
@@ -80,10 +80,9 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   EXPECT_NEAR(laser->GetRangeMax(), 10, DOUBLE_TOL);
   EXPECT_NEAR(laser->GetRangeResolution(), 0.01, DOUBLE_TOL);
 
-
   for (int i = 0; i < laser->GetRangeCount(); ++i)
   {
-    EXPECT_EQ(10, laser->GetRange(i));
+    EXPECT_DOUBLE_EQ(GZ_DBL_INF, laser->GetRange(i));
   }
 
   // Spawn a box and test for proper laser scan
@@ -247,9 +246,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   EXPECT_NEAR(raySensor->GetRange(mid), expectedRangeAtMidPoint, LASER_TOL);
   EXPECT_NEAR(raySensor->GetRange(0), expectedRangeAtMidPoint, LASER_TOL);
 
-  // WARNING: for readings of no return, gazebo returns max range rather
-  // than +inf. issue #124
-  EXPECT_NEAR(raySensor->GetRange(samples-1), maxRange, LASER_TOL);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(samples-1), GZ_DBL_INF);
 
   // Move all boxes out of range
   world->GetModel(box01)->SetWorldPose(
@@ -262,7 +259,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 
   for (int i = 0; i < raySensor->GetRayCount(); ++i)
   {
-    EXPECT_NEAR(raySensor->GetRange(i), maxRange, LASER_TOL);
+    EXPECT_DOUBLE_EQ(raySensor->GetRange(i), GZ_DBL_INF);
   }
 }
 
@@ -347,11 +344,8 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
 
     angleStep += vAngleStep;
 
-    // WARNING: for readings of no return, gazebo returns max range rather
-    // than +inf. issue #124
-    EXPECT_NEAR(raySensor->GetRange(i*samples), maxRange, LASER_TOL);
-    EXPECT_NEAR(raySensor->GetRange(i*samples + samples-1),
-        maxRange, LASER_TOL);
+    EXPECT_DOUBLE_EQ(raySensor->GetRange(i*samples), GZ_DBL_INF);
+    EXPECT_DOUBLE_EQ(raySensor->GetRange(i*samples + samples-1), GZ_DBL_INF);
   }
 
   // Move box out of range
@@ -364,8 +358,8 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
   {
     for (int i = 0; i < raySensor->GetRayCount(); ++i)
     {
-      EXPECT_NEAR(raySensor->GetRange(j*raySensor->GetRayCount() + i),
-          maxRange, LASER_TOL);
+      EXPECT_DOUBLE_EQ(raySensor->GetRange(j*raySensor->GetRayCount() + i),
+          GZ_DBL_INF);
     }
   }
 }
@@ -586,20 +580,13 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  // Expect at least one value to be non-max (empty world), and expect the
-  // mean to be close to the max+noiseMean
-  double total = 0.0;
   bool foundNoise = false;
   for (int i = 0; i < raySensor->GetRayCount(); ++i)
   {
     if (fabs(raySensor->GetRange(i) - maxRange) > LASER_TOL)
       foundNoise = true;
-    total += raySensor->GetRange(i);
   }
   EXPECT_TRUE(foundNoise);
-  double mean = total / raySensor->GetRayCount();
-  // The mean should be well within 3-sigma
-  EXPECT_NEAR(mean, maxRange + noiseMean, 3*noiseStdDev);
 }
 
 TEST_P(LaserTest, LaserNoise)

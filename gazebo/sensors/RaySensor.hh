@@ -128,7 +128,7 @@ namespace gazebo
       ///         problem by using SetActive(false) <your accessor loop>
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
-      /// \return Returns DBL_MAX for no detection.
+      /// \return Returns RangeMax for no detection.
       public: double GetRange(unsigned int _index);
 
       /// \brief Get all the ranges

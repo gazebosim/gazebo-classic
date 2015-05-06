@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_FFMPEG_INC_HH_
 #define _GAZEBO_FFMPEG_INC_HH_
 
+#include <gazebo/gazebo_config.h>
+
 #pragma GCC system_header
 
 #ifdef HAVE_FFMPEG
@@ -32,6 +34,24 @@ extern "C" {
 #include <libavutil/opt.h>
 #include <libswscale/swscale.h>
 }
-#endif  // ifdef HAVE_FFMPEG
 
-#endif  // ifndef _GAZEBO_FFMPEG_INC_HH
+#include "gazebo/util/system.hh"
+
+namespace gazebo
+{
+  namespace common
+  {
+    /// \brief Helper function to avoid deprecation warnings.
+    GZ_COMMON_VISIBLE
+    AVFrame *AVFrameAlloc(void);
+
+    /// \brief Helper function to avoid deprecation warnings.
+    GZ_COMMON_VISIBLE
+    void AVFrameUnref(AVFrame *_frame);
+  }
+}
+// ifdef HAVE_FFMPEG
+#endif
+
+// ifndef _GAZEBO_FFMPEG_INC_HH
+#endif

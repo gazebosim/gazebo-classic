@@ -42,14 +42,14 @@ namespace gazebo
     class EntityMaker;
     class EditorItem;
     class BuildingModelManip;
-    class FinishBuildingDialog;
+    class SaveDialog;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class BuildingMaker BuildingMaker.hh
     /// \brief Create and manage 3D visuals of a building.
-    class GAZEBO_VISIBLE BuildingMaker : public EntityMaker
+    class GZ_GUI_BUILDING_VISIBLE BuildingMaker : public EntityMaker
     {
       /// \enum SaveState
       /// \brief Save states for the building editor.
@@ -208,14 +208,6 @@ namespace gazebo
       /// \return Angle in radians.
       public: static double ConvertAngle(double _angle);
 
-      /// \brief Save model to SDF format.
-      /// \param[in] _savePath Path to save the SDF to.
-      public: void SaveToSDF(const std::string &_savePath);
-
-      /// \brief Save config file.
-      /// \param[in] _savePath Path to save the file to.
-      public: void SaveToConfig(const std::string &_savePath);
-
       /// \brief Reset the building maker and the SDF.
       public: void Reset();
 
@@ -227,9 +219,6 @@ namespace gazebo
 
       /// \brief Generate the SDF from building part visuals.
       public: void GenerateSDF();
-
-      /// \brief Generate the config file.
-      public: void GenerateConfig();
 
       // Documentation inherited
       public: virtual bool IsActive() const;
@@ -252,9 +241,6 @@ namespace gazebo
 
       /// \brief Get a template SDF string of a simple model.
       private: std::string GetTemplateSDFString();
-
-      /// \brief Get a template config file for a simple model.
-      private: std::string GetTemplateConfigString();
 
       /// \brief Internal helper function for QPointF comparison used by the
       /// surface subsivision algorithm.
@@ -281,14 +267,12 @@ namespace gazebo
       private: void SaveModelFiles();
 
       /// \brief Callback for saving the model.
-      /// \param[in] _saveName Name to save the model.
       /// \return True if the user chose to save, false if the user cancelled.
-      private: bool OnSave(const std::string &_saveName = "");
+      private: bool OnSave();
 
       /// \brief Callback for selecting a folder and saving the model.
-      /// \param[in] _saveName Name to save the model.
       /// \return True if the user chose to save, false if the user cancelled.
-      private: bool OnSaveAs(const std::string &_saveName);
+      private: bool OnSaveAs();
 
       /// \brief Callback for when the name is changed through the Palette.
       /// \param[in] _modelName The newly entered building name.
@@ -355,11 +339,11 @@ namespace gazebo
       /// \brief A template SDF of a simple box model.
       private: sdf::SDFPtr modelTemplateSDF;
 
-      /// \brief The building model's config file.
-      private: TiXmlDocument modelConfig;
-
       /// \brief Name of the building model.
       private: std::string modelName;
+
+      /// \brief Folder name, which is the model name without spaces.
+      private: std::string folderName;
 
       /// \brief Name of the building model preview.
       private: static const std::string previewName;
@@ -385,24 +369,6 @@ namespace gazebo
       /// \brief Store the current save state of the model.
       private: enum SaveState currentSaveState;
 
-      /// \brief Default directory to save models: ~/building_editor_models
-      private: std::string defaultPath;
-
-      /// \brief Path to where the model is saved.
-      private: std::string saveLocation;
-
-      /// \brief Name of the building model's author.
-      private: std::string authorName;
-
-      /// \brief Name of the building model's author's email.
-      private: std::string authorEmail;
-
-      /// \brief Model description.
-      private: std::string description;
-
-      /// \brief Model version.
-      private: std::string version;
-
       /// \brief A list of gui editor events connected to the building maker.
       private: std::vector<event::ConnectionPtr> connections;
 
@@ -410,7 +376,7 @@ namespace gazebo
       private: static const std::string buildingDefaultName;
 
       /// \brief A dialog for setting building model name and save location.
-      private: FinishBuildingDialog *saveDialog;
+      private: SaveDialog *saveDialog;
 
       /// \brief Visual that is currently hovered over by the mouse.
       private: rendering::VisualPtr hoverVis;

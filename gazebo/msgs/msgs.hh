@@ -130,6 +130,18 @@ namespace gazebo
     GAZEBO_VISIBLE
     std::string ConvertJointType(const msgs::Joint::Type _type);
 
+    /// \brief Convert a string to a msgs::Geometry::Type enum.
+    /// \param[in] _str Geometry type string.
+    /// \return A msgs::Geometry::Type enum.
+    GAZEBO_VISIBLE
+    msgs::Geometry::Type ConvertGeometryType(const std::string &_str);
+
+    /// \brief Convert a msgs::Geometry::Type to a string.
+    /// \param[in] _type A msgs::Geometry::Type enum.
+    /// \return Geometry type string.
+    GAZEBO_VISIBLE
+    std::string ConvertGeometryType(const msgs::Geometry::Type _type);
+
     /// \brief Convert a msgs::Vector3d to a math::Vector
     /// \param[in] _v The plane to convert
     /// \return A math::Vector3 object
@@ -270,6 +282,18 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create a msgs::Axis from an axis SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Axis object
+    GAZEBO_VISIBLE
+    msgs::Axis AxisFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::Joint from a joint SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Joint object
+    GAZEBO_VISIBLE
+    msgs::Joint JointFromSDF(sdf::ElementPtr _sdf);
+
     /// \brief Create or update an SDF element from a msgs::Visual
     /// \param[in] _msg Visual messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
@@ -352,7 +376,6 @@ namespace gazebo
     sdf::ElementPtr CollisionToSDF(const msgs::Collision &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
-    /// \internal
     /// \brief Create or update an SDF element from a msgs::Link.
     /// If _sdf is supplied and _msg has any collisions or visuals,
     /// the <collision> and <visual> elements will be removed from _sdf.

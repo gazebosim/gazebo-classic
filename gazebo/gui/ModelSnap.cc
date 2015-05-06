@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
@@ -46,29 +52,58 @@ ModelSnap::ModelSnap()
   this->dataPtr->selectedTriangleDirty = false;
   this->dataPtr->hoverTriangleDirty = false;
   this->dataPtr->snapLines = NULL;
-
-  this->dataPtr->updateMutex = new boost::recursive_mutex();
+  this->dataPtr->updateMutex = NULL;
 }
 
 /////////////////////////////////////////////////
 ModelSnap::~ModelSnap()
 {
+  this->Clear();
+  delete this->dataPtr;
+  this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelSnap::Clear()
+{
+  this->dataPtr->selectedTriangleDirty = false;
+  this->dataPtr->hoverTriangleDirty = false;
+  this->dataPtr->selectedTriangle.clear();
+  this->dataPtr->hoverTriangle.clear();
+  this->dataPtr->selectedVis.reset();
+  this->dataPtr->hoverVis.reset();
+
+  this->dataPtr->node.reset();
   this->dataPtr->modelPub.reset();
 
+  if (this->dataPtr->updateMutex)
   {
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
-    if (this->dataPtr->snapLines)
-      delete this->dataPtr->snapLines;
+    delete this->dataPtr->snapLines;
+    this->dataPtr->snapLines = NULL;
     this->dataPtr->snapVisual.reset();
+
+    if (this->dataPtr->snapHighlight != NULL &&
+        this->dataPtr->highlightVisual != NULL)
+    {
+      this->dataPtr->highlightVisual->
+          DeleteDynamicLine(this->dataPtr->snapHighlight);
+    }
+    this->dataPtr->highlightVisual.reset();
   }
 
-  event::Events::DisconnectRender(this->dataPtr->renderConnection);
+  if (this->dataPtr->renderConnection)
+    event::Events::DisconnectRender(this->dataPtr->renderConnection);
   this->dataPtr->renderConnection.reset();
 
   delete this->dataPtr->updateMutex;
+  this->dataPtr->updateMutex = NULL;
 
-  delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr->scene.reset();
+  this->dataPtr->userCamera.reset();
+  this->dataPtr->rayQuery.reset();
+
+  this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////
@@ -86,6 +121,8 @@ void ModelSnap::Init()
 
   this->dataPtr->userCamera = cam;
   this->dataPtr->scene =  cam->GetScene();
+
+  this->dataPtr->updateMutex = new boost::recursive_mutex();
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
@@ -198,6 +235,8 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     // Parent model or parent link
     rendering::VisualPtr currentParent = vis->GetRootVisual();
     rendering::VisualPtr previousParent;
+    rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
+
     if (gui::get_entity_id(currentParent->GetName()))
     {
       if (this->dataPtr->selectedVis)
@@ -205,9 +244,11 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     }
     else
     {
-      currentParent = vis->GetParent();
+      currentParent = topLevelVis;
       if (this->dataPtr->selectedVis)
-        previousParent = this->dataPtr->selectedVis->GetParent();
+      {
+        previousParent = this->dataPtr->selectedVis->GetNthAncestor(2);
+      }
     }
 
     // Select first triangle on any mesh

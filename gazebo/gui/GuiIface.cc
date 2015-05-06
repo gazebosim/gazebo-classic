@@ -20,7 +20,7 @@
 #include <boost/property_tree/ini_parser.hpp>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gazebo.hh"
+#include "gazebo/gazebo_client.hh"
 
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Console.hh"
@@ -71,7 +71,7 @@ void print_usage()
 void signal_handler(int)
 {
   gazebo::gui::stop();
-  gazebo::shutdown();
+  gazebo::client::shutdown();
 }
 
 //////////////////////////////////////////////////
@@ -113,7 +113,7 @@ bool parse_args(int _argc, char **_argv)
 
   if (vm.count("verbose"))
   {
-    gazebo::printVersion();
+    gazebo::client::printVersion();
     gazebo::common::Console::SetQuiet(false);
   }
 
@@ -126,7 +126,7 @@ bool parse_args(int _argc, char **_argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      gazebo::addPlugin(*iter);
+      gazebo::client::addPlugin(*iter);
     }
   }
 
@@ -271,7 +271,7 @@ bool gui::run(int _argc, char **_argv)
   if (!parse_args(_argc, _argv))
     return false;
 
-  if (!gazebo::setupClient(_argc, _argv))
+  if (!gazebo::client::setup(_argc, _argv))
     return false;
 
   if (!gazebo::gui::load())
@@ -292,14 +292,16 @@ bool gui::run(int _argc, char **_argv)
   g_app->exec();
 
   gazebo::gui::fini();
-  gazebo::shutdown();
+  gazebo::client::shutdown();
+
+  delete g_main_win;
   return true;
 }
 
 /////////////////////////////////////////////////
 void gui::stop()
 {
-  gazebo::shutdown();
+  gazebo::client::shutdown();
   g_active_camera.reset();
   g_app->quit();
 }

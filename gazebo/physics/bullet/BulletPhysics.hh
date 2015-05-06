@@ -45,7 +45,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet physics engine
-    class GAZEBO_VISIBLE BulletPhysics : public PhysicsEngine
+    class GZ_PHYSICS_VISIBLE BulletPhysics : public PhysicsEngine
     {
       /// \enum BulletParam
       /// \brief Bullet physics parameter types.
@@ -163,6 +163,10 @@ namespace gazebo
 
       /// Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
+
+      /// Documentation inherited
+      public: virtual bool GetParam(const std::string &_key,
+          boost::any &_value) const;
 
       // Documentation inherited
       public: virtual void SetSORPGSIters(unsigned int iters);

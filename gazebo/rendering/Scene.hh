@@ -65,7 +65,8 @@ namespace gazebo
     /// \brief Representation of an entire scene graph.
     ///
     /// Maintains all the Visuals, Lights, and Cameras for a World.
-    class GAZEBO_VISIBLE Scene : public boost::enable_shared_from_this<Scene>
+    class GZ_RENDERING_VISIBLE Scene :
+      public boost::enable_shared_from_this<Scene>
     {
       public: enum SkyXMode {
         GZ_SKYX_ALL = 0x0FFFFFFF,
@@ -197,8 +198,11 @@ namespace gazebo
       ///
       /// A user camera is one design for use with a GUI.
       /// \param[in] _name Name of the UserCamera.
+      /// \param[in] _stereoEnabled True to enable stereo rendering. This is
+      /// here for compatibility with 3D monitors/TVs.
       /// \return A pointer to the new UserCamera.
-      public: UserCameraPtr CreateUserCamera(const std::string &_name);
+      public: UserCameraPtr CreateUserCamera(const std::string &_name,
+                  bool _stereoEnabled = false);
 
       /// \brief Get the number of user cameras in this scene
       /// \return The number of user cameras.
@@ -357,6 +361,17 @@ namespace gazebo
       /// \param[in] _vis Visual to remove.
       public: void RemoveVisual(VisualPtr _vis);
 
+      /// \brief Remove a visual from the scene.
+      /// \param[in] _id Id of the visual to remove.
+      public: void RemoveVisual(uint32_t _id);
+
+      /// \internal
+      /// \brief Set the id of a visual. Internally used when visual ids'
+      /// are required to be updated from visual msgs.
+      /// \param[in] _vis Pointer to visual.
+      /// \param[in] _id New id to set to.
+      public: void SetVisualId(VisualPtr _vis, uint32_t _id);
+
       /// \brief Add a light to the scene
       /// \param[in] _light Light to add.
       public: void AddLight(LightPtr _light);
@@ -401,6 +416,10 @@ namespace gazebo
       /// \brief Enable or disable center of mass visualization.
       /// \param[in] _show True to enable center of mass visualization.
       public: void ShowCOMs(bool _show);
+
+      /// \brief Enable or disable inertia visualization.
+      /// \param[in] _show True to enable inertia visualization.
+      public: void ShowInertias(bool _show);
 
       /// \brief Enable or disable joint visualization.
       /// \param[in] _show True to enable joint visualization.
@@ -582,6 +601,18 @@ namespace gazebo
       /// \param[in] _linkVisual Pointer to the link's visual.
       private: void CreateCOMVisual(sdf::ElementPtr _elem,
                                     VisualPtr _linkVisual);
+
+      /// \brief Create a new inertia visual.
+      /// \param[in] _msg Message containing the link data.
+      /// \param[in] _linkVisual Pointer to the link's visual.
+      private: void CreateInertiaVisual(ConstLinkPtr &_msg,
+          VisualPtr _linkVisual);
+
+      /// \brief Create an inertia visual using SDF data.
+      /// \param[in] _elem SDF element data.
+      /// \param[in] _linkVisual Pointer to the link's visual.
+      private: void CreateInertiaVisual(sdf::ElementPtr _elem,
+          VisualPtr _linkVisual);
 
       /// \internal
       /// \brief Pointer to private data.

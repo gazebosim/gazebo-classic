@@ -36,7 +36,7 @@ namespace gazebo
     /// \{
 
     /// \brief Simbody Link class
-    class GAZEBO_VISIBLE SimbodyLink : public Link
+    class GZ_PHYSICS_VISIBLE SimbodyLink : public Link
     {
       /// \brief Constructor
       public: SimbodyLink(EntityPtr _parent);
@@ -124,6 +124,10 @@ namespace gazebo
       public: virtual void AddForceAtRelativePosition(
                   const math::Vector3 &_force,
                   const math::Vector3 &_relpos);
+
+      // Documentation inherited
+      public: virtual void AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero);
 
       // Documentation inherited.
       public: virtual void AddTorque(const math::Vector3 &_torque);

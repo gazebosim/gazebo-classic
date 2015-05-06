@@ -17,6 +17,12 @@
 #ifndef _GAZEBO_WORLD_HH_
 #define _GAZEBO_WORLD_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <vector>
 #include <list>
 #include <set>
@@ -59,7 +65,8 @@ namespace gazebo
     /// (links, joints, sensors, plugins, etc), and WorldPlugin instances.
     /// Many core function are also handled in the World, including physics
     /// update, model updates, and message processing.
-    class GAZEBO_VISIBLE World : public boost::enable_shared_from_this<World>
+    class GZ_PHYSICS_VISIBLE World :
+      public boost::enable_shared_from_this<World>
     {
       /// \brief Constructor.
       /// Constructor for the World. Must specify a unique name.
@@ -114,6 +121,10 @@ namespace gazebo
       /// Get a pointer to the physics engine used by the world.
       /// \return Pointer to the physics engine.
       public: PhysicsEnginePtr GetPhysicsEngine() const;
+
+      /// \brief Return the preset manager.
+      /// \return Pointer to the preset manager.
+      public: PresetManagerPtr GetPresetManager() const;
 
       /// \brief Return the spherical coordinates converter.
       /// \return Pointer to the spherical coordinates converter.

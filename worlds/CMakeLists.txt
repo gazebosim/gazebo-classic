@@ -1,6 +1,5 @@
 set (files
   actor.world
-  arat.world
   blank.world
   camera.world
   cart_demo.world

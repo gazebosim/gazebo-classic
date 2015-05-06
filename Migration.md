@@ -1,3 +1,39 @@
+## Gazebo 5.X to 6.X
+
+### Modifications
+
+1. Gazebo client's should now use `gazebo/gazebo_client.hh` and `libgazebo_client.so` instead of `gazebo/gazebo.hh` and `libgazebo.so`. This separates running a Gazebo server from a Gazebo client.
+
+1. **gazebo/rendering/GpuLaser.hh**
+    + ***Removed:*** protected: double near
+    + ***Replacement:*** protected: double nearClip
+
+1. **gazebo/rendering/GpuLaser.hh**
+    + ***Removed:*** protected: double far
+    + ***Replacement:*** protected: double farClip
+
+1. **gazebo/common/MeshManager.hh**
+    + ***Removed:*** void CreateExtrudedPolyline(const std::string &_name, const std::vector<math::Vector2d> &_vertices, const double &_height, const math::Vector2d &_uvCoords)
+    + ***Replacement:*** void CreateExtrudedPolyline(const std::string &_name, const const std::vector<std::vector<math::Vector2d> > &_vertices, const double &_height, const math::Vector2d &_uvCoords)
+
+1. **gazebo/common/GTSMeshUtils.hh**
+    + ***Removed:*** public: static bool CreateExtrudedPolyline(const std::vector<math::Vector2d> &_vertices, const double &_height, SubMesh *_submesh)
+    + ***Replacement:*** public: static bool DelaunayTriangulation(const std::vector<std::vector<math::Vector2d> > &_path, SubMesh *_submesh)
+
+1. **gazebo/physics/PolylineShape.hh**
+    + ***Removed:*** public: std::vector<math::Vector2d> GetVertices() const
+    + ***Replacement:*** public: std::vector<std::vector<math::Vector2d> > GetVertices() const
+
+1. **gazebo/physics/SurfaceParams.hh**
+    + ***Removed:*** public: FrictionPyramid frictionPyramid
+    + ***Replacement:*** public: FrictionPyramidPtr GetFrictionPyramid() const
+
+### Deletions
+
+1. **gazebo/gui/RenderWidget.hh**
+    + The ShowEditor(bool _show)
+
+
 ## Gazebo 4.X to 5.X
 
 ### C++11 compiler required

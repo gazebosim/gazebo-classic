@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <gazebo/gazebo_config.h>
 #ifdef HAVE_SPNAV
 #include <spnav.h>
@@ -32,6 +38,7 @@ using namespace gui;
 // spnav_open() when spnav daemon is not running.
 int spnav_test_daemon(void)
 {
+#ifndef _WIN32
   int s;
   struct sockaddr_un addr;
 
@@ -49,6 +56,7 @@ int spnav_test_daemon(void)
   }
 
   close(s);
+#endif
   return 0;
 }
 
@@ -69,6 +77,10 @@ SpaceNav::~SpaceNav()
 bool SpaceNav::Load()
 {
   bool result = true;
+
+  // reset button settings
+  this->dataPtr->buttons[0] = 0;
+  this->dataPtr->buttons[1] = 0;
 
 #ifdef HAVE_SPNAV
   // Read deadband from [spacenav] in gui.ini
@@ -129,6 +141,10 @@ void SpaceNav::Run()
   {
     msgs::Joystick joystickMsg;
 
+    // add button state
+    for (unsigned int i = 0; i < 2; ++i)
+      joystickMsg.add_buttons(this->dataPtr->buttons[i]);
+
     // bool joyStale = false;
     bool queueEmpty = false;
 
@@ -137,6 +153,13 @@ void SpaceNav::Run()
       // spnav_poll_event returns 0 when no event is present
       case 0:
         queueEmpty = true;
+        break;
+
+      case SPNAV_EVENT_BUTTON:
+        // update button press
+        this->dataPtr->buttons[sev.button.bnum] = sev.button.press;
+        joystickMsg.mutable_buttons()->Set(sev.button.bnum, sev.button.press);
+        this->dataPtr->joyPub->Publish(joystickMsg);
         break;
 
       case SPNAV_EVENT_MOTION:
@@ -160,12 +183,6 @@ void SpaceNav::Run()
             this->Deadband(this->dataPtr->deadbandRot.z,
               sev.motion.ry / SCALE));
 
-        this->dataPtr->joyPub->Publish(joystickMsg);
-        break;
-
-      case SPNAV_EVENT_BUTTON:
-        joystickMsg.add_buttons(sev.button.bnum == 0 ? sev.button.press : 0);
-        joystickMsg.add_buttons(sev.button.bnum == 1 ? sev.button.press : 0);
         this->dataPtr->joyPub->Publish(joystickMsg);
         break;
 

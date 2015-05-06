@@ -19,6 +19,12 @@
  * Date: 29 March 2012
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
@@ -594,7 +600,16 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
       int index = j * this->GetRayCount() + i;
       double range = this->laserCam->GetLaserData()[index * 3];
 
-      if (!this->noises.empty())
+      // Mask ranges outside of min/max to +/- inf, as per REP 117
+      if (range >= this->GetRangeMax())
+      {
+        range = GZ_DBL_INF;
+      }
+      else if (range <= this->GetRangeMin())
+      {
+        range = -GZ_DBL_INF;
+      }
+      else if (!this->noises.empty())
       {
         range = this->noises[0]->Apply(range);
         range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());

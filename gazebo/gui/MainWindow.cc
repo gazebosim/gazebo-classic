@@ -27,7 +27,7 @@
 #include "gazebo/gui/viewers/TopicView.hh"
 #include "gazebo/gui/viewers/ImageView.hh"
 
-#include "gazebo/gazebo.hh"
+#include "gazebo/gazebo_client.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
@@ -49,6 +49,7 @@
 #include "gazebo/gui/ToolsWidget.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/AlignWidget.hh"
+#include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/SpaceNav.hh"
@@ -205,6 +206,7 @@ MainWindow::MainWindow()
 /////////////////////////////////////////////////
 MainWindow::~MainWindow()
 {
+  this->DeleteActions();
 }
 
 /////////////////////////////////////////////////
@@ -244,7 +246,7 @@ void MainWindow::Init()
   this->renderWidget->show();
 
   // Default window size is entire desktop.
-  QSize winSize = QApplication::desktop()->size();
+  QSize winSize = QApplication::desktop()->screenGeometry().size();
 
   // Get the size properties from the INI file.
   int winWidth = getINIProperty<int>("geometry.width", winSize.width());
@@ -271,9 +273,6 @@ void MainWindow::Init()
 
   this->lightSub = this->node->Subscribe("~/light", &MainWindow::OnLight, this);
 
-  this->statsSub =
-    this->node->Subscribe("~/world_stats", &MainWindow::OnStats, this);
-
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response",
       &MainWindow::OnResponse, this);
@@ -296,12 +295,6 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 
   this->connections.clear();
 
-  delete this->renderWidget;
-
-  // Cleanup the space navigator
-  delete this->spacenav;
-  this->spacenav = NULL;
-
 #ifdef HAVE_OCULUS
   if (this->oculusWindow)
   {
@@ -309,8 +302,15 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
     this->oculusWindow = NULL;
   }
 #endif
+  delete this->renderWidget;
 
-  gazebo::shutdown();
+  // Cleanup the space navigator
+  delete this->spacenav;
+  this->spacenav = NULL;
+
+  emit Close();
+
+  gazebo::client::shutdown();
 }
 
 /////////////////////////////////////////////////
@@ -410,17 +410,22 @@ void MainWindow::SaveINI()
 /////////////////////////////////////////////////
 void MainWindow::SaveAs()
 {
-  std::string filename = QFileDialog::getSaveFileName(this,
-      tr("Save World"), QString(),
-      tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
+  QFileDialog fileDialog(this, tr("Save World"), QDir::homePath(),
+      tr("SDF Files (*.xml *.sdf *.world)"));
+  fileDialog.setAcceptMode(QFileDialog::AcceptSave);
 
-  // Return if the user has canceled.
-  if (filename.empty())
-    return;
+  if (fileDialog.exec() == QDialog::Accepted)
+  {
+    QStringList selected = fileDialog.selectedFiles();
+    if (selected.empty())
+      return;
 
-  g_saveAct->setEnabled(true);
-  this->saveFilename = filename;
-  this->Save();
+    std::string filename = selected[0].toStdString();
+
+    g_saveAct->setEnabled(true);
+    this->saveFilename = filename;
+    this->Save();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -443,9 +448,9 @@ void MainWindow::Save()
     sdf::SDF sdf_parsed;
     sdf_parsed.SetFromString(msg.data());
     // Check that sdf contains world
-    if (sdf_parsed.root->HasElement("world"))
+    if (sdf_parsed.Root()->HasElement("world"))
     {
-      sdf::ElementPtr world = sdf_parsed.root->GetElement("world");
+      sdf::ElementPtr world = sdf_parsed.Root()->GetElement("world");
       sdf::ElementPtr guiElem = world->GetElement("gui");
 
       if (guiElem->HasAttribute("fullscreen"))
@@ -458,7 +463,7 @@ void MainWindow::Save()
       cameraElem->GetElement("view_controller")->Set(
           cam->GetViewControllerTypeString());
       // TODO: export track_visual properties as well.
-      msgData = sdf_parsed.root->ToString("");
+      msgData = sdf_parsed.Root()->ToString("");
     }
     else
     {
@@ -562,8 +567,6 @@ void MainWindow::Play()
   msgs::WorldControl msg;
   msg.set_pause(false);
 
-  g_pauseAct->setVisible(true);
-  g_playAct->setVisible(false);
   this->worldControlPub->Publish(msg);
 }
 
@@ -573,8 +576,6 @@ void MainWindow::Pause()
   msgs::WorldControl msg;
   msg.set_pause(true);
 
-  g_pauseAct->setVisible(false);
-  g_playAct->setVisible(true);
   this->worldControlPub->Publish(msg);
 }
 
@@ -821,6 +822,12 @@ void MainWindow::SetWireframe()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ShowGUIOverlays()
+{
+  this->GetRenderWidget()->SetOverlaysVisible(g_overlayAct->isChecked());
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ShowCOM()
 {
   if (g_showCOMAct->isChecked())
@@ -829,6 +836,17 @@ void MainWindow::ShowCOM()
   else
     transport::requestNoReply(this->node->GetTopicNamespace(),
         "hide_com", "all");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ShowInertia()
+{
+  if (g_showInertiaAct->isChecked())
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_inertia", "all");
+  else
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_inertia", "all");
 }
 
 /////////////////////////////////////////////////
@@ -847,6 +865,21 @@ void MainWindow::FullScreen()
 {
   g_fullscreen = !g_fullscreen;
   gui::Events::fullScreen(g_fullscreen);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ShowToolbars()
+{
+  if (g_showToolbarsAct->isChecked())
+  {
+    this->GetRenderWidget()->GetTimePanel()->show();
+    this->GetRenderWidget()->GetToolbar()->show();
+  }
+  else
+  {
+    this->GetRenderWidget()->GetTimePanel()->hide();
+    this->GetRenderWidget()->GetToolbar()->hide();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -961,12 +994,14 @@ void MainWindow::CreateActions()
 
   g_resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
   g_resetModelsAct->setShortcut(tr("Ctrl+Shift+R"));
+  this->addAction(g_resetModelsAct);
   g_resetModelsAct->setStatusTip(tr("Reset model poses"));
   connect(g_resetModelsAct, SIGNAL(triggered()), this,
     SLOT(OnResetModelOnly()));
 
   g_resetWorldAct = new QAction(tr("&Reset World"), this);
   g_resetWorldAct->setShortcut(tr("Ctrl+R"));
+  this->addAction(g_resetWorldAct);
   g_resetWorldAct->setStatusTip(tr("Reset the world"));
   connect(g_resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
 
@@ -1003,8 +1038,6 @@ void MainWindow::CreateActions()
   g_playAct->setStatusTip(tr("Run the world"));
   g_playAct->setVisible(false);
   connect(g_playAct, SIGNAL(triggered()), this, SLOT(Play()));
-  connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
-  this->OnPlayActionChanged();
 
   g_pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
   g_pauseAct->setStatusTip(tr("Pause the world"));
@@ -1075,7 +1108,6 @@ void MainWindow::CreateActions()
       SLOT(CreateMesh()));
   this->CreateDisabledIcon(":/images/cylinder.png", g_meshCreateAct);
 
-
   g_pointLghtCreateAct = new QAction(QIcon(":/images/pointlight.png"),
       tr("Point Light"), this);
   g_pointLghtCreateAct->setStatusTip(tr("Create a point light"));
@@ -1133,12 +1165,19 @@ void MainWindow::CreateActions()
   connect(g_viewWireframeAct, SIGNAL(triggered()), this,
           SLOT(SetWireframe()));
 
-  g_showCOMAct = new QAction(tr("Center of Mass / Inertia"), this);
-  g_showCOMAct->setStatusTip(tr("Show COM/MOI"));
+  g_showCOMAct = new QAction(tr("Center of Mass"), this);
+  g_showCOMAct->setStatusTip(tr("Show center of mass"));
   g_showCOMAct->setCheckable(true);
   g_showCOMAct->setChecked(false);
   connect(g_showCOMAct, SIGNAL(triggered()), this,
           SLOT(ShowCOM()));
+
+  g_showInertiaAct = new QAction(tr("Inertias"), this);
+  g_showInertiaAct->setStatusTip(tr("Show moments of inertia"));
+  g_showInertiaAct->setCheckable(true);
+  g_showInertiaAct->setChecked(false);
+  connect(g_showInertiaAct, SIGNAL(triggered()), this,
+      SLOT(ShowInertia()));
 
   g_showContactsAct = new QAction(tr("Contacts"), this);
   g_showContactsAct->setStatusTip(tr("Show Contacts"));
@@ -1154,8 +1193,19 @@ void MainWindow::CreateActions()
   connect(g_showJointsAct, SIGNAL(triggered()), this,
           SLOT(ShowJoints()));
 
+  g_showToolbarsAct = new QAction(tr("Show Toolbars"), this);
+  g_showToolbarsAct->setStatusTip(
+      tr("Show or hide the top and bottom toolbars"));
+  g_showToolbarsAct->setShortcut(tr("Ctrl+H"));
+  this->addAction(g_showToolbarsAct);
+  g_showToolbarsAct->setCheckable(true);
+  g_showToolbarsAct->setChecked(true);
+  connect(g_showToolbarsAct, SIGNAL(triggered()), this,
+      SLOT(ShowToolbars()));
+
   g_fullScreenAct = new QAction(tr("Full Screen"), this);
-  g_fullScreenAct->setStatusTip(tr("Full Screen(F-11 to exit)"));
+  g_fullScreenAct->setStatusTip(tr("Full Screen (F-11 to exit)"));
+  g_fullScreenAct->setShortcut(tr("F11"));
   connect(g_fullScreenAct, SIGNAL(triggered()), this,
       SLOT(FullScreen()));
 
@@ -1170,6 +1220,13 @@ void MainWindow::CreateActions()
   g_orbitAct->setCheckable(true);
   g_orbitAct->setChecked(true);
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
+
+  g_overlayAct = new QAction(tr("Show GUI Overlays"), this);
+  g_overlayAct->setStatusTip(tr("Show GUI Overlays"));
+  g_overlayAct->setEnabled(false);
+  g_overlayAct->setCheckable(true);
+  g_overlayAct->setChecked(false);
+  connect(g_overlayAct, SIGNAL(triggered()), this, SLOT(ShowGUIOverlays()));
 
   QActionGroup *viewControlActionGroup = new QActionGroup(this);
   viewControlActionGroup->addAction(g_fpsAct);
@@ -1335,6 +1392,155 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 }
 
 /////////////////////////////////////////////////
+void MainWindow::DeleteActions()
+{
+  delete g_topicVisAct;
+  g_topicVisAct = 0;
+
+  delete g_openAct;
+  g_openAct = 0;
+
+  delete g_saveAct;
+  g_saveAct = 0;
+
+  delete g_saveAsAct;
+  g_saveAsAct = 0;
+
+  delete g_saveCfgAct;
+  g_saveCfgAct = 0;
+
+  delete g_cloneAct;
+  g_cloneAct = 0;
+
+  delete g_aboutAct;
+  g_aboutAct = 0;
+
+  delete g_quitAct;
+  g_quitAct = 0;
+
+  delete g_resetModelsAct;
+  g_resetModelsAct = 0;
+
+  delete g_resetWorldAct;
+  g_resetWorldAct = 0;
+
+  delete g_editBuildingAct;
+  g_editBuildingAct = 0;
+
+  delete g_editTerrainAct;
+  g_editTerrainAct = 0;
+
+  delete g_editModelAct;
+  g_editModelAct = 0;
+
+  delete g_stepAct;
+  g_stepAct = 0;
+
+  delete g_playAct;
+  g_playAct = 0;
+
+  delete g_pauseAct;
+  g_pauseAct = 0;
+
+  delete g_arrowAct;
+  g_arrowAct = 0,
+
+  delete g_translateAct;
+  g_translateAct = 0;
+
+  delete g_rotateAct;
+  g_rotateAct = 0;
+
+  delete g_scaleAct;
+  g_scaleAct = 0;
+
+  delete g_boxCreateAct;
+  g_boxCreateAct = 0;
+
+  delete g_sphereCreateAct;
+  g_sphereCreateAct = 0;
+
+  delete g_cylinderCreateAct;
+  g_cylinderCreateAct = 0;
+
+  delete g_meshCreateAct;
+  g_meshCreateAct = 0;
+
+  delete g_pointLghtCreateAct;
+  g_pointLghtCreateAct = 0;
+
+  delete g_spotLghtCreateAct;
+  g_spotLghtCreateAct = 0;
+
+  delete g_dirLghtCreateAct;
+  g_dirLghtCreateAct = 0;
+
+  delete g_resetAct;
+  g_resetAct = 0;
+
+  delete g_showCollisionsAct;
+  g_showCollisionsAct = 0;
+
+  delete g_showGridAct;
+  g_showGridAct = 0;
+
+  delete g_transparentAct;
+  g_transparentAct = 0;
+
+  delete g_viewWireframeAct;
+  g_viewWireframeAct = 0;
+
+  delete g_showCOMAct;
+  g_showCOMAct = 0;
+
+  delete g_showInertiaAct;
+  g_showInertiaAct = 0;
+
+  delete g_showContactsAct;
+  g_showContactsAct = 0;
+
+  delete g_showJointsAct;
+  g_showJointsAct = 0;
+
+  delete g_showToolbarsAct;
+  g_showToolbarsAct = 0;
+
+  delete g_fullScreenAct;
+  g_fullScreenAct = 0;
+
+  delete g_fpsAct;
+  g_fpsAct = 0;
+
+  delete g_orbitAct;
+  g_orbitAct = 0;
+
+  delete g_overlayAct;
+  g_overlayAct = 0;
+
+  delete g_viewOculusAct;
+  g_viewOculusAct = 0;
+
+  delete g_dataLoggerAct;
+  g_dataLoggerAct = 0;
+
+  delete g_screenshotAct;
+  g_screenshotAct = 0;
+
+  delete g_copyAct;
+  g_copyAct = 0;
+
+  delete g_pasteAct;
+  g_pasteAct = 0;
+
+  delete g_snapAct;
+  g_snapAct = 0;
+
+  delete g_alignAct;
+  g_alignAct = 0;
+}
+
+
+/////////////////////////////////////////////////
 void MainWindow::CreateMenuBar()
 {
   // main window's menu bar
@@ -1355,13 +1561,12 @@ void MainWindow::CreateMenuBar()
   this->editMenu = bar->addMenu(tr("&Edit"));
   editMenu->addAction(g_resetModelsAct);
   editMenu->addAction(g_resetWorldAct);
+  editMenu->addSeparator();
   editMenu->addAction(g_editBuildingAct);
+  editMenu->addAction(g_editModelAct);
 
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
-
-  // \TODO: Add this back in when implementing the full Model Editor spec.
-  editMenu->addAction(g_editModelAct);
 
   QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
@@ -1373,11 +1578,11 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_showCollisionsAct);
   viewMenu->addAction(g_showJointsAct);
   viewMenu->addAction(g_showCOMAct);
+  viewMenu->addAction(g_showInertiaAct);
   viewMenu->addAction(g_showContactsAct);
   viewMenu->addSeparator();
 
   viewMenu->addAction(g_resetAct);
-  viewMenu->addAction(g_fullScreenAct);
   viewMenu->addSeparator();
 
   viewMenu->addAction(g_fpsAct);
@@ -1387,8 +1592,11 @@ void MainWindow::CreateMenuBar()
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
   windowMenu->addAction(g_dataLoggerAct);
-
   windowMenu->addAction(g_viewOculusAct);
+  windowMenu->addSeparator();
+  windowMenu->addAction(g_overlayAct);
+  windowMenu->addAction(g_showToolbarsAct);
+  windowMenu->addAction(g_fullScreenAct);
 
 #ifdef HAVE_QWT
   // windowMenu->addAction(g_diagnosticsAct);
@@ -1401,6 +1609,12 @@ void MainWindow::CreateMenuBar()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::AddMenu(QMenu *_menu)
+{
+  this->menuBar->addMenu(_menu);
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreateMenus()
 {
   this->ShowMenuBar();
@@ -1410,15 +1624,6 @@ void MainWindow::CreateMenus()
   frame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
   this->setMenuWidget(frame);
-}
-
-/////////////////////////////////////////////////
-void MainWindow::CreateToolbars()
-{
-  this->playToolbar = this->addToolBar(tr("Play"));
-  this->playToolbar->addAction(g_playAct);
-  this->playToolbar->addAction(g_pauseAct);
-  this->playToolbar->addAction(g_stepAct);
 }
 
 /////////////////////////////////////////////////
@@ -1535,6 +1740,9 @@ void MainWindow::OnAddPlugins()
     }
   }
   this->pluginMsgs.clear();
+
+  g_overlayAct->setChecked(true);
+  g_overlayAct->setEnabled(true);
 }
 
 /////////////////////////////////////////////////
@@ -1675,36 +1883,6 @@ void MainWindow::OnSetSelectedEntity(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
-{
-  if (_msg->paused() && g_pauseAct->isVisible())
-  {
-    g_pauseAct->setVisible(false);
-    g_playAct->setVisible(true);
-  }
-  else if (!_msg->paused() && !g_playAct->isVisible())
-  {
-    g_pauseAct->setVisible(true);
-    g_playAct->setVisible(false);
-  }
-}
-
-/////////////////////////////////////////////////
-void MainWindow::OnPlayActionChanged()
-{
-  if (g_playAct->isVisible())
-  {
-    g_stepAct->setToolTip("Step the world");
-    g_stepAct->setEnabled(true);
-  }
-  else
-  {
-    g_stepAct->setToolTip("Pause the world before stepping");
-    g_stepAct->setEnabled(false);
-  }
-}
-
-/////////////////////////////////////////////////
 void MainWindow::ItemSelected(QTreeWidgetItem *_item, int)
 {
   _item->setExpanded(!_item->isExpanded());
@@ -1736,16 +1914,28 @@ RenderWidget *MainWindow::GetRenderWidget() const
 }
 
 /////////////////////////////////////////////////
+bool MainWindow::IsPaused() const
+{
+  if (this->renderWidget)
+  {
+    TimePanel *timePanel = this->renderWidget->GetTimePanel();
+    if (timePanel)
+      return timePanel->IsPaused();
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreateEditors()
 {
   // Create a Terrain Editor
-  this->editors.push_back(new TerrainEditor(this));
+  this->editors["terrain"] = new TerrainEditor(this);
 
   // Create a Building Editor
-  this->editors.push_back(new BuildingEditor(this));
+  this->editors["building"] = new BuildingEditor(this);
 
   // Create a Model Editor
-  this->editors.push_back(new ModelEditor(this));
+  this->editors["model"] = new ModelEditor(this);
 }
 
 /////////////////////////////////////////////////
@@ -1788,4 +1978,40 @@ void MainWindow::OnEditorGroup(QAction *_action)
       editorGroup->actions()[i]->setChecked(false);
     }
   }
+}
+
+/////////////////////////////////////////////////
+Editor *MainWindow::GetEditor(const std::string &_name) const
+{
+  auto iter = this->editors.find(_name);
+  if (iter != this->editors.end())
+    return iter->second;
+
+  return NULL;
+}
+
+/////////////////////////////////////////////////
+QAction *MainWindow::CloneAction(QAction *_action, QObject *_parent)
+{
+  if (!_action || !_parent)
+  {
+    gzwarn << "Missing action or parent. Not cloning action." << std::endl;
+    return NULL;
+  }
+
+  QAction *actionClone = new QAction(_action->text(), _parent);
+
+  // Copy basic information from original action.
+  actionClone->setStatusTip(_action->statusTip());
+  actionClone->setCheckable(_action->isCheckable());
+  actionClone->setChecked(_action->isChecked());
+
+  // Do not copy shortcut to avoid overlaps. Instead, connect actions.
+  // Cloned action will trigger original action, which does the desired effect.
+  connect(actionClone, SIGNAL(triggered()), _action, SLOT(trigger()));
+  // Then the original action reports its checked state to the cloned action
+  // without triggering it circularly.
+  connect(_action, SIGNAL(toggled(bool)), actionClone, SLOT(setChecked(bool)));
+
+  return actionClone;
 }

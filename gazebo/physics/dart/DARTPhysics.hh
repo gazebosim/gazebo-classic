@@ -40,7 +40,7 @@ namespace gazebo
     /// \{
 
     /// \brief DART physics engine
-    class GAZEBO_VISIBLE DARTPhysics : public PhysicsEngine
+    class GZ_PHYSICS_VISIBLE DARTPhysics : public PhysicsEngine
     {
       /// \enum DARTParam
       /// \brief DART physics parameter types.
@@ -130,6 +130,10 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
+
+      // Documentation inherited
+      public: virtual bool GetParam(const std::string &_key,
+                  boost::any &_value) const;
 
       // Documentation inherited
       public: virtual bool SetParam(const std::string &_key,
