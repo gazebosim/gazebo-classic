@@ -702,10 +702,10 @@ double ODEPhysics::GetSORPGSW()
 
 //////////////////////////////////////////////////
 /// Uncomment this until sdformat changes (sdformat repo issue #96)
-/// int ODEPhysics::GetFrictionModel()
+/// std::string ODEPhysics::GetFrictionModel()
 /// {
 ///   return this->sdf->GetElement("ode")->GetElement(
-///     "solver")->Get<int>("friction_model");
+///     "solver")->Get<std::string>("friction_model");
 /// }
 
 //////////////////////////////////////////////////
