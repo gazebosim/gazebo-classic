@@ -151,7 +151,7 @@ set (gtest_sources_dri
 
 set (TEST_DEPENDENCIES
   gazebo_rendering
-  server_fixture
+  gazebo_test_fixture
 )
 gz_build_dri_tests(${gtest_sources_dri})
 

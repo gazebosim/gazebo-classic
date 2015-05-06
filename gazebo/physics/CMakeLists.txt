@@ -163,6 +163,6 @@ set (gtest_sources
 )
 set (TEST_DEPENDENCIES
   gazebo_physics
-  server_fixture
+  gazebo_test_fixture
 )
 gz_build_tests(${gtest_sources})
