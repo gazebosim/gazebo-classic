@@ -45,7 +45,7 @@ RestWebPlugin::RestWebPlugin()
   C_STATUS Result = ::UuidCreate(uuid);
   if (Result != RPC_S_OK)
   {
-    std::cerr << "Call to UuidCreate return a non success RPC call. " <<
+    gzerr << "Call to UuidCreate return a non success RPC call. " <<
                  "Return code: " << Result << std::endl;
   }
   char* szUuid = NULL;
@@ -232,7 +232,7 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
     physics::WorldPtr world = physics::get_world();
     if (!world)
     {
-      gzerr << "World is null" << std::endl;
+      gzerr << "Can't access world before web service POST" << std::endl;
     }
     else
     {
@@ -299,7 +299,6 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 //////////////////////////////////////////////////
 void RestWebPlugin::OnRestLoginRequest(ConstRestLoginPtr &_msg)
 {
-  gzerr << "RestWebPlugin::OnRestLoginRequest" << std::endl;
   boost::mutex::scoped_lock lock(this->requestQMutex);
   this->msgLoginQ.push_back(_msg);
 }
@@ -307,7 +306,6 @@ void RestWebPlugin::OnRestLoginRequest(ConstRestLoginPtr &_msg)
 //////////////////////////////////////////////////
 void RestWebPlugin::OnRestLogoutRequest(ConstRestLogoutPtr &/*_msg*/)
 {
-  gzerr << "RestWebPlugin::OnRestLogoutRequest" << std::endl;
   boost::mutex::scoped_lock lock(this->requestQMutex);
   this->restApi.Logout();
 }
