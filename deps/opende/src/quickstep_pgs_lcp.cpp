@@ -508,7 +508,14 @@ static void ComputeRows(
                 lo_act_erp = -hi_act_erp;
             }
             else
-                dMessage (d_ERR_UASSERT, "internal error, undefined friction model");
+            {
+              // initialize the hi and lo to get rid of warnings
+              hi_act = dInfinity;
+              lo_act = -dInfinity;
+              hi_act_erp = dInfinity;
+              lo_act_erp = -dInfinity;
+              dMessage (d_ERR_UASSERT, "internal error, undefined friction model");
+            }
         } else {
           // FOR erp throttled by info.c_v_max or info.c
           hi_act = hi[index];
