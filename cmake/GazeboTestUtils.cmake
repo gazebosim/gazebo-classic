@@ -30,18 +30,11 @@ macro (gz_build_tests)
 
 
     target_link_libraries(${BINARY_NAME}
+      # libgazebo will bring all library dependencies
+      libgazebo
+      gazebo_test_fixture
       gtest
       gtest_main
-      gazebo_test_fixture
-      gazebo_common
-      gazebo_math
-      gazebo_physics
-      gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
-      libgazebo
-      pthread
       )
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
@@ -88,16 +81,6 @@ if (VALID_DISPLAY)
       )
 
     target_link_libraries(${BINARY_NAME}
-      gazebo_gui
-      gazebo_common
-      gazebo_math
-      gazebo_physics
-      gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
-      libgazebo
-      pthread
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}
       )
