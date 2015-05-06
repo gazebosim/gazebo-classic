@@ -22,6 +22,7 @@
 #include <ode/common.h>
 #include <ode/odemath.h>
 #include <ode/rotation.h>
+#include <ode/objects.h>
 #include <ode/timer.h>
 #include <ode/error.h>
 #include <ode/matrix.h>

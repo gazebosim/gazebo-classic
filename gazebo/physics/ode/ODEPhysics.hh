@@ -225,6 +225,18 @@ namespace gazebo
       /// converted.
       public: static void ConvertMass(void *_odeMass, InertialPtr _inertial);
 
+      /// \brief Convert a string to a Friction_Model enum.
+      /// \param[in] _fricModel Friction model string.
+      /// \return A Friction_Model enum. Defaults to pyramid_friction
+      /// if _fricModel is unrecognized.
+      public: static Friction_Model ConvertFrictionModel(const std::string &_fricModel);
+
+      /// \brief Convert a Friction_Model enum to a string.
+      /// \param[in] _fricModel Friction_Model enum.
+      /// \return Friction model string. Returns "unknown" if
+      /// _fricModel is unrecognized.
+      public: static std::string ConvertFrictionModel(const Friction_Model _fricModel);
+
       /// \brief Get the step type (quick, world).
       /// \return The step type.
       public: virtual std::string GetStepType() const;

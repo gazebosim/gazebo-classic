@@ -31,6 +31,14 @@
 extern "C" {
 #endif
 
+/// \brief  Enum for Friction_Model
+/// Enum of different friction models
+enum Friction_Model {
+  pyramid_friction,
+  cone_friction,
+  box_friction
+};
+
 /**
  * @defgroup world World
  *
@@ -628,7 +636,7 @@ ODE_API void dWorldSetQuickStepExtraFrictionIterations (dWorldID, int iters);
  * @ingroup world
  * @param enum for friction model
  */
-ODE_API void dWorldSetQuickStepFrictionModel(dWorldID, int fricmodel);
+ODE_API void dWorldSetQuickStepFrictionModel(dWorldID, Friction_Model fricmodel);
 
 /* PGS experimental parameters */
 

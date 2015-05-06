@@ -545,7 +545,7 @@ dWorldID ODEPhysics::GetWorldId()
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::ConvertMass(InertialPtr _inertial, void *_engineMass)
+void ConvertMass(InertialPtr _inertial, void *_engineMass)
 {
   dMass *odeMass = static_cast<dMass*>(_engineMass);
 
@@ -556,6 +556,52 @@ void ODEPhysics::ConvertMass(InertialPtr _inertial, void *_engineMass)
       odeMass->I[0*4+2], odeMass->I[1*4+2]);
 }
 
+Friction_Model ODEPhysics::ConvertFrictionModel(const std::string &_fricModel)
+{
+  Friction_Model result = pyramid_friction;
+  if (_fricModel.compare("pyramid_model") == 0)
+      result = pyramid_friction;
+  else if (_fricModel.compare("cone_model") == 0)
+      result = cone_friction;
+  else if (_fricModel.compare("box_model") == 0)
+      result = box_friction;
+  else
+    gzerr << "Unrecognized friction model ["
+          << _fricModel
+          << "], returning pyramid friction"
+          << std::endl;
+  return result;
+}
+
+std::string ODEPhysics::ConvertFrictionModel(const Friction_Model _fricModel)
+{
+  std::string result;
+  switch (_fricModel)
+  {
+    case pyramid_friction:
+    {
+      result = "pyramid_model";
+      break;
+    }
+    case cone_friction:
+    {
+      result = "cone_model";
+      break;
+    }
+    case box_friction:
+    {
+      result = "box_model";
+      break;
+    }
+    default:
+    {
+      result = "unknown";
+      gzerr << "Unrecognized friction model [" << _fricModel << "]"
+            << std::endl;
+    }
+  }
+  return result;
+}
 //////////////////////////////////////////////////
 void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
 {
@@ -584,19 +630,11 @@ void ODEPhysics::SetSORPGSW(double _w)
 //////////////////////////////////////////////////
 void ODEPhysics::SetFrictionModel(const std::string &_fricModel)
 {
-  unsigned int fricModel = 0;
-  if (_fricModel.compare("pyramid_model") == 0)
-      fricModel = 0;
-  else if (_fricModel.compare("cone_model") == 0)
-      fricModel = 1;
-  else if (_fricModel.compare("box_model") == 0)
-      fricModel = 2;
-
   /// Uncomment this until sdformat changes (sdformat repo issue #96)
   ///
   /// this->sdf->GetElement("ode")->GetElement(
-  ///   "solver")->GetElement("friction_model")->Set(fricModel);
-  dWorldSetQuickStepFrictionModel(this->dataPtr->worldId, fricModel);
+  ///   "solver")->GetElement("friction_model")->Set(_fricModel);
+  dWorldSetQuickStepFrictionModel(this->dataPtr->worldId, ConvertFrictionModel(_fricModel));
 }
 
 //////////////////////////////////////////////////

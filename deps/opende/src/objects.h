@@ -49,12 +49,6 @@ enum {
   dxBodyGyroscopic =                256// use gyroscopic term
 };
 
-enum{
-    pyramid_friction,          // use pyramid friction model
-    cone_friction,             // use cone friction model
-    box_friction               // use box friction model
-};
-
 // base class that does correct object allocation / deallocation
 
 struct dBase {
