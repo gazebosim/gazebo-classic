@@ -1364,10 +1364,7 @@ void ModelCreator::FinishModel()
           this->serverModelName);
       // Make sure the response is correct
       if (response->response() == "nonexistent")
-      {
-        std::cerr << " non existent " << this->serverModelName << std::endl;
         break;
-      }
 
       common::Time::MSleep(100);
       timeoutCounter++;
@@ -1388,7 +1385,7 @@ void ModelCreator::CreateTheEntity()
   }
 
   msgs::Factory msg;
-/*  // Create a new name if the model exists
+  // Create a new name if the model exists
   sdf::ElementPtr modelElem = this->modelSDF->Root()->GetElement("model");
   std::string modelElemName = modelElem->Get<std::string>("name");
   if (has_entity_name(modelElemName))
@@ -1400,7 +1397,7 @@ void ModelCreator::CreateTheEntity()
         boost::lexical_cast<std::string>(i++);
     }
     modelElem->GetAttribute("name")->Set(modelElemName);
-  }*/
+  }
 
   msg.set_sdf(this->modelSDF->ToString());
   msgs::Set(msg.mutable_pose(), this->modelPose);

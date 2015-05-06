@@ -66,6 +66,18 @@
         </link>
       </model>
 
+    <joint name='joint1' type='revolute'>
+      <parent>model0::model1::link1</parent>
+      <child>model0::model2::link2</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+          <limit>
+            <lower>-1000000000000000</lower>
+            <upper>1000000000000000</upper>
+          </limit>
+        </axis>
+    </joint>
+
     </model>
 
   </world>

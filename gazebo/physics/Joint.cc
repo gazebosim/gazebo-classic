@@ -205,12 +205,51 @@ void Joint::Load(sdf::ElementPtr _sdf)
   std::string parentName = parentElem->Get<std::string>();
   std::string childName = childElem->Get<std::string>();
 
+  // Try to get links in this model, with scoped or unscoped name
   if (this->model)
   {
     this->childLink = this->model->GetLink(childName);
     this->parentLink = this->model->GetLink(parentName);
   }
 
+  // Link might not have been found because it is on another model
+  // or because model name has been changed and doesn't match scoped name
+  // First try to change the scope to use the top model
+  if (!this->childLink)
+  {
+    BasePtr parentModel = this->model;
+
+    while (parentModel && parentModel->GetParent() &&
+        parentModel->GetParent()->HasType(MODEL))
+    {
+      parentModel = parentModel->GetParent();
+    }
+
+    std::string childNameThisModel = childName.substr(childName.find("::"));
+    childNameThisModel = parentModel->GetName() + childNameThisModel;
+
+    this->childLink = boost::dynamic_pointer_cast<Link>(
+        this->GetWorld()->GetByName(childNameThisModel));
+  }
+
+  if (!this->parentLink)
+  {
+    BasePtr parentModel = this->model;
+
+    while (parentModel && parentModel->GetParent() &&
+        parentModel->GetParent()->HasType(MODEL))
+    {
+      parentModel = parentModel->GetParent();
+    }
+
+    std::string parentNameThisModel = parentName.substr(parentName.find("::"));
+    parentNameThisModel = parentModel->GetName() + parentNameThisModel;
+
+    this->parentLink = boost::dynamic_pointer_cast<Link>(
+        this->GetWorld()->GetByName(parentNameThisModel));
+  }
+
+  // Finally, try with the scoped name without changing the parent
   if (!this->childLink)
   {
     this->childLink = boost::dynamic_pointer_cast<Link>(
