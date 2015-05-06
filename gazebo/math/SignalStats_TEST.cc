@@ -255,19 +255,8 @@ TEST_F(SignalStatsTest, SignalVarianceConstructor)
 TEST_F(SignalStatsTest, SignalVarianceOneValue)
 {
   // Add one value, expect 0.0 variance
-  // Use the following when merging to gazebo5
-  // std::vector<double> values = {0, 1.0, 10.0, -100.0};
-  // for (auto value : values)
-  std::vector<double> values;
-  values.push_back(0.0);
-  values.push_back(1.0);
-  values.push_back(10.0);
-  values.push_back(-100.0);
-  // Use the following when merging to gazebo5
-  // for (auto value : values)
-  for (unsigned int i = 0; i < values.size(); ++i)
-  {
-    double value = values[i];
+  std::vector<double> values = {0, 1.0, 10.0, -100.0};
+  for (auto value : values)
     math::SignalVariance var;
     var.InsertData(value);
     EXPECT_EQ(var.Count(), 1u);
