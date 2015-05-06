@@ -1,4 +1,4 @@
-/* 
+/*
    Copyright (c) 2013 Claude Lacoursiere
 
    This software is provided 'as-is', without any express or implied
@@ -22,10 +22,10 @@
 
 reference:
    hdf5-based BPMD database: https://grasp.robotics.cs.rpi.edu/bpmd/
-*/ 
+*/
 
-
-#ifdef MBSFCLIB_HDF
+#include "gazebo/gazebo_config.h"
+#ifdef HDF5_INSTRUMENT
 
 
 #ifndef H5_IO
@@ -34,7 +34,7 @@ reference:
 #include <ode/ode.h>
 #include <unordered_map>
 class h5dump {
-  private: 
+  private:
   std::string file;           // data will be accumulated in this file
   dxWorld * world;
   dReal step_size;
@@ -50,7 +50,7 @@ class h5dump {
   int   *id;                  // body labels to match constraints
   int   *state;               // body labels to match constraints
   std::unordered_map< void*, int> tags; // tags are not guaranteed to be constant in
-  // so we need to user pointers to do that. 
+  // so we need to user pointers to do that.
 
   // data for constraints
   size_t nconstraints;          // number of constraints in current frame
@@ -61,7 +61,7 @@ class h5dump {
   dReal * bounds;               // lower bound for bounded constraints
   int *  constraint_pairs;      // pairs of bodies bound by constraints
   dReal *G;                     // The Jacobian packed in a matrix with nrows and 12 columns.  This is row major
-  bool *holonomic;              // Whether a constraint is holonomic or not. 
+  bool *holonomic;              // Whether a constraint is holonomic or not.
   const size_t ldg;             // the leading dimension for G
 
   // data for contacts
@@ -93,12 +93,12 @@ class h5dump {
   void dump_contacts();
   void dump( bool first );
 
-  public: 
-  h5dump(const std::string & filename, dxWorld *w, dReal stepsize, bool first, size_t l = 12) :  
-    file(filename), world(w), step_size(stepsize), ldg(l) { 
+  public:
+  h5dump(const std::string & filename, dxWorld *w, dReal stepsize, bool first, size_t l = 12) :
+    file(filename), world(w), step_size(stepsize), ldg(l) {
     dump( first );
   }
-}; 
+};
 
 #endif // H5_IO
-#endif // MBSFCLIB_HDF
+#endif // HDF5_INSTRUMENT

@@ -24,6 +24,11 @@
  * @update  2007 by independentCreations see independentCreations@gmail.com
  */
 
+#ifdef _WIN32
+  // Ensure that windows types like LONGLONG are defined
+  #include <windows.h>
+#endif
+
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/common/common.hh"

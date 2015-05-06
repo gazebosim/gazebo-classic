@@ -246,7 +246,7 @@ include/ode/rotation.h
 include/ode/timer.h
 )
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -DdNODEBUG -DdDOUBLE -DHAVE_CONFIG_H -DPIC -DMBSFCLIB_HDF")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -DdNODEBUG -DdDOUBLE -DHAVE_CONFIG_H -DPIC")
 
 if (SSE2_FOUND OR SSE3_FOUND OR SSSE3_FOUND OR SSE4_1_FOUND OR SSE4_2_FOUND)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSSE")
@@ -268,10 +268,13 @@ target_link_libraries(gazebo_ode
   gazebo_opcode
   gazebo_gimpact
   gazebo_opende_ou
-  hdf5_cpp
-  hdf5
   ${CCD_LIBRARIES}
   ${Boost_LIBRARIES})
+
+if (HDF5_FOUND AND HDF5_INSTRUMENT)
+  message(STATUS "HDF5 Found and Instrument enabled")
+  target_link_libraries(gazebo_ode ${HDF5_LIBRARIES})
+endif()
 
 add_dependencies(gazebo_ode gazebo_opcode gazebo_gimpact)
 add_dependencies(gazebo_ode gazebo_opende_ou)
