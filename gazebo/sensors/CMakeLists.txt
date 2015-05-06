@@ -73,7 +73,7 @@ gz_build_tests(${gtest_sources})
 
 set (TEST_DEPENDENCIES
   gazebo_sensors
-  server_fixture
+  gazebo_test_fixture
 )
 set (gtest_sources_dri
   GpuRaySensor_TEST.cc
