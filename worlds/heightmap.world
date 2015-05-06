@@ -49,7 +49,29 @@
 
 
     <model name="barrier1">
-      <pose>-148 -391 5 0 0 0</pose>
+      <pose>-239.705399 -399 5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>319.576 0.2 80.0</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>319.576 0.2 80.0</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <model name="barrier2">
+      <pose>-129 -244 5 0 0 0</pose>
       <static>true</static>
       <link name="link">
         <collision name="collision">
@@ -70,6 +92,27 @@
       </link>
     </model>
 
+    <model name="barrier3">
+      <pose>-80 -328.922394 5 0 0 1.5707</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>150 0.2 80.0</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>140 0.2 1.0</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
 
     <model name="box">
       <pose>-128 -334 0.78 0 0 3.1415</pose>

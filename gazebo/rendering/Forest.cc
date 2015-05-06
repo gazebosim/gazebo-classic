@@ -103,7 +103,7 @@ void Forest::Load()
     return;
 
   this->camera = boost::dynamic_pointer_cast<Camera>(
-      this->scene->GetOculusCamera(0));
+      this->scene->GetUserCamera(0));
 
   this->connections.push_back(event::Events::ConnectRender(
         boost::bind(&Forest::Update, this, false)));
