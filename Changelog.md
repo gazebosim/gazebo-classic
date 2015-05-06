@@ -28,11 +28,11 @@ compilation on Windows.
     * [Issue #1576](https://bitbucket.org/osrf/gazebo/issue/1576)
 
 1. Alert user of connection problems when using the REST service plugin
-    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+    * [Pull request #1655](https://bitbucket.org/osrf/gazebo/pull-request/)
     * [Issue #1574](https://bitbucket.org/osrf/gazebo/issue/1572)
 
 1. Detect uuid library during compilation.
-    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+    * [Pull request #1655](https://bitbucket.org/osrf/gazebo/pull-request/)
     * [Issue #1572](https://bitbucket.org/osrf/gazebo/issue/1572)
 
 1. New accessors in LogPlay class.
