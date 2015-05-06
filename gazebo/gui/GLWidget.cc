@@ -1074,6 +1074,8 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
     }
     g_copyAct->setEnabled(true);
 
+    std::cerr << " glwidget SetSelectedVisual " << _vis->GetName() << std::endl;
+
     msg.set_id(_vis->GetId());
     msg.set_name(_vis->GetName());
     msg.set_selected(true);
@@ -1230,6 +1232,7 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
     // Shortcircuit the case when GLWidget already selected the visual.
     if (it == this->selectedVisuals.end() || _name != (*it)->GetName())
     {
+      std::cerr << "OnSetSelectedEntity _name " << _name << std::endl;
       this->SetSelectedVisual(selection);
       this->scene->SelectVisual(name, _mode);
     }

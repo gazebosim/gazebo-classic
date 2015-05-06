@@ -1329,6 +1329,8 @@ void World::ProcessEntityMsgs()
 
   for (auto &entityName : this->dataPtr->deleteEntity)
   {
+    std::cerr << " process ent msg remove model entityName " <<
+        entityName << std::endl;
     this->RemoveModel(entityName);
   }
 
@@ -1391,6 +1393,7 @@ void World::ProcessRequestMsgs()
           std::string *serializedData = response.mutable_serialized_data();
           modelMsg.SerializeToString(serializedData);
           response.set_type(modelMsg.GetTypeName());
+              std::cerr << " entity info " << std::endl;
         }
         else if (entity->HasType(Base::LINK))
         {
