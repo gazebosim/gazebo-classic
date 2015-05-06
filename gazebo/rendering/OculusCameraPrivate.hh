@@ -18,6 +18,7 @@
 #define _GAZEBO_RENDERING_OCULUS_CAMERA_PRIVATE_HH_
 
 #include <OVR_CAPI.h>
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
