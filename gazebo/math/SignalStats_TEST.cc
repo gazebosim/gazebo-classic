@@ -257,6 +257,7 @@ TEST_F(SignalStatsTest, SignalVarianceOneValue)
   // Add one value, expect 0.0 variance
   std::vector<double> values = {0, 1.0, 10.0, -100.0};
   for (auto value : values)
+  {
     math::SignalVariance var;
     var.InsertData(value);
     EXPECT_EQ(var.Count(), 1u);
