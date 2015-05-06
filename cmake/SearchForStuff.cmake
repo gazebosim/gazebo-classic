@@ -77,6 +77,15 @@ else ()
 endif ()
 
 ########################################
+include (FindHDF5)
+find_package(HDF5)
+
+if (NOT HDF5_FOUND)
+  BUILD_WARNING("HDF5 not found")
+else ()
+  message(STATUS "HDF5 Found")
+endif ()
+########################################
 # Find packages
 
 # In Visual Studio we use configure.bat to trick all path cmake 
@@ -174,7 +183,6 @@ if (PKG_CONFIG_FOUND)
   else()
     # Needed in WIN32 since in UNIX the flag is added in the code installed
     message (STATUS "Skipping search for tinyxml")
-    add_definitions(-DTIXML_USE_STL)
     set (tinyxml_INCLUDE_DIRS "")
     set (tinyxml_LIBRARIES "")
     set (tinyxml_LIBRARY_DIRS "")
@@ -449,11 +457,12 @@ endif ()
 
 ########################################
 # Find SDFormat
-find_package(SDFormat 3.0.0)
+set (SDFormat_MIN_VERSION 3.0.3)
+find_package(SDFormat ${SDFormat_MIN_VERSION})
 
 if (NOT SDFormat_FOUND)
   message (STATUS "Looking for SDFormat - not found")
-  BUILD_ERROR ("Missing: SDF version >=3.0.0. Required for reading and writing SDF files.")
+  BUILD_ERROR ("Missing: SDF version >=${SDFormat_MIN_VERSION}. Required for reading and writing SDF files.")
 else()
   message (STATUS "Looking for SDFormat - found")
 endif()
@@ -540,6 +549,18 @@ find_program(XSLTPROC xsltproc)
 if (NOT EXISTS ${XSLTPROC})
   BUILD_WARNING("xsltproc not found. The check_test_ran.py script will cause tests to fail.")
 endif()
+
+########################################
+# Find graphviz
+include (${gazebo_cmake_dir}/FindGraphviz.cmake)
+if (NOT GRAPHVIZ_FOUND)
+  message (STATUS "Looking for libgraphviz-dev - not found")
+  BUILD_WARNING ("Graphviz not found, Model editor's schematic view will be disabled.")
+  set (HAVE_GRAPHVIZ OFF CACHE BOOL "HAVE GRAPHVIZ" FORCE)
+else ()
+  message (STATUS "Looking for libgraphviz-dev - found")
+  set (HAVE_GRAPHVIZ ON CACHE BOOL "HAVE GRAPHVIZ" FORCE)
+endif ()
 
 ########################################
 # Find QWT (QT graphing library)

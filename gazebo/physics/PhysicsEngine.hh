@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class PhysicsEngine PhysicsEngine.hh physics/physics.hh
     /// \brief Base class for a physics engine.
-    class GAZEBO_VISIBLE PhysicsEngine
+    class GZ_PHYSICS_VISIBLE PhysicsEngine
     {
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.
@@ -282,6 +282,10 @@ namespace gazebo
       /// \return Pointer to the physics mutex.
       public: boost::recursive_mutex *GetPhysicsUpdateMutex() const
               {return this->physicsUpdateMutex;}
+
+      /// \brief Get a pointer to the SDF element for this physics engine.
+      /// \return Pointer to the physics SDF element.
+      public: sdf::ElementPtr GetSDF() const;
 
       /// \brief virtual callback for gztopic "~/request".
       /// \param[in] _msg Request message.

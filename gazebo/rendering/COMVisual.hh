@@ -22,6 +22,7 @@
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class COMVisual COMVisual.hh rendering/rendering.hh
     /// \brief Basic Center of Mass visualization
-    class GAZEBO_VISIBLE COMVisual : public Visual
+    class GZ_RENDERING_VISIBLE COMVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the Visual
@@ -51,12 +52,12 @@ namespace gazebo
       /// \param[in] _msg Pointer to the message
       public: virtual void Load(ConstLinkPtr &_msg);
 
-      /// \brief Load based on a math::Pose
-      /// \param[in] _pose Pose of the COM visual.
-      /// \param[in] _radius Radius for the sphere visual.
-      /// \param[in] _box Link's bounding box.
-      private: void Load(const math::Pose &_pose,
-          double _radius = 0.01, math::Box _box = math::Box());
+      /// \brief Get inertia pose.
+      /// \return Inertia pose in link frame.
+      public: math::Pose GetInertiaPose() const;
+
+      /// \brief Load using previously set member variables.
+      private: void Load();
     };
     /// \}
   }

@@ -14,10 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap geometry
- * Author: Nate Koenig
- * Date: 12 May 2009
- */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <string.h>
 #include <math.h>
@@ -34,6 +36,7 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -102,12 +105,17 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 
   for (int i = 0; i < _msg->geometry().heightmap().texture_size(); ++i)
   {
-    this->diffuseTextures.push_back(common::find_file(
-        _msg->geometry().heightmap().texture(i).diffuse()));
-    this->normalTextures.push_back(common::find_file(
-        _msg->geometry().heightmap().texture(i).normal()));
-    this->worldSizes.push_back(
-        _msg->geometry().heightmap().texture(i).size());
+    std::string diffusePath = common::find_file(
+        _msg->geometry().heightmap().texture(i).diffuse());
+    std::string normalPath = common::find_file(
+        _msg->geometry().heightmap().texture(i).normal());
+
+    RenderEngine::Instance()->AddResourcePath(diffusePath);
+    RenderEngine::Instance()->AddResourcePath(normalPath);
+
+    this->diffuseTextures.push_back(diffusePath);
+    this->normalTextures.push_back(normalPath);
+    this->worldSizes.push_back(_msg->geometry().heightmap().texture(i).size());
   }
 
   for (int i = 0; i < _msg->geometry().heightmap().blend_size(); ++i)
@@ -971,7 +979,7 @@ GzTerrainMatGen::~GzTerrainMatGen()
 GzTerrainMatGen::SM2Profile::SM2Profile(
     Ogre::TerrainMaterialGenerator *_parent, const Ogre::String &_name,
     const Ogre::String &_desc)
-: TerrainMaterialGeneratorA::SM2Profile::SM2Profile(_parent, _name, _desc)
+: TerrainMaterialGeneratorA::SM2Profile(_parent, _name, _desc)
 {
   this->mShaderGen = NULL;
 }

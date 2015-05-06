@@ -17,7 +17,7 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/common.hh"
 

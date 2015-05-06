@@ -17,7 +17,7 @@
 
 #include <unistd.h>
 #include "gazebo/common/ModelDatabase.hh"
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 

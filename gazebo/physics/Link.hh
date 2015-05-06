@@ -21,6 +21,12 @@
 #ifndef _LINK_HH_
 #define _LINK_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <map>
 #include <vector>
 #include <string>
@@ -58,7 +64,7 @@ namespace gazebo
     /// \brief Link class defines a rigid body entity, containing
     /// information on inertia, visual and collision properties of
     /// a rigid body.
-    class GAZEBO_VISIBLE Link : public Entity
+    class GZ_PHYSICS_VISIBLE Link : public Entity
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of this link.
@@ -572,8 +578,21 @@ namespace gazebo
       /// \return true if value is in vector.
       private: bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
 
-      /// \brief Update visual SDFs.
-      private: void UpdateVisualSDF();
+      /// \brief Update visual SDF's geometry size with the new scale.
+      /// \param[in] _scale New scale applied to the visual
+      private: void UpdateVisualGeomSDF(const math::Vector3 &_scale);
+
+      /// \brief Update visual msgs.
+      private: void UpdateVisualMsg();
+
+      /// \brief Called when a new wrench message arrives. The wrench's force,
+      /// torque and force offset are described in the link frame,
+      /// \param[in] _msg The wrench message.
+      private: void OnWrenchMsg(ConstWrenchPtr &_msg);
+
+      /// \brief Process the message and add force and torque.
+      /// \param[in] _msg The message to set the wrench from.
+      private: void ProcessWrenchMsg(const msgs::Wrench &_msg);
 
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
@@ -632,6 +651,15 @@ namespace gazebo
 
       /// \brief Cached list of collisions. This is here for performance.
       private: Collision_V collisions;
+
+      /// \brief Wrench subscriber.
+      private: transport::SubscriberPtr wrenchSub;
+
+      /// \brief Vector of wrench messages to be processed.
+      private: std::vector<msgs::Wrench> wrenchMsgs;
+
+      /// \brief Mutex to protect the wrenchMsgs variable.
+      private: boost::mutex wrenchMsgMutex;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources
