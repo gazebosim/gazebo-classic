@@ -326,7 +326,7 @@ void DiagnosticTimer::InsertData(const std::string &_name,
   {
     this->stats[_name] = math::SignalStats();
     iter = this->stats.find(_name);
-    iter->second.InsertStatistics("mean,maxAbs");
+    iter->second.InsertStatistics("mean,maxAbs,var");
   }
   iter->second.InsertData(_time.Double());
 }
