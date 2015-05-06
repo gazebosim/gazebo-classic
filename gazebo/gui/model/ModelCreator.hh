@@ -344,13 +344,15 @@ namespace gazebo
       /// \brief Create a link from an SDF.
       /// \param[in] _link SDF element of the link that will be used to
       /// recreate its visual representation in the model editor.
-      private: void CreateLinkFromSDF(sdf::ElementPtr _linkElem);
+      /// return Data describing this link.
+      private: LinkData *CreateLinkFromSDF(sdf::ElementPtr _linkElem);
 
       /// \brief Create a link from an SDF with the specified parent visual.
       /// \param[in] _linkElem SDF element of the link that will be used to
       /// recreate its visual representation in the model editor.
       /// \param[in] _parentVis Parent visual that the link will be attached to.
-      private: void CreateLinkFromSDF(sdf::ElementPtr _linkElem,
+      /// return Data describing this link.
+      private: LinkData *CreateLinkFromSDF(sdf::ElementPtr _linkElem,
           rendering::VisualPtr _parentVis);
 
       /// \brief Open the link inspector.
@@ -370,7 +372,8 @@ namespace gazebo
       /// \brief Load a model SDF file and create visuals in the model editor.
       /// This is used mainly when editing existing models.
       /// \param[in] _sdf SDF of a model to be loaded
-      private: rendering::VisualPtr CreateModelFromSDF(sdf::ElementPtr _sdf,
+      /// \return Data describing the model.
+      private: NestedModelData *CreateModelFromSDF(sdf::ElementPtr _sdf,
           rendering::VisualPtr _parentVis = NULL,
           bool _attachedToMouse = false);
 
@@ -466,8 +469,11 @@ namespace gazebo
       /// \brief Type of link being added.
       private: LinkType addLinkType;
 
-      /// \brief A map of model link names to and their visuals.
+      /// \brief A map of model link names and their visuals.
       private: std::map<std::string, LinkData *> allLinks;
+
+      /// \brief A map of nested model link names and their visuals.
+      private: std::map<std::string, LinkData *> nestedLinks;
 
       /// \brief A map of nested model names to and their visuals.
       private: std::map<std::string, NestedModelData *> allNestedModels;

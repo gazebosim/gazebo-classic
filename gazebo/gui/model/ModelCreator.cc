@@ -176,10 +176,14 @@ ModelCreator::~ModelCreator()
   while (!this->allLinks.empty())
     this->RemoveLinkImpl(this->allLinks.begin()->first);
 
+  while (!this->nestedLinks.empty())
+    this->RemoveLinkImpl(this->nestedLinks.begin()->first);
+
   while (!this->allNestedModels.empty())
     this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
 
   this->allLinks.clear();
+  this->nestedLinks.clear();
   this->allNestedModels.clear();
   this->node->Fini();
   this->node.reset();
@@ -278,7 +282,8 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
       {
         if (model->GetAttribute("name")->GetAsString() == _modelName)
         {
-          rendering::VisualPtr modelVis = this->CreateModelFromSDF(model);
+          NestedModelData *modelData = this->CreateModelFromSDF(model);
+          rendering::VisualPtr modelVis = modelData->modelVisual;
 
           // Hide the model from the scene to substitute with the preview visual
           this->SetModelVisible(_modelName, false);
@@ -320,7 +325,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
 }
 
 /////////////////////////////////////////////////
-rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
+NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
     _modelElem, rendering::VisualPtr _parentVis, bool _attachedToMouse)
 {
   rendering::VisualPtr modelVisual;
@@ -354,6 +359,8 @@ rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
       this->autoDisable = _modelElem->Get<bool>("allow_auto_disable");
     gui::model::Events::modelPropertiesChanged(this->isStatic,
         this->autoDisable, this->modelPose, this->GetModelName());
+
+    modelData->modelVisual = modelVisual;
   }
   // Nested models are attached to a parent visual
   else
@@ -406,7 +413,10 @@ rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
      nestedModelElem = _modelElem->GetElement("model");
   while (nestedModelElem)
   {
-    this->CreateModelFromSDF(nestedModelElem, modelVisual);
+    NestedModelData *nestedModelData =
+        this->CreateModelFromSDF(nestedModelElem, modelVisual);
+    rendering::VisualPtr nestedModelVis = nestedModelData->modelVisual;
+    modelData->models[nestedModelVis->GetName()] = nestedModelVis;
     nestedModelElem = nestedModelElem->GetNextElement("model");
   }
 
@@ -416,7 +426,10 @@ rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
     linkElem = _modelElem->GetElement("link");
   while (linkElem)
   {
-    this->CreateLinkFromSDF(linkElem, modelVisual);
+    LinkData *linkData = this->CreateLinkFromSDF(linkElem, modelVisual);
+    rendering::VisualPtr linkVis = linkData->linkVisual;
+
+    modelData->links[linkVis->GetName()] = linkVis;
     linkElem = linkElem->GetNextElement("link");
   }
 
@@ -447,7 +460,7 @@ rendering::VisualPtr ModelCreator::CreateModelFromSDF(sdf::ElementPtr
       gui::model::Events::nestedModelInserted(nestedModelName);
   }
 
-  return modelVisual;
+  return modelData;
 }
 
 /////////////////////////////////////////////////
@@ -936,7 +949,7 @@ NestedModelData *ModelCreator::CloneNestedModel(
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem,
+LinkData *ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem,
     rendering::VisualPtr _parentVis)
 {
   LinkData *link = new LinkData();
@@ -1091,14 +1104,21 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem,
     this->allLinks[linkName] = link;
     gui::model::Events::linkInserted(linkName);
   }
+  else
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    this->nestedLinks[linkName] = link;
+  }
 
   this->ModelChanged();
+
+  return link;
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
+LinkData *ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
 {
-  this->CreateLinkFromSDF(_linkElem, this->previewVisual);
+  return this->CreateLinkFromSDF(_linkElem, this->previewVisual);
 }
 
 /////////////////////////////////////////////////
@@ -1126,6 +1146,25 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
 
   // Copy before reference is deleted.
   std::string nestedModelName(_nestedModelName);
+
+
+  // remove all its models
+  for (auto &modelIt : modelData->models)
+    this->RemoveNestedModelImpl(modelIt.first);
+
+  // remove all its links and joints
+  for (auto &linkIt : modelData->links)
+  {
+    // if it's a link
+    if (this->nestedLinks.find(linkIt.first) != this->nestedLinks.end())
+    {
+      if (this->jointMaker)
+      {
+        this->jointMaker->RemoveJointsByLink(linkIt.first);
+      }
+      this->RemoveLinkImpl(linkIt.first);
+    }
+  }
 
   rendering::ScenePtr scene = modelData->modelVisual->GetScene();
   if (scene)
@@ -1159,6 +1198,13 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
     if (this->allLinks.find(_linkName) == this->allLinks.end())
       return;
     link = this->allLinks[_linkName];
+
+    if (!link)
+    {
+      if (this->nestedLinks.find(_linkName) == this->nestedLinks.end())
+        return;
+      link = this->nestedLinks[_linkName];
+    }
   }
 
   if (!link)
@@ -1189,6 +1235,7 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allLinks.erase(linkName);
+    this->nestedLinks.erase(linkName);
     delete link;
   }
   gui::model::Events::linkRemoved(linkName);
@@ -1370,8 +1417,9 @@ void ModelCreator::AddEntity(sdf::ElementPtr _sdf)
   if (_sdf->GetName() == "model")
   {
     // Create a top-level nested model
-    rendering::VisualPtr entityVisual =
+    NestedModelData *modelData =
         this->CreateModelFromSDF(_sdf, this->previewVisual, true);
+    rendering::VisualPtr entityVisual = modelData->modelVisual;
 
     this->addLinkType = NESTED_MODEL;
     this->mouseVisual = entityVisual;

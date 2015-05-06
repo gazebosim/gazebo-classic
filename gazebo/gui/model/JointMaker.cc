@@ -239,6 +239,7 @@ void JointMaker::RemoveJointsByLink(const std::string &_linkName)
         joint->parent->GetName() == _linkName)
     {
       toDelete.push_back(it.first);
+      std::cerr << " remove nested model jjjjjoint " <<it.first << std::endl;
     }
   }
 
@@ -786,6 +787,14 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   _joint->hotspot = hotspotVisual;
   gui::model::Events::jointInserted(jointId, _joint->name,
       _joint->parent->GetName(), _joint->child->GetName());
+
+  /// for nested model
+  if (_joint->parent->GetParent() != _joint->child->GetParent())
+  {
+    gui::model::Events::jointInserted(jointId +"_nested", _joint->name,
+        _joint->parent->GetParent()->GetName(),
+        _joint->child->GetParent()->GetName());
+  }
 }
 
 /////////////////////////////////////////////////

@@ -96,9 +96,24 @@ std::string SchematicViewWidget::GetLeafName(const std::string &_scopedName)
 }
 
 /////////////////////////////////////////////////
+std::string SchematicViewWidget::GetScopedName(const std::string &_scopedName)
+{
+  if (_scopedName.empty())
+    return "";
+
+  std::string name = _scopedName;
+  size_t idx = _scopedName.find("::");
+  if (idx != std::string::npos)
+    name = _scopedName.substr(idx+2);
+  return name;
+}
+
+/////////////////////////////////////////////////
 void SchematicViewWidget::AddNode(const std::string &_node)
 {
-  std::string node = this->GetLeafName(_node);
+//  std::string node = this->GetLeafName(_node);
+  std::string node = this->GetScopedName(_node);
+  std::cerr << " add node " << node << std::endl;
 
   if (this->scene->HasNode(node))
     return;
@@ -121,7 +136,8 @@ unsigned int SchematicViewWidget::GetNodeCount() const
 /////////////////////////////////////////////////
 void SchematicViewWidget::RemoveNode(const std::string &_node)
 {
-  std::string node = this->GetLeafName(_node);
+//  std::string node = this->GetLeafName(_node);
+  std::string node = this->GetScopedName(_node);
 
   if (!this->scene->HasNode(node))
     return;
@@ -145,8 +161,12 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
     const std::string &/*_name*/, const std::string &_parent,
     const std::string &_child)
 {
-  std::string parentNode = this->GetLeafName(_parent);
-  std::string childNode = this->GetLeafName(_child);
+//  std::string parentNode = this->GetLeafName(_parent);
+//  std::string childNode = this->GetLeafName(_child);
+  std::string parentNode = this->GetScopedName(_parent);
+  std::string childNode = this->GetScopedName(_child);
+
+  std::cerr << " add edge " << parentNode << " VS " << childNode << std::endl;
 
   this->edges[_id] = std::make_pair(parentNode, childNode);
 

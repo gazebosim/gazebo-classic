@@ -91,6 +91,12 @@ namespace gazebo
       /// \return Leaf name.
       private: std::string GetLeafName(const std::string &_scopedName);
 
+      /// \brief Helper function to get the entity scopd name without the
+      ///model name prefix.
+      /// \param[in] _scopedName Scoped name.
+      /// \return Scopd name without model prefix.
+      private: std::string GetScopedName(const std::string &_scopedName);
+
       /// \brief Qt event received when the widget is being resized
       /// \param[in] _event Resize event.
       private: void resizeEvent(QResizeEvent *_event);

@@ -30,28 +30,44 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
   : QWidget(_parent),
     title(_menuTitle),
     node(new gazebo::transport::Node()),
-    dialog(this, _loginTitle, _urlLabel, _defautlUrl)
+    logoutDialog(this, _defautlUrl),
+    loginDialog(this, _loginTitle, _urlLabel, _defautlUrl)
 {
   this->node->Init();
-  this->pub = node->Advertise<gazebo::msgs::RestLogin>(
+  this->loginPub = node->Advertise<gazebo::msgs::RestLogin>(
       "/gazebo/rest/rest_login");
+  this->logoutPub = node->Advertise<gazebo::msgs::RestLogout>(
+      "/gazebo/rest/rest_logout");
   // this for a problem where the server cannot subscribe to the topic
-  this->pub->WaitForConnection();
-  this->sub = node->Subscribe("/gazebo/rest/rest_error",
+//  this->loginPub->WaitForConnection();
+  this->errorSub = node->Subscribe("/gazebo/rest/rest_error",
                               &RestUiWidget::OnResponse,
                               this);
 }
 
 /////////////////////////////////////////////////
+void RestUiWidget::Logout()
+{
+  if (this->logoutDialog.exec() != QDialog::Rejected)
+  {
+    gazebo::msgs::RestLogout msg;
+    std::string url = this->loginDialog.GetUrl();
+    msg.set_url(url);
+    gzmsg << "Loging out from: " << url << std::endl;
+    this->logoutPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
 void RestUiWidget::Login()
 {
-  if (this->dialog.exec() != QDialog::Rejected)
+  if (this->loginDialog.exec() != QDialog::Rejected)
   {
     gazebo::msgs::RestLogin msg;
-    msg.set_url(this->dialog.GetUrl());
-    msg.set_username(this->dialog.GetUsername());
-    msg.set_password(this->dialog.GetPassword());
-    this->pub->Publish(msg);
+    msg.set_url(this->loginDialog.GetUrl());
+    msg.set_username(this->loginDialog.GetUsername());
+    msg.set_password(this->loginDialog.GetPassword());
+    this->loginPub->Publish(msg);
   }
 }
 
@@ -61,7 +77,6 @@ void RestUiWidget::OnResponse(ConstRestErrorPtr &_msg)
   gzerr << "Error received:" << std::endl;
   gzerr << " type: " << _msg->type() << std::endl;
   gzerr << " msg:  " << _msg->msg() << std::endl;
-
   // add msg to queue for later processing from the GUI thread
   this->msgRespQ.push_back(_msg);
 }
@@ -72,19 +87,23 @@ void RestUiWidget::Update()
   // Login problem?
   while (!this->msgRespQ.empty())
   {
+    std::string titleStr = this->title;
     ConstRestErrorPtr msg = this->msgRespQ.front();
+    std::string msgStr = msg->msg();
     this->msgRespQ.pop_front();
     if (msg->type() == "Error")
     {
+      msgStr += "\n\nIf the server is not available, ";
+      msgStr += "logout to hide theses messages.";
       QMessageBox::critical(this,
-                            tr(this->title.c_str()),
-                            tr(msg->msg().c_str()));
+                            tr(titleStr.c_str()),
+                            tr(msgStr.c_str()));
     }
     else
     {
       QMessageBox::information(this,
-                               tr(this->title.c_str()),
-                               tr(msg->msg().c_str()));
+                               tr(titleStr.c_str()),
+                               tr(msgStr.c_str()));
     }
   }
 }

@@ -2412,6 +2412,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
   }
   else
   {
+//    std::cerr << "process visual _msg " << _msg->name() << " " << _msg->id() << std::endl;
+
     VisualPtr visual;
 
     // TODO: A bit of a hack.
@@ -2584,6 +2586,8 @@ void Scene::OnModelMsg(ConstModelPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   this->dataPtr->modelMsgs.push_back(_msg);
+
+//  std::cerr << "model msg " << _msg->DebugString() << std::endl;
 }
 
 /////////////////////////////////////////////////

@@ -27,6 +27,7 @@
 #endif
 #include <gazebo/util/system.hh>
 #include "RestUiLoginDialog.hh"
+#include "RestUiLogoutDialog.hh"
 
 namespace gazebo
 {
@@ -51,8 +52,11 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~RestUiWidget() = default;
 
-    /// \brief QT callback (from the login menu)
+     /// \brief QT callback (from the window menu)
     public slots: void Login();
+
+    /// \brief QT callback (from the window menu)
+    public slots: void Logout();
 
     /// \brief Called before rendering, from the GUI thread this is called from
     /// the plugin's update.
@@ -68,14 +72,20 @@ namespace gazebo
     /// \brief Pub/sub node to communicate with gzserver.
     private: gazebo::transport::NodePtr node;
 
+     /// \brief Login dialog.
+    private: gui::RestUiLogoutDialog logoutDialog;
+
     /// \brief Login dialog.
-    private: gui::RestUiLoginDialog dialog;
+    private: gui::RestUiLoginDialog loginDialog;
 
-    /// \brief Gazebo topics publisher
-    private: gazebo::transport::PublisherPtr pub;
+    /// \brief Gazebo login topic publisher
+    private: gazebo::transport::PublisherPtr loginPub;
 
-    /// \brief Gazebo topics subscriber.
-    private: gazebo::transport::SubscriberPtr sub;
+    /// \brief Gazebo logout topic publisher
+    private: gazebo::transport::PublisherPtr logoutPub;
+
+    /// \brief Gazebo error topic subscriber.
+    private: gazebo::transport::SubscriberPtr errorSub;
 
     /// \brief List of unprocessed error messages to be displayed from the gui
     /// thread.

@@ -331,6 +331,7 @@ void Visual::Load()
   std::string subMesh = this->GetSubMeshName();
   bool centerSubMesh = this->GetCenterSubMesh();
 
+//  std::cerr << " LOAD " << this->GetName() << std::endl;
   if (!mesh.empty())
   {
     try
@@ -580,6 +581,9 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
 
   if (!this->HasAttachedObject(_obj->getName()))
   {
+//    std::cerr << this->GetName() << " " << this->GetId() <<
+//        " attach " << _obj->getName() << std::endl;
+
     // update to use unique materials
     Ogre::Entity *entity = dynamic_cast<Ogre::Entity *>(_obj);
     if (entity)
@@ -1809,6 +1813,10 @@ std::string Visual::GetMaterialName() const
 //////////////////////////////////////////////////
 math::Box Visual::GetBoundingBox() const
 {
+/*  rendering::VisualPtr rootVis = this->GetRootVisual();
+  rootVis->GetSceneNode()->_updateBounds();
+  rootVis->GetSceneNode()->_update(true, true);*/
+
   math::Box box;
   this->GetBoundsHelper(this->GetSceneNode(), box);
   return box;
@@ -1847,6 +1855,12 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       math::Vector3 min;
       math::Vector3 max;
 
+        min = Conversions::Convert(bb.getMinimum());
+        max = Conversions::Convert(bb.getMaximum());
+//        std::cerr << "BEFORE bbox " << obj->getName() << " " <<  min << " VS " << max
+//            << " scale " << node->_getDerivedScale() << " vs " <<
+//            node->getScale() <<  std::endl;
+
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")
       {
@@ -1863,8 +1877,13 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
         // get oriented bounding box in object's local space
         bb.transformAffine(transform);
 
+
         min = Conversions::Convert(bb.getMinimum());
         max = Conversions::Convert(bb.getMaximum());
+
+//        std::cerr << "AFTER bbox " << obj->getName() << " " <<  min << " VS " << max
+//            << " scale " << node->_getDerivedScale() << " vs " <<
+//            node->getScale() <<  std::endl;
       }
 
       box.Merge(math::Box(min, max));
@@ -2173,6 +2192,8 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   /*if (msg->has_is_static() && msg->is_static())
     this->MakeStatic();
     */
+
+//  std::cerr << " UPDATE FROM MSG " << this->GetName() << std::endl;
 
   if (_msg->has_pose())
     this->SetPose(msgs::Convert(_msg->pose()));
