@@ -29,10 +29,10 @@ class Issue940Test : public ServerFixture,
                      public testing::WithParamInterface<const char*>
 {
   public: void ForceTorqueSensorFrameTest(const std::string &_physicsEngine);
-  public: void ExpectForceTorqueMeasure(const std::string & sensorName,
-                                        const Vector3 expForce,
-                                        const Vector3 expTorque,
-                                        sensors::SensorManager * mgr);
+  public: void ExpectForceTorqueMeasure(const std::string & _sensorName,
+                                        const Vector3 &_expForce,
+                                        const Vector3 &_expTorque,
+                                        sensors::SensorManager *_mgr);
 };
 
 /////////////////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  // Make sure that the sensor are correctly simulated
+  // Make sure that the sensors are correctly simulated
   world->Step(20);
 
   // Assume gravity on z axis
@@ -121,14 +121,14 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
 
 ////////////////////////////////////////////////////////////////////
 // \brief Expect force and torque measures for a force torque sensor
-void Issue940Test::ExpectForceTorqueMeasure(const std::string & sensorName,
-                                            const Vector3 expForce,
-                                            const Vector3 expTorque,
-                                            sensors::SensorManager * mgr)
+void Issue940Test::ExpectForceTorqueMeasure(const std::string & _sensorName,
+                                            const Vector3 &_expForce,
+                                            const Vector3 &_expTorque,
+                                            sensors::SensorManager *_mgr)
 {
   sensors::ForceTorqueSensorPtr sensor =
     boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
-        mgr->GetSensor(sensorName));
+        _mgr->GetSensor(_sensorName));
 
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
@@ -136,19 +136,19 @@ void Issue940Test::ExpectForceTorqueMeasure(const std::string & sensorName,
   Vector3 mesForce = sensor->GetForce();
   Vector3 mesTorque = sensor->GetTorque();
 
-  gzdbg << "sensorName: " << sensorName << std::endl;
+  gzdbg << "sensorName: " << _sensorName << std::endl;
   gzdbg << "mesForce :  " << mesForce << std::endl;
-  gzdbg << "expForce :  " << expForce << std::endl;
+  gzdbg << "expForce :  " << _expForce << std::endl;
   gzdbg << "mesTorque : " << mesTorque << std::endl;
-  gzdbg << "expTorque : " << expTorque << std::endl;
+  gzdbg << "expTorque : " << _expTorque << std::endl;
 
-  EXPECT_NEAR(expForce.x, mesForce.x, TOL_FORCES);
-  EXPECT_NEAR(expForce.y, mesForce.y, TOL_FORCES);
-  EXPECT_NEAR(expForce.z, mesForce.z, TOL_FORCES);
+  EXPECT_NEAR(_expForce.x, mesForce.x, TOL_FORCES);
+  EXPECT_NEAR(_expForce.y, mesForce.y, TOL_FORCES);
+  EXPECT_NEAR(_expForce.z, mesForce.z, TOL_FORCES);
 
-  EXPECT_NEAR(expTorque.x, mesTorque.x, TOL_TORQUES);
-  EXPECT_NEAR(expTorque.y, mesTorque.y, TOL_TORQUES);
-  EXPECT_NEAR(expTorque.z, mesTorque.z, TOL_TORQUES);
+  EXPECT_NEAR(_expTorque.x, mesTorque.x, TOL_TORQUES);
+  EXPECT_NEAR(_expTorque.y, mesTorque.y, TOL_TORQUES);
+  EXPECT_NEAR(_expTorque.z, mesTorque.z, TOL_TORQUES);
 
   EXPECT_TRUE(sensor->IsActive());
 }
