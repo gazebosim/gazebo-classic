@@ -43,6 +43,16 @@ target_link_libraries(gz
  gazebo_msgs gazebo_common gazebo_transport gazebo_gui gazebo_physics
  gazebo_physics_ode gazebo_sensors ${QT_LIBRARIES} ${Boost_LIBRARIES})
 
+if(HAVE_BULLET)
+  target_link_libraries(gz gazebo_physics_bullet)
+endif()
+if (HAVE_SIMBODY)
+  target_link_libraries(gz gazebo_physics_simbody)
+endif()
+if(HAVE_DART)
+  target_link_libraries(gz gazebo_physics_dart)
+endif()
+
 if (UNIX)
   target_link_libraries(gz pthread)
 endif()
