@@ -89,8 +89,9 @@ if (VALID_DISPLAY)
       # https://bitbucket.org/osrf/gazebo/issue/1516
       gazebo_physics
       gazebo_sensors
-      # libgazebo will bring all most of gazebo libraries as dependencies
+      # gazebo_gui and libgazebo will bring all most of gazebo libraries as dependencies
       libgazebo
+      gazebo_gui
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}
       )
