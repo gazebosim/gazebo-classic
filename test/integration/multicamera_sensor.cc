@@ -23,7 +23,7 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/sensors/MultiCameraSensor.hh"
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "scans_cmp.h"
 
 using namespace gazebo;
