@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
+#ifndef _GAZEBO_LAYERS_WIDGET_HH_
+#define _GAZEBO_LAYERS_WIDGET_HH_
 
-#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
-using namespace gazebo;
-using namespace rendering;
+namespace gazebo
+{
+  namespace gui
+  {
+    class GZ_GUI_VISIBLE LayersWidget : public QWidget
+    {
+      Q_OBJECT
+      public: LayersWidget(QWidget *_parent = 0);
+      public: virtual ~LayersWidget();
 
-event::EventT<void (const std::string &)> Events::createScene;
-event::EventT<void (const std::string &)> Events::removeScene;
-event::EventT<void (const int32_t)> Events::toggleLayer;
+      public slots: void OnLayerSelected(QListWidgetItem *_layer);
+    };
+  }
+}
+#endif

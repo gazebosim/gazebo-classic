@@ -469,6 +469,16 @@ namespace gazebo
       /// \brief Remove all projectors.
       public: void RemoveProjectors();
 
+      /// \brief Set which layer is currently being viewed. This will
+      /// process all visuals. If a visual is
+      /// on the specified layer it will be set visible, otherwise it will
+      /// become invisible.
+      /// \param[in] _layer Index of the layer to show.
+      /// \sa Visual::ViewLayer
+      public: void ViewLayer(const int32_t _layer);
+
+      public: void ToggleLayer(const int32_t _layer);
+
       /// \brief Helper function to setup the sky.
       private: void SetSky();
 
