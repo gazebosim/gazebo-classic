@@ -26,13 +26,15 @@
 
 namespace gazebo
 {
-  /// \brief A struct for storing the volume properties of a link.
+  /// \brief A class for storing the volume properties of a link.
   class VolumeProperties
   {
     /// \brief Default constructor.
     public: VolumeProperties() : volume(0) {}
+
     /// \brief Center of volume in the link frame.
     public: math::Vector3 cov;
+
     /// \brief Volume of this link.
     public: double volume;
   };
