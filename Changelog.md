@@ -25,6 +25,8 @@ compilation on Windows.
     * [Pull request #1653](https://bitbucket.org/osrf/gazebo/pull-request/1653)
     * [Pull request #1654](https://bitbucket.org/osrf/gazebo/pull-request/1654)
     * [Pull request #1657](https://bitbucket.org/osrf/gazebo/pull-request/1657)
+    * [Pull request #1658](https://bitbucket.org/osrf/gazebo/pull-request/1658)
+    * [Pull request #1659](https://bitbucket.org/osrf/gazebo/pull-request/1659)
 
 1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
     * [Pull request #1606](https://bitbucket.org/osrf/gazebo/pull-request/1606)
@@ -462,6 +464,11 @@ compilation on Windows.
     * [Pull request #1318](https://bitbucket.org/osrf/gazebo/pull-request/1318)
 
 ## Gazebo 4.0
+
+### Gazebo 4.1.3 (xxxx-xx-xx)
+
+1. Fix heightmap model texture loading.
+    * [Pull request #1595](https://bitbucket.org/osrf/gazebo/pull-request/1595)
 
 ### Gazebo 4.1.2 (2015-03-20)
 

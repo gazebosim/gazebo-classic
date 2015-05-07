@@ -13,6 +13,11 @@ import "vector3d.proto";
 
 message Visual
 {
+  message Meta
+  {
+    optional int32 layer       = 1;
+  }
+
   required string name         = 1;
   optional uint32 id           = 2; 
   required string parent_name  = 3;
@@ -29,4 +34,6 @@ message Visual
   optional bool is_static      = 13;
   optional Plugin plugin       = 14;
   optional Vector3d scale      = 15;
+
+  optional Meta meta           = 16;
 }
