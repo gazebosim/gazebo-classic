@@ -170,6 +170,9 @@ compilation on Windows.
         * [Pull request #1489](https://bitbucket.org/osrf/gazebo/pull-request/1489)
         * [Issue #1457](https://bitbucket.org/osrf/gazebo/issue/1457)
 
+    1. Moved DataLogger from Window menu to the toolbar.
+        * [Pull request #1665](https://bitbucket.org/osrf/gazebo/pull-request/1665)
+
     1. Keep loaded model's name.
         * [Pull request #1516](https://bitbucket.org/osrf/gazebo/pull-request/1516)
         * [Issue #1504](https://bitbucket.org/osrf/gazebo/issue/1504)

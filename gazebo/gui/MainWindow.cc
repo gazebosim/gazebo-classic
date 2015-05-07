@@ -1260,7 +1260,7 @@ void MainWindow::CreateActions()
   g_dataLoggerAct = new QAction(QIcon(":images/log_record.png"),
       tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
-  g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
+  g_dataLoggerAct->setStatusTip(tr("Data Logging Utility (Ctrl+D)"));
   g_dataLoggerAct->setCheckable(true);
   g_dataLoggerAct->setChecked(false);
   connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
