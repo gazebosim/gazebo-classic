@@ -82,9 +82,7 @@ namespace gazebo
       /// state.
       private slots: void OnToggleSettings(bool _checked);
 
-      /// \brief QT callback for toggling the settings visibility.
-      /// \param[in] _checked True if the record button is in the checked
-      /// state.
+      /// \brief QT callback for blinking the status message.
       private slots: void OnBlinkStatus();
 
       /// \brief QT callback for toggling the settings visibility.
@@ -129,10 +127,10 @@ namespace gazebo
       /// \brief Label to display status information.
       private: QLabel *statusLabel;
 
-      /// \brief Label to display status information.
+      /// \brief Timer used to blink the status label.
       private: QTimer *statusTimer;
 
-      /// \brief Label to display status information.
+      /// \brief Keep track of the time the status label blinks.
       private: double statusTime;
 
       /// \brief Name of the log file path
