@@ -702,7 +702,7 @@ double ODEPhysics::GetSORPGSW()
 }
 
 //////////////////////////////////////////////////
-std::string ODEPhysics::GetFrictionModel()
+std::string ODEPhysics::GetFrictionModel() const
 {
   return ConvertFrictionModel(
     dWorldGetQuickStepFrictionModel(this->dataPtr->worldId));
@@ -1414,7 +1414,7 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
   else if (_key == "extra_friction_iterations")
     _value = dWorldGetQuickStepExtraFrictionIterations(this->dataPtr->worldId);
   else if (_key == "friction_model")
-    _value = dWorldGetQuickStepFrictionModel(this->dataPtr->worldId);
+    _value = this->GetFrictionModel();
   else
   {
     return PhysicsEngine::GetParam(_key, _value);

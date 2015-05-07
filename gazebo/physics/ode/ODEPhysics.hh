@@ -182,7 +182,7 @@ namespace gazebo
       // Documentation inherited
       /// \brief get friction model
       /// \return a friction model string
-      public: virtual std::string GetFrictionModel();
+      public: virtual std::string GetFrictionModel() const;
 
       // Documentation inherited
       public: virtual double GetContactSurfaceLayer();
