@@ -545,7 +545,7 @@ dWorldID ODEPhysics::GetWorldId()
 }
 
 //////////////////////////////////////////////////
-void ConvertMass(InertialPtr _inertial, void *_engineMass)
+void ODEPhysics::ConvertMass(InertialPtr _inertial, void *_engineMass)
 {
   dMass *odeMass = static_cast<dMass*>(_engineMass);
 
