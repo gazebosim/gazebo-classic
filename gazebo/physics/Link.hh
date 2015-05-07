@@ -551,6 +551,9 @@ namespace gazebo
       /// \param[in] _scale New scale applied to the visual
       private: void UpdateVisualGeomSDF(const math::Vector3 &_scale);
 
+      /// \brief Update visual msgs.
+      private: void UpdateVisualMsg();
+
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
 
