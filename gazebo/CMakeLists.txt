@@ -75,6 +75,18 @@ target_link_libraries(gzserver
   ${TBB_LIBRARIES}
 )
 
+if (HAVE_SIMBODY)
+  target_link_libraries(gzserver gazebo_physics_simbody)
+endif()
+
+if (HAVE_DART)
+  target_link_libraries(gzserver gazebo_physics_dart)
+endif()
+
+if (HAVE_BULLET)
+  target_link_libraries(gzserver gazebo_physics_bullet)
+endif()
+
 if (UNIX)
   target_link_libraries(gzserver pthread)
 endif()
