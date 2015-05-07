@@ -85,9 +85,7 @@ namespace gazebo
       /// \brief QT callback for blinking the status message.
       private slots: void OnBlinkStatus();
 
-      /// \brief QT callback for toggling the settings visibility.
-      /// \param[in] _checked True if the record button is in the checked
-      /// state.
+      /// \brief QT callback for timing out the confirmation message.
       private slots: void OnConfirmationTimeout();
 
       /// \brief Callback for log status messages.
@@ -145,10 +143,10 @@ namespace gazebo
       // private: QListWidget *logList;
       private: QTextBrowser *logList;
 
-      /// \brief Label to display status information.
+      /// \brief Dialog that displays confirmation after saving.
       private: QDialog *confirmationDialog;
 
-      /// \brief Label to display status information.
+      /// \brief Timer used to timeout confirmation dialog.
       private: QTimer *confirmationTimer;
     };
     /// \}

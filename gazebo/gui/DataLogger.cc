@@ -234,7 +234,6 @@ DataLogger::DataLogger(QWidget *_parent)
 
   // Timer used to hide the confirmation dialog
   this->confirmationTimer = new QTimer();
-  //this->confirmationTimer->setSingleShot(true);
   connect(this->confirmationTimer, SIGNAL(timeout()), this,
       SLOT(OnConfirmationTimeout()));
 
@@ -290,8 +289,8 @@ void DataLogger::OnRecord(bool _toggle)
     this->confirmationDialog = new QDialog(this, Qt::FramelessWindowHint);
     this->confirmationDialog->setLayout(confirmationLayout);
     this->confirmationDialog->setStyleSheet(
-        "QDialog{background-color: #eee;}\
-         QLabel{color: #111;}");
+        "QDialog {background-color: #eee}\
+         QLabel {color: #111}");
     this->confirmationDialog->setModal(false);
     this->confirmationDialog->show();
     this->confirmationDialog->move(this->mapToGlobal(
